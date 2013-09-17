@@ -144,7 +144,7 @@ protected:
 private:
     PluginOutputData<NewRealTimeMultiSampleArray>::SPtr m_pRTSA_TMSI;       /**< The RealTimeSampleArray to provide the EEG data.*/
 
-    QString m_qStringResourcePath;                                          /**< the path to the ECG resource directory.*/
+    QString                         m_qStringResourcePath;                  /**< the path to the ECG resource directory.*/
 
     int                             m_iSamplingFreq;                        /**< the sampling frequency.*/
     int                             m_iNumberOfChannels;                    /**< the number of channels.*/

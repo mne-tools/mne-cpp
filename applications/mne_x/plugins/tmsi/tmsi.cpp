@@ -186,9 +186,9 @@ void TMSI::run()
     {
         //pop matrix
         matValue = m_pRawMatrixBuffer_In->pop();
-        //        std::cout << "matValue " << matValue.block(0,0,1,10) << std::endl;
+        //std::cout << "matValue " << matValue.block(0,0,1,10) << std::endl;
 
-        //emit values
+        //emit values to real time multi sample array
         for(qint32 i = 0; i < matValue.cols(); ++i)
             m_pRTSA_TMSI->data()->setValue(matValue.col(i).cast<double>());
     }

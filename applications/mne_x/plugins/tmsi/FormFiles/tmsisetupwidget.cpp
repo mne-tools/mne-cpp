@@ -65,12 +65,13 @@ using namespace TMSIPlugin;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-TMSISetupWidget::TMSISetupWidget(TMSI* simulator, QWidget* parent)
+TMSISetupWidget::TMSISetupWidget(TMSI* pTMSI, QWidget* parent)
 : QWidget(parent)
-, m_pTMSI(simulator)
+, m_pTMSI(pTMSI)
 {
     ui.setupUi(this);
 
+    //Connect properties
     connect(ui.m_spinBox_SamplingFreq, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             this, &TMSISetupWidget::setSamplingFreq);
     connect(ui.m_spinBox_NumberOfChannels, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
@@ -78,17 +79,23 @@ TMSISetupWidget::TMSISetupWidget(TMSI* simulator, QWidget* parent)
     connect(ui.m_spinBox_SamplesPerBlock, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             this, &TMSISetupWidget::setSamplesPerBlock);
 
+    //Connect start stop buttons
+    connect(ui.m_pushButton_StartAcquisition, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
+            this, &TMSISetupWidget::startAcquisition);
+    connect(ui.m_pushButton_StopAcquisition, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
+            this, &TMSISetupWidget::stopAcquisition);
 
-    QString path(m_pTMSI->m_qStringResourcePath+"data/");
-
+    //Connect about button
     connect(ui.m_qPushButton_About, &QPushButton::released, this, &TMSISetupWidget::showAboutDialog);
 
+    //Fill info box
     QFile file(m_pTMSI->m_qStringResourcePath+"readme.txt");
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
         return;
 
     QTextStream in(&file);
-    while (!in.atEnd()) {
+    while (!in.atEnd())
+    {
         QString line = in.readLine();
         ui.m_qTextBrowser_Information->insertHtml(line);
         ui.m_qTextBrowser_Information->insertHtml("<br>");
@@ -136,6 +143,23 @@ void TMSISetupWidget::setSamplesPerBlock(int value)
 {
     m_pTMSI->m_iSamplesPerBlock = value;
 }
+
+
+//*************************************************************************************************************
+
+void TMSISetupWidget::startAcquisition()
+{
+    m_pTMSI->start();
+}
+
+
+//*************************************************************************************************************
+
+void TMSISetupWidget::stopAcquisition()
+{
+    m_pTMSI->stop();
+}
+
 
 //*************************************************************************************************************
 

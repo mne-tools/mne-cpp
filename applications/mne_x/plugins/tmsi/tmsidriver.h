@@ -55,7 +55,7 @@
 #include <fstream>
 #include <string>
 #include <math.h>
-
+#include <Eigen/Core>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -64,7 +64,15 @@
 
 #include "RtDevice.h"
 #include "Feature.h"
-#include <Eigen/Core>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE TMSIPlugin
+//=============================================================================================================
+
+namespace TMSIPlugin
+{
 
 
 //*************************************************************************************************************
@@ -90,7 +98,7 @@ class TMSIProducer;
 //=============================================================================================================
 
 #define MAX_DEVICE			1	//Max number of devices supported by this driver
-#define MY_BUFFER_SIZE      10000
+#define MY_BUFFER_SIZE      0xFFFFFFFF
 
 
 //=============================================================================================================
@@ -106,7 +114,7 @@ public:
     /**
     * Constructs a TMSIDriver.
     *
-    * @param [in] TMSIProducer a pointer to the corresponding TMSI Producer class.
+    * @param [in] pTMSIProducer a pointer to the corresponding TMSI Producer class.
     */
     TMSIDriver(TMSIProducer* pTMSIProducer);
 
@@ -122,28 +130,30 @@ public:
     */
     MatrixXf getSampleMatrixValue();
 
+    //=========================================================================================================
+    /**
+    * Initialise device .
+    */
+    RTDevice *InitDevice(ULONG SampRate);
+
 protected:
     //=========================================================================================================
     /**
     * Select Device and return the device handler.
     */
-    RTDeviceEx *SelectDevice(IN BOOLEAN Present);
-
-    //=========================================================================================================
-    /**
-    * Initialise device .
-    */
-    RTDeviceEx *InitDevice(ULONG SampRate);
+    RTDevice *SelectDevice(IN BOOLEAN Present);
 
     //=========================================================================================================
     /**
     * Get the total number of channels which the device offers.
     */
-    int getTotalNumberOfChannels(RTDeviceEx *Master, int& triggerChannel);
+    int getTotalNumberOfChannels(RTDevice *Master, int& triggerChannel);
 
 private:
     TMSIProducer*     m_pTMSIProducer;            /**< A pointer to the corresponding TMSIProducer class.*/
 
 };
+
+} // NAMESPACE
 
 #endif // TMSIDRIVER_H

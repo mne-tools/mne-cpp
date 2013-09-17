@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
 * @file     tmsiproducer.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     September, 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2013, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -40,6 +41,7 @@
 
 #include "tmsiproducer.h"
 #include "tmsi.h"
+#include "tmsidriver.h"
 
 #include <QDebug>
 
@@ -59,6 +61,7 @@ using namespace TMSIPlugin;
 
 TMSIProducer::TMSIProducer(TMSI* pTMSI)
 : m_pTMSI(pTMSI)
+, m_pTMSIDriver(new TMSIDriver(this))
 , m_bIsRunning(true)
 {
 }
@@ -74,8 +77,24 @@ TMSIProducer::~TMSIProducer()
 
 //*************************************************************************************************************
 
+void TMSIProducer::start()
+{
+    //TODO: Initialise device (find, open, connect, setup buffer etc.)
+    //m_pTMSIDriver->initiliseDevice();
+
+    m_bIsRunning = true;
+
+    QThread::start();
+}
+
+
+//*************************************************************************************************************
+
 void TMSIProducer::stop()
 {
+    //TODO: Uninitialise device (close device, clear buffers etc.)
+    //m_pTMSIDriver->uninitiliseDevice();
+
     m_bIsRunning = false;
     QThread::wait();
 }
@@ -93,20 +112,16 @@ void TMSIProducer::run()
     //
     MatrixXf t_matRawBuffer;
 
-    double value;
-
     while(m_bIsRunning)
     {
         //usleep(uiSamplePeriod);
 
         //Get the TMSi EEG data out of the device buffer
-        value = 0;
+        t_matRawBuffer = m_pTMSIDriver->getSampleMatrixValue();
 
-        //TODO Get the TMSi EEG data out of the device buffer
-
-        //Write received data to
+        //Write received data to circular buffer
         m_pTMSI->m_pRawMatrixBuffer_In->push(&t_matRawBuffer);
-
-        //uiCounter = uiCounter_I + m_pTMSI->m_iDownsamplingFactor;
     }
 }
+
+

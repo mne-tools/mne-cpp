@@ -86,9 +86,9 @@ public:
     * Constructs a TMSISetupWidget which is a child of parent.
     *
     * @param [in] parent pointer to parent widget; If parent is 0, the new ECGSetupWidget becomes a window. If parent is another widget, ECGSetupWidget becomes a child window inside parent. ECGSetupWidget is deleted when its parent is deleted.
-    * @param [in] simulator a pointer to the corresponding ECGSimulator.
+    * @param [in] pTMSI a pointer to the corresponding ECGSimulator.
     */
-    TMSISetupWidget(TMSI* simulator, QWidget *parent = 0);
+    TMSISetupWidget(TMSI* pTMSI, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
@@ -126,6 +126,20 @@ private:
     *
     */
     void setSamplesPerBlock(int value);
+
+    //=========================================================================================================
+    /**
+    * Connects the device and starts the acquisition.
+    *
+    */
+    void startAcquisition();
+
+    //=========================================================================================================
+    /**
+    * Disconnects the device and stops the acquisition.
+    *
+    */
+    void stopAcquisition();
 
     //=========================================================================================================
     /**

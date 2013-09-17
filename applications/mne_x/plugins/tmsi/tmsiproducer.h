@@ -77,6 +77,7 @@ using namespace IOBuffer;
 //=============================================================================================================
 
 class TMSI;
+class TMSIDriver;
 
 
 //=============================================================================================================
@@ -88,9 +89,6 @@ class TMSI;
 class TMSIProducer : public QThread
 {
 public:
-    typedef QSharedPointer<TMSIProducer> SPtr;              /**< Shared pointer type for TMSIProducer. */
-    typedef QSharedPointer<const TMSIProducer> ConstSPtr;   /**< Const shared pointer type for TMSIProducer. */
-
     //=========================================================================================================
     /**
     * Constructs a TMSIProducer.
@@ -107,9 +105,15 @@ public:
 
     //=========================================================================================================
     /**
+    * Starts the TMSIProducer by starting the producer's thread and initialising the device.
+    */
+    virtual void start();
+
+    //=========================================================================================================
+    /**
     * Stops the TMSIProducer by stopping the producer's thread.
     */
-    void stop();
+    virtual void stop();
 
 protected:
     //=========================================================================================================
@@ -121,8 +125,10 @@ protected:
     virtual void run();
 
 private:
-    TMSI*     m_pTMSI;            /**< A pointer to the corresponding TMSI class.*/
-    bool      m_bIsRunning;       /**< Whether TMSIProducer is running.*/
+    TMSI*           m_pTMSI;            /**< A pointer to the corresponding TMSI class.*/
+    TMSIDriver*     m_pTMSIDriver;      /**< A pointer to the corresponding TMSI driver class.*/
+
+    bool            m_bIsRunning;       /**< Whether TMSIProducer is running.*/
 };
 
 } // NAMESPACE

@@ -1,4 +1,60 @@
+//=============================================================================================================
+/**
+* @file     tmsidriver.cpp
+* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+* @version  1.0
+* @date     September, 2013
+*
+* @section  LICENSE
+*
+* Copyright (C) 2013, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+* the following conditions are met:
+*     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+*       following disclaimer.
+*     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+*       the following disclaimer in the documentation and/or other materials provided with the distribution.
+*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*       to endorse or promote products derived from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+*
+* @brief    Contains the implementation of the TMSIDriver class.
+*
+*/
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
 #include "tmsidriver.h"
+#include "tmsiproducer.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace TMSIPlugin;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
 
 TMSIDriver::TMSIDriver(TMSIProducer* pTMSIProducer)
 : m_pTMSIProducer(pTMSIProducer)
@@ -11,243 +67,180 @@ TMSIDriver::~TMSIDriver()
 
 MatrixXf TMSIDriver::getSampleMatrixValue()
 {
-    char hostname[256];
-    int port;
-    int ctrlPort;
+    MatrixXf sampleValue;
 
-    int triggerChannel = -1;
-    int triggerStatus  = 0;
+//    int triggerChannel = -1;
+//    int triggerStatus  = 0;
 
-    RTDeviceEx *Master;
-    ULONG SampleRate = MAX_SAMPLE_RATE;
-    ULONG BufferSize = MAX_BUFFER_SIZE;
+//    RTDeviceEx *Master;
+//    ULONG SampleRate = MAX_SAMPLE_RATE;
+//    ULONG BufferSize = MAX_BUFFER_SIZE;
 
-    ULONG PercentFull,Overflow;
-    ULONG BytesPerSample=0;
-    ULONG BytesReturned;
-    ULONG numHwChans;
+//    ULONG PercentFull,Overflow;
+//    ULONG BytesPerSample=0;
+//    ULONG BytesReturned;
+//    ULONG numHwChans;
 
-    // Buffer for storing the samples;
-    ULONG SignalBuffer[MY_BUFFER_SIZE];
+//    // Buffer for storing the samples;
+//    ULONG SignalBuffer[MY_BUFFER_SIZE];
 
-    Master->SetSignalBuffer(&SampleRate,&BufferSize);
+//    Master=InitDevice(SampleRate);
+//    if (Master == 0)
+//    {
+//        fprintf(stderr, "Cannot initialise device\n");
+//        return sampleValue;
+//    }
+//    Master->SetSignalBuffer(&SampleRate,&BufferSize);
 
-    numHwChans = getTotalNumberOfChannels(Master, triggerChannel);
-    BytesPerSample = 4*numHwChans;
+//    numHwChans = getTotalNumberOfChannels(Master, triggerChannel);
+//    BytesPerSample = 4*numHwChans;
 
-    if( BytesPerSample == 0 ) {
-        fprintf(stderr, "Device returns no samples\n");
-        return 1;
-    }
+//    if( BytesPerSample == 0 )
+//    {
+//        fprintf(stderr, "Device returns no samples\n");
+//        return sampleValue;
+//    }
 
-    printf("Maximum sample rate   = %.3f Hz\n",(float) SampleRate / 1000.0);
-    printf("Maximum Buffer size   = %d Samples\n",(int) BufferSize);
-    printf("Number of HW channels = %d\n", (int) numHwChans);
+//    printf("Maximum sample rate   = %.3f Hz\n",(float) SampleRate / 1000.0);
+//    printf("Maximum Buffer size   = %d Samples\n",(int) BufferSize);
+//    printf("Number of HW channels = %d\n", (int) numHwChans);
 
-    BufferSize = MY_BUFFER_SIZE;
-    if (sigConf.getSampleRate() != 0.0) {
-        // override SampleRate if configured this way
-        SampleRate = (int) (sigConf.getSampleRate() * 1000.0);
-    }
+//    /* these represent the acquisition system properties */
+//    float fSample      = SampleRate/1000.0;
+//    int nBufferSamp	   = 0;
+//    int nTotalSamp	   = 0;
 
-    Master->SetSignalBuffer(&SampleRate ,&BufferSize);
+//    if (!Master->Start())
+//    {
+//        fprintf(stderr, "Unable to start the Device\n");
+//        return sampleValue;
+//    }
 
-    printf("Selected sample rate = %.3f Hz\n", (float) SampleRate / 1000.0);
-    printf("Selected Buffer size = %d Samples\n", (int) BufferSize);
+//    //Get Signal buffer information
+//    Master->GetBufferInfo(&Overflow,&PercentFull);
 
-    /* these represent the acquisition system properties */
-    float fSample      = SampleRate/1000.0;
-    int nBufferSamp	   = 0;
-    int nTotalSamp	   = 0;
+//    if (PercentFull > 0)
+//    {
+//        // If there is data available, get samples from the device
+//        // GetSamples returns the number of bytes written in the signal buffer
+//        // This will always be a multiple op BytesPerSample.
 
-    ODM = new OnlineDataManager<int32_t, float>(0, numHwChans, fSample);
+//        // Divide the result by BytesPerSamples to get the number of samples returned
+//        BytesReturned = Master->GetSamples((PULONG)SignalBuffer,sizeof(SignalBuffer));
 
-    if (!Master->Start()) {
-        fprintf(stderr, "Unable to start the Device\n");
-        return 1;
-    }
-    if (!strcmp(hostname, "-")) {
-        if (!ODM->useOwnServer(port)) {
-            fprintf(stderr, "Could not spawn buffer server on port %d.\n",port);
-            goto cleanup;
-        }
-    } else {
-        if (!ODM->connectToServer(hostname, port)) {
-            fprintf(stderr, "Could not connect to buffer server at %s:%d.\n",hostname, port);
-            goto cleanup;
-        }
-    }
+//        if (BytesReturned != 0)
+//        {
+//            //loop on the channel
+//            for(uint32 i=0; i<m_oHeader.getChannelCount(); i++)
+//            {
+//                //loop on the samples by channel
+//                for(uint32 j=0; j<l_lmin; j++)
+//                {
+//                    m_pSample[m_ui32SampleIndex+j + i*m_ui32SampleCountPerSentBlock] =(float32)((((float32)m_ulSignalBuffer[(l_ui32IndexBuffer+j)*m_ui32NbTotalChannels +i])*m_vUnitGain[i]+m_vUnitOffSet[i])*pow(10.,(double)m_vExponentChannel[i]));
+//                }
+//            }
+//        }
+//    }
+//    else
+//    {
+//        Sleep(1);
+//    }
 
-    if (!ODM->setSignalConfiguration(sigConf)) {
-        fprintf(stderr, "Could not set OnlineDataManager configuration. Did you specify more channels than the HW provides?\n");
-        goto cleanup;
-    }
-
-    ODM->enableStreaming();
-
-    printf("\nPress [Escape] to quit...\n");
-
-    while (1) {
-        if (conIn.checkKey()) {
-            int c = conIn.getKey();
-            if (c==27) break; // quit
-        }
-        // Process any incoming request on the control port
-        ctrlServ.checkRequests(*ODM);
-
-        //Get Signal buffer information
-        Master->GetBufferInfo(&Overflow,&PercentFull);
-
-        if (PercentFull > 0) {
-            // If there is data available, get samples from the device
-            // GetSamples returns the number of bytes written in the signal buffer
-            // This will always be a multiple op BytesPerSample.
-
-            // Divide the result by BytesPerSamples to get the number of samples returned
-            BytesReturned = Master->GetSamples((PULONG)SignalBuffer,sizeof(SignalBuffer));
-
-            if (BytesReturned != 0) {
-                // wprintf(L"\rSampleCounter = %8d, ,Sampwritten=%8d,Samp[%d]=%d, %d ,Buffer  = %d, Overflow = %d      " , Total /BytesPerSample ,sample, ShowChannel,SignalBuffer[ShowChannel], SignalBuffer[ShowChannel + 1],PercentFull,Overflow);
-                nBufferSamp=BytesReturned/BytesPerSample;
-                nTotalSamp+=nBufferSamp;
-
-                int32_t *data = ODM->provideBlock(nBufferSamp);
-                if (data==0) {
-                    fprintf(stderr, "Out of memory\n");
-                    break;
-                }
-                memcpy(data, SignalBuffer, nBufferSamp * BytesPerSample);
-
-                // TODO: allow for multiple trigger channels
-                if (triggerChannel >= 0) {
-                    for (int j=0;j<nBufferSamp;j++) {
-                        int trigVal = SignalBuffer[triggerChannel + j*numHwChans];
-
-                        if (trigVal != triggerStatus && trigVal != 0) {
-                            // TODO: maybe use the channel label as the event type instead of "Digi"
-                            ODM->getEventList().add(j, "Digi", trigVal);
-                        }
-                        triggerStatus = trigVal;
-                    }
-                }
-
-                ODM->handleBlock();
-            }
-        } else {
-            Sleep(1);
-        }
-    }
-
-cleanup:
-    //Stop the device
-    if (Master->Stop()) {
-        printf("Device stopped.\n");
-    } else {
-        fprintf(stderr, "Unable to stop the device!\n");
-    }
-
-    //Unchain any slave devices
-    Master->GetSlaveHandle();
-    delete ODM;
-
-    return 0;
+    return sampleValue;
 }
 
-RTDeviceEx * TMSIDriver::SelectDevice( IN BOOLEAN Present )
+RTDevice * TMSIDriver::SelectDevice( IN BOOLEAN Present )
 {
     ULONG Count = 0;
     ULONG Max = 0;
-    RTDeviceEx *Device;
+    RTDevice *Device;
 
-    Device = new RTDeviceEx;
+    Device = new RTDevice;
 
-    if( Device == NULL )
-        return NULL;
+//    if( Device == NULL )
+//        return NULL;
 
-    if( !Device->InitOk  )
-    {
-        delete Device;
-        return NULL;
-    }
+//    if( !Device->InitOk  )
+//    {
+//        delete Device;
+//        return NULL;
+//    }
 
-    PSP_DEVICE_PATH Id;
+//    PSP_DEVICE_PATH Id;
 
-    while(1)
-    {
-        TCHAR DeviceName[40] = _T("Unknown Device");
-        ULONG SerialNumber = 0;
+//    while(1)
+//    {
+//        TCHAR DeviceName[40] = _T("Unknown Device");
+//        ULONG SerialNumber = 0;
 
+//        HKEY hKey;
 
-        HKEY hKey;
+//        Id = Device->GetInstanceId( Count++ , Present , &Max );
+//        if( !Id )
+//            break;
 
-        Id = Device->GetInstanceId( Count++ , Present , &Max );
-        if( !Id ) break;
+//        hKey = Device->OpenRegistryKey( Id );
 
-        hKey = Device->OpenRegistryKey( Id );
+//        if( hKey != INVALID_HANDLE_VALUE )
+//        {
+//            ULONG Size;
 
-        if( hKey != INVALID_HANDLE_VALUE )
-        {
-            ULONG Size;
+//            Size = sizeof( SerialNumber );
+//            RegQueryValueEx( hKey , _T("DeviceSerialNumber"), NULL , NULL , (PBYTE)&SerialNumber , &Size  );
 
-            Size = sizeof( SerialNumber );
-            RegQueryValueEx( hKey , _T("DeviceSerialNumber"), NULL , NULL , (PBYTE)&SerialNumber , &Size  );
+//            Size = sizeof( DeviceName );
+//            if( RegQueryValueEx( hKey , _T("DeviceDescription"), NULL , NULL , (PBYTE)&DeviceName[0] , &Size  )
+//                == ERROR_SUCCESS )
+//            {
+//                _tprintf( "%lud . %s %lud\n" , Count , DeviceName , SerialNumber	);
+//            }
 
-            Size = sizeof( DeviceName );
-            if( RegQueryValueEx( hKey , _T("DeviceDescription"), NULL , NULL , (PBYTE)&DeviceName[0] , &Size  )
-                == ERROR_SUCCESS )
-            {
-                _tprintf( "%lud . %s %lud\n" , Count , DeviceName , SerialNumber	);
-            }
+//            RegCloseKey( hKey );
+//        }
 
-            RegCloseKey( hKey );
-        }
+//        Device->Free( Id );
+//    }
 
-        Device->Free( Id );
-    }
+//    if( Max == 0 )
+//    {
+//        printf("There are no device connected to the PC\n");
+//        return NULL;
+//    }
 
-    if( Max == 0 )
-    {
-        printf("There are no device connected to the PC\n");
-        return NULL;
-    }
+//    if( Max == 1 )
+//    {
+//        Id = Device->GetInstanceId( 0 , Present );
+//    }
+//    else
+//    {
+//        printf("Please select device ...\n\n");
+//        while( _kbhit() ){}
+//        while( !_kbhit() ){}
+//        int key = _getch() - '0';
+//        Id = Device->GetInstanceId( key - 1 , Present );
+//    }
 
-    if( Max == 1 )
-    {
-        Id = Device->GetInstanceId( 0 , Present );
-    }
-    else
-    {
-        printf("Please select device ...\n\n");
-        while( _kbhit() ){}
-        while( !_kbhit() ){}
-        int key = _getch() - '0';
-        Id = Device->GetInstanceId( key - 1 , Present );
-    }
-
-    if( !Device->Open( Id ) )
-    {
-        Device->Free( Id );
-        delete Device;
-        return NULL;
-    }
+//    if( !Device->Open( Id ) )
+//    {
+//        Device->Free( Id );
+//        delete Device;
+//        return NULL;
+//    }
 
     return Device;
 }
 
-RTDeviceEx * TMSIDriver::InitDevice( ULONG SampRate)
+RTDevice * TMSIDriver::InitDevice( ULONG SampRate)
 {
     ULONG Index;
 
-    RTDeviceEx *Device[MAX_DEVICE];
+    RTDevice *Device[MAX_DEVICE];
     for(Index=0;Index < MAX_DEVICE;Index++)
         Device[Index] = NULL;
 
-    RTDeviceEx *MasterL;
+    RTDevice *MasterL;
 
-    if( USE_MASTER_SLAVE )
-        UseMasterSlave( Device , MAX_DEVICE );
-    else
-        Device[0] = SelectDevice( TRUE );
+    Device[0] = SelectDevice( TRUE );
 
     MasterL = Device[0];
 
@@ -262,13 +255,14 @@ RTDeviceEx * TMSIDriver::InitDevice( ULONG SampRate)
     return MasterL;
 }
 
-int TMSIDriver::getTotalNumberOfChannels(RTDeviceEx *Master, int& triggerChannel)
+int TMSIDriver::getTotalNumberOfChannels(RTDevice *Master, int& triggerChannel)
 {
     int numChan;
     PSIGNAL_FORMAT psf;
 
     psf = Master->GetSignalFormat(NULL);
-    if (psf == NULL) return 0;
+    if (psf == NULL)
+        return 0;
 
     // printf("%i x %i\n", (int) psf[0].Size, (int) psf[0].Elements);
     numChan = psf[0].Elements;
@@ -282,7 +276,8 @@ int TMSIDriver::getTotalNumberOfChannels(RTDeviceEx *Master, int& triggerChannel
 
         // the documentation gives 0x13 for the type, but at least
         // for the Porti we need a "4".
-        if (psf[i].Type == 4) triggerChannel = i;
+        if (psf[i].Type == 4)
+            triggerChannel = i;
     }
     // do we need to free this? or did we get static memory?
     // LocalFree(psf);
