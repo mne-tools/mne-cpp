@@ -161,37 +161,25 @@ PFREE m_oFpFree;
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Handler, buffer defines
+// Handler, buffer declarations
 //=============================================================================================================
 
-//Device Handle Master
+//Device handle Master
 HANDLE m_HandleMaster;
 
 //Lib handle
 HINSTANCE m_oLibHandle;
 
-//Buffer for storing the samples
-ULONG *m_ulSignalBuffer;
-LONG *m_lSignalBuffer;
-bool m_bSignalBufferUnsigned;
-ULONG m_ulSampleRate ;
-ULONG m_ulBufferSize ;
+//device info
+TCHAR m_cDevicePathAndSerialNumber[1024]; //m_vDevicePathMap contains the connected devicePath
 
-//device
-char m_cDevicePath[1024]; //m_vDevicePathMap contains all connected devicePath and their name
-string m_pDevicePathMaster; //the name of the Master devicePath chosen
-vector <string> m_vDevicePathSlave; //a list with the name of the Slave devicePath chosen
-ULONG m_lNrOfDevicesConnected; // Number of devices on this PC
-ULONG m_lNrOfDevicesOpen; //total of Master/slaves device open
+//signal info
+uint m_iNumberOfAvailableChannels;
 
 //store value for calculating the data
-vector <LONG> m_vExponentChannel;
+vector <LONG>  m_vExponentChannel;
 vector <FLOAT> m_vUnitGain;
 vector <FLOAT> m_vUnitOffSet;
-
-//number of channels
-ULONG m_ui32NbTotalChannels;
-uint m_ui32BufferSize;
 
 
 //*************************************************************************************************************
@@ -202,7 +190,7 @@ uint m_ui32BufferSize;
 #define __load_dll_func__(var, type, name) \
     var = (type)::GetProcAddress(m_oLibHandle, name); \
     if(!var) \
-        cout<< "Error loading method " << name << "\n"; \
+        cout<< "Plugin TMSI - Error loading method " << name << "\n"; \
 
 
 //*************************************************************************************************************
@@ -214,7 +202,7 @@ TMSIDriver::TMSIDriver(TMSIProducer* pTMSIProducer)
 : m_pTMSIProducer(pTMSIProducer)
 , m_iNumberOfChannels(32)
 , m_iSamplingFrequency(512)
-, m_iSamplesPerblock(32)
+, m_iSamplesPerBlock(32)
 {
     //Open library
     m_oLibHandle = ::LoadLibrary(L"C:\\Windows\\System32\\RTINST.DLL");
@@ -222,7 +210,7 @@ TMSIDriver::TMSIDriver(TMSIProducer* pTMSIProducer)
     //if it can't be open return FALSE;
     if( m_oLibHandle == NULL)
     {
-        cout << "Couldn't load DLL in 'C:\\Windows\\System32\\RTINST.DLL' - Is the USB Fiber Connector driver installed?" << endl;
+        cout << "Plugin TMSI - Couldn't load DLL in 'C:\\Windows\\System32\\RTINST.DLL' - Is the driver for the TMSi USB Fiber Connector installed?" << endl;
         return;
     }
 
@@ -245,7 +233,7 @@ TMSIDriver::TMSIDriver(TMSIProducer* pTMSIProducer)
     __load_dll_func__(m_oFpOpenRegKey, POPENREGKEY, "OpenRegKey" );
     __load_dll_func__(m_oFpFree, PFREE, "Free" );
 
-    cout << "Successfully loaded all DLL functions" << endl;
+    cout << "Plugin TMSI - Successfully loaded all DLL functions" << endl;
 }
 
 
@@ -268,7 +256,7 @@ MatrixXf TMSIDriver::getSampleMatrixValue()
 
 //*************************************************************************************************************
 
-void TMSIDriver::InitDevice()
+bool TMSIDriver::InitDevice()
 {
     //Get the device path connected
     ULONG maxDevices = 0;
@@ -280,25 +268,93 @@ void TMSIDriver::InitDevice()
 
     if(hKey != INVALID_HANDLE_VALUE)
     {
-        ULONG sizeSerial;
-        ULONG sizeDesc;
-
-        TCHAR deviceName[] = _T("Unknown Device");
         ULONG serialNumber = 0;
+        char deviceNameTemp[80] = "Unknown Device";
+        string deviceName = deviceNameTemp;
 
         //get the serial number of the device
-        sizeSerial = sizeof(serialNumber);
-        ::RegQueryValueEx(hKey, "DeviceSerialNumber", NULL, NULL, (PBYTE)&serialNumber, &sizeSerial);
+        DWORD sizeSerial = sizeof(serialNumber);
+        ::RegQueryValueEx(hKey, L"DeviceSerialNumber", NULL, NULL, (PBYTE)&serialNumber, &sizeSerial);
 
         //get the name of the device
-        sizeDesc = sizeof( deviceName );
-        ::RegQueryValueEx(hKey , "DeviceDescription", NULL, NULL, (PBYTE)&deviceName[0], &sizeDesc);
-        ::sprintf(m_cDevicePath, "%s %d", deviceName, serialNumber);
-        ::RegCloseKey(hKey);
+        DWORD sizeDesc = sizeof(deviceName);
+        ::RegQueryValueEx(hKey, L"DeviceDescription", NULL, NULL, (PBYTE)&deviceName, &sizeDesc);
 
-        cout<<"Found device: "<< *m_cDevicePath <<endl;
+        //TODO: Get rid of \0 escape sequences in the char. Why is RegQueryValueEx() adding \0's?
+        //        TCHAR deviceNameTemp[80];
+
+        //        for(int i=0; i<79; i++)
+        //        {
+        //            if(&deviceName[i]=="\0")
+        //                cout<<i<<endl;
+        //        }
+
+        ::_tprintf(m_cDevicePathAndSerialNumber, "%s %d", deviceName, serialNumber);
+
+        cout << "Plugin TMSI - Found device " << m_cDevicePathAndSerialNumber << endl;
+
+        ::RegCloseKey(hKey);
+    }
+    else
+    {
+        cout << "Plugin TMSI - Invalid registry handle" << endl;
+        return false;
     }
 
+    //Check if a Refa device is connected
+    if(maxDevices==0)
+    {
+        cout << "Plugin TMSI - There was no connected device found" << endl;
+        return false;
+    }
+
+    //Open master device
+    m_HandleMaster = m_oFpOpen(device);
+    if(!m_HandleMaster)
+    {
+        cout << "Plugin TMSI - Failed to open connected device" << endl;
+        return false;
+    }
+
+    //Initialise and set up the signal buffer
+    ULONG iSampleRate = m_iSamplingFrequency*1000; //Times 1000 because the driver works in millihertz
+    ULONG iBufferSize = MAX_BUFFER_SIZE;
+    if(!m_oFpSetSignalBuffer(m_HandleMaster, &iSampleRate, &iBufferSize))
+    {
+        cout << "Plugin TMSI - Failed to allocate signal buffer" << endl;
+        return false;
+    }
+
+    //Start the sampling process
+    bool start = m_oFpStart(m_HandleMaster);
+    if(!start)
+    {
+        cout << "Plugin TMSI - Failed to start the sampling procedure" << endl;
+        return false;
+    }
+
+    //Get information about the signal format created by the device - UnitExponent, UnitGain, UnitOffSet
+    PSIGNAL_FORMAT pSignalFormat = m_oFpGetSignalFormat(m_HandleMaster, NULL);
+
+    if(pSignalFormat != NULL)
+    {
+        cout << "Plugin TMSI - Master device name: " << (char*)pSignalFormat[0].PortName << endl;
+        cout << "Plugin TMSI - Number of available channels: " << (uint)pSignalFormat[0].Elements << endl;
+        m_iNumberOfAvailableChannels = pSignalFormat[0].Elements;
+
+        for(uint i = 0 ; i < m_iNumberOfAvailableChannels; i++ )
+        {
+            m_vExponentChannel.push_back(pSignalFormat[i].UnitExponent+6/*changed measure unit in V*/);
+            m_vUnitGain.push_back(pSignalFormat[i].UnitGain);
+            m_vUnitOffSet.push_back(pSignalFormat[i].UnitOffSet);
+        }
+    }
+
+    //Create the signal buffer which we want to write to
+
+
+    cout << "Plugin TMSI - The device has been connected and initialised successfully" << endl;
+    return true;
 }
 
 

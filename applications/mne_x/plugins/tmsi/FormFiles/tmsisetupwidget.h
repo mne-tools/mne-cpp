@@ -129,17 +129,10 @@ private:
 
     //=========================================================================================================
     /**
-    * Connects the device and starts the acquisition.
+    * Connects the device and starts or stops the acquisition.
     *
     */
-    void startAcquisition();
-
-    //=========================================================================================================
-    /**
-    * Disconnects the device and stops the acquisition.
-    *
-    */
-    void stopAcquisition();
+    void startStopAcquisition();
 
     //=========================================================================================================
     /**
@@ -149,9 +142,10 @@ private:
     void showAboutDialog();
 
 
-    TMSI*           m_pTMSI;    /**< a pointer to corresponding TMSI.*/
+    bool            m_bAcquisitionIsRunning;
+    TMSI*           m_pTMSI;                    /**< a pointer to corresponding TMSI.*/
 
-    Ui::TMSISetupClass ui;                       /**< the user interface for the TMSISetupWidget.*/
+    Ui::TMSISetupClass ui;                      /**< the user interface for the TMSISetupWidget.*/
 };
 
 } // NAMESPACE
