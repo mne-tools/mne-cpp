@@ -53,234 +53,255 @@ using namespace TMSIPlugin;
 
 //*************************************************************************************************************
 //=============================================================================================================
+// Structure Typedefs - structure define as used in the RTINST.DLL
+//=============================================================================================================
+
+typedef struct _SP_DEVICE_PATH
+{
+    DWORD  dwCbSize;
+    TCHAR  devicePath[1];
+} SP_DEVICE_PATH, *PSP_DEVICE_PATH;
+
+typedef struct _FeatureData
+{
+    ULONG FeatureId;
+    ULONG Info;
+} FEATURE_DATA, *PFEATURE_DATA;
+
+typedef struct _SYSTEM_TIME
+{
+    WORD wYear;
+    WORD wMonth;
+    WORD wDayOfWeek;
+    WORD wDay;
+    WORD wHour;
+    WORD wMinute;
+    WORD wSecond;
+    WORD wMilliseconds;
+} SYSTEM_TIME;
+
+typedef struct _SIGNAL_FORMAT
+{
+    ULONG Size;      // Size of this structure
+    ULONG Elements;  // Number of elements in list
+
+    ULONG Type;      // One of the signal types above
+    ULONG SubType;   // One of the signal sub-types above
+    ULONG Format;    // Float / Integer / Asci / Ect..
+    ULONG Bytes;     // Number of bytes per sample including subsignals
+
+    FLOAT UnitGain;
+    FLOAT UnitOffSet;
+    ULONG UnitId;
+    LONG UnitExponent;
+
+    WCHAR Name[40];
+
+    ULONG Port;
+    WCHAR PortName[40];
+    ULONG SerialNumber;
+} SIGNAL_FORMAT, *PSIGNAL_FORMAT;
+
+typedef struct _FeatureMemory{
+    FEATURE_DATA Feature;
+    ULONG Data[1];
+}FEATURE_MEMORY, *PFEATURE_MEMORY;
+
+typedef struct _FeatureMode{
+    FEATURE_DATA Feature;
+    ULONG Mode;
+}FEATURE_MODE,*PFEATURE_MODE;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Method Typedefs - method defines as used in the RTINST.DLL
+//=============================================================================================================
+
+typedef HANDLE          ( __stdcall * POPEN)            (PSP_DEVICE_PATH DevicePath);
+typedef BOOL            ( __stdcall * PCLOSE)           (HANDLE hHandle);
+typedef ULONG           ( __stdcall * PGETDEVICESTATE)  (IN HANDLE Handle);
+typedef BOOLEAN         ( __stdcall * PSTART)           (IN HANDLE Handle);
+typedef BOOLEAN         ( __stdcall * PRESETDEVICE)     (IN HANDLE Handle);
+typedef BOOLEAN         ( __stdcall * PSTOP)            (IN HANDLE Handle);
+typedef HANDLE          ( __stdcall * PGETSLAVEHANDLE)  (IN HANDLE Handle);
+typedef BOOLEAN         ( __stdcall * PADDSLAVE)        (IN HANDLE Handle, IN HANDLE SlaveHandle);
+typedef PSIGNAL_FORMAT  ( __stdcall * PGETSIGNALFORMAT) (IN HANDLE Handle, IN OUT PSIGNAL_FORMAT pSignalFormat);
+typedef BOOLEAN         ( __stdcall * PSETSIGNALBUFFER) (IN HANDLE Handle, IN OUT PULONG SampleRate, IN OUT PULONG BufferSize);
+typedef ULONG           ( __stdcall * PGETSAMPLES)      (IN HANDLE Handle, OUT PULONG SampleBuffer, IN ULONG Size);
+typedef BOOLEAN         ( __stdcall * PGETBUFFERINFO)   (IN HANDLE Handle, OUT PULONG Overflow, OUT PULONG PercentFull);
+typedef BOOLEAN         ( __stdcall * PDEVICEFEATURE)   (IN HANDLE Handle, IN LPVOID DataIn, IN DWORD InSize, OUT LPVOID DataOut, IN DWORD OutSize);
+typedef PSP_DEVICE_PATH ( __stdcall * PGETINSTANCEID)   (IN LONG DeviceIndex, IN BOOLEAN Present, OUT ULONG  *MaxDevices );
+typedef HKEY            ( __stdcall * POPENREGKEY)      (IN PSP_DEVICE_PATH Path );
+typedef BOOL            ( __stdcall * PFREE)            (IN VOID *Memory);
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Variables used for loading the RTINST.DLL methods
+//=============================================================================================================
+
+POPEN m_oFpOpen;
+PCLOSE m_oFpClose;
+PGETDEVICESTATE m_oFpGetDeviceState;
+PSTART m_oFpStart;
+PRESETDEVICE m_oFpReset;
+PSTOP m_oFpStop;
+PGETSLAVEHANDLE m_oFpGetSlaveHandle;
+PADDSLAVE m_oFpAddSlave;
+PGETSIGNALFORMAT m_oFpGetSignalFormat;
+PSETSIGNALBUFFER m_oFpSetSignalBuffer;
+PGETSAMPLES m_oFpGetSamples;
+PGETBUFFERINFO m_oFpGetBufferInfo;
+PDEVICEFEATURE m_oFpDeviceFeature;
+PGETINSTANCEID m_oFpGetInstanceId;
+POPENREGKEY m_oFpOpenRegKey;
+PFREE m_oFpFree;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Handler, buffer defines
+//=============================================================================================================
+
+//Device Handle Master
+HANDLE m_HandleMaster;
+
+//Lib handle
+HINSTANCE m_oLibHandle;
+
+//Buffer for storing the samples
+ULONG *m_ulSignalBuffer;
+LONG *m_lSignalBuffer;
+bool m_bSignalBufferUnsigned;
+ULONG m_ulSampleRate ;
+ULONG m_ulBufferSize ;
+
+//device
+char m_cDevicePath[1024]; //m_vDevicePathMap contains all connected devicePath and their name
+string m_pDevicePathMaster; //the name of the Master devicePath chosen
+vector <string> m_vDevicePathSlave; //a list with the name of the Slave devicePath chosen
+ULONG m_lNrOfDevicesConnected; // Number of devices on this PC
+ULONG m_lNrOfDevicesOpen; //total of Master/slaves device open
+
+//store value for calculating the data
+vector <LONG> m_vExponentChannel;
+vector <FLOAT> m_vUnitGain;
+vector <FLOAT> m_vUnitOffSet;
+
+//number of channels
+ULONG m_ui32NbTotalChannels;
+uint m_ui32BufferSize;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DLL Function loader define
+//=============================================================================================================
+
+#define __load_dll_func__(var, type, name) \
+    var = (type)::GetProcAddress(m_oLibHandle, name); \
+    if(!var) \
+        cout<< "Error loading method " << name << "\n"; \
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
 TMSIDriver::TMSIDriver(TMSIProducer* pTMSIProducer)
 : m_pTMSIProducer(pTMSIProducer)
+, m_iNumberOfChannels(32)
+, m_iSamplingFrequency(512)
+, m_iSamplesPerblock(32)
 {
+    //Open library
+    m_oLibHandle = ::LoadLibrary(L"C:\\Windows\\System32\\RTINST.DLL");
+
+    //if it can't be open return FALSE;
+    if( m_oLibHandle == NULL)
+    {
+        cout << "Couldn't load DLL in 'C:\\Windows\\System32\\RTINST.DLL' - Is the USB Fiber Connector driver installed?" << endl;
+        return;
+    }
+
+    //Load DLL methods for initializing the driver
+    __load_dll_func__(m_oFpOpen, POPEN, "Open");
+    __load_dll_func__(m_oFpClose, PCLOSE, "Close");
+    __load_dll_func__(m_oFpGetDeviceState, PGETDEVICESTATE, "GetDeviceState");
+    __load_dll_func__(m_oFpStart, PSTART, "Start");
+    __load_dll_func__(m_oFpReset, PRESETDEVICE, "ResetDevice");
+    __load_dll_func__(m_oFpStop, PSTOP, "Stop");
+    __load_dll_func__(m_oFpGetSlaveHandle, PGETSLAVEHANDLE, "GetSlaveHandle");
+    __load_dll_func__(m_oFpAddSlave, PADDSLAVE, "AddSlave");
+    __load_dll_func__(m_oFpGetSignalFormat, PGETSIGNALFORMAT, "GetSignalFormat");
+    __load_dll_func__(m_oFpSetSignalBuffer, PSETSIGNALBUFFER, "SetSignalBuffer");
+    __load_dll_func__(m_oFpGetSamples, PGETSAMPLES, "GetSamples");
+    __load_dll_func__(m_oFpGetBufferInfo, PGETBUFFERINFO, "GetBufferInfo");
+    __load_dll_func__(m_oFpDeviceFeature, PDEVICEFEATURE, "DeviceFeature");
+
+    __load_dll_func__(m_oFpGetInstanceId, PGETINSTANCEID, "GetInstanceId" );
+    __load_dll_func__(m_oFpOpenRegKey, POPENREGKEY, "OpenRegKey" );
+    __load_dll_func__(m_oFpFree, PFREE, "Free" );
+
+    cout << "Successfully loaded all DLL functions" << endl;
 }
+
+
+//*************************************************************************************************************
 
 TMSIDriver::~TMSIDriver()
 {
 }
 
+
+//*************************************************************************************************************
+
 MatrixXf TMSIDriver::getSampleMatrixValue()
 {
     MatrixXf sampleValue;
 
-    int triggerChannel = -1;
-    int triggerStatus  = 0;
-
-    RTDeviceEx *Master;
-    ULONG SampleRate = MAX_SAMPLE_RATE;
-    ULONG BufferSize = MAX_BUFFER_SIZE;
-
-    ULONG PercentFull,Overflow;
-    ULONG BytesPerSample=0;
-    ULONG BytesReturned;
-    ULONG numHwChans;
-
-    // Buffer for storing the samples;
-    ULONG SignalBuffer[MY_BUFFER_SIZE];
-
-    Master=InitDevice(SampleRate);
-    if (Master == 0)
-    {
-        fprintf(stderr, "Cannot initialise device\n");
-        return sampleValue;
-    }
-    Master->SetSignalBuffer(&SampleRate,&BufferSize);
-
-    numHwChans = getTotalNumberOfChannels(Master, triggerChannel);
-    BytesPerSample = 4*numHwChans;
-
-    if( BytesPerSample == 0 )
-    {
-        fprintf(stderr, "Device returns no samples\n");
-        return sampleValue;
-    }
-
-    printf("Maximum sample rate   = %.3f Hz\n",(float) SampleRate / 1000.0);
-    printf("Maximum Buffer size   = %d Samples\n",(int) BufferSize);
-    printf("Number of HW channels = %d\n", (int) numHwChans);
-
-    /* these represent the acquisition system properties */
-    float fSample      = SampleRate/1000.0;
-    int nBufferSamp	   = 0;
-    int nTotalSamp	   = 0;
-
-    if (!Master->Start())
-    {
-        fprintf(stderr, "Unable to start the Device\n");
-        return sampleValue;
-    }
-
-    //Get Signal buffer information
-    Master->GetBufferInfo(&Overflow,&PercentFull);
-
-    if (PercentFull > 0)
-    {
-        // If there is data available, get samples from the device
-        // GetSamples returns the number of bytes written in the signal buffer
-        // This will always be a multiple op BytesPerSample.
-
-        // Divide the result by BytesPerSamples to get the number of samples returned
-        BytesReturned = Master->GetSamples((PULONG)SignalBuffer,sizeof(SignalBuffer));
-
-        if (BytesReturned != 0)
-        {
-            //loop on the channel
-            for(uint32 i=0; i<m_oHeader.getChannelCount(); i++)
-            {
-                //loop on the samples by channel
-                for(uint32 j=0; j<l_lmin; j++)
-                {
-                    m_pSample[m_ui32SampleIndex+j + i*m_ui32SampleCountPerSentBlock] =(float32)((((float32)m_ulSignalBuffer[(l_ui32IndexBuffer+j)*m_ui32NbTotalChannels +i])*m_vUnitGain[i]+m_vUnitOffSet[i])*pow(10.,(double)m_vExponentChannel[i]));
-                }
-            }
-        }
-    }
-    else
-    {
-        Sleep(1);
-    }
-
     return sampleValue;
 }
 
-RTDevice * TMSIDriver::SelectDevice( IN BOOLEAN Present )
+
+//*************************************************************************************************************
+
+void TMSIDriver::InitDevice()
 {
-    ULONG Count = 0;
-    ULONG Max = 0;
-    RTDevice *Device;
+    //Get the device path connected
+    ULONG maxDevices = 0;
 
-    Device = new RTDevice;
+    PSP_DEVICE_PATH device = m_oFpGetInstanceId(0 , TRUE, &maxDevices);
 
-//    if( Device == NULL )
-//        return NULL;
+    // get the name corresponding to this device
+    HKEY hKey = m_oFpOpenRegKey(device);
 
-//    if( !Device->InitOk  )
-//    {
-//        delete Device;
-//        return NULL;
-//    }
-
-//    PSP_DEVICE_PATH Id;
-
-//    while(1)
-//    {
-//        TCHAR DeviceName[40] = _T("Unknown Device");
-//        ULONG SerialNumber = 0;
-
-//        HKEY hKey;
-
-//        Id = Device->GetInstanceId( Count++ , Present , &Max );
-//        if( !Id )
-//            break;
-
-//        hKey = Device->OpenRegistryKey( Id );
-
-//        if( hKey != INVALID_HANDLE_VALUE )
-//        {
-//            ULONG Size;
-
-//            Size = sizeof( SerialNumber );
-//            RegQueryValueEx( hKey , _T("DeviceSerialNumber"), NULL , NULL , (PBYTE)&SerialNumber , &Size  );
-
-//            Size = sizeof( DeviceName );
-//            if( RegQueryValueEx( hKey , _T("DeviceDescription"), NULL , NULL , (PBYTE)&DeviceName[0] , &Size  )
-//                == ERROR_SUCCESS )
-//            {
-//                _tprintf( "%lud . %s %lud\n" , Count , DeviceName , SerialNumber	);
-//            }
-
-//            RegCloseKey( hKey );
-//        }
-
-//        Device->Free( Id );
-//    }
-
-//    if( Max == 0 )
-//    {
-//        printf("There are no device connected to the PC\n");
-//        return NULL;
-//    }
-
-//    if( Max == 1 )
-//    {
-//        Id = Device->GetInstanceId( 0 , Present );
-//    }
-//    else
-//    {
-//        printf("Please select device ...\n\n");
-//        while( _kbhit() ){}
-//        while( !_kbhit() ){}
-//        int key = _getch() - '0';
-//        Id = Device->GetInstanceId( key - 1 , Present );
-//    }
-
-//    if( !Device->Open( Id ) )
-//    {
-//        Device->Free( Id );
-//        delete Device;
-//        return NULL;
-//    }
-
-    return Device;
-}
-
-RTDevice * TMSIDriver::InitDevice( ULONG SampRate)
-{
-    ULONG Index;
-
-    RTDevice *Device[MAX_DEVICE];
-    for(Index=0;Index < MAX_DEVICE;Index++)
-        Device[Index] = NULL;
-
-    RTDevice *MasterL;
-
-    Device[0] = SelectDevice( TRUE );
-
-    MasterL = Device[0];
-
-    if( MasterL == NULL )
+    if(hKey != INVALID_HANDLE_VALUE)
     {
-        _getch();
-        return 0;
+        ULONG sizeSerial;
+        ULONG sizeDesc;
+
+        TCHAR deviceName[] = _T("Unknown Device");
+        ULONG serialNumber = 0;
+
+        //get the serial number of the device
+        sizeSerial = sizeof(serialNumber);
+        ::RegQueryValueEx(hKey, "DeviceSerialNumber", NULL, NULL, (PBYTE)&serialNumber, &sizeSerial);
+
+        //get the name of the device
+        sizeDesc = sizeof( deviceName );
+        ::RegQueryValueEx(hKey , "DeviceDescription", NULL, NULL, (PBYTE)&deviceName[0], &sizeDesc);
+        ::sprintf(m_cDevicePath, "%s %d", deviceName, serialNumber);
+        ::RegCloseKey(hKey);
+
+        cout<<"Found device: "<< *m_cDevicePath <<endl;
     }
 
-    MasterL->Reset();
-
-    return MasterL;
 }
 
-int TMSIDriver::getTotalNumberOfChannels(RTDevice *Master, int& triggerChannel)
-{
-    int numChan;
-    PSIGNAL_FORMAT psf;
 
-    psf = Master->GetSignalFormat(NULL);
-    if (psf == NULL)
-        return 0;
+//*************************************************************************************************************
 
-    // printf("%i x %i\n", (int) psf[0].Size, (int) psf[0].Elements);
-    numChan = psf[0].Elements;
-    triggerChannel = -1;
-
-    for (int i=0;i<numChan;i++)
-    {
-        printf("Channel %i: %i %i ", i+1, (int) psf[i].Type, (int) psf[i].SubType);
-        wprintf(psf[i].Name); // .Name field is of WCHAR type (unicode)
-        printf("\n");
-
-        // the documentation gives 0x13 for the type, but at least
-        // for the Porti we need a "4".
-        if (psf[i].Type == 4)
-            triggerChannel = i;
-    }
-    // do we need to free this? or did we get static memory?
-    // LocalFree(psf);
-    return numChan;
-}
 

@@ -30,8 +30,8 @@ Environment:
 #include "SADIO.H"
 
 
-#define MAX_SAMPLE_RATE 0xFFFFFFFF
-#define MAX_BUFFER_SIZE 0xFFFFFFFF
+#define MAX_SAMPLE_RATE 4096
+#define MAX_BUFFER_SIZE 5000
 
 //classes 
 class RTDevice{

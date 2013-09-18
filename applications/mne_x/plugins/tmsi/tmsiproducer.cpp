@@ -80,7 +80,7 @@ TMSIProducer::~TMSIProducer()
 void TMSIProducer::start()
 {
     //TODO: Initialise device (find, open, connect, setup buffer etc.)
-    //m_pTMSIDriver->initiliseDevice();
+    m_pTMSIDriver->InitDevice();
 
     m_bIsRunning = true;
 
@@ -117,7 +117,7 @@ void TMSIProducer::run()
         //usleep(uiSamplePeriod);
 
         //Get the TMSi EEG data out of the device buffer
-        t_matRawBuffer = m_pTMSIDriver->getSampleMatrixValue();
+        //t_matRawBuffer = m_pTMSIDriver->getSampleMatrixValue();
 
         //cout<<"... data ..."<<endl;
 

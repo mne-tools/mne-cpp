@@ -70,8 +70,7 @@ SOURCES += \
         tmsiproducer.cpp \
         FormFiles/tmsisetupwidget.cpp \
         FormFiles/tmsiaboutwidget.cpp \
-        tmsidriver.cpp \
-        RTDevice.cpp
+        tmsidriver.cpp
 
 HEADERS += \
         tmsi.h\
@@ -79,9 +78,7 @@ HEADERS += \
         tmsiproducer.h \
         FormFiles/tmsisetupwidget.h \
         FormFiles/tmsiaboutwidget.h \
-        tmsidriver.h \
-        Sadio.h \
-        RTDevice.h
+        tmsidriver.h
 
 FORMS += \
         FormFiles/tmsisetup.ui \

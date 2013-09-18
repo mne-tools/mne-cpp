@@ -43,26 +43,23 @@
 // INCLUDES
 //=============================================================================================================
 
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN
-#endif
-#include <Windows.h>
-#include <stdio.h>
-#include <wchar.h>
-#include <conio.h>
-#include <tchar.h>
 #include <iostream>
-#include <fstream>
-#include <string>
-#include <math.h>
+#include <cmath>
+#include <cstring>
+#include <vector>
+#include <map>
+#include <tchar.h>
+#include <string.h>
+#include <windows.h>
 #include <Eigen/Core>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // TMSi Driver INCLUDES
 //=============================================================================================================
 
-#include "RtDevice.h"
+//#include "RtDevice.h"
 
 
 //*************************************************************************************************************
@@ -97,7 +94,7 @@ class TMSIProducer;
 //=============================================================================================================
 
 #define MAX_DEVICE			1	//Max number of devices supported by this driver
-#define MY_BUFFER_SIZE      0xFFFFFFFF
+#define MY_BUFFER_SIZE      2500
 
 
 //=============================================================================================================
@@ -133,24 +130,17 @@ public:
     /**
     * Initialise device .
     */
-    RTDevice *InitDevice(ULONG SampRate);
+    void InitDevice();
 
 protected:
-    //=========================================================================================================
-    /**
-    * Select Device and return the device handler.
-    */
-    RTDevice *SelectDevice(IN BOOLEAN Present);
 
-    //=========================================================================================================
-    /**
-    * Get the total number of channels which the device offers.
-    */
-    int getTotalNumberOfChannels(RTDevice *Master, int& triggerChannel);
 
 private:
     TMSIProducer*     m_pTMSIProducer;            /**< A pointer to the corresponding TMSIProducer class.*/
 
+    int               m_iNumberOfChannels;
+    int               m_iSamplingFrequency;
+    int               m_iSamplesPerblock;
 };
 
 } // NAMESPACE
