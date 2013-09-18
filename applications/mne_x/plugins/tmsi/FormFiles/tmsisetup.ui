@@ -157,7 +157,7 @@
        </property>
        <layout class="QGridLayout" name="m_qGridLayout_Channels">
         <item row="0" column="0">
-         <widget class="QPushButton" name="m_pushButton_StartAcquisition">
+         <widget class="QPushButton" name="m_pushButton_StartStopAcquisition">
           <property name="enabled">
            <bool>true</bool>
           </property>
@@ -172,13 +172,6 @@
           </property>
           <property name="flat">
            <bool>false</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QPushButton" name="m_pushButton_StopAcquisition">
-          <property name="text">
-           <string>Stop acquisition</string>
           </property>
          </widget>
         </item>

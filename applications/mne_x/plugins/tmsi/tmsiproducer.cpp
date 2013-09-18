@@ -80,7 +80,11 @@ TMSIProducer::~TMSIProducer()
 void TMSIProducer::start()
 {
     //TODO: Initialise device (find, open, connect, setup buffer etc.)
-    m_pTMSIDriver->InitDevice();
+    if(!m_pTMSIDriver->InitDevice())
+    {
+        cout << "Plugin TMSI - Failed to initialise the device - Sampling not started - Exiting producer thread" << endl;
+        return;
+    }
 
     m_bIsRunning = true;
 
@@ -119,7 +123,7 @@ void TMSIProducer::run()
         //Get the TMSi EEG data out of the device buffer
         //t_matRawBuffer = m_pTMSIDriver->getSampleMatrixValue();
 
-        //cout<<"... data ..."<<endl;
+        cout<<"... data ..."<<endl;
 
         //Write received data to circular buffer
         m_pTMSI->m_pRawMatrixBuffer_In->push(&t_matRawBuffer);

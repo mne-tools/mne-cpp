@@ -69,6 +69,8 @@ TMSISetupWidget::TMSISetupWidget(TMSI* pTMSI, QWidget* parent)
 : QWidget(parent)
 , m_pTMSI(pTMSI)
 {
+    m_bAcquisitionIsRunning = false;
+
     ui.setupUi(this);
 
     //Connect properties
@@ -80,10 +82,8 @@ TMSISetupWidget::TMSISetupWidget(TMSI* pTMSI, QWidget* parent)
             this, &TMSISetupWidget::setSamplesPerBlock);
 
     //Connect start stop buttons
-    connect(ui.m_pushButton_StartAcquisition, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
-            this, &TMSISetupWidget::startAcquisition);
-    connect(ui.m_pushButton_StopAcquisition, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
-            this, &TMSISetupWidget::stopAcquisition);
+    connect(ui.m_pushButton_StartStopAcquisition, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
+            this, &TMSISetupWidget::startStopAcquisition);
 
     //Connect about button
     connect(ui.m_qPushButton_About, &QPushButton::released, this, &TMSISetupWidget::showAboutDialog);
@@ -147,17 +147,21 @@ void TMSISetupWidget::setSamplesPerBlock(int value)
 
 //*************************************************************************************************************
 
-void TMSISetupWidget::startAcquisition()
+void TMSISetupWidget::startStopAcquisition()
 {
-    m_pTMSI->start();
-}
+    if(m_bAcquisitionIsRunning == false) //->Start acquisition
+    {
+        m_pTMSI->start();
+        m_bAcquisitionIsRunning = true;
+        ui.m_pushButton_StartStopAcquisition->setText("Stop Acquisition");
+    }
+    else
+    {
+        m_pTMSI->stop();
+        m_bAcquisitionIsRunning = false;
+        ui.m_pushButton_StartStopAcquisition->setText("Start Acquisition");
+    }
 
-
-//*************************************************************************************************************
-
-void TMSISetupWidget::stopAcquisition()
-{
-    m_pTMSI->stop();
 }
 
 
