@@ -142,7 +142,7 @@ protected:
     virtual void run();
 
 private:
-    PluginOutputData<NewRealTimeMultiSampleArray>::SPtr m_pRTSA_TMSI;       /**< The RealTimeSampleArray to provide the EEG data.*/
+    PluginOutputData<NewRealTimeMultiSampleArray>::SPtr m_pRMTSA_TMSI;      /**< The RealTimeSampleArray to provide the EEG data.*/
 
     QString                         m_qStringResourcePath;                  /**< the path to the ECG resource directory.*/
 
