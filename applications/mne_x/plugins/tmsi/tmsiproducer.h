@@ -107,7 +107,7 @@ public:
     /**
     * Starts the TMSIProducer by starting the producer's thread and initialising the device.
     */
-    virtual void start();
+    virtual void start(int iNumberOfChannels, int iSamplingFrequency, int iSamplesPerBlock);
 
     //=========================================================================================================
     /**

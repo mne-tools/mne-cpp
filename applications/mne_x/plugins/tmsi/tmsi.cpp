@@ -75,8 +75,8 @@ using namespace XMEASLIB;
 
 TMSI::TMSI()
 : m_pRTSA_TMSI(0)
-, m_iSamplingFreq(512)
-, m_iNumberOfChannels(32)
+, m_iSamplingFreq(2048)
+, m_iNumberOfChannels(64)
 , m_iSamplesPerBlock(32)
 , m_iBufferSize(5000)
 , m_pRawMatrixBuffer_In(0)
@@ -91,6 +91,11 @@ TMSI::TMSI()
 TMSI::~TMSI()
 {
     std::cout << "TMSI::~TMSI()" << std::endl;
+
+    //TODO: Destruktor is not getting called when mne_x is closed
+    //-> This is a problem because the REfa device is not shut down from the sampling mode
+    //-> uninit Fkt wird nicht richtig aufgerufen
+    //-> Beim abbrechen des programms bevor stop gedrückt wurde, muss das gleiche passieren als wäre stop gedrückt worden.
 }
 
 
@@ -120,10 +125,10 @@ void TMSI::init()
 bool TMSI::start()
 {
     // Buffer
-    m_pRawMatrixBuffer_In = QSharedPointer<RawMatrixBuffer>(new RawMatrixBuffer(m_iSamplesPerBlock,m_iNumberOfChannels,m_iBufferSize));
+    m_pRawMatrixBuffer_In = QSharedPointer<RawMatrixBuffer>(new RawMatrixBuffer(m_iSamplesPerBlock, m_iNumberOfChannels, m_iBufferSize));
 
     // Start threads
-    m_pTMSIProducer->start();
+    m_pTMSIProducer->start(m_iNumberOfChannels, m_iSamplingFreq, m_iSamplesPerBlock);
 
     QThread::start();
 
@@ -137,6 +142,7 @@ bool TMSI::stop()
 {
     // Stop threads
     m_pTMSIProducer->stop();
+
     QThread::terminate();
     QThread::wait();
 
