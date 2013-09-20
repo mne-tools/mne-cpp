@@ -65,6 +65,91 @@ namespace TMSIPlugin
 
 //*************************************************************************************************************
 //=============================================================================================================
+// Structure Typedefs - structure define as used in the RTINST.DLL
+//=============================================================================================================
+
+typedef struct _SP_DEVICE_PATH
+{
+    DWORD  dwCbSize;
+    TCHAR  devicePath[1];
+} SP_DEVICE_PATH, *PSP_DEVICE_PATH;
+
+typedef struct _FeatureData
+{
+    ULONG FeatureId;
+    ULONG Info;
+} FEATURE_DATA, *PFEATURE_DATA;
+
+typedef struct _SYSTEM_TIME
+{
+    WORD wYear;
+    WORD wMonth;
+    WORD wDayOfWeek;
+    WORD wDay;
+    WORD wHour;
+    WORD wMinute;
+    WORD wSecond;
+    WORD wMilliseconds;
+} SYSTEM_TIME;
+
+typedef struct _SIGNAL_FORMAT
+{
+    ULONG Size;      // Size of this structure
+    ULONG Elements;  // Number of elements in list
+
+    ULONG Type;      // One of the signal types above
+    ULONG SubType;   // One of the signal sub-types above
+    ULONG Format;    // Float / Integer / Asci / Ect..
+    ULONG Bytes;     // Number of bytes per sample including subsignals
+
+    FLOAT UnitGain;
+    FLOAT UnitOffSet;
+    ULONG UnitId;
+    LONG UnitExponent;
+
+    WCHAR Name[40];
+
+    ULONG Port;
+    WCHAR PortName[40];
+    ULONG SerialNumber;
+} SIGNAL_FORMAT, *PSIGNAL_FORMAT;
+
+typedef struct _FeatureMemory{
+    FEATURE_DATA Feature;
+    ULONG Data[1];
+}FEATURE_MEMORY, *PFEATURE_MEMORY;
+
+typedef struct _FeatureMode{
+    FEATURE_DATA Feature;
+    ULONG Mode;
+}FEATURE_MODE,*PFEATURE_MODE;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Method Typedefs - method defines as used in the RTINST.DLL
+//=============================================================================================================
+
+typedef HANDLE          ( __stdcall * POPEN)            (PSP_DEVICE_PATH DevicePath);
+typedef BOOL            ( __stdcall * PCLOSE)           (HANDLE hHandle);
+typedef ULONG           ( __stdcall * PGETDEVICESTATE)  (IN HANDLE Handle);
+typedef BOOLEAN         ( __stdcall * PSTART)           (IN HANDLE Handle);
+typedef BOOLEAN         ( __stdcall * PRESETDEVICE)     (IN HANDLE Handle);
+typedef BOOLEAN         ( __stdcall * PSTOP)            (IN HANDLE Handle);
+typedef HANDLE          ( __stdcall * PGETSLAVEHANDLE)  (IN HANDLE Handle);
+typedef BOOLEAN         ( __stdcall * PADDSLAVE)        (IN HANDLE Handle, IN HANDLE SlaveHandle);
+typedef PSIGNAL_FORMAT  ( __stdcall * PGETSIGNALFORMAT) (IN HANDLE Handle, IN OUT PSIGNAL_FORMAT pSignalFormat);
+typedef BOOLEAN         ( __stdcall * PSETSIGNALBUFFER) (IN HANDLE Handle, IN OUT PULONG SampleRate, IN OUT PULONG BufferSize);
+typedef ULONG           ( __stdcall * PGETSAMPLES)      (IN HANDLE Handle, OUT PULONG SampleBuffer, IN ULONG Size);
+typedef BOOLEAN         ( __stdcall * PGETBUFFERINFO)   (IN HANDLE Handle, OUT PULONG Overflow, OUT PULONG PercentFull);
+typedef BOOLEAN         ( __stdcall * PDEVICEFEATURE)   (IN HANDLE Handle, IN LPVOID DataIn, IN DWORD InSize, OUT LPVOID DataOut, IN DWORD OutSize);
+typedef PSP_DEVICE_PATH ( __stdcall * PGETINSTANCEID)   (IN LONG DeviceIndex, IN BOOLEAN Present, OUT ULONG  *MaxDevices );
+typedef HKEY            ( __stdcall * POPENREGKEY)      (IN PSP_DEVICE_PATH Path );
+typedef BOOL            ( __stdcall * PFREE)            (IN VOID *Memory);
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
@@ -86,6 +171,12 @@ class TMSIProducer;
 //=============================================================================================================
 
 #define MAX_BUFFER_SIZE 0xFFFFFFFF
+
+//DLL Function loader define
+#define __load_dll_func__(var, type, name) \
+    var = (type)::GetProcAddress(m_oLibHandle, name); \
+    if(!var) \
+        cout<< "Plugin TMSI - ERROR - Error loading method " << name << "\n"; \
 
 
 //=============================================================================================================
@@ -121,17 +212,71 @@ public:
     /**
     * Initialise device .
     */
-    bool InitDevice();
+    bool initDevice(int iNumberOfChannels, int iSamplingFrequency, int iSamplesPerBlock);
+
+    //=========================================================================================================
+    /**
+    * Uninitialise device .
+    */
+    bool uninitDevice();
 
 protected:
 
 
 private:
-    TMSIProducer*     m_pTMSIProducer;            /**< A pointer to the corresponding TMSIProducer class.*/
+    TMSIProducer*     m_pTMSIProducer;              /**< A pointer to the corresponding TMSIProducer class.*/
+
+    bool              m_bInitDeviceSuccess;
 
     int               m_iNumberOfChannels;
-    int               m_iSamplingFrequency;
+    int               m_iSamplingFrequency;         /**< The sampling frequency in millihertz;.*/
     int               m_iSamplesPerBlock;
+
+    //Device handle Master
+    HANDLE m_HandleMaster;
+
+    //Lib handle
+    HINSTANCE m_oLibHandle;
+
+    //device info
+    WCHAR m_wcDeviceName[40]; //m_vDevicePathMap contains the connected devicePath
+    ULONG m_ulSerialNumber;
+    PSP_DEVICE_PATH m_PSPDPMasterDevicePath;
+
+    //signal info
+    int m_iNumberOfAvailableChannels;
+
+    //Buffer
+    ULONG *m_aulSignalBuffer;    //Buffer in which the device can write the samples
+    LONG m_lSignalBufferSize ;   //Size of m_ulSignalBuffer = (samples per block) * (number of channels) * 4 (4 because every signal value takes 4 bytes - see TMSi SDK doc)
+    float *m_afSampleBuffer;     //Buffer for one sample read from the device signal buffer
+
+    //store value for calculating the data
+    vector <LONG>  m_vExponentChannel;
+    vector <FLOAT> m_vUnitGain;
+    vector <FLOAT> m_vUnitOffSet;
+
+    //*************************************************************************************************************
+    //=============================================================================================================
+    // Variables used for loading the RTINST.DLL methods
+    //=============================================================================================================
+
+    POPEN m_oFpOpen;
+    PCLOSE m_oFpClose;
+    PGETDEVICESTATE m_oFpGetDeviceState;
+    PSTART m_oFpStart;
+    PRESETDEVICE m_oFpReset;
+    PSTOP m_oFpStop;
+    PGETSLAVEHANDLE m_oFpGetSlaveHandle;
+    PADDSLAVE m_oFpAddSlave;
+    PGETSIGNALFORMAT m_oFpGetSignalFormat;
+    PSETSIGNALBUFFER m_oFpSetSignalBuffer;
+    PGETSAMPLES m_oFpGetSamples;
+    PGETBUFFERINFO m_oFpGetBufferInfo;
+    PDEVICEFEATURE m_oFpDeviceFeature;
+    PGETINSTANCEID m_oFpGetInstanceId;
+    POPENREGKEY m_oFpOpenRegKey;
+    PFREE m_oFpFree;
 };
 
 } // NAMESPACE
