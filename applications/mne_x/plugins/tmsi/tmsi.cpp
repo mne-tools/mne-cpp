@@ -74,7 +74,7 @@ using namespace XMEASLIB;
 //=============================================================================================================
 
 TMSI::TMSI()
-: m_pRTSA_TMSI(0)
+: m_pRMTSA_TMSI(0)
 , m_iSamplingFreq(2048)
 , m_iNumberOfChannels(64)
 , m_iSamplesPerBlock(32)
@@ -115,8 +115,8 @@ QSharedPointer<IPlugin> TMSI::clone() const
 
 void TMSI::init()
 {
-    m_pRTSA_TMSI = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "TMSI", "EEG output data");
-    m_outputConnectors.append(m_pRTSA_TMSI);
+    m_pRMTSA_TMSI = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "TMSI", "EEG output data");
+    m_outputConnectors.append(m_pRMTSA_TMSI);
 }
 
 
@@ -192,10 +192,10 @@ void TMSI::run()
     {
         //pop matrix
         matValue = m_pRawMatrixBuffer_In->pop();
-        //std::cout << "matValue " << matValue.block(0,0,1,10) << std::endl;
+//        std::cout << "matValue " << matValue.block(0,0,m_iNumberOfChannels,0) << std::endl;
 
         //emit values to real time multi sample array
         for(qint32 i = 0; i < matValue.cols(); ++i)
-            m_pRTSA_TMSI->data()->setValue(matValue.col(i).cast<double>());
+            m_pRMTSA_TMSI->data()->setValue(matValue.col(i).cast<double>());
     }
 }

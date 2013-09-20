@@ -56,6 +56,14 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// QT STL INCLUDES
+//=============================================================================================================
+
+#include <QSharedPointer>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // DEFINE NAMESPACE TMSIPlugin
 //=============================================================================================================
 
@@ -205,78 +213,86 @@ public:
     //=========================================================================================================
     /**
     * Get sample from the device in form of a mtrix.
+    * @param [in] MatrixXf the block sample values in form of a matrix.
+    * @param [out] bool returns true if sample was successfully written to the input variable, false otherwise.
     */
-    MatrixXf getSampleMatrixValue();
+    bool getSampleMatrixValue(MatrixXf& sampleMatrix);
 
     //=========================================================================================================
     /**
-    * Initialise device .
+    * Initialise device.
+    * @param [in] iNumberOfChannels number of channels specified by the user.
+    * @param [in] iSamplingFrequency sampling frequency specified by the user.
+    * @param [in] iSamplesPerBlock samples per block specified by the user.
+    * @param [out] bool returns true if device was successfully initialised, false otherwise.
     */
     bool initDevice(int iNumberOfChannels, int iSamplingFrequency, int iSamplesPerBlock);
 
     //=========================================================================================================
     /**
-    * Uninitialise device .
+    * Uninitialise device.
+    * @param [out] bool returns true if device was successfully uninitialised, false otherwise.
     */
     bool uninitDevice();
 
 protected:
-
+    //=========================================================================================================
+    /**
+    * Checks if a device is connected to the computer.
+    * @param [out] bool returns true if device is connected, false otherwise.
+    */
+    bool deviceConnected();
 
 private:
-    TMSIProducer*     m_pTMSIProducer;              /**< A pointer to the corresponding TMSIProducer class.*/
+    QSharedPointer<TMSIProducer>    m_pTMSIProducer;    /**< A pointer to the corresponding TMSIProducer class.*/
 
-    bool              m_bInitDeviceSuccess;
+    bool                m_bInitDeviceSuccess;
 
-    int               m_iNumberOfChannels;
-    int               m_iSamplingFrequency;         /**< The sampling frequency in millihertz;.*/
-    int               m_iSamplesPerBlock;
+    uint                m_uiNumberOfChannels;
+    uint                m_uiSamplingFrequency;           /**< The sampling frequency in millihertz;.*/
+    uint                m_uiSamplesPerBlock;
 
     //Device handle Master
-    HANDLE m_HandleMaster;
+    HANDLE              m_HandleMaster;
 
     //Lib handle
-    HINSTANCE m_oLibHandle;
+    HINSTANCE           m_oLibHandle;
 
     //device info
-    WCHAR m_wcDeviceName[40]; //m_vDevicePathMap contains the connected devicePath
-    ULONG m_ulSerialNumber;
-    PSP_DEVICE_PATH m_PSPDPMasterDevicePath;
+    WCHAR               m_wcDeviceName[40];             /**< m_vDevicePathMap contains the connected devicePath.*/
+    ULONG               m_ulSerialNumber;
+    PSP_DEVICE_PATH     m_PSPDPMasterDevicePath;
 
     //signal info
-    int m_iNumberOfAvailableChannels;
+    ULONG               m_iNumberOfAvailableChannels;
 
     //Buffer
-    ULONG *m_aulSignalBuffer;    //Buffer in which the device can write the samples
-    LONG m_lSignalBufferSize ;   //Size of m_ulSignalBuffer = (samples per block) * (number of channels) * 4 (4 because every signal value takes 4 bytes - see TMSi SDK doc)
-    float *m_afSampleBuffer;     //Buffer for one sample read from the device signal buffer
+    ULONG *             m_ulSignalBuffer;               /**< Buffer in which the device can write the samples.*/
+    LONG                m_lSignalBufferSize ;           /**< Size of m_ulSignalBuffer = (samples per block) * (number of channels) * 4 (4 because every signal value takes 4 bytes - see TMSi SDK doc).*/
+    float *             m_fSampleBuffer;                /**< Buffer for one sample read from the device signal buffer.*/
 
-    //store value for calculating the data
-    vector <LONG>  m_vExponentChannel;
-    vector <FLOAT> m_vUnitGain;
-    vector <FLOAT> m_vUnitOffSet;
+    //Signal formats fo every channel
+    vector <LONG>       m_vExponentChannel;
+    vector <FLOAT>      m_vUnitGain;
+    vector <FLOAT>      m_vUnitOffSet;
 
-    //*************************************************************************************************************
-    //=============================================================================================================
     // Variables used for loading the RTINST.DLL methods
-    //=============================================================================================================
-
-    POPEN m_oFpOpen;
-    PCLOSE m_oFpClose;
-    PGETDEVICESTATE m_oFpGetDeviceState;
-    PSTART m_oFpStart;
-    PRESETDEVICE m_oFpReset;
-    PSTOP m_oFpStop;
-    PGETSLAVEHANDLE m_oFpGetSlaveHandle;
-    PADDSLAVE m_oFpAddSlave;
-    PGETSIGNALFORMAT m_oFpGetSignalFormat;
-    PSETSIGNALBUFFER m_oFpSetSignalBuffer;
-    PGETSAMPLES m_oFpGetSamples;
-    PGETBUFFERINFO m_oFpGetBufferInfo;
-    PDEVICEFEATURE m_oFpDeviceFeature;
-    PGETINSTANCEID m_oFpGetInstanceId;
-    POPENREGKEY m_oFpOpenRegKey;
-    PFREE m_oFpFree;
+    POPEN               m_oFpOpen;
+    PCLOSE              m_oFpClose;
+    PGETDEVICESTATE     m_oFpGetDeviceState;
+    PSTART              m_oFpStart;
+    PRESETDEVICE        m_oFpReset;
+    PSTOP               m_oFpStop;
+    PGETSLAVEHANDLE     m_oFpGetSlaveHandle;
+    PADDSLAVE           m_oFpAddSlave;
+    PGETSIGNALFORMAT    m_oFpGetSignalFormat;
+    PSETSIGNALBUFFER    m_oFpSetSignalBuffer;
+    PGETSAMPLES         m_oFpGetSamples;
+    PGETBUFFERINFO      m_oFpGetBufferInfo;
+    PDEVICEFEATURE      m_oFpDeviceFeature;
+    PGETINSTANCEID      m_oFpGetInstanceId;
+    POPENREGKEY         m_oFpOpenRegKey;
+    PFREE               m_oFpFree;
 };
 
 } // NAMESPACE

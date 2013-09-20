@@ -59,13 +59,17 @@ using namespace TMSIPlugin;
 TMSIDriver::TMSIDriver(TMSIProducer* pTMSIProducer)
 : m_pTMSIProducer(pTMSIProducer)
 , m_bInitDeviceSuccess(false)
-, m_iNumberOfChannels(64)
-, m_iSamplingFrequency(2048)
-, m_iSamplesPerBlock(32)
+, m_uiNumberOfChannels(64)
+, m_uiSamplingFrequency(2048)
+, m_uiSamplesPerBlock(32)
 {
     //Initialise NULL pointers
     m_oLibHandle = NULL ;
     m_HandleMaster = NULL;
+    m_PSPDPMasterDevicePath = NULL;
+    m_ulSignalBuffer = NULL;
+    m_fSampleBuffer = NULL;
+    m_ulSignalBuffer = NULL;
 
     //Open library
     m_oLibHandle = ::LoadLibrary(L"C:\\Windows\\System32\\RTINST.DLL");
@@ -111,9 +115,9 @@ TMSIDriver::~TMSIDriver()
 
 bool TMSIDriver::initDevice(int iNumberOfChannels, int iSamplingFrequency, int iSamplesPerBlock)
 {
-    m_iNumberOfChannels = iNumberOfChannels;
-    m_iSamplingFrequency = iSamplingFrequency;
-    m_iSamplesPerBlock = iSamplesPerBlock;
+    m_uiNumberOfChannels = iNumberOfChannels;
+    m_uiSamplingFrequency = iSamplingFrequency;
+    m_uiSamplesPerBlock = iSamplesPerBlock;
 
     //Check if device handler already exists and a connection was therefore established before
     if(m_HandleMaster != NULL)
@@ -148,8 +152,8 @@ bool TMSIDriver::initDevice(int iNumberOfChannels, int iSamplingFrequency, int i
     }
 
     //Initialise and set up (sample rate/frequency and buffer size) the intern driver signal buffer which is used by the driver to store the value
-    ULONG iSamplingFrequencyMilliHertz = m_iSamplingFrequency*1000; //Times 1000 because the driver works in millihertz
-    ULONG iBufferSize = m_iSamplingFrequency*m_iSamplesPerBlock;    //This size is not defined in bytes but in the number of elements which are to be sampled. A sample in this case is one conversion result for all input channels..
+    ULONG iSamplingFrequencyMilliHertz = m_uiSamplingFrequency*1000;    //Times 1000 because the driver works in millihertz
+    ULONG iBufferSize = m_uiSamplingFrequency*m_uiSamplesPerBlock;      //This size is not defined in bytes but in the number of elements which are to be sampled. A sample in this case is one conversion result for all input channels..
 
     if(!m_oFpSetSignalBuffer(m_HandleMaster, &iSamplingFrequencyMilliHertz, &iBufferSize))
     {
@@ -170,11 +174,11 @@ bool TMSIDriver::initDevice(int iNumberOfChannels, int iSamplingFrequency, int i
 
     if(pSignalFormat != NULL)
     {
-        cout << "Plugin TMSI - INFO - Master device name: " << (char*)pSignalFormat[0].PortName << endl;
-        cout << "Plugin TMSI - INFO - Number of available channels: " << (uint)pSignalFormat[0].Elements << endl;
+        wcscpy_s(m_wcDeviceName, pSignalFormat->PortName);
+        m_ulSerialNumber = pSignalFormat->SerialNumber;
         m_iNumberOfAvailableChannels = pSignalFormat[0].Elements;
 
-        for(int i = 0 ; i < m_iNumberOfAvailableChannels; i++ )
+        for(uint i = 0 ; i < m_iNumberOfAvailableChannels; i++ )
         {
             m_vExponentChannel.push_back(pSignalFormat[i].UnitExponent+6/*changed measure unit in V*/);
             m_vUnitGain.push_back(pSignalFormat[i].UnitGain);
@@ -183,11 +187,13 @@ bool TMSIDriver::initDevice(int iNumberOfChannels, int iSamplingFrequency, int i
     }
 
     //Create the buffers
-    //TODO: Check if sampling frequency must be considered when specifying the buffer size
-    m_afSampleBuffer = new float[m_iNumberOfChannels*m_iSamplesPerBlock*4];
+    //The sampling frequency is not needed here because it is only used to specify the internal buffer size used by the driver with setSignalBuffer()
+    m_fSampleBuffer = new float[m_uiNumberOfChannels*m_uiSamplesPerBlock*4];
 
-    m_lSignalBufferSize = m_iSamplesPerBlock*m_iNumberOfChannels*4;
-    m_aulSignalBuffer = new ULONG[m_lSignalBufferSize];
+    m_lSignalBufferSize = m_uiSamplesPerBlock*m_iNumberOfAvailableChannels*4;
+    m_ulSignalBuffer = new ULONG[m_lSignalBufferSize];
+
+    wcout << "Plugin TMSI - INFO - Found "<< m_wcDeviceName << " device (" << m_ulSerialNumber << ") with " << m_iNumberOfAvailableChannels << " available channels" << endl;
 
     m_bInitDeviceSuccess = true;
     return true;
@@ -204,6 +210,12 @@ bool TMSIDriver::uninitDevice()
         return false;
     }
 
+    if(!m_oFpReset(m_HandleMaster))
+    {
+        cout << "Plugin TMSI - ERROR - Failed to reset the device" << endl;
+        return false;
+    }
+
     if(!m_oFpClose(m_HandleMaster))
     {
         cout << "Plugin TMSI - ERROR - Failed to close the device" << endl;
@@ -213,57 +225,85 @@ bool TMSIDriver::uninitDevice()
     //Reset to NULL pointers
     m_oLibHandle = NULL ;
     m_HandleMaster = NULL;
-//    m_PSPDPMasterDevicePath = NULL;
-//    m_aulSignalBuffer = NULL;
-//    m_afSampleBuffer = NULL;
-//    m_aulSignalBuffer = NULL;
+    m_PSPDPMasterDevicePath = NULL;
+    m_ulSignalBuffer = NULL;
+    m_fSampleBuffer = NULL;
+    m_ulSignalBuffer = NULL;
+
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+bool TMSIDriver::deviceConnected()
+{
+    //TODO: Implement function to check whether the device was turned off during the sampling process
+    //getstate or getid did not  work
 
     return true;
 }
 
 //*************************************************************************************************************
 
-MatrixXf TMSIDriver::getSampleMatrixValue()
+ bool TMSIDriver::getSampleMatrixValue(MatrixXf& sampleMatrix)
 {
-    MatrixXf sampleValue;
+     //Check if a device is connected to the computer
+     if(!deviceConnected())
+     {
+         cout << "Plugin TMSI - ERROR - Cannot start to get samples from device because it is not connected" << endl;
+         return false;
+     }
 
     //Check if device was initialised and connected correctly
     if(!m_bInitDeviceSuccess)
     {
         cout << "Plugin TMSI - ERROR - Cannot start to get samples from device because device was not initialised correctly" << endl;
-        return sampleValue;
+        return false;
     }
 
     //Get sample block from device
-    ULONG lSizeSamples = m_oFpGetSamples(m_HandleMaster, (PULONG)m_aulSignalBuffer, m_lSignalBufferSize);
+    ULONG ulSizeSamples = m_oFpGetSamples(m_HandleMaster, (PULONG)m_ulSignalBuffer, m_lSignalBufferSize);
 
-    if(lSizeSamples<1)
-    {
-        cout << "Plugin TMSI - ERROR - No samples received from device" << endl;
-        return sampleValue;
-    }
-    else
-        cout << "Plugin TMSI - INFO - " << lSizeSamples << " bytes of samples received from device" << endl;
+    ULONG ulNumSamples = ulSizeSamples/(m_iNumberOfAvailableChannels*4);
+
+//    if(ulNumSamples<1)
+//    {
+//        cout << "Plugin TMSI - ERROR - No samples received from device" << endl;
+//        return false;
+//    }
+//    else
+//        cout << "Plugin TMSI - INFO - " << ulSizeSamples << " bytes of " << ulNumSamples << " samples received from device" << endl;
 
     //Read the sample block out of the signal buffer (m_ulSignalBuffer) and write them to the sample buffer (m_pSample)
-    //int iNumberSamplesReceived = lSizeSamples/(m_ui32NbTotalChannels*4);
+    //TODO: It is possible that the sampleMatrix is not fully filled with data because the available amount of samples or channels can be smaller than defined by the user. Fix this :-)
+    sampleMatrix.setZero(); // Clear matrix - set all elements to zero
+    int channelMax;
+    int sampleMax;
 
-    for(int channel = 0; channel<m_iNumberOfChannels ; channel++)
+    if(ulNumSamples<m_uiSamplesPerBlock) //If the number of received samples is smaller than the number defined by the user -> set the sampleMax to the smaller number
+        sampleMax = ulNumSamples;
+    else
+        sampleMax = m_uiSamplesPerBlock;
+
+    if(m_iNumberOfAvailableChannels<m_uiNumberOfChannels)//If the number of available channels is smaller than the number defined by the user -> set the channelMax to the smaller number
+        channelMax = m_iNumberOfAvailableChannels;
+    else
+        channelMax = m_uiNumberOfChannels;
+
+    for(int channel = 0; channel<channelMax; channel++)
     {
-        for(int channel = 0; channel<m_iNumberOfChannels ; channel++)
+        for(int sample = 0; sample<sampleMax; sample++)
         {
-
+            sampleMatrix(channel, sample) = m_ulSignalBuffer[(m_iNumberOfAvailableChannels*sample)+channel];//(float)(((float)m_ulSignalBuffer[(m_uiNumberOfChannels*sample)+channel]*m_vUnitGain[channel]+m_vUnitOffSet[channel])*pow(10.,(double)m_vExponentChannel[channel]));
         }
     }
 
-    //Convert the m_pSample buffer into the MatrixXf format
+    //cout << "matValue " << sampleMatrix(0,0) << " " << sampleMatrix(1,0) << " " << sampleMatrix(2,0) << " " << sampleMatrix(3,0) << endl;
+    cout << sampleMatrix.block(0, 0, channelMax, m_uiSamplesPerBlock) << endl << endl;
 
-    return sampleValue;
+    return true;
 }
-
-
-
-
 
 //*************************************************************************************************************
 
