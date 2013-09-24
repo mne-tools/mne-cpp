@@ -71,6 +71,7 @@ TMSIProducer::TMSIProducer(TMSI* pTMSI)
 
 TMSIProducer::~TMSIProducer()
 {
+    std::cout << "TMSIProducer::~TMSIProducer()" << std::endl;
 }
 
 
@@ -82,13 +83,15 @@ void TMSIProducer::start(int iNumberOfChannels, int iSamplingFrequency, int iSam
     if(!m_pTMSIDriver->initDevice(iNumberOfChannels, iSamplingFrequency, iSamplesPerBlock))
     {
         cout << "Plugin TMSI - ERROR - Failed to initialise the device - Sampling not started - Exiting producer thread" << endl;
+        m_bIsRunning = false;
         return;
     }
-    cout << "Plugin TMSI - INFO - The device has been connected and initialised successfully" << endl;
-
-    m_bIsRunning = true;
-
-    QThread::start();
+    else //start thread
+    {
+        cout << "Plugin TMSI - INFO - The device has been connected and initialised successfully" << endl;
+        m_bIsRunning = true;
+        QThread::start();
+    }
 }
 
 
@@ -102,11 +105,9 @@ void TMSIProducer::stop()
 
     //Uinitialise device
     if(!m_pTMSIDriver->uninitDevice())
-    {
         cout << "Plugin TMSI - ERROR - Failed to uninitialise the device" << endl;
-        return;
-    }
-    cout << "Plugin TMSI - INFO - Successfully uninitialised the device" << endl;
+    else
+        cout << "Plugin TMSI - INFO - Successfully uninitialised the device" << endl;
 }
 
 
@@ -114,14 +115,13 @@ void TMSIProducer::stop()
 
 void TMSIProducer::run()
 {
-    //unsigned int uiSamplePeriod = (unsigned int) (1000000.0/(m_pTMSI->m_fSamplingRate));
-    m_bIsRunning = true;
-
+    unsigned int uiSamplePeriod = (unsigned int) (1/(m_pTMSI->m_iSamplingFreq));
     MatrixXf matRawBuffer(m_pTMSI->m_iNumberOfChannels, m_pTMSI->m_iSamplesPerBlock);
 
     while(m_bIsRunning)
     {
-        //usleep(uiSamplePeriod);
+        //TODO:Wait for sampling period to pass
+        usleep(uiSamplePeriod);
 
         //Get the TMSi EEG data out of the device buffer and write received data to circular buffer
         if(m_pTMSIDriver->getSampleMatrixValue(matRawBuffer))

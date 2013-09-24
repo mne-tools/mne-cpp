@@ -23,7 +23,7 @@
       </font>
      </property>
      <property name="text">
-      <string>TMSi EEG Connector Properties</string>
+      <string>TMSi EEG Connector</string>
      </property>
     </widget>
    </item>
@@ -85,10 +85,10 @@
            <number>1</number>
           </property>
           <property name="maximum">
-           <number>128</number>
+           <number>138</number>
           </property>
           <property name="value">
-           <number>32</number>
+           <number>64</number>
           </property>
          </widget>
         </item>
@@ -112,13 +112,13 @@
         <item row="0" column="2">
          <widget class="QSpinBox" name="m_spinBox_SamplingFreq">
           <property name="minimum">
-           <number>128</number>
+           <number>8</number>
           </property>
           <property name="maximum">
-           <number>4096</number>
+           <number>2048</number>
           </property>
           <property name="value">
-           <number>512</number>
+           <number>2048</number>
           </property>
          </widget>
         </item>
@@ -131,7 +131,7 @@
            <number>512</number>
           </property>
           <property name="value">
-           <number>32</number>
+           <number>5</number>
           </property>
          </widget>
         </item>

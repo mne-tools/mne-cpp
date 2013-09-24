@@ -44,6 +44,7 @@
 //=============================================================================================================
 
 #include <iostream>
+#include <fstream>
 #include <cmath>
 #include <cstring>
 #include <vector>
@@ -60,6 +61,8 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
+#include <QtGlobal>
+#include <qapplication.h>
 
 
 //*************************************************************************************************************
@@ -247,6 +250,7 @@ private:
     QSharedPointer<TMSIProducer>    m_pTMSIProducer;    /**< A pointer to the corresponding TMSIProducer class.*/
 
     bool                m_bInitDeviceSuccess;
+    bool                m_bDllLoaded;
 
     uint                m_uiNumberOfChannels;
     uint                m_uiSamplingFrequency;           /**< The sampling frequency in millihertz;.*/
@@ -267,9 +271,8 @@ private:
     ULONG               m_iNumberOfAvailableChannels;
 
     //Buffer
-    ULONG *             m_ulSignalBuffer;               /**< Buffer in which the device can write the samples.*/
+    LONG*               m_lSignalBuffer;               /**< Buffer in which the device can write the samples.*/
     LONG                m_lSignalBufferSize ;           /**< Size of m_ulSignalBuffer = (samples per block) * (number of channels) * 4 (4 because every signal value takes 4 bytes - see TMSi SDK doc).*/
-    float *             m_fSampleBuffer;                /**< Buffer for one sample read from the device signal buffer.*/
 
     //Signal formats fo every channel
     vector <LONG>       m_vExponentChannel;
@@ -293,6 +296,9 @@ private:
     PGETINSTANCEID      m_oFpGetInstanceId;
     POPENREGKEY         m_oFpOpenRegKey;
     PFREE               m_oFpFree;
+
+    //fstream for writing the sample values to txt file
+    ofstream m_outputFileStream;
 };
 
 } // NAMESPACE
