@@ -55,14 +55,12 @@ CONFIG(debug, debug|release) {
             -lxMeasd \
             -lxDispd \
             -lmne_xd \
-            advapi32.lib
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
             -lxMeas \
             -lxDisp \
             -lmne_x \
-            advapi32.lib
 }
 
 DESTDIR = $${MNE_BINARY_DIR}/mne_x_plugins
