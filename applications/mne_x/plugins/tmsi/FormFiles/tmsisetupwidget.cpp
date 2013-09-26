@@ -81,10 +81,6 @@ TMSISetupWidget::TMSISetupWidget(TMSI* pTMSI, QWidget* parent)
     connect(ui.m_spinBox_SamplesPerBlock, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             this, &TMSISetupWidget::setSamplesPerBlock);
 
-    //Connect start stop buttons
-    connect(ui.m_pushButton_StartStopAcquisition, static_cast<void (QPushButton::*)(bool)>(&QPushButton::clicked),
-            this, &TMSISetupWidget::startStopAcquisition);
-
     //Connect about button
     connect(ui.m_qPushButton_About, &QPushButton::released, this, &TMSISetupWidget::showAboutDialog);
 
@@ -142,26 +138,6 @@ void TMSISetupWidget::setNumberOfChannels(int value)
 void TMSISetupWidget::setSamplesPerBlock(int value)
 {
     m_pTMSI->m_iSamplesPerBlock = value;
-}
-
-
-//*************************************************************************************************************
-
-void TMSISetupWidget::startStopAcquisition()
-{
-    if(m_bAcquisitionIsRunning == false) //->Start acquisition
-    {
-        m_pTMSI->start();
-        m_bAcquisitionIsRunning = true;
-        ui.m_pushButton_StartStopAcquisition->setText("Stop Acquisition");
-    }
-    else
-    {
-        m_pTMSI->stop();
-        m_bAcquisitionIsRunning = false;
-        ui.m_pushButton_StartStopAcquisition->setText("Start Acquisition");
-    }
-
 }
 
 
