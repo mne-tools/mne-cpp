@@ -255,6 +255,7 @@ bool TMSIDriver::deviceConnected()
     return true;
 }
 
+
 //*************************************************************************************************************
 
  bool TMSIDriver::getSampleMatrixValue(MatrixXf& sampleMatrix)
@@ -331,12 +332,13 @@ bool TMSIDriver::deviceConnected()
         {
             m_outputFileStream << "Plugin TMSI - INFO - Internal driver buffer is " << PercentFull << "% full" << endl;
             m_outputFileStream << "Plugin TMSI - INFO - " << ulSizeSamples << " bytes of " << ulNumSamplesReceived << " samples received from device" << endl;
-            //m_outputFileStream<< sampleMatrix.block(0, 0, channelMax, sampleMax) << endl << endl;
+            m_outputFileStream<< sampleMatrix.block(0, 0, channelMax, sampleMax) << endl << endl;
         }
     }
 
     return true;
 }
+
 
 //*************************************************************************************************************
 

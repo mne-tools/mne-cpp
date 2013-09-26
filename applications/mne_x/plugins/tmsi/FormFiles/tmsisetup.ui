@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>600</width>
-    <height>450</height>
+    <width>630</width>
+    <height>554</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -46,7 +46,7 @@
    <item>
     <layout class="QGridLayout" name="m_qGridLayout_main">
      <item row="0" column="0">
-      <widget class="QGroupBox" name="m_qGroupBox_Properties">
+      <widget class="QGroupBox" name="m_qGroupBox_SamplingProperties">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
          <horstretch>0</horstretch>
@@ -56,7 +56,7 @@
        <property name="minimumSize">
         <size>
          <width>0</width>
-         <height>200</height>
+         <height>120</height>
         </size>
        </property>
        <property name="maximumSize">
@@ -66,29 +66,22 @@
         </size>
        </property>
        <property name="title">
-        <string>Properties</string>
+        <string>Sampling Properties</string>
        </property>
        <property name="flat">
         <bool>false</bool>
        </property>
        <layout class="QGridLayout" name="m_qGridLayout_Properties">
-        <item row="1" column="0">
-         <widget class="QLabel" name="m_qLabel_NumberOfChannels">
-          <property name="text">
-           <string>Number of channels</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="2">
-         <widget class="QSpinBox" name="m_spinBox_NumberOfChannels">
+        <item row="2" column="1">
+         <widget class="QSpinBox" name="m_spinBox_SamplesPerBlock">
           <property name="minimum">
            <number>1</number>
           </property>
           <property name="maximum">
-           <number>138</number>
+           <number>512</number>
           </property>
           <property name="value">
-           <number>64</number>
+           <number>1</number>
           </property>
          </widget>
         </item>
@@ -98,7 +91,40 @@
            <enum>Qt::LeftToRight</enum>
           </property>
           <property name="text">
-           <string>Sampling Frequency:</string>
+           <string>Sampling Frequency (Hz):</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QSpinBox" name="m_spinBox_SamplingFreq">
+          <property name="minimum">
+           <number>8</number>
+          </property>
+          <property name="maximum">
+           <number>2048</number>
+          </property>
+          <property name="value">
+           <number>1024</number>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QSpinBox" name="m_spinBox_NumberOfChannels">
+          <property name="minimum">
+           <number>1</number>
+          </property>
+          <property name="maximum">
+           <number>138</number>
+          </property>
+          <property name="value">
+           <number>138</number>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="m_qLabel_NumberOfChannels">
+          <property name="text">
+           <string>Number of channels</string>
           </property>
          </widget>
         </item>
@@ -109,37 +135,56 @@
           </property>
          </widget>
         </item>
-        <item row="0" column="2">
-         <widget class="QSpinBox" name="m_spinBox_SamplingFreq">
-          <property name="minimum">
-           <number>8</number>
-          </property>
-          <property name="maximum">
-           <number>2048</number>
-          </property>
-          <property name="value">
-           <number>2048</number>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="2">
-         <widget class="QSpinBox" name="m_spinBox_SamplesPerBlock">
-          <property name="minimum">
-           <number>1</number>
-          </property>
-          <property name="maximum">
-           <number>512</number>
-          </property>
-          <property name="value">
-           <number>5</number>
-          </property>
-         </widget>
+       </layout>
+      </widget>
+     </item>
+     <item row="4" column="2">
+      <widget class="QPushButton" name="m_qPushButton_About">
+       <property name="text">
+        <string>About</string>
+       </property>
+      </widget>
+     </item>
+     <item row="4" column="1">
+      <spacer name="m_qHorizontalSpacer_About">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item row="3" column="0">
+      <spacer name="m_qVerticalSpacer_LeftRow">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item row="0" column="1" rowspan="4" colspan="2">
+      <widget class="QGroupBox" name="m_qGroupBox_Information">
+       <property name="title">
+        <string>Information</string>
+       </property>
+       <layout class="QGridLayout" name="m_qGridLayout_Information">
+        <item row="0" column="0">
+         <widget class="QTextBrowser" name="m_qTextBrowser_Information"/>
         </item>
        </layout>
       </widget>
      </item>
      <item row="1" column="0">
-      <widget class="QGroupBox" name="m_qGroupBox_Channels">
+      <widget class="QGroupBox" name="m_qGroupBox_ChannelCorrections">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
          <horstretch>0</horstretch>
@@ -153,75 +198,74 @@
         </size>
        </property>
        <property name="title">
-        <string>Acquisition</string>
+        <string>Channel Corrections</string>
        </property>
        <layout class="QGridLayout" name="m_qGridLayout_Channels">
-        <item row="0" column="0">
-         <widget class="QPushButton" name="m_pushButton_StartStopAcquisition">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
+        <item row="5" column="0">
+         <widget class="QCheckBox" name="m_checkBox_UseUnitOffset">
           <property name="text">
-           <string>Start acquisition</string>
+           <string>Use unit offset</string>
           </property>
-          <property name="autoDefault">
-           <bool>false</bool>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QCheckBox" name="m_checkBox_UseUnitGain">
+          <property name="text">
+           <string>Use unit gain</string>
           </property>
-          <property name="default">
-           <bool>false</bool>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QCheckBox" name="m_checkBox_ConvertToVolt">
+          <property name="text">
+           <string>Convert to Volt</string>
           </property>
-          <property name="flat">
-           <bool>false</bool>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QCheckBox" name="m_checkBox_UseChExponent">
+          <property name="text">
+           <string>Use channel's exponent</string>
           </property>
          </widget>
         </item>
        </layout>
       </widget>
      </item>
-     <item row="3" column="1">
-      <spacer name="m_qHorizontalSpacer_About">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
+     <item row="2" column="0">
+      <widget class="QGroupBox" name="m_qGroupBox_WriteToFile">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
        </property>
-       <property name="sizeHint" stdset="0">
+       <property name="minimumSize">
         <size>
-         <width>40</width>
-         <height>20</height>
+         <width>0</width>
+         <height>70</height>
         </size>
        </property>
-      </spacer>
-     </item>
-     <item row="0" column="1" rowspan="3" colspan="2">
-      <widget class="QGroupBox" name="m_qGroupBox_Information">
        <property name="title">
-        <string>Information</string>
+        <string>Write to file</string>
        </property>
-       <layout class="QGridLayout" name="m_qGridLayout_Information">
-        <item row="0" column="0">
-         <widget class="QTextBrowser" name="m_qTextBrowser_Information"/>
+       <layout class="QGridLayout" name="gridLayout">
+        <item row="1" column="1">
+         <widget class="QPushButton" name="m_pushButton_ChangeDir">
+          <property name="text">
+           <string>Change dir</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QCheckBox" name="m_checkBox_WriteToFile">
+          <property name="text">
+           <string>Write samples to file</string>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>
-     </item>
-     <item row="3" column="2">
-      <widget class="QPushButton" name="m_qPushButton_About">
-       <property name="text">
-        <string>About</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="0">
-      <spacer name="m_qVerticalSpacer_LeftRow">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>20</width>
-         <height>40</height>
-        </size>
-       </property>
-      </spacer>
      </item>
     </layout>
    </item>
