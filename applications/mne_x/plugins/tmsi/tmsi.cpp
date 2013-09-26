@@ -75,10 +75,9 @@ using namespace XMEASLIB;
 
 TMSI::TMSI()
 : m_pRMTSA_TMSI(0)
-, m_iSamplingFreq(2048)
-, m_iNumberOfChannels(5)
-, m_iSamplesPerBlock(5)
-, m_iBufferSize(5000)
+, m_iSamplingFreq(1024)
+, m_iNumberOfChannels(138)
+, m_iSamplesPerBlock(1)
 , m_pRawMatrixBuffer_In(0)
 , m_pTMSIProducer(new TMSIProducer(this))
 , m_qStringResourcePath(qApp->applicationDirPath()+"/mne_x_plugins/resources/tmsi/")
@@ -91,9 +90,6 @@ TMSI::TMSI()
 TMSI::~TMSI()
 {
     std::cout << "TMSI::~TMSI()" << std::endl;
-
-//    if(this->isRunning())
-//        stop();
 
     //TODO: Destruktor is not getting called when mne_x is closed
     //-> This is a problem because the REfa device is not shut down from the sampling mode
@@ -132,6 +128,8 @@ bool TMSI::start()
 {
     //Set the channel size of the RMTSA - this needs to be done here and NOT in the init() function because the user can change the number of channels during runtime
     m_pRMTSA_TMSI->data()->init(m_iNumberOfChannels);
+    m_pRMTSA_TMSI->data()->setSamplingRate(m_iSamplingFreq);
+    //m_pRMTSA_TMSI->data()->setMultiArraySize(m_iSamplesPerBlock);
 
     // Buffer
     m_pRawMatrixBuffer_In = QSharedPointer<RawMatrixBuffer>(new RawMatrixBuffer(8, m_iNumberOfChannels, m_iSamplesPerBlock));
@@ -139,7 +137,7 @@ bool TMSI::start()
     // Start threads
     m_pTMSIProducer->start(m_iNumberOfChannels, m_iSamplingFreq, m_iSamplesPerBlock);
 
-    //if the producer could not be started (the driver is still sampling because it was not closed correctly) stop the producer (close the driver) and try to start the producer again
+    //if the producer could not be started stop the producer (close the driver) and try to start the producer again - reason for doing this: the driver could still be sampling because it was not closed correctly
     if(m_pTMSIProducer->isRunning())
     {
         QThread::start();
@@ -156,7 +154,7 @@ bool TMSI::start()
         }
     }
 
-    std::cout << "Plugin TMSI - ERROR - TMSIProducer thread could not be started" << endl;
+    qWarning() << "Plugin TMSI - ERROR - TMSIProducer thread could not be started - Either the device is turned off or the driver DLL (RTINST.dll) is not installed in the system directory - Also check the cmd line for more information" << endl;
     return false;
 }
 
@@ -217,13 +215,14 @@ void TMSI::run()
     {
         //pop matrix
         matValue = m_pRawMatrixBuffer_In->pop();
-        std::cout << "matValue " << matValue.block(0,0,m_iNumberOfChannels,m_iSamplesPerBlock) << std::endl;
-
-        //TODO: make matValue's size dynamic depending on the samples received by the tmsidriver class
-        //      -> dynamically set the size of the m_pRMTSA_TMSI multi array
+        //std::cout << "matValue " << matValue.block(0,0,m_iNumberOfChannels,m_iSamplesPerBlock) << std::endl;
 
         //emit values to real time multi sample array
         for(qint32 i = 0; i < matValue.cols(); ++i)
-            m_pRMTSA_TMSI->data()->setValue(matValue.col(i).cast<double>());
+        {
+            //Check if one sample (values for all channels at one sample moment in time) is equal to zero -> if so the application is reading faster from the buffer than the device can write new data into the buffer -> do not display these zero values
+            if(!matValue.col(i).isZero())
+                m_pRMTSA_TMSI->data()->setValue(matValue.col(i).cast<double>());
+        }
     }
 }

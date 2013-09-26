@@ -46,7 +46,6 @@
 #include "tmsi_global.h"
 
 #include <mne_x/Interfaces/ISensor.h>
-#include <generics/circularbuffer.h>
 #include <generics/circularmatrixbuffer.h>
 #include <xMeas/newrealtimemultisamplearray.h>
 
@@ -91,7 +90,7 @@ class TMSIProducer;
 /**
 * TMSI...
 *
-* @brief The TMSI class provides a EEG connector.
+* @brief The TMSI class provides a EEG connector. In order for this plugin to work properly the driver dll "RTINST.dll" must be installed in the system directory. This dll is automatically copied in the system directory during the driver installtion of the TMSi Refa device.
 */
 class TMSISHARED_EXPORT TMSI : public ISensor
 {
@@ -129,8 +128,15 @@ public:
     virtual void init();
 
     //=========================================================================================================
-
+    /**
+    * Starts the TMSI by starting the tmsi's thread.
+    */
     virtual bool start();
+
+    //=========================================================================================================
+    /**
+    * Stops the TMSI by stopping the tmsi's thread.
+    */
     virtual bool stop();
 
     virtual IPlugin::PluginType getType() const;
@@ -139,21 +145,26 @@ public:
     virtual QWidget* setupWidget();
 
 protected:
+    //=========================================================================================================
+    /**
+    * The starting point for the thread. After calling start(), the newly created thread calls this function.
+    * Returning from this method will end the execution of the thread.
+    * Pure virtual method inherited by QThread.
+    */
     virtual void run();
 
 private:
     PluginOutputData<NewRealTimeMultiSampleArray>::SPtr m_pRMTSA_TMSI;      /**< The RealTimeSampleArray to provide the EEG data.*/
 
-    QString                         m_qStringResourcePath;                  /**< the path to the ECG resource directory.*/
+    QString                             m_qStringResourcePath;              /**< The path to the EEG resource directory.*/
 
-    int                             m_iSamplingFreq;                        /**< the sampling frequency.*/
-    int                             m_iNumberOfChannels;                    /**< the number of channels.*/
-    int                             m_iSamplesPerBlock;                     /**< the samples taken per block.*/
+    int                                 m_iSamplingFreq;                    /**< The sampling frequency defined by the user via the GUI (in Hertz).*/
+    int                                 m_iNumberOfChannels;                /**< The samples per block defined by the user via the GUI.*/
+    int                                 m_iSamplesPerBlock;                 /**< The number of channels defined by the user via the GUI.*/
 
-    qint32                          m_iBufferSize;                          /**< The raw data buffer size.*/
-    QSharedPointer<RawMatrixBuffer> m_pRawMatrixBuffer_In;                  /**< Holds incoming raw data. */
+    QSharedPointer<RawMatrixBuffer>     m_pRawMatrixBuffer_In;              /**< Holds incoming raw data.*/
 
-    QSharedPointer<TMSIProducer>    m_pTMSIProducer;                        /**< the EEGProducer.*/
+    QSharedPointer<TMSIProducer>        m_pTMSIProducer;                    /**< the TMSIProducer.*/
 };
 
 } // NAMESPACE

@@ -159,7 +159,7 @@
         <item row="0" column="0">
          <widget class="QPushButton" name="m_pushButton_StartStopAcquisition">
           <property name="enabled">
-           <bool>true</bool>
+           <bool>false</bool>
           </property>
           <property name="text">
            <string>Start acquisition</string>

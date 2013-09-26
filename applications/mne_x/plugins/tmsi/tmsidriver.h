@@ -61,7 +61,6 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
-#include <QtGlobal>
 #include <qapplication.h>
 
 
@@ -249,37 +248,34 @@ protected:
 private:
     QSharedPointer<TMSIProducer>    m_pTMSIProducer;    /**< A pointer to the corresponding TMSIProducer class.*/
 
-    bool                m_bInitDeviceSuccess;
-    bool                m_bDllLoaded;
+    //Flags
+    bool                m_bInitDeviceSuccess;           /**< Flag which defines if the device initialisation was successfull.*/
+    bool                m_bDllLoaded;                   /**< Flag which defines if the driver DLL was loaded successfully.*/
 
-    uint                m_uiNumberOfChannels;
-    uint                m_uiSamplingFrequency;           /**< The sampling frequency in millihertz;.*/
-    uint                m_uiSamplesPerBlock;
+    //User definitons
+    uint                m_uiNumberOfChannels;           /**< The number of channels defined by the user via the GUI.*/
+    uint                m_uiSamplingFrequency;          /**< The sampling frequency defined by the user via the GUI (in Hertz).*/
+    uint                m_uiSamplesPerBlock;            /**< The samples per block defined by the user via the GUI.*/
 
-    //Device handle Master
-    HANDLE              m_HandleMaster;
+    //Handler
+    HANDLE              m_HandleMaster;                 /**< The handler used to communciate with the device.*/
+    HINSTANCE           m_oLibHandle;                   /**< The handler used to load the driver dll/lib.*/
 
-    //Lib handle
-    HINSTANCE           m_oLibHandle;
+    //Device info
+    WCHAR               m_wcDeviceName[40];             /**< Contains the connected device name.*/
+    ULONG               m_ulSerialNumber;               /**< Contains the connected device serial number.*/
+    PSP_DEVICE_PATH     m_PSPDPMasterDevicePath;        /**< Contains the connected devicePath (used to get/open the device handler).*/
+    ULONG               m_iNumberOfAvailableChannels;   /**< Holds the available number of channels offered by the device.*/
 
-    //device info
-    WCHAR               m_wcDeviceName[40];             /**< m_vDevicePathMap contains the connected devicePath.*/
-    ULONG               m_ulSerialNumber;
-    PSP_DEVICE_PATH     m_PSPDPMasterDevicePath;
+    //Signal info
+    vector <LONG>       m_vExponentChannel;             /**< Contains the exponents for every channel available by the device.*/
+    vector <FLOAT>      m_vUnitGain;                    /**< Contains the unit gain for every channel available by the device.*/
+    vector <FLOAT>      m_vUnitOffSet;                  /**< Contains the unit offset for every channel available by the device.*/
+    LONG*               m_lSignalBuffer;                /**< Buffer in which the device can write the samples -> these values get read out by the getSampleMatrix(...) function.*/
+    LONG                m_lSignalBufferSize ;           /**< Size of m_ulSignalBuffer = (samples per block) * (number of channels) * 4 (4 because every signal value takes 4 bytes - see TMSi SDK documentation).*/
+    ofstream            m_outputFileStream;             /**< fstream for writing the sample values to txt file.*/
 
-    //signal info
-    ULONG               m_iNumberOfAvailableChannels;
-
-    //Buffer
-    LONG*               m_lSignalBuffer;               /**< Buffer in which the device can write the samples.*/
-    LONG                m_lSignalBufferSize ;           /**< Size of m_ulSignalBuffer = (samples per block) * (number of channels) * 4 (4 because every signal value takes 4 bytes - see TMSi SDK doc).*/
-
-    //Signal formats fo every channel
-    vector <LONG>       m_vExponentChannel;
-    vector <FLOAT>      m_vUnitGain;
-    vector <FLOAT>      m_vUnitOffSet;
-
-    // Variables used for loading the RTINST.DLL methods
+    //Variables used for loading the RTINST.DLL methods. Note: Not all functions are used by this class at the moment.
     POPEN               m_oFpOpen;
     PCLOSE              m_oFpClose;
     PGETDEVICESTATE     m_oFpGetDeviceState;
@@ -296,9 +292,6 @@ private:
     PGETINSTANCEID      m_oFpGetInstanceId;
     POPENREGKEY         m_oFpOpenRegKey;
     PFREE               m_oFpFree;
-
-    //fstream for writing the sample values to txt file
-    ofstream m_outputFileStream;
 };
 
 } // NAMESPACE

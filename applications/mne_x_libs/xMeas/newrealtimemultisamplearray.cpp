@@ -88,7 +88,7 @@ void NewRealTimeMultiSampleArray::init(unsigned int uiNumChannels)
     {
         RealTimeSampleArrayChInfo initChInfo;
         QString string;
-        initChInfo.setChannelName(string.number(i));
+        initChInfo.setChannelName(string.number(i+1));
         m_qListChInfo.append(initChInfo);
     }
 }
