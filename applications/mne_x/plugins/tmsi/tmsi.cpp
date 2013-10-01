@@ -78,6 +78,12 @@ TMSI::TMSI()
 , m_iSamplingFreq(1024)
 , m_iNumberOfChannels(138)
 , m_iSamplesPerBlock(1)
+, m_bConvertToVolt(false)
+, m_bUseChExponent(false)
+, m_bUseUnitGain(false)
+, m_bUseUnitOffset(false)
+, m_bWriteToFile(false)
+, m_sOutputFilePath("mne_x_plugins/resources/tmsi")
 , m_pRawMatrixBuffer_In(0)
 , m_pTMSIProducer(new TMSIProducer(this))
 , m_qStringResourcePath(qApp->applicationDirPath()+"/mne_x_plugins/resources/tmsi/")
@@ -129,13 +135,20 @@ bool TMSI::start()
     //Set the channel size of the RMTSA - this needs to be done here and NOT in the init() function because the user can change the number of channels during runtime
     m_pRMTSA_TMSI->data()->init(m_iNumberOfChannels);
     m_pRMTSA_TMSI->data()->setSamplingRate(m_iSamplingFreq);
-    //m_pRMTSA_TMSI->data()->setMultiArraySize(m_iSamplesPerBlock);
 
     // Buffer
     m_pRawMatrixBuffer_In = QSharedPointer<RawMatrixBuffer>(new RawMatrixBuffer(8, m_iNumberOfChannels, m_iSamplesPerBlock));
 
     // Start threads
-    m_pTMSIProducer->start(m_iNumberOfChannels, m_iSamplingFreq, m_iSamplesPerBlock);
+    m_pTMSIProducer->start(m_iNumberOfChannels,
+                           m_iSamplingFreq,
+                           m_iSamplesPerBlock,
+                           m_bConvertToVolt,
+                           m_bUseChExponent,
+                           m_bUseUnitGain,
+                           m_bUseUnitOffset,
+                           m_bWriteToFile,
+                           m_sOutputFilePath);
 
     //if the producer could not be started stop the producer (close the driver) and try to start the producer again - reason for doing this: the driver could still be sampling because it was not closed correctly
     if(m_pTMSIProducer->isRunning())
@@ -146,7 +159,16 @@ bool TMSI::start()
     else
     {
         m_pTMSIProducer->stop();
-        m_pTMSIProducer->start(m_iNumberOfChannels, m_iSamplingFreq, m_iSamplesPerBlock);
+        m_pTMSIProducer->start(m_iNumberOfChannels,
+                               m_iSamplingFreq,
+                               m_iSamplesPerBlock,
+                               m_bConvertToVolt,
+                               m_bUseChExponent,
+                               m_bUseUnitGain,
+                               m_bUseUnitOffset,
+                               m_bWriteToFile,
+                               m_sOutputFilePath);
+
         if(m_pTMSIProducer->isRunning())
         {
            QThread::start();

@@ -129,10 +129,24 @@ private:
 
     //=========================================================================================================
     /**
-    * Connects the device and starts or stops the acquisition.
+    * Sets the channel correction properties.
     *
     */
-    void startStopAcquisition();
+    void setChannelCorrections();
+
+    //=========================================================================================================
+    /**
+    * Sets flag for writing the received samples to a file.
+    *
+    */
+    void setWriteToFile();
+
+    //=========================================================================================================
+    /**
+    * Sets dir where the output file is saved
+    *
+    */
+    void changeOutputFileDir();
 
     //=========================================================================================================
     /**

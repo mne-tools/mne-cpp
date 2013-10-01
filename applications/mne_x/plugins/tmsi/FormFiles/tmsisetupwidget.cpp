@@ -81,6 +81,21 @@ TMSISetupWidget::TMSISetupWidget(TMSI* pTMSI, QWidget* parent)
     connect(ui.m_spinBox_SamplesPerBlock, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             this, &TMSISetupWidget::setSamplesPerBlock);
 
+    //Connect channel corrections
+    connect(ui.m_checkBox_ConvertToVolt, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+            this, &TMSISetupWidget::setChannelCorrections);
+    connect(ui.m_checkBox_UseChExponent, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+            this, &TMSISetupWidget::setChannelCorrections);
+    connect(ui.m_checkBox_UseUnitGain, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+            this, &TMSISetupWidget::setChannelCorrections);
+    connect(ui.m_checkBox_UseUnitOffset, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+            this, &TMSISetupWidget::setChannelCorrections);
+
+    //Connect write to file
+    connect(ui.m_checkBox_WriteToFile, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+            this, &TMSISetupWidget::setWriteToFile);
+    connect(ui.m_pushButton_ChangeDir, &QPushButton::released, this, &TMSISetupWidget::changeOutputFileDir);
+
     //Connect about button
     connect(ui.m_qPushButton_About, &QPushButton::released, this, &TMSISetupWidget::showAboutDialog);
 
@@ -111,9 +126,20 @@ TMSISetupWidget::~TMSISetupWidget()
 
 void TMSISetupWidget::initSamplingProperties()
 {
+    //Init device sampling properties
     ui.m_spinBox_SamplingFreq->setValue(m_pTMSI->m_iSamplingFreq);
     ui.m_spinBox_NumberOfChannels->setValue(m_pTMSI->m_iNumberOfChannels);
     ui.m_spinBox_SamplesPerBlock->setValue(m_pTMSI->m_iSamplesPerBlock);
+
+    //Init channel corrections
+    ui.m_checkBox_ConvertToVolt->setChecked(m_pTMSI->m_bConvertToVolt);
+    ui.m_checkBox_UseChExponent->setChecked(m_pTMSI->m_bUseChExponent);
+    ui.m_checkBox_UseUnitGain->setChecked(m_pTMSI->m_bUseUnitGain);
+    ui.m_checkBox_UseUnitOffset->setChecked(m_pTMSI->m_bUseUnitOffset);
+
+    //Init write to file
+    ui.m_checkBox_WriteToFile->setChecked(m_pTMSI->m_bWriteToFile);
+    ui.m_lineEdit_outputDir->setText(m_pTMSI->m_sOutputFilePath);
 }
 
 
@@ -138,6 +164,41 @@ void TMSISetupWidget::setNumberOfChannels(int value)
 void TMSISetupWidget::setSamplesPerBlock(int value)
 {
     m_pTMSI->m_iSamplesPerBlock = value;
+}
+
+
+//*************************************************************************************************************
+
+void TMSISetupWidget::setChannelCorrections()
+{
+    m_pTMSI->m_bConvertToVolt = ui.m_checkBox_ConvertToVolt->isChecked();
+    m_pTMSI->m_bUseChExponent = ui.m_checkBox_UseChExponent->isChecked();
+    m_pTMSI->m_bUseUnitGain = ui.m_checkBox_UseUnitGain->isChecked();
+    m_pTMSI->m_bUseUnitOffset = ui.m_checkBox_UseUnitOffset->isChecked();
+}
+
+
+//*************************************************************************************************************
+
+void TMSISetupWidget::setWriteToFile()
+{
+    m_pTMSI->m_sOutputFilePath = ui.m_lineEdit_outputDir->text();
+    m_pTMSI->m_bWriteToFile = ui.m_checkBox_WriteToFile->isChecked();
+}
+
+
+//*************************************************************************************************************
+
+void TMSISetupWidget::changeOutputFileDir()
+{
+    QString path = QFileDialog::getExistingDirectory(
+                this,
+                "Change output directory",
+                "mne_x_plugins/resources/tmsi",
+                 QFileDialog::ShowDirsOnly);
+
+    ui.m_lineEdit_outputDir->setText(path);
+    m_pTMSI->m_sOutputFilePath = ui.m_lineEdit_outputDir->text();
 }
 
 

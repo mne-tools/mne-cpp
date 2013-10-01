@@ -226,9 +226,23 @@ public:
     * @param [in] iNumberOfChannels number of channels specified by the user.
     * @param [in] iSamplingFrequency sampling frequency specified by the user.
     * @param [in] iSamplesPerBlock samples per block specified by the user.
+    * @param [in] bConvertToVolt Flag for converting the values to Volt. Defined by the user via the GUI.
+    * @param [in] bUseChExponent Flag for using the channels exponent. Defined by the user via the GUI.
+    * @param [in] bUseUnitGain Flag for using the channels unit gain. Defined by the user via the GUI.
+    * @param [in] bUseUnitOffset Flag for using the channels unit offset. Defined by the user via the GUI.
+    * @param [in] sOutpuFilePath Holds the path for the output file. Defined by the user via the GUI.
+    * @param [in] bWriteToFile Flag for writing the received samples to a file. Defined by the user via the GUI.
     * @param [out] bool returns true if device was successfully initialised, false otherwise.
     */
-    bool initDevice(int iNumberOfChannels, int iSamplingFrequency, int iSamplesPerBlock);
+    bool initDevice(int iNumberOfChannels,
+                    int iSamplingFrequency,
+                    int iSamplesPerBlock,
+                    bool bConvertToVolt,
+                    bool bUseChExponent,
+                    bool bUseUnitGain,
+                    bool bUseUnitOffset,
+                    bool bWriteToFile,
+                    QString sOutpuFilePath);
 
     //=========================================================================================================
     /**
@@ -256,6 +270,12 @@ private:
     uint                m_uiNumberOfChannels;           /**< The number of channels defined by the user via the GUI.*/
     uint                m_uiSamplingFrequency;          /**< The sampling frequency defined by the user via the GUI (in Hertz).*/
     uint                m_uiSamplesPerBlock;            /**< The samples per block defined by the user via the GUI.*/
+    bool                m_bConvertToVolt;               /**< Flag for converting the values to Volt. Defined by the user via the GUI.*/
+    bool                m_bUseChExponent;               /**< Flag for using the channels exponent. Defined by the user via the GUI.*/
+    bool                m_bUseUnitGain;                 /**< Flag for using the channels unit gain. Defined by the user via the GUI.*/
+    bool                m_bUseUnitOffset;               /**< Flag for using the channels unit offset. Defined by the user via the GUI.*/
+    bool                m_bWriteToFile;                 /**< Flag for writing the received samples to a file. Defined by the user via the GUI.*/
+    QString             m_sOutputFilePath;              /**< Holds the path for the output file. Defined by the user via the GUI.*/
 
     //Handler
     HANDLE              m_HandleMaster;                 /**< The handler used to communciate with the device.*/

@@ -63,6 +63,12 @@ TMSIDriver::TMSIDriver(TMSIProducer* pTMSIProducer)
 , m_uiNumberOfChannels(138)
 , m_uiSamplingFrequency(1024)
 , m_uiSamplesPerBlock(1)
+, m_bConvertToVolt(false)
+, m_bUseChExponent(false)
+, m_bUseUnitGain(false)
+, m_bUseUnitOffset(false)
+, m_bWriteToFile(false)
+, m_sOutputFilePath("/mne_x_plugins/resources/tmsi")
 {
     //Initialise NULL pointers
     m_oLibHandle = NULL ;
@@ -113,18 +119,34 @@ TMSIDriver::~TMSIDriver()
 
 //*************************************************************************************************************
 
-bool TMSIDriver::initDevice(int iNumberOfChannels, int iSamplingFrequency, int iSamplesPerBlock)
+bool TMSIDriver::initDevice(int iNumberOfChannels,
+                            int iSamplingFrequency,
+                            int iSamplesPerBlock,
+                            bool bConvertToVolt,
+                            bool bUseChExponent,
+                            bool bUseUnitGain,
+                            bool bUseUnitOffset,
+                            bool bWriteToFile,
+                            QString sOutpuFilePath)
 {
     //Check if the driver DLL was loaded
     if(!m_bDllLoaded)
         return false;
 
-    //Open file to write to
-    m_outputFileStream.open("TMSiSampleData.txt", ios::trunc); //ios::trunc deletes old file data
-
+    //Set global variables
     m_uiNumberOfChannels = iNumberOfChannels;
     m_uiSamplingFrequency = iSamplingFrequency;
     m_uiSamplesPerBlock = iSamplesPerBlock;
+    m_bConvertToVolt = bConvertToVolt;
+    m_bUseChExponent = bUseChExponent;
+    m_bUseUnitGain = bUseUnitGain;
+    m_bUseUnitOffset = bUseUnitOffset;
+    m_bWriteToFile = bWriteToFile;
+    m_sOutputFilePath = sOutpuFilePath;
+
+    //Open file to write to
+    if(m_bWriteToFile)
+        m_outputFileStream.open(m_sOutputFilePath.append("/TMSi_Sample_Data.txt").toStdString(), ios::trunc); //ios::trunc deletes old file data
 
     //Check if device handler already exists and a connection was established before
     if(m_HandleMaster != NULL)
@@ -187,7 +209,7 @@ bool TMSIDriver::initDevice(int iNumberOfChannels, int iSamplingFrequency, int i
 
         for(uint i = 0 ; i < m_iNumberOfAvailableChannels; i++ )
         {
-            m_vExponentChannel.push_back(pSignalFormat[i].UnitExponent/*+6*/); //+6 changed measure unit in V
+            m_vExponentChannel.push_back(pSignalFormat[i].UnitExponent);
             m_vUnitGain.push_back(pSignalFormat[i].UnitGain);
             m_vUnitOffSet.push_back(pSignalFormat[i].UnitOffSet);
             //cout << "Channel number: " << i << " has type " << pSignalFormat[i].Type << " , format " << pSignalFormat[i].Format << " exponent " << pSignalFormat[i].UnitExponent << " gain " << pSignalFormat[i].UnitGain << " offset " << pSignalFormat[i].UnitOffSet << endl;
@@ -215,7 +237,8 @@ bool TMSIDriver::uninitDevice()
         return false;
 
     //Close the output stream/file
-    m_outputFileStream.close();
+    if(m_bWriteToFile)
+        m_outputFileStream.close();
 
     if(!m_oFpStop(m_HandleMaster))
     {
@@ -301,7 +324,6 @@ bool TMSIDriver::deviceConnected()
         //cout << "Plugin TMSI - INFO - " << ulSizeSamples << " bytes of " << ulNumSamplesReceived << " samples received from device" << endl;
 
         //Read the sample block out of the signal buffer (m_ulSignalBuffer) and write them to the sample buffer (m_pSample)
-        //TODO: It is possible that the sampleMatrix is not fully filled with data because the available amount of samples or channels can be smaller than defined by the user. Fix this :-)
         sampleMatrix.setZero(); // Clear matrix - set all elements to zero
         int channelMax;
         int sampleMax;
@@ -320,15 +342,14 @@ bool TMSIDriver::deviceConnected()
         {
             for(int sample = 0; sample<sampleMax; sample++)
             {
-                sampleMatrix(channel, sample) = (float)(((float)m_lSignalBuffer[(m_uiNumberOfChannels*sample)+channel]*m_vUnitGain[channel]+m_vUnitOffSet[channel])*pow(10.,(double)m_vExponentChannel[channel]));//m_ulSignalBuffer[(m_iNumberOfAvailableChannels*sample)+channel];
-                //sampleMatrix(channel, sample) = m_lSignalBuffer[(m_iNumberOfAvailableChannels*sample)+channel];
+                sampleMatrix(channel, sample) = (float)(((float)m_lSignalBuffer[(m_uiNumberOfChannels*sample)+channel]*(m_bUseUnitGain ? m_vUnitGain[channel] : 1) + (m_bUseUnitOffset ? m_vUnitOffSet[channel] : 0)) * (m_bUseChExponent ? pow(10., (m_bConvertToVolt ? (double)m_vExponentChannel[channel]+6 : (double)m_vExponentChannel[channel])) : 1));
             }
         }
 
         //cout << sampleMatrix.block(0, 0, channelMax, sampleMax) << endl << endl;
 
         //write to file
-        if(m_outputFileStream.is_open())
+        if(m_outputFileStream.is_open() && m_bWriteToFile)
         {
             m_outputFileStream << "Plugin TMSI - INFO - Internal driver buffer is " << PercentFull << "% full" << endl;
             m_outputFileStream << "Plugin TMSI - INFO - " << ulSizeSamples << " bytes of " << ulNumSamplesReceived << " samples received from device" << endl;
