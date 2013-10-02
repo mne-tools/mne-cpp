@@ -260,7 +260,7 @@ protected:
     bool deviceConnected();
 
 private:
-    QSharedPointer<TMSIProducer>    m_pTMSIProducer;    /**< A pointer to the corresponding TMSIProducer class.*/
+    TMSIProducer*       m_pTMSIProducer;                /**< A pointer to the corresponding TMSIProducer class.*/
 
     //Flags
     bool                m_bInitDeviceSuccess;           /**< Flag which defines if the device initialisation was successfull.*/

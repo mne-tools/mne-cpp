@@ -51,7 +51,7 @@ contains(MNECPP_CONFIG, babyMEG) {
 }
 else {
     message(RtServer plugin configured!)
-    SUBDIRS += sourcelab
+#    SUBDIRS += sourcelab
 
 #    qtHaveModule(3d) {
 #        message(Qt3D available: brainmonitor library configured!)

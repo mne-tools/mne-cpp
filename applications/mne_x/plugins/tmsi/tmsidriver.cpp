@@ -232,6 +232,10 @@ bool TMSIDriver::initDevice(int iNumberOfChannels,
 
 bool TMSIDriver::uninitDevice()
 {
+    //Check if the device was initialised
+    if(!m_bInitDeviceSuccess)
+        return false;
+
     //Check if the driver DLL was loaded
     if(!m_bDllLoaded)
         return false;
@@ -353,7 +357,7 @@ bool TMSIDriver::deviceConnected()
         {
             m_outputFileStream << "Plugin TMSI - INFO - Internal driver buffer is " << PercentFull << "% full" << endl;
             m_outputFileStream << "Plugin TMSI - INFO - " << ulSizeSamples << " bytes of " << ulNumSamplesReceived << " samples received from device" << endl;
-            m_outputFileStream<< sampleMatrix.block(0, 0, channelMax, sampleMax) << endl << endl;
+            m_outputFileStream << sampleMatrix.block(0, 0, channelMax, sampleMax) << endl << endl;
         }
     }
 

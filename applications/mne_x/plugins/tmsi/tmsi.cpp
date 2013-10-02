@@ -55,7 +55,6 @@
 #include <QtCore/QtPlugin>
 #include <QtCore/QTextStream>
 #include <QtCore/QFile>
-
 #include <QDebug>
 
 
@@ -75,15 +74,6 @@ using namespace XMEASLIB;
 
 TMSI::TMSI()
 : m_pRMTSA_TMSI(0)
-, m_iSamplingFreq(1024)
-, m_iNumberOfChannels(138)
-, m_iSamplesPerBlock(1)
-, m_bConvertToVolt(false)
-, m_bUseChExponent(false)
-, m_bUseUnitGain(false)
-, m_bUseUnitOffset(false)
-, m_bWriteToFile(false)
-, m_sOutputFilePath("mne_x_plugins/resources/tmsi")
 , m_pRawMatrixBuffer_In(0)
 , m_pTMSIProducer(new TMSIProducer(this))
 , m_qStringResourcePath(qApp->applicationDirPath()+"/mne_x_plugins/resources/tmsi/")
@@ -95,13 +85,10 @@ TMSI::TMSI()
 
 TMSI::~TMSI()
 {
-    std::cout << "TMSI::~TMSI()" << std::endl;
+    std::cout << "TMSI::~TMSI() " << std::endl;
 
-    //TODO: Destruktor is not getting called when mne_x is closed
-    //-> This is a problem because the REfa device is not shut down from the sampling mode
-    //-> uninit Fkt is not getting called
-    //-> Beim abbrechen des programms bevor stop gedrückt wurde, muss das gleiche passieren als wäre stop gedrückt worden.
-    //-> Plugin destructors are not called when exiting the glmainwindow
+    if(this->isRunning())
+        this->stop();
 }
 
 
@@ -125,6 +112,17 @@ void TMSI::init()
 
     m_pRMTSA_TMSI->data()->setVisibility(true);
     m_outputConnectors.append(m_pRMTSA_TMSI);
+
+    m_iSamplingFreq = 1024;
+    m_iNumberOfChannels = 138;
+    m_iSamplesPerBlock = 1;
+    m_bConvertToVolt = false;
+    m_bUseChExponent = false;
+    m_bUseUnitGain = false;
+    m_bUseUnitOffset = false;
+    m_bWriteToFile = false;
+    m_bIsRunning = false;
+    m_sOutputFilePath = QString("mne_x_plugins/resources/tmsi");
 }
 
 
@@ -136,10 +134,9 @@ bool TMSI::start()
     m_pRMTSA_TMSI->data()->init(m_iNumberOfChannels);
     m_pRMTSA_TMSI->data()->setSamplingRate(m_iSamplingFreq);
 
-    // Buffer
+    //Buffer
     m_pRawMatrixBuffer_In = QSharedPointer<RawMatrixBuffer>(new RawMatrixBuffer(8, m_iNumberOfChannels, m_iSamplesPerBlock));
 
-    // Start threads
     m_pTMSIProducer->start(m_iNumberOfChannels,
                            m_iSamplingFreq,
                            m_iSamplesPerBlock,
@@ -150,34 +147,17 @@ bool TMSI::start()
                            m_bWriteToFile,
                            m_sOutputFilePath);
 
-    //if the producer could not be started stop the producer (close the driver) and try to start the producer again - reason for doing this: the driver could still be sampling because it was not closed correctly
     if(m_pTMSIProducer->isRunning())
     {
+        m_bIsRunning = true;
         QThread::start();
         return true;
     }
     else
     {
-        m_pTMSIProducer->stop();
-        m_pTMSIProducer->start(m_iNumberOfChannels,
-                               m_iSamplingFreq,
-                               m_iSamplesPerBlock,
-                               m_bConvertToVolt,
-                               m_bUseChExponent,
-                               m_bUseUnitGain,
-                               m_bUseUnitOffset,
-                               m_bWriteToFile,
-                               m_sOutputFilePath);
-
-        if(m_pTMSIProducer->isRunning())
-        {
-           QThread::start();
-           return true;
-        }
+        qWarning() << "Plugin TMSI - ERROR - TMSIProducer thread could not be started - Either the device is turned off or the driver DLL (RTINST.dll) is not installed in the system directory - Also check the cmd line for more information" << endl;
+        return false;
     }
-
-    qWarning() << "Plugin TMSI - ERROR - TMSIProducer thread could not be started - Either the device is turned off or the driver DLL (RTINST.dll) is not installed in the system directory - Also check the cmd line for more information" << endl;
-    return false;
 }
 
 
@@ -185,11 +165,10 @@ bool TMSI::start()
 
 bool TMSI::stop()
 {
-    // Stop threads
-    m_pTMSIProducer->stop();
+    m_bIsRunning = false;
 
-    QThread::terminate();
-    QThread::wait();
+    //Stop threads after the run() was exited
+    m_pTMSIProducer->stop();
 
     //Clear Buffers
     m_pRawMatrixBuffer_In->clear();
@@ -231,18 +210,16 @@ QWidget* TMSI::setupWidget()
 
 void TMSI::run()
 {
-    MatrixXf matValue;
-
-    while(true)
+    while(m_bIsRunning)
     {
         //pop matrix
-        matValue = m_pRawMatrixBuffer_In->pop();
+        MatrixXf matValue = m_pRawMatrixBuffer_In->pop();
         //std::cout << "matValue " << matValue.block(0,0,m_iNumberOfChannels,m_iSamplesPerBlock) << std::endl;
 
         //emit values to real time multi sample array
         for(qint32 i = 0; i < matValue.cols(); ++i)
         {
-            //Check if one sample (values for all channels at one sample moment in time) is equal to zero -> if so the application is reading faster from the buffer than the device can write new data into the buffer -> do not display these zero values
+            //Check if one sample (values for all channels at one "sample moment" in time) is equal to zero -> if so the application is reading faster from the buffer than the device can write new data into the buffer -> do not display these zero values
             if(!matValue.col(i).isZero())
                 m_pRMTSA_TMSI->data()->setValue(matValue.col(i).cast<double>());
         }
