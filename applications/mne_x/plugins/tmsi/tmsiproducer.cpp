@@ -117,9 +117,6 @@ void TMSIProducer::stop()
 {
     m_bIsRunning = false;
 
-    QThread::terminate();
-    QThread::wait();
-
     //Uinitialise device
     if(!m_pTMSIDriver->uninitDevice())
         cout << "Plugin TMSI - ERROR - Failed to uninitialise the device" << endl;
@@ -132,11 +129,11 @@ void TMSIProducer::stop()
 
 void TMSIProducer::run()
 {
-    float uiSamplePeriod = 1.0/((float)(m_pTMSI->m_iSamplingFreq));
-    MatrixXf matRawBuffer(m_pTMSI->m_iNumberOfChannels, m_pTMSI->m_iSamplesPerBlock);
-
     while(m_bIsRunning)
     {
+        float uiSamplePeriod = 1.0/((float)(m_pTMSI->m_iSamplingFreq));
+        MatrixXf matRawBuffer(m_pTMSI->m_iNumberOfChannels, m_pTMSI->m_iSamplesPerBlock);
+
         //Wait for sampling period to pass
         usleep(uiSamplePeriod*m_pTMSI->m_iSamplesPerBlock);
 
