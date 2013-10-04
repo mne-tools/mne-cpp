@@ -78,35 +78,34 @@ TMSIProducer::~TMSIProducer()
 //*************************************************************************************************************
 
 void TMSIProducer::start(int iNumberOfChannels,
-                         int iSamplingFrequency,
-                         int iSamplesPerBlock,
-                         bool bConvertToVolt,
-                         bool bUseChExponent,
-                         bool bUseUnitGain,
-                         bool bUseUnitOffset,
-                         bool bWriteToFile,
-                         QString sOutputFilePath)
+                     int iSamplingFrequency,
+                     int iSamplesPerBlock,
+                     bool bConvertToVolt,
+                     bool bUseChExponent,
+                     bool bUseUnitGain,
+                     bool bUseUnitOffset,
+                     bool bWriteToFile,
+                     QString sOutputFilePath)
 {
     //Initialise device
-    if(!m_pTMSIDriver->initDevice(iNumberOfChannels,
-                                  iSamplingFrequency,
-                                  iSamplesPerBlock,
-                                  bConvertToVolt,
-                                  bUseChExponent,
-                                  bUseUnitGain,
-                                  bUseUnitOffset,
-                                  bWriteToFile,
-                                  sOutputFilePath))
-    {
-        cout << "Plugin TMSI - ERROR - Failed to initialise the device - Sampling not started - Exiting producer thread" << endl;
-        m_bIsRunning = false;
-        return;
-    }
-    else //start thread
+    if(m_pTMSIDriver->initDevice(iNumberOfChannels,
+                              iSamplingFrequency,
+                              iSamplesPerBlock,
+                              bConvertToVolt,
+                              bUseChExponent,
+                              bUseUnitGain,
+                              bUseUnitOffset,
+                              bWriteToFile,
+                              sOutputFilePath))
     {
         cout << "Plugin TMSI - INFO - The device has been connected and initialised successfully" << endl;
         m_bIsRunning = true;
         QThread::start();
+    }
+    else //start thread
+    {
+        cout << "Plugin TMSI - ERROR - Failed to initialise the device - Sampling not started - Exiting producer thread" << endl;
+        m_bIsRunning = false;
     }
 }
 
@@ -131,6 +130,7 @@ void TMSIProducer::run()
 {
     while(m_bIsRunning)
     {
+        cout << "TMSIProducer::run()" << endl;
         float uiSamplePeriod = 1.0/((float)(m_pTMSI->m_iSamplingFreq));
         MatrixXf matRawBuffer(m_pTMSI->m_iNumberOfChannels, m_pTMSI->m_iSamplesPerBlock);
 

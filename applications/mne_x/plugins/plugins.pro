@@ -41,9 +41,15 @@ TEMPLATE = subdirs
 SUBDIRS += \
     ecgsimulator \
     mnertclient \
-    dummytoolbox \
-    tmsi
+    dummytoolbox
 #    rtsss \
+
+win32 {
+    exists(C:/Windows/System32/RTINST.DLL) {
+        message(TMSI driver DLL found)
+        SUBDIRS += tmsi
+    }
+}
 
 contains(MNECPP_CONFIG, babyMEG) {
     message(BabyMEG plugin configured!)
@@ -51,7 +57,7 @@ contains(MNECPP_CONFIG, babyMEG) {
 }
 else {
     message(RtServer plugin configured!)
-#    SUBDIRS += sourcelab
+    SUBDIRS += sourcelab
 
 #    qtHaveModule(3d) {
 #        message(Qt3D available: brainmonitor library configured!)

@@ -174,6 +174,10 @@ bool TMSIDriver::initDevice(int iNumberOfChannels,
 
     //Open master device
     m_HandleMaster = m_oFpOpen(m_PSPDPMasterDevicePath);
+
+    //Stop the device from sampling. Reason for this: just in case the device was not stopped correctly after the last sampling process
+    m_oFpStop(m_HandleMaster);
+
     if(m_HandleMaster == INVALID_HANDLE_VALUE)
     {
         cout << "Plugin TMSI - ERROR - Failed to open connected device" << endl;
@@ -207,21 +211,28 @@ bool TMSIDriver::initDevice(int iNumberOfChannels,
         m_ulSerialNumber = pSignalFormat->SerialNumber;
         m_iNumberOfAvailableChannels = pSignalFormat[0].Elements;
 
+        if(m_bWriteToFile)
+            m_outputFileStream << "Found "<< m_wcDeviceName << " device (" << m_ulSerialNumber << ") with " << m_iNumberOfAvailableChannels << " available channels" << endl << endl;
+
+
         for(uint i = 0 ; i < m_iNumberOfAvailableChannels; i++ )
         {
             m_vExponentChannel.push_back(pSignalFormat[i].UnitExponent);
             m_vUnitGain.push_back(pSignalFormat[i].UnitGain);
             m_vUnitOffSet.push_back(pSignalFormat[i].UnitOffSet);
-            //cout << "Channel number: " << i << " has type " << pSignalFormat[i].Type << " , format " << pSignalFormat[i].Format << " exponent " << pSignalFormat[i].UnitExponent << " gain " << pSignalFormat[i].UnitGain << " offset " << pSignalFormat[i].UnitOffSet << endl;
+
+            if(m_bWriteToFile)
+                m_outputFileStream << "Channel number: " << i << " has type " << pSignalFormat[i].Type << " , format " << pSignalFormat[i].Format << " exponent " << pSignalFormat[i].UnitExponent << " gain " << pSignalFormat[i].UnitGain << " offset " << pSignalFormat[i].UnitOffSet << endl;
         }
+
+        if(m_bWriteToFile)
+            m_outputFileStream << endl;
     }
 
     //Create the buffers
     //The sampling frequency is not needed here because it is only used to specify the internal buffer size used by the driver with setSignalBuffer()
     m_lSignalBufferSize = m_uiSamplesPerBlock*m_iNumberOfAvailableChannels*4;
     m_lSignalBuffer = new LONG[m_lSignalBufferSize];
-
-    wcout << "Plugin TMSI - INFO - Found "<< m_wcDeviceName << " device (" << m_ulSerialNumber << ") with " << m_iNumberOfAvailableChannels << " available channels" << endl;
 
     m_bInitDeviceSuccess = true;
     return true;
@@ -234,11 +245,17 @@ bool TMSIDriver::uninitDevice()
 {
     //Check if the device was initialised
     if(!m_bInitDeviceSuccess)
+    {
+        cout << "Plugin TMSI - ERROR - Device was not initialised - therefore can not be uninitialised" << endl;
         return false;
+    }
 
     //Check if the driver DLL was loaded
     if(!m_bDllLoaded)
+    {
+        cout << "Plugin TMSI - ERROR - Driver DLL was not loaded" << endl;
         return false;
+    }
 
     //Close the output stream/file
     if(m_bWriteToFile)

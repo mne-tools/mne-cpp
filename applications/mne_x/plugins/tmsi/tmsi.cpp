@@ -110,7 +110,6 @@ void TMSI::init()
 {
     m_pRMTSA_TMSI = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "TMSI", "EEG output data");
 
-    m_pRMTSA_TMSI->data()->setVisibility(true);
     m_outputConnectors.append(m_pRMTSA_TMSI);
 
     m_iSamplingFreq = 1024;
@@ -130,9 +129,14 @@ void TMSI::init()
 
 bool TMSI::start()
 {
+    //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
+    if(this->isRunning())
+        QThread::wait();
+
     //Set the channel size of the RMTSA - this needs to be done here and NOT in the init() function because the user can change the number of channels during runtime
     m_pRMTSA_TMSI->data()->init(m_iNumberOfChannels);
     m_pRMTSA_TMSI->data()->setSamplingRate(m_iSamplingFreq);
+    m_pRMTSA_TMSI->data()->setVisibility(true);
 
     //Buffer
     m_pRawMatrixBuffer_In = QSharedPointer<RawMatrixBuffer>(new RawMatrixBuffer(8, m_iNumberOfChannels, m_iSamplesPerBlock));
@@ -167,7 +171,7 @@ bool TMSI::stop()
 {
     m_bIsRunning = false;
 
-    //Stop threads after the run() was exited
+    //Stop producer thread
     m_pTMSIProducer->stop();
 
     //Clear Buffers
@@ -213,6 +217,7 @@ void TMSI::run()
     while(m_bIsRunning)
     {
         //pop matrix
+        std::cout<<"TMSI::run()"<<std::endl;
         MatrixXf matValue = m_pRawMatrixBuffer_In->pop();
         //std::cout << "matValue " << matValue.block(0,0,m_iNumberOfChannels,m_iSamplesPerBlock) << std::endl;
 
@@ -224,4 +229,6 @@ void TMSI::run()
                 m_pRMTSA_TMSI->data()->setValue(matValue.col(i).cast<double>());
         }
     }
+
+
 }
