@@ -54,7 +54,7 @@ win32 {
         }
 }
 else {
-    message(TMSI plugin was not configured due to wrong OS (32bit needed - 64bit found)!)
+    message(TMSI plugin was not configured due to wrong OS (win32 needed)!)
     }
 
 contains(MNECPP_CONFIG, babyMEG) {
