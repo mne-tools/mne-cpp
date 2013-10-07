@@ -85,8 +85,9 @@ TMSI::TMSI()
 
 TMSI::~TMSI()
 {
-    std::cout << "TMSI::~TMSI() " << std::endl;
+    //std::cout << "TMSI::~TMSI() " << std::endl;
 
+    //If the program is closed while the sampling is in process
     if(this->isRunning())
         this->stop();
 }
@@ -159,7 +160,7 @@ bool TMSI::start()
     }
     else
     {
-        qWarning() << "Plugin TMSI - ERROR - TMSIProducer thread could not be started - Either the device is turned off or the driver DLL (RTINST.dll) is not installed in the system directory - Also check the cmd line for more information" << endl;
+        qWarning() << "Plugin TMSI - ERROR - TMSIProducer thread could not be started - Either the device is turned off (check your OS device manager) or the driver DLL (RTINST.dll) is not installed in the system directory" << endl;
         return false;
     }
 }
@@ -217,7 +218,6 @@ void TMSI::run()
     while(m_bIsRunning)
     {
         //pop matrix
-        std::cout<<"TMSI::run()"<<std::endl;
         MatrixXf matValue = m_pRawMatrixBuffer_In->pop();
         //std::cout << "matValue " << matValue.block(0,0,m_iNumberOfChannels,m_iSamplesPerBlock) << std::endl;
 

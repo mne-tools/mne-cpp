@@ -71,7 +71,7 @@ TMSIProducer::TMSIProducer(TMSI* pTMSI)
 
 TMSIProducer::~TMSIProducer()
 {
-    cout << "TMSIProducer::~TMSIProducer()" << endl;
+    //cout << "TMSIProducer::~TMSIProducer()" << endl;
 }
 
 
@@ -98,15 +98,11 @@ void TMSIProducer::start(int iNumberOfChannels,
                               bWriteToFile,
                               sOutputFilePath))
     {
-        cout << "Plugin TMSI - INFO - The device has been connected and initialised successfully" << endl;
         m_bIsRunning = true;
         QThread::start();
     }
-    else //start thread
-    {
-        cout << "Plugin TMSI - ERROR - Failed to initialise the device - Sampling not started - Exiting producer thread" << endl;
+    else
         m_bIsRunning = false;
-    }
 }
 
 
@@ -117,10 +113,7 @@ void TMSIProducer::stop()
     m_bIsRunning = false;
 
     //Uinitialise device
-    if(!m_pTMSIDriver->uninitDevice())
-        cout << "Plugin TMSI - ERROR - Failed to uninitialise the device" << endl;
-    else
-        cout << "Plugin TMSI - INFO - Successfully uninitialised the device" << endl;
+    m_pTMSIDriver->uninitDevice();
 }
 
 
@@ -130,7 +123,6 @@ void TMSIProducer::run()
 {
     while(m_bIsRunning)
     {
-        cout << "TMSIProducer::run()" << endl;
         float uiSamplePeriod = 1.0/((float)(m_pTMSI->m_iSamplingFreq));
         MatrixXf matRawBuffer(m_pTMSI->m_iNumberOfChannels, m_pTMSI->m_iSamplesPerBlock);
 

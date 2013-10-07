@@ -252,12 +252,6 @@ public:
     bool uninitDevice();
 
 protected:
-    //=========================================================================================================
-    /**
-    * Checks if a device is connected to the computer.
-    * @param [out] bool returns true if device is connected, false otherwise.
-    */
-    bool deviceConnected();
 
 private:
     TMSIProducer*       m_pTMSIProducer;                /**< A pointer to the corresponding TMSIProducer class.*/
