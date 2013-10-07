@@ -46,10 +46,16 @@ SUBDIRS += \
 
 win32 {
     exists(C:/Windows/System32/RTINST.DLL) {
-        message(TMSI driver DLL found)
+        message(TMSI plugin configured! Driver DLL found!)
         SUBDIRS += tmsi
     }
+    else {
+        message(TMSI plugin was not configured due to missing driver DLL!)
+        }
 }
+else {
+    message(TMSI plugin was not configured due to wrong OS (32bit needed - 64bit found)!)
+    }
 
 contains(MNECPP_CONFIG, babyMEG) {
     message(BabyMEG plugin configured!)

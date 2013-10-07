@@ -105,7 +105,7 @@ TMSIDriver::TMSIDriver(TMSIProducer* pTMSIProducer)
     __load_dll_func__(m_oFpOpenRegKey, POPENREGKEY, "OpenRegKey" );
     __load_dll_func__(m_oFpFree, PFREE, "Free" );
 
-    cout << "Plugin TMSI - INFO - Successfully loaded all DLL functions" << endl;
+    cout << "Plugin TMSI - INFO - TMSIDriver() - Successfully loaded all DLL functions" << endl;
 }
 
 
@@ -113,7 +113,7 @@ TMSIDriver::TMSIDriver(TMSIProducer* pTMSIProducer)
 
 TMSIDriver::~TMSIDriver()
 {
-    cout << "TMSIDriver::~TMSIDriver()" << endl;
+    //cout << "TMSIDriver::~TMSIDriver()" << endl;
 }
 
 
@@ -160,7 +160,7 @@ bool TMSIDriver::initDevice(int iNumberOfChannels,
 
     if(m_oFpGetInstanceId == NULL)
     {
-        cout << "Plugin TMSI - ERROR - Could not get instance id of the device" << endl;
+        cout << "Plugin TMSI - ERROR - initDevice() - Could not get instance id of the device" << endl;
         return false;
     }
     PSP_DEVICE_PATH m_PSPDPMasterDevicePath = m_oFpGetInstanceId(0 , TRUE, &maxDevices);
@@ -168,7 +168,7 @@ bool TMSIDriver::initDevice(int iNumberOfChannels,
     //Check if a Refa device is connected
     if(maxDevices<1)
     {
-        cout << "Plugin TMSI - ERROR - No connected device was found" << endl;
+        cout << "Plugin TMSI - ERROR - initDevice() - No connected device was found" << endl;
         return false;
     }
 
@@ -180,17 +180,17 @@ bool TMSIDriver::initDevice(int iNumberOfChannels,
 
     if(m_HandleMaster == INVALID_HANDLE_VALUE)
     {
-        cout << "Plugin TMSI - ERROR - Failed to open connected device" << endl;
+        cout << "Plugin TMSI - ERROR - initDevice() - Failed to open connected device" << endl;
         return false;
     }
 
     //Initialise and set up (sample rate/frequency and buffer size) the intern driver signal buffer which is used by the driver to store the value
     ULONG iSamplingFrequencyMilliHertz = m_uiSamplingFrequency*1000;    //Times 1000 because the driver works in millihertz
-    ULONG iBufferSize = MAX_BUFFER_SIZE; //m_uiSamplingFrequency*m_uiSamplesPerBlock;      //see TMSi doc file for more info. This size is not defined in bytes but in the number of elements which are to be sampled. A sample in this case is one conversion result for all input channels..
+    ULONG iBufferSize = MAX_BUFFER_SIZE;                                //see TMSi doc file for more info. This size is not defined in bytes but in the number of elements which are to be sampled. A sample in this case is one conversion result for all input channels..
 
     if(!m_oFpSetSignalBuffer(m_HandleMaster, &iSamplingFrequencyMilliHertz, &iBufferSize))
     {
-        cout << "Plugin TMSI - ERROR - Failed to allocate signal buffer" << endl;
+        cout << "Plugin TMSI - ERROR - initDevice() - Failed to allocate signal buffer" << endl;
         return false;
     }
 
@@ -198,7 +198,7 @@ bool TMSIDriver::initDevice(int iNumberOfChannels,
     bool start = m_oFpStart(m_HandleMaster);
     if(!start)
     {
-        cout << "Plugin TMSI - ERROR - Failed to start the sampling procedure" << endl;
+        cout << "Plugin TMSI - ERROR - initDevice() - Failed to start the sampling procedure" << endl;
         return false;
     }
 
@@ -234,6 +234,7 @@ bool TMSIDriver::initDevice(int iNumberOfChannels,
     m_lSignalBufferSize = m_uiSamplesPerBlock*m_iNumberOfAvailableChannels*4;
     m_lSignalBuffer = new LONG[m_lSignalBufferSize];
 
+    cout << "Plugin TMSI - INFO - initDevice() - The device has been connected and initialised successfully" << endl;
     m_bInitDeviceSuccess = true;
     return true;
 }
@@ -246,14 +247,14 @@ bool TMSIDriver::uninitDevice()
     //Check if the device was initialised
     if(!m_bInitDeviceSuccess)
     {
-        cout << "Plugin TMSI - ERROR - Device was not initialised - therefore can not be uninitialised" << endl;
+        cout << "Plugin TMSI - ERROR - uninitDevice() - Device was not initialised - therefore can not be uninitialised" << endl;
         return false;
     }
 
     //Check if the driver DLL was loaded
     if(!m_bDllLoaded)
     {
-        cout << "Plugin TMSI - ERROR - Driver DLL was not loaded" << endl;
+        cout << "Plugin TMSI - ERROR - uninitDevice() - Driver DLL was not loaded" << endl;
         return false;
     }
 
@@ -263,19 +264,19 @@ bool TMSIDriver::uninitDevice()
 
     if(!m_oFpStop(m_HandleMaster))
     {
-        cout << "Plugin TMSI - ERROR - Failed to stop the device" << endl;
+        cout << "Plugin TMSI - ERROR - uninitDevice() - Failed to stop the device" << endl;
         return false;
     }
 
     if(!m_oFpReset(m_HandleMaster))
     {
-        cout << "Plugin TMSI - ERROR - Failed to reset the device" << endl;
+        cout << "Plugin TMSI - ERROR - uninitDevice() - Failed to reset the device" << endl;
         return false;
     }
 
     if(!m_oFpClose(m_HandleMaster))
     {
-        cout << "Plugin TMSI - ERROR - Failed to close the device" << endl;
+        cout << "Plugin TMSI - ERROR - uninitDevice() - Failed to close the device" << endl;
         return false;
     }
 
@@ -285,17 +286,7 @@ bool TMSIDriver::uninitDevice()
     m_PSPDPMasterDevicePath = NULL;
     m_lSignalBuffer = NULL;
 
-    return true;
-}
-
-
-//*************************************************************************************************************
-
-bool TMSIDriver::deviceConnected()
-{
-    //TODO: Implement function to check whether the device was turned off during the sampling process
-    //getstate or getid did not work
-
+    cout << "Plugin TMSI - INFO - uninitDevice() - Successfully uninitialised the device" << endl;
     return true;
 }
 
@@ -308,17 +299,10 @@ bool TMSIDriver::deviceConnected()
     if(!m_bDllLoaded)
         return false;
 
-    //Check if a device is connected to the computer
-    if(!deviceConnected())
-    {
-        cout << "Plugin TMSI - ERROR - Cannot start to get samples from device because it is not connected" << endl;
-        return false;
-    }
-
     //Check if device was initialised and connected correctly
     if(!m_bInitDeviceSuccess)
     {
-        cout << "Plugin TMSI - ERROR - Cannot start to get samples from device because device was not initialised correctly" << endl;
+        cout << "Plugin TMSI - ERROR - getSampleMatrixValue() - Cannot start to get samples from device because device was not initialised correctly" << endl;
         return false;
     }
 
@@ -331,7 +315,7 @@ bool TMSIDriver::deviceConnected()
     if(ulNumSamplesReceived<1)
     {
         sampleMatrix.setZero();
-        //cout << "Plugin TMSI - ERROR - No samples received from device" << endl;
+        //cout << "Plugin TMSI - ERROR - getSampleMatrixValue() - No samples received from device" << endl;
         return false;
     }
     else
@@ -340,9 +324,6 @@ bool TMSIDriver::deviceConnected()
         ULONG PercentFull;
 
         m_oFpGetBufferInfo(m_HandleMaster, &Overflow, &PercentFull);
-
-        //cout << "Plugin TMSI - INFO - Internal driver buffer is " << PercentFull << "% full" << endl;
-        //cout << "Plugin TMSI - INFO - " << ulSizeSamples << " bytes of " << ulNumSamplesReceived << " samples received from device" << endl;
 
         //Read the sample block out of the signal buffer (m_ulSignalBuffer) and write them to the sample buffer (m_pSample)
         sampleMatrix.setZero(); // Clear matrix - set all elements to zero
