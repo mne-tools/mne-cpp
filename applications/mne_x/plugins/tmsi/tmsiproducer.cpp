@@ -110,7 +110,11 @@ void TMSIProducer::start(int iNumberOfChannels,
 
 void TMSIProducer::stop()
 {
+    //Stop this (TMSIProducer) thread
     m_bIsRunning = false;
+
+//    if(this->isRunning())
+//        QThread::wait();
 
     //Uinitialise device
     m_pTMSIDriver->uninitDevice();
@@ -123,16 +127,19 @@ void TMSIProducer::run()
 {
     while(m_bIsRunning)
     {
-        float uiSamplePeriod = 1.0/((float)(m_pTMSI->m_iSamplingFreq));
+        std::cout<<"TMSIProducer::run()"<<std::endl;
         MatrixXf matRawBuffer(m_pTMSI->m_iNumberOfChannels, m_pTMSI->m_iSamplesPerBlock);
 
-        //Wait for sampling period to pass
-        usleep(uiSamplePeriod*m_pTMSI->m_iSamplesPerBlock);
+//        //Wait for sampling period to pass
+//        float uiSamplePeriod = 1.0/((float)(m_pTMSI->m_iSamplingFreq));
+//        usleep(uiSamplePeriod*m_pTMSI->m_iSamplesPerBlock);
 
         //Get the TMSi EEG data out of the device buffer and write received data to circular buffer
         if(m_pTMSIDriver->getSampleMatrixValue(matRawBuffer))
             m_pTMSI->m_pRawMatrixBuffer_In->push(&matRawBuffer);
     }
+
+    std::cout<<"EXITING - TMSIProducer::run()"<<std::endl;
 }
 
 
