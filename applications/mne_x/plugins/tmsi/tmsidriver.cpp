@@ -209,13 +209,13 @@ bool TMSIDriver::initDevice(int iNumberOfChannels,
     {
         wcscpy_s(m_wcDeviceName, pSignalFormat->PortName);
         m_ulSerialNumber = pSignalFormat->SerialNumber;
-        m_iNumberOfAvailableChannels = pSignalFormat[0].Elements;
+        m_uiNumberOfAvailableChannels = pSignalFormat[0].Elements;
 
         if(m_bWriteToFile)
-            m_outputFileStream << "Found "<< m_wcDeviceName << " device (" << m_ulSerialNumber << ") with " << m_iNumberOfAvailableChannels << " available channels" << endl << endl;
+            m_outputFileStream << "Found "<< m_wcDeviceName << " device (" << m_ulSerialNumber << ") with " << m_uiNumberOfAvailableChannels << " available channels" << endl << endl;
 
 
-        for(uint i = 0 ; i < m_iNumberOfAvailableChannels; i++ )
+        for(uint i = 0 ; i < m_uiNumberOfAvailableChannels; i++ )
         {
             m_vExponentChannel.push_back(pSignalFormat[i].UnitExponent);
             m_vUnitGain.push_back(pSignalFormat[i].UnitGain);
@@ -231,7 +231,7 @@ bool TMSIDriver::initDevice(int iNumberOfChannels,
 
     //Create the buffers
     //The sampling frequency is not needed here because it is only used to specify the internal buffer size used by the driver with setSignalBuffer()
-    m_lSignalBufferSize = m_uiSamplesPerBlock*m_iNumberOfAvailableChannels*4;
+    m_lSignalBufferSize = m_uiSamplesPerBlock*m_uiNumberOfAvailableChannels*4;
     m_lSignalBuffer = new LONG[m_lSignalBufferSize];
 
     cout << "Plugin TMSI - INFO - initDevice() - The device has been connected and initialised successfully" << endl;
@@ -244,6 +244,9 @@ bool TMSIDriver::initDevice(int iNumberOfChannels,
 
 bool TMSIDriver::uninitDevice()
 {
+    //Clear the buffer which is used to store the received samples
+    m_vSampleBlockBuffer.clear();
+
     //Check if the device was initialised
     if(!m_bInitDeviceSuccess)
     {
@@ -306,60 +309,109 @@ bool TMSIDriver::uninitDevice()
         return false;
     }
 
-    //Get sample block from device
-    ULONG ulSizeSamples = m_oFpGetSamples(m_HandleMaster, (PULONG)m_lSignalBuffer, m_lSignalBufferSize);
+    uint iSamplesWrittenToMatrix = 0;
+    int channelMax = 0;
+    int sampleMax = 0;
 
-    ULONG ulNumSamplesReceived = ulSizeSamples/(m_iNumberOfAvailableChannels*4);
-
-    //Only read from buffer if at least one sample was received otherwise return false
-    if(ulNumSamplesReceived<1)
+    while(iSamplesWrittenToMatrix < m_uiSamplesPerBlock)
     {
-        sampleMatrix.setZero();
-        //cout << "Plugin TMSI - ERROR - getSampleMatrixValue() - No samples received from device" << endl;
-        return false;
+        //Get sample block from device
+        ULONG ulSizeSamples = m_oFpGetSamples(m_HandleMaster, (PULONG)m_lSignalBuffer, m_lSignalBufferSize);
+        ULONG ulNumSamplesReceived = ulSizeSamples/(m_uiNumberOfAvailableChannels*4);
+
+        for(uint i=0; i<ulNumSamplesReceived*m_uiNumberOfAvailableChannels; i++)
+            m_vSampleBlockBuffer.push_back((double)m_lSignalBuffer[i]);
+
+        if(m_uiNumberOfAvailableChannels<m_uiNumberOfChannels)
+            channelMax = m_uiNumberOfAvailableChannels;
+        else
+            channelMax = m_uiNumberOfChannels;
+
+        if(iSamplesWrittenToMatrix + ulNumSamplesReceived > m_uiSamplesPerBlock)
+            sampleMax = m_uiSamplesPerBlock - iSamplesWrittenToMatrix;
+        else
+            sampleMax = ulNumSamplesReceived;
+
+        if(sampleMax > 0)
+        {
+            for(int sample = 0; sample<sampleMax; sample++)
+            {
+                for(int channel = 0; channel<channelMax;channel++)
+                {
+                    sampleMatrix(channel, sample) = (m_vSampleBlockBuffer.first())*(m_bUseUnitGain ? m_vUnitGain[channel] : 1) + (m_bUseUnitOffset ? m_vUnitOffSet[channel] : 0) * (m_bUseChExponent ? pow(10., (m_bConvertToVolt ? (double)m_vExponentChannel[channel]+6 : (double)m_vExponentChannel[channel])) : 1);
+                    m_vSampleBlockBuffer.pop_front();
+                }
+            }
+        }
+
+        iSamplesWrittenToMatrix += sampleMax;
     }
-    else
+
+    if(m_outputFileStream.is_open() && m_bWriteToFile)
     {
         ULONG Overflow;
         ULONG PercentFull;
 
         m_oFpGetBufferInfo(m_HandleMaster, &Overflow, &PercentFull);
 
-        //Read the sample block out of the signal buffer (m_ulSignalBuffer) and write them to the sample buffer (m_pSample)
-        sampleMatrix.setZero(); // Clear matrix - set all elements to zero
-        int channelMax;
-        int sampleMax;
-
-        if(ulNumSamplesReceived<m_uiSamplesPerBlock) //If the number of received samples is smaller than the number defined by the user -> set the sampleMax to the smaller number
-            sampleMax = ulNumSamplesReceived;
-        else
-            sampleMax = m_uiSamplesPerBlock;
-
-        if(m_iNumberOfAvailableChannels<m_uiNumberOfChannels)//If the number of available channels is smaller than the number defined by the user -> set the channelMax to the smaller number
-            channelMax = m_iNumberOfAvailableChannels;
-        else
-            channelMax = m_uiNumberOfChannels;
-
-        for(int channel = 0; channel<channelMax; channel++)
-        {
-            for(int sample = 0; sample<sampleMax; sample++)
-            {
-                sampleMatrix(channel, sample) = (float)(((float)m_lSignalBuffer[(m_uiNumberOfChannels*sample)+channel]*(m_bUseUnitGain ? m_vUnitGain[channel] : 1) + (m_bUseUnitOffset ? m_vUnitOffSet[channel] : 0)) * (m_bUseChExponent ? pow(10., (m_bConvertToVolt ? (double)m_vExponentChannel[channel]+6 : (double)m_vExponentChannel[channel])) : 1));
-            }
-        }
-
-        //cout << sampleMatrix.block(0, 0, channelMax, sampleMax) << endl << endl;
-
-        //write to file
-        if(m_outputFileStream.is_open() && m_bWriteToFile)
-        {
-            m_outputFileStream << "Plugin TMSI - INFO - Internal driver buffer is " << PercentFull << "% full" << endl;
-            m_outputFileStream << "Plugin TMSI - INFO - " << ulSizeSamples << " bytes of " << ulNumSamplesReceived << " samples received from device" << endl;
-            m_outputFileStream << sampleMatrix.block(0, 0, channelMax, sampleMax) << endl << endl;
-        }
+        m_outputFileStream << "Plugin TMSI - INFO - Internal driver buffer is " << PercentFull << "% full" << endl;
+        m_outputFileStream << sampleMatrix.block(0, 0, channelMax, m_uiSamplesPerBlock) << endl << endl;
     }
 
     return true;
+
+
+    //---------------------------------------------------------------------------------------------------
+
+//    //Only read from buffer if at least one sample was received otherwise return false
+//    if(ulNumSamplesReceived<1)
+//    {
+//        sampleMatrix.setZero();
+//        //cout << "Plugin TMSI - ERROR - getSampleMatrixValue() - No samples received from device" << endl;
+//        return false;
+//    }
+//    else
+//    {
+//        ULONG Overflow;
+//        ULONG PercentFull;
+
+//        m_oFpGetBufferInfo(m_HandleMaster, &Overflow, &PercentFull);
+
+//        //Read the sample block out of the signal buffer (m_ulSignalBuffer) and write them to the sample buffer (m_pSample)
+//        sampleMatrix.setZero(); // Clear matrix - set all elements to zero
+//        int channelMax;
+//        int sampleMax;
+
+//        if(ulNumSamplesReceived<m_uiSamplesPerBlock) //If the number of received samples is smaller than the number defined by the user -> set the sampleMax to the smaller number
+//            sampleMax = ulNumSamplesReceived;
+//        else
+//            sampleMax = m_uiSamplesPerBlock;
+
+//        if(m_uiNumberOfAvailableChannels<m_uiNumberOfChannels)//If the number of available channels is smaller than the number defined by the user -> set the channelMax to the smaller number
+//            channelMax = m_uiNumberOfAvailableChannels;
+//        else
+//            channelMax = m_uiNumberOfChannels;
+
+//        for(int channel = 0; channel<channelMax; channel++)
+//        {
+//            for(int sample = 0; sample<sampleMax; sample++)
+//            {
+//                sampleMatrix(channel, sample) = (float)(((float)m_lSignalBuffer[(m_uiNumberOfChannels*sample)+channel]*(m_bUseUnitGain ? m_vUnitGain[channel] : 1) + (m_bUseUnitOffset ? m_vUnitOffSet[channel] : 0)) * (m_bUseChExponent ? pow(10., (m_bConvertToVolt ? (double)m_vExponentChannel[channel]+6 : (double)m_vExponentChannel[channel])) : 1));
+//            }
+//        }
+
+//        //cout << sampleMatrix.block(0, 0, channelMax, sampleMax) << endl << endl;
+
+//        //write to file
+//        if(m_outputFileStream.is_open() && m_bWriteToFile)
+//        {
+//            m_outputFileStream << "Plugin TMSI - INFO - Internal driver buffer is " << PercentFull << "% full" << endl;
+//            m_outputFileStream << "Plugin TMSI - INFO - " << ulSizeSamples << " bytes of " << ulNumSamplesReceived << " samples received from device" << endl;
+//            m_outputFileStream << sampleMatrix.block(0, 0, channelMax, sampleMax) << endl << endl;
+//        }
+//    }
+
+//    return true;
 }
 
 

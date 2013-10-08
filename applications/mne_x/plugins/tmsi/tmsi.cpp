@@ -115,7 +115,7 @@ void TMSI::init()
 
     m_iSamplingFreq = 1024;
     m_iNumberOfChannels = 138;
-    m_iSamplesPerBlock = 1;
+    m_iSamplesPerBlock = 16;
     m_bConvertToVolt = false;
     m_bUseChExponent = false;
     m_bUseUnitGain = false;
@@ -143,14 +143,14 @@ bool TMSI::start()
     m_pRawMatrixBuffer_In = QSharedPointer<RawMatrixBuffer>(new RawMatrixBuffer(8, m_iNumberOfChannels, m_iSamplesPerBlock));
 
     m_pTMSIProducer->start(m_iNumberOfChannels,
-                           m_iSamplingFreq,
-                           m_iSamplesPerBlock,
-                           m_bConvertToVolt,
-                           m_bUseChExponent,
-                           m_bUseUnitGain,
-                           m_bUseUnitOffset,
-                           m_bWriteToFile,
-                           m_sOutputFilePath);
+                       m_iSamplingFreq,
+                       m_iSamplesPerBlock,
+                       m_bConvertToVolt,
+                       m_bUseChExponent,
+                       m_bUseUnitGain,
+                       m_bUseUnitOffset,
+                       m_bWriteToFile,
+                       m_sOutputFilePath);
 
     if(m_pTMSIProducer->isRunning())
     {
@@ -170,10 +170,23 @@ bool TMSI::start()
 
 bool TMSI::stop()
 {
+    //Stop this (TMSI) thread
     m_bIsRunning = false;
 
     //Stop producer thread
     m_pTMSIProducer->stop();
+
+//    QThread::terminate();
+//    QThread::wait();
+
+//    while(this->isRunning())
+//    {
+//        MatrixXf test = MatrixXf::Zero(m_iNumberOfChannels, m_iSamplesPerBlock);
+//        m_pRawMatrixBuffer_In->push(&test);
+//    }
+
+//    if(this->isRunning())
+//        QThread::wait();
 
     //Clear Buffers
     m_pRawMatrixBuffer_In->clear();
@@ -217,18 +230,21 @@ void TMSI::run()
 {
     while(m_bIsRunning)
     {
-        //pop matrix
-        MatrixXf matValue = m_pRawMatrixBuffer_In->pop();
-        //std::cout << "matValue " << matValue.block(0,0,m_iNumberOfChannels,m_iSamplesPerBlock) << std::endl;
+        std::cout<<"TMSI::run()"<<std::endl;
 
-        //emit values to real time multi sample array
-        for(qint32 i = 0; i < matValue.cols(); ++i)
+        //pop matrix only if the producer thread is running
+        if(m_pTMSIProducer->isRunning())
         {
-            //Check if one sample (values for all channels at one "sample moment" in time) is equal to zero -> if so the application is reading faster from the buffer than the device can write new data into the buffer -> do not display these zero values
-            if(!matValue.col(i).isZero())
+            MatrixXf matValue = m_pRawMatrixBuffer_In->pop();
+            //std::cout << "matValue " << matValue.block(0,0,m_iNumberOfChannels,m_iSamplesPerBlock) << std::endl;
+
+            //emit values to real time multi sample array
+            for(qint32 i = 0; i < matValue.cols(); ++i)
+            {
                 m_pRMTSA_TMSI->data()->setValue(matValue.col(i).cast<double>());
+            }
         }
     }
 
-
+    std::cout<<"EXITING - TMSI::run()"<<std::endl;
 }
