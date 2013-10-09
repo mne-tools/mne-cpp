@@ -113,7 +113,7 @@ void TMSIProducer::stop()
     //Stop this (TMSIProducer) thread
     m_bIsRunning = false;
 
-    if(this->isRunning())
+    //if(this->isRunning())
         QThread::wait();
 
     //Uinitialise device
@@ -127,7 +127,7 @@ void TMSIProducer::run()
 {
     while(m_bIsRunning)
     {
-        //std::cout<<"TMSIProducer::run()"<<std::endl;
+        std::cout<<"TMSIProducer::run()"<<std::endl;
         MatrixXf matRawBuffer(m_pTMSI->m_iNumberOfChannels, m_pTMSI->m_iSamplesPerBlock);
 
 //        //Wait for sampling period to pass
