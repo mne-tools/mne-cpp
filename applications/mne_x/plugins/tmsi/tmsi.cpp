@@ -230,7 +230,7 @@ void TMSI::run()
 {
     while(m_bIsRunning)
     {
-        std::cout<<"TMSI::run()"<<std::endl;
+        //std::cout<<"TMSI::run()"<<std::endl;
 
         //pop matrix only if the producer thread is running
         if(m_pTMSIProducer->isRunning())
@@ -240,9 +240,7 @@ void TMSI::run()
 
             //emit values to real time multi sample array
             for(qint32 i = 0; i < matValue.cols(); ++i)
-            {
                 m_pRMTSA_TMSI->data()->setValue(matValue.col(i).cast<double>());
-            }
         }
     }
 

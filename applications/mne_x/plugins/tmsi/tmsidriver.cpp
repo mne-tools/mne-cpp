@@ -309,42 +309,60 @@ bool TMSIDriver::uninitDevice()
         return false;
     }
 
+    sampleMatrix.setZero(); // Clear matrix - set all elements to zero
     uint iSamplesWrittenToMatrix = 0;
     int channelMax = 0;
     int sampleMax = 0;
+    int sampleIterator = 0;
 
+    //get samples from device until the complete matrix is filled, i.e. the samples per block size is met
     while(iSamplesWrittenToMatrix < m_uiSamplesPerBlock)
     {
         //Get sample block from device
         ULONG ulSizeSamples = m_oFpGetSamples(m_HandleMaster, (PULONG)m_lSignalBuffer, m_lSignalBufferSize);
         ULONG ulNumSamplesReceived = ulSizeSamples/(m_uiNumberOfAvailableChannels*4);
 
-        for(uint i=0; i<ulNumSamplesReceived*m_uiNumberOfAvailableChannels; i++)
-            m_vSampleBlockBuffer.push_back((double)m_lSignalBuffer[i]);
-
-        if(m_uiNumberOfAvailableChannels<m_uiNumberOfChannels)
-            channelMax = m_uiNumberOfAvailableChannels;
-        else
-            channelMax = m_uiNumberOfChannels;
-
-        if(iSamplesWrittenToMatrix + ulNumSamplesReceived > m_uiSamplesPerBlock)
-            sampleMax = m_uiSamplesPerBlock - iSamplesWrittenToMatrix;
-        else
-            sampleMax = ulNumSamplesReceived;
-
-        if(sampleMax > 0)
+        //Only do the next steps if there was at least one sample received, otherwise skip and wait until at least one sample was received
+        if(ulNumSamplesReceived > 0)
         {
-            for(int sample = 0; sample<sampleMax; sample++)
+            int actualSamplesWritten = 0; //Holds the number of samples which are actually written to the matrix in this while procedure
+
+            //Write the received samples to an extra buffer, so that they are not getting lost if too many samples were received. The  are then written to the next matrix (block)
+            for(uint i=0; i<ulNumSamplesReceived*m_uiNumberOfAvailableChannels; i++)
+                m_vSampleBlockBuffer.push_back((double)m_lSignalBuffer[i]);
+
+            //If the number of available channels is smaller than the number defined by the user -> set the channelMax to the smaller number
+            if(m_uiNumberOfAvailableChannels < m_uiNumberOfChannels)
+                channelMax = m_uiNumberOfAvailableChannels;
+            else
+                channelMax = m_uiNumberOfChannels;
+
+            //If the number of the samples which were already written to the matrix plus the last received number of samples is larger then the defined block size
+            //-> only fill until the matrix is completeley filled with samples. The other (unused) samples are still stored in the vector buffer m_vSampleBlockBuffer and will be used in the next matrix which is to be sent to the circualr buffer by the producer
+            if(iSamplesWrittenToMatrix + ulNumSamplesReceived > m_uiSamplesPerBlock)
+                sampleMax = m_uiSamplesPerBlock - iSamplesWrittenToMatrix + sampleIterator;
+            else
+                sampleMax = ulNumSamplesReceived + sampleIterator;
+
+            //Read the needed number of samples from the vector buffer to store them in the matrix
+            for(; sampleIterator < sampleMax; sampleIterator++)
             {
-                for(int channel = 0; channel<channelMax;channel++)
+                for(int channelIterator = 0; channelIterator < channelMax; channelIterator++)
                 {
-                    sampleMatrix(channel, sample) = (m_vSampleBlockBuffer.first())*(m_bUseUnitGain ? m_vUnitGain[channel] : 1) + (m_bUseUnitOffset ? m_vUnitOffSet[channel] : 0) * (m_bUseChExponent ? pow(10., (m_bConvertToVolt ? (double)m_vExponentChannel[channel]+6 : (double)m_vExponentChannel[channel])) : 1);
+                    sampleMatrix(channelIterator, sampleIterator) = (m_vSampleBlockBuffer.first())*(m_bUseUnitGain ? m_vUnitGain[channelIterator] : 1) + (m_bUseUnitOffset ? m_vUnitOffSet[channelIterator] : 0) * (m_bUseChExponent ? pow(10., (m_bConvertToVolt ? (double)m_vExponentChannel[channelIterator]+6 : (double)m_vExponentChannel[channelIterator])) : 1);
                     m_vSampleBlockBuffer.pop_front();
                 }
+
+                actualSamplesWritten ++;
             }
+
+            iSamplesWrittenToMatrix = iSamplesWrittenToMatrix + actualSamplesWritten;
         }
 
-        iSamplesWrittenToMatrix += sampleMax;
+        m_outputFileStream << "ulNumSamplesReceived: " << ulNumSamplesReceived << endl;
+        m_outputFileStream << "sampleMax: " << sampleMax << endl;
+        m_outputFileStream << "sampleIterator: " << sampleIterator << endl;
+        m_outputFileStream << "iSamplesWrittenToMatrix: " << iSamplesWrittenToMatrix << endl << endl;
     }
 
     if(m_outputFileStream.is_open() && m_bWriteToFile)
@@ -361,7 +379,10 @@ bool TMSIDriver::uninitDevice()
     return true;
 
 
-    //---------------------------------------------------------------------------------------------------
+//    //---- Fill up with zeros -> the function does not wait until the block is completley filled with values ------------------------------------------
+
+//    ULONG ulSizeSamples = m_oFpGetSamples(m_HandleMaster, (PULONG)m_lSignalBuffer, m_lSignalBufferSize);
+//    ULONG ulNumSamplesReceived = ulSizeSamples/(m_uiNumberOfAvailableChannels*4);
 
 //    //Only read from buffer if at least one sample was received otherwise return false
 //    if(ulNumSamplesReceived<1)
@@ -407,7 +428,7 @@ bool TMSIDriver::uninitDevice()
 //        {
 //            m_outputFileStream << "Plugin TMSI - INFO - Internal driver buffer is " << PercentFull << "% full" << endl;
 //            m_outputFileStream << "Plugin TMSI - INFO - " << ulSizeSamples << " bytes of " << ulNumSamplesReceived << " samples received from device" << endl;
-//            m_outputFileStream << sampleMatrix.block(0, 0, channelMax, sampleMax) << endl << endl;
+//            m_outputFileStream << sampleMatrix.block(0, 0, m_uiNumberOfChannels, m_uiSamplesPerBlock) << endl << endl;
 //        }
 //    }
 
