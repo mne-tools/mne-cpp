@@ -170,23 +170,22 @@ bool TMSI::start()
 
 bool TMSI::stop()
 {
-    //Stop this (TMSI) thread
-    m_bIsRunning = false;
-
-    //Stop producer thread
+    //Stop the producer thread first
     m_pTMSIProducer->stop();
 
-//    QThread::terminate();
-//    QThread::wait();
+    //Stop this (TMSI) thread
+    m_bIsRunning = false;
+    m_pRawMatrixBuffer_In->pause(true);
 
-//    while(this->isRunning())
-//    {
-//        MatrixXf test = MatrixXf::Zero(m_iNumberOfChannels, m_iSamplesPerBlock);
-//        m_pRawMatrixBuffer_In->push(&test);
-//    }
+    if(this->isFinished())
+        std::cout << "TMSI is finished" << std::endl;
 
-//    if(this->isRunning())
-//        QThread::wait();
+    if(this->isRunning())
+        std::cout << "TMSI is finished" << std::endl;
+
+    //this->wait();
+
+    m_pRawMatrixBuffer_In->pause(false);
 
     //Clear Buffers
     m_pRawMatrixBuffer_In->clear();
@@ -230,7 +229,7 @@ void TMSI::run()
 {
     while(m_bIsRunning)
     {
-        //std::cout<<"TMSI::run()"<<std::endl;
+        std::cout<<"TMSI::run()"<<std::endl;
 
         //pop matrix only if the producer thread is running
         if(m_pTMSIProducer->isRunning())

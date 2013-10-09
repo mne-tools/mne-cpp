@@ -153,6 +153,12 @@ public:
     */
     inline quint32 cols() const;
 
+    //=========================================================================================================
+    /**
+    * Pauses the buffer
+    */
+    inline void pause(bool);
+
 private:
     //=========================================================================================================
     /**
@@ -172,6 +178,7 @@ private:
     int             m_iCurrentWriteIndex;       /**< Holds the current write index.*/
     QSemaphore*     m_pFreeElements;            /**< Holds a semaphore which acquires free elements for thread safe writing. A semaphore is a generalization of a mutex.*/
     QSemaphore*     m_pUsedElements;            /**< Holds a semaphore which acquires written semaphore for thread safe reading.*/
+    bool            m_bPause;
 };
 
 
@@ -192,6 +199,7 @@ CircularMatrixBuffer<_Tp>::CircularMatrixBuffer(unsigned int uiMaxNumMatrices, u
 , m_iCurrentWriteIndex(-1)
 , m_pFreeElements(new QSemaphore(m_uiMaxNumElements))
 , m_pUsedElements(new QSemaphore(0))
+, m_bPause(false)
 {
 
 }
@@ -213,16 +221,19 @@ CircularMatrixBuffer<_Tp>::~CircularMatrixBuffer()
 template<typename _Tp>
 inline void CircularMatrixBuffer<_Tp>::push(const Matrix<_Tp, Dynamic, Dynamic>* pMatrix)
 {
-    unsigned int t_size = pMatrix->size();
-    if(t_size == m_uiRows*m_uiCols)
+    if(!m_bPause)
     {
-        m_pFreeElements->acquire(t_size);
-        for(unsigned int i = 0; i < t_size; ++i)
-            m_pBuffer[mapIndex(m_iCurrentWriteIndex)] = pMatrix->data()[i];
-        m_pUsedElements->release(t_size);
+        unsigned int t_size = pMatrix->size();
+        if(t_size == m_uiRows*m_uiCols)
+        {
+            m_pFreeElements->acquire(t_size);
+            for(unsigned int i = 0; i < t_size; ++i)
+                m_pBuffer[mapIndex(m_iCurrentWriteIndex)] = pMatrix->data()[i];
+            m_pUsedElements->release(t_size);
+        }
+    //    else
+    //        printf("Error: Matrix not appended to CircularMatrixBuffer - wrong dimensions\n");
     }
-//    else
-//        printf("Error: Matrix not appended to CircularMatrixBuffer - wrong dimensions\n");
 }
 
 
@@ -231,11 +242,17 @@ inline void CircularMatrixBuffer<_Tp>::push(const Matrix<_Tp, Dynamic, Dynamic>*
 template<typename _Tp>
 inline Matrix<_Tp, Dynamic, Dynamic> CircularMatrixBuffer<_Tp>::pop()
 {
-    m_pUsedElements->acquire(m_uiRows*m_uiCols);
     Matrix<_Tp, Dynamic, Dynamic> matrix(m_uiRows, m_uiCols);
-    for(quint32 i = 0; i < m_uiRows*m_uiCols; ++i)
-        matrix.data()[i] = m_pBuffer[mapIndex(m_iCurrentReadIndex)];
-    m_pFreeElements->release(m_uiRows*m_uiCols);
+
+    if(!m_bPause)
+    {
+        m_pUsedElements->acquire(m_uiRows*m_uiCols);
+        for(quint32 i = 0; i < m_uiRows*m_uiCols; ++i)
+            matrix.data()[i] = m_pBuffer[mapIndex(m_iCurrentReadIndex)];
+        m_pFreeElements->release(m_uiRows*m_uiCols);
+    }
+    else
+        matrix.setZero();
 
     return matrix;
 }
@@ -291,6 +308,21 @@ inline quint32 CircularMatrixBuffer<_Tp>::cols() const
     return m_uiCols;
 }
 
+
+//*************************************************************************************************************
+
+template<typename _Tp>
+inline void CircularMatrixBuffer<_Tp>::pause(bool bPause)
+{
+    m_bPause = bPause;
+
+    if(bPause == true)
+    {
+        unsigned int t_size = m_uiRows*m_uiCols;
+        for(unsigned int i = 0; i < t_size; ++i)
+            m_pBuffer[mapIndex(m_iCurrentWriteIndex)] = 0;
+    }
+}
 
 //*************************************************************************************************************
 //=============================================================================================================
