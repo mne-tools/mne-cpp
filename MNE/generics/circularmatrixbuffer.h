@@ -155,9 +155,23 @@ public:
 
     //=========================================================================================================
     /**
-    * Pauses the buffer
+    * Pauses the buffer. Skpis any incoming matrices and only pops zero matrices.
     */
     inline void pause(bool);
+
+    //=========================================================================================================
+    /**
+    * Releases the circular buffer from the acquire statement in the pop() function.
+    * @param [out] bool returns true if resources were freed so that the aquire statement in the pop function can release, otherwise false.
+    */
+    inline bool releaseFromPop();
+
+    //=========================================================================================================
+    /**
+    * Releases the circular buffer from the acquire statement in the push() function.
+    * @param [out] bool returns true if resources were freed so that the aquire statement in the push function can release, otherwise false.
+    */
+    inline bool releaseFromPush();
 
 private:
     //=========================================================================================================
@@ -315,14 +329,52 @@ template<typename _Tp>
 inline void CircularMatrixBuffer<_Tp>::pause(bool bPause)
 {
     m_bPause = bPause;
+}
 
-    if(bPause == true)
+
+//*************************************************************************************************************
+
+template<typename _Tp>
+inline bool CircularMatrixBuffer<_Tp>::releaseFromPop()
+{
+   if((uint)m_pUsedElements->available() < m_uiRows*m_uiCols)
     {
+        //The last matrix which is to be popped from the buffer is supposed to be a zero matrix
         unsigned int t_size = m_uiRows*m_uiCols;
         for(unsigned int i = 0; i < t_size; ++i)
             m_pBuffer[mapIndex(m_iCurrentWriteIndex)] = 0;
+
+        //Release (create) values from m_pUsedElements so that the pop function can leave the acquire statement in the pop function
+        m_pUsedElements->release(m_uiRows*m_uiCols);
+
+        return true;
     }
+
+    return false;
 }
+
+
+//*************************************************************************************************************
+
+template<typename _Tp>
+inline bool CircularMatrixBuffer<_Tp>::releaseFromPush()
+{
+    if((uint)m_pFreeElements->available() < m_uiRows*m_uiCols)
+    {
+        //The last matrix which is to be pushed to the buffer is supposed to be a zero matrix
+        unsigned int t_size = m_uiRows*m_uiCols;
+        for(unsigned int i = 0; i < t_size; ++i)
+            m_pBuffer[mapIndex(m_iCurrentWriteIndex)] = 0;
+
+        //Release (create) values from m_pFreeElements so that the push function can leave the acquire statement in the push function
+        m_pFreeElements->release(m_uiRows*m_uiCols);
+
+        return true;
+    }
+
+    return false;
+}
+
 
 //*************************************************************************************************************
 //=============================================================================================================

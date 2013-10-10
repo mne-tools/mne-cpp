@@ -197,6 +197,9 @@ void TMSISetupWidget::changeOutputFileDir()
                 "mne_x_plugins/resources/tmsi",
                  QFileDialog::ShowDirsOnly);
 
+    if(path==NULL)
+        path = ui.m_lineEdit_outputDir->text();
+
     ui.m_lineEdit_outputDir->setText(path);
     m_pTMSI->m_sOutputFilePath = ui.m_lineEdit_outputDir->text();
 }
