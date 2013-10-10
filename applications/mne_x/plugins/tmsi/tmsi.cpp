@@ -173,21 +173,12 @@ bool TMSI::stop()
     //Stop the producer thread first
     m_pTMSIProducer->stop();
 
-    //Stop this (TMSI) thread
+    //Wait until this thread (TMSI) is stopped
     m_bIsRunning = false;
-    m_pRawMatrixBuffer_In->pause(true);
 
-    if(this->isFinished())
-        std::cout << "TMSI is finished" << std::endl;
+    //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the pop function (acquire statement)
+    m_pRawMatrixBuffer_In->releaseFromPop();
 
-    if(this->isRunning())
-        std::cout << "TMSI is finished" << std::endl;
-
-    //this->wait();
-
-    m_pRawMatrixBuffer_In->pause(false);
-
-    //Clear Buffers
     m_pRawMatrixBuffer_In->clear();
 
     return true;
@@ -229,10 +220,10 @@ void TMSI::run()
 {
     while(m_bIsRunning)
     {
-        std::cout<<"TMSI::run()"<<std::endl;
+        //std::cout<<"TMSI::run()"<<std::endl;
 
         //pop matrix only if the producer thread is running
-        if(m_pTMSIProducer->isRunning())
+        if(true/*m_pTMSIProducer->isRunning()*/)
         {
             MatrixXf matValue = m_pRawMatrixBuffer_In->pop();
             //std::cout << "matValue " << matValue.block(0,0,m_iNumberOfChannels,m_iSamplesPerBlock) << std::endl;
@@ -243,5 +234,5 @@ void TMSI::run()
         }
     }
 
-    std::cout<<"EXITING - TMSI::run()"<<std::endl;
+    //std::cout<<"EXITING - TMSI::run()"<<std::endl;
 }
