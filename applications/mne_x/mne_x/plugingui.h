@@ -85,6 +85,9 @@ class PluginGui : public QMainWindow
 public:
     PluginGui(MNEX::PluginManager::SPtr &pPluginManager, MNEX::PluginSceneManager::SPtr &pPluginSceneManager);
 
+    ~PluginGui();
+
+
     inline IPlugin::SPtr getCurrentPlugin();
 
     void uiSetupRunningState(bool state);

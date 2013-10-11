@@ -99,6 +99,14 @@ PluginGui::PluginGui(PluginManager::SPtr &pPluginManager, MNEX::PluginSceneManag
 
 //*************************************************************************************************************
 
+PluginGui::~PluginGui()
+{
+    m_pCurrentPlugin.reset();
+}
+
+
+//*************************************************************************************************************
+
 
 void PluginGui::uiSetupRunningState(bool state)
 {

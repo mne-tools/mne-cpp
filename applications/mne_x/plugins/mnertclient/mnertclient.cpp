@@ -91,8 +91,10 @@ MneRtClient::MneRtClient()
 
 MneRtClient::~MneRtClient()
 {
-    stop();
-    m_pMneRtClientProducer->stop();
+    if(this->isRunning())
+        stop();
+    if(m_pMneRtClientProducer->isRunning())
+        m_pMneRtClientProducer->stop();
 }
 
 

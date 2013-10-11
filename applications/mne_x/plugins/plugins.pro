@@ -41,9 +41,21 @@ TEMPLATE = subdirs
 SUBDIRS += \
     ecgsimulator \
     mnertclient \
-    dummytoolbox \
-    tmsi
+    dummytoolbox
 #    rtsss \
+
+win32 {
+    exists(C:/Windows/System32/RTINST.DLL) {
+        message(TMSI plugin configured! Driver DLL found!)
+        SUBDIRS += tmsi
+    }
+    else {
+        message(TMSI plugin was not configured due to missing driver DLL!)
+        }
+}
+else {
+    message(TMSI plugin was not configured due to wrong OS (win32 needed)!)
+    }
 
 contains(MNECPP_CONFIG, babyMEG) {
     message(BabyMEG plugin configured!)
