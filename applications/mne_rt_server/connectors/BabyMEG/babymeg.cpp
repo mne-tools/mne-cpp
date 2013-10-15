@@ -156,6 +156,10 @@ void BabyMEG::comFLL(Command p_command)
 
 void BabyMEG::setCMDData(QByteArray DATA)
 {
+    qDebug()<<"------"<<DATA;
+    m_commandManager["FLL"].reply(DATA);
+
+/*
     int exec,a,b;
     QByteArray chan;
     int nChan;
@@ -164,7 +168,9 @@ void BabyMEG::setCMDData(QByteArray DATA)
     QByteArray rcmd = DATA.left(4);
     QString sbuf;
 
+    exec =0;
     if (rcmd == "INIT") exec = 2;
+    if (rcmd == "SYNC") exec = 3;
 
     switch (exec)
     {
@@ -196,8 +202,10 @@ void BabyMEG::setCMDData(QByteArray DATA)
             break;
         default:
             m_commandManager["FLL"].reply(DATA);
+            qDebug()<<"-----"<<DATA;
             break;
     }
+    */
 }
 
 

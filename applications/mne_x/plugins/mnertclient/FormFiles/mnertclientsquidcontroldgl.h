@@ -164,6 +164,7 @@ public:
     void ReplyCmdProc(QString sReply);
     void UpdateGUI();
     void SyncGUI();
+    QString GenChnInfo(QString);
 };
 
 }//namespace

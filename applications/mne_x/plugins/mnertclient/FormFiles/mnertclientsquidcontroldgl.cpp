@@ -108,6 +108,7 @@ void mnertclientSQUIDControlDgl::SendCMD(QString CMDSTR)
     this->ui->m_tx_info->setText(CMDSTR);
     // Read reply
     QString t_sReply = m_pMneRtClient->m_pRtCmdClient->readAvailableData();
+
     this->ui->m_tx_info->setText(QString("Reply:")+t_sReply);
 
     ReplyCmdProc(t_sReply);
@@ -132,6 +133,8 @@ void mnertclientSQUIDControlDgl::ReplyCmdProc(QString sReply)
         // if the reply is coming from INIT command, then initialize the FLL config.
         tmp = sReply.split("#");
         //get the channels
+        //load channel information from files
+        tmp[1] = GenChnInfo(tmp[1]);
         InitChannels(tmp[1]);
         //init GUI controls
         InitGUIConfig(tmp[0]);
@@ -148,6 +151,14 @@ void mnertclientSQUIDControlDgl::ReplyCmdProc(QString sReply)
     default:
         break;
     }
+}
+QString mnertclientSQUIDControlDgl::GenChnInfo(QString nChan)
+{
+    QString chaninfo;
+    for (int i=0;i<nChan.toInt();i++){
+        chaninfo += "MEG_"+tr("%1").arg(i+1)+"|";
+    }
+    return chaninfo;
 }
 
 void mnertclientSQUIDControlDgl::InitChannels(QString sReply)
