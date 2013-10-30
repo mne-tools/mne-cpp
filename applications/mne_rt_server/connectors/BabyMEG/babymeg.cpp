@@ -158,7 +158,7 @@ void BabyMEG::setCMDData(QByteArray DATA)
 {
     qDebug()<<"------"<<DATA;
     m_commandManager["FLL"].reply(DATA);
-
+    qDebug()<<"Data has been received.";
 /*
     int exec,a,b;
     QByteArray chan;
