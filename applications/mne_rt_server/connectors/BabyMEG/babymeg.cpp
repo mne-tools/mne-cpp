@@ -156,7 +156,56 @@ void BabyMEG::comFLL(Command p_command)
 
 void BabyMEG::setCMDData(QByteArray DATA)
 {
+    qDebug()<<"------"<<DATA;
     m_commandManager["FLL"].reply(DATA);
+    qDebug()<<"Data has been received.";
+/*
+    int exec,a,b;
+    QByteArray chan;
+    int nChan;
+    //QList<QByteArray> mdat;
+    //qDebug()<<"setCMDData"<<DATA;
+    QByteArray rcmd = DATA.left(4);
+    QString sbuf;
+
+    exec =0;
+    if (rcmd == "INIT") exec = 2;
+    if (rcmd == "SYNC") exec = 3;
+
+    switch (exec)
+    {
+        case 1:
+            //find the repetition number for sending the channel information
+            a = DATA.indexOf("[",0);
+            b = DATA.indexOf("#",0);
+
+            chan = DATA.mid(a+1,b-a-1);
+            nChan = chan.toInt();
+//            //qDebug()<<"a, b, Chan"<<a<<b<<nChan;
+//            mdat = DATA.split('#');
+//            //qDebug()<<"size of list mdat"<<mdat.size();
+//            //qDebug()<<"mdat"<<mdat[0]<<mdat[1]<<mdat[2];
+//            for (int i=1; i<nChan+1; i++){
+//                //Send information per channel
+//                sbuf.clear();
+//                sbuf = "INIT|"+chan+"|"+tr("%1").arg(i)+"|"+mdat[i];
+//                //qDebug()<<sbuf;
+//                m_commandManager["FLL"].reply(sbuf);
+//            }
+            sbuf.clear();
+            sbuf = "INIT|"+chan;
+            m_commandManager["FLL"].reply(sbuf);
+
+            break;
+        case 2:
+            m_commandManager["FLL"].reply(DATA);
+            break;
+        default:
+            m_commandManager["FLL"].reply(DATA);
+            qDebug()<<"-----"<<DATA;
+            break;
+    }
+    */
 }
 
 
