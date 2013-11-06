@@ -76,7 +76,7 @@ namespace TMSIPlugin
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Structure Typedefs - structure define as used in the RTINST.DLL
+// Structure Typedefs - structure define as used in the TMSiSDK.dll
 //=============================================================================================================
 
 typedef struct _SP_DEVICE_PATH
@@ -125,39 +125,51 @@ typedef struct _SIGNAL_FORMAT
     ULONG SerialNumber;
 } SIGNAL_FORMAT, *PSIGNAL_FORMAT;
 
-typedef struct _FeatureMemory{
-    FEATURE_DATA Feature;
-    ULONG Data[1];
-}FEATURE_MEMORY, *PFEATURE_MEMORY;
+typedef enum _TMSiConnectionEnum {
+    TMSiConnectionUndefined = 0,    //Undefined connection, indicates programming error
+    TMSiConnectionFiber,            //Obsolete, do not use
+    TMSiConnectionBluetooth,        //Bluetooth connection with Microsoft driver
+    TMSiConnectionUSB,              //USB 2.0 connection direct
+    TMSiConnectionWifi,             //Network connection, Ip-adress and port needed, wireless
+    TMSiConnectionNetwork           //Network connection, Ip-adress and port needed, wired
+} TMSiConnectionType;
 
-typedef struct _FeatureMode{
-    FEATURE_DATA Feature;
-    ULONG Mode;
-}FEATURE_MODE,*PFEATURE_MODE;
-
+typedef struct _FRONTENDINFO
+{	unsigned short NrOfChannels;        //Current number of channels used
+    unsigned short SampleRateSetting;   //Current sample rate setting (a.k.a. base sample rate divider )
+    unsigned short Mode;                //operating mode
+    unsigned short maxRS232;
+    unsigned long  Serial;              //Serial number
+    unsigned short NrExg;               //Number of Exg channels in this device
+    unsigned short NrAux;               //Number of Aux channels in this device
+    unsigned short HwVersion;           //Version number for the hardware
+    unsigned short SwVersion;           //Version number of the embedded software
+    unsigned short RecBufSize;          //Used for debugging only
+    unsigned short SendBufSize;         //Used for debugging only
+    unsigned short NrOfSwChannels;      //Max. number of channels supported by this device
+    unsigned short BaseSf;              //Max. sample frequency
+    unsigned short Power;
+    unsigned short Check;
+}FRONTENDINFO,*PFRONTENDINFO;
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Method Typedefs - method defines as used in the RTINST.DLL
 //=============================================================================================================
 
-typedef HANDLE          ( __stdcall * POPEN)            (PSP_DEVICE_PATH DevicePath);
+typedef BOOLEAN         ( __stdcall * POPEN)            (void *Handle, const char *DeviceLocator);
 typedef BOOL            ( __stdcall * PCLOSE)           (HANDLE hHandle);
-typedef ULONG           ( __stdcall * PGETDEVICESTATE)  (IN HANDLE Handle);
 typedef BOOLEAN         ( __stdcall * PSTART)           (IN HANDLE Handle);
-typedef BOOLEAN         ( __stdcall * PRESETDEVICE)     (IN HANDLE Handle);
 typedef BOOLEAN         ( __stdcall * PSTOP)            (IN HANDLE Handle);
-typedef HANDLE          ( __stdcall * PGETSLAVEHANDLE)  (IN HANDLE Handle);
-typedef BOOLEAN         ( __stdcall * PADDSLAVE)        (IN HANDLE Handle, IN HANDLE SlaveHandle);
-typedef PSIGNAL_FORMAT  ( __stdcall * PGETSIGNALFORMAT) (IN HANDLE Handle, IN OUT PSIGNAL_FORMAT pSignalFormat);
+typedef PSIGNAL_FORMAT  ( __stdcall * PGETSIGNALFORMAT) (IN HANDLE Handle, IN OUT char* FrontEndName);
 typedef BOOLEAN         ( __stdcall * PSETSIGNALBUFFER) (IN HANDLE Handle, IN OUT PULONG SampleRate, IN OUT PULONG BufferSize);
-typedef ULONG           ( __stdcall * PGETSAMPLES)      (IN HANDLE Handle, OUT PULONG SampleBuffer, IN ULONG Size);
+typedef LONG            ( __stdcall * PGETSAMPLES)      (IN HANDLE Handle, OUT PULONG SampleBuffer, IN ULONG Size);
 typedef BOOLEAN         ( __stdcall * PGETBUFFERINFO)   (IN HANDLE Handle, OUT PULONG Overflow, OUT PULONG PercentFull);
-typedef BOOLEAN         ( __stdcall * PDEVICEFEATURE)   (IN HANDLE Handle, IN LPVOID DataIn, IN DWORD InSize, OUT LPVOID DataOut, IN DWORD OutSize);
-typedef PSP_DEVICE_PATH ( __stdcall * PGETINSTANCEID)   (IN LONG DeviceIndex, IN BOOLEAN Present, OUT ULONG  *MaxDevices );
-typedef HKEY            ( __stdcall * POPENREGKEY)      (IN PSP_DEVICE_PATH Path );
 typedef BOOL            ( __stdcall * PFREE)            (IN VOID *Memory);
-
+typedef HANDLE          ( __stdcall * PLIBRARYINIT)     (IN TMSiConnectionType GivenConnectionType, IN OUT int *ErrorCode );
+typedef int             ( __stdcall * PLIBRARYEXIT)     (IN HANDLE Handle);
+typedef char**          ( __stdcall * PGETDEVICELIST)   (IN HANDLE Handle, IN OUT int *NrOfFrontEnds);
+typedef BOOLEAN         ( __stdcall * PGETFRONTENDINFO) (IN HANDLE Handle, IN OUT FRONTENDINFO *FrontEndInfo );
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -233,6 +245,7 @@ public:
     * @param [in] bUseUnitOffset Flag for using the channels unit offset. Defined by the user via the GUI.
     * @param [in] sOutpuFilePath Holds the path for the output file. Defined by the user via the GUI.
     * @param [in] bWriteToFile Flag for writing the received samples to a file. Defined by the user via the GUI.
+    * @param [in] Flag for using preprocessing actions for the EEG data. Defined by the user via the GUI.
     * @param [out] bool returns true if device was successfully initialised, false otherwise.
     */
     bool initDevice(int iNumberOfChannels,
@@ -243,6 +256,7 @@ public:
                     bool bUseUnitGain,
                     bool bUseUnitOffset,
                     bool bWriteToFile,
+                    bool bUsePreprocessing,
                     QString sOutpuFilePath);
 
     //=========================================================================================================
@@ -253,6 +267,7 @@ public:
     bool uninitDevice();
 
 protected:
+    MatrixXf            oldMatrix;
 
 private:
     TMSIProducer*       m_pTMSIProducer;                /**< A pointer to the corresponding TMSIProducer class.*/
@@ -270,6 +285,7 @@ private:
     bool                m_bUseUnitGain;                 /**< Flag for using the channels unit gain. Defined by the user via the GUI.*/
     bool                m_bUseUnitOffset;               /**< Flag for using the channels unit offset. Defined by the user via the GUI.*/
     bool                m_bWriteToFile;                 /**< Flag for writing the received samples to a file. Defined by the user via the GUI.*/
+    bool                m_bUsePreprocessing;            /**< Flag for using preprocessing actions for the EEG data. Defined by the user via the GUI.*/
     QString             m_sOutputFilePath;              /**< Holds the path for the output file. Defined by the user via the GUI.*/
 
     //Handler
@@ -291,23 +307,20 @@ private:
     ofstream            m_outputFileStream;             /**< fstream for writing the sample values to txt file.*/
     QVector <double>    m_vSampleBlockBuffer;           /**< Buffer to store all the incoming smaples. This is the buffer which is getting read from.*/
 
-    //Variables used for loading the RTINST.DLL methods. Note: Not all functions are used by this class at the moment.
+    //Variables used for loading the TMSiSDK.dll methods. Note: Not all functions are used by this class at the moment.
     POPEN               m_oFpOpen;
     PCLOSE              m_oFpClose;
-    PGETDEVICESTATE     m_oFpGetDeviceState;
     PSTART              m_oFpStart;
-    PRESETDEVICE        m_oFpReset;
     PSTOP               m_oFpStop;
-    PGETSLAVEHANDLE     m_oFpGetSlaveHandle;
-    PADDSLAVE           m_oFpAddSlave;
     PGETSIGNALFORMAT    m_oFpGetSignalFormat;
     PSETSIGNALBUFFER    m_oFpSetSignalBuffer;
     PGETSAMPLES         m_oFpGetSamples;
     PGETBUFFERINFO      m_oFpGetBufferInfo;
-    PDEVICEFEATURE      m_oFpDeviceFeature;
-    PGETINSTANCEID      m_oFpGetInstanceId;
-    POPENREGKEY         m_oFpOpenRegKey;
     PFREE               m_oFpFree;
+    PLIBRARYINIT        m_oFpLibraryInit;
+    PLIBRARYEXIT        m_oFpLibraryExit;
+    PGETDEVICELIST      m_oFpGetDeviceList;
+    PGETFRONTENDINFO    m_oFpGetFrontEndInfo;
 };
 
 } // NAMESPACE
