@@ -121,6 +121,7 @@ void TMSI::init()
     m_bUseUnitGain = false;
     m_bUseUnitOffset = false;
     m_bWriteToFile = false;
+    m_bUsePreProcessing = true;
     m_bIsRunning = false;
     m_sOutputFilePath = QString("mne_x_plugins/resources/tmsi");
 }
@@ -150,6 +151,7 @@ bool TMSI::start()
                        m_bUseUnitGain,
                        m_bUseUnitOffset,
                        m_bWriteToFile,
+                       m_bUsePreProcessing,
                        m_sOutputFilePath);
 
     if(m_pTMSIProducer->isRunning())
@@ -160,7 +162,7 @@ bool TMSI::start()
     }
     else
     {
-        qWarning() << "Plugin TMSI - ERROR - TMSIProducer thread could not be started - Either the device is turned off (check your OS device manager) or the driver DLL (RTINST.dll) is not installed in the system directory" << endl;
+        qWarning() << "Plugin TMSI - ERROR - TMSIProducer thread could not be started - Either the device is turned off (check your OS device manager) or the driver DLL (TMSiSDK.dll) is not installed in the system32 directory" << endl;
         return false;
     }
 }
