@@ -278,7 +278,7 @@ bool FiffEvoked::read(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant 
     fiff_int_t nchan = 0;
     float sfreq = -1.0f;
     QList<FiffChInfo> chs;
-    fiff_int_t kind, pos, first, last;
+    fiff_int_t kind, pos, first=0, last=0;
     FiffTag::SPtr t_pTag;
     QString comment("");
     qint32 k;
@@ -413,7 +413,7 @@ bool FiffEvoked::read(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant 
     }
     if (all_data.cols() != nsamp)
     {
-        qWarning("Incorrect number of samples (%d instead of %d)", all_data.cols(), nsamp);
+        qWarning("Incorrect number of samples (%d instead of %d)", (int) all_data.cols(), nsamp);
         return false;
     }
 
