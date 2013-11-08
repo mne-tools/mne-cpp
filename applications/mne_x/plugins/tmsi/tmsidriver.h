@@ -63,6 +63,7 @@
 #include <QSharedPointer>
 #include <qapplication.h>
 #include <QVector>
+#include <QSysInfo>
 
 
 //*************************************************************************************************************
@@ -201,6 +202,14 @@ class TMSIProducer;
     if(!var) \
         cout<< "Plugin TMSI - ERROR - Error loading method " << name << "\n"; \
 
+// Check windows
+#if _WIN32 || _WIN64
+#if _WIN64
+#define ENVIRONMENT 64
+#else
+#define ENVIRONMENT 32
+#endif
+#endif
 
 //=============================================================================================================
 /**
@@ -299,9 +308,9 @@ private:
     ULONG               m_uiNumberOfAvailableChannels;  /**< Holds the available number of channels offered by the device.*/
 
     //Signal info
-    vector <LONG>       m_vExponentChannel;             /**< Contains the exponents for every channel available by the device.*/
-    vector <FLOAT>      m_vUnitGain;                    /**< Contains the unit gain for every channel available by the device.*/
-    vector <FLOAT>      m_vUnitOffSet;                  /**< Contains the unit offset for every channel available by the device.*/
+    QVector <LONG>      m_vExponentChannel;             /**< Contains the exponents for every channel available by the device.*/
+    QVector <FLOAT>     m_vUnitGain;                    /**< Contains the unit gain for every channel available by the device.*/
+    QVector <FLOAT>     m_vUnitOffSet;                  /**< Contains the unit offset for every channel available by the device.*/
     LONG*               m_lSignalBuffer;                /**< Buffer in which the device can write the samples -> these values get read out by the getSampleMatrix(...) function.*/
     LONG                m_lSignalBufferSize ;           /**< Size of m_ulSignalBuffer = (samples per block) * (number of channels) * 4 (4 because every signal value takes 4 bytes - see TMSi SDK documentation).*/
     ofstream            m_outputFileStream;             /**< fstream for writing the sample values to txt file.*/
