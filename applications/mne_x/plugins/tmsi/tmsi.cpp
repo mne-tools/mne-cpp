@@ -46,6 +46,8 @@
 
 #include <iostream>
 
+#include <utils/filterTools.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -65,6 +67,7 @@
 
 using namespace TMSIPlugin;
 using namespace XMEASLIB;
+//using namespace UTILSLIB;
 
 
 //*************************************************************************************************************
@@ -131,6 +134,23 @@ void TMSI::init()
 
 bool TMSI::start()
 {
+    //Check filter class - will be removed in the future - testing purpose only!
+    UTILSLIB::FilterTools* filterObject = new UTILSLIB::FilterTools();
+
+    QVector<double> window(50);
+    filterObject->createFilter(QString('HP'), 50, 0.3, window);
+
+    qDebug() << window;
+    //Write kaiser window to file - testing purpose only
+    QFile file("filterToolsTest");
+    file.open(QIODevice::WriteOnly);
+    QDataStream outputFileStream(&file);
+
+    outputFileStream << QString("Kaiser window test:");
+    outputFileStream << window;
+
+    file.close();
+
     //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
     if(this->isRunning())
         QThread::wait();

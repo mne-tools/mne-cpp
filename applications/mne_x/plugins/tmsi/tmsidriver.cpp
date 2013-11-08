@@ -83,12 +83,33 @@ TMSIDriver::TMSIDriver(TMSIProducer* pTMSIProducer)
 //    lstrcat(Path, _T("\\TMSiSDK.dll"));
 //    m_oLibHandle = LoadLibrary(Path);
 
-    m_oLibHandle = ::LoadLibrary(L"C:\\Windows\\System32\\TMSiSDK.dll");
+    if(QSysInfo::WordSize == 32)
+    {
+        //MNE-X was compiled in 32 bit
+
+        if(ENVIRONMENT == 32)//If 32 bit compiled MNE-X is running on a 32 bit windows system
+        {
+            cout<<"MNE-X was compiled in: "<<QSysInfo::WordSize<<"bit and is running on a "<<ENVIRONMENT<<"bit system."<<endl;
+            m_oLibHandle = ::LoadLibrary(L"C:\\Windows\\System32\\TMSiSDK.dll");
+        }
+
+        if(ENVIRONMENT == 64)//If 32 bit compiled MNE-X is running on a 64 bit windows system
+        {
+            cout<<"MNE-X was compiled in: "<<QSysInfo::WordSize<<"bit and is running on a "<<ENVIRONMENT<<"bit system."<<endl;
+            m_oLibHandle = ::LoadLibrary(L"C:\\Windows\\SysWOW64\\TMSiSDK32.dll");
+        }
+    }
+    else
+    {
+        //MNE-X was compiled in 64 bit
+        cout<<"MNE-X was compiled in: "<<QSysInfo::WordSize<<"bit"<<endl;
+        m_oLibHandle = ::LoadLibrary(L"C:\\Windows\\System32\\TMSiSDK.dll");
+    }
 
     //If it can't be open return
     if( m_oLibHandle == NULL)
     {
-        cout << "Plugin TMSI - ERROR - Couldn't load DLL in 'C:\\Windows\\System32\\RTINST.DLL' - Is the driver for the TMSi USB Fiber Connector installed?" << endl;
+        cout << "Plugin TMSI - ERROR - Couldn't load DLL - Check if the driver for the TMSi USB Fiber Connector installed in the system dir" << endl;
         m_bDllLoaded = false;
         return;
     }
@@ -107,9 +128,6 @@ TMSIDriver::TMSIDriver(TMSIProducer* pTMSIProducer)
     __load_dll_func__(m_oFpLibraryExit, PLIBRARYEXIT, "LibraryExit");
     __load_dll_func__(m_oFpGetDeviceList, PGETDEVICELIST, "GetDeviceList");
     __load_dll_func__(m_oFpGetFrontEndInfo, PGETFRONTENDINFO, "GetFrontEndInfo");
-
-    cout << "sizeof(ULONG): " << sizeof(ULONG) << endl;
-    cout << "sizeof(LONG): " << sizeof(LONG) << endl;
 
     cout << "Plugin TMSI - INFO - TMSIDriver() - Successfully loaded all DLL functions" << endl;
 }
