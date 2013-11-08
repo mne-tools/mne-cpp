@@ -75,10 +75,10 @@ FiffTag::FiffTag()
 //*************************************************************************************************************
 
 FiffTag::FiffTag(const FiffTag* p_pFiffTag)
-: kind(p_pFiffTag->kind)
+: QByteArray(p_pFiffTag->data(), p_pFiffTag->size())
+, kind(p_pFiffTag->kind)
 , type(p_pFiffTag->type)
 , next(p_pFiffTag->next)
-, QByteArray(p_pFiffTag->data(), p_pFiffTag->size())
 {
     if(p_pFiffTag->m_pComplexFloatData)
         this->toComplexFloat();
