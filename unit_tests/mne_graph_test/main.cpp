@@ -97,14 +97,14 @@ int main(int argc, char *argv[])
 
     for(int i = 0; i < width; ++i)
         for(int j = 0; j < height; ++j)
-            mat(i,j) = ((double)(i+j))*0.1-1.5;
+            mat(i,j) = ((double)(i+j))/698.0;//*0.1-1.5;
 
     ImageSc imagesc(mat);
     imagesc.setTitle("Test Matrix");
     imagesc.setXLabel("X Axes");
     imagesc.setYLabel("Y Axes");
 
-    imagesc.setColorMap("Jet");//imagesc.setColorMap("RedBlue");//imagesc.setColorMap("Bone");//imagesc.setColorMap("Jet");//imagesc.setColorMap("Hot");
+    imagesc.setColorMap("HotNeg2");//imagesc.setColorMap("Jet");//imagesc.setColorMap("RedBlue");//imagesc.setColorMap("Bone");//imagesc.setColorMap("Jet");//imagesc.setColorMap("Hot");
 
     imagesc.setWindowTitle("Corresponding function to MATLABs imagesc");
     imagesc.show();

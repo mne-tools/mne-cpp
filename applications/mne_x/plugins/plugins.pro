@@ -42,8 +42,15 @@ SUBDIRS += \
     ecgsimulator \
     mnertclient \
     dummytoolbox \
-    tmsi
+    tmsi \
+    triggercontrol
+
+
 #    rtsss \
+
+
+
+
 
 contains(MNECPP_CONFIG, babyMEG) {
     message(BabyMEG plugin configured!)
