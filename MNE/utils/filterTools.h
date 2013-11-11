@@ -1,11 +1,11 @@
 //=============================================================================================================
 /**
-* @file     tmsisetupwidget.h
+* @file     filtertools.h
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     September, 2013
+* @date     November, 2013
 *
 * @section  LICENSE
 *
@@ -30,145 +30,106 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the TMSISetupWidget class.
+* @brief    FilterTools class declaration.
 *
 */
 
-#ifndef TMSISETUPWIDGET_H
-#define TMSISETUPWIDGET_H
-
+#ifndef FILTERTOOLS_H
+#define FILTERTOOLS_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
+#include "utils_global.h"
+#include <qmath.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
-#include "../ui_tmsisetup.h"
+#include <QSharedPointer>
+#include <QVector>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE TMSIPlugin
+// Eigen INCLUDES
 //=============================================================================================================
 
-namespace TMSIPlugin
+#include <Eigen/Core>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE MNELIB
+//=============================================================================================================
+
+namespace UTILSLIB
 {
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// USED NAMESPACES
 //=============================================================================================================
 
-class TMSI;
+using namespace Eigen;
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINES
+//=============================================================================================================
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS TMSISetupWidget
+* Basic filter operations (HP, TP, BP)
 *
-* @brief The TMSISetupWidget class provides the TMSI configuration window.
+* @brief Basic filter operations and calculation (HP, TP, BP)
 */
-class TMSISetupWidget : public QWidget
+class UTILSSHARED_EXPORT FilterTools
 {
-    Q_OBJECT
 public:
+    typedef QSharedPointer<FilterTools> SPtr;            /**< Shared pointer type for KMeans. */
+    typedef QSharedPointer<const FilterTools> ConstSPtr; /**< Const shared pointer type for KMeans. */
 
     //=========================================================================================================
     /**
-    * Constructs a TMSISetupWidget which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new ECGSetupWidget becomes a window. If parent is another widget, ECGSetupWidget becomes a child window inside parent. ECGSetupWidget is deleted when its parent is deleted.
-    * @param [in] pTMSI a pointer to the corresponding ECGSimulator.
+    * Constructs a Filter object.
     */
-    TMSISetupWidget(TMSI* pTMSI, QWidget *parent = 0);
+    FilterTools();
 
     //=========================================================================================================
     /**
-    * Destroys the ECGSetupWidget.
-    * All ECGSetupWidget's children are deleted first. The application exits if ECGSetupWidget is the main widget.
+    * Creates a Filter.
+    * @param [in] type specifies the type (high-, low- , band-pass) of the filter which is to be designed.
+    * @param [in] numberOfCoefficients number of coefficients used for the filter.
+    * @param [in] normalizedCutOffFreq holds the cut off frequency for the filter. Range [0 1] whre 1 (pi) corresponds to f_max.
+    * @param [in] impulseResponse holds the created coefficients (impulse response) of the filter.
     */
-    ~TMSISetupWidget();
+    void createFilter(QString type, qint32 numberOfCoefficients, double normalizedCutOffFreq, QVector<double> &impulseResponse);
 
-    //=========================================================================================================
-    /**
-    * Initializes the Connector properties.
-    *
-    */
-    void initSamplingProperties();
 
 private:
+    /**
+    * Creates a kaiser window. Regular Modified Cylindrical Bessel Function (Bessel I).
+    * @param [in] window
+    * @param [in] size
+    * @param [in] alpha
+    */
+    void KBDWindow(QVector<double> &window, int size, double alpha);
 
     //=========================================================================================================
     /**
-    * Sets the Sampling frequency.
-    *
+    * Calculates Bssel function.
+    * @param [in] x
     */
-    void setSamplingFreq(int value);
-
-    //=========================================================================================================
-    /**
-    * Sets the number of channels.
-    *
-    */
-    void setNumberOfChannels(int value);
-
-    //=========================================================================================================
-    /**
-    * Sets the samples taken per block.
-    *
-    */
-    void setSamplesPerBlock(int value);
-
-    //=========================================================================================================
-    /**
-    * Sets the preprocessing properties.
-    *
-    */
-    void setPreprocessing();
-
-    //=========================================================================================================
-    /**
-    * Sets the channel correction properties.
-    *
-    */
-    void setChannelCorrections();
-
-    //=========================================================================================================
-    /**
-    * Sets flag for writing the received samples to a file.
-    *
-    */
-    void setWriteToFile();
-
-    //=========================================================================================================
-    /**
-    * Sets dir where the output file is saved
-    *
-    */
-    void changeOutputFileDir();
-
-    //=========================================================================================================
-    /**
-    * Shows the About Dialog
-    *
-    */
-    void showAboutDialog();
-
-
-    bool            m_bAcquisitionIsRunning;
-    TMSI*           m_pTMSI;                    /**< a pointer to corresponding TMSI.*/
-
-    Ui::TMSISetupClass ui;                      /**< the user interface for the TMSISetupWidget.*/
+    double BesselI0(double x);
 };
 
 } // NAMESPACE
 
-#endif // TMSISETUPWIDGET_H
+#endif // FILTERTOOLS_H
