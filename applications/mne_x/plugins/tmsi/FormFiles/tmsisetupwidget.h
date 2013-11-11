@@ -86,9 +86,9 @@ public:
     * Constructs a TMSISetupWidget which is a child of parent.
     *
     * @param [in] parent pointer to parent widget; If parent is 0, the new ECGSetupWidget becomes a window. If parent is another widget, ECGSetupWidget becomes a child window inside parent. ECGSetupWidget is deleted when its parent is deleted.
-    * @param [in] simulator a pointer to the corresponding ECGSimulator.
+    * @param [in] pTMSI a pointer to the corresponding ECGSimulator.
     */
-    TMSISetupWidget(TMSI* simulator, QWidget *parent = 0);
+    TMSISetupWidget(TMSI* pTMSI, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
@@ -99,103 +99,54 @@ public:
 
     //=========================================================================================================
     /**
-    * Initializes the sampling rate and the downsampling factor.
+    * Initializes the Connector properties.
     *
     */
-    void initSamplingFactors();
-
-    //=========================================================================================================
-    /**
-    * Initializes each channel comboBox with given the channel file.
-    *
-    */
-    void initSelectedChannelFile();
-
-    //=========================================================================================================
-    /**
-    * Initializes the channel check boxes for visibility and whether channels are enabled.
-    *
-    */
-    void initChannelStates();
+    void initSamplingProperties();
 
 private:
 
     //=========================================================================================================
     /**
-    * Sets the SamplingRate.
+    * Sets the Sampling frequency.
     *
     */
-    void setSamplingRate(double value);
+    void setSamplingFreq(int value);
 
     //=========================================================================================================
     /**
-    * Sets the SamplingRate.
+    * Sets the number of channels.
     *
     */
-    void setDownsamplingRate(int value);
+    void setNumberOfChannels(int value);
 
     //=========================================================================================================
     /**
-    * Enables Channel I.
+    * Sets the samples taken per block.
     *
     */
-    void setEnabledChannel_I(bool state);
+    void setSamplesPerBlock(int value);
 
     //=========================================================================================================
     /**
-    * Enables Channel II.
+    * Sets the channel correction properties.
     *
     */
-    void setEnabledChannel_II(bool state);
+    void setChannelCorrections();
 
     //=========================================================================================================
     /**
-    * Enables Channel III.
+    * Sets flag for writing the received samples to a file.
     *
     */
-    void setEnabledChannel_III(bool state);
+    void setWriteToFile();
 
     //=========================================================================================================
     /**
-    * Sets visibility of Channel I.
+    * Sets dir where the output file is saved
     *
     */
-    void setVisibleChannel_I(bool state);
-
-    //=========================================================================================================
-    /**
-    * Sets visibility of Channel II.
-    *
-    */
-    void setVisibleChannel_II(bool state);
-
-    //=========================================================================================================
-    /**
-    * Sets visibility of Channel III.
-    *
-    */
-    void setVisibleChannel_III(bool state);
-
-    //=========================================================================================================
-    /**
-    * Sets the selected file of Channel I.
-    *
-    */
-    void setFileOfChannel_I(qint32);
-
-    //=========================================================================================================
-    /**
-    * Sets the selected file of Channel II.
-    *
-    */
-    void setFileOfChannel_II(qint32);
-
-    //=========================================================================================================
-    /**
-    * Sets the selected file of Channel III.
-    *
-    */
-    void setFileOfChannel_III(qint32);
+    void changeOutputFileDir();
 
     //=========================================================================================================
     /**
@@ -205,9 +156,10 @@ private:
     void showAboutDialog();
 
 
-    TMSI*           m_pTMSI;    /**< a pointer to corresponding TMSI.*/
+    bool            m_bAcquisitionIsRunning;
+    TMSI*           m_pTMSI;                    /**< a pointer to corresponding TMSI.*/
 
-    Ui::TMSISetupClass ui;                       /**< the user interface for the TMSISetupWidget.*/
+    Ui::TMSISetupClass ui;                      /**< the user interface for the TMSISetupWidget.*/
 };
 
 } // NAMESPACE

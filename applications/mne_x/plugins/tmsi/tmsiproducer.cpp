@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
 * @file     tmsiproducer.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     September, 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2013, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -40,6 +41,7 @@
 
 #include "tmsiproducer.h"
 #include "tmsi.h"
+#include "tmsidriver.h"
 
 #include <QDebug>
 
@@ -57,15 +59,11 @@ using namespace TMSIPlugin;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-TMSIProducer::TMSIProducer(TMSI* simulator, dBuffer::SPtr& buffer_I, dBuffer::SPtr& buffer_II, dBuffer::SPtr& buffer_III)
-: m_pTMSI(simulator)
-, m_pdBuffer_I(buffer_I)
-, m_pdBuffer_II(buffer_II)
-, m_pdBuffer_III(buffer_III)
+TMSIProducer::TMSIProducer(TMSI* pTMSI)
+: m_pTMSI(pTMSI)
+, m_pTMSIDriver(new TMSIDriver(this))
 , m_bIsRunning(true)
-
 {
-
 }
 
 
@@ -73,7 +71,38 @@ TMSIProducer::TMSIProducer(TMSI* simulator, dBuffer::SPtr& buffer_I, dBuffer::SP
 
 TMSIProducer::~TMSIProducer()
 {
+    //cout << "TMSIProducer::~TMSIProducer()" << endl;
+}
 
+
+//*************************************************************************************************************
+
+void TMSIProducer::start(int iNumberOfChannels,
+                     int iSamplingFrequency,
+                     int iSamplesPerBlock,
+                     bool bConvertToVolt,
+                     bool bUseChExponent,
+                     bool bUseUnitGain,
+                     bool bUseUnitOffset,
+                     bool bWriteToFile,
+                     QString sOutputFilePath)
+{
+    //Initialise device
+    if(m_pTMSIDriver->initDevice(iNumberOfChannels,
+                              iSamplingFrequency,
+                              iSamplesPerBlock,
+                              bConvertToVolt,
+                              bUseChExponent,
+                              bUseUnitGain,
+                              bUseUnitOffset,
+                              bWriteToFile,
+                              sOutputFilePath))
+    {
+        m_bIsRunning = true;
+        QThread::start();
+    }
+    else
+        m_bIsRunning = false;
 }
 
 
@@ -81,8 +110,17 @@ TMSIProducer::~TMSIProducer()
 
 void TMSIProducer::stop()
 {
+    //Wait until this thread (TMSIProducer) is stopped
     m_bIsRunning = false;
-    QThread::wait();
+
+    while(this->isRunning())
+        m_bIsRunning = false;
+
+    //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the push function (acquire statement)
+    m_pTMSI->m_pRawMatrixBuffer_In->releaseFromPush();
+
+    //Uinitialise device only after the thread stopped
+    m_pTMSIDriver->uninitDevice();
 }
 
 
@@ -90,77 +128,17 @@ void TMSIProducer::stop()
 
 void TMSIProducer::run()
 {
-    unsigned int uiSamplePeriod = (unsigned int) (1000000.0/(m_pTMSI->m_fSamplingRate));
-    int uiCounter_I = 0;
-    int uiCounter_II = 0;
-    int uiCounter_III = 0;
-    m_bIsRunning = true;
-
-    double value_I;
-    double value_II;
-    double value_III;
+    MatrixXf matRawBuffer(m_pTMSI->m_iNumberOfChannels, m_pTMSI->m_iSamplesPerBlock);
 
     while(m_bIsRunning)
     {
-        usleep(uiSamplePeriod);
-
-        //TMSI I
-        if(m_pTMSI->m_pTMSIChannel_TMSI_I->isEnabled())
-        {
-            if(uiCounter_I >= (m_pTMSI->m_pTMSIChannel_TMSI_I->getSamples().size()-1))
-                uiCounter_I = 0;
-
-            value_I = 0;
-
-            for(unsigned char i = 0; i < m_pTMSI->m_iDownsamplingFactor; ++i)
-            {
-                value_I = value_I + m_pTMSI->m_pTMSIChannel_TMSI_I->getSamples()[uiCounter_I];
-            }
-
-            value_I = value_I / m_pTMSI->m_iDownsamplingFactor;
-            m_pdBuffer_I->push(value_I);
-
-            uiCounter_I = uiCounter_I + m_pTMSI->m_iDownsamplingFactor;
-
-        }
-        //TMSI II
-        if(m_pTMSI->m_pTMSIChannel_TMSI_II->isEnabled())
-        {
-            if(uiCounter_II >= (m_pTMSI->m_pTMSIChannel_TMSI_II->getSamples().size()-1))
-                uiCounter_II = 0;
-
-            value_II = 0;
-
-            for(unsigned char i = 0; i < m_pTMSI->m_iDownsamplingFactor; ++i)
-            {
-                value_II = value_II + m_pTMSI->m_pTMSIChannel_TMSI_II->getSamples()[uiCounter_II];
-            }
-
-            value_II = value_II / m_pTMSI->m_iDownsamplingFactor;
-            m_pdBuffer_II->push(value_II);
-
-            uiCounter_II = uiCounter_II + m_pTMSI->m_iDownsamplingFactor;
-        }
-
-        //TMSI III
-        if(m_pTMSI->m_pTMSIChannel_TMSI_III->isEnabled())
-        {
-            if(uiCounter_III >= (m_pTMSI->m_pTMSIChannel_TMSI_III->getSamples().size()-1))
-                uiCounter_III = 0;
-
-            value_III = 0;
-
-            for(unsigned char i = 0; i < m_pTMSI->m_iDownsamplingFactor; ++i)
-            {
-
-                value_III = value_III + m_pTMSI->m_pTMSIChannel_TMSI_III->getSamples()[uiCounter_III];
-            }
-
-            value_III = value_III / m_pTMSI->m_iDownsamplingFactor;
-            m_pdBuffer_III->push(value_III);
-
-            uiCounter_III = uiCounter_III + m_pTMSI->m_iDownsamplingFactor;
-        }
-
+        //std::cout<<"TMSIProducer::run()"<<std::endl;
+        //Get the TMSi EEG data out of the device buffer and write received data to circular buffer
+        if(m_pTMSIDriver->getSampleMatrixValue(matRawBuffer))
+            m_pTMSI->m_pRawMatrixBuffer_In->push(&matRawBuffer);
     }
+
+    //std::cout<<"EXITING - TMSIProducer::run()"<<std::endl;
 }
+
+

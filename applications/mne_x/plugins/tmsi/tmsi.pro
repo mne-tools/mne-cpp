@@ -54,31 +54,31 @@ CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
             -lxMeasd \
             -lxDispd \
-            -lmne_xd
+            -lmne_xd \
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
             -lxMeas \
             -lxDisp \
-            -lmne_x
+            -lmne_x \
 }
 
 DESTDIR = $${MNE_BINARY_DIR}/mne_x_plugins
 
 SOURCES += \
         tmsi.cpp \
-        tmsichannel.cpp \
         tmsiproducer.cpp \
         FormFiles/tmsisetupwidget.cpp \
-        FormFiles/tmsiaboutwidget.cpp
+        FormFiles/tmsiaboutwidget.cpp \
+        tmsidriver.cpp
 
 HEADERS += \
         tmsi.h\
         tmsi_global.h \
-        tmsichannel.h \
         tmsiproducer.h \
         FormFiles/tmsisetupwidget.h \
-        FormFiles/tmsiaboutwidget.h
+        FormFiles/tmsiaboutwidget.h \
+        tmsidriver.h
 
 FORMS += \
         FormFiles/tmsisetup.ui \
