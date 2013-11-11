@@ -261,6 +261,10 @@ void ImageSc::setColorMap(const QString &p_sColorMap)
         pColorMapper = ColorMap::valueToJet;
     else if(p_sColorMap == "Hot")
         pColorMapper = ColorMap::valueToHot;
+    else if(p_sColorMap == "HotNeg1")
+        pColorMapper = ColorMap::valueToHotNegative1;
+    else if(p_sColorMap == "HotNeg2")
+        pColorMapper = ColorMap::valueToHotNegative2;
     else if(p_sColorMap == "Bone")
         pColorMapper = ColorMap::valueToBone;
     else if(p_sColorMap == "RedBlue")

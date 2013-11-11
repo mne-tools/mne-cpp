@@ -1,11 +1,11 @@
 //=============================================================================================================
 /**
-* @file     tmsichannel.cpp
+* @file     filtertools.cpp
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     September, 2013
+* @date     November, 2013
 *
 * @section  LICENSE
 *
@@ -30,34 +30,26 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the TMSIChannel class.
+* @brief    Implementation of the FilterTools class
 *
 */
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "tmsichannel.h"
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QtCore/QTextStream>
-#include <QtCore/QFile>
-
+#include "filtertools.h"
+#include <fstream>
+#include <QFile>
+#include <QDataStream>
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace TMSIPlugin;
+using namespace UTILSLIB;
 
 
 //*************************************************************************************************************
@@ -65,62 +57,106 @@ using namespace TMSIPlugin;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-TMSIChannel::TMSIChannel(QString ResourceDataPath, QString ChannelFile, bool enabled, bool visible)
-: m_qStringResourceDataPath(ResourceDataPath)
-, m_qStringChannelFile(ChannelFile)
-, m_bIsEnabled(enabled)
-, m_bIsVisible(visible)
-{
-
-}
-
-
-//*************************************************************************************************************
-
-TMSIChannel::~TMSIChannel()
+FilterTools::FilterTools()
 {
 }
 
 
 //*************************************************************************************************************
 
-void TMSIChannel::initChannel()
+void FilterTools::createFilter(QString type, qint32 numberOfCoefficients, double normalizedCutOffFreq, QVector<double> &impulseResponse)
 {
-    QFile file;
-    file.setFileName(m_qStringResourceDataPath+m_qStringChannelFile);
-    if(file.open(QIODevice::ReadOnly | QIODevice::Text))
+    //Create kaiser window
+    QVector<double> window(numberOfCoefficients);
+    KBDWindow(window, numberOfCoefficients, 8);
+
+    impulseResponse = window;
+
+    //Calculate approximated sinc function (ideal TP in frequency domain)
+    QVector<double> sincApprox;
+    int t = 0;
+    int nd = (numberOfCoefficients-1)/2;
+
+    for(int i=0; i<numberOfCoefficients; i++)
     {
-        QTextStream in(&file);
-        double value;
+        double sinc = sin(normalizedCutOffFreq*M_PI*(t-nd)) / (M_PI*(t-nd));
+        sincApprox.push_back(sinc*window[i]);
+        t++;
+    }
 
-        while(!in.atEnd())
-        {
-            in >> value;
+    //Create final filter specified by the type parameter
+    if(type == QString('HP'))
+    {
 
-            //init min and max with first value
-            if(m_vecBuffer.size() == 0)
-            {
-                m_dMin = value;
-                m_dMax = value;
-            }
+    }
 
-            if(value < m_dMin)
-                m_dMin = value;
+    if(type == QString('LP'))
+    {
 
-            if(value > m_dMax)
-                m_dMax = value;
+    }
 
-            m_vecBuffer.push_back(value);
+    if(type == QString('BP'))
+    {
 
-        }
-        file.close();
+    }
+
+}
+
+
+//*************************************************************************************************************
+
+void FilterTools::KBDWindow(QVector<double> &window, int size, double alpha)
+{
+    double sumvalue = 0.0;
+    int i;
+
+    for (i=0; i<size/2; i++)
+    {
+        sumvalue += BesselI0(M_PI * alpha * sqrt(1.0 - pow(4.0*i/size - 1.0, 2)));
+        window[i] = sumvalue;
+    }
+
+    /* need to add one more value to the nomalization factor at size/2: */
+    sumvalue += BesselI0(M_PI * alpha * sqrt(1.0 - pow(4.0*(size/2)/size-1.0, 2)));
+
+    /* normalize the window and fill in the righthand side of the window: */
+    for (i=0; i<size/2; i++)
+    {
+        window[i] = sqrt(window[i]/sumvalue);
+        window[size-1-i] = window[i];
     }
 }
 
 
 //*************************************************************************************************************
 
-void TMSIChannel::clear()
+double FilterTools::BesselI0(double x)
 {
-    m_vecBuffer.clear();
+    double denominator;
+    double numerator;
+    double z;
+
+    if (x == 0.0)
+    {
+        return 1.0;
+    }
+    else
+    {
+        z = x * x;
+        numerator = (z* (z* (z* (z* (z* (z* (z* (z* (z* (z* (z* (z* (z*
+            (z* 0.210580722890567e-22  + 0.380715242345326e-19 ) +
+            0.479440257548300e-16) + 0.435125971262668e-13 ) +
+            0.300931127112960e-10) + 0.160224679395361e-7  ) +
+            0.654858370096785e-5)  + 0.202591084143397e-2  ) +
+            0.463076284721000e0)   + 0.754337328948189e2   ) +
+            0.830792541809429e4)   + 0.571661130563785e6   ) +
+            0.216415572361227e8)   + 0.356644482244025e9   ) +
+            0.144048298227235e10);
+
+        denominator = (z*(z*(z-0.307646912682801e4)+
+            0.347626332405882e7)-0.144048298227235e10);
+    }
+
+    return -numerator/denominator;
 }
+
