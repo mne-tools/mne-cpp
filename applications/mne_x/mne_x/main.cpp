@@ -205,6 +205,5 @@ int main(int argc, char *argv[])
 //    pluginOutputData->data()->setValue(v);
 //    //DEBUG
 
-
     return app.exec();
 }
