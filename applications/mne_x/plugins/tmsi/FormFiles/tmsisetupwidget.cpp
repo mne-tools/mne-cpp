@@ -91,6 +91,10 @@ TMSISetupWidget::TMSISetupWidget(TMSI* pTMSI, QWidget* parent)
     connect(ui.m_checkBox_UseUnitOffset, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
             this, &TMSISetupWidget::setChannelCorrections);
 
+    //Connect presprocessing
+    connect(ui.m_checkBox_UsePresprocessing, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+            this, &TMSISetupWidget::setPreprocessing);
+
     //Connect write to file
     connect(ui.m_checkBox_WriteToFile, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
             this, &TMSISetupWidget::setWriteToFile);
@@ -137,6 +141,9 @@ void TMSISetupWidget::initSamplingProperties()
     ui.m_checkBox_UseUnitGain->setChecked(m_pTMSI->m_bUseUnitGain);
     ui.m_checkBox_UseUnitOffset->setChecked(m_pTMSI->m_bUseUnitOffset);
 
+    //Init preprocessing
+    ui.m_checkBox_UsePresprocessing->setChecked(m_pTMSI->m_bUsePreProcessing);
+
     //Init write to file
     ui.m_checkBox_WriteToFile->setChecked(m_pTMSI->m_bWriteToFile);
     ui.m_lineEdit_outputDir->setText(m_pTMSI->m_sOutputFilePath);
@@ -164,6 +171,14 @@ void TMSISetupWidget::setNumberOfChannels(int value)
 void TMSISetupWidget::setSamplesPerBlock(int value)
 {
     m_pTMSI->m_iSamplesPerBlock = value;
+}
+
+
+//*************************************************************************************************************
+
+void TMSISetupWidget::setPreprocessing()
+{
+    m_pTMSI->m_bUsePreProcessing = ui.m_checkBox_UsePresprocessing->isChecked();
 }
 
 

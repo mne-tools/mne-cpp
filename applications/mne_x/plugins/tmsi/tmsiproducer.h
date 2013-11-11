@@ -114,6 +114,7 @@ public:
     * @param [in] bUseUnitGain Flag for using the channels unit gain. Defined by the user via the GUI.
     * @param [in] sOutpuFilePath Holds the path for the output file. Defined by the user via the GUI.
     * @param [in] bWriteToFile Flag for writing the received samples to a file. Defined by the user via the GUI.
+    * @param [in] bUsePreProcessing Flag for writing the received samples to a file. Defined by the user via the GUI.
     * @param [in] bUseUnitOffset Flag for using the channels unit offset. Defined by the user via the GUI.
     */
     virtual void start(int iNumberOfChannels,
@@ -124,6 +125,7 @@ public:
                        bool bUseUnitGain,
                        bool bUseUnitOffset,
                        bool bWriteToFile,
+                       bool bUsePreProcessing,
                        QString sOutputFilePath);
 
     //=========================================================================================================
