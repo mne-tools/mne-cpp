@@ -59,6 +59,8 @@
 #include <QTimer>
 #include <QTime>
 
+#include <iostream>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -83,7 +85,7 @@ const char* pluginDir = "/mne_x_plugins";        /**< holds path to plugins.*/
 
 MainWindow::MainWindow(QWidget *parent)
 : QMainWindow(parent)
-, m_pStartUpWidget(new StartUpWidget())
+, m_pStartUpWidget(new StartUpWidget(this))
 , m_pRunWidget(NULL)
 , m_bDisplayMax(false)
 , m_bIsRunning(false)
@@ -128,66 +130,32 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow()
 {
+    clear();
+}
+
+
+//*************************************************************************************************************
+
+void MainWindow::clear()
+{
     //garbage collection
-    if(m_pStartUpWidget)
-        delete m_pStartUpWidget;
-    if(m_pRunWidget)
-        delete m_pRunWidget;
+    m_pPluginSceneManager.reset();
 
-    if(m_pActionNewConfig)
-        delete m_pActionNewConfig;
-    if(m_pActionOpenConfig)
-        delete m_pActionOpenConfig;
-    if(m_pActionSaveConfig)
-        delete m_pActionSaveConfig;
-    if(m_pActionExit)
-        delete m_pActionExit;
-    if(m_pActionGroupLgLv)
-        delete m_pActionGroupLgLv;
-    if(m_pActionMinLgLv)
-        delete m_pActionMinLgLv;
-    if(m_pActionNormLgLv)
-        delete m_pActionNormLgLv;
-    if(m_pActionMaxLgLv)
-        delete m_pActionMaxLgLv;
-    if(m_pActionHelpContents)
-        delete m_pActionHelpContents;
-    if(m_pActionAbout)
-        delete m_pActionAbout;
-    if(m_pActionRun)
-        delete m_pActionRun;
-    if(m_pActionStop)
-        delete m_pActionStop;
-    if(m_pActionZoomStd)
-        delete m_pActionZoomStd;
-    if(m_pActionZoomIn)
-        delete m_pActionZoomIn;
-    if(m_pActionZoomOut)
-        delete m_pActionZoomOut;
-    if(m_pActionDisplayMax)
-        delete m_pActionDisplayMax;
-
-    if(m_pMenuFile)
-        delete m_pMenuFile;
-    if(m_pMenuView)
-        delete m_pMenuView;
-    if(m_pMenuLgLv)
-        delete m_pMenuLgLv;
-    if(m_pMenuHelp)
-        delete m_pMenuHelp;
-
-    if(m_pToolBar)
-        delete m_pToolBar;
-
-    if(m_pLabelTime)
-        delete m_pLabelTime;
-
-    if(m_pDockWidget_Log)
-        delete m_pDockWidget_Log;
-    if(m_pTextBrowser_Log)
-        delete m_pTextBrowser_Log;
+    if(m_pPluginGui)
+        delete m_pPluginGui;
 
 }
+
+
+//*************************************************************************************************************
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    clear();
+
+    QMainWindow::closeEvent(event);
+}
+
 
 
 //*************************************************************************************************************
