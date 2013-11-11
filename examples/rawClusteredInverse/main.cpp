@@ -366,16 +366,16 @@ int main(int argc, char *argv[])
     //
     // calculate the average
     //
-    //Option 1
-    qint32 numAverages = 10;
-    VectorXi vecSel(numAverages);
-    srand (time(NULL)); // initialize random seed
+//    //Option 1
+//    qint32 numAverages = 10;
+//    VectorXi vecSel(numAverages);
+//    srand (time(NULL)); // initialize random seed
 
-    for(qint32 i = 0; i < vecSel.size(); ++i)
-    {
-        qint32 val = rand() % data.size();
-        vecSel(i) = val;
-    }
+//    for(qint32 i = 0; i < vecSel.size(); ++i)
+//    {
+//        qint32 val = rand() % data.size();
+//        vecSel(i) = val;
+//    }
 
 //    //Option 2
 //    VectorXi vecSel(20);
@@ -383,6 +383,11 @@ int main(int argc, char *argv[])
 ////    vecSel << 76, 74, 13, 61, 97, 94, 75, 71, 60, 56, 26, 57, 56, 0, 52, 72, 33, 86, 96, 67;
 
 //    vecSel << 65, 22, 47, 55, 16, 29, 14, 36, 57, 97, 89, 46, 9, 93, 83, 52, 71, 52, 3, 96;
+
+    //Option 3
+    VectorXi vecSel(10);
+
+    vecSel << 0, 96, 80, 55, 66, 25, 26, 2, 55, 58, 6, 88;
 
 
     std::cout << "Select following epochs to average:\n" << vecSel << std::endl;
@@ -415,7 +420,7 @@ int main(int argc, char *argv[])
 //    QFile t_fileEvoked("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-ave.fif");
 
 
-    double snr = 1.0f;//3.0f;//0.1f;//3.0f;
+    double snr = 0.1f;//1.0f;//3.0f;//0.1f;//3.0f;
     QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
 
     QString t_sFileNameClusteredInv("");

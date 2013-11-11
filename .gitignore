@@ -257,3 +257,5 @@ bin/.DS_Store
 /bin/stc.dat
 
 /applications/mne_x/*.user
+
+/applications/mne_x/plugins/tmsi/*.dll
