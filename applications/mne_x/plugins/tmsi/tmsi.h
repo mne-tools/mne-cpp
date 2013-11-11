@@ -167,6 +167,7 @@ private:
     bool                                m_bUseUnitGain;                     /**< Flag for using the channels unit gain. Defined by the user via the GUI.*/
     bool                                m_bUseUnitOffset;                   /**< Flag for using the channels unit offset. Defined by the user via the GUI.*/
     bool                                m_bWriteToFile;                     /**< Flag for for writing the received samples to a file. Defined by the user via the GUI.*/
+    bool                                m_bUsePreProcessing;                /**< Flag for writing the received samples to a file. Defined by the user via the GUI.*/
     bool                                m_bIsRunning;                       /**< Whether TMSI is running.*/
 
     QString                             m_sOutputFilePath;                  /**< Holds the path for the output file. Defined by the user via the GUI.*/
