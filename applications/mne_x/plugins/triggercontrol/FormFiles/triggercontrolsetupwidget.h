@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
-* @file     tmsisetupwidget.h
-* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+* @file     dummysetupwidget.h
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     September, 2013
+* @date     February, 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,18 +29,20 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the TMSISetupWidget class.
+* @brief    Contains the declaration of the DummySetupWidget class.
 *
 */
 
-#ifndef TMSISETUPWIDGET_H
-#define TMSISETUPWIDGET_H
+#ifndef DUMMYSETUPWIDGET_H
+#define DUMMYSETUPWIDGET_H
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
+
+#include "../ui_triggercontrolsetup.h"
 
 
 //*************************************************************************************************************
@@ -50,15 +51,20 @@
 //=============================================================================================================
 
 #include <QtWidgets>
-#include "../ui_tmsisetup.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE TMSIPlugin
+// USED NAMESPACES
 //=============================================================================================================
 
-namespace TMSIPlugin
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE TriggerControlPlugin
+//=============================================================================================================
+
+namespace TriggerControlPlugin
 {
 
 
@@ -67,94 +73,39 @@ namespace TMSIPlugin
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class TMSI;
+class TriggerControl;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS TMSISetupWidget
+* DECLARE CLASS DummySetupWidget
 *
-* @brief The TMSISetupWidget class provides the TMSI configuration window.
+* @brief The DummySetupWidget class provides the DummyToolbox configuration window.
 */
-class TMSISetupWidget : public QWidget
+class TriggerControlSetupWidget : public QWidget
 {
     Q_OBJECT
+
 public:
 
     //=========================================================================================================
     /**
-    * Constructs a TMSISetupWidget which is a child of parent.
+    * Constructs a DummySetupWidget which is a child of parent.
     *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new ECGSetupWidget becomes a window. If parent is another widget, ECGSetupWidget becomes a child window inside parent. ECGSetupWidget is deleted when its parent is deleted.
-    * @param [in] pTMSI a pointer to the corresponding ECGSimulator.
+    * @param [in] toolbox a pointer to the corresponding DummyToolbox.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new DummySetupWidget becomes a window. If parent is another widget, DummySetupWidget becomes a child window inside parent. DummySetupWidget is deleted when its parent is deleted.
     */
-    TMSISetupWidget(TMSI* pTMSI, QWidget *parent = 0);
+    TriggerControlSetupWidget(TriggerControl* toolbox, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the ECGSetupWidget.
-    * All ECGSetupWidget's children are deleted first. The application exits if ECGSetupWidget is the main widget.
+    * Destroys the DummySetupWidget.
+    * All DummySetupWidget's children are deleted first. The application exits if DummySetupWidget is the main widget.
     */
-    ~TMSISetupWidget();
+    ~TriggerControlSetupWidget();
 
-    //=========================================================================================================
-    /**
-    * Initializes the Connector properties.
-    *
-    */
-    void initSamplingProperties();
 
-private:
-
-    //=========================================================================================================
-    /**
-    * Sets the Sampling frequency.
-    *
-    */
-    void setSamplingFreq(int value);
-
-    //=========================================================================================================
-    /**
-    * Sets the number of channels.
-    *
-    */
-    void setNumberOfChannels(int value);
-
-    //=========================================================================================================
-    /**
-    * Sets the samples taken per block.
-    *
-    */
-    void setSamplesPerBlock(int value);
-
-    //=========================================================================================================
-    /**
-    * Sets the preprocessing properties.
-    *
-    */
-    void setPreprocessing();
-
-    //=========================================================================================================
-    /**
-    * Sets the channel correction properties.
-    *
-    */
-    void setChannelCorrections();
-
-    //=========================================================================================================
-    /**
-    * Sets flag for writing the received samples to a file.
-    *
-    */
-    void setWriteToFile();
-
-    //=========================================================================================================
-    /**
-    * Sets dir where the output file is saved
-    *
-    */
-    void changeOutputFileDir();
-
+private slots:
     //=========================================================================================================
     /**
     * Shows the About Dialog
@@ -162,13 +113,13 @@ private:
     */
     void showAboutDialog();
 
+private:
 
-    bool            m_bAcquisitionIsRunning;
-    TMSI*           m_pTMSI;                    /**< a pointer to corresponding TMSI.*/
+    TriggerControl* m_pTriggerControl;  /**< Holds a pointer to corresponding TriggerControl.*/
 
-    Ui::TMSISetupClass ui;                      /**< the user interface for the TMSISetupWidget.*/
+    Ui::TriggerControlSetupWidgetClass ui;       /**< Holds the user interface for the TriggerControlSetupWidget.*/
 };
 
 } // NAMESPACE
 
-#endif // TMSISETUPWIDGET_H
+#endif // TRIGGERCONTROLSETUPWIDGET_H

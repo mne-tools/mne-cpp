@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
-* @file     tmsisetupwidget.h
-* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+* @file     dummytoolbox.h
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     September, 2013
+* @date     February, 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,18 +29,24 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the TMSISetupWidget class.
+* @brief    Contains the declaration of the DummyToolbox class.
 *
 */
 
-#ifndef TMSISETUPWIDGET_H
-#define TMSISETUPWIDGET_H
+#ifndef TRIGGERCONTROL_H
+#define TRIGGERCONTROL_H
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
+
+#include "triggercontrol_global.h"
+
+#include <mne_x/Interfaces/IAlgorithm.h>
+#include <generics/circularbuffer.h>
+#include <xMeas/newrealtimesamplearray.h>
 
 
 //*************************************************************************************************************
@@ -50,16 +55,25 @@
 //=============================================================================================================
 
 #include <QtWidgets>
-#include "../ui_tmsisetup.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE TMSIPlugin
+// DEFINE NAMESPACE TriggerControlPlugin
 //=============================================================================================================
 
-namespace TMSIPlugin
+namespace TriggerControlPlugin
 {
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace MNEX;
+using namespace XMEASLIB;
+using namespace IOBuffer;
 
 
 //*************************************************************************************************************
@@ -67,108 +81,62 @@ namespace TMSIPlugin
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class TMSI;
-
 
 //=============================================================================================================
 /**
-* DECLARE CLASS TMSISetupWidget
+* DECLARE CLASS TriggerControl
 *
-* @brief The TMSISetupWidget class provides the TMSI configuration window.
+* @brief The TriggerControl ....
 */
-class TMSISetupWidget : public QWidget
+class TRIGGERCONTROLSHARED_EXPORT TriggerControl : public IAlgorithm
 {
     Q_OBJECT
+    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "triggercontrol.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
+    Q_INTERFACES(MNEX::IAlgorithm)
+
 public:
+    //=========================================================================================================
+    /**
+    * Constructs a TriggerControl.
+    */
+    TriggerControl();
 
     //=========================================================================================================
     /**
-    * Constructs a TMSISetupWidget which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new ECGSetupWidget becomes a window. If parent is another widget, ECGSetupWidget becomes a child window inside parent. ECGSetupWidget is deleted when its parent is deleted.
-    * @param [in] pTMSI a pointer to the corresponding ECGSimulator.
+    * Destroys the TriggerControl.
     */
-    TMSISetupWidget(TMSI* pTMSI, QWidget *parent = 0);
+    ~TriggerControl();
 
     //=========================================================================================================
     /**
-    * Destroys the ECGSetupWidget.
-    * All ECGSetupWidget's children are deleted first. The application exits if ECGSetupWidget is the main widget.
+    * Initialise input and output connectors.
     */
-    ~TMSISetupWidget();
+    void init();
 
     //=========================================================================================================
     /**
-    * Initializes the Connector properties.
-    *
+    * Clone the plugin
     */
-    void initSamplingProperties();
+    virtual QSharedPointer<IPlugin> clone() const;
+
+    virtual bool start();
+    virtual bool stop();
+
+    virtual IPlugin::PluginType getType() const;
+    virtual QString getName() const;
+
+    virtual QWidget* setupWidget();
+
+    void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
+
+protected:
+    virtual void run();
 
 private:
-
-    //=========================================================================================================
-    /**
-    * Sets the Sampling frequency.
-    *
-    */
-    void setSamplingFreq(int value);
-
-    //=========================================================================================================
-    /**
-    * Sets the number of channels.
-    *
-    */
-    void setNumberOfChannels(int value);
-
-    //=========================================================================================================
-    /**
-    * Sets the samples taken per block.
-    *
-    */
-    void setSamplesPerBlock(int value);
-
-    //=========================================================================================================
-    /**
-    * Sets the preprocessing properties.
-    *
-    */
-    void setPreprocessing();
-
-    //=========================================================================================================
-    /**
-    * Sets the channel correction properties.
-    *
-    */
-    void setChannelCorrections();
-
-    //=========================================================================================================
-    /**
-    * Sets flag for writing the received samples to a file.
-    *
-    */
-    void setWriteToFile();
-
-    //=========================================================================================================
-    /**
-    * Sets dir where the output file is saved
-    *
-    */
-    void changeOutputFileDir();
-
-    //=========================================================================================================
-    /**
-    * Shows the About Dialog
-    *
-    */
-    void showAboutDialog();
-
-
-    bool            m_bAcquisitionIsRunning;
-    TMSI*           m_pTMSI;                    /**< a pointer to corresponding TMSI.*/
-
-    Ui::TMSISetupClass ui;                      /**< the user interface for the TMSISetupWidget.*/
+    PluginOutputData<NewRealTimeSampleArray>::SPtr  m_pTriggerOutput;    /**< The RealTimeSampleArray of the trigger output.*/
 };
 
 } // NAMESPACE
 
-#endif // TMSISETUPWIDGET_H
+#endif // TRIGGERCONTROL_H

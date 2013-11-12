@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
-* @file     tmsichannel.cpp
-* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     dummyaboutwidget.h
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     September, 2013
+* @date     February, 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,9 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the TMSIChannel class.
+* @brief    Contains the declaration of the DummyAboutWidget class.
 *
 */
+
+#ifndef TRIGGERCONTROLABOUTWIDGET_H
+#define TRIGGERCONTROLABOUTWIDGET_H
 
 
 //*************************************************************************************************************
@@ -40,7 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "tmsichannel.h"
+#include "../ui_triggercontrolabout.h"
 
 
 //*************************************************************************************************************
@@ -48,79 +50,51 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtCore/QTextStream>
-#include <QtCore/QFile>
+#include <QtWidgets>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// DEFINE NAMESPACE TriggerControlPlugin
 //=============================================================================================================
 
-using namespace TMSIPlugin;
+namespace TriggerControlPlugin
+{
 
 
-//*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
-//=============================================================================================================
-
-TMSIChannel::TMSIChannel(QString ResourceDataPath, QString ChannelFile, bool enabled, bool visible)
-: m_qStringResourceDataPath(ResourceDataPath)
-, m_qStringChannelFile(ChannelFile)
-, m_bIsEnabled(enabled)
-, m_bIsVisible(visible)
+/**
+* DECLARE CLASS DummyAboutWidget
+*
+* @brief The DummyAboutWidget class provides the about dialog for the DummyToolbox.
+*/
+class TriggerControlAboutWidget : public QDialog
 {
+    Q_OBJECT
 
-}
+public:
 
+    //=========================================================================================================
+    /**
+    * Constructs a DummyAboutWidget dialog which is a child of parent.
+    *
+    * @param [in] parent pointer to parent widget; If parent is 0, the new DummyAboutWidget becomes a window. If parent is another widget, DummyAboutWidget becomes a child window inside parent. DummyAboutWidget is deleted when its parent is deleted.
+    */
+    TriggerControlAboutWidget(QWidget *parent = 0);
 
-//*************************************************************************************************************
+    //=========================================================================================================
+    /**
+    * Destroys the DummyAboutWidget.
+    * All DummyAboutWidget's children are deleted first. The application exits if DummyAboutWidget is the main widget.
+    */
+    ~TriggerControlAboutWidget();
 
-TMSIChannel::~TMSIChannel()
-{
-}
+private:
 
+    Ui::TriggerControlAboutWidgetClass ui;      /**< Holds the user interface for the DummyAboutWidget.*/
 
-//*************************************************************************************************************
+};
 
-void TMSIChannel::initChannel()
-{
-    QFile file;
-    file.setFileName(m_qStringResourceDataPath+m_qStringChannelFile);
-    if(file.open(QIODevice::ReadOnly | QIODevice::Text))
-    {
-        QTextStream in(&file);
-        double value;
+} // NAMESPACE
 
-        while(!in.atEnd())
-        {
-            in >> value;
-
-            //init min and max with first value
-            if(m_vecBuffer.size() == 0)
-            {
-                m_dMin = value;
-                m_dMax = value;
-            }
-
-            if(value < m_dMin)
-                m_dMin = value;
-
-            if(value > m_dMax)
-                m_dMax = value;
-
-            m_vecBuffer.push_back(value);
-
-        }
-        file.close();
-    }
-}
-
-
-//*************************************************************************************************************
-
-void TMSIChannel::clear()
-{
-    m_vecBuffer.clear();
-}
+#endif // TRIGGERCONTROLABOUTWIDGET_H

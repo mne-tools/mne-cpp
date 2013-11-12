@@ -283,8 +283,8 @@ void InverseView::initializeGL(QGLPainter *painter)
     // Set stereo type
     //
     if (m_bStereo) {
-            this->setStereoType(QGLView::RedCyanAnaglyph);
-//        this->setStereoType(QGLView::StretchedLeftRight);
+//        this->setStereoType(QGLView::RedCyanAnaglyph);
+        this->setStereoType(QGLView::StretchedLeftRight);
 //        camera()->setEyeSeparation(0.4f);
 //        m_pCameraFrontal->setEyeSeparation(0.1f);
 
@@ -435,22 +435,22 @@ void InverseView::updateActivation(QSharedPointer<Eigen::VectorXd> p_pVecActivat
 
 //            int r, g, b;
             QRgb qRgb;
-            if(m_iColorMode == 0)
-            {
-//                r = iVal;
-//                g = iVal;
-//                b = iVal;
+//            if(m_iColorMode == 0)
+//            {
+////                r = iVal;
+////                g = iVal;
+////                b = iVal;
 //                qRgb = ColorMap::valueToHotNegative1((double)iVal/255.0);
+////                qRgb = ColorMap::valueToHotNegative2((double)iVal/255.0);
+//            }
+//            else if(m_iColorMode == 1)
+//            {
+////                r = iVal;
+////                g = iVal;
+////                b = iVal;
+////                qRgb = ColorMap::valueToHot((double)iVal/255.0);
                 qRgb = ColorMap::valueToHotNegative2((double)iVal/255.0);
-            }
-            else if(m_iColorMode == 1)
-            {
-//                r = iVal;
-//                g = iVal;
-//                b = iVal;
-//                qRgb = ColorMap::valueToHot((double)iVal/255.0);
-                qRgb = ColorMap::valueToHotNegative2((double)iVal/255.0);
-            }
+//            }
 
             m_pSceneNode->palette()->material(i)->setSpecularColor(QColor(qRgb));
                         //QColor(r,g,b,200));

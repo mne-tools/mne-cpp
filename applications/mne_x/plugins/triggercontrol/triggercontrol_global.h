@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     realtimesourceestimate.cpp
+* @file     dummytoolbox_global.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,18 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the RealTimeSourceEstimate class.
+* @brief    Contains the DummyToolbox library export/import macros.
 *
 */
 
-//*************************************************************************************************************
-//=============================================================================================================
-// INCLUDES
-//=============================================================================================================
-
-#include "realtimemultisamplearray_new.h"
-
-#include "realtimesourceestimate.h"
+#ifndef TRIGGERCONTROL_GLOBAL_H
+#define TRIGGERCONTROL_GLOBAL_H
 
 
 //*************************************************************************************************************
@@ -48,69 +42,18 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QDebug>
+#include <QtCore/qglobal.h>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// PREPROCESSOR DEFINES
 //=============================================================================================================
 
-using namespace XMEASLIB;
-//using namespace IOBuffer;
+#if defined(TRIGGERCONTROL_LIBRARY)
+#  define TRIGGERCONTROLSHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#else
+#  define TRIGGERCONTROLSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#endif
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE MEMBER METHODS
-//=============================================================================================================
-
-RealTimeSourceEstimate::RealTimeSourceEstimate()
-: MltChnMeasurement()
-, m_ucArraySize(10)
-{
-
-}
-
-
-//*************************************************************************************************************
-
-RealTimeSourceEstimate::~RealTimeSourceEstimate()
-{
-
-}
-
-
-//*************************************************************************************************************
-
-VectorXd RealTimeSourceEstimate::getValue() const
-{
-    return m_vecValue;
-}
-
-
-//*************************************************************************************************************
-
-void RealTimeSourceEstimate::setValue(VectorXd v)
-{
-//    //check vector size
-//    if(v.size() != m_qListChInfo.size())
-//        qCritical() << "Error Occured in RealTimeMultiSampleArrayNew::setVector: Vector size does not matche the number of channels! ";
-
-//    //Check if maximum exceeded //ToDo speed this up
-//    for(qint32 i = 0; i < v.size(); ++i)
-//    {
-//        if(v[i] < m_qListChInfo[i].getMinValue()) v[i] = m_qListChInfo[i].getMinValue();
-//        else if(v[i] > m_qListChInfo[i].getMaxValue()) v[i] = m_qListChInfo[i].getMaxValue();
-//    }
-
-    //Store
-    m_vecValue = v;
-    m_matSamples.push_back(m_vecValue);
-    if(m_matSamples.size() >= m_ucArraySize && notifyEnabled)
-    {
-        notify();
-        m_matSamples.clear();
-    }
-}
-
+#endif // TRIGGERCONTROL_GLOBAL_H

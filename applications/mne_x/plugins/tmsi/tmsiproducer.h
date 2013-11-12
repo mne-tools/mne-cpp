@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
 * @file     tmsiproducer.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     February, 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2013, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -76,36 +77,56 @@ using namespace IOBuffer;
 //=============================================================================================================
 
 class TMSI;
+class TMSIDriver;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS ECGProducer
+* DECLARE CLASS EEGProducer
 *
-* @brief The ECGProducer class provides a ECG data producer for a given sampling rate.
+* @brief The EEGProducer class provides a EEG data producer for a given sampling rate.
 */
 class TMSIProducer : public QThread
 {
 public:
-    typedef QSharedPointer<TMSIProducer> SPtr;              /**< Shared pointer type for ECGProducer. */
-    typedef QSharedPointer<const TMSIProducer> ConstSPtr;   /**< Const shared pointer type for ECGProducer. */
-
     //=========================================================================================================
     /**
     * Constructs a TMSIProducer.
     *
-    * @param [in] simulator a pointer to the corresponding ECGSimulator.
-    * @param [in] buffer_I a pointer to the buffer to which the ECGProducer should write the generated data for ECG I.
-    * @param [in] buffer_II a pointer to the buffer to which the ECGProducer should write the generated data for ECG II.
-    * @param [in] buffer_III a pointer to the buffer to which the ECGProducer should write the generated data for ECG III.
+    * @param [in] pTMSI a pointer to the corresponding TMSI class.
     */
-    TMSIProducer(TMSI* simulator, dBuffer::SPtr& buffer_I, dBuffer::SPtr& buffer_II, dBuffer::SPtr& buffer_III);
+    TMSIProducer(TMSI* pTMSI);
 
     //=========================================================================================================
     /**
     * Destroys the TMSIProducer.
     */
     ~TMSIProducer();
+
+    //=========================================================================================================
+    /**
+    * Starts the TMSIProducer by starting the producer's thread and initialising the device.
+    * @param [in] iNumberOfChannels The number of channels defined by the user via the GUI.
+    * @param [in] iSamplingFrequency The sampling frequency defined by the user via the GUI (in Hertz).
+    * @param [in] iSamplesPerBlock The samples per block defined by the user via the GUI.
+    * @param [in] bConvertToVolt Flag for converting the values to Volt. Defined by the user via the GUI.
+    * @param [in] bUseChExponent Flag for using the channels exponent. Defined by the user via the GUI.
+    * @param [in] bUseUnitGain Flag for using the channels unit gain. Defined by the user via the GUI.
+    * @param [in] sOutpuFilePath Holds the path for the output file. Defined by the user via the GUI.
+    * @param [in] bWriteToFile Flag for writing the received samples to a file. Defined by the user via the GUI.
+    * @param [in] bUsePreProcessing Flag for writing the received samples to a file. Defined by the user via the GUI.
+    * @param [in] bUseUnitOffset Flag for using the channels unit offset. Defined by the user via the GUI.
+    */
+    virtual void start(int iNumberOfChannels,
+                       int iSamplingFrequency,
+                       int iSamplesPerBlock,
+                       bool bConvertToVolt,
+                       bool bUseChExponent,
+                       bool bUseUnitGain,
+                       bool bUseUnitOffset,
+                       bool bWriteToFile,
+                       bool bUsePreProcessing,
+                       QString sOutputFilePath);
 
     //=========================================================================================================
     /**
@@ -123,11 +144,11 @@ protected:
     virtual void run();
 
 private:
-    TMSI*                   m_pTMSI;            /**< A pointer to corresponding TMSI.*/
-    dBuffer::SPtr           m_pdBuffer_I;       /**< A pointer to the buffer where the simulated data of ECG I should be written to.*/
-    dBuffer::SPtr           m_pdBuffer_II;      /**< A pointer to the buffer where the simulated data of ECG II should be written to.*/
-    dBuffer::SPtr           m_pdBuffer_III;     /**< A pointer to the buffer where the simulated data of ECG III should be written to.*/
-    bool                    m_bIsRunning;       /**< Whether TMSIProducer is running.*/
+    TMSI*                       m_pTMSI;            /**< A pointer to the corresponding TMSI class.*/
+    QSharedPointer<TMSIDriver>  m_pTMSIDriver;      /**< A pointer to the corresponding TMSI driver class.*/
+
+    bool                        m_bIsRunning;       /**< Whether TMSIProducer is running.*/
+
 };
 
 } // NAMESPACE

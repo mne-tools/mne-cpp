@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     plugingui.h
+* @file     dummyaboutwidget.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     August, 2013
+* @date     February, 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,122 +29,41 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    PluginGui class declaration
+* @brief    Contains the implementation of the DummyAboutWidget class.
 *
 */
-
-#ifndef PLUGINGUI_H
-#define PLUGINGUI_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "pluginitem.h"
-#include "pluginscene.h"
-
-#include <mne_x/Management/pluginmanager.h>
-#include <mne_x/Management/pluginscenemanager.h>
-
-#include <QMainWindow>
-#include <QMap>
+#include "triggercontrolaboutwidget.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// USED NAMESPACES
 //=============================================================================================================
 
-class QAction;
-class QToolBox;
-class QSpinBox;
-class QComboBox;
-class QButtonGroup;
-class QActionGroup;
-class QLineEdit;
-class QToolButton;
-class QAbstractButton;
-class QGraphicsView;
-
+using namespace TriggerControlPlugin;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNEX
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-namespace MNEX
+TriggerControlAboutWidget::TriggerControlAboutWidget(QWidget *parent)
+: QDialog(parent)
 {
-
-
-class PluginGui : public QMainWindow
-{
-    Q_OBJECT
-    friend class PluginScene;
-public:
-    PluginGui(MNEX::PluginManager::SPtr &pPluginManager, MNEX::PluginSceneManager::SPtr &pPluginSceneManager);
-
-    ~PluginGui();
-
-
-    inline IPlugin::SPtr getCurrentPlugin();
-
-    void uiSetupRunningState(bool state);
-
-signals:
-   void selectedPluginChanged(IPlugin::SPtr pPlugin);
-
-private:
-
-    void pointerGroupClicked(int id);
-    void actionGroupTriggered(QAction* action);
-
-    bool removePlugin(IPlugin::SPtr pPlugin);
-
-    void itemInserted(PluginItem *item);
-    void newItemSelected();
-
-    void deleteItem();
-    void bringToFront();
-    void sendToBack();
-
-    void createActions();
-    void createMenuItem();
-    void createToolbars();
-
-    QAction* createItemAction(QString name, QMenu* menu);
-
-    PluginManager::SPtr       m_pPluginManager;       /**< Corresponding plugin manager. */
-    PluginSceneManager::SPtr  m_pPluginSceneManager;  /**< Corresponding plugin scene manager. */
-
-    IPlugin::SPtr             m_pCurrentPlugin;
-
-    PluginScene*    m_pPluginScene;         /**< Plugin graph */
-    QGraphicsView*  m_pGraphicsView;        /**< View to show graph */
-    QToolBar*       m_pToolBarPlugins;
-    QActionGroup*   m_pActionGroupPlugins;
-
-    QToolBar *      m_pToolBarPointer;
-    QButtonGroup *  m_pButtonGroupPointers;
-
-    QToolBar*   m_pToolBarItem;
-    QMenu*      m_pMenuItem;
-    QAction*    deleteAction;
-    QAction*    toFrontAction;
-    QAction*    sendBackAction;
-};
-
-//*************************************************************************************************************
-//=============================================================================================================
-// INLINE DEFINITIONS
-//=============================================================================================================
-
-inline IPlugin::SPtr PluginGui::getCurrentPlugin()
-{
-    return m_pCurrentPlugin;
+    ui.setupUi(this);
 }
 
-} //NAMESPACE
 
-#endif // PLUGINGUI_H
+//*************************************************************************************************************
+
+TriggerControlAboutWidget::~TriggerControlAboutWidget()
+{
+
+}

@@ -78,9 +78,9 @@ SOURCES += \
         progressbarwidget.cpp \
         numericwidget.cpp \
         realtimemultisamplearray_new_widget.cpp \
-        realtimesourceestimatewidget.cpp \
         newrealtimesamplearraywidget.cpp \
-        newrealtimemultisamplearraywidget.cpp
+        newrealtimemultisamplearraywidget.cpp \
+        realtimesourceestimatewidget.cpp
 
 HEADERS += \
         xdisp_global.h \
@@ -91,9 +91,9 @@ HEADERS += \
         progressbarwidget.h \
         numericwidget.h \
         realtimemultisamplearray_new_widget.h \
-        realtimesourceestimatewidget.h \
         newrealtimesamplearraywidget.h \
-        newrealtimemultisamplearraywidget.h
+        newrealtimemultisamplearraywidget.h \
+        realtimesourceestimatewidget.h
 
 FORMS += \
     realtimemultisamplearraywidget.ui \
@@ -102,7 +102,6 @@ FORMS += \
     progressbarwidget.ui \
     numericwidget.ui \
     realtimemultisamplearray_new_widget.ui \
-    realtimesourceestimatewidget.ui \
     newrealtimesamplearraywidget.ui \
     newrealtimemultisamplearraywidget.ui
 

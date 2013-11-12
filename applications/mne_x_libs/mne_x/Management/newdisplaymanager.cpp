@@ -43,9 +43,11 @@
 
 #include <xDisp/newrealtimesamplearraywidget.h>
 #include <xDisp/newrealtimemultisamplearraywidget.h>
+#include <xDisp/realtimesourceestimatewidget.h>
 
 #include <xMeas/newrealtimesamplearray.h>
 #include <xMeas/newrealtimemultisamplearray.h>
+#include <xMeas/realtimesourceestimate.h>
 
 
 //#include <xDisp/measurementwidget.h>
@@ -135,6 +137,17 @@ QWidget* NewDisplayManager::show(IPlugin::OutputConnectorList &pOutputConnectorL
 
             vboxLayout->addWidget(rtmsaWidget);
             rtmsaWidget->init();
+        }
+        else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeSourceEstimate> >())
+        {
+//            QSharedPointer<RealTimeSourceEstimate>* pRealTimeSourceEstimate = &pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeSourceEstimate> >()->data();
+            RealTimeSourceEstimateWidget* rtseWidget = new RealTimeSourceEstimateWidget(newDisp);//new RealTimeSourceEstimateWidget(*pRealTimeSourceEstimate, pT, newDisp);
+
+//            connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
+//                    rtmsaWidget, &NewRealTimeMultiSampleArrayWidget::update, Qt::BlockingQueuedConnection);
+
+            vboxLayout->addWidget(rtseWidget);
+            rtseWidget->init();
         }
     }
 
