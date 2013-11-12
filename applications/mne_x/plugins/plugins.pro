@@ -42,7 +42,6 @@ SUBDIRS += \
     ecgsimulator \
     mnertclient \
     dummytoolbox \
-    tmsi \
     triggercontrol
 
 
