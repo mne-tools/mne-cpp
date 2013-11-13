@@ -160,6 +160,24 @@ FiffEvokedSet FiffEvokedSet::pick_channels(const QStringList& include, const QSt
 //    return res;
 }
 
+//*************************************************************************************************************
+
+bool FiffEvokedSet::find_evoked(const FiffEvokedSet& p_FiffEvokedSet) const
+{
+    if(!p_FiffEvokedSet.evoked.size()) {
+        printf("No evoked response data sets in %s\n",p_FiffEvokedSet.info.filename.toLatin1().constData());
+        return false;
+    }
+    else
+        printf("\nFound %d evoked response data sets in %s :\n",p_FiffEvokedSet.evoked.size(),p_FiffEvokedSet.info.filename.toLatin1().constData());
+
+    for(qint32 i = 0; i < p_FiffEvokedSet.evoked.size(); ++i) {
+        printf("%s (%s)\n",p_FiffEvokedSet.evoked.at(i).comment.toLatin1().constData(),p_FiffEvokedSet.evoked.at(i).aspectKindToString().toLatin1().constBegin());
+    }
+
+    return true;
+}
+
 
 //*************************************************************************************************************
 
@@ -212,6 +230,7 @@ bool FiffEvokedSet::read(QIODevice& p_IODevice, FiffEvokedSet& p_FiffEvokedSet, 
 
     for(qint32 i = 0; i < comments.size(); ++i)
     {
+        printf("HERE iterators number: %d \n",i);
         QFile t_file(p_FiffEvokedSet.info.filename);
         printf(">> Processing %s <<\n", comments[i].toLatin1().constData());
         FiffEvoked t_FiffEvoked;

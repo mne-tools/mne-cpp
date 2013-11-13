@@ -1,13 +1,14 @@
 //=============================================================================================================
 /**
 * @file     main.cpp
-* @author   Christoph Dinh <christoph.dinh@tu-ilmenau.de>
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2013
+* @date     July, 2012
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh. All rights reserved.
+* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -38,17 +39,13 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <fs/label.h>
-#include <fs/surface.h>
-#include <fs/annotationset.h>
-
-#include <fiff/fiff_evoked.h>
-#include <inverse/sourceestimate.h>
-#include <inverse/rapMusic/rapmusic.h>
-
-#include <utils/mnemath.h>
-
 #include <iostream>
+#include <vector>
+#include <math.h>
+
+
+#include <fiff/fiff.h>
+#include <mne/mne.h>
 
 
 //*************************************************************************************************************
@@ -64,11 +61,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
-using namespace FSLIB;
 using namespace FIFFLIB;
-using namespace INVERSELIB;
-using namespace UTILSLIB;
+using namespace MNELIB;
 
 
 //*************************************************************************************************************
@@ -89,17 +83,17 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    //########################################################################################
-    // Source Estimate
+    //generate FiffEvokedSet
+    QFile t_sampleFile("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    FiffEvokedSet p_FiffEvokedSet(t_sampleFile);
 
-    QFile t_fileFwd("./MNE-sample-data/MEG/sample/sample_audvis-meg-oct-6-fwd.fif");
-
-    MNEForwardSolution t_Fwd(t_fileFwd);
-    if(t_Fwd.isEmpty())
-        return 1;
-
-    RapMusic t_rapMusic(t_Fwd, false, 7);
-
+    //run find_evoked function
+    p_FiffEvokedSet.find_evoked(p_FiffEvokedSet);
 
     return a.exec();
 }
+
+//*************************************************************************************************************
+//=============================================================================================================
+// STATIC DEFINITIONS
+//=============================================================================================================
