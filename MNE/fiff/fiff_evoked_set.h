@@ -144,6 +144,21 @@ public:
     */
     FiffEvokedSet pick_channels(const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList) const;
 
+
+    //=========================================================================================================
+    /**
+    * fiff_find_evoked
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Find evoked data sets
+    *
+    * @param[out] p_FiffEvokedSet   The read evoked data set
+    *
+    * @return true when any set was found, false otherwise
+    */
+    bool find_evoked(const FiffEvokedSet& p_FiffEvokedSet) const;
+
     //=========================================================================================================
     /**
     * fiff_read_evoked

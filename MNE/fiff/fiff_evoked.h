@@ -148,7 +148,7 @@ public:
     *
     * @return string formatted aspect_kind
     */
-    inline QString aspectKindToString();
+    inline QString aspectKindToString() const;
 
     //=========================================================================================================
     /**
@@ -232,14 +232,14 @@ inline QStringList FiffEvoked::ch_names()
 
 //*************************************************************************************************************
 
-inline QString FiffEvoked::aspectKindToString()
+inline QString FiffEvoked::aspectKindToString() const
 {
     if(aspect_kind == FIFFV_ASPECT_AVERAGE)
-        return QString("average");
+        return QString("Average");
     else if(aspect_kind == FIFFV_ASPECT_STD_ERR)
-        return QString("standard_error");
+        return QString("Standard_error");
     else
-        return QString("unknown");
+        return QString("Unknown");
 }
 
 

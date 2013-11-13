@@ -323,6 +323,25 @@ public:
 
     //=========================================================================================================
     /**
+    * fiff_find_evoked
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Wrapper for the FiffEvokedDataSet find_evoked member function
+    *
+    * Find evoked data sets
+    *
+    * @param[out] orig   The read evoked data set
+    *
+    * @return true when any set was found, false otherwise
+    */
+    inline static bool find_evoked()
+    {
+        return orig.find_evoked(FiffEvokedSet& orig);
+    }
+
+    //=========================================================================================================
+    /**
     * fiff_pick_info
     *
     * ### MNE toolbox root function ###
