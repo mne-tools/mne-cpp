@@ -39,6 +39,10 @@ TEMPLATE = lib
 
 QT += widgets
 
+qtHaveModule(3d) {
+    QT += 3d
+}
+
 DEFINES += XDISP_LIBRARY
 
 TARGET = xDisp
@@ -49,11 +53,26 @@ CONFIG(debug, debug|release) {
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
+            -lMNE$${MNE_LIB_VERSION}Fiffd \
+            -lMNE$${MNE_LIB_VERSION}Mned \
+            -lMNE$${MNE_LIB_VERSION}Dispd \
             -lxMeasd
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
+            -lMNE$${MNE_LIB_VERSION}Fiff \
+            -lMNE$${MNE_LIB_VERSION}Mne \
+            -lMNE$${MNE_LIB_VERSION}Disp \
             -lxMeas
+}
+
+qtHaveModule(3d) {
+    CONFIG(debug, debug|release) {
+        LIBS += -lMNE$${MNE_LIB_VERSION}Disp3Dd
+    }
+    else {
+        LIBS += -lMNE$${MNE_LIB_VERSION}Disp3D
+    }
 }
 
 DESTDIR = $${MNE_LIBRARY_DIR}
@@ -79,8 +98,7 @@ SOURCES += \
         numericwidget.cpp \
         realtimemultisamplearray_new_widget.cpp \
         newrealtimesamplearraywidget.cpp \
-        newrealtimemultisamplearraywidget.cpp \
-        realtimesourceestimatewidget.cpp
+        newrealtimemultisamplearraywidget.cpp
 
 HEADERS += \
         xdisp_global.h \
@@ -92,8 +110,7 @@ HEADERS += \
         numericwidget.h \
         realtimemultisamplearray_new_widget.h \
         newrealtimesamplearraywidget.h \
-        newrealtimemultisamplearraywidget.h \
-        realtimesourceestimatewidget.h
+        newrealtimemultisamplearraywidget.h
 
 FORMS += \
     realtimemultisamplearraywidget.ui \
@@ -104,6 +121,12 @@ FORMS += \
     realtimemultisamplearray_new_widget.ui \
     newrealtimesamplearraywidget.ui \
     newrealtimemultisamplearraywidget.ui
+
+qtHaveModule(3d) {
+    SOURCES += realtimesourceestimatewidget.cpp
+
+    HEADERS += realtimesourceestimatewidget.h
+}
 
 UI_DIR = $${PWD}
 
