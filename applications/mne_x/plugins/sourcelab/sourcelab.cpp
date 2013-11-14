@@ -174,7 +174,7 @@ void SourceLab::init()
 
 bool SourceLab::start()
 {
-    QThread::start();
+//    QThread::start();
     return true;
 }
 

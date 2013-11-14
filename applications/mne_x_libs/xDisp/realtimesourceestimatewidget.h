@@ -45,6 +45,9 @@
 #include "xdisp_global.h"
 #include "measurementwidget.h"
 
+#include <disp3D/geometryview.h>
+#include <mne/mne_forwardsolution.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -87,6 +90,8 @@ namespace XDISPLIB
 //=============================================================================================================
 
 //using namespace XMEASLIB;
+using namespace DISP3DLIB;
+using namespace MNELIB;
 
 
 //*************************************************************************************************************
@@ -237,6 +242,18 @@ private slots:
     void minValueChanged(double);
 
 private:
+
+
+    QFile m_qFile;
+    MNEForwardSolution* m_pForwardSolution;
+    GeometryView* m_pView;
+    QWidget* m_pContainer;
+
+
+
+
+
+
     void actualize();                                   /**< Actualize member variables. Like y position, scaling factor, middle value of the frame and the highest sampling rate to calculate the sample width.*/
 //    Ui::RealTimeSourceEstimateClass   ui;               /**< The user interface of the RealTimeSampleArray widget. */
 //    QSharedPointer<RealTimeSourceEstimate> m_pRTMSE;    /**< The real-time source estimate measurement. */

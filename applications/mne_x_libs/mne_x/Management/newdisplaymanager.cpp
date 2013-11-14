@@ -43,10 +43,14 @@
 
 #include <xDisp/newrealtimesamplearraywidget.h>
 #include <xDisp/newrealtimemultisamplearraywidget.h>
+
+#if defined(QT3D_LIBRARY_AVAILABLE)
 #include <xDisp/realtimesourceestimatewidget.h>
+#endif
 
 #include <xMeas/newrealtimesamplearray.h>
 #include <xMeas/newrealtimemultisamplearray.h>
+
 #include <xMeas/realtimesourceestimate.h>
 
 
@@ -138,6 +142,7 @@ QWidget* NewDisplayManager::show(IPlugin::OutputConnectorList &pOutputConnectorL
             vboxLayout->addWidget(rtmsaWidget);
             rtmsaWidget->init();
         }
+    #if defined(QT3D_LIBRARY_AVAILABLE)
         else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeSourceEstimate> >())
         {
 //            QSharedPointer<RealTimeSourceEstimate>* pRealTimeSourceEstimate = &pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeSourceEstimate> >()->data();
@@ -149,6 +154,7 @@ QWidget* NewDisplayManager::show(IPlugin::OutputConnectorList &pOutputConnectorL
             vboxLayout->addWidget(rtseWidget);
             rtseWidget->init();
         }
+    #endif
     }
 
 //    // Add all widgets but NumericWidgets to layout and display them

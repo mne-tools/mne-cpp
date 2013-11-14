@@ -45,6 +45,12 @@
 
 //#include <xMeas/realtimesourceestimate.h>
 
+#include <disp3D/geometryview.h>
+#include <mne/mne_forwardsolution.h>
+
+
+
+
 #include <Eigen/Core>
 
 
@@ -81,6 +87,8 @@
 //=============================================================================================================
 
 using namespace XDISPLIB;
+using namespace DISP3DLIB;
+using namespace MNELIB;
 //using namespace XMEASLIB;
 
 
@@ -91,19 +99,30 @@ using namespace XDISPLIB;
 
 RealTimeSourceEstimateWidget::RealTimeSourceEstimateWidget(QWidget* parent)
 : MeasurementWidget(parent)
+, m_qFile("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif")
 {
     QHBoxLayout *layout = new QHBoxLayout(this);
 
 
     QWindow *window = new QWindow();//ToDo replace this with source estimate 3D
 
-    QWidget *container = QWidget::createWindowContainer(window);
-    container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    container->setFocusPolicy(Qt::StrongFocus);
 
-    layout->addWidget(new QLineEdit(QLatin1String("A QLineEdit")));
-    layout->addWidget(container);
-    layout->addWidget(new QLineEdit(QLatin1String("A QLabel")));
+    m_pForwardSolution = new MNEForwardSolution(m_qFile);
+
+    m_pView = new GeometryView(m_pForwardSolution->src);
+
+    if (m_pView->stereoType() != QGLView::RedCyanAnaglyph)
+        m_pView->camera()->setEyeSeparation(0.3f);
+
+
+    m_pContainer = QWidget::createWindowContainer(m_pView);
+//    m_pContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+//    m_pContainer->setFocusPolicy(Qt::StrongFocus);
+    m_pContainer->setFocusPolicy(Qt::TabFocus);
+
+//    layout->addWidget(new QLineEdit(QLatin1String("A QLineEdit")));
+    layout->addWidget(m_pContainer);
+//    layout->addWidget(new QLineEdit(QLatin1String("A QLabel")));
 
 
 
