@@ -335,9 +335,9 @@ public:
     *
     * @return true when any set was found, false otherwise
     */
-    inline static bool find_evoked()
+    inline static bool find_evoked(FiffEvokedSet& orig)
     {
-        return orig.find_evoked(FiffEvokedSet& orig);
+        return orig.find_evoked(orig);
     }
 
     //=========================================================================================================

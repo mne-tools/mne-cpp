@@ -338,6 +338,10 @@ int main(int argc, char *argv[])
         }
     }
 
+    //Example for average_epochs
+    data.average(raw.info,raw.first_samp,raw.last_samp);
+
+    /*
     if(data.size() > 0)
     {
         printf("Read %d epochs, %d samples each.\n",data.size(),(qint32)data[0]->epoch.cols());
@@ -349,6 +353,7 @@ int main(int argc, char *argv[])
         std::cout << times.block(0,0,1,10) << std::endl;
         qDebug() << times.rows() << " x " << times.cols();
     }
+    */
 
     return a.exec();
 }
