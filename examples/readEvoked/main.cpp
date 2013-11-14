@@ -84,12 +84,9 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    //generate FiffEvokedSet
+    //generate FiffEvoked object
     QFile t_sampleFile("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
-    FiffEvokedSet p_FiffEvokedSet(t_sampleFile);
-
-    //run find_evoked function
-    p_FiffEvokedSet.find_evoked(p_FiffEvokedSet);
+    FiffEvoked p_FiffEvoked(t_sampleFile,QVariant("2"));
 
     return a.exec();
 }

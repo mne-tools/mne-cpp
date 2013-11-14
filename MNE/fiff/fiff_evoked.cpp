@@ -420,6 +420,9 @@ bool FiffEvoked::read(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant 
     //
     //   Calibrate
     //
+    printf("\n\tPreprocessing...\n");
+    printf("\t%d channels remain after picking\n",info.nchan);
+
     typedef Eigen::Triplet<double> T;
     std::vector<T> tripletList;
     tripletList.reserve(info.nchan);
@@ -464,12 +467,13 @@ bool FiffEvoked::read(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant 
 
     if(p_FiffEvoked.proj.rows() > 0)
     {
-        printf("\tSSP projectors applied...\n");
         all_data = p_FiffEvoked.proj * all_data;
+        printf("\tSSP projectors applied to the evoked data\n");
     }
 
     // Run baseline correction
     all_data = MNEMath::rescale(all_data, times, baseline, QString("mean"));
+    printf("Applying baseline correction ... (mode: mean)");
 
     // Put it all together
     p_FiffEvoked.info = info;

@@ -45,7 +45,7 @@ QT -= gui
 CONFIG   += console
 CONFIG   -= app_bundle
 
-TARGET = findEvoked
+TARGET = readEvoked
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
