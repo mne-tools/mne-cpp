@@ -44,8 +44,6 @@
 
 #include "FormFiles/tmsisetupwidget.h"
 
-#include <utils/filterTools.h>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -63,7 +61,6 @@
 //=============================================================================================================
 
 using namespace TMSIPlugin;
-using namespace XMEASLIB;
 
 
 //*************************************************************************************************************
@@ -200,7 +197,7 @@ void TMSI::init()
 bool TMSI::start()
 {
     //Check filter class - will be removed in the future - testing purpose only!
-    UTILSLIB::FilterTools* filterObject = new UTILSLIB::FilterTools();
+    FilterTools* filterObject = new FilterTools();
 
     //kaiser window testing
     qint32 numberCoeff = 51;

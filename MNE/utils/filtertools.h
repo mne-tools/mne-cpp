@@ -78,6 +78,7 @@ namespace UTILSLIB
 
 using namespace Eigen;
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINES
@@ -86,21 +87,22 @@ using namespace Eigen;
 
 //=============================================================================================================
 /**
-* Basic filter operations (HP, TP, BP)
+* Basic filter creation and operations (HP, TP, BP)
 *
-* @brief Basic filter operations and calculation (HP, TP, BP)
+* @brief Basic filter creation and operations (HP, TP, BP)
 */
 class UTILSSHARED_EXPORT FilterTools
 {
 public:
-    typedef QSharedPointer<FilterTools> SPtr;            /**< Shared pointer type for KMeans. */
-    typedef QSharedPointer<const FilterTools> ConstSPtr; /**< Const shared pointer type for KMeans. */
+    typedef QSharedPointer<FilterTools> SPtr;            /**< Shared pointer type for FilterTools. */
+    typedef QSharedPointer<const FilterTools> ConstSPtr; /**< Const shared pointer type for FilterTools. */
 
     //=========================================================================================================
     /**
     * Constructs a Filter object.
     */
     FilterTools();
+
 
     //=========================================================================================================
     /**
