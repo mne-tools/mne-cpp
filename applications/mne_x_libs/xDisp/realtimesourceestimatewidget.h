@@ -70,10 +70,10 @@
 
 class QTime;
 
-//namespace XMEASLIB
-//{
-//    class RealTimeSourceEstimate;
-//}
+namespace XMEASLIB
+{
+    class RealTimeSourceEstimate;
+}
 
 
 //*************************************************************************************************************
@@ -89,7 +89,7 @@ namespace XDISPLIB
 // USED NAMESPACES
 //=============================================================================================================
 
-//using namespace XMEASLIB;
+using namespace XMEASLIB;
 using namespace DISP3DLIB;
 using namespace MNELIB;
 
@@ -130,7 +130,7 @@ public:
     * @param [in] pTime         pointer to application time.
     * @param [in] parent        pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
     */
-    RealTimeSourceEstimateWidget(QWidget* parent = 0);
+    RealTimeSourceEstimateWidget(QSharedPointer<RealTimeSourceEstimate> &pRTSE, QWidget* parent = 0);
 
 //    RealTimeSourceEstimateWidget(QSharedPointer<RealTimeSourceEstimate> pRTMSE, QSharedPointer<QTime> pTime, QWidget* parent = 0);
 
@@ -243,14 +243,10 @@ private slots:
 
 private:
 
-
-    QFile m_qFile;
-    MNEForwardSolution* m_pForwardSolution;
     GeometryView* m_pView;
     QWidget* m_pContainer;
 
-
-
+    QSharedPointer<RealTimeSourceEstimate> m_pRTMSE;    /**< The real-time source estimate measurement. */
 
 
 
