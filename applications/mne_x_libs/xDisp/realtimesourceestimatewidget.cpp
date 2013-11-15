@@ -43,7 +43,7 @@
 #include "realtimesourceestimatewidget.h"
 //#include "annotationwindow.h"
 
-//#include <xMeas/realtimesourceestimate.h>
+#include <xMeas/realtimesourceestimate.h>
 
 #include <disp3D/geometryview.h>
 #include <mne/mne_forwardsolution.h>
@@ -89,7 +89,7 @@
 using namespace XDISPLIB;
 using namespace DISP3DLIB;
 using namespace MNELIB;
-//using namespace XMEASLIB;
+using namespace XMEASLIB;
 
 
 //*************************************************************************************************************
@@ -97,23 +97,16 @@ using namespace MNELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RealTimeSourceEstimateWidget::RealTimeSourceEstimateWidget(QWidget* parent)
+RealTimeSourceEstimateWidget::RealTimeSourceEstimateWidget(QSharedPointer<RealTimeSourceEstimate> &pRTSE, QWidget* parent)
 : MeasurementWidget(parent)
-, m_qFile("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif")
+, m_pRTMSE(pRTSE)
 {
     QHBoxLayout *layout = new QHBoxLayout(this);
 
-
-    QWindow *window = new QWindow();//ToDo replace this with source estimate 3D
-
-
-    m_pForwardSolution = new MNEForwardSolution(m_qFile);
-
-    m_pView = new GeometryView(m_pForwardSolution->src);
+    m_pView = new GeometryView(m_pRTMSE->getSrc());
 
     if (m_pView->stereoType() != QGLView::RedCyanAnaglyph)
         m_pView->camera()->setEyeSeparation(0.3f);
-
 
     m_pContainer = QWidget::createWindowContainer(m_pView);
 //    m_pContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);

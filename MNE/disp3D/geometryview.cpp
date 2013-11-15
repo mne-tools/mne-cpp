@@ -258,10 +258,10 @@ void GeometryView::initializeGL(QGLPainter *painter)
 //            m_pCameraFrontal->setEyeSeparation(0.1f);
         }
 
-//        //set background to white
-//        glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
-        //set background to light grey-blue
-        glClearColor(0.8f, 0.8f, 1.0f, 0.0f);
+        //set background to white
+        glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
+//        //set background to light grey-blue
+//        glClearColor(0.8f, 0.8f, 1.0f, 0.0f);
     }
 
 }
