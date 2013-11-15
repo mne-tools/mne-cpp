@@ -172,6 +172,7 @@ typedef int             ( __stdcall * PLIBRARYEXIT)     (IN HANDLE Handle);
 typedef char**          ( __stdcall * PGETDEVICELIST)   (IN HANDLE Handle, IN OUT int *NrOfFrontEnds);
 typedef BOOLEAN         ( __stdcall * PGETFRONTENDINFO) (IN HANDLE Handle, IN OUT FRONTENDINFO *FrontEndInfo );
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES

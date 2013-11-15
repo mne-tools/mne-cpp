@@ -45,12 +45,12 @@ SUBDIRS += \
 #    rtsss \
 
 win32 {
-    exists(C:/Windows/System32/RTINST.DLL) {
-        message(TMSI plugin configured! Driver DLL found!)
+    exists(C:/Windows/System32/TMSiSDK.DLL) {
+        message(TMSI plugin configured! Driver TMSiSDK.DLL found!)
         SUBDIRS += tmsi
     }
     else {
-        message(TMSI plugin was not configured due to missing driver DLL!)
+        message(TMSI plugin was not configured due to missing driver TMSiSDK.DLL!)
         }
 }
 else {
