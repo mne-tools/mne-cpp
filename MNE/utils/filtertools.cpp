@@ -155,6 +155,7 @@ QVector<float> FilterTools::convolve(QVector<float> &in, QVector<float> &kernel)
     return out;
 }
 
+
 //*************************************************************************************************************
 
 void FilterTools::KBDWindow(QVector<float> &window, int size, float alpha)
