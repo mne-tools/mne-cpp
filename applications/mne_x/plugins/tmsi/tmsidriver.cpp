@@ -443,7 +443,6 @@ bool TMSIDriver::uninitDevice()
 
     return true;
 
-
 //    //---- Fill up with zeros -> the function does not wait until the block is completley filled with values ------------------------------------------
 
 //    ULONG ulSizeSamples = m_oFpGetSamples(m_HandleMaster, (PULONG)m_lSignalBuffer, m_lSignalBufferSize);

@@ -44,9 +44,7 @@
 
 #include "FormFiles/tmsisetupwidget.h"
 
-#include <iostream>
-
-//#include <utils/filterTools.h>
+#include <utils/filterTools.h>
 
 
 //*************************************************************************************************************
@@ -56,7 +54,6 @@
 
 #include <QtCore/QtPlugin>
 #include <QtCore/QTextStream>
-#include <QtCore/QFile>
 #include <QDebug>
 
 
@@ -67,7 +64,6 @@
 
 using namespace TMSIPlugin;
 using namespace XMEASLIB;
-//using namespace UTILSLIB;
 
 
 //*************************************************************************************************************
@@ -106,9 +102,76 @@ QSharedPointer<IPlugin> TMSI::clone() const
 
 
 //*************************************************************************************************************
-//=============================================================================================================
-// Create measurement instances and config them
-//=============================================================================================================
+
+void TMSI::setUpFiffInfo()
+{
+    //Clear old fiff info data
+    m_pFiffInfo->clear();
+
+    //Set number of channels
+    m_pFiffInfo->nchan = m_iNumberOfChannels;
+
+    //Append channels to fiff info
+    QStringList QSLChNames;
+    for(int i=0; i<m_iNumberOfChannels; i++)
+    {
+        //Create information for each channel
+        QString sChType;
+        FiffChInfo fChInfo;
+
+        //EEG Channels
+        if(i<=127)
+        {
+            //Set channel name
+            sChType = QString("EEG_");
+            fChInfo.ch_name = sChType.append(sChType.number(i));
+
+            //Set coil type
+            fChInfo.coil_type = FIFFV_COIL_EEG;
+
+            //TODO: Set EEG electrode location
+        }
+
+        //Bipolar channels
+        if(i>=128 && i<=131)
+        {
+            sChType = QString("BIPO_");
+            fChInfo.ch_name = sChType.append(sChType.number(i-128));
+        }
+
+        //Auxilary input channels
+        if(i>=132 && i<=135)
+        {
+            sChType = QString("AUX_");
+            fChInfo.ch_name = sChType.append(sChType.number(i-132));
+        }
+
+        //Digital input channel
+        if(i==136)
+        {
+            sChType = QString("DIG");
+            fChInfo.ch_name = sChType;
+        }
+
+        //Internally generated test signal - ramp signal
+        if(i==137)
+        {
+            sChType = QString("TEST_RAMP");
+            fChInfo.ch_name = sChType;
+        }
+
+        QSLChNames << sChType;
+
+        m_pFiffInfo->chs.append(fChInfo);
+    }
+
+    //Set channel namesin fiff_info_base
+    m_pFiffInfo->ch_names = QSLChNames;
+
+}
+
+
+//*************************************************************************************************************
 
 void TMSI::init()
 {
@@ -127,6 +190,8 @@ void TMSI::init()
     m_bUsePreProcessing = true;
     m_bIsRunning = false;
     m_sOutputFilePath = QString("mne_x_plugins/resources/tmsi");
+
+    m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo());
 }
 
 
@@ -135,30 +200,39 @@ void TMSI::init()
 bool TMSI::start()
 {
     //Check filter class - will be removed in the future - testing purpose only!
-//    UTILSLIB::FilterTools* filterObject = new UTILSLIB::FilterTools();
+    UTILSLIB::FilterTools* filterObject = new UTILSLIB::FilterTools();
 
-//    QVector<double> window(50);
-//    filterObject->createFilter(QString('HP'), 50, 0.3, window);
+    //kaiser window testing
+    qint32 numberCoeff = 51;
+    QVector<float> impulseResponse(numberCoeff);
+    filterObject->createDynamicFilter(QString('LP'), numberCoeff, (float)0.3, impulseResponse);
 
-//    qDebug() << window;
-//    //Write kaiser window to file - testing purpose only
-//    QFile file("filterToolsTest");
-//    file.open(QIODevice::WriteOnly);
-//    QDataStream outputFileStream(&file);
+    ofstream outputFileStream("mne_x_plugins/resources/tmsi/filterToolsTest.txt", ios::out);
 
-//    outputFileStream << QString("Kaiser window test:");
-//    outputFileStream << window;
+    outputFileStream << "impulseResponse:\n";
+    for(int i=0; i<impulseResponse.size(); i++)
+        outputFileStream << impulseResponse[i] << " ";
+    outputFileStream << endl;
 
-//    file.close();
+    //convolution testing
+    QVector<float> in (12, 2);
+    QVector<float> kernel (4, 2);
+
+    QVector<float> out = filterObject->convolve(in, kernel);
+
+    outputFileStream << "convolution result:\n";
+    for(int i=0; i<out.size(); i++)
+        outputFileStream << out[i] << " ";
+    outputFileStream << endl;
 
     //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
     if(this->isRunning())
         QThread::wait();
 
     //Set the channel size of the RMTSA - this needs to be done here and NOT in the init() function because the user can change the number of channels during runtime
-    m_pRMTSA_TMSI->data()->init(m_iNumberOfChannels);
+    setUpFiffInfo();
+    m_pRMTSA_TMSI->data()->initFromFiffInfo(m_pFiffInfo);
     m_pRMTSA_TMSI->data()->setSamplingRate(m_iSamplingFreq);
-    m_pRMTSA_TMSI->data()->setVisibility(true);
 
     //Buffer
     m_pRawMatrixBuffer_In = QSharedPointer<RawMatrixBuffer>(new RawMatrixBuffer(8, m_iNumberOfChannels, m_iSamplesPerBlock));
