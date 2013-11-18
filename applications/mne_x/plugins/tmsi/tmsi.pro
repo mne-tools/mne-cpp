@@ -52,12 +52,16 @@ CONFIG(debug, debug|release) {
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
+            -lMNE$${MNE_LIB_VERSION}Utilsd \
+            -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lxMeasd \
             -lxDispd \
             -lmne_xd
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
+            -lMNE$${MNE_LIB_VERSION}Utils \
+            -lMNE$${MNE_LIB_VERSION}Fiff \
             -lxMeas \
             -lxDisp \
             -lmne_x
@@ -67,18 +71,18 @@ DESTDIR = $${MNE_BINARY_DIR}/mne_x_plugins
 
 SOURCES += \
         tmsi.cpp \
-        tmsichannel.cpp \
         tmsiproducer.cpp \
         FormFiles/tmsisetupwidget.cpp \
-        FormFiles/tmsiaboutwidget.cpp
+        FormFiles/tmsiaboutwidget.cpp \
+        tmsidriver.cpp
 
 HEADERS += \
         tmsi.h\
         tmsi_global.h \
-        tmsichannel.h \
         tmsiproducer.h \
         FormFiles/tmsisetupwidget.h \
-        FormFiles/tmsiaboutwidget.h
+        FormFiles/tmsiaboutwidget.h \
+        tmsidriver.h
 
 FORMS += \
         FormFiles/tmsisetup.ui \

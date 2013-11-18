@@ -92,7 +92,7 @@ ECGSimulator::ECGSimulator()
 
 ECGSimulator::~ECGSimulator()
 {
-    qWarning() << "ECGSimulator::~ECGSimulator()";
+    std::cout << "ECGSimulator::~ECGSimulator()" << std::endl;
 }
 
 

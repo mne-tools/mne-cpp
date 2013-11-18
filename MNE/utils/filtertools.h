@@ -1,11 +1,11 @@
 //=============================================================================================================
 /**
-* @file     tmsiproducer.h
+* @file     filtertools.h
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     November, 2013
 *
 * @section  LICENSE
 *
@@ -30,36 +30,44 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the TMSIProducer class.
+* @brief    FilterTools class declaration.
 *
 */
 
-#ifndef TMSIPRODUCER_H
-#define TMSIPRODUCER_H
-
+#ifndef FILTERTOOLS_H
+#define FILTERTOOLS_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <generics/circularbuffer.h>
+#include "utils_global.h"
+#include <qmath.h>
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
+
+#include <QSharedPointer>
+#include <QVector>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// Eigen INCLUDES
 //=============================================================================================================
 
-#include <QThread>
+#include <Eigen/Core>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE TMSIPlugin
+// DEFINE NAMESPACE MNELIB
 //=============================================================================================================
 
-namespace TMSIPlugin
+namespace UTILSLIB
 {
 
 
@@ -68,89 +76,83 @@ namespace TMSIPlugin
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace IOBuffer;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DEFINES
 //=============================================================================================================
-
-class TMSI;
-class TMSIDriver;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS EEGProducer
+* Basic filter creation and operations (HP, TP, BP)
 *
-* @brief The EEGProducer class provides a EEG data producer for a given sampling rate.
+* @brief Basic filter creation and operations (HP, TP, BP)
 */
-class TMSIProducer : public QThread
+class UTILSSHARED_EXPORT FilterTools
 {
 public:
-    //=========================================================================================================
-    /**
-    * Constructs a TMSIProducer.
-    *
-    * @param [in] pTMSI a pointer to the corresponding TMSI class.
-    */
-    TMSIProducer(TMSI* pTMSI);
+    typedef QSharedPointer<FilterTools> SPtr;            /**< Shared pointer type for FilterTools. */
+    typedef QSharedPointer<const FilterTools> ConstSPtr; /**< Const shared pointer type for FilterTools. */
 
     //=========================================================================================================
     /**
-    * Destroys the TMSIProducer.
+    * Constructs a Filter object.
     */
-    ~TMSIProducer();
+    FilterTools();
+
 
     //=========================================================================================================
     /**
-    * Starts the TMSIProducer by starting the producer's thread and initialising the device.
-    * @param [in] iNumberOfChannels The number of channels defined by the user via the GUI.
-    * @param [in] iSamplingFrequency The sampling frequency defined by the user via the GUI (in Hertz).
-    * @param [in] iSamplesPerBlock The samples per block defined by the user via the GUI.
-    * @param [in] bConvertToVolt Flag for converting the values to Volt. Defined by the user via the GUI.
-    * @param [in] bUseChExponent Flag for using the channels exponent. Defined by the user via the GUI.
-    * @param [in] bUseUnitGain Flag for using the channels unit gain. Defined by the user via the GUI.
-    * @param [in] sOutpuFilePath Holds the path for the output file. Defined by the user via the GUI.
-    * @param [in] bWriteToFile Flag for writing the received samples to a file. Defined by the user via the GUI.
-    * @param [in] bUsePreProcessing Flag for writing the received samples to a file. Defined by the user via the GUI.
-    * @param [in] bUseUnitOffset Flag for using the channels unit offset. Defined by the user via the GUI.
+    * Gets the impulse response of a static precalculated (matlab) filter.
+    * @param [in] type specifies the type (high-, low- , band-pass) of the filter which is to be designed. Possible values: 'HP', 'LP', 'BP'.
+    * @param [in] numberOfCoefficients number of coefficients used for the filter.
+    * @param [in] samplingRate holds the sampling frequency for the filter. Possible values: 128, 256, 512, 1024, 2048.
+    * @param [in] cutOffFreq holds the cut off frequency for the filter. Max possible value: samplingRate/2.
+    * @param [in] impulseResponse holds the created coefficients (impulse response) of the filter.
     */
-    virtual void start(int iNumberOfChannels,
-                       int iSamplingFrequency,
-                       int iSamplesPerBlock,
-                       bool bConvertToVolt,
-                       bool bUseChExponent,
-                       bool bUseUnitGain,
-                       bool bUseUnitOffset,
-                       bool bWriteToFile,
-                       bool bUsePreProcessing,
-                       QString sOutputFilePath);
+    void getStaticFilter(QString type, qint32 numberOfCoefficients, qint32 samplingRate, qint32 cutOffFreq, QVector<float> &impulseResponse);
+
 
     //=========================================================================================================
     /**
-    * Stops the TMSIProducer by stopping the producer's thread.
+    * Creates a Filter.
+    * @param [in] type specifies the type (high-, low- , band-pass) of the filter which is to be designed. Possible values: 'HP', 'LP', 'BP'.
+    * @param [in] numberOfCoefficients number of coefficients used for the filter.
+    * @param [in] normalizedCutOffFreq holds the cut off frequency for the filter. Range [0 1] whre 1 (pi) corresponds to f_max.
+    * @param [in] impulseResponse holds the created coefficients (impulse response) of the filter.
     */
-    void stop();
+    void createDynamicFilter(QString type, qint32 numberOfCoefficients, float normalizedCutOffFreq, QVector<float> &impulseResponse);
 
-protected:
+
     //=========================================================================================================
     /**
-    * The starting point for the thread. After calling start(), the newly created thread calls this function.
-    * Returning from this method will end the execution of the thread.
-    * Pure virtual method inherited by QThread.
+    * Convolves a given data set with a given filter impulse response.
+    * @param [in] in holds the data which is to be filtered.
+    * @param [in] kernel holds the impulse response of the filter which is to be used during the convolution.
+    * @param [out] QVector<float> holds the result of the convolution.
     */
-    virtual void run();
+    QVector<float> convolve(QVector<float> &in, QVector<float> &kernel);
 
 private:
-    TMSI*                       m_pTMSI;            /**< A pointer to the corresponding TMSI class.*/
-    QSharedPointer<TMSIDriver>  m_pTMSIDriver;      /**< A pointer to the corresponding TMSI driver class.*/
+    /**
+    * Creates a kaiser window. Regular Modified Cylindrical Bessel Function (Bessel I).
+    * @param [in] window
+    * @param [in] size
+    * @param [in] alpha
+    */
+    void KBDWindow(QVector<float> &window, int size, float alpha);
 
-    bool                        m_bIsRunning;       /**< Whether TMSIProducer is running.*/
-
+    //=========================================================================================================
+    /**
+    * Calculates Bssel function.
+    * @param [in] x
+    */
+    float BesselI0(float x);
 };
 
 } // NAMESPACE
 
-#endif // TMSIPRODUCER_H
+#endif // FILTERTOOLS_H

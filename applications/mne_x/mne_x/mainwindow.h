@@ -142,6 +142,20 @@ public:
 
     //=========================================================================================================
     /**
+    * Garbage collection
+    */
+    void clear();
+
+    //=========================================================================================================
+    /**
+    * This event handler is called when Qt receives a window close request from the window system.
+    *
+    * @param [in] event     close event
+    */
+    void closeEvent(QCloseEvent *event);
+
+    //=========================================================================================================
+    /**
     * Starts or restarts the main application timer with a timeout interval of msec milliseconds.
     *
     * @param [in] msec timeout interval in milliseconds

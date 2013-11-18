@@ -1,11 +1,11 @@
 //=============================================================================================================
 /**
-* @file     tmsichannel.cpp
+* @file     asaelc.h
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     September, 2013
+* @date     November, 2013
 *
 * @section  LICENSE
 *
@@ -30,26 +30,49 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the TMSIChannel class.
+* @brief    AsAElc class declaration.
 *
 */
 
+#ifndef ASAELC_H
+#define ASAELC_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "tmsichannel.h"
+#include "utils_global.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
 
-#include <QtCore/QTextStream>
-#include <QtCore/QFile>
+#include <QSharedPointer>
+#include <QVector>
+#include <QFile>
+#include <QTextStream>
+#include <QStringList>
+#include <QDebug>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE MNELIB
+//=============================================================================================================
+
+namespace UTILSLIB
+{
 
 
 //*************************************************************************************************************
@@ -57,70 +80,48 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace TMSIPlugin;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// DEFINES
 //=============================================================================================================
 
-TMSIChannel::TMSIChannel(QString ResourceDataPath, QString ChannelFile, bool enabled, bool visible)
-: m_qStringResourceDataPath(ResourceDataPath)
-, m_qStringChannelFile(ChannelFile)
-, m_bIsEnabled(enabled)
-, m_bIsVisible(visible)
+
+//=============================================================================================================
+/**
+* Processes AsA .elc files which contain the electrode positions of a EEG hat.
+*
+* @brief Processes AsA .elc files which contain the electrode positions of a EEG hat.
+*/
+class UTILSSHARED_EXPORT AsAElc
 {
+public:
+    typedef QSharedPointer<AsAElc> SPtr;            /**< Shared pointer type for AsAElc. */
+    typedef QSharedPointer<const AsAElc> ConstSPtr; /**< Const shared pointer type for AsAElc. */
 
-}
-
-
-//*************************************************************************************************************
-
-TMSIChannel::~TMSIChannel()
-{
-}
-
-
-//*************************************************************************************************************
-
-void TMSIChannel::initChannel()
-{
-    QFile file;
-    file.setFileName(m_qStringResourceDataPath+m_qStringChannelFile);
-    if(file.open(QIODevice::ReadOnly | QIODevice::Text))
-    {
-        QTextStream in(&file);
-        double value;
-
-        while(!in.atEnd())
-        {
-            in >> value;
-
-            //init min and max with first value
-            if(m_vecBuffer.size() == 0)
-            {
-                m_dMin = value;
-                m_dMax = value;
-            }
-
-            if(value < m_dMin)
-                m_dMin = value;
-
-            if(value > m_dMax)
-                m_dMax = value;
-
-            m_vecBuffer.push_back(value);
-
-        }
-        file.close();
-    }
-}
+    //=========================================================================================================
+    /**
+    * Constructs a Filter object.
+    */
+    AsAElc();
 
 
-//*************************************************************************************************************
+    //=========================================================================================================
+    /**
+    * Gets the impulse response of a static precalculated (matlab) filter.
+    * @param [in] path holds the file path of the elc file which is to be read.
+    * @param [in] location3D holds the vector to which the read 3D positions are stored.
+    * @param [in] location2D holds the vector to which the read 2D positions are stored.
+    * @param [out] bool returns true if reading was successful, false otherwise.
+    */
+    bool readElcFile(QString path, QStringList &channelNames, QVector<QVector<double>> &location3D, QVector<QVector<double> > &location2D, QString &unit);
 
-void TMSIChannel::clear()
-{
-    m_vecBuffer.clear();
-}
+private:
+
+};
+
+} // NAMESPACE
+
+#endif // ASAELC_H

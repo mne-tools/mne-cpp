@@ -42,14 +42,17 @@
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
+#include <iostream>
+#include <fstream>
 
 #include "tmsi_global.h"
 
-#include "tmsichannel.h"
-
 #include <mne_x/Interfaces/ISensor.h>
-#include <generics/circularbuffer.h>
-#include <xMeas/newrealtimesamplearray.h>
+#include <generics/circularmatrixbuffer.h>
+#include <xMeas/newrealtimemultisamplearray.h>
+
+#include <utils/filterTools.h>
+#include <utils/asaelc.h>
 
 
 //*************************************************************************************************************
@@ -59,6 +62,14 @@
 
 #include <QtWidgets>
 #include <QVector>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FIFF INCLUDES
+//=============================================================================================================
+
+#include <fiff/fiff_info.h>
 
 
 //*************************************************************************************************************
@@ -78,6 +89,9 @@ namespace TMSIPlugin
 using namespace MNEX;
 using namespace XMEASLIB;
 using namespace IOBuffer;
+using namespace FIFFLIB;
+using namespace std;
+using namespace UTILSLIB;
 
 
 //*************************************************************************************************************
@@ -86,14 +100,13 @@ using namespace IOBuffer;
 //=============================================================================================================
 
 class TMSIProducer;
-//class ECGChannel;
 
 
 //=============================================================================================================
 /**
 * TMSI...
 *
-* @brief The TMSI class provides a EEG connector.
+* @brief The TMSI class provides a EEG connector. In order for this plugin to work properly the driver dll "RTINST.dll" must be installed in the system directory. This dll is automatically copied in the system directory during the driver installtion of the TMSi Refa device.
 */
 class TMSISHARED_EXPORT TMSI : public ISensor
 {
@@ -126,18 +139,26 @@ public:
 
     //=========================================================================================================
     /**
+    * Sets up the fiff info with the current data chosen by the user.
+    */
+    void setUpFiffInfo();
+
+    //=========================================================================================================
+    /**
     * Initialise input and output connectors.
     */
     virtual void init();
 
     //=========================================================================================================
     /**
-    * Initialise the ECGSimulator.
+    * Starts the TMSI by starting the tmsi's thread.
     */
-    void initChannels();
-
-
     virtual bool start();
+
+    //=========================================================================================================
+    /**
+    * Stops the TMSI by stopping the tmsi's thread.
+    */
     virtual bool stop();
 
     virtual IPlugin::PluginType getType() const;
@@ -145,36 +166,42 @@ public:
 
     virtual QWidget* setupWidget();
 
+protected:
     //=========================================================================================================
     /**
-    * Returns the ECGSimulator resource path.
-    *
-    * @return the ECGSimulator resource path.
+    * The starting point for the thread. After calling start(), the newly created thread calls this function.
+    * Returning from this method will end the execution of the thread.
+    * Pure virtual method inherited by QThread.
     */
-    QString getResourcePath() const {return m_qStringResourcePath;}
-
-protected:
     virtual void run();
 
 private:
-    PluginOutputData<NewRealTimeSampleArray>::SPtr m_pRTSA_TMSI_I_new;   /**< The RealTimeSampleArray to provide the channel ECG I.*/
-    PluginOutputData<NewRealTimeSampleArray>::SPtr m_pRTSA_TMSI_II_new;  /**< The RealTimeSampleArray to provide the channel ECG II.*/
-    PluginOutputData<NewRealTimeSampleArray>::SPtr m_pRTSA_TMSI_III_new; /**< The RealTimeSampleArray to provide the channel ECG III.*/
+    PluginOutputData<NewRealTimeMultiSampleArray>::SPtr m_pRMTSA_TMSI;      /**< The RealTimeSampleArray to provide the EEG data.*/
 
-    float           m_fSamplingRate;        /**< the sampling rate.*/
-    int             m_iDownsamplingFactor;  /**< the down sampling factor.*/
-    dBuffer::SPtr   m_pInBuffer_I;          /**< ECG I data which arrive from ECG producer.*/
-    dBuffer::SPtr   m_pInBuffer_II;         /**< ECG II data which arrive from ECG producer.*/
-    dBuffer::SPtr   m_pInBuffer_III;        /**< ECG III data which arrive from ECG producer.*/
-    QSharedPointer<TMSIProducer>     m_pTMSIProducer; /**< the ECGProducer.*/
+    QString                             m_qStringResourcePath;              /**< The path to the EEG resource directory.*/
 
-    QString m_qStringResourcePath;          /**< the path to the ECG resource directory.*/
+    int                                 m_iSamplingFreq;                    /**< The sampling frequency defined by the user via the GUI (in Hertz).*/
+    int                                 m_iNumberOfChannels;                /**< The samples per block defined by the user via the GUI.*/
+    int                                 m_iSamplesPerBlock;                 /**< The number of channels defined by the user via the GUI.*/
 
-    TMSIChannel::SPtr m_pTMSIChannel_TMSI_I;    /**< the simulation channel for ECG I.*/
-    TMSIChannel::SPtr m_pTMSIChannel_TMSI_II;   /**< the simulation channel for ECG II.*/
-    TMSIChannel::SPtr m_pTMSIChannel_TMSI_III;  /**< the simulation channel for ECG III.*/
+    bool                                m_bConvertToVolt;                   /**< Flag for converting the values to Volt. Defined by the user via the GUI.*/
+    bool                                m_bUseChExponent;                   /**< Flag for using the channels exponent. Defined by the user via the GUI.*/
+    bool                                m_bUseUnitGain;                     /**< Flag for using the channels unit gain. Defined by the user via the GUI.*/
+    bool                                m_bUseUnitOffset;                   /**< Flag for using the channels unit offset. Defined by the user via the GUI.*/
+    bool                                m_bWriteToFile;                     /**< Flag for for writing the received samples to a file. Defined by the user via the GUI.*/
+    bool                                m_bUsePreProcessing;                /**< Flag for writing the received samples to a file. Defined by the user via the GUI.*/
+    bool                                m_bIsRunning;                       /**< Whether TMSI is running.*/
+
+    QString                             m_sOutputFilePath;                  /**< Holds the path for the output file. Defined by the user via the GUI.*/
+    QString                             m_sElcFilePath;                     /**< Holds the path for the .elc file (electrode positions). Defined by the user via the GUI.*/
+
+    QSharedPointer<RawMatrixBuffer>     m_pRawMatrixBuffer_In;              /**< Holds incoming raw data.*/
+
+    QSharedPointer<TMSIProducer>        m_pTMSIProducer;                    /**< the TMSIProducer.*/
+
+    QSharedPointer<FiffInfo>            m_pFiffInfo;                        /**< Fiff measurement info.*/
 };
 
 } // NAMESPACE
 
-#endif // ECGSIMULATOR_H
+#endif // TMSI_H
