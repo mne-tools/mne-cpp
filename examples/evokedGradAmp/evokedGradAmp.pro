@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     examples.pro
+# @file     readRaw.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
@@ -8,7 +8,7 @@
 # @date     July, 2012
 #
 # @section  LICENSE
-#
+#d
 # Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
@@ -30,35 +30,49 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds all examples of the mne-cpp project.
+# @brief    ToDo Documentation...
 #
 #--------------------------------------------------------------------------------------------------------------
 
-include(../mne-cpp.pri)
+include(../../mne-cpp.pri)
 
-TEMPLATE = subdirs
+TEMPLATE = app
 
-SUBDIRS += \
-    readRaw \
-    readWriteRaw \
-    readFwd \
-    readEpochs \
-    readEvoked \
-    computeInverse \
-    computeInverseRaw \
-    computeInverseRapMusic \
-    makeInverseOperator \
-    findEvoked \
-    evokedGradAmp
+VERSION = $${MNE_CPP_VERSION}
 
-contains(MNECPP_CONFIG, isGui) {
-    qtHaveModule(3d) {
-        message(Qt3D available: readFwdDisp3D configured!)
-        SUBDIRS += \
-            clusteredInverse \
-            rawClusteredInverse \
-            readFwdDisp3D \
-            plotSurfaces \
-            lnt
-    }
+QT -= gui
+
+CONFIG   += console
+CONFIG   -= app_bundle
+
+TARGET = evokedGradAmp
+
+CONFIG(debug, debug|release) {
+    TARGET = $$join(TARGET,,,d)
 }
+
+LIBS += -L$${MNE_LIBRARY_DIR}
+CONFIG(debug, debug|release) {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd \
+            -lMNE$${MNE_LIB_VERSION}Fsd \
+            -lMNE$${MNE_LIB_VERSION}Fiffd \
+            -lMNE$${MNE_LIB_VERSION}Mned
+}
+else {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
+            -lMNE$${MNE_LIB_VERSION}Fs \
+            -lMNE$${MNE_LIB_VERSION}Fiff \
+            -lMNE$${MNE_LIB_VERSION}Mne
+}
+
+DESTDIR =  $${MNE_BINARY_DIR}
+
+SOURCES += \
+        main.cpp \
+
+HEADERS += \
+
+INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
+INCLUDEPATH += $${MNE_INCLUDE_DIR}
+
+unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
