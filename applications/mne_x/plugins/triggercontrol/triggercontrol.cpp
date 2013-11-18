@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     main.cpp
+* @file     dummytoolbox.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implements the main() application function.
+* @brief    Contains the implementation of the DummyToolbox class.
 *
 */
 
@@ -38,19 +38,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <disp/imagesc.h>
-#include <disp/plot.h>
-#include <disp/rtplot.h>
-
-#include <math.h>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Eigen
-//=============================================================================================================
-
-#include <Eigen/Core>
+#include "triggercontrol.h"
+#include "FormFiles/triggercontrolsetupwidget.h"
 
 
 //*************************************************************************************************************
@@ -58,9 +47,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QApplication>
-#include <QImage>
-#include <QGraphicsView>
+#include <QtCore/QtPlugin>
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -68,77 +56,150 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace Eigen;
-using namespace DISPLIB;
+using namespace TriggerControlPlugin;
+using namespace MNEX;
+using namespace XMEASLIB;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// MAIN
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-//=============================================================================================================
-/**
-* The function main marks the entry point of the program.
-* By default, main has the storage class extern.
-*
-* @param [in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
-* @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
-* @return the value that was set to exit() (which is 0 if exit() is called via quit()).
-*/
-int main(int argc, char *argv[])
+TriggerControl::TriggerControl()
+: m_pTriggerOutput(NULL)
 {
-    QApplication a(argc, argv);
-
-    //ImageSc Test
-    qint32 width = 300;
-    qint32 height = 400;
-    MatrixXd mat(width,height);
-
-    for(int i = 0; i < width; ++i)
-        for(int j = 0; j < height; ++j)
-            mat(i,j) = ((double)(i+j))/698.0;//*0.1-1.5;
-
-    ImageSc imagesc(mat);
-    imagesc.setTitle("Test Matrix");
-    imagesc.setXLabel("X Axes");
-    imagesc.setYLabel("Y Axes");
-
-    imagesc.setColorMap("HotNeg2");//imagesc.setColorMap("Jet");//imagesc.setColorMap("RedBlue");//imagesc.setColorMap("Bone");//imagesc.setColorMap("Jet");//imagesc.setColorMap("Hot");
-
-    imagesc.setWindowTitle("Corresponding function to MATLABs imagesc");
-    imagesc.show();
-
-    //Plot Test
-    qint32 t_iSize = 100;
-    VectorXd vec(t_iSize);
-    for(int i = 0; i < t_iSize; ++i)
-    {
-        double t = 0.01 * i;
-        vec[i] = sin(2 * 3.1416 * 4 * t); //4 Hz
-    }
-
-    Plot plot(vec);
-
-    plot.setTitle("Test Plot");
-    plot.setXLabel("X Axes");
-    plot.setYLabel("Y Axes");
-
-    plot.setWindowTitle("Corresponding function to MATLABs plot");
-    plot.show();
-
-
-    RtPlot rtplot(vec);
-
-    rtplot.setTitle("Test Plot");
-    rtplot.setXLabel("X Axes");
-    rtplot.setYLabel("Y Axes");
-
-    rtplot.setWindowTitle("Rt Plot");
-    rtplot.show();
-
-
-
-
-    return a.exec();
 }
+
+
+//*************************************************************************************************************
+
+TriggerControl::~TriggerControl()
+{
+    stop();
+}
+
+
+//*************************************************************************************************************
+
+QSharedPointer<IPlugin> TriggerControl::clone() const
+{
+    QSharedPointer<TriggerControl> pTriggerControlClone(new TriggerControl);
+    return pTriggerControlClone;
+}
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Creating required display instances and set configurations
+//=============================================================================================================
+
+void TriggerControl::init()
+{
+    // Input
+
+    // Output
+    m_pTriggerOutput = PluginOutputData<NewRealTimeSampleArray>::create(this, "DummyOut", "Dummy output data");
+    m_outputConnectors.append(m_pTriggerOutput);
+
+    m_pTriggerOutput->data()->setName("Dummy Output");
+    m_pTriggerOutput->data()->setUnit("");
+    m_pTriggerOutput->data()->setMinValue(0);
+    m_pTriggerOutput->data()->setMaxValue(2);
+    m_pTriggerOutput->data()->setSamplingRate(256.0/1.0);
+}
+
+
+//*************************************************************************************************************
+
+bool TriggerControl::start()
+{
+    QThread::start();
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+bool TriggerControl::stop()
+{
+    // Stop threads
+    QThread::terminate();
+    QThread::wait();
+
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+IPlugin::PluginType TriggerControl::getType() const
+{
+    return _IAlgorithm;
+}
+
+
+//*************************************************************************************************************
+
+QString TriggerControl::getName() const
+{
+    return "Trigger Control";
+}
+
+
+//*************************************************************************************************************
+
+QWidget* TriggerControl::setupWidget()
+{
+    TriggerControlSetupWidget* setupWidget = new TriggerControlSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
+    return setupWidget;
+}
+
+
+//*************************************************************************************************************
+
+void TriggerControl::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
+{
+//    QSharedPointer<NewRealTimeSampleArray> pRTSA = pMeasurement.dynamicCast<NewRealTimeSampleArray>();
+
+//    if(pRTSA)
+//    {
+//        for(unsigned char i = 0; i < pRTSA->getArraySize(); ++i)
+//        {
+//            double value = pRTSA->getSampleArray()[i];
+//            m_pDummyBuffer->push(value);
+//        }
+//    }
+}
+
+
+
+//*************************************************************************************************************
+
+void TriggerControl::run()
+{
+    int count = 0;
+    double v = 0;
+
+
+
+
+
+
+
+
+
+    while (true)
+    {
+        //ToDo: Implement your algorithm here
+
+        if( (count % 5 == 0) )
+            v = count % 2;
+
+        m_pTriggerOutput->data()->setValue(v);
+
+        msleep((1.0/256.0)*1000.0);
+        ++count;
+    }
+}
+
