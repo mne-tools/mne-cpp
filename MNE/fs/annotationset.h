@@ -137,6 +137,14 @@ public:
 
     //=========================================================================================================
     /**
+    * True if AnnotationSet is empty.
+    *
+    * @return true if AnnotationSet is empty
+    */
+    inline bool isEmpty() const;
+
+    //=========================================================================================================
+    /**
     * Reads different annotation files and assembles them to a AnnotationSet
     *
     * @param[in] p_sLHFileName  Left hemisphere annotation file
@@ -181,10 +189,36 @@ public:
     */
     Annotation& operator[] (QString idt);
 
+    //=========================================================================================================
+    /**
+    * Returns number of loaded hemispheres
+    *
+    * @return number of loaded hemispheres
+    */
+    inline qint32 size() const;
+
 private:
     QMap<qint32, Annotation> m_qMapAnnots;   /**< Hemisphere annotations (lh = 0; rh = 1). */
 
 };
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline bool AnnotationSet::isEmpty() const
+{
+    return m_qMapAnnots.isEmpty();
+}
+
+
+//*************************************************************************************************************
+
+inline qint32 AnnotationSet::size() const
+{
+    return m_qMapAnnots.size();
+}
 
 } // NAMESPACE
 

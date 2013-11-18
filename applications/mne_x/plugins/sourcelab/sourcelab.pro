@@ -80,19 +80,16 @@ DESTDIR = $${MNE_BINARY_DIR}/mne_x_plugins
 SOURCES += \
         sourcelab.cpp \
         FormFiles/sourcelabsetupwidget.cpp \
-        FormFiles/sourcelabrunwidget.cpp \
         FormFiles/sourcelababoutwidget.cpp
 
 HEADERS += \
         sourcelab.h\
         sourcelab_global.h \
         FormFiles/sourcelabsetupwidget.h \
-        FormFiles/sourcelabrunwidget.h \
         FormFiles/sourcelababoutwidget.h
 
 FORMS += \
         FormFiles/sourcelabsetup.ui \
-        FormFiles/sourcelabrun.ui \
         FormFiles/sourcelababout.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
