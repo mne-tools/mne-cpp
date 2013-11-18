@@ -98,7 +98,10 @@ TMSISetupWidget::TMSISetupWidget(TMSI* pTMSI, QWidget* parent)
     //Connect write to file
     connect(ui.m_checkBox_WriteToFile, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
             this, &TMSISetupWidget::setWriteToFile);
-    connect(ui.m_pushButton_ChangeDir, &QPushButton::released, this, &TMSISetupWidget::changeOutputFileDir);
+    connect(ui.m_pushButton_ChangeOutputDir, &QPushButton::released, this, &TMSISetupWidget::changeOutputFileDir);
+
+    //Connect EEG hat
+    connect(ui.m_pushButton_ChangeEEGHatDir, &QPushButton::released, this, &TMSISetupWidget::changeHatDir);
 
     //Connect about button
     connect(ui.m_qPushButton_About, &QPushButton::released, this, &TMSISetupWidget::showAboutDialog);
@@ -147,6 +150,9 @@ void TMSISetupWidget::initSamplingProperties()
     //Init write to file
     ui.m_checkBox_WriteToFile->setChecked(m_pTMSI->m_bWriteToFile);
     ui.m_lineEdit_outputDir->setText(m_pTMSI->m_sOutputFilePath);
+
+    //Init EEG hat
+    ui.m_lineEdit_CurrentEEGHat->setText(m_pTMSI->m_sElcFilePath);
 }
 
 
@@ -219,6 +225,22 @@ void TMSISetupWidget::changeOutputFileDir()
     m_pTMSI->m_sOutputFilePath = ui.m_lineEdit_outputDir->text();
 }
 
+//*************************************************************************************************************
+
+void TMSISetupWidget::changeHatDir()
+{
+    QString path = QFileDialog::getOpenFileName(
+                this,
+                "Change file for current used EEG hat",
+                "mne_x_plugins/resources/tmsi/loc_files",
+                 tr("Electrode location files (*.elc)"));
+
+    if(path==NULL)
+        path = ui.m_lineEdit_CurrentEEGHat->text();
+
+    ui.m_lineEdit_CurrentEEGHat->setText(path);
+    m_pTMSI->m_sElcFilePath = ui.m_lineEdit_CurrentEEGHat->text();
+}
 
 //*************************************************************************************************************
 

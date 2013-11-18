@@ -52,6 +52,7 @@
 #include <xMeas/newrealtimemultisamplearray.h>
 
 #include <utils/filterTools.h>
+#include <utils/asaelc.h>
 
 
 //*************************************************************************************************************
@@ -192,6 +193,7 @@ private:
     bool                                m_bIsRunning;                       /**< Whether TMSI is running.*/
 
     QString                             m_sOutputFilePath;                  /**< Holds the path for the output file. Defined by the user via the GUI.*/
+    QString                             m_sElcFilePath;                     /**< Holds the path for the .elc file (electrode positions). Defined by the user via the GUI.*/
 
     QSharedPointer<RawMatrixBuffer>     m_pRawMatrixBuffer_In;              /**< Holds incoming raw data.*/
 

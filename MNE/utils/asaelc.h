@@ -1,11 +1,11 @@
 //=============================================================================================================
 /**
-* @file     tmsisetupwidget.h
+* @file     asaelc.h
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     September, 2013
+* @date     November, 2013
 *
 * @section  LICENSE
 *
@@ -30,152 +30,98 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the TMSISetupWidget class.
+* @brief    AsAElc class declaration.
 *
 */
 
-#ifndef TMSISETUPWIDGET_H
-#define TMSISETUPWIDGET_H
-
+#ifndef ASAELC_H
+#define ASAELC_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QtWidgets>
-#include "../ui_tmsisetup.h"
+#include "utils_global.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE TMSIPlugin
+// Qt INCLUDES
 //=============================================================================================================
 
-namespace TMSIPlugin
+#include <QSharedPointer>
+#include <QVector>
+#include <QFile>
+#include <QTextStream>
+#include <QStringList>
+#include <QDebug>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE MNELIB
+//=============================================================================================================
+
+namespace UTILSLIB
 {
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// USED NAMESPACES
 //=============================================================================================================
 
-class TMSI;
+using namespace Eigen;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINES
+//=============================================================================================================
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS TMSISetupWidget
+* Processes AsA .elc files which contain the electrode positions of a EEG hat.
 *
-* @brief The TMSISetupWidget class provides the TMSI configuration window.
+* @brief Processes AsA .elc files which contain the electrode positions of a EEG hat.
 */
-class TMSISetupWidget : public QWidget
+class UTILSSHARED_EXPORT AsAElc
 {
-    Q_OBJECT
 public:
+    typedef QSharedPointer<AsAElc> SPtr;            /**< Shared pointer type for AsAElc. */
+    typedef QSharedPointer<const AsAElc> ConstSPtr; /**< Const shared pointer type for AsAElc. */
 
     //=========================================================================================================
     /**
-    * Constructs a TMSISetupWidget which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new ECGSetupWidget becomes a window. If parent is another widget, ECGSetupWidget becomes a child window inside parent. ECGSetupWidget is deleted when its parent is deleted.
-    * @param [in] pTMSI a pointer to the corresponding ECGSimulator.
+    * Constructs a Filter object.
     */
-    TMSISetupWidget(TMSI* pTMSI, QWidget *parent = 0);
+    AsAElc();
+
 
     //=========================================================================================================
     /**
-    * Destroys the ECGSetupWidget.
-    * All ECGSetupWidget's children are deleted first. The application exits if ECGSetupWidget is the main widget.
+    * Gets the impulse response of a static precalculated (matlab) filter.
+    * @param [in] path holds the file path of the elc file which is to be read.
+    * @param [in] location3D holds the vector to which the read 3D positions are stored.
+    * @param [in] location2D holds the vector to which the read 2D positions are stored.
+    * @param [out] bool returns true if reading was successful, false otherwise.
     */
-    ~TMSISetupWidget();
-
-    //=========================================================================================================
-    /**
-    * Initializes the Connector properties.
-    *
-    */
-    void initSamplingProperties();
+    bool readElcFile(QString path, QStringList &channelNames, QVector<QVector<double>> &location3D, QVector<QVector<double> > &location2D, QString &unit);
 
 private:
 
-    //=========================================================================================================
-    /**
-    * Sets the Sampling frequency.
-    *
-    */
-    void setSamplingFreq(int value);
-
-    //=========================================================================================================
-    /**
-    * Sets the number of channels.
-    *
-    */
-    void setNumberOfChannels(int value);
-
-    //=========================================================================================================
-    /**
-    * Sets the samples taken per block.
-    *
-    */
-    void setSamplesPerBlock(int value);
-
-    //=========================================================================================================
-    /**
-    * Sets the preprocessing properties.
-    *
-    */
-    void setPreprocessing();
-
-    //=========================================================================================================
-    /**
-    * Sets the channel correction properties.
-    *
-    */
-    void setChannelCorrections();
-
-    //=========================================================================================================
-    /**
-    * Sets flag for writing the received samples to a file.
-    *
-    */
-    void setWriteToFile();
-
-    //=========================================================================================================
-    /**
-    * Sets the dir where the output file is saved
-    *
-    */
-    void changeOutputFileDir();
-
-    //=========================================================================================================
-    /**
-    * Sets the dir where the eeg hat file is located
-    *
-    */
-    void changeHatDir();
-
-    //=========================================================================================================
-    /**
-    * Shows the About Dialog
-    *
-    */
-    void showAboutDialog();
-
-
-    bool            m_bAcquisitionIsRunning;
-    TMSI*           m_pTMSI;                    /**< a pointer to corresponding TMSI.*/
-
-    Ui::TMSISetupClass ui;                      /**< the user interface for the TMSISetupWidget.*/
 };
 
 } // NAMESPACE
 
-#endif // TMSISETUPWIDGET_H
+#endif // ASAELC_H
