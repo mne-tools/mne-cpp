@@ -108,8 +108,25 @@ void TMSI::setUpFiffInfo()
     //Set number of channels
     m_pFiffInfo->nchan = m_iNumberOfChannels;
 
-    //Append channels to fiff info
+    //Read electrode positions from .elc file
+    AsAElc *asaObject = new AsAElc();
+    QVector<QVector<double>> elcLocation3D;
+    QVector<QVector<double>> elcLocation2D;
+    QString unit;
+    QStringList elcChannelNames;
+
+    if(!asaObject->readElcFile(m_sElcFilePath, elcChannelNames, elcLocation3D, elcLocation2D, unit))
+        qDebug() << "Error while reading elc file.";
+
+//    qDebug() << elcLocation3D;
+//    qDebug() << elcLocation2D;
+//    qDebug() << channelNames;
+
+    //Set up the fiff info with new data
     QStringList QSLChNames;
+    Matrix<double,3,2,DontAlign> locMatrix;
+    locMatrix.setZero();
+
     for(int i=0; i<m_iNumberOfChannels; i++)
     {
         //Create information for each channel
@@ -120,13 +137,20 @@ void TMSI::setUpFiffInfo()
         if(i<=127)
         {
             //Set channel name
+            //fChInfo.ch_name = elcChannelNames.at(i);
             sChType = QString("EEG_");
             fChInfo.ch_name = sChType.append(sChType.number(i));
 
             //Set coil type
             fChInfo.coil_type = FIFFV_COIL_EEG;
 
-            //TODO: Set EEG electrode location
+            //Set EEG electrode location
+            locMatrix(0,0) = elcLocation3D[i][0];
+            locMatrix(1,0) = elcLocation3D[i][1];
+            locMatrix(2,0) = elcLocation3D[i][2];
+
+            //cout<<i<<endl<<locMatrix<<endl;
+            fChInfo.eeg_loc = locMatrix;
         }
 
         //Bipolar channels
@@ -162,9 +186,8 @@ void TMSI::setUpFiffInfo()
         m_pFiffInfo->chs.append(fChInfo);
     }
 
-    //Set channel namesin fiff_info_base
+    //Set channel names in fiff_info_base
     m_pFiffInfo->ch_names = QSLChNames;
-
 }
 
 
@@ -187,6 +210,7 @@ void TMSI::init()
     m_bUsePreProcessing = true;
     m_bIsRunning = false;
     m_sOutputFilePath = QString("mne_x_plugins/resources/tmsi");
+    m_sElcFilePath = QString("mne_x_plugins/resources/tmsi/loc_files/standard.elc");
 
     m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo());
 }
@@ -196,31 +220,31 @@ void TMSI::init()
 
 bool TMSI::start()
 {
-    //Check filter class - will be removed in the future - testing purpose only!
-    FilterTools* filterObject = new FilterTools();
+//    //Check filter class - will be removed in the future - testing purpose only!
+//    FilterTools* filterObject = new FilterTools();
 
-    //kaiser window testing
-    qint32 numberCoeff = 51;
-    QVector<float> impulseResponse(numberCoeff);
-    filterObject->createDynamicFilter(QString('LP'), numberCoeff, (float)0.3, impulseResponse);
+//    //kaiser window testing
+//    qint32 numberCoeff = 51;
+//    QVector<float> impulseResponse(numberCoeff);
+//    filterObject->createDynamicFilter(QString('LP'), numberCoeff, (float)0.3, impulseResponse);
 
-    ofstream outputFileStream("mne_x_plugins/resources/tmsi/filterToolsTest.txt", ios::out);
+//    ofstream outputFileStream("mne_x_plugins/resources/tmsi/filterToolsTest.txt", ios::out);
 
-    outputFileStream << "impulseResponse:\n";
-    for(int i=0; i<impulseResponse.size(); i++)
-        outputFileStream << impulseResponse[i] << " ";
-    outputFileStream << endl;
+//    outputFileStream << "impulseResponse:\n";
+//    for(int i=0; i<impulseResponse.size(); i++)
+//        outputFileStream << impulseResponse[i] << " ";
+//    outputFileStream << endl;
 
-    //convolution testing
-    QVector<float> in (12, 2);
-    QVector<float> kernel (4, 2);
+//    //convolution testing
+//    QVector<float> in (12, 2);
+//    QVector<float> kernel (4, 2);
 
-    QVector<float> out = filterObject->convolve(in, kernel);
+//    QVector<float> out = filterObject->convolve(in, kernel);
 
-    outputFileStream << "convolution result:\n";
-    for(int i=0; i<out.size(); i++)
-        outputFileStream << out[i] << " ";
-    outputFileStream << endl;
+//    outputFileStream << "convolution result:\n";
+//    for(int i=0; i<out.size(); i++)
+//        outputFileStream << out[i] << " ";
+//    outputFileStream << endl;
 
     //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
     if(this->isRunning())
