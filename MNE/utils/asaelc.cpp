@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
-* @file     plugingui.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+* @file     asaelc.cpp
+* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     August, 2013
+* @date     November, 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2013, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,122 +30,101 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    PluginGui class declaration
+* @brief    Implementation of the AsAElc class
 *
 */
-
-#ifndef PLUGINGUI_H
-#define PLUGINGUI_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "pluginitem.h"
-#include "pluginscene.h"
-
-#include <mne_x/Management/pluginmanager.h>
-#include <mne_x/Management/pluginscenemanager.h>
-
-#include <QMainWindow>
-#include <QMap>
+#include "asaelc.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// USED NAMESPACES
 //=============================================================================================================
 
-class QAction;
-class QToolBox;
-class QSpinBox;
-class QComboBox;
-class QButtonGroup;
-class QActionGroup;
-class QLineEdit;
-class QToolButton;
-class QAbstractButton;
-class QGraphicsView;
-
+using namespace UTILSLIB;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNEX
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-namespace MNEX
+AsAElc::AsAElc()
 {
-
-
-class PluginGui : public QMainWindow
-{
-    Q_OBJECT
-    friend class PluginScene;
-public:
-    PluginGui(MNEX::PluginManager::SPtr &pPluginManager, MNEX::PluginSceneManager::SPtr &pPluginSceneManager);
-
-    ~PluginGui();
-
-
-    inline IPlugin::SPtr getCurrentPlugin();
-
-    void uiSetupRunningState(bool state);
-
-signals:
-   void selectedPluginChanged(IPlugin::SPtr pPlugin);
-
-private:
-
-    void pointerGroupClicked(int id);
-    void actionGroupTriggered(QAction* action);
-
-    bool removePlugin(IPlugin::SPtr pPlugin);
-
-    void itemInserted(PluginItem *item);
-    void newItemSelected();
-
-    void deleteItem();
-    void bringToFront();
-    void sendToBack();
-
-    void createActions();
-    void createMenuItem();
-    void createToolbars();
-
-    QAction* createItemAction(QString name, QMenu* menu);
-
-    PluginManager::SPtr       m_pPluginManager;       /**< Corresponding plugin manager. */
-    PluginSceneManager::SPtr  m_pPluginSceneManager;  /**< Corresponding plugin scene manager. */
-
-    IPlugin::SPtr             m_pCurrentPlugin;
-
-    PluginScene*    m_pPluginScene;         /**< Plugin graph */
-    QGraphicsView*  m_pGraphicsView;        /**< View to show graph */
-    QToolBar*       m_pToolBarPlugins;
-    QActionGroup*   m_pActionGroupPlugins;
-
-    QToolBar *      m_pToolBarPointer;
-    QButtonGroup *  m_pButtonGroupPointers;
-
-    QToolBar*   m_pToolBarItem;
-    QMenu*      m_pMenuItem;
-    QAction*    deleteAction;
-    QAction*    toFrontAction;
-    QAction*    sendBackAction;
-};
-
-//*************************************************************************************************************
-//=============================================================================================================
-// INLINE DEFINITIONS
-//=============================================================================================================
-
-inline IPlugin::SPtr PluginGui::getCurrentPlugin()
-{
-    return m_pCurrentPlugin;
 }
 
-} //NAMESPACE
 
-#endif // PLUGINGUI_H
+//*************************************************************************************************************
+
+bool AsAElc::readElcFile(QString path, QStringList &channelNames, QVector<QVector<double>> &location3D, QVector<QVector<double>> &location2D, QString &unit)
+{
+    //Open .elc file
+    if(!path.contains(".elc"))
+        return false;
+
+    QFile file(path);
+    file.open(QIODevice::ReadOnly | QIODevice::Text);
+
+    //Start reading from file
+    double numberElectrodes;
+    QTextStream in(&file);
+    bool read2D = false;
+
+    while(!in.atEnd())
+    {
+        QString line = in.readLine();
+        QStringList fields = line.split(QRegExp("\\s+"));
+
+        if(!line.contains("#")) //Skip commented areas in file
+        {
+            //Read number of electrodes
+            if(line.contains("NumberPositions"))
+                numberElectrodes = fields.at(1).toDouble();
+
+            //Read the unit of the position values
+            if(line.contains("UnitPosition"))
+                unit = fields.at(1);
+
+            //Read actual electrode positions
+            if(line.contains("Positions2D"))
+                read2D = true;
+
+            if(line.contains(":") && !read2D) //Read 3D positions
+            {
+                channelNames.push_back(fields.at(0));
+                QVector<double> posTemp;
+                posTemp.push_back(fields.at(fields.size()-3).toDouble());    //x
+                posTemp.push_back(fields.at(fields.size()-2).toDouble());    //y
+                posTemp.push_back(fields.at(fields.size()-1).toDouble());    //z
+                location3D.push_back(posTemp);
+            }
+
+            if(line.contains(":") && read2D) //Read 2D positions
+            {
+                QVector<double> posTemp;
+                posTemp.push_back(fields.at(fields.size()-2).toDouble());    //x
+                posTemp.push_back(fields.at(fields.size()-1).toDouble());    //y
+                location2D.push_back(posTemp);
+            }
+
+            //Read channel names
+            if(line.contains("Labels"))
+            {
+                line = in.readLine();
+                fields = line.split(QRegExp("\\s+"));
+                fields.removeLast(); //Delete last element because it is always a blank character
+                channelNames = fields;
+            }
+        }
+    }
+
+    file.close();
+
+    return true;
+}
