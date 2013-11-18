@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     main.cpp
+* @file     dummyaboutwidget.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,28 +29,20 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implements the main() application function.
+* @brief    Contains the declaration of the DummyAboutWidget class.
 *
 */
+
+#ifndef TRIGGERCONTROLABOUTWIDGET_H
+#define TRIGGERCONTROLABOUTWIDGET_H
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <disp/imagesc.h>
-#include <disp/plot.h>
-#include <disp/rtplot.h>
-
-#include <math.h>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Eigen
-//=============================================================================================================
-
-#include <Eigen/Core>
+#include "../ui_triggercontrolabout.h"
 
 
 //*************************************************************************************************************
@@ -58,87 +50,51 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QApplication>
-#include <QImage>
-#include <QGraphicsView>
+#include <QtWidgets>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// DEFINE NAMESPACE TriggerControlPlugin
 //=============================================================================================================
 
-using namespace Eigen;
-using namespace DISPLIB;
+namespace TriggerControlPlugin
+{
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// MAIN
-//=============================================================================================================
 
 //=============================================================================================================
 /**
-* The function main marks the entry point of the program.
-* By default, main has the storage class extern.
+* DECLARE CLASS DummyAboutWidget
 *
-* @param [in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
-* @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
-* @return the value that was set to exit() (which is 0 if exit() is called via quit()).
+* @brief The DummyAboutWidget class provides the about dialog for the DummyToolbox.
 */
-int main(int argc, char *argv[])
+class TriggerControlAboutWidget : public QDialog
 {
-    QApplication a(argc, argv);
+    Q_OBJECT
 
-    //ImageSc Test
-    qint32 width = 300;
-    qint32 height = 400;
-    MatrixXd mat(width,height);
+public:
 
-    for(int i = 0; i < width; ++i)
-        for(int j = 0; j < height; ++j)
-            mat(i,j) = ((double)(i+j))/698.0;//*0.1-1.5;
+    //=========================================================================================================
+    /**
+    * Constructs a DummyAboutWidget dialog which is a child of parent.
+    *
+    * @param [in] parent pointer to parent widget; If parent is 0, the new DummyAboutWidget becomes a window. If parent is another widget, DummyAboutWidget becomes a child window inside parent. DummyAboutWidget is deleted when its parent is deleted.
+    */
+    TriggerControlAboutWidget(QWidget *parent = 0);
 
-    ImageSc imagesc(mat);
-    imagesc.setTitle("Test Matrix");
-    imagesc.setXLabel("X Axes");
-    imagesc.setYLabel("Y Axes");
+    //=========================================================================================================
+    /**
+    * Destroys the DummyAboutWidget.
+    * All DummyAboutWidget's children are deleted first. The application exits if DummyAboutWidget is the main widget.
+    */
+    ~TriggerControlAboutWidget();
 
-    imagesc.setColorMap("HotNeg2");//imagesc.setColorMap("Jet");//imagesc.setColorMap("RedBlue");//imagesc.setColorMap("Bone");//imagesc.setColorMap("Jet");//imagesc.setColorMap("Hot");
+private:
 
-    imagesc.setWindowTitle("Corresponding function to MATLABs imagesc");
-    imagesc.show();
+    Ui::TriggerControlAboutWidgetClass ui;      /**< Holds the user interface for the DummyAboutWidget.*/
 
-    //Plot Test
-    qint32 t_iSize = 100;
-    VectorXd vec(t_iSize);
-    for(int i = 0; i < t_iSize; ++i)
-    {
-        double t = 0.01 * i;
-        vec[i] = sin(2 * 3.1416 * 4 * t); //4 Hz
-    }
+};
 
-    Plot plot(vec);
+} // NAMESPACE
 
-    plot.setTitle("Test Plot");
-    plot.setXLabel("X Axes");
-    plot.setYLabel("Y Axes");
-
-    plot.setWindowTitle("Corresponding function to MATLABs plot");
-    plot.show();
-
-
-    RtPlot rtplot(vec);
-
-    rtplot.setTitle("Test Plot");
-    rtplot.setXLabel("X Axes");
-    rtplot.setYLabel("Y Axes");
-
-    rtplot.setWindowTitle("Rt Plot");
-    rtplot.show();
-
-
-
-
-    return a.exec();
-}
+#endif // TRIGGERCONTROLABOUTWIDGET_H

@@ -1,15 +1,14 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     mne_x.pro
-# @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-#           Limin Sun <liminsun@nmr.mgh.harvard.edu>;
-#           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+# @file     triggercontrol.pro
+# @author   
+#			Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
 # @version  1.0
-# @date     February, 2013
+# @date     July, 2012
 #
 # @section  LICENSE
 #
-# Copyright (C) 2013, Christoph Dinh, Limin Sun, Martin Luessi and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2012, Christoph Dinh. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -30,65 +29,61 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds the plugins for mne-x project.
+# @brief    This project file generates the makefile for the dummytoolbox plug-in.
 #
 #--------------------------------------------------------------------------------------------------------------
 
-include(../../../mne-cpp.pri)
+include(../../../../mne-cpp.pri)
 
-TEMPLATE = subdirs
+TEMPLATE = lib
 
-SUBDIRS += \
-    ecgsimulator \
-    mnertclient \
-    dummytoolbox \
-    triggercontrol
+CONFIG += plugin
 
+DEFINES += TRIGGERCONTROL_LIBRARY
 
-#    rtsss \
+QT += core widgets
 
-win32 {
-    exists(C:/Windows/System32/TMSiSDK.dll) {
-        message(TMSI plugin configured! Driver TMSiSDK.dll found!)
-        SUBDIRS += tmsi
-    }
-    else {
-        message(TMSI plugin was not configured due to missing driver TMSiSDK.DLL!)
-        }
+TARGET = triggercontrol
+CONFIG(debug, debug|release) {
+    TARGET = $$join(TARGET,,,d)
+}
+
+LIBS += -L$${MNE_LIBRARY_DIR}
+CONFIG(debug, debug|release) {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
+            -lxMeasd \
+            -lxDispd \
+            -lmne_xd
 }
 else {
-    message(TMSI plugin was not configured due to wrong OS (win32 needed)!)
-    }
-
-contains(MNECPP_CONFIG, babyMEG) {
-    message(BabyMEG plugin configured!)
-#    SUBDIRS +=
-}
-else {
-    message(RtServer plugin configured!)
-    SUBDIRS += sourcelab
-
-#    qtHaveModule(3d) {
-#        message(Qt3D available: brainmonitor library configured!)
-#        SUBDIRS += brainmonitor \
-#    }
+    LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
+            -lxMeas \
+            -lxDisp \
+            -lmne_x
 }
 
-#    filtertoolbox \
-#    gaborparticletoolbox \
-#    megchannelsimulator \
-#    megrtproc \
-#    roitoolbox \
-#    localizationtoolbox \
-#    prelocalizationtoolbox
+DESTDIR = $${MNE_BINARY_DIR}/mne_x_plugins
 
+SOURCES += \
+        triggercontrol.cpp \
+        FormFiles/triggercontrolsetupwidget.cpp \
+        FormFiles/triggercontrolaboutwidget.cpp
 
-### BabyMEG alternative ###
-#contains(MNECPP_CONFIG, babyMEG) {
-#    message(BabyMEG plugin configured!)
-#    SUBDIRS += babymeg
-#}
-#else {
-#    message(RtServer plugin configured!)
-#    SUBDIRS += rtclient
-#}
+HEADERS += \
+        triggercontrol.h\
+        triggercontrol_global.h \
+        FormFiles/triggercontrolsetupwidget.h \
+        FormFiles/triggercontrolaboutwidget.h
+
+FORMS += \
+        FormFiles/triggercontrolsetup.ui \
+        FormFiles/triggercontrolabout.ui
+
+INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
+INCLUDEPATH += $${MNE_INCLUDE_DIR}
+INCLUDEPATH += $${MNE_X_INCLUDE_DIR}
+
+OTHER_FILES += triggercontrol.json
+
+# Put generated form headers into the origin --> cause other src is pointing at them
+UI_DIR = $$PWD

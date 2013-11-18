@@ -89,7 +89,7 @@ InverseView::InverseView(const MNESourceSpace &p_sourceSpace, QList<Label> &p_qL
 , m_sourceSpace(p_sourceSpace)
 , m_qListLabels(p_qListLabels)
 , m_qListRGBAs(p_qListRGBAs)
-, m_bStereo(true)
+, m_bStereo(false)
 , m_fOffsetZ(-100.0f)
 , m_fOffsetZEye(60.0f)
 , m_pSceneNodeBrain(0)
@@ -435,22 +435,22 @@ void InverseView::updateActivation(QSharedPointer<Eigen::VectorXd> p_pVecActivat
 
 //            int r, g, b;
             QRgb qRgb;
-            if(m_iColorMode == 0)
-            {
-//                r = iVal;
-//                g = iVal;
-//                b = iVal;
-                qRgb = ColorMap::valueToHotNegative1((double)iVal/255.0);
-//                qRgb = ColorMap::valueToHotNegative2((double)iVal/255.0);
-            }
-            else if(m_iColorMode == 1)
-            {
-//                r = iVal;
-//                g = iVal;
-//                b = iVal;
-//                qRgb = ColorMap::valueToHot((double)iVal/255.0);
+//            if(m_iColorMode == 0)
+//            {
+////                r = iVal;
+////                g = iVal;
+////                b = iVal;
+//                qRgb = ColorMap::valueToHotNegative1((double)iVal/255.0);
+////                qRgb = ColorMap::valueToHotNegative2((double)iVal/255.0);
+//            }
+//            else if(m_iColorMode == 1)
+//            {
+////                r = iVal;
+////                g = iVal;
+////                b = iVal;
+////                qRgb = ColorMap::valueToHot((double)iVal/255.0);
                 qRgb = ColorMap::valueToHotNegative2((double)iVal/255.0);
-            }
+//            }
 
             m_pSceneNode->palette()->material(i)->setSpecularColor(QColor(qRgb));
                         //QColor(r,g,b,200));

@@ -44,8 +44,14 @@
 #include <xDisp/newrealtimesamplearraywidget.h>
 #include <xDisp/newrealtimemultisamplearraywidget.h>
 
+#if defined(QT3D_LIBRARY_AVAILABLE)
+#include <xDisp/realtimesourceestimatewidget.h>
+#endif
+
 #include <xMeas/newrealtimesamplearray.h>
 #include <xMeas/newrealtimemultisamplearray.h>
+
+#include <xMeas/realtimesourceestimate.h>
 
 
 //#include <xDisp/measurementwidget.h>
@@ -136,6 +142,19 @@ QWidget* NewDisplayManager::show(IPlugin::OutputConnectorList &pOutputConnectorL
             vboxLayout->addWidget(rtmsaWidget);
             rtmsaWidget->init();
         }
+    #if defined(QT3D_LIBRARY_AVAILABLE)
+        else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeSourceEstimate> >())
+        {
+            QSharedPointer<RealTimeSourceEstimate>* pRealTimeSourceEstimate = &pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeSourceEstimate> >()->data();
+            RealTimeSourceEstimateWidget* rtseWidget = new RealTimeSourceEstimateWidget(*pRealTimeSourceEstimate, newDisp);//new RealTimeSourceEstimateWidget(*pRealTimeSourceEstimate, pT, newDisp);
+
+//            connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
+//                    rtmsaWidget, &NewRealTimeMultiSampleArrayWidget::update, Qt::BlockingQueuedConnection);
+
+            vboxLayout->addWidget(rtseWidget);
+            rtseWidget->init();
+        }
+    #endif
     }
 
 //    // Add all widgets but NumericWidgets to layout and display them

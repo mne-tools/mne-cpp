@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     main.cpp
+* @file     dummytoolbox.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,28 +29,24 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implements the main() application function.
+* @brief    Contains the declaration of the DummyToolbox class.
 *
 */
+
+#ifndef TRIGGERCONTROL_H
+#define TRIGGERCONTROL_H
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <disp/imagesc.h>
-#include <disp/plot.h>
-#include <disp/rtplot.h>
+#include "triggercontrol_global.h"
 
-#include <math.h>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Eigen
-//=============================================================================================================
-
-#include <Eigen/Core>
+#include <mne_x/Interfaces/IAlgorithm.h>
+#include <generics/circularbuffer.h>
+#include <xMeas/newrealtimesamplearray.h>
 
 
 //*************************************************************************************************************
@@ -58,9 +54,16 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QApplication>
-#include <QImage>
-#include <QGraphicsView>
+#include <QtWidgets>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE TriggerControlPlugin
+//=============================================================================================================
+
+namespace TriggerControlPlugin
+{
 
 
 //*************************************************************************************************************
@@ -68,77 +71,72 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace Eigen;
-using namespace DISPLIB;
+using namespace MNEX;
+using namespace XMEASLIB;
+using namespace IOBuffer;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// MAIN
+// FORWARD DECLARATIONS
 //=============================================================================================================
+
 
 //=============================================================================================================
 /**
-* The function main marks the entry point of the program.
-* By default, main has the storage class extern.
+* DECLARE CLASS TriggerControl
 *
-* @param [in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
-* @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
-* @return the value that was set to exit() (which is 0 if exit() is called via quit()).
+* @brief The TriggerControl ....
 */
-int main(int argc, char *argv[])
+class TRIGGERCONTROLSHARED_EXPORT TriggerControl : public IAlgorithm
 {
-    QApplication a(argc, argv);
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "triggercontrol.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
+    Q_INTERFACES(MNEX::IAlgorithm)
 
-    //ImageSc Test
-    qint32 width = 300;
-    qint32 height = 400;
-    MatrixXd mat(width,height);
+public:
+    //=========================================================================================================
+    /**
+    * Constructs a TriggerControl.
+    */
+    TriggerControl();
 
-    for(int i = 0; i < width; ++i)
-        for(int j = 0; j < height; ++j)
-            mat(i,j) = ((double)(i+j))/698.0;//*0.1-1.5;
+    //=========================================================================================================
+    /**
+    * Destroys the TriggerControl.
+    */
+    ~TriggerControl();
 
-    ImageSc imagesc(mat);
-    imagesc.setTitle("Test Matrix");
-    imagesc.setXLabel("X Axes");
-    imagesc.setYLabel("Y Axes");
+    //=========================================================================================================
+    /**
+    * Initialise input and output connectors.
+    */
+    void init();
 
-    imagesc.setColorMap("HotNeg2");//imagesc.setColorMap("Jet");//imagesc.setColorMap("RedBlue");//imagesc.setColorMap("Bone");//imagesc.setColorMap("Jet");//imagesc.setColorMap("Hot");
+    //=========================================================================================================
+    /**
+    * Clone the plugin
+    */
+    virtual QSharedPointer<IPlugin> clone() const;
 
-    imagesc.setWindowTitle("Corresponding function to MATLABs imagesc");
-    imagesc.show();
+    virtual bool start();
+    virtual bool stop();
 
-    //Plot Test
-    qint32 t_iSize = 100;
-    VectorXd vec(t_iSize);
-    for(int i = 0; i < t_iSize; ++i)
-    {
-        double t = 0.01 * i;
-        vec[i] = sin(2 * 3.1416 * 4 * t); //4 Hz
-    }
+    virtual IPlugin::PluginType getType() const;
+    virtual QString getName() const;
 
-    Plot plot(vec);
+    virtual QWidget* setupWidget();
 
-    plot.setTitle("Test Plot");
-    plot.setXLabel("X Axes");
-    plot.setYLabel("Y Axes");
+    void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
 
-    plot.setWindowTitle("Corresponding function to MATLABs plot");
-    plot.show();
+protected:
+    virtual void run();
 
+private:
+    PluginOutputData<NewRealTimeSampleArray>::SPtr  m_pTriggerOutput;    /**< The RealTimeSampleArray of the trigger output.*/
+};
 
-    RtPlot rtplot(vec);
+} // NAMESPACE
 
-    rtplot.setTitle("Test Plot");
-    rtplot.setXLabel("X Axes");
-    rtplot.setYLabel("Y Axes");
-
-    rtplot.setWindowTitle("Rt Plot");
-    rtplot.show();
-
-
-
-
-    return a.exec();
-}
+#endif // TRIGGERCONTROL_H
