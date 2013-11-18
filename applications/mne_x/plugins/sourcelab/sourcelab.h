@@ -114,6 +114,8 @@ class SOURCELABSHARED_EXPORT SourceLab : public IAlgorithm
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(MNEX::IAlgorithm)
 
+    friend class SourceLabSetupWidget;
+
 public:
 
     //=========================================================================================================
@@ -194,7 +196,9 @@ private:
     MNEForwardSolution::SPtr    m_pFwd;             /**< Forward solution. */
     MNEForwardSolution::SPtr    m_pClusteredFwd;    /**< Clustered forward solution. */
 
+    QString                     m_sAtlasDir;       /**< File to Atlas. */
     AnnotationSet::SPtr         m_pAnnotationSet;   /**< Annotation set. */
+    QString                     m_sSurfaceDir;     /**< File to Surface. */
     SurfaceSet::SPtr            m_pSurfaceSet;      /**< Surface set. */
 
 
