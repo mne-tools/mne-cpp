@@ -197,9 +197,9 @@ const MNESourceSpace& RapMusic::getSourceSpace() const
 
 //*************************************************************************************************************
 
-SourceEstimate RapMusic::calculateInverse(const MatrixXd& p_matMeasurement, QVector< DipolePair<double> > &p_RapDipoles)
+MNESourceEstimate RapMusic::calculateInverse(const MatrixXd& p_matMeasurement, QVector< DipolePair<double> > &p_RapDipoles)
 {
-    SourceEstimate p_SourceEstimate;
+    MNESourceEstimate p_SourceEstimate;
 
     //if not initialized -> break
     if(!m_bIsInit)

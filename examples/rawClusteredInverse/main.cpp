@@ -49,7 +49,7 @@
 
 #include <mne/mne_epoch_data_list.h>
 
-#include <inverse/sourceestimate.h>
+#include <mne/mne_sourceestimate.h>
 #include <inverse/minimumNorm/minimumnorm.h>
 
 #include <disp3D/inverseview.h>
@@ -500,7 +500,7 @@ int main(int argc, char *argv[])
     // Compute inverse solution
     //
     MinimumNorm minimumNorm(inverse_operator, lambda2, method);
-    SourceEstimate sourceEstimate = minimumNorm.calculateInverse(evoked);
+    MNESourceEstimate sourceEstimate = minimumNorm.calculateInverse(evoked);
 
     if(sourceEstimate.isEmpty())
         return 1;

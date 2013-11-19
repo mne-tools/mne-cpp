@@ -44,9 +44,9 @@
 #include "../IInverseAlgorithm.h"
 
 #include "dipole.h"
-#include "../sourceestimate.h"
 
 #include <mne/mne_forwardsolution.h>
+#include <mne/mne_sourceestimate.h>
 #include <time.h>
 
 #include <QVector>
@@ -161,17 +161,17 @@ public:
     */
     bool init(MNEForwardSolution& p_pFwd, bool p_bSparsed = false, int p_iN = 2, double p_dThr = 0.5);
 
-    virtual SourceEstimate calculateInverse(const MatrixXd& p_matMeasurement, QVector< DipolePair<double> > &p_RapDipoles);
+    virtual MNESourceEstimate calculateInverse(const MatrixXd& p_matMeasurement, QVector< DipolePair<double> > &p_RapDipoles);
 
-    virtual SourceEstimate calculateInverse(const FiffEvoked &p_fiffEvoked, bool pick_normal = false)
+    virtual MNESourceEstimate calculateInverse(const FiffEvoked &p_fiffEvoked, bool pick_normal = false)
     {
-        SourceEstimate p_sourceEstimate;
+        MNESourceEstimate p_sourceEstimate;
         return p_sourceEstimate;
     }
 
-    virtual SourceEstimate calculateInverse(const MatrixXd &data, float tmin, float tstep) const
+    virtual MNESourceEstimate calculateInverse(const MatrixXd &data, float tmin, float tstep) const
     {
-        SourceEstimate p_sourceEstimate;
+        MNESourceEstimate p_sourceEstimate;
         return p_sourceEstimate;
     }
 

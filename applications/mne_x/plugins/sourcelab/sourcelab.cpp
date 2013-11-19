@@ -390,7 +390,7 @@ void SourceLab::run()
                     //
                     // calculate the inverse
                     //
-                    SourceEstimate sourceEstimate = m_pMinimumNorm->calculateInverse(t_mat, 0, 1/m_pFiffInfo->sfreq);
+                    MNESourceEstimate sourceEstimate = m_pMinimumNorm->calculateInverse(t_mat, 0, 1/m_pFiffInfo->sfreq);
 
                     std::cout << "Source Estimated" << std::endl;
                 }
@@ -409,7 +409,7 @@ void SourceLab::run()
                     float tmin = ((float)t_fiffEvoked.first) / t_fiffEvoked.info.sfreq;
                     float tstep = 1/t_fiffEvoked.info.sfreq;
 
-                    SourceEstimate sourceEstimate = m_pMinimumNorm->calculateInverse(t_fiffEvoked.data, tmin, tstep);
+                    MNESourceEstimate sourceEstimate = m_pMinimumNorm->calculateInverse(t_fiffEvoked.data, tmin, tstep);
 
                     std::cout << "SourceEstimated:\n" << std::endl;
     //                std::cout << "SourceEstimated:\n" << sourceEstimate.data.block(0,0,10,10) << std::endl;

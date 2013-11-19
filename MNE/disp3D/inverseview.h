@@ -47,7 +47,7 @@
 
 #include <mne/mne_sourcespace.h>
 #include <fs/surfaceset.h>
-#include <inverse/sourceestimate.h>
+#include <mne/mne_sourceestimate.h>
 
 
 //*************************************************************************************************************
@@ -99,7 +99,6 @@ namespace DISP3DLIB
 
 using namespace MNELIB;
 using namespace FSLIB;
-using namespace INVERSELIB;
 using namespace Eigen;
 
 
@@ -146,7 +145,7 @@ public:
     *
     * @param[in] p_sourceEstimate   Source estimate to push
     */
-    void pushSourceEstimate(SourceEstimate &p_sourceEstimate);
+    void pushSourceEstimate(MNESourceEstimate &p_sourceEstimate);
 
 protected:
     //=========================================================================================================

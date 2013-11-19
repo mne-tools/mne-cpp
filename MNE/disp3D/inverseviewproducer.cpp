@@ -80,7 +80,7 @@ InverseViewProducer::~InverseViewProducer()
 
 //*************************************************************************************************************
 
-void InverseViewProducer::pushSourceEstimate(SourceEstimate &p_sourceEstimate)
+void InverseViewProducer::pushSourceEstimate(MNESourceEstimate &p_sourceEstimate)
 {
     mutex.lock();
 
