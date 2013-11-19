@@ -2,6 +2,7 @@
 /**
 * @file     fiff_evoked_set.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     July, 2012
@@ -162,6 +163,32 @@ FiffEvokedSet FiffEvokedSet::pick_channels(const QStringList& include, const QSt
 
 //*************************************************************************************************************
 
+bool FiffEvokedSet::compensate_to(FiffEvokedSet& p_FiffEvokedSet, fiff_int_t to) const
+{
+    qint32 now = p_FiffEvokedSet.info.get_current_comp();
+    FiffCtfComp ctf_comp;
+
+    if(now == to)
+    {
+        printf("Data is already compensated as desired.\n");
+        return false;
+    }
+
+    //Make the compensator and apply it to all data sets
+    p_FiffEvokedSet.info.make_compensator(now,to,ctf_comp);
+
+    for(qint16 i; i < p_FiffEvokedSet.evoked.size(); ++i)
+    {
+        p_FiffEvokedSet.evoked.at(i).data = ctf_comp.data.data()->data*p_FiffEvokedSet.evoked.at(i).data;
+    }
+
+    //Update the compensation info in the channel descriptors
+    p_FiffEvokedSet.info.set_current_comp(to);
+
+}
+
+//*************************************************************************************************************
+
 bool FiffEvokedSet::find_evoked(const FiffEvokedSet& p_FiffEvokedSet) const
 {
     if(!p_FiffEvokedSet.evoked.size()) {
@@ -230,7 +257,6 @@ bool FiffEvokedSet::read(QIODevice& p_IODevice, FiffEvokedSet& p_FiffEvokedSet, 
 
     for(qint32 i = 0; i < comments.size(); ++i)
     {
-        printf("HERE iterators number: %d \n",i);
         QFile t_file(p_FiffEvokedSet.info.filename);
         printf(">> Processing %s <<\n", comments[i].toLatin1().constData());
         FiffEvoked t_FiffEvoked;
