@@ -48,13 +48,20 @@ SUBDIRS += \
 #    rtsss \
 
 win32 {
-    exists(C:/Windows/System32/TMSiSDK.dll) {
-        message(TMSI plugin configured! Driver TMSiSDK.dll found!)
-        SUBDIRS += tmsi
+    contains(QMAKE_HOST.arch, x86_64) {
+        message(Compiling ON a 64bit windows machine)
+        exists(C:/Windows/SysWOW64/TMSiSDK32bit.dll) {
+            message(TMSI plugin configured! Driver TMSiSDK.dll found!)
+            SUBDIRS += tmsi
+        }
     }
     else {
-        message(TMSI plugin was not configured due to missing driver TMSiSDK.dll!)
+        message(Compiling ON a 32bit windows machine)
+        exists(C:/Windows/System32/TMSiSDK.dll) {
+            message(TMSI plugin configured! Driver TMSiSDK.dll found!)
+            SUBDIRS += tmsi
         }
+    }
 }
 else {
     message(TMSI plugin was not configured due to wrong OS (win32 needed)!)
