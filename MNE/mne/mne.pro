@@ -79,6 +79,7 @@ SOURCES += \
     mne.cpp \
     mne_sourcespace.cpp \
     mne_forwardsolution.cpp \
+    mne_sourceestimate.cpp \
     mne_hemisphere.cpp \
     mne_inverse_operator.cpp \
     mne_epoch_data.cpp \
@@ -92,6 +93,7 @@ HEADERS += \
     mne_sourcespace.h \
     mne_hemisphere.h \
     mne_forwardsolution.h \
+    mne_sourceestimate.h \
     mne_inverse_operator.h \
     mne_epoch_data.h \
     mne_epoch_data_list.h \

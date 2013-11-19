@@ -52,7 +52,7 @@
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_evoked.h>
 #include <mne/mne_forwardsolution.h>
-#include <inverse/sourceestimate.h>
+#include <mne/mne_sourceestimate.h>
 #include <inverse/minimumNorm/minimumnorm.h>
 #include <rtInv/rtcov.h>
 #include <rtInv/rtinvop.h>

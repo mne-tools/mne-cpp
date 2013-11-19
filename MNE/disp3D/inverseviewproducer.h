@@ -41,7 +41,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <inverse/sourceestimate.h>
+#include <mne/mne_sourceestimate.h>
 
 
 //*************************************************************************************************************
@@ -75,7 +75,7 @@ namespace DISP3DLIB
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace INVERSELIB;
+using namespace MNELIB;
 
 
 //*************************************************************************************************************
@@ -135,7 +135,7 @@ public:
     *
     * @param[in] p_sourceEstimate   Source estimate to push
     */
-    void pushSourceEstimate(SourceEstimate &p_sourceEstimate);
+    void pushSourceEstimate(MNESourceEstimate &p_sourceEstimate);
 
     //=========================================================================================================
     /**
@@ -161,7 +161,7 @@ private:
 
     bool m_bIsRunning;      /**< If inverse view producer is running. */
 
-    SourceEstimate m_curSourceEstimate; /**< Current source estimate.*/
+    MNESourceEstimate m_curSourceEstimate; /**< Current source estimate.*/
 
     VectorXd m_vecMaxActivation;      /**< Maximum of each source. */
     double m_dGlobalMaximum;             /**< Global maximum. */
