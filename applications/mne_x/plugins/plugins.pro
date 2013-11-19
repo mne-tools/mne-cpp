@@ -53,7 +53,7 @@ win32 {
         SUBDIRS += tmsi
     }
     else {
-        message(TMSI plugin was not configured due to missing driver TMSiSDK.DLL!)
+        message(TMSI plugin was not configured due to missing driver TMSiSDK.dll!)
         }
 }
 else {
