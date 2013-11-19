@@ -43,24 +43,29 @@ SUBDIRS += \
     mnertclient \
     dummytoolbox \
     triggercontrol
-
-
 #    rtsss \
 
 win32 {
-    contains(QMAKE_HOST.arch, x86_64) {
-        message(Compiling ON a 64bit windows machine)
-        exists(C:/Windows/SysWOW64/TMSiSDK32bit.dll) {
-            message(TMSI plugin configured! Driver TMSiSDK.dll found!)
+    contains(QMAKE_HOST.arch, x86_64) { #Compiling MNE-X FOR a 64bit system
+        exists(C:/Windows/System32/TMSiSDK.dll) {
+            message(TMSI plugin configured! TMSi Driver found!)
             SUBDIRS += tmsi
         }
     }
     else {
-        message(Compiling ON a 32bit windows machine)
-        exists(C:/Windows/System32/TMSiSDK.dll) {
-            message(TMSI plugin configured! Driver TMSiSDK.dll found!)
+        exists(C:/Windows/System32/TMSiSDK.dll) { #Compiling MNE-X FOR a 32bit system ON a 32bit system
+            message(TMSI plugin configured! TMSi Driver found!)
             SUBDIRS += tmsi
         }
+        else {
+            exists(C:/Windows/SysWOW64/TMSiSDK32bit.dll) { #Compiling MNE-X FOR a 32bit system ON a 64bit system
+                message(TMSI plugin configured! TMSi Driver found!)
+                SUBDIRS += tmsi
+            }
+            else {
+                message(TMSI plugin not configured! TMSi Driver found!)
+            }
+    }
     }
 }
 else {
