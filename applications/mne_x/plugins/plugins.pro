@@ -45,7 +45,8 @@ SUBDIRS += \
     triggercontrol
 #    rtsss \
 
-win32 {
+
+win32 { #Only compile the TMSI plugin if a windows system is used - TMSi driver is not available for linux yet
     contains(QMAKE_HOST.arch, x86_64) { #Compiling MNE-X FOR a 64bit system
         exists(C:/Windows/System32/TMSiSDK.dll) {
             message(TMSI plugin configured! TMSi Driver found!)
@@ -65,7 +66,7 @@ win32 {
             else {
                 message(TMSI plugin not configured! TMSi Driver found!)
             }
-    }
+        }
     }
 }
 else {
