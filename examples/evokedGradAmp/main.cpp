@@ -88,7 +88,27 @@ int main(int argc, char *argv[])
     QFile t_sampleFile("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
     FiffEvokedSet p_FiffEvokedSet(t_sampleFile);
 
-    //ToDo: include epochs member function when reading fiff file
+    //mne_ex_evoked_grad_amp.m example
+    fiff_int_t coil1,coil2;
+    QString one,two;
+    QChar lastone,lasttwo;
+
+    for(qint16 i=0;i < p_FiffEvokedSe.info.nchan-1;++i)
+    {
+        //First check the coil types
+        coil1 = p_FiffEvokedSet.info.chs.at(i).coil_type;
+        coil2 = p_FiffEvokedSet.info.chs.at(i+1).coil_type;
+        if (coil1 == coil2 && (coil1 == 2 || coil1 == 3012 || coil1 == 3013))
+        {
+            one = p_FiffEvokedSet.info.ch_names[i];
+            two = p_FiffEvokedSet.info.ch_names[i+1];
+            lastone = one.at(one.size()-1);
+            lasttwo = one.at(two.size()-1);
+
+            //Then the channel names
+            if(one.left(3) == 'MEG' && two.left(3) == 'MEG' &&)
+        }
+    }
 
     return a.exec();
 }

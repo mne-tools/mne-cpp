@@ -163,7 +163,7 @@ FiffEvokedSet FiffEvokedSet::pick_channels(const QStringList& include, const QSt
 
 //*************************************************************************************************************
 
-bool FiffEvokedSet::compensate_to(FiffEvokedSet& p_FiffEvokedSet, fiff_int_t to) const
+bool FiffEvokedSet::compensate_to(FiffEvokedSet& p_FiffEvokedSet, fiff_int_t to)
 {
     qint32 now = p_FiffEvokedSet.info.get_current_comp();
     FiffCtfComp ctf_comp;
@@ -177,14 +177,15 @@ bool FiffEvokedSet::compensate_to(FiffEvokedSet& p_FiffEvokedSet, fiff_int_t to)
     //Make the compensator and apply it to all data sets
     p_FiffEvokedSet.info.make_compensator(now,to,ctf_comp);
 
-    for(qint16 i; i < p_FiffEvokedSet.evoked.size(); ++i)
+    for(qint16 i=0; i < p_FiffEvokedSet.evoked.size(); ++i)
     {
-        p_FiffEvokedSet.evoked.at(i).data = ctf_comp.data.data()->data*p_FiffEvokedSet.evoked.at(i).data;
+        p_FiffEvokedSet.evoked[i].data = ctf_comp.data->data*p_FiffEvokedSet.evoked.at(i).data;
     }
 
     //Update the compensation info in the channel descriptors
     p_FiffEvokedSet.info.set_current_comp(to);
 
+    return true;
 }
 
 //*************************************************************************************************************
