@@ -106,17 +106,7 @@ int main(int argc, char *argv[])
         printf("No forward operator compensator needed.\n");
 
     //Do the projection
-    /*if(p_FiffEvokedSet.info.projs.isEmpty())
-        fprintf("No projector included with these data\n");
-    else
-    {
-        for(qint32 i; i < p_FiffEvokedSet.info.projs.size(); ++i)
-            p_FiffEvokedSet.info.projs.at(i).active = true;
-
-        //Create the projector
-        p_FiffEvokedSet.info.make_projector()
-    }*/
-
+    //this was already done when FiffEvoked set object was instantiated
 
     //std::cout << "\n\ndata.info.comps.size(): " << p_FiffEvokedSet.info.get_current_comp() << std::endl;
 

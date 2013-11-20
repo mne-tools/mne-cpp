@@ -157,7 +157,7 @@ public:
     *
     * @return true if succeeded, false otherwise
     */
-    bool compensate_to(FiffEvokedSet &p_FiffEvokedSet, fiff_int_t to) const;
+    bool compensate_to(FiffEvokedSet &p_FiffEvokedSet, fiff_int_t to);
 
 
     //=========================================================================================================
