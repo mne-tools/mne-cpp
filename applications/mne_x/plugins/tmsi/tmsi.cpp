@@ -237,8 +237,16 @@ bool TMSI::start()
 
     //Open file to write to
     if(m_bWriteToFile)
-        m_outputFileStream.open(m_sOutputFilePath.append("/TMSi_Driver_Samples.txt").toStdString(), ios::trunc); //ios::trunc deletes old file data
-
+    {
+        m_outputFileStream.open(m_sOutputFilePath.append("/TMSi_Received_Samples.txt").toStdString(), ios::out); //ios::trunc deletes old file data
+        cout<<m_outputFileStream.rdstate()<<endl;
+        if(m_outputFileStream.is_open())
+        {
+            m_outputFileStream<<"Sampling frequency (user input): "<<m_iSamplingFreq<<endl;
+            m_outputFileStream<<"Number of channels (user input): "<<m_iNumberOfChannels<<endl;
+            m_outputFileStream<<"Blocksize (user input): "<<m_iSamplesPerBlock<<endl;
+        }
+    }
 
     //Buffer
     m_pRawMatrixBuffer_In = QSharedPointer<RawMatrixBuffer>(new RawMatrixBuffer(8, m_iNumberOfChannels, m_iSamplesPerBlock));
@@ -279,10 +287,6 @@ bool TMSI::stop()
 
     //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the pop function (acquire statement)
     m_pRawMatrixBuffer_In->releaseFromPop();
-
-    //Close the output stream/file
-    if(m_bWriteToFile)
-        m_outputFileStream.close();
 
     m_pRawMatrixBuffer_In->clear();
 
@@ -392,10 +396,22 @@ void TMSI::run()
                 m_outputFileStream << matValue.block(0, 0, m_iNumberOfChannels, m_iSamplesPerBlock) << endl << endl;
 
             //emit values to real time multi sample array
+            for(int i = 0; i<matValue.row(137).cols(); i++)
+            {
+                if(matValue.row(136)[i] == 254)
+                    matValue.row(136)[i] = 4000;
+            }
+
             for(qint32 i = 0; i < matValue.cols(); ++i)
                 m_pRMTSA_TMSI->data()->setValue(matValue.col(i).cast<double>());
         }
     }
 
+    //Close the output stream/file
+    if(m_outputFileStream.is_open() && m_bWriteToFile)
+    {
+        m_outputFileStream.close();
+        m_outputFileStream.clear();
+    }
     //std::cout<<"EXITING - TMSI::run()"<<std::endl;
 }
