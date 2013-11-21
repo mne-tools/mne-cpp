@@ -84,8 +84,7 @@ void TMSIProducer::start(int iNumberOfChannels,
                      bool bUseChExponent,
                      bool bUseUnitGain,
                      bool bUseUnitOffset,
-                     bool bWriteToFile,
-                     bool bUsePreProcessing,
+                     bool bWriteDriverDebugToFile,
                      QString sOutputFilePath)
 {
     //Initialise device
@@ -96,8 +95,7 @@ void TMSIProducer::start(int iNumberOfChannels,
                               bUseChExponent,
                               bUseUnitGain,
                               bUseUnitOffset,
-                              bWriteToFile,
-                              bUsePreProcessing,
+                              bWriteDriverDebugToFile,
                               sOutputFilePath))
     {
         m_bIsRunning = true;

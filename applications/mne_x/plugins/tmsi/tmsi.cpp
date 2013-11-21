@@ -199,6 +199,7 @@ void TMSI::init()
 
     m_outputConnectors.append(m_pRMTSA_TMSI);
 
+    //setupGUI default values must be set here
     m_iSamplingFreq = 1024;
     m_iNumberOfChannels = 138;
     m_iSamplesPerBlock = 16;
@@ -207,12 +208,17 @@ void TMSI::init()
     m_bUseUnitGain = false;
     m_bUseUnitOffset = false;
     m_bWriteToFile = false;
-    m_bUsePreProcessing = true;
+    m_bWriteDriverDebugToFile = false;
+    m_bUsePreprocessing = false;
+    m_bUseFFT = false;
     m_bIsRunning = false;
     m_sOutputFilePath = QString("mne_x_plugins/resources/tmsi");
     m_sElcFilePath = QString("mne_x_plugins/resources/tmsi/loc_files/standard.elc");
 
     m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo());
+
+    // Initialise matrix used to perform a high pass filtering operation
+    m_matOldMatrix = MatrixXf::Zero(m_iNumberOfChannels, m_iSamplesPerBlock);
 }
 
 
@@ -220,32 +226,6 @@ void TMSI::init()
 
 bool TMSI::start()
 {
-//    //Check filter class - will be removed in the future - testing purpose only!
-//    FilterTools* filterObject = new FilterTools();
-
-//    //kaiser window testing
-//    qint32 numberCoeff = 51;
-//    QVector<float> impulseResponse(numberCoeff);
-//    filterObject->createDynamicFilter(QString('LP'), numberCoeff, (float)0.3, impulseResponse);
-
-//    ofstream outputFileStream("mne_x_plugins/resources/tmsi/filterToolsTest.txt", ios::out);
-
-//    outputFileStream << "impulseResponse:\n";
-//    for(int i=0; i<impulseResponse.size(); i++)
-//        outputFileStream << impulseResponse[i] << " ";
-//    outputFileStream << endl;
-
-//    //convolution testing
-//    QVector<float> in (12, 2);
-//    QVector<float> kernel (4, 2);
-
-//    QVector<float> out = filterObject->convolve(in, kernel);
-
-//    outputFileStream << "convolution result:\n";
-//    for(int i=0; i<out.size(); i++)
-//        outputFileStream << out[i] << " ";
-//    outputFileStream << endl;
-
     //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
     if(this->isRunning())
         QThread::wait();
@@ -254,6 +234,11 @@ bool TMSI::start()
     setUpFiffInfo();
     m_pRMTSA_TMSI->data()->initFromFiffInfo(m_pFiffInfo);
     m_pRMTSA_TMSI->data()->setSamplingRate(m_iSamplingFreq);
+
+    //Open file to write to
+    if(m_bWriteToFile)
+        m_outputFileStream.open(m_sOutputFilePath.append("/TMSi_Driver_Samples.txt").toStdString(), ios::trunc); //ios::trunc deletes old file data
+
 
     //Buffer
     m_pRawMatrixBuffer_In = QSharedPointer<RawMatrixBuffer>(new RawMatrixBuffer(8, m_iNumberOfChannels, m_iSamplesPerBlock));
@@ -265,8 +250,7 @@ bool TMSI::start()
                        m_bUseChExponent,
                        m_bUseUnitGain,
                        m_bUseUnitOffset,
-                       m_bWriteToFile,
-                       m_bUsePreProcessing,
+                       m_bWriteDriverDebugToFile,
                        m_sOutputFilePath);
 
     if(m_pTMSIProducer->isRunning())
@@ -295,6 +279,10 @@ bool TMSI::stop()
 
     //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the pop function (acquire statement)
     m_pRawMatrixBuffer_In->releaseFromPop();
+
+    //Close the output stream/file
+    if(m_bWriteToFile)
+        m_outputFileStream.close();
 
     m_pRawMatrixBuffer_In->clear();
 
@@ -340,10 +328,68 @@ void TMSI::run()
         //std::cout<<"TMSI::run()"<<std::endl;
 
         //pop matrix only if the producer thread is running
-        if(true/*m_pTMSIProducer->isRunning()*/)
+        if(m_pTMSIProducer->isRunning())
         {
             MatrixXf matValue = m_pRawMatrixBuffer_In->pop();
             //std::cout << "matValue " << matValue.block(0,0,m_iNumberOfChannels,m_iSamplesPerBlock) << std::endl;
+
+            //Use preprocessing if wanted by the user
+            if(m_bUsePreprocessing)
+            {
+                MatrixXf temp = matValue;
+
+                matValue = matValue - m_matOldMatrix;
+                m_matOldMatrix = temp;
+
+                //    //Check filter class - will be removed in the future - testing purpose only!
+                //    FilterTools* filterObject = new FilterTools();
+
+                //    //kaiser window testing
+                //    qint32 numberCoeff = 51;
+                //    QVector<float> impulseResponse(numberCoeff);
+                //    filterObject->createDynamicFilter(QString('LP'), numberCoeff, (float)0.3, impulseResponse);
+
+                //    ofstream outputFileStream("mne_x_plugins/resources/tmsi/filterToolsTest.txt", ios::out);
+
+                //    outputFileStream << "impulseResponse:\n";
+                //    for(int i=0; i<impulseResponse.size(); i++)
+                //        outputFileStream << impulseResponse[i] << " ";
+                //    outputFileStream << endl;
+
+                //    //convolution testing
+                //    QVector<float> in (12, 2);
+                //    QVector<float> kernel (4, 2);
+
+                //    QVector<float> out = filterObject->convolve(in, kernel);
+
+                //    outputFileStream << "convolution result:\n";
+                //    for(int i=0; i<out.size(); i++)
+                //        outputFileStream << out[i] << " ";
+                //    outputFileStream << endl;
+            }
+
+            //Perform a fft if wanted by the user
+            if(m_bUseFFT)
+            {
+                QElapsedTimer timer;
+                timer.start();
+
+                FFT<float> fft;
+                Matrix<complex<float>, 138, 16> freq;
+
+                for(qint32 i = 0; i < matValue.rows(); ++i)
+                    fft.fwd(freq.row(i), matValue.row(i));
+
+                cout<<"FFT postprocessing done in "<<timer.nsecsElapsed()<<" nanosec"<<endl;
+                cout<<"matValue before FFT:"<<endl<<matValue<<endl;
+                cout<<"freq after FFT:"<<endl<<freq<<endl;
+                matValue = freq.cwiseAbs();
+                cout<<"matValue after FFT:"<<endl<<matValue<<endl;
+            }
+
+            //Write to file if user wants it
+            if(m_outputFileStream.is_open() && m_bWriteToFile)
+                m_outputFileStream << matValue.block(0, 0, m_iNumberOfChannels, m_iSamplesPerBlock) << endl << endl;
 
             //emit values to real time multi sample array
             for(qint32 i = 0; i < matValue.cols(); ++i)

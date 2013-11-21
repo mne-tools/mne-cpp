@@ -108,24 +108,10 @@ private:
 
     //=========================================================================================================
     /**
-    * Sets the Sampling frequency.
+    * Sets the device sampling properties.
     *
     */
-    void setSamplingFreq(int value);
-
-    //=========================================================================================================
-    /**
-    * Sets the number of channels.
-    *
-    */
-    void setNumberOfChannels(int value);
-
-    //=========================================================================================================
-    /**
-    * Sets the samples taken per block.
-    *
-    */
-    void setSamplesPerBlock(int value);
+    void setDeviceSamplingProperties();
 
     //=========================================================================================================
     /**
@@ -136,10 +122,10 @@ private:
 
     //=========================================================================================================
     /**
-    * Sets the channel correction properties.
+    * Sets the postprocessing properties.
     *
     */
-    void setChannelCorrections();
+    void setPostprocessing();
 
     //=========================================================================================================
     /**
