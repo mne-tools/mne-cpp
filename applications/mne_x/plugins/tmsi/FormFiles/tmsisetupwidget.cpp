@@ -73,29 +73,35 @@ TMSISetupWidget::TMSISetupWidget(TMSI* pTMSI, QWidget* parent)
 
     ui.setupUi(this);
 
-    //Connect properties
+    //Connect device sampling properties
     connect(ui.m_spinBox_SamplingFreq, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-            this, &TMSISetupWidget::setSamplingFreq);
+            this, &TMSISetupWidget::setDeviceSamplingProperties);
     connect(ui.m_spinBox_NumberOfChannels, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-            this, &TMSISetupWidget::setNumberOfChannels);
+            this, &TMSISetupWidget::setDeviceSamplingProperties);
     connect(ui.m_spinBox_SamplesPerBlock, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-            this, &TMSISetupWidget::setSamplesPerBlock);
+            this, &TMSISetupWidget::setDeviceSamplingProperties);
 
     //Connect channel corrections
     connect(ui.m_checkBox_ConvertToVolt, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
-            this, &TMSISetupWidget::setChannelCorrections);
+            this, &TMSISetupWidget::setDeviceSamplingProperties);
     connect(ui.m_checkBox_UseChExponent, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
-            this, &TMSISetupWidget::setChannelCorrections);
+            this, &TMSISetupWidget::setDeviceSamplingProperties);
     connect(ui.m_checkBox_UseUnitGain, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
-            this, &TMSISetupWidget::setChannelCorrections);
+            this, &TMSISetupWidget::setDeviceSamplingProperties);
     connect(ui.m_checkBox_UseUnitOffset, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
-            this, &TMSISetupWidget::setChannelCorrections);
+            this, &TMSISetupWidget::setDeviceSamplingProperties);
 
-    //Connect presprocessing
-    connect(ui.m_checkBox_UsePresprocessing, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+    //Connect preprocessing
+    connect(ui.m_checkBox_UsePreprocessing, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
             this, &TMSISetupWidget::setPreprocessing);
 
+    //Connect presprocessing
+    connect(ui.m_checkBox_UseFFT, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+            this, &TMSISetupWidget::setPostprocessing);
+
     //Connect write to file
+    connect(ui.m_checkBox_WriteDriverDebugToFile, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+            this, &TMSISetupWidget::setWriteToFile);
     connect(ui.m_checkBox_WriteToFile, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
             this, &TMSISetupWidget::setWriteToFile);
     connect(ui.m_pushButton_ChangeOutputDir, &QPushButton::released, this, &TMSISetupWidget::changeOutputFileDir);
@@ -145,9 +151,13 @@ void TMSISetupWidget::initSamplingProperties()
     ui.m_checkBox_UseUnitOffset->setChecked(m_pTMSI->m_bUseUnitOffset);
 
     //Init preprocessing
-    ui.m_checkBox_UsePresprocessing->setChecked(m_pTMSI->m_bUsePreProcessing);
+    ui.m_checkBox_UsePreprocessing->setChecked(m_pTMSI->m_bUsePreprocessing);
+
+    //Init postprocessing
+    ui.m_checkBox_UseFFT->setChecked(m_pTMSI->m_bUseFFT);
 
     //Init write to file
+    ui.m_checkBox_WriteDriverDebugToFile->setChecked(m_pTMSI->m_bWriteDriverDebugToFile);
     ui.m_checkBox_WriteToFile->setChecked(m_pTMSI->m_bWriteToFile);
     ui.m_lineEdit_outputDir->setText(m_pTMSI->m_sOutputFilePath);
 
@@ -158,40 +168,12 @@ void TMSISetupWidget::initSamplingProperties()
 
 //*************************************************************************************************************
 
-void TMSISetupWidget::setSamplingFreq(int value)
+void TMSISetupWidget::setDeviceSamplingProperties()
 {
-    m_pTMSI->m_iSamplingFreq = value;
-}
+    m_pTMSI->m_iSamplingFreq = ui.m_spinBox_SamplingFreq->value();
+    m_pTMSI->m_iNumberOfChannels = ui.m_spinBox_NumberOfChannels->value();
+    m_pTMSI->m_iSamplesPerBlock = ui.m_spinBox_SamplesPerBlock->value();
 
-
-//*************************************************************************************************************
-
-void TMSISetupWidget::setNumberOfChannels(int value)
-{
-    m_pTMSI->m_iNumberOfChannels = value;
-}
-
-
-//*************************************************************************************************************
-
-void TMSISetupWidget::setSamplesPerBlock(int value)
-{
-    m_pTMSI->m_iSamplesPerBlock = value;
-}
-
-
-//*************************************************************************************************************
-
-void TMSISetupWidget::setPreprocessing()
-{
-    m_pTMSI->m_bUsePreProcessing = ui.m_checkBox_UsePresprocessing->isChecked();
-}
-
-
-//*************************************************************************************************************
-
-void TMSISetupWidget::setChannelCorrections()
-{
     m_pTMSI->m_bConvertToVolt = ui.m_checkBox_ConvertToVolt->isChecked();
     m_pTMSI->m_bUseChExponent = ui.m_checkBox_UseChExponent->isChecked();
     m_pTMSI->m_bUseUnitGain = ui.m_checkBox_UseUnitGain->isChecked();
@@ -201,10 +183,27 @@ void TMSISetupWidget::setChannelCorrections()
 
 //*************************************************************************************************************
 
+void TMSISetupWidget::setPreprocessing()
+{
+    m_pTMSI->m_bUsePreprocessing = ui.m_checkBox_UseFFT->isChecked();
+}
+
+
+//*************************************************************************************************************
+
+void TMSISetupWidget::setPostprocessing()
+{
+    m_pTMSI->m_bUseFFT = ui.m_checkBox_UseFFT->isChecked();
+}
+
+
+//*************************************************************************************************************
+
 void TMSISetupWidget::setWriteToFile()
 {
     m_pTMSI->m_sOutputFilePath = ui.m_lineEdit_outputDir->text();
     m_pTMSI->m_bWriteToFile = ui.m_checkBox_WriteToFile->isChecked();
+    m_pTMSI->m_bWriteDriverDebugToFile = ui.m_checkBox_WriteDriverDebugToFile->isChecked();
 }
 
 
