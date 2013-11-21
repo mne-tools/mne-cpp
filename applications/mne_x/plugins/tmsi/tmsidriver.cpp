@@ -310,8 +310,11 @@ bool TMSIDriver::uninitDevice()
     }
 
     //Close the output stream/file
-    if(m_bWriteDriverDebugToFile)
+    if(m_outputFileStream.is_open() && m_bWriteDriverDebugToFile)
+    {
         m_outputFileStream.close();
+        m_outputFileStream.clear();
+    }
 
     if(!m_oFpStop(m_HandleMaster))
     {
@@ -417,7 +420,16 @@ bool TMSIDriver::uninitDevice()
     }
 
     if(m_outputFileStream.is_open() && m_bWriteDriverDebugToFile)
+    {
+        //Get device buffer info
+        ULONG ulOverflow;
+        ULONG ulPercentFull;
+        m_oFpGetBufferInfo(m_HandleMaster, &ulOverflow, &ulPercentFull);
+
         m_outputFileStream << "----------<See output file for sample matrix>----------" <<endl<<endl;
+        m_outputFileStream << "----------<Internal driver buffer is "<<ulPercentFull<<" full>----------"<<endl;
+        m_outputFileStream << "----------<Internal driver overflow is "<<ulOverflow<< ">----------"<<endl;
+    }
 
     return true;
 
