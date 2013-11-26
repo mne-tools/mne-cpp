@@ -100,7 +100,7 @@ void MNECorSourceEstimate::clear()
 
 //*************************************************************************************************************
 
-bool MNECorSourceEstimate::read(QIODevice &p_IODevice, MNESourceEstimate& p_stc)
+bool MNECorSourceEstimate::read(QIODevice &p_IODevice, MNECorSourceEstimate& p_stc)
 {
     return MNESourceEstimate::read(p_IODevice, p_stc);
 }
@@ -116,7 +116,7 @@ bool MNECorSourceEstimate::write(QIODevice &p_IODevice)
 
 //*************************************************************************************************************
 
-MNECorSourceEstimate& MNECorSourceEstimate::operator= (const MNESourceEstimate &rhs)
+MNECorSourceEstimate& MNECorSourceEstimate::operator= (const MNECorSourceEstimate &rhs)
 {
     if (this != &rhs) // protect against invalid self-assignment
     {
