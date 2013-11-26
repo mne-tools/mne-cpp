@@ -1,3 +1,4 @@
+bin/
 /bin/clusteredInversed
 /bin/computeInversed
 /bin/lnt
@@ -258,3 +259,7 @@ bin/.DS_Store
 /applications/mne_x/*.user
 
 /applications/mne_x/plugins/tmsi/*.dll
+
+.directory
+.~lock*
+*autosave

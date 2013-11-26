@@ -41,7 +41,7 @@
 #include "fiff_raw_data.h"
 #include "fiff_tag.h"
 #include "fiff_stream.h"
-
+#include "cstdlib"
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -72,7 +72,8 @@ FiffRawData::FiffRawData(QIODevice &p_IODevice)
 {
     if(!FiffStream::setup_read_raw(p_IODevice, *this))
     {
-        printf("\tError during fiff setup raw read.\n");//ToDo Throw here
+        printf("\tError during fiff setup raw read.\n");
+        exit(EXIT_FAILURE); //ToDo Throw here, e.g.: throw std::runtime_error("IO Error! File not found");
         return;
     }
 }
@@ -254,7 +255,6 @@ bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t f
     }
 
     MatrixXd one;
-    bool doing_whole;
     fiff_int_t first_pick, last_pick, picksamp;
     for(k = 0; k < this->rawdir.size(); ++k)
     {
@@ -271,7 +271,6 @@ bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t f
                 //
                 if(do_debug)
                     printf("S");
-                doing_whole = false;
                 if (sel.cols() <= 0)
                     one.resize(nchan,thisRawDir.nsamp);
                 else

@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
     //########################################################################################
     // Source Estimate
 
-    QFile t_fileFwd("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    QFile t_fileFwd("./MNE-sample-data/MEG/sample/sample_audvis-meg-oct-6-fwd.fif");
 
     MNEForwardSolution t_Fwd(t_fileFwd);
     if(t_Fwd.isEmpty())

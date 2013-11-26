@@ -182,7 +182,7 @@ fiff_int_t FiffProj::make_projector(const QList<FiffProj>& projs, const QStringL
 
             if (one.data->col_names.size() != uniqueMap.keys().size())
             {
-                printf("Channel name list in projection item %d contains duplicate items");
+                printf("Channel name list in projection item %d contains duplicate items",k);
                 return 0;
             }
 
