@@ -88,6 +88,35 @@ int main(int argc, char *argv[])
     QFile t_sampleFile("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
     FiffEvoked p_FiffEvoked(t_sampleFile,QVariant("2"));
 
+    //Select the head coordinate system
+    bool use_ctf_head = 1;
+    FiffCoordTrans meg_trans;
+
+    if(use_ctf_head) {
+        if(p_FiffEvoked.info.ctf_head_t.isEmpty())
+           std::cout << "\nNo CTF head transformation available" << std::endl;
+        else {
+            meg_trans = p_FiffEvoked.info.dev_ctf_t;
+            FiffCoordTrans eeg_trans(meg_trans);
+            eeg_trans.invert_transform();
+            std::cout << "Employing the CTF/4D head coordinate system\n" << std::endl;
+        }
+    }
+    else {
+        meg_trans = p_FiffEvoked.info.dev_head_t;
+        FiffCoordTrans eeg_trans;
+        std::cout << "Employing the Neuromag head coordinate system\n" << std::endl;
+    }
+
+    //Transform coil and electrode locations to the desired coordinate frame
+    //ToDo: MATLAB root fct fiff_transform_meg_chs and fiff_transform_eeg_chs needs to be implemented
+
+    //Create the coil definitions
+    //ToDo: MATLAB root fct mne_add_coil_defs needs to be implemented
+
+    //N.B. If a nonstandard (in MNE sense) coil def file is used, do
+    //ToDo: MATLAB root fct mne_load_coil_def, mne_add_coil_defs needs to be implemented
+
     return a.exec();
 }
 
