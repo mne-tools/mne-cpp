@@ -229,7 +229,7 @@ bool FiffInfo::make_compensator(fiff_int_t kind, MatrixXd& this_comp) const//pri
     qDebug() << "make_compensator not debugged jet";
     FiffNamedMatrix::SDPtr this_data;
     MatrixXd presel, postsel;
-    qint32 k, col, c, ch, row, row_ch, channelAvailable;
+    qint32 k, col, c, ch, row, row_ch=0, channelAvailable;
     for (k = 0; k < this->comps.size(); ++k)
     {
         if (this->comps[k].kind == kind)
