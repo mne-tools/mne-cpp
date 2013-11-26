@@ -99,18 +99,14 @@ int main(int argc, char *argv[])
     FiffCtfComp comp;
     if(dest_comp > 0 )
     {
-        p_FiffEvokedSet.info.make_compensator(comp_now,dest_comp,comp);
+        p_FiffEvokedSet.info.make_compensator(comp_now,dest_comp,comp); //ToDo: make_compensator needs to be debugged
         printf("Appropriate forward operator compensator created.\n");
     }
     else
         printf("No forward operator compensator needed.\n");
 
     //Do the projection
-    //this was already done when FiffEvoked set object was instantiated
-
-    //std::cout << "\n\ndata.info.comps.size(): " << p_FiffEvokedSet.info.get_current_comp() << std::endl;
-
-
+    //this was already performed with the FiffEvoked instantiation
 
     return a.exec();
 }
