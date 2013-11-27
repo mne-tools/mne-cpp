@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     fiff.pro
+# @file     fiffIO.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
@@ -8,7 +8,7 @@
 # @date     July, 2012
 #
 # @section  LICENSE
-#
+#d
 # Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
@@ -30,107 +30,49 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds the fiff library.
+# @brief    ToDo Documentation...
 #
 #--------------------------------------------------------------------------------------------------------------
 
 include(../../mne-cpp.pri)
 
-TEMPLATE = lib
+TEMPLATE = app
 
-QT += network
+VERSION = $${MNE_CPP_VERSION}
+
 QT -= gui
 
-DEFINES += FIFF_LIBRARY
+CONFIG   += console
+CONFIG   -= app_bundle
 
-TARGET = Fiff
-TARGET = $$join(TARGET,,MNE$${MNE_LIB_VERSION},)
+TARGET = fiffIO
+
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd
+    LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd \
+            -lMNE$${MNE_LIB_VERSION}Fsd \
+            -lMNE$${MNE_LIB_VERSION}Fiffd \
+            -lMNE$${MNE_LIB_VERSION}Mned
 }
 else {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Utils
+    LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
+            -lMNE$${MNE_LIB_VERSION}Fs \
+            -lMNE$${MNE_LIB_VERSION}Fiff \
+            -lMNE$${MNE_LIB_VERSION}Mne
 }
 
-DESTDIR = $${MNE_LIBRARY_DIR}
+DESTDIR =  $${MNE_BINARY_DIR}
 
-#
-# win32: copy dll's to bin dir
-# unix: add lib folder to LD_LIBRARY_PATH
-#
-win32 {
-    FILE = $${DESTDIR}/$${TARGET}.dll
-    BINDIR = $${DESTDIR}/../bin
-    FILE ~= s,/,\\,g
-    BINDIR ~= s,/,\\,g
-    QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${BINDIR}) $$escape_expand(\\n\\t)
-}
+SOURCES += \
+        main.cpp \
 
-SOURCES += fiff.cpp \
-#    fiff_parser.cpp \
-    fiff_tag.cpp \
-    fiff_dir_tree.cpp \
-    fiff_coord_trans.cpp \
-    fiff_ch_info.cpp \
-    fiff_proj.cpp \
-    fiff_named_matrix.cpp \
-    fiff_raw_data.cpp \
-    fiff_ctf_comp.cpp \
-    fiff_id.cpp \
-    fiff_info.cpp \
-    fiff_raw_dir.cpp \
-    fiff_dig_point.cpp \
-    fiff_ch_pos.cpp \
-    fiff_evoked_data.cpp \
-    fiff_cov.cpp \
-    fiff_stream.cpp \
-    fiff_dir_entry.cpp \
-    fiff_info_base.cpp \
-    fiff_evoked.cpp \
-    fiff_evoked_set.cpp \
-    fiff_io.cpp
-
-HEADERS += fiff.h \
-    fiff_global.h \
-    fiff_types.h \
-    fiff_id.h \
-    fiff_constants.h \
-    fiff_tag.h \
-    fiff_dir_tree.h \
-    fiff_coord_trans.h \
-    fiff_ch_info.h \
-    fiff_proj.h \
-    fiff_named_matrix.h \
-    fiff_ctf_comp.h \
-    fiff_info.h \
-    fiff_raw_data.h \
-    fiff_dir_entry.h \
-    fiff_raw_dir.h \
-    fiff_dig_point.h \
-    fiff_ch_pos.h \
-    fiff_evoked_data.h \
-    fiff_evoked_data.h \
-    fiff_evoked_data.h \
-    fiff_cov.h \
-    fiff_stream.h \
-    fiff_info_base.h \
-    fiff_evoked.h \
-    fiff_evoked_set.h \
-    fiff_io.h
+HEADERS += \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
-# Install headers to include directory
-header_files.files = ./*.h
-header_files.path = $${MNE_INCLUDE_DIR}/fiff
-
-INSTALLS += header_files
-
 unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
-
