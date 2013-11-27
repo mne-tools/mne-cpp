@@ -211,11 +211,11 @@ void TMSISetupWidget::setWriteToFile()
 
 void TMSISetupWidget::changeOutputFileDir()
 {
-    QString path = QFileDialog::getExistingDirectory(
+    QString path = QFileDialog::getSaveFileName(
                 this,
-                "Change output directory",
-                "mne_x_plugins/resources/tmsi",
-                 QFileDialog::ShowDirsOnly);
+                "Save to fif file",
+                "mne_x_plugins/resources/tmsi/EEG_data_001.fif",
+                 tr("Fif files (*.fif)"));
 
     if(path==NULL)
         path = ui.m_lineEdit_outputDir->text();

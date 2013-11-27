@@ -72,7 +72,7 @@
 // FIFF INCLUDES
 //=============================================================================================================
 
-#include <fiff/fiff_info.h>
+#include <fiff/fiff.h>
 
 
 //*************************************************************************************************************
@@ -206,9 +206,9 @@ private:
 
     QSharedPointer<TMSIProducer>        m_pTMSIProducer;                    /**< the TMSIProducer.*/
 
-    QSharedPointer<FiffInfo>            m_pFiffInfo;                        /**< Fiff measurement info.*/
+    QSharedPointer<FiffRawData>         m_pFiff;                            /**< Fiff measurement info.*/
 
-    MatrixXf                            m_matOldMatrix;                          /**< Last received sample matrix by the tmsiproducer/tmsidriver class. Used for simple HP filtering.*/
+    MatrixXf                            m_matOldMatrix;                     /**< Last received sample matrix by the tmsiproducer/tmsidriver class. Used for simple HP filtering.*/
 
 };
 
