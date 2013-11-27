@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implements the main() application function.
+* @brief    Example of computing a L2 minimum-norm estimate or a dSPM solution
 *
 */
 
