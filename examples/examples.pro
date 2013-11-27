@@ -50,7 +50,8 @@ SUBDIRS += \
     makeInverseOperator \
     findEvoked \
     evokedGradAmp \
-    cancelNoise
+    cancelNoise \
+    fiffIO
 
 contains(MNECPP_CONFIG, isGui) {
     qtHaveModule(3d) {

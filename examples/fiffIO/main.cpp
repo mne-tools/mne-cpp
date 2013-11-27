@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     fiff_obj.cpp
+* @file     main.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
@@ -30,17 +30,32 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of a generic Fiff IO interface
+* @brief     Example of the FiffIO interface class
 *
 */
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "fiff_io.h"
-#include "fiff_stream.h"
+#include <iostream>
+#include <vector>
+#include <math.h>
+
+#include <fiff/fiff.h>
+#include <mne/mne.h>
+
+#include <fiff/fiff_io.h>
+
+//*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QtCore/QCoreApplication>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -48,60 +63,35 @@
 //=============================================================================================================
 
 using namespace FIFFLIB;
+using namespace MNELIB;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// MAIN
 //=============================================================================================================
 
-FiffIO::FiffIO()
+//=============================================================================================================
+/**
+* The function main marks the entry point of the program.
+* By default, main has the storage class extern.
+*
+* @param [in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
+* @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
+* @return the value that was set to exit() (which is 0 if exit() is called via quit()).
+*/
+int main(int argc, char *argv[])
 {
+    QCoreApplication a(argc, argv);
+
+    //instantiate FiffIO object
+    QFile t_sampleFile("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    FiffIO p_FiffIO(t_sampleFile);
+
+    return a.exec();
 }
 
 //*************************************************************************************************************
-
-FiffIO::~FiffIO()
-{
-}
-
-//*************************************************************************************************************
-
-FiffIO::FiffIO(QIODevice& p_IODevice)
-{
-    // execute read method
-    FiffIO::read(p_IODevice);
-}
-
-//*************************************************************************************************************
-
-//FiffIO::FiffIO(QList<QIODevice>& p_qlistIODevices)
-//{
-//    // execute read method..., iterate through QList
-//}
-
-//*************************************************************************************************************
-bool FiffIO::read(QIODevice& p_IODevice)
-{
-    //perform read routines, all sort of types -> raw, evoked
-    std::cout << "reading file..." << std::endl;
-
-    FiffRawData raw(p_IODevice);
-    QSharedPointer<FiffRawData*> tmpraw = &raw; //to be debugged
-
-    //m_qlistRaw.push_back(tmpraw);
-}
-
-//*************************************************************************************************************
-
-FiffIO::FiffIO(const FiffIO& p_FiffIO)
-: m_qlistRaw(p_FiffIO.m_qlistRaw)
-, m_qlistEvoked(p_FiffIO.m_qlistEvoked)
-, m_qlistProj(p_FiffIO.m_qlistProj)
-, m_qlistFwd(p_FiffIO.m_qlistFwd)
-, m_qlistCov(p_FiffIO.m_qlistCov)
-, m_qlistNMatrix(p_FiffIO.m_qlistNMatrix)
-{
-
-}
-
-//*************************************************************************************************************
+//=============================================================================================================
+// STATIC DEFINITIONS
+//=============================================================================================================
