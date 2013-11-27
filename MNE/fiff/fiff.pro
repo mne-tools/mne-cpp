@@ -93,7 +93,6 @@ SOURCES += fiff.cpp \
     fiff_info_base.cpp \
     fiff_evoked.cpp \
     fiff_evoked_set.cpp \
-    fiff_obj.cpp \
     fiff_io.cpp
 
 HEADERS += fiff.h \
