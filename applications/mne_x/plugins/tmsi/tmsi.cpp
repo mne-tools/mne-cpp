@@ -103,10 +103,10 @@ QSharedPointer<IPlugin> TMSI::clone() const
 void TMSI::setUpFiffInfo()
 {
     //Clear old fiff info data
-    m_pFiffInfo->clear();
+    m_pFiff->info.clear();
 
     //Set number of channels
-    m_pFiffInfo->nchan = m_iNumberOfChannels;
+    m_pFiff->info.nchan = m_iNumberOfChannels;
 
     //Read electrode positions from .elc file
     AsAElc *asaObject = new AsAElc();
@@ -117,6 +117,20 @@ void TMSI::setUpFiffInfo()
 
     if(!asaObject->readElcFile(m_sElcFilePath, elcChannelNames, elcLocation3D, elcLocation2D, unit))
         qDebug() << "Error while reading elc file.";
+
+    //Write electrode positions in digitzier info in the fiffinfo
+    QList<FiffDigPoint> digitizerInfo;
+    for(int i=0; i<elcLocation3D.size(); i++)
+    {
+        FiffDigPoint digPoint;
+        digPoint.kind = FIFFV_POINT_EEG;
+        digPoint.ident = i;
+        digPoint.r[0] = elcLocation3D[i][0];
+        digPoint.r[1] = elcLocation3D[i][1];
+        digPoint.r[2] = elcLocation3D[i][2];
+        digitizerInfo.push_back(digPoint);
+    }
+    m_pFiff->info.dig = digitizerInfo;
 
 //    qDebug() << elcLocation3D;
 //    qDebug() << elcLocation2D;
@@ -183,11 +197,11 @@ void TMSI::setUpFiffInfo()
 
         QSLChNames << sChType;
 
-        m_pFiffInfo->chs.append(fChInfo);
+        m_pFiff->info.chs.append(fChInfo);
     }
 
     //Set channel names in fiff_info_base
-    m_pFiffInfo->ch_names = QSLChNames;
+    m_pFiff->info.ch_names = QSLChNames;
 }
 
 
@@ -212,11 +226,11 @@ void TMSI::init()
     m_bUsePreprocessing = false;
     m_bUseFFT = false;
     m_bIsRunning = false;
-    m_sOutputFilePath = QString("mne_x_plugins/resources/tmsi");
+    m_sOutputFilePath = QString("mne_x_plugins/resources/tmsi/EEG_data_001.fif");
     m_sElcFilePath = QString("mne_x_plugins/resources/tmsi/loc_files/standard.elc");
 
-    m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo());
-
+    QFile t_fileOut(m_sOutputFilePath);
+    m_pFiff = QSharedPointer<FiffRawData>(new FiffRawData(t_fileOut));
     // Initialise matrix used to perform a high pass filtering operation
     m_matOldMatrix = MatrixXf::Zero(m_iNumberOfChannels, m_iSamplesPerBlock);
 }
@@ -230,23 +244,26 @@ bool TMSI::start()
     if(this->isRunning())
         QThread::wait();
 
-    //Set the channel size of the RMTSA - this needs to be done here and NOT in the init() function because the user can change the number of channels during runtime
-    setUpFiffInfo();
-    m_pRMTSA_TMSI->data()->initFromFiffInfo(m_pFiffInfo);
-    m_pRMTSA_TMSI->data()->setSamplingRate(m_iSamplingFreq);
-
     //Open file to write to
     if(m_bWriteToFile)
     {
-        m_outputFileStream.open(m_sOutputFilePath.append("/TMSi_Received_Samples.txt").toStdString(), ios::out); //ios::trunc deletes old file data
-        cout<<m_outputFileStream.rdstate()<<endl;
-        if(m_outputFileStream.is_open())
-        {
-            m_outputFileStream<<"Sampling frequency (user input): "<<m_iSamplingFreq<<endl;
-            m_outputFileStream<<"Number of channels (user input): "<<m_iNumberOfChannels<<endl;
-            m_outputFileStream<<"Blocksize (user input): "<<m_iSamplesPerBlock<<endl;
-        }
+        QFile t_fileOut(m_sOutputFilePath);
+        m_pFiff = QSharedPointer<FiffRawData>(new FiffRawData(t_fileOut));
+
+//        m_outputFileStream.open(m_sOutputFilePath.append("/TMSi_Received_Samples.txt").toStdString(), ios::out); //ios::trunc deletes old file data
+//        cout<<m_outputFileStream.rdstate()<<endl;
+//        if(m_outputFileStream.is_open())
+//        {
+//            m_outputFileStream<<"Sampling frequency (user input): "<<m_iSamplingFreq<<endl;
+//            m_outputFileStream<<"Number of channels (user input): "<<m_iNumberOfChannels<<endl;
+//            m_outputFileStream<<"Blocksize (user input): "<<m_iSamplesPerBlock<<endl;
+//        }
     }
+
+    //Set the channel size of the RMTSA - this needs to be done here and NOT in the init() function because the user can change the number of channels during runtime
+    setUpFiffInfo();
+    m_pRMTSA_TMSI->data()->initFromFiffInfo(QSharedPointer<FiffInfo>(&m_pFiff->info));
+    m_pRMTSA_TMSI->data()->setSamplingRate(m_iSamplingFreq);
 
     //Buffer
     m_pRawMatrixBuffer_In = QSharedPointer<RawMatrixBuffer>(new RawMatrixBuffer(8, m_iNumberOfChannels, m_iSamplesPerBlock));
@@ -392,7 +409,7 @@ void TMSI::run()
             }
 
             //Write to file if user wants it
-            if(m_outputFileStream.is_open() && m_bWriteToFile)
+            if(/*m_outputFileStream.is_open() && */m_bWriteToFile)
                 m_outputFileStream << matValue.block(0, 0, m_iNumberOfChannels, m_iSamplesPerBlock) << endl << endl;
 
             //emit values to real time multi sample array
