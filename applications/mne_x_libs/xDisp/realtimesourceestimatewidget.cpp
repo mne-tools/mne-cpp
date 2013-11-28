@@ -48,10 +48,10 @@
 #include <disp3D/geometryview.h>
 #include <mne/mne_forwardsolution.h>
 
-
-
-
 #include <Eigen/Core>
+
+
+#include <QtConcurrent>
 
 
 //*************************************************************************************************************
@@ -102,36 +102,10 @@ RealTimeSourceEstimateWidget::RealTimeSourceEstimateWidget(QSharedPointer<RealTi
 , m_pRTMSE(pRTSE)
 {
 
-
-
-    if(!m_pRTMSE->getAnnotSet()->isEmpty() && !m_pRTMSE->getSurfSet()->isEmpty())
-    {
-        QList<Label> t_qListLabels;
-        QList<RowVector4i> t_qListRGBAs;
-
-        m_pRTMSE->getAnnotSet()->toLabels(*m_pRTMSE->getSurfSet().data(), t_qListLabels, t_qListRGBAs);
-
-        QHBoxLayout *layout = new QHBoxLayout(this);
-
-        m_pView = new InverseView(m_pRTMSE->getSrc(), t_qListLabels, t_qListRGBAs);
-
-        if (m_pView->stereoType() != QGLView::RedCyanAnaglyph)
-            m_pView->camera()->setEyeSeparation(0.3f);
-
-        m_pContainer = QWidget::createWindowContainer(m_pView);
-//    m_pContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-//    m_pContainer->setFocusPolicy(Qt::StrongFocus);
-        m_pContainer->setFocusPolicy(Qt::TabFocus);
-
-//    layout->addWidget(new QLineEdit(QLatin1String("A QLineEdit")));
-        layout->addWidget(m_pContainer);
-//    layout->addWidget(new QLineEdit(QLatin1String("A QLabel")));
-
-    }
-
 }
 
 
+//*************************************************************************************************************
 
 //RealTimeSourceEstimateWidget::RealTimeSourceEstimateWidget(QSharedPointer<RealTimeSourceEstimate> pRTMSE, QSharedPointer<QTime> pTime, QWidget* parent)
 //: MeasurementWidget(parent)
@@ -315,6 +289,21 @@ void RealTimeSourceEstimateWidget::update(Subject*)
 
 void RealTimeSourceEstimateWidget::init()
 {
+
+
+#ifndef QT_NO_CONCURRENT
+    qDebug() << "Concurrent defined";
+    this->initOpenGLWidget();
+//    QFuture<void> future = QtConcurrent::run(this, &RealTimeSourceEstimateWidget::initOpenGLWidget);
+#else
+    this->initOpenGLWidget();
+#endif
+
+
+
+
+
+
 //    ui.m_qLabel_Caption->setText(m_pRTMSA_New->getName());
 ////    ui.m_qLabel_MinValue->setText(QString::number(m_pRTSM->getMinValue()));
 ////    ui.m_qLabel_MaxValue->setText(QString::number(m_pRTSM->getMaxValue()));
@@ -343,6 +332,37 @@ void RealTimeSourceEstimateWidget::init()
 //    m_pTimeCurrentDisplay = QSharedPointer<QTime>(new QTime(0, 0));
 
 //    actualize();
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeSourceEstimateWidget::initOpenGLWidget()
+{
+    if(!m_pRTMSE->getAnnotSet()->isEmpty() && !m_pRTMSE->getSurfSet()->isEmpty())
+    {
+        QList<Label> t_qListLabels;
+        QList<RowVector4i> t_qListRGBAs;
+
+        m_pRTMSE->getAnnotSet()->toLabels(*m_pRTMSE->getSurfSet().data(), t_qListLabels, t_qListRGBAs);
+
+        QHBoxLayout *layout = new QHBoxLayout(this);
+
+        m_pView = new InverseView(m_pRTMSE->getSrc(), t_qListLabels, t_qListRGBAs);
+
+        if (m_pView->stereoType() != QGLView::RedCyanAnaglyph)
+            m_pView->camera()->setEyeSeparation(0.3f);
+
+        m_pContainer = QWidget::createWindowContainer(m_pView);
+//    m_pContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+//    m_pContainer->setFocusPolicy(Qt::StrongFocus);
+        m_pContainer->setFocusPolicy(Qt::TabFocus);
+
+//    layout->addWidget(new QLineEdit(QLatin1String("A QLineEdit")));
+        layout->addWidget(m_pContainer);
+//    layout->addWidget(new QLineEdit(QLatin1String("A QLabel")));
+
+    }
 }
 
 

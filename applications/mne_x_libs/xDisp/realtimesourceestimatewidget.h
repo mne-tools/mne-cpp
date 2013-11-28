@@ -62,7 +62,6 @@
 #include <QThread>
 
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -124,7 +123,7 @@ class XDISPSHARED_EXPORT RealTimeSourceEstimateWidget : public MeasurementWidget
 public:
     //=========================================================================================================
     /**
-    * Constructs a RealTimeMultiSampleArrayWidget which is a child of parent.
+    * Constructs a RealTimeSourceEstimateWidget which is a child of parent.
     *
     * @param [in] pRTMSE        pointer to real-time multi sample array measurement.
     * @param [in] pTime         pointer to application time.
@@ -136,7 +135,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Destroys the RealTimeMultiSampleArrayWidget.
+    * Destroys the RealTimeSourceEstimateWidget.
     */
     ~RealTimeSourceEstimateWidget();
 
@@ -151,9 +150,15 @@ public:
 
     //=========================================================================================================
     /**
-    * Initialise the RealTimeMultiSampleArrayWidget.
+    * Initialise the RealTimeSourceEstimateWidget.
     */
     virtual void init();
+
+    //=========================================================================================================
+    /**
+    * Initialise the OpenGL widget.
+    */
+    void initOpenGLWidget();
 
 protected:
 
