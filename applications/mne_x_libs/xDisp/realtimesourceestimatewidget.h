@@ -45,7 +45,7 @@
 #include "xdisp_global.h"
 #include "measurementwidget.h"
 
-#include <disp3D/geometryview.h>
+#include <disp3D/inverseview.h>
 #include <mne/mne_forwardsolution.h>
 
 
@@ -243,7 +243,7 @@ private slots:
 
 private:
 
-    GeometryView* m_pView;
+    InverseView* m_pView;
     QWidget* m_pContainer;
 
     QSharedPointer<RealTimeSourceEstimate> m_pRTMSE;    /**< The real-time source estimate measurement. */

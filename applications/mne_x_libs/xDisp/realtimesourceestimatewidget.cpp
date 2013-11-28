@@ -101,25 +101,34 @@ RealTimeSourceEstimateWidget::RealTimeSourceEstimateWidget(QSharedPointer<RealTi
 : MeasurementWidget(parent)
 , m_pRTMSE(pRTSE)
 {
-    QHBoxLayout *layout = new QHBoxLayout(this);
 
-    m_pView = new GeometryView(m_pRTMSE->getSrc());
 
-    if (m_pView->stereoType() != QGLView::RedCyanAnaglyph)
-        m_pView->camera()->setEyeSeparation(0.3f);
 
-    m_pContainer = QWidget::createWindowContainer(m_pView);
+    if(!m_pRTMSE->getAnnotSet()->isEmpty() && !m_pRTMSE->getSurfSet()->isEmpty())
+    {
+        QList<Label> t_qListLabels;
+        QList<RowVector4i> t_qListRGBAs;
+
+        m_pRTMSE->getAnnotSet()->toLabels(*m_pRTMSE->getSurfSet().data(), t_qListLabels, t_qListRGBAs);
+
+        QHBoxLayout *layout = new QHBoxLayout(this);
+
+        m_pView = new InverseView(m_pRTMSE->getSrc(), t_qListLabels, t_qListRGBAs);
+
+        if (m_pView->stereoType() != QGLView::RedCyanAnaglyph)
+            m_pView->camera()->setEyeSeparation(0.3f);
+
+        m_pContainer = QWidget::createWindowContainer(m_pView);
 //    m_pContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 //    m_pContainer->setFocusPolicy(Qt::StrongFocus);
-    m_pContainer->setFocusPolicy(Qt::TabFocus);
+        m_pContainer->setFocusPolicy(Qt::TabFocus);
 
 //    layout->addWidget(new QLineEdit(QLatin1String("A QLineEdit")));
-    layout->addWidget(m_pContainer);
+        layout->addWidget(m_pContainer);
 //    layout->addWidget(new QLineEdit(QLatin1String("A QLabel")));
 
+    }
 
-
-//createWindowContainer
 }
 
 
