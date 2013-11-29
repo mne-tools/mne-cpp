@@ -214,7 +214,7 @@ void TMSISetupWidget::changeOutputFileDir()
     QString path = QFileDialog::getSaveFileName(
                 this,
                 "Save to fif file",
-                "mne_x_plugins/resources/tmsi/EEG_data_001.fif",
+                "mne_x_plugins/resources/tmsi/EEG_data_001_raw.fif",
                  tr("Fif files (*.fif)"));
 
     if(path==NULL)

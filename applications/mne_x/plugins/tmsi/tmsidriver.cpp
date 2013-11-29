@@ -169,7 +169,7 @@ bool TMSIDriver::initDevice(int iNumberOfChannels,
 
     //Open file to write to
     if(m_bWriteDriverDebugToFile)
-        m_outputFileStream.open(m_sOutputFilePath.append("mne_x_plugins/resources/tmsi/TMSi_Driver_Debug.txt").toStdString(), ios::trunc); //ios::trunc deletes old file data
+        m_outputFileStream.open("mne_x_plugins/resources/tmsi/TMSi_Driver_Debug.txt", ios::trunc); //ios::trunc deletes old file data
 
     //Check if device handler already exists and a connection was established before
 //    if(m_HandleMaster != NULL)
@@ -419,7 +419,7 @@ bool TMSIDriver::uninitDevice()
         }
     }
 
-    if(m_outputFileStream.is_open() && m_bWriteDriverDebugToFile)
+    if(/*m_outputFileStream.is_open() &&*/ m_bWriteDriverDebugToFile)
     {
         //Get device buffer info
         ULONG ulOverflow;
