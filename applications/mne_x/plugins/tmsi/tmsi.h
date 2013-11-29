@@ -201,12 +201,14 @@ private:
     ofstream                            m_outputFileStream;                 /**< fstream for writing the samples values to txt file.*/
     QString                             m_sOutputFilePath;                  /**< Holds the path for the sample output file. Defined by the user via the GUI.*/
     QString                             m_sElcFilePath;                     /**< Holds the path for the .elc file (electrode positions). Defined by the user via the GUI.*/
+    QFile                               m_fileOut;                          /**< QFile for writing to fif file.*/
+    FiffStream::SPtr                    m_pOutfid;                          /**< QFile for writing to fif file.*/
+    FiffInfo::SPtr                      m_pFiffInfo;                        /**< Fiff measurement info.*/
+    MatrixXd                            m_cals;
 
     QSharedPointer<RawMatrixBuffer>     m_pRawMatrixBuffer_In;              /**< Holds incoming raw data.*/
 
     QSharedPointer<TMSIProducer>        m_pTMSIProducer;                    /**< the TMSIProducer.*/
-
-    QSharedPointer<FiffRawData>         m_pFiff;                            /**< Fiff measurement info.*/
 
     MatrixXf                            m_matOldMatrix;                     /**< Last received sample matrix by the tmsiproducer/tmsidriver class. Used for simple HP filtering.*/
 
