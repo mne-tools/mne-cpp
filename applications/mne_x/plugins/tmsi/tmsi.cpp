@@ -103,10 +103,10 @@ QSharedPointer<IPlugin> TMSI::clone() const
 void TMSI::setUpFiffInfo()
 {
     //Clear old fiff info data
-    m_pFiffInfo->clear();
+    m_pFiffInfo.clear();
 
     //Set number of channels
-    m_pFiffInfo->nchan = m_iNumberOfChannels;
+    m_pFiffInfo.nchan = m_iNumberOfChannels;
 
     //Read electrode positions from .elc file
     AsAElc *asaObject = new AsAElc();
@@ -130,14 +130,14 @@ void TMSI::setUpFiffInfo()
         digPoint.r[2] = elcLocation3D[i][2];
         digitizerInfo.push_back(digPoint);
     }
-    m_pFiffInfo->dig = digitizerInfo;
+    m_pFiffInfo.dig = digitizerInfo;
 
     //qDebug() << elcLocation3D;
     //qDebug() << elcLocation2D;
     //qDebug() << channelNames;
 
     //Set sampling frequency
-    m_pFiffInfo->sfreq = m_iSamplingFreq;
+    m_pFiffInfo.sfreq = m_iSamplingFreq;
 
     //Set up the fif channel info
     QStringList QSLChNames;
@@ -155,16 +155,22 @@ void TMSI::setUpFiffInfo()
         {
             //Set channel name
             //fChInfo.ch_name = elcChannelNames.at(i);
-            sChType = QString("EEG_");
+            sChType = QString("EEG ");
+            if(i<10)
+                sChType.append("00");
+
+            if(i>=10 && i<100)
+                sChType.append("0");
+
             fChInfo.ch_name = sChType.append(sChType.number(i));
 
             //Set coil type
             fChInfo.coil_type = FIFFV_COIL_EEG;
 
-            //Set EEG electrode location
-            locMatrix(0,0) = elcLocation3D[i][0];
-            locMatrix(1,0) = elcLocation3D[i][1];
-            locMatrix(2,0) = elcLocation3D[i][2];
+            //Set EEG electrode location - Convert from mm to m
+            locMatrix(0,0) = elcLocation3D[i][0]*0.001;
+            locMatrix(1,0) = elcLocation3D[i][1]*0.001;
+            locMatrix(2,0) = elcLocation3D[i][2]*0.001;
 
             //cout<<i<<endl<<locMatrix<<endl;
             fChInfo.eeg_loc = locMatrix;
@@ -173,38 +179,38 @@ void TMSI::setUpFiffInfo()
         //Bipolar channels
         if(i>=128 && i<=131)
         {
-            sChType = QString("BIPO_");
+            sChType = QString("BIPO ");
             fChInfo.ch_name = sChType.append(sChType.number(i-128));
         }
 
         //Auxilary input channels
         if(i>=132 && i<=135)
         {
-            sChType = QString("AUX_");
+            sChType = QString("AUX ");
             fChInfo.ch_name = sChType.append(sChType.number(i-132));
         }
 
         //Digital input channel
         if(i==136)
         {
-            sChType = QString("DIG");
+            sChType = QString("STI 014");
             fChInfo.ch_name = sChType;
         }
 
         //Internally generated test signal - ramp signal
         if(i==137)
         {
-            sChType = QString("TEST_RAMP");
+            sChType = QString("TEST RAMP");
             fChInfo.ch_name = sChType;
         }
 
         QSLChNames << sChType;
 
-        m_pFiffInfo->chs.append(fChInfo);
+        m_pFiffInfo.chs.append(fChInfo);
     }
 
     //Set channel names in fiff_info_base
-    m_pFiffInfo->ch_names = QSLChNames;
+    m_pFiffInfo.ch_names = QSLChNames;
 }
 
 
@@ -232,7 +238,7 @@ void TMSI::init()
     m_sOutputFilePath = QString("./mne_x_plugins/resources/tmsi/EEG_data_001_raw.fif");
     m_sElcFilePath = QString("./mne_x_plugins/resources/tmsi/loc_files/standard.elc");
 
-    m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo());
+    //m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo());
 
     // Initialise matrix used to perform a very simple high pass filter operation
     m_matOldMatrix = MatrixXf::Zero(m_iNumberOfChannels, m_iSamplesPerBlock);
@@ -265,13 +271,13 @@ bool TMSI::start()
 
         setUpFiffInfo();
 
-        m_pOutfid = Fiff::start_writing_raw(m_fileOut, *m_pFiffInfo, m_cals);
+        m_pOutfid = Fiff::start_writing_raw(m_fileOut, m_pFiffInfo, m_cals);
     }
     else
         setUpFiffInfo();
 
     //Set the channel size of the RMTSA - this needs to be done here and NOT in the init() function because the user can change the number of channels during runtime
-    m_pRMTSA_TMSI->data()->initFromFiffInfo(m_pFiffInfo);
+    m_pRMTSA_TMSI->data()->initFromFiffInfo(QSharedPointer<FiffInfo>(&m_pFiffInfo));
     m_pRMTSA_TMSI->data()->setSamplingRate(m_iSamplingFreq);
 
     //Buffer
@@ -433,7 +439,7 @@ void TMSI::run()
         }
     }
 
-    //Close the output stream/file
+    //Close the fif output stream
     if(m_bWriteToFile)
         m_pOutfid->finish_writing_raw();
 

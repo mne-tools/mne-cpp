@@ -203,7 +203,7 @@ private:
     QString                             m_sElcFilePath;                     /**< Holds the path for the .elc file (electrode positions). Defined by the user via the GUI.*/
     QFile                               m_fileOut;                          /**< QFile for writing to fif file.*/
     FiffStream::SPtr                    m_pOutfid;                          /**< QFile for writing to fif file.*/
-    FiffInfo::SPtr                      m_pFiffInfo;                        /**< Fiff measurement info.*/
+    FiffInfo                            m_pFiffInfo;                        /**< Fiff measurement info.*/
     MatrixXd                            m_cals;
 
     QSharedPointer<RawMatrixBuffer>     m_pRawMatrixBuffer_In;              /**< Holds incoming raw data.*/
