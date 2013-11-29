@@ -51,9 +51,6 @@
 #include <Eigen/Core>
 
 
-#include <QtConcurrent>
-
-
 //*************************************************************************************************************
 //=============================================================================================================
 // STL INCLUDES
@@ -100,6 +97,7 @@ using namespace XMEASLIB;
 RealTimeSourceEstimateWidget::RealTimeSourceEstimateWidget(QSharedPointer<RealTimeSourceEstimate> &pRTSE, QWidget* parent)
 : MeasurementWidget(parent)
 , m_pRTMSE(pRTSE)
+, m_bInitialized(false)
 {
 
 }
@@ -161,34 +159,39 @@ RealTimeSourceEstimateWidget::~RealTimeSourceEstimateWidget()
 
 void RealTimeSourceEstimateWidget::actualize()
 {
-//    m_dPosY = ui.m_qFrame->pos().y()+0.5*ui.m_qFrame->height();
+    if(m_bInitialized)
+    {
+//        m_dPosY = ui.m_qFrame->pos().y()+0.5*ui.m_qFrame->height();
 
 
-//    // Compute scaling factor
-//    m_fScaleFactor = ui.m_qFrame->height()/static_cast<float>(m_pRTMSA_New->chInfo()[0].getMaxValue()-m_pRTMSA_New->chInfo()[0].getMinValue());
+//        // Compute scaling factor
+//        m_fScaleFactor = ui.m_qFrame->height()/static_cast<float>(m_pRTMSA_New->chInfo()[0].getMaxValue()-m_pRTMSA_New->chInfo()[0].getMinValue());
 
-//    // Compute the middle of RTSA values
-//    m_dMiddle = 0.5*(m_pRTMSA_New->chInfo()[0].getMinValue()+m_pRTMSA_New->chInfo()[0].getMaxValue())*m_fScaleFactor;
+//        // Compute the middle of RTSA values
+//        m_dMiddle = 0.5*(m_pRTMSA_New->chInfo()[0].getMinValue()+m_pRTMSA_New->chInfo()[0].getMaxValue())*m_fScaleFactor;
 
-//    //*********************************************************************************************************
-//    //=========================================================================================================
-//    // Compute new sample width in order to synchronize all RTSA
-//    //=========================================================================================================
+//        //*********************************************************************************************************
+//        //=========================================================================================================
+//        // Compute new sample width in order to synchronize all RTSA
+//        //=========================================================================================================
 
-//    if((m_pRTMSA_New->getSamplingRate() == 0) || (DisplayManager::getRTSAWidgets().size() == 0))
-//        return;
+//        if((m_pRTMSA_New->getSamplingRate() == 0) || (DisplayManager::getRTSAWidgets().size() == 0))
+//            return;
 
-//    // Add current sampling rate to s_listSamplingRates
-//    RealTimeSourceEstimateWidget::s_listSamplingRates << m_pRTMSA_New->getSamplingRate();
+//        // Add current sampling rate to s_listSamplingRates
+//        RealTimeSourceEstimateWidget::s_listSamplingRates << m_pRTMSA_New->getSamplingRate();
 
-//    // Find maximal sampling rate in s_listSamplingRates
-//    double dMax = 0;
-//    foreach (double value, s_listSamplingRates)
-//        dMax = value > dMax ? value : dMax;
+//        // Find maximal sampling rate in s_listSamplingRates
+//        double dMax = 0;
+//        foreach (double value, s_listSamplingRates)
+//            dMax = value > dMax ? value : dMax;
 
-//    // Set new sample widths
-//    foreach(RealTimeSourceEstimateWidget* pRTMSAW, DisplayManager::getRTMSANewWidgets().values())
-//        pRTMSAW->m_dSampleWidth = dMax/pRTMSAW->m_pRTMSA_New->getSamplingRate();
+//        // Set new sample widths
+//        foreach(RealTimeSourceEstimateWidget* pRTMSAW, DisplayManager::getRTMSANewWidgets().values())
+//            pRTMSAW->m_dSampleWidth = dMax/pRTMSAW->m_pRTMSA_New->getSamplingRate();
+    }
+    else
+        this->init();
 }
 
 
@@ -289,15 +292,8 @@ void RealTimeSourceEstimateWidget::update(Subject*)
 
 void RealTimeSourceEstimateWidget::init()
 {
-
-
-#ifndef QT_NO_CONCURRENT
-    qDebug() << "Concurrent defined";
-    this->initOpenGLWidget();
-//    QFuture<void> future = QtConcurrent::run(this, &RealTimeSourceEstimateWidget::initOpenGLWidget);
-#else
-    this->initOpenGLWidget();
-#endif
+    if(this->initOpenGLWidget())
+    {
 
 
 
@@ -329,15 +325,21 @@ void RealTimeSourceEstimateWidget::init()
 
 //    m_bStartFlag = true;
 
+        m_bInitialized = true;
+
 //    m_pTimeCurrentDisplay = QSharedPointer<QTime>(new QTime(0, 0));
 
 //    actualize();
+
+    }
+    else
+        m_bInitialized = false;
 }
 
 
 //*************************************************************************************************************
 
-void RealTimeSourceEstimateWidget::initOpenGLWidget()
+bool RealTimeSourceEstimateWidget::initOpenGLWidget()
 {
     if(!m_pRTMSE->getAnnotSet()->isEmpty() && !m_pRTMSE->getSurfSet()->isEmpty())
     {
@@ -353,16 +355,19 @@ void RealTimeSourceEstimateWidget::initOpenGLWidget()
         if (m_pView->stereoType() != QGLView::RedCyanAnaglyph)
             m_pView->camera()->setEyeSeparation(0.3f);
 
-        m_pContainer = QWidget::createWindowContainer(m_pView);
-//    m_pContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-//    m_pContainer->setFocusPolicy(Qt::StrongFocus);
-        m_pContainer->setFocusPolicy(Qt::TabFocus);
+        m_pWidgetView = QWidget::createWindowContainer(m_pView);
+//        m_pContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+//        m_pContainer->setFocusPolicy(Qt::StrongFocus);
+        m_pWidgetView->setFocusPolicy(Qt::TabFocus);
 
-//    layout->addWidget(new QLineEdit(QLatin1String("A QLineEdit")));
-        layout->addWidget(m_pContainer);
-//    layout->addWidget(new QLineEdit(QLatin1String("A QLabel")));
+//        layout->addWidget(new QLineEdit(QLatin1String("A QLineEdit")));
+        layout->addWidget(m_pWidgetView);
+//        layout->addWidget(new QLineEdit(QLatin1String("A QLabel")));
 
+        return true;
     }
+    else
+        return false;
 }
 
 
