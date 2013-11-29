@@ -101,7 +101,7 @@ InverseView::InverseView(const MNESourceSpace &p_sourceSpace, QList<Label> &p_qL
 //    m_pCameraFrontal = new QGLCamera(this);
 //    m_pCameraFrontal->setAdjustForAspectRatio(false);
 
-    qDebug() << "p_qListLabels" << p_qListLabels.size();
+//    qDebug() << "p_qListLabels" << p_qListLabels.size();
 
     QObject::connect(m_pInverseViewProducer.data(), &InverseViewProducer::sourceEstimateSample, this, &InverseView::updateActivation);
 }

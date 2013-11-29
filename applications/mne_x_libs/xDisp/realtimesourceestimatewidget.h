@@ -157,8 +157,10 @@ public:
     //=========================================================================================================
     /**
     * Initialise the OpenGL widget.
+    *
+    * @return true when successful
     */
-    void initOpenGLWidget();
+    bool initOpenGLWidget();
 
 protected:
 
@@ -249,7 +251,9 @@ private slots:
 private:
 
     InverseView* m_pView;
-    QWidget* m_pContainer;
+    QWidget* m_pWidgetView;
+
+    bool m_bInitialized;
 
     QSharedPointer<RealTimeSourceEstimate> m_pRTMSE;    /**< The real-time source estimate measurement. */
 
