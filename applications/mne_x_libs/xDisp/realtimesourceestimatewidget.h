@@ -181,58 +181,7 @@ protected:
     */
     virtual void resizeEvent(QResizeEvent* event);
 
-    //=========================================================================================================
-    /**
-    * Is called when mouse button is pressed.
-    * Function is getting the current mouse position and to differ between left(measure curve) and right(zoom) mouse button.
-    *
-    * @param [in] mouseEvent pointer to MouseEvent.
-    */
-    virtual void mousePressEvent(QMouseEvent* mouseEvent);
-
-    //=========================================================================================================
-    /**
-    * Is called when mouse is moved.
-    * Function is getting the current mouse position for measurement of the real-time curve and to zoom in or out.
-    *
-    * @param [in] mouseEvent pointer to MouseEvent.
-    */
-    virtual void mouseMoveEvent(QMouseEvent* mouseEvent);
-
-    //=========================================================================================================
-    /**
-    * Is called when mouse button is released.
-    * Function is stopping measurement of the real-time curve or the zooming.
-    *
-    * @param [in] event pointer to MouseEvent -> not used.
-    */
-    virtual void mouseReleaseEvent(QMouseEvent* event);
-
-    //=========================================================================================================
-    /**
-    * Is called when mouse button is double clicked.
-    * Depending on the current selected tool: Function is (un-)freezing the real-time curve or an annotation point is set.
-    *
-    * @param [in] event pointer to MouseEvent -> not used.
-    */
-    virtual void mouseDoubleClickEvent(QMouseEvent* event);
-
-    //=========================================================================================================
-    /**
-    * Is called when mouse wheel is used.
-    * Function is selecting the tool (freezing/annotation);
-    *
-    * @param [in] wheelEvent pointer to WheelEvent. Depending on the delta movement a tool is selected.
-    */
-    virtual void wheelEvent(QWheelEvent* wheelEvent);
-
 private slots:
-
-    //=========================================================================================================
-    /**
-    * Stops the Annotation
-    */
-    void stopAnnotation();
 
     //=========================================================================================================
     /**
@@ -259,7 +208,7 @@ private:
 
 
 
-    void actualize();                                   /**< Actualize member variables. Like y position, scaling factor, middle value of the frame and the highest sampling rate to calculate the sample width.*/
+    void actualize();                                   /**< Actualize member variables. */
 //    Ui::RealTimeSourceEstimateClass   ui;               /**< The user interface of the RealTimeSampleArray widget. */
 //    QSharedPointer<RealTimeSourceEstimate> m_pRTMSE;    /**< The real-time source estimate measurement. */
 
@@ -269,33 +218,8 @@ private:
 //    QPainterPath                    m_qPainterPathTest;
 //    QVector<QPainterPath>           m_qVecPainterPath;
 
-//    QPainterPath                    m_qPainterPath_Freeze;          /**< Holds the frozen painter path which is the frozen real-time curve. */
-//    QPainterPath                    m_qPainterPath_FreezeTest;
-//    QVector<QPainterPath>           m_qVecPainterPath_Freeze;
-
-//    QMutex                          m_qMutex;                       /**< Holds a mutex to make the access to the painter path thread safe. */
-//    bool                            m_bMeasurement;                 /**< Holds current status whether curve measurement is active (left mouse). */
-//    bool                            m_bPosition;                    /**< Holds current status whether current coordinates should be shown. */
-//    bool                            m_bFrozen;                      /**< Holds current status whether curve is frozen. */
-//    bool                            m_bScaling;                     /**< Holds current status whether scaling of curve is active. */
-//    bool                            m_bToolInUse;                   /**< Holds current status whether tool (annotation/freezing) is active. */
-//    QPoint                          m_qPointMouseStartPosition;     /**< Holds mouse start position which is the position where mouse was first pressed. */
-//    QPoint                          m_qPointMouseEndPosition;       /**< Holds mouse end position which is current mouse position. */
-//    float                           m_fScaleFactor;                 /**< Holds current scaling factor -> renewed over actualize. */
 //    double                          m_dMinValue_init;               /**< Holds the initial minimal value */
 //    double                          m_dMaxValue_init;               /**< Holds the initial maximal value */
-//    double                          m_dMiddle;                      /**< Holds the current middle value depending on the current scaling factor -> renewed over actualize. */
-//    double                          m_dPosition;                    /**< Holds the start position which is the x position of the frame. */
-//    double                          m_dSampleWidth;                 /**< Sample distance to synchronize all real-time sample array widgets independent from their sampling rate. */
-//    double                          m_dPosX;                        /**< Holds the x position of the frame. */
-//    double                          m_dPosY;                        /**< Holds the middle y position of the frame. */
-//    bool                            m_bStartFlag;                   /**< Holds status whether the real-time curve should be restarted. */
-//    std::vector<QString>            m_vecTool;                      /**< Holds the available tools. */
-//    unsigned char                   m_ucToolIndex;                  /**< Holds the selected tool index. */
-//    QTimer*                         m_pTimerToolDisplay;            /**< Timer for blending the tool label. */
-//    QTimer*                         m_pTimerUpdate;                 /**< Timer which is caring about a continuous paint update of the widget. */
-//    QSharedPointer<QTime>           m_pTime;                        /**< Holds the application time. */
-//    QSharedPointer<QTime>           m_pTimeCurrentDisplay;          /**< Time which corresponds to the x starting position of each segment. */
 //    static QList<double>            s_listSamplingRates;            /**< Holds all real-time sample array sampling rates of the current display. */
 
 };
