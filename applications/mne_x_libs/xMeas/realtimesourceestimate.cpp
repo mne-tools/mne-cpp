@@ -65,7 +65,7 @@ using namespace XMEASLIB;
 
 RealTimeSourceEstimate::RealTimeSourceEstimate(QObject *parent)
 : NewMeasurement(QMetaType::type("RealTimeSourceEstimate::SPtr"), parent)
-, m_ucArraySize(10)
+, m_ucArraySize(200)
 {
 
 }
