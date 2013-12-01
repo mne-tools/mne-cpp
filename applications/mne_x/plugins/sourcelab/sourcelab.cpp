@@ -71,6 +71,7 @@ using namespace XMEASLIB;
 SourceLab::SourceLab()
 : m_bIsRunning(false)
 , m_bReceiveData(false)
+, m_bProcessData(false)
 , m_qFileFwdSolution("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif")
 , m_sAtlasDir("./MNE-sample-data/subjects/sample/label")
 , m_sSurfaceDir("./MNE-sample-data/subjects/sample/surf")
@@ -176,7 +177,7 @@ void SourceLab::init()
 
 bool SourceLab::start()
 {
-//    QThread::start();
+    QThread::start();
     return true;
 }
 
@@ -240,7 +241,6 @@ void SourceLab::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
     //MEG
     if(pRTMSA && m_bReceiveData)
     {
-
         //Check if buffer initialized
         if(!m_pSourceLabBuffer)
             m_pSourceLabBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSA->getNumChannels(), pRTMSA->getMultiArraySize()));
@@ -249,15 +249,15 @@ void SourceLab::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
         if(!m_pFiffInfo)
             m_pFiffInfo = pRTMSA->getFiffInfo();
 
-        MatrixXd t_mat(pRTMSA->getNumChannels(), pRTMSA->getMultiArraySize());
+        if(m_bProcessData)
+        {
+            MatrixXd t_mat(pRTMSA->getNumChannels(), pRTMSA->getMultiArraySize());
 
-        for(unsigned char i = 0; i < pRTMSA->getMultiArraySize(); ++i)
-            t_mat.col(i) = pRTMSA->getMultiSampleArray()[i];
+            for(unsigned char i = 0; i < pRTMSA->getMultiArraySize(); ++i)
+                t_mat.col(i) = pRTMSA->getMultiSampleArray()[i];
 
-        m_pSourceLabBuffer->push(&t_mat);
-
-////            getAcceptorMeasurementBuffer(pRTMSANew->getID()).staticCast<CircularMatrixBuffer<double> >()
-////                    ->push(&t_mat);
+            m_pSourceLabBuffer->push(&t_mat);
+        }
     }
 }
 
@@ -368,6 +368,10 @@ void SourceLab::run()
     if(!m_bSingleTrial)
         m_pRtAve->start();
 
+    //
+    // start processing data
+    //
+    m_bProcessData = true;
 
     while(m_bIsRunning)
     {

@@ -190,6 +190,7 @@ private:
 
     bool m_bIsRunning;      /**< If source lab is running */
     bool m_bReceiveData;    /**< If thread is ready to receive data */
+    bool m_bProcessData;    /**< If data should be received for processing */
 
     //MNE stuff
     QFile                       m_qFileFwdSolution; /**< File to forward solution. */
