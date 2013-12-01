@@ -77,7 +77,7 @@ SourceLab::SourceLab()
 , m_sSurfaceDir("./MNE-sample-data/subjects/sample/surf")
 , m_iStimChan(0)
 , m_iNumAverages(10)
-, m_bSingleTrial(true)
+, m_bSingleTrial(false)
 {
 
 }
@@ -418,9 +418,9 @@ void SourceLab::run()
                     std::cout << "SourceEstimated:\n" << std::endl;
     //                std::cout << "SourceEstimated:\n" << sourceEstimate.data.block(0,0,10,10) << std::endl;
 
-    //                //emit source estimates sample wise
-    //                for(qint32 i = 0; i < sourceEstimate.data.cols(); ++i)
-    //                    m_pRTSE_SourceLab->setValue(sourceEstimate.data.col(i));
+                    //emit source estimates sample wise
+                    for(qint32 i = 0; i < sourceEstimate.data.cols(); ++i)
+                        m_pRTSEOutput->data()->setValue(sourceEstimate.data.col(i));
 
 
                     m_qVecEvokedData.pop_front();

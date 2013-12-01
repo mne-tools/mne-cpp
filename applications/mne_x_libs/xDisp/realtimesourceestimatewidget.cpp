@@ -95,7 +95,7 @@ using namespace XMEASLIB;
 //=============================================================================================================
 
 RealTimeSourceEstimateWidget::RealTimeSourceEstimateWidget(QSharedPointer<RealTimeSourceEstimate> &pRTSE, QWidget* parent)
-: MeasurementWidget(parent)
+: NewMeasurementWidget(parent)
 , m_pRTMSE(pRTSE)
 , m_bInitialized(false)
 {
@@ -180,11 +180,13 @@ void RealTimeSourceEstimateWidget::minValueChanged(double minValue)
 
 //*************************************************************************************************************
 
-void RealTimeSourceEstimateWidget::update(Subject*)
+void RealTimeSourceEstimateWidget::update(XMEASLIB::NewMeasurement::SPtr)
 {
 //    VectorXd vecValue = VectorXd::Zero(m_uiNumChannels);
 //    double dPositionDifference = 0.0;
-//    QVector< VectorXd > matSamples = m_pRTMSA_New->getMultiSampleArray();
+    QVector< VectorXd > matSamples = m_pRTMSE->getSourceArray();
+
+    std::cout << "#### Update display ####";
 
 }
 

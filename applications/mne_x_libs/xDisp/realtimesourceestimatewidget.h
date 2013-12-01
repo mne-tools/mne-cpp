@@ -43,7 +43,7 @@
 //=============================================================================================================
 
 #include "xdisp_global.h"
-#include "measurementwidget.h"
+#include "newmeasurementwidget.h"
 
 #include <disp3D/inverseview.h>
 #include <mne/mne_forwardsolution.h>
@@ -116,7 +116,7 @@ using namespace MNELIB;
 * @brief The RealTimeMultiSampleArrayNewWidget class provides a real-time curve display.
 */
 
-class XDISPSHARED_EXPORT RealTimeSourceEstimateWidget : public MeasurementWidget
+class XDISPSHARED_EXPORT RealTimeSourceEstimateWidget : public NewMeasurementWidget
 {
     Q_OBJECT
 
@@ -142,11 +142,10 @@ public:
     //=========================================================================================================
     /**
     * Is called when new data are available.
-    * Inherited by IObserver.
     *
-    * @param [in] pSubject pointer to Subject -> not used because its direct attached to the measurement.
+    * @param [in] pMeasurement  pointer to measurement -> not used because its direct attached to the measurement.
     */
-    virtual void update(Subject* pSubject);
+    virtual void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
