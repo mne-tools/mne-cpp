@@ -121,7 +121,7 @@ InverseView::~InverseView()
 
 void InverseView::pushSourceEstimate(MNESourceEstimate &p_sourceEstimate)
 {
-    qDebug() << "Push Source Estimate 1";
+//    qDebug() << "Push Source Estimate 1";
     m_pInverseViewProducer->pushSourceEstimate(p_sourceEstimate);
 }
 
@@ -440,7 +440,7 @@ void InverseView::updateActivation(QSharedPointer<Eigen::VectorXd> p_pVecActivat
 ////                r = iVal;
 ////                g = iVal;
 ////                b = iVal;
-//                qRgb = ColorMap::valueToHotNegative1((double)iVal/255.0);
+                qRgb = ColorMap::valueToHotNegative1((double)iVal/255.0);
 ////                qRgb = ColorMap::valueToHotNegative2((double)iVal/255.0);
 //            }
 //            else if(m_iColorMode == 1)
@@ -449,7 +449,7 @@ void InverseView::updateActivation(QSharedPointer<Eigen::VectorXd> p_pVecActivat
 ////                g = iVal;
 ////                b = iVal;
 ////                qRgb = ColorMap::valueToHot((double)iVal/255.0);
-                qRgb = ColorMap::valueToHotNegative2((double)iVal/255.0);
+//                qRgb = ColorMap::valueToHotNegative2((double)iVal/255.0);
 //            }
 
             m_pSceneNode->palette()->material(i)->setSpecularColor(QColor(qRgb));
