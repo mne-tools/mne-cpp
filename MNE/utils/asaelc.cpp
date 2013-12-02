@@ -99,9 +99,11 @@ bool AsAElc::readElcFile(QString path, QStringList &channelNames, QVector<QVecto
             {
                 channelNames.push_back(fields.at(0));
                 QVector<double> posTemp;
-                posTemp.push_back(fields.at(fields.size()-3).toDouble());    //x
-                posTemp.push_back(fields.at(fields.size()-2).toDouble());    //y
-                posTemp.push_back(fields.at(fields.size()-1).toDouble());    //z
+
+                posTemp.push_back(fields.at(fields.size()-4).toDouble());    //x
+                posTemp.push_back(fields.at(fields.size()-3).toDouble());    //y
+                posTemp.push_back(fields.at(fields.size()-2).toDouble());    //z
+
                 location3D.push_back(posTemp);
             }
 
