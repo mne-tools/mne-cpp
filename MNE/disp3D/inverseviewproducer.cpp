@@ -65,7 +65,7 @@ InverseViewProducer::InverseViewProducer(qint32 p_iT)
 , m_nTimeSteps(0)
 , m_dGlobalMaximum(0)
 , m_iDownSampling(20)
-, m_bBeep(true)
+, m_bBeep(false)
 {
 
 }

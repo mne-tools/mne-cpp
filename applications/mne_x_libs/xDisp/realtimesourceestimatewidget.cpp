@@ -186,7 +186,9 @@ void RealTimeSourceEstimateWidget::update(XMEASLIB::NewMeasurement::SPtr)
 //    double dPositionDifference = 0.0;
     MNESourceEstimate stc = m_pRTMSE->getStc();
 
-    std::cout << "#### Update display ####";
+//    std::cout << "#### Update display ####";
+
+    m_pView->pushSourceEstimate(stc);
 
 }
 

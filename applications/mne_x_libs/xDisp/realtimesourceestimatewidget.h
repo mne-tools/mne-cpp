@@ -206,7 +206,6 @@ private:
     QSharedPointer<RealTimeSourceEstimate> m_pRTMSE;    /**< The real-time source estimate measurement. */
 
 
-
     void actualize();                                   /**< Actualize member variables. */
 //    Ui::RealTimeSourceEstimateClass   ui;               /**< The user interface of the RealTimeSampleArray widget. */
 //    QSharedPointer<RealTimeSourceEstimate> m_pRTMSE;    /**< The real-time source estimate measurement. */

@@ -70,6 +70,7 @@ RealTimeSourceEstimate::RealTimeSourceEstimate(QObject *parent)
 , m_iArraySize(200)
 , m_iCurIdx(0)
 , m_fCurTimePoint(0)
+, m_bStcSend(true)
 {
     m_MNEStc.data = MatrixXd(0,0);
     m_MNEStc.times = RowVectorXf(m_iArraySize);
@@ -121,9 +122,13 @@ void RealTimeSourceEstimate::setValue(VectorXd v)
 
     if(m_iCurIdx >= m_iArraySize)
     {
-        emit notify();
+        if(m_bStcSend)
+            emit notify();
+
         m_iCurIdx = 0;
         m_MNEStc.tmin = m_fCurTimePoint;
+
+        m_bStcSend = false;
     }
 }
 
