@@ -184,7 +184,7 @@ void RealTimeSourceEstimateWidget::update(XMEASLIB::NewMeasurement::SPtr)
 {
 //    VectorXd vecValue = VectorXd::Zero(m_uiNumChannels);
 //    double dPositionDifference = 0.0;
-    QVector< VectorXd > matSamples = m_pRTMSE->getSourceArray();
+    MNESourceEstimate stc = m_pRTMSE->getStc();
 
     std::cout << "#### Update display ####";
 
