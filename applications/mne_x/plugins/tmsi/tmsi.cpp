@@ -181,10 +181,14 @@ void TMSI::setUpFiffInfo()
             fChInfo.coil_type = FIFFV_COIL_EEG;
 
             //Set EEG electrode location - Convert from mm to m
-            fChInfo.eeg_loc.setZero();
             fChInfo.eeg_loc(0,0) = elcLocation3D[i][0]*0.001;
             fChInfo.eeg_loc(1,0) = elcLocation3D[i][1]*0.001;
             fChInfo.eeg_loc(2,0) = elcLocation3D[i][2]*0.001;
+
+            //Also write the eeg electrode locations int ot he meg loc variable (matlab mne wants this)
+            fChInfo.loc(0,0) = elcLocation3D[i][0]*0.001;
+            fChInfo.loc(1,0) = elcLocation3D[i][1]*0.001;
+            fChInfo.loc(2,0) = elcLocation3D[i][2]*0.001;
 
             //cout<<i<<endl<<fChInfo.eeg_loc<<endl;
         }
@@ -298,7 +302,7 @@ bool TMSI::start()
 
         m_pOutfid = Fiff::start_writing_raw(m_fileOut, *m_pFiffInfo, m_cals);
         fiff_int_t first = 0;
-        m_pOutfid->write_int(FIFF_FIRST_SAMPLE,&first);
+        m_pOutfid->write_int(FIFF_FIRST_SAMPLE, &first);
     }
     else
         setUpFiffInfo();
@@ -447,11 +451,11 @@ void TMSI::run()
                 for(qint32 i = 0; i < matValue.rows(); ++i)
                     fft.fwd(freq.row(i), matValue.row(i));
 
-                cout<<"FFT postprocessing done in "<<timer.nsecsElapsed()<<" nanosec"<<endl;
-                cout<<"matValue before FFT:"<<endl<<matValue<<endl;
-                cout<<"freq after FFT:"<<endl<<freq<<endl;
-                matValue = freq.cwiseAbs();
-                cout<<"matValue after FFT:"<<endl<<matValue<<endl;
+//                cout<<"FFT postprocessing done in "<<timer.nsecsElapsed()<<" nanosec"<<endl;
+//                cout<<"matValue before FFT:"<<endl<<matValue<<endl;
+//                cout<<"freq after FFT:"<<endl<<freq<<endl;
+//                matValue = freq.cwiseAbs();
+//                cout<<"matValue after FFT:"<<endl<<matValue<<endl;
             }
 
             //emit values to real time multi sample array
