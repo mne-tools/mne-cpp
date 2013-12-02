@@ -329,6 +329,18 @@ public:
     QList<FiffProj> read_proj(const FiffDirTree& p_Node);
 
     //=========================================================================================================
+
+    /**
+    * Read the CTF software compensation data from the given node
+    *
+    * @param[in] p_IODevice     An fiff IO device like a fiff QFile or QTCPSocket
+    *
+    * @return true if succeeded, false otherwise
+    */
+
+    static bool setup_read(QIODevice& p_IODevice, FiffInfo& info, FiffDirTree& dirTree);
+
+    //=========================================================================================================
     /**
     * fiff_setup_read_raw
     *
