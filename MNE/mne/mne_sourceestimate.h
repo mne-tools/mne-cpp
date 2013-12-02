@@ -57,6 +57,7 @@
 // Qt INCLUDES
 //=============================================================================================================
 
+#include <QSharedPointer>
 #include <QList>
 #include <QIODevice>
 
@@ -94,6 +95,8 @@ using namespace Eigen;
 class MNESHARED_EXPORT MNESourceEstimate
 {
 public:
+    typedef QSharedPointer<MNESourceEstimate> SPtr;             /**< Shared pointer type for MNESourceEstimate. */
+    typedef QSharedPointer<const MNESourceEstimate> ConstSPtr;  /**< Const shared pointer type for MNESourceEstimate. */
 
     //=========================================================================================================
     /**

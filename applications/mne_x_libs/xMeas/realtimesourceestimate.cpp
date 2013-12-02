@@ -65,9 +65,14 @@ using namespace XMEASLIB;
 
 RealTimeSourceEstimate::RealTimeSourceEstimate(QObject *parent)
 : NewMeasurement(QMetaType::type("RealTimeSourceEstimate::SPtr"), parent)
-, m_ucArraySize(200)
+, m_dSamplingRate(0)
+, m_fT(0)
+, m_iArraySize(200)
+, m_iCurIdx(0)
+, m_fCurTimePoint(0)
 {
-
+    m_MNEStc.data = MatrixXd(0,0);
+    m_MNEStc.times = RowVectorXf(m_iArraySize);
 }
 
 
@@ -104,11 +109,21 @@ void RealTimeSourceEstimate::setValue(VectorXd v)
 
     //Store
     m_vecValue = v;
-    m_matSamples.push_back(m_vecValue);
-    if(m_matSamples.size() >= m_ucArraySize)
+
+    if(m_MNEStc.data.cols() == 0)
+        m_MNEStc.data = MatrixXd(m_vecValue.size(), m_iArraySize);
+
+    m_MNEStc.data.col(m_iCurIdx) = m_vecValue;
+    m_MNEStc.times[m_iCurIdx] = m_fCurTimePoint;
+
+    m_fCurTimePoint += m_fT;
+    ++m_iCurIdx;
+
+    if(m_iCurIdx >= m_iArraySize)
     {
         emit notify();
-        m_matSamples.clear();
+        m_iCurIdx = 0;
+        m_MNEStc.tmin = m_fCurTimePoint;
     }
 }
 
