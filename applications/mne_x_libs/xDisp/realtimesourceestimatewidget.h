@@ -198,15 +198,15 @@ private slots:
 
 private:
 
-    InverseView* m_pView;
-    QWidget* m_pWidgetView;
+    InverseView* m_pView;                               /**< The inverse view, owner ship is taken by container widget of m_pView -> no need to delete */
+    QWidget* m_pWidgetView;                             /**< The inverse view container, ownership is taken by QHBoxLayout -> no need to delete */
 
-    bool m_bInitialized;
+    bool m_bInitialized;                                /**< Whether init was processed successfully. */
 
     QSharedPointer<RealTimeSourceEstimate> m_pRTMSE;    /**< The real-time source estimate measurement. */
 
-
     void actualize();                                   /**< Actualize member variables. */
+
 //    Ui::RealTimeSourceEstimateClass   ui;               /**< The user interface of the RealTimeSampleArray widget. */
 //    QSharedPointer<RealTimeSourceEstimate> m_pRTMSE;    /**< The real-time source estimate measurement. */
 

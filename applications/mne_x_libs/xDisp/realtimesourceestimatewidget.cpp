@@ -236,13 +236,12 @@ bool RealTimeSourceEstimateWidget::initOpenGLWidget()
 
         QHBoxLayout *layout = new QHBoxLayout(this);
 
-        m_pView = new InverseView(m_pRTMSE->getSrc(), t_qListLabels, t_qListRGBAs);
+        m_pView = new InverseView(m_pRTMSE->getSrc(), t_qListLabels, t_qListRGBAs, 24, false);
 
         if (m_pView->stereoType() != QGLView::RedCyanAnaglyph)
             m_pView->camera()->setEyeSeparation(0.3f);
 
-        m_pWidgetView = QWidget::createWindowContainer(m_pView);
-//        m_pContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+        m_pWidgetView = QWidget::createWindowContainer(m_pView); //widget take owner ship of m_pView
 //        m_pContainer->setFocusPolicy(Qt::StrongFocus);
         m_pWidgetView->setFocusPolicy(Qt::TabFocus);
 

@@ -129,9 +129,12 @@ public:
     * @param[in] p_sourceSpace  Source space which contains the geometry information
     * @param[in] p_qListLabels  region of interest labels
     * @param[in] p_qListRGBAs   color information for given region of interest
+    * @param[in] p_iFps         Frames per second
+    * @param[in] p_bLoop        if current source estimate should be repeated
+    * @param[in] p_bStereo      if stereo view should be turned on
     * @param[in] parent         Parent QObject (optional)
     */
-    InverseView(const MNESourceSpace &p_sourceSpace, QList<Label> &p_qListLabels, QList<RowVector4i> &p_qListRGBAs, QWindow *parent = 0);
+    InverseView(const MNESourceSpace &p_sourceSpace, QList<Label> &p_qListLabels, QList<RowVector4i> &p_qListRGBAs, qint32 p_iFps = 24, bool p_bLoop = true, bool p_bStereo = false, QWindow *parent = 0);
     
     //=========================================================================================================
     /**
@@ -192,11 +195,12 @@ private:
 
     InverseViewProducer::SPtr m_pInverseViewProducer;   /**< Inverse view producer. */
 
-    qint32 m_iColorMode;                            /**< used colorization mode. */
     //Data Stuff
     MNESourceSpace m_sourceSpace;                   /**< The used source space. */
     QList<Label> m_qListLabels;                     /**< The labels. */
     QList<RowVector4i> m_qListRGBAs;                /**< The label colors encoded in RGBA. */
+
+    qint32 m_iColorMode;                            /**< used colorization mode. */
 
     //GL Stuff
     bool m_bStereo;

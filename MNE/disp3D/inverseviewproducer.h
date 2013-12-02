@@ -59,6 +59,7 @@
 
 #include <QThread>
 #include <QMutex>
+#include <QVector>
 
 
 //*************************************************************************************************************
@@ -102,10 +103,10 @@ public:
     /**
     * Default constructor
     *
-    *
-    * @param[in] p_iT   Time in us between each sample (default 1000)
+    * @param[in] p_iFps     Frames per second
+    * @param[in] p_bLoop    if source estimate should be repeated
     */
-    InverseViewProducer(qint32 p_iT = 1000);
+    InverseViewProducer(qint32 p_iFps, bool p_bLoop);
     
     //=========================================================================================================
     /**
@@ -161,16 +162,18 @@ private:
 
     bool m_bIsRunning;      /**< If inverse view producer is running. */
 
-    MNESourceEstimate m_curSourceEstimate; /**< Current source estimate.*/
+//    MNESourceEstimate m_curSourceEstimate; /**< Current source estimate.*/
 
-    VectorXd m_vecMaxActivation;      /**< Maximum of each source. */
-    double m_dGlobalMaximum;             /**< Global maximum. */
+    QVector<VectorXd> m_vecStcs;    /**< Stc samples to produce. */
+    QVector<float> m_vecTime;       /**< Time samples to produce. */
 
-    qint32 m_iFps;          /**< Frames per second.*/
-    qint32 m_iT;            /**< Time in us between each step.*/
-    qint32 m_nTimeSteps;    /**< Number of time steps.*/
+    VectorXd m_vecMaxActivation;    /**< Maximum of each source. */
+    double m_dGlobalMaximum;        /**< Global maximum. */
 
-    qint32 m_iDownSampling; /**< Downsampling factor */
+    qint32 m_iFps;              /**< Frames per second.*/
+    bool m_bLoop;               /**< If producer should loop over source estimate.*/
+    qint32 m_iT;                /**< Time in us between each step. */
+    qint32 m_iCurSampleStep;    /**< Current sample step. */
 
     bool m_bBeep;           /**< Indicate stimulus onset with a beep tone. */
 
