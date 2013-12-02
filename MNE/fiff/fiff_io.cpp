@@ -85,13 +85,23 @@ bool FiffIO::read(QIODevice& p_IODevice)
     //perform read routines, all sort of types -> raw, evoked
     std::cout << "reading file..." << std::endl;
 
-    FiffRawData raw(p_IODevice);
-    QSharedPointer<FiffRawData*> tmpraw = &raw; //to be debugged
+    FiffStream::setup_read(p_IODevice,m_fiffInfo,m_dirTree);
 
-    //m_qlistRaw.push_back(tmpraw);
+    QList<FiffDirTree> evoked_node = m_dirTree.dir_tree_find(FIFFB_EVOKED);
+    std::cout << evoked_node.size() << " evoked Nodes found!" << std::endl;
+
+    QList<FiffDirTree> raw_node = m_dirTree.dir_tree_find(FIFFB_RAW_DATA);
+    std::cout << raw_node.size() << " raw data sets found!" << std::endl;
+
+    //FiffRawData raw(p_IODevice);
+    //If specific data type that was read is not empty, append to type qlist
+    //m_qlistRaw.append(QSharedPointer<FiffRawData>(&raw));
+
+    return true;
 }
 
 //*************************************************************************************************************
+/* QObject must not be copied!
 
 FiffIO::FiffIO(const FiffIO& p_FiffIO)
 : m_qlistRaw(p_FiffIO.m_qlistRaw)
@@ -103,5 +113,5 @@ FiffIO::FiffIO(const FiffIO& p_FiffIO)
 {
 
 }
-
+*/
 //*************************************************************************************************************

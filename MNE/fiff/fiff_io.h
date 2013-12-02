@@ -101,15 +101,15 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a FiffIO object by reading from a I/O device p_pIODevice.
+    * Constructs a FiffIO object by reading from a I/O device p_IODevice.
     *
-    * @param[in] p_pIODevice    A fiff IO device like a fiff QFile or QTCPSocket
+    * @param[in] p_IODevice    A fiff IO device like a fiff QFile or QTCPSocket
     */
     FiffIO(QIODevice& p_IODevice);
 
     //=========================================================================================================
     /**
-    * Constructs a FiffIO object that uses the I/O device p_pIODevice.
+    * Constructs a FiffIO object that uses the I/O device p_IODevice.
     *
     * @param[in] p_qlistIODevices    A QList of fiff IO devices like a fiff QFile or QTCPSocket
     */
@@ -127,7 +127,7 @@ public:
     /**
     * Read data from a p_IODevice.
     *
-    * @param[in] p_pIODevice    A fiff IO device like a fiff QFile or QTCPSocket
+    * @param[in] p_IODevice    A fiff IO device like a fiff QFile or QTCPSocket
     */
     bool read(QIODevice& p_IODevice);
 
@@ -143,7 +143,7 @@ public:
     /**
     * Write data to a p_IODevice.
     *
-    * @param[in] p_pIODevice    A fiff IO device like a fiff QFile or QTCPSocket
+    * @param[in] p_IODevice    A fiff IO device like a fiff QFile or QTCPSocket
     */
     //bool write(QIODevice p_IODevice, Type type, fiff_int_t idx);
 
@@ -151,17 +151,20 @@ public:
     /**
     * Write data to a p_IODevice.
     *
-    * @param[in] p_pIODevice    A fiff IO device like a fiff QFile or QTCPSocket
+    * @param[in] p_IODevice    A fiff IO device like a fiff QFile or QTCPSocket
     */
     //bool write(QString filename, QString folder = "./"); //including AutoFileNaming, e.g. -raw/evoked/fwd.fiff
 
 private:
-    QList<QSharedPointer<FiffRawData*> > m_qlistRaw;
-    QList<QSharedPointer<FiffEvoked*> > m_qlistEvoked;
-    QList<QSharedPointer<FiffProj*> > m_qlistProj;
-    QList<QSharedPointer<MNEForwardSolution*> > m_qlistFwd;
-    QList<QSharedPointer<FiffCov*> > m_qlistCov;
-    QList<QSharedPointer<FiffNamedMatrix*> > m_qlistNMatrix;
+    FiffInfo m_fiffInfo;
+    FiffDirTree m_dirTree;
+
+    QList<QSharedPointer<FiffRawData> > m_qlistRaw;
+    QList<QSharedPointer<FiffEvoked> > m_qlistEvoked;
+    QList<QSharedPointer<FiffProj> > m_qlistProj;
+    QList<QSharedPointer<MNEForwardSolution> > m_qlistFwd;
+    QList<QSharedPointer<FiffCov> > m_qlistCov;
+    QList<QSharedPointer<FiffNamedMatrix> > m_qlistNMatrix;
 };
 
 //*************************************************************************************************************
