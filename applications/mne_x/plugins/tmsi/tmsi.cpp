@@ -103,10 +103,10 @@ QSharedPointer<IPlugin> TMSI::clone() const
 void TMSI::setUpFiffInfo()
 {
     //Clear old fiff info data
-    m_pFiffInfo.clear();
+    m_pFiffInfo->clear();
 
     //Set number of channels
-    m_pFiffInfo.nchan = m_iNumberOfChannels;
+    m_pFiffInfo->nchan = m_iNumberOfChannels;
 
     //Read electrode positions from .elc file
     AsAElc *asaObject = new AsAElc();
@@ -118,31 +118,41 @@ void TMSI::setUpFiffInfo()
     if(!asaObject->readElcFile(m_sElcFilePath, elcChannelNames, elcLocation3D, elcLocation2D, unit))
         qDebug() << "Error while reading elc file.";
 
-    //Write electrode positions in digitzier info in the fiffinfo
+    //Write electrode positions in digitizer info in the fiffinfo
     QList<FiffDigPoint> digitizerInfo;
-    for(int i=0; i<elcLocation3D.size(); i++)
+    int numberCh = m_iNumberOfChannels;
+    if(numberCh>128)
+        numberCh = 128;
+
+    if(numberCh > elcLocation3D.size())
+    {
+        qDebug()<<"Error while reading setting up fiff info in tmsi plugin: Not enough positions read from elc file.";
+        return;
+    }
+
+    for(int i=0; i<numberCh; i++)
     {
         FiffDigPoint digPoint;
         digPoint.kind = FIFFV_POINT_EEG;
         digPoint.ident = i;
-        digPoint.r[0] = elcLocation3D[i][0];
-        digPoint.r[1] = elcLocation3D[i][1];
-        digPoint.r[2] = elcLocation3D[i][2];
+
+        //Set EEG electrode location - Convert from mm to m
+        digPoint.r[0] = elcLocation3D[i][0]*0.001;
+        digPoint.r[1] = elcLocation3D[i][1]*0.001;
+        digPoint.r[2] = elcLocation3D[i][2]*0.001;
         digitizerInfo.push_back(digPoint);
     }
-    m_pFiffInfo.dig = digitizerInfo;
+    m_pFiffInfo->dig = digitizerInfo;
 
     //qDebug() << elcLocation3D;
     //qDebug() << elcLocation2D;
     //qDebug() << channelNames;
 
     //Set sampling frequency
-    m_pFiffInfo.sfreq = m_iSamplingFreq;
+    m_pFiffInfo->sfreq = m_iSamplingFreq;
 
     //Set up the fif channel info
     QStringList QSLChNames;
-    Matrix<double,3,2,DontAlign> locMatrix;
-    locMatrix.setZero();
 
     for(int i=0; i<m_iNumberOfChannels; i++)
     {
@@ -164,21 +174,27 @@ void TMSI::setUpFiffInfo()
 
             fChInfo.ch_name = sChType.append(sChType.number(i));
 
+            //Set channel type
+            fChInfo.kind = FIFFV_EEG_CH;
+
             //Set coil type
             fChInfo.coil_type = FIFFV_COIL_EEG;
 
             //Set EEG electrode location - Convert from mm to m
-            locMatrix(0,0) = elcLocation3D[i][0]*0.001;
-            locMatrix(1,0) = elcLocation3D[i][1]*0.001;
-            locMatrix(2,0) = elcLocation3D[i][2]*0.001;
+            fChInfo.eeg_loc.setZero();
+            fChInfo.eeg_loc(0,0) = elcLocation3D[i][0]*0.001;
+            fChInfo.eeg_loc(1,0) = elcLocation3D[i][1]*0.001;
+            fChInfo.eeg_loc(2,0) = elcLocation3D[i][2]*0.001;
 
-            //cout<<i<<endl<<locMatrix<<endl;
-            fChInfo.eeg_loc = locMatrix;
+            //cout<<i<<endl<<fChInfo.eeg_loc<<endl;
         }
 
         //Bipolar channels
         if(i>=128 && i<=131)
         {
+            //Set channel type
+            fChInfo.kind = FIFFV_MISC_CH;
+
             sChType = QString("BIPO ");
             fChInfo.ch_name = sChType.append(sChType.number(i-128));
         }
@@ -186,6 +202,9 @@ void TMSI::setUpFiffInfo()
         //Auxilary input channels
         if(i>=132 && i<=135)
         {
+            //Set channel type
+            fChInfo.kind = FIFFV_MISC_CH;
+
             sChType = QString("AUX ");
             fChInfo.ch_name = sChType.append(sChType.number(i-132));
         }
@@ -193,24 +212,30 @@ void TMSI::setUpFiffInfo()
         //Digital input channel
         if(i==136)
         {
-            sChType = QString("STI 014");
+            //Set channel type
+            fChInfo.kind = FIFFV_STIM_CH;
+
+            sChType = QString("DIG");
             fChInfo.ch_name = sChType;
         }
 
         //Internally generated test signal - ramp signal
         if(i==137)
         {
+            //Set channel type
+            fChInfo.kind = FIFFV_MISC_CH;
+
             sChType = QString("TEST RAMP");
             fChInfo.ch_name = sChType;
         }
 
         QSLChNames << sChType;
 
-        m_pFiffInfo.chs.append(fChInfo);
+        m_pFiffInfo->chs.append(fChInfo);
     }
 
     //Set channel names in fiff_info_base
-    m_pFiffInfo.ch_names = QSLChNames;
+    m_pFiffInfo->ch_names = QSLChNames;
 }
 
 
@@ -238,7 +263,7 @@ void TMSI::init()
     m_sOutputFilePath = QString("./mne_x_plugins/resources/tmsi/EEG_data_001_raw.fif");
     m_sElcFilePath = QString("./mne_x_plugins/resources/tmsi/loc_files/standard.elc");
 
-    //m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo());
+    m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo());
 
     // Initialise matrix used to perform a very simple high pass filter operation
     m_matOldMatrix = MatrixXf::Zero(m_iNumberOfChannels, m_iSamplesPerBlock);
@@ -271,13 +296,15 @@ bool TMSI::start()
 
         setUpFiffInfo();
 
-        m_pOutfid = Fiff::start_writing_raw(m_fileOut, m_pFiffInfo, m_cals);
+        m_pOutfid = Fiff::start_writing_raw(m_fileOut, *m_pFiffInfo, m_cals);
+        fiff_int_t first = 0;
+        m_pOutfid->write_int(FIFF_FIRST_SAMPLE,&first);
     }
     else
         setUpFiffInfo();
 
     //Set the channel size of the RMTSA - this needs to be done here and NOT in the init() function because the user can change the number of channels during runtime
-    m_pRMTSA_TMSI->data()->initFromFiffInfo(QSharedPointer<FiffInfo>(&m_pFiffInfo));
+    m_pRMTSA_TMSI->data()->initFromFiffInfo(m_pFiffInfo);
     m_pRMTSA_TMSI->data()->setSamplingRate(m_iSamplingFreq);
 
     //Buffer
@@ -361,13 +388,13 @@ void TMSI::run()
 {
     while(m_bIsRunning)
     {
-        //std::cout<<"TMSI::run()"<<std::endl;
+        //std::cout<<"TMSI::run(s)"<<std::endl;
 
         //pop matrix only if the producer thread is running
         if(m_pTMSIProducer->isRunning())
         {
             MatrixXf matValue = m_pRawMatrixBuffer_In->pop();
-            //std::cout << "matValue " << matValue.block(0,0,m_iNumberOfChannels,m_iSamplesPerBlock) << std::endl;
+            //std::cout << "matValue " << matValue.cast<double>() << std::endl;
 
             //Write raw data to fif file
             if(m_bWriteToFile)
