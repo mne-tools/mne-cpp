@@ -123,7 +123,8 @@ void RealTimeSourceEstimate::setValue(VectorXd v)
 
     if(m_iCurIdx >= m_iArraySize)
     {
-        emit notify();
+        if(m_bStcSend)
+            emit notify();
 
         m_iCurIdx = 0;
         m_MNEStc.tmin = m_fCurTimePoint;

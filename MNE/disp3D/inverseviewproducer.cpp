@@ -108,7 +108,6 @@ void InverseViewProducer::pushSourceEstimate(MNESourceEstimate &p_sourceEstimate
     }
     else
         std::cout << "T step not set!" << std::endl;
-
     mutex.unlock();
 }
 
