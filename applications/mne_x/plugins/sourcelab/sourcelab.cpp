@@ -113,6 +113,10 @@ void SourceLab::init()
     m_pAnnotationSet = AnnotationSet::SPtr(new AnnotationSet(m_sAtlasDir+"/lh.aparc.a2009s.annot", m_sAtlasDir+"/rh.aparc.a2009s.annot"));
     m_pSurfaceSet = SurfaceSet::SPtr(new SurfaceSet(m_sSurfaceDir+"/lh.white", m_sSurfaceDir+"/rh.white"));
 
+
+    //ToDo accelerate this
+    m_pClusteredFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(m_pFwd->cluster_forward_solution(*m_pAnnotationSet.data(), 40)));
+
     //Delete Buffer - will be initailzed with first incoming data
     if(!m_pSourceLabBuffer.isNull())
         m_pSourceLabBuffer = CircularMatrixBuffer<double>::SPtr();
@@ -130,8 +134,9 @@ void SourceLab::init()
     m_pRTSEOutput->data()->setAnnotSet(m_pAnnotationSet);
     m_pRTSEOutput->data()->setSurfSet(m_pSurfaceSet);
 //    m_pRTSEOutput->data()->setSrc(m_pFwd->src); // Is done after clustering -> m_pClusteredFwd
+    m_pRTSEOutput->data()->setSrc(m_pClusteredFwd->src);
 
-    m_pRTSEOutput->data()->setSamplingRate(1000);
+    m_pRTSEOutput->data()->setSamplingRate(1200);
 
 
 
@@ -328,9 +333,11 @@ void SourceLab::run()
 //    future.waitForFinished();
 //    m_pClusteredFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(future.result()));
 
-    m_pClusteredFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(m_pFwd->cluster_forward_solution(*m_pAnnotationSet.data(), 40)));
 
-    m_pRTSEOutput->data()->setSrc(m_pClusteredFwd->src);
+    //Do this already in init
+//    m_pClusteredFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(m_pFwd->cluster_forward_solution(*m_pAnnotationSet.data(), 40)));
+
+//    m_pRTSEOutput->data()->setSrc(m_pClusteredFwd->src);
 
     //
     // start receiving data

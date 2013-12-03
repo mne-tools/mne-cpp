@@ -230,6 +230,9 @@ public:
     */
     inline MNESourceEstimate& getStc();
 
+
+    bool m_bStcSend; //dirty hack
+
 private:
     AnnotationSet::SPtr     m_pAnnotSet;    /**< Annotation set. */
     SurfaceSet::SPtr        m_pSurfSet;     /**< Surface set. */
@@ -247,6 +250,7 @@ private:
     float                       m_fCurTimePoint;    /**< The current time point.*/
 
     MNESourceEstimate           m_MNEStc;           /**< The source estimate. */
+
 };
 
 

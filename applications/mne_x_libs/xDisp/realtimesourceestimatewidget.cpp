@@ -135,6 +135,7 @@ void RealTimeSourceEstimateWidget::update(XMEASLIB::NewMeasurement::SPtr)
     {
         if(!m_bInitializationStarted && !m_pRTMSE->getSrc().isEmpty())
         {
+            m_pRTMSE->m_bStcSend = false;
             m_bInitializationStarted = true;
             emit startInit();
         }
@@ -149,6 +150,7 @@ void RealTimeSourceEstimateWidget::init()
     if(this->initOpenGLWidget())
     {
         m_bInitialized = true;
+        m_pRTMSE->m_bStcSend = true;
     }
     else
     {
@@ -162,7 +164,9 @@ void RealTimeSourceEstimateWidget::init()
 
 bool RealTimeSourceEstimateWidget::initOpenGLWidget()
 {
-    if(!m_pRTMSE->getSrc().isEmpty() && !m_pRTMSE->getAnnotSet()->isEmpty() && !m_pRTMSE->getSurfSet()->isEmpty())
+    if(     !m_pRTMSE->getSrc().isEmpty() &&
+            !m_pRTMSE->getAnnotSet()->isEmpty() &&
+            !m_pRTMSE->getSurfSet()->isEmpty())
     {
         QList<Label> t_qListLabels;
         QList<RowVector4i> t_qListRGBAs;
