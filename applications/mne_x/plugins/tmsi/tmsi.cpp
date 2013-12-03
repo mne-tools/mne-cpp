@@ -100,15 +100,53 @@ QSharedPointer<IPlugin> TMSI::clone() const
 
 //*************************************************************************************************************
 
+void TMSI::init()
+{
+    m_pRMTSA_TMSI = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "TMSI", "EEG output data");
+
+    m_outputConnectors.append(m_pRMTSA_TMSI);
+
+    //setupGUI default values must be set here
+    m_iSamplingFreq = 1024;
+    m_iNumberOfChannels = 138;
+    m_iSamplesPerBlock = 16;
+    m_bConvertToVolt = false;
+    m_bUseChExponent = false;
+    m_bUseUnitGain = false;
+    m_bUseUnitOffset = false;
+    m_bWriteToFile = false;
+    m_bWriteDriverDebugToFile = false;
+    m_bUsePreprocessing = false;
+    m_bUseFFT = false;
+    m_bIsRunning = false;
+    m_sOutputFilePath = QString("./mne_x_plugins/resources/tmsi/EEG_data_001_raw.fif");
+    m_sElcFilePath = QString("./mne_x_plugins/resources/tmsi/loc_files/standard.elc");
+
+    m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo());
+
+    // Initialise matrix used to perform a very simple high pass filter operation
+    m_matOldMatrix = MatrixXf::Zero(m_iNumberOfChannels, m_iSamplesPerBlock);
+}
+
+
+//*************************************************************************************************************
+
 void TMSI::setUpFiffInfo()
 {
+    //
     //Clear old fiff info data
+    //
     m_pFiffInfo->clear();
 
-    //Set number of channels
+    //
+    //Set number of channels and sampling frequency
+    //
     m_pFiffInfo->nchan = m_iNumberOfChannels;
+    m_pFiffInfo->sfreq = m_iSamplingFreq;
 
+    //
     //Read electrode positions from .elc file
+    //
     AsAElc *asaObject = new AsAElc();
     QVector<QVector<double>> elcLocation3D;
     QVector<QVector<double>> elcLocation2D;
@@ -116,18 +154,31 @@ void TMSI::setUpFiffInfo()
     QStringList elcChannelNames;
 
     if(!asaObject->readElcFile(m_sElcFilePath, elcChannelNames, elcLocation3D, elcLocation2D, unit))
-        qDebug() << "Error while reading elc file.";
+        qDebug() << "Error: Reading elc file.";
 
+    //
     //Write electrode positions in digitizer info in the fiffinfo
+    //
     QList<FiffDigPoint> digitizerInfo;
+
+    //Only write the first 128 electrodes
     int numberCh = m_iNumberOfChannels;
     if(numberCh>128)
         numberCh = 128;
 
+    //Check if channel size by user corresponds with read channel informations from the elc file. If not apped zeros and string 'unknown' until the size matches.
     if(numberCh > elcLocation3D.size())
     {
-        qDebug()<<"Error while reading setting up fiff info in tmsi plugin: Not enough positions read from elc file.";
-        return;
+        qDebug()<<"Warning: setUpFiffInfo() - Not enough positions read from the elc file. Filling missing channel names and positions with zeroes and 'unknown' strings.";
+        QVector<double> tempA(3, 0.0);
+        QVector<double> tempB(2, 0.0);
+        int size = numberCh-elcLocation3D.size();
+        for(int i = 0; i<size; i++)
+        {
+            elcLocation3D.push_back(tempA);
+            elcLocation2D.push_back(tempB);
+            elcChannelNames.append(QString("Unknown"));
+        }
     }
 
     for(int i=0; i<numberCh; i++)
@@ -146,12 +197,11 @@ void TMSI::setUpFiffInfo()
 
     //qDebug() << elcLocation3D;
     //qDebug() << elcLocation2D;
-    //qDebug() << channelNames;
+    //qDebug() << elcChannelNames;
 
-    //Set sampling frequency
-    m_pFiffInfo->sfreq = m_iSamplingFreq;
-
+    //
     //Set up the fif channel info
+    //
     QStringList QSLChNames;
 
     for(int i=0; i<m_iNumberOfChannels; i++)
@@ -185,7 +235,7 @@ void TMSI::setUpFiffInfo()
             fChInfo.eeg_loc(1,0) = elcLocation3D[i][1]*0.001;
             fChInfo.eeg_loc(2,0) = elcLocation3D[i][2]*0.001;
 
-            //Also write the eeg electrode locations int ot he meg loc variable (matlab mne wants this)
+            //Also write the eeg electrode locations into the meg loc variable (mne_ex_read_raw() matlab function wants this)
             fChInfo.loc(0,0) = elcLocation3D[i][0]*0.001;
             fChInfo.loc(1,0) = elcLocation3D[i][1]*0.001;
             fChInfo.loc(2,0) = elcLocation3D[i][2]*0.001;
@@ -240,37 +290,6 @@ void TMSI::setUpFiffInfo()
 
     //Set channel names in fiff_info_base
     m_pFiffInfo->ch_names = QSLChNames;
-}
-
-
-//*************************************************************************************************************
-
-void TMSI::init()
-{
-    m_pRMTSA_TMSI = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "TMSI", "EEG output data");
-
-    m_outputConnectors.append(m_pRMTSA_TMSI);
-
-    //setupGUI default values must be set here
-    m_iSamplingFreq = 1024;
-    m_iNumberOfChannels = 138;
-    m_iSamplesPerBlock = 16;
-    m_bConvertToVolt = false;
-    m_bUseChExponent = false;
-    m_bUseUnitGain = false;
-    m_bUseUnitOffset = false;
-    m_bWriteToFile = false;
-    m_bWriteDriverDebugToFile = false;
-    m_bUsePreprocessing = false;
-    m_bUseFFT = false;
-    m_bIsRunning = false;
-    m_sOutputFilePath = QString("./mne_x_plugins/resources/tmsi/EEG_data_001_raw.fif");
-    m_sElcFilePath = QString("./mne_x_plugins/resources/tmsi/loc_files/standard.elc");
-
-    m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo());
-
-    // Initialise matrix used to perform a very simple high pass filter operation
-    m_matOldMatrix = MatrixXf::Zero(m_iNumberOfChannels, m_iSamplesPerBlock);
 }
 
 

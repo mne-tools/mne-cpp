@@ -79,7 +79,12 @@ bool AsAElc::readElcFile(QString path, QStringList &channelNames, QVector<QVecto
     while(!in.atEnd())
     {
         QString line = in.readLine();
+
         QStringList fields = line.split(QRegExp("\\s+"));
+
+        //Delete last element if it is a blank character
+        if(fields.at(fields.size()-1) == "")
+            fields.removeLast();
 
         if(!line.contains("#")) //Skip commented areas in file
         {
@@ -100,9 +105,9 @@ bool AsAElc::readElcFile(QString path, QStringList &channelNames, QVector<QVecto
                 channelNames.push_back(fields.at(0));
                 QVector<double> posTemp;
 
-                posTemp.push_back(fields.at(fields.size()-4).toDouble());    //x
-                posTemp.push_back(fields.at(fields.size()-3).toDouble());    //y
-                posTemp.push_back(fields.at(fields.size()-2).toDouble());    //z
+                posTemp.push_back(fields.at(fields.size()-3).toDouble());    //x
+                posTemp.push_back(fields.at(fields.size()-2).toDouble());    //y
+                posTemp.push_back(fields.at(fields.size()-1).toDouble());    //z
 
                 location3D.push_back(posTemp);
             }
@@ -120,7 +125,11 @@ bool AsAElc::readElcFile(QString path, QStringList &channelNames, QVector<QVecto
             {
                 line = in.readLine();
                 fields = line.split(QRegExp("\\s+"));
-                fields.removeLast(); //Delete last element because it is always a blank character
+
+                //Delete last element if it is a blank character
+                if(fields.at(fields.size()-1) == "")
+                    fields.removeLast();
+
                 channelNames = fields;
             }
         }
