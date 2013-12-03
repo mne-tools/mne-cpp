@@ -129,7 +129,11 @@ void SourceLab::init()
     m_pRTSEOutput->data()->setName("Real-Time Source Estimate");
     m_pRTSEOutput->data()->setAnnotSet(m_pAnnotationSet);
     m_pRTSEOutput->data()->setSurfSet(m_pSurfaceSet);
-    m_pRTSEOutput->data()->setSrc(m_pFwd->src); // ToDo in set Src - set bool that source space has been set
+//    m_pRTSEOutput->data()->setSrc(m_pFwd->src); // Is done after clustering -> m_pClusteredFwd
+
+    m_pRTSEOutput->data()->setSamplingRate(1000);
+
+
 
 
 //    // Output

@@ -161,40 +161,8 @@ public:
     */
     bool initOpenGLWidget();
 
-protected:
-
-    //=========================================================================================================
-    /**
-    * Is called to paint the incoming real-time data.
-    * Function is painting the real-time curve, the grid, the measurement curve (when left button is pressed) and is calculating the zoom (when right button is pressed -> ToDo it's maybe better done in press event directly).
-    *
-    * @param [in] event pointer to PaintEvent -> not used.
-    */
-    virtual void paintEvent( QPaintEvent* event );
-
-    //=========================================================================================================
-    /**
-    * Is called when RealTimeSampleArrayWidget is resized.
-    *
-    * @param [in] event pointer to ResizeEvent -> not used.
-    */
-    virtual void resizeEvent(QResizeEvent* event);
-
-private slots:
-
-    //=========================================================================================================
-    /**
-    * Sets a new maximal value to the real time sample array.
-    * This is used for zooming functionality.
-    */
-    void maxValueChanged(double maxValue);
-
-    //=========================================================================================================
-    /**
-    * Sets a new minimal value to the real time sample array.
-    * This is used for zooming functionality.
-    */
-    void minValueChanged(double);
+signals:
+    void startInit();
 
 private:
 
@@ -202,23 +170,9 @@ private:
     QWidget* m_pWidgetView;                             /**< The inverse view container, ownership is taken by QHBoxLayout -> no need to delete */
 
     bool m_bInitialized;                                /**< Whether init was processed successfully. */
+    bool m_bInitializationStarted;
 
     QSharedPointer<RealTimeSourceEstimate> m_pRTMSE;    /**< The real-time source estimate measurement. */
-
-    void actualize();                                   /**< Actualize member variables. */
-
-//    Ui::RealTimeSourceEstimateClass   ui;               /**< The user interface of the RealTimeSampleArray widget. */
-//    QSharedPointer<RealTimeSourceEstimate> m_pRTMSE;    /**< The real-time source estimate measurement. */
-
-//    unsigned int                    m_uiNumChannels;
-
-//    QPainterPath                    m_qPainterPath;                 /**< Holds the current painter path which is the real-time curve. */
-//    QPainterPath                    m_qPainterPathTest;
-//    QVector<QPainterPath>           m_qVecPainterPath;
-
-//    double                          m_dMinValue_init;               /**< Holds the initial minimal value */
-//    double                          m_dMaxValue_init;               /**< Holds the initial maximal value */
-//    static QList<double>            s_listSamplingRates;            /**< Holds all real-time sample array sampling rates of the current display. */
 
 };
 

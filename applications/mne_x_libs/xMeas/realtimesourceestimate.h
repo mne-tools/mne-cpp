@@ -247,8 +247,6 @@ private:
     float                       m_fCurTimePoint;    /**< The current time point.*/
 
     MNESourceEstimate           m_MNEStc;           /**< The source estimate. */
-
-    bool                    m_bStcSend;
 };
 
 
