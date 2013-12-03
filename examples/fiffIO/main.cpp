@@ -85,7 +85,10 @@ int main(int argc, char *argv[])
     QCoreApplication a(argc, argv);
 
     //instantiate FiffIO object
+    //QFile t_sampleFile("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
     QFile t_sampleFile("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    //QFile t_sampleFile("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    //QFile t_sampleFile("./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
     FiffIO p_FiffIO(t_sampleFile);
 
     return a.exec();
