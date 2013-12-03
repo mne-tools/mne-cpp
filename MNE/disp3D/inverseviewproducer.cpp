@@ -85,23 +85,29 @@ void InverseViewProducer::pushSourceEstimate(MNESourceEstimate &p_sourceEstimate
 {
     mutex.lock();
 
-    m_vecMaxActivation = p_sourceEstimate.data.rowwise().maxCoeff();
-    m_dGlobalMaximum = m_vecMaxActivation.maxCoeff();
-
-    float t_fTstep = p_sourceEstimate.tstep*1000000;
-
-    qint32 t_iSampleStep = (qint32)ceil((float)m_iT)/t_fTstep;  //how many samples to skip
-    qint32 t_iCurrentSample = m_iCurSampleStep;                 //take first or sample skip of previous push into account
-
-    while(p_sourceEstimate.data.cols() > t_iCurrentSample)
+    if(p_sourceEstimate.tstep > 0.0f)
     {
-        m_vecStcs.append(p_sourceEstimate.data.col(t_iCurrentSample));
-        m_vecTime.append(p_sourceEstimate.times(t_iCurrentSample));
+        m_vecMaxActivation = p_sourceEstimate.data.rowwise().maxCoeff(); //Per Label Source
 
-        t_iCurrentSample += t_iSampleStep;
+        m_dGlobalMaximum = m_vecMaxActivation.maxCoeff();
+
+        float t_fTstep = p_sourceEstimate.tstep*1000000;
+
+        qint32 t_iSampleStep = (qint32)ceil((float)m_iT)/t_fTstep;  //how many samples to skip
+        qint32 t_iCurrentSample = m_iCurSampleStep;                 //take first or sample skip of previous push into account
+
+        while(p_sourceEstimate.data.cols() > t_iCurrentSample)
+        {
+            m_vecStcs.append(p_sourceEstimate.data.col(t_iCurrentSample));
+            m_vecTime.append(p_sourceEstimate.times(t_iCurrentSample));
+
+            t_iCurrentSample += t_iSampleStep;
+        }
+
+        m_iCurSampleStep = t_iCurrentSample - p_sourceEstimate.data.cols();
     }
-
-    m_iCurSampleStep = t_iCurrentSample - p_sourceEstimate.data.cols();
+    else
+        std::cout << "T step not set!" << std::endl;
 
     mutex.unlock();
 }
@@ -160,13 +166,13 @@ void InverseViewProducer::run()
                     qDebug("beep");
                 }
                 t_fTimeOld = m_vecTime[0];
+
                 QSharedPointer<VectorXd> p_qVecCurrentActivation(new VectorXd(m_vecStcs[0]));
                 emit sourceEstimateSample(p_qVecCurrentActivation);
                 m_vecTime.pop_front();
                 m_vecStcs.pop_front();
             }
         }
-
 
         mutex.unlock();
 

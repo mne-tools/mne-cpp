@@ -48,6 +48,12 @@
 #include <disp3D/geometryview.h>
 #include <mne/mne_forwardsolution.h>
 
+
+
+#include <mne/mne_inverse_operator.h>
+#include <inverse/minimumNorm/minimumnorm.h>
+
+
 #include <Eigen/Core>
 
 
@@ -89,6 +95,9 @@ using namespace MNELIB;
 using namespace XMEASLIB;
 
 
+using namespace INVERSELIB;
+
+
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -98,8 +107,9 @@ RealTimeSourceEstimateWidget::RealTimeSourceEstimateWidget(QSharedPointer<RealTi
 : NewMeasurementWidget(parent)
 , m_pRTMSE(pRTSE)
 , m_bInitialized(false)
+, m_bInitializationStarted(false)
 {
-
+    connect(this,&RealTimeSourceEstimateWidget::startInit, this, &RealTimeSourceEstimateWidget::init);
 }
 
 
@@ -114,82 +124,21 @@ RealTimeSourceEstimateWidget::~RealTimeSourceEstimateWidget()
 
 //*************************************************************************************************************
 
-void RealTimeSourceEstimateWidget::actualize()
+void RealTimeSourceEstimateWidget::update(XMEASLIB::NewMeasurement::SPtr)
 {
     if(m_bInitialized)
     {
-//        m_dPosY = ui.m_qFrame->pos().y()+0.5*ui.m_qFrame->height();
-
-
-//        // Compute scaling factor
-//        m_fScaleFactor = ui.m_qFrame->height()/static_cast<float>(m_pRTMSA_New->chInfo()[0].getMaxValue()-m_pRTMSA_New->chInfo()[0].getMinValue());
-
-//        // Compute the middle of RTSA values
-//        m_dMiddle = 0.5*(m_pRTMSA_New->chInfo()[0].getMinValue()+m_pRTMSA_New->chInfo()[0].getMaxValue())*m_fScaleFactor;
-
-//        //*********************************************************************************************************
-//        //=========================================================================================================
-//        // Compute new sample width in order to synchronize all RTSA
-//        //=========================================================================================================
-
-//        if((m_pRTMSA_New->getSamplingRate() == 0) || (DisplayManager::getRTSAWidgets().size() == 0))
-//            return;
-
-//        // Add current sampling rate to s_listSamplingRates
-//        RealTimeSourceEstimateWidget::s_listSamplingRates << m_pRTMSA_New->getSamplingRate();
-
-//        // Find maximal sampling rate in s_listSamplingRates
-//        double dMax = 0;
-//        foreach (double value, s_listSamplingRates)
-//            dMax = value > dMax ? value : dMax;
-
-//        // Set new sample widths
-//        foreach(RealTimeSourceEstimateWidget* pRTMSAW, DisplayManager::getRTMSANewWidgets().values())
-//            pRTMSAW->m_dSampleWidth = dMax/pRTMSAW->m_pRTMSA_New->getSamplingRate();
+        MNESourceEstimate stc = m_pRTMSE->getStc();
+        m_pView->pushSourceEstimate(stc);
     }
     else
-        this->init();
-}
-
-
-//*************************************************************************************************************
-
-void RealTimeSourceEstimateWidget::maxValueChanged(double maxValue)
-{
-////    m_pRTMSA_New->setMaxValue(maxValue);
-//    for(quint32 i = 0; i < m_pRTMSA_New->getNumChannels(); ++i)
-//            m_pRTMSA_New->chInfo()[i].setMaxValue(maxValue);
-
-////    ui.m_qLabel_MaxValue->setText(QString::number(maxValue));
-//    actualize();
-}
-
-
-//*************************************************************************************************************
-
-void RealTimeSourceEstimateWidget::minValueChanged(double minValue)
-{
-////    m_pRTMSA_New->setMinValue(minValue);
-//    for(quint32 i = 0; i < m_pRTMSA_New->getNumChannels(); ++i)
-//        m_pRTMSA_New->chInfo()[i].setMaxValue(minValue);
-
-////    ui.m_qLabel_MinValue->setText(QString::number(minValue));
-//    actualize();
-}
-
-
-//*************************************************************************************************************
-
-void RealTimeSourceEstimateWidget::update(XMEASLIB::NewMeasurement::SPtr)
-{
-//    VectorXd vecValue = VectorXd::Zero(m_uiNumChannels);
-//    double dPositionDifference = 0.0;
-    MNESourceEstimate stc = m_pRTMSE->getStc();
-
-//    std::cout << "#### Update display ####";
-
-    m_pView->pushSourceEstimate(stc);
-
+    {
+        if(!m_bInitializationStarted && !m_pRTMSE->getSrc().isEmpty())
+        {
+            m_bInitializationStarted = true;
+            emit startInit();
+        }
+    }
 }
 
 
@@ -199,27 +148,13 @@ void RealTimeSourceEstimateWidget::init()
 {
     if(this->initOpenGLWidget())
     {
-
-
-//    ui.m_qLabel_Caption->setText(m_pRTMSA_New->getName());
-////    ui.m_qLabel_MinValue->setText(QString::number(m_pRTSM->getMinValue()));
-////    ui.m_qLabel_MaxValue->setText(QString::number(m_pRTSM->getMaxValue()));
-
-//    m_dMinValue_init = m_pRTMSA_New->chInfo()[0].getMinValue();
-//    m_dMaxValue_init = m_pRTMSA_New->chInfo()[0].getMaxValue();
-
-
-//    m_bStartFlag = true;
-
         m_bInitialized = true;
-
-//    m_pTimeCurrentDisplay = QSharedPointer<QTime>(new QTime(0, 0));
-
-//    actualize();
-
     }
     else
+    {
         m_bInitialized = false;
+        m_bInitializationStarted = false;
+    }
 }
 
 
@@ -227,7 +162,7 @@ void RealTimeSourceEstimateWidget::init()
 
 bool RealTimeSourceEstimateWidget::initOpenGLWidget()
 {
-    if(!m_pRTMSE->getAnnotSet()->isEmpty() && !m_pRTMSE->getSurfSet()->isEmpty())
+    if(!m_pRTMSE->getSrc().isEmpty() && !m_pRTMSE->getAnnotSet()->isEmpty() && !m_pRTMSE->getSurfSet()->isEmpty())
     {
         QList<Label> t_qListLabels;
         QList<RowVector4i> t_qListRGBAs;
@@ -254,24 +189,6 @@ bool RealTimeSourceEstimateWidget::initOpenGLWidget()
     else
         return false;
 }
-
-
-//*************************************************************************************************************
-
-void RealTimeSourceEstimateWidget::paintEvent(QPaintEvent*)
-{
-//    QPainter painter(this);
-
-}
-
-
-//*************************************************************************************************************
-
-void RealTimeSourceEstimateWidget::resizeEvent(QResizeEvent*)
-{
-//    actualize();
-}
-
 
 //*************************************************************************************************************
 //=============================================================================================================

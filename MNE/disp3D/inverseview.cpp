@@ -121,7 +121,6 @@ InverseView::~InverseView()
 
 void InverseView::pushSourceEstimate(MNESourceEstimate &p_sourceEstimate)
 {
-//    qDebug() << "Push Source Estimate 1";
     m_pInverseViewProducer->pushSourceEstimate(p_sourceEstimate);
 }
 
@@ -421,6 +420,7 @@ void InverseView::updateActivation(QSharedPointer<Eigen::VectorXd> p_pVecActivat
             qint32 labelId = m_sourceSpace[h].cluster_info.clusterLabelIds[i];
             qint32 colorIdx = m_qListMapLabelIdIndex[h][labelId];
             //search for max activation within one label - by checking if there is already an assigned value
+
             if(abs(t_curLabelActivation[colorIdx]) < abs((*p_pVecActivation.data())[i]))//m_curSourceEstimate.data(i, currentSample)))
                 t_curLabelActivation[colorIdx] = (*p_pVecActivation.data())[i];//m_curSourceEstimate.data(i, currentSample);
         }
@@ -430,7 +430,8 @@ void InverseView::updateActivation(QSharedPointer<Eigen::VectorXd> p_pVecActivat
     {
         if(m_pInverseViewProducer->getMaxActivation()[i] != 0)
         {
-            qint32 iVal = (t_curLabelActivation[i]/m_pInverseViewProducer->getGlobalMax()) * 400;//255;
+            qint32 iVal = (t_curLabelActivation[i]/m_pInverseViewProducer->getGlobalMax()) * 800;//255;
+
             iVal = iVal > 255 ? 255 : iVal < 0 ? 0 : iVal;
 
 //            int r, g, b;

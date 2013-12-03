@@ -162,8 +162,6 @@ private:
 
     bool m_bIsRunning;      /**< If inverse view producer is running. */
 
-//    MNESourceEstimate m_curSourceEstimate; /**< Current source estimate.*/
-
     QVector<VectorXd> m_vecStcs;    /**< Stc samples to produce. */
     QVector<float> m_vecTime;       /**< Time samples to produce. */
 
@@ -178,10 +176,6 @@ private:
     bool m_bBeep;           /**< Indicate stimulus onset with a beep tone. */
 
 //    CircularMatrixBuffer<double>::SPtr m_pSourceEstimateBuffer; /**< Holds incoming source estimate sample data.*/
-
-
-
-//    RowVectorXd m_dMaxActivation;
 };
 
 //*************************************************************************************************************
