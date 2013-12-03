@@ -124,6 +124,18 @@ public:
     FiffIO(const FiffIO& p_FiffIO);
 
     //=========================================================================================================
+
+    /**
+    * Setup a FiffStream
+    *
+    * @param[in] p_IODevice     An fiff IO device like a fiff QFile or QTCPSocket
+    *
+    * @return true if succeeded, false otherwise
+    */
+
+    static bool setup_read(QIODevice& p_IODevice, FiffInfo& info, FiffDirTree& dirTree);
+
+    //=========================================================================================================
     /**
     * Read data from a p_IODevice.
     *
@@ -156,15 +168,14 @@ public:
     //bool write(QString filename, QString folder = "./"); //including AutoFileNaming, e.g. -raw/evoked/fwd.fiff
 
 private:
-    FiffInfo m_fiffInfo;
-    FiffDirTree m_dirTree;
 
     QList<QSharedPointer<FiffRawData> > m_qlistRaw;
     QList<QSharedPointer<FiffEvoked> > m_qlistEvoked;
-    QList<QSharedPointer<FiffProj> > m_qlistProj;
+    QList<QSharedPointer<FiffProj> > m_qlistProj; //remove
     QList<QSharedPointer<MNEForwardSolution> > m_qlistFwd;
     QList<QSharedPointer<FiffCov> > m_qlistCov;
-    QList<QSharedPointer<FiffNamedMatrix> > m_qlistNMatrix;
+    QList<QSharedPointer<FiffNamedMatrix> > m_qlistNMatrix; //rem
+    //add epochs, label, annotation
 };
 
 //*************************************************************************************************************

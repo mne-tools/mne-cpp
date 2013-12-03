@@ -1299,31 +1299,6 @@ QList<FiffProj> FiffStream::read_proj(const FiffDirTree& p_Node)
 
 //*************************************************************************************************************
 
-bool FiffStream::setup_read(QIODevice& p_IODevice, FiffInfo& info, FiffDirTree& dirTree)
-{
-    //Open the file
-    FiffStream::SPtr p_pStream(new FiffStream(&p_IODevice));
-    QString t_sFileName = p_pStream->streamName();
-
-    printf("Opening fiff file %s...\n",t_sFileName.toUtf8().constData());
-
-    FiffDirTree t_Tree;
-    QList<FiffDirEntry> t_Dir;
-
-    if(!p_pStream->open(t_Tree, t_Dir))
-        return false;
-
-    //Read the measurement info
-    //FiffInfo info;// = NULL;
-    //FiffDirTree meas;
-    if(!p_pStream->read_meas_info(t_Tree, info, dirTree))
-        return false;
-
-    return true;
-}
-
-//*************************************************************************************************************
-
 bool FiffStream::setup_read_raw(QIODevice &p_IODevice, FiffRawData& data, bool allow_maxshield)
 {
     //
