@@ -47,6 +47,7 @@
 #include <mne_x/Interfaces/IAlgorithm.h>
 #include <generics/circularbuffer.h>
 #include <xMeas/newrealtimesamplearray.h>
+#include <xMeas/newrealtimemultisamplearray.h>
 
 
 //*************************************************************************************************************
@@ -95,6 +96,8 @@ class TRIGGERCONTROLSHARED_EXPORT TriggerControl : public IAlgorithm
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(MNEX::IAlgorithm)
 
+    friend class TriggerControlSetupWidget;
+
 public:
     //=========================================================================================================
     /**
@@ -134,7 +137,9 @@ protected:
     virtual void run();
 
 private:
-    PluginOutputData<NewRealTimeSampleArray>::SPtr  m_pTriggerOutput;    /**< The RealTimeSampleArray of the trigger output.*/
+    PluginOutputData<NewRealTimeSampleArray>::SPtr  m_pTriggerOutput;   /**< The RealTimeSampleArray of the trigger output.*/
+
+    PluginInputData<NewRealTimeMultiSampleArray>::SPtr  m_pRTMSAInput;  /**< The RealTimeMultiSampleArray input.*/
 };
 
 } // NAMESPACE
