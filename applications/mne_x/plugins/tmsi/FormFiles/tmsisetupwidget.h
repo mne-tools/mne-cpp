@@ -99,10 +99,10 @@ public:
 
     //=========================================================================================================
     /**
-    * Initializes the Connector properties.
+    * Initializes the Connector's GUI properties.
     *
     */
-    void initSamplingProperties();
+    void initGui();
 
 private:
 

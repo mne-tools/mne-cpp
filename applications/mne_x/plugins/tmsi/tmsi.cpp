@@ -119,8 +119,8 @@ void TMSI::init()
     m_bUsePreprocessing = false;
     m_bUseFFT = false;
     m_bIsRunning = false;
-    m_sOutputFilePath = QString("./mne_x_plugins/resources/tmsi/EEG_data_001_raw.fif");
-    m_sElcFilePath = QString("./mne_x_plugins/resources/tmsi/loc_files/standard.elc");
+    m_sOutputFilePath = QString("C:/Lorenz Esch/Dropbox/Masterarbeit DB/Messdaten/EEG/EEG_data_001_raw.fif");
+    m_sElcFilePath = QString("./mne_x_plugins/resources/tmsi/loc_files/Lorenz-Duke128-28-11-2013.elc");
 
     m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo());
 
@@ -156,23 +156,29 @@ void TMSI::setUpFiffInfo()
     if(!asaObject->readElcFile(m_sElcFilePath, elcChannelNames, elcLocation3D, elcLocation2D, unit))
         qDebug() << "Error: Reading elc file.";
 
+    //qDebug() << elcLocation3D;
+    //qDebug() << elcLocation2D;
+    //qDebug() << elcChannelNames;
+
     //
-    //Write electrode positions in digitizer info in the fiffinfo
+    //Write electrode positions to the digitizer info in the fiffinfo
     //
     QList<FiffDigPoint> digitizerInfo;
 
-    //Only write the first 128 electrodes
-    int numberCh = m_iNumberOfChannels;
-    if(numberCh>128)
-        numberCh = 128;
+    //Only write the EEG channel positions to the fiff info. The Refa devices have next to the EEG input channels 10 other input channels (Bipolar, Auxilary, Digital, Test)
+    int numberEEGCh;
+    if(m_iNumberOfChannels>128)
+        numberEEGCh = 138 - (m_iNumberOfChannels-128);
+    else
+        numberEEGCh = m_iNumberOfChannels;
 
     //Check if channel size by user corresponds with read channel informations from the elc file. If not apped zeros and string 'unknown' until the size matches.
-    if(numberCh > elcLocation3D.size())
+    if(numberEEGCh > elcLocation3D.size())
     {
         qDebug()<<"Warning: setUpFiffInfo() - Not enough positions read from the elc file. Filling missing channel names and positions with zeroes and 'unknown' strings.";
         QVector<double> tempA(3, 0.0);
         QVector<double> tempB(2, 0.0);
-        int size = numberCh-elcLocation3D.size();
+        int size = numberEEGCh-elcLocation3D.size();
         for(int i = 0; i<size; i++)
         {
             elcLocation3D.push_back(tempA);
@@ -181,7 +187,7 @@ void TMSI::setUpFiffInfo()
         }
     }
 
-    for(int i=0; i<numberCh; i++)
+    for(int i=0; i<numberEEGCh; i++)
     {
         FiffDigPoint digPoint;
         digPoint.kind = FIFFV_POINT_EEG;
@@ -193,11 +199,20 @@ void TMSI::setUpFiffInfo()
         digPoint.r[2] = elcLocation3D[i][2]*0.001;
         digitizerInfo.push_back(digPoint);
     }
-    m_pFiffInfo->dig = digitizerInfo;
 
-    //qDebug() << elcLocation3D;
-    //qDebug() << elcLocation2D;
-    //qDebug() << elcChannelNames;
+    //Append nasion value to digitizer data. Take location of Z1 electrode minus 6 cm as approximation.
+    int indexZ1 = elcChannelNames.indexOf("Z1");
+    FiffDigPoint digPoint;
+    digPoint.kind = FIFFV_POINT_NASION;
+    digPoint.ident = digitizerInfo.size();
+
+    //Set EEG electrode location - Convert from mm to m
+    digPoint.r[0] = elcLocation3D[indexZ1][0]*0.001;
+    digPoint.r[1] = elcLocation3D[indexZ1][1]*0.001;
+    digPoint.r[2] = (elcLocation3D[indexZ1][2]-60)*0.001;
+    digitizerInfo.push_back(digPoint);
+
+    m_pFiffInfo->dig = digitizerInfo;
 
     //
     //Set up the fif channel info
@@ -211,7 +226,7 @@ void TMSI::setUpFiffInfo()
         FiffChInfo fChInfo;
 
         //EEG Channels
-        if(i<=127)
+        if(i<=numberEEGCh-1)
         {
             //Set channel name
             //fChInfo.ch_name = elcChannelNames.at(i);
@@ -269,7 +284,7 @@ void TMSI::setUpFiffInfo()
             //Set channel type
             fChInfo.kind = FIFFV_STIM_CH;
 
-            sChType = QString("DIG");
+            sChType = QString("STIM");
             fChInfo.ch_name = sChType;
         }
 
@@ -399,7 +414,7 @@ QWidget* TMSI::setupWidget()
     TMSISetupWidget* widget = new TMSISetupWidget(this);//widget is later destroyed by CentralWidget - so it has to be created everytime new
 
     //init properties dialog
-    widget->initSamplingProperties();
+    widget->initGui();
 
     return widget;
 }
@@ -477,13 +492,17 @@ void TMSI::run()
 //                cout<<"matValue after FFT:"<<endl<<matValue<<endl;
             }
 
-            //emit values to real time multi sample array
-            for(int i = 0; i<matValue.row(137).cols(); i++)
+            //Change values of the Dig channel
+            if(m_iNumberOfChannels>137)
             {
-                if(matValue.row(136)[i] == 254)
-                    matValue.row(136)[i] = 4000;
+                for(int i = 0; i<matValue.row(137).cols(); i++)
+                {
+                    if(matValue.row(136)[i] == 254)
+                        matValue.row(136)[i] = 4000;
+                }
             }
 
+            //emit values to real time multi sample array
             for(qint32 i = 0; i < matValue.cols(); ++i)
                 m_pRMTSA_TMSI->data()->setValue(matValue.col(i).cast<double>());
         }
