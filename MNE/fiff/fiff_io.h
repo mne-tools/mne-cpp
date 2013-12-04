@@ -77,14 +77,14 @@ using namespace MNELIB;
 class FIFFSHARED_EXPORT FiffIO : public QObject
 {
 public:
-    enum Type {
-        _RAW = FIFFB_RAW_DATA, //102
-        _EVOKED = FIFFB_EVOKED, //104
-        _PROJ = FIFFB_PROJ, //313
-        _FWD = FIFFB_MNE_FORWARD_SOLUTION, //352
-        _COV = FIFFB_MNE_COV, //355
-        _NAMED_MATRIX = FIFFB_MNE_NAMED_MATRIX //357
-    };
+//    enum Type {
+//        _RAW = FIFFB_RAW_DATA, //102
+//        _EVOKED = FIFFB_EVOKED, //104
+//        _PROJ = FIFFB_PROJ, //313
+//        _FWD = FIFFB_MNE_FORWARD_SOLUTION, //352
+//        _COV = FIFFB_MNE_COV, //355
+//        _NAMED_MATRIX = FIFFB_MNE_NAMED_MATRIX //357
+//    };
 
     //=========================================================================================================
     /**
@@ -182,7 +182,6 @@ public:
         out << p_fiffIO.m_qlistRaw.size() << " raw data sets found! " << std::endl;
         out << p_fiffIO.m_qlistEvoked.size() << " evoked sets found!" << std::endl;
         out << p_fiffIO.m_qlistFwd.size() << " forward solutions found!" << std::endl;
-        out << p_fiffIO.m_qlistCov.size() << " covariances found!" << std::endl;
         return out;
     }
 
@@ -190,9 +189,7 @@ private:
     QList<QSharedPointer<FiffRawData> > m_qlistRaw;
     QList<QSharedPointer<FiffEvoked> > m_qlistEvoked;
     QList<QSharedPointer<MNEForwardSolution> > m_qlistFwd;
-    QList<QSharedPointer<FiffCov> > m_qlistCov;
-    //label, annotation
-
+    //FiffCov, MNEInverseOperator, AnnotationSet,
 };
 
 //*************************************************************************************************************
