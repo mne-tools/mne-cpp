@@ -112,7 +112,7 @@ bool FiffIO::read(QIODevice& p_IODevice)
     FiffInfo t_fiffInfo;
     FiffDirTree t_Tree;
     FiffDirTree t_dirTree;
-    bool hasRaw=false,hasEvoked=false,hasFwds=false,hasCov=false;
+    bool hasRaw=false,hasEvoked=false,hasFwds=false;
 
     FiffIO::setup_read(p_IODevice,t_fiffInfo,t_Tree,t_dirTree);
     p_IODevice.close(); //file can be closed, since IODevice is already read
@@ -154,7 +154,7 @@ bool FiffIO::read(QIODevice& p_IODevice)
         m_qlistFwd.append(QSharedPointer<MNEForwardSolution>(&p_forwardSolution));
     }
 
-    //print read summary
+    //print summary
     //std::cout << *this << std::endl;
 
     return true;
