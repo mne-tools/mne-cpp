@@ -105,20 +105,35 @@ public:
     */
     ~SourceLabSetupWidget();
 
-
-private slots:
+private:
     //=========================================================================================================
     /**
-    * Shows the About Dialog
-    *
+    * Shows the About Dialogs
     */
     void showAboutDialog();
 
-private:
+    //=========================================================================================================
+    /**
+    * Shows forward solution selection dialog
+    */
+    void showFwdFileDialog();
 
-    SourceLab* m_pSourceLab;	/**< Holds a pointer to corresponding DummyToolbox.*/
+    //=========================================================================================================
+    /**
+    * Shows atlas selection dialog
+    */
+    void showAtlasDirDialog();
 
-    Ui::SourceLabSetupWidgetClass ui;	/**< Holds the user interface for the DummySetupWidget.*/
+    //=========================================================================================================
+    /**
+    * Shows atlas selection dialog
+    */
+    void showSurfaceDirDialog();
+
+
+    SourceLab* m_pSourceLab;            /**< Holds a pointer to corresponding DummyToolbox.*/
+
+    Ui::SourceLabSetupWidgetClass ui;   /**< Holds the user interface for the DummySetupWidget.*/
 };
 
 } // NAMESPACE

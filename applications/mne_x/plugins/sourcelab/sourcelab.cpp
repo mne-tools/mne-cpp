@@ -41,7 +41,6 @@
 #include "sourcelab.h"
 
 #include "FormFiles/sourcelabsetupwidget.h"
-#include "FormFiles/sourcelabrunwidget.h"
 
 
 //*************************************************************************************************************
@@ -72,10 +71,13 @@ using namespace XMEASLIB;
 SourceLab::SourceLab()
 : m_bIsRunning(false)
 , m_bReceiveData(false)
+, m_bProcessData(false)
 , m_qFileFwdSolution("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif")
+, m_sAtlasDir("./MNE-sample-data/subjects/sample/label")
+, m_sSurfaceDir("./MNE-sample-data/subjects/sample/surf")
 , m_iStimChan(0)
 , m_iNumAverages(10)
-, m_bSingleTrial(true)
+, m_bSingleTrial(false)
 {
 
 }
@@ -108,8 +110,12 @@ void SourceLab::init()
 {
     // Inits
     m_pFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(m_qFileFwdSolution));
-    m_pAnnotationSet = AnnotationSet::SPtr(new AnnotationSet("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot", "./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot"));
-    m_pSurfaceSet = SurfaceSet::SPtr(new SurfaceSet("./MNE-sample-data/subjects/sample/surf/lh.white", "./MNE-sample-data/subjects/sample/surf/rh.white"));
+    m_pAnnotationSet = AnnotationSet::SPtr(new AnnotationSet(m_sAtlasDir+"/lh.aparc.a2009s.annot", m_sAtlasDir+"/rh.aparc.a2009s.annot"));
+    m_pSurfaceSet = SurfaceSet::SPtr(new SurfaceSet(m_sSurfaceDir+"/lh.white", m_sSurfaceDir+"/rh.white"));
+
+
+    //ToDo accelerate this
+    m_pClusteredFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(m_pFwd->cluster_forward_solution(*m_pAnnotationSet.data(), 40)));
 
     //Delete Buffer - will be initailzed with first incoming data
     if(!m_pSourceLabBuffer.isNull())
@@ -127,6 +133,12 @@ void SourceLab::init()
     m_pRTSEOutput->data()->setName("Real-Time Source Estimate");
     m_pRTSEOutput->data()->setAnnotSet(m_pAnnotationSet);
     m_pRTSEOutput->data()->setSurfSet(m_pSurfaceSet);
+//    m_pRTSEOutput->data()->setSrc(m_pFwd->src); // Is done after clustering -> m_pClusteredFwd
+    m_pRTSEOutput->data()->setSrc(m_pClusteredFwd->src);
+
+    m_pRTSEOutput->data()->setSamplingRate(1200);
+
+
 
 
 //    // Output
@@ -238,7 +250,6 @@ void SourceLab::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
     //MEG
     if(pRTMSA && m_bReceiveData)
     {
-
         //Check if buffer initialized
         if(!m_pSourceLabBuffer)
             m_pSourceLabBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSA->getNumChannels(), pRTMSA->getMultiArraySize()));
@@ -247,15 +258,15 @@ void SourceLab::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
         if(!m_pFiffInfo)
             m_pFiffInfo = pRTMSA->getFiffInfo();
 
-        MatrixXd t_mat(pRTMSA->getNumChannels(), pRTMSA->getMultiArraySize());
+        if(m_bProcessData)
+        {
+            MatrixXd t_mat(pRTMSA->getNumChannels(), pRTMSA->getMultiArraySize());
 
-        for(unsigned char i = 0; i < pRTMSA->getMultiArraySize(); ++i)
-            t_mat.col(i) = pRTMSA->getMultiSampleArray()[i];
+            for(unsigned char i = 0; i < pRTMSA->getMultiArraySize(); ++i)
+                t_mat.col(i) = pRTMSA->getMultiSampleArray()[i];
 
-        m_pSourceLabBuffer->push(&t_mat);
-
-////            getAcceptorMeasurementBuffer(pRTMSANew->getID()).staticCast<CircularMatrixBuffer<double> >()
-////                    ->push(&t_mat);
+            m_pSourceLabBuffer->push(&t_mat);
+        }
     }
 }
 
@@ -322,9 +333,11 @@ void SourceLab::run()
 //    future.waitForFinished();
 //    m_pClusteredFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(future.result()));
 
-    m_pClusteredFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(m_pFwd->cluster_forward_solution(*m_pAnnotationSet.data(), 40)));
 
-    m_pRTSEOutput->data()->setSrc(m_pClusteredFwd->src);
+    //Do this already in init
+//    m_pClusteredFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(m_pFwd->cluster_forward_solution(*m_pAnnotationSet.data(), 40)));
+
+//    m_pRTSEOutput->data()->setSrc(m_pClusteredFwd->src);
 
     //
     // start receiving data
@@ -366,6 +379,10 @@ void SourceLab::run()
     if(!m_bSingleTrial)
         m_pRtAve->start();
 
+    //
+    // start processing data
+    //
+    m_bProcessData = true;
 
     while(m_bIsRunning)
     {
@@ -388,7 +405,7 @@ void SourceLab::run()
                     //
                     // calculate the inverse
                     //
-                    SourceEstimate sourceEstimate = m_pMinimumNorm->calculateInverse(t_mat, 0, 1/m_pFiffInfo->sfreq);
+                    MNESourceEstimate sourceEstimate = m_pMinimumNorm->calculateInverse(t_mat, 0, 1/m_pFiffInfo->sfreq);
 
                     std::cout << "Source Estimated" << std::endl;
                 }
@@ -407,14 +424,14 @@ void SourceLab::run()
                     float tmin = ((float)t_fiffEvoked.first) / t_fiffEvoked.info.sfreq;
                     float tstep = 1/t_fiffEvoked.info.sfreq;
 
-                    SourceEstimate sourceEstimate = m_pMinimumNorm->calculateInverse(t_fiffEvoked.data, tmin, tstep);
+                    MNESourceEstimate sourceEstimate = m_pMinimumNorm->calculateInverse(t_fiffEvoked.data, tmin, tstep);
 
                     std::cout << "SourceEstimated:\n" << std::endl;
     //                std::cout << "SourceEstimated:\n" << sourceEstimate.data.block(0,0,10,10) << std::endl;
 
-    //                //emit source estimates sample wise
-    //                for(qint32 i = 0; i < sourceEstimate.data.cols(); ++i)
-    //                    m_pRTSE_SourceLab->setValue(sourceEstimate.data.col(i));
+                    //emit source estimates sample wise
+                    for(qint32 i = 0; i < sourceEstimate.data.cols(); ++i)
+                        m_pRTSEOutput->data()->setValue(sourceEstimate.data.col(i));
 
 
                     m_qVecEvokedData.pop_front();

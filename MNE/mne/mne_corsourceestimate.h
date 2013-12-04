@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     labelview.h
+* @file     mne_corsourceestimate.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     March, 2013
+* @date     November, 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,65 +29,54 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    LabelView class declaration
+* @brief     MNECorSourceEstimate class declaration.
 *
 */
 
-#ifndef LABELVIEW_H
-#define LABELVIEW_H
+#ifndef MNECORSOURCEESTIMATE_H
+#define MNECORSOURCEESTIMATE_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "disp3D_global.h"
-
-#include <mne/mne.h>
-#include <fs/surfaceset.h>
-#include <mne/mne_sourceestimate.h>
+#include "mne_global.h"
+#include "mne_sourceestimate.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// Eigen INCLUDES
 //=============================================================================================================
 
-#include "qglview.h"
-#include <QGeometryData>
-#include <QGLColorMaterial>
-#include <QSharedPointer>
+#include <Eigen/SparseCore>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
+
 #include <QList>
+#include <QIODevice>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DEFINE NAMESPACE MNELIB
 //=============================================================================================================
 
-class QTimer;
-
-namespace FSLIB
+namespace MNELIB
 {
-class Label;
-}
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE FSLIB
-//=============================================================================================================
-
-namespace DISP3DLIB
-{
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
-using namespace FSLIB;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -96,107 +85,101 @@ using namespace FSLIB;
 //=============================================================================================================
 
 
+
 //=============================================================================================================
 /**
-* Visualize labels using a stereoscopic view. Coloring is done per label.
+* Correlated source estimation which holds results of MNE-CPP inverse routines, which estimate the correlation too
 *
-* @brief 3D stereoscopic labels
+* @brief Correlated source estimation
 */
-class DISP3DSHARED_EXPORT LabelView : public QGLView
+class MNESHARED_EXPORT MNECorSourceEstimate : public MNESourceEstimate
 {
-    Q_OBJECT
 public:
-    typedef QSharedPointer<LabelView> SPtr;            /**< Shared pointer type for LabelView class. */
-    typedef QSharedPointer<const LabelView> ConstSPtr; /**< Const shared pointer type for LabelView class. */
-    
+
     //=========================================================================================================
     /**
     * Default constructor
-    *
-    * @param[in] parent     Parent QObject (optional)
     */
-    LabelView(SurfaceSet &p_surfSet, QList<Label> &p_qListLabels, QList<RowVector4i> &p_qListRGBAs, QWindow *parent = 0);
-    
-    //=========================================================================================================
-    /**
-    * Destroys the LabelView class.
-    */
-    ~LabelView();
-
-
-    void pushSourceEstimate(MNESourceEstimate &p_sourceEstimate);
-
-
-protected:
-    //=========================================================================================================
-    /**
-    * Initializes the current GL context represented by painter.
-    *
-    * @param[in] painter    GL painter which should be initialized
-    */
-    void initializeGL(QGLPainter *painter);
+    MNECorSourceEstimate();
 
     //=========================================================================================================
     /**
-    * Paints the scene onto painter. The color and depth buffers will have already been cleared, and the camera() position set.
+    * Constructs a source estimation from given data
     *
-    * @param[in] painter    GL painter which is updated
+    * @param[in] p_sol
+    * @param[in] p_vertices
+    * @param[in] p_tmin
+    * @param[in] p_tstep
     */
-    void paintGL(QGLPainter *painter);
+    MNECorSourceEstimate(const MatrixXd &p_sol, const VectorXi &p_vertices, float p_tmin, float p_tstep);
+
+    //=========================================================================================================
+    /**
+    * Copy constructor.
+    *
+    * @param[in] p_SourceEstimate    Source estimate data which should be copied
+    */
+    MNECorSourceEstimate(const MNECorSourceEstimate& p_SourceEstimate);
+
+    //=========================================================================================================
+    /**
+    * Constructs a source estimation, by reading from a IO device.
+    *
+    * @param[in] p_IODevice     IO device to read from the source estimation.
+    *
+    */
+    MNECorSourceEstimate(QIODevice &p_IODevice);
+
+    //=========================================================================================================
+    /**
+    * Initializes source estimate.
+    */
+    void clear();
+
+    //=========================================================================================================
+    /**
+    * mne_read_stc_file
+    *
+    * Reads a source estimate from a given file
+    *
+    * @param [in] p_IODevice    IO device to red the stc from.
+    * @param [out] p_stc        the read stc
+    *
+    * @return true if successful, false otherwise
+    */
+    static bool read(QIODevice &p_IODevice, MNECorSourceEstimate& p_stc);
+
+    //=========================================================================================================
+    /**
+    * mne_write_stc_file
+    *
+    * Writes a stc file
+    *
+    * @param [in] p_IODevice   IO device to write the stc to.
+    */
+    bool write(QIODevice &p_IODevice);
+
+    //=========================================================================================================
+    /**
+    * Assignment Operator
+    *
+    * @param[in] rhs     SourceEstimate which should be assigned.
+    *
+    * @return the copied source estimate
+    */
+    MNECorSourceEstimate& operator= (const MNECorSourceEstimate &rhs);
 
 private:
-
-    //Data Stuff
-    SurfaceSet m_surfSet;                                 /**< The surface which should be displayed. */
-    QList<Label> m_qListLabels;                     /**< The labels. */
-    QList<RowVector4i> m_qListRGBAs;                /**< The label colors encoded in RGBA. */
-
-    //GL Stuff
-    bool m_bStereo;
-
-    QGLLightModel *m_pLightModel;                   /**< The selected light model. */
-    QGLLightParameters *m_pLightParametersScene;    /**< The selected light parameters. */
-
-    QGLColorMaterial material;
-
-    QGLSceneNode *m_pSceneNodeBrain;               /**< Scene node of the hemisphere models. */
-    QGLSceneNode *m_pSceneNode;                    /**< Node of the scene. */
-
-    QGLCamera *m_pCameraFrontal;                    /**< frontal camera. */
-
-
-
-
-    MNESourceEstimate m_curSourceEstimate;
-    RowVectorXd m_vecFirstLabelSourceEstimate;
-    double m_dMaxSourceEstimate;
-
-    qint32 simCount;
-    qint32 m_nTSteps;
-    QTimer *m_timer;
-    void updateData();
-
-
-
-
-
-    //=========================================================================================================
-    /**
-    * Creates the scene
-    *
-    * @return the root scene noode
-    */
-//    QGLSceneNode *createScene();
+    SparseMatrix<float> m_matCorrelations;  /**< Upper triangular matrix of shape [n_dipoles x n_dipoles] which contains the dipole correlations. */
 
 };
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
 
+} //NAMESPACE
 
-} // NAMESPACE
-
-#endif // LABELVIEW_H
-
+#endif // MNECORSOURCEESTIMATE_H

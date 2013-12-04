@@ -43,7 +43,7 @@
 #include <fs/annotationset.h>
 
 #include <fiff/fiff_evoked.h>
-#include <inverse/sourceestimate.h>
+#include <mne/mne_sourceestimate.h>
 #include <inverse/rapMusic/rapmusic.h>
 
 #include <utils/mnemath.h>

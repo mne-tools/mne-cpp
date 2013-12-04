@@ -41,7 +41,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <inverse/sourceestimate.h>
+#include <mne/mne_sourceestimate.h>
 
 
 //*************************************************************************************************************
@@ -59,6 +59,7 @@
 
 #include <QThread>
 #include <QMutex>
+#include <QVector>
 
 
 //*************************************************************************************************************
@@ -75,7 +76,7 @@ namespace DISP3DLIB
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace INVERSELIB;
+using namespace MNELIB;
 
 
 //*************************************************************************************************************
@@ -102,10 +103,10 @@ public:
     /**
     * Default constructor
     *
-    *
-    * @param[in] p_iT   Time in us between each sample (default 1000)
+    * @param[in] p_iFps     Frames per second
+    * @param[in] p_bLoop    if source estimate should be repeated
     */
-    InverseViewProducer(qint32 p_iT = 1000);
+    InverseViewProducer(qint32 p_iFps, bool p_bLoop);
     
     //=========================================================================================================
     /**
@@ -135,7 +136,7 @@ public:
     *
     * @param[in] p_sourceEstimate   Source estimate to push
     */
-    void pushSourceEstimate(SourceEstimate &p_sourceEstimate);
+    void pushSourceEstimate(MNESourceEstimate &p_sourceEstimate);
 
     //=========================================================================================================
     /**
@@ -161,24 +162,20 @@ private:
 
     bool m_bIsRunning;      /**< If inverse view producer is running. */
 
-    SourceEstimate m_curSourceEstimate; /**< Current source estimate.*/
+    QVector<VectorXd> m_vecStcs;    /**< Stc samples to produce. */
+    QVector<float> m_vecTime;       /**< Time samples to produce. */
 
-    VectorXd m_vecMaxActivation;      /**< Maximum of each source. */
-    double m_dGlobalMaximum;             /**< Global maximum. */
+    VectorXd m_vecMaxActivation;    /**< Maximum of each source. */
+    double m_dGlobalMaximum;        /**< Global maximum. */
 
-    qint32 m_iFps;          /**< Frames per second.*/
-    qint32 m_iT;            /**< Time in us between each step.*/
-    qint32 m_nTimeSteps;    /**< Number of time steps.*/
-
-    qint32 m_iDownSampling; /**< Downsampling factor */
+    qint32 m_iFps;              /**< Frames per second.*/
+    bool m_bLoop;               /**< If producer should loop over source estimate.*/
+    qint32 m_iT;                /**< Time in us between each step. */
+    qint32 m_iCurSampleStep;    /**< Current sample step. */
 
     bool m_bBeep;           /**< Indicate stimulus onset with a beep tone. */
 
 //    CircularMatrixBuffer<double>::SPtr m_pSourceEstimateBuffer; /**< Holds incoming source estimate sample data.*/
-
-
-
-//    RowVectorXd m_dMaxActivation;
 };
 
 //*************************************************************************************************************

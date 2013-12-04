@@ -65,7 +65,73 @@ namespace MneRtClientPlugin   //Ui
 //=============================================================================================================
 class MneRtClient;
 
+//*************************************************************************************************************
+//=============================================================================================================
+// Structure definitions
+//=============================================================================================================
+struct FLLPara{
+    int Bias;
+    int Mod;
+    int Mode;
+    int PreGain;
+    int PostGain;
+    int slew;
+    int offset;
+    int LoPass;
+    int LPBW;
+    int HiPass;
+    int HPBW;
+    int AutoReset;
+    int ResetLock;
+    QString channame;
+};
 
+struct FLLConfig{
+    QList < FLLPara > m_Fll;
+
+};
+
+//*************************************************************************************************************
+//=============================================================================================================
+// GUI Status Machine Structure definitions
+//=============================================================================================================
+struct GUIStatMachine{
+    int CommType;
+    int ChannelSel;
+    int ChannelStat;
+    int OperMode;
+    int Retune;
+    int HeatThis;
+    int Atune;
+    int Reset;
+    int HeatAndTune;
+    int Save;
+    int _Save;
+    int GroupHeat;
+    int Last;
+    int Default;
+
+    int HighPass;
+    int LowPass;
+    int PreGain;
+    int PostGain;
+    int Slew;
+    float HeatTime;
+    float CoolTime;
+
+    int AutoRest;
+    int ResetLock;
+    float offset;
+    float bias;
+    float modulation;
+
+    int TuneCheck;
+    int Amp;
+    int IntegratorReset;
+    int MicroReset;
+
+
+};
 //=============================================================================================================
 /**
 * DECLARE CLASS mnertclientSQUIDControlDgl
@@ -86,11 +152,19 @@ private:
 
 public:
     MneRtClient*   m_pMneRtClient;
+    FLLConfig m_FLLConfig;
+    GUIStatMachine  m_GUISM;
+
     void SendRetune();
     void Cancel();
     void SendCMD(QString CMDSTR);
     void Init();
-
+    void InitChannels(QString sReply);
+    void InitGUIConfig(QString sFLLPara);
+    void ReplyCmdProc(QString sReply);
+    void UpdateGUI();
+    void SyncGUI();
+    QString GenChnInfo(QString);
 };
 
 }//namespace
