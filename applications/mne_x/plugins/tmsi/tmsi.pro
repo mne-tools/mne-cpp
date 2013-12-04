@@ -42,6 +42,25 @@ CONFIG += plugin
 
 DEFINES += TMSI_LIBRARY
 
+contains(QMAKE_HOST.arch, x86_64) { #Compiling MNE-X FOR a 64bit system
+    exists(C:/Windows/System32/TMSiSDK.dll) {
+        DEFINES += TAKE_TMSISDK_DLL
+    }
+}
+else {
+    exists(C:/Windows/SysWOW64/TMSiSDK32bit.dll) { #Compiling MNE-X FOR a 32bit system ON a 64bit system
+        DEFINES += TAKE_TMSISDK_32_DLL
+    }
+    else {
+        exists(C:/Windows/System32/TMSiSDK.dll) { #Compiling MNE-X FOR a 32bit system ON a 32bit system
+            DEFINES += TAKE_TMSISDK_DLL
+        }
+        else {
+            message(TMSI.pro warning: TMSi Driver DLL not found!)
+        }
+    }
+}
+
 QT += core widgets
 
 TARGET = tmsi
