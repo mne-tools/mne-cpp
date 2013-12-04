@@ -63,12 +63,14 @@ win32 {
 
 SOURCES += kmeans.cpp \
     mnemath.cpp \
-    ioutils.cpp
+    ioutils.cpp \
+    filtertools.cpp
 
 HEADERS +=  kmeans.h\
             utils_global.h \
     mnemath.h \
-    ioutils.h
+    ioutils.h \
+    filtertools.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

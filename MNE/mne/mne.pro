@@ -79,12 +79,14 @@ SOURCES += \
     mne.cpp \
     mne_sourcespace.cpp \
     mne_forwardsolution.cpp \
+    mne_sourceestimate.cpp \
     mne_hemisphere.cpp \
     mne_inverse_operator.cpp \
     mne_epoch_data.cpp \
     mne_epoch_data_list.cpp \
     mne_cluster_info.cpp \
-    mne_surface.cpp
+    mne_surface.cpp \
+    mne_corsourceestimate.cpp
 
 HEADERS += \
     mne.h \
@@ -92,11 +94,13 @@ HEADERS += \
     mne_sourcespace.h \
     mne_hemisphere.h \
     mne_forwardsolution.h \
+    mne_sourceestimate.h \
     mne_inverse_operator.h \
     mne_epoch_data.h \
     mne_epoch_data_list.h \
     mne_cluster_info.h \
-    mne_surface.h
+    mne_surface.h \
+    mne_corsourceestimate.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

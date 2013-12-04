@@ -124,6 +124,14 @@ public:
 
     //=========================================================================================================
     /**
+    * True if SurfaceSet is empty.
+    *
+    * @return true if SurfaceSet is empty
+    */
+    inline bool isEmpty() const;
+
+    //=========================================================================================================
+    /**
     * Reads different surface files and assembles them to a SurfaceSet
     *
     * @param[in] p_sLHFileName      Left hemisphere surface file
@@ -174,6 +182,14 @@ public:
     */
     Surface& operator[] (QString idt);
 
+    //=========================================================================================================
+    /**
+    * Returns number of loaded hemispheres
+    *
+    * @return number of loaded hemispheres
+    */
+    inline qint32 size() const;
+
 private:
     QMap<qint32, Surface> m_qMapSurfs;   /**< Hemisphere surfaces (lh = 0; rh = 1). */
 };
@@ -183,6 +199,18 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
+inline bool SurfaceSet::isEmpty() const
+{
+    return m_qMapSurfs.isEmpty();
+}
+
+
+//*************************************************************************************************************
+
+inline qint32 SurfaceSet::size() const
+{
+    return m_qMapSurfs.size();
+}
 
 } // NAMESPACE
 

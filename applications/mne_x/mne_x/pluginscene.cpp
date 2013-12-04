@@ -74,6 +74,14 @@ PluginScene::PluginScene(QMenu *pMenuPluginItem, PluginGui *pPluginGui)
 
 //*************************************************************************************************************
 
+PluginScene::~PluginScene()
+{
+    this->clear();
+}
+
+
+//*************************************************************************************************************
+
 bool PluginScene::insertPlugin(QAction* pActionPluginItem, IPlugin::SPtr &pAddedPlugin)
 {
     if(pActionPluginItem->isEnabled())

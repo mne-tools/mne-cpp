@@ -96,6 +96,8 @@ public:
 
     explicit PluginScene(QMenu *pMenuPluginItem, PluginGui *pPluginGui);
 
+    ~PluginScene();
+
     //=========================================================================================================
     /**
     * Inserts the m_pActionPluginItem selected plugin into PluginSceneManager

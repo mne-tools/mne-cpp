@@ -65,54 +65,52 @@ using namespace TMSIPlugin;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-TMSISetupWidget::TMSISetupWidget(TMSI* simulator, QWidget* parent)
+TMSISetupWidget::TMSISetupWidget(TMSI* pTMSI, QWidget* parent)
 : QWidget(parent)
-, m_pTMSI(simulator)
+, m_pTMSI(pTMSI)
 {
+    m_bAcquisitionIsRunning = false;
+
     ui.setupUi(this);
 
-    connect(ui.m_qDoubleSpinBox_SamplingRate, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            this, &TMSISetupWidget::setSamplingRate);
-    connect(ui.m_qSpinBox_Downsampling, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-            this, &TMSISetupWidget::setDownsamplingRate);
+    //Connect properties
+    connect(ui.m_spinBox_SamplingFreq, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+            this, &TMSISetupWidget::setSamplingFreq);
+    connect(ui.m_spinBox_NumberOfChannels, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+            this, &TMSISetupWidget::setNumberOfChannels);
+    connect(ui.m_spinBox_SamplesPerBlock, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+            this, &TMSISetupWidget::setSamplesPerBlock);
 
+    //Connect channel corrections
+    connect(ui.m_checkBox_ConvertToVolt, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+            this, &TMSISetupWidget::setChannelCorrections);
+    connect(ui.m_checkBox_UseChExponent, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+            this, &TMSISetupWidget::setChannelCorrections);
+    connect(ui.m_checkBox_UseUnitGain, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+            this, &TMSISetupWidget::setChannelCorrections);
+    connect(ui.m_checkBox_UseUnitOffset, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+            this, &TMSISetupWidget::setChannelCorrections);
 
-    QString path(m_pTMSI->m_qStringResourcePath+"data/");
+    //Connect presprocessing
+    connect(ui.m_checkBox_UsePresprocessing, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+            this, &TMSISetupWidget::setPreprocessing);
 
-    QDir directory = QDir(path);
-    QStringList files;
-    QString fileName("*.txt");
-    files = directory.entryList(QStringList(fileName),
-                                QDir::Files | QDir::NoSymLinks);
+    //Connect write to file
+    connect(ui.m_checkBox_WriteToFile, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+            this, &TMSISetupWidget::setWriteToFile);
+    connect(ui.m_pushButton_ChangeDir, &QPushButton::released, this, &TMSISetupWidget::changeOutputFileDir);
 
-    ui.m_qComboBox_Channel_1->addItems(files);
-    ui.m_qComboBox_Channel_2->addItems(files);
-    ui.m_qComboBox_Channel_3->addItems(files);
-
-    connect(ui.m_qComboBox_Channel_1, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-            this, &TMSISetupWidget::setFileOfChannel_I);
-    connect(ui.m_qComboBox_Channel_2, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-            this, &TMSISetupWidget::setFileOfChannel_II);
-    connect(ui.m_qComboBox_Channel_3, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-            this, &TMSISetupWidget::setFileOfChannel_III);
-
-    connect(ui.m_qCheckBox_Channel_Enable_1, &QCheckBox::toggled, this, &TMSISetupWidget::setEnabledChannel_I);
-    connect(ui.m_qCheckBox_Channel_Enable_2, &QCheckBox::toggled, this, &TMSISetupWidget::setEnabledChannel_II);
-    connect(ui.m_qCheckBox_Channel_Enable_3, &QCheckBox::toggled, this, &TMSISetupWidget::setEnabledChannel_III);
-
-    connect(ui.m_qCheckBox_Channel_Visible_1, &QCheckBox::toggled, this, &TMSISetupWidget::setVisibleChannel_I);
-    connect(ui.m_qCheckBox_Channel_Visible_2, &QCheckBox::toggled, this, &TMSISetupWidget::setVisibleChannel_II);
-    connect(ui.m_qCheckBox_Channel_Visible_3, &QCheckBox::toggled, this, &TMSISetupWidget::setVisibleChannel_III);
-
+    //Connect about button
     connect(ui.m_qPushButton_About, &QPushButton::released, this, &TMSISetupWidget::showAboutDialog);
 
-
+    //Fill info box
     QFile file(m_pTMSI->m_qStringResourcePath+"readme.txt");
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
         return;
 
     QTextStream in(&file);
-    while (!in.atEnd()) {
+    while (!in.atEnd())
+    {
         QString line = in.readLine();
         ui.m_qTextBrowser_Information->insertHtml(line);
         ui.m_qTextBrowser_Information->insertHtml("<br>");
@@ -130,148 +128,95 @@ TMSISetupWidget::~TMSISetupWidget()
 
 //*************************************************************************************************************
 
-void TMSISetupWidget::initSamplingFactors()
+void TMSISetupWidget::initSamplingProperties()
 {
-    ui.m_qDoubleSpinBox_SamplingRate->setValue(m_pTMSI->m_fSamplingRate);
-    ui.m_qSpinBox_Downsampling->setValue(m_pTMSI->m_iDownsamplingFactor);
+    //Init device sampling properties
+    ui.m_spinBox_SamplingFreq->setValue(m_pTMSI->m_iSamplingFreq);
+    ui.m_spinBox_NumberOfChannels->setValue(m_pTMSI->m_iNumberOfChannels);
+    ui.m_spinBox_SamplesPerBlock->setValue(m_pTMSI->m_iSamplesPerBlock);
+
+    //Init channel corrections
+    ui.m_checkBox_ConvertToVolt->setChecked(m_pTMSI->m_bConvertToVolt);
+    ui.m_checkBox_UseChExponent->setChecked(m_pTMSI->m_bUseChExponent);
+    ui.m_checkBox_UseUnitGain->setChecked(m_pTMSI->m_bUseUnitGain);
+    ui.m_checkBox_UseUnitOffset->setChecked(m_pTMSI->m_bUseUnitOffset);
+
+    //Init preprocessing
+    ui.m_checkBox_UsePresprocessing->setChecked(m_pTMSI->m_bUsePreProcessing);
+
+    //Init write to file
+    ui.m_checkBox_WriteToFile->setChecked(m_pTMSI->m_bWriteToFile);
+    ui.m_lineEdit_outputDir->setText(m_pTMSI->m_sOutputFilePath);
 }
 
 
 //*************************************************************************************************************
 
-void TMSISetupWidget::initSelectedChannelFile()
+void TMSISetupWidget::setSamplingFreq(int value)
 {
-    int idx;
-    idx = ui.m_qComboBox_Channel_1->findText(m_pTMSI->m_pTMSIChannel_TMSI_I->getChannelFile());
-    if(idx >= 0)
-        ui.m_qComboBox_Channel_1->setCurrentIndex(idx);
-
-    idx = ui.m_qComboBox_Channel_2->findText(m_pTMSI->m_pTMSIChannel_TMSI_II->getChannelFile());
-    if(idx >= 0)
-        ui.m_qComboBox_Channel_2->setCurrentIndex(idx);
-
-    idx = ui.m_qComboBox_Channel_3->findText(m_pTMSI->m_pTMSIChannel_TMSI_III->getChannelFile());
-    if(idx >= 0)
-        ui.m_qComboBox_Channel_3->setCurrentIndex(idx);
-
+    m_pTMSI->m_iSamplingFreq = value;
 }
 
 
 //*************************************************************************************************************
 
-void TMSISetupWidget::initChannelStates()
+void TMSISetupWidget::setNumberOfChannels(int value)
 {
-    setEnabledChannel_I(m_pTMSI->m_pTMSIChannel_TMSI_I->isEnabled());
-    setVisibleChannel_I(m_pTMSI->m_pTMSIChannel_TMSI_I->isVisible());
-
-    setEnabledChannel_II(m_pTMSI->m_pTMSIChannel_TMSI_II->isEnabled());
-    setVisibleChannel_II(m_pTMSI->m_pTMSIChannel_TMSI_II->isVisible());
-
-    setEnabledChannel_III(m_pTMSI->m_pTMSIChannel_TMSI_III->isEnabled());
-    setVisibleChannel_III(m_pTMSI->m_pTMSIChannel_TMSI_III->isVisible());
-}
-
-
-
-//*************************************************************************************************************
-
-void TMSISetupWidget::setSamplingRate(double value)
-{
-    m_pTMSI->m_fSamplingRate = value;
+    m_pTMSI->m_iNumberOfChannels = value;
 }
 
 
 //*************************************************************************************************************
 
-void TMSISetupWidget::setDownsamplingRate(int value)
+void TMSISetupWidget::setSamplesPerBlock(int value)
 {
-    m_pTMSI->m_iDownsamplingFactor = value;
-}
-
-//*************************************************************************************************************
-
-void TMSISetupWidget::setEnabledChannel_I(bool state)
-{
-    m_pTMSI->m_pTMSIChannel_TMSI_I->setEnabled(state);
-    ui.m_qCheckBox_Channel_Enable_1->setChecked(state);
-    ui.m_qLabel_Channel_1->setEnabled(state);
-    ui.m_qCheckBox_Channel_Visible_1->setEnabled(state);
-    ui.m_qComboBox_Channel_1->setEnabled(state);
+    m_pTMSI->m_iSamplesPerBlock = value;
 }
 
 
 //*************************************************************************************************************
 
-void TMSISetupWidget::setEnabledChannel_II(bool state)
+void TMSISetupWidget::setPreprocessing()
 {
-    m_pTMSI->m_pTMSIChannel_TMSI_II->setEnabled(state);
-    ui.m_qCheckBox_Channel_Enable_2->setChecked(state);
-    ui.m_qLabel_Channel_2->setEnabled(state);
-    ui.m_qCheckBox_Channel_Visible_2->setEnabled(state);
-    ui.m_qComboBox_Channel_2->setEnabled(state);
+    m_pTMSI->m_bUsePreProcessing = ui.m_checkBox_UsePresprocessing->isChecked();
 }
 
 
 //*************************************************************************************************************
 
-void TMSISetupWidget::setEnabledChannel_III(bool state)
+void TMSISetupWidget::setChannelCorrections()
 {
-    m_pTMSI->m_pTMSIChannel_TMSI_III->setEnabled(state);
-    ui.m_qCheckBox_Channel_Enable_3->setChecked(state);
-    ui.m_qLabel_Channel_3->setEnabled(state);
-    ui.m_qCheckBox_Channel_Visible_3->setEnabled(state);
-    ui.m_qComboBox_Channel_3->setEnabled(state);
+    m_pTMSI->m_bConvertToVolt = ui.m_checkBox_ConvertToVolt->isChecked();
+    m_pTMSI->m_bUseChExponent = ui.m_checkBox_UseChExponent->isChecked();
+    m_pTMSI->m_bUseUnitGain = ui.m_checkBox_UseUnitGain->isChecked();
+    m_pTMSI->m_bUseUnitOffset = ui.m_checkBox_UseUnitOffset->isChecked();
 }
 
 
 //*************************************************************************************************************
 
-void TMSISetupWidget::setVisibleChannel_I(bool state)
+void TMSISetupWidget::setWriteToFile()
 {
-    m_pTMSI->m_pTMSIChannel_TMSI_I->setVisible(state);
-    ui.m_qCheckBox_Channel_Visible_1->setChecked(state);
+    m_pTMSI->m_sOutputFilePath = ui.m_lineEdit_outputDir->text();
+    m_pTMSI->m_bWriteToFile = ui.m_checkBox_WriteToFile->isChecked();
 }
 
 
 //*************************************************************************************************************
 
-void TMSISetupWidget::setVisibleChannel_II(bool state)
+void TMSISetupWidget::changeOutputFileDir()
 {
-    m_pTMSI->m_pTMSIChannel_TMSI_II->setVisible(state);
-    ui.m_qCheckBox_Channel_Visible_2->setChecked(state);
-}
+    QString path = QFileDialog::getExistingDirectory(
+                this,
+                "Change output directory",
+                "mne_x_plugins/resources/tmsi",
+                 QFileDialog::ShowDirsOnly);
 
+    if(path==NULL)
+        path = ui.m_lineEdit_outputDir->text();
 
-//*************************************************************************************************************
-
-void TMSISetupWidget::setVisibleChannel_III(bool state)
-{
-    m_pTMSI->m_pTMSIChannel_TMSI_III->setVisible(state);
-    ui.m_qCheckBox_Channel_Visible_3->setChecked(state);
-}
-
-
-//*************************************************************************************************************
-
-void TMSISetupWidget::setFileOfChannel_I(qint32)
-{
-    m_pTMSI->m_pTMSIChannel_TMSI_I->setChannelFile(ui.m_qComboBox_Channel_1->currentText());
-}
-
-
-//*************************************************************************************************************
-
-void TMSISetupWidget::setFileOfChannel_II(qint32)
-{
-    m_pTMSI->m_pTMSIChannel_TMSI_II->setChannelFile(ui.m_qComboBox_Channel_2->currentText());
-}
-
-
-//*************************************************************************************************************
-
-void TMSISetupWidget::setFileOfChannel_III(qint32)
-{
-    m_pTMSI->m_pTMSIChannel_TMSI_III->setChannelFile(ui.m_qComboBox_Channel_3->currentText());
+    ui.m_lineEdit_outputDir->setText(path);
+    m_pTMSI->m_sOutputFilePath = ui.m_lineEdit_outputDir->text();
 }
 
 

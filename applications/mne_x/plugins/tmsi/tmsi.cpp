@@ -46,6 +46,8 @@
 
 #include <iostream>
 
+//#include <utils/filterTools.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -55,7 +57,6 @@
 #include <QtCore/QtPlugin>
 #include <QtCore/QTextStream>
 #include <QtCore/QFile>
-
 #include <QDebug>
 
 
@@ -66,6 +67,7 @@
 
 using namespace TMSIPlugin;
 using namespace XMEASLIB;
+//using namespace UTILSLIB;
 
 
 //*************************************************************************************************************
@@ -74,17 +76,10 @@ using namespace XMEASLIB;
 //=============================================================================================================
 
 TMSI::TMSI()
-: m_pRTSA_TMSI_I_new(0)
-, m_fSamplingRate(250.0)
-, m_iDownsamplingFactor(1)
-, m_pInBuffer_I(new dBuffer(1024))
-, m_pInBuffer_II(new dBuffer(1024))
-, m_pInBuffer_III(new dBuffer(1024))
-, m_pTMSIProducer(new TMSIProducer(this, m_pInBuffer_I, m_pInBuffer_II, m_pInBuffer_III))
-, m_qStringResourcePath(qApp->applicationDirPath()+"/mne_x_plugins/resources/ECGSimulator/")
-, m_pTMSIChannel_TMSI_I(new TMSIChannel(m_qStringResourcePath+"data/", QString("ECG_I_256_s30661.txt")))
-, m_pTMSIChannel_TMSI_II(new TMSIChannel(m_qStringResourcePath+"data/", QString("ECG_II_256_s30661.txt")))
-, m_pTMSIChannel_TMSI_III(new TMSIChannel(m_qStringResourcePath+"data/", QString("ECG_III_256_s30661.txt")))
+: m_pRMTSA_TMSI(0)
+, m_pRawMatrixBuffer_In(0)
+, m_pTMSIProducer(new TMSIProducer(this))
+, m_qStringResourcePath(qApp->applicationDirPath()+"/mne_x_plugins/resources/tmsi/")
 {
 }
 
@@ -93,7 +88,11 @@ TMSI::TMSI()
 
 TMSI::~TMSI()
 {
-    std::cout << "TMSI::~TMSI()" << std::endl;
+    //std::cout << "TMSI::~TMSI() " << std::endl;
+
+    //If the program is closed while the sampling is in process
+    if(this->isRunning())
+        this->stop();
 }
 
 
@@ -110,77 +109,24 @@ QSharedPointer<IPlugin> TMSI::clone() const
 //=============================================================================================================
 // Create measurement instances and config them
 //=============================================================================================================
+
 void TMSI::init()
 {
-    if(m_pTMSIChannel_TMSI_I->isEnabled())
-    {
-        m_pRTSA_TMSI_I_new = PluginOutputData<NewRealTimeSampleArray>::create(this, "ECG I", "ECG I output data");
-        m_outputConnectors.append(m_pRTSA_TMSI_I_new);
-    }
+    m_pRMTSA_TMSI = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "TMSI", "EEG output data");
 
-    if(m_pTMSIChannel_TMSI_II->isEnabled())
-    {
-        m_pRTSA_TMSI_II_new = PluginOutputData<NewRealTimeSampleArray>::create(this, "ECG II", "ECG II output data");
-        m_outputConnectors.append(m_pRTSA_TMSI_II_new);
-    }
+    m_outputConnectors.append(m_pRMTSA_TMSI);
 
-    if(m_pTMSIChannel_TMSI_III->isEnabled())
-    {
-        m_pRTSA_TMSI_III_new = PluginOutputData<NewRealTimeSampleArray>::create(this, "ECG III", "ECG III output data");
-        m_outputConnectors.append(m_pRTSA_TMSI_III_new);
-    }
-}
-
-
-//*************************************************************************************************************
-
-void TMSI::initChannels()
-{
-    m_pTMSIChannel_TMSI_I->initChannel();
-    m_pTMSIChannel_TMSI_II->initChannel();
-    m_pTMSIChannel_TMSI_III->initChannel();
-
-    if(m_pTMSIChannel_TMSI_I->isEnabled())
-    {
-        double diff = m_pTMSIChannel_TMSI_I->getMaximum() - m_pTMSIChannel_TMSI_I->getMinimum();
-
-        m_pRTSA_TMSI_I_new->data()->setName("ECG I");
-        m_pRTSA_TMSI_I_new->data()->setUnit("mV");
-
-        m_pRTSA_TMSI_I_new->data()->setMinValue(m_pTMSIChannel_TMSI_I->getMinimum()-diff/10);
-        m_pRTSA_TMSI_I_new->data()->setMaxValue(m_pTMSIChannel_TMSI_I->getMaximum()+diff/10);
-        m_pRTSA_TMSI_I_new->data()->setArraySize(10);
-        m_pRTSA_TMSI_I_new->data()->setSamplingRate(m_fSamplingRate/m_iDownsamplingFactor);
-        m_pRTSA_TMSI_I_new->data()->setVisibility(m_pTMSIChannel_TMSI_I->isVisible());
-    }
-
-    if(m_pTMSIChannel_TMSI_II->isEnabled())
-    {
-        double diff = m_pTMSIChannel_TMSI_II->getMaximum() - m_pTMSIChannel_TMSI_II->getMinimum();
-
-        m_pRTSA_TMSI_II_new->data()->setName("ECG II");
-        m_pRTSA_TMSI_II_new->data()->setUnit("mV");
-
-        m_pRTSA_TMSI_II_new->data()->setMinValue(m_pTMSIChannel_TMSI_II->getMinimum()-diff/10);
-        m_pRTSA_TMSI_II_new->data()->setMaxValue(m_pTMSIChannel_TMSI_II->getMaximum()+diff/10);
-        m_pRTSA_TMSI_II_new->data()->setArraySize(10);
-        m_pRTSA_TMSI_II_new->data()->setSamplingRate(m_fSamplingRate/m_iDownsamplingFactor);
-        m_pRTSA_TMSI_II_new->data()->setVisibility(m_pTMSIChannel_TMSI_II->isVisible());
-    }
-
-    if(m_pTMSIChannel_TMSI_III->isEnabled())
-    {
-        double diff = m_pTMSIChannel_TMSI_III->getMaximum() - m_pTMSIChannel_TMSI_III->getMinimum();
-
-        m_pRTSA_TMSI_III_new->data()->setName("ECG III");
-        m_pRTSA_TMSI_III_new->data()->setUnit("mV");
-
-        m_pRTSA_TMSI_III_new->data()->setMinValue(m_pTMSIChannel_TMSI_III->getMinimum()-diff/10);
-        m_pRTSA_TMSI_III_new->data()->setMaxValue(m_pTMSIChannel_TMSI_III->getMaximum()+diff/10);
-        m_pRTSA_TMSI_III_new->data()->setArraySize(10);
-        m_pRTSA_TMSI_III_new->data()->setSamplingRate(m_fSamplingRate/m_iDownsamplingFactor);
-        m_pRTSA_TMSI_III_new->data()->setVisibility(m_pTMSIChannel_TMSI_III->isVisible());
-    }
+    m_iSamplingFreq = 1024;
+    m_iNumberOfChannels = 138;
+    m_iSamplesPerBlock = 16;
+    m_bConvertToVolt = false;
+    m_bUseChExponent = false;
+    m_bUseUnitGain = false;
+    m_bUseUnitOffset = false;
+    m_bWriteToFile = false;
+    m_bUsePreProcessing = true;
+    m_bIsRunning = false;
+    m_sOutputFilePath = QString("mne_x_plugins/resources/tmsi");
 }
 
 
@@ -188,14 +134,57 @@ void TMSI::initChannels()
 
 bool TMSI::start()
 {
-    initChannels();
+    //Check filter class - will be removed in the future - testing purpose only!
+//    UTILSLIB::FilterTools* filterObject = new UTILSLIB::FilterTools();
 
-    // Start threads
-    m_pTMSIProducer->start();
+//    QVector<double> window(50);
+//    filterObject->createFilter(QString('HP'), 50, 0.3, window);
 
-    QThread::start();
+//    qDebug() << window;
+//    //Write kaiser window to file - testing purpose only
+//    QFile file("filterToolsTest");
+//    file.open(QIODevice::WriteOnly);
+//    QDataStream outputFileStream(&file);
 
-    return true;
+//    outputFileStream << QString("Kaiser window test:");
+//    outputFileStream << window;
+
+//    file.close();
+
+    //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
+    if(this->isRunning())
+        QThread::wait();
+
+    //Set the channel size of the RMTSA - this needs to be done here and NOT in the init() function because the user can change the number of channels during runtime
+    m_pRMTSA_TMSI->data()->init(m_iNumberOfChannels);
+    m_pRMTSA_TMSI->data()->setSamplingRate(m_iSamplingFreq);
+    m_pRMTSA_TMSI->data()->setVisibility(true);
+
+    //Buffer
+    m_pRawMatrixBuffer_In = QSharedPointer<RawMatrixBuffer>(new RawMatrixBuffer(8, m_iNumberOfChannels, m_iSamplesPerBlock));
+
+    m_pTMSIProducer->start(m_iNumberOfChannels,
+                       m_iSamplingFreq,
+                       m_iSamplesPerBlock,
+                       m_bConvertToVolt,
+                       m_bUseChExponent,
+                       m_bUseUnitGain,
+                       m_bUseUnitOffset,
+                       m_bWriteToFile,
+                       m_bUsePreProcessing,
+                       m_sOutputFilePath);
+
+    if(m_pTMSIProducer->isRunning())
+    {
+        m_bIsRunning = true;
+        QThread::start();
+        return true;
+    }
+    else
+    {
+        qWarning() << "Plugin TMSI - ERROR - TMSIProducer thread could not be started - Either the device is turned off (check your OS device manager) or the driver DLL (TMSiSDK.dll) is not installed in the system32 directory" << endl;
+        return false;
+    }
 }
 
 
@@ -203,19 +192,16 @@ bool TMSI::start()
 
 bool TMSI::stop()
 {
-    // Stop threads
+    //Stop the producer thread first
     m_pTMSIProducer->stop();
-    QThread::terminate();
-    QThread::wait();
 
-    //Clear Buffers
-    m_pTMSIChannel_TMSI_I->clear();
-    m_pTMSIChannel_TMSI_II->clear();
-    m_pTMSIChannel_TMSI_III->clear();
+    //Wait until this thread (TMSI) is stopped
+    m_bIsRunning = false;
 
-    m_pInBuffer_I->clear();
-    m_pInBuffer_II->clear();
-    m_pInBuffer_III->clear();
+    //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the pop function (acquire statement)
+    m_pRawMatrixBuffer_In->releaseFromPop();
+
+    m_pRawMatrixBuffer_In->clear();
 
     return true;
 }
@@ -241,12 +227,10 @@ QString TMSI::getName() const
 
 QWidget* TMSI::setupWidget()
 {
-    TMSISetupWidget* widget = new TMSISetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
+    TMSISetupWidget* widget = new TMSISetupWidget(this);//widget is later destroyed by CentralWidget - so it has to be created everytime new
 
-    //init dialog
-    widget->initSamplingFactors();
-    widget->initSelectedChannelFile();
-    widget->initChannelStates();
+    //init properties dialog
+    widget->initSamplingProperties();
 
     return widget;
 }
@@ -256,26 +240,21 @@ QWidget* TMSI::setupWidget()
 
 void TMSI::run()
 {
-    double dValue_I = 0;
-    double dValue_II = 0;
-    double dValue_III = 0;
-
-    while(true)
+    while(m_bIsRunning)
     {
-        if(m_pTMSIChannel_TMSI_I->isEnabled())
+        //std::cout<<"TMSI::run()"<<std::endl;
+
+        //pop matrix only if the producer thread is running
+        if(true/*m_pTMSIProducer->isRunning()*/)
         {
-            dValue_I = m_pInBuffer_I->pop();
-            m_pRTSA_TMSI_I_new->data()->setValue(dValue_I);
-        }
-        if(m_pTMSIChannel_TMSI_II->isEnabled())
-        {
-            dValue_II = m_pInBuffer_II->pop();
-            m_pRTSA_TMSI_II_new->data()->setValue(dValue_II);
-        }
-        if(m_pTMSIChannel_TMSI_III->isEnabled())
-        {
-            dValue_III = m_pInBuffer_III->pop();
-            m_pRTSA_TMSI_III_new->data()->setValue(dValue_III);
+            MatrixXf matValue = m_pRawMatrixBuffer_In->pop();
+            //std::cout << "matValue " << matValue.block(0,0,m_iNumberOfChannels,m_iSamplesPerBlock) << std::endl;
+
+            //emit values to real time multi sample array
+            for(qint32 i = 0; i < matValue.cols(); ++i)
+                m_pRMTSA_TMSI->data()->setValue(matValue.col(i).cast<double>());
         }
     }
+
+    //std::cout<<"EXITING - TMSI::run()"<<std::endl;
 }

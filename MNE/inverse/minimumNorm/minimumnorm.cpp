@@ -39,8 +39,8 @@
 //=============================================================================================================
 
 #include "minimumnorm.h"
-#include "../sourceestimate.h"
 
+#include <mne/mne_sourceestimate.h>
 #include <fiff/fiff_evoked.h>
 
 
@@ -88,7 +88,7 @@ MinimumNorm::MinimumNorm(const MNEInverseOperator &p_inverseOperator, float lamb
 
 //*************************************************************************************************************
 
-SourceEstimate MinimumNorm::calculateInverse(const FiffEvoked &p_fiffEvoked, bool pick_normal)
+MNESourceEstimate MinimumNorm::calculateInverse(const FiffEvoked &p_fiffEvoked, bool pick_normal)
 {
     //
     //   Set up the inverse according to the parameters
@@ -98,7 +98,7 @@ SourceEstimate MinimumNorm::calculateInverse(const FiffEvoked &p_fiffEvoked, boo
     if(!m_inverseOperator.check_ch_names(p_fiffEvoked.info))
     {
         qWarning("Channel name check failed.");
-        return SourceEstimate();
+        return MNESourceEstimate();
     }
 
     doInverseSetup(nave,pick_normal);
@@ -185,12 +185,12 @@ SourceEstimate MinimumNorm::calculateInverse(const FiffEvoked &p_fiffEvoked, boo
 
 //*************************************************************************************************************
 
-SourceEstimate MinimumNorm::calculateInverse(const MatrixXd &data, float tmin, float tstep) const
+MNESourceEstimate MinimumNorm::calculateInverse(const MatrixXd &data, float tmin, float tstep) const
 {
     if(!inverseSetup)
     {
         qWarning("Inverse not setup -> call doInverseSetup first!");
-        return SourceEstimate();
+        return MNESourceEstimate();
     }
 
     MatrixXd sol = K * data; //apply imaging kernel
@@ -229,7 +229,7 @@ SourceEstimate MinimumNorm::calculateInverse(const MatrixXd &data, float tmin, f
 //    for(qint32 h = 0; h < inv.src.size(); ++h)
 //        t_qListVertices.push_back(inv.src[h].vertno);
 
-    return SourceEstimate(sol, p_vecVertices, tmin, tstep);
+    return MNESourceEstimate(sol, p_vecVertices, tmin, tstep);
 
 }
 
