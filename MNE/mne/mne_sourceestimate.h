@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     sourceestimate.h
+* @file     mne_sourceestimate.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2012
+* @date     February, 2013
 *
 * @section  LICENSE
 *
@@ -29,19 +29,19 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     SourceEstimate class declaration.
+* @brief     MNESourceEstimate class declaration.
 *
 */
 
-#ifndef SOURCEESTIMATE_H
-#define SOURCEESTIMATE_H
+#ifndef MNESOURCEESTIMATE_H
+#define MNESOURCEESTIMATE_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "inverse_global.h"
+#include "mne_global.h"
 
 
 //*************************************************************************************************************
@@ -57,16 +57,17 @@
 // Qt INCLUDES
 //=============================================================================================================
 
+#include <QSharedPointer>
 #include <QList>
 #include <QIODevice>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE INVERSELIB
+// DEFINE NAMESPACE MNELIB
 //=============================================================================================================
 
-namespace INVERSELIB
+namespace MNELIB
 {
 
 
@@ -91,15 +92,17 @@ using namespace Eigen;
 *
 * @brief Source estimation
 */
-class INVERSESHARED_EXPORT SourceEstimate
+class MNESHARED_EXPORT MNESourceEstimate
 {
 public:
+    typedef QSharedPointer<MNESourceEstimate> SPtr;             /**< Shared pointer type for MNESourceEstimate. */
+    typedef QSharedPointer<const MNESourceEstimate> ConstSPtr;  /**< Const shared pointer type for MNESourceEstimate. */
 
     //=========================================================================================================
     /**
     * Default constructor
     */
-    SourceEstimate();
+    MNESourceEstimate();
 
     //=========================================================================================================
     /**
@@ -110,7 +113,7 @@ public:
     * @param[in] p_tmin
     * @param[in] p_tstep
     */
-    SourceEstimate(const MatrixXd &p_sol, const VectorXi &p_vertices, float p_tmin, float p_tstep);
+    MNESourceEstimate(const MatrixXd &p_sol, const VectorXi &p_vertices, float p_tmin, float p_tstep);
 
     //=========================================================================================================
     /**
@@ -118,7 +121,7 @@ public:
     *
     * @param[in] p_SourceEstimate    Source estimate data which should be copied
     */
-    SourceEstimate(const SourceEstimate& p_SourceEstimate);
+    MNESourceEstimate(const MNESourceEstimate& p_SourceEstimate);
 
     //=========================================================================================================
     /**
@@ -127,7 +130,7 @@ public:
     * @param[in] p_IODevice     IO device to read from the source estimation.
     *
     */
-    SourceEstimate(QIODevice &p_IODevice);
+    MNESourceEstimate(QIODevice &p_IODevice);
 
     //=========================================================================================================
     /**
@@ -142,7 +145,7 @@ public:
     * @param[in] start  The start index to cut the estimate from.
     * @param[in] n      Number of samples to cut from start index.
     */
-    SourceEstimate reduce(qint32 start, qint32 n);
+    MNESourceEstimate reduce(qint32 start, qint32 n);
 
     //=========================================================================================================
     /**
@@ -155,7 +158,7 @@ public:
     *
     * @return true if successful, false otherwise
     */
-    static bool read(QIODevice &p_IODevice, SourceEstimate& p_stc);
+    static bool read(QIODevice &p_IODevice, MNESourceEstimate& p_stc);
 
     //=========================================================================================================
     /**
@@ -183,7 +186,7 @@ public:
     *
     * @return the copied source estimate
     */
-    SourceEstimate& operator= (const SourceEstimate &rhs);
+    MNESourceEstimate& operator= (const MNESourceEstimate &rhs);
 
 public:
     MatrixXd data;          /**< Matrix of shape [n_dipoles x n_times] which contains the data in source space. */
@@ -207,11 +210,11 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline bool SourceEstimate::isEmpty()
+inline bool MNESourceEstimate::isEmpty()
 {
     return tstep == -1;
 }
 
 } //NAMESPACE
 
-#endif // SOURCEESTIMATE_H
+#endif // MNESOURCEESTIMATE_H

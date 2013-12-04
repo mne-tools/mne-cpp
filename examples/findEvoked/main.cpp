@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
-* @file     tmsichannel.cpp
-* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     main.cpp
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     September, 2013
+* @date     July, 2012
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the TMSIChannel class.
+* @brief    Implements the main() application function.
 *
 */
 
@@ -40,7 +40,13 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "tmsichannel.h"
+#include <iostream>
+#include <vector>
+#include <math.h>
+
+
+#include <fiff/fiff.h>
+#include <mne/mne.h>
 
 
 //*************************************************************************************************************
@@ -48,8 +54,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtCore/QTextStream>
-#include <QtCore/QFile>
+#include <QtCore/QCoreApplication>
 
 
 //*************************************************************************************************************
@@ -57,70 +62,39 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace TMSIPlugin;
+using namespace FIFFLIB;
+using namespace MNELIB;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// MAIN
 //=============================================================================================================
 
-TMSIChannel::TMSIChannel(QString ResourceDataPath, QString ChannelFile, bool enabled, bool visible)
-: m_qStringResourceDataPath(ResourceDataPath)
-, m_qStringChannelFile(ChannelFile)
-, m_bIsEnabled(enabled)
-, m_bIsVisible(visible)
+//=============================================================================================================
+/**
+* The function main marks the entry point of the program.
+* By default, main has the storage class extern.
+*
+* @param [in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
+* @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
+* @return the value that was set to exit() (which is 0 if exit() is called via quit()).
+*/
+int main(int argc, char *argv[])
 {
+    QCoreApplication a(argc, argv);
 
+    //generate FiffEvokedSet
+    QFile t_sampleFile("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    FiffEvokedSet p_FiffEvokedSet(t_sampleFile);
+
+    //run find_evoked function
+    p_FiffEvokedSet.find_evoked(p_FiffEvokedSet);
+
+    return a.exec();
 }
-
 
 //*************************************************************************************************************
-
-TMSIChannel::~TMSIChannel()
-{
-}
-
-
-//*************************************************************************************************************
-
-void TMSIChannel::initChannel()
-{
-    QFile file;
-    file.setFileName(m_qStringResourceDataPath+m_qStringChannelFile);
-    if(file.open(QIODevice::ReadOnly | QIODevice::Text))
-    {
-        QTextStream in(&file);
-        double value;
-
-        while(!in.atEnd())
-        {
-            in >> value;
-
-            //init min and max with first value
-            if(m_vecBuffer.size() == 0)
-            {
-                m_dMin = value;
-                m_dMax = value;
-            }
-
-            if(value < m_dMin)
-                m_dMin = value;
-
-            if(value > m_dMax)
-                m_dMax = value;
-
-            m_vecBuffer.push_back(value);
-
-        }
-        file.close();
-    }
-}
-
-
-//*************************************************************************************************************
-
-void TMSIChannel::clear()
-{
-    m_vecBuffer.clear();
-}
+//=============================================================================================================
+// STATIC DEFINITIONS
+//=============================================================================================================

@@ -43,6 +43,10 @@
 
 #include "../sourcelab.h"
 
+#include <fs/annotationset.h>
+#include <fs/surfaceset.h>
+#include <mne/mne_forwardsolution.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -50,6 +54,7 @@
 //=============================================================================================================
 
 #include <QDebug>
+#include <QFileDialog>
 
 
 //*************************************************************************************************************
@@ -71,7 +76,24 @@ SourceLabSetupWidget::SourceLabSetupWidget(SourceLab* toolbox, QWidget *parent)
 {
     ui.setupUi(this);
 
-    connect(ui.m_qPushButton_About, SIGNAL(released()), this, SLOT(showAboutDialog()));
+    ui.m_qLineEdit_FwdFileName->setText(m_pSourceLab->m_qFileFwdSolution.fileName());
+
+    ui.m_qLineEdit_AtlasDirName->setText(m_pSourceLab->m_sAtlasDir);
+    if(m_pSourceLab->m_pAnnotationSet->isEmpty())
+        ui.m_qLabel_atlasStat->setText("not loaded");
+    else
+        ui.m_qLabel_atlasStat->setText("loaded");
+
+    ui.m_qLineEdit_SurfaceDirName->setText(m_pSourceLab->m_sSurfaceDir);
+    if(m_pSourceLab->m_pSurfaceSet->isEmpty())
+        ui.m_qLabel_surfaceStat->setText("not loaded");
+    else
+        ui.m_qLabel_surfaceStat->setText("loaded");
+
+    connect(ui.m_qPushButton_About, &QPushButton::released, this, &SourceLabSetupWidget::showAboutDialog);
+    connect(ui.m_qPushButton_FwdFileDialog, &QPushButton::released, this, &SourceLabSetupWidget::showFwdFileDialog);
+    connect(ui.m_qPushButton_AtlasDirDialog, &QPushButton::released, this, &SourceLabSetupWidget::showAtlasDirDialog);
+    connect(ui.m_qPushButton_SurfaceDirDialog, &QPushButton::released, this, &SourceLabSetupWidget::showSurfaceDirDialog);
 }
 
 
@@ -89,4 +111,83 @@ void SourceLabSetupWidget::showAboutDialog()
 {
     SourceLabAboutWidget aboutDialog(this);
     aboutDialog.exec();
+}
+
+
+//*************************************************************************************************************
+
+void SourceLabSetupWidget::showFwdFileDialog()
+{
+    QString t_sFileName = QFileDialog::getOpenFileName(this,
+                                                    tr("Open Forward Solution"),
+                                                    QString(),
+                                                    tr("Fif Files (*.fif)"));
+
+    QFile file(t_sFileName);
+    MNEForwardSolution::SPtr t_pFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(file));
+
+    if(!t_pFwd->isEmpty())
+    {
+        ui.m_qLineEdit_FwdFileName->setText(t_sFileName);
+        m_pSourceLab->m_qFileFwdSolution.setFileName(t_sFileName);
+        m_pSourceLab->m_pFwd = t_pFwd;
+    }
+}
+
+
+//*************************************************************************************************************
+
+void SourceLabSetupWidget::showAtlasDirDialog()
+{
+    QString t_sAtlasDir = QFileDialog::getExistingDirectory(this, tr("Open Atlas Directory"),
+                                                            QString(),
+                                                            QFileDialog::ShowDirsOnly
+                                                            | QFileDialog::DontResolveSymlinks);
+
+    m_pSourceLab->m_sAtlasDir = t_sAtlasDir;
+
+    ui.m_qLineEdit_AtlasDirName->setText(m_pSourceLab->m_sAtlasDir);
+
+    AnnotationSet::SPtr t_pAnnotationSet = AnnotationSet::SPtr(new AnnotationSet(t_sAtlasDir+"/lh.aparc.a2009s.annot", t_sAtlasDir+"/rh.aparc.a2009s.annot"));
+
+    if(!t_pAnnotationSet->isEmpty() && t_pAnnotationSet->size() == 2)
+    {
+        m_pSourceLab->m_pAnnotationSet = t_pAnnotationSet;
+
+        m_pSourceLab->m_sAtlasDir = t_sAtlasDir;
+
+        ui.m_qLabel_atlasStat->setText("loaded");
+    }
+    else
+    {
+        m_pSourceLab->m_pAnnotationSet = AnnotationSet::SPtr(new AnnotationSet());
+        ui.m_qLabel_atlasStat->setText("not loaded");
+    }
+}
+
+
+//*************************************************************************************************************
+
+void SourceLabSetupWidget::showSurfaceDirDialog()
+{
+    QString t_sSurfaceDir = QFileDialog::getExistingDirectory(  this, tr("Open Surface Directory"),
+                                                                QString(),
+                                                                QFileDialog::ShowDirsOnly
+                                                                | QFileDialog::DontResolveSymlinks);
+
+    SurfaceSet::SPtr t_pSurfaceSet = SurfaceSet::SPtr(new SurfaceSet(t_sSurfaceDir+"/lh.white", t_sSurfaceDir+"/rh.white"));
+
+    if(!t_pSurfaceSet->isEmpty() && t_pSurfaceSet->size() == 2)
+    {
+        m_pSourceLab->m_pSurfaceSet = t_pSurfaceSet;
+
+        m_pSourceLab->m_sSurfaceDir = t_sSurfaceDir;
+
+        ui.m_qLabel_surfaceStat->setText("loaded");
+    }
+    else
+    {
+        m_pSourceLab->m_pSurfaceSet = SurfaceSet::SPtr(new SurfaceSet());
+        ui.m_qLabel_surfaceStat->setText("not loaded");
+    }
 }

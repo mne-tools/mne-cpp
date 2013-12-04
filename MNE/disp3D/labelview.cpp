@@ -106,7 +106,7 @@ LabelView::~LabelView()
 
 //*************************************************************************************************************
 
-void LabelView::pushSourceEstimate(SourceEstimate &p_sourceEstimate)
+void LabelView::pushSourceEstimate(MNESourceEstimate &p_sourceEstimate)
 {
     m_timer->stop();
     m_curSourceEstimate = p_sourceEstimate;

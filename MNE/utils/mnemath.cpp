@@ -278,6 +278,8 @@ MatrixXd MNEMath::legendre(qint32 n, const VectorXd &X, QString normalize)
 {
     MatrixXd y;
 
+    Q_UNUSED ( y );
+
     //ToDo
 
     return y;
