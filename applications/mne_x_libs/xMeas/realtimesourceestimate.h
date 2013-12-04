@@ -50,6 +50,7 @@
 #include <fs/annotationset.h>
 #include <fiff/fiff_info.h>
 #include <mne/mne_sourcespace.h>
+#include <mne/mne_sourceestimate.h>
 
 
 //*************************************************************************************************************
@@ -157,11 +158,27 @@ public:
 
     //=========================================================================================================
     /**
+    * Sets the sampling rate of the NewRealTimeSampleArray Measurement.
+    *
+    * @param [in] dSamplingRate the sampling rate of the NewRealTimeSampleArray.
+    */
+    inline void setSamplingRate(double dSamplingRate);
+
+    //=========================================================================================================
+    /**
+    * Returns the sampling rate of the NewRealTimeSampleArray Measurement.
+    *
+    * @return the sampling rate of the NewRealTimeSampleArray.
+    */
+    inline double getSamplingRate() const;
+
+    //=========================================================================================================
+    /**
     * Sets the number of sample vectors which should be gathered before attached observers are notified by calling the Subject notify() method.
     *
-    * @param[in] ucArraySize the number of values.
+    * @param[in] iArraySize the number of values.
     */
-    inline void setArraySize(unsigned char ucArraySize);
+    inline void setArraySize(qint32 iArraySize);
 
     //=========================================================================================================
     /**
@@ -169,15 +186,7 @@ public:
     *
     * @return the number of values which are gathered before a notify() is called.
     */
-    inline unsigned char getArraySize() const;
-
-    //=========================================================================================================
-    /**
-    * Returns the gathered multi sample array.
-    *
-    * @return the current multi sample array.
-    */
-    inline const QVector< VectorXd >& getSourceArray();
+    inline qint32 getArraySize() const;
 
     //=========================================================================================================
     /**
@@ -207,11 +216,22 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns if source space is set.
+    * Returns the source space if source space is set.
     *
     * @return the connected source space
     */
     inline MNESourceSpace& getSrc();
+
+    //=========================================================================================================
+    /**
+    * Returns if source space is set.
+    *
+    * @return the connected source space
+    */
+    inline MNESourceEstimate& getStc();
+
+
+    bool m_bStcSend; //dirty hack
 
 private:
     AnnotationSet::SPtr     m_pAnnotSet;    /**< Annotation set. */
@@ -221,11 +241,16 @@ private:
     QList<Label> m_pListLabel;          /**< List of labels. */
     QList<RowVector4i> m_pListRGBA;     /**< List of RGBAs corresponding to labels. */
 
-
     double                      m_dSamplingRate;    /**< Sampling rate of the RealTimeSampleArray.*/
+    float                       m_fT;               /**< Time between two samples.*/
     VectorXd                    m_vecValue;         /**< The current attached sample vector.*/
-    unsigned char               m_ucArraySize;      /**< Sample size of the multi sample array.*/
-    QVector< VectorXd >         m_matSamples;       /**< The source estimate array.*/
+    qint32                      m_iArraySize;      /**< Sample size of the source estimate.*/
+    qint32                      m_iCurIdx;         /**< Sample size of the multi sample array.*/
+
+    float                       m_fCurTimePoint;    /**< The current time point.*/
+
+    MNESourceEstimate           m_MNEStc;           /**< The source estimate. */
+
 };
 
 
@@ -286,29 +311,44 @@ inline SurfaceSet::SPtr& RealTimeSourceEstimate::getSurfSet()
 
 //*************************************************************************************************************
 
-inline void RealTimeSourceEstimate::setArraySize(unsigned char ucArraySize)
+inline void RealTimeSourceEstimate::setSamplingRate(double dSamplingRate)
+{
+    m_dSamplingRate = dSamplingRate;
+    m_fT = 1.0f/(float)dSamplingRate;
+
+    m_MNEStc.tstep = m_fT;
+}
+
+
+//*************************************************************************************************************
+
+inline double RealTimeSourceEstimate::getSamplingRate() const
+{
+    return m_dSamplingRate;
+}
+
+
+//*************************************************************************************************************
+
+inline void RealTimeSourceEstimate::setArraySize(qint32 iArraySize)
 {
     //Obsolete unsigned char can't be bigger
-//    if(ucArraySize > 255)
-//        m_ucArraySize = 255;
-//    else
-        m_ucArraySize = ucArraySize;
+    if(iArraySize > 255)
+        m_iArraySize = 255;
+    else
+        m_iArraySize = iArraySize;
+
+    //reset data
+    m_MNEStc.data = MatrixXd(0,0);
+    m_MNEStc.times = RowVectorXf::Zero(m_iArraySize);
 }
 
 
 //*************************************************************************************************************
 
-unsigned char RealTimeSourceEstimate::getArraySize() const
+qint32 RealTimeSourceEstimate::getArraySize() const
 {
-    return m_ucArraySize;
-}
-
-
-//*************************************************************************************************************
-
-inline const QVector< VectorXd >& RealTimeSourceEstimate::getSourceArray()
-{
-    return m_matSamples;
+    return m_iArraySize;
 }
 
 
@@ -325,6 +365,14 @@ inline void RealTimeSourceEstimate::setSrc(MNESourceSpace& src)
 inline MNESourceSpace& RealTimeSourceEstimate::getSrc()
 {
     return m_pSrc;
+}
+
+
+//*************************************************************************************************************
+
+inline MNESourceEstimate& RealTimeSourceEstimate::getStc()
+{
+    return m_MNEStc;
 }
 
 } // NAMESPACE

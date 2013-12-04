@@ -44,7 +44,7 @@
 #include <fs/annotationset.h>
 
 #include <fiff/fiff_evoked.h>
-#include <inverse/sourceestimate.h>
+#include <mne/mne_sourceestimate.h>
 #include <inverse/minimumNorm/minimumnorm.h>
 
 #include <disp3D/inverseview.h>
@@ -142,7 +142,7 @@ int main(int argc, char *argv[])
     // Compute inverse solution
     //
     MinimumNorm minimumNorm(inverse_operator, lambda2, method);
-    SourceEstimate sourceEstimate = minimumNorm.calculateInverse(evoked);
+    MNESourceEstimate sourceEstimate = minimumNorm.calculateInverse(evoked);
 
     if(sourceEstimate.isEmpty())
         return 1;
@@ -166,7 +166,7 @@ int main(int argc, char *argv[])
     //ToDo overload toLabels using instead of t_surfSet rr of MNESourceSpace
     t_annotSet.toLabels(t_surfSet, t_qListLabels, t_qListRGBAs);
 
-    InverseView view(minimumNorm.getSourceSpace(), t_qListLabels, t_qListRGBAs);
+    InverseView view(minimumNorm.getSourceSpace(), t_qListLabels, t_qListRGBAs, 24, true);
 
     if (view.stereoType() != QGLView::RedCyanAnaglyph)
         view.camera()->setEyeSeparation(0.3f);

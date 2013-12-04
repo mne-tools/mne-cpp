@@ -1,5 +1,14 @@
 var searchData=
 [
+  ['fiff_5fbem_5fcoord_5fframe',['FIFF_BEM_COORD_FRAME',['../fiff__constants_8h.html#a793b37a461ec04db1b67e0e4fa42d3ab',1,'fiff_constants.h']]],
+  ['fiff_5fbem_5fsigma',['FIFF_BEM_SIGMA',['../fiff__constants_8h.html#a9559defd7b5516ba89985e3e5ee1424f',1,'fiff_constants.h']]],
+  ['fiff_5fbem_5fsurf_5fid',['FIFF_BEM_SURF_ID',['../fiff__constants_8h.html#a92b229995ffba1151d4baa1393c1fa3e',1,'fiff_constants.h']]],
+  ['fiff_5fbem_5fsurf_5fname',['FIFF_BEM_SURF_NAME',['../fiff__constants_8h.html#ac9ce712a9969173a412dfbbf9d39679f',1,'fiff_constants.h']]],
+  ['fiff_5fbem_5fsurf_5fnnode',['FIFF_BEM_SURF_NNODE',['../fiff__constants_8h.html#a610c51649cd8ce35b27f42928e837e8a',1,'fiff_constants.h']]],
+  ['fiff_5fbem_5fsurf_5fnodes',['FIFF_BEM_SURF_NODES',['../fiff__constants_8h.html#a73fb31aee6f7dbf4cd0148719e7e09f4',1,'fiff_constants.h']]],
+  ['fiff_5fbem_5fsurf_5fnormals',['FIFF_BEM_SURF_NORMALS',['../fiff__constants_8h.html#ac534a656d0ced033deb45228e63408ae',1,'fiff_constants.h']]],
+  ['fiff_5fbem_5fsurf_5fntri',['FIFF_BEM_SURF_NTRI',['../fiff__constants_8h.html#a9462e157ffe22cf60488405e3ee20039',1,'fiff_constants.h']]],
+  ['fiff_5fbem_5fsurf_5ftriangles',['FIFF_BEM_SURF_TRIANGLES',['../fiff__constants_8h.html#a7667fad810eb69f677aeb03df7ea9b8f',1,'fiff_constants.h']]],
   ['fiff_5fdata_5fbuffer',['FIFF_DATA_BUFFER',['../fiff__constants_8h.html#a0136b998f6acc7a0a02f8c46a7300d59',1,'fiff_constants.h']]],
   ['fiff_5fdata_5fskip',['FIFF_DATA_SKIP',['../fiff__constants_8h.html#ae77686d2eb7f936a7a55431a5df1951e',1,'fiff_constants.h']]],
   ['fiff_5fdata_5fskip_5fsamp',['FIFF_DATA_SKIP_SAMP',['../fiff__constants_8h.html#a338f7425177ff0e6bbf163af92ee7f45',1,'fiff_constants.h']]],
@@ -55,6 +64,8 @@ var searchData=
   ['fiff_5funit_5fam_5fm2',['FIFF_UNIT_AM_M2',['../fiff__constants_8h.html#a48bc75930b9f5f7bf0ebedf003ef7175',1,'fiff_constants.h']]],
   ['fiff_5funit_5fam_5fm3',['FIFF_UNIT_AM_M3',['../fiff__constants_8h.html#ad0f904a8d0cbe2a8f188c063611cb854',1,'fiff_constants.h']]],
   ['fiff_5funit_5ft_5fm',['FIFF_UNIT_T_M',['../fiff__constants_8h.html#ae772550aceede71f6a7595227c44e261',1,'FIFF_UNIT_T_M():&#160;fiff_constants.h'],['../fiff__constants_8h.html#ae772550aceede71f6a7595227c44e261',1,'FIFF_UNIT_T_M():&#160;fiff_constants.h']]],
+  ['fiffb_5fbem',['FIFFB_BEM',['../fiff__constants_8h.html#a84b6ad0e234363428a256d029249ae29',1,'fiff_constants.h']]],
+  ['fiffb_5fbem_5fsurf',['FIFFB_BEM_SURF',['../fiff__constants_8h.html#a55eefaa57fa48e7a59f8df7e30a33d29',1,'fiff_constants.h']]],
   ['fiffb_5fmne_5frt_5fmeas_5finfo',['FIFFB_MNE_RT_MEAS_INFO',['../fiff__constants_8h.html#a55e61168958e1e00a300b17682d408c1',1,'fiff_constants.h']]],
   ['fiffshared_5fexport',['FIFFSHARED_EXPORT',['../fiff__global_8h.html#aab6c6e9f74ed9d6762feab45287c6ad8',1,'fiff_global.h']]],
   ['fiffv_5faspect_5faltaverage',['FIFFV_ASPECT_ALTAVERAGE',['../fiff__constants_8h.html#ae4871050039404e9e5b4e978196d19a2',1,'fiff_constants.h']]],

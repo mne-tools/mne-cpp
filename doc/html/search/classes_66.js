@@ -20,5 +20,6 @@ var searchData=
   ['fiffrawdata',['FiffRawData',['../class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html',1,'FIFFLIB']]],
   ['fiffrawdir',['FiffRawDir',['../class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html',1,'FIFFLIB']]],
   ['fiffstream',['FiffStream',['../class_f_i_f_f_l_i_b_1_1_fiff_stream.html',1,'FIFFLIB']]],
-  ['fifftag',['FiffTag',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html',1,'FIFFLIB']]]
+  ['fifftag',['FiffTag',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html',1,'FIFFLIB']]],
+  ['filtertools',['FilterTools',['../class_u_t_i_l_s_l_i_b_1_1_filter_tools.html',1,'UTILSLIB']]]
 ];

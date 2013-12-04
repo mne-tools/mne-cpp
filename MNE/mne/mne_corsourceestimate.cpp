@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     sourcelabrunwidget.h
+* @file     mne_corsourceestimate.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     November, 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,45 +29,20 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the SourceLabRunWidget class.
+* @brief    Implementation of the MNECorSourceEstimate Class.
 *
 */
-
-#ifndef SOURCELABRUNWIDGET_H
-#define SOURCELABRUNWIDGET_H
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_sourcelabrun.h"
+#include "mne_corsourceestimate.h"
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QtWidgets>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE SourceLabPlugin
-//=============================================================================================================
-
-namespace SourceLabPlugin
-{
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-class SourceLab;
+#include <QFile>
+#include <QDataStream>
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
@@ -75,58 +50,78 @@ class SourceLab;
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace MNELIB;
 
+
+//*************************************************************************************************************
 //=============================================================================================================
-/**
-* DECLARE CLASS SourceLabRunWidget
-*
-* @brief The SourceLabRunWidget class provides the SourceLab configuration window for the run mode.
-*/
-class SourceLabRunWidget : public QWidget
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+MNECorSourceEstimate::MNECorSourceEstimate()
+: MNESourceEstimate()
 {
-    Q_OBJECT
+}
 
-public:
 
-    //=========================================================================================================
-    /**
-    * Constructs a SourceLabRunWidget which is a child of parent.
-    *
-    * @param [in] toolbox a pointer to the corresponding SourceLab.
-    * @param [in] parent pointer to parent widget; If parent is 0, the new DummyRunWidget becomes a window. If parent is another widget, DummyRunWidget becomes a child window inside parent. DummyRunWidget is deleted when its parent is deleted.
-    */
-    SourceLabRunWidget(SourceLab* toolbox, QWidget *parent = 0);
+//*************************************************************************************************************
 
-    //=========================================================================================================
-    /**
-    * Destroys the SourceLabRunWidget.
-    * All SourceLabRunWidget's children are deleted first. The application exits if SourceLabRunWidget is the main widget.
-    */
-    ~SourceLabRunWidget();
+MNECorSourceEstimate::MNECorSourceEstimate(const MatrixXd &p_sol, const VectorXi &p_vertices, float p_tmin, float p_tstep)
+: MNESourceEstimate(p_sol, p_vertices, p_tmin, p_tstep)
+{
+}
 
-    //=========================================================================================================
-    /**
-    * Writes to SourceLab run log
-    *
-    * @param[in] p_sLogMsg     status message to append
-    */
-    void writeToLog(QString p_sLogMsg);
 
-private slots:
-    //=========================================================================================================
-    /**
-    * Shows the About Dialog
-    *
-    */
-    void showAboutDialog();
+//*************************************************************************************************************
 
-private:
+MNECorSourceEstimate::MNECorSourceEstimate(const MNECorSourceEstimate& p_SourceEstimate)
+: MNESourceEstimate(p_SourceEstimate)
+{
 
-    SourceLab*    m_pSourceLab;     /**< Holds a pointer to corresponding DummyToolbox.*/
+}
 
-    Ui::SourceLabRunWidgetClass ui; /**< Holds the user interface for the DummyRunWidget.*/
-};
 
-} // NAMESPACE
+//*************************************************************************************************************
 
-#endif // SOURCELABRUNWIDGET_H
+MNECorSourceEstimate::MNECorSourceEstimate(QIODevice &p_IODevice)
+: MNESourceEstimate(p_IODevice)
+{
+}
+
+
+//*************************************************************************************************************
+
+void MNECorSourceEstimate::clear()
+{
+    MNESourceEstimate::clear();
+
+}
+
+
+//*************************************************************************************************************
+
+bool MNECorSourceEstimate::read(QIODevice &p_IODevice, MNECorSourceEstimate& p_stc)
+{
+    return MNESourceEstimate::read(p_IODevice, p_stc);
+}
+
+
+//*************************************************************************************************************
+
+bool MNECorSourceEstimate::write(QIODevice &p_IODevice)
+{
+    return MNESourceEstimate::write(p_IODevice);
+}
+
+
+//*************************************************************************************************************
+
+MNECorSourceEstimate& MNECorSourceEstimate::operator= (const MNECorSourceEstimate &rhs)
+{
+    if (this != &rhs) // protect against invalid self-assignment
+    {
+        MNESourceEstimate::operator= (rhs);
+    }
+    // to support chained assignment operators (a=b=c), always return *this
+    return *this;
+}

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     sourceestimate.cpp
+* @file     mne_sourceestimate.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "sourceestimate.h"
+#include "mne_sourceestimate.h"
 
 #include <QFile>
 #include <QDataStream>
@@ -50,7 +50,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace INVERSELIB;
+using namespace MNELIB;
 
 
 //*************************************************************************************************************
@@ -58,7 +58,7 @@ using namespace INVERSELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SourceEstimate::SourceEstimate()
+MNESourceEstimate::MNESourceEstimate()
 : tmin(0)
 , tstep(-1)
 {
@@ -67,7 +67,7 @@ SourceEstimate::SourceEstimate()
 
 //*************************************************************************************************************
 
-SourceEstimate::SourceEstimate(const MatrixXd &p_sol, const VectorXi &p_vertices, float p_tmin, float p_tstep)
+MNESourceEstimate::MNESourceEstimate(const MatrixXd &p_sol, const VectorXi &p_vertices, float p_tmin, float p_tstep)
 : data(p_sol)
 , vertices(p_vertices)
 , tmin(p_tmin)
@@ -79,7 +79,7 @@ SourceEstimate::SourceEstimate(const MatrixXd &p_sol, const VectorXi &p_vertices
 
 //*************************************************************************************************************
 
-SourceEstimate::SourceEstimate(const SourceEstimate& p_SourceEstimate)
+MNESourceEstimate::MNESourceEstimate(const MNESourceEstimate& p_SourceEstimate)
 : data(p_SourceEstimate.data)
 , vertices(p_SourceEstimate.vertices)
 , times(p_SourceEstimate.times)
@@ -92,7 +92,7 @@ SourceEstimate::SourceEstimate(const SourceEstimate& p_SourceEstimate)
 
 //*************************************************************************************************************
 
-SourceEstimate::SourceEstimate(QIODevice &p_IODevice)
+MNESourceEstimate::MNESourceEstimate(QIODevice &p_IODevice)
 : tmin(0)
 , tstep(-1)
 {
@@ -106,7 +106,7 @@ SourceEstimate::SourceEstimate(QIODevice &p_IODevice)
 
 //*************************************************************************************************************
 
-void SourceEstimate::clear()
+void MNESourceEstimate::clear()
 {
     data = MatrixXd();
     vertices = VectorXi();
@@ -118,9 +118,9 @@ void SourceEstimate::clear()
 
 //*************************************************************************************************************
 
-SourceEstimate SourceEstimate::reduce(qint32 start, qint32 n)
+MNESourceEstimate MNESourceEstimate::reduce(qint32 start, qint32 n)
 {
-    SourceEstimate p_sourceEstimateReduced;
+    MNESourceEstimate p_sourceEstimateReduced;
 
     qint32 rows = this->data.rows();
 
@@ -138,7 +138,7 @@ SourceEstimate SourceEstimate::reduce(qint32 start, qint32 n)
 
 //*************************************************************************************************************
 
-bool SourceEstimate::read(QIODevice &p_IODevice, SourceEstimate& p_stc)
+bool MNESourceEstimate::read(QIODevice &p_IODevice, MNESourceEstimate& p_stc)
 {
     QSharedPointer<QDataStream> t_pStream(new QDataStream(&p_IODevice));
 
@@ -196,7 +196,7 @@ bool SourceEstimate::read(QIODevice &p_IODevice, SourceEstimate& p_stc)
 
 //*************************************************************************************************************
 
-bool SourceEstimate::write(QIODevice &p_IODevice)
+bool MNESourceEstimate::write(QIODevice &p_IODevice)
 {
     // Create the file and save the essentials
     QSharedPointer<QDataStream> t_pStream(new QDataStream(&p_IODevice));
@@ -244,7 +244,7 @@ bool SourceEstimate::write(QIODevice &p_IODevice)
 
 //*************************************************************************************************************
 
-void SourceEstimate::update_times()
+void MNESourceEstimate::update_times()
 {
     if(data.cols() > 0)
     {
@@ -260,7 +260,7 @@ void SourceEstimate::update_times()
 
 //*************************************************************************************************************
 
-SourceEstimate& SourceEstimate::operator= (const SourceEstimate &rhs)
+MNESourceEstimate& MNESourceEstimate::operator= (const MNESourceEstimate &rhs)
 {
     if (this != &rhs) // protect against invalid self-assignment
     {

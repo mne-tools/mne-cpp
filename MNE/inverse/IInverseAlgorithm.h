@@ -57,6 +57,7 @@ class FiffEvoked;
 namespace MNELIB
 {
 class MNESourceSpace;
+class MNESourceEstimate;
 }
 
 //*************************************************************************************************************
@@ -81,8 +82,6 @@ using namespace Eigen;
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
-
-class SourceEstimate;
 
 
 //=============================================================================================================
@@ -110,7 +109,7 @@ public:
     *
     * @return the calculated source estimation
     */
-    virtual SourceEstimate calculateInverse(const FiffEvoked &p_fiffEvoked, bool pick_normal = false) = 0;
+    virtual MNESourceEstimate calculateInverse(const FiffEvoked &p_fiffEvoked, bool pick_normal = false) = 0;
 
     //=========================================================================================================
     /**
@@ -122,7 +121,7 @@ public:
     *
     * @return the calculated source estimation
     */
-    virtual SourceEstimate calculateInverse(const MatrixXd &data, float tmin, float tstep) const = 0;
+    virtual MNESourceEstimate calculateInverse(const MatrixXd &data, float tmin, float tstep) const = 0;
 
     //=========================================================================================================
     /**

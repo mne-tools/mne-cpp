@@ -39,6 +39,12 @@ TEMPLATE = lib
 
 QT += widgets
 
+qtHaveModule(3d) {
+    QT += 3d
+
+    DEFINES += QT3D_LIBRARY_AVAILABLE
+}
+
 DEFINES += MNE_X_LIBRARY
 
 TARGET = mne_x
@@ -51,6 +57,7 @@ CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
             -lMNE$${MNE_LIB_VERSION}Fsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
+            -lMNE$${MNE_LIB_VERSION}Dispd \
             -lxMeasd \
             -lxDispd
 }
@@ -58,8 +65,18 @@ else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
             -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \
+            -lMNE$${MNE_LIB_VERSION}Disp \
             -lxMeas \
             -lxDisp
+}
+
+qtHaveModule(3d) {
+    CONFIG(debug, debug|release) {
+        LIBS += -lMNE$${MNE_LIB_VERSION}Disp3Dd
+    }
+    else {
+        LIBS += -lMNE$${MNE_LIB_VERSION}Disp3D
+    }
 }
 
 DESTDIR = $${MNE_LIBRARY_DIR}
