@@ -95,7 +95,7 @@ TMSISetupWidget::TMSISetupWidget(TMSI* pTMSI, QWidget* parent)
     connect(ui.m_checkBox_UsePreprocessing, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
             this, &TMSISetupWidget::setPreprocessing);
 
-    //Connect presprocessing
+    //Connect postprocessing
     connect(ui.m_checkBox_UseFFT, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
             this, &TMSISetupWidget::setPostprocessing);
 
@@ -137,7 +137,7 @@ TMSISetupWidget::~TMSISetupWidget()
 
 //*************************************************************************************************************
 
-void TMSISetupWidget::initSamplingProperties()
+void TMSISetupWidget::initGui()
 {
     //Init device sampling properties
     ui.m_spinBox_SamplingFreq->setValue(m_pTMSI->m_iSamplingFreq);
@@ -185,7 +185,7 @@ void TMSISetupWidget::setDeviceSamplingProperties()
 
 void TMSISetupWidget::setPreprocessing()
 {
-    m_pTMSI->m_bUsePreprocessing = ui.m_checkBox_UseFFT->isChecked();
+    m_pTMSI->m_bUsePreprocessing = ui.m_checkBox_UsePreprocessing->isChecked();
 }
 
 
