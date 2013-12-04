@@ -119,7 +119,7 @@ void TMSI::init()
     m_bUsePreprocessing = false;
     m_bUseFFT = false;
     m_bIsRunning = false;
-    m_sOutputFilePath = QString("C:/Lorenz Esch/Dropbox/Masterarbeit DB/Messdaten/EEG/EEG_data_001_raw.fif");
+    m_sOutputFilePath = QString("./mne_x_plugins/resources/tmsi/EEG_data_001_raw.fif");
     m_sElcFilePath = QString("./mne_x_plugins/resources/tmsi/loc_files/Lorenz-Duke128-28-11-2013.elc");
 
     m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo());
