@@ -113,7 +113,7 @@ public:
     *
     * @param[in] p_qlistIODevices    A QList of fiff IO devices like a fiff QFile or QTCPSocket
     */
-    //FiffIO(QList<QIODevice>& p_qlistIODevices);
+    FiffIO(QList<QIODevice*>& p_qlistIODevices);
 
     //=========================================================================================================
     /**
@@ -129,11 +129,14 @@ public:
     * Setup a FiffStream
     *
     * @param[in] p_IODevice     An fiff IO device like a fiff QFile or QTCPSocket
+    * @param[in] info           Overall info for fiff IO device
+    * @param[out] Tree          Directory tree structure
+    * @param[out] dirTree       Node directory structure
     *
     * @return true if succeeded, false otherwise
     */
 
-    static bool setup_read(QIODevice& p_IODevice, FiffInfo& info, FiffDirTree& dirTree);
+    static bool setup_read(QIODevice& p_IODevice, FiffInfo& info, FiffDirTree& Tree, FiffDirTree& dirTree);
 
     //=========================================================================================================
     /**
@@ -149,7 +152,7 @@ public:
     *
     * @param[in] p_qlistIODevices    A QList of fiff IO devices like a fiff QFile or QTCPSocket
     */
-    //bool read(QList<QIODevice> p_qlistIODevices);
+    bool read(QList<QIODevice>& p_qlistIODevices);
 
     //=========================================================================================================
     /**
@@ -167,21 +170,37 @@ public:
     */
     //bool write(QString filename, QString folder = "./"); //including AutoFileNaming, e.g. -raw/evoked/fwd.fiff
 
-private:
+    //=========================================================================================================
+    /**
+    * Overloading ostream for printing member infos
+    *
+    * @param[in] p_fiffIO    the fiffIO, whose members shall be printed
+    */
 
+    friend std::ostream& operator<<(std::ostream& out, const FiffIO &p_fiffIO) {
+        out << "\n\n---------------------- Fiff data read summary ---------------------- " << std::endl;
+        out << p_fiffIO.m_qlistRaw.size() << " raw data sets found! " << std::endl;
+        out << p_fiffIO.m_qlistEvoked.size() << " evoked sets found!" << std::endl;
+        out << p_fiffIO.m_qlistFwd.size() << " forward solutions found!" << std::endl;
+        out << p_fiffIO.m_qlistCov.size() << " covariances found!" << std::endl;
+        return out;
+    }
+
+private:
     QList<QSharedPointer<FiffRawData> > m_qlistRaw;
     QList<QSharedPointer<FiffEvoked> > m_qlistEvoked;
-    QList<QSharedPointer<FiffProj> > m_qlistProj; //remove
     QList<QSharedPointer<MNEForwardSolution> > m_qlistFwd;
     QList<QSharedPointer<FiffCov> > m_qlistCov;
-    QList<QSharedPointer<FiffNamedMatrix> > m_qlistNMatrix; //rem
-    //add epochs, label, annotation
+    //label, annotation
+
 };
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
+
+
 
 
 } // NAMESPACE
