@@ -86,6 +86,8 @@ class TriggerControlSetupWidget : public QWidget
 {
     Q_OBJECT
 
+    friend class SettingsWidget;
+
 public:
 
     //=========================================================================================================
@@ -104,8 +106,7 @@ public:
     */
     ~TriggerControlSetupWidget();
 
-
-private slots:
+private:
     //=========================================================================================================
     /**
     * Shows the About Dialog
@@ -113,7 +114,14 @@ private slots:
     */
     void showAboutDialog();
 
-private:
+
+    //=========================================================================================================
+    /**
+    * Shows the settings widget
+    */
+    void showSettings();
+
+
 
     TriggerControl* m_pTriggerControl;  /**< Holds a pointer to corresponding TriggerControl.*/
 

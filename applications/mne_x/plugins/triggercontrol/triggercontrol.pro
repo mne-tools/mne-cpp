@@ -69,19 +69,19 @@ SOURCES += \
         triggercontrol.cpp \
         FormFiles/triggercontrolsetupwidget.cpp \
         FormFiles/triggercontrolaboutwidget.cpp \
-    settingsdialog.cpp
+        FormFiles/settingswidget.cpp
 
 HEADERS += \
         triggercontrol.h\
         triggercontrol_global.h \
         FormFiles/triggercontrolsetupwidget.h \
         FormFiles/triggercontrolaboutwidget.h \
-    settingsdialog.h
+        FormFiles/settingswidget.h
 
 FORMS += \
         FormFiles/triggercontrolsetup.ui \
         FormFiles/triggercontrolabout.ui \
-    settingsdialog.ui
+        FormFiles/settingswidget.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
