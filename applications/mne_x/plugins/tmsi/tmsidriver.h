@@ -204,13 +204,16 @@ class TMSIProducer;
         cout<< "Plugin TMSI - ERROR - Error loading method " << name << "\n"; \
 
 // Check windows
-#if _WIN32 || _WIN64
-#if _WIN64
-#define ENVIRONMENT 64
-#else
-#define ENVIRONMENT 32
+#if defined (TAKE_TMSISDK_DLL)
+#define TMSISDK true
+#define TMSISDK32 false
 #endif
+
+#if defined (TAKE_TMSISDK_32_DLL)
+#define TMSISDK32 true
+#define TMSISDK false
 #endif
+
 
 //=============================================================================================================
 /**

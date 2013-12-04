@@ -82,30 +82,13 @@ TMSIDriver::TMSIDriver(TMSIProducer* pTMSIProducer)
 //    lstrcat(Path, _T("\\TMSiSDK.dll"));
 //    m_oLibHandle = LoadLibrary(Path);
 
-    if(QSysInfo::WordSize == 32)
-    {
-        //MNE-X was compiled in 32 bit
-
-        if(ENVIRONMENT == 32)//If 32 bit compiled MNE-X is running on a 32 bit windows system
-        {
-            cout<<"MNE-X was compiled in: "<<QSysInfo::WordSize<<"bit and is running on a "<<ENVIRONMENT<<"bit system."<<endl;
-            m_oLibHandle = ::LoadLibrary(L"C:\\Windows\\System32\\TMSiSDK.dll");
-        }
-
-        if(ENVIRONMENT == 64)//If 32 bit compiled MNE-X is running on a 64 bit windows system
-        {
-            cout<<"MNE-X was compiled in: "<<QSysInfo::WordSize<<"bit and is running on a "<<ENVIRONMENT<<"bit system."<<endl;
-            m_oLibHandle = ::LoadLibrary(L"C:\\Windows\\SysWOW64\\TMSiSDK32.dll");
-        }
-    }
-    else
-    {
-        //MNE-X was compiled in 64 bit
-        cout<<"MNE-X was compiled in: "<<QSysInfo::WordSize<<"bit"<<endl;
+    //Check which driver dll to take: TMSiSDK.dll oder TMSiSDK32bit.dll
+    if(TMSISDK)
         m_oLibHandle = ::LoadLibrary(L"C:\\Windows\\System32\\TMSiSDK.dll");
-    }
+    if(TMSISDK32)
+        m_oLibHandle = ::LoadLibrary(L"C:\\Windows\\SysWOW64\\TMSiSDK32bit.dll");
 
-    //If it can't be open return
+    //If dll can't be open return
     if( m_oLibHandle == NULL)
     {
         cout << "Plugin TMSI - ERROR - Couldn't load DLL - Check if the driver for the TMSi USB Fiber Connector installed in the system dir" << endl;
@@ -488,8 +471,4 @@ bool TMSIDriver::uninitDevice()
 
 //    return true;
 }
-
-
-//*************************************************************************************************************
-
 

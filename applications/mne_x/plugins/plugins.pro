@@ -49,22 +49,22 @@ SUBDIRS += \
 win32 { #Only compile the TMSI plugin if a windows system is used - TMSi driver is not available for linux yet
     contains(QMAKE_HOST.arch, x86_64) { #Compiling MNE-X FOR a 64bit system
         exists(C:/Windows/System32/TMSiSDK.dll) {
-            message(TMSI plugin configured! TMSi Driver found!)
+            message(Compiling MNE-X FOR a 64bit system: TMSI plugin configured! TMSi Driver found!)
             SUBDIRS += tmsi
         }
     }
     else {
-        exists(C:/Windows/System32/TMSiSDK.dll) { #Compiling MNE-X FOR a 32bit system ON a 32bit system
-            message(TMSI plugin configured! TMSi Driver found!)
+        exists(C:/Windows/SysWOW64/TMSiSDK32bit.dll) { #Compiling MNE-X FOR a 32bit system ON a 64bit system
+            message(Compiling MNE-X FOR a 32bit system ON a 64bit system: TMSI plugin configured! TMSi Driver found!)
             SUBDIRS += tmsi
         }
         else {
-            exists(C:/Windows/SysWOW64/TMSiSDK32bit.dll) { #Compiling MNE-X FOR a 32bit system ON a 64bit system
-                message(TMSI plugin configured! TMSi Driver found!)
+            exists(C:/Windows/System32/TMSiSDK.dll) { #Compiling MNE-X FOR a 32bit system ON a 32bit system
+                message(Compiling MNE-X FOR a 32bit system ON a 32bit system: TMSI plugin configured! TMSi Driver found!)
                 SUBDIRS += tmsi
             }
             else {
-                message(TMSI plugin not configured! TMSi Driver found!)
+                message(TMSI plugin not configured! TMSi Driver not found!)
             }
         }
     }
