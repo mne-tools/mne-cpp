@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     dummytoolbox.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+* @file     triggercontrol.h
+* @author   Tim Kunze <tim.kunze@tu-ilmenau.de>;
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     February, 2013
+* @date     November, 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2013, Tim Kunze and Christoph Dinh. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the DummyToolbox class.
+* @brief    Contains the declaration of the TriggerControl class.
 *
 */
 
