@@ -56,7 +56,7 @@
        <property name="minimumSize">
         <size>
          <width>0</width>
-         <height>100</height>
+         <height>50</height>
         </size>
        </property>
        <property name="title">
@@ -66,6 +66,66 @@
         <bool>false</bool>
        </property>
        <layout class="QGridLayout" name="m_qGridLayout_Properties"/>
+      </widget>
+     </item>
+     <item row="5" column="1">
+      <spacer name="m_qHorizontalSpacer_About">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item row="5" column="2">
+      <widget class="QPushButton" name="m_qPushButton_About">
+       <property name="text">
+        <string>About</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="2">
+      <widget class="QPushButton" name="m_qPushButton_Connect">
+       <property name="text">
+        <string>Connect</string>
+       </property>
+      </widget>
+     </item>
+     <item row="3" column="2">
+      <widget class="QPushButton" name="m_qPushButton_Disconnect">
+       <property name="text">
+        <string>Disconnect</string>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1" rowspan="5">
+      <widget class="QGroupBox" name="m_qGroupBox_Information">
+       <property name="title">
+        <string>Information</string>
+       </property>
+       <layout class="QGridLayout" name="m_qGridLayout_Information">
+        <item row="0" column="0">
+         <widget class="QTextBrowser" name="m_qTextBrowser_Information"/>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="m_qLabel_Statusbar">
+          <property name="text">
+           <string>Status</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item row="1" column="2">
+      <widget class="QPushButton" name="m_qPushButton_Settings">
+       <property name="text">
+        <string>Settings</string>
+       </property>
       </widget>
      </item>
      <item row="1" column="0">
@@ -85,53 +145,72 @@
        <property name="title">
         <string>Channels</string>
        </property>
-       <layout class="QGridLayout" name="m_qGridLayout_Channels"/>
-      </widget>
-     </item>
-     <item row="3" column="1">
-      <spacer name="m_qHorizontalSpacer_About">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item row="0" column="1" rowspan="3" colspan="2">
-      <widget class="QGroupBox" name="m_qGroupBox_Information">
-       <property name="title">
-        <string>Information</string>
-       </property>
-       <layout class="QGridLayout" name="m_qGridLayout_Information">
+       <layout class="QGridLayout" name="m_qGridLayout_Channels">
+        <item row="3" column="0">
+         <widget class="QRadioButton" name="m_qRadioButton_4">
+          <property name="text">
+           <string>16</string>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="0">
+         <widget class="QRadioButton" name="m_qRadioButton_1">
+          <property name="text">
+           <string>2</string>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="0">
+         <widget class="QPushButton" name="m_qPushButton_Send">
+          <property name="text">
+           <string>Send</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0">
+         <widget class="QRadioButton" name="m_qRadioButton_3">
+          <property name="text">
+           <string>8</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="0">
+         <widget class="QRadioButton" name="m_qRadioButton_2">
+          <property name="text">
+           <string>4</string>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="0">
+         <widget class="QRadioButton" name="m_qRadioButton_0">
+          <property name="text">
+           <string>0 - LSB</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QRadioButton" name="m_qRadioButton_5">
+          <property name="text">
+           <string>32</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QRadioButton" name="m_qRadioButton_6">
+          <property name="text">
+           <string>64</string>
+          </property>
+         </widget>
+        </item>
         <item row="0" column="0">
-         <widget class="QTextBrowser" name="m_qTextBrowser_Information"/>
+         <widget class="QRadioButton" name="m_qRadioButton_7">
+          <property name="text">
+           <string>128 - HSB</string>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>
-     </item>
-     <item row="3" column="2">
-      <widget class="QPushButton" name="m_qPushButton_About">
-       <property name="text">
-        <string>About</string>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="0">
-      <spacer name="m_qVerticalSpacer_LeftRow">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>20</width>
-         <height>40</height>
-        </size>
-       </property>
-      </spacer>
      </item>
     </layout>
    </item>
