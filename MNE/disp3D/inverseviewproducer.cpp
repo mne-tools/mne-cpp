@@ -93,8 +93,24 @@ void InverseViewProducer::pushSourceEstimate(MNESourceEstimate &p_sourceEstimate
 
         float t_fTstep = p_sourceEstimate.tstep*1000000;
 
+        //
+        // Adapt skip to buffer size
+        //
         qint32 t_iSampleStep = (qint32)ceil((float)m_iT)/t_fTstep;  //how many samples to skip
-        qint32 t_iCurrentSample = m_iCurSampleStep;                 //take first or sample skip of previous push into account
+
+        qint32 t_iBlockSize = p_sourceEstimate.data.cols();
+
+        if(m_vecStcs.size() > t_iBlockSize*8)
+            t_iSampleStep = t_iBlockSize; //skip block
+        else if(m_vecStcs.size() > t_iBlockSize*4)
+            t_iSampleStep *= 4;
+        else if(m_vecStcs.size() > t_iBlockSize*2)
+            t_iSampleStep *= 2;
+
+        //
+        // Take first or sample skip of previous push into account
+        //
+        qint32 t_iCurrentSample = m_iCurSampleStep;
 
         while(p_sourceEstimate.data.cols() > t_iCurrentSample)
         {
