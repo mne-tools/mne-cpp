@@ -139,10 +139,12 @@ void TMSI::setUpFiffInfo()
     m_pFiffInfo->clear();
 
     //
-    //Set number of channels and sampling frequency
+    //Set number of channels, sampling frequency and high/-lowpass
     //
     m_pFiffInfo->nchan = m_iNumberOfChannels;
     m_pFiffInfo->sfreq = m_iSamplingFreq;
+    m_pFiffInfo->highpass = (float)0.001;
+    m_pFiffInfo->lowpass = m_iSamplingFreq/2;
 
     //
     //Read electrode positions from .elc file
@@ -218,6 +220,7 @@ void TMSI::setUpFiffInfo()
     //Set up the fif channel info
     //
     QStringList QSLChNames;
+    m_pFiffInfo->chs.clear();
 
     for(int i=0; i<m_iNumberOfChannels; i++)
     {
@@ -305,6 +308,30 @@ void TMSI::setUpFiffInfo()
 
     //Set channel names in fiff_info_base
     m_pFiffInfo->ch_names = QSLChNames;
+
+    //
+    //Set head projection
+    //
+    m_pFiffInfo->dev_head_t.from = FIFFV_COORD_DEVICE;
+    m_pFiffInfo->dev_head_t.to = FIFFV_COORD_HEAD;
+    m_pFiffInfo->ctf_head_t.from = FIFFV_COORD_DEVICE;
+    m_pFiffInfo->ctf_head_t.to = FIFFV_COORD_HEAD;
+
+    //
+    //Set projection
+    //
+//    m_pFiffInfo->projs.clear();
+//    FiffProj proj;
+//    proj.kind = 1;
+//    proj.active = true;
+
+//    FiffNamedMatrix::SDPtr namedMatrix = proj.data;
+//    namedMatrix->ncol = m_iNumberOfChannels/3;
+//    namedMatrix->nrow = 1;
+//    namedMatrix->data = MatrixXd::Ones(1, m_iNumberOfChannels/3);
+//    m_pFiffInfo->projs.append(proj);
+//    m_pFiffInfo->projs.append(proj);
+//    m_pFiffInfo->projs.append(proj);
 }
 
 
@@ -324,7 +351,7 @@ bool TMSI::start()
         if(m_fileOut.exists())
         {
             QMessageBox msgBox;
-            msgBox.setText("The file you want to write to already exists.");
+            msgBox.setText("The file you want to write already exists.");
             msgBox.setInformativeText("Do you want to overwrite this file?");
             msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
             int ret = msgBox.exec();

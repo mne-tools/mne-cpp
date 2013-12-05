@@ -105,6 +105,7 @@ TMSISetupWidget::TMSISetupWidget(TMSI* pTMSI, QWidget* parent)
     connect(ui.m_checkBox_WriteToFile, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
             this, &TMSISetupWidget::setWriteToFile);
     connect(ui.m_pushButton_ChangeOutputDir, &QPushButton::released, this, &TMSISetupWidget::changeOutputFileDir);
+    connect(ui.m_lineEdit_outputDir, &QLineEdit::textChanged, this, &TMSISetupWidget::setOutputTextField);
 
     //Connect EEG hat
     connect(ui.m_pushButton_ChangeEEGHatDir, &QPushButton::released, this, &TMSISetupWidget::changeHatDir);
@@ -221,6 +222,14 @@ void TMSISetupWidget::changeOutputFileDir()
         path = ui.m_lineEdit_outputDir->text();
 
     ui.m_lineEdit_outputDir->setText(path);
+    m_pTMSI->m_sOutputFilePath = ui.m_lineEdit_outputDir->text();
+}
+
+
+//*************************************************************************************************************
+
+void TMSISetupWidget::setOutputTextField()
+{
     m_pTMSI->m_sOutputFilePath = ui.m_lineEdit_outputDir->text();
 }
 
