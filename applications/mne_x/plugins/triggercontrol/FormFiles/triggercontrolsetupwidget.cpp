@@ -40,6 +40,7 @@
 
 #include "triggercontrolsetupwidget.h"
 #include "triggercontrolaboutwidget.h"
+#include "settingswidget.h"
 
 #include "../triggercontrol.h"
 
@@ -71,7 +72,10 @@ TriggerControlSetupWidget::TriggerControlSetupWidget(TriggerControl* toolbox, QW
 {
     ui.setupUi(this);
 
-    connect(ui.m_qPushButton_About, SIGNAL(released()), this, SLOT(showAboutDialog()));
+    connect(ui.m_qPushButton_About, &QPushButton::released, this, &TriggerControlSetupWidget::showAboutDialog);
+
+
+    connect(ui.m_qPushButton_Settings, &QPushButton::released, this, &TriggerControlSetupWidget::showSettings);
 }
 
 
@@ -89,4 +93,15 @@ void TriggerControlSetupWidget::showAboutDialog()
 {
     TriggerControlAboutWidget aboutDialog(this);
     aboutDialog.exec();
+}
+
+
+//*************************************************************************************************************
+
+void TriggerControlSetupWidget::showSettings()
+{
+    SettingsWidget settingsWidget(this);
+    settingsWidget.exec();
+
+    qDebug() << "Here";
 }

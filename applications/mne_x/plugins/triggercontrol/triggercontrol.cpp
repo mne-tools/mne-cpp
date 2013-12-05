@@ -69,6 +69,7 @@ using namespace XMEASLIB;
 TriggerControl::TriggerControl()
 : m_pTriggerOutput(NULL)
 {
+
 }
 
 
@@ -97,9 +98,9 @@ QSharedPointer<IPlugin> TriggerControl::clone() const
 void TriggerControl::init()
 {
     // Input
-//    m_pDummyInput = PluginInputData<NewRealTimeSampleArray>::create(this, "DummyIn", "Dummy input data");
-//    connect(m_pDummyInput.data(), &PluginInputConnector::notify, this, &DummyToolbox::update, Qt::DirectConnection);
-//    m_inputConnectors.append(m_pDummyInput);
+    m_pRTMSAInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "SourceLabIn", "SourceLab input data");
+    connect(m_pRTMSAInput.data(), &PluginInputConnector::notify, this, &TriggerControl::update, Qt::DirectConnection);
+    m_inputConnectors.append(m_pRTMSAInput);
 
     // Output
     m_pTriggerOutput = PluginOutputData<NewRealTimeSampleArray>::create(this, "DummyOut", "Dummy output data");
@@ -156,6 +157,7 @@ QString TriggerControl::getName() const
 QWidget* TriggerControl::setupWidget()
 {
     TriggerControlSetupWidget* setupWidget = new TriggerControlSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
+
     return setupWidget;
 }
 
@@ -164,16 +166,19 @@ QWidget* TriggerControl::setupWidget()
 
 void TriggerControl::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 {
-//    QSharedPointer<NewRealTimeSampleArray> pRTSA = pMeasurement.dynamicCast<NewRealTimeSampleArray>();
+    QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<NewRealTimeMultiSampleArray>();
+    if(pRTMSA)
+    {
+//        pRTMSA->
 
-//    if(pRTSA)
-//    {
-//        for(unsigned char i = 0; i < pRTSA->getArraySize(); ++i)
-//        {
-//            double value = pRTSA->getSampleArray()[i];
-//            m_pDummyBuffer->push(value);
-//        }
-//    }
+        //Auswertung des trigger kanals
+
+        //u.U. mutex.lock()
+        //m_bTriggerReceived = true;
+        //u.U. mutex.unlock()
+
+
+    }
 }
 
 
@@ -184,6 +189,23 @@ void TriggerControl::run()
 {
     int count = 0;
     double v = 0;
+
+
+
+    //send byte to trigger
+
+    //.......
+
+    //timer start
+
+
+    while(true)
+    {
+        //u.U. mutex.lock()
+//        if(m_bTriggerReceived)
+//            timer stop
+        //u.U. mutex.unlock()
+    }
 
 
 
