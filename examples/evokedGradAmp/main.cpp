@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implements the main() application function.
+* @brief     Compute tangential gradient amplitudes from planar gradiometer data
 *
 */
 
