@@ -333,3 +333,17 @@ bool FiffDirTree::has_tag(fiff_int_t findkind)
    return false;
 }
 
+//*************************************************************************************************************
+
+bool FiffDirTree::has_kind(fiff_int_t p_kind) const
+{
+    if(this->block == p_kind)
+        return true;
+
+    QList<FiffDirTree>::const_iterator i;
+    for(i = this->children.begin(); i != this->children.end(); ++i)
+        if((*i).has_kind(p_kind))
+            return true;
+
+    return false;
+}

@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implements the main() application function.
+* @brief    Example of noise cancellation procedures
 *
 */
 
@@ -99,6 +99,7 @@ int main(int argc, char *argv[])
     FiffCtfComp comp;
     if(dest_comp > 0 )
     {
+        qDebug() << "This part needs to be debugged";
         p_FiffEvokedSet.info.make_compensator(comp_now,dest_comp,comp); //ToDo: make_compensator needs to be debugged
         printf("Appropriate forward operator compensator created.\n");
     }

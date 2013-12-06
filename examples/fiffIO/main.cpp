@@ -2,6 +2,7 @@
 /**
 * @file     main.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     July, 2012
@@ -29,9 +30,10 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     Example of reading forwardsolution data from a fiff file
+* @brief     Example of the FiffIO interface class
 *
 */
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -39,8 +41,13 @@
 //=============================================================================================================
 
 #include <iostream>
+#include <vector>
+#include <math.h>
+
+#include <fiff/fiff.h>
 #include <mne/mne.h>
 
+#include <fiff/fiff_io.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -55,6 +62,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace FIFFLIB;
 using namespace MNELIB;
 
 
@@ -76,15 +84,22 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    QFile t_fileForwardSolution("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
-    MNEForwardSolution t_ForwardSolution(t_fileForwardSolution);
+    //create list of fiff data to read
+    QList<QIODevice*> t_listSampleFiles;
+    t_listSampleFiles.append(new QFile("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif"));
+//    t_listSampleFiles.append(new QFile("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif"));
+//    t_listSampleFiles.append(new QFile("./MNE-sample-data/MEG/sample/sample_audvis-no-filter-ave.fif"));
+//    t_listSampleFiles.append(new QFile("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif"));
+//    t_listSampleFiles.append(new QFile("./MNE-sample-data/MEG/sample/sample_audvis-cov.fif"));
 
-    if(t_ForwardSolution.source_ori != -1)
-    {
-        std::cout << "\nfirst 10 rows and columns of the Gain Matrix:\n" << t_ForwardSolution.sol->data.block(0,0,10,10) << std::endl;
-        std::cout << "\nfirst 10 dipole coordinates:\n" << t_ForwardSolution.source_rr.block(0,0,10,3) << std::endl ;
-        std::cout << "\nfirst 10 dipole normales:\n" << t_ForwardSolution.source_nn.block(0,0,10,3) << std::endl ;
-    }
+    FiffIO p_fiffIO(t_listSampleFiles);
+
+    std::cout << p_fiffIO << std::endl;
 
     return a.exec();
 }
+
+//*************************************************************************************************************
+//=============================================================================================================
+// STATIC DEFINITIONS
+//=============================================================================================================
