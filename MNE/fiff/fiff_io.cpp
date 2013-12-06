@@ -221,6 +221,7 @@ bool FiffIO::write(QIODevice& p_IODevice, fiff_int_t type, fiff_int_t idx) {
 //        printf("Finished\n");
     }
 
+    return true;
 
 }
 
