@@ -146,13 +146,13 @@ bool FiffIO::read(QIODevice& p_IODevice)
         }
     }
 
-    //forward solutions
-    if(hasFwds) {
-        MNEForwardSolution p_forwardSolution(p_IODevice);
+//    //forward solutions
+//    if(hasFwds) {
+//        MNEForwardSolution p_forwardSolution(p_IODevice);
 
-        //append to corresponding member qlist
-        m_qlistFwd.append(QSharedPointer<MNEForwardSolution>(&p_forwardSolution));
-    }
+//        //append to corresponding member qlist
+//        m_qlistFwd.append(QSharedPointer<MNEForwardSolution>(&p_forwardSolution));
+//    }
 
     //print summary
     //std::cout << *this << std::endl;

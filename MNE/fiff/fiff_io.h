@@ -48,7 +48,7 @@
 
 #include "fiff_raw_data.h"
 #include "fiff_evoked.h"
-#include <mne/mne.h>
+//#include <mne/mne.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -72,7 +72,7 @@ namespace FIFFLIB
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
+//using namespace MNELIB;
 
 class FIFFSHARED_EXPORT FiffIO : public QObject
 {
@@ -185,14 +185,14 @@ public:
         out << "fiff data contains" << std::endl;
         out << p_fiffIO.m_qlistRaw.size() << " raw data sets" << std::endl;
         out << p_fiffIO.m_qlistEvoked.size() << " evoked sets" << std::endl;
-        out << p_fiffIO.m_qlistFwd.size() << " forward solutions" << std::endl;
+//        out << p_fiffIO.m_qlistFwd.size() << " forward solutions" << std::endl;
         return out;
     }
 
 private:
     QList<QSharedPointer<FiffRawData> > m_qlistRaw;
     QList<QSharedPointer<FiffEvoked> > m_qlistEvoked;
-    QList<QSharedPointer<MNEForwardSolution> > m_qlistFwd;
+//    QList<QSharedPointer<MNEForwardSolution> > m_qlistFwd;
     //FiffCov, MNEInverseOperator, AnnotationSet,
 };
 
