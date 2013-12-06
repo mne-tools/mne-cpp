@@ -83,10 +83,13 @@ TMSIDriver::TMSIDriver(TMSIProducer* pTMSIProducer)
 //    m_oLibHandle = LoadLibrary(Path);
 
     //Check which driver dll to take: TMSiSDK.dll oder TMSiSDK32bit.dll
-    if(TMSISDK)
+//    if(TMSISDK)
+#ifdef TAKE_TMSISDK_DLL //32 bit system & 64 bit (with 64 bit compiler)
         m_oLibHandle = ::LoadLibrary(L"C:\\Windows\\System32\\TMSiSDK.dll");
-    if(TMSISDK32)
+#elif TAKE_TMSISDK_32_DLL //64 bit (with 32 bit compiler)
+//    if(TMSISDK32)
         m_oLibHandle = ::LoadLibrary(L"C:\\Windows\\SysWOW64\\TMSiSDK32bit.dll");
+#endif
 
     //If dll can't be open return
     if( m_oLibHandle == NULL)
