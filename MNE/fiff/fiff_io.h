@@ -1,7 +1,8 @@
 //=============================================================================================================
 /**
-* @file     sourceestimate.h
+* @file     fiff_io.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     July, 2012
@@ -29,28 +30,25 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     SourceEstimate class declaration.
+* @brief    Implementation of a generic Fiff IO interface
 *
 */
 
-#ifndef SOURCEESTIMATE_H
-#define SOURCEESTIMATE_H
+#ifndef FIFF_IO_H
+#define FIFF_IO_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "inverse_global.h"
+#include "fiff_global.h"
+#include "fiff_info.h"
+#include "fiff_types.h"
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Eigen INCLUDES
-//=============================================================================================================
-
-#include <Eigen/Core>
-
+#include "fiff_raw_data.h"
+#include "fiff_evoked.h"
+//#include <mne/mne.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -59,159 +57,153 @@
 
 #include <QList>
 #include <QIODevice>
-
+#include <QSharedPointer>
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE INVERSELIB
+// DEFINE NAMESPACE FIFFLIB
 //=============================================================================================================
 
-namespace INVERSELIB
+namespace FIFFLIB
 {
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace Eigen;
+//using namespace MNELIB;
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-
-
-//=============================================================================================================
-/**
-* Source estimation which holds results of MNE-CPP inverse routines
-*
-* @brief Source estimation
-*/
-class INVERSESHARED_EXPORT SourceEstimate
+class FIFFSHARED_EXPORT FiffIO : public QObject
 {
 public:
+//    enum Type {
+//        _RAW = FIFFB_RAW_DATA, //102
+//        _EVOKED = FIFFB_EVOKED, //104
+//        _PROJ = FIFFB_PROJ, //313
+//        _FWD = FIFFB_MNE_FORWARD_SOLUTION, //352
+//        _COV = FIFFB_MNE_COV, //355
+//        _NAMED_MATRIX = FIFFB_MNE_NAMED_MATRIX //357
+//    };
 
     //=========================================================================================================
     /**
-    * Default constructor
-    */
-    SourceEstimate();
-
-    //=========================================================================================================
-    /**
-    * Constructs a source estimation from given data
+    * Constructs a FiffIO
     *
-    * @param[in] p_sol
-    * @param[in] p_vertices
-    * @param[in] p_tmin
-    * @param[in] p_tstep
     */
-    SourceEstimate(const MatrixXd &p_sol, const VectorXi &p_vertices, float p_tmin, float p_tstep);
+    FiffIO();
+
+    //=========================================================================================================
+    /**
+    * Destroys the FiffIO.
+    */
+    ~FiffIO();
+
+    //=========================================================================================================
+    /**
+    * Constructs a FiffIO object by reading from a I/O device p_IODevice.
+    *
+    * @param[in] p_IODevice    A fiff IO device like a fiff QFile or QTCPSocket
+    */
+    FiffIO(QIODevice& p_IODevice);
+
+    //=========================================================================================================
+    /**
+    * Constructs a FiffIO object that uses the I/O device p_IODevice.
+    *
+    * @param[in] p_qlistIODevices    A QList of fiff IO devices like a fiff QFile or QTCPSocket
+    */
+    FiffIO(QList<QIODevice*>& p_qlistIODevices);
 
     //=========================================================================================================
     /**
     * Copy constructor.
     *
-    * @param[in] p_SourceEstimate    Source estimate data which should be copied
+    * @param[in] p_FiffIO    FiffIO, which should be copied
     */
-    SourceEstimate(const SourceEstimate& p_SourceEstimate);
+    FiffIO(const FiffIO& p_FiffIO);
+
+    //=========================================================================================================
+
+    /**
+    * Setup a FiffStream
+    *
+    * @param[in] p_IODevice     An fiff IO device like a fiff QFile or QTCPSocket
+    * @param[in] info           Overall info for fiff IO device
+    * @param[out] Tree          Directory tree structure
+    * @param[out] dirTree       Node directory structure
+    *
+    * @return true if succeeded, false otherwise
+    */
+
+    static bool setup_read(QIODevice& p_IODevice, FiffInfo& info, FiffDirTree& Tree, FiffDirTree& dirTree);
 
     //=========================================================================================================
     /**
-    * Constructs a source estimation, by reading from a IO device.
+    * Read data from a p_IODevice.
     *
-    * @param[in] p_IODevice     IO device to read from the source estimation.
-    *
+    * @param[in] p_IODevice    A fiff IO device like a fiff QFile or QTCPSocket
     */
-    SourceEstimate(QIODevice &p_IODevice);
+    bool read(QIODevice& p_IODevice);
 
     //=========================================================================================================
     /**
-    * Initializes source estimate.
+    * Read data from a QList of p_IODevices.
+    *
+    * @param[in] p_qlistIODevices    A QList of fiff IO devices like a fiff QFile or QTCPSocket
     */
-    void clear();
+    bool read(QList<QIODevice>& p_qlistIODevices);
 
     //=========================================================================================================
     /**
-    * Reduces the source estimate to selected samples.
+    * Write data to a p_IODevice.
     *
-    * @param[in] start  The start index to cut the estimate from.
-    * @param[in] n      Number of samples to cut from start index.
+    * @param[in] p_IODevice             A fiff IO device like a fiff QFile or QTCPSocket
+    * @param[in] type of data to write  fiff constants types, e.g. FIFFB_RAW_DATA
+    * @param[in] idx                    index of type, 0 for all entities of this type
+    *
     */
-    SourceEstimate reduce(qint32 start, qint32 n);
+    bool write(QIODevice& p_IODevice, fiff_int_t type, fiff_int_t idx);
 
     //=========================================================================================================
     /**
-    * mne_read_stc_file
+    * Write data to a p_IODevice.
     *
-    * Reads a source estimate from a given file
-    *
-    * @param [in] p_IODevice    IO device to red the stc from.
-    * @param [out] p_stc        the read stc
-    *
-    * @return true if successful, false otherwise
+    * @param[in] p_IODevice    A fiff IO device like a fiff QFile or QTCPSocket
     */
-    static bool read(QIODevice &p_IODevice, SourceEstimate& p_stc);
+    //bool write(QString filename, QString folder = "./"); //including AutoFileNaming, e.g. -raw/evoked/fwd.fiff
 
     //=========================================================================================================
     /**
-    * mne_write_stc_file
+    * Overloading ostream for printing member infos
     *
-    * Writes a stc file
-    *
-    * @param [in] p_IODevice   IO device to write the stc to.
+    * @param[in] p_fiffIO    the fiffIO, whose members shall be printed
     */
-    bool write(QIODevice &p_IODevice);
 
-    //=========================================================================================================
-    /**
-    * Returns whether SourceEstimate is empty.
-    *
-    * @return true if is empty, false otherwise
-    */
-    inline bool isEmpty();
-
-    //=========================================================================================================
-    /**
-    * Assignment Operator
-    *
-    * @param[in] rhs     SourceEstimate which should be assigned.
-    *
-    * @return the copied source estimate
-    */
-    SourceEstimate& operator= (const SourceEstimate &rhs);
-
-public:
-    MatrixXd data;          /**< Matrix of shape [n_dipoles x n_times] which contains the data in source space. */
-    VectorXi vertices;      /**< The indices of the dipoles in the different source spaces. */ //ToDo define is_clustered_result; change vertno to ROI idcs
-    RowVectorXf times;      /**< The time vector with n_times steps. */
-    float tmin;             /**< Time starting point. */
-    float tstep;            /**< Time steps within the times vector. */
+    friend std::ostream& operator<<(std::ostream& out, const FiffIO &p_fiffIO) {
+        out << "\n\n---------------------- Fiff data read summary ---------------------- " << std::endl;
+        out << "fiff data contains" << std::endl;
+        out << p_fiffIO.m_qlistRaw.size() << " raw data sets" << std::endl;
+        out << p_fiffIO.m_qlistEvoked.size() << " evoked sets" << std::endl;
+//        out << p_fiffIO.m_qlistFwd.size() << " forward solutions" << std::endl;
+        return out;
+    }
 
 private:
-
-    //=========================================================================================================
-    /**
-    * Update the times attribute after changing tmin, tmax, or tstep
-    */
-    void update_times();
+    QList<QSharedPointer<FiffRawData> > m_qlistRaw;
+    QList<QSharedPointer<FiffEvoked> > m_qlistEvoked;
+//    QList<QSharedPointer<MNEForwardSolution> > m_qlistFwd;
+    //FiffCov, MNEInverseOperator, AnnotationSet,
 };
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline bool SourceEstimate::isEmpty()
-{
-    return tstep == -1;
-}
 
-} //NAMESPACE
 
-#endif // SOURCEESTIMATE_H
+
+} // NAMESPACE
+
+#endif // FIFF_IO_H

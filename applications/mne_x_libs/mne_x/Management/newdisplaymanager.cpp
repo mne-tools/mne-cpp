@@ -148,8 +148,8 @@ QWidget* NewDisplayManager::show(IPlugin::OutputConnectorList &pOutputConnectorL
             QSharedPointer<RealTimeSourceEstimate>* pRealTimeSourceEstimate = &pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeSourceEstimate> >()->data();
             RealTimeSourceEstimateWidget* rtseWidget = new RealTimeSourceEstimateWidget(*pRealTimeSourceEstimate, newDisp);//new RealTimeSourceEstimateWidget(*pRealTimeSourceEstimate, pT, newDisp);
 
-//            connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
-//                    rtmsaWidget, &NewRealTimeMultiSampleArrayWidget::update, Qt::BlockingQueuedConnection);
+            connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
+                    rtseWidget, &RealTimeSourceEstimateWidget::update, Qt::BlockingQueuedConnection);
 
             vboxLayout->addWidget(rtseWidget);
             rtseWidget->init();

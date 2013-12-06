@@ -2,6 +2,7 @@
 #
 # @file     fiff.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+#           Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
 # @date     July, 2012
@@ -91,7 +92,8 @@ SOURCES += fiff.cpp \
     fiff_dir_entry.cpp \
     fiff_info_base.cpp \
     fiff_evoked.cpp \
-    fiff_evoked_set.cpp
+    fiff_evoked_set.cpp \
+    fiff_io.cpp
 
 HEADERS += fiff.h \
     fiff_global.h \
@@ -118,7 +120,8 @@ HEADERS += fiff.h \
     fiff_stream.h \
     fiff_info_base.h \
     fiff_evoked.h \
-    fiff_evoked_set.h
+    fiff_evoked_set.h \
+    fiff_io.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
@@ -128,3 +131,6 @@ header_files.files = ./*.h
 header_files.path = $${MNE_INCLUDE_DIR}/fiff
 
 INSTALLS += header_files
+
+unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
+

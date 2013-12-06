@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
-* @file     dummyrunwidget.cpp
+* @file     main.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     July, 2012
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,19 +30,31 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the DummyRunWidget class.
+* @brief     Example of the FiffIO interface class
 *
 */
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "sourcelabrunwidget.h"
-#include "sourcelababoutwidget.h"
+#include <iostream>
+#include <vector>
+#include <math.h>
 
-#include "../sourcelab.h"
+#include <fiff/fiff.h>
+#include <mne/mne.h>
+
+#include <fiff/fiff_io.h>
+
+//*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QtCore/QCoreApplication>
 
 
 //*************************************************************************************************************
@@ -49,50 +62,44 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace SourceLabPlugin;
+using namespace FIFFLIB;
+using namespace MNELIB;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// MAIN
 //=============================================================================================================
 
-SourceLabRunWidget::SourceLabRunWidget(SourceLab* toolbox, QWidget *parent)
-: QWidget(parent)
-, m_pSourceLab(toolbox)
+//=============================================================================================================
+/**
+* The function main marks the entry point of the program.
+* By default, main has the storage class extern.
+*
+* @param [in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
+* @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
+* @return the value that was set to exit() (which is 0 if exit() is called via quit()).
+*/
+int main(int argc, char *argv[])
 {
-    ui.setupUi(this);
+    QCoreApplication a(argc, argv);
 
-    connect(ui.m_qPushButton_About, SIGNAL(released()), this, SLOT(showAboutDialog()));
+    //create list of fiff data to read
+    QList<QIODevice*> t_listSampleFiles;
+    t_listSampleFiles.append(new QFile("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif"));
+//    t_listSampleFiles.append(new QFile("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif"));
+//    t_listSampleFiles.append(new QFile("./MNE-sample-data/MEG/sample/sample_audvis-no-filter-ave.fif"));
+//    t_listSampleFiles.append(new QFile("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif"));
+//    t_listSampleFiles.append(new QFile("./MNE-sample-data/MEG/sample/sample_audvis-cov.fif"));
+
+    FiffIO p_fiffIO(t_listSampleFiles);
+
+    std::cout << p_fiffIO << std::endl;
+
+    return a.exec();
 }
-
 
 //*************************************************************************************************************
-
-SourceLabRunWidget::~SourceLabRunWidget()
-{
-
-}
-
-
-//*************************************************************************************************************
-
-void SourceLabRunWidget::writeToLog(QString p_sLogMsg)
-{
-    ui.m_qTextBrowser_Information->insertHtml(p_sLogMsg);
-
-    ui.m_qTextBrowser_Information->insertPlainText("\n"); // new line
-    //scroll down to the newest entry
-    QTextCursor c = ui.m_qTextBrowser_Information->textCursor();
-    c.movePosition(QTextCursor::End);
-    ui.m_qTextBrowser_Information->setTextCursor(c);
-}
-
-
-//*************************************************************************************************************
-
-void SourceLabRunWidget::showAboutDialog()
-{
-    SourceLabAboutWidget aboutDialog(this);
-    aboutDialog.exec();
-}
+//=============================================================================================================
+// STATIC DEFINITIONS
+//=============================================================================================================

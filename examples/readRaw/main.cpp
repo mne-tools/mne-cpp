@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implements the main() application function.
+* @brief    Example of reading raw data
 *
 */
 
@@ -83,7 +83,7 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    QFile t_fileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+    QFile t_fileRaw("./MNE-sample-data/MEG/sample/ernoise_raw.fif");
 
     float from = 42.956f;
     float to = 320.670f;

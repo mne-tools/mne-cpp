@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implements the main() application function.
+* @brief    Example of computing a L2 minimum-norm estimate or a dSPM solution
 *
 */
 
@@ -53,7 +53,7 @@
 #include <mne/mne_inverse_operator.h>
 
 #include <fiff/fiff_evoked.h>
-#include <inverse/sourceestimate.h>
+#include <mne/mne_sourceestimate.h>
 #include <inverse/minimumNorm/minimumnorm.h>
 
 
@@ -154,7 +154,7 @@ int main(int argc, char *argv[])
     // Compute inverse solution
     //
     MinimumNorm minimumNorm(inverse_operator, lambda2, method);
-    SourceEstimate sourceEstimate = minimumNorm.calculateInverse(evoked);
+    MNESourceEstimate sourceEstimate = minimumNorm.calculateInverse(evoked);
 
     //
     //Results
@@ -170,7 +170,7 @@ int main(int argc, char *argv[])
         sourceEstimate.write(t_fileStc);
 
         //test if everything was written correctly
-        SourceEstimate readSourceEstimate(t_fileStc);
+        MNESourceEstimate readSourceEstimate(t_fileStc);
 
         std::cout << "\npart ( block( 0, 0, 10, 10) ) of the inverse solution:\n" << readSourceEstimate.data.block(0,0,10,10) << std::endl;
         printf("tmin = %f s\n", readSourceEstimate.tmin);

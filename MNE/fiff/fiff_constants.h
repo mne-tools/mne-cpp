@@ -806,7 +806,7 @@ namespace FIFFLIB
                      * disks in the data acquisition front end */
 #define FIFF_CONTINUE_FILE      17  /* Used to inform that data is saved into a continuation file. */
 #define FIFF_JITTER_MAX         18  /* Used to tell the jitter in the timing of data packets */
-#define  FIFF_STREAM_SEGMENT    19  /* A segment of data stream */
+#define FIFF_STREAM_SEGMENT    19  /* A segment of data stream */
 
 
 
