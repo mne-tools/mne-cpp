@@ -1,11 +1,11 @@
 //=============================================================================================================
 /**
-* @file     tmsiproducer.cpp
+* @file     asaelc.cpp
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     September, 2013
+* @date     November, 2013
 *
 * @section  LICENSE
 *
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the TMSIProducer class.
+* @brief    Implementation of the AsAElc class
 *
 */
 
@@ -39,11 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "tmsiproducer.h"
-#include "tmsi.h"
-#include "tmsidriver.h"
-
-#include <QDebug>
+#include "asaelc.h"
 
 
 //*************************************************************************************************************
@@ -51,7 +47,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace TMSIPlugin;
+using namespace UTILSLIB;
 
 
 //*************************************************************************************************************
@@ -59,86 +55,87 @@ using namespace TMSIPlugin;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-TMSIProducer::TMSIProducer(TMSI* pTMSI)
-: m_pTMSI(pTMSI)
-, m_pTMSIDriver(new TMSIDriver(this))
-, m_bIsRunning(true)
+AsAElc::AsAElc()
 {
 }
 
 
 //*************************************************************************************************************
 
-TMSIProducer::~TMSIProducer()
+bool AsAElc::readElcFile(QString path, QStringList &channelNames, QVector<QVector<double>> &location3D, QVector<QVector<double>> &location2D, QString &unit)
 {
-    //cout << "TMSIProducer::~TMSIProducer()" << endl;
-}
+    //Open .elc file
+    if(!path.contains(".elc"))
+        return false;
 
+    QFile file(path);
+    file.open(QIODevice::ReadOnly | QIODevice::Text);
 
-//*************************************************************************************************************
+    //Start reading from file
+    double numberElectrodes;
+    QTextStream in(&file);
+    bool read2D = false;
 
-void TMSIProducer::start(int iNumberOfChannels,
-                     int iSamplingFrequency,
-                     int iSamplesPerBlock,
-                     bool bConvertToVolt,
-                     bool bUseChExponent,
-                     bool bUseUnitGain,
-                     bool bUseUnitOffset,
-                     bool bWriteDriverDebugToFile,
-                     QString sOutputFilePath)
-{
-    //Initialise device
-    if(m_pTMSIDriver->initDevice(iNumberOfChannels,
-                              iSamplingFrequency,
-                              iSamplesPerBlock,
-                              bConvertToVolt,
-                              bUseChExponent,
-                              bUseUnitGain,
-                              bUseUnitOffset,
-                              bWriteDriverDebugToFile,
-                              sOutputFilePath))
+    while(!in.atEnd())
     {
-        m_bIsRunning = true;
-        QThread::start();
+        QString line = in.readLine();
+
+        QStringList fields = line.split(QRegExp("\\s+"));
+
+        //Delete last element if it is a blank character
+        if(fields.at(fields.size()-1) == "")
+            fields.removeLast();
+
+        if(!line.contains("#")) //Skip commented areas in file
+        {
+            //Read number of electrodes
+            if(line.contains("NumberPositions"))
+                numberElectrodes = fields.at(1).toDouble();
+
+            //Read the unit of the position values
+            if(line.contains("UnitPosition"))
+                unit = fields.at(1);
+
+            //Read actual electrode positions
+            if(line.contains("Positions2D"))
+                read2D = true;
+
+            if(line.contains(":") && !read2D) //Read 3D positions
+            {
+                channelNames.push_back(fields.at(0));
+                QVector<double> posTemp;
+
+                posTemp.push_back(fields.at(fields.size()-3).toDouble());    //x
+                posTemp.push_back(fields.at(fields.size()-2).toDouble());    //y
+                posTemp.push_back(fields.at(fields.size()-1).toDouble());    //z
+
+                location3D.push_back(posTemp);
+            }
+
+            if(line.contains(":") && read2D) //Read 2D positions
+            {
+                QVector<double> posTemp;
+                posTemp.push_back(fields.at(fields.size()-2).toDouble());    //x
+                posTemp.push_back(fields.at(fields.size()-1).toDouble());    //y
+                location2D.push_back(posTemp);
+            }
+
+            //Read channel names
+            if(line.contains("Labels"))
+            {
+                line = in.readLine();
+                fields = line.split(QRegExp("\\s+"));
+
+                //Delete last element if it is a blank character
+                if(fields.at(fields.size()-1) == "")
+                    fields.removeLast();
+
+                channelNames = fields;
+            }
+        }
     }
-    else
-        m_bIsRunning = false;
+
+    file.close();
+
+    return true;
 }
-
-
-//*************************************************************************************************************
-
-void TMSIProducer::stop()
-{
-    //Wait until this thread (TMSIProducer) is stopped
-    m_bIsRunning = false;
-
-    //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the push function (acquire statement)
-    m_pTMSI->m_pRawMatrixBuffer_In->releaseFromPush();
-
-    while(this->isRunning())
-        m_bIsRunning = false;
-
-    //Uinitialise device only after the thread stopped
-    m_pTMSIDriver->uninitDevice();
-}
-
-
-//*************************************************************************************************************
-
-void TMSIProducer::run()
-{
-    MatrixXf matRawBuffer(m_pTMSI->m_iNumberOfChannels, m_pTMSI->m_iSamplesPerBlock);
-
-    while(m_bIsRunning)
-    {
-        //std::cout<<"TMSIProducer::run()"<<std::endl;
-        //Get the TMSi EEG data out of the device buffer and write received data to circular buffer
-        if(m_pTMSIDriver->getSampleMatrixValue(matRawBuffer))
-            m_pTMSI->m_pRawMatrixBuffer_In->push(&matRawBuffer);
-    }
-
-    //std::cout<<"EXITING - TMSIProducer::run()"<<std::endl;
-}
-
-
