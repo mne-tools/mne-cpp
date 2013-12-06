@@ -1,14 +1,14 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     utils.pro
-# @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-#           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+# @file     triggercontrol.pro
+# @author   
+#			Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
 # @version  1.0
 # @date     July, 2012
 #
 # @section  LICENSE
 #
-# Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2012, Christoph Dinh. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -29,56 +29,61 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds the Utils library.
+# @brief    This project file generates the makefile for the dummytoolbox plug-in.
 #
 #--------------------------------------------------------------------------------------------------------------
 
-include(../../mne-cpp.pri)
+include(../../../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-QT       -= gui
+CONFIG += plugin
 
-DEFINES += UTILS_LIBRARY
+DEFINES += TRIGGERCONTROL_LIBRARY
 
-TARGET = Utils
-TARGET = $$join(TARGET,,MNE$$MNE_LIB_VERSION,)
+QT += core widgets
+
+TARGET = triggercontrol
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
-DESTDIR = $${MNE_LIBRARY_DIR}
-
-#
-# win32: copy dll's to bin dir
-# unix: add lib folder to LD_LIBRARY_PATH
-#
-win32 {
-    FILE = $${DESTDIR}/$${TARGET}.dll
-    BINDIR = $${DESTDIR}/../bin
-    FILE ~= s,/,\\,g
-    BINDIR ~= s,/,\\,g
-    QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${BINDIR}) $$escape_expand(\\n\\t)
+LIBS += -L$${MNE_LIBRARY_DIR}
+CONFIG(debug, debug|release) {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
+            -lxMeasd \
+            -lxDispd \
+            -lmne_xd
+}
+else {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
+            -lxMeas \
+            -lxDisp \
+            -lmne_x
 }
 
-SOURCES += kmeans.cpp \
-    mnemath.cpp \
-    ioutils.cpp \
-    filtertools.cpp \
-    asaelc.cpp
+DESTDIR = $${MNE_BINARY_DIR}/mne_x_plugins
 
-HEADERS +=  kmeans.h\
-            utils_global.h \
-    mnemath.h \
-    ioutils.h \
-    filtertools.h \
-    asaelc.h
+SOURCES += \
+        triggercontrol.cpp \
+        FormFiles/triggercontrolsetupwidget.cpp \
+        FormFiles/triggercontrolaboutwidget.cpp
+
+HEADERS += \
+        triggercontrol.h\
+        triggercontrol_global.h \
+        FormFiles/triggercontrolsetupwidget.h \
+        FormFiles/triggercontrolaboutwidget.h
+
+FORMS += \
+        FormFiles/triggercontrolsetup.ui \
+        FormFiles/triggercontrolabout.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
+INCLUDEPATH += $${MNE_X_INCLUDE_DIR}
 
-# Install headers to include directory
-header_files.files = ./*.h
-header_files.path = $${MNE_INCLUDE_DIR}/utils
+OTHER_FILES += triggercontrol.json
 
-INSTALLS += header_files
+# Put generated form headers into the origin --> cause other src is pointing at them
+UI_DIR = $$PWD

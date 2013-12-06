@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     fiff_ch_info.cpp
+* @file     dummytoolbox_global.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2012
+* @date     February, 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,71 +29,31 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the FiffChInfo Class.
+* @brief    Contains the DummyToolbox library export/import macros.
 *
 */
 
-//*************************************************************************************************************
-//=============================================================================================================
-// INCLUDES
-//=============================================================================================================
-
-#include "fiff_ch_info.h"
+#ifndef TRIGGERCONTROL_GLOBAL_H
+#define TRIGGERCONTROL_GLOBAL_H
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// QT INCLUDES
 //=============================================================================================================
 
-using namespace FIFFLIB;
+#include <QtCore/qglobal.h>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// PREPROCESSOR DEFINES
 //=============================================================================================================
 
-FiffChInfo::FiffChInfo()
-: scanno(0)
-, logno(0)
-, kind(0)
-, range(-1)
-, cal(1.0f)
-, coil_type(0)
-, coord_frame(FIFFV_COORD_UNKNOWN)
-, unit(0)
-, unit_mul(0)
-, ch_name(QString(""))
-{
+#if defined(TRIGGERCONTROL_LIBRARY)
+#  define TRIGGERCONTROLSHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#else
+#  define TRIGGERCONTROLSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#endif
 
-}
-
-
-//*************************************************************************************************************
-
-FiffChInfo::FiffChInfo(const FiffChInfo &p_FiffChInfo)
-: scanno(p_FiffChInfo.scanno)
-, logno(p_FiffChInfo.logno)
-, kind(p_FiffChInfo.kind)
-, range(p_FiffChInfo.range)
-, cal(p_FiffChInfo.cal)
-, coil_type(p_FiffChInfo.coil_type)
-, loc(p_FiffChInfo.loc)
-, coil_trans(p_FiffChInfo.coil_trans)
-, eeg_loc(p_FiffChInfo.eeg_loc)
-, coord_frame(p_FiffChInfo.coord_frame)
-, unit(p_FiffChInfo.unit)
-, unit_mul(p_FiffChInfo.unit_mul)
-, ch_name(p_FiffChInfo.ch_name)
-{
-
-}
-
-
-//*************************************************************************************************************
-
-FiffChInfo::~FiffChInfo()
-{
-
-}
+#endif // TRIGGERCONTROL_GLOBAL_H

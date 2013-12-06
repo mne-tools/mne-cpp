@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
-* @file     filtertools.h
-* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     dummyaboutwidget.h
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     November, 2013
+* @date     February, 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,106 +29,72 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    FilterTools class declaration.
+* @brief    Contains the declaration of the DummyAboutWidget class.
 *
 */
 
-#ifndef FILTERTOOLS_H
-#define FILTERTOOLS_H
+#ifndef TRIGGERCONTROLABOUTWIDGET_H
+#define TRIGGERCONTROLABOUTWIDGET_H
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "utils_global.h"
-#include <qmath.h>
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Qt INCLUDES
-//=============================================================================================================
-
-#include <QSharedPointer>
-#include <QVector>
+#include "../ui_triggercontrolabout.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Eigen INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
-#include <Eigen/Core>
+#include <QtWidgets>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNELIB
+// DEFINE NAMESPACE TriggerControlPlugin
 //=============================================================================================================
 
-namespace UTILSLIB
+namespace TriggerControlPlugin
 {
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace Eigen;
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINES
-//=============================================================================================================
 
 
 //=============================================================================================================
 /**
-* Basic filter operations (HP, TP, BP)
+* DECLARE CLASS DummyAboutWidget
 *
-* @brief Basic filter operations and calculation (HP, TP, BP)
+* @brief The DummyAboutWidget class provides the about dialog for the DummyToolbox.
 */
-class UTILSSHARED_EXPORT FilterTools
+class TriggerControlAboutWidget : public QDialog
 {
+    Q_OBJECT
+
 public:
-    typedef QSharedPointer<FilterTools> SPtr;            /**< Shared pointer type for KMeans. */
-    typedef QSharedPointer<const FilterTools> ConstSPtr; /**< Const shared pointer type for KMeans. */
 
     //=========================================================================================================
     /**
-    * Constructs a Filter object.
+    * Constructs a DummyAboutWidget dialog which is a child of parent.
+    *
+    * @param [in] parent pointer to parent widget; If parent is 0, the new DummyAboutWidget becomes a window. If parent is another widget, DummyAboutWidget becomes a child window inside parent. DummyAboutWidget is deleted when its parent is deleted.
     */
-    FilterTools();
+    TriggerControlAboutWidget(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Creates a Filter.
-    * @param [in] type specifies the type (high-, low- , band-pass) of the filter which is to be designed.
-    * @param [in] numberOfCoefficients number of coefficients used for the filter.
-    * @param [in] normalizedCutOffFreq holds the cut off frequency for the filter. Range [0 1] whre 1 (pi) corresponds to f_max.
-    * @param [in] impulseResponse holds the created coefficients (impulse response) of the filter.
+    * Destroys the DummyAboutWidget.
+    * All DummyAboutWidget's children are deleted first. The application exits if DummyAboutWidget is the main widget.
     */
-    void createFilter(QString type, qint32 numberOfCoefficients, double normalizedCutOffFreq, QVector<double> &impulseResponse);
-
+    ~TriggerControlAboutWidget();
 
 private:
-    /**
-    * Creates a kaiser window. Regular Modified Cylindrical Bessel Function (Bessel I).
-    * @param [in] window
-    * @param [in] size
-    * @param [in] alpha
-    */
-    void KBDWindow(QVector<double> &window, int size, double alpha);
 
-    //=========================================================================================================
-    /**
-    * Calculates Bssel function.
-    * @param [in] x
-    */
-    double BesselI0(double x);
+    Ui::TriggerControlAboutWidgetClass ui;      /**< Holds the user interface for the DummyAboutWidget.*/
+
 };
 
 } // NAMESPACE
 
-#endif // FILTERTOOLS_H
+#endif // TRIGGERCONTROLABOUTWIDGET_H

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     filtertools.cpp
+* @file     asaelc.cpp
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the FilterTools class
+* @brief    Implementation of the AsAElc class
 *
 */
 
@@ -39,10 +39,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "filtertools.h"
-#include <fstream>
-#include <QFile>
-#include <QDataStream>
+#include "asaelc.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -57,106 +55,87 @@ using namespace UTILSLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-FilterTools::FilterTools()
+AsAElc::AsAElc()
 {
 }
 
 
 //*************************************************************************************************************
 
-void FilterTools::createFilter(QString type, qint32 numberOfCoefficients, double normalizedCutOffFreq, QVector<double> &impulseResponse)
+bool AsAElc::readElcFile(QString path, QStringList &channelNames, QVector<QVector<double>> &location3D, QVector<QVector<double>> &location2D, QString &unit)
 {
-    //Create kaiser window
-    QVector<double> window(numberOfCoefficients);
-    KBDWindow(window, numberOfCoefficients, 8);
+    //Open .elc file
+    if(!path.contains(".elc"))
+        return false;
 
-    impulseResponse = window;
+    QFile file(path);
+    file.open(QIODevice::ReadOnly | QIODevice::Text);
 
-    //Calculate approximated sinc function (ideal TP in frequency domain)
-    QVector<double> sincApprox;
-    int t = 0;
-    int nd = (numberOfCoefficients-1)/2;
+    //Start reading from file
+    double numberElectrodes;
+    QTextStream in(&file);
+    bool read2D = false;
 
-    for(int i=0; i<numberOfCoefficients; i++)
+    while(!in.atEnd())
     {
-        double sinc = sin(normalizedCutOffFreq*M_PI*(t-nd)) / (M_PI*(t-nd));
-        sincApprox.push_back(sinc*window[i]);
-        t++;
+        QString line = in.readLine();
+
+        QStringList fields = line.split(QRegExp("\\s+"));
+
+        //Delete last element if it is a blank character
+        if(fields.at(fields.size()-1) == "")
+            fields.removeLast();
+
+        if(!line.contains("#")) //Skip commented areas in file
+        {
+            //Read number of electrodes
+            if(line.contains("NumberPositions"))
+                numberElectrodes = fields.at(1).toDouble();
+
+            //Read the unit of the position values
+            if(line.contains("UnitPosition"))
+                unit = fields.at(1);
+
+            //Read actual electrode positions
+            if(line.contains("Positions2D"))
+                read2D = true;
+
+            if(line.contains(":") && !read2D) //Read 3D positions
+            {
+                channelNames.push_back(fields.at(0));
+                QVector<double> posTemp;
+
+                posTemp.push_back(fields.at(fields.size()-3).toDouble());    //x
+                posTemp.push_back(fields.at(fields.size()-2).toDouble());    //y
+                posTemp.push_back(fields.at(fields.size()-1).toDouble());    //z
+
+                location3D.push_back(posTemp);
+            }
+
+            if(line.contains(":") && read2D) //Read 2D positions
+            {
+                QVector<double> posTemp;
+                posTemp.push_back(fields.at(fields.size()-2).toDouble());    //x
+                posTemp.push_back(fields.at(fields.size()-1).toDouble());    //y
+                location2D.push_back(posTemp);
+            }
+
+            //Read channel names
+            if(line.contains("Labels"))
+            {
+                line = in.readLine();
+                fields = line.split(QRegExp("\\s+"));
+
+                //Delete last element if it is a blank character
+                if(fields.at(fields.size()-1) == "")
+                    fields.removeLast();
+
+                channelNames = fields;
+            }
+        }
     }
 
-    //Create final filter specified by the type parameter
-    if(type == QString('HP'))
-    {
+    file.close();
 
-    }
-
-    if(type == QString('LP'))
-    {
-
-    }
-
-    if(type == QString('BP'))
-    {
-
-    }
-
+    return true;
 }
-
-
-//*************************************************************************************************************
-
-void FilterTools::KBDWindow(QVector<double> &window, int size, double alpha)
-{
-    double sumvalue = 0.0;
-    int i;
-
-    for (i=0; i<size/2; i++)
-    {
-        sumvalue += BesselI0(M_PI * alpha * sqrt(1.0 - pow(4.0*i/size - 1.0, 2)));
-        window[i] = sumvalue;
-    }
-
-    /* need to add one more value to the nomalization factor at size/2: */
-    sumvalue += BesselI0(M_PI * alpha * sqrt(1.0 - pow(4.0*(size/2)/size-1.0, 2)));
-
-    /* normalize the window and fill in the righthand side of the window: */
-    for (i=0; i<size/2; i++)
-    {
-        window[i] = sqrt(window[i]/sumvalue);
-        window[size-1-i] = window[i];
-    }
-}
-
-
-//*************************************************************************************************************
-
-double FilterTools::BesselI0(double x)
-{
-    double denominator;
-    double numerator;
-    double z;
-
-    if (x == 0.0)
-    {
-        return 1.0;
-    }
-    else
-    {
-        z = x * x;
-        numerator = (z* (z* (z* (z* (z* (z* (z* (z* (z* (z* (z* (z* (z*
-            (z* 0.210580722890567e-22  + 0.380715242345326e-19 ) +
-            0.479440257548300e-16) + 0.435125971262668e-13 ) +
-            0.300931127112960e-10) + 0.160224679395361e-7  ) +
-            0.654858370096785e-5)  + 0.202591084143397e-2  ) +
-            0.463076284721000e0)   + 0.754337328948189e2   ) +
-            0.830792541809429e4)   + 0.571661130563785e6   ) +
-            0.216415572361227e8)   + 0.356644482244025e9   ) +
-            0.144048298227235e10);
-
-        denominator = (z*(z*(z-0.307646912682801e4)+
-            0.347626332405882e7)-0.144048298227235e10);
-    }
-
-    return -numerator/denominator;
-}
-

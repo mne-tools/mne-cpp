@@ -127,6 +127,7 @@ void SourceLab::init()
     m_pRTSEOutput->data()->setName("Real-Time Source Estimate");
     m_pRTSEOutput->data()->setAnnotSet(m_pAnnotationSet);
     m_pRTSEOutput->data()->setSurfSet(m_pSurfaceSet);
+    m_pRTSEOutput->data()->setSrc(m_pFwd->src); // ToDo in set Src - set bool that source space has been set
 
 
 //    // Output
@@ -174,7 +175,7 @@ void SourceLab::init()
 
 bool SourceLab::start()
 {
-    QThread::start();
+//    QThread::start();
     return true;
 }
 

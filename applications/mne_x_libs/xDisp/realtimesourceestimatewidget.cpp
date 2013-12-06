@@ -45,6 +45,12 @@
 
 #include <xMeas/realtimesourceestimate.h>
 
+#include <disp3D/geometryview.h>
+#include <mne/mne_forwardsolution.h>
+
+
+
+
 #include <Eigen/Core>
 
 
@@ -69,12 +75,20 @@
 #include <QDebug>
 
 
+#include <QWindow>
+#include <QWidget>
+#include <QHBoxLayout>
+#include <QLineEdit>
+
+
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
 using namespace XDISPLIB;
+using namespace DISP3DLIB;
+using namespace MNELIB;
 using namespace XMEASLIB;
 
 
@@ -83,53 +97,80 @@ using namespace XMEASLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RealTimeSourceEstimateWidget::RealTimeSourceEstimateWidget(QSharedPointer<RealTimeSourceEstimate> pRTMSE, QSharedPointer<QTime> pTime, QWidget* parent)
+RealTimeSourceEstimateWidget::RealTimeSourceEstimateWidget(QSharedPointer<RealTimeSourceEstimate> &pRTSE, QWidget* parent)
 : MeasurementWidget(parent)
-, m_pRTMSE(pRTMSE)
-, m_bMeasurement(false)
-, m_bPosition(true)
-, m_bFrozen(false)
-, m_bScaling(false)
-, m_bToolInUse(false)
-, m_dSampleWidth(1.0)
-, m_dPosX(0.0)
-, m_dPosY(0)
-, m_bStartFlag(true)
-, m_ucToolIndex(0)
-, m_pTimerToolDisplay(0)
-, m_pTimerUpdate(0)
-, m_pTime(pTime)
-, m_pTimeCurrentDisplay(0)
+, m_pRTMSE(pRTSE)
 {
-    ui.setupUi(this);
-    ui.m_qLabel_Tool->hide();
+    QHBoxLayout *layout = new QHBoxLayout(this);
 
-    // Add tool names to vector
-    m_vecTool.push_back("Freeze");
-    m_vecTool.push_back("Annotation");
+    m_pView = new GeometryView(m_pRTMSE->getSrc());
 
-    // Start timer
-    m_pTimerUpdate = new QTimer(this);
-    connect(m_pTimerUpdate, SIGNAL(timeout()), this, SLOT(update()));
+    if (m_pView->stereoType() != QGLView::RedCyanAnaglyph)
+        m_pView->camera()->setEyeSeparation(0.3f);
 
-    m_pTimerUpdate->start(25);
+    m_pContainer = QWidget::createWindowContainer(m_pView);
+//    m_pContainer->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+//    m_pContainer->setFocusPolicy(Qt::StrongFocus);
+    m_pContainer->setFocusPolicy(Qt::TabFocus);
 
-    //connect(ui.m_qSpinBox_Max, SIGNAL(valueChanged(int)), this, SLOT(maxValueChanged(int)));
-    //connect(ui.m_qSpinBox_Min, SIGNAL(valueChanged(int)), this, SLOT(minValueChanged(int)));
+//    layout->addWidget(new QLineEdit(QLatin1String("A QLineEdit")));
+    layout->addWidget(m_pContainer);
+//    layout->addWidget(new QLineEdit(QLatin1String("A QLabel")));
 
-    setMouseTracking(true);
+
+
+//createWindowContainer
 }
+
+
+
+//RealTimeSourceEstimateWidget::RealTimeSourceEstimateWidget(QSharedPointer<RealTimeSourceEstimate> pRTMSE, QSharedPointer<QTime> pTime, QWidget* parent)
+//: MeasurementWidget(parent)
+//, m_pRTMSE(pRTMSE)
+//, m_bMeasurement(false)
+//, m_bPosition(true)
+//, m_bFrozen(false)
+//, m_bScaling(false)
+//, m_bToolInUse(false)
+//, m_dSampleWidth(1.0)
+//, m_dPosX(0.0)
+//, m_dPosY(0)
+//, m_bStartFlag(true)
+//, m_ucToolIndex(0)
+//, m_pTimerToolDisplay(0)
+//, m_pTimerUpdate(0)
+//, m_pTime(pTime)
+//, m_pTimeCurrentDisplay(0)
+//{
+//    ui.setupUi(this);
+//    ui.m_qLabel_Tool->hide();
+
+//    // Add tool names to vector
+//    m_vecTool.push_back("Freeze");
+//    m_vecTool.push_back("Annotation");
+
+//    // Start timer
+//    m_pTimerUpdate = new QTimer(this);
+//    connect(m_pTimerUpdate, SIGNAL(timeout()), this, SLOT(update()));
+
+//    m_pTimerUpdate->start(25);
+
+//    //connect(ui.m_qSpinBox_Max, SIGNAL(valueChanged(int)), this, SLOT(maxValueChanged(int)));
+//    //connect(ui.m_qSpinBox_Min, SIGNAL(valueChanged(int)), this, SLOT(minValueChanged(int)));
+
+//    setMouseTracking(true);
+//}
 
 
 //*************************************************************************************************************
 
 RealTimeSourceEstimateWidget::~RealTimeSourceEstimateWidget()
 {
-    delete m_pTimerToolDisplay;
-    delete m_pTimerUpdate;
+//    delete m_pTimerToolDisplay;
+//    delete m_pTimerUpdate;
 
-    // Clear sampling rate vector
-    RealTimeSourceEstimateWidget::s_listSamplingRates.clear();
+//    // Clear sampling rate vector
+//    RealTimeSourceEstimateWidget::s_listSamplingRates.clear();
 }
 
 
@@ -172,7 +213,7 @@ void RealTimeSourceEstimateWidget::actualize()
 
 void RealTimeSourceEstimateWidget::stopAnnotation()
 {
-    m_bToolInUse = !m_bToolInUse;
+//    m_bToolInUse = !m_bToolInUse;
 }
 
 
@@ -564,25 +605,25 @@ void RealTimeSourceEstimateWidget::paintEvent(QPaintEvent*)
 
 void RealTimeSourceEstimateWidget::resizeEvent(QResizeEvent*)
 {
-    m_bStartFlag = true; //start new painting
-    actualize();
+//    m_bStartFlag = true; //start new painting
+//    actualize();
 }
 
 //*************************************************************************************************************
 
 void RealTimeSourceEstimateWidget::mousePressEvent(QMouseEvent* mouseEvent)
 {
-    m_qPointMouseStartPosition = m_qPointMouseEndPosition = mouseEvent->pos();
-    if(mouseEvent->button() == Qt::LeftButton)
-    {
-        m_bMeasurement = true;
-        m_bPosition = false;
-    }
-    else if(mouseEvent->button() == Qt::RightButton)
-    {
-        m_bScaling = true;
-        m_bPosition = false;
-    }
+//    m_qPointMouseStartPosition = m_qPointMouseEndPosition = mouseEvent->pos();
+//    if(mouseEvent->button() == Qt::LeftButton)
+//    {
+//        m_bMeasurement = true;
+//        m_bPosition = false;
+//    }
+//    else if(mouseEvent->button() == Qt::RightButton)
+//    {
+//        m_bScaling = true;
+//        m_bPosition = false;
+//    }
 }
 
 
@@ -590,8 +631,8 @@ void RealTimeSourceEstimateWidget::mousePressEvent(QMouseEvent* mouseEvent)
 
 void RealTimeSourceEstimateWidget::mouseMoveEvent(QMouseEvent* mouseEvent)
 {
-    if(m_bMeasurement || m_bScaling)
-        m_qPointMouseEndPosition = mouseEvent->pos();
+//    if(m_bMeasurement || m_bScaling)
+//        m_qPointMouseEndPosition = mouseEvent->pos();
 }
 
 
@@ -599,9 +640,9 @@ void RealTimeSourceEstimateWidget::mouseMoveEvent(QMouseEvent* mouseEvent)
 
 void RealTimeSourceEstimateWidget::mouseReleaseEvent(QMouseEvent*)
 {
-    m_bMeasurement = false;
-    m_bPosition = true;
-    m_bScaling = false;
+//    m_bMeasurement = false;
+//    m_bPosition = true;
+//    m_bScaling = false;
 }
 
 
@@ -638,35 +679,35 @@ void RealTimeSourceEstimateWidget::mouseDoubleClickEvent(QMouseEvent*)
 
 void RealTimeSourceEstimateWidget::wheelEvent(QWheelEvent* wheelEvent)
 {
-    if(m_bToolInUse)
-        return;
+//    if(m_bToolInUse)
+//        return;
 
-    if(wheelEvent->delta() < 0)
-    {
-        if(m_ucToolIndex == 0)
-            m_ucToolIndex = m_vecTool.size()-1;
-        else
-            --m_ucToolIndex;
-    }
-    else
-    {
-        if(m_ucToolIndex == m_vecTool.size()-1)
-            m_ucToolIndex = 0;
-        else
-            ++m_ucToolIndex;
-    }
+//    if(wheelEvent->delta() < 0)
+//    {
+//        if(m_ucToolIndex == 0)
+//            m_ucToolIndex = m_vecTool.size()-1;
+//        else
+//            --m_ucToolIndex;
+//    }
+//    else
+//    {
+//        if(m_ucToolIndex == m_vecTool.size()-1)
+//            m_ucToolIndex = 0;
+//        else
+//            ++m_ucToolIndex;
+//    }
 
-    QString text = QString("%1/%2 Tool: %3").arg(m_ucToolIndex+1).arg(m_vecTool.size()).arg(m_vecTool[m_ucToolIndex]);
-    ui.m_qLabel_Tool->setText(text);
-    ui.m_qLabel_Tool->show();
+//    QString text = QString("%1/%2 Tool: %3").arg(m_ucToolIndex+1).arg(m_vecTool.size()).arg(m_vecTool[m_ucToolIndex]);
+//    ui.m_qLabel_Tool->setText(text);
+//    ui.m_qLabel_Tool->show();
 
-    if(m_pTimerToolDisplay)
-        delete m_pTimerToolDisplay;
+//    if(m_pTimerToolDisplay)
+//        delete m_pTimerToolDisplay;
 
-    m_pTimerToolDisplay = new QTimer(this);
+//    m_pTimerToolDisplay = new QTimer(this);
 
-    connect( m_pTimerToolDisplay, SIGNAL(timeout()), ui.m_qLabel_Tool, SLOT(hide()));
-    m_pTimerToolDisplay->start(2000);
+//    connect( m_pTimerToolDisplay, SIGNAL(timeout()), ui.m_qLabel_Tool, SLOT(hide()));
+//    m_pTimerToolDisplay->start(2000);
 
 }
 
@@ -676,4 +717,4 @@ void RealTimeSourceEstimateWidget::wheelEvent(QWheelEvent* wheelEvent)
 // STATIC DEFINITIONS
 //=============================================================================================================
 
-QList<double>       RealTimeSourceEstimateWidget::s_listSamplingRates;
+//QList<double>       RealTimeSourceEstimateWidget::s_listSamplingRates;

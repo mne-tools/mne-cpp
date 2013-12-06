@@ -1,11 +1,11 @@
 //=============================================================================================================
 /**
-* @file     tmsiproducer.cpp
+* @file     asaelc.h
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     September, 2013
+* @date     November, 2013
 *
 * @section  LICENSE
 *
@@ -30,20 +30,49 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the TMSIProducer class.
+* @brief    AsAElc class declaration.
 *
 */
+
+#ifndef ASAELC_H
+#define ASAELC_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "tmsiproducer.h"
-#include "tmsi.h"
-#include "tmsidriver.h"
+#include "utils_global.h"
 
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
+
+#include <QSharedPointer>
+#include <QVector>
+#include <QFile>
+#include <QTextStream>
+#include <QStringList>
 #include <QDebug>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE MNELIB
+//=============================================================================================================
+
+namespace UTILSLIB
+{
 
 
 //*************************************************************************************************************
@@ -51,94 +80,48 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace TMSIPlugin;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// DEFINES
 //=============================================================================================================
 
-TMSIProducer::TMSIProducer(TMSI* pTMSI)
-: m_pTMSI(pTMSI)
-, m_pTMSIDriver(new TMSIDriver(this))
-, m_bIsRunning(true)
+
+//=============================================================================================================
+/**
+* Processes AsA .elc files which contain the electrode positions of a EEG hat.
+*
+* @brief Processes AsA .elc files which contain the electrode positions of a EEG hat.
+*/
+class UTILSSHARED_EXPORT AsAElc
 {
-}
+public:
+    typedef QSharedPointer<AsAElc> SPtr;            /**< Shared pointer type for AsAElc. */
+    typedef QSharedPointer<const AsAElc> ConstSPtr; /**< Const shared pointer type for AsAElc. */
+
+    //=========================================================================================================
+    /**
+    * Constructs a Filter object.
+    */
+    AsAElc();
 
 
-//*************************************************************************************************************
+    //=========================================================================================================
+    /**
+    * Gets the impulse response of a static precalculated (matlab) filter.
+    * @param [in] path holds the file path of the elc file which is to be read.
+    * @param [in] location3D holds the vector to which the read 3D positions are stored.
+    * @param [in] location2D holds the vector to which the read 2D positions are stored.
+    * @param [out] bool returns true if reading was successful, false otherwise.
+    */
+    bool readElcFile(QString path, QStringList &channelNames, QVector<QVector<double>> &location3D, QVector<QVector<double> > &location2D, QString &unit);
 
-TMSIProducer::~TMSIProducer()
-{
-    //cout << "TMSIProducer::~TMSIProducer()" << endl;
-}
+private:
 
+};
 
-//*************************************************************************************************************
+} // NAMESPACE
 
-void TMSIProducer::start(int iNumberOfChannels,
-                     int iSamplingFrequency,
-                     int iSamplesPerBlock,
-                     bool bConvertToVolt,
-                     bool bUseChExponent,
-                     bool bUseUnitGain,
-                     bool bUseUnitOffset,
-                     bool bWriteDriverDebugToFile,
-                     QString sOutputFilePath)
-{
-    //Initialise device
-    if(m_pTMSIDriver->initDevice(iNumberOfChannels,
-                              iSamplingFrequency,
-                              iSamplesPerBlock,
-                              bConvertToVolt,
-                              bUseChExponent,
-                              bUseUnitGain,
-                              bUseUnitOffset,
-                              bWriteDriverDebugToFile,
-                              sOutputFilePath))
-    {
-        m_bIsRunning = true;
-        QThread::start();
-    }
-    else
-        m_bIsRunning = false;
-}
-
-
-//*************************************************************************************************************
-
-void TMSIProducer::stop()
-{
-    //Wait until this thread (TMSIProducer) is stopped
-    m_bIsRunning = false;
-
-    //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the push function (acquire statement)
-    m_pTMSI->m_pRawMatrixBuffer_In->releaseFromPush();
-
-    while(this->isRunning())
-        m_bIsRunning = false;
-
-    //Uinitialise device only after the thread stopped
-    m_pTMSIDriver->uninitDevice();
-}
-
-
-//*************************************************************************************************************
-
-void TMSIProducer::run()
-{
-    MatrixXf matRawBuffer(m_pTMSI->m_iNumberOfChannels, m_pTMSI->m_iSamplesPerBlock);
-
-    while(m_bIsRunning)
-    {
-        //std::cout<<"TMSIProducer::run()"<<std::endl;
-        //Get the TMSi EEG data out of the device buffer and write received data to circular buffer
-        if(m_pTMSIDriver->getSampleMatrixValue(matRawBuffer))
-            m_pTMSI->m_pRawMatrixBuffer_In->push(&matRawBuffer);
-    }
-
-    //std::cout<<"EXITING - TMSIProducer::run()"<<std::endl;
-}
-
-
+#endif // ASAELC_H

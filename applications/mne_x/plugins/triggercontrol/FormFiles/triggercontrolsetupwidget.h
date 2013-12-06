@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
-* @file     tmsiproducer.cpp
-* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     dummysetupwidget.h
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     September, 2013
+* @date     February, 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,20 +29,28 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the TMSIProducer class.
+* @brief    Contains the declaration of the DummySetupWidget class.
 *
 */
+
+#ifndef DUMMYSETUPWIDGET_H
+#define DUMMYSETUPWIDGET_H
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "tmsiproducer.h"
-#include "tmsi.h"
-#include "tmsidriver.h"
+#include "../ui_triggercontrolsetup.h"
 
-#include <QDebug>
+
+//*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QtWidgets>
 
 
 //*************************************************************************************************************
@@ -51,94 +58,68 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace TMSIPlugin;
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE TriggerControlPlugin
+//=============================================================================================================
+
+namespace TriggerControlPlugin
+{
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
-TMSIProducer::TMSIProducer(TMSI* pTMSI)
-: m_pTMSI(pTMSI)
-, m_pTMSIDriver(new TMSIDriver(this))
-, m_bIsRunning(true)
+class TriggerControl;
+
+
+//=============================================================================================================
+/**
+* DECLARE CLASS DummySetupWidget
+*
+* @brief The DummySetupWidget class provides the DummyToolbox configuration window.
+*/
+class TriggerControlSetupWidget : public QWidget
 {
-}
+    Q_OBJECT
+
+public:
+
+    //=========================================================================================================
+    /**
+    * Constructs a DummySetupWidget which is a child of parent.
+    *
+    * @param [in] toolbox a pointer to the corresponding DummyToolbox.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new DummySetupWidget becomes a window. If parent is another widget, DummySetupWidget becomes a child window inside parent. DummySetupWidget is deleted when its parent is deleted.
+    */
+    TriggerControlSetupWidget(TriggerControl* toolbox, QWidget *parent = 0);
+
+    //=========================================================================================================
+    /**
+    * Destroys the DummySetupWidget.
+    * All DummySetupWidget's children are deleted first. The application exits if DummySetupWidget is the main widget.
+    */
+    ~TriggerControlSetupWidget();
 
 
-//*************************************************************************************************************
+private slots:
+    //=========================================================================================================
+    /**
+    * Shows the About Dialog
+    *
+    */
+    void showAboutDialog();
 
-TMSIProducer::~TMSIProducer()
-{
-    //cout << "TMSIProducer::~TMSIProducer()" << endl;
-}
+private:
 
+    TriggerControl* m_pTriggerControl;  /**< Holds a pointer to corresponding TriggerControl.*/
 
-//*************************************************************************************************************
+    Ui::TriggerControlSetupWidgetClass ui;       /**< Holds the user interface for the TriggerControlSetupWidget.*/
+};
 
-void TMSIProducer::start(int iNumberOfChannels,
-                     int iSamplingFrequency,
-                     int iSamplesPerBlock,
-                     bool bConvertToVolt,
-                     bool bUseChExponent,
-                     bool bUseUnitGain,
-                     bool bUseUnitOffset,
-                     bool bWriteDriverDebugToFile,
-                     QString sOutputFilePath)
-{
-    //Initialise device
-    if(m_pTMSIDriver->initDevice(iNumberOfChannels,
-                              iSamplingFrequency,
-                              iSamplesPerBlock,
-                              bConvertToVolt,
-                              bUseChExponent,
-                              bUseUnitGain,
-                              bUseUnitOffset,
-                              bWriteDriverDebugToFile,
-                              sOutputFilePath))
-    {
-        m_bIsRunning = true;
-        QThread::start();
-    }
-    else
-        m_bIsRunning = false;
-}
+} // NAMESPACE
 
-
-//*************************************************************************************************************
-
-void TMSIProducer::stop()
-{
-    //Wait until this thread (TMSIProducer) is stopped
-    m_bIsRunning = false;
-
-    //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the push function (acquire statement)
-    m_pTMSI->m_pRawMatrixBuffer_In->releaseFromPush();
-
-    while(this->isRunning())
-        m_bIsRunning = false;
-
-    //Uinitialise device only after the thread stopped
-    m_pTMSIDriver->uninitDevice();
-}
-
-
-//*************************************************************************************************************
-
-void TMSIProducer::run()
-{
-    MatrixXf matRawBuffer(m_pTMSI->m_iNumberOfChannels, m_pTMSI->m_iSamplesPerBlock);
-
-    while(m_bIsRunning)
-    {
-        //std::cout<<"TMSIProducer::run()"<<std::endl;
-        //Get the TMSi EEG data out of the device buffer and write received data to circular buffer
-        if(m_pTMSIDriver->getSampleMatrixValue(matRawBuffer))
-            m_pTMSI->m_pRawMatrixBuffer_In->push(&matRawBuffer);
-    }
-
-    //std::cout<<"EXITING - TMSIProducer::run()"<<std::endl;
-}
-
-
+#endif // TRIGGERCONTROLSETUPWIDGET_H

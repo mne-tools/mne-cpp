@@ -41,17 +41,33 @@ TEMPLATE = subdirs
 SUBDIRS += \
     ecgsimulator \
     mnertclient \
-    dummytoolbox
+    dummytoolbox \
+    triggercontrol
 #    rtsss \
 
-win32 {
-    exists(C:/Windows/System32/RTINST.DLL) {
-        message(TMSI plugin configured! Driver DLL found!)
-        SUBDIRS += tmsi
+
+win32 { #Only compile the TMSI plugin if a windows system is used - TMSi driver is not available for linux yet
+    contains(QMAKE_HOST.arch, x86_64) { #Compiling MNE-X FOR a 64bit system
+        exists(C:/Windows/System32/TMSiSDK.dll) {
+            message(Compiling MNE-X FOR a 64bit system: TMSI plugin configured! TMSi Driver found!)
+            SUBDIRS += tmsi
+        }
     }
     else {
-        message(TMSI plugin was not configured due to missing driver DLL!)
+        exists(C:/Windows/SysWOW64/TMSiSDK32bit.dll) { #Compiling MNE-X FOR a 32bit system ON a 64bit system
+            message(Compiling MNE-X FOR a 32bit system ON a 64bit system: TMSI plugin configured! TMSi Driver found!)
+            SUBDIRS += tmsi
         }
+        else {
+            exists(C:/Windows/System32/TMSiSDK.dll) { #Compiling MNE-X FOR a 32bit system ON a 32bit system
+                message(Compiling MNE-X FOR a 32bit system ON a 32bit system: TMSI plugin configured! TMSi Driver found!)
+                SUBDIRS += tmsi
+            }
+            else {
+                message(TMSI plugin not configured! TMSi Driver not found!)
+            }
+        }
+    }
 }
 else {
     message(TMSI plugin was not configured due to wrong OS (win32 needed)!)
