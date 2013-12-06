@@ -196,7 +196,6 @@ public:
     *
     * @return true when fiff_dir_tree contains kind
     */
-
     bool has_kind(fiff_int_t p_kind) const;
 
 public:

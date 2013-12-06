@@ -87,9 +87,9 @@ int main(int argc, char *argv[])
     //create list of fiff data to read
     QList<QIODevice*> t_listSampleFiles;
     t_listSampleFiles.append(new QFile("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif"));
-    t_listSampleFiles.append(new QFile("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif"));
-    t_listSampleFiles.append(new QFile("./MNE-sample-data/MEG/sample/sample_audvis-no-filter-ave.fif"));
-    t_listSampleFiles.append(new QFile("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif"));
+//    t_listSampleFiles.append(new QFile("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif"));
+//    t_listSampleFiles.append(new QFile("./MNE-sample-data/MEG/sample/sample_audvis-no-filter-ave.fif"));
+//    t_listSampleFiles.append(new QFile("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif"));
 //    t_listSampleFiles.append(new QFile("./MNE-sample-data/MEG/sample/sample_audvis-cov.fif"));
 
     FiffIO p_fiffIO(t_listSampleFiles);

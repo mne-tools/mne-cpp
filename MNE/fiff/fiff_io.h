@@ -158,9 +158,12 @@ public:
     /**
     * Write data to a p_IODevice.
     *
-    * @param[in] p_IODevice    A fiff IO device like a fiff QFile or QTCPSocket
+    * @param[in] p_IODevice             A fiff IO device like a fiff QFile or QTCPSocket
+    * @param[in] type of data to write  fiff constants types, e.g. FIFFB_RAW_DATA
+    * @param[in] idx                    index of type, 0 for all entities of this type
+    *
     */
-    //bool write(QIODevice p_IODevice, Type type, fiff_int_t idx);
+    bool write(QIODevice& p_IODevice, fiff_int_t type, fiff_int_t idx);
 
     //=========================================================================================================
     /**
@@ -179,9 +182,10 @@ public:
 
     friend std::ostream& operator<<(std::ostream& out, const FiffIO &p_fiffIO) {
         out << "\n\n---------------------- Fiff data read summary ---------------------- " << std::endl;
-        out << p_fiffIO.m_qlistRaw.size() << " raw data sets found! " << std::endl;
-        out << p_fiffIO.m_qlistEvoked.size() << " evoked sets found!" << std::endl;
-        out << p_fiffIO.m_qlistFwd.size() << " forward solutions found!" << std::endl;
+        out << "fiff data contains" << std::endl;
+        out << p_fiffIO.m_qlistRaw.size() << " raw data sets" << std::endl;
+        out << p_fiffIO.m_qlistEvoked.size() << " evoked sets" << std::endl;
+        out << p_fiffIO.m_qlistFwd.size() << " forward solutions" << std::endl;
         return out;
     }
 
