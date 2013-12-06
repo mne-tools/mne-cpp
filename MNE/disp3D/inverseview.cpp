@@ -82,14 +82,14 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-InverseView::InverseView(const MNESourceSpace &p_sourceSpace, QList<Label> &p_qListLabels, QList<RowVector4i> &p_qListRGBAs, QWindow *parent)
+InverseView::InverseView(const MNESourceSpace &p_sourceSpace, QList<Label> &p_qListLabels, QList<RowVector4i> &p_qListRGBAs, qint32 p_iFps, bool p_bLoop, bool p_bStereo, QWindow *parent)
 : QGLView(parent)
-, m_pInverseViewProducer(new InverseViewProducer)
-, m_iColorMode(0)
+, m_pInverseViewProducer(new InverseViewProducer(p_iFps, p_bLoop))
 , m_sourceSpace(p_sourceSpace)
 , m_qListLabels(p_qListLabels)
 , m_qListRGBAs(p_qListRGBAs)
-, m_bStereo(false)
+, m_iColorMode(0)
+, m_bStereo(p_bStereo)
 , m_fOffsetZ(-100.0f)
 , m_fOffsetZEye(60.0f)
 , m_pSceneNodeBrain(0)
@@ -101,7 +101,7 @@ InverseView::InverseView(const MNESourceSpace &p_sourceSpace, QList<Label> &p_qL
 //    m_pCameraFrontal = new QGLCamera(this);
 //    m_pCameraFrontal->setAdjustForAspectRatio(false);
 
-    qDebug() << "p_qListLabels" << p_qListLabels.size();
+//    qDebug() << "p_qListLabels" << p_qListLabels.size();
 
     QObject::connect(m_pInverseViewProducer.data(), &InverseViewProducer::sourceEstimateSample, this, &InverseView::updateActivation);
 }
@@ -119,9 +119,8 @@ InverseView::~InverseView()
 
 //*************************************************************************************************************
 
-void InverseView::pushSourceEstimate(SourceEstimate &p_sourceEstimate)
+void InverseView::pushSourceEstimate(MNESourceEstimate &p_sourceEstimate)
 {
-    qDebug() << "Push Source Estimate 1";
     m_pInverseViewProducer->pushSourceEstimate(p_sourceEstimate);
 }
 
@@ -421,6 +420,7 @@ void InverseView::updateActivation(QSharedPointer<Eigen::VectorXd> p_pVecActivat
             qint32 labelId = m_sourceSpace[h].cluster_info.clusterLabelIds[i];
             qint32 colorIdx = m_qListMapLabelIdIndex[h][labelId];
             //search for max activation within one label - by checking if there is already an assigned value
+
             if(abs(t_curLabelActivation[colorIdx]) < abs((*p_pVecActivation.data())[i]))//m_curSourceEstimate.data(i, currentSample)))
                 t_curLabelActivation[colorIdx] = (*p_pVecActivation.data())[i];//m_curSourceEstimate.data(i, currentSample);
         }
@@ -430,7 +430,8 @@ void InverseView::updateActivation(QSharedPointer<Eigen::VectorXd> p_pVecActivat
     {
         if(m_pInverseViewProducer->getMaxActivation()[i] != 0)
         {
-            qint32 iVal = (t_curLabelActivation[i]/m_pInverseViewProducer->getGlobalMax()) * 400;//255;
+            qint32 iVal = (t_curLabelActivation[i]/m_pInverseViewProducer->getGlobalMax()) * 800;//255;
+
             iVal = iVal > 255 ? 255 : iVal < 0 ? 0 : iVal;
 
 //            int r, g, b;
@@ -440,7 +441,7 @@ void InverseView::updateActivation(QSharedPointer<Eigen::VectorXd> p_pVecActivat
 ////                r = iVal;
 ////                g = iVal;
 ////                b = iVal;
-//                qRgb = ColorMap::valueToHotNegative1((double)iVal/255.0);
+                qRgb = ColorMap::valueToHotNegative1((double)iVal/255.0);
 ////                qRgb = ColorMap::valueToHotNegative2((double)iVal/255.0);
 //            }
 //            else if(m_iColorMode == 1)
@@ -449,7 +450,7 @@ void InverseView::updateActivation(QSharedPointer<Eigen::VectorXd> p_pVecActivat
 ////                g = iVal;
 ////                b = iVal;
 ////                qRgb = ColorMap::valueToHot((double)iVal/255.0);
-                qRgb = ColorMap::valueToHotNegative2((double)iVal/255.0);
+//                qRgb = ColorMap::valueToHotNegative2((double)iVal/255.0);
 //            }
 
             m_pSceneNode->palette()->material(i)->setSpecularColor(QColor(qRgb));

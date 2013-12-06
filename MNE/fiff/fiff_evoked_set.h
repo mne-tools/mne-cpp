@@ -146,6 +146,36 @@ public:
 
     //=========================================================================================================
     /**
+    * mne_compensate_to
+    *
+    * ### MNE toolbox root function ### Implementation of the mne_compensate_to function
+    *
+    * Apply compensation to the data as desired
+    *
+    * @param[in] to                 desired compensation in the output
+    * @param[in,out] p_FiffEvoked   Evoked set to compensate
+    *
+    * @return true if succeeded, false otherwise
+    */
+    bool compensate_to(FiffEvokedSet &p_FiffEvokedSet, fiff_int_t to) const;
+
+
+    //=========================================================================================================
+    /**
+    * fiff_find_evoked
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Find evoked data sets
+    *
+    * @param[out] p_FiffEvokedSet   The read evoked data set
+    *
+    * @return true when any set was found, false otherwise
+    */
+    bool find_evoked(const FiffEvokedSet& p_FiffEvokedSet) const;
+
+    //=========================================================================================================
+    /**
     * fiff_read_evoked
     *
     * ### MNE toolbox root function ###

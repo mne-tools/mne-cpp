@@ -254,6 +254,7 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(AnnotationSet &p
 
         //iterate over labels
         MatrixXd t_LF_partial;
+        //ToDo OpenMP
         for (qint32 i = 0; i < label_ids.rows(); ++i)
         {
 

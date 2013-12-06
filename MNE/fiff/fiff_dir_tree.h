@@ -188,6 +188,16 @@ public:
     */
     bool has_tag(fiff_int_t findkind);
 
+    //=========================================================================================================
+    /**
+    * Checks whether a DirTree has a specific kind
+    *
+    * @param[in] findkind kind to find
+    *
+    * @return true when fiff_dir_tree contains kind
+    */
+    bool has_kind(fiff_int_t p_kind) const;
+
 public:
     fiff_int_t          block;      /**< Block type for this directory */
     FiffId              id;         /**< Id of this block if any */

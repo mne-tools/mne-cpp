@@ -89,7 +89,6 @@ win32 {
 
 
 SOURCES += \
-    sourceestimate.cpp \
     minimumNorm/minimumnorm.cpp \
     rapMusic/rapmusic.cpp \
     rapMusic/dipole.cpp
@@ -97,7 +96,6 @@ SOURCES += \
 HEADERS +=\
     inverse_global.h \
     IInverseAlgorithm.h \
-    sourceestimate.h \
     minimumNorm/minimumnorm.h \
     rapMusic/rapmusic.h \
     rapMusic/dipole.h

@@ -68,7 +68,7 @@ FiffEvokedData::FiffEvokedData()
 
 //*************************************************************************************************************
 
-FiffEvokedData::FiffEvokedData(const FiffEvokedData &p_FiffEvokedData)
+FiffEvokedData::FiffEvokedData(const FiffEvokedData& p_FiffEvokedData)
 : QSharedData(p_FiffEvokedData)
 , aspect_kind(p_FiffEvokedData.aspect_kind)
 , is_smsh(p_FiffEvokedData.is_smsh)
