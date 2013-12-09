@@ -1,11 +1,11 @@
 //=============================================================================================================
 /**
-* @file     tmsiaboutwidget.cpp
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+* @file     bci_global.h
+* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     September, 2013
+* @date     December, 2013
 *
 * @section  LICENSE
 *
@@ -30,16 +30,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the TMSIAboutWidget class.
+* @brief    Contains the BCI library export/import macros.
 *
 */
 
-//*************************************************************************************************************
-//=============================================================================================================
-// INCLUDES
-//=============================================================================================================
-
-#include "tmsiaboutwidget.h"
+#ifndef BCI_GLOBAL_H
+#define BCI_GLOBAL_H
 
 
 //*************************************************************************************************************
@@ -47,31 +43,18 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QtCore/qglobal.h>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// PREPROCESSOR DEFINES
 //=============================================================================================================
 
-using namespace TMSIPlugin;
+#if defined(BCI_LIBRARY)
+#  define BCISHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#else
+#  define BCISHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#endif
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE MEMBER METHODS
-//=============================================================================================================
-
-TMSIAboutWidget::TMSIAboutWidget(QWidget *parent)
-: QDialog(parent)
-{
-    ui.setupUi(this);
-}
-
-
-//*************************************************************************************************************
-
-TMSIAboutWidget::~TMSIAboutWidget()
-{
-
-}
+#endif // TMSI_GLOBAL_H
