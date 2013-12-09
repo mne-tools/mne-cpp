@@ -1,11 +1,11 @@
 //=============================================================================================================
 /**
-* @file     tmsiaboutwidget.h
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
+* @file     bci.cpp
+* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     December, 2013
 *
 * @section  LICENSE
 *
@@ -30,20 +30,18 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the TMSIAboutWidget class.
+* @brief    Contains the implementation of the BCI class.
 *
 */
-
-#ifndef TMSIABOUTWIDGET_H
-#define TMSIABOUTWIDGET_H
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_tmsiabout.h"
+#include "bci.h"
+
+#include "FormFiles/bcisetupwidget.h"
 
 
 //*************************************************************************************************************
@@ -51,16 +49,9 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE TMSIPlugin
-//=============================================================================================================
-
-namespace TMSIPlugin
-{
+#include <QtCore/QtPlugin>
+#include <QtCore/QTextStream>
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -68,44 +59,112 @@ namespace TMSIPlugin
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace BCIPlugin;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-
-//=============================================================================================================
-/**
-* DECLARE CLASS TMSIAboutWidget
-*
-* @brief The TMSIAboutWidget class provides the about dialog for the TMSI.
-*/
-class TMSIAboutWidget : public QDialog
+BCI::BCI()
+: m_qStringResourcePath(qApp->applicationDirPath()+"/mne_x_plugins/resources/bci/")
 {
-    Q_OBJECT
+}
 
-public:
 
-    //=========================================================================================================
-    /**
-    * Constructs a ECGAboutWidget dialog which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new TMSIAboutWidget becomes a window. If parent is another widget, TMSIAboutWidget becomes a child window inside parent. TMSIAboutWidget is deleted when its parent is deleted.
-    */
-    TMSIAboutWidget(QWidget *parent = 0);
+//*************************************************************************************************************
 
-    //=========================================================================================================
-    /**
-    * Destroys the TMSIAboutWidget.
-    * All TMSIAboutWidget's children are deleted first. The application exits if TMSIAboutWidget is the main widget.
-    */
-    ~TMSIAboutWidget();
+BCI::~BCI()
+{
+    //std::cout << "BCI::~BCI() " << std::endl;
 
-private:
-    Ui::TMSIAboutWidgetClass ui;    /**< Holds the user interface for the TMSIAboutWidgetClass.*/
-};
+    //If the program is closed while the sampling is in process
+    if(this->isRunning())
+        this->stop();
+}
 
-} // NAMESPACE
 
-#endif // TMSIABOUTWIDGET_H
+//*************************************************************************************************************
+
+QSharedPointer<IPlugin> BCI::clone() const
+{
+    QSharedPointer<BCI> pTMSIClone(new BCI());
+    return pTMSIClone;
+}
+
+
+//*************************************************************************************************************
+
+void BCI::init()
+{
+	m_bIsRunning = false;
+}
+
+
+//*************************************************************************************************************
+
+bool BCI::start()
+{ 
+	m_bIsRunning = true;
+
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+bool BCI::stop()
+{
+    //Wait until this thread (BCI) is stopped
+    m_bIsRunning = false;
+
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+IPlugin::PluginType BCI::getType() const
+{
+    return _IAlgorithm;
+}
+
+
+//*************************************************************************************************************
+
+QString BCI::getName() const
+{
+    return "BCI EEG";
+}
+
+
+//*************************************************************************************************************
+
+QWidget* BCI::setupWidget()
+{
+    BCISetupWidget* widget = new BCISetupWidget(this);//widget is later destroyed by CentralWidget - so it has to be created everytime new
+
+    //init properties dialog
+    widget->initGui();
+
+    return widget;
+}
+
+
+//*************************************************************************************************************
+
+void BCI::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
+{
+}
+
+
+//*************************************************************************************************************
+
+void BCI::run()
+{
+    while(m_bIsRunning)
+    {
+        
+    }
+}

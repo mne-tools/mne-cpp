@@ -1,11 +1,11 @@
 //=============================================================================================================
 /**
-* @file     tmsiaboutwidget.h
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
+* @file     bcisetupwidget.h
+* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     February, 2013
+* @date     December, 2013
 *
 * @section  LICENSE
 *
@@ -30,20 +30,18 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the TMSIAboutWidget class.
+* @brief    Contains the declaration of the BCISetupWidget class.
 *
 */
 
-#ifndef TMSIABOUTWIDGET_H
-#define TMSIABOUTWIDGET_H
+#ifndef BCISETUPWIDGET_H
+#define BCISETUPWIDGET_H
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
-
-#include "../ui_tmsiabout.h"
 
 
 //*************************************************************************************************************
@@ -52,6 +50,7 @@
 //=============================================================================================================
 
 #include <QtWidgets>
+#include "../ui_bcisetup.h"
 
 
 //*************************************************************************************************************
@@ -59,14 +58,8 @@
 // DEFINE NAMESPACE TMSIPlugin
 //=============================================================================================================
 
-namespace TMSIPlugin
+namespace BCIPlugin
 {
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
 
 
 //*************************************************************************************************************
@@ -74,38 +67,57 @@ namespace TMSIPlugin
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+class BCI;
+
 
 //=============================================================================================================
 /**
-* DECLARE CLASS TMSIAboutWidget
+* DECLARE CLASS TMSISetupWidget
 *
-* @brief The TMSIAboutWidget class provides the about dialog for the TMSI.
+* @brief The TMSISetupWidget class provides the TMSI configuration window.
 */
-class TMSIAboutWidget : public QDialog
+class BCISetupWidget : public QWidget
 {
     Q_OBJECT
-
 public:
 
     //=========================================================================================================
     /**
-    * Constructs a ECGAboutWidget dialog which is a child of parent.
+    * Constructs a BCISetupWidget which is a child of parent.
     *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new TMSIAboutWidget becomes a window. If parent is another widget, TMSIAboutWidget becomes a child window inside parent. TMSIAboutWidget is deleted when its parent is deleted.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new BCISetupWidget becomes a window. If parent is another widget, BCISetupWidget becomes a child window inside parent. BCISetupWidget is deleted when its parent is deleted.
+    * @param [in] pBCI a pointer to the corresponding BCI.
     */
-    TMSIAboutWidget(QWidget *parent = 0);
+    BCISetupWidget(BCI* pBCI, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the TMSIAboutWidget.
-    * All TMSIAboutWidget's children are deleted first. The application exits if TMSIAboutWidget is the main widget.
+    * Destroys the BCISetupWidget.
+    * All BCISetupWidget's children are deleted first. The application exits if BCISetupWidget is the main widget.
     */
-    ~TMSIAboutWidget();
+    ~BCISetupWidget();
+
+    //=========================================================================================================
+    /**
+    * Initializes the BCI's GUI properties.
+    *
+    */
+    void initGui();
 
 private:
-    Ui::TMSIAboutWidgetClass ui;    /**< Holds the user interface for the TMSIAboutWidgetClass.*/
+
+    //=========================================================================================================
+    /**
+    * Shows the About Dialog
+    *
+    */
+    void showAboutDialog();
+
+    BCI*           m_pBCI;                    /**< a pointer to corresponding BCI.*/
+
+    Ui::BCISetupClass ui;                      /**< the user interface for the BCISetupWidget.*/
 };
 
 } // NAMESPACE
 
-#endif // TMSIABOUTWIDGET_H
+#endif // TMSISETUPWIDGET_H

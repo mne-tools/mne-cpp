@@ -39,6 +39,7 @@ include(../../../mne-cpp.pri)
 TEMPLATE = subdirs
 
 SUBDIRS += \
+    bci \
     ecgsimulator \
     mnertclient \
     dummytoolbox \

@@ -1,11 +1,11 @@
 //=============================================================================================================
 /**
-* @file     tmsiaboutwidget.h
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     bciaboutwidget.h
+* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+* 			Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     December, 2013
 *
 * @section  LICENSE
 *
@@ -30,12 +30,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the TMSIAboutWidget class.
+* @brief    Contains the declaration of the BCIAboutWidget class.
 *
 */
 
-#ifndef TMSIABOUTWIDGET_H
-#define TMSIABOUTWIDGET_H
+#ifndef BCIABOUTWIDGET_H
+#define BCIABOUTWIDGET_H
 
 
 //*************************************************************************************************************
@@ -43,7 +43,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_tmsiabout.h"
+#include "../ui_bciabout.h"
 
 
 //*************************************************************************************************************
@@ -59,7 +59,7 @@
 // DEFINE NAMESPACE TMSIPlugin
 //=============================================================================================================
 
-namespace TMSIPlugin
+namespace BCIPlugin
 {
 
 
@@ -77,11 +77,11 @@ namespace TMSIPlugin
 
 //=============================================================================================================
 /**
-* DECLARE CLASS TMSIAboutWidget
+* DECLARE CLASS BCIAboutWidget
 *
-* @brief The TMSIAboutWidget class provides the about dialog for the TMSI.
+* @brief The BCIAboutWidget class provides the about dialog for the BCI.
 */
-class TMSIAboutWidget : public QDialog
+class BCIAboutWidget : public QDialog
 {
     Q_OBJECT
 
@@ -89,21 +89,21 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a ECGAboutWidget dialog which is a child of parent.
+    * Constructs a BCIAboutWidget dialog which is a child of parent.
     *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new TMSIAboutWidget becomes a window. If parent is another widget, TMSIAboutWidget becomes a child window inside parent. TMSIAboutWidget is deleted when its parent is deleted.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new BCIAboutWidget becomes a window. If parent is another widget, BCIAboutWidget becomes a child window inside parent. TMSIAboutWidget is deleted when its parent is deleted.
     */
-    TMSIAboutWidget(QWidget *parent = 0);
+    BCIAboutWidget(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the TMSIAboutWidget.
-    * All TMSIAboutWidget's children are deleted first. The application exits if TMSIAboutWidget is the main widget.
+    * Destroys the BCIAboutWidget.
+    * All BCIAboutWidget's children are deleted first. The application exits if BCIAboutWidget is the main widget.
     */
-    ~TMSIAboutWidget();
+    ~BCIAboutWidget();
 
 private:
-    Ui::TMSIAboutWidgetClass ui;    /**< Holds the user interface for the TMSIAboutWidgetClass.*/
+    Ui::BCIAboutWidgetClass ui;    /**< Holds the user interface for the BCIAboutWidgetClass.*/
 };
 
 } // NAMESPACE

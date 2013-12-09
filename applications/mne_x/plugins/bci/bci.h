@@ -1,11 +1,11 @@
 //=============================================================================================================
 /**
-* @file     tmsiaboutwidget.h
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
+* @file     bci.h
+* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     February, 2013
+* @date     December, 2013
 *
 * @section  LICENSE
 *
@@ -30,25 +30,28 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the TMSIAboutWidget class.
+* @brief    Contains the declaration of the BCI class.
 *
 */
 
-#ifndef TMSIABOUTWIDGET_H
-#define TMSIABOUTWIDGET_H
+#ifndef BCI_H
+#define BCI_H
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
+#include "bci_global.h"
 
-#include "../ui_tmsiabout.h"
-
+#include <mne_x/Interfaces/IAlgorithm.h>
+#include <generics/circularbuffer.h>
+#include <xMeas/newrealtimesamplearray.h>
+#include <xMeas/newrealtimemultisamplearray.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// QT STL INCLUDES
 //=============================================================================================================
 
 #include <QtWidgets>
@@ -59,7 +62,7 @@
 // DEFINE NAMESPACE TMSIPlugin
 //=============================================================================================================
 
-namespace TMSIPlugin
+namespace BCIPlugin
 {
 
 
@@ -67,6 +70,10 @@ namespace TMSIPlugin
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
+
+using namespace MNEX;
+using namespace XMEASLIB;
+using namespace IOBuffer;
 
 
 //*************************************************************************************************************
@@ -77,35 +84,77 @@ namespace TMSIPlugin
 
 //=============================================================================================================
 /**
-* DECLARE CLASS TMSIAboutWidget
+* BCI...
 *
-* @brief The TMSIAboutWidget class provides the about dialog for the TMSI.
+* @brief The BCI class provides an EEG BCI.
 */
-class TMSIAboutWidget : public QDialog
+class BCISHARED_EXPORT BCI : public IAlgorithm
 {
     Q_OBJECT
+    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "bci.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
+    Q_INTERFACES(MNEX::IAlgorithm)
 
 public:
+    //=========================================================================================================
+    /**
+    * Constructs a BCI.
+    */
+    BCI();
 
     //=========================================================================================================
     /**
-    * Constructs a ECGAboutWidget dialog which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new TMSIAboutWidget becomes a window. If parent is another widget, TMSIAboutWidget becomes a child window inside parent. TMSIAboutWidget is deleted when its parent is deleted.
+    * Destroys the BCI.
     */
-    TMSIAboutWidget(QWidget *parent = 0);
+    virtual ~BCI();
 
     //=========================================================================================================
     /**
-    * Destroys the TMSIAboutWidget.
-    * All TMSIAboutWidget's children are deleted first. The application exits if TMSIAboutWidget is the main widget.
+    * Clone the plugin
     */
-    ~TMSIAboutWidget();
+    virtual QSharedPointer<IPlugin> clone() const;
+
+    //=========================================================================================================
+    /**
+    * Initialise input and output connectors.
+    */
+    virtual void init();
+
+    //=========================================================================================================
+    /**
+    * Starts the BCI by starting the BCI's thread.
+    */
+    virtual bool start();
+
+    //=========================================================================================================
+    /**
+    * Stops the BCI by stopping the BCI's thread.
+    */
+    virtual bool stop();
+
+    virtual IPlugin::PluginType getType() const;
+    virtual QString getName() const;
+
+    virtual QWidget* setupWidget();
+
+    void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
+
+protected:
+    //=========================================================================================================
+    /**
+    * The starting point for the thread. After calling start(), the newly created thread calls this function.
+    * Returning from this method will end the execution of the thread.
+    * Pure virtual method inherited by QThread.
+    */
+    virtual void run();
 
 private:
-    Ui::TMSIAboutWidgetClass ui;    /**< Holds the user interface for the TMSIAboutWidgetClass.*/
+	bool                                m_bIsRunning;                       /**< Whether TMSI is running.*/
+
+    QString                             m_qStringResourcePath;              /**< The path to the EEG resource directory.*/
+
 };
 
 } // NAMESPACE
 
-#endif // TMSIABOUTWIDGET_H
+#endif // BCI_H
