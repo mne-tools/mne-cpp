@@ -150,6 +150,7 @@ public:
     };
     Settings settings() const;
 
+    Settings g_currentSettings;
 
 protected:
     virtual void run();
@@ -164,7 +165,7 @@ private:
 
 
     qint32 m_iBaud;
-//    Settings currentSettings;
+
 };
 
 } // NAMESPACE

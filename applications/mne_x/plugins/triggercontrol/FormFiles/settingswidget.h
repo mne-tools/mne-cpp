@@ -58,21 +58,21 @@ public:
 
 
 
-    explicit SettingsWidget(QWidget *parent = 0);
+    explicit SettingsWidget(TriggerControl* toolbox, QWidget *parent = 0);
     ~SettingsWidget();
 
 
 
 private slots:
-//    void showPortInfo(int idx);
-//    void apply();
+    void showPortInfo(int idx);
+    void apply();
 
 private:
-  //  void fillPortsParameters();
-  //  void fillPortsInfo();
-  //  void updateSettings();
+    void fillPortsParameters();
+    void fillPortsInfo();
+    void updateSettings();
 
-
+    TriggerControl* m_TriggerControl;  /**< Holds a pointer to corresponding TriggerControl.*/
     Ui::SettingsWidget *ui;
 
 };
