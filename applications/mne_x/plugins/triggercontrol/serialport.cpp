@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
-* @file     dummysetupwidget.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+* @file     serialport.cpp
+* @author   Tim Kunze <tim.kunze@tu-ilmenau.de>
+*           Luise Lang <luise.lang@tu-ilmenau.de>
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     February, 2013
+* @date     November, 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2013, Tim Kunze, Luise Lang and Christoph Dinh. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the ECGSetupWidget class.
+* @brief    Contains the implementation of the SerialPort class.
 *
 */
 
@@ -38,19 +39,14 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "triggercontrolsetupwidget.h"
-#include "triggercontrolaboutwidget.h"
-#include "settingswidget.h"
-
-#include "../triggercontrol.h"
-
+#include "serialport.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QDebug>
+
 
 
 //*************************************************************************************************************
@@ -58,7 +54,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace TriggerControlPlugin;
+//using namespace TriggerControlPlugin;
 
 
 //*************************************************************************************************************
@@ -66,26 +62,16 @@ using namespace TriggerControlPlugin;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-TriggerControlSetupWidget::TriggerControlSetupWidget(TriggerControl* toolbox, QWidget *parent)
-: QWidget(parent)
-, m_pTriggerControl(toolbox)
+SerialPort::SerialPort()
 {
-    ui.setupUi(this);
 
-    connect(ui.m_qPushButton_About, &QPushButton::released, this, &TriggerControlSetupWidget::showAboutDialog);
-
-
-    connect(ui.m_qPushButton_Settings, &QPushButton::released, this, &TriggerControlSetupWidget::showSettings);
-
-
-    //Bsp Parameter
-
-    m_pTriggerControl->m_bBspBool = true;
 }
+
+
 
 //*************************************************************************************************************
 
-TriggerControlSetupWidget::~TriggerControlSetupWidget()
+SerialPort::~SerialPort()
 {
 
 }
@@ -93,17 +79,8 @@ TriggerControlSetupWidget::~TriggerControlSetupWidget()
 
 //*************************************************************************************************************
 
-void TriggerControlSetupWidget::showAboutDialog()
-{
-    TriggerControlAboutWidget aboutDialog(this);
-    aboutDialog.exec();
-}
 
 
-//*************************************************************************************************************
 
-void TriggerControlSetupWidget::showSettings()
-{
-    SettingsWidget settingsWidget(this);
-    settingsWidget.exec();
-}
+
+
