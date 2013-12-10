@@ -73,7 +73,7 @@ FiffRawData::FiffRawData(QIODevice &p_IODevice)
     if(!FiffStream::setup_read_raw(p_IODevice, *this))
     {
         printf("\tError during fiff setup raw read.\n");
-        exit(EXIT_FAILURE); //ToDo Throw here, e.g.: throw std::runtime_error("IO Error! File not found");
+        //exit(EXIT_FAILURE); //ToDo Throw here, e.g.: throw std::runtime_error("IO Error! File not found");
         return;
     }
 }

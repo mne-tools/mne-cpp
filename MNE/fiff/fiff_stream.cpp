@@ -1297,7 +1297,6 @@ QList<FiffProj> FiffStream::read_proj(const FiffDirTree& p_Node)
     return projdata;
 }
 
-
 //*************************************************************************************************************
 
 bool FiffStream::setup_read_raw(QIODevice &p_IODevice, FiffRawData& data, bool allow_maxshield)

@@ -67,8 +67,7 @@ TMSIDriver::TMSIDriver(TMSIProducer* pTMSIProducer)
 , m_bUseChExponent(false)
 , m_bUseUnitGain(false)
 , m_bUseUnitOffset(false)
-, m_bWriteToFile(false)
-, m_bUsePreprocessing(true)
+, m_bWriteDriverDebugToFile(false)
 , m_sOutputFilePath("/mne_x_plugins/resources/tmsi")
 {
     //Initialise NULL pointers
@@ -83,30 +82,16 @@ TMSIDriver::TMSIDriver(TMSIProducer* pTMSIProducer)
 //    lstrcat(Path, _T("\\TMSiSDK.dll"));
 //    m_oLibHandle = LoadLibrary(Path);
 
-    if(QSysInfo::WordSize == 32)
-    {
-        //MNE-X was compiled in 32 bit
-
-        if(ENVIRONMENT == 32)//If 32 bit compiled MNE-X is running on a 32 bit windows system
-        {
-            cout<<"MNE-X was compiled in: "<<QSysInfo::WordSize<<"bit and is running on a "<<ENVIRONMENT<<"bit system."<<endl;
-            m_oLibHandle = ::LoadLibrary(L"C:\\Windows\\System32\\TMSiSDK.dll");
-        }
-
-        if(ENVIRONMENT == 64)//If 32 bit compiled MNE-X is running on a 64 bit windows system
-        {
-            cout<<"MNE-X was compiled in: "<<QSysInfo::WordSize<<"bit and is running on a "<<ENVIRONMENT<<"bit system."<<endl;
-            m_oLibHandle = ::LoadLibrary(L"C:\\Windows\\SysWOW64\\TMSiSDK32.dll");
-        }
-    }
-    else
-    {
-        //MNE-X was compiled in 64 bit
-        cout<<"MNE-X was compiled in: "<<QSysInfo::WordSize<<"bit"<<endl;
+    //Check which driver dll to take: TMSiSDK.dll oder TMSiSDK32bit.dll
+//    if(TMSISDK)
+#ifdef TAKE_TMSISDK_DLL //32 bit system & 64 bit (with 64 bit compiler)
         m_oLibHandle = ::LoadLibrary(L"C:\\Windows\\System32\\TMSiSDK.dll");
-    }
+#elif TAKE_TMSISDK_32_DLL //64 bit (with 32 bit compiler)
+//    if(TMSISDK32)
+        m_oLibHandle = ::LoadLibrary(L"C:\\Windows\\SysWOW64\\TMSiSDK32bit.dll");
+#endif
 
-    //If it can't be open return
+    //If dll can't be open return
     if( m_oLibHandle == NULL)
     {
         cout << "Plugin TMSI - ERROR - Couldn't load DLL - Check if the driver for the TMSi USB Fiber Connector installed in the system dir" << endl;
@@ -150,8 +135,7 @@ bool TMSIDriver::initDevice(int iNumberOfChannels,
                             bool bUseChExponent,
                             bool bUseUnitGain,
                             bool bUseUnitOffset,
-                            bool bWriteToFile,
-                            bool bUsePreprocessing,
+                            bool bWriteDriverDebugToFile,
                             QString sOutpuFilePath)
 {
     //Check if the driver DLL was loaded
@@ -166,16 +150,12 @@ bool TMSIDriver::initDevice(int iNumberOfChannels,
     m_bUseChExponent = bUseChExponent;
     m_bUseUnitGain = bUseUnitGain;
     m_bUseUnitOffset = bUseUnitOffset;
-    m_bWriteToFile = bWriteToFile;
-    m_bUsePreprocessing = bUsePreprocessing;
+    m_bWriteDriverDebugToFile = bWriteDriverDebugToFile;
     m_sOutputFilePath = sOutpuFilePath;
 
-    // Initialise matrix used to perform a high pass operation
-    oldMatrix = MatrixXf::Zero(iNumberOfChannels, iSamplesPerBlock);
-
     //Open file to write to
-    if(m_bWriteToFile)
-        m_outputFileStream.open(m_sOutputFilePath.append("/TMSi_Sample_Data.txt").toStdString(), ios::trunc); //ios::trunc deletes old file data
+    if(m_bWriteDriverDebugToFile)
+        m_outputFileStream.open("mne_x_plugins/resources/tmsi/TMSi_Driver_Debug.txt", ios::trunc); //ios::trunc deletes old file data
 
     //Check if device handler already exists and a connection was established before
 //    if(m_HandleMaster != NULL)
@@ -226,9 +206,7 @@ bool TMSIDriver::initDevice(int iNumberOfChannels,
     unsigned short serial, hwVersion, swVersion, baseSf, maxRS232, nrOfChannels;
 
     if(!Status)
-    {
         cout << "Plugin TMSI - ERROR - initDevice() - FrontendInfo NOT available" << endl;
-    }
     else
     {
         serial = FrontEndInfo.Serial;
@@ -248,7 +226,7 @@ bool TMSIDriver::initDevice(int iNumberOfChannels,
         m_ulSerialNumber = pSignalFormat->SerialNumber;
         m_uiNumberOfAvailableChannels = pSignalFormat[0].Elements;
 
-        if(m_bWriteToFile)
+        if(m_bWriteDriverDebugToFile)
             m_outputFileStream << "Found "<< m_wcDeviceName << " device (" << m_ulSerialNumber << ") with " << m_uiNumberOfAvailableChannels << " available channels" << endl << endl;
 
         for(uint i = 0 ; i < m_uiNumberOfAvailableChannels; i++ )
@@ -257,11 +235,11 @@ bool TMSIDriver::initDevice(int iNumberOfChannels,
             m_vUnitGain.push_back(pSignalFormat[i].UnitGain);
             m_vUnitOffSet.push_back(pSignalFormat[i].UnitOffSet);
 
-            if(m_bWriteToFile)
+            if(m_bWriteDriverDebugToFile)
                 m_outputFileStream << "Channel number: " << i << " has type " << pSignalFormat[i].Type << " , format " << pSignalFormat[i].Format << " exponent " << pSignalFormat[i].UnitExponent << " gain " << pSignalFormat[i].UnitGain << " offset " << pSignalFormat[i].UnitOffSet << endl;
         }
 
-        if(m_bWriteToFile)
+        if(m_bWriteDriverDebugToFile)
             m_outputFileStream << endl;
     }
 
@@ -318,8 +296,11 @@ bool TMSIDriver::uninitDevice()
     }
 
     //Close the output stream/file
-    if(m_bWriteToFile)
+    if(m_outputFileStream.is_open() && m_bWriteDriverDebugToFile)
+    {
         m_outputFileStream.close();
+        m_outputFileStream.clear();
+    }
 
     if(!m_oFpStop(m_HandleMaster))
     {
@@ -414,35 +395,29 @@ bool TMSIDriver::uninitDevice()
             iSamplesWrittenToMatrix = iSamplesWrittenToMatrix + actualSamplesWritten;
         }
 
-        m_outputFileStream << "ulSizeSamples: " << ulSizeSamples << endl;
-        m_outputFileStream << "ulNumSamplesReceived: " << ulNumSamplesReceived << endl;
-        m_outputFileStream << "sampleMax: " << sampleMax << endl;
-        m_outputFileStream << "sampleIterator: " << sampleIterator << endl;
-        m_outputFileStream << "iSamplesWrittenToMatrix: " << iSamplesWrittenToMatrix << endl << endl;
+        if(m_outputFileStream.is_open() && m_bWriteDriverDebugToFile)
+        {
+            m_outputFileStream << "ulSizeSamples: " << ulSizeSamples << endl;
+            m_outputFileStream << "ulNumSamplesReceived: " << ulNumSamplesReceived << endl;
+            m_outputFileStream << "sampleMax: " << sampleMax << endl;
+            m_outputFileStream << "sampleIterator: " << sampleIterator << endl;
+            m_outputFileStream << "iSamplesWrittenToMatrix: " << iSamplesWrittenToMatrix << endl << endl;
+        }
     }
 
-    //Use preprocessing if wanted by the user
-    if(m_bUsePreprocessing)
+    if(/*m_outputFileStream.is_open() &&*/ m_bWriteDriverDebugToFile)
     {
-        MatrixXf temp = sampleMatrix;
+        //Get device buffer info
+        ULONG ulOverflow;
+        ULONG ulPercentFull;
+        m_oFpGetBufferInfo(m_HandleMaster, &ulOverflow, &ulPercentFull);
 
-        sampleMatrix = sampleMatrix - oldMatrix;
-        oldMatrix = temp;
-    }
-
-    if(m_outputFileStream.is_open() && m_bWriteToFile)
-    {
-        ULONG Overflow;
-        ULONG PercentFull;
-
-        m_oFpGetBufferInfo(m_HandleMaster, &Overflow, &PercentFull);
-
-        m_outputFileStream << "Plugin TMSI - INFO - Internal driver buffer is " << PercentFull << "% full" << endl;
-        m_outputFileStream << sampleMatrix.block(0, 0, channelMax, m_uiSamplesPerBlock) << endl << endl;
+        m_outputFileStream << "----------<See output file for sample matrix>----------" <<endl<<endl;
+        m_outputFileStream << "----------<Internal driver buffer is "<<ulPercentFull<<" full>----------"<<endl;
+        m_outputFileStream << "----------<Internal driver overflow is "<<ulOverflow<< ">----------"<<endl;
     }
 
     return true;
-
 
 //    //---- Fill up with zeros -> the function does not wait until the block is completley filled with values ------------------------------------------
 
@@ -499,8 +474,4 @@ bool TMSIDriver::uninitDevice()
 
 //    return true;
 }
-
-
-//*************************************************************************************************************
-
 

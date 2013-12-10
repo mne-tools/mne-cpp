@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
-* @file     tmsisetupwidget.h
-* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+* @file     fiff_io.cpp
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     September, 2013
+* @date     July, 2012
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,145 +30,180 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the TMSISetupWidget class.
+* @brief    Implementation of a generic Fiff IO interface
 *
 */
 
-#ifndef TMSISETUPWIDGET_H
-#define TMSISETUPWIDGET_H
-
+#ifndef FIFF_IO_H
+#define FIFF_IO_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
+#include "fiff_global.h"
+#include "fiff_info.h"
+#include "fiff_types.h"
+
+#include "fiff_raw_data.h"
+#include "fiff_evoked.h"
+//#include <mne/mne.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
-#include "../ui_tmsisetup.h"
-
+#include <QList>
+#include <QIODevice>
+#include <QSharedPointer>
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE TMSIPlugin
+// DEFINE NAMESPACE FIFFLIB
 //=============================================================================================================
 
-namespace TMSIPlugin
+namespace FIFFLIB
 {
 
-
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// USED NAMESPACES
 //=============================================================================================================
 
-class TMSI;
+//using namespace MNELIB;
 
-
-//=============================================================================================================
-/**
-* DECLARE CLASS TMSISetupWidget
-*
-* @brief The TMSISetupWidget class provides the TMSI configuration window.
-*/
-class TMSISetupWidget : public QWidget
+class FIFFSHARED_EXPORT FiffIO : public QObject
 {
-    Q_OBJECT
 public:
+//    enum Type {
+//        _RAW = FIFFB_RAW_DATA, //102
+//        _EVOKED = FIFFB_EVOKED, //104
+//        _PROJ = FIFFB_PROJ, //313
+//        _FWD = FIFFB_MNE_FORWARD_SOLUTION, //352
+//        _COV = FIFFB_MNE_COV, //355
+//        _NAMED_MATRIX = FIFFB_MNE_NAMED_MATRIX //357
+//    };
 
     //=========================================================================================================
     /**
-    * Constructs a TMSISetupWidget which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new ECGSetupWidget becomes a window. If parent is another widget, ECGSetupWidget becomes a child window inside parent. ECGSetupWidget is deleted when its parent is deleted.
-    * @param [in] pTMSI a pointer to the corresponding ECGSimulator.
-    */
-    TMSISetupWidget(TMSI* pTMSI, QWidget *parent = 0);
-
-    //=========================================================================================================
-    /**
-    * Destroys the ECGSetupWidget.
-    * All ECGSetupWidget's children are deleted first. The application exits if ECGSetupWidget is the main widget.
-    */
-    ~TMSISetupWidget();
-
-    //=========================================================================================================
-    /**
-    * Initializes the Connector's GUI properties.
+    * Constructs a FiffIO
     *
     */
-    void initGui();
+    FiffIO();
+
+    //=========================================================================================================
+    /**
+    * Destroys the FiffIO.
+    */
+    ~FiffIO();
+
+    //=========================================================================================================
+    /**
+    * Constructs a FiffIO object by reading from a I/O device p_IODevice.
+    *
+    * @param[in] p_IODevice    A fiff IO device like a fiff QFile or QTCPSocket
+    */
+    FiffIO(QIODevice& p_IODevice);
+
+    //=========================================================================================================
+    /**
+    * Constructs a FiffIO object that uses the I/O device p_IODevice.
+    *
+    * @param[in] p_qlistIODevices    A QList of fiff IO devices like a fiff QFile or QTCPSocket
+    */
+    FiffIO(QList<QIODevice*>& p_qlistIODevices);
+
+    //=========================================================================================================
+    /**
+    * Copy constructor.
+    *
+    * @param[in] p_FiffIO    FiffIO, which should be copied
+    */
+    FiffIO(const FiffIO& p_FiffIO);
+
+    //=========================================================================================================
+
+    /**
+    * Setup a FiffStream
+    *
+    * @param[in] p_IODevice     An fiff IO device like a fiff QFile or QTCPSocket
+    * @param[in] info           Overall info for fiff IO device
+    * @param[out] Tree          Directory tree structure
+    * @param[out] dirTree       Node directory structure
+    *
+    * @return true if succeeded, false otherwise
+    */
+
+    static bool setup_read(QIODevice& p_IODevice, FiffInfo& info, FiffDirTree& Tree, FiffDirTree& dirTree);
+
+    //=========================================================================================================
+    /**
+    * Read data from a p_IODevice.
+    *
+    * @param[in] p_IODevice    A fiff IO device like a fiff QFile or QTCPSocket
+    */
+    bool read(QIODevice& p_IODevice);
+
+    //=========================================================================================================
+    /**
+    * Read data from a QList of p_IODevices.
+    *
+    * @param[in] p_qlistIODevices    A QList of fiff IO devices like a fiff QFile or QTCPSocket
+    */
+    bool read(QList<QIODevice>& p_qlistIODevices);
+
+    //=========================================================================================================
+    /**
+    * Write data to a p_IODevice.
+    *
+    * @param[in] p_IODevice             A fiff IO device like a fiff QFile or QTCPSocket
+    * @param[in] type of data to write  fiff constants types, e.g. FIFFB_RAW_DATA
+    * @param[in] idx                    index of type, 0 for all entities of this type
+    *
+    */
+    bool write(QIODevice& p_IODevice, fiff_int_t type, fiff_int_t idx);
+
+    //=========================================================================================================
+    /**
+    * Write data to a p_IODevice.
+    *
+    * @param[in] p_IODevice    A fiff IO device like a fiff QFile or QTCPSocket
+    */
+    //bool write(QString filename, QString folder = "./"); //including AutoFileNaming, e.g. -raw/evoked/fwd.fiff
+
+    //=========================================================================================================
+    /**
+    * Overloading ostream for printing member infos
+    *
+    * @param[in] p_fiffIO    the fiffIO, whose members shall be printed
+    */
+
+    friend std::ostream& operator<<(std::ostream& out, const FiffIO &p_fiffIO) {
+        out << "\n\n---------------------- Fiff data read summary ---------------------- " << std::endl;
+        out << "fiff data contains" << std::endl;
+        out << p_fiffIO.m_qlistRaw.size() << " raw data sets" << std::endl;
+        out << p_fiffIO.m_qlistEvoked.size() << " evoked sets" << std::endl;
+//        out << p_fiffIO.m_qlistFwd.size() << " forward solutions" << std::endl;
+        return out;
+    }
 
 private:
-
-    //=========================================================================================================
-    /**
-    * Sets the device sampling properties.
-    *
-    */
-    void setDeviceSamplingProperties();
-
-    //=========================================================================================================
-    /**
-    * Sets the preprocessing properties.
-    *
-    */
-    void setPreprocessing();
-
-    //=========================================================================================================
-    /**
-    * Sets the postprocessing properties.
-    *
-    */
-    void setPostprocessing();
-
-    //=========================================================================================================
-    /**
-    * Sets flag for writing the received samples to a file.
-    *
-    */
-    void setWriteToFile();
-
-    //=========================================================================================================
-    /**
-    * Sets the dir where the output file is saved
-    *
-    */
-    void changeOutputFileDir();
-
-    //=========================================================================================================
-    /**
-    * Sets the dir where the output file is saved
-    *
-    */
-    void setOutputTextField();
-
-    //=========================================================================================================
-    /**
-    * Sets the dir where the eeg hat file is located
-    *
-    */
-    void changeHatDir();
-
-    //=========================================================================================================
-    /**
-    * Shows the About Dialog
-    *
-    */
-    void showAboutDialog();
-
-
-    bool            m_bAcquisitionIsRunning;
-    TMSI*           m_pTMSI;                    /**< a pointer to corresponding TMSI.*/
-
-    Ui::TMSISetupClass ui;                      /**< the user interface for the TMSISetupWidget.*/
+    QList<QSharedPointer<FiffRawData> > m_qlistRaw;
+    QList<QSharedPointer<FiffEvoked> > m_qlistEvoked;
+//    QList<QSharedPointer<MNEForwardSolution> > m_qlistFwd;
+    //FiffCov, MNEInverseOperator, AnnotationSet,
 };
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+
+
 
 } // NAMESPACE
 
-#endif // TMSISETUPWIDGET_H
+#endif // FIFF_IO_H
