@@ -41,8 +41,7 @@
 
 #include "filtertools.h"
 #include <fstream>
-#include <QFile>
-#include <QDataStream>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -64,48 +63,101 @@ FilterTools::FilterTools()
 
 //*************************************************************************************************************
 
-void FilterTools::createFilter(QString type, qint32 numberOfCoefficients, double normalizedCutOffFreq, QVector<double> &impulseResponse)
+void FilterTools::getStaticFilter(QString type, qint32 numberOfCoefficients, qint32 samplingRate, qint32 cutOffFreq, QVector<float> &impulseResponse)
+{
+    if(type == QString('HP'))
+    {
+        //HP from matlab
+    }
+
+    if(type == QString('LP'))
+    {
+        //LP from matlab
+    }
+
+    if(type == QString('BP'))
+    {
+        //BP from matlab
+    }
+
+}
+
+//*************************************************************************************************************
+
+void FilterTools::createDynamicFilter(QString type, qint32 numberOfCoefficients, float normalizedCutOffFreq, QVector<float> &impulseResponse)
 {
     //Create kaiser window
-    QVector<double> window(numberOfCoefficients);
+    QVector<float> window(numberOfCoefficients);
     KBDWindow(window, numberOfCoefficients, 8);
 
-    impulseResponse = window;
-
     //Calculate approximated sinc function (ideal TP in frequency domain)
-    QVector<double> sincApprox;
     int t = 0;
     int nd = (numberOfCoefficients-1)/2;
 
     for(int i=0; i<numberOfCoefficients; i++)
     {
         double sinc = sin(normalizedCutOffFreq*M_PI*(t-nd)) / (M_PI*(t-nd));
-        sincApprox.push_back(sinc*window[i]);
+        impulseResponse[i] = sinc*window[i];
         t++;
     }
 
     //Create final filter specified by the type parameter
     if(type == QString('HP'))
     {
-
+        for(int i=1; i<impulseResponse.size(); i=i+2)
+            impulseResponse[i] = impulseResponse[i] * (-1);
     }
 
     if(type == QString('LP'))
     {
-
+        impulseResponse = impulseResponse;
     }
 
     if(type == QString('BP'))
     {
-
+        t = 0;
+        for(int i=0; i<numberOfCoefficients; i++)
+        {
+            double tempCos = cos(normalizedCutOffFreq*M_PI*(t-nd));
+            impulseResponse[i] = impulseResponse[i]*tempCos;
+            t++;
+        }
     }
-
 }
 
 
 //*************************************************************************************************************
 
-void FilterTools::KBDWindow(QVector<double> &window, int size, double alpha)
+QVector<float> FilterTools::convolve(QVector<float> &in, QVector<float> &kernel)
+{
+    int i, j, k;
+    QVector<float> out(in.size());
+
+    // start convolution from out[kernelSize.size()-1] to out[in.size()-1] (last)
+    for(i = kernel.size()-1; i < in.size(); ++i)
+    {
+        out[i] = 0;                             // init to 0 before accumulate
+
+        for(j = i, k = 0; k < kernel.size(); --j, ++k)
+            out[i] += in[j] * kernel[k];
+    }
+
+    // convolution from out[0] to out[kernelSize-2]
+    for(i = 0; i < kernel.size() - 1; ++i)
+    {
+        out[i] = 0;                             // init to 0 before sum
+
+        for(j = i, k = 0; j >= 0; --j, ++k)
+            out[i] += in[j] * kernel[k];
+    }
+
+    return out;
+}
+
+
+//*************************************************************************************************************
+
+void FilterTools::KBDWindow(QVector<float> &window, int size, float alpha)
 {
     double sumvalue = 0.0;
     int i;
@@ -130,11 +182,11 @@ void FilterTools::KBDWindow(QVector<double> &window, int size, double alpha)
 
 //*************************************************************************************************************
 
-double FilterTools::BesselI0(double x)
+float FilterTools::BesselI0(float x)
 {
-    double denominator;
-    double numerator;
-    double z;
+    float denominator;
+    float numerator;
+    float z;
 
     if (x == 0.0)
     {

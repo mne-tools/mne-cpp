@@ -78,6 +78,7 @@ namespace UTILSLIB
 
 using namespace Eigen;
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINES
@@ -86,15 +87,15 @@ using namespace Eigen;
 
 //=============================================================================================================
 /**
-* Basic filter operations (HP, TP, BP)
+* Basic filter creation and operations (HP, TP, BP)
 *
-* @brief Basic filter operations and calculation (HP, TP, BP)
+* @brief Basic filter creation and operations (HP, TP, BP)
 */
 class UTILSSHARED_EXPORT FilterTools
 {
 public:
-    typedef QSharedPointer<FilterTools> SPtr;            /**< Shared pointer type for KMeans. */
-    typedef QSharedPointer<const FilterTools> ConstSPtr; /**< Const shared pointer type for KMeans. */
+    typedef QSharedPointer<FilterTools> SPtr;            /**< Shared pointer type for FilterTools. */
+    typedef QSharedPointer<const FilterTools> ConstSPtr; /**< Const shared pointer type for FilterTools. */
 
     //=========================================================================================================
     /**
@@ -102,16 +103,38 @@ public:
     */
     FilterTools();
 
+
+    //=========================================================================================================
+    /**
+    * Gets the impulse response of a static precalculated (matlab) filter.
+    * @param [in] type specifies the type (high-, low- , band-pass) of the filter which is to be designed. Possible values: 'HP', 'LP', 'BP'.
+    * @param [in] numberOfCoefficients number of coefficients used for the filter.
+    * @param [in] samplingRate holds the sampling frequency for the filter. Possible values: 128, 256, 512, 1024, 2048.
+    * @param [in] cutOffFreq holds the cut off frequency for the filter. Max possible value: samplingRate/2.
+    * @param [in] impulseResponse holds the created coefficients (impulse response) of the filter.
+    */
+    void getStaticFilter(QString type, qint32 numberOfCoefficients, qint32 samplingRate, qint32 cutOffFreq, QVector<float> &impulseResponse);
+
+
     //=========================================================================================================
     /**
     * Creates a Filter.
-    * @param [in] type specifies the type (high-, low- , band-pass) of the filter which is to be designed.
+    * @param [in] type specifies the type (high-, low- , band-pass) of the filter which is to be designed. Possible values: 'HP', 'LP', 'BP'.
     * @param [in] numberOfCoefficients number of coefficients used for the filter.
     * @param [in] normalizedCutOffFreq holds the cut off frequency for the filter. Range [0 1] whre 1 (pi) corresponds to f_max.
     * @param [in] impulseResponse holds the created coefficients (impulse response) of the filter.
     */
-    void createFilter(QString type, qint32 numberOfCoefficients, double normalizedCutOffFreq, QVector<double> &impulseResponse);
+    void createDynamicFilter(QString type, qint32 numberOfCoefficients, float normalizedCutOffFreq, QVector<float> &impulseResponse);
 
+
+    //=========================================================================================================
+    /**
+    * Convolves a given data set with a given filter impulse response.
+    * @param [in] in holds the data which is to be filtered.
+    * @param [in] kernel holds the impulse response of the filter which is to be used during the convolution.
+    * @param [out] QVector<float> holds the result of the convolution.
+    */
+    QVector<float> convolve(QVector<float> &in, QVector<float> &kernel);
 
 private:
     /**
@@ -120,14 +143,14 @@ private:
     * @param [in] size
     * @param [in] alpha
     */
-    void KBDWindow(QVector<double> &window, int size, double alpha);
+    void KBDWindow(QVector<float> &window, int size, float alpha);
 
     //=========================================================================================================
     /**
     * Calculates Bssel function.
     * @param [in] x
     */
-    double BesselI0(double x);
+    float BesselI0(float x);
 };
 
 } // NAMESPACE

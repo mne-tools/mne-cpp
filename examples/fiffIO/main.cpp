@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
-* @file     tmsiproducer.cpp
-* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     main.cpp
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     September, 2013
+* @date     July, 2012
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,20 +30,31 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the TMSIProducer class.
+* @brief     Example of the FiffIO interface class
 *
 */
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "tmsiproducer.h"
-#include "tmsi.h"
-#include "tmsidriver.h"
+#include <iostream>
+#include <vector>
+#include <math.h>
 
-#include <QDebug>
+#include <fiff/fiff.h>
+#include <mne/mne.h>
+
+#include <fiff/fiff_io.h>
+
+//*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QtCore/QCoreApplication>
 
 
 //*************************************************************************************************************
@@ -51,94 +62,44 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace TMSIPlugin;
+using namespace FIFFLIB;
+using namespace MNELIB;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// MAIN
 //=============================================================================================================
 
-TMSIProducer::TMSIProducer(TMSI* pTMSI)
-: m_pTMSI(pTMSI)
-, m_pTMSIDriver(new TMSIDriver(this))
-, m_bIsRunning(true)
+//=============================================================================================================
+/**
+* The function main marks the entry point of the program.
+* By default, main has the storage class extern.
+*
+* @param [in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
+* @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
+* @return the value that was set to exit() (which is 0 if exit() is called via quit()).
+*/
+int main(int argc, char *argv[])
 {
-}
+    QCoreApplication a(argc, argv);
 
+    //create list of fiff data to read
+    QList<QIODevice*> t_listSampleFiles;
+    t_listSampleFiles.append(new QFile("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif"));
+//    t_listSampleFiles.append(new QFile("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif"));
+//    t_listSampleFiles.append(new QFile("./MNE-sample-data/MEG/sample/sample_audvis-no-filter-ave.fif"));
+//    t_listSampleFiles.append(new QFile("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif"));
+//    t_listSampleFiles.append(new QFile("./MNE-sample-data/MEG/sample/sample_audvis-cov.fif"));
+
+    FiffIO p_fiffIO(t_listSampleFiles);
+
+    std::cout << p_fiffIO << std::endl;
+
+    return a.exec();
+}
 
 //*************************************************************************************************************
-
-TMSIProducer::~TMSIProducer()
-{
-    //cout << "TMSIProducer::~TMSIProducer()" << endl;
-}
-
-
-//*************************************************************************************************************
-
-void TMSIProducer::start(int iNumberOfChannels,
-                     int iSamplingFrequency,
-                     int iSamplesPerBlock,
-                     bool bConvertToVolt,
-                     bool bUseChExponent,
-                     bool bUseUnitGain,
-                     bool bUseUnitOffset,
-                     bool bWriteDriverDebugToFile,
-                     QString sOutputFilePath)
-{
-    //Initialise device
-    if(m_pTMSIDriver->initDevice(iNumberOfChannels,
-                              iSamplingFrequency,
-                              iSamplesPerBlock,
-                              bConvertToVolt,
-                              bUseChExponent,
-                              bUseUnitGain,
-                              bUseUnitOffset,
-                              bWriteDriverDebugToFile,
-                              sOutputFilePath))
-    {
-        m_bIsRunning = true;
-        QThread::start();
-    }
-    else
-        m_bIsRunning = false;
-}
-
-
-//*************************************************************************************************************
-
-void TMSIProducer::stop()
-{
-    //Wait until this thread (TMSIProducer) is stopped
-    m_bIsRunning = false;
-
-    //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the push function (acquire statement)
-    m_pTMSI->m_pRawMatrixBuffer_In->releaseFromPush();
-
-    while(this->isRunning())
-        m_bIsRunning = false;
-
-    //Uinitialise device only after the thread stopped
-    m_pTMSIDriver->uninitDevice();
-}
-
-
-//*************************************************************************************************************
-
-void TMSIProducer::run()
-{
-    MatrixXf matRawBuffer(m_pTMSI->m_iNumberOfChannels, m_pTMSI->m_iSamplesPerBlock);
-
-    while(m_bIsRunning)
-    {
-        //std::cout<<"TMSIProducer::run()"<<std::endl;
-        //Get the TMSi EEG data out of the device buffer and write received data to circular buffer
-        if(m_pTMSIDriver->getSampleMatrixValue(matRawBuffer))
-            m_pTMSI->m_pRawMatrixBuffer_In->push(&matRawBuffer);
-    }
-
-    //std::cout<<"EXITING - TMSIProducer::run()"<<std::endl;
-}
-
-
+//=============================================================================================================
+// STATIC DEFINITIONS
+//=============================================================================================================

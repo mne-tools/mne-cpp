@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     readRaw.pro
+# @file     findEvoked.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
