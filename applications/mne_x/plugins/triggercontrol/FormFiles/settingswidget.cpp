@@ -3,6 +3,9 @@
 
 #include "../triggercontrol.h"
 
+#include "triggercontrolsetupwidget.h"
+
+
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
@@ -26,9 +29,8 @@ using namespace TriggerControlPlugin;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SettingsWidget::SettingsWidget(TriggerControl* toolbox, QWidget *parent)
+SettingsWidget::SettingsWidget(QWidget *parent)
 : QDialog(parent)
-, m_TriggerControl(toolbox)
 , ui(new Ui::SettingsWidget)
 {
     ui->setupUi(this);
@@ -81,11 +83,11 @@ void SettingsWidget::fillPortsParameters()
     ui->m_qComboBox_baudrate->addItem(QLatin1String("19200"), QSerialPort::Baud19200);
     ui->m_qComboBox_baudrate->addItem(QLatin1String("38400"), QSerialPort::Baud38400);
     ui->m_qComboBox_baudrate->addItem(QLatin1String("115200"), QSerialPort::Baud115200);
-    ui->m_qComboBox_baudrate->setCurrentIndex(4);
+    ui->m_qComboBox_baudrate->setCurrentIndex(3);
 
     ui->m_qComboBox_databits->addItem(QLatin1String("7"),QSerialPort::Data7);
     ui->m_qComboBox_databits->addItem(QLatin1String("8"),QSerialPort::Data8);
-    ui->m_qComboBox_databits->setCurrentIndex(2);
+    ui->m_qComboBox_databits->setCurrentIndex(1);
 
     ui->m_qComboBox_parity->addItem(QLatin1String("Even"), QSerialPort::EvenParity);
     ui->m_qComboBox_parity->addItem(QLatin1String("Odd"), QSerialPort::OddParity);
@@ -114,31 +116,34 @@ void SettingsWidget::showPortInfo(int idx)
 
 void SettingsWidget::updateSettings()
 {
-    m_TriggerControl->g_currentSettings.name = ui->m_qComboBox_port->currentText();
+    TriggerControlSetupWidget* tcsWidget = static_cast<TriggerControlSetupWidget*> (this->parentWidget());
+
+    tcsWidget->m_pTriggerControl->m_currentSettings.name = ui->m_qComboBox_port->currentText();
 
 
     // Baud Rate
-    m_TriggerControl->g_currentSettings.baudRate = static_cast<QSerialPort::BaudRate>(
+
+    tcsWidget->m_pTriggerControl->m_currentSettings.baudRate = static_cast<QSerialPort::BaudRate>(
                     ui->m_qComboBox_baudrate->itemData(ui->m_qComboBox_baudrate->currentIndex()).toInt());
-    m_TriggerControl->g_currentSettings.stringBaudRate = QString::number(m_TriggerControl->g_currentSettings.baudRate);
+    tcsWidget->m_pTriggerControl->m_currentSettings.stringBaudRate = QString::number(tcsWidget->m_pTriggerControl->m_currentSettings.baudRate);
 
     // Data bits
-    m_TriggerControl->g_currentSettings.dataBits = static_cast<QSerialPort::DataBits>(
+    tcsWidget->m_pTriggerControl->m_currentSettings.dataBits = static_cast<QSerialPort::DataBits>(
                 ui->m_qComboBox_databits->itemData(ui->m_qComboBox_databits->currentIndex()).toInt());
-    m_TriggerControl->g_currentSettings.stringDataBits = ui->m_qComboBox_databits->currentText();
+    tcsWidget->m_pTriggerControl->m_currentSettings.stringDataBits = ui->m_qComboBox_databits->currentText();
 
     // Parity
-    m_TriggerControl->g_currentSettings.parity = static_cast<QSerialPort::Parity>(
+    tcsWidget->m_pTriggerControl->m_currentSettings.parity = static_cast<QSerialPort::Parity>(
                 ui->m_qComboBox_parity->itemData(ui->m_qComboBox_parity->currentIndex()).toInt());
-    m_TriggerControl->g_currentSettings.stringParity = ui->m_qComboBox_parity->currentText();
+    tcsWidget->m_pTriggerControl->m_currentSettings.stringParity = ui->m_qComboBox_parity->currentText();
 
     // Stop bits
-    m_TriggerControl->g_currentSettings.stopBits = static_cast<QSerialPort::StopBits>(
+    tcsWidget->m_pTriggerControl->m_currentSettings.stopBits = static_cast<QSerialPort::StopBits>(
                 ui->m_qComboBox_stopbits->itemData(ui->m_qComboBox_stopbits->currentIndex()).toInt());
-    m_TriggerControl->g_currentSettings.stringStopBits = ui->m_qComboBox_stopbits->currentText();
+    tcsWidget->m_pTriggerControl->m_currentSettings.stringStopBits = ui->m_qComboBox_stopbits->currentText();
 
     // Flow control
-    m_TriggerControl->g_currentSettings.flowControl = static_cast<QSerialPort::FlowControl>(
+    tcsWidget->m_pTriggerControl->m_currentSettings.flowControl = static_cast<QSerialPort::FlowControl>(
                 ui->m_qComboBox_flowcontrol->itemData(ui->m_qComboBox_flowcontrol->currentIndex()).toInt());
-    m_TriggerControl->g_currentSettings.stringFlowControl = ui->m_qComboBox_flowcontrol->currentText();
+    tcsWidget->m_pTriggerControl->m_currentSettings.stringFlowControl = ui->m_qComboBox_flowcontrol->currentText();
 }

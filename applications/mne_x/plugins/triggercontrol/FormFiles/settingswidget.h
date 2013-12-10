@@ -58,7 +58,7 @@ public:
 
 
 
-    explicit SettingsWidget(TriggerControl* toolbox, QWidget *parent = 0);
+    explicit SettingsWidget(QWidget *parent = 0);
     ~SettingsWidget();
 
 
@@ -72,7 +72,7 @@ private:
     void fillPortsInfo();
     void updateSettings();
 
-    TriggerControl* m_TriggerControl;  /**< Holds a pointer to corresponding TriggerControl.*/
+  //  TriggerControl* m_TriggerControl;  /**< Holds a pointer to corresponding TriggerControl.*/
     Ui::SettingsWidget *ui;
 
 };

@@ -2,13 +2,14 @@
 /**
 * @file     triggercontrol.cpp
 * @author   Tim Kunze <tim.kunze@tu-ilmenau.de>
+*           Luise Lang <luise.lang@tu-ilmenau.de>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 * @version  1.0
 * @date     November, 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Tim Kunze and Christoph Dinh. All rights reserved.
+* Copyright (C) 2013, Tim Kunze, Luise Lang and Christoph Dinh. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -70,7 +71,7 @@ TriggerControl::TriggerControl()
 : m_pTriggerOutput(NULL)
 , m_iBaud(115000)
 {
-
+    initSettings();
 }
 
 
@@ -228,5 +229,24 @@ void TriggerControl::run()
         msleep((1.0/256.0)*1000.0);
         ++count;
     }
+}
+
+//*************************************************************************************************************
+
+void TriggerControl::initSettings()
+{
+    m_currentSettings.name = "";
+    m_currentSettings.baudRate = static_cast<QSerialPort::BaudRate>(115200);
+    m_currentSettings.stringBaudRate = "115200";
+    m_currentSettings.dataBits = static_cast<QSerialPort::DataBits>(8);
+    m_currentSettings.stringDataBits = "8";
+    m_currentSettings.parity = QSerialPort::NoParity;
+    m_currentSettings.stringParity = "None";
+    m_currentSettings.stopBits = static_cast<QSerialPort::StopBits>(1);
+    m_currentSettings.stringStopBits = "1";
+    m_currentSettings.flowControl = static_cast<QSerialPort::FlowControl>(0);
+    m_currentSettings.stringFlowControl = "None";
+
+
 }
 
