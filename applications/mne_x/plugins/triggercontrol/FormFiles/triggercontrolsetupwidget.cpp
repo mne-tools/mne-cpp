@@ -76,6 +76,11 @@ TriggerControlSetupWidget::TriggerControlSetupWidget(TriggerControl* toolbox, QW
 
 
     connect(ui.m_qPushButton_Settings, &QPushButton::released, this, &TriggerControlSetupWidget::showSettings);
+
+
+    //Bsp Parameter
+
+    m_pTriggerControl->m_bBspBool = true;
 }
 
 
@@ -102,6 +107,4 @@ void TriggerControlSetupWidget::showSettings()
 {
     SettingsWidget settingsWidget(this);
     settingsWidget.exec();
-
-    qDebug() << "Here";
 }

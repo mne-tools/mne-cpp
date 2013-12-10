@@ -56,6 +56,7 @@
 //=============================================================================================================
 
 #include <QtWidgets>
+#include <QtSerialPort/QSerialPort>
 
 
 //*************************************************************************************************************
@@ -82,7 +83,7 @@ using namespace IOBuffer;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-
+class SettingsWidget;
 //=============================================================================================================
 /**
 * DECLARE CLASS TriggerControl
@@ -97,6 +98,7 @@ class TRIGGERCONTROLSHARED_EXPORT TriggerControl : public IAlgorithm
     Q_INTERFACES(MNEX::IAlgorithm)
 
     friend class TriggerControlSetupWidget;
+    friend class SettingsWidget;
 
 public:
     //=========================================================================================================
@@ -132,6 +134,22 @@ public:
     virtual QWidget* setupWidget();
 
     void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
+//
+    struct Settings {
+        QString name;
+        qint32 baudRate;
+        QString stringBaudRate;
+        QSerialPort::DataBits dataBits;
+        QString stringDataBits;
+        QSerialPort::Parity parity;
+        QString stringParity;
+        QSerialPort::StopBits stopBits;
+        QString stringStopBits;
+        QSerialPort::FlowControl flowControl;
+        QString stringFlowControl;
+    };
+    Settings settings() const;
+
 
 protected:
     virtual void run();
@@ -140,6 +158,13 @@ private:
     PluginOutputData<NewRealTimeSampleArray>::SPtr  m_pTriggerOutput;   /**< The RealTimeSampleArray of the trigger output.*/
 
     PluginInputData<NewRealTimeMultiSampleArray>::SPtr  m_pRTMSAInput;  /**< The RealTimeMultiSampleArray input.*/
+
+
+    bool m_bBspBool;
+
+
+    qint32 m_iBaud;
+//    Settings currentSettings;
 };
 
 } // NAMESPACE

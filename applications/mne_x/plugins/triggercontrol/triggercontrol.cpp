@@ -68,6 +68,7 @@ using namespace XMEASLIB;
 
 TriggerControl::TriggerControl()
 : m_pTriggerOutput(NULL)
+, m_iBaud(115000)
 {
 
 }
