@@ -57,7 +57,6 @@
 //=============================================================================================================
 
 #include <QtWidgets>
-#include <QtSerialPort/QSerialPort>
 
 
 //*************************************************************************************************************
@@ -85,6 +84,9 @@ using namespace IOBuffer;
 //=============================================================================================================
 
 class SettingsWidget;
+class SerialPort;
+
+
 //=============================================================================================================
 /**
 * DECLARE CLASS TriggerControl
@@ -100,7 +102,6 @@ class TRIGGERCONTROLSHARED_EXPORT TriggerControl : public IAlgorithm
 
     friend class TriggerControlSetupWidget;
     friend class SettingsWidget;
-    friend class SerialPort;
 
 public:
     //=========================================================================================================
@@ -137,22 +138,6 @@ public:
 
     void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
 //
-    struct Settings {
-        QString name;
-        qint32 baudRate;
-        QString stringBaudRate;
-        QSerialPort::DataBits dataBits;
-        QString stringDataBits;
-        QSerialPort::Parity parity;
-        QString stringParity;
-        QSerialPort::StopBits stopBits;
-        QString stringStopBits;
-        QSerialPort::FlowControl flowControl;
-        QString stringFlowControl;
-    };
-    Settings settings() const;
-
-    Settings m_currentSettings;
 
 protected:
     virtual void run();
@@ -162,15 +147,9 @@ private:
     PluginInputData<NewRealTimeMultiSampleArray>::SPtr  m_pRTMSAInput;  /**< The RealTimeMultiSampleArray input.*/
 
 
-
-    void initSettings();
-
-
-
-
     bool m_bBspBool;
 
-
+    QSharedPointer<SerialPort> m_pSerialPort;
 
     qint32 m_iBaud;
 

@@ -83,13 +83,9 @@ namespace TriggerControlPlugin
 *
 * @brief The TriggerControl ....
 */
-class SerialPort : public QSerialPort
+class SerialPort : public QObject
 {
-
-    friend class TriggerControl;
-    friend class TriggerControlSetupWidget;
-
-
+    Q_OBJECT
 public:
     //=========================================================================================================
     /**
@@ -103,9 +99,11 @@ public:
     */
     ~SerialPort();
 
-private slots:
-    void openSerialPort(TriggerControl::Settings m_currentSettings);
-//    void closeSerialPort();
+
+    void initSettings();
+
+    bool open();
+    void close();
   //  void sendData();
 
  //   void writeData(const QByteArray &data);
@@ -113,12 +111,34 @@ private slots:
 
    // void handleError(QSerialPort::SerialPortError error);
 
+
+    struct Settings {
+        QString name;
+        qint32 baudRate;
+        QString stringBaudRate;
+        QSerialPort::DataBits dataBits;
+        QString stringDataBits;
+        QSerialPort::Parity parity;
+        QString stringParity;
+        QSerialPort::StopBits stopBits;
+        QString stringStopBits;
+        QSerialPort::FlowControl flowControl;
+        QString stringFlowControl;
+    };
+
+    inline Settings& settings()
+    {
+        return m_currentSettings;
+    }
+
+signals:
+    void dataAvailable(const QByteArray);
+
 protected:
 
 private:
-
-
-
+    Settings m_currentSettings;
+    QSerialPort m_qSerialPort;
 
 };
 

@@ -65,7 +65,7 @@ using namespace TriggerControlPlugin;
 
 SerialPort::SerialPort()
 {
-   // QSerialPort *m_serial = new QSerialPort;
+    initSettings();
 }
 
 
@@ -80,19 +80,44 @@ SerialPort::~SerialPort()
 
 //*************************************************************************************************************
 
-void SerialPort::openSerialPort(TriggerControl::Settings m_currentSettings)
-{/*
+void SerialPort::initSettings()
+{
+    m_currentSettings.name = "";
+    m_currentSettings.baudRate = QSerialPort::Baud115200;
+    m_currentSettings.stringBaudRate = "115200";
+    m_currentSettings.dataBits = QSerialPort::Data8;
+    m_currentSettings.stringDataBits = "8";
+    m_currentSettings.parity = QSerialPort::NoParity;
+    m_currentSettings.stringParity = "None";
+    m_currentSettings.stopBits = QSerialPort::OneStop;
+    m_currentSettings.stringStopBits = "1";
+    m_currentSettings.flowControl = QSerialPort::NoFlowControl;
+    m_currentSettings.stringFlowControl = "None";
+
+
+}
+
+
+//*************************************************************************************************************
+
+bool SerialPort::open()
+{
+    bool success = false;
+
     // get current settings
-    m_serial->setPortName(m_currentSettings.name);
+    m_qSerialPort.setPortName(m_currentSettings.name);
+
+
+
 
  //   qDebug() << "noch nicht geöffnet" << endl;
-    if (m_serial->open(QIODevice::ReadWrite))
+    if (m_qSerialPort.open(QIODevice::ReadWrite))
     {    qDebug() << "geöffnet, ohne Konfigs" << endl;
-        if (m_serial->setBaudRate(m_currentSettings.baudRate)
-                && m_serial->setDataBits(m_currentSettings.dataBits)
-                && m_serial->setParity(m_currentSettings.parity)
-                && m_serial->setStopBits(m_currentSettings.stopBits)
-                && m_serial->setFlowControl(m_currentSettings.flowControl))
+        if (m_qSerialPort.setBaudRate(m_currentSettings.baudRate)
+                && m_qSerialPort.setDataBits(m_currentSettings.dataBits)
+                && m_qSerialPort.setParity(m_currentSettings.parity)
+                && m_qSerialPort.setStopBits(m_currentSettings.stopBits)
+                && m_qSerialPort.setFlowControl(m_currentSettings.flowControl))
         {    qDebug() << "geöffnet, mit konfigs" << endl;
 //            ui->pushButton_connect->setEnabled(false);
 //            ui->pushButton_disconnect->setEnabled(true);
@@ -102,12 +127,14 @@ void SerialPort::openSerialPort(TriggerControl::Settings m_currentSettings)
 //                                       .arg(p.name).arg(p.stringBaudRate).arg(p.stringDataBits)
 //                                       .arg(p.stringParity).arg(p.stringStopBits)
 //                                       .arg(p.stringFlowControl));
+            success = true;
         }
         else
         {    qDebug() << "nicht geöffnet, Fehler mit KOnfigurationszuweisung" << endl;
-            m_serial->close();
+            m_qSerialPort.close();
          //   QMessageBox::critical(this,tr("Error"),serial->errorString());
           //  ui->statusBar->showMessage(tr("Fehler beim Öffnen"));
+            success = false;
         }
 
     }
@@ -115,16 +142,17 @@ void SerialPort::openSerialPort(TriggerControl::Settings m_currentSettings)
     {    qDebug() << "nicht geöffnet, Fehler schon beim readwriteöffnen" << endl;
        // QMessageBox::critical(this,tr("Error"),serial->errorString());
       //  ui->statusBar->showMessage(tr("Konfigurationsfehler"));
-    }*/
+        success = false;
+    }
 
+    return success;
 }
 
-/*
-void SerialPort::closeSerialPort()
+
+void SerialPort::close()
 {
-    m_serial->close();
+    m_qSerialPort.close();
 qDebug() << "port geschlossen" << endl;
 }
-*/
 
 
