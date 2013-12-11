@@ -132,6 +132,7 @@ void SettingsWidget::fillPortsParameters()
     ui->m_qComboBox_databits->addItem(QLatin1String("8"),QSerialPort::Data8);
     ui->m_qComboBox_databits->setCurrentIndex(1);
 
+    ui->m_qComboBox_parity->addItem(QLatin1String("None"), QSerialPort::NoParity);
     ui->m_qComboBox_parity->addItem(QLatin1String("Even"), QSerialPort::EvenParity);
     ui->m_qComboBox_parity->addItem(QLatin1String("Odd"), QSerialPort::OddParity);
     ui->m_qComboBox_parity->addItem(QLatin1String("Mark"), QSerialPort::MarkParity);

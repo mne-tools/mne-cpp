@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
+    <width>538</width>
     <height>300</height>
    </rect>
   </property>
@@ -29,9 +29,9 @@
   <widget class="QGroupBox" name="groupBox">
    <property name="geometry">
     <rect>
-     <x>20</x>
+     <x>10</x>
      <y>10</y>
-     <width>141</width>
+     <width>271</width>
      <height>161</height>
     </rect>
    </property>
@@ -41,14 +41,14 @@
    <widget class="QComboBox" name="m_qComboBox_port">
     <property name="geometry">
      <rect>
-      <x>8</x>
+      <x>10</x>
       <y>20</y>
-      <width>101</width>
+      <width>201</width>
       <height>22</height>
      </rect>
     </property>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>10</x>
@@ -81,12 +81,12 @@
      </item>
     </layout>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>60</x>
       <y>50</y>
-      <width>61</width>
+      <width>181</width>
       <height>53</height>
      </rect>
     </property>
@@ -118,16 +118,16 @@
   <widget class="QGroupBox" name="groupBox_2">
    <property name="geometry">
     <rect>
-     <x>180</x>
+     <x>330</x>
      <y>10</y>
      <width>191</width>
      <height>171</height>
     </rect>
    </property>
    <property name="title">
-    <string>GroupBox</string>
+    <string>Configurations</string>
    </property>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
       <x>30</x>
