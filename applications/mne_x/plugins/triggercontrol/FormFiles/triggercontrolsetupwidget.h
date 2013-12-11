@@ -126,6 +126,7 @@ private:
     void showSettings();
 
 
+    SerialPort* m_serial;
     TriggerControl* m_pTriggerControl;
 
     Ui::TriggerControlSetupWidgetClass ui;       /**< Holds the user interface for the TriggerControlSetupWidget.*/

@@ -87,14 +87,13 @@ TriggerControlSetupWidget::TriggerControlSetupWidget(TriggerControl* toolbox, QW
 
     // create a SerialPort object which can be opened and closed by the buttons
 
- //   SerialPort *m_port_tsw;
-
+    m_serial = new SerialPort(this);
 
 
 
     // connect the buttons with methods from the Serialportobject
 
-    //    connect(ui.m_qPushButton_Connect, SIGNAL(released()), this, SLOT( m_port_tsw->openSerialPort(TriggerControl::Settings m_pTriggerControl->m_currentSettings)));
+//    connect(ui.m_qPushButton_Connect, SIGNAL(released()), this, SLOT( m_port_tsw->openSerialPort(TriggerControl::Settings m_pTriggerControl->m_currentSettings)));
 //    connect(ui.m_qPushButton_Disconnect, SIGNAL(released()), this, SLOT(closeSerialPort()));
 //    connect(ui->pushButton_send,SIGNAL(released()),this, SLOT(sendData()));
 
