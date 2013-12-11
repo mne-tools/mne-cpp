@@ -108,6 +108,13 @@ public:
     ~TriggerControlSetupWidget();
 
 
+private slots:
+    void on_m_qPushButton_Connect_released();
+
+    void on_m_qPushButton_Disconnect_released();
+
+    void on_m_qPushButton_Send_released();
+
 private:
     //=========================================================================================================
     /**

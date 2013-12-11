@@ -49,6 +49,7 @@
 #include <QMessageBox>
 #include <QDebug>
 #include <QSerialPort>
+#include <QSerialPortInfo>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -66,6 +67,7 @@ using namespace TriggerControlPlugin;
 SerialPort::SerialPort()
 {
     initSettings();
+    initPort();
 }
 
 
@@ -75,6 +77,15 @@ SerialPort::SerialPort()
 SerialPort::~SerialPort()
 {
 
+}
+
+
+//*************************************************************************************************************
+
+void SerialPort::close()
+{
+    m_qSerialPort.close();
+    qDebug() << "port geschlossen" << endl;
 }
 
 
@@ -93,9 +104,38 @@ void SerialPort::initSettings()
     m_currentSettings.stringStopBits = "1";
     m_currentSettings.flowControl = QSerialPort::NoFlowControl;
     m_currentSettings.stringFlowControl = "None";
+}
 
+//*************************************************************************************************************
+
+void SerialPort::initPort()
+{
+    QString sPortName;
+
+    QList<QSerialPortInfo> t_qListPortInfo = QSerialPortInfo::availablePorts();
+
+//    foreach (const QSerialPortInfo &info, QSerialPortInfo::availablePorts()) {
+// qDebug() << "Port gefunden und geändert, "<< info.portName() << endl;
+//        sPortName = info.portName();
+
+//    }
+
+    if(t_qListPortInfo.size() > 0)
+    {
+        m_currentSettings.name = t_qListPortInfo[0].portName();
+
+        m_qSerialPort.setPortName( t_qListPortInfo[0].portName());
+    }
 
 }
+
+
+//*************************************************************************************************************
+void SerialPort::sendData(const QByteArray &data)
+{
+        m_qSerialPort.write(data);
+}
+
 
 
 //*************************************************************************************************************
@@ -118,7 +158,12 @@ bool SerialPort::open()
                 && m_qSerialPort.setParity(m_currentSettings.parity)
                 && m_qSerialPort.setStopBits(m_currentSettings.stopBits)
                 && m_qSerialPort.setFlowControl(m_currentSettings.flowControl))
-        {    qDebug() << "geöffnet, mit konfigs" << endl;
+        {    qDebug() << "geöffnet, mit:"
+                      << "Name" << m_currentSettings.name
+                      << "BaudRat" << m_currentSettings.stringBaudRate
+                      << "Databits" << m_currentSettings.stringDataBits
+                      << "Parity" << m_currentSettings.stringParity
+                      << "FlowControl" << m_currentSettings.stringFlowControl  << endl;
 //            ui->pushButton_connect->setEnabled(false);
 //            ui->pushButton_disconnect->setEnabled(true);
 //            ui->pushButton_opensettings->setEnabled(false);
@@ -149,10 +194,5 @@ bool SerialPort::open()
 }
 
 
-void SerialPort::close()
-{
-    m_qSerialPort.close();
-qDebug() << "port geschlossen" << endl;
-}
 
 

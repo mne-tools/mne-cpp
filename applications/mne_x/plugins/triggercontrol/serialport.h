@@ -101,10 +101,11 @@ public:
 
 
     void initSettings();
+    void initPort();
 
     bool open();
     void close();
-  //  void sendData();
+    void sendData(const QByteArray &data);
 
  //   void writeData(const QByteArray &data);
 //    void readData();

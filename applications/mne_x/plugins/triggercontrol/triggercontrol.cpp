@@ -74,6 +74,7 @@ TriggerControl::TriggerControl()
 , m_iBaud(115000)
 , m_pSerialPort(new SerialPort) // initialize a new serial port
 {
+
 }
 
 
