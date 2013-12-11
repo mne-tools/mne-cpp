@@ -85,11 +85,6 @@ TriggerControlSetupWidget::TriggerControlSetupWidget(TriggerControl* toolbox, QW
 
 
 
-    // create a SerialPort object which can be opened and closed by the buttons
-
-    m_serial = new SerialPort(this);
-
-
 
     // connect the buttons with methods from the Serialportobject
 

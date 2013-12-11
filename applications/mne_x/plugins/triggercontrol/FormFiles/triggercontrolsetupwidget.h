@@ -52,7 +52,7 @@
 //=============================================================================================================
 
 #include <QtWidgets>
-#include <QSerialPort>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -91,7 +91,6 @@ class TriggerControlSetupWidget : public QWidget
     friend class SettingsWidget;
 
 public:
-
     //=========================================================================================================
     /**
     * Constructs a TriggerControlSetupWidget which is a child of parent.
@@ -107,7 +106,6 @@ public:
     * All DummySetupWidget's children are deleted first. The application exits if DummySetupWidget is the main widget.
     */
     ~TriggerControlSetupWidget();
-
 
 
 private:
@@ -126,7 +124,6 @@ private:
     void showSettings();
 
 
-    SerialPort* m_serial;
     TriggerControl* m_pTriggerControl;
 
     Ui::TriggerControlSetupWidgetClass ui;       /**< Holds the user interface for the TriggerControlSetupWidget.*/

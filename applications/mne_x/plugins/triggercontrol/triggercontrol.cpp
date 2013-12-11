@@ -42,6 +42,8 @@
 #include "triggercontrol.h"
 #include "FormFiles/triggercontrolsetupwidget.h"
 
+#include "serialport.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -70,12 +72,8 @@ using namespace XMEASLIB;
 TriggerControl::TriggerControl()
 : m_pTriggerOutput(NULL)
 , m_iBaud(115000)
+, m_pSerialPort(new SerialPort) // initialize a new serial port
 {
-    initSettings();
-
-    // initialize a new serial port
-
-
 }
 
 
@@ -240,28 +238,3 @@ void TriggerControl::run()
         ++count;
     }
 }
-
-//*************************************************************************************************************
-
-void TriggerControl::initSettings()
-{
-    m_currentSettings.name = "";
-    m_currentSettings.baudRate = static_cast<QSerialPort::BaudRate>(115200);
-    m_currentSettings.stringBaudRate = "115200";
-    m_currentSettings.dataBits = static_cast<QSerialPort::DataBits>(8);
-    m_currentSettings.stringDataBits = "8";
-    m_currentSettings.parity = QSerialPort::NoParity;
-    m_currentSettings.stringParity = "None";
-    m_currentSettings.stopBits = static_cast<QSerialPort::StopBits>(1);
-    m_currentSettings.stringStopBits = "1";
-    m_currentSettings.flowControl = static_cast<QSerialPort::FlowControl>(0);
-    m_currentSettings.stringFlowControl = "None";
-
-
-}
-
-TriggerControl::Settings TriggerControl::settings() const
-{
-    return m_currentSettings;
-}
-
