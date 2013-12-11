@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
-* @file     dummysetupwidget.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+* @file     triggercontrolsetupwidget.h
+* @author   Tim Kunze <tim.kunze@tu-ilmenau.de>;
+*           Luise Lang <luise.lang@tu-ilmenau.de>;
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     November, 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2013, Tim Kunze, Luise Lang and Christoph Dinh. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,12 +30,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the DummySetupWidget class.
+* @brief    Contains the declaration of the TriggerControlSetupWidget class.
 *
 */
 
-#ifndef DUMMYSETUPWIDGET_H
-#define DUMMYSETUPWIDGET_H
+#ifndef TRIGGERCONTROLSETUPWIDGET_H
+#define TRIGGERCONTROLSETUPWIDGET_H
 
 
 //*************************************************************************************************************
@@ -51,7 +52,7 @@
 //=============================================================================================================
 
 #include <QtWidgets>
-
+#include <QSerialPort>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -74,13 +75,14 @@ namespace TriggerControlPlugin
 //=============================================================================================================
 
 class TriggerControl;
+class SerialPort;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS DummySetupWidget
+* DECLARE CLASS TriggerControlSetupWidget
 *
-* @brief The DummySetupWidget class provides the DummyToolbox configuration window.
+* @brief The TriggerControlSetupWidget class provides the TriggerControlToolbox configuration window.
 */
 class TriggerControlSetupWidget : public QWidget
 {
@@ -92,10 +94,10 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a DummySetupWidget which is a child of parent.
+    * Constructs a TriggerControlSetupWidget which is a child of parent.
     *
-    * @param [in] toolbox a pointer to the corresponding DummyToolbox.
-    * @param [in] parent pointer to parent widget; If parent is 0, the new DummySetupWidget becomes a window. If parent is another widget, DummySetupWidget becomes a child window inside parent. DummySetupWidget is deleted when its parent is deleted.
+    * @param [in] toolbox a pointer to the corresponding TriggerControlToolbox.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new TriggerControlSetupWidget becomes a window. If parent is another widget, TriggerControlSetupWidget becomes a child window inside parent. TriggerControlSetupWidget is deleted when its parent is deleted.
     */
     TriggerControlSetupWidget(TriggerControl* toolbox, QWidget *parent = 0);
 
@@ -124,8 +126,7 @@ private:
     void showSettings();
 
 
-
-    TriggerControl* m_pTriggerControl;  /**< Holds a pointer to corresponding TriggerControl.*/
+    TriggerControl* m_pTriggerControl;
 
     Ui::TriggerControlSetupWidgetClass ui;       /**< Holds the user interface for the TriggerControlSetupWidget.*/
 };

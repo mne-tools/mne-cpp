@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
-* @file     triggercontrol_global.h
+* @file     trigger_global.h
 * @author   Tim Kunze <tim.kunze@tu-ilmenau.de>;
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*
+*           Luise Lang <luise.lang@tu-ilmenau.de>;
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     November, 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Tim Kunze. All rights reserved.
+* Copyright (C) 2013, Tim Kunze, Luise Lang and Christoph Dinh. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:

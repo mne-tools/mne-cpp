@@ -100,6 +100,7 @@ class TRIGGERCONTROLSHARED_EXPORT TriggerControl : public IAlgorithm
 
     friend class TriggerControlSetupWidget;
     friend class SettingsWidget;
+    friend class SerialPort;
 
 public:
     //=========================================================================================================
@@ -158,11 +159,17 @@ protected:
 
 private:
     PluginOutputData<NewRealTimeSampleArray>::SPtr  m_pTriggerOutput;   /**< The RealTimeSampleArray of the trigger output.*/
-
     PluginInputData<NewRealTimeMultiSampleArray>::SPtr  m_pRTMSAInput;  /**< The RealTimeMultiSampleArray input.*/
 
+
+
     void initSettings();
+
+
+
+
     bool m_bBspBool;
+
 
 
     qint32 m_iBaud;

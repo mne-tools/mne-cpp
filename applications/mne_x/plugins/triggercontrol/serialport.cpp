@@ -46,15 +46,16 @@
 // QT INCLUDES
 //=============================================================================================================
 
-
-
+#include <QMessageBox>
+#include <QDebug>
+#include <QSerialPort>
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-//using namespace TriggerControlPlugin;
+using namespace TriggerControlPlugin;
 
 
 //*************************************************************************************************************
@@ -64,7 +65,7 @@
 
 SerialPort::SerialPort()
 {
-
+   // QSerialPort *m_serial = new QSerialPort;
 }
 
 
@@ -78,9 +79,51 @@ SerialPort::~SerialPort()
 
 
 //*************************************************************************************************************
+/*
+void SerialPort::openSerialPort(TriggerControl::Settings m_currentSettings)
+{
+    // get current settings
+    m_serial->setPortName(m_currentSettings.name);
 
+ //   qDebug() << "noch nicht geöffnet" << endl;
+    if (m_serial->open(QIODevice::ReadWrite))
+    {    qDebug() << "geöffnet, ohne Konfigs" << endl;
+        if (m_serial->setBaudRate(m_currentSettings.baudRate)
+                && m_serial->setDataBits(m_currentSettings.dataBits)
+                && m_serial->setParity(m_currentSettings.parity)
+                && m_serial->setStopBits(m_currentSettings.stopBits)
+                && m_serial->setFlowControl(m_currentSettings.flowControl))
+        {    qDebug() << "geöffnet, mit konfigs" << endl;
+//            ui->pushButton_connect->setEnabled(false);
+//            ui->pushButton_disconnect->setEnabled(true);
+//            ui->pushButton_opensettings->setEnabled(false);
+//            ui->pushButton_send->setEnabled(true);
+//            ui->statusBar->showMessage(tr("Verbunden mit %1 : %2, %3, %4, %5, %6")
+//                                       .arg(p.name).arg(p.stringBaudRate).arg(p.stringDataBits)
+//                                       .arg(p.stringParity).arg(p.stringStopBits)
+//                                       .arg(p.stringFlowControl));
+        }
+        else
+        {    qDebug() << "nicht geöffnet, Fehler mit KOnfigurationszuweisung" << endl;
+            m_serial->close();
+         //   QMessageBox::critical(this,tr("Error"),serial->errorString());
+          //  ui->statusBar->showMessage(tr("Fehler beim Öffnen"));
+        }
 
+    }
+    else
+    {    qDebug() << "nicht geöffnet, Fehler schon beim readwriteöffnen" << endl;
+       // QMessageBox::critical(this,tr("Error"),serial->errorString());
+      //  ui->statusBar->showMessage(tr("Konfigurationsfehler"));
+    }
 
+}
 
+void SerialPort::closeSerialPort()
+{
+    m_serial->close();
+qDebug() << "port geschlossen" << endl;
+}
+*/
 
 
