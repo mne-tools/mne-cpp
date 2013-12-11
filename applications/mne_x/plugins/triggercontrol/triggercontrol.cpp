@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the TriggerControl class.
+* @brief    Contains the implementation of the TriggerControlclass.
 *
 */
 
@@ -72,6 +72,10 @@ TriggerControl::TriggerControl()
 , m_iBaud(115000)
 {
     initSettings();
+
+    // initialize a new serial port
+
+
 }
 
 
@@ -123,6 +127,9 @@ bool TriggerControl::start()
 {
     QThread::start();
     return true;
+
+
+
 }
 
 
@@ -189,8 +196,9 @@ void TriggerControl::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
 void TriggerControl::run()
 {
-    int count = 0;
-    double v = 0;
+
+
+    // open Serial Port
 
 
 
@@ -216,6 +224,8 @@ void TriggerControl::run()
 
 
 
+    int count = 0;
+    double v = 0;
 
     while (true)
     {
@@ -248,5 +258,10 @@ void TriggerControl::initSettings()
     m_currentSettings.stringFlowControl = "None";
 
 
+}
+
+TriggerControl::Settings TriggerControl::settings() const
+{
+    return m_currentSettings;
 }
 
