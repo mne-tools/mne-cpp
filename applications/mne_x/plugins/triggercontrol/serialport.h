@@ -66,14 +66,14 @@ namespace TriggerControlPlugin
 //=============================================================================================================
 
 //using namespace MNEX;
-using namespace TriggerControlPlugin;
+//using namespace TriggerControlPlugin;
 
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class TriggerControlSetupWidget;
+//class TriggerControlSetupWidget;
 //class TriggerControl;
 //class SettingsWidget;
 
@@ -83,7 +83,7 @@ class TriggerControlSetupWidget;
 *
 * @brief The TriggerControl ....
 */
-class SerialPort
+class SerialPort : public QSerialPort
 {
 
     friend class TriggerControl;
@@ -103,8 +103,8 @@ public:
     */
     ~SerialPort();
 
-//private slots:
-//    void openSerialPort(TriggerControl::Settings m_currentSettings);
+private slots:
+    void openSerialPort(TriggerControl::Settings m_currentSettings);
 //    void closeSerialPort();
   //  void sendData();
 

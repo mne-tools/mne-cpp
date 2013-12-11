@@ -79,9 +79,9 @@ SerialPort::~SerialPort()
 
 
 //*************************************************************************************************************
-/*
+
 void SerialPort::openSerialPort(TriggerControl::Settings m_currentSettings)
-{
+{/*
     // get current settings
     m_serial->setPortName(m_currentSettings.name);
 
@@ -115,10 +115,11 @@ void SerialPort::openSerialPort(TriggerControl::Settings m_currentSettings)
     {    qDebug() << "nicht geöffnet, Fehler schon beim readwriteöffnen" << endl;
        // QMessageBox::critical(this,tr("Error"),serial->errorString());
       //  ui->statusBar->showMessage(tr("Konfigurationsfehler"));
-    }
+    }*/
 
 }
 
+/*
 void SerialPort::closeSerialPort()
 {
     m_serial->close();
