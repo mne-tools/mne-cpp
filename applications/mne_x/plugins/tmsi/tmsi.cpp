@@ -174,7 +174,7 @@ void TMSI::setUpFiffInfo()
     else
         numberEEGCh = m_iNumberOfChannels;
 
-    //Check if channel size by user corresponds with read channel informations from the elc file. If not apped zeros and string 'unknown' until the size matches.
+    //Check if channel size by user corresponds with read channel informations from the elc file. If not append zeros and string 'unknown' until the size matches.
     if(numberEEGCh > elcLocation3D.size())
     {
         qDebug()<<"Warning: setUpFiffInfo() - Not enough positions read from the elc file. Filling missing channel names and positions with zeroes and 'unknown' strings.";
@@ -214,6 +214,47 @@ void TMSI::setUpFiffInfo()
     digPoint.r[2] = (elcLocation3D[indexZ1][2]-60)*0.001;
     digitizerInfo.push_back(digPoint);
 
+    //Append LAP value to digitizer data. Take location of LE2 electrode minus 1 cm as approximation.
+    int indexLE2 = elcChannelNames.indexOf("LE2");
+    digPoint.kind = FIFFV_POINT_LPA;
+    digPoint.ident = digitizerInfo.size();
+
+    //Set EEG electrode location - Convert from mm to m
+    digPoint.r[0] = elcLocation3D[indexLE2][0]*0.001;
+    digPoint.r[1] = elcLocation3D[indexLE2][1]*0.001;
+    digPoint.r[2] = (elcLocation3D[indexLE2][2]-10)*0.001;
+    digitizerInfo.push_back(digPoint);
+
+    //Append RAP value to digitizer data. Take location of RE2 electrode minus 1 cm as approximation.
+    int indexRE2 = elcChannelNames.indexOf("RE2");
+    digPoint.kind = FIFFV_POINT_RPA;
+    digPoint.ident = digitizerInfo.size();
+
+    //Set EEG electrode location - Convert from mm to m
+    digPoint.r[0] = elcLocation3D[indexRE2][0]*0.001;
+    digPoint.r[1] = elcLocation3D[indexRE2][1]*0.001;
+    digPoint.r[2] = (elcLocation3D[indexRE2][2]-10)*0.001;
+    digitizerInfo.push_back(digPoint);
+
+    //The positions read from the asa elc file do not correspond to a RAS coordinate system - use a simple 90° z transformation to fix this
+    Matrix3f rotation_z;
+    rotation_z = AngleAxisf((float)M_PI/2, Vector3f::UnitZ());
+
+    for(int i = 0; i<digitizerInfo.size(); i++)
+    {
+        Vector3f point;
+        point << digitizerInfo[i].r[0], digitizerInfo[i].r[1] , digitizerInfo[i].r[2];
+        Vector3f point_rot = rotation_z * point;
+//        cout<<"point: "<<endl<<point<<endl<<endl;
+//        cout<<"matrix: "<<endl<<rotation_z<<endl<<endl;
+//        cout<<"point_rot: "<<endl<<point_rot<<endl<<endl;
+//        cout<<"-----------------------------"<<endl;
+        digitizerInfo[i].r[0] = point_rot[0];
+        digitizerInfo[i].r[1] = point_rot[1];
+        digitizerInfo[i].r[2] = point_rot[2];
+    }
+
+    //Set the final digitizer values to the fiff info
     m_pFiffInfo->dig = digitizerInfo;
 
     //
@@ -364,6 +405,7 @@ bool TMSI::start()
         m_pOutfid = Fiff::start_writing_raw(m_fileOut, *m_pFiffInfo, m_cals);
         fiff_int_t first = 0;
         m_pOutfid->write_int(FIFF_FIRST_SAMPLE, &first);
+        m_pOutfid->finish_writing_raw();
     }
     else
         setUpFiffInfo();
@@ -465,7 +507,7 @@ void TMSI::run()
             if(m_bWriteToFile)
                 m_pOutfid->write_raw_buffer(matValue.cast<double>(), m_cals);
 
-            //Use preprocessing if wanted by the user
+            // TODO: Use preprocessing if wanted by the user
             if(m_bUsePreprocessing)
             {
                 MatrixXf temp = matValue;
@@ -500,7 +542,7 @@ void TMSI::run()
                 //    outputFileStream << endl;
             }
 
-            //Perform a fft if wanted by the user
+            // TODO: Perform a fft if wanted by the user
             if(m_bUseFFT)
             {
                 QElapsedTimer timer;
