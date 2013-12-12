@@ -2,6 +2,7 @@
 /**
 * @file     fiff_evoked_set.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     July, 2012
@@ -158,6 +159,51 @@ FiffEvokedSet FiffEvokedSet::pick_channels(const QStringList& include, const QSt
 //    }
 
 //    return res;
+}
+
+//*************************************************************************************************************
+
+bool FiffEvokedSet::compensate_to(FiffEvokedSet& p_FiffEvokedSet, fiff_int_t to) const
+{
+    qint32 now = p_FiffEvokedSet.info.get_current_comp();
+    FiffCtfComp ctf_comp;
+
+    if(now == to)
+    {
+        printf("Data is already compensated as desired.\n");
+        return false;
+    }
+
+    //Make the compensator and apply it to all data sets
+    p_FiffEvokedSet.info.make_compensator(now,to,ctf_comp);
+
+    for(qint16 i=0; i < p_FiffEvokedSet.evoked.size(); ++i)
+    {
+        p_FiffEvokedSet.evoked[i].data = ctf_comp.data->data*p_FiffEvokedSet.evoked.at(i).data;
+    }
+
+    //Update the compensation info in the channel descriptors
+    p_FiffEvokedSet.info.set_current_comp(to);
+
+    return true;
+}
+
+//*************************************************************************************************************
+
+bool FiffEvokedSet::find_evoked(const FiffEvokedSet& p_FiffEvokedSet) const
+{
+    if(!p_FiffEvokedSet.evoked.size()) {
+        printf("No evoked response data sets in %s\n",p_FiffEvokedSet.info.filename.toLatin1().constData());
+        return false;
+    }
+    else
+        printf("\nFound %d evoked response data sets in %s :\n",p_FiffEvokedSet.evoked.size(),p_FiffEvokedSet.info.filename.toLatin1().constData());
+
+    for(qint32 i = 0; i < p_FiffEvokedSet.evoked.size(); ++i) {
+        printf("%s (%s)\n",p_FiffEvokedSet.evoked.at(i).comment.toLatin1().constData(),p_FiffEvokedSet.evoked.at(i).aspectKindToString().toLatin1().constBegin());
+    }
+
+    return true;
 }
 
 

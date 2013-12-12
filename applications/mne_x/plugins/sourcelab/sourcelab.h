@@ -52,7 +52,7 @@
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_evoked.h>
 #include <mne/mne_forwardsolution.h>
-#include <inverse/sourceestimate.h>
+#include <mne/mne_sourceestimate.h>
 #include <inverse/minimumNorm/minimumnorm.h>
 #include <rtInv/rtcov.h>
 #include <rtInv/rtinvop.h>
@@ -113,6 +113,8 @@ class SOURCELABSHARED_EXPORT SourceLab : public IAlgorithm
     Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "sourcelab.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(MNEX::IAlgorithm)
+
+    friend class SourceLabSetupWidget;
 
 public:
 
@@ -188,13 +190,16 @@ private:
 
     bool m_bIsRunning;      /**< If source lab is running */
     bool m_bReceiveData;    /**< If thread is ready to receive data */
+    bool m_bProcessData;    /**< If data should be received for processing */
 
     //MNE stuff
     QFile                       m_qFileFwdSolution; /**< File to forward solution. */
     MNEForwardSolution::SPtr    m_pFwd;             /**< Forward solution. */
     MNEForwardSolution::SPtr    m_pClusteredFwd;    /**< Clustered forward solution. */
 
+    QString                     m_sAtlasDir;       /**< File to Atlas. */
     AnnotationSet::SPtr         m_pAnnotationSet;   /**< Annotation set. */
+    QString                     m_sSurfaceDir;     /**< File to Surface. */
     SurfaceSet::SPtr            m_pSurfaceSet;      /**< Surface set. */
 
 

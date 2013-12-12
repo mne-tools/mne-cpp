@@ -372,7 +372,7 @@ FiffCov FiffCov::regularize(const FiffInfo& p_info, double p_fRegMag, double p_f
 
     MatrixXd C(cov_good.data);
 
-    if(C.rows() != idx_eeg.size() + idx_mag.size() + idx_grad.size())
+    if((unsigned) C.rows() != idx_eeg.size() + idx_mag.size() + idx_grad.size())
         printf("Error in FiffCov::regularize: Channel dimensions do not fit.\n");//ToDo Throw
 
     QList<FiffProj> t_listProjs;

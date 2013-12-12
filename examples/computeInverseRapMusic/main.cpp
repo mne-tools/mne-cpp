@@ -28,7 +28,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implements the main() application function.
+* @brief    Example of MNEForwardSolution and RapMusic application
 *
 */
 
@@ -43,7 +43,7 @@
 #include <fs/annotationset.h>
 
 #include <fiff/fiff_evoked.h>
-#include <inverse/sourceestimate.h>
+#include <mne/mne_sourceestimate.h>
 #include <inverse/rapMusic/rapmusic.h>
 
 #include <utils/mnemath.h>
@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
     //########################################################################################
     // Source Estimate
 
-    QFile t_fileFwd("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+    QFile t_fileFwd("./MNE-sample-data/MEG/sample/sample_audvis-meg-oct-6-fwd.fif");
 
     MNEForwardSolution t_Fwd(t_fileFwd);
     if(t_Fwd.isEmpty())

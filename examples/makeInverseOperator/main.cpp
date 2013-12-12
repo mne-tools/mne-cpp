@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implements the main() application function.
+* @brief    Example of making an inverse operator
 *
 */
 
@@ -40,7 +40,7 @@
 
 #include <fiff/fiff_cov.h>
 #include <fiff/fiff_evoked.h>
-#include <inverse/sourceestimate.h>
+#include <mne/mne_sourceestimate.h>
 #include <inverse/minimumNorm/minimumnorm.h>
 
 
@@ -125,13 +125,13 @@ int main(int argc, char *argv[])
 
     // Compute inverse solution
     MinimumNorm minimumNorm_meeg(inverse_operator_meeg, lambda2, method);
-    SourceEstimate sourceEstimate_meeg = minimumNorm_meeg.calculateInverse(evoked);
+    MNESourceEstimate sourceEstimate_meeg = minimumNorm_meeg.calculateInverse(evoked);
 
     MinimumNorm minimumNorm_meg(inverse_operator_meg, lambda2, method);
-    SourceEstimate sourceEstimate_meg = minimumNorm_meg.calculateInverse(evoked);
+    MNESourceEstimate sourceEstimate_meg = minimumNorm_meg.calculateInverse(evoked);
 
     MinimumNorm minimumNorm_eeg(inverse_operator_eeg, lambda2, method);
-    SourceEstimate sourceEstimate_eeg = minimumNorm_eeg.calculateInverse(evoked);
+    MNESourceEstimate sourceEstimate_eeg = minimumNorm_eeg.calculateInverse(evoked);
 
     if(sourceEstimate_meeg.isEmpty() || sourceEstimate_meg.isEmpty() || sourceEstimate_eeg.isEmpty())
         return 1;

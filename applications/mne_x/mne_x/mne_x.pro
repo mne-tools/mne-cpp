@@ -69,6 +69,15 @@ else {
             -lmne_x
 }
 
+qtHaveModule(3d) {
+    CONFIG(debug, debug|release) {
+        LIBS += -lMNE$${MNE_LIB_VERSION}Disp3Dd
+    }
+    else {
+        LIBS += -lMNE$${MNE_LIB_VERSION}Disp3D
+    }
+}
+
 DESTDIR = $${MNE_BINARY_DIR}
 
 SOURCES += \

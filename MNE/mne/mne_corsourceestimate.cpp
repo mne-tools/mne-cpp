@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     dummyrunwidget.cpp
+* @file     mne_corsourceestimate.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     November, 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the DummyRunWidget class.
+* @brief    Implementation of the MNECorSourceEstimate Class.
 *
 */
 
@@ -38,10 +38,11 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "sourcelabrunwidget.h"
-#include "sourcelababoutwidget.h"
+#include "mne_corsourceestimate.h"
 
-#include "../sourcelab.h"
+#include <QFile>
+#include <QDataStream>
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
@@ -49,7 +50,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace SourceLabPlugin;
+using namespace MNELIB;
 
 
 //*************************************************************************************************************
@@ -57,19 +58,24 @@ using namespace SourceLabPlugin;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SourceLabRunWidget::SourceLabRunWidget(SourceLab* toolbox, QWidget *parent)
-: QWidget(parent)
-, m_pSourceLab(toolbox)
+MNECorSourceEstimate::MNECorSourceEstimate()
+: MNESourceEstimate()
 {
-    ui.setupUi(this);
-
-    connect(ui.m_qPushButton_About, SIGNAL(released()), this, SLOT(showAboutDialog()));
 }
 
 
 //*************************************************************************************************************
 
-SourceLabRunWidget::~SourceLabRunWidget()
+MNECorSourceEstimate::MNECorSourceEstimate(const MatrixXd &p_sol, const VectorXi &p_vertices, float p_tmin, float p_tstep)
+: MNESourceEstimate(p_sol, p_vertices, p_tmin, p_tstep)
+{
+}
+
+
+//*************************************************************************************************************
+
+MNECorSourceEstimate::MNECorSourceEstimate(const MNECorSourceEstimate& p_SourceEstimate)
+: MNESourceEstimate(p_SourceEstimate)
 {
 
 }
@@ -77,22 +83,45 @@ SourceLabRunWidget::~SourceLabRunWidget()
 
 //*************************************************************************************************************
 
-void SourceLabRunWidget::writeToLog(QString p_sLogMsg)
+MNECorSourceEstimate::MNECorSourceEstimate(QIODevice &p_IODevice)
+: MNESourceEstimate(p_IODevice)
 {
-    ui.m_qTextBrowser_Information->insertHtml(p_sLogMsg);
-
-    ui.m_qTextBrowser_Information->insertPlainText("\n"); // new line
-    //scroll down to the newest entry
-    QTextCursor c = ui.m_qTextBrowser_Information->textCursor();
-    c.movePosition(QTextCursor::End);
-    ui.m_qTextBrowser_Information->setTextCursor(c);
 }
 
 
 //*************************************************************************************************************
 
-void SourceLabRunWidget::showAboutDialog()
+void MNECorSourceEstimate::clear()
 {
-    SourceLabAboutWidget aboutDialog(this);
-    aboutDialog.exec();
+    MNESourceEstimate::clear();
+
+}
+
+
+//*************************************************************************************************************
+
+bool MNECorSourceEstimate::read(QIODevice &p_IODevice, MNECorSourceEstimate& p_stc)
+{
+    return MNESourceEstimate::read(p_IODevice, p_stc);
+}
+
+
+//*************************************************************************************************************
+
+bool MNECorSourceEstimate::write(QIODevice &p_IODevice)
+{
+    return MNESourceEstimate::write(p_IODevice);
+}
+
+
+//*************************************************************************************************************
+
+MNECorSourceEstimate& MNECorSourceEstimate::operator= (const MNECorSourceEstimate &rhs)
+{
+    if (this != &rhs) // protect against invalid self-assignment
+    {
+        MNESourceEstimate::operator= (rhs);
+    }
+    // to support chained assignment operators (a=b=c), always return *this
+    return *this;
 }

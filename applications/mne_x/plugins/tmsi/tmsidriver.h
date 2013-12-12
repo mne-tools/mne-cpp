@@ -204,13 +204,16 @@ class TMSIProducer;
         cout<< "Plugin TMSI - ERROR - Error loading method " << name << "\n"; \
 
 // Check windows
-#if _WIN32 || _WIN64
-#if _WIN64
-#define ENVIRONMENT 64
-#else
-#define ENVIRONMENT 32
-#endif
-#endif
+//#if defined (TAKE_TMSISDK_DLL)
+//#define TMSISDK true
+//#define TMSISDK32 false
+//#endif
+
+//#if defined (TAKE_TMSISDK_32_DLL)
+//#define TMSISDK32 true
+//#define TMSISDK false
+//#endif
+
 
 //=============================================================================================================
 /**
@@ -253,9 +256,8 @@ public:
     * @param [in] bUseChExponent Flag for using the channels exponent. Defined by the user via the GUI.
     * @param [in] bUseUnitGain Flag for using the channels unit gain. Defined by the user via the GUI.
     * @param [in] bUseUnitOffset Flag for using the channels unit offset. Defined by the user via the GUI.
+    * @param [in] bWriteDriverDebugToFile Flag for writing driver debug information to a file. Defined by the user via the GUI.
     * @param [in] sOutpuFilePath Holds the path for the output file. Defined by the user via the GUI.
-    * @param [in] bWriteToFile Flag for writing the received samples to a file. Defined by the user via the GUI.
-    * @param [in] Flag for using preprocessing actions for the EEG data. Defined by the user via the GUI.
     * @param [out] bool returns true if device was successfully initialised, false otherwise.
     */
     bool initDevice(int iNumberOfChannels,
@@ -265,8 +267,7 @@ public:
                     bool bUseChExponent,
                     bool bUseUnitGain,
                     bool bUseUnitOffset,
-                    bool bWriteToFile,
-                    bool bUsePreprocessing,
+                    bool bWriteDriverDebugToFile,
                     QString sOutpuFilePath);
 
     //=========================================================================================================
@@ -275,9 +276,6 @@ public:
     * @param [out] bool returns true if device was successfully uninitialised, false otherwise.
     */
     bool uninitDevice();
-
-protected:
-    MatrixXf            oldMatrix;
 
 private:
     TMSIProducer*       m_pTMSIProducer;                /**< A pointer to the corresponding TMSIProducer class.*/
@@ -294,7 +292,7 @@ private:
     bool                m_bUseChExponent;               /**< Flag for using the channels exponent. Defined by the user via the GUI.*/
     bool                m_bUseUnitGain;                 /**< Flag for using the channels unit gain. Defined by the user via the GUI.*/
     bool                m_bUseUnitOffset;               /**< Flag for using the channels unit offset. Defined by the user via the GUI.*/
-    bool                m_bWriteToFile;                 /**< Flag for writing the received samples to a file. Defined by the user via the GUI.*/
+    bool                m_bWriteDriverDebugToFile;      /**< Flag for for writing driver debug informstions to a file. Defined by the user via the GUI.*/
     bool                m_bUsePreprocessing;            /**< Flag for using preprocessing actions for the EEG data. Defined by the user via the GUI.*/
     QString             m_sOutputFilePath;              /**< Holds the path for the output file. Defined by the user via the GUI.*/
 
@@ -314,7 +312,7 @@ private:
     QVector <FLOAT>     m_vUnitOffSet;                  /**< Contains the unit offset for every channel available by the device.*/
     LONG*               m_lSignalBuffer;                /**< Buffer in which the device can write the samples -> these values get read out by the getSampleMatrix(...) function.*/
     LONG                m_lSignalBufferSize ;           /**< Size of m_ulSignalBuffer = (samples per block) * (number of channels) * 4 (4 because every signal value takes 4 bytes - see TMSi SDK documentation).*/
-    ofstream            m_outputFileStream;             /**< fstream for writing the sample values to txt file.*/
+    ofstream            m_outputFileStream;             /**< fstream for writing the driver debug informations to a txt file.*/
     QVector <double>    m_vSampleBlockBuffer;           /**< Buffer to store all the incoming smaples. This is the buffer which is getting read from.*/
 
     //Variables used for loading the TMSiSDK.dll methods. Note: Not all functions are used by this class at the moment.

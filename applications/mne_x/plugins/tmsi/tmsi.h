@@ -54,6 +54,9 @@
 #include <utils/filterTools.h>
 #include <utils/asaelc.h>
 
+#include <Eigen/unsupported/FFT>
+#include <Eigen/geometry>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -62,6 +65,7 @@
 
 #include <QtWidgets>
 #include <QVector>
+#include <QTime>
 
 
 //*************************************************************************************************************
@@ -69,7 +73,7 @@
 // FIFF INCLUDES
 //=============================================================================================================
 
-#include <fiff/fiff_info.h>
+#include <fiff/fiff.h>
 
 
 //*************************************************************************************************************
@@ -92,6 +96,7 @@ using namespace IOBuffer;
 using namespace FIFFLIB;
 using namespace std;
 using namespace UTILSLIB;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -139,15 +144,15 @@ public:
 
     //=========================================================================================================
     /**
-    * Sets up the fiff info with the current data chosen by the user.
-    */
-    void setUpFiffInfo();
-
-    //=========================================================================================================
-    /**
     * Initialise input and output connectors.
     */
     virtual void init();
+
+    //=========================================================================================================
+    /**
+    * Sets up the fiff info with the current data chosen by the user.
+    */
+    void setUpFiffInfo();
 
     //=========================================================================================================
     /**
@@ -189,17 +194,25 @@ private:
     bool                                m_bUseUnitGain;                     /**< Flag for using the channels unit gain. Defined by the user via the GUI.*/
     bool                                m_bUseUnitOffset;                   /**< Flag for using the channels unit offset. Defined by the user via the GUI.*/
     bool                                m_bWriteToFile;                     /**< Flag for for writing the received samples to a file. Defined by the user via the GUI.*/
-    bool                                m_bUsePreProcessing;                /**< Flag for writing the received samples to a file. Defined by the user via the GUI.*/
+    bool                                m_bWriteDriverDebugToFile;          /**< Flag for for writing driver debug informstions to a file. Defined by the user via the GUI.*/
+    bool                                m_bUsePreprocessing;                /**< Flag for writing the received samples to a file. Defined by the user via the GUI.*/
     bool                                m_bIsRunning;                       /**< Whether TMSI is running.*/
+    bool                                m_bUseFFT;                          /**< Flag for using FFT. Defined by the user via the GUI.*/
 
-    QString                             m_sOutputFilePath;                  /**< Holds the path for the output file. Defined by the user via the GUI.*/
+    ofstream                            m_outputFileStream;                 /**< fstream for writing the samples values to txt file.*/
+    QString                             m_sOutputFilePath;                  /**< Holds the path for the sample output file. Defined by the user via the GUI.*/
     QString                             m_sElcFilePath;                     /**< Holds the path for the .elc file (electrode positions). Defined by the user via the GUI.*/
+    QFile                               m_fileOut;                          /**< QFile for writing to fif file.*/
+    FiffStream::SPtr                    m_pOutfid;                          /**< QFile for writing to fif file.*/
+    QSharedPointer<FiffInfo>            m_pFiffInfo;                        /**< Fiff measurement info.*/
+    MatrixXd                            m_cals;
 
     QSharedPointer<RawMatrixBuffer>     m_pRawMatrixBuffer_In;              /**< Holds incoming raw data.*/
 
     QSharedPointer<TMSIProducer>        m_pTMSIProducer;                    /**< the TMSIProducer.*/
 
-    QSharedPointer<FiffInfo>            m_pFiffInfo;                        /**< Fiff measurement info.*/
+    MatrixXf                            m_matOldMatrix;                     /**< Last received sample matrix by the tmsiproducer/tmsidriver class. Used for simple HP filtering.*/
+
 };
 
 } // NAMESPACE
