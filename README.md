@@ -53,7 +53,7 @@ request to the main repository.
 Release
 ==========
 
-MNE1.0 release
+[MNE1.0 release](https://github.com/mne-tools/mne-cpp/wiki/MNE-1.0-release)
 
 
 
