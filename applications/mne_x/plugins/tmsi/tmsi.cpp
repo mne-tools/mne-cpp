@@ -238,7 +238,7 @@ void TMSI::setUpFiffInfo()
 
     //The positions read from the asa elc file do not correspond to a RAS coordinate system - use a simple 90° z transformation to fix this
     Matrix3f rotation_z;
-    rotation_z = AngleAxisf((float)M_PI/2, Vector3f::UnitZ());
+    rotation_z = AngleAxisf((float)M_PI/2, Vector3f::UnitZ()); //M_PI/2 = 90°
 
     for(int i = 0; i<digitizerInfo.size(); i++)
     {
