@@ -68,13 +68,12 @@ FiffInfoBase::FiffInfoBase()
 
 FiffInfoBase::FiffInfoBase(const FiffInfoBase& p_FiffInfoBase)
 : filename(p_FiffInfoBase.filename)
+, bads(p_FiffInfoBase.bads)
 , meas_id(FiffId(p_FiffInfoBase.meas_id))
 , nchan(p_FiffInfoBase.nchan)
+, ch_names(p_FiffInfoBase.ch_names)
 , dev_head_t(p_FiffInfoBase.dev_head_t)
 , ctf_head_t(p_FiffInfoBase.ctf_head_t)
-, ch_names(p_FiffInfoBase.ch_names)
-, bads(p_FiffInfoBase.bads)
-
 {
     qint32 i;
     for(i = 0; i < p_FiffInfoBase.chs.size(); ++i)

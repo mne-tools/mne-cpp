@@ -99,33 +99,19 @@ public:
 
     //=========================================================================================================
     /**
-    * Initializes the Connector properties.
+    * Initializes the Connector's GUI properties.
     *
     */
-    void initSamplingProperties();
+    void initGui();
 
 private:
 
     //=========================================================================================================
     /**
-    * Sets the Sampling frequency.
+    * Sets the device sampling properties.
     *
     */
-    void setSamplingFreq(int value);
-
-    //=========================================================================================================
-    /**
-    * Sets the number of channels.
-    *
-    */
-    void setNumberOfChannels(int value);
-
-    //=========================================================================================================
-    /**
-    * Sets the samples taken per block.
-    *
-    */
-    void setSamplesPerBlock(int value);
+    void setDeviceSamplingProperties();
 
     //=========================================================================================================
     /**
@@ -136,10 +122,10 @@ private:
 
     //=========================================================================================================
     /**
-    * Sets the channel correction properties.
+    * Sets the postprocessing properties.
     *
     */
-    void setChannelCorrections();
+    void setPostprocessing();
 
     //=========================================================================================================
     /**
@@ -154,6 +140,13 @@ private:
     *
     */
     void changeOutputFileDir();
+
+    //=========================================================================================================
+    /**
+    * Sets the dir where the output file is saved
+    *
+    */
+    void setOutputTextField();
 
     //=========================================================================================================
     /**

@@ -84,8 +84,7 @@ void TMSIProducer::start(int iNumberOfChannels,
                      bool bUseChExponent,
                      bool bUseUnitGain,
                      bool bUseUnitOffset,
-                     bool bWriteToFile,
-                     bool bUsePreProcessing,
+                     bool bWriteDriverDebugToFile,
                      QString sOutputFilePath)
 {
     //Initialise device
@@ -96,8 +95,7 @@ void TMSIProducer::start(int iNumberOfChannels,
                               bUseChExponent,
                               bUseUnitGain,
                               bUseUnitOffset,
-                              bWriteToFile,
-                              bUsePreProcessing,
+                              bWriteDriverDebugToFile,
                               sOutputFilePath))
     {
         m_bIsRunning = true;
@@ -115,11 +113,11 @@ void TMSIProducer::stop()
     //Wait until this thread (TMSIProducer) is stopped
     m_bIsRunning = false;
 
-    while(this->isRunning())
-        m_bIsRunning = false;
-
     //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the push function (acquire statement)
     m_pTMSI->m_pRawMatrixBuffer_In->releaseFromPush();
+
+    while(this->isRunning())
+        m_bIsRunning = false;
 
     //Uinitialise device only after the thread stopped
     m_pTMSIDriver->uninitDevice();

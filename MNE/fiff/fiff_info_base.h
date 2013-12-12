@@ -201,13 +201,13 @@ public:
 
 public: //Public because it's a mne struct
     QString filename;           /**< Filename when the info is read of a fiff file. */
+    QStringList bads;           /**< List of bad channels. */
     FiffId      meas_id;        /**< Measurement ID. */
     fiff_int_t  nchan;          /**< Number of channels. */
     QList<FiffChInfo> chs;      /**< List of all channel info descriptors. */
     QStringList ch_names;       /**< List of all channel names. */
     FiffCoordTrans dev_head_t;  /**< Coordinate transformation ToDo... */
     FiffCoordTrans ctf_head_t;  /**< Coordinate transformation ToDo... */
-    QStringList bads;           /**< List of bad channels. */
 };
 
 //*************************************************************************************************************

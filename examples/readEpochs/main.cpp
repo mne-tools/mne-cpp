@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implements the main() application function.
+* @brief     	Read epoch data from a raw data file
 *
 */
 
@@ -338,17 +338,8 @@ int main(int argc, char *argv[])
         }
     }
 
-    if(data.size() > 0)
-    {
-        printf("Read %d epochs, %d samples each.\n",data.size(),(qint32)data[0]->epoch.cols());
-
-        //DEBUG
-        std::cout << data[0]->epoch.block(0,0,10,10) << std::endl;
-        qDebug() << data[0]->epoch.rows() << " x " << data[0]->epoch.cols();
-
-        std::cout << times.block(0,0,1,10) << std::endl;
-        qDebug() << times.rows() << " x " << times.cols();
-    }
+    //Example for average_epochs
+    data.average(raw.info,raw.first_samp,raw.last_samp);
 
     return a.exec();
 }

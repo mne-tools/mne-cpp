@@ -1162,7 +1162,7 @@ QList<FiffProj> FiffStream::read_proj(const FiffDirTree& p_Node)
 
     FiffTag::SPtr t_pTag;
     t_qListNodes[0].find_tag(this, FIFF_NCHAN, t_pTag);
-    fiff_int_t global_nchan;
+    fiff_int_t global_nchan = 0;
     if (t_pTag)
         global_nchan = *t_pTag->toInt();
 
@@ -1296,7 +1296,6 @@ QList<FiffProj> FiffStream::read_proj(const FiffDirTree& p_Node)
 
     return projdata;
 }
-
 
 //*************************************************************************************************************
 
@@ -2069,7 +2068,7 @@ void FiffStream::write_float_sparse_ccs(fiff_int_t kind, const SparseMatrix<floa
     quint32 i;
     for(i = 0; i < s.size(); ++i)
     {
-        if(s[i].col() != v_old)
+        if((signed) s[i].col() != v_old)
         {
             v_old = s[i].col();
             cols.push_back(s[i].col());
@@ -2162,7 +2161,7 @@ void FiffStream::write_float_sparse_rcs(fiff_int_t kind, const SparseMatrix<floa
     quint32 i;
     for(i = 0; i < s.size(); ++i)
     {
-        if(s[i].row() != v_old)
+        if((signed) s[i].row() != v_old)
         {
             v_old = s[i].row();
             rows.push_back(s[i].row());

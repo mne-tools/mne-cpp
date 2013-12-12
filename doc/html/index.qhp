@@ -31,23 +31,23 @@
               <section title="InverseView" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html">
                 <section title="ConstSPtr" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html#acbd3608fef565cbfdaeabc7ecd83a83e" />
                 <section title="SPtr" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html#a29a09132596437680ba804eb676dd00e" />
-                <section title="InverseView" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html#ab88f220eaa7b98b77caa6ed3a15cea92" />
+                <section title="InverseView" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html#a6e40de9777aa78e9a7228bdde5a43d4c" />
                 <section title="~InverseView" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html#ae99edaeebd5abd5d7af7c59f1a1f6570" />
                 <section title="initializeGL" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html#ae5a3640847371575dfdc72507164dfce" />
                 <section title="keyPressEvent" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html#a3712afd1743b5f4b26659d9901887792" />
                 <section title="mouseMoveEvent" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html#a1ca2212ed86b6b4f5f83387467cde465" />
                 <section title="mousePressEvent" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html#aedb11c859919e99a1a4bf680864f5ffe" />
                 <section title="paintGL" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html#ac6b6252ec5be9702a1404b280771b37f" />
-                <section title="pushSourceEstimate" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html#a30c7bcd376a2246a9cce9c8d8a5d4257" />
+                <section title="pushSourceEstimate" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html#a80d713f2eeb4e4a5adff3bd36446a756" />
               </section>
               <section title="InverseViewProducer" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view_producer.html">
                 <section title="ConstSPtr" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view_producer.html#af713843568f6cb16e817e2b91bd8b5f7" />
                 <section title="SPtr" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view_producer.html#a222f9d3411f1210337d9e3e552d1eb93" />
-                <section title="InverseViewProducer" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view_producer.html#ac0763f5e8fae0aa991ef97379f5c8ac8" />
+                <section title="InverseViewProducer" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view_producer.html#ab0c8bf460f53bcdd793099fcfe296172" />
                 <section title="~InverseViewProducer" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view_producer.html#a93b235bdbfbf4d799a5d71e5fb6013e9" />
                 <section title="getGlobalMax" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view_producer.html#a6ee48a8b5548761e311944649bccafe4" />
                 <section title="getMaxActivation" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view_producer.html#ad347cbfeb31f4ac800871d84a04955b4" />
-                <section title="pushSourceEstimate" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view_producer.html#ab0edc196072c367528a1ef5dcf659039" />
+                <section title="pushSourceEstimate" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view_producer.html#a75c6f256d2c020ff6057f086c02e8fee" />
                 <section title="run" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view_producer.html#aa6a77dcd3c7d87a5cd18d040bfb6f94b" />
                 <section title="sourceEstimateSample" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view_producer.html#a29343083df0d8e8daf7ece9c2e05ce08" />
                 <section title="stop" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view_producer.html#a4762b7feca48af61fad170257f5a8973" />
@@ -59,7 +59,7 @@
                 <section title="~LabelView" ref="class_d_i_s_p3_d_l_i_b_1_1_label_view.html#a3c7ec5b375db42b8984ec08f76228295" />
                 <section title="initializeGL" ref="class_d_i_s_p3_d_l_i_b_1_1_label_view.html#a4777b7f0234499359d1416b104bfe908" />
                 <section title="paintGL" ref="class_d_i_s_p3_d_l_i_b_1_1_label_view.html#ac61e3be860ec6c41640a1b082df8552d" />
-                <section title="pushSourceEstimate" ref="class_d_i_s_p3_d_l_i_b_1_1_label_view.html#a751b31c71ed2f03a3ab64d782ef7f7d4" />
+                <section title="pushSourceEstimate" ref="class_d_i_s_p3_d_l_i_b_1_1_label_view.html#ab9f304a688eaf443e6026d4d2f57557d" />
               </section>
             </section>
             <section title="DISPLIB">
@@ -132,6 +132,22 @@
                 <section title="m_dMinX" ref="class_d_i_s_p_l_i_b_1_1_plot.html#a53a9ed0dd41182377b43b58e0a853f21" />
                 <section title="m_dMinY" ref="class_d_i_s_p_l_i_b_1_1_plot.html#ab12dd0cd296ad1b6a609162357bbdd53" />
                 <section title="m_qListVecPointFPaths" ref="class_d_i_s_p_l_i_b_1_1_plot.html#a7c8128b100f3c8c8eea48849253bd643" />
+              </section>
+              <section title="RtPlot" ref="class_d_i_s_p_l_i_b_1_1_rt_plot.html">
+                <section title="ConstSPtr" ref="class_d_i_s_p_l_i_b_1_1_rt_plot.html#aa20819ba3df7ecb70efe197eadc17a69" />
+                <section title="SPtr" ref="class_d_i_s_p_l_i_b_1_1_rt_plot.html#a413d0d8ab1074c2d703e7f518300edf1" />
+                <section title="RtPlot" ref="class_d_i_s_p_l_i_b_1_1_rt_plot.html#a25c93b81dcc4de823464c202ba4133fa" />
+                <section title="RtPlot" ref="class_d_i_s_p_l_i_b_1_1_rt_plot.html#afd02aebedfd19c16f904a0990bbc05ca" />
+                <section title="~RtPlot" ref="class_d_i_s_p_l_i_b_1_1_rt_plot.html#a039182ec66b7a102db5774da3f29795b" />
+                <section title="init" ref="class_d_i_s_p_l_i_b_1_1_rt_plot.html#a7f3065d80248a89a094db902536caf40" />
+                <section title="paintEvent" ref="class_d_i_s_p_l_i_b_1_1_rt_plot.html#a0addef8b25300d0d468cbc2768ed8701" />
+                <section title="updateData" ref="class_d_i_s_p_l_i_b_1_1_rt_plot.html#a7d07d687de99842ec52f93b963858915" />
+                <section title="m_bHoldOn" ref="class_d_i_s_p_l_i_b_1_1_rt_plot.html#a90636a8421217b37e9852c83a688fb0e" />
+                <section title="m_dMaxX" ref="class_d_i_s_p_l_i_b_1_1_rt_plot.html#ace63dfeff40aab25ddd71172b8b59879" />
+                <section title="m_dMaxY" ref="class_d_i_s_p_l_i_b_1_1_rt_plot.html#ad34cbe65a6517501b01a09e95e40802a" />
+                <section title="m_dMinX" ref="class_d_i_s_p_l_i_b_1_1_rt_plot.html#a3530cac490233f18648c66c37faf0e7e" />
+                <section title="m_dMinY" ref="class_d_i_s_p_l_i_b_1_1_rt_plot.html#a9d25a2b3e9dfc49a037a154af52e8657" />
+                <section title="m_qListVecPointFPaths" ref="class_d_i_s_p_l_i_b_1_1_rt_plot.html#af141c4dc1329164afd34ab0bebeb0b6a" />
               </section>
             </section>
             <section title="FIFFLIB">
@@ -273,7 +289,7 @@
                 <section title="FiffEvoked" ref="class_f_i_f_f_l_i_b_1_1_fiff_evoked.html#ac1936632addae9ca19f8ced356c3fba1" />
                 <section title="FiffEvoked" ref="class_f_i_f_f_l_i_b_1_1_fiff_evoked.html#a25a3e4d095544355eb179cf938b5f3ed" />
                 <section title="~FiffEvoked" ref="class_f_i_f_f_l_i_b_1_1_fiff_evoked.html#aca8c60d1b714ceb563057f91ca8c7ef8" />
-                <section title="aspectKindToString" ref="class_f_i_f_f_l_i_b_1_1_fiff_evoked.html#a70c1e65208eeda7fd8ad5d47bd8ce098" />
+                <section title="aspectKindToString" ref="class_f_i_f_f_l_i_b_1_1_fiff_evoked.html#a133a00c10457715b24ff330764e5835e" />
                 <section title="ch_names" ref="class_f_i_f_f_l_i_b_1_1_fiff_evoked.html#a501188d866347cca652e129c4afe8c98" />
                 <section title="clear" ref="class_f_i_f_f_l_i_b_1_1_fiff_evoked.html#a196068971089679a53a01e877a2b3de6" />
                 <section title="isEmpty" ref="class_f_i_f_f_l_i_b_1_1_fiff_evoked.html#af1b42c0d4929a8c4643cca4ed8776560" />
@@ -313,6 +329,8 @@
                 <section title="FiffEvokedSet" ref="class_f_i_f_f_l_i_b_1_1_fiff_evoked_set.html#a6129e41eeeff1351af72300d50c6ad05" />
                 <section title="~FiffEvokedSet" ref="class_f_i_f_f_l_i_b_1_1_fiff_evoked_set.html#a461f8fc1efc8a2c0707c04d3941fc858" />
                 <section title="clear" ref="class_f_i_f_f_l_i_b_1_1_fiff_evoked_set.html#ad5dd813313ea34b948208f9dfda9a3f1" />
+                <section title="compensate_to" ref="class_f_i_f_f_l_i_b_1_1_fiff_evoked_set.html#a65ccccf285b37a85b7a2129f8e5d6ab3" />
+                <section title="find_evoked" ref="class_f_i_f_f_l_i_b_1_1_fiff_evoked_set.html#aa1f2c36a523ac14ce7b17e82ce3a7a94" />
                 <section title="pick_channels" ref="class_f_i_f_f_l_i_b_1_1_fiff_evoked_set.html#a49d197d5a669e33fb9aa4751d2b80aaa" />
                 <section title="evoked" ref="class_f_i_f_f_l_i_b_1_1_fiff_evoked_set.html#aec48fff116de710b554d21f7f89f8fe6" />
                 <section title="info" ref="class_f_i_f_f_l_i_b_1_1_fiff_evoked_set.html#a23176cb723c6187b9e4822266426b931" />
@@ -563,8 +581,10 @@
                 <section title="AnnotationSet" ref="class_f_s_l_i_b_1_1_annotation_set.html#a7ef5bdecdcd1451761f34fdebaf47d4d" />
                 <section title="~AnnotationSet" ref="class_f_s_l_i_b_1_1_annotation_set.html#a7f36fa0ac6ddc742a0a88498a24391dc" />
                 <section title="clear" ref="class_f_s_l_i_b_1_1_annotation_set.html#a50e15835a32be178552134ee08def943" />
+                <section title="isEmpty" ref="class_f_s_l_i_b_1_1_annotation_set.html#a40d3625d5e98aa3903382f3e9af64194" />
                 <section title="operator[]" ref="class_f_s_l_i_b_1_1_annotation_set.html#ac2c85b6c78cb4d6c56c6732584ff8c2e" />
                 <section title="operator[]" ref="class_f_s_l_i_b_1_1_annotation_set.html#a21a44ee7fe417c705aa80a26baeee7a0" />
+                <section title="size" ref="class_f_s_l_i_b_1_1_annotation_set.html#a8fe85b503b0400b9fe1914950d5b99fe" />
                 <section title="toLabels" ref="class_f_s_l_i_b_1_1_annotation_set.html#aebd156d216d0d79380ca0cf63a74ebab" />
               </section>
               <section title="Colortable" ref="class_f_s_l_i_b_1_1_colortable.html">
@@ -619,16 +639,19 @@
                 <section title="SurfaceSet" ref="class_f_s_l_i_b_1_1_surface_set.html#a137a3391dddd10c89cebd57ff6be50d2" />
                 <section title="~SurfaceSet" ref="class_f_s_l_i_b_1_1_surface_set.html#a74176d9d573614df26a73aafba5c2cb3" />
                 <section title="clear" ref="class_f_s_l_i_b_1_1_surface_set.html#a9ed03130dea7dffbbba0608b5028e762" />
+                <section title="isEmpty" ref="class_f_s_l_i_b_1_1_surface_set.html#a9dae75b27a36b32e408bea40cfaf0c67" />
                 <section title="operator[]" ref="class_f_s_l_i_b_1_1_surface_set.html#afcf1e7e55a41cc931b5a59c0781e90ab" />
                 <section title="operator[]" ref="class_f_s_l_i_b_1_1_surface_set.html#a5c5e5f6bbc87848e95527c07a123983e" />
                 <section title="operator[]" ref="class_f_s_l_i_b_1_1_surface_set.html#a81e50861a2c5bf5e7b92e37f7875646b" />
                 <section title="operator[]" ref="class_f_s_l_i_b_1_1_surface_set.html#a1d07bc53038bf380f88564e005584ed1" />
+                <section title="size" ref="class_f_s_l_i_b_1_1_surface_set.html#a4b8e5cd5d5290709bbf8bd3cbdded8cb" />
               </section>
             </section>
             <section title="INVERSELIB">
               <section title="IInverseAlgorithm" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_i_inverse_algorithm.html">
                 <section title="~IInverseAlgorithm" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_i_inverse_algorithm.html#a9c2cda48ff32559bfedc02d8479be7f7" />
-                <section title="calculateInverse" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_i_inverse_algorithm.html#aeb4557c3d15974fbc6c5e74b01b26262" />
+                <section title="calculateInverse" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_i_inverse_algorithm.html#af900d44a0e523a4221912be16f33911e" />
+                <section title="calculateInverse" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_i_inverse_algorithm.html#a710a538d7312fc313889fd9f4eed58b0" />
                 <section title="getName" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_i_inverse_algorithm.html#a89c73b0cc0887941b8e9e8fe3be20943" />
                 <section title="getSourceSpace" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_i_inverse_algorithm.html#a11beb115090dc108b857465f64494e1f" />
               </section>
@@ -638,31 +661,63 @@
                 <section title="MinimumNorm" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_minimum_norm.html#a0439015d4d2b367523aea36f9e39398b" />
                 <section title="MinimumNorm" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_minimum_norm.html#a602de1995a285f2506b70aabd0190e09" />
                 <section title="~MinimumNorm" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_minimum_norm.html#a9b773cff343424f3c68cda75c7eb45f3" />
-                <section title="calculateInverse" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_minimum_norm.html#aede3e8398bfac4ad9a1366b3cba89af6" />
+                <section title="calculateInverse" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_minimum_norm.html#abd4a36d001f13678cd783a3fb72bcb31" />
+                <section title="calculateInverse" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_minimum_norm.html#abd64eae429fe48bc5a73721d42cc9d03" />
+                <section title="doInverseSetup" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_minimum_norm.html#a96ba858c671ae220922ddc4ac7b73897" />
                 <section title="getName" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_minimum_norm.html#a2e328adb859a6e5a3d0443cab5f9f247" />
                 <section title="getSourceSpace" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_minimum_norm.html#ad65d7049a646e94fe8080b05c585454c" />
                 <section title="setMethod" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_minimum_norm.html#ad4b70afa3ff6d7de780ffe248b5fd120" />
                 <section title="setMethod" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_minimum_norm.html#a46c8154877896582b9d510afe3d28820" />
                 <section title="setRegularization" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_minimum_norm.html#af5d1f861283da41315b6ab7f14a1104a" />
               </section>
+              <section title="Dipole" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html">
+                <section title="Dipole" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#a1ec3404654f5a01a2a1fb9b36312caf6" />
+                <section title="~Dipole" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#ac073300709c24934665a784352cbc9c8" />
+                <section title="clean" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#adb006995b8f8e09a5f12699af5ca65e5" />
+                <section title="phi_x" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#ad7e3d9edd9ba276181e82322b95fa7ca" />
+                <section title="phi_x" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#a762f63d3d8a5cd8f22067b5b8db8b229" />
+                <section title="phi_y" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#acd9efb81871a0d5e757c01f7526f479a" />
+                <section title="phi_y" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#a4ccaa8654c83303ac3dc767dd2d8180a" />
+                <section title="phi_z" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#a5967863f70e28dcf0be68f06999379a6" />
+                <section title="phi_z" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#a71068906146ee1105b02924e033413b5" />
+                <section title="x" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#a60b18a62a496a597484e006b861b220d" />
+                <section title="x" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#a1668939da977509529e94dc7002ab7b5" />
+                <section title="y" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#a6cbb3c0ac2f03cf308dd34f275f83cec" />
+                <section title="y" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#a74b78836fcf06d7c43a87b0d2529d775" />
+                <section title="z" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#a314268fac926e4dfd766954d05df32b8" />
+                <section title="z" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#a0d65cdf122c60656de63c154f6fab0a5" />
+              </section>
+              <section title="DipolePair" ref="struct_i_n_v_e_r_s_e_l_i_b_1_1_dipole_pair.html">
+                <section title="m_Dipole1" ref="struct_i_n_v_e_r_s_e_l_i_b_1_1_dipole_pair.html#a9189c658c056606c9fdd51d4c8a06826" />
+                <section title="m_Dipole2" ref="struct_i_n_v_e_r_s_e_l_i_b_1_1_dipole_pair.html#afcdc8820911d0c5cdf5d55488de2fad2" />
+                <section title="m_iIdx1" ref="struct_i_n_v_e_r_s_e_l_i_b_1_1_dipole_pair.html#aacbdaa22d5e68a07d80e3bc013f64678" />
+                <section title="m_iIdx2" ref="struct_i_n_v_e_r_s_e_l_i_b_1_1_dipole_pair.html#af7138c701312919903423faaa65cbabf" />
+                <section title="m_vCorrelation" ref="struct_i_n_v_e_r_s_e_l_i_b_1_1_dipole_pair.html#acf7d371377401c941118fd9df37fd0d6" />
+              </section>
+              <section title="Pair" ref="struct_i_n_v_e_r_s_e_l_i_b_1_1_pair.html">
+                <section title="x1" ref="struct_i_n_v_e_r_s_e_l_i_b_1_1_pair.html#aebddc056b9761d1647ae282fb8b20e88" />
+                <section title="x2" ref="struct_i_n_v_e_r_s_e_l_i_b_1_1_pair.html#a5e72c38d49abd45201ce7f9459400adf" />
+              </section>
               <section title="RapMusic" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html">
                 <section title="RapMusic" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#a1ffb7ec05cc168fea1cc064560f35a8d" />
-                <section title="~RapMusic" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#a925910c198a9bb365e66dc9ba5035a89" />
-                <section title="calculateInverse" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#a1505382ce7da52bee7eba86db02cf747" />
+                <section title="RapMusic" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#a49f6b0ccd861d74be5e593737c72a8ab" />
+                <section title="~RapMusic" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#a6929610a0329ed58b322a37f59ff97b1" />
+                <section title="calcA_k_1" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#af55842050e36300c75bf178cc953f4da" />
+                <section title="calcOrthProj" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#a98640a9d4ae01bee0a453f9ba395da86" />
+                <section title="calcPairCombinations" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#ad2b19259e50f59237c2a7247b73e98ee" />
+                <section title="calcPhi_s" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#a2b31addad147f88ba32961d97686e4dc" />
+                <section title="calculateInverse" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#a21cc6e9bd56640e54b40076cff552204" />
+                <section title="calculateInverse" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#a1d974a75c631e7ddbd5342d9fec49f9f" />
+                <section title="calculateInverse" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#a2a19a340da3e007fd9ada3b87fb1789e" />
+                <section title="getGainMatrixPair" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#adf85a0b8822000fbfee5b42c6ef889e7" />
                 <section title="getName" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#aa6b55a784708e1f1ad7dcc8a37be4b78" />
+                <section title="getPointPair" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#a36780c23eee9526d5f387b2b9627da97" />
                 <section title="getSourceSpace" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#aef5d0ee31620a5fcee3f40ddc67bd4e9" />
-              </section>
-              <section title="SourceEstimate" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html">
-                <section title="SourceEstimate" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#a7de0394b3e1c7f5dd278e917b44d42a3" />
-                <section title="SourceEstimate" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#a1a117bda78a9aa73a2b47a3f69f818a1" />
-                <section title="SourceEstimate" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#a548611f1063e5e4ae923abd6c4c907e8" />
-                <section title="clear" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#ab6c31cf75e753d3e3733f76e2ddd5a64" />
-                <section title="isEmpty" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#a4b95695a45977ccb5ccc73bd957960cf" />
-                <section title="data" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#a7ae98d0ab882aa80a82215cf9a0b881f" />
-                <section title="times" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#a6b3861a0fdf6f14f3be0d3ddcf708354" />
-                <section title="tmin" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#ad295c3ee271fa3345f21045d1da6157e" />
-                <section title="tstep" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#ac34303f7634fe3cc5741ea7b7b308b9e" />
-                <section title="vertno" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#a25ee3b098597003c172aa00dd4e33c05" />
+                <section title="init" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#af70db78ac058cb6780a9d75f1f535341" />
+                <section title="insertSource" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#a2c31dfd36741c715c909119c25eff8f8" />
+                <section title="nchoose2" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#a6b7c53ea247575cd13688b3048337504" />
+                <section title="subcorr" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#a0229f4a162e2c792c542a2f39f7e69f8" />
+                <section title="subcorr" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#a4cd1e0a0659e39f4687ef4e61ad6fd46" />
               </section>
             </section>
             <section title="IOBuffer">
@@ -699,8 +754,11 @@
                 <section title="~CircularMatrixBuffer" ref="class_i_o_buffer_1_1_circular_matrix_buffer.html#a909d7813d2a7b3ecc3a0d7f3e4cd0f64" />
                 <section title="clear" ref="class_i_o_buffer_1_1_circular_matrix_buffer.html#af61689beb6325a34564e76ccc674487a" />
                 <section title="cols" ref="class_i_o_buffer_1_1_circular_matrix_buffer.html#adc11730178ddf03c23081c6e74ab78b7" />
+                <section title="pause" ref="class_i_o_buffer_1_1_circular_matrix_buffer.html#adc42580f375a160883a77291a56bf246" />
                 <section title="pop" ref="class_i_o_buffer_1_1_circular_matrix_buffer.html#ad22568c8be8da160dd52a98cf5f4fd46" />
                 <section title="push" ref="class_i_o_buffer_1_1_circular_matrix_buffer.html#adbba1720803e03e6b1bcd6b37f884f09" />
+                <section title="releaseFromPop" ref="class_i_o_buffer_1_1_circular_matrix_buffer.html#a2a2115cde980084c54c138b00b3a2273" />
+                <section title="releaseFromPush" ref="class_i_o_buffer_1_1_circular_matrix_buffer.html#a9e90b085a8dcdb0576e2c5cc3e75cb1b" />
                 <section title="rows" ref="class_i_o_buffer_1_1_circular_matrix_buffer.html#af347e627917d3bfa6ede461e5202e575" />
                 <section title="size" ref="class_i_o_buffer_1_1_circular_matrix_buffer.html#aad526a1017128c5d6aaf9cbaa92508ef" />
               </section>
@@ -734,6 +792,15 @@
                 <section title="clusterLabelIds" ref="class_m_n_e_l_i_b_1_1_m_n_e_cluster_info.html#ab0024e066b0c4a00d2d25a12e6ffb541" />
                 <section title="clusterVertnos" ref="class_m_n_e_l_i_b_1_1_m_n_e_cluster_info.html#a20a63ced4fbfed93d20ac98332899fcc" />
               </section>
+              <section title="MNECorSourceEstimate" ref="class_m_n_e_l_i_b_1_1_m_n_e_cor_source_estimate.html">
+                <section title="MNECorSourceEstimate" ref="class_m_n_e_l_i_b_1_1_m_n_e_cor_source_estimate.html#a00cd84c5ce400e29170c1a83917dd203" />
+                <section title="MNECorSourceEstimate" ref="class_m_n_e_l_i_b_1_1_m_n_e_cor_source_estimate.html#a56aca4564bd9f7f9ba401ef311f06ae8" />
+                <section title="MNECorSourceEstimate" ref="class_m_n_e_l_i_b_1_1_m_n_e_cor_source_estimate.html#ab8156daa8161454389293544413375c7" />
+                <section title="MNECorSourceEstimate" ref="class_m_n_e_l_i_b_1_1_m_n_e_cor_source_estimate.html#a818a800e0489f9a8b9d29724630c3f6b" />
+                <section title="clear" ref="class_m_n_e_l_i_b_1_1_m_n_e_cor_source_estimate.html#ac5fda3c984ea0df3476a8e5f99684243" />
+                <section title="operator=" ref="class_m_n_e_l_i_b_1_1_m_n_e_cor_source_estimate.html#a06fd678cb48fd44e8203ab0d296e0502" />
+                <section title="write" ref="class_m_n_e_l_i_b_1_1_m_n_e_cor_source_estimate.html#a53cd9494c0347056a5cdb12d5503a841" />
+              </section>
               <section title="MNEEpochData" ref="class_m_n_e_l_i_b_1_1_m_n_e_epoch_data.html">
                 <section title="ConstSPtr" ref="class_m_n_e_l_i_b_1_1_m_n_e_epoch_data.html#af246bb796f76cbf0827c83ca456df7a2" />
                 <section title="SPtr" ref="class_m_n_e_l_i_b_1_1_m_n_e_epoch_data.html#a8c7db76c1ed6c28c008fe03ad6b6c5b9" />
@@ -751,6 +818,7 @@
                 <section title="SPtr" ref="class_m_n_e_l_i_b_1_1_m_n_e_epoch_data_list.html#a3f4058543a7cc0fb89cede7dbf25590d" />
                 <section title="MNEEpochDataList" ref="class_m_n_e_l_i_b_1_1_m_n_e_epoch_data_list.html#a8fa5934787333011283ae5718b6ce9fe" />
                 <section title="~MNEEpochDataList" ref="class_m_n_e_l_i_b_1_1_m_n_e_epoch_data_list.html#a36e22a830680b6eee0706993461e139f" />
+                <section title="average" ref="class_m_n_e_l_i_b_1_1_m_n_e_epoch_data_list.html#a4569c050d7aec49423f23d76f9732caf" />
               </section>
               <section title="MNEForwardSolution" ref="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html">
                 <section title="ConstSPtr" ref="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#ac205e3b5d9a3fe1a455d3c45e30d7636" />
@@ -860,6 +928,24 @@
                 <section title="src" ref="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a8074f2dd4963041afbe819487d0e3bd2" />
                 <section title="whitener" ref="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#abf082cb145b566cd250b32305d5bacd1" />
               </section>
+              <section title="MNESourceEstimate" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html">
+                <section title="ConstSPtr" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#a18932f2f987a2f864aafe425721a0b10" />
+                <section title="SPtr" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#aeb5aaa994876790254bbf4b773f3fe2f" />
+                <section title="MNESourceEstimate" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#a4cfd7288cd442b68881f5bd7ed9d8b56" />
+                <section title="MNESourceEstimate" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#a0ac8068acc244a3cdc2d0bd70085ee41" />
+                <section title="MNESourceEstimate" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#a524435cb687793aae018214307dd88d3" />
+                <section title="MNESourceEstimate" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#a5fbd9cc9e9350e5c5c4b326d1fb73cf7" />
+                <section title="clear" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#a3d1397a27d52863bf6a1855b2185f395" />
+                <section title="isEmpty" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#a860c19b56a4b016ebdaa13c01ad87c54" />
+                <section title="operator=" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#ae098df966acc04f84018ce92861998e6" />
+                <section title="reduce" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#ac7b9729c959a5f039436efb67dfdffcd" />
+                <section title="write" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#ac8c6656bedf48d45aeb723b04a64a731" />
+                <section title="data" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#a559cc268813564a34cc274278d19ce45" />
+                <section title="times" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#a91e69283b98935c554457308a980d53c" />
+                <section title="tmin" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#a8b69add3ffadfe3b72784c227840df23" />
+                <section title="tstep" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#a9f7582126a35a8b70c570c5aa4d3e60b" />
+                <section title="vertices" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#a28d87dbcf7369d7a98b4a4a2ec022c07" />
+              </section>
               <section title="MNESourceSpace" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html">
                 <section title="ConstSPtr" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a57ee055409f6763551ce3193248e2664" />
                 <section title="SPtr" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#ada0354e381b1d4ca00189ed577b32fcb" />
@@ -877,6 +963,23 @@
                 <section title="size" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a506dcb62cbc44957b2e4be9e7e32b429" />
                 <section title="transform_source_space_to" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a38654bb9875091c2cb5a04e2531653d7" />
                 <section title="writeToStream" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#ae078c1f063f047c677e933366cac1ffc" />
+              </section>
+              <section title="MNESurface" ref="class_m_n_e_l_i_b_1_1_m_n_e_surface.html">
+                <section title="ConstSPtr" ref="class_m_n_e_l_i_b_1_1_m_n_e_surface.html#a9073e5b7a5c12745f9ae13bfe41a6d40" />
+                <section title="NormalsT" ref="class_m_n_e_l_i_b_1_1_m_n_e_surface.html#aee2c37cdc2786f354ce5f4ede533376a" />
+                <section title="PointsT" ref="class_m_n_e_l_i_b_1_1_m_n_e_surface.html#a75bcdd935016ededb7e30e34ef610e02" />
+                <section title="SPtr" ref="class_m_n_e_l_i_b_1_1_m_n_e_surface.html#a2229e2dbf520e05bbebc459b84a27351" />
+                <section title="TrianglesT" ref="class_m_n_e_l_i_b_1_1_m_n_e_surface.html#aae537efecdcae0678ca6281e2728d182" />
+                <section title="MNESurface" ref="class_m_n_e_l_i_b_1_1_m_n_e_surface.html#a025d7d5a0e47af1feab7750b93523b0f" />
+                <section title="~MNESurface" ref="class_m_n_e_l_i_b_1_1_m_n_e_surface.html#a73d71c94aaedaa587a56b83ce8e86f42" />
+                <section title="coord_frame" ref="class_m_n_e_l_i_b_1_1_m_n_e_surface.html#a28fe7fabc34efcca149c9ac00172b384" />
+                <section title="id" ref="class_m_n_e_l_i_b_1_1_m_n_e_surface.html#ab6b8cedbde80475dab5baa965f1f4ae8" />
+                <section title="nn" ref="class_m_n_e_l_i_b_1_1_m_n_e_surface.html#adb8118473cb58868af69321977ddcecd" />
+                <section title="np" ref="class_m_n_e_l_i_b_1_1_m_n_e_surface.html#ab73760bde0da4b0e04d2ca61bd4e6bb9" />
+                <section title="ntri" ref="class_m_n_e_l_i_b_1_1_m_n_e_surface.html#a4e3b41300531127fd73b4ad6b4f7f046" />
+                <section title="rr" ref="class_m_n_e_l_i_b_1_1_m_n_e_surface.html#ac60da6b67bff3c8fe44c6dd6fc69eacf" />
+                <section title="sigma" ref="class_m_n_e_l_i_b_1_1_m_n_e_surface.html#aea0cba23540bb4eafc8c6fa92879f8ba" />
+                <section title="tris" ref="class_m_n_e_l_i_b_1_1_m_n_e_surface.html#a10531008e6ee53d330c17f2c6503eee9" />
               </section>
             </section>
             <section title="RTCLIENTLIB">
@@ -1000,7 +1103,7 @@
               <section title="RtAve" ref="class_r_t_i_n_v_l_i_b_1_1_rt_ave.html">
                 <section title="ConstSPtr" ref="class_r_t_i_n_v_l_i_b_1_1_rt_ave.html#a9332acb3c6f0f5ae3f1e8c5771e215c6" />
                 <section title="SPtr" ref="class_r_t_i_n_v_l_i_b_1_1_rt_ave.html#ab503e21f35941a11a010beaf25b1db33" />
-                <section title="RtAve" ref="class_r_t_i_n_v_l_i_b_1_1_rt_ave.html#aa44236a0dcc0c7d71241e05ef1f35629" />
+                <section title="RtAve" ref="class_r_t_i_n_v_l_i_b_1_1_rt_ave.html#ab905110d161ee2a62dc32f4812ecf9b0" />
                 <section title="~RtAve" ref="class_r_t_i_n_v_l_i_b_1_1_rt_ave.html#a17f21c3faa0eeeccae2fc04f9ce9515f" />
                 <section title="append" ref="class_r_t_i_n_v_l_i_b_1_1_rt_ave.html#a93644080694b38ba14f990525828f6e1" />
                 <section title="evokedPostStim" ref="class_r_t_i_n_v_l_i_b_1_1_rt_ave.html#afb6dc4dc94f580f7bf837a2723caac48" />
@@ -1034,6 +1137,12 @@
               </section>
             </section>
             <section title="UTILSLIB">
+              <section title="FilterTools" ref="class_u_t_i_l_s_l_i_b_1_1_filter_tools.html">
+                <section title="ConstSPtr" ref="class_u_t_i_l_s_l_i_b_1_1_filter_tools.html#aeefe80fcee72da14d5c6f5a7c613f204" />
+                <section title="SPtr" ref="class_u_t_i_l_s_l_i_b_1_1_filter_tools.html#a9546e592954548658df34883084a3a66" />
+                <section title="FilterTools" ref="class_u_t_i_l_s_l_i_b_1_1_filter_tools.html#abdf0cca904883bf94d613d51dd2d34f0" />
+                <section title="createFilter" ref="class_u_t_i_l_s_l_i_b_1_1_filter_tools.html#ab8db5be505f2a5a4b8bf3d0f42d23d2a" />
+              </section>
               <section title="IOUtils" ref="class_u_t_i_l_s_l_i_b_1_1_i_o_utils.html">
                 <section title="ConstSPtr" ref="class_u_t_i_l_s_l_i_b_1_1_i_o_utils.html#a5a749cbd6480dd699afae67b94372a6b" />
                 <section title="SPtr" ref="class_u_t_i_l_s_l_i_b_1_1_i_o_utils.html#a4f014172f5041789ac17d0ac863853a6" />
@@ -1048,13 +1157,6 @@
               <section title="MNEMath" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html">
                 <section title="IdxIntValue" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a3129ad163aae01f8855c1d5ae163e782" />
                 <section title="~MNEMath" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a52c52d62e3393a51837e7a12688d1439" />
-                <section title="compareIdxValuePairBiggerThan" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a574c6bdbdc3df1ef765b8e3db44dc80f" />
-                <section title="compareIdxValuePairSmallerThan" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#aec4b1c309b2d8cf04bc176d7883a3498" />
-                <section title="compareTripletFirstEntry" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#aa4434423d6d6dc48715d1ba332a9b0b3" />
-                <section title="compareTripletSecondEntry" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#aabe9ed92c7541464546e791a09275609" />
-                <section title="sort" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a7f803e78f5df5662f604eac88922ed6f" />
-                <section title="sort" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a46849426fe2b2de690ae2a60139f046c" />
-                <section title="sortrows" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a7607cb06b13feda4c4fa7d9ff492f5c5" />
               </section>
             </section>
             <section title="CTypeName" ref="class_c_type_name.html" />
@@ -1102,6 +1204,8 @@
             <section title="DISPLIB::ColorMap" ref="class_d_i_s_p_l_i_b_1_1_color_map.html" />
             <section title="FSLIB::Colortable" ref="class_f_s_l_i_b_1_1_colortable.html" />
             <section title="CTypeName&lt; T &gt;" ref="class_c_type_name.html" />
+            <section title="INVERSELIB::Dipole&lt; T &gt;" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html" />
+            <section title="INVERSELIB::DipolePair&lt; T &gt;" ref="struct_i_n_v_e_r_s_e_l_i_b_1_1_dipole_pair.html" />
             <section title="FIFFLIB::Fiff" ref="class_f_i_f_f_l_i_b_1_1_fiff.html" />
             <section title="FIFFLIB::FiffChInfo" ref="class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html" />
             <section title="FIFFLIB::FiffChPos" ref="class_f_i_f_f_l_i_b_1_1_fiff_ch_pos.html" />
@@ -1119,6 +1223,7 @@
             <section title="FIFFLIB::FiffProj" ref="class_f_i_f_f_l_i_b_1_1_fiff_proj.html" />
             <section title="FIFFLIB::FiffRawData" ref="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html" />
             <section title="FIFFLIB::FiffRawDir" ref="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html" />
+            <section title="UTILSLIB::FilterTools" ref="class_u_t_i_l_s_l_i_b_1_1_filter_tools.html" />
             <section title="ICommand" ref="class_i_command.html">
               <section title="RTCOMMANDLIB::Command" ref="class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command.html" />
               <section title="RTCOMMANDLIB::RawCommand" ref="class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_raw_command.html" />
@@ -1140,7 +1245,12 @@
             <section title="MNELIB::MNEHemisphere" ref="class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html" />
             <section title="MNELIB::MNEInverseOperator" ref="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html" />
             <section title="UTILSLIB::MNEMath" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html" />
+            <section title="MNELIB::MNESourceEstimate" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html">
+              <section title="MNELIB::MNECorSourceEstimate" ref="class_m_n_e_l_i_b_1_1_m_n_e_cor_source_estimate.html" />
+            </section>
             <section title="MNELIB::MNESourceSpace" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html" />
+            <section title="MNELIB::MNESurface" ref="class_m_n_e_l_i_b_1_1_m_n_e_surface.html" />
+            <section title="INVERSELIB::Pair" ref="struct_i_n_v_e_r_s_e_l_i_b_1_1_pair.html" />
             <section title="QByteArray">
               <section title="FIFFLIB::FiffTag" ref="class_f_i_f_f_l_i_b_1_1_fiff_tag.html" />
             </section>
@@ -1181,9 +1291,9 @@
               <section title="DISPLIB::Graph" ref="class_d_i_s_p_l_i_b_1_1_graph.html">
                 <section title="DISPLIB::ImageSc" ref="class_d_i_s_p_l_i_b_1_1_image_sc.html" />
                 <section title="DISPLIB::Plot" ref="class_d_i_s_p_l_i_b_1_1_plot.html" />
+                <section title="DISPLIB::RtPlot" ref="class_d_i_s_p_l_i_b_1_1_rt_plot.html" />
               </section>
             </section>
-            <section title="INVERSELIB::SourceEstimate" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html" />
             <section title="Subject" ref="class_subject.html">
               <section title="RTCOMMANDLIB::CommandParser" ref="class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command_parser.html" />
             </section>
@@ -1214,6 +1324,7 @@
               <section title="u" ref="functions_0x75.html" />
               <section title="v" ref="functions_0x76.html" />
               <section title="w" ref="functions_0x77.html" />
+              <section title="x" ref="functions_0x78.html" />
               <section title="~" ref="functions_0x7e.html" />
             </section>
             <section title="Functions" ref="functions_func.html">
@@ -1262,6 +1373,7 @@
               <section title="u" ref="functions_vars_0x75.html" />
               <section title="v" ref="functions_vars_0x76.html" />
               <section title="w" ref="functions_vars_0x77.html" />
+              <section title="x" ref="functions_vars_0x78.html" />
             </section>
             <section title="Typedefs" ref="functions_type.html" />
             <section title="Related Functions" ref="functions_rela.html" />
@@ -1356,6 +1468,25 @@
                     <section title="m_qListVecPointFPaths" ref="class_d_i_s_p_l_i_b_1_1_plot.html#a7c8128b100f3c8c8eea48849253bd643" />
                   </section>
                 </section>
+                <section title="rtplot.cpp" ref="rtplot_8cpp.html" />
+                <section title="rtplot.h" ref="rtplot_8h.html">
+                  <section title="RtPlot" ref="class_d_i_s_p_l_i_b_1_1_rt_plot.html">
+                    <section title="ConstSPtr" ref="class_d_i_s_p_l_i_b_1_1_rt_plot.html#aa20819ba3df7ecb70efe197eadc17a69" />
+                    <section title="SPtr" ref="class_d_i_s_p_l_i_b_1_1_rt_plot.html#a413d0d8ab1074c2d703e7f518300edf1" />
+                    <section title="RtPlot" ref="class_d_i_s_p_l_i_b_1_1_rt_plot.html#a25c93b81dcc4de823464c202ba4133fa" />
+                    <section title="RtPlot" ref="class_d_i_s_p_l_i_b_1_1_rt_plot.html#afd02aebedfd19c16f904a0990bbc05ca" />
+                    <section title="~RtPlot" ref="class_d_i_s_p_l_i_b_1_1_rt_plot.html#a039182ec66b7a102db5774da3f29795b" />
+                    <section title="init" ref="class_d_i_s_p_l_i_b_1_1_rt_plot.html#a7f3065d80248a89a094db902536caf40" />
+                    <section title="paintEvent" ref="class_d_i_s_p_l_i_b_1_1_rt_plot.html#a0addef8b25300d0d468cbc2768ed8701" />
+                    <section title="updateData" ref="class_d_i_s_p_l_i_b_1_1_rt_plot.html#a7d07d687de99842ec52f93b963858915" />
+                    <section title="m_bHoldOn" ref="class_d_i_s_p_l_i_b_1_1_rt_plot.html#a90636a8421217b37e9852c83a688fb0e" />
+                    <section title="m_dMaxX" ref="class_d_i_s_p_l_i_b_1_1_rt_plot.html#ace63dfeff40aab25ddd71172b8b59879" />
+                    <section title="m_dMaxY" ref="class_d_i_s_p_l_i_b_1_1_rt_plot.html#ad34cbe65a6517501b01a09e95e40802a" />
+                    <section title="m_dMinX" ref="class_d_i_s_p_l_i_b_1_1_rt_plot.html#a3530cac490233f18648c66c37faf0e7e" />
+                    <section title="m_dMinY" ref="class_d_i_s_p_l_i_b_1_1_rt_plot.html#a9d25a2b3e9dfc49a037a154af52e8657" />
+                    <section title="m_qListVecPointFPaths" ref="class_d_i_s_p_l_i_b_1_1_rt_plot.html#af141c4dc1329164afd34ab0bebeb0b6a" />
+                  </section>
+                </section>
               </section>
               <section title="disp3D" ref="dir_a0f69d5cb4834a722f5c816edde5c66b.html">
                 <section title="disp3D_global.h" ref="disp3_d__global_8h.html">
@@ -1378,14 +1509,14 @@
                   <section title="InverseView" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html">
                     <section title="ConstSPtr" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html#acbd3608fef565cbfdaeabc7ecd83a83e" />
                     <section title="SPtr" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html#a29a09132596437680ba804eb676dd00e" />
-                    <section title="InverseView" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html#ab88f220eaa7b98b77caa6ed3a15cea92" />
+                    <section title="InverseView" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html#a6e40de9777aa78e9a7228bdde5a43d4c" />
                     <section title="~InverseView" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html#ae99edaeebd5abd5d7af7c59f1a1f6570" />
                     <section title="initializeGL" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html#ae5a3640847371575dfdc72507164dfce" />
                     <section title="keyPressEvent" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html#a3712afd1743b5f4b26659d9901887792" />
                     <section title="mouseMoveEvent" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html#a1ca2212ed86b6b4f5f83387467cde465" />
                     <section title="mousePressEvent" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html#aedb11c859919e99a1a4bf680864f5ffe" />
                     <section title="paintGL" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html#ac6b6252ec5be9702a1404b280771b37f" />
-                    <section title="pushSourceEstimate" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html#a30c7bcd376a2246a9cce9c8d8a5d4257" />
+                    <section title="pushSourceEstimate" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html#a80d713f2eeb4e4a5adff3bd36446a756" />
                   </section>
                 </section>
                 <section title="inverseviewproducer.cpp" ref="inverseviewproducer_8cpp.html" />
@@ -1393,11 +1524,11 @@
                   <section title="InverseViewProducer" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view_producer.html">
                     <section title="ConstSPtr" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view_producer.html#af713843568f6cb16e817e2b91bd8b5f7" />
                     <section title="SPtr" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view_producer.html#a222f9d3411f1210337d9e3e552d1eb93" />
-                    <section title="InverseViewProducer" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view_producer.html#ac0763f5e8fae0aa991ef97379f5c8ac8" />
+                    <section title="InverseViewProducer" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view_producer.html#ab0c8bf460f53bcdd793099fcfe296172" />
                     <section title="~InverseViewProducer" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view_producer.html#a93b235bdbfbf4d799a5d71e5fb6013e9" />
                     <section title="getGlobalMax" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view_producer.html#a6ee48a8b5548761e311944649bccafe4" />
                     <section title="getMaxActivation" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view_producer.html#ad347cbfeb31f4ac800871d84a04955b4" />
-                    <section title="pushSourceEstimate" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view_producer.html#ab0edc196072c367528a1ef5dcf659039" />
+                    <section title="pushSourceEstimate" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view_producer.html#a75c6f256d2c020ff6057f086c02e8fee" />
                     <section title="run" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view_producer.html#aa6a77dcd3c7d87a5cd18d040bfb6f94b" />
                     <section title="sourceEstimateSample" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view_producer.html#a29343083df0d8e8daf7ece9c2e05ce08" />
                     <section title="stop" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view_producer.html#a4762b7feca48af61fad170257f5a8973" />
@@ -1412,7 +1543,7 @@
                     <section title="~LabelView" ref="class_d_i_s_p3_d_l_i_b_1_1_label_view.html#a3c7ec5b375db42b8984ec08f76228295" />
                     <section title="initializeGL" ref="class_d_i_s_p3_d_l_i_b_1_1_label_view.html#a4777b7f0234499359d1416b104bfe908" />
                     <section title="paintGL" ref="class_d_i_s_p3_d_l_i_b_1_1_label_view.html#ac61e3be860ec6c41640a1b082df8552d" />
-                    <section title="pushSourceEstimate" ref="class_d_i_s_p3_d_l_i_b_1_1_label_view.html#a751b31c71ed2f03a3ab64d782ef7f7d4" />
+                    <section title="pushSourceEstimate" ref="class_d_i_s_p3_d_l_i_b_1_1_label_view.html#ab9f304a688eaf443e6026d4d2f57557d" />
                   </section>
                 </section>
               </section>
@@ -1463,6 +1594,13 @@
                 </section>
                 <section title="fiff_constants.h" ref="fiff__constants_8h.html">
                   <section title="FIFF_ASPECT_KIND" ref="fiff__constants_8h.html#a7a682f518e8ca0b8eb6da34203cc9774" />
+                  <section title="FIFF_BEM_COORD_FRAME" ref="fiff__constants_8h.html#a793b37a461ec04db1b67e0e4fa42d3ab" />
+                  <section title="FIFF_BEM_SIGMA" ref="fiff__constants_8h.html#a9559defd7b5516ba89985e3e5ee1424f" />
+                  <section title="FIFF_BEM_SURF_ID" ref="fiff__constants_8h.html#a92b229995ffba1151d4baa1393c1fa3e" />
+                  <section title="FIFF_BEM_SURF_NAME" ref="fiff__constants_8h.html#ac9ce712a9969173a412dfbbf9d39679f" />
+                  <section title="FIFF_BEM_SURF_NNODE" ref="fiff__constants_8h.html#a610c51649cd8ce35b27f42928e837e8a" />
+                  <section title="FIFF_BEM_SURF_NODES" ref="fiff__constants_8h.html#a73fb31aee6f7dbf4cd0148719e7e09f4" />
+                  <section title="FIFF_BEM_SURF_NORMALS" ref="fiff__constants_8h.html#ac534a656d0ced033deb45228e63408ae" />
                   <section title="FIFF_BEM_SURF_NTRI" ref="fiff__constants_8h.html#a9462e157ffe22cf60488405e3ee20039" />
                   <section title="FIFF_BEM_SURF_TRIANGLES" ref="fiff__constants_8h.html#a7667fad810eb69f677aeb03df7ea9b8f" />
                   <section title="FIFF_BLOCK_END" ref="fiff__constants_8h.html#a216c95d5961a0dc60149e2e8de6928bf" />
@@ -1684,6 +1822,8 @@
                   <section title="FIFF_UNITM_T" ref="fiff__constants_8h.html#af7971df9d18bbc7d9bccc0d6e64b54c7" />
                   <section title="FIFF_UNITM_T" ref="fiff__constants_8h.html#af7971df9d18bbc7d9bccc0d6e64b54c7" />
                   <section title="FIFFB_ASPECT" ref="fiff__constants_8h.html#a58d42332b9e3839af7152fe18fe93d0b" />
+                  <section title="FIFFB_BEM" ref="fiff__constants_8h.html#a84b6ad0e234363428a256d029249ae29" />
+                  <section title="FIFFB_BEM_SURF" ref="fiff__constants_8h.html#a55eefaa57fa48e7a59f8df7e30a33d29" />
                   <section title="FIFFB_CONTINUOUS_DATA" ref="fiff__constants_8h.html#ab0e13422add50609e9c05b40eff82d0c" />
                   <section title="FIFFB_DACQ_PARS" ref="fiff__constants_8h.html#a934328cb4d1a32556415d48721e77032" />
                   <section title="FIFFB_EVOKED" ref="fiff__constants_8h.html#ab4a7e926d503253862bd061fc9ff3a18" />
@@ -2101,6 +2241,8 @@
                     <section title="FiffEvokedSet" ref="class_f_i_f_f_l_i_b_1_1_fiff_evoked_set.html#a6129e41eeeff1351af72300d50c6ad05" />
                     <section title="~FiffEvokedSet" ref="class_f_i_f_f_l_i_b_1_1_fiff_evoked_set.html#a461f8fc1efc8a2c0707c04d3941fc858" />
                     <section title="clear" ref="class_f_i_f_f_l_i_b_1_1_fiff_evoked_set.html#ad5dd813313ea34b948208f9dfda9a3f1" />
+                    <section title="compensate_to" ref="class_f_i_f_f_l_i_b_1_1_fiff_evoked_set.html#a65ccccf285b37a85b7a2129f8e5d6ab3" />
+                    <section title="find_evoked" ref="class_f_i_f_f_l_i_b_1_1_fiff_evoked_set.html#aa1f2c36a523ac14ce7b17e82ce3a7a94" />
                     <section title="pick_channels" ref="class_f_i_f_f_l_i_b_1_1_fiff_evoked_set.html#a49d197d5a669e33fb9aa4751d2b80aaa" />
                     <section title="evoked" ref="class_f_i_f_f_l_i_b_1_1_fiff_evoked_set.html#aec48fff116de710b554d21f7f89f8fe6" />
                     <section title="info" ref="class_f_i_f_f_l_i_b_1_1_fiff_evoked_set.html#a23176cb723c6187b9e4822266426b931" />
@@ -2423,8 +2565,10 @@
                     <section title="AnnotationSet" ref="class_f_s_l_i_b_1_1_annotation_set.html#a7ef5bdecdcd1451761f34fdebaf47d4d" />
                     <section title="~AnnotationSet" ref="class_f_s_l_i_b_1_1_annotation_set.html#a7f36fa0ac6ddc742a0a88498a24391dc" />
                     <section title="clear" ref="class_f_s_l_i_b_1_1_annotation_set.html#a50e15835a32be178552134ee08def943" />
+                    <section title="isEmpty" ref="class_f_s_l_i_b_1_1_annotation_set.html#a40d3625d5e98aa3903382f3e9af64194" />
                     <section title="operator[]" ref="class_f_s_l_i_b_1_1_annotation_set.html#ac2c85b6c78cb4d6c56c6732584ff8c2e" />
                     <section title="operator[]" ref="class_f_s_l_i_b_1_1_annotation_set.html#a21a44ee7fe417c705aa80a26baeee7a0" />
+                    <section title="size" ref="class_f_s_l_i_b_1_1_annotation_set.html#a8fe85b503b0400b9fe1914950d5b99fe" />
                     <section title="toLabels" ref="class_f_s_l_i_b_1_1_annotation_set.html#aebd156d216d0d79380ca0cf63a74ebab" />
                   </section>
                 </section>
@@ -2494,10 +2638,12 @@
                     <section title="SurfaceSet" ref="class_f_s_l_i_b_1_1_surface_set.html#a137a3391dddd10c89cebd57ff6be50d2" />
                     <section title="~SurfaceSet" ref="class_f_s_l_i_b_1_1_surface_set.html#a74176d9d573614df26a73aafba5c2cb3" />
                     <section title="clear" ref="class_f_s_l_i_b_1_1_surface_set.html#a9ed03130dea7dffbbba0608b5028e762" />
+                    <section title="isEmpty" ref="class_f_s_l_i_b_1_1_surface_set.html#a9dae75b27a36b32e408bea40cfaf0c67" />
                     <section title="operator[]" ref="class_f_s_l_i_b_1_1_surface_set.html#afcf1e7e55a41cc931b5a59c0781e90ab" />
                     <section title="operator[]" ref="class_f_s_l_i_b_1_1_surface_set.html#a5c5e5f6bbc87848e95527c07a123983e" />
                     <section title="operator[]" ref="class_f_s_l_i_b_1_1_surface_set.html#a81e50861a2c5bf5e7b92e37f7875646b" />
                     <section title="operator[]" ref="class_f_s_l_i_b_1_1_surface_set.html#a1d07bc53038bf380f88564e005584ed1" />
+                    <section title="size" ref="class_f_s_l_i_b_1_1_surface_set.html#a4b8e5cd5d5290709bbf8bd3cbdded8cb" />
                   </section>
                 </section>
               </section>
@@ -2573,8 +2719,11 @@
                     <section title="~CircularMatrixBuffer" ref="class_i_o_buffer_1_1_circular_matrix_buffer.html#a909d7813d2a7b3ecc3a0d7f3e4cd0f64" />
                     <section title="clear" ref="class_i_o_buffer_1_1_circular_matrix_buffer.html#af61689beb6325a34564e76ccc674487a" />
                     <section title="cols" ref="class_i_o_buffer_1_1_circular_matrix_buffer.html#adc11730178ddf03c23081c6e74ab78b7" />
+                    <section title="pause" ref="class_i_o_buffer_1_1_circular_matrix_buffer.html#adc42580f375a160883a77291a56bf246" />
                     <section title="pop" ref="class_i_o_buffer_1_1_circular_matrix_buffer.html#ad22568c8be8da160dd52a98cf5f4fd46" />
                     <section title="push" ref="class_i_o_buffer_1_1_circular_matrix_buffer.html#adbba1720803e03e6b1bcd6b37f884f09" />
+                    <section title="releaseFromPop" ref="class_i_o_buffer_1_1_circular_matrix_buffer.html#a2a2115cde980084c54c138b00b3a2273" />
+                    <section title="releaseFromPush" ref="class_i_o_buffer_1_1_circular_matrix_buffer.html#a9e90b085a8dcdb0576e2c5cc3e75cb1b" />
                     <section title="rows" ref="class_i_o_buffer_1_1_circular_matrix_buffer.html#af347e627917d3bfa6ede461e5202e575" />
                     <section title="size" ref="class_i_o_buffer_1_1_circular_matrix_buffer.html#aad526a1017128c5d6aaf9cbaa92508ef" />
                   </section>
@@ -2659,7 +2808,9 @@
                       <section title="MinimumNorm" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_minimum_norm.html#a0439015d4d2b367523aea36f9e39398b" />
                       <section title="MinimumNorm" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_minimum_norm.html#a602de1995a285f2506b70aabd0190e09" />
                       <section title="~MinimumNorm" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_minimum_norm.html#a9b773cff343424f3c68cda75c7eb45f3" />
-                      <section title="calculateInverse" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_minimum_norm.html#aede3e8398bfac4ad9a1366b3cba89af6" />
+                      <section title="calculateInverse" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_minimum_norm.html#abd4a36d001f13678cd783a3fb72bcb31" />
+                      <section title="calculateInverse" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_minimum_norm.html#abd64eae429fe48bc5a73721d42cc9d03" />
+                      <section title="doInverseSetup" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_minimum_norm.html#a96ba858c671ae220922ddc4ac7b73897" />
                       <section title="getName" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_minimum_norm.html#a2e328adb859a6e5a3d0443cab5f9f247" />
                       <section title="getSourceSpace" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_minimum_norm.html#ad65d7049a646e94fe8080b05c585454c" />
                       <section title="setMethod" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_minimum_norm.html#ad4b70afa3ff6d7de780ffe248b5fd120" />
@@ -2669,35 +2820,90 @@
                   </section>
                 </section>
                 <section title="rapMusic" ref="dir_3614b4c5b1f5849497579d49ce87e0dd.html">
+                  <section title="dipole.cpp" ref="dipole_8cpp.html">
+                    <section title="DIPOLE_SOURCES" ref="dipole_8cpp.html#af36304aa9edd0617641287a0755effb6" />
+                  </section>
+                  <section title="dipole.h" ref="dipole_8h.html">
+                    <section title="Dipole" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html">
+                      <section title="Dipole" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#a1ec3404654f5a01a2a1fb9b36312caf6" />
+                      <section title="~Dipole" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#ac073300709c24934665a784352cbc9c8" />
+                      <section title="clean" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#adb006995b8f8e09a5f12699af5ca65e5" />
+                      <section title="phi_x" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#ad7e3d9edd9ba276181e82322b95fa7ca" />
+                      <section title="phi_x" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#a762f63d3d8a5cd8f22067b5b8db8b229" />
+                      <section title="phi_y" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#acd9efb81871a0d5e757c01f7526f479a" />
+                      <section title="phi_y" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#a4ccaa8654c83303ac3dc767dd2d8180a" />
+                      <section title="phi_z" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#a5967863f70e28dcf0be68f06999379a6" />
+                      <section title="phi_z" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#a71068906146ee1105b02924e033413b5" />
+                      <section title="x" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#a60b18a62a496a597484e006b861b220d" />
+                      <section title="x" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#a1668939da977509529e94dc7002ab7b5" />
+                      <section title="y" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#a6cbb3c0ac2f03cf308dd34f275f83cec" />
+                      <section title="y" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#a74b78836fcf06d7c43a87b0d2529d775" />
+                      <section title="z" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#a314268fac926e4dfd766954d05df32b8" />
+                      <section title="z" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#a0d65cdf122c60656de63c154f6fab0a5" />
+                    </section>
+                    <section title="DipolePair" ref="struct_i_n_v_e_r_s_e_l_i_b_1_1_dipole_pair.html">
+                      <section title="m_Dipole1" ref="struct_i_n_v_e_r_s_e_l_i_b_1_1_dipole_pair.html#a9189c658c056606c9fdd51d4c8a06826" />
+                      <section title="m_Dipole2" ref="struct_i_n_v_e_r_s_e_l_i_b_1_1_dipole_pair.html#afcdc8820911d0c5cdf5d55488de2fad2" />
+                      <section title="m_iIdx1" ref="struct_i_n_v_e_r_s_e_l_i_b_1_1_dipole_pair.html#aacbdaa22d5e68a07d80e3bc013f64678" />
+                      <section title="m_iIdx2" ref="struct_i_n_v_e_r_s_e_l_i_b_1_1_dipole_pair.html#af7138c701312919903423faaa65cbabf" />
+                      <section title="m_vCorrelation" ref="struct_i_n_v_e_r_s_e_l_i_b_1_1_dipole_pair.html#acf7d371377401c941118fd9df37fd0d6" />
+                    </section>
+                    <section title="Dipole" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html">
+                      <section title="Dipole" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#a1ec3404654f5a01a2a1fb9b36312caf6" />
+                      <section title="~Dipole" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#ac073300709c24934665a784352cbc9c8" />
+                      <section title="clean" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#adb006995b8f8e09a5f12699af5ca65e5" />
+                      <section title="phi_x" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#ad7e3d9edd9ba276181e82322b95fa7ca" />
+                      <section title="phi_x" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#a762f63d3d8a5cd8f22067b5b8db8b229" />
+                      <section title="phi_y" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#acd9efb81871a0d5e757c01f7526f479a" />
+                      <section title="phi_y" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#a4ccaa8654c83303ac3dc767dd2d8180a" />
+                      <section title="phi_z" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#a5967863f70e28dcf0be68f06999379a6" />
+                      <section title="phi_z" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#a71068906146ee1105b02924e033413b5" />
+                      <section title="x" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#a60b18a62a496a597484e006b861b220d" />
+                      <section title="x" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#a1668939da977509529e94dc7002ab7b5" />
+                      <section title="y" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#a6cbb3c0ac2f03cf308dd34f275f83cec" />
+                      <section title="y" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#a74b78836fcf06d7c43a87b0d2529d775" />
+                      <section title="z" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#a314268fac926e4dfd766954d05df32b8" />
+                      <section title="z" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#a0d65cdf122c60656de63c154f6fab0a5" />
+                    </section>
+                    <section title="Dipole_DOUBLE" ref="dipole_8h.html#a8039a6599a662d8c1fa5522f982a999b" />
+                    <section title="Dipole_FLOAT" ref="dipole_8h.html#a7512b84e7b2665a73c0b4e712f9484f4" />
+                    <section title="Dipole_INT" ref="dipole_8h.html#a6d37a8990da8a1b82aa2028899d34bc1" />
+                  </section>
                   <section title="rapmusic.cpp" ref="rapmusic_8cpp.html" />
                   <section title="rapmusic.h" ref="rapmusic_8h.html">
+                    <section title="Pair" ref="struct_i_n_v_e_r_s_e_l_i_b_1_1_pair.html">
+                      <section title="x1" ref="struct_i_n_v_e_r_s_e_l_i_b_1_1_pair.html#aebddc056b9761d1647ae282fb8b20e88" />
+                      <section title="x2" ref="struct_i_n_v_e_r_s_e_l_i_b_1_1_pair.html#a5e72c38d49abd45201ce7f9459400adf" />
+                    </section>
                     <section title="RapMusic" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html">
                       <section title="RapMusic" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#a1ffb7ec05cc168fea1cc064560f35a8d" />
-                      <section title="~RapMusic" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#a925910c198a9bb365e66dc9ba5035a89" />
-                      <section title="calculateInverse" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#a1505382ce7da52bee7eba86db02cf747" />
+                      <section title="RapMusic" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#a49f6b0ccd861d74be5e593737c72a8ab" />
+                      <section title="~RapMusic" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#a6929610a0329ed58b322a37f59ff97b1" />
+                      <section title="calcA_k_1" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#af55842050e36300c75bf178cc953f4da" />
+                      <section title="calcOrthProj" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#a98640a9d4ae01bee0a453f9ba395da86" />
+                      <section title="calcPairCombinations" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#ad2b19259e50f59237c2a7247b73e98ee" />
+                      <section title="calcPhi_s" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#a2b31addad147f88ba32961d97686e4dc" />
+                      <section title="calculateInverse" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#a21cc6e9bd56640e54b40076cff552204" />
+                      <section title="calculateInverse" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#a1d974a75c631e7ddbd5342d9fec49f9f" />
+                      <section title="calculateInverse" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#a2a19a340da3e007fd9ada3b87fb1789e" />
+                      <section title="getGainMatrixPair" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#adf85a0b8822000fbfee5b42c6ef889e7" />
                       <section title="getName" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#aa6b55a784708e1f1ad7dcc8a37be4b78" />
+                      <section title="getPointPair" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#a36780c23eee9526d5f387b2b9627da97" />
                       <section title="getSourceSpace" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#aef5d0ee31620a5fcee3f40ddc67bd4e9" />
+                      <section title="init" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#af70db78ac058cb6780a9d75f1f535341" />
+                      <section title="insertSource" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#a2c31dfd36741c715c909119c25eff8f8" />
+                      <section title="nchoose2" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#a6b7c53ea247575cd13688b3048337504" />
+                      <section title="subcorr" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#a0229f4a162e2c792c542a2f39f7e69f8" />
+                      <section title="subcorr" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#a4cd1e0a0659e39f4687ef4e61ad6fd46" />
                     </section>
+                    <section title="IS_TRANSPOSED" ref="rapmusic_8h.html#ac18202c2d588eee60087ed889794a5ff" />
+                    <section title="NOT_TRANSPOSED" ref="rapmusic_8h.html#a4594ff69b42430e5b31670333bad4446" />
+                    <section title="Pair" ref="rapmusic_8h.html#aa86cd1a8a571112f4e10db3629ee1b6b" />
                   </section>
                 </section>
                 <section title="IInverseAlgorithm.h" ref="_i_inverse_algorithm_8h_source.html" />
                 <section title="inverse_global.h" ref="inverse__global_8h.html">
                   <section title="INVERSESHARED_EXPORT" ref="inverse__global_8h.html#a690715da53886c394e203431ad1f18a2" />
-                </section>
-                <section title="sourceestimate.cpp" ref="sourceestimate_8cpp.html" />
-                <section title="sourceestimate.h" ref="sourceestimate_8h.html">
-                  <section title="SourceEstimate" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html">
-                    <section title="SourceEstimate" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#a7de0394b3e1c7f5dd278e917b44d42a3" />
-                    <section title="SourceEstimate" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#a1a117bda78a9aa73a2b47a3f69f818a1" />
-                    <section title="SourceEstimate" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#a548611f1063e5e4ae923abd6c4c907e8" />
-                    <section title="clear" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#ab6c31cf75e753d3e3733f76e2ddd5a64" />
-                    <section title="isEmpty" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#a4b95695a45977ccb5ccc73bd957960cf" />
-                    <section title="data" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#a7ae98d0ab882aa80a82215cf9a0b881f" />
-                    <section title="times" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#a6b3861a0fdf6f14f3be0d3ddcf708354" />
-                    <section title="tmin" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#ad295c3ee271fa3345f21045d1da6157e" />
-                    <section title="tstep" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#ac34303f7634fe3cc5741ea7b7b308b9e" />
-                    <section title="vertno" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#a25ee3b098597003c172aa00dd4e33c05" />
-                  </section>
                 </section>
               </section>
               <section title="mne" ref="dir_2818de1e5b67557da8c9b7d659dc1661.html">
@@ -2719,6 +2925,18 @@
                     <section title="clusterDistances" ref="class_m_n_e_l_i_b_1_1_m_n_e_cluster_info.html#a021453fe1c635a7b9f23e83ac6af4cdc" />
                     <section title="clusterLabelIds" ref="class_m_n_e_l_i_b_1_1_m_n_e_cluster_info.html#ab0024e066b0c4a00d2d25a12e6ffb541" />
                     <section title="clusterVertnos" ref="class_m_n_e_l_i_b_1_1_m_n_e_cluster_info.html#a20a63ced4fbfed93d20ac98332899fcc" />
+                  </section>
+                </section>
+                <section title="mne_corsourceestimate.cpp" ref="mne__corsourceestimate_8cpp.html" />
+                <section title="mne_corsourceestimate.h" ref="mne__corsourceestimate_8h.html">
+                  <section title="MNECorSourceEstimate" ref="class_m_n_e_l_i_b_1_1_m_n_e_cor_source_estimate.html">
+                    <section title="MNECorSourceEstimate" ref="class_m_n_e_l_i_b_1_1_m_n_e_cor_source_estimate.html#a00cd84c5ce400e29170c1a83917dd203" />
+                    <section title="MNECorSourceEstimate" ref="class_m_n_e_l_i_b_1_1_m_n_e_cor_source_estimate.html#a56aca4564bd9f7f9ba401ef311f06ae8" />
+                    <section title="MNECorSourceEstimate" ref="class_m_n_e_l_i_b_1_1_m_n_e_cor_source_estimate.html#ab8156daa8161454389293544413375c7" />
+                    <section title="MNECorSourceEstimate" ref="class_m_n_e_l_i_b_1_1_m_n_e_cor_source_estimate.html#a818a800e0489f9a8b9d29724630c3f6b" />
+                    <section title="clear" ref="class_m_n_e_l_i_b_1_1_m_n_e_cor_source_estimate.html#ac5fda3c984ea0df3476a8e5f99684243" />
+                    <section title="operator=" ref="class_m_n_e_l_i_b_1_1_m_n_e_cor_source_estimate.html#a06fd678cb48fd44e8203ab0d296e0502" />
+                    <section title="write" ref="class_m_n_e_l_i_b_1_1_m_n_e_cor_source_estimate.html#a53cd9494c0347056a5cdb12d5503a841" />
                   </section>
                 </section>
                 <section title="mne_epoch_data.cpp" ref="mne__epoch__data_8cpp.html" />
@@ -2743,6 +2961,7 @@
                     <section title="SPtr" ref="class_m_n_e_l_i_b_1_1_m_n_e_epoch_data_list.html#a3f4058543a7cc0fb89cede7dbf25590d" />
                     <section title="MNEEpochDataList" ref="class_m_n_e_l_i_b_1_1_m_n_e_epoch_data_list.html#a8fa5934787333011283ae5718b6ce9fe" />
                     <section title="~MNEEpochDataList" ref="class_m_n_e_l_i_b_1_1_m_n_e_epoch_data_list.html#a36e22a830680b6eee0706993461e139f" />
+                    <section title="average" ref="class_m_n_e_l_i_b_1_1_m_n_e_epoch_data_list.html#a4569c050d7aec49423f23d76f9732caf" />
                   </section>
                 </section>
                 <section title="mne_forwardsolution.cpp" ref="mne__forwardsolution_8cpp.html" />
@@ -2867,6 +3086,27 @@
                   </section>
                   <section title="operator&lt;&lt;" ref="mne__inverse__operator_8h.html#a0a33dc980ef17da82d409a15722b3d8e" />
                 </section>
+                <section title="mne_sourceestimate.cpp" ref="mne__sourceestimate_8cpp.html" />
+                <section title="mne_sourceestimate.h" ref="mne__sourceestimate_8h.html">
+                  <section title="MNESourceEstimate" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html">
+                    <section title="ConstSPtr" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#a18932f2f987a2f864aafe425721a0b10" />
+                    <section title="SPtr" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#aeb5aaa994876790254bbf4b773f3fe2f" />
+                    <section title="MNESourceEstimate" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#a4cfd7288cd442b68881f5bd7ed9d8b56" />
+                    <section title="MNESourceEstimate" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#a0ac8068acc244a3cdc2d0bd70085ee41" />
+                    <section title="MNESourceEstimate" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#a524435cb687793aae018214307dd88d3" />
+                    <section title="MNESourceEstimate" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#a5fbd9cc9e9350e5c5c4b326d1fb73cf7" />
+                    <section title="clear" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#a3d1397a27d52863bf6a1855b2185f395" />
+                    <section title="isEmpty" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#a860c19b56a4b016ebdaa13c01ad87c54" />
+                    <section title="operator=" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#ae098df966acc04f84018ce92861998e6" />
+                    <section title="reduce" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#ac7b9729c959a5f039436efb67dfdffcd" />
+                    <section title="write" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#ac8c6656bedf48d45aeb723b04a64a731" />
+                    <section title="data" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#a559cc268813564a34cc274278d19ce45" />
+                    <section title="times" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#a91e69283b98935c554457308a980d53c" />
+                    <section title="tmin" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#a8b69add3ffadfe3b72784c227840df23" />
+                    <section title="tstep" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#a9f7582126a35a8b70c570c5aa4d3e60b" />
+                    <section title="vertices" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#a28d87dbcf7369d7a98b4a4a2ec022c07" />
+                  </section>
+                </section>
                 <section title="mne_sourcespace.cpp" ref="mne__sourcespace_8cpp.html" />
                 <section title="mne_sourcespace.h" ref="mne__sourcespace_8h.html">
                   <section title="MNESourceSpace" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html">
@@ -2886,6 +3126,26 @@
                     <section title="size" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a506dcb62cbc44957b2e4be9e7e32b429" />
                     <section title="transform_source_space_to" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a38654bb9875091c2cb5a04e2531653d7" />
                     <section title="writeToStream" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#ae078c1f063f047c677e933366cac1ffc" />
+                  </section>
+                </section>
+                <section title="mne_surface.cpp" ref="mne__surface_8cpp.html" />
+                <section title="mne_surface.h" ref="mne__surface_8h.html">
+                  <section title="MNESurface" ref="class_m_n_e_l_i_b_1_1_m_n_e_surface.html">
+                    <section title="ConstSPtr" ref="class_m_n_e_l_i_b_1_1_m_n_e_surface.html#a9073e5b7a5c12745f9ae13bfe41a6d40" />
+                    <section title="NormalsT" ref="class_m_n_e_l_i_b_1_1_m_n_e_surface.html#aee2c37cdc2786f354ce5f4ede533376a" />
+                    <section title="PointsT" ref="class_m_n_e_l_i_b_1_1_m_n_e_surface.html#a75bcdd935016ededb7e30e34ef610e02" />
+                    <section title="SPtr" ref="class_m_n_e_l_i_b_1_1_m_n_e_surface.html#a2229e2dbf520e05bbebc459b84a27351" />
+                    <section title="TrianglesT" ref="class_m_n_e_l_i_b_1_1_m_n_e_surface.html#aae537efecdcae0678ca6281e2728d182" />
+                    <section title="MNESurface" ref="class_m_n_e_l_i_b_1_1_m_n_e_surface.html#a025d7d5a0e47af1feab7750b93523b0f" />
+                    <section title="~MNESurface" ref="class_m_n_e_l_i_b_1_1_m_n_e_surface.html#a73d71c94aaedaa587a56b83ce8e86f42" />
+                    <section title="coord_frame" ref="class_m_n_e_l_i_b_1_1_m_n_e_surface.html#a28fe7fabc34efcca149c9ac00172b384" />
+                    <section title="id" ref="class_m_n_e_l_i_b_1_1_m_n_e_surface.html#ab6b8cedbde80475dab5baa965f1f4ae8" />
+                    <section title="nn" ref="class_m_n_e_l_i_b_1_1_m_n_e_surface.html#adb8118473cb58868af69321977ddcecd" />
+                    <section title="np" ref="class_m_n_e_l_i_b_1_1_m_n_e_surface.html#ab73760bde0da4b0e04d2ca61bd4e6bb9" />
+                    <section title="ntri" ref="class_m_n_e_l_i_b_1_1_m_n_e_surface.html#a4e3b41300531127fd73b4ad6b4f7f046" />
+                    <section title="rr" ref="class_m_n_e_l_i_b_1_1_m_n_e_surface.html#ac60da6b67bff3c8fe44c6dd6fc69eacf" />
+                    <section title="sigma" ref="class_m_n_e_l_i_b_1_1_m_n_e_surface.html#aea0cba23540bb4eafc8c6fa92879f8ba" />
+                    <section title="tris" ref="class_m_n_e_l_i_b_1_1_m_n_e_surface.html#a10531008e6ee53d330c17f2c6503eee9" />
                   </section>
                 </section>
               </section>
@@ -3020,7 +3280,7 @@
                   <section title="RtAve" ref="class_r_t_i_n_v_l_i_b_1_1_rt_ave.html">
                     <section title="ConstSPtr" ref="class_r_t_i_n_v_l_i_b_1_1_rt_ave.html#a9332acb3c6f0f5ae3f1e8c5771e215c6" />
                     <section title="SPtr" ref="class_r_t_i_n_v_l_i_b_1_1_rt_ave.html#ab503e21f35941a11a010beaf25b1db33" />
-                    <section title="RtAve" ref="class_r_t_i_n_v_l_i_b_1_1_rt_ave.html#aa44236a0dcc0c7d71241e05ef1f35629" />
+                    <section title="RtAve" ref="class_r_t_i_n_v_l_i_b_1_1_rt_ave.html#ab905110d161ee2a62dc32f4812ecf9b0" />
                     <section title="~RtAve" ref="class_r_t_i_n_v_l_i_b_1_1_rt_ave.html#a17f21c3faa0eeeccae2fc04f9ce9515f" />
                     <section title="append" ref="class_r_t_i_n_v_l_i_b_1_1_rt_ave.html#a93644080694b38ba14f990525828f6e1" />
                     <section title="evokedPostStim" ref="class_r_t_i_n_v_l_i_b_1_1_rt_ave.html#afb6dc4dc94f580f7bf837a2723caac48" />
@@ -3070,6 +3330,15 @@
                 </section>
               </section>
               <section title="utils" ref="dir_0eb5c52225c067648f3f5a2d310612be.html">
+                <section title="filtertools.cpp" ref="filtertools_8cpp.html" />
+                <section title="filtertools.h" ref="filtertools_8h.html">
+                  <section title="FilterTools" ref="class_u_t_i_l_s_l_i_b_1_1_filter_tools.html">
+                    <section title="ConstSPtr" ref="class_u_t_i_l_s_l_i_b_1_1_filter_tools.html#aeefe80fcee72da14d5c6f5a7c613f204" />
+                    <section title="SPtr" ref="class_u_t_i_l_s_l_i_b_1_1_filter_tools.html#a9546e592954548658df34883084a3a66" />
+                    <section title="FilterTools" ref="class_u_t_i_l_s_l_i_b_1_1_filter_tools.html#abdf0cca904883bf94d613d51dd2d34f0" />
+                    <section title="createFilter" ref="class_u_t_i_l_s_l_i_b_1_1_filter_tools.html#ab8db5be505f2a5a4b8bf3d0f42d23d2a" />
+                  </section>
+                </section>
                 <section title="ioutils.cpp" ref="ioutils_8cpp.html" />
                 <section title="ioutils.h" ref="ioutils_8h.html">
                   <section title="IOUtils" ref="class_u_t_i_l_s_l_i_b_1_1_i_o_utils.html">
@@ -3092,13 +3361,6 @@
                   <section title="MNEMath" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html">
                     <section title="IdxIntValue" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a3129ad163aae01f8855c1d5ae163e782" />
                     <section title="~MNEMath" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a52c52d62e3393a51837e7a12688d1439" />
-                    <section title="compareIdxValuePairBiggerThan" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a574c6bdbdc3df1ef765b8e3db44dc80f" />
-                    <section title="compareIdxValuePairSmallerThan" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#aec4b1c309b2d8cf04bc176d7883a3498" />
-                    <section title="compareTripletFirstEntry" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#aa4434423d6d6dc48715d1ba332a9b0b3" />
-                    <section title="compareTripletSecondEntry" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#aabe9ed92c7541464546e791a09275609" />
-                    <section title="sort" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a7f803e78f5df5662f604eac88922ed6f" />
-                    <section title="sort" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a46849426fe2b2de690ae2a60139f046c" />
-                    <section title="sortrows" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a7607cb06b13feda4c4fa7d9ff492f5c5" />
                   </section>
                 </section>
                 <section title="utils_global.h" ref="utils__global_8h.html">
@@ -3275,6 +3537,8 @@
       <keyword name="FIFFB_REF" id="fiff_constants.h::FIFFB_REF" ref="fiff__constants_8h.html#a03bc7495a53759399050c03521bebccd" />
       <keyword name="FIFFB_SMSH_RAW_DATA" id="fiff_constants.h::FIFFB_SMSH_RAW_DATA" ref="fiff__constants_8h.html#a6f79b426739b15ffd332b09684078b90" />
       <keyword name="FIFFB_SMSH_ASPECT" id="fiff_constants.h::FIFFB_SMSH_ASPECT" ref="fiff__constants_8h.html#a83232d432eb978aa024177f29ad7cf3c" />
+      <keyword name="FIFFB_BEM" id="fiff_constants.h::FIFFB_BEM" ref="fiff__constants_8h.html#a84b6ad0e234363428a256d029249ae29" />
+      <keyword name="FIFFB_BEM_SURF" id="fiff_constants.h::FIFFB_BEM_SURF" ref="fiff__constants_8h.html#a55eefaa57fa48e7a59f8df7e30a33d29" />
       <keyword name="FIFFB_PROJ" id="fiff_constants.h::FIFFB_PROJ" ref="fiff__constants_8h.html#a088ffdc367b4174f65fb422eb8b897f1" />
       <keyword name="FIFFB_PROJ_ITEM" id="fiff_constants.h::FIFFB_PROJ_ITEM" ref="fiff__constants_8h.html#a92ec60aa049c35dd83a171c313a8f467" />
       <keyword name="FIFFB_MRI" id="fiff_constants.h::FIFFB_MRI" ref="fiff__constants_8h.html#ae107fe42f418faab452a6dcf5012e83a" />
@@ -3360,6 +3624,15 @@
       <keyword name="FIFFV_ASPECT_SAMPLE" id="fiff_constants.h::FIFFV_ASPECT_SAMPLE" ref="fiff__constants_8h.html#a82adf18ad416d658e59ea81bb6c395c2" />
       <keyword name="FIFFV_ASPECT_POWER_DENSITY" id="fiff_constants.h::FIFFV_ASPECT_POWER_DENSITY" ref="fiff__constants_8h.html#af30e0d9ccccb1199f3e0080925b989af" />
       <keyword name="FIFFV_ASPECT_DIPOLE_WAVE" id="fiff_constants.h::FIFFV_ASPECT_DIPOLE_WAVE" ref="fiff__constants_8h.html#a6d07f8d88ad9cddfedec387bc54b8d17" />
+      <keyword name="FIFF_BEM_SURF_ID" id="fiff_constants.h::FIFF_BEM_SURF_ID" ref="fiff__constants_8h.html#a92b229995ffba1151d4baa1393c1fa3e" />
+      <keyword name="FIFF_BEM_SURF_NAME" id="fiff_constants.h::FIFF_BEM_SURF_NAME" ref="fiff__constants_8h.html#ac9ce712a9969173a412dfbbf9d39679f" />
+      <keyword name="FIFF_BEM_SURF_NNODE" id="fiff_constants.h::FIFF_BEM_SURF_NNODE" ref="fiff__constants_8h.html#a610c51649cd8ce35b27f42928e837e8a" />
+      <keyword name="FIFF_BEM_SURF_NTRI" id="fiff_constants.h::FIFF_BEM_SURF_NTRI" ref="fiff__constants_8h.html#a9462e157ffe22cf60488405e3ee20039" />
+      <keyword name="FIFF_BEM_SURF_NODES" id="fiff_constants.h::FIFF_BEM_SURF_NODES" ref="fiff__constants_8h.html#a73fb31aee6f7dbf4cd0148719e7e09f4" />
+      <keyword name="FIFF_BEM_SURF_TRIANGLES" id="fiff_constants.h::FIFF_BEM_SURF_TRIANGLES" ref="fiff__constants_8h.html#a7667fad810eb69f677aeb03df7ea9b8f" />
+      <keyword name="FIFF_BEM_SURF_NORMALS" id="fiff_constants.h::FIFF_BEM_SURF_NORMALS" ref="fiff__constants_8h.html#ac534a656d0ced033deb45228e63408ae" />
+      <keyword name="FIFF_BEM_COORD_FRAME" id="fiff_constants.h::FIFF_BEM_COORD_FRAME" ref="fiff__constants_8h.html#a793b37a461ec04db1b67e0e4fa42d3ab" />
+      <keyword name="FIFF_BEM_SIGMA" id="fiff_constants.h::FIFF_BEM_SIGMA" ref="fiff__constants_8h.html#a9559defd7b5516ba89985e3e5ee1424f" />
       <keyword name="FIFFV_BEM_SURF_ID_UNKNOWN" id="fiff_constants.h::FIFFV_BEM_SURF_ID_UNKNOWN" ref="fiff__constants_8h.html#a0c20408e88580abcdd91be13efb6a80e" />
       <keyword name="FIFFV_BEM_SURF_ID_BRAIN" id="fiff_constants.h::FIFFV_BEM_SURF_ID_BRAIN" ref="fiff__constants_8h.html#ac68961fcaaba117812ddca066b0b7cd3" />
       <keyword name="FIFFV_BEM_SURF_ID_SKULL" id="fiff_constants.h::FIFFV_BEM_SURF_ID_SKULL" ref="fiff__constants_8h.html#a6278a15808cf5f698e656f839e7c0ab6" />
@@ -3436,8 +3709,6 @@
       <keyword name="FIFF_MNE_SOURCE_SPACE_MRI_FILE" id="fiff_constants.h::FIFF_MNE_SOURCE_SPACE_MRI_FILE" ref="fiff__constants_8h.html#a81e309fe9a75c1f5c22deba3700fda66" />
       <keyword name="FIFF_MNE_SOURCE_SPACE_DIST" id="fiff_constants.h::FIFF_MNE_SOURCE_SPACE_DIST" ref="fiff__constants_8h.html#a6342fc7fea3bc397eea7eb2182e48460" />
       <keyword name="FIFF_MNE_SOURCE_SPACE_DIST_LIMIT" id="fiff_constants.h::FIFF_MNE_SOURCE_SPACE_DIST_LIMIT" ref="fiff__constants_8h.html#a255826ac1a9a74b9b11f1d9687e76ae4" />
-      <keyword name="FIFF_BEM_SURF_NTRI" id="fiff_constants.h::FIFF_BEM_SURF_NTRI" ref="fiff__constants_8h.html#a9462e157ffe22cf60488405e3ee20039" />
-      <keyword name="FIFF_BEM_SURF_TRIANGLES" id="fiff_constants.h::FIFF_BEM_SURF_TRIANGLES" ref="fiff__constants_8h.html#a7667fad810eb69f677aeb03df7ea9b8f" />
       <keyword name="FIFF_MNE_FORWARD_SOLUTION" id="fiff_constants.h::FIFF_MNE_FORWARD_SOLUTION" ref="fiff__constants_8h.html#a4db826e24000c6dc0d7d5b863497eb1e" />
       <keyword name="FIFF_MNE_SOURCE_ORIENTATION" id="fiff_constants.h::FIFF_MNE_SOURCE_ORIENTATION" ref="fiff__constants_8h.html#a3271879db122798d290ee16bf50c72be" />
       <keyword name="FIFF_MNE_INCLUDED_METHODS" id="fiff_constants.h::FIFF_MNE_INCLUDED_METHODS" ref="fiff__constants_8h.html#a855b2bdbae1a571457fbd69082e3ef5b" />
@@ -3695,6 +3966,12 @@
       <keyword name="DECLARE_TYPE_NAME" id="typename_old.h::DECLARE_TYPE_NAME" ref="typename__old_8h.html#aedc3cb7d2b3114ea6495508cd30e0a8d" />
       <keyword name="DECLARE_TYPE_NAME" id="typename_old.h::DECLARE_TYPE_NAME" ref="typename__old_8h.html#a475c58d655f6e7323819a16aac0199b7" />
       <keyword name="INVERSESHARED_EXPORT" id="inverse_global.h::INVERSESHARED_EXPORT" ref="inverse__global_8h.html#a690715da53886c394e203431ad1f18a2" />
+      <keyword name="Dipole_INT" id="dipole.h::Dipole_INT" ref="dipole_8h.html#a6d37a8990da8a1b82aa2028899d34bc1" />
+      <keyword name="Dipole_FLOAT" id="dipole.h::Dipole_FLOAT" ref="dipole_8h.html#a7512b84e7b2665a73c0b4e712f9484f4" />
+      <keyword name="Dipole_DOUBLE" id="dipole.h::Dipole_DOUBLE" ref="dipole_8h.html#a8039a6599a662d8c1fa5522f982a999b" />
+      <keyword name="NOT_TRANSPOSED" id="rapmusic.h::NOT_TRANSPOSED" ref="rapmusic_8h.html#a4594ff69b42430e5b31670333bad4446" />
+      <keyword name="IS_TRANSPOSED" id="rapmusic.h::IS_TRANSPOSED" ref="rapmusic_8h.html#ac18202c2d588eee60087ed889794a5ff" />
+      <keyword name="Pair" id="rapmusic.h::Pair" ref="rapmusic_8h.html#aa86cd1a8a571112f4e10db3629ee1b6b" />
       <keyword name="operator&lt;&lt;" id="mne_forwardsolution.h::operator&lt;&lt;" ref="mne__forwardsolution_8h.html#a4119a52081529f93218c8c9a0e590d34" />
       <keyword name="MNESHARED_EXPORT" id="mne_global.h::MNESHARED_EXPORT" ref="mne__global_8h.html#ae182e5976a87d895a5eecf737aafefc3" />
       <keyword name="operator&lt;&lt;" id="mne_inverse_operator.h::operator&lt;&lt;" ref="mne__inverse__operator_8h.html#a0a33dc980ef17da82d409a15722b3d8e" />
@@ -3741,9 +4018,9 @@
       <keyword name="DISP3DLIB::InverseView" id="DISP3DLIB::InverseView" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html" />
       <keyword name="SPtr" id="DISP3DLIB::InverseView::SPtr" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html#a29a09132596437680ba804eb676dd00e" />
       <keyword name="ConstSPtr" id="DISP3DLIB::InverseView::ConstSPtr" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html#acbd3608fef565cbfdaeabc7ecd83a83e" />
-      <keyword name="InverseView" id="DISP3DLIB::InverseView::InverseView" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html#ab88f220eaa7b98b77caa6ed3a15cea92" />
+      <keyword name="InverseView" id="DISP3DLIB::InverseView::InverseView" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html#a6e40de9777aa78e9a7228bdde5a43d4c" />
       <keyword name="~InverseView" id="DISP3DLIB::InverseView::~InverseView" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html#ae99edaeebd5abd5d7af7c59f1a1f6570" />
-      <keyword name="pushSourceEstimate" id="DISP3DLIB::InverseView::pushSourceEstimate" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html#a30c7bcd376a2246a9cce9c8d8a5d4257" />
+      <keyword name="pushSourceEstimate" id="DISP3DLIB::InverseView::pushSourceEstimate" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html#a80d713f2eeb4e4a5adff3bd36446a756" />
       <keyword name="initializeGL" id="DISP3DLIB::InverseView::initializeGL" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html#ae5a3640847371575dfdc72507164dfce" />
       <keyword name="paintGL" id="DISP3DLIB::InverseView::paintGL" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html#ac6b6252ec5be9702a1404b280771b37f" />
       <keyword name="keyPressEvent" id="DISP3DLIB::InverseView::keyPressEvent" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view.html#a3712afd1743b5f4b26659d9901887792" />
@@ -3753,11 +4030,11 @@
       <keyword name="SPtr" id="DISP3DLIB::InverseViewProducer::SPtr" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view_producer.html#a222f9d3411f1210337d9e3e552d1eb93" />
       <keyword name="ConstSPtr" id="DISP3DLIB::InverseViewProducer::ConstSPtr" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view_producer.html#af713843568f6cb16e817e2b91bd8b5f7" />
       <keyword name="sourceEstimateSample" id="DISP3DLIB::InverseViewProducer::sourceEstimateSample" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view_producer.html#a29343083df0d8e8daf7ece9c2e05ce08" />
-      <keyword name="InverseViewProducer" id="DISP3DLIB::InverseViewProducer::InverseViewProducer" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view_producer.html#ac0763f5e8fae0aa991ef97379f5c8ac8" />
+      <keyword name="InverseViewProducer" id="DISP3DLIB::InverseViewProducer::InverseViewProducer" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view_producer.html#ab0c8bf460f53bcdd793099fcfe296172" />
       <keyword name="~InverseViewProducer" id="DISP3DLIB::InverseViewProducer::~InverseViewProducer" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view_producer.html#a93b235bdbfbf4d799a5d71e5fb6013e9" />
       <keyword name="getGlobalMax" id="DISP3DLIB::InverseViewProducer::getGlobalMax" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view_producer.html#a6ee48a8b5548761e311944649bccafe4" />
       <keyword name="getMaxActivation" id="DISP3DLIB::InverseViewProducer::getMaxActivation" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view_producer.html#ad347cbfeb31f4ac800871d84a04955b4" />
-      <keyword name="pushSourceEstimate" id="DISP3DLIB::InverseViewProducer::pushSourceEstimate" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view_producer.html#ab0edc196072c367528a1ef5dcf659039" />
+      <keyword name="pushSourceEstimate" id="DISP3DLIB::InverseViewProducer::pushSourceEstimate" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view_producer.html#a75c6f256d2c020ff6057f086c02e8fee" />
       <keyword name="stop" id="DISP3DLIB::InverseViewProducer::stop" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view_producer.html#a4762b7feca48af61fad170257f5a8973" />
       <keyword name="run" id="DISP3DLIB::InverseViewProducer::run" ref="class_d_i_s_p3_d_l_i_b_1_1_inverse_view_producer.html#aa6a77dcd3c7d87a5cd18d040bfb6f94b" />
       <keyword name="DISP3DLIB::LabelView" id="DISP3DLIB::LabelView" ref="class_d_i_s_p3_d_l_i_b_1_1_label_view.html" />
@@ -3765,7 +4042,7 @@
       <keyword name="ConstSPtr" id="DISP3DLIB::LabelView::ConstSPtr" ref="class_d_i_s_p3_d_l_i_b_1_1_label_view.html#a075ef2ab9e773e769a589c712e8dd9a3" />
       <keyword name="LabelView" id="DISP3DLIB::LabelView::LabelView" ref="class_d_i_s_p3_d_l_i_b_1_1_label_view.html#a448bdf4cb4b1a6f98350efae144fddc3" />
       <keyword name="~LabelView" id="DISP3DLIB::LabelView::~LabelView" ref="class_d_i_s_p3_d_l_i_b_1_1_label_view.html#a3c7ec5b375db42b8984ec08f76228295" />
-      <keyword name="pushSourceEstimate" id="DISP3DLIB::LabelView::pushSourceEstimate" ref="class_d_i_s_p3_d_l_i_b_1_1_label_view.html#a751b31c71ed2f03a3ab64d782ef7f7d4" />
+      <keyword name="pushSourceEstimate" id="DISP3DLIB::LabelView::pushSourceEstimate" ref="class_d_i_s_p3_d_l_i_b_1_1_label_view.html#ab9f304a688eaf443e6026d4d2f57557d" />
       <keyword name="initializeGL" id="DISP3DLIB::LabelView::initializeGL" ref="class_d_i_s_p3_d_l_i_b_1_1_label_view.html#a4777b7f0234499359d1416b104bfe908" />
       <keyword name="paintGL" id="DISP3DLIB::LabelView::paintGL" ref="class_d_i_s_p3_d_l_i_b_1_1_label_view.html#ac61e3be860ec6c41640a1b082df8552d" />
       <keyword name="DISPLIB::ColorMap" id="DISPLIB::ColorMap" ref="class_d_i_s_p_l_i_b_1_1_color_map.html" />
@@ -3775,7 +4052,10 @@
       <keyword name="~ColorMap" id="DISPLIB::ColorMap::~ColorMap" ref="class_d_i_s_p_l_i_b_1_1_color_map.html#a6c8d5222750e389108c2e97302d3e8c4" />
       <keyword name="valueToJet" id="DISPLIB::ColorMap::valueToJet" ref="class_d_i_s_p_l_i_b_1_1_color_map.html#a6d2e65e00fd1a8827132b3cfc30bd941" />
       <keyword name="valueToHot" id="DISPLIB::ColorMap::valueToHot" ref="class_d_i_s_p_l_i_b_1_1_color_map.html#af0e3402bb90d91acd6adb19b1ff01ed4" />
+      <keyword name="valueToHotNegative1" id="DISPLIB::ColorMap::valueToHotNegative1" ref="class_d_i_s_p_l_i_b_1_1_color_map.html#af205f9d3d65c41c4224b79904bcab53d" />
+      <keyword name="valueToHotNegative2" id="DISPLIB::ColorMap::valueToHotNegative2" ref="class_d_i_s_p_l_i_b_1_1_color_map.html#ac0240d448f62b4deb2568e0f7e9e3185" />
       <keyword name="valueToBone" id="DISPLIB::ColorMap::valueToBone" ref="class_d_i_s_p_l_i_b_1_1_color_map.html#a3ea6600fe319ede93abde1e58e67ca0a" />
+      <keyword name="valueToRedBlue" id="DISPLIB::ColorMap::valueToRedBlue" ref="class_d_i_s_p_l_i_b_1_1_color_map.html#a8db9c9c6ff90e31de54a9553f53f3b63" />
       <keyword name="linearSlope" id="DISPLIB::ColorMap::linearSlope" ref="class_d_i_s_p_l_i_b_1_1_color_map.html#a3fc2088e75d0f2a019a6ed23e723dc16" />
       <keyword name="jetR" id="DISPLIB::ColorMap::jetR" ref="class_d_i_s_p_l_i_b_1_1_color_map.html#a64173832d6dfb8d2f0130dba4251cab0" />
       <keyword name="jetG" id="DISPLIB::ColorMap::jetG" ref="class_d_i_s_p_l_i_b_1_1_color_map.html#a91b69c49baa2b85d133b2299b57b5ccf" />
@@ -3783,9 +4063,18 @@
       <keyword name="hotR" id="DISPLIB::ColorMap::hotR" ref="class_d_i_s_p_l_i_b_1_1_color_map.html#ac5e3bb01e109e8d4990644e2679af85d" />
       <keyword name="hotG" id="DISPLIB::ColorMap::hotG" ref="class_d_i_s_p_l_i_b_1_1_color_map.html#a111a7f90d61026ad1081063eb73f9bff" />
       <keyword name="hotB" id="DISPLIB::ColorMap::hotB" ref="class_d_i_s_p_l_i_b_1_1_color_map.html#ac943f066da416006a699ff1474231939" />
+      <keyword name="hotRNeg1" id="DISPLIB::ColorMap::hotRNeg1" ref="class_d_i_s_p_l_i_b_1_1_color_map.html#aba9acf0baed7bcd9dab0bda579531bb5" />
+      <keyword name="hotGNeg1" id="DISPLIB::ColorMap::hotGNeg1" ref="class_d_i_s_p_l_i_b_1_1_color_map.html#aaa70bd7ff18c8ff488ba49cf5e1ec90e" />
+      <keyword name="hotBNeg1" id="DISPLIB::ColorMap::hotBNeg1" ref="class_d_i_s_p_l_i_b_1_1_color_map.html#aa82ef495bbdb171ec2f47d3e2583c81c" />
+      <keyword name="hotRNeg2" id="DISPLIB::ColorMap::hotRNeg2" ref="class_d_i_s_p_l_i_b_1_1_color_map.html#a2ab1bcc25ad3921aa70f51637e1a07d1" />
+      <keyword name="hotGNeg2" id="DISPLIB::ColorMap::hotGNeg2" ref="class_d_i_s_p_l_i_b_1_1_color_map.html#a4a5983812a5751d73d207997f21942c9" />
+      <keyword name="hotBNeg2" id="DISPLIB::ColorMap::hotBNeg2" ref="class_d_i_s_p_l_i_b_1_1_color_map.html#a65010775d527fbdd12cd9b887293fa98" />
       <keyword name="boneR" id="DISPLIB::ColorMap::boneR" ref="class_d_i_s_p_l_i_b_1_1_color_map.html#a476f9ed39c73ad05a556cd3860b1af90" />
       <keyword name="boneG" id="DISPLIB::ColorMap::boneG" ref="class_d_i_s_p_l_i_b_1_1_color_map.html#ad15b6e9517fecd18bc6c6654662f3cb2" />
       <keyword name="boneB" id="DISPLIB::ColorMap::boneB" ref="class_d_i_s_p_l_i_b_1_1_color_map.html#abb251bb7603ba90d567f8c2d44d06745" />
+      <keyword name="rbR" id="DISPLIB::ColorMap::rbR" ref="class_d_i_s_p_l_i_b_1_1_color_map.html#aa425fb80c61a8091d95460b4d2997d39" />
+      <keyword name="rbG" id="DISPLIB::ColorMap::rbG" ref="class_d_i_s_p_l_i_b_1_1_color_map.html#a8a4a371cff4e5de03ffabd6767d26677" />
+      <keyword name="rbB" id="DISPLIB::ColorMap::rbB" ref="class_d_i_s_p_l_i_b_1_1_color_map.html#a3bcdf9576f57bfbf30f210ffb70e287a" />
       <keyword name="DISPLIB::Graph" id="DISPLIB::Graph" ref="class_d_i_s_p_l_i_b_1_1_graph.html" />
       <keyword name="Graph" id="DISPLIB::Graph::Graph" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a16c725d15f3725ecf6e467ea021cc211" />
       <keyword name="init" id="DISPLIB::Graph::init" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a658fb9e409aea585c61dba4792adb9ea" />
@@ -3881,6 +4170,38 @@
       <keyword name="m_sYLabel" id="DISPLIB::Graph::m_sYLabel" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a825d912df975c7a84950eb1ec0d0b8da" />
       <keyword name="m_qFontAxes" id="DISPLIB::Graph::m_qFontAxes" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a6c3a5a1fe927f36f4b7d5470f59099b4" />
       <keyword name="m_qPenAxes" id="DISPLIB::Graph::m_qPenAxes" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a159ced9595c462dc093dba194ba6f8bd" />
+      <keyword name="DISPLIB::RtPlot" id="DISPLIB::RtPlot" ref="class_d_i_s_p_l_i_b_1_1_rt_plot.html" />
+      <keyword name="SPtr" id="DISPLIB::RtPlot::SPtr" ref="class_d_i_s_p_l_i_b_1_1_rt_plot.html#a413d0d8ab1074c2d703e7f518300edf1" />
+      <keyword name="ConstSPtr" id="DISPLIB::RtPlot::ConstSPtr" ref="class_d_i_s_p_l_i_b_1_1_rt_plot.html#aa20819ba3df7ecb70efe197eadc17a69" />
+      <keyword name="RtPlot" id="DISPLIB::RtPlot::RtPlot" ref="class_d_i_s_p_l_i_b_1_1_rt_plot.html#a25c93b81dcc4de823464c202ba4133fa" />
+      <keyword name="RtPlot" id="DISPLIB::RtPlot::RtPlot" ref="class_d_i_s_p_l_i_b_1_1_rt_plot.html#afd02aebedfd19c16f904a0990bbc05ca" />
+      <keyword name="~RtPlot" id="DISPLIB::RtPlot::~RtPlot" ref="class_d_i_s_p_l_i_b_1_1_rt_plot.html#a039182ec66b7a102db5774da3f29795b" />
+      <keyword name="init" id="DISPLIB::RtPlot::init" ref="class_d_i_s_p_l_i_b_1_1_rt_plot.html#a7f3065d80248a89a094db902536caf40" />
+      <keyword name="updateData" id="DISPLIB::RtPlot::updateData" ref="class_d_i_s_p_l_i_b_1_1_rt_plot.html#a7d07d687de99842ec52f93b963858915" />
+      <keyword name="Graph" id="DISPLIB::Graph::Graph" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a16c725d15f3725ecf6e467ea021cc211" />
+      <keyword name="init" id="DISPLIB::Graph::init" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a658fb9e409aea585c61dba4792adb9ea" />
+      <keyword name="setTitle" id="DISPLIB::Graph::setTitle" ref="class_d_i_s_p_l_i_b_1_1_graph.html#ab7c5b3b2e675d13c3d4df992269269ce" />
+      <keyword name="setXLabel" id="DISPLIB::Graph::setXLabel" ref="class_d_i_s_p_l_i_b_1_1_graph.html#af1b62fe24283b53d581c4e527d0c0bf2" />
+      <keyword name="setYLabel" id="DISPLIB::Graph::setYLabel" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a752dbea2ba2aac829500c61e31b2f860" />
+      <keyword name="paintEvent" id="DISPLIB::RtPlot::paintEvent" ref="class_d_i_s_p_l_i_b_1_1_rt_plot.html#a0addef8b25300d0d468cbc2768ed8701" />
+      <keyword name="resizeEvent" id="DISPLIB::Graph::resizeEvent" ref="class_d_i_s_p_l_i_b_1_1_graph.html#af14afde24b95a50479709f467c3e82f4" />
+      <keyword name="drawLabels" id="DISPLIB::Graph::drawLabels" ref="class_d_i_s_p_l_i_b_1_1_graph.html#ae4dff910e045b93fe4fa5339338377a7" />
+      <keyword name="m_bHoldOn" id="DISPLIB::RtPlot::m_bHoldOn" ref="class_d_i_s_p_l_i_b_1_1_rt_plot.html#a90636a8421217b37e9852c83a688fb0e" />
+      <keyword name="m_qListVecPointFPaths" id="DISPLIB::RtPlot::m_qListVecPointFPaths" ref="class_d_i_s_p_l_i_b_1_1_rt_plot.html#af141c4dc1329164afd34ab0bebeb0b6a" />
+      <keyword name="m_dMinX" id="DISPLIB::RtPlot::m_dMinX" ref="class_d_i_s_p_l_i_b_1_1_rt_plot.html#a3530cac490233f18648c66c37faf0e7e" />
+      <keyword name="m_dMaxX" id="DISPLIB::RtPlot::m_dMaxX" ref="class_d_i_s_p_l_i_b_1_1_rt_plot.html#ace63dfeff40aab25ddd71172b8b59879" />
+      <keyword name="m_dMinY" id="DISPLIB::RtPlot::m_dMinY" ref="class_d_i_s_p_l_i_b_1_1_rt_plot.html#a9d25a2b3e9dfc49a037a154af52e8657" />
+      <keyword name="m_dMaxY" id="DISPLIB::RtPlot::m_dMaxY" ref="class_d_i_s_p_l_i_b_1_1_rt_plot.html#ad34cbe65a6517501b01a09e95e40802a" />
+      <keyword name="m_qSizeWidget" id="DISPLIB::Graph::m_qSizeWidget" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a67d2f25fe83844ce262688c84de8d150" />
+      <keyword name="m_sTitle" id="DISPLIB::Graph::m_sTitle" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a81ca0811d73601afa99c72e9b5883ef2" />
+      <keyword name="m_qFontTitle" id="DISPLIB::Graph::m_qFontTitle" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a0e848c5034b65c5d81d1bbffed3a0c01" />
+      <keyword name="m_qPenTitle" id="DISPLIB::Graph::m_qPenTitle" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a851ab45d1cf04d0895f06affa73adc3a" />
+      <keyword name="m_iBorderTopBottom" id="DISPLIB::Graph::m_iBorderTopBottom" ref="class_d_i_s_p_l_i_b_1_1_graph.html#ada86d8d4bbd804133722720eab808110" />
+      <keyword name="m_iBorderLeftRight" id="DISPLIB::Graph::m_iBorderLeftRight" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a86659ac189c2b959ab800d280db9761d" />
+      <keyword name="m_sXLabel" id="DISPLIB::Graph::m_sXLabel" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a1c4ce890f2f03697cd4cbaaa5a04da82" />
+      <keyword name="m_sYLabel" id="DISPLIB::Graph::m_sYLabel" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a825d912df975c7a84950eb1ec0d0b8da" />
+      <keyword name="m_qFontAxes" id="DISPLIB::Graph::m_qFontAxes" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a6c3a5a1fe927f36f4b7d5470f59099b4" />
+      <keyword name="m_qPenAxes" id="DISPLIB::Graph::m_qPenAxes" ref="class_d_i_s_p_l_i_b_1_1_graph.html#a159ced9595c462dc093dba194ba6f8bd" />
       <keyword name="FIFFLIB::Fiff" id="FIFFLIB::Fiff" ref="class_f_i_f_f_l_i_b_1_1_fiff.html" />
       <keyword name="~Fiff" id="FIFFLIB::Fiff::~Fiff" ref="class_f_i_f_f_l_i_b_1_1_fiff.html#a897e94c38f4685fd74f2543ace9c2213" />
       <keyword name="copy_tree" id="FIFFLIB::Fiff::copy_tree" ref="class_f_i_f_f_l_i_b_1_1_fiff.html#a2204cae0f25804f90ca463f47f7fa66b" />
@@ -3893,6 +4214,7 @@
       <keyword name="open" id="FIFFLIB::Fiff::open" ref="class_f_i_f_f_l_i_b_1_1_fiff.html#aca4c534b3277c74bcc022bc644161a51" />
       <keyword name="pick_channels" id="FIFFLIB::Fiff::pick_channels" ref="class_f_i_f_f_l_i_b_1_1_fiff.html#a71e2c1f24381bb8368c238fc102309c7" />
       <keyword name="pick_channels" id="FIFFLIB::Fiff::pick_channels" ref="class_f_i_f_f_l_i_b_1_1_fiff.html#aef7f55fae4deec70ddd40523bb0e4e24" />
+      <keyword name="find_evoked" id="FIFFLIB::Fiff::find_evoked" ref="class_f_i_f_f_l_i_b_1_1_fiff.html#ab8215770690bdde47aec93c6e07bc1c5" />
       <keyword name="pick_info" id="FIFFLIB::Fiff::pick_info" ref="class_f_i_f_f_l_i_b_1_1_fiff.html#a5b4f961942bd1966570c1d2c1c9716dc" />
       <keyword name="pick_types" id="FIFFLIB::Fiff::pick_types" ref="class_f_i_f_f_l_i_b_1_1_fiff.html#a19c3c6706517775ae94478c41e7b0040" />
       <keyword name="read_bad_channels" id="FIFFLIB::Fiff::read_bad_channels" ref="class_f_i_f_f_l_i_b_1_1_fiff.html#ac852f6b4dbd3d810630640edbebe9c5c" />
@@ -4059,7 +4381,7 @@
       <keyword name="~FiffEvoked" id="FIFFLIB::FiffEvoked::~FiffEvoked" ref="class_f_i_f_f_l_i_b_1_1_fiff_evoked.html#aca8c60d1b714ceb563057f91ca8c7ef8" />
       <keyword name="ch_names" id="FIFFLIB::FiffEvoked::ch_names" ref="class_f_i_f_f_l_i_b_1_1_fiff_evoked.html#a501188d866347cca652e129c4afe8c98" />
       <keyword name="clear" id="FIFFLIB::FiffEvoked::clear" ref="class_f_i_f_f_l_i_b_1_1_fiff_evoked.html#a196068971089679a53a01e877a2b3de6" />
-      <keyword name="aspectKindToString" id="FIFFLIB::FiffEvoked::aspectKindToString" ref="class_f_i_f_f_l_i_b_1_1_fiff_evoked.html#a70c1e65208eeda7fd8ad5d47bd8ce098" />
+      <keyword name="aspectKindToString" id="FIFFLIB::FiffEvoked::aspectKindToString" ref="class_f_i_f_f_l_i_b_1_1_fiff_evoked.html#a133a00c10457715b24ff330764e5835e" />
       <keyword name="isEmpty" id="FIFFLIB::FiffEvoked::isEmpty" ref="class_f_i_f_f_l_i_b_1_1_fiff_evoked.html#af1b42c0d4929a8c4643cca4ed8776560" />
       <keyword name="pick_channels" id="FIFFLIB::FiffEvoked::pick_channels" ref="class_f_i_f_f_l_i_b_1_1_fiff_evoked.html#aab35f351cc360933246f7088e68234e5" />
       <keyword name="setInfo" id="FIFFLIB::FiffEvoked::setInfo" ref="class_f_i_f_f_l_i_b_1_1_fiff_evoked.html#a937ba053abbed8b852277572379a3529" />
@@ -4097,6 +4419,8 @@
       <keyword name="~FiffEvokedSet" id="FIFFLIB::FiffEvokedSet::~FiffEvokedSet" ref="class_f_i_f_f_l_i_b_1_1_fiff_evoked_set.html#a461f8fc1efc8a2c0707c04d3941fc858" />
       <keyword name="clear" id="FIFFLIB::FiffEvokedSet::clear" ref="class_f_i_f_f_l_i_b_1_1_fiff_evoked_set.html#ad5dd813313ea34b948208f9dfda9a3f1" />
       <keyword name="pick_channels" id="FIFFLIB::FiffEvokedSet::pick_channels" ref="class_f_i_f_f_l_i_b_1_1_fiff_evoked_set.html#a49d197d5a669e33fb9aa4751d2b80aaa" />
+      <keyword name="compensate_to" id="FIFFLIB::FiffEvokedSet::compensate_to" ref="class_f_i_f_f_l_i_b_1_1_fiff_evoked_set.html#a65ccccf285b37a85b7a2129f8e5d6ab3" />
+      <keyword name="find_evoked" id="FIFFLIB::FiffEvokedSet::find_evoked" ref="class_f_i_f_f_l_i_b_1_1_fiff_evoked_set.html#aa1f2c36a523ac14ce7b17e82ce3a7a94" />
       <keyword name="read" id="FIFFLIB::FiffEvokedSet::read" ref="class_f_i_f_f_l_i_b_1_1_fiff_evoked_set.html#a0b68d63d623b921151c3bbeee89f8366" />
       <keyword name="info" id="FIFFLIB::FiffEvokedSet::info" ref="class_f_i_f_f_l_i_b_1_1_fiff_evoked_set.html#a23176cb723c6187b9e4822266426b931" />
       <keyword name="evoked" id="FIFFLIB::FiffEvokedSet::evoked" ref="class_f_i_f_f_l_i_b_1_1_fiff_evoked_set.html#aec48fff116de710b554d21f7f89f8fe6" />
@@ -4152,13 +4476,13 @@
       <keyword name="acq_pars" id="FIFFLIB::FiffInfo::acq_pars" ref="class_f_i_f_f_l_i_b_1_1_fiff_info.html#ac5441674648831c0e691f4022360755e" />
       <keyword name="acq_stim" id="FIFFLIB::FiffInfo::acq_stim" ref="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a40a96f92d6d21fbd0678c1f6d0abcee0" />
       <keyword name="filename" id="FIFFLIB::FiffInfoBase::filename" ref="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#ab4ed13fa034471b15a66b303e71c23d6" />
+      <keyword name="bads" id="FIFFLIB::FiffInfoBase::bads" ref="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#abb2b7b298afe7439c1012962c2a8c43c" />
       <keyword name="meas_id" id="FIFFLIB::FiffInfoBase::meas_id" ref="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#a4e7cc06ad6cd39b9e554c09b0935f5d9" />
       <keyword name="nchan" id="FIFFLIB::FiffInfoBase::nchan" ref="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#ab029006706d937001324c13892102893" />
       <keyword name="chs" id="FIFFLIB::FiffInfoBase::chs" ref="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#aa07b3b770d7fe65ac065e01461688e04" />
       <keyword name="ch_names" id="FIFFLIB::FiffInfoBase::ch_names" ref="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#af15ed691efe28790897198f06306ab29" />
       <keyword name="dev_head_t" id="FIFFLIB::FiffInfoBase::dev_head_t" ref="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#af928d3bcb3e2a26e386647587b48579e" />
       <keyword name="ctf_head_t" id="FIFFLIB::FiffInfoBase::ctf_head_t" ref="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#aa4ff7b1f98b00a295617c1aaa80e1146" />
-      <keyword name="bads" id="FIFFLIB::FiffInfoBase::bads" ref="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#abb2b7b298afe7439c1012962c2a8c43c" />
       <keyword name="FIFFLIB::FiffInfoBase" id="FIFFLIB::FiffInfoBase" ref="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html" />
       <keyword name="SPtr" id="FIFFLIB::FiffInfoBase::SPtr" ref="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#ab300518e40333c0b65dce228769b1e80" />
       <keyword name="ConstSPtr" id="FIFFLIB::FiffInfoBase::ConstSPtr" ref="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#a4141e1b93eee97b568f5c87b6bbf75cb" />
@@ -4173,13 +4497,13 @@
       <keyword name="pick_types" id="FIFFLIB::FiffInfoBase::pick_types" ref="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#af9887e8a9ac6d59b891ed03ac11d913f" />
       <keyword name="pick_channels" id="FIFFLIB::FiffInfoBase::pick_channels" ref="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#a50360642b60e476370360e8c684ba67f" />
       <keyword name="filename" id="FIFFLIB::FiffInfoBase::filename" ref="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#ab4ed13fa034471b15a66b303e71c23d6" />
+      <keyword name="bads" id="FIFFLIB::FiffInfoBase::bads" ref="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#abb2b7b298afe7439c1012962c2a8c43c" />
       <keyword name="meas_id" id="FIFFLIB::FiffInfoBase::meas_id" ref="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#a4e7cc06ad6cd39b9e554c09b0935f5d9" />
       <keyword name="nchan" id="FIFFLIB::FiffInfoBase::nchan" ref="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#ab029006706d937001324c13892102893" />
       <keyword name="chs" id="FIFFLIB::FiffInfoBase::chs" ref="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#aa07b3b770d7fe65ac065e01461688e04" />
       <keyword name="ch_names" id="FIFFLIB::FiffInfoBase::ch_names" ref="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#af15ed691efe28790897198f06306ab29" />
       <keyword name="dev_head_t" id="FIFFLIB::FiffInfoBase::dev_head_t" ref="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#af928d3bcb3e2a26e386647587b48579e" />
       <keyword name="ctf_head_t" id="FIFFLIB::FiffInfoBase::ctf_head_t" ref="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#aa4ff7b1f98b00a295617c1aaa80e1146" />
-      <keyword name="bads" id="FIFFLIB::FiffInfoBase::bads" ref="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#abb2b7b298afe7439c1012962c2a8c43c" />
       <keyword name="FIFFLIB::FiffNamedMatrix" id="FIFFLIB::FiffNamedMatrix" ref="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html" />
       <keyword name="SPtr" id="FIFFLIB::FiffNamedMatrix::SPtr" ref="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html#ae9caf7f441e93dba375b971382c1276b" />
       <keyword name="ConstSPtr" id="FIFFLIB::FiffNamedMatrix::ConstSPtr" ref="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html#ac9fe78ab48e91a80a62f64f6550c399b" />
@@ -4370,9 +4694,11 @@
       <keyword name="AnnotationSet" id="FSLIB::AnnotationSet::AnnotationSet" ref="class_f_s_l_i_b_1_1_annotation_set.html#a7ef5bdecdcd1451761f34fdebaf47d4d" />
       <keyword name="~AnnotationSet" id="FSLIB::AnnotationSet::~AnnotationSet" ref="class_f_s_l_i_b_1_1_annotation_set.html#a7f36fa0ac6ddc742a0a88498a24391dc" />
       <keyword name="clear" id="FSLIB::AnnotationSet::clear" ref="class_f_s_l_i_b_1_1_annotation_set.html#a50e15835a32be178552134ee08def943" />
+      <keyword name="isEmpty" id="FSLIB::AnnotationSet::isEmpty" ref="class_f_s_l_i_b_1_1_annotation_set.html#a40d3625d5e98aa3903382f3e9af64194" />
       <keyword name="toLabels" id="FSLIB::AnnotationSet::toLabels" ref="class_f_s_l_i_b_1_1_annotation_set.html#aebd156d216d0d79380ca0cf63a74ebab" />
       <keyword name="operator[]" id="FSLIB::AnnotationSet::operator[]" ref="class_f_s_l_i_b_1_1_annotation_set.html#ac2c85b6c78cb4d6c56c6732584ff8c2e" />
       <keyword name="operator[]" id="FSLIB::AnnotationSet::operator[]" ref="class_f_s_l_i_b_1_1_annotation_set.html#a21a44ee7fe417c705aa80a26baeee7a0" />
+      <keyword name="size" id="FSLIB::AnnotationSet::size" ref="class_f_s_l_i_b_1_1_annotation_set.html#a8fe85b503b0400b9fe1914950d5b99fe" />
       <keyword name="read" id="FSLIB::AnnotationSet::read" ref="class_f_s_l_i_b_1_1_annotation_set.html#a000932b83fdb3a164a0f85e0af6f9c49" />
       <keyword name="FSLIB::Colortable" id="FSLIB::Colortable" ref="class_f_s_l_i_b_1_1_colortable.html" />
       <keyword name="SPtr" id="FSLIB::Colortable::SPtr" ref="class_f_s_l_i_b_1_1_colortable.html#a7d57c8cbf2408975db0ccbe1d2e71675" />
@@ -4425,14 +4751,17 @@
       <keyword name="SurfaceSet" id="FSLIB::SurfaceSet::SurfaceSet" ref="class_f_s_l_i_b_1_1_surface_set.html#a137a3391dddd10c89cebd57ff6be50d2" />
       <keyword name="~SurfaceSet" id="FSLIB::SurfaceSet::~SurfaceSet" ref="class_f_s_l_i_b_1_1_surface_set.html#a74176d9d573614df26a73aafba5c2cb3" />
       <keyword name="clear" id="FSLIB::SurfaceSet::clear" ref="class_f_s_l_i_b_1_1_surface_set.html#a9ed03130dea7dffbbba0608b5028e762" />
+      <keyword name="isEmpty" id="FSLIB::SurfaceSet::isEmpty" ref="class_f_s_l_i_b_1_1_surface_set.html#a9dae75b27a36b32e408bea40cfaf0c67" />
       <keyword name="operator[]" id="FSLIB::SurfaceSet::operator[]" ref="class_f_s_l_i_b_1_1_surface_set.html#afcf1e7e55a41cc931b5a59c0781e90ab" />
       <keyword name="operator[]" id="FSLIB::SurfaceSet::operator[]" ref="class_f_s_l_i_b_1_1_surface_set.html#a5c5e5f6bbc87848e95527c07a123983e" />
       <keyword name="operator[]" id="FSLIB::SurfaceSet::operator[]" ref="class_f_s_l_i_b_1_1_surface_set.html#a81e50861a2c5bf5e7b92e37f7875646b" />
       <keyword name="operator[]" id="FSLIB::SurfaceSet::operator[]" ref="class_f_s_l_i_b_1_1_surface_set.html#a1d07bc53038bf380f88564e005584ed1" />
+      <keyword name="size" id="FSLIB::SurfaceSet::size" ref="class_f_s_l_i_b_1_1_surface_set.html#a4b8e5cd5d5290709bbf8bd3cbdded8cb" />
       <keyword name="read" id="FSLIB::SurfaceSet::read" ref="class_f_s_l_i_b_1_1_surface_set.html#a27e8fb28692c18a49748b0144c99f271" />
       <keyword name="INVERSELIB::IInverseAlgorithm" id="INVERSELIB::IInverseAlgorithm" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_i_inverse_algorithm.html" />
       <keyword name="~IInverseAlgorithm" id="INVERSELIB::IInverseAlgorithm::~IInverseAlgorithm" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_i_inverse_algorithm.html#a9c2cda48ff32559bfedc02d8479be7f7" />
-      <keyword name="calculateInverse" id="INVERSELIB::IInverseAlgorithm::calculateInverse" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_i_inverse_algorithm.html#aeb4557c3d15974fbc6c5e74b01b26262" />
+      <keyword name="calculateInverse" id="INVERSELIB::IInverseAlgorithm::calculateInverse" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_i_inverse_algorithm.html#af900d44a0e523a4221912be16f33911e" />
+      <keyword name="calculateInverse" id="INVERSELIB::IInverseAlgorithm::calculateInverse" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_i_inverse_algorithm.html#a710a538d7312fc313889fd9f4eed58b0" />
       <keyword name="getName" id="INVERSELIB::IInverseAlgorithm::getName" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_i_inverse_algorithm.html#a89c73b0cc0887941b8e9e8fe3be20943" />
       <keyword name="getSourceSpace" id="INVERSELIB::IInverseAlgorithm::getSourceSpace" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_i_inverse_algorithm.html#a11beb115090dc108b857465f64494e1f" />
       <keyword name="INVERSELIB::MinimumNorm" id="INVERSELIB::MinimumNorm" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_minimum_norm.html" />
@@ -4440,30 +4769,60 @@
       <keyword name="ConstSPtr" id="INVERSELIB::MinimumNorm::ConstSPtr" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_minimum_norm.html#ae806410ac938effc0a549a84c7b6c473" />
       <keyword name="MinimumNorm" id="INVERSELIB::MinimumNorm::MinimumNorm" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_minimum_norm.html#a0439015d4d2b367523aea36f9e39398b" />
       <keyword name="MinimumNorm" id="INVERSELIB::MinimumNorm::MinimumNorm" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_minimum_norm.html#a602de1995a285f2506b70aabd0190e09" />
-      <keyword name="calculateInverse" id="INVERSELIB::MinimumNorm::calculateInverse" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_minimum_norm.html#aede3e8398bfac4ad9a1366b3cba89af6" />
+      <keyword name="calculateInverse" id="INVERSELIB::MinimumNorm::calculateInverse" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_minimum_norm.html#abd4a36d001f13678cd783a3fb72bcb31" />
+      <keyword name="calculateInverse" id="INVERSELIB::MinimumNorm::calculateInverse" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_minimum_norm.html#abd64eae429fe48bc5a73721d42cc9d03" />
+      <keyword name="doInverseSetup" id="INVERSELIB::MinimumNorm::doInverseSetup" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_minimum_norm.html#a96ba858c671ae220922ddc4ac7b73897" />
       <keyword name="getName" id="INVERSELIB::MinimumNorm::getName" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_minimum_norm.html#a2e328adb859a6e5a3d0443cab5f9f247" />
       <keyword name="getSourceSpace" id="INVERSELIB::MinimumNorm::getSourceSpace" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_minimum_norm.html#ad65d7049a646e94fe8080b05c585454c" />
       <keyword name="setMethod" id="INVERSELIB::MinimumNorm::setMethod" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_minimum_norm.html#ad4b70afa3ff6d7de780ffe248b5fd120" />
       <keyword name="setMethod" id="INVERSELIB::MinimumNorm::setMethod" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_minimum_norm.html#a46c8154877896582b9d510afe3d28820" />
       <keyword name="setRegularization" id="INVERSELIB::MinimumNorm::setRegularization" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_minimum_norm.html#af5d1f861283da41315b6ab7f14a1104a" />
       <keyword name="~IInverseAlgorithm" id="INVERSELIB::IInverseAlgorithm::~IInverseAlgorithm" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_i_inverse_algorithm.html#a9c2cda48ff32559bfedc02d8479be7f7" />
+      <keyword name="INVERSELIB::Dipole" id="INVERSELIB::Dipole" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html" />
+      <keyword name="Dipole" id="INVERSELIB::Dipole::Dipole" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#a1ec3404654f5a01a2a1fb9b36312caf6" />
+      <keyword name="~Dipole" id="INVERSELIB::Dipole::~Dipole" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#ac073300709c24934665a784352cbc9c8" />
+      <keyword name="x" id="INVERSELIB::Dipole::x" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#a60b18a62a496a597484e006b861b220d" />
+      <keyword name="y" id="INVERSELIB::Dipole::y" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#a6cbb3c0ac2f03cf308dd34f275f83cec" />
+      <keyword name="z" id="INVERSELIB::Dipole::z" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#a314268fac926e4dfd766954d05df32b8" />
+      <keyword name="x" id="INVERSELIB::Dipole::x" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#a1668939da977509529e94dc7002ab7b5" />
+      <keyword name="y" id="INVERSELIB::Dipole::y" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#a74b78836fcf06d7c43a87b0d2529d775" />
+      <keyword name="z" id="INVERSELIB::Dipole::z" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#a0d65cdf122c60656de63c154f6fab0a5" />
+      <keyword name="phi_x" id="INVERSELIB::Dipole::phi_x" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#ad7e3d9edd9ba276181e82322b95fa7ca" />
+      <keyword name="phi_y" id="INVERSELIB::Dipole::phi_y" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#acd9efb81871a0d5e757c01f7526f479a" />
+      <keyword name="phi_z" id="INVERSELIB::Dipole::phi_z" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#a5967863f70e28dcf0be68f06999379a6" />
+      <keyword name="phi_x" id="INVERSELIB::Dipole::phi_x" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#a762f63d3d8a5cd8f22067b5b8db8b229" />
+      <keyword name="phi_y" id="INVERSELIB::Dipole::phi_y" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#a4ccaa8654c83303ac3dc767dd2d8180a" />
+      <keyword name="phi_z" id="INVERSELIB::Dipole::phi_z" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#a71068906146ee1105b02924e033413b5" />
+      <keyword name="clean" id="INVERSELIB::Dipole::clean" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html#adb006995b8f8e09a5f12699af5ca65e5" />
+      <keyword name="INVERSELIB::DipolePair" id="INVERSELIB::DipolePair" ref="struct_i_n_v_e_r_s_e_l_i_b_1_1_dipole_pair.html" />
+      <keyword name="m_iIdx1" id="INVERSELIB::DipolePair::m_iIdx1" ref="struct_i_n_v_e_r_s_e_l_i_b_1_1_dipole_pair.html#aacbdaa22d5e68a07d80e3bc013f64678" />
+      <keyword name="m_Dipole1" id="INVERSELIB::DipolePair::m_Dipole1" ref="struct_i_n_v_e_r_s_e_l_i_b_1_1_dipole_pair.html#a9189c658c056606c9fdd51d4c8a06826" />
+      <keyword name="m_iIdx2" id="INVERSELIB::DipolePair::m_iIdx2" ref="struct_i_n_v_e_r_s_e_l_i_b_1_1_dipole_pair.html#af7138c701312919903423faaa65cbabf" />
+      <keyword name="m_Dipole2" id="INVERSELIB::DipolePair::m_Dipole2" ref="struct_i_n_v_e_r_s_e_l_i_b_1_1_dipole_pair.html#afcdc8820911d0c5cdf5d55488de2fad2" />
+      <keyword name="m_vCorrelation" id="INVERSELIB::DipolePair::m_vCorrelation" ref="struct_i_n_v_e_r_s_e_l_i_b_1_1_dipole_pair.html#acf7d371377401c941118fd9df37fd0d6" />
+      <keyword name="INVERSELIB::Pair" id="INVERSELIB::Pair" ref="struct_i_n_v_e_r_s_e_l_i_b_1_1_pair.html" />
+      <keyword name="x1" id="INVERSELIB::Pair::x1" ref="struct_i_n_v_e_r_s_e_l_i_b_1_1_pair.html#aebddc056b9761d1647ae282fb8b20e88" />
+      <keyword name="x2" id="INVERSELIB::Pair::x2" ref="struct_i_n_v_e_r_s_e_l_i_b_1_1_pair.html#a5e72c38d49abd45201ce7f9459400adf" />
       <keyword name="INVERSELIB::RapMusic" id="INVERSELIB::RapMusic" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html" />
-      <keyword name="calculateInverse" id="INVERSELIB::RapMusic::calculateInverse" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#a1505382ce7da52bee7eba86db02cf747" />
+      <keyword name="RapMusic" id="INVERSELIB::RapMusic::RapMusic" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#a1ffb7ec05cc168fea1cc064560f35a8d" />
+      <keyword name="RapMusic" id="INVERSELIB::RapMusic::RapMusic" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#a49f6b0ccd861d74be5e593737c72a8ab" />
+      <keyword name="init" id="INVERSELIB::RapMusic::init" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#af70db78ac058cb6780a9d75f1f535341" />
+      <keyword name="calculateInverse" id="INVERSELIB::RapMusic::calculateInverse" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#a21cc6e9bd56640e54b40076cff552204" />
+      <keyword name="calculateInverse" id="INVERSELIB::RapMusic::calculateInverse" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#a1d974a75c631e7ddbd5342d9fec49f9f" />
+      <keyword name="calculateInverse" id="INVERSELIB::RapMusic::calculateInverse" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#a2a19a340da3e007fd9ada3b87fb1789e" />
       <keyword name="getName" id="INVERSELIB::RapMusic::getName" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#aa6b55a784708e1f1ad7dcc8a37be4b78" />
       <keyword name="getSourceSpace" id="INVERSELIB::RapMusic::getSourceSpace" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#aef5d0ee31620a5fcee3f40ddc67bd4e9" />
+      <keyword name="nchoose2" id="INVERSELIB::RapMusic::nchoose2" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#a6b7c53ea247575cd13688b3048337504" />
       <keyword name="~IInverseAlgorithm" id="INVERSELIB::IInverseAlgorithm::~IInverseAlgorithm" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_i_inverse_algorithm.html#a9c2cda48ff32559bfedc02d8479be7f7" />
-      <keyword name="calculateInverse" id="INVERSELIB::IInverseAlgorithm::calculateInverse" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_i_inverse_algorithm.html#aeb4557c3d15974fbc6c5e74b01b26262" />
-      <keyword name="INVERSELIB::SourceEstimate" id="INVERSELIB::SourceEstimate" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html" />
-      <keyword name="SourceEstimate" id="INVERSELIB::SourceEstimate::SourceEstimate" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#a7de0394b3e1c7f5dd278e917b44d42a3" />
-      <keyword name="SourceEstimate" id="INVERSELIB::SourceEstimate::SourceEstimate" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#a1a117bda78a9aa73a2b47a3f69f818a1" />
-      <keyword name="SourceEstimate" id="INVERSELIB::SourceEstimate::SourceEstimate" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#a548611f1063e5e4ae923abd6c4c907e8" />
-      <keyword name="clear" id="INVERSELIB::SourceEstimate::clear" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#ab6c31cf75e753d3e3733f76e2ddd5a64" />
-      <keyword name="isEmpty" id="INVERSELIB::SourceEstimate::isEmpty" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#a4b95695a45977ccb5ccc73bd957960cf" />
-      <keyword name="data" id="INVERSELIB::SourceEstimate::data" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#a7ae98d0ab882aa80a82215cf9a0b881f" />
-      <keyword name="vertno" id="INVERSELIB::SourceEstimate::vertno" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#a25ee3b098597003c172aa00dd4e33c05" />
-      <keyword name="times" id="INVERSELIB::SourceEstimate::times" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#a6b3861a0fdf6f14f3be0d3ddcf708354" />
-      <keyword name="tmin" id="INVERSELIB::SourceEstimate::tmin" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#ad295c3ee271fa3345f21045d1da6157e" />
-      <keyword name="tstep" id="INVERSELIB::SourceEstimate::tstep" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html#ac34303f7634fe3cc5741ea7b7b308b9e" />
+      <keyword name="calcPhi_s" id="INVERSELIB::RapMusic::calcPhi_s" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#a2b31addad147f88ba32961d97686e4dc" />
+      <keyword name="subcorr" id="INVERSELIB::RapMusic::subcorr" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#a0229f4a162e2c792c542a2f39f7e69f8" />
+      <keyword name="subcorr" id="INVERSELIB::RapMusic::subcorr" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#a4cd1e0a0659e39f4687ef4e61ad6fd46" />
+      <keyword name="calcA_k_1" id="INVERSELIB::RapMusic::calcA_k_1" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#af55842050e36300c75bf178cc953f4da" />
+      <keyword name="calcOrthProj" id="INVERSELIB::RapMusic::calcOrthProj" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#a98640a9d4ae01bee0a453f9ba395da86" />
+      <keyword name="calcPairCombinations" id="INVERSELIB::RapMusic::calcPairCombinations" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#ad2b19259e50f59237c2a7247b73e98ee" />
+      <keyword name="getPointPair" id="INVERSELIB::RapMusic::getPointPair" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#a36780c23eee9526d5f387b2b9627da97" />
+      <keyword name="getGainMatrixPair" id="INVERSELIB::RapMusic::getGainMatrixPair" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#adf85a0b8822000fbfee5b42c6ef889e7" />
+      <keyword name="insertSource" id="INVERSELIB::RapMusic::insertSource" ref="class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#a2c31dfd36741c715c909119c25eff8f8" />
       <keyword name="IOBuffer::Buffer" id="IOBuffer::Buffer" ref="class_i_o_buffer_1_1_buffer.html" />
       <keyword name="SPtr" id="IOBuffer::Buffer::SPtr" ref="class_i_o_buffer_1_1_buffer.html#a1b7d8e4dc0d5820951ca6eee079af4e3" />
       <keyword name="ConstSPtr" id="IOBuffer::Buffer::ConstSPtr" ref="class_i_o_buffer_1_1_buffer.html#a64ab6cc0f8dcf3cdd93bbe6c19cf54c5" />
@@ -4504,6 +4863,9 @@
       <keyword name="size" id="IOBuffer::CircularMatrixBuffer::size" ref="class_i_o_buffer_1_1_circular_matrix_buffer.html#aad526a1017128c5d6aaf9cbaa92508ef" />
       <keyword name="rows" id="IOBuffer::CircularMatrixBuffer::rows" ref="class_i_o_buffer_1_1_circular_matrix_buffer.html#af347e627917d3bfa6ede461e5202e575" />
       <keyword name="cols" id="IOBuffer::CircularMatrixBuffer::cols" ref="class_i_o_buffer_1_1_circular_matrix_buffer.html#adc11730178ddf03c23081c6e74ab78b7" />
+      <keyword name="pause" id="IOBuffer::CircularMatrixBuffer::pause" ref="class_i_o_buffer_1_1_circular_matrix_buffer.html#adc42580f375a160883a77291a56bf246" />
+      <keyword name="releaseFromPop" id="IOBuffer::CircularMatrixBuffer::releaseFromPop" ref="class_i_o_buffer_1_1_circular_matrix_buffer.html#a2a2115cde980084c54c138b00b3a2273" />
+      <keyword name="releaseFromPush" id="IOBuffer::CircularMatrixBuffer::releaseFromPush" ref="class_i_o_buffer_1_1_circular_matrix_buffer.html#a9e90b085a8dcdb0576e2c5cc3e75cb1b" />
       <keyword name="Buffer" id="IOBuffer::Buffer::Buffer" ref="class_i_o_buffer_1_1_buffer.html#a2071703c082f507144349ffbccf6b2f3" />
       <keyword name="getTypeId" id="IOBuffer::Buffer::getTypeId" ref="class_i_o_buffer_1_1_buffer.html#a587586f369e9d5df00a7fc77fc8f7f86" />
       <keyword name="IOBuffer::CircularMultiChannelBuffer_old" id="IOBuffer::CircularMultiChannelBuffer_old" ref="class_i_o_buffer_1_1_circular_multi_channel_buffer__old.html" />
@@ -4539,6 +4901,7 @@
       <keyword name="read_inverse_operator" id="MNELIB::MNE::read_inverse_operator" ref="class_m_n_e_l_i_b_1_1_m_n_e.html#a160abcaa87d4726d3afe3a6645ff4abe" />
       <keyword name="read_forward_solution" id="MNELIB::MNE::read_forward_solution" ref="class_m_n_e_l_i_b_1_1_m_n_e.html#a45db303f38665c476c2e26a221311b45" />
       <keyword name="read_source_spaces" id="MNELIB::MNE::read_source_spaces" ref="class_m_n_e_l_i_b_1_1_m_n_e.html#a0e423690d890f1e65858ad917b09f248" />
+      <keyword name="read_bem_surface" id="MNELIB::MNE::read_bem_surface" ref="class_m_n_e_l_i_b_1_1_m_n_e.html#a893ff12d65e657112b6d35830c351615" />
       <keyword name="set_current_comp" id="MNELIB::MNE::set_current_comp" ref="class_m_n_e_l_i_b_1_1_m_n_e.html#a5c6bc847cfa3c318c7567ba9c771d7bc" />
       <keyword name="transform_source_space_to" id="MNELIB::MNE::transform_source_space_to" ref="class_m_n_e_l_i_b_1_1_m_n_e.html#a24942df6f7a4d0869e3fd254e11e67e5" />
       <keyword name="transpose_named_matrix" id="MNELIB::MNE::transpose_named_matrix" ref="class_m_n_e_l_i_b_1_1_m_n_e.html#a1bce4f10a8fec00dc70d460da1b96955" />
@@ -4552,6 +4915,32 @@
       <keyword name="clusterVertnos" id="MNELIB::MNEClusterInfo::clusterVertnos" ref="class_m_n_e_l_i_b_1_1_m_n_e_cluster_info.html#a20a63ced4fbfed93d20ac98332899fcc" />
       <keyword name="clusterDistances" id="MNELIB::MNEClusterInfo::clusterDistances" ref="class_m_n_e_l_i_b_1_1_m_n_e_cluster_info.html#a021453fe1c635a7b9f23e83ac6af4cdc" />
       <keyword name="clusterLabelIds" id="MNELIB::MNEClusterInfo::clusterLabelIds" ref="class_m_n_e_l_i_b_1_1_m_n_e_cluster_info.html#ab0024e066b0c4a00d2d25a12e6ffb541" />
+      <keyword name="MNELIB::MNECorSourceEstimate" id="MNELIB::MNECorSourceEstimate" ref="class_m_n_e_l_i_b_1_1_m_n_e_cor_source_estimate.html" />
+      <keyword name="MNECorSourceEstimate" id="MNELIB::MNECorSourceEstimate::MNECorSourceEstimate" ref="class_m_n_e_l_i_b_1_1_m_n_e_cor_source_estimate.html#a00cd84c5ce400e29170c1a83917dd203" />
+      <keyword name="MNECorSourceEstimate" id="MNELIB::MNECorSourceEstimate::MNECorSourceEstimate" ref="class_m_n_e_l_i_b_1_1_m_n_e_cor_source_estimate.html#a56aca4564bd9f7f9ba401ef311f06ae8" />
+      <keyword name="MNECorSourceEstimate" id="MNELIB::MNECorSourceEstimate::MNECorSourceEstimate" ref="class_m_n_e_l_i_b_1_1_m_n_e_cor_source_estimate.html#ab8156daa8161454389293544413375c7" />
+      <keyword name="MNECorSourceEstimate" id="MNELIB::MNECorSourceEstimate::MNECorSourceEstimate" ref="class_m_n_e_l_i_b_1_1_m_n_e_cor_source_estimate.html#a818a800e0489f9a8b9d29724630c3f6b" />
+      <keyword name="clear" id="MNELIB::MNECorSourceEstimate::clear" ref="class_m_n_e_l_i_b_1_1_m_n_e_cor_source_estimate.html#ac5fda3c984ea0df3476a8e5f99684243" />
+      <keyword name="write" id="MNELIB::MNECorSourceEstimate::write" ref="class_m_n_e_l_i_b_1_1_m_n_e_cor_source_estimate.html#a53cd9494c0347056a5cdb12d5503a841" />
+      <keyword name="operator=" id="MNELIB::MNECorSourceEstimate::operator=" ref="class_m_n_e_l_i_b_1_1_m_n_e_cor_source_estimate.html#a06fd678cb48fd44e8203ab0d296e0502" />
+      <keyword name="MNESourceEstimate" id="MNELIB::MNESourceEstimate::MNESourceEstimate" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#a4cfd7288cd442b68881f5bd7ed9d8b56" />
+      <keyword name="MNESourceEstimate" id="MNELIB::MNESourceEstimate::MNESourceEstimate" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#a0ac8068acc244a3cdc2d0bd70085ee41" />
+      <keyword name="MNESourceEstimate" id="MNELIB::MNESourceEstimate::MNESourceEstimate" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#a524435cb687793aae018214307dd88d3" />
+      <keyword name="MNESourceEstimate" id="MNELIB::MNESourceEstimate::MNESourceEstimate" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#a5fbd9cc9e9350e5c5c4b326d1fb73cf7" />
+      <keyword name="clear" id="MNELIB::MNESourceEstimate::clear" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#a3d1397a27d52863bf6a1855b2185f395" />
+      <keyword name="reduce" id="MNELIB::MNESourceEstimate::reduce" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#ac7b9729c959a5f039436efb67dfdffcd" />
+      <keyword name="write" id="MNELIB::MNESourceEstimate::write" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#ac8c6656bedf48d45aeb723b04a64a731" />
+      <keyword name="isEmpty" id="MNELIB::MNESourceEstimate::isEmpty" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#a860c19b56a4b016ebdaa13c01ad87c54" />
+      <keyword name="operator=" id="MNELIB::MNESourceEstimate::operator=" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#ae098df966acc04f84018ce92861998e6" />
+      <keyword name="read" id="MNELIB::MNECorSourceEstimate::read" ref="class_m_n_e_l_i_b_1_1_m_n_e_cor_source_estimate.html#ab1e215f8aba087953390e072a1d9de84" />
+      <keyword name="read" id="MNELIB::MNESourceEstimate::read" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#a11c183ff0e6f393f3f0596c4495d7112" />
+      <keyword name="SPtr" id="MNELIB::MNESourceEstimate::SPtr" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#aeb5aaa994876790254bbf4b773f3fe2f" />
+      <keyword name="ConstSPtr" id="MNELIB::MNESourceEstimate::ConstSPtr" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#a18932f2f987a2f864aafe425721a0b10" />
+      <keyword name="data" id="MNELIB::MNESourceEstimate::data" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#a559cc268813564a34cc274278d19ce45" />
+      <keyword name="vertices" id="MNELIB::MNESourceEstimate::vertices" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#a28d87dbcf7369d7a98b4a4a2ec022c07" />
+      <keyword name="times" id="MNELIB::MNESourceEstimate::times" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#a91e69283b98935c554457308a980d53c" />
+      <keyword name="tmin" id="MNELIB::MNESourceEstimate::tmin" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#a8b69add3ffadfe3b72784c227840df23" />
+      <keyword name="tstep" id="MNELIB::MNESourceEstimate::tstep" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#a9f7582126a35a8b70c570c5aa4d3e60b" />
       <keyword name="MNELIB::MNEEpochData" id="MNELIB::MNEEpochData" ref="class_m_n_e_l_i_b_1_1_m_n_e_epoch_data.html" />
       <keyword name="SPtr" id="MNELIB::MNEEpochData::SPtr" ref="class_m_n_e_l_i_b_1_1_m_n_e_epoch_data.html#a8c7db76c1ed6c28c008fe03ad6b6c5b9" />
       <keyword name="ConstSPtr" id="MNELIB::MNEEpochData::ConstSPtr" ref="class_m_n_e_l_i_b_1_1_m_n_e_epoch_data.html#af246bb796f76cbf0827c83ca456df7a2" />
@@ -4568,6 +4957,7 @@
       <keyword name="ConstSPtr" id="MNELIB::MNEEpochDataList::ConstSPtr" ref="class_m_n_e_l_i_b_1_1_m_n_e_epoch_data_list.html#aab87a21f4308e479d0a9846dc1fd75fe" />
       <keyword name="MNEEpochDataList" id="MNELIB::MNEEpochDataList::MNEEpochDataList" ref="class_m_n_e_l_i_b_1_1_m_n_e_epoch_data_list.html#a8fa5934787333011283ae5718b6ce9fe" />
       <keyword name="~MNEEpochDataList" id="MNELIB::MNEEpochDataList::~MNEEpochDataList" ref="class_m_n_e_l_i_b_1_1_m_n_e_epoch_data_list.html#a36e22a830680b6eee0706993461e139f" />
+      <keyword name="average" id="MNELIB::MNEEpochDataList::average" ref="class_m_n_e_l_i_b_1_1_m_n_e_epoch_data_list.html#a4569c050d7aec49423f23d76f9732caf" />
       <keyword name="MNELIB::MNEForwardSolution" id="MNELIB::MNEForwardSolution" ref="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html" />
       <keyword name="SPtr" id="MNELIB::MNEForwardSolution::SPtr" ref="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a7e95a8381a0f621201981cd6a39ea25c" />
       <keyword name="ConstSPtr" id="MNELIB::MNEForwardSolution::ConstSPtr" ref="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#ac205e3b5d9a3fe1a455d3c45e30d7636" />
@@ -4678,6 +5068,24 @@
       <keyword name="reginv" id="MNELIB::MNEInverseOperator::reginv" ref="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a1377129c9684f572208c9f2851925271" />
       <keyword name="noisenorm" id="MNELIB::MNEInverseOperator::noisenorm" ref="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a40f80ae63531d67ceb8a40ddd48f80d2" />
       <keyword name="operator&lt;&lt;" id="MNELIB::MNEInverseOperator::operator&lt;&lt;" ref="class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a5ee9fd4b01a95c7944f54ae309570aeb" />
+      <keyword name="MNELIB::MNESourceEstimate" id="MNELIB::MNESourceEstimate" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html" />
+      <keyword name="SPtr" id="MNELIB::MNESourceEstimate::SPtr" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#aeb5aaa994876790254bbf4b773f3fe2f" />
+      <keyword name="ConstSPtr" id="MNELIB::MNESourceEstimate::ConstSPtr" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#a18932f2f987a2f864aafe425721a0b10" />
+      <keyword name="MNESourceEstimate" id="MNELIB::MNESourceEstimate::MNESourceEstimate" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#a4cfd7288cd442b68881f5bd7ed9d8b56" />
+      <keyword name="MNESourceEstimate" id="MNELIB::MNESourceEstimate::MNESourceEstimate" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#a0ac8068acc244a3cdc2d0bd70085ee41" />
+      <keyword name="MNESourceEstimate" id="MNELIB::MNESourceEstimate::MNESourceEstimate" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#a524435cb687793aae018214307dd88d3" />
+      <keyword name="MNESourceEstimate" id="MNELIB::MNESourceEstimate::MNESourceEstimate" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#a5fbd9cc9e9350e5c5c4b326d1fb73cf7" />
+      <keyword name="clear" id="MNELIB::MNESourceEstimate::clear" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#a3d1397a27d52863bf6a1855b2185f395" />
+      <keyword name="reduce" id="MNELIB::MNESourceEstimate::reduce" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#ac7b9729c959a5f039436efb67dfdffcd" />
+      <keyword name="write" id="MNELIB::MNESourceEstimate::write" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#ac8c6656bedf48d45aeb723b04a64a731" />
+      <keyword name="isEmpty" id="MNELIB::MNESourceEstimate::isEmpty" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#a860c19b56a4b016ebdaa13c01ad87c54" />
+      <keyword name="operator=" id="MNELIB::MNESourceEstimate::operator=" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#ae098df966acc04f84018ce92861998e6" />
+      <keyword name="read" id="MNELIB::MNESourceEstimate::read" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#a11c183ff0e6f393f3f0596c4495d7112" />
+      <keyword name="data" id="MNELIB::MNESourceEstimate::data" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#a559cc268813564a34cc274278d19ce45" />
+      <keyword name="vertices" id="MNELIB::MNESourceEstimate::vertices" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#a28d87dbcf7369d7a98b4a4a2ec022c07" />
+      <keyword name="times" id="MNELIB::MNESourceEstimate::times" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#a91e69283b98935c554457308a980d53c" />
+      <keyword name="tmin" id="MNELIB::MNESourceEstimate::tmin" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#a8b69add3ffadfe3b72784c227840df23" />
+      <keyword name="tstep" id="MNELIB::MNESourceEstimate::tstep" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html#a9f7582126a35a8b70c570c5aa4d3e60b" />
       <keyword name="MNELIB::MNESourceSpace" id="MNELIB::MNESourceSpace" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html" />
       <keyword name="SPtr" id="MNELIB::MNESourceSpace::SPtr" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#ada0354e381b1d4ca00189ed577b32fcb" />
       <keyword name="ConstSPtr" id="MNELIB::MNESourceSpace::ConstSPtr" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a57ee055409f6763551ce3193248e2664" />
@@ -4698,6 +5106,24 @@
       <keyword name="find_source_space_hemi" id="MNELIB::MNESourceSpace::find_source_space_hemi" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a2f8b00c1ed22ac6d76b5bb94771f37ab" />
       <keyword name="patch_info" id="MNELIB::MNESourceSpace::patch_info" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a0092de75b4374893bebd6ab3dbae6ca0" />
       <keyword name="readFromStream" id="MNELIB::MNESourceSpace::readFromStream" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a9da28f6120a0f8164824c2a5e693e6cd" />
+      <keyword name="MNELIB::MNESurface" id="MNELIB::MNESurface" ref="class_m_n_e_l_i_b_1_1_m_n_e_surface.html" />
+      <keyword name="SPtr" id="MNELIB::MNESurface::SPtr" ref="class_m_n_e_l_i_b_1_1_m_n_e_surface.html#a2229e2dbf520e05bbebc459b84a27351" />
+      <keyword name="ConstSPtr" id="MNELIB::MNESurface::ConstSPtr" ref="class_m_n_e_l_i_b_1_1_m_n_e_surface.html#a9073e5b7a5c12745f9ae13bfe41a6d40" />
+      <keyword name="PointsT" id="MNELIB::MNESurface::PointsT" ref="class_m_n_e_l_i_b_1_1_m_n_e_surface.html#a75bcdd935016ededb7e30e34ef610e02" />
+      <keyword name="NormalsT" id="MNELIB::MNESurface::NormalsT" ref="class_m_n_e_l_i_b_1_1_m_n_e_surface.html#aee2c37cdc2786f354ce5f4ede533376a" />
+      <keyword name="TrianglesT" id="MNELIB::MNESurface::TrianglesT" ref="class_m_n_e_l_i_b_1_1_m_n_e_surface.html#aae537efecdcae0678ca6281e2728d182" />
+      <keyword name="MNESurface" id="MNELIB::MNESurface::MNESurface" ref="class_m_n_e_l_i_b_1_1_m_n_e_surface.html#a025d7d5a0e47af1feab7750b93523b0f" />
+      <keyword name="~MNESurface" id="MNELIB::MNESurface::~MNESurface" ref="class_m_n_e_l_i_b_1_1_m_n_e_surface.html#a73d71c94aaedaa587a56b83ce8e86f42" />
+      <keyword name="read" id="MNELIB::MNESurface::read" ref="class_m_n_e_l_i_b_1_1_m_n_e_surface.html#ab2261d41f96d61cde3519018700f87d8" />
+      <keyword name="read" id="MNELIB::MNESurface::read" ref="class_m_n_e_l_i_b_1_1_m_n_e_surface.html#a912ee25fde6ad47667cf95e15e51fd71" />
+      <keyword name="id" id="MNELIB::MNESurface::id" ref="class_m_n_e_l_i_b_1_1_m_n_e_surface.html#ab6b8cedbde80475dab5baa965f1f4ae8" />
+      <keyword name="sigma" id="MNELIB::MNESurface::sigma" ref="class_m_n_e_l_i_b_1_1_m_n_e_surface.html#aea0cba23540bb4eafc8c6fa92879f8ba" />
+      <keyword name="np" id="MNELIB::MNESurface::np" ref="class_m_n_e_l_i_b_1_1_m_n_e_surface.html#ab73760bde0da4b0e04d2ca61bd4e6bb9" />
+      <keyword name="ntri" id="MNELIB::MNESurface::ntri" ref="class_m_n_e_l_i_b_1_1_m_n_e_surface.html#a4e3b41300531127fd73b4ad6b4f7f046" />
+      <keyword name="coord_frame" id="MNELIB::MNESurface::coord_frame" ref="class_m_n_e_l_i_b_1_1_m_n_e_surface.html#a28fe7fabc34efcca149c9ac00172b384" />
+      <keyword name="rr" id="MNELIB::MNESurface::rr" ref="class_m_n_e_l_i_b_1_1_m_n_e_surface.html#ac60da6b67bff3c8fe44c6dd6fc69eacf" />
+      <keyword name="nn" id="MNELIB::MNESurface::nn" ref="class_m_n_e_l_i_b_1_1_m_n_e_surface.html#adb8118473cb58868af69321977ddcecd" />
+      <keyword name="tris" id="MNELIB::MNESurface::tris" ref="class_m_n_e_l_i_b_1_1_m_n_e_surface.html#a10531008e6ee53d330c17f2c6503eee9" />
       <keyword name="RTCLIENTLIB::RtClient" id="RTCLIENTLIB::RtClient" ref="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_client.html" />
       <keyword name="SPtr" id="RTCLIENTLIB::RtClient::SPtr" ref="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_client.html#afa05fe23d7be76658f88765cf8c6dbc4" />
       <keyword name="ConstSPtr" id="RTCLIENTLIB::RtClient::ConstSPtr" ref="class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_client.html#a7a3a48750be525bafe450793c7ee48ee" />
@@ -4829,7 +5255,7 @@
       <keyword name="evokedPreStim" id="RTINVLIB::RtAve::evokedPreStim" ref="class_r_t_i_n_v_l_i_b_1_1_rt_ave.html#afcd67cf178d9b292c06aca49a19d77f9" />
       <keyword name="evokedPostStim" id="RTINVLIB::RtAve::evokedPostStim" ref="class_r_t_i_n_v_l_i_b_1_1_rt_ave.html#afb6dc4dc94f580f7bf837a2723caac48" />
       <keyword name="evokedStim" id="RTINVLIB::RtAve::evokedStim" ref="class_r_t_i_n_v_l_i_b_1_1_rt_ave.html#aa4a8b5fc55ee6c1e7d0572f7467f78eb" />
-      <keyword name="RtAve" id="RTINVLIB::RtAve::RtAve" ref="class_r_t_i_n_v_l_i_b_1_1_rt_ave.html#aa44236a0dcc0c7d71241e05ef1f35629" />
+      <keyword name="RtAve" id="RTINVLIB::RtAve::RtAve" ref="class_r_t_i_n_v_l_i_b_1_1_rt_ave.html#ab905110d161ee2a62dc32f4812ecf9b0" />
       <keyword name="~RtAve" id="RTINVLIB::RtAve::~RtAve" ref="class_r_t_i_n_v_l_i_b_1_1_rt_ave.html#a17f21c3faa0eeeccae2fc04f9ce9515f" />
       <keyword name="append" id="RTINVLIB::RtAve::append" ref="class_r_t_i_n_v_l_i_b_1_1_rt_ave.html#a93644080694b38ba14f990525828f6e1" />
       <keyword name="stop" id="RTINVLIB::RtAve::stop" ref="class_r_t_i_n_v_l_i_b_1_1_rt_ave.html#a6152aaeb0cb1aef0d4cffa21b91ba7ce" />
@@ -4855,6 +5281,11 @@
       <keyword name="stop" id="RTINVLIB::RtInvOp::stop" ref="class_r_t_i_n_v_l_i_b_1_1_rt_inv_op.html#aecb10c471559d69296828ccb86580022" />
       <keyword name="isRunning" id="RTINVLIB::RtInvOp::isRunning" ref="class_r_t_i_n_v_l_i_b_1_1_rt_inv_op.html#ac4ba64ec15e9310751edffbc7b142c8d" />
       <keyword name="run" id="RTINVLIB::RtInvOp::run" ref="class_r_t_i_n_v_l_i_b_1_1_rt_inv_op.html#aa29baeeccb8749acfd2653e7169e6307" />
+      <keyword name="UTILSLIB::FilterTools" id="UTILSLIB::FilterTools" ref="class_u_t_i_l_s_l_i_b_1_1_filter_tools.html" />
+      <keyword name="SPtr" id="UTILSLIB::FilterTools::SPtr" ref="class_u_t_i_l_s_l_i_b_1_1_filter_tools.html#a9546e592954548658df34883084a3a66" />
+      <keyword name="ConstSPtr" id="UTILSLIB::FilterTools::ConstSPtr" ref="class_u_t_i_l_s_l_i_b_1_1_filter_tools.html#aeefe80fcee72da14d5c6f5a7c613f204" />
+      <keyword name="FilterTools" id="UTILSLIB::FilterTools::FilterTools" ref="class_u_t_i_l_s_l_i_b_1_1_filter_tools.html#abdf0cca904883bf94d613d51dd2d34f0" />
+      <keyword name="createFilter" id="UTILSLIB::FilterTools::createFilter" ref="class_u_t_i_l_s_l_i_b_1_1_filter_tools.html#ab8db5be505f2a5a4b8bf3d0f42d23d2a" />
       <keyword name="UTILSLIB::IOUtils" id="UTILSLIB::IOUtils" ref="class_u_t_i_l_s_l_i_b_1_1_i_o_utils.html" />
       <keyword name="SPtr" id="UTILSLIB::IOUtils::SPtr" ref="class_u_t_i_l_s_l_i_b_1_1_i_o_utils.html#a4f014172f5041789ac17d0ac863853a6" />
       <keyword name="ConstSPtr" id="UTILSLIB::IOUtils::ConstSPtr" ref="class_u_t_i_l_s_l_i_b_1_1_i_o_utils.html#a5a749cbd6480dd699afae67b94372a6b" />
@@ -4876,27 +5307,23 @@
       <keyword name="UTILSLIB::MNEMath" id="UTILSLIB::MNEMath" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html" />
       <keyword name="IdxIntValue" id="UTILSLIB::MNEMath::IdxIntValue" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a3129ad163aae01f8855c1d5ae163e782" />
       <keyword name="~MNEMath" id="UTILSLIB::MNEMath::~MNEMath" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a52c52d62e3393a51837e7a12688d1439" />
-      <keyword name="sort" id="UTILSLIB::MNEMath::sort" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a7f803e78f5df5662f604eac88922ed6f" />
-      <keyword name="sort" id="UTILSLIB::MNEMath::sort" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a46849426fe2b2de690ae2a60139f046c" />
-      <keyword name="sortrows" id="UTILSLIB::MNEMath::sortrows" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a7607cb06b13feda4c4fa7d9ff492f5c5" />
+      <keyword name="combine_xyz" id="UTILSLIB::MNEMath::combine_xyz" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a2b01df2e1093da85ab5edb2ba9354a14" />
+      <keyword name="getConditionNumber" id="UTILSLIB::MNEMath::getConditionNumber" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a4960236f88219d3589b6277844220cb1" />
+      <keyword name="getConditionSlope" id="UTILSLIB::MNEMath::getConditionSlope" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#ac4b86fe71aecf150d4bd477a730e2a6c" />
+      <keyword name="get_whitener" id="UTILSLIB::MNEMath::get_whitener" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a4826938d921564a8fa5779c6e4f45cb3" />
+      <keyword name="intersect" id="UTILSLIB::MNEMath::intersect" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a8a4a8e78dbcf3f06ad8b5d7e6e186022" />
+      <keyword name="issparse" id="UTILSLIB::MNEMath::issparse" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#af9543225700faee9fea4a21f1dedaa96" />
+      <keyword name="legendre" id="UTILSLIB::MNEMath::legendre" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a562fcae82a64793e49a730a7a4a643ce" />
+      <keyword name="make_block_diag" id="UTILSLIB::MNEMath::make_block_diag" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a0db0d2c5128dfa345c8a04acdb9ec70d" />
+      <keyword name="rank" id="UTILSLIB::MNEMath::rank" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a5e871e7bcca6042ca4d8837cd90bbd28" />
+      <keyword name="rescale" id="UTILSLIB::MNEMath::rescale" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a46d75f6834ab6bb6ddca24e395cff7de" />
+      <keyword name="sort" id="UTILSLIB::MNEMath::sort" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a72a917dd5c42a6be016f09ca3075a24d" />
+      <keyword name="sort" id="UTILSLIB::MNEMath::sort" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a391986e7ba6e1d93b24bd95c223bf0c7" />
+      <keyword name="sortrows" id="UTILSLIB::MNEMath::sortrows" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#aa9ae038b1b4ba55ba6e87b7ebe509fcb" />
       <keyword name="compareIdxValuePairBiggerThan" id="UTILSLIB::MNEMath::compareIdxValuePairBiggerThan" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a574c6bdbdc3df1ef765b8e3db44dc80f" />
       <keyword name="compareIdxValuePairSmallerThan" id="UTILSLIB::MNEMath::compareIdxValuePairSmallerThan" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#aec4b1c309b2d8cf04bc176d7883a3498" />
       <keyword name="compareTripletFirstEntry" id="UTILSLIB::MNEMath::compareTripletFirstEntry" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#aa4434423d6d6dc48715d1ba332a9b0b3" />
       <keyword name="compareTripletSecondEntry" id="UTILSLIB::MNEMath::compareTripletSecondEntry" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#aabe9ed92c7541464546e791a09275609" />
-      <keyword name="combine_xyz" id="UTILSLIB::MNEMath::combine_xyz" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a2b01df2e1093da85ab5edb2ba9354a14" />
-      <keyword name="get_whitener" id="UTILSLIB::MNEMath::get_whitener" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a4826938d921564a8fa5779c6e4f45cb3" />
-      <keyword name="intersect" id="UTILSLIB::MNEMath::intersect" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a8a4a8e78dbcf3f06ad8b5d7e6e186022" />
-      <keyword name="issparse" id="UTILSLIB::MNEMath::issparse" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#af9543225700faee9fea4a21f1dedaa96" />
-      <keyword name="make_block_diag" id="UTILSLIB::MNEMath::make_block_diag" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a0db0d2c5128dfa345c8a04acdb9ec70d" />
-      <keyword name="rank" id="UTILSLIB::MNEMath::rank" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a5e871e7bcca6042ca4d8837cd90bbd28" />
-      <keyword name="rescale" id="UTILSLIB::MNEMath::rescale" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a46d75f6834ab6bb6ddca24e395cff7de" />
-      <keyword name="sort" id="UTILSLIB::MNEMath::sort" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a35afa407b5c09e6a11cdd5fb1c1d06eb" />
-      <keyword name="sort" id="UTILSLIB::MNEMath::sort" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a7130bb3bc8868c20856d577b50fd74fa" />
-      <keyword name="sortrows" id="UTILSLIB::MNEMath::sortrows" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a6895912c0813fc0752f5776dda800590" />
-      <keyword name="compareIdxValuePairBiggerThan" id="UTILSLIB::MNEMath::compareIdxValuePairBiggerThan" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#ad4470e2d5a20957060311c026df71780" />
-      <keyword name="compareIdxValuePairSmallerThan" id="UTILSLIB::MNEMath::compareIdxValuePairSmallerThan" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#aaa7b5b8bbf7083927fc90fe58afb0747" />
-      <keyword name="compareTripletFirstEntry" id="UTILSLIB::MNEMath::compareTripletFirstEntry" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#aa40f6a335d85bac8b479addaeb26c97f" />
-      <keyword name="compareTripletSecondEntry" id="UTILSLIB::MNEMath::compareTripletSecondEntry" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a857b932f587061a921592e1d285cfe9a" />
     </keywords>
     <files>
       <file>tabs.css</file>
@@ -4946,6 +5373,8 @@
       <file>imagesc_8h_source.html</file>
       <file>plot_8cpp_source.html</file>
       <file>plot_8h_source.html</file>
+      <file>rtplot_8cpp_source.html</file>
+      <file>rtplot_8h_source.html</file>
       <file>disp3_d__global_8h_source.html</file>
       <file>geometryview_8cpp_source.html</file>
       <file>geometryview_8h_source.html</file>
@@ -5030,14 +5459,16 @@
       <file>inverse__global_8h_source.html</file>
       <file>minimumnorm_8cpp_source.html</file>
       <file>minimumnorm_8h_source.html</file>
+      <file>dipole_8cpp_source.html</file>
+      <file>dipole_8h_source.html</file>
       <file>rapmusic_8cpp_source.html</file>
       <file>rapmusic_8h_source.html</file>
-      <file>sourceestimate_8cpp_source.html</file>
-      <file>sourceestimate_8h_source.html</file>
       <file>mne_8cpp_source.html</file>
       <file>mne_8h_source.html</file>
       <file>mne__cluster__info_8cpp_source.html</file>
       <file>mne__cluster__info_8h_source.html</file>
+      <file>mne__corsourceestimate_8cpp_source.html</file>
+      <file>mne__corsourceestimate_8h_source.html</file>
       <file>mne__epoch__data_8cpp_source.html</file>
       <file>mne__epoch__data_8h_source.html</file>
       <file>mne__epoch__data__list_8cpp_source.html</file>
@@ -5049,8 +5480,12 @@
       <file>mne__hemisphere_8h_source.html</file>
       <file>mne__inverse__operator_8cpp_source.html</file>
       <file>mne__inverse__operator_8h_source.html</file>
+      <file>mne__sourceestimate_8cpp_source.html</file>
+      <file>mne__sourceestimate_8h_source.html</file>
       <file>mne__sourcespace_8cpp_source.html</file>
       <file>mne__sourcespace_8h_source.html</file>
+      <file>mne__surface_8cpp_source.html</file>
+      <file>mne__surface_8h_source.html</file>
       <file>rtclient_8cpp_source.html</file>
       <file>rtclient_8h_source.html</file>
       <file>rtclient__global_8h_source.html</file>
@@ -5074,6 +5509,8 @@
       <file>rtinv__global_8h_source.html</file>
       <file>rtinvop_8cpp_source.html</file>
       <file>rtinvop_8h_source.html</file>
+      <file>filtertools_8cpp_source.html</file>
+      <file>filtertools_8h_source.html</file>
       <file>ioutils_8cpp_source.html</file>
       <file>ioutils_8h_source.html</file>
       <file>kmeans_8cpp_source.html</file>
@@ -5090,6 +5527,8 @@
       <file>imagesc_8h.html</file>
       <file>plot_8cpp.html</file>
       <file>plot_8h.html</file>
+      <file>rtplot_8cpp.html</file>
+      <file>rtplot_8h.html</file>
       <file>disp3_d__global_8h.html</file>
       <file>geometryview_8cpp.html</file>
       <file>geometryview_8h.html</file>
@@ -5172,14 +5611,16 @@
       <file>inverse__global_8h.html</file>
       <file>minimumnorm_8cpp.html</file>
       <file>minimumnorm_8h.html</file>
+      <file>dipole_8cpp.html</file>
+      <file>dipole_8h.html</file>
       <file>rapmusic_8cpp.html</file>
       <file>rapmusic_8h.html</file>
-      <file>sourceestimate_8cpp.html</file>
-      <file>sourceestimate_8h.html</file>
       <file>mne_8cpp.html</file>
       <file>mne_8h.html</file>
       <file>mne__cluster__info_8cpp.html</file>
       <file>mne__cluster__info_8h.html</file>
+      <file>mne__corsourceestimate_8cpp.html</file>
+      <file>mne__corsourceestimate_8h.html</file>
       <file>mne__epoch__data_8cpp.html</file>
       <file>mne__epoch__data_8h.html</file>
       <file>mne__epoch__data__list_8cpp.html</file>
@@ -5191,8 +5632,12 @@
       <file>mne__hemisphere_8h.html</file>
       <file>mne__inverse__operator_8cpp.html</file>
       <file>mne__inverse__operator_8h.html</file>
+      <file>mne__sourceestimate_8cpp.html</file>
+      <file>mne__sourceestimate_8h.html</file>
       <file>mne__sourcespace_8cpp.html</file>
       <file>mne__sourcespace_8h.html</file>
+      <file>mne__surface_8cpp.html</file>
+      <file>mne__surface_8h.html</file>
       <file>rtclient_8cpp.html</file>
       <file>rtclient_8h.html</file>
       <file>rtclient__global_8h.html</file>
@@ -5212,6 +5657,8 @@
       <file>rtinv__global_8h.html</file>
       <file>rtinvop_8cpp.html</file>
       <file>rtinvop_8h.html</file>
+      <file>filtertools_8cpp.html</file>
+      <file>filtertools_8h.html</file>
       <file>ioutils_8cpp.html</file>
       <file>ioutils_8h.html</file>
       <file>kmeans_8cpp.html</file>
@@ -5253,6 +5700,9 @@
       <file>class_d_i_s_p_l_i_b_1_1_plot.html</file>
       <file>class_d_i_s_p_l_i_b_1_1_plot.png</file>
       <file>class_d_i_s_p_l_i_b_1_1_plot-members.html</file>
+      <file>class_d_i_s_p_l_i_b_1_1_rt_plot.html</file>
+      <file>class_d_i_s_p_l_i_b_1_1_rt_plot.png</file>
+      <file>class_d_i_s_p_l_i_b_1_1_rt_plot-members.html</file>
       <file>class_f_i_f_f_l_i_b_1_1_fiff.html</file>
       <file>class_f_i_f_f_l_i_b_1_1_fiff-members.html</file>
       <file>class_f_i_f_f_l_i_b_1_1_fiff_ch_info.html</file>
@@ -5330,11 +5780,15 @@
       <file>class_i_n_v_e_r_s_e_l_i_b_1_1_minimum_norm.html</file>
       <file>class_i_n_v_e_r_s_e_l_i_b_1_1_minimum_norm.png</file>
       <file>class_i_n_v_e_r_s_e_l_i_b_1_1_minimum_norm-members.html</file>
+      <file>class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html</file>
+      <file>class_i_n_v_e_r_s_e_l_i_b_1_1_dipole-members.html</file>
+      <file>struct_i_n_v_e_r_s_e_l_i_b_1_1_dipole_pair.html</file>
+      <file>struct_i_n_v_e_r_s_e_l_i_b_1_1_dipole_pair-members.html</file>
+      <file>struct_i_n_v_e_r_s_e_l_i_b_1_1_pair.html</file>
+      <file>struct_i_n_v_e_r_s_e_l_i_b_1_1_pair-members.html</file>
       <file>class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html</file>
       <file>class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.png</file>
       <file>class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music-members.html</file>
-      <file>class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate.html</file>
-      <file>class_i_n_v_e_r_s_e_l_i_b_1_1_source_estimate-members.html</file>
       <file>class_i_o_buffer_1_1_buffer.html</file>
       <file>class_i_o_buffer_1_1_buffer.png</file>
       <file>class_i_o_buffer_1_1_buffer-members.html</file>
@@ -5353,6 +5807,9 @@
       <file>class_m_n_e_l_i_b_1_1_m_n_e-members.html</file>
       <file>class_m_n_e_l_i_b_1_1_m_n_e_cluster_info.html</file>
       <file>class_m_n_e_l_i_b_1_1_m_n_e_cluster_info-members.html</file>
+      <file>class_m_n_e_l_i_b_1_1_m_n_e_cor_source_estimate.html</file>
+      <file>class_m_n_e_l_i_b_1_1_m_n_e_cor_source_estimate.png</file>
+      <file>class_m_n_e_l_i_b_1_1_m_n_e_cor_source_estimate-members.html</file>
       <file>class_m_n_e_l_i_b_1_1_m_n_e_epoch_data.html</file>
       <file>class_m_n_e_l_i_b_1_1_m_n_e_epoch_data-members.html</file>
       <file>class_m_n_e_l_i_b_1_1_m_n_e_epoch_data_list.html</file>
@@ -5364,8 +5821,13 @@
       <file>class_m_n_e_l_i_b_1_1_m_n_e_hemisphere-members.html</file>
       <file>class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html</file>
       <file>class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator-members.html</file>
+      <file>class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.html</file>
+      <file>class_m_n_e_l_i_b_1_1_m_n_e_source_estimate.png</file>
+      <file>class_m_n_e_l_i_b_1_1_m_n_e_source_estimate-members.html</file>
       <file>class_m_n_e_l_i_b_1_1_m_n_e_source_space.html</file>
       <file>class_m_n_e_l_i_b_1_1_m_n_e_source_space-members.html</file>
+      <file>class_m_n_e_l_i_b_1_1_m_n_e_surface.html</file>
+      <file>class_m_n_e_l_i_b_1_1_m_n_e_surface-members.html</file>
       <file>class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_client.html</file>
       <file>class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_client.png</file>
       <file>class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_client-members.html</file>
@@ -5396,6 +5858,8 @@
       <file>class_r_t_i_n_v_l_i_b_1_1_rt_inv_op.html</file>
       <file>class_r_t_i_n_v_l_i_b_1_1_rt_inv_op.png</file>
       <file>class_r_t_i_n_v_l_i_b_1_1_rt_inv_op-members.html</file>
+      <file>class_u_t_i_l_s_l_i_b_1_1_filter_tools.html</file>
+      <file>class_u_t_i_l_s_l_i_b_1_1_filter_tools-members.html</file>
       <file>class_u_t_i_l_s_l_i_b_1_1_i_o_utils.html</file>
       <file>class_u_t_i_l_s_l_i_b_1_1_i_o_utils-members.html</file>
       <file>class_u_t_i_l_s_l_i_b_1_1_k_means.html</file>
@@ -5442,6 +5906,7 @@
       <file>functions_0x75.html</file>
       <file>functions_0x76.html</file>
       <file>functions_0x77.html</file>
+      <file>functions_0x78.html</file>
       <file>functions_0x7e.html</file>
       <file>functions_func.html</file>
       <file>functions_func_0x62.html</file>
@@ -5486,6 +5951,7 @@
       <file>functions_vars_0x75.html</file>
       <file>functions_vars_0x76.html</file>
       <file>functions_vars_0x77.html</file>
+      <file>functions_vars_0x78.html</file>
       <file>functions_type.html</file>
       <file>functions_rela.html</file>
       <file>files.html</file>

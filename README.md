@@ -1,5 +1,5 @@
-mne-cpp (beta)
-==================
+mne-cpp
+=========
 
 MNE cross-platform standalone MEG/EEG (real-time) applications using [Qt5](http://qt-project.org/downloads)'s and [Eigen](http://eigen.tuxfamily.org)'s C++ libraries
 
@@ -20,7 +20,7 @@ Building
 To build the mne libraries [Qt5](http://qt-project.org/downloads) and a platform specific C++ compiler are required.
 
 To build mne-cpp follow the wiki-guide:
-* [1. Build Qt5](https://github.com/mne-tools/mne-cpp/wiki/1.-Build-Qt5): This page describes how to build Qt5 for [Windows](https://github.com/mne-tools/mne-cpp/wiki/1.-Build-Qt5#windows)/[Linux](https://github.com/mne-tools/mne-cpp/wiki/1.-Build-Qt5#linux)/[Mac OS X](https://github.com/mne-tools/mne-cpp/wiki/1.-Build-Qt5#mac-os-x)
+* [1. Build Qt5](https://github.com/mne-tools/mne-cpp/wiki/1.-Build-Qt5): This page describes how to build Qt5 for desktop platforms [Windows](https://github.com/mne-tools/mne-cpp/wiki/1.-Build-Qt5#windows)/[Linux](https://github.com/mne-tools/mne-cpp/wiki/1.-Build-Qt5#linux)/[Mac OS X](https://github.com/mne-tools/mne-cpp/wiki/1.-Build-Qt5#mac-os-x). How to build Qt5 on embedded plaforms (DirectFB, EGLFS, KMS, Wayland, Windows embedded, QNX, VxWorks, INTEGRITY) or mobile platforms (Android, iOS, Windows 8 (WinRT), BlackBerry 10) you'll find [here](http://qt-project.org/doc/qt-5.0/qtdoc/platform-details.html).
 
 * (optional) [2. Install Qt Creator](https://github.com/mne-tools/mne-cpp/wiki/2.-Install-Qt-Creator): For convinience of the further processing it's recommended to install Qt Creator at this point.
 
@@ -48,6 +48,13 @@ clone it using 'git clone' on the computers where you want to work. Make
 your changes in your clone, push them to your github account, test them
 on several computer, and when you are happy with them, send a pull
 request to the main repository.
+
+
+Release
+==========
+
+[MNE1.0 release](https://github.com/mne-tools/mne-cpp/wiki/MNE-1.0-release)
+
 
 
 Licensing
