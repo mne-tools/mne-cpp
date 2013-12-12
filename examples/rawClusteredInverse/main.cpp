@@ -102,13 +102,13 @@ int main(int argc, char *argv[])
 //    QFile t_fileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
 //    QFile t_fileRaw("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw.fif");
 
-    QFile t_fileRaw("C:/Lorenz Esch/Dropbox/Masterarbeit DB/Messdaten/EEG/2013_12_05 Lorenz Esch 001/EEG_data_001_right_tapping_raw.fif");
+    QFile t_fileRaw("C:/Lorenz Esch/Dropbox/Masterarbeit DB/Messdaten/EEG/2013_12_05_Lorenz_Esch_001/EEG_data_001_right_tapping_raw.fif");
 
     qint32 event = 1;
 //    QString t_sEventName = "./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif";
 //    QString t_sEventName = "E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-eve.fif";
 
-    QString t_sEventName = "C:/Lorenz Esch/Dropbox/Masterarbeit DB/Messdaten/EEG/2013_12_05 Lorenz Esch 001/EEG_data_001_right_tapping_raw-eve.fif";
+    QString t_sEventName = "C:/Lorenz Esch/Dropbox/Masterarbeit DB/Messdaten/EEG/2013_12_05_Lorenz_Esch_001/EEG_data_001_right_tapping_raw-eve.fif";
 
     float tmin = -0.2f;
     float tmax = 0.4f;
@@ -422,7 +422,7 @@ int main(int argc, char *argv[])
 
 //    QFile t_fileFwd("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-oct-6p-fwd.fif");
 //    QFile t_fileCov("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-cov.fif");
-    QFile t_fileFwd("C:/Lorenz Esch/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/fwd-Lorenz-031213.fif");
+    QFile t_fileFwd("C:/Lorenz Esch/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/Lorenz-121213-fwd.fif");
     QFile t_fileCov("C:/Lorenz Esch/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/EEG_data_001_right_tapping_raw-cov.fif");
 
 //    QFile t_fileEvoked("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-ave.fif");
