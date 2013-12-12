@@ -43,7 +43,6 @@ SUBDIRS += \
     ecgsimulator \
     mnertclient \
     dummytoolbox \
-    tmsi \
     triggercontrol
 #    rtsss \
 
