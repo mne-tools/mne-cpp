@@ -96,6 +96,17 @@ int main(int argc, char *argv[])
 
     std::cout << p_fiffIO << std::endl;
 
+    //Write some raw data
+    QFile t_fileToWrite("./MNE-sample-data/MEG/sample/sample_write/sample.fif");
+
+//    p_fiffIO.write(t_fileToWrite,FIFFB_RAW_DATA,0);
+    MatrixXd data;
+    MatrixXd times;
+
+//    std::cout << "Number of raw sets: " << p_fiffIO.m_qlistRaw[0]->rawdir. << std::endl;
+    p_fiffIO.m_qlistRaw[0]->read_raw_segment(data,times);
+
+
     return a.exec();
 }
 
