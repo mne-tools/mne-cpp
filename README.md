@@ -1,5 +1,5 @@
-mne-cpp (beta)
-==================
+mne-cpp
+=========
 
 MNE cross-platform standalone MEG/EEG (real-time) applications using [Qt5](http://qt-project.org/downloads)'s and [Eigen](http://eigen.tuxfamily.org)'s C++ libraries
 
@@ -48,6 +48,13 @@ clone it using 'git clone' on the computers where you want to work. Make
 your changes in your clone, push them to your github account, test them
 on several computer, and when you are happy with them, send a pull
 request to the main repository.
+
+
+Release
+==========
+
+[MNE1.0 release](https://github.com/mne-tools/mne-cpp/wiki/MNE-1.0-release)
+
 
 
 Licensing
