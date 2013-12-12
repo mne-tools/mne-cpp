@@ -1,8 +1,8 @@
 //=============================================================================================================
 /**
 * @file     fiff_obj.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
+* @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     July, 2012
@@ -131,8 +131,15 @@ bool FiffIO::read(QIODevice& p_IODevice)
         FiffRawData p_fiffRawData(p_IODevice);
         p_IODevice.close();
 
+        MatrixXd data;
+        MatrixXd times;
+//        p_fiffRawData.read_raw_segment(data,times);
+
         //append to corresponding member qlist
         m_qlistRaw.append(QSharedPointer<FiffRawData>(&p_fiffRawData));
+        m_qlistRaw[0]->read_raw_segment(data,times);
+
+        printf("Finished reading raw data!");
     }
 
     //evoked data + projections
@@ -164,17 +171,17 @@ bool FiffIO::read(QIODevice& p_IODevice)
 
 bool FiffIO::write(QIODevice& p_IODevice, fiff_int_t type, fiff_int_t idx) {
 
-    if(type == FIFFB_RAW_DATA) {
+//    if(type == FIFFB_RAW_DATA) {
 //        MatrixXd cals;
 
-//        FiffStream::SPtr outfid = Fiff::start_writing_raw(p_IODevice,this->m_qlistRaw[0]->info, cals, picks);
+//        FiffStream::SPtr outfid = Fiff::start_writing_raw(p_IODevice,this->m_qlistRaw[idx]->info, cals);
 //        //
 //        //   Set up the reading parameters
 //        //
-//        fiff_int_t from = raw.first_samp;
-//        fiff_int_t to = raw.last_samp;
+//        fiff_int_t from = m_qlistRaw[idx]->first_samp;
+//        fiff_int_t to = m_qlistRaw[idx]->last_samp;
 //        float quantum_sec = 10.0f;//read and write in 10 sec junks
-//        fiff_int_t quantum = ceil(quantum_sec*raw.info.sfreq);
+//        fiff_int_t quantum = ceil(quantum_sec*m_qlistRaw[idx]->info.sfreq);
 //        //
 //        //   To read the whole file at once set
 //        //
@@ -189,37 +196,48 @@ bool FiffIO::write(QIODevice& p_IODevice, fiff_int_t type, fiff_int_t idx) {
 //        MatrixXd data;
 //        MatrixXd times;
 
-//        for(first = from; first < to; first+=quantum)
-//        {
-//            last = first+quantum-1;
-//            if (last > to)
-//            {
-//                last = to;
-//            }
+////        for(first = from; first < to; first+=quantum)
+////        {
+////            last = first+quantum-1;
+////            if (last > to)
+////                last = to;
 
-//            if (!raw.read_raw_segment(data,times,first,last,picks))
-//            {
-//                    printf("error during read_raw_segment\n");
-//                    return -1;
-//            }
-//            //
-//            //   You can add your own miracle here
-//            //
-//            printf("Writing...");
-//            if (first_buffer)
-//            {
-//               if (first > 0)
-//                   outfid->write_int(FIFF_FIRST_SAMPLE,&first);
-//               first_buffer = false;
-//            }
-//            outfid->write_raw_buffer(data,cals);
-//            printf("[done]\n");
+////            if (!raw.read_raw_segment(data,times,first,last,picks)) {
+////                    printf("error during read_raw_segment\n");
+////                    return -1;
+////            }
+////            //
+////            //   You can add your own miracle here
+////            //
+////            printf("Writing...");
+////            if (first_buffer)
+////            {
+////               if (first > 0)
+////                   outfid->write_int(FIFF_FIRST_SAMPLE,&first);
+////               first_buffer = false;
+////            }
+////            outfid->write_raw_buffer(m_qlistRaw[idx]->rawdir[0],cals);
+////            printf("[done]\n");
+////        }
+
+//        printf("Writing...");
+
+//        if (first_buffer)
+//        {
+//           if (first > 0)
+//               outfid->write_int(FIFF_FIRST_SAMPLE,&first);
+//           first_buffer = false;
 //        }
+////        outfid->write_raw_buffer(m_qlistRaw[idx]->rawdir[0].ent.,cals);
+//        printf("[done]\n");
+
+////        m_qlistRaw[idx]->rawdir[0]cals.
+
 
 //        outfid->finish_writing_raw();
 
 //        printf("Finished\n");
-    }
+//    }
 
     return true;
 
