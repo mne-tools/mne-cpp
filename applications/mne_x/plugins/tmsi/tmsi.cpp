@@ -106,7 +106,7 @@ void TMSI::init()
 
     m_outputConnectors.append(m_pRMTSA_TMSI);
 
-    //setupGUI default values must be set here
+    //default values used by the setupGUI class must be set here
     m_iSamplingFreq = 1024;
     m_iNumberOfChannels = 138;
     m_iSamplesPerBlock = 16;
@@ -258,7 +258,7 @@ void TMSI::setUpFiffInfo()
     m_pFiffInfo->dig = digitizerInfo;
 
     //
-    //Set up the fif channel info
+    //Set up the channel info
     //
     QStringList QSLChNames;
     m_pFiffInfo->chs.clear();
@@ -359,20 +359,43 @@ void TMSI::setUpFiffInfo()
     m_pFiffInfo->ctf_head_t.to = FIFFV_COORD_HEAD;
 
     //
-    //Set projection
+    //Set projection data
     //
-//    m_pFiffInfo->projs.clear();
-//    FiffProj proj;
-//    proj.kind = 1;
-//    proj.active = true;
+    m_pFiffInfo->projs.clear();
+    FiffProj proj;
+    proj.kind = 1;
+    proj.active = false;
 
-//    FiffNamedMatrix::SDPtr namedMatrix = proj.data;
-//    namedMatrix->ncol = m_iNumberOfChannels/3;
-//    namedMatrix->nrow = 1;
-//    namedMatrix->data = MatrixXd::Ones(1, m_iNumberOfChannels/3);
-//    m_pFiffInfo->projs.append(proj);
-//    m_pFiffInfo->projs.append(proj);
-//    m_pFiffInfo->projs.append(proj);
+    FiffNamedMatrix::SDPtr namedMatrix = proj.data;
+    namedMatrix->ncol = numberEEGCh/3;
+    namedMatrix->nrow = 1;
+    namedMatrix->data = MatrixXd::Ones(1, namedMatrix->ncol);
+
+    //Set projection 1
+    for(int i=0; i<namedMatrix->ncol; i++)
+        namedMatrix->col_names << QSLChNames.at(i);
+
+    proj.data = namedMatrix;
+    proj.desc = QString("PCA-v1");
+    m_pFiffInfo->projs.append(proj);
+
+    //Set projection 2
+    namedMatrix->col_names.clear();
+    for(int i=0; i<namedMatrix->ncol; i++)
+        namedMatrix->col_names << QSLChNames.at(i+namedMatrix->ncol);
+
+    proj.data = namedMatrix;
+    proj.desc = QString("PCA-v2");
+    m_pFiffInfo->projs.append(proj);
+
+    //Set projection 3
+    namedMatrix->col_names.clear();
+    for(int i=0; i<namedMatrix->ncol; i++)
+        namedMatrix->col_names << QSLChNames.at(i+(2*namedMatrix->ncol));
+
+    proj.data = namedMatrix;
+    proj.desc = QString("PCA-v3");
+    m_pFiffInfo->projs.append(proj);
 }
 
 
