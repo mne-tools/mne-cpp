@@ -50,6 +50,13 @@ on several computer, and when you are happy with them, send a pull
 request to the main repository.
 
 
+Release
+==========
+
+MNE1.0 release
+
+
+
 Licensing
 ----------
 
