@@ -88,7 +88,8 @@ SettingsWidget::SettingsWidget(QWidget *parent)
     fillPortsParameters();
     fillPortsInfo();
 
-//    updateSettings();
+   // initSettings();   --> eigentlich reicht es, wenn wir das hier weglassen, denn initial wurden die richtigen
+    //                      Parameter ja schon gesetzt. Eine Änderung durch die comboboxen ruft weiterhin updatesettings auf
 }
 
 
@@ -158,7 +159,6 @@ void SettingsWidget::fillPortsParameters()
     ui->m_qComboBox_flowcontrol->addItem(QLatin1String("RTS/CTS"), QSerialPort::HardwareControl);
     ui->m_qComboBox_flowcontrol->addItem(QLatin1String("XON/XOFF"), QSerialPort::SoftwareControl);
 }
-
 
 //*************************************************************************************************************
 
