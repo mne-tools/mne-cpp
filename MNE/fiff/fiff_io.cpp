@@ -128,16 +128,11 @@ bool FiffIO::read(QIODevice& p_IODevice)
     //Read all sort of types
     //raw data
     if(hasRaw) {
-        FiffRawData p_fiffRawData(p_IODevice);
+        QSharedPointer<FiffRawData> p_fiffRawData(new FiffRawData(p_IODevice));
         p_IODevice.close();
 
-        MatrixXd data;
-        MatrixXd times;
-//        p_fiffRawData.read_raw_segment(data,times);
-
         //append to corresponding member qlist
-        m_qlistRaw.append(QSharedPointer<FiffRawData>(&p_fiffRawData));
-        m_qlistRaw[0]->read_raw_segment(data,times);
+        m_qlistRaw.append(p_fiffRawData);
 
         printf("Finished reading raw data!");
     }
@@ -170,91 +165,84 @@ bool FiffIO::read(QIODevice& p_IODevice)
 //*************************************************************************************************************
 
 bool FiffIO::write(QIODevice& p_IODevice, fiff_int_t type, fiff_int_t idx) {
+    //ToDo: change QIODevice input to QString in order to output multiple files
 
-//    if(type == FIFFB_RAW_DATA) {
-//        MatrixXd cals;
+    switch(type) {
+        case FIFFB_RAW_DATA: {
+            if(idx == -1) {
+                for(qint32 i=0; i < m_qlistRaw.size(); ++i) {
+                    //Alter filename in ascending numbering
+                    QFile t_file(new QFile(&p_IODevice));
+                    QString t_fname = t_file.fileName();
+                    qint32 p = t_file.fileName().indexOf(".fif");
+                    t_file.setFileName(t_file.fileName().insert(p,QString("-"+QString::number(i))));
 
-//        FiffStream::SPtr outfid = Fiff::start_writing_raw(p_IODevice,this->m_qlistRaw[idx]->info, cals);
-//        //
-//        //   Set up the reading parameters
-//        //
-//        fiff_int_t from = m_qlistRaw[idx]->first_samp;
-//        fiff_int_t to = m_qlistRaw[idx]->last_samp;
-//        float quantum_sec = 10.0f;//read and write in 10 sec junks
-//        fiff_int_t quantum = ceil(quantum_sec*m_qlistRaw[idx]->info.sfreq);
-//        //
-//        //   To read the whole file at once set
-//        //
-//        //quantum     = to - from + 1;
-//        //
-//        //
-//        //   Read and write all the data
-//        //
-//        bool first_buffer = true;
+                    std::cout << t_file.fileName().toUtf8().constData() << std::endl;
 
-//        fiff_int_t first, last;
-//        MatrixXd data;
-//        MatrixXd times;
-
-////        for(first = from; first < to; first+=quantum)
-////        {
-////            last = first+quantum-1;
-////            if (last > to)
-////                last = to;
-
-////            if (!raw.read_raw_segment(data,times,first,last,picks)) {
-////                    printf("error during read_raw_segment\n");
-////                    return -1;
-////            }
-////            //
-////            //   You can add your own miracle here
-////            //
-////            printf("Writing...");
-////            if (first_buffer)
-////            {
-////               if (first > 0)
-////                   outfid->write_int(FIFF_FIRST_SAMPLE,&first);
-////               first_buffer = false;
-////            }
-////            outfid->write_raw_buffer(m_qlistRaw[idx]->rawdir[0],cals);
-////            printf("[done]\n");
-////        }
-
-//        printf("Writing...");
-
-//        if (first_buffer)
-//        {
-//           if (first > 0)
-//               outfid->write_int(FIFF_FIRST_SAMPLE,&first);
-//           first_buffer = false;
-//        }
-////        outfid->write_raw_buffer(m_qlistRaw[idx]->rawdir[0].ent.,cals);
-//        printf("[done]\n");
-
-////        m_qlistRaw[idx]->rawdir[0]cals.
-
-
-//        outfid->finish_writing_raw();
-
-//        printf("Finished\n");
-//    }
+                    FiffIO::write_raw(p_IODevice,i);
+                }
+            }
+            else {
+                FiffIO::write_raw(p_IODevice,idx);
+            }
+            printf("Finished Writing!\n");
+        }
+//        case FIFFB_EVOKED:
+            //ToDo: write evoked set to file
+    }
 
     return true;
 
 }
 
 //*************************************************************************************************************
-/* QObject must not be copied!
 
-FiffIO::FiffIO(const FiffIO& p_FiffIO)
-: m_qlistRaw(p_FiffIO.m_qlistRaw)
-, m_qlistEvoked(p_FiffIO.m_qlistEvoked)
-, m_qlistProj(p_FiffIO.m_qlistProj)
-, m_qlistFwd(p_FiffIO.m_qlistFwd)
-, m_qlistCov(p_FiffIO.m_qlistCov)
-, m_qlistNMatrix(p_FiffIO.m_qlistNMatrix)
-{
+bool FiffIO::write_raw(QIODevice& p_IODevice, fiff_int_t idx) {
 
+    MatrixXd cals;
+
+//    std::cout << "Writing file " << QFile(&p_IODevice).fileName() << std::endl;
+    FiffStream::SPtr outfid = Fiff::start_writing_raw(p_IODevice,this->m_qlistRaw[idx]->info,cals);
+
+    //Setup reading parameters
+    fiff_int_t from = m_qlistRaw[idx]->first_samp;
+    fiff_int_t to = m_qlistRaw[idx]->last_samp;
+    float quantum_sec = 10.0f;//read and write in 10 sec junks
+    fiff_int_t quantum = ceil(quantum_sec*m_qlistRaw[idx]->info.sfreq);
+
+    // To read the whole file at once
+    //        quantum = to - from + 1;
+
+    // Read and write all the data
+    bool first_buffer = true;
+
+    fiff_int_t first, last;
+    MatrixXd data;
+    MatrixXd times;
+
+    for(first = from; first < to; first+=quantum) {
+        last = first+quantum-1;
+        if (last > to)
+            last = to;
+
+        if (!m_qlistRaw[idx]->read_raw_segment(data,times,first,last)) {
+                printf("error during read_raw_segment\n");
+                return -1;
+        }
+
+        printf("Writing...");
+        if (first_buffer) {
+           if (first > 0)
+               outfid->write_int(FIFF_FIRST_SAMPLE,&first);
+           first_buffer = false;
+        }
+        outfid->write_raw_buffer(data,cals);
+        printf("[done]\n");
+    }
+
+    outfid->finish_writing_raw();
+
+    return true;
 }
-*/
+
 //*************************************************************************************************************

@@ -160,10 +160,21 @@ public:
     *
     * @param[in] p_IODevice             A fiff IO device like a fiff QFile or QTCPSocket
     * @param[in] type of data to write  fiff constants types, e.g. FIFFB_RAW_DATA
-    * @param[in] idx                    index of type, 0 for all entities of this type
+    * @param[in] idx                    index of type, -1 for all entities of this type
     *
     */
     bool write(QIODevice& p_IODevice, fiff_int_t type, fiff_int_t idx);
+
+    //=========================================================================================================
+    /**
+    * Write raw data to a p_IODevice.
+    *
+    * @param[in] p_IODevice             A fiff IO device like a fiff QFile or QTCPSocket
+    * @param[in] type of data to write  fiff constants types, e.g. FIFFB_RAW_DATA
+    * @param[in] idx                    index of type, -1 for all entities of this type
+    *
+    */
+    bool write_raw(QIODevice& p_IODevice, fiff_int_t idx);
 
     //=========================================================================================================
     /**

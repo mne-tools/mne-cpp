@@ -1,8 +1,8 @@
 #--------------------------------------------------------------------------------------------------------------
 #
 # @file     fiffIO.pro
-# @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-#           Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
+# @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
+#           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
 # @date     July, 2012
