@@ -56,7 +56,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
+#include <QTime>
 
 
 //*************************************************************************************************************
@@ -152,6 +152,16 @@ private:
     QSharedPointer<SerialPort> m_pSerialPort;
 
     qint32 m_iBaud;
+
+
+    QMutex m_qMutex;
+
+
+    QVector< VectorXd > m_pData;
+
+    qint32 m_iNumChs;
+
+    QTime m_qTime;
 
 };
 

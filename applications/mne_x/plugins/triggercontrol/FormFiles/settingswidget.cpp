@@ -88,19 +88,28 @@ SettingsWidget::SettingsWidget(QWidget *parent)
     fillPortsParameters();
     fillPortsInfo();
 
-    updateSettings();
+//    updateSettings();
 }
+
+
+//*************************************************************************************************************
 
 SettingsWidget::~SettingsWidget()
 {
     delete ui;
 }
 
+
+//*************************************************************************************************************
+
 void SettingsWidget::apply()
 {
     updateSettings();
     close();
 }
+
+
+//*************************************************************************************************************
 
 void SettingsWidget::fillPortsInfo()
 {
@@ -119,6 +128,9 @@ void SettingsWidget::fillPortsInfo()
         ui->m_qComboBox_port->addItem(list.first(), list);
     }
 }
+
+
+//*************************************************************************************************************
 
 void SettingsWidget::fillPortsParameters()
 {
@@ -147,6 +159,9 @@ void SettingsWidget::fillPortsParameters()
     ui->m_qComboBox_flowcontrol->addItem(QLatin1String("XON/XOFF"), QSerialPort::SoftwareControl);
 }
 
+
+//*************************************************************************************************************
+
 void SettingsWidget::showPortInfo(int idx)
 {
     if (idx != -1) {
@@ -157,6 +172,9 @@ void SettingsWidget::showPortInfo(int idx)
 
     }
 }
+
+
+//*************************************************************************************************************
 
 void SettingsWidget::updateSettings()
 {
