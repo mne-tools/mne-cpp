@@ -193,15 +193,23 @@ void TriggerControl::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
 void TriggerControl::run()
 {
+qDebug() << "in run method" << endl;
+
+    if(m_pSerialPort->open())   // open Serial Port
+    {
+        QByteArray m_data;
+        m_data.clear();
+        m_data[0] = m_data[0]|0x01;
+        m_pSerialPort->sendData(m_data);
+        qDebug() << "data sent" << endl;
+        m_pSerialPort->close();
+    }
+    else
+    {
+        qDebug() << "Sending not possible, please check settings" << endl;
+    }
 
 
-    // open Serial Port
-
-    //....
-
-    //send byte to trigger
-
-    //....
 
     m_qTime.start();
 

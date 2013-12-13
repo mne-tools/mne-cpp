@@ -70,7 +70,9 @@ private slots:
 private:
     void fillPortsParameters();
     void fillPortsInfo();
+
     void updateSettings();
+
 
   //  TriggerControl* m_TriggerControl;  /**< Holds a pointer to corresponding TriggerControl.*/
     Ui::SettingsWidget *ui;
