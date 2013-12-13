@@ -73,6 +73,7 @@ TriggerControl::TriggerControl()
 : m_pTriggerOutput(NULL)
 , m_iBaud(115000)
 , m_pSerialPort(new SerialPort) // initialize a new serial port
+, m_iNumChs(0)
 {
 
 }
@@ -103,19 +104,19 @@ QSharedPointer<IPlugin> TriggerControl::clone() const
 void TriggerControl::init()
 {
     // Input
-    m_pRTMSAInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "SourceLabIn", "SourceLab input data");
+    m_pRTMSAInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "TriggerControlInI", "TriggerControl input data I");
     connect(m_pRTMSAInput.data(), &PluginInputConnector::notify, this, &TriggerControl::update, Qt::DirectConnection);
     m_inputConnectors.append(m_pRTMSAInput);
 
-    // Output
-    m_pTriggerOutput = PluginOutputData<NewRealTimeSampleArray>::create(this, "DummyOut", "Dummy output data");
-    m_outputConnectors.append(m_pTriggerOutput);
+//    // Output
+//    m_pTriggerOutput = PluginOutputData<NewRealTimeSampleArray>::create(this, "DummyOut", "Dummy output data");
+//    m_outputConnectors.append(m_pTriggerOutput);
 
-    m_pTriggerOutput->data()->setName("Dummy Output");
-    m_pTriggerOutput->data()->setUnit("");
-    m_pTriggerOutput->data()->setMinValue(0);
-    m_pTriggerOutput->data()->setMaxValue(2);
-    m_pTriggerOutput->data()->setSamplingRate(256.0/1.0);
+//    m_pTriggerOutput->data()->setName("Dummy Output");
+//    m_pTriggerOutput->data()->setUnit("");
+//    m_pTriggerOutput->data()->setMinValue(0);
+//    m_pTriggerOutput->data()->setMaxValue(2);
+//    m_pTriggerOutput->data()->setSamplingRate(256.0/1.0);
 
 }
 
@@ -177,15 +178,12 @@ void TriggerControl::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
     QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<NewRealTimeMultiSampleArray>();
     if(pRTMSA)
     {
-//        pRTMSA->
-
-        //Auswertung des trigger kanals
-
-        //u.U. mutex.lock()
-        //m_bTriggerReceived = true;
-        //u.U. mutex.unlock()
-
-
+        m_qMutex.lock();
+        m_iNumChs = pRTMSA->getNumChannels();
+        qint32 t_iSize = pRTMSA->getMultiSampleArray().size();
+        for(qint32 i = 0; i < t_iSize; ++i)
+            m_pData.append(pRTMSA->getMultiSampleArray()[i]);//Append sample wise
+        m_qMutex.unlock();
     }
 }
 
@@ -199,21 +197,28 @@ void TriggerControl::run()
 
     // open Serial Port
 
-
+    //....
 
     //send byte to trigger
 
-    //.......
+    //....
 
-    //timer start
+    m_qTime.start();
 
 
     while(true)
     {
-        //u.U. mutex.lock()
-//        if(m_bTriggerReceived)
-//            timer stop
-        //u.U. mutex.unlock()
+        m_qMutex.lock();
+
+        while(m_pData.size() > 0)
+        {
+            if(m_pData.first()[m_iNumChs-2] > 9999)
+                qDebug() << "Time elpased: " << m_qTime.elapsed();
+
+            m_pData.pop_front();
+        }
+
+        m_qMutex.unlock();
     }
 
 
@@ -223,19 +228,19 @@ void TriggerControl::run()
 
 
 
-    int count = 0;
-    double v = 0;
+//    int count = 0;
+//    double v = 0;
 
-    while (true)
-    {
-        //ToDo: Implement your algorithm here
+//    while (true)
+//    {
+//        //ToDo: Implement your algorithm here
 
-        if( (count % 5 == 0) )
-            v = count % 2;
+//        if( (count % 5 == 0) )
+//            v = count % 2;
 
-        m_pTriggerOutput->data()->setValue(v);
+//        m_pTriggerOutput->data()->setValue(v);
 
-        msleep((1.0/256.0)*1000.0);
-        ++count;
-    }
+//        msleep((1.0/256.0)*1000.0);
+//        ++count;
+//    }
 }
