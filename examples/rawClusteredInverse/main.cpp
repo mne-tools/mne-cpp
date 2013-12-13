@@ -582,6 +582,14 @@ int main(int argc, char *argv[])
 //    std::cout << "Condition Number Gradiometers:\n" << t_dConditionNumberGrads << std::endl;
 //    std::cout << "Clustered Condition Number Gradiometers:\n" << t_dConditionNumberGradsClustered << std::endl;
 
+    // Write to file
+    t_sFileNameStc = QString("./mne_x_plugins/resources/tmsi/test.stc");
+
+    if(!t_sFileNameStc.isEmpty())
+    {
+        QFile t_fileClusteredStc(t_sFileNameStc);
+        sourceEstimate.write(t_fileClusteredStc);
+    }
 
     //Source Estimate end
     //########################################################################################
@@ -597,17 +605,17 @@ int main(int argc, char *argv[])
     SurfaceSet t_surfSet("C:/Lorenz Esch/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/lh.white", "C:/Lorenz Esch/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/rh.white");
 
     //only one time point - P100
-    qint32 sample = 0;
-    for(qint32 i = 0; i < sourceEstimate.times.size(); ++i)
-    {
-        if(sourceEstimate.times(i) >= 0)
-        {
-            sample = i;
-            break;
-        }
-    }
-    sample += (qint32)ceil(0.106/sourceEstimate.tstep); //100ms
-    sourceEstimate = sourceEstimate.reduce(sample, 1);
+//    qint32 sample = 0;
+//    for(qint32 i = 0; i < sourceEstimate.times.size(); ++i)
+//    {
+//        if(sourceEstimate.times(i) >= 0)
+//        {
+//            sample = i;
+//            break;
+//        }
+//    }
+//    sample += (qint32)ceil(0.106/sourceEstimate.tstep); //100ms
+//    sourceEstimate = sourceEstimate.reduce(sample, 1);
 
     QList<Label> t_qListLabels;
     QList<RowVector4i> t_qListRGBAs;
