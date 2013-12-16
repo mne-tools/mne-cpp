@@ -84,6 +84,7 @@ ECGSimulator::ECGSimulator()
 , m_pECGChannel_ECG_I(new ECGSimChannel(m_qStringResourcePath+"data/", QString("ECG_I_256_s30661.txt")))
 , m_pECGChannel_ECG_II(new ECGSimChannel(m_qStringResourcePath+"data/", QString("ECG_II_256_s30661.txt")))
 , m_pECGChannel_ECG_III(new ECGSimChannel(m_qStringResourcePath+"data/", QString("ECG_III_256_s30661.txt")))
+, m_bIsRunning(false)
 {
 }
 
@@ -92,7 +93,9 @@ ECGSimulator::ECGSimulator()
 
 ECGSimulator::~ECGSimulator()
 {
-    std::cout << "ECGSimulator::~ECGSimulator()" << std::endl;
+    //If the program is closed while the sampling is in process
+    if(this->isRunning())
+        this->stop();
 }
 
 
@@ -187,14 +190,26 @@ void ECGSimulator::initChannels()
 
 bool ECGSimulator::start()
 {
+    //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
+    if(this->isRunning())
+        QThread::wait();
+
     initChannels();
 
     // Start threads
     m_pECGProducer->start();
 
-    QThread::start();
-
-    return true;
+    if(m_pECGProducer->isRunning())
+    {
+        m_bIsRunning = true;
+        QThread::start();
+        return true;
+    }
+    else
+    {
+        qWarning() << "Plugin TMSI - ERROR - TMSIProducer thread could not be started - Either the device is turned off (check your OS device manager) or the driver DLL (TMSiSDK.dll / TMSiSDK32bit.dll) is not installed in the system32 / SysWOW64 directory" << endl;
+        return false;
+    }
 }
 
 
@@ -204,8 +219,19 @@ bool ECGSimulator::stop()
 {
     // Stop threads
     m_pECGProducer->stop();
-    QThread::terminate();
-    QThread::wait();
+
+    //Wait until this thread (TMSI) is stopped
+    m_bIsRunning = false;
+
+
+    //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the pop function (acquire statement)
+    m_pInBuffer_I->releaseFromPop();
+    m_pInBuffer_I->clear();
+    m_pInBuffer_II->releaseFromPop();
+    m_pInBuffer_II->clear();
+    m_pInBuffer_III->releaseFromPop();
+    m_pInBuffer_III->clear();
+
 
     //Clear Buffers
     m_pECGChannel_ECG_I->clear();
@@ -259,22 +285,26 @@ void ECGSimulator::run()
     double dValue_II = 0;
     double dValue_III = 0;
 
-    while(true)
+    while(m_bIsRunning)
     {
-        if(m_pECGChannel_ECG_I->isEnabled())
+        //pop matrix only if the producer thread is running
+        if(m_pECGProducer->isRunning())
         {
-            dValue_I = m_pInBuffer_I->pop();
-            m_pRTSA_ECG_I_new->data()->setValue(dValue_I);
-        }
-        if(m_pECGChannel_ECG_II->isEnabled())
-        {
-            dValue_II = m_pInBuffer_II->pop();
-            m_pRTSA_ECG_II_new->data()->setValue(dValue_II);
-        }
-        if(m_pECGChannel_ECG_III->isEnabled())
-        {
-            dValue_III = m_pInBuffer_III->pop();
-            m_pRTSA_ECG_III_new->data()->setValue(dValue_III);
+            if(m_pECGChannel_ECG_I->isEnabled())
+            {
+                dValue_I = m_pInBuffer_I->pop();
+                m_pRTSA_ECG_I_new->data()->setValue(dValue_I);
+            }
+            if(m_pECGChannel_ECG_II->isEnabled())
+            {
+                dValue_II = m_pInBuffer_II->pop();
+                m_pRTSA_ECG_II_new->data()->setValue(dValue_II);
+            }
+            if(m_pECGChannel_ECG_III->isEnabled())
+            {
+                dValue_III = m_pInBuffer_III->pop();
+                m_pRTSA_ECG_III_new->data()->setValue(dValue_III);
+            }
         }
     }
 }
