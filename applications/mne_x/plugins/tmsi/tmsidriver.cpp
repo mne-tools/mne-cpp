@@ -63,7 +63,6 @@ TMSIDriver::TMSIDriver(TMSIProducer* pTMSIProducer)
 , m_uiNumberOfChannels(138)
 , m_uiSamplingFrequency(1024)
 , m_uiSamplesPerBlock(1)
-, m_bConvertToVolt(false)
 , m_bUseChExponent(false)
 , m_bUseUnitGain(false)
 , m_bUseUnitOffset(false)
@@ -131,7 +130,6 @@ TMSIDriver::~TMSIDriver()
 bool TMSIDriver::initDevice(int iNumberOfChannels,
                             int iSamplingFrequency,
                             int iSamplesPerBlock,
-                            bool bConvertToVolt,
                             bool bUseChExponent,
                             bool bUseUnitGain,
                             bool bUseUnitOffset,
@@ -146,7 +144,6 @@ bool TMSIDriver::initDevice(int iNumberOfChannels,
     m_uiNumberOfChannels = iNumberOfChannels;
     m_uiSamplingFrequency = iSamplingFrequency;
     m_uiSamplesPerBlock = iSamplesPerBlock;
-    m_bConvertToVolt = bConvertToVolt;
     m_bUseChExponent = bUseChExponent;
     m_bUseUnitGain = bUseUnitGain;
     m_bUseUnitOffset = bUseUnitOffset;
@@ -385,7 +382,7 @@ bool TMSIDriver::uninitDevice()
             {
                 for(int channelIterator = 0; channelIterator < channelMax; channelIterator++)
                 {
-                    sampleMatrix(channelIterator, sampleIterator) = (m_vSampleBlockBuffer.first())*(m_bUseUnitGain ? m_vUnitGain[channelIterator] : 1) + (m_bUseUnitOffset ? m_vUnitOffSet[channelIterator] : 0) * (m_bUseChExponent ? pow(10., (m_bConvertToVolt ? (double)m_vExponentChannel[channelIterator]+6 : (double)m_vExponentChannel[channelIterator])) : 1);
+                    sampleMatrix(channelIterator, sampleIterator) = (m_vSampleBlockBuffer.first() * (m_bUseUnitGain ? m_vUnitGain[channelIterator] : 1) + (m_bUseUnitOffset ? m_vUnitOffSet[channelIterator] : 0)) * (m_bUseChExponent ? pow(10., (double)m_vExponentChannel[channelIterator]) : 0);
                     m_vSampleBlockBuffer.pop_front();
                 }
 

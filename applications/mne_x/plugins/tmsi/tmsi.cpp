@@ -110,7 +110,6 @@ void TMSI::init()
     m_iSamplingFreq = 1024;
     m_iNumberOfChannels = 138;
     m_iSamplesPerBlock = 16;
-    m_bConvertToVolt = false;
     m_bUseChExponent = false;
     m_bUseUnitGain = false;
     m_bUseUnitOffset = false;
@@ -443,7 +442,6 @@ bool TMSI::start()
     m_pTMSIProducer->start(m_iNumberOfChannels,
                        m_iSamplingFreq,
                        m_iSamplesPerBlock,
-                       m_bConvertToVolt,
                        m_bUseChExponent,
                        m_bUseUnitGain,
                        m_bUseUnitOffset,
