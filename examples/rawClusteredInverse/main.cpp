@@ -102,20 +102,20 @@ int main(int argc, char *argv[])
 //    QFile t_fileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
 //    QFile t_fileRaw("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw.fif");
 
-    QFile t_fileRaw("C:/Lorenz Esch/Dropbox/Masterarbeit DB/Messdaten/EEG/2013_12_05_Lorenz_Esch_001/EEG_data_001_right_tapping_raw.fif");
+    QFile t_fileRaw("D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2013_12_05_Lorenz_Esch_001/EEG_data_001_left_tapping_raw.fif");
 
     qint32 event = 1;
 //    QString t_sEventName = "./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif";
 //    QString t_sEventName = "E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-eve.fif";
 
-    QString t_sEventName = "C:/Lorenz Esch/Dropbox/Masterarbeit DB/Messdaten/EEG/2013_12_05_Lorenz_Esch_001/EEG_data_001_right_tapping_raw-eve.fif";
+    QString t_sEventName = "D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2013_12_05_Lorenz_Esch_001/EEG_data_001_right_tapping_raw-eve.fif";
 
     float tmin = -0.2f;
     float tmax = 0.4f;
 
     bool keep_comp = false;
     fiff_int_t dest_comp = 0;
-    bool pick_all  = true;
+    bool pick_all  = false;
 
     qint32 k, p;
 
@@ -139,9 +139,9 @@ int main(int argc, char *argv[])
     else
     {
         QStringList include;
-        include << "STI 014";
-        bool want_meg   = true;
-        bool want_eeg   = false;
+        //include << "STI 014";
+        bool want_meg   = false;
+        bool want_eeg   = true;
         bool want_stim  = false;
 
 //        picks = Fiff::pick_types(raw.info, want_meg, want_eeg, want_stim, include, raw.info.bads);
@@ -371,16 +371,16 @@ int main(int argc, char *argv[])
     //
     // calculate the average
     //
-//    //Option 1
-//    qint32 numAverages = 10;
-//    VectorXi vecSel(numAverages);
-//    srand (time(NULL)); // initialize random seed
+    //Option 1
+    qint32 numAverages = 10;
+    VectorXi vecSel(numAverages);
+    srand (time(NULL)); // initialize random seed
 
-//    for(qint32 i = 0; i < vecSel.size(); ++i)
-//    {
-//        qint32 val = rand() % data.size();
-//        vecSel(i) = val;
-//    }
+    for(qint32 i = 0; i < vecSel.size(); ++i)
+    {
+        qint32 val = rand() % data.size();
+        vecSel(i) = val;
+    }
 
 //    //Option 2
 //    VectorXi vecSel(20);
@@ -390,9 +390,13 @@ int main(int argc, char *argv[])
 //    vecSel << 65, 22, 47, 55, 16, 29, 14, 36, 57, 97, 89, 46, 9, 93, 83, 52, 71, 52, 3, 96;
 
     //Option 3
-    VectorXi vecSel(11);
+//    VectorXi vecSel(10);
 
-    vecSel << 0, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40;
+//    vecSel << 0, 96, 80, 55, 66, 25, 26, 2, 55, 58, 6, 88;
+
+//    VectorXi vecSel(11);
+
+//    vecSel << 0, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40;
 
 
     std::cout << "Select following epochs to average:\n" << vecSel << std::endl;
@@ -422,14 +426,14 @@ int main(int argc, char *argv[])
 
 //    QFile t_fileFwd("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-oct-6p-fwd.fif");
 //    QFile t_fileCov("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-cov.fif");
-    QFile t_fileFwd("C:/Lorenz Esch/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/Lorenz-121213-fwd.fif");
-    QFile t_fileCov("C:/Lorenz Esch/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/EEG_data_001_right_tapping_raw-cov.fif");
+    QFile t_fileFwd("D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/Lorenz-121213-fwd.fif");
+    QFile t_fileCov("D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/EEG_data_001_right_tapping_raw-cov.fif");
 
 //    QFile t_fileEvoked("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-ave.fif");
 
 
     double snr = 0.1f;//1.0f;//3.0f;//0.1f;//3.0f;
-    QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
+    QString method("MNE"); //"MNE" | "dSPM" | "sLORETA"
 
     QString t_sFileNameClusteredInv("");
     QString t_sFileNameStc("");
@@ -476,7 +480,7 @@ int main(int argc, char *argv[])
 //    AnnotationSet t_annotationSet("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot", "./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot");
 //    AnnotationSet t_annotationSet("/home/chdinh/sl_data/subjects/mind006/label/lh.aparc.a2009s.annot", "/home/chdinh/sl_data/subjects/mind006/label/rh.aparc.a2009s.annot");
 //    AnnotationSet t_annotationSet("E:/Data/sl_data/subjects/mind006/label/lh.aparc.a2009s.annot", "E:/Data/sl_data/subjects/mind006/label/rh.aparc.a2009s.annot");
-    AnnotationSet t_annotationSet("C:/Lorenz Esch/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/lh.aparc.a2009s.annot", "C:/Lorenz Esch/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/rh.aparc.a2009s.annot");
+    AnnotationSet t_annotationSet("D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/lh.aparc.a2009s.annot", "D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/rh.aparc.a2009s.annot");
 
 
     FiffCov noise_cov(t_fileCov);
@@ -511,6 +515,7 @@ int main(int argc, char *argv[])
     MinimumNorm minimumNorm(inverse_operator, lambda2, method);
     MNESourceEstimate sourceEstimate = minimumNorm.calculateInverse(evoked);
 
+    //sourceEstimate.data = sourceEstimate.data * 0.000001;
     if(sourceEstimate.isEmpty())
         return 1;
 
@@ -594,15 +599,15 @@ int main(int argc, char *argv[])
     //Source Estimate end
     //########################################################################################
 
-//    AnnotationSet t_annotSet("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot","./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot");
+    AnnotationSet t_annotSet("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot","./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot");
 //    AnnotationSet t_annotSet("/home/chdinh/sl_data/subjects/mind006/label/lh.aparc.a2009s.annot", "/home/chdinh/sl_data/subjects/mind006/label/rh.aparc.a2009s.annot");
 //    AnnotationSet t_annotSet("E:/Data/sl_data/subjects/mind006/label/lh.aparc.a2009s.annot", "E:/Data/sl_data/subjects/mind006/label/rh.aparc.a2009s.annot");
-    AnnotationSet t_annotSet("C:/Lorenz Esch/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/lh.aparc.a2009s.annot", "C:/Lorenz Esch/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/rh.aparc.a2009s.annot");
+//    AnnotationSet t_annotSet("D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/lh.aparc.a2009s.annot", "D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/rh.aparc.a2009s.annot");
 
-//    SurfaceSet t_surfSet("./MNE-sample-data/subjects/sample/surf/lh.white", "./MNE-sample-data/subjects/sample/surf/rh.white");
+    SurfaceSet t_surfSet("./MNE-sample-data/subjects/sample/surf/lh.white", "./MNE-sample-data/subjects/sample/surf/rh.white");
 //    SurfaceSet t_surfSet("/home/chdinh/sl_data/subjects/mind006/surf/lh.white", "/home/chdinh/sl_data/subjects/mind006/surf/rh.white");
 //    SurfaceSet t_surfSet("E:/Data/sl_data/subjects/mind006/surf/lh.white", "E:/Data/sl_data/subjects/mind006/surf/rh.white");
-    SurfaceSet t_surfSet("C:/Lorenz Esch/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/lh.white", "C:/Lorenz Esch/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/rh.white");
+//    SurfaceSet t_surfSet("D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/lh.white", "D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/rh.white");
 
     //only one time point - P100
 //    qint32 sample = 0;

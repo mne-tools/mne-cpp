@@ -189,7 +189,6 @@ private:
     int                                 m_iNumberOfChannels;                /**< The samples per block defined by the user via the GUI.*/
     int                                 m_iSamplesPerBlock;                 /**< The number of channels defined by the user via the GUI.*/
 
-    bool                                m_bConvertToVolt;                   /**< Flag for converting the values to Volt. Defined by the user via the GUI.*/
     bool                                m_bUseChExponent;                   /**< Flag for using the channels exponent. Defined by the user via the GUI.*/
     bool                                m_bUseUnitGain;                     /**< Flag for using the channels unit gain. Defined by the user via the GUI.*/
     bool                                m_bUseUnitOffset;                   /**< Flag for using the channels unit offset. Defined by the user via the GUI.*/
