@@ -110,7 +110,7 @@ void TMSI::init()
     m_iSamplingFreq = 1024;
     m_iNumberOfChannels = 138;
     m_iSamplesPerBlock = 16;
-    m_bUseChExponent = false;
+    m_bUseChExponent = true;
     m_bUseUnitGain = false;
     m_bUseUnitOffset = false;
     m_bWriteToFile = false;

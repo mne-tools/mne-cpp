@@ -68,6 +68,9 @@
        <layout class="QFormLayout" name="formLayout">
         <item row="0" column="0">
          <widget class="QCheckBox" name="m_checkBox_UseFFT">
+          <property name="enabled">
+           <bool>false</bool>
+          </property>
           <property name="text">
            <string>Use FFT</string>
           </property>
