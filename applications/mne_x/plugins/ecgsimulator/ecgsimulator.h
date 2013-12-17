@@ -172,6 +172,9 @@ private:
     ECGSimChannel::SPtr m_pECGChannel_ECG_I;    /**< the simulation channel for ECG I.*/
     ECGSimChannel::SPtr m_pECGChannel_ECG_II;   /**< the simulation channel for ECG II.*/
     ECGSimChannel::SPtr m_pECGChannel_ECG_III;  /**< the simulation channel for ECG III.*/
+
+    bool m_bIsRunning;  /**< Whether main thread is running */
+
 };
 
 } // NAMESPACE

@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
-* @file     dummyaboutwidget.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+* @file     triggercontrolaboutwidget.h
+* @author   Tim Kunze <tim.kunze@tu-ilmenau.de>;
+*           Luise Lang <luise.lang@tu-ilmenau.de>;
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     November, 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2013, Tim Kunze, Luise Lang and Christoph Dinh. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the DummyAboutWidget class.
+* @brief    Contains the declaration of the TriggercontrolAboutWidget class.
 *
 */
 
@@ -64,9 +65,9 @@ namespace TriggerControlPlugin
 
 //=============================================================================================================
 /**
-* DECLARE CLASS DummyAboutWidget
+* DECLARE CLASS TriggercontrolAboutWidget
 *
-* @brief The DummyAboutWidget class provides the about dialog for the DummyToolbox.
+* @brief The TriggercontrolAboutWidget class provides the about dialog for the TriggercontrolToolbox.
 */
 class TriggerControlAboutWidget : public QDialog
 {
@@ -76,22 +77,22 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a DummyAboutWidget dialog which is a child of parent.
+    * Constructs a TriggercontrolAboutWidget dialog which is a child of parent.
     *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new DummyAboutWidget becomes a window. If parent is another widget, DummyAboutWidget becomes a child window inside parent. DummyAboutWidget is deleted when its parent is deleted.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new TriggercontrolAboutWidget becomes a window. If parent is another widget, TriggercontrolAboutWidget becomes a child window inside parent. TriggercontrolAboutWidget is deleted when its parent is deleted.
     */
     TriggerControlAboutWidget(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the DummyAboutWidget.
-    * All DummyAboutWidget's children are deleted first. The application exits if DummyAboutWidget is the main widget.
+    * Destroys the TriggercontrolAboutWidget.
+    * All TriggercontrolAboutWidget's children are deleted first. The application exits if TriggercontrolAboutWidget is the main widget.
     */
     ~TriggerControlAboutWidget();
 
 private:
 
-    Ui::TriggerControlAboutWidgetClass ui;      /**< Holds the user interface for the DummyAboutWidget.*/
+    Ui::TriggerControlAboutWidgetClass ui;      /**< Holds the user interface for the TriggercontrolAboutWidget.*/
 
 };
 

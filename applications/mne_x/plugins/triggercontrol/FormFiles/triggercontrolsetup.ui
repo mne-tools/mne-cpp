@@ -151,12 +151,18 @@
           <property name="text">
            <string>16</string>
           </property>
+          <property name="autoExclusive">
+           <bool>false</bool>
+          </property>
          </widget>
         </item>
         <item row="6" column="0">
          <widget class="QRadioButton" name="m_qRadioButton_1">
           <property name="text">
            <string>2</string>
+          </property>
+          <property name="autoExclusive">
+           <bool>false</bool>
           </property>
          </widget>
         </item>
@@ -172,12 +178,18 @@
           <property name="text">
            <string>8</string>
           </property>
+          <property name="autoExclusive">
+           <bool>false</bool>
+          </property>
          </widget>
         </item>
         <item row="5" column="0">
          <widget class="QRadioButton" name="m_qRadioButton_2">
           <property name="text">
            <string>4</string>
+          </property>
+          <property name="autoExclusive">
+           <bool>false</bool>
           </property>
          </widget>
         </item>
@@ -186,12 +198,18 @@
           <property name="text">
            <string>0 - LSB</string>
           </property>
+          <property name="autoExclusive">
+           <bool>false</bool>
+          </property>
          </widget>
         </item>
         <item row="2" column="0">
          <widget class="QRadioButton" name="m_qRadioButton_5">
           <property name="text">
            <string>32</string>
+          </property>
+          <property name="autoExclusive">
+           <bool>false</bool>
           </property>
          </widget>
         </item>
@@ -200,12 +218,18 @@
           <property name="text">
            <string>64</string>
           </property>
+          <property name="autoExclusive">
+           <bool>false</bool>
+          </property>
          </widget>
         </item>
         <item row="0" column="0">
          <widget class="QRadioButton" name="m_qRadioButton_7">
           <property name="text">
            <string>128 - HSB</string>
+          </property>
+          <property name="autoExclusive">
+           <bool>false</bool>
           </property>
          </widget>
         </item>
