@@ -131,15 +131,16 @@ bool TriggerControl::start()
     QThread::start();
     m_bIsRunning = true;
 
-    m_qTime.start();
+
 
     if(m_pSerialPort->open())   // open Serial Port
     {
         QByteArray t_data;
         t_data.append(0x01);
 //        t_data[0] = t_data[0]|0x01;
+        m_qTime.start();
         m_pSerialPort->sendData(t_data);
-        std::cout << "data sent" << std::endl;
+//        std::cout << "data sent" << std::endl;
     }
     else
     {
@@ -223,8 +224,12 @@ void TriggerControl::run()
 
         while(m_pData.size() > 0)
         {
-            if(m_pData.first()[m_iNumChs-2] > 9999)
-                qDebug() << "Time elpased: " << m_qTime.elapsed();
+            if(m_pData.first()[m_iNumChs-2] > 1000)
+            {
+                std::cout << "Time elpased: " << m_qTime.elapsed() << std::endl;
+
+                m_bIsRunning = false;
+            }
 
             m_pData.pop_front();
         }

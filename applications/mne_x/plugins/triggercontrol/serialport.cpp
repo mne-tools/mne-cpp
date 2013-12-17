@@ -124,11 +124,11 @@ void SerialPort::initPort()
 
 //    }
 
-    if(t_qListPortInfo.size() > 1)
+    if(t_qListPortInfo.size() > 0)
     {
-        m_currentSettings.name = t_qListPortInfo[1].portName();
+        m_currentSettings.name = t_qListPortInfo[0].portName();
 
-        m_qSerialPort.setPortName( t_qListPortInfo[1].portName());
+        m_qSerialPort.setPortName( t_qListPortInfo[0].portName());
     }
 
 }
@@ -157,19 +157,19 @@ bool SerialPort::open()
  //   qDebug() << "noch nicht geöffnet" << endl;
     if (m_qSerialPort.open(QIODevice::ReadWrite))
     {
-        std::cout << "geöffnet, ohne Konfigs" << std::endl;
+        //std::cout << "geöffnet, ohne Konfigs" << std::endl;
         if (m_qSerialPort.setBaudRate(m_currentSettings.baudRate)
                 && m_qSerialPort.setDataBits(m_currentSettings.dataBits)
                 && m_qSerialPort.setParity(m_currentSettings.parity)
                 && m_qSerialPort.setStopBits(m_currentSettings.stopBits)
                 && m_qSerialPort.setFlowControl(m_currentSettings.flowControl))
         {
-            std::cout << "geöffnet, mit:"
-                      << "Name" << m_currentSettings.name.toLatin1().data()
-                      << "BaudRat" << m_currentSettings.stringBaudRate.toLatin1().data()
-                      << "Databits" << m_currentSettings.stringDataBits.toLatin1().data()
-                      << "Parity" << m_currentSettings.stringParity.toLatin1().data()
-                      << "FlowControl" << m_currentSettings.stringFlowControl.toLatin1().data()  << std::endl;
+            //std::cout << "geöffnet, mit:"
+//                      << "Name" << m_currentSettings.name.toLatin1().data()
+//                      << "BaudRat" << m_currentSettings.stringBaudRate.toLatin1().data()
+//                      << "Databits" << m_currentSettings.stringDataBits.toLatin1().data()
+//                      << "Parity" << m_currentSettings.stringParity.toLatin1().data()
+//                      << "FlowControl" << m_currentSettings.stringFlowControl.toLatin1().data()  << std::endl;
 //            ui->pushButton_connect->setEnabled(false);
 //            ui->pushButton_disconnect->setEnabled(true);
 //            ui->pushButton_opensettings->setEnabled(false);
@@ -181,7 +181,7 @@ bool SerialPort::open()
             success = true;
         }
         else
-        {    std::cout << "nicht geöffnet, Fehler mit KOnfigurationszuweisung" << std::endl;
+        {    //std::cout << "nicht geöffnet, Fehler mit KOnfigurationszuweisung" << std::endl;
             m_qSerialPort.close();
          //   QMessageBox::critical(this,tr("Error"),serial->errorString());
           //  ui->statusBar->showMessage(tr("Fehler beim Öffnen"));
@@ -191,7 +191,7 @@ bool SerialPort::open()
     }
     else
     {
-        std::cout << "nicht geöffnet, Fehler schon beim readwriteöffnen" << std::endl;
+        //std::cout << "nicht geöffnet, Fehler schon beim readwriteöffnen" << std::endl;
        // QMessageBox::critical(this,tr("Error"),serial->errorString());
       //  ui->statusBar->showMessage(tr("Konfigurationsfehler"));
         success = false;
