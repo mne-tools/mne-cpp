@@ -1,9 +1,9 @@
 //=============================================================================================================
 /**
-* @file     triggercontrolsetupwidget.h
-* @author   Tim Kunze <tim.kunze@tu-ilmenau.de>;
-*           Luise Lang <luise.lang@tu-ilmenau.de>;
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
+* @file     serialport.h
+* @author   Tim Kunze <tim.kunze@tu-ilmenau.de>
+*           Luise Lang <luise.lang@tu-ilmenau.de>
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 * @version  1.0
 * @date     November, 2013
 *
@@ -30,35 +30,26 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the TriggerControlSetupWidget class.
+* @brief    Contains the declaration of the SerialPort class.
 *
 */
 
-#ifndef TRIGGERCONTROLSETUPWIDGET_H
-#define TRIGGERCONTROLSETUPWIDGET_H
+#ifndef SERIALPORT_H
+#define SERIALPORT_H
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
-
-#include "../ui_triggercontrolsetup.h"
-
+#include "triggercontrol.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
+#include <QSerialPort>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -71,71 +62,93 @@ namespace TriggerControlPlugin
 
 //*************************************************************************************************************
 //=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+//using namespace MNEX;
+//using namespace TriggerControlPlugin;
+
+//*************************************************************************************************************
+//=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class TriggerControl;
-class SerialPort;
-
+//class TriggerControlSetupWidget;
+//class TriggerControl;
+//class SettingsWidget;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS TriggerControlSetupWidget
+* DECLARE CLASS TriggerControl
 *
-* @brief The TriggerControlSetupWidget class provides the TriggerControlToolbox configuration window.
+* @brief The TriggerControl ....
 */
-class TriggerControlSetupWidget : public QWidget
+class SerialPort : public QObject
 {
     Q_OBJECT
-
-    friend class SettingsWidget;
-
 public:
     //=========================================================================================================
     /**
-    * Constructs a TriggerControlSetupWidget which is a child of parent.
-    *
-    * @param [in] toolbox a pointer to the corresponding TriggerControlToolbox.
-    * @param [in] parent pointer to parent widget; If parent is 0, the new TriggerControlSetupWidget becomes a window. If parent is another widget, TriggerControlSetupWidget becomes a child window inside parent. TriggerControlSetupWidget is deleted when its parent is deleted.
+    * Constructs a SerialPort.
     */
-    TriggerControlSetupWidget(TriggerControl* toolbox, QWidget *parent = 0);
+    SerialPort();
 
     //=========================================================================================================
     /**
-    * Destroys the DummySetupWidget.
-    * All DummySetupWidget's children are deleted first. The application exits if DummySetupWidget is the main widget.
+    * Destroys the SerialPort.
     */
-    ~TriggerControlSetupWidget();
+    ~SerialPort();
 
 
-private slots:
-    void on_m_qPushButton_Connect_released();
+    void initSettings();
+    void initPort();
 
-    void on_m_qPushButton_Disconnect_released();
+    bool open();
+    void close();
+    void sendData(const QByteArray &data);
 
-    void on_m_qPushButton_Send_released();
+ //   void writeData(const QByteArray &data);
+//    void readData();
+
+   // void handleError(QSerialPort::SerialPortError error);
+
+
+    struct Settings {
+        QString name;
+        qint32 baudRate;
+        QString stringBaudRate;
+        QSerialPort::DataBits dataBits;
+        QString stringDataBits;
+        QSerialPort::Parity parity;
+        QString stringParity;
+        QSerialPort::StopBits stopBits;
+        QString stringStopBits;
+        QSerialPort::FlowControl flowControl;
+        QString stringFlowControl;
+    };
+
+    inline Settings& settings()
+    {
+        return m_currentSettings;
+    }
+
+signals:
+    void dataAvailable(const QByteArray);
+
+protected:
 
 private:
-    //=========================================================================================================
-    /**
-    * Shows the About Dialog
-    *
-    */
-    void showAboutDialog();
+    Settings m_currentSettings;
+    QSerialPort m_qSerialPort;
 
-
-    //=========================================================================================================
-    /**
-    * Shows the settings widget
-    */
-    void showSettings();
-
-
-    TriggerControl* m_pTriggerControl;
-
-    Ui::TriggerControlSetupWidgetClass ui;       /**< Holds the user interface for the TriggerControlSetupWidget.*/
 };
 
-} // NAMESPACE
+} // Namespace
 
-#endif // TRIGGERCONTROLSETUPWIDGET_H
+#endif // SERIALPORT_H
+
+
+
+
+
+
