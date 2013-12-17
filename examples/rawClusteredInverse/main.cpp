@@ -374,15 +374,15 @@ int main(int argc, char *argv[])
     // calculate the average
     //
     //Option 1
-    qint32 numAverages = 10;
-    VectorXi vecSel(numAverages);
-    srand (time(NULL)); // initialize random seed
+//    qint32 numAverages = 10;
+//    VectorXi vecSel(numAverages);
+//    srand (time(NULL)); // initialize random seed
 
-    for(qint32 i = 0; i < vecSel.size(); ++i)
-    {
-        qint32 val = rand() % data.size();
-        vecSel(i) = val;
-    }
+//    for(qint32 i = 0; i < vecSel.size(); ++i)
+//    {
+//        qint32 val = rand() % data.size();
+//        vecSel(i) = val;
+//    }
 
 //    //Option 2
 //    VectorXi vecSel(20);
@@ -396,9 +396,9 @@ int main(int argc, char *argv[])
 
 //    vecSel << 0, 96, 80, 55, 66, 25, 26, 2, 55, 58, 6, 88;
 
-//    VectorXi vecSel(11);
+    VectorXi vecSel(11);
 
-//    vecSel << 0, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40;
+    vecSel << 0, 4, 8, 12, 16, 20, 24, 28, 32, 36, 40;
 
 
     std::cout << "Select following epochs to average:\n" << vecSel << std::endl;
@@ -437,7 +437,7 @@ int main(int argc, char *argv[])
 
 
     double snr = 0.1f;//1.0f;//3.0f;//0.1f;//3.0f;
-    QString method("MNE"); //"MNE" | "dSPM" | "sLORETA"
+    QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
 
     QString t_sFileNameClusteredInv("");
     QString t_sFileNameStc("");
