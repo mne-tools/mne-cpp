@@ -163,6 +163,9 @@ private:
 
     QTime m_qTime;
 
+    bool m_bIsRunning;
+
+
 };
 
 } // NAMESPACE
