@@ -53,6 +53,8 @@
 #include <QtCore/QtPlugin>
 #include <QDebug>
 
+#include <iostream>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -74,6 +76,7 @@ TriggerControl::TriggerControl()
 , m_iBaud(115000)
 , m_pSerialPort(new SerialPort) // initialize a new serial port
 , m_iNumChs(0)
+, m_bIsRunning(false)
 {
 
 }
@@ -126,10 +129,25 @@ void TriggerControl::init()
 bool TriggerControl::start()
 {
     QThread::start();
+    m_bIsRunning = true;
+
+    m_qTime.start();
+
+    if(m_pSerialPort->open())   // open Serial Port
+    {
+        QByteArray t_data;
+        t_data.append(0x01);
+//        t_data[0] = t_data[0]|0x01;
+        m_pSerialPort->sendData(t_data);
+        std::cout << "data sent" << std::endl;
+    }
+    else
+    {
+        std::cout << "Sending not possible, please check settings" << std::endl;
+    }
+
+
     return true;
-
-
-
 }
 
 
@@ -137,9 +155,13 @@ bool TriggerControl::start()
 
 bool TriggerControl::stop()
 {
-    // Stop threads
-    QThread::terminate();
-    QThread::wait();
+    m_pSerialPort->close();
+
+    m_bIsRunning = false;
+
+//    // Stop threads
+//    QThread::terminate();
+//    QThread::wait();
 
     return true;
 }
@@ -165,8 +187,9 @@ QString TriggerControl::getName() const
 
 QWidget* TriggerControl::setupWidget()
 {
-    TriggerControlSetupWidget* setupWidget = new TriggerControlSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
+//    TriggerControlSetupWidget* setupWidget = new TriggerControlSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
 
+    QWidget* setupWidget = new QWidget;
     return setupWidget;
 }
 
@@ -193,28 +216,8 @@ void TriggerControl::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
 void TriggerControl::run()
 {
-qDebug() << "in run method" << endl;
 
-    if(m_pSerialPort->open())   // open Serial Port
-    {
-        QByteArray m_data;
-        m_data.clear();
-        m_data[0] = m_data[0]|0x01;
-        m_pSerialPort->sendData(m_data);
-        qDebug() << "data sent" << endl;
-        m_pSerialPort->close();
-    }
-    else
-    {
-        qDebug() << "Sending not possible, please check settings" << endl;
-    }
-
-
-
-    m_qTime.start();
-
-
-    while(true)
+    while(m_bIsRunning)
     {
         m_qMutex.lock();
 
