@@ -156,14 +156,24 @@ public:
 
     //=========================================================================================================
     /**
-    * Write data to a p_IODevice.
+    * Write data to a single p_IODevice.
     *
     * @param[in] p_IODevice             A fiff IO device like a fiff QFile or QTCPSocket
     * @param[in] type of data to write  fiff constants types, e.g. FIFFB_RAW_DATA
     * @param[in] idx                    index of type, -1 for all entities of this type
     *
     */
-    bool write(QIODevice& p_IODevice, fiff_int_t type, fiff_int_t idx);
+    bool write(QIODevice& p_IODevice, const fiff_int_t type, const fiff_int_t idx) const;
+
+    //=========================================================================================================
+    /**
+    * Write whole data of a type to a fiff file.
+    *
+    * @param[in] filename    filename including the path but not the type, e.g. ./sample_date/sample_audvis.fif -> will be extended to ./sample_date/sample_audvis-type-1.fif
+    * @param[in] type of data to write  fiff constants types, e.g. FIFFB_RAW_DATA
+    * @param[in] idx                    index of type, -1 for all entities of this type
+    */
+    bool write(QFile& p_QFile, const fiff_int_t type, const fiff_int_t idx) const;
 
     //=========================================================================================================
     /**
@@ -174,15 +184,7 @@ public:
     * @param[in] idx                    index of type, -1 for all entities of this type
     *
     */
-    bool write_raw(QIODevice& p_IODevice, fiff_int_t idx);
-
-    //=========================================================================================================
-    /**
-    * Write data to a p_IODevice.
-    *
-    * @param[in] p_IODevice    A fiff IO device like a fiff QFile or QTCPSocket
-    */
-    //bool write(QString filename, QString folder = "./"); //including AutoFileNaming, e.g. -raw/evoked/fwd.fiff
+    bool write_raw(QIODevice& p_IODevice, const fiff_int_t idx) const;
 
     //=========================================================================================================
     /**
