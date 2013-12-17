@@ -2,13 +2,14 @@
 /**
 * @file     triggercontrol.cpp
 * @author   Tim Kunze <tim.kunze@tu-ilmenau.de>
+*           Luise Lang <luise.lang@tu-ilmenau.de>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 * @version  1.0
 * @date     November, 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Tim Kunze and Christoph Dinh. All rights reserved.
+* Copyright (C) 2013, Tim Kunze, Luise Lang and Christoph Dinh. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the TriggerControl class.
+* @brief    Contains the implementation of the TriggerControlclass.
 *
 */
 
@@ -40,6 +41,8 @@
 
 #include "triggercontrol.h"
 #include "FormFiles/triggercontrolsetupwidget.h"
+
+#include "serialport.h"
 
 
 //*************************************************************************************************************
@@ -68,6 +71,9 @@ using namespace XMEASLIB;
 
 TriggerControl::TriggerControl()
 : m_pTriggerOutput(NULL)
+, m_iBaud(115000)
+, m_pSerialPort(new SerialPort) // initialize a new serial port
+, m_iNumChs(0)
 {
 
 }
@@ -98,19 +104,19 @@ QSharedPointer<IPlugin> TriggerControl::clone() const
 void TriggerControl::init()
 {
     // Input
-    m_pRTMSAInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "SourceLabIn", "SourceLab input data");
+    m_pRTMSAInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "TriggerControlInI", "TriggerControl input data I");
     connect(m_pRTMSAInput.data(), &PluginInputConnector::notify, this, &TriggerControl::update, Qt::DirectConnection);
     m_inputConnectors.append(m_pRTMSAInput);
 
-    // Output
-    m_pTriggerOutput = PluginOutputData<NewRealTimeSampleArray>::create(this, "DummyOut", "Dummy output data");
-    m_outputConnectors.append(m_pTriggerOutput);
+//    // Output
+//    m_pTriggerOutput = PluginOutputData<NewRealTimeSampleArray>::create(this, "DummyOut", "Dummy output data");
+//    m_outputConnectors.append(m_pTriggerOutput);
 
-    m_pTriggerOutput->data()->setName("Dummy Output");
-    m_pTriggerOutput->data()->setUnit("");
-    m_pTriggerOutput->data()->setMinValue(0);
-    m_pTriggerOutput->data()->setMaxValue(2);
-    m_pTriggerOutput->data()->setSamplingRate(256.0/1.0);
+//    m_pTriggerOutput->data()->setName("Dummy Output");
+//    m_pTriggerOutput->data()->setUnit("");
+//    m_pTriggerOutput->data()->setMinValue(0);
+//    m_pTriggerOutput->data()->setMaxValue(2);
+//    m_pTriggerOutput->data()->setSamplingRate(256.0/1.0);
 
 }
 
@@ -121,6 +127,9 @@ bool TriggerControl::start()
 {
     QThread::start();
     return true;
+
+
+
 }
 
 
@@ -169,15 +178,12 @@ void TriggerControl::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
     QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<NewRealTimeMultiSampleArray>();
     if(pRTMSA)
     {
-//        pRTMSA->
-
-        //Auswertung des trigger kanals
-
-        //u.U. mutex.lock()
-        //m_bTriggerReceived = true;
-        //u.U. mutex.unlock()
-
-
+        m_qMutex.lock();
+        m_iNumChs = pRTMSA->getNumChannels();
+        qint32 t_iSize = pRTMSA->getMultiSampleArray().size();
+        for(qint32 i = 0; i < t_iSize; ++i)
+            m_pData.append(pRTMSA->getMultiSampleArray()[i]);//Append sample wise
+        m_qMutex.unlock();
     }
 }
 
@@ -187,24 +193,40 @@ void TriggerControl::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
 void TriggerControl::run()
 {
-    int count = 0;
-    double v = 0;
+qDebug() << "in run method" << endl;
+
+    if(m_pSerialPort->open())   // open Serial Port
+    {
+        QByteArray m_data;
+        m_data.clear();
+        m_data[0] = m_data[0]|0x01;
+        m_pSerialPort->sendData(m_data);
+        qDebug() << "data sent" << endl;
+        m_pSerialPort->close();
+    }
+    else
+    {
+        qDebug() << "Sending not possible, please check settings" << endl;
+    }
 
 
 
-    //send byte to trigger
-
-    //.......
-
-    //timer start
+    m_qTime.start();
 
 
     while(true)
     {
-        //u.U. mutex.lock()
-//        if(m_bTriggerReceived)
-//            timer stop
-        //u.U. mutex.unlock()
+        m_qMutex.lock();
+
+        while(m_pData.size() > 0)
+        {
+            if(m_pData.first()[m_iNumChs-2] > 9999)
+                qDebug() << "Time elpased: " << m_qTime.elapsed();
+
+            m_pData.pop_front();
+        }
+
+        m_qMutex.unlock();
     }
 
 
@@ -214,18 +236,19 @@ void TriggerControl::run()
 
 
 
+//    int count = 0;
+//    double v = 0;
 
-    while (true)
-    {
-        //ToDo: Implement your algorithm here
+//    while (true)
+//    {
+//        //ToDo: Implement your algorithm here
 
-        if( (count % 5 == 0) )
-            v = count % 2;
+//        if( (count % 5 == 0) )
+//            v = count % 2;
 
-        m_pTriggerOutput->data()->setValue(v);
+//        m_pTriggerOutput->data()->setValue(v);
 
-        msleep((1.0/256.0)*1000.0);
-        ++count;
-    }
+//        msleep((1.0/256.0)*1000.0);
+//        ++count;
+//    }
 }
-

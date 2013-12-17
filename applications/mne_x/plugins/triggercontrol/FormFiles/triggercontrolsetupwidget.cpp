@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
-* @file     dummysetupwidget.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+* @file     triggercontrolsetupwidget.cpp
+* @author   Tim Kunze <tim.kunze@tu-ilmenau.de>
+*           Luise Lang <luise.lang@tu-ilmenau.de>
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     February, 2013
+* @date     November, 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2013, Tim Kunze, Luise Lang and Christoph Dinh. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the ECGSetupWidget class.
+* @brief    Contains the implementation of the TriggerControlSetupWidget class.
 *
 */
 
@@ -41,6 +42,8 @@
 #include "triggercontrolsetupwidget.h"
 #include "triggercontrolaboutwidget.h"
 #include "settingswidget.h"
+
+#include "serialport.h"
 
 #include "../triggercontrol.h"
 
@@ -73,11 +76,28 @@ TriggerControlSetupWidget::TriggerControlSetupWidget(TriggerControl* toolbox, QW
     ui.setupUi(this);
 
     connect(ui.m_qPushButton_About, &QPushButton::released, this, &TriggerControlSetupWidget::showAboutDialog);
-
-
     connect(ui.m_qPushButton_Settings, &QPushButton::released, this, &TriggerControlSetupWidget::showSettings);
-}
 
+
+
+    // initialize Buttons
+    ui.m_qPushButton_Connect->setEnabled(true);
+    ui.m_qPushButton_Disconnect->setEnabled(false);
+    ui.m_qPushButton_Send->setEnabled(false);
+
+
+
+//    connect(ui.m_qPushButton_Connect, SIGNAL(released()), this, SLOT( m_port_tsw->openSerialPort(TriggerControl::Settings m_pTriggerControl->m_currentSettings)));
+//    connect(ui.m_qPushButton_Disconnect, SIGNAL(released()), this, SLOT(closeSerialPort()));
+//    connect(ui->pushButton_send,SIGNAL(released()),this, SLOT(sendData()));
+
+
+
+
+    //Bsp Parameter
+
+    m_pTriggerControl->m_bBspBool = true;
+}
 
 //*************************************************************************************************************
 
@@ -102,6 +122,88 @@ void TriggerControlSetupWidget::showSettings()
 {
     SettingsWidget settingsWidget(this);
     settingsWidget.exec();
+}
 
-    qDebug() << "Here";
+
+
+void TriggerControlSetupWidget::on_m_qPushButton_Connect_released()
+{
+    if (m_pTriggerControl->m_pSerialPort->open())
+    {
+        qDebug() << "Port geöffnet" << endl;
+        ui.m_qPushButton_Connect->setEnabled(false);
+        ui.m_qPushButton_Disconnect->setEnabled(true);
+        ui.m_qPushButton_Send->setEnabled(true);
+    }
+    else
+    {
+        qDebug() << "Port konnte nicht geöffnet werden" << endl;
+    }
+}
+
+void TriggerControlSetupWidget::on_m_qPushButton_Disconnect_released()
+{
+//    if (m_pTriggerControl->m_pSerialPort->close())
+//    {
+    m_pTriggerControl->m_pSerialPort->close();
+    qDebug() << "Port geschlossen" << endl;
+    ui.m_qPushButton_Connect->setEnabled(true);
+    ui.m_qPushButton_Disconnect->setEnabled(false);
+    ui.m_qPushButton_Send->setEnabled(false);
+//    }
+//    else
+//    {
+//        qDebug() << "Port konnte nicht geschlossen werden" << endl;
+//    }
+
+}
+
+void TriggerControlPlugin::TriggerControlSetupWidget::on_m_qPushButton_Send_released()
+{
+    // create Data byte
+
+    QByteArray data;
+//    int length = data.size();
+
+
+    // Auswerten der LED Steuerung
+
+    unsigned char steuerwert = 0;
+    if (ui.m_qRadioButton_7->isChecked()) // Auswertung HSB
+    {
+        steuerwert = steuerwert + 128;
+    }
+    if (ui.m_qRadioButton_6->isChecked())
+    {
+        steuerwert = steuerwert + 64;
+    }
+    if (ui.m_qRadioButton_5->isChecked())
+    {
+        steuerwert = steuerwert + 32;
+    }
+    if (ui.m_qRadioButton_4->isChecked())
+    {
+        steuerwert = steuerwert + 16;
+    }
+    if (ui.m_qRadioButton_3->isChecked())
+    {
+        steuerwert = steuerwert + 8;
+    }
+    if ( ui.m_qRadioButton_2->isChecked())
+    {
+        steuerwert = steuerwert + 4;
+    }
+    if (ui.m_qRadioButton_1->isChecked())
+    {
+        steuerwert = steuerwert + 2;
+    }
+    if ( ui.m_qRadioButton_0->isChecked())    // Auswertung LSB
+    {
+        steuerwert = steuerwert + 1;
+    }
+
+     qDebug() << "LEDS ausgelesen" << steuerwert << endl;
+    data[0] = steuerwert;
+
+    m_pTriggerControl->m_pSerialPort->sendData(data);
 }

@@ -42,7 +42,7 @@ CONFIG += plugin
 
 DEFINES += TRIGGERCONTROL_LIBRARY
 
-QT += core widgets
+QT += core widgets serialport
 
 TARGET = triggercontrol
 CONFIG(debug, debug|release) {
@@ -69,14 +69,16 @@ SOURCES += \
         triggercontrol.cpp \
         FormFiles/triggercontrolsetupwidget.cpp \
         FormFiles/triggercontrolaboutwidget.cpp \
-        FormFiles/settingswidget.cpp
+        FormFiles/settingswidget.cpp \
+        serialport.cpp
 
 HEADERS += \
         triggercontrol.h\
         triggercontrol_global.h \
         FormFiles/triggercontrolsetupwidget.h \
         FormFiles/triggercontrolaboutwidget.h \
-        FormFiles/settingswidget.h
+        FormFiles/settingswidget.h \
+        serialport.h
 
 FORMS += \
         FormFiles/triggercontrolsetup.ui \
