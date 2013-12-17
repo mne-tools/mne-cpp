@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
 * @file     triggercontrol.h
-* @author   Tim Kunze <tim.kunze@tu-ilmenau.de>;
+* @author   Tim Kunze <tim.kunze@tu-ilmenau.de>
+*           Luise Lang <luise.lang@tu-ilmenau.de>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 * @version  1.0
 * @date     November, 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Tim Kunze and Christoph Dinh. All rights reserved.
+* Copyright (C) 2013, Tim Kunze, Luise Lang and Christoph Dinh. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -55,7 +56,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
+#include <QTime>
 
 
 //*************************************************************************************************************
@@ -82,6 +83,9 @@ using namespace IOBuffer;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+class SettingsWidget;
+class SerialPort;
+
 
 //=============================================================================================================
 /**
@@ -97,6 +101,7 @@ class TRIGGERCONTROLSHARED_EXPORT TriggerControl : public IAlgorithm
     Q_INTERFACES(MNEX::IAlgorithm)
 
     friend class TriggerControlSetupWidget;
+    friend class SettingsWidget;
 
 public:
     //=========================================================================================================
@@ -132,14 +137,32 @@ public:
     virtual QWidget* setupWidget();
 
     void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
+//
 
 protected:
     virtual void run();
 
 private:
     PluginOutputData<NewRealTimeSampleArray>::SPtr  m_pTriggerOutput;   /**< The RealTimeSampleArray of the trigger output.*/
-
     PluginInputData<NewRealTimeMultiSampleArray>::SPtr  m_pRTMSAInput;  /**< The RealTimeMultiSampleArray input.*/
+
+
+    bool m_bBspBool;
+
+    QSharedPointer<SerialPort> m_pSerialPort;
+
+    qint32 m_iBaud;
+
+
+    QMutex m_qMutex;
+
+
+    QVector< VectorXd > m_pData;
+
+    qint32 m_iNumChs;
+
+    QTime m_qTime;
+
 };
 
 } // NAMESPACE
