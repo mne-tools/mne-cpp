@@ -382,7 +382,7 @@ bool TMSIDriver::uninitDevice()
             {
                 for(int channelIterator = 0; channelIterator < channelMax; channelIterator++)
                 {
-                    sampleMatrix(channelIterator, sampleIterator) = (m_vSampleBlockBuffer.first() * (m_bUseUnitGain ? m_vUnitGain[channelIterator] : 1) + (m_bUseUnitOffset ? m_vUnitOffSet[channelIterator] : 0)) * (m_bUseChExponent ? pow(10., (double)m_vExponentChannel[channelIterator]) : 0);
+                    sampleMatrix(channelIterator, sampleIterator) = (m_vSampleBlockBuffer.first() * (m_bUseUnitGain ? m_vUnitGain[channelIterator] : 1) + (m_bUseUnitOffset ? m_vUnitOffSet[channelIterator] : 0)) * (m_bUseChExponent ? pow(10., (double)m_vExponentChannel[channelIterator]) : 1);
                     m_vSampleBlockBuffer.pop_front();
                 }
 
