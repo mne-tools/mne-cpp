@@ -1,10 +1,11 @@
 #--------------------------------------------------------------------------------------------------------------
 #
 # @file     applications.pro
-# @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+# @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>
+#           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
-# @date     May, 2013
+# @date     December, 2013
 #
 # @section  LICENSE
 #
@@ -18,7 +19,7 @@
 #       the following disclaimer in the documentation and/or other materials provided with the distribution.
 #     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
 #       to endorse or promote products derived from this software without specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 # WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 # PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
@@ -29,22 +30,24 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds all applications.
+# @brief    This project file builds the mne_browse_raw_qt project
 #
 #--------------------------------------------------------------------------------------------------------------
 
-include(../mne-cpp.pri)
+include(../../../mne-cpp.pri)
 
-TEMPLATE = subdirs
+QT       += core gui
 
-SUBDIRS += \
-    mne_rt_server
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-contains(MNECPP_CONFIG, isGui) {
-    SUBDIRS += \
-        mne_x_libs \
-        mne_x \
-        mne_browse_raw_qt
-}
+TARGET = mne_browse_raw_qt
+TEMPLATE = app
 
-CONFIG += ordered
+DESTDIR = $${MNE_BINARY_DIR}
+
+SOURCES += main.cpp\
+        mne_browse_raw_qt.cpp
+
+HEADERS  += mne_browse_raw_qt.h
+
+FORMS    += mne_browse_raw_qt.ui
