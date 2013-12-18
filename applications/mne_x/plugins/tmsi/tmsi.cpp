@@ -477,6 +477,8 @@ bool TMSI::stop()
 
     m_pRawMatrixBuffer_In->clear();
 
+    m_pRMTSA_TMSI->data()->clear();
+
     return true;
 }
 
