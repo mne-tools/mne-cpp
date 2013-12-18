@@ -53,7 +53,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QDebug>
+#include <iostream>
 
 
 //*************************************************************************************************************
@@ -128,92 +128,89 @@ void TriggerControlSetupWidget::showSettings()
 }
 
 
-////*************************************************************************************************************
+//*************************************************************************************************************
 
-//void TriggerControlSetupWidget::on_m_qPushButton_Connect_released()
-//{
-//    if (m_pTriggerControl->m_pSerialPort->open())
-//    {
-//        qDebug() << "Port geöffnet" << endl;
-//        ui.m_qPushButton_Connect->setEnabled(false);
-//        ui.m_qPushButton_Disconnect->setEnabled(true);
-//        ui.m_qPushButton_Send->setEnabled(true);
-//    }
-//    else
-//    {
-//        qDebug() << "Port konnte nicht geöffnet werden" << endl;
-//    }
-//}
-
-
-////*************************************************************************************************************
-
-//void TriggerControlSetupWidget::on_m_qPushButton_Disconnect_released()
-//{
-////    if (m_pTriggerControl->m_pSerialPort->close())
-////    {
-//    m_pTriggerControl->m_pSerialPort->close();
-//    qDebug() << "Port geschlossen" << endl;
-//    ui.m_qPushButton_Connect->setEnabled(true);
-//    ui.m_qPushButton_Disconnect->setEnabled(false);
-//    ui.m_qPushButton_Send->setEnabled(false);
-////    }
-////    else
-////    {
-////        qDebug() << "Port konnte nicht geschlossen werden" << endl;
-////    }
-
-//}
+void TriggerControlSetupWidget::on_m_qPushButton_Connect_released()
+{
+    if (m_pTriggerControl->m_pSerialPort->open())
+    {
+        std::cout << "Port geöffnet" << std::endl;
+        ui.m_qPushButton_Connect->setEnabled(false);
+        ui.m_qPushButton_Disconnect->setEnabled(true);
+        ui.m_qPushButton_Send->setEnabled(true);
+        ui.m_qPushButton_Settings->setEnabled(false);
+    }
+    else
+    {
+        std::cout << "Port konnte nicht geöffnet werden" << std::endl;
+    }
+}
 
 
-////*************************************************************************************************************
+//*************************************************************************************************************
 
-//void TriggerControlPlugin::TriggerControlSetupWidget::on_m_qPushButton_Send_released()
-//{
-//    // create Data byte
+void TriggerControlSetupWidget::on_m_qPushButton_Disconnect_released()
+{
 
-//    QByteArray data;
-////    int length = data.size();
+    m_pTriggerControl->m_pSerialPort->close();
+    std::cout << "Port geschlossen" << std::endl;
+    ui.m_qPushButton_Connect->setEnabled(true);
+    ui.m_qPushButton_Disconnect->setEnabled(false);
+    ui.m_qPushButton_Send->setEnabled(false);
+    ui.m_qPushButton_Settings->setEnabled(true);
 
 
-//    // Auswerten der LED Steuerung
+}
 
-//    unsigned char steuerwert = 0;
-//    if (ui.m_qRadioButton_7->isChecked()) // Auswertung HSB
-//    {
-//        steuerwert = steuerwert + 128;
-//    }
-//    if (ui.m_qRadioButton_6->isChecked())
-//    {
-//        steuerwert = steuerwert + 64;
-//    }
-//    if (ui.m_qRadioButton_5->isChecked())
-//    {
-//        steuerwert = steuerwert + 32;
-//    }
-//    if (ui.m_qRadioButton_4->isChecked())
-//    {
-//        steuerwert = steuerwert + 16;
-//    }
-//    if (ui.m_qRadioButton_3->isChecked())
-//    {
-//        steuerwert = steuerwert + 8;
-//    }
-//    if ( ui.m_qRadioButton_2->isChecked())
-//    {
-//        steuerwert = steuerwert + 4;
-//    }
-//    if (ui.m_qRadioButton_1->isChecked())
-//    {
-//        steuerwert = steuerwert + 2;
-//    }
-//    if ( ui.m_qRadioButton_0->isChecked())    // Auswertung LSB
-//    {
-//        steuerwert = steuerwert + 1;
-//    }
 
-//     qDebug() << "LEDS ausgelesen" << steuerwert << endl;
-//    data[0] = steuerwert;
+//*************************************************************************************************************
 
-//    m_pTriggerControl->m_pSerialPort->sendData(data);
-//}
+void TriggerControlPlugin::TriggerControlSetupWidget::on_m_qPushButton_Send_released()
+{
+    // create Data byte
+
+    QByteArray data;
+//    int length = data.size();
+
+
+    // Auswerten der LED Steuerung
+
+    unsigned char steuerwert = 0;
+    if (ui.m_qRadioButton_7->isChecked()) // Auswertung HSB
+    {
+        steuerwert = steuerwert + 128;
+    }
+    if (ui.m_qRadioButton_6->isChecked())
+    {
+        steuerwert = steuerwert + 64;
+    }
+    if (ui.m_qRadioButton_5->isChecked())
+    {
+        steuerwert = steuerwert + 32;
+    }
+    if (ui.m_qRadioButton_4->isChecked())
+    {
+        steuerwert = steuerwert + 16;
+    }
+    if (ui.m_qRadioButton_3->isChecked())
+    {
+        steuerwert = steuerwert + 8;
+    }
+    if ( ui.m_qRadioButton_2->isChecked())
+    {
+        steuerwert = steuerwert + 4;
+    }
+    if (ui.m_qRadioButton_1->isChecked())
+    {
+        steuerwert = steuerwert + 2;
+    }
+    if ( ui.m_qRadioButton_0->isChecked())    // Auswertung LSB
+    {
+        steuerwert = steuerwert + 1;
+    }
+
+     std::cout << "LEDS ausgelesen" << steuerwert << std::endl;
+    data[0] = steuerwert;
+
+    m_pTriggerControl->m_pSerialPort->sendData(data);
+}
