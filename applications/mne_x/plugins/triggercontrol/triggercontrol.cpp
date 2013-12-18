@@ -187,9 +187,9 @@ QString TriggerControl::getName() const
 
 QWidget* TriggerControl::setupWidget()
 {
-//    TriggerControlSetupWidget* setupWidget = new TriggerControlSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
+    TriggerControlSetupWidget* setupWidget = new TriggerControlSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
 
-    QWidget* setupWidget = new QWidget;
+  //  QWidget* setupWidget = new QWidget;
     return setupWidget;
 }
 

@@ -114,22 +114,33 @@ void SerialPort::initSettings()
 
 void SerialPort::initPort()
 {
-    QString sPortName;
-
     QList<QSerialPortInfo> t_qListPortInfo = QSerialPortInfo::availablePorts();
 
-//    foreach (const QSerialPortInfo &info, QSerialPortInfo::availablePorts()) {
-// qDebug() << "Port gefunden und geändert, "<< info.portName() << endl;
-//        sPortName = info.portName();
+    bool t_correctPort = false;
 
+//    if(t_qListPortInfo.size() > 1)
+//    {
+//        m_currentSettings.name = t_qListPortInfo[1].portName();
+//        qDebug() << t_qListPortInfo[1].description().toLatin1() << endl;
+//        m_qSerialPort.setPortName( t_qListPortInfo[1].portName());
 //    }
 
-    if(t_qListPortInfo.size() > 1)
+    for (int t_count = 0; t_count <= t_qListPortInfo.size();t_count++)
     {
-        m_currentSettings.name = t_qListPortInfo[1].portName();
+        if (t_qListPortInfo[t_count].description() == "Silicon Labs CP210x USB to UART Bridge")
+        {
 
-        m_qSerialPort.setPortName( t_qListPortInfo[1].portName());
+            t_correctPort = true;
+            m_currentSettings.name = t_qListPortInfo[t_count].portName();
+            m_qSerialPort.setPortName( t_qListPortInfo[t_count].portName());
+            break;
+        }
     }
+
+    if(t_correctPort)
+        qDebug() << "correct port was found";
+    else
+        qDebug() << "correct port was not found";
 
 }
 
@@ -170,21 +181,13 @@ bool SerialPort::open()
                       << "Databits" << m_currentSettings.stringDataBits.toLatin1().data()
                       << "Parity" << m_currentSettings.stringParity.toLatin1().data()
                       << "FlowControl" << m_currentSettings.stringFlowControl.toLatin1().data()  << std::endl;
-//            ui->pushButton_connect->setEnabled(false);
-//            ui->pushButton_disconnect->setEnabled(true);
-//            ui->pushButton_opensettings->setEnabled(false);
-//            ui->pushButton_send->setEnabled(true);
-//            ui->statusBar->showMessage(tr("Verbunden mit %1 : %2, %3, %4, %5, %6")
-//                                       .arg(p.name).arg(p.stringBaudRate).arg(p.stringDataBits)
-//                                       .arg(p.stringParity).arg(p.stringStopBits)
-//                                       .arg(p.stringFlowControl));
+
             success = true;
         }
         else
         {    std::cout << "nicht geöffnet, Fehler mit KOnfigurationszuweisung" << std::endl;
-            m_qSerialPort.close();
-         //   QMessageBox::critical(this,tr("Error"),serial->errorString());
-          //  ui->statusBar->showMessage(tr("Fehler beim Öffnen"));
+             m_qSerialPort.close();
+
             success = false;
         }
 
@@ -192,8 +195,7 @@ bool SerialPort::open()
     else
     {
         std::cout << "nicht geöffnet, Fehler schon beim readwriteöffnen" << std::endl;
-       // QMessageBox::critical(this,tr("Error"),serial->errorString());
-      //  ui->statusBar->showMessage(tr("Konfigurationsfehler"));
+
         success = false;
     }
 
