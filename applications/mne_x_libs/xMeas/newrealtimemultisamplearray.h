@@ -101,12 +101,11 @@ public:
     */
     virtual ~NewRealTimeMultiSampleArray();
 
-
-    void clear()
-    {
-        m_matSamples.clear();
-    }
-
+    //=========================================================================================================
+    /**
+    * Clears all the data stored in the buffer.
+    */
+    void clear();
 
     //=========================================================================================================
     /**
@@ -221,6 +220,11 @@ private:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
+
+inline void NewRealTimeMultiSampleArray::clear()
+{
+    m_matSamples.clear();
+}
 
 inline void NewRealTimeMultiSampleArray::setSamplingRate(double dSamplingRate)
 {

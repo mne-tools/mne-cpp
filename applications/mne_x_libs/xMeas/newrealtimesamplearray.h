@@ -100,6 +100,12 @@ public:
 
     //=========================================================================================================
     /**
+    * Clears all the data stored in the buffer.
+    */
+    void clear();
+
+    //=========================================================================================================
+    /**
     * Sets the minimal value. If current value to set is smaller, current value is set to minimal value.
     *
     * @param [in] minValue minimal value.
@@ -219,6 +225,11 @@ private:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
+
+inline void NewRealTimeSampleArray::clear()
+{
+    m_vecSamples.clear();
+}
 
 inline void NewRealTimeSampleArray::setMinValue(double minValue)
 {
