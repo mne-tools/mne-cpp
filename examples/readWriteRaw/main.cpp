@@ -81,10 +81,11 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    QFile t_fileIn("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+//    QFile t_fileIn("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
 //    QFile t_fileIn("./MNE-sample-data/MEG/test_output.fif");
+    QFile t_fileIn("./MNE-sample-data/MEG/sample/sample_write/test_output.fif");
 
-    QFile t_fileOut("./MNE-sample-data/MEG/test_output.fif");
+    QFile t_fileOut("./MNE-sample-data/MEG/sample/sample_write/test_output2.fif");
 //    QFile t_fileOut("./MNE-sample-data/MEG/test_output2.fif");
 
     //
@@ -119,7 +120,7 @@ int main(int argc, char *argv[])
     //
     MatrixXd cals;
 
-    FiffStream::SPtr outfid = Fiff::start_writing_raw(t_fileOut,raw.info, cals, picks);
+    FiffStream::SPtr outfid = Fiff::start_writing_raw(t_fileOut,raw.info, cals/*, picks*/);
     //
     //   Set up the reading parameters
     //
@@ -149,7 +150,7 @@ int main(int argc, char *argv[])
             last = to;
         }
 
-        if (!raw.read_raw_segment(data,times,first,last,picks))
+        if (!raw.read_raw_segment(data,times,first,last/*,picks*/))
         {
                 printf("error during read_raw_segment\n");
                 return -1;
