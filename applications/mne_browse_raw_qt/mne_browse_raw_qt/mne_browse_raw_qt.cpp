@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
-* @file     asaelc.h
-* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+* @file     main.cpp
+* @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     November, 2013
+* @date     December, 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,98 +30,59 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    AsAElc class declaration.
+* @brief    Implements the mne_browse_raw_qt GUI application.
 *
 */
-
-#ifndef ASAELC_H
-#define ASAELC_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "utils_global.h"
-
+#include "mne_browse_raw_qt.h"
+#include "ui_mne_browse_raw_qt.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
-#include <QSharedPointer>
-#include <QVector>
+#include <QFileDialog>
 #include <QFile>
+#include <QMessageBox>
 #include <QTextStream>
-#include <QStringList>
-#include <QDebug>
-
 
 //*************************************************************************************************************
-//=============================================================================================================
-// Eigen INCLUDES
-//=============================================================================================================
 
-#include <Eigen/Core>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE MNELIB
-//=============================================================================================================
-
-namespace UTILSLIB
+mne_browse_raw_qt::mne_browse_raw_qt(QWidget *parent) :
+    QMainWindow(parent),
+    ui(new Ui::mne_browse_raw_qt)
 {
+    ui->setupUi(this);
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace Eigen;
-
+    //Set normal window size and maximize window
+    this->setWindowState(Qt::WindowMaximized);
+}
 
 //*************************************************************************************************************
-//=============================================================================================================
-// DEFINES
-//=============================================================================================================
 
-
-//=============================================================================================================
-/**
-* Processes AsA .elc files which contain the electrode positions of a EEG hat.
-*
-* @brief Processes AsA .elc files which contain the electrode positions of a EEG hat.
-*/
-class UTILSSHARED_EXPORT AsAElc
+mne_browse_raw_qt::~mne_browse_raw_qt()
 {
-public:
-    typedef QSharedPointer<AsAElc> SPtr;            /**< Shared pointer type for AsAElc. */
-    typedef QSharedPointer<const AsAElc> ConstSPtr; /**< Const shared pointer type for AsAElc. */
+    delete ui;
+}
 
-    //=========================================================================================================
-    /**
-    * Constructs a Filter object.
-    */
-    AsAElc();
+//*************************************************************************************************************
 
+void mne_browse_raw_qt::on_actionExit_triggered()
+{
+    qApp->quit();
+}
 
-    //=========================================================================================================
-    /**
-    * Gets the impulse response of a static precalculated (matlab) filter.
-    * @param [in] path holds the file path of the elc file which is to be read.
-    * @param [in] location3D holds the vector to which the read 3D positions are stored.
-    * @param [in] location2D holds the vector to which the read 2D positions are stored.
-    * @param [out] bool returns true if reading was successful, false otherwise.
-    */
-    bool readElcFile(QString path, QStringList &channelNames, QVector<QVector<double> > &location3D, QVector<QVector<double> > &location2D, QString &unit);
+//*************************************************************************************************************
 
-private:
+void mne_browse_raw_qt::on_actionOpen_triggered()
+{
+    QString filename = QFileDialog::getOpenFileName(this,QString("Open fiff data file"),QString("./MNE-sample-data/MEG/sample/"),tr("fif data files (*.fif)"));
 
-};
-
-} // NAMESPACE
-
-#endif // ASAELC_H
+    ui->textEdit->setText(filename);
+}

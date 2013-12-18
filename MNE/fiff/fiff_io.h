@@ -1,8 +1,8 @@
 //=============================================================================================================
 /**
 * @file     fiff_io.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
+* @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     July, 2012
@@ -156,22 +156,35 @@ public:
 
     //=========================================================================================================
     /**
-    * Write data to a p_IODevice.
+    * Write data to a single p_IODevice.
     *
     * @param[in] p_IODevice             A fiff IO device like a fiff QFile or QTCPSocket
     * @param[in] type of data to write  fiff constants types, e.g. FIFFB_RAW_DATA
-    * @param[in] idx                    index of type, 0 for all entities of this type
+    * @param[in] idx                    index of type, -1 for all entities of this type
     *
     */
-    bool write(QIODevice& p_IODevice, fiff_int_t type, fiff_int_t idx);
+    bool write(QIODevice& p_IODevice, const fiff_int_t type, const fiff_int_t idx) const;
 
     //=========================================================================================================
     /**
-    * Write data to a p_IODevice.
+    * Write whole data of a type to a fiff file.
     *
-    * @param[in] p_IODevice    A fiff IO device like a fiff QFile or QTCPSocket
+    * @param[in] filename    filename including the path but not the type, e.g. ./sample_date/sample_audvis.fif -> will be extended to ./sample_date/sample_audvis-type-1.fif
+    * @param[in] type of data to write  fiff constants types, e.g. FIFFB_RAW_DATA
+    * @param[in] idx                    index of type, -1 for all entities of this type
     */
-    //bool write(QString filename, QString folder = "./"); //including AutoFileNaming, e.g. -raw/evoked/fwd.fiff
+    bool write(QFile& p_QFile, const fiff_int_t type, const fiff_int_t idx) const;
+
+    //=========================================================================================================
+    /**
+    * Write raw data to a p_IODevice.
+    *
+    * @param[in] p_IODevice             A fiff IO device like a fiff QFile or QTCPSocket
+    * @param[in] type of data to write  fiff constants types, e.g. FIFFB_RAW_DATA
+    * @param[in] idx                    index of type, -1 for all entities of this type
+    *
+    */
+    bool write_raw(QIODevice& p_IODevice, const fiff_int_t idx) const;
 
     //=========================================================================================================
     /**
@@ -189,7 +202,7 @@ public:
         return out;
     }
 
-private:
+public:
     QList<QSharedPointer<FiffRawData> > m_qlistRaw;
     QList<QSharedPointer<FiffEvoked> > m_qlistEvoked;
 //    QList<QSharedPointer<MNEForwardSolution> > m_qlistFwd;
