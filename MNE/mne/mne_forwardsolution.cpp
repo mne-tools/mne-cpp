@@ -377,6 +377,7 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(AnnotationSet &p
 //                            p_fwdOut.src[h].nn.row(count) = MatrixXd::Zero(1,3);
 
                             p_fwdOut.src[h].vertno[count] = this->src[h].vertno[sel_idx];
+
                             ++count;
                         }
                     }
@@ -396,6 +397,9 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(AnnotationSet &p
 //        p_fwdOut.src[h].rr.conservativeResize(count, 3);
 //        p_fwdOut.src[h].nn.conservativeResize(count, 3);
         p_fwdOut.src[h].vertno.conservativeResize(count);
+
+//        std::cout << "Vertno hemisphere:" << h << std::endl << p_fwdOut.src[h].vertno << std::endl;
+
 
 //        p_fwdOut.src[h].nuse_tri = 0;
 //        p_fwdOut.src[h].use_tris = MatrixX3i(0,3);
