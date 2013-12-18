@@ -62,7 +62,7 @@ AsAElc::AsAElc()
 
 //*************************************************************************************************************
 
-bool AsAElc::readElcFile(QString path, QStringList &channelNames, QVector<QVector<double>> &location3D, QVector<QVector<double>> &location2D, QString &unit)
+bool AsAElc::readElcFile(QString path, QStringList &channelNames, QVector<QVector<double> > &location3D, QVector<QVector<double> > &location2D, QString &unit)
 {
     //Open .elc file
     if(!path.contains(".elc"))
