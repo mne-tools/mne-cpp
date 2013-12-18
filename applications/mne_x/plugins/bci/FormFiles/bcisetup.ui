@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>TMSISetupClass</class>
- <widget class="QWidget" name="TMSISetupClass">
+ <class>BCISetupClass</class>
+ <widget class="QWidget" name="BCISetupClass">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -68,9 +68,6 @@
        <layout class="QFormLayout" name="formLayout">
         <item row="0" column="0">
          <widget class="QCheckBox" name="m_checkBox_UseFFT">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
           <property name="text">
            <string>Use FFT</string>
           </property>
@@ -145,39 +142,16 @@
        </property>
        <layout class="QGridLayout" name="m_qGridLayout_Properties">
         <item row="5" column="0">
+         <widget class="QCheckBox" name="m_checkBox_ConvertToVolt">
+          <property name="text">
+           <string>Convert to Volt</string>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="0">
          <widget class="QCheckBox" name="m_checkBox_UseUnitOffset">
           <property name="text">
            <string>Use unit offset</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QSpinBox" name="m_spinBox_SamplingFreq">
-          <property name="minimum">
-           <number>8</number>
-          </property>
-          <property name="maximum">
-           <number>2048</number>
-          </property>
-          <property name="value">
-           <number>1024</number>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0">
-         <widget class="QLabel" name="m_qLabel_SamplingRate">
-          <property name="layoutDirection">
-           <enum>Qt::LeftToRight</enum>
-          </property>
-          <property name="text">
-           <string>Sampling Frequency (Hz):</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="m_qLabel_NumberOfChannels">
-          <property name="text">
-           <string>Number of channels</string>
           </property>
          </widget>
         </item>
@@ -194,6 +168,29 @@
           </property>
          </widget>
         </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="m_qLabel_SamplingRate">
+          <property name="layoutDirection">
+           <enum>Qt::LeftToRight</enum>
+          </property>
+          <property name="text">
+           <string>Sampling Frequency (Hz):</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QSpinBox" name="m_spinBox_SamplingFreq">
+          <property name="minimum">
+           <number>8</number>
+          </property>
+          <property name="maximum">
+           <number>2048</number>
+          </property>
+          <property name="value">
+           <number>1024</number>
+          </property>
+         </widget>
+        </item>
         <item row="1" column="1">
          <widget class="QSpinBox" name="m_spinBox_NumberOfChannels">
           <property name="minimum">
@@ -207,10 +204,10 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="0">
-         <widget class="QCheckBox" name="m_checkBox_UseUnitGain">
+        <item row="1" column="0">
+         <widget class="QLabel" name="m_qLabel_NumberOfChannels">
           <property name="text">
-           <string>Use unit gain</string>
+           <string>Number of channels</string>
           </property>
          </widget>
         </item>
@@ -218,6 +215,13 @@
          <widget class="QLabel" name="m_qLabel_SamplesPerBlock">
           <property name="text">
            <string>Samples taken per block</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QCheckBox" name="m_checkBox_UseUnitGain">
+          <property name="text">
+           <string>Use unit gain</string>
           </property>
          </widget>
         </item>

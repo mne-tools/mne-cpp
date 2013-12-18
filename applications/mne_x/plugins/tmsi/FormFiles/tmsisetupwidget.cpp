@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
 * @file     tmsisetupwidget.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     September 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2013, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -82,8 +83,6 @@ TMSISetupWidget::TMSISetupWidget(TMSI* pTMSI, QWidget* parent)
             this, &TMSISetupWidget::setDeviceSamplingProperties);
 
     //Connect channel corrections
-    connect(ui.m_checkBox_ConvertToVolt, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
-            this, &TMSISetupWidget::setDeviceSamplingProperties);
     connect(ui.m_checkBox_UseChExponent, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
             this, &TMSISetupWidget::setDeviceSamplingProperties);
     connect(ui.m_checkBox_UseUnitGain, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
@@ -146,7 +145,6 @@ void TMSISetupWidget::initGui()
     ui.m_spinBox_SamplesPerBlock->setValue(m_pTMSI->m_iSamplesPerBlock);
 
     //Init channel corrections
-    ui.m_checkBox_ConvertToVolt->setChecked(m_pTMSI->m_bConvertToVolt);
     ui.m_checkBox_UseChExponent->setChecked(m_pTMSI->m_bUseChExponent);
     ui.m_checkBox_UseUnitGain->setChecked(m_pTMSI->m_bUseUnitGain);
     ui.m_checkBox_UseUnitOffset->setChecked(m_pTMSI->m_bUseUnitOffset);
@@ -175,7 +173,6 @@ void TMSISetupWidget::setDeviceSamplingProperties()
     m_pTMSI->m_iNumberOfChannels = ui.m_spinBox_NumberOfChannels->value();
     m_pTMSI->m_iSamplesPerBlock = ui.m_spinBox_SamplesPerBlock->value();
 
-    m_pTMSI->m_bConvertToVolt = ui.m_checkBox_ConvertToVolt->isChecked();
     m_pTMSI->m_bUseChExponent = ui.m_checkBox_UseChExponent->isChecked();
     m_pTMSI->m_bUseUnitGain = ui.m_checkBox_UseUnitGain->isChecked();
     m_pTMSI->m_bUseUnitOffset = ui.m_checkBox_UseUnitOffset->isChecked();

@@ -1,11 +1,11 @@
 //=============================================================================================================
 /**
-* @file     tmsiproducer.cpp
+* @file     bciaboutwidget.h
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* 			Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     September, 2013
+* @date     December, 2013
 *
 * @section  LICENSE
 *
@@ -30,20 +30,37 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the TMSIProducer class.
+* @brief    Contains the declaration of the BCIAboutWidget class.
 *
 */
+
+#ifndef BCIABOUTWIDGET_H
+#define BCIABOUTWIDGET_H
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "tmsiproducer.h"
-#include "tmsi.h"
-#include "tmsidriver.h"
+#include "../ui_bciabout.h"
 
-#include <QDebug>
+
+//*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QtWidgets>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE TMSIPlugin
+//=============================================================================================================
+
+namespace BCIPlugin
+{
 
 
 //*************************************************************************************************************
@@ -51,92 +68,44 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace TMSIPlugin;
-
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
-TMSIProducer::TMSIProducer(TMSI* pTMSI)
-: m_pTMSI(pTMSI)
-, m_pTMSIDriver(new TMSIDriver(this))
-, m_bIsRunning(true)
+
+//=============================================================================================================
+/**
+* DECLARE CLASS BCIAboutWidget
+*
+* @brief The BCIAboutWidget class provides the about dialog for the BCI.
+*/
+class BCIAboutWidget : public QDialog
 {
-}
+    Q_OBJECT
 
+public:
 
-//*************************************************************************************************************
+    //=========================================================================================================
+    /**
+    * Constructs a BCIAboutWidget dialog which is a child of parent.
+    *
+    * @param [in] parent pointer to parent widget; If parent is 0, the new BCIAboutWidget becomes a window. If parent is another widget, BCIAboutWidget becomes a child window inside parent. TMSIAboutWidget is deleted when its parent is deleted.
+    */
+    BCIAboutWidget(QWidget *parent = 0);
 
-TMSIProducer::~TMSIProducer()
-{
-    //cout << "TMSIProducer::~TMSIProducer()" << endl;
-}
+    //=========================================================================================================
+    /**
+    * Destroys the BCIAboutWidget.
+    * All BCIAboutWidget's children are deleted first. The application exits if BCIAboutWidget is the main widget.
+    */
+    ~BCIAboutWidget();
 
+private:
+    Ui::BCIAboutWidgetClass ui;    /**< Holds the user interface for the BCIAboutWidgetClass.*/
+};
 
-//*************************************************************************************************************
+} // NAMESPACE
 
-void TMSIProducer::start(int iNumberOfChannels,
-                     int iSamplingFrequency,
-                     int iSamplesPerBlock,
-                     bool bUseChExponent,
-                     bool bUseUnitGain,
-                     bool bUseUnitOffset,
-                     bool bWriteDriverDebugToFile,
-                     QString sOutputFilePath)
-{
-    //Initialise device
-    if(m_pTMSIDriver->initDevice(iNumberOfChannels,
-                              iSamplingFrequency,
-                              iSamplesPerBlock,
-                              bUseChExponent,
-                              bUseUnitGain,
-                              bUseUnitOffset,
-                              bWriteDriverDebugToFile,
-                              sOutputFilePath))
-    {
-        m_bIsRunning = true;
-        QThread::start();
-    }
-    else
-        m_bIsRunning = false;
-}
-
-
-//*************************************************************************************************************
-
-void TMSIProducer::stop()
-{
-    //Wait until this thread (TMSIProducer) is stopped
-    m_bIsRunning = false;
-
-    //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the push function (acquire statement)
-    m_pTMSI->m_pRawMatrixBuffer_In->releaseFromPush();
-
-    while(this->isRunning())
-        m_bIsRunning = false;
-
-    //Uinitialise device only after the thread stopped
-    m_pTMSIDriver->uninitDevice();
-}
-
-
-//*************************************************************************************************************
-
-void TMSIProducer::run()
-{
-    MatrixXf matRawBuffer(m_pTMSI->m_iNumberOfChannels, m_pTMSI->m_iSamplesPerBlock);
-
-    while(m_bIsRunning)
-    {
-        //std::cout<<"TMSIProducer::run()"<<std::endl;
-        //Get the TMSi EEG data out of the device buffer and write received data to circular buffer
-        if(m_pTMSIDriver->getSampleMatrixValue(matRawBuffer))
-            m_pTMSI->m_pRawMatrixBuffer_In->push(&matRawBuffer);
-    }
-
-    //std::cout<<"EXITING - TMSIProducer::run()"<<std::endl;
-}
-
-
+#endif // TMSIABOUTWIDGET_H

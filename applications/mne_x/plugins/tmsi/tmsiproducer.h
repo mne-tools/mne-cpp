@@ -5,7 +5,7 @@
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     September, 2013
 *
 * @section  LICENSE
 *
@@ -109,7 +109,6 @@ public:
     * @param [in] iNumberOfChannels The number of channels defined by the user via the GUI.
     * @param [in] iSamplingFrequency The sampling frequency defined by the user via the GUI (in Hertz).
     * @param [in] iSamplesPerBlock The samples per block defined by the user via the GUI.
-    * @param [in] bConvertToVolt Flag for converting the values to Volt. Defined by the user via the GUI.
     * @param [in] bUseChExponent Flag for using the channels exponent. Defined by the user via the GUI.
     * @param [in] bUseUnitGain Flag for using the channels unit gain. Defined by the user via the GUI.
     * @param [in] sOutpuFilePath Holds the path for the output file. Defined by the user via the GUI.
@@ -119,7 +118,6 @@ public:
     virtual void start(int iNumberOfChannels,
                        int iSamplingFrequency,
                        int iSamplesPerBlock,
-                       bool bConvertToVolt,
                        bool bUseChExponent,
                        bool bUseUnitGain,
                        bool bUseUnitOffset,

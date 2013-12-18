@@ -78,7 +78,7 @@ TriggerControl::TriggerControl()
 , m_iNumChs(0)
 , m_bIsRunning(false)
 {
-
+    connect(this, &TriggerControl::sendByte, this, &TriggerControl::sendByteTo);
 }
 
 
@@ -128,16 +128,16 @@ void TriggerControl::init()
 
 bool TriggerControl::start()
 {
-    QThread::start();
     m_bIsRunning = true;
-
-    m_qTime.start();
+    QThread::start();
 
     if(m_pSerialPort->open())   // open Serial Port
     {
         QByteArray t_data;
         t_data.append(0x01);
 //        t_data[0] = t_data[0]|0x01;
+
+        m_qTime.start();
         m_pSerialPort->sendData(t_data);
         std::cout << "data sent" << std::endl;
     }
@@ -162,6 +162,16 @@ bool TriggerControl::stop()
 //    // Stop threads
 //    QThread::terminate();
 //    QThread::wait();
+
+    double sum = 0;
+    for(int i=0; i<m_vTimes.size(); i++)
+        sum += m_vTimes[i];
+
+    std::cout << "Average time: " << sum/m_vTimes.size() << std::cout;
+    std::cout << "Size m_vTimes: " << m_vTimes.size() << std::cout;
+
+    m_pData.clear();
+    m_vTimes.clear();
 
     return true;
 }
@@ -216,18 +226,61 @@ void TriggerControl::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
 void TriggerControl::run()
 {
+    m_pData.clear();
+    //std::cout << "m_pData.size() " << m_pData.size() << std::endl;
+
+
+    bool t_bFound = false;
+
+    int count = 0;
+
 
     while(m_bIsRunning)
     {
         m_qMutex.lock();
 
-        while(m_pData.size() > 0)
+        if(t_bFound && m_pData.size() > 0)
         {
-            if(m_pData.first()[m_iNumChs-2] > 9999)
-                qDebug() << "Time elpased: " << m_qTime.elapsed();
+            m_pData.clear();
+            ++count;
+
+            if(count > 2)
+            {
+                t_bFound = false;
+                count = 0;
+
+                emit sendByte(1);
+                m_qTime.start();
+            }
+
+        }
+
+        if(m_pData.size() > 0)
+        {
+            if(!t_bFound && m_pData.first()[m_iNumChs-2] > 1000)
+            {
+                //std::cout << "Time elpased: " << m_qTime.elapsed() << std::endl;
+
+                m_vTimes.push_back(m_qTime.elapsed());
+                emit sendByte(0);
+
+                t_bFound = true;
+            }
 
             m_pData.pop_front();
         }
+
+//        while(m_pData.size() > 0)
+//        {
+//            if(m_pData.first()[m_iNumChs-2] > 1000)
+//            {
+//                std::cout << "Time elpased: " << m_qTime.elapsed() << std::endl;
+
+//                m_bIsRunning = false;
+//            }
+
+//            m_pData.pop_front();
+//        }
 
         m_qMutex.unlock();
     }
@@ -254,4 +307,14 @@ void TriggerControl::run()
 //        msleep((1.0/256.0)*1000.0);
 //        ++count;
 //    }
+}
+
+
+//*************************************************************************************************************
+
+void TriggerControl::sendByteTo(int value)
+{
+    QByteArray t_data;
+    t_data.append(value);
+    m_pSerialPort->sendData(t_data);
 }
