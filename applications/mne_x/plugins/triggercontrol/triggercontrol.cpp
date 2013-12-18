@@ -167,8 +167,8 @@ bool TriggerControl::stop()
     for(int i=0; i<m_vTimes.size(); i++)
         sum += m_vTimes[i];
 
-    std::cout << "Average time: " << sum/m_vTimes.size() << std::cout;
-    std::cout << "Size m_vTimes: " << m_vTimes.size() << std::cout;
+    std::cout << "Average time: " << sum/m_vTimes.size() << std::endl;
+    std::cout << "Size m_vTimes: " << m_vTimes.size() << std::endl;
 
     m_pData.clear();
     m_vTimes.clear();
