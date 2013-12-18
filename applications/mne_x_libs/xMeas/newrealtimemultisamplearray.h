@@ -101,6 +101,13 @@ public:
     */
     virtual ~NewRealTimeMultiSampleArray();
 
+
+    void clear()
+    {
+        m_matSamples.clear();
+    }
+
+
     //=========================================================================================================
     /**
     * Inits RealTimeMultiSampleArrayNew and adds uiNumChannels empty channel information

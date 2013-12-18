@@ -128,7 +128,7 @@ MNESourceEstimate MNESourceEstimate::reduce(qint32 start, qint32 n)
     p_sourceEstimateReduced.data = this->data.block(0, start, rows, n);
     p_sourceEstimateReduced.vertices = this->vertices;
     p_sourceEstimateReduced.times = RowVectorXf::Zero(n);
-    p_sourceEstimateReduced.times = this->times.block(start,0,1,n);
+    p_sourceEstimateReduced.times = this->times.block(0,start,1,n);
     p_sourceEstimateReduced.tmin = p_sourceEstimateReduced.times(0);
     p_sourceEstimateReduced.tstep = this->tstep;
 

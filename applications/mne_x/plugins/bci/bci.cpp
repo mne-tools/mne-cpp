@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
-* @file     serialport.cpp
-* @author   Tim Kunze <tim.kunze@tu-ilmenau.de>
-*           Luise Lang <luise.lang@tu-ilmenau.de>
+* @file     bci.cpp
+* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     November, 2013
+* @date     December, 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Tim Kunze, Luise Lang and Christoph Dinh. All rights reserved.
+* Copyright (C) 2013, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the SerialPort class.
+* @brief    Contains the implementation of the BCI class.
 *
 */
 
@@ -39,9 +39,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "serialport.h"
+#include "bci.h"
 
-#include <iostream>
+#include "FormFiles/bcisetupwidget.h"
 
 
 //*************************************************************************************************************
@@ -49,10 +49,9 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QMessageBox>
+#include <QtCore/QtPlugin>
+#include <QtCore/QTextStream>
 #include <QDebug>
-#include <QSerialPort>
-#include <QSerialPortInfo>
 
 
 //*************************************************************************************************************
@@ -60,7 +59,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace TriggerControlPlugin;
+using namespace BCIPlugin;
 
 
 //*************************************************************************************************************
@@ -68,140 +67,104 @@ using namespace TriggerControlPlugin;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-SerialPort::SerialPort()
+BCI::BCI()
+: m_qStringResourcePath(qApp->applicationDirPath()+"/mne_x_plugins/resources/bci/")
 {
-    initSettings();
-    initPort();
-}
-
-
-
-//*************************************************************************************************************
-
-SerialPort::~SerialPort()
-{
-
 }
 
 
 //*************************************************************************************************************
 
-void SerialPort::close()
+BCI::~BCI()
 {
-    m_qSerialPort.close();
-    std::cout << "port geschlossen" << std::endl;
+    //std::cout << "BCI::~BCI() " << std::endl;
+
+    //If the program is closed while the sampling is in process
+    if(this->isRunning())
+        this->stop();
 }
 
 
 //*************************************************************************************************************
 
-void SerialPort::initSettings()
+QSharedPointer<IPlugin> BCI::clone() const
 {
-    m_currentSettings.name = "";
-    m_currentSettings.baudRate = QSerialPort::Baud115200;
-    m_currentSettings.stringBaudRate = "115200";
-    m_currentSettings.dataBits = QSerialPort::Data8;
-    m_currentSettings.stringDataBits = "8";
-    m_currentSettings.parity = QSerialPort::NoParity;
-    m_currentSettings.stringParity = "None";
-    m_currentSettings.stopBits = QSerialPort::OneStop;
-    m_currentSettings.stringStopBits = "1";
-    m_currentSettings.flowControl = QSerialPort::NoFlowControl;
-    m_currentSettings.stringFlowControl = "None";
+    QSharedPointer<BCI> pTMSIClone(new BCI());
+    return pTMSIClone;
 }
+
 
 //*************************************************************************************************************
 
-void SerialPort::initPort()
+void BCI::init()
 {
-    QList<QSerialPortInfo> t_qListPortInfo = QSerialPortInfo::availablePorts();
+	m_bIsRunning = false;
+}
 
-    bool t_correctPort = false;
 
-//    if(t_qListPortInfo.size() > 1)
-//    {
-//        m_currentSettings.name = t_qListPortInfo[1].portName();
-//        qDebug() << t_qListPortInfo[1].description().toLatin1() << endl;
-//        m_qSerialPort.setPortName( t_qListPortInfo[1].portName());
-//    }
+//*************************************************************************************************************
 
-    for (int t_count = 0; t_count <= t_qListPortInfo.size();t_count++)
+bool BCI::start()
+{ 
+	m_bIsRunning = true;
+
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+bool BCI::stop()
+{
+    //Wait until this thread (BCI) is stopped
+    m_bIsRunning = false;
+
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+IPlugin::PluginType BCI::getType() const
+{
+    return _IAlgorithm;
+}
+
+
+//*************************************************************************************************************
+
+QString BCI::getName() const
+{
+    return "BCI EEG";
+}
+
+
+//*************************************************************************************************************
+
+QWidget* BCI::setupWidget()
+{
+    BCISetupWidget* widget = new BCISetupWidget(this);//widget is later destroyed by CentralWidget - so it has to be created everytime new
+
+    //init properties dialog
+    widget->initGui();
+
+    return widget;
+}
+
+
+//*************************************************************************************************************
+
+void BCI::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
+{
+}
+
+
+//*************************************************************************************************************
+
+void BCI::run()
+{
+    while(m_bIsRunning)
     {
-        if (t_qListPortInfo[t_count].description() == "Silicon Labs CP210x USB to UART Bridge")
-        {
-
-            t_correctPort = true;
-            m_currentSettings.name = t_qListPortInfo[t_count].portName();
-            m_qSerialPort.setPortName( t_qListPortInfo[t_count].portName());
-            break;
-        }
+        
     }
-
-    if(t_correctPort)
-        qDebug() << "correct port was found";
-    else
-        qDebug() << "correct port was not found";
-
 }
-
-
-//*************************************************************************************************************
-void SerialPort::sendData(const QByteArray &data)
-{
-        m_qSerialPort.write(data);
-}
-
-
-
-//*************************************************************************************************************
-
-bool SerialPort::open()
-{
-    bool success = false;
-
-    // get current settings
-    m_qSerialPort.setPortName(m_currentSettings.name);
-
-
-
-
- //   qDebug() << "noch nicht geöffnet" << endl;
-    if (m_qSerialPort.open(QIODevice::ReadWrite))
-    {
-        //std::cout << "geöffnet, ohne Konfigs" << std::endl;
-        if (m_qSerialPort.setBaudRate(m_currentSettings.baudRate)
-                && m_qSerialPort.setDataBits(m_currentSettings.dataBits)
-                && m_qSerialPort.setParity(m_currentSettings.parity)
-                && m_qSerialPort.setStopBits(m_currentSettings.stopBits)
-                && m_qSerialPort.setFlowControl(m_currentSettings.flowControl))
-        {
-//            std::cout << "geöffnet, mit:"
-//                      << "Name" << m_currentSettings.name.toLatin1().data()
-//                      << "BaudRat" << m_currentSettings.stringBaudRate.toLatin1().data()
-//                      << "Databits" << m_currentSettings.stringDataBits.toLatin1().data()
-//                      << "Parity" << m_currentSettings.stringParity.toLatin1().data()
-//                      << "FlowControl" << m_currentSettings.stringFlowControl.toLatin1().data()  << std::endl;
-
-            success = true;
-        }
-        else
-        {    std::cout << "nicht geöffnet, Fehler mit KOnfigurationszuweisung" << std::endl;
-             m_qSerialPort.close();
-
-            success = false;
-        }
-
-    }
-    else
-    {
-        std::cout << "nicht geöffnet, Fehler schon beim readwriteöffnen" << std::endl;
-
-        success = false;
-    }
-
-    return success;
-}
-
-
-
-

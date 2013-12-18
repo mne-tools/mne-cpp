@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
-* @file     triggercontrol.h
-* @author   Tim Kunze <tim.kunze@tu-ilmenau.de>
-*           Luise Lang <luise.lang@tu-ilmenau.de>
+* @file     bci.h
+* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     November, 2013
+* @date     December, 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Tim Kunze, Luise Lang and Christoph Dinh. All rights reserved.
+* Copyright (C) 2013, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,41 +30,39 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the TriggerControl class.
+* @brief    Contains the declaration of the BCI class.
 *
 */
 
-#ifndef TRIGGERCONTROL_H
-#define TRIGGERCONTROL_H
+#ifndef BCI_H
+#define BCI_H
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
-
-#include "triggercontrol_global.h"
+#include "bci_global.h"
 
 #include <mne_x/Interfaces/IAlgorithm.h>
 #include <generics/circularbuffer.h>
 #include <xMeas/newrealtimesamplearray.h>
 #include <xMeas/newrealtimemultisamplearray.h>
 
+//*************************************************************************************************************
+//=============================================================================================================
+// QT STL INCLUDES
+//=============================================================================================================
+
+#include <QtWidgets>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// DEFINE NAMESPACE TMSIPlugin
 //=============================================================================================================
 
-#include <QTime>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE TriggerControlPlugin
-//=============================================================================================================
-
-namespace TriggerControlPlugin
+namespace BCIPlugin
 {
 
 
@@ -83,44 +81,32 @@ using namespace IOBuffer;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class SettingsWidget;
-class SerialPort;
-
 
 //=============================================================================================================
 /**
-* DECLARE CLASS TriggerControl
+* BCI...
 *
-* @brief The TriggerControl ....
+* @brief The BCI class provides an EEG BCI.
 */
-class TRIGGERCONTROLSHARED_EXPORT TriggerControl : public IAlgorithm
+class BCISHARED_EXPORT BCI : public IAlgorithm
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "triggercontrol.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "bci.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(MNEX::IAlgorithm)
-
-    friend class TriggerControlSetupWidget;
-    friend class SettingsWidget;
 
 public:
     //=========================================================================================================
     /**
-    * Constructs a TriggerControl.
+    * Constructs a BCI.
     */
-    TriggerControl();
+    BCI();
 
     //=========================================================================================================
     /**
-    * Destroys the TriggerControl.
+    * Destroys the BCI.
     */
-    ~TriggerControl();
-
-    //=========================================================================================================
-    /**
-    * Initialise input and output connectors.
-    */
-    void init();
+    virtual ~BCI();
 
     //=========================================================================================================
     /**
@@ -128,7 +114,22 @@ public:
     */
     virtual QSharedPointer<IPlugin> clone() const;
 
+    //=========================================================================================================
+    /**
+    * Initialise input and output connectors.
+    */
+    virtual void init();
+
+    //=========================================================================================================
+    /**
+    * Starts the BCI by starting the BCI's thread.
+    */
     virtual bool start();
+
+    //=========================================================================================================
+    /**
+    * Stops the BCI by stopping the BCI's thread.
+    */
     virtual bool stop();
 
     virtual IPlugin::PluginType getType() const;
@@ -137,42 +138,23 @@ public:
     virtual QWidget* setupWidget();
 
     void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
-//
-
-signals:
-    void sendByte(int value);
 
 protected:
+    //=========================================================================================================
+    /**
+    * The starting point for the thread. After calling start(), the newly created thread calls this function.
+    * Returning from this method will end the execution of the thread.
+    * Pure virtual method inherited by QThread.
+    */
     virtual void run();
-    void sendByteTo(int);
 
 private:
-    PluginOutputData<NewRealTimeSampleArray>::SPtr  m_pTriggerOutput;   /**< The RealTimeSampleArray of the trigger output.*/
-    PluginInputData<NewRealTimeMultiSampleArray>::SPtr  m_pRTMSAInput;  /**< The RealTimeMultiSampleArray input.*/
+	bool                                m_bIsRunning;                       /**< Whether TMSI is running.*/
 
-    QVector<int> m_vTimes;
-
-    bool m_bBspBool;
-
-    QSharedPointer<SerialPort> m_pSerialPort;
-
-    qint32 m_iBaud;
-
-
-    QMutex m_qMutex;
-
-
-    QVector< VectorXd > m_pData;
-
-    qint32 m_iNumChs;
-
-    QTime m_qTime;
-
-    bool m_bIsRunning;
-
+    QString                             m_qStringResourcePath;              /**< The path to the EEG resource directory.*/
 
 };
 
 } // NAMESPACE
 
-#endif // TRIGGERCONTROL_H
+#endif // BCI_H

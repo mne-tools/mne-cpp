@@ -63,7 +63,6 @@ TMSIDriver::TMSIDriver(TMSIProducer* pTMSIProducer)
 , m_uiNumberOfChannels(138)
 , m_uiSamplingFrequency(1024)
 , m_uiSamplesPerBlock(1)
-, m_bConvertToVolt(false)
 , m_bUseChExponent(false)
 , m_bUseUnitGain(false)
 , m_bUseUnitOffset(false)
@@ -131,7 +130,6 @@ TMSIDriver::~TMSIDriver()
 bool TMSIDriver::initDevice(int iNumberOfChannels,
                             int iSamplingFrequency,
                             int iSamplesPerBlock,
-                            bool bConvertToVolt,
                             bool bUseChExponent,
                             bool bUseUnitGain,
                             bool bUseUnitOffset,
@@ -146,7 +144,6 @@ bool TMSIDriver::initDevice(int iNumberOfChannels,
     m_uiNumberOfChannels = iNumberOfChannels;
     m_uiSamplingFrequency = iSamplingFrequency;
     m_uiSamplesPerBlock = iSamplesPerBlock;
-    m_bConvertToVolt = bConvertToVolt;
     m_bUseChExponent = bUseChExponent;
     m_bUseUnitGain = bUseUnitGain;
     m_bUseUnitOffset = bUseUnitOffset;
@@ -385,7 +382,7 @@ bool TMSIDriver::uninitDevice()
             {
                 for(int channelIterator = 0; channelIterator < channelMax; channelIterator++)
                 {
-                    sampleMatrix(channelIterator, sampleIterator) = (m_vSampleBlockBuffer.first())*(m_bUseUnitGain ? m_vUnitGain[channelIterator] : 1) + (m_bUseUnitOffset ? m_vUnitOffSet[channelIterator] : 0) * (m_bUseChExponent ? pow(10., (m_bConvertToVolt ? (double)m_vExponentChannel[channelIterator]+6 : (double)m_vExponentChannel[channelIterator])) : 1);
+                    sampleMatrix(channelIterator, sampleIterator) = (m_vSampleBlockBuffer.first() * (m_bUseUnitGain ? m_vUnitGain[channelIterator] : 1) + (m_bUseUnitOffset ? m_vUnitOffSet[channelIterator] : 0)) * (m_bUseChExponent ? pow(10., (double)m_vExponentChannel[channelIterator]) : 1);
                     m_vSampleBlockBuffer.pop_front();
                 }
 
@@ -418,60 +415,5 @@ bool TMSIDriver::uninitDevice()
     }
 
     return true;
-
-//    //---- Fill up with zeros -> the function does not wait until the block is completley filled with values ------------------------------------------
-
-//    ULONG ulSizeSamples = m_oFpGetSamples(m_HandleMaster, (PULONG)m_lSignalBuffer, m_lSignalBufferSize);
-//    ULONG ulNumSamplesReceived = ulSizeSamples/(m_uiNumberOfAvailableChannels*4);
-
-//    //Only read from buffer if at least one sample was received otherwise return false
-//    if(ulNumSamplesReceived<1)
-//    {
-//        sampleMatrix.setZero();
-//        //cout << "Plugin TMSI - ERROR - getSampleMatrixValue() - No samples received from device" << endl;
-//        return false;
-//    }
-//    else
-//    {
-//        ULONG Overflow;
-//        ULONG PercentFull;
-
-//        m_oFpGetBufferInfo(m_HandleMaster, &Overflow, &PercentFull);
-
-//        //Read the sample block out of the signal buffer (m_ulSignalBuffer) and write them to the sample buffer (m_pSample)
-//        sampleMatrix.setZero(); // Clear matrix - set all elements to zero
-//        int channelMax;
-//        int sampleMax;
-
-//        if(ulNumSamplesReceived<m_uiSamplesPerBlock) //If the number of received samples is smaller than the number defined by the user -> set the sampleMax to the smaller number
-//            sampleMax = ulNumSamplesReceived;
-//        else
-//            sampleMax = m_uiSamplesPerBlock;
-
-//        if(m_uiNumberOfAvailableChannels<m_uiNumberOfChannels)//If the number of available channels is smaller than the number defined by the user -> set the channelMax to the smaller number
-//            channelMax = m_uiNumberOfAvailableChannels;
-//        else
-//            channelMax = m_uiNumberOfChannels;
-
-//        for(int channel = 0; channel<channelMax; channel++)
-//        {
-//            for(int sample = 0; sample<sampleMax; sample++)
-//            {
-//                sampleMatrix(channel, sample) = (float)(((float)m_lSignalBuffer[(m_uiNumberOfChannels*sample)+channel]*(m_bUseUnitGain ? m_vUnitGain[channel] : 1) + (m_bUseUnitOffset ? m_vUnitOffSet[channel] : 0)) * (m_bUseChExponent ? pow(10., (m_bConvertToVolt ? (double)m_vExponentChannel[channel]+6 : (double)m_vExponentChannel[channel])) : 1));
-//            }
-//        }
-
-//        //cout << sampleMatrix.block(0, 0, channelMax, sampleMax) << endl << endl;
-
-//        //write to file
-//        if(m_outputFileStream.is_open() && m_bWriteToFile)
-//        {
-//            m_outputFileStream << "Plugin TMSI - INFO - Internal driver buffer is " << PercentFull << "% full" << endl;
-//            m_outputFileStream << "Plugin TMSI - INFO - " << ulSizeSamples << " bytes of " << ulNumSamplesReceived << " samples received from device" << endl;
-//            m_outputFileStream << sampleMatrix.block(0, 0, m_uiNumberOfChannels, m_uiSamplesPerBlock) << endl << endl;
-//        }
-//    }
-
-//    return true;
 }
 
