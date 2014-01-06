@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
-* @file     main.cpp
+* @file     mainwindow.cpp
 * @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     December, 2013
+* @date     January, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implements the mne_browse_raw_qt GUI application.
+* @brief    Implements the mainwindow function of mne_browse_raw_qt
 *
 */
 
@@ -39,26 +39,50 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <QApplication>
-#include <QTableView>
-
-#include "mymodel.h"
-#include "modelview.h"
-
 #include "mainwindow.h"
 
+#include <QApplication>
+
 //*************************************************************************************************************
-//=============================================================================================================
-// MAIN
-//=============================================================================================================
 
-int main(int argc, char *argv[])
+MainWindow::MainWindow(QWidget *parent) :
+    QMainWindow(parent)
 {
-    QApplication a(argc, argv);
+    //maximize window
+    //this->setWindowState(Qt::WindowMaximized);
 
-    //ModelView w;
-    MainWindow w;
-    w.show();
+    QFile t_rawFile("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+    QAbstractTableModel *rawModel = new RawModel(this,t_rawFile);
 
-    return a.exec();
+
+
+}
+
+//*************************************************************************************************************
+
+MainWindow::~MainWindow()
+{
+}
+
+//*************************************************************************************************************
+
+void MainWindow::showWindowTitle(const QString & title)
+{
+    setWindowTitle(title);
+}
+
+//*************************************************************************************************************
+
+void MainWindow::on_actionExit_triggered()
+{
+    qApp->quit();
+}
+
+//*************************************************************************************************************
+
+void MainWindow::on_actionOpen_triggered()
+{
+    QString filename = QFileDialog::getOpenFileName(this,QString("Open fiff data file"),QString("./MNE-sample-data/MEG/sample/"),tr("fif data files (*.fif)"));
+
+    //ui->textEdit->setText(filename);
 }

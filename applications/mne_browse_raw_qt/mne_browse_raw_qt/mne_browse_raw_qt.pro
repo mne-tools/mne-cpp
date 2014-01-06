@@ -36,18 +36,51 @@
 
 include(../../../mne-cpp.pri)
 
-QT       += core gui
+TEMPLATE = app
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+QT += network core widgets
 
 TARGET = mne_browse_raw_qt
-TEMPLATE = app
+
+CONFIG(debug, debug|release) {
+    TARGET = $$join(TARGET,,,d)
+}
+
+CONFIG += console #DEBUG
+
+LIBS += -L$${MNE_LIBRARY_DIR}
+CONFIG(debug, debug|release) {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
+            -lMNE$${MNE_LIB_VERSION}Utilsd \
+            -lMNE$${MNE_LIB_VERSION}Fiffd \
+            -lMNE$${MNE_LIB_VERSION}Mned \
+            -lmne_xd
+}
+else {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
+            -lMNE$${MNE_LIB_VERSION}Utils \
+            -lMNE$${MNE_LIB_VERSION}Fiff \
+            -lMNE$${MNE_LIB_VERSION}Mne \
+            -lmne_x
+}
 
 DESTDIR = $${MNE_BINARY_DIR}
 
 SOURCES += main.cpp\
-        mne_browse_raw_qt.cpp
+    rawmodel.cpp \
+    mymodel.cpp \
+    modelview.cpp \
+    mainwindow.cpp
 
-HEADERS  += mne_browse_raw_qt.h
+HEADERS  += \
+    rawmodel.h \
+    mymodel.h \
+    modelview.h \
+    mainwindow.h
 
-FORMS    += mne_browse_raw_qt.ui
+FORMS +=
+
+INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
+INCLUDEPATH += $${MNE_INCLUDE_DIR}
+INCLUDEPATH += $${MNE_X_INCLUDE_DIR}
+

@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
-* @file     main.cpp
-* @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>
+* @file     rawmodel.h
+* @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     December, 2013
+* @date     January, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,35 +30,76 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implements the mne_browse_raw_qt GUI application.
+* @brief    Implementation of data model of mne_browse_raw_qt
 *
 */
+
+#ifndef RAWMODEL_H
+#define RAWMODEL_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <QApplication>
-#include <QTableView>
 
-#include "mymodel.h"
-#include "modelview.h"
+//Qt
+#include <QAbstractTableModel>
 
-#include "mainwindow.h"
+//MNE
+#include <fiff/fiff.h>
+#include <mne/mne.h>
+#include <fiff/fiff_io.h>
+
+//Eigen
+#include <Eigen/Core>
+#include <Eigen/SparseCore>
 
 //*************************************************************************************************************
 //=============================================================================================================
-// MAIN
+// USED NAMESPACES
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+using namespace Eigen;
+using namespace MNELIB;
+
+//=============================================================================================================
+
+class RawModel : public QAbstractTableModel
 {
-    QApplication a(argc, argv);
+    Q_OBJECT
+public:
+    RawModel(QObject *parent);
+    RawModel(QObject *parent, QIODevice& p_IODevice);
+    int rowCount(const QModelIndex &parent = QModelIndex()) const ;
+    int columnCount(const QModelIndex &parent = QModelIndex()) const;
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
 
-    //ModelView w;
-    MainWindow w;
-    w.show();
+private:
+    //display types
+    MatrixXd m_data;
+    MatrixXd m_times;
+    QStringList m_chnames;
 
-    return a.exec();
-}
+    //Fiff
+    FiffIO m_fiffIO;
+    QList<FiffChInfo*> m_chinfolist;
+
+    //settings
+    qint32 m_windowlength; //in sec
+    qint32 m_position;
+
+    //methods
+    void loadChNames();
+    void loadChInfos();
+
+signals:
+
+public slots:
+
+};
+
+//Q_DECLARE_METATYPE(Eigen::MatrixXf);
+//qRegisterMetaType<MatrixXf>("MatrixXf");
+
+#endif // RAWMODEL_H
