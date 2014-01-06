@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
-* @file     main.cpp
+* @file     mainwindow.h
 * @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     December, 2013
+* @date     January, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,12 +30,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implements the main() application function.
+* @brief    Implements the mainwindow function of mne_browse_raw_qt
 *
 */
 
-#ifndef MNE_BRAWSE_H
-#define MNE_BRAWSE_H
+#ifndef MNE_MAINWINDOW_H
+#define MNE_MAINWINDOW_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -43,25 +43,31 @@
 //=============================================================================================================
 
 #include <QMainWindow>
+#include <QTableView>
+#include <QFileDialog>
+#include <QFile>
+
+#include "mymodel.h"
+#include "rawmodel.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE NAMESPACE
 //=============================================================================================================
 
-namespace Ui {
-class mne_browse_raw_qt;
-}
 
 //=============================================================================================================
 
-class mne_browse_raw_qt : public QMainWindow
+class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    explicit mne_browse_raw_qt(QWidget *parent = 0);
-    ~mne_browse_raw_qt();
+    explicit MainWindow(QWidget *parent = 0);
+    ~MainWindow();
+
+public slots:
+    void showWindowTitle(const QString & title);
 
 private slots:
     //=========================================================================================================
@@ -76,7 +82,8 @@ private slots:
     void on_actionOpen_triggered();
 
 private:
-    Ui::mne_browse_raw_qt *ui;
+
+
 };
 
 #endif // MNE_BRAWSE_H

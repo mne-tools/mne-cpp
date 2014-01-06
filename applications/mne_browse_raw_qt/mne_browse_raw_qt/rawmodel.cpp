@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
-* @file     main.cpp
-* @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>
+* @file     rawmodel.cpp
+* @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     December, 2013
+* @date     January, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,59 +30,78 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implements the mne_browse_raw_qt GUI application.
+* @brief    Implementation of data model of mne_browse_raw_qt
 *
 */
 
-//*************************************************************************************************************
-//=============================================================================================================
-// INCLUDES
-//=============================================================================================================
-
-#include "mne_browse_raw_qt.h"
-#include "ui_mne_browse_raw_qt.h"
-
-//*************************************************************************************************************
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QFileDialog>
-#include <QFile>
-#include <QMessageBox>
-#include <QTextStream>
+#include "rawmodel.h"
 
 //*************************************************************************************************************
 
-mne_browse_raw_qt::mne_browse_raw_qt(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::mne_browse_raw_qt)
+RawModel::RawModel(QObject *parent) :
+    QAbstractTableModel(parent)
 {
-    ui->setupUi(this);
-
-    //Set normal window size and maximize window
-    this->setWindowState(Qt::WindowMaximized);
 }
 
 //*************************************************************************************************************
 
-mne_browse_raw_qt::~mne_browse_raw_qt()
+RawModel::RawModel(QObject *parent, QIODevice& p_IODevice) :
+    QAbstractTableModel(parent)
 {
-    delete ui;
+    //read fiff data
+    FiffIO m_fiffIO(p_IODevice);
+
+    m_windowlength = 2; //just for now
+    m_position = 0;
+
+    if(!m_fiffIO.m_qlistRaw[0]->read_raw_segment_times(m_data, m_times, m_position, m_position+m_windowlength)) {
+        printf("Error when reading raw data!");
+    }
+
+    RawModel::loadChNames();
+    RawModel::loadChInfos();
+
 }
 
 //*************************************************************************************************************
 
-void mne_browse_raw_qt::on_actionExit_triggered()
+int RawModel::rowCount(const QModelIndex & /*parent*/) const
 {
-    qApp->quit();
+return m_data.rows();
 }
 
 //*************************************************************************************************************
 
-void mne_browse_raw_qt::on_actionOpen_triggered()
+int RawModel::columnCount(const QModelIndex & /*parent*/) const
 {
-    QString filename = QFileDialog::getOpenFileName(this,QString("Open fiff data file"),QString("./MNE-sample-data/MEG/sample/"),tr("fif data files (*.fif)"));
+ return 2;
+}
 
-    ui->textEdit->setText(filename);
+//*************************************************************************************************************
+
+QVariant RawModel::data(const QModelIndex &index, int role) const
+{
+ if (role == Qt::DisplayRole)
+ {
+    return QString("Row%1, Column%2")
+                .arg(index.row() + 1)
+                .arg(index.column() +1);
+ }
+ return QVariant();
+}
+
+//*************************************************************************************************************
+
+void RawModel::loadChNames() {
+    for(qint32 i=0; i < m_fiffIO.m_qlistRaw[0]->info.nchan; ++i) {
+        m_chnames.append(m_fiffIO.m_qlistRaw[0]->info.chs[i].ch_name);
+    }
+}
+
+//*************************************************************************************************************
+
+void RawModel::loadChInfos() {
+    for(qint32 i=0; i < m_fiffIO.m_qlistRaw[0]->info.nchan; ++i) {
+        m_chinfolist.append(m_fiffIO.m_qlistRaw[0]->info.chs[i]);
+    }
 }
