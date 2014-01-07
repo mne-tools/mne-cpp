@@ -42,9 +42,6 @@
 #include <QApplication>
 #include <QTableView>
 
-#include "mymodel.h"
-#include "modelview.h"
-
 #include "mainwindow.h"
 
 //*************************************************************************************************************

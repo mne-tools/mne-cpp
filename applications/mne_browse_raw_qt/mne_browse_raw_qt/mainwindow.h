@@ -42,12 +42,18 @@
 // INCLUDES
 //=============================================================================================================
 
+//Qt
 #include <QMainWindow>
 #include <QTableView>
+#include <QHeaderView>
 #include <QFileDialog>
 #include <QFile>
+#include <QApplication>
+#include <QMenu>
+#include <QMenuBar>
+#include <QAction>
 
-#include "mymodel.h"
+//own
 #include "rawmodel.h"
 
 //*************************************************************************************************************
@@ -67,23 +73,16 @@ public:
     ~MainWindow();
 
 public slots:
-    void showWindowTitle(const QString & title);
 
 private slots:
-    //=========================================================================================================
-    /**
-    * Exits program.
-    */
-    void on_actionExit_triggered();
-    //=========================================================================================================
-    /**
-    * Open fiff file
-    */
-    void on_actionOpen_triggered();
+    void openFile();
 
 private:
+    void setupModel();
+    void setupView();
 
-
+    QAbstractTableModel *m_pRawModel;
+    QTableView *m_pTableView;
 };
 
-#endif // MNE_BRAWSE_H
+#endif // MAINWINDOW

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     rawmodel.h
+* @file     rawdelegate.cpp
 * @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
@@ -30,12 +30,10 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of data model of mne_browse_raw_qt
+* @brief    Implementation of delegate of mne_browse_raw_qt
 *
 */
 
-#ifndef RAWMODEL_H
-#define RAWMODEL_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -43,7 +41,7 @@
 //=============================================================================================================
 
 //Qt
-#include <QAbstractTableModel>
+#include <QAbstractItemDelegate>
 
 //MNE
 #include <fiff/fiff.h>
@@ -53,6 +51,8 @@
 //Eigen
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
+
+#include "rawdelegate.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -64,45 +64,21 @@ using namespace MNELIB;
 
 //=============================================================================================================
 
-class RawModel : public QAbstractTableModel
+RawDelegate::RawDelegate(QObject *parent)
 {
-    Q_OBJECT
-public:
-    RawModel(QObject *parent);
-    RawModel(QObject *parent, QIODevice& p_IODevice);
-    int rowCount(const QModelIndex &parent = QModelIndex()) const ;
-    int columnCount(const QModelIndex &parent = QModelIndex()) const;
-    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
-    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-    Qt::ItemFlags flags(const QModelIndex & index) const;
+}
 
+//=============================================================================================================
 
-private:
-    //display types
-    MatrixXd m_data;
-    MatrixXd m_times;
-    QStringList m_chnames;
+void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
 
-    //Fiff
-    QSharedPointer<FiffIO> m_pfiffIO;
-    QList<FiffChInfo> m_chinfolist;
+}
 
-    //settings
-    qint32 m_windowlength; //in sec
-    qint32 m_position;
+//=============================================================================================================
 
-    //methods
-    void loadChNames();
-    void loadChInfos();
+QSize RawDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
 
-signals:
+}
 
-public slots:
-
-
-
-};
-
-Q_DECLARE_METATYPE(Eigen::MatrixXd);
-
-#endif // RAWMODEL_H
