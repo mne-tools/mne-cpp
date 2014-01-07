@@ -41,21 +41,35 @@
 
 #include "mainwindow.h"
 
-#include <QApplication>
-
 //*************************************************************************************************************
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
 {
-    //maximize window
-    //this->setWindowState(Qt::WindowMaximized);
+    //setupFileMenu
+    QMenu *fileMenu = new QMenu(tr("&File"), this);
+    QAction *openAction = fileMenu->addAction(tr("&Open..."));
+    openAction->setShortcuts(QKeySequence::Open);
+    QAction *quitAction = fileMenu->addAction(tr("E&xit"));
+    quitAction->setShortcuts(QKeySequence::Quit);
 
-    QFile t_rawFile("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
-    QAbstractTableModel *rawModel = new RawModel(this,t_rawFile);
+    menuBar()->addMenu(fileMenu);
+    statusBar();
 
+    //setup MVC
+    MainWindow::setupModel();
+    MainWindow::setupView();
 
+    //connect signalslots
+    connect(openAction, SIGNAL(triggered()), this, SLOT(openFile()));
+//    connect(saveAction, SIGNAL(triggered()), this, SLOT(saveFile()));
+    connect(quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
 
+    //Window-related
+    setWindowTitle("MNE_BROWSE_RAW_QT");
+    resize(800,600);
+    //this->setWindowState(Qt::WindowMaximized); //maximize window
+    this->move(100,100);
 }
 
 //*************************************************************************************************************
@@ -64,25 +78,33 @@ MainWindow::~MainWindow()
 {
 }
 
+
 //*************************************************************************************************************
 
-void MainWindow::showWindowTitle(const QString & title)
-{
-    setWindowTitle(title);
+void MainWindow::setupModel() {
+    QFile t_rawFile("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+    m_pRawModel = new RawModel(this,t_rawFile);
+
+    //set header
+//    m_pRawModel->setHeaderData(0, Qt::Horizontal, tr("chname"));
+//    m_pRawModel->setHeaderData(1, Qt::Horizontal, tr("data plot"));
+}
+
+void MainWindow::setupView() {
+    m_pTableView = new QTableView;
+//    m_pTableView->setShowGrid(false);
+//    m_pTableView->verticalHeader()->hide();
+    m_pTableView->setModel(m_pRawModel);
+
+    setCentralWidget(m_pTableView);
 }
 
 //*************************************************************************************************************
 
-void MainWindow::on_actionExit_triggered()
-{
-    qApp->quit();
-}
-
-//*************************************************************************************************************
-
-void MainWindow::on_actionOpen_triggered()
+void MainWindow::openFile()
 {
     QString filename = QFileDialog::getOpenFileName(this,QString("Open fiff data file"),QString("./MNE-sample-data/MEG/sample/"),tr("fif data files (*.fif)"));
 
     //ui->textEdit->setText(filename);
 }
+

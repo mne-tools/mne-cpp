@@ -41,6 +41,7 @@
 RawModel::RawModel(QObject *parent) :
     QAbstractTableModel(parent)
 {
+    qRegisterMetaType<MatrixXd>("MatrixXd");
 }
 
 //*************************************************************************************************************
@@ -48,18 +49,24 @@ RawModel::RawModel(QObject *parent) :
 RawModel::RawModel(QObject *parent, QIODevice& p_IODevice) :
     QAbstractTableModel(parent)
 {
+    qRegisterMetaType<MatrixXd>("MatrixXd");
+
     //read fiff data
-    FiffIO m_fiffIO(p_IODevice);
+    m_pfiffIO = QSharedPointer<FiffIO>(new FiffIO(p_IODevice));
 
     m_windowlength = 2; //just for now
-    m_position = 0;
+    m_position = 100;
 
-    if(!m_fiffIO.m_qlistRaw[0]->read_raw_segment_times(m_data, m_times, m_position, m_position+m_windowlength)) {
+    if(!m_pfiffIO->m_qlistRaw[0]->read_raw_segment_times(m_data, m_times, m_position, m_position+m_windowlength)) {
         printf("Error when reading raw data!");
     }
 
-    RawModel::loadChNames();
-    RawModel::loadChInfos();
+    if(!m_pfiffIO->m_qlistRaw.empty()) {
+        RawModel::loadChNames();
+        RawModel::loadChInfos();
+    }
+    else
+        printf("ERROR! Data set does not contain any fiff data!");
 
 }
 
@@ -67,41 +74,70 @@ RawModel::RawModel(QObject *parent, QIODevice& p_IODevice) :
 
 int RawModel::rowCount(const QModelIndex & /*parent*/) const
 {
-return m_data.rows();
+    return m_data.rows();
 }
 
 //*************************************************************************************************************
 
 int RawModel::columnCount(const QModelIndex & /*parent*/) const
 {
- return 2;
+    return 1; //2
 }
 
 //*************************************************************************************************************
 
 QVariant RawModel::data(const QModelIndex &index, int role) const
 {
- if (role == Qt::DisplayRole)
- {
-    return QString("Row%1, Column%2")
-                .arg(index.row() + 1)
-                .arg(index.column() +1);
- }
- return QVariant();
+    if (role == Qt::DisplayRole && index.isValid()) {
+        if(index.column()==0)
+            return QVariant(m_chnames[index.row()]);
+        if(index.column()==1) {
+            QVariant v;
+            v.setValue((MatrixXd)m_data.row(index.row()));
+            return v;
+        }
+    }
+
+    return QVariant();
+}
+
+Qt::ItemFlags RawModel::flags(const QModelIndex & index) const
+{
+//    return Qt::NoItemFlags;
+}
+
+QVariant RawModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    if(role != Qt::DisplayRole)
+        return QVariant();
+
+    if(orientation == Qt::Horizontal) {
+        switch(section) {
+        case 0: return QVariant("chname");
+        case 1: return QVariant("data plot");
+        }
+    }
+    else if(orientation == Qt::Vertical) {
+        return QVariant(section);
+    }
+
+    return QVariant();
 }
 
 //*************************************************************************************************************
 
+
+
+//*************************************************************************************************************
+
 void RawModel::loadChNames() {
-    for(qint32 i=0; i < m_fiffIO.m_qlistRaw[0]->info.nchan; ++i) {
-        m_chnames.append(m_fiffIO.m_qlistRaw[0]->info.chs[i].ch_name);
-    }
+   for(qint32 i=0; i < m_pfiffIO->m_qlistRaw[0]->info.nchan; ++i)
+            m_chnames.append(m_pfiffIO->m_qlistRaw[0]->info.chs[i].ch_name);
 }
 
 //*************************************************************************************************************
 
 void RawModel::loadChInfos() {
-    for(qint32 i=0; i < m_fiffIO.m_qlistRaw[0]->info.nchan; ++i) {
-        m_chinfolist.append(m_fiffIO.m_qlistRaw[0]->info.chs[i]);
-    }
+    for(qint32 i=0; i < m_pfiffIO->m_qlistRaw[0]->info.nchan; ++i)
+        m_chinfolist.append(m_pfiffIO->m_qlistRaw[0]->info.chs[i]);
 }

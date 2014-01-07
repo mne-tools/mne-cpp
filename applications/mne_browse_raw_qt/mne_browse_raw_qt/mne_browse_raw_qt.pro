@@ -68,15 +68,13 @@ DESTDIR = $${MNE_BINARY_DIR}
 
 SOURCES += main.cpp\
     rawmodel.cpp \
-    mymodel.cpp \
-    modelview.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    rawdelegate.cpp
 
 HEADERS  += \
     rawmodel.h \
-    mymodel.h \
-    modelview.h \
-    mainwindow.h
+    mainwindow.h \
+    rawdelegate.h
 
 FORMS +=
 
