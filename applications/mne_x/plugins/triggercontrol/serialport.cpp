@@ -72,6 +72,15 @@ SerialPort::SerialPort()
 {
     initSettings();
     initPort();
+
+    digchannel.resize(22);
+    for (int i = 0; i < digchannel.size(); ++i)
+    digchannel[i] = i+1;
+
+    for (int i = 0; i < digchannel.size(); i++)
+    std::cout << digchannel[i] << std::endl;
+
+
 }
 
 
@@ -92,6 +101,150 @@ void SerialPort::close()
     std::cout << "port geschlossen" << std::endl;
 }
 
+
+//*************************************************************************************************************
+
+void SerialPort::encodeana()
+{
+
+//    QByteArray m_data;
+  //  m_data.resize(4);
+
+    m_data.clear();
+
+
+//denote control bytes
+    m_data[0] = m_data[0]|0xC0;
+    m_data[1] = m_data[1]|0x01;
+    m_data[2] = m_data[2]|0x02;
+    m_data[3] = m_data[3]|0x03;
+
+
+// Motorauswahl
+    //Channelkodierung
+    //1:0000	2:0001	3:0010	4:0100	5:1000	6:0011	7:0101	8:1001	9:0110	10:1010	11:1100	12:0111	13:1011	14:1101	15:1110	16:1111
+
+    m_data[0] = m_data[0]|0x04;
+    /*
+    if (ui->radioButton_motor1->isChecked())     {m_data[0] = m_data[0]|0x00;}     // 0000 0000   1. Motor
+    else if (ui->radioButton_motor2->isChecked()){m_data[0] = m_data[0]|0x04;}     // 0000 0100   2. Motor
+    else if (ui->radioButton_motor3->isChecked()){m_data[0] = m_data[0]|0x08;}     // 0000 1000   3. Motor
+    else if (ui->radioButton_motor4->isChecked()){m_data[0] = m_data[0]|0x10;}     // 0001 0000   4. Motor
+    else {qDebug() << "Fehler bei Motorauswahl" << endl;}
+*/
+
+// Konvertierung analoger Wert
+    int m_analval = 12345; // zwischen 0 und 65535
+
+    int i = 32768;				 				//i=2^15
+    int j = 0;								//Variable zur Kennzeichnung des entsprechenden Bytes in m_data
+    int k = 0;								//Variable zur Positionierung des entsprechenden Bits
+    QByteArray posArray = 0;					//Hilfsarray zum Ansprechen der Bits in m_data an der jeweiligen Position
+    posArray.resize(6);
+    posArray.clear();
+
+    posArray [0]= posArray [0]|0x80;
+    posArray [1]= posArray [1]|0x40;
+    posArray [2]= posArray [2]|0x20;
+    posArray [3]= posArray [3]|0x10;
+    posArray [4]= posArray [4]|0x08;
+    posArray [5]= posArray [5]|0x04;
+
+
+
+    while (i>=1)    							//Schleife zum Konvertieren des analogen Wertes
+        {
+        if (i>2048 && i<32769) {j=1; k=2;} else if (i>32 && i<2049) {j=2; k=0;} else {j=3;k=0;};
+        while (j==1)
+        {
+            if (m_analval/i >= 1){
+            m_data[j] = m_data[j]|posArray[k];
+            m_analval = m_analval-i;
+            i=i/2;}
+            else {i=i/2;}
+            if (i>2048 && i<32769) {j=1; k++;} else {j=0;}
+        }
+        while (j==2)
+        {
+            if (m_analval/i >= 1){
+            m_data[j] = m_data[j]|posArray[k];
+            m_analval = m_analval-i;
+            i=i/2;}
+            else {i=i/2;}
+            if (i>32 && i<2049) {j=2; k++;} else {j=0;}
+        }
+        while (j==3)
+        {
+            if (m_analval/i >= 1){
+            m_data[j] = m_data[j]|posArray[k];
+            m_analval = m_analval-i;
+            i=i/2;}
+            else {i=i/2;}
+            if (i>0 && i<33) {j=3; k++;} else {j=0;}
+        }
+        }
+
+    qDebug() << "Analog ausgelesen" << endl;
+
+
+}
+
+//*************************************************************************************************************
+
+void SerialPort::encodedig()
+{
+/*
+
+    m_data.resize(4);
+    m_data.clear();
+
+    //denote control bytes
+    m_data[0] = m_data[0]|0x00;
+    m_data[1] = m_data[1]|0x01;
+    m_data[2] = m_data[2]|0x02;
+    m_data[3] = m_data[3]|0x03;
+
+
+
+
+
+    // Auswerten der Steuerung
+    // 1 - 6
+
+    if (ui->radioButton_1->isChecked()) m_data[3] = m_data[3]|0x04;     // 0000 0100
+    if (ui->radioButton_2->isChecked()) m_data[3] = m_data[3]|0x08;     // 0000 1000
+    if (ui->radioButton_3->isChecked()) m_data[3] = m_data[3]|0x10;     // 0001 0000
+    if (ui->radioButton_4->isChecked()) m_data[3] = m_data[3]|0x20;     // 0010 0000
+    if (ui->radioButton_5->isChecked()) m_data[3] = m_data[3]|0x40;     // 0100 0000
+    if (ui->radioButton_6->isChecked()) m_data[3] = m_data[3]|0x80;     // 1000 0000
+
+    // 7 - 12
+    if (ui->radioButton_7->isChecked()) m_data[2] = m_data[2]|0x04;     // 0000 0100
+    if (ui->radioButton_8->isChecked()) m_data[2] = m_data[2]|0x08;     // 0000 1000
+    if (ui->radioButton_9->isChecked()) m_data[2] = m_data[2]|0x10;     // 0001 0000
+    if (ui->radioButton_10->isChecked()) m_data[2] = m_data[2]|0x20;     // 0010 0000
+    if (ui->radioButton_11->isChecked()) m_data[2] = m_data[2]|0x40;     // 0100 0000
+    if (ui->radioButton_12->isChecked()) m_data[2] = m_data[2]|0x80;     // 1000 0000
+
+    // 13 - 18
+    if (ui->radioButton_13->isChecked()) m_data[1] = m_data[1]|0x04;     // 0000 0100
+    if (ui->radioButton_14->isChecked()) m_data[1] = m_data[1]|0x08;     // 0000 1000
+    if (ui->radioButton_15->isChecked()) m_data[1] = m_data[1]|0x10;     // 0001 0000
+    if (ui->radioButton_16->isChecked()) m_data[1] = m_data[1]|0x20;     // 0010 0000
+    if (ui->radioButton_17->isChecked()) m_data[1] = m_data[1]|0x40;     // 0100 0000
+    if (ui->radioButton_18->isChecked()) m_data[1] = m_data[1]|0x80;     // 1000 0000
+
+    // 19 - 22
+    if (ui->radioButton_19->isChecked()) m_data[0] = m_data[0]|0x04;     // 0000 0100
+    if (ui->radioButton_20->isChecked()) m_data[0] = m_data[0]|0x08;     // 0000 1000
+    if (ui->radioButton_21->isChecked()) m_data[0] = m_data[0]|0x10;     // 0001 0000
+    if (ui->radioButton_22->isChecked()) m_data[0] = m_data[0]|0x20;     // 0010 0000
+
+    qDebug() << "Digital ausgelesen" << endl;
+
+    writeData(m_data);
+*/
+}
 
 //*************************************************************************************************************
 
@@ -176,11 +329,11 @@ bool SerialPort::open()
                 && m_qSerialPort.setFlowControl(m_currentSettings.flowControl))
         {
             std::cout << "geöffnet, mit:"
-                      << "Name" << m_currentSettings.name.toLatin1().data()
-                      << "BaudRat" << m_currentSettings.stringBaudRate.toLatin1().data()
-                      << "Databits" << m_currentSettings.stringDataBits.toLatin1().data()
-                      << "Parity" << m_currentSettings.stringParity.toLatin1().data()
-                      << "FlowControl" << m_currentSettings.stringFlowControl.toLatin1().data()  << std::endl;
+                      << " Name: " << m_currentSettings.name.toLatin1().data()
+                      << ", BaudRate: " << m_currentSettings.stringBaudRate.toLatin1().data()
+                      << ", Databits: " << m_currentSettings.stringDataBits.toLatin1().data()
+                      << ", Parity: " << m_currentSettings.stringParity.toLatin1().data()
+                      << ", FlowControl: " << m_currentSettings.stringFlowControl.toLatin1().data()  << std::endl;
 
             success = true;
         }
