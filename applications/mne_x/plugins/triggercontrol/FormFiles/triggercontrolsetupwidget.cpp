@@ -218,3 +218,17 @@ void TriggerControlPlugin::TriggerControlSetupWidget::on_m_qPushButton_Send_rele
 
     m_pTriggerControl->m_pSerialPort->sendData(m_pTriggerControl->m_pSerialPort->m_data);
 }
+
+void TriggerControlPlugin::TriggerControlSetupWidget::on_m_qPushButton_nullen_released()
+{
+    QByteArray t_data;
+    //t_data = m_pTriggerControl->m_pSerialPort->m_data;
+
+    t_data.resize(3);
+    int value = 1;
+    t_data.append(value);
+
+    std::cout << t_data.size() << std::endl;
+
+    m_pTriggerControl->m_pSerialPort->sendData(t_data);
+}

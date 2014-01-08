@@ -138,14 +138,18 @@ public:
 
     void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
 //
+signals:
+    void sendByte(int value);
 
 protected:
     virtual void run();
+    void sendByteTo(int);
 
 private:
     PluginOutputData<NewRealTimeSampleArray>::SPtr  m_pTriggerOutput;   /**< The RealTimeSampleArray of the trigger output.*/
     PluginInputData<NewRealTimeMultiSampleArray>::SPtr  m_pRTMSAInput;  /**< The RealTimeMultiSampleArray input.*/
 
+    QVector<int> m_vTimes;
 
     bool m_bBspBool;
 
