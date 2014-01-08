@@ -46,28 +46,13 @@ RawModel::RawModel(QObject *parent) :
 
 //*************************************************************************************************************
 
-RawModel::RawModel(QObject *parent, QIODevice& p_IODevice) :
+RawModel::RawModel(QIODevice &p_IODevice, QObject *parent) :
     QAbstractTableModel(parent)
 {
     qRegisterMetaType<MatrixXd>("MatrixXd");
 
     //read fiff data
-    m_pfiffIO = QSharedPointer<FiffIO>(new FiffIO(p_IODevice));
-
-    m_windowlength = 2; //just for now
-    m_position = 100;
-
-    if(!m_pfiffIO->m_qlistRaw[0]->read_raw_segment_times(m_data, m_times, m_position, m_position+m_windowlength)) {
-        printf("Error when reading raw data!");
-    }
-
-    if(!m_pfiffIO->m_qlistRaw.empty()) {
-        RawModel::loadChNames();
-        RawModel::loadChInfos();
-    }
-    else
-        printf("ERROR! Data set does not contain any fiff data!");
-
+    loadFiffData(p_IODevice);
 }
 
 //*************************************************************************************************************
@@ -124,20 +109,42 @@ QVariant RawModel::headerData(int section, Qt::Orientation orientation, int role
     return QVariant();
 }
 
-//*************************************************************************************************************
-
-
 
 //*************************************************************************************************************
+void RawModel::loadFiffData(QIODevice& p_IODevice)
+{
+    beginResetModel();
 
-void RawModel::loadChNames() {
+    m_pfiffIO = QSharedPointer<FiffIO>(new FiffIO(p_IODevice));
+
+    m_windowlength = 2; //just for now
+    m_position = m_pfiffIO->m_qlistRaw[0]->first_samp/m_pfiffIO->m_qlistRaw[0]->info.sfreq; //take beginning of raw data as position [in secs]
+
+    if(!m_pfiffIO->m_qlistRaw[0]->read_raw_segment_times(m_data, m_times, m_position, m_position+m_windowlength)) {
+        printf("Error when reading raw data!");
+    }
+
+    if(!m_pfiffIO->m_qlistRaw.empty()) {
+        RawModel::loadChNames();
+        RawModel::loadChInfos();
+
+        qDebug("Fiff data loaded.");
+    }
+    else
+        printf("ERROR! Data set does not contain any fiff data!");
+
+    endResetModel();
+}
+
+
+void RawModel::loadChNames()
+{
    for(qint32 i=0; i < m_pfiffIO->m_qlistRaw[0]->info.nchan; ++i)
             m_chnames.append(m_pfiffIO->m_qlistRaw[0]->info.chs[i].ch_name);
 }
 
-//*************************************************************************************************************
-
-void RawModel::loadChInfos() {
+void RawModel::loadChInfos()
+{
     for(qint32 i=0; i < m_pfiffIO->m_qlistRaw[0]->info.nchan; ++i)
         m_chinfolist.append(m_pfiffIO->m_qlistRaw[0]->info.chs[i]);
 }

@@ -46,30 +46,14 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
 {
-    //setupFileMenu
-    QMenu *fileMenu = new QMenu(tr("&File"), this);
-    QAction *openAction = fileMenu->addAction(tr("&Open..."));
-    openAction->setShortcuts(QKeySequence::Open);
-    QAction *quitAction = fileMenu->addAction(tr("E&xit"));
-    quitAction->setShortcuts(QKeySequence::Quit);
-
-    menuBar()->addMenu(fileMenu);
-    statusBar();
-
     //setup MVC
-    MainWindow::setupModel();
-    MainWindow::setupView();
+    setupModel();
+    setupDelegate();
+    setupView();
 
-    //connect signalslots
-    connect(openAction, SIGNAL(triggered()), this, SLOT(openFile()));
-//    connect(saveAction, SIGNAL(triggered()), this, SLOT(saveFile()));
-    connect(quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
+    createMenus();
 
-    //Window-related
-    setWindowTitle("MNE_BROWSE_RAW_QT");
-    resize(800,600);
-    //this->setWindowState(Qt::WindowMaximized); //maximize window
-    this->move(100,100);
+    setWindow();
 }
 
 //*************************************************************************************************************
@@ -81,22 +65,47 @@ MainWindow::~MainWindow()
 
 //*************************************************************************************************************
 
-void MainWindow::setupModel() {
+void MainWindow::setupModel()
+{
     QFile t_rawFile("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
-    m_pRawModel = new RawModel(this,t_rawFile);
-
-    //set header
-//    m_pRawModel->setHeaderData(0, Qt::Horizontal, tr("chname"));
-//    m_pRawModel->setHeaderData(1, Qt::Horizontal, tr("data plot"));
+    m_pRawModel = new RawModel(t_rawFile,this);
 }
 
-void MainWindow::setupView() {
+void MainWindow::setupDelegate()
+{
+    m_pRawDelegate = new RawDelegate(this);
+}
+
+void MainWindow::setupView()
+{
     m_pTableView = new QTableView;
-//    m_pTableView->setShowGrid(false);
-//    m_pTableView->verticalHeader()->hide();
     m_pTableView->setModel(m_pRawModel);
 
+    //set custom delegate for view
+    m_pTableView->setItemDelegate(m_pRawDelegate);
+
     setCentralWidget(m_pTableView);
+}
+
+
+void MainWindow::createMenus() {
+    QMenu *fileMenu = new QMenu(tr("&File"), this);
+
+    QAction *openAction = fileMenu->addAction(tr("&Open..."));
+    openAction->setShortcuts(QKeySequence::Open);
+    connect(openAction, SIGNAL(triggered()), this, SLOT(openFile()));
+
+    QAction *quitAction = fileMenu->addAction(tr("E&xit"));
+    quitAction->setShortcuts(QKeySequence::Quit);
+    connect(quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
+
+    menuBar()->addMenu(fileMenu);
+}
+
+void MainWindow::setWindow() {
+    setWindowTitle("MNE_BROWSE_RAW_QT");
+    resize(800,600);
+    this->move(100,100);
 }
 
 //*************************************************************************************************************
@@ -104,7 +113,9 @@ void MainWindow::setupView() {
 void MainWindow::openFile()
 {
     QString filename = QFileDialog::getOpenFileName(this,QString("Open fiff data file"),QString("./MNE-sample-data/MEG/sample/"),tr("fif data files (*.fif)"));
+    QFile t_fileRaw(filename);
 
+    m_pRawModel->loadFiffData(t_fileRaw);
     //ui->textEdit->setText(filename);
 }
 
