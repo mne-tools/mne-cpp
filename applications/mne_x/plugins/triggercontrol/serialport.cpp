@@ -104,7 +104,7 @@ void SerialPort::close()
 
 //*************************************************************************************************************
 
-void SerialPort::encodeana()
+void SerialPort::encodeana(int m_analval, int motor)
 {
 
 //    QByteArray m_data;
@@ -124,17 +124,17 @@ void SerialPort::encodeana()
     //Channelkodierung
     //1:0000	2:0001	3:0010	4:0100	5:1000	6:0011	7:0101	8:1001	9:0110	10:1010	11:1100	12:0111	13:1011	14:1101	15:1110	16:1111
 
-    m_data[0] = m_data[0]|0x04;
-    /*
-    if (ui->radioButton_motor1->isChecked())     {m_data[0] = m_data[0]|0x00;}     // 0000 0000   1. Motor
-    else if (ui->radioButton_motor2->isChecked()){m_data[0] = m_data[0]|0x04;}     // 0000 0100   2. Motor
-    else if (ui->radioButton_motor3->isChecked()){m_data[0] = m_data[0]|0x08;}     // 0000 1000   3. Motor
-    else if (ui->radioButton_motor4->isChecked()){m_data[0] = m_data[0]|0x10;}     // 0001 0000   4. Motor
+    //m_data[0] = m_data[0]|0x04;
+
+    if (motor == 1)     {m_data[0] = m_data[0]|0x00;}     // 0000 0000   1. Motor
+    else if (motor == 2){m_data[0] = m_data[0]|0x04;}     // 0000 0100   2. Motor
+    else if (motor == 3){m_data[0] = m_data[0]|0x08;}     // 0000 1000   3. Motor
+    else if (motor == 4){m_data[0] = m_data[0]|0x10;}     // 0001 0000   4. Motor
     else {qDebug() << "Fehler bei Motorauswahl" << endl;}
-*/
+
 
 // Konvertierung analoger Wert
-    int m_analval = 12345; // zwischen 0 und 65535
+
 
     int i = 32768;				 				//i=2^15
     int j = 0;								//Variable zur Kennzeichnung des entsprechenden Bytes in m_data
@@ -193,6 +193,7 @@ void SerialPort::encodeana()
 
 void SerialPort::encodedig()
 {
+    std::cout << "not implemented yet" << std::endl;
 /*
 
     m_data.resize(4);

@@ -138,6 +138,7 @@ void TriggerControlSetupWidget::on_m_qPushButton_Connect_released()
         ui.m_qPushButton_Connect->setEnabled(false);
         ui.m_qPushButton_Disconnect->setEnabled(true);
         ui.m_qPushButton_Send->setEnabled(true);
+        ui.m_qPushButton_Sendanalog->setEnabled(true);
         ui.m_qPushButton_Settings->setEnabled(false);
     }
     else
@@ -157,6 +158,7 @@ void TriggerControlSetupWidget::on_m_qPushButton_Disconnect_released()
     ui.m_qPushButton_Connect->setEnabled(true);
     ui.m_qPushButton_Disconnect->setEnabled(false);
     ui.m_qPushButton_Send->setEnabled(false);
+    ui.m_qPushButton_Sendanalog->setEnabled(false);
     ui.m_qPushButton_Settings->setEnabled(true);
 
 
@@ -167,56 +169,49 @@ void TriggerControlSetupWidget::on_m_qPushButton_Disconnect_released()
 
 void TriggerControlPlugin::TriggerControlSetupWidget::on_m_qPushButton_Send_released()
 {
-    // create Data byte
+    QByteArray t_data;
+    t_data.resize(4);
+    t_data.clear();
 
-/*
+    //denote control bytes
+    t_data[0] = t_data[0]|0x40;
+    t_data[1] = t_data[1]|0x01;
+    t_data[2] = t_data[2]|0x02;
+    t_data[3] = t_data[3]|0x03;
+    // 1 - 6
+    if (ui.m_qRadioButton_1->isChecked()) t_data[3] = t_data[3]|0x04;     // 0000 0100
+    if (ui.m_qRadioButton_2->isChecked()) t_data[3] = t_data[3]|0x08;     // 0000 1000
+    if (ui.m_qRadioButton_3->isChecked()) t_data[3] = t_data[3]|0x10;     // 0001 0000
+    if (ui.m_qRadioButton_4->isChecked()) t_data[3] = t_data[3]|0x20;     // 0010 0000
+    if (ui.m_qRadioButton_5->isChecked()) t_data[3] = t_data[3]|0x40;     // 0100 0000
+    if (ui.m_qRadioButton_6->isChecked()) t_data[3] = t_data[3]|0x80;     // 1000 0000
 
-    QByteArray data;
-//    int length = data.size();
+    // 7 - 12
+    if (ui.m_qRadioButton_7->isChecked()) t_data[2] = t_data[2]|0x04;     // 0000 0100
+    if (ui.m_qRadioButton_8->isChecked()) t_data[2] = t_data[2]|0x08;     // 0000 1000
+    if (ui.m_qRadioButton_9->isChecked()) t_data[2] = t_data[2]|0x10;     // 0001 0000
+    if (ui.m_qRadioButton_10->isChecked()) t_data[2] = t_data[2]|0x20;     // 0010 0000
+    if (ui.m_qRadioButton_11->isChecked()) t_data[2] = t_data[2]|0x40;     // 0100 0000
+    if (ui.m_qRadioButton_12->isChecked()) t_data[2] = t_data[2]|0x80;     // 1000 0000
 
+    // 13 - 18
+    if (ui.m_qRadioButton_13->isChecked()) t_data[1] = t_data[1]|0x04;     // 0000 0100
+    if (ui.m_qRadioButton_14->isChecked()) t_data[1] = t_data[1]|0x08;     // 0000 1000
+    if (ui.m_qRadioButton_15->isChecked()) t_data[1] = t_data[1]|0x10;     // 0001 0000
+    if (ui.m_qRadioButton_16->isChecked()) t_data[1] = t_data[1]|0x20;     // 0010 0000
+    if (ui.m_qRadioButton_17->isChecked()) t_data[1] = t_data[1]|0x40;     // 0100 0000
+    if (ui.m_qRadioButton_18->isChecked()) t_data[1] = t_data[1]|0x80;     // 1000 0000
 
-    // Auswerten der LED Steuerung
+    // 19 - 22
+    if (ui.m_qRadioButton_19->isChecked()) t_data[0] = t_data[0]|0x04;     // 0000 0100
+    if (ui.m_qRadioButton_20->isChecked()) t_data[0] = t_data[0]|0x08;     // 0000 1000
+    if (ui.m_qRadioButton_21->isChecked()) t_data[0] = t_data[0]|0x10;     // 0001 0000
+    if (ui.m_qRadioButton_22->isChecked()) t_data[0] = t_data[0]|0x20;     // 0010 0000
 
-    unsigned char steuerwert = 0;
-    if (ui.m_qRadioButton_8->isChecked()) // Auswertung HSB
-    {
-        steuerwert = steuerwert + 128;
-    }
-    if (ui.m_qRadioButton_7->isChecked())
-    {
-        steuerwert = steuerwert + 64;
-    }
-    if (ui.m_qRadioButton_6->isChecked())
-    {
-        steuerwert = steuerwert + 32;
-    }
-    if (ui.m_qRadioButton_5->isChecked())
-    {
-        steuerwert = steuerwert + 16;
-    }
-    if (ui.m_qRadioButton_4->isChecked())
-    {
-        steuerwert = steuerwert + 8;
-    }
-    if ( ui.m_qRadioButton_3->isChecked())
-    {
-        steuerwert = steuerwert + 4;
-    }
-    if (ui.m_qRadioButton_2->isChecked())
-    {
-        steuerwert = steuerwert + 2;
-    }
-    if ( ui.m_qRadioButton_1->isChecked())    // Auswertung LSB
-    {
-        steuerwert = steuerwert + 1;
-    }
+  //  m_pTriggerControl->m_pSerialPort->encodedig();
 
-     std::cout << "LEDS ausgelesen" << steuerwert << std::endl;
-    data[0] = steuerwert;*/
-
-    m_pTriggerControl->m_pSerialPort->encodeana();
-
-    m_pTriggerControl->m_pSerialPort->sendData(m_pTriggerControl->m_pSerialPort->m_data);
+    m_pTriggerControl->m_pSerialPort->sendData(t_data);
+    std::cout << "Digitale Daten gesendet" << std::endl;
 }
 
 void TriggerControlPlugin::TriggerControlSetupWidget::on_m_qPushButton_nullen_released()
@@ -225,10 +220,28 @@ void TriggerControlPlugin::TriggerControlSetupWidget::on_m_qPushButton_nullen_re
     //t_data = m_pTriggerControl->m_pSerialPort->m_data;
 
     t_data.resize(3);
-    int value = 1;
+    int value = 0;
     t_data.append(value);
 
     std::cout << t_data.size() << std::endl;
 
     m_pTriggerControl->m_pSerialPort->sendData(t_data);
+}
+
+void TriggerControlPlugin::TriggerControlSetupWidget::on_m_qPushButton_Sendanalog_released()
+{
+    // create Data byte
+    int t_motor;
+    if(ui.m_qRadioButton_motor1->isChecked()) t_motor = 1;
+    if(ui.m_qRadioButton_motor2->isChecked()) t_motor = 2;
+    if(ui.m_qRadioButton_motor3->isChecked()) t_motor = 3;
+    if(ui.m_qRadioButton_motor4->isChecked()) t_motor = 4;
+
+    int t_analval = ui.m_qAnalogDisp->intValue();
+
+    m_pTriggerControl->m_pSerialPort->encodeana(t_analval,t_motor);
+
+    m_pTriggerControl->m_pSerialPort->sendData(m_pTriggerControl->m_pSerialPort->m_data);
+
+    std::cout << "Analoge Daten gesendet" << std::endl;
 }
