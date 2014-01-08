@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
-* @file     main.cpp
-* @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>
+* @file     rawdelegate.h
+* @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     December, 2013
+* @date     January, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,59 +30,52 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implements the mne_browse_raw_qt GUI application.
+* @brief    Implementation of delegate of mne_browse_raw_qt
 *
 */
+
+#ifndef RAWDELEGATE_H
+#define RAWDELEGATE_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "mne_browse_raw_qt.h"
-#include "ui_mne_browse_raw_qt.h"
+//Qt
+#include <QAbstractItemDelegate>
+
+//MNE
+#include <fiff/fiff.h>
+#include <mne/mne.h>
+#include <fiff/fiff_io.h>
+
+//Eigen
+#include <Eigen/Core>
+#include <Eigen/SparseCore>
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// USED NAMESPACES
 //=============================================================================================================
 
-#include <QFileDialog>
-#include <QFile>
-#include <QMessageBox>
-#include <QTextStream>
+using namespace Eigen;
+using namespace MNELIB;
 
-//*************************************************************************************************************
+//=============================================================================================================
 
-mne_browse_raw_qt::mne_browse_raw_qt(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::mne_browse_raw_qt)
+class RawDelegate : public QAbstractItemDelegate
 {
-    ui->setupUi(this);
+    Q_OBJECT
+public:
+    RawDelegate(QObject *parent = 0);
+    void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
-    //Set normal window size and maximize window
-    this->setWindowState(Qt::WindowMaximized);
-}
+signals:
 
-//*************************************************************************************************************
+public slots:
 
-mne_browse_raw_qt::~mne_browse_raw_qt()
-{
-    delete ui;
-}
+};
 
-//*************************************************************************************************************
-
-void mne_browse_raw_qt::on_actionExit_triggered()
-{
-    qApp->quit();
-}
-
-//*************************************************************************************************************
-
-void mne_browse_raw_qt::on_actionOpen_triggered()
-{
-    QString filename = QFileDialog::getOpenFileName(this,QString("Open fiff data file"),QString("./MNE-sample-data/MEG/sample/"),tr("fif data files (*.fif)"));
-
-    ui->textEdit->setText(filename);
-}
+#endif // RAWDELEGATE_H
