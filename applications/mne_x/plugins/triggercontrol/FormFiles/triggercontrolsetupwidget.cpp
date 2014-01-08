@@ -169,6 +169,8 @@ void TriggerControlPlugin::TriggerControlSetupWidget::on_m_qPushButton_Send_rele
 {
     // create Data byte
 
+/*
+
     QByteArray data;
 //    int length = data.size();
 
@@ -176,41 +178,58 @@ void TriggerControlPlugin::TriggerControlSetupWidget::on_m_qPushButton_Send_rele
     // Auswerten der LED Steuerung
 
     unsigned char steuerwert = 0;
-    if (ui.m_qRadioButton_7->isChecked()) // Auswertung HSB
+    if (ui.m_qRadioButton_8->isChecked()) // Auswertung HSB
     {
         steuerwert = steuerwert + 128;
     }
-    if (ui.m_qRadioButton_6->isChecked())
+    if (ui.m_qRadioButton_7->isChecked())
     {
         steuerwert = steuerwert + 64;
     }
-    if (ui.m_qRadioButton_5->isChecked())
+    if (ui.m_qRadioButton_6->isChecked())
     {
         steuerwert = steuerwert + 32;
     }
-    if (ui.m_qRadioButton_4->isChecked())
+    if (ui.m_qRadioButton_5->isChecked())
     {
         steuerwert = steuerwert + 16;
     }
-    if (ui.m_qRadioButton_3->isChecked())
+    if (ui.m_qRadioButton_4->isChecked())
     {
         steuerwert = steuerwert + 8;
     }
-    if ( ui.m_qRadioButton_2->isChecked())
+    if ( ui.m_qRadioButton_3->isChecked())
     {
         steuerwert = steuerwert + 4;
     }
-    if (ui.m_qRadioButton_1->isChecked())
+    if (ui.m_qRadioButton_2->isChecked())
     {
         steuerwert = steuerwert + 2;
     }
-    if ( ui.m_qRadioButton_0->isChecked())    // Auswertung LSB
+    if ( ui.m_qRadioButton_1->isChecked())    // Auswertung LSB
     {
         steuerwert = steuerwert + 1;
     }
 
      std::cout << "LEDS ausgelesen" << steuerwert << std::endl;
-    data[0] = steuerwert;
+    data[0] = steuerwert;*/
 
-    m_pTriggerControl->m_pSerialPort->sendData(data);
+    m_pTriggerControl->m_pSerialPort->encodeana();
+
+    m_pTriggerControl->m_pSerialPort->sendData(m_pTriggerControl->m_pSerialPort->m_data);
+}
+
+void TriggerControlPlugin::TriggerControlSetupWidget::on_m_qPushButton_nullen_released()
+{
+    QByteArray t_data;
+    //t_data = m_pTriggerControl->m_pSerialPort->m_data;
+
+    t_data.resize(3);
+    t_data.clear();
+    int value = 0;
+    t_data.append(value);
+
+    std::cout << t_data.size() << std::endl;
+
+    m_pTriggerControl->m_pSerialPort->sendData(t_data);
 }

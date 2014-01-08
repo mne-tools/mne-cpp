@@ -114,6 +114,8 @@ private slots:
 
     void on_m_qPushButton_Send_released();
 
+    void on_m_qPushButton_nullen_released();
+
 private:
     //=========================================================================================================
     /**

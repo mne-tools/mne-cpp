@@ -138,7 +138,6 @@ public:
 
     void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
 //
-
 signals:
     void sendByte(int value);
 

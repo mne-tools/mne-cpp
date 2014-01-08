@@ -128,17 +128,21 @@ void TriggerControl::init()
 
 bool TriggerControl::start()
 {
-    m_bIsRunning = true;
     QThread::start();
+    m_bIsRunning = true;
+
+    m_qTime.start();
 
     if(m_pSerialPort->open())   // open Serial Port
     {
-        QByteArray t_data;
-        t_data.append(0x01);
+      //  QByteArray t_data;
+      //  t_data.append(0x01);
 //        t_data[0] = t_data[0]|0x01;
+        m_pSerialPort->encodeana();
+        m_pSerialPort->sendData(m_pSerialPort->m_data);
 
-        m_qTime.start();
-        m_pSerialPort->sendData(t_data);
+     //   m_pTriggerControl->m_pSerialPort->sendData(m_pTriggerControl->m_pSerialPort->m_data);
+     //   m_pSerialPort->sendData(t_data);
         std::cout << "data sent" << std::endl;
     }
     else
@@ -163,12 +167,24 @@ bool TriggerControl::stop()
 //    QThread::terminate();
 //    QThread::wait();
 
+
     double sum = 0;
-    for(int i=0; i<m_vTimes.size(); i++)
+    for(int i=4; i<m_vTimes.size(); i++)
         sum += m_vTimes[i];
+
+    QFile file(qApp->applicationDirPath()+"/mne_x_plugins/resources/triggercontrol/t_measurements_2048.txt");
+    file.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream out(&file);
+
+    for(int i=0; i<m_vTimes.size() ;i++)
+        out << m_vTimes[i] << endl;
+
+    // optional, as QFile destructor will already do it:
+    file.close();
 
     std::cout << "Average time: " << sum/m_vTimes.size() << std::endl;
     std::cout << "Size m_vTimes: " << m_vTimes.size() << std::endl;
+
 
     m_pData.clear();
     m_vTimes.clear();
@@ -244,7 +260,7 @@ void TriggerControl::run()
             m_pData.clear();
             ++count;
 
-            if(count > 2)
+            if(count > 20)
             {
                 t_bFound = false;
                 count = 0;
@@ -269,28 +285,24 @@ void TriggerControl::run()
 
             m_pData.pop_front();
         }
-
-//        while(m_pData.size() > 0)
-//        {
-//            if(m_pData.first()[m_iNumChs-2] > 1000)
-//            {
-//                std::cout << "Time elpased: " << m_qTime.elapsed() << std::endl;
-
-//                m_bIsRunning = false;
-//            }
-
-//            m_pData.pop_front();
-//        }
-
         m_qMutex.unlock();
     }
 
+/*
+    while(m_bIsRunning)
+    {
+        m_qMutex.lock();
 
+        while(m_pData.size() > 0)
+        {
+            if(m_pData.first()[m_iNumChs-2] > 9999)
+                qDebug() << "Time elpased: " << m_qTime.elapsed();
 
+            m_pData.pop_front();
+        }
 
-
-
-
+        m_qMutex.unlock();
+    }*/
 
 //    int count = 0;
 //    double v = 0;
@@ -315,6 +327,12 @@ void TriggerControl::run()
 void TriggerControl::sendByteTo(int value)
 {
     QByteArray t_data;
+    t_data.resize(3);
+    t_data.clear();
     t_data.append(value);
+
+    //std::cout << t_data.size() << std::endl;
+
     m_pSerialPort->sendData(t_data);
 }
+
