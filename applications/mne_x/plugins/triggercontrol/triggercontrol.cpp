@@ -138,7 +138,7 @@ bool TriggerControl::start()
       //  QByteArray t_data;
       //  t_data.append(0x01);
 //        t_data[0] = t_data[0]|0x01;
-        m_pSerialPort->encodeana();
+        //m_pSerialPort->encodeana();
         m_pSerialPort->sendData(m_pSerialPort->m_data);
 
      //   m_pTriggerControl->m_pSerialPort->sendData(m_pTriggerControl->m_pSerialPort->m_data);

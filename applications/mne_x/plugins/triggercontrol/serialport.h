@@ -109,7 +109,7 @@ public:
     void sendData(const QByteArray &data);
 
     void encodedig();
-    void encodeana();
+    void encodeana(int anaval, int motor);
  //   void writeData(const QByteArray &data);
 //    void readData();
 
