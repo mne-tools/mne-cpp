@@ -102,9 +102,17 @@ int main(int argc, char *argv[])
 
     QFile t_fileRaw("D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2013_12_05_Lorenz_Esch_001/Processed/filtered/EEG_data_001_right_tapping_filtered_7_14_raw.fif");
 
-    qint32 event = 1;
+    QFile t_fileFwd("D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/Lorenz-121213-Duke128-fwd.fif");
+    QFile t_fileCov("D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2013_12_05_Lorenz_Esch_001/Processed/covariance/EEG_data_001_right_tapping_filtered_7_14_raw-cov.fif");
 
     QString t_sEventName = "D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2013_12_05_Lorenz_Esch_001/Processed/events/EEG_data_001_right_tapping_raw-eve.fif";
+
+    SurfaceSet t_surfSet("D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/surface/lh.white", "D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/surface/rh.white");
+
+    AnnotationSet t_annotationSet("D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/atlas/lh.aparc.a2009s.annot", "D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/atlas/rh.aparc.a2009s.annot");
+
+    qint32 event = 1;
+
 
     //with events
     float tmin = -0.4f;
@@ -399,8 +407,6 @@ int main(int argc, char *argv[])
 
     //########################################################################################
     // Source Estimate
-    QFile t_fileFwd("D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/Lorenz-121213-Duke128-fwd.fif");
-    QFile t_fileCov("D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2013_12_05_Lorenz_Esch_001/Processed/covariance/EEG_data_001_right_tapping_filtered_7_14_raw-cov.fif");
 
     double snr = 0.1f;//1.0f;//3.0f;//0.1f;//3.0f;
     QString method("MNE"); //"MNE" | "dSPM" | "sLORETA"
@@ -447,7 +453,6 @@ int main(int argc, char *argv[])
     if(t_Fwd.isEmpty())
         return 1;
 
-    AnnotationSet t_annotationSet("D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/atlas/lh.aparc.a2009s.annot", "D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/atlas/rh.aparc.a2009s.annot");
 
     FiffCov noise_cov(t_fileCov);
 
@@ -646,8 +651,6 @@ int main(int argc, char *argv[])
 
     //Source Estimate end
     //########################################################################################
-    AnnotationSet t_annotSet("D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/atlas/lh.aparc.a2009s.annot", "D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/atlas/rh.aparc.a2009s.annot");
-    SurfaceSet t_surfSet("D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/surface/lh.white", "D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/surface/rh.white");
 
     //only one time point - P100
 //    qint32 sample = 0;
@@ -666,7 +669,7 @@ int main(int argc, char *argv[])
     QList<RowVector4i> t_qListRGBAs;
 
     //ToDo overload toLabels using instead of t_surfSet rr of MNESourceSpace
-    t_annotSet.toLabels(t_surfSet, t_qListLabels, t_qListRGBAs);
+    t_annotationSet.toLabels(t_surfSet, t_qListLabels, t_qListRGBAs);
 
     InverseView view(minimumNorm.getSourceSpace(), t_qListLabels, t_qListRGBAs);
 
