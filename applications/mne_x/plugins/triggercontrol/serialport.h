@@ -50,6 +50,7 @@
 //=============================================================================================================
 
 #include <QSerialPort>
+#include <QVector>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -107,11 +108,15 @@ public:
     void close();
     void sendData(const QByteArray &data);
 
+    void encodedig();
+    void encodeana();
  //   void writeData(const QByteArray &data);
 //    void readData();
 
    // void handleError(QSerialPort::SerialPortError error);
 
+    QByteArray m_data;
+    QVector<int> digchannel;
 
     struct Settings {
         QString name;
@@ -140,6 +145,7 @@ protected:
 private:
     Settings m_currentSettings;
     QSerialPort m_qSerialPort;
+
 
 };
 

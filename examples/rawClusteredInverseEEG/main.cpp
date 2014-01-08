@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
 * @file     main.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2013
+* @date     January, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2012, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implements the main() application function.
+* @brief    Example of the computation of a rawClusteredInverse with EEG data
 *
 */
 
@@ -49,7 +50,7 @@
 
 #include <mne/mne_epoch_data_list.h>
 
-#include <inverse/sourceestimate.h>
+#include <mne/mne_sourceestimate.h>
 #include <inverse/minimumNorm/minimumnorm.h>
 
 #include <disp3D/inverseview.h>
@@ -99,18 +100,23 @@ int main(int argc, char *argv[])
 {
     QGuiApplication a(argc, argv);
 
-//    QFile t_fileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
-    QFile t_fileRaw("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw.fif");
+    QFile t_fileRaw("D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2013_12_05_Lorenz_Esch_001/Processed/filtered/EEG_data_001_right_tapping_filtered_7_14_raw.fif");
 
     qint32 event = 1;
-//    QString t_sEventName = "./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif";
-    QString t_sEventName = "E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-eve.fif";
-    float tmin = -0.2f;
-    float tmax = 0.4f;
+
+    QString t_sEventName = "D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2013_12_05_Lorenz_Esch_001/Processed/events/EEG_data_001_right_tapping_raw-eve.fif";
+
+    //with events
+    float tmin = -0.4f;
+    float tmax = 0.2f;
+
+    //without events - base EEG measurement
+//    float tmin = 0.1f;
+//    float tmax = 50.0f;
 
     bool keep_comp = false;
     fiff_int_t dest_comp = 0;
-    bool pick_all  = true;
+    bool pick_all  = false;
 
     qint32 k, p;
 
@@ -134,9 +140,9 @@ int main(int argc, char *argv[])
     else
     {
         QStringList include;
-        include << "STI 014";
-        bool want_meg   = true;
-        bool want_eeg   = false;
+        //include << "STI 014";
+        bool want_meg   = false;
+        bool want_eeg   = true;
         bool want_stim  = false;
 
 //        picks = Fiff::pick_types(raw.info, want_meg, want_eeg, want_stim, include, raw.info.bads);
@@ -366,62 +372,38 @@ int main(int argc, char *argv[])
     //
     // calculate the average
     //
-//    //Option 1
-//    qint32 numAverages = 10;
-//    VectorXi vecSel(numAverages);
-//    srand (time(NULL)); // initialize random seed
+    //Only take first finger movement of each tapping session (each tapping session consists of 4 seperate finger movement)
+    VectorXi vecSel(count/4);
 
-//    for(qint32 i = 0; i < vecSel.size(); ++i)
-//    {
-//        qint32 val = rand() % data.size();
-//        vecSel(i) = val;
-//    }
-
-//    //Option 2
-//    VectorXi vecSel(20);
-
-////    vecSel << 76, 74, 13, 61, 97, 94, 75, 71, 60, 56, 26, 57, 56, 0, 52, 72, 33, 86, 96, 67;
-
-//    vecSel << 65, 22, 47, 55, 16, 29, 14, 36, 57, 97, 89, 46, 9, 93, 83, 52, 71, 52, 3, 96;
-
-    //Option 3
-    VectorXi vecSel(10);
-
-    vecSel << 0, 96, 80, 55, 66, 25, 26, 2, 55, 58, 6, 88;
-
+    for(int i=0; i<count/4; i++)
+        vecSel[i] = i*4;
 
     std::cout << "Select following epochs to average:\n" << vecSel << std::endl;
-
     FiffEvoked evoked = data.average(raw.info, tmin*raw.info.sfreq, floor(tmax*raw.info.sfreq + 0.5), vecSel);
 
+    //Write averaged data to file
+    QFile m_fileOut("./mne_x_plugins/resources/tmsi/Averaged_data.fif");
+    MatrixXd m_cals;
 
+    FiffStream::SPtr m_pOutfid = Fiff::start_writing_raw(m_fileOut, raw.info, m_cals);
+    fiff_int_t first = 0;
+    m_pOutfid->write_int(FIFF_FIRST_SAMPLE, &first);
+    m_pOutfid->finish_writing_raw();
 
+    MatrixXd matValue = evoked.data;
 
+    m_pOutfid->write_raw_buffer(matValue, m_cals);
 
-
-
-
+    m_pOutfid->finish_writing_raw();
 
 
     //########################################################################################
     // Source Estimate
-
-//    QFile t_fileFwd("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
-//    QFile t_fileCov("./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
-//    QFile t_fileEvoked("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
-
-//    QFile t_fileFwd("/home/chdinh/sl_data/MEG/mind006/mind006_051209_auditory01_raw-oct-6p-fwd.fif");
-//    QFile t_fileCov("/home/chdinh/sl_data/MEG/mind006/mind006_051209_auditory01_raw-cov.fif");
-//    QFile t_fileEvoked("/home/chdinh/sl_data/MEG/mind006/mind006_051209_auditory01_raw-ave.fif");
-
-
-    QFile t_fileFwd("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-oct-6p-fwd.fif");
-    QFile t_fileCov("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-cov.fif");
-//    QFile t_fileEvoked("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-ave.fif");
-
+    QFile t_fileFwd("D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/Lorenz-121213-Duke128-fwd.fif");
+    QFile t_fileCov("D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2013_12_05_Lorenz_Esch_001/Processed/covariance/EEG_data_001_right_tapping_filtered_7_14_raw-cov.fif");
 
     double snr = 0.1f;//1.0f;//3.0f;//0.1f;//3.0f;
-    QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
+    QString method("MNE"); //"MNE" | "dSPM" | "sLORETA"
 
     QString t_sFileNameClusteredInv("");
     QString t_sFileNameStc("");
@@ -465,10 +447,7 @@ int main(int argc, char *argv[])
     if(t_Fwd.isEmpty())
         return 1;
 
-//    AnnotationSet t_annotationSet("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot", "./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot");
-//    AnnotationSet t_annotationSet("/home/chdinh/sl_data/subjects/mind006/label/lh.aparc.a2009s.annot", "/home/chdinh/sl_data/subjects/mind006/label/rh.aparc.a2009s.annot");
-    AnnotationSet t_annotationSet("E:/Data/sl_data/subjects/mind006/label/lh.aparc.a2009s.annot", "E:/Data/sl_data/subjects/mind006/label/rh.aparc.a2009s.annot");
-
+    AnnotationSet t_annotationSet("D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/atlas/lh.aparc.a2009s.annot", "D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/atlas/rh.aparc.a2009s.annot");
 
     FiffCov noise_cov(t_fileCov);
 
@@ -479,6 +458,89 @@ int main(int argc, char *argv[])
     // Cluster forward solution;
     //
     MNEForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution(t_annotationSet, 20);//40);
+
+    // Find rows of interest in stc files
+    QFile wrtFWD ("./mne_x_plugins/resources/tmsi/fwd_clustered.txt");
+    wrtFWD.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream out(&wrtFWD);
+
+    //Read vertnos
+    VectorXi vertno_left = t_clusteredFwd.src[0].vertno;
+    VectorXi vertno_right = t_clusteredFwd.src[1].vertno;
+
+    out<<"Vertno Left Hemi:"<<endl<<endl;
+    for(int i=0; i<vertno_left.rows(); i++)
+        out<<vertno_left[i]<<endl;
+
+    out<<endl<<"Vertno right Hemi:"<<endl<<endl;
+    for(int i=0; i<vertno_right.rows(); i++)
+        out<<vertno_right[i]<<endl;
+
+    //Read corresponding labels
+    VectorXi labelIds_left = t_annotationSet[0].getLabelIds();
+    out<<endl<<endl<<"labelIds_left:"<<endl<<endl;
+    for(int i=0; i<labelIds_left.rows(); i++)
+        out<<labelIds_left[i]<<endl;
+
+    VectorXi labelIds_right = t_annotationSet[1].getLabelIds();
+    out<<endl<<endl<<"labelIds_right:"<<endl<<endl;
+    for(int i=0; i<labelIds_right.rows(); i++)
+        out<<labelIds_right[i]<<endl;
+
+    //Find interesting rows in stc files
+    QVector<int> interestingRows_Left;
+    out<<endl<<endl<<"interestingRows_Left (matlab syntax):"<<endl<<endl;
+    for(int i=0; i<vertno_left.rows() ; i++)
+    {
+        //G_postcentral
+        if(labelIds_left[vertno_left[i]] == 9221140)
+        {
+            interestingRows_Left.push_back(i);
+            out<<"Region 28 - G_postcentral: "<<i+1<<endl;
+        }
+
+        //G_precentral
+        if(labelIds_left[vertno_left[i]] == 11832380)
+        {
+            interestingRows_Left.push_back(i);
+            out<<"Region 29 - G_precentral: "<<i+1<<endl;
+        }
+
+        //S_central
+        if(labelIds_left[vertno_left[i]] == 660701)
+        {
+            interestingRows_Left.push_back(i);
+            out<<"Region 45 - S_central: "<<i+1<<endl;
+        }
+    }
+
+    QVector<int> interestingRows_Right;
+    out<<endl<<endl<<"interestingRows_Right (matlab syntax):"<<endl<<endl;
+    for(int i=0; i<vertno_right.rows() ; i++)
+    {
+        //G_postcentral
+        if(labelIds_right[vertno_right[i]] == 9221140)
+        {
+            interestingRows_Right.push_back(i);
+            out<<"Region 28 - G_postcentral: "<<i+1+vertno_left.rows()<<endl;
+        }
+
+        //G_precentral
+        if(labelIds_right[vertno_right[i]] == 11832380)
+        {
+            interestingRows_Right.push_back(i);
+            out<<"Region 29 - G_precentral: "<<i+1+vertno_left.rows()<<endl;
+        }
+
+        //S_central
+        if(labelIds_right[vertno_right[i]] == 660701)
+        {
+            interestingRows_Right.push_back(i);
+            out<<"Region 45 - S_central: "<<i+1+vertno_left.rows()<<endl;
+        }
+    }
+
+    wrtFWD.close();
 
     //
     // make an inverse operators
@@ -500,7 +562,7 @@ int main(int argc, char *argv[])
     // Compute inverse solution
     //
     MinimumNorm minimumNorm(inverse_operator, lambda2, method);
-    SourceEstimate sourceEstimate = minimumNorm.calculateInverse(evoked);
+    MNESourceEstimate sourceEstimate = minimumNorm.calculateInverse(evoked);
 
     if(sourceEstimate.isEmpty())
         return 1;
@@ -573,32 +635,32 @@ int main(int argc, char *argv[])
 //    std::cout << "Condition Number Gradiometers:\n" << t_dConditionNumberGrads << std::endl;
 //    std::cout << "Clustered Condition Number Gradiometers:\n" << t_dConditionNumberGradsClustered << std::endl;
 
+    // Write to file
+    t_sFileNameStc = QString("./mne_x_plugins/resources/tmsi/SourceLoc_Avr_MNE_left_tapping.stc");
+
+    if(!t_sFileNameStc.isEmpty())
+    {
+        QFile t_fileClusteredStc(t_sFileNameStc);
+        sourceEstimate.write(t_fileClusteredStc);
+    }
 
     //Source Estimate end
     //########################################################################################
-
-//    AnnotationSet t_annotSet("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot","./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot");
-//    AnnotationSet t_annotSet("/home/chdinh/sl_data/subjects/mind006/label/lh.aparc.a2009s.annot", "/home/chdinh/sl_data/subjects/mind006/label/rh.aparc.a2009s.annot");
-    AnnotationSet t_annotSet("E:/Data/sl_data/subjects/mind006/label/lh.aparc.a2009s.annot", "E:/Data/sl_data/subjects/mind006/label/rh.aparc.a2009s.annot");
-
-
-
-//    SurfaceSet t_surfSet("./MNE-sample-data/subjects/sample/surf/lh.white", "./MNE-sample-data/subjects/sample/surf/rh.white");
-//    SurfaceSet t_surfSet("/home/chdinh/sl_data/subjects/mind006/surf/lh.white", "/home/chdinh/sl_data/subjects/mind006/surf/rh.white");
-    SurfaceSet t_surfSet("E:/Data/sl_data/subjects/mind006/surf/lh.white", "E:/Data/sl_data/subjects/mind006/surf/rh.white");
+    AnnotationSet t_annotSet("D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/atlas/lh.aparc.a2009s.annot", "D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/atlas/rh.aparc.a2009s.annot");
+    SurfaceSet t_surfSet("D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/surface/lh.white", "D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/surface/rh.white");
 
     //only one time point - P100
-    qint32 sample = 0;
-    for(qint32 i = 0; i < sourceEstimate.times.size(); ++i)
-    {
-        if(sourceEstimate.times(i) >= 0)
-        {
-            sample = i;
-            break;
-        }
-    }
-    sample += (qint32)ceil(0.106/sourceEstimate.tstep); //100ms
-    sourceEstimate = sourceEstimate.reduce(sample, 1);
+//    qint32 sample = 0;
+//    for(qint32 i = 0; i < sourceEstimate.times.size(); ++i)
+//    {
+//        if(sourceEstimate.times(i) >= 0)
+//        {
+//            sample = i;
+//            break;
+//        }
+//    }
+//    sample += (qint32)ceil(0.106/sourceEstimate.tstep); //100ms
+//    sourceEstimate = sourceEstimate.reduce(sample, 1);
 
     QList<Label> t_qListLabels;
     QList<RowVector4i> t_qListRGBAs;
@@ -645,6 +707,5 @@ int main(int argc, char *argv[])
         sourceEstimate.write(t_fileClusteredStc);
     }
 
-//*/
     return a.exec();//1;//a.exec();
 }
