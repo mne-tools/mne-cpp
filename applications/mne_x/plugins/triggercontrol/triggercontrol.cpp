@@ -78,7 +78,7 @@ TriggerControl::TriggerControl()
 , m_iNumChs(0)
 , m_bIsRunning(false)
 {
-
+    connect(this, &TriggerControl::sendByte, this, &TriggerControl::sendByteTo);
 }
 
 
@@ -167,6 +167,27 @@ bool TriggerControl::stop()
 //    QThread::terminate();
 //    QThread::wait();
 
+
+    double sum = 0;
+    for(int i=0; i<m_vTimes.size(); i++)
+        sum += m_vTimes[i];
+
+    QFile file(qApp->applicationDirPath()+"/mne_x_plugins/resources/triggercontrol/");
+    file.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream out(&file);
+
+    for(int i=0; i<m_vTimes.size() ;i++)
+        out << m_vTimes[i];
+
+    // optional, as QFile destructor will already do it:
+    file.close();
+
+    std::cout << "Average time: " << sum/m_vTimes.size() << std::endl;
+    std::cout << "Size m_vTimes: " << m_vTimes.size() << std::endl;
+
+    m_pData.clear();
+    m_vTimes.clear();
+
     return true;
 }
 
@@ -220,7 +241,53 @@ void TriggerControl::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
 void TriggerControl::run()
 {
+    m_pData.clear();
+    //std::cout << "m_pData.size() " << m_pData.size() << std::endl;
 
+
+    bool t_bFound = false;
+
+    int count = 0;
+
+
+    while(m_bIsRunning)
+    {
+        m_qMutex.lock();
+
+        if(t_bFound && m_pData.size() > 0)
+        {
+            m_pData.clear();
+            ++count;
+
+            if(count > 2)
+            {
+                t_bFound = false;
+                count = 0;
+
+                emit sendByte(1);
+                m_qTime.start();
+            }
+
+        }
+
+        if(m_pData.size() > 0)
+        {
+            if(!t_bFound && m_pData.first()[m_iNumChs-2] > 1000)
+            {
+                //std::cout << "Time elpased: " << m_qTime.elapsed() << std::endl;
+
+                m_vTimes.push_back(m_qTime.elapsed());
+                emit sendByte(0);
+
+                t_bFound = true;
+            }
+
+            m_pData.pop_front();
+        }
+        m_qMutex.unlock();
+    }
+
+/*
     while(m_bIsRunning)
     {
         m_qMutex.lock();
@@ -234,14 +301,7 @@ void TriggerControl::run()
         }
 
         m_qMutex.unlock();
-    }
-
-
-
-
-
-
-
+    }*/
 
 //    int count = 0;
 //    double v = 0;
@@ -259,3 +319,18 @@ void TriggerControl::run()
 //        ++count;
 //    }
 }
+
+
+//*************************************************************************************************************
+
+void TriggerControl::sendByteTo(int value)
+{
+    QByteArray t_data;
+    t_data.resize(3);
+    t_data.append(value);
+
+   // std::cout << t_data.size() << std::endl;
+
+    m_pSerialPort->sendData(t_data);
+}
+

@@ -174,12 +174,12 @@
          <string>Send</string>
         </property>
        </widget>
-       <widget class="QWidget" name="">
+       <widget class="QWidget" name="layoutWidget">
         <property name="geometry">
          <rect>
           <x>1</x>
           <y>38</y>
-          <width>211</width>
+          <width>242</width>
           <height>121</height>
          </rect>
         </property>
@@ -364,31 +364,22 @@
          </item>
         </layout>
        </widget>
-       <zorder>m_qRadioButton_5</zorder>
-       <zorder>m_qRadioButton_2</zorder>
+       <widget class="QPushButton" name="m_qPushButton_nullen">
+        <property name="geometry">
+         <rect>
+          <x>120</x>
+          <y>180</y>
+          <width>75</width>
+          <height>23</height>
+         </rect>
+        </property>
+        <property name="text">
+         <string>Nullen</string>
+        </property>
+       </widget>
+       <zorder>layoutWidget</zorder>
        <zorder>m_qPushButton_Send</zorder>
-       <zorder>m_qRadioButton_4</zorder>
-       <zorder>m_qRadioButton_3</zorder>
-       <zorder>m_qRadioButton_1</zorder>
-       <zorder>m_qRadioButton_8</zorder>
-       <zorder>m_qRadioButton_7</zorder>
-       <zorder>m_qRadioButton_6</zorder>
-       <zorder>m_qGroupBox_Information</zorder>
-       <zorder>m_qRadioButton_9</zorder>
-       <zorder>m_qRadioButton_10</zorder>
-       <zorder>m_qRadioButton_11</zorder>
-       <zorder>m_qRadioButton_12</zorder>
-       <zorder>m_qRadioButton_13</zorder>
-       <zorder>m_qRadioButton_14</zorder>
-       <zorder>m_qRadioButton_15</zorder>
-       <zorder>m_qRadioButton_16</zorder>
-       <zorder>m_qRadioButton_17</zorder>
-       <zorder>m_qRadioButton_18</zorder>
-       <zorder>m_qRadioButton_19</zorder>
-       <zorder>m_qRadioButton_20</zorder>
-       <zorder>m_qRadioButton_21</zorder>
-       <zorder>m_qRadioButton_22</zorder>
-       <zorder>m_qTextBrowser_Information</zorder>
+       <zorder>m_qPushButton_nullen</zorder>
       </widget>
      </item>
     </layout>
