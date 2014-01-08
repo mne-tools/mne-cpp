@@ -325,7 +325,7 @@ bool Annotation::toLabels(const Surface &p_surf, QList<Label> &p_qListLabels, QL
     }
 
 
-//    for label_id, label_name, label_rgba in\
+//    for label_id, label_name, label_rgba in
 //            zip(label_ids, label_names, label_rgbas):
 //        vertices = np.where(annot == label_id)[0]
 //        if len(vertices) == 0:
