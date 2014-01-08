@@ -34,8 +34,8 @@
 *
 */
 
-#ifndef MNE_MAINWINDOW_H
-#define MNE_MAINWINDOW_H
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -43,18 +43,23 @@
 //=============================================================================================================
 
 //Qt
+#include <QApplication>
 #include <QMainWindow>
-#include <QTableView>
-#include <QHeaderView>
 #include <QFileDialog>
 #include <QFile>
-#include <QApplication>
 #include <QMenu>
 #include <QMenuBar>
 #include <QAction>
 
-//own
+#include <QTableView>
+#include <QHeaderView>
+
+//MNE
 #include "rawmodel.h"
+#include "rawdelegate.h"
+
+class RawDelegate;
+class RawModel;
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -79,10 +84,15 @@ private slots:
 
 private:
     void setupModel();
+    void setupDelegate();
     void setupView();
 
-    QAbstractTableModel *m_pRawModel;
+    void createMenus();
+    void setWindow();
+
+    RawModel *m_pRawModel;
     QTableView *m_pTableView;
+    RawDelegate *m_pRawDelegate;
 };
 
 #endif // MAINWINDOW

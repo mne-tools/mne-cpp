@@ -40,19 +40,10 @@
 // INCLUDES
 //=============================================================================================================
 
-//Qt
-#include <QAbstractItemDelegate>
-
-//MNE
-#include <fiff/fiff.h>
-#include <mne/mne.h>
-#include <fiff/fiff_io.h>
-
-//Eigen
-#include <Eigen/Core>
-#include <Eigen/SparseCore>
-
 #include "rawdelegate.h"
+
+#include <QPointF>
+#include <QRect>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -72,6 +63,15 @@ RawDelegate::RawDelegate(QObject *parent)
 
 void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
+    // prepare
+    painter->save();
+
+    //Set custom QStyleOptionViewItem
+    QRect rect = option.rect.adjusted(20,20,-20,-20);
+
+    painter->drawText(rect, Qt::AlignCenter | Qt::AlignVCenter,index.model()->data(index,Qt::DisplayRole).toString());
+
+    painter->restore();
 
 }
 
@@ -79,6 +79,6 @@ void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, c
 
 QSize RawDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-
+    return QSize(1000,100);
 }
 
