@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
-* @file     main.cpp
+* @file     mainwindow.h
 * @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     December, 2013
+* @date     January, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,32 +30,59 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implements the mne_browse_raw_qt GUI application.
+* @brief    Implements the mainwindow function of mne_browse_raw_qt
 *
 */
+
+#ifndef MNE_MAINWINDOW_H
+#define MNE_MAINWINDOW_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <QApplication>
+//Qt
+#include <QMainWindow>
 #include <QTableView>
+#include <QHeaderView>
+#include <QFileDialog>
+#include <QFile>
+#include <QApplication>
+#include <QMenu>
+#include <QMenuBar>
+#include <QAction>
 
-#include "mainwindow.h"
+//own
+#include "rawmodel.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
-// MAIN
+// DEFINE NAMESPACE
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+
+//=============================================================================================================
+
+class MainWindow : public QMainWindow
 {
-    QApplication a(argc, argv);
+    Q_OBJECT
 
-    //ModelView w;
-    MainWindow w;
-    w.show();
+public:
+    explicit MainWindow(QWidget *parent = 0);
+    ~MainWindow();
 
-    return a.exec();
-}
+public slots:
+
+private slots:
+    void openFile();
+
+private:
+    void setupModel();
+    void setupView();
+
+    QAbstractTableModel *m_pRawModel;
+    QTableView *m_pTableView;
+};
+
+#endif // MAINWINDOW
