@@ -41,6 +41,14 @@
 
 #include "mainwindow.h"
 
+#include "plotsignalwidget.h"
+
+#include <QWidget>
+#include <QPainter>
+
+#include <QVBoxLayout>
+#include <QGroupBox>
+
 //*************************************************************************************************************
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -84,7 +92,32 @@ void MainWindow::setupView()
     //set custom delegate for view
     m_pTableView->setItemDelegate(m_pRawDelegate);
 
-    setCentralWidget(m_pTableView);
+//    setCentralWidget(m_pTableView);
+
+    QFile t_rawFile("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+    FiffIO m_fiffIO(t_rawFile);
+
+    MatrixXd t_data,t_times;
+    m_fiffIO.m_qlistRaw[0]->read_raw_segment_times(t_data,t_times,100,102);
+
+
+
+    //generate plotsignalwidget
+    PlotSignalWidget *plotSignalWidget = new PlotSignalWidget(t_data.row(0),t_times,this);
+
+//    QGroupBox *box = new QGroupBox();
+//    box->setTitle("Test");
+
+    //set vertical layout
+    QVBoxLayout *mainlayout = new QVBoxLayout;
+    mainlayout->addWidget(plotSignalWidget);
+    mainlayout->addWidget(m_pTableView);
+
+    //set layouts
+    QWidget *window = new QWidget();
+    window->setLayout(mainlayout);
+
+    setCentralWidget(window);
 }
 
 

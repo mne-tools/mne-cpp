@@ -1,7 +1,7 @@
 //=============================================================================================================
 /**
-* @file     rawdelegate.cpp
-* @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
+* @file     plotsignalwidget.cpp
+* @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -9,7 +9,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,49 +30,82 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of delegate of mne_browse_raw_qt
+* @brief    Implements the PlotSignalWidget function of mne_browse_raw_qt
 *
 */
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "rawdelegate.h"
+#include "plotsignalwidget.h"
 
+#include <QPainter>
 #include <QPointF>
-#include <QRect>
 
 //*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
 
-using namespace Eigen;
-using namespace MNELIB;
-
-//=============================================================================================================
-
-RawDelegate::RawDelegate(QObject *parent)
+PlotSignalWidget::PlotSignalWidget(QWidget *parent)
+: QWidget(parent)
 {
 }
 
-//=============================================================================================================
-
-void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+PlotSignalWidget::PlotSignalWidget(MatrixXd data, MatrixXd times, QWidget *parent)
+: QWidget(parent)
 {
-    QRect rect = option.rect;
-    painter->drawText(rect, NULL ,index.model()->data(index,Qt::DisplayRole).toString());
+//    m_data = data;
+//    m_times = times;
 
+    qDebug("size of data matrix is %ix%i",data.rows(),data.cols());
+}
+
+//*************************************************************************************************************
+
+void PlotSignalWidget::paintEvent(QPaintEvent *)
+{
+    QPainter painter(this);
+
+    painter.save();
+
+    //Draw background
+    painter.setBrush(Qt::white);
+    painter.setPen(Qt::NoPen);
+    painter.drawRect(0, 0, width(),200);
+
+    painter.restore();
+
+    QPointF point(100,100);
+    painter.drawText(point,"test");
 
 }
 
-//=============================================================================================================
-
-QSize RawDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
+void PlotSignalWidget::createPath()
 {
-    return QSize(1000,100);
-}
+//    double dValue = 0;
+//    double dPositionDifference = 0.0;
+//    for(unsigned char i = 0; i < m_data.size(); ++i)
+//    {
+//        dValue = m_data[i]*m_fScaleFactor - m_dMiddle;
+//        dPositionDifference = m_dPosition - (m_dPosX+width());
 
+//        if((dPositionDifference >= 0) || m_bStartFlag)
+//        {
+//            if(m_bStartFlag)
+//                dPositionDifference = 0;
+
+//            m_qPainterPath = QPainterPath();
+//                m_dPosition = m_dPosX + dPositionDifference;
+//                m_qPainterPath.moveTo(m_dPosition, m_dPosY-dValue);
+
+//        }
+//        else
+//        {
+//            m_qMutex.lock();
+//                m_qPainterPath.lineTo(m_dPosition, m_dPosY-dValue);
+//            m_qMutex.unlock();
+//        }
+
+//        m_dPosition = m_dPosition + m_dSampleWidth;
+//    }
+}
