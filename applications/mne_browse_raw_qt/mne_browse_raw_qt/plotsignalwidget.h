@@ -1,7 +1,7 @@
 //=============================================================================================================
 /**
-* @file     rawdelegate.cpp
-* @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
+* @file     plotsignal.h
+* @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -9,7 +9,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,49 +30,62 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of delegate of mne_browse_raw_qt
+* @brief    Implements the PlotSignalWidget of mne_browse_raw_qt
 *
 */
 
+#ifndef PLOTSIGNAL_H
+#define PLOTSIGNAL_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "rawdelegate.h"
+//Qt
+#include <QWidget>
 
-#include <QPointF>
-#include <QRect>
+//Eigen
+#include <Eigen/Core>
+#include <Eigen/SparseCore>
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// DEFINE NAMESPACE
 //=============================================================================================================
 
 using namespace Eigen;
-using namespace MNELIB;
 
 //=============================================================================================================
 
-RawDelegate::RawDelegate(QObject *parent)
+#include <QWidget>
+
+class PlotSignalWidget : public QWidget
 {
-}
+    Q_OBJECT
+public:
+    PlotSignalWidget(QWidget *parent = 0);
+    PlotSignalWidget(MatrixXd data, MatrixXd times, QWidget *parent = 0);
 
-//=============================================================================================================
+protected:
+    void paintEvent(QPaintEvent *event);
 
-void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
-{
-    QRect rect = option.rect;
-    painter->drawText(rect, NULL ,index.model()->data(index,Qt::DisplayRole).toString());
+signals:
+
+public slots:
+
+private:
+    void createPath();
+
+    QVector<double> m_data,m_times;
+    QPainterPath m_qPainterPath; /**< The current painter path which is the real-time curve. */
 
 
-}
+    double m_dPosition; /**< The start position which is the x position of the frame. */
+    double m_dPosX; /**< The x position of the frame. */
+    double m_dPosY; /**< The middle y position of the frame. */
+    float m_fScaleFactor; /**< Current scaling factor -> renewed over actualize. */
 
-//=============================================================================================================
+};
 
-QSize RawDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
-{
-    return QSize(1000,100);
-}
-
+#endif // PLOTSIGNAL_H

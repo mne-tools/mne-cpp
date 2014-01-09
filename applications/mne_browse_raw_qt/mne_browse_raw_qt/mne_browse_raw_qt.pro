@@ -69,12 +69,16 @@ DESTDIR = $${MNE_BINARY_DIR}
 SOURCES += main.cpp\
     rawmodel.cpp \
     mainwindow.cpp \
-    rawdelegate.cpp
+    rawdelegate.cpp \
+    analogclock.cpp \
+    plotsignalwidget.cpp
 
 HEADERS  += \
     rawmodel.h \
     mainwindow.h \
-    rawdelegate.h
+    rawdelegate.h \
+    analogclock.h \
+    plotsignalwidget.h
 
 FORMS +=
 
