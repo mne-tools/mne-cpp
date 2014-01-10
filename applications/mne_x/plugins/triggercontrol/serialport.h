@@ -108,11 +108,11 @@ public:
     void close();           /**< Closes a communication channel to the serial port.*/
 
 
-    void encodedig();       /**< Encodes the chosen digital channels according to the data transfer protocol.*/
-    void encodeana();  /**< Encodes the chosen analog channels and values according to the data transfer protocol.*/
+//    void encodedig();       /**< Encodes the chosen digital channels according to the data transfer protocol.*/
+//    void encodeana();  /**< Encodes the chosen analog channels and values according to the data transfer protocol.*/
 
-    void decodedig();       /**< Decodes the incoming digital information according to the data transfer protocol.*/
-    void decodeana();       /**< Decodes the incoming analog information according to the data transfer protocol.*/
+//    void decodedig();       /**< Decodes the incoming digital information according to the data transfer protocol.*/
+//    void decodeana();       /**< Decodes the incoming analog information according to the data transfer protocol.*/
 
     void sendData(const QByteArray &data);    /**< Sends an array of bytes to the configured serial port.*/
 
@@ -123,10 +123,10 @@ public:
    // void handleError(QSerialPort::SerialPortError error);
 
     QByteArray m_data;
-    QVector<int> m_digchannel;
+/*    QVector<int> m_digchannel;
     int m_motor;
     int m_analval;
-
+*/
     struct Settings {
         QString name;
         qint32 baudRate;
