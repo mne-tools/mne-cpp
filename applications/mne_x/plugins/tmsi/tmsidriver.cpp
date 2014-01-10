@@ -392,14 +392,14 @@ bool TMSIDriver::uninitDevice()
             iSamplesWrittenToMatrix = iSamplesWrittenToMatrix + actualSamplesWritten;
         }
 
-        if(m_outputFileStream.is_open() && m_bWriteDriverDebugToFile)
-        {
-            m_outputFileStream << "ulSizeSamples: " << ulSizeSamples << endl;
-            m_outputFileStream << "ulNumSamplesReceived: " << ulNumSamplesReceived << endl;
-            m_outputFileStream << "sampleMax: " << sampleMax << endl;
-            m_outputFileStream << "sampleIterator: " << sampleIterator << endl;
-            m_outputFileStream << "iSamplesWrittenToMatrix: " << iSamplesWrittenToMatrix << endl << endl;
-        }
+//        if(m_outputFileStream.is_open() && m_bWriteDriverDebugToFile)
+//        {
+//            m_outputFileStream << "ulSizeSamples: " << ulSizeSamples << endl;
+//            m_outputFileStream << "ulNumSamplesReceived: " << ulNumSamplesReceived << endl;
+//            m_outputFileStream << "sampleMax: " << sampleMax << endl;
+//            m_outputFileStream << "sampleIterator: " << sampleIterator << endl;
+//            m_outputFileStream << "iSamplesWrittenToMatrix: " << iSamplesWrittenToMatrix << endl << endl;
+//        }
     }
 
     if(/*m_outputFileStream.is_open() &&*/ m_bWriteDriverDebugToFile)
