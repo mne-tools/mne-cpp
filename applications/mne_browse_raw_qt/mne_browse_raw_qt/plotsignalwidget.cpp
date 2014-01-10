@@ -71,7 +71,7 @@ void PlotSignalWidget::paintEvent(QPaintEvent *)
     //Draw background
     painter.setBrush(Qt::white);
     painter.setPen(Qt::NoPen);
-    painter.drawRect(0, 0, width(),200);
+    painter.drawRect(0, 0, width(),150);
 
     painter.restore();
 

@@ -86,10 +86,10 @@ QVariant RawModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-Qt::ItemFlags RawModel::flags(const QModelIndex & index) const
+/*Qt::ItemFlags RawModel::flags(const QModelIndex & index) const
 {
 //    return Qt::NoItemFlags;
-}
+}*/
 
 QVariant RawModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
