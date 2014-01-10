@@ -80,7 +80,7 @@
         <property name="title">
          <string>Channels</string>
         </property>
-        <widget class="QWidget" name="">
+        <widget class="QWidget" name="layoutWidget">
          <property name="geometry">
           <rect>
            <x>1</x>
@@ -97,12 +97,18 @@
               <property name="text">
                <string>22</string>
               </property>
+              <property name="autoExclusive">
+               <bool>false</bool>
+              </property>
              </widget>
             </item>
             <item row="0" column="3">
              <widget class="QRadioButton" name="m_qRadioButton_21">
               <property name="text">
                <string>21</string>
+              </property>
+              <property name="autoExclusive">
+               <bool>false</bool>
               </property>
              </widget>
             </item>
@@ -111,12 +117,18 @@
               <property name="text">
                <string>20</string>
               </property>
+              <property name="autoExclusive">
+               <bool>false</bool>
+              </property>
              </widget>
             </item>
             <item row="0" column="5">
              <widget class="QRadioButton" name="m_qRadioButton_19">
               <property name="text">
                <string>19</string>
+              </property>
+              <property name="autoExclusive">
+               <bool>false</bool>
               </property>
              </widget>
             </item>
@@ -125,12 +137,18 @@
               <property name="text">
                <string>18</string>
               </property>
+              <property name="autoExclusive">
+               <bool>false</bool>
+              </property>
              </widget>
             </item>
             <item row="1" column="1">
              <widget class="QRadioButton" name="m_qRadioButton_17">
               <property name="text">
                <string>17</string>
+              </property>
+              <property name="autoExclusive">
+               <bool>false</bool>
               </property>
              </widget>
             </item>
@@ -139,12 +157,18 @@
               <property name="text">
                <string>16</string>
               </property>
+              <property name="autoExclusive">
+               <bool>false</bool>
+              </property>
              </widget>
             </item>
             <item row="1" column="3">
              <widget class="QRadioButton" name="m_qRadioButton_15">
               <property name="text">
                <string>15</string>
+              </property>
+              <property name="autoExclusive">
+               <bool>false</bool>
               </property>
              </widget>
             </item>
@@ -153,12 +177,18 @@
               <property name="text">
                <string>14</string>
               </property>
+              <property name="autoExclusive">
+               <bool>false</bool>
+              </property>
              </widget>
             </item>
             <item row="1" column="5">
              <widget class="QRadioButton" name="m_qRadioButton_13">
               <property name="text">
                <string>13</string>
+              </property>
+              <property name="autoExclusive">
+               <bool>false</bool>
               </property>
              </widget>
             </item>
@@ -167,12 +197,18 @@
               <property name="text">
                <string>12</string>
               </property>
+              <property name="autoExclusive">
+               <bool>false</bool>
+              </property>
              </widget>
             </item>
             <item row="2" column="1">
              <widget class="QRadioButton" name="m_qRadioButton_11">
               <property name="text">
                <string>11</string>
+              </property>
+              <property name="autoExclusive">
+               <bool>false</bool>
               </property>
              </widget>
             </item>
@@ -181,12 +217,18 @@
               <property name="text">
                <string>10</string>
               </property>
+              <property name="autoExclusive">
+               <bool>false</bool>
+              </property>
              </widget>
             </item>
             <item row="2" column="3">
              <widget class="QRadioButton" name="m_qRadioButton_9">
               <property name="text">
                <string>9</string>
+              </property>
+              <property name="autoExclusive">
+               <bool>false</bool>
               </property>
              </widget>
             </item>
@@ -288,11 +330,8 @@
           </item>
          </layout>
         </widget>
-        <zorder>layoutWidget</zorder>
-        <zorder>m_qPushButton_Send</zorder>
-        <zorder>m_qPushButton_nullen</zorder>
        </widget>
-       <widget class="QWidget" name="">
+       <widget class="QWidget" name="layoutWidget">
         <property name="geometry">
          <rect>
           <x>10</x>
@@ -360,14 +399,7 @@
          </item>
         </layout>
        </widget>
-       <zorder>m_qRadioButton_motor1</zorder>
-       <zorder>m_qRadioButton_motor2</zorder>
-       <zorder>m_qRadioButton_motor3</zorder>
-       <zorder>m_qRadioButton_motor4</zorder>
-       <zorder>m_qPushButton_Sendanalog</zorder>
-       <zorder>dial</zorder>
-       <zorder>m_qAnalogDisp</zorder>
-       <zorder>m_qGroupBox_Channels</zorder>
+       <zorder>layoutWidget</zorder>
        <zorder>m_qGroupBox_Channels</zorder>
       </widget>
      </item>
