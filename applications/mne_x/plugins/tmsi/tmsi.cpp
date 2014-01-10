@@ -327,7 +327,7 @@ void TMSI::setUpFiffInfo()
             //Set channel type
             fChInfo.kind = FIFFV_STIM_CH;
 
-            sChType = QString("STIM");
+            sChType = QString("STI 014");
             fChInfo.ch_name = sChType;
         }
 
@@ -427,7 +427,7 @@ bool TMSI::start()
         m_pOutfid = Fiff::start_writing_raw(m_fileOut, *m_pFiffInfo, m_cals);
         fiff_int_t first = 0;
         m_pOutfid->write_int(FIFF_FIRST_SAMPLE, &first);
-        m_pOutfid->finish_writing_raw();
+        //m_pOutfid->finish_writing_raw();
     }
     else
         setUpFiffInfo();
