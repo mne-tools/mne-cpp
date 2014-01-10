@@ -101,22 +101,31 @@ public:
     ~SerialPort();
 
 
-    void initSettings();
-    void initPort();
+    void initSettings();    /**< Initializes Settings as #data bits or baud rate.*/
+    void initPort();        /**< Checks all available serial ports and initializes the one of the trigger box.*/
 
-    bool open();
-    void close();
-    void sendData(const QByteArray &data);
+    bool open();            /**< Opens a communication channel to the serial port.*/
+    void close();           /**< Closes a communication channel to the serial port.*/
 
-    void encodedig();
-    void encodeana(int anaval, int motor);
+
+    void encodedig();       /**< Encodes the chosen digital channels according to the data transfer protocol.*/
+    void encodeana();  /**< Encodes the chosen analog channels and values according to the data transfer protocol.*/
+
+    void decodedig();       /**< Decodes the incoming digital information according to the data transfer protocol.*/
+    void decodeana();       /**< Decodes the incoming analog information according to the data transfer protocol.*/
+
+    void sendData(const QByteArray &data);    /**< Sends an array of bytes to the configured serial port.*/
+
+
  //   void writeData(const QByteArray &data);
 //    void readData();
 
    // void handleError(QSerialPort::SerialPortError error);
 
     QByteArray m_data;
-    QVector<int> digchannel;
+    QVector<int> m_digchannel;
+    int m_motor;
+    int m_analval;
 
     struct Settings {
         QString name;
