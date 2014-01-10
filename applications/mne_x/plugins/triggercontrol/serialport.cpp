@@ -74,8 +74,8 @@ SerialPort::SerialPort()
     initPort();
 
     m_digchannel.resize(22);
-    for (int i = 0; i < m_digchannel.size(); ++i)
-    m_digchannel[i] = i+1;
+    for (int i = 0; i < m_digchannel.size(); i++)
+    {m_digchannel.replace(i,0);}
 
     //for (int i = 0; i < digchannel.size(); i++)
     //std::cout << digchannel[i] << std::endl;
