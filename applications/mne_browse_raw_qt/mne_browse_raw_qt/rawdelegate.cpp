@@ -66,7 +66,6 @@ void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, c
     QRect rect = option.rect;
     painter->drawText(rect, NULL ,index.model()->data(index,Qt::DisplayRole).toString());
 
-
 }
 
 //=============================================================================================================

@@ -70,14 +70,11 @@ SOURCES += main.cpp\
     rawmodel.cpp \
     mainwindow.cpp \
     rawdelegate.cpp \
-    analogclock.cpp \
     plotsignalwidget.cpp
 
-HEADERS  += \
-    rawmodel.h \
+HEADERS  += rawmodel.h\
     mainwindow.h \
     rawdelegate.h \
-    analogclock.h \
     plotsignalwidget.h
 
 FORMS +=
