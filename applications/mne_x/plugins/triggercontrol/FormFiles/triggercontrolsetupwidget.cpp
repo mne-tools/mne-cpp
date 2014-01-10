@@ -169,48 +169,44 @@ void TriggerControlSetupWidget::on_m_qPushButton_Disconnect_released()
 
 void TriggerControlPlugin::TriggerControlSetupWidget::on_m_qPushButton_Send_released()
 {
-    QByteArray t_data;
-    t_data.resize(4);
-    t_data.clear();
-
-    //denote control bytes
-    t_data[0] = t_data[0]|0x40;
-    t_data[1] = t_data[1]|0x01;
-    t_data[2] = t_data[2]|0x02;
-    t_data[3] = t_data[3]|0x03;
-    // 1 - 6
-    if (ui.m_qRadioButton_1->isChecked()) t_data[3] = t_data[3]|0x04;     // 0000 0100
-    if (ui.m_qRadioButton_2->isChecked()) t_data[3] = t_data[3]|0x08;     // 0000 1000
-    if (ui.m_qRadioButton_3->isChecked()) t_data[3] = t_data[3]|0x10;     // 0001 0000
-    if (ui.m_qRadioButton_4->isChecked()) t_data[3] = t_data[3]|0x20;     // 0010 0000
-    if (ui.m_qRadioButton_5->isChecked()) t_data[3] = t_data[3]|0x40;     // 0100 0000
-    if (ui.m_qRadioButton_6->isChecked()) t_data[3] = t_data[3]|0x80;     // 1000 0000
+    // retrieve current configuration of digital channels
+    if (ui.m_qRadioButton_1->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(0,1);     // 0000 0100
+    if (ui.m_qRadioButton_2->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(1,1);     // 0000 1000
+    if (ui.m_qRadioButton_3->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(2,1);     // 0001 0000
+    if (ui.m_qRadioButton_4->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(3,1);     // 0010 0000
+    if (ui.m_qRadioButton_5->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(4,1);     // 0100 0000
+    if (ui.m_qRadioButton_6->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(5,1);     // 1000 0000
 
     // 7 - 12
-    if (ui.m_qRadioButton_7->isChecked()) t_data[2] = t_data[2]|0x04;     // 0000 0100
-    if (ui.m_qRadioButton_8->isChecked()) t_data[2] = t_data[2]|0x08;     // 0000 1000
-    if (ui.m_qRadioButton_9->isChecked()) t_data[2] = t_data[2]|0x10;     // 0001 0000
-    if (ui.m_qRadioButton_10->isChecked()) t_data[2] = t_data[2]|0x20;     // 0010 0000
-    if (ui.m_qRadioButton_11->isChecked()) t_data[2] = t_data[2]|0x40;     // 0100 0000
-    if (ui.m_qRadioButton_12->isChecked()) t_data[2] = t_data[2]|0x80;     // 1000 0000
+    if (ui.m_qRadioButton_7->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(6,1);     // 0000 0100
+    if (ui.m_qRadioButton_8->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(7,1);     // 0000 1000
+    if (ui.m_qRadioButton_9->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(8,1);     // 0001 0000
+    if (ui.m_qRadioButton_10->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(9,1);     // 0010 0000
+    if (ui.m_qRadioButton_11->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(10,1);     // 0100 0000
+    if (ui.m_qRadioButton_12->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(11,1);     // 1000 0000
 
     // 13 - 18
-    if (ui.m_qRadioButton_13->isChecked()) t_data[1] = t_data[1]|0x04;     // 0000 0100
-    if (ui.m_qRadioButton_14->isChecked()) t_data[1] = t_data[1]|0x08;     // 0000 1000
-    if (ui.m_qRadioButton_15->isChecked()) t_data[1] = t_data[1]|0x10;     // 0001 0000
-    if (ui.m_qRadioButton_16->isChecked()) t_data[1] = t_data[1]|0x20;     // 0010 0000
-    if (ui.m_qRadioButton_17->isChecked()) t_data[1] = t_data[1]|0x40;     // 0100 0000
-    if (ui.m_qRadioButton_18->isChecked()) t_data[1] = t_data[1]|0x80;     // 1000 0000
+    if (ui.m_qRadioButton_13->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(12,1);     // 0000 0100
+    if (ui.m_qRadioButton_14->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(13,1);     // 0000 1000
+    if (ui.m_qRadioButton_15->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(14,1);     // 0001 0000
+    if (ui.m_qRadioButton_16->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(15,1);     // 0010 0000
+    if (ui.m_qRadioButton_17->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(16,1);     // 0100 0000
+    if (ui.m_qRadioButton_18->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(17,1);     // 1000 0000
 
     // 19 - 22
-    if (ui.m_qRadioButton_19->isChecked()) t_data[0] = t_data[0]|0x04;     // 0000 0100
-    if (ui.m_qRadioButton_20->isChecked()) t_data[0] = t_data[0]|0x08;     // 0000 1000
-    if (ui.m_qRadioButton_21->isChecked()) t_data[0] = t_data[0]|0x10;     // 0001 0000
-    if (ui.m_qRadioButton_22->isChecked()) t_data[0] = t_data[0]|0x20;     // 0010 0000
+    if (ui.m_qRadioButton_19->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(18,1);     // 0000 0100
+    if (ui.m_qRadioButton_20->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(19,1);     // 0000 1000
+    if (ui.m_qRadioButton_21->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(20,1);     // 0001 0000
+    if (ui.m_qRadioButton_22->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(21,1);     // 0010 0000
 
-  //  m_pTriggerControl->m_pSerialPort->encodedig();
 
-    m_pTriggerControl->m_pSerialPort->sendData(t_data);
+    // encode information according to data transfer protocol
+    m_pTriggerControl->m_pSerialPort->encodedig();
+
+
+    // send data
+    m_pTriggerControl->m_pSerialPort->sendData(m_pTriggerControl->m_pSerialPort->m_data);
+
     std::cout << "Digitale Daten gesendet" << std::endl;
 }
 
@@ -230,17 +226,22 @@ void TriggerControlPlugin::TriggerControlSetupWidget::on_m_qPushButton_nullen_re
 
 void TriggerControlPlugin::TriggerControlSetupWidget::on_m_qPushButton_Sendanalog_released()
 {
-    // create Data byte
-    int t_motor;
-    if(ui.m_qRadioButton_motor1->isChecked()) t_motor = 1;
-    if(ui.m_qRadioButton_motor2->isChecked()) t_motor = 2;
-    if(ui.m_qRadioButton_motor3->isChecked()) t_motor = 3;
-    if(ui.m_qRadioButton_motor4->isChecked()) t_motor = 4;
+    // retrieve current configuration
+    // retrieve motor selection
+    if(ui.m_qRadioButton_motor1->isChecked()) m_pTriggerControl->m_pSerialPort->m_motor = 1;
+    if(ui.m_qRadioButton_motor2->isChecked()) m_pTriggerControl->m_pSerialPort->m_motor = 2;
+    if(ui.m_qRadioButton_motor3->isChecked()) m_pTriggerControl->m_pSerialPort->m_motor = 3;
+    if(ui.m_qRadioButton_motor4->isChecked()) m_pTriggerControl->m_pSerialPort->m_motor = 4;
 
-    int t_analval = ui.m_qAnalogDisp->intValue();
+    // retrieve analog value
+    m_pTriggerControl->m_pSerialPort->m_analval = ui.m_qAnalogDisp->intValue();
 
-    m_pTriggerControl->m_pSerialPort->encodeana(t_analval,t_motor);
 
+    // encode information according to data transfer protocol
+    m_pTriggerControl->m_pSerialPort->encodeana();
+
+
+    // send data
     m_pTriggerControl->m_pSerialPort->sendData(m_pTriggerControl->m_pSerialPort->m_data);
 
     std::cout << "Analoge Daten gesendet" << std::endl;

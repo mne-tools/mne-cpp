@@ -73,12 +73,14 @@ SerialPort::SerialPort()
     initSettings();
     initPort();
 
-    digchannel.resize(22);
-    for (int i = 0; i < digchannel.size(); ++i)
-    digchannel[i] = i+1;
+    m_digchannel.resize(22);
+    for (int i = 0; i < m_digchannel.size(); ++i)
+    m_digchannel[i] = i+1;
 
-    for (int i = 0; i < digchannel.size(); i++)
-    std::cout << digchannel[i] << std::endl;
+    //for (int i = 0; i < digchannel.size(); i++)
+    //std::cout << digchannel[i] << std::endl;
+    m_motor = 1;
+    m_analval = 0;
 
 
 }
@@ -101,14 +103,25 @@ void SerialPort::close()
     std::cout << "port geschlossen" << std::endl;
 }
 
+//*************************************************************************************************************
+
+void SerialPort::decodeana()
+{
+    std::cout << "Not implemented yet" << endl;
+}
 
 //*************************************************************************************************************
 
-void SerialPort::encodeana(int m_analval, int motor)
+void SerialPort::decodedig()
+{
+    std::cout << "Not implemented yet" << endl;
+}
+
+//*************************************************************************************************************
+
+void SerialPort::encodeana()
 {
 
-//    QByteArray m_data;
-  //  m_data.resize(4);
 
     m_data.clear();
 
@@ -126,12 +139,11 @@ void SerialPort::encodeana(int m_analval, int motor)
 
     //m_data[0] = m_data[0]|0x04;
 
-    if (motor == 1)     {m_data[0] = m_data[0]|0x00;}     // 0000 0000   1. Motor
-    else if (motor == 2){m_data[0] = m_data[0]|0x04;}     // 0000 0100   2. Motor
-    else if (motor == 3){m_data[0] = m_data[0]|0x08;}     // 0000 1000   3. Motor
-    else if (motor == 4){m_data[0] = m_data[0]|0x10;}     // 0001 0000   4. Motor
-    else {qDebug() << "Fehler bei Motorauswahl" << endl;}
-
+    if (m_motor == 1)     {m_data[0] = m_data[0]|0x00;}     // 0000 0000   1. Motor
+    else if (m_motor == 2){m_data[0] = m_data[0]|0x04;}     // 0000 0100   2. Motor
+    else if (m_motor == 3){m_data[0] = m_data[0]|0x08;}     // 0000 1000   3. Motor
+    else if (m_motor == 4){m_data[0] = m_data[0]|0x10;}     // 0001 0000   4. Motor
+    else {std::cout << "Fehler bei Motorauswahl" << std::endl;}
 
 // Konvertierung analoger Wert
 
@@ -184,7 +196,7 @@ void SerialPort::encodeana(int m_analval, int motor)
         }
         }
 
-    qDebug() << "Analog ausgelesen" << endl;
+    std::cout << "Analog ausgelesen" << std::endl;
 
 
 }
@@ -193,58 +205,53 @@ void SerialPort::encodeana(int m_analval, int motor)
 
 void SerialPort::encodedig()
 {
-    std::cout << "not implemented yet" << std::endl;
-/*
 
-    m_data.resize(4);
     m_data.clear();
 
     //denote control bytes
-    m_data[0] = m_data[0]|0x00;
+    m_data[0] = m_data[0]|0x40;
     m_data[1] = m_data[1]|0x01;
     m_data[2] = m_data[2]|0x02;
     m_data[3] = m_data[3]|0x03;
 
 
-
-
-
-    // Auswerten der Steuerung
+    // evaluate chosen digital channels
     // 1 - 6
 
-    if (ui->radioButton_1->isChecked()) m_data[3] = m_data[3]|0x04;     // 0000 0100
-    if (ui->radioButton_2->isChecked()) m_data[3] = m_data[3]|0x08;     // 0000 1000
-    if (ui->radioButton_3->isChecked()) m_data[3] = m_data[3]|0x10;     // 0001 0000
-    if (ui->radioButton_4->isChecked()) m_data[3] = m_data[3]|0x20;     // 0010 0000
-    if (ui->radioButton_5->isChecked()) m_data[3] = m_data[3]|0x40;     // 0100 0000
-    if (ui->radioButton_6->isChecked()) m_data[3] = m_data[3]|0x80;     // 1000 0000
+    if (m_digchannel.at(0) == 1) m_data[3] = m_data[3]|0x04;     // 0000 0100
+    if (m_digchannel.at(1) == 1) m_data[3] = m_data[3]|0x08;     // 0000 1000
+    if (m_digchannel.at(2) == 1) m_data[3] = m_data[3]|0x10;     // 0001 0000
+    if (m_digchannel.at(3) == 1) m_data[3] = m_data[3]|0x20;     // 0010 0000
+    if (m_digchannel.at(4) == 1) m_data[3] = m_data[3]|0x40;     // 0100 0000
+    if (m_digchannel.at(5) == 1) m_data[3] = m_data[3]|0x80;     // 1000 0000
 
     // 7 - 12
-    if (ui->radioButton_7->isChecked()) m_data[2] = m_data[2]|0x04;     // 0000 0100
-    if (ui->radioButton_8->isChecked()) m_data[2] = m_data[2]|0x08;     // 0000 1000
-    if (ui->radioButton_9->isChecked()) m_data[2] = m_data[2]|0x10;     // 0001 0000
-    if (ui->radioButton_10->isChecked()) m_data[2] = m_data[2]|0x20;     // 0010 0000
-    if (ui->radioButton_11->isChecked()) m_data[2] = m_data[2]|0x40;     // 0100 0000
-    if (ui->radioButton_12->isChecked()) m_data[2] = m_data[2]|0x80;     // 1000 0000
+    if (m_digchannel.at(6) == 1) m_data[2] = m_data[2]|0x04;     // 0000 0100
+    if (m_digchannel.at(7) == 1) m_data[2] = m_data[2]|0x08;     // 0000 1000
+    if (m_digchannel.at(8) == 1) m_data[2] = m_data[2]|0x10;     // 0001 0000
+    if (m_digchannel.at(9) == 1) m_data[2] = m_data[2]|0x20;     // 0010 0000
+    if (m_digchannel.at(10) == 1) m_data[2] = m_data[2]|0x40;     // 0100 0000
+    if (m_digchannel.at(11) == 1) m_data[2] = m_data[2]|0x80;     // 1000 0000
 
     // 13 - 18
-    if (ui->radioButton_13->isChecked()) m_data[1] = m_data[1]|0x04;     // 0000 0100
-    if (ui->radioButton_14->isChecked()) m_data[1] = m_data[1]|0x08;     // 0000 1000
-    if (ui->radioButton_15->isChecked()) m_data[1] = m_data[1]|0x10;     // 0001 0000
-    if (ui->radioButton_16->isChecked()) m_data[1] = m_data[1]|0x20;     // 0010 0000
-    if (ui->radioButton_17->isChecked()) m_data[1] = m_data[1]|0x40;     // 0100 0000
-    if (ui->radioButton_18->isChecked()) m_data[1] = m_data[1]|0x80;     // 1000 0000
+    if (m_digchannel.at(12) == 1) m_data[1] = m_data[1]|0x04;     // 0000 0100
+    if (m_digchannel.at(13) == 1) m_data[1] = m_data[1]|0x08;     // 0000 1000
+    if (m_digchannel.at(14) == 1) m_data[1] = m_data[1]|0x10;     // 0001 0000
+    if (m_digchannel.at(15) == 1) m_data[1] = m_data[1]|0x20;     // 0010 0000
+    if (m_digchannel.at(16) == 1) m_data[1] = m_data[1]|0x40;     // 0100 0000
+    if (m_digchannel.at(17) == 1) m_data[1] = m_data[1]|0x80;     // 1000 0000
 
     // 19 - 22
-    if (ui->radioButton_19->isChecked()) m_data[0] = m_data[0]|0x04;     // 0000 0100
-    if (ui->radioButton_20->isChecked()) m_data[0] = m_data[0]|0x08;     // 0000 1000
-    if (ui->radioButton_21->isChecked()) m_data[0] = m_data[0]|0x10;     // 0001 0000
-    if (ui->radioButton_22->isChecked()) m_data[0] = m_data[0]|0x20;     // 0010 0000
+    if (m_digchannel.at(18) == 1) m_data[0] = m_data[0]|0x04;     // 0000 0100
+    if (m_digchannel.at(19) == 1) m_data[0] = m_data[0]|0x08;     // 0000 1000
+    if (m_digchannel.at(20) == 1) m_data[0] = m_data[0]|0x10;     // 0001 0000
+    if (m_digchannel.at(21) == 1) m_data[0] = m_data[0]|0x20;     // 0010 0000
 
-    qDebug() << "Digital ausgelesen" << endl;
 
-    writeData(m_data);
-*/
+qDebug() << "Digital ausgelesen" << endl;
+
+    //writeData(m_data);
+
 }
 
 //*************************************************************************************************************
@@ -292,9 +299,9 @@ void SerialPort::initPort()
     }
 
     if(t_correctPort)
-        qDebug() << "correct port was found";
+        std::cout << "correct port was found" << std::cout;
     else
-        qDebug() << "correct port was not found";
+        std::cout << "correct port was not found" << std::cout;
 
 }
 
