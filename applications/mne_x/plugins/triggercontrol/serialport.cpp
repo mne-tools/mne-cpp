@@ -72,7 +72,7 @@ SerialPort::SerialPort()
 {
     initSettings();
     initPort();
-
+/*
     m_digchannel.resize(22);
     for (int i = 0; i < m_digchannel.size(); i++)
     {m_digchannel.replace(i,0);}
@@ -81,7 +81,7 @@ SerialPort::SerialPort()
     //std::cout << digchannel[i] << std::endl;
     m_motor = 1;
     m_analval = 0;
-
+*/
 
 }
 
@@ -104,7 +104,7 @@ void SerialPort::close()
 }
 
 //*************************************************************************************************************
-
+/*
 void SerialPort::decodeana()
 {
     std::cout << "Not implemented yet" << endl;
@@ -251,9 +251,8 @@ void SerialPort::encodedig()
 qDebug() << "Digital ausgelesen" << endl;
 
     //writeData(m_data);
-
 }
-
+*/
 //*************************************************************************************************************
 
 void SerialPort::initSettings()

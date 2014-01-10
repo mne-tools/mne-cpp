@@ -87,6 +87,7 @@ TriggerControlSetupWidget::TriggerControlSetupWidget(TriggerControl* toolbox, QW
     ui.m_qPushButton_Connect->setEnabled(true);
     ui.m_qPushButton_Disconnect->setEnabled(false);
     ui.m_qPushButton_Send->setEnabled(false);
+    ui.m_qPushButton_Sendanalog->setEnabled(false);
 
 
 
@@ -169,6 +170,7 @@ void TriggerControlSetupWidget::on_m_qPushButton_Disconnect_released()
 
 void TriggerControlPlugin::TriggerControlSetupWidget::on_m_qPushButton_Send_released()
 {
+    /*
     // retrieve current configuration of digital channels
     if (ui.m_qRadioButton_1->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(0,1);     // 0000 0100
     if (ui.m_qRadioButton_2->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(1,1);     // 0000 1000
@@ -199,33 +201,21 @@ void TriggerControlPlugin::TriggerControlSetupWidget::on_m_qPushButton_Send_rele
     if (ui.m_qRadioButton_21->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(20,1);     // 0001 0000
     if (ui.m_qRadioButton_22->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(21,1);     // 0010 0000
 
-
+*/
     // encode information according to data transfer protocol
-    m_pTriggerControl->m_pSerialPort->encodedig();
+ //   m_pTriggerControl->m_pSerialPort->encodedig();
 
 
     // send data
-    m_pTriggerControl->m_pSerialPort->sendData(m_pTriggerControl->m_pSerialPort->m_data);
+//    m_pTriggerControl->m_pSerialPort->sendData(m_pTriggerControl->m_pSerialPort->m_data);
 
     std::cout << "Digitale Daten gesendet" << std::endl;
 }
 
-void TriggerControlPlugin::TriggerControlSetupWidget::on_m_qPushButton_nullen_released()
-{
-    QByteArray t_data;
-    //t_data = m_pTriggerControl->m_pSerialPort->m_data;
-
-    t_data.resize(3);
-    int value = 0;
-    t_data.append(value);
-
-    std::cout << t_data.size() << std::endl;
-
-    m_pTriggerControl->m_pSerialPort->sendData(t_data);
-}
 
 void TriggerControlPlugin::TriggerControlSetupWidget::on_m_qPushButton_Sendanalog_released()
 {
+    /*
     // retrieve current configuration
     // retrieve motor selection
     if(ui.m_qRadioButton_motor1->isChecked()) m_pTriggerControl->m_pSerialPort->m_motor = 1;
@@ -235,14 +225,14 @@ void TriggerControlPlugin::TriggerControlSetupWidget::on_m_qPushButton_Sendanalo
 
     // retrieve analog value
     m_pTriggerControl->m_pSerialPort->m_analval = ui.m_qAnalogDisp->intValue();
-
+*/
 
     // encode information according to data transfer protocol
-    m_pTriggerControl->m_pSerialPort->encodeana();
+//    m_pTriggerControl->m_pSerialPort->encodeana();
 
 
     // send data
-    m_pTriggerControl->m_pSerialPort->sendData(m_pTriggerControl->m_pSerialPort->m_data);
+//    m_pTriggerControl->m_pSerialPort->sendData(m_pTriggerControl->m_pSerialPort->m_data);
 
     std::cout << "Analoge Daten gesendet" << std::endl;
 }
