@@ -170,7 +170,7 @@ void TriggerControlSetupWidget::on_m_qPushButton_Disconnect_released()
 
 void TriggerControlPlugin::TriggerControlSetupWidget::on_m_qPushButton_Send_released()
 {
-    /*
+
     // retrieve current configuration of digital channels
     if (ui.m_qRadioButton_1->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(0,1);     // 0000 0100
     if (ui.m_qRadioButton_2->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(1,1);     // 0000 1000
@@ -201,13 +201,13 @@ void TriggerControlPlugin::TriggerControlSetupWidget::on_m_qPushButton_Send_rele
     if (ui.m_qRadioButton_21->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(20,1);     // 0001 0000
     if (ui.m_qRadioButton_22->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(21,1);     // 0010 0000
 
-*/
-    // encode information according to data transfer protocol
- //   m_pTriggerControl->m_pSerialPort->encodedig();
+
+   // encode information according to data transfer protocol
+    m_pTriggerControl->m_pSerialPort->encodedig();
 
 
     // send data
-//    m_pTriggerControl->m_pSerialPort->sendData(m_pTriggerControl->m_pSerialPort->m_data);
+    m_pTriggerControl->m_pSerialPort->sendData(m_pTriggerControl->m_pSerialPort->m_data);
 
     std::cout << "Digitale Daten gesendet" << std::endl;
 }
@@ -215,7 +215,7 @@ void TriggerControlPlugin::TriggerControlSetupWidget::on_m_qPushButton_Send_rele
 
 void TriggerControlPlugin::TriggerControlSetupWidget::on_m_qPushButton_Sendanalog_released()
 {
-    /*
+
     // retrieve current configuration
     // retrieve motor selection
     if(ui.m_qRadioButton_motor1->isChecked()) m_pTriggerControl->m_pSerialPort->m_motor = 1;
@@ -225,14 +225,14 @@ void TriggerControlPlugin::TriggerControlSetupWidget::on_m_qPushButton_Sendanalo
 
     // retrieve analog value
     m_pTriggerControl->m_pSerialPort->m_analval = ui.m_qAnalogDisp->intValue();
-*/
+
 
     // encode information according to data transfer protocol
-//    m_pTriggerControl->m_pSerialPort->encodeana();
+    m_pTriggerControl->m_pSerialPort->encodeana();
 
 
     // send data
-//    m_pTriggerControl->m_pSerialPort->sendData(m_pTriggerControl->m_pSerialPort->m_data);
+    m_pTriggerControl->m_pSerialPort->sendData(m_pTriggerControl->m_pSerialPort->m_data);
 
     std::cout << "Analoge Daten gesendet" << std::endl;
 }

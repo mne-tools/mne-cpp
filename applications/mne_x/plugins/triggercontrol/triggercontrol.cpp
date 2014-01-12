@@ -86,7 +86,8 @@ TriggerControl::TriggerControl()
 
 TriggerControl::~TriggerControl()
 {
-    stop();
+    if(this->isRunning())
+        stop();
 }
 
 
