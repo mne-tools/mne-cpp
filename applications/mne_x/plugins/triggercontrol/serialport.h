@@ -111,14 +111,14 @@ public:
     void encodedig();       /**< Encodes the chosen digital channels according to the data transfer protocol.*/
     void encodeana();  /**< Encodes the chosen analog channels and values according to the data transfer protocol.*/
 
-    void decodedig();       /**< Decodes the incoming digital information according to the data transfer protocol.*/
-    void decodeana();       /**< Decodes the incoming analog information according to the data transfer protocol.*/
+    void decodedig(QByteArray &t_incomingArray);       /**< Decodes the incoming digital information according to the data transfer protocol.*/
+    void decodeana(QByteArray &t_incomingArray);       /**< Decodes the incoming analog information according to the data transfer protocol.*/
 
     void sendData(const QByteArray &data);    /**< Sends an array of bytes to the configured serial port.*/
-
+    void readData();
 
  //   void writeData(const QByteArray &data);
-//    void readData();
+
 
    // void handleError(QSerialPort::SerialPortError error);
 
@@ -126,6 +126,10 @@ public:
     QVector<int> m_digchannel;
     int m_motor;
     int m_analval;
+
+    QVector<int> m_InAnChannelVal;        // contains the analog values coming from the MUC - channel specific position
+    QVector<int> m_InActiveDig;
+
 
     struct Settings {
         QString name;
