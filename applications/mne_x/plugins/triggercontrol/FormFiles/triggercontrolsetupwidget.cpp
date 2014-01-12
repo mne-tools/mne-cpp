@@ -235,4 +235,7 @@ void TriggerControlPlugin::TriggerControlSetupWidget::on_m_qPushButton_Sendanalo
     m_pTriggerControl->m_pSerialPort->sendData(m_pTriggerControl->m_pSerialPort->m_data);
 
     std::cout << "Analoge Daten gesendet" << std::endl;
+
+    m_pTriggerControl->m_pSerialPort->readData();
+
 }

@@ -85,6 +85,22 @@ SerialPort::SerialPort()
     m_analval = 0;
 
 
+    m_InAnChannelVal.resize(16);
+    for (int i = 0; i < m_InAnChannelVal.size(); i++)
+    {
+        m_InAnChannelVal.replace(i,0);
+    }
+
+    m_InActiveDig.resize(22);
+    for (int i = 0; i < m_InActiveDig.size(); i++)
+    {
+        m_InActiveDig.replace(i,0);
+    }
+
+
+    //connect(this->m_qSerialPort, SIGNAL(readyRead()), this, SLOT(SerialPort::readData()));   // if data available, read
+    //connect(&m_qSerialPort, &readyRead, this, &SerialPort::readData);
+
 }
 
 
@@ -107,16 +123,148 @@ void SerialPort::close()
 
 //*************************************************************************************************************
 
-void SerialPort::decodeana()
+void SerialPort::decodeana(QByteArray &t_incomingArray)
 {
-    std::cout << "Not implemented yet" << endl;
+
+    int AnChannel=0;
+    int AnValue=0;
+
+    t_incomingArray[0]=t_incomingArray[0] << 2;     // left shift to pop the type info (11)
+
+// decode channel
+         if (t_incomingArray.at(0) == 0x00) {AnChannel=1;}
+    else if (t_incomingArray.at(0)==0x10) {AnChannel=2;}
+    else if (t_incomingArray.at(0)==0x20) {AnChannel=3;}
+    else if (t_incomingArray.at(0)==0x40) {AnChannel=4;}
+    else if (t_incomingArray.at(0)==0x80) {AnChannel=5;}
+    else if (t_incomingArray.at(0)==0x30) {AnChannel=6;}
+    else if (t_incomingArray.at(0)==0x50) {AnChannel=7;}
+    else if (t_incomingArray.at(0)==0x90) {AnChannel=8;}
+    else if (t_incomingArray.at(0)==0x60) {AnChannel=9;}
+    else if (t_incomingArray.at(0)==0xA0) {AnChannel=10;}
+    else if (t_incomingArray.at(0)==0xC0) {AnChannel=11;}
+    else if (t_incomingArray.at(0)==0x70) {AnChannel=12;}
+    else if (t_incomingArray.at(0)==0xB0) {AnChannel=13;}
+    else if (t_incomingArray.at(0)==0xD0) {AnChannel=14;}
+    else if (t_incomingArray.at(0)==0xE0) {AnChannel=15;}
+    else if (t_incomingArray.at(0)==0xF0) {AnChannel=16;}
+    else {std::cout << "Error during analog channel selection" << std::endl;}
+
+
+
+// decode channel value
+    t_incomingArray[1]=t_incomingArray[1] >> 2;
+    t_incomingArray[2]=t_incomingArray[2] >> 2;
+    t_incomingArray[3]=t_incomingArray[3] >> 2;
+
+    if ((t_incomingArray[1]&0x08) == 0x08) {AnValue=AnValue+32768;}   // 0000 1000
+    if ((t_incomingArray[1]&0x04) == 0x04) {AnValue=AnValue+16384;}   // 0000 0100
+    if ((t_incomingArray[1]&0x02) == 0x02) {AnValue=AnValue+8192;}    // 0000 0010
+    if ((t_incomingArray[1]&0x01) == 0x01) {AnValue=AnValue+4096;}    // 0000 0001
+    if ((t_incomingArray[2]&0x20) == 0x20) {AnValue=AnValue+2048;}    // 0010 0000
+    if ((t_incomingArray[2]&0x10) == 0x10) {AnValue=AnValue+1024;}    // 0001 0000
+    if ((t_incomingArray[2]&0x08) == 0x08) {AnValue=AnValue+512;}     // 0000 1000
+    if ((t_incomingArray[2]&0x04) == 0x04) {AnValue=AnValue+256;}     // 0000 0100
+    if ((t_incomingArray[2]&0x02) == 0x02) {AnValue=AnValue+128;}     // 0000 0010
+    if ((t_incomingArray[2]&0x01) == 0x01) {AnValue=AnValue+64;}
+    if ((t_incomingArray[3]&0x20) == 0x20) {AnValue=AnValue+32;}
+    if ((t_incomingArray[3]&0x10) == 0x10) {AnValue=AnValue+16;}
+    if ((t_incomingArray[3]&0x08) == 0x08) {AnValue=AnValue+8;}
+    if ((t_incomingArray[3]&0x04) == 0x04) {AnValue=AnValue+4;}
+    if ((t_incomingArray[3]&0x02) == 0x02) {AnValue=AnValue+2;}
+    if ((t_incomingArray[3]&0x01) == 0x01) {AnValue=AnValue+1;}
+
+    std::cout << "Analoger Channel: " << AnChannel <<  " | Analogerwert:" << AnValue << std::endl;
+
+    m_InAnChannelVal[AnChannel-1] = AnValue;
+
 }
 
 //*************************************************************************************************************
 
-void SerialPort::decodedig()
+void SerialPort::decodedig(QByteArray &t_incomingArray)
 {
-    std::cout << "Not implemented yet" << endl;
+
+
+// decode channel 1-6
+
+    if ((t_incomingArray.at(3)&0x04) == 0x04) m_InActiveDig[0] = 1;              // 0000 0100
+    else m_InActiveDig[0] = 0;
+
+    if ((t_incomingArray.at(3)&0x08) == 0x08) m_InActiveDig[1] = 1;            // 0000 1000
+    else m_InActiveDig[1] = 0;
+
+    if ((t_incomingArray.at(3)&0x10) == 0x10) m_InActiveDig[2] = 1;            // 0001 0000
+    else m_InActiveDig[2] = 0;
+
+    if ((t_incomingArray.at(3)&0x20) == 0x20) m_InActiveDig[3] = 1;            // 0010 0000
+    else m_InActiveDig[3] = 0;
+
+    if ((t_incomingArray.at(3)&0x40) == 0x40) m_InActiveDig[4] = 1;             // 0100 0000
+    else m_InActiveDig[4] = 0;
+
+    if ((t_incomingArray.at(3)&0x80) == 0x80) m_InActiveDig[5] = 1;             // 1000 0000
+    else m_InActiveDig[5] = 0;
+
+
+// decode channel 7 - 12
+
+    if ((t_incomingArray.at(2)&0x04) == 0x4) m_InActiveDig[6] = 1;            // 0000 0100
+    else m_InActiveDig[6] = 0;
+
+    if ((t_incomingArray.at(2)&0x08) == 0x8) m_InActiveDig[7] = 1;            // 0000 1000
+    else m_InActiveDig[7] = 0;
+
+    if ((t_incomingArray.at(2)&0x10) == 0x10) m_InActiveDig[8] = 1;            // 0001 0000
+    else m_InActiveDig[8] = 0;
+
+    if ((t_incomingArray.at(2)&0x20) == 0x20) m_InActiveDig[9] = 1;            // 0010 0000
+    else m_InActiveDig[9] = 0;
+
+    if ((t_incomingArray.at(2)&0x40) == 0x40) m_InActiveDig[10] = 1;            // 0100 0000
+    else m_InActiveDig[10] = 0;
+
+    if ((t_incomingArray.at(2)&0x80) == 0x80) m_InActiveDig[11] = 1;            // 1000 0000
+    else m_InActiveDig[11] = 0;
+
+// decode channel 13 - 18
+
+    if ((t_incomingArray.at(1)&0x04) == 0x4) m_InActiveDig[12] = 1;            // 0000 0100
+    else m_InActiveDig[12] = 0;
+
+    if ((t_incomingArray.at(1)&0x08) == 0x8) m_InActiveDig[13] = 1;            // 0000 1000
+    else m_InActiveDig[13] = 0;
+
+    if ((t_incomingArray.at(1)&0x10) == 0x10) m_InActiveDig[14] = 1;            // 0001 0000
+    else m_InActiveDig[14] = 0;
+
+    if ((t_incomingArray.at(1)&0x20) == 0x20) m_InActiveDig[15] = 1;            // 0010 0000
+    else m_InActiveDig[15] = 0;
+
+
+    if ((t_incomingArray.at(1)&0x40) == 0x40) m_InActiveDig[16] = 1;            // 0100 0000
+    else m_InActiveDig[16] = 0;
+
+    if ((t_incomingArray.at(1)&0x80) == 0x80) m_InActiveDig[17] = 1;            // 1000 0000
+    else m_InActiveDig[17] = 0;
+
+// decode channel 19 - 22
+
+    if ((t_incomingArray.at(0)&0x04) == 0x4) m_InActiveDig[18] = 1;            // 0000 0100
+    else m_InActiveDig[18] = 0;
+
+    if ((t_incomingArray.at(0)&0x08) == 0x8) m_InActiveDig[19] = 1;            // 0000 1000
+    else m_InActiveDig[19] = 0;
+
+    if ((t_incomingArray.at(0)&0x10) == 0x10) m_InActiveDig[20] = 1;            // 0001 0000
+    else m_InActiveDig[20] = 0;
+
+    if ((t_incomingArray.at(0)&0x20) == 0x20) m_InActiveDig[21] = 1;            // 0010 0000
+    else m_InActiveDig[21] = 0;
+
+
+    for ( int i = 0; i<22;i++)
+        std::cout << "Kanal: " << m_InActiveDig[i] << std::endl;
 }
 
 //*************************************************************************************************************
@@ -308,9 +456,23 @@ void SerialPort::initPort()
 
 
 //*************************************************************************************************************
-void SerialPort::sendData(const QByteArray &data)
+void SerialPort::readData()
 {
-        m_qSerialPort.write(data);
+    QByteArray t_incomingArray = m_qSerialPort.readAll();
+
+    if(((t_incomingArray[0]&0x03) == 0x00) && ((t_incomingArray[1]&0x03) == 0x01) && ((t_incomingArray[2]&0x03) == 0x02) && ((t_incomingArray[3]&0x03) == 0x03))
+    {
+        if ((t_incomingArray[0]&0xC0) == 0x40)
+            decodedig(t_incomingArray);
+
+        else if ((t_incomingArray[0]&0xC0) == 0xC0)
+            decodeana(t_incomingArray);
+
+        else
+            std::cout << "Error while reading" << std::endl;
+    }
+
+
 }
 
 
@@ -362,6 +524,15 @@ bool SerialPort::open()
     }
 
     return success;
+}
+
+
+//*************************************************************************************************************
+
+
+void SerialPort::sendData(const QByteArray &data)
+{
+        m_qSerialPort.write(data);
 }
 
 
