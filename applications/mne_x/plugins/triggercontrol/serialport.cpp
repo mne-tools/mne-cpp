@@ -460,6 +460,20 @@ void SerialPort::readData()
 {
     QByteArray t_incomingArray = m_qSerialPort.readAll();
 
+/*    QByteArray t_incomingArray;
+    //t_incomingArray.resize(4);
+    t_incomingArray.append(0xC4);
+    t_incomingArray.append(0x0D);
+    t_incomingArray.append(0x7E);
+    t_incomingArray.append(0x2F);
+*/
+
+/*
+    t_incomingArray[0] = 0xC4;
+    t_incomingArray[1] = 0x0D;
+    t_incomingArray[2] = 0x7E;
+    t_incomingArray[3] = 0x2F;
+*/
     if(((t_incomingArray[0]&0x03) == 0x00) && ((t_incomingArray[1]&0x03) == 0x01) && ((t_incomingArray[2]&0x03) == 0x02) && ((t_incomingArray[3]&0x03) == 0x03))
     {
         if ((t_incomingArray[0]&0xC0) == 0x40)
