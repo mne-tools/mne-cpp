@@ -64,8 +64,12 @@ RawDelegate::RawDelegate(QObject *parent)
 void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     QRect rect = option.rect;
-    painter->drawText(rect, NULL ,index.model()->data(index,Qt::DisplayRole).toString());
+    qDebug("rectsize (WxH):%ix%i",option.rect.width(),option.rect.height());
 
+    switch(index.column()) {
+    case 0: painter->drawText(rect, NULL ,index.model()->data(index,Qt::DisplayRole).toString()); break;
+    case 1: painter->drawText(rect, NULL ,"Plot here"); break;
+    }
 }
 
 //=============================================================================================================
