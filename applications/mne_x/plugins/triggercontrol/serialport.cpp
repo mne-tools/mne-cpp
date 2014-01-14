@@ -99,7 +99,7 @@ SerialPort::SerialPort()
 
 
     //connect(this->m_qSerialPort, SIGNAL(readyRead()), this, SLOT(SerialPort::readData()));   // if data available, read
-    //connect(&m_qSerialPort, &readyRead, this, &SerialPort::readData);
+    connect(&m_qSerialPort, &QSerialPort::readyRead, this, &SerialPort::readData);
 
 }
 
