@@ -109,7 +109,8 @@ public:
 
 
     void encodedig();       /**< Encodes the chosen digital channels according to the data transfer protocol.*/
-    void encodeana();  /**< Encodes the chosen analog channels and values according to the data transfer protocol.*/
+    void encodeana();       /**< Encodes the chosen analog channels and values according to the data transfer protocol.*/
+    void encoderetr();      /**< Encodes a retrieve bytearray according to the data transfer protocol.*/
 
     void decodedig(QByteArray &t_incomingArray);       /**< Decodes the incoming digital information according to the data transfer protocol.*/
     void decodeana(QByteArray &t_incomingArray);       /**< Decodes the incoming analog information according to the data transfer protocol.*/
@@ -129,6 +130,9 @@ public:
 
     QVector<int> m_InAnChannelVal;        // contains the analog values coming from the MUC - channel specific position
     QVector<int> m_InActiveDig;
+
+    int m_retrievetyp;
+    int m_retrievechan;
 
 
     struct Settings {

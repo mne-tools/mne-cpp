@@ -44,6 +44,12 @@
        </property>
        <layout class="QGridLayout" name="m_qGridLayout_Information">
         <item row="3" column="0">
+         <widget class="QLineEdit" name="m_qLineEdit_RetrieveChannel"/>
+        </item>
+        <item row="4" column="0">
+         <widget class="QComboBox" name="m_qComboBox_RetrieveType"/>
+        </item>
+        <item row="6" column="0">
          <widget class="QLabel" name="m_qLabel_Statusbar">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
@@ -63,6 +69,13 @@
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="0">
+         <widget class="QPushButton" name="m_qPushButton_RetrieveInfo">
+          <property name="text">
+           <string>Retrieve Information</string>
           </property>
          </widget>
         </item>
@@ -118,7 +131,7 @@
      <item row="4" column="0">
       <widget class="QGroupBox" name="m_qGroupBox_Channels">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Expanding" vsizetype="Minimum">
+        <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -132,7 +145,7 @@
        <property name="title">
         <string>Channels</string>
        </property>
-       <widget class="QWidget" name="">
+       <widget class="QWidget" name="layoutWidget">
         <property name="geometry">
          <rect>
           <x>0</x>
@@ -380,7 +393,7 @@
      <item row="3" column="0">
       <widget class="QGroupBox" name="groupBox">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+        <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
@@ -388,7 +401,7 @@
        <property name="title">
         <string>Analog Information</string>
        </property>
-       <widget class="QWidget" name="">
+       <widget class="QWidget" name="layoutWidget">
         <property name="geometry">
          <rect>
           <x>30</x>

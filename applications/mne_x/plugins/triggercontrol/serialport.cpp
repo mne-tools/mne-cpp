@@ -277,7 +277,7 @@ void SerialPort::encodeana()
 
 
 //denote control bytes
-    m_data[0] = m_data[0]|0xC0;
+    m_data[0] = m_data[0]|0x40;
     m_data[1] = m_data[1]|0x01;
     m_data[2] = m_data[2]|0x02;
     m_data[3] = m_data[3]|0x03;
@@ -359,7 +359,7 @@ void SerialPort::encodedig()
     m_data.clear();
 
     //denote control bytes
-    m_data[0] = m_data[0]|0x40;
+    m_data[0] = m_data[0]|0x00;
     m_data[1] = m_data[1]|0x01;
     m_data[2] = m_data[2]|0x02;
     m_data[3] = m_data[3]|0x03;
@@ -398,10 +398,44 @@ void SerialPort::encodedig()
     if (m_digchannel.at(21) == 1) m_data[0] = m_data[0]|0x20;     // 0010 0000
 
 
-qDebug() << "Digital ausgelesen" << endl;
+    std::cout << "Digital ausgelesen" << std::endl;
 
-    //writeData(m_data);
+
 }
+
+//*************************************************************************************************************
+ void SerialPort::encoderetr()
+ {
+    if (m_retrievetyp == 0)     // retrieve digital information
+    {
+        m_data.clear();
+
+        //denote control bytes
+        m_data[0] = m_data[0]|0x80;
+        m_data[1] = m_data[1]|0x01;
+        m_data[2] = m_data[2]|0x02;
+        m_data[3] = m_data[3]|0x03;
+    }
+    else if(m_retrievetyp == 1)     // retrieve analog information
+    {
+        m_data.clear();
+        //denote control bytes
+        m_data[0] = m_data[0]|0x90;
+        m_data[1] = m_data[1]|0x01;
+        m_data[2] = m_data[2]|0x02;
+        m_data[3] = m_data[3]|0x03;
+        qDebug() << m_retrievechan << endl;
+        if (m_retrievechan == 1){m_data[1] = m_data[1]|0x00;}     // 0000 0000   1. analoger In-Channel
+        else if (m_retrievechan == 2){m_data[1] = m_data[1]|0x04;}     // 0000 0100   2. Motor
+        //else if (m_motor == 3){m_data[0] = m_data[0]|0x08;}     // 0000 1000   3. Motor
+        //else if (m_motor == 4){m_data[0] = m_data[0]|0x10;}     // 0001 0000   4. Motor
+
+        else {std::cout << "Error while retrieving analog channel information" << std::endl;}
+    }
+    else std::cout << " Error while encoding retrieve data array" << std::endl;
+
+ }
+
 
 //*************************************************************************************************************
 
@@ -460,26 +494,13 @@ void SerialPort::readData()
 {
     QByteArray t_incomingArray = m_qSerialPort.readAll();
 
-/*    QByteArray t_incomingArray;
-    //t_incomingArray.resize(4);
-    t_incomingArray.append(0xC4);
-    t_incomingArray.append(0x0D);
-    t_incomingArray.append(0x7E);
-    t_incomingArray.append(0x2F);
-*/
 
-/*
-    t_incomingArray[0] = 0xC4;
-    t_incomingArray[1] = 0x0D;
-    t_incomingArray[2] = 0x7E;
-    t_incomingArray[3] = 0x2F;
-*/
     if(((t_incomingArray[0]&0x03) == 0x00) && ((t_incomingArray[1]&0x03) == 0x01) && ((t_incomingArray[2]&0x03) == 0x02) && ((t_incomingArray[3]&0x03) == 0x03))
     {
-        if ((t_incomingArray[0]&0xC0) == 0x40)
+        if ((t_incomingArray[0]&0xC0) == 0x00)
             decodedig(t_incomingArray);
 
-        else if ((t_incomingArray[0]&0xC0) == 0xC0)
+        else if ((t_incomingArray[0]&0xC0) == 0x40)
             decodeana(t_incomingArray);
 
         else
