@@ -89,6 +89,8 @@ TriggerControlSetupWidget::TriggerControlSetupWidget(TriggerControl* toolbox, QW
     ui.m_qPushButton_Send->setEnabled(false);
     ui.m_qPushButton_Sendanalog->setEnabled(false);
 
+    ui.m_qComboBox_RetrieveType->addItem(QLatin1String("Digital"));
+    ui.m_qComboBox_RetrieveType->addItem(QLatin1String("Analog"));
 
 
 //    connect(ui.m_qPushButton_Connect, SIGNAL(released()), this, SLOT( m_port_tsw->openSerialPort(TriggerControl::Settings m_pTriggerControl->m_currentSettings)));
@@ -173,33 +175,55 @@ void TriggerControlPlugin::TriggerControlSetupWidget::on_m_qPushButton_Send_rele
 
     // retrieve current configuration of digital channels
     if (ui.m_qRadioButton_1->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(0,1);     // 0000 0100
+    else m_pTriggerControl->m_pSerialPort->m_digchannel.replace(0,0);
     if (ui.m_qRadioButton_2->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(1,1);     // 0000 1000
+    else m_pTriggerControl->m_pSerialPort->m_digchannel.replace(1,0);
     if (ui.m_qRadioButton_3->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(2,1);     // 0001 0000
+    else m_pTriggerControl->m_pSerialPort->m_digchannel.replace(2,0);
     if (ui.m_qRadioButton_4->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(3,1);     // 0010 0000
+    else m_pTriggerControl->m_pSerialPort->m_digchannel.replace(3,0);
     if (ui.m_qRadioButton_5->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(4,1);     // 0100 0000
+    else m_pTriggerControl->m_pSerialPort->m_digchannel.replace(4,0);
     if (ui.m_qRadioButton_6->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(5,1);     // 1000 0000
+    else m_pTriggerControl->m_pSerialPort->m_digchannel.replace(5,0);
 
     // 7 - 12
     if (ui.m_qRadioButton_7->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(6,1);     // 0000 0100
+    else m_pTriggerControl->m_pSerialPort->m_digchannel.replace(6,0);
     if (ui.m_qRadioButton_8->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(7,1);     // 0000 1000
+    else m_pTriggerControl->m_pSerialPort->m_digchannel.replace(7,0);
     if (ui.m_qRadioButton_9->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(8,1);     // 0001 0000
+    else m_pTriggerControl->m_pSerialPort->m_digchannel.replace(8,0);
     if (ui.m_qRadioButton_10->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(9,1);     // 0010 0000
+    else m_pTriggerControl->m_pSerialPort->m_digchannel.replace(9,0);
     if (ui.m_qRadioButton_11->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(10,1);     // 0100 0000
+    else m_pTriggerControl->m_pSerialPort->m_digchannel.replace(10,0);
     if (ui.m_qRadioButton_12->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(11,1);     // 1000 0000
+    else m_pTriggerControl->m_pSerialPort->m_digchannel.replace(11,0);
 
     // 13 - 18
     if (ui.m_qRadioButton_13->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(12,1);     // 0000 0100
+    else m_pTriggerControl->m_pSerialPort->m_digchannel.replace(12,0);
     if (ui.m_qRadioButton_14->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(13,1);     // 0000 1000
+    else m_pTriggerControl->m_pSerialPort->m_digchannel.replace(13,0);
     if (ui.m_qRadioButton_15->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(14,1);     // 0001 0000
+        else m_pTriggerControl->m_pSerialPort->m_digchannel.replace(14,0);
     if (ui.m_qRadioButton_16->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(15,1);     // 0010 0000
+        else m_pTriggerControl->m_pSerialPort->m_digchannel.replace(15,0);
     if (ui.m_qRadioButton_17->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(16,1);     // 0100 0000
+        else m_pTriggerControl->m_pSerialPort->m_digchannel.replace(16,0);
     if (ui.m_qRadioButton_18->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(17,1);     // 1000 0000
+        else m_pTriggerControl->m_pSerialPort->m_digchannel.replace(17,0);
 
     // 19 - 22
     if (ui.m_qRadioButton_19->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(18,1);     // 0000 0100
+    else m_pTriggerControl->m_pSerialPort->m_digchannel.replace(18,0);
     if (ui.m_qRadioButton_20->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(19,1);     // 0000 1000
+    else m_pTriggerControl->m_pSerialPort->m_digchannel.replace(19,0);
     if (ui.m_qRadioButton_21->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(20,1);     // 0001 0000
+    else m_pTriggerControl->m_pSerialPort->m_digchannel.replace(20,0);
     if (ui.m_qRadioButton_22->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(21,1);     // 0010 0000
+    else m_pTriggerControl->m_pSerialPort->m_digchannel.replace(21,0);
 
 
    // encode information according to data transfer protocol
@@ -212,6 +236,8 @@ void TriggerControlPlugin::TriggerControlSetupWidget::on_m_qPushButton_Send_rele
     std::cout << "Digitale Daten gesendet" << std::endl;
 }
 
+
+//*************************************************************************************************************
 
 void TriggerControlPlugin::TriggerControlSetupWidget::on_m_qPushButton_Sendanalog_released()
 {
@@ -236,6 +262,28 @@ void TriggerControlPlugin::TriggerControlSetupWidget::on_m_qPushButton_Sendanalo
 
     std::cout << "Analoge Daten gesendet" << std::endl;
 
-    m_pTriggerControl->m_pSerialPort->readData();
+  //  m_pTriggerControl->m_pSerialPort->readData();
+
+}
+
+//*************************************************************************************************************
+
+void TriggerControlPlugin::TriggerControlSetupWidget::on_m_qPushButton_RetrieveInfo_released()
+{
+    if ( ui.m_qComboBox_RetrieveType->currentIndex() == 0)      // digital selected
+        m_pTriggerControl->m_pSerialPort->m_retrievetyp = 0;
+
+    else if (ui.m_qComboBox_RetrieveType->currentIndex() == 1)
+    {
+        m_pTriggerControl->m_pSerialPort->m_retrievetyp = 1;
+        int t_channel = ui.m_qLineEdit_RetrieveChannel->text().toInt();
+        if ((t_channel <= 2) && (t_channel > 0))
+                m_pTriggerControl->m_pSerialPort->m_retrievechan = t_channel;
+        else
+            std::cout << "check desired channel" << std::endl;
+    }
+    m_pTriggerControl->m_pSerialPort->encoderetr();
+
+    m_pTriggerControl->m_pSerialPort->sendData(m_pTriggerControl->m_pSerialPort->m_data);
 
 }

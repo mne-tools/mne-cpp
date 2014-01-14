@@ -117,6 +117,8 @@ private slots:
 
     void on_m_qPushButton_Sendanalog_released();
 
+    void on_m_qPushButton_RetrieveInfo_released();
+
 private:
     //=========================================================================================================
     /**
