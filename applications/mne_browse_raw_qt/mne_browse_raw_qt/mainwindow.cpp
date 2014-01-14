@@ -91,7 +91,11 @@ void MainWindow::setupView()
 
     //set custom delegate for view
     m_pTableView->setItemDelegate(m_pRawDelegate);
+
+    //set some size settings for m_pTableView
     m_pTableView->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+    m_pTableView->verticalHeader()->setDefaultSectionSize(25);
+    m_pTableView->horizontalHeader()->setStretchLastSection(true);
 
     //*****************************
     //testing of PlotSignalWidget
