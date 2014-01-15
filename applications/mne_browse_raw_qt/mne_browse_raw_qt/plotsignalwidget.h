@@ -78,8 +78,9 @@ private:
     void createPlotPath(QPainterPath& path);
     void createGridPath(QPainterPath& path);
 
+    QSize sizeHint() const;
+
     MatrixXd m_data;
-//    QPainterPath m_qPainterPath; /**< The current painter path which is the real-time curve. */
 
     // Plots settings
     double m_dPlotHeight; /**< The height of the plot */
@@ -89,6 +90,8 @@ private:
     double m_dScaleY; /**< Maximum amplitude of plot (max is m_dPlotHeight/2) */
     double m_dDx; /**< pixel difference to the next sample*/
 
+    //Look
+    qint8 m_nhlines;
 };
 
 #endif // PLOTSIGNAL_H

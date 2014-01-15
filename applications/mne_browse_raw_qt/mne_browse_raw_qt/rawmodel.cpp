@@ -41,7 +41,7 @@
 RawModel::RawModel(QObject *parent) :
     QAbstractTableModel(parent)
 {
-    qRegisterMetaType<MatrixXd>("MatrixXd");
+//    qRegisterMetaType<MatrixXd>("MatrixXd");
 }
 
 //*************************************************************************************************************
@@ -49,7 +49,7 @@ RawModel::RawModel(QObject *parent) :
 RawModel::RawModel(QIODevice &p_IODevice, QObject *parent) :
     QAbstractTableModel(parent)
 {
-    qRegisterMetaType<MatrixXd>("MatrixXd");
+//    qRegisterMetaType<MatrixXd>("MatrixXd");
 
     //read fiff data
     loadFiffData(p_IODevice);
@@ -59,7 +59,7 @@ RawModel::RawModel(QIODevice &p_IODevice, QObject *parent) :
 
 int RawModel::rowCount(const QModelIndex & /*parent*/) const
 {
-    return m_data.rows();
+    return 3;//m_data.rows();
 }
 
 //*************************************************************************************************************
@@ -78,7 +78,7 @@ QVariant RawModel::data(const QModelIndex &index, int role) const
             return QVariant(m_chnames[index.row()]);
         if(index.column()==1) {
             QVariant v;
-            v.setValue((MatrixXd)m_data.row(index.row()));
+            v.setValue((MatrixXd) m_data.row(index.row()));
             return v;
         }
     }

@@ -45,6 +45,7 @@
 //Qt
 #include <QAbstractItemDelegate>
 #include <QPainter>
+#include <QPainterPath>
 
 //MNE
 #include <fiff/fiff.h>
@@ -73,9 +74,25 @@ public:
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
     QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
+    // Plots settings
+    double m_dPlotHeight; /**< The height of the plot */
+
 signals:
 
 public slots:
+
+private:
+    void createPlotPath(QPainterPath& path, MatrixXd data) const;
+    void createGridPath(QPainterPath& path);
+
+
+    // Scaling
+    double m_dMaxValue; /**< Maximum value of the data to plot  */
+    double m_dScaleY; /**< Maximum amplitude of plot (max is m_dPlotHeight/2) */
+    double m_dDx; /**< pixel difference to the next sample*/
+
+    //Look
+    qint8 m_nhlines;
 
 };
 

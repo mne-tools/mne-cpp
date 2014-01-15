@@ -41,6 +41,7 @@
 //=============================================================================================================
 
 #include "rawdelegate.h"
+#include "rawmodel.h"
 
 #include <QPointF>
 #include <QRect>
@@ -56,6 +57,9 @@ using namespace MNELIB;
 //=============================================================================================================
 
 RawDelegate::RawDelegate(QObject *parent)
+: m_dPlotHeight(70)
+, m_dDx(1)
+, m_nhlines(6)
 {
 }
 
@@ -67,9 +71,30 @@ void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, c
     qDebug("rectsize (WxH):%ix%i",option.rect.width(),option.rect.height());
 
     switch(index.column()) {
-    case 0: painter->drawText(rect, NULL ,index.model()->data(index,Qt::DisplayRole).toString()); break;
-    case 1: painter->drawText(rect, NULL ,"Plot here"); break;
+    case 0:
+        painter->drawText(rect, NULL ,index.model()->data(index,Qt::DisplayRole).toString());
+        break;
+    case 1:
+        //Plot data
+        QPainterPath path;
+        QVariant variant = index.model()->data(index,Qt::DisplayRole);
+        MatrixXd data = variant.value<MatrixXd>();
+
+        createPlotPath(path,data);
+
+        painter->translate(option.rect.x(),option.rect.y());
+
+        painter->save();
+        painter->setBrush(Qt::white);
+        painter->setPen(Qt::NoPen);
+        painter->drawRect(0, 0, 1000,m_dPlotHeight); //ToDo: make it dynamic
+        painter->translate(0,m_dPlotHeight/2);
+
+        painter->restore();
+        painter->drawPath(path);
+        break;
     }
+
 }
 
 //=============================================================================================================
@@ -77,5 +102,48 @@ void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, c
 QSize RawDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     return QSize(1000,100);
+}
+
+//=============================================================================================================
+
+void RawDelegate::createPlotPath(QPainterPath& path, MatrixXd data) const
+{
+    double dValue;
+    double dMaxValue = data.row(0).cwiseAbs().maxCoeff();
+    double dScaleY = m_dPlotHeight/(2*dMaxValue);
+
+    QPointF qSamplePosition;
+
+    //create lines from one to the next sample
+    for(qint32 i=0; i < data.cols(); ++i)
+    {
+        dValue = data(0,i)*dScaleY;
+
+        qSamplePosition.setY(dValue);
+        qSamplePosition.setX(path.currentPosition().x()+m_dDx);
+
+        path.lineTo(qSamplePosition);
+
+        path.moveTo(qSamplePosition);
+    }
+
+    qDebug("Plot-PainterPath created!");
+}
+
+void RawDelegate::createGridPath(QPainterPath &path)
+{
+//    //horizontal lines
+//    qint8 m_nhlines = 6;
+//    double distance = m_dPlotHeight/m_nhlines;
+
+//    path.moveTo(0,-m_dPlotHeight/2+distance);
+
+//    for(qint8 i=0; i < m_nhlines-1; ++i) {
+//        QPointF endpoint(this->width(),path.currentPosition().y());
+//        path.lineTo(endpoint);
+//        path.moveTo(0,path.currentPosition().y()+distance);
+//    }
+
+//    qDebug("Grid-PainterPath created!");
 }
 
