@@ -41,22 +41,25 @@
 
 #include "plotsignalwidget.h"
 
-#include <QPainter>
 #include <QPointF>
+#include <QPainter>
 
 //*************************************************************************************************************
 
 PlotSignalWidget::PlotSignalWidget(QWidget *parent)
 : QWidget(parent)
+, m_dPlotHeight(70)
 {
 }
 
-PlotSignalWidget::PlotSignalWidget(MatrixXd data, MatrixXd times, QWidget *parent)
+PlotSignalWidget::PlotSignalWidget(MatrixXd data, QWidget *parent)
 : QWidget(parent)
+, m_dPlotHeight(70)
+, m_data(data)
+, m_dMaxValue(data.row(0).cwiseAbs().maxCoeff())
+, m_dScaleY(m_dPlotHeight/(2*m_dMaxValue))
+, m_dDx(1)
 {
-//    m_data = data;
-//    m_times = times;
-
     qDebug("size of data matrix is %ix%i",data.rows(),data.cols());
 }
 
@@ -68,44 +71,54 @@ void PlotSignalWidget::paintEvent(QPaintEvent *)
 
     painter.save();
 
-    //Draw background
+    //Draw white background-box
     painter.setBrush(Qt::white);
     painter.setPen(Qt::NoPen);
-    painter.drawRect(0, 0, width(),150);
+    painter.drawRect(0, 0, width(),m_dPlotHeight);
 
     painter.restore();
 
-    QPointF point(100,100);
-    painter.drawText(point,"test");
+    //painter settings
+    painter.translate(0,m_dPlotHeight/2);
+    painter.setRenderHint(QPainter::Antialiasing, true);
+
+    //create and draw PainterPaths
+    QPainterPath t_qPlotPath;
+    createPlotPath(t_qPlotPath);
+    painter.drawPath(t_qPlotPath);
+
+    QPainterPath t_qGridPath;
+    createGridPath(t_qGridPath);
+    painter.drawPath(t_qGridPath);
 
 }
 
-void PlotSignalWidget::createPath()
+void PlotSignalWidget::createPlotPath(QPainterPath& path)
 {
-//    double dValue = 0;
-//    double dPositionDifference = 0.0;
-//    for(unsigned char i = 0; i < m_data.size(); ++i)
-//    {
-//        dValue = m_data[i]*m_fScaleFactor - m_dMiddle;
-//        dPositionDifference = m_dPosition - (m_dPosX+width());
+    double dValue;
+    QPointF qSamplePosition;
 
-//        if((dPositionDifference >= 0) || m_bStartFlag)
-//        {
-//            if(m_bStartFlag)
-//                dPositionDifference = 0;
+    //create lines from one to the next sample
+    for(qint32 i=0; i < m_data.cols(); ++i)
+    {
+        dValue = m_data(0,i)*m_dScaleY;
 
-//            m_qPainterPath = QPainterPath();
-//                m_dPosition = m_dPosX + dPositionDifference;
-//                m_qPainterPath.moveTo(m_dPosition, m_dPosY-dValue);
+        qSamplePosition.setY(dValue);
+        qSamplePosition.setX(path.currentPosition().x()+m_dDx);
 
-//        }
-//        else
-//        {
-//            m_qMutex.lock();
-//                m_qPainterPath.lineTo(m_dPosition, m_dPosY-dValue);
-//            m_qMutex.unlock();
-//        }
+        path.lineTo(qSamplePosition);
 
-//        m_dPosition = m_dPosition + m_dSampleWidth;
-//    }
+        path.moveTo(qSamplePosition);
+    }
+
+    qDebug("Plot-PainterPath created!");
+}
+
+void PlotSignalWidget::createGridPath(QPainterPath& path)
+{
+    //ToDo: draw gridPath here!
+    QPointF endpoint(0,this->width());
+    path.lineTo(endpoint);
+
+    qDebug("Plot-PainterPath created!");
 }
