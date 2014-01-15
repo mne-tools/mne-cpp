@@ -102,16 +102,20 @@ void MainWindow::setupView()
     QFile t_rawFile("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
     FiffIO m_fiffIO(t_rawFile);
 
-    MatrixXd t_data,t_times;
-    m_fiffIO.m_qlistRaw[0]->read_raw_segment_times(t_data,t_times,100,102);
+    MatrixXd t_samples,t_times;
+    m_fiffIO.m_qlistRaw[0]->read_raw_segment_times(t_samples,t_times,100,102);
 
+    MatrixXd t_data;
+    t_data.resize(2,t_samples.cols());
+    t_data.row(0) = t_samples.row(0);
+    t_data.row(1) = t_times;
     //generate PlotSignalWidget
-    PlotSignalWidget *plotSignalWidget = new PlotSignalWidget(t_data.row(0),t_times,this);
+    PlotSignalWidget *plotSignalWidget = new PlotSignalWidget(t_data,this);
 
     //set vertical layout
     QVBoxLayout *mainlayout = new QVBoxLayout;
-    mainlayout->addWidget(m_pTableView);
-//    mainlayout->addWidget(plotSignalWidget);
+//    mainlayout->addWidget(m_pTableView);
+    mainlayout->addWidget(plotSignalWidget);
 
     //set layouts
     QWidget *window = new QWidget();

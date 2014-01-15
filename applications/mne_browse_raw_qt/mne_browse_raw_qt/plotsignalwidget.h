@@ -65,7 +65,7 @@ class PlotSignalWidget : public QWidget
     Q_OBJECT
 public:
     PlotSignalWidget(QWidget *parent = 0);
-    PlotSignalWidget(MatrixXd data, MatrixXd times, QWidget *parent = 0);
+    PlotSignalWidget(MatrixXd data, QWidget *parent = 0);
 
 protected:
     void paintEvent(QPaintEvent *event);
@@ -75,16 +75,19 @@ signals:
 public slots:
 
 private:
-    void createPath();
+    void createPlotPath(QPainterPath& path);
+    void createGridPath(QPainterPath& path);
 
-    QVector<double> m_data,m_times;
-    QPainterPath m_qPainterPath; /**< The current painter path which is the real-time curve. */
+    MatrixXd m_data;
+//    QPainterPath m_qPainterPath; /**< The current painter path which is the real-time curve. */
 
+    // Plots settings
+    double m_dPlotHeight; /**< The height of the plot */
 
-    double m_dPosition; /**< The start position which is the x position of the frame. */
-    double m_dPosX; /**< The x position of the frame. */
-    double m_dPosY; /**< The middle y position of the frame. */
-    float m_fScaleFactor; /**< Current scaling factor -> renewed over actualize. */
+    // Scaling
+    double m_dMaxValue; /**< Maximum value of the data to plot  */
+    double m_dScaleY; /**< Maximum amplitude of plot (max is m_dPlotHeight/2) */
+    double m_dDx; /**< pixel difference to the next sample*/
 
 };
 
