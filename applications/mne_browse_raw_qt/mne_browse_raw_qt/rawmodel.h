@@ -106,4 +106,5 @@ public slots:
 
 Q_DECLARE_METATYPE(Eigen::MatrixXd);
 
+
 #endif // RAWMODEL_H

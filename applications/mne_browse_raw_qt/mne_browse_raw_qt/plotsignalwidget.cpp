@@ -59,6 +59,7 @@ PlotSignalWidget::PlotSignalWidget(MatrixXd data, QWidget *parent)
 , m_dMaxValue(data.row(0).cwiseAbs().maxCoeff())
 , m_dScaleY(m_dPlotHeight/(2*m_dMaxValue))
 , m_dDx(1)
+, m_nhlines(6)
 {
     qDebug("size of data matrix is %ix%i",data.rows(),data.cols());
 }
@@ -89,6 +90,15 @@ void PlotSignalWidget::paintEvent(QPaintEvent *)
 
     QPainterPath t_qGridPath;
     createGridPath(t_qGridPath);
+    painter.save();
+
+    painter.setRenderHint(QPainter::Antialiasing, false);
+    QPen pen;
+    pen.setStyle(Qt::DotLine);
+    pen.setWidthF(0.5);
+    painter.setPen(pen);
+
+    painter.setBrush(QColor(Qt::darkGray));
     painter.drawPath(t_qGridPath);
 
 }
@@ -116,9 +126,22 @@ void PlotSignalWidget::createPlotPath(QPainterPath& path)
 
 void PlotSignalWidget::createGridPath(QPainterPath& path)
 {
-    //ToDo: draw gridPath here!
-    QPointF endpoint(0,this->width());
-    path.lineTo(endpoint);
+    //horizontal lines
+    qint8 m_nhlines = 6;
+    double distance = m_dPlotHeight/m_nhlines;
 
-    qDebug("Plot-PainterPath created!");
+    path.moveTo(0,-m_dPlotHeight/2+distance);
+
+    for(qint8 i=0; i < m_nhlines-1; ++i) {
+        QPointF endpoint(this->width(),path.currentPosition().y());
+        path.lineTo(endpoint);
+        path.moveTo(0,path.currentPosition().y()+distance);
+    }
+
+    qDebug("Grid-PainterPath created!");
+}
+
+QSize PlotSignalWidget::sizeHint() const
+{
+    return QSize(m_dDx*m_data.cols(),m_dPlotHeight);
 }

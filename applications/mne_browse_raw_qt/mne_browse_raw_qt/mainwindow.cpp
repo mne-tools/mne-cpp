@@ -46,6 +46,7 @@
 
 #include <QVBoxLayout>
 #include <QGroupBox>
+#include <QScrollArea>
 
 #include "plotsignalwidget.h"
 
@@ -94,7 +95,7 @@ void MainWindow::setupView()
 
     //set some size settings for m_pTableView
     m_pTableView->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
-    m_pTableView->verticalHeader()->setDefaultSectionSize(25);
+    m_pTableView->verticalHeader()->setDefaultSectionSize(m_pRawDelegate->m_dPlotHeight);
     m_pTableView->horizontalHeader()->setStretchLastSection(true);
 
     //*****************************
@@ -104,18 +105,27 @@ void MainWindow::setupView()
 
     MatrixXd t_samples,t_times;
     m_fiffIO.m_qlistRaw[0]->read_raw_segment_times(t_samples,t_times,100,102);
-
     MatrixXd t_data;
     t_data.resize(2,t_samples.cols());
     t_data.row(0) = t_samples.row(0);
     t_data.row(1) = t_times;
     //generate PlotSignalWidget
     PlotSignalWidget *plotSignalWidget = new PlotSignalWidget(t_data,this);
+    plotSignalWidget->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
+
+
+    //*****************************
 
     //set vertical layout
     QVBoxLayout *mainlayout = new QVBoxLayout;
-//    mainlayout->addWidget(m_pTableView);
-    mainlayout->addWidget(plotSignalWidget);
+    mainlayout->addWidget(m_pTableView);
+    QScrollArea *scrollArea = new QScrollArea();
+    scrollArea->setWidget(plotSignalWidget);
+    scrollArea->setWidgetResizable(true);
+    scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+
+//    mainlayout->addWidget(scrollArea);
+
 
     //set layouts
     QWidget *window = new QWidget();
