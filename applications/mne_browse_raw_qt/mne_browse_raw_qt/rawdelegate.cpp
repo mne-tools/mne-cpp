@@ -79,6 +79,7 @@ void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, c
 
 QSize RawDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-
+    QSize size;
+    return size;
 }
 
