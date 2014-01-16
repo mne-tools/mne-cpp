@@ -76,30 +76,48 @@ public:
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
     //Qt::ItemFlags flags(const QModelIndex & index) const;
 
+    /**
+    * Load fiff data.
+    *
+    */
     void loadFiffData(QIODevice &p_IODevice);
+
+    //Model settings
+    double m_dWindowLength; /**< Length of window to load in secs */
+    double m_dPosition; /**< Position of window in secs */
+
+    /**
+     * @brief getMaxDataValue
+     * @return max data value of m_data for scaling purposes.
+     */
+    double getMaxDataValue(qint32 type) const;
 
 private:
     //display types
-    MatrixXd m_data;
-    MatrixXd m_times;
-    QStringList m_chnames;
+    MatrixXd m_data; /**< Holds the fiff matrix data <n_channels x n_samples> */
+    MatrixXd m_times; /**< Time axis in secs */
+    QStringList m_chnames; /**< Channel names string list */
 
     //Fiff
-    QSharedPointer<FiffIO> m_pfiffIO;
-    QList<FiffChInfo> m_chinfolist;
-
-    //settings
-    qint32 m_windowlength; //in sec
-    qint32 m_position;
+    QSharedPointer<FiffIO> m_pfiffIO; /**< FiffIO objects, which holds all the information of the fiff data (excluding the samples!) */
+    QList<FiffChInfo> m_chinfolist; /**< List of FiffChInfo objects that holds the corresponding channels information */
 
     //methods
+    /**
+    * Load channel names to member m_chnames.
+    *
+    */
     void loadChNames();
+
+    /**
+    * Load channel infos to.
+    *
+    */
     void loadChInfos();
 
 signals:
 
 public slots:
-
 
 
 };

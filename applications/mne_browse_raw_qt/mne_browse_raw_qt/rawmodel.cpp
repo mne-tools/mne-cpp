@@ -38,16 +38,18 @@
 
 //*************************************************************************************************************
 
-RawModel::RawModel(QObject *parent) :
-    QAbstractTableModel(parent)
+RawModel::RawModel(QObject *parent)
+: QAbstractTableModel(parent)
+, m_dWindowLength(2)
 {
 //    qRegisterMetaType<MatrixXd>("MatrixXd");
 }
 
 //*************************************************************************************************************
 
-RawModel::RawModel(QIODevice &p_IODevice, QObject *parent) :
-    QAbstractTableModel(parent)
+RawModel::RawModel(QIODevice &p_IODevice, QObject *parent)
+: QAbstractTableModel(parent)
+, m_dWindowLength(2)
 {
 //    qRegisterMetaType<MatrixXd>("MatrixXd");
 
@@ -59,17 +61,13 @@ RawModel::RawModel(QIODevice &p_IODevice, QObject *parent) :
 
 int RawModel::rowCount(const QModelIndex & /*parent*/) const
 {
-    return 3;//m_data.rows();
+    return m_data.rows();
 }
-
-//*************************************************************************************************************
 
 int RawModel::columnCount(const QModelIndex & /*parent*/) const
 {
-    return 2; //2
+    return 2;
 }
-
-//*************************************************************************************************************
 
 QVariant RawModel::data(const QModelIndex &index, int role) const
 {
@@ -93,13 +91,17 @@ QVariant RawModel::data(const QModelIndex &index, int role) const
 
 QVariant RawModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-    if(role != Qt::DisplayRole)
+    if(role != Qt::DisplayRole || role != Qt::TextAlignmentRole)
         return QVariant();
 
     if(orientation == Qt::Horizontal) {
         switch(section) {
         case 0: return QVariant("chname");
-        case 1: return QVariant("data plot");
+        case 1:
+            if(role == Qt::DisplayRole)
+                return QVariant("data plot");
+            else if(role == Qt::TextAlignmentRole)
+                return QVariant(Qt::AlignLeft);
         }
     }
     else if(orientation == Qt::Vertical) {
@@ -117,10 +119,10 @@ void RawModel::loadFiffData(QIODevice& p_IODevice)
 
     m_pfiffIO = QSharedPointer<FiffIO>(new FiffIO(p_IODevice));
 
-    m_windowlength = 2; //just for now
-    m_position = m_pfiffIO->m_qlistRaw[0]->first_samp/m_pfiffIO->m_qlistRaw[0]->info.sfreq; //take beginning of raw data as position [in secs]
+    m_dPosition = m_pfiffIO->m_qlistRaw[0]->first_samp/m_pfiffIO->m_qlistRaw[0]->info.sfreq; //take beginning of raw data as position [in secs]
 
-    if(!m_pfiffIO->m_qlistRaw[0]->read_raw_segment_times(m_data, m_times, m_position, m_position+m_windowlength)) {
+
+    if(!m_pfiffIO->m_qlistRaw[0]->read_raw_segment_times(m_data, m_times, m_dPosition, m_dPosition+m_dWindowLength)) {
         printf("Error when reading raw data!");
     }
 
@@ -147,4 +149,25 @@ void RawModel::loadChInfos()
 {
     for(qint32 i=0; i < m_pfiffIO->m_qlistRaw[0]->info.nchan; ++i)
         m_chinfolist.append(m_pfiffIO->m_qlistRaw[0]->info.chs[i]);
+}
+
+double RawModel::getMaxDataValue(qint32 type) const {
+
+//    QString kind = m_chinfolist[0].channel_type(type);
+
+    MatrixXd picks(m_data.rows(),m_data.rows());
+    picks.setZero();
+    qint32 j = 0;
+
+    for(qint32 i=0; i < m_chinfolist.size(); ++i) {
+        if(m_chinfolist[i].kind == type) {
+            picks(i,i) = 1;
+            ++j;
+        }
+    }
+
+    MatrixXd picks_data = picks*m_data;
+
+    double max = picks_data.maxCoeff();
+    return max;
 }

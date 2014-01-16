@@ -68,48 +68,72 @@ RawDelegate::RawDelegate(QObject *parent)
 void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     QRect rect = option.rect;
-    qDebug("rectsize (WxH):%ix%i",option.rect.width(),option.rect.height());
 
     switch(index.column()) {
-    case 0:
-        painter->drawText(rect, NULL ,index.model()->data(index,Qt::DisplayRole).toString());
+    case 0: //chnames
+        painter->drawText(rect, Qt::AlignCenter ,index.model()->data(index,Qt::DisplayRole).toString());
         break;
-    case 1:
-        //Plot data
+    case 1: //data plot
         QPainterPath path;
+
         QVariant variant = index.model()->data(index,Qt::DisplayRole);
         MatrixXd data = variant.value<MatrixXd>();
 
-        createPlotPath(path,data);
-
-        painter->translate(option.rect.x(),option.rect.y());
+        createPlotPath(index,data,path);
 
         painter->save();
-        painter->setBrush(Qt::white);
-        painter->setPen(Qt::NoPen);
-        painter->drawRect(0, 0, 1000,m_dPlotHeight); //ToDo: make it dynamic
-        painter->translate(0,m_dPlotHeight/2);
+            painter->translate(option.rect.x(),option.rect.y()+m_dPlotHeight/2);
+
+            //Plot data
+            painter->setRenderHint(QPainter::Antialiasing, true);
+            painter->drawPath(path);
+
+            //Plot grid
+            painter->save();
+            painter->translate(0,-m_dPlotHeight/2);
+            painter->setRenderHint(QPainter::Antialiasing, false);
+            path = QPainterPath();
+            createGridPath(path,data);
+
+            QPen pen;
+            pen.setStyle(Qt::DotLine);
+            pen.setWidthF(0.5);
+            painter->setPen(pen);
+            painter->drawPath(path);
+
+            painter->restore();
 
         painter->restore();
-        painter->drawPath(path);
+
         break;
     }
 
 }
 
-//=============================================================================================================
-
 QSize RawDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    return QSize(1000,100);
+    QSize size;
+
+    switch(index.column()) {
+    case 0:
+        size = QSize(80,m_dPlotHeight);
+        break;
+    case 1:
+        qint32 nsamples = index.model()->data(index).value<MatrixXd>().cols();
+        size = QSize(m_dDx*nsamples,m_dPlotHeight);
+        break;
+    }
+
+    return size;
 }
 
 //=============================================================================================================
 
-void RawDelegate::createPlotPath(QPainterPath& path, MatrixXd data) const
+void RawDelegate::createPlotPath(const QModelIndex &index, MatrixXd& data, QPainterPath& path) const
 {
     double dValue;
-    double dMaxValue = data.row(0).cwiseAbs().maxCoeff();
+    double dMaxValue = data.maxCoeff();
+//    double dMaxValue = (static_cast<const RawModel*>(index.model()))->getMaxDataValue(FIFFV_MEG_CH); //ToDo: scale single channel to all channels of same type
     double dScaleY = m_dPlotHeight/(2*dMaxValue);
 
     QPointF qSamplePosition;
@@ -118,7 +142,6 @@ void RawDelegate::createPlotPath(QPainterPath& path, MatrixXd data) const
     for(qint32 i=0; i < data.cols(); ++i)
     {
         dValue = data(0,i)*dScaleY;
-
         qSamplePosition.setY(dValue);
         qSamplePosition.setX(path.currentPosition().x()+m_dDx);
 
@@ -130,20 +153,20 @@ void RawDelegate::createPlotPath(QPainterPath& path, MatrixXd data) const
     qDebug("Plot-PainterPath created!");
 }
 
-void RawDelegate::createGridPath(QPainterPath &path)
+void RawDelegate::createGridPath(QPainterPath& path, MatrixXd& data) const
 {
-//    //horizontal lines
-//    qint8 m_nhlines = 6;
-//    double distance = m_dPlotHeight/m_nhlines;
+    //horizontal lines
+    double distance = m_dPlotHeight/m_nhlines;
 
-//    path.moveTo(0,-m_dPlotHeight/2+distance);
+    QPointF startpos = path.currentPosition();
+    QPointF endpoint(data.cols()*m_dDx,path.currentPosition().y());
 
-//    for(qint8 i=0; i < m_nhlines-1; ++i) {
-//        QPointF endpoint(this->width(),path.currentPosition().y());
-//        path.lineTo(endpoint);
-//        path.moveTo(0,path.currentPosition().y()+distance);
-//    }
+    for(qint8 i=0; i < m_nhlines-1; ++i) {
+        endpoint.setY(endpoint.y()+distance);
+        path.moveTo(startpos.x(),endpoint.y());
+        path.lineTo(endpoint);
+    }
 
-//    qDebug("Grid-PainterPath created!");
+    qDebug("Grid-PainterPath created!");
 }
 

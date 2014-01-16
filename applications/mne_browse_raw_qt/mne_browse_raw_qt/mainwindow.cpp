@@ -95,37 +95,40 @@ void MainWindow::setupView()
 
     //set some size settings for m_pTableView
     m_pTableView->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+
+    //Item cells/columns resizing
     m_pTableView->verticalHeader()->setDefaultSectionSize(m_pRawDelegate->m_dPlotHeight);
-    m_pTableView->horizontalHeader()->setStretchLastSection(true);
+    m_pTableView->resizeColumnToContents(0); //based on returned sizeHint of RawDelegate
+    m_pTableView->resizeColumnsToContents();
+
+    m_pTableView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
 
     //*****************************
-    //testing of PlotSignalWidget
-    QFile t_rawFile("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
-    FiffIO m_fiffIO(t_rawFile);
+//    //testing of PlotSignalWidget
+//    QFile t_rawFile("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+//    FiffIO m_fiffIO(t_rawFile);
 
-    MatrixXd t_samples,t_times;
-    m_fiffIO.m_qlistRaw[0]->read_raw_segment_times(t_samples,t_times,100,102);
-    MatrixXd t_data;
-    t_data.resize(2,t_samples.cols());
-    t_data.row(0) = t_samples.row(0);
-    t_data.row(1) = t_times;
-    //generate PlotSignalWidget
-    PlotSignalWidget *plotSignalWidget = new PlotSignalWidget(t_data,this);
-    plotSignalWidget->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
-
-
+//    MatrixXd t_samples,t_times;
+//    m_fiffIO.m_qlistRaw[0]->read_raw_segment_times(t_samples,t_times,100,102);
+//    MatrixXd t_data;
+//    t_data.resize(2,t_samples.cols());
+//    t_data.row(0) = t_samples.row(0);
+//    t_data.row(1) = t_times;
+//    //generate PlotSignalWidget
+//    PlotSignalWidget *plotSignalWidget = new PlotSignalWidget(t_data,this);
+//    plotSignalWidget->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
     //*****************************
 
     //set vertical layout
     QVBoxLayout *mainlayout = new QVBoxLayout;
+
+//    QScrollArea *scrollArea = new QScrollArea();
+//    scrollArea->setWidget(m_pTableView);
+//    scrollArea->setWidgetResizable(true);
+//    scrollArea->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+//    scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
+
     mainlayout->addWidget(m_pTableView);
-    QScrollArea *scrollArea = new QScrollArea();
-    scrollArea->setWidget(plotSignalWidget);
-    scrollArea->setWidgetResizable(true);
-    scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-
-//    mainlayout->addWidget(scrollArea);
-
 
     //set layouts
     QWidget *window = new QWidget();
