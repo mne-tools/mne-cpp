@@ -47,6 +47,7 @@
 //=============================================================================================================
 
 #include <fs/colortable.h>
+#include <fs/label.h>
 #include <utils/mnemath.h>
 #include <utils/kmeans.h>
 
@@ -377,6 +378,7 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(AnnotationSet &p
 //                            p_fwdOut.src[h].nn.row(count) = MatrixXd::Zero(1,3);
 
                             p_fwdOut.src[h].vertno[count] = this->src[h].vertno[sel_idx];
+
                             ++count;
                         }
                     }
@@ -396,6 +398,9 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(AnnotationSet &p
 //        p_fwdOut.src[h].rr.conservativeResize(count, 3);
 //        p_fwdOut.src[h].nn.conservativeResize(count, 3);
         p_fwdOut.src[h].vertno.conservativeResize(count);
+
+//        std::cout << "Vertno hemisphere:" << h << std::endl << p_fwdOut.src[h].vertno << std::endl;
+
 
 //        p_fwdOut.src[h].nuse_tri = 0;
 //        p_fwdOut.src[h].use_tris = MatrixX3i(0,3);
@@ -1381,6 +1386,58 @@ void MNEForwardSolution::restrict_gain_matrix(MatrixXd &G, const FiffInfo &info)
         }
     }
 }
+
+
+//*************************************************************************************************************
+
+MNEForwardSolution MNEForwardSolution::selectRegions(const QList<Label> &t_qListLabels) const
+{
+    VectorXi selVertices;
+
+    qint32 iSize = 0;
+    for(qint32 i = 0; i < t_qListLabels.size(); ++i)
+    {
+        VectorXi currentSelection;
+         this->src.label_src_vertno_sel(t_qListLabels[i], currentSelection);
+
+        selVertices.conservativeResize(iSize+currentSelection.size());
+        selVertices.block(iSize,0,currentSelection.size(),1) = currentSelection;
+        iSize = selVertices.size();
+    }
+
+    MNEMath::sort(selVertices, false);
+
+    MNEForwardSolution selectedFwd(*this);
+
+    MatrixX3f rr(selVertices.size(),3);
+    MatrixX3f nn(selVertices.size(),3);
+
+    for(qint32 i = 0; i < selVertices.size(); ++i)
+    {
+        rr.block(i, 0, 1, 3) = selectedFwd.source_rr.row(selVertices(i));
+        nn.block(i, 0, 1, 3) = selectedFwd.source_nn.row(selVertices(i));
+    }
+
+    selectedFwd.source_rr = rr;
+    selectedFwd.source_nn = nn;
+
+    VectorXi selSolIdcs = tripletSelection(selVertices);
+    MatrixXd G(selectedFwd.sol->data.rows(),selSolIdcs.size());
+//    selectedFwd.sol_grad; //ToDo
+    qint32 rows = G.rows();
+
+    for(qint32 i = 0; i < selSolIdcs.size(); ++i)
+        G.block(0, i, rows, 1) = selectedFwd.sol->data.col(selSolIdcs(i));
+
+    selectedFwd.sol->data = G;
+    selectedFwd.sol->nrow = selectedFwd.sol->data.rows();
+    selectedFwd.sol->ncol = selectedFwd.sol->data.cols();
+    selectedFwd.nsource = selectedFwd.sol->ncol / 3;
+
+    return selectedFwd;
+}
+
+
 
 
 //*************************************************************************************************************

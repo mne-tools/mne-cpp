@@ -70,6 +70,7 @@ FiffRawData::FiffRawData(QIODevice &p_IODevice)
 : first_samp(-1)
 , last_samp(-1)
 {
+    //setup FiffRawData object
     if(!FiffStream::setup_read_raw(p_IODevice, *this))
     {
         printf("\tError during fiff setup raw read.\n");

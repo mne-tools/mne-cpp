@@ -116,7 +116,7 @@ public:
     * @param [in] location2D holds the vector to which the read 2D positions are stored.
     * @param [out] bool returns true if reading was successful, false otherwise.
     */
-    bool readElcFile(QString path, QStringList &channelNames, QVector<QVector<double>> &location3D, QVector<QVector<double> > &location2D, QString &unit);
+    bool readElcFile(QString path, QStringList &channelNames, QVector<QVector<double> > &location3D, QVector<QVector<double> > &location2D, QString &unit);
 
 private:
 

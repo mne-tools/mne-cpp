@@ -312,16 +312,16 @@ public:
     /**
     *
     */
-//    VectorXi tripletSelection(VectorXi& p_vecIdxSelection)
-//    {
-//        MatrixXi triSelect = p_vecIdxSelection.transpose().replicate(3,1).array() * 3;//repmat((p_vecIdxSelection - 1) * 3 + 1, 3, 1);
-//        triSelect.row(1).array() += 1;
-//        triSelect.row(2).array() += 2;
-//        VectorXi retTriSelect(triSelect.cols()*3);
-//        for(int i = 0; i < triSelect.cols(); ++i)
-//            retTriSelect.block(i*3,0,3,1) = triSelect.col(i);
-//        return retTriSelect;
-//    } // tripletSelection
+    VectorXi tripletSelection(const VectorXi& p_vecIdxSelection) const
+    {
+        MatrixXi triSelect = p_vecIdxSelection.transpose().replicate(3,1).array() * 3;//repmat((p_vecIdxSelection - 1) * 3 + 1, 3, 1);
+        triSelect.row(1).array() += 1;
+        triSelect.row(2).array() += 2;
+        VectorXi retTriSelect(triSelect.cols()*3);
+        for(int i = 0; i < triSelect.cols(); ++i)
+            retTriSelect.block(i*3,0,3,1) = triSelect.col(i);
+        return retTriSelect;
+    } // tripletSelection
 
 
     //=========================================================================================================
@@ -352,6 +352,15 @@ public:
     * @param[in] info       Fiff information
     */
     static void restrict_gain_matrix(MatrixXd &G, const FiffInfo &info);
+
+    //=========================================================================================================
+    /**
+    * Restrict gain matrix entries for optimal depth weighting
+    *
+    * @param[in, out] G     Gain matrix to be restricted; result is stored in place.
+    * @param[in] info       Fiff information
+    */
+    MNEForwardSolution selectRegions(const QList<Label> &t_qListLabels) const;
 
     //=========================================================================================================
     /**

@@ -1,8 +1,8 @@
 //=============================================================================================================
 /**
 * @file     main.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
+* @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     July, 2012
@@ -85,16 +85,23 @@ int main(int argc, char *argv[])
     QCoreApplication a(argc, argv);
 
     //create list of fiff data to read
-    QList<QIODevice*> t_listSampleFiles;
-    t_listSampleFiles.append(new QFile("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif"));
-//    t_listSampleFiles.append(new QFile("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif"));
-//    t_listSampleFiles.append(new QFile("./MNE-sample-data/MEG/sample/sample_audvis-no-filter-ave.fif"));
-//    t_listSampleFiles.append(new QFile("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif"));
-//    t_listSampleFiles.append(new QFile("./MNE-sample-data/MEG/sample/sample_audvis-cov.fif"));
+    QList<QIODevice*> t_listSampleFilesIn;
+    t_listSampleFilesIn.append(new QFile("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif"));
+    t_listSampleFilesIn.append(new QFile("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif"));
+//    t_listSampleFilesIn.append(new QFile("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif"));
+//    t_listSampleFilesIn.append(new QFile("./MNE-sample-data/MEG/sample/sample_audvis-no-filter-ave.fif"));
+//    t_listSampleFilesIn.append(new QFile("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif"));
+//    t_listSampleFilesIn.append(new QFile("./MNE-sample-data/MEG/sample/sample_audvis-cov.fif"));
 
-    FiffIO p_fiffIO(t_listSampleFiles);
+
+    FiffIO p_fiffIO(t_listSampleFilesIn);
 
     std::cout << p_fiffIO << std::endl;
+
+    //Write some raw data
+    QFile t_fileToWrite("./MNE-sample-data/MEG/sample/sample_write/sample_out.fif");
+    p_fiffIO.write(t_fileToWrite,FIFFB_RAW_DATA,-1);
+
 
     return a.exec();
 }
