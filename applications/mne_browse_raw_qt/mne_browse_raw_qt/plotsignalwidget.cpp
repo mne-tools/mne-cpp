@@ -48,13 +48,13 @@
 
 PlotSignalWidget::PlotSignalWidget(QWidget *parent)
 : QWidget(parent)
-, m_dPlotHeight(70)
+, m_dPlotHeight(40)
 {
 }
 
 PlotSignalWidget::PlotSignalWidget(MatrixXd data, QWidget *parent)
 : QWidget(parent)
-, m_dPlotHeight(70)
+, m_dPlotHeight(40)
 , m_data(data)
 , m_dMaxValue(data.row(0).cwiseAbs().maxCoeff())
 , m_dScaleY(m_dPlotHeight/(2*m_dMaxValue))

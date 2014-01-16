@@ -71,8 +71,8 @@ class RawDelegate : public QAbstractItemDelegate
     Q_OBJECT
 public:
     RawDelegate(QObject *parent = 0);
-    void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
-    QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
     // Plots settings
     double m_dPlotHeight; /**< The height of the plot */
@@ -82,8 +82,20 @@ signals:
 public slots:
 
 private:
-    void createPlotPath(QPainterPath& path, MatrixXd data) const;
-    void createGridPath(QPainterPath& path);
+    /**
+     * @brief createPlotPath Creates the QPointer path for the data plot.
+     *
+     * @param[in] index QModelIndex for accessing associated data and model object.
+     * @param[in,out] path The QPointerPath to create for the data plot.
+     */
+    void createPlotPath(const QModelIndex &index, MatrixXd& data, QPainterPath& path) const;
+    /**
+     * @brief createGridPath Creates the QPointer path for the grid plot.
+     *
+     * @param[in,out] path The row vector of the data matrix <1 x nsamples>.
+     * @param[in] data The row vector of the data matrix <1 x nsamples>.
+     */
+    void createGridPath(QPainterPath& path, MatrixXd& data) const;
 
 
     // Scaling
@@ -92,7 +104,7 @@ private:
     double m_dDx; /**< pixel difference to the next sample*/
 
     //Look
-    qint8 m_nhlines;
+    qint8 m_nhlines; /**< Number of horizontal lines for the grid plot */
 
 };
 
