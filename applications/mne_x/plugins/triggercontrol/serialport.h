@@ -124,9 +124,9 @@ public:
    // void handleError(QSerialPort::SerialPortError error);
 
     QByteArray m_data;
-    QVector<int> m_digchannel;
-    int m_motor;
-    int m_analval;
+    QVector<int> m_digchannel;      // current digital channels (OUT)
+    int m_motor;                    // current selected analog channel (OUT)
+    int m_analval;                  // current analog value (OUT)
 
     QVector<int> m_InAnChannelVal;        // contains the analog values coming from the MUC - channel specific position
     QVector<int> m_InActiveDig;
