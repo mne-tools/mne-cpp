@@ -77,6 +77,7 @@ TriggerControl::TriggerControl()
 , m_pSerialPort(new SerialPort) // initialize a new serial port
 , m_iNumChs(0)
 , m_bIsRunning(false)
+, m_pDataSingleChannel(new dBuffer(1024))
 {
     connect(this, &TriggerControl::sendByte, this, &TriggerControl::sendByteTo);
 }
@@ -107,12 +108,18 @@ QSharedPointer<IPlugin> TriggerControl::clone() const
 
 void TriggerControl::init()
 {
-    /* Beginn Zeitmessung
+    // Beginn Zeitmessung
     // Input
-    m_pRTMSAInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "TriggerControlInI", "TriggerControl input data I");
-    connect(m_pRTMSAInput.data(), &PluginInputConnector::notify, this, &TriggerControl::update, Qt::DirectConnection);
-    m_inputConnectors.append(m_pRTMSAInput);
+//    m_pRTMSAInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "TriggerControlInI", "TriggerControl input data I");
+//    connect(m_pRTMSAInput.data(), &PluginInputConnector::notify, this, &TriggerControl::update, Qt::DirectConnection);
+//    m_inputConnectors.append(m_pRTMSAInput);
     // Ende Zeitmessung*/
+
+
+
+    m_pRTSAInput = PluginInputData<NewRealTimeSampleArray>::create(this, "TriggerControlInII", "TriggerControl input data II");
+    connect(m_pRTSAInput.data(), &PluginInputConnector::notify, this, &TriggerControl::updateSingleChannel, Qt::DirectConnection);
+    m_inputConnectors.append(m_pRTSAInput);
 
 
     // Output
@@ -121,8 +128,8 @@ void TriggerControl::init()
 
     m_pTriggerOutput->data()->setName("Dummy Output");
     m_pTriggerOutput->data()->setUnit("");
-    m_pTriggerOutput->data()->setMinValue(0);
-    m_pTriggerOutput->data()->setMaxValue(2);
+    m_pTriggerOutput->data()->setMinValue(-200);
+    m_pTriggerOutput->data()->setMaxValue(360);
     m_pTriggerOutput->data()->setSamplingRate(256.0/1.0);
 
 }
@@ -137,14 +144,8 @@ bool TriggerControl::start()
 
     // ////////////////////////////
 
-        if(m_pSerialPort->open())   // open Serial Port
-        {
-            ;
-        }
-        else
-        {
-            std::cout << "Not able to open port" << std::endl;
-        }
+//    if(!m_pSerialPort->open())   // open Serial Port
+//        std::cout << "Not able to open port" << std::endl;
 
     // ////////////////////////////
 
@@ -178,13 +179,15 @@ bool TriggerControl::start()
 
 bool TriggerControl::stop()
 {
-//    m_pSerialPort->close();
+    m_pSerialPort->close();
 
     m_bIsRunning = false;
 
-//    // Stop threads
-//    QThread::terminate();
-//    QThread::wait();
+    // Stop threads
+    QThread::terminate();
+    QThread::wait();
+
+    m_pDataSingleChannel->clear();
 
 
 
@@ -244,6 +247,22 @@ QWidget* TriggerControl::setupWidget()
 
 //*************************************************************************************************************
 
+void TriggerControl::updateSingleChannel(XMEASLIB::NewMeasurement::SPtr pMeasurement)
+{
+    QSharedPointer<NewRealTimeSampleArray> pRTSA = pMeasurement.dynamicCast<NewRealTimeSampleArray>();
+    if(pRTSA)
+    {
+        m_qMutex.lock();
+        qint32 t_iSize = pRTSA->getArraySize();
+        for(qint32 i = 0; i < t_iSize; ++i)
+            m_pDataSingleChannel->push(pRTSA->getSampleArray()[i]);//Append sample wise
+        m_qMutex.unlock();
+    }
+}
+
+
+//*************************************************************************************************************
+
 void TriggerControl::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 {
     /* Beginn Zeitmessung
@@ -259,6 +278,7 @@ void TriggerControl::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
     }
     // ENDE Zeitmessung */
 }
+
 
 
 
@@ -315,44 +335,67 @@ void TriggerControl::run()
     }
 // Ende Zeitmessung */
 
-
-
-
-// ////////////////////////////
-
-msleep(200);
-    int count = 0;
-    double v = 0;
+    double v_old = 0;
 
     while (true)
     {
-        //ToDo: Implement your algorithm here
+        /* Dispatch the inputs */
+        double v = m_pDataSingleChannel->pop();
 
-        if( (count % 5 == 0) )
-            v = count % 2;
-            m_pTriggerOutput->data()->setValue(v);
-        if ( v == 1)
+        double diff = v_old - v;
+
+        m_pTriggerOutput->data()->setValue(diff);
+
+        if(diff > 20)
         {
-            emit sendByte(1);
-            m_pSerialPort->m_digchannel.replace(0,1); // select 1st digital channel
-            m_pSerialPort->encodedig();             // encode signal to m_data
-            m_pSerialPort->sendData(m_pSerialPort->m_data);
+            //ToDo: Implement your algorithm here
 
         }
-        else if (v == 0)
-        {
-            emit sendByte(0);
 
-            m_pSerialPort->m_digchannel.replace(0,0); // select 1st digital channel
-            m_pSerialPort->encodedig();             // encode signal to m_data
-            m_pSerialPort->sendData(m_pSerialPort->m_data);
-        }
 
-        msleep((1.0/256.0)*1000.0);
-        ++count;
+
+        v_old  = v;
+
+
+
+
     }
 
-// ////////////////////////////
+//    // ////////////////////////////
+//    int count = 0;
+//    double v = 0;
+
+//    while (true)
+//    {
+//        //ToDo: Implement your algorithm here
+
+//        if( (count % 5 == 0) )
+//        {
+//            v = count % 2;
+//            //m_pTriggerOutput->data()->setValue(v);
+
+//            if ( v == 1)
+//            {
+//                emit sendByte(1);
+////                m_pSerialPort->m_digchannel.replace(0,1); // select 1st digital channel
+////                m_pSerialPort->encodedig();             // encode signal to m_data
+////                m_pSerialPort->sendData(m_pSerialPort->m_data);
+
+//            }
+//            else if (v == 0)
+//            {
+//                emit sendByte(0);
+////                m_pSerialPort->m_digchannel.replace(0,0); // select 1st digital channel
+////                m_pSerialPort->encodedig();             // encode signal to m_data
+////                m_pSerialPort->sendData(m_pSerialPort->m_data);
+//            }
+
+//        }
+
+//        msleep((1.0/256.0)*10000.0);
+//        ++count;
+//    }
+
 
 }
 
