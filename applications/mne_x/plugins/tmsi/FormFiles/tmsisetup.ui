@@ -187,7 +187,7 @@
        </property>
        <layout class="QFormLayout" name="formLayout_3">
         <item row="0" column="0">
-         <widget class="QCheckBox" name="m_checkBox_UsePreprocessing">
+         <widget class="QCheckBox" name="m_checkBox_UseFiltering">
           <property name="text">
            <string>Enable preprocessing (HP)</string>
           </property>
@@ -320,7 +320,25 @@
        </property>
       </spacer>
      </item>
-     <item row="2" column="1" colspan="2">
+     <item row="3" column="0" colspan="3">
+      <widget class="QGroupBox" name="m_qGroupBox_Information">
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>16777215</height>
+        </size>
+       </property>
+       <property name="title">
+        <string>Information</string>
+       </property>
+       <layout class="QGridLayout" name="m_qGridLayout_Information">
+        <item row="0" column="0">
+         <widget class="QTextBrowser" name="m_qTextBrowser_Information"/>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item row="2" column="1">
       <widget class="QGroupBox" name="m_qGroupBox_WriteToFile">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
@@ -336,7 +354,7 @@
        </property>
        <property name="maximumSize">
         <size>
-         <width>420</width>
+         <width>200</width>
          <height>124</height>
         </size>
        </property>
@@ -344,20 +362,6 @@
         <string>Write received samples to file</string>
        </property>
        <layout class="QGridLayout" name="gridLayout">
-        <item row="1" column="0">
-         <widget class="QCheckBox" name="m_checkBox_WriteDriverDebugToFile">
-          <property name="text">
-           <string>Driver debug info</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0">
-         <widget class="QCheckBox" name="m_checkBox_WriteToFile">
-          <property name="text">
-           <string>Write samples to file</string>
-          </property>
-         </widget>
-        </item>
         <item row="4" column="0">
          <widget class="QLineEdit" name="m_lineEdit_outputDir">
           <property name="enabled">
@@ -400,23 +404,51 @@
           </property>
          </widget>
         </item>
+        <item row="0" column="0" colspan="2">
+         <widget class="QCheckBox" name="m_checkBox_WriteToFile">
+          <property name="text">
+           <string>Write samples to file</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0" colspan="2">
+         <widget class="QCheckBox" name="m_checkBox_WriteDriverDebugToFile">
+          <property name="text">
+           <string>Driver debug info</string>
+          </property>
+         </widget>
+        </item>
        </layout>
       </widget>
      </item>
-     <item row="3" column="0" colspan="3">
-      <widget class="QGroupBox" name="m_qGroupBox_Information">
-       <property name="maximumSize">
-        <size>
-         <width>16777215</width>
-         <height>16777215</height>
-        </size>
-       </property>
+     <item row="2" column="2">
+      <widget class="QGroupBox" name="groupBox">
        <property name="title">
-        <string>Information</string>
+        <string>Trigger - properties</string>
        </property>
-       <layout class="QGridLayout" name="m_qGridLayout_Information">
+       <layout class="QFormLayout" name="formLayout">
         <item row="0" column="0">
-         <widget class="QTextBrowser" name="m_qTextBrowser_Information"/>
+         <widget class="QCheckBox" name="m_checkBox_EnableBeep">
+          <property name="text">
+           <string>Enable beep</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QSpinBox" name="m_spinBox_BeepLength">
+          <property name="maximumSize">
+           <size>
+            <width>50</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="minimum">
+           <number>600</number>
+          </property>
+          <property name="maximum">
+           <number>2000000000</number>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>
