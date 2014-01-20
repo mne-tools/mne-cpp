@@ -377,17 +377,17 @@ void TriggerControl::run()
 //            if ( v == 1)
 //            {
 //                emit sendByte(1);
-////                m_pSerialPort->m_digchannel.replace(0,1); // select 1st digital channel
-////                m_pSerialPort->encodedig();             // encode signal to m_data
-////                m_pSerialPort->sendData(m_pSerialPort->m_data);
+// //                m_pSerialPort->m_digchannel.replace(0,1); // select 1st digital channel
+// //                m_pSerialPort->encodedig();             // encode signal to m_data
+// //                m_pSerialPort->sendData(m_pSerialPort->m_data);
 
 //            }
 //            else if (v == 0)
 //            {
 //                emit sendByte(0);
-////                m_pSerialPort->m_digchannel.replace(0,0); // select 1st digital channel
-////                m_pSerialPort->encodedig();             // encode signal to m_data
-////                m_pSerialPort->sendData(m_pSerialPort->m_data);
+// //                m_pSerialPort->m_digchannel.replace(0,0); // select 1st digital channel
+// //                m_pSerialPort->encodedig();             // encode signal to m_data
+// //                m_pSerialPort->sendData(m_pSerialPort->m_data);
 //            }
 
 //        }
