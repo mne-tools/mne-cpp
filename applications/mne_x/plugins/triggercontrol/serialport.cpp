@@ -469,7 +469,7 @@ void SerialPort::initPort()
 //        m_qSerialPort.setPortName( t_qListPortInfo[1].portName());
 //    }
 
-    for (int t_count = 0; t_count <= t_qListPortInfo.size();t_count++)
+    for (int t_count = 0; t_count < t_qListPortInfo.size();t_count++)
     {
         if (t_qListPortInfo[t_count].description() == "Silicon Labs CP210x USB to UART Bridge")
         {
