@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
-* @file     main.cpp
-* @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>
+* @file     rawdelegate.cpp
+* @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     December, 2013
+* @date     January, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,32 +30,55 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implements the mne_browse_raw_qt GUI application.
+* @brief    Implementation of delegate of mne_browse_raw_qt
 *
 */
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <QApplication>
-#include <QTableView>
+//Qt
+#include <QAbstractItemDelegate>
 
-#include "mainwindow.h"
+//MNE
+#include <fiff/fiff.h>
+#include <mne/mne.h>
+#include <fiff/fiff_io.h>
+
+//Eigen
+#include <Eigen/Core>
+#include <Eigen/SparseCore>
+
+#include "rawdelegate.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
-// MAIN
+// USED NAMESPACES
 //=============================================================================================================
 
-int main(int argc, char *argv[])
+using namespace Eigen;
+using namespace MNELIB;
+
+//=============================================================================================================
+
+RawDelegate::RawDelegate(QObject *parent)
 {
-    QApplication a(argc, argv);
-
-    //ModelView w;
-    MainWindow w;
-    w.show();
-
-    return a.exec();
 }
+
+//=============================================================================================================
+
+void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+
+}
+
+//=============================================================================================================
+
+QSize RawDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+
+}
+

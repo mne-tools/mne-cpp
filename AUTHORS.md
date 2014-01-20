@@ -8,3 +8,4 @@ Authors
   * Daniel Strohmeier <daniel.strohmeier@tu-ilmenau.de> 2013
   * Florian Schlembach <florian.schlembach@tu-ilmenau.de> 2013
   * Matti Hamalainen <msh@nmr.mgh.harvard.edu> 2012
+  * Felix Arndt <felix.arndt@tu-ilmenau.de> 2014

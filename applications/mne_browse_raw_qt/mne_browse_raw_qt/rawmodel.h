@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
-* @file     main.cpp
-* @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>
+* @file     rawmodel.h
+* @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     December, 2013
+* @date     January, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,53 +30,79 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implements the main() application function.
+* @brief    Implementation of data model of mne_browse_raw_qt
 *
 */
 
-#ifndef MNE_BRAWSE_H
-#define MNE_BRAWSE_H
+#ifndef RAWMODEL_H
+#define RAWMODEL_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <QMainWindow>
+//Qt
+#include <QAbstractTableModel>
+
+//MNE
+#include <fiff/fiff.h>
+#include <mne/mne.h>
+#include <fiff/fiff_io.h>
+
+//Eigen
+#include <Eigen/Core>
+#include <Eigen/SparseCore>
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE
+// USED NAMESPACES
 //=============================================================================================================
 
-namespace Ui {
-class mne_browse_raw_qt;
-}
+using namespace Eigen;
+using namespace MNELIB;
 
 //=============================================================================================================
 
-class mne_browse_raw_qt : public QMainWindow
+class RawModel : public QAbstractTableModel
 {
     Q_OBJECT
-
 public:
-    explicit mne_browse_raw_qt(QWidget *parent = 0);
-    ~mne_browse_raw_qt();
+    RawModel(QObject *parent);
+    RawModel(QObject *parent, QIODevice& p_IODevice);
+    int rowCount(const QModelIndex &parent = QModelIndex()) const ;
+    int columnCount(const QModelIndex &parent = QModelIndex()) const;
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+    QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+    Qt::ItemFlags flags(const QModelIndex & index) const;
 
-private slots:
-    //=========================================================================================================
-    /**
-    * Exits program.
-    */
-    void on_actionExit_triggered();
-    //=========================================================================================================
-    /**
-    * Open fiff file
-    */
-    void on_actionOpen_triggered();
 
 private:
-    Ui::mne_browse_raw_qt *ui;
+    //display types
+    MatrixXd m_data;
+    MatrixXd m_times;
+    QStringList m_chnames;
+
+    //Fiff
+    QSharedPointer<FiffIO> m_pfiffIO;
+    QList<FiffChInfo> m_chinfolist;
+
+    //settings
+    qint32 m_windowlength; //in sec
+    qint32 m_position;
+
+    //methods
+    void loadChNames();
+    void loadChInfos();
+
+signals:
+
+public slots:
+
+
+
 };
 
-#endif // MNE_BRAWSE_H
+Q_DECLARE_METATYPE(Eigen::MatrixXd);
+
+#endif // RAWMODEL_H
