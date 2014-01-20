@@ -355,12 +355,13 @@ public:
 
     //=========================================================================================================
     /**
-    * Restrict gain matrix entries for optimal depth weighting
+    * Reduces a forward solution to selected regions
     *
-    * @param[in, out] G     Gain matrix to be restricted; result is stored in place.
-    * @param[in] info       Fiff information
+    * @param[in] p_qListLabels  ROIs
+    *
+    * @return the reduced forward solution
     */
-    MNEForwardSolution selectRegions(const QList<Label> &t_qListLabels) const;
+    MNEForwardSolution selectRegions(const QList<Label> &p_qListLabels) const;
 
     //=========================================================================================================
     /**
