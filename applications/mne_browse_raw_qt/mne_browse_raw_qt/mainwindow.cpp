@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
-* @file     main.cpp
+* @file     mainwindow.cpp
 * @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     December, 2013
+* @date     January, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implements the mne_browse_raw_qt GUI application.
+* @brief    Implements the mainwindow function of mne_browse_raw_qt
 *
 */
 
@@ -39,23 +39,72 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <QApplication>
-#include <QTableView>
-
 #include "mainwindow.h"
 
 //*************************************************************************************************************
-//=============================================================================================================
-// MAIN
-//=============================================================================================================
 
-int main(int argc, char *argv[])
+MainWindow::MainWindow(QWidget *parent) :
+    QMainWindow(parent)
 {
-    QApplication a(argc, argv);
+    //setupFileMenu
+    QMenu *fileMenu = new QMenu(tr("&File"), this);
+    QAction *openAction = fileMenu->addAction(tr("&Open..."));
+    openAction->setShortcuts(QKeySequence::Open);
+    QAction *quitAction = fileMenu->addAction(tr("E&xit"));
+    quitAction->setShortcuts(QKeySequence::Quit);
 
-    //ModelView w;
-    MainWindow w;
-    w.show();
+    menuBar()->addMenu(fileMenu);
+    statusBar();
 
-    return a.exec();
+    //setup MVC
+    MainWindow::setupModel();
+    MainWindow::setupView();
+
+    //connect signalslots
+    connect(openAction, SIGNAL(triggered()), this, SLOT(openFile()));
+//    connect(saveAction, SIGNAL(triggered()), this, SLOT(saveFile()));
+    connect(quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
+
+    //Window-related
+    setWindowTitle("MNE_BROWSE_RAW_QT");
+    resize(800,600);
+    //this->setWindowState(Qt::WindowMaximized); //maximize window
+    this->move(100,100);
 }
+
+//*************************************************************************************************************
+
+MainWindow::~MainWindow()
+{
+}
+
+
+//*************************************************************************************************************
+
+void MainWindow::setupModel() {
+    QFile t_rawFile("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+    m_pRawModel = new RawModel(this,t_rawFile);
+
+    //set header
+//    m_pRawModel->setHeaderData(0, Qt::Horizontal, tr("chname"));
+//    m_pRawModel->setHeaderData(1, Qt::Horizontal, tr("data plot"));
+}
+
+void MainWindow::setupView() {
+    m_pTableView = new QTableView;
+//    m_pTableView->setShowGrid(false);
+//    m_pTableView->verticalHeader()->hide();
+    m_pTableView->setModel(m_pRawModel);
+
+    setCentralWidget(m_pTableView);
+}
+
+//*************************************************************************************************************
+
+void MainWindow::openFile()
+{
+    QString filename = QFileDialog::getOpenFileName(this,QString("Open fiff data file"),QString("./MNE-sample-data/MEG/sample/"),tr("fif data files (*.fif)"));
+
+    //ui->textEdit->setText(filename);
+}
+
