@@ -143,9 +143,6 @@ public:
 signals:
     void sendByte(int value);
 
-signals:
-    void sendByte(int value);
-
 protected:
     virtual void run();
     void sendByteTo(int);
