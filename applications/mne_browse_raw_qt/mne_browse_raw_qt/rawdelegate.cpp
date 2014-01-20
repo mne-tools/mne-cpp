@@ -71,18 +71,22 @@ void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, c
 
     switch(index.column()) {
     case 0: //chnames
-        painter->drawText(rect, Qt::AlignCenter ,index.model()->data(index,Qt::DisplayRole).toString());
-        break;
+        //content of column=0 is plotted jointly with content of column=1 -> see below
     case 1: //data plot
         QPainterPath path;
 
+        //write channel name
+        const QAbstractItemModel* model = index.model();
+        painter->drawText(rect,NULL,model->data(model->index(index.row(), 0), Qt::DisplayRole).toString());
+
+        //plot data
         QVariant variant = index.model()->data(index,Qt::DisplayRole);
         MatrixXd data = variant.value<MatrixXd>();
 
         createPlotPath(index,data,path);
 
         painter->save();
-            painter->translate(option.rect.x(),option.rect.y()+m_dPlotHeight/2);
+            painter->translate(/*option.rect.x()*/0,option.rect.y()+m_dPlotHeight/2);
 
             //Plot data
             painter->setRenderHint(QPainter::Antialiasing, true);
@@ -116,7 +120,7 @@ QSize RawDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelInde
 
     switch(index.column()) {
     case 0:
-        size = QSize(80,m_dPlotHeight);
+        size = QSize(70,m_dPlotHeight);
         break;
     case 1:
         qint32 nsamples = index.model()->data(index).value<MatrixXd>().cols();
@@ -150,7 +154,7 @@ void RawDelegate::createPlotPath(const QModelIndex &index, MatrixXd& data, QPain
         path.moveTo(qSamplePosition);
     }
 
-    qDebug("Plot-PainterPath created!");
+//    qDebug("Plot-PainterPath created!");
 }
 
 void RawDelegate::createGridPath(QPainterPath& path, MatrixXd& data) const
@@ -167,6 +171,6 @@ void RawDelegate::createGridPath(QPainterPath& path, MatrixXd& data) const
         path.lineTo(endpoint);
     }
 
-    qDebug("Grid-PainterPath created!");
+//    qDebug("Grid-PainterPath created!");
 }
 

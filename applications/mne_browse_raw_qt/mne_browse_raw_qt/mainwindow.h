@@ -38,12 +38,11 @@
 #define MAINWINDOW_H
 
 //*************************************************************************************************************
-//=============================================================================================================
 // INCLUDES
-//=============================================================================================================
 
 //Qt
 #include <QApplication>
+#include <QDebug>
 #include <QMainWindow>
 #include <QFileDialog>
 #include <QFile>
@@ -54,22 +53,27 @@
 #include <QTableView>
 #include <QHeaderView>
 
+#include <QDockWidget>
+#include <QTextBrowser>
+
 //MNE
 #include "rawmodel.h"
 #include "rawdelegate.h"
+
+#include "info.h"
 
 #include <fiff/fiff.h>
 #include <mne/mne.h>
 #include <fiff/fiff_io.h>
 
 //*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE
-//=============================================================================================================
+// namespaces
 
 using namespace Eigen;
 
-//=============================================================================================================
+//*************************************************************************************************************
+
+namespace MNE_BROWSE_RAW_QT {
 
 class MainWindow : public QMainWindow
 {
@@ -78,6 +82,15 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = 0);
     ~MainWindow();
+
+    /**
+    * Writes to MainWindow log.
+    *
+    * @param [in] logMsg message
+    * @param [in] lgknd message kind; Message is formated depending on its kind.
+    * @param [in] lglvl message level; Message is displayed depending on its level.
+    */
+    void writeToLog(const QString& logMsg, LogKind lgknd, LogLevel lglvl);
 
 public slots:
 
@@ -90,13 +103,26 @@ private:
     void setupView();
 
     void createMenus();
+    void createLogDockWindow();
     void setWindow();
 
     RawModel *m_pRawModel;
     QTableView *m_pTableView;
     RawDelegate *m_pRawDelegate;
+
+    //Log
+    QDockWidget* m_pDockWidget_Log;
+    QTextBrowser* m_pTextBrowser_Log;
+    LogLevel m_eLogLevelCurrent; /**< Holds the current log level.*/
+
+    /**
+    * Sets the log level
+    *
+    * @param [in] lvl message level; Message is displayed depending on its level.
+    */
+    void setLogLevel(LogLevel lvl);
 };
 
+}
 
-
-#endif // MAINWINDOW
+#endif // MAINWINDOW_H

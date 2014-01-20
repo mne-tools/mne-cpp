@@ -40,7 +40,7 @@
 
 RawModel::RawModel(QObject *parent)
 : QAbstractTableModel(parent)
-, m_dWindowLength(2)
+, m_dWindowLength(10) //secs
 {
 //    qRegisterMetaType<MatrixXd>("MatrixXd");
 }
@@ -49,7 +49,7 @@ RawModel::RawModel(QObject *parent)
 
 RawModel::RawModel(QIODevice &p_IODevice, QObject *parent)
 : QAbstractTableModel(parent)
-, m_dWindowLength(2)
+, m_dWindowLength(10) //secs
 {
 //    qRegisterMetaType<MatrixXd>("MatrixXd");
 
@@ -91,17 +91,26 @@ QVariant RawModel::data(const QModelIndex &index, int role) const
 
 QVariant RawModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-    if(role != Qt::DisplayRole || role != Qt::TextAlignmentRole)
+    if(role != Qt::DisplayRole && role != Qt::TextAlignmentRole && role != Qt::ForegroundRole)
         return QVariant();
 
     if(orientation == Qt::Horizontal) {
         switch(section) {
-        case 0: return QVariant("chname");
-        case 1:
-            if(role == Qt::DisplayRole)
+        case 0: //chname column
+            return QVariant("chname");
+//            switch(role) {
+//            case Qt::DisplayRole:
+//                return QVariant("chname");
+//            case Qt::ForegroundRole:
+//                return QVariant(QBrush(Qt::NoBrush));
+//            }
+        case 1: //data plot column
+            switch(role) {
+            case Qt::DisplayRole:
                 return QVariant("data plot");
-            else if(role == Qt::TextAlignmentRole)
+            case Qt::TextAlignmentRole:
                 return QVariant(Qt::AlignLeft);
+            }
         }
     }
     else if(orientation == Qt::Vertical) {
@@ -113,16 +122,18 @@ QVariant RawModel::headerData(int section, Qt::Orientation orientation, int role
 
 
 //*************************************************************************************************************
+//own functions
+
 void RawModel::loadFiffData(QIODevice& p_IODevice)
 {
     beginResetModel();
 
     m_pfiffIO = QSharedPointer<FiffIO>(new FiffIO(p_IODevice));
 
-    m_dPosition = m_pfiffIO->m_qlistRaw[0]->first_samp/m_pfiffIO->m_qlistRaw[0]->info.sfreq; //take beginning of raw data as position [in secs]
+    m_dFiffPosition = m_pfiffIO->m_qlistRaw[0]->first_samp/m_pfiffIO->m_qlistRaw[0]->info.sfreq+10; //take beginning of raw data as position + 10 secs [in secs]
 
 
-    if(!m_pfiffIO->m_qlistRaw[0]->read_raw_segment_times(m_data, m_times, m_dPosition, m_dPosition+m_dWindowLength)) {
+    if(!m_pfiffIO->m_qlistRaw[0]->read_raw_segment_times(m_data, m_times, m_dFiffPosition-m_dWindowLength/2, m_dFiffPosition+m_dWindowLength/2)) {
         printf("Error when reading raw data!");
     }
 
@@ -151,7 +162,13 @@ void RawModel::loadChInfos()
         m_chinfolist.append(m_pfiffIO->m_qlistRaw[0]->info.chs[i]);
 }
 
-double RawModel::getMaxDataValue(qint32 type) const {
+qint32 RawModel::sizeOfData()
+{
+    return m_data.cols();
+}
+
+
+double RawModel::maxDataValue(qint32 type) const {
 
 //    QString kind = m_chinfolist[0].channel_type(type);
 
@@ -171,3 +188,11 @@ double RawModel::getMaxDataValue(qint32 type) const {
     double max = picks_data.maxCoeff();
     return max;
 }
+
+//*************************************************************************************************************
+//slots
+
+//void RawModel::reloadData(int value) {
+//    if(value > (m_data.cols()/2 - ))
+
+//}

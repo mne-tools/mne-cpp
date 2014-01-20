@@ -77,6 +77,11 @@ public:
     // Plots settings
     double m_dPlotHeight; /**< The height of the plot */
 
+    // Scaling
+    double m_dMaxValue; /**< Maximum value of the data to plot  */
+    double m_dScaleY; /**< Maximum amplitude of plot (max is m_dPlotHeight/2) */
+    double m_dDx; /**< pixel difference to the next sample*/
+
 signals:
 
 public slots:
@@ -96,12 +101,6 @@ private:
      * @param[in] data The row vector of the data matrix <1 x nsamples>.
      */
     void createGridPath(QPainterPath& path, MatrixXd& data) const;
-
-
-    // Scaling
-    double m_dMaxValue; /**< Maximum value of the data to plot  */
-    double m_dScaleY; /**< Maximum amplitude of plot (max is m_dPlotHeight/2) */
-    double m_dDx; /**< pixel difference to the next sample*/
 
     //Look
     qint8 m_nhlines; /**< Number of horizontal lines for the grid plot */
