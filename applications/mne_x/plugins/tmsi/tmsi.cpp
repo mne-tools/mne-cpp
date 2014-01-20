@@ -110,20 +110,24 @@ void TMSI::init()
     m_iSamplingFreq = 1024;
     m_iNumberOfChannels = 138;
     m_iSamplesPerBlock = 16;
+    m_iTriggerInterval = 5000;
+
     m_bUseChExponent = true;
     m_bUseUnitGain = false;
     m_bUseUnitOffset = false;
     m_bWriteToFile = false;
     m_bWriteDriverDebugToFile = false;
-    m_bUsePreprocessing = false;
+    m_bUseFiltering = false;
     m_bUseFFT = false;
     m_bIsRunning = false;
+    m_bShowEventTrigger = false;
+
     m_sOutputFilePath = QString("./mne_x_plugins/resources/tmsi/EEG_data_001_raw.fif");
     m_sElcFilePath = QString("./mne_x_plugins/resources/tmsi/loc_files/Lorenz-Duke128-28-11-2013.elc");
 
     m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo());
 
-    // Initialise matrix used to perform a very simple high pass filter operation
+    //Initialise matrix used to perform a very simple high pass filter operation
     m_matOldMatrix = MatrixXf::Zero(m_iNumberOfChannels, m_iSamplesPerBlock);
 }
 
@@ -327,7 +331,7 @@ void TMSI::setUpFiffInfo()
             //Set channel type
             fChInfo.kind = FIFFV_STIM_CH;
 
-            sChType = QString("STIM");
+            sChType = QString("STI 014");
             fChInfo.ch_name = sChType;
         }
 
@@ -406,6 +410,9 @@ bool TMSI::start()
     if(this->isRunning())
         QThread::wait();
 
+    if(m_bShowEventTrigger)
+        m_qTimerTrigger.start();
+
     //Setup writing to file
     if(m_bWriteToFile)
     {
@@ -427,7 +434,6 @@ bool TMSI::start()
         m_pOutfid = Fiff::start_writing_raw(m_fileOut, *m_pFiffInfo, m_cals);
         fiff_int_t first = 0;
         m_pOutfid->write_int(FIFF_FIRST_SAMPLE, &first);
-        m_pOutfid->finish_writing_raw();
     }
     else
         setUpFiffInfo();
@@ -524,14 +530,22 @@ void TMSI::run()
         if(m_pTMSIProducer->isRunning())
         {
             MatrixXf matValue = m_pRawMatrixBuffer_In->pop();
-            //std::cout << "matValue " << matValue.cast<double>() << std::endl;
+
+            if(m_bShowEventTrigger && m_qTimerTrigger.elapsed() >= m_iTriggerInterval)
+            {
+                QFuture<void> future = QtConcurrent::run(Beep, 523, 500);
+
+                //Set trigger in received data samples - just for one sample, so that this event is easy to detect
+                matValue(136, m_iSamplesPerBlock-1) = 254;
+                m_qTimerTrigger.restart();
+            }
 
             //Write raw data to fif file
             if(m_bWriteToFile)
                 m_pOutfid->write_raw_buffer(matValue.cast<double>(), m_cals);
 
             // TODO: Use preprocessing if wanted by the user
-            if(m_bUsePreprocessing)
+            if(m_bUseFiltering)
             {
                 MatrixXf temp = matValue;
 

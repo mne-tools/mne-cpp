@@ -70,8 +70,6 @@ TMSISetupWidget::TMSISetupWidget(TMSI* pTMSI, QWidget* parent)
 : QWidget(parent)
 , m_pTMSI(pTMSI)
 {
-    m_bAcquisitionIsRunning = false;
-
     ui.setupUi(this);
 
     //Connect device sampling properties
@@ -91,7 +89,7 @@ TMSISetupWidget::TMSISetupWidget(TMSI* pTMSI, QWidget* parent)
             this, &TMSISetupWidget::setDeviceSamplingProperties);
 
     //Connect preprocessing
-    connect(ui.m_checkBox_UsePreprocessing, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+    connect(ui.m_checkBox_UseFiltering, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
             this, &TMSISetupWidget::setPreprocessing);
 
     //Connect postprocessing
@@ -108,6 +106,12 @@ TMSISetupWidget::TMSISetupWidget(TMSI* pTMSI, QWidget* parent)
 
     //Connect EEG hat
     connect(ui.m_pushButton_ChangeEEGHatDir, &QPushButton::released, this, &TMSISetupWidget::changeHatDir);
+
+    //Connect trigger properties
+    connect(ui.m_spinBox_BeepLength, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+            this, &TMSISetupWidget::setTriggerProperties);
+    connect(ui.m_checkBox_EnableBeep, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+            this, &TMSISetupWidget::setTriggerProperties);
 
     //Connect about button
     connect(ui.m_qPushButton_About, &QPushButton::released, this, &TMSISetupWidget::showAboutDialog);
@@ -150,7 +154,7 @@ void TMSISetupWidget::initGui()
     ui.m_checkBox_UseUnitOffset->setChecked(m_pTMSI->m_bUseUnitOffset);
 
     //Init preprocessing
-    ui.m_checkBox_UsePreprocessing->setChecked(m_pTMSI->m_bUsePreprocessing);
+    ui.m_checkBox_UseFiltering->setChecked(m_pTMSI->m_bUseFiltering);
 
     //Init postprocessing
     ui.m_checkBox_UseFFT->setChecked(m_pTMSI->m_bUseFFT);
@@ -162,6 +166,10 @@ void TMSISetupWidget::initGui()
 
     //Init EEG hat
     ui.m_lineEdit_CurrentEEGHat->setText(m_pTMSI->m_sElcFilePath);
+
+    //Init trigger properties
+    ui.m_spinBox_BeepLength->setValue(m_pTMSI->m_iTriggerInterval);
+    ui.m_checkBox_EnableBeep->setChecked(m_pTMSI->m_bShowEventTrigger);
 }
 
 
@@ -183,7 +191,7 @@ void TMSISetupWidget::setDeviceSamplingProperties()
 
 void TMSISetupWidget::setPreprocessing()
 {
-    m_pTMSI->m_bUsePreprocessing = ui.m_checkBox_UsePreprocessing->isChecked();
+    m_pTMSI->m_bUseFiltering = ui.m_checkBox_UseFiltering->isChecked();
 }
 
 
@@ -230,6 +238,7 @@ void TMSISetupWidget::setOutputTextField()
     m_pTMSI->m_sOutputFilePath = ui.m_lineEdit_outputDir->text();
 }
 
+
 //*************************************************************************************************************
 
 void TMSISetupWidget::changeHatDir()
@@ -246,6 +255,16 @@ void TMSISetupWidget::changeHatDir()
     ui.m_lineEdit_CurrentEEGHat->setText(path);
     m_pTMSI->m_sElcFilePath = ui.m_lineEdit_CurrentEEGHat->text();
 }
+
+
+//*************************************************************************************************************
+
+void TMSISetupWidget::setTriggerProperties()
+{
+    m_pTMSI->m_iTriggerInterval = ui.m_spinBox_BeepLength->value();
+    m_pTMSI->m_bShowEventTrigger = ui.m_checkBox_EnableBeep->isChecked();
+}
+
 
 //*************************************************************************************************************
 
