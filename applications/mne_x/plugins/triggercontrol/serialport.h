@@ -50,6 +50,7 @@
 //=============================================================================================================
 
 #include <QSerialPort>
+#include <QVector>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -100,17 +101,38 @@ public:
     ~SerialPort();
 
 
-    void initSettings();
-    void initPort();
+    void initSettings();    /**< Initializes Settings as #data bits or baud rate.*/
+    void initPort();        /**< Checks all available serial ports and initializes the one of the trigger box.*/
 
-    bool open();
-    void close();
-    void sendData(const QByteArray &data);
+    bool open();            /**< Opens a communication channel to the serial port.*/
+    void close();           /**< Closes a communication channel to the serial port.*/
+
+
+    void encodedig();       /**< Encodes the chosen digital channels according to the data transfer protocol.*/
+    void encodeana();       /**< Encodes the chosen analog channels and values according to the data transfer protocol.*/
+    void encoderetr();      /**< Encodes a retrieve bytearray according to the data transfer protocol.*/
+
+    void decodedig(QByteArray &t_incomingArray);       /**< Decodes the incoming digital information according to the data transfer protocol.*/
+    void decodeana(QByteArray &t_incomingArray);       /**< Decodes the incoming analog information according to the data transfer protocol.*/
+
+    void sendData(const QByteArray &data);    /**< Sends an array of bytes to the configured serial port.*/
+    void readData();
 
  //   void writeData(const QByteArray &data);
-//    void readData();
+
 
    // void handleError(QSerialPort::SerialPortError error);
+
+    QByteArray m_data;
+    QVector<int> m_digchannel;      // current digital channels (OUT)
+    int m_motor;                    // current selected analog channel (OUT)
+    int m_analval;                  // current analog value (OUT)
+
+    QVector<int> m_InAnChannelVal;        // contains the analog values coming from the MUC - channel specific position
+    QVector<int> m_InActiveDig;
+
+    int m_retrievetyp;
+    int m_retrievechan;
 
 
     struct Settings {
@@ -140,7 +162,6 @@ protected:
 private:
     Settings m_currentSettings;
     QSerialPort m_qSerialPort;
-
 };
 
 } // Namespace

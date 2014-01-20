@@ -136,8 +136,12 @@ public:
 
     virtual QWidget* setupWidget();
 
+    void updateSingleChannel(XMEASLIB::NewMeasurement::SPtr pMeasurement);
+
     void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
 //
+signals:
+    void sendByte(int value);
 
 signals:
     void sendByte(int value);
@@ -149,6 +153,7 @@ protected:
 private:
     PluginOutputData<NewRealTimeSampleArray>::SPtr  m_pTriggerOutput;   /**< The RealTimeSampleArray of the trigger output.*/
     PluginInputData<NewRealTimeMultiSampleArray>::SPtr  m_pRTMSAInput;  /**< The RealTimeMultiSampleArray input.*/
+    PluginInputData<NewRealTimeSampleArray>::SPtr  m_pRTSAInput;
 
     QVector<int> m_vTimes;
 
@@ -161,8 +166,8 @@ private:
 
     QMutex m_qMutex;
 
-
-    QVector< VectorXd > m_pData;
+    QVector<VectorXd> m_pData;
+    dBuffer::SPtr m_pDataSingleChannel;
 
     qint32 m_iNumChs;
 

@@ -214,6 +214,16 @@ public:
 
     //=========================================================================================================
     /**
+    * Reduces a source space to selected regions
+    *
+    * @param[in] p_qListLabels  ROIs
+    *
+    * @return the reduced source space
+    */
+    MNESourceSpace selectRegions(const QList<Label> &p_qListLabels) const;
+
+    //=========================================================================================================
+    /**
     * Returns the number of stored hemispheres 0, 1 or 2
     *
     * @return number of stored hemispheres
