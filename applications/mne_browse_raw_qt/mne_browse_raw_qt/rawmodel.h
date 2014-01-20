@@ -83,14 +83,22 @@ public:
     void loadFiffData(QIODevice &p_IODevice);
 
     //Model settings
-    double m_dWindowLength; /**< Length of window to load in secs */
-    double m_dPosition; /**< Position of window in secs */
+    double m_dWindowLength; /**< Length of window to load [in secs] */
+    double m_dFiffPosition; /**< Position of window in fiff data [in secs] */
+
+//    int n_reload
+
+    /**
+     * @brief sizeOfData
+     * @return size of loaded m_data
+     */
+    qint32 sizeOfData();
 
     /**
      * @brief getMaxDataValue
      * @return max data value of m_data for scaling purposes.
      */
-    double getMaxDataValue(qint32 type) const;
+    double maxDataValue(qint32 type) const;
 
 private:
     //display types
@@ -110,19 +118,18 @@ private:
     void loadChNames();
 
     /**
-    * Load channel infos to.
+    * Load channel infos to m_chinfolist.
     *
     */
     void loadChInfos();
 
 signals:
 
-public slots:
-
+private slots:
+//    void reloadData(int value);
 
 };
 
 Q_DECLARE_METATYPE(Eigen::MatrixXd);
-
 
 #endif // RAWMODEL_H

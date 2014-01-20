@@ -35,11 +35,13 @@
 */
 
 //*************************************************************************************************************
-//=============================================================================================================
 // INCLUDES
-//=============================================================================================================
 
 #include "mainwindow.h"
+#include "info.h"
+
+//Qt
+#include <QDebug>
 
 #include <QWidget>
 #include <QPainter>
@@ -47,14 +49,23 @@
 #include <QVBoxLayout>
 #include <QGroupBox>
 #include <QScrollArea>
+#include <QScrollBar>
+#include <QScroller>
 
-#include "plotsignalwidget.h"
+//#include "plotsignalwidget.h"
+
+//*************************************************************************************************************
+//namespaces
+
+using namespace MNE_BROWSE_RAW_QT;
 
 //*************************************************************************************************************
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
 {
+    qDebug() << "test log";
+
     //setup MVC
     setupModel();
     setupDelegate();
@@ -62,6 +73,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     createMenus();
 
+    createLogDockWindow();
     setWindow();
 }
 
@@ -88,23 +100,38 @@ void MainWindow::setupDelegate()
 void MainWindow::setupView()
 {
     m_pTableView = new QTableView;
-    m_pTableView->setModel(m_pRawModel);
 
-    //set custom delegate for view
-    m_pTableView->setItemDelegate(m_pRawDelegate);
+    m_pTableView->setModel(m_pRawModel); //set custom model
+    m_pTableView->setItemDelegate(m_pRawDelegate); //set custom delegate
 
     //set some size settings for m_pTableView
     m_pTableView->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
 
-    //Item cells/columns resizing
+    //TableView settings
+    m_pTableView->setShowGrid(false);
+    m_pTableView->verticalHeader()->hide();
+    m_pTableView->horizontalHeader()->hide();
     m_pTableView->verticalHeader()->setDefaultSectionSize(m_pRawDelegate->m_dPlotHeight);
+
+    m_pTableView->setAutoScroll(false);
+    m_pTableView->setColumnHidden(0,true); //because content is plotted jointly with column=1
+
     m_pTableView->resizeColumnToContents(0); //based on returned sizeHint of RawDelegate
     m_pTableView->resizeColumnsToContents();
 
     m_pTableView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
 
+    //obtain position of QScrollArea
+    m_pTableView->horizontalScrollBar()->setMinimum(0);
+    m_pTableView->horizontalScrollBar()->setValue(m_pRawModel->sizeOfData()/2-this->width()/2);
+    m_pTableView->horizontalScrollBar()->setMaximum(m_pRawModel->sizeOfData()*m_pRawDelegate->m_dDx);
+    qDebug("INFO: ScrollBar: Position: %i, Min %i, Max %i",m_pTableView->horizontalScrollBar()->value(),m_pTableView->horizontalScrollBar()->minimum(),m_pTableView->horizontalScrollBar()->maximum());
+
+    QScroller::grabGesture(m_pTableView,QScroller::MiddleMouseButtonGesture); //activate kinetic scrolling
+
+
     //*****************************
-//    //testing of PlotSignalWidget
+//    //example for PlotSignalWidget
 //    QFile t_rawFile("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
 //    FiffIO m_fiffIO(t_rawFile);
 
@@ -121,12 +148,6 @@ void MainWindow::setupView()
 
     //set vertical layout
     QVBoxLayout *mainlayout = new QVBoxLayout;
-
-//    QScrollArea *scrollArea = new QScrollArea();
-//    scrollArea->setWidget(m_pTableView);
-//    scrollArea->setWidgetResizable(true);
-//    scrollArea->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
-//    scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
 
     mainlayout->addWidget(m_pTableView);
 
@@ -154,8 +175,63 @@ void MainWindow::createMenus() {
 
 void MainWindow::setWindow() {
     setWindowTitle("MNE_BROWSE_RAW_QT");
-    resize(800,600);
+    resize(1200,800);
     this->move(100,100);
+}
+
+//*************************************************************************************************************
+//Log
+
+void MainWindow::createLogDockWindow()
+{
+    //Log TextBrowser
+    m_pDockWidget_Log = new QDockWidget(tr("Log"), this);
+
+    m_pTextBrowser_Log = new QTextBrowser(m_pDockWidget_Log);
+
+    m_pDockWidget_Log->setWidget(m_pTextBrowser_Log);
+
+    m_pDockWidget_Log->setAllowedAreas(Qt::BottomDockWidgetArea);
+    addDockWidget(Qt::BottomDockWidgetArea, m_pDockWidget_Log);
+
+    //Set standard LogLevel
+    setLogLevel(_LogLvMax);
+}
+
+void MainWindow::writeToLog(const QString& logMsg, LogKind lgknd, LogLevel lglvl)
+{
+    if(lglvl<=m_eLogLevelCurrent) {
+        if(lgknd == _LogKndError)
+            m_pTextBrowser_Log->insertHtml("<font color=red><b>Error:</b> "+logMsg+"</font>");
+        else if(lgknd == _LogKndWarning)
+            m_pTextBrowser_Log->insertHtml("<font color=blue><b>Warning:</b> "+logMsg+"</font>");
+        else
+            m_pTextBrowser_Log->insertHtml(logMsg);
+        m_pTextBrowser_Log->insertPlainText("\n"); // new line
+        //scroll down to the newest entry
+        QTextCursor c = m_pTextBrowser_Log->textCursor();
+        c.movePosition(QTextCursor::End);
+        m_pTextBrowser_Log->setTextCursor(c);
+
+        m_pTextBrowser_Log->verticalScrollBar()->setValue(m_pTextBrowser_Log->verticalScrollBar()->maximum());
+    }
+}
+
+void MainWindow::setLogLevel(LogLevel lvl)
+{
+    switch(lvl) {
+    case _LogLvMin:
+        writeToLog(tr("minimal log level set"), _LogKndMessage, _LogLvMin);
+        break;
+    case _LogLvNormal:
+        writeToLog(tr("normal log level set"), _LogKndMessage, _LogLvMin);
+        break;
+    case _LogLvMax:
+        writeToLog(tr("maximum log level set"), _LogKndMessage, _LogLvMin);
+        break;
+    }
+
+    m_eLogLevelCurrent = lvl;
 }
 
 //*************************************************************************************************************

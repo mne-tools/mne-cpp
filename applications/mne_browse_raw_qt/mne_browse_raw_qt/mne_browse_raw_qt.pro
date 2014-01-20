@@ -72,7 +72,8 @@ SOURCES += main.cpp\
     rawdelegate.cpp \
     plotsignalwidget.cpp
 
-HEADERS  += rawmodel.h\
+HEADERS  += info.h\
+    rawmodel.h\
     mainwindow.h \
     rawdelegate.h \
     plotsignalwidget.h

@@ -5,7 +5,7 @@
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     December, 2013
+* @date     January, 2014
 *
 * @section  LICENSE
 *
@@ -35,26 +35,66 @@
 */
 
 //*************************************************************************************************************
-//=============================================================================================================
 // INCLUDES
-//=============================================================================================================
-
+#include <QtGui>
 #include <QApplication>
+#include <QDateTime>
 
 #include "mainwindow.h"
 
 //*************************************************************************************************************
-//=============================================================================================================
+// USED NAMESPACES
+
+using namespace MNE_BROWSE_RAW_QT;
+
+//*************************************************************************************************************
+//Forward Declarations
+
+MainWindow* mainWindow = NULL;
+
+//*************************************************************************************************************
+
+void customMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
+{
+    Q_UNUSED(context);
+
+    QString dt = QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm:ss");
+    QString txt = QString("[%1] ").arg(dt);
+
+    if(mainWindow) {
+        switch (type) {
+        case QtDebugMsg:
+           txt += QString("{Debug} \t\t %1").arg(msg);
+           mainWindow->writeToLog(txt,_LogKndMessage, _LogLvMax);
+           break;
+        case QtWarningMsg:
+           txt += QString("{Warning} \t %1").arg(msg);
+           mainWindow->writeToLog(txt,_LogKndWarning, _LogLvNormal);
+           break;
+        case QtCriticalMsg:
+           txt += QString("{Critical} \t %1").arg(msg);
+           mainWindow->writeToLog(txt,_LogKndError, _LogLvMin);
+           break;
+        case QtFatalMsg:
+           txt += QString("{Fatal} \t\t %1").arg(msg);
+           mainWindow->writeToLog(txt,_LogKndError, _LogLvMin);
+           abort();
+           break;
+        }
+    }
+}
+
+
+//*************************************************************************************************************
 // MAIN
-//=============================================================================================================
 
 int main(int argc, char *argv[])
 {
+//    qInstallMessageHandler(customMessageHandler);
     QApplication a(argc, argv);
 
-    //ModelView w;
-    MainWindow w;
-    w.show();
+    mainWindow = new MainWindow();
+    mainWindow->show();
 
     return a.exec();
 }
