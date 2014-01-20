@@ -222,6 +222,34 @@ bool MNESourceSpace::readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, 
 
 //*************************************************************************************************************
 
+MNESourceSpace MNESourceSpace::selectRegions(const QList<Label> &p_qListLabels) const
+{
+//    QList<VectorXi> vertno;
+//    vertno << this->m_qListHemispheres[0].vertno << this->m_qListHemispheres[1].vertno;
+
+//    if (p_label.hemi == 0) //lh
+//    {
+//        VectorXi vertno_sel = MNEMath::intersect(vertno[0], p_label.vertices, src_sel);
+//        vertno[0] = vertno_sel;
+//        vertno[1] = VectorXi();
+//    }
+//    else if (p_label.hemi == 1) //rh
+//    {
+//        VectorXi vertno_sel = MNEMath::intersect(vertno[1], p_label.vertices, src_sel);
+//        src_sel.array() += p_label.vertices.size();
+//        vertno[0] = VectorXi();
+//        vertno[1] = vertno_sel;
+//    }
+
+
+
+    MNESourceSpace test;
+    return test;
+}
+
+
+//*************************************************************************************************************
+
 qint32 MNESourceSpace::find_source_space_hemi(MNEHemisphere& p_Hemisphere)
 {
     double xave = p_Hemisphere.rr.col(0).sum();
