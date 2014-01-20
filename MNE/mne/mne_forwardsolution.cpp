@@ -1390,15 +1390,15 @@ void MNEForwardSolution::restrict_gain_matrix(MatrixXd &G, const FiffInfo &info)
 
 //*************************************************************************************************************
 
-MNEForwardSolution MNEForwardSolution::selectRegions(const QList<Label> &t_qListLabels) const
+MNEForwardSolution MNEForwardSolution::selectRegions(const QList<Label> &p_qListLabels) const
 {
     VectorXi selVertices;
 
     qint32 iSize = 0;
-    for(qint32 i = 0; i < t_qListLabels.size(); ++i)
+    for(qint32 i = 0; i < p_qListLabels.size(); ++i)
     {
         VectorXi currentSelection;
-         this->src.label_src_vertno_sel(t_qListLabels[i], currentSelection);
+         this->src.label_src_vertno_sel(p_qListLabels[i], currentSelection);
 
         selVertices.conservativeResize(iSize+currentSelection.size());
         selVertices.block(iSize,0,currentSelection.size(),1) = currentSelection;
@@ -1433,6 +1433,8 @@ MNEForwardSolution MNEForwardSolution::selectRegions(const QList<Label> &t_qList
     selectedFwd.sol->nrow = selectedFwd.sol->data.rows();
     selectedFwd.sol->ncol = selectedFwd.sol->data.cols();
     selectedFwd.nsource = selectedFwd.sol->ncol / 3;
+
+    selectedFwd.src = selectedFwd.src.selectRegions(p_qListLabels);
 
     return selectedFwd;
 }
