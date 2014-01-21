@@ -43,6 +43,7 @@
 //=============================================================================================================
 
 //Qt
+#include <QDebug>
 #include <QAbstractTableModel>
 
 //MNE
@@ -122,9 +123,15 @@ private:
     */
     void loadChInfos();
 
+    void reloadFiffData(bool before);
+
 signals:
 
 private slots:
+    /**
+     * @brief reloadData Checks, whether the actual position of the QScrollBar demands for a fiff data reload (depending on m_reloadPos)
+     * @param value the position of QScrollBar
+     */
     void reloadData(int value);
 
 };

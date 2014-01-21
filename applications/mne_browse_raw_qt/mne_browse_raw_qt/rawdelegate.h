@@ -43,6 +43,7 @@
 //=============================================================================================================
 
 //Qt
+#include <QDebug>
 #include <QAbstractItemDelegate>
 #include <QPainter>
 #include <QPainterPath>
@@ -93,7 +94,7 @@ private:
      * @param[in] index QModelIndex for accessing associated data and model object.
      * @param[in,out] path The QPointerPath to create for the data plot.
      */
-    void createPlotPath(const QModelIndex &index, MatrixXd& data, QPainterPath& path) const;
+    void createPlotPath(const QModelIndex &index, QPainterPath& path, MatrixXd& data) const;
     /**
      * @brief createGridPath Creates the QPointer path for the grid plot.
      *

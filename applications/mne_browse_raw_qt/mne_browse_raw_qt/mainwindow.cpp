@@ -64,8 +64,6 @@ using namespace MNE_BROWSE_RAW_QT;
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
 {
-    qDebug() << "test log";
-
     //setup MVC
     setupModel();
     setupDelegate();
@@ -109,12 +107,13 @@ void MainWindow::setupView()
 
     //TableView settings
     m_pTableView->setShowGrid(false);
-    m_pTableView->verticalHeader()->hide();
+//    m_pTableView->verticalHeader()->hide();
     m_pTableView->horizontalHeader()->hide();
     m_pTableView->verticalHeader()->setDefaultSectionSize(m_pRawDelegate->m_dPlotHeight);
 
     m_pTableView->setAutoScroll(false);
     m_pTableView->setColumnHidden(0,true); //because content is plotted jointly with column=1
+//    m_pTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
 
     m_pTableView->resizeColumnToContents(0); //based on returned sizeHint of RawDelegate
     m_pTableView->resizeColumnsToContents();
@@ -178,7 +177,7 @@ void MainWindow::createMenus() {
 void MainWindow::setWindow() {
     setWindowTitle("MNE_BROWSE_RAW_QT");
     resize(1200,800);
-    this->move(100,100);
+    this->move(50,50);
 }
 
 //*************************************************************************************************************

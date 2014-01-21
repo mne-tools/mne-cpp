@@ -46,6 +46,8 @@
 #include <QPointF>
 #include <QRect>
 
+//#include <QDebug>
+
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
@@ -67,55 +69,58 @@ RawDelegate::RawDelegate(QObject *parent)
 
 void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    QRect rect = option.rect;
-
     switch(index.column()) {
     case 0: //chnames
-        //content of column=0 is plotted jointly with content of column=1 -> see below
-    case 1: //data plot
-        QPainterPath path;
-
         painter->save();
 
-        //write channel name
-        const QAbstractItemModel* model = index.model();
-        painter->drawText(rect,NULL,model->data(model->index(index.row(), 0), Qt::DisplayRole).toString());
+//        qDebug() << "option.rect.x" << option.rect.x() << "y" << option.rect.y() << "w" << option.rect.width() << "h" << option.rect.height();
+        painter->rotate(-90);
+        painter->drawText(QRectF(-option.rect.y()-m_dPlotHeight,0,m_dPlotHeight,20),Qt::AlignCenter,index.model()->data(index,Qt::DisplayRole).toString());
+        painter->restore();
+        break;
+    case 1: //data plot
+        painter->save();
 
-        //plot data
+        QPainterPath path(QPointF(option.rect.x(),option.rect.y()));
+
+        //Get data
         QVariant variant = index.model()->data(index,Qt::DisplayRole);
         MatrixXd data = variant.value<MatrixXd>();
 
-        createPlotPath(index,data,path);
-
-        painter->translate(/*option.rect.x()*/0,option.rect.y());
-
-        //Plot white rectangle
-        painter->save();
-        painter->setBrush(QBrush(Qt::gray));
-        painter->setPen(Qt::NoPen);
-        painter->drawRect(0,0,option.rect.width(),m_dPlotHeight);
-        painter->restore();
-
-        painter->translate(0,m_dPlotHeight/2);
-
-        //Plot data
-        painter->setRenderHint(QPainter::Antialiasing, true);
-        painter->drawPath(path);
-
         //Plot grid
-        painter->translate(0,-m_dPlotHeight/2);
         painter->setRenderHint(QPainter::Antialiasing, false);
-        path = QPainterPath();
         createGridPath(path,data);
 
+        painter->save();
         QPen pen;
         pen.setStyle(Qt::DotLine);
         pen.setWidthF(0.5);
         painter->setPen(pen);
         painter->drawPath(path);
-
         painter->restore();
 
+        //Plot data path
+        path = QPainterPath(QPointF(option.rect.x(),option.rect.y()));
+        createPlotPath(index,path,data);
+
+//        qDebug() << "option.rect.x" << option.rect.x() << "y" << option.rect.y() << "w" << option.rect.width() << "h" << option.rect.height();
+
+        painter->translate(0,m_dPlotHeight/2);
+
+        painter->setRenderHint(QPainter::Antialiasing, true);
+        painter->drawPath(path);
+
+//        painter->translate(0,-m_dPlotHeight/2);
+
+        //Write channel name
+//        const QAbstractItemModel* model = index.model();
+
+//        painter->translate(-option.rect.x(),0);
+//        rect.moveTo(0,option.rect.y());
+//        qDebug() << "New Rect, x" << rect.x() << "y" << rect.y() << "w" << rect.width() << "h" << rect.height();
+//        painter->drawText(option.rect,model->data(model->index(index.row(), 0), Qt::DisplayRole).toString());
+//        painter->drawText(QPointF(0,0),"test");
+        painter->restore();
         break;
     }
 
@@ -127,7 +132,7 @@ QSize RawDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelInde
 
     switch(index.column()) {
     case 0:
-        size = QSize(70,m_dPlotHeight);
+        size = QSize(20,m_dPlotHeight);
         break;
     case 1:
         qint32 nsamples = index.model()->data(index).value<MatrixXd>().cols();
@@ -140,20 +145,21 @@ QSize RawDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelInde
 
 //=============================================================================================================
 
-void RawDelegate::createPlotPath(const QModelIndex &index, MatrixXd& data, QPainterPath& path) const
+void RawDelegate::createPlotPath(const QModelIndex &index, QPainterPath& path, MatrixXd& data) const
 {
     double dValue;
     double dMaxValue = data.maxCoeff();
 //    double dMaxValue = (static_cast<const RawModel*>(index.model()))->getMaxDataValue(FIFFV_MEG_CH); //ToDo: scale single channel to all channels of same type
     double dScaleY = m_dPlotHeight/(2*dMaxValue);
 
+    double y_base = path.currentPosition().y();
     QPointF qSamplePosition;
 
     //create lines from one to the next sample
     for(qint32 i=0; i < data.cols(); ++i)
     {
         dValue = data(0,i)*dScaleY;
-        qSamplePosition.setY(dValue);
+        qSamplePosition.setY(y_base+dValue);
         qSamplePosition.setX(path.currentPosition().x()+m_dDx);
 
         path.lineTo(qSamplePosition);
