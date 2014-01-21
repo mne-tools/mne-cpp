@@ -88,20 +88,15 @@ QVariant RawModel::data(const QModelIndex &index, int role) const
 
 QVariant RawModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-    if(role != Qt::DisplayRole && role != Qt::TextAlignmentRole && role != Qt::ForegroundRole)
+    if(role != Qt::DisplayRole && role != Qt::TextAlignmentRole)
         return QVariant();
 
     if(orientation == Qt::Horizontal) {
         switch(section) {
         case 0: //chname column
-            return QVariant("chname");
-//            switch(role) {
-//            case Qt::DisplayRole:
-//                return QVariant("chname");
-//            case Qt::ForegroundRole:
-//                return QVariant(QBrush(Qt::NoBrush));
-//            }
+            return QVariant();
         case 1: //data plot column
+            return QVariant("data plot");
             switch(role) {
             case Qt::DisplayRole:
                 return QVariant("data plot");
@@ -111,7 +106,13 @@ QVariant RawModel::headerData(int section, Qt::Orientation orientation, int role
         }
     }
     else if(orientation == Qt::Vertical) {
-        return QVariant(section);
+        QModelIndex chname = createIndex(section,0);
+        switch(role) {
+        case Qt::DisplayRole:
+            return QVariant(data(chname).toString());
+//        case Qt::TextAlignmentRole:
+//            return QVariant();
+        }
     }
 
     return QVariant();
@@ -126,13 +127,10 @@ void RawModel::loadFiffData(QIODevice& p_IODevice)
     beginResetModel();
 
     m_pfiffIO = QSharedPointer<FiffIO>(new FiffIO(p_IODevice));
+    m_dFiffPosition = m_pfiffIO->m_qlistRaw[0]->first_samp/m_pfiffIO->m_qlistRaw[0]->info.sfreq+40; //take beginning of raw data as position + 40 secs [in secs]
 
-    m_dFiffPosition = m_pfiffIO->m_qlistRaw[0]->first_samp/m_pfiffIO->m_qlistRaw[0]->info.sfreq+10; //take beginning of raw data as position + 10 secs [in secs]
-
-
-    if(!m_pfiffIO->m_qlistRaw[0]->read_raw_segment_times(m_data, m_times, m_dFiffPosition-m_dWindowLength/2, m_dFiffPosition+m_dWindowLength/2)) {
-        printf("Error when reading raw data!");
-    }
+    if(!m_pfiffIO->m_qlistRaw[0]->read_raw_segment_times(m_data, m_times, m_dFiffPosition-m_dWindowLength/2, m_dFiffPosition+m_dWindowLength/2))
+        qFatal("Error when reading raw data!");
 
     if(!m_pfiffIO->m_qlistRaw.empty()) {
         RawModel::loadChNames();
@@ -141,7 +139,7 @@ void RawModel::loadFiffData(QIODevice& p_IODevice)
         qDebug("Fiff data loaded.");
     }
     else
-        printf("ERROR! Data set does not contain any fiff data!");
+        qFatal("ERROR! Data set does not contain any fiff data!");
 
     endResetModel();
 }
@@ -186,12 +184,68 @@ double RawModel::maxDataValue(qint32 type) const {
     return max;
 }
 
+void RawModel::reloadFiffData(bool before) {
+    MatrixXd t_reloaddata,t_reloadtimes;
+
+    QString test = this->m_pfiffIO->m_qlistRaw[0]->info.ch_names[0];
+
+    QSharedPointer<FiffRawData> tmp = this->m_pfiffIO->m_qlistRaw[0];
+
+
+
+    QFile t_rawFile("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+
+
+
+    QSharedPointer<FiffIO> t_pfiffIO = QSharedPointer<FiffIO>(new FiffIO(t_rawFile));
+
+//    if(!m_pfiffIO->m_qlistRaw[0]->read_raw_segment_times(m_data, m_times, m_dFiffPosition-m_dWindowLength/2, m_dFiffPosition+m_dWindowLength/2))
+//        qFatal("Error when reading raw data!");
+
+
+    qDebug() << this->m_pfiffIO->m_qlistRaw[0]->info.ch_names[0];
+    t_pfiffIO->m_qlistRaw[0]->read_raw_segment_times(t_reloaddata, t_reloadtimes, m_dFiffPosition-3/2*m_dWindowLength, m_dFiffPosition-m_dWindowLength/2);
+//    this->m_pfiffIO->m_qlistRaw[0]->read_raw_segment_times(t_reloaddata, t_reloadtimes, m_dFiffPosition-3/2*m_dWindowLength, m_dFiffPosition-m_dWindowLength/2);
+
+    if(before)
+        if(!m_pfiffIO->m_qlistRaw[0]->read_raw_segment_times(t_reloaddata, t_reloadtimes, m_dFiffPosition-3/2*m_dWindowLength, m_dFiffPosition-m_dWindowLength/2))
+            printf("Error when reading raw data!");
+//    else
+//        if(!m_pfiffIO->m_qlistRaw[0]->read_raw_segment_times(t_reloaddata, t_reloadtimes, m_dFiffPosition+m_dWindowLength/2, m_dFiffPosition+3/2*m_dWindowLength))
+//            printf("Error when reading raw data!");
+
+    //assemble both m_data and t_reloaddata
+//    MatrixXd t_CombData(m_data.rows(),2*m_data.cols()),t_CombTimes(m_data.rows(),2*m_data.cols());
+
+//    MatrixXd t_CombData(m_data.rows(),m_data.cols()+m_dWindowLength),t_CombTimes(m_data.rows(),m_data.cols()+m_dWindowLength);
+//    t_CombData.leftCols(t_reloaddata.cols()) = t_reloaddata;
+//    t_CombData.rightCols(m_data.cols()) = m_data;
+
+//    t_CombTimes.leftCols(t_reloaddata.cols()) = t_reloadtimes;
+//    t_CombTimes.rightCols(m_data.cols()) = m_times;
+
+//    m_data = t_CombData;
+//    m_times = t_CombTimes;
+
+//    qDebug("Fiff data REloaded.");
+
+    QModelIndex topLeft = createIndex(0,0);
+    QModelIndex bottomRight = createIndex(m_data.rows(),m_data.cols());
+
+    emit dataChanged(topLeft,bottomRight);
+
+}
+
 //*************************************************************************************************************
 //slots
 
 void RawModel::reloadData(int value) {
-    if(value < n_reloadPos || value > m_data.cols()-(n_reloadPos+1000)) { //ToDo: 1000 is an estimation for the window size -> make it dynamic
-//        qDebug("reload data, value: %i", value);
+    if(value < n_reloadPos) { //ToDo: 1200 is an estimation for the window size -> make it dynamic
+        qDebug("reload data at FRONT, value: %i", value);
+        reloadFiffData(true);
+    }
+    else if(value > m_data.cols()-(n_reloadPos+1200)) {
+        qDebug("reload data at AFTER, value: %i", value);
     }
 
 }

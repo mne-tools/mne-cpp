@@ -70,13 +70,15 @@ SOURCES += main.cpp\
     rawmodel.cpp \
     mainwindow.cpp \
     rawdelegate.cpp \
-    plotsignalwidget.cpp
+    plotsignalwidget.cpp #\
+    #rawview.cpp
 
 HEADERS  += info.h\
     rawmodel.h\
     mainwindow.h \
     rawdelegate.h \
-    plotsignalwidget.h
+    plotsignalwidget.h #\
+    #rawview.h
 
 FORMS +=
 
