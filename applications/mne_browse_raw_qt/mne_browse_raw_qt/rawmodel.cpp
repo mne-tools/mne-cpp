@@ -41,6 +41,7 @@
 RawModel::RawModel(QObject *parent)
 : QAbstractTableModel(parent)
 , m_dWindowLength(10) //secs
+, n_reloadPos(2000) //samples
 {
 //    qRegisterMetaType<MatrixXd>("MatrixXd");
 }
@@ -50,6 +51,7 @@ RawModel::RawModel(QObject *parent)
 RawModel::RawModel(QIODevice &p_IODevice, QObject *parent)
 : QAbstractTableModel(parent)
 , m_dWindowLength(10) //secs
+, n_reloadPos(2000) //samples
 {
 //    qRegisterMetaType<MatrixXd>("MatrixXd");
 
@@ -84,11 +86,6 @@ QVariant RawModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
-/*Qt::ItemFlags RawModel::flags(const QModelIndex & index) const
-{
-//    return Qt::NoItemFlags;
-}*/
-
 QVariant RawModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if(role != Qt::DisplayRole && role != Qt::TextAlignmentRole && role != Qt::ForegroundRole)
@@ -122,7 +119,7 @@ QVariant RawModel::headerData(int section, Qt::Orientation orientation, int role
 
 
 //*************************************************************************************************************
-//own functions
+//non-virtual functions
 
 void RawModel::loadFiffData(QIODevice& p_IODevice)
 {
@@ -192,7 +189,9 @@ double RawModel::maxDataValue(qint32 type) const {
 //*************************************************************************************************************
 //slots
 
-//void RawModel::reloadData(int value) {
-//    if(value > (m_data.cols()/2 - ))
+void RawModel::reloadData(int value) {
+    if(value < n_reloadPos || value > m_data.cols()-(n_reloadPos+1000)) { //ToDo: 1000 is an estimation for the window size -> make it dynamic
+//        qDebug("reload data, value: %i", value);
+    }
 
-//}
+}

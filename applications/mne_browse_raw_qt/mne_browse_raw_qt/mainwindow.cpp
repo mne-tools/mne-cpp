@@ -129,6 +129,8 @@ void MainWindow::setupView()
 
     QScroller::grabGesture(m_pTableView,QScroller::MiddleMouseButtonGesture); //activate kinetic scrolling
 
+    //connect QScrollBar with model in order to reload data samples
+    connect(m_pTableView->horizontalScrollBar(),SIGNAL(valueChanged(int)),m_pRawModel,SLOT(reloadData(int)));
 
     //*****************************
 //    //example for PlotSignalWidget

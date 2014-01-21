@@ -74,7 +74,6 @@ public:
     int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
-    //Qt::ItemFlags flags(const QModelIndex & index) const;
 
     /**
     * Load fiff data.
@@ -86,7 +85,7 @@ public:
     double m_dWindowLength; /**< Length of window to load [in secs] */
     double m_dFiffPosition; /**< Position of window in fiff data [in secs] */
 
-//    int n_reload
+    int n_reloadPos; /**< Distance that the current window needs to be off the ends of m_data [in samples] */
 
     /**
      * @brief sizeOfData
@@ -126,7 +125,7 @@ private:
 signals:
 
 private slots:
-//    void reloadData(int value);
+    void reloadData(int value);
 
 };
 
