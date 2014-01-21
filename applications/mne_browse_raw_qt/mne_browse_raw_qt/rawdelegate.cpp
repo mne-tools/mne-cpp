@@ -75,6 +75,8 @@ void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, c
     case 1: //data plot
         QPainterPath path;
 
+        painter->save();
+
         //write channel name
         const QAbstractItemModel* model = index.model();
         painter->drawText(rect,NULL,model->data(model->index(index.row(), 0), Qt::DisplayRole).toString());
@@ -85,27 +87,32 @@ void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, c
 
         createPlotPath(index,data,path);
 
+        painter->translate(/*option.rect.x()*/0,option.rect.y());
+
+        //Plot white rectangle
         painter->save();
-            painter->translate(/*option.rect.x()*/0,option.rect.y()+m_dPlotHeight/2);
+        painter->setBrush(QBrush(Qt::gray));
+        painter->setPen(Qt::NoPen);
+        painter->drawRect(0,0,option.rect.width(),m_dPlotHeight);
+        painter->restore();
 
-            //Plot data
-            painter->setRenderHint(QPainter::Antialiasing, true);
-            painter->drawPath(path);
+        painter->translate(0,m_dPlotHeight/2);
 
-            //Plot grid
-            painter->save();
-            painter->translate(0,-m_dPlotHeight/2);
-            painter->setRenderHint(QPainter::Antialiasing, false);
-            path = QPainterPath();
-            createGridPath(path,data);
+        //Plot data
+        painter->setRenderHint(QPainter::Antialiasing, true);
+        painter->drawPath(path);
 
-            QPen pen;
-            pen.setStyle(Qt::DotLine);
-            pen.setWidthF(0.5);
-            painter->setPen(pen);
-            painter->drawPath(path);
+        //Plot grid
+        painter->translate(0,-m_dPlotHeight/2);
+        painter->setRenderHint(QPainter::Antialiasing, false);
+        path = QPainterPath();
+        createGridPath(path,data);
 
-            painter->restore();
+        QPen pen;
+        pen.setStyle(Qt::DotLine);
+        pen.setWidthF(0.5);
+        painter->setPen(pen);
+        painter->drawPath(path);
 
         painter->restore();
 
