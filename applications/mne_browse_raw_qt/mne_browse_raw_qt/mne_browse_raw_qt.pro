@@ -77,7 +77,9 @@ HEADERS  += info.h\
     rawmodel.h\
     mainwindow.h \
     rawdelegate.h \
-    plotsignalwidget.h #\
+    plotsignalwidget.h \
+    types.h \ #\
+    types.h
     #rawview.h
 
 FORMS +=

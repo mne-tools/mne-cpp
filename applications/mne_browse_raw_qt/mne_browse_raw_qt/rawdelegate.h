@@ -53,6 +53,9 @@
 #include <mne/mne.h>
 #include <fiff/fiff_io.h>
 
+//MNE_BROWSE_RAW_QT
+#include <types.h>
+
 //Eigen
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
@@ -71,6 +74,8 @@ class RawDelegate : public QAbstractItemDelegate
 {
     Q_OBJECT
 public:
+    typedef Matrix<double,Dynamic,Dynamic,RowMajor> MatrixXdR;
+
     RawDelegate(QObject *parent = 0);
     virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
     virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
@@ -94,14 +99,14 @@ private:
      * @param[in] index QModelIndex for accessing associated data and model object.
      * @param[in,out] path The QPointerPath to create for the data plot.
      */
-    void createPlotPath(const QModelIndex &index, QPainterPath& path, MatrixXd& data) const;
+    void createPlotPath(const QModelIndex &index, QPainterPath& path, MatrixXdR& data) const;
     /**
      * @brief createGridPath Creates the QPointer path for the grid plot.
      *
      * @param[in,out] path The row vector of the data matrix <1 x nsamples>.
      * @param[in] data The row vector of the data matrix <1 x nsamples>.
      */
-    void createGridPath(QPainterPath& path, MatrixXd& data) const;
+    void createGridPath(QPainterPath& path, MatrixXdR &data) const;
 
     //Look
     qint8 m_nhlines; /**< Number of horizontal lines for the grid plot */
