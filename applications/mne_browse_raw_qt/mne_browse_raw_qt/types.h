@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mainwindow.h
+* @file     info.h
 * @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
@@ -30,44 +30,22 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implements the mainwindow function of mne_browse_raw_qt
+* @brief    Contains general application information like: application name and  version number.
 *
 */
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef TYPES_H
+#define TYPES_H
 
 //*************************************************************************************************************
-// INCLUDES
+//Includes
 
-//Qt
-#include <QApplication>
-#include <QDebug>
-#include <QMainWindow>
-#include <QFileDialog>
-#include <QFile>
-#include <QMenu>
-#include <QMenuBar>
-#include <QAction>
-
-#include <QTableView>
-#include <QHeaderView>
-
-#include <QDockWidget>
-#include <QTextBrowser>
-
-//MNE
-#include "rawmodel.h"
-#include "rawdelegate.h"
-
-#include "info.h"
-
-#include <fiff/fiff.h>
-#include <mne/mne.h>
-#include <fiff/fiff_io.h>
+//Eigen
+#include <Eigen/Core>
+#include <Eigen/SparseCore>
 
 //*************************************************************************************************************
-// namespaces
+//Namespaces
 
 using namespace Eigen;
 
@@ -75,56 +53,10 @@ using namespace Eigen;
 
 namespace MNE_BROWSE_RAW_QT {
 
-class MainWindow : public QMainWindow
-{
-    Q_OBJECT
-
-public:
-    MainWindow(QWidget *parent = 0);
-    ~MainWindow();
-
-    /**
-    * Writes to MainWindow log.
-    *
-    * @param [in] logMsg message
-    * @param [in] lgknd message kind; Message is formated depending on its kind.
-    * @param [in] lglvl message level; Message is displayed depending on its level.
-    */
-    void writeToLog(const QString& logMsg, LogKind lgknd, LogLevel lglvl);
-
-public slots:
-
-private slots:
-    void openFile();
-
-private:
-    void setupModel();
-    void setupDelegate();
-    void setupView();
-
-    void createMenus();
-    void createLogDockWindow();
-    void setWindow();
-
-    QFile m_qFileRaw; /** Fiff data file to read (set for convenience */
-
-    RawModel *m_pRawModel;
-    QTableView *m_pTableView;
-    RawDelegate *m_pRawDelegate;
-
-    //Log
-    QDockWidget* m_pDockWidget_Log;
-    QTextBrowser* m_pTextBrowser_Log;
-    LogLevel m_eLogLevelCurrent; /**< Holds the current log level.*/
-
-    /**
-    * Sets the log level
-    *
-    * @param [in] lvl message level; Message is displayed depending on its level.
-    */
-    void setLogLevel(LogLevel lvl);
-};
+typedef Matrix<double,Dynamic,Dynamic,RowMajor> MatrixXdR;
+typedef Eigen::Map<RowVectorXd> MapRowVectorXd;
 
 }
 
-#endif // MAINWINDOW_H
+
+#endif // TYPES_H

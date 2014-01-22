@@ -61,8 +61,9 @@ using namespace MNE_BROWSE_RAW_QT;
 
 //*************************************************************************************************************
 
-MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent)
+MainWindow::MainWindow(QWidget *parent)
+: QMainWindow(parent)
+, m_qFileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
 {
     //setup MVC
     setupModel();
@@ -86,8 +87,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::setupModel()
 {
-    QFile t_rawFile("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
-    m_pRawModel = new RawModel(t_rawFile,this);
+    m_pRawModel = new RawModel(m_qFileRaw,this);
 }
 
 void MainWindow::setupDelegate()

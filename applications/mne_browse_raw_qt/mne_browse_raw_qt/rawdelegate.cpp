@@ -36,9 +36,7 @@
 
 
 //*************************************************************************************************************
-//=============================================================================================================
 // INCLUDES
-//=============================================================================================================
 
 #include "rawdelegate.h"
 #include "rawmodel.h"
@@ -49,14 +47,14 @@
 //#include <QDebug>
 
 //*************************************************************************************************************
-//=============================================================================================================
 // USED NAMESPACES
-//=============================================================================================================
 
+
+using namespace MNE_BROWSE_RAW_QT;
 using namespace Eigen;
 using namespace MNELIB;
 
-//=============================================================================================================
+//*************************************************************************************************************
 
 RawDelegate::RawDelegate(QObject *parent)
 : m_dPlotHeight(70)
@@ -65,7 +63,7 @@ RawDelegate::RawDelegate(QObject *parent)
 {
 }
 
-//=============================================================================================================
+//*************************************************************************************************************
 
 void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
@@ -85,7 +83,12 @@ void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, c
 
         //Get data
         QVariant variant = index.model()->data(index,Qt::DisplayRole);
-        MatrixXd data = variant.value<MatrixXd>();
+
+//        RowVectorXd data = variant.value<MapRowVectorXd>();
+
+//        QList<MatrixXdR> datalist = variant.value<QList<MatrixXdR>();
+//        MatrixXdR data;
+//        data = datalist[0].row(index.row());
 
         //Plot grid
         painter->setRenderHint(QPainter::Antialiasing, false);
@@ -135,7 +138,7 @@ QSize RawDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelInde
         size = QSize(20,m_dPlotHeight);
         break;
     case 1:
-        qint32 nsamples = index.model()->data(index).value<MatrixXd>().cols();
+        qint32 nsamples = index.model()->data(index).value<MatrixXdR>().cols();
         size = QSize(m_dDx*nsamples,m_dPlotHeight);
         break;
     }
@@ -145,7 +148,7 @@ QSize RawDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelInde
 
 //=============================================================================================================
 
-void RawDelegate::createPlotPath(const QModelIndex &index, QPainterPath& path, MatrixXd& data) const
+void RawDelegate::createPlotPath(const QModelIndex &index, QPainterPath& path, MatrixXdR& data) const
 {
     double dValue;
     double dMaxValue = data.maxCoeff();
@@ -170,7 +173,7 @@ void RawDelegate::createPlotPath(const QModelIndex &index, QPainterPath& path, M
 //    qDebug("Plot-PainterPath created!");
 }
 
-void RawDelegate::createGridPath(QPainterPath& path, MatrixXd& data) const
+void RawDelegate::createGridPath(QPainterPath& path, MatrixXdR& data) const
 {
     //horizontal lines
     double distance = m_dPlotHeight/m_nhlines;

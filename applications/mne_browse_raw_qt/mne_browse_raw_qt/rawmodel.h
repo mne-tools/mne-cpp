@@ -55,10 +55,13 @@
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
 
+//MNE_BROWSE_RAW_QT
+#include <types.h>
+
 //*************************************************************************************************************
-//=============================================================================================================
 // USED NAMESPACES
-//=============================================================================================================
+
+using namespace MNE_BROWSE_RAW_QT;
 
 using namespace Eigen;
 using namespace MNELIB;
@@ -100,14 +103,18 @@ public:
      */
     double maxDataValue(qint32 type) const;
 
+        QSharedPointer<FiffIO> m_pfiffIO; /**< FiffIO objects, which holds all the information of the fiff data (excluding the samples!) */
+
 private:
     //display types
-    MatrixXd m_data; /**< Holds the fiff matrix data <n_channels x n_samples> */
-    MatrixXd m_times; /**< Time axis in secs */
+    QList<MatrixXd> m_data; /**< List that holds the fiff matrix data <n_channels x n_samples> */
+    QList<MatrixXd> m_times; /**< List that holds the time axis [in secs] */
+    qint16 m_iBlockPosition;
+
     QStringList m_chnames; /**< Channel names string list */
 
     //Fiff
-    QSharedPointer<FiffIO> m_pfiffIO; /**< FiffIO objects, which holds all the information of the fiff data (excluding the samples!) */
+
     QList<FiffChInfo> m_chinfolist; /**< List of FiffChInfo objects that holds the corresponding channels information */
 
     //methods
@@ -125,6 +132,8 @@ private:
 
     void reloadFiffData(bool before);
 
+    bool m_reloaded;
+
 signals:
 
 private slots:
@@ -136,6 +145,11 @@ private slots:
 
 };
 
-Q_DECLARE_METATYPE(Eigen::MatrixXd);
+Q_DECLARE_METATYPE(MatrixXd);
+Q_DECLARE_METATYPE(MapRowVectorXd);
+//Q_DECLARE_METATYPE(QList<MatrixXdR>);
+//Q_DECLARE_METATYPE(Eigen::Map<RowVectorXd>);
+//Q_DECLARE_METATYPE(QList<Map<VectorXdR> >);
+
 
 #endif // RAWMODEL_H
