@@ -106,11 +106,11 @@ int main(int argc, char *argv[])
     QString method("MNE"); //"MNE" | "dSPM" | "sLORETA"
 
     //time read around events - note: trigger point is the pressing of the button, not the atual
-    float tmin = -1.0f; //0.1f;
+    float tmin = -2.0f; //0.1f;
     float tmax = 0.2f;  //50.0f;
 
     //Choose which epoch to take - i.e. for every 4th epoch set to 4
-    int averageIterator = 1;
+    int averageIterator = 4;
 
     //measurement data location (data location must always has same directory structure - see dropbox folder for more information)
     //QString data_location("D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2013_12_05_Lorenz_Esch_001");
