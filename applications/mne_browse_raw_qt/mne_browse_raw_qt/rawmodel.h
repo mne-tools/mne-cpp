@@ -3,7 +3,8 @@
 * @file     rawmodel.h
 * @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+*           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
 * @version  1.0
 * @date     January, 2014
 *
@@ -99,9 +100,11 @@ public:
 
     /**
      * @brief getMaxDataValue
+     *
+     * @param chan number of channel in m_chinfolist
      * @return max data value of m_data for scaling purposes.
      */
-    double maxDataValue(qint32 type) const;
+    double maxDataValue(qint16 chan) const;
 
         QSharedPointer<FiffIO> m_pfiffIO; /**< FiffIO objects, which holds all the information of the fiff data (excluding the samples!) */
 
@@ -146,10 +149,10 @@ private slots:
 };
 
 Q_DECLARE_METATYPE(MatrixXd);
-Q_DECLARE_METATYPE(MapRowVectorXd);
-//Q_DECLARE_METATYPE(QList<MatrixXdR>);
-//Q_DECLARE_METATYPE(Eigen::Map<RowVectorXd>);
-//Q_DECLARE_METATYPE(QList<Map<VectorXdR> >);
+Q_DECLARE_METATYPE(MatrixXdR);
+Q_DECLARE_METATYPE(RowVectorPair);
+
+//Q_DECLARE_METATYPE(RowVectorXd&);
 
 
 #endif // RAWMODEL_H

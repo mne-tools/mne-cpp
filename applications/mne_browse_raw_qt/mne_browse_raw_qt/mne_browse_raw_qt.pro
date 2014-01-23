@@ -1,9 +1,10 @@
 #--------------------------------------------------------------------------------------------------------------
 #
 # @file     applications.pro
-# @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>
+# @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
 #           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-#           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+#           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+#           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
 # @version  1.0
 # @date     December, 2013
 #
@@ -73,13 +74,12 @@ SOURCES += main.cpp\
     plotsignalwidget.cpp #\
     #rawview.cpp
 
-HEADERS  += info.h\
+HEADERS  += types.h\
+    info.h\
     rawmodel.h\
     mainwindow.h \
     rawdelegate.h \
-    plotsignalwidget.h \
-    types.h \ #\
-    types.h
+    plotsignalwidget.h #\
     #rawview.h
 
 FORMS +=

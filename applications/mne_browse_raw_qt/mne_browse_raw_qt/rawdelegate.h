@@ -3,7 +3,8 @@
 * @file     rawdelegate.h
 * @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+*           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
 * @version  1.0
 * @date     January, 2014
 *
@@ -65,6 +66,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace MNE_BROWSE_RAW_QT;
 using namespace Eigen;
 using namespace MNELIB;
 
@@ -99,14 +101,14 @@ private:
      * @param[in] index QModelIndex for accessing associated data and model object.
      * @param[in,out] path The QPointerPath to create for the data plot.
      */
-    void createPlotPath(const QModelIndex &index, QPainterPath& path, MatrixXdR& data) const;
+    void createPlotPath(const QModelIndex &index, QPainterPath& path, RowVectorPair& pair) const;
     /**
      * @brief createGridPath Creates the QPointer path for the grid plot.
      *
      * @param[in,out] path The row vector of the data matrix <1 x nsamples>.
      * @param[in] data The row vector of the data matrix <1 x nsamples>.
      */
-    void createGridPath(QPainterPath& path, MatrixXdR &data) const;
+    void createGridPath(QPainterPath& path, RowVectorPair& pair) const;
 
     //Look
     qint8 m_nhlines; /**< Number of horizontal lines for the grid plot */
