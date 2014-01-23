@@ -175,7 +175,7 @@ bool RealTimeSourceEstimateWidget::initOpenGLWidget()
 
         QHBoxLayout *layout = new QHBoxLayout(this);
 
-        m_pView = new InverseView(m_pRTMSE->getSrc(), t_qListLabels, t_qListRGBAs, 24, false);
+        m_pView = new InverseView(m_pRTMSE->getSrc(), t_qListLabels, t_qListRGBAs, 12, false);
 
         if (m_pView->stereoType() != QGLView::RedCyanAnaglyph)
             m_pView->camera()->setEyeSeparation(0.3f);
