@@ -3,7 +3,8 @@
 * @file     plotsignalwidget.cpp
 * @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+*           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
 * @version  1.0
 * @date     January, 2014
 *

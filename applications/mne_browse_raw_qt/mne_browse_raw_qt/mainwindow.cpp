@@ -1,9 +1,10 @@
 //=============================================================================================================
 /**
 * @file     mainwindow.cpp
-* @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>
+* @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+*           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
 * @version  1.0
 * @date     January, 2014
 *
@@ -116,7 +117,7 @@ void MainWindow::setupView()
 //    m_pTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
 
     m_pTableView->resizeColumnToContents(0); //based on returned sizeHint of RawDelegate
-    m_pTableView->resizeColumnsToContents();
+//    m_pTableView->resizeColumnsToContents();
 
     m_pTableView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
 

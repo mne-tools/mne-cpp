@@ -1,9 +1,10 @@
 //=============================================================================================================
 /**
 * @file     info.h
-* @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>
+* @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+*           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
 * @version  1.0
 * @date     January, 2014
 *
@@ -54,7 +55,8 @@ using namespace Eigen;
 namespace MNE_BROWSE_RAW_QT {
 
 typedef Matrix<double,Dynamic,Dynamic,RowMajor> MatrixXdR;
-typedef Eigen::Map<RowVectorXd> MapRowVectorXd;
+//typedef Block<MatrixXdR, 1, Dynamic, 1> BlockXdR;
+typedef QPair<double*,qint32> RowVectorPair;
 
 }
 

@@ -3,7 +3,8 @@
 * @file     rawmodel.cpp
 * @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+*           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
 * @version  1.0
 * @date     January, 2014
 *
@@ -66,7 +67,7 @@ RawModel::RawModel(QIODevice &p_IODevice, QObject *parent)
 
 int RawModel::rowCount(const QModelIndex & /*parent*/) const
 {
-    return m_data[m_iBlockPosition].rows();
+    return 1;//m_data[m_iBlockPosition].rows();
 }
 
 int RawModel::columnCount(const QModelIndex & /*parent*/) const
@@ -82,10 +83,13 @@ QVariant RawModel::data(const QModelIndex &index, int role) const
         if(index.column()==1) {
             QVariant v;
 
-            MatrixXd mat = m_data[m_iBlockPosition];
-            MapRowVectorXd mapVector(mat.row(index.row()).data(),mat.rows());
+            MatrixXdR mat = m_data[m_iBlockPosition];
 
-            v.setValue((MapRowVectorXd) mapVector);
+            QPair<double*,qint32> rowVectorPair;
+            rowVectorPair.first = mat.row(0).data();
+            rowVectorPair.second = mat.cols();
+
+            v.setValue(rowVectorPair);
 //            v.setValue((QList<Matrix<double,Dynamic,Dynamic,RowMajor> >) m_data);
             return v;
         }
@@ -199,25 +203,15 @@ qint32 RawModel::sizeOfData()
 }
 
 
-double RawModel::maxDataValue(qint32 type) const {
+double RawModel::maxDataValue(qint16 chan) const {
+    double dMax;
 
-//    QString kind = m_chinfolist[0].channel_type(type);
+    double max = m_data[0].row(0).maxCoeff();
+    double min = m_data[0].row(0).minCoeff();
 
-    MatrixXd picks(m_data[m_iBlockPosition].rows(),m_data[m_iBlockPosition].rows());
-    picks.setZero();
-    qint32 j = 0;
+    dMax = (double) (m_chinfolist[chan].range*m_chinfolist[chan].cal)/2;
 
-    for(qint32 i=0; i < m_chinfolist.size(); ++i) {
-        if(m_chinfolist[i].kind == type) {
-            picks(i,i) = 1;
-            ++j;
-        }
-    }
-
-    MatrixXd picks_data = picks*m_data[m_iBlockPosition];
-
-    double max = picks_data.maxCoeff();
-    return max;
+    return dMax;
 }
 
 //*************************************************************************************************************
