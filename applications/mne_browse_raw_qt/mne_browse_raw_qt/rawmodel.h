@@ -84,7 +84,12 @@ public:
     * Load fiff data.
     *
     */
-    void loadFiffData(QIODevice &p_IODevice);
+    bool loadFiffData(QIODevice &p_IODevice);
+
+    /**
+     * @brief clearModel clears all model's members
+     */
+    void clearModel();
 
     //Model settings
     double m_dWindowLength; /**< Length of window to load [in secs] */
@@ -106,27 +111,18 @@ public:
      */
     double maxDataValue(qint16 chan) const;
 
-        QSharedPointer<FiffIO> m_pfiffIO; /**< FiffIO objects, which holds all the information of the fiff data (excluding the samples!) */
+    QSharedPointer<FiffIO> m_pfiffIO; /**< FiffIO objects, which holds all the information of the fiff data (excluding the samples!) */
 
 private:
     //display types
-    QList<MatrixXd> m_data; /**< List that holds the fiff matrix data <n_channels x n_samples> */
-    QList<MatrixXd> m_times; /**< List that holds the time axis [in secs] */
+    QList<MatrixXdR> m_data; /**< List that holds the fiff matrix data <n_channels x n_samples> */
+    QList<MatrixXdR> m_times; /**< List that holds the time axis [in secs] */
     qint16 m_iBlockPosition;
 
-    QStringList m_chnames; /**< Channel names string list */
-
     //Fiff
-
     QList<FiffChInfo> m_chinfolist; /**< List of FiffChInfo objects that holds the corresponding channels information */
 
     //methods
-    /**
-    * Load channel names to member m_chnames.
-    *
-    */
-    void loadChNames();
-
     /**
     * Load channel infos to m_chinfolist.
     *

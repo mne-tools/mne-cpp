@@ -56,7 +56,7 @@ namespace MNE_BROWSE_RAW_QT {
 
 typedef Matrix<double,Dynamic,Dynamic,RowMajor> MatrixXdR;
 //typedef Block<MatrixXdR, 1, Dynamic, 1> BlockXdR;
-typedef QPair<double*,qint32> RowVectorPair;
+typedef QPair<const double*,qint32> RowVectorPair;
 
 }
 

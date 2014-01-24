@@ -36,7 +36,7 @@
 */
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 // INCLUDES
 
 #include "rawdelegate.h"
@@ -47,7 +47,7 @@
 
 //#include <QDebug>
 
-//*************************************************************************************************************
+//=============================================================================================================
 // USED NAMESPACES
 
 
@@ -87,19 +87,17 @@ void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, c
 
         RowVectorPair pair = variant.value<RowVectorPair>();
 
-        std::cout << "Address: " << pair.first << " value " << *(pair.first) << std::endl;
-
         //Plot grid
-//        painter->setRenderHint(QPainter::Antialiasing, false);
-//        createGridPath(path,pair);
+        painter->setRenderHint(QPainter::Antialiasing, false);
+        createGridPath(path,pair);
 
-//        painter->save();
-//        QPen pen;
-//        pen.setStyle(Qt::DotLine);
-//        pen.setWidthF(0.5);
-//        painter->setPen(pen);
-//        painter->drawPath(path);
-//        painter->restore();
+        painter->save();
+        QPen pen;
+        pen.setStyle(Qt::DotLine);
+        pen.setWidthF(0.5);
+        painter->setPen(pen);
+        painter->drawPath(path);
+        painter->restore();
 
         //Plot data path
         path = QPainterPath(QPointF(option.rect.x(),option.rect.y()));
@@ -147,15 +145,11 @@ void RawDelegate::createPlotPath(const QModelIndex &index, QPainterPath& path, R
     double y_base = path.currentPosition().y();
     QPointF qSamplePosition;
 
-    std::cout << "Address: " << pair.first << " value " << *(pair.first+29) << std::endl;
-
     //create lines from one to the next sample
-    for(qint32 i=0; i < pair.second-1; ++i) //ToDo: check whether -1 is necessary
+    for(qint32 i=0; i < pair.second; ++i) //ToDo: check whether -1 is necessary
     {
         double val = *(pair.first+i);
         dValue = val*dScaleY;
-
-        std::cout << "i " << i << " Address: " << (pair.first+i) << " value " << *(pair.first+i) << std::endl;
 
         double newY = y_base+dValue;
 
@@ -163,8 +157,6 @@ void RawDelegate::createPlotPath(const QModelIndex &index, QPainterPath& path, R
         qSamplePosition.setX(path.currentPosition().x()+m_dDx);
 
         path.lineTo(qSamplePosition);
-
-//        path.moveTo(qSamplePosition);
     }
 
 //    qDebug("Plot-PainterPath created!");

@@ -102,6 +102,8 @@ private:
     void setupModel();
     void setupDelegate();
     void setupView();
+    void setupLayout();
+    void setupViewSettings();
 
     void createMenus();
     void createLogDockWindow();
