@@ -35,15 +35,14 @@
 *
 */
 
-//*************************************************************************************************************
-// INCLUDES
+//=============================================================================================================
+// Includes
 
 #include "mainwindow.h"
 #include "info.h"
 
 //Qt
 #include <QDebug>
-
 #include <QWidget>
 #include <QPainter>
 
@@ -55,8 +54,8 @@
 
 //#include "plotsignalwidget.h"
 
-//*************************************************************************************************************
-//namespaces
+//=============================================================================================================
+// Namespaces
 
 using namespace MNE_BROWSE_RAW_QT;
 
@@ -70,6 +69,7 @@ MainWindow::MainWindow(QWidget *parent)
     setupModel();
     setupDelegate();
     setupView();
+    setupLayout();
 
     createMenus();
 
@@ -88,13 +88,18 @@ MainWindow::~MainWindow()
 
 void MainWindow::setupModel()
 {
+//    m_pRawModel = new RawModel(this);
     m_pRawModel = new RawModel(m_qFileRaw,this);
 }
+
+//*************************************************************************************************************
 
 void MainWindow::setupDelegate()
 {
     m_pRawDelegate = new RawDelegate(this);
 }
+
+//*************************************************************************************************************
 
 void MainWindow::setupView()
 {
@@ -107,30 +112,9 @@ void MainWindow::setupView()
     m_pTableView->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
 
     //TableView settings
-    m_pTableView->setShowGrid(false);
-//    m_pTableView->verticalHeader()->hide();
-    m_pTableView->horizontalHeader()->hide();
-    m_pTableView->verticalHeader()->setDefaultSectionSize(m_pRawDelegate->m_dPlotHeight);
+    setupViewSettings();
 
-    m_pTableView->setAutoScroll(false);
-    m_pTableView->setColumnHidden(0,true); //because content is plotted jointly with column=1
-//    m_pTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
-
-    m_pTableView->resizeColumnToContents(0); //based on returned sizeHint of RawDelegate
-//    m_pTableView->resizeColumnsToContents();
-
-    m_pTableView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
-
-    //obtain position of QScrollArea
-    m_pTableView->horizontalScrollBar()->setMinimum(0);
-    m_pTableView->horizontalScrollBar()->setValue(m_pRawModel->sizeOfData()/2-this->width()/2);
-    m_pTableView->horizontalScrollBar()->setMaximum(m_pRawModel->sizeOfData()*m_pRawDelegate->m_dDx);
-    qDebug("INFO: ScrollBar: Position: %i, Min %i, Max %i",m_pTableView->horizontalScrollBar()->value(),m_pTableView->horizontalScrollBar()->minimum(),m_pTableView->horizontalScrollBar()->maximum());
-
-    QScroller::grabGesture(m_pTableView,QScroller::MiddleMouseButtonGesture); //activate kinetic scrolling
-
-    //connect QScrollBar with model in order to reload data samples
-    connect(m_pTableView->horizontalScrollBar(),SIGNAL(valueChanged(int)),m_pRawModel,SLOT(reloadData(int)));
+//    qDebug("INFO: ScrollBar: Position: %i, Min %i, Max %i",m_pTableView->horizontalScrollBar()->value(),m_pTableView->horizontalScrollBar()->minimum(),m_pTableView->horizontalScrollBar()->maximum());
 
     //*****************************
 //    //example for PlotSignalWidget
@@ -147,7 +131,11 @@ void MainWindow::setupView()
 //    PlotSignalWidget *plotSignalWidget = new PlotSignalWidget(t_data,this);
 //    plotSignalWidget->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
     //*****************************
+}
 
+//*************************************************************************************************************
+
+void MainWindow::setupLayout() {
     //set vertical layout
     QVBoxLayout *mainlayout = new QVBoxLayout;
 
@@ -160,6 +148,35 @@ void MainWindow::setupView()
     setCentralWidget(window);
 }
 
+//*************************************************************************************************************
+
+void MainWindow::setupViewSettings() {
+    m_pTableView->setShowGrid(false);
+    m_pTableView->horizontalHeader()->hide();
+    m_pTableView->verticalHeader()->setDefaultSectionSize(m_pRawDelegate->m_dPlotHeight);
+
+    m_pTableView->setAutoScroll(false);
+    m_pTableView->setColumnHidden(0,true); //because content is plotted jointly with column=1
+//    m_pTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
+
+    m_pTableView->resizeColumnToContents(0); //based on returned sizeHint of RawDelegate
+    m_pTableView->resizeColumnsToContents();
+
+    m_pTableView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
+
+    //obtain position of QScrollArea
+//    m_pTableView->horizontalScrollBar()->setMinimum(0);
+    m_pTableView->horizontalScrollBar()->setValue(m_pRawModel->sizeOfData()/2-this->width()/2);
+//    m_pTableView->horizontalScrollBar()->setMaximum(m_pRawModel->sizeOfData()*m_pRawDelegate->m_dDx);
+
+    //activate kinetic scrolling
+    QScroller::grabGesture(m_pTableView,QScroller::MiddleMouseButtonGesture);
+
+    //connect QScrollBar with model in order to reload data samples
+    connect(m_pTableView->horizontalScrollBar(),SIGNAL(valueChanged(int)),m_pRawModel,SLOT(reloadData(int)));
+}
+
+//*************************************************************************************************************
 
 void MainWindow::createMenus() {
     QMenu *fileMenu = new QMenu(tr("&File"), this);
@@ -181,7 +198,7 @@ void MainWindow::setWindow() {
     this->move(50,50);
 }
 
-//*************************************************************************************************************
+//=============================================================================================================
 //Log
 
 void MainWindow::createLogDockWindow()
@@ -199,6 +216,8 @@ void MainWindow::createLogDockWindow()
     //Set standard LogLevel
     setLogLevel(_LogLvMax);
 }
+
+//*************************************************************************************************************
 
 void MainWindow::writeToLog(const QString& logMsg, LogKind lgknd, LogLevel lglvl)
 {
@@ -218,6 +237,8 @@ void MainWindow::writeToLog(const QString& logMsg, LogKind lgknd, LogLevel lglvl
         m_pTextBrowser_Log->verticalScrollBar()->setValue(m_pTextBrowser_Log->verticalScrollBar()->maximum());
     }
 }
+
+//*************************************************************************************************************
 
 void MainWindow::setLogLevel(LogLevel lvl)
 {
@@ -243,7 +264,12 @@ void MainWindow::openFile()
     QString filename = QFileDialog::getOpenFileName(this,QString("Open fiff data file"),QString("./MNE-sample-data/MEG/sample/"),tr("fif data files (*.fif)"));
     QFile t_fileRaw(filename);
 
-    m_pRawModel->loadFiffData(t_fileRaw);
-    //ui->textEdit->setText(filename);
+    if(m_pRawModel->loadFiffData(t_fileRaw)) {
+        qDebug() << "Fiff data file" << filename << "loaded.";
+        setupViewSettings();
+    }
+    else {
+        qDebug("ERROR loading fiff data file %s",filename.toLatin1().data());
+    }
 }
 

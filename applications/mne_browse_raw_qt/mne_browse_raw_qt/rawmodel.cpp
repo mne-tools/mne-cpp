@@ -45,7 +45,6 @@ RawModel::RawModel(QObject *parent)
 , n_reloadPos(2000) //samples
 , m_reloaded(false)
 {
-//    qRegisterMetaType<MatrixXd>("MatrixXd");
 }
 
 //*************************************************************************************************************
@@ -56,18 +55,18 @@ RawModel::RawModel(QIODevice &p_IODevice, QObject *parent)
 , n_reloadPos(2000) //samples
 , m_reloaded(false)
 {
-//    qRegisterMetaType<MatrixXd>("MatrixXd");
-
     //read fiff data
     loadFiffData(p_IODevice);
 }
 
-//*************************************************************************************************************
+//=============================================================================================================
 //virtual functions
 
 int RawModel::rowCount(const QModelIndex & /*parent*/) const
 {
-    return 1;//m_data[m_iBlockPosition].rows();
+    if(!m_chinfolist.empty())
+        return m_chinfolist.size();
+    else return 0;
 }
 
 int RawModel::columnCount(const QModelIndex & /*parent*/) const
@@ -75,28 +74,31 @@ int RawModel::columnCount(const QModelIndex & /*parent*/) const
     return 2;
 }
 
+//*************************************************************************************************************
+
 QVariant RawModel::data(const QModelIndex &index, int role) const
 {
     if (role == Qt::DisplayRole && index.isValid()) {
         if(index.column()==0)
-            return QVariant(m_chnames[index.row()]);
+            return QVariant(m_chinfolist[index.row()].ch_name);
         if(index.column()==1) {
             QVariant v;
 
-            MatrixXdR mat = m_data[m_iBlockPosition];
+            QPair<const double*,qint32> rowVectorPair;
+            rowVectorPair.first = m_data[m_iBlockPosition].data() + index.row()*m_data[m_iBlockPosition].cols();
+            rowVectorPair.second = m_data[m_iBlockPosition].cols();
 
-            QPair<double*,qint32> rowVectorPair;
-            rowVectorPair.first = mat.row(0).data();
-            rowVectorPair.second = mat.cols();
+//            std::cout << "Address Pair " << rowVectorPair.first << " Address mat " << &m_data[m_iBlockPosition](0,0) << std::endl;
 
             v.setValue(rowVectorPair);
-//            v.setValue((QList<Matrix<double,Dynamic,Dynamic,RowMajor> >) m_data);
             return v;
         }
     }
 
     return QVariant();
 }
+
+//*************************************************************************************************************
 
 QVariant RawModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
@@ -131,37 +133,52 @@ QVariant RawModel::headerData(int section, Qt::Orientation orientation, int role
 }
 
 
-//*************************************************************************************************************
+//=============================================================================================================
 //non-virtual functions
 
-void RawModel::loadFiffData(QIODevice& p_IODevice)
+bool RawModel::loadFiffData(QIODevice& p_IODevice)
 {
     beginResetModel();
+    clearModel();
 
     MatrixXd t_data,t_times;
 
     m_pfiffIO = QSharedPointer<FiffIO>(new FiffIO(p_IODevice));
-    m_dFiffPosition = m_pfiffIO->m_qlistRaw[0]->first_samp/m_pfiffIO->m_qlistRaw[0]->info.sfreq+40; //take beginning of raw data as position + 40 secs [in secs]
-
-    if(!m_pfiffIO->m_qlistRaw[0]->read_raw_segment_times(t_data, t_times, m_dFiffPosition-m_dWindowLength/2, m_dFiffPosition+m_dWindowLength/2))
-        qFatal("Error when reading raw data!");
+    if(!m_pfiffIO->m_qlistRaw.empty()) {
+        m_dFiffPosition = m_pfiffIO->m_qlistRaw[0]->first_samp/m_pfiffIO->m_qlistRaw[0]->info.sfreq+40; //take beginning of raw data as position + 40 secs [in secs]
+        if(!m_pfiffIO->m_qlistRaw[0]->read_raw_segment_times(t_data, t_times, m_dFiffPosition-m_dWindowLength/2, m_dFiffPosition+m_dWindowLength/2))
+            return false;
+    }
+    else {
+        qDebug("RawModel: ERROR! Data set does not contain any fiff data!");
+        endResetModel();
+        return false;
+    }
 
     //set loaded fiff data
     m_data.append(t_data);
     m_times.append(t_times);
     m_iBlockPosition = 0; //set BlockPosition in m_data QList to first block
 
-    if(!m_pfiffIO->m_qlistRaw.empty()) {
-        RawModel::loadChNames();
-        RawModel::loadChInfos();
-
-        qDebug("Fiff data loaded.");
-    }
-    else
-        qFatal("ERROR! Data set does not contain any fiff data!");
+    loadChInfos();
 
     endResetModel();
+    return true;
 }
+
+//*************************************************************************************************************
+
+void RawModel::clearModel() {
+    m_pfiffIO.clear();
+    m_data.clear();
+    m_times.clear();
+    m_iBlockPosition = 0;
+    m_chinfolist.clear();
+
+    qDebug("RawModel cleared.");
+}
+
+//*************************************************************************************************************
 
 void RawModel::reloadFiffData(bool before) {
     MatrixXd t_reloaddata,t_reloadtimes;
@@ -185,11 +202,7 @@ void RawModel::reloadFiffData(bool before) {
     emit dataChanged(topLeft,bottomRight);
 }
 
-void RawModel::loadChNames()
-{
-    for(qint32 i=0; i < m_pfiffIO->m_qlistRaw[0]->info.nchan; ++i)
-            m_chnames.append(m_pfiffIO->m_qlistRaw[0]->info.chs[i].ch_name);
-}
+//*************************************************************************************************************
 
 void RawModel::loadChInfos()
 {
@@ -197,11 +210,16 @@ void RawModel::loadChInfos()
         m_chinfolist.append(m_pfiffIO->m_qlistRaw[0]->info.chs[i]);
 }
 
+//*************************************************************************************************************
+
 qint32 RawModel::sizeOfData()
 {
-    return m_data[m_iBlockPosition].cols();
+    if(!m_data.empty())
+        return m_data[m_iBlockPosition].cols();
+    else return 0;
 }
 
+//*************************************************************************************************************
 
 double RawModel::maxDataValue(qint16 chan) const {
     double dMax;
@@ -214,7 +232,7 @@ double RawModel::maxDataValue(qint16 chan) const {
     return dMax;
 }
 
-//*************************************************************************************************************
+//=============================================================================================================
 //slots
 
 void RawModel::reloadData(int value) {
@@ -223,8 +241,6 @@ void RawModel::reloadData(int value) {
 //        reloadFiffData(true);
         m_reloaded = true;
     }
-    else if(value > m_data[m_iBlockPosition].cols()-(n_reloadPos+1200)) {
+    else if(value > m_data[m_iBlockPosition].cols()-(n_reloadPos+1200))
         qDebug("reload data at AFTER, value: %i", value);
-    }
-
 }
