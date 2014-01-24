@@ -131,6 +131,7 @@ void MainWindow::setupView()
 //    PlotSignalWidget *plotSignalWidget = new PlotSignalWidget(t_data,this);
 //    plotSignalWidget->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
     //*****************************
+
 }
 
 //*************************************************************************************************************

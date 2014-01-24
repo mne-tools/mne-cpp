@@ -92,10 +92,10 @@ public:
     void clearModel();
 
     //Model settings
-    double m_dWindowLength; /**< Length of window to load [in secs] */
-    double m_dFiffPosition; /**< Position of window in fiff data [in secs] */
-
-    int n_reloadPos; /**< Distance that the current window needs to be off the ends of m_data [in samples] */
+    qint32 m_iWindowSize; /**< Length of window to load [in samples] */
+    qint32 m_iFiffCursor; /**< Cursor that points to the current position in the fiff data file [in samples] */
+    qint32 m_iCurScrollPos; /** the current ScrollPosition in the fiff data file */
+    qint32 n_reloadPos; /**< Distance that the current window needs to be off the ends of m_data [in samples] */
 
     /**
      * @brief sizeOfData
@@ -104,7 +104,7 @@ public:
     qint32 sizeOfData();
 
     /**
-     * @brief getMaxDataValue
+     * @brief getMaxDataValue obtains the maximum value for the underlying channel
      *
      * @param chan number of channel in m_chinfolist
      * @return max data value of m_data for scaling purposes.
@@ -117,7 +117,7 @@ private:
     //display types
     QList<MatrixXdR> m_data; /**< List that holds the fiff matrix data <n_channels x n_samples> */
     QList<MatrixXdR> m_times; /**< List that holds the time axis [in secs] */
-    qint16 m_iBlockPosition;
+    qint16 m_iCurBlockPosition;
 
     //Fiff
     QList<FiffChInfo> m_chinfolist; /**< List of FiffChInfo objects that holds the corresponding channels information */
@@ -137,18 +137,15 @@ signals:
 
 private slots:
     /**
-     * @brief reloadData Checks, whether the actual position of the QScrollBar demands for a fiff data reload (depending on m_reloadPos)
+     * @brief reloadData checks, whether the actual position of the QScrollBar demands for a fiff data reload (depending on m_reloadPos)
      * @param value the position of QScrollBar
      */
     void reloadData(int value);
 
 };
 
-Q_DECLARE_METATYPE(MatrixXd);
 Q_DECLARE_METATYPE(MatrixXdR);
 Q_DECLARE_METATYPE(RowVectorPair);
-
-//Q_DECLARE_METATYPE(RowVectorXd&);
 
 
 #endif // RAWMODEL_H
