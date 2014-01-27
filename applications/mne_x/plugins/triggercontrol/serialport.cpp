@@ -527,7 +527,7 @@ bool SerialPort::open()
  //   qDebug() << "noch nicht geöffnet" << endl;
     if (m_qSerialPort.open(QIODevice::ReadWrite))
     {
-        std::cout << "geöffnet, ohne Konfigs" << std::endl;
+        //std::cout << "geöffnet, ohne Konfigs" << std::endl;
         if (m_qSerialPort.setBaudRate(m_currentSettings.baudRate)
                 && m_qSerialPort.setDataBits(m_currentSettings.dataBits)
                 && m_qSerialPort.setParity(m_currentSettings.parity)
@@ -535,11 +535,29 @@ bool SerialPort::open()
                 && m_qSerialPort.setFlowControl(m_currentSettings.flowControl))
         {
             std::cout << "geöffnet, mit:"
+                      << "Name" << m_currentSettings.name.toLatin1().data()
+                      << "BaudRat" << m_currentSettings.stringBaudRate.toLatin1().data()
+                      << "Databits" << m_currentSettings.stringDataBits.toLatin1().data()
+                      << "Parity" << m_currentSettings.stringParity.toLatin1().data()
+                      << "FlowControl" << m_currentSettings.stringFlowControl.toLatin1().data()  << std::endl;
+            std::cout << "geöffnet, mit:"
+                      << "Name" << m_currentSettings.name.toLatin1().data()
+                      << "BaudRat" << m_currentSettings.stringBaudRate.toLatin1().data()
+                      << "Databits" << m_currentSettings.stringDataBits.toLatin1().data()
+                      << "Parity" << m_currentSettings.stringParity.toLatin1().data()
+                      << "FlowControl" << m_currentSettings.stringFlowControl.toLatin1().data()  << std::endl;
+            std::cout << "geöffnet, mit:"
                       << " Name: " << m_currentSettings.name.toLatin1().data()
                       << ", BaudRate: " << m_currentSettings.stringBaudRate.toLatin1().data()
                       << ", Databits: " << m_currentSettings.stringDataBits.toLatin1().data()
                       << ", Parity: " << m_currentSettings.stringParity.toLatin1().data()
                       << ", FlowControl: " << m_currentSettings.stringFlowControl.toLatin1().data()  << std::endl;
+//            std::cout << "geöffnet, mit:"
+//                      << "Name" << m_currentSettings.name.toLatin1().data()
+//                      << "BaudRat" << m_currentSettings.stringBaudRate.toLatin1().data()
+//                      << "Databits" << m_currentSettings.stringDataBits.toLatin1().data()
+//                      << "Parity" << m_currentSettings.stringParity.toLatin1().data()
+//                      << "FlowControl" << m_currentSettings.stringFlowControl.toLatin1().data()  << std::endl;
 
             success = true;
         }

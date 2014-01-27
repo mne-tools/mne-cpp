@@ -38,12 +38,15 @@ include(../mne-cpp.pri)
 TEMPLATE = subdirs
 
 SUBDIRS += \
-    mne_rt_server \
+    mne_rt_server
 
 contains(MNECPP_CONFIG, isGui) {
     SUBDIRS += \
         mne_x_libs \
-        mne_x
+        mne_x \
+        mne_browse_raw_qt \
+        mne_viewer \
+        mne_viewer_parent
 }
 
 CONFIG += ordered
