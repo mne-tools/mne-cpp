@@ -57,7 +57,7 @@
 #include <Eigen/SparseCore>
 
 //MNE_BROWSE_RAW_QT
-#include <types.h>
+#include "types.h"
 
 //*************************************************************************************************************
 // USED NAMESPACES
@@ -98,12 +98,6 @@ public:
     qint32 n_reloadPos; /**< Distance that the current window needs to be off the ends of m_data [in samples] */
 
     /**
-     * @brief sizeOfData
-     * @return size of loaded m_data
-     */
-    qint32 sizeOfData();
-
-    /**
      * @brief getMaxDataValue obtains the maximum value for the underlying channel
      *
      * @param chan number of channel in m_chinfolist
@@ -142,10 +136,53 @@ private slots:
      */
     void reloadData(int value);
 
+//Inline
+public:
+    /**
+     * @brief sizeOfFiffData
+     * @return the size of the total data contained in the loaded Fiff file
+     */
+    inline qint32 sizeOfFiffData() {
+        if(!m_pfiffIO->m_qlistRaw.empty())
+            return (m_pfiffIO->m_qlistRaw[0]->last_samp-m_pfiffIO->m_qlistRaw[0]->first_samp);
+        else return 0;
+    }
+
+    /**
+     * @brief firstSample
+     * @return the first sample of the loaded Fiff file
+     */
+    inline qint32 firstSample() {
+        if(!m_pfiffIO->m_qlistRaw.empty())
+            return m_pfiffIO->m_qlistRaw[0]->first_samp;
+        else return 0;
+    }
+
+    /**
+     * @brief lastSample
+     * @return the last sample of the loaded Fiff file
+     */
+    inline qint32 lastSample() {
+        if(!m_pfiffIO->m_qlistRaw.empty())
+            return m_pfiffIO->m_qlistRaw[0]->last_samp;
+        else return 0;
+    }
+
+    /**
+     * @brief sizeOfData
+     * @return size of loaded m_data
+     */
+    inline qint32 sizeOfData() {
+        if(!m_data.empty())
+            return m_data[m_iCurBlockPosition].cols();
+        else return 0;
+    }
+
 };
 
 Q_DECLARE_METATYPE(MatrixXdR);
 Q_DECLARE_METATYPE(RowVectorPair);
+Q_DECLARE_METATYPE(QList<RowVectorPair>);
 
 
 #endif // RAWMODEL_H

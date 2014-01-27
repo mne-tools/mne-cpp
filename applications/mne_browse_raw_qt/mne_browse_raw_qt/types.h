@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     info.h
+* @file     types.h
 * @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
@@ -31,7 +31,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains general application information like: application name and  version number.
+* @brief    Contains general application specific types
 *
 */
 
@@ -55,7 +55,6 @@ using namespace Eigen;
 namespace MNE_BROWSE_RAW_QT {
 
 typedef Matrix<double,Dynamic,Dynamic,RowMajor> MatrixXdR;
-//typedef Block<MatrixXdR, 1, Dynamic, 1> BlockXdR;
 typedef QPair<const double*,qint32> RowVectorPair;
 
 }
