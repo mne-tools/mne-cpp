@@ -6,7 +6,7 @@
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 #           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
 # @version  1.0
-# @date     December, 2013
+# @date     January, 2014
 #
 # @section  LICENSE
 #

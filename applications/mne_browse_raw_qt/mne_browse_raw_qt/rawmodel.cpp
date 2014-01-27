@@ -84,13 +84,20 @@ QVariant RawModel::data(const QModelIndex &index, int role) const
         if(index.column()==1) {
             QVariant v;
 
+            //form RowVectorPair of pointer and length of RowVector
             QPair<const double*,qint32> rowVectorPair;
-            rowVectorPair.first = m_data[m_iCurBlockPosition].data() + index.row()*m_data[m_iCurBlockPosition].cols();
-            rowVectorPair.second = m_data[m_iCurBlockPosition].cols();
 
-//            std::cout << "Address Pair " << rowVectorPair.first << " Address mat " << &m_data[m_iCurBlockPosition](0,0) << std::endl;
+            //pack all adjacent (after reload) RowVectorPairs into a QList
+            QList<RowVectorPair> listRowVectorPair;
 
-            v.setValue(rowVectorPair);
+            for(qint16 i=0; i < m_data.size(); ++i) {
+                rowVectorPair.first = m_data[i].data() + index.row()*m_data[i].cols();
+                rowVectorPair.second = m_data[i].cols();
+
+                listRowVectorPair.append(rowVectorPair);
+            }
+
+            v.setValue(listRowVectorPair);
             return v;
         }
     }
@@ -173,7 +180,9 @@ void RawModel::clearModel() {
     m_data.clear();
     m_times.clear();
     m_iCurBlockPosition = 0;
+    m_iFiffCursor = 0;
     m_chinfolist.clear();
+
 
     qDebug("RawModel cleared.");
 }
@@ -183,18 +192,22 @@ void RawModel::clearModel() {
 void RawModel::reloadFiffData(bool before) {
     MatrixXd t_reloaddata,t_reloadtimes;
 
-    if(before)
-        if(!m_pfiffIO->m_qlistRaw[0]->read_raw_segment(t_reloaddata, t_reloadtimes, m_iFiffCursor-m_iWindowSize, m_iFiffCursor))
-            printf("Error when reading raw data!");
-    else
-        if(!m_pfiffIO->m_qlistRaw[0]->read_raw_segment(t_reloaddata, t_reloadtimes, m_iFiffCursor+m_iWindowSize, m_iFiffCursor+2*m_iWindowSize))
-            printf("Error when reading raw data!");
+    //update scroll position
+    if(before) {
+        m_iCurBlockPosition += 1;
+        m_iFiffCursor -= m_iWindowSize;
+    }
+    else {
+//        m_iCurBlockPosition += 1;
+        m_iFiffCursor += m_iWindowSize;
+    }
 
-    // extend m_data with reloaded data
+    if(!m_pfiffIO->m_qlistRaw[0]->read_raw_segment(t_reloaddata, t_reloadtimes, m_iFiffCursor-m_iWindowSize, m_iFiffCursor))
+        printf("Error when reading raw data!");
+
+    //extend m_data with reloaded data
     m_data.prepend(t_reloaddata);
     m_times.prepend(t_reloadtimes);
-
-    m_iCurBlockPosition += 1;
 
     qDebug("Fiff data REloaded.");
 
@@ -202,6 +215,7 @@ void RawModel::reloadFiffData(bool before) {
     QModelIndex bottomRight = createIndex(m_data[m_iCurBlockPosition].rows(),1);
 
     emit dataChanged(topLeft,bottomRight);
+    emit layoutChanged();
 }
 
 //*************************************************************************************************************
@@ -210,15 +224,6 @@ void RawModel::loadChInfos()
 {
     for(qint32 i=0; i < m_pfiffIO->m_qlistRaw[0]->info.nchan; ++i)
         m_chinfolist.append(m_pfiffIO->m_qlistRaw[0]->info.chs[i]);
-}
-
-//*************************************************************************************************************
-
-qint32 RawModel::sizeOfData()
-{
-    if(!m_data.empty())
-        return m_data[m_iCurBlockPosition].cols();
-    else return 0;
 }
 
 //*************************************************************************************************************
@@ -239,13 +244,14 @@ double RawModel::maxDataValue(qint16 chan) const {
 
 void RawModel::reloadData(int value) {
     m_iCurScrollPos = m_iFiffCursor+value;
-//    qDebug() << "Current Fiff Position value " << n_iCurScrollPos;
+    qDebug() << "Current ScrollBar value" << value << "Current Fiff Scroll Position value " << m_iCurScrollPos;
 
     if(value < n_reloadPos && !m_reloaded) {
-        qDebug() << "Current ScrollBar value" << value << "(reload data at FRONT)";
+//        qDebug() << "Current ScrollBar value" << value << "(reload data at FRONT)";
         reloadFiffData(true);
         m_reloaded = true;
     }
-    else if(value > m_iWindowSize-n_reloadPos)
-        qDebug() << "Current ScrollBar value" << value << "(reload data at END), absolute Fiff file position:" << m_iCurScrollPos;
+    else if(value > m_iWindowSize-n_reloadPos) {
+//        qDebug() << "Current ScrollBar value" << value << "(reload data at END), absolute Fiff file position:" << m_iCurScrollPos;
+    }
 }

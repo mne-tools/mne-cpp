@@ -114,7 +114,8 @@ void MainWindow::setupView()
     //TableView settings
     setupViewSettings();
 
-//    qDebug("INFO: ScrollBar: Position: %i, Min %i, Max %i",m_pTableView->horizontalScrollBar()->value(),m_pTableView->horizontalScrollBar()->minimum(),m_pTableView->horizontalScrollBar()->maximum());
+    //connect models dataChanged() signal to updateScrollbar() slot here
+    connect(m_pRawModel,SIGNAL(layoutChanged()),this,SLOT(updateScrollArea()));
 
     //*****************************
 //    //example for PlotSignalWidget
@@ -158,17 +159,17 @@ void MainWindow::setupViewSettings() {
 
     m_pTableView->setAutoScroll(false);
     m_pTableView->setColumnHidden(0,true); //because content is plotted jointly with column=1
-//    m_pTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
 
-    m_pTableView->resizeColumnToContents(0); //based on returned sizeHint of RawDelegate
     m_pTableView->resizeColumnsToContents();
 
     m_pTableView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
 
     //obtain position of QScrollArea
-//    m_pTableView->horizontalScrollBar()->setMinimum(0);
-    m_pTableView->horizontalScrollBar()->setValue(m_pRawModel->sizeOfData()/2-this->width()/2);
-//    m_pTableView->horizontalScrollBar()->setMaximum(m_pRawModel->sizeOfData()*m_pRawDelegate->m_dDx);
+    m_pTableView->horizontalScrollBar()->setMinimum(-30000);
+    m_pTableView->horizontalScrollBar()->setMaximum(45000);
+    m_pTableView->horizontalScrollBar()->setValue(38000);
+
+//    m_pTableView->horizontalScrollBar()->
 
     //activate kinetic scrolling
     QScroller::grabGesture(m_pTableView,QScroller::MiddleMouseButtonGesture);
@@ -269,8 +270,19 @@ void MainWindow::openFile()
         qDebug() << "Fiff data file" << filename << "loaded.";
         setupViewSettings();
     }
-    else {
+    else
         qDebug("ERROR loading fiff data file %s",filename.toLatin1().data());
-    }
 }
 
+void MainWindow::updateScrollArea() {
+    qint32 newValue = m_pTableView->horizontalScrollBar()->value()+m_pRawModel->m_iWindowSize;
+
+    m_pTableView->resizeColumnsToContents();
+
+    qint32 range = m_pTableView->horizontalScrollBar()->maximum()- m_pTableView->horizontalScrollBar()->minimum();
+
+    m_pTableView->horizontalScrollBar()->setValue(newValue);
+
+    qDebug() << "new ScrollBar value" << newValue << "range" << range;
+    qDebug() << "ScrollArea updated!";
+}

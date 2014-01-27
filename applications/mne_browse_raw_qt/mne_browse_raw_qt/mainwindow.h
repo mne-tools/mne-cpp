@@ -97,6 +97,7 @@ public slots:
 
 private slots:
     void openFile();
+    void updateScrollArea();
 
 private:
     void setupModel();
