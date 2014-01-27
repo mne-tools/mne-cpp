@@ -103,6 +103,12 @@ public:
 
     //=========================================================================================================
     /**
+    * Clears all the data stored in the buffer.
+    */
+    void clear();
+
+    //=========================================================================================================
+    /**
     * Inits RealTimeMultiSampleArrayNew and adds uiNumChannels empty channel information
     *
     * @param [in] uiNumChannels     the number of channels to init.
@@ -214,6 +220,11 @@ private:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
+
+inline void NewRealTimeMultiSampleArray::clear()
+{
+    m_matSamples.clear();
+}
 
 inline void NewRealTimeMultiSampleArray::setSamplingRate(double dSamplingRate)
 {

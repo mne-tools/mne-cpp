@@ -110,9 +110,9 @@ void TriggerControl::init()
 {
     // Beginn Zeitmessung
     // Input
-//    m_pRTMSAInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "TriggerControlInI", "TriggerControl input data I");
-//    connect(m_pRTMSAInput.data(), &PluginInputConnector::notify, this, &TriggerControl::update, Qt::DirectConnection);
-//    m_inputConnectors.append(m_pRTMSAInput);
+    m_pRTMSAInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "TriggerControlInI", "TriggerControl input data I");
+    connect(m_pRTMSAInput.data(), &PluginInputConnector::notify, this, &TriggerControl::update, Qt::DirectConnection);
+    m_inputConnectors.append(m_pRTMSAInput);
     // Ende Zeitmessung*/
 
 
@@ -142,18 +142,17 @@ bool TriggerControl::start()
     m_bIsRunning = true;
     QThread::start();
 
-    // ////////////////////////////
+//    // ////////////////////////////
 
 //    if(!m_pSerialPort->open())   // open Serial Port
-//        std::cout << "Not able to open port" << std::endl;
+//        std::cout << "Not able to open port - test" << std::endl;
 
-    // ////////////////////////////
-
-
+//    // ////////////////////////////
 
 
-/* Beginn Zeitmessung
- *
+
+
+ // Beginn Zeitmessung
 
 
 
@@ -161,15 +160,22 @@ bool TriggerControl::start()
     if(m_pSerialPort->open())   // open Serial Port
     {
         m_qTime.start();
-        m_pSerialPort->m_digchannel.replace(0,1); // select 1st digital channel
+        QByteArray t_data;
+        m_pSerialPort->m_digchannel.replace(9,1); // select 1st digital channel
+        //t_data.append(0x01);
         m_pSerialPort->encodedig();             // encode signal to m_data
+//        t_data[0] = t_data[0]|0x01;
         m_pSerialPort->sendData(m_pSerialPort->m_data);
+
+        m_qTime.start();
+        //m_pSerialPort->sendData(t_data);
+        std::cout << "data sent" << std::endl;
     }
     else
     {
         std::cout << "Sending not possible, please check settings" << std::endl;
     }
-* Ende Zeitmessung */
+ //Ende Zeitmessung
 
     return true;
 }
@@ -191,27 +197,30 @@ bool TriggerControl::stop()
 
 
 
-/* Beginn Zeitmessung
+ //Beginn Zeitmessung
     double sum = 0;
     for(int i=0; i<m_vTimes.size(); i++)
         sum += m_vTimes[i];
 
-    QFile file(qApp->applicationDirPath()+"/mne_x_plugins/resources/triggercontrol/");
-    file.open(QIODevice::WriteOnly | QIODevice::Text);
-    QTextStream out(&file);
-
-    for(int i=0; i<m_vTimes.size() ;i++)
-        out << m_vTimes[i];
-
-    // optional, as QFile destructor will already do it:
-    file.close();
+    QFile file(qApp->applicationDirPath()+"/mne_x_plugins/resources/triggercontrol/t_meas.txt");
+    for(int i=0; i<m_vTimes.size(); i++)
+        sum += m_vTimes[i];
 
     std::cout << "Average time: " << sum/m_vTimes.size() << std::endl;
     std::cout << "Size m_vTimes: " << m_vTimes.size() << std::endl;
 
+    file.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream out(&file);
+
+    for(int i=0; i<m_vTimes.size() ;i++)
+        out << m_vTimes[i] << endl;
+
+    // optional, as QFile destructor will already do it:
+    file.close();
+
     m_pData.clear();
     m_vTimes.clear();
-// Ende Zeitmessung*/
+// Ende Zeitmessung
 
 
     return true;
@@ -265,7 +274,7 @@ void TriggerControl::updateSingleChannel(XMEASLIB::NewMeasurement::SPtr pMeasure
 
 void TriggerControl::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 {
-    /* Beginn Zeitmessung
+    ///* Beginn Zeitmessung
     QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<NewRealTimeMultiSampleArray>();
     if(pRTMSA)
     {
@@ -284,10 +293,11 @@ void TriggerControl::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
 //*************************************************************************************************************
 
+
 void TriggerControl::run()
 {
 
-/* Beginn Zeitmessung
+ //Beginn Zeitmessung
 
     m_pData.clear();
 
@@ -333,33 +343,33 @@ void TriggerControl::run()
         }
         m_qMutex.unlock();
     }
-// Ende Zeitmessung */
+// Ende Zeitmessung
 
-    double v_old = 0;
+//    double v_old = 0;
 
-    while (true)
-    {
-        /* Dispatch the inputs */
-        double v = m_pDataSingleChannel->pop();
+//    while (true)
+//    {
+//        /* Dispatch the inputs */
+//        double v = m_pDataSingleChannel->pop();
 
-        double diff = v_old - v;
+//        double diff = v_old - v;
 
-        m_pTriggerOutput->data()->setValue(diff);
+//        m_pTriggerOutput->data()->setValue(diff);
 
-        if(diff > 20)
-        {
-            //ToDo: Implement your algorithm here
+//        if(diff > 20)
+//        {
+//            //ToDo: Implement your algorithm here
 
-        }
-
-
-
-        v_old  = v;
+//        }
 
 
 
+//        v_old  = v;
 
-    }
+
+
+
+//    }
 
 //    // ////////////////////////////
 //    int count = 0;
@@ -400,6 +410,7 @@ void TriggerControl::run()
 }
 
 
+
 //*************************************************************************************************************
 
 void TriggerControl::sendByteTo(int value)
@@ -418,4 +429,3 @@ void TriggerControl::sendByteTo(int value)
     }
 
 }
-

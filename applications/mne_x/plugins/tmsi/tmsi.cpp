@@ -106,25 +106,28 @@ void TMSI::init()
 
     m_outputConnectors.append(m_pRMTSA_TMSI);
 
-    //setupGUI default values must be set here
+    //default values used by the setupGUI class must be set here
     m_iSamplingFreq = 1024;
     m_iNumberOfChannels = 138;
     m_iSamplesPerBlock = 16;
-    m_bConvertToVolt = false;
-    m_bUseChExponent = false;
+    m_iTriggerInterval = 5000;
+
+    m_bUseChExponent = true;
     m_bUseUnitGain = false;
     m_bUseUnitOffset = false;
     m_bWriteToFile = false;
     m_bWriteDriverDebugToFile = false;
-    m_bUsePreprocessing = false;
+    m_bUseFiltering = false;
     m_bUseFFT = false;
     m_bIsRunning = false;
+    m_bShowEventTrigger = false;
+
     m_sOutputFilePath = QString("./mne_x_plugins/resources/tmsi/EEG_data_001_raw.fif");
     m_sElcFilePath = QString("./mne_x_plugins/resources/tmsi/loc_files/Lorenz-Duke128-28-11-2013.elc");
 
     m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo());
 
-    // Initialise matrix used to perform a very simple high pass filter operation
+    //Initialise matrix used to perform a very simple high pass filter operation
     m_matOldMatrix = MatrixXf::Zero(m_iNumberOfChannels, m_iSamplesPerBlock);
 }
 
@@ -174,7 +177,7 @@ void TMSI::setUpFiffInfo()
     else
         numberEEGCh = m_iNumberOfChannels;
 
-    //Check if channel size by user corresponds with read channel informations from the elc file. If not apped zeros and string 'unknown' until the size matches.
+    //Check if channel size by user corresponds with read channel informations from the elc file. If not append zeros and string 'unknown' until the size matches.
     if(numberEEGCh > elcLocation3D.size())
     {
         qDebug()<<"Warning: setUpFiffInfo() - Not enough positions read from the elc file. Filling missing channel names and positions with zeroes and 'unknown' strings.";
@@ -214,10 +217,51 @@ void TMSI::setUpFiffInfo()
     digPoint.r[2] = (elcLocation3D[indexZ1][2]-60)*0.001;
     digitizerInfo.push_back(digPoint);
 
+    //Append LAP value to digitizer data. Take location of LE2 electrode minus 1 cm as approximation.
+    int indexLE2 = elcChannelNames.indexOf("LE2");
+    digPoint.kind = FIFFV_POINT_LPA;
+    digPoint.ident = digitizerInfo.size();
+
+    //Set EEG electrode location - Convert from mm to m
+    digPoint.r[0] = elcLocation3D[indexLE2][0]*0.001;
+    digPoint.r[1] = elcLocation3D[indexLE2][1]*0.001;
+    digPoint.r[2] = (elcLocation3D[indexLE2][2]-10)*0.001;
+    digitizerInfo.push_back(digPoint);
+
+    //Append RAP value to digitizer data. Take location of RE2 electrode minus 1 cm as approximation.
+    int indexRE2 = elcChannelNames.indexOf("RE2");
+    digPoint.kind = FIFFV_POINT_RPA;
+    digPoint.ident = digitizerInfo.size();
+
+    //Set EEG electrode location - Convert from mm to m
+    digPoint.r[0] = elcLocation3D[indexRE2][0]*0.001;
+    digPoint.r[1] = elcLocation3D[indexRE2][1]*0.001;
+    digPoint.r[2] = (elcLocation3D[indexRE2][2]-10)*0.001;
+    digitizerInfo.push_back(digPoint);
+
+    //The positions read from the asa elc file do not correspond to a RAS coordinate system - use a simple 90° z transformation to fix this
+    Matrix3f rotation_z;
+    rotation_z = AngleAxisf((float)M_PI/2, Vector3f::UnitZ()); //M_PI/2 = 90°
+
+    for(int i = 0; i<digitizerInfo.size(); i++)
+    {
+        Vector3f point;
+        point << digitizerInfo[i].r[0], digitizerInfo[i].r[1] , digitizerInfo[i].r[2];
+        Vector3f point_rot = rotation_z * point;
+//        cout<<"point: "<<endl<<point<<endl<<endl;
+//        cout<<"matrix: "<<endl<<rotation_z<<endl<<endl;
+//        cout<<"point_rot: "<<endl<<point_rot<<endl<<endl;
+//        cout<<"-----------------------------"<<endl;
+        digitizerInfo[i].r[0] = point_rot[0];
+        digitizerInfo[i].r[1] = point_rot[1];
+        digitizerInfo[i].r[2] = point_rot[2];
+    }
+
+    //Set the final digitizer values to the fiff info
     m_pFiffInfo->dig = digitizerInfo;
 
     //
-    //Set up the fif channel info
+    //Set up the channel info
     //
     QStringList QSLChNames;
     m_pFiffInfo->chs.clear();
@@ -287,7 +331,7 @@ void TMSI::setUpFiffInfo()
             //Set channel type
             fChInfo.kind = FIFFV_STIM_CH;
 
-            sChType = QString("STIM");
+            sChType = QString("STI 014");
             fChInfo.ch_name = sChType;
         }
 
@@ -318,20 +362,43 @@ void TMSI::setUpFiffInfo()
     m_pFiffInfo->ctf_head_t.to = FIFFV_COORD_HEAD;
 
     //
-    //Set projection
+    //Set projection data
     //
-//    m_pFiffInfo->projs.clear();
-//    FiffProj proj;
-//    proj.kind = 1;
-//    proj.active = true;
+    m_pFiffInfo->projs.clear();
+    FiffProj proj;
+    proj.kind = 1;
+    proj.active = false;
 
-//    FiffNamedMatrix::SDPtr namedMatrix = proj.data;
-//    namedMatrix->ncol = m_iNumberOfChannels/3;
-//    namedMatrix->nrow = 1;
-//    namedMatrix->data = MatrixXd::Ones(1, m_iNumberOfChannels/3);
-//    m_pFiffInfo->projs.append(proj);
-//    m_pFiffInfo->projs.append(proj);
-//    m_pFiffInfo->projs.append(proj);
+    FiffNamedMatrix::SDPtr namedMatrix = proj.data;
+    namedMatrix->ncol = numberEEGCh/3;
+    namedMatrix->nrow = 1;
+    namedMatrix->data = MatrixXd::Ones(1, namedMatrix->ncol);
+
+    //Set projection 1
+    for(int i=0; i<namedMatrix->ncol; i++)
+        namedMatrix->col_names << QSLChNames.at(i);
+
+    proj.data = namedMatrix;
+    proj.desc = QString("PCA-v1");
+    m_pFiffInfo->projs.append(proj);
+
+    //Set projection 2
+    namedMatrix->col_names.clear();
+    for(int i=0; i<namedMatrix->ncol; i++)
+        namedMatrix->col_names << QSLChNames.at(i+namedMatrix->ncol);
+
+    proj.data = namedMatrix;
+    proj.desc = QString("PCA-v2");
+    m_pFiffInfo->projs.append(proj);
+
+    //Set projection 3
+    namedMatrix->col_names.clear();
+    for(int i=0; i<namedMatrix->ncol; i++)
+        namedMatrix->col_names << QSLChNames.at(i+(2*namedMatrix->ncol));
+
+    proj.data = namedMatrix;
+    proj.desc = QString("PCA-v3");
+    m_pFiffInfo->projs.append(proj);
 }
 
 
@@ -342,6 +409,9 @@ bool TMSI::start()
     //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
     if(this->isRunning())
         QThread::wait();
+
+    if(m_bShowEventTrigger)
+        m_qTimerTrigger.start();
 
     //Setup writing to file
     if(m_bWriteToFile)
@@ -378,7 +448,6 @@ bool TMSI::start()
     m_pTMSIProducer->start(m_iNumberOfChannels,
                        m_iSamplingFreq,
                        m_iSamplesPerBlock,
-                       m_bConvertToVolt,
                        m_bUseChExponent,
                        m_bUseUnitGain,
                        m_bUseUnitOffset,
@@ -413,6 +482,8 @@ bool TMSI::stop()
     m_pRawMatrixBuffer_In->releaseFromPop();
 
     m_pRawMatrixBuffer_In->clear();
+
+    m_pRMTSA_TMSI->data()->clear();
 
     return true;
 }
@@ -459,14 +530,22 @@ void TMSI::run()
         if(m_pTMSIProducer->isRunning())
         {
             MatrixXf matValue = m_pRawMatrixBuffer_In->pop();
-            //std::cout << "matValue " << matValue.cast<double>() << std::endl;
+
+            if(m_bShowEventTrigger && m_qTimerTrigger.elapsed() >= m_iTriggerInterval)
+            {
+                QFuture<void> future = QtConcurrent::run(Beep, 523, 500);
+
+                //Set trigger in received data samples - just for one sample, so that this event is easy to detect
+                matValue(136, m_iSamplesPerBlock-1) = 254;
+                m_qTimerTrigger.restart();
+            }
 
             //Write raw data to fif file
             if(m_bWriteToFile)
                 m_pOutfid->write_raw_buffer(matValue.cast<double>(), m_cals);
 
-            //Use preprocessing if wanted by the user
-            if(m_bUsePreprocessing)
+            // TODO: Use preprocessing if wanted by the user
+            if(m_bUseFiltering)
             {
                 MatrixXf temp = matValue;
 
@@ -500,7 +579,7 @@ void TMSI::run()
                 //    outputFileStream << endl;
             }
 
-            //Perform a fft if wanted by the user
+            // TODO: Perform a fft if wanted by the user
             if(m_bUseFFT)
             {
                 QElapsedTimer timer;
