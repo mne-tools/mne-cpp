@@ -174,6 +174,7 @@ private:
 
     QSharedPointer<RealTimeSourceEstimate> m_pRTMSE;    /**< The real-time source estimate measurement. */
 
+    qint32 count;
 };
 
 } // NAMESPACE

@@ -108,6 +108,7 @@ RealTimeSourceEstimateWidget::RealTimeSourceEstimateWidget(QSharedPointer<RealTi
 , m_pRTMSE(pRTSE)
 , m_bInitialized(false)
 , m_bInitializationStarted(false)
+, count(0)
 {
     connect(this,&RealTimeSourceEstimateWidget::startInit, this, &RealTimeSourceEstimateWidget::init);
 }
@@ -128,8 +129,12 @@ void RealTimeSourceEstimateWidget::update(XMEASLIB::NewMeasurement::SPtr)
 {
     if(m_bInitialized)
     {
-        MNESourceEstimate stc = m_pRTMSE->getStc();
-        m_pView->pushSourceEstimate(stc);
+        if(count % 4 == 0)
+        {
+            MNESourceEstimate stc = m_pRTMSE->getStc();
+            m_pView->pushSourceEstimate(stc);
+        }
+        ++count;
     }
     else
     {
