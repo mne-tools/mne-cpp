@@ -35,10 +35,8 @@
 *
 */
 
-//*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
-//=============================================================================================================
 
 #include "plotsignalwidget.h"
 
@@ -104,6 +102,8 @@ void PlotSignalWidget::paintEvent(QPaintEvent *)
 
 }
 
+//*************************************************************************************************************
+
 void PlotSignalWidget::createPlotPath(QPainterPath& path)
 {
     double dValue;
@@ -125,6 +125,8 @@ void PlotSignalWidget::createPlotPath(QPainterPath& path)
     qDebug("Plot-PainterPath created!");
 }
 
+//*************************************************************************************************************
+
 void PlotSignalWidget::createGridPath(QPainterPath& path)
 {
     //horizontal lines
@@ -141,6 +143,8 @@ void PlotSignalWidget::createGridPath(QPainterPath& path)
 
     qDebug("Grid-PainterPath created!");
 }
+
+//*************************************************************************************************************
 
 QSize PlotSignalWidget::sizeHint() const
 {

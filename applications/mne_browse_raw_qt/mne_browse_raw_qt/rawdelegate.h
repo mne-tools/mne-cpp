@@ -61,10 +61,8 @@
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
 
-//*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
-//=============================================================================================================
 
 using namespace MNE_BROWSE_RAW_QT;
 using namespace Eigen;
@@ -96,7 +94,7 @@ public slots:
 
 private:
     /**
-     * @brief createPlotPath Creates the QPointer path for the data plot.
+     * @brief createPlotPath creates the QPointer path for the data plot.
      *
      * @param[in] index QModelIndex for accessing associated data and model object.
      * @param[in,out] path The QPointerPath to create for the data plot.

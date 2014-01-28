@@ -80,12 +80,12 @@ void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, c
     case 1: //data plot
         painter->save();
 
-        QPainterPath path(QPointF(option.rect.x(),option.rect.y()));
-
         //Get data
         QVariant variant = index.model()->data(index,Qt::DisplayRole);
-
         QList<RowVectorPair> listPairs = variant.value<QList<RowVectorPair> >();
+        const RawModel* t_rawModel = (static_cast<const RawModel*>(index.model()));
+
+        QPainterPath path(QPointF(option.rect.x()+t_rawModel->relFiffCursor()-1,option.rect.y()));
 
         //Plot grid
         painter->setRenderHint(QPainter::Antialiasing, false);
@@ -100,7 +100,7 @@ void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, c
         painter->restore();
 
         //Plot data path
-        path = QPainterPath(QPointF(option.rect.x(),option.rect.y()));
+        path = QPainterPath(QPointF(option.rect.x()+t_rawModel->relFiffCursor(),option.rect.y()));
         createPlotPath(index,path,listPairs);
 
 //        qDebug() << "option.rect.x" << option.rect.x() << "y" << option.rect.y() << "w" << option.rect.width() << "h" << option.rect.height();
@@ -116,6 +116,8 @@ void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, c
 
 }
 
+//*************************************************************************************************************
+
 QSize RawDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     QSize size;
@@ -126,12 +128,9 @@ QSize RawDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelInde
         break;
     case 1:
         QList<RowVectorPair> listPairs = index.model()->data(index).value<QList<RowVectorPair> >();
-        qint32 nsamples = 0;
+        qint32 nsamples = (static_cast<const RawModel*>(index.model()))->lastSample()-(static_cast<const RawModel*>(index.model()))->firstSample();
 
-        for(qint16 i=0; i < listPairs.size(); ++i)
-            nsamples += listPairs[i].second;
-
-        size = QSize(m_dDx*nsamples,m_dPlotHeight);
+        size = QSize(nsamples*m_dDx,m_dPlotHeight);
         break;
     }
 
@@ -170,13 +169,15 @@ void RawDelegate::createPlotPath(const QModelIndex &index, QPainterPath& path, Q
 //    qDebug("Plot-PainterPath created!");
 }
 
+//*************************************************************************************************************
+
 void RawDelegate::createGridPath(QPainterPath& path, QList<RowVectorPair>& listPairs) const
 {
     //horizontal lines
     double distance = m_dPlotHeight/m_nhlines;
 
     QPointF startpos = path.currentPosition();
-    QPointF endpoint(listPairs.size()*listPairs[0].second*m_dDx,path.currentPosition().y());
+    QPointF endpoint(path.currentPosition().x()+listPairs[0].second*listPairs.size()*m_dDx,path.currentPosition().y());
 
     for(qint8 i=0; i < m_nhlines-1; ++i) {
         endpoint.setY(endpoint.y()+distance);
