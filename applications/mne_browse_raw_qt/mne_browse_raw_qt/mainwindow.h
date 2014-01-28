@@ -38,7 +38,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-//*************************************************************************************************************
+//=============================================================================================================
 // INCLUDES
 
 //Qt
@@ -96,29 +96,61 @@ public:
 public slots:
 
 private slots:
+    /**
+     * @brief openFile opens a file dialog that picks the fiff data file to analyze and invokes the setup methods.
+     */
     void openFile();
-    void updateScrollArea();
 
 private:
+    /**
+     * @brief setupModel creates the RawModel object being part of the model/view framework of QT (derived from QAbstractTableModel)
+     */
     void setupModel();
+
+    /**
+     * @brief setupDelegate creates the RawDelegate object being part of the model/view framework of QT (derived from QAbstractItemDelegate)
+     */
     void setupDelegate();
+
+    /**
+     * @brief setupView sets up the QTableView being part of the model/view framework and connects them with previously created RawModel and RawDelegate.
+     */
     void setupView();
+
+    /**
+     * @brief setupLayout create and connects the individual elements of the layout.
+     */
     void setupLayout();
+
+    /**
+     * @brief setupViewSettings set the settings of the view such as size policies, scrolling behaviour etc.
+     */
     void setupViewSettings();
 
+    /**
+     * @brief createMenus sets up the filemenu
+     */
     void createMenus();
+
+    /**
+     * @brief createLogDockWindow creates the log window as a dock widget
+     */
     void createLogDockWindow();
+
+    /**
+     * @brief setWindow makes settings that are related to the MainWindow
+     */
     void setWindow();
 
-    QFile m_qFileRaw; /** Fiff data file to read (set for convenience */
+    QFile m_qFileRaw; /**< Fiff data file to read (set for convenience */
 
-    RawModel *m_pRawModel;
-    QTableView *m_pTableView;
-    RawDelegate *m_pRawDelegate;
+    RawModel *m_pRawModel; /**< the QAbstractTable model being part of the model/view framework of Qt */
+    QTableView *m_pTableView; /**< the QTableView being part of the model/view framework of Qt */
+    RawDelegate *m_pRawDelegate; /**< the QAbstractDelegate being part of the model/view framework of Qt */
 
     //Log
-    QDockWidget* m_pDockWidget_Log;
-    QTextBrowser* m_pTextBrowser_Log;
+    QDockWidget* m_pDockWidget_Log; /**< a dock widget being part of the log feature */
+    QTextBrowser* m_pTextBrowser_Log; /** a textbox being part of the log feature */
     LogLevel m_eLogLevelCurrent; /**< Holds the current log level.*/
 
     /**
