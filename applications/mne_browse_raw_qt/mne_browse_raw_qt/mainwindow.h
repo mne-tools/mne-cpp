@@ -10,7 +10,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Florian Schlembach, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -58,14 +58,17 @@
 #include <QTextBrowser>
 
 //MNE
+#include <fiff/fiff.h>
+#include <mne/mne.h>
+#include <fiff/fiff_io.h>
+
+//MNE_BROWSE_RAW_QT
 #include "rawmodel.h"
 #include "rawdelegate.h"
 
 #include "info.h"
+#include "types_settings.h"
 
-#include <fiff/fiff.h>
-#include <mne/mne.h>
-#include <fiff/fiff_io.h>
 
 //*************************************************************************************************************
 // namespaces
@@ -97,48 +100,48 @@ public slots:
 
 private slots:
     /**
-     * @brief openFile opens a file dialog that picks the fiff data file to analyze and invokes the setup methods.
+     * openFile opens a file dialog that picks the fiff data file to analyze and invokes the setup methods.
      */
     void openFile();
 
 private:
     /**
-     * @brief setupModel creates the RawModel object being part of the model/view framework of QT (derived from QAbstractTableModel)
+     * setupModel creates the RawModel object being part of the model/view framework of QT (derived from QAbstractTableModel)
      */
     void setupModel();
 
     /**
-     * @brief setupDelegate creates the RawDelegate object being part of the model/view framework of QT (derived from QAbstractItemDelegate)
+     * setupDelegate creates the RawDelegate object being part of the model/view framework of QT (derived from QAbstractItemDelegate)
      */
     void setupDelegate();
 
     /**
-     * @brief setupView sets up the QTableView being part of the model/view framework and connects them with previously created RawModel and RawDelegate.
+     * setupView sets up the QTableView being part of the model/view framework and connects them with previously created RawModel and RawDelegate.
      */
     void setupView();
 
     /**
-     * @brief setupLayout create and connects the individual elements of the layout.
+     * setupLayout create and connects the individual elements of the layout.
      */
     void setupLayout();
 
     /**
-     * @brief setupViewSettings set the settings of the view such as size policies, scrolling behaviour etc.
+     * setupViewSettings set the settings of the view such as size policies, scrolling behaviour etc.
      */
     void setupViewSettings();
 
     /**
-     * @brief createMenus sets up the filemenu
+     * createMenus sets up the filemenu
      */
     void createMenus();
 
     /**
-     * @brief createLogDockWindow creates the log window as a dock widget
+     * createLogDockWindow creates the log window as a dock widget
      */
     void createLogDockWindow();
 
     /**
-     * @brief setWindow makes settings that are related to the MainWindow
+     * setWindow makes settings that are related to the MainWindow
      */
     void setWindow();
 

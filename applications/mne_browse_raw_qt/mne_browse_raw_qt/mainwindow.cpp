@@ -10,7 +10,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Florian Schlembach, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -36,8 +36,9 @@
 */
 
 //=============================================================================================================
-// Includes
+// INCLUDES
 
+//MNE_BROWSE_RAW_QT
 #include "mainwindow.h"
 #include "info.h"
 
@@ -52,10 +53,8 @@
 #include <QScrollBar>
 #include <QScroller>
 
-//#include "plotsignalwidget.h"
-
 //=============================================================================================================
-// Namespaces
+// NAMESPACE
 
 using namespace MNE_BROWSE_RAW_QT;
 
@@ -109,25 +108,6 @@ void MainWindow::setupView()
 
     //TableView settings
     setupViewSettings();
-
-    //connect models dataChanged() signal to updateScrollbar() slot here
-//    connect(m_pRawModel,SIGNAL(layoutChanged()),this,SLOT(updateScrollArea()));
-
-    //*****************************
-//    //example for PlotSignalWidget
-//    QFile t_rawFile("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
-//    FiffIO m_fiffIO(t_rawFile);
-
-//    MatrixXd t_samples,t_times;
-//    m_fiffIO.m_qlistRaw[0]->read_raw_segment_times(t_samples,t_times,100,102);
-//    MatrixXd t_data;
-//    t_data.resize(2,t_samples.cols());
-//    t_data.row(0) = t_samples.row(0);
-//    t_data.row(1) = t_times;
-//    //generate PlotSignalWidget
-//    PlotSignalWidget *plotSignalWidget = new PlotSignalWidget(t_data,this);
-//    plotSignalWidget->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
-    //*****************************
 
 }
 

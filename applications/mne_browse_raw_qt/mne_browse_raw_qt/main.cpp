@@ -10,7 +10,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Florian Schlembach, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -36,7 +36,7 @@
 */
 
 //=============================================================================================================
-// Includes
+// INCLUDES
 #include <QtGui>
 #include <QApplication>
 #include <QDateTime>
@@ -44,12 +44,12 @@
 #include "mainwindow.h"
 
 //=============================================================================================================
-// Namespaces
+// NAMESPACES
 
 using namespace MNE_BROWSE_RAW_QT;
 
 //=============================================================================================================
-//Forward Declarations
+// FORWARD DECLARATIONS
 
 MainWindow* mainWindow = NULL;
 

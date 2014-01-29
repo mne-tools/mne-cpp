@@ -10,7 +10,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Florian Schlembach, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -55,7 +55,8 @@
 #include <fiff/fiff_io.h>
 
 //MNE_BROWSE_RAW_QT
-#include "types.h"
+#include "rawmodel.h"
+#include "types_settings.h"
 
 //Eigen
 #include <Eigen/Core>
@@ -94,14 +95,15 @@ public slots:
 
 private:
     /**
-     * @brief createPlotPath creates the QPointer path for the data plot.
+     * createPlotPath creates the QPointer path for the data plot.
      *
      * @param[in] index QModelIndex for accessing associated data and model object.
      * @param[in,out] path The QPointerPath to create for the data plot.
      */
     void createPlotPath(const QModelIndex &index, QPainterPath& path, QList<RowVectorPair>& listPairs) const;
+
     /**
-     * @brief createGridPath Creates the QPointer path for the grid plot.
+     * createGridPath Creates the QPointer path for the grid plot.
      *
      * @param[in,out] path The row vector of the data matrix <1 x nsamples>.
      * @param[in] data The row vector of the data matrix <1 x nsamples>.

@@ -10,7 +10,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Florian Schlembach, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -37,6 +37,26 @@
 
 #ifndef PLOTSIGNALWIDGET_H
 #define PLOTSIGNALWIDGET_H
+
+// ! INFORMATION !
+
+// use this QWidget class as followed here:
+
+//*****************************
+//    //example for PlotSignalWidget
+//    QFile t_rawFile("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+//    FiffIO m_fiffIO(t_rawFile);
+
+//    MatrixXd t_samples,t_times;
+//    m_fiffIO.m_qlistRaw[0]->read_raw_segment_times(t_samples,t_times,100,102);
+//    MatrixXd t_data;
+//    t_data.resize(2,t_samples.cols());
+//    t_data.row(0) = t_samples.row(0);
+//    t_data.row(1) = t_times;
+//    //generate PlotSignalWidget
+//    PlotSignalWidget *plotSignalWidget = new PlotSignalWidget(t_data,this);
+//    plotSignalWidget->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
+//*****************************
 
 //=============================================================================================================
 // INCLUDES
