@@ -71,7 +71,7 @@ SOURCES += main.cpp\
     rawmodel.cpp \
     mainwindow.cpp \
     rawdelegate.cpp \
-    plotsignalwidget.cpp #\
+    #plotsignalwidget.cpp #\
     #rawview.cpp
 
 HEADERS += types_settings.h\
@@ -79,7 +79,7 @@ HEADERS += types_settings.h\
     rawmodel.h\
     mainwindow.h \
     rawdelegate.h \
-    plotsignalwidget.h #\
+    #plotsignalwidget.h #\
     #rawview.h
 
 FORMS +=
