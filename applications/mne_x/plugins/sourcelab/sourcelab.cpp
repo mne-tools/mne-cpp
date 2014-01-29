@@ -78,6 +78,7 @@ SourceLab::SourceLab()
 , m_iStimChan(0)
 , m_iNumAverages(10)
 , m_bSingleTrial(false)
+, m_iDownSample(4)
 {
 
 }
@@ -136,7 +137,7 @@ void SourceLab::init()
 //    m_pRTSEOutput->data()->setSrc(m_pFwd->src); // Is done after clustering -> m_pClusteredFwd
     m_pRTSEOutput->data()->setSrc(m_pClusteredFwd->src);
 
-    m_pRTSEOutput->data()->setSamplingRate(1200);
+    m_pRTSEOutput->data()->setSamplingRate(600/m_iDownSample);
 
 
 
@@ -384,6 +385,8 @@ void SourceLab::run()
     //
     m_bProcessData = true;
 
+    qint32 skip_count = 0;
+
     while(m_bIsRunning)
     {
         qint32 nrows = m_pSourceLabBuffer->rows();
@@ -416,8 +419,10 @@ void SourceLab::run()
                 //Average Data
                 m_pRtAve->append(t_mat);
 
+
+
                 mutex.lock();
-                if(m_pMinimumNorm && m_qVecEvokedData.size() > 0)
+                if(m_pMinimumNorm && m_qVecEvokedData.size() > 0 && skip_count > 2)
                 {
                     FiffEvoked t_fiffEvoked = *m_qVecEvokedData[0].data();
 
@@ -430,13 +435,16 @@ void SourceLab::run()
     //                std::cout << "SourceEstimated:\n" << sourceEstimate.data.block(0,0,10,10) << std::endl;
 
                     //emit source estimates sample wise
-                    for(qint32 i = 0; i < sourceEstimate.data.cols(); ++i)
+                    for(qint32 i = 0; i < sourceEstimate.data.cols(); i += m_iDownSample)
                         m_pRTSEOutput->data()->setValue(sourceEstimate.data.col(i));
 
-
                     m_qVecEvokedData.pop_front();
+
+                    skip_count = 0;
                 }
                 mutex.unlock();
+
+                ++skip_count;
             }
 
 

@@ -354,6 +354,7 @@ bool MneRtClient::stop()
     QThread::wait();
 
     //Clear Buffers
+    m_pRawMatrixBuffer_In->clear();
 
     return true;
 }
