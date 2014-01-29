@@ -10,7 +10,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Florian Schlembach, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -40,16 +40,14 @@
 // INCLUDES
 
 #include "rawdelegate.h"
-#include "rawmodel.h"
+#include "types_settings.h"
 
+//Qt
 #include <QPointF>
 #include <QRect>
 
-//#include <QDebug>
-
 //=============================================================================================================
-// USED NAMESPACES
-
+// NAMESPACES
 
 using namespace MNE_BROWSE_RAW_QT;
 using namespace Eigen;
@@ -103,14 +101,13 @@ void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, c
         path = QPainterPath(QPointF(option.rect.x()+t_rawModel->relFiffCursor(),option.rect.y()));
         createPlotPath(index,path,listPairs);
 
-//        qDebug() << "option.rect.x" << option.rect.x() << "y" << option.rect.y() << "w" << option.rect.width() << "h" << option.rect.height();
-
         painter->translate(0,m_dPlotHeight/2);
 
         painter->setRenderHint(QPainter::Antialiasing, true);
         painter->drawPath(path);
 
         painter->restore();
+
         break;
     }
 
@@ -141,8 +138,35 @@ QSize RawDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelInde
 
 void RawDelegate::createPlotPath(const QModelIndex &index, QPainterPath& path, QList<RowVectorPair>& listPairs) const
 {
+    //get maximum range of respective channel type (range value in FiffChInfo does not seem to contain a reasonable value)
+    qint32 kind = (static_cast<const RawModel*>(index.model()))->m_chinfolist[index.row()].kind;
+    double dMaxValue = 1e-9;
+
+    switch(kind) {
+    case FIFFV_MEG_CH: {
+        qint32 unit = (static_cast<const RawModel*>(index.model()))->m_pfiffIO->m_qlistRaw[0]->info.chs[index.row()].unit;
+        if(unit == FIFF_UNIT_T_M) {
+            dMaxValue = MAX_MEG_UNIT_T_M;
+        }
+        else if(unit == FIFF_UNIT_T)
+            dMaxValue = MAX_MEG_UNIT_T;
+        break;
+    }
+    case FIFFV_EEG_CH: {
+        dMaxValue = MAX_EEG;
+        break;
+    }
+    case FIFFV_EOG_CH: {
+        dMaxValue = MAX_EOG;
+        break;
+    }
+    case FIFFV_STIM_CH: {
+        dMaxValue = MAX_STIM;
+        break;
+    }
+    }
+
     double dValue;
-    double dMaxValue = 1e-10;
 //    double dMaxValue = (static_cast<const RawModel*>(index.model()))->maxDataValue(index.row());
     double dScaleY = m_dPlotHeight/(2*dMaxValue);
 

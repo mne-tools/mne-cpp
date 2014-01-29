@@ -10,7 +10,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Florian Schlembach, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -35,18 +35,18 @@
 *
 */
 
-#ifndef TYPES_H
-#define TYPES_H
+#ifndef TYPES_SETTINGS_H
+#define TYPES_SETTINGS_H
 
-//*************************************************************************************************************
-//Includes
+//=============================================================================================================
+// INCLUDES
 
 //Eigen
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
 
 //*************************************************************************************************************
-//Namespaces
+// NAMESPACES
 
 using namespace Eigen;
 
@@ -57,7 +57,16 @@ namespace MNE_BROWSE_RAW_QT {
 typedef Matrix<double,Dynamic,Dynamic,RowMajor> MatrixXdR;
 typedef QPair<const double*,qint32> RowVectorPair;
 
+//maximum values for different types of channels according to FiffChInfo
+//#ifndef MAX_MEG_UNIT_T_M
+    #define MAX_MEG_UNIT_T_M 1e-10; // kind=FIFFV_MEG_CH && unit=FIFF_UNIT_T_M
+    #define MAX_MEG_UNIT_T 1e-11; // kind=FIFFV_MEG_CH && unit=FIFF_UNIT_T
+    #define MAX_EEG 1e-4; // kind=FIFFV_EEG_CH
+    #define MAX_EOG 1e-3; // kind=FIFFV_EOG_CH
+    #define MAX_STIM 5; // kind=FIFFV_STIM_CH
+//#endif //MAX_MEG_UNIT_T_M
+
 }
 
 
-#endif // TYPES_H
+#endif // TYPES_SETTINGS_H

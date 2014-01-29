@@ -10,7 +10,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Florian Schlembach, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -43,6 +43,7 @@ RawModel::RawModel(QObject *parent)
 : QAbstractTableModel(parent)
 , m_iWindowSize(6000) //samples
 , n_reloadPos(2000) //samples
+, n_maxWindows(4)
 , m_bStartReached(false)
 , m_bEndReached(false)
 {
@@ -54,6 +55,7 @@ RawModel::RawModel(QIODevice &p_IODevice, QObject *parent)
 : QAbstractTableModel(parent)
 , m_iWindowSize(6000) //samples
 , n_reloadPos(2000) //samples
+, n_maxWindows(4)
 , m_bStartReached(false)
 , m_bEndReached(false)
 {
@@ -85,6 +87,15 @@ QVariant RawModel::data(const QModelIndex &index, int role) const
             return QVariant(m_chinfolist[index.row()].ch_name);
         if(index.column()==1) {
             QVariant v;
+
+            //for debugging purposes
+//            for(qint32 i=0; i < m_chinfolist.size(); ++i) {
+//                if(m_chinfolist[i].ch_name == "EEG 004") {
+//                    double max = m_data[0].row(i).maxCoeff();
+//                    double min = m_data[0].row(i).minCoeff();
+//                    RowVectorXd mat = m_data[0].row(i);
+//                }
+//            }
 
             //form RowVectorPair of pointer and length of RowVector
             QPair<const double*,qint32> rowVectorPair;
@@ -155,7 +166,7 @@ bool RawModel::loadFiffData(QIODevice& p_IODevice)
     m_pfiffIO = QSharedPointer<FiffIO>(new FiffIO(p_IODevice));
     if(!m_pfiffIO->m_qlistRaw.empty()) {
         m_iAbsFiffCursor = m_pfiffIO->m_qlistRaw[0]->first_samp; //Set cursor somewhere into fiff file [in samples]
-        if(!m_pfiffIO->m_qlistRaw[0]->read_raw_segment(t_data, t_times, m_iAbsFiffCursor, m_iAbsFiffCursor+m_iWindowSize))
+        if(!m_pfiffIO->m_qlistRaw[0]->read_raw_segment(t_data, t_times, m_iAbsFiffCursor, m_iAbsFiffCursor+m_iWindowSize-1))
             return false;
     }
     else {
@@ -222,6 +233,7 @@ void RawModel::reloadFiffData(bool before) {
         }
     }
 
+    //read data with respect to set start and end point
     if(!m_pfiffIO->m_qlistRaw[0]->read_raw_segment(t_reloaddata, t_reloadtimes, start, end))
         printf("RawModel: Error when reading raw data!");
 
@@ -229,11 +241,24 @@ void RawModel::reloadFiffData(bool before) {
     if(before) {
         m_data.prepend(t_reloaddata);
         m_times.prepend(t_reloadtimes);
+
+        //maintain at maximum n_maxWindows data windows and drop the rest
+        if(m_data.size() > n_maxWindows)
+            m_data.removeLast();
     }
     else {
         m_data.append(t_reloaddata);
         m_times.append(t_reloadtimes);
+
+        //maintain at maximum n_maxWindows data windows and drop the rest
+        if(m_data.size() > n_maxWindows) {
+            m_data.removeFirst();
+            m_iAbsFiffCursor += m_iWindowSize;
+        }
     }
+
+
+
 
     qDebug() << "RawModel: Fiff data REloaded from " << start << "to" << end;
 

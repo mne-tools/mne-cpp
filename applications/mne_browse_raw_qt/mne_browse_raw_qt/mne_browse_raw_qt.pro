@@ -74,7 +74,7 @@ SOURCES += main.cpp\
     plotsignalwidget.cpp #\
     #rawview.cpp
 
-HEADERS  += types.h\
+HEADERS += types_settings.h\
     info.h\
     rawmodel.h\
     mainwindow.h \

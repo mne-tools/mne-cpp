@@ -10,7 +10,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Florian Schlembach, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -45,17 +45,17 @@
 #include <QDebug>
 #include <QAbstractTableModel>
 
+//Eigen
+#include <Eigen/Core>
+#include <Eigen/SparseCore>
+
 //MNE
 #include <fiff/fiff.h>
 #include <mne/mne.h>
 #include <fiff/fiff_io.h>
 
-//Eigen
-#include <Eigen/Core>
-#include <Eigen/SparseCore>
-
 //MNE_BROWSE_RAW_QT
-#include "types.h"
+#include "types_settings.h"
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -85,24 +85,33 @@ public:
     bool loadFiffData(QIODevice &p_IODevice);
 
     /**
-     * @brief resetPosition reset the position of the current m_iAbsFiffCursor if a ScrollBar position is selected, whose data is not yet loaded.
+     * resetPosition reset the position of the current m_iAbsFiffCursor if a ScrollBar position is selected, whose data is not yet loaded.
+     *
      * @param position where the new data block of the fiff file should be loaded.
      */
     void resetPosition(qint32 position);
 
     /**
-     * @brief clearModel clears all model's members
+     * clearModel clears all model's members
      */
     void clearModel();
 
+    //Fiff data structure
+    QList<MatrixXdR> m_data; /**< List that holds the fiff matrix data <n_channels x n_samples> */
+    QList<MatrixXdR> m_times; /**< List that holds the time axis [in secs] */
+
+    QList<FiffChInfo> m_chinfolist; /**< List of FiffChInfo objects that holds the corresponding channels information */
+
     //Model/Fiff settings
-    qint32 m_iWindowSize; /**< Length of window to load [in samples] */
     qint32 m_iAbsFiffCursor; /**< Cursor that points to the current position in the fiff data file [in samples] */
     qint32 m_iCurAbsScrollPos; /**< the current (absolute) ScrollPosition in the fiff data file */
+
+    qint32 m_iWindowSize; /**< Length of window to load [in samples] */
     qint32 n_reloadPos; /**< Distance that the current window needs to be off the ends of m_data [in samples] */
+    qint8 n_maxWindows; /**< number of windows that are at maximum remained in m_data */
 
     /**
-     * @brief getMaxDataValue obtains the maximum value for the underlying channel
+     * getMaxDataValue obtains the maximum value for the underlying channel
      *
      * @param chan number of channel in m_chinfolist
      * @return max data value of m_data for scaling purposes.
@@ -112,12 +121,7 @@ public:
     QSharedPointer<FiffIO> m_pfiffIO; /**< FiffIO objects, which holds all the information of the fiff data (excluding the samples!) */
 
 private:
-    //Fiff
-    QList<MatrixXdR> m_data; /**< List that holds the fiff matrix data <n_channels x n_samples> */
-    QList<MatrixXdR> m_times; /**< List that holds the time axis [in secs] */
-
-    QList<FiffChInfo> m_chinfolist; /**< List of FiffChInfo objects that holds the corresponding channels information */
-
+    //View control
     bool m_bStartReached; /** signals, whether the start of the fiff data file is reached */
     bool m_bEndReached; /** signals, whether the end of the fiff data file is reached */
 
@@ -128,14 +132,20 @@ private:
     */
     void loadChInfos();
 
-
+    /**
+     * reloadFiffData
+     *
+     * @param before
+     */
     void reloadFiffData(bool before);
+
 
 signals:
 
 private slots:
     /**
-     * @brief reloadData checks, whether the actual position of the QScrollBar demands for a fiff data reload (depending on m_reloadPos)
+     * reloadData checks, whether the actual position of the QScrollBar demands for a fiff data reload (depending on m_reloadPos)
+     *
      * @param value the position of QScrollBar
      */
     void reloadData(int value);
@@ -143,7 +153,8 @@ private slots:
 //Inline
 public:
     /**
-     * @brief sizeOfFiffData
+     * sizeOfFiffData
+     *
      * @return the size of the total data contained in the loaded Fiff file
      */
     inline qint32 sizeOfFiffData() {
@@ -153,7 +164,8 @@ public:
     }
 
     /**
-     * @brief firstSample
+     * firstSample
+     *
      * @return the first sample of the loaded Fiff file
      */
     inline qint32 firstSample() const {
@@ -163,7 +175,8 @@ public:
     }
 
     /**
-     * @brief lastSample
+     * lastSample
+     *
      * @return the last sample of the loaded Fiff file
      */
     inline qint32 lastSample() const {
@@ -173,7 +186,8 @@ public:
     }
 
     /**
-     * @brief sizeOfPreloadedData
+     * sizeOfPreloadedData
+     *
      * @return size of loaded m_data
      */
     inline qint32 sizeOfPreloadedData() const {
@@ -184,7 +198,8 @@ public:
     }
 
     /**
-     * @brief relFiffCursor
+     * relFiffCursor
+     *
      * @return the relative cursor in the fiff file
      */
     inline qint32 relFiffCursor() const {
@@ -192,7 +207,8 @@ public:
     }
 
     /**
-     * @brief absFiffCursor (introduced for consistency reasons)
+     * absFiffCursor (introduced for consistency reasons)
+     *
      * @return the absolute cursor in the fiff file
      */
     inline qint32 absFiffCursor() const {
