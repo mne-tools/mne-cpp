@@ -77,6 +77,7 @@ TriggerControl::TriggerControl()
 , m_pSerialPort(new SerialPort) // initialize a new serial port
 , m_iNumChs(0)
 , m_bIsRunning(false)
+, m_pDataSingleChannel(new dBuffer(1024))
 {
     connect(this, &TriggerControl::sendByte, this, &TriggerControl::sendByteTo);
 }
@@ -86,7 +87,8 @@ TriggerControl::TriggerControl()
 
 TriggerControl::~TriggerControl()
 {
-    stop();
+    if(this->isRunning())
+        stop();
 }
 
 
@@ -106,20 +108,29 @@ QSharedPointer<IPlugin> TriggerControl::clone() const
 
 void TriggerControl::init()
 {
+    // Beginn Zeitmessung
     // Input
     m_pRTMSAInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "TriggerControlInI", "TriggerControl input data I");
     connect(m_pRTMSAInput.data(), &PluginInputConnector::notify, this, &TriggerControl::update, Qt::DirectConnection);
     m_inputConnectors.append(m_pRTMSAInput);
+    // Ende Zeitmessung*/
 
-//    // Output
-//    m_pTriggerOutput = PluginOutputData<NewRealTimeSampleArray>::create(this, "DummyOut", "Dummy output data");
-//    m_outputConnectors.append(m_pTriggerOutput);
 
-//    m_pTriggerOutput->data()->setName("Dummy Output");
-//    m_pTriggerOutput->data()->setUnit("");
-//    m_pTriggerOutput->data()->setMinValue(0);
-//    m_pTriggerOutput->data()->setMaxValue(2);
-//    m_pTriggerOutput->data()->setSamplingRate(256.0/1.0);
+
+    m_pRTSAInput = PluginInputData<NewRealTimeSampleArray>::create(this, "TriggerControlInII", "TriggerControl input data II");
+    connect(m_pRTSAInput.data(), &PluginInputConnector::notify, this, &TriggerControl::updateSingleChannel, Qt::DirectConnection);
+    m_inputConnectors.append(m_pRTSAInput);
+
+
+    // Output
+    m_pTriggerOutput = PluginOutputData<NewRealTimeSampleArray>::create(this, "DummyOut", "Dummy output data");
+    m_outputConnectors.append(m_pTriggerOutput);
+
+    m_pTriggerOutput->data()->setName("Dummy Output");
+    m_pTriggerOutput->data()->setUnit("");
+    m_pTriggerOutput->data()->setMinValue(-200);
+    m_pTriggerOutput->data()->setMaxValue(360);
+    m_pTriggerOutput->data()->setSamplingRate(256.0/1.0);
 
 }
 
@@ -128,28 +139,43 @@ void TriggerControl::init()
 
 bool TriggerControl::start()
 {
-    QThread::start();
     m_bIsRunning = true;
+    QThread::start();
 
-    m_qTime.start();
+//    // ////////////////////////////
+
+//    if(!m_pSerialPort->open())   // open Serial Port
+//        std::cout << "Not able to open port - test" << std::endl;
+
+//    // ////////////////////////////
+
+
+
+
+ // Beginn Zeitmessung
+
+
+
 
     if(m_pSerialPort->open())   // open Serial Port
     {
-      //  QByteArray t_data;
-      //  t_data.append(0x01);
+        m_qTime.start();
+        QByteArray t_data;
+        m_pSerialPort->m_digchannel.replace(9,1); // select 1st digital channel
+        //t_data.append(0x01);
+        m_pSerialPort->encodedig();             // encode signal to m_data
 //        t_data[0] = t_data[0]|0x01;
-        m_pSerialPort->encodeana();
         m_pSerialPort->sendData(m_pSerialPort->m_data);
 
-     //   m_pTriggerControl->m_pSerialPort->sendData(m_pTriggerControl->m_pSerialPort->m_data);
-     //   m_pSerialPort->sendData(t_data);
+        m_qTime.start();
+        //m_pSerialPort->sendData(t_data);
         std::cout << "data sent" << std::endl;
     }
     else
     {
         std::cout << "Sending not possible, please check settings" << std::endl;
     }
-
+ //Ende Zeitmessung
 
     return true;
 }
@@ -163,16 +189,26 @@ bool TriggerControl::stop()
 
     m_bIsRunning = false;
 
-//    // Stop threads
-//    QThread::terminate();
-//    QThread::wait();
+    // Stop threads
+    QThread::terminate();
+    QThread::wait();
+
+    m_pDataSingleChannel->clear();
 
 
+
+ //Beginn Zeitmessung
     double sum = 0;
-    for(int i=4; i<m_vTimes.size(); i++)
+    for(int i=0; i<m_vTimes.size(); i++)
         sum += m_vTimes[i];
 
-    QFile file(qApp->applicationDirPath()+"/mne_x_plugins/resources/triggercontrol/t_measurements_2048.txt");
+    QFile file(qApp->applicationDirPath()+"/mne_x_plugins/resources/triggercontrol/t_meas.txt");
+    for(int i=0; i<m_vTimes.size(); i++)
+        sum += m_vTimes[i];
+
+    std::cout << "Average time: " << sum/m_vTimes.size() << std::endl;
+    std::cout << "Size m_vTimes: " << m_vTimes.size() << std::endl;
+
     file.open(QIODevice::WriteOnly | QIODevice::Text);
     QTextStream out(&file);
 
@@ -182,12 +218,10 @@ bool TriggerControl::stop()
     // optional, as QFile destructor will already do it:
     file.close();
 
-    std::cout << "Average time: " << sum/m_vTimes.size() << std::endl;
-    std::cout << "Size m_vTimes: " << m_vTimes.size() << std::endl;
-
-
     m_pData.clear();
     m_vTimes.clear();
+// Ende Zeitmessung
+
 
     return true;
 }
@@ -222,8 +256,25 @@ QWidget* TriggerControl::setupWidget()
 
 //*************************************************************************************************************
 
+void TriggerControl::updateSingleChannel(XMEASLIB::NewMeasurement::SPtr pMeasurement)
+{
+    QSharedPointer<NewRealTimeSampleArray> pRTSA = pMeasurement.dynamicCast<NewRealTimeSampleArray>();
+    if(pRTSA)
+    {
+        m_qMutex.lock();
+        qint32 t_iSize = pRTSA->getArraySize();
+        for(qint32 i = 0; i < t_iSize; ++i)
+            m_pDataSingleChannel->push(pRTSA->getSampleArray()[i]);//Append sample wise
+        m_qMutex.unlock();
+    }
+}
+
+
+//*************************************************************************************************************
+
 void TriggerControl::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 {
+    ///* Beginn Zeitmessung
     QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<NewRealTimeMultiSampleArray>();
     if(pRTMSA)
     {
@@ -234,16 +285,21 @@ void TriggerControl::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
             m_pData.append(pRTMSA->getMultiSampleArray()[i]);//Append sample wise
         m_qMutex.unlock();
     }
+    // ENDE Zeitmessung */
 }
+
 
 
 
 //*************************************************************************************************************
 
+
 void TriggerControl::run()
 {
+
+ //Beginn Zeitmessung
+
     m_pData.clear();
-    //std::cout << "m_pData.size() " << m_pData.size() << std::endl;
 
 
     bool t_bFound = false;
@@ -260,7 +316,7 @@ void TriggerControl::run()
             m_pData.clear();
             ++count;
 
-            if(count > 20)
+            if(count > 2)
             {
                 t_bFound = false;
                 count = 0;
@@ -275,7 +331,7 @@ void TriggerControl::run()
         {
             if(!t_bFound && m_pData.first()[m_iNumChs-2] > 1000)
             {
-                //std::cout << "Time elpased: " << m_qTime.elapsed() << std::endl;
+                //std::cout << "Time elapsed: " << m_qTime.elapsed() << std::endl;
 
                 m_vTimes.push_back(m_qTime.elapsed());
                 emit sendByte(0);
@@ -287,23 +343,35 @@ void TriggerControl::run()
         }
         m_qMutex.unlock();
     }
+// Ende Zeitmessung
 
-/*
-    while(m_bIsRunning)
-    {
-        m_qMutex.lock();
+//    double v_old = 0;
 
-        while(m_pData.size() > 0)
-        {
-            if(m_pData.first()[m_iNumChs-2] > 9999)
-                qDebug() << "Time elpased: " << m_qTime.elapsed();
+//    while (true)
+//    {
+//        /* Dispatch the inputs */
+//        double v = m_pDataSingleChannel->pop();
 
-            m_pData.pop_front();
-        }
+//        double diff = v_old - v;
 
-        m_qMutex.unlock();
-    }*/
+//        m_pTriggerOutput->data()->setValue(diff);
 
+//        if(diff > 20)
+//        {
+//            //ToDo: Implement your algorithm here
+
+//        }
+
+
+
+//        v_old  = v;
+
+
+
+
+//    }
+
+//    // ////////////////////////////
 //    int count = 0;
 //    double v = 0;
 
@@ -312,27 +380,52 @@ void TriggerControl::run()
 //        //ToDo: Implement your algorithm here
 
 //        if( (count % 5 == 0) )
+//        {
 //            v = count % 2;
+//            //m_pTriggerOutput->data()->setValue(v);
 
-//        m_pTriggerOutput->data()->setValue(v);
+//            if ( v == 1)
+//            {
+//                emit sendByte(1);
+// //                m_pSerialPort->m_digchannel.replace(0,1); // select 1st digital channel
+// //                m_pSerialPort->encodedig();             // encode signal to m_data
+// //                m_pSerialPort->sendData(m_pSerialPort->m_data);
 
-//        msleep((1.0/256.0)*1000.0);
+//            }
+//            else if (v == 0)
+//            {
+//                emit sendByte(0);
+// //                m_pSerialPort->m_digchannel.replace(0,0); // select 1st digital channel
+// //                m_pSerialPort->encodedig();             // encode signal to m_data
+// //                m_pSerialPort->sendData(m_pSerialPort->m_data);
+//            }
+
+//        }
+
+//        msleep((1.0/256.0)*10000.0);
 //        ++count;
 //    }
+
+
 }
+
 
 
 //*************************************************************************************************************
 
 void TriggerControl::sendByteTo(int value)
 {
-    QByteArray t_data;
-    t_data.resize(3);
-    t_data.clear();
-    t_data.append(value);
+    if (value == 0)
+    {
+        m_pSerialPort->m_digchannel.replace(9,0); // select 1st digital channel
+        m_pSerialPort->encodedig();             // encode signal to m_data
+        m_pSerialPort->sendData(m_pSerialPort->m_data);
+    }
+    else if (value == 1)
+    {
+        m_pSerialPort->m_digchannel.replace(9,1); // select 1st digital channel
+        m_pSerialPort->encodedig();             // encode signal to m_data
+        m_pSerialPort->sendData(m_pSerialPort->m_data);
+    }
 
-    //std::cout << t_data.size() << std::endl;
-
-    m_pSerialPort->sendData(t_data);
 }
-

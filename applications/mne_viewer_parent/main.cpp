@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
-* @file     triggercontrolsetupwidget.h
-* @author   Tim Kunze <tim.kunze@tu-ilmenau.de>;
-*           Luise Lang <luise.lang@tu-ilmenau.de>;
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
+* @file     main.cpp
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* 			Jens Haueisen <jens.haueisen@tu-ilmenau.de>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     November, 2013
+* @date     July, 2012
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Tim Kunze, Luise Lang and Christoph Dinh. All rights reserved.
+* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,12 +30,9 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the TriggerControlSetupWidget class.
+* @brief    mne_viewer used as sub_process
 *
 */
-
-#ifndef TRIGGERCONTROLSETUPWIDGET_H
-#define TRIGGERCONTROLSETUPWIDGET_H
 
 
 //*************************************************************************************************************
@@ -43,7 +40,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_triggercontrolsetup.h"
+#include <iostream>
 
 
 //*************************************************************************************************************
@@ -51,7 +48,9 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
+#include <QtCore/QCoreApplication>
+#include <QProcess>
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -62,84 +61,41 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE TriggerControlPlugin
+// MAIN
 //=============================================================================================================
-
-namespace TriggerControlPlugin
-{
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-class TriggerControl;
-class SerialPort;
-
 
 //=============================================================================================================
 /**
-* DECLARE CLASS TriggerControlSetupWidget
+* The function main marks the entry point of the program.
+* By default, main has the storage class extern.
 *
-* @brief The TriggerControlSetupWidget class provides the TriggerControlToolbox configuration window.
+* @param [in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
+* @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
+* @return the value that was set to exit() (which is 0 if exit() is called via quit()).
 */
-class TriggerControlSetupWidget : public QWidget
+int main(int argc, char *argv[])
 {
-    Q_OBJECT
+    QCoreApplication a(argc, argv);
 
-    friend class SettingsWidget;
-public:
-    //=========================================================================================================
-    /**
-    * Constructs a TriggerControlSetupWidget which is a child of parent.
-    *
-    * @param [in] toolbox a pointer to the corresponding TriggerControlToolbox.
-    * @param [in] parent pointer to parent widget; If parent is 0, the new TriggerControlSetupWidget becomes a window. If parent is another widget, TriggerControlSetupWidget becomes a child window inside parent. TriggerControlSetupWidget is deleted when its parent is deleted.
-    */
-    TriggerControlSetupWidget(TriggerControl* toolbox, QWidget *parent = 0);
+    std::cout << "Parent Process" << std::endl;
 
-    //=========================================================================================================
-    /**
-    * Destroys the DummySetupWidget.
-    * All DummySetupWidget's children are deleted first. The application exits if DummySetupWidget is the main widget.
-    */
-    ~TriggerControlSetupWidget();
+    QStringList arguments;
+//    arguments << "-style" << "fusion";
 
+    QProcess myProcess;
+    myProcess.start("mne_viewer");
 
-private slots:
-    void on_m_qPushButton_Connect_released();
+    QByteArray ba;
 
-    void on_m_qPushButton_Disconnect_released();
+    while(myProcess.waitForReadyRead(-1))
+    {
+        qDebug() << myProcess.readAllStandardOutput();
+    }
 
-    void on_m_qPushButton_Send_released();
+    return a.exec();
+}
 
-
-    void on_m_qPushButton_Sendanalog_released();
-
-    void on_m_qPushButton_RetrieveInfo_released();
-
-private:
-    //=========================================================================================================
-    /**
-    * Shows the About Dialog
-    *
-    */
-    void showAboutDialog();
-
-
-    //=========================================================================================================
-    /**
-    * Shows the settings widget
-    */
-    void showSettings();
-
-
-    TriggerControl* m_pTriggerControl;
-
-    Ui::TriggerControlSetupWidgetClass ui;       /**< Holds the user interface for the TriggerControlSetupWidget.*/
-};
-
-} // NAMESPACE
-
-#endif // TRIGGERCONTROLSETUPWIDGET_H
+//*************************************************************************************************************
+//=============================================================================================================
+// STATIC DEFINITIONS
+//=============================================================================================================
