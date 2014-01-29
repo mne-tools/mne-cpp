@@ -1,10 +1,11 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     applications.pro
+# @file     mne_viewer_process.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+#           Jens Haueisen <jens.haueisen@tu-ilmenau.de>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
-# @date     May, 2013
+# @date     July, 2012
 #
 # @section  LICENSE
 #
@@ -18,7 +19,7 @@
 #       the following disclaimer in the documentation and/or other materials provided with the distribution.
 #     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
 #       to endorse or promote products derived from this software without specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 # WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 # PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
@@ -29,24 +30,37 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds all applications.
+# @brief    This project file generates the makefile to build the core app.
 #
 #--------------------------------------------------------------------------------------------------------------
 
-include(../mne-cpp.pri)
+include(../../mne-cpp.pri)
 
-TEMPLATE = subdirs
+TEMPLATE = app
 
-SUBDIRS += \
-    mne_rt_server
+CONFIG   += console
+CONFIG   -= app_bundle
 
-contains(MNECPP_CONFIG, isGui) {
-    SUBDIRS += \
-        mne_x_libs \
-        mne_x \
-        mne_browse_raw_qt \
-        mne_viewer \
-        mne_viewer_parent
+TARGET = mne_viewer_parent
+
+CONFIG(debug, debug|release) {
+    TARGET = $$join(TARGET,,,d)
 }
 
-CONFIG += ordered
+LIBS += -L$${MNE_LIBRARY_DIR}
+CONFIG(debug, debug|release) {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd
+}
+else {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Generics
+}
+
+DESTDIR = $${MNE_BINARY_DIR}
+
+SOURCES += \
+    main.cpp
+
+HEADERS += \
+
+INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
+INCLUDEPATH += $${MNE_INCLUDE_DIR}

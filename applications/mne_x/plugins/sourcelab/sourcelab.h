@@ -218,6 +218,7 @@ private:
     qint32 m_iStimChan;                             /**< Stimulus Channel to use for source estimation */
 
     MinimumNorm::SPtr           m_pMinimumNorm;     /**< Minimum Norm Estimation. */
+    qint32                      m_iDownSample;      /**< Sampling rate */
 
 //    RealTimeSourceEstimate::SPtr m_pRTSE_SourceLab; /**< Source Estimate output channel. */
 };
