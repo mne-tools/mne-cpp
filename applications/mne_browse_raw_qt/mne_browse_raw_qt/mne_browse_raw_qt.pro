@@ -1,11 +1,12 @@
 #--------------------------------------------------------------------------------------------------------------
 #
 # @file     applications.pro
-# @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>
+# @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
 #           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-#           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+#           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+#           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
 # @version  1.0
-# @date     December, 2013
+# @date     January, 2014
 #
 # @section  LICENSE
 #
@@ -69,12 +70,17 @@ DESTDIR = $${MNE_BINARY_DIR}
 SOURCES += main.cpp\
     rawmodel.cpp \
     mainwindow.cpp \
-    rawdelegate.cpp
+    rawdelegate.cpp \
+    plotsignalwidget.cpp #\
+    #rawview.cpp
 
-HEADERS  += \
-    rawmodel.h \
+HEADERS += types_settings.h\
+    info.h\
+    rawmodel.h\
     mainwindow.h \
-    rawdelegate.h
+    rawdelegate.h \
+    plotsignalwidget.h #\
+    #rawview.h
 
 FORMS +=
 

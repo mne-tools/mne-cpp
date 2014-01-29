@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     main.cpp
+* @file     types.h
 * @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
@@ -31,71 +31,42 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implements the mne_browse_raw_qt GUI application.
+* @brief    Contains general application specific types
 *
 */
 
+#ifndef TYPES_SETTINGS_H
+#define TYPES_SETTINGS_H
+
 //=============================================================================================================
 // INCLUDES
-#include <QtGui>
-#include <QApplication>
-#include <QDateTime>
 
-#include "mainwindow.h"
+//Eigen
+#include <Eigen/Core>
+#include <Eigen/SparseCore>
 
-//=============================================================================================================
+//*************************************************************************************************************
 // NAMESPACES
 
-using namespace MNE_BROWSE_RAW_QT;
-
-//=============================================================================================================
-// FORWARD DECLARATIONS
-
-MainWindow* mainWindow = NULL;
+using namespace Eigen;
 
 //*************************************************************************************************************
 
-void customMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
-{
-    Q_UNUSED(context);
+namespace MNE_BROWSE_RAW_QT {
 
-    QString dt = QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm:ss");
-    QString txt = QString("[%1] ").arg(dt);
+typedef Matrix<double,Dynamic,Dynamic,RowMajor> MatrixXdR;
+typedef QPair<const double*,qint32> RowVectorPair;
 
-    if(mainWindow) {
-        switch (type) {
-        case QtDebugMsg:
-           txt += QString("{Debug} \t\t %1").arg(msg);
-           mainWindow->writeToLog(txt,_LogKndMessage, _LogLvMax);
-           break;
-        case QtWarningMsg:
-           txt += QString("{Warning} \t %1").arg(msg);
-           mainWindow->writeToLog(txt,_LogKndWarning, _LogLvNormal);
-           break;
-        case QtCriticalMsg:
-           txt += QString("{Critical} \t %1").arg(msg);
-           mainWindow->writeToLog(txt,_LogKndError, _LogLvMin);
-           break;
-        case QtFatalMsg:
-           txt += QString("{Fatal} \t\t %1").arg(msg);
-           mainWindow->writeToLog(txt,_LogKndError, _LogLvMin);
-           abort();
-           break;
-        }
-    }
+//maximum values for different types of channels according to FiffChInfo
+//#ifndef MAX_MEG_UNIT_T_M
+    #define MAX_MEG_UNIT_T_M 1e-10; // kind=FIFFV_MEG_CH && unit=FIFF_UNIT_T_M
+    #define MAX_MEG_UNIT_T 1e-11; // kind=FIFFV_MEG_CH && unit=FIFF_UNIT_T
+    #define MAX_EEG 1e-4; // kind=FIFFV_EEG_CH
+    #define MAX_EOG 1e-3; // kind=FIFFV_EOG_CH
+    #define MAX_STIM 5; // kind=FIFFV_STIM_CH
+//#endif //MAX_MEG_UNIT_T_M
+
 }
 
 
-//=============================================================================================================
-// MAIN
-
-int main(int argc, char *argv[])
-{
-    qInstallMessageHandler(customMessageHandler);
-    QApplication a(argc, argv);
-
-    mainWindow = new MainWindow();
-    mainWindow->show();
-
-    return a.exec();
-}
+#endif // TYPES_SETTINGS_H

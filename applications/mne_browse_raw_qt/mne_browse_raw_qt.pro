@@ -1,9 +1,10 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     mne_x.pro
-# @author   
-#Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-#           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+# @file     mne_browse_raw_qt.pro
+# @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
+#           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+#           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+#           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
 # @version  1.0
 # @date     February, 2013
 #

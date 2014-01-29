@@ -3,13 +3,14 @@
 * @file     mainwindow.h
 * @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+*           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
 * @version  1.0
 * @date     January, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Florian Schlembach, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -34,55 +35,135 @@
 *
 */
 
-#ifndef MNE_MAINWINDOW_H
-#define MNE_MAINWINDOW_H
+#ifndef MAINWINDOW_H
+#define MAINWINDOW_H
 
-//*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
-//=============================================================================================================
 
 //Qt
+#include <QApplication>
+#include <QDebug>
 #include <QMainWindow>
-#include <QTableView>
-#include <QHeaderView>
 #include <QFileDialog>
 #include <QFile>
-#include <QApplication>
 #include <QMenu>
 #include <QMenuBar>
 #include <QAction>
 
-//own
+#include <QTableView>
+#include <QHeaderView>
+
+#include <QDockWidget>
+#include <QTextBrowser>
+
+//MNE
+#include <fiff/fiff.h>
+#include <mne/mne.h>
+#include <fiff/fiff_io.h>
+
+//MNE_BROWSE_RAW_QT
 #include "rawmodel.h"
+#include "rawdelegate.h"
+
+#include "info.h"
+#include "types_settings.h"
+
 
 //*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE
-//=============================================================================================================
+// namespaces
 
+using namespace Eigen;
 
-//=============================================================================================================
+//*************************************************************************************************************
+
+namespace MNE_BROWSE_RAW_QT {
 
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    MainWindow(QWidget *parent = 0);
     ~MainWindow();
+
+    /**
+    * Writes to MainWindow log.
+    *
+    * @param [in] logMsg message
+    * @param [in] lgknd message kind; Message is formated depending on its kind.
+    * @param [in] lglvl message level; Message is displayed depending on its level.
+    */
+    void writeToLog(const QString& logMsg, LogKind lgknd, LogLevel lglvl);
 
 public slots:
 
 private slots:
+    /**
+     * openFile opens a file dialog that picks the fiff data file to analyze and invokes the setup methods.
+     */
     void openFile();
 
 private:
+    /**
+     * setupModel creates the RawModel object being part of the model/view framework of QT (derived from QAbstractTableModel)
+     */
     void setupModel();
+
+    /**
+     * setupDelegate creates the RawDelegate object being part of the model/view framework of QT (derived from QAbstractItemDelegate)
+     */
+    void setupDelegate();
+
+    /**
+     * setupView sets up the QTableView being part of the model/view framework and connects them with previously created RawModel and RawDelegate.
+     */
     void setupView();
 
-    QAbstractTableModel *m_pRawModel;
-    QTableView *m_pTableView;
+    /**
+     * setupLayout create and connects the individual elements of the layout.
+     */
+    void setupLayout();
+
+    /**
+     * setupViewSettings set the settings of the view such as size policies, scrolling behaviour etc.
+     */
+    void setupViewSettings();
+
+    /**
+     * createMenus sets up the filemenu
+     */
+    void createMenus();
+
+    /**
+     * createLogDockWindow creates the log window as a dock widget
+     */
+    void createLogDockWindow();
+
+    /**
+     * setWindow makes settings that are related to the MainWindow
+     */
+    void setWindow();
+
+    QFile m_qFileRaw; /**< Fiff data file to read (set for convenience */
+
+    RawModel *m_pRawModel; /**< the QAbstractTable model being part of the model/view framework of Qt */
+    QTableView *m_pTableView; /**< the QTableView being part of the model/view framework of Qt */
+    RawDelegate *m_pRawDelegate; /**< the QAbstractDelegate being part of the model/view framework of Qt */
+
+    //Log
+    QDockWidget* m_pDockWidget_Log; /**< a dock widget being part of the log feature */
+    QTextBrowser* m_pTextBrowser_Log; /** a textbox being part of the log feature */
+    LogLevel m_eLogLevelCurrent; /**< Holds the current log level.*/
+
+    /**
+    * Sets the log level
+    *
+    * @param [in] lvl message level; Message is displayed depending on its level.
+    */
+    void setLogLevel(LogLevel lvl);
 };
 
-#endif // MAINWINDOW
+}
+
+#endif // MAINWINDOW_H
