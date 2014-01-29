@@ -176,13 +176,12 @@ public:
 
 public:
     QString comment;    /**< Comment from the first line of the label file. */
-    qint32 hemi;        /**< Hemisphere (lh = 0; rh = 1) */
-//    qint32 hemi;                        /**< Hemisphere (lh = 0; rh = 1; both = 2) */ Don't mix both hemis - KISS principle
-    QString name;       /**< Name of the label */
     VectorXi vertices;  /**< Vertex indices (0 based) */
     MatrixX3f pos;      /**< Locations in meters */
     VectorXd values;    /**< Values at the vertices */
-
+    qint32 hemi;        /**< Hemisphere (lh = 0; rh = 1) */
+//    qint32 hemi;                        /**< Hemisphere (lh = 0; rh = 1; both = 2) */ Don't mix both hemis - KISS principle
+    QString name;       /**< Name of the label */
     qint32 label_id;    /**< Label id (optional) */
 //    MatrixX3i tris;     /**< Tris for plotting (optional) */
 

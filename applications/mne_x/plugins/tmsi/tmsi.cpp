@@ -110,20 +110,24 @@ void TMSI::init()
     m_iSamplingFreq = 1024;
     m_iNumberOfChannels = 138;
     m_iSamplesPerBlock = 16;
+    m_iTriggerInterval = 5000;
+
     m_bUseChExponent = true;
     m_bUseUnitGain = false;
     m_bUseUnitOffset = false;
     m_bWriteToFile = false;
     m_bWriteDriverDebugToFile = false;
-    m_bUsePreprocessing = false;
+    m_bUseFiltering = false;
     m_bUseFFT = false;
     m_bIsRunning = false;
+    m_bShowEventTrigger = false;
+
     m_sOutputFilePath = QString("./mne_x_plugins/resources/tmsi/EEG_data_001_raw.fif");
     m_sElcFilePath = QString("./mne_x_plugins/resources/tmsi/loc_files/Lorenz-Duke128-28-11-2013.elc");
 
     m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo());
 
-    // Initialise matrix used to perform a very simple high pass filter operation
+    //Initialise matrix used to perform a very simple high pass filter operation
     m_matOldMatrix = MatrixXf::Zero(m_iNumberOfChannels, m_iSamplesPerBlock);
 }
 
@@ -161,6 +165,34 @@ void TMSI::setUpFiffInfo()
     //qDebug() << elcLocation2D;
     //qDebug() << elcChannelNames;
 
+    //The positions read from the asa elc file do not correspond to a RAS coordinate system - use a simple 90° z transformation to fix this
+    Matrix3f rotation_z;
+    rotation_z = AngleAxisf((float)M_PI/2, Vector3f::UnitZ()); //M_PI/2 = 90°
+    QVector3D center_pos;
+
+    for(int i = 0; i<elcLocation3D.size(); i++)
+    {
+        Vector3f point;
+        point << elcLocation3D[i][0], elcLocation3D[i][1] , elcLocation3D[i][2];
+        Vector3f point_rot = rotation_z * point;
+//        cout<<"point: "<<endl<<point<<endl<<endl;
+//        cout<<"matrix: "<<endl<<rotation_z<<endl<<endl;
+//        cout<<"point_rot: "<<endl<<point_rot<<endl<<endl;
+//        cout<<"-----------------------------"<<endl;
+        elcLocation3D[i][0] = point_rot[0];
+        elcLocation3D[i][1] = point_rot[1];
+        elcLocation3D[i][2] = point_rot[2];
+
+        //Also calculate the center position of the electrode positions in this for routine
+        center_pos.setX(center_pos.x() + elcLocation3D[i][0]);
+        center_pos.setY(center_pos.y() + elcLocation3D[i][1]);
+        center_pos.setZ(center_pos.z() + elcLocation3D[i][2]);
+    }
+
+    center_pos.setX(center_pos.x()/elcLocation3D.size());
+    center_pos.setY(center_pos.y()/elcLocation3D.size());
+    center_pos.setZ(center_pos.z()/elcLocation3D.size());
+
     //
     //Write electrode positions to the digitizer info in the fiffinfo
     //
@@ -188,6 +220,41 @@ void TMSI::setUpFiffInfo()
         }
     }
 
+    //Append LAP value to digitizer data. Take location of LE2 electrode minus 1 cm as approximation.
+    FiffDigPoint digPoint;
+    int indexLE2 = elcChannelNames.indexOf("LE2");
+    digPoint.kind = FIFFV_POINT_CARDINAL;
+    digPoint.ident = FIFFV_POINT_LPA;//digitizerInfo.size();
+
+    //Set EEG electrode location - Convert from mm to m
+    digPoint.r[0] = elcLocation3D[indexLE2][0]*0.001;
+    digPoint.r[1] = elcLocation3D[indexLE2][1]*0.001;
+    digPoint.r[2] = (elcLocation3D[indexLE2][2]-10)*0.001;
+    digitizerInfo.push_back(digPoint);
+
+    //Append nasion value to digitizer data. Take location of Z1 electrode minus 6 cm as approximation.
+    int indexZ1 = elcChannelNames.indexOf("Z1");
+    digPoint.kind = FIFFV_POINT_CARDINAL;//FIFFV_POINT_NASION;
+    digPoint.ident = FIFFV_POINT_NASION;//digitizerInfo.size();
+
+    //Set EEG electrode location - Convert from mm to m
+    digPoint.r[0] = elcLocation3D[indexZ1][0]*0.001;
+    digPoint.r[1] = elcLocation3D[indexZ1][1]*0.001;
+    digPoint.r[2] = (elcLocation3D[indexZ1][2]-60)*0.001;
+    digitizerInfo.push_back(digPoint);
+
+    //Append RAP value to digitizer data. Take location of RE2 electrode minus 1 cm as approximation.
+    int indexRE2 = elcChannelNames.indexOf("RE2");
+    digPoint.kind = FIFFV_POINT_CARDINAL;
+    digPoint.ident = FIFFV_POINT_RPA;//digitizerInfo.size();
+
+    //Set EEG electrode location - Convert from mm to m
+    digPoint.r[0] = elcLocation3D[indexRE2][0]*0.001;
+    digPoint.r[1] = elcLocation3D[indexRE2][1]*0.001;
+    digPoint.r[2] = (elcLocation3D[indexRE2][2]-10)*0.001;
+    digitizerInfo.push_back(digPoint);
+
+    //Add EEG electrode positions as digitizers
     for(int i=0; i<numberEEGCh; i++)
     {
         FiffDigPoint digPoint;
@@ -199,58 +266,6 @@ void TMSI::setUpFiffInfo()
         digPoint.r[1] = elcLocation3D[i][1]*0.001;
         digPoint.r[2] = elcLocation3D[i][2]*0.001;
         digitizerInfo.push_back(digPoint);
-    }
-
-    //Append nasion value to digitizer data. Take location of Z1 electrode minus 6 cm as approximation.
-    int indexZ1 = elcChannelNames.indexOf("Z1");
-    FiffDigPoint digPoint;
-    digPoint.kind = FIFFV_POINT_NASION;
-    digPoint.ident = digitizerInfo.size();
-
-    //Set EEG electrode location - Convert from mm to m
-    digPoint.r[0] = elcLocation3D[indexZ1][0]*0.001;
-    digPoint.r[1] = elcLocation3D[indexZ1][1]*0.001;
-    digPoint.r[2] = (elcLocation3D[indexZ1][2]-60)*0.001;
-    digitizerInfo.push_back(digPoint);
-
-    //Append LAP value to digitizer data. Take location of LE2 electrode minus 1 cm as approximation.
-    int indexLE2 = elcChannelNames.indexOf("LE2");
-    digPoint.kind = FIFFV_POINT_LPA;
-    digPoint.ident = digitizerInfo.size();
-
-    //Set EEG electrode location - Convert from mm to m
-    digPoint.r[0] = elcLocation3D[indexLE2][0]*0.001;
-    digPoint.r[1] = elcLocation3D[indexLE2][1]*0.001;
-    digPoint.r[2] = (elcLocation3D[indexLE2][2]-10)*0.001;
-    digitizerInfo.push_back(digPoint);
-
-    //Append RAP value to digitizer data. Take location of RE2 electrode minus 1 cm as approximation.
-    int indexRE2 = elcChannelNames.indexOf("RE2");
-    digPoint.kind = FIFFV_POINT_RPA;
-    digPoint.ident = digitizerInfo.size();
-
-    //Set EEG electrode location - Convert from mm to m
-    digPoint.r[0] = elcLocation3D[indexRE2][0]*0.001;
-    digPoint.r[1] = elcLocation3D[indexRE2][1]*0.001;
-    digPoint.r[2] = (elcLocation3D[indexRE2][2]-10)*0.001;
-    digitizerInfo.push_back(digPoint);
-
-    //The positions read from the asa elc file do not correspond to a RAS coordinate system - use a simple 90° z transformation to fix this
-    Matrix3f rotation_z;
-    rotation_z = AngleAxisf((float)M_PI/2, Vector3f::UnitZ()); //M_PI/2 = 90°
-
-    for(int i = 0; i<digitizerInfo.size(); i++)
-    {
-        Vector3f point;
-        point << digitizerInfo[i].r[0], digitizerInfo[i].r[1] , digitizerInfo[i].r[2];
-        Vector3f point_rot = rotation_z * point;
-//        cout<<"point: "<<endl<<point<<endl<<endl;
-//        cout<<"matrix: "<<endl<<rotation_z<<endl<<endl;
-//        cout<<"point_rot: "<<endl<<point_rot<<endl<<endl;
-//        cout<<"-----------------------------"<<endl;
-        digitizerInfo[i].r[0] = point_rot[0];
-        digitizerInfo[i].r[1] = point_rot[1];
-        digitizerInfo[i].r[2] = point_rot[2];
     }
 
     //Set the final digitizer values to the fiff info
@@ -288,15 +303,41 @@ void TMSI::setUpFiffInfo()
             //Set coil type
             fChInfo.coil_type = FIFFV_COIL_EEG;
 
+            //Set logno
+            fChInfo.logno = i;
+
+            //Set coord frame
+            fChInfo.coord_frame = FIFFV_COORD_HEAD;
+
+            //Set unit
+            //fChInfo.unit = FIFF_UNIT_V;
+
             //Set EEG electrode location - Convert from mm to m
             fChInfo.eeg_loc(0,0) = elcLocation3D[i][0]*0.001;
             fChInfo.eeg_loc(1,0) = elcLocation3D[i][1]*0.001;
             fChInfo.eeg_loc(2,0) = elcLocation3D[i][2]*0.001;
 
+            //Set EEG electrode direction - Convert from mm to m
+            fChInfo.eeg_loc(0,1) = center_pos.x()*0.001;
+            fChInfo.eeg_loc(1,1) = center_pos.y()*0.001;
+            fChInfo.eeg_loc(2,1) = center_pos.z()*0.001;
+
             //Also write the eeg electrode locations into the meg loc variable (mne_ex_read_raw() matlab function wants this)
             fChInfo.loc(0,0) = elcLocation3D[i][0]*0.001;
             fChInfo.loc(1,0) = elcLocation3D[i][1]*0.001;
             fChInfo.loc(2,0) = elcLocation3D[i][2]*0.001;
+
+            fChInfo.loc(3,0) = center_pos.x()*0.001;
+            fChInfo.loc(4,0) = center_pos.y()*0.001;
+            fChInfo.loc(5,0) = center_pos.z()*0.001;
+
+            fChInfo.loc(6,0) = 0;
+            fChInfo.loc(7,0) = 1;
+            fChInfo.loc(8,0) = 0;
+
+            fChInfo.loc(9,0) = 0;
+            fChInfo.loc(10,0) = 0;
+            fChInfo.loc(11,0) = 1;
 
             //cout<<i<<endl<<fChInfo.eeg_loc<<endl;
         }
@@ -406,6 +447,9 @@ bool TMSI::start()
     if(this->isRunning())
         QThread::wait();
 
+    if(m_bShowEventTrigger)
+        m_qTimerTrigger.start();
+
     //Setup writing to file
     if(m_bWriteToFile)
     {
@@ -427,7 +471,6 @@ bool TMSI::start()
         m_pOutfid = Fiff::start_writing_raw(m_fileOut, *m_pFiffInfo, m_cals);
         fiff_int_t first = 0;
         m_pOutfid->write_int(FIFF_FIRST_SAMPLE, &first);
-        //m_pOutfid->finish_writing_raw();
     }
     else
         setUpFiffInfo();
@@ -524,14 +567,22 @@ void TMSI::run()
         if(m_pTMSIProducer->isRunning())
         {
             MatrixXf matValue = m_pRawMatrixBuffer_In->pop();
-            //std::cout << "matValue " << matValue.cast<double>() << std::endl;
+
+            if(m_bShowEventTrigger && m_qTimerTrigger.elapsed() >= m_iTriggerInterval)
+            {
+                QFuture<void> future = QtConcurrent::run(Beep, 523, 500);
+
+                //Set trigger in received data samples - just for one sample, so that this event is easy to detect
+                matValue(136, m_iSamplesPerBlock-1) = 254;
+                m_qTimerTrigger.restart();
+            }
 
             //Write raw data to fif file
             if(m_bWriteToFile)
                 m_pOutfid->write_raw_buffer(matValue.cast<double>(), m_cals);
 
             // TODO: Use preprocessing if wanted by the user
-            if(m_bUsePreprocessing)
+            if(m_bUseFiltering)
             {
                 MatrixXf temp = matValue;
 

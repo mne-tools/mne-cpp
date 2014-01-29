@@ -62,7 +62,7 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Disp3Dd
 }
 else {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
+    LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
             -lMNE$${MNE_LIB_VERSION}Utils \
             -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \
