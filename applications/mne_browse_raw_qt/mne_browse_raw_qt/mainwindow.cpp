@@ -1,15 +1,16 @@
 //=============================================================================================================
 /**
 * @file     mainwindow.cpp
-* @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>
+* @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+*           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
 * @version  1.0
 * @date     January, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Florian Schlembach, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -34,42 +35,45 @@
 *
 */
 
-//*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
-//=============================================================================================================
 
+//MNE_BROWSE_RAW_QT
 #include "mainwindow.h"
+#include "info.h"
+
+//Qt
+#include <QDebug>
+#include <QWidget>
+#include <QPainter>
+
+#include <QVBoxLayout>
+#include <QGroupBox>
+#include <QScrollArea>
+#include <QScrollBar>
+#include <QScroller>
+
+//=============================================================================================================
+// NAMESPACE
+
+using namespace MNE_BROWSE_RAW_QT;
 
 //*************************************************************************************************************
 
-MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent)
+MainWindow::MainWindow(QWidget *parent)
+: QMainWindow(parent)
+, m_qFileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
 {
-    //setupFileMenu
-    QMenu *fileMenu = new QMenu(tr("&File"), this);
-    QAction *openAction = fileMenu->addAction(tr("&Open..."));
-    openAction->setShortcuts(QKeySequence::Open);
-    QAction *quitAction = fileMenu->addAction(tr("E&xit"));
-    quitAction->setShortcuts(QKeySequence::Quit);
-
-    menuBar()->addMenu(fileMenu);
-    statusBar();
-
     //setup MVC
-    MainWindow::setupModel();
-    MainWindow::setupView();
+    setupModel();
+    setupDelegate();
+    setupView();
+    setupLayout();
 
-    //connect signalslots
-    connect(openAction, SIGNAL(triggered()), this, SLOT(openFile()));
-//    connect(saveAction, SIGNAL(triggered()), this, SLOT(saveFile()));
-    connect(quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
+    createMenus();
 
-    //Window-related
-    setWindowTitle("MNE_BROWSE_RAW_QT");
-    resize(800,600);
-    //this->setWindowState(Qt::WindowMaximized); //maximize window
-    this->move(100,100);
+    createLogDockWindow();
+    setWindow();
 }
 
 //*************************************************************************************************************
@@ -78,25 +82,156 @@ MainWindow::~MainWindow()
 {
 }
 
+//*************************************************************************************************************
+
+void MainWindow::setupModel()
+{
+//    m_pRawModel = new RawModel(this);
+    m_pRawModel = new RawModel(m_qFileRaw,this);
+}
 
 //*************************************************************************************************************
 
-void MainWindow::setupModel() {
-    QFile t_rawFile("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
-    m_pRawModel = new RawModel(this,t_rawFile);
-
-    //set header
-//    m_pRawModel->setHeaderData(0, Qt::Horizontal, tr("chname"));
-//    m_pRawModel->setHeaderData(1, Qt::Horizontal, tr("data plot"));
+void MainWindow::setupDelegate()
+{
+    m_pRawDelegate = new RawDelegate(this);
 }
 
-void MainWindow::setupView() {
-    m_pTableView = new QTableView;
-//    m_pTableView->setShowGrid(false);
-//    m_pTableView->verticalHeader()->hide();
-    m_pTableView->setModel(m_pRawModel);
+//*************************************************************************************************************
 
-    setCentralWidget(m_pTableView);
+void MainWindow::setupView()
+{
+    m_pTableView = new QTableView;
+
+    m_pTableView->setModel(m_pRawModel); //set custom model
+    m_pTableView->setItemDelegate(m_pRawDelegate); //set custom delegate
+
+    //TableView settings
+    setupViewSettings();
+
+}
+
+//*************************************************************************************************************
+
+void MainWindow::setupLayout() {
+    //set vertical layout
+    QVBoxLayout *mainlayout = new QVBoxLayout;
+
+    mainlayout->addWidget(m_pTableView);
+
+    //set layouts
+    QWidget *window = new QWidget();
+    window->setLayout(mainlayout);
+
+    setCentralWidget(window);
+}
+
+//*************************************************************************************************************
+
+void MainWindow::setupViewSettings() {
+    //set some size settings for m_pTableView
+    m_pTableView->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+
+    m_pTableView->setShowGrid(false);
+    m_pTableView->horizontalHeader()->hide();
+    m_pTableView->verticalHeader()->setDefaultSectionSize(m_pRawDelegate->m_dPlotHeight);
+
+    m_pTableView->setAutoScroll(false);
+    m_pTableView->setColumnHidden(0,true); //because content is plotted jointly with column=1
+
+    m_pTableView->resizeColumnsToContents();
+
+    m_pTableView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
+
+    //set position of QScrollArea
+    m_pTableView->horizontalScrollBar()->setValue(m_pRawModel->relFiffCursor()+m_pRawModel->m_iWindowSize/2);
+
+    //activate kinetic scrolling
+    QScroller::grabGesture(m_pTableView,QScroller::MiddleMouseButtonGesture);
+
+    //connect QScrollBar with model in order to reload data samples
+    connect(m_pTableView->horizontalScrollBar(),SIGNAL(valueChanged(int)),m_pRawModel,SLOT(reloadData(int)));
+}
+
+//*************************************************************************************************************
+
+void MainWindow::createMenus() {
+    QMenu *fileMenu = new QMenu(tr("&File"), this);
+
+    QAction *openAction = fileMenu->addAction(tr("&Open..."));
+    openAction->setShortcuts(QKeySequence::Open);
+    connect(openAction, SIGNAL(triggered()), this, SLOT(openFile()));
+
+    QAction *quitAction = fileMenu->addAction(tr("E&xit"));
+    quitAction->setShortcuts(QKeySequence::Quit);
+    connect(quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
+
+    menuBar()->addMenu(fileMenu);
+}
+
+void MainWindow::setWindow() {
+    setWindowTitle("MNE_BROWSE_RAW_QT");
+    resize(1200,800);
+    this->move(50,50);
+}
+
+//=============================================================================================================
+//Log
+
+void MainWindow::createLogDockWindow()
+{
+    //Log TextBrowser
+    m_pDockWidget_Log = new QDockWidget(tr("Log"), this);
+
+    m_pTextBrowser_Log = new QTextBrowser(m_pDockWidget_Log);
+
+    m_pDockWidget_Log->setWidget(m_pTextBrowser_Log);
+
+    m_pDockWidget_Log->setAllowedAreas(Qt::BottomDockWidgetArea);
+    addDockWidget(Qt::BottomDockWidgetArea, m_pDockWidget_Log);
+
+    //Set standard LogLevel
+    setLogLevel(_LogLvMax);
+}
+
+//*************************************************************************************************************
+
+void MainWindow::writeToLog(const QString& logMsg, LogKind lgknd, LogLevel lglvl)
+{
+    if(lglvl<=m_eLogLevelCurrent) {
+        if(lgknd == _LogKndError)
+            m_pTextBrowser_Log->insertHtml("<font color=red><b>Error:</b> "+logMsg+"</font>");
+        else if(lgknd == _LogKndWarning)
+            m_pTextBrowser_Log->insertHtml("<font color=blue><b>Warning:</b> "+logMsg+"</font>");
+        else
+            m_pTextBrowser_Log->insertHtml(logMsg);
+        m_pTextBrowser_Log->insertPlainText("\n"); // new line
+        //scroll down to the newest entry
+        QTextCursor c = m_pTextBrowser_Log->textCursor();
+        c.movePosition(QTextCursor::End);
+        m_pTextBrowser_Log->setTextCursor(c);
+
+        m_pTextBrowser_Log->verticalScrollBar()->setValue(m_pTextBrowser_Log->verticalScrollBar()->maximum());
+    }
+}
+
+//*************************************************************************************************************
+
+void MainWindow::setLogLevel(LogLevel lvl)
+{
+    switch(lvl) {
+    case _LogLvMin:
+        writeToLog(tr("minimal log level set"), _LogKndMessage, _LogLvMin);
+        break;
+    case _LogLvNormal:
+        writeToLog(tr("normal log level set"), _LogKndMessage, _LogLvMin);
+        break;
+    case _LogLvMax:
+        writeToLog(tr("maximum log level set"), _LogKndMessage, _LogLvMin);
+        break;
+    }
+
+    m_eLogLevelCurrent = lvl;
 }
 
 //*************************************************************************************************************
@@ -104,7 +239,12 @@ void MainWindow::setupView() {
 void MainWindow::openFile()
 {
     QString filename = QFileDialog::getOpenFileName(this,QString("Open fiff data file"),QString("./MNE-sample-data/MEG/sample/"),tr("fif data files (*.fif)"));
+    QFile t_fileRaw(filename);
 
-    //ui->textEdit->setText(filename);
+    if(m_pRawModel->loadFiffData(t_fileRaw)) {
+        qDebug() << "Fiff data file" << filename << "loaded.";
+        setupViewSettings();
+    }
+    else
+        qDebug("ERROR loading fiff data file %s",filename.toLatin1().data());
 }
-

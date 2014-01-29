@@ -1,7 +1,7 @@
 //=============================================================================================================
 /**
-* @file     rawdelegate.h
-* @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
+* @file     plotsignal.h
+* @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 *           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
@@ -31,55 +31,73 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of delegate of mne_browse_raw_qt
+* @brief    Implements the PlotSignalWidget of mne_browse_raw_qt
 *
 */
 
-#ifndef RAWDELEGATE_H
-#define RAWDELEGATE_H
+#ifndef PLOTSIGNALWIDGET_H
+#define PLOTSIGNALWIDGET_H
 
-//*************************************************************************************************************
+// ! INFORMATION !
+
+// use this QWidget class as followed here:
+
+//*****************************
+//    //example for PlotSignalWidget
+//    QFile t_rawFile("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+//    FiffIO m_fiffIO(t_rawFile);
+
+//    MatrixXd t_samples,t_times;
+//    m_fiffIO.m_qlistRaw[0]->read_raw_segment_times(t_samples,t_times,100,102);
+//    MatrixXd t_data;
+//    t_data.resize(2,t_samples.cols());
+//    t_data.row(0) = t_samples.row(0);
+//    t_data.row(1) = t_times;
+//    //generate PlotSignalWidget
+//    PlotSignalWidget *plotSignalWidget = new PlotSignalWidget(t_data,this);
+//    plotSignalWidget->setSizePolicy(QSizePolicy::Fixed,QSizePolicy::Fixed);
+//*****************************
+
 //=============================================================================================================
 // INCLUDES
-//=============================================================================================================
 
 //Qt
-#include <QDebug>
-#include <QAbstractItemDelegate>
-#include <QPainter>
-#include <QPainterPath>
-
-//MNE
-#include <fiff/fiff.h>
-#include <mne/mne.h>
-#include <fiff/fiff_io.h>
-
-//MNE_BROWSE_RAW_QT
-#include "rawmodel.h"
-#include "types_settings.h"
+#include <QWidget>
 
 //Eigen
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
 
 //=============================================================================================================
-// USED NAMESPACES
+// DEFINE NAMESPACE
 
-using namespace MNE_BROWSE_RAW_QT;
 using namespace Eigen;
-using namespace MNELIB;
 
 //=============================================================================================================
 
-class RawDelegate : public QAbstractItemDelegate
+#include <QWidget>
+
+class PlotSignalWidget : public QWidget
 {
     Q_OBJECT
 public:
-    typedef Matrix<double,Dynamic,Dynamic,RowMajor> MatrixXdR;
+    PlotSignalWidget(QWidget *parent = 0);
+    PlotSignalWidget(MatrixXd data, QWidget *parent = 0);
 
-    RawDelegate(QObject *parent = 0);
-    virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
-    virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
+protected:
+    virtual void paintEvent(QPaintEvent *event);
+
+signals:
+
+public slots:
+
+private:
+    void createPlotPath(QPainterPath& path);
+    void createGridPath(QPainterPath& path);
+
+    QSize sizeHint() const;
+
+    MatrixXd m_data;
 
     // Plots settings
     double m_dPlotHeight; /**< The height of the plot */
@@ -89,30 +107,8 @@ public:
     double m_dScaleY; /**< Maximum amplitude of plot (max is m_dPlotHeight/2) */
     double m_dDx; /**< pixel difference to the next sample*/
 
-signals:
-
-public slots:
-
-private:
-    /**
-     * createPlotPath creates the QPointer path for the data plot.
-     *
-     * @param[in] index QModelIndex for accessing associated data and model object.
-     * @param[in,out] path The QPointerPath to create for the data plot.
-     */
-    void createPlotPath(const QModelIndex &index, QPainterPath& path, QList<RowVectorPair>& listPairs) const;
-
-    /**
-     * createGridPath Creates the QPointer path for the grid plot.
-     *
-     * @param[in,out] path The row vector of the data matrix <1 x nsamples>.
-     * @param[in] data The row vector of the data matrix <1 x nsamples>.
-     */
-    void createGridPath(QPainterPath& path, QList<RowVectorPair>& listPairs) const;
-
     //Look
-    qint8 m_nhlines; /**< Number of horizontal lines for the grid plot */
-
+    qint8 m_nhlines;
 };
 
-#endif // RAWDELEGATE_H
+#endif // PLOTSIGNAL_H
