@@ -231,19 +231,19 @@ int main(int argc, char *argv[])
 //    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_voluntary_right_filtered_07_40_Avr_");
 //    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_voluntary_right_filtered_07_40_Averaged_");
 
-    //Filtered 7-14Hz left voluntary finger opposing
-    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_001_voluntary_left_opposing_filtered_7_14_raw.fif");
-    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_voluntary_base_filtered_7_14_raw-cov.fif");
-    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_voluntary_left_opposing_artefact_reduction_-1_1_0.003_45_raw-eve.fif"); // ("EEG_data_001_voluntary_left_opposing_raw-eve")
-    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_voluntary_left_filtered_7_14_Avr_");
-    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_voluntary_left_filtered_7_14_Averaged_");
-
-//    //Filtered 7-14Hz right voluntary finger opposing
-//    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_001_voluntary_right_opposing_filtered_7_14_raw.fif");
+//    //Filtered 7-14Hz left voluntary finger opposing
+//    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_001_voluntary_left_opposing_filtered_7_14_raw.fif");
 //    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_voluntary_base_filtered_7_14_raw-cov.fif");
-//    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_voluntary_right_opposing_artefact_reduction_-1_1_0.0008_raw-eve.fif");    // ("EEG_data_001_voluntary_right_opposing_raw-eve")
-//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_voluntary_right_filtered_7_14_Avr_");
-//    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_voluntary_right_filtered_7_14_Averaged_");
+//    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_voluntary_left_opposing_artefact_reduction_-1_1_0.003_45_raw-eve.fif"); // ("EEG_data_001_voluntary_left_opposing_raw-eve")
+//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_voluntary_left_filtered_7_14_Avr_");
+//    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_voluntary_left_filtered_7_14_Averaged_");
+
+    //Filtered 7-14Hz right voluntary finger opposing
+    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_001_voluntary_right_opposing_filtered_7_14_raw.fif");
+    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_voluntary_base_filtered_7_14_raw-cov.fif");
+    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_voluntary_right_opposing_artefact_reduction_-1_1_0.003_29_raw-eve.fif");    // ("EEG_data_001_voluntary_right_opposing_raw-eve")
+    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_voluntary_right_filtered_7_14_Avr_");
+    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_voluntary_right_filtered_7_14_Averaged_");
 
     //##########################################################################################################################
 
