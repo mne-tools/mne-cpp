@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     main.cpp
+* @file     rawsettings.cpp
 * @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
@@ -31,76 +31,59 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implements the mne_browse_raw_qt GUI application.
+* @brief    Contains all application settings.
 *
 */
 
-//=============================================================================================================
-// INCLUDES
-#include <QtGui>
-#include <QApplication>
-#include <QDateTime>
-
-#include "mainwindow.h"
-#include "info.h"
-
-//=============================================================================================================
-// NAMESPACES
-
-using namespace MNE_BROWSE_RAW_QT;
-
-//=============================================================================================================
-// FORWARD DECLARATIONS
-
-MainWindow* mainWindow = NULL;
+#include "rawsettings.h"
 
 //*************************************************************************************************************
 
-void customMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
+using namespace MNE_BROWSE_RAW_QT;
+
+//*************************************************************************************************************
+
+RawSettings::RawSettings(QObject *parent)
+: QObject(parent)
+, m_qSettings("mne-cpp","MNE_BROWSE_RAW_QT")
 {
-    Q_UNUSED(context);
+    init();
 
-    QString dt = QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm:ss");
-    QString txt = QString("[%1] ").arg(dt);
-
-    if(mainWindow) {
-        switch (type) {
-        case QtDebugMsg:
-           txt += QString("{Debug} \t\t %1").arg(msg);
-           mainWindow->writeToLog(txt,_LogKndMessage, _LogLvMax);
-           break;
-        case QtWarningMsg:
-           txt += QString("{Warning} \t %1").arg(msg);
-           mainWindow->writeToLog(txt,_LogKndWarning, _LogLvNormal);
-           break;
-        case QtCriticalMsg:
-           txt += QString("{Critical} \t %1").arg(msg);
-           mainWindow->writeToLog(txt,_LogKndError, _LogLvMin);
-           break;
-        case QtFatalMsg:
-           txt += QString("{Fatal} \t\t %1").arg(msg);
-           mainWindow->writeToLog(txt,_LogKndError, _LogLvMin);
-           abort();
-           break;
-        }
-    }
 }
 
+//*************************************************************************************************************
 
-//=============================================================================================================
-// MAIN
-
-int main(int argc, char *argv[])
+void RawSettings::init()
 {
-    qInstallMessageHandler(customMessageHandler);
-    QApplication a(argc, argv);
+    //MainWindow
+    //Window settings
+    m_qSettings.beginGroup("MainWindow");
+        m_qSettings.setValue("size",QSize(MAINWINDOW_WINDOW_SIZE_W,MAINWINDOW_WINDOW_SIZE_H));
+    m_qSettings.endGroup();
 
-    //set application settings
-    QCoreApplication::setOrganizationName(CInfo::OrganizationName());
-    QCoreApplication::setApplicationName(CInfo::AppNameShort());
+    //RawModel
+    m_qSettings.beginGroup("RawModel");
+        m_qSettings.setValue("window_size",MODEL_WINDOW_SIZE);
+        m_qSettings.setValue("reload_pos",MODEL_RELOAD_POS);
+        m_qSettings.setValue("max_windows",MODEL_MAX_WINDOWS);
+    m_qSettings.endGroup();
 
-    mainWindow = new MainWindow();
-    mainWindow->show();
+    //RawDelegate
+    m_qSettings.beginGroup("RawDelegate");
 
-    return a.exec();
+        //look
+        m_qSettings.setValue("plotheight",DELEGATE_PLOT_HEIGHT);
+        m_qSettings.setValue("dx",DELEGATE_DX);
+        m_qSettings.setValue("nhlines",DELEGATE_NHLINES);
+
+//        //maximum values for different channels types according to FiffChInfo
+        m_qSettings.setValue("max_meg_grad",DELEGATE_MAX_MEG_GRAD);
+        m_qSettings.setValue("max_meg_mag",DELEGATE_MAX_MEG_MAG);
+        m_qSettings.setValue("max_eeg",DELEGATE_MAX_EEG);
+        m_qSettings.setValue("max_eog",DELEGATE_MAX_EOG);
+        m_qSettings.setValue("max_stim",DELEGATE_MAX_STIM);
+
+    m_qSettings.endGroup();
+
+
 }

@@ -44,7 +44,10 @@
 //Qt
 #include <QApplication>
 #include <QDebug>
+#include <QSettings>
 #include <QMainWindow>
+#include <QWidget>
+
 #include <QFileDialog>
 #include <QFile>
 #include <QMenu>
@@ -53,9 +56,17 @@
 
 #include <QTableView>
 #include <QHeaderView>
+#include <QVBoxLayout>
+#include <QGroupBox>
+#include <QScrollArea>
+#include <QScrollBar>
+#include <QScroller>
 
 #include <QDockWidget>
 #include <QTextBrowser>
+
+#include <QDebug>
+#include <QPainter>
 
 //MNE
 #include <fiff/fiff.h>
@@ -67,8 +78,8 @@
 #include "rawdelegate.h"
 
 #include "info.h"
-#include "types_settings.h"
-
+#include "types.h"
+#include "rawsettings.h"
 
 //*************************************************************************************************************
 // namespaces
@@ -147,9 +158,14 @@ private:
 
     QFile m_qFileRaw; /**< Fiff data file to read (set for convenience */
 
+    //modelview framework
     RawModel *m_pRawModel; /**< the QAbstractTable model being part of the model/view framework of Qt */
     QTableView *m_pTableView; /**< the QTableView being part of the model/view framework of Qt */
     RawDelegate *m_pRawDelegate; /**< the QAbstractDelegate being part of the model/view framework of Qt */
+
+    //application settings
+    QSettings m_qSettings;
+    RawSettings m_rawSettings;
 
     //Log
     QDockWidget* m_pDockWidget_Log; /**< a dock widget being part of the log feature */

@@ -41,24 +41,27 @@
 
 RawModel::RawModel(QObject *parent)
 : QAbstractTableModel(parent)
-, m_iWindowSize(6000) //samples
-, n_reloadPos(2000) //samples
-, n_maxWindows(4)
+, m_qSettings()
 , m_bStartReached(false)
 , m_bEndReached(false)
 {
+    m_iWindowSize = m_qSettings.value("RawModel/window_size").toInt();
+    n_reloadPos = m_qSettings.value("RawModel/reload_pos").toInt();
+    n_maxWindows = m_qSettings.value("RawModel/max_windows").toInt();
 }
 
 //*************************************************************************************************************
 
 RawModel::RawModel(QIODevice &p_IODevice, QObject *parent)
 : QAbstractTableModel(parent)
-, m_iWindowSize(6000) //samples
-, n_reloadPos(2000) //samples
-, n_maxWindows(4)
+, m_qSettings()
 , m_bStartReached(false)
 , m_bEndReached(false)
 {
+    m_iWindowSize = m_qSettings.value("RawModel/window_size").toInt();
+    n_reloadPos = m_qSettings.value("RawModel/reload_pos").toInt();
+    n_maxWindows = m_qSettings.value("RawModel/max_windows").toInt();
+
     //read fiff data
     loadFiffData(p_IODevice);
 }
@@ -87,15 +90,6 @@ QVariant RawModel::data(const QModelIndex &index, int role) const
             return QVariant(m_chinfolist[index.row()].ch_name);
         if(index.column()==1) {
             QVariant v;
-
-            //for debugging purposes
-//            for(qint32 i=0; i < m_chinfolist.size(); ++i) {
-//                if(m_chinfolist[i].ch_name == "EEG 004") {
-//                    double max = m_data[0].row(i).maxCoeff();
-//                    double min = m_data[0].row(i).minCoeff();
-//                    RowVectorXd mat = m_data[0].row(i);
-//                }
-//            }
 
             //form RowVectorPair of pointer and length of RowVector
             QPair<const double*,qint32> rowVectorPair;
