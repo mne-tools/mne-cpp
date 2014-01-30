@@ -85,29 +85,56 @@ int RawModel::columnCount(const QModelIndex & /*parent*/) const
 
 QVariant RawModel::data(const QModelIndex &index, int role) const
 {
-    if (role == Qt::DisplayRole && index.isValid()) {
-        if(index.column()==0)
+    if(role != Qt::DisplayRole && role != Qt::BackgroundRole)
+        return QVariant();
+
+
+    if (index.isValid()) {
+        //******** first column (chname) ********
+        if(index.column()==0 && role == Qt::DisplayRole)
             return QVariant(m_chinfolist[index.row()].ch_name);
+
+        //******** second column (data plot) ********
         if(index.column()==1) {
             QVariant v;
 
-            //form RowVectorPair of pointer and length of RowVector
-            QPair<const double*,qint32> rowVectorPair;
+            switch(role) {
+            case Qt::DisplayRole: {
+                //form RowVectorPair of pointer and length of RowVector
+                QPair<const double*,qint32> rowVectorPair;
 
-            //pack all adjacent (after reload) RowVectorPairs into a QList
-            QList<RowVectorPair> listRowVectorPair;
+                //pack all adjacent (after reload) RowVectorPairs into a QList
+                QList<RowVectorPair> listRowVectorPair;
 
-            for(qint16 i=0; i < m_data.size(); ++i) {
-                rowVectorPair.first = m_data[i].data() + index.row()*m_data[i].cols();
-                rowVectorPair.second = m_data[i].cols();
+                for(qint16 i=0; i < m_data.size(); ++i) {
+                    rowVectorPair.first = m_data[i].data() + index.row()*m_data[i].cols();
+                    rowVectorPair.second = m_data[i].cols();
 
-                listRowVectorPair.append(rowVectorPair);
+                    listRowVectorPair.append(rowVectorPair);
+                }
+
+                v.setValue(listRowVectorPair);
+                return v;
+                break;
             }
+            case Qt::BackgroundRole: {
+                QBrush brush;
+                if(m_chinfolist[index.row()].ch_name == "MEG 0113"/*m_pfiffIO->m_qlistRaw[0]->info.bads.contains(m_chinfolist[index.row()].ch_name)*/) {
+                    brush.setColor(QColor("red"));
+                    qDebug() << "MEG 0113 is marked as red, index:" << index.row();
+                }
+                else {
+                    brush.setColor(QPalette::Normal);
+                }
+                brush.setStyle(Qt::SolidPattern);
 
-            v.setValue(listRowVectorPair);
-            return v;
-        }
-    }
+                return QVariant(brush);
+                break;
+            }
+        } // end role switch
+    } // end column check
+
+    } // end index.valid() check
 
     return QVariant();
 }
