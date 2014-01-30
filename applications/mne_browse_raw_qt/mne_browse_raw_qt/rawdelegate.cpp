@@ -36,18 +36,9 @@
 */
 
 
-//=============================================================================================================
-// INCLUDES
-
 #include "rawdelegate.h"
-#include "types_settings.h"
 
-//Qt
-#include <QPointF>
-#include <QRect>
-
-//=============================================================================================================
-// NAMESPACES
+//*************************************************************************************************************
 
 using namespace MNE_BROWSE_RAW_QT;
 using namespace Eigen;
@@ -56,10 +47,11 @@ using namespace MNELIB;
 //*************************************************************************************************************
 
 RawDelegate::RawDelegate(QObject *parent)
-: m_dPlotHeight(70)
-, m_dDx(1)
-, m_nhlines(6)
+: m_qSettings()
 {
+    m_dPlotHeight = m_qSettings.value("RawDelegate/plotheight").toDouble();
+    m_dDx = m_qSettings.value("RawDelegate/dx").toDouble();
+    m_nhlines = m_qSettings.value("RawDelegate/nhlines").toDouble();
 }
 
 //*************************************************************************************************************
@@ -146,28 +138,27 @@ void RawDelegate::createPlotPath(const QModelIndex &index, QPainterPath& path, Q
     case FIFFV_MEG_CH: {
         qint32 unit = (static_cast<const RawModel*>(index.model()))->m_pfiffIO->m_qlistRaw[0]->info.chs[index.row()].unit;
         if(unit == FIFF_UNIT_T_M) {
-            dMaxValue = MAX_MEG_UNIT_T_M;
+            dMaxValue = m_qSettings.value("RawDelegate/max_meg_grad").toDouble();
         }
         else if(unit == FIFF_UNIT_T)
-            dMaxValue = MAX_MEG_UNIT_T;
+            dMaxValue = m_qSettings.value("RawDelegate/max_meg_mag").toDouble();
         break;
     }
     case FIFFV_EEG_CH: {
-        dMaxValue = MAX_EEG;
+        dMaxValue = m_qSettings.value("RawDelegate/max_eeg").toDouble();
         break;
     }
     case FIFFV_EOG_CH: {
-        dMaxValue = MAX_EOG;
+        dMaxValue = m_qSettings.value("RawDelegate/max_eog").toDouble();
         break;
     }
     case FIFFV_STIM_CH: {
-        dMaxValue = MAX_STIM;
+        dMaxValue = m_qSettings.value("RawDelegate/max_stim").toDouble();
         break;
     }
     }
 
     double dValue;
-//    double dMaxValue = (static_cast<const RawModel*>(index.model()))->maxDataValue(index.row());
     double dScaleY = m_dPlotHeight/(2*dMaxValue);
 
     double y_base = path.currentPosition().y();
@@ -176,7 +167,7 @@ void RawDelegate::createPlotPath(const QModelIndex &index, QPainterPath& path, Q
     //plot all rows from list of pairs
     for(qint8 i=0; i < listPairs.size(); ++i) {
         //create lines from one to the next sample
-        for(qint32 j=0; j < listPairs[i].second; ++j) //ToDo: check whether -1 is necessary
+        for(qint32 j=0; j < listPairs[i].second; ++j)
         {
             double val = *(listPairs[i].first+j);
             dValue = val*dScaleY;

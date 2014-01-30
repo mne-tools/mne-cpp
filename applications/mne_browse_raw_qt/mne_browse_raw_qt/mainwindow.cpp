@@ -35,26 +35,9 @@
 *
 */
 
-//=============================================================================================================
-// INCLUDES
-
-//MNE_BROWSE_RAW_QT
 #include "mainwindow.h"
-#include "info.h"
 
-//Qt
-#include <QDebug>
-#include <QWidget>
-#include <QPainter>
-
-#include <QVBoxLayout>
-#include <QGroupBox>
-#include <QScrollArea>
-#include <QScrollBar>
-#include <QScroller>
-
-//=============================================================================================================
-// NAMESPACE
+//*************************************************************************************************************
 
 using namespace MNE_BROWSE_RAW_QT;
 
@@ -63,6 +46,8 @@ using namespace MNE_BROWSE_RAW_QT;
 MainWindow::MainWindow(QWidget *parent)
 : QMainWindow(parent)
 , m_qFileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
+, m_rawSettings()
+, m_qSettings()
 {
     //setup MVC
     setupModel();
@@ -73,8 +58,7 @@ MainWindow::MainWindow(QWidget *parent)
     createMenus();
 
     createLogDockWindow();
-    setWindow();
-}
+    setWindow();}
 
 //*************************************************************************************************************
 
@@ -170,8 +154,8 @@ void MainWindow::createMenus() {
 }
 
 void MainWindow::setWindow() {
-    setWindowTitle("MNE_BROWSE_RAW_QT");
-    resize(1200,800);
+    setWindowTitle(CInfo::AppNameShort());
+    resize(m_qSettings.value("MainWindow/size").toSize());
     this->move(50,50);
 }
 

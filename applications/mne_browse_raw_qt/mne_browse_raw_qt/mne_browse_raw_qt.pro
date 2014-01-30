@@ -67,20 +67,21 @@ else {
 
 DESTDIR = $${MNE_BINARY_DIR}
 
-SOURCES += main.cpp\
+SOURCES += rawsettings.cpp\
+    main.cpp\
     rawmodel.cpp \
     mainwindow.cpp \
-    rawdelegate.cpp \
-    #plotsignalwidget.cpp #\
+    rawdelegate.cpp #\
     #rawview.cpp
 
-HEADERS += types_settings.h\
-    info.h\
+HEADERS += info.h\
+    types.h\
+    rawsettings.h\
     rawmodel.h\
     mainwindow.h \
-    rawdelegate.h \
-    #plotsignalwidget.h #\
+    rawdelegate.h #\
     #rawview.h
+
 
 FORMS +=
 

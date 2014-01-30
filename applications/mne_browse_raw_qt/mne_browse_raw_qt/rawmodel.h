@@ -44,6 +44,7 @@
 //Qt
 #include <QDebug>
 #include <QAbstractTableModel>
+#include <QSettings>
 
 //Eigen
 #include <Eigen/Core>
@@ -55,7 +56,7 @@
 #include <fiff/fiff_io.h>
 
 //MNE_BROWSE_RAW_QT
-#include "types_settings.h"
+#include "types.h"
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -102,12 +103,14 @@ public:
 
     QList<FiffChInfo> m_chinfolist; /**< List of FiffChInfo objects that holds the corresponding channels information */
 
-    //Model/Fiff settings
+    //Settings
+    QSettings m_qSettings;
+
     qint32 m_iAbsFiffCursor; /**< Cursor that points to the current position in the fiff data file [in samples] */
     qint32 m_iCurAbsScrollPos; /**< the current (absolute) ScrollPosition in the fiff data file */
 
     qint32 m_iWindowSize; /**< Length of window to load [in samples] */
-    qint32 n_reloadPos; /**< Distance that the current window needs to be off the ends of m_data [in samples] */
+    qint32 n_reloadPos; /**< Distance that the current window needs to be off the ends of m_data[i] [in samples] */
     qint8 n_maxWindows; /**< number of windows that are at maximum remained in m_data */
 
     /**
