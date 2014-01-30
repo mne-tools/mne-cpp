@@ -38,6 +38,8 @@
 
 #include "rawdelegate.h"
 
+#include <QBrush>
+
 //*************************************************************************************************************
 
 using namespace MNE_BROWSE_RAW_QT;
@@ -62,13 +64,17 @@ void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, c
     case 0: //chnames
         painter->save();
 
-//        qDebug() << "option.rect.x" << option.rect.x() << "y" << option.rect.y() << "w" << option.rect.width() << "h" << option.rect.height();
         painter->rotate(-90);
         painter->drawText(QRectF(-option.rect.y()-m_dPlotHeight,0,m_dPlotHeight,20),Qt::AlignCenter,index.model()->data(index,Qt::DisplayRole).toString());
+
         painter->restore();
         break;
     case 1: //data plot
         painter->save();
+
+        painter->setBackgroundMode(Qt::OpaqueMode);
+        QVariant v = index.model()->data(index,Qt::BackgroundRole);
+        bool conversion = v.canConvert(QVariant::Brush);
 
         //Get data
         QVariant variant = index.model()->data(index,Qt::DisplayRole);

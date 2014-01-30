@@ -46,6 +46,9 @@
 #include <QAbstractTableModel>
 #include <QSettings>
 
+#include <QBrush>
+#include <QPalette>
+
 //Eigen
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
