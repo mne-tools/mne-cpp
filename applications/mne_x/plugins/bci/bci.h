@@ -47,7 +47,7 @@
 #include <mne_x/Interfaces/IAlgorithm.h>
 #include <generics/circularbuffer.h>
 #include <xMeas/newrealtimesamplearray.h>
-#include <xMeas/newrealtimemultisamplearray.h>
+#include <xMeas/realtimesourceestimate.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -149,10 +149,16 @@ protected:
     virtual void run();
 
 private:
-	bool                                m_bIsRunning;                       /**< Whether TMSI is running.*/
+    PluginOutputData<NewRealTimeSampleArray>::SPtr      m_pBCIOutput;       /**< The RealTimeSampleArray of the BCI output.*/
+    PluginInputData<RealTimeSourceEstimate>::SPtr       m_pRTSEInput;       /**< The RealTimeMultiSampleArray input.*/
 
-    QString                             m_qStringResourcePath;              /**< The path to the EEG resource directory.*/
+    bool                m_bIsRunning;                       /**< Whether BCI is running.*/
 
+    qint32              m_iNumChs;
+
+    QString             m_qStringResourcePath;              /**< The path to the BCI resource directory.*/
+    QMutex              m_qMutex;
+    QVector<double>     m_pData;
 };
 
 } // NAMESPACE

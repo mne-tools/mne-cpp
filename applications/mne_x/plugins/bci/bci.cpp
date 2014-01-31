@@ -99,6 +99,15 @@ QSharedPointer<IPlugin> BCI::clone() const
 void BCI::init()
 {
 	m_bIsRunning = false;
+
+    // Input
+    m_pRTSEInput = PluginInputData<RealTimeSourceEstimate>::create(this, "BCIIn", "BCI input data");
+    connect(m_pRTSEInput.data(), &PluginInputConnector::notify, this, &BCI::update, Qt::DirectConnection);
+    m_inputConnectors.append(m_pRTSEInput);
+
+    // Output
+    m_pBCIOutput = PluginOutputData<NewRealTimeSampleArray>::create(this, "ControlSignal", "BCI output data");
+    m_outputConnectors.append(m_pBCIOutput);
 }
 
 
@@ -156,6 +165,16 @@ QWidget* BCI::setupWidget()
 
 void BCI::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 {
+    QSharedPointer<RealTimeSourceEstimate> pRTSE = pMeasurement.dynamicCast<RealTimeSourceEstimate>();
+    if(pRTSE)
+    {
+        m_qMutex.lock();
+        m_iNumChs = pRTSE->getValue().size();;
+        qint32 t_iSize = pRTSE->getValue().size();
+        for(qint32 i = 0; i < t_iSize; ++i)
+            m_pData.append(pRTSE->getValue()[i]);//Append sample wise
+        m_qMutex.unlock();
+    }
 }
 
 
@@ -165,6 +184,6 @@ void BCI::run()
 {
     while(m_bIsRunning)
     {
-        
+        //TODO:
     }
 }

@@ -132,57 +132,55 @@ int main(int argc, char *argv[])
     //AnnotationSet (See Destrieux paper)
     AnnotationSet t_annotationSet("D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/atlas/lh.aparc.a2009s.annot", "D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/atlas/rh.aparc.a2009s.annot");
 
-    //********************************** Original **********************************//
+    //********************************** Tapping ***********************************//
 
-//    //Original left tapping
+//    //Original left tapping - no filtering DC still present
 //    QString t_sRawFileNameRel  ("/Original/EEG_data_001_right_tapping_raw.fif");
 //    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_001_base_raw-cov.fif");
 //    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_right_tapping_raw-eve.fif");
-//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_right_tapping_Avr_");
+//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_right_tapping_Averaged_");
 //    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_right_tapping_Averaged_");
-
-    //********************************** Tapping ***********************************//
 
 //    //Filtered 7-14Hz left tapping
 //    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_001_left_tapping_filtered_7_14_raw.fif");
 //    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_001_left_tapping_filtered_7_14_raw-cov.fif");
 //    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_left_tapping_raw-eve.fif");
-//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_left_tapping_filtered_7_14_Avr_");
+//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_left_tapping_filtered_7_14_Averaged_");
 //    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_left_tapping_filtered_7_14_Averaged_");
 
 //    //Filtered 7-14Hz right tapping
 //    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_001_right_tapping_filtered_7_14_raw.fif");
 //    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_001_right_tapping_filtered_7_14_raw-cov.fif");                   //("/Processed/covariance/EEG_data_001_base_filtered_7_14_raw-cov.fif"); ("/Processed/covariance/EEG_data_001_right_tapping_filtered_7_14_raw-cov.fif")
 //    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_right_tapping_artefact_reduction_-1_1_0.001_raw-eve.fif");  //("EEG_data_001_right_tapping_raw-eve.fif")
-//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_right_tapping_filtered_7_14_Avr_");
+//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_right_tapping_filtered_7_14_Averaged_");
 //    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_right_tapping_filtered_7_14_Averaged_");
 
 //    //Filtered 0.6-40Hz left tapping
 //    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_001_left_tapping_filtered_06_40_raw.fif");
 //    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_001_left_tapping_filtered_06_40_raw-cov.fif");
 //    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_left_tapping_raw-eve.fif");
-//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_left_tapping_filtered_06_40_Avr_");
+//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_left_tapping_filtered_06_40_Averaged_");
 //    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_left_tapping_filtered_06_40_Averaged_");
 
 //    //Filtered 0.6-40Hz right tapping
 //    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_001_right_tapping_filtered_06_40_raw.fif");
 //    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_001_right_tapping_filtered_06_40_raw-cov.fif");
 //    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_right_tapping_raw-eve.fif");
-//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_right_tapping_filtered_06_40_Avr_");
+//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_right_tapping_filtered_06_40_Averaged_");
 //    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_right_tapping_filtered_06_40_Averaged_");
 
 //    //Filtered 0.7-40Hz right tapping
 //    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_001_right_tapping_filtered_07_40_raw.fif");
 //    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_001_base_filtered_07_40_raw-cov.fif"); //("/Processed/covariance/EEG_data_001_right_tapping_filtered_07_40_raw-cov.fif"); ("/Processed/covariance/EEG_data_001_base_filtered_07_40_raw-cov.fif");
 //    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_right_tapping_raw-eve.fif");
-//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_right_tapping_filtered_07_40_Avr_");
+//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_right_tapping_filtered_07_40_Averaged_");
 //    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_right_tapping_filtered_07_40_Averaged_");
 
 //    //Filtered 0.7-100Hz right tapping
 //    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_001_right_tapping_filtered_07_100_raw.fif");
 //    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_001_base_filtered_07_100_raw-cov.fif");
 //    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_right_tapping_raw-eve.fif");
-//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_right_tapping_filtered_07_100_Avr_");
+//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_right_tapping_filtered_07_100_Averaged_");
 //    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_right_tapping_filtered_07_100_Averaged_");
 
     //********************************** Medianus **********************************//
@@ -190,59 +188,73 @@ int main(int argc, char *argv[])
 //    //Filtered 0.7-40Hz left medianus stimulation
 //    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_002_medianus_left_filtered_07_40_raw.fif");
 //    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_medianus_base_filtered_07_40_raw-cov.fif");
-//    QString t_sEventFileNameRel("/Processed/events/EEG_data_002_medianus_left_artefact_reduction_-1_1_0.003_raw-eve.fif"); // ("EEG_data_002_medianus_left_raw-eve")
-//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_medianus_left_filtered_07_40_Avr_");
+//    QString t_sEventFileNameRel("/Processed/events/EEG_data_002_medianus_left_artefact_reduction_-1_1_0.002_80_raw-eve.fif"); // ("EEG_data_002_medianus_left_raw-eve")
+//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_medianus_left_filtered_07_40_Averaged_");
 //    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_002_medianus_left_filtered_07_40_Averaged_");
 
 //    //Filtered 0.7-40Hz right medianus stimulation
 //    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_002_medianus_right_filtered_07_40_raw.fif");
 //    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_medianus_base_filtered_07_40_raw-cov.fif");
-//    QString t_sEventFileNameRel("/Processed/events/EEG_data_002_medianus_right_artefact_reduction_-1_1_0.003_raw-eve.fif");    // ("EEG_data_002_medianus_right_raw-eve")
-//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_medianus_right_filtered_07_40_Avr_");
+//    QString t_sEventFileNameRel("/Processed/events/EEG_data_002_medianus_right_artefact_reduction_-1_1_0.0025_93_raw-eve.fif");    // ("EEG_data_002_medianus_right_raw-eve")
+//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_medianus_right_filtered_07_40_Averaged_");
 //    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_002_medianus_right_filtered_07_40_Averaged_");
 
 //    //Filtered 7-14Hz left medianus stimulation
 //    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_002_medianus_left_filtered_7_14_raw.fif");
 //    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_medianus_base_filtered_7_14_raw-cov.fif");
 //    QString t_sEventFileNameRel("/Processed/events/EEG_data_002_medianus_left_artefact_reduction_-1_1_0.002_80_raw-eve.fif"); // ("EEG_data_002_medianus_left_raw-eve")
-//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_medianus_left_filtered_7_14_Avr_");
+//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_medianus_left_filtered_7_14_Averaged_");
 //    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_002_medianus_left_filtered_7_14_Averaged_");
 
 //    //Filtered 7-14Hz right medianus stimulation
 //    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_002_medianus_right_filtered_7_14_raw.fif");
 //    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_medianus_base_filtered_7_14_raw-cov.fif");
 //    QString t_sEventFileNameRel("/Processed/events/EEG_data_002_medianus_right_artefact_reduction_-1_1_0.002_15_raw-eve.fif");    // ("EEG_data_002_medianus_right_raw-eve")
-//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_medianus_right_filtered_7_14_Avr_");
+//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_medianus_right_filtered_7_14_Averaged_");
 //    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_002_medianus_right_filtered_7_14_Averaged_");
 
     //*************************** Opposing finger movement **************************//
 
+//    //Original left opposing finger movement - no filtering DC still present
+//    QString t_sRawFileNameRel  ("/Original/EEG_data_001_voluntary_left_opposing_raw.fif");
+//    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_voluntary_base_raw-cov.fif");
+//    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_voluntary_left_opposing_raw-eve.fif");
+//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_voluntary_left_Averaged_");
+//    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_voluntary_left_Averaged_");
+
+//    //Original right opposing finger movement - no filtering DC still present
+//    QString t_sRawFileNameRel  ("/Original/EEG_data_001_voluntary_right_opposing_raw.fif");
+//    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_voluntary_base_raw-cov.fif");
+//    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_voluntary_right_opposing_raw-eve.fif");
+//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_voluntary_right_Averaged_");
+//    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_voluntary_right_Averaged_");
+
 //    //Filtered 0.7-40Hz left voluntary finger opposing
 //    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_001_voluntary_left_opposing_filtered_07_40_raw.fif");
 //    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_voluntary_base_filtered_07_40_raw-cov.fif");
-//    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_voluntary_left_opposing_artefact_reduction_-1_1_0.003_raw-eve.fif"); // ("EEG_data_001_voluntary_left_opposing_raw-eve")
-//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_voluntary_left_filtered_07_40_Avr_");
+//    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_voluntary_left_opposing_artefact_reduction_-1_1_0.003_45_raw-eve.fif"); // ("EEG_data_001_voluntary_left_opposing_raw-eve")
+//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_voluntary_left_filtered_07_40_Averaged_");
 //    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_voluntary_left_filtered_07_40_Averaged_");
 
 //    //Filtered 0.7-40Hz right voluntary finger opposing
 //    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_001_voluntary_right_opposing_filtered_07_40_raw.fif");
 //    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_voluntary_base_filtered_07_40_raw-cov.fif");
-//    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_voluntary_right_opposing_artefact_reduction_-1_1_0.003_raw-eve.fif");    // ("EEG_data_001_voluntary_right_opposing_raw-eve")
-//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_voluntary_right_filtered_07_40_Avr_");
+//    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_voluntary_right_opposing_artefact_reduction_-1_1_0.003_29_raw-eve.fif");    // ("EEG_data_001_voluntary_right_opposing_raw-eve")
+//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_voluntary_right_filtered_07_40_Averaged_");
 //    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_voluntary_right_filtered_07_40_Averaged_");
 
 //    //Filtered 7-14Hz left voluntary finger opposing
 //    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_001_voluntary_left_opposing_filtered_7_14_raw.fif");
 //    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_voluntary_base_filtered_7_14_raw-cov.fif");
-//    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_voluntary_left_opposing_artefact_reduction_-1_1_0.003_45_raw-eve.fif"); // ("EEG_data_001_voluntary_left_opposing_raw-eve")
-//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_voluntary_left_filtered_7_14_Avr_");
+//    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_voluntary_left_opposing_artefact_reduction_-1_1_0.004_57_raw-eve.fif"); // ("EEG_data_001_voluntary_left_opposing_raw-eve")
+//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_voluntary_left_filtered_7_14_Averaged_");
 //    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_voluntary_left_filtered_7_14_Averaged_");
 
     //Filtered 7-14Hz right voluntary finger opposing
     QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_001_voluntary_right_opposing_filtered_7_14_raw.fif");
     QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_voluntary_base_filtered_7_14_raw-cov.fif");
-    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_voluntary_right_opposing_artefact_reduction_-1_1_0.003_29_raw-eve.fif");    // ("EEG_data_001_voluntary_right_opposing_raw-eve")
-    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_voluntary_right_filtered_7_14_Avr_");
+    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_voluntary_right_opposing_artefact_reduction_-1_1_0.0045_60_raw-eve.fif");    // ("EEG_data_001_voluntary_right_opposing_raw-eve")
+    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_voluntary_right_filtered_7_14_Averaged_");
     QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_voluntary_right_filtered_7_14_Averaged_");
 
     //##########################################################################################################################
@@ -251,19 +263,6 @@ int main(int argc, char *argv[])
     QFile t_fileRaw(t_sRawFileNameRel.prepend(data_location));
     QFile t_fileCov(t_sCovFileNameRel.prepend(data_location));
     QString t_sEventName = t_sEventFileNameRel.prepend(data_location);
-
-    t_sStcFileNameRel.append(t_sStcFileNameRel.number(tmin));
-    t_sStcFileNameRel.append("_");
-    t_sStcFileNameRel.append(t_sStcFileNameRel.number(tmax));
-    t_sStcFileNameRel.append("_");
-    t_sStcFileNameRel.append(method.append(".stc"));
-    QString t_sFileNameStc = t_sStcFileNameRel.prepend(data_location);
-
-    t_sAvrFileNameRel.append(t_sAvrFileNameRel.number(tmin));
-    t_sAvrFileNameRel.append("_");
-    t_sAvrFileNameRel.append(t_sAvrFileNameRel.number(tmax));
-    t_sAvrFileNameRel.append(".fif");
-    QString t_sAvrFileName = t_sAvrFileNameRel.prepend(data_location);
 
     qint32 event = 1;
     qint32 k, p;
@@ -426,6 +425,24 @@ int main(int argc, char *argv[])
         printf("No desired events found.\n");
         return 0;
     }
+
+    // Add number of averages read from the eventfile to the file name
+    t_sAvrFileNameRel.append(t_sAvrFileNameRel.number(tmin));
+    t_sAvrFileNameRel.append("_");
+    t_sAvrFileNameRel.append(t_sAvrFileNameRel.number(tmax));
+    t_sAvrFileNameRel.append("_");
+    t_sAvrFileNameRel.append(t_sAvrFileNameRel.number(count));
+    t_sAvrFileNameRel.append(".fif");
+    QString t_sAvrFileName = t_sAvrFileNameRel.prepend(data_location);
+
+    t_sStcFileNameRel.append(t_sStcFileNameRel.number(tmin));
+    t_sStcFileNameRel.append("_");
+    t_sStcFileNameRel.append(t_sStcFileNameRel.number(tmax));
+    t_sStcFileNameRel.append("_");
+    t_sStcFileNameRel.append(t_sStcFileNameRel.number(count));
+    t_sStcFileNameRel.append("_");
+    t_sStcFileNameRel.append(method.append(".stc"));
+    QString t_sFileNameStc = t_sStcFileNameRel.prepend(data_location);
 
     fiff_int_t event_samp, from, to;
     MatrixXd timesDummy;
