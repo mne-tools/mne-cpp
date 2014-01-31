@@ -53,6 +53,7 @@
 #include <QMenu>
 #include <QMenuBar>
 #include <QAction>
+#include <QSignalMapper>
 
 #include <QTableView>
 #include <QHeaderView>
@@ -108,12 +109,25 @@ public:
     void writeToLog(const QString& logMsg, LogKind lgknd, LogLevel lglvl);
 
 public slots:
+    /**
+     * @brief customContextMenuRequested
+     * @param pos is the position, where the right-click occurred
+     */
+    void customContextMenuRequested(QPoint pos);
 
 private slots:
     /**
      * openFile opens a file dialog that picks the fiff data file to analyze and invokes the setup methods.
      */
     void openFile();
+
+    /**
+     * openFile opens a file dialog that lets choose the location and the file name of the fiff data file to write.
+     */
+    void writeFile();
+
+signals:
+    void testSignal();
 
 private:
     /**
@@ -152,11 +166,19 @@ private:
     void createLogDockWindow();
 
     /**
+    * Sets the log level
+    *
+    * @param [in] lvl message level; Message is displayed depending on its level.
+    */
+    void setLogLevel(LogLevel lvl);
+
+    /**
      * setWindow makes settings that are related to the MainWindow
      */
     void setWindow();
 
-    QFile m_qFileRaw; /**< Fiff data file to read (set for convenience */
+    QFile m_qFileRaw; /**< Fiff data file to read (set for convenience) */
+    QSignalMapper* m_qSignalMapper; /**< signal mapper used for signal-slot mapping */
 
     //modelview framework
     RawModel *m_pRawModel; /**< the QAbstractTable model being part of the model/view framework of Qt */
@@ -172,12 +194,6 @@ private:
     QTextBrowser* m_pTextBrowser_Log; /** a textbox being part of the log feature */
     LogLevel m_eLogLevelCurrent; /**< Holds the current log level.*/
 
-    /**
-    * Sets the log level
-    *
-    * @param [in] lvl message level; Message is displayed depending on its level.
-    */
-    void setLogLevel(LogLevel lvl);
 };
 
 }

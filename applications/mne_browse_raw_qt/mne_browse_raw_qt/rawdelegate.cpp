@@ -61,7 +61,7 @@ RawDelegate::RawDelegate(QObject *parent)
 void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     switch(index.column()) {
-    case 0: //chnames
+    case 0: { //chnames
         painter->save();
 
         painter->rotate(-90);
@@ -69,12 +69,18 @@ void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, c
 
         painter->restore();
         break;
-    case 1: //data plot
+    }
+    case 1: { //data plot
         painter->save();
 
-        painter->setBackgroundMode(Qt::OpaqueMode);
+        //draw special background when channel is marked as bad
         QVariant v = index.model()->data(index,Qt::BackgroundRole);
-        bool conversion = v.canConvert(QVariant::Brush);
+        if(v.canConvert<QBrush>() && !(option.state & QStyle::State_Selected)) {
+            QPointF oldBO = painter->brushOrigin();
+            painter->setBrushOrigin(option.rect.topLeft());
+            painter->fillRect(option.rect, qvariant_cast<QBrush>(v));
+            painter->setBrushOrigin(oldBO);
+        }
 
         //Get data
         QVariant variant = index.model()->data(index,Qt::DisplayRole);
@@ -105,8 +111,8 @@ void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, c
         painter->drawPath(path);
 
         painter->restore();
-
         break;
+    }
     }
 
 }
@@ -137,7 +143,7 @@ QSize RawDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelInde
 void RawDelegate::createPlotPath(const QModelIndex &index, QPainterPath& path, QList<RowVectorPair>& listPairs) const
 {
     //get maximum range of respective channel type (range value in FiffChInfo does not seem to contain a reasonable value)
-    qint32 kind = (static_cast<const RawModel*>(index.model()))->m_chinfolist[index.row()].kind;
+    qint32 kind = (static_cast<const RawModel*>(index.model()))->m_chInfolist[index.row()].kind;
     double dMaxValue = 1e-9;
 
     switch(kind) {
