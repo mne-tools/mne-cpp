@@ -74,8 +74,8 @@ SOURCES += rawsettings.cpp\
     rawdelegate.cpp #\
     #rawview.cpp
 
-HEADERS += info.h\
-    types.h\
+HEADERS += types.h\
+    info.h\
     rawsettings.h\
     rawmodel.h\
     mainwindow.h \
@@ -89,3 +89,4 @@ INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_X_INCLUDE_DIR}
 
+unix: QMAKE_CXXFLAGS += -std=c++0x

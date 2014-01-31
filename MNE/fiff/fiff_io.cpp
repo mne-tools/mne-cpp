@@ -40,8 +40,6 @@
 //=============================================================================================================
 
 #include "fiff_io.h"
-#include "fiff_stream.h"
-#include <mne/mne.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -168,7 +166,7 @@ bool FiffIO::write(QIODevice& p_IODevice, const fiff_int_t type, const fiff_int_
     switch(type) {
         case FIFFB_RAW_DATA: {
             FiffIO::write_raw(p_IODevice,idx);
-        printf("Finished writing single raw data with index %i!\n",idx);
+            qDebug() << "Finished writing single raw data with index" << idx << ".";
         }
         case FIFFB_EVOKED:
         //ToDo: write evoked set to file
@@ -182,7 +180,7 @@ bool FiffIO::write(QIODevice& p_IODevice, const fiff_int_t type, const fiff_int_
 //*************************************************************************************************************
 
 bool FiffIO::write(QFile& p_QFile, const fiff_int_t type, const fiff_int_t idx) const {
-    printf("------------------------ Writing fiff data ------------------------\n");
+    qDebug("------------------------ Writing fiff data ------------------------");
 
     switch(type) {
         case FIFFB_RAW_DATA: {
@@ -196,7 +194,7 @@ bool FiffIO::write(QFile& p_QFile, const fiff_int_t type, const fiff_int_t idx) 
                 t_fname = p_QFile.fileName().insert(p,QString("_"+t_nameoftype+"-"+QString::number(i)));
 
                 //assign new file name
-                printf("\nWriting set with index %i to file %s ...",i,t_fname.toUtf8().constData());
+                qDebug("\nWriting set with index %i to file %s ...",i,t_fname.toUtf8().constData());
                 QFile t_file(t_fname);
 
                 FiffIO::write_raw(t_file,i);
@@ -205,7 +203,7 @@ bool FiffIO::write(QFile& p_QFile, const fiff_int_t type, const fiff_int_t idx) 
         else {
             FiffIO::write_raw(p_QFile,idx);
         }
-        printf("\nFinished Writing %i raw data sets!\n",m_qlistRaw.size());
+        qDebug("\nFinished Writing %i raw data sets!\n",m_qlistRaw.size());
         }
         case FIFFB_EVOKED:
 
@@ -223,7 +221,7 @@ bool FiffIO::write_raw(QIODevice& p_IODevice, const fiff_int_t idx) const {
 
     MatrixXd cals;
 
-//    std::cout << "Writing file " << QFile(&p_IODevice).fileName() << std::endl;
+//    std::cout << "Writing file " << QFile(&p_IODevice).fileName().toLatin1() << std::endl;
     FiffStream::SPtr outfid = Fiff::start_writing_raw(p_IODevice,this->m_qlistRaw[idx]->info,cals);
 
     //Setup reading parameters
@@ -248,18 +246,18 @@ bool FiffIO::write_raw(QIODevice& p_IODevice, const fiff_int_t idx) const {
             last = to;
 
         if (!m_qlistRaw[idx]->read_raw_segment(data,times,first,last)) {
-                printf("error during read_raw_segment\n");
+                qDebug("error during read_raw_segment\n");
                 return -1;
         }
 
-        printf("Writing...");
+        qDebug("Writing...");
         if (first_buffer) {
            if (first > 0)
                outfid->write_int(FIFF_FIRST_SAMPLE,&first);
            first_buffer = false;
         }
         outfid->write_raw_buffer(data,cals);
-        printf("[done]\n");
+        qDebug("[done]\n");
     }
 
     outfid->finish_writing_raw();

@@ -76,17 +76,25 @@ class RawModel : public QAbstractTableModel
     Q_OBJECT
 public:
     RawModel(QObject *parent);
-    RawModel(QIODevice& p_IODevice, QObject *parent);
+    RawModel(QFile &qFile, QObject *parent);
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const ;
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
     virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 
     /**
-    * Load fiff data.
+    * loadFiffData loads fiff data file.
     *
+    * @param p_IODevice fiff data file to write
     */
-    bool loadFiffData(QIODevice &p_IODevice);
+    bool loadFiffData(QFile &qFile);
+
+    /**
+     * writeFiffData writes a new fiff data file
+     * @param p_IODevice fiff data file to write
+     * @return
+     */
+    bool writeFiffData(QFile &qFile);
 
     /**
      * resetPosition reset the position of the current m_iAbsFiffCursor if a ScrollBar position is selected, whose data is not yet loaded.
@@ -100,11 +108,20 @@ public:
      */
     void clearModel();
 
+    /**
+     * getMaxDataValue obtains the maximum value for the underlying channel
+     *
+     * @param chan number of channel in m_chInfolist
+     * @return max data value of m_data for scaling purposes.
+     */
+    double maxDataValue(qint16 chan) const;
+
     //Fiff data structure
     QList<MatrixXdR> m_data; /**< List that holds the fiff matrix data <n_channels x n_samples> */
     QList<MatrixXdR> m_times; /**< List that holds the time axis [in secs] */
 
-    QList<FiffChInfo> m_chinfolist; /**< List of FiffChInfo objects that holds the corresponding channels information */
+    QList<FiffChInfo> m_chInfolist; /**< List of FiffChInfo objects that holds the corresponding channels information */
+    FiffInfo m_fiffInfo; /**< fiff info of whole fiff file */
 
     //Settings
     QSettings m_qSettings;
@@ -116,14 +133,6 @@ public:
     qint32 n_reloadPos; /**< Distance that the current window needs to be off the ends of m_data[i] [in samples] */
     qint8 n_maxWindows; /**< number of windows that are at maximum remained in m_data */
 
-    /**
-     * getMaxDataValue obtains the maximum value for the underlying channel
-     *
-     * @param chan number of channel in m_chinfolist
-     * @return max data value of m_data for scaling purposes.
-     */
-    double maxDataValue(qint16 chan) const;
-
     QSharedPointer<FiffIO> m_pfiffIO; /**< FiffIO objects, which holds all the information of the fiff data (excluding the samples!) */
 
 private:
@@ -133,10 +142,10 @@ private:
 
     //methods
     /**
-    * Load channel infos to m_chinfolist.
+    * Loads fiff infos to m_chInfolist abd m_fiffInfo.
     *
     */
-    void loadChInfos();
+    void loadFiffInfos();
 
     /**
      * reloadFiffData
@@ -148,13 +157,20 @@ private:
 
 signals:
 
-private slots:
+public slots:
     /**
      * reloadData checks, whether the actual position of the QScrollBar demands for a fiff data reload (depending on m_reloadPos)
      *
      * @param value the position of QScrollBar
      */
     void reloadData(int value);
+
+    /**
+     * @brief markChBad marks the selected channels as bad/good in m_chInfolist
+     * @param selected is the list of indices that are selected for marking
+     * @param status, status=1 -> mark as bad, status=0 -> mark as good
+     */
+    void markChBad(QModelIndexList selected, bool status);
 
 //Inline
 public:

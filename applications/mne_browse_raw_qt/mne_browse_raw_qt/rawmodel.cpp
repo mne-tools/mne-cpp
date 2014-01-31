@@ -52,7 +52,7 @@ RawModel::RawModel(QObject *parent)
 
 //*************************************************************************************************************
 
-RawModel::RawModel(QIODevice &p_IODevice, QObject *parent)
+RawModel::RawModel(QFile &qFile, QObject *parent)
 : QAbstractTableModel(parent)
 , m_qSettings()
 , m_bStartReached(false)
@@ -63,7 +63,7 @@ RawModel::RawModel(QIODevice &p_IODevice, QObject *parent)
     n_maxWindows = m_qSettings.value("RawModel/max_windows").toInt();
 
     //read fiff data
-    loadFiffData(p_IODevice);
+    loadFiffData(qFile);
 }
 
 //=============================================================================================================
@@ -71,8 +71,8 @@ RawModel::RawModel(QIODevice &p_IODevice, QObject *parent)
 
 int RawModel::rowCount(const QModelIndex & /*parent*/) const
 {
-    if(!m_chinfolist.empty())
-        return m_chinfolist.size();
+    if(!m_chInfolist.empty())
+        return m_chInfolist.size();
     else return 0;
 }
 
@@ -92,7 +92,7 @@ QVariant RawModel::data(const QModelIndex &index, int role) const
     if (index.isValid()) {
         //******** first column (chname) ********
         if(index.column()==0 && role == Qt::DisplayRole)
-            return QVariant(m_chinfolist[index.row()].ch_name);
+            return QVariant(m_chInfolist[index.row()].ch_name);
 
         //******** second column (data plot) ********
         if(index.column()==1) {
@@ -118,17 +118,16 @@ QVariant RawModel::data(const QModelIndex &index, int role) const
                 break;
             }
             case Qt::BackgroundRole: {
-                QBrush brush;
-                if(m_chinfolist[index.row()].ch_name == "MEG 0113"/*m_pfiffIO->m_qlistRaw[0]->info.bads.contains(m_chinfolist[index.row()].ch_name)*/) {
-                    brush.setColor(QColor("red"));
-                    qDebug() << "MEG 0113 is marked as red, index:" << index.row();
+                if(m_fiffInfo.bads.contains(m_chInfolist[index.row()].ch_name)) {
+                    QBrush brush;
+                    brush.setStyle(Qt::SolidPattern);
+                    qDebug() << m_chInfolist[index.row()].ch_name << "is marked as bad, index:" << index.row();
+                    brush.setColor(Qt::red);
+                    return QVariant(brush);
                 }
-                else {
-                    brush.setColor(QPalette::Normal);
-                }
-                brush.setStyle(Qt::SolidPattern);
+                else
+                    return QVariant();
 
-                return QVariant(brush);
                 break;
             }
         } // end role switch
@@ -177,14 +176,14 @@ QVariant RawModel::headerData(int section, Qt::Orientation orientation, int role
 //=============================================================================================================
 //non-virtual functions
 
-bool RawModel::loadFiffData(QIODevice& p_IODevice)
+bool RawModel::loadFiffData(QFile &qFile)
 {
     beginResetModel();
     clearModel();
 
     MatrixXd t_data,t_times;
 
-    m_pfiffIO = QSharedPointer<FiffIO>(new FiffIO(p_IODevice));
+    m_pfiffIO = QSharedPointer<FiffIO>(new FiffIO(qFile));
     if(!m_pfiffIO->m_qlistRaw.empty()) {
         m_iAbsFiffCursor = m_pfiffIO->m_qlistRaw[0]->first_samp; //Set cursor somewhere into fiff file [in samples]
         if(!m_pfiffIO->m_qlistRaw[0]->read_raw_segment(t_data, t_times, m_iAbsFiffCursor, m_iAbsFiffCursor+m_iWindowSize-1))
@@ -200,10 +199,21 @@ bool RawModel::loadFiffData(QIODevice& p_IODevice)
     m_data.append(t_data);
     m_times.append(t_times);
 
-    loadChInfos();
+    loadFiffInfos();
 
     endResetModel();
     return true;
+}
+
+//*************************************************************************************************************
+
+bool RawModel::writeFiffData(QFile &qFile)
+{
+    //replace m_fiffInfo with the one contained in the m_pfiffIO object (for replacing bad channesls)
+    m_pfiffIO->m_qlistRaw[0]->info = m_fiffInfo;
+
+    m_pfiffIO->write_raw(qFile,0); //ToDo: by now, fiff data file is completely written new -> substitute only FiffInfo in old file?
+    qDebug() << "Done saving as fiff file" << qFile.fileName() << "...";
 }
 
 //*************************************************************************************************************
@@ -212,7 +222,7 @@ void RawModel::clearModel() {
     m_pfiffIO.clear();
     m_data.clear();
     m_times.clear();
-    m_chinfolist.clear();
+    m_chInfolist.clear();
 
     m_iAbsFiffCursor = 0;
     m_iCurAbsScrollPos = 0;
@@ -278,13 +288,10 @@ void RawModel::reloadFiffData(bool before) {
         }
     }
 
-
-
-
     qDebug() << "RawModel: Fiff data REloaded from " << start << "to" << end;
 
     QModelIndex topLeft = createIndex(0,1);
-    QModelIndex bottomRight = createIndex(m_chinfolist.size(),1);
+    QModelIndex bottomRight = createIndex(m_chInfolist.size(),1);
 
     emit dataChanged(topLeft,bottomRight);
 }
@@ -317,7 +324,7 @@ void RawModel::resetPosition(qint32 position) {
     m_times.append(t_times);
 
     QModelIndex topLeft = createIndex(0,1);
-    QModelIndex bottomRight = createIndex(m_chinfolist.size(),1);
+    QModelIndex bottomRight = createIndex(m_chInfolist.size(),1);
     emit dataChanged(topLeft,bottomRight);
 
     endResetModel();
@@ -328,10 +335,14 @@ void RawModel::resetPosition(qint32 position) {
 
 //*************************************************************************************************************
 
-void RawModel::loadChInfos()
+void RawModel::loadFiffInfos()
 {
+    //loads chinfos
     for(qint32 i=0; i < m_pfiffIO->m_qlistRaw[0]->info.nchan; ++i)
-        m_chinfolist.append(m_pfiffIO->m_qlistRaw[0]->info.chs[i]);
+        m_chInfolist.append(m_pfiffIO->m_qlistRaw[0]->info.chs[i]);
+
+    //loads fiffInfo
+    m_fiffInfo = m_pfiffIO->m_qlistRaw[0]->info;
 }
 
 //*************************************************************************************************************
@@ -342,13 +353,13 @@ double RawModel::maxDataValue(qint16 chan) const {
     double max = m_data[0].row(0).maxCoeff();
     double min = m_data[0].row(0).minCoeff();
 
-    dMax = (double) (m_chinfolist[chan].range*m_chinfolist[chan].cal)/2;
+    dMax = (double) (m_chInfolist[chan].range*m_chInfolist[chan].cal)/2;
 
     return dMax;
 }
 
 //=============================================================================================================
-//slots
+//SLOTS
 
 void RawModel::reloadData(int value) {
     m_iCurAbsScrollPos = firstSample()+value;
@@ -367,5 +378,26 @@ void RawModel::reloadData(int value) {
     else if(m_iCurAbsScrollPos > m_iAbsFiffCursor+sizeOfPreloadedData()-n_reloadPos && !m_bEndReached) {
         qDebug() << "RawModel: Reload requested at END of loaded fiff data.";
         reloadFiffData(0);
+    }
+}
+
+//*************************************************************************************************************
+
+void RawModel::markChBad(QModelIndexList selected, bool status)
+{
+    for(qint8 i=0; i < selected.size(); ++i) {
+        if(status) {
+            m_fiffInfo.bads.append(m_chInfolist[selected[i].row()].ch_name);
+            qDebug() << "RawModel:" << m_chInfolist[selected[i].row()].ch_name << "marked as bad.";
+        }
+        else {
+            if(m_fiffInfo.bads.contains(m_chInfolist[selected[i].row()].ch_name)) {
+                int index = m_fiffInfo.bads.indexOf(m_chInfolist[selected[i].row()].ch_name);
+                m_fiffInfo.bads.removeAt(index);
+                qDebug() << "RawModel:" << m_chInfolist[selected[i].row()].ch_name << "marked as good.";
+            }
+        }
+
+        emit dataChanged(selected[i],selected[i]);
     }
 }
