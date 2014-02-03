@@ -635,7 +635,7 @@ void TMSI::run()
 //                cout<<"matValue after FFT:"<<endl<<matValue<<endl;
             }
 
-            //Change values of the Dig channel
+            //Change values of the trigger channel for better plotting - this change is not saved in the produced fif file
             if(m_iNumberOfChannels>137)
             {
                 for(int i = 0; i<matValue.row(137).cols(); i++)
