@@ -37,6 +37,9 @@
 
 #include "mainwindow.h"
 
+#include "newparksmcclellan.h"
+
+
 //*************************************************************************************************************
 
 using namespace MNE_BROWSE_RAW_QT;
@@ -58,7 +61,17 @@ MainWindow::MainWindow(QWidget *parent)
     createMenus();
 
     createLogDockWindow();
-    setWindow();}
+    setWindow();
+
+    //example filter generation
+    int NumTaps = 80;
+    NewParksMcClellan(NumTaps, 0.7, 0.2, 0.1, HPF);
+
+    std::vector<double> firCoeffs(FirCoeff, FirCoeff + NumTaps);
+
+    std::cout << "test" << std::endl;
+
+}
 
 //*************************************************************************************************************
 
