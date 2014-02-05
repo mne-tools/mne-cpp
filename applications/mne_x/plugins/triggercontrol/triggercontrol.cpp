@@ -58,6 +58,15 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// USER DEFINES
+//=============================================================================================================
+
+//#define TIMEMEAS // Zeitmessung;
+#define BUFFERX1 // X1 determination
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
@@ -297,53 +306,162 @@ void TriggerControl::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 void TriggerControl::run()
 {
 
- //Beginn Zeitmessung
-
-    m_pData.clear();
 
 
-    bool t_bFound = false;
 
-    int count = 0;
+
+
+
+
+
+#ifdef TIMEMEAS
+
+        //Beginn Zeitmessung - alpha zeitmessung
+
+        m_pData.clear();
+
+
+        bool t_bFound = false;
+        double x_u = -0.01;
+        double x_o = 0.01;
+
+    //       int count = 0;
+
+
+           while(m_bIsRunning)
+           {
+               m_qMutex.lock();
+
+               if(t_bFound && m_pData.size() > 0)
+               {
+                  // m_pData.clear();
+                   // ++count;
+
+                   msleep(5000);
+                   m_pData.clear();
+                   t_bFound = false;
+
+                 /*  if(count > 2)
+                   {
+                       t_bFound = false;
+                       count = 0;
+
+                       emit sendByte(1);
+                       m_qTime.start();
+                   }*/
+
+               }
+
+               if(m_pData.size() > 0)
+               {
+                   if((!t_bFound) && (m_pData.first()[m_iNumChs-2] > x_u) && (m_pData.first()[m_iNumChs-2] < x_o)) // x_u untere Schranke // x_o obere Schranke
+                   {
+
+
+                       //m_vTimes.push_back(m_qTime.elapsed());
+                        emit sendByte(1);
+                        msleep(10);
+                        emit sendByte(0);
+                        t_bFound = true;
+                   }
+
+                   m_pData.pop_front();
+               }
+               m_qMutex.unlock();
+
+           }
+    // Ende Zeitmessung alpha zeitmessung
+
+#endif
+
+#ifdef BUFFERX1
 
 
     while(m_bIsRunning)
     {
-        m_qMutex.lock();
 
-        if(t_bFound && m_pData.size() > 0)
-        {
-            m_pData.clear();
-            ++count;
+        emit sendByte(1);
+        msleep(10);
+        emit sendByte(0);
+        msleep(500);
 
-            if(count > 2)
-            {
-                t_bFound = false;
-                count = 0;
-
-                emit sendByte(1);
-                m_qTime.start();
-            }
-
-        }
-
-        if(m_pData.size() > 0)
-        {
-            if(!t_bFound && m_pData.first()[m_iNumChs-2] > 1000)
-            {
-                //std::cout << "Time elapsed: " << m_qTime.elapsed() << std::endl;
-
-                m_vTimes.push_back(m_qTime.elapsed());
-                emit sendByte(0);
-
-                t_bFound = true;
-            }
-
-            m_pData.pop_front();
-        }
-        m_qMutex.unlock();
     }
-// Ende Zeitmessung
+
+
+
+#endif
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// //Beginn Zeitmessung
+
+//    m_pData.clear();
+
+
+//    bool t_bFound = false;
+
+//    int count = 0;
+
+
+//    while(m_bIsRunning)
+//    {
+//        m_qMutex.lock();
+
+//        if(t_bFound && m_pData.size() > 0)
+//        {
+//            m_pData.clear();
+//            ++count;
+
+//            if(count > 2)
+//            {
+//                t_bFound = false;
+//                count = 0;
+
+//                emit sendByte(1);
+//                m_qTime.start();
+//            }
+
+//        }
+
+//        if(m_pData.size() > 0)
+//        {
+//            if(!t_bFound && m_pData.first()[m_iNumChs-2] > 1000)
+//            {
+//                //std::cout << "Time elapsed: " << m_qTime.elapsed() << std::endl;
+
+//                m_vTimes.push_back(m_qTime.elapsed());
+//                emit sendByte(0);
+
+//                t_bFound = true;
+//            }
+
+//            m_pData.pop_front();
+//        }
+//        m_qMutex.unlock();
+//    }
+
+
+//// Ende Zeitmessung
 
 //    double v_old = 0;
 

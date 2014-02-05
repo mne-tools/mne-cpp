@@ -398,7 +398,7 @@ void SerialPort::encodedig()
     if (m_digchannel.at(21) == 1) m_data[0] = m_data[0]|0x20;     // 0010 0000
 
 
-    std::cout << "Digital ausgelesen" << std::endl;
+//    std::cout << "Digital ausgelesen" << std::endl;
 
 
 }
