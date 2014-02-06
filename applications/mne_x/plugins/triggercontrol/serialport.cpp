@@ -200,6 +200,7 @@ void SerialPort::decodedig(QByteArray &t_incomingArray)
     if ((t_incomingArray.at(3)&0x20) == 0x20) m_InActiveDig[3] = 1;            // 0010 0000
     else m_InActiveDig[3] = 0;
 
+/*
     if ((t_incomingArray.at(3)&0x40) == 0x40) m_InActiveDig[4] = 1;             // 0100 0000
     else m_InActiveDig[4] = 0;
 
@@ -261,10 +262,13 @@ void SerialPort::decodedig(QByteArray &t_incomingArray)
 
     if ((t_incomingArray.at(0)&0x20) == 0x20) m_InActiveDig[21] = 1;            // 0010 0000
     else m_InActiveDig[21] = 0;
+*/
 
+    for ( int i = 1; i<5;i++)
+        std::cout << "Kanal " << i <<": " << m_InActiveDig[i-1] << std::endl;
 
-    for ( int i = 0; i<22;i++)
-        std::cout << "Kanal: " << m_InActiveDig[i] << std::endl;
+    //ZeitmessungMUC
+    emit TriggerControl::Bytereceived();
 }
 
 //*************************************************************************************************************
