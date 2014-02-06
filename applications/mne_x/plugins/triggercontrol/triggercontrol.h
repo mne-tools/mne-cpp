@@ -142,6 +142,8 @@ public:
 //
 signals:
     void sendByte(int value);
+    void Bytereceived();
+
 
 protected:
     virtual void run();
@@ -171,6 +173,7 @@ private:
     QTime m_qTime;
 
     bool m_bIsRunning;
+    bool m_received;
 
 
 };

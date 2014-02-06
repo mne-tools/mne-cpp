@@ -266,6 +266,9 @@ void SerialPort::decodedig(QByteArray &t_incomingArray)
 
     for ( int i = 1; i<5;i++)
         std::cout << "Kanal " << i <<": " << m_InActiveDig[i-1] << std::endl;
+
+    //ZeitmessungMUC
+    emit TriggerControl::Bytereceived();
 }
 
 //*************************************************************************************************************
