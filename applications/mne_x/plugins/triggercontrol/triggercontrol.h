@@ -140,9 +140,10 @@ public:
 
     void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
 //
+    void byteReceived();
+
 signals:
     void sendByte(int value);
-    void Bytereceived();
 
 
 protected:
@@ -173,7 +174,7 @@ private:
     QTime m_qTime;
 
     bool m_bIsRunning;
-    bool m_received;
+    bool m_isReceived;
 
 
 };
