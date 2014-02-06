@@ -177,6 +177,20 @@ private:
     bool m_isReceived;
 
 
+
+    //alpha locked stuff
+
+    double m_fs;
+    double m_dt;
+    double m_refFreq;
+    double m_alphaFreq;
+
+    VectorXd m_refSin;
+    VectorXd m_vecCorr;
+
+    double corr(VectorXd a, VectorXd b);
+
+
 };
 
 } // NAMESPACE
