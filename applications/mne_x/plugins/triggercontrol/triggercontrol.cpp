@@ -321,19 +321,19 @@ void TriggerControl::run()
 #ifdef TIMEMUC
     connect(m_pSerialPort.data(), &SerialPort::byteReceived, this, &TriggerControl::byteReceived);
 
+
+    m_isReceived = false;
+    emit sendByte(1);
+    m_qTime.start();
+
     while(m_bIsRunning)
     {
-        emit sendByte(1);
-
-        while(m_isReceived == 0)
+        if(m_isReceived)
         {
-
-
+            m_vTimes.push_back(m_qTime.elapsed());
+            m_isReceived = false;
+            emit sendByte(1);
         }
-
-        m_vTimes.push_back(m_qTime.elapsed());
-
-
     }
 #endif
 
