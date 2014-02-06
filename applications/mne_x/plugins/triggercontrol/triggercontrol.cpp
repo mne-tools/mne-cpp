@@ -318,17 +318,18 @@ void TriggerControl::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 void TriggerControl::run()
 {
 
-
-
 #ifdef TIMEMUC
-
+    connect(m_pSerialPort.data(), &SerialPort::byteReceived, this, &TriggerControl::byteReceived);
 
     while(m_bIsRunning)
     {
         emit sendByte(1);
 
-        while(m_received == 0)
-        {}
+        while(m_isReceived == 0)
+        {
+
+
+        }
 
         m_vTimes.push_back(m_qTime.elapsed());
 
@@ -574,7 +575,7 @@ void TriggerControl::sendByteTo(int value)
 
 //*************************************************************************************************************
 
-void TriggerControl::Bytereceived()
+void TriggerControl::byteReceived()
 {
-    m_received = 1;
+    m_isReceived = true;
 }
