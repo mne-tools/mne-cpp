@@ -62,7 +62,8 @@
 //=============================================================================================================
 
 //#define TIMEMEAS // Zeitmessung;
-#define BUFFERX1 // X1 determination
+//#define BUFFERX1 // X1 determination
+#define TIMEMUC // Zeitmessung MUC
 
 
 //*************************************************************************************************************
@@ -158,6 +159,16 @@ bool TriggerControl::start()
 
 //    // ////////////////////////////
 
+#ifdef TIMEMUC
+
+    if(!m_pSerialPort->open())   // open Serial Port
+        std::cout << "Not able to open port - test" << std::endl;
+
+#endif
+
+
+
+#ifdef TIMEMEAS
 
 
 
@@ -184,7 +195,8 @@ bool TriggerControl::start()
     {
         std::cout << "Sending not possible, please check settings" << std::endl;
     }
- //Ende Zeitmessung
+#endif
+
 
     return true;
 }
@@ -308,9 +320,21 @@ void TriggerControl::run()
 
 
 
+#ifdef TIMEMUC
 
 
+    while(m_bIsRunning)
+    {
+        emit sendByte(1);
 
+        while(m_received == 0)
+        {}
+
+        m_vTimes.push_back(m_qTime.elapsed());
+
+
+    }
+#endif
 
 
 
@@ -546,4 +570,11 @@ void TriggerControl::sendByteTo(int value)
         m_pSerialPort->sendData(m_pSerialPort->m_data);
     }
 
+}
+
+//*************************************************************************************************************
+
+void TriggerControl::Bytereceived()
+{
+    m_received = 1;
 }
