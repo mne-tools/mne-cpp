@@ -52,6 +52,14 @@
 //Eigen
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
+#include <Eigen/unsupported/FFT>
+
+#ifndef EIGEN_FFTW_DEFAULT
+#define EIGEN_FFTW_DEFAULT
+#endif
+
+//external stuff
+#include "newparksmcclellan.h"
 
 //MNE
 #include <fiff/fiff.h>
@@ -130,15 +138,17 @@ public:
     qint32 m_iCurAbsScrollPos; /**< the current (absolute) ScrollPosition in the fiff data file */
 
     qint32 m_iWindowSize; /**< Length of window to load [in samples] */
-    qint32 n_reloadPos; /**< Distance that the current window needs to be off the ends of m_data[i] [in samples] */
-    qint8 n_maxWindows; /**< number of windows that are at maximum remained in m_data */
+    qint32 m_reloadPos; /**< Distance that the current window needs to be off the ends of m_data[i] [in samples] */
+    qint8 m_maxWindows; /**< number of windows that are at maximum remained in m_data */
+    qint16 m_iFilterTaps; /**< Number of Filter taps */
 
     QSharedPointer<FiffIO> m_pfiffIO; /**< FiffIO objects, which holds all the information of the fiff data (excluding the samples!) */
 
 private:
     //View control
-    bool m_bStartReached; /** signals, whether the start of the fiff data file is reached */
-    bool m_bEndReached; /** signals, whether the end of the fiff data file is reached */
+    bool m_bStartReached; /**< signals, whether the start of the fiff data file is reached */
+    bool m_bEndReached; /**< signals, whether the end of the fiff data file is reached */
+    QMap<TPassType,RowVectorXd> m_mapFilters; /**< Map of all filter coeffs vectors */
 
     //methods
     /**
@@ -154,6 +164,17 @@ private:
      */
     void reloadFiffData(bool before);
 
+    /**
+     * genFilter generates filter coeffient vectors with respect to the given filter parameters
+     * @param NumTaps number of taps, higher stopband attenuation for higher filter orders (=NumTaps).
+     * @param OmegaC is the 3 dB corner freq for low pass and high pass filters.
+     * @param BW is the bandwidth for bandpass and notch filters (ignored on low and high pass).
+     * @param ParksWidth is the width of the transition bands.
+     * @param PassType is the type of filter that shall be generated. options: LPF, HPF, BPF, NOTCH.
+     */
+    void genFilter(int NumTaps, double OmegaC, double BW, double ParksWidth, TPassType PassType);
+
+
 
 signals:
 
@@ -166,11 +187,16 @@ public slots:
     void reloadData(int value);
 
     /**
-     * @brief markChBad marks the selected channels as bad/good in m_chInfolist
+     * markChBad marks the selected channels as bad/good in m_chInfolist
      * @param selected is the list of indices that are selected for marking
      * @param status, status=1 -> mark as bad, status=0 -> mark as good
      */
     void markChBad(QModelIndexList selected, bool status);
+
+    /**
+     * applyFilter applies filter to channels
+     */
+    void applyFilter(QModelIndex index, TPassType type);
 
 //Inline
 public:

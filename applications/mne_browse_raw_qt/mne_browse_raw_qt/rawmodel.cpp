@@ -46,8 +46,8 @@ RawModel::RawModel(QObject *parent)
 , m_bEndReached(false)
 {
     m_iWindowSize = m_qSettings.value("RawModel/window_size").toInt();
-    n_reloadPos = m_qSettings.value("RawModel/reload_pos").toInt();
-    n_maxWindows = m_qSettings.value("RawModel/max_windows").toInt();
+    m_reloadPos = m_qSettings.value("RawModel/reload_pos").toInt();
+    m_maxWindows = m_qSettings.value("RawModel/max_windows").toInt();
 }
 
 //*************************************************************************************************************
@@ -59,11 +59,18 @@ RawModel::RawModel(QFile &qFile, QObject *parent)
 , m_bEndReached(false)
 {
     m_iWindowSize = m_qSettings.value("RawModel/window_size").toInt();
-    n_reloadPos = m_qSettings.value("RawModel/reload_pos").toInt();
-    n_maxWindows = m_qSettings.value("RawModel/max_windows").toInt();
+    m_reloadPos = m_qSettings.value("RawModel/reload_pos").toInt();
+    m_maxWindows = m_qSettings.value("RawModel/max_windows").toInt();
+    m_iFilterTaps = m_qSettings.value("RawModel/num_filter_taps").toInt();
 
     //read fiff data
     loadFiffData(qFile);
+
+    //generate filters
+    //HPF
+    genFilter(m_qSettings.value("RawModel/num_filter_taps").toInt(), 0.15, 0.2, 0.1, HPF);
+    //LPF
+    genFilter(m_qSettings.value("RawModel/num_filter_taps").toInt(), 0.08, 0.2, 0.1, LPF);
 }
 
 //=============================================================================================================
@@ -273,16 +280,16 @@ void RawModel::reloadFiffData(bool before) {
         m_data.prepend(t_reloaddata);
         m_times.prepend(t_reloadtimes);
 
-        //maintain at maximum n_maxWindows data windows and drop the rest
-        if(m_data.size() > n_maxWindows)
+        //maintain at maximum m_maxWindows data windows and drop the rest
+        if(m_data.size() > m_maxWindows)
             m_data.removeLast();
     }
     else {
         m_data.append(t_reloaddata);
         m_times.append(t_reloadtimes);
 
-        //maintain at maximum n_maxWindows data windows and drop the rest
-        if(m_data.size() > n_maxWindows) {
+        //maintain at maximum m_maxWindows data windows and drop the rest
+        if(m_data.size() > m_maxWindows) {
             m_data.removeFirst();
             m_iAbsFiffCursor += m_iWindowSize;
         }
@@ -295,6 +302,55 @@ void RawModel::reloadFiffData(bool before) {
 
     emit dataChanged(topLeft,bottomRight);
 }
+
+//*************************************************************************************************************
+
+void RawModel::genFilter(int NumTaps, double OmegaC, double BW, double ParksWidth, TPassType PassType)
+{
+    NewParksMcClellan(NumTaps, OmegaC, BW, ParksWidth, PassType);
+    std::vector<double> t_firCoeffs(FirCoeff, FirCoeff + NumTaps);
+
+    RowVectorXd t_coeffs(NumTaps); //ToDo: could this be more elegant?
+    for(qint16 i=0; i < NumTaps; ++i)
+        t_coeffs[i] = t_firCoeffs[i];
+
+    m_mapFilters[PassType] = t_coeffs;
+
+    qDebug() << "RawModel" << PassType << " filter generated and stored to RawModel.";
+}
+
+//*************************************************************************************************************
+
+void RawModel::applyFilter(QModelIndex index, TPassType type) //ToDo: make this method efficient
+{
+    //generate fft object
+    Eigen::FFT<double> fft;
+    fft.SetFlag(fft.HalfSpectrum);
+
+    RowVectorXcd freqFilter,freqData;
+
+    m_mapFilters[type].conservativeResize(m_iWindowSize+m_iFilterTaps);
+    m_mapFilters[type].block(0,m_iFilterTaps,1,m_iWindowSize) = RowVectorXd::Zero(1,m_iWindowSize);
+
+    RowVectorXd procData(1,m_iWindowSize+m_iFilterTaps);
+    procData.block(0,0,1,m_iWindowSize) = m_data[0].row(index.row());
+    procData.block(0,m_iWindowSize,1,m_iFilterTaps) = RowVectorXd::Zero(1,m_iFilterTaps);
+
+    fft.fwd(freqFilter,m_mapFilters[type]);
+    fft.fwd(freqData,procData);
+
+    RowVectorXcd filtered = freqFilter.array()*freqData.array();
+
+//    std::cout << "address of m_data: " << m_data[0].data() << "address of data " << &dat << std::endl;
+
+    RowVectorXd filteredTime;
+    fft.inv(filteredTime,filtered);
+
+    m_data[0].row(index.row()) = filteredTime.block(0,m_iFilterTaps/2,1,m_iWindowSize);
+
+    qDebug() << "RawModel: Filter applied to channel#" << index.row() << "of PassType" << type;
+}
+
 
 //*************************************************************************************************************
 
@@ -371,11 +427,11 @@ void RawModel::reloadData(int value) {
         return;
     }
 
-    if((m_iCurAbsScrollPos-m_iAbsFiffCursor) < n_reloadPos && !m_bStartReached) {
+    if((m_iCurAbsScrollPos-m_iAbsFiffCursor) < m_reloadPos && !m_bStartReached) {
         qDebug() << "RawModel: Reload requested at FRONT of loaded fiff data.";
         reloadFiffData(1);
     }
-    else if(m_iCurAbsScrollPos > m_iAbsFiffCursor+sizeOfPreloadedData()-n_reloadPos && !m_bEndReached) {
+    else if(m_iCurAbsScrollPos > m_iAbsFiffCursor+sizeOfPreloadedData()-m_reloadPos && !m_bEndReached) {
         qDebug() << "RawModel: Reload requested at END of loaded fiff data.";
         reloadFiffData(0);
     }
