@@ -66,6 +66,7 @@ void RawSettings::init()
         m_qSettings.setValue("window_size",MODEL_WINDOW_SIZE);
         m_qSettings.setValue("reload_pos",MODEL_RELOAD_POS);
         m_qSettings.setValue("max_windows",MODEL_MAX_WINDOWS);
+        m_qSettings.setValue("num_filter_taps",MODEL_NUM_FILTER_TAPS);
     m_qSettings.endGroup();
 
     //RawDelegate

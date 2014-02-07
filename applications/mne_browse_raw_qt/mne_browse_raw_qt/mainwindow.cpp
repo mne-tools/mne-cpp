@@ -37,8 +37,9 @@
 
 #include "mainwindow.h"
 
-#include "newparksmcclellan.h"
-
+//Eigen
+#include <Eigen/Core>
+#include <Eigen/SparseCore>
 
 //*************************************************************************************************************
 
@@ -62,14 +63,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     createLogDockWindow();
     setWindow();
-
-    //example filter generation
-    int NumTaps = 80;
-    NewParksMcClellan(NumTaps, 0.7, 0.2, 0.1, HPF);
-
-    std::vector<double> firCoeffs(FirCoeff, FirCoeff + NumTaps);
-
-    std::cout << "test" << std::endl;
 
 }
 
@@ -145,7 +138,7 @@ void MainWindow::setupViewSettings() {
     connect(m_pTableView,SIGNAL(customContextMenuRequested(QPoint)),this,SLOT(customContextMenuRequested(QPoint)));
 
     //set position of QScrollArea
-    m_pTableView->horizontalScrollBar()->setValue(m_pRawModel->relFiffCursor()+m_pRawModel->m_iWindowSize/2);
+//    m_pTableView->horizontalScrollBar()->setValue(m_pRawModel->relFiffCursor()+m_pRawModel->m_iWindowSize/2);
 
     //activate kinetic scrolling
     QScroller::grabGesture(m_pTableView,QScroller::MiddleMouseButtonGesture);
@@ -274,6 +267,8 @@ void MainWindow::customContextMenuRequested(QPoint pos)
     QMenu *menu = new QMenu(this);
     QAction* doMarkChBad = menu->addAction(tr("Mark as bad"));
     QAction* doMarkChGood = menu->addAction(tr("Mark as good"));
+    QAction* doApplyHPFFilter = menu->addAction(tr("Apply HPF"));
+    QAction* doApplyLPFFilter = menu->addAction(tr("Apply LPF"));
 
     //get selected items
     QModelIndexList selected = m_pTableView->selectionModel()->selectedIndexes();
@@ -285,6 +280,14 @@ void MainWindow::customContextMenuRequested(QPoint pos)
 
     connect(doMarkChGood,&QAction::triggered, [=](){
         m_pRawModel->markChBad(selected,0);
+    });
+
+    connect(doApplyHPFFilter,&QAction::triggered, [=](){
+        m_pRawModel->applyFilter(index,HPF);
+    });
+
+    connect(doApplyLPFFilter,&QAction::triggered, [=](){
+        m_pRawModel->applyFilter(index,LPF);
     });
 
     //show context menu

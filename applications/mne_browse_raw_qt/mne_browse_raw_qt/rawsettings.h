@@ -53,13 +53,14 @@
 // CONSTANTS
 
 //MainWindow
-#define MAINWINDOW_WINDOW_SIZE_W 1200 //width of Mainwindow
-#define MAINWINDOW_WINDOW_SIZE_H 800 //width of Mainwindow
+#define MAINWINDOW_WINDOW_SIZE_W 1200 //width of MainWindow
+#define MAINWINDOW_WINDOW_SIZE_H 800 //width of MainWindow
 
 //RawModel
-#define MODEL_WINDOW_SIZE 6000 //length of data window to preload [in samples]
-#define MODEL_RELOAD_POS 2000 //Distance that the current window needs to be off the ends of m_data[i] [in samples]
-#define MODEL_MAX_WINDOWS 4 //number of windows that are at maximum remained in m_data
+#define MODEL_WINDOW_SIZE 4016 //4096-80 length of data window to preload [in samples]
+#define MODEL_RELOAD_POS 1500 //Distance that the current window needs to be off the ends of m_data[i] [in samples]
+#define MODEL_MAX_WINDOWS 3 //number of windows that are at maximum remained in m_data
+#define MODEL_NUM_FILTER_TAPS 80 //number of filter taps, required to take into account because of FFT convolution (zero padding)
 
 //RawDelegate
 //Look
