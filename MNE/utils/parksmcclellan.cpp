@@ -3,7 +3,7 @@
 * @file     parksmcclellan.cpp
 * @version  1.0
 *
-* ported to mne-cpp by Christoph Dinh in February, 2014
+* ported to mne-cpp by Christoph Dinh and Florian Schlembach in February, 2014
 *
 *
 * October 19, 2013
@@ -88,7 +88,7 @@ ParksMcClellan::ParksMcClellan()
 , CosOfGrid(0)
 , DesPlus(0)
 , Coeff(0)
-, Edge(0)
+, Edge(7)
 , BandMag(0)
 , InitWeight(0)
 , DesiredMag(0)
@@ -102,19 +102,19 @@ ParksMcClellan::ParksMcClellan()
 //*************************************************************************************************************
 
 ParksMcClellan::ParksMcClellan(int NumTaps, double OmegaC, double BW, double ParksWidth, TPassType PassType)
-: ExchangeIndex(0)
-, LeGrangeD(0)
-, Alpha(0)
-, CosOfGrid(0)
-, DesPlus(0)
-, Coeff(0)
-, Edge(0)
-, BandMag(0)
-, InitWeight(0)
-, DesiredMag(0)
-, Grid(0)
-, Weight(0)
-, FirCoeff(0)
+: ExchangeIndex(NumTaps)
+, LeGrangeD(NumTaps)
+, Alpha(NumTaps)
+, CosOfGrid(NumTaps)
+, DesPlus(NumTaps)
+, Coeff(NumTaps)
+, Edge(7)
+, BandMag(1000)
+, InitWeight(1000)
+, DesiredMag(1000)
+, Grid(1000)
+, Weight(1000)
+, FirCoeff(NumTaps)
 {
     init(NumTaps, OmegaC, BW, ParksWidth, PassType);
 }
@@ -125,44 +125,44 @@ ParksMcClellan::ParksMcClellan(int NumTaps, double OmegaC, double BW, double Par
 ParksMcClellan::~ParksMcClellan()
 {
 
-    if(ExchangeIndex)
-        delete[] ExchangeIndex;
+//    if(ExchangeIndex)
+//        delete[] ExchangeIndex;
 
-    if(LeGrangeD)
-        delete[] LeGrangeD;
+//    if(LeGrangeD)
+//        delete[] LeGrangeD;
 
-    if(Alpha)
-        delete[] Alpha;
+//    if(Alpha)
+//        delete[] Alpha;
 
-    if(CosOfGrid)
-        delete[] CosOfGrid;
+//    if(CosOfGrid)
+//        delete[] CosOfGrid;
 
-    if(DesPlus)
-        delete[] DesPlus;
+//    if(DesPlus)
+//        delete[] DesPlus;
 
-    if(Coeff)
-        delete[] Coeff;
+//    if(Coeff)
+//        delete[] Coeff;
 
-    if(Edge)
-        delete[] Edge;
+//    if(&Edge)
+//        delete[] Edge;
 
-    if(BandMag)
-        delete[] BandMag;
+//    if(&BandMag)
+//        delete[] BandMag;
 
-    if(InitWeight)
-        delete[] InitWeight;
+//    if(InitWeight)
+//        delete[] InitWeight;
 
-    if(DesiredMag)
-        delete[] DesiredMag;
+//    if(DesiredMag)
+//        delete[] DesiredMag;
 
-    if(Grid)
-        delete[] Grid;
+//    if(Grid)
+//        delete[] Grid;
 
-    if(Weight)
-        delete[] Weight;
+//    if(Weight)
+//        delete[] Weight;
 
-    if(FirCoeff)
-        delete[] FirCoeff;
+//    if(FirCoeff)
+//        delete[] FirCoeff;
 }
 
 
@@ -170,46 +170,46 @@ ParksMcClellan::~ParksMcClellan()
 
 void ParksMcClellan::InitParksMcClellan2()
 {
-    InitDone2 = true;
+//    InitDone2 = true;
 
-    ExchangeIndex  = new(std::nothrow) int[SMALL];
-    if(ExchangeIndex == 0)InitDone2 = false;
+//    ExchangeIndex  = new(std::nothrow) int[SMALL];
+//    if(ExchangeIndex == 0)InitDone2 = false;
 
-    LeGrangeD  = new(std::nothrow) double[SMALL];
-    if(LeGrangeD == 0)InitDone2 = false;
+//    LeGrangeD  = new(std::nothrow) double[SMALL];
+//    if(LeGrangeD == 0)InitDone2 = false;
 
-    Alpha    = new(std::nothrow) double[SMALL];
-    if(Alpha == 0)InitDone2 = false;
+//    Alpha    = new(std::nothrow) double[SMALL];
+//    if(Alpha == 0)InitDone2 = false;
 
-    CosOfGrid  = new(std::nothrow) double[SMALL];
-    if(CosOfGrid == 0)InitDone2 = false;
+//    CosOfGrid  = new(std::nothrow) double[SMALL];
+//    if(CosOfGrid == 0)InitDone2 = false;
 
-    DesPlus  = new(std::nothrow) double[SMALL];
-    if(DesPlus == 0)InitDone2 = false;
+//    DesPlus  = new(std::nothrow) double[SMALL];
+//    if(DesPlus == 0)InitDone2 = false;
 
-    Coeff  = new(std::nothrow) double[SMALL];
-    if(Coeff == 0)InitDone2 = false;
+//    Coeff  = new(std::nothrow) double[SMALL];
+//    if(Coeff == 0)InitDone2 = false;
 
-    Edge  = new(std::nothrow) double[SMALL];
-    if(Edge == 0)InitDone2 = false;
+//    Edge  = new(std::nothrow) double[SMALL];
+//    if(Edge == 0)InitDone2 = false;
 
-    BandMag    = new(std::nothrow) double[SMALL];
-    if(BandMag == 0)InitDone2 = false;
+//    BandMag    = new(std::nothrow) double[SMALL];
+//    if(BandMag == 0)InitDone2 = false;
 
-    InitWeight  = new(std::nothrow) double[SMALL];
-    if(InitWeight == 0)InitDone2 = false;
+//    InitWeight  = new(std::nothrow) double[SMALL];
+//    if(InitWeight == 0)InitDone2 = false;
 
-    DesiredMag    = new(std::nothrow) double[BIG];
-    if(DesiredMag == 0)InitDone2 = false;
+//    DesiredMag    = new(std::nothrow) double[BIG];
+//    if(DesiredMag == 0)InitDone2 = false;
 
-    Grid  = new(std::nothrow) double[BIG];
-    if(Grid == 0)InitDone2 = false;
+//    Grid  = new(std::nothrow) double[BIG];
+//    if(Grid == 0)InitDone2 = false;
 
-    Weight  = new(std::nothrow) double[BIG];
-    if(Weight == 0)InitDone2 = false;
+//    Weight  = new(std::nothrow) double[BIG];
+//    if(Weight == 0)InitDone2 = false;
 
-    FirCoeff = new(std::nothrow) double[BIG];
-    if(FirCoeff == 0)InitDone2 = false;
+//    FirCoeff = new(std::nothrow) double[BIG];
+//    if(FirCoeff == 0)InitDone2 = false;
 
     //if(!InitDone2)MessageBox(0, L"Memory Error", L"Memory not Allocated in InitParksMcClellan", MB_OK);
 
@@ -228,9 +228,9 @@ void ParksMcClellan::init(int NumTaps, double OmegaC, double BW, double ParksWid
         if(!InitDone2)return;
     }
 
-    if(NumTaps > 128)NumTaps = 128;
-    if(NumTaps < 9)NumTaps = 9;
-    if( (PassType == HPF || PassType == NOTCH) && NumTaps % 2 == 0)NumTaps--;
+    if(NumTaps > 128) NumTaps = 128;
+    if(NumTaps < 9) NumTaps = 9;
+    if( (PassType == HPF || PassType == NOTCH) && NumTaps % 2 == 0) NumTaps--;
 
     // It helps the algorithm a great deal if each band is at least 0.01 wide.
     // The weights used here came from the orig PM code.
@@ -313,7 +313,7 @@ void ParksMcClellan::init(int NumTaps, double OmegaC, double BW, double ParksWid
     }
 
     // Parks McClellan's edges are based on 2Pi, we are based on Pi.
-    for(j=1; j<=2*NumBands; j++)Edge[j] /= 2.0;
+    for(j=1; j<=2*NumBands; j++) Edge[j] /= 2.0;
 
     CalcParkCoeff2(NumBands, NumTaps);
 }
@@ -404,11 +404,11 @@ void ParksMcClellan::CalcParkCoeff2(int NumBands, int TapCount)
 
 
     // Output section.
-    for(j=1; j<=HalfTapCount; j++)FirCoeff[j-1] = Coeff[j];
+    for(j=1; j<=HalfTapCount; j++) FirCoeff[j-1] = Coeff[j];
     if(OddNumTaps)
-        for(j=1; j<HalfTapCount; j++)FirCoeff[HalfTapCount+j-1] = Coeff[HalfTapCount-j];
+        for(j=1; j<HalfTapCount; j++) FirCoeff[HalfTapCount+j-1] = Coeff[HalfTapCount-j];
     else
-        for(j=1; j<=HalfTapCount; j++)FirCoeff[HalfTapCount+j-1] = Coeff[HalfTapCount-j+1];
+        for(j=1; j<=HalfTapCount; j++ )FirCoeff[HalfTapCount+j-1] = Coeff[HalfTapCount-j+1];
 
     // Parks2Label was on my application's main form.
     // These replace the original Ouch() function

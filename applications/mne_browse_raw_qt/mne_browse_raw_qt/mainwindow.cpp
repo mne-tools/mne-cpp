@@ -283,11 +283,11 @@ void MainWindow::customContextMenuRequested(QPoint pos)
     });
 
     connect(doApplyHPFFilter,&QAction::triggered, [=](){
-        m_pRawModel->applyFilter(index,HPF);
+        m_pRawModel->applyFilter(index,ParksMcClellan::TPassType::HPF);
     });
 
     connect(doApplyLPFFilter,&QAction::triggered, [=](){
-        m_pRawModel->applyFilter(index,LPF);
+        m_pRawModel->applyFilter(index,ParksMcClellan::TPassType::LPF);
     });
 
     //show context menu

@@ -3,7 +3,7 @@
 * @file     parksmcclellan.h
 * @version  1.0
 *
-* ported to mne-cpp by Christoph Dinh in February, 2014
+* ported to mne-cpp by Christoph Dinh and Florian Schlembach in February, 2014
 *
 *
 * October 19, 2013
@@ -63,15 +63,14 @@
 #ifndef PARKSMCCLELLAN_H
 #define PARKSMCCLELLAN_H
 
-
-
+#include "utils_global.h"
+#include <vector>
 
 #define BIG 4096    // Used to define array sizes. Must be somewhat larger than 8 * MaxNumTaps
 #define SMALL 256
 #define M_2PI  6.28318530717958647692
 #define ITRMAX 50             // Max Number of Iterations. Some filters require as many as 45 iterations.
 #define MIN_TEST_VAL 1.0E-6   // Min value used in LeGrangeInterp and GEE
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -81,7 +80,7 @@
 namespace UTILSLIB
 {
 
-class ParksMcClellan
+class UTILSSHARED_EXPORT ParksMcClellan
 {
 public:
     enum TPassType {LPF, HPF, BPF, NOTCH };
@@ -157,23 +156,24 @@ public:
     */
     void CalcCoefficients();
 
+    std::vector<double> FirCoeff; /**< containt the generated filter coefficients */
+
 private:
     void InitParksMcClellan2();
 
     int HalfTapCount;
-    int *ExchangeIndex;
-    double *LeGrangeD;
-    double *Alpha;
-    double *CosOfGrid;
-    double *DesPlus;
-    double *Coeff;
-    double *Edge;
-    double *BandMag;
-    double *InitWeight;
-    double *DesiredMag;
-    double *Grid;
-    double *Weight;
-    double *FirCoeff;
+    std::vector<int> ExchangeIndex;
+    std::vector<double> LeGrangeD;
+    std::vector<double> Alpha;
+    std::vector<double> CosOfGrid;
+    std::vector<double> DesPlus;
+    std::vector<double> Coeff;
+    std::vector<double> Edge;
+    std::vector<double> BandMag;
+    std::vector<double> InitWeight;
+    std::vector<double> DesiredMag;
+    std::vector<double> Grid;
+    std::vector<double> Weight;
     bool InitDone2;
 
 };

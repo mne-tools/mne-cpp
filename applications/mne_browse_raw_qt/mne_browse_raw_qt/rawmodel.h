@@ -58,13 +58,11 @@
 #define EIGEN_FFTW_DEFAULT
 #endif
 
-//external stuff
-#include "newparksmcclellan.h"
-
 //MNE
 #include <fiff/fiff.h>
 #include <mne/mne.h>
 #include <fiff/fiff_io.h>
+#include <utils/parksmcclellan.h>
 
 //MNE_BROWSE_RAW_QT
 #include "types.h"
@@ -76,6 +74,7 @@ using namespace MNE_BROWSE_RAW_QT;
 
 using namespace Eigen;
 using namespace MNELIB;
+using namespace UTILSLIB;
 
 //=============================================================================================================
 
@@ -148,7 +147,7 @@ private:
     //View control
     bool m_bStartReached; /**< signals, whether the start of the fiff data file is reached */
     bool m_bEndReached; /**< signals, whether the end of the fiff data file is reached */
-    QMap<TPassType,RowVectorXd> m_mapFilters; /**< Map of all filter coeffs vectors */
+    QMap<ParksMcClellan::TPassType,RowVectorXd> m_mapFilters; /**< Map of all filter coeffs vectors */
 
     //methods
     /**
@@ -172,9 +171,7 @@ private:
      * @param ParksWidth is the width of the transition bands.
      * @param PassType is the type of filter that shall be generated. options: LPF, HPF, BPF, NOTCH.
      */
-    void genFilter(int NumTaps, double OmegaC, double BW, double ParksWidth, TPassType PassType);
-
-
+    void genFilter(int NumTaps, double OmegaC, double BW, double ParksWidth, ParksMcClellan::TPassType type);
 
 signals:
 
@@ -196,7 +193,7 @@ public slots:
     /**
      * applyFilter applies filter to channels
      */
-    void applyFilter(QModelIndex index, TPassType type);
+    void applyFilter(QModelIndex index, ParksMcClellan::TPassType type);
 
 //Inline
 public:
