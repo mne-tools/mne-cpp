@@ -67,16 +67,14 @@ else {
 
 DESTDIR = $${MNE_BINARY_DIR}
 
-SOURCES += newparksmcclellan.cpp\
-    rawsettings.cpp\
+SOURCES += rawsettings.cpp\
     main.cpp\
     rawmodel.cpp \
     mainwindow.cpp \
     rawdelegate.cpp #\
     #rawview.cpp
 
-HEADERS += newparksmcclellan.h\
-    types.h\
+HEADERS += types.h\
     info.h\
     rawsettings.h\
     rawmodel.h\

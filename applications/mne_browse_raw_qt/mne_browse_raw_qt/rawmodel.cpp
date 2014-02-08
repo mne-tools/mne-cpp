@@ -37,6 +37,9 @@
 
 #include "rawmodel.h"
 
+#include <utils/parksmcclellan.h>
+using namespace UTILSLIB;
+
 //*************************************************************************************************************
 
 RawModel::RawModel(QObject *parent)
@@ -66,11 +69,14 @@ RawModel::RawModel(QFile &qFile, QObject *parent)
     //read fiff data
     loadFiffData(qFile);
 
+//    ParksMcClellan* filter = new ParksMcClellan(80, 0.2, 0.1, 0.1, ParksMcClellan::HPF);
+//    ParksMcClellan* filter = new ParksMcClellan();
+
     //generate filters
     //HPF
-    genFilter(m_qSettings.value("RawModel/num_filter_taps").toInt(), 0.15, 0.2, 0.1, HPF);
+    genFilter(m_qSettings.value("RawModel/num_filter_taps").toInt(), 0.15, 0.2, 0.1, ParksMcClellan::TPassType::HPF);
     //LPF
-    genFilter(m_qSettings.value("RawModel/num_filter_taps").toInt(), 0.08, 0.2, 0.1, LPF);
+    genFilter(m_qSettings.value("RawModel/num_filter_taps").toInt(), 0.08, 0.2, 0.1, ParksMcClellan::TPassType::LPF);
 }
 
 //=============================================================================================================
@@ -219,8 +225,11 @@ bool RawModel::writeFiffData(QFile &qFile)
     //replace m_fiffInfo with the one contained in the m_pfiffIO object (for replacing bad channesls)
     m_pfiffIO->m_qlistRaw[0]->info = m_fiffInfo;
 
-    m_pfiffIO->write_raw(qFile,0); //ToDo: by now, fiff data file is completely written new -> substitute only FiffInfo in old file?
-    qDebug() << "Done saving as fiff file" << qFile.fileName() << "...";
+    if (m_pfiffIO->write_raw(qFile,0)) { ; //ToDo: by now, fiff data file is completely written new -> substitute only FiffInfo in old file?
+        qDebug() << "Done saving as fiff file" << qFile.fileName() << "...";
+        return true;
+    }
+    else return false;
 }
 
 //*************************************************************************************************************
@@ -305,23 +314,23 @@ void RawModel::reloadFiffData(bool before) {
 
 //*************************************************************************************************************
 
-void RawModel::genFilter(int NumTaps, double OmegaC, double BW, double ParksWidth, TPassType PassType)
+void RawModel::genFilter(int NumTaps, double OmegaC, double BW, double ParksWidth, ParksMcClellan::TPassType type)
 {
-    NewParksMcClellan(NumTaps, OmegaC, BW, ParksWidth, PassType);
-    std::vector<double> t_firCoeffs(FirCoeff, FirCoeff + NumTaps);
+    ParksMcClellan filter(NumTaps, OmegaC, BW, ParksWidth, type);
+    std::vector<double> t_firCoeffs = filter.FirCoeff;
 
     RowVectorXd t_coeffs(NumTaps); //ToDo: could this be more elegant?
     for(qint16 i=0; i < NumTaps; ++i)
         t_coeffs[i] = t_firCoeffs[i];
 
-    m_mapFilters[PassType] = t_coeffs;
+    m_mapFilters[type] = t_coeffs;
 
-    qDebug() << "RawModel" << PassType << " filter generated and stored to RawModel.";
+    qDebug() << "RawModel" << type << " filter generated and stored to RawModel.";
 }
 
 //*************************************************************************************************************
 
-void RawModel::applyFilter(QModelIndex index, TPassType type) //ToDo: make this method efficient
+void RawModel::applyFilter(QModelIndex index, ParksMcClellan::TPassType type) //ToDo: make this method efficient
 {
     //generate fft object
     Eigen::FFT<double> fft;
@@ -406,8 +415,8 @@ void RawModel::loadFiffInfos()
 double RawModel::maxDataValue(qint16 chan) const {
     double dMax;
 
-    double max = m_data[0].row(0).maxCoeff();
-    double min = m_data[0].row(0).minCoeff();
+//    double max = m_data[0].row(0).maxCoeff();
+//    double min = m_data[0].row(0).minCoeff();
 
     dMax = (double) (m_chInfolist[chan].range*m_chInfolist[chan].cal)/2;
 
