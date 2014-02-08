@@ -271,14 +271,16 @@ void TriggerControlPlugin::TriggerControlSetupWidget::on_m_qPushButton_Sendanalo
 void TriggerControlPlugin::TriggerControlSetupWidget::on_m_qPushButton_RetrieveInfo_released()
 {
     if ( ui.m_qComboBox_RetrieveType->currentIndex() == 0)      // digital selected
-        m_pTriggerControl->m_pSerialPort->m_retrievetyp = 0;
+    {
+        m_pTriggerControl->m_pSerialPort->m_retrievetyp = 0;    // digital channel desired
+    }
 
     else if (ui.m_qComboBox_RetrieveType->currentIndex() == 1)
     {
-        m_pTriggerControl->m_pSerialPort->m_retrievetyp = 1;
+        m_pTriggerControl->m_pSerialPort->m_retrievetyp = 1;    // analog channel desired
         int t_channel = ui.m_qLineEdit_RetrieveChannel->text().toInt();
         if ((t_channel <= 2) && (t_channel > 0))
-                m_pTriggerControl->m_pSerialPort->m_retrievechan = t_channel;
+                m_pTriggerControl->m_pSerialPort->m_retrievechan = t_channel;   // xth channel desired
         else
             std::cout << "check desired channel" << std::endl;
     }
