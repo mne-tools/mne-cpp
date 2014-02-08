@@ -61,18 +61,22 @@ win32 {
     QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${BINDIR}) $$escape_expand(\\n\\t)
 }
 
-SOURCES += kmeans.cpp \
+SOURCES += \
+    kmeans.cpp \
     mnemath.cpp \
     ioutils.cpp \
     filtertools.cpp \
-    asaelc.cpp
+    asaelc.cpp \
+    parksmcclellan.cpp
 
-HEADERS +=  kmeans.h\
-            utils_global.h \
+HEADERS += \
+    kmeans.h\
+    utils_global.h \
     mnemath.h \
     ioutils.h \
     filtertools.h \
-    asaelc.h
+    asaelc.h \
+    parksmcclellan.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
