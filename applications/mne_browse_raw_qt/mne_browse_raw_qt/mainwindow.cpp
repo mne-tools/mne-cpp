@@ -35,26 +35,13 @@
 *
 */
 
-//=============================================================================================================
-// INCLUDES
-
-//MNE_BROWSE_RAW_QT
 #include "mainwindow.h"
-#include "info.h"
 
-//Qt
-#include <QDebug>
-#include <QWidget>
-#include <QPainter>
+//Eigen
+#include <Eigen/Core>
+#include <Eigen/SparseCore>
 
-#include <QVBoxLayout>
-#include <QGroupBox>
-#include <QScrollArea>
-#include <QScrollBar>
-#include <QScroller>
-
-//=============================================================================================================
-// NAMESPACE
+//*************************************************************************************************************
 
 using namespace MNE_BROWSE_RAW_QT;
 
@@ -63,6 +50,8 @@ using namespace MNE_BROWSE_RAW_QT;
 MainWindow::MainWindow(QWidget *parent)
 : QMainWindow(parent)
 , m_qFileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
+, m_qSettings()
+, m_rawSettings()
 {
     //setup MVC
     setupModel();
@@ -74,6 +63,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     createLogDockWindow();
     setWindow();
+
 }
 
 //*************************************************************************************************************
@@ -143,8 +133,12 @@ void MainWindow::setupViewSettings() {
 
     m_pTableView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
 
+    //set context menu
+    m_pTableView->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(m_pTableView,SIGNAL(customContextMenuRequested(QPoint)),this,SLOT(customContextMenuRequested(QPoint)));
+
     //set position of QScrollArea
-    m_pTableView->horizontalScrollBar()->setValue(m_pRawModel->relFiffCursor()+m_pRawModel->m_iWindowSize/2);
+//    m_pTableView->horizontalScrollBar()->setValue(m_pRawModel->relFiffCursor()+m_pRawModel->m_iWindowSize/2);
 
     //activate kinetic scrolling
     QScroller::grabGesture(m_pTableView,QScroller::MiddleMouseButtonGesture);
@@ -162,6 +156,10 @@ void MainWindow::createMenus() {
     openAction->setShortcuts(QKeySequence::Open);
     connect(openAction, SIGNAL(triggered()), this, SLOT(openFile()));
 
+    QAction *writeAction = fileMenu->addAction(tr("&Save As..."));
+    openAction->setShortcuts(QKeySequence::SaveAs);
+    connect(writeAction, SIGNAL(triggered()), this, SLOT(writeFile()));
+
     QAction *quitAction = fileMenu->addAction(tr("E&xit"));
     quitAction->setShortcuts(QKeySequence::Quit);
     connect(quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
@@ -170,8 +168,8 @@ void MainWindow::createMenus() {
 }
 
 void MainWindow::setWindow() {
-    setWindowTitle("MNE_BROWSE_RAW_QT");
-    resize(1200,800);
+    setWindowTitle(CInfo::AppNameShort());
+    resize(m_qSettings.value("MainWindow/size").toSize());
     this->move(50,50);
 }
 
@@ -234,7 +232,8 @@ void MainWindow::setLogLevel(LogLevel lvl)
     m_eLogLevelCurrent = lvl;
 }
 
-//*************************************************************************************************************
+//=============================================================================================================
+// SLOTS
 
 void MainWindow::openFile()
 {
@@ -247,4 +246,50 @@ void MainWindow::openFile()
     }
     else
         qDebug("ERROR loading fiff data file %s",filename.toLatin1().data());
+}
+
+void MainWindow::writeFile()
+{
+    QString filename = QFileDialog::getSaveFileName(this,QString("Write fiff data file"),QString("./MNE-sample-data/MEG/sample/"),tr("fif data files (*.fif)"));
+    QFile t_fileRaw(filename);
+
+    if(!m_pRawModel->writeFiffData(t_fileRaw))
+        qDebug() << "MainWindow: ERROR writing fiff data file" << t_fileRaw.fileName() << "!";
+
+}
+
+void MainWindow::customContextMenuRequested(QPoint pos)
+{
+    //obtain index where index was clicked
+    QModelIndex index = m_pTableView->indexAt(pos);
+
+    //create custom context menu and actions
+    QMenu *menu = new QMenu(this);
+    QAction* doMarkChBad = menu->addAction(tr("Mark as bad"));
+    QAction* doMarkChGood = menu->addAction(tr("Mark as good"));
+    QAction* doApplyHPFFilter = menu->addAction(tr("Apply HPF"));
+    QAction* doApplyLPFFilter = menu->addAction(tr("Apply LPF"));
+
+    //get selected items
+    QModelIndexList selected = m_pTableView->selectionModel()->selectedIndexes();
+
+    //connect actions
+    connect(doMarkChBad,&QAction::triggered, [=](){
+        m_pRawModel->markChBad(selected,1);
+    });
+
+    connect(doMarkChGood,&QAction::triggered, [=](){
+        m_pRawModel->markChBad(selected,0);
+    });
+
+    connect(doApplyHPFFilter,&QAction::triggered, [=](){
+        m_pRawModel->applyFilter(selected,ParksMcClellan::TPassType::HPF);
+    });
+
+    connect(doApplyLPFFilter,&QAction::triggered, [=](){
+        m_pRawModel->applyFilter(selected,ParksMcClellan::TPassType::LPF);
+    });
+
+    //show context menu
+    menu->popup(m_pTableView->viewport()->mapToGlobal(pos));
 }

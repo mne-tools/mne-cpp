@@ -41,26 +41,39 @@
 
 RawModel::RawModel(QObject *parent)
 : QAbstractTableModel(parent)
-, m_iWindowSize(6000) //samples
-, n_reloadPos(2000) //samples
-, n_maxWindows(4)
+, m_qSettings()
 , m_bStartReached(false)
 , m_bEndReached(false)
 {
+    m_iWindowSize = m_qSettings.value("RawModel/window_size").toInt();
+    m_reloadPos = m_qSettings.value("RawModel/reload_pos").toInt();
+    m_maxWindows = m_qSettings.value("RawModel/max_windows").toInt();
 }
 
 //*************************************************************************************************************
 
-RawModel::RawModel(QIODevice &p_IODevice, QObject *parent)
+RawModel::RawModel(QFile &qFile, QObject *parent)
 : QAbstractTableModel(parent)
-, m_iWindowSize(6000) //samples
-, n_reloadPos(2000) //samples
-, n_maxWindows(4)
+, m_qSettings()
 , m_bStartReached(false)
 , m_bEndReached(false)
 {
+    m_iWindowSize = m_qSettings.value("RawModel/window_size").toInt();
+    m_reloadPos = m_qSettings.value("RawModel/reload_pos").toInt();
+    m_maxWindows = m_qSettings.value("RawModel/max_windows").toInt();
+    m_iFilterTaps = m_qSettings.value("RawModel/num_filter_taps").toInt();
+
     //read fiff data
-    loadFiffData(p_IODevice);
+    loadFiffData(qFile);
+
+//    ParksMcClellan* filter = new ParksMcClellan(80, 0.2, 0.1, 0.1, ParksMcClellan::HPF);
+//    ParksMcClellan* filter = new ParksMcClellan();
+
+    //generate filters
+    //HPF
+    genFilter(m_qSettings.value("RawModel/num_filter_taps").toInt(), 0.15, 0.2, 0.1, ParksMcClellan::TPassType::HPF);
+    //LPF
+    genFilter(m_qSettings.value("RawModel/num_filter_taps").toInt(), 0.08, 0.2, 0.1, ParksMcClellan::TPassType::LPF);
 }
 
 //=============================================================================================================
@@ -68,8 +81,8 @@ RawModel::RawModel(QIODevice &p_IODevice, QObject *parent)
 
 int RawModel::rowCount(const QModelIndex & /*parent*/) const
 {
-    if(!m_chinfolist.empty())
-        return m_chinfolist.size();
+    if(!m_chInfolist.empty())
+        return m_chInfolist.size();
     else return 0;
 }
 
@@ -82,38 +95,55 @@ int RawModel::columnCount(const QModelIndex & /*parent*/) const
 
 QVariant RawModel::data(const QModelIndex &index, int role) const
 {
-    if (role == Qt::DisplayRole && index.isValid()) {
-        if(index.column()==0)
-            return QVariant(m_chinfolist[index.row()].ch_name);
+    if(role != Qt::DisplayRole && role != Qt::BackgroundRole)
+        return QVariant();
+
+
+    if (index.isValid()) {
+        //******** first column (chname) ********
+        if(index.column()==0 && role == Qt::DisplayRole)
+            return QVariant(m_chInfolist[index.row()].ch_name);
+
+        //******** second column (data plot) ********
         if(index.column()==1) {
             QVariant v;
 
-            //for debugging purposes
-//            for(qint32 i=0; i < m_chinfolist.size(); ++i) {
-//                if(m_chinfolist[i].ch_name == "EEG 004") {
-//                    double max = m_data[0].row(i).maxCoeff();
-//                    double min = m_data[0].row(i).minCoeff();
-//                    RowVectorXd mat = m_data[0].row(i);
-//                }
-//            }
+            switch(role) {
+            case Qt::DisplayRole: {
+                //form RowVectorPair of pointer and length of RowVector
+                QPair<const double*,qint32> rowVectorPair;
 
-            //form RowVectorPair of pointer and length of RowVector
-            QPair<const double*,qint32> rowVectorPair;
+                //pack all adjacent (after reload) RowVectorPairs into a QList
+                QList<RowVectorPair> listRowVectorPair;
 
-            //pack all adjacent (after reload) RowVectorPairs into a QList
-            QList<RowVectorPair> listRowVectorPair;
+                for(qint16 i=0; i < m_data.size(); ++i) {
+                    rowVectorPair.first = m_data[i].data() + index.row()*m_data[i].cols();
+                    rowVectorPair.second = m_data[i].cols();
 
-            for(qint16 i=0; i < m_data.size(); ++i) {
-                rowVectorPair.first = m_data[i].data() + index.row()*m_data[i].cols();
-                rowVectorPair.second = m_data[i].cols();
+                    listRowVectorPair.append(rowVectorPair);
+                }
 
-                listRowVectorPair.append(rowVectorPair);
+                v.setValue(listRowVectorPair);
+                return v;
+                break;
             }
+            case Qt::BackgroundRole: {
+                if(m_fiffInfo.bads.contains(m_chInfolist[index.row()].ch_name)) {
+                    QBrush brush;
+                    brush.setStyle(Qt::SolidPattern);
+                    qDebug() << m_chInfolist[index.row()].ch_name << "is marked as bad, index:" << index.row();
+                    brush.setColor(Qt::red);
+                    return QVariant(brush);
+                }
+                else
+                    return QVariant();
 
-            v.setValue(listRowVectorPair);
-            return v;
-        }
-    }
+                break;
+            }
+        } // end role switch
+    } // end column check
+
+    } // end index.valid() check
 
     return QVariant();
 }
@@ -156,14 +186,14 @@ QVariant RawModel::headerData(int section, Qt::Orientation orientation, int role
 //=============================================================================================================
 //non-virtual functions
 
-bool RawModel::loadFiffData(QIODevice& p_IODevice)
+bool RawModel::loadFiffData(QFile &qFile)
 {
     beginResetModel();
     clearModel();
 
     MatrixXd t_data,t_times;
 
-    m_pfiffIO = QSharedPointer<FiffIO>(new FiffIO(p_IODevice));
+    m_pfiffIO = QSharedPointer<FiffIO>(new FiffIO(qFile));
     if(!m_pfiffIO->m_qlistRaw.empty()) {
         m_iAbsFiffCursor = m_pfiffIO->m_qlistRaw[0]->first_samp; //Set cursor somewhere into fiff file [in samples]
         if(!m_pfiffIO->m_qlistRaw[0]->read_raw_segment(t_data, t_times, m_iAbsFiffCursor, m_iAbsFiffCursor+m_iWindowSize-1))
@@ -179,10 +209,24 @@ bool RawModel::loadFiffData(QIODevice& p_IODevice)
     m_data.append(t_data);
     m_times.append(t_times);
 
-    loadChInfos();
+    loadFiffInfos();
 
     endResetModel();
     return true;
+}
+
+//*************************************************************************************************************
+
+bool RawModel::writeFiffData(QFile &qFile)
+{
+    //replace m_fiffInfo with the one contained in the m_pfiffIO object (for replacing bad channesls)
+    m_pfiffIO->m_qlistRaw[0]->info = m_fiffInfo;
+
+    if (m_pfiffIO->write_raw(qFile,0)) { ; //ToDo: by now, fiff data file is completely written new -> substitute only FiffInfo in old file?
+        qDebug() << "Done saving as fiff file" << qFile.fileName() << "...";
+        return true;
+    }
+    else return false;
 }
 
 //*************************************************************************************************************
@@ -191,7 +235,7 @@ void RawModel::clearModel() {
     m_pfiffIO.clear();
     m_data.clear();
     m_times.clear();
-    m_chinfolist.clear();
+    m_chInfolist.clear();
 
     m_iAbsFiffCursor = 0;
     m_iCurAbsScrollPos = 0;
@@ -242,31 +286,90 @@ void RawModel::reloadFiffData(bool before) {
         m_data.prepend(t_reloaddata);
         m_times.prepend(t_reloadtimes);
 
-        //maintain at maximum n_maxWindows data windows and drop the rest
-        if(m_data.size() > n_maxWindows)
+        //maintain at maximum m_maxWindows data windows and drop the rest
+        if(m_data.size() > m_maxWindows)
             m_data.removeLast();
     }
     else {
         m_data.append(t_reloaddata);
         m_times.append(t_reloadtimes);
 
-        //maintain at maximum n_maxWindows data windows and drop the rest
-        if(m_data.size() > n_maxWindows) {
+        //maintain at maximum m_maxWindows data windows and drop the rest
+        if(m_data.size() > m_maxWindows) {
             m_data.removeFirst();
             m_iAbsFiffCursor += m_iWindowSize;
         }
     }
 
-
-
-
     qDebug() << "RawModel: Fiff data REloaded from " << start << "to" << end;
 
     QModelIndex topLeft = createIndex(0,1);
-    QModelIndex bottomRight = createIndex(m_chinfolist.size(),1);
+    QModelIndex bottomRight = createIndex(m_chInfolist.size(),1);
 
     emit dataChanged(topLeft,bottomRight);
 }
+
+//*************************************************************************************************************
+
+void RawModel::genFilter(int NumTaps, double OmegaC, double BW, double ParksWidth, ParksMcClellan::TPassType type)
+{
+    ParksMcClellan filter(NumTaps, OmegaC, BW, ParksWidth, type);
+    std::vector<double> t_firCoeffs = filter.FirCoeff;
+
+    RowVectorXd t_coeffs(NumTaps); //ToDo: could this be more elegant?
+    for(qint16 i=0; i < NumTaps; ++i)
+        t_coeffs[i] = t_firCoeffs[i];
+
+    m_mapFilters[type] = t_coeffs;
+
+    qDebug() << "RawModel" << type << " filter generated and stored to RawModel.";
+}
+
+//*************************************************************************************************************
+
+void RawModel::applyFilter(QModelIndexList selected, ParksMcClellan::TPassType type) //ToDo: make this method more efficient
+{
+    //generate fft object
+    Eigen::FFT<double> fft;
+    fft.SetFlag(fft.HalfSpectrum);
+
+    m_mapFilters[type].conservativeResize(m_iWindowSize+m_iFilterTaps);
+    m_mapFilters[type].block(0,m_iFilterTaps,1,m_iWindowSize) = RowVectorXd::Zero(1,m_iWindowSize);
+
+    //iterate through selected channels
+    for(qint16 i=0; i < selected.size(); ++i) {
+        RowVectorXcd freqFilter,freqData;
+
+        RowVectorXd procData(1,m_iWindowSize+m_iFilterTaps);
+        procData.block(0,0,1,m_iWindowSize) = m_data[0].row(selected[i].row());
+        procData.block(0,m_iWindowSize,1,m_iFilterTaps) = RowVectorXd::Zero(1,m_iFilterTaps);
+
+        fft.fwd(freqFilter,m_mapFilters[type]);
+        fft.fwd(freqData,procData);
+
+        //frequency-domain filtering by multiplication
+        RowVectorXcd filtered = freqFilter.array()*freqData.array();
+
+    //    std::cout << "address of m_data: " << m_data[0].data() << "address of data " << &dat << std::endl;
+
+        //inverse-FFT
+        RowVectorXd filteredTime;
+        fft.inv(filteredTime,filtered);
+
+        //ToDo: store processed data in a separate matrix
+        m_data[0].row(selected[i].row()) = filteredTime.block(0,m_iFilterTaps/2,1,m_iWindowSize);
+
+        qDebug() << "RawModel: Filtering applied to channel#" << selected[i].row();
+    }
+
+    //Get name from TPassType's enum value
+    const QMetaObject& meta = ParksMcClellan::staticMetaObject;
+    int index = meta.indexOfEnumerator("TPassType");
+    QMetaEnum metaEnum = meta.enumerator(index);
+
+    qDebug() << "RawModel: using PassType" << metaEnum.valueToKey(type);
+}
+
 
 //*************************************************************************************************************
 
@@ -296,7 +399,7 @@ void RawModel::resetPosition(qint32 position) {
     m_times.append(t_times);
 
     QModelIndex topLeft = createIndex(0,1);
-    QModelIndex bottomRight = createIndex(m_chinfolist.size(),1);
+    QModelIndex bottomRight = createIndex(m_chInfolist.size(),1);
     emit dataChanged(topLeft,bottomRight);
 
     endResetModel();
@@ -307,10 +410,14 @@ void RawModel::resetPosition(qint32 position) {
 
 //*************************************************************************************************************
 
-void RawModel::loadChInfos()
+void RawModel::loadFiffInfos()
 {
+    //loads chinfos
     for(qint32 i=0; i < m_pfiffIO->m_qlistRaw[0]->info.nchan; ++i)
-        m_chinfolist.append(m_pfiffIO->m_qlistRaw[0]->info.chs[i]);
+        m_chInfolist.append(m_pfiffIO->m_qlistRaw[0]->info.chs[i]);
+
+    //loads fiffInfo
+    m_fiffInfo = m_pfiffIO->m_qlistRaw[0]->info;
 }
 
 //*************************************************************************************************************
@@ -318,16 +425,16 @@ void RawModel::loadChInfos()
 double RawModel::maxDataValue(qint16 chan) const {
     double dMax;
 
-    double max = m_data[0].row(0).maxCoeff();
-    double min = m_data[0].row(0).minCoeff();
+//    double max = m_data[0].row(0).maxCoeff();
+//    double min = m_data[0].row(0).minCoeff();
 
-    dMax = (double) (m_chinfolist[chan].range*m_chinfolist[chan].cal)/2;
+    dMax = (double) (m_chInfolist[chan].range*m_chInfolist[chan].cal)/2;
 
     return dMax;
 }
 
 //=============================================================================================================
-//slots
+//SLOTS
 
 void RawModel::reloadData(int value) {
     m_iCurAbsScrollPos = firstSample()+value;
@@ -339,12 +446,33 @@ void RawModel::reloadData(int value) {
         return;
     }
 
-    if((m_iCurAbsScrollPos-m_iAbsFiffCursor) < n_reloadPos && !m_bStartReached) {
+    if((m_iCurAbsScrollPos-m_iAbsFiffCursor) < m_reloadPos && !m_bStartReached) {
         qDebug() << "RawModel: Reload requested at FRONT of loaded fiff data.";
         reloadFiffData(1);
     }
-    else if(m_iCurAbsScrollPos > m_iAbsFiffCursor+sizeOfPreloadedData()-n_reloadPos && !m_bEndReached) {
+    else if(m_iCurAbsScrollPos > m_iAbsFiffCursor+sizeOfPreloadedData()-m_reloadPos && !m_bEndReached) {
         qDebug() << "RawModel: Reload requested at END of loaded fiff data.";
         reloadFiffData(0);
+    }
+}
+
+//*************************************************************************************************************
+
+void RawModel::markChBad(QModelIndexList selected, bool status)
+{
+    for(qint8 i=0; i < selected.size(); ++i) {
+        if(status) {
+            m_fiffInfo.bads.append(m_chInfolist[selected[i].row()].ch_name);
+            qDebug() << "RawModel:" << m_chInfolist[selected[i].row()].ch_name << "marked as bad.";
+        }
+        else {
+            if(m_fiffInfo.bads.contains(m_chInfolist[selected[i].row()].ch_name)) {
+                int index = m_fiffInfo.bads.indexOf(m_chInfolist[selected[i].row()].ch_name);
+                m_fiffInfo.bads.removeAt(index);
+                qDebug() << "RawModel:" << m_chInfolist[selected[i].row()].ch_name << "marked as good.";
+            }
+        }
+
+        emit dataChanged(selected[i],selected[i]);
     }
 }
