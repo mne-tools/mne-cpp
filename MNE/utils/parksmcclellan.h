@@ -63,8 +63,15 @@
 #ifndef PARKSMCCLELLAN_H
 #define PARKSMCCLELLAN_H
 
+//=============================================================================================================
+// INCLUDES
+
 #include "utils_global.h"
 #include <vector>
+
+//Qt
+#include <QObject>
+#include <QMetaObject>
 
 #define BIG 4096    // Used to define array sizes. Must be somewhat larger than 8 * MaxNumTaps
 #define SMALL 256
@@ -80,8 +87,11 @@
 namespace UTILSLIB
 {
 
-class UTILSSHARED_EXPORT ParksMcClellan
+class UTILSSHARED_EXPORT ParksMcClellan : public QObject
 {
+    Q_OBJECT
+    Q_ENUMS(TPassType) //makes enum available to the class' Qt meta object
+
 public:
     enum TPassType {LPF, HPF, BPF, NOTCH };
 
