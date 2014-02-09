@@ -37,9 +37,6 @@
 
 #include "rawmodel.h"
 
-#include <utils/parksmcclellan.h>
-using namespace UTILSLIB;
-
 //*************************************************************************************************************
 
 RawModel::RawModel(QObject *parent)
@@ -330,34 +327,47 @@ void RawModel::genFilter(int NumTaps, double OmegaC, double BW, double ParksWidt
 
 //*************************************************************************************************************
 
-void RawModel::applyFilter(QModelIndex index, ParksMcClellan::TPassType type) //ToDo: make this method efficient
+void RawModel::applyFilter(QModelIndexList selected, ParksMcClellan::TPassType type) //ToDo: make this method more efficient
 {
     //generate fft object
     Eigen::FFT<double> fft;
     fft.SetFlag(fft.HalfSpectrum);
 
-    RowVectorXcd freqFilter,freqData;
-
     m_mapFilters[type].conservativeResize(m_iWindowSize+m_iFilterTaps);
     m_mapFilters[type].block(0,m_iFilterTaps,1,m_iWindowSize) = RowVectorXd::Zero(1,m_iWindowSize);
 
-    RowVectorXd procData(1,m_iWindowSize+m_iFilterTaps);
-    procData.block(0,0,1,m_iWindowSize) = m_data[0].row(index.row());
-    procData.block(0,m_iWindowSize,1,m_iFilterTaps) = RowVectorXd::Zero(1,m_iFilterTaps);
+    //iterate through selected channels
+    for(qint16 i=0; i < selected.size(); ++i) {
+        RowVectorXcd freqFilter,freqData;
 
-    fft.fwd(freqFilter,m_mapFilters[type]);
-    fft.fwd(freqData,procData);
+        RowVectorXd procData(1,m_iWindowSize+m_iFilterTaps);
+        procData.block(0,0,1,m_iWindowSize) = m_data[0].row(selected[i].row());
+        procData.block(0,m_iWindowSize,1,m_iFilterTaps) = RowVectorXd::Zero(1,m_iFilterTaps);
 
-    RowVectorXcd filtered = freqFilter.array()*freqData.array();
+        fft.fwd(freqFilter,m_mapFilters[type]);
+        fft.fwd(freqData,procData);
 
-//    std::cout << "address of m_data: " << m_data[0].data() << "address of data " << &dat << std::endl;
+        //frequency-domain filtering by multiplication
+        RowVectorXcd filtered = freqFilter.array()*freqData.array();
 
-    RowVectorXd filteredTime;
-    fft.inv(filteredTime,filtered);
+    //    std::cout << "address of m_data: " << m_data[0].data() << "address of data " << &dat << std::endl;
 
-    m_data[0].row(index.row()) = filteredTime.block(0,m_iFilterTaps/2,1,m_iWindowSize);
+        //inverse-FFT
+        RowVectorXd filteredTime;
+        fft.inv(filteredTime,filtered);
 
-    qDebug() << "RawModel: Filter applied to channel#" << index.row() << "of PassType" << type;
+        //ToDo: store processed data in a separate matrix
+        m_data[0].row(selected[i].row()) = filteredTime.block(0,m_iFilterTaps/2,1,m_iWindowSize);
+
+        qDebug() << "RawModel: Filtering applied to channel#" << selected[i].row();
+    }
+
+    //Get name from TPassType's enum value
+    const QMetaObject& meta = ParksMcClellan::staticMetaObject;
+    int index = meta.indexOfEnumerator("TPassType");
+    QMetaEnum metaEnum = meta.enumerator(index);
+
+    qDebug() << "RawModel: using PassType" << metaEnum.valueToKey(type);
 }
 
 

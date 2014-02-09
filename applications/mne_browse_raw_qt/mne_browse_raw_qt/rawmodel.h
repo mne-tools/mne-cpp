@@ -45,6 +45,7 @@
 #include <QDebug>
 #include <QAbstractTableModel>
 #include <QSettings>
+#include <QMetaEnum>
 
 #include <QBrush>
 #include <QPalette>
@@ -193,7 +194,7 @@ public slots:
     /**
      * applyFilter applies filter to channels
      */
-    void applyFilter(QModelIndex index, ParksMcClellan::TPassType type);
+    void applyFilter(QModelIndexList selected, ParksMcClellan::TPassType type);
 
 //Inline
 public:
