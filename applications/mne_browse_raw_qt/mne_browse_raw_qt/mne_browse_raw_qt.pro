@@ -67,20 +67,21 @@ else {
 
 DESTDIR = $${MNE_BINARY_DIR}
 
-SOURCES += main.cpp\
+SOURCES += rawsettings.cpp\
+    main.cpp\
     rawmodel.cpp \
     mainwindow.cpp \
-    rawdelegate.cpp \
-    #plotsignalwidget.cpp #\
+    rawdelegate.cpp #\
     #rawview.cpp
 
-HEADERS += types_settings.h\
+HEADERS += types.h\
     info.h\
+    rawsettings.h\
     rawmodel.h\
     mainwindow.h \
-    rawdelegate.h \
-    #plotsignalwidget.h #\
+    rawdelegate.h #\
     #rawview.h
+
 
 FORMS +=
 
@@ -88,3 +89,4 @@ INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_X_INCLUDE_DIR}
 
+unix: QMAKE_CXXFLAGS += -std=c++0x
