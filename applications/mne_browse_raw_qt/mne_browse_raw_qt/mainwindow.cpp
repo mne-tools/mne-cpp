@@ -269,6 +269,9 @@ void MainWindow::customContextMenuRequested(QPoint pos)
     QAction* doMarkChGood = menu->addAction(tr("Mark as good"));
     QAction* doApplyHPFFilter = menu->addAction(tr("Apply HPF"));
     QAction* doApplyLPFFilter = menu->addAction(tr("Apply LPF"));
+    QAction* undoApplyHPFFilter = menu->addAction(tr("Undo HPF"));
+    QAction* undoApplyLPFFilter = menu->addAction(tr("Undo LPF"));
+    QAction* undoApplyFilter = menu->addAction(tr("Undo All filtering"));
 
     //get selected items
     QModelIndexList selected = m_pTableView->selectionModel()->selectedIndexes();
@@ -277,17 +280,23 @@ void MainWindow::customContextMenuRequested(QPoint pos)
     connect(doMarkChBad,&QAction::triggered, [=](){
         m_pRawModel->markChBad(selected,1);
     });
-
     connect(doMarkChGood,&QAction::triggered, [=](){
         m_pRawModel->markChBad(selected,0);
     });
-
     connect(doApplyHPFFilter,&QAction::triggered, [=](){
         m_pRawModel->applyFilter(selected,ParksMcClellan::TPassType::HPF);
     });
-
     connect(doApplyLPFFilter,&QAction::triggered, [=](){
         m_pRawModel->applyFilter(selected,ParksMcClellan::TPassType::LPF);
+    });
+    connect(undoApplyHPFFilter,&QAction::triggered, [=](){
+        m_pRawModel->undoFilter(selected,ParksMcClellan::TPassType::HPF);
+    });
+    connect(undoApplyLPFFilter,&QAction::triggered, [=](){
+        m_pRawModel->undoFilter(selected,ParksMcClellan::TPassType::LPF);
+    });
+    connect(undoApplyFilter,&QAction::triggered, [=](){
+        m_pRawModel->undoFilter();
     });
 
     //show context menu
