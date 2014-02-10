@@ -156,6 +156,8 @@ public:
 
 signals:
     void dataAvailable(const QByteArray);
+    void byteReceived();
+
 
 protected:
 

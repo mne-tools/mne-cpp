@@ -140,8 +140,11 @@ public:
 
     void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
 //
+    void byteReceived();
+
 signals:
     void sendByte(int value);
+
 
 protected:
     virtual void run();
@@ -171,6 +174,21 @@ private:
     QTime m_qTime;
 
     bool m_bIsRunning;
+    bool m_isReceived;
+
+
+
+    //alpha locked stuff
+
+    double m_fs;
+    double m_dt;
+    double m_refFreq;
+    double m_alphaFreq;
+
+    VectorXd m_refSin;
+    VectorXd m_vecCorr;
+
+    double corr(VectorXd a, VectorXd b);
 
 
 };

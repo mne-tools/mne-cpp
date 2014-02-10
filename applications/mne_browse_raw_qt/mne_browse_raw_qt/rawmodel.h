@@ -44,18 +44,29 @@
 //Qt
 #include <QDebug>
 #include <QAbstractTableModel>
+#include <QSettings>
+#include <QMetaEnum>
+
+#include <QBrush>
+#include <QPalette>
 
 //Eigen
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
+#include <Eigen/unsupported/FFT>
+
+#ifndef EIGEN_FFTW_DEFAULT
+#define EIGEN_FFTW_DEFAULT
+#endif
 
 //MNE
 #include <fiff/fiff.h>
 #include <mne/mne.h>
 #include <fiff/fiff_io.h>
+#include <utils/parksmcclellan.h>
 
 //MNE_BROWSE_RAW_QT
-#include "types_settings.h"
+#include "types.h"
 
 //=============================================================================================================
 // USED NAMESPACES
@@ -64,6 +75,7 @@ using namespace MNE_BROWSE_RAW_QT;
 
 using namespace Eigen;
 using namespace MNELIB;
+using namespace UTILSLIB;
 
 //=============================================================================================================
 
@@ -72,17 +84,25 @@ class RawModel : public QAbstractTableModel
     Q_OBJECT
 public:
     RawModel(QObject *parent);
-    RawModel(QIODevice& p_IODevice, QObject *parent);
+    RawModel(QFile &qFile, QObject *parent);
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const ;
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
     virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 
     /**
-    * Load fiff data.
+    * loadFiffData loads fiff data file.
     *
+    * @param p_IODevice fiff data file to write
     */
-    bool loadFiffData(QIODevice &p_IODevice);
+    bool loadFiffData(QFile &qFile);
+
+    /**
+     * writeFiffData writes a new fiff data file
+     * @param p_IODevice fiff data file to write
+     * @return
+     */
+    bool writeFiffData(QFile &qFile);
 
     /**
      * resetPosition reset the position of the current m_iAbsFiffCursor if a ScrollBar position is selected, whose data is not yet loaded.
@@ -96,41 +116,51 @@ public:
      */
     void clearModel();
 
+    /**
+     * getMaxDataValue obtains the maximum value for the underlying channel
+     *
+     * @param chan number of channel in m_chInfolist
+     * @return max data value of m_data for scaling purposes.
+     */
+    double maxDataValue(qint16 chan) const;
+
     //Fiff data structure
     QList<MatrixXdR> m_data; /**< List that holds the fiff matrix data <n_channels x n_samples> */
+    QList<MatrixXdR> m_procData; /**< List that holds the processed fiff matrix data <n_channels x n_samples> */
     QList<MatrixXdR> m_times; /**< List that holds the time axis [in secs] */
 
-    QList<FiffChInfo> m_chinfolist; /**< List of FiffChInfo objects that holds the corresponding channels information */
+    QMap<ParksMcClellan::TPassType,QList<int>> m_mapFilteredChannels; /**< filtered channel list with TPasstype->Channelno. mapping */
+    QList<int> m_allFilteredChannels; /**< contains channel numbers of filtered channels independent of the value of TPassFilter */
 
-    //Model/Fiff settings
+    QList<FiffChInfo> m_chInfolist; /**< List of FiffChInfo objects that holds the corresponding channels information */
+    FiffInfo m_fiffInfo; /**< fiff info of whole fiff file */
+
+    //Settings
+    QSettings m_qSettings;
+
     qint32 m_iAbsFiffCursor; /**< Cursor that points to the current position in the fiff data file [in samples] */
     qint32 m_iCurAbsScrollPos; /**< the current (absolute) ScrollPosition in the fiff data file */
 
     qint32 m_iWindowSize; /**< Length of window to load [in samples] */
-    qint32 n_reloadPos; /**< Distance that the current window needs to be off the ends of m_data [in samples] */
-    qint8 n_maxWindows; /**< number of windows that are at maximum remained in m_data */
-
-    /**
-     * getMaxDataValue obtains the maximum value for the underlying channel
-     *
-     * @param chan number of channel in m_chinfolist
-     * @return max data value of m_data for scaling purposes.
-     */
-    double maxDataValue(qint16 chan) const;
+    qint32 m_reloadPos; /**< Distance that the current window needs to be off the ends of m_data[i] [in samples] */
+    qint8 m_maxWindows; /**< number of windows that are at maximum remained in m_data */
+    qint16 m_iFilterTaps; /**< Number of Filter taps */
 
     QSharedPointer<FiffIO> m_pfiffIO; /**< FiffIO objects, which holds all the information of the fiff data (excluding the samples!) */
 
 private:
     //View control
-    bool m_bStartReached; /** signals, whether the start of the fiff data file is reached */
-    bool m_bEndReached; /** signals, whether the end of the fiff data file is reached */
+    bool m_bStartReached; /**< signals, whether the start of the fiff data file is reached */
+    bool m_bEndReached; /**< signals, whether the end of the fiff data file is reached */
+    QMap<ParksMcClellan::TPassType,RowVectorXd> m_mapFilters; /**< Map of filter types to filter coeffs vectors */
+    QMap<ParksMcClellan::TPassType,RowVectorXcd> m_mapFiltersFreq; /**< Map of filter types to filter coeffs freq vectors of size 1x(m_iWindowSize+m_iFilterTaps)/2*/
 
     //methods
     /**
-    * Load channel infos to m_chinfolist.
+    * Loads fiff infos to m_chInfolist abd m_fiffInfo.
     *
     */
-    void loadChInfos();
+    void loadFiffInfos();
 
     /**
      * reloadFiffData
@@ -139,16 +169,57 @@ private:
      */
     void reloadFiffData(bool before);
 
+    /**
+     * genFilter generates filter coeffient vectors with respect to the given filter parameters
+     * @param NumTaps number of taps, higher stopband attenuation for higher filter orders (=NumTaps).
+     * @param OmegaC is the 3 dB corner freq for low pass and high pass filters.
+     * @param BW is the bandwidth for bandpass and notch filters (ignored on low and high pass).
+     * @param ParksWidth is the width of the transition bands.
+     * @param PassType is the type of filter that shall be generated. options: LPF, HPF, BPF, NOTCH.
+     */
+    void genFilter(int NumTaps, double OmegaC, double BW, double ParksWidth, ParksMcClellan::TPassType type);
 
 signals:
 
-private slots:
+public slots:
     /**
      * reloadData checks, whether the actual position of the QScrollBar demands for a fiff data reload (depending on m_reloadPos)
      *
      * @param value the position of QScrollBar
      */
     void reloadData(int value);
+
+    /**
+     * markChBad marks the selected channels as bad/good in m_chInfolist
+     * @param selected is the list of indices that are selected for marking
+     * @param status, status=1 -> mark as bad, status=0 -> mark as good
+     */
+    void markChBad(QModelIndexList selected, bool status);
+
+    /**
+     * applyFilter applies filter to channels
+     * @param selected selects the channels to filter
+     * @param type determines the filter type TPassType to choose for filtering
+     */
+    void applyFilter(QModelIndexList selected, ParksMcClellan::TPassType type);
+
+    /**
+     * undoFilter undoes the filtering operation for filter operations of the type
+     * @param selected selects the channels to filter
+     * @param type determines the filter type TPassType to choose for the undo operation
+     */
+    void undoFilter(QModelIndexList selected, ParksMcClellan::TPassType type);
+
+    /**
+     * undoFilter undoes the filtering operation for all filter operations
+     * @param selected selects the channels to filter
+     */
+    void undoFilter(QModelIndexList selected);
+
+    /**
+     * undoFilter undoes the filtering operation for all filter operations for all channels
+     */
+    void undoFilter();
 
 //Inline
 public:

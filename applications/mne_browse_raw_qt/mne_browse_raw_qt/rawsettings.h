@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     rawdelegate.h
+* @file     rawsettings.h
 * @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
@@ -31,90 +31,77 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of delegate of mne_browse_raw_qt
+* @brief    Contains all application settings.
 *
 */
 
-#ifndef RAWDELEGATE_H
-#define RAWDELEGATE_H
+#ifndef RAWSETTINGS_H
+#define RAWSETTINGS_H
 
-//*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
-//=============================================================================================================
+
+#include "info.h"
+#include "types.h"
 
 //Qt
-#include <QDebug>
-#include <QAbstractItemDelegate>
-#include <QPainter>
-#include <QPainterPath>
-#include <QPointF>
-#include <QRect>
-
-//MNE
-#include <fiff/fiff.h>
-#include <mne/mne.h>
-#include <fiff/fiff_io.h>
-
-//MNE_BROWSE_RAW_QT
-#include "rawmodel.h"
-#include "types.h"
-#include "rawsettings.h"
-
-//Eigen
-#include <Eigen/Core>
-#include <Eigen/SparseCore>
+#include <QObject>
+#include <QSettings>
+#include <QSize>
 
 //=============================================================================================================
-// USED NAMESPACES
+// CONSTANTS
 
-using namespace MNE_BROWSE_RAW_QT;
-using namespace Eigen;
-using namespace MNELIB;
+//MainWindow
+#define MAINWINDOW_WINDOW_SIZE_W 1200 //width of MainWindow
+#define MAINWINDOW_WINDOW_SIZE_H 800 //width of MainWindow
+
+//RawModel
+#define MODEL_WINDOW_SIZE 4016 //4096-MODEL_NUM_FILTER_TAPS length of data window to preload [in samples]
+#define MODEL_RELOAD_POS 1500 //Distance that the current window needs to be off the ends of m_data[i] [in samples]
+#define MODEL_MAX_WINDOWS 3 //number of windows that are at maximum remained in m_data
+#define MODEL_NUM_FILTER_TAPS 80 //number of filter taps, required to take into account because of FFT convolution (zero padding)
+
+//RawDelegate
+//Look
+#define DELEGATE_PLOT_HEIGHT 50 //height of a single plot (row)
+#define DELEGATE_DX 1 //each DX pixel a sample is plot -> plot resolution
+#define DELEGATE_NHLINES 6 //number of horizontal lines within a single plot (row)
+
+//maximum values for different channels types according to FiffChInfo
+#define DELEGATE_MAX_MEG_GRAD 1e-10 // kind=FIFFV_MEG_CH && unit=FIFF_UNIT_T_M
+#define DELEGATE_MAX_MEG_MAG 1e-11 // kind=FIFFV_MEG_CH && unit=FIFF_UNIT_T
+#define DELEGATE_MAX_EEG 1e-4 // kind=FIFFV_EEG_CH
+#define DELEGATE_MAX_EOG 1e-3 // kind=FIFFV_EOG_CH
+#define DELEGATE_MAX_STIM 5 // kind=FIFFV_STIM_CH
 
 //=============================================================================================================
+// NAMESPACE
 
-class RawDelegate : public QAbstractItemDelegate
+namespace MNE_BROWSE_RAW_QT {
+
+//*************************************************************************************************************
+
+class RawSettings : public QObject
 {
     Q_OBJECT
 public:
-    RawDelegate(QObject *parent = 0);
-    virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
-    virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
-
-    // Plots settings
-    double m_dPlotHeight; /**< The height of the plot */
-
-    // Scaling
-    double m_dMaxValue; /**< Maximum value of the data to plot  */
-    double m_dScaleY; /**< Maximum amplitude of plot (max is m_dPlotHeight/2) */
-    double m_dDx; /**< pixel difference to the next sample*/
+    RawSettings(QObject *parent = 0);
 
 signals:
 
 public slots:
 
+
 private:
     /**
-     * createPlotPath creates the QPointer path for the data plot.
-     *
-     * @param[in] index QModelIndex for accessing associated data and model object.
-     * @param[in,out] path The QPointerPath to create for the data plot.
+     * init initializes all the application settings values from the macros
      */
-    void createPlotPath(const QModelIndex &index, QPainterPath& path, QList<RowVectorPair>& listPairs) const;
+    void init();
 
-    /**
-     * createGridPath Creates the QPointer path for the grid plot.
-     *
-     * @param[in,out] path The row vector of the data matrix <1 x nsamples>.
-     * @param[in] data The row vector of the data matrix <1 x nsamples>.
-     */
-    void createGridPath(QPainterPath& path, QList<RowVectorPair>& listPairs) const;
-
-    //Settings
-    qint8 m_nhlines; /**< Number of horizontal lines for the grid plot */
-    QSettings m_qSettings;
-
+    QSettings m_qSettings; /**< QSettings object that initializes all the RawSettings */
 };
 
-#endif // RAWDELEGATE_H
+} //end namespace MNE_BROWSE_RAW_QT
+
+#endif // RAWSETTINGS_H

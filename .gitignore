@@ -125,9 +125,15 @@
 /bin/mne_rt_testsd
 /bin/mne_x
 /bin/mne_xd
+/bin/mne_viewer
+/bin/mne_viewerd
+/bin/mne_viewer_parent
+/bin/mne_viewer_parentd
 /bin/plotSurfacesd
 /bin/rawClusteredInverse
 /bin/rawClusteredInversed
+/bin/rawClusteredInverseEEG
+/bin/rawClusteredInverseEEGd
 /bin/readEpochsd
 /bin/readEvoked
 /bin/readEvokedd
