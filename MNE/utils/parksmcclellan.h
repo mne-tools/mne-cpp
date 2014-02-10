@@ -169,8 +169,6 @@ public:
     std::vector<double> FirCoeff; /**< containt the generated filter coefficients */
 
 private:
-    void InitParksMcClellan2();
-
     int HalfTapCount;
     std::vector<int> ExchangeIndex;
     std::vector<double> LeGrangeD;

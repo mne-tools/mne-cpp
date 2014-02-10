@@ -126,7 +126,11 @@ public:
 
     //Fiff data structure
     QList<MatrixXdR> m_data; /**< List that holds the fiff matrix data <n_channels x n_samples> */
+    QList<MatrixXdR> m_procData; /**< List that holds the processed fiff matrix data <n_channels x n_samples> */
     QList<MatrixXdR> m_times; /**< List that holds the time axis [in secs] */
+
+    QMap<ParksMcClellan::TPassType,QList<int>> m_mapFilteredChannels; /**< filtered channel list with TPasstype->Channelno. mapping */
+    QList<int> m_allFilteredChannels; /**< contains channel numbers of filtered channels independent of the value of TPassFilter */
 
     QList<FiffChInfo> m_chInfolist; /**< List of FiffChInfo objects that holds the corresponding channels information */
     FiffInfo m_fiffInfo; /**< fiff info of whole fiff file */
@@ -148,7 +152,8 @@ private:
     //View control
     bool m_bStartReached; /**< signals, whether the start of the fiff data file is reached */
     bool m_bEndReached; /**< signals, whether the end of the fiff data file is reached */
-    QMap<ParksMcClellan::TPassType,RowVectorXd> m_mapFilters; /**< Map of all filter coeffs vectors */
+    QMap<ParksMcClellan::TPassType,RowVectorXd> m_mapFilters; /**< Map of filter types to filter coeffs vectors */
+    QMap<ParksMcClellan::TPassType,RowVectorXcd> m_mapFiltersFreq; /**< Map of filter types to filter coeffs freq vectors of size 1x(m_iWindowSize+m_iFilterTaps)/2*/
 
     //methods
     /**
@@ -193,8 +198,28 @@ public slots:
 
     /**
      * applyFilter applies filter to channels
+     * @param selected selects the channels to filter
+     * @param type determines the filter type TPassType to choose for filtering
      */
     void applyFilter(QModelIndexList selected, ParksMcClellan::TPassType type);
+
+    /**
+     * undoFilter undoes the filtering operation for filter operations of the type
+     * @param selected selects the channels to filter
+     * @param type determines the filter type TPassType to choose for the undo operation
+     */
+    void undoFilter(QModelIndexList selected, ParksMcClellan::TPassType type);
+
+    /**
+     * undoFilter undoes the filtering operation for all filter operations
+     * @param selected selects the channels to filter
+     */
+    void undoFilter(QModelIndexList selected);
+
+    /**
+     * undoFilter undoes the filtering operation for all filter operations for all channels
+     */
+    void undoFilter();
 
 //Inline
 public:
