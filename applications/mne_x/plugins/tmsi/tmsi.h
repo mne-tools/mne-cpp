@@ -51,7 +51,6 @@
 #include <generics/circularmatrixbuffer.h>
 #include <xMeas/newrealtimemultisamplearray.h>
 
-#include <utils/filterTools.h>
 #include <utils/asaelc.h>
 
 #include <Eigen/unsupported/FFT>

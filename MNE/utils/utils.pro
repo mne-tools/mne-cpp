@@ -65,7 +65,6 @@ SOURCES += \
     kmeans.cpp \
     mnemath.cpp \
     ioutils.cpp \
-    filtertools.cpp \
     asaelc.cpp \
     parksmcclellan.cpp
 
@@ -74,7 +73,6 @@ HEADERS += \
     utils_global.h \
     mnemath.h \
     ioutils.h \
-    filtertools.h \
     asaelc.h \
     parksmcclellan.h
 
