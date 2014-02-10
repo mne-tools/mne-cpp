@@ -570,8 +570,7 @@ void TMSI::run()
 
             if(m_bShowEventTrigger && m_qTimerTrigger.elapsed() >= m_iTriggerInterval)
             {
-                QFuture<void> future = QtConcurrent::run(Beep, 523, 500);
-
+                QFuture<void> future = QtConcurrent::run(Beep, 450, 700);
                 //Set trigger in received data samples - just for one sample, so that this event is easy to detect
                 matValue(136, m_iSamplesPerBlock-1) = 254;
                 m_qTimerTrigger.restart();
