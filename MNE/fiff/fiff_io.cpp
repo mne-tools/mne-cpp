@@ -39,7 +39,137 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "fiff.h"
+#include "fiff_evoked_set.h"
 #include "fiff_io.h"
+#include "fiff_stream.h"
+// #include <mne/mne.h>
+
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace FIFFLIB;
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+FiffIO::FiffIO()
+{
+}
+
+//*************************************************************************************************************
+
+FiffIO::~FiffIO()
+{
+}
+
+//*************************************************************************************************************
+
+FiffIO::FiffIO(QIODevice& p_IODevice)
+{
+    // execute read method
+    FiffIO::read(p_IODevice);
+}
+
+//*************************************************************************************************************
+
+FiffIO::FiffIO(QList<QIODevice*>& p_qlistIODevices)
+{
+    QList<QIODevice*>::iterator i;
+    for(i = p_qlistIODevices.begin(); i != p_qlistIODevices.end(); ++i) {
+        FiffIO::read((**i));
+    }
+}
+
+//*************************************************************************************************************
+
+bool FiffIO::setup_read(QIODevice& p_IODevice, FiffInfo& info, FiffDirTree& Tree, FiffDirTree& dirTree)
+{
+    //Open the file
+    FiffStream::SPtr p_pStream(new FiffStream(&p_IODevice));
+    QString t_sFileName = p_pStream->streamName();
+
+    printf("Opening fiff data %s...\n",t_sFileName.toUtf8().constData());
+
+    QList<FiffDirEntry> t_dirEntry;
+
+    if(!p_pStream->open(Tree, t_dirEntry))
+        return false;
+
+    //Read the measurement info
+    if(!p_pStream->read_meas_info(Tree, info, dirTree))
+        return false;
+
+    return true;
+}
+
+//*************************************************************************************************************
+bool FiffIO::read(QIODevice& p_IODevice)
+{
+    //Read dirTree from fiff data (raw,evoked,fwds,cov)
+    FiffInfo t_fiffInfo;
+    FiffDirTree t_Tree;
+    FiffDirTree t_dirTree;
+    bool hasRaw=false,hasEvoked=false,hasFwds=false;
+
+    FiffIO::setup_read(p_IODevice,t_fiffInfo,t_Tree,t_dirTree);
+    p_IODevice.close(); //file can be closed, since IODevice is already read
+
+    //Search dirTree for specific data types
+    if(t_dirTree.has_kind(FIFFB_EVOKED))
+        hasEvoked = true;
+    if(t_dirTree.has_kind(FIFFB_RAW_DATA)) //this type might not yet be sufficient, (another is e.g. FIFFB_RAW_DATA)
+        hasRaw = true;
+    if(t_Tree.has_kind(FIFFB_MNE_FORWARD_SOLUTION))
+        hasFwds = true;
+
+    //Read all sort of types
+    //raw data
+    if(hasRaw) {
+        QSharedPointer<FiffRawData> p_fiffRawData(new FiffRawData(p_IODevice));
+        p_IODevice.close();
+
+        //append to corresponding member qlist
+        m_qlistRaw.append(p_fiffRawData);
+
+        printf("Finished reading raw data!");
+    }
+
+    //evoked data + projections
+    if(hasEvoked) {
+        FiffEvokedSet p_fiffEvokedSet(p_IODevice);
+        p_IODevice.close();
+
+        //append to corresponding member qlist
+        for(qint32 i=0; i < p_fiffEvokedSet.evoked.size(); ++i) {
+            m_qlistEvoked.append(QSharedPointer<FiffEvoked>(&p_fiffEvokedSet.evoked[i]));
+        }
+    }
+
+//    //forward solutions
+//    if(hasFwds) {
+//        MNEForwardSolution p_forwardSolution(p_IODevice);
+
+//        //append to corresponding member qlist
+//        m_qlistFwd.append(QSharedPointer<MNEForwardSolution>(&p_forwardSolution));
+//    }
+
+    //print summary
+    //std::cout << *this << std::endl;
+
+    return true;
+}
+
+//*************************************************************************************************************
+
+bool FiffIO::write(QIODevice& p_IODevice, const fiff_int_t type, const fiff_int_t idx) const {
+    switch(type) {
+        case FIFFB_RAW_DATA: {
+            FiffIO::write_raw(p_IODevice,idx);
 
 //*************************************************************************************************************
 //=============================================================================================================
