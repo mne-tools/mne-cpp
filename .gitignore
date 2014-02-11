@@ -289,3 +289,5 @@ bin/.DS_Store
 .directory
 .~lock*
 *autosave
+
+.DS_Store
