@@ -126,397 +126,398 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;: first_samp(-1)</div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;, last_samp(-1)</div>
 <div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;{</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    <span class="keywordflow">if</span>(!<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a650740d72668d3d85b27de3d44c20a96">FiffStream::setup_read_raw</a>(p_IODevice, *<span class="keyword">this</span>))</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    {</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;        printf(<span class="stringliteral">&quot;\tError during fiff setup raw read.\n&quot;</span>);</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;        exit(EXIT_FAILURE); <span class="comment">//ToDo Throw here, e.g.: throw std::runtime_error(&quot;IO Error! File not found&quot;);</span></div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;        <span class="keywordflow">return</span>;</div>
-<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;    }</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;}</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    <span class="comment">//setup FiffRawData object</span></div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    <span class="keywordflow">if</span>(!<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a650740d72668d3d85b27de3d44c20a96">FiffStream::setup_read_raw</a>(p_IODevice, *<span class="keyword">this</span>))</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    {</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;        printf(<span class="stringliteral">&quot;\tError during fiff setup raw read.\n&quot;</span>);</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;        <span class="comment">//exit(EXIT_FAILURE); //ToDo Throw here, e.g.: throw std::runtime_error(&quot;IO Error! File not found&quot;);</span></div>
+<div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;        <span class="keywordflow">return</span>;</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    }</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;}</div>
 <div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;</div>
-<div class="line"><a name="l00084"></a><span class="lineno"><a class="line" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a7678e7521125623a3eb4b8a1a2b0e91f">   84</a></span>&#160;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#ac4f5bbd43f8eea9c61fdcd2e3556bd73">FiffRawData::FiffRawData</a>(<span class="keyword">const</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html">FiffRawData</a> &amp;p_FiffRawData)</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;: file(p_FiffRawData.file)</div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;, info(p_FiffRawData.info)</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;, first_samp(p_FiffRawData.first_samp)</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;, last_samp(p_FiffRawData.last_samp)</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;, cals(p_FiffRawData.cals)</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;, rawdir(p_FiffRawData.rawdir)</div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;, proj(p_FiffRawData.proj)</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;, comp(p_FiffRawData.comp)</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;{</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;</div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;}</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;</div>
+<div class="line"><a name="l00085"></a><span class="lineno"><a class="line" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a7678e7521125623a3eb4b8a1a2b0e91f">   85</a></span>&#160;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#ac4f5bbd43f8eea9c61fdcd2e3556bd73">FiffRawData::FiffRawData</a>(<span class="keyword">const</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html">FiffRawData</a> &amp;p_FiffRawData)</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;: file(p_FiffRawData.file)</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;, info(p_FiffRawData.info)</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;, first_samp(p_FiffRawData.first_samp)</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;, last_samp(p_FiffRawData.last_samp)</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;, cals(p_FiffRawData.cals)</div>
+<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;, rawdir(p_FiffRawData.rawdir)</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;, proj(p_FiffRawData.proj)</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;, comp(p_FiffRawData.comp)</div>
+<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160;{</div>
+<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;}</div>
 <div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;</div>
-<div class="line"><a name="l00100"></a><span class="lineno"><a class="line" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#ab0f75372627777039d42f4f4e31cf233">  100</a></span>&#160;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#ab0f75372627777039d42f4f4e31cf233">FiffRawData::~FiffRawData</a>()</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;{</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;}</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;</div>
+<div class="line"><a name="l00101"></a><span class="lineno"><a class="line" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#ab0f75372627777039d42f4f4e31cf233">  101</a></span>&#160;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#ab0f75372627777039d42f4f4e31cf233">FiffRawData::~FiffRawData</a>()</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;{</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;}</div>
 <div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;</div>
-<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;</div>
-<div class="line"><a name="l00108"></a><span class="lineno"><a class="line" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a233b7f937006a65dc7a2c0f96722a40e">  108</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a233b7f937006a65dc7a2c0f96722a40e">FiffRawData::clear</a>()</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;{</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a30074ee25c17578db14b98a473092061">info</a>.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#adc07a81c63cfb3796fde6b49bfa419d1">clear</a>();</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#aa7f34c5b4601b59bf79945f4cd8f9e4a">first_samp</a> = -1;</div>
-<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a7be676d089d03325fd7c08cc58d17c2f">last_samp</a> = -1;</div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a58a1c11cf348af6a2b02b7bc98d16cb1">cals</a> = RowVectorXd();</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#aa907af5de89694ca190356aec73a796e">rawdir</a>.clear();</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#af67fb04b8b963db4eca1c167359a26d5">proj</a> = MatrixXd();</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#adbe4741e8ec3c9438da36e627995ef1a">comp</a>.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html#a2d900f59128799f79ed965fa86600659">clear</a>();</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;}</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160;</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;</div>
+<div class="line"><a name="l00109"></a><span class="lineno"><a class="line" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a233b7f937006a65dc7a2c0f96722a40e">  109</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a233b7f937006a65dc7a2c0f96722a40e">FiffRawData::clear</a>()</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;{</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a30074ee25c17578db14b98a473092061">info</a>.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#adc07a81c63cfb3796fde6b49bfa419d1">clear</a>();</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#aa7f34c5b4601b59bf79945f4cd8f9e4a">first_samp</a> = -1;</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a7be676d089d03325fd7c08cc58d17c2f">last_samp</a> = -1;</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a58a1c11cf348af6a2b02b7bc98d16cb1">cals</a> = RowVectorXd();</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#aa907af5de89694ca190356aec73a796e">rawdir</a>.clear();</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#af67fb04b8b963db4eca1c167359a26d5">proj</a> = MatrixXd();</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#adbe4741e8ec3c9438da36e627995ef1a">comp</a>.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html#a2d900f59128799f79ed965fa86600659">clear</a>();</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;}</div>
 <div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;</div>
-<div class="line"><a name="l00122"></a><span class="lineno"><a class="line" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a05784c90a67226790f4d0ed7b8a591f8">  122</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a05784c90a67226790f4d0ed7b8a591f8">FiffRawData::read_raw_segment</a>(MatrixXd&amp; data, MatrixXd&amp; times, fiff_int_t from, fiff_int_t to, <span class="keyword">const</span> RowVectorXi&amp; sel)</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;{</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    <span class="keywordtype">bool</span> projAvailable = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;    <span class="keywordflow">if</span> (this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#af67fb04b8b963db4eca1c167359a26d5">proj</a>.size() == 0)</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;        projAvailable = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    <span class="keywordflow">if</span>(from == -1)</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;        from = this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#aa7f34c5b4601b59bf79945f4cd8f9e4a">first_samp</a>;</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    <span class="keywordflow">if</span>(to == -1)</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;        to = this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a7be676d089d03325fd7c08cc58d17c2f">last_samp</a>;</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    <span class="comment">//  Initial checks</span></div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    <span class="keywordflow">if</span>(from &lt; this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#aa7f34c5b4601b59bf79945f4cd8f9e4a">first_samp</a>)</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;        from = this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#aa7f34c5b4601b59bf79945f4cd8f9e4a">first_samp</a>;</div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;    <span class="keywordflow">if</span>(to &gt; this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a7be676d089d03325fd7c08cc58d17c2f">last_samp</a>)</div>
-<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;        to = this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a7be676d089d03325fd7c08cc58d17c2f">last_samp</a>;</div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;    <span class="keywordflow">if</span>(from &gt; to)</div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;    {</div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;        printf(<span class="stringliteral">&quot;No data in this range\n&quot;</span>);</div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;    }</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;    printf(<span class="stringliteral">&quot;Reading %d ... %d  =  %9.3f ... %9.3f secs...&quot;</span>, from, to, ((<span class="keywordtype">float</span>)from)/this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a30074ee25c17578db14b98a473092061">info</a>.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a963c80bf73b01ed07eb1a31540cf308c">sfreq</a>, ((<span class="keywordtype">float</span>)to)/this-&gt;info.sfreq);</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;    <span class="comment">//  Initialize the data and calibration vector</span></div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;    qint32 nchan = this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a30074ee25c17578db14b98a473092061">info</a>.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#ab029006706d937001324c13892102893">nchan</a>;</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;    qint32 dest  = 0;<span class="comment">//1;</span></div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;    qint32 i, k, r;</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;</div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;    <span class="keyword">typedef</span> Eigen::Triplet&lt;double&gt; T;</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;    std::vector&lt;T&gt; tripletList;</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;    tripletList.reserve(nchan);</div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;    <span class="keywordflow">for</span>(i = 0; i &lt; nchan; ++i)</div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;        tripletList.push_back(T(i, i, this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a58a1c11cf348af6a2b02b7bc98d16cb1">cals</a>[i]));</div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;    SparseMatrix&lt;double&gt; cal(nchan, nchan);</div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;    cal.setFromTriplets(tripletList.begin(), tripletList.end());</div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;<span class="comment">//    cal.makeCompressed();</span></div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;</div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;    MatrixXd mult_full;</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;    <span class="keywordflow">if</span> (sel.size() == 0)</div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;    {</div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;        data = MatrixXd(nchan, to-from+1);</div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;<span class="comment">//            data-&gt;setZero();</span></div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;        <span class="keywordflow">if</span> (projAvailable || this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#adbe4741e8ec3c9438da36e627995ef1a">comp</a>.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html#a87ce56e229922b8c0b71c0d29a4d8698">kind</a> != -1)</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;        {</div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;            <span class="keywordflow">if</span> (!projAvailable)</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;                mult_full = this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#adbe4741e8ec3c9438da36e627995ef1a">comp</a>.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html#a59d3cc5600aa876c0f8bcfc3b31e4e65">data</a>-&gt;data*cal;</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;            <span class="keywordflow">else</span> <span class="keywordflow">if</span> (this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#adbe4741e8ec3c9438da36e627995ef1a">comp</a>.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html#a87ce56e229922b8c0b71c0d29a4d8698">kind</a> == -1)</div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;                mult_full = this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#af67fb04b8b963db4eca1c167359a26d5">proj</a>*cal;</div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;            <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;                mult_full = this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#af67fb04b8b963db4eca1c167359a26d5">proj</a>*this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#adbe4741e8ec3c9438da36e627995ef1a">comp</a>.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html#a59d3cc5600aa876c0f8bcfc3b31e4e65">data</a>-&gt;data*cal;</div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;        }</div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;    }</div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;    {</div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;        data = MatrixXd(sel.size(),to-from+1);</div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;<span class="comment">//            data-&gt;setZero();</span></div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;</div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;        MatrixXd selVect(sel.size(), nchan);</div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;</div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;        selVect.setZero();</div>
-<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;</div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;        <span class="keywordflow">if</span> (!projAvailable &amp;&amp; this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#adbe4741e8ec3c9438da36e627995ef1a">comp</a>.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html#a87ce56e229922b8c0b71c0d29a4d8698">kind</a> == -1)</div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;        {</div>
-<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;            tripletList.clear();</div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;            tripletList.reserve(sel.size());</div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;            <span class="keywordflow">for</span>(i = 0; i &lt; sel.size(); ++i)</div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;                tripletList.push_back(T(i, i, this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a58a1c11cf348af6a2b02b7bc98d16cb1">cals</a>[sel[i]]));</div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;            cal = SparseMatrix&lt;double&gt;(sel.size(), sel.size());</div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;            cal.setFromTriplets(tripletList.begin(), tripletList.end());</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;        }</div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;        <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;        {</div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;            <span class="keywordflow">if</span> (!projAvailable)</div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;            {</div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;                qDebug() &lt;&lt; <span class="stringliteral">&quot;This has to be debugged! #1&quot;</span>;</div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;                <span class="keywordflow">for</span>( i = 0; i  &lt; sel.size(); ++i)</div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;                    selVect.row(i) = this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#adbe4741e8ec3c9438da36e627995ef1a">comp</a>.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html#a59d3cc5600aa876c0f8bcfc3b31e4e65">data</a>-&gt;data.block(sel[i],0,1,nchan);</div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;                mult_full = selVect*cal;</div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;            }</div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;            <span class="keywordflow">else</span> <span class="keywordflow">if</span> (this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#adbe4741e8ec3c9438da36e627995ef1a">comp</a>.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html#a87ce56e229922b8c0b71c0d29a4d8698">kind</a> == -1)</div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;            {</div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;                <span class="keywordflow">for</span>( i = 0; i  &lt; sel.size(); ++i)</div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;                    selVect.row(i) = this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#af67fb04b8b963db4eca1c167359a26d5">proj</a>.block(sel[i],0,1,nchan);</div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;</div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;                mult_full = selVect*cal;</div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;            }</div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;            <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;            {</div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;                qDebug() &lt;&lt; <span class="stringliteral">&quot;This has to be debugged! #3&quot;</span>;</div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;                <span class="keywordflow">for</span>( i = 0; i  &lt; sel.size(); ++i)</div>
-<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;                    selVect.row(i) = this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#af67fb04b8b963db4eca1c167359a26d5">proj</a>.block(sel[i],0,1,nchan);</div>
-<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;</div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;                mult_full = selVect*this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#adbe4741e8ec3c9438da36e627995ef1a">comp</a>.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html#a59d3cc5600aa876c0f8bcfc3b31e4e65">data</a>-&gt;data*cal;</div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;            }</div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;        }</div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;    }</div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;</div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;    <span class="keywordtype">bool</span> do_debug = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;    <span class="comment">// Make mult sparse</span></div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;    tripletList.clear();</div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;    tripletList.reserve(mult_full.rows()*mult_full.cols());</div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;    <span class="keywordflow">for</span>(i = 0; i &lt; mult_full.rows(); ++i)</div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;        <span class="keywordflow">for</span>(k = 0; k &lt; mult_full.cols(); ++k)</div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;            <span class="keywordflow">if</span>(mult_full(i,k) != 0)</div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;                tripletList.push_back(T(i, k, mult_full(i,k)));</div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;</div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;    SparseMatrix&lt;double&gt; mult(mult_full.rows(),mult_full.cols());</div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;    <span class="keywordflow">if</span>(tripletList.size() &gt; 0)</div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;        mult.setFromTriplets(tripletList.begin(), tripletList.end());</div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;<span class="comment">//    mult.makeCompressed();</span></div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;</div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;</div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#afc5bb6ae857cf5e93e4e0271bf0bee05">FiffStream::SPtr</a> fid;</div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;    <span class="keywordflow">if</span> (!this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a4d7d8906a821657c22e4e3aaa9a964a9">file</a>-&gt;device()-&gt;isOpen())</div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;    {</div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;        <span class="keywordflow">if</span> (!this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a4d7d8906a821657c22e4e3aaa9a964a9">file</a>-&gt;device()-&gt;open(QIODevice::ReadOnly))</div>
-<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;        {</div>
-<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;            printf(<span class="stringliteral">&quot;Cannot open file %s&quot;</span>,this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a30074ee25c17578db14b98a473092061">info</a>.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#ab4ed13fa034471b15a66b303e71c23d6">filename</a>.toUtf8().constData());</div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;        }</div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;        fid = this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a4d7d8906a821657c22e4e3aaa9a964a9">file</a>;</div>
-<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;    }</div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;    {</div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;        fid = this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a4d7d8906a821657c22e4e3aaa9a964a9">file</a>;</div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;    }</div>
-<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;</div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;    MatrixXd one;</div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;    fiff_int_t first_pick, last_pick, picksamp;</div>
-<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;    <span class="keywordflow">for</span>(k = 0; k &lt; this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#aa907af5de89694ca190356aec73a796e">rawdir</a>.size(); ++k)</div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;    {</div>
-<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;        <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html">FiffRawDir</a> thisRawDir = this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#aa907af5de89694ca190356aec73a796e">rawdir</a>[k];</div>
-<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;        <span class="comment">//</span></div>
-<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;        <span class="comment">//  Do we need this buffer</span></div>
-<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;        <span class="comment">//</span></div>
-<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;        <span class="keywordflow">if</span> (thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#a678362f3b56c8a6e006a2fd8f92cb316">last</a> &gt; from)</div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;        {</div>
-<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;            <span class="keywordflow">if</span> (thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#a4eb9431e5cc5f8a5d8ae452a51661f5e">ent</a>.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_entry.html#a5027557278aa7bab1c93801e1e45dcb1">kind</a> == -1)</div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;            {</div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;                <span class="comment">//</span></div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;                <span class="comment">//  Take the easy route: skip is translated to zeros</span></div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;                <span class="comment">//</span></div>
-<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;                <span class="keywordflow">if</span>(do_debug)</div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;                    printf(<span class="stringliteral">&quot;S&quot;</span>);</div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;                <span class="keywordflow">if</span> (sel.cols() &lt;= 0)</div>
-<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;                    one.resize(nchan,thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#ac8b1337bef29631f387327972a1a3db1">nsamp</a>);</div>
-<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;                <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;                    one.resize(sel.cols(),thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#ac8b1337bef29631f387327972a1a3db1">nsamp</a>);</div>
-<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;</div>
-<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;                one.setZero();</div>
-<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;            }</div>
-<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;            <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;            {</div>
-<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;                <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a81dd3125f347ffdcae77188caf6670f5">FiffTag::SPtr</a> t_pTag;</div>
-<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;                <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a982a42024ec666c049685dd98ddf3545">FiffTag::read_tag</a>(fid.data(), t_pTag, thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#a4eb9431e5cc5f8a5d8ae452a51661f5e">ent</a>.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_entry.html#a9f8411b582913d9fc965d8e07d0a6152">pos</a>);</div>
-<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;                <span class="comment">//</span></div>
-<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;                <span class="comment">//   Depending on the state of the projection and selection</span></div>
-<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;                <span class="comment">//   we proceed a little bit differently</span></div>
-<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;                <span class="comment">//</span></div>
-<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;                <span class="keywordflow">if</span> (mult.cols() == 0)</div>
-<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;                {</div>
-<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;                    <span class="keywordflow">if</span> (sel.cols() == 0)</div>
-<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;                    {</div>
-<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;                        <span class="keywordflow">if</span> (t_pTag-&gt;type == FIFFT_DAU_PACK16)</div>
-<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;                            one = cal*(Map&lt; MatrixDau16 &gt;( t_pTag-&gt;toDauPack16(),nchan, thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#ac8b1337bef29631f387327972a1a3db1">nsamp</a>)).cast&lt;<span class="keywordtype">double</span>&gt;();</div>
-<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;                        <span class="keywordflow">else</span> <span class="keywordflow">if</span>(t_pTag-&gt;type == FIFFT_INT)</div>
-<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;                            one = cal*(Map&lt; MatrixXi &gt;( t_pTag-&gt;toInt(),nchan, thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#ac8b1337bef29631f387327972a1a3db1">nsamp</a>)).cast&lt;<span class="keywordtype">double</span>&gt;();</div>
-<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;                        <span class="keywordflow">else</span> <span class="keywordflow">if</span>(t_pTag-&gt;type == FIFFT_FLOAT)</div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;                            one = cal*(Map&lt; MatrixXf &gt;( t_pTag-&gt;toFloat(),nchan, thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#ac8b1337bef29631f387327972a1a3db1">nsamp</a>)).cast&lt;<span class="keywordtype">double</span>&gt;();</div>
-<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;                        <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;                            printf(<span class="stringliteral">&quot;Data Storage Format not known jet [1]!! Type: %d\n&quot;</span>, t_pTag-&gt;type);</div>
-<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;                    }</div>
-<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;                    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;                    {</div>
-<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;</div>
-<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;                        <span class="comment">//ToDo find a faster solution for this!! --&gt; make cal and mul sparse like in MATLAB</span></div>
-<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;                        MatrixXd newData(sel.cols(), thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#ac8b1337bef29631f387327972a1a3db1">nsamp</a>); <span class="comment">//ToDo this can be done much faster, without newData</span></div>
-<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;</div>
-<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;                        <span class="keywordflow">if</span> (t_pTag-&gt;type == FIFFT_DAU_PACK16)</div>
-<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;                        {</div>
-<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;                            MatrixXd tmp_data = (Map&lt; MatrixDau16 &gt; ( t_pTag-&gt;toDauPack16(),nchan, thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#ac8b1337bef29631f387327972a1a3db1">nsamp</a>)).cast&lt;<span class="keywordtype">double</span>&gt;();</div>
-<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;</div>
-<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;                            <span class="keywordflow">for</span>(r = 0; r &lt; sel.size(); ++r)</div>
-<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;                                newData.block(r,0,1,thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#ac8b1337bef29631f387327972a1a3db1">nsamp</a>) = tmp_data.block(sel[r],0,1,thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#ac8b1337bef29631f387327972a1a3db1">nsamp</a>);</div>
-<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;                        }</div>
-<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;                        <span class="keywordflow">else</span> <span class="keywordflow">if</span>(t_pTag-&gt;type == FIFFT_INT)</div>
-<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;                        {</div>
-<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;                            MatrixXd tmp_data = (Map&lt; MatrixXi &gt;( t_pTag-&gt;toInt(),nchan, thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#ac8b1337bef29631f387327972a1a3db1">nsamp</a>)).cast&lt;<span class="keywordtype">double</span>&gt;();</div>
-<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;</div>
-<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;                            <span class="keywordflow">for</span>(r = 0; r &lt; sel.size(); ++r)</div>
-<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;                                newData.block(r,0,1,thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#ac8b1337bef29631f387327972a1a3db1">nsamp</a>) = tmp_data.block(sel[r],0,1,thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#ac8b1337bef29631f387327972a1a3db1">nsamp</a>);</div>
-<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;                        }</div>
-<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;                        <span class="keywordflow">else</span> <span class="keywordflow">if</span>(t_pTag-&gt;type == FIFFT_FLOAT)</div>
-<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;                        {</div>
-<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;                            MatrixXd tmp_data = (Map&lt; MatrixXf &gt; ( t_pTag-&gt;toFloat(),nchan, thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#ac8b1337bef29631f387327972a1a3db1">nsamp</a>)).cast&lt;<span class="keywordtype">double</span>&gt;();</div>
-<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;</div>
-<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;                            <span class="keywordflow">for</span>(r = 0; r &lt; sel.size(); ++r)</div>
-<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;                                newData.block(r,0,1,thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#ac8b1337bef29631f387327972a1a3db1">nsamp</a>) = tmp_data.block(sel[r],0,1,thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#ac8b1337bef29631f387327972a1a3db1">nsamp</a>);</div>
-<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;                        }</div>
-<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;                        <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;                        {</div>
-<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;                            printf(<span class="stringliteral">&quot;Data Storage Format not known jet [2]!! Type: %d\n&quot;</span>, t_pTag-&gt;type);</div>
-<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;                        }</div>
-<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;</div>
-<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;                        one = cal*newData;</div>
-<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;                    }</div>
-<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;                }</div>
-<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;                <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;                {</div>
-<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;                    <span class="keywordflow">if</span> (t_pTag-&gt;type == FIFFT_DAU_PACK16)</div>
-<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;                        one = mult*(Map&lt; MatrixDau16 &gt;( t_pTag-&gt;toDauPack16(),nchan, thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#ac8b1337bef29631f387327972a1a3db1">nsamp</a>)).cast&lt;<span class="keywordtype">double</span>&gt;();</div>
-<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;                    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(t_pTag-&gt;type == FIFFT_INT)</div>
-<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;                        one = mult*(Map&lt; MatrixXi &gt;( t_pTag-&gt;toInt(),nchan, thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#ac8b1337bef29631f387327972a1a3db1">nsamp</a>)).cast&lt;<span class="keywordtype">double</span>&gt;();</div>
-<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;                    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(t_pTag-&gt;type == FIFFT_FLOAT)</div>
-<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;                        one = mult*(Map&lt; MatrixXf &gt;( t_pTag-&gt;toFloat(),nchan, thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#ac8b1337bef29631f387327972a1a3db1">nsamp</a>)).cast&lt;<span class="keywordtype">double</span>&gt;();</div>
-<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;                    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;                        printf(<span class="stringliteral">&quot;Data Storage Format not known jet [3]!! Type: %d\n&quot;</span>, t_pTag-&gt;type);</div>
-<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;                }</div>
-<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;            }</div>
-<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;            <span class="comment">//</span></div>
-<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;            <span class="comment">//  The picking logic is a bit complicated</span></div>
-<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;            <span class="comment">//</span></div>
-<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;            <span class="keywordflow">if</span> (to &gt;= thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#a678362f3b56c8a6e006a2fd8f92cb316">last</a> &amp;&amp; from &lt;= thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#a78fff7435092354e83dd1568710dc3b1">first</a>)</div>
-<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;            {</div>
-<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;                <span class="comment">//</span></div>
-<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;                <span class="comment">//  We need the whole buffer</span></div>
-<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;                <span class="comment">//</span></div>
-<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;                first_pick = 0;<span class="comment">//1;</span></div>
-<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;                last_pick  = thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#ac8b1337bef29631f387327972a1a3db1">nsamp</a> - 1;</div>
-<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;                <span class="keywordflow">if</span> (do_debug)</div>
-<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;                    printf(<span class="stringliteral">&quot;W&quot;</span>);</div>
-<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;            }</div>
-<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;            <span class="keywordflow">else</span> <span class="keywordflow">if</span> (from &gt; thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#a78fff7435092354e83dd1568710dc3b1">first</a>)</div>
-<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;            {</div>
-<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;                first_pick = from - thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#a78fff7435092354e83dd1568710dc3b1">first</a>;<span class="comment">// + 1;</span></div>
-<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;                <span class="keywordflow">if</span>(to &lt; thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#a678362f3b56c8a6e006a2fd8f92cb316">last</a>)</div>
-<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;                {</div>
-<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;                    <span class="comment">//</span></div>
-<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;                    <span class="comment">//  Something from the middle</span></div>
-<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;                    <span class="comment">//</span></div>
-<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;<span class="comment">//                    qDebug() &lt;&lt; &quot;This needs to be debugged!&quot;;</span></div>
-<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;                    last_pick = thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#ac8b1337bef29631f387327972a1a3db1">nsamp</a> + to - thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#a678362f3b56c8a6e006a2fd8f92cb316">last</a> - 1;<span class="comment">//is this alright?</span></div>
-<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;                    <span class="keywordflow">if</span> (do_debug)</div>
-<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;                        printf(<span class="stringliteral">&quot;M&quot;</span>);</div>
-<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;                }</div>
-<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;                <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;                {</div>
-<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;                    <span class="comment">//</span></div>
-<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;                    <span class="comment">//  From the middle to the end</span></div>
-<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;                    <span class="comment">//</span></div>
-<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;                    last_pick = thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#ac8b1337bef29631f387327972a1a3db1">nsamp</a> - 1;</div>
-<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;                    <span class="keywordflow">if</span> (do_debug)</div>
-<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;                        printf(<span class="stringliteral">&quot;E&quot;</span>);</div>
-<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;                }</div>
-<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;            }</div>
-<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;            <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;            {</div>
-<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;                <span class="comment">//</span></div>
-<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;                <span class="comment">//  From the beginning to the middle</span></div>
-<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;                <span class="comment">//</span></div>
-<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;                first_pick = 0;<span class="comment">//1;</span></div>
-<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;                last_pick  = to - thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#a78fff7435092354e83dd1568710dc3b1">first</a>;<span class="comment">// + 1;</span></div>
-<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;                <span class="keywordflow">if</span> (do_debug)</div>
-<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;                    printf(<span class="stringliteral">&quot;B&quot;</span>);</div>
-<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;            }</div>
-<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;            <span class="comment">//</span></div>
-<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;            <span class="comment">//  Now we are ready to pick</span></div>
-<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;            <span class="comment">//</span></div>
-<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;            picksamp = last_pick - first_pick + 1;</div>
-<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;</div>
-<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;            <span class="keywordflow">if</span>(do_debug)</div>
-<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;            {</div>
-<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;                qDebug() &lt;&lt; <span class="stringliteral">&quot;first_pick: &quot;</span> &lt;&lt; first_pick;</div>
-<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;                qDebug() &lt;&lt; <span class="stringliteral">&quot;last_pick: &quot;</span> &lt;&lt; last_pick;</div>
-<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;                qDebug() &lt;&lt; <span class="stringliteral">&quot;picksamp: &quot;</span> &lt;&lt; picksamp;</div>
-<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;            }</div>
-<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;</div>
-<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;            <span class="keywordflow">if</span> (picksamp &gt; 0)</div>
-<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;            {</div>
-<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;<span class="comment">//                    for(r = 0; r &lt; data-&gt;rows(); ++r)</span></div>
-<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;<span class="comment">//                        for(c = 0; c &lt; picksamp; ++c)</span></div>
-<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;<span class="comment">//                            (*data)(r,dest + c) = one(r,first_pick + c);</span></div>
-<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;                data.block(0,dest,data.rows(),picksamp) = one.block(0, first_pick, data.rows(), picksamp);</div>
-<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;</div>
-<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;                dest += picksamp;</div>
-<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;            }</div>
-<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;        }</div>
-<div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;        <span class="comment">//</span></div>
-<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;        <span class="comment">//  Done?</span></div>
-<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;        <span class="comment">//</span></div>
-<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;        <span class="keywordflow">if</span> (thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#a678362f3b56c8a6e006a2fd8f92cb316">last</a> &gt;= to)</div>
-<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;        {</div>
-<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;            printf(<span class="stringliteral">&quot; [done]\n&quot;</span>);</div>
-<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;            <span class="keywordflow">break</span>;</div>
-<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;        }</div>
-<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;    }</div>
-<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;</div>
-<div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;<span class="comment">//        fclose(fid);</span></div>
-<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;</div>
-<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;    times = MatrixXd(1, to-from+1);</div>
-<div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;</div>
-<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;    <span class="keywordflow">for</span> (i = 0; i &lt; times.cols(); ++i)</div>
-<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;        times(0, i) = ((float)(from+i)) / this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a30074ee25c17578db14b98a473092061">info</a>.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a963c80bf73b01ed07eb1a31540cf308c">sfreq</a>;</div>
-<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;</div>
-<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;}</div>
-<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;</div>
+<div class="line"><a name="l00123"></a><span class="lineno"><a class="line" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a05784c90a67226790f4d0ed7b8a591f8">  123</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a05784c90a67226790f4d0ed7b8a591f8">FiffRawData::read_raw_segment</a>(MatrixXd&amp; data, MatrixXd&amp; times, fiff_int_t from, fiff_int_t to, <span class="keyword">const</span> RowVectorXi&amp; sel)</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;{</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    <span class="keywordtype">bool</span> projAvailable = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    <span class="keywordflow">if</span> (this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#af67fb04b8b963db4eca1c167359a26d5">proj</a>.size() == 0)</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;        projAvailable = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    <span class="keywordflow">if</span>(from == -1)</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;        from = this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#aa7f34c5b4601b59bf79945f4cd8f9e4a">first_samp</a>;</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;    <span class="keywordflow">if</span>(to == -1)</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;        to = this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a7be676d089d03325fd7c08cc58d17c2f">last_samp</a>;</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;    <span class="comment">//  Initial checks</span></div>
+<div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;    <span class="keywordflow">if</span>(from &lt; this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#aa7f34c5b4601b59bf79945f4cd8f9e4a">first_samp</a>)</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;        from = this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#aa7f34c5b4601b59bf79945f4cd8f9e4a">first_samp</a>;</div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;    <span class="keywordflow">if</span>(to &gt; this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a7be676d089d03325fd7c08cc58d17c2f">last_samp</a>)</div>
+<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;        to = this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a7be676d089d03325fd7c08cc58d17c2f">last_samp</a>;</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;    <span class="keywordflow">if</span>(from &gt; to)</div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;    {</div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;        printf(<span class="stringliteral">&quot;No data in this range\n&quot;</span>);</div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;    }</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;    printf(<span class="stringliteral">&quot;Reading %d ... %d  =  %9.3f ... %9.3f secs...&quot;</span>, from, to, ((<span class="keywordtype">float</span>)from)/this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a30074ee25c17578db14b98a473092061">info</a>.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a963c80bf73b01ed07eb1a31540cf308c">sfreq</a>, ((<span class="keywordtype">float</span>)to)/this-&gt;info.sfreq);</div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;    <span class="comment">//  Initialize the data and calibration vector</span></div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;    qint32 nchan = this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a30074ee25c17578db14b98a473092061">info</a>.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#ab029006706d937001324c13892102893">nchan</a>;</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;    qint32 dest  = 0;<span class="comment">//1;</span></div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;    qint32 i, k, r;</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;    <span class="keyword">typedef</span> Eigen::Triplet&lt;double&gt; T;</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;    std::vector&lt;T&gt; tripletList;</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;    tripletList.reserve(nchan);</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;    <span class="keywordflow">for</span>(i = 0; i &lt; nchan; ++i)</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;        tripletList.push_back(T(i, i, this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a58a1c11cf348af6a2b02b7bc98d16cb1">cals</a>[i]));</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;    SparseMatrix&lt;double&gt; cal(nchan, nchan);</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;    cal.setFromTriplets(tripletList.begin(), tripletList.end());</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;<span class="comment">//    cal.makeCompressed();</span></div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;    MatrixXd mult_full;</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;    <span class="keywordflow">if</span> (sel.size() == 0)</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;    {</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;        data = MatrixXd(nchan, to-from+1);</div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;<span class="comment">//            data-&gt;setZero();</span></div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;        <span class="keywordflow">if</span> (projAvailable || this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#adbe4741e8ec3c9438da36e627995ef1a">comp</a>.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html#a87ce56e229922b8c0b71c0d29a4d8698">kind</a> != -1)</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;        {</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;            <span class="keywordflow">if</span> (!projAvailable)</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;                mult_full = this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#adbe4741e8ec3c9438da36e627995ef1a">comp</a>.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html#a59d3cc5600aa876c0f8bcfc3b31e4e65">data</a>-&gt;data*cal;</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;            <span class="keywordflow">else</span> <span class="keywordflow">if</span> (this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#adbe4741e8ec3c9438da36e627995ef1a">comp</a>.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html#a87ce56e229922b8c0b71c0d29a4d8698">kind</a> == -1)</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;                mult_full = this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#af67fb04b8b963db4eca1c167359a26d5">proj</a>*cal;</div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;            <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;                mult_full = this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#af67fb04b8b963db4eca1c167359a26d5">proj</a>*this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#adbe4741e8ec3c9438da36e627995ef1a">comp</a>.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html#a59d3cc5600aa876c0f8bcfc3b31e4e65">data</a>-&gt;data*cal;</div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;        }</div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;    }</div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;    {</div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;        data = MatrixXd(sel.size(),to-from+1);</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;<span class="comment">//            data-&gt;setZero();</span></div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;</div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;        MatrixXd selVect(sel.size(), nchan);</div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;</div>
+<div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;        selVect.setZero();</div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;        <span class="keywordflow">if</span> (!projAvailable &amp;&amp; this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#adbe4741e8ec3c9438da36e627995ef1a">comp</a>.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html#a87ce56e229922b8c0b71c0d29a4d8698">kind</a> == -1)</div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;        {</div>
+<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;            tripletList.clear();</div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;            tripletList.reserve(sel.size());</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;            <span class="keywordflow">for</span>(i = 0; i &lt; sel.size(); ++i)</div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;                tripletList.push_back(T(i, i, this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a58a1c11cf348af6a2b02b7bc98d16cb1">cals</a>[sel[i]]));</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;            cal = SparseMatrix&lt;double&gt;(sel.size(), sel.size());</div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;            cal.setFromTriplets(tripletList.begin(), tripletList.end());</div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;        }</div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;        <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;        {</div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;            <span class="keywordflow">if</span> (!projAvailable)</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;            {</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;                qDebug() &lt;&lt; <span class="stringliteral">&quot;This has to be debugged! #1&quot;</span>;</div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;                <span class="keywordflow">for</span>( i = 0; i  &lt; sel.size(); ++i)</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;                    selVect.row(i) = this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#adbe4741e8ec3c9438da36e627995ef1a">comp</a>.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html#a59d3cc5600aa876c0f8bcfc3b31e4e65">data</a>-&gt;data.block(sel[i],0,1,nchan);</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;                mult_full = selVect*cal;</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;            }</div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;            <span class="keywordflow">else</span> <span class="keywordflow">if</span> (this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#adbe4741e8ec3c9438da36e627995ef1a">comp</a>.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html#a87ce56e229922b8c0b71c0d29a4d8698">kind</a> == -1)</div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;            {</div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;                <span class="keywordflow">for</span>( i = 0; i  &lt; sel.size(); ++i)</div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;                    selVect.row(i) = this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#af67fb04b8b963db4eca1c167359a26d5">proj</a>.block(sel[i],0,1,nchan);</div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;</div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;                mult_full = selVect*cal;</div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;            }</div>
+<div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;            <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;            {</div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;                qDebug() &lt;&lt; <span class="stringliteral">&quot;This has to be debugged! #3&quot;</span>;</div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;                <span class="keywordflow">for</span>( i = 0; i  &lt; sel.size(); ++i)</div>
+<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;                    selVect.row(i) = this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#af67fb04b8b963db4eca1c167359a26d5">proj</a>.block(sel[i],0,1,nchan);</div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;</div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;                mult_full = selVect*this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#adbe4741e8ec3c9438da36e627995ef1a">comp</a>.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html#a59d3cc5600aa876c0f8bcfc3b31e4e65">data</a>-&gt;data*cal;</div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;            }</div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;        }</div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;    }</div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;</div>
+<div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;    <span class="keywordtype">bool</span> do_debug = <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;    <span class="comment">// Make mult sparse</span></div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;    tripletList.clear();</div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;    tripletList.reserve(mult_full.rows()*mult_full.cols());</div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;    <span class="keywordflow">for</span>(i = 0; i &lt; mult_full.rows(); ++i)</div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;        <span class="keywordflow">for</span>(k = 0; k &lt; mult_full.cols(); ++k)</div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;            <span class="keywordflow">if</span>(mult_full(i,k) != 0)</div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;                tripletList.push_back(T(i, k, mult_full(i,k)));</div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;</div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;    SparseMatrix&lt;double&gt; mult(mult_full.rows(),mult_full.cols());</div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;    <span class="keywordflow">if</span>(tripletList.size() &gt; 0)</div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;        mult.setFromTriplets(tripletList.begin(), tripletList.end());</div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;<span class="comment">//    mult.makeCompressed();</span></div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;</div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;</div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;    <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#afc5bb6ae857cf5e93e4e0271bf0bee05">FiffStream::SPtr</a> fid;</div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;    <span class="keywordflow">if</span> (!this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a4d7d8906a821657c22e4e3aaa9a964a9">file</a>-&gt;device()-&gt;isOpen())</div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;    {</div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;        <span class="keywordflow">if</span> (!this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a4d7d8906a821657c22e4e3aaa9a964a9">file</a>-&gt;device()-&gt;open(QIODevice::ReadOnly))</div>
+<div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;        {</div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;            printf(<span class="stringliteral">&quot;Cannot open file %s&quot;</span>,this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a30074ee25c17578db14b98a473092061">info</a>.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#ab4ed13fa034471b15a66b303e71c23d6">filename</a>.toUtf8().constData());</div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;        }</div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;        fid = this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a4d7d8906a821657c22e4e3aaa9a964a9">file</a>;</div>
+<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;    }</div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;    {</div>
+<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;        fid = this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a4d7d8906a821657c22e4e3aaa9a964a9">file</a>;</div>
+<div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;    }</div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;</div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;    MatrixXd one;</div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;    fiff_int_t first_pick, last_pick, picksamp;</div>
+<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;    <span class="keywordflow">for</span>(k = 0; k &lt; this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#aa907af5de89694ca190356aec73a796e">rawdir</a>.size(); ++k)</div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;    {</div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;        <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html">FiffRawDir</a> thisRawDir = this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#aa907af5de89694ca190356aec73a796e">rawdir</a>[k];</div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;        <span class="comment">//</span></div>
+<div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;        <span class="comment">//  Do we need this buffer</span></div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;        <span class="comment">//</span></div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;        <span class="keywordflow">if</span> (thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#a678362f3b56c8a6e006a2fd8f92cb316">last</a> &gt; from)</div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;        {</div>
+<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;            <span class="keywordflow">if</span> (thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#a4eb9431e5cc5f8a5d8ae452a51661f5e">ent</a>.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_entry.html#a5027557278aa7bab1c93801e1e45dcb1">kind</a> == -1)</div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;            {</div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;                <span class="comment">//</span></div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;                <span class="comment">//  Take the easy route: skip is translated to zeros</span></div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;                <span class="comment">//</span></div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;                <span class="keywordflow">if</span>(do_debug)</div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;                    printf(<span class="stringliteral">&quot;S&quot;</span>);</div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;                <span class="keywordflow">if</span> (sel.cols() &lt;= 0)</div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;                    one.resize(nchan,thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#ac8b1337bef29631f387327972a1a3db1">nsamp</a>);</div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;                <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;                    one.resize(sel.cols(),thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#ac8b1337bef29631f387327972a1a3db1">nsamp</a>);</div>
+<div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;</div>
+<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;                one.setZero();</div>
+<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;            }</div>
+<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;            <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;            {</div>
+<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;                <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a81dd3125f347ffdcae77188caf6670f5">FiffTag::SPtr</a> t_pTag;</div>
+<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;                <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a982a42024ec666c049685dd98ddf3545">FiffTag::read_tag</a>(fid.data(), t_pTag, thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#a4eb9431e5cc5f8a5d8ae452a51661f5e">ent</a>.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_dir_entry.html#a9f8411b582913d9fc965d8e07d0a6152">pos</a>);</div>
+<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;                <span class="comment">//</span></div>
+<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;                <span class="comment">//   Depending on the state of the projection and selection</span></div>
+<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;                <span class="comment">//   we proceed a little bit differently</span></div>
+<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;                <span class="comment">//</span></div>
+<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;                <span class="keywordflow">if</span> (mult.cols() == 0)</div>
+<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;                {</div>
+<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;                    <span class="keywordflow">if</span> (sel.cols() == 0)</div>
+<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;                    {</div>
+<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;                        <span class="keywordflow">if</span> (t_pTag-&gt;type == FIFFT_DAU_PACK16)</div>
+<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;                            one = cal*(Map&lt; MatrixDau16 &gt;( t_pTag-&gt;toDauPack16(),nchan, thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#ac8b1337bef29631f387327972a1a3db1">nsamp</a>)).cast&lt;<span class="keywordtype">double</span>&gt;();</div>
+<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;                        <span class="keywordflow">else</span> <span class="keywordflow">if</span>(t_pTag-&gt;type == FIFFT_INT)</div>
+<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;                            one = cal*(Map&lt; MatrixXi &gt;( t_pTag-&gt;toInt(),nchan, thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#ac8b1337bef29631f387327972a1a3db1">nsamp</a>)).cast&lt;<span class="keywordtype">double</span>&gt;();</div>
+<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;                        <span class="keywordflow">else</span> <span class="keywordflow">if</span>(t_pTag-&gt;type == FIFFT_FLOAT)</div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;                            one = cal*(Map&lt; MatrixXf &gt;( t_pTag-&gt;toFloat(),nchan, thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#ac8b1337bef29631f387327972a1a3db1">nsamp</a>)).cast&lt;<span class="keywordtype">double</span>&gt;();</div>
+<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;                        <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;                            printf(<span class="stringliteral">&quot;Data Storage Format not known jet [1]!! Type: %d\n&quot;</span>, t_pTag-&gt;type);</div>
+<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;                    }</div>
+<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;                    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;                    {</div>
+<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;</div>
+<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;                        <span class="comment">//ToDo find a faster solution for this!! --&gt; make cal and mul sparse like in MATLAB</span></div>
+<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;                        MatrixXd newData(sel.cols(), thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#ac8b1337bef29631f387327972a1a3db1">nsamp</a>); <span class="comment">//ToDo this can be done much faster, without newData</span></div>
+<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;</div>
+<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;                        <span class="keywordflow">if</span> (t_pTag-&gt;type == FIFFT_DAU_PACK16)</div>
+<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;                        {</div>
+<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;                            MatrixXd tmp_data = (Map&lt; MatrixDau16 &gt; ( t_pTag-&gt;toDauPack16(),nchan, thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#ac8b1337bef29631f387327972a1a3db1">nsamp</a>)).cast&lt;<span class="keywordtype">double</span>&gt;();</div>
+<div class="line"><a name="l00312"></a><span class="lineno">  312</span>&#160;</div>
+<div class="line"><a name="l00313"></a><span class="lineno">  313</span>&#160;                            <span class="keywordflow">for</span>(r = 0; r &lt; sel.size(); ++r)</div>
+<div class="line"><a name="l00314"></a><span class="lineno">  314</span>&#160;                                newData.block(r,0,1,thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#ac8b1337bef29631f387327972a1a3db1">nsamp</a>) = tmp_data.block(sel[r],0,1,thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#ac8b1337bef29631f387327972a1a3db1">nsamp</a>);</div>
+<div class="line"><a name="l00315"></a><span class="lineno">  315</span>&#160;                        }</div>
+<div class="line"><a name="l00316"></a><span class="lineno">  316</span>&#160;                        <span class="keywordflow">else</span> <span class="keywordflow">if</span>(t_pTag-&gt;type == FIFFT_INT)</div>
+<div class="line"><a name="l00317"></a><span class="lineno">  317</span>&#160;                        {</div>
+<div class="line"><a name="l00318"></a><span class="lineno">  318</span>&#160;                            MatrixXd tmp_data = (Map&lt; MatrixXi &gt;( t_pTag-&gt;toInt(),nchan, thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#ac8b1337bef29631f387327972a1a3db1">nsamp</a>)).cast&lt;<span class="keywordtype">double</span>&gt;();</div>
+<div class="line"><a name="l00319"></a><span class="lineno">  319</span>&#160;</div>
+<div class="line"><a name="l00320"></a><span class="lineno">  320</span>&#160;                            <span class="keywordflow">for</span>(r = 0; r &lt; sel.size(); ++r)</div>
+<div class="line"><a name="l00321"></a><span class="lineno">  321</span>&#160;                                newData.block(r,0,1,thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#ac8b1337bef29631f387327972a1a3db1">nsamp</a>) = tmp_data.block(sel[r],0,1,thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#ac8b1337bef29631f387327972a1a3db1">nsamp</a>);</div>
+<div class="line"><a name="l00322"></a><span class="lineno">  322</span>&#160;                        }</div>
+<div class="line"><a name="l00323"></a><span class="lineno">  323</span>&#160;                        <span class="keywordflow">else</span> <span class="keywordflow">if</span>(t_pTag-&gt;type == FIFFT_FLOAT)</div>
+<div class="line"><a name="l00324"></a><span class="lineno">  324</span>&#160;                        {</div>
+<div class="line"><a name="l00325"></a><span class="lineno">  325</span>&#160;                            MatrixXd tmp_data = (Map&lt; MatrixXf &gt; ( t_pTag-&gt;toFloat(),nchan, thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#ac8b1337bef29631f387327972a1a3db1">nsamp</a>)).cast&lt;<span class="keywordtype">double</span>&gt;();</div>
+<div class="line"><a name="l00326"></a><span class="lineno">  326</span>&#160;</div>
+<div class="line"><a name="l00327"></a><span class="lineno">  327</span>&#160;                            <span class="keywordflow">for</span>(r = 0; r &lt; sel.size(); ++r)</div>
+<div class="line"><a name="l00328"></a><span class="lineno">  328</span>&#160;                                newData.block(r,0,1,thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#ac8b1337bef29631f387327972a1a3db1">nsamp</a>) = tmp_data.block(sel[r],0,1,thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#ac8b1337bef29631f387327972a1a3db1">nsamp</a>);</div>
+<div class="line"><a name="l00329"></a><span class="lineno">  329</span>&#160;                        }</div>
+<div class="line"><a name="l00330"></a><span class="lineno">  330</span>&#160;                        <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00331"></a><span class="lineno">  331</span>&#160;                        {</div>
+<div class="line"><a name="l00332"></a><span class="lineno">  332</span>&#160;                            printf(<span class="stringliteral">&quot;Data Storage Format not known jet [2]!! Type: %d\n&quot;</span>, t_pTag-&gt;type);</div>
+<div class="line"><a name="l00333"></a><span class="lineno">  333</span>&#160;                        }</div>
+<div class="line"><a name="l00334"></a><span class="lineno">  334</span>&#160;</div>
+<div class="line"><a name="l00335"></a><span class="lineno">  335</span>&#160;                        one = cal*newData;</div>
+<div class="line"><a name="l00336"></a><span class="lineno">  336</span>&#160;                    }</div>
+<div class="line"><a name="l00337"></a><span class="lineno">  337</span>&#160;                }</div>
+<div class="line"><a name="l00338"></a><span class="lineno">  338</span>&#160;                <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00339"></a><span class="lineno">  339</span>&#160;                {</div>
+<div class="line"><a name="l00340"></a><span class="lineno">  340</span>&#160;                    <span class="keywordflow">if</span> (t_pTag-&gt;type == FIFFT_DAU_PACK16)</div>
+<div class="line"><a name="l00341"></a><span class="lineno">  341</span>&#160;                        one = mult*(Map&lt; MatrixDau16 &gt;( t_pTag-&gt;toDauPack16(),nchan, thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#ac8b1337bef29631f387327972a1a3db1">nsamp</a>)).cast&lt;<span class="keywordtype">double</span>&gt;();</div>
+<div class="line"><a name="l00342"></a><span class="lineno">  342</span>&#160;                    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(t_pTag-&gt;type == FIFFT_INT)</div>
+<div class="line"><a name="l00343"></a><span class="lineno">  343</span>&#160;                        one = mult*(Map&lt; MatrixXi &gt;( t_pTag-&gt;toInt(),nchan, thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#ac8b1337bef29631f387327972a1a3db1">nsamp</a>)).cast&lt;<span class="keywordtype">double</span>&gt;();</div>
+<div class="line"><a name="l00344"></a><span class="lineno">  344</span>&#160;                    <span class="keywordflow">else</span> <span class="keywordflow">if</span>(t_pTag-&gt;type == FIFFT_FLOAT)</div>
+<div class="line"><a name="l00345"></a><span class="lineno">  345</span>&#160;                        one = mult*(Map&lt; MatrixXf &gt;( t_pTag-&gt;toFloat(),nchan, thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#ac8b1337bef29631f387327972a1a3db1">nsamp</a>)).cast&lt;<span class="keywordtype">double</span>&gt;();</div>
+<div class="line"><a name="l00346"></a><span class="lineno">  346</span>&#160;                    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00347"></a><span class="lineno">  347</span>&#160;                        printf(<span class="stringliteral">&quot;Data Storage Format not known jet [3]!! Type: %d\n&quot;</span>, t_pTag-&gt;type);</div>
+<div class="line"><a name="l00348"></a><span class="lineno">  348</span>&#160;                }</div>
+<div class="line"><a name="l00349"></a><span class="lineno">  349</span>&#160;            }</div>
+<div class="line"><a name="l00350"></a><span class="lineno">  350</span>&#160;            <span class="comment">//</span></div>
+<div class="line"><a name="l00351"></a><span class="lineno">  351</span>&#160;            <span class="comment">//  The picking logic is a bit complicated</span></div>
+<div class="line"><a name="l00352"></a><span class="lineno">  352</span>&#160;            <span class="comment">//</span></div>
+<div class="line"><a name="l00353"></a><span class="lineno">  353</span>&#160;            <span class="keywordflow">if</span> (to &gt;= thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#a678362f3b56c8a6e006a2fd8f92cb316">last</a> &amp;&amp; from &lt;= thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#a78fff7435092354e83dd1568710dc3b1">first</a>)</div>
+<div class="line"><a name="l00354"></a><span class="lineno">  354</span>&#160;            {</div>
+<div class="line"><a name="l00355"></a><span class="lineno">  355</span>&#160;                <span class="comment">//</span></div>
+<div class="line"><a name="l00356"></a><span class="lineno">  356</span>&#160;                <span class="comment">//  We need the whole buffer</span></div>
+<div class="line"><a name="l00357"></a><span class="lineno">  357</span>&#160;                <span class="comment">//</span></div>
+<div class="line"><a name="l00358"></a><span class="lineno">  358</span>&#160;                first_pick = 0;<span class="comment">//1;</span></div>
+<div class="line"><a name="l00359"></a><span class="lineno">  359</span>&#160;                last_pick  = thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#ac8b1337bef29631f387327972a1a3db1">nsamp</a> - 1;</div>
+<div class="line"><a name="l00360"></a><span class="lineno">  360</span>&#160;                <span class="keywordflow">if</span> (do_debug)</div>
+<div class="line"><a name="l00361"></a><span class="lineno">  361</span>&#160;                    printf(<span class="stringliteral">&quot;W&quot;</span>);</div>
+<div class="line"><a name="l00362"></a><span class="lineno">  362</span>&#160;            }</div>
+<div class="line"><a name="l00363"></a><span class="lineno">  363</span>&#160;            <span class="keywordflow">else</span> <span class="keywordflow">if</span> (from &gt; thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#a78fff7435092354e83dd1568710dc3b1">first</a>)</div>
+<div class="line"><a name="l00364"></a><span class="lineno">  364</span>&#160;            {</div>
+<div class="line"><a name="l00365"></a><span class="lineno">  365</span>&#160;                first_pick = from - thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#a78fff7435092354e83dd1568710dc3b1">first</a>;<span class="comment">// + 1;</span></div>
+<div class="line"><a name="l00366"></a><span class="lineno">  366</span>&#160;                <span class="keywordflow">if</span>(to &lt; thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#a678362f3b56c8a6e006a2fd8f92cb316">last</a>)</div>
+<div class="line"><a name="l00367"></a><span class="lineno">  367</span>&#160;                {</div>
+<div class="line"><a name="l00368"></a><span class="lineno">  368</span>&#160;                    <span class="comment">//</span></div>
+<div class="line"><a name="l00369"></a><span class="lineno">  369</span>&#160;                    <span class="comment">//  Something from the middle</span></div>
+<div class="line"><a name="l00370"></a><span class="lineno">  370</span>&#160;                    <span class="comment">//</span></div>
+<div class="line"><a name="l00371"></a><span class="lineno">  371</span>&#160;<span class="comment">//                    qDebug() &lt;&lt; &quot;This needs to be debugged!&quot;;</span></div>
+<div class="line"><a name="l00372"></a><span class="lineno">  372</span>&#160;                    last_pick = thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#ac8b1337bef29631f387327972a1a3db1">nsamp</a> + to - thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#a678362f3b56c8a6e006a2fd8f92cb316">last</a> - 1;<span class="comment">//is this alright?</span></div>
+<div class="line"><a name="l00373"></a><span class="lineno">  373</span>&#160;                    <span class="keywordflow">if</span> (do_debug)</div>
+<div class="line"><a name="l00374"></a><span class="lineno">  374</span>&#160;                        printf(<span class="stringliteral">&quot;M&quot;</span>);</div>
+<div class="line"><a name="l00375"></a><span class="lineno">  375</span>&#160;                }</div>
+<div class="line"><a name="l00376"></a><span class="lineno">  376</span>&#160;                <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00377"></a><span class="lineno">  377</span>&#160;                {</div>
+<div class="line"><a name="l00378"></a><span class="lineno">  378</span>&#160;                    <span class="comment">//</span></div>
+<div class="line"><a name="l00379"></a><span class="lineno">  379</span>&#160;                    <span class="comment">//  From the middle to the end</span></div>
+<div class="line"><a name="l00380"></a><span class="lineno">  380</span>&#160;                    <span class="comment">//</span></div>
+<div class="line"><a name="l00381"></a><span class="lineno">  381</span>&#160;                    last_pick = thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#ac8b1337bef29631f387327972a1a3db1">nsamp</a> - 1;</div>
+<div class="line"><a name="l00382"></a><span class="lineno">  382</span>&#160;                    <span class="keywordflow">if</span> (do_debug)</div>
+<div class="line"><a name="l00383"></a><span class="lineno">  383</span>&#160;                        printf(<span class="stringliteral">&quot;E&quot;</span>);</div>
+<div class="line"><a name="l00384"></a><span class="lineno">  384</span>&#160;                }</div>
+<div class="line"><a name="l00385"></a><span class="lineno">  385</span>&#160;            }</div>
+<div class="line"><a name="l00386"></a><span class="lineno">  386</span>&#160;            <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00387"></a><span class="lineno">  387</span>&#160;            {</div>
+<div class="line"><a name="l00388"></a><span class="lineno">  388</span>&#160;                <span class="comment">//</span></div>
+<div class="line"><a name="l00389"></a><span class="lineno">  389</span>&#160;                <span class="comment">//  From the beginning to the middle</span></div>
+<div class="line"><a name="l00390"></a><span class="lineno">  390</span>&#160;                <span class="comment">//</span></div>
+<div class="line"><a name="l00391"></a><span class="lineno">  391</span>&#160;                first_pick = 0;<span class="comment">//1;</span></div>
+<div class="line"><a name="l00392"></a><span class="lineno">  392</span>&#160;                last_pick  = to - thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#a78fff7435092354e83dd1568710dc3b1">first</a>;<span class="comment">// + 1;</span></div>
+<div class="line"><a name="l00393"></a><span class="lineno">  393</span>&#160;                <span class="keywordflow">if</span> (do_debug)</div>
+<div class="line"><a name="l00394"></a><span class="lineno">  394</span>&#160;                    printf(<span class="stringliteral">&quot;B&quot;</span>);</div>
+<div class="line"><a name="l00395"></a><span class="lineno">  395</span>&#160;            }</div>
+<div class="line"><a name="l00396"></a><span class="lineno">  396</span>&#160;            <span class="comment">//</span></div>
+<div class="line"><a name="l00397"></a><span class="lineno">  397</span>&#160;            <span class="comment">//  Now we are ready to pick</span></div>
+<div class="line"><a name="l00398"></a><span class="lineno">  398</span>&#160;            <span class="comment">//</span></div>
+<div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;            picksamp = last_pick - first_pick + 1;</div>
+<div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;</div>
+<div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160;            <span class="keywordflow">if</span>(do_debug)</div>
+<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;            {</div>
+<div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160;                qDebug() &lt;&lt; <span class="stringliteral">&quot;first_pick: &quot;</span> &lt;&lt; first_pick;</div>
+<div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;                qDebug() &lt;&lt; <span class="stringliteral">&quot;last_pick: &quot;</span> &lt;&lt; last_pick;</div>
+<div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160;                qDebug() &lt;&lt; <span class="stringliteral">&quot;picksamp: &quot;</span> &lt;&lt; picksamp;</div>
+<div class="line"><a name="l00406"></a><span class="lineno">  406</span>&#160;            }</div>
+<div class="line"><a name="l00407"></a><span class="lineno">  407</span>&#160;</div>
+<div class="line"><a name="l00408"></a><span class="lineno">  408</span>&#160;            <span class="keywordflow">if</span> (picksamp &gt; 0)</div>
+<div class="line"><a name="l00409"></a><span class="lineno">  409</span>&#160;            {</div>
+<div class="line"><a name="l00410"></a><span class="lineno">  410</span>&#160;<span class="comment">//                    for(r = 0; r &lt; data-&gt;rows(); ++r)</span></div>
+<div class="line"><a name="l00411"></a><span class="lineno">  411</span>&#160;<span class="comment">//                        for(c = 0; c &lt; picksamp; ++c)</span></div>
+<div class="line"><a name="l00412"></a><span class="lineno">  412</span>&#160;<span class="comment">//                            (*data)(r,dest + c) = one(r,first_pick + c);</span></div>
+<div class="line"><a name="l00413"></a><span class="lineno">  413</span>&#160;                data.block(0,dest,data.rows(),picksamp) = one.block(0, first_pick, data.rows(), picksamp);</div>
+<div class="line"><a name="l00414"></a><span class="lineno">  414</span>&#160;</div>
+<div class="line"><a name="l00415"></a><span class="lineno">  415</span>&#160;                dest += picksamp;</div>
+<div class="line"><a name="l00416"></a><span class="lineno">  416</span>&#160;            }</div>
+<div class="line"><a name="l00417"></a><span class="lineno">  417</span>&#160;        }</div>
+<div class="line"><a name="l00418"></a><span class="lineno">  418</span>&#160;        <span class="comment">//</span></div>
+<div class="line"><a name="l00419"></a><span class="lineno">  419</span>&#160;        <span class="comment">//  Done?</span></div>
+<div class="line"><a name="l00420"></a><span class="lineno">  420</span>&#160;        <span class="comment">//</span></div>
+<div class="line"><a name="l00421"></a><span class="lineno">  421</span>&#160;        <span class="keywordflow">if</span> (thisRawDir.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#a678362f3b56c8a6e006a2fd8f92cb316">last</a> &gt;= to)</div>
+<div class="line"><a name="l00422"></a><span class="lineno">  422</span>&#160;        {</div>
+<div class="line"><a name="l00423"></a><span class="lineno">  423</span>&#160;            printf(<span class="stringliteral">&quot; [done]\n&quot;</span>);</div>
+<div class="line"><a name="l00424"></a><span class="lineno">  424</span>&#160;            <span class="keywordflow">break</span>;</div>
+<div class="line"><a name="l00425"></a><span class="lineno">  425</span>&#160;        }</div>
+<div class="line"><a name="l00426"></a><span class="lineno">  426</span>&#160;    }</div>
+<div class="line"><a name="l00427"></a><span class="lineno">  427</span>&#160;</div>
+<div class="line"><a name="l00428"></a><span class="lineno">  428</span>&#160;<span class="comment">//        fclose(fid);</span></div>
+<div class="line"><a name="l00429"></a><span class="lineno">  429</span>&#160;</div>
+<div class="line"><a name="l00430"></a><span class="lineno">  430</span>&#160;    times = MatrixXd(1, to-from+1);</div>
+<div class="line"><a name="l00431"></a><span class="lineno">  431</span>&#160;</div>
+<div class="line"><a name="l00432"></a><span class="lineno">  432</span>&#160;    <span class="keywordflow">for</span> (i = 0; i &lt; times.cols(); ++i)</div>
+<div class="line"><a name="l00433"></a><span class="lineno">  433</span>&#160;        times(0, i) = ((float)(from+i)) / this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a30074ee25c17578db14b98a473092061">info</a>.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a963c80bf73b01ed07eb1a31540cf308c">sfreq</a>;</div>
+<div class="line"><a name="l00434"></a><span class="lineno">  434</span>&#160;</div>
+<div class="line"><a name="l00435"></a><span class="lineno">  435</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00436"></a><span class="lineno">  436</span>&#160;}</div>
 <div class="line"><a name="l00437"></a><span class="lineno">  437</span>&#160;</div>
-<div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;</div>
-<div class="line"><a name="l00440"></a><span class="lineno"><a class="line" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#ac6ebfe5b8c86a22f0a0b4a36eb9050f0">  440</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#ac6ebfe5b8c86a22f0a0b4a36eb9050f0">FiffRawData::read_raw_segment_times</a>(MatrixXd&amp; data, MatrixXd&amp; times, <span class="keywordtype">float</span> from, <span class="keywordtype">float</span> to, <span class="keyword">const</span> RowVectorXi&amp; sel)</div>
-<div class="line"><a name="l00441"></a><span class="lineno">  441</span>&#160;{</div>
-<div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;    <span class="comment">//   Convert to samples</span></div>
-<div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;    from = floor(from*this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a30074ee25c17578db14b98a473092061">info</a>.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a963c80bf73b01ed07eb1a31540cf308c">sfreq</a>);</div>
-<div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;    to   = ceil(to*this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a30074ee25c17578db14b98a473092061">info</a>.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a963c80bf73b01ed07eb1a31540cf308c">sfreq</a>);</div>
-<div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;    <span class="comment">//   Read it</span></div>
-<div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;    <span class="comment">//</span></div>
-<div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;    <span class="keywordflow">return</span> this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a05784c90a67226790f4d0ed7b8a591f8">read_raw_segment</a>(data, times, (qint32)from, (qint32)to, sel);</div>
-<div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;}</div>
+<div class="line"><a name="l00438"></a><span class="lineno">  438</span>&#160;</div>
+<div class="line"><a name="l00439"></a><span class="lineno">  439</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00440"></a><span class="lineno">  440</span>&#160;</div>
+<div class="line"><a name="l00441"></a><span class="lineno"><a class="line" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#ac6ebfe5b8c86a22f0a0b4a36eb9050f0">  441</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#ac6ebfe5b8c86a22f0a0b4a36eb9050f0">FiffRawData::read_raw_segment_times</a>(MatrixXd&amp; data, MatrixXd&amp; times, <span class="keywordtype">float</span> from, <span class="keywordtype">float</span> to, <span class="keyword">const</span> RowVectorXi&amp; sel)</div>
+<div class="line"><a name="l00442"></a><span class="lineno">  442</span>&#160;{</div>
+<div class="line"><a name="l00443"></a><span class="lineno">  443</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00444"></a><span class="lineno">  444</span>&#160;    <span class="comment">//   Convert to samples</span></div>
+<div class="line"><a name="l00445"></a><span class="lineno">  445</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00446"></a><span class="lineno">  446</span>&#160;    from = floor(from*this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a30074ee25c17578db14b98a473092061">info</a>.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a963c80bf73b01ed07eb1a31540cf308c">sfreq</a>);</div>
+<div class="line"><a name="l00447"></a><span class="lineno">  447</span>&#160;    to   = ceil(to*this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a30074ee25c17578db14b98a473092061">info</a>.<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_info.html#a963c80bf73b01ed07eb1a31540cf308c">sfreq</a>);</div>
+<div class="line"><a name="l00448"></a><span class="lineno">  448</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00449"></a><span class="lineno">  449</span>&#160;    <span class="comment">//   Read it</span></div>
+<div class="line"><a name="l00450"></a><span class="lineno">  450</span>&#160;    <span class="comment">//</span></div>
+<div class="line"><a name="l00451"></a><span class="lineno">  451</span>&#160;    <span class="keywordflow">return</span> this-&gt;<a class="code" href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a05784c90a67226790f4d0ed7b8a591f8">read_raw_segment</a>(data, times, (qint32)from, (qint32)to, sel);</div>
+<div class="line"><a name="l00452"></a><span class="lineno">  452</span>&#160;}</div>
 <div class="ttc" id="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp_html_a2d900f59128799f79ed965fa86600659"><div class="ttname"><a href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html#a2d900f59128799f79ed965fa86600659">FIFFLIB::FiffCtfComp::clear</a></div><div class="ttdeci">void clear()</div><div class="ttdef"><b>Definition:</b> <a href="fiff__ctf__comp_8cpp_source.html#l00090">fiff_ctf_comp.cpp:90</a></div></div>
 <div class="ttc" id="class_f_i_f_f_l_i_b_1_1_fiff_dir_entry_html_a5027557278aa7bab1c93801e1e45dcb1"><div class="ttname"><a href="class_f_i_f_f_l_i_b_1_1_fiff_dir_entry.html#a5027557278aa7bab1c93801e1e45dcb1">FIFFLIB::FiffDirEntry::kind</a></div><div class="ttdeci">fiff_int_t kind</div><div class="ttdef"><b>Definition:</b> <a href="fiff__dir__entry_8h_source.html#l00112">fiff_dir_entry.h:112</a></div></div>
-<div class="ttc" id="class_f_i_f_f_l_i_b_1_1_fiff_raw_data_html_ab0f75372627777039d42f4f4e31cf233"><div class="ttname"><a href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#ab0f75372627777039d42f4f4e31cf233">FIFFLIB::FiffRawData::~FiffRawData</a></div><div class="ttdeci">~FiffRawData()</div><div class="ttdef"><b>Definition:</b> <a href="fiff__raw__data_8cpp_source.html#l00100">fiff_raw_data.cpp:100</a></div></div>
+<div class="ttc" id="class_f_i_f_f_l_i_b_1_1_fiff_raw_data_html_ab0f75372627777039d42f4f4e31cf233"><div class="ttname"><a href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#ab0f75372627777039d42f4f4e31cf233">FIFFLIB::FiffRawData::~FiffRawData</a></div><div class="ttdeci">~FiffRawData()</div><div class="ttdef"><b>Definition:</b> <a href="fiff__raw__data_8cpp_source.html#l00101">fiff_raw_data.cpp:101</a></div></div>
 <div class="ttc" id="class_f_i_f_f_l_i_b_1_1_fiff_info_base_html_ab4ed13fa034471b15a66b303e71c23d6"><div class="ttname"><a href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#ab4ed13fa034471b15a66b303e71c23d6">FIFFLIB::FiffInfoBase::filename</a></div><div class="ttdeci">QString filename</div><div class="ttdef"><b>Definition:</b> <a href="fiff__info__base_8h_source.html#l00203">fiff_info_base.h:203</a></div></div>
-<div class="ttc" id="class_f_i_f_f_l_i_b_1_1_fiff_raw_data_html_a233b7f937006a65dc7a2c0f96722a40e"><div class="ttname"><a href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a233b7f937006a65dc7a2c0f96722a40e">FIFFLIB::FiffRawData::clear</a></div><div class="ttdeci">void clear()</div><div class="ttdef"><b>Definition:</b> <a href="fiff__raw__data_8cpp_source.html#l00108">fiff_raw_data.cpp:108</a></div></div>
+<div class="ttc" id="class_f_i_f_f_l_i_b_1_1_fiff_raw_data_html_a233b7f937006a65dc7a2c0f96722a40e"><div class="ttname"><a href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a233b7f937006a65dc7a2c0f96722a40e">FIFFLIB::FiffRawData::clear</a></div><div class="ttdeci">void clear()</div><div class="ttdef"><b>Definition:</b> <a href="fiff__raw__data_8cpp_source.html#l00109">fiff_raw_data.cpp:109</a></div></div>
 <div class="ttc" id="class_f_i_f_f_l_i_b_1_1_fiff_tag_html_a81dd3125f347ffdcae77188caf6670f5"><div class="ttname"><a href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a81dd3125f347ffdcae77188caf6670f5">FIFFLIB::FiffTag::SPtr</a></div><div class="ttdeci">QSharedPointer&lt; FiffTag &gt; SPtr</div><div class="ttdef"><b>Definition:</b> <a href="fiff__tag_8h_source.html#l00166">fiff_tag.h:166</a></div></div>
 <div class="ttc" id="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir_html"><div class="ttname"><a href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html">FIFFLIB::FiffRawDir</a></div><div class="ttdoc">Raw Directory entry. </div><div class="ttdef"><b>Definition:</b> <a href="fiff__raw__dir_8h_source.html#l00081">fiff_raw_dir.h:81</a></div></div>
 <div class="ttc" id="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir_html_a4eb9431e5cc5f8a5d8ae452a51661f5e"><div class="ttname"><a href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#a4eb9431e5cc5f8a5d8ae452a51661f5e">FIFFLIB::FiffRawDir::ent</a></div><div class="ttdeci">FiffDirEntry ent</div><div class="ttdef"><b>Definition:</b> <a href="fiff__raw__dir_8h_source.html#l00108">fiff_raw_dir.h:108</a></div></div>
 <div class="ttc" id="class_f_i_f_f_l_i_b_1_1_fiff_tag_html_a982a42024ec666c049685dd98ddf3545"><div class="ttname"><a href="class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a982a42024ec666c049685dd98ddf3545">FIFFLIB::FiffTag::read_tag</a></div><div class="ttdeci">static bool read_tag(FiffStream *p_pStream, FiffTag::SPtr &amp;p_pTag, qint64 pos=-1)</div><div class="ttdef"><b>Definition:</b> <a href="fiff__tag_8cpp_source.html#l00204">fiff_tag.cpp:204</a></div></div>
 <div class="ttc" id="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir_html_a678362f3b56c8a6e006a2fd8f92cb316"><div class="ttname"><a href="class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html#a678362f3b56c8a6e006a2fd8f92cb316">FIFFLIB::FiffRawDir::last</a></div><div class="ttdeci">fiff_int_t last</div><div class="ttdef"><b>Definition:</b> <a href="fiff__raw__dir_8h_source.html#l00110">fiff_raw_dir.h:110</a></div></div>
 <div class="ttc" id="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp_html_a87ce56e229922b8c0b71c0d29a4d8698"><div class="ttname"><a href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html#a87ce56e229922b8c0b71c0d29a4d8698">FIFFLIB::FiffCtfComp::kind</a></div><div class="ttdeci">fiff_int_t kind</div><div class="ttdef"><b>Definition:</b> <a href="fiff__ctf__comp_8h_source.html#l00121">fiff_ctf_comp.h:121</a></div></div>
-<div class="ttc" id="class_f_i_f_f_l_i_b_1_1_fiff_raw_data_html_ac6ebfe5b8c86a22f0a0b4a36eb9050f0"><div class="ttname"><a href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#ac6ebfe5b8c86a22f0a0b4a36eb9050f0">FIFFLIB::FiffRawData::read_raw_segment_times</a></div><div class="ttdeci">bool read_raw_segment_times(MatrixXd &amp;data, MatrixXd &amp;times, float from, float to, const RowVectorXi &amp;sel=defaultRowVectorXi)</div><div class="ttdef"><b>Definition:</b> <a href="fiff__raw__data_8cpp_source.html#l00440">fiff_raw_data.cpp:440</a></div></div>
+<div class="ttc" id="class_f_i_f_f_l_i_b_1_1_fiff_raw_data_html_ac6ebfe5b8c86a22f0a0b4a36eb9050f0"><div class="ttname"><a href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#ac6ebfe5b8c86a22f0a0b4a36eb9050f0">FIFFLIB::FiffRawData::read_raw_segment_times</a></div><div class="ttdeci">bool read_raw_segment_times(MatrixXd &amp;data, MatrixXd &amp;times, float from, float to, const RowVectorXi &amp;sel=defaultRowVectorXi)</div><div class="ttdef"><b>Definition:</b> <a href="fiff__raw__data_8cpp_source.html#l00441">fiff_raw_data.cpp:441</a></div></div>
 <div class="ttc" id="class_f_i_f_f_l_i_b_1_1_fiff_raw_data_html_ac4f5bbd43f8eea9c61fdcd2e3556bd73"><div class="ttname"><a href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#ac4f5bbd43f8eea9c61fdcd2e3556bd73">FIFFLIB::FiffRawData::FiffRawData</a></div><div class="ttdeci">FiffRawData()</div><div class="ttdef"><b>Definition:</b> <a href="fiff__raw__data_8cpp_source.html#l00059">fiff_raw_data.cpp:59</a></div></div>
 <div class="ttc" id="class_f_i_f_f_l_i_b_1_1_fiff_raw_data_html_aa907af5de89694ca190356aec73a796e"><div class="ttname"><a href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#aa907af5de89694ca190356aec73a796e">FIFFLIB::FiffRawData::rawdir</a></div><div class="ttdeci">QList&lt; FiffRawDir &gt; rawdir</div><div class="ttdef"><b>Definition:</b> <a href="fiff__raw__data_8h_source.html#l00183">fiff_raw_data.h:183</a></div></div>
 <div class="ttc" id="class_f_i_f_f_l_i_b_1_1_fiff_raw_data_html_a58a1c11cf348af6a2b02b7bc98d16cb1"><div class="ttname"><a href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a58a1c11cf348af6a2b02b7bc98d16cb1">FIFFLIB::FiffRawData::cals</a></div><div class="ttdeci">RowVectorXd cals</div><div class="ttdef"><b>Definition:</b> <a href="fiff__raw__data_8h_source.html#l00182">fiff_raw_data.h:182</a></div></div>
@@ -526,9 +527,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="ttc" id="class_f_i_f_f_l_i_b_1_1_fiff_raw_data_html"><div class="ttname"><a href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html">FIFFLIB::FiffRawData</a></div><div class="ttdoc">FIFF raw measurement data. </div><div class="ttdef"><b>Definition:</b> <a href="fiff__raw__data_8h_source.html#l00094">fiff_raw_data.h:94</a></div></div>
 <div class="ttc" id="class_f_i_f_f_l_i_b_1_1_fiff_raw_data_html_a4d7d8906a821657c22e4e3aaa9a964a9"><div class="ttname"><a href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a4d7d8906a821657c22e4e3aaa9a964a9">FIFFLIB::FiffRawData::file</a></div><div class="ttdeci">FiffStream::SPtr file</div><div class="ttdef"><b>Definition:</b> <a href="fiff__raw__data_8h_source.html#l00178">fiff_raw_data.h:178</a></div></div>
 <div class="ttc" id="class_f_i_f_f_l_i_b_1_1_fiff_info_base_html_ab029006706d937001324c13892102893"><div class="ttname"><a href="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#ab029006706d937001324c13892102893">FIFFLIB::FiffInfoBase::nchan</a></div><div class="ttdeci">fiff_int_t nchan</div><div class="ttdef"><b>Definition:</b> <a href="fiff__info__base_8h_source.html#l00206">fiff_info_base.h:206</a></div></div>
-<div class="ttc" id="class_f_i_f_f_l_i_b_1_1_fiff_stream_html_a650740d72668d3d85b27de3d44c20a96"><div class="ttname"><a href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a650740d72668d3d85b27de3d44c20a96">FIFFLIB::FiffStream::setup_read_raw</a></div><div class="ttdeci">static bool setup_read_raw(QIODevice &amp;p_IODevice, FiffRawData &amp;data, bool allow_maxshield=false)</div><div class="ttdef"><b>Definition:</b> <a href="fiff__stream_8cpp_source.html#l01303">fiff_stream.cpp:1303</a></div></div>
+<div class="ttc" id="class_f_i_f_f_l_i_b_1_1_fiff_stream_html_a650740d72668d3d85b27de3d44c20a96"><div class="ttname"><a href="class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a650740d72668d3d85b27de3d44c20a96">FIFFLIB::FiffStream::setup_read_raw</a></div><div class="ttdeci">static bool setup_read_raw(QIODevice &amp;p_IODevice, FiffRawData &amp;data, bool allow_maxshield=false)</div><div class="ttdef"><b>Definition:</b> <a href="fiff__stream_8cpp_source.html#l01302">fiff_stream.cpp:1302</a></div></div>
 <div class="ttc" id="class_f_i_f_f_l_i_b_1_1_fiff_raw_data_html_adbe4741e8ec3c9438da36e627995ef1a"><div class="ttname"><a href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#adbe4741e8ec3c9438da36e627995ef1a">FIFFLIB::FiffRawData::comp</a></div><div class="ttdeci">FiffCtfComp comp</div><div class="ttdef"><b>Definition:</b> <a href="fiff__raw__data_8h_source.html#l00185">fiff_raw_data.h:185</a></div></div>
-<div class="ttc" id="class_f_i_f_f_l_i_b_1_1_fiff_raw_data_html_a05784c90a67226790f4d0ed7b8a591f8"><div class="ttname"><a href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a05784c90a67226790f4d0ed7b8a591f8">FIFFLIB::FiffRawData::read_raw_segment</a></div><div class="ttdeci">bool read_raw_segment(MatrixXd &amp;data, MatrixXd &amp;times, fiff_int_t from=-1, fiff_int_t to=-1, const RowVectorXi &amp;sel=defaultRowVectorXi)</div><div class="ttdef"><b>Definition:</b> <a href="fiff__raw__data_8cpp_source.html#l00122">fiff_raw_data.cpp:122</a></div></div>
+<div class="ttc" id="class_f_i_f_f_l_i_b_1_1_fiff_raw_data_html_a05784c90a67226790f4d0ed7b8a591f8"><div class="ttname"><a href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a05784c90a67226790f4d0ed7b8a591f8">FIFFLIB::FiffRawData::read_raw_segment</a></div><div class="ttdeci">bool read_raw_segment(MatrixXd &amp;data, MatrixXd &amp;times, fiff_int_t from=-1, fiff_int_t to=-1, const RowVectorXi &amp;sel=defaultRowVectorXi)</div><div class="ttdef"><b>Definition:</b> <a href="fiff__raw__data_8cpp_source.html#l00123">fiff_raw_data.cpp:123</a></div></div>
 <div class="ttc" id="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp_html_a59d3cc5600aa876c0f8bcfc3b31e4e65"><div class="ttname"><a href="class_f_i_f_f_l_i_b_1_1_fiff_ctf_comp.html#a59d3cc5600aa876c0f8bcfc3b31e4e65">FIFFLIB::FiffCtfComp::data</a></div><div class="ttdeci">FiffNamedMatrix::SDPtr data</div><div class="ttdef"><b>Definition:</b> <a href="fiff__ctf__comp_8h_source.html#l00125">fiff_ctf_comp.h:125</a></div></div>
 <div class="ttc" id="fiff__stream_8h_html"><div class="ttname"><a href="fiff__stream_8h.html">fiff_stream.h</a></div><div class="ttdoc">FiffStream class declaration. </div></div>
 <div class="ttc" id="class_f_i_f_f_l_i_b_1_1_fiff_raw_data_html_a7be676d089d03325fd7c08cc58d17c2f"><div class="ttname"><a href="class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#a7be676d089d03325fd7c08cc58d17c2f">FIFFLIB::FiffRawData::last_samp</a></div><div class="ttdeci">fiff_int_t last_samp</div><div class="ttdef"><b>Definition:</b> <a href="fiff__raw__data_8h_source.html#l00181">fiff_raw_data.h:181</a></div></div>
@@ -543,7 +544,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Tue Dec 3 2013 19:07:33 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Tue Feb 11 2014 09:58:39 for mne-cpp (MNE1) by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.5
 </small></address>

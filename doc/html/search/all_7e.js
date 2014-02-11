@@ -24,6 +24,7 @@ var searchData=
   ['_7efiffid',['~FiffId',['../class_f_i_f_f_l_i_b_1_1_fiff_id.html#ab3467278bc55db12bfd716f1f1ef8a47',1,'FIFFLIB::FiffId']]],
   ['_7efiffinfo',['~FiffInfo',['../class_f_i_f_f_l_i_b_1_1_fiff_info.html#add8bdec4260deab126d6aa3cdf367e8e',1,'FIFFLIB::FiffInfo']]],
   ['_7efiffinfobase',['~FiffInfoBase',['../class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#a40097f4856494f666a7d06c27739880f',1,'FIFFLIB::FiffInfoBase']]],
+  ['_7efiffio',['~FiffIO',['../class_f_i_f_f_l_i_b_1_1_fiff_i_o.html#afd4a712ec54ca362a22c6256c1856c87',1,'FIFFLIB::FiffIO']]],
   ['_7efiffnamedmatrix',['~FiffNamedMatrix',['../class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html#a17f05c53798ade294f3c5e5685ca8a92',1,'FIFFLIB::FiffNamedMatrix']]],
   ['_7efiffproj',['~FiffProj',['../class_f_i_f_f_l_i_b_1_1_fiff_proj.html#a607c56259f9c0d516065440ec3f094a9',1,'FIFFLIB::FiffProj']]],
   ['_7efiffrawdata',['~FiffRawData',['../class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html#ab0f75372627777039d42f4f4e31cf233',1,'FIFFLIB::FiffRawData']]],

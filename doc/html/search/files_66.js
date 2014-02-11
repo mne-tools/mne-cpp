@@ -31,6 +31,7 @@ var searchData=
   ['fiff_5finfo_2eh',['fiff_info.h',['../fiff__info_8h.html',1,'']]],
   ['fiff_5finfo_5fbase_2ecpp',['fiff_info_base.cpp',['../fiff__info__base_8cpp.html',1,'']]],
   ['fiff_5finfo_5fbase_2eh',['fiff_info_base.h',['../fiff__info__base_8h.html',1,'']]],
+  ['fiff_5fio_2ecpp',['fiff_io.cpp',['../fiff__io_8cpp.html',1,'']]],
   ['fiff_5fnamed_5fmatrix_2ecpp',['fiff_named_matrix.cpp',['../fiff__named__matrix_8cpp.html',1,'']]],
   ['fiff_5fnamed_5fmatrix_2eh',['fiff_named_matrix.h',['../fiff__named__matrix_8h.html',1,'']]],
   ['fiff_5fproj_2ecpp',['fiff_proj.cpp',['../fiff__proj_8cpp.html',1,'']]],

@@ -36,8 +36,9 @@ var searchData=
   ['convert_5fmatrix_5ffrom_5ffile_5fdata',['convert_matrix_from_file_data',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#ae1df1d9ad14631cb152cb229a484fe92',1,'FIFFLIB::FiffTag']]],
   ['convert_5fmatrix_5fto_5ffile_5fdata',['convert_matrix_to_file_data',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a3b4e6e1ee598d325e04b3efd62f330ec',1,'FIFFLIB::FiffTag']]],
   ['convert_5ftag_5fdata',['convert_tag_data',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#af8c7b52de530ad5a6b8d58933b59afcb',1,'FIFFLIB::FiffTag']]],
+  ['convolve',['convolve',['../class_u_t_i_l_s_l_i_b_1_1_filter_tools.html#ab898fe45a8e603d9d121549f72f1d6c2',1,'UTILSLIB::FilterTools']]],
   ['copy_5ftree',['copy_tree',['../class_f_i_f_f_l_i_b_1_1_fiff.html#a2204cae0f25804f90ca463f47f7fa66b',1,'FIFFLIB::Fiff::copy_tree()'],['../class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#ad11316c8b752ede1bdddc6897a13d4c4',1,'FIFFLIB::FiffDirTree::copy_tree()']]],
   ['count',['count',['../class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command.html#a1f0852548f8559b79e47a1650a50066c',1,'RTCOMMANDLIB::Command::count()'],['../class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_raw_command.html#a79af80bd7071011d4122b49537960eca',1,'RTCOMMANDLIB::RawCommand::count()']]],
   ['covcalculated',['covCalculated',['../class_r_t_i_n_v_l_i_b_1_1_rt_cov.html#a7ed6fb62ac1833ec04b16f2069e34ec4',1,'RTINVLIB::RtCov']]],
-  ['createfilter',['createFilter',['../class_u_t_i_l_s_l_i_b_1_1_filter_tools.html#ab8db5be505f2a5a4b8bf3d0f42d23d2a',1,'UTILSLIB::FilterTools']]]
+  ['createdynamicfilter',['createDynamicFilter',['../class_u_t_i_l_s_l_i_b_1_1_filter_tools.html#a1e41df225ee73ec41d2baf451f0d5ca5',1,'UTILSLIB::FilterTools']]]
 ];

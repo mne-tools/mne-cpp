@@ -271,6 +271,7 @@
                 <section title="clear" ref="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a44eabac7e1d8f14850643935b1cbe86c" />
                 <section title="dir_tree_find" ref="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a70da2b06043102864248454470946a81" />
                 <section title="find_tag" ref="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a589bc602a07f1f2e5d9b8c7585cd1530" />
+                <section title="has_kind" ref="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#aab96eeae91230c3a508658afef129eb1" />
                 <section title="has_tag" ref="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#ace0a94dbb1d7d86bbf5099ec78ec2e0c" />
                 <section title="isEmpty" ref="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a2a052c82246da140eac2a98a313a2154" />
                 <section title="block" ref="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#ae7a0a42675b015ba4b5ff83586a2394a" />
@@ -394,6 +395,21 @@
                 <section title="filename" ref="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#ab4ed13fa034471b15a66b303e71c23d6" />
                 <section title="meas_id" ref="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#a4e7cc06ad6cd39b9e554c09b0935f5d9" />
                 <section title="nchan" ref="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#ab029006706d937001324c13892102893" />
+              </section>
+              <section title="FiffIO" ref="class_f_i_f_f_l_i_b_1_1_fiff_i_o.html">
+                <section title="FiffIO" ref="class_f_i_f_f_l_i_b_1_1_fiff_i_o.html#ad8e6d9cb7e2dbbbdfe004d9f4f523cdd" />
+                <section title="~FiffIO" ref="class_f_i_f_f_l_i_b_1_1_fiff_i_o.html#afd4a712ec54ca362a22c6256c1856c87" />
+                <section title="FiffIO" ref="class_f_i_f_f_l_i_b_1_1_fiff_i_o.html#a64ee707f6920206299acc33176fac653" />
+                <section title="FiffIO" ref="class_f_i_f_f_l_i_b_1_1_fiff_i_o.html#aac76b32998b36fc7285787bde9574aef" />
+                <section title="FiffIO" ref="class_f_i_f_f_l_i_b_1_1_fiff_i_o.html#a20f884cfc300d3436424b8dc998ebd30" />
+                <section title="read" ref="class_f_i_f_f_l_i_b_1_1_fiff_i_o.html#ad91d17482044a7388030892e50f32860" />
+                <section title="read" ref="class_f_i_f_f_l_i_b_1_1_fiff_i_o.html#a2467a3d1611faa541d2c6abef01f2870" />
+                <section title="write" ref="class_f_i_f_f_l_i_b_1_1_fiff_i_o.html#a87e0012fcdadd4a076c145657f433d49" />
+                <section title="write" ref="class_f_i_f_f_l_i_b_1_1_fiff_i_o.html#ae143965b765673079ec24bace2f34027" />
+                <section title="write_raw" ref="class_f_i_f_f_l_i_b_1_1_fiff_i_o.html#a28cb8148290cf0e2a0ba602d0269c9e9" />
+                <section title="operator&lt;&lt;" ref="class_f_i_f_f_l_i_b_1_1_fiff_i_o.html#a31b1d8893746be2cd57ac8cdf3f47e72" />
+                <section title="m_qlistEvoked" ref="class_f_i_f_f_l_i_b_1_1_fiff_i_o.html#aadb8fb26284f7d9a2a12cff0e69d3b75" />
+                <section title="m_qlistRaw" ref="class_f_i_f_f_l_i_b_1_1_fiff_i_o.html#a0e5d117031f5b193c0c98d0001ee86cc" />
               </section>
               <section title="FiffNamedMatrix" ref="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html">
                 <section title="ConstSPtr" ref="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html#ac9fe78ab48e91a80a62f64f6550c399b" />
@@ -733,9 +749,12 @@
                 <section title="CircularBuffer" ref="class_i_o_buffer_1_1_circular_buffer.html#a7e3316b1e7023eb2dc12be7505237eb5" />
                 <section title="~CircularBuffer" ref="class_i_o_buffer_1_1_circular_buffer.html#afad0d62db8447902da708e304835d512" />
                 <section title="clear" ref="class_i_o_buffer_1_1_circular_buffer.html#a4408f39111c0291bc30ce1f6bdb64164" />
+                <section title="pause" ref="class_i_o_buffer_1_1_circular_buffer.html#afa53f46ed5459be3d34ef51569ce731b" />
                 <section title="pop" ref="class_i_o_buffer_1_1_circular_buffer.html#aaccacc3c56017b4d10cf755ce825fb44" />
                 <section title="push" ref="class_i_o_buffer_1_1_circular_buffer.html#a1a0b3e0b9b61592f6a3491ca82efb3d1" />
                 <section title="push" ref="class_i_o_buffer_1_1_circular_buffer.html#a51a1eaea404e8a87d290fd192cf91d92" />
+                <section title="releaseFromPop" ref="class_i_o_buffer_1_1_circular_buffer.html#a40e39a0c334d9ed5c132d67921b093bc" />
+                <section title="releaseFromPush" ref="class_i_o_buffer_1_1_circular_buffer.html#a26417486102c6cc72f80ac91df5ba0ac" />
               </section>
               <section title="CircularBuffer_old" ref="class_i_o_buffer_1_1_circular_buffer__old.html">
                 <section title="ConstSPtr" ref="class_i_o_buffer_1_1_circular_buffer__old.html#a0fe718da6321dcf2e26ae7f403b19b20" />
@@ -836,7 +855,9 @@
                 <section title="pick_channels" ref="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#aeaf47f20ad6c98f1e5016980568ef107" />
                 <section title="pick_types" ref="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#abec6e96b8ebbfa68f60f1c19ef75b2c6" />
                 <section title="prepare_forward" ref="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a75dda7fcbf06cd708b3fadc12f2cf227" />
+                <section title="selectRegions" ref="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#aaf4b7801620189bf9e13d8da25c2ede6" />
                 <section title="to_fixed_ori" ref="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a5090c26dd98d9a2bb1364a6f01793dcb" />
+                <section title="tripletSelection" ref="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a0f2f18b5ea97b20e227927e9f938d394" />
                 <section title="operator&lt;&lt;" ref="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#aeed5feefa2bdefa17bcd612fc8abdbd5" />
                 <section title="coord_frame" ref="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a8776126f2f4ec08939fb83a61a429348" />
                 <section title="info" ref="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#adeda03feac0c09dc76711921c1e576dd" />
@@ -960,6 +981,7 @@
                 <section title="operator[]" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a096b8b6aa75f866b3bbaae5afcf0418b" />
                 <section title="operator[]" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#ad9f6c2409ccec6fec539ff65b63b214a" />
                 <section title="operator[]" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a378906997381ceb75c424dd6e3cafe05" />
+                <section title="selectRegions" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a183cd7771926411415e5f2f078d48b51" />
                 <section title="size" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a506dcb62cbc44957b2e4be9e7e32b429" />
                 <section title="transform_source_space_to" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a38654bb9875091c2cb5a04e2531653d7" />
                 <section title="writeToStream" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#ae078c1f063f047c677e933366cac1ffc" />
@@ -1137,11 +1159,19 @@
               </section>
             </section>
             <section title="UTILSLIB">
+              <section title="AsAElc" ref="class_u_t_i_l_s_l_i_b_1_1_as_a_elc.html">
+                <section title="ConstSPtr" ref="class_u_t_i_l_s_l_i_b_1_1_as_a_elc.html#ae0f583cfb608288742e9eaad2e088193" />
+                <section title="SPtr" ref="class_u_t_i_l_s_l_i_b_1_1_as_a_elc.html#a1ea4a3624f0ac9a12a3bd85c1f00ad65" />
+                <section title="AsAElc" ref="class_u_t_i_l_s_l_i_b_1_1_as_a_elc.html#aad32871e9d646b1e929801e8c7c47882" />
+                <section title="readElcFile" ref="class_u_t_i_l_s_l_i_b_1_1_as_a_elc.html#affa1d3af83b8a7ab40d8842c30124df5" />
+              </section>
               <section title="FilterTools" ref="class_u_t_i_l_s_l_i_b_1_1_filter_tools.html">
                 <section title="ConstSPtr" ref="class_u_t_i_l_s_l_i_b_1_1_filter_tools.html#aeefe80fcee72da14d5c6f5a7c613f204" />
                 <section title="SPtr" ref="class_u_t_i_l_s_l_i_b_1_1_filter_tools.html#a9546e592954548658df34883084a3a66" />
                 <section title="FilterTools" ref="class_u_t_i_l_s_l_i_b_1_1_filter_tools.html#abdf0cca904883bf94d613d51dd2d34f0" />
-                <section title="createFilter" ref="class_u_t_i_l_s_l_i_b_1_1_filter_tools.html#ab8db5be505f2a5a4b8bf3d0f42d23d2a" />
+                <section title="convolve" ref="class_u_t_i_l_s_l_i_b_1_1_filter_tools.html#ab898fe45a8e603d9d121549f72f1d6c2" />
+                <section title="createDynamicFilter" ref="class_u_t_i_l_s_l_i_b_1_1_filter_tools.html#a1e41df225ee73ec41d2baf451f0d5ca5" />
+                <section title="getStaticFilter" ref="class_u_t_i_l_s_l_i_b_1_1_filter_tools.html#a261a963ad3c42ebc95295076f6c824ea" />
               </section>
               <section title="IOUtils" ref="class_u_t_i_l_s_l_i_b_1_1_i_o_utils.html">
                 <section title="ConstSPtr" ref="class_u_t_i_l_s_l_i_b_1_1_i_o_utils.html#a5a749cbd6480dd699afae67b94372a6b" />
@@ -1158,6 +1188,7 @@
                 <section title="IdxIntValue" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a3129ad163aae01f8855c1d5ae163e782" />
                 <section title="~MNEMath" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a52c52d62e3393a51837e7a12688d1439" />
               </section>
+              <section title="ParksMcClellan" ref="class_u_t_i_l_s_l_i_b_1_1_parks_mc_clellan.html" />
             </section>
             <section title="CTypeName" ref="class_c_type_name.html" />
             <section title="ICommand" ref="class_i_command.html">
@@ -1194,6 +1225,7 @@
             <section title="FIFFLIB::_fiffTimeRec" ref="struct_f_i_f_f_l_i_b_1_1__fiff_time_rec.html" />
             <section title="FSLIB::Annotation" ref="class_f_s_l_i_b_1_1_annotation.html" />
             <section title="FSLIB::AnnotationSet" ref="class_f_s_l_i_b_1_1_annotation_set.html" />
+            <section title="UTILSLIB::AsAElc" ref="class_u_t_i_l_s_l_i_b_1_1_as_a_elc.html" />
             <section title="IOBuffer::Buffer" ref="class_i_o_buffer_1_1_buffer.html">
               <section title="IOBuffer::CircularMatrixBuffer&lt; double &gt;" ref="class_i_o_buffer_1_1_circular_matrix_buffer.html" />
               <section title="IOBuffer::CircularBuffer_old&lt; _Tp &gt;" ref="class_i_o_buffer_1_1_circular_buffer__old.html" />
@@ -1266,10 +1298,12 @@
               <section title="MNELIB::MNEEpochDataList" ref="class_m_n_e_l_i_b_1_1_m_n_e_epoch_data_list.html" />
             </section>
             <section title="QObject">
+              <section title="FIFFLIB::FiffIO" ref="class_f_i_f_f_l_i_b_1_1_fiff_i_o.html" />
               <section title="RTCOMMANDLIB::Command" ref="class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command.html" />
               <section title="RTCOMMANDLIB::CommandManager" ref="class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command_manager.html" />
               <section title="RTCOMMANDLIB::CommandParser" ref="class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command_parser.html" />
               <section title="RTCOMMANDLIB::RawCommand" ref="class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_raw_command.html" />
+              <section title="UTILSLIB::ParksMcClellan" ref="class_u_t_i_l_s_l_i_b_1_1_parks_mc_clellan.html" />
             </section>
             <section title="QSharedData">
               <section title="FIFFLIB::FiffCov" ref="class_f_i_f_f_l_i_b_1_1_fiff_cov.html" />
@@ -2198,6 +2232,7 @@
                     <section title="clear" ref="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a44eabac7e1d8f14850643935b1cbe86c" />
                     <section title="dir_tree_find" ref="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a70da2b06043102864248454470946a81" />
                     <section title="find_tag" ref="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a589bc602a07f1f2e5d9b8c7585cd1530" />
+                    <section title="has_kind" ref="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#aab96eeae91230c3a508658afef129eb1" />
                     <section title="has_tag" ref="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#ace0a94dbb1d7d86bbf5099ec78ec2e0c" />
                     <section title="isEmpty" ref="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a2a052c82246da140eac2a98a313a2154" />
                     <section title="block" ref="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#ae7a0a42675b015ba4b5ff83586a2394a" />
@@ -2320,6 +2355,8 @@
                     <section title="nchan" ref="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#ab029006706d937001324c13892102893" />
                   </section>
                 </section>
+                <section title="fiff_io.cpp" ref="fiff__io_8cpp.html" />
+                <section title="fiff_io.h" ref="fiff__io_8h_source.html" />
                 <section title="fiff_named_matrix.cpp" ref="fiff__named__matrix_8cpp.html" />
                 <section title="fiff_named_matrix.h" ref="fiff__named__matrix_8h.html">
                   <section title="FiffNamedMatrix" ref="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html">
@@ -2665,9 +2702,12 @@
                     <section title="CircularBuffer" ref="class_i_o_buffer_1_1_circular_buffer.html#a7e3316b1e7023eb2dc12be7505237eb5" />
                     <section title="~CircularBuffer" ref="class_i_o_buffer_1_1_circular_buffer.html#afad0d62db8447902da708e304835d512" />
                     <section title="clear" ref="class_i_o_buffer_1_1_circular_buffer.html#a4408f39111c0291bc30ce1f6bdb64164" />
+                    <section title="pause" ref="class_i_o_buffer_1_1_circular_buffer.html#afa53f46ed5459be3d34ef51569ce731b" />
                     <section title="pop" ref="class_i_o_buffer_1_1_circular_buffer.html#aaccacc3c56017b4d10cf755ce825fb44" />
                     <section title="push" ref="class_i_o_buffer_1_1_circular_buffer.html#a1a0b3e0b9b61592f6a3491ca82efb3d1" />
                     <section title="push" ref="class_i_o_buffer_1_1_circular_buffer.html#a51a1eaea404e8a87d290fd192cf91d92" />
+                    <section title="releaseFromPop" ref="class_i_o_buffer_1_1_circular_buffer.html#a40e39a0c334d9ed5c132d67921b093bc" />
+                    <section title="releaseFromPush" ref="class_i_o_buffer_1_1_circular_buffer.html#a26417486102c6cc72f80ac91df5ba0ac" />
                   </section>
                   <section title="_char_CircularBuffer" ref="circularbuffer_8h.html#ae5152e69ff2cbffb197540213d507eab" />
                   <section title="_double_CircularBuffer" ref="circularbuffer_8h.html#a9d5da9c221fb3ae53bbba2655e38d98e" />
@@ -2982,7 +3022,9 @@
                     <section title="pick_channels" ref="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#aeaf47f20ad6c98f1e5016980568ef107" />
                     <section title="pick_types" ref="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#abec6e96b8ebbfa68f60f1c19ef75b2c6" />
                     <section title="prepare_forward" ref="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a75dda7fcbf06cd708b3fadc12f2cf227" />
+                    <section title="selectRegions" ref="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#aaf4b7801620189bf9e13d8da25c2ede6" />
                     <section title="to_fixed_ori" ref="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a5090c26dd98d9a2bb1364a6f01793dcb" />
+                    <section title="tripletSelection" ref="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a0f2f18b5ea97b20e227927e9f938d394" />
                     <section title="operator&lt;&lt;" ref="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#aeed5feefa2bdefa17bcd612fc8abdbd5" />
                     <section title="coord_frame" ref="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a8776126f2f4ec08939fb83a61a429348" />
                     <section title="info" ref="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#adeda03feac0c09dc76711921c1e576dd" />
@@ -3123,6 +3165,7 @@
                     <section title="operator[]" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a096b8b6aa75f866b3bbaae5afcf0418b" />
                     <section title="operator[]" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#ad9f6c2409ccec6fec539ff65b63b214a" />
                     <section title="operator[]" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a378906997381ceb75c424dd6e3cafe05" />
+                    <section title="selectRegions" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a183cd7771926411415e5f2f078d48b51" />
                     <section title="size" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a506dcb62cbc44957b2e4be9e7e32b429" />
                     <section title="transform_source_space_to" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a38654bb9875091c2cb5a04e2531653d7" />
                     <section title="writeToStream" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#ae078c1f063f047c677e933366cac1ffc" />
@@ -3330,13 +3373,24 @@
                 </section>
               </section>
               <section title="utils" ref="dir_0eb5c52225c067648f3f5a2d310612be.html">
+                <section title="asaelc.cpp" ref="asaelc_8cpp.html" />
+                <section title="asaelc.h" ref="asaelc_8h.html">
+                  <section title="AsAElc" ref="class_u_t_i_l_s_l_i_b_1_1_as_a_elc.html">
+                    <section title="ConstSPtr" ref="class_u_t_i_l_s_l_i_b_1_1_as_a_elc.html#ae0f583cfb608288742e9eaad2e088193" />
+                    <section title="SPtr" ref="class_u_t_i_l_s_l_i_b_1_1_as_a_elc.html#a1ea4a3624f0ac9a12a3bd85c1f00ad65" />
+                    <section title="AsAElc" ref="class_u_t_i_l_s_l_i_b_1_1_as_a_elc.html#aad32871e9d646b1e929801e8c7c47882" />
+                    <section title="readElcFile" ref="class_u_t_i_l_s_l_i_b_1_1_as_a_elc.html#affa1d3af83b8a7ab40d8842c30124df5" />
+                  </section>
+                </section>
                 <section title="filtertools.cpp" ref="filtertools_8cpp.html" />
                 <section title="filtertools.h" ref="filtertools_8h.html">
                   <section title="FilterTools" ref="class_u_t_i_l_s_l_i_b_1_1_filter_tools.html">
                     <section title="ConstSPtr" ref="class_u_t_i_l_s_l_i_b_1_1_filter_tools.html#aeefe80fcee72da14d5c6f5a7c613f204" />
                     <section title="SPtr" ref="class_u_t_i_l_s_l_i_b_1_1_filter_tools.html#a9546e592954548658df34883084a3a66" />
                     <section title="FilterTools" ref="class_u_t_i_l_s_l_i_b_1_1_filter_tools.html#abdf0cca904883bf94d613d51dd2d34f0" />
-                    <section title="createFilter" ref="class_u_t_i_l_s_l_i_b_1_1_filter_tools.html#ab8db5be505f2a5a4b8bf3d0f42d23d2a" />
+                    <section title="convolve" ref="class_u_t_i_l_s_l_i_b_1_1_filter_tools.html#ab898fe45a8e603d9d121549f72f1d6c2" />
+                    <section title="createDynamicFilter" ref="class_u_t_i_l_s_l_i_b_1_1_filter_tools.html#a1e41df225ee73ec41d2baf451f0d5ca5" />
+                    <section title="getStaticFilter" ref="class_u_t_i_l_s_l_i_b_1_1_filter_tools.html#a261a963ad3c42ebc95295076f6c824ea" />
                   </section>
                 </section>
                 <section title="ioutils.cpp" ref="ioutils_8cpp.html" />
@@ -3362,6 +3416,15 @@
                     <section title="IdxIntValue" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a3129ad163aae01f8855c1d5ae163e782" />
                     <section title="~MNEMath" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a52c52d62e3393a51837e7a12688d1439" />
                   </section>
+                </section>
+                <section title="parksmcclellan.cpp" ref="parksmcclellan_8cpp.html" />
+                <section title="parksmcclellan.h" ref="parksmcclellan_8h.html">
+                  <section title="ParksMcClellan" ref="class_u_t_i_l_s_l_i_b_1_1_parks_mc_clellan.html" />
+                  <section title="BIG" ref="parksmcclellan_8h.html#a38eb76aa0a9a1bb1dac30c75be4a05b6" />
+                  <section title="ITRMAX" ref="parksmcclellan_8h.html#a056d176a605f44b8b29878100fcb2be8" />
+                  <section title="M_2PI" ref="parksmcclellan_8h.html#a4aa2c43b09c1300c334821f5507d6f71" />
+                  <section title="MIN_TEST_VAL" ref="parksmcclellan_8h.html#afab2ba156379ff6796e706226749e797" />
+                  <section title="SMALL" ref="parksmcclellan_8h.html#a09c78d2f8feb311dd9fc969a0bf84979" />
                 </section>
                 <section title="utils_global.h" ref="utils__global_8h.html">
                   <section title="UTILSSHARED_EXPORT" ref="utils__global_8h.html#a66e92968c1d28ba0dcd8b83fd51f6c95" />
@@ -3982,6 +4045,11 @@
       <keyword name="Q_DECLARE_METATYPE" id="rtcov.h::Q_DECLARE_METATYPE" ref="rtcov_8h.html#a5b7bebc3712b263ee2f8d15c0b5d367c" />
       <keyword name="RTINVSHARED_EXPORT" id="rtinv_global.h::RTINVSHARED_EXPORT" ref="rtinv__global_8h.html#a8dc11860d3dce4b0b36b94fc499b10a3" />
       <keyword name="Q_DECLARE_METATYPE" id="rtinvop.h::Q_DECLARE_METATYPE" ref="rtinvop_8h.html#a50f77c90ebbeb08252ab46036a65b54f" />
+      <keyword name="BIG" id="parksmcclellan.h::BIG" ref="parksmcclellan_8h.html#a38eb76aa0a9a1bb1dac30c75be4a05b6" />
+      <keyword name="SMALL" id="parksmcclellan.h::SMALL" ref="parksmcclellan_8h.html#a09c78d2f8feb311dd9fc969a0bf84979" />
+      <keyword name="M_2PI" id="parksmcclellan.h::M_2PI" ref="parksmcclellan_8h.html#a4aa2c43b09c1300c334821f5507d6f71" />
+      <keyword name="ITRMAX" id="parksmcclellan.h::ITRMAX" ref="parksmcclellan_8h.html#a056d176a605f44b8b29878100fcb2be8" />
+      <keyword name="MIN_TEST_VAL" id="parksmcclellan.h::MIN_TEST_VAL" ref="parksmcclellan_8h.html#afab2ba156379ff6796e706226749e797" />
       <keyword name="UTILSSHARED_EXPORT" id="utils_global.h::UTILSSHARED_EXPORT" ref="utils__global_8h.html#a66e92968c1d28ba0dcd8b83fd51f6c95" />
       <keyword name="CTypeName" id="CTypeName" ref="class_c_type_name.html" />
       <keyword name="name" id="CTypeName::name" ref="class_c_type_name.html#ae1c92fafa161460cdc8555d45581c84c" />
@@ -4362,6 +4430,7 @@
       <keyword name="dir_tree_find" id="FIFFLIB::FiffDirTree::dir_tree_find" ref="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a70da2b06043102864248454470946a81" />
       <keyword name="find_tag" id="FIFFLIB::FiffDirTree::find_tag" ref="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a589bc602a07f1f2e5d9b8c7585cd1530" />
       <keyword name="has_tag" id="FIFFLIB::FiffDirTree::has_tag" ref="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#ace0a94dbb1d7d86bbf5099ec78ec2e0c" />
+      <keyword name="has_kind" id="FIFFLIB::FiffDirTree::has_kind" ref="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#aab96eeae91230c3a508658afef129eb1" />
       <keyword name="copy_tree" id="FIFFLIB::FiffDirTree::copy_tree" ref="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#ad11316c8b752ede1bdddc6897a13d4c4" />
       <keyword name="make_dir_tree" id="FIFFLIB::FiffDirTree::make_dir_tree" ref="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#a617d30cdbaba04567bee3a4ee0c327d0" />
       <keyword name="block" id="FIFFLIB::FiffDirTree::block" ref="class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#ae7a0a42675b015ba4b5ff83586a2394a" />
@@ -4504,6 +4573,21 @@
       <keyword name="ch_names" id="FIFFLIB::FiffInfoBase::ch_names" ref="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#af15ed691efe28790897198f06306ab29" />
       <keyword name="dev_head_t" id="FIFFLIB::FiffInfoBase::dev_head_t" ref="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#af928d3bcb3e2a26e386647587b48579e" />
       <keyword name="ctf_head_t" id="FIFFLIB::FiffInfoBase::ctf_head_t" ref="class_f_i_f_f_l_i_b_1_1_fiff_info_base.html#aa4ff7b1f98b00a295617c1aaa80e1146" />
+      <keyword name="FIFFLIB::FiffIO" id="FIFFLIB::FiffIO" ref="class_f_i_f_f_l_i_b_1_1_fiff_i_o.html" />
+      <keyword name="FiffIO" id="FIFFLIB::FiffIO::FiffIO" ref="class_f_i_f_f_l_i_b_1_1_fiff_i_o.html#ad8e6d9cb7e2dbbbdfe004d9f4f523cdd" />
+      <keyword name="~FiffIO" id="FIFFLIB::FiffIO::~FiffIO" ref="class_f_i_f_f_l_i_b_1_1_fiff_i_o.html#afd4a712ec54ca362a22c6256c1856c87" />
+      <keyword name="FiffIO" id="FIFFLIB::FiffIO::FiffIO" ref="class_f_i_f_f_l_i_b_1_1_fiff_i_o.html#a64ee707f6920206299acc33176fac653" />
+      <keyword name="FiffIO" id="FIFFLIB::FiffIO::FiffIO" ref="class_f_i_f_f_l_i_b_1_1_fiff_i_o.html#aac76b32998b36fc7285787bde9574aef" />
+      <keyword name="FiffIO" id="FIFFLIB::FiffIO::FiffIO" ref="class_f_i_f_f_l_i_b_1_1_fiff_i_o.html#a20f884cfc300d3436424b8dc998ebd30" />
+      <keyword name="read" id="FIFFLIB::FiffIO::read" ref="class_f_i_f_f_l_i_b_1_1_fiff_i_o.html#ad91d17482044a7388030892e50f32860" />
+      <keyword name="read" id="FIFFLIB::FiffIO::read" ref="class_f_i_f_f_l_i_b_1_1_fiff_i_o.html#a2467a3d1611faa541d2c6abef01f2870" />
+      <keyword name="write" id="FIFFLIB::FiffIO::write" ref="class_f_i_f_f_l_i_b_1_1_fiff_i_o.html#a87e0012fcdadd4a076c145657f433d49" />
+      <keyword name="write" id="FIFFLIB::FiffIO::write" ref="class_f_i_f_f_l_i_b_1_1_fiff_i_o.html#ae143965b765673079ec24bace2f34027" />
+      <keyword name="write_raw" id="FIFFLIB::FiffIO::write_raw" ref="class_f_i_f_f_l_i_b_1_1_fiff_i_o.html#a28cb8148290cf0e2a0ba602d0269c9e9" />
+      <keyword name="setup_read" id="FIFFLIB::FiffIO::setup_read" ref="class_f_i_f_f_l_i_b_1_1_fiff_i_o.html#aebc38da125cd6bf97a6c6c32172ff157" />
+      <keyword name="m_qlistRaw" id="FIFFLIB::FiffIO::m_qlistRaw" ref="class_f_i_f_f_l_i_b_1_1_fiff_i_o.html#a0e5d117031f5b193c0c98d0001ee86cc" />
+      <keyword name="m_qlistEvoked" id="FIFFLIB::FiffIO::m_qlistEvoked" ref="class_f_i_f_f_l_i_b_1_1_fiff_i_o.html#aadb8fb26284f7d9a2a12cff0e69d3b75" />
+      <keyword name="operator&lt;&lt;" id="FIFFLIB::FiffIO::operator&lt;&lt;" ref="class_f_i_f_f_l_i_b_1_1_fiff_i_o.html#a31b1d8893746be2cd57ac8cdf3f47e72" />
       <keyword name="FIFFLIB::FiffNamedMatrix" id="FIFFLIB::FiffNamedMatrix" ref="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html" />
       <keyword name="SPtr" id="FIFFLIB::FiffNamedMatrix::SPtr" ref="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html#ae9caf7f441e93dba375b971382c1276b" />
       <keyword name="ConstSPtr" id="FIFFLIB::FiffNamedMatrix::ConstSPtr" ref="class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html#ac9fe78ab48e91a80a62f64f6550c399b" />
@@ -4724,11 +4808,11 @@
       <keyword name="selectTris" id="FSLIB::Label::selectTris" ref="class_f_s_l_i_b_1_1_label.html#a8fbc25c3de7fe47c377d6b15a5f0ed8a" />
       <keyword name="read" id="FSLIB::Label::read" ref="class_f_s_l_i_b_1_1_label.html#ae947494138be5062444cd014815181fb" />
       <keyword name="comment" id="FSLIB::Label::comment" ref="class_f_s_l_i_b_1_1_label.html#a7ed5373bf3ac45c3c9fe6dc7789dd423" />
-      <keyword name="hemi" id="FSLIB::Label::hemi" ref="class_f_s_l_i_b_1_1_label.html#a846b65c0b3a8ce5a56a944cca3d95378" />
-      <keyword name="name" id="FSLIB::Label::name" ref="class_f_s_l_i_b_1_1_label.html#aafe7016a7b71c8850e1c70db77065917" />
       <keyword name="vertices" id="FSLIB::Label::vertices" ref="class_f_s_l_i_b_1_1_label.html#a9fa6d9321697cf073cecc4a2426badf5" />
       <keyword name="pos" id="FSLIB::Label::pos" ref="class_f_s_l_i_b_1_1_label.html#ab8e2ce6ac9114f437093e0b8dc0fb537" />
       <keyword name="values" id="FSLIB::Label::values" ref="class_f_s_l_i_b_1_1_label.html#afeaac89afbc1ec5221a8e068f399bc7e" />
+      <keyword name="hemi" id="FSLIB::Label::hemi" ref="class_f_s_l_i_b_1_1_label.html#a846b65c0b3a8ce5a56a944cca3d95378" />
+      <keyword name="name" id="FSLIB::Label::name" ref="class_f_s_l_i_b_1_1_label.html#aafe7016a7b71c8850e1c70db77065917" />
       <keyword name="label_id" id="FSLIB::Label::label_id" ref="class_f_s_l_i_b_1_1_label.html#a24103edab5af2b181f49cfa6e870345b" />
       <keyword name="FSLIB::Surface" id="FSLIB::Surface" ref="class_f_s_l_i_b_1_1_surface.html" />
       <keyword name="SPtr" id="FSLIB::Surface::SPtr" ref="class_f_s_l_i_b_1_1_surface.html#a98676b16c2fce1dbd457feaeb44e330d" />
@@ -4837,6 +4921,9 @@
       <keyword name="push" id="IOBuffer::CircularBuffer::push" ref="class_i_o_buffer_1_1_circular_buffer.html#a51a1eaea404e8a87d290fd192cf91d92" />
       <keyword name="pop" id="IOBuffer::CircularBuffer::pop" ref="class_i_o_buffer_1_1_circular_buffer.html#aaccacc3c56017b4d10cf755ce825fb44" />
       <keyword name="clear" id="IOBuffer::CircularBuffer::clear" ref="class_i_o_buffer_1_1_circular_buffer.html#a4408f39111c0291bc30ce1f6bdb64164" />
+      <keyword name="pause" id="IOBuffer::CircularBuffer::pause" ref="class_i_o_buffer_1_1_circular_buffer.html#afa53f46ed5459be3d34ef51569ce731b" />
+      <keyword name="releaseFromPop" id="IOBuffer::CircularBuffer::releaseFromPop" ref="class_i_o_buffer_1_1_circular_buffer.html#a40e39a0c334d9ed5c132d67921b093bc" />
+      <keyword name="releaseFromPush" id="IOBuffer::CircularBuffer::releaseFromPush" ref="class_i_o_buffer_1_1_circular_buffer.html#a26417486102c6cc72f80ac91df5ba0ac" />
       <keyword name="IOBuffer::CircularBuffer_old" id="IOBuffer::CircularBuffer_old" ref="class_i_o_buffer_1_1_circular_buffer__old.html" />
       <keyword name="SPtr" id="IOBuffer::CircularBuffer_old::SPtr" ref="class_i_o_buffer_1_1_circular_buffer__old.html#a567132506de2ce82e22dcab44fd11d1b" />
       <keyword name="ConstSPtr" id="IOBuffer::CircularBuffer_old::ConstSPtr" ref="class_i_o_buffer_1_1_circular_buffer__old.html#a0fe718da6321dcf2e26ae7f403b19b20" />
@@ -4974,6 +5061,8 @@
       <keyword name="pick_channels" id="MNELIB::MNEForwardSolution::pick_channels" ref="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#aeaf47f20ad6c98f1e5016980568ef107" />
       <keyword name="pick_types" id="MNELIB::MNEForwardSolution::pick_types" ref="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#abec6e96b8ebbfa68f60f1c19ef75b2c6" />
       <keyword name="prepare_forward" id="MNELIB::MNEForwardSolution::prepare_forward" ref="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a75dda7fcbf06cd708b3fadc12f2cf227" />
+      <keyword name="tripletSelection" id="MNELIB::MNEForwardSolution::tripletSelection" ref="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a0f2f18b5ea97b20e227927e9f938d394" />
+      <keyword name="selectRegions" id="MNELIB::MNEForwardSolution::selectRegions" ref="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#aaf4b7801620189bf9e13d8da25c2ede6" />
       <keyword name="to_fixed_ori" id="MNELIB::MNEForwardSolution::to_fixed_ori" ref="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a5090c26dd98d9a2bb1364a6f01793dcb" />
       <keyword name="compute_depth_prior" id="MNELIB::MNEForwardSolution::compute_depth_prior" ref="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a7d03724db839eef8e94640d500077f5f" />
       <keyword name="read" id="MNELIB::MNEForwardSolution::read" ref="class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a2a98232cf4d2c1c810cb9a89f372ffde" />
@@ -5096,6 +5185,7 @@
       <keyword name="isEmpty" id="MNELIB::MNESourceSpace::isEmpty" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a43b3055101cbb51adaea2cc5aed25a95" />
       <keyword name="get_vertno" id="MNELIB::MNESourceSpace::get_vertno" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#afd545fff36165135b89261c1d232ea0d" />
       <keyword name="label_src_vertno_sel" id="MNELIB::MNESourceSpace::label_src_vertno_sel" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#af10f8f81d884d689de34cbe15f0ef56e" />
+      <keyword name="selectRegions" id="MNELIB::MNESourceSpace::selectRegions" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a183cd7771926411415e5f2f078d48b51" />
       <keyword name="size" id="MNELIB::MNESourceSpace::size" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a506dcb62cbc44957b2e4be9e7e32b429" />
       <keyword name="transform_source_space_to" id="MNELIB::MNESourceSpace::transform_source_space_to" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a38654bb9875091c2cb5a04e2531653d7" />
       <keyword name="writeToStream" id="MNELIB::MNESourceSpace::writeToStream" ref="class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#ae078c1f063f047c677e933366cac1ffc" />
@@ -5281,11 +5371,18 @@
       <keyword name="stop" id="RTINVLIB::RtInvOp::stop" ref="class_r_t_i_n_v_l_i_b_1_1_rt_inv_op.html#aecb10c471559d69296828ccb86580022" />
       <keyword name="isRunning" id="RTINVLIB::RtInvOp::isRunning" ref="class_r_t_i_n_v_l_i_b_1_1_rt_inv_op.html#ac4ba64ec15e9310751edffbc7b142c8d" />
       <keyword name="run" id="RTINVLIB::RtInvOp::run" ref="class_r_t_i_n_v_l_i_b_1_1_rt_inv_op.html#aa29baeeccb8749acfd2653e7169e6307" />
+      <keyword name="UTILSLIB::AsAElc" id="UTILSLIB::AsAElc" ref="class_u_t_i_l_s_l_i_b_1_1_as_a_elc.html" />
+      <keyword name="SPtr" id="UTILSLIB::AsAElc::SPtr" ref="class_u_t_i_l_s_l_i_b_1_1_as_a_elc.html#a1ea4a3624f0ac9a12a3bd85c1f00ad65" />
+      <keyword name="ConstSPtr" id="UTILSLIB::AsAElc::ConstSPtr" ref="class_u_t_i_l_s_l_i_b_1_1_as_a_elc.html#ae0f583cfb608288742e9eaad2e088193" />
+      <keyword name="AsAElc" id="UTILSLIB::AsAElc::AsAElc" ref="class_u_t_i_l_s_l_i_b_1_1_as_a_elc.html#aad32871e9d646b1e929801e8c7c47882" />
+      <keyword name="readElcFile" id="UTILSLIB::AsAElc::readElcFile" ref="class_u_t_i_l_s_l_i_b_1_1_as_a_elc.html#affa1d3af83b8a7ab40d8842c30124df5" />
       <keyword name="UTILSLIB::FilterTools" id="UTILSLIB::FilterTools" ref="class_u_t_i_l_s_l_i_b_1_1_filter_tools.html" />
       <keyword name="SPtr" id="UTILSLIB::FilterTools::SPtr" ref="class_u_t_i_l_s_l_i_b_1_1_filter_tools.html#a9546e592954548658df34883084a3a66" />
       <keyword name="ConstSPtr" id="UTILSLIB::FilterTools::ConstSPtr" ref="class_u_t_i_l_s_l_i_b_1_1_filter_tools.html#aeefe80fcee72da14d5c6f5a7c613f204" />
       <keyword name="FilterTools" id="UTILSLIB::FilterTools::FilterTools" ref="class_u_t_i_l_s_l_i_b_1_1_filter_tools.html#abdf0cca904883bf94d613d51dd2d34f0" />
-      <keyword name="createFilter" id="UTILSLIB::FilterTools::createFilter" ref="class_u_t_i_l_s_l_i_b_1_1_filter_tools.html#ab8db5be505f2a5a4b8bf3d0f42d23d2a" />
+      <keyword name="getStaticFilter" id="UTILSLIB::FilterTools::getStaticFilter" ref="class_u_t_i_l_s_l_i_b_1_1_filter_tools.html#a261a963ad3c42ebc95295076f6c824ea" />
+      <keyword name="createDynamicFilter" id="UTILSLIB::FilterTools::createDynamicFilter" ref="class_u_t_i_l_s_l_i_b_1_1_filter_tools.html#a1e41df225ee73ec41d2baf451f0d5ca5" />
+      <keyword name="convolve" id="UTILSLIB::FilterTools::convolve" ref="class_u_t_i_l_s_l_i_b_1_1_filter_tools.html#ab898fe45a8e603d9d121549f72f1d6c2" />
       <keyword name="UTILSLIB::IOUtils" id="UTILSLIB::IOUtils" ref="class_u_t_i_l_s_l_i_b_1_1_i_o_utils.html" />
       <keyword name="SPtr" id="UTILSLIB::IOUtils::SPtr" ref="class_u_t_i_l_s_l_i_b_1_1_i_o_utils.html#a4f014172f5041789ac17d0ac863853a6" />
       <keyword name="ConstSPtr" id="UTILSLIB::IOUtils::ConstSPtr" ref="class_u_t_i_l_s_l_i_b_1_1_i_o_utils.html#a5a749cbd6480dd699afae67b94372a6b" />
@@ -5324,6 +5421,7 @@
       <keyword name="compareIdxValuePairSmallerThan" id="UTILSLIB::MNEMath::compareIdxValuePairSmallerThan" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#aec4b1c309b2d8cf04bc176d7883a3498" />
       <keyword name="compareTripletFirstEntry" id="UTILSLIB::MNEMath::compareTripletFirstEntry" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#aa4434423d6d6dc48715d1ba332a9b0b3" />
       <keyword name="compareTripletSecondEntry" id="UTILSLIB::MNEMath::compareTripletSecondEntry" ref="class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#aabe9ed92c7541464546e791a09275609" />
+      <keyword name="UTILSLIB::ParksMcClellan" id="UTILSLIB::ParksMcClellan" ref="class_u_t_i_l_s_l_i_b_1_1_parks_mc_clellan.html" />
     </keywords>
     <files>
       <file>tabs.css</file>
@@ -5416,6 +5514,8 @@
       <file>fiff__info_8h_source.html</file>
       <file>fiff__info__base_8cpp_source.html</file>
       <file>fiff__info__base_8h_source.html</file>
+      <file>fiff__io_8cpp_source.html</file>
+      <file>fiff__io_8h_source.html</file>
       <file>fiff__named__matrix_8cpp_source.html</file>
       <file>fiff__named__matrix_8h_source.html</file>
       <file>fiff__proj_8cpp_source.html</file>
@@ -5509,6 +5609,8 @@
       <file>rtinv__global_8h_source.html</file>
       <file>rtinvop_8cpp_source.html</file>
       <file>rtinvop_8h_source.html</file>
+      <file>asaelc_8cpp_source.html</file>
+      <file>asaelc_8h_source.html</file>
       <file>filtertools_8cpp_source.html</file>
       <file>filtertools_8h_source.html</file>
       <file>ioutils_8cpp_source.html</file>
@@ -5517,6 +5619,8 @@
       <file>kmeans_8h_source.html</file>
       <file>mnemath_8cpp_source.html</file>
       <file>mnemath_8h_source.html</file>
+      <file>parksmcclellan_8cpp_source.html</file>
+      <file>parksmcclellan_8h_source.html</file>
       <file>utils__global_8h_source.html</file>
       <file>colormap_8cpp.html</file>
       <file>colormap_8h.html</file>
@@ -5569,6 +5673,7 @@
       <file>fiff__info_8h.html</file>
       <file>fiff__info__base_8cpp.html</file>
       <file>fiff__info__base_8h.html</file>
+      <file>fiff__io_8cpp.html</file>
       <file>fiff__named__matrix_8cpp.html</file>
       <file>fiff__named__matrix_8h.html</file>
       <file>fiff__proj_8cpp.html</file>
@@ -5657,6 +5762,8 @@
       <file>rtinv__global_8h.html</file>
       <file>rtinvop_8cpp.html</file>
       <file>rtinvop_8h.html</file>
+      <file>asaelc_8cpp.html</file>
+      <file>asaelc_8h.html</file>
       <file>filtertools_8cpp.html</file>
       <file>filtertools_8h.html</file>
       <file>ioutils_8cpp.html</file>
@@ -5665,6 +5772,8 @@
       <file>kmeans_8h.html</file>
       <file>mnemath_8cpp.html</file>
       <file>mnemath_8h.html</file>
+      <file>parksmcclellan_8cpp.html</file>
+      <file>parksmcclellan_8h.html</file>
       <file>utils__global_8h.html</file>
       <file>class_c_type_name.html</file>
       <file>class_c_type_name-members.html</file>
@@ -5737,6 +5846,9 @@
       <file>class_f_i_f_f_l_i_b_1_1_fiff_info_base.html</file>
       <file>class_f_i_f_f_l_i_b_1_1_fiff_info_base.png</file>
       <file>class_f_i_f_f_l_i_b_1_1_fiff_info_base-members.html</file>
+      <file>class_f_i_f_f_l_i_b_1_1_fiff_i_o.html</file>
+      <file>class_f_i_f_f_l_i_b_1_1_fiff_i_o.png</file>
+      <file>class_f_i_f_f_l_i_b_1_1_fiff_i_o-members.html</file>
       <file>class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html</file>
       <file>class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.png</file>
       <file>class_f_i_f_f_l_i_b_1_1_fiff_named_matrix-members.html</file>
@@ -5858,6 +5970,8 @@
       <file>class_r_t_i_n_v_l_i_b_1_1_rt_inv_op.html</file>
       <file>class_r_t_i_n_v_l_i_b_1_1_rt_inv_op.png</file>
       <file>class_r_t_i_n_v_l_i_b_1_1_rt_inv_op-members.html</file>
+      <file>class_u_t_i_l_s_l_i_b_1_1_as_a_elc.html</file>
+      <file>class_u_t_i_l_s_l_i_b_1_1_as_a_elc-members.html</file>
       <file>class_u_t_i_l_s_l_i_b_1_1_filter_tools.html</file>
       <file>class_u_t_i_l_s_l_i_b_1_1_filter_tools-members.html</file>
       <file>class_u_t_i_l_s_l_i_b_1_1_i_o_utils.html</file>
@@ -5866,6 +5980,9 @@
       <file>class_u_t_i_l_s_l_i_b_1_1_k_means-members.html</file>
       <file>class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html</file>
       <file>class_u_t_i_l_s_l_i_b_1_1_m_n_e_math-members.html</file>
+      <file>class_u_t_i_l_s_l_i_b_1_1_parks_mc_clellan.html</file>
+      <file>class_u_t_i_l_s_l_i_b_1_1_parks_mc_clellan.png</file>
+      <file>class_u_t_i_l_s_l_i_b_1_1_parks_mc_clellan-members.html</file>
       <file>dir_3724822b9604f2d84f3a550bba2b646c.html</file>
       <file>dir_a0f69d5cb4834a722f5c816edde5c66b.html</file>
       <file>dir_02d6b00d369dfdccb62582dcf5f74964.html</file>

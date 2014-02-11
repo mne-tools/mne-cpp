@@ -25,6 +25,7 @@ var searchData=
   ['getrawcommand',['getRawCommand',['../class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command_parser.html#a9fbfc231a0b473fed63384bf069891e0',1,'RTCOMMANDLIB::CommandParser']]],
   ['getrgbas',['getRGBAs',['../class_f_s_l_i_b_1_1_colortable.html#a68a4b340ecc8291ffee8378cfcf6a264',1,'FSLIB::Colortable']]],
   ['getsourcespace',['getSourceSpace',['../class_i_n_v_e_r_s_e_l_i_b_1_1_i_inverse_algorithm.html#a11beb115090dc108b857465f64494e1f',1,'INVERSELIB::IInverseAlgorithm::getSourceSpace()'],['../class_i_n_v_e_r_s_e_l_i_b_1_1_minimum_norm.html#ad65d7049a646e94fe8080b05c585454c',1,'INVERSELIB::MinimumNorm::getSourceSpace()'],['../class_i_n_v_e_r_s_e_l_i_b_1_1_rap_music.html#aef5d0ee31620a5fcee3f40ddc67bd4e9',1,'INVERSELIB::RapMusic::getSourceSpace()']]],
+  ['getstaticfilter',['getStaticFilter',['../class_u_t_i_l_s_l_i_b_1_1_filter_tools.html#a261a963ad3c42ebc95295076f6c824ea',1,'UTILSLIB::FilterTools']]],
   ['gettricoords',['getTriCoords',['../class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a5a6e6a0f5f9de937b2732d2fb7f4d500',1,'MNELIB::MNEHemisphere']]],
   ['gettype',['getType',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#aab091e676b13f297052e66e40a3bc004',1,'FIFFLIB::FiffTag']]],
   ['gettypeid',['getTypeId',['../class_i_o_buffer_1_1_buffer.html#a587586f369e9d5df00a7fc77fc8f7f86',1,'IOBuffer::Buffer']]],

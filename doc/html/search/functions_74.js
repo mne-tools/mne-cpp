@@ -27,5 +27,6 @@ var searchData=
   ['transform_5fhemisphere_5fto',['transform_hemisphere_to',['../class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a65d5329ce3b7bfefd30e2a7bf43fa654',1,'MNELIB::MNEHemisphere']]],
   ['transform_5fsource_5fspace_5fto',['transform_source_space_to',['../class_m_n_e_l_i_b_1_1_m_n_e.html#a24942df6f7a4d0869e3fd254e11e67e5',1,'MNELIB::MNE::transform_source_space_to()'],['../class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a38654bb9875091c2cb5a04e2531653d7',1,'MNELIB::MNESourceSpace::transform_source_space_to()']]],
   ['transpose_5fnamed_5fmatrix',['transpose_named_matrix',['../class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html#acfc42a46812792ab7b36a5de046c37b6',1,'FIFFLIB::FiffNamedMatrix::transpose_named_matrix()'],['../class_m_n_e_l_i_b_1_1_m_n_e.html#a1bce4f10a8fec00dc70d460da1b96955',1,'MNELIB::MNE::transpose_named_matrix()']]],
-  ['triggered',['triggered',['../class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command_manager.html#aacc0233908903bf8d02356fb7a971f21',1,'RTCOMMANDLIB::CommandManager']]]
+  ['triggered',['triggered',['../class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command_manager.html#aacc0233908903bf8d02356fb7a971f21',1,'RTCOMMANDLIB::CommandManager']]],
+  ['tripletselection',['tripletSelection',['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a0f2f18b5ea97b20e227927e9f938d394',1,'MNELIB::MNEForwardSolution']]]
 ];

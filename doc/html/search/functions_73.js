@@ -1,5 +1,6 @@
 var searchData=
 [
+  ['selectregions',['selectRegions',['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#aaf4b7801620189bf9e13d8da25c2ede6',1,'MNELIB::MNEForwardSolution::selectRegions()'],['../class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a183cd7771926411415e5f2f078d48b51',1,'MNELIB::MNESourceSpace::selectRegions()']]],
   ['selecttris',['selectTris',['../class_f_s_l_i_b_1_1_label.html#a3ad2d98ee5a39cfbd77fb938e224a5a1',1,'FSLIB::Label::selectTris(const Surface &amp;p_Surface)'],['../class_f_s_l_i_b_1_1_label.html#a8fbc25c3de7fe47c377d6b15a5f0ed8a',1,'FSLIB::Label::selectTris(const MatrixX3i &amp;p_matTris)']]],
   ['send',['send',['../class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command.html#a84f5215214b690f06c3af1c8dea20f67',1,'RTCOMMANDLIB::Command']]],
   ['sendclicommand',['sendCLICommand',['../class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_cmd_client.html#a96d5f4a9a935b7564a986c8fdef7bacb',1,'RTCLIENTLIB::RtCmdClient']]],
@@ -12,6 +13,7 @@ var searchData=
   ['setregularization',['setRegularization',['../class_i_n_v_e_r_s_e_l_i_b_1_1_minimum_norm.html#af5d1f861283da41315b6ab7f14a1104a',1,'INVERSELIB::MinimumNorm']]],
   ['setstatus',['setStatus',['../class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command_manager.html#a214698664568b9831e424cfc0f5450a4',1,'RTCOMMANDLIB::CommandManager']]],
   ['settitle',['setTitle',['../class_d_i_s_p_l_i_b_1_1_graph.html#ab7c5b3b2e675d13c3d4df992269269ce',1,'DISPLIB::Graph']]],
+  ['setup_5fread',['setup_read',['../class_f_i_f_f_l_i_b_1_1_fiff_i_o.html#aebc38da125cd6bf97a6c6c32172ff157',1,'FIFFLIB::FiffIO']]],
   ['setup_5fread_5fraw',['setup_read_raw',['../class_f_i_f_f_l_i_b_1_1_fiff.html#ae24c513ca2b4e1e77920c8c723994fc6',1,'FIFFLIB::Fiff::setup_read_raw()'],['../class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a650740d72668d3d85b27de3d44c20a96',1,'FIFFLIB::FiffStream::setup_read_raw()']]],
   ['setxlabel',['setXLabel',['../class_d_i_s_p_l_i_b_1_1_graph.html#af1b62fe24283b53d581c4e527d0c0bf2',1,'DISPLIB::Graph']]],
   ['setylabel',['setYLabel',['../class_d_i_s_p_l_i_b_1_1_graph.html#a752dbea2ba2aac829500c61e31b2f860',1,'DISPLIB::Graph']]],
