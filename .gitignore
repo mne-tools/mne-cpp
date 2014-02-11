@@ -291,3 +291,7 @@ bin/.DS_Store
 *autosave
 
 .DS_Store
+
+bin/mne_browse_raw_qt.app/Contents/MacOS/mne_browse_raw_qt
+
+bin/mne_browse_raw_qt.app/Contents/PkgInfo
