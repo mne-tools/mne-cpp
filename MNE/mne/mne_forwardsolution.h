@@ -124,6 +124,28 @@ public:
 
     //=========================================================================================================
     /**
+    * Gain matrix input data for one region, used for clustering
+    */
+    struct RegionDataIn
+    {
+        MatrixXd    matRoiG;    /**< Region gain matrix sources x sensors(x,y,z)*/
+        qint32      nClusters;  /**< Number of clusters within this region */
+    };
+
+    //=========================================================================================================
+    /**
+    * Gain matrix output data for one region, used for clustering
+    */
+    struct RegionDataOut
+    {
+        VectorXi    roiIdx;     /**< Region cluster indices */
+        MatrixXd    ctrs;       /**< Cluster centers */
+        VectorXd    sumd;       /**< Sums of the distances to the centroid */
+        MatrixXd    D;          /**< Distances to the centroid */
+    };
+
+    //=========================================================================================================
+    /**
     * Default constructor.
     */
     MNEForwardSolution();
@@ -173,6 +195,8 @@ public:
     * @return clustered MNE forward solution
     */
     MNEForwardSolution cluster_forward_solution(AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize);
+
+    MNEForwardSolution cluster_forward_solution_new(AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize);
 
     //=========================================================================================================
     /**
@@ -394,6 +418,8 @@ private:
     * @return True if succeeded, false otherwise
     */
     static bool read_one(FiffStream* p_pStream, const FiffDirTree& p_Node, MNEForwardSolution& one);
+
+//    MNEForwardSolution::RegionDataOut kMeansRoiClustering(RegionDataIn p_RegionDataIn);
 
 public:
     FiffInfoBase info;                  /**< light weighted measurement info */
