@@ -89,12 +89,16 @@
  * \section authors_sec Authors
  *
  * \li Christoph Dinh chdinh@nmr.mgh.harvard.edu 2012
+ * \li Matti Hamalainen msh@nmr.mgh.harvard.edu 2012
  * \li Martin Luessi mluessi@nmr.mgh.harvard.edu 2012
  * \li Christof Pieloth pieloth@labp.htwk-leipzig.de 2012
  * \li Limin Sun liminsun@nmr.mgh.harvard.edu 2013
  * \li Daniel Strohmeier daniel.strohmeier@tu-ilmenau.de 2013
+ * \li Lorenz Esch lorenz.esch@tu-ilmenau.de 2013
  * \li Florian Schlembach florian.schlembach@tu-ilmenau.de 2013
- * \li Matti Hamalainen msh@nmr.mgh.harvard.edu 2012
+ * \li Tim Kunze tim.kunze@tu-ilmenau.de 2014
+ * \li Luise Lang luise.lang@tu-ilmenau.de 2014
+ * \li Felix Arndt felix.arndt@tu-ilmenau.de 2014
  *
  */
 
