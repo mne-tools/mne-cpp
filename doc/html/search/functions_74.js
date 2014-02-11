@@ -1,5 +1,12 @@
 var searchData=
 [
+  ['text',['Text',['../class_x_m_e_a_s_l_i_b_1_1_text.html#ab3e26143fccc52699bcc5149cae852bc',1,'XMEASLIB::Text']]],
+  ['textwidget',['TextWidget',['../class_x_d_i_s_p_l_i_b_1_1_text_widget.html#abfe9d17f9de9349f8f2feae2966b1c00',1,'XDISPLIB::TextWidget']]],
+  ['tmsi',['TMSI',['../class_t_m_s_i_plugin_1_1_t_m_s_i.html#af05f662f0cf7db2650b4322049e8d640',1,'TMSIPlugin::TMSI']]],
+  ['tmsiaboutwidget',['TMSIAboutWidget',['../class_t_m_s_i_plugin_1_1_t_m_s_i_about_widget.html#a0bf21f6a2701c88ae39fa2651bda1eb2',1,'TMSIPlugin::TMSIAboutWidget']]],
+  ['tmsidriver',['TMSIDriver',['../class_t_m_s_i_plugin_1_1_t_m_s_i_driver.html#ae78ab176b5f82ce29690e5c5dfde710d',1,'TMSIPlugin::TMSIDriver']]],
+  ['tmsiproducer',['TMSIProducer',['../class_t_m_s_i_plugin_1_1_t_m_s_i_producer.html#ac508c2c58456f996c665aa16b50580f9',1,'TMSIPlugin::TMSIProducer']]],
+  ['tmsisetupwidget',['TMSISetupWidget',['../class_t_m_s_i_plugin_1_1_t_m_s_i_setup_widget.html#a719a494dcaa20c993deabfe729f70a1c',1,'TMSIPlugin::TMSISetupWidget']]],
   ['to_5ffixed_5fori',['to_fixed_ori',['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a5090c26dd98d9a2bb1364a6f01793dcb',1,'MNELIB::MNEForwardSolution']]],
   ['tobyte',['toByte',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#ada15d83c2cca87f79b7eeb79aaf2dc23',1,'FIFFLIB::FiffTag']]],
   ['tochinfo',['toChInfo',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#aeda236f03bbca64ad81a319a557ae2e4',1,'FIFFLIB::FiffTag']]],
@@ -27,6 +34,10 @@ var searchData=
   ['transform_5fhemisphere_5fto',['transform_hemisphere_to',['../class_m_n_e_l_i_b_1_1_m_n_e_hemisphere.html#a65d5329ce3b7bfefd30e2a7bf43fa654',1,'MNELIB::MNEHemisphere']]],
   ['transform_5fsource_5fspace_5fto',['transform_source_space_to',['../class_m_n_e_l_i_b_1_1_m_n_e.html#a24942df6f7a4d0869e3fd254e11e67e5',1,'MNELIB::MNE::transform_source_space_to()'],['../class_m_n_e_l_i_b_1_1_m_n_e_source_space.html#a38654bb9875091c2cb5a04e2531653d7',1,'MNELIB::MNESourceSpace::transform_source_space_to()']]],
   ['transpose_5fnamed_5fmatrix',['transpose_named_matrix',['../class_f_i_f_f_l_i_b_1_1_fiff_named_matrix.html#acfc42a46812792ab7b36a5de046c37b6',1,'FIFFLIB::FiffNamedMatrix::transpose_named_matrix()'],['../class_m_n_e_l_i_b_1_1_m_n_e.html#a1bce4f10a8fec00dc70d460da1b96955',1,'MNELIB::MNE::transpose_named_matrix()']]],
+  ['triggercontrol',['TriggerControl',['../class_trigger_control_plugin_1_1_trigger_control.html#ab4e05209de8fad9ae655eb9546f4c95c',1,'TriggerControlPlugin::TriggerControl']]],
+  ['triggercontrolaboutwidget',['TriggerControlAboutWidget',['../class_trigger_control_plugin_1_1_trigger_control_about_widget.html#a6841c7268f757482ed68741243ecf7d4',1,'TriggerControlPlugin::TriggerControlAboutWidget']]],
+  ['triggercontrolsetupwidget',['TriggerControlSetupWidget',['../class_trigger_control_plugin_1_1_trigger_control_setup_widget.html#a806196255f6f53112ce5cdb02dd8c39f',1,'TriggerControlPlugin::TriggerControlSetupWidget']]],
   ['triggered',['triggered',['../class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command_manager.html#aacc0233908903bf8d02356fb7a971f21',1,'RTCOMMANDLIB::CommandManager']]],
-  ['tripletselection',['tripletSelection',['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a0f2f18b5ea97b20e227927e9f938d394',1,'MNELIB::MNEForwardSolution']]]
+  ['tripletselection',['tripletSelection',['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a0f2f18b5ea97b20e227927e9f938d394',1,'MNELIB::MNEForwardSolution']]],
+  ['type',['type',['../class_x_m_e_a_s_l_i_b_1_1_new_measurement.html#a29e173fdd5dab68f945035d335d513f7',1,'XMEASLIB::NewMeasurement']]]
 ];
