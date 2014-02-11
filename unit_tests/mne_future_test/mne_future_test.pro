@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     unit_tests.pro
+# @file     mne_graph_test.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -29,31 +29,42 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file generates the makefile to build the unit tests.
+# @brief    This project file generates the makefile to build the mne_graph_test app.
 #
 #--------------------------------------------------------------------------------------------------------------
 
-include(../mne-cpp.pri)
+include(../../mne-cpp.pri)
 
-TEMPLATE = subdirs
+TEMPLATE = app
 
-SUBDIRS += \
-    mne_lib_tests \
-    mne_rt_tests \
-    mne_x_plugin_com \
-    mne_future_test
+QT += widgets concurrent
 
-contains(MNECPP_CONFIG, isGui) {
-    SUBDIRS += \
-#        mne_disp_test \
-        mne_graph_test \
+CONFIG   += console
 
-    qtHaveModule(3d) {
-        isEqual(QT_MAJOR_VERSION, 5){
-            isEqual(QT_MINOR_VERSION, 1){
-                message(Qt3D available && QTVersion >= Qt 5.1: mne 3D tests configured!)
-                SUBDIRS += mne_3d_widget
-            }
-        }
-    }
+TARGET = mne_future_test
+
+CONFIG(debug, debug|release) {
+    TARGET = $$join(TARGET,,,d)
 }
+
+LIBS += -L$${MNE_LIBRARY_DIR}
+CONFIG(debug, debug|release) {
+#    LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd
+}
+else {
+#    LIBS += -lMNE$${MNE_LIB_VERSION}Generics
+}
+
+DESTDIR = $${MNE_BINARY_DIR}
+
+SOURCES += main.cpp
+
+HEADERS  +=
+
+FORMS    +=
+
+INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
+INCLUDEPATH += $${MNE_INCLUDE_DIR}
+
+# Put generated form headers into the origin --> cause other src is pointing at them
+UI_DIR = $$PWD
