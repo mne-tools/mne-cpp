@@ -60,7 +60,7 @@ Release
 Licensing
 ----------
 
-MNE-cpp is **BSD-licenced** (3 clause):
+MNE-CPP is **BSD-licenced** (3 clause):
 
     This software is OSI Certified Open Source Software.
     OSI Certified is a certification mark of the Open Source Initiative.
