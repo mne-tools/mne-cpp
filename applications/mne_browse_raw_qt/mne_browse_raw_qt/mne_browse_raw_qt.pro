@@ -54,37 +54,44 @@ CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
             -lMNE$${MNE_LIB_VERSION}Utilsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
-            -lMNE$${MNE_LIB_VERSION}Mned \
-            -lmne_xd
+            -lMNE$${MNE_LIB_VERSION}Mned
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
             -lMNE$${MNE_LIB_VERSION}Utils \
             -lMNE$${MNE_LIB_VERSION}Fiff \
-            -lMNE$${MNE_LIB_VERSION}Mne \
-            -lmne_x
+            -lMNE$${MNE_LIB_VERSION}Mne
 }
 
 DESTDIR = $${MNE_BINARY_DIR}
 
-SOURCES += main.cpp\
+SOURCES += rawsettings.cpp\
+    main.cpp\
     rawmodel.cpp \
     mainwindow.cpp \
-    rawdelegate.cpp \
-    #plotsignalwidget.cpp #\
+    rawdelegate.cpp #\
     #rawview.cpp
 
-HEADERS += types_settings.h\
+HEADERS += types.h\
     info.h\
+    rawsettings.h\
     rawmodel.h\
     mainwindow.h \
-    rawdelegate.h \
-    #plotsignalwidget.h #\
+    rawdelegate.h #\
     #rawview.h
+
 
 FORMS +=
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_X_INCLUDE_DIR}
+
+unix:!macx {
+    QMAKE_CXXFLAGS += -std=c++0x
+}
+macx {
+    QMAKE_CXXFLAGS = -mmacosx-version-min=10.7 -std=gnu0x -stdlib=libc+
+    CONFIG +=c++11
+}
 

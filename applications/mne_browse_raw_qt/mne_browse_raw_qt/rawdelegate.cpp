@@ -36,18 +36,11 @@
 */
 
 
-//=============================================================================================================
-// INCLUDES
-
 #include "rawdelegate.h"
-#include "types_settings.h"
 
-//Qt
-#include <QPointF>
-#include <QRect>
+#include <QBrush>
 
-//=============================================================================================================
-// NAMESPACES
+//*************************************************************************************************************
 
 using namespace MNE_BROWSE_RAW_QT;
 using namespace Eigen;
@@ -56,10 +49,11 @@ using namespace MNELIB;
 //*************************************************************************************************************
 
 RawDelegate::RawDelegate(QObject *parent)
-: m_dPlotHeight(70)
-, m_dDx(1)
-, m_nhlines(6)
+: m_qSettings()
 {
+    m_dPlotHeight = m_qSettings.value("RawDelegate/plotheight").toDouble();
+    m_dDx = m_qSettings.value("RawDelegate/dx").toDouble();
+    m_nhlines = m_qSettings.value("RawDelegate/nhlines").toDouble();
 }
 
 //*************************************************************************************************************
@@ -67,16 +61,34 @@ RawDelegate::RawDelegate(QObject *parent)
 void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     switch(index.column()) {
-    case 0: //chnames
+    case 0: { //chnames
         painter->save();
 
-//        qDebug() << "option.rect.x" << option.rect.x() << "y" << option.rect.y() << "w" << option.rect.width() << "h" << option.rect.height();
         painter->rotate(-90);
         painter->drawText(QRectF(-option.rect.y()-m_dPlotHeight,0,m_dPlotHeight,20),Qt::AlignCenter,index.model()->data(index,Qt::DisplayRole).toString());
+
         painter->restore();
         break;
-    case 1: //data plot
+    }
+    case 1: { //data plot
         painter->save();
+
+        //draw special background when channel is marked as bad
+        QVariant v = index.model()->data(index,Qt::BackgroundRole);
+        if(v.canConvert<QBrush>() && !(option.state & QStyle::State_Selected)) {
+            QPointF oldBO = painter->brushOrigin();
+            painter->setBrushOrigin(option.rect.topLeft());
+            painter->fillRect(option.rect, qvariant_cast<QBrush>(v));
+            painter->setBrushOrigin(oldBO);
+        }
+
+        //Highlight selected channels
+        if(option.state & QStyle::State_Selected) {
+            QPointF oldBO = painter->brushOrigin();
+            painter->setBrushOrigin(option.rect.topLeft());
+            painter->fillRect(option.rect, option.palette.highlight());
+            painter->setBrushOrigin(oldBO);
+        }
 
         //Get data
         QVariant variant = index.model()->data(index,Qt::DisplayRole);
@@ -107,8 +119,8 @@ void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, c
         painter->drawPath(path);
 
         painter->restore();
-
         break;
+    }
     }
 
 }
@@ -139,35 +151,34 @@ QSize RawDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelInde
 void RawDelegate::createPlotPath(const QModelIndex &index, QPainterPath& path, QList<RowVectorPair>& listPairs) const
 {
     //get maximum range of respective channel type (range value in FiffChInfo does not seem to contain a reasonable value)
-    qint32 kind = (static_cast<const RawModel*>(index.model()))->m_chinfolist[index.row()].kind;
+    qint32 kind = (static_cast<const RawModel*>(index.model()))->m_chInfolist[index.row()].kind;
     double dMaxValue = 1e-9;
 
     switch(kind) {
     case FIFFV_MEG_CH: {
         qint32 unit = (static_cast<const RawModel*>(index.model()))->m_pfiffIO->m_qlistRaw[0]->info.chs[index.row()].unit;
         if(unit == FIFF_UNIT_T_M) {
-            dMaxValue = MAX_MEG_UNIT_T_M;
+            dMaxValue = m_qSettings.value("RawDelegate/max_meg_grad").toDouble();
         }
         else if(unit == FIFF_UNIT_T)
-            dMaxValue = MAX_MEG_UNIT_T;
+            dMaxValue = m_qSettings.value("RawDelegate/max_meg_mag").toDouble();
         break;
     }
     case FIFFV_EEG_CH: {
-        dMaxValue = MAX_EEG;
+        dMaxValue = m_qSettings.value("RawDelegate/max_eeg").toDouble();
         break;
     }
     case FIFFV_EOG_CH: {
-        dMaxValue = MAX_EOG;
+        dMaxValue = m_qSettings.value("RawDelegate/max_eog").toDouble();
         break;
     }
     case FIFFV_STIM_CH: {
-        dMaxValue = MAX_STIM;
+        dMaxValue = m_qSettings.value("RawDelegate/max_stim").toDouble();
         break;
     }
     }
 
     double dValue;
-//    double dMaxValue = (static_cast<const RawModel*>(index.model()))->maxDataValue(index.row());
     double dScaleY = m_dPlotHeight/(2*dMaxValue);
 
     double y_base = path.currentPosition().y();
@@ -176,7 +187,7 @@ void RawDelegate::createPlotPath(const QModelIndex &index, QPainterPath& path, Q
     //plot all rows from list of pairs
     for(qint8 i=0; i < listPairs.size(); ++i) {
         //create lines from one to the next sample
-        for(qint32 j=0; j < listPairs[i].second; ++j) //ToDo: check whether -1 is necessary
+        for(qint32 j=0; j < listPairs[i].second; ++j)
         {
             double val = *(listPairs[i].first+j);
             dValue = val*dScaleY;

@@ -48,6 +48,8 @@
 #include <QAbstractItemDelegate>
 #include <QPainter>
 #include <QPainterPath>
+#include <QPointF>
+#include <QRect>
 
 //MNE
 #include <fiff/fiff.h>
@@ -56,7 +58,8 @@
 
 //MNE_BROWSE_RAW_QT
 #include "rawmodel.h"
-#include "types_settings.h"
+#include "types.h"
+#include "rawsettings.h"
 
 //Eigen
 #include <Eigen/Core>
@@ -75,8 +78,6 @@ class RawDelegate : public QAbstractItemDelegate
 {
     Q_OBJECT
 public:
-    typedef Matrix<double,Dynamic,Dynamic,RowMajor> MatrixXdR;
-
     RawDelegate(QObject *parent = 0);
     virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
     virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
@@ -110,8 +111,9 @@ private:
      */
     void createGridPath(QPainterPath& path, QList<RowVectorPair>& listPairs) const;
 
-    //Look
+    //Settings
     qint8 m_nhlines; /**< Number of horizontal lines for the grid plot */
+    QSettings m_qSettings;
 
 };
 

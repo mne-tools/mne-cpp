@@ -42,6 +42,7 @@
 #include <QDateTime>
 
 #include "mainwindow.h"
+#include "info.h"
 
 //=============================================================================================================
 // NAMESPACES
@@ -93,6 +94,10 @@ int main(int argc, char *argv[])
 {
     qInstallMessageHandler(customMessageHandler);
     QApplication a(argc, argv);
+
+    //set application settings
+    QCoreApplication::setOrganizationName(CInfo::OrganizationName());
+    QCoreApplication::setApplicationName(CInfo::AppNameShort());
 
     mainWindow = new MainWindow();
     mainWindow->show();
