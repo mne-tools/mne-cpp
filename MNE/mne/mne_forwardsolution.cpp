@@ -61,6 +61,8 @@
 #include <QtConcurrent>
 #include <QFuture>
 
+#include <QImage>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -71,21 +73,6 @@ using namespace MNELIB;
 using namespace UTILSLIB;
 using namespace FSLIB;
 
-
-
-
-//*************************************************************************************************************
-
-MNEForwardSolution::RegionDataOut kMeansRoiClustering(MNEForwardSolution::RegionDataIn p_RegionDataIn)
-{
-        // Kmeans Reduction
-        MNEForwardSolution::RegionDataOut p_RegionDataOut;
-
-        KMeans t_kMeans(QString("cityblock"), QString("sample"), 5);
-        t_kMeans.calculate(p_RegionDataIn.matRoiG, p_RegionDataIn.nClusters, p_RegionDataOut.roiIdx, p_RegionDataOut.ctrs, p_RegionDataOut.sumd, p_RegionDataOut.D);
-
-        return p_RegionDataOut;
-}
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -647,7 +634,7 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution_new(AnnotationSe
 //                            ++count;
 //                        }
 //                    }
-//                    printf("[done]\n");
+                    printf("[added]\n");
                 }
                 else
                 {
@@ -656,25 +643,18 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution_new(AnnotationSe
             }
         }
 
+        QFuture< RegionDataOut > res;
 
-
-
-        //Cluster stuff
-
-
-        QFuture< MNEForwardSolution::RegionDataOut > res;
-
-        res = QtConcurrent::mapped(m_qListRegionDataIn, kMeansRoiClustering);
+        res = QtConcurrent::mapped(m_qListRegionDataIn, &RegionDataIn::cluster);
 
         res.waitForFinished();
 
         qDebug() << "Clustering done";
 
+//        QFuture<RegionDataOut>::const_iterator i;
 
-
-
-
-
+//        for (i = future.constBegin(); i != future.constEnd(); ++i)
+//             cout << i->sumd << endl;
 
         //
         // Assemble new hemisphere information
