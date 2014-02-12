@@ -52,6 +52,7 @@
 //=============================================================================================================
 
 #include <utils/mnemath.h>
+#include <utils/kmeans.h>
 
 #include <fs/annotationset.h>
 
@@ -90,6 +91,7 @@
 #include <QDataStream>
 
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE NAMESPACE MNELIB
@@ -109,6 +111,52 @@ using namespace FSLIB;
 using namespace UTILSLIB;
 using namespace FIFFLIB;
 
+//=========================================================================================================
+/**
+* Gain matrix output data for one region, used for clustering
+*/
+struct RegionDataOut
+{
+    VectorXi    roiIdx;     /**< Region cluster indices */
+    MatrixXd    ctrs;       /**< Cluster centers */
+    VectorXd    sumd;       /**< Sums of the distances to the centroid */
+    MatrixXd    D;          /**< Distances to the centroid */
+};
+
+
+//=========================================================================================================
+/**
+* Gain matrix input data for one region, used for clustering
+*/
+struct RegionDataIn
+{
+    MatrixXd    matRoiG;    /**< Region gain matrix sources x sensors(x,y,z)*/
+    qint32      nClusters;  /**< Number of clusters within this region */
+
+    RegionDataOut cluster() const
+    {
+        // Kmeans Reduction
+        RegionDataOut p_RegionDataOut;
+
+        KMeans t_kMeans(QString("cityblock"), QString("sample"), 5);
+        t_kMeans.calculate(this->matRoiG, this->nClusters, p_RegionDataOut.roiIdx, p_RegionDataOut.ctrs, p_RegionDataOut.sumd, p_RegionDataOut.D);
+
+        return p_RegionDataOut;
+    }
+
+};
+
+//RegionDataOut MNEForwardSolution::roiClustering(RegionDataIn p_RegionDataIn)
+//{
+//        // Kmeans Reduction
+//        RegionDataOut p_RegionDataOut;
+
+//        KMeans t_kMeans(QString("cityblock"), QString("sample"), 5);
+//        t_kMeans.calculate(p_RegionDataIn.matRoiG, p_RegionDataIn.nClusters, p_RegionDataOut.roiIdx, p_RegionDataOut.ctrs, p_RegionDataOut.sumd, p_RegionDataOut.D);
+
+//        return p_RegionDataOut;
+//}
+
 
 //=============================================================================================================
 /**
@@ -121,28 +169,6 @@ class MNESHARED_EXPORT MNEForwardSolution
 public:
     typedef QSharedPointer<MNEForwardSolution> SPtr;            /**< Shared pointer type for MNEForwardSolution. */
     typedef QSharedPointer<const MNEForwardSolution> ConstSPtr; /**< Const shared pointer type for MNEForwardSolution. */
-
-    //=========================================================================================================
-    /**
-    * Gain matrix input data for one region, used for clustering
-    */
-    struct RegionDataIn
-    {
-        MatrixXd    matRoiG;    /**< Region gain matrix sources x sensors(x,y,z)*/
-        qint32      nClusters;  /**< Number of clusters within this region */
-    };
-
-    //=========================================================================================================
-    /**
-    * Gain matrix output data for one region, used for clustering
-    */
-    struct RegionDataOut
-    {
-        VectorXi    roiIdx;     /**< Region cluster indices */
-        MatrixXd    ctrs;       /**< Cluster centers */
-        VectorXd    sumd;       /**< Sums of the distances to the centroid */
-        MatrixXd    D;          /**< Distances to the centroid */
-    };
 
     //=========================================================================================================
     /**
@@ -404,7 +430,10 @@ public:
     */
     friend std::ostream& operator<<(std::ostream& out, const MNELIB::MNEForwardSolution &p_MNEForwardSolution);
 
+
+
 private:
+
     //=========================================================================================================
     /**
     * Implementation of the read_one function in mne_read_forward_solution.m
@@ -418,8 +447,6 @@ private:
     * @return True if succeeded, false otherwise
     */
     static bool read_one(FiffStream* p_pStream, const FiffDirTree& p_Node, MNEForwardSolution& one);
-
-//    MNEForwardSolution::RegionDataOut kMeansRoiClustering(RegionDataIn p_RegionDataIn);
 
 public:
     FiffInfoBase info;                  /**< light weighted measurement info */
