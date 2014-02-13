@@ -47,7 +47,6 @@
 #include <mne/mne.h>
 #include <utils/parksmcclellan.h>
 
-
 //Eigen
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
@@ -62,6 +61,7 @@
 
 using namespace MNELIB;
 using namespace Eigen;
+using namespace UTILSLIB;
 
 //*************************************************************************************************************
 
@@ -76,17 +76,34 @@ public:
     } m_Type;
 
     FilterOperator();
+    ~FilterOperator();
 
-    FilterOperator(FilterType type, qint8 order, double centerfreq, double bandwidth, double parkswidth, qint32 fftlength=4096);
+    /**
+    * FilterOperator::FilterOperator
+    * @param unique_name defines the name of the generated filter
+    * @param type of the filter: LPF, HPF, BPF, NOTCH (from enum FilterType)
+    * @param order represents the order of the filter, the higher the higher is the stopband attenuation
+    * @param centerfreq determines the center of the frequency
+    * @param bandwidth ignored if FilterType is set to LPF,HPF. if NOTCH/BPF: bandwidth of stop-/passband
+    * @param parkswidth determines the width of the filter slopes (steepness)
+    */
+    FilterOperator(QString unique_name, FilterType type, qint8 order, double centerfreq, double bandwidth, double parkswidth, qint32 fftlength=4096);
+
+    /**
+     * @brief fftTransformCoeffs transforms the calculated filter coefficients to frequency-domain
+     */
+    void fftTransformCoeffs();
+
+    RowVectorXd applyFFTFilter(RowVectorXd data);
 
     qint8 m_iFilterOrder; /**< represents the order of the filter instance */
     qint32 m_iFFTlength; /**< represents the filter length */
 
-    RawVectorXd m_dCoeffA; /**< contains the forward filter coefficient set */
-    RawVectorXd m_dCoeffB; /**< contains the backward filter coefficient set (empty if FIR filter) */
+    RowVectorXd m_dCoeffA; /**< contains the forward filter coefficient set */
+    RowVectorXd m_dCoeffB; /**< contains the backward filter coefficient set (empty if FIR filter) */
 
-    RawVectorXd m_dFFTCoeffA; /**< the FFT-transformed forward filter coefficient set, required for frequency-domain filtering, zero-padded to m_iFFTlength */
-    RawVectorXd m_dFFTCoeffB; /**< the FFT-transformed backward filter coefficient set, required for frequency-domain filtering, zero-padded to m_iFFTlength */
+    RowVectorXcd m_dFFTCoeffA; /**< the FFT-transformed forward filter coefficient set, required for frequency-domain filtering, zero-padded to m_iFFTlength */
+    RowVectorXcd m_dFFTCoeffB; /**< the FFT-transformed backward filter coefficient set, required for frequency-domain filtering, zero-padded to m_iFFTlength */
 };
 
 #endif // FILTEROPERATOR_H

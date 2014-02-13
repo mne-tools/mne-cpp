@@ -37,35 +37,73 @@
 
 
 #include "filteroperator.h"
-#include "mneoperator.h"
 
 //*************************************************************************************************************
 
 FilterOperator::FilterOperator()
-: MNEOperator()
+: MNEOperator(OperatorType::FILTER)
 {
+}
 
+FilterOperator::~FilterOperator()
+{
 }
 
 //*************************************************************************************************************
 
-/**
-* @brief FilterOperator::FilterOperator
-* @param type of the filter: LPF, HPF, BPF, NOTCH (from enum FilterType)
-* @param order represents the order of the filter, the higher the higher is the stopband attenuation
-* @param centerfreq determines the center of the frequency
-* @param bandwidth ignored if FilterType is set to LPF,HPF. if NOTCH/BPF: bandwidth of stop-/passband
-* @param parkswidth determines the width of the filter slopes (steepness)
-*/
-FilterOperator::FilterOperator(FilterType type, qint8 order, double centerfreq, double bandwidth, double parkswidth, qint32 fftlength)
-: MNEOperator()
+FilterOperator::FilterOperator(QString unique_name, FilterType type, qint8 order, double centerfreq, double bandwidth, double parkswidth, qint32 fftlength)
+: MNEOperator(OperatorType::FILTER)
 , m_iFilterOrder(order)
 , m_Type(type)
 , m_iFFTlength(fftlength)
 {
-    ParksMcClellan filter(order, centerfreq, bandwidth, parkswidth, type);
-    RowVectorXd t_coeffs = filter.FirCoeff; //ToDo: change output datatype to RowVectorXd
+    ParksMcClellan filter(order, centerfreq, bandwidth, parkswidth, (ParksMcClellan::TPassType)type);
+    m_dCoeffA = filter.FirCoeff;
 
-    //zero-padding
+    //fft-transform m_dCoeffA in order to be able to perform frequency-domain filtering
+    fftTransformCoeffs();
 }
 
+//*************************************************************************************************************
+
+void FilterOperator::fftTransformCoeffs()
+{
+    //zero-pad m_dCoeffA to m_iFFTlength
+    RowVectorXd t_coeffAzeroPad = RowVectorXd::Zero(m_iFFTlength);
+    t_coeffAzeroPad.head(m_iFilterOrder) = m_dCoeffA;
+
+    //generate fft object
+    Eigen::FFT<double> fft;
+    fft.SetFlag(fft.HalfSpectrum);
+
+    //fft-transform filter coeffs
+    m_dFFTCoeffA = RowVectorXcd::Zero(m_iFFTlength);
+    fft.fwd(m_dFFTCoeffA,t_coeffAzeroPad);
+}
+
+//*************************************************************************************************************
+
+RowVectorXd FilterOperator::applyFFTFilter(RowVectorXd data)
+{
+    //zero-pad data to m_iFFTlength
+    RowVectorXd t_dataZeroPad = RowVectorXd::Zero(m_iFFTlength);
+    t_dataZeroPad.head(m_iFilterOrder) = data;
+
+    //generate fft object
+    Eigen::FFT<double> fft;
+    fft.SetFlag(fft.HalfSpectrum);
+
+    //fft-transform data sequence
+    RowVectorXcd t_freqData = RowVectorXcd::Zero(m_iFFTlength);
+    fft.fwd(t_freqData,t_dataZeroPad);
+
+    //perform frequency-domain filtering
+    RowVectorXcd t_filteredFreq = m_dFFTCoeffA.array()*t_freqData.array();
+
+    //inverse-FFT
+    RowVectorXd t_filteredTime;
+    fft.inv(t_filteredTime,t_filteredFreq);
+
+    //cuts off ends at front and end and return result
+    return t_filteredTime.segment(m_iFilterOrder/2+1,m_iFFTlength-m_iFilterOrder);
+}

@@ -87,6 +87,7 @@ class RawSettings : public QObject
     Q_OBJECT
 public:
     RawSettings(QObject *parent = 0);
+    ~RawSettings();
 
 signals:
 

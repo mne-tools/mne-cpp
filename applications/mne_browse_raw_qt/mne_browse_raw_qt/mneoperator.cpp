@@ -38,9 +38,29 @@
 
 #include "mneoperator.h"
 
-MNEOperator::MNEOperator(QObject *parent)
-: QObject(parent)
+MNEOperator::MNEOperator()
+//: QObject(parent)
 {
 }
 
 //*************************************************************************************************************
+
+MNEOperator::~MNEOperator()
+{
+}
+
+//*************************************************************************************************************
+
+MNEOperator::MNEOperator(const MNEOperator& obj)
+{
+    m_OperatorType = obj.m_OperatorType;
+    m_name = obj.m_name;
+}
+
+//*************************************************************************************************************
+
+MNEOperator::MNEOperator(OperatorType type)
+: /*QObject(parent),*/
+m_OperatorType(type)
+{
+}

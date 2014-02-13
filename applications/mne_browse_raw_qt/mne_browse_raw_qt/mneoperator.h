@@ -52,17 +52,24 @@
 
 //*************************************************************************************************************
 
-class MNEOperator : public QObject
+class MNEOperator
 {
-    Q_OBJECT
+//    Q_OBJECT
 public:
-    enum Type {
+    enum OperatorType {
         FILTER,
         PCA,
         AVERAGE
-    };
+    } m_OperatorType;
 
-    MNEOperator(QObject *parent = 0);
+    MNEOperator();
+    ~MNEOperator();
+
+    MNEOperator(const MNEOperator& obj);
+
+    MNEOperator(OperatorType type);
+
+    QString m_name;
 
 signals:
 
