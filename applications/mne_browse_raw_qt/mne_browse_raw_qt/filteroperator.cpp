@@ -57,8 +57,10 @@ FilterOperator::FilterOperator(QString unique_name, FilterType type, qint8 order
 , m_Type(type)
 , m_iFFTlength(fftlength)
 {
+    m_sName = unique_name;
+
     ParksMcClellan filter(order, centerfreq, bandwidth, parkswidth, (ParksMcClellan::TPassType)type);
-    m_dCoeffA = filter.FirCoeff;
+    m_dCoeffA = filter.FirCoeff;    
 
     //fft-transform m_dCoeffA in order to be able to perform frequency-domain filtering
     fftTransformCoeffs();
@@ -83,11 +85,11 @@ void FilterOperator::fftTransformCoeffs()
 
 //*************************************************************************************************************
 
-RowVectorXd FilterOperator::applyFFTFilter(RowVectorXd data)
+RowVectorXd FilterOperator::applyFFTFilter(RowVectorXd& data)
 {
     //zero-pad data to m_iFFTlength
     RowVectorXd t_dataZeroPad = RowVectorXd::Zero(m_iFFTlength);
-    t_dataZeroPad.head(m_iFilterOrder) = data;
+    t_dataZeroPad.head(data.cols()) = data;
 
     //generate fft object
     Eigen::FFT<double> fft;

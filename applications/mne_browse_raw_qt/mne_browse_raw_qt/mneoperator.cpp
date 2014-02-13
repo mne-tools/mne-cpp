@@ -54,7 +54,7 @@ MNEOperator::~MNEOperator()
 MNEOperator::MNEOperator(const MNEOperator& obj)
 {
     m_OperatorType = obj.m_OperatorType;
-    m_name = obj.m_name;
+    m_sName = obj.m_sName;
 }
 
 //*************************************************************************************************************

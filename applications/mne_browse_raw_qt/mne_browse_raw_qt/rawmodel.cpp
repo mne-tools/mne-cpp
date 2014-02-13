@@ -323,17 +323,17 @@ void RawModel::reloadFiffData(bool before) {
     QModelIndexList t_indexList;
 //    for(qint32 i=0; i < m_mapFilteredChannels[ParksMcClellan::HPF].count(); ++i)
 //        t_indexList.append(createIndex(m_mapFilteredChannels[ParksMcClellan::HPF][i],1));
-    if(!t_indexList.empty()) {
-        FilterOperator* ptr = (m_filterOperators[0])*; //ToDo: get pointer of element in QList
-        applyFilter(t_indexList,ptr);
-}
+//    if(!t_indexList.empty()) {
+//        FilterOperator* ptr = (m_filterOperators[0])*; //ToDo: get pointer of element in QList
+//        applyFilter(t_indexList,ptr);
+//    }
     //LPF
     t_indexList.clear();
 //    for(qint32 i=0; i < m_mapFilteredChannels[ParksMcClellan::LPF].count(); ++i)
 //        t_indexList.append(createIndex(m_mapFilteredChannels[ParksMcClellan::LPF][i],1));
-    if(!t_indexList.empty()) {
-        applyFilter(t_indexList,m_filterOperators[1]*);
-    }
+//    if(!t_indexList.empty()) {
+//        applyFilter(t_indexList,m_filterOperators[1]*);
+//    }
 
 //    qDebug() << "RawModel: Fiff data REloaded from " << start << "to" << end;
 
@@ -364,32 +364,26 @@ void RawModel::genFilter(int NumTaps, double OmegaC, double BW, double ParksWidt
 
 //*************************************************************************************************************
 
-void RawModel::applyFilter(QModelIndex chan, FilterOperator* filter)
+void RawModel::applyFilter(QModelIndex chan, FilterOperator& filter)
 {
     //generate fft object
     Eigen::FFT<double> fft;
     fft.SetFlag(fft.HalfSpectrum);
 
-    RowVectorXcd t_freqData;
-
     for(qint8 j=0; j < m_data.size(); ++j) { //iterate through m_data list in order to filter them all, ToDo: dont filter already filtered blocks -> check it somehow
-        m_procData[j].row(chan.row()) = filter->applyFFTFilter(m_data[j].row(chan.row()));
+        m_procData[j].row(chan.row()) = filter.applyFFTFilter((RowVectorXd)m_data[j].row(chan.row()));
     }
 
     //adds filtered channel to m_mapFilterChannels and m_allFilteredChannels
-//    if(!m_mapFilteredChannels[type].contains(chan.row())) m_mapFilteredChannels[type].append(chan.row());
-//    if(!m_allFilteredChannels.contains(chan.row())) m_allFilteredChannels.append(chan.row());
+    if(!m_mapFilteredChannels[filter.m_Type].contains(chan.row())) m_mapFilteredChannels[filter.m_Type].append(chan.row());
+    if(!m_allFilteredChannels.contains(chan.row())) m_allFilteredChannels.append(chan.row());
 
-    //let RawModel emit a dataChanged() signal so that the views gets updated
-//        QModelIndex changed = createIndex(chan.row(),chan.column());
-//        emit dataChanged(changed,changed);
-
-    qDebug() << "RawModel: Filter" << filter->m_name << "applied to channel#" << chan.row();
+    qDebug() << "RawModel: Filter" << filter.m_sName << "applied to channel#" << chan.row();
 }
 
 //*************************************************************************************************************
 
-void RawModel::applyFilter(QModelIndexList selected, FilterOperator* filter) //ToDo: make this method more efficient
+void RawModel::applyFilter(QModelIndexList selected, FilterOperator& filter) //ToDo: make this method more efficient
 {    
     //filter all when selected is empty
     if(selected.empty()) {
@@ -401,37 +395,32 @@ void RawModel::applyFilter(QModelIndexList selected, FilterOperator* filter) //T
         applyFilter(selected[i],filter);
     }
 
-    qDebug() << "RawModel: using FilterType" << filter->m_name;
+    qDebug() << "RawModel: using FilterType" << filter.m_sName;
 }
 
 //*************************************************************************************************************
 
-void RawModel::undoFilter(QModelIndexList selected, FilterOperator::FilterType type)
+void RawModel::undoFilter(QModelIndexList selected, FilterOperator& filter)
 {
-    //Get name from TPassType's enum value
-    const QMetaObject& meta = ParksMcClellan::staticMetaObject;
-    int index = meta.indexOfEnumerator("TPassType");
-    QMetaEnum metaEnum = meta.enumerator(index);
-
-    for(qint32 i=0; i < selected.size(); ++i) {
-        if(m_mapFilteredChannels[type].contains(selected[i].row())) {
-            m_allFilteredChannels.removeOne(selected[i].row());
-            m_mapFilteredChannels[type].removeOne(selected[i].row());
-            qDebug() << "RawModel: Filter undone of type" << metaEnum.valueToKey(type) << "for channel" << selected[i].row();
-        }
-        else {
-            qDebug() << "RawModel: No filter of type" << metaEnum.valueToKey(type) << "applied to channel" << selected[i].row();
-            continue;
-        }
-    }
+//    for(qint32 i=0; i < selected.size(); ++i) {
+//        if(m_mapFilteredChannels[type].contains(selected[i].row())) {
+//            m_allFilteredChannels.removeOne(selected[i].row());
+//            m_mapFilteredChannels[type].removeOne(selected[i].row());
+//            qDebug() << "RawModel: Filter undone of type" << metaEnum.valueToKey(type) << "for channel" << selected[i].row();
+//        }
+//        else {
+//            qDebug() << "RawModel: No filter of type" << metaEnum.valueToKey(type) << "applied to channel" << selected[i].row();
+//            continue;
+//        }
+//    }
 }
 
 //*************************************************************************************************************
 
 void RawModel::undoFilter(QModelIndexList selected)
 {
-    undoFilter(selected,FilterOperator::HPF);
-    undoFilter(selected,FilterOperator::LPF);
+    undoFilter(selected,m_filterOperators[0]);
+    undoFilter(selected,m_filterOperators[1]);
 }
 
 //*************************************************************************************************************

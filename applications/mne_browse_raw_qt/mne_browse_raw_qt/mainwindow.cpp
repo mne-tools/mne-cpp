@@ -288,23 +288,23 @@ void MainWindow::customContextMenuRequested(QPoint pos)
     });
     //filtering
     connect(doApplyHPFFilter,&QAction::triggered, [=](){
-        FilterOperator (m_pRawModel->m_filterOperators[0])*; //ToDo: iterate through m_filterOperators and select certain filterOperator instance
-        m_pRawModel->applyFilter(selected,(m_pRawModel->m_filterOperators[0])*);
+        //ToDo: iterate through m_filterOperators and select certain filterOperator instance
+        m_pRawModel->applyFilter(selected,m_pRawModel->m_filterOperators[0]);
     });
     connect(doApplyLPFFilter,&QAction::triggered, [=](){
-//        m_pRawModel->applyFilter(selected,ParksMcClellan::TPassType::LPF);
+        m_pRawModel->applyFilter(selected,m_pRawModel->m_filterOperators[1]);
     });
     connect(doApplyHPFFilterAll,&QAction::triggered, [=](){
-//        m_pRawModel->applyFilter(QModelIndexList(),ParksMcClellan::TPassType::HPF);
+        m_pRawModel->applyFilter(QModelIndexList(),m_pRawModel->m_filterOperators[0]);
     });
     connect(doApplyLPFFilterAll,&QAction::triggered, [=](){
-//        m_pRawModel->applyFilter(QModelIndexList(),ParksMcClellan::TPassType::LPF);
+        m_pRawModel->applyFilter(QModelIndexList(),m_pRawModel->m_filterOperators[1]);
     });
 //    connect(undoApplyHPFFilter,&QAction::triggered, [=](){
-//        m_pRawModel->undoFilter(selected,ParksMcClellan::TPassType::HPF);
+//        m_pRawModel->undoFilter(selected,m_pRawModel->m_filterOperators[0]);
 //    });
 //    connect(undoApplyLPFFilter,&QAction::triggered, [=](){
-//        m_pRawModel->undoFilter(selected,ParksMcClellan::TPassType::LPF);
+//        m_pRawModel->undoFilter(selected,m_pRawModel->m_filterOperators[1]);
 //    });
     connect(undoApplyFilter,&QAction::triggered, [=](){
         m_pRawModel->undoFilter();
