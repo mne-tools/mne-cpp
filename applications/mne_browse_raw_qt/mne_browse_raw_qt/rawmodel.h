@@ -50,6 +50,8 @@
 #include <QBrush>
 #include <QPalette>
 
+#include <QtConcurrent>
+
 //Eigen
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
@@ -195,6 +197,13 @@ public slots:
      * @param status, status=1 -> mark as bad, status=0 -> mark as good
      */
     void markChBad(QModelIndexList selected, bool status);
+
+    /**
+     * applyFilter applies filter to channels
+     * @param index selects the channel to filter
+     * @param type determines the filter type TPassType to choose for filtering
+     */
+    void applyFilter(QModelIndex chan, ParksMcClellan::TPassType type);
 
     /**
      * applyFilter applies filter to channels

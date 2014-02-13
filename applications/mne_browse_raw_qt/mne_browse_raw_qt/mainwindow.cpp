@@ -204,7 +204,7 @@ void MainWindow::writeToLog(const QString& logMsg, LogKind lgknd, LogLevel lglvl
         else
             m_pTextBrowser_Log->insertHtml(logMsg);
         m_pTextBrowser_Log->insertPlainText("\n"); // new line
-        //scroll down to the newest entry
+        //scroll down to the latest entry
         QTextCursor c = m_pTextBrowser_Log->textCursor();
         c.movePosition(QTextCursor::End);
         m_pTextBrowser_Log->setTextCursor(c);
@@ -267,34 +267,44 @@ void MainWindow::customContextMenuRequested(QPoint pos)
     QMenu *menu = new QMenu(this);
     QAction* doMarkChBad = menu->addAction(tr("Mark as bad"));
     QAction* doMarkChGood = menu->addAction(tr("Mark as good"));
-    QAction* doApplyHPFFilter = menu->addAction(tr("Apply HPF"));
-    QAction* doApplyLPFFilter = menu->addAction(tr("Apply LPF"));
-    QAction* undoApplyHPFFilter = menu->addAction(tr("Undo HPF"));
-    QAction* undoApplyLPFFilter = menu->addAction(tr("Undo LPF"));
-    QAction* undoApplyFilter = menu->addAction(tr("Undo All filtering"));
+    QAction* doApplyHPFFilter = menu->addAction(tr("Apply HPF to selected channels"));
+    QAction* doApplyLPFFilter = menu->addAction(tr("Apply LPF to selected channels"));
+    QAction* doApplyHPFFilterAll = menu->addAction(tr("Apply HPF to all channels"));
+    QAction* doApplyLPFFilterAll = menu->addAction(tr("Apply LPF to all channels"));
+//    QAction* undoApplyHPFFilter = menu->addAction(tr("Undo HPF"));
+//    QAction* undoApplyLPFFilter = menu->addAction(tr("Undo LPF"));
+    QAction* undoApplyFilter = menu->addAction(tr("Undo all filtering to all channels"));
 
     //get selected items
     QModelIndexList selected = m_pTableView->selectionModel()->selectedIndexes();
 
     //connect actions
+    //marking
     connect(doMarkChBad,&QAction::triggered, [=](){
         m_pRawModel->markChBad(selected,1);
     });
     connect(doMarkChGood,&QAction::triggered, [=](){
         m_pRawModel->markChBad(selected,0);
     });
+    //filtering
     connect(doApplyHPFFilter,&QAction::triggered, [=](){
         m_pRawModel->applyFilter(selected,ParksMcClellan::TPassType::HPF);
     });
     connect(doApplyLPFFilter,&QAction::triggered, [=](){
         m_pRawModel->applyFilter(selected,ParksMcClellan::TPassType::LPF);
     });
-    connect(undoApplyHPFFilter,&QAction::triggered, [=](){
-        m_pRawModel->undoFilter(selected,ParksMcClellan::TPassType::HPF);
+    connect(doApplyHPFFilterAll,&QAction::triggered, [=](){
+        m_pRawModel->applyFilter(QModelIndexList(),ParksMcClellan::TPassType::HPF);
     });
-    connect(undoApplyLPFFilter,&QAction::triggered, [=](){
-        m_pRawModel->undoFilter(selected,ParksMcClellan::TPassType::LPF);
+    connect(doApplyLPFFilterAll,&QAction::triggered, [=](){
+        m_pRawModel->applyFilter(QModelIndexList(),ParksMcClellan::TPassType::LPF);
     });
+//    connect(undoApplyHPFFilter,&QAction::triggered, [=](){
+//        m_pRawModel->undoFilter(selected,ParksMcClellan::TPassType::HPF);
+//    });
+//    connect(undoApplyLPFFilter,&QAction::triggered, [=](){
+//        m_pRawModel->undoFilter(selected,ParksMcClellan::TPassType::LPF);
+//    });
     connect(undoApplyFilter,&QAction::triggered, [=](){
         m_pRawModel->undoFilter();
     });
