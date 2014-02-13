@@ -66,11 +66,11 @@ RawModel::RawModel(QFile &qFile, QObject *parent)
     //read fiff data
     loadFiffData(qFile);
 
-    //generate filters
+    //generator FilterOperator objects
     //HPF
-    genFilter(m_qSettings.value("RawModel/num_filter_taps").toInt(), 0.15, 0.2, 0.1, ParksMcClellan::TPassType::HPF);
+    m_filterOperators.append(FilterOperator("HPF",FilterOperator::HPF,m_iFilterTaps,0.15,0.2,0.1,(m_iWindowSize+m_iFilterTaps)));
     //LPF
-    genFilter(m_qSettings.value("RawModel/num_filter_taps").toInt(), 0.08, 0.2, 0.1, ParksMcClellan::TPassType::LPF);
+    m_filterOperators.append(FilterOperator("LPF",FilterOperator::LPF,m_iFilterTaps,0.08, 0.2, 0.1,(m_iWindowSize+m_iFilterTaps)));
 }
 
 //=============================================================================================================
@@ -321,20 +321,18 @@ void RawModel::reloadFiffData(bool before) {
 
     //HPF
     QModelIndexList t_indexList;
-    for(qint32 i=0; i < m_mapFilteredChannels[ParksMcClellan::HPF].count(); ++i)
-        t_indexList.append(createIndex(m_mapFilteredChannels[ParksMcClellan::HPF][i],1));
-    if(!t_indexList.empty())
-        applyFilter(t_indexList,ParksMcClellan::HPF);
-
+//    for(qint32 i=0; i < m_mapFilteredChannels[ParksMcClellan::HPF].count(); ++i)
+//        t_indexList.append(createIndex(m_mapFilteredChannels[ParksMcClellan::HPF][i],1));
+    if(!t_indexList.empty()) {
+        FilterOperator* ptr = (m_filterOperators[0])*; //ToDo: get pointer of element in QList
+        applyFilter(t_indexList,ptr);
+}
     //LPF
     t_indexList.clear();
-    for(qint32 i=0; i < m_mapFilteredChannels[ParksMcClellan::LPF].count(); ++i)
-        t_indexList.append(createIndex(m_mapFilteredChannels[ParksMcClellan::LPF][i],1));
+//    for(qint32 i=0; i < m_mapFilteredChannels[ParksMcClellan::LPF].count(); ++i)
+//        t_indexList.append(createIndex(m_mapFilteredChannels[ParksMcClellan::LPF][i],1));
     if(!t_indexList.empty()) {
-        applyFilter(t_indexList,ParksMcClellan::LPF);
-//        QFuture<void> future = QtConcurrent::run(this,&RawModel::applyFilter,t_indexList,ParksMcClellan::LPF);
-
-//        future.waitForFinished();
+        applyFilter(t_indexList,m_filterOperators[1]*);
     }
 
 //    qDebug() << "RawModel: Fiff data REloaded from " << start << "to" << end;
@@ -345,16 +343,13 @@ void RawModel::reloadFiffData(bool before) {
 //    emit dataChanged(topLeft,bottomRight);
 }
 
-//**************//   ***********************************************************************************************
+//*************************************************************************************************************
 
 void RawModel::genFilter(int NumTaps, double OmegaC, double BW, double ParksWidth, ParksMcClellan::TPassType type)
 {
     ParksMcClellan filter(NumTaps, OmegaC, BW, ParksWidth, type);
-    std::vector<double> t_firCoeffs = filter.FirCoeff;
-
     m_mapFilters[type] = RowVectorXd::Zero(m_iWindowSize+m_iFilterTaps);
-    for(qint16 i=0; i < NumTaps; ++i)
-        m_mapFilters[type][i] = t_firCoeffs[i]; //ToDo: could this be more elegant to map an existing std::vector to RowVectorXd apart of Map<RowVectorXd>?
+    m_mapFilters[type].head(m_iFilterTaps) = filter.FirCoeff;
 
     //perform fft of filter's impulse response
     //generate fft object
@@ -369,7 +364,7 @@ void RawModel::genFilter(int NumTaps, double OmegaC, double BW, double ParksWidt
 
 //*************************************************************************************************************
 
-void RawModel::applyFilter(QModelIndex chan, ParksMcClellan::TPassType type)
+void RawModel::applyFilter(QModelIndex chan, FilterOperator* filter)
 {
     //generate fft object
     Eigen::FFT<double> fft;
@@ -378,38 +373,23 @@ void RawModel::applyFilter(QModelIndex chan, ParksMcClellan::TPassType type)
     RowVectorXcd t_freqData;
 
     for(qint8 j=0; j < m_data.size(); ++j) { //iterate through m_data list in order to filter them all, ToDo: dont filter already filtered blocks -> check it somehow
-        RowVectorXd t_procData = RowVectorXd::Zero(m_iWindowSize+m_iFilterTaps);
-
-        //insert part of m_data row and pad the rest of the row with zeros
-        t_procData.block(0,0,1,m_iWindowSize) = m_data[j].row(chan.row());
-
-        fft.fwd(t_freqData,t_procData);
-
-        //frequency-domain filtering by multiplication
-        RowVectorXcd t_filteredFreq = m_mapFiltersFreq[type].array()*t_freqData.array();
-
-        //inverse-FFT
-        RowVectorXd t_filteredTime;
-        fft.inv(t_filteredTime,t_filteredFreq);
-
-        //cuts off ends at front and end
-        m_procData[j].row(chan.row()) = t_filteredTime.block(0,m_iFilterTaps/2+1,1,m_iWindowSize);
+        m_procData[j].row(chan.row()) = filter->applyFFTFilter(m_data[j].row(chan.row()));
     }
 
     //adds filtered channel to m_mapFilterChannels and m_allFilteredChannels
-    if(!m_mapFilteredChannels[type].contains(chan.row())) m_mapFilteredChannels[type].append(chan.row());
-    if(!m_allFilteredChannels.contains(chan.row())) m_allFilteredChannels.append(chan.row());
+//    if(!m_mapFilteredChannels[type].contains(chan.row())) m_mapFilteredChannels[type].append(chan.row());
+//    if(!m_allFilteredChannels.contains(chan.row())) m_allFilteredChannels.append(chan.row());
 
     //let RawModel emit a dataChanged() signal so that the views gets updated
 //        QModelIndex changed = createIndex(chan.row(),chan.column());
 //        emit dataChanged(changed,changed);
 
-//        qDebug() << "RawModel: Filtering applied to channel#" << chan.row();
+    qDebug() << "RawModel: Filter" << filter->m_name << "applied to channel#" << chan.row();
 }
 
 //*************************************************************************************************************
 
-void RawModel::applyFilter(QModelIndexList selected, ParksMcClellan::TPassType type) //ToDo: make this method more efficient
+void RawModel::applyFilter(QModelIndexList selected, FilterOperator* filter) //ToDo: make this method more efficient
 {    
     //filter all when selected is empty
     if(selected.empty()) {
@@ -418,20 +398,15 @@ void RawModel::applyFilter(QModelIndexList selected, ParksMcClellan::TPassType t
     }
 
     for(qint32 i=0; i < selected.size(); ++i) { //iterate through selected channels to filter
-        applyFilter(selected[i],type);
+        applyFilter(selected[i],filter);
     }
 
-    //Get name from TPassType's enum value
-    const QMetaObject& meta = ParksMcClellan::staticMetaObject;
-    int index = meta.indexOfEnumerator("TPassType");
-    QMetaEnum metaEnum = meta.enumerator(index);
-
-//    qDebug() << "RawModel: using PassType" << metaEnum.valueToKey(type);
+    qDebug() << "RawModel: using FilterType" << filter->m_name;
 }
 
 //*************************************************************************************************************
 
-void RawModel::undoFilter(QModelIndexList selected, ParksMcClellan::TPassType type)
+void RawModel::undoFilter(QModelIndexList selected, FilterOperator::FilterType type)
 {
     //Get name from TPassType's enum value
     const QMetaObject& meta = ParksMcClellan::staticMetaObject;
@@ -455,8 +430,8 @@ void RawModel::undoFilter(QModelIndexList selected, ParksMcClellan::TPassType ty
 
 void RawModel::undoFilter(QModelIndexList selected)
 {
-    undoFilter(selected,ParksMcClellan::HPF);
-    undoFilter(selected,ParksMcClellan::LPF);
+    undoFilter(selected,FilterOperator::HPF);
+    undoFilter(selected,FilterOperator::LPF);
 }
 
 //*************************************************************************************************************

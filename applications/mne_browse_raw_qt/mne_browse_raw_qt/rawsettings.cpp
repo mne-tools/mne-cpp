@@ -51,6 +51,10 @@ RawSettings::RawSettings(QObject *parent)
 
 }
 
+RawSettings::~RawSettings()
+{
+}
+
 //*************************************************************************************************************
 
 void RawSettings::init()
