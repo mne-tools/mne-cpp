@@ -62,7 +62,6 @@
 //MNE
 #include <fiff/fiff.h>
 #include <mne/mne.h>
-#include <fiff/fiff_io.h>
 #include <utils/parksmcclellan.h>
 
 //MNE_BROWSE_RAW_QT
