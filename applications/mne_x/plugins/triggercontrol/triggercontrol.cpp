@@ -64,8 +64,8 @@
 
 //#define TIMEMEAS // Zeitmessung;
 //#define BUFFERX1 // X1 determination
-#define TIMEMUC // Zeitmessung MUC
-//#define ALPHA // Alpha locked stimulus
+//#define TIMEMUC // Zeitmessung MUC
+#define ALPHA // Alpha locked stimulus
 
 
 //*************************************************************************************************************
@@ -92,8 +92,8 @@ TriggerControl::TriggerControl()
 , m_pDataSingleChannel(new dBuffer(1024))
 , m_fs(1024)
 , m_dt(1/m_fs)
-, m_refFreq(10)
-, m_alphaFreq(10)
+, m_refFreq(0.5)
+, m_alphaFreq(0.5)
 {
     connect(this, &TriggerControl::sendByte, this, &TriggerControl::sendByteTo);
 
@@ -170,6 +170,8 @@ bool TriggerControl::start()
     m_bIsRunning = true;
     QThread::start();
 
+
+
 //    // ////////////////////////////
 
 //    if(!m_pSerialPort->open())   // open Serial Port
@@ -234,6 +236,14 @@ bool TriggerControl::stop()
 
     m_pDataSingleChannel->clear();
 
+
+    //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the pop function (acquire statement)
+
+    if(m_pDataMatrixBuffer)
+    {
+        m_pDataMatrixBuffer->releaseFromPop();
+        m_pDataMatrixBuffer->clear();
+    }
 
 
  //Beginn Zeitmessung
@@ -300,11 +310,11 @@ void TriggerControl::updateSingleChannel(XMEASLIB::NewMeasurement::SPtr pMeasure
     QSharedPointer<NewRealTimeSampleArray> pRTSA = pMeasurement.dynamicCast<NewRealTimeSampleArray>();
     if(pRTSA)
     {
-        m_qMutex.lock();
-        qint32 t_iSize = pRTSA->getArraySize();
-        for(qint32 i = 0; i < t_iSize; ++i)
-            m_pDataSingleChannel->push(pRTSA->getSampleArray()[i]);//Append sample wise
-        m_qMutex.unlock();
+//        m_qMutex.lock();
+//        qint32 t_iSize = pRTSA->getArraySize();
+//        for(qint32 i = 0; i < t_iSize; ++i)
+//            m_pDataSingleChannel->push(pRTSA->getSampleArray()[i]);//Append sample wise
+//        m_qMutex.unlock();
     }
 }
 
@@ -317,12 +327,24 @@ void TriggerControl::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
     QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<NewRealTimeMultiSampleArray>();
     if(pRTMSA)
     {
-        m_qMutex.lock();
-        m_iNumChs = pRTMSA->getNumChannels();
-        qint32 t_iSize = pRTMSA->getMultiSampleArray().size();
-        for(qint32 i = 0; i < t_iSize; ++i)
-            m_pData.append(pRTMSA->getMultiSampleArray()[i]);//Append sample wise
-        m_qMutex.unlock();
+        //Check if buffer initialized
+        if(!m_pDataMatrixBuffer)
+            m_pDataMatrixBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSA->getNumChannels(), pRTMSA->getMultiArraySize()));
+
+//        MatrixXd t_mat(pRTMSA->getNumChannels(), pRTMSA->getMultiArraySize());
+
+//        for(unsigned char i = 0; i < pRTMSA->getMultiArraySize(); ++i)
+//            t_mat.col(i) = pRTMSA->getMultiSampleArray()[i];
+
+//        m_pDataMatrixBuffer->push(&t_mat);
+
+//        m_qMutex.lock();
+//        m_iNumChs = pRTMSA->getNumChannels();
+
+//        qint32 t_iSize = pRTMSA->getMultiSampleArray().size();
+//        for(qint32 i = 0; i < t_iSize; ++i)
+//            m_pData.append(pRTMSA->getMultiSampleArray()[i]);//Append sample wise
+//        m_qMutex.unlock();
     }
     // ENDE Zeitmessung */
 }
@@ -343,59 +365,72 @@ void TriggerControl::run()
     int basisDelay = 4;
     int shift = 0;
 
-    int channel = 40;
+    int channel = 132;
     int posStim = 0;
     int posMax = 0;
+
+    MatrixXd t_mat;
 
     while(m_bIsRunning)
     {
 
-        if(m_pData.size() > 2 * m_refSin.size())
-        {
+//        if(m_pDataMatrixBuffer)
+//            t_mat = m_pDataMatrixBuffer->pop();
 
-            bool stimFound = false;
+//        m_qMutex.lock();
+//        if(m_pData.size() > 2 * m_refSin.size())
+//        {
 
-            for(int i = 0; i < 2 * m_pData.size(); ++i)
-            {
-                if(m_pData[i](136) > 1000) //ToDo stim is larger than one sample remove at least one more than stim duration
-                {
-                    posStim = i;
-                    stimFound = true;
-                }
-            }
+//            bool stimFound = false;
 
-
-            if(stimFound)
-            {
-                stimFound = false;
-
-                //Correlate Vector with RefSin over one period
-                for(int currentSample = 0; currentSample <  m_refSin.size(); ++currentSample)
-                {
-                    VectorXd b(m_refSin.size());
-
-                    for(int i = 0; i < b.size(); ++i)
-                        b(i) = m_pData[i+currentSample](channel);
-
-                    ++currentSample;
-
-                    m_vecCorr(currentSample) = (corr(m_refSin, b));
-                }
-                m_vecCorr.maxCoeff(&posMax);
+//            for(int i = 0; i < 2 * m_pData.size(); ++i)
+//            {
+//                if(m_pData[i](136) > 1000) //ToDo stim is larger than one sample remove at least one more than stim duration
+//                {
+//                    posStim = i;
+//                    stimFound = true;
+//                }
+//            }
 
 
-                shift = (int)((posStim - posMax) * m_dt);
+//            if(stimFound)
+//            {
+//                stimFound = false;
 
-            }
+//                //Correlate Vector with RefSin over one period
+//                for(int currentSample = 0; currentSample <  m_refSin.size(); ++currentSample)
+//                {
+//                    VectorXd b(m_refSin.size());
 
-            m_pData.remove(0, m_refSin.size());
-        }
+//                    for(int i = 0; i < b.size(); ++i)
+//                        b(i) = m_pData[i+currentSample](channel);
 
-        msleep(periodTime-basisDelay-shift);
+//                    ++currentSample;
+
+//                    m_vecCorr(currentSample) = (corr(m_refSin, b));
+//                }
+//                m_vecCorr.maxCoeff(&posMax);
+
+
+//                shift = (int)((posStim - posMax) * m_dt);
+
+//            }
+
+
+//            m_pData.remove(0, m_refSin.size());
+//        }
+
+//        m_qMutex.unlock();
+
+        msleep(periodTime-basisDelay-shift-10);
 
         shift = 0;
 
         emit sendByte(1);
+
+        msleep(10);
+
+        emit sendByte(0);
 
 
     }

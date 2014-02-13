@@ -47,8 +47,10 @@
 
 #include <mne_x/Interfaces/IAlgorithm.h>
 #include <generics/circularbuffer.h>
+#include <generics/circularmatrixbuffer.h>
 #include <xMeas/newrealtimesamplearray.h>
 #include <xMeas/newrealtimemultisamplearray.h>
+
 
 
 //*************************************************************************************************************
@@ -165,6 +167,8 @@ private:
 
 
     QMutex m_qMutex;
+
+    CircularMatrixBuffer<double>::SPtr m_pDataMatrixBuffer;   /**< Holds incoming rt server data.*/
 
     QVector<VectorXd> m_pData;
     dBuffer::SPtr m_pDataSingleChannel;
