@@ -131,7 +131,7 @@ public:
     QList<MatrixXdR> m_procData; /**< List that holds the processed fiff matrix data <n_channels x n_samples> */
     QList<MatrixXdR> m_times; /**< List that holds the time axis [in secs] */
 
-    QMap<ParksMcClellan::TPassType,QList<int>> m_mapFilteredChannels; /**< filtered channel list with TPasstype->Channelno. mapping */
+    QMap<FilterOperator::FilterType,QList<int>> m_mapFilteredChannels; /**< filtered channel list with TPasstype->Channelno. mapping */
     QList<int> m_allFilteredChannels; /**< contains channel numbers of filtered channels independent of the value of TPassFilter */
 
     QList<FiffChInfo> m_chInfolist; /**< List of FiffChInfo objects that holds the corresponding channels information */
@@ -205,21 +205,21 @@ public slots:
      * @param index selects the channel to filter
      * @param filter
      */
-    void applyFilter(QModelIndex chan, FilterOperator* filter);
+    void applyFilter(QModelIndex chan, FilterOperator& filter);
 
     /**
      * applyFilter applies filter to channels
      * @param selected selects the channels to filter
      * @param filter
      */
-    void applyFilter(QModelIndexList selected, FilterOperator* filter);
+    void applyFilter(QModelIndexList selected, FilterOperator& filter);
 
     /**
      * undoFilter undoes the filtering operation for filter operations of the type
      * @param selected selects the channels to filter
      * @param type determines the filter type TPassType to choose for the undo operation
      */
-    void undoFilter(QModelIndexList selected, FilterOperator::FilterType type);
+    void undoFilter(QModelIndexList selected, FilterOperator& filter);
 
     /**
      * undoFilter undoes the filtering operation for all filter operations

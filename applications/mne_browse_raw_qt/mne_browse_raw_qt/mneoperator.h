@@ -69,7 +69,7 @@ public:
 
     MNEOperator(OperatorType type);
 
-    QString m_name;
+    QString m_sName;
 
 signals:
 

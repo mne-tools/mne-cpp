@@ -94,7 +94,7 @@ public:
      */
     void fftTransformCoeffs();
 
-    RowVectorXd applyFFTFilter(RowVectorXd data);
+    RowVectorXd applyFFTFilter(RowVectorXd &data);
 
     qint8 m_iFilterOrder; /**< represents the order of the filter instance */
     qint32 m_iFFTlength; /**< represents the filter length */
