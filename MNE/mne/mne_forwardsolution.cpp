@@ -440,7 +440,7 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(AnnotationSet &p
 
 //*************************************************************************************************************
 
-MNEForwardSolution MNEForwardSolution::cluster_forward_solution_new(AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize)
+MNEForwardSolution MNEForwardSolution::cluster_forward_solution_ccr(AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize)
 {
     MNEForwardSolution p_fwdOut = MNEForwardSolution(*this);
 
