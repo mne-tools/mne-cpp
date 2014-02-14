@@ -122,8 +122,6 @@ struct RegionDataOut
     VectorXd    sumd;       /**< Sums of the distances to the centroid */
     MatrixXd    D;          /**< Distances to the centroid */
 
-    MatrixXd    matRoiGOrig;    /**< Region gain matrix sensors x sources(x,y,z)*/
-    VectorXi    idcs;       /**< Get source space indeces */
     qint32      iLabelIdxOut;
 };
 
@@ -149,8 +147,6 @@ struct RegionDataIn
         KMeans t_kMeans(QString("cityblock"), QString("sample"), 5);
         t_kMeans.calculate(this->matRoiG, this->nClusters, p_RegionDataOut.roiIdx, p_RegionDataOut.ctrs, p_RegionDataOut.sumd, p_RegionDataOut.D);
 
-        p_RegionDataOut.matRoiGOrig = this->matRoiGOrig;
-        p_RegionDataOut.idcs = this->idcs;
         p_RegionDataOut.iLabelIdxOut = this->iLabelIdxIn;
 
         return p_RegionDataOut;
