@@ -362,7 +362,7 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(AnnotationSet &p
 
                             double sqec = sqrt((t_LF.block(0, j*3, t_LF.rows(), 3) - t_LF_partial.block(0, k*3, t_LF_partial.rows(), 3)).array().pow(2).sum());
                             double sqec_min = sqec;
-                            double j_min = j;
+                            qint32 j_min = j;
                             for(qint32 j = 1; j < idcs.rows(); ++j)
                             {
                                 sqec = sqrt((t_LF.block(0, j*3, t_LF.rows(), 3) - t_LF_partial.block(0, k*3, t_LF_partial.rows(), 3)).array().pow(2).sum());
@@ -536,6 +536,8 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution_new(AnnotationSe
                     t_sensG.iLabelIdxIn = i;
                     t_sensG.nClusters = ceil((double)nSources/(double)p_iClusterSize);
 
+                    t_sensG.matRoiGOrig = t_LF;
+
                     printf("%d Cluster(s)... ", t_sensG.nClusters);
 
                     // Reshape Input data -> sources rows; sensors columns
@@ -615,77 +617,45 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution_new(AnnotationSe
             }
 
 
-//            //
-//            // Assign partial LF to new LeadField
-//            //
-//            if(t_LF_partial.rows() > 0 && t_LF_partial.cols() > 0)
-//            {
-//                t_LF_new.conservativeResize(t_LF_partial.rows(), t_LF_new.cols() + t_LF_partial.cols());
-//                t_LF_new.block(0, t_LF_new.cols() - t_LF_partial.cols(), t_LF_new.rows(), t_LF_partial.cols()) = t_LF_partial;
+            //
+            // Assign partial LF to new LeadField
+            //
+            if(t_LF_partial.rows() > 0 && t_LF_partial.cols() > 0)
+            {
+                t_LF_new.conservativeResize(t_LF_partial.rows(), t_LF_new.cols() + t_LF_partial.cols());
+                t_LF_new.block(0, t_LF_new.cols() - t_LF_partial.cols(), t_LF_new.rows(), t_LF_partial.cols()) = t_LF_partial;
 
-//                // Map the centroids to the closest rr
-//                for(qint32 k = 0; k < nClusters; ++k)
-//                {
-//                    qint32 j = 0;
+                // Map the centroids to the closest rr
+                for(qint32 k = 0; k < nClusters; ++k)
+                {
+                    qint32 j = 0;
 
-//                    double sqec = sqrt((x->matRoiGOrig.block(0, j*3, x->matRoiGOrig.rows(), 3) - t_LF_partial.block(0, k*3, t_LF_partial.rows(), 3)).array().pow(2).sum());
-//                    double sqec_min = sqec;
-//                    double j_min = j;
-//                    for(qint32 j = 1; j < x->idcs.rows(); ++j)
-//                    {
-//                        sqec = sqrt((x->matRoiGOrig.block(0, j*3, x->matRoiGOrig.rows(), 3) - t_LF_partial.block(0, k*3, t_LF_partial.rows(), 3)).array().pow(2).sum());
-//                        if(sqec < sqec_min)
-//                        {
-//                            sqec_min = sqec;
-//                            j_min = j;
-//                        }
-//                    }
+                    double sqec = sqrt((x->matRoiGOrig.block(0, j*3, x->matRoiGOrig.rows(), 3) - t_LF_partial.block(0, k*3, t_LF_partial.rows(), 3)).array().pow(2).sum());
+                    double sqec_min = sqec;
+                    qint32 j_min = 0;
+                    for(qint32 j = 1; j < x->idcs.rows(); ++j)
+                    {
+                        sqec = sqrt((x->matRoiGOrig.block(0, j*3, x->matRoiGOrig.rows(), 3) - t_LF_partial.block(0, k*3, t_LF_partial.rows(), 3)).array().pow(2).sum());
 
-//                    // Take the closest coordinates
-//                    qint32 sel_idx = x->idcs[j_min];
-//                    //ToDo store this in cluster info
-////                    p_fwdOut.src[h].rr.row(count) = this->src[h].rr.row(sel_idx);
-////                    p_fwdOut.src[h].nn.row(count) = MatrixXd::Zero(1,3);
+                        if(sqec < sqec_min)
+                        {
+                            sqec_min = sqec;
+                            j_min = j;
+                        }
+                    }
 
-//                    p_fwdOut.src[h].vertno[count] = this->src[h].vertno[sel_idx];
+                    // Take the closest coordinates
+                    qint32 sel_idx = x->idcs[j_min];
+                    //ToDo store this in cluster info
+//                    p_fwdOut.src[h].rr.row(count) = this->src[h].rr.row(sel_idx);
+//                    p_fwdOut.src[h].nn.row(count) = MatrixXd::Zero(1,3);
 
-//                    ++count;
-//                }
-//            }
+                    p_fwdOut.src[h].vertno[count] = this->src[h].vertno[sel_idx];
 
+                    ++count;
+                }
+            }
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         //
         // Assemble new hemisphere information
@@ -693,7 +663,7 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution_new(AnnotationSe
 //ToDo store this in cluster info
 //        p_fwdOut.src[h].rr.conservativeResize(count, 3);
 //        p_fwdOut.src[h].nn.conservativeResize(count, 3);
-//        p_fwdOut.src[h].vertno.conservativeResize(count);
+        p_fwdOut.src[h].vertno.conservativeResize(count);
 
 //        std::cout << "Vertno hemisphere:" << h << std::endl << p_fwdOut.src[h].vertno << std::endl;
 
@@ -717,26 +687,16 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution_new(AnnotationSe
 //            p_fwdOut.source_nn.block(p_fwdOut.source_nn.rows() -  p_fwdOut.src[h].nn.rows(), 0,  p_fwdOut.src[h].nn.rows(), 3) = p_fwdOut.src[h].nn;
 //        }
 
-
-
-
-
-
-
-
-
-
-
 //        printf("[done]\n");
     }
 
-//    //
-//    // Put it all together
-//    //
-//    p_fwdOut.sol->data = t_LF_new;
-//    p_fwdOut.sol->ncol = t_LF_new.cols();
+    //
+    // Put it all together
+    //
+    p_fwdOut.sol->data = t_LF_new;
+    p_fwdOut.sol->ncol = t_LF_new.cols();
 
-//    p_fwdOut.nsource = p_fwdOut.sol->ncol/3;
+    p_fwdOut.nsource = p_fwdOut.sol->ncol/3;
 
     return p_fwdOut;
 }
