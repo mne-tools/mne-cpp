@@ -289,3 +289,10 @@ bin/.DS_Store
 .directory
 .~lock*
 *autosave
+
+.DS_Store
+
+bin/mne_browse_raw_qt.app/Contents/MacOS/mne_browse_raw_qt
+
+bin/mne_browse_raw_qt.app/Contents/PkgInfo
+/bin/mne_x_plugins/resources/tmsi/*.fif

@@ -68,7 +68,7 @@ win32 {
     QMAKE_CXXFLAGS+= -openmp
     QMAKE_LFLAGS +=  -openmp
 }
-unix {
+unix:!macx {
     QMAKE_CXXFLAGS+= -fopenmp
     QMAKE_LFLAGS +=  -fopenmp
 }

@@ -116,7 +116,7 @@ void SourceLab::init()
 
 
     //ToDo accelerate this
-    m_pClusteredFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(m_pFwd->cluster_forward_solution(*m_pAnnotationSet.data(), 40)));
+    m_pClusteredFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(m_pFwd->cluster_forward_solution_ccr(*m_pAnnotationSet.data(), 40)));
 
     //Delete Buffer - will be initailzed with first incoming data
     if(!m_pSourceLabBuffer.isNull())
