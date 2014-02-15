@@ -409,6 +409,16 @@ bool TMSIDriver::uninitDevice()
         ULONG ulPercentFull;
         m_oFpGetBufferInfo(m_HandleMaster, &ulOverflow, &ulPercentFull);
 
+        m_outputFileStream <<  "Unit offset: " << endl;
+        for(int w = 0; w<<m_vUnitOffSet.size(); w++)
+            cout << m_vUnitOffSet[w] << "  ";
+        m_outputFileStream << endl << endl;
+
+        m_outputFileStream <<  "Unit gain: " << endl;
+        for(int w = 0; w<<m_vUnitGain.size(); w++)
+            m_outputFileStream << m_vUnitGain[w] << "  ";
+        m_outputFileStream << endl << endl;
+
         m_outputFileStream << "----------<See output file for sample matrix>----------" <<endl<<endl;
         m_outputFileStream << "----------<Internal driver buffer is "<<ulPercentFull<<" full>----------"<<endl;
         m_outputFileStream << "----------<Internal driver overflow is "<<ulOverflow<< ">----------"<<endl;
