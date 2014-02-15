@@ -52,6 +52,7 @@
 //=============================================================================================================
 
 #include <utils/mnemath.h>
+#include <utils/kmeans.h>
 
 #include <fs/annotationset.h>
 
@@ -90,6 +91,7 @@
 #include <QDataStream>
 
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE NAMESPACE MNELIB
@@ -108,6 +110,60 @@ using namespace Eigen;
 using namespace FSLIB;
 using namespace UTILSLIB;
 using namespace FIFFLIB;
+
+//=========================================================================================================
+/**
+* Gain matrix output data for one region, used for clustering
+*/
+struct RegionDataOut
+{
+    VectorXi    roiIdx;     /**< Region cluster indices */
+    MatrixXd    ctrs;       /**< Cluster centers */
+    VectorXd    sumd;       /**< Sums of the distances to the centroid */
+    MatrixXd    D;          /**< Distances to the centroid */
+
+    qint32      iLabelIdxOut;
+};
+
+
+//=========================================================================================================
+/**
+* Gain matrix input data for one region, used for clustering
+*/
+struct RegionDataIn
+{
+    MatrixXd    matRoiG;        /**< Region gain matrix sources x sensors(x,y,z)*/
+    MatrixXd    matRoiGOrig;    /**< Region gain matrix sensors x sources(x,y,z)*/
+    qint32      nClusters;      /**< Number of clusters within this region */
+
+    VectorXi    idcs;           /**< Get source space indeces */
+    qint32      iLabelIdxIn;
+
+    RegionDataOut cluster() const
+    {
+        // Kmeans Reduction
+        RegionDataOut p_RegionDataOut;
+
+        KMeans t_kMeans(QString("cityblock"), QString("sample"), 5);
+        t_kMeans.calculate(this->matRoiG, this->nClusters, p_RegionDataOut.roiIdx, p_RegionDataOut.ctrs, p_RegionDataOut.sumd, p_RegionDataOut.D);
+
+        p_RegionDataOut.iLabelIdxOut = this->iLabelIdxIn;
+
+        return p_RegionDataOut;
+    }
+
+};
+
+//RegionDataOut MNEForwardSolution::roiClustering(RegionDataIn p_RegionDataIn)
+//{
+//        // Kmeans Reduction
+//        RegionDataOut p_RegionDataOut;
+
+//        KMeans t_kMeans(QString("cityblock"), QString("sample"), 5);
+//        t_kMeans.calculate(p_RegionDataIn.matRoiG, p_RegionDataIn.nClusters, p_RegionDataOut.roiIdx, p_RegionDataOut.ctrs, p_RegionDataOut.sumd, p_RegionDataOut.D);
+
+//        return p_RegionDataOut;
+//}
 
 
 //=============================================================================================================
@@ -173,6 +229,8 @@ public:
     * @return clustered MNE forward solution
     */
     MNEForwardSolution cluster_forward_solution(AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize);
+
+    MNEForwardSolution cluster_forward_solution_ccr(AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize);
 
     //=========================================================================================================
     /**
@@ -380,7 +438,10 @@ public:
     */
     friend std::ostream& operator<<(std::ostream& out, const MNELIB::MNEForwardSolution &p_MNEForwardSolution);
 
+
+
 private:
+
     //=========================================================================================================
     /**
     * Implementation of the read_one function in mne_read_forward_solution.m

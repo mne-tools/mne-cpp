@@ -40,7 +40,8 @@ TEMPLATE = subdirs
 SUBDIRS += \
     mne_lib_tests \
     mne_rt_tests \
-    mne_x_plugin_com
+    mne_x_plugin_com \
+    mne_future_test
 
 contains(MNECPP_CONFIG, isGui) {
     SUBDIRS += \

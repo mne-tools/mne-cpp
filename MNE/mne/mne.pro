@@ -37,7 +37,7 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-QT += network
+QT += network concurrent
 QT -= gui
 
 DEFINES += MNE_LIBRARY
