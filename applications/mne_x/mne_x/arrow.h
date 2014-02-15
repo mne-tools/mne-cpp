@@ -89,6 +89,8 @@ public:
     PluginItem *startItem() const { return m_StartItem; }
     PluginItem *endItem() const { return m_EndItem; }
 
+    PluginConnectorConnection::SPtr connection() { return m_pConnection; }
+
     void updatePosition();
 
 protected:
