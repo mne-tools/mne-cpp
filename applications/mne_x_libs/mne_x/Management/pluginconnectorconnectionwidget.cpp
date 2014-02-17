@@ -39,6 +39,7 @@
 //=============================================================================================================
 
 #include "pluginconnectorconnectionwidget.h"
+#include "pluginconnectorconnection.h"
 
 
 //*************************************************************************************************************
@@ -55,14 +56,18 @@ using namespace MNEX;
 //=============================================================================================================
 
 
-PluginConnectorConnectionWidget::PluginConnectorConnectionWidget(QWidget *parent)
+PluginConnectorConnectionWidget::PluginConnectorConnectionWidget(PluginConnectorConnection* pPluginConnectorConnection, QWidget *parent)
 : QWidget(parent)
+, m_pPluginConnectorConnection(pPluginConnectorConnection)
 {
 
     QWidget *topFiller = new QWidget;
     topFiller->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-    m_pLabel = new QLabel(tr("Connector Connection"), this);
+    QString sSender = m_pPluginConnectorConnection->getSender()->getName();
+    QString sReceiver = m_pPluginConnectorConnection->getReceiver()->getName();
+
+    m_pLabel = new QLabel(tr("Connector Connection: ")+sSender+" -> "+sReceiver, this);
     m_pLabel->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
     m_pLabel->setAlignment(Qt::AlignCenter);
 
@@ -76,5 +81,4 @@ PluginConnectorConnectionWidget::PluginConnectorConnectionWidget(QWidget *parent
     layout->addWidget(bottomFiller);
 
     this->setLayout(layout);
-
 }
