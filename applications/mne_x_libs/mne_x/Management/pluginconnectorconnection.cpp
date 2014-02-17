@@ -144,7 +144,6 @@ bool PluginConnectorConnection::createConnection()
 
 QWidget* PluginConnectorConnection::setupWidget()
 {
-    PluginConnectorConnectionWidget* pccWidget = new PluginConnectorConnectionWidget();
-
+    PluginConnectorConnectionWidget* pccWidget = new PluginConnectorConnectionWidget(this);
     return pccWidget;
 }

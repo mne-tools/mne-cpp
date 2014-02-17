@@ -62,6 +62,14 @@ namespace MNEX
 {
 
 
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+class PluginConnectorConnection;
+
+
 //=============================================================================================================
 /**
 * Class implements the plug-in connector connection widget.
@@ -75,9 +83,12 @@ public:
 
     //=========================================================================================================
     /**
-    * Destructor
+    * Constructs a PluginConnectorConnectionWidget which is a child of parent.
+    *
+    * @param [in] parent pointer to parent widget; If parent is 0, the new PluginConnectorConnectionWidget becomes a window. If parent is another widget, PluginConnectorConnectionWidget becomes a child window inside parent. PluginConnectorConnectionWidget is deleted when its parent is deleted.
+    * @param [in] pPluginConnectorConnection a pointer to the corresponding Connector Connection.
     */
-    explicit PluginConnectorConnectionWidget(QWidget *parent = 0);
+    PluginConnectorConnectionWidget(PluginConnectorConnection* pPluginConnectorConnection, QWidget *parent = 0);
 
 signals:
 
@@ -85,7 +96,9 @@ public slots:
 
 
 private:
-    QLabel* m_pLabel;      /**< Holds the start up widget label. */
+    QLabel* m_pLabel;                                           /**< Holds the start up widget label. */
+
+    PluginConnectorConnection*  m_pPluginConnectorConnection;   /**< a pointer to corresponding PluginConnectorConnection.*/
 
 };
 
