@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     startupwidget.cpp
+* @file     pluginconnectorconnectionwidget.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     February, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains implementation of StartUpWidget class.
+* @brief    Contains the implementation of the PluginConnectorConnectionWidget class.
 *
 */
 
@@ -38,18 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "startupwidget.h"
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QLabel>
-#include <QVBoxLayout>
-
-#include <QDebug>
+#include "pluginconnectorconnectionwidget.h"
 
 
 //*************************************************************************************************************
@@ -65,16 +54,17 @@ using namespace MNEX;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-StartUpWidget::StartUpWidget(QWidget *parent)
+
+PluginConnectorConnectionWidget::PluginConnectorConnectionWidget(QWidget *parent)
 : QWidget(parent)
 {
 
     QWidget *topFiller = new QWidget;
     topFiller->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-    m_pLabel_Info = new QLabel(tr("MNE-X - Real-Time Acquisition & Processing"), this);
-    m_pLabel_Info->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
-    m_pLabel_Info->setAlignment(Qt::AlignCenter);
+    m_pLabel = new QLabel(tr("Connector Connection"), this);
+    m_pLabel->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
+    m_pLabel->setAlignment(Qt::AlignCenter);
 
     QWidget *bottomFiller = new QWidget;
     bottomFiller->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -82,16 +72,9 @@ StartUpWidget::StartUpWidget(QWidget *parent)
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setMargin(5);
     layout->addWidget(topFiller);
-    layout->addWidget(m_pLabel_Info);
+    layout->addWidget(m_pLabel);
     layout->addWidget(bottomFiller);
 
     this->setLayout(layout);
-}
-
-
-//*************************************************************************************************************
-
-StartUpWidget::~StartUpWidget()
-{
 
 }

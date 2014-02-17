@@ -491,7 +491,7 @@ void MainWindow::updatePluginWidget(IPlugin::SPtr pPlugin)
 
 void MainWindow::updateConnectionWidget(PluginConnectorConnection::SPtr pConnection)
 {
-    QWidget* pWidget = new QWidget;
+    QWidget* pWidget = pConnection->setupWidget();
     setCentralWidget(pWidget);
 }
 

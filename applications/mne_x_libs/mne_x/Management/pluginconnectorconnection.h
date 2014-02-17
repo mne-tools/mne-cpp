@@ -105,6 +105,14 @@ public:
 
     inline bool isConnected();
 
+    //=========================================================================================================
+    /**
+    * The connector connection setup widget
+    *
+    * @return the setup widget
+    */
+    QWidget* setupWidget();
+
 signals:
     
 private:
