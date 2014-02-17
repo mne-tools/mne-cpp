@@ -68,9 +68,10 @@ RawModel::RawModel(QFile &qFile, QObject *parent)
 
     //generator FilterOperator objects
     //HPF
-    m_filterOperators.append(FilterOperator("HPF",FilterOperator::HPF,m_iFilterTaps,0.15,0.2,0.1,(m_iWindowSize+m_iFilterTaps)));
+    m_Operators["HPF"] = QSharedPointer<MNEOperator>(new FilterOperator("HPF",FilterOperator::HPF,m_iFilterTaps,0.15,0.2,0.1,(m_iWindowSize+m_iFilterTaps)));
     //LPF
-    m_filterOperators.append(FilterOperator("LPF",FilterOperator::LPF,m_iFilterTaps,0.08, 0.2, 0.1,(m_iWindowSize+m_iFilterTaps)));
+    m_Operators["LPF"] = QSharedPointer<MNEOperator>(new FilterOperator("LPF",FilterOperator::LPF,m_iFilterTaps,0.08,0.2,0.1,(m_iWindowSize+m_iFilterTaps)));
+
 }
 
 //=============================================================================================================
@@ -114,7 +115,7 @@ QVariant RawModel::data(const QModelIndex &index, int role) const
                 QList<RowVectorPair> listRowVectorPair;
 
                 for(qint16 i=0; i < m_data.size(); ++i) {
-                    if(!m_allFilteredChannels.contains(index.row())) //if channel is not filtered
+                    if(!m_assignedOperators.contains(index.row())) //if channel is not filtered
                         rowVectorPair.first = m_data[i].data() + index.row()*m_data[i].cols();
                     else //if channel is filtered
                         rowVectorPair.first = m_procData[i].data() + index.row()*m_procData[i].cols();
@@ -238,8 +239,7 @@ void RawModel::clearModel() {
     m_procData.clear();
     m_times.clear();
 
-    m_allFilteredChannels.clear();
-    m_mapFilteredChannels.clear();
+    m_assignedOperators.clear();
 
     m_chInfolist.clear();
 
@@ -257,9 +257,8 @@ extern void applyFilter(QModelIndexList arg1, ParksMcClellan::TPassType arg2);
 
 void RawModel::reloadFiffData(bool before) {
 
-    qint32 start,end;
-
     //update scroll position
+    fiff_int_t start,end;
     if(before) {
         m_iAbsFiffCursor -= m_iWindowSize;
         end = m_iAbsFiffCursor-1;
@@ -286,18 +285,41 @@ void RawModel::reloadFiffData(bool before) {
     }
 
     //read data with respect to set start and end point
-    MatrixXd t_reloaddata,t_reloadtimes;
-    if(!m_pfiffIO->m_qlistRaw[0]->read_raw_segment(t_reloaddata, t_reloadtimes, start, end))
-        printf("RawModel: Error when reading raw data!");
+    m_reloadFuture = QtConcurrent::run(this,&RawModel::readSegment,start,end);
+    m_reloadFutureWatcher.setFuture(m_reloadFuture);
+//    future.waitForFinished();
 
+    connect(&m_reloadFutureWatcher,&QFutureWatcher<QPair<MatrixXd,MatrixXd> >::finished,[this,before](){
+        insertReloadedData(m_reloadFutureWatcher.result(),before);
+    });
+
+}
+//*************************************************************************************************************
+
+QPair<MatrixXd,MatrixXd> RawModel::readSegment(fiff_int_t from, fiff_int_t to) {
+    MatrixXd data,times;
+    QPair<MatrixXd,MatrixXd> datatime;
+
+    if(!m_pfiffIO->m_qlistRaw[0]->read_raw_segment(data, times, from, to)) {
+        printf("RawModel: Error when reading raw data!");
+        return datatime;
+    }
+    else {
+        datatime.first = data;
+        datatime.second = times;
+        return datatime;
+    }
+}
+
+void RawModel::insertReloadedData(QPair<MatrixXd,MatrixXd> dataTimesPair, bool before) {
     //filter reloaded data
     MatrixXdR t_reloadProcData = MatrixXdR::Zero(m_chInfolist.size(),m_iWindowSize);
 
     //extend m_data with reloaded data
     if(before) {
-        m_data.prepend(t_reloaddata);
+        m_data.prepend(dataTimesPair.first);
         m_procData.prepend(t_reloadProcData);
-        m_times.prepend(t_reloadtimes);
+        m_times.prepend(dataTimesPair.second);
 
         //maintain at maximum m_maxWindows data windows and drop the rest
         if(m_data.size() > m_maxWindows) {
@@ -306,10 +328,10 @@ void RawModel::reloadFiffData(bool before) {
         }
     }
     else {
-        m_data.append(t_reloaddata);
+        m_data.append(dataTimesPair.first);
 
         m_procData.append(t_reloadProcData);
-        m_times.append(t_reloadtimes);
+        m_times.append(dataTimesPair.second);
 
         //maintain at maximum m_maxWindows data windows and drop the rest
         if(m_data.size() > m_maxWindows) {
@@ -319,71 +341,38 @@ void RawModel::reloadFiffData(bool before) {
         }
     }
 
-    //HPF
-    QModelIndexList t_indexList;
-//    for(qint32 i=0; i < m_mapFilteredChannels[ParksMcClellan::HPF].count(); ++i)
-//        t_indexList.append(createIndex(m_mapFilteredChannels[ParksMcClellan::HPF][i],1));
-//    if(!t_indexList.empty()) {
-//        FilterOperator* ptr = (m_filterOperators[0])*; //ToDo: get pointer of element in QList
-//        applyFilter(t_indexList,ptr);
-//    }
-    //LPF
-    t_indexList.clear();
-//    for(qint32 i=0; i < m_mapFilteredChannels[ParksMcClellan::LPF].count(); ++i)
-//        t_indexList.append(createIndex(m_mapFilteredChannels[ParksMcClellan::LPF][i],1));
-//    if(!t_indexList.empty()) {
-//        applyFilter(t_indexList,m_filterOperators[1]*);
-//    }
-
-//    qDebug() << "RawModel: Fiff data REloaded from " << start << "to" << end;
-
-    QModelIndex topLeft = createIndex(0,1);
-    QModelIndex bottomRight = createIndex(m_chInfolist.size(),1);
-
-//    emit dataChanged(topLeft,bottomRight);
+    qDebug() << "RawModel: Fiff data REloaded from ";// << dataTimesPair.second(0) << "to" << end;
 }
 
 //*************************************************************************************************************
 
-void RawModel::genFilter(int NumTaps, double OmegaC, double BW, double ParksWidth, ParksMcClellan::TPassType type)
+void RawModel::applyOperator(QModelIndex chan, QSharedPointer<MNEOperator>& operatorPtr)
 {
-    ParksMcClellan filter(NumTaps, OmegaC, BW, ParksWidth, type);
-    m_mapFilters[type] = RowVectorXd::Zero(m_iWindowSize+m_iFilterTaps);
-    m_mapFilters[type].head(m_iFilterTaps) = filter.FirCoeff;
+    //cast to QSharedPointer<FilterOperator>
+    QSharedPointer<FilterOperator> filter;
+    if(operatorPtr->m_OperatorType==MNEOperator::FILTER)
+        filter = operatorPtr.staticCast<FilterOperator>();
 
-    //perform fft of filter's impulse response
-    //generate fft object
-    Eigen::FFT<double> fft;
-    fft.SetFlag(fft.HalfSpectrum);
+    //iterate through m_data list in order to filter them all, ToDo: do not filter already filtered blocks -> check it somehow
+    for(qint8 j=0; j < m_data.size(); ++j) {
+        RowVectorXd tmp;
+        if(!m_assignedOperators.contains(chan.row()))
+            tmp = m_data[j].row(chan.row());
+        else
+            tmp = m_procData[j].row(chan.row());
 
-    m_mapFiltersFreq[type] = RowVectorXcd::Zero((m_iWindowSize+m_iFilterTaps)/2+1);
-    fft.fwd(m_mapFiltersFreq[type],m_mapFilters[type]);
-
-    qDebug() << "RawModel" << type << " filter generated and stored to RawModel.";
-}
-
-//*************************************************************************************************************
-
-void RawModel::applyFilter(QModelIndex chan, FilterOperator& filter)
-{
-    //generate fft object
-    Eigen::FFT<double> fft;
-    fft.SetFlag(fft.HalfSpectrum);
-
-    for(qint8 j=0; j < m_data.size(); ++j) { //iterate through m_data list in order to filter them all, ToDo: dont filter already filtered blocks -> check it somehow
-        m_procData[j].row(chan.row()) = filter.applyFFTFilter((RowVectorXd)m_data[j].row(chan.row()));
+        m_procData[j].row(chan.row()) = filter->applyFFTFilter(tmp);
     }
 
-    //adds filtered channel to m_mapFilterChannels and m_allFilteredChannels
-    if(!m_mapFilteredChannels[filter.m_Type].contains(chan.row())) m_mapFilteredChannels[filter.m_Type].append(chan.row());
-    if(!m_allFilteredChannels.contains(chan.row())) m_allFilteredChannels.append(chan.row());
+    //adds filtered channel to m_assignedOperators
+    if(!m_assignedOperators.values(chan.row()).contains(filter)) m_assignedOperators[chan.row()] = filter;
 
-    qDebug() << "RawModel: Filter" << filter.m_sName << "applied to channel#" << chan.row();
+    qDebug() << "RawModel: Filter" << filter->m_sName << "applied to channel#" << chan.row();
 }
 
 //*************************************************************************************************************
 
-void RawModel::applyFilter(QModelIndexList selected, FilterOperator& filter) //ToDo: make this method more efficient
+void RawModel::applyOperator(QModelIndexList selected, QSharedPointer<MNEOperator>& operatorPtr)
 {    
     //filter all when selected is empty
     if(selected.empty()) {
@@ -392,10 +381,10 @@ void RawModel::applyFilter(QModelIndexList selected, FilterOperator& filter) //T
     }
 
     for(qint32 i=0; i < selected.size(); ++i) { //iterate through selected channels to filter
-        applyFilter(selected[i],filter);
+        applyOperator(selected[i],operatorPtr);
     }
 
-    qDebug() << "RawModel: using FilterType" << filter.m_sName;
+    qDebug() << "RawModel: using FilterType" << operatorPtr->m_sName;
 }
 
 //*************************************************************************************************************
@@ -419,16 +408,15 @@ void RawModel::undoFilter(QModelIndexList selected, FilterOperator& filter)
 
 void RawModel::undoFilter(QModelIndexList selected)
 {
-    undoFilter(selected,m_filterOperators[0]);
-    undoFilter(selected,m_filterOperators[1]);
+//    undoFilter(selected,m_filterOperators[0]);
+//    undoFilter(selected,m_filterOperators[1]);
 }
 
 //*************************************************************************************************************
 
 void RawModel::undoFilter()
 {
-    m_mapFilteredChannels.clear();
-    m_allFilteredChannels.clear();
+    m_assignedOperators.clear();
 }
 
 //*************************************************************************************************************

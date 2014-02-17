@@ -71,7 +71,8 @@ SOURCES += rawsettings.cpp\
     mainwindow.cpp \
     rawdelegate.cpp \ #\
     mneoperator.cpp \
-    filteroperator.cpp
+    filteroperator.cpp \
+    rawch.cpp
     #rawview.cpp
 
 HEADERS += types.h\
@@ -81,7 +82,8 @@ HEADERS += types.h\
     mainwindow.h \
     rawdelegate.h \ #\
     mneoperator.h \
-    filteroperator.h
+    filteroperator.h \
+    rawch.h
     #rawview.h
 
 

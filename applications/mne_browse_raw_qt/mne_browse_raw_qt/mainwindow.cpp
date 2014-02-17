@@ -288,17 +288,16 @@ void MainWindow::customContextMenuRequested(QPoint pos)
     });
     //filtering
     connect(doApplyHPFFilter,&QAction::triggered, [=](){
-        //ToDo: iterate through m_filterOperators and select certain filterOperator instance
-        m_pRawModel->applyFilter(selected,m_pRawModel->m_filterOperators[0]);
+        m_pRawModel->applyOperator(selected,m_pRawModel->m_Operators["HPF"]);
     });
     connect(doApplyLPFFilter,&QAction::triggered, [=](){
-        m_pRawModel->applyFilter(selected,m_pRawModel->m_filterOperators[1]);
+        m_pRawModel->applyOperator(selected,m_pRawModel->m_Operators["LPF"]);
     });
     connect(doApplyHPFFilterAll,&QAction::triggered, [=](){
-        m_pRawModel->applyFilter(QModelIndexList(),m_pRawModel->m_filterOperators[0]);
+        m_pRawModel->applyOperator(QModelIndexList(),m_pRawModel->m_Operators["HPF"]);
     });
     connect(doApplyLPFFilterAll,&QAction::triggered, [=](){
-        m_pRawModel->applyFilter(QModelIndexList(),m_pRawModel->m_filterOperators[1]);
+        m_pRawModel->applyOperator(QModelIndexList(),m_pRawModel->m_Operators["LPF"]);
     });
 //    connect(undoApplyHPFFilter,&QAction::triggered, [=](){
 //        m_pRawModel->undoFilter(selected,m_pRawModel->m_filterOperators[0]);
