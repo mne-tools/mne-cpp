@@ -78,6 +78,7 @@ using namespace MNE_BROWSE_RAW_QT;
 using namespace Eigen;
 using namespace MNELIB;
 using namespace UTILSLIB;
+using namespace FIFFLIB;
 
 //=============================================================================================================
 
@@ -131,11 +132,12 @@ public:
     QList<MatrixXdR> m_procData; /**< List that holds the processed fiff matrix data <n_channels x n_samples> */
     QList<MatrixXdR> m_times; /**< List that holds the time axis [in secs] */
 
-    QMap<FilterOperator::FilterType,QList<int>> m_mapFilteredChannels; /**< filtered channel list with TPasstype->Channelno. mapping */
-    QList<int> m_allFilteredChannels; /**< contains channel numbers of filtered channels independent of the value of TPassFilter */
-
     QList<FiffChInfo> m_chInfolist; /**< List of FiffChInfo objects that holds the corresponding channels information */
     FiffInfo m_fiffInfo; /**< fiff info of whole fiff file */
+
+    //Filter operators
+    QMap<QString,QSharedPointer<MNEOperator> > m_Operators; /**< generated MNEOperator types (FilterOperator,PCA etc.) */
+    QMap<int,QSharedPointer<MNEOperator> > m_assignedOperators; /**< Map of MNEOperator types to channels*/
 
     //Settings
     QSettings m_qSettings;
@@ -150,14 +152,13 @@ public:
 
     QSharedPointer<FiffIO> m_pfiffIO; /**< FiffIO objects, which holds all the information of the fiff data (excluding the samples!) */
 
-    QMap<ParksMcClellan::TPassType,RowVectorXd> m_mapFilters; /**< Map of filter types to filter coeffs vectors */
-    QMap<ParksMcClellan::TPassType,RowVectorXcd> m_mapFiltersFreq; /**< Map of filter types to filter coeffs freq vectors of size 1x(m_iWindowSize+m_iFilterTaps)/2*/
-    QList<FilterOperator> m_filterOperators; /**< contains the FilterOperator objects that perform filtering */
-
 private:
     //View control
     bool m_bStartReached; /**< signals, whether the start of the fiff data file is reached */
     bool m_bEndReached; /**< signals, whether the end of the fiff data file is reached */
+
+    QFutureWatcher<QPair<MatrixXd,MatrixXd> > m_reloadFutureWatcher;
+    QFuture<QPair<MatrixXd,MatrixXd> > m_reloadFuture;
 
     //methods
     /**
@@ -174,14 +175,12 @@ private:
     void reloadFiffData(bool before);
 
     /**
-     * genFilter generates filter coeffient vectors with respect to the given filter parameters
-     * @param NumTaps number of taps, higher stopband attenuation for higher filter orders (=NumTaps).
-     * @param OmegaC is the 3 dB corner freq for low pass and high pass filters.
-     * @param BW is the bandwidth for bandpass and notch filters (ignored on low and high pass).
-     * @param ParksWidth is the width of the transition bands.
-     * @param PassType is the type of filter that shall be generated. options: LPF, HPF, BPF, NOTCH.
+     * @brief readSegment is the wrapper method to read a segment from the raw fiff file
+     * @param from the start point to read from the file
+     * @param to the end point to read from the file
+     * @return the data and times matrices
      */
-    void genFilter(int NumTaps, double OmegaC, double BW, double ParksWidth, ParksMcClellan::TPassType type);
+    QPair<MatrixXd,MatrixXd> readSegment(fiff_int_t from, fiff_int_t to);
 
 signals:
 
@@ -201,18 +200,18 @@ public slots:
     void markChBad(QModelIndexList selected, bool status);
 
     /**
-     * applyFilter applies filter to channels
-     * @param index selects the channel to filter
+     * applyOperator applies assigend operators to channel
+     * @param index selects the channel to process
      * @param filter
      */
-    void applyFilter(QModelIndex chan, FilterOperator& filter);
+    void applyOperator(QModelIndex chan, QSharedPointer<MNEOperator>& operatorPtr);
 
     /**
-     * applyFilter applies filter to channels
-     * @param selected selects the channels to filter
+     * applyOperator applies operators to channels
+     * @param selected selects the channels to process
      * @param filter
      */
-    void applyFilter(QModelIndexList selected, FilterOperator& filter);
+    void applyOperator(QModelIndexList selected, QSharedPointer<MNEOperator>& operatorPtr);
 
     /**
      * undoFilter undoes the filtering operation for filter operations of the type
@@ -231,6 +230,9 @@ public slots:
      * undoFilter undoes the filtering operation for all filter operations for all channels
      */
     void undoFilter();
+
+private slots:
+    void insertReloadedData(QPair<MatrixXd,MatrixXd> dataTimesPair, bool before);
 
 //Inline
 public:
