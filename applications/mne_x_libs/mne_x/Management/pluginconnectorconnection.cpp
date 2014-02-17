@@ -39,6 +39,8 @@
 //=============================================================================================================
 
 #include "pluginconnectorconnection.h"
+#include "pluginconnectorconnectionwidget.h"
+
 #include <xMeas/newrealtimesamplearray.h>
 #include <xMeas/newrealtimemultisamplearray.h>
 
@@ -135,4 +137,14 @@ bool PluginConnectorConnection::createConnection()
 //    m_con = connect(sender.data(), &PluginOutputConnector::notify, receiver.data(), &PluginInputConnector::update);
 
     return bConnected;
+}
+
+
+//*************************************************************************************************************
+
+QWidget* PluginConnectorConnection::setupWidget()
+{
+    PluginConnectorConnectionWidget* pccWidget = new PluginConnectorConnectionWidget();
+
+    return pccWidget;
 }
