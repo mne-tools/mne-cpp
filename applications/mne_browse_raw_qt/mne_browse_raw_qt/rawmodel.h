@@ -93,6 +93,7 @@ public:
     virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 
+    //METHODS
     /**
     * loadFiffData loads fiff data file.
     *
@@ -107,26 +108,7 @@ public:
      */
     bool writeFiffData(QFile &qFile);
 
-    /**
-     * resetPosition reset the position of the current m_iAbsFiffCursor if a ScrollBar position is selected, whose data is not yet loaded.
-     *
-     * @param position where the new data block of the fiff file should be loaded.
-     */
-    void resetPosition(qint32 position);
-
-    /**
-     * clearModel clears all model's members
-     */
-    void clearModel();
-
-    /**
-     * getMaxDataValue obtains the maximum value for the underlying channel
-     *
-     * @param chan number of channel in m_chInfolist
-     * @return max data value of m_data for scaling purposes.
-     */
-    double maxDataValue(qint16 chan) const;
-
+    //VARIABLES
     //Fiff data structure
     QList<MatrixXdR> m_data; /**< List that holds the fiff matrix data <n_channels x n_samples> */
     QList<MatrixXdR> m_procData; /**< List that holds the processed fiff matrix data <n_channels x n_samples> */
@@ -153,19 +135,24 @@ public:
     QSharedPointer<FiffIO> m_pfiffIO; /**< FiffIO objects, which holds all the information of the fiff data (excluding the samples!) */
 
 private:
-    //View control
-    bool m_bStartReached; /**< signals, whether the start of the fiff data file is reached */
-    bool m_bEndReached; /**< signals, whether the end of the fiff data file is reached */
-
-    QFutureWatcher<QPair<MatrixXd,MatrixXd> > m_reloadFutureWatcher;
-    QFuture<QPair<MatrixXd,MatrixXd> > m_reloadFuture;
-
-    //methods
+    //METHODS
     /**
     * Loads fiff infos to m_chInfolist abd m_fiffInfo.
     *
     */
     void loadFiffInfos();
+
+    /**
+     * clearModel clears all model's members
+     */
+    void clearModel();
+
+    /**
+     * resetPosition reset the position of the current m_iAbsFiffCursor if a ScrollBar position is selected, whose data is not yet loaded.
+     *
+     * @param position where the new data block of the fiff file should be loaded.
+     */
+    void resetPosition(qint32 position);
 
     /**
      * reloadFiffData
@@ -182,49 +169,76 @@ private:
      */
     QPair<MatrixXd,MatrixXd> readSegment(fiff_int_t from, fiff_int_t to);
 
+    //VARIABLES
+    //Reload control
+    bool m_bStartReached; /**< signals, whether the start of the fiff data file is reached */
+    bool m_bEndReached; /**< signals, whether the end of the fiff data file is reached */
+    bool m_bReloading; /**< signals when the reloading is ongoing */
+    bool m_bReloadBefore; /**< */
+
+    QFutureWatcher<QPair<MatrixXd,MatrixXd> > m_reloadFutureWatcher;
+
 signals:
+    void dataReloaded();
 
 public slots:
     /**
-     * reloadData checks, whether the actual position of the QScrollBar demands for a fiff data reload (depending on m_reloadPos)
+     * updateScrollPos checks, whether the actual position of the QScrollBar demands for a fiff data reload (depending on m_reloadPos and m_iCurAbsScrollPos)
      *
      * @param value the position of QScrollBar
      */
-    void reloadData(int value);
+    void updateScrollPos(int value);
 
     /**
      * markChBad marks the selected channels as bad/good in m_chInfolist
-     * @param selected is the list of indices that are selected for marking
+     * @param chlist is the list of indices that are selected for marking
      * @param status, status=1 -> mark as bad, status=0 -> mark as good
      */
-    void markChBad(QModelIndexList selected, bool status);
+    void markChBad(QModelIndexList chlist, bool status);
 
     /**
      * applyOperator applies assigend operators to channel
      * @param index selects the channel to process
      * @param filter
      */
-    void applyOperator(QModelIndex chan, QSharedPointer<MNEOperator>& operatorPtr);
+    void applyOperator(QModelIndex chan, QSharedPointer<MNEOperator>& operatorPtr, bool reset=false);
 
     /**
      * applyOperator applies operators to channels
-     * @param selected selects the channels to process
+     * @param chlist selects the channels to process
      * @param filter
      */
-    void applyOperator(QModelIndexList selected, QSharedPointer<MNEOperator>& operatorPtr);
+    void applyOperator(QModelIndexList chlist, QSharedPointer<MNEOperator>& operatorPtr, bool reset=false);
+
+    /**
+     * updateOperators updates all set operator to channels according to m_assignedOperators
+     * @param chan the channel to which the operators shall be updated
+     */
+    void updateOperators(QModelIndex chan);
+
+    /**
+     * updateOperators is an overloaded function to update the operators to a channel list
+     * @param chlist
+     */
+    void updateOperators(QModelIndexList chlist);
+
+    /**
+     * updateOperators is an overloaded function that updates all channels according to m_assignedOperators
+     */
+    void updateOperators();
 
     /**
      * undoFilter undoes the filtering operation for filter operations of the type
-     * @param selected selects the channels to filter
+     * @param chlist selects the channels to filter
      * @param type determines the filter type TPassType to choose for the undo operation
      */
-    void undoFilter(QModelIndexList selected, FilterOperator& filter);
+    void undoFilter(QModelIndexList chlist, QSharedPointer<MNEOperator>& filterPtr);
 
     /**
      * undoFilter undoes the filtering operation for all filter operations
-     * @param selected selects the channels to filter
+     * @param chlist selects the channels to filter
      */
-    void undoFilter(QModelIndexList selected);
+    void undoFilter(QModelIndexList chlist);
 
     /**
      * undoFilter undoes the filtering operation for all filter operations for all channels
@@ -232,7 +246,9 @@ public slots:
     void undoFilter();
 
 private slots:
-    void insertReloadedData(QPair<MatrixXd,MatrixXd> dataTimesPair, bool before);
+    void insertReloadedData(QPair<MatrixXd,MatrixXd> dataTimesPair);
+
+    void updateOperatorsConcurrently();
 
 //Inline
 public:

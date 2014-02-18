@@ -301,6 +301,9 @@ void ParksMcClellan::CalcParkCoeff2(int NumBands, int TapCount)
     else
         for(j=1; j<=HalfTapCount; j++ )FirCoeff[HalfTapCount+j-1] = Coeff[HalfTapCount-j+1];
 
+    FirCoeff.conservativeResize(TapCount);
+
+
     // Parks2Label was on my application's main form.
     // These replace the original Ouch() function
     if(NumIterations <= 3)

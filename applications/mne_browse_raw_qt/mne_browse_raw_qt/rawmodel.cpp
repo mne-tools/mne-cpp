@@ -44,6 +44,7 @@ RawModel::RawModel(QObject *parent)
 , m_qSettings()
 , m_bStartReached(false)
 , m_bEndReached(false)
+, m_bReloading(false)
 {
     m_iWindowSize = m_qSettings.value("RawModel/window_size").toInt();
     m_reloadPos = m_qSettings.value("RawModel/reload_pos").toInt();
@@ -57,6 +58,7 @@ RawModel::RawModel(QFile &qFile, QObject *parent)
 , m_qSettings()
 , m_bStartReached(false)
 , m_bEndReached(false)
+, m_bReloading(false)
 {
     m_iWindowSize = m_qSettings.value("RawModel/window_size").toInt();
     m_reloadPos = m_qSettings.value("RawModel/reload_pos").toInt();
@@ -66,12 +68,18 @@ RawModel::RawModel(QFile &qFile, QObject *parent)
     //read fiff data
     loadFiffData(qFile);
 
-    //generator FilterOperator objects
+    //generator FilterOperator objects Da wir jedoch täglich neue Projekte zur Besetzung erhalten, möchten wir auf jeden Fall weiter mit Ihrer interessanten Bewerbung arbeiten und hoffen, bald mit einem passenden Angebot auf Sie zukommen zu können. Vielen Dank für Ihre Geduld!
     //HPF
     m_Operators["HPF"] = QSharedPointer<MNEOperator>(new FilterOperator("HPF",FilterOperator::HPF,m_iFilterTaps,0.15,0.2,0.1,(m_iWindowSize+m_iFilterTaps)));
     //LPF
     m_Operators["LPF"] = QSharedPointer<MNEOperator>(new FilterOperator("LPF",FilterOperator::LPF,m_iFilterTaps,0.08,0.2,0.1,(m_iWindowSize+m_iFilterTaps)));
 
+    //connect signal and slots
+    connect(&m_reloadFutureWatcher,&QFutureWatcher<QPair<MatrixXd,MatrixXd> >::finished,[this](){
+        insertReloadedData(m_reloadFutureWatcher.future().result());
+    });
+
+    connect(this,&RawModel::dataReloaded,this,&RawModel::updateOperatorsConcurrently);
 }
 
 //=============================================================================================================
@@ -80,7 +88,7 @@ RawModel::RawModel(QFile &qFile, QObject *parent)
 int RawModel::rowCount(const QModelIndex & /*parent*/) const
 {
     if(!m_chInfolist.empty())
-        return m_chInfolist.size();
+        return 10;//m_chInfolist.size();
     else return 0;
 }
 
@@ -175,17 +183,13 @@ QVariant RawModel::headerData(int section, Qt::Orientation orientation, int role
         switch(role) {
         case Qt::DisplayRole:
             return QVariant(data(chname).toString());
-//        case Qt::TextAlignmentRole:
-//            return QVariant();
         }
     }
 
     return QVariant();
 }
 
-
-//=============================================================================================================
-//non-virtual functions
+//*************************************************************************************************************
 
 bool RawModel::loadFiffData(QFile &qFile)
 {
@@ -197,6 +201,7 @@ bool RawModel::loadFiffData(QFile &qFile)
     m_pfiffIO = QSharedPointer<FiffIO>(new FiffIO(qFile));
     if(!m_pfiffIO->m_qlistRaw.empty()) {
         m_iAbsFiffCursor = m_pfiffIO->m_qlistRaw[0]->first_samp; //Set cursor somewhere into fiff file [in samples]
+        m_bStartReached = true;
         if(!m_pfiffIO->m_qlistRaw[0]->read_raw_segment(t_data, t_times, m_iAbsFiffCursor, m_iAbsFiffCursor+m_iWindowSize-1))
             return false;
     }
@@ -231,6 +236,20 @@ bool RawModel::writeFiffData(QFile &qFile)
     else return false;
 }
 
+//=============================================================================================================
+//non-virtual functions
+//private
+
+void RawModel::loadFiffInfos()
+{
+    //loads chinfos
+    for(qint32 i=0; i < m_pfiffIO->m_qlistRaw[0]->info.nchan; ++i)
+        m_chInfolist.append(m_pfiffIO->m_qlistRaw[0]->info.chs[i]);
+
+    //loads fiffInfo
+    m_fiffInfo = m_pfiffIO->m_qlistRaw[0]->info;
+}
+
 //*************************************************************************************************************
 
 void RawModel::clearModel() {
@@ -253,9 +272,46 @@ void RawModel::clearModel() {
 
 //*************************************************************************************************************
 
-extern void applyFilter(QModelIndexList arg1, ParksMcClellan::TPassType arg2);
+void RawModel::resetPosition(qint32 position) {
+    beginResetModel();
+
+    //reset members
+    m_data.clear();
+    m_procData.clear();
+    m_times.clear();
+
+    m_bStartReached = false;
+    m_bEndReached = false;
+    m_bReloading = false;
+
+    //calculate multiple integer of m_iWindowSize from beginning of Fiff file (rounded down)
+    qint32 distance = position - firstSample();
+    qint32 mult = floor(distance / m_iWindowSize);
+
+    m_iAbsFiffCursor = firstSample() + mult*m_iWindowSize;
+
+    MatrixXd t_data,t_times; //type is later on (when append to m_data) casted into MatrixXdR (Row-Major)
+
+    if(!m_pfiffIO->m_qlistRaw[0]->read_raw_segment(t_data, t_times, m_iAbsFiffCursor, m_iAbsFiffCursor+m_iWindowSize-1))
+        qDebug() << "RawModel: Error resetting position of Fiff file!";
+
+    //append loaded block
+    m_data.append(t_data);
+    m_procData.append(MatrixXdR::Zero(t_data.rows(),m_iWindowSize));
+    m_times.append(t_times);
+
+    emit dataChanged(createIndex(0,1),createIndex(m_chInfolist.size(),1));
+
+    endResetModel();
+    updateScrollPos(m_iCurAbsScrollPos-firstSample()); //little hack: if the m_iCurAbsScrollPos is now close to the edge -> force reloading w/o scrolling
+
+    qDebug() << "RawModel: Model Position RESET, samples from " << m_iAbsFiffCursor << "to" << m_iAbsFiffCursor+m_iWindowSize-1 << "reloaded.";
+}
+
+//*************************************************************************************************************
 
 void RawModel::reloadFiffData(bool before) {
+    m_bReloadBefore = before;
 
     //update scroll position
     fiff_int_t start,end;
@@ -266,7 +322,7 @@ void RawModel::reloadFiffData(bool before) {
 
         //check if start of fiff file is reached
         if(start < firstSample()) {
-//            qDebug() << "RawModel: Start of fiff file reached.";
+            qDebug() << "RawModel: Start of fiff file reached.";
             m_bStartReached = true;
             m_iAbsFiffCursor += m_iWindowSize;
             return;
@@ -278,45 +334,203 @@ void RawModel::reloadFiffData(bool before) {
 
         //check if end of fiff file is reached
         if(end > lastSample()) {
-//            qDebug() << "RawModel: End of fiff file reached.";
+            qDebug() << "RawModel: End of fiff file reached.";
             m_bEndReached = true;
             return;
         }
     }
 
-    //read data with respect to set start and end point
-    m_reloadFuture = QtConcurrent::run(this,&RawModel::readSegment,start,end);
-    m_reloadFutureWatcher.setFuture(m_reloadFuture);
-//    future.waitForFinished();
+    //read data with respect to start and end point
+    QFuture<QPair<MatrixXd,MatrixXd> > future = QtConcurrent::run(this,&RawModel::readSegment,start,end);
 
-    connect(&m_reloadFutureWatcher,&QFutureWatcher<QPair<MatrixXd,MatrixXd> >::finished,[this,before](){
-        insertReloadedData(m_reloadFutureWatcher.result(),before);
-    });
+    m_reloadFutureWatcher.setFuture(future);
 
 }
 //*************************************************************************************************************
 
 QPair<MatrixXd,MatrixXd> RawModel::readSegment(fiff_int_t from, fiff_int_t to) {
-    MatrixXd data,times;
     QPair<MatrixXd,MatrixXd> datatime;
 
-    if(!m_pfiffIO->m_qlistRaw[0]->read_raw_segment(data, times, from, to)) {
+    if(!m_pfiffIO->m_qlistRaw[0]->read_raw_segment(datatime.first, datatime.second, from, to)) {
         printf("RawModel: Error when reading raw data!");
         return datatime;
     }
-    else {
-        datatime.first = data;
-        datatime.second = times;
-        return datatime;
+
+    return datatime;
+}
+
+//=============================================================================================================
+//public SLOTS
+
+void RawModel::updateScrollPos(int value) {
+    m_iCurAbsScrollPos = firstSample()+value;
+    qDebug() << "RawModel: absolute Fiff Scroll Cursor" << m_iCurAbsScrollPos << "(m_iAbsFiffCursor" << m_iAbsFiffCursor << ", sizeOfPreloadedData" << sizeOfPreloadedData() << ")";
+
+    //if a scroll position is selected, which is not within the loaded data range -> reset position of model
+    if(m_iCurAbsScrollPos > (m_iAbsFiffCursor+sizeOfPreloadedData()) || m_iCurAbsScrollPos < m_iAbsFiffCursor) {
+        resetPosition(m_iCurAbsScrollPos);
+        return;
+    }
+
+    //reload data if ends of loaded range is reached
+    //front
+    if(!m_bReloading && (m_iCurAbsScrollPos-m_iAbsFiffCursor < m_reloadPos) && !m_bStartReached) {
+        m_bReloading = true;
+        qDebug() << "RawModel: Reload requested at FRONT of loaded fiff data.";
+        reloadFiffData(1);
+    }
+    //end
+    else if(!m_bReloading && m_iCurAbsScrollPos > m_iAbsFiffCursor+sizeOfPreloadedData()-m_reloadPos && !m_bEndReached) {
+        m_bReloading = true;
+        qDebug() << "RawModel: Reload requested at END of loaded fiff data.";
+        reloadFiffData(0);
     }
 }
 
-void RawModel::insertReloadedData(QPair<MatrixXd,MatrixXd> dataTimesPair, bool before) {
+//*************************************************************************************************************
+
+void RawModel::markChBad(QModelIndexList chlist, bool status)
+{
+    for(qint8 i=0; i < chlist.size(); ++i) {
+        if(status) {
+            m_fiffInfo.bads.append(m_chInfolist[chlist[i].row()].ch_name);
+            qDebug() << "RawModel:" << m_chInfolist[chlist[i].row()].ch_name << "marked as bad.";
+        }
+        else {
+            if(m_fiffInfo.bads.contains(m_chInfolist[chlist[i].row()].ch_name)) {
+                int index = m_fiffInfo.bads.indexOf(m_chInfolist[chlist[i].row()].ch_name);
+                m_fiffInfo.bads.removeAt(index);
+                qDebug() << "RawModel:" << m_chInfolist[chlist[i].row()].ch_name << "marked as good.";
+            }
+        }
+
+        emit dataChanged(chlist[i],chlist[i]);
+    }
+}
+
+//*************************************************************************************************************
+
+void RawModel::applyOperator(QModelIndex chan, QSharedPointer<MNEOperator>& operatorPtr, bool reset)
+{
+    //cast to QSharedPointer<FilterOperator>
+    QSharedPointer<FilterOperator> filter;
+    if(operatorPtr->m_OperatorType==MNEOperator::FILTER)
+        filter = operatorPtr.staticCast<FilterOperator>();
+
+    //iterate through m_data list in order to filter them all, ToDo: do not filter already filtered blocks -> check it somehow
+    for(qint8 j=0; j < m_data.size(); ++j) {
+        RowVectorXd tmp;
+        if(!m_assignedOperators.contains(chan.row()) || reset)
+            tmp = m_data[j].row(chan.row());
+        else
+            tmp = m_procData[j].row(chan.row());
+
+        m_procData[j].row(chan.row()) = filter->applyFFTFilter(tmp);
+    }
+
+    //adds filtered channel to m_assignedOperators
+    if(!m_assignedOperators.values(chan.row()).contains(operatorPtr)) m_assignedOperators.insertMulti(chan.row(),operatorPtr);
+
+    qDebug() << "RawModel: Filter" << filter->m_sName << "applied to channel#" << chan.row();
+
+    emit dataChanged(chan,chan);
+}
+
+//*************************************************************************************************************
+
+void RawModel::applyOperator(QModelIndexList chlist, QSharedPointer<MNEOperator>& operatorPtr, bool reset)
+{
+    //filter all when chlist is empty
+    if(chlist.empty()) {
+        for(qint32 i=0; i < m_chInfolist.size(); ++i)
+            chlist.append(createIndex(i,1));
+    }
+
+    for(qint32 i=0; i < chlist.size(); ++i) { //iterate through selected channels to filter
+        applyOperator(chlist[i],operatorPtr,reset);
+    }
+
+    qDebug() << "RawModel: using FilterType" << operatorPtr->m_sName;
+}
+
+//*************************************************************************************************************
+
+void RawModel::updateOperators(QModelIndex chan) {
+    for(qint32 i=0; i < m_assignedOperators.values(chan.row()).size(); ++i)
+        applyOperator(chan,m_assignedOperators.values(chan.row())[i],true);
+}
+
+//*************************************************************************************************************
+
+void RawModel::updateOperators(QModelIndexList chlist) {
+    if(chlist.empty())
+        for(qint32 i=0; i < m_chInfolist.size(); ++i)
+            chlist.append(createIndex(i,1));
+
+    for(qint32 i=0; i < chlist.size(); ++i) {
+        if(m_assignedOperators.contains(chlist[i].row()))
+            for(qint32 j=0; j < m_assignedOperators.values(chlist[i].row()).size(); ++j)
+                applyOperator(chlist[i],m_assignedOperators.values(chlist[i].row())[j],true);
+    }
+}
+
+//*************************************************************************************************************
+
+void RawModel::updateOperators() {
+    updateOperators(QModelIndexList());
+}
+
+//*************************************************************************************************************
+
+void RawModel::undoFilter(QModelIndexList chlist, QSharedPointer<MNEOperator> &filterPtr)
+{
+    for(qint32 i=0; i < chlist.size(); ++i) {
+        if(m_assignedOperators.contains(chlist[i].row()) && m_assignedOperators.values(chlist[i].row()).contains(filterPtr)) {
+            QMutableMapIterator<int,QSharedPointer<MNEOperator> > it(m_assignedOperators);
+            while(it.hasNext()) {
+                it.next();
+                if(it.key()==chlist[i].row() && it.value()==filterPtr) {
+                    it.remove();
+                    qDebug() << "RawModel: Filter operator removed of type" << filterPtr->m_sName << "for channel" << chlist[i].row();
+                    updateOperators(chlist[i]);
+                    continue;
+                }
+            }
+
+        }
+        else {
+            qDebug() << "RawModel: No filter of type" << filterPtr->m_sName << "applied to channel" << chlist[i].row();
+            continue;
+        }
+    }
+}
+
+//*************************************************************************************************************
+
+void RawModel::undoFilter(QModelIndexList chlist)
+{
+    for(qint32 i=0; i < chlist.size(); ++i) {
+        m_assignedOperators.remove(chlist[i].row());
+        qDebug() << "RawModel: All filter operator removed of type for channel" << chlist[i].row();
+    }
+}
+
+//*************************************************************************************************************
+
+void RawModel::undoFilter()
+{
+    m_assignedOperators.clear();
+}
+
+//*************************************************************************************************************
+//private SLOTS
+
+void RawModel::insertReloadedData(QPair<MatrixXd,MatrixXd> dataTimesPair) {
     //filter reloaded data
     MatrixXdR t_reloadProcData = MatrixXdR::Zero(m_chInfolist.size(),m_iWindowSize);
 
     //extend m_data with reloaded data
-    if(before) {
+    if(m_bReloadBefore) {
         m_data.prepend(dataTimesPair.first);
         m_procData.prepend(t_reloadProcData);
         m_times.prepend(dataTimesPair.second);
@@ -341,189 +555,17 @@ void RawModel::insertReloadedData(QPair<MatrixXd,MatrixXd> dataTimesPair, bool b
         }
     }
 
-    qDebug() << "RawModel: Fiff data REloaded from ";// << dataTimesPair.second(0) << "to" << end;
+    m_bReloading = false;
+
+    emit dataChanged(createIndex(0,1),createIndex(m_chInfolist.size(),1));
+    emit dataReloaded();
+
+    qDebug() << "RawModel: Fiff data REloaded from " << dataTimesPair.second.coeff(0) << "to" << dataTimesPair.second.coeff(dataTimesPair.second.cols()-1);
 }
 
 //*************************************************************************************************************
 
-void RawModel::applyOperator(QModelIndex chan, QSharedPointer<MNEOperator>& operatorPtr)
+void RawModel::updateOperatorsConcurrently()
 {
-    //cast to QSharedPointer<FilterOperator>
-    QSharedPointer<FilterOperator> filter;
-    if(operatorPtr->m_OperatorType==MNEOperator::FILTER)
-        filter = operatorPtr.staticCast<FilterOperator>();
-
-    //iterate through m_data list in order to filter them all, ToDo: do not filter already filtered blocks -> check it somehow
-    for(qint8 j=0; j < m_data.size(); ++j) {
-        RowVectorXd tmp;
-        if(!m_assignedOperators.contains(chan.row()))
-            tmp = m_data[j].row(chan.row());
-        else
-            tmp = m_procData[j].row(chan.row());
-
-        m_procData[j].row(chan.row()) = filter->applyFFTFilter(tmp);
-    }
-
-    //adds filtered channel to m_assignedOperators
-    if(!m_assignedOperators.values(chan.row()).contains(filter)) m_assignedOperators[chan.row()] = filter;
-
-    qDebug() << "RawModel: Filter" << filter->m_sName << "applied to channel#" << chan.row();
-}
-
-//*************************************************************************************************************
-
-void RawModel::applyOperator(QModelIndexList selected, QSharedPointer<MNEOperator>& operatorPtr)
-{    
-    //filter all when selected is empty
-    if(selected.empty()) {
-        for(qint32 i=0; i < m_chInfolist.size(); ++i)
-            selected.append(createIndex(i,1));
-    }
-
-    for(qint32 i=0; i < selected.size(); ++i) { //iterate through selected channels to filter
-        applyOperator(selected[i],operatorPtr);
-    }
-
-    qDebug() << "RawModel: using FilterType" << operatorPtr->m_sName;
-}
-
-//*************************************************************************************************************
-
-void RawModel::undoFilter(QModelIndexList selected, FilterOperator& filter)
-{
-//    for(qint32 i=0; i < selected.size(); ++i) {
-//        if(m_mapFilteredChannels[type].contains(selected[i].row())) {
-//            m_allFilteredChannels.removeOne(selected[i].row());
-//            m_mapFilteredChannels[type].removeOne(selected[i].row());
-//            qDebug() << "RawModel: Filter undone of type" << metaEnum.valueToKey(type) << "for channel" << selected[i].row();
-//        }
-//        else {
-//            qDebug() << "RawModel: No filter of type" << metaEnum.valueToKey(type) << "applied to channel" << selected[i].row();
-//            continue;
-//        }
-//    }
-}
-
-//*************************************************************************************************************
-
-void RawModel::undoFilter(QModelIndexList selected)
-{
-//    undoFilter(selected,m_filterOperators[0]);
-//    undoFilter(selected,m_filterOperators[1]);
-}
-
-//*************************************************************************************************************
-
-void RawModel::undoFilter()
-{
-    m_assignedOperators.clear();
-}
-
-//*************************************************************************************************************
-
-void RawModel::resetPosition(qint32 position) {
-    beginResetModel();
-
-    //reset members
-    m_data.clear();
-    m_procData.clear();
-    m_times.clear();
-
-    m_bStartReached = false;
-    m_bEndReached = false;
-
-    //calculate multiple integer of m_iWindowSize from beginning of Fiff file (rounded down)
-    qint32 distance = position - firstSample();
-    qint32 mult = floor(distance / m_iWindowSize);
-
-    m_iAbsFiffCursor = firstSample() + mult*m_iWindowSize;
-
-    MatrixXd t_data,t_times; //type is later on (when append to m_data) casted into MatrixXdR (Row-Major)
-
-    if(!m_pfiffIO->m_qlistRaw[0]->read_raw_segment(t_data, t_times, m_iAbsFiffCursor, m_iAbsFiffCursor+m_iWindowSize-1))
-        qDebug() << "RawModel: Error resetting position of Fiff file!";
-
-    //append loaded block
-    m_data.append(t_data);
-    m_procData.append(MatrixXdR::Zero(t_data.rows(),m_iWindowSize));
-    m_times.append(t_times);
-
-    QModelIndex topLeft = createIndex(0,1);
-    QModelIndex bottomRight = createIndex(m_chInfolist.size(),1);
-    emit dataChanged(topLeft,bottomRight);
-
-    endResetModel();
-
-    qDebug() << "RawModel: Model Position RESET, samples from " << m_iAbsFiffCursor << "to" << m_iAbsFiffCursor+m_iWindowSize-1 << "reloaded.";
-
-}
-
-//*************************************************************************************************************
-
-void RawModel::loadFiffInfos()
-{
-    //loads chinfos
-    for(qint32 i=0; i < m_pfiffIO->m_qlistRaw[0]->info.nchan; ++i)
-        m_chInfolist.append(m_pfiffIO->m_qlistRaw[0]->info.chs[i]);
-
-    //loads fiffInfo
-    m_fiffInfo = m_pfiffIO->m_qlistRaw[0]->info;
-}
-
-//*************************************************************************************************************
-
-double RawModel::maxDataValue(qint16 chan) const {
-    double dMax;
-
-//    double max = m_data[0].row(0).maxCoeff();
-//    double min = m_data[0].row(0).minCoeff();
-
-    dMax = (double) (m_chInfolist[chan].range*m_chInfolist[chan].cal)/2;
-
-    return dMax;
-}
-
-//=============================================================================================================
-//SLOTS
-
-void RawModel::reloadData(int value) {
-    m_iCurAbsScrollPos = firstSample()+value;
-    qDebug() << "RawModel: absolute Fiff Scroll Cursor" << m_iCurAbsScrollPos << "(m_iAbsFiffCursor" << m_iAbsFiffCursor << ", sizeOfPreloadedData" << sizeOfPreloadedData() << ")";
-
-    //if a scroll position is selected, which is not ym_iFiffCursoret loaded, reset position of model
-    if(m_iCurAbsScrollPos > (m_iAbsFiffCursor+sizeOfPreloadedData()) || m_iCurAbsScrollPos < m_iAbsFiffCursor) {
-        resetPosition(m_iCurAbsScrollPos);
-        return;
-    }
-
-    if((m_iCurAbsScrollPos-m_iAbsFiffCursor) < m_reloadPos && !m_bStartReached) {
-        qDebug() << "RawModel: Reload requested at FRONT of loaded fiff data.";
-        reloadFiffData(1);
-    }
-    else if(m_iCurAbsScrollPos > m_iAbsFiffCursor+sizeOfPreloadedData()-m_reloadPos && !m_bEndReached) {
-        qDebug() << "RawModel: Reload requested at END of loaded fiff data.";
-        reloadFiffData(0);
-//        QFuture<void> future = QtConcurrent::run(this,&RawModel::reloadFiffData,0);
-    }
-}
-
-//*************************************************************************************************************
-
-void RawModel::markChBad(QModelIndexList selected, bool status)
-{
-    for(qint8 i=0; i < selected.size(); ++i) {
-        if(status) {
-            m_fiffInfo.bads.append(m_chInfolist[selected[i].row()].ch_name);
-            qDebug() << "RawModel:" << m_chInfolist[selected[i].row()].ch_name << "marked as bad.";
-        }
-        else {
-            if(m_fiffInfo.bads.contains(m_chInfolist[selected[i].row()].ch_name)) {
-                int index = m_fiffInfo.bads.indexOf(m_chInfolist[selected[i].row()].ch_name);
-                m_fiffInfo.bads.removeAt(index);
-                qDebug() << "RawModel:" << m_chInfolist[selected[i].row()].ch_name << "marked as good.";
-            }
-        }
-
-        emit dataChanged(selected[i],selected[i]);
-    }
+    qDebug() << "updateOperatorMT";
 }
