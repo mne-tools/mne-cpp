@@ -224,6 +224,7 @@ bool MNESourceSpace::readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, 
 
 MNESourceSpace MNESourceSpace::selectRegions(const QList<Label> &p_qListLabels) const
 {
+    Q_UNUSED(p_qListLabels);
 //    QList<VectorXi> vertno;
 //    vertno << this->m_qListHemispheres[0].vertno << this->m_qListHemispheres[1].vertno;
 

@@ -165,12 +165,17 @@ public:
 
     virtual MNESourceEstimate calculateInverse(const FiffEvoked &p_fiffEvoked, bool pick_normal = false)
     {
+        Q_UNUSED ( p_fiffEvoked );
+        Q_UNUSED ( pick_normal );
         MNESourceEstimate p_sourceEstimate;
         return p_sourceEstimate;
     }
 
     virtual MNESourceEstimate calculateInverse(const MatrixXd &data, float tmin, float tstep) const
     {
+        Q_UNUSED ( data );
+        Q_UNUSED ( tmin );
+        Q_UNUSED ( tstep );
         MNESourceEstimate p_sourceEstimate;
         return p_sourceEstimate;
     }
