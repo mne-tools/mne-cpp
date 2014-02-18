@@ -144,7 +144,7 @@ void MainWindow::setupViewSettings() {
     QScroller::grabGesture(m_pTableView,QScroller::MiddleMouseButtonGesture);
 
     //connect QScrollBar with model in order to reload data samples
-    connect(m_pTableView->horizontalScrollBar(),SIGNAL(valueChanged(int)),m_pRawModel,SLOT(reloadData(int)));
+    connect(m_pTableView->horizontalScrollBar(),SIGNAL(valueChanged(int)),m_pRawModel,SLOT(updateScrollPos(int)));
 }
 
 //*************************************************************************************************************
@@ -265,15 +265,19 @@ void MainWindow::customContextMenuRequested(QPoint pos)
 
     //create custom context menu and actions
     QMenu *menu = new QMenu(this);
+    menu->addSection("Marking channels");
     QAction* doMarkChBad = menu->addAction(tr("Mark as bad"));
     QAction* doMarkChGood = menu->addAction(tr("Mark as good"));
+    menu->addSection("Applying FilterOperators");
     QAction* doApplyHPFFilter = menu->addAction(tr("Apply HPF to selected channels"));
     QAction* doApplyLPFFilter = menu->addAction(tr("Apply LPF to selected channels"));
     QAction* doApplyHPFFilterAll = menu->addAction(tr("Apply HPF to all channels"));
     QAction* doApplyLPFFilterAll = menu->addAction(tr("Apply LPF to all channels"));
-//    QAction* undoApplyHPFFilter = menu->addAction(tr("Undo HPF"));
-//    QAction* undoApplyLPFFilter = menu->addAction(tr("Undo LPF"));
-    QAction* undoApplyFilter = menu->addAction(tr("Undo all filtering to all channels"));
+    menu->addSection("Undoing FilterOperators");
+    QAction* undoApplyHPFFilter = menu->addAction(tr("Undo HPF to selected channel"));
+    QAction* undoApplyLPFFilter = menu->addAction(tr("Undo LPF to selected channel"));
+    QAction* undoApplyFilter = menu->addAction(tr("Undo all filtering to selected channels"));
+    QAction* undoApplyFilterAll = menu->addAction(tr("Undo all filtering to all channels"));
 
     //get selected items
     QModelIndexList selected = m_pTableView->selectionModel()->selectedIndexes();
@@ -299,13 +303,16 @@ void MainWindow::customContextMenuRequested(QPoint pos)
     connect(doApplyLPFFilterAll,&QAction::triggered, [=](){
         m_pRawModel->applyOperator(QModelIndexList(),m_pRawModel->m_Operators["LPF"]);
     });
-//    connect(undoApplyHPFFilter,&QAction::triggered, [=](){
-//        m_pRawModel->undoFilter(selected,m_pRawModel->m_filterOperators[0]);
-//    });
-//    connect(undoApplyLPFFilter,&QAction::triggered, [=](){
-//        m_pRawModel->undoFilter(selected,m_pRawModel->m_filterOperators[1]);
-//    });
+    connect(undoApplyHPFFilter,&QAction::triggered, [=](){
+        m_pRawModel->undoFilter(selected,m_pRawModel->m_Operators["HPF"]);
+    });
+    connect(undoApplyLPFFilter,&QAction::triggered, [=](){
+        m_pRawModel->undoFilter(selected,m_pRawModel->m_Operators["LPF"]);
+    });
     connect(undoApplyFilter,&QAction::triggered, [=](){
+        m_pRawModel->undoFilter(selected);
+    });
+    connect(undoApplyFilterAll,&QAction::triggered, [=](){
         m_pRawModel->undoFilter();
     });
 
