@@ -114,8 +114,8 @@ MNEHemisphere::MNEHemisphere(const MNEHemisphere& p_MNEHemisphere)
 , use_tri_cent(p_MNEHemisphere.use_tri_cent)
 , use_tri_nn(p_MNEHemisphere.use_tri_nn)
 , use_tri_area(p_MNEHemisphere.use_tri_area)
-, m_TriCoords(p_MNEHemisphere.m_TriCoords)
 , cluster_info(p_MNEHemisphere.cluster_info)
+, m_TriCoords(p_MNEHemisphere.m_TriCoords)
 {
     //*m_pGeometryData = *p_MNEHemisphere.m_pGeometryData;
 }

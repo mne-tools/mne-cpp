@@ -113,3 +113,5 @@ INSTALLS += header_files
 
 OTHER_FILES += \
     mne.pro
+
+unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
