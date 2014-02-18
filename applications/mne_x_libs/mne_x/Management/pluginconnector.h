@@ -117,6 +117,14 @@ public:
      */
     virtual bool isOutputConnector() const = 0;
 
+    //=========================================================================================================
+    /**
+     * Returns the PluginConnectors name.
+     *
+     * @return the PluginConnectors name
+     */
+    inline QString getName() const;
+
 signals:
 
 
@@ -133,6 +141,16 @@ private:
     QString m_sDescription; /**< Connection description */
 
 };
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+QString PluginConnector::getName() const
+{
+    return m_sName;
+}
 
 } // NAMESPACE
 

@@ -66,6 +66,20 @@
 namespace MNEX
 {
 
+//*************************************************************************************************************
+/**
+* Connector Data Type
+*/
+enum ConnectorDataType
+{
+    _N,         /**< Numeric */
+    _RTMSA,     /**< Real-Time Multi Sample Array */
+    _RTSA,      /**< Real-Time Sample Array */
+    _RTSE,      /**< Real-Time Source Estimate */
+    _None,      /**< None */
+};
+
+
 //=============================================================================================================
 /**
 * Class implements plug-in connector connections.
@@ -98,6 +112,8 @@ public:
     * Create connection
     */
     static inline QSharedPointer<PluginConnectorConnection> create(IPlugin::SPtr sender, IPlugin::SPtr receiver, QObject *parent = 0);
+
+    static ConnectorDataType getDataType(QSharedPointer<PluginConnector> pPluginConnector);
 
     inline IPlugin::SPtr& getSender();
 
