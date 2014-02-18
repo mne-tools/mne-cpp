@@ -44,6 +44,15 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include <QGridLayout>
+#include <QComboBox>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
@@ -61,24 +70,52 @@ PluginConnectorConnectionWidget::PluginConnectorConnectionWidget(PluginConnector
 , m_pPluginConnectorConnection(pPluginConnectorConnection)
 {
 
-    QWidget *topFiller = new QWidget;
-    topFiller->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    QWidget *rightFiller = new QWidget;
+    rightFiller->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+    QWidget *bottomFiller = new QWidget;
+    bottomFiller->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
     QString sSender = m_pPluginConnectorConnection->getSender()->getName();
     QString sReceiver = m_pPluginConnectorConnection->getReceiver()->getName();
 
     m_pLabel = new QLabel(tr("Connector Connection: ")+sSender+" -> "+sReceiver, this);
-    m_pLabel->setFrameStyle(QFrame::StyledPanel | QFrame::Sunken);
-    m_pLabel->setAlignment(Qt::AlignCenter);
+    m_pLabel->setStyleSheet("border: 0px; font-size: 14px; font-weight: bold;");
 
-    QWidget *bottomFiller = new QWidget;
-    bottomFiller->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-    QVBoxLayout *layout = new QVBoxLayout;
+    qint32 curRow = 0;
+
+    QGridLayout *layout = new QGridLayout;
     layout->setMargin(5);
-    layout->addWidget(topFiller);
-    layout->addWidget(m_pLabel);
-    layout->addWidget(bottomFiller);
+    layout->addWidget(m_pLabel,curRow,0,1,3);
+    ++curRow;
+
+    for(qint32 i = 0; i < m_pPluginConnectorConnection->getSender()->getOutputConnectors().size(); ++i)
+    {
+        QComboBox* m_pComboBox = new QComboBox(this);
+        QLabel* m_pLabelOutput = new QLabel(m_pPluginConnectorConnection->getSender()->getOutputConnectors()[i]->getName(),this);
+        layout->addWidget(m_pLabelOutput,curRow,0);
+
+        ConnectorDataType t_senderConnectorDataType = PluginConnectorConnection::getDataType(m_pPluginConnectorConnection->getSender()->getOutputConnectors()[i]);
+
+        m_pComboBox->addItem("----");
+
+        for(qint32 j = 0; j < m_pPluginConnectorConnection->getReceiver()->getInputConnectors().size(); ++j)
+        {
+            ConnectorDataType t_receiverConnectorDataType = PluginConnectorConnection::getDataType(m_pPluginConnectorConnection->getReceiver()->getInputConnectors()[j]);
+            if(t_senderConnectorDataType == t_receiverConnectorDataType)
+                m_pComboBox->addItem(m_pPluginConnectorConnection->getReceiver()->getInputConnectors()[j]->getName());
+        }
+
+        layout->addWidget(m_pComboBox,curRow,1);
+        ++curRow;
+    }
+
+
+    layout->addWidget(bottomFiller,curRow,0);
+    ++curRow;
+
+    layout->addWidget(rightFiller,1,3,curRow-1,1);
 
     this->setLayout(layout);
 }
