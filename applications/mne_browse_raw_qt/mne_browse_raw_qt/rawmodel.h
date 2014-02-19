@@ -87,7 +87,7 @@ class RawModel : public QAbstractTableModel
     Q_OBJECT
 public:
     RawModel(QObject *parent);
-    RawModel(QFile &qFile, QObject *parent);
+    RawModel(QFile& qFile, QObject *parent);
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const ;
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
     virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
@@ -99,7 +99,7 @@ public:
     *
     * @param p_IODevice fiff data file to write
     */
-    bool loadFiffData(QFile &qFile);
+    bool loadFiffData(QFile& qFile);
 
     /**
      * writeFiffData writes a new fiff data file
@@ -173,10 +173,17 @@ private:
     //Reload control
     bool m_bStartReached; /**< signals, whether the start of the fiff data file is reached */
     bool m_bEndReached; /**< signals, whether the end of the fiff data file is reached */
-    bool m_bReloading; /**< signals when the reloading is ongoing */
-    bool m_bReloadBefore; /**< */
+    bool m_bReloadBefore; /**< bool value indicating if data was reloaded before (1) or after (0) the existing data */
 
-    QFutureWatcher<QPair<MatrixXd,MatrixXd> > m_reloadFutureWatcher;
+    //Concurrent reloading
+    QFutureWatcher<QPair<MatrixXd,MatrixXd> > m_reloadFutureWatcher; /**< QFutureWatcher for watching process of reloading fiff data */
+    bool m_bReloading; /**< signals when the reloading is ongoing */
+
+    //Concurrent processing
+//    QFutureWatcher<QPair<int,RowVectorXd> > m_operatorFutureWatcher; /**< QFutureWatcher for watching process of applying Operators to reloaded fiff data */
+    QFutureWatcher<void> m_operatorFutureWatcher; /**< QFutureWatcher for watching process of applying Operators to reloaded fiff data */
+    QList<QPair<int,RowVectorXd> > m_listTmpChData;
+    bool m_bProcessing;
 
 signals:
     void dataReloaded();
@@ -209,6 +216,12 @@ public slots:
      * @param filter
      */
     void applyOperator(QModelIndexList chlist, QSharedPointer<MNEOperator>& operatorPtr, bool reset=false);
+
+    /**
+     * applyOperatorsConcurrently updates all applied MNEOperators to a given RowVectorXd and modifies it in-place
+     * @param chdata[in,out] represents the channel data as a RowVectorXd
+     */
+    void applyOperatorsConcurrently(QPair<int, RowVectorXd>& chdata);
 
     /**
      * updateOperators updates all set operator to channels according to m_assignedOperators
@@ -249,6 +262,10 @@ private slots:
     void insertReloadedData(QPair<MatrixXd,MatrixXd> dataTimesPair);
 
     void updateOperatorsConcurrently();
+
+    void insertProcessedData(int index);
+
+    void insertProcessedData();
 
 //Inline
 public:
