@@ -69,6 +69,8 @@
 #include <QDebug>
 #include <QPainter>
 
+#include <QMessageBox>
+
 //MNE
 #include <fiff/fiff.h>
 #include <mne/mne.h>
@@ -82,6 +84,10 @@
 #include "info.h"
 #include "types.h"
 #include "rawsettings.h"
+
+//Eigen
+#include <Eigen/Core>
+#include <Eigen/SparseCore>
 
 //*************************************************************************************************************
 // namespaces
@@ -126,6 +132,11 @@ private slots:
      * openFile opens a file dialog that lets choose the location and the file name of the fiff data file to write.
      */
     void writeFile();
+
+    /**
+     * about opens the about dialog
+     */
+    void about();
 
 signals:
     void testSignal();
