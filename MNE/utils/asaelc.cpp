@@ -135,7 +135,7 @@ bool AsAElc::readElcFile(QString path, QStringList &channelNames, QVector<QVecto
         }
     }
 
-    Q_UNUSED ( numberElectrodes );
+    Q_UNUSED(numberElectrodes);
 
     file.close();
 
