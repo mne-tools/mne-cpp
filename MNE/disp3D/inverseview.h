@@ -205,24 +205,22 @@ private:
     //GL Stuff
     bool m_bStereo;
 
+    float m_fOffsetZ;                               /**< Z offset for pop-out effect. */
+    float m_fOffsetZEye;                            /**< Z offset eye. */
+    QGLSceneNode *m_pSceneNodeBrain;                /**< Scene node of the hemisphere models. */
+    QGLSceneNode *m_pSceneNode;                     /**< Node of the scene. */
+
     QGLLightModel *m_pLightModel;                   /**< The selected light model. */
     QGLLightParameters *m_pLightParametersScene;    /**< The selected light parameters. */
 
     QGLColorMaterial material;
 
-    QGLSceneNode *m_pSceneNodeBrain;                /**< Scene node of the hemisphere models. */
+
     QVector3D m_vecBoundingBoxMin;                  /**< X, Y, Z minima. */
     QVector3D m_vecBoundingBoxMax;                  /**< X, Y, Z maxima. */
     QVector3D m_vecBoundingBoxCenter;               /**< X, Y, Z center. */
 
-    float m_fOffsetZ;                               /**< Z offset for pop-out effect. */
-    float m_fOffsetZEye;                            /**< Z offset eye. */
-
-
-    QGLSceneNode *m_pSceneNode;                     /**< Node of the scene. */
-
-//    QGLCamera *m_pCameraFrontal;     /**< frontal camera. */
-
+    //    QGLCamera *m_pCameraFrontal;     /**< frontal camera. */
 
     QList< QMap<qint32, qint32> > m_qListMapLabelIdIndex;
 
