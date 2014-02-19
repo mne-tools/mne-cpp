@@ -170,12 +170,13 @@ protected:
     virtual void run();
 
 private:
-    FiffInfo::SPtr  m_pFiffInfo;        /**< Holds the fiff measurement information. */
-
     QMutex      mutex;                  /**< Provides access serialization between threads*/
-    bool        m_bIsRunning;           /**< Holds if real-time Covariance estimation is running.*/
 
     quint32      m_iMaxSamples;         /**< Maximal amount of samples received, before covariance is estimated.*/
+
+    FiffInfo::SPtr  m_pFiffInfo;        /**< Holds the fiff measurement information. */
+
+    bool        m_bIsRunning;           /**< Holds if real-time Covariance estimation is running.*/
 
     CircularMatrixBuffer<double>::SPtr m_pRawMatrixBuffer;   /**< The Circular Raw Matrix Buffer. */
 };
