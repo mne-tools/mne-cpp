@@ -114,6 +114,7 @@ public:
     * @param [in] sOutpuFilePath Holds the path for the output file. Defined by the user via the GUI.
     * @param [in] bWriteDriverDebugToFile Flag for writing the received samples to a file. Defined by the user via the GUI.
     * @param [in] bUseUnitOffset Flag for using the channels unit offset. Defined by the user via the GUI.
+    * @param [in] bUseCommonAverage Flag for using common average when recording EEG data. Defined by the user via the GUI.
     */
     virtual void start(int iNumberOfChannels,
                        int iSamplingFrequency,
@@ -122,7 +123,8 @@ public:
                        bool bUseUnitGain,
                        bool bUseUnitOffset,
                        bool bWriteDriverDebugToFile,
-                       QString sOutputFilePath);
+                       QString sOutputFilePath,
+                       bool bUseCommonAverage);
 
     //=========================================================================================================
     /**

@@ -68,6 +68,7 @@ TMSIDriver::TMSIDriver(TMSIProducer* pTMSIProducer)
 , m_bUseUnitOffset(false)
 , m_bWriteDriverDebugToFile(false)
 , m_sOutputFilePath("/mne_x_plugins/resources/tmsi")
+, m_bUseCommonAverage(false)
 {
     //Initialise NULL pointers
     m_oLibHandle = NULL ;
@@ -112,6 +113,7 @@ TMSIDriver::TMSIDriver(TMSIProducer* pTMSIProducer)
     __load_dll_func__(m_oFpLibraryExit, PLIBRARYEXIT, "LibraryExit");
     __load_dll_func__(m_oFpGetDeviceList, PGETDEVICELIST, "GetDeviceList");
     __load_dll_func__(m_oFpGetFrontEndInfo, PGETFRONTENDINFO, "GetFrontEndInfo");
+    __load_dll_func__(m_oFpSetRefCalculation, PSETREFCALCULATION, "SetRefCalculation");
 
     cout << "Plugin TMSI - INFO - TMSIDriver() - Successfully loaded all DLL functions" << endl;
 }
@@ -134,7 +136,8 @@ bool TMSIDriver::initDevice(int iNumberOfChannels,
                             bool bUseUnitGain,
                             bool bUseUnitOffset,
                             bool bWriteDriverDebugToFile,
-                            QString sOutpuFilePath)
+                            QString sOutpuFilePath,
+                            bool bUseCommonAverage)
 {
     //Check if the driver DLL was loaded
     if(!m_bDllLoaded)
@@ -149,6 +152,7 @@ bool TMSIDriver::initDevice(int iNumberOfChannels,
     m_bUseUnitOffset = bUseUnitOffset;
     m_bWriteDriverDebugToFile = bWriteDriverDebugToFile;
     m_sOutputFilePath = sOutpuFilePath;
+    m_bUseCommonAverage = bUseCommonAverage;
 
     //Open file to write to
     if(m_bWriteDriverDebugToFile)
@@ -212,6 +216,16 @@ bool TMSIDriver::initDevice(int iNumberOfChannels,
         baseSf = FrontEndInfo.BaseSf;
         maxRS232 = FrontEndInfo.maxRS232;
         nrOfChannels = FrontEndInfo.NrOfChannels;
+    }
+
+    // Set Ref Calculation
+    if(m_bUseCommonAverage)
+    {
+        BOOLEAN setRefCalculation = m_oFpSetRefCalculation(m_HandleMaster, 1);
+        if(setRefCalculation)
+            cout << "Plugin TMSI - INFO - initDevice() - Common average now active" << endl;
+        else
+            cout << "Plugin TMSI - INFO - initDevice() - Common average is inactive (Could not be initiated)" << endl;
     }
 
     //Get information about the signal format created by the device - UnitExponent, UnitGain, UnitOffSet
@@ -382,7 +396,7 @@ bool TMSIDriver::uninitDevice()
             {
                 for(int channelIterator = 0; channelIterator < channelMax; channelIterator++)
                 {
-                    sampleMatrix(channelIterator, sampleIterator) = (m_vSampleBlockBuffer.first() * (m_bUseUnitGain ? m_vUnitGain[channelIterator] : 1) + (m_bUseUnitOffset ? m_vUnitOffSet[channelIterator] : 0)) * (m_bUseChExponent ? pow(10., (double)m_vExponentChannel[channelIterator]) : 1);
+                    sampleMatrix(channelIterator, sampleIterator) = ((m_vSampleBlockBuffer.first() * (m_bUseUnitGain ? m_vUnitGain[channelIterator] : 1)) + (m_bUseUnitOffset ? m_vUnitOffSet[channelIterator] : 0)) * (m_bUseChExponent ? pow(10., (double)m_vExponentChannel[channelIterator]) : 1);
                     m_vSampleBlockBuffer.pop_front();
                 }
 

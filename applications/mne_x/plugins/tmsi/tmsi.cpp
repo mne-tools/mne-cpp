@@ -113,14 +113,15 @@ void TMSI::init()
     m_iTriggerInterval = 5000;
 
     m_bUseChExponent = true;
-    m_bUseUnitGain = false;
-    m_bUseUnitOffset = false;
+    m_bUseUnitGain = true;
+    m_bUseUnitOffset = true;
     m_bWriteToFile = false;
     m_bWriteDriverDebugToFile = false;
     m_bUseFiltering = false;
     m_bUseFFT = false;
     m_bIsRunning = false;
     m_bShowEventTrigger = false;
+    m_bUseCommonAverage = false;
 
     m_sOutputFilePath = QString("./mne_x_plugins/resources/tmsi/EEG_data_001_raw.fif");
     m_sElcFilePath = QString("./mne_x_plugins/resources/tmsi/loc_files/Lorenz-Duke128-28-11-2013.elc");
@@ -489,7 +490,8 @@ bool TMSI::start()
                        m_bUseUnitGain,
                        m_bUseUnitOffset,
                        m_bWriteDriverDebugToFile,
-                       m_sOutputFilePath);
+                       m_sOutputFilePath,
+                       m_bUseCommonAverage);
 
     if(m_pTMSIProducer->isRunning())
     {

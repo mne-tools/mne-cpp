@@ -84,7 +84,8 @@ void TMSIProducer::start(int iNumberOfChannels,
                      bool bUseUnitGain,
                      bool bUseUnitOffset,
                      bool bWriteDriverDebugToFile,
-                     QString sOutputFilePath)
+                     QString sOutputFilePath,
+                     bool bUseCommonAverage)
 {
     //Initialise device
     if(m_pTMSIDriver->initDevice(iNumberOfChannels,
@@ -94,7 +95,8 @@ void TMSIProducer::start(int iNumberOfChannels,
                               bUseUnitGain,
                               bUseUnitOffset,
                               bWriteDriverDebugToFile,
-                              sOutputFilePath))
+                              sOutputFilePath,
+                              bUseCommonAverage))
     {
         m_bIsRunning = true;
         QThread::start();

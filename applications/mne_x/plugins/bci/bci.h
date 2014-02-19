@@ -45,8 +45,11 @@
 #include "bci_global.h"
 
 #include <mne_x/Interfaces/IAlgorithm.h>
-#include <generics/circularbuffer.h>
+
+#include <generics/circularmatrixbuffer.h>
+
 #include <xMeas/newrealtimesamplearray.h>
+#include <xMeas/newrealtimemultisamplearray.h>
 #include <xMeas/realtimesourceestimate.h>
 
 //*************************************************************************************************************
@@ -137,7 +140,8 @@ public:
 
     virtual QWidget* setupWidget();
 
-    void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
+    void updateSensor(XMEASLIB::NewMeasurement::SPtr pMeasurement);
+    void updateSource(XMEASLIB::NewMeasurement::SPtr pMeasurement);
 
 protected:
     //=========================================================================================================
@@ -150,15 +154,23 @@ protected:
 
 private:
     PluginOutputData<NewRealTimeSampleArray>::SPtr      m_pBCIOutput;       /**< The RealTimeSampleArray of the BCI output.*/
-    PluginInputData<RealTimeSourceEstimate>::SPtr       m_pRTSEInput;       /**< The RealTimeMultiSampleArray input.*/
 
-    bool                m_bIsRunning;                       /**< Whether BCI is running.*/
+    PluginInputData<NewRealTimeMultiSampleArray>::SPtr  m_pRTMSAInput;      /**< The RealTimeMultiSampleArray input.*/
+    PluginInputData<RealTimeSourceEstimate>::SPtr       m_pRTSEInput;       /**< The RealTimeSourceEstimate input.*/
 
-    qint32              m_iNumChs;
+    CircularMatrixBuffer<double>::SPtr                  m_pBCIBuffer_Sensor;/**< Holds incoming sensor level data.*/
+    CircularMatrixBuffer<double>::SPtr                  m_pBCIBuffer_Source;/**< Holds incoming source level data.*/
 
-    QString             m_qStringResourcePath;              /**< The path to the BCI resource directory.*/
+    bool                m_bIsRunning;                                       /**< Whether BCI is running.*/
+    bool                m_bProcessData;                                     /**< Whether BCI is to get data out of the continous input data stream, i.e. the EEG data from sensor level.*/
+
+    qint32              m_iNumChs_Sensor;
+    qint32              m_iNumChs_Source;
+
+    QString             m_qStringResourcePath;                              /**< The path to the BCI resource directory.*/
     QMutex              m_qMutex;
-    QVector<double>     m_pData;
+
+    FiffInfo::SPtr      m_pFiffInfo_Sensor;                                 /**< Fiff information for sensor data. */
 };
 
 } // NAMESPACE
