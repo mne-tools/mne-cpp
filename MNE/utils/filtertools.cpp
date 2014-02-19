@@ -80,10 +80,10 @@ void FilterTools::getStaticFilter(QString type, qint32 numberOfCoefficients, qin
         //BP from matlab
     }
 
-    Q_UNUSED ( numberOfCoefficients );
-    Q_UNUSED ( samplingRate );
-    Q_UNUSED ( cutOffFreq );
-    Q_UNUSED ( impulseResponse );
+    Q_UNUSED(numberOfCoefficients);
+    Q_UNUSED(samplingRate);
+    Q_UNUSED(cutOffFreq);
+    Q_UNUSED(impulseResponse);
 }
 
 //*************************************************************************************************************

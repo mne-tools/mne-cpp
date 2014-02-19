@@ -82,7 +82,8 @@ using namespace UTILSLIB;
 //=============================================================================================================
 
 ParksMcClellan::ParksMcClellan()
-: ExchangeIndex(0)
+: FirCoeff(0)
+, ExchangeIndex(0)
 , LeGrangeD(0)
 , Alpha(0)
 , CosOfGrid(0)
@@ -94,7 +95,6 @@ ParksMcClellan::ParksMcClellan()
 , DesiredMag(0)
 , Grid(0)
 , Weight(0)
-, FirCoeff(0)
 {
 }
 
@@ -102,7 +102,8 @@ ParksMcClellan::ParksMcClellan()
 //*************************************************************************************************************
 
 ParksMcClellan::ParksMcClellan(int NumTaps, double OmegaC, double BW, double ParksWidth, TPassType PassType)
-: ExchangeIndex(SMALL)
+: FirCoeff(BIG)
+, ExchangeIndex(SMALL)
 , LeGrangeD(SMALL)
 , Alpha(SMALL)
 , CosOfGrid(SMALL)
@@ -114,7 +115,6 @@ ParksMcClellan::ParksMcClellan(int NumTaps, double OmegaC, double BW, double Par
 , DesiredMag(BIG)
 , Grid(BIG)
 , Weight(BIG)
-, FirCoeff(BIG)
 {
     init(NumTaps, OmegaC, BW, ParksWidth, PassType);
 }

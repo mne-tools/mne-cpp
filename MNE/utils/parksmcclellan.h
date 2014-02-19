@@ -166,6 +166,8 @@ public:
     */
     void CalcCoefficients();
 
+    std::vector<double> FirCoeff; /**< containt the generated filter coefficients */
+
 private:
     int HalfTapCount;
     std::vector<int> ExchangeIndex;
@@ -180,8 +182,6 @@ private:
     std::vector<double> DesiredMag;
     std::vector<double> Grid;
     std::vector<double> Weight;
-
-    std::vector<double> FirCoeff; /**< containt the generated filter coefficients */
 
     bool InitDone2;
 

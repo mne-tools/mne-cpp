@@ -278,11 +278,11 @@ MatrixXd MNEMath::legendre(qint32 n, const VectorXd &X, QString normalize)
 {
     MatrixXd y;
 
-    Q_UNUSED ( y );
+    Q_UNUSED(y);
 
-    Q_UNUSED ( n );
-    Q_UNUSED ( X );
-    Q_UNUSED ( normalize );
+    Q_UNUSED(n);
+    Q_UNUSED(X);
+    Q_UNUSED(normalize);
 
     //ToDo
 
