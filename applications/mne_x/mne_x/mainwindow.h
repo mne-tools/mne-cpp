@@ -108,6 +108,8 @@ class NewDisplayManager;
 
 class IPlugin;
 
+class PluginConnectorConnection;
+
 class RunWidget;
 class PluginDockWidget;
 
@@ -258,7 +260,10 @@ private:
     LogLevel                             m_eLogLevelCurrent;            /**< Holds the current log level.*/
 
 
-    void updatePluginWidget(QSharedPointer<IPlugin> pPlugin);     /**< Sets a widget to central widget of MainWindow class depending on the current plugin selected in m_pDockWidgetPlugins.*/
+    void updatePluginWidget(QSharedPointer<IPlugin> pPlugin);           /**< Sets the plugin widget to central widget of MainWindow class depending on the current plugin selected in m_pDockWidgetPlugins.*/
+
+    void updateConnectionWidget(QSharedPointer<PluginConnectorConnection> pConnection);   /**< Sets the connection widget to central widget of MainWindow class depending on the current arrow selected in m_pDockWidgetPlugins.*/
+
 
 private slots:
     void newConfiguration();            /**< Implements new configuration tasks.*/

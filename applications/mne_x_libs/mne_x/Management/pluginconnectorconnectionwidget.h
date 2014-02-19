@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     arrow.h
+* @file     pluginconnectorconnectionwidget.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     August, 2013
+* @date     February, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,20 +29,18 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     Arrow class declaration
+* @brief    Contains the declaration of the PluginConnectorConnectionWidget class.
 *
 */
-
-#ifndef ARROW_H
-#define ARROW_H
+#ifndef PLUGINCONNECTORCONNECTIONWIDGET_H
+#define PLUGINCONNECTORCONNECTIONWIDGET_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "pluginitem.h"
-#include <mne_x/Management/pluginconnectorconnection.h>
+#include "../mne_x_global.h"
 
 
 //*************************************************************************************************************
@@ -50,21 +48,8 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QSharedPointer>
-#include <QGraphicsLineItem>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-class QGraphicsPolygonItem;
-class QGraphicsLineItem;
-class QGraphicsScene;
-class QRectF;
-class QGraphicsSceneMouseEvent;
-class QPainterPath;
+#include <QLabel>
+#include <QWidget>
 
 
 //*************************************************************************************************************
@@ -75,37 +60,47 @@ class QPainterPath;
 namespace MNEX
 {
 
-class Arrow : public QGraphicsLineItem
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+class PluginConnectorConnection;
+
+
+//=============================================================================================================
+/**
+* Class implements the plug-in connector connection widget.
+*
+* @brief The PluginConnectorConnectionWidget class provides an user interface for connector connections
+*/
+class MNE_X_SHARED_EXPORT PluginConnectorConnectionWidget : public QWidget
 {
+    Q_OBJECT
 public:
-    enum { Type = UserType + 4 };
 
-    Arrow(PluginItem *startItem, PluginItem *endItem, PluginConnectorConnection::SPtr &connection, QGraphicsItem *parent = 0);
+    //=========================================================================================================
+    /**
+    * Constructs a PluginConnectorConnectionWidget which is a child of parent.
+    *
+    * @param [in] parent pointer to parent widget; If parent is 0, the new PluginConnectorConnectionWidget becomes a window. If parent is another widget, PluginConnectorConnectionWidget becomes a child window inside parent. PluginConnectorConnectionWidget is deleted when its parent is deleted.
+    * @param [in] pPluginConnectorConnection a pointer to the corresponding Connector Connection.
+    */
+    PluginConnectorConnectionWidget(PluginConnectorConnection* pPluginConnectorConnection, QWidget *parent = 0);
 
-    int type() const { return Type; }
-    QRectF boundingRect() const;
-    QPainterPath shape() const;
-    void setColor(const QColor &color) { m_qColor = color; }
-    PluginItem *startItem() const { return m_StartItem; }
-    PluginItem *endItem() const { return m_EndItem; }
+signals:
 
-    PluginConnectorConnection::SPtr connection() { return m_pConnection; }
+public slots:
 
-    void updatePosition();
-
-protected:
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
 
 private:
-    PluginItem *m_StartItem;
-    PluginItem *m_EndItem;
+    QLabel* m_pLabel;                                           /**< Holds the start up widget label. */
 
-    PluginConnectorConnection::SPtr m_pConnection;
+    PluginConnectorConnection*  m_pPluginConnectorConnection;   /**< a pointer to corresponding PluginConnectorConnection.*/
 
-    QColor m_qColor;
-    QPolygonF arrowHead;
 };
 
-} //NAMESPACE
+} // NAMESPACE
 
-#endif // ARROW_H
+#endif // PLUGINCONNECTORCONNECTIONWIDGET_H
