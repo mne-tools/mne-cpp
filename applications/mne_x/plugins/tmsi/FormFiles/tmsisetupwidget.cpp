@@ -79,6 +79,8 @@ TMSISetupWidget::TMSISetupWidget(TMSI* pTMSI, QWidget* parent)
             this, &TMSISetupWidget::setDeviceSamplingProperties);
     connect(ui.m_spinBox_SamplesPerBlock, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             this, &TMSISetupWidget::setDeviceSamplingProperties);
+    connect(ui.m_checkBox_UseCommonAverage, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+            this, &TMSISetupWidget::setDeviceSamplingProperties);
 
     //Connect channel corrections
     connect(ui.m_checkBox_UseChExponent, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
@@ -147,6 +149,7 @@ void TMSISetupWidget::initGui()
     ui.m_spinBox_SamplingFreq->setValue(m_pTMSI->m_iSamplingFreq);
     ui.m_spinBox_NumberOfChannels->setValue(m_pTMSI->m_iNumberOfChannels);
     ui.m_spinBox_SamplesPerBlock->setValue(m_pTMSI->m_iSamplesPerBlock);
+    ui.m_checkBox_UseCommonAverage->setChecked(m_pTMSI->m_bUseCommonAverage);
 
     //Init channel corrections
     ui.m_checkBox_UseChExponent->setChecked(m_pTMSI->m_bUseChExponent);
@@ -184,6 +187,8 @@ void TMSISetupWidget::setDeviceSamplingProperties()
     m_pTMSI->m_bUseChExponent = ui.m_checkBox_UseChExponent->isChecked();
     m_pTMSI->m_bUseUnitGain = ui.m_checkBox_UseUnitGain->isChecked();
     m_pTMSI->m_bUseUnitOffset = ui.m_checkBox_UseUnitOffset->isChecked();
+
+    m_pTMSI->m_bUseCommonAverage = ui.m_checkBox_UseCommonAverage->isChecked();
 }
 
 

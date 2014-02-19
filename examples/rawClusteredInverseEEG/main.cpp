@@ -109,7 +109,7 @@ int main(int argc, char *argv[])
     //Choose which epoch to take - i.e. for every 4th epoch set to 4
     int averageIterator = 1;
 
-    bool doRawTrialLocalization = true;
+    bool doRawTrialLocalization = false;
 
     //measurement data location (data location must always has same directory structure - see dropbox folder for more information)
     //QString data_location("D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2013_12_05_Lorenz_Esch_001");
@@ -288,66 +288,66 @@ int main(int argc, char *argv[])
     //////////////////////////////////////////// Interesting start ////////////////////////////////////////////////////////////////////
     //*************************** Involuntary opposing finger movement **************************//
 
-    //time read around events - note: trigger point is the pressing of the button, not the atual
-    float tmin = -3.0f;
-    float tmax = 3.0f;
+    //time read around events - note: trigger point is the pressing of the button
+    float tmin = -4.0f;
+    float tmax = 4.0f;
 
 //    //Filtered 7-14Hz left voluntary finger opposing
 //    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_001_involuntary_left_opposing_filtered_7_14_raw.fif");
 //    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_001_base_filtered_7_14_raw-cov.fif");
-//    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_involuntary_left_opposing_137_raw-eve.fif");
+//    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_involuntary_left_opposing_artefact_reduction_-1_1_0.002_102_raw-eve.fif");
 //    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_involuntary_left_opposing_filtered_7_14_Averaged_");
 //    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_involuntary_left_opposing_filtered_7_14_Averaged_");
 
-    //Filtered 7-14Hz right voluntary finger opposing
-    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_001_involuntary_right_opposing_filtered_7_14_raw.fif");
-    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_001_base_filtered_7_14_raw-cov.fif");
-    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_involuntary_right_opposing_150_raw-eve.fif");
-    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_involuntary_right_opposing_filtered_7_14_Averaged_");
-    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_involuntary_right_opposing_filtered_7_14_Averaged_");
+//    //Filtered 7-14Hz right voluntary finger opposing
+//    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_001_involuntary_right_opposing_filtered_7_14_raw.fif");
+//    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_001_base_filtered_7_14_raw-cov.fif");
+//    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_involuntary_right_opposing_artefact_reduction_-1_1_0.002_92_raw-eve.fif");
+//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_involuntary_right_opposing_filtered_7_14_Averaged_");
+//    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_involuntary_right_opposing_filtered_7_14_Averaged_");
 
 //    //Filtered 0.7-40Hz left voluntary finger opposing
 //    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_001_involuntary_left_opposing_filtered_07_40_raw.fif");
 //    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_001_base_filtered_07_40_raw-cov.fif");
-//    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_involuntary_left_opposing_137_raw-eve.fif");
+//    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_involuntary_left_opposing_artefact_reduction_-1_1_0.002_102_raw-eve.fif");
 //    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_involuntary_left_opposing_filtered_07_40_Averaged_");
 //    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_involuntary_left_opposing_filtered_07_40_Averaged_");
 
-//    //Filtered 0.7-40Hz right voluntary finger opposing
-//    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_001_involuntary_right_opposing_filtered_07_40_raw.fif");
-//    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_001_base_filtered_07_40_raw-cov.fif");
-//    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_involuntary_right_opposing_150_raw-eve.fif");
-//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_involuntary_right_opposing_filtered_07_40_Averaged_");
-//    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_involuntary_right_opposing_filtered_07_40_Averaged_");
+    //Filtered 0.7-40Hz right voluntary finger opposing
+    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_001_involuntary_right_opposing_filtered_07_40_raw.fif");
+    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_001_base_filtered_07_40_raw-cov.fif");
+    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_involuntary_right_opposing_artefact_reduction_-1_1_0.002_92_raw-eve.fif");
+    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_involuntary_right_opposing_filtered_07_40_Averaged_");
+    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_involuntary_right_opposing_filtered_07_40_Averaged_");
 
     //*************************** Motor imagery **************************//
 
-//    //time read around events - note: trigger point is the pressing of the button, not the atual
+    //time read around events - note: trigger point is the pressing of the button, not the atual
 //    float tmin = -1.0f;
 //    float tmax = 6.0f;
 
-//    //Filtered 7-14Hz left voluntary finger opposing
+//    //Filtered 7-14Hz left MI
 //    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_002_left_MI_filtered_7_14_raw.fif");
 //    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_002_base_filtered_7_14_raw-cov.fif");
 //    QString t_sEventFileNameRel("/Processed/events/EEG_data_002_left_MI_filtered_100_raw-eve.fif");
 //    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_left_MI_filtered_7_14_Averaged_");
 //    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_002_left_MI_filtered_7_14_Averaged_");
 
-//    //Filtered 7-14Hz right voluntary finger opposing
+//    //Filtered 7-14Hz right MI
 //    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_002_right_MI_filtered_7_14_raw.fif");
 //    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_002_base_filtered_7_14_raw-cov.fif");
 //    QString t_sEventFileNameRel("/Processed/events/EEG_data_002_right_MI_filtered_105_raw-eve.fif");
 //    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_right_MI_filtered_7_14_Averaged_");
 //    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_002_right_MI_filtered_7_14_Averaged_");
 
-//    //Filtered 0.7-40Hz left voluntary finger opposing
+//    //Filtered 0.7-40Hz left MI
 //    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_002_left_MI_filtered_07_40_raw.fif");
 //    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_002_base_filtered_07_40_raw-cov.fif");
 //    QString t_sEventFileNameRel("/Processed/events/EEG_data_002_left_MI_filtered_100_raw-eve.fif");
 //    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_left_MI_filtered_07_40_Averaged_");
 //    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_002_left_MI_filtered_07_40_Averaged_");
 
-//    //Filtered 0.7-40Hz right voluntary finger opposing
+//    //Filtered 0.7-40Hz right MI
 //    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_002_right_MI_filtered_07_40_raw.fif");
 //    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_002_base_filtered_07_40_raw-cov.fif");
 //    QString t_sEventFileNameRel("/Processed/events/EEG_data_002_right_MI_filtered_105_raw-eve.fif");
@@ -668,6 +668,8 @@ int main(int argc, char *argv[])
     }
 
     double lambda2 = 1.0 / pow(snr, 2);
+
+
     qDebug() << "Start calculation with: SNR" << snr << "; Lambda" << lambda2 << "; Method" << method << "; stc:" << t_sFileNameStc;
 
     MNEForwardSolution t_Fwd(t_fileFwd);
@@ -682,7 +684,10 @@ int main(int argc, char *argv[])
     //
     // Cluster forward solution;
     //
-    MNEForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution(t_annotationSet, 20);//40);
+    MNEForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution_ccr(t_annotationSet, 20);//40); % Use multithreading
+    //MNEForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution(t_annotationSet, 10);//40);
+
+    //MNEForwardSolution t_clusteredFwd = t_Fwd;
 
     //
     // Find rows of interest in stc files
@@ -716,6 +721,19 @@ int main(int argc, char *argv[])
         out<<labelIds_right[i]<<endl;
 
     //Find interesting rows in stc files
+    // Left hemisphere
+    QFile wrtFWD_28_left ("./mne_x_plugins/resources/tmsi/fwd_clustered_postcentral_28_Left.txt");
+    wrtFWD_28_left.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream out_28_left(&wrtFWD_28_left);
+
+    QFile wrtFWD_29_left ("./mne_x_plugins/resources/tmsi/fwd_clustered_precentral_29_Left.txt");
+    wrtFWD_29_left.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream out_29_left(&wrtFWD_29_left);
+
+    QFile wrtFWD_45_left ("./mne_x_plugins/resources/tmsi/fwd_clustered_central_45_Left.txt");
+    wrtFWD_45_left.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream out_45_left(&wrtFWD_45_left);
+
     QVector<int> interestingRows_Left;
     out<<endl<<endl<<"interestingRows_Left (matlab syntax):"<<endl<<endl;
     for(int i=0; i<vertno_left.rows() ; i++)
@@ -725,6 +743,7 @@ int main(int argc, char *argv[])
         {
             interestingRows_Left.push_back(i);
             out<<"Region 28 - G_postcentral: "<<i+1<<endl;
+            out_28_left<<i+1<<endl;
         }
 
         //G_precentral
@@ -732,6 +751,7 @@ int main(int argc, char *argv[])
         {
             interestingRows_Left.push_back(i);
             out<<"Region 29 - G_precentral: "<<i+1<<endl;
+            out_29_left<<i+1<<endl;
         }
 
         //S_central
@@ -739,8 +759,22 @@ int main(int argc, char *argv[])
         {
             interestingRows_Left.push_back(i);
             out<<"Region 45 - S_central: "<<i+1<<endl;
+            out_45_left<<i+1<<endl;
         }
     }
+
+    // Right hemisphere
+    QFile wrtFWD_28_right ("./mne_x_plugins/resources/tmsi/fwd_clustered_postcentral_28_Right.txt");
+    wrtFWD_28_right.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream out_28_right(&wrtFWD_28_right);
+
+    QFile wrtFWD_29_right ("./mne_x_plugins/resources/tmsi/fwd_clustered_precentral_29_Right.txt");
+    wrtFWD_29_right.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream out_29_right(&wrtFWD_29_right);
+
+    QFile wrtFWD_45_right ("./mne_x_plugins/resources/tmsi/fwd_clustered_central_45_Right.txt");
+    wrtFWD_45_right.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream out_45_right(&wrtFWD_45_right);
 
     QVector<int> interestingRows_Right;
     out<<endl<<endl<<"interestingRows_Right (matlab syntax):"<<endl<<endl;
@@ -751,6 +785,7 @@ int main(int argc, char *argv[])
         {
             interestingRows_Right.push_back(i);
             out<<"Region 28 - G_postcentral: "<<i+1+vertno_left.rows()<<endl;
+            out_28_right<<i+1<<endl;
         }
 
         //G_precentral
@@ -758,6 +793,7 @@ int main(int argc, char *argv[])
         {
             interestingRows_Right.push_back(i);
             out<<"Region 29 - G_precentral: "<<i+1+vertno_left.rows()<<endl;
+            out_29_right<<i+1<<endl;
         }
 
         //S_central
@@ -765,9 +801,16 @@ int main(int argc, char *argv[])
         {
             interestingRows_Right.push_back(i);
             out<<"Region 45 - S_central: "<<i+1+vertno_left.rows()<<endl;
+            out_45_right<<i+1<<endl;
         }
     }
 
+    wrtFWD_28_left.close();
+    wrtFWD_29_left.close();
+    wrtFWD_45_left.close();
+    wrtFWD_28_right.close();
+    wrtFWD_29_right.close();
+    wrtFWD_45_right.close();
     wrtFWD.close();
 
     //
@@ -776,6 +819,9 @@ int main(int argc, char *argv[])
     FiffInfo info = evoked.info;
 
     MNEInverseOperator inverse_operator(info, t_clusteredFwd, noise_cov, 0.2f, 0.8f);
+
+//    QFile t_fileInv("D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2014_02_07_Lorenz_Esch_007/Processed/inverse operators/Lorenz-140128-Duke128-eeg-inv.fif");
+//    MNEInverseOperator inverse_operator(t_fileInv);
 
     //
     // save clustered inverse
@@ -791,6 +837,7 @@ int main(int argc, char *argv[])
     //
     // Calculate stc for averaged data
     MinimumNorm minimumNorm(inverse_operator, lambda2, method);
+
     MNESourceEstimate sourceEstimate = minimumNorm.calculateInverse(evoked);
 
     if(sourceEstimate.isEmpty())
@@ -851,13 +898,13 @@ int main(int argc, char *argv[])
 
     VectorXd s;
 
-    double t_dConditionNumber = MNEMath::getConditionNumber(t_Fwd.sol->data, s);
-    double t_dConditionNumberClustered = MNEMath::getConditionNumber(t_clusteredFwd.sol->data, s);
+    //double t_dConditionNumber = MNEMath::getConditionNumber(t_Fwd.sol->data, s);
+    //double t_dConditionNumberClustered = MNEMath::getConditionNumber(t_clusteredFwd.sol->data, s);
 
-    std::cout << "Condition Number:\n" << t_dConditionNumber << std::endl;
-    std::cout << "Clustered Condition Number:\n" << t_dConditionNumberClustered << std::endl;
+//    std::cout << "Condition Number:\n" << t_dConditionNumber << std::endl;
+//    std::cout << "Clustered Condition Number:\n" << t_dConditionNumberClustered << std::endl;
 
-    std::cout << "ForwardSolution" << t_Fwd.sol->data.block(0,0,10,10) << std::endl;
+//    std::cout << "ForwardSolution" << t_Fwd.sol->data.block(0,0,10,10) << std::endl;
 
     std::cout << "Clustered ForwardSolution" << t_clusteredFwd.sol->data.block(0,0,10,10) << std::endl;
 

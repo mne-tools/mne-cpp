@@ -171,7 +171,7 @@ typedef HANDLE          ( __stdcall * PLIBRARYINIT)     (IN TMSiConnectionType G
 typedef int             ( __stdcall * PLIBRARYEXIT)     (IN HANDLE Handle);
 typedef char**          ( __stdcall * PGETDEVICELIST)   (IN HANDLE Handle, IN OUT int *NrOfFrontEnds);
 typedef BOOLEAN         ( __stdcall * PGETFRONTENDINFO) (IN HANDLE Handle, IN OUT FRONTENDINFO *FrontEndInfo );
-
+typedef BOOLEAN         ( __stdcall * PSETREFCALCULATION) (IN HANDLE Handle, IN int OnOrOff );
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -258,6 +258,7 @@ public:
     * @param [in] bWriteDriverDebugToFile Flag for writing driver debug information to a file. Defined by the user via the GUI.
     * @param [in] sOutpuFilePath Holds the path for the output file. Defined by the user via the GUI.
     * @param [out] bool returns true if device was successfully initialised, false otherwise.
+    * @param [in] bUseCommonAverage Flag for using common average when recording EEG data. Defined by the user via the GUI.
     */
     bool initDevice(int iNumberOfChannels,
                     int iSamplingFrequency,
@@ -266,7 +267,8 @@ public:
                     bool bUseUnitGain,
                     bool bUseUnitOffset,
                     bool bWriteDriverDebugToFile,
-                    QString sOutpuFilePath);
+                    QString sOutpuFilePath,
+                    bool bUseCommonAverage);
 
     //=========================================================================================================
     /**
@@ -292,6 +294,7 @@ private:
     bool                m_bWriteDriverDebugToFile;      /**< Flag for for writing driver debug informstions to a file. Defined by the user via the GUI.*/
     bool                m_bUsePreprocessing;            /**< Flag for using preprocessing actions for the EEG data. Defined by the user via the GUI.*/
     QString             m_sOutputFilePath;              /**< Holds the path for the output file. Defined by the user via the GUI.*/
+    bool                m_bUseCommonAverage;            /**< Flag for using common average.*/
 
     //Handler
     HANDLE              m_HandleMaster;                 /**< The handler used to communciate with the device.*/
@@ -326,6 +329,7 @@ private:
     PLIBRARYEXIT        m_oFpLibraryExit;
     PGETDEVICELIST      m_oFpGetDeviceList;
     PGETFRONTENDINFO    m_oFpGetFrontEndInfo;
+    PSETREFCALCULATION  m_oFpSetRefCalculation;
 };
 
 } // NAMESPACE

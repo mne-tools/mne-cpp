@@ -60,7 +60,7 @@
 //=============================================================================================================
 
 using namespace BCIPlugin;
-
+using namespace std;
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -68,7 +68,8 @@ using namespace BCIPlugin;
 //=============================================================================================================
 
 BCI::BCI()
-: m_qStringResourcePath(qApp->applicationDirPath()+"/mne_x_plugins/resources/bci/")
+: m_qStringResourcePath(qApp->applicationDirPath()+"/mne_x_plugins/resources/bci/"),
+  m_bProcessData(false)
 {
 }
 
@@ -98,24 +99,41 @@ QSharedPointer<IPlugin> BCI::clone() const
 
 void BCI::init()
 {
-	m_bIsRunning = false;
+    m_bIsRunning = false;
 
-    // Input
-    m_pRTSEInput = PluginInputData<RealTimeSourceEstimate>::create(this, "BCIIn", "BCI input data");
-    connect(m_pRTSEInput.data(), &PluginInputConnector::notify, this, &BCI::update, Qt::DirectConnection);
+    // Inputs - Source estimates and sensor level
+    m_pRTSEInput = PluginInputData<RealTimeSourceEstimate>::create(this, "BCIInSource", "BCI source input data");
+    connect(m_pRTSEInput.data(), &PluginInputConnector::notify, this, &BCI::updateSource, Qt::DirectConnection);
     m_inputConnectors.append(m_pRTSEInput);
+
+    m_pRTMSAInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "BCIInSensor", "SourceLab sensor input data");
+    connect(m_pRTMSAInput.data(), &PluginInputConnector::notify, this, &BCI::updateSensor, Qt::DirectConnection);
+    m_inputConnectors.append(m_pRTMSAInput);
 
     // Output
     m_pBCIOutput = PluginOutputData<NewRealTimeSampleArray>::create(this, "ControlSignal", "BCI output data");
     m_outputConnectors.append(m_pBCIOutput);
+
+    //Delete Buffer - will be initailzed with first incoming data
+    if(!m_pBCIBuffer_Sensor.isNull())
+        m_pBCIBuffer_Sensor = CircularMatrixBuffer<double>::SPtr();
+
+    if(!m_pBCIBuffer_Source.isNull())
+        m_pBCIBuffer_Source = CircularMatrixBuffer<double>::SPtr();
+
+    // Delete fiff info because the initialisation of the fiff info is seen as the first data acquisition from the input stream
+    if(!m_pFiffInfo_Sensor.isNull())
+        m_pFiffInfo_Sensor = FiffInfo::SPtr();
 }
 
 
 //*************************************************************************************************************
 
 bool BCI::start()
-{ 
-	m_bIsRunning = true;
+{
+    m_bIsRunning = true;
+
+    QThread::start();
 
     return true;
 }
@@ -127,6 +145,16 @@ bool BCI::stop()
 {
     //Wait until this thread (BCI) is stopped
     m_bIsRunning = false;
+
+    // Start filling buffers with data from the inputs
+    m_bProcessData = false;
+
+    // Get data buffers out of idle state if they froze in the acquire or release function
+    //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the pop function (acquire statement)
+    m_pBCIBuffer_Sensor->releaseFromPop();
+    m_pBCIBuffer_Sensor->releaseFromPush();
+//    m_pBCIBuffer_Source->releaseFromPop();
+//    m_pBCIBuffer_Source->releaseFromPush();
 
     return true;
 }
@@ -163,17 +191,52 @@ QWidget* BCI::setupWidget()
 
 //*************************************************************************************************************
 
-void BCI::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
+void BCI::updateSensor(XMEASLIB::NewMeasurement::SPtr pMeasurement)
+{
+    QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<NewRealTimeMultiSampleArray>();
+    if(pRTMSA)
+    {
+        //Check if buffer initialized
+        if(!m_pBCIBuffer_Sensor)
+            m_pBCIBuffer_Sensor = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSA->getNumChannels(), pRTMSA->getMultiArraySize()));
+
+        //Fiff information for sensor level
+        if(!m_pFiffInfo_Sensor)
+            m_pFiffInfo_Sensor = pRTMSA->getFiffInfo();
+
+        if(m_bProcessData)
+        {
+            MatrixXd t_mat(pRTMSA->getNumChannels(), pRTMSA->getMultiArraySize());
+
+            for(unsigned char i = 0; i < pRTMSA->getMultiArraySize(); ++i)
+                t_mat.col(i) = pRTMSA->getMultiSampleArray()[i];
+
+            m_pBCIBuffer_Sensor->push(&t_mat);
+        }
+    }
+}
+
+
+//*************************************************************************************************************
+
+void BCI::updateSource(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 {
     QSharedPointer<RealTimeSourceEstimate> pRTSE = pMeasurement.dynamicCast<RealTimeSourceEstimate>();
     if(pRTSE)
     {
-        m_qMutex.lock();
-        m_iNumChs = pRTSE->getValue().size();;
-        qint32 t_iSize = pRTSE->getValue().size();
-        for(qint32 i = 0; i < t_iSize; ++i)
-            m_pData.append(pRTSE->getValue()[i]);//Append sample wise
-        m_qMutex.unlock();
+        //Check if buffer initialized
+        if(!m_pBCIBuffer_Source)
+            m_pBCIBuffer_Source = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTSE->getValue().size(), pRTSE->getArraySize()));
+
+        if(m_bProcessData)
+        {
+            MatrixXd t_mat(pRTSE->getValue().size(), pRTSE->getArraySize());
+
+            for(unsigned char i = 0; i < pRTSE->getArraySize(); ++i)
+                t_mat.col(i) = pRTSE->getStc().data.col(i);
+
+            m_pBCIBuffer_Source->push(&t_mat);
+        }
     }
 }
 
@@ -184,6 +247,15 @@ void BCI::run()
 {
     while(m_bIsRunning)
     {
-        //TODO:
+        // Wait for fiff Info if not yet
+        while(!m_pFiffInfo_Sensor)
+            msleep(10);
+
+        // Start filling buffers with data from the inputs
+        m_bProcessData = true;
+
+        MatrixXd t_mat = m_pBCIBuffer_Sensor->pop();
+        for(int i = 0; i<t_mat.cols() ; i++)
+            cout<<t_mat(137,i)<<endl;
     }
 }
