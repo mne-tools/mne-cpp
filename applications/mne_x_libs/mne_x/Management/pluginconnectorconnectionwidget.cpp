@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     arrow.h
+* @file     pluginconnectorconnectionwidget.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     August, 2013
+* @date     February, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,83 +29,93 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     Arrow class declaration
+* @brief    Contains the implementation of the PluginConnectorConnectionWidget class.
 *
 */
-
-#ifndef ARROW_H
-#define ARROW_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "pluginitem.h"
-#include <mne_x/Management/pluginconnectorconnection.h>
+#include "pluginconnectorconnectionwidget.h"
+#include "pluginconnectorconnection.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// INCLUDES
 //=============================================================================================================
 
-#include <QSharedPointer>
-#include <QGraphicsLineItem>
+#include <QGridLayout>
+#include <QComboBox>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// USED NAMESPACES
 //=============================================================================================================
 
-class QGraphicsPolygonItem;
-class QGraphicsLineItem;
-class QGraphicsScene;
-class QRectF;
-class QGraphicsSceneMouseEvent;
-class QPainterPath;
+using namespace MNEX;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNEX
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-namespace MNEX
+
+PluginConnectorConnectionWidget::PluginConnectorConnectionWidget(PluginConnectorConnection* pPluginConnectorConnection, QWidget *parent)
+: QWidget(parent)
+, m_pPluginConnectorConnection(pPluginConnectorConnection)
 {
 
-class Arrow : public QGraphicsLineItem
-{
-public:
-    enum { Type = UserType + 4 };
+    QWidget *rightFiller = new QWidget;
+    rightFiller->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-    Arrow(PluginItem *startItem, PluginItem *endItem, PluginConnectorConnection::SPtr &connection, QGraphicsItem *parent = 0);
+    QWidget *bottomFiller = new QWidget;
+    bottomFiller->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-    int type() const { return Type; }
-    QRectF boundingRect() const;
-    QPainterPath shape() const;
-    void setColor(const QColor &color) { m_qColor = color; }
-    PluginItem *startItem() const { return m_StartItem; }
-    PluginItem *endItem() const { return m_EndItem; }
+    QString sSender = m_pPluginConnectorConnection->getSender()->getName();
+    QString sReceiver = m_pPluginConnectorConnection->getReceiver()->getName();
 
-    PluginConnectorConnection::SPtr connection() { return m_pConnection; }
+    m_pLabel = new QLabel(tr("Connector Connection: ")+sSender+" -> "+sReceiver, this);
+    m_pLabel->setStyleSheet("border: 0px; font-size: 14px; font-weight: bold;");
 
-    void updatePosition();
 
-protected:
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
+    qint32 curRow = 0;
 
-private:
-    PluginItem *m_StartItem;
-    PluginItem *m_EndItem;
+    QGridLayout *layout = new QGridLayout;
+    layout->setMargin(5);
+    layout->addWidget(m_pLabel,curRow,0,1,3);
+    ++curRow;
 
-    PluginConnectorConnection::SPtr m_pConnection;
+    for(qint32 i = 0; i < m_pPluginConnectorConnection->getSender()->getOutputConnectors().size(); ++i)
+    {
+        QComboBox* m_pComboBox = new QComboBox(this);
+        QLabel* m_pLabelOutput = new QLabel(m_pPluginConnectorConnection->getSender()->getOutputConnectors()[i]->getName(),this);
+        layout->addWidget(m_pLabelOutput,curRow,0);
 
-    QColor m_qColor;
-    QPolygonF arrowHead;
-};
+        ConnectorDataType t_senderConnectorDataType = PluginConnectorConnection::getDataType(m_pPluginConnectorConnection->getSender()->getOutputConnectors()[i]);
 
-} //NAMESPACE
+        m_pComboBox->addItem("----");
 
-#endif // ARROW_H
+        for(qint32 j = 0; j < m_pPluginConnectorConnection->getReceiver()->getInputConnectors().size(); ++j)
+        {
+            ConnectorDataType t_receiverConnectorDataType = PluginConnectorConnection::getDataType(m_pPluginConnectorConnection->getReceiver()->getInputConnectors()[j]);
+            if(t_senderConnectorDataType == t_receiverConnectorDataType)
+                m_pComboBox->addItem(m_pPluginConnectorConnection->getReceiver()->getInputConnectors()[j]->getName());
+        }
+
+        layout->addWidget(m_pComboBox,curRow,1);
+        ++curRow;
+    }
+
+
+    layout->addWidget(bottomFiller,curRow,0);
+    ++curRow;
+
+    layout->addWidget(rightFiller,1,3,curRow-1,1);
+
+    this->setLayout(layout);
+}

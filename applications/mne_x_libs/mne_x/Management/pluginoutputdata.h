@@ -111,7 +111,6 @@ public:
     */
     inline QSharedPointer<T> &data();
 
-
     void update();
 
 private:

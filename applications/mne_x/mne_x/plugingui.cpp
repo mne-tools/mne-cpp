@@ -187,16 +187,28 @@ void PluginGui::itemInserted(PluginItem *item)
 void PluginGui::newItemSelected()
 {
     IPlugin::SPtr pPlugin;
+    PluginConnectorConnection::SPtr pConnection;
+
     foreach (QGraphicsItem *item, m_pPluginScene->selectedItems())
     {
         if(item->type() == PluginItem::Type)
             pPlugin = qgraphicsitem_cast<PluginItem *>(item)->plugin();
+        else if(item->type() == Arrow::Type)
+            pConnection = qgraphicsitem_cast<Arrow *>(item)->connection();
+
     }
 
     if(!pPlugin.isNull() && pPlugin != m_pCurrentPlugin)
     {
         m_pCurrentPlugin = pPlugin;
+        m_pCurrentConnection = PluginConnectorConnection::SPtr();
         emit selectedPluginChanged(m_pCurrentPlugin);
+    }
+    else if(!pConnection.isNull() && pConnection != m_pCurrentConnection)
+    {
+        m_pCurrentConnection = pConnection;
+        m_pCurrentPlugin = IPlugin::SPtr();
+        emit selectedConnectionChanged(m_pCurrentConnection);
     }
 }
 
