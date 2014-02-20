@@ -44,9 +44,14 @@ contains(MNECPP_CONFIG, isGui) {
     SUBDIRS += \
         mne_x_libs \
         mne_x \
-        mne_browse_raw_qt \
-        mne_viewer \
-        mne_viewer_parent
+        mne_browse_raw_qt
+
+    qtHaveModule(3d) {
+        message(Qt3D available: disp3D library configured!)
+        SUBDIRS += \
+            mne_viewer \
+            mne_viewer_parent
+    }
 }
 
 CONFIG += ordered
