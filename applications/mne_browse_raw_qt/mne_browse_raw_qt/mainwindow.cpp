@@ -31,7 +31,29 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implements the mainwindow function of mne_browse_raw_qt
+* @brief    mne_browse_raw_qt is the QT equivalent of the already existing C-version of mne_browse_raw. It is pursued
+*           to reimplement the full feature set of mne_browse_raw and even extend these.
+*
+*           An excerpt of what mne_browse_raw does:
+*           "The raw data processor mne_browse_raw is designed for simple raw data viewing and processing operations.
+*           In addition, the program is capable of off-line averaging and estimation of covariance matrices.
+*           mne_browse_raw can be also used to view averaged data in the topographical layout. Finally, mne_browse_raw
+*           can communicate with mne_analyze described in Interactive analysis to calculate current estimates from raw data interactively."
+*           (from [1])
+*
+*           Contributing and extending mne_browse_raw_qt is strongly appreciated!
+*           Here are some infos how mne_browse_raw_qt is structured. The program makes heavy use of the model/view framework of QT. [2]
+*           Hence, the base is divided into the three main compenents and the corresponding classes:
+*           - View (included in MainWindow):
+*           - Model (RawModel.cpp):
+*           - Delegate (RawDelegate.cpp):
+*
+*
+*
+*
+*
+*           [1] http://martinos.org/mne/stable/manual/browse.html
+*           [2] http://qt-project.org/doc/qt-5/model-view-programming.html
 *
 */
 
