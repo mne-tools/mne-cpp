@@ -41,6 +41,7 @@
 
 RawModel::RawModel(QObject *parent)
 : QAbstractTableModel(parent)
+, m_bFileloaded(false)
 , m_qSettings()
 , m_bStartReached(false)
 , m_bEndReached(false)
@@ -56,6 +57,7 @@ RawModel::RawModel(QObject *parent)
 
 RawModel::RawModel(QFile &qFile, QObject *parent)
 : QAbstractTableModel(parent)
+, m_bFileloaded(false)
 , m_qSettings()
 , m_bStartReached(false)
 , m_bEndReached(false)
@@ -220,10 +222,12 @@ bool RawModel::loadFiffData(QFile& qFile)
         m_bStartReached = true;
         if(!m_pfiffIO->m_qlistRaw[0]->read_raw_segment(t_data, t_times, m_iAbsFiffCursor, m_iAbsFiffCursor+m_iWindowSize-1))
             return false;
+        m_bFileloaded = true;
     }
     else {
         qDebug("RawModel: ERROR! Data set does not contain any fiff data!");
         endResetModel();
+        m_bFileloaded = false;
         return false;
     }
 
@@ -322,13 +326,17 @@ void RawModel::resetPosition(qint32 position) {
     m_procData.append(MatrixXdR::Zero(t_data.rows(),m_iWindowSize));
     m_times.append(t_times);
 
-    emit dataChanged(createIndex(0,1),createIndex(m_chInfolist.size(),1));
     updateOperators();
 
     endResetModel();
     updateScrollPos(m_iCurAbsScrollPos-firstSample()); //little hack: if the m_iCurAbsScrollPos is now close to the edge -> force reloading w/o scrolling
 
     qDebug() << "RawModel: Model Position RESET, samples from " << m_iAbsFiffCursor << "to" << m_iAbsFiffCursor+m_iWindowSize-1 << "reloaded.";
+
+    emit dataChanged(createIndex(0,1),createIndex(m_chInfolist.size(),1));
+
+    //set scrollBarPosition so that the m_iCurAbsScrollPos is not position closer that m_reloadPos to the loaded window's edge so that data is not reloaded right after this method
+    emit scrollBarValueChange(m_iAbsFiffCursor-firstSample()+m_reloadPos+1);
 }
 
 //*************************************************************************************************************
@@ -390,22 +398,22 @@ void RawModel::updateScrollPos(int value) {
     qDebug() << "RawModel: absolute Fiff Scroll Cursor" << m_iCurAbsScrollPos << "(m_iAbsFiffCursor" << m_iAbsFiffCursor << ", sizeOfPreloadedData" << sizeOfPreloadedData() << ")";
 
     //if a scroll position is selected, which is not within the loaded data range -> reset position of model
-    if(m_iCurAbsScrollPos > (m_iAbsFiffCursor+sizeOfPreloadedData()) || m_iCurAbsScrollPos < m_iAbsFiffCursor) {
+    if(m_iCurAbsScrollPos > (m_iAbsFiffCursor+sizeOfPreloadedData()+m_iWindowSize) || m_iCurAbsScrollPos < m_iAbsFiffCursor) {
         resetPosition(m_iCurAbsScrollPos);
         return;
     }
 
-    //reload data if ends of loaded range is reached
+    //reload data if end of loaded range is reached
     //front
     if(!m_bReloading && (m_iCurAbsScrollPos-m_iAbsFiffCursor < m_reloadPos) && !m_bStartReached) {
         m_bReloading = true;
-        qDebug() << "RawModel: Reload requested at FRONT of loaded fiff data.";
+        qDebug() << "RawModel: Reload requested at FRONT of loaded fiff data, m_iAbsFiffCursor:" << m_iAbsFiffCursor << "m_iCurAbsScrollPos:" << m_iCurAbsScrollPos;
         reloadFiffData(1);
     }
     //end
     else if(!m_bReloading && m_iCurAbsScrollPos > m_iAbsFiffCursor+sizeOfPreloadedData()-m_reloadPos && !m_bEndReached) {
         m_bReloading = true;
-        qDebug() << "RawModel: Reload requested at END of loaded fiff data.";
+        qDebug() << "RawModel: Reload requested at END of loaded fiff data, m_iAbsFiffCursor:" << m_iAbsFiffCursor << "m_iCurAbsScrollPos:" << m_iCurAbsScrollPos;
         reloadFiffData(0);
     }
 }
@@ -608,7 +616,7 @@ void RawModel::insertReloadedData(QPair<MatrixXd,MatrixXd> dataTimesPair) {
     emit dataChanged(createIndex(0,1),createIndex(m_chInfolist.size(),1));
     emit dataReloaded();
 
-    qDebug() << "RawModel: Fiff data REloaded from " << dataTimesPair.second.coeff(0) << "to" << dataTimesPair.second.coeff(dataTimesPair.second.cols()-1);
+    qDebug() << "RawModel: Fiff data REloaded from " << dataTimesPair.second.coeff(0) << "secs to" << dataTimesPair.second.coeff(dataTimesPair.second.cols()-1) << "secs";
 }
 
 //*************************************************************************************************************

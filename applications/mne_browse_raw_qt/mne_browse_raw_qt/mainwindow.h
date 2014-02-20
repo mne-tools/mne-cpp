@@ -122,6 +122,12 @@ public slots:
      */
     void customContextMenuRequested(QPoint pos);
 
+    /**
+     * setScrollBarPosition sets the position of the horizontal scrollbar
+     * @param pos the absolute position of the scrollbar
+     */
+    void setScrollBarPosition(int pos);
+
 private slots:
     /**
      * openFile opens a file dialog that picks the fiff data file to analyze and invokes the setup methods.
@@ -188,6 +194,11 @@ private:
      * setWindow makes settings that are related to the MainWindow
      */
     void setWindow();
+
+    /**
+     * setWindowStatus sets the window status depending on m_pRawModel->m_bFileloaded
+     */
+    void setWindowStatus();
 
     QFile m_qFileRaw; /**< Fiff data file to read (set for convenience) */
     QSignalMapper* m_qSignalMapper; /**< signal mapper used for signal-slot mapping */
