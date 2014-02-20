@@ -133,6 +133,8 @@ bool BCI::start()
 {
     m_bIsRunning = true;
 
+    //If statement if acquisiton plugin is connected - if not dont start
+
     QThread::start();
 
     return true;
@@ -247,7 +249,7 @@ void BCI::run()
 {
     while(m_bIsRunning)
     {
-        // Wait for fiff Info if not yet
+        // Wait for fiff Info if not yet received - this is needed because we have to wait until the buffers are firstly initiated in the update functions
         while(!m_pFiffInfo_Sensor)
             msleep(10);
 

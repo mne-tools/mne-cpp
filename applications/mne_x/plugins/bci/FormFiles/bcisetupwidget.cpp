@@ -71,6 +71,24 @@ BCISetupWidget::BCISetupWidget(BCI* pBCI, QWidget* parent)
 , m_pBCI(pBCI)
 {
     ui.setupUi(this);
+
+    //Connect general options
+    connect(ui.m_checkBox_UseSourceData, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+            this, &BCISetupWidget::setGeneralOptions);
+    connect(ui.m_checkBox_UseSensorData, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+            this, &BCISetupWidget::setGeneralOptions);
+
+    //Connect processing options
+    connect(ui.m_spinBox_SlidingWindowSize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+            this, &BCISetupWidget::setProcessingOptions);
+    connect(ui.m_spinBox_BaseLineWindowSize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+            this, &BCISetupWidget::setProcessingOptions);
+
+    //Connect classification options
+    connect(ui.m_pushButton_LoadSensorBoundary, &QPushButton::released,
+            this, &BCISetupWidget::changeLoadSourceBoundary);
+    connect(ui.m_pushButton_LoadSourceBoundary, &QPushButton::released,
+            this, &BCISetupWidget::changeLoadSensorBoundary);
 }
 
 
@@ -86,6 +104,60 @@ BCISetupWidget::~BCISetupWidget()
 
 void BCISetupWidget::initGui()
 {
+}
+
+
+//*************************************************************************************************************
+
+void BCISetupWidget::setGeneralOptions()
+{
+//    BCISetupWidget->m_bUseChExponent = ui.m_checkBox_UseChExponent->isChecked();
+//    BCISetupWidget->m_bUseUnitGain = ui.m_checkBox_UseUnitGain->isChecked();
+}
+
+
+//*************************************************************************************************************
+
+void BCISetupWidget::setProcessingOptions()
+{
+//    BCISetupWidget->m_iSamplingFreq = ui.m_spinBox_SamplingFreq->value();
+//    BCISetupWidget->m_iNumberOfChannels = ui.m_spinBox_NumberOfChannels->value();
+}
+
+
+//*************************************************************************************************************
+
+void BCISetupWidget::changeLoadSourceBoundary()
+{
+//    QString path = QFileDialog::getSaveFileName(
+//                this,
+//                "Save to fif file",
+//                "mne_x_plugins/resources/tmsi/EEG_data_001_raw.fif",
+//                 tr("Fif files (*.fif)"));
+
+//    if(path==NULL)
+//        path = ui.m_lineEdit_outputDir->text();
+
+//    ui.m_lineEdit_outputDir->setText(path);
+//    BCISetupWidget->m_sOutputFilePath = ui.m_lineEdit_outputDir->text();
+}
+
+
+//*************************************************************************************************************
+
+void BCISetupWidget::changeLoadSensorBoundary()
+{
+//    QString path = QFileDialog::getSaveFileName(
+//                this,
+//                "Save to fif file",
+//                "mne_x_plugins/resources/tmsi/EEG_data_001_raw.fif",
+//                 tr("Fif files (*.fif)"));
+
+//    if(path==NULL)
+//        path = ui.m_lineEdit_outputDir->text();
+
+//    ui.m_lineEdit_outputDir->setText(path);
+//    BCISetupWidget->m_sOutputFilePath = ui.m_lineEdit_outputDir->text();
 }
 
 
