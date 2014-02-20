@@ -141,12 +141,15 @@ QVariant RawModel::data(const QModelIndex &index, int role) const
 
                 for(qint16 i=0; i < m_data.size(); ++i) {
                     //if channel is not filtered or background Processing pending...
-                    if(!m_assignedOperators.contains(index.row()) || (m_bProcessing && m_bReloadBefore && i==0) || (m_bProcessing && !m_bReloadBefore && i==m_data.size()-1))
+                    if(!m_assignedOperators.contains(index.row()) || (m_bProcessing && m_bReloadBefore && i==0) || (m_bProcessing && !m_bReloadBefore && i==m_data.size()-1)) {
                         rowVectorPair.first = m_data[i].data() + index.row()*m_data[i].cols();
-                    else //if channel IS filtered
+                        rowVectorPair.second  = m_data[i].cols();
+                    }
+                    else { //if channel IS filtered
                         rowVectorPair.first = m_procData[i].data() + index.row()*m_procData[i].cols();
+                        rowVectorPair.second  = m_procData[i].cols();
+                    }
 
-                    rowVectorPair.second = m_iWindowSize;
                     listRowVectorPair.append(rowVectorPair);
                 }
 
@@ -338,7 +341,7 @@ void RawModel::resetPosition(qint32 position) {
     emit dataChanged(createIndex(0,1),createIndex(m_chInfolist.size(),1));
 
     //set scrollBarPosition so that the m_iCurAbsScrollPos is not position closer that m_reloadPos to the loaded window's edge so that data is not reloaded right after this method
-    emit scrollBarValueChange(m_iAbsFiffCursor-firstSample()+m_reloadPos+1);
+    emit scrollBarValueChange(m_iAbsFiffCursor-firstSample()+m_iWindowSize/2);
 }
 
 //*************************************************************************************************************
@@ -350,15 +353,15 @@ void RawModel::reloadFiffData(bool before) {
     fiff_int_t start,end;
     if(before) {
         m_iAbsFiffCursor -= m_iWindowSize;
-        end = m_iAbsFiffCursor-1;
-        start = end-m_iWindowSize+1;
+        start = m_iAbsFiffCursor;
+        end = m_iAbsFiffCursor+m_iWindowSize-1;
 
         //check if start of fiff file is reached
-        if(start < firstSample()) {
-            qDebug() << "RawModel: Start of fiff file reached.";
+        if(start == firstSample()) {
             m_bStartReached = true;
-            m_iAbsFiffCursor += m_iWindowSize;
-            return;
+            qDebug() << "RawModel: Start of fiff file reached.";
+
+            m_iAbsFiffCursor = firstSample();
         }
     }
     else {
@@ -367,11 +370,17 @@ void RawModel::reloadFiffData(bool before) {
 
         //check if end of fiff file is reached
         if(end > lastSample()) {
+            if(m_bEndReached)
+                return;
+            else
+                m_bEndReached = true;
+
+            end = lastSample();
             qDebug() << "RawModel: End of fiff file reached.";
-            m_bEndReached = true;
-            return;
         }
     }
+
+    m_bReloading = true;
 
     //read data with respect to start and end point
     QFuture<QPair<MatrixXd,MatrixXd> > future = QtConcurrent::run(this,&RawModel::readSegment,start,end);
@@ -410,13 +419,11 @@ void RawModel::updateScrollPos(int value) {
     //reload data if end of loaded range is reached
     //front
     if(!m_bReloading && (m_iCurAbsScrollPos-m_iAbsFiffCursor < m_reloadPos) && !m_bStartReached) {
-        m_bReloading = true;
         qDebug() << "RawModel: Reload requested at FRONT of loaded fiff data, m_iAbsFiffCursor:" << m_iAbsFiffCursor << "m_iCurAbsScrollPos:" << m_iCurAbsScrollPos;
         reloadFiffData(1);
     }
     //end
     else if(!m_bReloading && m_iCurAbsScrollPos > m_iAbsFiffCursor+sizeOfPreloadedData()-m_reloadPos && !m_bEndReached) {
-        m_bReloading = true;
         qDebug() << "RawModel: Reload requested at END of loaded fiff data, m_iAbsFiffCursor:" << m_iAbsFiffCursor << "m_iCurAbsScrollPos:" << m_iCurAbsScrollPos;
         reloadFiffData(0);
     }
