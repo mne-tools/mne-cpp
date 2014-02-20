@@ -57,7 +57,7 @@
 #define MAINWINDOW_WINDOW_SIZE_H 800 //width of MainWindow
 
 //RawModel
-#define MODEL_WINDOW_SIZE 8112 //this value+MODEL_NUM_FILTER_TAPS must be a multiple integer of 2^x, length of data window to preload [in samples]
+#define MODEL_WINDOW_SIZE 4016 //this value+MODEL_NUM_FILTER_TAPS must be a multiple integer of 2^x (e.g. 4016 or 8112 for 80 filter taps), length of data window to preload [in samples]
 #define MODEL_RELOAD_POS 2000 //Distance that the current window needs to be off the ends of m_data[i] [in samples]
 #define MODEL_MAX_WINDOWS 3 //number of windows that are at maximum remained in m_data
 #define MODEL_NUM_FILTER_TAPS 80 //number of filter taps, required to take into account because of FFT convolution (zero padding)

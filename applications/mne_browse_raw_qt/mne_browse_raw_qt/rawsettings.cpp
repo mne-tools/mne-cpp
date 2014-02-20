@@ -48,7 +48,6 @@ RawSettings::RawSettings(QObject *parent)
 , m_qSettings("mne-cpp","MNE_BROWSE_RAW_QT")
 {
     init();
-
 }
 
 RawSettings::~RawSettings()
@@ -60,6 +59,9 @@ RawSettings::~RawSettings()
 void RawSettings::init()
 {
     //MainWindow
+    //ToDo: ask for already stored setting in OS environment before setting them
+    //e.g. if(!m_qSettings.contains("RawModel/window_size")) m_qSettings.setValue("window_size",MODEL_WINDOW_SIZE);
+
     //Window settings
     m_qSettings.beginGroup("MainWindow");
         m_qSettings.setValue("size",QSize(MAINWINDOW_WINDOW_SIZE_W,MAINWINDOW_WINDOW_SIZE_H));
