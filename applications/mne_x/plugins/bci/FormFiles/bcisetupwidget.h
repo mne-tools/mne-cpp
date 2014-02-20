@@ -113,9 +113,38 @@ private:
     */
     void showAboutDialog();
 
-    BCI*           m_pBCI;                    /**< a pointer to corresponding BCI.*/
+    //=========================================================================================================
+    /**
+    * Sets general options made by the user
+    *
+    */
+    void setGeneralOptions();
 
-    Ui::BCISetupClass ui;                      /**< the user interface for the BCISetupWidget.*/
+    //=========================================================================================================
+    /**
+    * Sets processing options made by the user
+    *
+    */
+    void setProcessingOptions();
+
+    //=========================================================================================================
+    /**
+    * Loads classification boundary for source level
+    *
+    */
+    void changeLoadSourceBoundary();
+
+    //=========================================================================================================
+    /**
+    * Loads classification boundary for sensor level
+    *
+    */
+    void changeLoadSensorBoundary();
+
+
+    BCI* m_pBCI;                    /**< a pointer to corresponding BCI.*/
+
+    Ui::BCISetupClass ui;           /**< the user interface for the BCISetupWidget.*/
 };
 
 } // NAMESPACE
