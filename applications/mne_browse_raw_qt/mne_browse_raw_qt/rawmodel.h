@@ -109,6 +109,8 @@ public:
     bool writeFiffData(QFile &qFile);
 
     //VARIABLES
+    bool m_bFileloaded; /**< true when a Fiff file is loaded */
+
     //Fiff data structure
     QList<MatrixXdR> m_data; /**< List that holds the fiff matrix data <n_channels x n_samples> */
     QList<MatrixXdR> m_procData; /**< List that holds the processed fiff matrix data <n_channels x n_samples> */
@@ -182,11 +184,16 @@ private:
     //Concurrent processing
 //    QFutureWatcher<QPair<int,RowVectorXd> > m_operatorFutureWatcher; /**< QFutureWatcher for watching process of applying Operators to reloaded fiff data */
     QFutureWatcher<void> m_operatorFutureWatcher; /**< QFutureWatcher for watching process of applying Operators to reloaded fiff data */
-    QList<QPair<int,RowVectorXd> > m_listTmpChData;
-    bool m_bProcessing;
+    QList<QPair<int,RowVectorXd> > m_listTmpChData; /**< contains pairs with a channel number and the corresponding RowVectorXd */
+    bool m_bProcessing; /**< true when processing in a background-thread is ongoing*/
 
 signals:
+    /**
+     * dataReloaded is emitted when data reloading has finished in the background-thread
+     */
     void dataReloaded();
+
+    void scrollBarValueChange(int pos);
 
 public slots:
     /**
@@ -259,15 +266,29 @@ public slots:
     void undoFilter();
 
 private slots:
+    /**
+     * insertReloadedData inserts the reloaded data when the background has finished the operation
+     * @param dataTimesPair contains the reloaded matrices of the data and times so it can be inserted into m_data and m_times
+     */
     void insertReloadedData(QPair<MatrixXd,MatrixXd> dataTimesPair);
 
+    /**
+     * updateOperatorsConcurrently runs the processing of the MNEOperators in a background-thread
+     */
     void updateOperatorsConcurrently();
 
+    /**
+     * insertProcessedData inserts the processed data into m_procData when background-thread has finished (this method would be used for QtConcurrent::mapped)
+     * @param index represents the row index in m_procData
+     */
     void insertProcessedData(int index);
 
+    /**
+     * insertProcessedData inserts the processed data into m_procData when background-thread has finished (this method would be used for QtConcurrent::map)
+     */
     void insertProcessedData();
 
-//Inline
+//inline
 public:
     /**
      * sizeOfFiffData

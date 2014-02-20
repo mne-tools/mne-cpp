@@ -138,6 +138,9 @@ void MainWindow::setupViewSettings() {
 
     //connect QScrollBar with model in order to reload data samples
     connect(m_pTableView->horizontalScrollBar(),SIGNAL(valueChanged(int)),m_pRawModel,SLOT(updateScrollPos(int)));
+
+    //connect other signals
+    connect(m_pRawModel,SIGNAL(scrollBarValueChange(int)),this,SLOT(setScrollBarPosition(int)));
 }
 
 //*************************************************************************************************************
@@ -172,9 +175,33 @@ void MainWindow::createMenus() {
 //*************************************************************************************************************
 
 void MainWindow::setWindow() {
-    setWindowTitle(CInfo::AppNameShort());
+    setWindowStatus();
+
+    //set Window functions
     resize(m_qSettings.value("MainWindow/size").toSize());
     this->move(50,50);
+}
+
+//*************************************************************************************************************
+
+void MainWindow::setWindowStatus() {
+    QString title;
+    bool scrollBarEnabled = false;
+
+    //request status
+    if(m_pRawModel->m_bFileloaded) {
+        scrollBarEnabled = true;
+        title = QString("%1, (File loaded: %2)").arg(CInfo::AppNameShort()).arg(m_qFileRaw.fileName());
+    }
+    else {
+        title = QString("%1, (No File Loaded)").arg(CInfo::AppNameShort());
+    }
+
+    //set title
+    setWindowTitle(title);
+
+    //set scrollbar status
+    m_pTableView->horizontalScrollBar()->setEnabled(scrollBarEnabled);
 }
 
 //=============================================================================================================
@@ -253,9 +280,13 @@ void MainWindow::openFile()
     else
         qDebug("ERROR loading fiff data file %s",filename.toLatin1().data());
 
+    setWindowStatus();
+
     //set position of QScrollArea
-    m_pTableView->horizontalScrollBar()->setValue(0);
+    setScrollBarPosition(0);
 }
+
+//*************************************************************************************************************
 
 void MainWindow::writeFile()
 {
@@ -264,8 +295,9 @@ void MainWindow::writeFile()
 
     if(!m_pRawModel->writeFiffData(t_fileRaw))
         qDebug() << "MainWindow: ERROR writing fiff data file" << t_fileRaw.fileName() << "!";
-
 }
+
+//*************************************************************************************************************
 
 void MainWindow::customContextMenuRequested(QPoint pos)
 {
@@ -327,6 +359,14 @@ void MainWindow::customContextMenuRequested(QPoint pos)
 
     //show context menu
     menu->popup(m_pTableView->viewport()->mapToGlobal(pos));
+}
+
+//*************************************************************************************************************
+
+void MainWindow::setScrollBarPosition(int pos)
+{
+    m_pTableView->horizontalScrollBar()->setValue(pos);
+    qDebug() << "MainWindow: m_iAbsFiffCursor position set to" << (m_pRawModel->firstSample()+pos);
 }
 
 //*************************************************************************************************************
