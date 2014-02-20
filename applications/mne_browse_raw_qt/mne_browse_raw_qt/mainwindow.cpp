@@ -191,7 +191,9 @@ void MainWindow::setWindowStatus() {
     //request status
     if(m_pRawModel->m_bFileloaded) {
         scrollBarEnabled = true;
-        title = QString("%1, (File loaded: %2)").arg(CInfo::AppNameShort()).arg(m_qFileRaw.fileName());
+        int idx = m_qFileRaw.fileName().lastIndexOf("/");
+        QString filename = m_qFileRaw.fileName().remove(0,idx+1);
+        title = QString("%1, (File loaded: %2)").arg(CInfo::AppNameShort()).arg(filename);
     }
     else {
         title = QString("%1, (No File Loaded)").arg(CInfo::AppNameShort());
@@ -275,7 +277,7 @@ void MainWindow::openFile()
 
     if(m_pRawModel->loadFiffData(m_qFileRaw)) {
         qDebug() << "Fiff data file" << filename << "loaded.";
-        setupViewSettings();
+//        setupViewSettings();
     }
     else
         qDebug("ERROR loading fiff data file %s",filename.toLatin1().data());

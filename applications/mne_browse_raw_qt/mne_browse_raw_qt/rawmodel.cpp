@@ -318,8 +318,10 @@ void RawModel::resetPosition(qint32 position) {
 
     MatrixXd t_data,t_times; //type is later on (when append to m_data) casted into MatrixXdR (Row-Major)
 
+    m_Mutex.lock();
     if(!m_pfiffIO->m_qlistRaw[0]->read_raw_segment(t_data, t_times, m_iAbsFiffCursor, m_iAbsFiffCursor+m_iWindowSize-1))
         qDebug() << "RawModel: Error resetting position of Fiff file!";
+    m_Mutex.unlock();
 
     //append loaded block
     m_data.append(t_data);
@@ -382,10 +384,12 @@ void RawModel::reloadFiffData(bool before) {
 QPair<MatrixXd,MatrixXd> RawModel::readSegment(fiff_int_t from, fiff_int_t to) {
     QPair<MatrixXd,MatrixXd> datatime;
 
+    m_Mutex.lock();
     if(!m_pfiffIO->m_qlistRaw[0]->read_raw_segment(datatime.first, datatime.second, from, to)) {
         printf("RawModel: Error when reading raw data!");
         return datatime;
     }
+    m_Mutex.unlock();
 
     return datatime;
 }
@@ -637,12 +641,18 @@ void RawModel::updateOperatorsConcurrently()
 
     qDebug() << "RawModel: Starting of concurrent PROCESSING operation of" << listFilteredChs.size() << "items";
 
+    //************* here it could be also performed QtConcurrent::mapped() *************
+    // advantage: QFutureWatcher would give partial results -> signal resultsReadyAt(int idx)
+    // disadvantage: data needs to be copied twice (also to QFuture<QPair<int,RowVectorXd> > object) instead of once (to m_listTmpChData)
+
     //generate lambda function
 //    std::function<QPair<int,RowVectorXd> (QPair<int,RowVectorXd>&)> applyOps = [this](QPair<int,RowVectorXd>& chdata) -> QPair<int,RowVectorXd> {
 //        return applyOperatorsConcurrently(chdata);
 //    };
 
 //    QFuture<QPair<int,RowVectorXd> > future = QtConcurrent::mapped(m_listTmpChData.begin(),m_listTmpChData.end(),applyOps);
+    //**************************************************************************************************************************************************************************
+
     QFuture<void > future = QtConcurrent::map(m_listTmpChData,[this](QPair<int,RowVectorXd>& chdata) {
         return applyOperatorsConcurrently(chdata);
     });

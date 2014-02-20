@@ -187,12 +187,18 @@ private:
     QList<QPair<int,RowVectorXd> > m_listTmpChData; /**< contains pairs with a channel number and the corresponding RowVectorXd */
     bool m_bProcessing; /**< true when processing in a background-thread is ongoing*/
 
+    QMutex m_Mutex; /**< mutex for locking against simultaenous access to shared objects > */
+
 signals:
     /**
      * dataReloaded is emitted when data reloading has finished in the background-thread
      */
     void dataReloaded();
 
+    /**
+     * scrollBarValueChange is emitted if a change of the horizontal ScrollBar value is requested by the RawModel
+     * @param pos is the requested relative scroll position (0 equals beginning of ScrollBar)
+     */
     void scrollBarValueChange(int pos);
 
 public slots:
