@@ -65,21 +65,25 @@ FilterTools::FilterTools()
 
 void FilterTools::getStaticFilter(QString type, qint32 numberOfCoefficients, qint32 samplingRate, qint32 cutOffFreq, QVector<float> &impulseResponse)
 {
-    if(type == QString('HP'))
+    if(type == QString("HP"))
     {
         //HP from matlab
     }
 
-    if(type == QString('LP'))
+    if(type == QString("LP"))
     {
         //LP from matlab
     }
 
-    if(type == QString('BP'))
+    if(type == QString("BP"))
     {
         //BP from matlab
     }
 
+    Q_UNUSED(numberOfCoefficients);
+    Q_UNUSED(samplingRate);
+    Q_UNUSED(cutOffFreq);
+    Q_UNUSED(impulseResponse);
 }
 
 //*************************************************************************************************************
@@ -102,18 +106,18 @@ void FilterTools::createDynamicFilter(QString type, qint32 numberOfCoefficients,
     }
 
     //Create final filter specified by the type parameter
-    if(type == QString('HP'))
+    if(type == QString("HP"))
     {
         for(int i=1; i<impulseResponse.size(); i=i+2)
             impulseResponse[i] = impulseResponse[i] * (-1);
     }
 
-    if(type == QString('LP'))
+    if(type == QString("LP"))
     {
         impulseResponse = impulseResponse;
     }
 
-    if(type == QString('BP'))
+    if(type == QString("BP"))
     {
         t = 0;
         for(int i=0; i<numberOfCoefficients; i++)

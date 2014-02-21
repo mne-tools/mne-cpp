@@ -182,6 +182,7 @@ private:
     std::vector<double> DesiredMag;
     std::vector<double> Grid;
     std::vector<double> Weight;
+
     bool InitDone2;
 
 };

@@ -277,7 +277,10 @@ inline Matrix<_Tp, Dynamic, Dynamic> CircularMatrixBuffer<_Tp>::pop()
 template<typename _Tp>
 inline unsigned int CircularMatrixBuffer<_Tp>::mapIndex(int& index)
 {
-    return index = ++index % m_uiMaxNumElements;
+    int AuxIndex;
+    AuxIndex = ++index;
+    return index = AuxIndex % m_uiMaxNumElements;
+
 }
 
 
