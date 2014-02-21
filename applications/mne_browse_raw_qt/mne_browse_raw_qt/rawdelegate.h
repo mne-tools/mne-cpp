@@ -31,7 +31,14 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of delegate of mne_browse_raw_qt
+* @brief    This class represents the delegate of the model/view framework of mne_browse_raw_qt application.
+*           Since it is derived from the QAbstractItemDelegate class [1], the virtual functions paint() und sizeHint()
+*           need to be reimplemented.
+*           The paint() function is invoked from the connected QTableView for each table cell for any individual
+*           item with a certain QModelIndex. The task of this function is to paint this cell with the data
+*           that is requested by index.model()->data(index,Qt::DisplayRole); with the corresponding QModelIndex.
+*
+*           [1] http://qt-project.org/doc/qt-5/QAbstractItemDelegate.html
 *
 */
 
@@ -54,7 +61,6 @@
 //MNE
 #include <fiff/fiff.h>
 #include <mne/mne.h>
-#include <fiff/fiff_io.h>
 
 //MNE_BROWSE_RAW_QT
 #include "rawmodel.h"

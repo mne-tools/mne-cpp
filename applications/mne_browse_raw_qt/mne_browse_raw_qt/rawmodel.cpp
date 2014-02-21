@@ -31,7 +31,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of data model of mne_browse_raw_qt
+* @brief    This class represents the model of the model/view framework of mne_browse_raw_qt application.
 *
 */
 
@@ -72,11 +72,18 @@ RawModel::RawModel(QFile &qFile, QObject *parent)
     //read fiff data
     loadFiffData(qFile);
 
-    //generator FilterOperator objects Da wir jedoch täglich neue Projekte zur Besetzung erhalten, möchten wir auf jeden Fall weiter mit Ihrer interessanten Bewerbung arbeiten und hoffen, bald mit einem passenden Angebot auf Sie zukommen zu können. Vielen Dank für Ihre Geduld!
+    //generator FilterOperator objects
     //HPF
-    m_Operators["HPF"] = QSharedPointer<MNEOperator>(new FilterOperator("HPF",FilterOperator::HPF,m_iFilterTaps,0.15,0.2,0.1,(m_iWindowSize+m_iFilterTaps)));
+    double cutoff = 0.2;
+    QString name = QString("HPF_%1").arg(floor(cutoff*(m_fiffInfo.sfreq/2)));
+    m_Operators.insert(name,QSharedPointer<MNEOperator>(new FilterOperator(name,FilterOperator::HPF,m_iFilterTaps,cutoff,0.2,0.1,(m_iWindowSize+m_iFilterTaps))));
     //LPF
-    m_Operators["LPF"] = QSharedPointer<MNEOperator>(new FilterOperator("LPF",FilterOperator::LPF,m_iFilterTaps,0.08,0.2,0.1,(m_iWindowSize+m_iFilterTaps)));
+    cutoff = 0.05; //1 equals Nyquist freq
+    name = QString("LPF_%1").arg(floor(cutoff*(m_fiffInfo.sfreq/2)));
+    m_Operators.insert(name,QSharedPointer<MNEOperator>(new FilterOperator(name,FilterOperator::LPF,m_iFilterTaps,cutoff,0.2,0.1,(m_iWindowSize+m_iFilterTaps))));
+    cutoff = 0.12; //1 equals Nyquist freq
+    name = QString("LPF_%1").arg(floor(cutoff*(m_fiffInfo.sfreq/2)));
+    m_Operators.insert(name,QSharedPointer<MNEOperator>(new FilterOperator(name,FilterOperator::LPF,m_iFilterTaps,cutoff,0.2,0.1,(m_iWindowSize+m_iFilterTaps))));
 
     //connect signal and slots
     connect(&m_reloadFutureWatcher,&QFutureWatcher<QPair<MatrixXd,MatrixXd> >::finished,[this](){
@@ -452,7 +459,7 @@ void RawModel::markChBad(QModelIndexList chlist, bool status)
 
 //*************************************************************************************************************
 
-void RawModel::applyOperator(QModelIndex chan, QSharedPointer<MNEOperator>& operatorPtr, bool reset)
+void RawModel::applyOperator(QModelIndex chan, const QSharedPointer<MNEOperator>& operatorPtr, bool reset)
 {
     //cast to QSharedPointer<FilterOperator>
     QSharedPointer<FilterOperator> filter;
@@ -480,7 +487,7 @@ void RawModel::applyOperator(QModelIndex chan, QSharedPointer<MNEOperator>& oper
 
 //*************************************************************************************************************
 
-void RawModel::applyOperator(QModelIndexList chlist, QSharedPointer<MNEOperator>& operatorPtr, bool reset)
+void RawModel::applyOperator(QModelIndexList chlist, const QSharedPointer<MNEOperator>& operatorPtr, bool reset)
 {
     //filter all when chlist is empty
     if(chlist.empty()) {
@@ -552,7 +559,7 @@ void RawModel::updateOperators() {
 
 //*************************************************************************************************************
 
-void RawModel::undoFilter(QModelIndexList chlist, QSharedPointer<MNEOperator> &filterPtr)
+void RawModel::undoFilter(QModelIndexList chlist, const QSharedPointer<MNEOperator> &filterPtr)
 {
     for(qint32 i=0; i < chlist.size(); ++i) {
         if(m_assignedOperators.contains(chlist[i].row()) && m_assignedOperators.values(chlist[i].row()).contains(filterPtr)) {

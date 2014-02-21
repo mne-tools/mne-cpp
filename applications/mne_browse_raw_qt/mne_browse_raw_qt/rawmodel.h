@@ -31,7 +31,34 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of data model of mne_browse_raw_qt
+* @brief    This class represents the model of the model/view framework of mne_browse_raw_qt application.
+*           It is derived from QAbstractTableModel so the virtual functions rowCount(),columnCount() and data()
+*           needed to be reimplemented. The delegate requests the data for any individual table cell by
+*           invoking data(QModelIndex index, int role) and a certain role. DisplayRole is the standard role
+*           for requesting the plain data. Other roles such as BackgroundRole are requested to fill a cell
+*           with a certain background color with respect to the individual index.
+*           For further information see [1].
+*
+*           The way how the data is organized is totally up to the model. In our case, the raw and processed
+*           data is stored in stored in the two matrices m_data[i] and m_procData[i] (both are QList that contains MatrixXdR), respectively. (nchans x m_iWindowSize)
+*           The data is loaded and displayed blockwise. If the user scrolls close (meaning distanced smaller than
+*           m_iReloadPos) to the loaded edge, the subsequent block is loaded from the fiff file. The maximum number
+*           of loaded window blocks is determined by the parameter m_maxWindows. If m_maxWindows is reached and another
+*           block is to be loaded, the first or last block (depending on whether the user scrolls to the right or left edge)
+*           is removed from m_data, pretty much like a circular buffer. The logic of the reloading is managed by the
+*           slot updateScrollPos, which obtains the value from the horizontal QScrollBar being part of the connected TableView.
+*
+*           In order to not freeze the GUI when reloading new data or filtering data, the RawModel class makes heavy use
+*           of the QtConcurrent features. [2]
+*           Therefore, the methods updateOperatorsConcurrently() and readSegment() is run in a background-thread. Once the results
+*           are ready the m_operatorFutureWatcher and m_reloadFutureWatcher emits a signal that is connect to the slots
+*           insertProcessedData() and insertReloadedData(), respectively.
+*
+*           MNEOperators such as FilterOperators are stored in m_Operators. The MNEOperators that are applied to any
+*           individual channel are stored in the QMap m_assignedOperators.
+*
+*           [1] http://qt-project.org/doc/qt-5/QAbstractTableModel.html
+*           [2] http://qt-project.org/doc/qt-5.0/qtconcurrent/qtconcurrent-index.html
 *
 */
 
@@ -221,14 +248,14 @@ public slots:
      * @param index selects the channel to process
      * @param filter
      */
-    void applyOperator(QModelIndex chan, QSharedPointer<MNEOperator>& operatorPtr, bool reset=false);
+    void applyOperator(QModelIndex chan, const QSharedPointer<MNEOperator> &operatorPtr, bool reset=false);
 
     /**
      * applyOperator applies operators to channels
      * @param chlist selects the channels to process
      * @param filter
      */
-    void applyOperator(QModelIndexList chlist, QSharedPointer<MNEOperator>& operatorPtr, bool reset=false);
+    void applyOperator(QModelIndexList chlist, const QSharedPointer<MNEOperator> &operatorPtr, bool reset=false);
 
     /**
      * applyOperatorsConcurrently updates all applied MNEOperators to a given RowVectorXd and modifies it in-place
@@ -258,7 +285,7 @@ public slots:
      * @param chlist selects the channels to filter
      * @param type determines the filter type TPassType to choose for the undo operation
      */
-    void undoFilter(QModelIndexList chlist, QSharedPointer<MNEOperator>& filterPtr);
+    void undoFilter(QModelIndexList chlist, const QSharedPointer<MNEOperator> &filterPtr);
 
     /**
      * undoFilter undoes the filtering operation for all filter operations
