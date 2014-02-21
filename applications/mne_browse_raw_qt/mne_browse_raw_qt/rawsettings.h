@@ -31,7 +31,13 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains all application settings.
+* @brief    In this RawSettings class all mne_browse_raw_qt settings are managed. In order to store settings
+*           from the last mne_browse_raw_qt session, the class uses the QtSettings class of Qt. [1]
+*           Using QSettings, the entries are stored locally in a OS-specific place from where they shall
+*           be loaded at each start of mne_browse_raw_qt if they were already set (this is not yet implemented -> ToDo)
+*
+*
+*           [1] http://qt-project.org/doc/qt-5/QSettings.html
 *
 */
 

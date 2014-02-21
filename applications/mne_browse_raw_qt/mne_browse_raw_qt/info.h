@@ -31,7 +31,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains general application information like: application name and  version number.
+* @brief    Contains general application information like: application name and version number.
 *
 */
 

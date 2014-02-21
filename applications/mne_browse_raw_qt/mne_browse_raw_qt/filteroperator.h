@@ -31,8 +31,19 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains all FilterOperators.
+* @brief    The FilterOperator class represents a derived class from an arbitrary MNEOperator class object.
+*           Thus, it is a filter object that generates the FIR filter coefficients using Park's McClellan's
+*           filter design algorithm [1] and offers a overlap-add method [2] for frequency filtering of an input
+*           sequence. In this regard, the filter coefficients of a certain filter order are zero-padded to fill
+*           a length of an multiple integer of a power of 2 in order to efficiently compute a FFT. The length of
+*           the FFT is given by the next power of 2 of the length of the input sequence. In order to avoid
+*           circular-convolution, the input sequence is given by the FFT-length-NumFilterTaps.
 *
+*           e.g. FFT length=4096, NumFilterTaps=80 -> input sequence 4096-80=4016
+*
+*
+*           [1] http://en.wikipedia.org/wiki/Parks%E2%80%93McClellan_filter_design_algorithm
+*           [2] http://en.wikipedia.org/wiki/Overlap_add
 */
 
 #ifndef FILTEROPERATOR_H

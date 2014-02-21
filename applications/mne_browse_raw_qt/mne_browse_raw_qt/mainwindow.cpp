@@ -33,28 +33,6 @@
 *
 * @brief    mne_browse_raw_qt is the QT equivalent of the already existing C-version of mne_browse_raw. It is pursued
 *           to reimplement the full feature set of mne_browse_raw and even extend these.
-*
-*           An excerpt of what mne_browse_raw does:
-*           "The raw data processor mne_browse_raw is designed for simple raw data viewing and processing operations.
-*           In addition, the program is capable of off-line averaging and estimation of covariance matrices.
-*           mne_browse_raw can be also used to view averaged data in the topographical layout. Finally, mne_browse_raw
-*           can communicate with mne_analyze described in Interactive analysis to calculate current estimates from raw data interactively."
-*           (from [1])
-*
-*           Contributing and extending mne_browse_raw_qt is strongly appreciated!
-*           Here are some infos how mne_browse_raw_qt is structured. The program makes heavy use of the model/view framework of QT. [2]
-*           Hence, the base is divided into the three main compenents and the corresponding classes:
-*           - View (included in MainWindow):
-*           - Model (RawModel.cpp):
-*           - Delegate (RawDelegate.cpp):
-*
-*
-*
-*
-*
-*           [1] http://martinos.org/mne/stable/manual/browse.html
-*           [2] http://qt-project.org/doc/qt-5/model-view-programming.html
-*
 */
 
 #include "mainwindow.h"
@@ -328,58 +306,84 @@ void MainWindow::customContextMenuRequested(QPoint pos)
     //obtain index where index was clicked
     QModelIndex index = m_pTableView->indexAt(pos);
 
-    //create custom context menu and actions
-    QMenu *menu = new QMenu(this);
-    menu->addSection("Marking channels");
-    QAction* doMarkChBad = menu->addAction(tr("Mark as bad"));
-    QAction* doMarkChGood = menu->addAction(tr("Mark as good"));
-    menu->addSection("Applying FilterOperators");
-    QAction* doApplyHPFFilter = menu->addAction(tr("Apply HPF to selected channels"));
-    QAction* doApplyLPFFilter = menu->addAction(tr("Apply LPF to selected channels"));
-    QAction* doApplyHPFFilterAll = menu->addAction(tr("Apply HPF to all channels"));
-    QAction* doApplyLPFFilterAll = menu->addAction(tr("Apply LPF to all channels"));
-    menu->addSection("Undoing FilterOperators");
-    QAction* undoApplyHPFFilter = menu->addAction(tr("Undo HPF to selected channel"));
-    QAction* undoApplyLPFFilter = menu->addAction(tr("Undo LPF to selected channel"));
-    QAction* undoApplyFilter = menu->addAction(tr("Undo all filtering to selected channels"));
-    QAction* undoApplyFilterAll = menu->addAction(tr("Undo all filtering to all channels"));
-
     //get selected items
     QModelIndexList selected = m_pTableView->selectionModel()->selectedIndexes();
 
-    //connect actions
-    //marking
+    //create custom context menu and actions
+    QMenu *menu = new QMenu(this);
+
+    //**************** Marking ****************
+    QMenu *markingSubMenu = new QMenu("Mark channels",menu);
+
+    QAction* doMarkChBad = markingSubMenu->addAction(tr("Mark as bad"));
     connect(doMarkChBad,&QAction::triggered, [=](){
         m_pRawModel->markChBad(selected,1);
     });
+
+    QAction* doMarkChGood = markingSubMenu->addAction(tr("Mark as good"));
     connect(doMarkChGood,&QAction::triggered, [=](){
         m_pRawModel->markChBad(selected,0);
     });
-    //filtering
-    connect(doApplyHPFFilter,&QAction::triggered, [=](){
-        m_pRawModel->applyOperator(selected,m_pRawModel->m_Operators["HPF"]);
-    });
-    connect(doApplyLPFFilter,&QAction::triggered, [=](){
-        m_pRawModel->applyOperator(selected,m_pRawModel->m_Operators["LPF"]);
-    });
-    connect(doApplyHPFFilterAll,&QAction::triggered, [=](){
-        m_pRawModel->applyOperator(QModelIndexList(),m_pRawModel->m_Operators["HPF"]);
-    });
-    connect(doApplyLPFFilterAll,&QAction::triggered, [=](){
-        m_pRawModel->applyOperator(QModelIndexList(),m_pRawModel->m_Operators["LPF"]);
-    });
-    connect(undoApplyHPFFilter,&QAction::triggered, [=](){
-        m_pRawModel->undoFilter(selected,m_pRawModel->m_Operators["HPF"]);
-    });
-    connect(undoApplyLPFFilter,&QAction::triggered, [=](){
-        m_pRawModel->undoFilter(selected,m_pRawModel->m_Operators["LPF"]);
-    });
-    connect(undoApplyFilter,&QAction::triggered, [=](){
+
+    //**************** FilterOperators ****************
+    //selected channels
+    QMenu *filtOpSubMenu = new QMenu("Apply FilterOperator to selected channel",menu);
+    QMutableMapIterator<QString,QSharedPointer<MNEOperator> > it(m_pRawModel->m_Operators);
+    while(it.hasNext()) {
+        it.next();
+        QAction* doApplyFilter = filtOpSubMenu->addAction(tr("%1").arg(it.key()));
+
+        connect(doApplyFilter,&QAction::triggered, [=](){
+            m_pRawModel->applyOperator(selected,it.value());
+        });
+    }
+
+    //all channels
+    QMenu *filtOpAllSubMenu = new QMenu("Apply FilterOperator to all channels",menu);
+    it.toFront();
+    while(it.hasNext()) {
+        it.next();
+        QAction* doApplyFilter = filtOpAllSubMenu->addAction(tr("%1").arg(it.key()));
+
+        connect(doApplyFilter,&QAction::triggered, [=](){
+            m_pRawModel->applyOperator(QModelIndexList(),it.value());
+        });
+    }
+
+    //undoing filtering
+    QMenu *undoFiltOpSubMenu = new QMenu("Undo filtering",menu);
+    QMenu *undoFiltOpSelSubMenu = new QMenu("to selected channels",undoFiltOpSubMenu);
+
+    //undo certain FilterOperators to selected channels
+    it.toFront();
+    while(it.hasNext()) {
+        it.next();
+        QAction* undoApplyFilter = undoFiltOpSelSubMenu->addAction(tr("%1").arg(it.key()));
+
+        connect(undoApplyFilter,&QAction::triggered, [=](){
+            m_pRawModel->undoFilter(selected,it.value());
+        });
+    }
+
+    undoFiltOpSubMenu->addMenu(undoFiltOpSelSubMenu);
+
+    //undo all filterting to selected channels
+    QAction* undoApplyFilterSel = undoFiltOpSubMenu->addAction(tr("Undo FilterOperators to selected channels"));
+    connect(undoApplyFilterSel,&QAction::triggered, [=](){
         m_pRawModel->undoFilter(selected);
     });
+
+    //undo all filtering to all channels
+    QAction* undoApplyFilterAll = undoFiltOpSubMenu->addAction(tr("Undo FilterOperators to all channels"));
     connect(undoApplyFilterAll,&QAction::triggered, [=](){
         m_pRawModel->undoFilter();
     });
+
+    //add everything to main contextmenu
+    menu->addMenu(markingSubMenu);
+    menu->addMenu(filtOpSubMenu);
+    menu->addMenu(filtOpAllSubMenu);
+    menu->addMenu(undoFiltOpSubMenu);
 
     //show context menu
     menu->popup(m_pTableView->viewport()->mapToGlobal(pos));
