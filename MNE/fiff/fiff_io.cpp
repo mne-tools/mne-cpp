@@ -114,7 +114,7 @@ bool FiffIO::read(QIODevice& p_IODevice)
     FiffInfo t_fiffInfo;
     FiffDirTree t_Tree;
     FiffDirTree t_dirTree;
-    bool hasRaw=false,hasEvoked=false,hasFwds=false;
+    bool hasRaw=false,hasEvoked=false; // hasFwds=false;
 
     FiffIO::setup_read(p_IODevice,t_fiffInfo,t_Tree,t_dirTree);
     p_IODevice.close(); //file can be closed, since IODevice is already read
@@ -124,8 +124,8 @@ bool FiffIO::read(QIODevice& p_IODevice)
         hasEvoked = true;
     if(t_dirTree.has_kind(FIFFB_RAW_DATA)) //this type might not yet be sufficient, (another is e.g. FIFFB_RAW_DATA)
         hasRaw = true;
-    if(t_Tree.has_kind(FIFFB_MNE_FORWARD_SOLUTION))
-        hasFwds = true;
+   // if(t_Tree.has_kind(FIFFB_MNE_FORWARD_SOLUTION))
+   //     hasFwds = true;
 
     //Read all sort of types
     //raw data
