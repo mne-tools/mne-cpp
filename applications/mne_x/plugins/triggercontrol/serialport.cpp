@@ -97,6 +97,7 @@ SerialPort::SerialPort()
         m_InActiveDig.replace(i,0);
     }
 
+    m_wiredChannel = 0;
 
     //connect(this->m_qSerialPort, SIGNAL(readyRead()), this, SLOT(SerialPort::readData()));   // if data available, read
     connect(&m_qSerialPort, &QSerialPort::readyRead, this, &SerialPort::readData);
