@@ -118,6 +118,8 @@
 /bin/mne_3d_widgetd
 /bin/mne_browse_raw_qt
 /bin/mne_browse_raw_qtd
+/bin/mne_future_test
+/bin/mne_future_testd
 /bin/mne_graph_test
 /bin/mne_graph_testd
 /bin/mne_lib_testsd

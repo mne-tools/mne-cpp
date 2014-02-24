@@ -1,12 +1,12 @@
 //=============================================================================================================
 /**
-* @file     rawsettings.cpp
+* @file     filteroperator.cpp
 * @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 *           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
 * @version  1.0
-* @date     January, 2014
+* @date     February, 2014
 *
 * @section  LICENSE
 *
@@ -31,66 +31,80 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains all application settings.
+* @brief    Contains all FilterOperators.
 *
 */
 
-#include "rawsettings.h"
+#include "filteroperator.h"
 
 //*************************************************************************************************************
 
-using namespace MNE_BROWSE_RAW_QT;
-
-//*************************************************************************************************************
-
-RawSettings::RawSettings(QObject *parent)
-: QObject(parent)
-, m_qSettings("mne-cpp","MNE_BROWSE_RAW_QT")
+FilterOperator::FilterOperator()
+: MNEOperator(OperatorType::FILTER)
 {
-    init();
 }
 
-RawSettings::~RawSettings()
+FilterOperator::~FilterOperator()
 {
 }
 
 //*************************************************************************************************************
 
-void RawSettings::init()
+FilterOperator::FilterOperator(QString unique_name, FilterType type, qint8 order, double centerfreq, double bandwidth, double parkswidth, qint32 fftlength)
+: MNEOperator(OperatorType::FILTER)
+, m_iFilterOrder(order)
+, m_Type(type)
+, m_iFFTlength(fftlength)
 {
-    //MainWindow
-    //ToDo: ask for already stored setting in OS environment before setting them
-    //e.g. if(!m_qSettings.contains("RawModel/window_size")) m_qSettings.setValue("window_size",MODEL_WINDOW_SIZE);
+    m_sName = unique_name;
 
-    //Window settings
-    m_qSettings.beginGroup("MainWindow");
-        m_qSettings.setValue("size",QSize(MAINWINDOW_WINDOW_SIZE_W,MAINWINDOW_WINDOW_SIZE_H));
-    m_qSettings.endGroup();
+    ParksMcClellan filter(order, centerfreq, bandwidth, parkswidth, (ParksMcClellan::TPassType)type);
+    m_dCoeffA = filter.FirCoeff;
 
-    //RawModel
-    m_qSettings.beginGroup("RawModel");
-        m_qSettings.setValue("window_size",MODEL_WINDOW_SIZE);
-        m_qSettings.setValue("reload_pos",MODEL_RELOAD_POS);
-        m_qSettings.setValue("max_windows",MODEL_MAX_WINDOWS);
-        m_qSettings.setValue("num_filter_taps",MODEL_NUM_FILTER_TAPS);
-    m_qSettings.endGroup();
+    //fft-transform m_dCoeffA in order to be able to perform frequency-domain filtering
+    fftTransformCoeffs();
+}
 
-    //RawDelegate
-    m_qSettings.beginGroup("RawDelegate");
+//*************************************************************************************************************
 
-        //look
-        m_qSettings.setValue("plotheight",DELEGATE_PLOT_HEIGHT);
-        m_qSettings.setValue("dx",DELEGATE_DX);
-        m_qSettings.setValue("nhlines",DELEGATE_NHLINES);
+void FilterOperator::fftTransformCoeffs()
+{
+    //zero-pad m_dCoeffA to m_iFFTlength
+    RowVectorXd t_coeffAzeroPad = RowVectorXd::Zero(m_iFFTlength);
+    t_coeffAzeroPad.head(m_dCoeffA.cols()) = m_dCoeffA;
 
-//        //maximum values for different channels types according to FiffChInfo
-        m_qSettings.setValue("max_meg_grad",DELEGATE_MAX_MEG_GRAD);
-        m_qSettings.setValue("max_meg_mag",DELEGATE_MAX_MEG_MAG);
-        m_qSettings.setValue("max_eeg",DELEGATE_MAX_EEG);
-        m_qSettings.setValue("max_eog",DELEGATE_MAX_EOG);
-        m_qSettings.setValue("max_stim",DELEGATE_MAX_STIM);
+    //generate fft object
+    Eigen::FFT<double> fft;
+    fft.SetFlag(fft.HalfSpectrum);
 
-    m_qSettings.endGroup();
+    //fft-transform filter coeffs
+    m_dFFTCoeffA = RowVectorXcd::Zero(m_iFFTlength);
+    fft.fwd(m_dFFTCoeffA,t_coeffAzeroPad);
+}
 
+//*************************************************************************************************************
 
+RowVectorXd FilterOperator::applyFFTFilter(RowVectorXd& data)
+{
+    //zero-pad data to m_iFFTlength
+    RowVectorXd t_dataZeroPad = RowVectorXd::Zero(m_iFFTlength);
+    t_dataZeroPad.head(data.cols()) = data;
+
+    //generate fft object
+    Eigen::FFT<double> fft;
+    fft.SetFlag(fft.HalfSpectrum);
+
+    //fft-transform data sequence
+    RowVectorXcd t_freqData;
+    fft.fwd(t_freqData,t_dataZeroPad);
+
+    //perform frequency-domain filtering
+    RowVectorXcd t_filteredFreq = m_dFFTCoeffA.array()*t_freqData.array();
+
+    //inverse-FFT
+    RowVectorXd t_filteredTime;
+    fft.inv(t_filteredTime,t_filteredFreq);
+
+    //cuts off ends at front and end and return result
+    return t_filteredTime.segment(m_iFilterOrder/2+1,m_iFFTlength-m_iFilterOrder);
 }

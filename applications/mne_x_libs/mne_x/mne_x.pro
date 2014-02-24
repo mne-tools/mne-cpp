@@ -140,3 +140,12 @@ header_files_management.path = $${MNE_X_INCLUDE_DIR}/mne_x/Management
 INSTALLS += header_files
 INSTALLS += header_files_interfaces
 INSTALLS += header_files_management
+
+
+unix:!macx {
+    QMAKE_CXXFLAGS += -std=c++0x
+}
+macx {
+    QMAKE_CXXFLAGS = -mmacosx-version-min=10.7 -std=gnu0x -stdlib=libc+
+    CONFIG +=c++11
+}
