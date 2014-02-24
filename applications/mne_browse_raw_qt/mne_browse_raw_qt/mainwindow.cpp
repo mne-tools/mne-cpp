@@ -58,8 +58,9 @@ MainWindow::MainWindow(QWidget *parent)
     createMenus();
 
     createLogDockWindow();
-    setWindow();
 
+    setWindow();
+    setWindowStatus();
 }
 
 //*************************************************************************************************************
@@ -175,8 +176,6 @@ void MainWindow::createMenus() {
 //*************************************************************************************************************
 
 void MainWindow::setWindow() {
-    setWindowStatus();
-
     //set Window functions
     resize(m_qSettings.value("MainWindow/size").toSize());
     this->move(50,50);
@@ -186,11 +185,9 @@ void MainWindow::setWindow() {
 
 void MainWindow::setWindowStatus() {
     QString title;
-    bool scrollBarEnabled = false;
 
     //request status
     if(m_pRawModel->m_bFileloaded) {
-        scrollBarEnabled = true;
         int idx = m_qFileRaw.fileName().lastIndexOf("/");
         QString filename = m_qFileRaw.fileName().remove(0,idx+1);
         title = QString("%1, (File loaded: %2)").arg(CInfo::AppNameShort()).arg(filename);
@@ -202,8 +199,8 @@ void MainWindow::setWindowStatus() {
     //set title
     setWindowTitle(title);
 
-    //set scrollbar status
-    m_pTableView->horizontalScrollBar()->setEnabled(scrollBarEnabled);
+    //let the view update (ScrollBars etc.)
+    m_pTableView->resizeColumnsToContents();
 }
 
 //=============================================================================================================
@@ -277,7 +274,6 @@ void MainWindow::openFile()
 
     if(m_pRawModel->loadFiffData(m_qFileRaw)) {
         qDebug() << "Fiff data file" << filename << "loaded.";
-//        setupViewSettings();
     }
     else
         qDebug("ERROR loading fiff data file %s",filename.toLatin1().data());
