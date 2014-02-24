@@ -273,6 +273,7 @@ void TriggerControlPlugin::TriggerControlSetupWidget::on_m_qPushButton_RetrieveI
     if ( ui.m_qComboBox_RetrieveType->currentIndex() == 0)      // digital selected
     {
         m_pTriggerControl->m_pSerialPort->m_retrievetyp = 0;    // digital channel desired
+
     }
 
     else if (ui.m_qComboBox_RetrieveType->currentIndex() == 1)
