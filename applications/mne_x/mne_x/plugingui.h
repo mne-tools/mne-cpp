@@ -95,6 +95,8 @@ public:
 signals:
    void selectedPluginChanged(IPlugin::SPtr pPlugin);
 
+   void selectedConnectionChanged(PluginConnectorConnection::SPtr pConnection);
+
 private:
 
     void pointerGroupClicked(int id);
@@ -118,7 +120,8 @@ private:
     PluginManager::SPtr       m_pPluginManager;       /**< Corresponding plugin manager. */
     PluginSceneManager::SPtr  m_pPluginSceneManager;  /**< Corresponding plugin scene manager. */
 
-    IPlugin::SPtr             m_pCurrentPlugin;
+    IPlugin::SPtr                   m_pCurrentPlugin;
+    PluginConnectorConnection::SPtr m_pCurrentConnection;
 
     PluginScene*    m_pPluginScene;         /**< Plugin graph */
     QGraphicsView*  m_pGraphicsView;        /**< View to show graph */

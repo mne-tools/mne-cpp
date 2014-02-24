@@ -66,7 +66,7 @@ using namespace MNEX;
 //=============================================================================================================
 
 StartUpWidget::StartUpWidget(QWidget *parent)
-    : QWidget(parent)
+: QWidget(parent)
 {
 
     QWidget *topFiller = new QWidget;
@@ -93,4 +93,5 @@ StartUpWidget::StartUpWidget(QWidget *parent)
 
 StartUpWidget::~StartUpWidget()
 {
+
 }

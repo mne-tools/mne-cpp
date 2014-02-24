@@ -419,6 +419,9 @@ void MainWindow::createPluginDockWindow()
 
     connect(m_pPluginGui, &PluginGui::selectedPluginChanged,
             this, &MainWindow::updatePluginWidget);
+
+    connect(m_pPluginGui, &PluginGui::selectedConnectionChanged,
+            this, &MainWindow::updateConnectionWidget);
 }
 
 
@@ -481,6 +484,15 @@ void MainWindow::updatePluginWidget(IPlugin::SPtr pPlugin)
                 setCentralWidget(m_pRunWidget);
         }
     }
+}
+
+
+//*************************************************************************************************************
+
+void MainWindow::updateConnectionWidget(PluginConnectorConnection::SPtr pConnection)
+{
+    QWidget* pWidget = pConnection->setupWidget();
+    setCentralWidget(pWidget);
 }
 
 

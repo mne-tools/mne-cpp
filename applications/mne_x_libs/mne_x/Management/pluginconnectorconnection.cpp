@@ -39,8 +39,12 @@
 //=============================================================================================================
 
 #include "pluginconnectorconnection.h"
+#include "pluginconnectorconnectionwidget.h"
+
+#include <xMeas/newnumeric.h>
 #include <xMeas/newrealtimesamplearray.h>
 #include <xMeas/newrealtimemultisamplearray.h>
+#include <xMeas/realtimesourceestimate.h>
 
 
 //*************************************************************************************************************
@@ -125,6 +129,17 @@ bool PluginConnectorConnection::createConnection()
                 bConnected = true;
                 break;
             }
+
+            //Cast to RealTimeSourceEstimate
+            QSharedPointer< PluginOutputData<RealTimeSourceEstimate> > senderRTSE = m_pSender->getOutputConnectors()[i].dynamicCast< PluginOutputData<RealTimeSourceEstimate> >();
+            QSharedPointer< PluginInputData<RealTimeSourceEstimate> > receiverRTSE = m_pReceiver->getInputConnectors()[j].dynamicCast< PluginInputData<RealTimeSourceEstimate> >();
+            if(senderRTSE && receiverRTSE)
+            {
+                m_con = connect(m_pSender->getOutputConnectors()[i].data(), &PluginOutputConnector::notify,
+                        m_pReceiver->getInputConnectors()[j].data(), &PluginInputConnector::update, Qt::BlockingQueuedConnection);
+                bConnected = true;
+                break;
+            }
         }
 
         if(bConnected)
@@ -135,4 +150,41 @@ bool PluginConnectorConnection::createConnection()
 //    m_con = connect(sender.data(), &PluginOutputConnector::notify, receiver.data(), &PluginInputConnector::update);
 
     return bConnected;
+}
+
+
+//*************************************************************************************************************
+
+ConnectorDataType PluginConnectorConnection::getDataType(QSharedPointer<PluginConnector> pPluginConnector)
+{
+    QSharedPointer< PluginOutputData<XMEASLIB::NewRealTimeSampleArray> > RTSA_Out = pPluginConnector.dynamicCast< PluginOutputData<XMEASLIB::NewRealTimeSampleArray> >();
+    QSharedPointer< PluginInputData<XMEASLIB::NewRealTimeSampleArray> > RTSA_In = pPluginConnector.dynamicCast< PluginInputData<XMEASLIB::NewRealTimeSampleArray> >();
+    if(RTSA_Out || RTSA_In)
+        return ConnectorDataType::_RTSA;
+
+    QSharedPointer< PluginOutputData<XMEASLIB::NewRealTimeMultiSampleArray> > RTMSA_Out = pPluginConnector.dynamicCast< PluginOutputData<XMEASLIB::NewRealTimeMultiSampleArray> >();
+    QSharedPointer< PluginInputData<XMEASLIB::NewRealTimeMultiSampleArray> > RTMSA_In = pPluginConnector.dynamicCast< PluginInputData<XMEASLIB::NewRealTimeMultiSampleArray> >();
+    if(RTMSA_Out || RTMSA_In)
+        return ConnectorDataType::_RTMSA;
+
+    QSharedPointer< PluginOutputData<XMEASLIB::RealTimeSourceEstimate> > RTSE_Out = pPluginConnector.dynamicCast< PluginOutputData<XMEASLIB::RealTimeSourceEstimate> >();
+    QSharedPointer< PluginInputData<XMEASLIB::RealTimeSourceEstimate> > RTSE_In = pPluginConnector.dynamicCast< PluginInputData<XMEASLIB::RealTimeSourceEstimate> >();
+    if(RTSE_Out || RTSE_In)
+        return ConnectorDataType::_RTSE;
+
+    QSharedPointer< PluginOutputData<XMEASLIB::NewNumeric> > Num_Out = pPluginConnector.dynamicCast< PluginOutputData<XMEASLIB::NewNumeric> >();
+    QSharedPointer< PluginInputData<XMEASLIB::NewNumeric> > Num_In = pPluginConnector.dynamicCast< PluginInputData<XMEASLIB::NewNumeric> >();
+    if(Num_Out || Num_In)
+        return ConnectorDataType::_N;
+
+    return ConnectorDataType::_None;
+}
+
+
+//*************************************************************************************************************
+
+QWidget* PluginConnectorConnection::setupWidget()
+{
+    PluginConnectorConnectionWidget* pccWidget = new PluginConnectorConnectionWidget(this);
+    return pccWidget;
 }

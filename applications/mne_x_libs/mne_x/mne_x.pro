@@ -101,6 +101,7 @@ SOURCES += \
     Management/plugininputdata.cpp \
     Management/pluginoutputdata.cpp \
     Management/pluginconnectorconnection.cpp \
+    Management/pluginconnectorconnectionwidget.cpp \
     Management/pluginscenemanager.cpp \
     Management/newdisplaymanager.cpp
 
@@ -117,6 +118,7 @@ HEADERS += \
     Management/plugininputdata.h \
     Management/pluginoutputdata.h \
     Management/pluginconnectorconnection.h \
+    Management/pluginconnectorconnectionwidget.h \
     Management/pluginscenemanager.h \
     Management/newdisplaymanager.h
 

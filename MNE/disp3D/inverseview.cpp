@@ -430,7 +430,7 @@ void InverseView::updateActivation(QSharedPointer<Eigen::VectorXd> p_pVecActivat
     {
         if(m_pInverseViewProducer->getMaxActivation()[i] != 0)
         {
-            qint32 iVal = (t_curLabelActivation[i]/m_pInverseViewProducer->getGlobalMax()) * 1200;//255;
+            qint32 iVal = (t_curLabelActivation[i]/m_pInverseViewProducer->getGlobalMax()) * 800;//1200;//255;
 
             iVal = iVal > 255 ? 255 : iVal < 0 ? 0 : iVal;
 
@@ -441,8 +441,8 @@ void InverseView::updateActivation(QSharedPointer<Eigen::VectorXd> p_pVecActivat
 ////                r = iVal;
 ////                g = iVal;
 ////                b = iVal;
-                qRgb = ColorMap::valueToHotNegative1((double)iVal/255.0);
-////                qRgb = ColorMap::valueToHotNegative2((double)iVal/255.0);
+//                qRgb = ColorMap::valueToHotNegative1((double)iVal/255.0);
+                qRgb = ColorMap::valueToHotNegative2((double)iVal/255.0);
 //            }
 //            else if(m_iColorMode == 1)
 //            {

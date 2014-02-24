@@ -72,21 +72,6 @@ using namespace UTILSLIB;
 using namespace FSLIB;
 
 
-
-
-//*************************************************************************************************************
-
-MNEForwardSolution::RegionDataOut kMeansRoiClustering(MNEForwardSolution::RegionDataIn p_RegionDataIn)
-{
-        // Kmeans Reduction
-        MNEForwardSolution::RegionDataOut p_RegionDataOut;
-
-        KMeans t_kMeans(QString("cityblock"), QString("sample"), 5);
-        t_kMeans.calculate(p_RegionDataIn.matRoiG, p_RegionDataIn.nClusters, p_RegionDataOut.roiIdx, p_RegionDataOut.ctrs, p_RegionDataOut.sumd, p_RegionDataOut.D);
-
-        return p_RegionDataOut;
-}
-
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -377,7 +362,7 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(AnnotationSet &p
 
                             double sqec = sqrt((t_LF.block(0, j*3, t_LF.rows(), 3) - t_LF_partial.block(0, k*3, t_LF_partial.rows(), 3)).array().pow(2).sum());
                             double sqec_min = sqec;
-                            double j_min = j;
+                            qint32 j_min = j;
                             for(qint32 j = 1; j < idcs.rows(); ++j)
                             {
                                 sqec = sqrt((t_LF.block(0, j*3, t_LF.rows(), 3) - t_LF_partial.block(0, k*3, t_LF_partial.rows(), 3)).array().pow(2).sum());
@@ -455,7 +440,7 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(AnnotationSet &p
 
 //*************************************************************************************************************
 
-MNEForwardSolution MNEForwardSolution::cluster_forward_solution_new(AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize)
+MNEForwardSolution MNEForwardSolution::cluster_forward_solution_ccr(AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize)
 {
     MNEForwardSolution p_fwdOut = MNEForwardSolution(*this);
 
@@ -507,13 +492,8 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution_new(AnnotationSe
         for(qint32 i = 0; i < vertno_labeled.rows(); ++i)
             vertno_labeled[i] = p_AnnotationSet[h].getLabelIds()[this->src[h].vertno[i]];
 
-        //iterate over labels
-        MatrixXd t_LF_partial;
-
-
         //Qt Concurrent List
         QList<RegionDataIn> m_qListRegionDataIn;
-
 
         for (qint32 i = 0; i < label_ids.rows(); ++i)
         {
@@ -552,15 +532,15 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution_new(AnnotationSe
                 {
                     RegionDataIn t_sensG;
 
+                    t_sensG.idcs = idcs;
+                    t_sensG.iLabelIdxIn = i;
                     t_sensG.nClusters = ceil((double)nSources/(double)p_iClusterSize);
+
+                    t_sensG.matRoiGOrig = t_LF;
 
                     printf("%d Cluster(s)... ", t_sensG.nClusters);
 
-//                    t_LF_partial = MatrixXd::Zero(nSens,t_sensG.nClusters*3);
-
                     // Reshape Input data -> sources rows; sensors columns
-//                    MatrixXd t_sensLF(t_LF.cols()/3, 3*nSens);
-
                     t_sensG.matRoiG = MatrixXd(t_LF.cols()/3, 3*nSens);
 
                     for(qint32 j = 0; j < nSens; ++j)
@@ -571,83 +551,7 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution_new(AnnotationSe
 
                     m_qListRegionDataIn.append(t_sensG);
 
-
-//                    // Kmeans Reduction
-//                    VectorXi roiIdx;
-//                    MatrixXd ctrs;
-//                    VectorXd sumd;
-//                    MatrixXd D;
-
-//                    t_kMeans.calculate(t_sensLF, nClusters, roiIdx, ctrs, sumd, D);
-
-//                    //
-//                    // Assign the centroid for each cluster to the partial LF
-//                    //
-//                    for(qint32 j = 0; j < nSens; ++j)
-//                        for(qint32 k = 0; k < nClusters; ++k)
-//                            t_LF_partial.block(j, k*3, 1, 3) = ctrs.block(k,j*3,1,3);
-
-//                    //
-//                    // Get cluster indizes and its distances to the centroid
-//                    //
-//                    for(qint32 j = 0; j < nClusters; ++j)
-//                    {
-//                        VectorXi clusterIdcs = VectorXi::Zero(roiIdx.rows());
-//                        VectorXd clusterDistance = VectorXd::Zero(roiIdx.rows());
-//                        qint32 nClusterIdcs = 0;
-//                        for(qint32 k = 0; k < roiIdx.rows(); ++k)
-//                        {
-//                            if(roiIdx[k] == j)
-//                            {
-//                                clusterIdcs[nClusterIdcs] = idcs[k];
-//                                clusterDistance[nClusterIdcs] = D(k,j);
-//                                ++nClusterIdcs;
-//                            }
-//                        }
-//                        clusterIdcs.conservativeResize(nClusterIdcs);
-//                        p_fwdOut.src[h].cluster_info.clusterVertnos.append(clusterIdcs);
-//                        p_fwdOut.src[h].cluster_info.clusterDistances.append(clusterDistance);
-//                        p_fwdOut.src[h].cluster_info.clusterLabelIds.append(label_ids[i]);
-//                    }
-
-//                    //
-//                    // Assign partial LF to new LeadField
-//                    //
-//                    if(t_LF_partial.rows() > 0 && t_LF_partial.cols() > 0)
-//                    {
-//                        t_LF_new.conservativeResize(t_LF_partial.rows(), t_LF_new.cols() + t_LF_partial.cols());
-//                        t_LF_new.block(0, t_LF_new.cols() - t_LF_partial.cols(), t_LF_new.rows(), t_LF_partial.cols()) = t_LF_partial;
-
-//                        // Map the centroids to the closest rr
-//                        for(qint32 k = 0; k < nClusters; ++k)
-//                        {
-//                            qint32 j = 0;
-
-//                            double sqec = sqrt((t_LF.block(0, j*3, t_LF.rows(), 3) - t_LF_partial.block(0, k*3, t_LF_partial.rows(), 3)).array().pow(2).sum());
-//                            double sqec_min = sqec;
-//                            double j_min = j;
-//                            for(qint32 j = 1; j < idcs.rows(); ++j)
-//                            {
-//                                sqec = sqrt((t_LF.block(0, j*3, t_LF.rows(), 3) - t_LF_partial.block(0, k*3, t_LF_partial.rows(), 3)).array().pow(2).sum());
-//                                if(sqec < sqec_min)
-//                                {
-//                                    sqec_min = sqec;
-//                                    j_min = j;
-//                                }
-//                            }
-
-//                            // Take the closest coordinates
-//                            qint32 sel_idx = idcs[j_min];
-//                            //ToDo store this in cluster info
-////                            p_fwdOut.src[h].rr.row(count) = this->src[h].rr.row(sel_idx);
-////                            p_fwdOut.src[h].nn.row(count) = MatrixXd::Zero(1,3);
-
-//                            p_fwdOut.src[h].vertno[count] = this->src[h].vertno[sel_idx];
-
-//                            ++count;
-//                        }
-//                    }
-//                    printf("[done]\n");
+                    printf("[added]\n");
                 }
                 else
                 {
@@ -656,25 +560,106 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution_new(AnnotationSe
             }
         }
 
-
-
-
-        //Cluster stuff
-
-
-        QFuture< MNEForwardSolution::RegionDataOut > res;
-
-        res = QtConcurrent::mapped(m_qListRegionDataIn, kMeansRoiClustering);
-
+        //
+        // Calculate clusters
+        //
+        printf("Clustering... ");
+        QFuture< RegionDataOut > res;
+        res = QtConcurrent::mapped(m_qListRegionDataIn, &RegionDataIn::cluster);
         res.waitForFinished();
-
-        qDebug() << "Clustering done";
-
+        printf("[done]\n");
 
 
+        //
+        // Assign results
+        //
+        MatrixXd t_LF_partial;
+
+        qint32 nClusters;
+        qint32 nSens;
+        QFuture<RegionDataOut>::const_iterator itOut;
+        QList<RegionDataIn>::const_iterator itIn;
+        itIn = m_qListRegionDataIn.begin();
+        for (itOut = res.constBegin(); itOut != res.constEnd(); ++itOut)
+        {
+            nClusters = itOut->ctrs.rows();
+            nSens = itOut->ctrs.cols()/3;
+            t_LF_partial = MatrixXd::Zero(nSens, nClusters*3);
+
+//            std::cout << "Number of Clusters: " << nClusters << " x " << nSens << std::endl;//itOut->iLabelIdcsOut << std::endl;
+
+            //
+            // Assign the centroid for each cluster to the partial LF
+            //
+            for(qint32 j = 0; j < nSens; ++j)
+                for(qint32 k = 0; k < nClusters; ++k)
+                    t_LF_partial.block(j, k*3, 1, 3) = itOut->ctrs.block(k,j*3,1,3);
+
+            //
+            // Get cluster indizes and its distances to the centroid
+            //
+            for(qint32 j = 0; j < nClusters; ++j)
+            {
+                VectorXi clusterIdcs = VectorXi::Zero(itOut->roiIdx.rows());
+                VectorXd clusterDistance = VectorXd::Zero(itOut->roiIdx.rows());
+                qint32 nClusterIdcs = 0;
+                for(qint32 k = 0; k < itOut->roiIdx.rows(); ++k)
+                {
+                    if(itOut->roiIdx[k] == j)
+                    {
+                        clusterIdcs[nClusterIdcs] = itIn->idcs[k];
+                        clusterDistance[nClusterIdcs] = itOut->D(k,j);
+                        ++nClusterIdcs;
+                    }
+                }
+                clusterIdcs.conservativeResize(nClusterIdcs);
+                p_fwdOut.src[h].cluster_info.clusterVertnos.append(clusterIdcs);
+                p_fwdOut.src[h].cluster_info.clusterDistances.append(clusterDistance);
+                p_fwdOut.src[h].cluster_info.clusterLabelIds.append(label_ids[itOut->iLabelIdxOut]);
+            }
 
 
+            //
+            // Assign partial LF to new LeadField
+            //
+            if(t_LF_partial.rows() > 0 && t_LF_partial.cols() > 0)
+            {
+                t_LF_new.conservativeResize(t_LF_partial.rows(), t_LF_new.cols() + t_LF_partial.cols());
+                t_LF_new.block(0, t_LF_new.cols() - t_LF_partial.cols(), t_LF_new.rows(), t_LF_partial.cols()) = t_LF_partial;
 
+                // Map the centroids to the closest rr
+                for(qint32 k = 0; k < nClusters; ++k)
+                {
+                    qint32 j = 0;
+
+                    double sqec = sqrt((itIn->matRoiGOrig.block(0, j*3, itIn->matRoiGOrig.rows(), 3) - t_LF_partial.block(0, k*3, t_LF_partial.rows(), 3)).array().pow(2).sum());
+                    double sqec_min = sqec;
+                    qint32 j_min = 0;
+                    for(qint32 j = 1; j < itIn->idcs.rows(); ++j)
+                    {
+                        sqec = sqrt((itIn->matRoiGOrig.block(0, j*3, itIn->matRoiGOrig.rows(), 3) - t_LF_partial.block(0, k*3, t_LF_partial.rows(), 3)).array().pow(2).sum());
+
+                        if(sqec < sqec_min)
+                        {
+                            sqec_min = sqec;
+                            j_min = j;
+                        }
+                    }
+
+                    // Take the closest coordinates
+                    qint32 sel_idx = itIn->idcs[j_min];
+                    //ToDo store this in cluster info
+//                    p_fwdOut.src[h].rr.row(count) = this->src[h].rr.row(sel_idx);
+//                    p_fwdOut.src[h].nn.row(count) = MatrixXd::Zero(1,3);
+
+                    p_fwdOut.src[h].vertno[count] = this->src[h].vertno[sel_idx];
+
+                    ++count;
+                }
+            }
+
+            ++itIn;
+        }
 
         //
         // Assemble new hemisphere information
@@ -682,7 +667,7 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution_new(AnnotationSe
 //ToDo store this in cluster info
 //        p_fwdOut.src[h].rr.conservativeResize(count, 3);
 //        p_fwdOut.src[h].nn.conservativeResize(count, 3);
-//        p_fwdOut.src[h].vertno.conservativeResize(count);
+        p_fwdOut.src[h].vertno.conservativeResize(count);
 
 //        std::cout << "Vertno hemisphere:" << h << std::endl << p_fwdOut.src[h].vertno << std::endl;
 
@@ -706,26 +691,16 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution_new(AnnotationSe
 //            p_fwdOut.source_nn.block(p_fwdOut.source_nn.rows() -  p_fwdOut.src[h].nn.rows(), 0,  p_fwdOut.src[h].nn.rows(), 3) = p_fwdOut.src[h].nn;
 //        }
 
-
-
-
-
-
-
-
-
-
-
-        printf("[done]\n");
+//        printf("[done]\n");
     }
 
-//    //
-//    // Put it all together
-//    //
-//    p_fwdOut.sol->data = t_LF_new;
-//    p_fwdOut.sol->ncol = t_LF_new.cols();
+    //
+    // Put it all together
+    //
+    p_fwdOut.sol->data = t_LF_new;
+    p_fwdOut.sol->ncol = t_LF_new.cols();
 
-//    p_fwdOut.nsource = p_fwdOut.sol->ncol/3;
+    p_fwdOut.nsource = p_fwdOut.sol->ncol/3;
 
     return p_fwdOut;
 }
