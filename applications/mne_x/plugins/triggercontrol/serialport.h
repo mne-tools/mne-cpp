@@ -133,6 +133,7 @@ public:
 
     int m_retrievetyp;
     int m_retrievechan;
+    int m_wiredChannel;
 
 
     struct Settings {

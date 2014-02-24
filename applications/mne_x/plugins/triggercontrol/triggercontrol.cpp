@@ -689,15 +689,16 @@ void TriggerControl::run()
 
 void TriggerControl::sendByteTo(int value)
 {
+
     if (value == 0)
     {
-        m_pSerialPort->m_digchannel.replace(9,0); // select 1st digital channel
+        m_pSerialPort->m_digchannel.replace(m_pSerialPort->m_wiredChannel,0); // select 1st digital channel
         m_pSerialPort->encodedig();             // encode signal to m_data
         m_pSerialPort->sendData(m_pSerialPort->m_data);
     }
     else if (value == 1)
     {
-        m_pSerialPort->m_digchannel.replace(9,1); // select 1st digital channel
+        m_pSerialPort->m_digchannel.replace(m_pSerialPort->m_wiredChannel,1); // select 1st digital channel
         m_pSerialPort->encodedig();             // encode signal to m_data
         m_pSerialPort->sendData(m_pSerialPort->m_data);
     }
