@@ -64,8 +64,8 @@
 
 //#define TIMEMEAS // Zeitmessung;
 //#define BUFFERX1 // X1 determination
-//#define TIMEMUC // Zeitmessung MUC
-#define ALPHA // Alpha locked stimulus
+#define TIMEMUC // Zeitmessung MUC
+//#define ALPHA // Alpha locked stimulus
 
 
 //*************************************************************************************************************
@@ -442,8 +442,17 @@ void TriggerControl::run()
 
 #ifdef TIMEMUC
     connect(m_pSerialPort.data(), &SerialPort::byteReceived, this, &TriggerControl::byteReceived);
+    while(m_bIsRunning)
+    {
+    emit sendByte(1);
 
+    msleep(100);
 
+    emit sendByte(0);
+
+    msleep(100);
+    }
+/*
     m_isReceived = false;
     emit sendByte(1);
     m_qTime.start();
@@ -456,7 +465,7 @@ void TriggerControl::run()
             m_isReceived = false;
             emit sendByte(1);
         }
-    }
+    }*/
 #endif
 
 

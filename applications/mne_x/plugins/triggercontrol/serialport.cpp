@@ -184,7 +184,7 @@ void SerialPort::decodeana(QByteArray &t_incomingArray)
 
 void SerialPort::decodedig(QByteArray &t_incomingArray)
 {
-
+    std::cout << "Decodieren Digital" << std::endl;
 
 // decode channel 1-6
 
@@ -268,7 +268,7 @@ void SerialPort::decodedig(QByteArray &t_incomingArray)
         std::cout << "Kanal " << i <<": " << m_InActiveDig[i-1] << std::endl;
 
     //ZeitmessungMUC
-    emit byteReceived();
+//    emit byteReceived();
 }
 
 //*************************************************************************************************************
@@ -419,6 +419,8 @@ void SerialPort::encodedig()
         m_data[1] = m_data[1]|0x01;
         m_data[2] = m_data[2]|0x02;
         m_data[3] = m_data[3]|0x03;
+
+
     }
     else if(m_retrievetyp == 1)     // retrieve analog information
     {
@@ -497,7 +499,7 @@ void SerialPort::initPort()
 void SerialPort::readData()
 {
     QByteArray t_incomingArray = m_qSerialPort.readAll();
-
+    std::cout << "incoming data" << std::endl;
 
     if(((t_incomingArray[0]&0x03) == 0x00) && ((t_incomingArray[1]&0x03) == 0x01) && ((t_incomingArray[2]&0x03) == 0x02) && ((t_incomingArray[3]&0x03) == 0x03))
     {
