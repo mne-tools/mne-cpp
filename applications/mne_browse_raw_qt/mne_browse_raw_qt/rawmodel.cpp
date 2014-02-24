@@ -442,7 +442,8 @@ void RawModel::markChBad(QModelIndexList chlist, bool status)
 {
     for(qint8 i=0; i < chlist.size(); ++i) {
         if(status) {
-            m_fiffInfo.bads.append(m_chInfolist[chlist[i].row()].ch_name);
+            if(!m_fiffInfo.bads.contains(m_chInfolist[chlist[i].row()].ch_name))
+                m_fiffInfo.bads.append(m_chInfolist[chlist[i].row()].ch_name);
             qDebug() << "RawModel:" << m_chInfolist[chlist[i].row()].ch_name << "marked as bad.";
         }
         else {
