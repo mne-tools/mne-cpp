@@ -289,8 +289,8 @@ int main(int argc, char *argv[])
     //*************************** Involuntary opposing finger movement **************************//
 
     //time read around events - note: trigger point is the pressing of the button
-    float tmin = -4.0f;
-    float tmax = 4.0f;
+    float tmin = -3.0f;
+    float tmax = 3.0f;
 
 //    //Filtered 7-14Hz left voluntary finger opposing
 //    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_001_involuntary_left_opposing_filtered_7_14_raw.fif");
@@ -306,19 +306,19 @@ int main(int argc, char *argv[])
 //    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_involuntary_right_opposing_filtered_7_14_Averaged_");
 //    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_involuntary_right_opposing_filtered_7_14_Averaged_");
 
-//    //Filtered 0.7-40Hz left voluntary finger opposing
-//    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_001_involuntary_left_opposing_filtered_07_40_raw.fif");
-//    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_001_base_filtered_07_40_raw-cov.fif");
-//    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_involuntary_left_opposing_artefact_reduction_-1_1_0.002_102_raw-eve.fif");
-//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_involuntary_left_opposing_filtered_07_40_Averaged_");
-//    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_involuntary_left_opposing_filtered_07_40_Averaged_");
-
-    //Filtered 0.7-40Hz right voluntary finger opposing
-    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_001_involuntary_right_opposing_filtered_07_40_raw.fif");
+    //Filtered 0.7-40Hz left voluntary finger opposing
+    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_001_involuntary_left_opposing_filtered_07_40_raw.fif");
     QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_001_base_filtered_07_40_raw-cov.fif");
-    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_involuntary_right_opposing_artefact_reduction_-1_1_0.002_92_raw-eve.fif");
-    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_involuntary_right_opposing_filtered_07_40_Averaged_");
-    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_involuntary_right_opposing_filtered_07_40_Averaged_");
+    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_involuntary_left_opposing_artefact_reduction_-1_1_0.002_102_raw-eve.fif");
+    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_involuntary_left_opposing_filtered_07_40_Averaged_");
+    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_involuntary_left_opposing_filtered_07_40_Averaged_");
+
+//    //Filtered 0.7-40Hz right voluntary finger opposing
+//    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_001_involuntary_right_opposing_filtered_07_40_raw.fif");
+//    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_001_base_filtered_07_40_raw-cov.fif");
+//    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_involuntary_right_opposing_artefact_reduction_-1_1_0.002_92_raw-eve.fif");
+//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_involuntary_right_opposing_filtered_07_40_Averaged_");
+//    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_involuntary_right_opposing_filtered_07_40_Averaged_");
 
     //*************************** Motor imagery **************************//
 

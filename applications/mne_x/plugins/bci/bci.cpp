@@ -114,6 +114,9 @@ void BCI::init()
     m_pBCIOutput = PluginOutputData<NewRealTimeSampleArray>::create(this, "ControlSignal", "BCI output data");
     m_outputConnectors.append(m_pBCIOutput);
 
+    //m_pBCIOutput->data()->setMaxValue();
+
+
     //Delete Buffer - will be initailzed with first incoming data
     if(!m_pBCIBuffer_Sensor.isNull())
         m_pBCIBuffer_Sensor = CircularMatrixBuffer<double>::SPtr();
@@ -124,6 +127,25 @@ void BCI::init()
     // Delete fiff info because the initialisation of the fiff info is seen as the first data acquisition from the input stream
     if(!m_pFiffInfo_Sensor.isNull())
         m_pFiffInfo_Sensor = FiffInfo::SPtr();
+
+    // Intitalise GUI stuff
+    m_bUseSensorData = true;
+    m_bUseSourceData = false;
+    m_dSlidingWindowSize = 1000;
+    m_dBaseLineWindowSize = 1000;
+    m_sSensorBoundaryPath = QString("");
+    m_sSourceBoundaryPath = QString("");
+
+    // Initialise boundaries with linear coefficients y = mx+c -> vector = [m c]
+    m_qVLoadedSensorBoundary.push_back(1);
+    m_qVLoadedSensorBoundary.push_back(0);
+
+    m_qVLoadedSourceBoundary.push_back(1);
+    m_qVLoadedSourceBoundary.push_back(0);
+
+    // Initalise sliding window stuff
+    m_dSlidingWindowSize = (int) m_dSlidingWindowSize / 1000; // Divide window size by 1000 because the suer specifies the size in ms
+    m_iCurrentIndexSensor = 0;
 }
 
 
@@ -148,15 +170,19 @@ bool BCI::stop()
     //Wait until this thread (BCI) is stopped
     m_bIsRunning = false;
 
-    // Start filling buffers with data from the inputs
-    m_bProcessData = false;
-
     // Get data buffers out of idle state if they froze in the acquire or release function
     //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the pop function (acquire statement)
-    m_pBCIBuffer_Sensor->releaseFromPop();
-    m_pBCIBuffer_Sensor->releaseFromPush();
-//    m_pBCIBuffer_Source->releaseFromPop();
-//    m_pBCIBuffer_Source->releaseFromPush();
+
+    if(m_bProcessData) // Only clear if buffers have been initialised
+    {
+        m_pBCIBuffer_Sensor->releaseFromPop();
+        m_pBCIBuffer_Sensor->releaseFromPush();
+        //    m_pBCIBuffer_Source->releaseFromPop();
+        //    m_pBCIBuffer_Source->releaseFromPush();
+    }
+
+    // Stop filling buffers with data from the inputs
+    m_bProcessData = false;
 
     return true;
 }
@@ -204,7 +230,19 @@ void BCI::updateSensor(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
         //Fiff information for sensor level
         if(!m_pFiffInfo_Sensor)
+        {
             m_pFiffInfo_Sensor = pRTMSA->getFiffInfo();
+
+            // Adjust sliding window size so that the samples from the tmsi plugin fit in the sliding window perfectly
+            int modulo = (int)m_pFiffInfo_Sensor->sfreq*m_dSlidingWindowSize % (int)pRTMSA->getMultiArraySize();
+
+            int rows = m_pFiffInfo_Sensor->nchan;
+            int cols = m_pFiffInfo_Sensor->sfreq*m_dSlidingWindowSize-modulo;
+//            cout<<"modulo: "<<modulo<<endl;
+//            cout<<"rows: "<<rows<<endl;
+//            cout<<"cols: "<<cols<<endl;
+            m_mSlidingWindowSensor.resize(rows, cols);
+        }
 
         if(m_bProcessData)
         {
@@ -256,8 +294,30 @@ void BCI::run()
         // Start filling buffers with data from the inputs
         m_bProcessData = true;
 
-        MatrixXd t_mat = m_pBCIBuffer_Sensor->pop();
-        for(int i = 0; i<t_mat.cols() ; i++)
-            cout<<t_mat(137,i)<<endl;
+        // Sensor level: Fill working matrix until full -> calculate features
+        if(m_iCurrentIndexSensor < m_mSlidingWindowSensor.cols()) // Fill with data
+        {
+            //cout<<m_iCurrentIndexSensor<<endl;
+            MatrixXd t_mat = m_pBCIBuffer_Sensor->pop();
+
+            // Test if data is correctly streamed to this plugin
+//            for(int i = 0; i<t_mat.cols() ; i++)
+//                cout<<t_mat(137,i)<<endl;
+
+            // Fill data into m_mSlidingWindowSensor
+            m_mSlidingWindowSensor.block(0,m_iCurrentIndexSensor,t_mat.rows(),t_mat.cols()) = t_mat;
+
+            // Test if data is correctly streamed to this plugin
+            for(int i = 0; i<t_mat.cols() ; i++)
+                cout<<m_mSlidingWindowSensor.block(0,m_iCurrentIndexSensor,t_mat.rows(),t_mat.cols())(137,i)<<endl;
+
+            m_iCurrentIndexSensor = m_iCurrentIndexSensor + t_mat.cols();
+        }
+        else // Calculate features, classify and store results
+        {
+            //cout<<"CLASSIFY"<<endl;
+            m_mSlidingWindowSensor.setZero();
+            m_iCurrentIndexSensor = 0;
+        }
     }
 }

@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the tmsidriver class.
+* @brief    Contains the declaration of the tmsidriver class. This class implements the basic communication between MNE-X and a TMSI Refa device
 *
 */
 
