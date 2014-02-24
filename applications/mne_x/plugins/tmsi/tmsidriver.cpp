@@ -425,12 +425,12 @@ bool TMSIDriver::uninitDevice()
 
         m_outputFileStream <<  "Unit offset: " << endl;
         for(int w = 0; w<<m_vUnitOffSet.size(); w++)
-            cout << m_vUnitOffSet[w] << "  ";
+            cout << float(m_vUnitOffSet[w]) << "  ";
         m_outputFileStream << endl << endl;
 
         m_outputFileStream <<  "Unit gain: " << endl;
         for(int w = 0; w<<m_vUnitGain.size(); w++)
-            m_outputFileStream << m_vUnitGain[w] << "  ";
+            m_outputFileStream << float(m_vUnitGain[w]) << "  ";
         m_outputFileStream << endl << endl;
 
         m_outputFileStream << "----------<See output file for sample matrix>----------" <<endl<<endl;

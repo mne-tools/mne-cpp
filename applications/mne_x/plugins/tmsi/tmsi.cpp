@@ -311,7 +311,8 @@ void TMSI::setUpFiffInfo()
             fChInfo.coord_frame = FIFFV_COORD_HEAD;
 
             //Set unit
-            //fChInfo.unit = FIFF_UNIT_V;
+            fChInfo.unit = FIFF_UNIT_V;
+            fChInfo.unit_mul = 0;
 
             //Set EEG electrode location - Convert from mm to m
             fChInfo.eeg_loc(0,0) = elcLocation3D[i][0]*0.001;
@@ -478,6 +479,7 @@ bool TMSI::start()
 
     //Set the channel size of the RMTSA - this needs to be done here and NOT in the init() function because the user can change the number of channels during runtime
     m_pRMTSA_TMSI->data()->initFromFiffInfo(m_pFiffInfo);
+    m_pRMTSA_TMSI->data()->setMultiArraySize(m_iSamplesPerBlock);
     m_pRMTSA_TMSI->data()->setSamplingRate(m_iSamplingFreq);
 
     //Buffer

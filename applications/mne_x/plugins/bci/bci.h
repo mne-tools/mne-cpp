@@ -98,6 +98,8 @@ class BCISHARED_EXPORT BCI : public IAlgorithm
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(MNEX::IAlgorithm)
 
+    friend class BCISetupWidget;
+
 public:
     //=========================================================================================================
     /**
@@ -153,24 +155,33 @@ protected:
     virtual void run();
 
 private:
-    PluginOutputData<NewRealTimeSampleArray>::SPtr      m_pBCIOutput;       /**< The RealTimeSampleArray of the BCI output.*/
+    PluginOutputData<NewRealTimeSampleArray>::SPtr      m_pBCIOutput;           /**< The RealTimeSampleArray of the BCI output.*/
 
-    PluginInputData<NewRealTimeMultiSampleArray>::SPtr  m_pRTMSAInput;      /**< The RealTimeMultiSampleArray input.*/
-    PluginInputData<RealTimeSourceEstimate>::SPtr       m_pRTSEInput;       /**< The RealTimeSourceEstimate input.*/
+    PluginInputData<NewRealTimeMultiSampleArray>::SPtr  m_pRTMSAInput;          /**< The RealTimeMultiSampleArray input.*/
+    PluginInputData<RealTimeSourceEstimate>::SPtr       m_pRTSEInput;           /**< The RealTimeSourceEstimate input.*/
 
-    CircularMatrixBuffer<double>::SPtr                  m_pBCIBuffer_Sensor;/**< Holds incoming sensor level data.*/
-    CircularMatrixBuffer<double>::SPtr                  m_pBCIBuffer_Source;/**< Holds incoming source level data.*/
+    CircularMatrixBuffer<double>::SPtr                  m_pBCIBuffer_Sensor;    /**< Holds incoming sensor level data.*/
+    CircularMatrixBuffer<double>::SPtr                  m_pBCIBuffer_Source;    /**< Holds incoming source level data.*/
 
-    bool                m_bIsRunning;                                       /**< Whether BCI is running.*/
-    bool                m_bProcessData;                                     /**< Whether BCI is to get data out of the continous input data stream, i.e. the EEG data from sensor level.*/
-
-    qint32              m_iNumChs_Sensor;
-    qint32              m_iNumChs_Source;
-
-    QString             m_qStringResourcePath;                              /**< The path to the BCI resource directory.*/
+    bool                m_bIsRunning;                   /**< Whether BCI is running.*/
+    bool                m_bProcessData;                 /**< Whether BCI is to get data out of the continous input data stream, i.e. the EEG data from sensor level.*/
+    QString             m_qStringResourcePath;          /**< The path to the BCI resource directory.*/
     QMutex              m_qMutex;
 
-    FiffInfo::SPtr      m_pFiffInfo_Sensor;                                 /**< Fiff information for sensor data. */
+    FiffInfo::SPtr      m_pFiffInfo_Sensor;             /**< Fiff information for sensor data. */
+    MatrixXd            m_mSlidingWindowSensor;         /**< Working (sliding) matrix, used to store data for feature calculation on sensor level. */
+    int                 m_iCurrentIndexSensor;          /**< Index of the amount of data which was already filled in the sliding window. */
+
+    bool                m_bUseSensorData;               /**< GUI input: Use sensor data stream. */
+    bool                m_bUseSourceData;               /**< GUI input: Use source data stream. */
+    int                 m_dSlidingWindowSize;           /**< GUI input: Size of the sliding window in ms. */
+    int                 m_dBaseLineWindowSize;          /**< GUI input: Size of the baseline window in ms. */
+    QString             m_sSensorBoundaryPath;          /**< GUI input: Input path for boundary file on sensor level. */
+    QString             m_sSourceBoundaryPath;          /**< GUI input: Input path for boundary file on source level. */
+
+    QVector<double>     m_qVLoadedSensorBoundary;       /**< GUI input: Decision boundary on sensor level. */
+    QVector<double>     m_qVLoadedSourceBoundary;       /**< GUI input: Decision boundary on source level. */
+
 };
 
 } // NAMESPACE
