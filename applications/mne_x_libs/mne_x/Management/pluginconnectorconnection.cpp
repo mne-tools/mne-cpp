@@ -129,6 +129,17 @@ bool PluginConnectorConnection::createConnection()
                 bConnected = true;
                 break;
             }
+
+            //Cast to RealTimeSourceEstimate
+            QSharedPointer< PluginOutputData<RealTimeSourceEstimate> > senderRTSE = m_pSender->getOutputConnectors()[i].dynamicCast< PluginOutputData<RealTimeSourceEstimate> >();
+            QSharedPointer< PluginInputData<RealTimeSourceEstimate> > receiverRTSE = m_pReceiver->getInputConnectors()[j].dynamicCast< PluginInputData<RealTimeSourceEstimate> >();
+            if(senderRTSE && receiverRTSE)
+            {
+                m_con = connect(m_pSender->getOutputConnectors()[i].data(), &PluginOutputConnector::notify,
+                        m_pReceiver->getInputConnectors()[j].data(), &PluginInputConnector::update, Qt::BlockingQueuedConnection);
+                bConnected = true;
+                break;
+            }
         }
 
         if(bConnected)
