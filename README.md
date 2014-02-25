@@ -16,15 +16,15 @@ of the latest code: https://github.com/mne-tools/mne-cpp
 Requirements
 ==========
 
-Windows
+**Windows**
 
 \>= MSVC2010
 
-Linux
+**Linux**
 
 \>= gcc 4.5
 
-MacOSX
+**MacOSX**
 
 \>= Clang 3.1
 
