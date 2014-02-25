@@ -13,9 +13,15 @@ To get the latest code using git, simply type:
 If you don't have git installed, you can download a zip or tarball
 of the latest code: https://github.com/mne-tools/mne-cpp
 
+Requirements
+==========
+
+>= gcc 4.5
+>= MSVC2010
+
 
 Building
-==========
+========
 
 To build the mne libraries [Qt5](http://qt-project.org/downloads) and a platform specific C++ compiler are required.
 
