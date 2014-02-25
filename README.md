@@ -16,9 +16,9 @@ of the latest code: https://github.com/mne-tools/mne-cpp
 Requirements
 ==========
 
-\>= gcc 4.5
-
 \>= MSVC2010
+
+\>= gcc 4.5
 
 \>= Clang 3.1
 
