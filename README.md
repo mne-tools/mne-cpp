@@ -20,6 +20,8 @@ Requirements
 
 \>= MSVC2010
 
+\>= Clang 3.1
+
 
 Building
 ========
