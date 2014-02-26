@@ -174,13 +174,14 @@ private:
 
     bool                m_bUseSensorData;               /**< GUI input: Use sensor data stream. */
     bool                m_bUseSourceData;               /**< GUI input: Use source data stream. */
-    int                 m_dSlidingWindowSize;           /**< GUI input: Size of the sliding window in ms. */
-    int                 m_dBaseLineWindowSize;          /**< GUI input: Size of the baseline window in ms. */
+    double              m_dSlidingWindowSize;           /**< GUI input: Size of the sliding window in s. */
+    double              m_dBaseLineWindowSize;          /**< GUI input: Size of the baseline window in s. */
+    int                 m_iNumberSubSignals;            /**< GUI input: Number of subsignals. */
     QString             m_sSensorBoundaryPath;          /**< GUI input: Input path for boundary file on sensor level. */
     QString             m_sSourceBoundaryPath;          /**< GUI input: Input path for boundary file on source level. */
 
-    QVector<double>     m_qVLoadedSensorBoundary;       /**< GUI input: Decision boundary on sensor level. */
-    QVector<double>     m_qVLoadedSourceBoundary;       /**< GUI input: Decision boundary on source level. */
+    QVector<double>     m_qVLoadedSensorBoundary;       /**< Loaded decision boundary on sensor level. */
+    QVector<double>     m_qVLoadedSourceBoundary;       /**< Loaded decision boundary on source level. */
 
 };
 
