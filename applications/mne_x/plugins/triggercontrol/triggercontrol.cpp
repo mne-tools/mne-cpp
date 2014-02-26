@@ -64,8 +64,8 @@
 
 //#define TIMEMEAS // Zeitmessung;
 //#define BUFFERX1 // X1 determination
-//#define TIMEMUC // Zeitmessung MUC
-#define ALPHA // Alpha locked stimulus
+#define TIMEMUC // Zeitmessung MUC
+//#define ALPHA // Alpha locked stimulus
 
 
 //*************************************************************************************************************
@@ -442,8 +442,17 @@ void TriggerControl::run()
 
 #ifdef TIMEMUC
     connect(m_pSerialPort.data(), &SerialPort::byteReceived, this, &TriggerControl::byteReceived);
+    while(m_bIsRunning)
+    {
+    emit sendByte(1);
 
+    msleep(100);
 
+    emit sendByte(0);
+
+    msleep(100);
+    }
+/*
     m_isReceived = false;
     emit sendByte(1);
     m_qTime.start();
@@ -456,7 +465,7 @@ void TriggerControl::run()
             m_isReceived = false;
             emit sendByte(1);
         }
-    }
+    }*/
 #endif
 
 
@@ -680,15 +689,16 @@ void TriggerControl::run()
 
 void TriggerControl::sendByteTo(int value)
 {
+
     if (value == 0)
     {
-        m_pSerialPort->m_digchannel.replace(9,0); // select 1st digital channel
+        m_pSerialPort->m_digchannel.replace(m_pSerialPort->m_wiredChannel,0); // select 1st digital channel
         m_pSerialPort->encodedig();             // encode signal to m_data
         m_pSerialPort->sendData(m_pSerialPort->m_data);
     }
     else if (value == 1)
     {
-        m_pSerialPort->m_digchannel.replace(9,1); // select 1st digital channel
+        m_pSerialPort->m_digchannel.replace(m_pSerialPort->m_wiredChannel,1); // select 1st digital channel
         m_pSerialPort->encodedig();             // encode signal to m_data
         m_pSerialPort->sendData(m_pSerialPort->m_data);
     }
