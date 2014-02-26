@@ -73,17 +73,7 @@ RawModel::RawModel(QFile &qFile, QObject *parent)
     loadFiffData(qFile);
 
     //generator FilterOperator objects
-    //HPF
-    double cutoff = 0.2;
-    QString name = QString("HPF_%1").arg(floor(cutoff*(m_fiffInfo.sfreq/2)));
-    m_Operators.insert(name,QSharedPointer<MNEOperator>(new FilterOperator(name,FilterOperator::HPF,m_iFilterTaps,cutoff,0.2,0.1,(m_iWindowSize+m_iFilterTaps))));
-    //LPF
-    cutoff = 0.05; //1 equals Nyquist freq
-    name = QString("LPF_%1").arg(floor(cutoff*(m_fiffInfo.sfreq/2)));
-    m_Operators.insert(name,QSharedPointer<MNEOperator>(new FilterOperator(name,FilterOperator::LPF,m_iFilterTaps,cutoff,0.2,0.1,(m_iWindowSize+m_iFilterTaps))));
-    cutoff = 0.12; //1 equals Nyquist freq
-    name = QString("LPF_%1").arg(floor(cutoff*(m_fiffInfo.sfreq/2)));
-    m_Operators.insert(name,QSharedPointer<MNEOperator>(new FilterOperator(name,FilterOperator::LPF,m_iFilterTaps,cutoff,0.2,0.1,(m_iWindowSize+m_iFilterTaps))));
+    genStdFilterOps();
 
     //connect signal and slots
     connect(&m_reloadFutureWatcher,&QFutureWatcher<QPair<MatrixXd,MatrixXd> >::finished,[this](){
@@ -219,6 +209,33 @@ QVariant RawModel::headerData(int section, Qt::Orientation orientation, int role
 
 //*************************************************************************************************************
 
+void RawModel::genStdFilterOps()
+{
+    //clear operators
+    m_Operators.clear();
+
+    //regenerate them with the correct sampling frequency (only required for naming of filter)
+    double sfreq = m_fiffInfo.sfreq ? m_fiffInfo.sfreq : 600.0;
+
+    //HPF
+    double cutoffFreqHz = 50; //in Hz
+    double cutoffFreqNyq = 2*cutoffFreqHz/sfreq;//relative to Nyquist freq
+    QString name = QString("HPF_%1").arg(cutoffFreqHz);
+    m_Operators.insert(name,QSharedPointer<MNEOperator>(new FilterOperator(name,FilterOperator::HPF,m_iFilterTaps,cutoffFreqNyq,0.2,0.1,(m_iWindowSize+m_iFilterTaps))));
+    //LPF
+    cutoffFreqHz = 30; //in Hz
+    cutoffFreqNyq = 2*cutoffFreqHz/sfreq;//relative to Nyquist freq
+    name = QString("LPF_%1").arg(cutoffFreqHz);
+    m_Operators.insert(name,QSharedPointer<MNEOperator>(new FilterOperator(name,FilterOperator::LPF,m_iFilterTaps,cutoffFreqNyq,0.2,0.1,(m_iWindowSize+m_iFilterTaps))));
+    cutoffFreqHz = 10; //in Hz
+    cutoffFreqNyq = 2*cutoffFreqHz/sfreq;//relative to Nyquist freq
+    name = QString("LPF_%1").arg(cutoffFreqHz);
+    m_Operators.insert(name,QSharedPointer<MNEOperator>(new FilterOperator(name,FilterOperator::LPF,m_iFilterTaps,cutoffFreqNyq,0.2,0.1,(m_iWindowSize+m_iFilterTaps))));
+
+    qDebug() << "RawModel: Standard FilterOperators generated and loaded.";
+}
+
+
 bool RawModel::loadFiffData(QFile& qFile)
 {
     beginResetModel();
@@ -247,6 +264,7 @@ bool RawModel::loadFiffData(QFile& qFile)
     m_times.append(t_times);
 
     loadFiffInfos();
+    genStdFilterOps();
 
     endResetModel();
     return true;
@@ -442,7 +460,8 @@ void RawModel::markChBad(QModelIndexList chlist, bool status)
 {
     for(qint8 i=0; i < chlist.size(); ++i) {
         if(status) {
-            m_fiffInfo.bads.append(m_chInfolist[chlist[i].row()].ch_name);
+            if(!m_fiffInfo.bads.contains(m_chInfolist[chlist[i].row()].ch_name))
+                m_fiffInfo.bads.append(m_chInfolist[chlist[i].row()].ch_name);
             qDebug() << "RawModel:" << m_chInfolist[chlist[i].row()].ch_name << "marked as bad.";
         }
         else {
