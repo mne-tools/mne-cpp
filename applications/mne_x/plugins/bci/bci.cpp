@@ -131,12 +131,13 @@ void BCI::init()
     // Intitalise GUI stuff
     m_bUseSensorData = true;
     m_bUseSourceData = false;
-    m_dSlidingWindowSize = 1000;
-    m_dBaseLineWindowSize = 1000;
+    m_dSlidingWindowSize = 1.0;
+    m_dBaseLineWindowSize = 1.0;
+    m_iNumberSubSignals = 1;
     m_sSensorBoundaryPath = QString("");
     m_sSourceBoundaryPath = QString("");
 
-    // Initialise boundaries with linear coefficients y = mx+c -> vector = [m c]
+    // Initialise boundaries with linear coefficients y = mx+c -> vector = [m c] -> default [1 0]
     m_qVLoadedSensorBoundary.push_back(1);
     m_qVLoadedSensorBoundary.push_back(0);
 
@@ -144,7 +145,6 @@ void BCI::init()
     m_qVLoadedSourceBoundary.push_back(0);
 
     // Initalise sliding window stuff
-    m_dSlidingWindowSize = (int) m_dSlidingWindowSize / 1000; // Divide window size by 1000 because the suer specifies the size in ms
     m_iCurrentIndexSensor = 0;
 }
 
@@ -234,7 +234,7 @@ void BCI::updateSensor(XMEASLIB::NewMeasurement::SPtr pMeasurement)
             m_pFiffInfo_Sensor = pRTMSA->getFiffInfo();
 
             // Adjust sliding window size so that the samples from the tmsi plugin fit in the sliding window perfectly
-            int modulo = (int)m_pFiffInfo_Sensor->sfreq*m_dSlidingWindowSize % (int)pRTMSA->getMultiArraySize();
+            int modulo = (int)(m_pFiffInfo_Sensor->sfreq*m_dSlidingWindowSize) % (int)pRTMSA->getMultiArraySize();
 
             int rows = m_pFiffInfo_Sensor->nchan;
             int cols = m_pFiffInfo_Sensor->sfreq*m_dSlidingWindowSize-modulo;

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>713</width>
-    <height>584</height>
+    <height>588</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -96,19 +96,6 @@
        </layout>
       </widget>
      </item>
-     <item row="0" column="5" rowspan="5">
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
      <item row="0" column="0" rowspan="3" colspan="3">
       <widget class="QGroupBox" name="m_qGroupBox_General">
        <property name="sizePolicy">
@@ -141,7 +128,79 @@
        </layout>
       </widget>
      </item>
-     <item row="4" column="0" colspan="5">
+     <item row="0" column="3" rowspan="3" colspan="2">
+      <widget class="QGroupBox" name="m_qGroupBox_Processing">
+       <property name="title">
+        <string>Processing options</string>
+       </property>
+       <layout class="QGridLayout" name="gridLayout">
+        <item row="0" column="0">
+         <widget class="QLabel" name="m_label_SlidingWindowSize">
+          <property name="text">
+           <string>Sliding window size (s):</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="m_label_BaseLineWindowSize">
+          <property name="text">
+           <string>Base line correction size (s):</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="m_label_NumberSubSignals">
+          <property name="text">
+           <string>Number of sub signals:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QDoubleSpinBox" name="m_doubleSpinBox_SlidingWindowSize">
+          <property name="minimum">
+           <double>0.010000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>10.000000000000000</double>
+          </property>
+          <property name="singleStep">
+           <double>0.010000000000000</double>
+          </property>
+          <property name="value">
+           <double>0.010000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <widget class="QDoubleSpinBox" name="m_doubleSpinBox_BaseLineWindowSize">
+          <property name="minimum">
+           <double>0.010000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>10.000000000000000</double>
+          </property>
+          <property name="singleStep">
+           <double>0.010000000000000</double>
+          </property>
+          <property name="value">
+           <double>0.010000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QSpinBox" name="m_spinBox_NumberSubSignals">
+          <property name="minimum">
+           <number>1</number>
+          </property>
+          <property name="maximum">
+           <number>20</number>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item row="4" column="0" rowspan="2" colspan="5">
       <widget class="QGroupBox" name="m_qGroupBox_Information">
        <property name="sizePolicy">
         <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
@@ -169,70 +228,46 @@
           </property>
          </widget>
         </item>
-       </layout>
-      </widget>
-     </item>
-     <item row="0" column="3" rowspan="3" colspan="2">
-      <widget class="QGroupBox" name="m_qGroupBox_Processing">
-       <property name="title">
-        <string>Processing options</string>
-       </property>
-       <layout class="QGridLayout" name="gridLayout">
-        <item row="0" column="1">
-         <widget class="QSpinBox" name="m_spinBox_SlidingWindowSize">
-          <property name="maximum">
-           <number>5000</number>
-          </property>
-         </widget>
-        </item>
         <item row="1" column="1">
-         <widget class="QSpinBox" name="m_spinBox_BaseLineWindowSize">
-          <property name="maximum">
-           <number>5000</number>
+         <widget class="QPushButton" name="m_qPushButton_About">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
           </property>
-         </widget>
-        </item>
-        <item row="0" column="0">
-         <widget class="QLabel" name="m_label_SlidingWindowSize">
-          <property name="text">
-           <string>Sliding window size</string>
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
           </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="m_label_BaseLineWindowSize">
+          <property name="maximumSize">
+           <size>
+            <width>50</width>
+            <height>10000</height>
+           </size>
+          </property>
           <property name="text">
-           <string>Base line correction size</string>
+           <string>About</string>
           </property>
          </widget>
         </item>
        </layout>
       </widget>
      </item>
-     <item row="5" column="4">
-      <widget class="QPushButton" name="m_qPushButton_About">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Maximum" vsizetype="Maximum">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
+     <item row="0" column="5" rowspan="6">
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
        </property>
-       <property name="minimumSize">
+       <property name="sizeHint" stdset="0">
         <size>
-         <width>0</width>
-         <height>0</height>
+         <width>40</width>
+         <height>20</height>
         </size>
        </property>
-       <property name="maximumSize">
-        <size>
-         <width>50</width>
-         <height>10000</height>
-        </size>
-       </property>
-       <property name="text">
-        <string>About</string>
-       </property>
-      </widget>
+      </spacer>
      </item>
     </layout>
    </item>

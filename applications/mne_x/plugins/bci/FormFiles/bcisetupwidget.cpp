@@ -79,9 +79,11 @@ BCISetupWidget::BCISetupWidget(BCI* pBCI, QWidget* parent)
             this, &BCISetupWidget::setGeneralOptions);
 
     // Connect processing options
-    connect(ui.m_spinBox_SlidingWindowSize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+    connect(ui.m_doubleSpinBox_SlidingWindowSize, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
             this, &BCISetupWidget::setProcessingOptions);
-    connect(ui.m_spinBox_BaseLineWindowSize, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+    connect(ui.m_doubleSpinBox_BaseLineWindowSize, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            this, &BCISetupWidget::setProcessingOptions);
+    connect(ui.m_spinBox_NumberSubSignals, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             this, &BCISetupWidget::setProcessingOptions);
 
     // Connect classification options
@@ -89,6 +91,9 @@ BCISetupWidget::BCISetupWidget(BCI* pBCI, QWidget* parent)
             this, &BCISetupWidget::changeLoadSensorBoundary);
     connect(ui.m_pushButton_LoadSourceBoundary, &QPushButton::released,
             this, &BCISetupWidget::changeLoadSourceBoundary);
+
+    //Connect about button
+    connect(ui.m_qPushButton_About, &QPushButton::released, this, &BCISetupWidget::showAboutDialog);
 
     //Fill info box
     QFile file(m_pBCI->m_qStringResourcePath+"readme.txt");
@@ -121,8 +126,9 @@ void BCISetupWidget::initGui()
     ui.m_checkBox_UseSourceData->setChecked(m_pBCI->m_bUseSourceData);
 
     // Processing options
-    ui.m_spinBox_SlidingWindowSize->setValue(m_pBCI->m_dSlidingWindowSize);
-    ui.m_spinBox_BaseLineWindowSize->setValue(m_pBCI->m_dBaseLineWindowSize);
+    ui.m_doubleSpinBox_SlidingWindowSize->setValue(m_pBCI->m_dSlidingWindowSize);
+    ui.m_doubleSpinBox_BaseLineWindowSize->setValue(m_pBCI->m_dBaseLineWindowSize);
+    ui.m_spinBox_NumberSubSignals->setValue(m_pBCI->m_iNumberSubSignals);
 
     // Classification options
     ui.m_lineEdit_SensorBoundary->setText(m_pBCI->m_sSensorBoundaryPath);
@@ -143,8 +149,9 @@ void BCISetupWidget::setGeneralOptions()
 
 void BCISetupWidget::setProcessingOptions()
 {
-    m_pBCI->m_dSlidingWindowSize = ui.m_spinBox_SlidingWindowSize->value();
-    m_pBCI->m_dBaseLineWindowSize = ui.m_spinBox_BaseLineWindowSize->value();
+    m_pBCI->m_dSlidingWindowSize = ui.m_doubleSpinBox_SlidingWindowSize->value();
+    m_pBCI->m_dBaseLineWindowSize = ui.m_doubleSpinBox_BaseLineWindowSize->value();
+    m_pBCI->m_iNumberSubSignals = ui.m_spinBox_NumberSubSignals->value();
 }
 
 
