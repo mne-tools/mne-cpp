@@ -77,13 +77,17 @@ BCISetupWidget::BCISetupWidget(BCI* pBCI, QWidget* parent)
             this, &BCISetupWidget::setGeneralOptions);
     connect(ui.m_checkBox_UseSensorData, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
             this, &BCISetupWidget::setGeneralOptions);
+    connect(ui.m_checkBox_UseThresholdArtefactReduction, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+            this, &BCISetupWidget::setGeneralOptions);
 
     // Connect processing options
-    connect(ui.m_doubleSpinBox_SlidingWindowSize, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+    connect(ui.m_doubleSpinBox_SlidingWindowSize, static_cast<void (QDoubleSpinBox::*)()>(&QDoubleSpinBox::editingFinished),
             this, &BCISetupWidget::setProcessingOptions);
-    connect(ui.m_doubleSpinBox_BaseLineWindowSize, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+    connect(ui.m_doubleSpinBox_BaseLineWindowSize, static_cast<void (QDoubleSpinBox::*)()>(&QDoubleSpinBox::editingFinished),
             this, &BCISetupWidget::setProcessingOptions);
-    connect(ui.m_spinBox_NumberSubSignals, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+    connect(ui.m_spinBox_NumberSubSignals, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
+            this, &BCISetupWidget::setProcessingOptions);
+    connect(ui.m_doubleSpinBox_TimeBetweenWindows, static_cast<void (QDoubleSpinBox::*)()>(&QDoubleSpinBox::editingFinished),
             this, &BCISetupWidget::setProcessingOptions);
 
     // Connect classification options
@@ -124,15 +128,20 @@ void BCISetupWidget::initGui()
     // General options
     ui.m_checkBox_UseSensorData->setChecked(m_pBCI->m_bUseSensorData);
     ui.m_checkBox_UseSourceData->setChecked(m_pBCI->m_bUseSourceData);
+    ui.m_checkBox_UseThresholdArtefactReduction->setChecked(m_pBCI->m_bUseArtefactThresholdReduction);
 
     // Processing options
     ui.m_doubleSpinBox_SlidingWindowSize->setValue(m_pBCI->m_dSlidingWindowSize);
     ui.m_doubleSpinBox_BaseLineWindowSize->setValue(m_pBCI->m_dBaseLineWindowSize);
     ui.m_spinBox_NumberSubSignals->setValue(m_pBCI->m_iNumberSubSignals);
+    ui.m_doubleSpinBox_TimeBetweenWindows->setValue(m_pBCI->m_dTimeBetweenWindows);
 
     // Classification options
     ui.m_lineEdit_SensorBoundary->setText(m_pBCI->m_sSensorBoundaryPath);
     ui.m_lineEdit_SourceBoundary->setText(m_pBCI->m_sSourceBoundaryPath);
+
+    // Selected features on sensor level
+    initSelectedFeaturesSensor();
 }
 
 
@@ -140,8 +149,9 @@ void BCISetupWidget::initGui()
 
 void BCISetupWidget::setGeneralOptions()
 {
-    m_pBCI->m_bUseSensorData = ui.m_checkBox_UseSourceData->isChecked();
-    m_pBCI->m_bUseSourceData = ui.m_checkBox_UseSensorData->isChecked();
+    m_pBCI->m_bUseSensorData = ui.m_checkBox_UseSensorData->isChecked();
+    m_pBCI->m_bUseSourceData = ui.m_checkBox_UseSourceData->isChecked();
+    m_pBCI->m_bUseArtefactThresholdReduction = ui.m_checkBox_UseThresholdArtefactReduction->isChecked();
 }
 
 
@@ -152,6 +162,7 @@ void BCISetupWidget::setProcessingOptions()
     m_pBCI->m_dSlidingWindowSize = ui.m_doubleSpinBox_SlidingWindowSize->value();
     m_pBCI->m_dBaseLineWindowSize = ui.m_doubleSpinBox_BaseLineWindowSize->value();
     m_pBCI->m_iNumberSubSignals = ui.m_spinBox_NumberSubSignals->value();
+    m_pBCI->m_dTimeBetweenWindows = ui.m_doubleSpinBox_TimeBetweenWindows->value();
 }
 
 
@@ -188,6 +199,41 @@ void BCISetupWidget::changeLoadSourceBoundary()
 
     ui.m_lineEdit_SourceBoundary->setText(path);
     m_pBCI->m_sSourceBoundaryPath = ui.m_lineEdit_SourceBoundary->text();
+}
+
+
+//*************************************************************************************************************
+
+void BCISetupWidget::initSelectedFeaturesSensor()
+{
+    // Read electrode pinnig scheme from file and initialise List
+
+    QString path;
+    path.prepend(m_pBCI->m_qStringResourcePath);
+    path.append("Pinning_Scheme_Duke_128.txt");
+    QFile file(path);
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        return;
+
+    //Start reading from file
+    m_vAvailableFeaturesSensor.clear();
+    QTextStream in(&file);
+
+    while(!in.atEnd())
+    {
+        QString line = in.readLine();
+        line.replace(QRegExp("\\s+"), QString(" "));
+        m_vAvailableFeaturesSensor.append(line);
+    }
+
+    file.close();
+
+    // Remove default items from list
+    for(int i=0; i<m_pBCI->m_slChosenFeatureSensor.size(); i++)
+        m_vAvailableFeaturesSensor.removeAt(m_vAvailableFeaturesSensor.indexOf(m_pBCI->m_slChosenFeatureSensor.at(i)));
+
+    ui.m_listWidget_AvailableFeaturesOnSensorLevel->addItems(m_vAvailableFeaturesSensor);
+    ui.m_listWidget_ChosenFeaturesOnSensorLevel->addItems(m_pBCI->m_slChosenFeatureSensor);
 }
 
 

@@ -73,11 +73,11 @@ TMSISetupWidget::TMSISetupWidget(TMSI* pTMSI, QWidget* parent)
     ui.setupUi(this);
 
     //Connect device sampling properties
-    connect(ui.m_spinBox_SamplingFreq, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+    connect(ui.m_spinBox_SamplingFreq, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
             this, &TMSISetupWidget::setDeviceSamplingProperties);
-    connect(ui.m_spinBox_NumberOfChannels, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+    connect(ui.m_spinBox_NumberOfChannels, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
             this, &TMSISetupWidget::setDeviceSamplingProperties);
-    connect(ui.m_spinBox_SamplesPerBlock, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+    connect(ui.m_spinBox_SamplesPerBlock, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
             this, &TMSISetupWidget::setDeviceSamplingProperties);
     connect(ui.m_checkBox_UseCommonAverage, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
             this, &TMSISetupWidget::setDeviceSamplingProperties);
@@ -110,7 +110,7 @@ TMSISetupWidget::TMSISetupWidget(TMSI* pTMSI, QWidget* parent)
     connect(ui.m_pushButton_ChangeEEGHatDir, &QPushButton::released, this, &TMSISetupWidget::changeHatDir);
 
     //Connect trigger properties
-    connect(ui.m_spinBox_BeepLength, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+    connect(ui.m_spinBox_BeepLength, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
             this, &TMSISetupWidget::setTriggerProperties);
     connect(ui.m_checkBox_EnableBeep, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
             this, &TMSISetupWidget::setTriggerProperties);

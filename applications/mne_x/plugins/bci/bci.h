@@ -163,26 +163,29 @@ private:
     CircularMatrixBuffer<double>::SPtr                  m_pBCIBuffer_Sensor;    /**< Holds incoming sensor level data.*/
     CircularMatrixBuffer<double>::SPtr                  m_pBCIBuffer_Source;    /**< Holds incoming source level data.*/
 
-    bool                m_bIsRunning;                   /**< Whether BCI is running.*/
-    bool                m_bProcessData;                 /**< Whether BCI is to get data out of the continous input data stream, i.e. the EEG data from sensor level.*/
-    QString             m_qStringResourcePath;          /**< The path to the BCI resource directory.*/
+    bool                m_bIsRunning;                       /**< Whether BCI is running.*/
+    bool                m_bProcessData;                     /**< Whether BCI is to get data out of the continous input data stream, i.e. the EEG data from sensor level.*/
+    bool                m_bUseArtefactThresholdReduction;   /**< Whether BCI uses a threshold to obmit atrefacts.*/
+    QString             m_qStringResourcePath;              /**< The path to the BCI resource directory.*/
     QMutex              m_qMutex;
 
-    FiffInfo::SPtr      m_pFiffInfo_Sensor;             /**< Fiff information for sensor data. */
-    MatrixXd            m_mSlidingWindowSensor;         /**< Working (sliding) matrix, used to store data for feature calculation on sensor level. */
-    int                 m_iCurrentIndexSensor;          /**< Index of the amount of data which was already filled in the sliding window. */
+    FiffInfo::SPtr      m_pFiffInfo_Sensor;                 /**< Sensor level: Fiff information for sensor data. */
+    MatrixXd            m_mSlidingWindowSensor;             /**< Sensor level: Working (sliding) matrix, used to store data for feature calculation on sensor level. */
+    MatrixXd            m_mTimeBetweenWindowsSensor;        /**< Sensor level: Samples stored during time between windows on sensor level. */
+    int                 m_iTBWIndexSensor;                  /**< Sensor level: Index of the amount of data which was already filled during the time between windows. */
+    QVector<double>     m_vLoadedSensorBoundary;           /**< Sensor level: Loaded decision boundary on sensor level. */
+    QStringList         m_slChosenFeatureSensor;            /**< Sensor level: Features used to calculate data points in feature space on sensor level. */
 
-    bool                m_bUseSensorData;               /**< GUI input: Use sensor data stream. */
-    bool                m_bUseSourceData;               /**< GUI input: Use source data stream. */
-    double              m_dSlidingWindowSize;           /**< GUI input: Size of the sliding window in s. */
-    double              m_dBaseLineWindowSize;          /**< GUI input: Size of the baseline window in s. */
-    int                 m_iNumberSubSignals;            /**< GUI input: Number of subsignals. */
-    QString             m_sSensorBoundaryPath;          /**< GUI input: Input path for boundary file on sensor level. */
-    QString             m_sSourceBoundaryPath;          /**< GUI input: Input path for boundary file on source level. */
+    QVector<double>     m_vLoadedSourceBoundary;           /**< Source level: Loaded decision boundary on source level. */
 
-    QVector<double>     m_qVLoadedSensorBoundary;       /**< Loaded decision boundary on sensor level. */
-    QVector<double>     m_qVLoadedSourceBoundary;       /**< Loaded decision boundary on source level. */
-
+    bool                m_bUseSensorData;                   /**< GUI input: Use sensor data stream. */
+    bool                m_bUseSourceData;                   /**< GUI input: Use source data stream. */
+    double              m_dSlidingWindowSize;               /**< GUI input: Size of the sliding window in s. */
+    double              m_dBaseLineWindowSize;              /**< GUI input: Size of the baseline window in s. */
+    double              m_dTimeBetweenWindows;              /**< GUI input: Time between windows/feature calculation in s. */
+    int                 m_iNumberSubSignals;                /**< GUI input: Number of subsignals. */
+    QString             m_sSensorBoundaryPath;              /**< GUI input: Input path for boundary file on sensor level. */
+    QString             m_sSourceBoundaryPath;              /**< GUI input: Input path for boundary file on source level. */
 };
 
 } // NAMESPACE
