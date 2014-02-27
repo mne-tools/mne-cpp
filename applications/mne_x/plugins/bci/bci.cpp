@@ -340,6 +340,16 @@ void BCI::run()
                 // Recalculate m_matSlidingWindowSensor -> push m_matTimeBetweenWindowsSensor from the left
                 m_matSlidingWindowSensor.block(0, m_matSlidingWindowSensor.cols()-m_matTimeBetweenWindowsSensor.cols(), m_matTimeBetweenWindowsSensor.rows(), m_matTimeBetweenWindowsSensor.cols()) = m_matTimeBetweenWindowsSensor;
 
+                // TODO: Filter data in m_matSlidingWindowSensor
+
+                // TODO: Calculate features
+
+                // TODO: Store features
+
+                // TODO: Classify features and store results
+
+                // TODO: Check how full the classification result vector is -> if too big emit signal and average results, delete all results and make final decision to triggerbox
+
                 // Test if data is correctly streamed to this plugin
 //                cout<<"Recalculate matrix"<<endl;
 //                for(int i = 1; i<m_matSlidingWindowSensor.cols() ; i++)
@@ -348,6 +358,7 @@ void BCI::run()
 ////                    if(m_matSlidingWindowSensor(2,i) - m_matSlidingWindowSensor(2,i-1) != 1)
 ////                        cout<<"Sequence error while streaming from tmsi plugin at position: "<<i<<endl;
 //                }
+
                 m_iTBWIndexSensor = 0;
             }
         }
