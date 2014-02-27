@@ -148,6 +148,14 @@ private:
     */
     void initSelectedFeaturesSensor();
 
+    //=========================================================================================================
+    /**
+    * Sets feature selections made by the user on source and sensor level
+    *
+    */
+    void setFeatureSelection();
+
+
     BCI* m_pBCI;                                    /**< a pointer to corresponding BCI.*/
 
     QStringList m_vAvailableFeaturesSensor;         /**< QStringList holding available features to select on sensor level (electrodes).*/
