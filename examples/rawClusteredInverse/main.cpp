@@ -420,11 +420,11 @@ int main(int argc, char *argv[])
 //    QFile t_fileEvoked("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-ave.fif");
 
 
-    double snr = 0.1f;//1.0f;//3.0f;//0.1f;//3.0f;
+    double snr = 1.0f;//0.1f;//1.0f;//3.0f;//0.1f;//3.0f;
     QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
 
     QString t_sFileNameClusteredInv("");
-    QString t_sFileNameStc("");
+    QString t_sFileNameStc("mind006_051209_auditory01.stc");
 
     // Parse command line parameters
     for(qint32 i = 0; i < argc; ++i)
@@ -478,7 +478,7 @@ int main(int argc, char *argv[])
     //
     // Cluster forward solution;
     //
-    MNEForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution(t_annotationSet, 20);//40);
+    MNEForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution_ccr(t_annotationSet, 20);//40);
 
     //
     // make an inverse operators
@@ -587,18 +587,18 @@ int main(int argc, char *argv[])
 //    SurfaceSet t_surfSet("/home/chdinh/sl_data/subjects/mind006/surf/lh.white", "/home/chdinh/sl_data/subjects/mind006/surf/rh.white");
     SurfaceSet t_surfSet("E:/Data/sl_data/subjects/mind006/surf/lh.white", "E:/Data/sl_data/subjects/mind006/surf/rh.white");
 
-    //only one time point - P100
-    qint32 sample = 0;
-    for(qint32 i = 0; i < sourceEstimate.times.size(); ++i)
-    {
-        if(sourceEstimate.times(i) >= 0)
-        {
-            sample = i;
-            break;
-        }
-    }
-    sample += (qint32)ceil(0.106/sourceEstimate.tstep); //100ms
-    sourceEstimate = sourceEstimate.reduce(sample, 1);
+//    //only one time point - P100
+//    qint32 sample = 0;
+//    for(qint32 i = 0; i < sourceEstimate.times.size(); ++i)
+//    {
+//        if(sourceEstimate.times(i) >= 0)
+//        {
+//            sample = i;
+//            break;
+//        }
+//    }
+//    sample += (qint32)ceil(0.106/sourceEstimate.tstep); //100ms
+//    sourceEstimate = sourceEstimate.reduce(sample, 1);
 
     QList<Label> t_qListLabels;
     QList<RowVector4i> t_qListRGBAs;
