@@ -39,7 +39,7 @@ include(../../../mne-cpp.pri)
 
 TEMPLATE = app
 
-QT += network core widgets
+QT += network core widgets concurrent
 
 TARGET = mne_browse_raw_qt
 
@@ -69,16 +69,18 @@ SOURCES += rawsettings.cpp\
     main.cpp\
     rawmodel.cpp \
     mainwindow.cpp \
-    rawdelegate.cpp #\
-    #rawview.cpp
+    rawdelegate.cpp \
+    mneoperator.cpp \
+    filteroperator.cpp
 
 HEADERS += types.h\
     info.h\
     rawsettings.h\
     rawmodel.h\
     mainwindow.h \
-    rawdelegate.h #\
-    #rawview.h
+    rawdelegate.h \
+    mneoperator.h \
+    filteroperator.h
 
 
 FORMS +=

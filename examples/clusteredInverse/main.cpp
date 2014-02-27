@@ -273,12 +273,6 @@ int main(int argc, char *argv[])
     //Source Estimate end
     //########################################################################################
 
-    AnnotationSet t_annotSet("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot","./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot");
-//    AnnotationSet t_annotSet("/home/chdinh/sl_data/subjects/mind006/label/lh.aparc.a2009s.annot", "/home/chdinh/sl_data/subjects/mind006/label/rh.aparc.a2009s.annot");
-//    AnnotationSet t_annotSet("E:/Data/sl_data/subjects/mind006/label/lh.aparc.a2009s.annot", "E:/Data/sl_data/subjects/mind006/label/rh.aparc.a2009s.annot");
-
-
-
     SurfaceSet t_surfSet("./MNE-sample-data/subjects/sample/surf/lh.white", "./MNE-sample-data/subjects/sample/surf/rh.white");
 //    SurfaceSet t_surfSet("/home/chdinh/sl_data/subjects/mind006/surf/lh.white", "/home/chdinh/sl_data/subjects/mind006/surf/rh.white");
 //    SurfaceSet t_surfSet("E:/Data/sl_data/subjects/mind006/surf/lh.white", "E:/Data/sl_data/subjects/mind006/surf/rh.white");
@@ -300,7 +294,7 @@ int main(int argc, char *argv[])
     QList<RowVector4i> t_qListRGBAs;
 
     //ToDo overload toLabels using instead of t_surfSet rr of MNESourceSpace
-    t_annotSet.toLabels(t_surfSet, t_qListLabels, t_qListRGBAs);
+    t_annotationSet.toLabels(t_surfSet, t_qListLabels, t_qListRGBAs);
 
     InverseView view(minimumNorm.getSourceSpace(), t_qListLabels, t_qListRGBAs);
 

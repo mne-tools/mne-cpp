@@ -31,7 +31,34 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of data model of mne_browse_raw_qt
+* @brief    This class represents the model of the model/view framework of mne_browse_raw_qt application.
+*           It is derived from QAbstractTableModel so the virtual functions rowCount(),columnCount() and data()
+*           needed to be reimplemented. The delegate requests the data for any individual table cell by
+*           invoking data(QModelIndex index, int role) and a certain role. DisplayRole is the standard role
+*           for requesting the plain data. Other roles such as BackgroundRole are requested to fill a cell
+*           with a certain background color with respect to the individual index.
+*           For further information see [1].
+*
+*           The way how the data is organized is totally up to the model. In our case, the raw and processed
+*           data is stored in stored in the two matrices m_data[i] and m_procData[i] (both are QList that contains MatrixXdR), respectively. (nchans x m_iWindowSize)
+*           The data is loaded and displayed blockwise. If the user scrolls close (meaning distanced smaller than
+*           m_iReloadPos) to the loaded edge, the subsequent block is loaded from the fiff file. The maximum number
+*           of loaded window blocks is determined by the parameter m_maxWindows. If m_maxWindows is reached and another
+*           block is to be loaded, the first or last block (depending on whether the user scrolls to the right or left edge)
+*           is removed from m_data, pretty much like a circular buffer. The logic of the reloading is managed by the
+*           slot updateScrollPos, which obtains the value from the horizontal QScrollBar being part of the connected TableView.
+*
+*           In order to not freeze the GUI when reloading new data or filtering data, the RawModel class makes heavy use
+*           of the QtConcurrent features. [2]
+*           Therefore, the methods updateOperatorsConcurrently() and readSegment() is run in a background-thread. Once the results
+*           are ready the m_operatorFutureWatcher and m_reloadFutureWatcher emits a signal that is connect to the slots
+*           insertProcessedData() and insertReloadedData(), respectively.
+*
+*           MNEOperators such as FilterOperators are stored in m_Operators. The MNEOperators that are applied to any
+*           individual channel are stored in the QMap m_assignedOperators.
+*
+*           [1] http://qt-project.org/doc/qt-5/QAbstractTableModel.html
+*           [2] http://qt-project.org/doc/qt-5.0/qtconcurrent/qtconcurrent-index.html
 *
 */
 
@@ -50,6 +77,8 @@
 #include <QBrush>
 #include <QPalette>
 
+#include <QtConcurrent>
+
 //Eigen
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
@@ -62,8 +91,8 @@
 //MNE
 #include <fiff/fiff.h>
 #include <mne/mne.h>
-#include <fiff/fiff_io.h>
 #include <utils/parksmcclellan.h>
+#include "filteroperator.h"
 
 //MNE_BROWSE_RAW_QT
 #include "types.h"
@@ -76,6 +105,7 @@ using namespace MNE_BROWSE_RAW_QT;
 using namespace Eigen;
 using namespace MNELIB;
 using namespace UTILSLIB;
+using namespace FIFFLIB;
 
 //=============================================================================================================
 
@@ -84,18 +114,19 @@ class RawModel : public QAbstractTableModel
     Q_OBJECT
 public:
     RawModel(QObject *parent);
-    RawModel(QFile &qFile, QObject *parent);
+    RawModel(QFile& qFile, QObject *parent);
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const ;
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
     virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 
+    //METHODS
     /**
     * loadFiffData loads fiff data file.
     *
     * @param p_IODevice fiff data file to write
     */
-    bool loadFiffData(QFile &qFile);
+    bool loadFiffData(QFile& qFile);
 
     /**
      * writeFiffData writes a new fiff data file
@@ -104,36 +135,20 @@ public:
      */
     bool writeFiffData(QFile &qFile);
 
-    /**
-     * resetPosition reset the position of the current m_iAbsFiffCursor if a ScrollBar position is selected, whose data is not yet loaded.
-     *
-     * @param position where the new data block of the fiff file should be loaded.
-     */
-    void resetPosition(qint32 position);
-
-    /**
-     * clearModel clears all model's members
-     */
-    void clearModel();
-
-    /**
-     * getMaxDataValue obtains the maximum value for the underlying channel
-     *
-     * @param chan number of channel in m_chInfolist
-     * @return max data value of m_data for scaling purposes.
-     */
-    double maxDataValue(qint16 chan) const;
+    //VARIABLES
+    bool m_bFileloaded; /**< true when a Fiff file is loaded */
 
     //Fiff data structure
     QList<MatrixXdR> m_data; /**< List that holds the fiff matrix data <n_channels x n_samples> */
     QList<MatrixXdR> m_procData; /**< List that holds the processed fiff matrix data <n_channels x n_samples> */
     QList<MatrixXdR> m_times; /**< List that holds the time axis [in secs] */
 
-    QMap<ParksMcClellan::TPassType,QList<int>> m_mapFilteredChannels; /**< filtered channel list with TPasstype->Channelno. mapping */
-    QList<int> m_allFilteredChannels; /**< contains channel numbers of filtered channels independent of the value of TPassFilter */
-
     QList<FiffChInfo> m_chInfolist; /**< List of FiffChInfo objects that holds the corresponding channels information */
     FiffInfo m_fiffInfo; /**< fiff info of whole fiff file */
+
+    //Filter operators
+    QMap<QString,QSharedPointer<MNEOperator> > m_Operators; /**< generated MNEOperator types (FilterOperator,PCA etc.) */
+    QMap<int,QSharedPointer<MNEOperator> > m_assignedOperators; /**< Map of MNEOperator types to channels*/
 
     //Settings
     QSettings m_qSettings;
@@ -149,18 +164,29 @@ public:
     QSharedPointer<FiffIO> m_pfiffIO; /**< FiffIO objects, which holds all the information of the fiff data (excluding the samples!) */
 
 private:
-    //View control
-    bool m_bStartReached; /**< signals, whether the start of the fiff data file is reached */
-    bool m_bEndReached; /**< signals, whether the end of the fiff data file is reached */
-    QMap<ParksMcClellan::TPassType,RowVectorXd> m_mapFilters; /**< Map of filter types to filter coeffs vectors */
-    QMap<ParksMcClellan::TPassType,RowVectorXcd> m_mapFiltersFreq; /**< Map of filter types to filter coeffs freq vectors of size 1x(m_iWindowSize+m_iFilterTaps)/2*/
+    //METHODS
+    /**
+     * genStdFilters generates a set of standard FilterOperators
+     */
+    void genStdFilterOps();
 
-    //methods
     /**
     * Loads fiff infos to m_chInfolist abd m_fiffInfo.
     *
     */
     void loadFiffInfos();
+
+    /**
+     * clearModel clears all model's members
+     */
+    void clearModel();
+
+    /**
+     * resetPosition reset the position of the current m_iAbsFiffCursor if a ScrollBar position is selected, whose data is not yet loaded.
+     *
+     * @param position where the new data block of the fiff file should be loaded.
+     */
+    void resetPosition(qint32 position);
 
     /**
      * reloadFiffData
@@ -170,58 +196,137 @@ private:
     void reloadFiffData(bool before);
 
     /**
-     * genFilter generates filter coeffient vectors with respect to the given filter parameters
-     * @param NumTaps number of taps, higher stopband attenuation for higher filter orders (=NumTaps).
-     * @param OmegaC is the 3 dB corner freq for low pass and high pass filters.
-     * @param BW is the bandwidth for bandpass and notch filters (ignored on low and high pass).
-     * @param ParksWidth is the width of the transition bands.
-     * @param PassType is the type of filter that shall be generated. options: LPF, HPF, BPF, NOTCH.
+     * @brief readSegment is the wrapper method to read a segment from the raw fiff file
+     * @param from the start point to read from the file
+     * @param to the end point to read from the file
+     * @return the data and times matrices
      */
-    void genFilter(int NumTaps, double OmegaC, double BW, double ParksWidth, ParksMcClellan::TPassType type);
+    QPair<MatrixXd,MatrixXd> readSegment(fiff_int_t from, fiff_int_t to);
+
+    //VARIABLES
+    //Reload control
+    bool m_bStartReached; /**< signals, whether the start of the fiff data file is reached */
+    bool m_bEndReached; /**< signals, whether the end of the fiff data file is reached */
+    bool m_bReloadBefore; /**< bool value indicating if data was reloaded before (1) or after (0) the existing data */
+
+    //Concurrent reloading
+    QFutureWatcher<QPair<MatrixXd,MatrixXd> > m_reloadFutureWatcher; /**< QFutureWatcher for watching process of reloading fiff data */
+    bool m_bReloading; /**< signals when the reloading is ongoing */
+
+    //Concurrent processing
+//    QFutureWatcher<QPair<int,RowVectorXd> > m_operatorFutureWatcher; /**< QFutureWatcher for watching process of applying Operators to reloaded fiff data */
+    QFutureWatcher<void> m_operatorFutureWatcher; /**< QFutureWatcher for watching process of applying Operators to reloaded fiff data */
+    QList<QPair<int,RowVectorXd> > m_listTmpChData; /**< contains pairs with a channel number and the corresponding RowVectorXd */
+    bool m_bProcessing; /**< true when processing in a background-thread is ongoing*/
+
+    QMutex m_Mutex; /**< mutex for locking against simultaenous access to shared objects > */
 
 signals:
+    /**
+     * dataReloaded is emitted when data reloading has finished in the background-thread
+     */
+    void dataReloaded();
+
+    /**
+     * scrollBarValueChange is emitted if a change of the horizontal ScrollBar value is requested by the RawModel
+     * @param pos is the requested relative scroll position (0 equals beginning of ScrollBar)
+     */
+    void scrollBarValueChange(int pos);
 
 public slots:
     /**
-     * reloadData checks, whether the actual position of the QScrollBar demands for a fiff data reload (depending on m_reloadPos)
+     * updateScrollPos checks, whether the actual position of the QScrollBar demands for a fiff data reload (depending on m_reloadPos and m_iCurAbsScrollPos)
      *
      * @param value the position of QScrollBar
      */
-    void reloadData(int value);
+    void updateScrollPos(int value);
 
     /**
      * markChBad marks the selected channels as bad/good in m_chInfolist
-     * @param selected is the list of indices that are selected for marking
+     * @param chlist is the list of indices that are selected for marking
      * @param status, status=1 -> mark as bad, status=0 -> mark as good
      */
-    void markChBad(QModelIndexList selected, bool status);
+    void markChBad(QModelIndexList chlist, bool status);
 
     /**
-     * applyFilter applies filter to channels
-     * @param selected selects the channels to filter
-     * @param type determines the filter type TPassType to choose for filtering
+     * applyOperator applies assigend operators to channel
+     * @param index selects the channel to process
+     * @param filter
      */
-    void applyFilter(QModelIndexList selected, ParksMcClellan::TPassType type);
+    void applyOperator(QModelIndex chan, const QSharedPointer<MNEOperator> &operatorPtr, bool reset=false);
+
+    /**
+     * applyOperator applies operators to channels
+     * @param chlist selects the channels to process
+     * @param filter
+     */
+    void applyOperator(QModelIndexList chlist, const QSharedPointer<MNEOperator> &operatorPtr, bool reset=false);
+
+    /**
+     * applyOperatorsConcurrently updates all applied MNEOperators to a given RowVectorXd and modifies it in-place
+     * @param chdata[in,out] represents the channel data as a RowVectorXd
+     */
+    void applyOperatorsConcurrently(QPair<int, RowVectorXd>& chdata);
+
+    /**
+     * updateOperators updates all set operator to channels according to m_assignedOperators
+     * @param chan the channel to which the operators shall be updated
+     */
+    void updateOperators(QModelIndex chan);
+
+    /**
+     * updateOperators is an overloaded function to update the operators to a channel list
+     * @param chlist
+     */
+    void updateOperators(QModelIndexList chlist);
+
+    /**
+     * updateOperators is an overloaded function that updates all channels according to m_assignedOperators
+     */
+    void updateOperators();
 
     /**
      * undoFilter undoes the filtering operation for filter operations of the type
-     * @param selected selects the channels to filter
+     * @param chlist selects the channels to filter
      * @param type determines the filter type TPassType to choose for the undo operation
      */
-    void undoFilter(QModelIndexList selected, ParksMcClellan::TPassType type);
+    void undoFilter(QModelIndexList chlist, const QSharedPointer<MNEOperator> &filterPtr);
 
     /**
      * undoFilter undoes the filtering operation for all filter operations
-     * @param selected selects the channels to filter
+     * @param chlist selects the channels to filter
      */
-    void undoFilter(QModelIndexList selected);
+    void undoFilter(QModelIndexList chlist);
 
     /**
      * undoFilter undoes the filtering operation for all filter operations for all channels
      */
     void undoFilter();
 
-//Inline
+private slots:
+    /**
+     * insertReloadedData inserts the reloaded data when the background has finished the operation
+     * @param dataTimesPair contains the reloaded matrices of the data and times so it can be inserted into m_data and m_times
+     */
+    void insertReloadedData(QPair<MatrixXd,MatrixXd> dataTimesPair);
+
+    /**
+     * updateOperatorsConcurrently runs the processing of the MNEOperators in a background-thread
+     */
+    void updateOperatorsConcurrently();
+
+    /**
+     * insertProcessedData inserts the processed data into m_procData when background-thread has finished (this method would be used for QtConcurrent::mapped)
+     * @param index represents the row index in m_procData
+     */
+    void insertProcessedData(int index);
+
+    /**
+     * insertProcessedData inserts the processed data into m_procData when background-thread has finished (this method would be used for QtConcurrent::map)
+     */
+    void insertProcessedData();
+
+//inline
 public:
     /**
      * sizeOfFiffData
