@@ -31,7 +31,13 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains all application settings.
+* @brief    In this RawSettings class all mne_browse_raw_qt settings are managed. In order to store settings
+*           from the last mne_browse_raw_qt session, the class uses the QtSettings class of Qt. [1]
+*           Using QSettings, the entries are stored locally in a OS-specific place from where they shall
+*           be loaded at each start of mne_browse_raw_qt if they were already set (this is not yet implemented -> ToDo)
+*
+*
+*           [1] http://qt-project.org/doc/qt-5/QSettings.html
 *
 */
 
@@ -57,14 +63,14 @@
 #define MAINWINDOW_WINDOW_SIZE_H 800 //width of MainWindow
 
 //RawModel
-#define MODEL_WINDOW_SIZE 4016 //4096-MODEL_NUM_FILTER_TAPS length of data window to preload [in samples]
-#define MODEL_RELOAD_POS 1500 //Distance that the current window needs to be off the ends of m_data[i] [in samples]
+#define MODEL_WINDOW_SIZE 4016 //this value+MODEL_NUM_FILTER_TAPS must be a multiple integer of 2^x (e.g. 4016 or 8112 for 80 filter taps), length of data window to preload [in samples]
+#define MODEL_RELOAD_POS 2000 //Distance that the current window needs to be off the ends of m_data[i] [in samples]
 #define MODEL_MAX_WINDOWS 3 //number of windows that are at maximum remained in m_data
 #define MODEL_NUM_FILTER_TAPS 80 //number of filter taps, required to take into account because of FFT convolution (zero padding)
 
 //RawDelegate
 //Look
-#define DELEGATE_PLOT_HEIGHT 50 //height of a single plot (row)
+#define DELEGATE_PLOT_HEIGHT 40 //height of a single plot (row)
 #define DELEGATE_DX 1 //each DX pixel a sample is plot -> plot resolution
 #define DELEGATE_NHLINES 6 //number of horizontal lines within a single plot (row)
 
@@ -87,6 +93,7 @@ class RawSettings : public QObject
     Q_OBJECT
 public:
     RawSettings(QObject *parent = 0);
+    ~RawSettings();
 
 signals:
 

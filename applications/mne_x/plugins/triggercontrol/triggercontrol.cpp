@@ -63,9 +63,9 @@
 //=============================================================================================================
 
 //#define TIMEMEAS // Zeitmessung;
-//#define BUFFERX1 // X1 determination
+#define BUFFERX1 // X1 determination
 //#define TIMEMUC // Zeitmessung MUC
-#define ALPHA // Alpha locked stimulus
+//#define ALPHA // Alpha locked stimulus
 
 
 //*************************************************************************************************************
@@ -528,7 +528,7 @@ void TriggerControl::run()
     {
 
         emit sendByte(1);
-        msleep(10);
+        msleep(20);
         emit sendByte(0);
         msleep(500);
 

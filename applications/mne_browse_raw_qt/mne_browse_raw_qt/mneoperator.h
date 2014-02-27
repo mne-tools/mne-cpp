@@ -1,12 +1,12 @@
 //=============================================================================================================
 /**
-* @file     rawsettings.cpp
+* @file     mneoperator.h
 * @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 *           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
 * @version  1.0
-* @date     January, 2014
+* @date     February, 2014
 *
 * @section  LICENSE
 *
@@ -31,66 +31,50 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains all application settings.
+* @brief    Contains all MNEOperators.
 *
 */
 
-#include "rawsettings.h"
+#ifndef MNEOPERATOR_H
+#define MNEOPERATOR_H
+
+//=============================================================================================================
+// INCLUDES
+
+//Qt
+#include <QObject>
+
+//MNE
+#include <fiff/fiff.h>
+
+//=============================================================================================================
+// NAMESPACES
 
 //*************************************************************************************************************
 
-using namespace MNE_BROWSE_RAW_QT;
-
-//*************************************************************************************************************
-
-RawSettings::RawSettings(QObject *parent)
-: QObject(parent)
-, m_qSettings("mne-cpp","MNE_BROWSE_RAW_QT")
+class MNEOperator
 {
-    init();
-}
+//    Q_OBJECT
+public:
+    enum OperatorType {
+        FILTER,
+        PCA,
+        AVERAGE
+    } m_OperatorType;
 
-RawSettings::~RawSettings()
-{
-}
+    MNEOperator();
+    ~MNEOperator();
 
-//*************************************************************************************************************
+    MNEOperator(const MNEOperator& obj);
 
-void RawSettings::init()
-{
-    //MainWindow
-    //ToDo: ask for already stored setting in OS environment before setting them
-    //e.g. if(!m_qSettings.contains("RawModel/window_size")) m_qSettings.setValue("window_size",MODEL_WINDOW_SIZE);
+    MNEOperator(OperatorType type);
 
-    //Window settings
-    m_qSettings.beginGroup("MainWindow");
-        m_qSettings.setValue("size",QSize(MAINWINDOW_WINDOW_SIZE_W,MAINWINDOW_WINDOW_SIZE_H));
-    m_qSettings.endGroup();
+    QString m_sName;
 
-    //RawModel
-    m_qSettings.beginGroup("RawModel");
-        m_qSettings.setValue("window_size",MODEL_WINDOW_SIZE);
-        m_qSettings.setValue("reload_pos",MODEL_RELOAD_POS);
-        m_qSettings.setValue("max_windows",MODEL_MAX_WINDOWS);
-        m_qSettings.setValue("num_filter_taps",MODEL_NUM_FILTER_TAPS);
-    m_qSettings.endGroup();
+signals:
 
-    //RawDelegate
-    m_qSettings.beginGroup("RawDelegate");
+public slots:
 
-        //look
-        m_qSettings.setValue("plotheight",DELEGATE_PLOT_HEIGHT);
-        m_qSettings.setValue("dx",DELEGATE_DX);
-        m_qSettings.setValue("nhlines",DELEGATE_NHLINES);
+};
 
-//        //maximum values for different channels types according to FiffChInfo
-        m_qSettings.setValue("max_meg_grad",DELEGATE_MAX_MEG_GRAD);
-        m_qSettings.setValue("max_meg_mag",DELEGATE_MAX_MEG_MAG);
-        m_qSettings.setValue("max_eeg",DELEGATE_MAX_EEG);
-        m_qSettings.setValue("max_eog",DELEGATE_MAX_EOG);
-        m_qSettings.setValue("max_stim",DELEGATE_MAX_STIM);
-
-    m_qSettings.endGroup();
-
-
-}
+#endif // MNEOPERATOR_H
