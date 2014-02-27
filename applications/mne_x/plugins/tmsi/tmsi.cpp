@@ -121,7 +121,7 @@ void TMSI::init()
     m_bUseFFT = false;
     m_bIsRunning = false;
     m_bShowEventTrigger = false;
-    m_bUseCommonAverage = false;
+    m_bUseCommonAverage = true;
 
     m_sOutputFilePath = QString("./mne_x_plugins/resources/tmsi/EEG_data_001_raw.fif");
     m_sElcFilePath = QString("./mne_x_plugins/resources/tmsi/loc_files/Lorenz-Duke128-28-11-2013.elc");

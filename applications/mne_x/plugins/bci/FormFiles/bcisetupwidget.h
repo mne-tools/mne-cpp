@@ -141,10 +141,18 @@ private:
     */
     void changeLoadSensorBoundary();
 
+    //=========================================================================================================
+    /**
+    * Init selected feature list on sensor level
+    *
+    */
+    void initSelectedFeaturesSensor();
 
-    BCI* m_pBCI;                    /**< a pointer to corresponding BCI.*/
+    BCI* m_pBCI;                                    /**< a pointer to corresponding BCI.*/
 
-    Ui::BCISetupClass ui;           /**< the user interface for the BCISetupWidget.*/
+    QStringList m_vAvailableFeaturesSensor;         /**< QStringList holding available features to select on sensor level (electrodes).*/
+
+    Ui::BCISetupClass ui;                           /**< the user interface for the BCISetupWidget.*/
 };
 
 } // NAMESPACE
