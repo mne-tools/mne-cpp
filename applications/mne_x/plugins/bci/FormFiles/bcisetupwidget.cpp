@@ -96,6 +96,16 @@ BCISetupWidget::BCISetupWidget(BCI* pBCI, QWidget* parent)
     connect(ui.m_pushButton_LoadSourceBoundary, &QPushButton::released,
             this, &BCISetupWidget::changeLoadSourceBoundary);
 
+    // Connect feature selection
+    connect(ui.m_listWidget_ChosenFeaturesOnSensorLevel, &QListWidget::itemPressed,
+            this, &BCISetupWidget::setFeatureSelection);
+    connect(ui.m_listWidget_ChosenFeaturesOnSourceLevel, &QListWidget::itemPressed,
+            this, &BCISetupWidget::setFeatureSelection);
+    connect(ui.m_listWidget_AvailableFeaturesOnSensorLevel, &QListWidget::itemPressed,
+            this, &BCISetupWidget::setFeatureSelection);
+    connect(ui.m_listWidget_AvailableFeaturesOnSourceLevel, &QListWidget::itemPressed,
+            this, &BCISetupWidget::setFeatureSelection);
+
     //Connect about button
     connect(ui.m_qPushButton_About, &QPushButton::released, this, &BCISetupWidget::showAboutDialog);
 
@@ -206,8 +216,7 @@ void BCISetupWidget::changeLoadSourceBoundary()
 
 void BCISetupWidget::initSelectedFeaturesSensor()
 {
-    // Read electrode pinnig scheme from file and initialise List
-
+    // Read electrode pinnig scheme from file and initialise List and store in QMap in BCI object
     QString path;
     path.prepend(m_pBCI->m_qStringResourcePath);
     path.append("Pinning_Scheme_Duke_128.txt");
@@ -217,16 +226,25 @@ void BCISetupWidget::initSelectedFeaturesSensor()
 
     //Start reading from file
     m_vAvailableFeaturesSensor.clear();
+    QMap<QString, int>  mapElectrodePinningScheme;
+
     QTextStream in(&file);
 
     while(!in.atEnd())
     {
         QString line = in.readLine();
-        line.replace(QRegExp("\\s+"), QString(" "));
-        m_vAvailableFeaturesSensor.append(line);
+
+        QStringList list_temp = line.split(QRegExp("\\s+"));
+
+        if(list_temp.size() >= 2)
+            mapElectrodePinningScheme.insert(list_temp.at(1), list_temp.at(0).toInt()-1); // Decrement 1 because channels in matrix start with 0
+
+        m_vAvailableFeaturesSensor.append(list_temp.at(1));
     }
 
     file.close();
+
+    m_pBCI->m_mapElectrodePinningScheme = mapElectrodePinningScheme;
 
     // Remove default items from list
     for(int i=0; i<m_pBCI->m_slChosenFeatureSensor.size(); i++)
@@ -234,6 +252,23 @@ void BCISetupWidget::initSelectedFeaturesSensor()
 
     ui.m_listWidget_AvailableFeaturesOnSensorLevel->addItems(m_vAvailableFeaturesSensor);
     ui.m_listWidget_ChosenFeaturesOnSensorLevel->addItems(m_pBCI->m_slChosenFeatureSensor);
+}
+
+
+//*************************************************************************************************************
+
+void BCISetupWidget::setFeatureSelection()
+{
+    QStringList ChosenFeaturesOnSensorLevel;
+    for(int i=0; i< ui.m_listWidget_ChosenFeaturesOnSensorLevel->count(); i++)
+        ChosenFeaturesOnSensorLevel << ui.m_listWidget_ChosenFeaturesOnSensorLevel->item(i)->text();
+
+    QStringList ChosenFeaturesOnSourceLevel;
+    for(int i=0; i< ui.m_listWidget_ChosenFeaturesOnSourceLevel->count(); i++)
+        ChosenFeaturesOnSourceLevel << ui.m_listWidget_ChosenFeaturesOnSourceLevel->item(i)->text();
+
+    m_pBCI->m_slChosenFeatureSensor = ChosenFeaturesOnSensorLevel;
+    m_pBCI->m_slChosenFeatureSource = ChosenFeaturesOnSourceLevel;
 }
 
 

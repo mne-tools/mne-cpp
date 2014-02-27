@@ -137,7 +137,9 @@ void BCI::init()
     m_iNumberSubSignals = 1;
     m_sSensorBoundaryPath = m_qStringResourcePath;
     m_sSourceBoundaryPath = m_qStringResourcePath;
-    m_slChosenFeatureSensor << "113 LA4" << "65 RA4";
+
+    // Intitalise feature selection
+    m_slChosenFeatureSensor << "LA4" << "RA4"; //<< "TEST";
 
     // Initialise boundaries with linear coefficients y = mx+c -> vector = [m c] -> default [1 0]
     m_vLoadedSensorBoundary.push_back(1);
@@ -148,6 +150,7 @@ void BCI::init()
 
     // Initalise sliding window stuff
     m_iTBWIndexSensor = 0;
+    m_bFillSensorWindowFirstTime = true;
 }
 
 
@@ -238,14 +241,14 @@ void BCI::updateSensor(XMEASLIB::NewMeasurement::SPtr pMeasurement)
             // Adjust working matrixes (sliding window and time between windows matrix) size so that the samples from the tmsi plugin stream fit in the matrix perfectly
             int modulo = (int)(m_pFiffInfo_Sensor->sfreq*m_dSlidingWindowSize) % (int)pRTMSA->getMultiArraySize();
 
-            int rows = m_pFiffInfo_Sensor->nchan;
+            int rows = m_slChosenFeatureSensor.size();
             int cols = m_pFiffInfo_Sensor->sfreq*m_dSlidingWindowSize-modulo;
-            m_mSlidingWindowSensor.resize(rows, cols);
+            m_matSlidingWindowSensor.resize(rows, cols);
 
             modulo = (int)(m_pFiffInfo_Sensor->sfreq*m_dTimeBetweenWindows) % (int)pRTMSA->getMultiArraySize();
-            rows = m_pFiffInfo_Sensor->nchan;
+            rows = m_slChosenFeatureSensor.size();
             cols = m_pFiffInfo_Sensor->sfreq*m_dTimeBetweenWindows-modulo;
-            m_mTimeBetweenWindowsSensor.resize(rows, cols);
+            m_matTimeBetweenWindowsSensor.resize(rows, cols);
         }
 
         if(m_bProcessData)
@@ -298,36 +301,55 @@ void BCI::run()
         // Start filling buffers with data from the inputs
         m_bProcessData = true;
 
-        // Sensor level: Fill m_mTimeBetweenWindowsSensor matrix until full -> recalculate m_mSlidingWindowSensor
-        if(m_iTBWIndexSensor < m_mTimeBetweenWindowsSensor.cols())
+        // Sensor level: Fill matrices with data
+        if(m_bFillSensorWindowFirstTime) // Sensor level: Fill m_matSlidingWindowSensor with data for the first time
         {
-            MatrixXd t_mat = m_pBCIBuffer_Sensor->pop();
+            if(m_iTBWIndexSensor < m_matSlidingWindowSensor.cols())
+            {
+                MatrixXd t_mat = m_pBCIBuffer_Sensor->pop();
 
-            // Fill data into m_mSlidingWindowSensor
-            m_mTimeBetweenWindowsSensor.block(0,m_iTBWIndexSensor,t_mat.rows(),t_mat.cols()) = t_mat;
+                // Get only the rows from the matrix which correspond with the selected features, namely electrodes on sensor level and destrieux clustered regions on source level
+                for(int i = 0; i < m_matSlidingWindowSensor.rows(); i++)
+                    m_matSlidingWindowSensor.block(i, m_iTBWIndexSensor, 1, t_mat.cols()) = t_mat.block(m_mapElectrodePinningScheme[m_slChosenFeatureSensor.at(i)], 0, 1, t_mat.cols());
 
-//            // Test if data is correctly streamed to this plugin
-//            for(int i = 1; i<t_mat.cols() ; i++)
-//            {
-//                if(t_mat(137,i) - t_mat(137,i-1) != 1)
-//                    cout<<"Sequence error while streaming from tmsi plugin"<<endl;
-//            }
-
-            m_iTBWIndexSensor = m_iTBWIndexSensor + t_mat.cols();
+                m_iTBWIndexSensor = m_iTBWIndexSensor + t_mat.cols();
+            }
+            else // m_matSlidingWindowSensor is full for the first time
+            {
+                m_iTBWIndexSensor = 0;
+                m_bFillSensorWindowFirstTime = false;
+            }
         }
-        else // Recalculate m_mSlidingWindowSensor -> Calculate features, classify and store results
+        else // Sensor level: Fill m_matTimeBetweenWindowsSensor matrix until full -> Then -> recalculate m_matSlidingWindowSensor, calculate features and classify
         {
-            //cout<<"CLASSIFY"<<endl;
+            if(m_iTBWIndexSensor < m_matTimeBetweenWindowsSensor.cols())
+            {
+                MatrixXd t_mat = m_pBCIBuffer_Sensor->pop();
 
-//            // Test if data is correctly streamed to this plugin
-//            for(int i = 1; i<m_mTimeBetweenWindowsSensor.cols() ; i++)
-//            {
-//                if(m_mTimeBetweenWindowsSensor(137,i) - m_mTimeBetweenWindowsSensor(137,i-1) != 1)
-//                    cout<<"Sequence error while streaming from tmsi plugin"<<endl;
-//            }
+                // Get only the rows from the matrix which correspond with the selected features, namely electrodes on sensor level and destrieux clustered regions on source level
+                for(int i = 0; i < m_matTimeBetweenWindowsSensor.rows(); i++)
+                    m_matTimeBetweenWindowsSensor.block(i, m_iTBWIndexSensor, 1, t_mat.cols()) = t_mat.block(m_mapElectrodePinningScheme[m_slChosenFeatureSensor.at(i)], 0, 1, t_mat.cols());
 
-            m_mSlidingWindowSensor.setZero();
-            m_iTBWIndexSensor = 0;
+                m_iTBWIndexSensor = m_iTBWIndexSensor + t_mat.cols();
+            }
+            else // Recalculate m_matSlidingWindowSensor -> Calculate features, classify and store results
+            {
+                // Recalculate m_matSlidingWindowSensor -> Delete same block size of data from the right -> use eval() to resolve Eigens aliasing problem
+                m_matSlidingWindowSensor.block(0, 0, m_matSlidingWindowSensor.rows(), m_matSlidingWindowSensor.cols()-m_matTimeBetweenWindowsSensor.cols()) = m_matSlidingWindowSensor.block(0, m_matTimeBetweenWindowsSensor.cols(), m_matSlidingWindowSensor.rows(), m_matSlidingWindowSensor.cols()-m_matTimeBetweenWindowsSensor.cols()).eval();
+
+                // Recalculate m_matSlidingWindowSensor -> push m_matTimeBetweenWindowsSensor from the left
+                m_matSlidingWindowSensor.block(0, m_matSlidingWindowSensor.cols()-m_matTimeBetweenWindowsSensor.cols(), m_matTimeBetweenWindowsSensor.rows(), m_matTimeBetweenWindowsSensor.cols()) = m_matTimeBetweenWindowsSensor;
+
+                // Test if data is correctly streamed to this plugin
+//                cout<<"Recalculate matrix"<<endl;
+//                for(int i = 1; i<m_matSlidingWindowSensor.cols() ; i++)
+//                {
+//                    cout<<m_matSlidingWindowSensor(2,i)<<endl;
+////                    if(m_matSlidingWindowSensor(2,i) - m_matSlidingWindowSensor(2,i-1) != 1)
+////                        cout<<"Sequence error while streaming from tmsi plugin at position: "<<i<<endl;
+//                }
+                m_iTBWIndexSensor = 0;
+            }
         }
     }
 }

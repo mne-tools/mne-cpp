@@ -170,13 +170,17 @@ private:
     QMutex              m_qMutex;
 
     FiffInfo::SPtr      m_pFiffInfo_Sensor;                 /**< Sensor level: Fiff information for sensor data. */
-    MatrixXd            m_mSlidingWindowSensor;             /**< Sensor level: Working (sliding) matrix, used to store data for feature calculation on sensor level. */
-    MatrixXd            m_mTimeBetweenWindowsSensor;        /**< Sensor level: Samples stored during time between windows on sensor level. */
+    MatrixXd            m_matSlidingWindowSensor;           /**< Sensor level: Working (sliding) matrix, used to store data for feature calculation on sensor level. */
+    MatrixXd            m_matTimeBetweenWindowsSensor;      /**< Sensor level: Samples stored during time between windows on sensor level. */
     int                 m_iTBWIndexSensor;                  /**< Sensor level: Index of the amount of data which was already filled during the time between windows. */
-    QVector<double>     m_vLoadedSensorBoundary;           /**< Sensor level: Loaded decision boundary on sensor level. */
+    QVector<double>     m_vLoadedSensorBoundary;            /**< Sensor level: Loaded decision boundary on sensor level. */
     QStringList         m_slChosenFeatureSensor;            /**< Sensor level: Features used to calculate data points in feature space on sensor level. */
+    QMap<QString, int>  m_mapElectrodePinningScheme;        /**< Sensor level: Loaded pinning scheme of the Duke 128 EEG cap. */
+    bool                m_bFillSensorWindowFirstTime;       /**< Sensor level: Flag if the working matrix m_mSlidingWindowSensor is being filled for the first time. */
 
-    QVector<double>     m_vLoadedSourceBoundary;           /**< Source level: Loaded decision boundary on source level. */
+    QVector<double>     m_vLoadedSourceBoundary;            /**< Source level: Loaded decision boundary on source level. */
+    QStringList         m_slChosenFeatureSource;            /**< Source level: Features used to calculate data points in feature space on source level. */
+    QMap<QString, int>  m_mapDestrieuxAtlasRegions;         /**< Sensor level: Loaded Destrieux atlas regions. */
 
     bool                m_bUseSensorData;                   /**< GUI input: Use sensor data stream. */
     bool                m_bUseSourceData;                   /**< GUI input: Use source data stream. */
