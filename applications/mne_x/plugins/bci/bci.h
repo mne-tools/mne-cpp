@@ -45,9 +45,12 @@
 #include "bci_global.h"
 
 #include <mne_x/Interfaces/IAlgorithm.h>
-#include <generics/circularbuffer.h>
+
+#include <generics/circularmatrixbuffer.h>
+
 #include <xMeas/newrealtimesamplearray.h>
 #include <xMeas/newrealtimemultisamplearray.h>
+#include <xMeas/realtimesourceestimate.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -95,6 +98,8 @@ class BCISHARED_EXPORT BCI : public IAlgorithm
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(MNEX::IAlgorithm)
 
+    friend class BCISetupWidget;
+
 public:
     //=========================================================================================================
     /**
@@ -137,7 +142,8 @@ public:
 
     virtual QWidget* setupWidget();
 
-    void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
+    void updateSensor(XMEASLIB::NewMeasurement::SPtr pMeasurement);
+    void updateSource(XMEASLIB::NewMeasurement::SPtr pMeasurement);
 
 protected:
     //=========================================================================================================
@@ -149,10 +155,37 @@ protected:
     virtual void run();
 
 private:
-	bool                                m_bIsRunning;                       /**< Whether TMSI is running.*/
+    PluginOutputData<NewRealTimeSampleArray>::SPtr      m_pBCIOutput;           /**< The RealTimeSampleArray of the BCI output.*/
 
-    QString                             m_qStringResourcePath;              /**< The path to the EEG resource directory.*/
+    PluginInputData<NewRealTimeMultiSampleArray>::SPtr  m_pRTMSAInput;          /**< The RealTimeMultiSampleArray input.*/
+    PluginInputData<RealTimeSourceEstimate>::SPtr       m_pRTSEInput;           /**< The RealTimeSourceEstimate input.*/
 
+    CircularMatrixBuffer<double>::SPtr                  m_pBCIBuffer_Sensor;    /**< Holds incoming sensor level data.*/
+    CircularMatrixBuffer<double>::SPtr                  m_pBCIBuffer_Source;    /**< Holds incoming source level data.*/
+
+    bool                m_bIsRunning;                       /**< Whether BCI is running.*/
+    bool                m_bProcessData;                     /**< Whether BCI is to get data out of the continous input data stream, i.e. the EEG data from sensor level.*/
+    bool                m_bUseArtefactThresholdReduction;   /**< Whether BCI uses a threshold to obmit atrefacts.*/
+    QString             m_qStringResourcePath;              /**< The path to the BCI resource directory.*/
+    QMutex              m_qMutex;
+
+    FiffInfo::SPtr      m_pFiffInfo_Sensor;                 /**< Sensor level: Fiff information for sensor data. */
+    MatrixXd            m_mSlidingWindowSensor;             /**< Sensor level: Working (sliding) matrix, used to store data for feature calculation on sensor level. */
+    MatrixXd            m_mTimeBetweenWindowsSensor;        /**< Sensor level: Samples stored during time between windows on sensor level. */
+    int                 m_iTBWIndexSensor;                  /**< Sensor level: Index of the amount of data which was already filled during the time between windows. */
+    QVector<double>     m_vLoadedSensorBoundary;           /**< Sensor level: Loaded decision boundary on sensor level. */
+    QStringList         m_slChosenFeatureSensor;            /**< Sensor level: Features used to calculate data points in feature space on sensor level. */
+
+    QVector<double>     m_vLoadedSourceBoundary;           /**< Source level: Loaded decision boundary on source level. */
+
+    bool                m_bUseSensorData;                   /**< GUI input: Use sensor data stream. */
+    bool                m_bUseSourceData;                   /**< GUI input: Use source data stream. */
+    double              m_dSlidingWindowSize;               /**< GUI input: Size of the sliding window in s. */
+    double              m_dBaseLineWindowSize;              /**< GUI input: Size of the baseline window in s. */
+    double              m_dTimeBetweenWindows;              /**< GUI input: Time between windows/feature calculation in s. */
+    int                 m_iNumberSubSignals;                /**< GUI input: Number of subsignals. */
+    QString             m_sSensorBoundaryPath;              /**< GUI input: Input path for boundary file on sensor level. */
+    QString             m_sSourceBoundaryPath;              /**< GUI input: Input path for boundary file on source level. */
 };
 
 } // NAMESPACE

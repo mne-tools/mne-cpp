@@ -51,7 +51,6 @@
 #include <generics/circularmatrixbuffer.h>
 #include <xMeas/newrealtimemultisamplearray.h>
 
-#include <utils/filterTools.h>
 #include <utils/asaelc.h>
 
 #include <Eigen/unsupported/FFT>
@@ -201,8 +200,8 @@ private:
     bool                                m_bUseFiltering;                    /**< Flag for writing the received samples to a file. Defined by the user via the GUI.*/
     bool                                m_bIsRunning;                       /**< Whether TMSI is running.*/
     bool                                m_bUseFFT;                          /**< Flag for using FFT. Defined by the user via the GUI.*/
-    bool                                m_bShowEventTrigger;                 /**< Flag for using a trigger input.*/
-
+    bool                                m_bShowEventTrigger;                /**< Flag for using a trigger input.*/
+    bool                                m_bUseCommonAverage;                /**< Flag for using common average.*/
 
     ofstream                            m_outputFileStream;                 /**< fstream for writing the samples values to txt file.*/
     QString                             m_sOutputFilePath;                  /**< Holds the path for the sample output file. Defined by the user via the GUI.*/

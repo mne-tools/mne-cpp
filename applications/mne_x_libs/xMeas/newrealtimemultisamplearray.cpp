@@ -144,8 +144,8 @@ void NewRealTimeMultiSampleArray::initFromFiffInfo(FiffInfo::SPtr &p_pFiffInfo)
                     break;
                 case 107:
                     initChInfo.setUnit("V");
-                    initChInfo.setMinValue(0);
-                    initChInfo.setMaxValue(1.0e-3);
+//                    initChInfo.setMinValue(0);
+//                    initChInfo.setMaxValue(1.0e-3);
                     break;
                 case 108:
                     initChInfo.setUnit("F");

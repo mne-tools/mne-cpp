@@ -60,7 +60,7 @@
 //=============================================================================================================
 
 using namespace BCIPlugin;
-
+using namespace std;
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -68,7 +68,8 @@ using namespace BCIPlugin;
 //=============================================================================================================
 
 BCI::BCI()
-: m_qStringResourcePath(qApp->applicationDirPath()+"/mne_x_plugins/resources/bci/")
+: m_qStringResourcePath(qApp->applicationDirPath()+"/mne_x_plugins/resources/bci/"),
+  m_bProcessData(false)
 {
 }
 
@@ -98,15 +99,67 @@ QSharedPointer<IPlugin> BCI::clone() const
 
 void BCI::init()
 {
-	m_bIsRunning = false;
+    m_bIsRunning = false;
+
+    // Inputs - Source estimates and sensor level
+    m_pRTSEInput = PluginInputData<RealTimeSourceEstimate>::create(this, "BCIInSource", "BCI source input data");
+    connect(m_pRTSEInput.data(), &PluginInputConnector::notify, this, &BCI::updateSource, Qt::DirectConnection);
+    m_inputConnectors.append(m_pRTSEInput);
+
+    m_pRTMSAInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "BCIInSensor", "SourceLab sensor input data");
+    connect(m_pRTMSAInput.data(), &PluginInputConnector::notify, this, &BCI::updateSensor, Qt::DirectConnection);
+    m_inputConnectors.append(m_pRTMSAInput);
+
+    // Output
+    m_pBCIOutput = PluginOutputData<NewRealTimeSampleArray>::create(this, "ControlSignal", "BCI output data");
+    m_outputConnectors.append(m_pBCIOutput);
+
+    //m_pBCIOutput->data()->setMaxValue();
+
+    //Delete Buffer - will be initailzed with first incoming data
+    if(!m_pBCIBuffer_Sensor.isNull())
+        m_pBCIBuffer_Sensor = CircularMatrixBuffer<double>::SPtr();
+
+    if(!m_pBCIBuffer_Source.isNull())
+        m_pBCIBuffer_Source = CircularMatrixBuffer<double>::SPtr();
+
+    // Delete fiff info because the initialisation of the fiff info is seen as the first data acquisition from the input stream
+    if(!m_pFiffInfo_Sensor.isNull())
+        m_pFiffInfo_Sensor = FiffInfo::SPtr();
+
+    // Intitalise GUI stuff
+    m_bUseSensorData = true;
+    m_bUseSourceData = false;
+    m_bUseArtefactThresholdReduction = false;
+    m_dSlidingWindowSize = 1.0;
+    m_dBaseLineWindowSize = 1.0;
+    m_dTimeBetweenWindows = 0.04;
+    m_iNumberSubSignals = 1;
+    m_sSensorBoundaryPath = m_qStringResourcePath;
+    m_sSourceBoundaryPath = m_qStringResourcePath;
+    m_slChosenFeatureSensor << "113 LA4" << "65 RA4";
+
+    // Initialise boundaries with linear coefficients y = mx+c -> vector = [m c] -> default [1 0]
+    m_vLoadedSensorBoundary.push_back(1);
+    m_vLoadedSensorBoundary.push_back(0);
+
+    m_vLoadedSourceBoundary.push_back(1);
+    m_vLoadedSourceBoundary.push_back(0);
+
+    // Initalise sliding window stuff
+    m_iTBWIndexSensor = 0;
 }
 
 
 //*************************************************************************************************************
 
 bool BCI::start()
-{ 
-	m_bIsRunning = true;
+{
+    m_bIsRunning = true;
+
+    //If statement if acquisiton plugin is connected - if not dont start
+
+    QThread::start();
 
     return true;
 }
@@ -118,6 +171,20 @@ bool BCI::stop()
 {
     //Wait until this thread (BCI) is stopped
     m_bIsRunning = false;
+
+    // Get data buffers out of idle state if they froze in the acquire or release function
+    //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the pop function (acquire statement)
+
+    if(m_bProcessData) // Only clear if buffers have been initialised
+    {
+        m_pBCIBuffer_Sensor->releaseFromPop();
+        m_pBCIBuffer_Sensor->releaseFromPush();
+        //    m_pBCIBuffer_Source->releaseFromPop();
+        //    m_pBCIBuffer_Source->releaseFromPush();
+    }
+
+    // Stop filling buffers with data from the inputs
+    m_bProcessData = false;
 
     return true;
 }
@@ -154,8 +221,67 @@ QWidget* BCI::setupWidget()
 
 //*************************************************************************************************************
 
-void BCI::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
+void BCI::updateSensor(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 {
+    QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<NewRealTimeMultiSampleArray>();
+    if(pRTMSA)
+    {
+        //Check if buffer initialized
+        if(!m_pBCIBuffer_Sensor)
+            m_pBCIBuffer_Sensor = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSA->getNumChannels(), pRTMSA->getMultiArraySize()));
+
+        //Fiff information for sensor level
+        if(!m_pFiffInfo_Sensor)
+        {
+            m_pFiffInfo_Sensor = pRTMSA->getFiffInfo();
+
+            // Adjust working matrixes (sliding window and time between windows matrix) size so that the samples from the tmsi plugin stream fit in the matrix perfectly
+            int modulo = (int)(m_pFiffInfo_Sensor->sfreq*m_dSlidingWindowSize) % (int)pRTMSA->getMultiArraySize();
+
+            int rows = m_pFiffInfo_Sensor->nchan;
+            int cols = m_pFiffInfo_Sensor->sfreq*m_dSlidingWindowSize-modulo;
+            m_mSlidingWindowSensor.resize(rows, cols);
+
+            modulo = (int)(m_pFiffInfo_Sensor->sfreq*m_dTimeBetweenWindows) % (int)pRTMSA->getMultiArraySize();
+            rows = m_pFiffInfo_Sensor->nchan;
+            cols = m_pFiffInfo_Sensor->sfreq*m_dTimeBetweenWindows-modulo;
+            m_mTimeBetweenWindowsSensor.resize(rows, cols);
+        }
+
+        if(m_bProcessData)
+        {
+            MatrixXd t_mat(pRTMSA->getNumChannels(), pRTMSA->getMultiArraySize());
+
+            for(unsigned char i = 0; i < pRTMSA->getMultiArraySize(); ++i)
+                t_mat.col(i) = pRTMSA->getMultiSampleArray()[i];
+
+            m_pBCIBuffer_Sensor->push(&t_mat);
+        }
+    }
+}
+
+
+//*************************************************************************************************************
+
+void BCI::updateSource(XMEASLIB::NewMeasurement::SPtr pMeasurement)
+{
+    QSharedPointer<RealTimeSourceEstimate> pRTSE = pMeasurement.dynamicCast<RealTimeSourceEstimate>();
+    if(pRTSE)
+    {
+        //Check if buffer initialized
+        if(!m_pBCIBuffer_Source)
+            m_pBCIBuffer_Source = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTSE->getValue().size(), pRTSE->getArraySize()));
+
+        if(m_bProcessData)
+        {
+            MatrixXd t_mat(pRTSE->getValue().size(), pRTSE->getArraySize());
+
+            for(unsigned char i = 0; i < pRTSE->getArraySize(); ++i)
+                t_mat.col(i) = pRTSE->getStc().data.col(i);
+
+            m_pBCIBuffer_Source->push(&t_mat);
+        }
+    }
 }
 
 
@@ -165,6 +291,43 @@ void BCI::run()
 {
     while(m_bIsRunning)
     {
-        
+        // Wait for fiff Info if not yet received - this is needed because we have to wait until the buffers are firstly initiated in the update functions
+        while(!m_pFiffInfo_Sensor)
+            msleep(10);
+
+        // Start filling buffers with data from the inputs
+        m_bProcessData = true;
+
+        // Sensor level: Fill m_mTimeBetweenWindowsSensor matrix until full -> recalculate m_mSlidingWindowSensor
+        if(m_iTBWIndexSensor < m_mTimeBetweenWindowsSensor.cols())
+        {
+            MatrixXd t_mat = m_pBCIBuffer_Sensor->pop();
+
+            // Fill data into m_mSlidingWindowSensor
+            m_mTimeBetweenWindowsSensor.block(0,m_iTBWIndexSensor,t_mat.rows(),t_mat.cols()) = t_mat;
+
+//            // Test if data is correctly streamed to this plugin
+//            for(int i = 1; i<t_mat.cols() ; i++)
+//            {
+//                if(t_mat(137,i) - t_mat(137,i-1) != 1)
+//                    cout<<"Sequence error while streaming from tmsi plugin"<<endl;
+//            }
+
+            m_iTBWIndexSensor = m_iTBWIndexSensor + t_mat.cols();
+        }
+        else // Recalculate m_mSlidingWindowSensor -> Calculate features, classify and store results
+        {
+            //cout<<"CLASSIFY"<<endl;
+
+//            // Test if data is correctly streamed to this plugin
+//            for(int i = 1; i<m_mTimeBetweenWindowsSensor.cols() ; i++)
+//            {
+//                if(m_mTimeBetweenWindowsSensor(137,i) - m_mTimeBetweenWindowsSensor(137,i-1) != 1)
+//                    cout<<"Sequence error while streaming from tmsi plugin"<<endl;
+//            }
+
+            m_mSlidingWindowSensor.setZero();
+            m_iTBWIndexSensor = 0;
+        }
     }
 }
