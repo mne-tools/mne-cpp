@@ -63,8 +63,8 @@
 //=============================================================================================================
 
 //#define TIMEMEAS // Zeitmessung;
-#define BUFFERX1 // X1 determination
-//#define TIMEMUC // Zeitmessung MUC
+//#define BUFFERX1 // X1 determination
+#define TIMEMUC // Zeitmessung MUC
 //#define ALPHA // Alpha locked stimulus
 
 
