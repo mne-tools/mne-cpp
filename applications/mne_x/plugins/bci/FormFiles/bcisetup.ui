@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>713</width>
+    <width>771</width>
     <height>614</height>
    </rect>
   </property>
@@ -44,11 +44,24 @@
     </spacer>
    </item>
    <item>
-    <layout class="QGridLayout" name="m_qGridLayout_main" rowstretch="0,0,0,0,0" columnstretch="0,0,0,0,0,0,0">
+    <layout class="QGridLayout" name="m_qGridLayout_main" rowstretch="0,0,0,0,0" columnstretch="0,0,0,0,0,0,0,0">
      <property name="spacing">
       <number>6</number>
      </property>
-     <item row="0" column="5" rowspan="5">
+     <item row="0" column="7" rowspan="5">
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item row="0" column="6" rowspan="5">
       <widget class="QGroupBox" name="m_qGroupBox_SelectFeatures">
        <property name="title">
         <string>Select features</string>
@@ -200,20 +213,7 @@
        </layout>
       </widget>
      </item>
-     <item row="0" column="6" rowspan="5">
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item row="2" column="0" colspan="5">
+     <item row="2" column="0" colspan="6">
       <widget class="QGroupBox" name="m_qGroupBox_Classification">
        <property name="title">
         <string>Classification options</string>
@@ -261,19 +261,12 @@
        </layout>
       </widget>
      </item>
-     <item row="0" column="3" rowspan="2" colspan="2">
+     <item row="0" column="4" rowspan="2" colspan="2">
       <widget class="QGroupBox" name="m_qGroupBox_Processing">
        <property name="title">
         <string>Processing options</string>
        </property>
        <layout class="QGridLayout" name="gridLayout">
-        <item row="0" column="0">
-         <widget class="QLabel" name="m_label_SlidingWindowSize">
-          <property name="text">
-           <string>Sliding window size (s):</string>
-          </property>
-         </widget>
-        </item>
         <item row="1" column="0">
          <widget class="QLabel" name="m_label_BaseLineWindowSize">
           <property name="text">
@@ -281,26 +274,10 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="m_label_NumberSubSignals">
+        <item row="0" column="0">
+         <widget class="QLabel" name="m_label_SlidingWindowSize">
           <property name="text">
-           <string>Number of sub signals:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QDoubleSpinBox" name="m_doubleSpinBox_SlidingWindowSize">
-          <property name="minimum">
-           <double>0.010000000000000</double>
-          </property>
-          <property name="maximum">
-           <double>10.000000000000000</double>
-          </property>
-          <property name="singleStep">
-           <double>0.010000000000000</double>
-          </property>
-          <property name="value">
-           <double>0.010000000000000</double>
+           <string>Sliding window size (s):</string>
           </property>
          </widget>
         </item>
@@ -311,6 +288,19 @@
           </property>
           <property name="maximum">
            <number>20</number>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QDoubleSpinBox" name="m_doubleSpinBox_TimeBetweenWindows">
+          <property name="minimum">
+           <double>0.010000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>20.000000000000000</double>
+          </property>
+          <property name="singleStep">
+           <double>0.010000000000000</double>
           </property>
          </widget>
         </item>
@@ -330,16 +320,26 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="1">
-         <widget class="QDoubleSpinBox" name="m_doubleSpinBox_TimeBetweenWindows">
+        <item row="0" column="1">
+         <widget class="QDoubleSpinBox" name="m_doubleSpinBox_SlidingWindowSize">
           <property name="minimum">
            <double>0.010000000000000</double>
           </property>
           <property name="maximum">
-           <double>20.000000000000000</double>
+           <double>10.000000000000000</double>
           </property>
           <property name="singleStep">
            <double>0.010000000000000</double>
+          </property>
+          <property name="value">
+           <double>0.010000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="m_label_NumberSubSignals">
+          <property name="text">
+           <string>Number of sub signals:</string>
           </property>
          </widget>
         </item>
@@ -353,7 +353,7 @@
        </layout>
       </widget>
      </item>
-     <item row="3" column="0" rowspan="2" colspan="5">
+     <item row="3" column="0" rowspan="2" colspan="6">
       <widget class="QGroupBox" name="m_qGroupBox_Information">
        <property name="sizePolicy">
         <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
@@ -371,16 +371,6 @@
         <string>Information</string>
        </property>
        <layout class="QGridLayout" name="m_qGridLayout_Information">
-        <item row="0" column="1">
-         <widget class="QTextBrowser" name="m_qTextBrowser_Information">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-         </widget>
-        </item>
         <item row="1" column="1">
          <widget class="QPushButton" name="m_qPushButton_About">
           <property name="sizePolicy">
@@ -403,6 +393,16 @@
           </property>
           <property name="text">
            <string>About</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QTextBrowser" name="m_qTextBrowser_Information">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
           </property>
          </widget>
         </item>
@@ -442,6 +442,45 @@
          <widget class="QCheckBox" name="m_checkBox_UseThresholdArtefactReduction">
           <property name="text">
            <string>Use threshold artefact reduction</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item row="0" column="3" rowspan="2">
+      <widget class="QGroupBox" name="m_qGroupBox_Filter">
+       <property name="title">
+        <string>Filter options</string>
+       </property>
+       <layout class="QFormLayout" name="formLayout">
+        <item row="2" column="1">
+         <widget class="QDoubleSpinBox" name="doubleSpinBox_2"/>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Order:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>Center freq.:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QDoubleSpinBox" name="doubleSpinBox"/>
+        </item>
+        <item row="1" column="1">
+         <widget class="QSpinBox" name="spinBox"/>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="label_3">
+          <property name="text">
+           <string>Bandwidth:</string>
           </property>
          </widget>
         </item>
