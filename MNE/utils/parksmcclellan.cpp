@@ -82,6 +82,19 @@ using namespace UTILSLIB;
 //=============================================================================================================
 
 ParksMcClellan::ParksMcClellan()
+: FirCoeff(0)
+, ExchangeIndex(0)
+, LeGrangeD(0)
+, Alpha(0)
+, CosOfGrid(0)
+, DesPlus(0)
+, Coeff(0)
+, Edge(7)
+, BandMag(0)
+, InitWeight(0)
+, DesiredMag(0)
+, Grid(0)
+, Weight(0)
 {
 }
 
@@ -89,7 +102,8 @@ ParksMcClellan::ParksMcClellan()
 //*************************************************************************************************************
 
 ParksMcClellan::ParksMcClellan(int NumTaps, double OmegaC, double BW, double ParksWidth, TPassType PassType)
-: ExchangeIndex(SMALL)
+: FirCoeff(BIG)
+, ExchangeIndex(SMALL)
 , LeGrangeD(SMALL)
 , Alpha(SMALL)
 , CosOfGrid(SMALL)
@@ -101,7 +115,6 @@ ParksMcClellan::ParksMcClellan(int NumTaps, double OmegaC, double BW, double Par
 , DesiredMag(BIG)
 , Grid(BIG)
 , Weight(BIG)
-, FirCoeff(NumTaps)
 {
     init(NumTaps, OmegaC, BW, ParksWidth, PassType);
 }
@@ -300,9 +313,6 @@ void ParksMcClellan::CalcParkCoeff2(int NumBands, int TapCount)
         for(j=1; j<HalfTapCount; j++) FirCoeff[HalfTapCount+j-1] = Coeff[HalfTapCount-j];
     else
         for(j=1; j<=HalfTapCount; j++ )FirCoeff[HalfTapCount+j-1] = Coeff[HalfTapCount-j+1];
-
-    FirCoeff.conservativeResize(TapCount);
-
 
     // Parks2Label was on my application's main form.
     // These replace the original Ouch() function
