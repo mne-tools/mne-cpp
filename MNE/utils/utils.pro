@@ -66,7 +66,8 @@ SOURCES += \
     mnemath.cpp \
     ioutils.cpp \
     asaelc.cpp \
-    parksmcclellan.cpp
+    parksmcclellan.cpp \
+    mp\mp.cpp
 
 HEADERS += \
     kmeans.h\
@@ -74,7 +75,9 @@ HEADERS += \
     mnemath.h \
     ioutils.h \
     asaelc.h \
-    parksmcclellan.h
+    parksmcclellan.h \
+    mp\mp.h
+
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
