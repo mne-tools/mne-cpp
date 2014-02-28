@@ -61,6 +61,7 @@
 
 using namespace BCIPlugin;
 using namespace std;
+using namespace UTILSLIB;
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -151,6 +152,9 @@ void BCI::init()
     // Initalise sliding window stuff
     m_iTBWIndexSensor = 0;
     m_bFillSensorWindowFirstTime = true;
+
+    // Initialise filter stuff
+    m_filterOperator = QSharedPointer<FilterData>(new FilterData());
 }
 
 
@@ -290,6 +294,14 @@ void BCI::updateSource(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
 //*************************************************************************************************************
 
+void BCI::applyFilterOperatorConcurrently(QPair<int, RowVectorXd> &chdata)
+{
+    chdata.second = m_filterOperator->applyFFTFilter(chdata.second);
+}
+
+
+//*************************************************************************************************************
+
 void BCI::run()
 {
     while(m_bIsRunning)
@@ -340,7 +352,27 @@ void BCI::run()
                 // Recalculate m_matSlidingWindowSensor -> push m_matTimeBetweenWindowsSensor from the left
                 m_matSlidingWindowSensor.block(0, m_matSlidingWindowSensor.cols()-m_matTimeBetweenWindowsSensor.cols(), m_matTimeBetweenWindowsSensor.rows(), m_matTimeBetweenWindowsSensor.cols()) = m_matTimeBetweenWindowsSensor;
 
-                // TODO: Filter data in m_matSlidingWindowSensor
+                // TODO: Filter data in m_matSlidingWindowSensor concurrently using blockingMap
+                QList<QPair<int,RowVectorXd>> filteredRows;
+                for(int i = 0; i< m_matSlidingWindowSensor.rows(); i++)
+                {
+                    QPair<int,RowVectorXd> tmp;
+                    tmp.first = i;
+                    tmp.second = m_matSlidingWindowSensor.row(i);
+
+                    filteredRows << tmp;
+                }
+
+                QFuture<void> future = QtConcurrent::map(filteredRows,[this](QPair<int,RowVectorXd>& chdata) {
+                    return applyFilterOperatorConcurrently(chdata);
+                });
+
+                future.waitForFinished();
+
+                // Alternative way using blockingMapped
+//                QList<QPair<int,RowVectorXd>> filterResults = QtConcurrent::blockingMapped(filterRowInputs,[this](QPair<int,RowVectorXd>& chdata) {
+//                    return applyFilterOperatorConcurrently(chdata);
+//                });
 
                 // TODO: Calculate features
 

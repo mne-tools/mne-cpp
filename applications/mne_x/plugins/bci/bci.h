@@ -52,13 +52,15 @@
 #include <xMeas/newrealtimemultisamplearray.h>
 #include <xMeas/realtimesourceestimate.h>
 
+#include <utils/filterdata.h>
+
 //*************************************************************************************************************
 //=============================================================================================================
 // QT STL INCLUDES
 //=============================================================================================================
 
 #include <QtWidgets>
-
+#include <QtConcurrent/QtConcurrent>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -77,12 +79,7 @@ namespace BCIPlugin
 using namespace MNEX;
 using namespace XMEASLIB;
 using namespace IOBuffer;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
+using namespace UTILSLIB;
 
 
 //=============================================================================================================
@@ -142,8 +139,29 @@ public:
 
     virtual QWidget* setupWidget();
 
+    //=========================================================================================================
+    /**
+    * This update function gets called whenever the input buffer stream from the TMSI plugin is full and need to be emptied by this BCI plugin.
+    *
+    * @param [in] pMeasurement measurement object.
+    */
     void updateSensor(XMEASLIB::NewMeasurement::SPtr pMeasurement);
+
+    //=========================================================================================================
+    /**
+    * This update function gets called whenever the input buffer stream from the Sourcelab plugin is full and need to be emptied by this BCI plugin.
+    *
+    * @param [in] pMeasurement measurement object.
+    */
     void updateSource(XMEASLIB::NewMeasurement::SPtr pMeasurement);
+
+    //=========================================================================================================
+    /**
+    * Calculates the filtered signal of chdata
+    *
+    * @param [in] chdata QPair with number of the row and the data samples as a RowVectorXd.
+    */
+    void applyFilterOperatorConcurrently(QPair<int,RowVectorXd> &chdata);
 
 protected:
     //=========================================================================================================
@@ -162,6 +180,8 @@ private:
 
     CircularMatrixBuffer<double>::SPtr                  m_pBCIBuffer_Sensor;    /**< Holds incoming sensor level data.*/
     CircularMatrixBuffer<double>::SPtr                  m_pBCIBuffer_Source;    /**< Holds incoming source level data.*/
+
+    QSharedPointer<FilterData>                          m_filterOperator;       /**< Holds filter with specified properties by the user.*/
 
     bool                m_bIsRunning;                       /**< Whether BCI is running.*/
     bool                m_bProcessData;                     /**< Whether BCI is to get data out of the continous input data stream, i.e. the EEG data from sensor level.*/
