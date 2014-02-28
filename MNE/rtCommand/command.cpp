@@ -104,11 +104,14 @@ Command::Command(   const QString &p_sCommand, const QString &p_sDescription,
 , m_sDescription(p_sDescription)
 , m_bIsJson(p_bIsJson)
 {
-    if(p_qListParamNames.size() == p_qListParamValues.size() == p_vecParameterDescriptions.size())
+    if(p_qListParamNames.size() == p_qListParamValues.size())
     {
-        m_qListParamNames = p_qListParamNames;
-        m_qListParamValues = p_qListParamValues;
-        m_qListParamDescriptions = p_vecParameterDescriptions;
+        if(p_qListParamValues.size() == p_vecParameterDescriptions.size())
+        {
+            m_qListParamNames = p_qListParamNames;
+            m_qListParamValues = p_qListParamValues;
+            m_qListParamDescriptions = p_vecParameterDescriptions;
+        }
     }
     else
     {

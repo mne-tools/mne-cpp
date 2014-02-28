@@ -87,3 +87,5 @@ header_files.files = ./*.h
 header_files.path = $${MNE_INCLUDE_DIR}/utils
 
 INSTALLS += header_files
+
+unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
