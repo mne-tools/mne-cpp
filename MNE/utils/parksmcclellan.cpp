@@ -89,7 +89,8 @@ ParksMcClellan::ParksMcClellan()
 //*************************************************************************************************************
 
 ParksMcClellan::ParksMcClellan(int NumTaps, double OmegaC, double BW, double ParksWidth, TPassType PassType)
-: ExchangeIndex(SMALL)
+: FirCoeff(NumTaps)
+, ExchangeIndex(SMALL)
 , LeGrangeD(SMALL)
 , Alpha(SMALL)
 , CosOfGrid(SMALL)
@@ -101,7 +102,6 @@ ParksMcClellan::ParksMcClellan(int NumTaps, double OmegaC, double BW, double Par
 , DesiredMag(BIG)
 , Grid(BIG)
 , Weight(BIG)
-, FirCoeff(NumTaps)
 {
     init(NumTaps, OmegaC, BW, ParksWidth, PassType);
 }
