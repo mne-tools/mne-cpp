@@ -69,10 +69,6 @@
 #include "utils_global.h"
 #include <vector>
 
-//Eigen
-#include <Eigen/Core>
-#include <Eigen/SparseCore>
-
 //Qt
 #include <QObject>
 #include <QMetaObject>
@@ -87,8 +83,6 @@
 //=============================================================================================================
 // DEFINE NAMESPACE UTILSLIB
 //=============================================================================================================
-
-using namespace Eigen;
 
 namespace UTILSLIB
 {
@@ -172,22 +166,23 @@ public:
     */
     void CalcCoefficients();
 
-    RowVectorXd FirCoeff; /**< containt the generated filter coefficients */
+    std::vector<double> FirCoeff; /**< containt the generated filter coefficients */
 
 private:
     int HalfTapCount;
-    VectorXi ExchangeIndex;
-    VectorXd LeGrangeD;
-    VectorXd Alpha;
-    VectorXd CosOfGrid;
-    VectorXd DesPlus;
-    VectorXd Coeff;
-    VectorXd Edge;
-    VectorXd BandMag;
-    VectorXd InitWeight;
-    VectorXd DesiredMag;
-    VectorXd Grid;
-    VectorXd Weight;
+    std::vector<int> ExchangeIndex;
+    std::vector<double> LeGrangeD;
+    std::vector<double> Alpha;
+    std::vector<double> CosOfGrid;
+    std::vector<double> DesPlus;
+    std::vector<double> Coeff;
+    std::vector<double> Edge;
+    std::vector<double> BandMag;
+    std::vector<double> InitWeight;
+    std::vector<double> DesiredMag;
+    std::vector<double> Grid;
+    std::vector<double> Weight;
+
     bool InitDone2;
 
 };
