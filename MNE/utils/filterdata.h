@@ -112,7 +112,7 @@ public:
     * @param [in] bandwidth ignored if FilterType is set to LPF,HPF. if NOTCH/BPF: bandwidth of stop-/passband
     * @param [in] parkswidth determines the width of the filter slopes (steepness)
     */
-    FilterData(QString unique_name, FilterType type, qint8 order, double centerfreq, double bandwidth, double parkswidth, qint32 fftlength=4096);
+    FilterData(QString unique_name, FilterType type, int order, double centerfreq, double bandwidth, double parkswidth, qint32 fftlength=4096);
 
     /**
      * @brief fftTransformCoeffs transforms the calculated filter coefficients to frequency-domain
@@ -121,8 +121,8 @@ public:
 
     RowVectorXd applyFFTFilter(RowVectorXd& data);
 
-    qint8 m_iFilterOrder;       /**< represents the order of the filter instance */
-    qint32 m_iFFTlength;        /**< represents the filter length */
+    int m_iFilterOrder;       /**< represents the order of the filter instance */
+    int m_iFFTlength;        /**< represents the filter length */
 
     RowVectorXd m_dCoeffA;      /**< contains the forward filter coefficient set */
     RowVectorXd m_dCoeffB;      /**< contains the backward filter coefficient set (empty if FIR filter) */

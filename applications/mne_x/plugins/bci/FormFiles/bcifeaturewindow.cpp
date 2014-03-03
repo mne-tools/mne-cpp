@@ -1,16 +1,15 @@
 //=============================================================================================================
 /**
-* @file     filterdata.cpp
-* @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
+* @file     bcifeaturewindow.cpp
+* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
-*           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2014
+* @date     March, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Florian Schlembach, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2013, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -31,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains all FilterData.
+* @brief    Contains the implementation of the BCIAboutWidget class.
 *
 */
 
@@ -40,81 +39,49 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "filterdata.h"
-
+#include "bcifeaturewindow.h"
+#include "../bci.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace UTILSLIB;
+using namespace BCIPlugin;
+
+BCIFeatureWindow::BCIFeatureWindow(BCI* pBCI, QWidget *parent)
+: QWidget(parent)
+,  m_pBCI(pBCI)
+{
+    ui.setupUi(this);
+
+    connect(m_pBCI, &BCI::paintFeatures, this, &BCIFeatureWindow::paintFeaturesToScene);
+}
 
 
 //*************************************************************************************************************
 
-FilterData::FilterData()
+BCIFeatureWindow::~BCIFeatureWindow()
 {
 }
 
-FilterData::~FilterData()
-{
-}
 
 //*************************************************************************************************************
 
-FilterData::FilterData(QString unique_name, FilterType type, int order, double centerfreq, double bandwidth, double parkswidth, qint32 fftlength)
-: m_iFilterOrder(order)
-, m_Type(type)
-, m_iFFTlength(fftlength)
+void BCIFeatureWindow::initGui()
 {
-    ParksMcClellan filter(order, centerfreq, bandwidth, parkswidth, (ParksMcClellan::TPassType)type);
-    m_dCoeffA = filter.FirCoeff;
-
-    //fft-transform m_dCoeffA in order to be able to perform frequency-domain filtering
-    fftTransformCoeffs();
+    m_scene.addLine(0,0,100,100);
+    ui.m_graphicsView_featureVisualization->setScene(&m_scene);
 }
+
 
 //*************************************************************************************************************
 
-void FilterData::fftTransformCoeffs()
+void BCIFeatureWindow::paintFeaturesToScene()
 {
-    //zero-pad m_dCoeffA to m_iFFTlength
-    RowVectorXd t_coeffAzeroPad = RowVectorXd::Zero(m_iFFTlength);
-    t_coeffAzeroPad.head(m_dCoeffA.cols()) = m_dCoeffA;
+    QList<QPair<int,QVector<double>>> features = m_pBCI->m_lFeaturesSensor;
 
-    //generate fft object
-    Eigen::FFT<double> fft;
-    fft.SetFlag(fft.HalfSpectrum);
-
-    //fft-transform filter coeffs
-    m_dFFTCoeffA = RowVectorXcd::Zero(m_iFFTlength);
-    fft.fwd(m_dFFTCoeffA,t_coeffAzeroPad);
-}
-
-//*************************************************************************************************************
-
-RowVectorXd FilterData::applyFFTFilter(RowVectorXd& data)
-{
-    //zero-pad data to m_iFFTlength
-    RowVectorXd t_dataZeroPad = RowVectorXd::Zero(m_iFFTlength);
-    t_dataZeroPad.head(data.cols()) = data;
-
-    //generate fft object
-    Eigen::FFT<double> fft;
-    fft.SetFlag(fft.HalfSpectrum);
-
-    //fft-transform data sequence
-    RowVectorXcd t_freqData;
-    fft.fwd(t_freqData,t_dataZeroPad);
-
-    //perform frequency-domain filtering
-    RowVectorXcd t_filteredFreq = m_dFFTCoeffA.array()*t_freqData.array();
-
-    //inverse-FFT
-    RowVectorXd t_filteredTime;
-    fft.inv(t_filteredTime,t_filteredFreq);
-
-    //cuts off ends at front and end and return result
-    return t_filteredTime.segment(m_iFilterOrder/2+1,m_iFFTlength-m_iFilterOrder);
+    for(int i = 0; i<features.size()-1; i=i+2)
+        for(int t = 0; t<features.at(i).second.size(); t++)
+            m_scene.addEllipse(QRectF(features.at(i).second[t], features.at(i+1).second[t], 2, 2));
 }
