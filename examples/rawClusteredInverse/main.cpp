@@ -367,7 +367,7 @@ int main(int argc, char *argv[])
     // calculate the average
     //
 //    //Option 1
-//    qint32 numAverages = 10;
+//    qint32 numAverages = 99;
 //    VectorXi vecSel(numAverages);
 //    srand (time(NULL)); // initialize random seed
 
@@ -384,7 +384,7 @@ int main(int argc, char *argv[])
 
 //    vecSel << 65, 22, 47, 55, 16, 29, 14, 36, 57, 97, 89, 46, 9, 93, 83, 52, 71, 52, 3, 96;
 
-    //Option 3
+    //Option 3 Newest
     VectorXi vecSel(10);
 
     vecSel << 0, 96, 80, 55, 66, 25, 26, 2, 55, 58, 6, 88;
@@ -600,7 +600,8 @@ int main(int argc, char *argv[])
     //ToDo overload toLabels using instead of t_surfSet rr of MNESourceSpace
     t_annotationSet.toLabels(t_surfSet, t_qListLabels, t_qListRGBAs);
 
-    InverseView view(minimumNorm.getSourceSpace(), t_qListLabels, t_qListRGBAs);
+    InverseView view(minimumNorm.getSourceSpace(), t_qListLabels, t_qListRGBAs, 24, true, false, false);
+
 
     if (view.stereoType() != QGLView::RedCyanAnaglyph)
         view.camera()->setEyeSeparation(0.3f);

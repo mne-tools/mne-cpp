@@ -103,10 +103,11 @@ public:
     /**
     * Default constructor
     *
-    * @param[in] p_iFps     Frames per second
-    * @param[in] p_bLoop    if source estimate should be repeated
+    * @param[in] p_iFps         Frames per second
+    * @param[in] p_bLoop        if source estimate should be repeated
+    * @param[in] p_bSlowMotion  if slow motion should be turned on (fps is discarded)
     */
-    InverseViewProducer(qint32 p_iFps, bool p_bLoop);
+    InverseViewProducer(qint32 p_iFps, bool p_bLoop, bool p_bSlowMotion);
     
     //=========================================================================================================
     /**
@@ -164,6 +165,7 @@ private:
 
     qint32 m_iFps;              /**< Frames per second.*/
     bool m_bLoop;               /**< If producer should loop over source estimate.*/
+    bool m_bSlowMotion;         /**< If slow motion is turned on.*/
     qint32 m_iT;                /**< Time in us between each step. */
     qint32 m_iCurSampleStep;    /**< Current sample step. */
     double m_dGlobalMaximum;        /**< Global maximum. */
