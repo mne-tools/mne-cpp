@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>771</width>
-    <height>614</height>
+    <width>789</width>
+    <height>620</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -48,171 +48,6 @@
      <property name="spacing">
       <number>6</number>
      </property>
-     <item row="0" column="7" rowspan="5">
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item row="0" column="6" rowspan="5">
-      <widget class="QGroupBox" name="m_qGroupBox_SelectFeatures">
-       <property name="title">
-        <string>Select features</string>
-       </property>
-       <layout class="QVBoxLayout" name="verticalLayout">
-        <item>
-         <widget class="QTabWidget" name="m_tabWidget_featuresSource">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>200</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="currentIndex">
-           <number>0</number>
-          </property>
-          <widget class="QWidget" name="FeaturesSensorLevel">
-           <attribute name="title">
-            <string>Sensor level</string>
-           </attribute>
-           <layout class="QGridLayout" name="gridLayout_3">
-            <item row="1" column="1">
-             <widget class="QListWidget" name="m_listWidget_ChosenFeaturesOnSensorLevel">
-              <property name="dragEnabled">
-               <bool>true</bool>
-              </property>
-              <property name="dragDropOverwriteMode">
-               <bool>false</bool>
-              </property>
-              <property name="dragDropMode">
-               <enum>QAbstractItemView::DragDrop</enum>
-              </property>
-              <property name="defaultDropAction">
-               <enum>Qt::MoveAction</enum>
-              </property>
-              <property name="alternatingRowColors">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="0">
-             <widget class="QListWidget" name="m_listWidget_AvailableFeaturesOnSensorLevel">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="dragEnabled">
-               <bool>true</bool>
-              </property>
-              <property name="dragDropOverwriteMode">
-               <bool>false</bool>
-              </property>
-              <property name="dragDropMode">
-               <enum>QAbstractItemView::DragDrop</enum>
-              </property>
-              <property name="defaultDropAction">
-               <enum>Qt::MoveAction</enum>
-              </property>
-              <property name="alternatingRowColors">
-               <bool>true</bool>
-              </property>
-              <property name="selectionMode">
-               <enum>QAbstractItemView::SingleSelection</enum>
-              </property>
-              <property name="sortingEnabled">
-               <bool>false</bool>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="1">
-             <widget class="QLabel" name="m_label_SelectedFeaturesSensor">
-              <property name="text">
-               <string>Selected:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="0">
-             <widget class="QLabel" name="m_label_AvailableFeaturesSensor">
-              <property name="text">
-               <string>Available:</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-          <widget class="QWidget" name="FeaturesSourceLevel">
-           <attribute name="title">
-            <string>Source level</string>
-           </attribute>
-           <layout class="QGridLayout" name="gridLayout_4">
-            <item row="1" column="0">
-             <widget class="QListWidget" name="m_listWidget_AvailableFeaturesOnSourceLevel">
-              <property name="dragEnabled">
-               <bool>true</bool>
-              </property>
-              <property name="dragDropMode">
-               <enum>QAbstractItemView::DragDrop</enum>
-              </property>
-              <property name="defaultDropAction">
-               <enum>Qt::MoveAction</enum>
-              </property>
-              <property name="alternatingRowColors">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="1">
-             <widget class="QListWidget" name="m_listWidget_ChosenFeaturesOnSourceLevel">
-              <property name="dragEnabled">
-               <bool>true</bool>
-              </property>
-              <property name="dragDropMode">
-               <enum>QAbstractItemView::DragDrop</enum>
-              </property>
-              <property name="defaultDropAction">
-               <enum>Qt::MoveAction</enum>
-              </property>
-              <property name="alternatingRowColors">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="0">
-             <widget class="QLabel" name="m_label_AvailableFeaturesSource">
-              <property name="text">
-               <string>Available:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="1">
-             <widget class="QLabel" name="m_label_SelectedFeaturesSource">
-              <property name="text">
-               <string>Selected:</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </item>
      <item row="2" column="0" colspan="6">
       <widget class="QGroupBox" name="m_qGroupBox_Classification">
        <property name="title">
@@ -451,37 +286,222 @@
      <item row="0" column="3" rowspan="2">
       <widget class="QGroupBox" name="m_qGroupBox_Filter">
        <property name="title">
-        <string>Filter options</string>
+        <string>Bandpass filter options</string>
        </property>
        <layout class="QFormLayout" name="formLayout">
-        <item row="2" column="1">
-         <widget class="QDoubleSpinBox" name="doubleSpinBox_2"/>
-        </item>
+        <property name="fieldGrowthPolicy">
+         <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+        </property>
         <item row="1" column="0">
-         <widget class="QLabel" name="label">
+         <widget class="QLabel" name="m_label_FilterOrder">
           <property name="text">
            <string>Order:</string>
           </property>
          </widget>
         </item>
+        <item row="1" column="1">
+         <widget class="QSpinBox" name="m_SpinBox_FilterOrder">
+          <property name="minimum">
+           <number>10</number>
+          </property>
+          <property name="maximum">
+           <number>1000</number>
+          </property>
+         </widget>
+        </item>
         <item row="2" column="0">
-         <widget class="QLabel" name="label_2">
+         <widget class="QLabel" name="m_label_FilterLowerBound">
           <property name="text">
-           <string>Center freq.:</string>
+           <string>Lower bound:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QDoubleSpinBox" name="m_doubleSpinBox_FilterLowerBound"/>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="m_label_FilterUpperBound">
+          <property name="text">
+           <string>Upper bound:</string>
           </property>
          </widget>
         </item>
         <item row="3" column="1">
-         <widget class="QDoubleSpinBox" name="doubleSpinBox"/>
+         <widget class="QDoubleSpinBox" name="m_doubleSpinBox_FilterUpperBound"/>
         </item>
-        <item row="1" column="1">
-         <widget class="QSpinBox" name="spinBox"/>
+        <item row="4" column="1">
+         <widget class="QDoubleSpinBox" name="m_doubleSpinBox_ParcksWidth"/>
         </item>
-        <item row="3" column="0">
-         <widget class="QLabel" name="label_3">
+        <item row="4" column="0">
+         <widget class="QLabel" name="m_label_ParcksWidth">
           <property name="text">
-           <string>Bandwidth:</string>
+           <string>Parcks width:</string>
           </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item row="0" column="7" rowspan="5">
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item row="0" column="6" rowspan="5">
+      <widget class="QGroupBox" name="m_qGroupBox_SelectFeatures">
+       <property name="title">
+        <string>Select features</string>
+       </property>
+       <layout class="QVBoxLayout" name="verticalLayout">
+        <item>
+         <widget class="QTabWidget" name="m_tabWidget_featuresSource">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>200</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="currentIndex">
+           <number>0</number>
+          </property>
+          <widget class="QWidget" name="FeaturesSensorLevel">
+           <attribute name="title">
+            <string>Sensor level</string>
+           </attribute>
+           <layout class="QGridLayout" name="gridLayout_3">
+            <item row="1" column="0">
+             <widget class="QListWidget" name="m_listWidget_AvailableFeaturesOnSensorLevel">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="dragEnabled">
+               <bool>true</bool>
+              </property>
+              <property name="dragDropOverwriteMode">
+               <bool>false</bool>
+              </property>
+              <property name="dragDropMode">
+               <enum>QAbstractItemView::DragDrop</enum>
+              </property>
+              <property name="defaultDropAction">
+               <enum>Qt::MoveAction</enum>
+              </property>
+              <property name="alternatingRowColors">
+               <bool>true</bool>
+              </property>
+              <property name="selectionMode">
+               <enum>QAbstractItemView::SingleSelection</enum>
+              </property>
+              <property name="sortingEnabled">
+               <bool>false</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QLabel" name="m_label_SelectedFeaturesSensor">
+              <property name="text">
+               <string>Selected:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <widget class="QLabel" name="m_label_AvailableFeaturesSensor">
+              <property name="text">
+               <string>Available:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QListWidget" name="m_listWidget_ChosenFeaturesOnSensorLevel">
+              <property name="dragEnabled">
+               <bool>true</bool>
+              </property>
+              <property name="dragDropOverwriteMode">
+               <bool>false</bool>
+              </property>
+              <property name="dragDropMode">
+               <enum>QAbstractItemView::DragDrop</enum>
+              </property>
+              <property name="defaultDropAction">
+               <enum>Qt::MoveAction</enum>
+              </property>
+              <property name="alternatingRowColors">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+          <widget class="QWidget" name="FeaturesSourceLevel">
+           <attribute name="title">
+            <string>Source level</string>
+           </attribute>
+           <layout class="QGridLayout" name="gridLayout_4">
+            <item row="1" column="0">
+             <widget class="QListWidget" name="m_listWidget_AvailableFeaturesOnSourceLevel">
+              <property name="dragEnabled">
+               <bool>true</bool>
+              </property>
+              <property name="dragDropMode">
+               <enum>QAbstractItemView::DragDrop</enum>
+              </property>
+              <property name="defaultDropAction">
+               <enum>Qt::MoveAction</enum>
+              </property>
+              <property name="alternatingRowColors">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QListWidget" name="m_listWidget_ChosenFeaturesOnSourceLevel">
+              <property name="dragEnabled">
+               <bool>true</bool>
+              </property>
+              <property name="dragDropMode">
+               <enum>QAbstractItemView::DragDrop</enum>
+              </property>
+              <property name="defaultDropAction">
+               <enum>Qt::MoveAction</enum>
+              </property>
+              <property name="alternatingRowColors">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <widget class="QLabel" name="m_label_AvailableFeaturesSource">
+              <property name="text">
+               <string>Available:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QLabel" name="m_label_SelectedFeaturesSource">
+              <property name="text">
+               <string>Selected:</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
          </widget>
         </item>
        </layout>

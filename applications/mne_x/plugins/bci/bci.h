@@ -54,6 +54,8 @@
 
 #include <utils/filterdata.h>
 
+#include <fstream>
+
 //*************************************************************************************************************
 //=============================================================================================================
 // QT STL INCLUDES
@@ -80,6 +82,7 @@ using namespace MNEX;
 using namespace XMEASLIB;
 using namespace IOBuffer;
 using namespace UTILSLIB;
+using namespace std;
 
 
 //=============================================================================================================
@@ -96,6 +99,7 @@ class BCISHARED_EXPORT BCI : public IAlgorithm
     Q_INTERFACES(MNEX::IAlgorithm)
 
     friend class BCISetupWidget;
+    friend class BCIFeatureWindow;
 
 public:
     //=========================================================================================================
@@ -163,6 +167,15 @@ public:
     */
     void applyFilterOperatorConcurrently(QPair<int,RowVectorXd> &chdata);
 
+    //=========================================================================================================
+    /**
+    * Calculates the features on sensor level
+    *
+    * @param [in] chdata QPair with number of the row and the data samples as a RowVectorXd.
+    * @param [out] QPair<int,QVector<double>> calculated features.
+    */
+    QPair<int,QVector<double>> applyFeatureCalcConcurrentlyOnSensorLevel(const QPair<int,RowVectorXd> &chdata);
+
 protected:
     //=========================================================================================================
     /**
@@ -171,6 +184,10 @@ protected:
     * Pure virtual method inherited by QThread.
     */
     virtual void run();
+
+signals:
+    void paintFeatures();
+
 
 private:
     PluginOutputData<NewRealTimeSampleArray>::SPtr      m_pBCIOutput;           /**< The RealTimeSampleArray of the BCI output.*/
@@ -183,33 +200,40 @@ private:
 
     QSharedPointer<FilterData>                          m_filterOperator;       /**< Holds filter with specified properties by the user.*/
 
-    bool                m_bIsRunning;                       /**< Whether BCI is running.*/
-    bool                m_bProcessData;                     /**< Whether BCI is to get data out of the continous input data stream, i.e. the EEG data from sensor level.*/
-    bool                m_bUseArtefactThresholdReduction;   /**< Whether BCI uses a threshold to obmit atrefacts.*/
-    QString             m_qStringResourcePath;              /**< The path to the BCI resource directory.*/
-    QMutex              m_qMutex;
+    ofstream                m_outStreamDebug;                   /**< Outputstream to generate debug file.*/
 
-    FiffInfo::SPtr      m_pFiffInfo_Sensor;                 /**< Sensor level: Fiff information for sensor data. */
-    MatrixXd            m_matSlidingWindowSensor;           /**< Sensor level: Working (sliding) matrix, used to store data for feature calculation on sensor level. */
-    MatrixXd            m_matTimeBetweenWindowsSensor;      /**< Sensor level: Samples stored during time between windows on sensor level. */
-    int                 m_iTBWIndexSensor;                  /**< Sensor level: Index of the amount of data which was already filled during the time between windows. */
-    QVector<double>     m_vLoadedSensorBoundary;            /**< Sensor level: Loaded decision boundary on sensor level. */
-    QStringList         m_slChosenFeatureSensor;            /**< Sensor level: Features used to calculate data points in feature space on sensor level. */
-    QMap<QString, int>  m_mapElectrodePinningScheme;        /**< Sensor level: Loaded pinning scheme of the Duke 128 EEG cap. */
-    bool                m_bFillSensorWindowFirstTime;       /**< Sensor level: Flag if the working matrix m_mSlidingWindowSensor is being filled for the first time. */
+    bool                    m_bIsRunning;                       /**< Whether BCI is running.*/
+    bool                    m_bProcessData;                     /**< Whether BCI is to get data out of the continous input data stream, i.e. the EEG data from sensor level.*/
+    bool                    m_bUseArtefactThresholdReduction;   /**< Whether BCI uses a threshold to obmit atrefacts.*/
+    QString                 m_qStringResourcePath;              /**< The path to the BCI resource directory.*/
+    QMutex                  m_qMutex;
 
-    QVector<double>     m_vLoadedSourceBoundary;            /**< Source level: Loaded decision boundary on source level. */
-    QStringList         m_slChosenFeatureSource;            /**< Source level: Features used to calculate data points in feature space on source level. */
-    QMap<QString, int>  m_mapDestrieuxAtlasRegions;         /**< Sensor level: Loaded Destrieux atlas regions. */
+    FiffInfo::SPtr          m_pFiffInfo_Sensor;                 /**< Sensor level: Fiff information for sensor data. */
+    MatrixXd                m_matSlidingWindowSensor;           /**< Sensor level: Working (sliding) matrix, used to store data for feature calculation on sensor level. */
+    MatrixXd                m_matTimeBetweenWindowsSensor;      /**< Sensor level: Samples stored during time between windows on sensor level. */
+    int                     m_iTBWIndexSensor;                  /**< Sensor level: Index of the amount of data which was already filled during the time between windows. */
+    QVector<double>         m_vLoadedSensorBoundary;            /**< Sensor level: Loaded decision boundary on sensor level. */
+    QStringList             m_slChosenFeatureSensor;            /**< Sensor level: Features used to calculate data points in feature space on sensor level. */
+    QMap<QString, int>      m_mapElectrodePinningScheme;        /**< Sensor level: Loaded pinning scheme of the Duke 128 EEG cap. */
+    bool                    m_bFillSensorWindowFirstTime;       /**< Sensor level: Flag if the working matrix m_mSlidingWindowSensor is being filled for the first time. */
+    QList<QPair<int,QVector<double>>>  m_lFeaturesSensor;       /**< Sensor level: Features calculated on sensor level. */
 
-    bool                m_bUseSensorData;                   /**< GUI input: Use sensor data stream. */
-    bool                m_bUseSourceData;                   /**< GUI input: Use source data stream. */
-    double              m_dSlidingWindowSize;               /**< GUI input: Size of the sliding window in s. */
-    double              m_dBaseLineWindowSize;              /**< GUI input: Size of the baseline window in s. */
-    double              m_dTimeBetweenWindows;              /**< GUI input: Time between windows/feature calculation in s. */
-    int                 m_iNumberSubSignals;                /**< GUI input: Number of subsignals. */
-    QString             m_sSensorBoundaryPath;              /**< GUI input: Input path for boundary file on sensor level. */
-    QString             m_sSourceBoundaryPath;              /**< GUI input: Input path for boundary file on source level. */
+    QVector<double>         m_vLoadedSourceBoundary;            /**< Source level: Loaded decision boundary on source level. */
+    QStringList             m_slChosenFeatureSource;            /**< Source level: Features used to calculate data points in feature space on source level. */
+    QMap<QString, int>      m_mapDestrieuxAtlasRegions;         /**< Source level: Loaded Destrieux atlas regions. */
+
+    bool                    m_bUseSensorData;                   /**< GUI input: Use sensor data stream. */
+    bool                    m_bUseSourceData;                   /**< GUI input: Use source data stream. */
+    double                  m_dSlidingWindowSize;               /**< GUI input: Size of the sliding window in s. */
+    double                  m_dBaseLineWindowSize;              /**< GUI input: Size of the baseline window in s. */
+    double                  m_dTimeBetweenWindows;              /**< GUI input: Time between windows/feature calculation in s. */
+    double                  m_dFilterLowerBound;                /**< GUI input: Filter lower bound in Hz. */
+    double                  m_dFilterUpperBound;                /**< GUI input: Filter upper bound in Hz. */
+    double                  m_dParcksWidth;                     /**< GUI input: Parck filter algorithm width in Hz. */
+    int                     m_iFilterOrder;                     /**< GUI input: Filter order. */
+    int                     m_iNumberSubSignals;                /**< GUI input: Number of subsignals. */
+    QString                 m_sSensorBoundaryPath;              /**< GUI input: Input path for boundary file on sensor level. */
+    QString                 m_sSourceBoundaryPath;              /**< GUI input: Input path for boundary file on source level. */
 };
 
 } // NAMESPACE

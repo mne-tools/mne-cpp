@@ -106,6 +106,16 @@ BCISetupWidget::BCISetupWidget(BCI* pBCI, QWidget* parent)
     connect(ui.m_listWidget_AvailableFeaturesOnSourceLevel, &QListWidget::itemPressed,
             this, &BCISetupWidget::setFeatureSelection);
 
+    // Connect filter options
+    connect(ui.m_doubleSpinBox_FilterLowerBound, static_cast<void (QDoubleSpinBox::*)()>(&QDoubleSpinBox::editingFinished),
+            this, &BCISetupWidget::setFilterOptions);
+    connect(ui.m_doubleSpinBox_FilterUpperBound, static_cast<void (QDoubleSpinBox::*)()>(&QDoubleSpinBox::editingFinished),
+            this, &BCISetupWidget::setFilterOptions);
+    connect(ui.m_SpinBox_FilterOrder, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
+            this, &BCISetupWidget::setFilterOptions);
+    connect(ui.m_doubleSpinBox_ParcksWidth, static_cast<void (QDoubleSpinBox::*)()>(&QDoubleSpinBox::editingFinished),
+            this, &BCISetupWidget::setFilterOptions);
+
     //Connect about button
     connect(ui.m_qPushButton_About, &QPushButton::released, this, &BCISetupWidget::showAboutDialog);
 
@@ -149,6 +159,12 @@ void BCISetupWidget::initGui()
     // Classification options
     ui.m_lineEdit_SensorBoundary->setText(m_pBCI->m_sSensorBoundaryPath);
     ui.m_lineEdit_SourceBoundary->setText(m_pBCI->m_sSourceBoundaryPath);
+
+    // Filter options
+    ui.m_doubleSpinBox_FilterLowerBound->setValue(m_pBCI->m_dFilterLowerBound);
+    ui.m_doubleSpinBox_FilterUpperBound->setValue(m_pBCI->m_dFilterUpperBound);
+    ui.m_SpinBox_FilterOrder->setValue(m_pBCI->m_iFilterOrder);
+    ui.m_doubleSpinBox_ParcksWidth->setValue(m_pBCI->m_dParcksWidth);
 
     // Selected features on sensor level
     initSelectedFeaturesSensor();
@@ -269,6 +285,17 @@ void BCISetupWidget::setFeatureSelection()
 
     m_pBCI->m_slChosenFeatureSensor = ChosenFeaturesOnSensorLevel;
     m_pBCI->m_slChosenFeatureSource = ChosenFeaturesOnSourceLevel;
+}
+
+
+//*************************************************************************************************************
+
+void BCISetupWidget::setFilterOptions()
+{
+    m_pBCI->m_dFilterLowerBound = ui.m_doubleSpinBox_FilterLowerBound->value();
+    m_pBCI->m_dFilterUpperBound = ui.m_doubleSpinBox_FilterUpperBound->value();
+    m_pBCI->m_iFilterOrder = ui.m_SpinBox_FilterOrder->value();
+    m_pBCI->m_dParcksWidth = ui.m_doubleSpinBox_ParcksWidth->value();
 }
 
 
