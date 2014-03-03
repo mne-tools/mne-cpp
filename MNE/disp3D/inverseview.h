@@ -132,9 +132,10 @@ public:
     * @param[in] p_iFps         Frames per second
     * @param[in] p_bLoop        if current source estimate should be repeated
     * @param[in] p_bStereo      if stereo view should be turned on
+    * @param[in] p_bSlowMotion  if slow motion should be turned on (fps is discarded)
     * @param[in] parent         Parent QObject (optional)
     */
-    InverseView(const MNESourceSpace &p_sourceSpace, QList<Label> &p_qListLabels, QList<RowVector4i> &p_qListRGBAs, qint32 p_iFps = 24, bool p_bLoop = true, bool p_bStereo = false, QWindow *parent = 0);
+    InverseView(const MNESourceSpace &p_sourceSpace, QList<Label> &p_qListLabels, QList<RowVector4i> &p_qListRGBAs, qint32 p_iFps = 24, bool p_bLoop = true, bool p_bStereo = false, bool p_bSlowMotion = false, QWindow *parent = 0);
     
     //=========================================================================================================
     /**

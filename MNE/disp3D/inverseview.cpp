@@ -82,9 +82,9 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-InverseView::InverseView(const MNESourceSpace &p_sourceSpace, QList<Label> &p_qListLabels, QList<RowVector4i> &p_qListRGBAs, qint32 p_iFps, bool p_bLoop, bool p_bStereo, QWindow *parent)
+InverseView::InverseView(const MNESourceSpace &p_sourceSpace, QList<Label> &p_qListLabels, QList<RowVector4i> &p_qListRGBAs, qint32 p_iFps, bool p_bLoop, bool p_bStereo, bool p_bSlowMotion, QWindow *parent)
 : QGLView(parent)
-, m_pInverseViewProducer(new InverseViewProducer(p_iFps, p_bLoop))
+, m_pInverseViewProducer(new InverseViewProducer(p_iFps, p_bLoop, p_bSlowMotion))
 , m_sourceSpace(p_sourceSpace)
 , m_qListLabels(p_qListLabels)
 , m_qListRGBAs(p_qListRGBAs)
