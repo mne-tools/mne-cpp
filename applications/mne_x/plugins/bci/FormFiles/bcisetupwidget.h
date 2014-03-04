@@ -104,6 +104,14 @@ public:
     */
     void initGui();
 
+protected:
+    //=========================================================================================================
+    /**
+    * Filters specified objects for wanted events -> intercepts events
+    *
+    */
+    bool eventFilter(QObject *object, QEvent *event);
+
 private:
 
     //=========================================================================================================
