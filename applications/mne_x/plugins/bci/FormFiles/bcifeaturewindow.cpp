@@ -70,8 +70,12 @@ BCIFeatureWindow::~BCIFeatureWindow()
 
 void BCIFeatureWindow::initGui()
 {
-    m_scene.addLine(0,0,100,100);
+    QSize size = ui.m_graphicsView_featureVisualization->size();
+    m_scene.addLine(0,0,500,500);
+
     ui.m_graphicsView_featureVisualization->setScene(&m_scene);
+    ui.m_graphicsView_featureVisualization->setSceneRect(QRectF(0,0,500,500));
+    ui.m_graphicsView_featureVisualization->setInteractive(true);
 }
 
 
@@ -80,8 +84,11 @@ void BCIFeatureWindow::initGui()
 void BCIFeatureWindow::paintFeaturesToScene()
 {
     QList<QPair<int,QVector<double>>> features = m_pBCI->m_lFeaturesSensor;
-
+    std::cout<<"features.size()"<<features.size()<<endl;
     for(int i = 0; i<features.size()-1; i=i+2)
         for(int t = 0; t<features.at(i).second.size(); t++)
-            m_scene.addEllipse(QRectF(features.at(i).second[t], features.at(i+1).second[t], 2, 2));
+        {
+            QRectF rect(features.at(i).second[t]/500, features.at(i+1).second[t]/500, 2, 2);
+            m_scene.addEllipse(rect);
+        }
 }
