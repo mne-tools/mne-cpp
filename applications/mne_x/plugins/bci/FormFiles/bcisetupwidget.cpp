@@ -97,14 +97,10 @@ BCISetupWidget::BCISetupWidget(BCI* pBCI, QWidget* parent)
             this, &BCISetupWidget::changeLoadSourceBoundary);
 
     // Connect feature selection
-    connect(ui.m_listWidget_ChosenFeaturesOnSensorLevel, &QListWidget::itemPressed,
-            this, &BCISetupWidget::setFeatureSelection);
-    connect(ui.m_listWidget_ChosenFeaturesOnSourceLevel, &QListWidget::itemPressed,
-            this, &BCISetupWidget::setFeatureSelection);
-    connect(ui.m_listWidget_AvailableFeaturesOnSensorLevel, &QListWidget::itemPressed,
-            this, &BCISetupWidget::setFeatureSelection);
-    connect(ui.m_listWidget_AvailableFeaturesOnSourceLevel, &QListWidget::itemPressed,
-            this, &BCISetupWidget::setFeatureSelection);
+    ui.m_listWidget_ChosenFeaturesOnSensorLevel->installEventFilter(this);
+    ui.m_listWidget_ChosenFeaturesOnSourceLevel->installEventFilter(this);
+    ui.m_listWidget_AvailableFeaturesOnSensorLevel->installEventFilter(this);
+    ui.m_listWidget_AvailableFeaturesOnSourceLevel->installEventFilter(this);
 
     // Connect filter options
     connect(ui.m_doubleSpinBox_FilterLowerBound, static_cast<void (QDoubleSpinBox::*)()>(&QDoubleSpinBox::editingFinished),
@@ -305,4 +301,16 @@ void BCISetupWidget::showAboutDialog()
 {
     BCIAboutWidget aboutDialog(this);
     aboutDialog.exec();
+}
+
+
+//*************************************************************************************************************
+
+bool BCISetupWidget::eventFilter(QObject *object, QEvent *event)
+{
+     if ((object == ui.m_listWidget_ChosenFeaturesOnSensorLevel ||
+          object == ui.m_listWidget_ChosenFeaturesOnSourceLevel) && event->type() == QEvent::Leave)
+         setFeatureSelection();
+
+     return QObject::eventFilter(object, event);;
 }

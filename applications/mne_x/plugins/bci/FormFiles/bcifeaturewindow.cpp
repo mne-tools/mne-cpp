@@ -40,7 +40,7 @@
 //=============================================================================================================
 
 #include "bcifeaturewindow.h"
-#include "../bci.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -55,7 +55,10 @@ BCIFeatureWindow::BCIFeatureWindow(BCI* pBCI, QWidget *parent)
 {
     ui.setupUi(this);
 
-    connect(m_pBCI, &BCI::paintFeatures, this, &BCIFeatureWindow::paintFeaturesToScene);
+    qRegisterMetaType<MyQList>("MyQList");
+
+    connect(m_pBCI, &BCI::paintFeatures,
+            this, &BCIFeatureWindow::paintFeaturesToScene);
 }
 
 
@@ -81,14 +84,14 @@ void BCIFeatureWindow::initGui()
 
 //*************************************************************************************************************
 
-void BCIFeatureWindow::paintFeaturesToScene()
+void BCIFeatureWindow::paintFeaturesToScene(MyQList features)
 {
-    QList<QPair<int,QVector<double>>> features = m_pBCI->m_lFeaturesSensor;
     std::cout<<"features.size()"<<features.size()<<endl;
     for(int i = 0; i<features.size()-1; i=i+2)
         for(int t = 0; t<features.at(i).second.size(); t++)
         {
-            QRectF rect(features.at(i).second[t]/500, features.at(i+1).second[t]/500, 2, 2);
+            QRectF rect(features.at(i).second.at(t)/500, features.at(i+1).second.at(t)/500, 2, 2);
             m_scene.addEllipse(rect);
         }
 }
+

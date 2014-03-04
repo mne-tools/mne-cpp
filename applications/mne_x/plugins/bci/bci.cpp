@@ -41,8 +41,6 @@
 
 #include "bci.h"
 
-#include "FormFiles/bcisetupwidget.h"
-#include "FormFiles/bcifeaturewindow.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -72,10 +70,6 @@ BCI::BCI()
 : m_qStringResourcePath(qApp->applicationDirPath()+"/mne_x_plugins/resources/bci/"),
   m_bProcessData(false)
 {
-    QString path("filterOutput.txt");
-    path.prepend(m_qStringResourcePath);
-
-    m_outStreamDebug.open(path.toStdString(), ios::trunc);
 }
 
 
@@ -145,6 +139,7 @@ void BCI::init()
 
     // Intitalise feature selection
     m_slChosenFeatureSensor << "LA4" << "RA4"; //<< "TEST";
+    m_iNumberOfCalculatedFeatures = 0;
 
     // Initialise boundaries with linear coefficients y = mx+c -> vector = [m c] -> default [1 0]
     m_vLoadedSensorBoundary.push_back(1);
@@ -164,11 +159,12 @@ void BCI::init()
     m_dFilterLowerBound = 7.0;
     m_dFilterUpperBound = 14.0;
     m_dParcksWidth = (m_dFilterUpperBound-m_dFilterLowerBound)/2;
-    m_iFilterOrder = 100;
+    m_iFilterOrder = 128;
 
-    BCIFeatureWindow* featureWidget = new BCIFeatureWindow(this);
-    featureWidget->initGui();
-    featureWidget->show();
+    // Init BCIFeatureWindow for visualization
+    m_BCIFeatureWindow = QSharedPointer<BCIFeatureWindow>(new BCIFeatureWindow(this));
+    m_BCIFeatureWindow->initGui();
+    m_BCIFeatureWindow->show();
 }
 
 
@@ -176,6 +172,22 @@ void BCI::init()
 
 bool BCI::start()
 {
+    // Do not start BCI if the number of chosen electrodes/features is uneven
+    if(m_slChosenFeatureSensor.size()%2 != 0)
+    {
+        QMessageBox msgBox;
+        msgBox.setText("The number of selected electrodes needs to be even.");
+        msgBox.setInformativeText("Please select feautres again");
+        msgBox.setStandardButtons(QMessageBox::Ok);
+        msgBox.exec();
+        return false;
+    }
+
+    // Init debug output stream
+    QString path("filterOutput.txt");
+    path.prepend(m_qStringResourcePath);
+    m_outStreamDebug.open(path.toStdString(), ios::trunc);
+
     m_bIsRunning = true;
 
     QThread::start();
@@ -188,7 +200,6 @@ bool BCI::start()
 
 bool BCI::stop()
 {
-    //Wait until this thread (BCI) is stopped
     m_bIsRunning = false;
 
     // Get data buffers out of idle state if they froze in the acquire or release function
@@ -210,7 +221,7 @@ bool BCI::stop()
     m_outStreamDebug.clear();
 
     // Delete all features
-    m_lFeaturesSensor.clear();
+    clearFeaturesAndClassifications();
 
     return true;
 }
@@ -263,7 +274,6 @@ void BCI::updateSensor(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
             // Adjust working matrixes (sliding window and time between windows matrix) size so that the samples from the tmsi plugin stream fit in the matrix perfectly
             int modulo = (int)(m_pFiffInfo_Sensor->sfreq*m_dSlidingWindowSize) % (int)pRTMSA->getMultiArraySize();
-
             int rows = m_slChosenFeatureSensor.size();
             int cols = m_pFiffInfo_Sensor->sfreq*m_dSlidingWindowSize-modulo;
             m_matSlidingWindowSensor.resize(rows, cols);
@@ -280,8 +290,6 @@ void BCI::updateSensor(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
             m_filterOperator = QSharedPointer<FilterData>(new FilterData(QString("BPF"),FilterData::BPF,m_iFilterOrder,dCenterFreqNyq,dBandwidthNyq,dParksWidth,1024)); // letztes Argument muss 2er potenz sein - fft länge
 
-            //m_filterOperator = QSharedPointer<FilterData>(new FilterData(QString("BPF"),FilterData::BPF,100,100/512,25/512,0.1,2048)); // letztes Argument muss 2er potenz sein - fft länge
-
             for(int i = 0; i<m_filterOperator->m_dCoeffA.cols(); i++)
                 m_outStreamDebug << m_filterOperator->m_dFFTCoeffA(0,i).real() <<"+" << m_filterOperator->m_dFFTCoeffA(0,i).imag() << "i "  << endl;
 
@@ -289,7 +297,6 @@ void BCI::updateSensor(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
             for(int i = 0; i<m_filterOperator->m_dCoeffA.cols(); i++)
                 m_outStreamDebug << m_filterOperator->m_dCoeffA(0,i) << endl;
-
 
             m_outStreamDebug << "---------------------------------------------------------------------" << endl;
         }
@@ -341,14 +348,36 @@ void BCI::applyFilterOperatorConcurrently(QPair<int, RowVectorXd> &chdata)
 
 //*************************************************************************************************************
 
-QPair<int,QVector<double>> BCI::applyFeatureCalcConcurrentlyOnSensorLevel(const QPair<int, RowVectorXd> &chdata)
+QPair<int,QList<double>> BCI::applyFeatureCalcConcurrentlyOnSensorLevel(const QPair<int, RowVectorXd> &chdata)
 {
     RowVectorXd data = chdata.second;
-    QVector<double> features;
+    QList<double> features;
 
-    features.push_back(data.squaredNorm()); // Compute variance
+    // TODO: Divide in subsignals
+    features << data.squaredNorm(); // Compute variance
 
-    return QPair<int,QVector<double>>(chdata.first, features);
+    return QPair<int,QList<double>>(chdata.first, features);
+}
+
+
+//*************************************************************************************************************
+
+QPair<int,QList<double>> BCI::applyClassificationCalcConcurrentlyOnSensorLevel(const QPair<int, QList<double>> &chdata)
+{
+   QList<double> features;
+
+   return QPair<int,QList<double>>(chdata.first, features);
+}
+
+
+//*************************************************************************************************************
+
+void BCI::clearFeaturesAndClassifications()
+{
+    m_qMutex.lock();
+        m_lFeaturesSensor.clear();
+        m_lClassResultsSensor.clear();
+    m_qMutex.unlock();
 }
 
 
@@ -404,7 +433,15 @@ void BCI::run()
                 // Recalculate m_matSlidingWindowSensor -> push m_matTimeBetweenWindowsSensor from the left
                 m_matSlidingWindowSensor.block(0, m_matSlidingWindowSensor.cols()-m_matTimeBetweenWindowsSensor.cols(), m_matTimeBetweenWindowsSensor.rows(), m_matTimeBetweenWindowsSensor.cols()) = m_matTimeBetweenWindowsSensor;
 
-                // Filter data in m_matSlidingWindowSensor concurrently using map()
+//                // Test if data is correctly streamed to this plugin
+//                cout<<"Recalculate matrix"<<endl;
+//                for(int i = 1; i<m_matSlidingWindowSensor.cols() ; i++)
+//                {
+//                    if(m_matSlidingWindowSensor(2,i) - m_matSlidingWindowSensor(2,i-1) != 1)
+//                        cout<<"Sequence error while streaming from tmsi plugin at position: "<<i<<endl;
+//                }
+
+                // ---------- Filter data in m_matSlidingWindowSensor concurrently using map() ----------
                 QList<QPair<int,RowVectorXd>> filteredRows;
                 for(int i = 0; i< m_matSlidingWindowSensor.rows(); i++)
                     filteredRows << QPair<int,RowVectorXd>(i, m_matSlidingWindowSensor.row(i));
@@ -425,32 +462,56 @@ void BCI::run()
 
 //                m_outStreamDebug << endl << "---------------------------------------------------------" << endl << endl;
 
-                // Calculate features concurrently using mapped()
-                std::function<QPair<int,QVector<double>> (QPair<int,RowVectorXd>&)> applyOps = [this](QPair<int,RowVectorXd>& chdata) -> QPair<int,QVector<double>> {
+                // ---------- Calculate features concurrently using mapped() ----------
+                std::function<QPair<int,QList<double>> (QPair<int,RowVectorXd>&)> applyOpsFeatures = [this](QPair<int,RowVectorXd>& chdata) -> QPair<int,QList<double>> {
                     return applyFeatureCalcConcurrentlyOnSensorLevel(chdata);
                 };
 
-                QFuture<QPair<int,QVector<double>>> futureCalculatedFeatures = QtConcurrent::mapped(filteredRows.begin(), filteredRows.end(), applyOps);
+                QFuture<QPair<int,QList<double>>> futureCalculatedFeatures = QtConcurrent::mapped(filteredRows.begin(), filteredRows.end(), applyOpsFeatures);
 
                 futureCalculatedFeatures.waitForFinished();
+
+                m_iNumberOfCalculatedFeatures++;
 
                 // Store features
                 m_lFeaturesSensor.append(futureCalculatedFeatures.results());
 
-                emit paintFeatures();
+                // ---------- If enough features (windows) have been calculated (processed) -> classify features ----------
+                if(m_iNumberOfCalculatedFeatures >= (int)(m_matSlidingWindowSensor.cols()/m_matTimeBetweenWindowsSensor.cols()))
+                {
+                    // Display features
+                    emit paintFeatures((MyQList)m_lFeaturesSensor);
+                    m_iNumberOfCalculatedFeatures = 0;
 
-                // TODO: Classify features and store results concurrently using map()
+                    // ---------- Classify features and store results concurrently using mapped() ----------
+                    // Transform m_lFeaturesSensor into an easier file structure
+                    QList<QList<double>> lFeaturesSensor_new;
+                    for(int i = 0; i<m_slChosenFeatureSensor.size(); i++)
+                        lFeaturesSensor_new.prepend(QList<double>());
 
-                // TODO: Check how full the classification result vector is -> if too big emit signal and average results, delete all results and make final decision to triggerbox
+                    for(int i = 0; i<m_lFeaturesSensor.size()-m_slChosenFeatureSensor.size()+1; )
+                    {
+                        for(int t = 0; t<lFeaturesSensor_new.size(); t++)
+                            lFeaturesSensor_new[t].append(m_lFeaturesSensor.at(i+t).second);
 
-                // Test if data is correctly streamed to this plugin
-//                cout<<"Recalculate matrix"<<endl;
-//                for(int i = 1; i<m_matSlidingWindowSensor.cols() ; i++)
-//                {
-//                    cout<<m_matSlidingWindowSensor(2,i)<<endl;
-////                    if(m_matSlidingWindowSensor(2,i) - m_matSlidingWindowSensor(2,i-1) != 1)
-////                        cout<<"Sequence error while streaming from tmsi plugin at position: "<<i<<endl;
-//                }
+                        i = i + m_slChosenFeatureSensor.size();
+                    }
+
+                    std::function<QList<double> (QList<QList<double>>&)> applyOpsClassification = [this](QList<QList<double>>& featData) -> QList<double> {
+                        return applyClassificationCalcConcurrentlyOnSensorLevel(featData);
+                    };
+
+                    QFuture<QPair<int,QVector<double>>> futureCalculatedResults = QtConcurrent::mapped(lFeaturesSensor_new.begin(), lFeaturesSensor_new.end(), applyOpsClassification);
+
+                    futureCalculatedResults.waitForFinished();
+
+                    // Generate final classification result
+
+                    // Send result to output stream, i.e. which is connected to the triggerbox
+
+                    // Clear classifications and features vectors
+                    clearFeaturesAndClassifications();
+                }
 
                 m_iTBWIndexSensor = 0;
             }
