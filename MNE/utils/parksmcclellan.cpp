@@ -119,7 +119,7 @@ void ParksMcClellan::init(int NumTaps, double OmegaC, double BW, double ParksWid
 {
     int j, NumBands;
 
-    if(NumTaps > 128) NumTaps = 128;
+    if(NumTaps > 256) NumTaps = 256;
     if(NumTaps < 9) NumTaps = 9;
     if( (PassType == HPF || PassType == NOTCH) && NumTaps % 2 == 0) NumTaps--;
 
