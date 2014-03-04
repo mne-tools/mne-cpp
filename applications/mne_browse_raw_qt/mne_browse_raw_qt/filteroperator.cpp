@@ -50,7 +50,7 @@ FilterOperator::~FilterOperator()
 
 //*************************************************************************************************************
 
-FilterOperator::FilterOperator(QString unique_name, FilterType type, qint8 order, double centerfreq, double bandwidth, double parkswidth, qint32 fftlength)
+FilterOperator::FilterOperator(QString unique_name, FilterType type, int order, double centerfreq, double bandwidth, double parkswidth, qint32 fftlength)
 : MNEOperator(OperatorType::FILTER)
 , m_iFilterOrder(order)
 , m_Type(type)
