@@ -144,7 +144,6 @@ void TriggerControl::init()
     // Ende Zeitmessung*/
 
 
-
     m_pRTSAInput = PluginInputData<NewRealTimeSampleArray>::create(this, "TriggerControlInII", "TriggerControl input data II");
     connect(m_pRTSAInput.data(), &PluginInputConnector::notify, this, &TriggerControl::updateSingleChannel, Qt::DirectConnection);
     m_inputConnectors.append(m_pRTSAInput);
@@ -523,18 +522,13 @@ void TriggerControl::run()
 
 #ifdef BUFFERX1
 
-
     while(m_bIsRunning)
     {
-
-        emit sendByte(1);
+        emit sendByte(1, m_pSerialPort->m_wiredChannel);
         msleep(20);
-        emit sendByte(0);
+        emit sendByte(0, m_pSerialPort->m_wiredChannel);
         msleep(500);
-
     }
-
-
 
 #endif
 
@@ -678,17 +672,17 @@ void TriggerControl::run()
 
 //*************************************************************************************************************
 
-void TriggerControl::sendByteTo(int value)
+void TriggerControl::sendByteTo(int value, int channel)
 {
     if (value == 0)
     {
-        m_pSerialPort->m_digchannel.replace(9,0); // select 1st digital channel
+        m_pSerialPort->m_digchannel.replace(channel,0); // select 1st digital channel
         m_pSerialPort->encodedig();             // encode signal to m_data
         m_pSerialPort->sendData(m_pSerialPort->m_data);
     }
-    else if (value == 1)
+    else
     {
-        m_pSerialPort->m_digchannel.replace(9,1); // select 1st digital channel
+        m_pSerialPort->m_digchannel.replace(channel,1); // select 1st digital channel
         m_pSerialPort->encodedig();             // encode signal to m_data
         m_pSerialPort->sendData(m_pSerialPort->m_data);
     }

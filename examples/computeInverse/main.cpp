@@ -109,7 +109,7 @@ int main(int argc, char *argv[])
     QFile t_fileEvoked("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-ave.fif");
     QFile t_fileInv("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-oct-6p-meg-inv.fif");
 
-    float snr = 3.0f;
+    float snr = 1.0f;
     QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
     QString t_sFileNameStc("");
 

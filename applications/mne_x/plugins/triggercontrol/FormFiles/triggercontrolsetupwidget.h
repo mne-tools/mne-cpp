@@ -101,8 +101,8 @@ public:
 
     //=========================================================================================================
     /**
-    * Destroys the DummySetupWidget.
-    * All DummySetupWidget's children are deleted first. The application exits if DummySetupWidget is the main widget.
+    * Destroys the TriggerControlSetupWidget.
+    * All TriggerControlSetupWidget's children are deleted first. The application exits if TriggerControlSetupWidget is the main widget.
     */
     ~TriggerControlSetupWidget();
 
@@ -117,7 +117,15 @@ private slots:
 
     void on_m_qPushButton_Sendanalog_released();
 
-    void on_m_qPushButton_RetrieveInfo_released();
+
+
+    void on_m_qPushButton_RetrieveDigitalInfo_released();
+
+
+
+    void on_m_qPushButton_RetrieveAnalogInfo_released();
+
+    void on_m_qPushButton_ConnectChannel_released();
 
 private:
     //=========================================================================================================
