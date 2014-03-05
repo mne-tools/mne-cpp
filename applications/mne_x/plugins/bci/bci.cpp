@@ -119,24 +119,22 @@ void BCI::init()
     //m_pBCIOutput->data()->setMaxValue();
 
     //Delete Buffer - will be initailzed with first incoming data
-    if(!m_pBCIBuffer_Sensor.isNull())
-        m_pBCIBuffer_Sensor = CircularMatrixBuffer<double>::SPtr();
-
-    if(!m_pBCIBuffer_Source.isNull())
-        m_pBCIBuffer_Source = CircularMatrixBuffer<double>::SPtr();
+    m_pBCIBuffer_Sensor = CircularMatrixBuffer<double>::SPtr();
+    m_pBCIBuffer_Source = CircularMatrixBuffer<double>::SPtr();
 
     // Delete fiff info because the initialisation of the fiff info is seen as the first data acquisition from the input stream
-    if(!m_pFiffInfo_Sensor.isNull())
-        m_pFiffInfo_Sensor = FiffInfo::SPtr();
+    m_pFiffInfo_Sensor = FiffInfo::SPtr();
 
     // Intitalise GUI stuff
+    m_bSubtractMean = true;
+    m_bUseFilter = true;
     m_bUseSensorData = true;
     m_bUseSourceData = false;
-    m_bUseArtefactThresholdReduction = false;
+    m_bUseArtefactThresholdReduction = true;
     m_dSlidingWindowSize = 1.0;
-    m_dBaseLineWindowSize = 1.0;
     m_dTimeBetweenWindows = 0.04;
     m_iNumberSubSignals = 1;
+    m_dThresholdValue = 10;
     m_sSensorBoundaryPath = m_qStringResourcePath;
     m_sSourceBoundaryPath = m_qStringResourcePath;
 
@@ -166,8 +164,6 @@ void BCI::init()
 
     // Init BCIFeatureWindow for visualization
     m_BCIFeatureWindow = QSharedPointer<BCIFeatureWindow>(new BCIFeatureWindow(this));
-    m_BCIFeatureWindow->initGui();
-    m_BCIFeatureWindow->show();
 }
 
 
@@ -186,10 +182,16 @@ bool BCI::start()
         return false;
     }
 
+    // BCIFeatureWindow show and init
+    m_BCIFeatureWindow->initGui();
+    m_BCIFeatureWindow->show();
+
     // Init debug output stream
     QString path("filterOutput.txt");
     path.prepend(m_qStringResourcePath);
     m_outStreamDebug.open(path.toStdString(), ios::trunc);
+
+    m_pFiffInfo_Sensor = FiffInfo::SPtr();
 
     m_bIsRunning = true;
 
@@ -223,9 +225,11 @@ bool BCI::stop()
     m_outStreamDebug.close();
     m_outStreamDebug.clear();
 
+    // Hide feature visualization window
+    m_BCIFeatureWindow->hide();
+
     // Delete all features and classification results
     clearFeatures();
-
     clearClassifications();
 
     return true;
@@ -272,18 +276,19 @@ void BCI::updateSensor(XMEASLIB::NewMeasurement::SPtr pMeasurement)
         if(!m_pBCIBuffer_Sensor)
             m_pBCIBuffer_Sensor = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSA->getNumChannels(), pRTMSA->getMultiArraySize()));
 
-        //Fiff information for sensor level
+        // Load Fiff information on sensor level
         if(!m_pFiffInfo_Sensor)
         {
             m_pFiffInfo_Sensor = pRTMSA->getFiffInfo();
 
             // Adjust working matrixes (sliding window and time between windows matrix) size so that the samples from the tmsi plugin stream fit in the matrix perfectly
-            int modulo = (int)(m_pFiffInfo_Sensor->sfreq*m_dSlidingWindowSize) % (int)pRTMSA->getMultiArraySize();
+            int arraySize = pRTMSA->getMultiArraySize();
+            int modulo = int(m_pFiffInfo_Sensor->sfreq*m_dSlidingWindowSize) % arraySize;
             int rows = m_slChosenFeatureSensor.size();
             int cols = m_pFiffInfo_Sensor->sfreq*m_dSlidingWindowSize-modulo;
             m_matSlidingWindowSensor.resize(rows, cols);
 
-            modulo = (int)(m_pFiffInfo_Sensor->sfreq*m_dTimeBetweenWindows) % (int)pRTMSA->getMultiArraySize();
+            modulo = int(m_pFiffInfo_Sensor->sfreq*m_dTimeBetweenWindows) % arraySize;
             rows = m_slChosenFeatureSensor.size();
             cols = m_pFiffInfo_Sensor->sfreq*m_dTimeBetweenWindows-modulo;
             m_matTimeBetweenWindowsSensor.resize(rows, cols);
@@ -293,8 +298,14 @@ void BCI::updateSensor(XMEASLIB::NewMeasurement::SPtr pMeasurement)
             double dBandwidthNyq = (m_dFilterUpperBound - m_dFilterLowerBound)/(m_pFiffInfo_Sensor->sfreq/2);
             double dParksWidth = m_dParcksWidth/(m_pFiffInfo_Sensor->sfreq/2);
 
-            m_filterOperator = QSharedPointer<FilterData>(new FilterData(QString("BPF"),FilterData::BPF,m_iFilterOrder,dCenterFreqNyq,dBandwidthNyq,dParksWidth,1024)); // letztes Argument muss 2er potenz sein - fft länge
+            // Calculate needed fft length
+            int exponent = ceil(log10(m_matSlidingWindowSensor.cols())/log10(2));
+            int fftLength = pow(2,exponent+1);
 
+            // Initialise filter operator
+            m_filterOperator = QSharedPointer<FilterData>(new FilterData(QString("BPF"),FilterData::BPF,m_iFilterOrder,dCenterFreqNyq,dBandwidthNyq,dParksWidth,fftLength)); // letztes Argument muss 2er potenz sein - fft länge
+
+            // Write filter coefficients to debug file
             for(int i = 0; i<m_filterOperator->m_dCoeffA.cols(); i++)
                 m_outStreamDebug << m_filterOperator->m_dFFTCoeffA(0,i).real() <<"+" << m_filterOperator->m_dFFTCoeffA(0,i).imag() << "i "  << endl;
 
@@ -345,6 +356,14 @@ void BCI::updateSource(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
 //*************************************************************************************************************
 
+void BCI::applyMeanCorrectionConcurrently(QPair<int, RowVectorXd> &chdata)
+{
+    chdata.second = chdata.second.array() - chdata.second.mean(); // Row vector needs to be transformed to a array in order to subract a scalar
+}
+
+
+//*************************************************************************************************************
+
 void BCI::applyFilterOperatorConcurrently(QPair<int, RowVectorXd> &chdata)
 {
     chdata.second = m_filterOperator->applyFFTFilter(chdata.second);
@@ -358,7 +377,7 @@ QPair<int,QList<double>> BCI::applyFeatureCalcConcurrentlyOnSensorLevel(const QP
     RowVectorXd data = chdata.second;
     QList<double> features;
 
-    // TODO: Divide in subsignals
+    // TODO: Divide into subsignals
     features << data.squaredNorm(); // Compute variance
 
     return QPair<int,QList<double>>(chdata.first, features);
@@ -455,94 +474,121 @@ void BCI::run()
 //                        cout<<"Sequence error while streaming from tmsi plugin at position: "<<i<<endl;
 //                }
 
-                // ---------- Filter data in m_matSlidingWindowSensor concurrently using map() ----------
-                QList<QPair<int,RowVectorXd>> filteredRows;
-                for(int i = 0; i< m_matSlidingWindowSensor.rows(); i++)
-                    filteredRows << QPair<int,RowVectorXd>(i, m_matSlidingWindowSensor.row(i));
+                // ---------- Perform simple threshold artefact reduction ----------
+                double max = 0;
+                if(m_bUseArtefactThresholdReduction)
+                    max = m_matSlidingWindowSensor.maxCoeff();
 
-                QFuture<void> future = QtConcurrent::map(filteredRows,[this](QPair<int,RowVectorXd>& chdata) {
-                    applyFilterOperatorConcurrently(chdata);
-                });
+                cout<<max<<endl;
 
-                future.waitForFinished();
-
-//                for(int i=0; i<m_matSlidingWindowSensor.rows(); i++)
-//                    m_outStreamDebug << "m_matSlidingWindowSensor at row " << i << ": " << m_matSlidingWindowSensor.row(i) << "\n";
-
-//                m_outStreamDebug<<endl;
-
-//                for(int i=0; i<filteredRows.size(); i++)
-//                    m_outStreamDebug << "filteredRows at row " << i << ": " << filteredRows.at(i).second << "\n";
-
-//                m_outStreamDebug << endl << "---------------------------------------------------------" << endl << endl;
-
-                // ---------- Calculate features concurrently using mapped() ----------
-                std::function<QPair<int,QList<double>> (QPair<int,RowVectorXd>&)> applyOpsFeatures = [this](QPair<int,RowVectorXd>& chdata) -> QPair<int,QList<double>> {
-                    return applyFeatureCalcConcurrentlyOnSensorLevel(chdata);
-                };
-
-                QFuture<QPair<int,QList<double>>> futureCalculatedFeatures = QtConcurrent::mapped(filteredRows.begin(), filteredRows.end(), applyOpsFeatures);
-
-                futureCalculatedFeatures.waitForFinished();
-
-                m_iNumberOfCalculatedFeatures++;
-
-                // Store features
-                m_lFeaturesSensor.append(futureCalculatedFeatures.results());
-
-                // ---------- If enough features (windows) have been calculated (processed) -> classify all features and average result ----------
-                if(m_iNumberOfCalculatedFeatures >= (int)(m_matSlidingWindowSensor.cols()/m_matTimeBetweenWindowsSensor.cols()))
+                if(max<m_dThresholdValue*1e-06 && max>m_dThresholdValue*-1e-06) // If max is outside the threshold -> completley discard m_matSlidingWindowSensor
                 {
-                    // Display features
-                    emit paintFeatures((MyQList)m_lFeaturesSensor);
+                    // ---------- Subtract mean in m_matSlidingWindowSensor concurrently using map() ----------
+                    QList<QPair<int,RowVectorXd>> matrixRows;
+                    for(int i = 0; i< m_matSlidingWindowSensor.rows(); i++)
+                        matrixRows << QPair<int,RowVectorXd>(i, m_matSlidingWindowSensor.row(i));
 
-                    // Transform m_lFeaturesSensor into an easier file structure
-                    QList<QList<double>> lFeaturesSensor_new;
+                    if(m_bSubtractMean)
+                    {
+                        QFuture<void> futureMean = QtConcurrent::map(matrixRows,[this](QPair<int,RowVectorXd>& rowdata) {
+                            applyMeanCorrectionConcurrently(rowdata);
+                        });
 
-                    for(int i = 0; i<m_lFeaturesSensor.size()-m_slChosenFeatureSensor.size()+1; i = i + m_slChosenFeatureSensor.size()) // iterate over QPair feature List
-                        for(int z = 0; z<m_lFeaturesSensor.at(0).second.size(); z++) // iterate over number of sub signals
-                        {
-                            QList<double> temp;
-                            for(int t = 0; t<m_slChosenFeatureSensor.size(); t++) // iterate over chosen features (electrodes)
-                                temp.append(m_lFeaturesSensor.at(i+t).second.at(z));
-                            lFeaturesSensor_new.append(temp);
-                        }
+                        futureMean.waitForFinished();
+                    }
 
-//                    //Check sizes
-//                    cout<<"lFeaturesSensor_new.size()"<<lFeaturesSensor_new.size()<<endl;
-//                    cout<<"lFeaturesSensor_new.at(0).size()"<<lFeaturesSensor_new.at(0).size()<<endl;
-//                    cout<<"m_lFeaturesSensor.size()"<<m_lFeaturesSensor.size()<<endl;
+                    // ---------- Filter data in m_matSlidingWindowSensor concurrently using map() ----------
+                    QList<QPair<int,RowVectorXd>> filteredRows = matrixRows;
 
-                    // ---------- Classify features and store results concurrently using mapped() ----------
-                    std::function<double (QList<double>&)> applyOpsClassification = [this](QList<double>& featData){
-                        return applyClassificationCalcConcurrentlyOnSensorLevel(featData);
+                    if(m_bUseFilter)
+                    {
+                        QFuture<void> futureFilter = QtConcurrent::map(filteredRows,[this](QPair<int,RowVectorXd>& chdata) {
+                            applyFilterOperatorConcurrently(chdata);
+                        });
+
+                        futureFilter.waitForFinished();
+                    }
+
+    //                for(int i=0; i<m_matSlidingWindowSensor.rows(); i++)
+    //                    m_outStreamDebug << "m_matSlidingWindowSensor at row " << i << ": " << m_matSlidingWindowSensor.row(i) << "\n";
+
+    //                m_outStreamDebug<<endl;
+
+    //                for(int i=0; i<filteredRows.size(); i++)
+    //                    m_outStreamDebug << "filteredRows at row " << i << ": " << filteredRows.at(i).second << "\n";
+
+    //                m_outStreamDebug << endl << "---------------------------------------------------------" << endl << endl;
+
+                    // ---------- Calculate features concurrently using mapped() ----------
+                    std::function<QPair<int,QList<double>> (QPair<int,RowVectorXd>&)> applyOpsFeatures = [this](QPair<int,RowVectorXd>& chdata) -> QPair<int,QList<double>> {
+                        return applyFeatureCalcConcurrentlyOnSensorLevel(chdata);
                     };
 
-                    QFuture<double> futureClassificationResults = QtConcurrent::mapped(lFeaturesSensor_new.begin(), lFeaturesSensor_new.end(), applyOpsClassification);
+                    QFuture<QPair<int,QList<double>>> futureCalculatedFeatures = QtConcurrent::mapped(filteredRows.begin(), filteredRows.end(), applyOpsFeatures);
 
-                    futureClassificationResults.waitForFinished();
+                    futureCalculatedFeatures.waitForFinished();
 
-                    // Generate final classification result -> average all classification results
-                    double dfinalResult = 0;
+                    m_iNumberOfCalculatedFeatures++;
 
-                    for(int i = 0; i<futureClassificationResults.resultCount() ;i++)
-                        dfinalResult += futureClassificationResults.resultAt(i);
+                    // Store features
+                    m_lFeaturesSensor.append(futureCalculatedFeatures.results());
 
-                    dfinalResult = dfinalResult/futureClassificationResults.resultCount();
-                    //cout << dfinalResult << endl;
+                    // ---------- If enough features (windows) have been calculated (processed) -> classify all features and average result ----------
+                    if(m_iNumberOfCalculatedFeatures >= (int)(m_matSlidingWindowSensor.cols()/m_matTimeBetweenWindowsSensor.cols()))
+                    {
+                        // Transform m_lFeaturesSensor into an easier file structure
+                        QList<QList<double>> lFeaturesSensor_new;
 
-                    // Store final result
-                    m_lClassResultsSensor.append(dfinalResult);
+                        for(int i = 0; i<m_lFeaturesSensor.size()-m_slChosenFeatureSensor.size()+1; i = i + m_slChosenFeatureSensor.size()) // iterate over QPair feature List
+                            for(int z = 0; z<m_lFeaturesSensor.at(0).second.size(); z++) // iterate over number of sub signals
+                            {
+                                QList<double> temp;
+                                for(int t = 0; t<m_slChosenFeatureSensor.size(); t++) // iterate over chosen features (electrodes)
+                                    temp.append(m_lFeaturesSensor.at(i+t).second.at(z));
+                                lFeaturesSensor_new.append(temp);
+                            }
 
-                    // Send result to the output stream, i.e. which is connected to the triggerbox
-                    m_pBCIOutput->data()->setValue(dfinalResult);
+    //                    //Check sizes
+    //                    cout<<"lFeaturesSensor_new.size()"<<lFeaturesSensor_new.size()<<endl;
+    //                    cout<<"lFeaturesSensor_new.at(0).size()"<<lFeaturesSensor_new.at(0).size()<<endl;
+    //                    cout<<"m_lFeaturesSensor.size()"<<m_lFeaturesSensor.size()<<endl;
 
-                    // Clear classifications
-                    clearFeatures();
+                        // Display features
+                        emit paintFeatures((MyQList)lFeaturesSensor_new);
 
-                    // Reset counter
-                    m_iNumberOfCalculatedFeatures = 0;
+                        // ---------- Classify features and store results concurrently using mapped() ----------
+                        std::function<double (QList<double>&)> applyOpsClassification = [this](QList<double>& featData){
+                            return applyClassificationCalcConcurrentlyOnSensorLevel(featData);
+                        };
+
+                        QFuture<double> futureClassificationResults = QtConcurrent::mapped(lFeaturesSensor_new.begin(), lFeaturesSensor_new.end(), applyOpsClassification);
+
+                        futureClassificationResults.waitForFinished();
+
+                        // Generate final classification result -> average all classification results
+                        double dfinalResult = 0;
+
+                        for(int i = 0; i<futureClassificationResults.resultCount() ;i++)
+                            dfinalResult += futureClassificationResults.resultAt(i);
+
+                        dfinalResult = dfinalResult/futureClassificationResults.resultCount();
+                        //cout << dfinalResult << endl;
+
+                        // Store final result
+                        m_lClassResultsSensor.append(dfinalResult);
+
+                        // Send result to the output stream, i.e. which is connected to the triggerbox
+                        m_pBCIOutput->data()->setValue(dfinalResult);
+
+                        // Clear classifications
+                        clearFeatures();
+
+                        // Reset counter
+                        m_iNumberOfCalculatedFeatures = 0;
+                    }
                 }
+                else
+                    cout<<"Rejected artefact!"<<endl;
 
                 m_iTBWIndexSensor = 0;
             }
