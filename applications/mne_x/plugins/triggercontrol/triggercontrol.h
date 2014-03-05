@@ -145,12 +145,14 @@ public:
     void byteReceived();
 
 signals:
-    void sendByte(int value);
+    void sendByte(int value, int channel);
 
 
 protected:
     virtual void run();
-    void sendByteTo(int);
+
+
+    void sendByteTo(int value, int channel);
 
 private:
     PluginOutputData<NewRealTimeSampleArray>::SPtr  m_pTriggerOutput;   /**< The RealTimeSampleArray of the trigger output.*/
