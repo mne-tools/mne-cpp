@@ -65,7 +65,7 @@ namespace BCIPlugin
 // TypeDefs
 //=============================================================================================================
 
-typedef QList<QPair<int,QList<double>>> MyQList;
+typedef QList<QList<double>> MyQList;
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -115,6 +115,7 @@ protected:
     BCI*                        m_pBCI;         /**< a pointer to corresponding BCI.*/
     QGraphicsScene              m_scene;        /**< QGraphicsScene used to add the features.*/
 
+    double                      m_dFeatureMax;  /**< Max value for featrues - Used to scale the QGraphicsView.*/
     Ui::BCIFeatureWindowClass   ui;             /**< the user interface for the BCIFeatureWindow.*/
 };
 

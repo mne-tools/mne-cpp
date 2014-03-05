@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>789</width>
-    <height>620</height>
+    <height>643</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -102,14 +102,14 @@
         <string>Processing options</string>
        </property>
        <layout class="QGridLayout" name="gridLayout">
-        <item row="1" column="0">
-         <widget class="QLabel" name="m_label_BaseLineWindowSize">
+        <item row="3" column="0">
+         <widget class="QLabel" name="m_label_TimeBetweenWindows">
           <property name="text">
-           <string>Base line correction size (s):</string>
+           <string>Time between windows (s):</string>
           </property>
          </widget>
         </item>
-        <item row="0" column="0">
+        <item row="1" column="0">
          <widget class="QLabel" name="m_label_SlidingWindowSize">
           <property name="text">
            <string>Sliding window size (s):</string>
@@ -139,38 +139,6 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="1">
-         <widget class="QDoubleSpinBox" name="m_doubleSpinBox_BaseLineWindowSize">
-          <property name="minimum">
-           <double>0.010000000000000</double>
-          </property>
-          <property name="maximum">
-           <double>10.000000000000000</double>
-          </property>
-          <property name="singleStep">
-           <double>0.010000000000000</double>
-          </property>
-          <property name="value">
-           <double>0.010000000000000</double>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <widget class="QDoubleSpinBox" name="m_doubleSpinBox_SlidingWindowSize">
-          <property name="minimum">
-           <double>0.010000000000000</double>
-          </property>
-          <property name="maximum">
-           <double>10.000000000000000</double>
-          </property>
-          <property name="singleStep">
-           <double>0.010000000000000</double>
-          </property>
-          <property name="value">
-           <double>0.010000000000000</double>
-          </property>
-         </widget>
-        </item>
         <item row="2" column="0">
          <widget class="QLabel" name="m_label_NumberSubSignals">
           <property name="text">
@@ -178,10 +146,26 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="0">
-         <widget class="QLabel" name="m_label_TimeBetweenWindows">
+        <item row="1" column="1">
+         <widget class="QDoubleSpinBox" name="m_doubleSpinBox_SlidingWindowSize">
+          <property name="minimum">
+           <double>0.010000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>5.000000000000000</double>
+          </property>
+          <property name="singleStep">
+           <double>0.010000000000000</double>
+          </property>
+          <property name="value">
+           <double>0.010000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QCheckBox" name="m_checkBox_SubtractMean">
           <property name="text">
-           <string>Time between windows (s):</string>
+           <string>Subtract mean </string>
           </property>
          </widget>
         </item>
@@ -244,45 +228,6 @@
        </layout>
       </widget>
      </item>
-     <item row="0" column="0" rowspan="2" colspan="3">
-      <widget class="QGroupBox" name="m_qGroupBox_General">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="title">
-        <string>General options</string>
-       </property>
-       <property name="flat">
-        <bool>false</bool>
-       </property>
-       <layout class="QGridLayout" name="m_qGridLayout_Properties">
-        <item row="1" column="0">
-         <widget class="QCheckBox" name="m_checkBox_UseSourceData">
-          <property name="text">
-           <string>Use source level data</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0">
-         <widget class="QCheckBox" name="m_checkBox_UseSensorData">
-          <property name="text">
-           <string>Use sensor level data</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0">
-         <widget class="QCheckBox" name="m_checkBox_UseThresholdArtefactReduction">
-          <property name="text">
-           <string>Use threshold artefact reduction</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </item>
      <item row="0" column="3" rowspan="2">
       <widget class="QGroupBox" name="m_qGroupBox_Filter">
        <property name="title">
@@ -293,51 +238,58 @@
          <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
         </property>
         <item row="1" column="0">
+         <widget class="QCheckBox" name="m_checkBox_UseFilter">
+          <property name="text">
+           <string>Use Filter</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
          <widget class="QLabel" name="m_label_FilterOrder">
           <property name="text">
            <string>Order:</string>
           </property>
          </widget>
         </item>
-        <item row="1" column="1">
+        <item row="2" column="1">
          <widget class="QSpinBox" name="m_SpinBox_FilterOrder">
           <property name="minimum">
            <number>10</number>
           </property>
           <property name="maximum">
-           <number>1000</number>
+           <number>256</number>
           </property>
          </widget>
         </item>
-        <item row="2" column="0">
+        <item row="3" column="0">
          <widget class="QLabel" name="m_label_FilterLowerBound">
           <property name="text">
            <string>Lower bound:</string>
           </property>
          </widget>
         </item>
-        <item row="2" column="1">
+        <item row="3" column="1">
          <widget class="QDoubleSpinBox" name="m_doubleSpinBox_FilterLowerBound"/>
         </item>
-        <item row="3" column="0">
+        <item row="4" column="0">
          <widget class="QLabel" name="m_label_FilterUpperBound">
           <property name="text">
            <string>Upper bound:</string>
           </property>
          </widget>
         </item>
-        <item row="3" column="1">
+        <item row="4" column="1">
          <widget class="QDoubleSpinBox" name="m_doubleSpinBox_FilterUpperBound"/>
         </item>
-        <item row="4" column="1">
-         <widget class="QDoubleSpinBox" name="m_doubleSpinBox_ParcksWidth"/>
-        </item>
-        <item row="4" column="0">
+        <item row="5" column="0">
          <widget class="QLabel" name="m_label_ParcksWidth">
           <property name="text">
            <string>Parcks width:</string>
           </property>
          </widget>
+        </item>
+        <item row="5" column="1">
+         <widget class="QDoubleSpinBox" name="m_doubleSpinBox_ParcksWidth"/>
         </item>
        </layout>
       </widget>
@@ -502,6 +454,59 @@
             </item>
            </layout>
           </widget>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item row="0" column="0" rowspan="2" colspan="3">
+      <widget class="QGroupBox" name="m_qGroupBox_General">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="title">
+        <string>General options</string>
+       </property>
+       <property name="flat">
+        <bool>false</bool>
+       </property>
+       <layout class="QFormLayout" name="formLayout_2">
+        <item row="0" column="0">
+         <widget class="QCheckBox" name="m_checkBox_UseSensorData">
+          <property name="text">
+           <string>Use sensor level data</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QCheckBox" name="m_checkBox_UseSourceData">
+          <property name="text">
+           <string>Use source level data</string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QCheckBox" name="m_checkBox_UseThresholdArtefactReduction">
+          <property name="text">
+           <string>Use artefact reduction</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QLabel" name="m_label_Threshold">
+          <property name="text">
+           <string>Threshold:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0">
+         <widget class="QDoubleSpinBox" name="m_SpinBox_ThresholdValue">
+          <property name="maximum">
+           <double>100000000.000000000000000</double>
+          </property>
          </widget>
         </item>
        </layout>

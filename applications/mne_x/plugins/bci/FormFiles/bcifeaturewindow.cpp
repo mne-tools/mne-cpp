@@ -73,12 +73,9 @@ BCIFeatureWindow::~BCIFeatureWindow()
 
 void BCIFeatureWindow::initGui()
 {
-    QSize size = ui.m_graphicsView_featureVisualization->size();
-    m_scene.addLine(0,0,500,500);
-
+    m_scene.clear();
     ui.m_graphicsView_featureVisualization->setScene(&m_scene);
-    ui.m_graphicsView_featureVisualization->setSceneRect(QRectF(0,0,500,500));
-    ui.m_graphicsView_featureVisualization->setInteractive(true);
+    m_dFeatureMax = 0;
 }
 
 
@@ -87,11 +84,29 @@ void BCIFeatureWindow::initGui()
 void BCIFeatureWindow::paintFeaturesToScene(MyQList features)
 {
     //std::cout<<"features.size()"<<features.size()<<endl;
-    for(int i = 0; i<features.size()-1; i=i+2)
-        for(int t = 0; t<features.at(i).second.size(); t++)
+    if(features.first().size() == 2) // Only plot when 2D case with two electrodes
+    {
+        m_scene.clear();
+        int lineSize = 500;
+        m_scene.addLine(0,0,lineSize,lineSize);
+
+        for(int i = 0; i<features.size(); i++)
         {
-            QRectF rect(features.at(i).second.at(t)/500, features.at(i+1).second.at(t)/500, 2, 2);
+            double featureA = features.at(i).at(0);
+            double featureB = features.at(i).at(1);
+
+            if(featureA > m_dFeatureMax)
+                m_dFeatureMax = featureA;
+
+            if(featureB > m_dFeatureMax)
+                m_dFeatureMax = featureB;
+
+            QRectF rect(featureA*(lineSize/m_dFeatureMax), featureB*(lineSize/m_dFeatureMax), 2, 2);
+//            std::cout<<"Scaled: "<< featureA*(300/m_dFeatureMax) <<" "<< featureB*(300/m_dFeatureMax) << endl;
+//            std::cout<<"Unscaled: "<< featureA <<" "<< featureB << endl;
             m_scene.addEllipse(rect);
         }
+        ui.m_graphicsView_featureVisualization->fitInView(m_scene.sceneRect());
+    }
 }
 

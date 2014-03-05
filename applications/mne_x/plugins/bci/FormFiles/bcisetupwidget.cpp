@@ -79,11 +79,13 @@ BCISetupWidget::BCISetupWidget(BCI* pBCI, QWidget* parent)
             this, &BCISetupWidget::setGeneralOptions);
     connect(ui.m_checkBox_UseThresholdArtefactReduction, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
             this, &BCISetupWidget::setGeneralOptions);
+    connect(ui.m_SpinBox_ThresholdValue, static_cast<void (QDoubleSpinBox::*)()>(&QDoubleSpinBox::editingFinished),
+            this, &BCISetupWidget::setGeneralOptions);
 
     // Connect processing options
+    connect(ui.m_checkBox_SubtractMean, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+            this, &BCISetupWidget::setGeneralOptions);
     connect(ui.m_doubleSpinBox_SlidingWindowSize, static_cast<void (QDoubleSpinBox::*)()>(&QDoubleSpinBox::editingFinished),
-            this, &BCISetupWidget::setProcessingOptions);
-    connect(ui.m_doubleSpinBox_BaseLineWindowSize, static_cast<void (QDoubleSpinBox::*)()>(&QDoubleSpinBox::editingFinished),
             this, &BCISetupWidget::setProcessingOptions);
     connect(ui.m_spinBox_NumberSubSignals, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
             this, &BCISetupWidget::setProcessingOptions);
@@ -103,6 +105,8 @@ BCISetupWidget::BCISetupWidget(BCI* pBCI, QWidget* parent)
     ui.m_listWidget_AvailableFeaturesOnSourceLevel->installEventFilter(this);
 
     // Connect filter options
+    connect(ui.m_checkBox_UseFilter, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+            this, &BCISetupWidget::setFilterOptions);
     connect(ui.m_doubleSpinBox_FilterLowerBound, static_cast<void (QDoubleSpinBox::*)()>(&QDoubleSpinBox::editingFinished),
             this, &BCISetupWidget::setFilterOptions);
     connect(ui.m_doubleSpinBox_FilterUpperBound, static_cast<void (QDoubleSpinBox::*)()>(&QDoubleSpinBox::editingFinished),
@@ -145,10 +149,11 @@ void BCISetupWidget::initGui()
     ui.m_checkBox_UseSensorData->setChecked(m_pBCI->m_bUseSensorData);
     ui.m_checkBox_UseSourceData->setChecked(m_pBCI->m_bUseSourceData);
     ui.m_checkBox_UseThresholdArtefactReduction->setChecked(m_pBCI->m_bUseArtefactThresholdReduction);
+    ui.m_SpinBox_ThresholdValue->setValue(m_pBCI->m_dThresholdValue);
 
     // Processing options
+    ui.m_checkBox_SubtractMean->setChecked(m_pBCI->m_bSubtractMean);
     ui.m_doubleSpinBox_SlidingWindowSize->setValue(m_pBCI->m_dSlidingWindowSize);
-    ui.m_doubleSpinBox_BaseLineWindowSize->setValue(m_pBCI->m_dBaseLineWindowSize);
     ui.m_spinBox_NumberSubSignals->setValue(m_pBCI->m_iNumberSubSignals);
     ui.m_doubleSpinBox_TimeBetweenWindows->setValue(m_pBCI->m_dTimeBetweenWindows);
 
@@ -157,6 +162,7 @@ void BCISetupWidget::initGui()
     ui.m_lineEdit_SourceBoundary->setText(m_pBCI->m_sSourceBoundaryPath);
 
     // Filter options
+    ui.m_checkBox_UseFilter->setChecked(m_pBCI->m_bUseFilter);
     ui.m_doubleSpinBox_FilterLowerBound->setValue(m_pBCI->m_dFilterLowerBound);
     ui.m_doubleSpinBox_FilterUpperBound->setValue(m_pBCI->m_dFilterUpperBound);
     ui.m_SpinBox_FilterOrder->setValue(m_pBCI->m_iFilterOrder);
@@ -174,6 +180,7 @@ void BCISetupWidget::setGeneralOptions()
     m_pBCI->m_bUseSensorData = ui.m_checkBox_UseSensorData->isChecked();
     m_pBCI->m_bUseSourceData = ui.m_checkBox_UseSourceData->isChecked();
     m_pBCI->m_bUseArtefactThresholdReduction = ui.m_checkBox_UseThresholdArtefactReduction->isChecked();
+    m_pBCI->m_dThresholdValue = ui.m_SpinBox_ThresholdValue->value();
 }
 
 
@@ -181,8 +188,8 @@ void BCISetupWidget::setGeneralOptions()
 
 void BCISetupWidget::setProcessingOptions()
 {
+    m_pBCI->m_bSubtractMean = ui.m_checkBox_SubtractMean->isChecked();
     m_pBCI->m_dSlidingWindowSize = ui.m_doubleSpinBox_SlidingWindowSize->value();
-    m_pBCI->m_dBaseLineWindowSize = ui.m_doubleSpinBox_BaseLineWindowSize->value();
     m_pBCI->m_iNumberSubSignals = ui.m_spinBox_NumberSubSignals->value();
     m_pBCI->m_dTimeBetweenWindows = ui.m_doubleSpinBox_TimeBetweenWindows->value();
 }
@@ -288,6 +295,7 @@ void BCISetupWidget::setFeatureSelection()
 
 void BCISetupWidget::setFilterOptions()
 {
+    m_pBCI->m_bUseFilter = ui.m_checkBox_UseFilter->isChecked();
     m_pBCI->m_dFilterLowerBound = ui.m_doubleSpinBox_FilterLowerBound->value();
     m_pBCI->m_dFilterUpperBound = ui.m_doubleSpinBox_FilterUpperBound->value();
     m_pBCI->m_iFilterOrder = ui.m_SpinBox_FilterOrder->value();
