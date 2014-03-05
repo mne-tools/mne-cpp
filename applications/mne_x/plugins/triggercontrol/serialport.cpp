@@ -183,22 +183,22 @@ void SerialPort::decodeana(QByteArray &t_incomingArray)
 
 //*************************************************************************************************************
 
-void SerialPort::decodedig(QByteArray &t_incomingArray)
+void SerialPort::decodedig(QByteArray &p_incomingArray)
 {
     std::cout << "Decodieren Digital" << std::endl;
 
 // decode channel 1-6
 
-    if ((t_incomingArray.at(3)&0x04) == 0x04) m_InActiveDig[0] = 1;              // 0000 0100
+    if ((p_incomingArray.at(3)&0x04) == 0x04) m_InActiveDig[0] = 1;              // 0000 0100
     else m_InActiveDig[0] = 0;
 
-    if ((t_incomingArray.at(3)&0x08) == 0x08) m_InActiveDig[1] = 1;            // 0000 1000
+    if ((p_incomingArray.at(3)&0x08) == 0x08) m_InActiveDig[1] = 1;            // 0000 1000
     else m_InActiveDig[1] = 0;
 
-    if ((t_incomingArray.at(3)&0x10) == 0x10) m_InActiveDig[2] = 1;            // 0001 0000
+    if ((p_incomingArray.at(3)&0x10) == 0x10) m_InActiveDig[2] = 1;            // 0001 0000
     else m_InActiveDig[2] = 0;
 
-    if ((t_incomingArray.at(3)&0x20) == 0x20) m_InActiveDig[3] = 1;            // 0010 0000
+    if ((p_incomingArray.at(3)&0x20) == 0x20) m_InActiveDig[3] = 1;            // 0010 0000
     else m_InActiveDig[3] = 0;
 
 /*
