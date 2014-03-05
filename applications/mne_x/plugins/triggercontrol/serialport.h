@@ -100,11 +100,27 @@ public:
     */
     ~SerialPort();
 
+    //=========================================================================================================
+    /**
+    * Initializes Settings as #data bits or baud rate.
+    */
+    void initSettings();
 
-    void initSettings();    /**< Initializes Settings as #data bits or baud rate.*/
-    void initPort();        /**< Checks all available serial ports and initializes the one of the trigger box.*/
+    //=========================================================================================================
+    /**
+    * Checks all available serial ports and initializes the one of the trigger box.
+    */
+    void initPort();
 
-    bool open();            /**< Opens a communication channel to the serial port.*/
+
+    //=========================================================================================================
+    /**
+    * Opens a communication channel to the serial port.
+    *
+    * @return true in case successfull.
+    */
+    bool open();
+
     void close();           /**< Closes a communication channel to the serial port.*/
 
 
@@ -112,7 +128,13 @@ public:
     void encodeana();       /**< Encodes the chosen analog channels and values according to the data transfer protocol.*/
     void encoderetr();      /**< Encodes a retrieve bytearray according to the data transfer protocol.*/
 
-    void decodedig(QByteArray &t_incomingArray);       /**< Decodes the incoming digital information according to the data transfer protocol.*/
+    //=========================================================================================================
+    /**
+    * Decodes the incoming digital information according to the data transfer protocol.
+    *
+    * @param [in] p_incomingArray   .....
+    */
+    void decodedig(QByteArray &p_incomingArray);
     void decodeana(QByteArray &t_incomingArray);       /**< Decodes the incoming analog information according to the data transfer protocol.*/
 
     void sendData(const QByteArray &data);    /**< Sends an array of bytes to the configured serial port.*/
@@ -135,7 +157,10 @@ public:
     int m_retrievechan;
     int m_wiredChannel;
 
-
+    //=========================================================================================================
+    /**
+    * ....
+    */
     struct Settings {
         QString name;
         qint32 baudRate;

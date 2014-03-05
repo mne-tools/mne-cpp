@@ -144,7 +144,6 @@ void TriggerControl::init()
     // Ende Zeitmessung*/
 
 
-
     m_pRTSAInput = PluginInputData<NewRealTimeSampleArray>::create(this, "TriggerControlInII", "TriggerControl input data II");
     connect(m_pRTSAInput.data(), &PluginInputConnector::notify, this, &TriggerControl::updateSingleChannel, Qt::DirectConnection);
     m_inputConnectors.append(m_pRTSAInput);
