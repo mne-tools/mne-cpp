@@ -86,7 +86,7 @@ void BCIFeatureWindow::initGui()
 
 void BCIFeatureWindow::paintFeaturesToScene(MyQList features)
 {
-    std::cout<<"features.size()"<<features.size()<<endl;
+    //std::cout<<"features.size()"<<features.size()<<endl;
     for(int i = 0; i<features.size()-1; i=i+2)
         for(int t = 0; t<features.at(i).second.size(); t++)
         {

@@ -111,6 +111,9 @@ void BCI::init()
 
     // Output
     m_pBCIOutput = PluginOutputData<NewRealTimeSampleArray>::create(this, "ControlSignal", "BCI output data");
+    m_pBCIOutput->data()->setArraySize(1);
+    m_pBCIOutput->data()->setMaxValue(1);
+    m_pBCIOutput->data()->setMinValue(-1);
     m_outputConnectors.append(m_pBCIOutput);
 
     //m_pBCIOutput->data()->setMaxValue();
@@ -220,8 +223,10 @@ bool BCI::stop()
     m_outStreamDebug.close();
     m_outStreamDebug.clear();
 
-    // Delete all features
-    clearFeaturesAndClassifications();
+    // Delete all features and classification results
+    clearFeatures();
+
+    clearClassifications();
 
     return true;
 }
@@ -362,23 +367,32 @@ QPair<int,QList<double>> BCI::applyFeatureCalcConcurrentlyOnSensorLevel(const QP
 
 //*************************************************************************************************************
 
-QPair<int,QList<double>> BCI::applyClassificationCalcConcurrentlyOnSensorLevel(const QPair<int, QList<double>> &chdata)
+double BCI::applyClassificationCalcConcurrentlyOnSensorLevel(QList<double> &featData)
 {
-   QList<double> features;
+   double resultClassification = 0.5;
 
-   return QPair<int,QList<double>>(chdata.first, features);
+   return resultClassification;
 }
 
 
 //*************************************************************************************************************
 
-void BCI::clearFeaturesAndClassifications()
+void BCI::clearFeatures()
 {
     m_qMutex.lock();
         m_lFeaturesSensor.clear();
-        m_lClassResultsSensor.clear();
     m_qMutex.unlock();
 }
+
+
+ //*************************************************************************************************************
+
+ void BCI::clearClassifications()
+ {
+     m_qMutex.lock();
+         m_lClassResultsSensor.clear();
+     m_qMutex.unlock();
+ }
 
 
 //*************************************************************************************************************
@@ -476,41 +490,58 @@ void BCI::run()
                 // Store features
                 m_lFeaturesSensor.append(futureCalculatedFeatures.results());
 
-                // ---------- If enough features (windows) have been calculated (processed) -> classify features ----------
+                // ---------- If enough features (windows) have been calculated (processed) -> classify all features and average result ----------
                 if(m_iNumberOfCalculatedFeatures >= (int)(m_matSlidingWindowSensor.cols()/m_matTimeBetweenWindowsSensor.cols()))
                 {
                     // Display features
                     emit paintFeatures((MyQList)m_lFeaturesSensor);
-                    m_iNumberOfCalculatedFeatures = 0;
 
-                    // ---------- Classify features and store results concurrently using mapped() ----------
                     // Transform m_lFeaturesSensor into an easier file structure
                     QList<QList<double>> lFeaturesSensor_new;
-                    for(int i = 0; i<m_slChosenFeatureSensor.size(); i++)
-                        lFeaturesSensor_new.prepend(QList<double>());
 
-                    for(int i = 0; i<m_lFeaturesSensor.size()-m_slChosenFeatureSensor.size()+1; )
-                    {
-                        for(int t = 0; t<lFeaturesSensor_new.size(); t++)
-                            lFeaturesSensor_new[t].append(m_lFeaturesSensor.at(i+t).second);
+                    for(int i = 0; i<m_lFeaturesSensor.size()-m_slChosenFeatureSensor.size()+1; i = i + m_slChosenFeatureSensor.size()) // iterate over QPair feature List
+                        for(int z = 0; z<m_lFeaturesSensor.at(0).second.size(); z++) // iterate over number of sub signals
+                        {
+                            QList<double> temp;
+                            for(int t = 0; t<m_slChosenFeatureSensor.size(); t++) // iterate over chosen features (electrodes)
+                                temp.append(m_lFeaturesSensor.at(i+t).second.at(z));
+                            lFeaturesSensor_new.append(temp);
+                        }
 
-                        i = i + m_slChosenFeatureSensor.size();
-                    }
+//                    //Check sizes
+//                    cout<<"lFeaturesSensor_new.size()"<<lFeaturesSensor_new.size()<<endl;
+//                    cout<<"lFeaturesSensor_new.at(0).size()"<<lFeaturesSensor_new.at(0).size()<<endl;
+//                    cout<<"m_lFeaturesSensor.size()"<<m_lFeaturesSensor.size()<<endl;
 
-                    std::function<QList<double> (QList<QList<double>>&)> applyOpsClassification = [this](QList<QList<double>>& featData) -> QList<double> {
+                    // ---------- Classify features and store results concurrently using mapped() ----------
+                    std::function<double (QList<double>&)> applyOpsClassification = [this](QList<double>& featData){
                         return applyClassificationCalcConcurrentlyOnSensorLevel(featData);
                     };
 
-                    QFuture<QPair<int,QVector<double>>> futureCalculatedResults = QtConcurrent::mapped(lFeaturesSensor_new.begin(), lFeaturesSensor_new.end(), applyOpsClassification);
+                    QFuture<double> futureClassificationResults = QtConcurrent::mapped(lFeaturesSensor_new.begin(), lFeaturesSensor_new.end(), applyOpsClassification);
 
-                    futureCalculatedResults.waitForFinished();
+                    futureClassificationResults.waitForFinished();
 
-                    // Generate final classification result
+                    // Generate final classification result -> average all classification results
+                    double dfinalResult = 0;
 
-                    // Send result to output stream, i.e. which is connected to the triggerbox
+                    for(int i = 0; i<futureClassificationResults.resultCount() ;i++)
+                        dfinalResult += futureClassificationResults.resultAt(i);
 
-                    // Clear classifications and features vectors
-                    clearFeaturesAndClassifications();
+                    dfinalResult = dfinalResult/futureClassificationResults.resultCount();
+                    //cout << dfinalResult << endl;
+
+                    // Store final result
+                    m_lClassResultsSensor.append(dfinalResult);
+
+                    // Send result to the output stream, i.e. which is connected to the triggerbox
+                    m_pBCIOutput->data()->setValue(dfinalResult);
+
+                    // Clear classifications
+                    clearFeatures();
+
+                    // Reset counter
+                    m_iNumberOfCalculatedFeatures = 0;
                 }
 
                 m_iTBWIndexSensor = 0;

@@ -189,17 +189,24 @@ protected:
     /**
     * Classifies the features on sensor level
     *
-    * @param [in] chdata QPair with number of the row and the data samples as a RowVectorXd.
-    * @param [out] QPair<int,QVector<double>> calculated features.
+    * @param [in] featData QList<double> holds the feature data point (i.e. 2 electrodes make this parameter have size of 2).
+    * @param [out] double calculated classification value.
     */
-    QPair<int,QList<double>> applyClassificationCalcConcurrentlyOnSensorLevel(const QPair<int,QList<double>> &featData);
+    double applyClassificationCalcConcurrentlyOnSensorLevel(QList<double> &featData);
 
     //=========================================================================================================
     /**
-    * Clears features and classifications
+    * Clears features
     *
     */
-    void clearFeaturesAndClassifications();
+    void clearFeatures();
+
+    //=========================================================================================================
+    /**
+    * Clears all classification results
+    *
+    */
+    void clearClassifications();
 
     //=========================================================================================================
     /**
@@ -242,7 +249,7 @@ private:
     QMap<QString, int>      m_mapElectrodePinningScheme;        /**< Sensor level: Loaded pinning scheme of the Duke 128 EEG cap. */
     bool                    m_bFillSensorWindowFirstTime;       /**< Sensor level: Flag if the working matrix m_mSlidingWindowSensor is being filled for the first time. */
     QList<QPair<int,QList<double>>>  m_lFeaturesSensor;         /**< Sensor level: Features calculated on sensor level. */
-    QList<QPair<int,QList<double>>>  m_lClassResultsSensor;     /**< Sensor level: Classification results on sensor level. */
+    QList<double>           m_lClassResultsSensor;              /**< Sensor level: Classification results on sensor level. */
 
     QVector<double>         m_vLoadedSourceBoundary;            /**< Source level: Loaded decision boundary on source level. */
     QStringList             m_slChosenFeatureSource;            /**< Source level: Features used to calculate data points in feature space on source level. */
