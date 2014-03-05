@@ -67,8 +67,9 @@ SOURCES += \
     ioutils.cpp \
     asaelc.cpp \
     parksmcclellan.cpp \
-    filterdata.cpp
-
+    filterdata.cpp \
+    mp\mp.cpp
+	
 HEADERS += \
     kmeans.h\
     utils_global.h \
@@ -76,7 +77,8 @@ HEADERS += \
     ioutils.h \
     asaelc.h \
     parksmcclellan.h \
-    filterdata.h
+    filterdata.h \
+    mp\mp.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
@@ -86,3 +88,5 @@ header_files.files = ./*.h
 header_files.path = $${MNE_INCLUDE_DIR}/utils
 
 INSTALLS += header_files
+
+unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR

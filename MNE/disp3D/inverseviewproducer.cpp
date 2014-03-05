@@ -58,10 +58,11 @@ using namespace DISP3DLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-InverseViewProducer::InverseViewProducer(qint32 p_iFps, bool p_bLoop)
+InverseViewProducer::InverseViewProducer(qint32 p_iFps, bool p_bLoop, bool p_bSlowMotion)
 : m_bIsRunning(false)
 , m_iFps(p_iFps)
 , m_bLoop(p_bLoop)
+, m_bSlowMotion(p_bSlowMotion)
 , m_iT(0)
 , m_iCurSampleStep(0)
 , m_dGlobalMaximum(0)
@@ -93,6 +94,13 @@ void InverseViewProducer::pushSourceEstimate(MNESourceEstimate &p_sourceEstimate
 
         float t_fTstep = p_sourceEstimate.tstep*1000000;
 
+        if(m_bSlowMotion)
+        {
+            m_iFps = 1/p_sourceEstimate.tstep;
+            float t_fT = 1.0 / (float)m_iFps;
+            m_iT = (qint32)(t_fT*1000000);
+        }
+
         //
         // Adapt skip to buffer size
         //
@@ -106,6 +114,7 @@ void InverseViewProducer::pushSourceEstimate(MNESourceEstimate &p_sourceEstimate
             t_iSampleStep *= 4;
         else if(m_vecStcs.size() > t_iBlockSize*2)
             t_iSampleStep *= 2;
+
 
         //
         // Take first or sample skip of previous push into account
@@ -191,6 +200,9 @@ void InverseViewProducer::run()
 
         mutex.unlock();
 
-        usleep(m_iT);
+        if(m_bSlowMotion)
+            msleep(40);
+        else
+            usleep(m_iT);
     }
 }

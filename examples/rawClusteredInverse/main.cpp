@@ -99,12 +99,12 @@ int main(int argc, char *argv[])
 {
     QGuiApplication a(argc, argv);
 
-    QFile t_fileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
-//    QFile t_fileRaw("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw.fif");
+//    QFile t_fileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+    QFile t_fileRaw("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw.fif");
 
     qint32 event = 1;
-    QString t_sEventName = "./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif";
-//    QString t_sEventName = "E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-eve.fif";
+//    QString t_sEventName = "./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif";
+    QString t_sEventName = "E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-eve.fif";
     float tmin = -0.2f;
     float tmax = 0.4f;
 
@@ -367,7 +367,7 @@ int main(int argc, char *argv[])
     // calculate the average
     //
 //    //Option 1
-//    qint32 numAverages = 10;
+//    qint32 numAverages = 99;
 //    VectorXi vecSel(numAverages);
 //    srand (time(NULL)); // initialize random seed
 
@@ -384,7 +384,7 @@ int main(int argc, char *argv[])
 
 //    vecSel << 65, 22, 47, 55, 16, 29, 14, 36, 57, 97, 89, 46, 9, 93, 83, 52, 71, 52, 3, 96;
 
-    //Option 3
+    //Option 3 Newest
     VectorXi vecSel(10);
 
     vecSel << 0, 96, 80, 55, 66, 25, 26, 2, 55, 58, 6, 88;
@@ -406,25 +406,25 @@ int main(int argc, char *argv[])
     //########################################################################################
     // Source Estimate
 
-    QFile t_fileFwd("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
-    QFile t_fileCov("./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
-    QFile t_fileEvoked("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+//    QFile t_fileFwd("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+//    QFile t_fileCov("./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
+//    QFile t_fileEvoked("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
 
 //    QFile t_fileFwd("/home/chdinh/sl_data/MEG/mind006/mind006_051209_auditory01_raw-oct-6p-fwd.fif");
 //    QFile t_fileCov("/home/chdinh/sl_data/MEG/mind006/mind006_051209_auditory01_raw-cov.fif");
 //    QFile t_fileEvoked("/home/chdinh/sl_data/MEG/mind006/mind006_051209_auditory01_raw-ave.fif");
 
 
-//    QFile t_fileFwd("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-oct-6p-fwd.fif");
-//    QFile t_fileCov("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-cov.fif");
+    QFile t_fileFwd("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-oct-6p-fwd.fif");
+    QFile t_fileCov("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-cov.fif");
 //    QFile t_fileEvoked("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-ave.fif");
 
 
-    double snr = 0.1f;//1.0f;//3.0f;//0.1f;//3.0f;
+    double snr = 1.0f;//0.1f;//1.0f;//3.0f;//0.1f;//3.0f;
     QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
 
     QString t_sFileNameClusteredInv("");
-    QString t_sFileNameStc("");
+    QString t_sFileNameStc("mind006_051209_auditory01.stc");
 
     // Parse command line parameters
     for(qint32 i = 0; i < argc; ++i)
@@ -465,9 +465,9 @@ int main(int argc, char *argv[])
     if(t_Fwd.isEmpty())
         return 1;
 
-    AnnotationSet t_annotationSet("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot", "./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot");
+//    AnnotationSet t_annotationSet("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot", "./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot");
 //    AnnotationSet t_annotationSet("/home/chdinh/sl_data/subjects/mind006/label/lh.aparc.a2009s.annot", "/home/chdinh/sl_data/subjects/mind006/label/rh.aparc.a2009s.annot");
-//    AnnotationSet t_annotationSet("E:/Data/sl_data/subjects/mind006/label/lh.aparc.a2009s.annot", "E:/Data/sl_data/subjects/mind006/label/rh.aparc.a2009s.annot");
+    AnnotationSet t_annotationSet("E:/Data/sl_data/subjects/mind006/label/lh.aparc.a2009s.annot", "E:/Data/sl_data/subjects/mind006/label/rh.aparc.a2009s.annot");
 
 
     FiffCov noise_cov(t_fileCov);
@@ -478,7 +478,7 @@ int main(int argc, char *argv[])
     //
     // Cluster forward solution;
     //
-    MNEForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution(t_annotationSet, 20);//40);
+    MNEForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution_ccr(t_annotationSet, 20);//40);
 
     //
     // make an inverse operators
@@ -577,36 +577,31 @@ int main(int argc, char *argv[])
     //Source Estimate end
     //########################################################################################
 
-    AnnotationSet t_annotSet("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot","./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot");
-//    AnnotationSet t_annotSet("/home/chdinh/sl_data/subjects/mind006/label/lh.aparc.a2009s.annot", "/home/chdinh/sl_data/subjects/mind006/label/rh.aparc.a2009s.annot");
-//    AnnotationSet t_annotSet("E:/Data/sl_data/subjects/mind006/label/lh.aparc.a2009s.annot", "E:/Data/sl_data/subjects/mind006/label/rh.aparc.a2009s.annot");
-
-
-
-    SurfaceSet t_surfSet("./MNE-sample-data/subjects/sample/surf/lh.white", "./MNE-sample-data/subjects/sample/surf/rh.white");
+//    SurfaceSet t_surfSet("./MNE-sample-data/subjects/sample/surf/lh.white", "./MNE-sample-data/subjects/sample/surf/rh.white");
 //    SurfaceSet t_surfSet("/home/chdinh/sl_data/subjects/mind006/surf/lh.white", "/home/chdinh/sl_data/subjects/mind006/surf/rh.white");
-//    SurfaceSet t_surfSet("E:/Data/sl_data/subjects/mind006/surf/lh.white", "E:/Data/sl_data/subjects/mind006/surf/rh.white");
+    SurfaceSet t_surfSet("E:/Data/sl_data/subjects/mind006/surf/lh.white", "E:/Data/sl_data/subjects/mind006/surf/rh.white");
 
-    //only one time point - P100
-    qint32 sample = 0;
-    for(qint32 i = 0; i < sourceEstimate.times.size(); ++i)
-    {
-        if(sourceEstimate.times(i) >= 0)
-        {
-            sample = i;
-            break;
-        }
-    }
-    sample += (qint32)ceil(0.106/sourceEstimate.tstep); //100ms
-    sourceEstimate = sourceEstimate.reduce(sample, 1);
+//    //only one time point - P100
+//    qint32 sample = 0;
+//    for(qint32 i = 0; i < sourceEstimate.times.size(); ++i)
+//    {
+//        if(sourceEstimate.times(i) >= 0)
+//        {
+//            sample = i;
+//            break;
+//        }
+//    }
+//    sample += (qint32)ceil(0.106/sourceEstimate.tstep); //100ms
+//    sourceEstimate = sourceEstimate.reduce(sample, 1);
 
     QList<Label> t_qListLabels;
     QList<RowVector4i> t_qListRGBAs;
 
     //ToDo overload toLabels using instead of t_surfSet rr of MNESourceSpace
-    t_annotSet.toLabels(t_surfSet, t_qListLabels, t_qListRGBAs);
+    t_annotationSet.toLabels(t_surfSet, t_qListLabels, t_qListRGBAs);
 
-    InverseView view(minimumNorm.getSourceSpace(), t_qListLabels, t_qListRGBAs);
+    InverseView view(minimumNorm.getSourceSpace(), t_qListLabels, t_qListRGBAs, 24, true, false, false);
+
 
     if (view.stereoType() != QGLView::RedCyanAnaglyph)
         view.camera()->setEyeSeparation(0.3f);

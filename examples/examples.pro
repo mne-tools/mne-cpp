@@ -51,7 +51,8 @@ SUBDIRS += \
     findEvoked \
     evokedGradAmp \
     cancelNoise \
-    fiffIO
+    fiffIO \
+    matchingPursuit
 
 contains(MNECPP_CONFIG, isGui) {
     qtHaveModule(3d) {

@@ -82,9 +82,9 @@ using namespace DISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-InverseView::InverseView(const MNESourceSpace &p_sourceSpace, QList<Label> &p_qListLabels, QList<RowVector4i> &p_qListRGBAs, qint32 p_iFps, bool p_bLoop, bool p_bStereo, QWindow *parent)
+InverseView::InverseView(const MNESourceSpace &p_sourceSpace, QList<Label> &p_qListLabels, QList<RowVector4i> &p_qListRGBAs, qint32 p_iFps, bool p_bLoop, bool p_bStereo, bool p_bSlowMotion, QWindow *parent)
 : QGLView(parent)
-, m_pInverseViewProducer(new InverseViewProducer(p_iFps, p_bLoop))
+, m_pInverseViewProducer(new InverseViewProducer(p_iFps, p_bLoop, p_bSlowMotion))
 , m_sourceSpace(p_sourceSpace)
 , m_qListLabels(p_qListLabels)
 , m_qListRGBAs(p_qListRGBAs)
@@ -430,7 +430,7 @@ void InverseView::updateActivation(QSharedPointer<Eigen::VectorXd> p_pVecActivat
     {
         if(m_pInverseViewProducer->getMaxActivation()[i] != 0)
         {
-            qint32 iVal = (t_curLabelActivation[i]/m_pInverseViewProducer->getGlobalMax()) * 255;//1200;//255;
+            qint32 iVal = (t_curLabelActivation[i]/m_pInverseViewProducer->getGlobalMax()) * 400;//1200;//255;
 
             iVal = iVal > 255 ? 255 : iVal < 0 ? 0 : iVal;
 

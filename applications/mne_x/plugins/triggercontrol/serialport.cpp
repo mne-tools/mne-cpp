@@ -97,6 +97,7 @@ SerialPort::SerialPort()
         m_InActiveDig.replace(i,0);
     }
 
+    m_wiredChannel = 0;
 
     //connect(this->m_qSerialPort, SIGNAL(readyRead()), this, SLOT(SerialPort::readData()));   // if data available, read
     connect(&m_qSerialPort, &QSerialPort::readyRead, this, &SerialPort::readData);
@@ -182,22 +183,22 @@ void SerialPort::decodeana(QByteArray &t_incomingArray)
 
 //*************************************************************************************************************
 
-void SerialPort::decodedig(QByteArray &t_incomingArray)
+void SerialPort::decodedig(QByteArray &p_incomingArray)
 {
-
+    std::cout << "Decodieren Digital" << std::endl;
 
 // decode channel 1-6
 
-    if ((t_incomingArray.at(3)&0x04) == 0x04) m_InActiveDig[0] = 1;              // 0000 0100
+    if ((p_incomingArray.at(3)&0x04) == 0x04) m_InActiveDig[0] = 1;              // 0000 0100
     else m_InActiveDig[0] = 0;
 
-    if ((t_incomingArray.at(3)&0x08) == 0x08) m_InActiveDig[1] = 1;            // 0000 1000
+    if ((p_incomingArray.at(3)&0x08) == 0x08) m_InActiveDig[1] = 1;            // 0000 1000
     else m_InActiveDig[1] = 0;
 
-    if ((t_incomingArray.at(3)&0x10) == 0x10) m_InActiveDig[2] = 1;            // 0001 0000
+    if ((p_incomingArray.at(3)&0x10) == 0x10) m_InActiveDig[2] = 1;            // 0001 0000
     else m_InActiveDig[2] = 0;
 
-    if ((t_incomingArray.at(3)&0x20) == 0x20) m_InActiveDig[3] = 1;            // 0010 0000
+    if ((p_incomingArray.at(3)&0x20) == 0x20) m_InActiveDig[3] = 1;            // 0010 0000
     else m_InActiveDig[3] = 0;
 
 /*
@@ -268,7 +269,7 @@ void SerialPort::decodedig(QByteArray &t_incomingArray)
         std::cout << "Kanal " << i <<": " << m_InActiveDig[i-1] << std::endl;
 
     //ZeitmessungMUC
-    emit byteReceived();
+//    emit byteReceived();
 }
 
 //*************************************************************************************************************
@@ -419,6 +420,8 @@ void SerialPort::encodedig()
         m_data[1] = m_data[1]|0x01;
         m_data[2] = m_data[2]|0x02;
         m_data[3] = m_data[3]|0x03;
+
+
     }
     else if(m_retrievetyp == 1)     // retrieve analog information
     {
@@ -497,7 +500,7 @@ void SerialPort::initPort()
 void SerialPort::readData()
 {
     QByteArray t_incomingArray = m_qSerialPort.readAll();
-
+    std::cout << "incoming data" << std::endl;
 
     if(((t_incomingArray[0]&0x03) == 0x00) && ((t_incomingArray[1]&0x03) == 0x01) && ((t_incomingArray[2]&0x03) == 0x02) && ((t_incomingArray[3]&0x03) == 0x03))
     {

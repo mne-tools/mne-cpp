@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     geometryview.h
+* @file     mp.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -18,7 +18,7 @@
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
 *     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
-* 
+*
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
@@ -29,28 +29,34 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of the GeometryView Class.
+* @brief    MNEMath class declaration.
 *
 */
 
-#ifndef GEOMETRYVIEW_H
-#define GEOMETRYVIEW_H
+#ifndef MNEMATH_H
+#define MNEMATH_H
 
-//*************************************************************************************************************
-//=============================================================================================================
-// INCLUDES
-//=============================================================================================================
-
-#include "disp3D_global.h"
-
+//ToDo move this to the new MNE math library
 
 //*************************************************************************************************************
 //=============================================================================================================
 // MNE INCLUDES
 //=============================================================================================================
 
-#include <fs/annotation.h>
-#include <mne/mne_sourcespace.h>
+#include "../utils_global.h"
+
+#include <iostream>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+#include <Eigen/SparseCore>
+#include <Eigen/Eigen>
+#include <Eigen/SVD>
 
 
 //*************************************************************************************************************
@@ -58,17 +64,17 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include "qglview.h"
-#include <QGeometryData>
-#include <QGLColorMaterial>
+#include <QStringList>
+#include <QVariant>
+#include <QDebug>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE DISP3DLIB
+// DEFINE NAMESPACE UTILSLIB
 //=============================================================================================================
 
-namespace DISP3DLIB
+namespace UTILSLIB
 {
 
 //*************************************************************************************************************
@@ -76,108 +82,38 @@ namespace DISP3DLIB
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
-using namespace FSLIB;
+using namespace Eigen;
 
 
-//QT_BEGIN_NAMESPACE
-//class QGLSceneNode;
-//QT_END_NAMESPACE
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
 
 //=============================================================================================================
 /**
-* stereoscopic 3D geoemtry view
+* ToDo
 *
-* @brief Geometry View
+* @brief ToDo
 */
-class DISP3DSHARED_EXPORT GeometryView : public QGLView
+class UTILSSHARED_EXPORT MP
 {
-    Q_OBJECT
 public:
-
     //=========================================================================================================
     /**
-    * Creates the geometry view.
-    *
-    * @param[in] p_sourceSpace  Source space which contains the geometry information
-    * @param[in] parent         Parent QObject (optional)
+    * Constructs the MP object
     */
-    GeometryView(const MNESourceSpace &p_sourceSpace, QWindow *parent = 0);
+     MP();
 
-    //=========================================================================================================
-    /**
-    * Destroys the geometry view.
-    */
-    ~GeometryView();
-
-protected:
-    //=========================================================================================================
-    /**
-    * Initializes the current GL context represented by painter.
-    *
-    * @param[in] painter    GL painter which should be initialized
-    */
-    void initializeGL(QGLPainter *painter);
-
-    //=========================================================================================================
-    /**
-    * Paints the scene onto painter. The color and depth buffers will have already been cleared, and the camera() position set.
-    *
-    * @param[in] painter    GL painter which is updated
-    */
-    void paintGL(QGLPainter *painter);
-
-    //=========================================================================================================
-    /**
-    * Processes the key press event e.
-    *
-    * @param[in] e      the key press event.
-    */
-    void keyPressEvent(QKeyEvent *e);
-
-    //=========================================================================================================
-    /**
-    * Processes the mouse move event e.
-    *
-    * @param[in] e      the mouse move event.
-    */
-    void mouseMoveEvent(QMouseEvent *e);
-
-    //=========================================================================================================
-    /**
-    * Processes the mouse press event e.
-    *
-    * @param[in] e      the mouse press event.
-    */
-    void mousePressEvent(QMouseEvent *e);
-
-private:
-//    MNEForwardSolution m_forwardSolution;   /**< Holds the forward soultion -> ToDo change this to shraed data pointer */
-
-    QGLLightModel *m_pLightModel;    /**< The selected light model. */
-    QGLLightParameters *m_pLightParametersScene;    /**< The selected light parameters. */
-
-    QGLColorMaterial material;
-
-    QVector<Annotation::SPtr> m_vecAnnotation;
-
-    QVector3D m_vecBoundingBoxMin;                  /**< X, Y, Z minima. */
-    QVector3D m_vecBoundingBoxMax;                  /**< X, Y, Z maxima. */
-    QVector3D m_vecBoundingBoxCenter;               /**< X, Y, Z center. */
-
-    MNESourceSpace m_sourceSpace;           /**< The used source space. */
-
-    bool m_bStereo;
-
-    float m_fOffsetZ;                               /**< Z offset for pop-out effect. */
-    float m_fOffsetZEye;                            /**< Z offset eye. */
-
-    QGLSceneNode *m_pSceneNodeBrain;               /**< Scene node of the hemisphere models. */
-    QGLSceneNode *m_pSceneNode;                    /**< Node of the scene. */
-
-//    QGLCamera *m_pCameraFrontal;     /**< frontal camera. */
 };
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE & TEMPLATE DEFINITIONS
+//=============================================================================================================
+
 
 } // NAMESPACE
 
-#endif // GEOMETRYVIEW_H
+#endif // MP_H

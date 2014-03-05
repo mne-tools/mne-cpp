@@ -173,6 +173,8 @@ bool RapMusic::init(MNEForwardSolution& p_pFwd, bool p_bSparsed, int p_iN, doubl
 
     std::cout << "##### Initialization RAP MUSIC completed ######\n\n\n";
 
+    Q_UNUSED(p_bSparsed);
+
     m_bIsInit = true;
 
     return m_bIsInit;

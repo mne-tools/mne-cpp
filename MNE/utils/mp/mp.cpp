@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
-* @file     triggercontrolsetupwidget.h
-* @author   Tim Kunze <tim.kunze@tu-ilmenau.de>;
-*           Luise Lang <luise.lang@tu-ilmenau.de>;
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
+* @file     mnemath.cpp
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     November, 2013
+* @date     July, 2012
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Tim Kunze, Luise Lang and Christoph Dinh. All rights reserved.
+* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,20 +29,29 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the TriggerControlSetupWidget class.
+* @brief    Implementation of the MNEMath Class.
 *
 */
-
-#ifndef TRIGGERCONTROLSETUPWIDGET_H
-#define TRIGGERCONTROLSETUPWIDGET_H
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_triggercontrolsetup.h"
+#include "mp.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <iostream>
+#include <algorithm>    // std::sort
+#include <vector>       // std::vector
+
+//DEBUG fstream
+//#include <fstream>
 
 
 //*************************************************************************************************************
@@ -51,7 +59,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
+#include <QFile>
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -59,95 +68,15 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE TriggerControlPlugin
-//=============================================================================================================
-
-namespace TriggerControlPlugin
-{
+using namespace UTILSLIB;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-class TriggerControl;
-class SerialPort;
-
-
-//=============================================================================================================
-/**
-* DECLARE CLASS TriggerControlSetupWidget
-*
-* @brief The TriggerControlSetupWidget class provides the TriggerControlToolbox configuration window.
-*/
-class TriggerControlSetupWidget : public QWidget
+MP::MP()
 {
-    Q_OBJECT
 
-    friend class SettingsWidget;
-public:
-    //=========================================================================================================
-    /**
-    * Constructs a TriggerControlSetupWidget which is a child of parent.
-    *
-    * @param [in] toolbox a pointer to the corresponding TriggerControlToolbox.
-    * @param [in] parent pointer to parent widget; If parent is 0, the new TriggerControlSetupWidget becomes a window. If parent is another widget, TriggerControlSetupWidget becomes a child window inside parent. TriggerControlSetupWidget is deleted when its parent is deleted.
-    */
-    TriggerControlSetupWidget(TriggerControl* toolbox, QWidget *parent = 0);
-
-    //=========================================================================================================
-    /**
-    * Destroys the TriggerControlSetupWidget.
-    * All TriggerControlSetupWidget's children are deleted first. The application exits if TriggerControlSetupWidget is the main widget.
-    */
-    ~TriggerControlSetupWidget();
-
-
-private slots:
-    void on_m_qPushButton_Connect_released();
-
-    void on_m_qPushButton_Disconnect_released();
-
-    void on_m_qPushButton_Send_released();
-
-
-    void on_m_qPushButton_Sendanalog_released();
-
-
-
-    void on_m_qPushButton_RetrieveDigitalInfo_released();
-
-
-
-    void on_m_qPushButton_RetrieveAnalogInfo_released();
-
-    void on_m_qPushButton_ConnectChannel_released();
-
-private:
-    //=========================================================================================================
-    /**
-    * Shows the About Dialog
-    *
-    */
-    void showAboutDialog();
-
-
-    //=========================================================================================================
-    /**
-    * Shows the settings widget
-    */
-    void showSettings();
-
-
-    TriggerControl* m_pTriggerControl;
-
-    Ui::TriggerControlSetupWidgetClass ui;       /**< Holds the user interface for the TriggerControlSetupWidget.*/
-};
-
-} // NAMESPACE
-
-#endif // TRIGGERCONTROLSETUPWIDGET_H
+}
