@@ -42,7 +42,7 @@ CONFIG += plugin
 
 DEFINES += BCI_LIBRARY
 
-QT += core widgets
+QT += core widgets concurrent gui
 
 TARGET = bci
 CONFIG(debug, debug|release) {
@@ -52,6 +52,7 @@ CONFIG(debug, debug|release) {
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
+            -lMNE$${MNE_LIB_VERSION}Utilsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lxMeasd \
             -lxDispd \
@@ -59,6 +60,7 @@ CONFIG(debug, debug|release) {
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
+            -lMNE$${MNE_LIB_VERSION}Utils \
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lxMeas \
             -lxDisp \
@@ -70,17 +72,20 @@ DESTDIR = $${MNE_BINARY_DIR}/mne_x_plugins
 SOURCES += \
         bci.cpp \
         FormFiles/bcisetupwidget.cpp \
-        FormFiles/bciaboutwidget.cpp 
+        FormFiles/bciaboutwidget.cpp \ 
+        FormFiles/bcifeaturewindow.cpp
 
 HEADERS += \
         bci.h\
         bci_global.h \
         FormFiles/bcisetupwidget.h \
-        FormFiles/bciaboutwidget.h 
+        FormFiles/bciaboutwidget.h \  
+        FormFiles/bcifeaturewindow.h
 
 FORMS += \
         FormFiles/bcisetup.ui \
-        FormFiles/bciabout.ui
+        FormFiles/bciabout.ui \
+    FormFiles/bcifeaturewindow.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
