@@ -99,6 +99,7 @@ QSharedPointer<IPlugin> BCI::clone() const
 void BCI::init()
 {
     m_bIsRunning = false;
+    m_bTriggerActivated = false;
 
     // Inputs - Source estimates and sensor level
     m_pRTSEInput = PluginInputData<RealTimeSourceEstimate>::create(this, "BCIInSource", "BCI source input data");
@@ -134,7 +135,7 @@ void BCI::init()
     m_dSlidingWindowSize = 1.0;
     m_dTimeBetweenWindows = 0.04;
     m_iNumberSubSignals = 1;
-    m_dThresholdValue = 10;
+    m_dThresholdValue = 25;
     m_sSensorBoundaryPath = m_qStringResourcePath;
     m_sSourceBoundaryPath = m_qStringResourcePath;
 
@@ -174,12 +175,15 @@ bool BCI::start()
     // Do not start BCI if the number of chosen electrodes/features is uneven
     if(m_slChosenFeatureSensor.size()%2 != 0)
     {
-        QMessageBox msgBox;
-        msgBox.setText("The number of selected electrodes needs to be even.");
-        msgBox.setInformativeText("Please select feautres again");
-        msgBox.setStandardButtons(QMessageBox::Ok);
-        msgBox.exec();
-        return false;
+        if(!m_slChosenFeatureSensor.contains("TEST"))
+        {
+            QMessageBox msgBox;
+            msgBox.setText("The number of selected electrodes needs to be even.");
+            msgBox.setInformativeText("Please select feautres again");
+            msgBox.setStandardButtons(QMessageBox::Ok);
+            msgBox.exec();
+            return false;
+        }
     }
 
     // BCIFeatureWindow show and init
@@ -220,6 +224,9 @@ bool BCI::stop()
 
     // Stop filling buffers with data from the inputs
     m_bProcessData = false;
+
+    // Reset trigger
+    m_bTriggerActivated = false;
 
     // Clear stream
     m_outStreamDebug.close();
@@ -325,6 +332,11 @@ void BCI::updateSensor(XMEASLIB::NewMeasurement::SPtr pMeasurement)
                 t_mat.col(i) = pRTMSA->getMultiSampleArray()[i];
 
             m_pBCIBuffer_Sensor->push(&t_mat);
+
+            // Check if capacitive trigger signal was received - Note that there can also be "beep" triggers in the received data, hwich are only 1 sample wide -> therefore look for 2 samples with the value 254
+            for(int i = 0; i<t_mat.cols()-1; i++)
+                if(t_mat(t_mat.rows()-2,i) == 254 && t_mat(t_mat.rows()-2,i+1) == 254 && m_bTriggerActivated == false) // t_mat(t_mat.rows()-2,i) - corresponds with channel 136 which is the trigger channel
+                    m_bTriggerActivated = true;
         }
     }
 }
@@ -404,14 +416,36 @@ void BCI::clearFeatures()
 }
 
 
- //*************************************************************************************************************
+//*************************************************************************************************************
 
- void BCI::clearClassifications()
- {
-     m_qMutex.lock();
-         m_lClassResultsSensor.clear();
-     m_qMutex.unlock();
- }
+void BCI::clearClassifications()
+{
+    m_qMutex.lock();
+        m_lClassResultsSensor.clear();
+    m_qMutex.unlock();
+}
+
+
+//*************************************************************************************************************
+
+bool BCI::hasThresholdArtefact(const MatrixXd &data)
+{
+    // Perform simple threshold artefact reduction
+    double max = 0;
+    double min = 0;
+
+    // find min max in current m_matSlidingWindowSensor/qlMatrixRows after mean was subtracted
+    max = data.maxCoeff();
+    min = data.minCoeff();
+
+//    cout<<"max: "<<max<<endl;
+//    cout<<"min: "<<min<<endl;
+
+    if(max<m_dThresholdValue*1e-06 && min>m_dThresholdValue*-1e-06) // If max is outside the threshold -> completley discard m_matSlidingWindowSensor
+        return false;
+    else
+        return true;
+}
 
 
 //*************************************************************************************************************
@@ -435,10 +469,25 @@ void BCI::run()
                 MatrixXd t_mat = m_pBCIBuffer_Sensor->pop();
 
                 // Get only the rows from the matrix which correspond with the selected features, namely electrodes on sensor level and destrieux clustered regions on source level
+                bool rejectTrial = false;
                 for(int i = 0; i < m_matSlidingWindowSensor.rows(); i++)
-                    m_matSlidingWindowSensor.block(i, m_iTBWIndexSensor, 1, t_mat.cols()) = t_mat.block(m_mapElectrodePinningScheme[m_slChosenFeatureSensor.at(i)], 0, 1, t_mat.cols());
+                {
+                    MatrixXd tempData = t_mat.block(m_mapElectrodePinningScheme[m_slChosenFeatureSensor.at(i)], 0, 1, t_mat.cols());
 
-                m_iTBWIndexSensor = m_iTBWIndexSensor + t_mat.cols();
+                    // Check for artifacts in selected channels
+                    if(m_bUseArtefactThresholdReduction)
+                    {
+                        if(hasThresholdArtefact(tempData) == false)
+                            m_matSlidingWindowSensor.block(i, m_iTBWIndexSensor, 1, t_mat.cols()) = tempData;
+                        else
+                            rejectTrial = true;
+                    }
+                    else
+                        m_matSlidingWindowSensor.block(i, m_iTBWIndexSensor, 1, t_mat.cols()) = tempData;
+                }
+
+                if(rejectTrial == false)
+                    m_iTBWIndexSensor = m_iTBWIndexSensor + t_mat.cols();
             }
             else // m_matSlidingWindowSensor is full for the first time
             {
@@ -453,142 +502,167 @@ void BCI::run()
                 MatrixXd t_mat = m_pBCIBuffer_Sensor->pop();
 
                 // Get only the rows from the matrix which correspond with the selected features, namely electrodes on sensor level and destrieux clustered regions on source level
+                bool rejectTrial = false;
                 for(int i = 0; i < m_matTimeBetweenWindowsSensor.rows(); i++)
-                    m_matTimeBetweenWindowsSensor.block(i, m_iTBWIndexSensor, 1, t_mat.cols()) = t_mat.block(m_mapElectrodePinningScheme[m_slChosenFeatureSensor.at(i)], 0, 1, t_mat.cols());
+                {
+                    MatrixXd tempData = t_mat.block(m_mapElectrodePinningScheme[m_slChosenFeatureSensor.at(i)], 0, 1, t_mat.cols());
 
-                m_iTBWIndexSensor = m_iTBWIndexSensor + t_mat.cols();
+                    // Check for artifacts in selected channels
+                    if(m_bUseArtefactThresholdReduction)
+                    {
+                        if(hasThresholdArtefact(tempData) == false)
+                            m_matTimeBetweenWindowsSensor.block(i, m_iTBWIndexSensor, 1, t_mat.cols()) = tempData;
+                        else
+                            rejectTrial = true;
+                    }
+                    else
+                        m_matTimeBetweenWindowsSensor.block(i, m_iTBWIndexSensor, 1, t_mat.cols()) = tempData;
+                }
+
+                if(rejectTrial == false)
+                    m_iTBWIndexSensor = m_iTBWIndexSensor + t_mat.cols();
             }
             else // Recalculate m_matSlidingWindowSensor -> Calculate features, classify and store results
             {
-                // Recalculate m_matSlidingWindowSensor -> Delete same block size of data from the right -> use eval() to resolve Eigens aliasing problem
+                // ----1---- Recalculate m_matSlidingWindowSensor
+                //cout<<"----1----"<<endl;
+                //Delete same block size of data from the right -> use eval() to resolve Eigens aliasing problem
                 m_matSlidingWindowSensor.block(0, 0, m_matSlidingWindowSensor.rows(), m_matSlidingWindowSensor.cols()-m_matTimeBetweenWindowsSensor.cols()) = m_matSlidingWindowSensor.block(0, m_matTimeBetweenWindowsSensor.cols(), m_matSlidingWindowSensor.rows(), m_matSlidingWindowSensor.cols()-m_matTimeBetweenWindowsSensor.cols()).eval();
 
-                // Recalculate m_matSlidingWindowSensor -> push m_matTimeBetweenWindowsSensor from the left
+                // push m_matTimeBetweenWindowsSensor from the left
                 m_matSlidingWindowSensor.block(0, m_matSlidingWindowSensor.cols()-m_matTimeBetweenWindowsSensor.cols(), m_matTimeBetweenWindowsSensor.rows(), m_matTimeBetweenWindowsSensor.cols()) = m_matTimeBetweenWindowsSensor;
 
-//                // Test if data is correctly streamed to this plugin
-//                cout<<"Recalculate matrix"<<endl;
-//                for(int i = 1; i<m_matSlidingWindowSensor.cols() ; i++)
-//                {
-//                    if(m_matSlidingWindowSensor(2,i) - m_matSlidingWindowSensor(2,i-1) != 1)
-//                        cout<<"Sequence error while streaming from tmsi plugin at position: "<<i<<endl;
-//                }
-
-                // ---------- Perform simple threshold artefact reduction ----------
-                double max = 0;
-                if(m_bUseArtefactThresholdReduction)
-                    max = m_matSlidingWindowSensor.maxCoeff();
-
-                cout<<max<<endl;
-
-                if(max<m_dThresholdValue*1e-06 && max>m_dThresholdValue*-1e-06) // If max is outside the threshold -> completley discard m_matSlidingWindowSensor
+                // Test if data is correctly streamed to this plugin
+                if(m_slChosenFeatureSensor.contains("TEST"))
                 {
-                    // ---------- Subtract mean in m_matSlidingWindowSensor concurrently using map() ----------
-                    QList<QPair<int,RowVectorXd>> matrixRows;
-                    for(int i = 0; i< m_matSlidingWindowSensor.rows(); i++)
-                        matrixRows << QPair<int,RowVectorXd>(i, m_matSlidingWindowSensor.row(i));
-
-                    if(m_bSubtractMean)
+                    cout<<"Recalculate matrix"<<endl;
+                    for(int i = 1; i<m_matSlidingWindowSensor.cols() ; i++)
                     {
-                        QFuture<void> futureMean = QtConcurrent::map(matrixRows,[this](QPair<int,RowVectorXd>& rowdata) {
-                            applyMeanCorrectionConcurrently(rowdata);
-                        });
-
-                        futureMean.waitForFinished();
-                    }
-
-                    // ---------- Filter data in m_matSlidingWindowSensor concurrently using map() ----------
-                    QList<QPair<int,RowVectorXd>> filteredRows = matrixRows;
-
-                    if(m_bUseFilter)
-                    {
-                        QFuture<void> futureFilter = QtConcurrent::map(filteredRows,[this](QPair<int,RowVectorXd>& chdata) {
-                            applyFilterOperatorConcurrently(chdata);
-                        });
-
-                        futureFilter.waitForFinished();
-                    }
-
-    //                for(int i=0; i<m_matSlidingWindowSensor.rows(); i++)
-    //                    m_outStreamDebug << "m_matSlidingWindowSensor at row " << i << ": " << m_matSlidingWindowSensor.row(i) << "\n";
-
-    //                m_outStreamDebug<<endl;
-
-    //                for(int i=0; i<filteredRows.size(); i++)
-    //                    m_outStreamDebug << "filteredRows at row " << i << ": " << filteredRows.at(i).second << "\n";
-
-    //                m_outStreamDebug << endl << "---------------------------------------------------------" << endl << endl;
-
-                    // ---------- Calculate features concurrently using mapped() ----------
-                    std::function<QPair<int,QList<double>> (QPair<int,RowVectorXd>&)> applyOpsFeatures = [this](QPair<int,RowVectorXd>& chdata) -> QPair<int,QList<double>> {
-                        return applyFeatureCalcConcurrentlyOnSensorLevel(chdata);
-                    };
-
-                    QFuture<QPair<int,QList<double>>> futureCalculatedFeatures = QtConcurrent::mapped(filteredRows.begin(), filteredRows.end(), applyOpsFeatures);
-
-                    futureCalculatedFeatures.waitForFinished();
-
-                    m_iNumberOfCalculatedFeatures++;
-
-                    // Store features
-                    m_lFeaturesSensor.append(futureCalculatedFeatures.results());
-
-                    // ---------- If enough features (windows) have been calculated (processed) -> classify all features and average result ----------
-                    if(m_iNumberOfCalculatedFeatures >= (int)(m_matSlidingWindowSensor.cols()/m_matTimeBetweenWindowsSensor.cols()))
-                    {
-                        // Transform m_lFeaturesSensor into an easier file structure
-                        QList<QList<double>> lFeaturesSensor_new;
-
-                        for(int i = 0; i<m_lFeaturesSensor.size()-m_slChosenFeatureSensor.size()+1; i = i + m_slChosenFeatureSensor.size()) // iterate over QPair feature List
-                            for(int z = 0; z<m_lFeaturesSensor.at(0).second.size(); z++) // iterate over number of sub signals
-                            {
-                                QList<double> temp;
-                                for(int t = 0; t<m_slChosenFeatureSensor.size(); t++) // iterate over chosen features (electrodes)
-                                    temp.append(m_lFeaturesSensor.at(i+t).second.at(z));
-                                lFeaturesSensor_new.append(temp);
-                            }
-
-    //                    //Check sizes
-    //                    cout<<"lFeaturesSensor_new.size()"<<lFeaturesSensor_new.size()<<endl;
-    //                    cout<<"lFeaturesSensor_new.at(0).size()"<<lFeaturesSensor_new.at(0).size()<<endl;
-    //                    cout<<"m_lFeaturesSensor.size()"<<m_lFeaturesSensor.size()<<endl;
-
-                        // Display features
-                        emit paintFeatures((MyQList)lFeaturesSensor_new);
-
-                        // ---------- Classify features and store results concurrently using mapped() ----------
-                        std::function<double (QList<double>&)> applyOpsClassification = [this](QList<double>& featData){
-                            return applyClassificationCalcConcurrentlyOnSensorLevel(featData);
-                        };
-
-                        QFuture<double> futureClassificationResults = QtConcurrent::mapped(lFeaturesSensor_new.begin(), lFeaturesSensor_new.end(), applyOpsClassification);
-
-                        futureClassificationResults.waitForFinished();
-
-                        // Generate final classification result -> average all classification results
-                        double dfinalResult = 0;
-
-                        for(int i = 0; i<futureClassificationResults.resultCount() ;i++)
-                            dfinalResult += futureClassificationResults.resultAt(i);
-
-                        dfinalResult = dfinalResult/futureClassificationResults.resultCount();
-                        //cout << dfinalResult << endl;
-
-                        // Store final result
-                        m_lClassResultsSensor.append(dfinalResult);
-
-                        // Send result to the output stream, i.e. which is connected to the triggerbox
-                        m_pBCIOutput->data()->setValue(dfinalResult);
-
-                        // Clear classifications
-                        clearFeatures();
-
-                        // Reset counter
-                        m_iNumberOfCalculatedFeatures = 0;
+                        if(m_matSlidingWindowSensor(m_matSlidingWindowSensor.rows()-1,i) - m_matSlidingWindowSensor(m_matSlidingWindowSensor.rows()-1,i-1) != 1)
+                            cout<<"Sequence error while streaming from tmsi plugin at position: "<<i<<endl;
                     }
                 }
-                else
-                    cout<<"Rejected artefact!"<<endl;
+
+                // ----2---- Transform matrix into QList structure, so that QTConurrent can handle it properly
+                //cout<<"----2----"<<endl;
+                QList<QPair<int,RowVectorXd>> qlMatrixRows;
+                for(int i = 0; i< m_matSlidingWindowSensor.rows(); i++)
+                    qlMatrixRows << QPair<int,RowVectorXd>(i, m_matSlidingWindowSensor.row(i));
+
+                int iNumberOfFeatures = qlMatrixRows.size();
+
+                // ----3---- Subtract mean in m_matSlidingWindowSensor concurrently using map()
+                //cout<<"----3----"<<endl;
+                if(m_bSubtractMean)
+                {
+                    QFuture<void> futureMean = QtConcurrent::map(qlMatrixRows,[this](QPair<int,RowVectorXd>& rowdata) {
+                        applyMeanCorrectionConcurrently(rowdata);
+                    });
+
+                    futureMean.waitForFinished();
+                }
+
+                // ----4---- Filter data in m_matSlidingWindowSensor concurrently using map()
+                //cout<<"----4----"<<endl;
+                QList<QPair<int,RowVectorXd>> filteredRows = qlMatrixRows;
+
+                if(m_bUseFilter)
+                {
+                    QFuture<void> futureFilter = QtConcurrent::map(filteredRows,[this](QPair<int,RowVectorXd>& chdata) {
+                        applyFilterOperatorConcurrently(chdata);
+                    });
+
+                    futureFilter.waitForFinished();
+                }
+
+//                for(int i=0; i<m_matSlidingWindowSensor.rows(); i++)
+//                    m_outStreamDebug << "m_matSlidingWindowSensor at row " << i << ": " << m_matSlidingWindowSensor.row(i) << "\n";
+
+//                m_outStreamDebug<<endl;
+
+//                for(int i=0; i<filteredRows.size(); i++)
+//                    m_outStreamDebug << "filteredRows at row " << i << ": " << filteredRows.at(i).second << "\n";
+
+//                m_outStreamDebug << endl << "---------------------------------------------------------" << endl << endl;
+
+                // ----5---- Calculate features concurrently using mapped()
+                //cout<<"----5----"<<endl;
+                std::function<QPair<int,QList<double>> (QPair<int,RowVectorXd>&)> applyOpsFeatures = [this](QPair<int,RowVectorXd>& chdata) -> QPair<int,QList<double>> {
+                    return applyFeatureCalcConcurrentlyOnSensorLevel(chdata);
+                };
+
+                QFuture<QPair<int,QList<double>>> futureCalculatedFeatures = QtConcurrent::mapped(filteredRows.begin(), filteredRows.end(), applyOpsFeatures);
+
+                futureCalculatedFeatures.waitForFinished();
+
+                m_iNumberOfCalculatedFeatures++;
+
+                // ----6---- Store features
+                //cout<<"----6----"<<endl;
+                m_lFeaturesSensor.append(futureCalculatedFeatures.results());
+
+                // ----7---- If enough features (windows) have been calculated (processed) -> classify all features and average result ----------
+                //cout<<"----7----"<<endl;
+                if(m_iNumberOfCalculatedFeatures >= (int)(m_matSlidingWindowSensor.cols()/m_matTimeBetweenWindowsSensor.cols()))
+                {
+                    // Transform m_lFeaturesSensor into an easier file structure
+                    QList<QList<double>> lFeaturesSensor_new;
+
+                    for(int i = 0; i<m_lFeaturesSensor.size()-iNumberOfFeatures+1; i = i + iNumberOfFeatures) // iterate over QPair feature List
+                        for(int z = 0; z<m_lFeaturesSensor.at(0).second.size(); z++) // iterate over number of sub signals
+                        {
+                            QList<double> temp;
+                            for(int t = 0; t<iNumberOfFeatures; t++) // iterate over chosen features (electrodes)
+                                temp.append(m_lFeaturesSensor.at(i+t).second.at(z));
+                            lFeaturesSensor_new.append(temp);
+                        }
+
+//                    //Check sizes
+//                    cout<<"lFeaturesSensor_new.size()"<<lFeaturesSensor_new.size()<<endl;
+//                    cout<<"lFeaturesSensor_new.at(0).size()"<<lFeaturesSensor_new.at(0).size()<<endl;
+//                    cout<<"m_lFeaturesSensor.size()"<<m_lFeaturesSensor.size()<<endl;
+
+                    // Display features
+                    if(m_bTriggerActivated)
+                        cout<<"Trigger activated"<<endl;
+
+                    emit paintFeatures((MyQList)lFeaturesSensor_new, m_bTriggerActivated);
+                    m_bTriggerActivated = false; // reset trigger
+
+                    // ----8---- Classify features concurrently using mapped() ----------
+                    //cout<<"----8----"<<endl;
+                    std::function<double (QList<double>&)> applyOpsClassification = [this](QList<double>& featData){
+                        return applyClassificationCalcConcurrentlyOnSensorLevel(featData);
+                    };
+
+                    QFuture<double> futureClassificationResults = QtConcurrent::mapped(lFeaturesSensor_new.begin(), lFeaturesSensor_new.end(), applyOpsClassification);
+
+                    futureClassificationResults.waitForFinished();
+
+                    // ----9---- Generate final classification result -> average all classification results
+                    //cout<<"----9----"<<endl;
+                    double dfinalResult = 0;
+
+                    for(int i = 0; i<futureClassificationResults.resultCount() ;i++)
+                        dfinalResult += futureClassificationResults.resultAt(i);
+
+                    dfinalResult = dfinalResult/futureClassificationResults.resultCount();
+                    //cout << dfinalResult << endl;
+
+                    // ----10---- Store final result
+                    //cout<<"----10----"<<endl;
+                    m_lClassResultsSensor.append(dfinalResult);
+
+                    // ----11---- Send result to the output stream, i.e. which is connected to the triggerbox
+                    //cout<<"----11----"<<endl;
+                    m_pBCIOutput->data()->setValue(dfinalResult);
+
+                    // Clear classifications
+                    clearFeatures();
+
+                    // Reset counter
+                    m_iNumberOfCalculatedFeatures = 0;
+                }
 
                 m_iTBWIndexSensor = 0;
             }

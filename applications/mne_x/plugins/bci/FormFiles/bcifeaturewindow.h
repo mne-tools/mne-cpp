@@ -110,7 +110,7 @@ public:
     void initGui();
 
 protected:
-    void paintFeaturesToScene(MyQList features);
+    void paintFeaturesToScene(MyQList features, bool bTriggerActivated);
 
     BCI*                        m_pBCI;         /**< a pointer to corresponding BCI.*/
     QGraphicsScene              m_scene;        /**< QGraphicsScene used to add the features.*/
