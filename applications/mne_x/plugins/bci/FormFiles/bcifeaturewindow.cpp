@@ -99,6 +99,10 @@ void BCIFeatureWindow::paintFeaturesToScene(MyQList features, bool bTriggerActiv
         // Add items
         int lineSize = 500;
         m_scene.addLine(0,0,lineSize,lineSize);
+        QGraphicsTextItem* leftElectrode = m_scene.addText(m_pBCI->m_slChosenFeatureSensor.at(0));
+        leftElectrode->setPos(QPointF(lineSize/2, 10));
+        QGraphicsTextItem* rightElectrode = m_scene.addText(m_pBCI->m_slChosenFeatureSensor.at(1));
+        rightElectrode->setPos(QPointF(10,lineSize/2));
 
         for(int i = 0; i<features.size(); i++)
         {
@@ -114,7 +118,8 @@ void BCIFeatureWindow::paintFeaturesToScene(MyQList features, bool bTriggerActiv
             QRectF rect(featureA*(lineSize/m_dFeatureMax), featureB*(lineSize/m_dFeatureMax), 2, 2);
 //            std::cout<<"Scaled: "<< featureA*(lineSize/m_dFeatureMax) <<" "<< featureB*(lineSize/m_dFeatureMax) << endl;
 //            std::cout<<"Unscaled: "<< featureA <<" "<< featureB << endl;
-            if(featureA != featureA && featureB != featureB)
+            // If NAN -> don't plot features -> case when working with the Refa device without any channels connected
+            if(featureA == featureA && featureB == featureB)
                 m_scene.addEllipse(rect);
         }
 

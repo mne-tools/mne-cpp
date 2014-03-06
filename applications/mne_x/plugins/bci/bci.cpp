@@ -333,11 +333,6 @@ void BCI::updateSensor(XMEASLIB::NewMeasurement::SPtr pMeasurement)
             for(unsigned char i = 0; i < pRTMSA->getMultiArraySize(); ++i)
                 t_mat.col(i) = pRTMSA->getMultiSampleArray()[i];
 
-            // Check if capacitive trigger signal was received - Note that there can also be "beep" triggers in the received data, hwich are only 1 sample wide -> therefore look for 2 samples with the value 254
-            for(int i = 0; i<t_mat.cols()-1; i++)
-                if(t_mat(t_mat.rows()-2,i) == 254 && t_mat(t_mat.rows()-2,i+1) == 254 && m_bTriggerActivated == false) // t_mat(t_mat.rows()-2,i) - corresponds with channel 136 which is the trigger channel
-                    m_bTriggerActivated = true;
-
             // Check for artefacts
             bool rejectTrial = false;
             if(m_bUseArtefactThresholdReduction)
@@ -347,7 +342,7 @@ void BCI::updateSensor(XMEASLIB::NewMeasurement::SPtr pMeasurement)
                 {
                     MatrixXd tempData = t_mat.row(m_mapElectrodePinningScheme[m_slChosenFeatureSensor.at(i)]);
 
-                    if(hasThresholdArtefact(tempData))
+                    if(hasThresholdArtefact(tempData.array()-tempData.mean()))
                     {
                         cout<<"Reject trial"<<endl;
                         rejectTrial = true;
@@ -356,7 +351,19 @@ void BCI::updateSensor(XMEASLIB::NewMeasurement::SPtr pMeasurement)
             }
 
             if(rejectTrial == false)
+            {
+                // Check if capacitive touch trigger signal was received - Note that there can also be "beep" triggers in the received data, which are only 1 sample wide -> therefore look for 2 samples with a value of 254 each
+                for(int i = 0; i<t_mat.cols()-1; i++)
+                {
+                    if(t_mat(t_mat.rows()-2,i) == 254 && t_mat(t_mat.rows()-2,i+1) == 254 && m_bTriggerActivated == false) // t_mat(t_mat.rows()-2,i) - corresponds with channel 136 which is the trigger channel
+                    {
+                        m_bTriggerActivated = true;
+                        i = t_mat.cols(); // abort for statement if capacitive touch trigger was found
+                    }
+                }
+
                 m_pBCIBuffer_Sensor->push(&t_mat);
+            }
         }
     }
 }
@@ -613,9 +620,6 @@ void BCI::run()
 //                    cout<<"m_lFeaturesSensor.size()"<<m_lFeaturesSensor.size()<<endl;
 
                     // Display features
-                    if(m_bTriggerActivated)
-                        cout<<"Trigger activated"<<endl;
-
                     emit paintFeatures((MyQList)lFeaturesSensor_new, m_bTriggerActivated);
                     m_bTriggerActivated = false; // reset trigger
 
