@@ -117,6 +117,7 @@ void BCIFeatureWindow::paintFeaturesToScene(MyQList features, bool bTriggerActiv
             if(featureA != featureA && featureB != featureB)
                 m_scene.addEllipse(rect);
         }
+
         ui.m_graphicsView_featureVisualization->fitInView(m_scene.sceneRect());
     }
 }
