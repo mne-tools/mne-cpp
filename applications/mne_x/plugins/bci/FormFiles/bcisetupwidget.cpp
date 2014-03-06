@@ -256,7 +256,7 @@ void BCISetupWidget::initSelectedFeaturesSensor()
         QStringList list_temp = line.split(QRegExp("\\s+"));
 
         if(list_temp.size() >= 2)
-            mapElectrodePinningScheme.insert(list_temp.at(1), list_temp.at(0).toInt()-1); // Decrement 1 because channels in matrix start with 0
+            mapElectrodePinningScheme.insert(list_temp.at(1), list_temp.at(0).toInt()-1); // Decrement by 1 because channels in matrix start with 0
 
         m_vAvailableFeaturesSensor.append(list_temp.at(1));
     }

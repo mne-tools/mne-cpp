@@ -57,6 +57,8 @@ BCIFeatureWindow::BCIFeatureWindow(BCI* pBCI, QWidget *parent)
 
     qRegisterMetaType<MyQList>("MyQList");
 
+    ui.m_graphicsView_featureVisualization->setScene(&m_scene);
+
     connect(m_pBCI, &BCI::paintFeatures,
             this, &BCIFeatureWindow::paintFeaturesToScene);
 }
@@ -74,19 +76,27 @@ BCIFeatureWindow::~BCIFeatureWindow()
 void BCIFeatureWindow::initGui()
 {
     m_scene.clear();
-    ui.m_graphicsView_featureVisualization->setScene(&m_scene);
+
     m_dFeatureMax = 0;
 }
 
 
 //*************************************************************************************************************
 
-void BCIFeatureWindow::paintFeaturesToScene(MyQList features)
+void BCIFeatureWindow::paintFeaturesToScene(MyQList features, bool bTriggerActivated)
 {
     //std::cout<<"features.size()"<<features.size()<<endl;
     if(features.first().size() == 2) // Only plot when 2D case with two electrodes
     {
         m_scene.clear();
+
+        // If trigger was activated during feature calculation -> change scenes brush color
+        if(bTriggerActivated)
+            m_scene.setBackgroundBrush(Qt::blue);
+        else
+            m_scene.setBackgroundBrush(Qt::white);
+
+        // Add items
         int lineSize = 500;
         m_scene.addLine(0,0,lineSize,lineSize);
 
@@ -102,9 +112,10 @@ void BCIFeatureWindow::paintFeaturesToScene(MyQList features)
                 m_dFeatureMax = featureB;
 
             QRectF rect(featureA*(lineSize/m_dFeatureMax), featureB*(lineSize/m_dFeatureMax), 2, 2);
-//            std::cout<<"Scaled: "<< featureA*(300/m_dFeatureMax) <<" "<< featureB*(300/m_dFeatureMax) << endl;
+//            std::cout<<"Scaled: "<< featureA*(lineSize/m_dFeatureMax) <<" "<< featureB*(lineSize/m_dFeatureMax) << endl;
 //            std::cout<<"Unscaled: "<< featureA <<" "<< featureB << endl;
-            m_scene.addEllipse(rect);
+            if(featureA != featureA && featureB != featureB)
+                m_scene.addEllipse(rect);
         }
         ui.m_graphicsView_featureVisualization->fitInView(m_scene.sceneRect());
     }

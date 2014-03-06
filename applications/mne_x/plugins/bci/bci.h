@@ -189,7 +189,7 @@ protected:
     * Calculates the features on sensor level
     *
     * @param [in] chdata QPair with number of the row and the data samples as a RowVectorXd.
-    * @param [out] QPair<int,QVector<double>> calculated features.
+    * @param [out] QPair<int,QList<double>> calculated features.
     */
     QPair<int,QList<double>> applyFeatureCalcConcurrentlyOnSensorLevel(const QPair<int,RowVectorXd> &chdata);
 
@@ -218,6 +218,13 @@ protected:
 
     //=========================================================================================================
     /**
+    * Check for artefact in data
+    *
+    */
+    bool hasThresholdArtefact(const MatrixXd& data);
+
+    //=========================================================================================================
+    /**
     * The starting point for the thread. After calling start(), the newly created thread calls this function.
     * Returning from this method will end the execution of the thread.
     * Pure virtual method inherited by QThread.
@@ -225,7 +232,7 @@ protected:
     virtual void run();
 
 signals:
-    void paintFeatures(MyQList features);
+    void paintFeatures(MyQList features, bool bTrigerActivated);
 
 private:
     PluginOutputData<NewRealTimeSampleArray>::SPtr      m_pBCIOutput;           /**< The RealTimeSampleArray of the BCI output.*/
@@ -244,6 +251,7 @@ private:
 
     bool                    m_bIsRunning;                       /**< Whether BCI is running.*/
     bool                    m_bProcessData;                     /**< Whether BCI is to get data out of the continous input data stream, i.e. the EEG data from sensor level.*/
+    bool                    m_bTriggerActivated;                /**< Whether the trigger was activated.*/
     QString                 m_qStringResourcePath;              /**< The path to the BCI resource directory.*/
     QMutex                  m_qMutex;                           /**< QMutex to guarantee thread safety.*/
 

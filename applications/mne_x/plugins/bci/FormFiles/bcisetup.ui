@@ -498,7 +498,7 @@
         <item row="3" column="0">
          <widget class="QLabel" name="m_label_Threshold">
           <property name="text">
-           <string>Threshold:</string>
+           <string>Threshold (micro V):</string>
           </property>
          </widget>
         </item>
