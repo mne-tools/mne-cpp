@@ -317,7 +317,9 @@ void BCISetupWidget::showAboutDialog()
 bool BCISetupWidget::eventFilter(QObject *object, QEvent *event)
 {
      if ((object == ui.m_listWidget_ChosenFeaturesOnSensorLevel ||
-          object == ui.m_listWidget_ChosenFeaturesOnSourceLevel) && event->type() == QEvent::Leave)
+          object == ui.m_listWidget_ChosenFeaturesOnSourceLevel ||
+          object == ui.m_listWidget_AvailableFeaturesOnSensorLevel ||
+          object == ui.m_listWidget_AvailableFeaturesOnSourceLevel) && event->type() == QEvent::Leave)
          setFeatureSelection();
 
      return QObject::eventFilter(object, event);;

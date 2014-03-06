@@ -141,7 +141,6 @@ void BCI::init()
 
     // Intitalise feature selection
     m_slChosenFeatureSensor << "LA4" << "RA4"; //<< "TEST";
-    m_iNumberOfCalculatedFeatures = 0;
 
     // Initialise boundaries with linear coefficients y = mx+c -> vector = [m c] -> default [1 0]
     m_vLoadedSensorBoundary.push_back(1);
@@ -151,7 +150,6 @@ void BCI::init()
     m_vLoadedSourceBoundary.push_back(0);
 
     // Initalise sliding window stuff
-    m_iTBWIndexSensor = 0;
     m_bFillSensorWindowFirstTime = true;
 
     // Initialise filter stuff
@@ -185,6 +183,10 @@ bool BCI::start()
             return false;
         }
     }
+
+    // Initialise index
+    m_iTBWIndexSensor = 0;
+    m_iNumberOfCalculatedFeatures = 0;
 
     // BCIFeatureWindow show and init
     m_BCIFeatureWindow->initGui();
@@ -331,12 +333,30 @@ void BCI::updateSensor(XMEASLIB::NewMeasurement::SPtr pMeasurement)
             for(unsigned char i = 0; i < pRTMSA->getMultiArraySize(); ++i)
                 t_mat.col(i) = pRTMSA->getMultiSampleArray()[i];
 
-            m_pBCIBuffer_Sensor->push(&t_mat);
-
             // Check if capacitive trigger signal was received - Note that there can also be "beep" triggers in the received data, hwich are only 1 sample wide -> therefore look for 2 samples with the value 254
             for(int i = 0; i<t_mat.cols()-1; i++)
                 if(t_mat(t_mat.rows()-2,i) == 254 && t_mat(t_mat.rows()-2,i+1) == 254 && m_bTriggerActivated == false) // t_mat(t_mat.rows()-2,i) - corresponds with channel 136 which is the trigger channel
                     m_bTriggerActivated = true;
+
+            // Check for artefacts
+            bool rejectTrial = false;
+            if(m_bUseArtefactThresholdReduction)
+            {
+                // Get only the rows from the matrix which correspond with the selected features, namely electrodes on sensor level
+                for(int i = 0; i < m_slChosenFeatureSensor.size(); i++)
+                {
+                    MatrixXd tempData = t_mat.row(m_mapElectrodePinningScheme[m_slChosenFeatureSensor.at(i)]);
+
+                    if(hasThresholdArtefact(tempData))
+                    {
+                        cout<<"Reject trial"<<endl;
+                        rejectTrial = true;
+                    }
+                }
+            }
+
+            if(rejectTrial == false)
+                m_pBCIBuffer_Sensor->push(&t_mat);
         }
     }
 }
@@ -469,25 +489,10 @@ void BCI::run()
                 MatrixXd t_mat = m_pBCIBuffer_Sensor->pop();
 
                 // Get only the rows from the matrix which correspond with the selected features, namely electrodes on sensor level and destrieux clustered regions on source level
-                bool rejectTrial = false;
                 for(int i = 0; i < m_matSlidingWindowSensor.rows(); i++)
-                {
-                    MatrixXd tempData = t_mat.block(m_mapElectrodePinningScheme[m_slChosenFeatureSensor.at(i)], 0, 1, t_mat.cols());
+                    m_matSlidingWindowSensor.block(i, m_iTBWIndexSensor, 1, t_mat.cols()) = t_mat.block(m_mapElectrodePinningScheme[m_slChosenFeatureSensor.at(i)], 0, 1, t_mat.cols());
 
-                    // Check for artifacts in selected channels
-                    if(m_bUseArtefactThresholdReduction)
-                    {
-                        if(hasThresholdArtefact(tempData) == false)
-                            m_matSlidingWindowSensor.block(i, m_iTBWIndexSensor, 1, t_mat.cols()) = tempData;
-                        else
-                            rejectTrial = true;
-                    }
-                    else
-                        m_matSlidingWindowSensor.block(i, m_iTBWIndexSensor, 1, t_mat.cols()) = tempData;
-                }
-
-                if(rejectTrial == false)
-                    m_iTBWIndexSensor = m_iTBWIndexSensor + t_mat.cols();
+                m_iTBWIndexSensor = m_iTBWIndexSensor + t_mat.cols();
             }
             else // m_matSlidingWindowSensor is full for the first time
             {
@@ -502,25 +507,10 @@ void BCI::run()
                 MatrixXd t_mat = m_pBCIBuffer_Sensor->pop();
 
                 // Get only the rows from the matrix which correspond with the selected features, namely electrodes on sensor level and destrieux clustered regions on source level
-                bool rejectTrial = false;
                 for(int i = 0; i < m_matTimeBetweenWindowsSensor.rows(); i++)
-                {
-                    MatrixXd tempData = t_mat.block(m_mapElectrodePinningScheme[m_slChosenFeatureSensor.at(i)], 0, 1, t_mat.cols());
+                    m_matTimeBetweenWindowsSensor.block(i, m_iTBWIndexSensor, 1, t_mat.cols()) = t_mat.block(m_mapElectrodePinningScheme[m_slChosenFeatureSensor.at(i)], 0, 1, t_mat.cols());
 
-                    // Check for artifacts in selected channels
-                    if(m_bUseArtefactThresholdReduction)
-                    {
-                        if(hasThresholdArtefact(tempData) == false)
-                            m_matTimeBetweenWindowsSensor.block(i, m_iTBWIndexSensor, 1, t_mat.cols()) = tempData;
-                        else
-                            rejectTrial = true;
-                    }
-                    else
-                        m_matTimeBetweenWindowsSensor.block(i, m_iTBWIndexSensor, 1, t_mat.cols()) = tempData;
-                }
-
-                if(rejectTrial == false)
-                    m_iTBWIndexSensor = m_iTBWIndexSensor + t_mat.cols();
+                m_iTBWIndexSensor = m_iTBWIndexSensor + t_mat.cols();
             }
             else // Recalculate m_matSlidingWindowSensor -> Calculate features, classify and store results
             {
