@@ -74,6 +74,7 @@ using namespace FSLIB;
 using namespace FIFFLIB;
 using namespace INVERSELIB;
 using namespace UTILSLIB;
+using namespace DISP3DLIB;
 
 
 //*************************************************************************************************************
