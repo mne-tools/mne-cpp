@@ -750,7 +750,7 @@ void RapMusic::getGainMatrixPair(    const MatrixXT& p_matGainMarix,
 //*************************************************************************************************************
 
 void RapMusic::insertSource(    int p_iDipoleIdx1, int p_iDipoleIdx2,
-                                Vector6T &p_vec_phi_k_1,
+                                const Vector6T &p_vec_phi_k_1,
                                 double p_valCor,
                                 QVector< DipolePair<double> > &p_RapDipoles)
 {
