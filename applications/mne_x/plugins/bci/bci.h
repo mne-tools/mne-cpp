@@ -80,7 +80,7 @@ namespace BCIPlugin
 // TypeDefs
 //=============================================================================================================
 
-typedef QList<QList<double>> MyQList;
+typedef QList< QList<double> > MyQList;
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -191,7 +191,7 @@ protected:
     * @param [in] chdata QPair with number of the row and the data samples as a RowVectorXd.
     * @param [out] QPair<int,QList<double>> calculated features.
     */
-    QPair<int,QList<double>> applyFeatureCalcConcurrentlyOnSensorLevel(const QPair<int,RowVectorXd> &chdata);
+    QPair< int,QList<double> > applyFeatureCalcConcurrentlyOnSensorLevel(const QPair<int,RowVectorXd> &chdata);
 
     //=========================================================================================================
     /**
@@ -266,7 +266,7 @@ private:
     QVector<double>         m_vLoadedSensorBoundary;            /**< Sensor level: Loaded decision boundary on sensor level. */
     QStringList             m_slChosenFeatureSensor;            /**< Sensor level: Features used to calculate data points in feature space on sensor level. */
     QMap<QString, int>      m_mapElectrodePinningScheme;        /**< Sensor level: Loaded pinning scheme of the Duke 128 EEG cap. */
-    QList<QPair<int,QList<double>>>  m_lFeaturesSensor;         /**< Sensor level: Features calculated on sensor level. */
+    QList< QPair< int,QList<double> > >  m_lFeaturesSensor;         /**< Sensor level: Features calculated on sensor level. */
     QList<double>           m_lClassResultsSensor;              /**< Sensor level: Classification results on sensor level. */
 
     // Source level

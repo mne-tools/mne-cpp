@@ -91,6 +91,14 @@ INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_X_INCLUDE_DIR}
 
+unix:!macx {
+    QMAKE_CXXFLAGS += -std=c++0x
+}
+macx {
+    QMAKE_CXXFLAGS = -mmacosx-version-min=10.7 -std=gnu0x -stdlib=libc+
+    CONFIG +=c++11
+}
+
 OTHER_FILES += bci.json
 
 # Put generated form headers into the origin --> cause other src is pointing at them

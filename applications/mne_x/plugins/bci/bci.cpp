@@ -411,7 +411,7 @@ void BCI::applyFilterOperatorConcurrently(QPair<int, RowVectorXd> &chdata)
 
 //*************************************************************************************************************
 
-QPair<int,QList<double>> BCI::applyFeatureCalcConcurrentlyOnSensorLevel(const QPair<int, RowVectorXd> &chdata)
+QPair< int,QList<double> > BCI::applyFeatureCalcConcurrentlyOnSensorLevel(const QPair<int, RowVectorXd> &chdata)
 {
     RowVectorXd data = chdata.second;
     QList<double> features;
@@ -419,7 +419,7 @@ QPair<int,QList<double>> BCI::applyFeatureCalcConcurrentlyOnSensorLevel(const QP
     // TODO: Divide into subsignals
     features << data.squaredNorm(); // Compute variance
 
-    return QPair<int,QList<double>>(chdata.first, features);
+    return QPair< int,QList<double> >(chdata.first, features);
 }
 
 
@@ -542,7 +542,7 @@ void BCI::run()
 
                 // ----2---- Transform matrix into QList structure, so that QTConurrent can handle it properly
                 //cout<<"----2----"<<endl;
-                QList<QPair<int,RowVectorXd>> qlMatrixRows;
+                QList< QPair<int,RowVectorXd> > qlMatrixRows;
                 for(int i = 0; i< m_matSlidingWindowSensor.rows(); i++)
                     qlMatrixRows << QPair<int,RowVectorXd>(i, m_matSlidingWindowSensor.row(i));
 
@@ -561,7 +561,7 @@ void BCI::run()
 
                 // ----4---- Filter data in m_matSlidingWindowSensor concurrently using map()
                 //cout<<"----4----"<<endl;
-                QList<QPair<int,RowVectorXd>> filteredRows = qlMatrixRows;
+                QList< QPair<int,RowVectorXd> > filteredRows = qlMatrixRows;
 
                 if(m_bUseFilter)
                 {
@@ -584,11 +584,11 @@ void BCI::run()
 
                 // ----5---- Calculate features concurrently using mapped()
                 //cout<<"----5----"<<endl;
-                std::function<QPair<int,QList<double>> (QPair<int,RowVectorXd>&)> applyOpsFeatures = [this](QPair<int,RowVectorXd>& chdata) -> QPair<int,QList<double>> {
+                std::function< QPair<int,QList<double> > (QPair<int,RowVectorXd>&)> applyOpsFeatures = [this](QPair<int,RowVectorXd>& chdata) -> QPair< int,QList<double> > {
                     return applyFeatureCalcConcurrentlyOnSensorLevel(chdata);
                 };
 
-                QFuture<QPair<int,QList<double>>> futureCalculatedFeatures = QtConcurrent::mapped(filteredRows.begin(), filteredRows.end(), applyOpsFeatures);
+                QFuture< QPair< int,QList<double> > > futureCalculatedFeatures = QtConcurrent::mapped(filteredRows.begin(), filteredRows.end(), applyOpsFeatures);
 
                 futureCalculatedFeatures.waitForFinished();
 
@@ -603,7 +603,7 @@ void BCI::run()
                 if(m_iNumberOfCalculatedFeatures >= (int)(m_matSlidingWindowSensor.cols()/m_matTimeBetweenWindowsSensor.cols()))
                 {
                     // Transform m_lFeaturesSensor into an easier file structure
-                    QList<QList<double>> lFeaturesSensor_new;
+                    QList< QList<double> > lFeaturesSensor_new;
 
                     for(int i = 0; i<m_lFeaturesSensor.size()-iNumberOfFeatures+1; i = i + iNumberOfFeatures) // iterate over QPair feature List
                         for(int z = 0; z<m_lFeaturesSensor.at(0).second.size(); z++) // iterate over number of sub signals
