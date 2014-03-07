@@ -229,11 +229,11 @@ MNESourceEstimate RapMusic::calculateInverse(const FiffEvoked &p_fiffEvoked, boo
     {
         double dip1 = sqrt( pow(t_RapDipoles[i].m_Dipole1.phi_x(),2) +
                             pow(t_RapDipoles[i].m_Dipole1.phi_y(),2) +
-                            pow(t_RapDipoles[i].m_Dipole1.phi_z(),2) ) * t_RapDipoles[i].m_vCorrelation * 1000;
+                            pow(t_RapDipoles[i].m_Dipole1.phi_z(),2) ) * t_RapDipoles[i].m_vCorrelation;
 
         double dip2 = sqrt( pow(t_RapDipoles[i].m_Dipole2.phi_x(),2) +
                             pow(t_RapDipoles[i].m_Dipole2.phi_y(),2) +
-                            pow(t_RapDipoles[i].m_Dipole2.phi_z(),2) ) * t_RapDipoles[i].m_vCorrelation * 1000;
+                            pow(t_RapDipoles[i].m_Dipole2.phi_z(),2) ) * t_RapDipoles[i].m_vCorrelation;
 
 
         RowVectorXd dip1Time = RowVectorXd::Constant(p_fiffEvoked.data.cols(), dip1);
