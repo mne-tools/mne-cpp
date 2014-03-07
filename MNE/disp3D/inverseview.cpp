@@ -413,16 +413,19 @@ void InverseView::updateActivation(QSharedPointer<Eigen::VectorXd> p_pVecActivat
 {
     VectorXd t_curLabelActivation = VectorXd::Zero(m_pSceneNode->palette()->size());
 
+    qint32 actCount = 0;
     for(qint32 h = 0; h < 2; ++h)
     {
         for(qint32 i = 0; i < m_sourceSpace[h].cluster_info.numClust(); ++i)
         {
             qint32 labelId = m_sourceSpace[h].cluster_info.clusterLabelIds[i];
             qint32 colorIdx = m_qListMapLabelIdIndex[h][labelId];
-            //search for max activation within one label - by checking if there is already an assigned value
 
-            if(abs(t_curLabelActivation[colorIdx]) < abs((*p_pVecActivation.data())[i]))//m_curSourceEstimate.data(i, currentSample)))
-                t_curLabelActivation[colorIdx] = (*p_pVecActivation.data())[i];//m_curSourceEstimate.data(i, currentSample);
+            //search for max activation within one label - by checking if there is already an assigned value
+            if(abs(t_curLabelActivation[colorIdx]) < abs((*p_pVecActivation.data())[actCount]))//m_curSourceEstimate.data(i, currentSample)))
+                t_curLabelActivation[colorIdx] = (*p_pVecActivation.data())[actCount];//m_curSourceEstimate.data(i, currentSample);
+
+            ++actCount;
         }
     }
 
@@ -430,7 +433,7 @@ void InverseView::updateActivation(QSharedPointer<Eigen::VectorXd> p_pVecActivat
     {
         if(m_pInverseViewProducer->getMaxActivation()[i] != 0)
         {
-            qint32 iVal = (t_curLabelActivation[i]/m_pInverseViewProducer->getGlobalMax()) * 400;//1200;//255;
+            qint32 iVal = (t_curLabelActivation[i]/m_pInverseViewProducer->getGlobalMax()) * 255;//1200;//400;
 
             iVal = iVal > 255 ? 255 : iVal < 0 ? 0 : iVal;
 
