@@ -598,7 +598,7 @@ void BCI::run()
                 //cout<<"----6----"<<endl;
                 m_lFeaturesSensor.append(futureCalculatedFeatures.results());
 
-                // ----7---- If enough features (windows) have been calculated (processed) -> classify all features and average result ----------
+                // ----7---- If enough features (windows) have been calculated (processed) -> classify all features and average results ----------
                 //cout<<"----7----"<<endl;
                 if(m_iNumberOfCalculatedFeatures >= (int)(m_matSlidingWindowSensor.cols()/m_matTimeBetweenWindowsSensor.cols()))
                 {
