@@ -12,3 +12,4 @@ Authors
   * Tim Kunze <tim.kunze@tu-ilmenau.de> 2014
   * Luise Lang <luise.lang@tu-ilmenau.de> 2014
   * Felix Arndt <felix.arndt@tu-ilmenau.de> 2014
+  * Daniel Knobl <daniel.knobl@tu-ilmenau.de> 2014
