@@ -215,7 +215,7 @@ MNESourceEstimate RapMusic::calculateInverse(const FiffEvoked &p_fiffEvoked, boo
     QVector< DipolePair<double> > t_RapDipoles;
     calculateInverse(p_fiffEvoked.data, t_RapDipoles);
 
-    p_sourceEstimate.data = MatrixXd::Zero(p_fiffEvoked.data.rows(), p_fiffEvoked.data.cols());
+    p_sourceEstimate.data = MatrixXd::Zero(m_ForwardSolution.nsource, p_fiffEvoked.data.cols());
 
     //Results
     p_sourceEstimate.vertices = VectorXi(m_ForwardSolution.src[0].vertno.size() + m_ForwardSolution.src[1].vertno.size());
@@ -227,22 +227,20 @@ MNESourceEstimate RapMusic::calculateInverse(const FiffEvoked &p_fiffEvoked, boo
 
     for(qint32 i = 0; i < t_RapDipoles.size(); ++i)
     {
-        qDebug() << "Parse Dipole Pair" << i;
+        double dip1 = sqrt( pow(t_RapDipoles[i].m_Dipole1.phi_x(),2) +
+                            pow(t_RapDipoles[i].m_Dipole1.phi_y(),2) +
+                            pow(t_RapDipoles[i].m_Dipole1.phi_z(),2) ) * t_RapDipoles[i].m_vCorrelation * 1000;
 
-        VectorXd dip1 = VectorXd(3);
-        dip1[0] = abs(t_RapDipoles[i].m_Dipole1.phi_x())*t_RapDipoles[i].m_vCorrelation;
-        dip1[1] = abs(t_RapDipoles[i].m_Dipole1.phi_y())*t_RapDipoles[i].m_vCorrelation;
-        dip1[2] = abs(t_RapDipoles[i].m_Dipole1.phi_z())*t_RapDipoles[i].m_vCorrelation;
-        VectorXd dip2 = VectorXd(3);
-        dip2[0] = abs(t_RapDipoles[i].m_Dipole1.phi_x())*t_RapDipoles[i].m_vCorrelation;
-        dip2[1] = abs(t_RapDipoles[i].m_Dipole1.phi_y())*t_RapDipoles[i].m_vCorrelation;
-        dip2[2] = abs(t_RapDipoles[i].m_Dipole1.phi_z())*t_RapDipoles[i].m_vCorrelation;
+        double dip2 = sqrt( pow(t_RapDipoles[i].m_Dipole2.phi_x(),2) +
+                            pow(t_RapDipoles[i].m_Dipole2.phi_y(),2) +
+                            pow(t_RapDipoles[i].m_Dipole2.phi_z(),2) ) * t_RapDipoles[i].m_vCorrelation * 1000;
 
-        MatrixXd dip1Time = dip1.replicate(1, p_fiffEvoked.data.cols());
-        MatrixXd dip2Time = dip2.replicate(1, p_fiffEvoked.data.cols());
 
-        p_sourceEstimate.data.block(t_RapDipoles[i].m_iIdx1*3, 0, 3, p_fiffEvoked.data.cols()) = dip1Time;
-        p_sourceEstimate.data.block(t_RapDipoles[i].m_iIdx2*3, 0, 3, p_fiffEvoked.data.cols()) = dip2Time;
+        RowVectorXd dip1Time = RowVectorXd::Constant(p_fiffEvoked.data.cols(), dip1);
+        RowVectorXd dip2Time = RowVectorXd::Constant(p_fiffEvoked.data.cols(), dip2);
+
+        p_sourceEstimate.data.block(t_RapDipoles[i].m_iIdx1, 0, 1, p_fiffEvoked.data.cols()) = dip1Time;
+        p_sourceEstimate.data.block(t_RapDipoles[i].m_iIdx2, 0, 1, p_fiffEvoked.data.cols()) = dip2Time;
     }
 
 
