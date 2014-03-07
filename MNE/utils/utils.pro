@@ -69,7 +69,7 @@ SOURCES += \
     parksmcclellan.cpp \
     filterdata.cpp \
     mp\mp.cpp
-	
+
 HEADERS += \
     kmeans.h\
     utils_global.h \

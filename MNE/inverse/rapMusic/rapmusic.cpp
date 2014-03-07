@@ -199,6 +199,59 @@ const MNESourceSpace& RapMusic::getSourceSpace() const
 
 //*************************************************************************************************************
 
+MNESourceEstimate RapMusic::calculateInverse(const FiffEvoked &p_fiffEvoked, bool pick_normal)
+{
+    Q_UNUSED(pick_normal);
+
+    MNESourceEstimate p_sourceEstimate;
+    if(p_fiffEvoked.data.rows() != m_iNumChannels)
+    {
+        std::cout << "Number of FiffEvoked channels (" << p_fiffEvoked.data.rows() << ") doesn't match the number of channels (" << m_iNumChannels << ") of the forward solution." << std::endl;
+        return p_sourceEstimate;
+    }
+    else
+        std::cout << "Number of FiffEvoked channels (" << p_fiffEvoked.data.rows() << ") matchs the number of channels (" << m_iNumChannels << ") of the forward solution." << std::endl;
+
+    QVector< DipolePair<double> > t_RapDipoles;
+    calculateInverse(p_fiffEvoked.data, t_RapDipoles);
+
+    p_sourceEstimate.data = MatrixXd::Zero(p_fiffEvoked.data.rows(), p_fiffEvoked.data.cols());
+
+    //Results
+    p_sourceEstimate.vertices = VectorXi(m_ForwardSolution.src[0].vertno.size() + m_ForwardSolution.src[1].vertno.size());
+    p_sourceEstimate.vertices << m_ForwardSolution.src[0].vertno, m_ForwardSolution.src[1].vertno;
+
+    p_sourceEstimate.times = p_fiffEvoked.times;
+    p_sourceEstimate.tmin = p_fiffEvoked.times[0];
+    p_sourceEstimate.tstep = p_fiffEvoked.times[1] - p_fiffEvoked.times[0];
+
+    for(qint32 i = 0; i < t_RapDipoles.size(); ++i)
+    {
+        qDebug() << "Parse Dipole Pair" << i;
+
+        VectorXd dip1 = VectorXd(3);
+        dip1[0] = abs(t_RapDipoles[i].m_Dipole1.phi_x())*t_RapDipoles[i].m_vCorrelation;
+        dip1[1] = abs(t_RapDipoles[i].m_Dipole1.phi_y())*t_RapDipoles[i].m_vCorrelation;
+        dip1[2] = abs(t_RapDipoles[i].m_Dipole1.phi_z())*t_RapDipoles[i].m_vCorrelation;
+        VectorXd dip2 = VectorXd(3);
+        dip2[0] = abs(t_RapDipoles[i].m_Dipole1.phi_x())*t_RapDipoles[i].m_vCorrelation;
+        dip2[1] = abs(t_RapDipoles[i].m_Dipole1.phi_y())*t_RapDipoles[i].m_vCorrelation;
+        dip2[2] = abs(t_RapDipoles[i].m_Dipole1.phi_z())*t_RapDipoles[i].m_vCorrelation;
+
+        MatrixXd dip1Time = dip1.replicate(1, p_fiffEvoked.data.cols());
+        MatrixXd dip2Time = dip2.replicate(1, p_fiffEvoked.data.cols());
+
+        p_sourceEstimate.data.block(t_RapDipoles[i].m_iIdx1*3, 0, 3, p_fiffEvoked.data.cols()) = dip1Time;
+        p_sourceEstimate.data.block(t_RapDipoles[i].m_iIdx2*3, 0, 3, p_fiffEvoked.data.cols()) = dip2Time;
+    }
+
+
+    return p_sourceEstimate;
+}
+
+
+//*************************************************************************************************************
+
 MNESourceEstimate RapMusic::calculateInverse(const MatrixXd& p_matMeasurement, QVector< DipolePair<double> > &p_RapDipoles)
 {
     MNESourceEstimate p_SourceEstimate;
@@ -335,7 +388,6 @@ MNESourceEstimate RapMusic::calculateInverse(const MatrixXd& p_matMeasurement, Q
 //             //exit(0);
 //         }
 
-
         //subcorr benchmark
         end_subcorr = clock();
 
@@ -368,11 +420,11 @@ MNESourceEstimate RapMusic::calculateInverse(const MatrixXd& p_matMeasurement, Q
 
         //Calculate source direction
         //source direction (p_pMatPhi) for current source r (phi_k_1)
-        Vector6T t_vec_phi_k_1(6, 1);
+        Vector6T t_vec_phi_k_1(6);
         subcorr(t_matProj_G_k_1, t_matU_B, t_vec_phi_k_1);//Correlate the current source to calculate the direction
 
         //Set return values
-        insertSource(t_iIdx1, t_iIdx2, t_vec_phi_k_1.data(), t_val_roh_k, p_RapDipoles);
+        insertSource(t_iIdx1, t_iIdx2, t_vec_phi_k_1, t_val_roh_k, p_RapDipoles);
 
         //Stop Searching when Correlation is smaller then the Threshold
         if (t_val_roh_k < m_dThreshold)
@@ -700,7 +752,7 @@ void RapMusic::getGainMatrixPair(    const MatrixXT& p_matGainMarix,
 //*************************************************************************************************************
 
 void RapMusic::insertSource(    int p_iDipoleIdx1, int p_iDipoleIdx2,
-                                const double *p_vec_phi_k_1,
+                                Vector6T &p_vec_phi_k_1,
                                 double p_valCor,
                                 QVector< DipolePair<double> > &p_RapDipoles)
 {
@@ -708,7 +760,6 @@ void RapMusic::insertSource(    int p_iDipoleIdx1, int p_iDipoleIdx2,
 
     t_pRapDipolePair.m_iIdx1 = p_iDipoleIdx1; //p_iDipoleIdx1+1 because of MATLAB index
     t_pRapDipolePair.m_iIdx2 = p_iDipoleIdx2;
-
 
     t_pRapDipolePair.m_Dipole1.x() = 0; //m_bGridInitialized ? (*m_pMatGrid)(p_iDipoleIdx1, 0) : 0;
     t_pRapDipolePair.m_Dipole1.y() = 0; //m_bGridInitialized ? (*m_pMatGrid)(p_iDipoleIdx1, 1) : 0;
@@ -718,7 +769,6 @@ void RapMusic::insertSource(    int p_iDipoleIdx1, int p_iDipoleIdx2,
     t_pRapDipolePair.m_Dipole2.y() = 0; //m_bGridInitialized ? (*m_pMatGrid)(p_iDipoleIdx2, 1) : 0;
     t_pRapDipolePair.m_Dipole2.z() = 0; //m_bGridInitialized ? (*m_pMatGrid)(p_iDipoleIdx2, 2) : 0;
 
-
     t_pRapDipolePair.m_Dipole1.phi_x() = p_vec_phi_k_1[0];
     t_pRapDipolePair.m_Dipole1.phi_y() = p_vec_phi_k_1[1];
     t_pRapDipolePair.m_Dipole1.phi_z() = p_vec_phi_k_1[2];
@@ -726,7 +776,6 @@ void RapMusic::insertSource(    int p_iDipoleIdx1, int p_iDipoleIdx2,
     t_pRapDipolePair.m_Dipole2.phi_x() = p_vec_phi_k_1[3];
     t_pRapDipolePair.m_Dipole2.phi_y() = p_vec_phi_k_1[4];
     t_pRapDipolePair.m_Dipole2.phi_z() = p_vec_phi_k_1[5];
-
 
     t_pRapDipolePair.m_vCorrelation = p_valCor;
 
