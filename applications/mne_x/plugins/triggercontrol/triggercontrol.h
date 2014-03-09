@@ -185,8 +185,8 @@ public:
 
 
 signals:
-    void sendByte(int value);
-//    void sendByte(int value, int channel);
+//    void sendByte(int value);
+    void sendByte(int value, int channel);
 
 
 protected:
