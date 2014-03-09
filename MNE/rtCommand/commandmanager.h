@@ -161,9 +161,9 @@ private:
     */
     void init();
 
-    QJsonDocument m_jsonDocumentOrigin;
-
     bool m_bIsActive;
+
+    QJsonDocument m_jsonDocumentOrigin;
 
     QMetaObject::Connection m_conReplyChannel;      /**< The reply channel of the command manager. */
 

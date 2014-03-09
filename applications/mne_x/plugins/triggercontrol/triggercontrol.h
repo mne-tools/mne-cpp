@@ -93,6 +93,7 @@ class SerialPort;
 /**
 * DECLARE CLASS TriggerControl
 *
+
 * @brief The TriggerControl is a MNE-X plugin which contains an intuitive terminal for manual
 * configurations of output channels and an automated processing of connected signal channels.
 *
@@ -156,10 +157,12 @@ public:
     */
     virtual QString getName() const;
 
+
     //=========================================================================================================
     /**
     * Initialise input and output connectors.
-    */    virtual QWidget* setupWidget();
+    */    
+    virtual QWidget* setupWidget();
 
     //=========================================================================================================
     /**
@@ -183,6 +186,7 @@ public:
 
 signals:
     void sendByte(int value);
+//    void sendByte(int value, int channel);
 
 
 protected:
@@ -198,7 +202,9 @@ protected:
     * Sets or Unsets the HardWired channel from the terminal function (see manual)
     */
 
-    void sendByteTo(int);
+    void sendByteTo(int value, int channel);
+
+
 
 private:
     PluginOutputData<NewRealTimeSampleArray>::SPtr  m_pTriggerOutput;   /**< The RealTimeSampleArray of the trigger output.*/

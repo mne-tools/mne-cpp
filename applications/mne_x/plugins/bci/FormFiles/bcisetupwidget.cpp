@@ -71,6 +71,66 @@ BCISetupWidget::BCISetupWidget(BCI* pBCI, QWidget* parent)
 , m_pBCI(pBCI)
 {
     ui.setupUi(this);
+
+    // Connect general options
+    connect(ui.m_checkBox_UseSourceData, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+            this, &BCISetupWidget::setGeneralOptions);
+    connect(ui.m_checkBox_UseSensorData, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+            this, &BCISetupWidget::setGeneralOptions);
+    connect(ui.m_checkBox_UseThresholdArtefactReduction, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+            this, &BCISetupWidget::setGeneralOptions);
+    connect(ui.m_SpinBox_ThresholdValue, static_cast<void (QDoubleSpinBox::*)()>(&QDoubleSpinBox::editingFinished),
+            this, &BCISetupWidget::setGeneralOptions);
+
+    // Connect processing options
+    connect(ui.m_checkBox_SubtractMean, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+            this, &BCISetupWidget::setGeneralOptions);
+    connect(ui.m_doubleSpinBox_SlidingWindowSize, static_cast<void (QDoubleSpinBox::*)()>(&QDoubleSpinBox::editingFinished),
+            this, &BCISetupWidget::setProcessingOptions);
+    connect(ui.m_spinBox_NumberSubSignals, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
+            this, &BCISetupWidget::setProcessingOptions);
+    connect(ui.m_doubleSpinBox_TimeBetweenWindows, static_cast<void (QDoubleSpinBox::*)()>(&QDoubleSpinBox::editingFinished),
+            this, &BCISetupWidget::setProcessingOptions);
+
+    // Connect classification options
+    connect(ui.m_pushButton_LoadSensorBoundary, &QPushButton::released,
+            this, &BCISetupWidget::changeLoadSensorBoundary);
+    connect(ui.m_pushButton_LoadSourceBoundary, &QPushButton::released,
+            this, &BCISetupWidget::changeLoadSourceBoundary);
+
+    // Connect feature selection
+    ui.m_listWidget_ChosenFeaturesOnSensorLevel->installEventFilter(this);
+    ui.m_listWidget_ChosenFeaturesOnSourceLevel->installEventFilter(this);
+    ui.m_listWidget_AvailableFeaturesOnSensorLevel->installEventFilter(this);
+    ui.m_listWidget_AvailableFeaturesOnSourceLevel->installEventFilter(this);
+
+    // Connect filter options
+    connect(ui.m_checkBox_UseFilter, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+            this, &BCISetupWidget::setFilterOptions);
+    connect(ui.m_doubleSpinBox_FilterLowerBound, static_cast<void (QDoubleSpinBox::*)()>(&QDoubleSpinBox::editingFinished),
+            this, &BCISetupWidget::setFilterOptions);
+    connect(ui.m_doubleSpinBox_FilterUpperBound, static_cast<void (QDoubleSpinBox::*)()>(&QDoubleSpinBox::editingFinished),
+            this, &BCISetupWidget::setFilterOptions);
+    connect(ui.m_SpinBox_FilterOrder, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
+            this, &BCISetupWidget::setFilterOptions);
+    connect(ui.m_doubleSpinBox_ParcksWidth, static_cast<void (QDoubleSpinBox::*)()>(&QDoubleSpinBox::editingFinished),
+            this, &BCISetupWidget::setFilterOptions);
+
+    //Connect about button
+    connect(ui.m_qPushButton_About, &QPushButton::released, this, &BCISetupWidget::showAboutDialog);
+
+    //Fill info box
+    QFile file(m_pBCI->m_qStringResourcePath+"readme.txt");
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        return;
+
+    QTextStream in(&file);
+    while (!in.atEnd())
+    {
+        QString line = in.readLine();
+        ui.m_qTextBrowser_Information->insertHtml(line);
+        ui.m_qTextBrowser_Information->insertHtml("<br>");
+    }
 }
 
 
@@ -78,7 +138,6 @@ BCISetupWidget::BCISetupWidget(BCI* pBCI, QWidget* parent)
 
 BCISetupWidget::~BCISetupWidget()
 {
-
 }
 
 
@@ -86,6 +145,161 @@ BCISetupWidget::~BCISetupWidget()
 
 void BCISetupWidget::initGui()
 {
+    // General options
+    ui.m_checkBox_UseSensorData->setChecked(m_pBCI->m_bUseSensorData);
+    ui.m_checkBox_UseSourceData->setChecked(m_pBCI->m_bUseSourceData);
+    ui.m_checkBox_UseThresholdArtefactReduction->setChecked(m_pBCI->m_bUseArtefactThresholdReduction);
+    ui.m_SpinBox_ThresholdValue->setValue(m_pBCI->m_dThresholdValue);
+
+    // Processing options
+    ui.m_checkBox_SubtractMean->setChecked(m_pBCI->m_bSubtractMean);
+    ui.m_doubleSpinBox_SlidingWindowSize->setValue(m_pBCI->m_dSlidingWindowSize);
+    ui.m_spinBox_NumberSubSignals->setValue(m_pBCI->m_iNumberSubSignals);
+    ui.m_doubleSpinBox_TimeBetweenWindows->setValue(m_pBCI->m_dTimeBetweenWindows);
+
+    // Classification options
+    ui.m_lineEdit_SensorBoundary->setText(m_pBCI->m_sSensorBoundaryPath);
+    ui.m_lineEdit_SourceBoundary->setText(m_pBCI->m_sSourceBoundaryPath);
+
+    // Filter options
+    ui.m_checkBox_UseFilter->setChecked(m_pBCI->m_bUseFilter);
+    ui.m_doubleSpinBox_FilterLowerBound->setValue(m_pBCI->m_dFilterLowerBound);
+    ui.m_doubleSpinBox_FilterUpperBound->setValue(m_pBCI->m_dFilterUpperBound);
+    ui.m_SpinBox_FilterOrder->setValue(m_pBCI->m_iFilterOrder);
+    ui.m_doubleSpinBox_ParcksWidth->setValue(m_pBCI->m_dParcksWidth);
+
+    // Selected features on sensor level
+    initSelectedFeaturesSensor();
+}
+
+
+//*************************************************************************************************************
+
+void BCISetupWidget::setGeneralOptions()
+{
+    m_pBCI->m_bUseSensorData = ui.m_checkBox_UseSensorData->isChecked();
+    m_pBCI->m_bUseSourceData = ui.m_checkBox_UseSourceData->isChecked();
+    m_pBCI->m_bUseArtefactThresholdReduction = ui.m_checkBox_UseThresholdArtefactReduction->isChecked();
+    m_pBCI->m_dThresholdValue = ui.m_SpinBox_ThresholdValue->value();
+}
+
+
+//*************************************************************************************************************
+
+void BCISetupWidget::setProcessingOptions()
+{
+    m_pBCI->m_bSubtractMean = ui.m_checkBox_SubtractMean->isChecked();
+    m_pBCI->m_dSlidingWindowSize = ui.m_doubleSpinBox_SlidingWindowSize->value();
+    m_pBCI->m_iNumberSubSignals = ui.m_spinBox_NumberSubSignals->value();
+    m_pBCI->m_dTimeBetweenWindows = ui.m_doubleSpinBox_TimeBetweenWindows->value();
+}
+
+
+//*************************************************************************************************************
+
+void BCISetupWidget::changeLoadSensorBoundary()
+{
+    QString path = QFileDialog::getOpenFileName(
+                this,
+                "Load decision boundary for sensor level",
+                "mne_x_plugins/resources/tmsi/",
+                 tr("Text files (*.txt)"));
+
+    if(path==NULL)
+        path = ui.m_lineEdit_SensorBoundary->text();
+
+    ui.m_lineEdit_SensorBoundary->setText(path);
+    m_pBCI->m_sSensorBoundaryPath = ui.m_lineEdit_SensorBoundary->text();
+}
+
+
+//*************************************************************************************************************
+
+void BCISetupWidget::changeLoadSourceBoundary()
+{
+    QString path = QFileDialog::getOpenFileName(
+                this,
+                "Load decision boundary for source level",
+                "mne_x_plugins/resources/tmsi/",
+                 tr("Text files (*.txt)"));
+
+    if(path==NULL)
+        path = ui.m_lineEdit_SourceBoundary->text();
+
+    ui.m_lineEdit_SourceBoundary->setText(path);
+    m_pBCI->m_sSourceBoundaryPath = ui.m_lineEdit_SourceBoundary->text();
+}
+
+
+//*************************************************************************************************************
+
+void BCISetupWidget::initSelectedFeaturesSensor()
+{
+    // Read electrode pinnig scheme from file and initialise List and store in QMap in BCI object
+    QString path;
+    path.prepend(m_pBCI->m_qStringResourcePath);
+    path.append("Pinning_Scheme_Duke_128.txt");
+    QFile file(path);
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        return;
+
+    //Start reading from file
+    m_vAvailableFeaturesSensor.clear();
+    QMap<QString, int>  mapElectrodePinningScheme;
+
+    QTextStream in(&file);
+
+    while(!in.atEnd())
+    {
+        QString line = in.readLine();
+
+        QStringList list_temp = line.split(QRegExp("\\s+"));
+
+        if(list_temp.size() >= 2)
+            mapElectrodePinningScheme.insert(list_temp.at(1), list_temp.at(0).toInt()-1); // Decrement by 1 because channels in matrix start with 0
+
+        m_vAvailableFeaturesSensor.append(list_temp.at(1));
+    }
+
+    file.close();
+
+    m_pBCI->m_mapElectrodePinningScheme = mapElectrodePinningScheme;
+
+    // Remove default items from list
+    for(int i=0; i<m_pBCI->m_slChosenFeatureSensor.size(); i++)
+        m_vAvailableFeaturesSensor.removeAt(m_vAvailableFeaturesSensor.indexOf(m_pBCI->m_slChosenFeatureSensor.at(i)));
+
+    ui.m_listWidget_AvailableFeaturesOnSensorLevel->addItems(m_vAvailableFeaturesSensor);
+    ui.m_listWidget_ChosenFeaturesOnSensorLevel->addItems(m_pBCI->m_slChosenFeatureSensor);
+}
+
+
+//*************************************************************************************************************
+
+void BCISetupWidget::setFeatureSelection()
+{
+    QStringList ChosenFeaturesOnSensorLevel;
+    for(int i=0; i< ui.m_listWidget_ChosenFeaturesOnSensorLevel->count(); i++)
+        ChosenFeaturesOnSensorLevel << ui.m_listWidget_ChosenFeaturesOnSensorLevel->item(i)->text();
+
+    QStringList ChosenFeaturesOnSourceLevel;
+    for(int i=0; i< ui.m_listWidget_ChosenFeaturesOnSourceLevel->count(); i++)
+        ChosenFeaturesOnSourceLevel << ui.m_listWidget_ChosenFeaturesOnSourceLevel->item(i)->text();
+
+    m_pBCI->m_slChosenFeatureSensor = ChosenFeaturesOnSensorLevel;
+    m_pBCI->m_slChosenFeatureSource = ChosenFeaturesOnSourceLevel;
+}
+
+
+//*************************************************************************************************************
+
+void BCISetupWidget::setFilterOptions()
+{
+    m_pBCI->m_bUseFilter = ui.m_checkBox_UseFilter->isChecked();
+    m_pBCI->m_dFilterLowerBound = ui.m_doubleSpinBox_FilterLowerBound->value();
+    m_pBCI->m_dFilterUpperBound = ui.m_doubleSpinBox_FilterUpperBound->value();
+    m_pBCI->m_iFilterOrder = ui.m_SpinBox_FilterOrder->value();
+    m_pBCI->m_dParcksWidth = ui.m_doubleSpinBox_ParcksWidth->value();
 }
 
 
@@ -95,4 +309,18 @@ void BCISetupWidget::showAboutDialog()
 {
     BCIAboutWidget aboutDialog(this);
     aboutDialog.exec();
+}
+
+
+//*************************************************************************************************************
+
+bool BCISetupWidget::eventFilter(QObject *object, QEvent *event)
+{
+     if ((object == ui.m_listWidget_ChosenFeaturesOnSensorLevel ||
+          object == ui.m_listWidget_ChosenFeaturesOnSourceLevel ||
+          object == ui.m_listWidget_AvailableFeaturesOnSensorLevel ||
+          object == ui.m_listWidget_AvailableFeaturesOnSourceLevel) && event->type() == QEvent::Leave)
+         setFeatureSelection();
+
+     return QObject::eventFilter(object, event);;
 }

@@ -1,11 +1,11 @@
 //=============================================================================================================
 /**
-* @file     filtertools.h
+* @file     bcifeaturewindow.h
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* 			Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     November, 2013
+* @date     December, 2013
 *
 * @section  LICENSE
 *
@@ -30,129 +30,94 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    FilterTools class declaration.
+* @brief    Contains the declaration of the BCIAboutWidget class.
 *
 */
 
-#ifndef FILTERTOOLS_H
-#define FILTERTOOLS_H
+#ifndef BCIFEATUREWINDOW_H
+#define BCIFEATUREWINDOW_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "utils_global.h"
-#include <qmath.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
-#include <QSharedPointer>
-#include <QVector>
-
+#include <QWidget>
+#include "../ui_bcifeaturewindow.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Eigen INCLUDES
+// DEFINE NAMESPACE TMSIPlugin
 //=============================================================================================================
 
-#include <Eigen/Core>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE MNELIB
-//=============================================================================================================
-
-namespace UTILSLIB
+namespace BCIPlugin
 {
 
+//*************************************************************************************************************
+//=============================================================================================================
+// TypeDefs
+//=============================================================================================================
+
+typedef QList< QList<double> > MyQList;
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
-using namespace Eigen;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINES
-//=============================================================================================================
+class BCI;
 
 
 //=============================================================================================================
 /**
-* Basic filter creation and operations (HP, TP, BP)
+* DECLARE CLASS BCIFeatureWindow
 *
-* @brief Basic filter creation and operations (HP, TP, BP)
+* @brief The BCIFeatureWindow class provides a visualization tool for calculated features.
 */
-class UTILSSHARED_EXPORT FilterTools
+class BCIFeatureWindow : public QWidget
 {
+    Q_OBJECT
+
 public:
-    typedef QSharedPointer<FilterTools> SPtr;            /**< Shared pointer type for FilterTools. */
-    typedef QSharedPointer<const FilterTools> ConstSPtr; /**< Const shared pointer type for FilterTools. */
+    //=========================================================================================================
+    /**
+    * Constructs a BCIFeatureWindow which is a child of parent.
+    *
+    * @param [in] parent pointer to parent widget; If parent is 0, the new BCIFeatureWindow becomes a window. If parent is another widget, BCIFeatureWindow becomes a child window inside parent. BCIFeatureWindow is deleted when its parent is deleted.
+    * @param [in] pBCI a pointer to the corresponding BCI.
+    */
+    BCIFeatureWindow(BCI* pBCI, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Constructs a Filter object.
+    * Destroys the BCIFeatureWindow.
+    * All BCIFeatureWindow's children are deleted first. The application exits if BCIFeatureWindow is the main widget.
     */
-    FilterTools();
-
+    ~BCIFeatureWindow();
 
     //=========================================================================================================
     /**
-    * Gets the impulse response of a static precalculated (matlab) filter.
-    * @param [in] type specifies the type (high-, low- , band-pass) of the filter which is to be designed. Possible values: 'HP', 'LP', 'BP'.
-    * @param [in] numberOfCoefficients number of coefficients used for the filter.
-    * @param [in] samplingRate holds the sampling frequency for the filter. Possible values: 128, 256, 512, 1024, 2048.
-    * @param [in] cutOffFreq holds the cut off frequency for the filter. Max possible value: samplingRate/2.
-    * @param [in] impulseResponse holds the created coefficients (impulse response) of the filter.
+    * Initializes the BCI's GUI properties.
+    *
     */
-    void getStaticFilter(QString type, qint32 numberOfCoefficients, qint32 samplingRate, qint32 cutOffFreq, QVector<float> &impulseResponse);
+    void initGui();
 
+protected:
+    void paintFeaturesToScene(MyQList features, bool bTriggerActivated);
 
-    //=========================================================================================================
-    /**
-    * Creates a Filter.
-    * @param [in] type specifies the type (high-, low- , band-pass) of the filter which is to be designed. Possible values: 'HP', 'LP', 'BP'.
-    * @param [in] numberOfCoefficients number of coefficients used for the filter.
-    * @param [in] normalizedCutOffFreq holds the cut off frequency for the filter. Range [0 1] whre 1 (pi) corresponds to f_max.
-    * @param [in] impulseResponse holds the created coefficients (impulse response) of the filter.
-    */
-    void createDynamicFilter(QString type, qint32 numberOfCoefficients, float normalizedCutOffFreq, QVector<float> &impulseResponse);
+    BCI*                        m_pBCI;         /**< a pointer to corresponding BCI.*/
+    QGraphicsScene              m_scene;        /**< QGraphicsScene used to add the features.*/
 
-
-    //=========================================================================================================
-    /**
-    * Convolves a given data set with a given filter impulse response.
-    * @param [in] in holds the data which is to be filtered.
-    * @param [in] kernel holds the impulse response of the filter which is to be used during the convolution.
-    * @param [out] QVector<float> holds the result of the convolution.
-    */
-    QVector<float> convolve(QVector<float> &in, QVector<float> &kernel);
-
-private:
-    /**
-    * Creates a kaiser window. Regular Modified Cylindrical Bessel Function (Bessel I).
-    * @param [in] window
-    * @param [in] size
-    * @param [in] alpha
-    */
-    void KBDWindow(QVector<float> &window, int size, float alpha);
-
-    //=========================================================================================================
-    /**
-    * Calculates Bssel function.
-    * @param [in] x
-    */
-    float BesselI0(float x);
+    double                      m_dFeatureMax;  /**< Max value for featrues - Used to scale the QGraphicsView.*/
+    Ui::BCIFeatureWindowClass   ui;             /**< the user interface for the BCIFeatureWindow.*/
 };
 
 } // NAMESPACE
 
-#endif // FILTERTOOLS_H
+#endif // BCIFEATUREWINDOW_H

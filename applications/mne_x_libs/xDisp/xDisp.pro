@@ -118,7 +118,6 @@ HEADERS += \
 
 FORMS += \
     realtimemultisamplearraywidget.ui \
-    realtimemultisamplearraywidget.ui \
     textwidget.ui \
     progressbarwidget.ui \
     numericwidget.ui \
