@@ -158,8 +158,11 @@ void BCISetupWidget::initGui()
     ui.m_doubleSpinBox_TimeBetweenWindows->setValue(m_pBCI->m_dTimeBetweenWindows);
 
     // Classification options
-    ui.m_lineEdit_SensorBoundary->setText(m_pBCI->m_sSensorBoundaryPath);
-    ui.m_lineEdit_SourceBoundary->setText(m_pBCI->m_sSourceBoundaryPath);
+    QString temp = m_pBCI->m_sSensorBoundaryPath;
+    temp.append(QString("LDA_linear_boundary.txt"));
+
+    ui.m_lineEdit_SensorBoundary->setText(temp);
+    ui.m_lineEdit_SourceBoundary->setText(temp);
 
     // Filter options
     ui.m_checkBox_UseFilter->setChecked(m_pBCI->m_bUseFilter);
@@ -202,7 +205,7 @@ void BCISetupWidget::changeLoadSensorBoundary()
     QString path = QFileDialog::getOpenFileName(
                 this,
                 "Load decision boundary for sensor level",
-                "mne_x_plugins/resources/tmsi/",
+                "mne_x_plugins/resources/bci/LDA_linear_boundary.txt",
                  tr("Text files (*.txt)"));
 
     if(path==NULL)
@@ -220,7 +223,7 @@ void BCISetupWidget::changeLoadSourceBoundary()
     QString path = QFileDialog::getOpenFileName(
                 this,
                 "Load decision boundary for source level",
-                "mne_x_plugins/resources/tmsi/",
+                "mne_x_plugins/resources/bci/LDA_linear_boundary.txt",
                  tr("Text files (*.txt)"));
 
     if(path==NULL)
