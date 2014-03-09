@@ -308,12 +308,12 @@ signals:
     void executed(Command p_command);
 
 public:
-    bool                m_bIsJson;
     QString             m_sCommand;
     QString             m_sDescription;
     QStringList         m_qListParamNames;
     QList<QVariant>     m_qListParamValues;
     QStringList         m_qListParamDescriptions;
+    bool                m_bIsJson;
 };
 
 //*************************************************************************************************************

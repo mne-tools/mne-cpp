@@ -163,14 +163,13 @@ public:
 
     virtual MNESourceEstimate calculateInverse(const MatrixXd& p_matMeasurement, QVector< DipolePair<double> > &p_RapDipoles);
 
-    virtual MNESourceEstimate calculateInverse(const FiffEvoked &p_fiffEvoked, bool pick_normal = false)
-    {
-        MNESourceEstimate p_sourceEstimate;
-        return p_sourceEstimate;
-    }
+    virtual MNESourceEstimate calculateInverse(const FiffEvoked &p_fiffEvoked, bool pick_normal = false);
 
     virtual MNESourceEstimate calculateInverse(const MatrixXd &data, float tmin, float tstep) const
     {
+        Q_UNUSED(data);
+        Q_UNUSED(tmin);
+        Q_UNUSED(tstep);
         MNESourceEstimate p_sourceEstimate;
         return p_sourceEstimate;
     }
@@ -317,7 +316,7 @@ protected:
     * @param[out] p_RapDipoles  the list of dipole pairs.
     */
     void insertSource(  int p_iDipoleIdx1, int p_iDipoleIdx2,
-                        const double *p_vec_phi_k_1,
+                        const Vector6T &p_vec_phi_k_1,
                         double p_valCor,
                         QVector< DipolePair<double> > &p_RapDipoles);
 

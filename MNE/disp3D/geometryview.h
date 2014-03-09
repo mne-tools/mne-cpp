@@ -153,10 +153,6 @@ protected:
 
 private:
 //    MNEForwardSolution m_forwardSolution;   /**< Holds the forward soultion -> ToDo change this to shraed data pointer */
-    MNESourceSpace m_sourceSpace;           /**< The used source space. */
-
-
-    bool m_bStereo;
 
     QGLLightModel *m_pLightModel;    /**< The selected light model. */
     QGLLightParameters *m_pLightParametersScene;    /**< The selected light parameters. */
@@ -165,14 +161,18 @@ private:
 
     QVector<Annotation::SPtr> m_vecAnnotation;
 
-    QGLSceneNode *m_pSceneNodeBrain;               /**< Scene node of the hemisphere models. */
     QVector3D m_vecBoundingBoxMin;                  /**< X, Y, Z minima. */
     QVector3D m_vecBoundingBoxMax;                  /**< X, Y, Z maxima. */
     QVector3D m_vecBoundingBoxCenter;               /**< X, Y, Z center. */
 
+    MNESourceSpace m_sourceSpace;           /**< The used source space. */
+
+    bool m_bStereo;
+
     float m_fOffsetZ;                               /**< Z offset for pop-out effect. */
     float m_fOffsetZEye;                            /**< Z offset eye. */
 
+    QGLSceneNode *m_pSceneNodeBrain;               /**< Scene node of the hemisphere models. */
     QGLSceneNode *m_pSceneNode;                    /**< Node of the scene. */
 
 //    QGLCamera *m_pCameraFrontal;     /**< frontal camera. */

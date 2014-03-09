@@ -254,6 +254,8 @@ void TriggerControlPlugin::TriggerControlSetupWidget::on_m_qPushButton_RetrieveD
 }
 
 
+//*************************************************************************************************************
+
 void TriggerControlPlugin::TriggerControlSetupWidget::on_m_qPushButton_RetrieveAnalogInfo_released()
 {
     m_pTriggerControl->m_pSerialPort->m_retrievetyp = 1;    // analog channel desired
@@ -272,6 +274,9 @@ void TriggerControlPlugin::TriggerControlSetupWidget::on_m_qPushButton_RetrieveA
 
     m_pTriggerControl->m_pSerialPort->sendData(m_pTriggerControl->m_pSerialPort->m_data);
 }
+
+
+//*************************************************************************************************************
 
 void TriggerControlPlugin::TriggerControlSetupWidget::on_m_qPushButton_ConnectChannel_released()
 {

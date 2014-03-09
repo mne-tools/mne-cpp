@@ -116,3 +116,5 @@ header_files_rap_music.path = $${MNE_INCLUDE_DIR}/inverse/rapMusic
 INSTALLS += header_files
 INSTALLS += header_files_minimum_norm
 INSTALLS += header_files_rap_music
+
+unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR

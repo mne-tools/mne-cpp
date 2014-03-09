@@ -67,6 +67,7 @@ namespace TriggerControlPlugin
 //=============================================================================================================
 
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -74,10 +75,13 @@ namespace TriggerControlPlugin
 
 
 
+
 //=============================================================================================================
 /**
+
 * DECLARE CLASS SerialPort
 *
+
 * @brief The SerialPort is a class which holds all properties and methods necesarry to open, communicate and
 * close a serial port. In most cases you want to open the port, encode your output information (digital, analog
 * or retrieve) and decode input information (digital or analog). When you are done, close the serial port.
@@ -97,20 +101,17 @@ public:
     * Destroys the SerialPort.
     */
     ~SerialPort();
-
     //=========================================================================================================
     /**
     * Initializes Settings as data bits or baud rate, parity, stop bits and flow control
     *
     */
     void initSettings();
-
     //=========================================================================================================
     /**
     * Checks all available serial ports for the one desired and initializes to that
     *
     */    void initPort();
-
     //=========================================================================================================
     /**
     * Opens a channel to the serial port
@@ -118,11 +119,13 @@ public:
     */
     bool open();
 
+
     //=========================================================================================================
     /**
     * Closes the channel to the serial port
     *
-    */    void close();
+    */    
+	void close();
 
     //=========================================================================================================
     /**
@@ -137,6 +140,7 @@ public:
     *
     */
     void encodeana();
+
 
     //=========================================================================================================
     /**
@@ -174,7 +178,6 @@ public:
     void readData();
 
 
-
     QByteArray m_data;              /**< Holds the byte array*/
     QVector<int> m_digchannel;      /**< Holds the currently selected digital output channel */
     int m_motor;                    /**< Holds the currently selected analog output channel */
@@ -183,12 +186,17 @@ public:
     QVector<int> m_InAnChannelVal;  /**< Lists the analog values of the input channels*/
     QVector<int> m_InActiveDig;     /**< Lists the digital states of the input channels*/
 
+ 
     int m_retrievetyp;              /**< Holds the desired input mode (analog or digital)*/
     int m_retrievechan;             /**< Holds the desired analog input channel*/
 
+
     int m_wiredChannel;             /**< Holds the channel which is connected to the TriggerControl Run Method*/
 
-
+    //=========================================================================================================
+    /**
+    * ....
+    */
     struct Settings {
         QString name;
         qint32 baudRate;

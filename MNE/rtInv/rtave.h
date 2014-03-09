@@ -209,15 +209,16 @@ private:
     */
     void assemblePreStimulus(const QList<QPair<QList<qint32>, MatrixXd> > &p_qListRawMatBuf, qint32 p_iStimIdx);
 
-    FiffInfo::SPtr  m_pFiffInfo;        /**< Holds the fiff measurement information. */
-
     QMutex      mutex;                  /**< Provides access serialization between threads*/
-    bool        m_bIsRunning;           /**< Holds if real-time Covariance estimation is running.*/
 
     qint32 m_iNumAverages;              /**< Number of averages */
 
     qint32     m_iPreStimSamples;       /**< Amount of samples averaged before the stimulus. */
     qint32     m_iPostStimSamples;      /**< Amount of samples averaged after the stimulus, including the stimulus sample.*/
+
+    FiffInfo::SPtr  m_pFiffInfo;        /**< Holds the fiff measurement information. */
+
+    bool        m_bIsRunning;           /**< Holds if real-time Covariance estimation is running.*/
 
     CircularMatrixBuffer<double>::SPtr m_pRawMatrixBuffer;   /**< The Circular Raw Matrix Buffer. */
 

@@ -113,14 +113,15 @@ void TMSI::init()
     m_iTriggerInterval = 5000;
 
     m_bUseChExponent = true;
-    m_bUseUnitGain = false;
-    m_bUseUnitOffset = false;
+    m_bUseUnitGain = true;
+    m_bUseUnitOffset = true;
     m_bWriteToFile = false;
     m_bWriteDriverDebugToFile = false;
     m_bUseFiltering = false;
     m_bUseFFT = false;
     m_bIsRunning = false;
     m_bShowEventTrigger = false;
+    m_bUseCommonAverage = true;
 
     m_sOutputFilePath = QString("./mne_x_plugins/resources/tmsi/EEG_data_001_raw.fif");
     m_sElcFilePath = QString("./mne_x_plugins/resources/tmsi/loc_files/Lorenz-Duke128-28-11-2013.elc");
@@ -310,7 +311,8 @@ void TMSI::setUpFiffInfo()
             fChInfo.coord_frame = FIFFV_COORD_HEAD;
 
             //Set unit
-            //fChInfo.unit = FIFF_UNIT_V;
+            fChInfo.unit = FIFF_UNIT_V;
+            fChInfo.unit_mul = 0;
 
             //Set EEG electrode location - Convert from mm to m
             fChInfo.eeg_loc(0,0) = elcLocation3D[i][0]*0.001;
@@ -477,6 +479,7 @@ bool TMSI::start()
 
     //Set the channel size of the RMTSA - this needs to be done here and NOT in the init() function because the user can change the number of channels during runtime
     m_pRMTSA_TMSI->data()->initFromFiffInfo(m_pFiffInfo);
+    m_pRMTSA_TMSI->data()->setMultiArraySize(m_iSamplesPerBlock);
     m_pRMTSA_TMSI->data()->setSamplingRate(m_iSamplingFreq);
 
     //Buffer
@@ -489,7 +492,8 @@ bool TMSI::start()
                        m_bUseUnitGain,
                        m_bUseUnitOffset,
                        m_bWriteDriverDebugToFile,
-                       m_sOutputFilePath);
+                       m_sOutputFilePath,
+                       m_bUseCommonAverage);
 
     if(m_pTMSIProducer->isRunning())
     {
@@ -570,8 +574,7 @@ void TMSI::run()
 
             if(m_bShowEventTrigger && m_qTimerTrigger.elapsed() >= m_iTriggerInterval)
             {
-                QFuture<void> future = QtConcurrent::run(Beep, 523, 500);
-
+                QFuture<void> future = QtConcurrent::run(Beep, 450, 700);
                 //Set trigger in received data samples - just for one sample, so that this event is easy to detect
                 matValue(136, m_iSamplesPerBlock-1) = 254;
                 m_qTimerTrigger.restart();
@@ -635,7 +638,7 @@ void TMSI::run()
 //                cout<<"matValue after FFT:"<<endl<<matValue<<endl;
             }
 
-            //Change values of the Dig channel
+            //Change values of the trigger channel for better plotting - this change is not saved in the produced fif file
             if(m_iNumberOfChannels>137)
             {
                 for(int i = 0; i<matValue.row(137).cols(); i++)

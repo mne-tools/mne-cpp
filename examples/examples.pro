@@ -46,12 +46,12 @@ SUBDIRS += \
     readEvoked \
     computeInverse \
     computeInverseRaw \
-    computeInverseRapMusic \
     makeInverseOperator \
     findEvoked \
     evokedGradAmp \
     cancelNoise \
-    fiffIO
+    fiffIO \
+    matchingPursuit
 
 contains(MNECPP_CONFIG, isGui) {
     qtHaveModule(3d) {
@@ -62,6 +62,7 @@ contains(MNECPP_CONFIG, isGui) {
             rawClusteredInverseEEG \
             readFwdDisp3D \
             plotSurfaces \
-            lnt
+            lnt \
+            computeInverseRapMusic \
     }
 }

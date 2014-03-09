@@ -166,6 +166,11 @@ public:
 private:
     //METHODS
     /**
+     * genStdFilters generates a set of standard FilterOperators
+     */
+    void genStdFilterOps();
+
+    /**
     * Loads fiff infos to m_chInfolist abd m_fiffInfo.
     *
     */

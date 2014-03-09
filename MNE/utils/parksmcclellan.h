@@ -188,6 +188,7 @@ private:
     VectorXd DesiredMag;
     VectorXd Grid;
     VectorXd Weight;
+
     bool InitDone2;
 
 };
