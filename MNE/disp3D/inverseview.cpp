@@ -413,36 +413,37 @@ void InverseView::updateActivation(QSharedPointer<Eigen::VectorXd> p_pVecActivat
 {
     VectorXd t_curLabelActivation = VectorXd::Zero(m_pSceneNode->palette()->size());
 
+    qint32 actCount = 0;
     for(qint32 h = 0; h < 2; ++h)
     {
         for(qint32 i = 0; i < m_sourceSpace[h].cluster_info.numClust(); ++i)
         {
             qint32 labelId = m_sourceSpace[h].cluster_info.clusterLabelIds[i];
             qint32 colorIdx = m_qListMapLabelIdIndex[h][labelId];
-            //search for max activation within one label - by checking if there is already an assigned value
 
-            if(abs(t_curLabelActivation[colorIdx]) < abs((*p_pVecActivation.data())[i]))//m_curSourceEstimate.data(i, currentSample)))
-                t_curLabelActivation[colorIdx] = (*p_pVecActivation.data())[i];//m_curSourceEstimate.data(i, currentSample);
+            //search for max activation within one label - by checking if there is already an assigned value
+            if(abs(t_curLabelActivation[colorIdx]) < abs((*p_pVecActivation.data())[actCount]))//m_curSourceEstimate.data(i, currentSample)))
+                t_curLabelActivation[colorIdx] = (*p_pVecActivation.data())[actCount];//m_curSourceEstimate.data(i, currentSample);
+
+            ++actCount;
         }
     }
 
     for(qint32 i = 0; i < m_pSceneNode->palette()->size(); ++i)
     {
-        if(m_pInverseViewProducer->getMaxActivation()[i] != 0)
-        {
-            qint32 iVal = (t_curLabelActivation[i]/m_pInverseViewProducer->getGlobalMax()) * 400;//1200;//255;
+        qint32 iVal = (t_curLabelActivation[i]/m_pInverseViewProducer->getGlobalMax()) * 255;//1200;//400;
 
-            iVal = iVal > 255 ? 255 : iVal < 0 ? 0 : iVal;
+        iVal = iVal > 255 ? 255 : iVal < 0 ? 0 : iVal;
 
 //            int r, g, b;
-            QRgb qRgb;
+        QRgb qRgb;
 //            if(m_iColorMode == 0)
 //            {
 ////                r = iVal;
 ////                g = iVal;
 ////                b = iVal;
 //                qRgb = ColorMap::valueToHotNegative1((double)iVal/255.0);
-                qRgb = ColorMap::valueToHotNegative2((double)iVal/255.0);
+            qRgb = ColorMap::valueToHotNegative2((double)iVal/255.0);
 //            }
 //            else if(m_iColorMode == 1)
 //            {
@@ -453,9 +454,8 @@ void InverseView::updateActivation(QSharedPointer<Eigen::VectorXd> p_pVecActivat
 //                qRgb = ColorMap::valueToHotNegative2((double)iVal/255.0);
 //            }
 
-            m_pSceneNode->palette()->material(i)->setSpecularColor(QColor(qRgb));
-                        //QColor(r,g,b,200));
-        }
+        m_pSceneNode->palette()->material(i)->setSpecularColor(QColor(qRgb));
+                    //QColor(r,g,b,200));
     }
 
     this->update();
