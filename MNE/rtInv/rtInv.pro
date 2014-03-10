@@ -80,14 +80,14 @@ win32 {
 
 SOURCES += \
         rtcov.cpp \
-    rtinvop.cpp \
-    rtave.cpp
+        rtinvop.cpp \
+        rtave.cpp
 
 HEADERS +=  \
         rtinv_global.h \
         rtcov.h \
-    rtinvop.h \
-    rtave.h
+        rtinvop.h \
+        rtave.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
@@ -99,3 +99,6 @@ header_files.path = $${MNE_INCLUDE_DIR}/rtInv
 INSTALLS += header_files
 
 unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
+
+# suppress visibility warnings
+unix: QMAKE_CXXFLAGS += -Wno-attributes
