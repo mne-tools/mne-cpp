@@ -431,7 +431,7 @@ void InverseView::updateActivation(QSharedPointer<Eigen::VectorXd> p_pVecActivat
 
     for(qint32 i = 0; i < m_pSceneNode->palette()->size(); ++i)
     {
-        qint32 iVal = (t_curLabelActivation[i]/m_pInverseViewProducer->getGlobalMax()) * 255;//400;
+        qint32 iVal = (t_curLabelActivation[i]/m_pInverseViewProducer->getGlobalMax()) * 255;//300;
 
         iVal = iVal > 255 ? 255 : iVal < 0 ? 0 : iVal;
 
