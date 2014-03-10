@@ -98,7 +98,7 @@ void BCIFeatureWindow::paintFeaturesToScene(MyQList features, bool bTriggerActiv
             m_scene.setBackgroundBrush(Qt::white);
 
         // Add items
-        int lineSize = 500;
+        int lineSize = 1000;
         m_scene.addLine(0,0,lineSize,lineSize);
         QGraphicsTextItem* leftElectrode = m_scene.addText(m_pBCI->m_slChosenFeatureSensor.at(0));
         leftElectrode->setPos(QPointF(lineSize/2, 10));

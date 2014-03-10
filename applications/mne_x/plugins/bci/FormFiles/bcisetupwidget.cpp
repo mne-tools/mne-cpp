@@ -84,7 +84,7 @@ BCISetupWidget::BCISetupWidget(BCI* pBCI, QWidget* parent)
 
     // Connect processing options
     connect(ui.m_checkBox_SubtractMean, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
-            this, &BCISetupWidget::setGeneralOptions);
+            this, &BCISetupWidget::setProcessingOptions);
     connect(ui.m_doubleSpinBox_SlidingWindowSize, static_cast<void (QDoubleSpinBox::*)()>(&QDoubleSpinBox::editingFinished),
             this, &BCISetupWidget::setProcessingOptions);
     connect(ui.m_spinBox_NumberSubSignals, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
@@ -158,11 +158,8 @@ void BCISetupWidget::initGui()
     ui.m_doubleSpinBox_TimeBetweenWindows->setValue(m_pBCI->m_dTimeBetweenWindows);
 
     // Classification options
-    QString temp = m_pBCI->m_sSensorBoundaryPath;
-    temp.append(QString("LDA_linear_boundary.txt"));
-
-    ui.m_lineEdit_SensorBoundary->setText(temp);
-    ui.m_lineEdit_SourceBoundary->setText(temp);
+    ui.m_lineEdit_SensorBoundary->setText(m_pBCI->m_sSensorBoundaryPath);
+    ui.m_lineEdit_SourceBoundary->setText(m_pBCI->m_sSensorBoundaryPath);
 
     // Filter options
     ui.m_checkBox_UseFilter->setChecked(m_pBCI->m_bUseFilter);
@@ -210,6 +207,47 @@ void BCISetupWidget::changeLoadSensorBoundary()
 
     if(path==NULL)
         path = ui.m_lineEdit_SensorBoundary->text();
+
+    // Read boundary information generated with matlab
+    QString path;
+    QFile file(path);
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        return;
+
+    //Start reading from file
+    QVector<double> const_temp;
+    QVector<double> linear_temp;
+
+    QTextStream in(&file);
+
+    while(!in.atEnd())
+    {
+        QString line = in.readLine();
+
+        if(line.contains(QString("const")))
+        {
+            QStringList list_temp = line.split(QRegExp("\\s+"));
+
+            for(int i = 0; i<list_temp.at(1) ; i++)
+            {
+                QString line = in.readLine();
+                const_temp.push_back(line.toDouble());
+            }
+        }
+
+        if(line.contains(QString("linear")))
+        {
+            QStringList list_temp = line.split(QRegExp("\\s+"));
+
+            for(int i = 0; i<list_temp.at(1) ; i++)
+            {
+                QString line = in.readLine();
+                linear_temp.push_back(line.toDouble());
+            }
+        }
+    }
+
+    file.close();
 
     ui.m_lineEdit_SensorBoundary->setText(path);
     m_pBCI->m_sSensorBoundaryPath = ui.m_lineEdit_SensorBoundary->text();
