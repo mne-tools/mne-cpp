@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Example of the computation of a rawClusteredInverse
+* @brief    Example of the computation of a raw clustered inverse rap music
 *
 */
 
