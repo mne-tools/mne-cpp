@@ -114,9 +114,11 @@ int main(int argc, char *argv[])
     SurfaceSet t_surfSet("E:/Data/sl_data/subjects/mind006/surf/lh.white", "E:/Data/sl_data/subjects/mind006/surf/rh.white");
 
 
-    QString t_sFileNameStc("");
+    QString t_sFileNameStc("");//"RapMusic.stc");
 
     qint32 numDipolePairs = 7;
+
+    bool doMovie = true;
 
     // Parse command line parameters
     for(qint32 i = 0; i < argc; ++i)
@@ -161,7 +163,8 @@ int main(int argc, char *argv[])
 
     RapMusic t_rapMusic(t_clusteredFwd, false, numDipolePairs);
 
-    t_rapMusic.setStcProp(200,0.5);
+    if(doMovie)
+        t_rapMusic.setStcAttr(50,0.5);
 
 
     MNESourceEstimate sourceEstimate = t_rapMusic.calculateInverse(pickedEvoked);
@@ -209,11 +212,11 @@ int main(int argc, char *argv[])
     //Push Estimate
     view.pushSourceEstimate(sourceEstimate);
 
-//    if(!t_sFileNameStc.isEmpty())
-//    {
-//        QFile t_fileClusteredStc(t_sFileNameStc);
-//        sourceEstimate.write(t_fileClusteredStc);
-//    }
+    if(!t_sFileNameStc.isEmpty())
+    {
+        QFile t_fileClusteredStc(t_sFileNameStc);
+        sourceEstimate.write(t_fileClusteredStc);
+    }
 
     return a.exec();
 }

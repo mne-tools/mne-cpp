@@ -268,23 +268,33 @@ MNESourceEstimate RapMusic::calculateInverse(const FiffEvoked &p_fiffEvoked, boo
 
         qint32 curSample = 0;
         qint32 curResultSample = 0;
+        qint32 stcWindowSize = m_iSamplesStcWindow - 2*t_iSamplesDiscard;
 
         while(!last)
         {
             QVector< DipolePair<double> > t_RapDipoles;
 
             //Data
-            data = p_fiffEvoked.data.block(0, curSample, t_iNumSensors, m_iSamplesStcWindow);
-            curSample += (m_iSamplesStcWindow - t_iSamplesOverlap);
-
-            //ToDo
-            if(curSample + m_iSamplesStcWindow >= t_iNumSteps)
+            if(curSample + m_iSamplesStcWindow >= t_iNumSteps) //last
+            {
                 last = true;
+                data = p_fiffEvoked.data.block(0, p_fiffEvoked.data.cols()-m_iSamplesStcWindow, t_iNumSensors, m_iSamplesStcWindow);
+            }
+            else
+                data = p_fiffEvoked.data.block(0, curSample, t_iNumSensors, m_iSamplesStcWindow);
+
+
+            curSample += (m_iSamplesStcWindow - t_iSamplesOverlap);
+            if(first)
+                curSample -= t_iSamplesDiscard; //shift on start t_iSamplesDiscard backwards
 
             //Calculate
             calculateInverse(data, t_RapDipoles);
 
             //Assign Result
+            if(last)
+                stcWindowSize = p_sourceEstimate.data.cols() - curResultSample;
+
             for(qint32 i = 0; i < t_RapDipoles.size(); ++i)
             {
                 double dip1 = sqrt( pow(t_RapDipoles[i].m_Dipole1.phi_x(),2) +
@@ -295,29 +305,16 @@ MNESourceEstimate RapMusic::calculateInverse(const FiffEvoked &p_fiffEvoked, boo
                                     pow(t_RapDipoles[i].m_Dipole2.phi_y(),2) +
                                     pow(t_RapDipoles[i].m_Dipole2.phi_z(),2) ) * t_RapDipoles[i].m_vCorrelation;
 
-                if(first)
-                {
-                    curResultSample = m_iSamplesStcWindow - t_iSamplesDiscard;
 
-                    RowVectorXd dip1Time = RowVectorXd::Constant(curResultSample, dip1);
-                    RowVectorXd dip2Time = RowVectorXd::Constant(curResultSample, dip2);
+                RowVectorXd dip1Time = RowVectorXd::Constant(stcWindowSize, dip1);
+                RowVectorXd dip2Time = RowVectorXd::Constant(stcWindowSize, dip2);
 
-                    p_sourceEstimate.data.block(t_RapDipoles[i].m_iIdx1, 0, 1, curResultSample) = dip1Time;
-                    p_sourceEstimate.data.block(t_RapDipoles[i].m_iIdx2, 0, 1, curResultSample) = dip2Time;
-                }
-                else
-                {
-                    qint32 t_size = m_iSamplesStcWindow - 2*t_iSamplesDiscard;
+                p_sourceEstimate.data.block(t_RapDipoles[i].m_iIdx1, curResultSample, 1, stcWindowSize) = dip1Time;
+                p_sourceEstimate.data.block(t_RapDipoles[i].m_iIdx2, curResultSample, 1, stcWindowSize) = dip2Time;
 
-                    RowVectorXd dip1Time = RowVectorXd::Constant(t_size, dip1);
-                    RowVectorXd dip2Time = RowVectorXd::Constant(t_size, dip2);
-
-                    p_sourceEstimate.data.block(t_RapDipoles[i].m_iIdx1, curResultSample, 1, t_size) = dip1Time;
-                    p_sourceEstimate.data.block(t_RapDipoles[i].m_iIdx2, curResultSample, 1, t_size) = dip2Time;
-
-                    curResultSample += t_size;
-                }
             }
+
+            curResultSample += stcWindowSize;
 
             if(first)
                 first = false;
@@ -864,7 +861,7 @@ void RapMusic::insertSource(    int p_iDipoleIdx1, int p_iDipoleIdx2,
 
 //*************************************************************************************************************
 
-void RapMusic::setStcProp(int p_iSampStcWin, float p_fStcOverlap)
+void RapMusic::setStcAttr(int p_iSampStcWin, float p_fStcOverlap)
 {
     m_iSamplesStcWindow = p_iSampStcWin;
     m_fStcOverlap = p_fStcOverlap;

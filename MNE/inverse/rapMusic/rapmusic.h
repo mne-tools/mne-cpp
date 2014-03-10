@@ -191,12 +191,12 @@ public:
 
     //=========================================================================================================
     /**
-    * Sets the source estimate properties.
+    * Sets the source estimate attributes.
     *
     * @param[in] p_iSampStcWin  Samples per source localization window (default - 1 = not set)
     * @param[in] p_fStcOverlap  Percentage of localization window overlap
     */
-    void setStcProp(int p_iSampStcWin, float p_fStcOverlap);
+    void setStcAttr(int p_iSampStcWin, float p_fStcOverlap);
 
 protected:
     //=========================================================================================================
