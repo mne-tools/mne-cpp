@@ -102,3 +102,5 @@ header_files.path = $${MNE_INCLUDE_DIR}/disp
 INSTALLS += header_files
 
 FORMS +=
+
+unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
