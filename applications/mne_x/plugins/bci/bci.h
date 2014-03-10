@@ -221,7 +221,7 @@ protected:
     * Check for artefact in data
     *
     */
-    bool hasThresholdArtefact(const MatrixXd& data);
+    bool hasThresholdArtefact(const QList<QPair<int, RowVectorXd> > &data);
 
     //=========================================================================================================
     /**
@@ -263,14 +263,14 @@ private:
     MatrixXd                m_matTimeBetweenWindowsSensor;      /**< Sensor level: Samples stored during time between windows on sensor level. */
     int                     m_iTBWIndexSensor;                  /**< Sensor level: Index of the amount of data which was already filled during the time between windows. */
     int                     m_iNumberOfCalculatedFeatures;      /**< Index which is iterated until enough features are calculated and classified to generate a final classifcation result.*/
-    QVector<double>         m_vLoadedSensorBoundary;            /**< Sensor level: Loaded decision boundary on sensor level. */
+    QVector< QVector< double> > m_vLoadedSensorBoundary;        /**< Sensor level: Loaded decision boundary on sensor level. */
     QStringList             m_slChosenFeatureSensor;            /**< Sensor level: Features used to calculate data points in feature space on sensor level. */
     QMap<QString, int>      m_mapElectrodePinningScheme;        /**< Sensor level: Loaded pinning scheme of the Duke 128 EEG cap. */
-    QList< QPair< int,QList<double> > >  m_lFeaturesSensor;         /**< Sensor level: Features calculated on sensor level. */
+    QList< QPair< int,QList<double> > >  m_lFeaturesSensor;     /**< Sensor level: Features calculated on sensor level. */
     QList<double>           m_lClassResultsSensor;              /**< Sensor level: Classification results on sensor level. */
 
     // Source level
-    QVector<double>         m_vLoadedSourceBoundary;            /**< Source level: Loaded decision boundary on source level. */
+    QVector< QVector< double> >m_vLoadedSourceBoundary;         /**< Source level: Loaded decision boundary on source level. */
     QStringList             m_slChosenFeatureSource;            /**< Source level: Features used to calculate data points in feature space on source level. */
     QMap<QString, int>      m_mapDestrieuxAtlasRegions;         /**< Source level: Loaded Destrieux atlas regions. */
 
@@ -288,8 +288,6 @@ private:
     double                  m_dThresholdValue;                  /**< GUI input: Threshold in micro volts. */
     int                     m_iFilterOrder;                     /**< GUI input: Filter order. */
     int                     m_iNumberSubSignals;                /**< GUI input: Number of subsignals. */
-    QString                 m_sSensorBoundaryPath;              /**< GUI input: Input path for boundary file on sensor level. */
-    QString                 m_sSourceBoundaryPath;              /**< GUI input: Input path for boundary file on source level. */
 };
 
 } // NAMESPACE
