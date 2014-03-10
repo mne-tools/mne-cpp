@@ -50,7 +50,7 @@
 #include <mne/mne_epoch_data_list.h>
 
 #include <mne/mne_sourceestimate.h>
-#include <inverse/minimumNorm/minimumnorm.h>
+#include <inverse/rapMusic/rapmusic.h>
 
 #include <disp3D/inverseview.h>
 
@@ -100,11 +100,23 @@ int main(int argc, char *argv[])
     QGuiApplication a(argc, argv);
 
 //    QFile t_fileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+//    QString t_sEventName = "./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif";
+//    QFile t_fileFwd("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+//    AnnotationSet t_annotationSet("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot", "./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot");
+//    SurfaceSet t_surfSet("./MNE-sample-data/subjects/sample/surf/lh.white", "./MNE-sample-data/subjects/sample/surf/rh.white");
+
     QFile t_fileRaw("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw.fif");
+    QString t_sEventName = "E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-eve.fif";
+    QFile t_fileFwd("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-oct-6p-fwd.fif");
+    AnnotationSet t_annotationSet("E:/Data/sl_data/subjects/mind006/label/lh.aparc.a2009s.annot", "E:/Data/sl_data/subjects/mind006/label/rh.aparc.a2009s.annot");
+    SurfaceSet t_surfSet("E:/Data/sl_data/subjects/mind006/surf/lh.white", "E:/Data/sl_data/subjects/mind006/surf/rh.white");
+
+    QString t_sFileNameStc("");//("mind006_051209_auditory01.stc");
+
+    qint32 numDipolePairs = 7;
 
     qint32 event = 1;
-//    QString t_sEventName = "./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif";
-    QString t_sEventName = "E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-eve.fif";
+
     float tmin = -0.2f;
     float tmax = 0.4f;
 
@@ -113,6 +125,24 @@ int main(int argc, char *argv[])
     bool pick_all  = true;
 
     qint32 k, p;
+
+
+    // Parse command line parameters
+    for(qint32 i = 0; i < argc; ++i)
+    {
+        if(strcmp(argv[i], "-stc") == 0 || strcmp(argv[i], "--stc") == 0)
+        {
+            if(i + 1 < argc)
+                t_sFileNameStc = QString::fromUtf8(argv[i+1]);
+        }
+    }
+
+    //
+    // Load data
+    //
+    MNEForwardSolution t_Fwd(t_fileFwd);
+    if(t_Fwd.isEmpty())
+        return 1;
 
     //
     //   Setup for reading the raw data
@@ -139,7 +169,6 @@ int main(int argc, char *argv[])
         bool want_eeg   = false;
         bool want_stim  = false;
 
-//        picks = Fiff::pick_types(raw.info, want_meg, want_eeg, want_stim, include, raw.info.bads);
         picks = raw.info.pick_types(want_meg, want_eeg, want_stim, include, raw.info.bads);//prefer member function
     }
 
@@ -180,7 +209,6 @@ int main(int argc, char *argv[])
     //
     //   Set up the CTF compensator
     //
-//    qint32 current_comp = MNE::get_current_comp(raw.info);
     qint32 current_comp = raw.info.get_current_comp();
     if (current_comp > 0)
         printf("Current compensation grade : %d\n",current_comp);
@@ -193,7 +221,6 @@ int main(int argc, char *argv[])
         qDebug() << "This part needs to be debugged";
         if(MNE::make_compensator(raw.info, current_comp, dest_comp, raw.comp))
         {
-//            raw.info.chs = MNE::set_current_comp(raw.info.chs,dest_comp);
             raw.info.set_current_comp(dest_comp);
             printf("Appropriate compensator added to change to grade %d.\n",dest_comp);
         }
@@ -366,18 +393,18 @@ int main(int argc, char *argv[])
     //
     // calculate the average
     //
-//    //Option 1
-//    qint32 numAverages = 99;
-//    VectorXi vecSel(numAverages);
-//    srand (time(NULL)); // initialize random seed
+    //Option 1
+    qint32 numAverages = 99;
+    VectorXi vecSel(numAverages);
+    srand (time(NULL)); // initialize random seed
 
-//    for(qint32 i = 0; i < vecSel.size(); ++i)
-//    {
-//        qint32 val = rand() % data.size();
-//        vecSel(i) = val;
-//    }
+    for(qint32 i = 0; i < vecSel.size(); ++i)
+    {
+        qint32 val = rand() % data.size();
+        vecSel(i) = val;
+    }
 
-//    //Option 2
+    //Option 2
 //    VectorXi vecSel(20);
 
 ////    vecSel << 76, 74, 13, 61, 97, 94, 75, 71, 60, 56, 26, 57, 56, 0, 52, 72, 33, 86, 96, 67;
@@ -385,95 +412,22 @@ int main(int argc, char *argv[])
 //    vecSel << 65, 22, 47, 55, 16, 29, 14, 36, 57, 97, 89, 46, 9, 93, 83, 52, 71, 52, 3, 96;
 
     //Option 3 Newest
-    VectorXi vecSel(10);
+//    VectorXi vecSel(10);
 
-    vecSel << 0, 96, 80, 55, 66, 25, 26, 2, 55, 58, 6, 88;
+//    vecSel << 0, 96, 80, 55, 66, 25, 26, 2, 55, 58, 6, 88;
 
 
     std::cout << "Select following epochs to average:\n" << vecSel << std::endl;
 
     FiffEvoked evoked = data.average(raw.info, tmin*raw.info.sfreq, floor(tmax*raw.info.sfreq + 0.5), vecSel);
 
-
-
-
-
-
-
+    QStringList ch_sel_names = t_Fwd.info.ch_names;
+    FiffEvoked pickedEvoked = evoked.pick_channels(ch_sel_names);
 
 
 
     //########################################################################################
-    // Source Estimate
-
-//    QFile t_fileFwd("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
-//    QFile t_fileCov("./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
-//    QFile t_fileEvoked("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
-
-//    QFile t_fileFwd("/home/chdinh/sl_data/MEG/mind006/mind006_051209_auditory01_raw-oct-6p-fwd.fif");
-//    QFile t_fileCov("/home/chdinh/sl_data/MEG/mind006/mind006_051209_auditory01_raw-cov.fif");
-//    QFile t_fileEvoked("/home/chdinh/sl_data/MEG/mind006/mind006_051209_auditory01_raw-ave.fif");
-
-
-    QFile t_fileFwd("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-oct-6p-fwd.fif");
-    QFile t_fileCov("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-cov.fif");
-//    QFile t_fileEvoked("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-ave.fif");
-
-
-    double snr = 1.0f;//0.1f;//1.0f;//3.0f;//0.1f;//3.0f;
-    QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
-
-    QString t_sFileNameClusteredInv("");
-    QString t_sFileNameStc("mind006_051209_auditory01.stc");
-
-    // Parse command line parameters
-    for(qint32 i = 0; i < argc; ++i)
-    {
-        if(strcmp(argv[i], "-snr") == 0 || strcmp(argv[i], "--snr") == 0)
-        {
-            if(i + 1 < argc)
-                snr = atof(argv[i+1]);
-        }
-        else if(strcmp(argv[i], "-method") == 0 || strcmp(argv[i], "--method") == 0)
-        {
-            if(i + 1 < argc)
-                method = QString::fromUtf8(argv[i+1]);
-        }
-        else if(strcmp(argv[i], "-inv") == 0 || strcmp(argv[i], "--inv") == 0)
-        {
-            if(i + 1 < argc)
-                t_sFileNameClusteredInv = QString::fromUtf8(argv[i+1]);
-        }
-        else if(strcmp(argv[i], "-stc") == 0 || strcmp(argv[i], "--stc") == 0)
-        {
-            if(i + 1 < argc)
-                t_sFileNameStc = QString::fromUtf8(argv[i+1]);
-        }
-    }
-
-    double lambda2 = 1.0 / pow(snr, 2);
-    qDebug() << "Start calculation with: SNR" << snr << "; Lambda" << lambda2 << "; Method" << method << "; stc:" << t_sFileNameStc;
-
-//    // Load data
-//    fiff_int_t setno = 1;
-//    QPair<QVariant, QVariant> baseline(QVariant(), 0);
-//    FiffEvoked evoked(t_fileEvoked, setno, baseline);
-//    if(evoked.isEmpty())
-//        return 1;
-
-    MNEForwardSolution t_Fwd(t_fileFwd);
-    if(t_Fwd.isEmpty())
-        return 1;
-
-//    AnnotationSet t_annotationSet("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot", "./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot");
-//    AnnotationSet t_annotationSet("/home/chdinh/sl_data/subjects/mind006/label/lh.aparc.a2009s.annot", "/home/chdinh/sl_data/subjects/mind006/label/rh.aparc.a2009s.annot");
-    AnnotationSet t_annotationSet("E:/Data/sl_data/subjects/mind006/label/lh.aparc.a2009s.annot", "E:/Data/sl_data/subjects/mind006/label/rh.aparc.a2009s.annot");
-
-
-    FiffCov noise_cov(t_fileCov);
-
-    // regularize noise covariance
-    noise_cov = noise_cov.regularize(evoked.info, 0.05, 0.05, 0.1, true);
+    // RAP MUSIC Source Estimate
 
     //
     // Cluster forward solution;
@@ -481,105 +435,23 @@ int main(int argc, char *argv[])
     MNEForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution_ccr(t_annotationSet, 20);//40);
 
     //
-    // make an inverse operators
-    //
-    FiffInfo info = evoked.info;
-
-    MNEInverseOperator inverse_operator(info, t_clusteredFwd, noise_cov, 0.2f, 0.8f);
-
-    //
-    // save clustered inverse
-    //
-    if(!t_sFileNameClusteredInv.isEmpty())
-    {
-        QFile t_fileClusteredInverse(t_sFileNameClusteredInv);
-        inverse_operator.write(t_fileClusteredInverse);
-    }
-
-    //
     // Compute inverse solution
     //
-    MinimumNorm minimumNorm(inverse_operator, lambda2, method);
-    MNESourceEstimate sourceEstimate = minimumNorm.calculateInverse(evoked);
+    RapMusic t_rapMusic(t_clusteredFwd, false, numDipolePairs);
+    MNESourceEstimate sourceEstimate = t_rapMusic.calculateInverse(pickedEvoked);
 
     if(sourceEstimate.isEmpty())
         return 1;
 
-    // View activation time-series
-    std::cout << "\nsourceEstimate:\n" << sourceEstimate.data.block(0,0,10,10) << std::endl;
-    std::cout << "time\n" << sourceEstimate.times.block(0,0,1,10) << std::endl;
-    std::cout << "timeMin\n" << sourceEstimate.times[0] << std::endl;
-    std::cout << "timeMax\n" << sourceEstimate.times[sourceEstimate.times.size()-1] << std::endl;
-    std::cout << "time step\n" << sourceEstimate.tstep << std::endl;
-
-    //Condition Numbers
-//    MatrixXd mags(102, t_Fwd.sol->data.cols());
-//    qint32 count = 0;
-//    for(qint32 i = 2; i < 306; i += 3)
-//    {
-//        mags.row(count) = t_Fwd.sol->data.row(i);
-//        ++count;
-//    }
-//    MatrixXd magsClustered(102, t_clusteredFwd.sol->data.cols());
-//    count = 0;
-//    for(qint32 i = 2; i < 306; i += 3)
-//    {
-//        magsClustered.row(count) = t_clusteredFwd.sol->data.row(i);
-//        ++count;
-//    }
-
-//    MatrixXd grads(204, t_Fwd.sol->data.cols());
-//    count = 0;
-//    for(qint32 i = 0; i < 306; i += 3)
-//    {
-//        grads.row(count) = t_Fwd.sol->data.row(i);
-//        ++count;
-//        grads.row(count) = t_Fwd.sol->data.row(i+1);
-//        ++count;
-//    }
-//    MatrixXd gradsClustered(204, t_clusteredFwd.sol->data.cols());
-//    count = 0;
-//    for(qint32 i = 0; i < 306; i += 3)
-//    {
-//        gradsClustered.row(count) = t_clusteredFwd.sol->data.row(i);
-//        ++count;
-//        gradsClustered.row(count) = t_clusteredFwd.sol->data.row(i+1);
-//        ++count;
-//    }
-
-    VectorXd s;
-
-    double t_dConditionNumber = MNEMath::getConditionNumber(t_Fwd.sol->data, s);
-    double t_dConditionNumberClustered = MNEMath::getConditionNumber(t_clusteredFwd.sol->data, s);
-
-
-    std::cout << "Condition Number:\n" << t_dConditionNumber << std::endl;
-    std::cout << "Clustered Condition Number:\n" << t_dConditionNumberClustered << std::endl;
-
-    std::cout << "ForwardSolution" << t_Fwd.sol->data.block(0,0,10,10) << std::endl;
-
-    std::cout << "Clustered ForwardSolution" << t_clusteredFwd.sol->data.block(0,0,10,10) << std::endl;
-
-
-//    double t_dConditionNumberMags = MNEMath::getConditionNumber(mags, s);
-//    double t_dConditionNumberMagsClustered = MNEMath::getConditionNumber(magsClustered, s);
-
-//    std::cout << "Condition Number Magnetometers:\n" << t_dConditionNumberMags << std::endl;
-//    std::cout << "Clustered Condition Number Magnetometers:\n" << t_dConditionNumberMagsClustered << std::endl;
-
-//    double t_dConditionNumberGrads = MNEMath::getConditionNumber(grads, s);
-//    double t_dConditionNumberGradsClustered = MNEMath::getConditionNumber(gradsClustered, s);
-
-//    std::cout << "Condition Number Gradiometers:\n" << t_dConditionNumberGrads << std::endl;
-//    std::cout << "Clustered Condition Number Gradiometers:\n" << t_dConditionNumberGradsClustered << std::endl;
-
+//    // View activation time-series
+//    std::cout << "\nsourceEstimate:\n" << sourceEstimate.data.block(0,0,10,10) << std::endl;
+//    std::cout << "time\n" << sourceEstimate.times.block(0,0,1,10) << std::endl;
+//    std::cout << "timeMin\n" << sourceEstimate.times[0] << std::endl;
+//    std::cout << "timeMax\n" << sourceEstimate.times[sourceEstimate.times.size()-1] << std::endl;
+//    std::cout << "time step\n" << sourceEstimate.tstep << std::endl;
 
     //Source Estimate end
     //########################################################################################
-
-//    SurfaceSet t_surfSet("./MNE-sample-data/subjects/sample/surf/lh.white", "./MNE-sample-data/subjects/sample/surf/rh.white");
-//    SurfaceSet t_surfSet("/home/chdinh/sl_data/subjects/mind006/surf/lh.white", "/home/chdinh/sl_data/subjects/mind006/surf/rh.white");
-    SurfaceSet t_surfSet("E:/Data/sl_data/subjects/mind006/surf/lh.white", "E:/Data/sl_data/subjects/mind006/surf/rh.white");
 
 //    //only one time point - P100
 //    qint32 sample = 0;
@@ -600,7 +472,7 @@ int main(int argc, char *argv[])
     //ToDo overload toLabels using instead of t_surfSet rr of MNESourceSpace
     t_annotationSet.toLabels(t_surfSet, t_qListLabels, t_qListRGBAs);
 
-    InverseView view(minimumNorm.getSourceSpace(), t_qListLabels, t_qListRGBAs, 24, true, false, true);
+    InverseView view(t_rapMusic.getSourceSpace(), t_qListLabels, t_qListRGBAs, 24, true, false, true);
 
     if (view.stereoType() != QGLView::RedCyanAnaglyph)
         view.camera()->setEyeSeparation(0.3f);
@@ -639,6 +511,5 @@ int main(int argc, char *argv[])
         sourceEstimate.write(t_fileClusteredStc);
     }
 
-//*/
     return a.exec();//1;//a.exec();
 }

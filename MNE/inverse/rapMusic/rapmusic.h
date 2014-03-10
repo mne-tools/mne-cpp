@@ -142,7 +142,7 @@ public:
     * @param[in] p_bSparsed     True when sparse matrices should be used.
     * @param[in] p_iN           The number (default 2) of uncorrelated sources, which should be found. Starting with
     *                           the strongest.
-    * @param[in] p_dThr    The correlation threshold (default 0.5) at which the search for sources stops.
+    * @param[in] p_dThr         The correlation threshold (default 0.5) at which the search for sources stops.
     */
     RapMusic(MNEForwardSolution& p_pFwd, bool p_bSparsed, int p_iN = 2, double p_dThr = 0.5);
 
@@ -153,10 +153,10 @@ public:
     * Initializes the RAP MUSIC algorithm with the given model.
     *
     * @param[in] p_Fwd          The model which contains the gain matrix and its corresponding Grid matrix.
-    * @param[in] p_bSparsed    True when sparse matrices should be used.
-    * @param[in] p_iN   The number (default 2) of uncorrelated sources, which should be found. Starting with
-    *                   the strongest.
-    * @param[in] p_dThr    The correlation threshold (default 0.5) at which the search for sources stops.
+    * @param[in] p_bSparsed     True when sparse matrices should be used.
+    * @param[in] p_iN           The number (default 2) of uncorrelated sources, which should be found. Starting with
+    *                           the strongest.
+    * @param[in] p_dThr         The correlation threshold (default 0.5) at which the search for sources stops.
     * @return   true if successful initialized, false otherwise.
     */
     bool init(MNEForwardSolution& p_pFwd, bool p_bSparsed = false, int p_iN = 2, double p_dThr = 0.5);
@@ -189,8 +189,16 @@ public:
     */
     int nchoose2(int n);
 
-protected:
+    //=========================================================================================================
+    /**
+    * Sets the source estimate properties.
+    *
+    * @param[in] p_iSampStcWin  Samples per source localization window (default - 1 = not set)
+    * @param[in] p_fStcOverlap  Percentage of localization window overlap
+    */
+    void setStcProp(int p_iSampStcWin, float p_fStcOverlap);
 
+protected:
     //=========================================================================================================
     /**
     * Computes the signal subspace Phi_s out of the measurement F.
@@ -337,6 +345,10 @@ private:
     int m_iMaxNumThreads;   /**< Number of available CPU threads. */
 
     bool m_bIsInit; /**< Wether the algorithm is initialized. */
+
+    //Stc stuff
+    int m_iSamplesStcWindow;    /**< Number of samples per localization window */
+    float m_fStcOverlap;        /**< Percentage of localization window overlap */
 
     //=========================================================================================================
     /**
