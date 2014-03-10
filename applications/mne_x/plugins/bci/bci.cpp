@@ -136,25 +136,27 @@ void BCI::init()
     m_dTimeBetweenWindows = 0.04;
     m_iNumberSubSignals = 1;
     m_dThresholdValue = 25;
-    m_sSensorBoundaryPath = m_qStringResourcePath;
-    m_sSourceBoundaryPath = m_qStringResourcePath;
 
     // Intitalise feature selection
     m_slChosenFeatureSensor << "LA4" << "RA4"; //<< "TEST";
 
     // Initialise boundaries with linear coefficients y = mx+c -> vector = [m c] -> default [1 0]
-    m_vLoadedSensorBoundary.push_back(1);
-    m_vLoadedSensorBoundary.push_back(0);
+    VectorXd const_temp(1);
+    const_temp << 0.0;
+    VectorXd linear_temp(2);
+    linear_temp << 1.0, 1.0;
 
-    m_vLoadedSourceBoundary.push_back(1);
-    m_vLoadedSourceBoundary.push_back(0);
+    m_vLoadedSensorBoundary.push_back(const_temp);
+    m_vLoadedSensorBoundary.push_back(linear_temp);
+
+    m_vLoadedSourceBoundary.push_back(const_temp);
+    m_vLoadedSourceBoundary.push_back(linear_temp);
 
     // Initalise sliding window stuff
     m_bFillSensorWindowFirstTime = true;
 
     // Initialise filter stuff
-    if(!m_filterOperator.isNull())
-        m_filterOperator = QSharedPointer<FilterData>(new FilterData());
+    m_filterOperator = QSharedPointer<FilterData>(new FilterData());
 
     m_dFilterLowerBound = 7.0;
     m_dFilterUpperBound = 14.0;
@@ -408,9 +410,28 @@ QPair< int,QList<double> > BCI::applyFeatureCalcConcurrentlyOnSensorLevel(const 
 
 double BCI::applyClassificationCalcConcurrentlyOnSensorLevel(QList<double> &featData)
 {
-   double resultClassification = 0.5;
+   return classificationBoundaryValue(featData);
+}
 
-   return resultClassification;
+
+//*************************************************************************************************************
+
+double BCI::classificationBoundaryValue(const QList<double> &featData)
+{
+    double return_val = 0;
+
+    if(featData.size() == m_vLoadedSensorBoundary[1].size())
+    {
+        VectorXd feat_temp(featData.size());
+        for(int i = 0; i<featData.size() ;i++)
+            feat_temp(i) = featData.at(i);
+        return_val = m_vLoadedSensorBoundary[0](0) + m_vLoadedSensorBoundary[1].dot(feat_temp);
+
+    }
+
+    //cout<< return_val<<endl;
+
+    return return_val;
 }
 
 
@@ -462,7 +483,7 @@ bool BCI::hasThresholdArtefact(const QList< QPair<int,RowVectorXd> > &data)
         return false;
     else
     {
-        cout<<"Rejected artefact"<<endl;
+        //cout<<"Rejected artefact"<<endl;
         return true;
     }
 }

@@ -59,6 +59,7 @@
 //=============================================================================================================
 
 using namespace BCIPlugin;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -157,9 +158,9 @@ void BCISetupWidget::initGui()
     ui.m_spinBox_NumberSubSignals->setValue(m_pBCI->m_iNumberSubSignals);
     ui.m_doubleSpinBox_TimeBetweenWindows->setValue(m_pBCI->m_dTimeBetweenWindows);
 
-    // Classification options
-    ui.m_lineEdit_SensorBoundary->setText(m_pBCI->m_sSensorBoundaryPath);
-    ui.m_lineEdit_SourceBoundary->setText(m_pBCI->m_sSensorBoundaryPath);
+    // Classification boundaries
+    ui.m_lineEdit_SensorBoundary->setText(m_pBCI->m_qStringResourcePath);
+    ui.m_lineEdit_SourceBoundary->setText(m_pBCI->m_qStringResourcePath);
 
     // Filter options
     ui.m_checkBox_UseFilter->setChecked(m_pBCI->m_bUseFilter);
@@ -209,14 +210,13 @@ void BCISetupWidget::changeLoadSensorBoundary()
         path = ui.m_lineEdit_SensorBoundary->text();
 
     // Read boundary information generated with matlab
-    QString path;
     QFile file(path);
     if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
         return;
 
     //Start reading from file
-    QVector<double> const_temp;
-    QVector<double> linear_temp;
+    VectorXd const_temp(1);
+    VectorXd linear_temp(2);
 
     QTextStream in(&file);
 
@@ -228,10 +228,10 @@ void BCISetupWidget::changeLoadSensorBoundary()
         {
             QStringList list_temp = line.split(QRegExp("\\s+"));
 
-            for(int i = 0; i<list_temp.at(1) ; i++)
+            for(int i = 0; i<list_temp.at(1).toInt() ; i++)
             {
                 QString line = in.readLine();
-                const_temp.push_back(line.toDouble());
+                const_temp << line.toDouble();
             }
         }
 
@@ -239,18 +239,23 @@ void BCISetupWidget::changeLoadSensorBoundary()
         {
             QStringList list_temp = line.split(QRegExp("\\s+"));
 
-            for(int i = 0; i<list_temp.at(1) ; i++)
+            for(int i = 0; i<list_temp.at(1).toInt() ; i++)
             {
                 QString line = in.readLine();
-                linear_temp.push_back(line.toDouble());
+                linear_temp << line.toDouble();
             }
         }
     }
 
     file.close();
 
+    QVector<VectorXd> boundary_final;
+    boundary_final.push_back(const_temp);
+    boundary_final.push_back(linear_temp);
+
+    m_pBCI->m_vLoadedSensorBoundary = boundary_final;
+
     ui.m_lineEdit_SensorBoundary->setText(path);
-    m_pBCI->m_sSensorBoundaryPath = ui.m_lineEdit_SensorBoundary->text();
 }
 
 
@@ -267,8 +272,53 @@ void BCISetupWidget::changeLoadSourceBoundary()
     if(path==NULL)
         path = ui.m_lineEdit_SourceBoundary->text();
 
+    // Read boundary information generated with matlab
+    QFile file(path);
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
+        return;
+
+    //Start reading from file
+    VectorXd const_temp(1);
+    VectorXd linear_temp(2);
+
+    QTextStream in(&file);
+
+    while(!in.atEnd())
+    {
+        QString line = in.readLine();
+
+        if(line.contains(QString("const")))
+        {
+            QStringList list_temp = line.split(QRegExp("\\s+"));
+
+            for(int i = 0; i<list_temp.at(1).toInt() ; i++)
+            {
+                QString line = in.readLine();
+                const_temp << line.toDouble();
+            }
+        }
+
+        if(line.contains(QString("linear")))
+        {
+            QStringList list_temp = line.split(QRegExp("\\s+"));
+
+            for(int i = 0; i<list_temp.at(1).toInt() ; i++)
+            {
+                QString line = in.readLine();
+                linear_temp << line.toDouble();
+            }
+        }
+    }
+
+    file.close();
+
+    QVector<VectorXd> boundary_final;
+    boundary_final.push_back(const_temp);
+    boundary_final.push_back(linear_temp);
+
+    m_pBCI->m_vLoadedSourceBoundary = boundary_final;
+
     ui.m_lineEdit_SourceBoundary->setText(path);
-    m_pBCI->m_sSourceBoundaryPath = ui.m_lineEdit_SourceBoundary->text();
 }
 
 
