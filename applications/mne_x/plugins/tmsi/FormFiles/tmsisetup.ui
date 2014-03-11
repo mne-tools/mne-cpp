@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>713</width>
-    <height>584</height>
+    <height>622</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -141,16 +141,6 @@
           </property>
          </widget>
         </item>
-        <item row="3" column="0">
-         <widget class="QCheckBox" name="m_checkBox_UseCommonAverage">
-          <property name="enabled">
-           <bool>true</bool>
-          </property>
-          <property name="text">
-           <string>Use Common Average</string>
-          </property>
-         </widget>
-        </item>
        </layout>
       </widget>
      </item>
@@ -210,6 +200,16 @@
          <widget class="QCheckBox" name="m_checkBox_UseFiltering">
           <property name="text">
            <string>Enable preprocessing (HP)</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QCheckBox" name="m_checkBox_UseCommonAverage">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
+          <property name="text">
+           <string>Use Common Average</string>
           </property>
          </widget>
         </item>
@@ -307,7 +307,7 @@
           <property name="maximumSize">
            <size>
             <width>16777215</width>
-            <height>20</height>
+            <height>16777215</height>
            </size>
           </property>
          </widget>
@@ -315,19 +315,19 @@
         <item row="2" column="1">
          <widget class="QPushButton" name="m_pushButton_ChangeEEGHatDir">
           <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
           <property name="maximumSize">
            <size>
-            <width>50</width>
-            <height>20</height>
+            <width>16777215</width>
+            <height>16777215</height>
            </size>
           </property>
           <property name="text">
-           <string>Change</string>
+           <string>Select</string>
           </property>
          </widget>
         </item>
@@ -358,7 +358,7 @@
           <property name="maximumSize">
            <size>
             <width>16777215</width>
-            <height>20</height>
+            <height>16777215</height>
            </size>
           </property>
           <property name="text">
@@ -376,12 +376,12 @@
           </property>
           <property name="maximumSize">
            <size>
-            <width>50</width>
-            <height>20</height>
+            <width>16777215</width>
+            <height>16777215</height>
            </size>
           </property>
           <property name="text">
-           <string>Change</string>
+           <string>Dir</string>
           </property>
          </widget>
         </item>

@@ -159,8 +159,12 @@ void BCISetupWidget::initGui()
     ui.m_doubleSpinBox_TimeBetweenWindows->setValue(m_pBCI->m_dTimeBetweenWindows);
 
     // Classification boundaries
-    ui.m_lineEdit_SensorBoundary->setText(m_pBCI->m_qStringResourcePath);
-    ui.m_lineEdit_SourceBoundary->setText(m_pBCI->m_qStringResourcePath);
+    QString temp = m_pBCI->m_qStringResourcePath;
+    temp.append(QString("LDA_linear_boundary_Sensor.txt"));
+    ui.m_lineEdit_SensorBoundary->setText(temp);
+    ui.m_lineEdit_SourceBoundary->setText(temp);
+    m_pBCI->m_vLoadedSensorBoundary = readBoundaryInformation(temp);
+    m_pBCI->m_vLoadedSourceBoundary = readBoundaryInformation(temp);
 
     // Filter options
     ui.m_checkBox_UseFilter->setChecked(m_pBCI->m_bUseFilter);
@@ -209,51 +213,7 @@ void BCISetupWidget::changeLoadSensorBoundary()
     if(path==NULL)
         path = ui.m_lineEdit_SensorBoundary->text();
 
-    // Read boundary information generated with matlab
-    QFile file(path);
-    if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
-        return;
-
-    //Start reading from file
-    VectorXd const_temp(1);
-    VectorXd linear_temp(2);
-
-    QTextStream in(&file);
-
-    while(!in.atEnd())
-    {
-        QString line = in.readLine();
-
-        if(line.contains(QString("const")))
-        {
-            QStringList list_temp = line.split(QRegExp("\\s+"));
-
-            for(int i = 0; i<list_temp.at(1).toInt() ; i++)
-            {
-                QString line = in.readLine();
-                const_temp << line.toDouble();
-            }
-        }
-
-        if(line.contains(QString("linear")))
-        {
-            QStringList list_temp = line.split(QRegExp("\\s+"));
-
-            for(int i = 0; i<list_temp.at(1).toInt() ; i++)
-            {
-                QString line = in.readLine();
-                linear_temp << line.toDouble();
-            }
-        }
-    }
-
-    file.close();
-
-    QVector<VectorXd> boundary_final;
-    boundary_final.push_back(const_temp);
-    boundary_final.push_back(linear_temp);
-
-    m_pBCI->m_vLoadedSensorBoundary = boundary_final;
+    m_pBCI->m_vLoadedSensorBoundary = readBoundaryInformation(path);
 
     ui.m_lineEdit_SensorBoundary->setText(path);
 }
@@ -272,14 +232,38 @@ void BCISetupWidget::changeLoadSourceBoundary()
     if(path==NULL)
         path = ui.m_lineEdit_SourceBoundary->text();
 
+
+    m_pBCI->m_vLoadedSourceBoundary = readBoundaryInformation(path);
+
+    ui.m_lineEdit_SourceBoundary->setText(path);
+}
+
+
+//*************************************************************************************************************
+
+QVector<VectorXd> BCISetupWidget::readBoundaryInformation(QString path)
+{
+    QVector<VectorXd> boundary_final;
+
     // Read boundary information generated with matlab
     QFile file(path);
     if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
-        return;
+    {
+        // Initialise boundaries with linear coefficients y = mx+c -> vector = [m c] -> default [1 0]
+        VectorXd const_temp(1);
+        const_temp << 0.0;
+        VectorXd linear_temp(2);
+        linear_temp << 1.0, 1.0;
+
+        boundary_final.push_back(const_temp);
+        boundary_final.push_back(linear_temp);
+
+        return boundary_final;
+    }
 
     //Start reading from file
-    VectorXd const_temp(1);
-    VectorXd linear_temp(2);
+    VectorXd const_temp;
+    VectorXd linear_temp;
 
     QTextStream in(&file);
 
@@ -291,10 +275,12 @@ void BCISetupWidget::changeLoadSourceBoundary()
         {
             QStringList list_temp = line.split(QRegExp("\\s+"));
 
-            for(int i = 0; i<list_temp.at(1).toInt() ; i++)
+            const_temp.resize(list_temp.at(1).toInt());
+
+            for(int i = 0; i<list_temp.at(1).toInt(); i++)
             {
-                QString line = in.readLine();
-                const_temp << line.toDouble();
+                QString line_temp = in.readLine();
+                const_temp(i) = line_temp.toDouble();
             }
         }
 
@@ -302,23 +288,22 @@ void BCISetupWidget::changeLoadSourceBoundary()
         {
             QStringList list_temp = line.split(QRegExp("\\s+"));
 
-            for(int i = 0; i<list_temp.at(1).toInt() ; i++)
+            linear_temp.resize(list_temp.at(1).toInt());
+
+            for(int i = 0; i<list_temp.at(1).toInt(); i++)
             {
-                QString line = in.readLine();
-                linear_temp << line.toDouble();
+                QString line_temp = in.readLine();
+                linear_temp(i) = line_temp.toDouble();
             }
         }
     }
 
     file.close();
 
-    QVector<VectorXd> boundary_final;
     boundary_final.push_back(const_temp);
     boundary_final.push_back(linear_temp);
 
-    m_pBCI->m_vLoadedSourceBoundary = boundary_final;
-
-    ui.m_lineEdit_SourceBoundary->setText(path);
+    return boundary_final;
 }
 
 
