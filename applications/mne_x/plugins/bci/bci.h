@@ -271,12 +271,14 @@ private:
     MatrixXd                m_matSlidingWindowSensor;           /**< Sensor level: Working (sliding) matrix, used to store data for feature calculation on sensor level. */
     MatrixXd                m_matTimeBetweenWindowsSensor;      /**< Sensor level: Samples stored during time between windows on sensor level. */
     int                     m_iTBWIndexSensor;                  /**< Sensor level: Index of the amount of data which was already filled during the time between windows. */
-    int                     m_iNumberOfCalculatedFeatures;      /**< Index which is iterated until enough features are calculated and classified to generate a final classifcation result.*/
+    int                     m_iNumberOfCalculatedFeatures;      /**< Sensor level: Index which is iterated until enough features are calculated and classified to generate a final classifcation result.*/
     QVector< VectorXd >     m_vLoadedSensorBoundary;            /**< Sensor level: Loaded decision boundary on sensor level. */
     QStringList             m_slChosenFeatureSensor;            /**< Sensor level: Features used to calculate data points in feature space on sensor level. */
     QMap<QString, int>      m_mapElectrodePinningScheme;        /**< Sensor level: Loaded pinning scheme of the Duke 128 EEG cap. */
     QList< QPair< int,QList<double> > >  m_lFeaturesSensor;     /**< Sensor level: Features calculated on sensor level. */
     QList<double>           m_lClassResultsSensor;              /**< Sensor level: Classification results on sensor level. */
+    MatrixXd                m_matStimChannelSensor;             /**< Sensor level: Stim channel. */
+    MatrixXd                m_matTimeBetweenWindowsStimSensor;  /**< Sensor level: Stim channel. */
 
     // Source level
     QVector< VectorXd >     m_vLoadedSourceBoundary;            /**< Source level: Loaded decision boundary on source level. */

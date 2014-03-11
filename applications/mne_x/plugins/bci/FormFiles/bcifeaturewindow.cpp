@@ -89,7 +89,7 @@ void BCIFeatureWindow::paintFeaturesToScene(MyQList features, bool bTriggerActiv
     //std::cout<<"features.size()"<<features.size()<<endl;
     if(features.first().size() == 2) // Only plot when 2D case with two electrodes
     {
-        m_scene.clear();
+        //m_scene.clear();
 
         // If trigger was activated during feature calculation -> change scenes brush color
         if(bTriggerActivated)
@@ -116,12 +116,15 @@ void BCIFeatureWindow::paintFeaturesToScene(MyQList features, bool bTriggerActiv
             if(featureB > m_dFeatureMax)
                 m_dFeatureMax = featureB;
 
-            QRectF rect(featureA*(lineSize/m_dFeatureMax), featureB*(lineSize/m_dFeatureMax), 2, 2);
+            QRectF rect(featureA*(lineSize/m_dFeatureMax), featureB*(lineSize/m_dFeatureMax), 5, 5);
 //            std::cout<<"Scaled: "<< featureA*(lineSize/m_dFeatureMax) <<" "<< featureB*(lineSize/m_dFeatureMax) << endl;
 //            std::cout<<"Unscaled: "<< featureA <<" "<< featureB << endl;
             // If NAN -> don't plot features -> case when working with the Refa device without any channels connected
             if(featureA == featureA && featureB == featureB)
-                m_scene.addEllipse(rect);
+                if(bTriggerActivated)
+                    m_scene.addEllipse(rect, QPen(Qt::red));
+                else
+                    m_scene.addEllipse(rect, QPen(Qt::black));
         }
 
         ui.m_graphicsView_featureVisualization->fitInView(m_scene.sceneRect());
