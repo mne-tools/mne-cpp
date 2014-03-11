@@ -189,6 +189,8 @@ bool BCI::start()
 
     m_pFiffInfo_Sensor = FiffInfo::SPtr();
 
+    m_bFillSensorWindowFirstTime = true;
+
     m_bIsRunning = true;
 
     QThread::start();
@@ -287,10 +289,14 @@ void BCI::updateSensor(XMEASLIB::NewMeasurement::SPtr pMeasurement)
             int cols = m_pFiffInfo_Sensor->sfreq*m_dSlidingWindowSize-modulo;
             m_matSlidingWindowSensor.resize(rows, cols);
 
+            m_matStimChannelSensor.resize(1,cols);
+
             modulo = int(m_pFiffInfo_Sensor->sfreq*m_dTimeBetweenWindows) % arraySize;
             rows = m_slChosenFeatureSensor.size();
             cols = m_pFiffInfo_Sensor->sfreq*m_dTimeBetweenWindows-modulo;
             m_matTimeBetweenWindowsSensor.resize(rows, cols);
+
+            m_matTimeBetweenWindowsStimSensor.resize(1,cols);
 
             // Build filter operator
             double dCenterFreqNyq = (m_dFilterLowerBound+((m_dFilterUpperBound - m_dFilterLowerBound)/2))/(m_pFiffInfo_Sensor->sfreq/2);
@@ -320,16 +326,6 @@ void BCI::updateSensor(XMEASLIB::NewMeasurement::SPtr pMeasurement)
         if(m_bProcessData)
         {
             MatrixXd t_mat(pRTMSA->getNumChannels(), pRTMSA->getMultiArraySize());
-
-            // Check if capacitive touch trigger signal was received - Note that there can also be "beep" triggers in the received data, which are only 1 sample wide -> therefore look for 2 samples with a value of 254 each
-            for(int i = 0; i<t_mat.cols()-1; i++)
-            {
-                if(t_mat(t_mat.rows()-2,i) == 254 && t_mat(t_mat.rows()-2,i+1) == 254 && m_bTriggerActivated == false) // t_mat(t_mat.rows()-2,i) - corresponds with channel 136 which is the trigger channel
-                {
-                    m_bTriggerActivated = true;
-                    i = t_mat.cols(); // abort for statement if capacitive touch trigger was found
-                }
-            }
 
             for(unsigned char i = 0; i < pRTMSA->getMultiArraySize(); ++i)
                 t_mat.col(i) = pRTMSA->getMultiSampleArray()[i];
@@ -411,14 +407,13 @@ double BCI::classificationBoundaryValue(const QList<double> &featData)
     if(featData.size() == m_vLoadedSensorBoundary[1].size())
     {
         VectorXd feat_temp(featData.size());
-        for(int i = 0; i<featData.size() ;i++)
+        for(int i = 0; i<featData.size(); i++)
             feat_temp(i) = featData.at(i);
 
         return_val = m_vLoadedSensorBoundary[0](0) + m_vLoadedSensorBoundary[1].dot(feat_temp);
-
     }
 
-    //cout<< return_val<<endl;
+    // cout<< return_val<<endl;
 
     return return_val;
 }
@@ -488,6 +483,8 @@ void BCI::run()
         while(!m_pFiffInfo_Sensor)
             msleep(10);
 
+        cout << m_pFiffInfo_Sensor.isNull() << endl;
+
         // Start filling buffers with data from the inputs
         m_bProcessData = true;
 
@@ -501,6 +498,8 @@ void BCI::run()
                 // Get only the rows from the matrix which correspond with the selected features, namely electrodes on sensor level and destrieux clustered regions on source level
                 for(int i = 0; i < m_matSlidingWindowSensor.rows(); i++)
                     m_matSlidingWindowSensor.block(i, m_iTBWIndexSensor, 1, t_mat.cols()) = t_mat.block(m_mapElectrodePinningScheme[m_slChosenFeatureSensor.at(i)], 0, 1, t_mat.cols());
+
+                m_matStimChannelSensor.block(0, m_iTBWIndexSensor, 1, t_mat.cols()) = t_mat.block(136, 0, 1, t_mat.cols());
 
                 m_iTBWIndexSensor = m_iTBWIndexSensor + t_mat.cols();
             }
@@ -520,17 +519,23 @@ void BCI::run()
                 for(int i = 0; i < m_matTimeBetweenWindowsSensor.rows(); i++)
                     m_matTimeBetweenWindowsSensor.block(i, m_iTBWIndexSensor, 1, t_mat.cols()) = t_mat.block(m_mapElectrodePinningScheme[m_slChosenFeatureSensor.at(i)], 0, 1, t_mat.cols());
 
+                m_matTimeBetweenWindowsStimSensor.block(0, m_iTBWIndexSensor, 1, t_mat.cols()) = t_mat.block(136, 0, 1, t_mat.cols());
+
                 m_iTBWIndexSensor = m_iTBWIndexSensor + t_mat.cols();
             }
             else // Recalculate m_matSlidingWindowSensor -> Calculate features, classify and store results
             {
                 // ----1---- Recalculate m_matSlidingWindowSensor
                 //cout<<"----1----"<<endl;
-                //Delete same block size of data from the right -> use eval() to resolve Eigens aliasing problem
+                //Move block from the right to the left -> use eval() to resolve Eigens aliasing problem
                 m_matSlidingWindowSensor.block(0, 0, m_matSlidingWindowSensor.rows(), m_matSlidingWindowSensor.cols()-m_matTimeBetweenWindowsSensor.cols()) = m_matSlidingWindowSensor.block(0, m_matTimeBetweenWindowsSensor.cols(), m_matSlidingWindowSensor.rows(), m_matSlidingWindowSensor.cols()-m_matTimeBetweenWindowsSensor.cols()).eval();
+                m_matStimChannelSensor.block(0, 0, m_matStimChannelSensor.rows(), m_matStimChannelSensor.cols()-m_matTimeBetweenWindowsStimSensor.cols()) = m_matStimChannelSensor.block(0, m_matTimeBetweenWindowsStimSensor.cols(), m_matStimChannelSensor.rows(), m_matStimChannelSensor.cols()-m_matTimeBetweenWindowsStimSensor.cols()).eval();
 
-                // push m_matTimeBetweenWindowsSensor from the left
+                // push m_matTimeBetweenWindowsSensor from the right
                 m_matSlidingWindowSensor.block(0, m_matSlidingWindowSensor.cols()-m_matTimeBetweenWindowsSensor.cols(), m_matTimeBetweenWindowsSensor.rows(), m_matTimeBetweenWindowsSensor.cols()) = m_matTimeBetweenWindowsSensor;
+                m_matStimChannelSensor.block(0, m_matStimChannelSensor.cols()-m_matTimeBetweenWindowsStimSensor.cols(), m_matTimeBetweenWindowsStimSensor.rows(), m_matTimeBetweenWindowsStimSensor.cols()) = m_matTimeBetweenWindowsStimSensor;
+
+                cout<<m_matStimChannelSensor;
 
                 // Test if data is correctly streamed to this plugin
                 if(m_slChosenFeatureSensor.contains("TEST"))
@@ -538,6 +543,7 @@ void BCI::run()
                     cout<<"Recalculate matrix"<<endl;
                     for(int i = 1; i<m_matSlidingWindowSensor.cols() ; i++)
                     {
+                        cout << m_matSlidingWindowSensor(m_matSlidingWindowSensor.rows()-1,i-1) <<endl;
                         if(m_matSlidingWindowSensor(m_matSlidingWindowSensor.rows()-1,i) - m_matSlidingWindowSensor(m_matSlidingWindowSensor.rows()-1,i-1) != 1)
                             cout<<"Sequence error while streaming from tmsi plugin at position: "<<i<<endl;
                     }
@@ -566,6 +572,10 @@ void BCI::run()
                 //cout<<"----4----"<<endl;
                 if(hasThresholdArtefact(qlMatrixRows) == false)
                 {
+                    // Set trigger flag
+                    if(m_matTimeBetweenWindowsStimSensor.minCoeff() == 254 && !m_bTriggerActivated)
+                        m_bTriggerActivated = true;
+
                     // ----5---- Filter data in m_matSlidingWindowSensor concurrently using map()
                     //cout<<"----5----"<<endl;
                     QList< QPair<int,RowVectorXd> > filteredRows = qlMatrixRows;
@@ -579,16 +589,16 @@ void BCI::run()
                         futureFilter.waitForFinished();
                     }
 
-                    // Write data before and after filtering to debug file
-                    for(int i=0; i<qlMatrixRows.size(); i++)
-                        m_outStreamDebug << "qlMatrixRows at row " << i << ": " << qlMatrixRows.at(i).second << "\n";
+//                    // Write data before and after filtering to debug file
+//                    for(int i=0; i<qlMatrixRows.size(); i++)
+//                        m_outStreamDebug << "qlMatrixRows at row " << i << ": " << qlMatrixRows.at(i).second << "\n";
 
-                    m_outStreamDebug<<endl;
+//                    m_outStreamDebug<<endl;
 
-                    for(int i=0; i<filteredRows.size(); i++)
-                        m_outStreamDebug << "filteredRows at row " << i << ": " << filteredRows.at(i).second << "\n";
+//                    for(int i=0; i<filteredRows.size(); i++)
+//                        m_outStreamDebug << "filteredRows at row " << i << ": " << filteredRows.at(i).second << "\n";
 
-                    m_outStreamDebug << endl << "---------------------------------------------------------" << endl << endl;
+//                    m_outStreamDebug << endl << "---------------------------------------------------------" << endl << endl;
 
                     // ----6---- Calculate features concurrently using mapped()
                     //cout<<"----6----"<<endl;
@@ -650,7 +660,7 @@ void BCI::run()
                             dfinalResult += futureClassificationResults.resultAt(i);
 
                         dfinalResult = dfinalResult/futureClassificationResults.resultCount();
-                        //cout << dfinalResult << endl;
+                        cout << dfinalResult << endl << endl;
 
                         // ----11---- Store final result
                         //cout<<"----11----"<<endl;
@@ -667,12 +677,6 @@ void BCI::run()
                         m_iNumberOfCalculatedFeatures = 0;
                     } // End if enough features (windows) have been calculated (processed)
                 } // End artefact reduction
-                else
-                {
-                    // If enough features (windows) WOULD have been calculated (processed) but artefact reduction rejected trial -> reset trigger here
-                    if(m_iNumberOfCalculatedFeatures+1 >= (int)(m_matSlidingWindowSensor.cols()/m_matTimeBetweenWindowsSensor.cols()))
-                        m_bTriggerActivated = false;
-                }
 
                 m_iTBWIndexSensor = 0;
             }
