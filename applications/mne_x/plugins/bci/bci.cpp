@@ -133,9 +133,9 @@ void BCI::init()
     m_bUseSourceData = false;
     m_bUseArtefactThresholdReduction = true;
     m_dSlidingWindowSize = 1.0;
-    m_dTimeBetweenWindows = 0.04;
+    m_dTimeBetweenWindows = 0.25;
     m_iNumberSubSignals = 1;
-    m_dThresholdValue = 25;
+    m_dThresholdValue = 15;
 
     // Intitalise feature selection
     m_slChosenFeatureSensor << "LA4" << "RA4"; //<< "TEST";
@@ -475,6 +475,20 @@ bool BCI::hasThresholdArtefact(const QList< QPair<int,RowVectorXd> > &data)
 
 //*************************************************************************************************************
 
+bool BCI::lookForTrigger(const MatrixXd &data)
+{
+    // Check if capacitive touch trigger signal was received - Note that there can also be "beep" triggers in the received data, which are only 1 sample wide -> therefore look for 2 samples with a value of 254 each
+    for(int i = 0; i<data.cols()-1; i++)
+    {
+        if(data(0,i) == 254 && data(0,i+1) == 254) // data - corresponds with channel 136 which is the trigger channel
+            return true;
+    }
+
+    return false;
+}
+
+//*************************************************************************************************************
+
 void BCI::run()
 {
     while(m_bIsRunning)
@@ -482,8 +496,6 @@ void BCI::run()
         // Wait for fiff Info if not yet received - this is needed because we have to wait until the buffers are firstly initiated in the update functions
         while(!m_pFiffInfo_Sensor)
             msleep(10);
-
-        cout << m_pFiffInfo_Sensor.isNull() << endl;
 
         // Start filling buffers with data from the inputs
         m_bProcessData = true;
@@ -535,7 +547,7 @@ void BCI::run()
                 m_matSlidingWindowSensor.block(0, m_matSlidingWindowSensor.cols()-m_matTimeBetweenWindowsSensor.cols(), m_matTimeBetweenWindowsSensor.rows(), m_matTimeBetweenWindowsSensor.cols()) = m_matTimeBetweenWindowsSensor;
                 m_matStimChannelSensor.block(0, m_matStimChannelSensor.cols()-m_matTimeBetweenWindowsStimSensor.cols(), m_matTimeBetweenWindowsStimSensor.rows(), m_matTimeBetweenWindowsStimSensor.cols()) = m_matTimeBetweenWindowsStimSensor;
 
-                cout<<m_matStimChannelSensor;
+                //cout<<m_matStimChannelSensor;
 
                 // Test if data is correctly streamed to this plugin
                 if(m_slChosenFeatureSensor.contains("TEST"))
@@ -566,15 +578,18 @@ void BCI::run()
                     });
 
                     futureMean.waitForFinished();
-                }
+                }           
 
                 // ----4---- Do simple threshold artefact reduction
                 //cout<<"----4----"<<endl;
                 if(hasThresholdArtefact(qlMatrixRows) == false)
                 {
-                    // Set trigger flag
-                    if(m_matTimeBetweenWindowsStimSensor.minCoeff() == 254 && !m_bTriggerActivated)
+                    // Look for trigger flag
+                    if(lookForTrigger(m_matStimChannelSensor) && !m_bTriggerActivated)
+                    {
+                        cout << "Trigger activated" << endl;
                         m_bTriggerActivated = true;
+                    }
 
                     // ----5---- Filter data in m_matSlidingWindowSensor concurrently using map()
                     //cout<<"----5----"<<endl;
