@@ -140,18 +140,6 @@ void BCI::init()
     // Intitalise feature selection
     m_slChosenFeatureSensor << "LA4" << "RA4"; //<< "TEST";
 
-    // Initialise boundaries with linear coefficients y = mx+c -> vector = [m c] -> default [1 0]
-    VectorXd const_temp(1);
-    const_temp << 0.0;
-    VectorXd linear_temp(2);
-    linear_temp << 1.0, 1.0;
-
-    m_vLoadedSensorBoundary.push_back(const_temp);
-    m_vLoadedSensorBoundary.push_back(linear_temp);
-
-    m_vLoadedSourceBoundary.push_back(const_temp);
-    m_vLoadedSourceBoundary.push_back(linear_temp);
-
     // Initalise sliding window stuff
     m_bFillSensorWindowFirstTime = true;
 
@@ -160,8 +148,8 @@ void BCI::init()
 
     m_dFilterLowerBound = 7.0;
     m_dFilterUpperBound = 14.0;
-    m_dParcksWidth = (m_dFilterUpperBound-m_dFilterLowerBound)/2;
-    m_iFilterOrder = 128;
+    m_dParcksWidth = m_dFilterLowerBound-1; // (m_dFilterUpperBound-m_dFilterLowerBound)/2;
+    m_iFilterOrder = 256;
 
     // Init BCIFeatureWindow for visualization
     m_BCIFeatureWindow = QSharedPointer<BCIFeatureWindow>(new BCIFeatureWindow(this));
@@ -425,6 +413,7 @@ double BCI::classificationBoundaryValue(const QList<double> &featData)
         VectorXd feat_temp(featData.size());
         for(int i = 0; i<featData.size() ;i++)
             feat_temp(i) = featData.at(i);
+
         return_val = m_vLoadedSensorBoundary[0](0) + m_vLoadedSensorBoundary[1].dot(feat_temp);
 
     }
@@ -590,16 +579,16 @@ void BCI::run()
                         futureFilter.waitForFinished();
                     }
 
-//                    // Write data before and after filtering to debug file
-//                    for(int i=0; i<qlMatrixRows.size(); i++)
-//                        m_outStreamDebug << "qlMatrixRows at row " << i << ": " << qlMatrixRows.at(i).second << "\n";
+                    // Write data before and after filtering to debug file
+                    for(int i=0; i<qlMatrixRows.size(); i++)
+                        m_outStreamDebug << "qlMatrixRows at row " << i << ": " << qlMatrixRows.at(i).second << "\n";
 
-//                    m_outStreamDebug<<endl;
+                    m_outStreamDebug<<endl;
 
-//                    for(int i=0; i<filteredRows.size(); i++)
-//                        m_outStreamDebug << "filteredRows at row " << i << ": " << filteredRows.at(i).second << "\n";
+                    for(int i=0; i<filteredRows.size(); i++)
+                        m_outStreamDebug << "filteredRows at row " << i << ": " << filteredRows.at(i).second << "\n";
 
-//                    m_outStreamDebug << endl << "---------------------------------------------------------" << endl << endl;
+                    m_outStreamDebug << endl << "---------------------------------------------------------" << endl << endl;
 
                     // ----6---- Calculate features concurrently using mapped()
                     //cout<<"----6----"<<endl;
@@ -644,6 +633,7 @@ void BCI::run()
 
                         // ----9---- Classify features concurrently using mapped() ----------
                         //cout<<"----9----"<<endl;
+
                         std::function<double (QList<double>&)> applyOpsClassification = [this](QList<double>& featData){
                             return applyClassificationCalcConcurrentlyOnSensorLevel(featData);
                         };
