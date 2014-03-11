@@ -161,7 +161,7 @@ public:
     */
     bool init(MNEForwardSolution& p_pFwd, bool p_bSparsed = false, int p_iN = 2, double p_dThr = 0.5);
 
-    virtual MNESourceEstimate calculateInverse(const MatrixXd& p_matMeasurement, QVector< DipolePair<double> > &p_RapDipoles);
+    virtual MNESourceEstimate calculateInverse(const MatrixXd& p_matMeasurement, QList< DipolePair<double> > &p_RapDipoles);
 
     virtual MNESourceEstimate calculateInverse(const FiffEvoked &p_fiffEvoked, bool pick_normal = false);
 
@@ -326,7 +326,7 @@ protected:
     void insertSource(  int p_iDipoleIdx1, int p_iDipoleIdx2,
                         const Vector6T &p_vec_phi_k_1,
                         double p_valCor,
-                        QVector< DipolePair<double> > &p_RapDipoles);
+                        QList< DipolePair<double> > &p_RapDipoles);
 
 private:
     MNEForwardSolution m_ForwardSolution; /**< The Forward operator which should be scanned through*/

@@ -28,7 +28,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Example of MNEForwardSolution and RapMusic application
+* @brief    Example of MNEForwardSolution and Powell Rap Music application
 *
 */
 
@@ -123,7 +123,7 @@ int main(int argc, char *argv[])
 
     qint32 numDipolePairs = 7;
 
-    bool doMovie = true;//true;
+    bool doMovie = true;//false;
 
     // Parse command line parameters
     for(qint32 i = 0; i < argc; ++i)
@@ -169,10 +169,13 @@ int main(int argc, char *argv[])
     PwlRapMusic t_pwlRapMusic(t_clusteredFwd, false, numDipolePairs);
 
     if(doMovie)
-        t_pwlRapMusic.setStcAttr(200,0.5);
+        t_pwlRapMusic.setStcAttr(50,0.5);
 
 
     MNESourceEstimate sourceEstimate = t_pwlRapMusic.calculateInverse(pickedEvoked);
+
+    std::cout << "source estimated" << std::endl;
+
     if(sourceEstimate.isEmpty())
         return 1;
 
