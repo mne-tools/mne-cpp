@@ -29,6 +29,14 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// EIGEN INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // STL INCLUDES
 //=============================================================================================================
 
@@ -48,6 +56,8 @@ namespace INVERSELIB
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
+
+using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -103,7 +113,7 @@ public:
     *
     * @param p_sDataPath the path to the directory which contains the data folder.
     */
-    /*	Dipole();*/
+    /*  Dipole();*/
 
 
     //=========================================================================================================
@@ -114,19 +124,19 @@ public:
     virtual ~Dipole();
 
 
-    inline T& x() { return m_pPosition[0] ; }
-    inline T& y() { return m_pPosition[1] ; }
-    inline T& z() { return m_pPosition[2] ; }
-    inline T x() const { return m_pPosition[0] ; }
-    inline T y() const { return m_pPosition[1] ; }
-    inline T z() const { return m_pPosition[2] ; }
+    inline T& x() { return m_vecPosition[0] ; }
+    inline T& y() { return m_vecPosition[1] ; }
+    inline T& z() { return m_vecPosition[2] ; }
+    inline T x() const { return m_vecPosition[0] ; }
+    inline T y() const { return m_vecPosition[1] ; }
+    inline T z() const { return m_vecPosition[2] ; }
 
-    inline T& phi_x() { return m_pDirection[0] ; }
-    inline T& phi_y() { return m_pDirection[1] ; }
-    inline T& phi_z() { return m_pDirection[2] ; }
-    inline T phi_x() const { return m_pDirection[0] ; }
-    inline T phi_y() const { return m_pDirection[1] ; }
-    inline T phi_z() const { return m_pDirection[2] ; }
+    inline T& phi_x() { return m_vecDirection[0] ; }
+    inline T& phi_y() { return m_vecDirection[1] ; }
+    inline T& phi_z() { return m_vecDirection[2] ; }
+    inline T phi_x() const { return m_vecDirection[0] ; }
+    inline T phi_y() const { return m_vecDirection[1] ; }
+    inline T phi_z() const { return m_vecDirection[2] ; }
 
 
     //=========================================================================================================
@@ -139,8 +149,8 @@ protected:
 
 private:
 
-    T* m_pPosition;
-    T* m_pDirection;
+    Eigen::Matrix<T, 3, 1> m_vecPosition;
+    Eigen::Matrix<T, 3, 1> m_vecDirection;
 
     double  m_dLength;
     double  m_dFrequency;

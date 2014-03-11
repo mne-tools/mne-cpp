@@ -57,18 +57,12 @@ namespace INVERSELIB
 
 template <class T>
 Dipole<T>::Dipole()
-: m_pPosition(new T[3])
-, m_pDirection(new T[3])
+: m_vecPosition(Matrix<T, 3, 1>::Zero(3))
+, m_vecDirection(Matrix<T, 3, 1>::Zero(3))
 , m_dLength(1)
 , m_dFrequency(0)
 {
-    this->x() = 0;
-    this->y() = 0;
-    this->z() = 0;
 
-    this->phi_x() = 0;
-    this->phi_y() = 0;
-    this->phi_z() = 0;
 }
 
 
@@ -77,11 +71,7 @@ Dipole<T>::Dipole()
 template <class T>
 Dipole<T>::~Dipole()
 {
-    if (m_pPosition != NULL)
-        delete [] m_pPosition;
 
-    if(m_pDirection != NULL)
-        delete [] m_pDirection;
 }
 
 

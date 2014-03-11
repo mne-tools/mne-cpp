@@ -232,7 +232,7 @@ MNESourceEstimate PwlRapMusic::calculateInverse(const FiffEvoked &p_fiffEvoked, 
 
     if(m_iSamplesStcWindow <= 3) //if samples per stc aren't set -> use full window
     {
-        QVector< DipolePair<double> > t_RapDipoles;
+        QList< DipolePair<double> > t_RapDipoles;
         calculateInverse(p_fiffEvoked.data, t_RapDipoles);
 
         for(qint32 i = 0; i < t_RapDipoles.size(); ++i)
@@ -272,7 +272,7 @@ MNESourceEstimate PwlRapMusic::calculateInverse(const FiffEvoked &p_fiffEvoked, 
 
         while(!last)
         {
-            QVector< DipolePair<double> > t_RapDipoles;
+            QList< DipolePair<double> > t_RapDipoles;
 
             //Data
             if(curSample + m_iSamplesStcWindow >= t_iNumSteps) //last
@@ -327,7 +327,7 @@ MNESourceEstimate PwlRapMusic::calculateInverse(const FiffEvoked &p_fiffEvoked, 
 
 //*************************************************************************************************************
 
-MNESourceEstimate PwlRapMusic::calculateInverse(const MatrixXd& p_matMeasurement, QVector< DipolePair<double> > &p_RapDipoles)
+MNESourceEstimate PwlRapMusic::calculateInverse(const MatrixXd& p_matMeasurement, QList< DipolePair<double> > &p_RapDipoles)
 {
     MNESourceEstimate p_SourceEstimate;
 
@@ -540,8 +540,6 @@ MNESourceEstimate PwlRapMusic::calculateInverse(const MatrixXd& p_matMeasurement
 
         //Set return values
         insertSource(t_iIdx1, t_iIdx2, t_vec_phi_k_1, t_val_roh_k, p_RapDipoles);
-
-        std::cout << "Source pair inserted.\n" << std::endl;
 
         //Stop Searching when Correlation is smaller then the Threshold
         if (t_val_roh_k < m_dThreshold)
@@ -911,32 +909,32 @@ void PwlRapMusic::getGainMatrixPair(const MatrixXT& p_matGainMarix,
 void PwlRapMusic::insertSource( int p_iDipoleIdx1, int p_iDipoleIdx2,
                                 const Vector6T &p_vec_phi_k_1,
                                 double p_valCor,
-                                QVector< DipolePair<double> > &p_RapDipoles)
+                                QList< DipolePair<double> > &p_RapDipoles)
 {
-    DipolePair<double> t_pRapDipolePair;
+    DipolePair<double> t_rapDipolePair;
 
-    t_pRapDipolePair.m_iIdx1 = p_iDipoleIdx1; //p_iDipoleIdx1+1 because of MATLAB index
-    t_pRapDipolePair.m_iIdx2 = p_iDipoleIdx2;
+    t_rapDipolePair.m_iIdx1 = p_iDipoleIdx1; //p_iDipoleIdx1+1 because of MATLAB index
+    t_rapDipolePair.m_iIdx2 = p_iDipoleIdx2;
 
-    t_pRapDipolePair.m_Dipole1.x() = 0; //m_bGridInitialized ? (*m_pMatGrid)(p_iDipoleIdx1, 0) : 0;
-    t_pRapDipolePair.m_Dipole1.y() = 0; //m_bGridInitialized ? (*m_pMatGrid)(p_iDipoleIdx1, 1) : 0;
-    t_pRapDipolePair.m_Dipole1.z() = 0; //m_bGridInitialized ? (*m_pMatGrid)(p_iDipoleIdx1, 2) : 0;
+    t_rapDipolePair.m_Dipole1.x() = 0; //m_bGridInitialized ? (*m_pMatGrid)(p_iDipoleIdx1, 0) : 0;
+    t_rapDipolePair.m_Dipole1.y() = 0; //m_bGridInitialized ? (*m_pMatGrid)(p_iDipoleIdx1, 1) : 0;
+    t_rapDipolePair.m_Dipole1.z() = 0; //m_bGridInitialized ? (*m_pMatGrid)(p_iDipoleIdx1, 2) : 0;
 
-    t_pRapDipolePair.m_Dipole2.x() = 0; //m_bGridInitialized ? (*m_pMatGrid)(p_iDipoleIdx2, 0) : 0;
-    t_pRapDipolePair.m_Dipole2.y() = 0; //m_bGridInitialized ? (*m_pMatGrid)(p_iDipoleIdx2, 1) : 0;
-    t_pRapDipolePair.m_Dipole2.z() = 0; //m_bGridInitialized ? (*m_pMatGrid)(p_iDipoleIdx2, 2) : 0;
+    t_rapDipolePair.m_Dipole2.x() = 0; //m_bGridInitialized ? (*m_pMatGrid)(p_iDipoleIdx2, 0) : 0;
+    t_rapDipolePair.m_Dipole2.y() = 0; //m_bGridInitialized ? (*m_pMatGrid)(p_iDipoleIdx2, 1) : 0;
+    t_rapDipolePair.m_Dipole2.z() = 0; //m_bGridInitialized ? (*m_pMatGrid)(p_iDipoleIdx2, 2) : 0;
 
-    t_pRapDipolePair.m_Dipole1.phi_x() = p_vec_phi_k_1[0];
-    t_pRapDipolePair.m_Dipole1.phi_y() = p_vec_phi_k_1[1];
-    t_pRapDipolePair.m_Dipole1.phi_z() = p_vec_phi_k_1[2];
+    t_rapDipolePair.m_Dipole1.phi_x() = p_vec_phi_k_1[0];
+    t_rapDipolePair.m_Dipole1.phi_y() = p_vec_phi_k_1[1];
+    t_rapDipolePair.m_Dipole1.phi_z() = p_vec_phi_k_1[2];
 
-    t_pRapDipolePair.m_Dipole2.phi_x() = p_vec_phi_k_1[3];
-    t_pRapDipolePair.m_Dipole2.phi_y() = p_vec_phi_k_1[4];
-    t_pRapDipolePair.m_Dipole2.phi_z() = p_vec_phi_k_1[5];
+    t_rapDipolePair.m_Dipole2.phi_x() = p_vec_phi_k_1[3];
+    t_rapDipolePair.m_Dipole2.phi_y() = p_vec_phi_k_1[4];
+    t_rapDipolePair.m_Dipole2.phi_z() = p_vec_phi_k_1[5];
 
-    t_pRapDipolePair.m_vCorrelation = p_valCor;
+    t_rapDipolePair.m_vCorrelation = p_valCor;
 
-    p_RapDipoles.append(t_pRapDipolePair);
+    p_RapDipoles.append(t_rapDipolePair);
 }
 
 
