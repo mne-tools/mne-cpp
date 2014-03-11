@@ -234,6 +234,13 @@ protected:
 
     //=========================================================================================================
     /**
+    * Look for trigger in stim channel
+    *
+    */
+    bool lookForTrigger(const MatrixXd &data);
+
+    //=========================================================================================================
+    /**
     * The starting point for the thread. After calling start(), the newly created thread calls this function.
     * Returning from this method will end the execution of the thread.
     * Pure virtual method inherited by QThread.
