@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     rapmusic.cpp
+* @file     pwlrapmusic.cpp
 * @author   Christoph Dinh <christoph.dinh@tu-ilmenau.de>
 * @version  1.0
 * @date     July, 2013
@@ -28,7 +28,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the RapMusic Algorithm Class.
+* @brief    Implementation of the PwlRapMusic Algorithm Class.
 *
 */
 
@@ -37,7 +37,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "rapmusic.h"
+#include "pwlrapmusic.h"
 
 #ifdef _OPENMP
 #include <omp.h>
@@ -57,7 +57,7 @@ using namespace INVERSELIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RapMusic::RapMusic()
+PwlRapMusic::PwlRapMusic()
 : m_iN(0)
 , m_dThreshold(0)
 , m_iNumGridPoints(0)
@@ -74,7 +74,7 @@ RapMusic::RapMusic()
 
 //*************************************************************************************************************
 
-RapMusic::RapMusic(MNEForwardSolution& p_pFwd, bool p_bSparsed, int p_iN, double p_dThr)
+PwlRapMusic::PwlRapMusic(MNEForwardSolution& p_pFwd, bool p_bSparsed, int p_iN, double p_dThr)
 : m_iN(0)
 , m_dThreshold(0)
 , m_iNumGridPoints(0)
@@ -93,7 +93,7 @@ RapMusic::RapMusic(MNEForwardSolution& p_pFwd, bool p_bSparsed, int p_iN, double
 
 //*************************************************************************************************************
 
-RapMusic::~RapMusic()
+PwlRapMusic::~PwlRapMusic()
 {
     if(m_ppPairIdxCombinations != NULL)
         free(m_ppPairIdxCombinations);
@@ -102,7 +102,7 @@ RapMusic::~RapMusic()
 
 //*************************************************************************************************************
 
-bool RapMusic::init(MNEForwardSolution& p_pFwd, bool p_bSparsed, int p_iN, double p_dThr)
+bool PwlRapMusic::init(MNEForwardSolution& p_pFwd, bool p_bSparsed, int p_iN, double p_dThr)
 {
     //Get available thread number
     #ifdef _OPENMP
@@ -187,7 +187,7 @@ bool RapMusic::init(MNEForwardSolution& p_pFwd, bool p_bSparsed, int p_iN, doubl
 
 //*************************************************************************************************************
 
-const char* RapMusic::getName() const
+const char* PwlRapMusic::getName() const
 {
     return "RAP MUSIC";
 }
@@ -195,7 +195,7 @@ const char* RapMusic::getName() const
 
 //*************************************************************************************************************
 
-const MNESourceSpace& RapMusic::getSourceSpace() const
+const MNESourceSpace& PwlRapMusic::getSourceSpace() const
 {
     return m_ForwardSolution.src;
 }
@@ -203,7 +203,7 @@ const MNESourceSpace& RapMusic::getSourceSpace() const
 
 //*************************************************************************************************************
 
-MNESourceEstimate RapMusic::calculateInverse(const FiffEvoked &p_fiffEvoked, bool pick_normal)
+MNESourceEstimate PwlRapMusic::calculateInverse(const FiffEvoked &p_fiffEvoked, bool pick_normal)
 {
     Q_UNUSED(pick_normal);
 
@@ -254,6 +254,7 @@ MNESourceEstimate RapMusic::calculateInverse(const FiffEvoked &p_fiffEvoked, boo
     }
     else
     {
+
         bool first = true;
         bool last = false;
 
@@ -326,7 +327,7 @@ MNESourceEstimate RapMusic::calculateInverse(const FiffEvoked &p_fiffEvoked, boo
 
 //*************************************************************************************************************
 
-MNESourceEstimate RapMusic::calculateInverse(const MatrixXd& p_matMeasurement, QVector< DipolePair<double> > &p_RapDipoles)
+MNESourceEstimate PwlRapMusic::calculateInverse(const MatrixXd& p_matMeasurement, QVector< DipolePair<double> > &p_RapDipoles)
 {
     MNESourceEstimate p_SourceEstimate;
 
@@ -422,45 +423,95 @@ MNESourceEstimate RapMusic::calculateInverse(const MatrixXd& p_matMeasurement, Q
         clock_t start_subcorr, end_subcorr;
         start_subcorr = clock();
 
-        //Multithreading correlation calculation
-        #ifdef _OPENMP
-        #pragma omp parallel num_threads(m_iMaxNumThreads)
-        #endif
+        double t_val_roh_k;
+
+        //Powell
+        int t_iCurrentRow = 2;
+
+        int t_iIdx1 = -1;
+        int t_iIdx2 = -1;
+
+        int t_iMaxIdx_old = -1;
+
+        int t_iMaxFound = 0;
+
+        Eigen::VectorXi t_pVecIdxElements(m_iNumGridPoints);
+
+        PowellIdxVec(t_iCurrentRow, m_iNumGridPoints, t_pVecIdxElements);
+
+        int t_iNumVecElements = m_iNumGridPoints;
+
+        while(t_iMaxFound == 0)
         {
-        #ifdef _OPENMP
-        #pragma omp for
-        #endif
-            for(int i = 0; i < m_iNumLeadFieldCombinations; i++)
+
+            //Multithreading correlation calculation
+            #ifdef _OPENMP
+            #pragma omp parallel num_threads(m_iMaxNumThreads)
+            #endif
             {
-                //new Version: calculate matrix multiplication before
-                //Create Lead Field combinations -> It would be better to use a pointer construction, to increase performance
-                MatrixX6T t_matProj_G(t_matProj_LeadField.rows(),6);
+            #ifdef _OPENMP
+            #pragma omp for
+            #endif
+                for(int i = 0; i < t_iNumVecElements; i++)
+                {
+                    int k = t_pVecIdxElements(i);
+                    //new Version: calculate matrix multiplication before
+                    //Create Lead Field combinations -> It would be better to use a pointer construction, to increase performance
+                    MatrixX6T t_matProj_G(t_matProj_LeadField.rows(),6);
 
-                int idx1 = m_ppPairIdxCombinations[i]->x1;
-                int idx2 = m_ppPairIdxCombinations[i]->x2;
+                    int idx1 = m_ppPairIdxCombinations[k]->x1;
+                    int idx2 = m_ppPairIdxCombinations[k]->x2;
 
-                getGainMatrixPair(t_matProj_LeadField, t_matProj_G, idx1, idx2);
+                    getGainMatrixPair(t_matProj_LeadField, t_matProj_G, idx1, idx2);
 
-                t_vecRoh(i) = subcorr(t_matProj_G, t_matU_B);//t_vecRoh holds the correlations roh_k
+                    t_vecRoh(k) = subcorr(t_matProj_G, t_matU_B);//t_vecRoh holds the correlations roh_k
+                }
             }
+
+    //         if(r==0)
+    //         {
+    //             std::fstream filestr;
+    //             std::stringstream filename;
+    //             filename << "Roh_gold.txt";
+    //
+    //             filestr.open ( filename.str().c_str(), std::fstream::out);
+    //             for(int i = 0; i < m_iNumLeadFieldCombinations; ++i)
+    //             {
+    //               filestr << t_vecRoh(i) << "\n";
+    //             }
+    //             filestr.close();
+    //
+    //             //exit(0);
+    //         }
+
+            //Find the maximum of correlation - can't put this in the for loop because it's running in different threads.
+
+            VectorXT::Index t_iMaxIdx;
+
+            t_val_roh_k = t_vecRoh.maxCoeff(&t_iMaxIdx);//p_vecCor = ^roh_k
+
+            if((int)t_iMaxIdx == t_iMaxIdx_old)
+            {
+                t_iMaxFound = 1;
+                break;
+            }
+            else
+            {
+                t_iMaxIdx_old = t_iMaxIdx;
+                //get positions in sparsed leadfield from index combinations;
+                t_iIdx1 = m_ppPairIdxCombinations[t_iMaxIdx]->x1;
+                t_iIdx2 = m_ppPairIdxCombinations[t_iMaxIdx]->x2;
+            }
+
+
+            //set new index
+            if(t_iIdx1 == t_iCurrentRow)
+                t_iCurrentRow = t_iIdx2;
+            else
+                t_iCurrentRow = t_iIdx1;
+
+            PowellIdxVec(t_iCurrentRow, m_iNumGridPoints, t_pVecIdxElements);
         }
-
-
-//         if(r==0)
-//         {
-//             std::fstream filestr;
-//             std::stringstream filename;
-//             filename << "Roh_gold.txt";
-//
-//             filestr.open ( filename.str().c_str(), std::fstream::out);
-//             for(int i = 0; i < m_iNumLeadFieldCombinations; ++i)
-//             {
-//               filestr << t_vecRoh(i) << "\n";
-//             }
-//             filestr.close();
-//
-//             //exit(0);
-//         }
 
         //subcorr benchmark
         end_subcorr = clock();
@@ -468,22 +519,12 @@ MNESourceEstimate RapMusic::calculateInverse(const MatrixXd& p_matMeasurement, Q
         float t_fSubcorrElapsedTime = ( (float)(end_subcorr-start_subcorr) / (float)CLOCKS_PER_SEC ) * 1000.0f;
         std::cout << "Time Elapsed: " << t_fSubcorrElapsedTime << " ms" << std::endl;
 
-        //Find the maximum of correlation - can't put this in the for loop because it's running in different threads.
-        double t_val_roh_k;
-
-        VectorXT::Index t_iMaxIdx;
-
-        t_val_roh_k = t_vecRoh.maxCoeff(&t_iMaxIdx);//p_vecCor = ^roh_k
-
-        //get positions in sparsed leadfield from index combinations;
-        int t_iIdx1 = m_ppPairIdxCombinations[t_iMaxIdx]->x1;
-        int t_iIdx2 = m_ppPairIdxCombinations[t_iMaxIdx]->x2;
 
         // (Idx+1) because of MATLAB positions -> starting with 1 not with 0
         std::cout << "Iteration: " << r+1 << " of " << t_iMaxSearch
             << "; Correlation: " << t_val_roh_k<< "; Position (Idx+1): " << t_iIdx1+1 << " - " << t_iIdx2+1 <<"\n\n";
 
-        //Calculations with the max correlated dipole pair G_k_1 -> ToDo Obsolet when taking direkt Projected Lead Field
+        //Calculations with the max correlated dipole pair G_k_1
         MatrixX6T t_matG_k_1(m_ForwardSolution.sol->data.rows(),6);
         getGainMatrixPair(m_ForwardSolution.sol->data, t_matG_k_1, t_iIdx1, t_iIdx2);
 
@@ -494,7 +535,7 @@ MNESourceEstimate RapMusic::calculateInverse(const MatrixXd& p_matMeasurement, Q
 
         //Calculate source direction
         //source direction (p_pMatPhi) for current source r (phi_k_1)
-        Vector6T t_vec_phi_k_1(6);
+        Vector6T t_vec_phi_k_1(6, 1);
         subcorr(t_matProj_G_k_1, t_matU_B, t_vec_phi_k_1);//Correlate the current source to calculate the direction
 
         //Set return values
@@ -536,7 +577,47 @@ MNESourceEstimate RapMusic::calculateInverse(const MatrixXd& p_matMeasurement, Q
 
 //*************************************************************************************************************
 
-int RapMusic::nchoose2(int n)
+int PwlRapMusic::PowellOffset(int p_iRow, int p_iNumPoints)
+{
+
+    return p_iRow*p_iNumPoints - (( (p_iRow-1)*p_iRow) / 2); //triangular series 1 3 6 10 ... = (num_pairs*(num_pairs+1))/2
+
+}
+
+
+//*************************************************************************************************************
+
+void PwlRapMusic::PowellIdxVec(int p_iRow, int p_iNumPoints, Eigen::VectorXi& p_pVecElements)
+{
+
+    //     if(p_pVecElements != NULL)
+    //         delete[] p_pVecElements;
+    //
+    //     p_pVecElements = new int(p_iNumPoints);
+
+
+    //col combination index
+    for(int i = 0; i <= p_iRow; ++i)//=p_iNumPoints-1
+        p_pVecElements(i) = PowellOffset(i+1,p_iNumPoints)-(p_iNumPoints-p_iRow);
+
+
+    //row combination index
+    int off = PowellOffset(p_iRow,p_iNumPoints);
+    int length = p_iNumPoints - p_iRow;
+    int k=0;
+    for(int i = p_iRow; i < p_iRow+length; ++i)//=p_iNumPoints-1
+    {
+        p_pVecElements(i) = off+k;
+        k = k + 1;
+    }
+}
+
+
+
+
+//*************************************************************************************************************
+
+int PwlRapMusic::nchoose2(int n)
 {
 
     //nchoosek(n, k) with k = 2, equals n*(n-1)*0.5
@@ -549,7 +630,7 @@ int RapMusic::nchoose2(int n)
 
 //*************************************************************************************************************
 
-int RapMusic::calcPhi_s(const MatrixXT& p_matMeasurement, MatrixXT* &p_pMatPhi_s)
+int PwlRapMusic::calcPhi_s(const MatrixXT& p_matMeasurement, MatrixXT* &p_pMatPhi_s)
 {
     //Calculate p_pMatPhi_s
     MatrixXT t_matF;//t_matF = makeSquareMat(p_pMatMeasurement); //FF^T -> ToDo Check this
@@ -579,7 +660,7 @@ int RapMusic::calcPhi_s(const MatrixXT& p_matMeasurement, MatrixXT* &p_pMatPhi_s
 
 //*************************************************************************************************************
 
-double RapMusic::subcorr(MatrixX6T& p_matProj_G, const MatrixXT& p_matU_B)
+double PwlRapMusic::subcorr(MatrixX6T& p_matProj_G, const MatrixXT& p_matU_B)
 {
     //Orthogonalisierungstest wegen performance weggelassen -> ohne is es viel schneller
 
@@ -635,7 +716,7 @@ double RapMusic::subcorr(MatrixX6T& p_matProj_G, const MatrixXT& p_matU_B)
 
 //*************************************************************************************************************
 
-double RapMusic::subcorr(MatrixX6T& p_matProj_G, const MatrixXT& p_matU_B, Vector6T& p_vec_phi_k_1)
+double PwlRapMusic::subcorr(MatrixX6T& p_matProj_G, const MatrixXT& p_matU_B, Vector6T& p_vec_phi_k_1)
 {
     //Orthogonalisierungstest wegen performance weggelassen -> ohne is es viel schneller
 
@@ -712,7 +793,7 @@ double RapMusic::subcorr(MatrixX6T& p_matProj_G, const MatrixXT& p_matU_B, Vecto
 
 //*************************************************************************************************************
 
-void RapMusic::calcA_k_1(   const MatrixX6T& p_matG_k_1,
+void PwlRapMusic::calcA_k_1(const MatrixX6T& p_matG_k_1,
                             const Vector6T& p_matPhi_k_1,
                             const int p_iIdxk_1,
                             MatrixXT& p_matA_k_1)
@@ -728,7 +809,7 @@ void RapMusic::calcA_k_1(   const MatrixX6T& p_matG_k_1,
 
 //*************************************************************************************************************
 
-void RapMusic::calcOrthProj(const MatrixXT& p_matA_k_1, MatrixXT& p_matOrthProj)
+void PwlRapMusic::calcOrthProj(const MatrixXT& p_matA_k_1, MatrixXT& p_matOrthProj)
 {
     //Calculate OrthProj=I-A_k_1*(A_k_1'*A_k_1)^-1*A_k_1' //Wetterling -> A_k_1 = Gain
 
@@ -771,7 +852,7 @@ void RapMusic::calcOrthProj(const MatrixXT& p_matA_k_1, MatrixXT& p_matOrthProj)
 
 //*************************************************************************************************************
 
-void RapMusic::calcPairCombinations(    const int p_iNumPoints,
+void PwlRapMusic::calcPairCombinations( const int p_iNumPoints,
                                         const int p_iNumCombinations,
                                         Pair** p_ppPairIdxCombinations)
 {
@@ -802,7 +883,7 @@ void RapMusic::calcPairCombinations(    const int p_iNumPoints,
 
 //*************************************************************************************************************
 
-void RapMusic::getPointPair(const int p_iPoints, const int p_iCurIdx, int &p_iIdx1, int &p_iIdx2)
+void PwlRapMusic::getPointPair(const int p_iPoints, const int p_iCurIdx, int &p_iIdx1, int &p_iIdx2)
 {
     int ii = p_iPoints*(p_iPoints+1)/2-1-p_iCurIdx;
     int K = (int)floor((sqrt((double)(8*ii+1))-1)/2);
@@ -815,7 +896,7 @@ void RapMusic::getPointPair(const int p_iPoints, const int p_iCurIdx, int &p_iId
 
 //*************************************************************************************************************
 //ToDo don't make a real copy
-void RapMusic::getGainMatrixPair(    const MatrixXT& p_matGainMarix,
+void PwlRapMusic::getGainMatrixPair(const MatrixXT& p_matGainMarix,
                                     MatrixX6T& p_matGainMarix_Pair,
                                     int p_iIdx1, int p_iIdx2)
 {
@@ -827,7 +908,7 @@ void RapMusic::getGainMatrixPair(    const MatrixXT& p_matGainMarix,
 
 //*************************************************************************************************************
 
-void RapMusic::insertSource(    int p_iDipoleIdx1, int p_iDipoleIdx2,
+void PwlRapMusic::insertSource( int p_iDipoleIdx1, int p_iDipoleIdx2,
                                 const Vector6T &p_vec_phi_k_1,
                                 double p_valCor,
                                 QVector< DipolePair<double> > &p_RapDipoles)
@@ -861,7 +942,7 @@ void RapMusic::insertSource(    int p_iDipoleIdx1, int p_iDipoleIdx2,
 
 //*************************************************************************************************************
 
-void RapMusic::setStcAttr(int p_iSampStcWin, float p_fStcOverlap)
+void PwlRapMusic::setStcAttr(int p_iSampStcWin, float p_fStcOverlap)
 {
     m_iSamplesStcWindow = p_iSampStcWin;
     m_fStcOverlap = p_fStcOverlap;

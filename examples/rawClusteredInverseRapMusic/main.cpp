@@ -105,13 +105,22 @@ int main(int argc, char *argv[])
 //    AnnotationSet t_annotationSet("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot", "./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot");
 //    SurfaceSet t_surfSet("./MNE-sample-data/subjects/sample/surf/lh.white", "./MNE-sample-data/subjects/sample/surf/rh.white");
 
-    QFile t_fileRaw("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw.fif");
-    QString t_sEventName = "E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-eve.fif";
-    QFile t_fileFwd("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-oct-6p-fwd.fif");
+//    QFile t_fileRaw("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw.fif");
+//    QString t_sEventName = "E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-eve.fif";
+//    QFile t_fileFwd("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-oct-6p-fwd.fif");
+//    AnnotationSet t_annotationSet("E:/Data/sl_data/subjects/mind006/label/lh.aparc.a2009s.annot", "E:/Data/sl_data/subjects/mind006/label/rh.aparc.a2009s.annot");
+//    SurfaceSet t_surfSet("E:/Data/sl_data/subjects/mind006/surf/lh.white", "E:/Data/sl_data/subjects/mind006/surf/rh.white");
+
+    QFile t_fileRaw("E:/Data/sl_data/MEG/mind006/mind006_051209_median01_raw.fif");
+    QString t_sEventName = "E:/Data/sl_data/MEG/mind006/mind006_051209_median01_raw-eve.fif";
+    QFile t_fileFwd("E:/Data/sl_data/MEG/mind006/mind006_051209_median01_raw-oct-6-fwd.fif");
     AnnotationSet t_annotationSet("E:/Data/sl_data/subjects/mind006/label/lh.aparc.a2009s.annot", "E:/Data/sl_data/subjects/mind006/label/rh.aparc.a2009s.annot");
     SurfaceSet t_surfSet("E:/Data/sl_data/subjects/mind006/surf/lh.white", "E:/Data/sl_data/subjects/mind006/surf/rh.white");
 
     QString t_sFileNameStc("");//("mind006_051209_auditory01.stc");
+
+
+    bool doMovie = false;//true;
 
     qint32 numDipolePairs = 7;
 
@@ -393,16 +402,16 @@ int main(int argc, char *argv[])
     //
     // calculate the average
     //
-    //Option 1
-    qint32 numAverages = 99;
-    VectorXi vecSel(numAverages);
-    srand (time(NULL)); // initialize random seed
+//    //Option 1
+//    qint32 numAverages = 99;
+//    VectorXi vecSel(numAverages);
+//    srand (time(NULL)); // initialize random seed
 
-    for(qint32 i = 0; i < vecSel.size(); ++i)
-    {
-        qint32 val = rand() % data.size();
-        vecSel(i) = val;
-    }
+//    for(qint32 i = 0; i < vecSel.size(); ++i)
+//    {
+//        qint32 val = rand() % data.size();
+//        vecSel(i) = val;
+//    }
 
     //Option 2
 //    VectorXi vecSel(20);
@@ -415,6 +424,11 @@ int main(int argc, char *argv[])
 //    VectorXi vecSel(10);
 
 //    vecSel << 0, 96, 80, 55, 66, 25, 26, 2, 55, 58, 6, 88;
+
+
+    VectorXi vecSel(1);
+
+    vecSel << 0;
 
 
     std::cout << "Select following epochs to average:\n" << vecSel << std::endl;
@@ -438,6 +452,10 @@ int main(int argc, char *argv[])
     // Compute inverse solution
     //
     RapMusic t_rapMusic(t_clusteredFwd, false, numDipolePairs);
+
+    if(doMovie)
+        t_rapMusic.setStcAttr(200,0.5);
+
     MNESourceEstimate sourceEstimate = t_rapMusic.calculateInverse(pickedEvoked);
 
     if(sourceEstimate.isEmpty())
@@ -472,7 +490,7 @@ int main(int argc, char *argv[])
     //ToDo overload toLabels using instead of t_surfSet rr of MNESourceSpace
     t_annotationSet.toLabels(t_surfSet, t_qListLabels, t_qListRGBAs);
 
-    InverseView view(t_rapMusic.getSourceSpace(), t_qListLabels, t_qListRGBAs, 24, true, false, true);
+    InverseView view(t_rapMusic.getSourceSpace(), t_qListLabels, t_qListRGBAs, 24, true, false, false);//true);
 
     if (view.stereoType() != QGLView::RedCyanAnaglyph)
         view.camera()->setEyeSeparation(0.3f);
