@@ -70,7 +70,7 @@ win32 {
 }
 unix:!macx {
     QMAKE_CXXFLAGS  +=  -fopenmp
-    #QMAKE_LFLAGS    +=  -fopenmp
+    QMAKE_LFLAGS    +=  -fopenmp
 }
 
 DESTDIR = $${MNE_LIBRARY_DIR}
