@@ -74,11 +74,11 @@ class QTime;
 class QDockWidget;
 class QTextBrowser;
 
-namespace DISPLIB
+//ToDo Move this to the xDisp
+namespace XDISPLIB
 {
-class DisplayManager;
+class RoiSelectionWidget;
 }
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -184,9 +184,11 @@ private:
     //StartUp
     StartUpWidget* m_pStartUpWidget;    /**< holds the StartUpWidget.*/
 
+    QSharedPointer<XDISPLIB::RoiSelectionWidget> m_pRoiSelectionWidget;    /**< ROI selection widget, ToDo: move this to the xDisp */
+
     //Run
     RunWidget* m_pRunWidget;                                /**< The run widget */
-    QSharedPointer<NewDisplayManager> m_pDisplayManager;    /**< The run widget */
+    QSharedPointer<NewDisplayManager> m_pDisplayManager;    /**< display manager */
 
     bool m_bDisplayMax;                 /**< whether full screen mode is activated.*/
     bool m_bIsRunning;                  /**< whether program/plugins is/are started.*/
@@ -228,6 +230,8 @@ private:
     QAction*                             m_pActionZoomIn;           /**< zoom in */
     QAction*                             m_pActionZoomOut;          /**< zoom out */
     QAction*                             m_pActionDisplayMax;       /**< show full screen mode */
+
+    QAction*                             m_pActionSelectRoi;       /**< show roi select widget ToDo move this to the actual view-> and make a dynamical menu*/
 
     //Main Window Menu
     QMenu*                                 m_pMenuFile;     /**< Holds the file menu.*/
@@ -285,6 +289,8 @@ private slots:
     void zoomIn();                      /**< Implements zoom in of runWidget.*/
     void zoomOut();                     /**< Implements zoom out of runWidget.*/
     void toggleDisplayMax();            /**< Implements show full screen mode of runWidget.*/
+
+    void showRoiSelectionWidget();      /**< Implements the show roi selection widget. ToDo: Move this to the actual widget*/
 
     void updateTime();                  /**< Updates m_pTime and is called through timeout() of m_pTimer.*/
 

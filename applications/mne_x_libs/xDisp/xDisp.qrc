@@ -1,0 +1,16 @@
+<RCC>
+    <qresource prefix="/images">
+        <file alias="frontal_left.svg">images/frontal_left.svg</file>
+        <file alias="frontal_left_active.svg">images/frontal_left_active.svg</file>
+        <file alias="frontal_right.svg">images/frontal_right.svg</file>
+        <file alias="frontal_right_active.svg">images/frontal_right_active.svg</file>
+        <file alias="occipital_left.svg">images/occipital_left.svg</file>
+        <file alias="occipital_left_active.svg">images/occipital_left_active.svg</file>
+        <file alias="occipital_right.svg">images/occipital_right.svg</file>
+        <file alias="occipital_right_active.svg">images/occipital_right_active.svg</file>
+        <file alias="parietal_left.svg">images/parietal_left.svg</file>
+        <file alias="parietal_left_active.svg">images/parietal_left_active.svg</file>
+        <file alias="parietal_right.svg">images/parietal_right.svg</file>
+        <file alias="parietal_right_active.svg">images/parietal_right_active.svg</file>
+    </qresource>
+</RCC>

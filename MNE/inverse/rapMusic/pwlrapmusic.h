@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     rapmusic.h
+* @file     pwlrapmusic.h
 * @author   Christoph Dinh <christoph.dinh@tu-ilmenau.de>
 * @version  1.0
 * @date     July, 2013
@@ -28,12 +28,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    RapMusic algorithm class declaration.
+* @brief    PwlRapMusic algorithm class declaration.
 *
 */
 
-#ifndef RAPMUSIC_H
-#define RAPMUSIC_H
+#ifndef PWLRAPMUSIC_H
+#define PWLRAPMUSIC_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -102,11 +102,11 @@ typedef struct Pair
 
 //=============================================================================================================
 /**
-* @brief    The RapMusic class provides the RAP MUSIC Algorithm CPU implementation. ToDo: Paper references.
+* @brief    The PwlRapMusic class provides the POWELL RAP MUSIC Algorithm CPU implementation. ToDo: Paper references.
 *
 * ToDo Detailed description
 */
-class INVERSESHARED_EXPORT RapMusic : public IInverseAlgorithm
+class INVERSESHARED_EXPORT PwlRapMusic : public IInverseAlgorithm
 {
     //*************************************************************************************************************
     //=============================================================================================================
@@ -130,13 +130,13 @@ public:
 
     //=========================================================================================================
     /**
-    * Default constructor creates an empty RapMusic algorithm which still needs to be initialized.
+    * Default constructor creates an empty POWELL RAP MUSIC algorithm which still needs to be initialized.
     */
-    RapMusic();
+    PwlRapMusic();
 
     //=========================================================================================================
     /**
-    * Constructor which initializes the RapMusic algorithm with the given model.
+    * Constructor which initializes the POWELL RAP MUSIC algorithm with the given model.
     *
     * @param[in] p_Fwd          The model which contains the gain matrix and its corresponding grid matrix.
     * @param[in] p_bSparsed     True when sparse matrices should be used.
@@ -144,13 +144,13 @@ public:
     *                           the strongest.
     * @param[in] p_dThr         The correlation threshold (default 0.5) at which the search for sources stops.
     */
-    RapMusic(MNEForwardSolution& p_pFwd, bool p_bSparsed, int p_iN = 2, double p_dThr = 0.5);
+    PwlRapMusic(MNEForwardSolution& p_pFwd, bool p_bSparsed, int p_iN = 2, double p_dThr = 0.5);
 
-    virtual ~RapMusic();
+    virtual ~PwlRapMusic();
 
     //=========================================================================================================
     /**
-    * Initializes the RAP MUSIC algorithm with the given model.
+    * Initializes the POWELL RAP MUSIC algorithm with the given model.
     *
     * @param[in] p_Fwd          The model which contains the gain matrix and its corresponding Grid matrix.
     * @param[in] p_bSparsed     True when sparse matrices should be used.
@@ -174,6 +174,11 @@ public:
         return p_sourceEstimate;
     }
 
+
+    int PowellOffset(int p_iRow, int p_iNumPoints);
+
+
+    void PowellIdxVec(int p_iRow, int p_iNumPoints, Eigen::VectorXi& p_pVecElements);
 
 
     virtual const char* getName() const;
@@ -390,7 +395,7 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline int RapMusic::getRank(const MatrixXT& p_matSigma)
+inline int PwlRapMusic::getRank(const MatrixXT& p_matSigma)
 {
     int t_iRank;
     //if once a singularvalue is smaller than epsilon = 10^-5 the following values are also smaller
@@ -407,7 +412,7 @@ inline int RapMusic::getRank(const MatrixXT& p_matSigma)
 
 //*************************************************************************************************************
 
-inline int RapMusic::useFullRank(   const MatrixXT& p_Mat,
+inline int PwlRapMusic::useFullRank(   const MatrixXT& p_Mat,
                                     const MatrixXT& p_matSigma_src,
                                     MatrixXT& p_matFull_Rank,
                                     int type)
@@ -425,7 +430,7 @@ inline int RapMusic::useFullRank(   const MatrixXT& p_Mat,
 
 //*************************************************************************************************************
 
-inline RapMusic::MatrixXT RapMusic::makeSquareMat(const MatrixXT& p_matF)
+inline PwlRapMusic::MatrixXT PwlRapMusic::makeSquareMat(const MatrixXT& p_matF)
 {
     //Make rectangular - p_matF*p_matF^T
     //MatrixXT FFT = p_matF*p_matF.transpose();
@@ -435,4 +440,4 @@ inline RapMusic::MatrixXT RapMusic::makeSquareMat(const MatrixXT& p_matF)
 
 } //NAMESPACE
 
-#endif // RAPMUSIC_H
+#endif // PWLRAPMUSIC_H
