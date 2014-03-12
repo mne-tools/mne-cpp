@@ -147,83 +147,10 @@
         <string>Processing options</string>
        </property>
        <layout class="QGridLayout" name="gridLayout">
-        <item row="10" column="0">
-         <widget class="QLabel" name="m_label_Threshold">
+        <item row="6" column="0">
+         <widget class="QLabel" name="m_label_TotalProcessedTime">
           <property name="text">
-           <string>Threshold (micro V):</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="1">
-         <widget class="QDoubleSpinBox" name="m_doubleSpinBox_TimeBetweenWindows">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimum">
-           <double>0.010000000000000</double>
-          </property>
-          <property name="maximum">
-           <double>20.000000000000000</double>
-          </property>
-          <property name="singleStep">
-           <double>0.010000000000000</double>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0" colspan="2">
-         <widget class="Line" name="line_3">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-         </widget>
-        </item>
-        <item row="7" column="0" colspan="2">
-         <widget class="Line" name="line_2">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="0">
-         <widget class="QLabel" name="m_label_TimeBetweenWindows">
-          <property name="text">
-           <string>Time between windows (s):</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0">
-         <widget class="QCheckBox" name="m_checkBox_SubtractMean">
-          <property name="text">
-           <string>Subtract mean </string>
-          </property>
-         </widget>
-        </item>
-        <item row="8" column="0">
-         <widget class="QCheckBox" name="m_checkBox_UseThresholdArtefactReduction">
-          <property name="text">
-           <string>Use artefact reduction</string>
-          </property>
-         </widget>
-        </item>
-        <item row="10" column="1">
-         <widget class="QDoubleSpinBox" name="m_SpinBox_ThresholdValue">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="maximum">
-           <double>100000000.000000000000000</double>
+           <string>Total processed time:</string>
           </property>
          </widget>
         </item>
@@ -246,6 +173,67 @@
           </property>
           <property name="value">
            <double>0.010000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="1">
+         <widget class="QDoubleSpinBox" name="m_doubleSpinBox_TimeBetweenWindows">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimum">
+           <double>0.010000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>20.000000000000000</double>
+          </property>
+          <property name="singleStep">
+           <double>0.010000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="11" column="0">
+         <widget class="QLabel" name="m_label_Threshold">
+          <property name="text">
+           <string>Threshold (micro V):</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QCheckBox" name="m_checkBox_SubtractMean">
+          <property name="text">
+           <string>Subtract mean </string>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0">
+         <widget class="QLabel" name="m_label_TimeBetweenWindows">
+          <property name="text">
+           <string>Time between windows (s):</string>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="0" colspan="2">
+         <widget class="Line" name="line_2">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0" colspan="2">
+         <widget class="Line" name="line_3">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="9" column="0">
+         <widget class="QCheckBox" name="m_checkBox_UseThresholdArtefactReduction">
+          <property name="text">
+           <string>Use artefact reduction</string>
           </property>
          </widget>
         </item>
@@ -285,15 +273,41 @@
           </property>
          </widget>
         </item>
-        <item row="6" column="0">
-         <widget class="QLabel" name="m_label_TotalProcessedTime">
-          <property name="text">
-           <string>Total processing time:</string>
+        <item row="11" column="1">
+         <widget class="QDoubleSpinBox" name="m_SpinBox_ThresholdValue">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="maximum">
+           <double>100000000.000000000000000</double>
           </property>
          </widget>
         </item>
         <item row="6" column="1">
          <widget class="QLabel" name="m_label_TotalProcessedTimeDisplay">
+          <property name="text">
+           <string>Number</string>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="0">
+         <widget class="QLabel" name="m_label_TimeNeededForResults">
+          <property name="text">
+           <string>Time between results:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="7" column="1">
+         <widget class="QLabel" name="m_label_TimeNeededForResultsDisplay">
           <property name="text">
            <string>Number</string>
           </property>

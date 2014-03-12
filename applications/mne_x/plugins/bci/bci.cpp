@@ -120,19 +120,19 @@ void BCI::init()
 
     m_pBCIOutputTwo = PluginOutputData<NewRealTimeSampleArray>::create(this, "ControlSignal", "BCI output data Two");
     m_pBCIOutputTwo->data()->setArraySize(1);
-    m_pBCIOutputTwo->data()->setMaxValue(1e-06);
-    m_pBCIOutputTwo->data()->setMinValue(-1e-06);
+    m_pBCIOutputTwo->data()->setMaxValue(5e-07);
+    m_pBCIOutputTwo->data()->setMinValue(-5e-07);
     m_pBCIOutputTwo->data()->setName("Left electrode");
     m_outputConnectors.append(m_pBCIOutputTwo);
 
     m_pBCIOutputThree = PluginOutputData<NewRealTimeSampleArray>::create(this, "ControlSignal", "BCI output data Three");
     m_pBCIOutputThree->data()->setArraySize(1);
-    m_pBCIOutputThree->data()->setMaxValue(1e-06);
-    m_pBCIOutputThree->data()->setMinValue(-1e-06);
+    m_pBCIOutputThree->data()->setMaxValue(5e-07);
+    m_pBCIOutputThree->data()->setMinValue(-5e-07);
     m_pBCIOutputThree->data()->setName("Right electrode");
     m_outputConnectors.append(m_pBCIOutputThree);
 
-    //Delete Buffer - will be initailzed with first incoming data
+    // Delete Buffer - will be initailzed with first incoming data
     m_pBCIBuffer_Sensor = CircularMatrixBuffer<double>::SPtr();
     m_pBCIBuffer_Source = CircularMatrixBuffer<double>::SPtr();
 
@@ -144,11 +144,11 @@ void BCI::init()
     m_bUseFilter = true;
     m_bUseSensorData = true;
     m_bUseSourceData = false;
-    m_bDisplayFeatures = true;
+    m_bDisplayFeatures = false;
     m_bUseArtefactThresholdReduction = true;
-    m_dSlidingWindowSize = 1.0;
-    m_dTimeBetweenWindows = 0.04;
-    m_iNumberFeatures = 6;
+    m_dSlidingWindowSize = 0.5;
+    m_dTimeBetweenWindows = 0.5;
+    m_iNumberFeatures = 1;
     m_dThresholdValue = 15;
 
     // Intitalise feature selection
@@ -430,8 +430,6 @@ double BCI::classificationBoundaryValue(const QList<double> &featData)
 
         return_val = m_vLoadedSensorBoundary[0](0) + m_vLoadedSensorBoundary[1].dot(feat_temp);
     }
-
-    // cout<< return_val<<endl;
 
     return return_val;
 }

@@ -161,10 +161,14 @@ void BCISetupWidget::initGui()
     ui.m_checkBox_UseThresholdArtefactReduction->setChecked(m_pBCI->m_bUseArtefactThresholdReduction);
     ui.m_SpinBox_ThresholdValue->setValue(m_pBCI->m_dThresholdValue);
 
-    // Init total processing time
+    // Init time displays
     double totalProcessingTime = ui.m_doubleSpinBox_SlidingWindowSize->value() + (ui.m_doubleSpinBox_TimeBetweenWindows->value() * (ui.m_spinBox_NumberFeatures->value()-1));
     ui.m_label_TotalProcessedTimeDisplay->setNum(totalProcessingTime);
     ui.m_label_TotalProcessedTimeDisplay->setText(ui.m_label_TotalProcessedTimeDisplay->text().append(" s"));
+
+    double timeForNextResult = ui.m_doubleSpinBox_TimeBetweenWindows->value() * ui.m_spinBox_NumberFeatures->value();
+    ui.m_label_TimeNeededForResultsDisplay->setNum(timeForNextResult);
+    ui.m_label_TimeNeededForResultsDisplay->setText(ui.m_label_TimeNeededForResultsDisplay->text().append(" s"));
 
     // Classification boundaries
     QString temp = m_pBCI->m_qStringResourcePath;
@@ -210,6 +214,10 @@ void BCISetupWidget::setProcessingOptions()
     double totalProcessingTime = ui.m_doubleSpinBox_SlidingWindowSize->value() + (ui.m_doubleSpinBox_TimeBetweenWindows->value() * (ui.m_spinBox_NumberFeatures->value()-1));
     ui.m_label_TotalProcessedTimeDisplay->setNum(totalProcessingTime);
     ui.m_label_TotalProcessedTimeDisplay->setText(ui.m_label_TotalProcessedTimeDisplay->text().append(" s"));
+
+    double timeForNextResult = ui.m_doubleSpinBox_TimeBetweenWindows->value() * ui.m_spinBox_NumberFeatures->value();
+    ui.m_label_TimeNeededForResultsDisplay->setNum(timeForNextResult);
+    ui.m_label_TimeNeededForResultsDisplay->setText(ui.m_label_TimeNeededForResultsDisplay->text().append(" s"));
 }
 
 
