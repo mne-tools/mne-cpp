@@ -65,6 +65,7 @@ contains(MNECPP_CONFIG, isGui) {
             lnt \
             computeInverseRapMusic \
             rawClusteredInverseRapMusic \
-            computeInversePwlRapMusic
+            computeInversePwlRapMusic \
+            rawClusteredInversePwlRapMusic
     }
 }
