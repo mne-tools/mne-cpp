@@ -78,9 +78,7 @@ BCISetupWidget::BCISetupWidget(BCI* pBCI, QWidget* parent)
             this, &BCISetupWidget::setGeneralOptions);
     connect(ui.m_checkBox_UseSensorData, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
             this, &BCISetupWidget::setGeneralOptions);
-    connect(ui.m_checkBox_UseThresholdArtefactReduction, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
-            this, &BCISetupWidget::setGeneralOptions);
-    connect(ui.m_SpinBox_ThresholdValue, static_cast<void (QDoubleSpinBox::*)()>(&QDoubleSpinBox::editingFinished),
+    connect(ui.m_checkBox_DisplayFeatures, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
             this, &BCISetupWidget::setGeneralOptions);
 
     // Connect processing options
@@ -88,9 +86,13 @@ BCISetupWidget::BCISetupWidget(BCI* pBCI, QWidget* parent)
             this, &BCISetupWidget::setProcessingOptions);
     connect(ui.m_doubleSpinBox_SlidingWindowSize, static_cast<void (QDoubleSpinBox::*)()>(&QDoubleSpinBox::editingFinished),
             this, &BCISetupWidget::setProcessingOptions);
-    connect(ui.m_spinBox_NumberSubSignals, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
+    connect(ui.m_spinBox_NumberFeatures, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
             this, &BCISetupWidget::setProcessingOptions);
     connect(ui.m_doubleSpinBox_TimeBetweenWindows, static_cast<void (QDoubleSpinBox::*)()>(&QDoubleSpinBox::editingFinished),
+            this, &BCISetupWidget::setProcessingOptions);
+    connect(ui.m_checkBox_UseThresholdArtefactReduction, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+            this, &BCISetupWidget::setProcessingOptions);
+    connect(ui.m_SpinBox_ThresholdValue, static_cast<void (QDoubleSpinBox::*)()>(&QDoubleSpinBox::editingFinished),
             this, &BCISetupWidget::setProcessingOptions);
 
     // Connect classification options
@@ -149,14 +151,20 @@ void BCISetupWidget::initGui()
     // General options
     ui.m_checkBox_UseSensorData->setChecked(m_pBCI->m_bUseSensorData);
     ui.m_checkBox_UseSourceData->setChecked(m_pBCI->m_bUseSourceData);
-    ui.m_checkBox_UseThresholdArtefactReduction->setChecked(m_pBCI->m_bUseArtefactThresholdReduction);
-    ui.m_SpinBox_ThresholdValue->setValue(m_pBCI->m_dThresholdValue);
+    ui.m_checkBox_DisplayFeatures->setChecked(m_pBCI->m_bDisplayFeatures);
 
     // Processing options
     ui.m_checkBox_SubtractMean->setChecked(m_pBCI->m_bSubtractMean);
     ui.m_doubleSpinBox_SlidingWindowSize->setValue(m_pBCI->m_dSlidingWindowSize);
-    ui.m_spinBox_NumberSubSignals->setValue(m_pBCI->m_iNumberSubSignals);
     ui.m_doubleSpinBox_TimeBetweenWindows->setValue(m_pBCI->m_dTimeBetweenWindows);
+    ui.m_spinBox_NumberFeatures->setValue(m_pBCI->m_iNumberFeatures);
+    ui.m_checkBox_UseThresholdArtefactReduction->setChecked(m_pBCI->m_bUseArtefactThresholdReduction);
+    ui.m_SpinBox_ThresholdValue->setValue(m_pBCI->m_dThresholdValue);
+
+    // Init total processing time
+    double totalProcessingTime = ui.m_doubleSpinBox_SlidingWindowSize->value() + (ui.m_doubleSpinBox_TimeBetweenWindows->value() * (ui.m_spinBox_NumberFeatures->value()-1));
+    ui.m_label_TotalProcessedTimeDisplay->setNum(totalProcessingTime);
+    ui.m_label_TotalProcessedTimeDisplay->setText(ui.m_label_TotalProcessedTimeDisplay->text().append(" s"));
 
     // Classification boundaries
     QString temp = m_pBCI->m_qStringResourcePath;
@@ -184,8 +192,7 @@ void BCISetupWidget::setGeneralOptions()
 {
     m_pBCI->m_bUseSensorData = ui.m_checkBox_UseSensorData->isChecked();
     m_pBCI->m_bUseSourceData = ui.m_checkBox_UseSourceData->isChecked();
-    m_pBCI->m_bUseArtefactThresholdReduction = ui.m_checkBox_UseThresholdArtefactReduction->isChecked();
-    m_pBCI->m_dThresholdValue = ui.m_SpinBox_ThresholdValue->value();
+    m_pBCI->m_bDisplayFeatures = ui.m_checkBox_DisplayFeatures->isChecked();
 }
 
 
@@ -195,8 +202,14 @@ void BCISetupWidget::setProcessingOptions()
 {
     m_pBCI->m_bSubtractMean = ui.m_checkBox_SubtractMean->isChecked();
     m_pBCI->m_dSlidingWindowSize = ui.m_doubleSpinBox_SlidingWindowSize->value();
-    m_pBCI->m_iNumberSubSignals = ui.m_spinBox_NumberSubSignals->value();
-    m_pBCI->m_dTimeBetweenWindows = ui.m_doubleSpinBox_TimeBetweenWindows->value();
+    m_pBCI->m_dTimeBetweenWindows = ui.m_doubleSpinBox_TimeBetweenWindows->value();    
+    m_pBCI->m_iNumberFeatures = ui.m_spinBox_NumberFeatures->value();
+    m_pBCI->m_bUseArtefactThresholdReduction = ui.m_checkBox_UseThresholdArtefactReduction->isChecked();
+    m_pBCI->m_dThresholdValue = ui.m_SpinBox_ThresholdValue->value();
+
+    double totalProcessingTime = ui.m_doubleSpinBox_SlidingWindowSize->value() + (ui.m_doubleSpinBox_TimeBetweenWindows->value() * (ui.m_spinBox_NumberFeatures->value()-1));
+    ui.m_label_TotalProcessedTimeDisplay->setNum(totalProcessingTime);
+    ui.m_label_TotalProcessedTimeDisplay->setText(ui.m_label_TotalProcessedTimeDisplay->text().append(" s"));
 }
 
 

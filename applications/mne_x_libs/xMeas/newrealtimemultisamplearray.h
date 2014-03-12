@@ -113,7 +113,7 @@ public:
     *
     * @param [in] uiNumChannels     the number of channels to init.
     */
-    void init(unsigned int uiNumChannels);
+    void init(QList<RealTimeSampleArrayChInfo> &chInfo);
 
     //=========================================================================================================
     /**
