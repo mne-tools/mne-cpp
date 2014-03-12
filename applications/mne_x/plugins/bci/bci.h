@@ -251,7 +251,9 @@ signals:
     void paintFeatures(MyQList features, bool bTrigerActivated);
 
 private:
-    PluginOutputData<NewRealTimeSampleArray>::SPtr      m_pBCIOutput;           /**< The RealTimeSampleArray of the BCI output.*/
+    PluginOutputData<NewRealTimeSampleArray>::SPtr      m_pBCIOutputOne;        /**< The first RealTimeSampleArray of the BCI output.*/
+    PluginOutputData<NewRealTimeSampleArray>::SPtr      m_pBCIOutputTwo;        /**< The second RealTimeSampleArray of the BCI output.*/
+    PluginOutputData<NewRealTimeSampleArray>::SPtr      m_pBCIOutputThree;      /**< The third RealTimeSampleArray of the BCI output.*/
 
     PluginInputData<NewRealTimeMultiSampleArray>::SPtr  m_pRTMSAInput;          /**< The RealTimeMultiSampleArray input.*/
     PluginInputData<RealTimeSourceEstimate>::SPtr       m_pRTSEInput;           /**< The RealTimeSourceEstimate input.*/
@@ -297,6 +299,7 @@ private:
     bool                    m_bUseFilter;                       /**< GUI input: Use filtering. */
     bool                    m_bUseSensorData;                   /**< GUI input: Use sensor data stream. */
     bool                    m_bUseSourceData;                   /**< GUI input: Use source data stream. */
+    bool                    m_bDisplayFeatures;                 /**< GUI input: Display features in feature window. */
     bool                    m_bUseArtefactThresholdReduction;   /**< GUI input: Whether BCI uses a threshold to obmit atrefacts.*/
     double                  m_dSlidingWindowSize;               /**< GUI input: Size of the sliding window in s. */
     double                  m_dTimeBetweenWindows;              /**< GUI input: Time between windows/feature calculation in s. */
@@ -305,7 +308,7 @@ private:
     double                  m_dParcksWidth;                     /**< GUI input: Parck filter algorithm width in Hz. */
     double                  m_dThresholdValue;                  /**< GUI input: Threshold in micro volts. */
     int                     m_iFilterOrder;                     /**< GUI input: Filter order. */
-    int                     m_iNumberSubSignals;                /**< GUI input: Number of subsignals. */
+    int                     m_iNumberFeatures;                  /**< GUI input: Number of classifactions to store until they get averaged. */
 };
 
 } // NAMESPACE

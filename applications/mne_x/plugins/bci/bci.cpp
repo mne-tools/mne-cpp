@@ -110,14 +110,27 @@ void BCI::init()
     connect(m_pRTMSAInput.data(), &PluginInputConnector::notify, this, &BCI::updateSensor, Qt::DirectConnection);
     m_inputConnectors.append(m_pRTMSAInput);
 
-    // Output
-    m_pBCIOutput = PluginOutputData<NewRealTimeSampleArray>::create(this, "ControlSignal", "BCI output data");
-    m_pBCIOutput->data()->setArraySize(1);
-    m_pBCIOutput->data()->setMaxValue(1);
-    m_pBCIOutput->data()->setMinValue(-1);
-    m_outputConnectors.append(m_pBCIOutput);
+    // Output streams
+    m_pBCIOutputOne = PluginOutputData<NewRealTimeSampleArray>::create(this, "ControlSignal", "BCI output data One");
+    m_pBCIOutputOne->data()->setArraySize(1);
+    m_pBCIOutputOne->data()->setMaxValue(50);
+    m_pBCIOutputOne->data()->setMinValue(-50);
+    m_pBCIOutputOne->data()->setName("Boundary");
+    m_outputConnectors.append(m_pBCIOutputOne);
 
-    //m_pBCIOutput->data()->setMaxValue();
+    m_pBCIOutputTwo = PluginOutputData<NewRealTimeSampleArray>::create(this, "ControlSignal", "BCI output data Two");
+    m_pBCIOutputTwo->data()->setArraySize(1);
+    m_pBCIOutputTwo->data()->setMaxValue(1e-06);
+    m_pBCIOutputTwo->data()->setMinValue(-1e-06);
+    m_pBCIOutputTwo->data()->setName("Left electrode");
+    m_outputConnectors.append(m_pBCIOutputTwo);
+
+    m_pBCIOutputThree = PluginOutputData<NewRealTimeSampleArray>::create(this, "ControlSignal", "BCI output data Three");
+    m_pBCIOutputThree->data()->setArraySize(1);
+    m_pBCIOutputThree->data()->setMaxValue(1e-06);
+    m_pBCIOutputThree->data()->setMinValue(-1e-06);
+    m_pBCIOutputThree->data()->setName("Right electrode");
+    m_outputConnectors.append(m_pBCIOutputThree);
 
     //Delete Buffer - will be initailzed with first incoming data
     m_pBCIBuffer_Sensor = CircularMatrixBuffer<double>::SPtr();
@@ -131,10 +144,11 @@ void BCI::init()
     m_bUseFilter = true;
     m_bUseSensorData = true;
     m_bUseSourceData = false;
+    m_bDisplayFeatures = true;
     m_bUseArtefactThresholdReduction = true;
     m_dSlidingWindowSize = 1.0;
-    m_dTimeBetweenWindows = 0.25;
-    m_iNumberSubSignals = 1;
+    m_dTimeBetweenWindows = 0.04;
+    m_iNumberFeatures = 6;
     m_dThresholdValue = 15;
 
     // Intitalise feature selection
@@ -179,8 +193,11 @@ bool BCI::start()
     m_iNumberOfCalculatedFeatures = 0;
 
     // BCIFeatureWindow show and init
-    m_BCIFeatureWindow->initGui();
-    m_BCIFeatureWindow->show();
+    if(m_bDisplayFeatures)
+    {
+        m_BCIFeatureWindow->initGui();
+        m_BCIFeatureWindow->show();
+    }
 
     // Init debug output stream
     QString path("BCIDebugFile.txt");
@@ -227,7 +244,8 @@ bool BCI::stop()
     m_outStreamDebug.clear();
 
     // Hide feature visualization window
-    m_BCIFeatureWindow->hide();
+    if(m_bDisplayFeatures)
+        m_BCIFeatureWindow->hide();
 
     // Delete all features and classification results
     clearFeatures();
@@ -505,7 +523,9 @@ void BCI::run()
         {
             if(m_iTBWIndexSensor < m_matSlidingWindowSensor.cols())
             {
+                //cout<<"About to pop matrix"<<endl;
                 MatrixXd t_mat = m_pBCIBuffer_Sensor->pop();
+                //cout<<"poped matrix"<<endl;
 
                 // Get only the rows from the matrix which correspond with the selected features, namely electrodes on sensor level and destrieux clustered regions on source level
                 for(int i = 0; i < m_matSlidingWindowSensor.rows(); i++)
@@ -525,7 +545,9 @@ void BCI::run()
         {
             if(m_iTBWIndexSensor < m_matTimeBetweenWindowsSensor.cols())
             {
+                //cout<<"About to pop matrix"<<endl;
                 MatrixXd t_mat = m_pBCIBuffer_Sensor->pop();
+                //cout<<"poped matrix"<<endl;
 
                 // Get only the rows from the matrix which correspond with the selected features, namely electrodes on sensor level and destrieux clustered regions on source level
                 for(int i = 0; i < m_matTimeBetweenWindowsSensor.rows(); i++)
@@ -587,12 +609,14 @@ void BCI::run()
                     // Look for trigger flag
                     if(lookForTrigger(m_matStimChannelSensor) && !m_bTriggerActivated)
                     {
-                        cout << "Trigger activated" << endl;
+                        // cout << "Trigger activated" << endl;
+                        //QFuture<void> future = QtConcurrent::run(Beep, 450, 700);
                         m_bTriggerActivated = true;
                     }
 
                     // ----5---- Filter data in m_matSlidingWindowSensor concurrently using map()
                     //cout<<"----5----"<<endl;
+                    // TODO: work only on lMatrixRows -> filteredRows doenst need to be created -> more efficient
                     QList< QPair<int,RowVectorXd> > filteredRows = qlMatrixRows;
 
                     if(m_bUseFilter)
@@ -633,7 +657,7 @@ void BCI::run()
 
                     // ----8---- If enough features (windows) have been calculated (processed) -> classify all features and average results
                     //cout<<"----8----"<<endl;
-                    if(m_iNumberOfCalculatedFeatures >= (int)(m_matSlidingWindowSensor.cols()/m_matTimeBetweenWindowsSensor.cols()))
+                    if(m_iNumberOfCalculatedFeatures == m_iNumberFeatures)
                     {
                         // Transform m_lFeaturesSensor into an easier file structure
                         QList< QList<double> > lFeaturesSensor_new;
@@ -653,8 +677,11 @@ void BCI::run()
     //                    cout<<"m_lFeaturesSensor.size()"<<m_lFeaturesSensor.size()<<endl;
 
                         // Display features
-                        emit paintFeatures((MyQList)lFeaturesSensor_new, m_bTriggerActivated);
-                        m_bTriggerActivated = false; // reset trigger
+                        if(m_bDisplayFeatures)
+                            emit paintFeatures((MyQList)lFeaturesSensor_new, m_bTriggerActivated);
+
+                        // Reset trigger
+                        m_bTriggerActivated = false;
 
                         // ----9---- Classify features concurrently using mapped() ----------
                         //cout<<"----9----"<<endl;
@@ -675,7 +702,7 @@ void BCI::run()
                             dfinalResult += futureClassificationResults.resultAt(i);
 
                         dfinalResult = dfinalResult/futureClassificationResults.resultCount();
-                        cout << dfinalResult << endl << endl;
+                        //cout << dfinalResult << endl << endl;
 
                         // ----11---- Store final result
                         //cout<<"----11----"<<endl;
@@ -683,7 +710,18 @@ void BCI::run()
 
                         // ----12---- Send result to the output stream, i.e. which is connected to the triggerbox
                         //cout<<"----12----"<<endl;
-                        m_pBCIOutput->data()->setValue(dfinalResult);
+                        VectorXd variances(iNumberOfFeatures);
+                        variances.setZero();
+
+                        for(int i = 0; i<lFeaturesSensor_new.size(); i++)
+                            for(int t = 0; t<iNumberOfFeatures; t++)
+                                variances(t) = variances(t) + lFeaturesSensor_new.at(i).at(t);
+
+                        variances = variances/lFeaturesSensor_new.size();
+
+                        m_pBCIOutputOne->data()->setValue(dfinalResult);
+                        m_pBCIOutputTwo->data()->setValue(variances(0));
+                        m_pBCIOutputThree->data()->setValue(variances(1));
 
                         // Clear classifications
                         clearFeatures();
