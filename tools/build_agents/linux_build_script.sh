@@ -1,3 +1,3 @@
 cd ../..
 qmake -r
-make .j4
+make -j4
