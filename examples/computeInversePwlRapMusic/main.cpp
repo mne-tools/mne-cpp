@@ -28,7 +28,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Example of MNEForwardSolution and RapMusic application
+* @brief    Example of MNEForwardSolution and Powell Rap Music application
 *
 */
 
@@ -47,7 +47,7 @@
 #include <mne/mne.h>
 
 #include <mne/mne_sourceestimate.h>
-#include <inverse/rapMusic/rapmusic.h>
+#include <inverse/rapMusic/pwlrapmusic.h>
 
 #include <disp3D/inverseview.h>
 
@@ -123,7 +123,7 @@ int main(int argc, char *argv[])
 
     qint32 numDipolePairs = 7;
 
-    bool doMovie = false;//true;
+    bool doMovie = true;//false;
 
     // Parse command line parameters
     for(qint32 i = 0; i < argc; ++i)
@@ -166,16 +166,18 @@ int main(int argc, char *argv[])
 //    std::cout << "Clustered Fwd:\n" << t_clusteredFwd.sol->data.row(0) << std::endl;
 
 
-    RapMusic t_rapMusic(t_clusteredFwd, false, numDipolePairs);
+    PwlRapMusic t_pwlRapMusic(t_clusteredFwd, false, numDipolePairs);
 
     if(doMovie)
-        t_rapMusic.setStcAttr(200,0.5);
+        t_pwlRapMusic.setStcAttr(200,0.5);
 
 
-    MNESourceEstimate sourceEstimate = t_rapMusic.calculateInverse(pickedEvoked);
+    MNESourceEstimate sourceEstimate = t_pwlRapMusic.calculateInverse(pickedEvoked);
+
+    std::cout << "source estimated" << std::endl;
+
     if(sourceEstimate.isEmpty())
         return 1;
-
 
     QList<Label> t_qListLabels;
     QList<RowVector4i> t_qListRGBAs;
@@ -183,7 +185,7 @@ int main(int argc, char *argv[])
     //ToDo overload toLabels using instead of t_surfSet rr of MNESourceSpace
     t_annotationSet.toLabels(t_surfSet, t_qListLabels, t_qListRGBAs);
 
-    InverseView view(t_rapMusic.getSourceSpace(), t_qListLabels, t_qListRGBAs, 24, true, false, false);//true);
+    InverseView view(t_pwlRapMusic.getSourceSpace(), t_qListLabels, t_qListRGBAs, 24, true, false, false);//true);
 
 
     if (view.stereoType() != QGLView::RedCyanAnaglyph)

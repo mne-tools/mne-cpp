@@ -64,6 +64,8 @@ contains(MNECPP_CONFIG, isGui) {
             plotSurfaces \
             lnt \
             computeInverseRapMusic \
-            rawClusteredInverseRapMusic
+            rawClusteredInverseRapMusic \
+            computeInversePwlRapMusic \
+            rawClusteredInversePwlRapMusic
     }
 }

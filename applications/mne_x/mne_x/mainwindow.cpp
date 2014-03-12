@@ -42,6 +42,8 @@
 #include <mne_x/Management/pluginscenemanager.h>
 #include <mne_x/Management/newdisplaymanager.h>
 
+#include <xDisp/roiselectionwidget.h>
+
 //GUI
 #include "mainwindow.h"
 #include "runwidget.h"
@@ -144,6 +146,9 @@ void MainWindow::clear()
     if(m_pPluginGui)
         delete m_pPluginGui;
 
+
+    if(m_pRoiSelectionWidget)
+        m_pRoiSelectionWidget.clear();
 }
 
 
@@ -335,8 +340,14 @@ void MainWindow::createActions()
 
     m_pActionDisplayMax = new QAction(QIcon(":/images/displayMax.png"), tr("Maximize current Display (F11)"), this);
     m_pActionDisplayMax->setShortcut(tr("F11"));
-    m_pActionDisplayMax->setStatusTip(tr("Maximizes the current Display (F11)"));
+    m_pActionDisplayMax->setStatusTip(tr("Maximizes the current display (F11)"));
     connect(m_pActionDisplayMax, SIGNAL(triggered()), this, SLOT(toggleDisplayMax()));
+
+    m_pActionSelectRoi = new QAction(QIcon(":/images/selectRoi.png"), tr("Shows the region selection widget (F12)"), this);
+    m_pActionSelectRoi->setShortcut(tr("F12"));
+    m_pActionSelectRoi->setStatusTip(tr("Shows the region selection widget (F12)"));
+    connect(m_pActionSelectRoi, SIGNAL(triggered()), this, SLOT(showRoiSelectionWidget()));
+
 }
 
 
@@ -387,6 +398,11 @@ void MainWindow::createToolBars()
     m_pActionZoomIn->setEnabled(false);
     m_pActionZoomOut->setEnabled(false);
     m_pActionDisplayMax->setEnabled(false);
+
+    m_pToolBar->addSeparator();
+
+    m_pToolBar->addAction(m_pActionSelectRoi);
+    m_pActionSelectRoi->setEnabled(true);
 
     m_pToolBar->addSeparator();
 
@@ -465,8 +481,6 @@ void MainWindow::updatePluginWidget(IPlugin::SPtr pPlugin)
     }
     else
     {
-
-
         if(!m_bIsRunning)
             setCentralWidget(pPlugin->setupWidget());
         else
@@ -640,6 +654,17 @@ void MainWindow::toggleDisplayMax()
     m_pActionDisplayMax->setEnabled(!m_bDisplayMax);
 
     updatePluginWidget(m_pPluginGui->getCurrentPlugin());
+}
+
+
+//*************************************************************************************************************
+
+void MainWindow::showRoiSelectionWidget()
+{
+    if(!m_pRoiSelectionWidget)
+        m_pRoiSelectionWidget = QSharedPointer<XDISPLIB::RoiSelectionWidget>(new XDISPLIB::RoiSelectionWidget);
+
+    m_pRoiSelectionWidget->show();
 }
 
 

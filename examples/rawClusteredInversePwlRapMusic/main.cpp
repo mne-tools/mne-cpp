@@ -50,7 +50,7 @@
 #include <mne/mne_epoch_data_list.h>
 
 #include <mne/mne_sourceestimate.h>
-#include <inverse/rapMusic/rapmusic.h>
+#include <inverse/rapMusic/pwlrapmusic.h>
 
 #include <disp3D/inverseview.h>
 
@@ -120,7 +120,7 @@ int main(int argc, char *argv[])
     QString t_sFileNameStc("");//("mind006_051209_auditory01.stc");
 
 
-    bool doMovie = false;//true;
+    bool doMovie = true;//false;
 
     qint32 numDipolePairs = 7;
 
@@ -451,12 +451,12 @@ int main(int argc, char *argv[])
     //
     // Compute inverse solution
     //
-    RapMusic t_rapMusic(t_clusteredFwd, false, numDipolePairs);
+    PwlRapMusic t_pwlRapMusic(t_clusteredFwd, false, numDipolePairs);
 
     if(doMovie)
-        t_rapMusic.setStcAttr(200,0.5);
+        t_pwlRapMusic.setStcAttr(200,0.5);
 
-    MNESourceEstimate sourceEstimate = t_rapMusic.calculateInverse(pickedEvoked);
+    MNESourceEstimate sourceEstimate = t_pwlRapMusic.calculateInverse(pickedEvoked);
 
     if(sourceEstimate.isEmpty())
         return 1;
@@ -490,7 +490,7 @@ int main(int argc, char *argv[])
     //ToDo overload toLabels using instead of t_surfSet rr of MNESourceSpace
     t_annotationSet.toLabels(t_surfSet, t_qListLabels, t_qListRGBAs);
 
-    InverseView view(t_rapMusic.getSourceSpace(), t_qListLabels, t_qListRGBAs, 24, true, false, false);//true);
+    InverseView view(t_pwlRapMusic.getSourceSpace(), t_qListLabels, t_qListRGBAs, 24, true, false, false);//true);
 
     if (view.stereoType() != QGLView::RedCyanAnaglyph)
         view.camera()->setEyeSeparation(0.3f);
