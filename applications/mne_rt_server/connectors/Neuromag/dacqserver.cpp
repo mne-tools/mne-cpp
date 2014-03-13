@@ -300,7 +300,7 @@ void DacqServer::run()
     //            return;
     //        }
     if (m_pNeuromag->m_uiBufferSampleSize < MIN_BUFLEN) {
-        fprintf(stderr, "%s: Too small Neuromag buffer length requested, should be at least %d\n", m_pNeuromag->m_uiBufferSampleSize, MIN_BUFLEN);
+        fprintf(stderr, "%ui: Too small Neuromag buffer length requested, should be at least %d\n", m_pNeuromag->m_uiBufferSampleSize, MIN_BUFLEN);
         return;
     }
     else {

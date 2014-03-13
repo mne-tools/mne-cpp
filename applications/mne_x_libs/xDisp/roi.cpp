@@ -66,6 +66,8 @@ void Roi::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidg
 //    painter->setPen(QPen(Qt::black, 0));
 //    painter->drawPath( m_pGraphicsSvgItem->shape());
 
+    Q_UNUSED(painter);
+
 }
 
 QVariant Roi::itemChange(GraphicsItemChange change, const QVariant &value)

@@ -213,7 +213,7 @@ int ShmemSocket::receive_tag (FiffTag::SPtr& p_pTag)
             }
             if (interesting_data(mess.kind)) {
                 if (read_fif (read_fd,read_loc,mess.size,(char *)p_pTag->data()) == -1) {
-                    printf("Could not read data (tag = %d, size = %d, pos = %d)!\n", mess.kind,mess.size,read_loc);//dacq_log("Could not read data (tag = %d, size = %d, pos = %d)!\n", mess.kind,mess.size,read_loc);
+                    printf("Could not read data (tag = %d, size = %d, pos = %li)!\n", mess.kind,mess.size,read_loc);//dacq_log("Could not read data (tag = %d, size = %d, pos = %d)!\n", mess.kind,mess.size,read_loc);
                     //dacq_log("%s\n",err_get_error());
                 }
                 else {
