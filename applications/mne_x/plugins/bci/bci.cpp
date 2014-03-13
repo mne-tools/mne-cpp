@@ -113,24 +113,38 @@ void BCI::init()
     // Output streams
     m_pBCIOutputOne = PluginOutputData<NewRealTimeSampleArray>::create(this, "ControlSignal", "BCI output data One");
     m_pBCIOutputOne->data()->setArraySize(1);
-    m_pBCIOutputOne->data()->setMaxValue(50);
-    m_pBCIOutputOne->data()->setMinValue(-50);
+    m_pBCIOutputOne->data()->setMaxValue(10);
+    m_pBCIOutputOne->data()->setMinValue(-10);
     m_pBCIOutputOne->data()->setName("Boundary");
     m_outputConnectors.append(m_pBCIOutputOne);
 
     m_pBCIOutputTwo = PluginOutputData<NewRealTimeSampleArray>::create(this, "ControlSignal", "BCI output data Two");
     m_pBCIOutputTwo->data()->setArraySize(1);
-    m_pBCIOutputTwo->data()->setMaxValue(5e-07);
-    m_pBCIOutputTwo->data()->setMinValue(-5e-07);
-    m_pBCIOutputTwo->data()->setName("Left electrode");
+    m_pBCIOutputTwo->data()->setMaxValue(15);//(5e-07);
+    m_pBCIOutputTwo->data()->setMinValue(0);//(-5e-07);
+    m_pBCIOutputTwo->data()->setName("Left electrode var");
     m_outputConnectors.append(m_pBCIOutputTwo);
 
     m_pBCIOutputThree = PluginOutputData<NewRealTimeSampleArray>::create(this, "ControlSignal", "BCI output data Three");
     m_pBCIOutputThree->data()->setArraySize(1);
-    m_pBCIOutputThree->data()->setMaxValue(5e-07);
-    m_pBCIOutputThree->data()->setMinValue(-5e-07);
-    m_pBCIOutputThree->data()->setName("Right electrode");
+    m_pBCIOutputThree->data()->setMaxValue(15);//(5e-07);
+    m_pBCIOutputThree->data()->setMinValue(0);//(-5e-07);
+    m_pBCIOutputThree->data()->setName("Right electrode var");
     m_outputConnectors.append(m_pBCIOutputThree);
+
+    m_pBCIOutputFour = PluginOutputData<NewRealTimeSampleArray>::create(this, "ControlSignal", "BCI output data Four");
+    m_pBCIOutputFour->data()->setArraySize(1);
+    m_pBCIOutputFour->data()->setMaxValue(7e-05);
+    m_pBCIOutputFour->data()->setMinValue(-7e-05);
+    m_pBCIOutputFour->data()->setName("Left electrode");
+    m_outputConnectors.append(m_pBCIOutputFour);
+
+    m_pBCIOutputFive = PluginOutputData<NewRealTimeSampleArray>::create(this, "ControlSignal", "BCI output data Five");
+    m_pBCIOutputFive->data()->setArraySize(10000);
+    m_pBCIOutputFive->data()->setMaxValue(7e-05);
+    m_pBCIOutputFive->data()->setMinValue(-7e-05);
+    m_pBCIOutputFive->data()->setName("Right electrode");
+    m_outputConnectors.append(m_pBCIOutputFive);
 
     // Delete Buffer - will be initailzed with first incoming data
     m_pBCIBuffer_Sensor = CircularMatrixBuffer<double>::SPtr();
@@ -144,12 +158,12 @@ void BCI::init()
     m_bUseFilter = true;
     m_bUseSensorData = true;
     m_bUseSourceData = false;
-    m_bDisplayFeatures = false;
-    m_bUseArtefactThresholdReduction = true;
+    m_bDisplayFeatures = true;
+    m_bUseArtefactThresholdReduction = false;
     m_dSlidingWindowSize = 0.5;
     m_dTimeBetweenWindows = 0.5;
     m_iNumberFeatures = 1;
-    m_dThresholdValue = 15;
+    m_dThresholdValue = 30;
 
     // Intitalise feature selection
     m_slChosenFeatureSensor << "LA4" << "RA4"; //<< "TEST";
@@ -402,7 +416,7 @@ QPair< int,QList<double> > BCI::applyFeatureCalcConcurrentlyOnSensorLevel(const 
     QList<double> features;
 
     // TODO: Divide into subsignals
-    features << data.squaredNorm(); // Compute variance
+    features << abs(log10(data.squaredNorm())); // Compute variance
 
     return QPair< int,QList<double> >(chdata.first, features);
 }
@@ -573,15 +587,19 @@ void BCI::run()
                 if(m_slChosenFeatureSensor.contains("TEST"))
                 {
                     cout<<"Recalculate matrix"<<endl;
-                    for(int i = 1; i<m_matSlidingWindowSensor.cols() ; i++)
-                    {
-                        cout << m_matSlidingWindowSensor(m_matSlidingWindowSensor.rows()-1,i-1) <<endl;
-                        if(m_matSlidingWindowSensor(m_matSlidingWindowSensor.rows()-1,i) - m_matSlidingWindowSensor(m_matSlidingWindowSensor.rows()-1,i-1) != 1)
-                            cout<<"Sequence error while streaming from tmsi plugin at position: "<<i<<endl;
-                    }
+
+                    for(int i = 0; i<m_matSlidingWindowSensor.cols() ; i++)
+                        cout << m_matSlidingWindowSensor(m_matSlidingWindowSensor.rows()-1,i) <<endl;
+
+//                    for(int i = 1; i<m_matSlidingWindowSensor.cols() ; i++)
+//                    {
+//                        cout << m_matSlidingWindowSensor(m_matSlidingWindowSensor.rows()-1,i-1) <<endl;
+//                        if(m_matSlidingWindowSensor(m_matSlidingWindowSensor.rows()-1,i) - m_matSlidingWindowSensor(m_matSlidingWindowSensor.rows()-1,i-1) != 1)
+//                            cout<<"Sequence error while streaming from tmsi plugin at position: "<<i<<endl;
+//                    }
                 }
 
-                // ----2---- Transform matrix into QList structure, so that QTConurrent can handle it properly
+                // ----2---- Transform matrix into QList structure, so that QTConcurrent can handle it properly
                 //cout<<"----2----"<<endl;
                 QList< QPair<int,RowVectorXd> > qlMatrixRows;
                 for(int i = 0; i< m_matSlidingWindowSensor.rows(); i++)
@@ -614,7 +632,7 @@ void BCI::run()
 
                     // ----5---- Filter data in m_matSlidingWindowSensor concurrently using map()
                     //cout<<"----5----"<<endl;
-                    // TODO: work only on lMatrixRows -> filteredRows doenst need to be created -> more efficient
+                    // TODO: work only on qlMatrixRows -> filteredRows doesnt need to be created -> more efficient
                     QList< QPair<int,RowVectorXd> > filteredRows = qlMatrixRows;
 
                     if(m_bUseFilter)
@@ -637,6 +655,10 @@ void BCI::run()
 
 //                    m_outStreamDebug << endl << "---------------------------------------------------------" << endl << endl;
 
+//                    // Write filtered data continously to file
+//                    for(int i = 0; i<filteredRows.at(0).second.size() ;i++)
+//                        m_outStreamDebug << filteredRows.at(0).second(i)<<endl;
+
                     // ----6---- Calculate features concurrently using mapped()
                     //cout<<"----6----"<<endl;
                     std::function< QPair<int,QList<double> > (QPair<int,RowVectorXd>&)> applyOpsFeatures = [this](QPair<int,RowVectorXd>& chdata) -> QPair< int,QList<double> > {
@@ -657,7 +679,7 @@ void BCI::run()
                     //cout<<"----8----"<<endl;
                     if(m_iNumberOfCalculatedFeatures == m_iNumberFeatures)
                     {
-                        // Transform m_lFeaturesSensor into an easier file structure
+                        // Transform m_lFeaturesSensor into an easier file structure -> create feature points
                         QList< QList<double> > lFeaturesSensor_new;
 
                         for(int i = 0; i<m_lFeaturesSensor.size()-iNumberOfFeatures+1; i = i + iNumberOfFeatures) // iterate over QPair feature List
@@ -669,10 +691,10 @@ void BCI::run()
                                 lFeaturesSensor_new.append(temp);
                             }
 
-    //                    //Check sizes
-    //                    cout<<"lFeaturesSensor_new.size()"<<lFeaturesSensor_new.size()<<endl;
-    //                    cout<<"lFeaturesSensor_new.at(0).size()"<<lFeaturesSensor_new.at(0).size()<<endl;
-    //                    cout<<"m_lFeaturesSensor.size()"<<m_lFeaturesSensor.size()<<endl;
+//                        //Check sizes
+//                        cout<<"lFeaturesSensor_new.size()"<<lFeaturesSensor_new.size()<<endl;
+//                        cout<<"lFeaturesSensor_new.at(0).size()"<<lFeaturesSensor_new.at(0).size()<<endl;
+//                        cout<<"m_lFeaturesSensor.size()"<<m_lFeaturesSensor.size()<<endl;
 
                         // Display features
                         if(m_bDisplayFeatures)
@@ -700,7 +722,7 @@ void BCI::run()
                             dfinalResult += futureClassificationResults.resultAt(i);
 
                         dfinalResult = dfinalResult/futureClassificationResults.resultCount();
-                        //cout << dfinalResult << endl << endl;
+                        //cout << "dfinalResult" << dfinalResult << endl << endl;
 
                         // ----11---- Store final result
                         //cout<<"----11----"<<endl;
@@ -721,13 +743,43 @@ void BCI::run()
                         m_pBCIOutputTwo->data()->setValue(variances(0));
                         m_pBCIOutputThree->data()->setValue(variances(1));
 
+                        for(int i = 0; i<filteredRows.at(0).second.cols() ; i++)
+                        {
+                            m_pBCIOutputFour->data()->setValue(filteredRows.at(0).second(0,i));
+                            m_pBCIOutputFive->data()->setValue(filteredRows.at(1).second(0,i));
+                        }
+
                         // Clear classifications
                         clearFeatures();
 
                         // Reset counter
                         m_iNumberOfCalculatedFeatures = 0;
                     } // End if enough features (windows) have been calculated (processed)
-                } // End artefact reduction
+                } // End if artefact reduction
+                else
+                {
+                    // If trial has been rejected -> plot zeros as result and the filtered electrode channel
+                    m_pBCIOutputOne->data()->setValue(0);
+                    m_pBCIOutputTwo->data()->setValue(0);
+                    m_pBCIOutputThree->data()->setValue(0);
+
+                    QList< QPair<int,RowVectorXd> > filteredRows = qlMatrixRows;
+
+                    if(m_bUseFilter)
+                    {
+                        QFuture<void> futureFilter = QtConcurrent::map(filteredRows,[this](QPair<int,RowVectorXd>& chdata) {
+                            applyFilterOperatorConcurrently(chdata);
+                        });
+
+                        futureFilter.waitForFinished();
+                    }
+
+                    for(int i = 0; i<filteredRows.at(0).second.cols() ; i++)
+                    {
+                        m_pBCIOutputFour->data()->setValue(filteredRows.at(0).second(0,i));
+                        m_pBCIOutputFive->data()->setValue(filteredRows.at(1).second(0,i));
+                    }
+                }
 
                 m_iTBWIndexSensor = 0;
             }

@@ -49,6 +49,7 @@
 //=============================================================================================================
 
 using namespace BCIPlugin;
+using namespace Eigen;
 
 BCIFeatureWindow::BCIFeatureWindow(BCI* pBCI, QWidget *parent)
 : QWidget(parent)
@@ -78,9 +79,47 @@ void BCIFeatureWindow::initGui()
 {
     m_scene.clear();
 
-    m_dFeatureMax = 1e-08;
+    m_dFeatureMax = 15;//1e-08;
+    m_iScale = 600;
+
+    addBoundaryLineToScene();
 }
 
+
+//*************************************************************************************************************
+void BCIFeatureWindow::addBoundaryLineToScene()
+{
+    m_scene.addLine(0*(m_iScale/m_dFeatureMax), boundaryValue(0)*(m_iScale/m_dFeatureMax), 15*(m_iScale/m_dFeatureMax), boundaryValue(15)*(m_iScale/m_dFeatureMax));
+
+    // Add items
+//        QGraphicsTextItem* leftElectrode = m_scene.addText(m_pBCI->m_slChosenFeatureSensor.at(0));
+//        leftElectrode->setPos(QPointF(m_iScale/2, 10));
+//        QGraphicsTextItem* rightElectrode = m_scene.addText(m_pBCI->m_slChosenFeatureSensor.at(1));
+//        rightElectrode->setPos(QPointF(10,m_iScale/2));
+
+//        QGraphicsTextItem* leftUnit = m_scene.addText("1e-08");
+//        leftUnit->setPos(QPointF(m_iScale-100, 10));
+//        QGraphicsTextItem* rightUnit = m_scene.addText("1e-08");
+//        rightUnit->setPos(QPointF(10, m_iScale-100));
+}
+
+
+//*************************************************************************************************************
+
+double BCIFeatureWindow::boundaryValue(double x)
+{
+    QVector<VectorXd> boundary = m_pBCI->m_vLoadedSensorBoundary;
+
+    double K = boundary.at(0)(0);
+    double L1 = boundary.at(1)(0);
+    double L2 = boundary.at(1)(1);
+
+    double y;
+
+    y = (K+L1*x)/L2;
+
+    return (-1*y);
+}
 
 //*************************************************************************************************************
 
@@ -89,27 +128,17 @@ void BCIFeatureWindow::paintFeaturesToScene(MyQList features, bool bTriggerActiv
 //    std::cout<<"features.size()"<<features.size()<<endl;
     if(features.first().size() == 2) // Only plot when 2D case with two electrodes
     {
-//        m_scene.clear();
+        if(m_scene.items().size() > 30)
+        {
+            m_scene.clear();
+            addBoundaryLineToScene();
+        }
 
 //        // If trigger was activated during feature calculation -> change scenes brush color
 //        if(bTriggerActivated)
 //            m_scene.setBackgroundBrush(Qt::blue);
 //        else
 //            m_scene.setBackgroundBrush(Qt::white);
-
-        // Add items
-        int lineSize = 1000;
-        m_scene.addLine(0,0,lineSize,lineSize);
-
-        QGraphicsTextItem* leftElectrode = m_scene.addText(m_pBCI->m_slChosenFeatureSensor.at(0));
-        leftElectrode->setPos(QPointF(lineSize/2, 10));
-        QGraphicsTextItem* rightElectrode = m_scene.addText(m_pBCI->m_slChosenFeatureSensor.at(1));
-        rightElectrode->setPos(QPointF(10,lineSize/2));
-
-        QGraphicsTextItem* leftUnit = m_scene.addText("1e-08");
-        leftUnit->setPos(QPointF(lineSize-100, 10));
-        QGraphicsTextItem* rightUnit = m_scene.addText("1e-08");
-        rightUnit->setPos(QPointF(10, lineSize-100));
 
         for(int i = 0; i<features.size(); i++)
         {
@@ -122,18 +151,19 @@ void BCIFeatureWindow::paintFeaturesToScene(MyQList features, bool bTriggerActiv
 //            if(featureB > m_dFeatureMax)
 //                m_dFeatureMax = featureB;
 
-            QRectF rect(featureA*(lineSize/m_dFeatureMax), featureB*(lineSize/m_dFeatureMax), 5, 5);
-//            std::cout<<"Scaled: "<< featureA*(lineSize/m_dFeatureMax) <<" "<< featureB*(lineSize/m_dFeatureMax) << endl;
+            QRectF rect(featureA*(m_iScale/m_dFeatureMax), featureB*(m_iScale/m_dFeatureMax), 5, 5);
+
+//            std::cout<<"Scaled: "<< featureA*(m_iScale/m_dFeatureMax) <<" "<< featureB*(m_iScale/m_dFeatureMax) << endl;
 //            std::cout<<"Unscaled: "<< featureA <<" "<< featureB << endl;
-            // If NAN -> don't plot features -> case when working with the Refa device without any channels connected
-            if(featureA == featureA && featureB == featureB)
-                if(bTriggerActivated)
-                    m_scene.addEllipse(rect, QPen(Qt::red));
-                else
-                    m_scene.addEllipse(rect, QPen(Qt::black));
+
+            // Add ellipse to scene
+            if(bTriggerActivated)
+                m_scene.addEllipse(rect, QPen(Qt::red));
+            else
+                m_scene.addEllipse(rect, QPen(Qt::black));
         }
 
-//        ui.m_graphicsView_featureVisualization->fitInView(m_scene.sceneRect());
+        ui.m_graphicsView_featureVisualization->fitInView(m_scene.sceneRect());
     }
 }
 
