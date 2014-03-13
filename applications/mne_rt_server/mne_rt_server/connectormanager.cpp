@@ -163,6 +163,8 @@ void ConnectorManager::comStart(Command p_command)//comMeas
 {
     getActiveConnector()->start();
     qobject_cast<MNERTServer*>(this->parent())->getCommandManager()["start"].reply("Starting active connector.\n");
+
+    Q_UNUSED(p_command);
 }
 
 
@@ -172,6 +174,8 @@ void ConnectorManager::comStopAll(Command p_command)
 {
     getActiveConnector()->stop();
     qobject_cast<MNERTServer*>(this->parent())->getCommandManager()["stop-all"].reply("Stoping all connectors.\r\n");
+
+    Q_UNUSED(p_command);
 }
 
 
