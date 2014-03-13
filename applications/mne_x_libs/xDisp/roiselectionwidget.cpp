@@ -82,6 +82,8 @@ RoiSelectionWidget::RoiSelectionWidget(QWidget *parent)
     Roi *parietal_right = new Roi(":/images/parietal_right", this);
     Roi *occipital_left = new Roi(":/images/occipital_left", this);
     Roi *occipital_right = new Roi(":/images/occipital_right", this);
+    Roi *temporal_left = new Roi(":/images/temporal_left", this);
+    Roi *temporal_right = new Roi(":/images/temporal_right", this);
 
     scene->addItem(frontal_left);
     scene->addItem(frontal_right);
@@ -89,15 +91,19 @@ RoiSelectionWidget::RoiSelectionWidget(QWidget *parent)
     scene->addItem(parietal_right);
     scene->addItem(occipital_left);
     scene->addItem(occipital_right);
+    scene->addItem(temporal_left);
+    scene->addItem(temporal_right);
 
-    frontal_left->setPos(118, 140);
-    frontal_right->setPos(-134, 140);
-    parietal_left->setPos(126, 0);
-    parietal_right->setPos(-126, 0);
-    occipital_left->setPos(124, -136);
-    occipital_right->setPos(-76, -136);
+    frontal_left->setPos(-1070, -300);
+    frontal_right->setPos(0, -300);
+    parietal_left->setPos(-650, 0);
+    parietal_right->setPos(0, 0);
+    occipital_left->setPos(-500, 150);
+    occipital_right->setPos(0, 150);
+    temporal_left->setPos(-250, 260);
+    temporal_right->setPos(0, 260);
 
-    scene->setSceneRect(-154.0f, -156.0f, 540, 670);
+    scene->setSceneRect(-500.0f, -340.0f, 2140.0f, 3000.0f);
 }
 
 
