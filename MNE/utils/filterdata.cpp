@@ -64,8 +64,8 @@ FilterData::~FilterData()
 //*************************************************************************************************************
 
 FilterData::FilterData(QString unique_name, FilterType type, int order, double centerfreq, double bandwidth, double parkswidth, qint32 fftlength)
-: m_iFilterOrder(order)
-, m_Type(type)
+: m_Type(type)
+, m_iFilterOrder(order)
 , m_iFFTlength(fftlength)
 {
     ParksMcClellan filter(order, centerfreq, bandwidth, parkswidth, (ParksMcClellan::TPassType)type);
@@ -73,6 +73,8 @@ FilterData::FilterData(QString unique_name, FilterType type, int order, double c
 
     //fft-transform m_dCoeffA in order to be able to perform frequency-domain filtering
     fftTransformCoeffs();
+
+    Q_UNUSED(unique_name);
 }
 
 //*************************************************************************************************************
