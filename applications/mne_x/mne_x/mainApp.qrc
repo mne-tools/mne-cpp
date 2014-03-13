@@ -18,7 +18,6 @@
         <file alias="linepointer.png">images/icons/linepointer.png</file>
         <file alias="sendtoback.png">images/icons/sendtoback.png</file>
         <file alias="pointer.png">images/icons/pointer.png</file>
-        <file alias="selectRoi.png">images/icons/selectRoi.png</file>
     </qresource>
     <qresource prefix="/qss">
         <file>QtStyleSheets/plastique.qss</file>
