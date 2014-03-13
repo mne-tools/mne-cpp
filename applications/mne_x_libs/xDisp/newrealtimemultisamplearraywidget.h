@@ -61,7 +61,6 @@
 #include <QThread>
 
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
@@ -82,6 +81,14 @@ class NewRealTimeMultiSampleArray;
 
 namespace XDISPLIB
 {
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+class RoiSelectionWidget;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -119,7 +126,6 @@ class XDISPSHARED_EXPORT NewRealTimeMultiSampleArrayWidget : public NewMeasureme
     Q_OBJECT
 
 public:
-
     //=========================================================================================================
     /**
     * Constructs a RealTimeMultiSampleArrayWidget which is a child of parent.
@@ -289,6 +295,12 @@ private:
     QSharedPointer<QTime>           m_pTime;                        /**< The application time. */
     QSharedPointer<QTime>           m_pTimeCurrentDisplay;          /**< Time which corresponds to the x starting position of each segment. */
     static QList<double>            s_listSamplingRates;            /**< All real-time sample array sampling rates of the current display. */
+
+    QAction*                        m_pActionSelectRoi;     /**< show roi select widget ToDo move this to the actual view-> and make a dynamical menu*/
+
+    void showRoiSelectionWidget();                          /**< Implements the show roi selection widget. ToDo: Move this to the actual widget*/
+
+    QSharedPointer<XDISPLIB::RoiSelectionWidget> m_pRoiSelectionWidget;    /**< ROI selection widget, ToDo: move this to the xDisp */
 
 };
 

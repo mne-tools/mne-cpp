@@ -43,6 +43,8 @@
 #include "newrealtimemultisamplearraywidget.h"
 //#include "annotationwindow.h"
 
+#include "roiselectionwidget.h"
+
 #include <xMeas/newrealtimemultisamplearray.h>
 
 #include <Eigen/Core>
@@ -118,6 +120,14 @@ NewRealTimeMultiSampleArrayWidget::NewRealTimeMultiSampleArrayWidget(QSharedPoin
 {
     ui.setupUi(this);
     ui.m_qLabel_Tool->hide();
+
+    m_pActionSelectRoi = new QAction(QIcon(":/images/selectRoi.png"), tr("Shows the region selection widget (F12)"),this);
+    m_pActionSelectRoi->setShortcut(tr("F12"));
+    m_pActionSelectRoi->setStatusTip(tr("Shows the region selection widget (F12)"));
+    connect(m_pActionSelectRoi, &QAction::triggered, this, &NewRealTimeMultiSampleArrayWidget::showRoiSelectionWidget);
+
+    addDisplayAction(m_pActionSelectRoi);
+
 
     // Add tool names to vector
     m_vecTool.push_back("Freeze");
@@ -774,6 +784,17 @@ void NewRealTimeMultiSampleArrayWidget::wheelEvent(QWheelEvent* wheelEvent)
 //    connect( m_pTimerToolDisplay, SIGNAL(timeout()), ui.m_qLabel_Tool, SLOT(hide()));
 //    m_pTimerToolDisplay->start(2000);
 
+}
+
+
+//*************************************************************************************************************
+
+void NewRealTimeMultiSampleArrayWidget::showRoiSelectionWidget()
+{
+    if(!m_pRoiSelectionWidget)
+        m_pRoiSelectionWidget = QSharedPointer<XDISPLIB::RoiSelectionWidget>(new XDISPLIB::RoiSelectionWidget);
+
+    m_pRoiSelectionWidget->show();
 }
 
 

@@ -99,6 +99,8 @@ MainWindow::MainWindow(QWidget *parent)
 , m_pPluginManager(new PluginManager(this))
 , m_pPluginSceneManager(new PluginSceneManager(this))
 , m_pDisplayManager(new NewDisplayManager(this))
+, m_pToolBar(NULL)
+, m_pDynamicDisplayToolBar(NULL)
 , m_eLogLevelCurrent(_LogLvMax)
 {
     qDebug() << "Clinical Sensing and Analysis - Version" << CInfo::AppVersion();
@@ -145,10 +147,6 @@ void MainWindow::clear()
 
     if(m_pPluginGui)
         delete m_pPluginGui;
-
-
-    if(m_pRoiSelectionWidget)
-        m_pRoiSelectionWidget.clear();
 }
 
 
@@ -342,12 +340,6 @@ void MainWindow::createActions()
     m_pActionDisplayMax->setShortcut(tr("F11"));
     m_pActionDisplayMax->setStatusTip(tr("Maximizes the current display (F11)"));
     connect(m_pActionDisplayMax, SIGNAL(triggered()), this, SLOT(toggleDisplayMax()));
-
-    m_pActionSelectRoi = new QAction(QIcon(":/images/selectRoi.png"), tr("Shows the region selection widget (F12)"), this);
-    m_pActionSelectRoi->setShortcut(tr("F12"));
-    m_pActionSelectRoi->setStatusTip(tr("Shows the region selection widget (F12)"));
-    connect(m_pActionSelectRoi, SIGNAL(triggered()), this, SLOT(showRoiSelectionWidget()));
-
 }
 
 
@@ -383,32 +375,47 @@ void MainWindow::createMenus()
 
 void MainWindow::createToolBars()
 {
-    m_pToolBar = addToolBar(tr("File"));
-    m_pToolBar->addAction(m_pActionRun);
-    m_pToolBar->addAction(m_pActionStop);
-    m_pActionStop->setEnabled(false);
+    //Control
+    if(!m_pToolBar)
+    {
+        m_pToolBar = addToolBar(tr("Control"));
+        m_pToolBar->addAction(m_pActionRun);
+        m_pToolBar->addAction(m_pActionStop);
+        m_pActionStop->setEnabled(false);
 
-    m_pToolBar->addSeparator();
+        m_pToolBar->addSeparator();
 
-    m_pToolBar->addAction(m_pActionZoomStd);
-    m_pToolBar->addAction(m_pActionZoomIn);
-    m_pToolBar->addAction(m_pActionZoomOut);
-    m_pToolBar->addAction(m_pActionDisplayMax);
-    m_pActionZoomStd->setEnabled(false);
-    m_pActionZoomIn->setEnabled(false);
-    m_pActionZoomOut->setEnabled(false);
-    m_pActionDisplayMax->setEnabled(false);
+        m_pToolBar->addAction(m_pActionZoomStd);
+        m_pToolBar->addAction(m_pActionZoomIn);
+        m_pToolBar->addAction(m_pActionZoomOut);
+        m_pToolBar->addAction(m_pActionDisplayMax);
+        m_pActionZoomStd->setEnabled(false);
+        m_pActionZoomIn->setEnabled(false);
+        m_pActionZoomOut->setEnabled(false);
+        m_pActionDisplayMax->setEnabled(false);
 
-    m_pToolBar->addSeparator();
+        m_pToolBar->addSeparator();
 
-    m_pToolBar->addAction(m_pActionSelectRoi);
-    m_pActionSelectRoi->setEnabled(true);
+        m_pLabelTime = new QLabel;
+        m_pToolBar->addWidget(m_pLabelTime);
+        m_pLabelTime->setText(QTime(0, 0).toString());
+    }
 
-    m_pToolBar->addSeparator();
 
-    m_pLabelTime = new QLabel;
-    m_pToolBar->addWidget(m_pLabelTime);
-    m_pLabelTime->setText(QTime(0, 0).toString());
+    //Display
+    if(m_pDynamicDisplayToolBar)
+    {
+        removeToolBar(m_pDynamicDisplayToolBar);
+        delete m_pDynamicDisplayToolBar;
+        m_pDynamicDisplayToolBar = NULL;
+    }
+    if(m_qListDynamicDisplayActions.size() > 0)
+    {
+        m_pDynamicDisplayToolBar = addToolBar(tr("Control"));
+        for(qint32 i = 0; i < m_qListDynamicDisplayActions.size(); ++i)
+            m_pDynamicDisplayToolBar->addAction(m_qListDynamicDisplayActions[i]);
+    }
+
 }
 
 
@@ -445,7 +452,6 @@ void MainWindow::createPluginDockWindow()
 
 void MainWindow::createLogDockWindow()
 {
-
     //Log TextBrowser
     m_pDockWidget_Log = new QDockWidget(tr("Log"), this);
 
@@ -467,6 +473,8 @@ void MainWindow::createLogDockWindow()
 //Plugin stuff
 void MainWindow::updatePluginWidget(IPlugin::SPtr pPlugin)
 {
+    m_qListDynamicDisplayActions.clear();
+
     //Garbage collecting
     if(m_pRunWidget)
     {
@@ -485,7 +493,7 @@ void MainWindow::updatePluginWidget(IPlugin::SPtr pPlugin)
             setCentralWidget(pPlugin->setupWidget());
         else
         {
-            m_pRunWidget = new RunWidget( m_pDisplayManager->show(pPlugin->getOutputConnectors(), m_pTime));
+            m_pRunWidget = new RunWidget( m_pDisplayManager->show(pPlugin->getOutputConnectors(), m_pTime, m_qListDynamicDisplayActions));
 
             m_pRunWidget->show();
 
@@ -498,6 +506,8 @@ void MainWindow::updatePluginWidget(IPlugin::SPtr pPlugin)
                 setCentralWidget(m_pRunWidget);
         }
     }
+
+    this->createToolBars();
 }
 
 
@@ -654,17 +664,6 @@ void MainWindow::toggleDisplayMax()
     m_pActionDisplayMax->setEnabled(!m_bDisplayMax);
 
     updatePluginWidget(m_pPluginGui->getCurrentPlugin());
-}
-
-
-//*************************************************************************************************************
-
-void MainWindow::showRoiSelectionWidget()
-{
-    if(!m_pRoiSelectionWidget)
-        m_pRoiSelectionWidget = QSharedPointer<XDISPLIB::RoiSelectionWidget>(new XDISPLIB::RoiSelectionWidget);
-
-    m_pRoiSelectionWidget->show();
 }
 
 

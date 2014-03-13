@@ -184,8 +184,6 @@ private:
     //StartUp
     StartUpWidget* m_pStartUpWidget;    /**< holds the StartUpWidget.*/
 
-    QSharedPointer<XDISPLIB::RoiSelectionWidget> m_pRoiSelectionWidget;    /**< ROI selection widget, ToDo: move this to the xDisp */
-
     //Run
     RunWidget* m_pRunWidget;                                /**< The run widget */
     QSharedPointer<NewDisplayManager> m_pDisplayManager;    /**< display manager */
@@ -211,37 +209,37 @@ private:
 
     void initStatusBar();       /**< Creates QToolBar for user interface of MainWindow class. */
 
-    QAction*                             m_pActionNewConfig;        /**< new configuration */
-    QAction*                             m_pActionOpenConfig;       /**< open configuration */
-    QAction*                             m_pActionSaveConfig;       /**< save configuration */
-    QAction*                             m_pActionExit;             /**< exit application */
+    QAction*                            m_pActionNewConfig;         /**< new configuration */
+    QAction*                            m_pActionOpenConfig;        /**< open configuration */
+    QAction*                            m_pActionSaveConfig;        /**< save configuration */
+    QAction*                            m_pActionExit;              /**< exit application */
 
-    QActionGroup*                        m_pActionGroupLgLv;        /**< group log level */
-    QAction*                             m_pActionMinLgLv;          /**< set minimal log level */
-    QAction*                             m_pActionNormLgLv;         /**< set normal log level */
-    QAction*                             m_pActionMaxLgLv;          /**< set maximal log level */
+    QActionGroup*                       m_pActionGroupLgLv;         /**< group log level */
+    QAction*                            m_pActionMinLgLv;           /**< set minimal log level */
+    QAction*                            m_pActionNormLgLv;          /**< set normal log level */
+    QAction*                            m_pActionMaxLgLv;           /**< set maximal log level */
 
-    QAction*                             m_pActionHelpContents;     /**< open help contents */
-    QAction*                             m_pActionAbout;            /**< show about dialog */
+    QAction*                            m_pActionHelpContents;      /**< open help contents */
+    QAction*                            m_pActionAbout;             /**< show about dialog */
 
-    QAction*                             m_pActionRun;              /**< run application */
-    QAction*                             m_pActionStop;             /**< stop application */
-    QAction*                             m_pActionZoomStd;          /**< standard zoom */
-    QAction*                             m_pActionZoomIn;           /**< zoom in */
-    QAction*                             m_pActionZoomOut;          /**< zoom out */
-    QAction*                             m_pActionDisplayMax;       /**< show full screen mode */
+    QAction*                            m_pActionRun;               /**< run application */
+    QAction*                            m_pActionStop;              /**< stop application */
+    QAction*                            m_pActionZoomStd;           /**< standard zoom */
+    QAction*                            m_pActionZoomIn;            /**< zoom in */
+    QAction*                            m_pActionZoomOut;           /**< zoom out */
+    QAction*                            m_pActionDisplayMax;        /**< show full screen mode */
 
-    QAction*                             m_pActionSelectRoi;       /**< show roi select widget ToDo move this to the actual view-> and make a dynamical menu*/
+    QList< QAction* >                   m_qListDynamicDisplayActions; /**< dynamic display actions */
 
     //Main Window Menu
-    QMenu*                                 m_pMenuFile;     /**< Holds the file menu.*/
-    QMenu*                                 m_pMenuView;     /**< Holds the view menu.*/
-    QMenu*                                 m_pMenuLgLv;     /**< Holds the log level sub menu.*/
-    QMenu*                                 m_pMenuHelp;     /**< Holds the help menu.*/
+    QMenu*                              m_pMenuFile;    /**< Holds the file menu.*/
+    QMenu*                              m_pMenuView;    /**< Holds the view menu.*/
+    QMenu*                              m_pMenuLgLv;    /**< Holds the log level sub menu.*/
+    QMenu*                              m_pMenuHelp;    /**< Holds the help menu.*/
 
     // Tool bar
-    QToolBar*                             m_pToolBar;       /**< Holds the tool bar.*/
-
+    QToolBar*                           m_pToolBar;                 /**< Holds the tool bar.*/
+    QToolBar*                           m_pDynamicDisplayToolBar;   /**< Holds the display tool bar.*/
 
     QLabel*                             m_pLabelTime;      /**< Holds the display label for the running time.*/
     QSharedPointer<QTimer>              m_pTimer;           /**< timer of the main application*/
@@ -261,7 +259,7 @@ private:
     QDockWidget*                        m_pDockWidget_Log;              /**< Holds the dock widget containing the log.*/
     QTextBrowser*                       m_pTextBrowser_Log;             /**< Holds the text browser for the log.*/
 
-    LogLevel                             m_eLogLevelCurrent;            /**< Holds the current log level.*/
+    LogLevel                            m_eLogLevelCurrent;            /**< Holds the current log level.*/
 
 
     void updatePluginWidget(QSharedPointer<IPlugin> pPlugin);           /**< Sets the plugin widget to central widget of MainWindow class depending on the current plugin selected in m_pDockWidgetPlugins.*/
@@ -289,8 +287,6 @@ private slots:
     void zoomIn();                      /**< Implements zoom in of runWidget.*/
     void zoomOut();                     /**< Implements zoom out of runWidget.*/
     void toggleDisplayMax();            /**< Implements show full screen mode of runWidget.*/
-
-    void showRoiSelectionWidget();      /**< Implements the show roi selection widget. ToDo: Move this to the actual widget*/
 
     void updateTime();                  /**< Updates m_pTime and is called through timeout() of m_pTimer.*/
 
