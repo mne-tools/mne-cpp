@@ -186,7 +186,7 @@
           </property>
          </widget>
         </item>
-        <item row="2" column="0">
+        <item row="3" column="0">
          <widget class="QCheckBox" name="m_checkBox_UseFFT">
           <property name="enabled">
            <bool>false</bool>
@@ -196,20 +196,27 @@
           </property>
          </widget>
         </item>
-        <item row="1" column="0">
+        <item row="2" column="0">
          <widget class="QCheckBox" name="m_checkBox_UseFiltering">
           <property name="text">
            <string>Enable preprocessing (HP)</string>
           </property>
          </widget>
         </item>
-        <item row="3" column="0">
+        <item row="4" column="0">
          <widget class="QCheckBox" name="m_checkBox_UseCommonAverage">
           <property name="enabled">
            <bool>true</bool>
           </property>
           <property name="text">
            <string>Use Common Average</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QCheckBox" name="m_checkBox_EnableKeyboardTrigger">
+          <property name="text">
+           <string>Enable keyboard trigger</string>
           </property>
          </widget>
         </item>

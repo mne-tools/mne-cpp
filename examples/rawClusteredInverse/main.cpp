@@ -600,8 +600,7 @@ int main(int argc, char *argv[])
     //ToDo overload toLabels using instead of t_surfSet rr of MNESourceSpace
     t_annotationSet.toLabels(t_surfSet, t_qListLabels, t_qListRGBAs);
 
-    InverseView view(minimumNorm.getSourceSpace(), t_qListLabels, t_qListRGBAs, 24, true, false, false);
-
+    InverseView view(minimumNorm.getSourceSpace(), t_qListLabels, t_qListRGBAs, 24, true, false, true);
 
     if (view.stereoType() != QGLView::RedCyanAnaglyph)
         view.camera()->setEyeSeparation(0.3f);

@@ -85,15 +85,15 @@ public:
     /**
     * Constructs a TMSISetupWidget which is a child of parent.
     *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new ECGSetupWidget becomes a window. If parent is another widget, ECGSetupWidget becomes a child window inside parent. ECGSetupWidget is deleted when its parent is deleted.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new TMSISetupWidget becomes a window. If parent is another widget, TMSISetupWidget becomes a child window inside parent. TMSISetupWidget is deleted when its parent is deleted.
     * @param [in] pTMSI a pointer to the corresponding ECGSimulator.
     */
     TMSISetupWidget(TMSI* pTMSI, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the ECGSetupWidget.
-    * All ECGSetupWidget's children are deleted first. The application exits if ECGSetupWidget is the main widget.
+    * Destroys the TMSISetupWidget.
+    * All TMSISetupWidget's children are deleted first. The application exits if TMSISetupWidget is the main widget.
     */
     ~TMSISetupWidget();
 
