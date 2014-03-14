@@ -311,6 +311,7 @@ private:
     double                  m_dThresholdValue;                  /**< GUI input: Threshold in micro volts. */
     int                     m_iFilterOrder;                     /**< GUI input: Filter order. */
     int                     m_iNumberFeatures;                  /**< GUI input: Number of classifactions to store until they get averaged. */
+    int                     m_iNumberFeaturesToDisplay;         /**< GUI input: Number of features to display. */
 };
 
 } // NAMESPACE

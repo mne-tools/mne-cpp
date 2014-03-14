@@ -80,6 +80,8 @@ BCISetupWidget::BCISetupWidget(BCI* pBCI, QWidget* parent)
             this, &BCISetupWidget::setGeneralOptions);
     connect(ui.m_checkBox_DisplayFeatures, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
             this, &BCISetupWidget::setGeneralOptions);
+    connect(ui.m_SpinBox_NumberFeaturesToDisplay, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
+            this, &BCISetupWidget::setGeneralOptions);
 
     // Connect processing options
     connect(ui.m_checkBox_SubtractMean, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
@@ -152,6 +154,7 @@ void BCISetupWidget::initGui()
     ui.m_checkBox_UseSensorData->setChecked(m_pBCI->m_bUseSensorData);
     ui.m_checkBox_UseSourceData->setChecked(m_pBCI->m_bUseSourceData);
     ui.m_checkBox_DisplayFeatures->setChecked(m_pBCI->m_bDisplayFeatures);
+    ui.m_SpinBox_NumberFeaturesToDisplay->setValue(m_pBCI->m_iNumberFeaturesToDisplay);
 
     // Processing options
     ui.m_checkBox_SubtractMean->setChecked(m_pBCI->m_bSubtractMean);
@@ -197,6 +200,7 @@ void BCISetupWidget::setGeneralOptions()
     m_pBCI->m_bUseSensorData = ui.m_checkBox_UseSensorData->isChecked();
     m_pBCI->m_bUseSourceData = ui.m_checkBox_UseSourceData->isChecked();
     m_pBCI->m_bDisplayFeatures = ui.m_checkBox_DisplayFeatures->isChecked();
+    m_pBCI->m_iNumberFeaturesToDisplay = ui.m_SpinBox_NumberFeaturesToDisplay->value();
 }
 
 
