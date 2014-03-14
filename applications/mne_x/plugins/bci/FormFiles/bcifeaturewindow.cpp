@@ -51,6 +51,8 @@
 using namespace BCIPlugin;
 using namespace Eigen;
 
+//*************************************************************************************************************
+
 BCIFeatureWindow::BCIFeatureWindow(BCI* pBCI, QWidget *parent)
 : QWidget(parent)
 ,  m_pBCI(pBCI)

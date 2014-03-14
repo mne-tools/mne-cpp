@@ -416,7 +416,8 @@ QPair< int,QList<double> > BCI::applyFeatureCalcConcurrentlyOnSensorLevel(const 
     QList<double> features;
 
     // TODO: Divide into subsignals
-    features << abs(log10(data.squaredNorm())); // Compute variance
+    //features << data.squaredNorm(); // Compute variance
+    features << abs(log10(data.squaredNorm())); // Compute log of variance
 
     return QPair< int,QList<double> >(chdata.first, features);
 }

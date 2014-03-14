@@ -68,6 +68,10 @@
 #include <QtConcurrent/QtConcurrent>
 
 
+#include "FormFiles/tmsisetupwidget.h"
+#include "FormFiles/tmsimanualannotationwidget.h"
+
+
 //*************************************************************************************************************
 //=============================================================================================================
 // FIFF INCLUDES
@@ -171,6 +175,8 @@ public:
 
     virtual QWidget* setupWidget();
 
+    void setKeyboardTriggerType(int type);
+
 protected:
     //=========================================================================================================
     /**
@@ -182,6 +188,7 @@ protected:
 
 private:
     PluginOutputData<NewRealTimeMultiSampleArray>::SPtr m_pRMTSA_TMSI;      /**< The RealTimeSampleArray to provide the EEG data.*/
+    QSharedPointer<TMSIManualAnnotationWidget> m_tmsiManualAnnotationWidget;/**< Widget for manually annotation the trigger during session.*/
 
     QString                             m_qStringResourcePath;              /**< The path to the EEG resource directory.*/
 
@@ -200,8 +207,11 @@ private:
     bool                                m_bUseFiltering;                    /**< Flag for writing the received samples to a file. Defined by the user via the GUI.*/
     bool                                m_bIsRunning;                       /**< Whether TMSI is running.*/
     bool                                m_bUseFFT;                          /**< Flag for using FFT. Defined by the user via the GUI.*/
-    bool                                m_bShowEventTrigger;                /**< Flag for using a trigger input.*/
+    bool                                m_bBeepTrigger;                     /**< Flag for using a trigger input.*/
     bool                                m_bUseCommonAverage;                /**< Flag for using common average.*/
+    bool                                m_bUseKeyboardTrigger;              /**< Flag for using the keyboard as a trigger input.*/
+
+    int                                 m_iTriggerType;                     /**< Holds the trigger type | 0 - no trigger activated, 254 - left, 253 - right, 252 - beep.*/
 
     ofstream                            m_outputFileStream;                 /**< fstream for writing the samples values to txt file.*/
     QString                             m_sOutputFilePath;                  /**< Holds the path for the sample output file. Defined by the user via the GUI.*/
@@ -217,6 +227,7 @@ private:
 
     MatrixXf                            m_matOldMatrix;                     /**< Last received sample matrix by the tmsiproducer/tmsidriver class. Used for simple HP filtering.*/
 
+    QMutex                              m_qMutex;                           /**< Holds the threads mutex.*/
 };
 
 } // NAMESPACE

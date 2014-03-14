@@ -66,6 +66,8 @@ RapMusic::RapMusic()
 , m_ppPairIdxCombinations(NULL)
 , m_iMaxNumThreads(1)
 , m_bIsInit(false)
+, m_iSamplesStcWindow(-1)
+, m_fStcOverlap(-1)
 {
 }
 
@@ -81,6 +83,8 @@ RapMusic::RapMusic(MNEForwardSolution& p_pFwd, bool p_bSparsed, int p_iN, double
 , m_ppPairIdxCombinations(NULL)
 , m_iMaxNumThreads(1)
 , m_bIsInit(false)
+, m_iSamplesStcWindow(-1)
+, m_fStcOverlap(-1)
 {
     //Init
     init(p_pFwd, p_bSparsed, p_iN, p_dThr);
@@ -204,6 +208,7 @@ MNESourceEstimate RapMusic::calculateInverse(const FiffEvoked &p_fiffEvoked, boo
     Q_UNUSED(pick_normal);
 
     MNESourceEstimate p_sourceEstimate;
+
     if(p_fiffEvoked.data.rows() != m_iNumChannels)
     {
         std::cout << "Number of FiffEvoked channels (" << p_fiffEvoked.data.rows() << ") doesn't match the number of channels (" << m_iNumChannels << ") of the forward solution." << std::endl;
@@ -212,9 +217,9 @@ MNESourceEstimate RapMusic::calculateInverse(const FiffEvoked &p_fiffEvoked, boo
     else
         std::cout << "Number of FiffEvoked channels (" << p_fiffEvoked.data.rows() << ") matchs the number of channels (" << m_iNumChannels << ") of the forward solution." << std::endl;
 
-    QVector< DipolePair<double> > t_RapDipoles;
-    calculateInverse(p_fiffEvoked.data, t_RapDipoles);
-
+    //
+    // Rap MUSIC Source estimate
+    //
     p_sourceEstimate.data = MatrixXd::Zero(m_ForwardSolution.nsource, p_fiffEvoked.data.cols());
 
     //Results
@@ -225,22 +230,93 @@ MNESourceEstimate RapMusic::calculateInverse(const FiffEvoked &p_fiffEvoked, boo
     p_sourceEstimate.tmin = p_fiffEvoked.times[0];
     p_sourceEstimate.tstep = p_fiffEvoked.times[1] - p_fiffEvoked.times[0];
 
-    for(qint32 i = 0; i < t_RapDipoles.size(); ++i)
+    if(m_iSamplesStcWindow <= 3) //if samples per stc aren't set -> use full window
     {
-        double dip1 = sqrt( pow(t_RapDipoles[i].m_Dipole1.phi_x(),2) +
-                            pow(t_RapDipoles[i].m_Dipole1.phi_y(),2) +
-                            pow(t_RapDipoles[i].m_Dipole1.phi_z(),2) ) * t_RapDipoles[i].m_vCorrelation;
+        QList< DipolePair<double> > t_RapDipoles;
+        calculateInverse(p_fiffEvoked.data, t_RapDipoles);
 
-        double dip2 = sqrt( pow(t_RapDipoles[i].m_Dipole2.phi_x(),2) +
-                            pow(t_RapDipoles[i].m_Dipole2.phi_y(),2) +
-                            pow(t_RapDipoles[i].m_Dipole2.phi_z(),2) ) * t_RapDipoles[i].m_vCorrelation;
+        for(qint32 i = 0; i < t_RapDipoles.size(); ++i)
+        {
+            double dip1 = sqrt( pow(t_RapDipoles[i].m_Dipole1.phi_x(),2) +
+                                pow(t_RapDipoles[i].m_Dipole1.phi_y(),2) +
+                                pow(t_RapDipoles[i].m_Dipole1.phi_z(),2) ) * t_RapDipoles[i].m_vCorrelation;
+
+            double dip2 = sqrt( pow(t_RapDipoles[i].m_Dipole2.phi_x(),2) +
+                                pow(t_RapDipoles[i].m_Dipole2.phi_y(),2) +
+                                pow(t_RapDipoles[i].m_Dipole2.phi_z(),2) ) * t_RapDipoles[i].m_vCorrelation;
+
+            RowVectorXd dip1Time = RowVectorXd::Constant(p_fiffEvoked.data.cols(), dip1);
+            RowVectorXd dip2Time = RowVectorXd::Constant(p_fiffEvoked.data.cols(), dip2);
+
+            p_sourceEstimate.data.block(t_RapDipoles[i].m_iIdx1, 0, 1, p_fiffEvoked.data.cols()) = dip1Time;
+            p_sourceEstimate.data.block(t_RapDipoles[i].m_iIdx2, 0, 1, p_fiffEvoked.data.cols()) = dip2Time;
+        }
+    }
+    else
+    {
+        bool first = true;
+        bool last = false;
+
+        qint32 t_iNumSensors = p_fiffEvoked.data.rows();
+        qint32 t_iNumSteps = p_fiffEvoked.data.cols();
+
+        qint32 t_iSamplesOverlap = (qint32)floor(((float)m_iSamplesStcWindow)*m_fStcOverlap);
+        qint32 t_iSamplesDiscard = t_iSamplesOverlap/2;
+
+        MatrixXd data = MatrixXd::Zero(t_iNumSensors, m_iSamplesStcWindow);
+
+        qint32 curSample = 0;
+        qint32 curResultSample = 0;
+        qint32 stcWindowSize = m_iSamplesStcWindow - 2*t_iSamplesDiscard;
+
+        while(!last)
+        {
+            QList< DipolePair<double> > t_RapDipoles;
+
+            //Data
+            if(curSample + m_iSamplesStcWindow >= t_iNumSteps) //last
+            {
+                last = true;
+                data = p_fiffEvoked.data.block(0, p_fiffEvoked.data.cols()-m_iSamplesStcWindow, t_iNumSensors, m_iSamplesStcWindow);
+            }
+            else
+                data = p_fiffEvoked.data.block(0, curSample, t_iNumSensors, m_iSamplesStcWindow);
 
 
-        RowVectorXd dip1Time = RowVectorXd::Constant(p_fiffEvoked.data.cols(), dip1);
-        RowVectorXd dip2Time = RowVectorXd::Constant(p_fiffEvoked.data.cols(), dip2);
+            curSample += (m_iSamplesStcWindow - t_iSamplesOverlap);
+            if(first)
+                curSample -= t_iSamplesDiscard; //shift on start t_iSamplesDiscard backwards
 
-        p_sourceEstimate.data.block(t_RapDipoles[i].m_iIdx1, 0, 1, p_fiffEvoked.data.cols()) = dip1Time;
-        p_sourceEstimate.data.block(t_RapDipoles[i].m_iIdx2, 0, 1, p_fiffEvoked.data.cols()) = dip2Time;
+            //Calculate
+            calculateInverse(data, t_RapDipoles);
+
+            //Assign Result
+            if(last)
+                stcWindowSize = p_sourceEstimate.data.cols() - curResultSample;
+
+            for(qint32 i = 0; i < t_RapDipoles.size(); ++i)
+            {
+                double dip1 = sqrt( pow(t_RapDipoles[i].m_Dipole1.phi_x(),2) +
+                                    pow(t_RapDipoles[i].m_Dipole1.phi_y(),2) +
+                                    pow(t_RapDipoles[i].m_Dipole1.phi_z(),2) ) * t_RapDipoles[i].m_vCorrelation;
+
+                double dip2 = sqrt( pow(t_RapDipoles[i].m_Dipole2.phi_x(),2) +
+                                    pow(t_RapDipoles[i].m_Dipole2.phi_y(),2) +
+                                    pow(t_RapDipoles[i].m_Dipole2.phi_z(),2) ) * t_RapDipoles[i].m_vCorrelation;
+
+                RowVectorXd dip1Time = RowVectorXd::Constant(stcWindowSize, dip1);
+                RowVectorXd dip2Time = RowVectorXd::Constant(stcWindowSize, dip2);
+
+                p_sourceEstimate.data.block(t_RapDipoles[i].m_iIdx1, curResultSample, 1, stcWindowSize) = dip1Time;
+                p_sourceEstimate.data.block(t_RapDipoles[i].m_iIdx2, curResultSample, 1, stcWindowSize) = dip2Time;
+
+            }
+
+            curResultSample += stcWindowSize;
+
+            if(first)
+                first = false;
+        }
     }
 
 
@@ -250,7 +326,7 @@ MNESourceEstimate RapMusic::calculateInverse(const FiffEvoked &p_fiffEvoked, boo
 
 //*************************************************************************************************************
 
-MNESourceEstimate RapMusic::calculateInverse(const MatrixXd& p_matMeasurement, QVector< DipolePair<double> > &p_RapDipoles)
+MNESourceEstimate RapMusic::calculateInverse(const MatrixXd& p_matMeasurement, QList< DipolePair<double> > &p_RapDipoles)
 {
     MNESourceEstimate p_SourceEstimate;
 
@@ -752,7 +828,7 @@ void RapMusic::getGainMatrixPair(    const MatrixXT& p_matGainMarix,
 void RapMusic::insertSource(    int p_iDipoleIdx1, int p_iDipoleIdx2,
                                 const Vector6T &p_vec_phi_k_1,
                                 double p_valCor,
-                                QVector< DipolePair<double> > &p_RapDipoles)
+                                QList< DipolePair<double> > &p_RapDipoles)
 {
     DipolePair<double> t_pRapDipolePair;
 
@@ -781,4 +857,10 @@ void RapMusic::insertSource(    int p_iDipoleIdx1, int p_iDipoleIdx2,
 }
 
 
+//*************************************************************************************************************
 
+void RapMusic::setStcAttr(int p_iSampStcWin, float p_fStcOverlap)
+{
+    m_iSamplesStcWindow = p_iSampStcWin;
+    m_fStcOverlap = p_fStcOverlap;
+}
