@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
-* @file     tmsisetupwidget.h
+* @file     tmsimanualannotationwidget.h
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     September, 2013
-*
+* @date     March, 2014
 * @section  LICENSE
 *
-* Copyright (C) 2013, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the TMSISetupWidget class.
+* @brief    Contains the declaration of the TMSIManualAnnotation class.
 *
 */
 
-#ifndef TMSISETUPWIDGET_H
-#define TMSISETUPWIDGET_H
+#ifndef TMSIMANUALANNOTATIONWIDGET_H
+#define TMSIMANUALANNOTATIONWIDGET_H
 
 
 //*************************************************************************************************************
@@ -49,8 +48,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
-#include "../ui_tmsisetup.h"
+#include <QWidget>
+#include "../ui_tmsimanualannotation.h"
 
 
 //*************************************************************************************************************
@@ -72,30 +71,29 @@ class TMSI;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS TMSISetupWidget
+* DECLARE CLASS TMSIManualAnnotationWidget
 *
-* @brief The TMSISetupWidget class provides the TMSI configuration window.
+* @brief The TMSIManualAnnotationWidget class provides a widget/window for manually annotating the trigger, which the subject pressed during the session.
 */
-class TMSISetupWidget : public QWidget
+class TMSIManualAnnotationWidget : public QWidget
 {
     Q_OBJECT
 public:
-
     //=========================================================================================================
     /**
-    * Constructs a TMSISetupWidget which is a child of parent.
+    * Constructs a TMSIManualAnnotationWidget which is a child of parent.
     *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new TMSISetupWidget becomes a window. If parent is another widget, TMSISetupWidget becomes a child window inside parent. TMSISetupWidget is deleted when its parent is deleted.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new TMSIManualAnnotationWidget becomes a window. If parent is another widget, TMSIManualAnnotationWidget becomes a child window inside parent. TMSIManualAnnotationWidget is deleted when its parent is deleted.
     * @param [in] pTMSI a pointer to the corresponding ECGSimulator.
     */
-    TMSISetupWidget(TMSI* pTMSI, QWidget *parent = 0);
+    TMSIManualAnnotationWidget(TMSI* pTMSI, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the TMSISetupWidget.
-    * All TMSISetupWidget's children are deleted first. The application exits if TMSISetupWidget is the main widget.
+    * Destroys the TMSIManualAnnotationWidget.
+    * All TMSIManualAnnotationWidget's children are deleted first. The application exits if TMSIManualAnnotationWidget is the main widget.
     */
-    ~TMSISetupWidget();
+    ~TMSIManualAnnotationWidget();
 
     //=========================================================================================================
     /**
@@ -105,75 +103,13 @@ public:
     void initGui();
 
 private:
+    TMSI*           m_pTMSI;                /**< a pointer to corresponding TMSI.*/
 
-    //=========================================================================================================
-    /**
-    * Sets the device sampling properties.
-    *
-    */
-    void setDeviceSamplingProperties();
+    Ui::TMSIManualAnnotationWidget ui;      /**< the user interface for the TMSIManualAnnotationWidget.*/
 
-    //=========================================================================================================
-    /**
-    * Sets the preprocessing properties.
-    *
-    */
-    void setPreprocessing();
-
-    //=========================================================================================================
-    /**
-    * Sets the postprocessing properties.
-    *
-    */
-    void setPostprocessing();
-
-    //=========================================================================================================
-    /**
-    * Sets flag for writing the received samples to a file.
-    *
-    */
-    void setWriteToFile();
-
-    //=========================================================================================================
-    /**
-    * Sets the dir where the output file is saved
-    *
-    */
-    void changeOutputFileDir();
-
-    //=========================================================================================================
-    /**
-    * Sets the dir where the output file is saved
-    *
-    */
-    void setOutputTextField();
-
-    //=========================================================================================================
-    /**
-    * Sets the dir where the eeg hat file is located
-    *
-    */
-    void changeHatDir();
-
-    //=========================================================================================================
-    /**
-    * Sets the triggering properties
-    *
-    */
-    void setTriggerProperties();
-
-    //=========================================================================================================
-    /**
-    * Shows the About Dialog
-    *
-    */
-    void showAboutDialog();
-
-    TMSI*           m_pTMSI;                    /**< a pointer to corresponding TMSI.*/
-
-    Ui::TMSISetupClass ui;                      /**< the user interface for the TMSISetupWidget.*/
+    virtual void  keyPressEvent(QKeyEvent *event);
 };
 
 } // NAMESPACE
 
-#endif // TMSISETUPWIDGET_H
+#endif // TMSIMANUALANNOTATIONWIDGET_H

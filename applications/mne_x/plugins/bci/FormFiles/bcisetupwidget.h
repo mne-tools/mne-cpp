@@ -151,6 +151,14 @@ private:
 
     //=========================================================================================================
     /**
+    * Loads classification boundary for sensor level
+    * [in] path location of the boundary file
+    * [out] QVector<VectorXd> boundary coeff
+    */
+    QVector<VectorXd> readBoundaryInformation(QString path);
+
+    //=========================================================================================================
+    /**
     * Init selected feature list on sensor level
     *
     */
