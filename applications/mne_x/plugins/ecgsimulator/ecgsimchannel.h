@@ -159,7 +159,7 @@ public:
     *
     * @return true when the channel is enabled, false otherwise.
     */
-    inline const bool isEnabled();
+    inline bool isEnabled();
 
     //=========================================================================================================
     /**
@@ -175,7 +175,7 @@ public:
     *
     * @return true when the channel is visible, false otherwise.
     */
-    inline const bool isVisible();
+    inline bool isVisible();
 
     //=========================================================================================================
     /**
@@ -183,7 +183,7 @@ public:
     *
     * @return the minimal value of all sample values.
     */
-    inline const double getMinimum();
+    inline double getMinimum();
 
     //=========================================================================================================
     /**
@@ -191,7 +191,7 @@ public:
     *
     * @return the maximal value of all sample values.
     */
-    inline const double getMaximum();
+    inline double getMaximum();
 
     //=========================================================================================================
     /**
@@ -273,7 +273,7 @@ inline void ECGSimChannel::setEnabled(bool enabled)
 
 //*************************************************************************************************************
 
-inline const bool ECGSimChannel::isEnabled()
+inline bool ECGSimChannel::isEnabled()
 {
     return m_bIsEnabled;
 }
@@ -289,7 +289,7 @@ inline void ECGSimChannel::setVisible(bool visible)
 
 //*************************************************************************************************************
 
-inline const bool ECGSimChannel::isVisible()
+inline bool ECGSimChannel::isVisible()
 {
     return m_bIsVisible;
 }
@@ -297,7 +297,7 @@ inline const bool ECGSimChannel::isVisible()
 
 //*************************************************************************************************************
 
-inline const double ECGSimChannel::getMinimum()
+inline double ECGSimChannel::getMinimum()
 {
     return m_dMin;
 }
@@ -305,7 +305,7 @@ inline const double ECGSimChannel::getMinimum()
 
 //*************************************************************************************************************
 
-inline const double ECGSimChannel::getMaximum()
+inline double ECGSimChannel::getMaximum()
 {
     return m_dMax;
 }

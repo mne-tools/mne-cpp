@@ -72,7 +72,6 @@ using namespace NeuromagPlugin;
 
 DacqServer::DacqServer(Neuromag* p_pNeuromag, QObject * parent)
 : QThread(parent)
-, m_pNeuromag(p_pNeuromag)
 , m_pCollectorSock(NULL)
 , m_pShmemSock(NULL)
 , m_bIsRunning(false)
@@ -80,6 +79,7 @@ DacqServer::DacqServer(Neuromag* p_pNeuromag, QObject * parent)
 , m_bMeasRequest(true)
 , m_bMeasStopRequest(false)
 , m_bSetBuffersizeRequest(false)
+, m_pNeuromag(p_pNeuromag)
 {
 }
 
@@ -299,6 +299,8 @@ void DacqServer::run()
     //            collector_close();
     //            return;
     //        }
+    Q_UNUSED(t_iOriginalMaxBuflen);
+
     if (m_pNeuromag->m_uiBufferSampleSize < MIN_BUFLEN) {
         fprintf(stderr, "%ui: Too small Neuromag buffer length requested, should be at least %d\n", m_pNeuromag->m_uiBufferSampleSize, MIN_BUFLEN);
         return;

@@ -71,10 +71,10 @@ using namespace NeuromagPlugin;
 
 ShmemSocket::ShmemSocket(QObject *parent)
 : QObject(parent)
-, m_iShmemSock(-1)
-, m_iShmemId(CLIENT_ID)
 , shmid(-1)
 , shmptr(NULL)
+, m_iShmemSock(-1)
+, m_iShmemId(CLIENT_ID)
 , fd(NULL)
 , shmem_fd(NULL)
 , filename(NULL)

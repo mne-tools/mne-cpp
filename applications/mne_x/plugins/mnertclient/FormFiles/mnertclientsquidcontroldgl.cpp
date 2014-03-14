@@ -56,8 +56,9 @@ using namespace MneRtClientPlugin;
 
 mnertclientSQUIDControlDgl::mnertclientSQUIDControlDgl(MneRtClient* p_pMneRtClient,QWidget *parent) :
     QDialog(parent),
-    m_pMneRtClient(p_pMneRtClient),
-    ui(new Ui::mnertclientSQUIDControlDgl)
+    ui(new Ui::mnertclientSQUIDControlDgl),
+    m_pMneRtClient(p_pMneRtClient)
+
 {
     ui->setupUi(this);
 

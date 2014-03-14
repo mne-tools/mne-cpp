@@ -63,9 +63,9 @@ using namespace MNEX;
 PluginItem::PluginItem(IPlugin::SPtr pPlugin, QMenu *contextMenu, QGraphicsItem *parent)
 : QGraphicsPolygonItem(parent)
 , m_pPlugin(pPlugin)
-, m_contextMenu(contextMenu)
 , m_iWidth(60)
 , m_iHeight(40)
+, m_contextMenu(contextMenu)
 {
     QPainterPath path;
     m_qLinearGradientFace = QLinearGradient(m_iWidth/2, -10, m_iWidth/2, m_iHeight);

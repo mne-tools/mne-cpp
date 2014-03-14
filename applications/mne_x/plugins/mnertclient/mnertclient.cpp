@@ -76,9 +76,9 @@ using namespace UTILSLIB;
 MneRtClient::MneRtClient()
 : m_sMneRtClientClientAlias("mne-x")
 , m_pRtCmdClient(NULL)
-, m_pMneRtClientProducer(new MneRtClientProducer(this))
-, m_sMneRtClientIP("127.0.0.1")//("172.21.16.88")//("127.0.0.1")
 , m_bCmdClientIsConnected(false)
+, m_sMneRtClientIP("127.0.0.1")//("172.21.16.88")//("127.0.0.1")
+, m_pMneRtClientProducer(new MneRtClientProducer(this))
 , m_iBufferSize(-1)
 , m_pRawMatrixBuffer_In(0)
 /*m_pRTMSA_MneRtClient(0)*/
