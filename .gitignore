@@ -144,6 +144,10 @@
 /bin/readFwdd
 /bin/readRawd
 /bin/readWriteRawd
+/bin/computeInversePwlRapMusicd
+/bin/matchingPursuitd
+/bin/rawClusteredInversePwlRapMusicd
+/bin/rawClusteredInverseRapMusicd
 
 /lib/libdisp.so.1
 /lib/libdisp.so.1.0

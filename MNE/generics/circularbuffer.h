@@ -248,7 +248,8 @@ inline _Tp CircularBuffer<_Tp>::pop()
 template<typename _Tp>
 inline unsigned int CircularBuffer<_Tp>::mapIndex(int& index)
 {
-    return index = ++index % m_uiMaxNumElements;
+    int aux = index;
+    return index = ++aux % m_uiMaxNumElements;
 }
 
 

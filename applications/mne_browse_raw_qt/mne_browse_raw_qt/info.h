@@ -121,7 +121,7 @@ public:
     *
     * @return the major version number.
     */
-    const static int MajorVersion()
+    static int MajorVersion()
     {
         return 1;
     }
@@ -132,7 +132,7 @@ public:
     *
     * @return the minor version number.
     */
-    const static int MinorVersion()
+    static int MinorVersion()
     {
         return 2;
     }
@@ -143,7 +143,7 @@ public:
     *
     * @return the revision number.
     */
-    const static int RevisionVersion()
+    static int RevisionVersion()
     {
         return 0;
     }
@@ -154,7 +154,7 @@ public:
     *
     * @return the build number.
     */
-    const static int BuildVersion()
+    static int BuildVersion()
     {
         return 224;
     }

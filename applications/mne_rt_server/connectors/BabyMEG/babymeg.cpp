@@ -89,10 +89,10 @@ using namespace UTILSLIB;
 //=============================================================================================================
 
 BabyMEG::BabyMEG()
-:m_bIsRunning(false)
+:pInfo(NULL)
+, m_bIsRunning(false)
 , m_uiBufferSampleSize(1000)
 , m_pRawMatrixBuffer(NULL)
-, pInfo(NULL)
 {
     //BabyMEG Inits
     pInfo = new BabyMEGInfo();

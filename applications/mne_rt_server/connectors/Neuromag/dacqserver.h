@@ -150,17 +150,7 @@ private:
 //    QString         m_sCollectorHost;
     CollectorSocket*    m_pCollectorSock;
 
-
     ShmemSocket*        m_pShmemSock;
-    
-
-
-
-
-
-
-
-
 
 //dacqserver
 
@@ -171,11 +161,9 @@ private:
     bool m_bMeasStopRequest;
     bool m_bSetBuffersizeRequest;
 
-
     bool getMeasInfo(FiffInfo &p_FiffInfo);
 
     Neuromag* m_pNeuromag;
-
 
 };
 

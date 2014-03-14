@@ -243,14 +243,11 @@ private:
 
     double                      m_dSamplingRate;    /**< Sampling rate of the RealTimeSampleArray.*/
     float                       m_fT;               /**< Time between two samples.*/
-    VectorXd                    m_vecValue;         /**< The current attached sample vector.*/
     qint32                      m_iArraySize;      /**< Sample size of the source estimate.*/
     qint32                      m_iCurIdx;         /**< Sample size of the multi sample array.*/
-
     float                       m_fCurTimePoint;    /**< The current time point.*/
-
     MNESourceEstimate           m_MNEStc;           /**< The source estimate. */
-
+    VectorXd                    m_vecValue;         /**< The current attached sample vector.*/
 };
 
 

@@ -163,4 +163,6 @@ void CommandServer::prepareReply(QString p_sReply, Command p_command)
     printf("%s",t_blockReply.data());
 
     emit replyCommand(t_blockReply, t_iThreadID);
+
+    Q_UNUSED(p_command);
 }

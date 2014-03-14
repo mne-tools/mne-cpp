@@ -650,6 +650,8 @@ void RealTimeMultiSampleArrayNewWidget::keyPressEvent(QKeyEvent* keyEvent)
 //    }
 
 //    QWidget::keyPressEvent(keyEvent);
+
+    Q_UNUSED(keyEvent);
 }
 
 
