@@ -77,7 +77,7 @@ SourceLab::SourceLab()
 , m_sSurfaceDir("./MNE-sample-data/subjects/sample/surf")
 , m_iStimChan(0)
 , m_iNumAverages(10)
-, m_bSingleTrial(false)
+, m_bSingleTrial(true)//(false)
 , m_iDownSample(4)
 {
 
