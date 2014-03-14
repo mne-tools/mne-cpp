@@ -49,7 +49,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QDir>
 #include <QDebug>
 
 
@@ -114,6 +113,8 @@ TMSISetupWidget::TMSISetupWidget(TMSI* pTMSI, QWidget* parent)
             this, &TMSISetupWidget::setTriggerProperties);
     connect(ui.m_checkBox_EnableBeep, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
             this, &TMSISetupWidget::setTriggerProperties);
+    connect(ui.m_checkBox_EnableKeyboardTrigger, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+            this, &TMSISetupWidget::setTriggerProperties);
 
     //Connect about button
     connect(ui.m_qPushButton_About, &QPushButton::released, this, &TMSISetupWidget::showAboutDialog);
@@ -172,7 +173,9 @@ void TMSISetupWidget::initGui()
 
     //Init trigger properties
     ui.m_spinBox_BeepLength->setValue(m_pTMSI->m_iTriggerInterval);
-    ui.m_checkBox_EnableBeep->setChecked(m_pTMSI->m_bShowEventTrigger);
+    ui.m_checkBox_EnableBeep->setChecked(m_pTMSI->m_bBeepTrigger);
+
+    ui.m_checkBox_EnableKeyboardTrigger->setChecked(m_pTMSI->m_bUseKeyboardTrigger);
 }
 
 
@@ -267,7 +270,8 @@ void TMSISetupWidget::changeHatDir()
 void TMSISetupWidget::setTriggerProperties()
 {
     m_pTMSI->m_iTriggerInterval = ui.m_spinBox_BeepLength->value();
-    m_pTMSI->m_bShowEventTrigger = ui.m_checkBox_EnableBeep->isChecked();
+    m_pTMSI->m_bBeepTrigger = ui.m_checkBox_EnableBeep->isChecked();
+    m_pTMSI->m_bUseKeyboardTrigger = ui.m_checkBox_EnableKeyboardTrigger->isChecked();
 }
 
 

@@ -109,12 +109,17 @@ public:
     void initGui();
 
 protected:
+    double boundaryValue(double x);
+
+    void addBoundaryLineToScene();
+
     void paintFeaturesToScene(MyQList features, bool bTriggerActivated);
 
     BCI*                        m_pBCI;         /**< a pointer to corresponding BCI.*/
     QGraphicsScene              m_scene;        /**< QGraphicsScene used to add the features.*/
 
     double                      m_dFeatureMax;  /**< Max value for featrues - Used to scale the QGraphicsView.*/
+    int                         m_iScale;       /**< Scaling value.*/
     Ui::BCIFeatureWindowClass   ui;             /**< the user interface for the BCIFeatureWindow.*/
 };
 

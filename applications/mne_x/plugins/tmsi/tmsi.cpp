@@ -42,8 +42,6 @@
 #include "tmsi.h"
 #include "tmsiproducer.h"
 
-#include "FormFiles/tmsisetupwidget.h"
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -120,8 +118,11 @@ void TMSI::init()
     m_bUseFiltering = false;
     m_bUseFFT = false;
     m_bIsRunning = false;
-    m_bShowEventTrigger = false;
+    m_bBeepTrigger = false;
     m_bUseCommonAverage = true;
+    m_bUseKeyboardTrigger = true;
+
+    m_iTriggerType = 0;
 
     m_sOutputFilePath = QString("./mne_x_plugins/resources/tmsi/EEG_data_001_raw.fif");
     m_sElcFilePath = QString("./mne_x_plugins/resources/tmsi/loc_files/Lorenz-Duke128-28-11-2013.elc");
@@ -449,7 +450,7 @@ bool TMSI::start()
     if(this->isRunning())
         QThread::wait();
 
-    if(m_bShowEventTrigger)
+    if(m_bBeepTrigger)
         m_qTimerTrigger.start();
 
     //Setup writing to file
@@ -497,6 +498,14 @@ bool TMSI::start()
 
     if(m_pTMSIProducer->isRunning())
     {
+        // Init BCIFeatureWindow for visualization
+        if(m_bUseKeyboardTrigger)
+        {
+            m_tmsiManualAnnotationWidget = QSharedPointer<TMSIManualAnnotationWidget>(new TMSIManualAnnotationWidget(this));
+            m_tmsiManualAnnotationWidget->initGui();
+            m_tmsiManualAnnotationWidget->show();
+        }
+
         m_bIsRunning = true;
         QThread::start();
         return true;
@@ -525,6 +534,8 @@ bool TMSI::stop()
     m_pRawMatrixBuffer_In->clear();
 
     m_pRMTSA_TMSI->data()->clear();
+
+    m_tmsiManualAnnotationWidget->hide();
 
     return true;
 }
@@ -561,6 +572,16 @@ QWidget* TMSI::setupWidget()
 
 //*************************************************************************************************************
 
+void TMSI::setKeyboardTriggerType(int type)
+{
+    m_qMutex.lock();
+        m_iTriggerType =type;
+    m_qMutex.unlock();
+}
+
+
+//*************************************************************************************************************
+
 void TMSI::run()
 {
     while(m_bIsRunning)
@@ -572,15 +593,20 @@ void TMSI::run()
         {
             MatrixXf matValue = m_pRawMatrixBuffer_In->pop();
 
-            if(m_bShowEventTrigger && m_qTimerTrigger.elapsed() >= m_iTriggerInterval)
+            // Set Beep trigger (if activated)
+            if(m_bBeepTrigger && m_qTimerTrigger.elapsed() >= m_iTriggerInterval)
             {
                 QFuture<void> future = QtConcurrent::run(Beep, 450, 700);
                 //Set trigger in received data samples - just for one sample, so that this event is easy to detect
-                matValue(136, m_iSamplesPerBlock-1) = 254;
+                matValue(136, m_iSamplesPerBlock-1) = 252;
                 m_qTimerTrigger.restart();
 
                 Q_UNUSED(future);
             }
+
+            // Set keyboard trigger (if activated and !=0)
+            if(m_bUseKeyboardTrigger && m_iTriggerType!=0)
+                matValue(136, m_iSamplesPerBlock-1) = m_iTriggerType;
 
             //Write raw data to fif file
             if(m_bWriteToFile)
@@ -645,14 +671,26 @@ void TMSI::run()
             {
                 for(int i = 0; i<matValue.row(137).cols(); i++)
                 {
+                    // Left keyboard or capacitive
                     if(matValue.row(136)[i] == 254)
                         matValue.row(136)[i] = 4000;
+
+                    // Right keyboard
+                    if(matValue.row(136)[i] == 253)
+                        matValue.row(136)[i] = 8000;
+
+                    // Beep
+                    if(matValue.row(136)[i] == 252)
+                        matValue.row(136)[i] = 2000;
                 }
             }
 
             //emit values to real time multi sample array
             for(qint32 i = 0; i < matValue.cols(); ++i)
                 m_pRMTSA_TMSI->data()->setValue(matValue.col(i).cast<double>());
+
+            // Reset keyboard trigger
+            m_iTriggerType = 0;
         }
     }
 
