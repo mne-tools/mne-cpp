@@ -67,8 +67,8 @@ using namespace UTILSLIB;
 //=============================================================================================================
 
 BCI::BCI()
-: m_qStringResourcePath(qApp->applicationDirPath()+"/mne_x_plugins/resources/bci/"),
-  m_bProcessData(false)
+: m_bProcessData(false)
+, m_qStringResourcePath(qApp->applicationDirPath()+"/mne_x_plugins/resources/bci/")
 {
 }
 
@@ -421,6 +421,8 @@ QPair< int,QList<double> > BCI::applyFeatureCalcConcurrentlyOnSensorLevel(const 
 double BCI::applyClassificationCalcConcurrentlyOnSensorLevel(QList<double> &featData)
 {
    double resultClassification = 0.5;
+
+   Q_UNUSED(featData);
 
    return resultClassification;
 }

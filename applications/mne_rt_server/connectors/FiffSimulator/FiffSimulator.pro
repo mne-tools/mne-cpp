@@ -85,7 +85,7 @@ OTHER_FILES += fiffsimulator.json
 # Put generated form headers into the origin --> cause other src is pointing at them
 UI_DIR = $${PWD}
 
-
+unix: QMAKE_CXXFLAGS += -Wno-attributes
 
 #  The QML_INFRA_FILES and QML_MESHES_FILES are both about QML based
 # applications, so we'll install them into QT_INSTALL_DATA instead of

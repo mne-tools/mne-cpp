@@ -26,8 +26,8 @@ using namespace MneRtClientPlugin;
 //=============================================================================================================
 
 MneRtClientSetupBabyMegWidget::MneRtClientSetupBabyMegWidget(MneRtClient* p_pMneRtClient, QWidget *parent)
-: m_pMneRtClient(p_pMneRtClient)
-, QWidget(parent)
+: QWidget(parent)
+, m_pMneRtClient(p_pMneRtClient)
 , ui(new Ui::MneRtClientSetupBabyMegWidget)
 {
     ui->setupUi(this);

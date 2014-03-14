@@ -97,7 +97,7 @@ QVector<double> RealTimeMultiSampleArray::getVector() const
 
 void RealTimeMultiSampleArray::setVector(QVector<double> v)
 {
-    if(v.size() != m_uiNumChannels)
+    if(v.size() != int(m_uiNumChannels))
         qDebug() << "Error Occured in RealTimeMultiSampleArray::setVector: Vector size does not matche the number of channels! ";
 
     for(QVector<double>::iterator it = v.begin(); it != v.end(); ++it)

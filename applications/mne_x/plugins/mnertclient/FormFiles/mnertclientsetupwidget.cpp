@@ -73,10 +73,10 @@ using namespace MneRtClientPlugin;
 MneRtClientSetupWidget::MneRtClientSetupWidget(MneRtClient* p_pMneRtClient, QWidget* parent)
 : QWidget(parent)
 , m_pMneRtClient(p_pMneRtClient)
+, m_bIsInit(false)
 , m_pMneRtClientSetupFiffFileSimulatorWidget(new MneRtClientSetupFiffFileSimulatorWidget)
 , m_pMneRtClientSetupNeuromagWidget(new MneRtClientSetupNeuromagWidget)
 , m_pMneRtClientSetupBabyMegWidget(new MneRtClientSetupBabyMegWidget(p_pMneRtClient))
-, m_bIsInit(false)
 {
     ui.setupUi(this);
 

@@ -197,9 +197,9 @@ private:
     MNEForwardSolution::SPtr    m_pFwd;             /**< Forward solution. */
     MNEForwardSolution::SPtr    m_pClusteredFwd;    /**< Clustered forward solution. */
 
-    QString                     m_sAtlasDir;       /**< File to Atlas. */
+    QString                     m_sAtlasDir;        /**< File to Atlas. */
     AnnotationSet::SPtr         m_pAnnotationSet;   /**< Annotation set. */
-    QString                     m_sSurfaceDir;     /**< File to Surface. */
+    QString                     m_sSurfaceDir;      /**< File to Surface. */
     SurfaceSet::SPtr            m_pSurfaceSet;      /**< Surface set. */
 
 
@@ -215,7 +215,7 @@ private:
     qint32                      m_iNumAverages;     /**< Number of averages. */
     bool                        m_bSingleTrial;     /**< Single trial mode, or averages */
     QVector<FiffEvoked::SPtr>   m_qVecEvokedData;   /**< Evoked data set */
-    qint32 m_iStimChan;                             /**< Stimulus Channel to use for source estimation */
+    qint32                      m_iStimChan;        /**< Stimulus Channel to use for source estimation */
 
     MinimumNorm::SPtr           m_pMinimumNorm;     /**< Minimum Norm Estimation. */
     qint32                      m_iDownSample;      /**< Sampling rate */
