@@ -92,10 +92,10 @@ public:
     void zoomOut();
 
 protected:
-    void keyPressEvent(QKeyEvent *event);
-#ifndef QT_NO_WHEELEVENT
-    void wheelEvent(QWheelEvent *event);
-#endif
+//    void keyPressEvent(QKeyEvent *event);
+//#ifndef QT_NO_WHEELEVENT
+//    void wheelEvent(QWheelEvent *event);
+//#endif
 
     //=========================================================================================================
     /**
