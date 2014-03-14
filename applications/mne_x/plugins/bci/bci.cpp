@@ -373,6 +373,7 @@ void BCI::updateSensor(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
 void BCI::updateSource(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 {
+    cout<<"update source"<<endl;
     QSharedPointer<RealTimeSourceEstimate> pRTSE = pMeasurement.dynamicCast<RealTimeSourceEstimate>();
     if(pRTSE)
     {
