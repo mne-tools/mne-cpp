@@ -93,6 +93,10 @@ INCLUDEPATH += $${MNE_X_INCLUDE_DIR}
 
 unix:!macx {
     QMAKE_CXXFLAGS += -std=c++0x
+    QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
+
+    # suppress visibility warnings
+    QMAKE_CXXFLAGS += -Wno-attributes
 }
 macx {
     QMAKE_CXXFLAGS = -mmacosx-version-min=10.7 -std=gnu0x -stdlib=libc+
