@@ -80,17 +80,18 @@ NewRealTimeMultiSampleArray::~NewRealTimeMultiSampleArray()
 
 //*************************************************************************************************************
 
-void NewRealTimeMultiSampleArray::init(unsigned int uiNumChannels)
+void NewRealTimeMultiSampleArray::init(QList<RealTimeSampleArrayChInfo> &chInfo)
 {
-    m_qListChInfo.clear();
+    m_qListChInfo = chInfo;
 
-    for(quint32 i = 0; i < uiNumChannels; ++i)
-    {
-        RealTimeSampleArrayChInfo initChInfo;
-        QString string;
-        initChInfo.setChannelName(string.number(i+1));
-        m_qListChInfo.append(initChInfo);
-    }
+//    m_qListChInfo.clear();
+//    for(quint32 i = 0; i < uiNumChannels; ++i)
+//    {
+//        RealTimeSampleArrayChInfo initChInfo;
+//        QString string;
+//        initChInfo.setChannelName(string.number(i+1));
+//        m_qListChInfo.append(initChInfo);
+//    }
 }
 
 

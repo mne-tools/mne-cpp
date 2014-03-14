@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
-* @file     bcifeaturewindow.h
-* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
-* 			Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     tmsimanualannotationwidget.cpp
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     December, 2013
-*
+* @date     March 2014*
 * @section  LICENSE
 *
-* Copyright (C) 2013, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,17 +29,17 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the BCIAboutWidget class.
+* @brief    Contains the implementation of the TMSISetupWidget class.
 *
 */
-
-#ifndef BCIFEATUREWINDOW_H
-#define BCIFEATUREWINDOW_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
+
+#include "tmsimanualannotationwidget.h"
+#include "../tmsi.h"
 
 
 //*************************************************************************************************************
@@ -48,81 +47,68 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QWidget>
-#include "../ui_bcifeaturewindow.h"
+#include <QDebug>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE TMSIPlugin
+// USED NAMESPACES
 //=============================================================================================================
 
-namespace BCIPlugin
+using namespace TMSIPlugin;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+TMSIManualAnnotationWidget::TMSIManualAnnotationWidget(TMSI* pTMSI, QWidget *parent)
+: QWidget(parent)
+, m_pTMSI(pTMSI)
 {
+    ui.setupUi(this);
+}
+
 
 //*************************************************************************************************************
-//=============================================================================================================
-// TypeDefs
-//=============================================================================================================
-
-typedef QList< QList<double> > MyQList;
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-class BCI;
 
 
-//=============================================================================================================
-/**
-* DECLARE CLASS BCIFeatureWindow
-*
-* @brief The BCIFeatureWindow class provides a visualization tool for calculated features.
-*/
-class BCIFeatureWindow : public QWidget
+TMSIManualAnnotationWidget::~TMSIManualAnnotationWidget()
 {
-    Q_OBJECT
+}
 
-public:
-    //=========================================================================================================
-    /**
-    * Constructs a BCIFeatureWindow which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new BCIFeatureWindow becomes a window. If parent is another widget, BCIFeatureWindow becomes a child window inside parent. BCIFeatureWindow is deleted when its parent is deleted.
-    * @param [in] pBCI a pointer to the corresponding BCI.
-    */
-    BCIFeatureWindow(BCI* pBCI, QWidget *parent = 0);
 
-    //=========================================================================================================
-    /**
-    * Destroys the BCIFeatureWindow.
-    * All BCIFeatureWindow's children are deleted first. The application exits if BCIFeatureWindow is the main widget.
-    */
-    ~BCIFeatureWindow();
+//*************************************************************************************************************
 
-    //=========================================================================================================
-    /**
-    * Initializes the BCI's GUI properties.
-    *
-    */
-    void initGui();
+void TMSIManualAnnotationWidget::initGui()
+{
+}
 
-protected:
-    double boundaryValue(double x);
 
-    void addBoundaryLineToScene();
+//*************************************************************************************************************
 
-    void paintFeaturesToScene(MyQList features, bool bTriggerActivated);
-
-    BCI*                        m_pBCI;         /**< a pointer to corresponding BCI.*/
-    QGraphicsScene              m_scene;        /**< QGraphicsScene used to add the features.*/
-
-    double                      m_dFeatureMax;  /**< Max value for featrues - Used to scale the QGraphicsView.*/
-    int                         m_iScale;       /**< Scaling value.*/
-    Ui::BCIFeatureWindowClass   ui;             /**< the user interface for the BCIFeatureWindow.*/
-};
-
-} // NAMESPACE
-
-#endif // BCIFEATUREWINDOW_H
+void TMSIManualAnnotationWidget::keyPressEvent(QKeyEvent *event)
+{
+    switch (event->key())
+    {
+        case Qt::Key_Up:
+            //std::cout<<"Up"<<endl;
+            break;
+        case Qt::Key_Down:
+            //std::cout<<"Down"<<endl;
+            break;
+        case Qt::Key_Control://Qt::Key_Left:
+            //std::cout<<"Left"<<endl;
+            m_pTMSI->setKeyboardTriggerType(253);
+            ui.m_pushButton_Left->click();//setStyleSheet("background-color: green");
+            break;
+        case Qt::Key_Enter://Qt::Key_Right:
+            //std::cout<<"right"<<endl;
+            m_pTMSI->setKeyboardTriggerType(254);
+            ui.m_pushButton_Right->click();//->setStyleSheet("background-color: green");
+            break;
+        default:
+            QWidget::keyPressEvent(event);
+     }
+}
