@@ -651,6 +651,7 @@ void NewRealTimeMultiSampleArrayWidget::resizeEvent(QResizeEvent*)
 
 void NewRealTimeMultiSampleArrayWidget::keyPressEvent(QKeyEvent* keyEvent)
 {
+    Q_UNUSED(keyEvent);
 //    if(keyEvent->key() == Qt::UpArrow)
 //    {
 //        if(m_uiFirstChannel + m_uiNumChannels < m_pRTMSA_New->getNumChannels())
