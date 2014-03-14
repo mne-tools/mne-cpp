@@ -81,8 +81,8 @@ FiffStreamThread::FiffStreamThread(qint32 id, int socketDescriptor, QObject *par
 : QThread(parent)
 , m_iDataClientId(id)
 , m_sDataClientAlias(QString(""))
-, m_bIsSendingRawBuffer(false)
 , m_iSocketDescriptor(socketDescriptor)
+, m_bIsSendingRawBuffer(false)
 , m_bIsRunning(false)
 {
 }

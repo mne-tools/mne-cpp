@@ -68,9 +68,9 @@ using namespace TMSIPlugin;
 
 TMSI::TMSI()
 : m_pRMTSA_TMSI(0)
+, m_qStringResourcePath(qApp->applicationDirPath()+"/mne_x_plugins/resources/tmsi/")
 , m_pRawMatrixBuffer_In(0)
 , m_pTMSIProducer(new TMSIProducer(this))
-, m_qStringResourcePath(qApp->applicationDirPath()+"/mne_x_plugins/resources/tmsi/")
 {
 }
 
@@ -155,8 +155,8 @@ void TMSI::setUpFiffInfo()
     //Read electrode positions from .elc file
     //
     AsAElc *asaObject = new AsAElc();
-    QVector<QVector<double>> elcLocation3D;
-    QVector<QVector<double>> elcLocation2D;
+    QVector< QVector<double> > elcLocation3D;
+    QVector< QVector<double> > elcLocation2D;
     QString unit;
     QStringList elcChannelNames;
 
@@ -600,6 +600,8 @@ void TMSI::run()
                 //Set trigger in received data samples - just for one sample, so that this event is easy to detect
                 matValue(136, m_iSamplesPerBlock-1) = 252;
                 m_qTimerTrigger.restart();
+
+                Q_UNUSED(future);
             }
 
             // Set keyboard trigger (if activated and !=0)

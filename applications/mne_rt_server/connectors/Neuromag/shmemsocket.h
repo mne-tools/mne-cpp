@@ -215,7 +215,6 @@ private:
     int read_fif (FILE *fd, long pos, size_t size, char *data);
 
 
-
 private:
 
     int* filter_kinds;  /**< Filter these tags */
@@ -224,14 +223,8 @@ private:
     int shmid;
     dacqShmBlock shmptr;
 
-
-
-
     int     m_iShmemSock;
     int     m_iShmemId;
-
-
-
 
     FILE   *fd;		/* The temporary file */
     FILE   *shmem_fd;
@@ -239,25 +232,6 @@ private:
 
     long read_loc;
     FILE *read_fd;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     
 signals:

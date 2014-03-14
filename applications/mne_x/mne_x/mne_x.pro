@@ -112,3 +112,5 @@ INCLUDEPATH += $${MNE_X_INCLUDE_DIR}
 
 RESOURCES += \
     mainApp.qrc
+
+unix: QMAKE_CXXFLAGS += -Wno-attributes

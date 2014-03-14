@@ -75,9 +75,9 @@ SourceLab::SourceLab()
 , m_qFileFwdSolution("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif")
 , m_sAtlasDir("./MNE-sample-data/subjects/sample/label")
 , m_sSurfaceDir("./MNE-sample-data/subjects/sample/surf")
-, m_iStimChan(0)
 , m_iNumAverages(10)
-, m_bSingleTrial(true)//(false)
+, m_bSingleTrial(false)
+, m_iStimChan(0)
 , m_iDownSample(4)
 {
 
