@@ -13,5 +13,9 @@
         <file alias="parietal_right.svg">images/parietal_right.svg</file>
         <file alias="parietal_right_active.svg">images/parietal_right_active.svg</file>
         <file alias="selectRoi.png">images/selectRoi.png</file>
+        <file alias="temporal_left.svg">images/temporal_left.svg</file>
+        <file alias="temporal_left_active.svg">images/temporal_left_active.svg</file>
+        <file alias="temporal_right.svg">images/temporal_right.svg</file>
+        <file alias="temporal_right_active.svg">images/temporal_right_active.svg</file>
     </qresource>
 </RCC>

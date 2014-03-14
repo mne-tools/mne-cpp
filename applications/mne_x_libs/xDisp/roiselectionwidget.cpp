@@ -1,3 +1,43 @@
+//=============================================================================================================
+/**
+* @file     realtimesamplearray_new_widget.cpp
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+* @version  1.0
+* @date     March, 2014
+*
+* @section  LICENSE
+*
+* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+* the following conditions are met:
+*     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+*       following disclaimer.
+*     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+*       the following disclaimer in the documentation and/or other materials provided with the distribution.
+*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*       to endorse or promote products derived from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+*
+* @brief    Implementation of the RoiSelectionWidget Class.
+*
+*/
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
 #include "roiselectionwidget.h"
 #include "roi.h"
 
@@ -16,6 +56,11 @@
 using namespace XDISPLIB;
 
 
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
 RoiSelectionWidget::RoiSelectionWidget(QWidget *parent)
 : QGraphicsView(parent)
 {
@@ -29,7 +74,7 @@ RoiSelectionWidget::RoiSelectionWidget(QWidget *parent)
     setTransformationAnchor(AnchorUnderMouse);
     scale(qreal(0.8), qreal(0.8));
     setMinimumSize(400, 400);
-    setWindowTitle(tr("Elastic Nodes"));
+    setWindowTitle(tr("ROI Channel Selection"));
 
     Roi *frontal_left = new Roi(":/images/frontal_left", this);
     Roi *frontal_right = new Roi(":/images/frontal_right", this);
@@ -37,6 +82,8 @@ RoiSelectionWidget::RoiSelectionWidget(QWidget *parent)
     Roi *parietal_right = new Roi(":/images/parietal_right", this);
     Roi *occipital_left = new Roi(":/images/occipital_left", this);
     Roi *occipital_right = new Roi(":/images/occipital_right", this);
+    Roi *temporal_left = new Roi(":/images/temporal_left", this);
+    Roi *temporal_right = new Roi(":/images/temporal_right", this);
 
     scene->addItem(frontal_left);
     scene->addItem(frontal_right);
@@ -44,22 +91,23 @@ RoiSelectionWidget::RoiSelectionWidget(QWidget *parent)
     scene->addItem(parietal_right);
     scene->addItem(occipital_left);
     scene->addItem(occipital_right);
+    scene->addItem(temporal_left);
+    scene->addItem(temporal_right);
 
-    frontal_left->setPos(118, 140);
-    frontal_right->setPos(-134, 140);
-    parietal_left->setPos(126, 0);
-    parietal_right->setPos(-126, 0);
-    occipital_left->setPos(124, -136);
-    occipital_right->setPos(-76, -136);
+    frontal_left->setPos(-1070, -300);
+    frontal_right->setPos(0, -300);
+    parietal_left->setPos(-650, 0);
+    parietal_right->setPos(0, 0);
+    occipital_left->setPos(-500, 150);
+    occipital_right->setPos(0, 150);
+    temporal_left->setPos(-250, 260);
+    temporal_right->setPos(0, 260);
 
-    scene->setSceneRect(-154.0f, -156.0f, 540, 670);
-
+    scene->setSceneRect(-500.0f, -340.0f, 2140.0f, 3000.0f);
 }
 
-void RoiSelectionWidget::itemMoved()
-{
 
-}
+//*************************************************************************************************************
 
 void RoiSelectionWidget::keyPressEvent(QKeyEvent *event)
 {
@@ -69,10 +117,6 @@ void RoiSelectionWidget::keyPressEvent(QKeyEvent *event)
         break;
     case Qt::Key_Minus:
         zoomOut();
-        break;
-    case Qt::Key_Space:
-    case Qt::Key_Enter:
-        shuffle();
         break;
     default:
         QGraphicsView::keyPressEvent(event);
@@ -86,42 +130,8 @@ void RoiSelectionWidget::wheelEvent(QWheelEvent *event)
 }
 #endif
 
-//void RoiSelectionWidget::drawBackground(QPainter *painter, const QRectF &rect)
-//{
-//    Q_UNUSED(rect);
 
-//    // Shadow
-//    QRectF sceneRect = this->sceneRect();
-//    QRectF rightShadow(sceneRect.right(), sceneRect.top() + 5, 5, sceneRect.height());
-//    QRectF bottomShadow(sceneRect.left() + 5, sceneRect.bottom(), sceneRect.width(), 5);
-//    if (rightShadow.intersects(rect) || rightShadow.contains(rect))
-//        painter->fillRect(rightShadow, Qt::darkGray);
-//    if (bottomShadow.intersects(rect) || bottomShadow.contains(rect))
-//        painter->fillRect(bottomShadow, Qt::darkGray);
-
-//    // Fill
-//    QLinearGradient gradient(sceneRect.topLeft(), sceneRect.bottomRight());
-//    gradient.setColorAt(0, Qt::white);
-//    gradient.setColorAt(1, Qt::lightGray);
-//    painter->fillRect(rect.intersected(sceneRect), gradient);
-//    painter->setBrush(Qt::NoBrush);
-//    painter->drawRect(sceneRect);
-
-////    // Text
-////    QRectF textRect(sceneRect.left() + 4, sceneRect.top() + 4,
-////                    sceneRect.width() - 4, sceneRect.height() - 4);
-////    QString message(tr("Click and drag the nodes around, and zoom with the mouse "
-////                       "wheel or the '+' and '-' keys"));
-
-////    QFont font = painter->font();
-////    font.setBold(true);
-////    font.setPointSize(14);
-////    painter->setFont(font);
-////    painter->setPen(Qt::lightGray);
-////    painter->drawText(textRect.translated(2, 2), message);
-////    painter->setPen(Qt::black);
-////    painter->drawText(textRect, message);
-//}
+//*************************************************************************************************************
 
 void RoiSelectionWidget::scaleView(qreal scaleFactor)
 {
@@ -132,18 +142,16 @@ void RoiSelectionWidget::scaleView(qreal scaleFactor)
     scale(scaleFactor, scaleFactor);
 }
 
-void RoiSelectionWidget::shuffle()
-{
-    foreach (QGraphicsItem *item, scene()->items()) {
-        if (qgraphicsitem_cast<Roi *>(item))
-            item->setPos(-150 + qrand() % 300, -150 + qrand() % 300);
-    }
-}
+
+//*************************************************************************************************************
 
 void RoiSelectionWidget::zoomIn()
 {
     scaleView(qreal(1.2));
 }
+
+
+//*************************************************************************************************************
 
 void RoiSelectionWidget::zoomOut()
 {
