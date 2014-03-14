@@ -164,6 +164,7 @@ void BCI::init()
     m_dTimeBetweenWindows = 0.5;
     m_iNumberFeatures = 1;
     m_dThresholdValue = 30;
+    m_iNumberFeaturesToDisplay = 30;
 
     // Intitalise feature selection
     m_slChosenFeatureSensor << "LA4" << "RA4"; //<< "TEST";
@@ -723,7 +724,7 @@ void BCI::run()
                             dfinalResult += futureClassificationResults.resultAt(i);
 
                         dfinalResult = dfinalResult/futureClassificationResults.resultCount();
-                        cout << "dfinalResult" << dfinalResult << endl << endl;
+                        //cout << "dfinalResult" << dfinalResult << endl << endl;
 
                         // ----11---- Store final result
                         //cout<<"----11----"<<endl;

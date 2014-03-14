@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>789</width>
-    <height>643</height>
+    <width>825</width>
+    <height>572</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -48,134 +48,12 @@
      <property name="spacing">
       <number>6</number>
      </property>
-     <item row="2" column="0" colspan="6">
-      <widget class="QGroupBox" name="m_qGroupBox_Classification">
-       <property name="title">
-        <string>Classification options</string>
-       </property>
-       <layout class="QGridLayout" name="gridLayout_2">
-        <item row="0" column="0">
-         <widget class="QLabel" name="label_2">
-          <property name="text">
-           <string>Boundary on sensor level:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLineEdit" name="m_lineEdit_SensorBoundary">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>0</height>
-           </size>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="1">
-         <widget class="QPushButton" name="m_pushButton_LoadSensorBoundary">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>40</width>
-            <height>23</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>Load</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="0">
-         <widget class="QLineEdit" name="m_lineEdit_SourceBoundary">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>0</width>
-            <height>0</height>
-           </size>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="1">
-         <widget class="QPushButton" name="m_pushButton_LoadSourceBoundary">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>40</width>
-            <height>23</height>
-           </size>
-          </property>
-          <property name="text">
-           <string>Load</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="label">
-          <property name="text">
-           <string>Boundary on source level:</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </item>
      <item row="0" column="4" rowspan="2" colspan="2">
       <widget class="QGroupBox" name="m_qGroupBox_Processing">
        <property name="title">
         <string>Processing options</string>
        </property>
        <layout class="QGridLayout" name="gridLayout">
-        <item row="6" column="0">
-         <widget class="QLabel" name="m_label_TotalProcessedTime">
-          <property name="text">
-           <string>Total processed time:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="QDoubleSpinBox" name="m_doubleSpinBox_SlidingWindowSize">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimum">
-           <double>0.010000000000000</double>
-          </property>
-          <property name="maximum">
-           <double>5.000000000000000</double>
-          </property>
-          <property name="singleStep">
-           <double>0.010000000000000</double>
-          </property>
-          <property name="value">
-           <double>0.010000000000000</double>
-          </property>
-         </widget>
-        </item>
         <item row="4" column="1">
          <widget class="QDoubleSpinBox" name="m_doubleSpinBox_TimeBetweenWindows">
           <property name="sizePolicy">
@@ -192,48 +70,6 @@
           </property>
           <property name="singleStep">
            <double>0.010000000000000</double>
-          </property>
-         </widget>
-        </item>
-        <item row="11" column="0">
-         <widget class="QLabel" name="m_label_Threshold">
-          <property name="text">
-           <string>Threshold (micro V):</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0">
-         <widget class="QCheckBox" name="m_checkBox_SubtractMean">
-          <property name="text">
-           <string>Subtract mean </string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="0">
-         <widget class="QLabel" name="m_label_TimeBetweenWindows">
-          <property name="text">
-           <string>Time between windows (s):</string>
-          </property>
-         </widget>
-        </item>
-        <item row="8" column="0" colspan="2">
-         <widget class="Line" name="line_2">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0" colspan="2">
-         <widget class="Line" name="line_3">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-         </widget>
-        </item>
-        <item row="9" column="0">
-         <widget class="QCheckBox" name="m_checkBox_UseThresholdArtefactReduction">
-          <property name="text">
-           <string>Use artefact reduction</string>
           </property>
          </widget>
         </item>
@@ -256,20 +92,31 @@
           </property>
          </widget>
         </item>
-        <item row="5" column="0">
-         <widget class="QLabel" name="m_label_NumberFeatures">
-          <property name="enabled">
-           <bool>true</bool>
-          </property>
+        <item row="6" column="1">
+         <widget class="QLabel" name="m_label_TotalProcessedTimeDisplay">
           <property name="text">
-           <string>Nr. feature points:</string>
+           <string>Number</string>
           </property>
          </widget>
         </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="m_label_SlidingWindowSize">
+        <item row="7" column="1">
+         <widget class="QLabel" name="m_label_TimeNeededForResultsDisplay">
           <property name="text">
-           <string>Sliding window size (s):</string>
+           <string>Number</string>
+          </property>
+         </widget>
+        </item>
+        <item row="6" column="0">
+         <widget class="QLabel" name="m_label_TotalProcessedTime">
+          <property name="text">
+           <string>Total processed time:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="11" column="0">
+         <widget class="QLabel" name="m_label_Threshold">
+          <property name="text">
+           <string>Threshold (micro V):</string>
           </property>
          </widget>
         </item>
@@ -292,10 +139,17 @@
           </property>
          </widget>
         </item>
-        <item row="6" column="1">
-         <widget class="QLabel" name="m_label_TotalProcessedTimeDisplay">
+        <item row="9" column="0">
+         <widget class="QCheckBox" name="m_checkBox_UseThresholdArtefactReduction">
           <property name="text">
-           <string>Number</string>
+           <string>Use artefact reduction</string>
+          </property>
+         </widget>
+        </item>
+        <item row="8" column="0" colspan="2">
+         <widget class="Line" name="line_2">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
           </property>
          </widget>
         </item>
@@ -306,10 +160,69 @@
           </property>
          </widget>
         </item>
-        <item row="7" column="1">
-         <widget class="QLabel" name="m_label_TimeNeededForResultsDisplay">
+        <item row="2" column="1">
+         <widget class="QDoubleSpinBox" name="m_doubleSpinBox_SlidingWindowSize">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="minimum">
+           <double>0.010000000000000</double>
+          </property>
+          <property name="maximum">
+           <double>5.000000000000000</double>
+          </property>
+          <property name="singleStep">
+           <double>0.010000000000000</double>
+          </property>
+          <property name="value">
+           <double>0.010000000000000</double>
+          </property>
+         </widget>
+        </item>
+        <item row="4" column="0">
+         <widget class="QLabel" name="m_label_TimeBetweenWindows">
           <property name="text">
-           <string>Number</string>
+           <string>Time between windows (s):</string>
+          </property>
+         </widget>
+        </item>
+        <item row="5" column="0">
+         <widget class="QLabel" name="m_label_NumberFeatures">
+          <property name="enabled">
+           <bool>true</bool>
+          </property>
+          <property name="text">
+           <string>Nr. feature points:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0" colspan="2">
+         <widget class="Line" name="line_3">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QCheckBox" name="m_checkBox_SubtractMean">
+          <property name="text">
+           <string>Subtract mean </string>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="0">
+         <widget class="QLabel" name="m_label_SlidingWindowSize">
+          <property name="text">
+           <string>Sliding window size (s):</string>
           </property>
          </widget>
         </item>
@@ -405,7 +318,7 @@
           </property>
           <property name="minimumSize">
            <size>
-            <width>50</width>
+            <width>0</width>
             <height>0</height>
            </size>
           </property>
@@ -478,7 +391,7 @@
           </property>
           <property name="minimumSize">
            <size>
-            <width>20</width>
+            <width>0</width>
             <height>0</height>
            </size>
           </property>
@@ -703,7 +616,107 @@
         <item row="3" column="0">
          <widget class="QCheckBox" name="m_checkBox_DisplayFeatures">
           <property name="text">
-           <string>Display features</string>
+           <string>Display feature points</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QSpinBox" name="m_SpinBox_NumberFeaturesToDisplay">
+          <property name="maximum">
+           <number>1000</number>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item row="2" column="0" colspan="6">
+      <widget class="QGroupBox" name="m_qGroupBox_Classification">
+       <property name="title">
+        <string>Classification options</string>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_2">
+        <item row="1" column="1">
+         <widget class="QLineEdit" name="m_lineEdit_SensorBoundary">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item row="2" column="1">
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Boundary on source level:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="1">
+         <widget class="QLineEdit" name="m_lineEdit_SourceBoundary">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLabel" name="label_2">
+          <property name="text">
+           <string>Boundary on sensor level:</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="QPushButton" name="m_pushButton_LoadSensorBoundary">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>40</width>
+            <height>23</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Load</string>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="2">
+         <widget class="QPushButton" name="m_pushButton_LoadSourceBoundary">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>40</width>
+            <height>23</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Load</string>
           </property>
          </widget>
         </item>
