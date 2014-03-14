@@ -94,41 +94,43 @@ RoiSelectionWidget::RoiSelectionWidget(QWidget *parent)
     scene->addItem(temporal_left);
     scene->addItem(temporal_right);
 
-    frontal_left->setPos(-1070, -300);
-    frontal_right->setPos(0, -300);
-    parietal_left->setPos(-650, 0);
+    frontal_left->setPos(-1073, -307);
+    frontal_right->setPos(0, -305);
+    parietal_left->setPos(-651, -7);
     parietal_right->setPos(0, 0);
-    occipital_left->setPos(-500, 150);
-    occipital_right->setPos(0, 150);
-    temporal_left->setPos(-250, 260);
-    temporal_right->setPos(0, 260);
+    occipital_left->setPos(-410, 158);
+    occipital_right->setPos(4, 154);
+    temporal_left->setPos(-887, 474);
+    temporal_right->setPos(360, 474);
 
-    scene->setSceneRect(-500.0f, -340.0f, 2140.0f, 3000.0f);
+    scene->setSceneRect(-1125.0f, -371.0f, 2250.0f, 1390.0f);
+
+    scaleView(1 / qreal(2.0));
 }
 
 
 //*************************************************************************************************************
 
-void RoiSelectionWidget::keyPressEvent(QKeyEvent *event)
-{
-    switch (event->key()) {
-    case Qt::Key_Plus:
-        zoomIn();
-        break;
-    case Qt::Key_Minus:
-        zoomOut();
-        break;
-    default:
-        QGraphicsView::keyPressEvent(event);
-    }
-}
+//void RoiSelectionWidget::keyPressEvent(QKeyEvent *event)
+//{
+//    switch (event->key()) {
+//    case Qt::Key_Plus:
+//        zoomIn();
+//        break;
+//    case Qt::Key_Minus:
+//        zoomOut();
+//        break;
+//    default:
+//        QGraphicsView::keyPressEvent(event);
+//    }
+//}
 
-#ifndef QT_NO_WHEELEVENT
-void RoiSelectionWidget::wheelEvent(QWheelEvent *event)
-{
-    scaleView(pow((double)2, -event->delta() / 240.0));
-}
-#endif
+//#ifndef QT_NO_WHEELEVENT
+//void RoiSelectionWidget::wheelEvent(QWheelEvent *event)
+//{
+//    scaleView(pow((double)2, -event->delta() / 240.0));
+//}
+//#endif
 
 
 //*************************************************************************************************************
