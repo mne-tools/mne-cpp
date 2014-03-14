@@ -120,7 +120,6 @@ using namespace XMEASLIB;
 *
 * @brief The RealTimeMultiSampleArrayNewWidget class provides a real-time curve display.
 */
-
 class XDISPSHARED_EXPORT NewRealTimeMultiSampleArrayWidget : public NewMeasurementWidget
 {
     Q_OBJECT
