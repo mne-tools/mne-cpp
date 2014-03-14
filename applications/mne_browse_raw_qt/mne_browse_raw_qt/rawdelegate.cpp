@@ -54,6 +54,8 @@ RawDelegate::RawDelegate(QObject *parent)
     m_dPlotHeight = m_qSettings.value("RawDelegate/plotheight").toDouble();
     m_dDx = m_qSettings.value("RawDelegate/dx").toDouble();
     m_nhlines = m_qSettings.value("RawDelegate/nhlines").toDouble();
+
+    Q_UNUSED(parent);
 }
 
 //*************************************************************************************************************
@@ -142,6 +144,8 @@ QSize RawDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelInde
         size = QSize(nsamples*m_dDx,m_dPlotHeight);
         break;
     }
+
+    Q_UNUSED(option);
 
     return size;
 }

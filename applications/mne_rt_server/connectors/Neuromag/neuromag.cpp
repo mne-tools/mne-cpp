@@ -88,10 +88,10 @@ using namespace MNELIB;
 
 Neuromag::Neuromag()
 : m_pDacqServer(new DacqServer(this))
-, m_bIsRunning(false)
 , m_iID(-1)
 , m_uiBufferSampleSize(100)
 , m_pRawMatrixBuffer(NULL)
+, m_bIsRunning(false)
 {
     this->init();
 }
@@ -274,7 +274,7 @@ void Neuromag::run()
 {
     m_bIsRunning = true;
 
-    qint32 count = 0;
+    //qint32 count = 0;
 
     while(m_bIsRunning)
     {
