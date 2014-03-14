@@ -128,11 +128,11 @@ void BCIFeatureWindow::paintFeaturesToScene(MyQList features, bool bTriggerActiv
 //    std::cout<<"features.size()"<<features.size()<<endl;
     if(features.first().size() == 2) // Only plot when 2D case with two electrodes
     {
-        if(m_scene.items().size() > 30)
-        {
-            m_scene.clear();
-            addBoundaryLineToScene();
-        }
+//        if(m_scene.items().size() > 30)
+//        {
+//            m_scene.clear();
+//            addBoundaryLineToScene();
+//        }
 
 //        // If trigger was activated during feature calculation -> change scenes brush color
 //        if(bTriggerActivated)

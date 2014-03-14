@@ -722,7 +722,7 @@ void BCI::run()
                             dfinalResult += futureClassificationResults.resultAt(i);
 
                         dfinalResult = dfinalResult/futureClassificationResults.resultCount();
-                        //cout << "dfinalResult" << dfinalResult << endl << endl;
+                        cout << "dfinalResult" << dfinalResult << endl << endl;
 
                         // ----11---- Store final result
                         //cout<<"----11----"<<endl;
