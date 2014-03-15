@@ -112,7 +112,7 @@ void BCI::init()
 
     // Output streams
     m_pBCIOutputOne = PluginOutputData<NewRealTimeSampleArray>::create(this, "ControlSignal", "BCI output data One");
-    m_pBCIOutputOne->data()->setArraySize(1);
+    m_pBCIOutputOne->data()->setArraySize(1); //()
     m_pBCIOutputOne->data()->setMaxValue(10);
     m_pBCIOutputOne->data()->setMinValue(-10);
     m_pBCIOutputOne->data()->setName("Boundary");
@@ -140,7 +140,7 @@ void BCI::init()
     m_outputConnectors.append(m_pBCIOutputFour);
 
     m_pBCIOutputFive = PluginOutputData<NewRealTimeSampleArray>::create(this, "ControlSignal", "BCI output data Five");
-    m_pBCIOutputFive->data()->setArraySize(10000);
+    m_pBCIOutputFive->data()->setArraySize(1);
     m_pBCIOutputFive->data()->setMaxValue(7e-05);
     m_pBCIOutputFive->data()->setMinValue(-7e-05);
     m_pBCIOutputFive->data()->setName("Right electrode");
@@ -418,8 +418,8 @@ QPair< int,QList<double> > BCI::applyFeatureCalcConcurrentlyOnSensorLevel(const 
     QList<double> features;
 
     // TODO: Divide into subsignals
-    //features << data.squaredNorm(); // Compute variance
-    features << abs(log10(data.squaredNorm())); // Compute log of variance
+    features << data.squaredNorm(); // Compute variance
+    //features << abs(log10(data.squaredNorm())); // Compute log of variance
 
     return QPair< int,QList<double> >(chdata.first, features);
 }
@@ -519,6 +519,7 @@ bool BCI::lookForTrigger(const MatrixXd &data)
 
     return false;
 }
+
 
 //*************************************************************************************************************
 
@@ -725,7 +726,7 @@ void BCI::run()
                             dfinalResult += futureClassificationResults.resultAt(i);
 
                         dfinalResult = dfinalResult/futureClassificationResults.resultCount();
-                        //cout << "dfinalResult" << dfinalResult << endl << endl;
+                        cout << "dfinalResult " << dfinalResult << endl << endl;
 
                         // ----11---- Store final result
                         //cout<<"----11----"<<endl;
