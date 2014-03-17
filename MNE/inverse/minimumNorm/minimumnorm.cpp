@@ -185,7 +185,7 @@ MNESourceEstimate MinimumNorm::calculateInverse(const FiffEvoked &p_fiffEvoked, 
 
 //*************************************************************************************************************
 
-MNESourceEstimate MinimumNorm::calculateInverse(const MatrixXd &data, float tmin, float tstep)
+MNESourceEstimate MinimumNorm::calculateInverse(const MatrixXd &data, float tmin, float tstep) const
 {
     if(!inverseSetup)
     {
