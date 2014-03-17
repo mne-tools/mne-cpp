@@ -88,6 +88,12 @@ BCISetupWidget::BCISetupWidget(BCI* pBCI, QWidget* parent)
             this, &BCISetupWidget::setGeneralOptions);
     connect(ui.m_doubleSpinBox_Electrodes, static_cast<void (QDoubleSpinBox::*)()>(&QDoubleSpinBox::editingFinished),
             this, &BCISetupWidget::setGeneralOptions);
+    connect(ui.m_spinBox_exponentBoundary, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
+            this, &BCISetupWidget::setGeneralOptions);
+    connect(ui.m_spinBox_exponentVariances, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
+            this, &BCISetupWidget::setGeneralOptions);
+    connect(ui.m_spinBox_exponentElectrodes, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
+            this, &BCISetupWidget::setGeneralOptions);
 
     // Connect processing options
     connect(ui.m_checkBox_SubtractMean, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
@@ -168,6 +174,8 @@ void BCISetupWidget::initGui()
     ui.m_doubleSpinBox_Variances->setValue(m_pBCI->m_dDisplayRangeVariances);
     ui.m_doubleSpinBox_Electrodes->setValue(m_pBCI->m_dDisplayRangeElectrodes);
 
+    setGeneralOptions(); // Set up ranges for the first time
+
     // Processing options
     ui.m_checkBox_SubtractMean->setChecked(m_pBCI->m_bSubtractMean);
     ui.m_doubleSpinBox_SlidingWindowSize->setValue(m_pBCI->m_dSlidingWindowSize);
@@ -214,9 +222,10 @@ void BCISetupWidget::setGeneralOptions()
     m_pBCI->m_bUseSourceData = ui.m_checkBox_UseSourceData->isChecked();
     m_pBCI->m_bDisplayFeatures = ui.m_checkBox_DisplayFeatures->isChecked();
     m_pBCI->m_iNumberFeaturesToDisplay = ui.m_SpinBox_NumberFeaturesToDisplay->value();
-    m_pBCI->m_dDisplayRangeBoundary = ui.m_doubleSpinBox_Boundary->value();
-    m_pBCI->m_dDisplayRangeVariances = ui.m_doubleSpinBox_Variances->value();
-    m_pBCI->m_dDisplayRangeElectrodes = ui.m_doubleSpinBox_Electrodes->value();
+
+    m_pBCI->m_dDisplayRangeBoundary = ui.m_doubleSpinBox_Boundary->value() * std::pow(10, ui.m_spinBox_exponentBoundary->value());
+    m_pBCI->m_dDisplayRangeVariances = ui.m_doubleSpinBox_Variances->value() * std::pow(10, ui.m_spinBox_exponentVariances->value());
+    m_pBCI->m_dDisplayRangeElectrodes = ui.m_doubleSpinBox_Electrodes->value() * std::pow(10, ui.m_spinBox_exponentElectrodes->value());
 }
 
 
