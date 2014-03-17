@@ -125,7 +125,7 @@ public:
     */
     virtual MNESourceEstimate calculateInverse(const FiffEvoked &p_fiffEvoked, bool pick_normal = false);
 
-    virtual MNESourceEstimate calculateInverse(const MatrixXd &data, float tmin, float tstep) const;
+    virtual MNESourceEstimate calculateInverse(const MatrixXd &data, float tmin, float tstep);
 
     virtual void doInverseSetup(qint32 nave, bool pick_normal = false);
 
