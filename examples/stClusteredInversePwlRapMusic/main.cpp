@@ -247,9 +247,8 @@ int main(int argc, char *argv[])
     float tstep = 1.0f/raw.info.sfreq;
 
     MNESourceEstimate sourceEstimate = t_pwlRapMusic.calculateInverse(data, 0.0f, tstep);
-
-//    if(sourceEstimate.isEmpty())
-//        return 1;
+    if(sourceEstimate.isEmpty())
+        return 1;
 
     //Source Estimate end
     //########################################################################################
