@@ -1,5 +1,7 @@
-# startdir = mne-cpp/tools/build_agents/
-cd ../..
+# teamcity build agent script
+# commandline with parameters
+# 
+
 qmake -r
 make -j4
 
