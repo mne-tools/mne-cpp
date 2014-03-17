@@ -247,6 +247,20 @@ protected:
     */
     virtual void run();
 
+    //=========================================================================================================
+    /**
+    * Do BCI stuff with data received from sensor level
+    *
+    */
+    void BCIOnSensorLevel();
+
+    //=========================================================================================================
+    /**
+    * Do BCI stuff with data received from source level
+    *
+    */
+    void BCIOnSourceLevel();
+
 signals:
     void paintFeatures(MyQList features, bool bTrigerActivated);
 
