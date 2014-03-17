@@ -121,7 +121,7 @@ public:
     *
     * @return the calculated source estimation
     */
-    virtual MNESourceEstimate calculateInverse(const MatrixXd &data, float tmin, float tstep) = 0;
+    virtual MNESourceEstimate calculateInverse(const MatrixXd &data, float tmin, float tstep) const = 0;
 
     //=========================================================================================================
     /**

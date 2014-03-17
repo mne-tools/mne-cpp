@@ -160,11 +160,11 @@ public:
     */
     bool init(MNEForwardSolution& p_pFwd, bool p_bSparsed = false, int p_iN = 2, double p_dThr = 0.5);
 
-    virtual MNESourceEstimate calculateInverse(const MatrixXd& p_matMeasurement, QList< DipolePair<double> > &p_RapDipoles);
+    virtual MNESourceEstimate calculateInverse(const MatrixXd& p_matMeasurement, QList< DipolePair<double> > &p_RapDipoles) const;
 
     virtual MNESourceEstimate calculateInverse(const FiffEvoked &p_fiffEvoked, bool pick_normal = false);
 
-    virtual MNESourceEstimate calculateInverse(const MatrixXd &data, float tmin, float tstep)
+    virtual MNESourceEstimate calculateInverse(const MatrixXd &data, float tmin, float tstep) const
     {
         Q_UNUSED(data);
         Q_UNUSED(tmin);

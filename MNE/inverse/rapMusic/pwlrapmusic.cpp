@@ -215,7 +215,7 @@ MNESourceEstimate PwlRapMusic::calculateInverse(const FiffEvoked &p_fiffEvoked, 
 
 //*************************************************************************************************************
 
-MNESourceEstimate PwlRapMusic::calculateInverse(const MatrixXd &data, float tmin, float tstep)
+MNESourceEstimate PwlRapMusic::calculateInverse(const MatrixXd &data, float tmin, float tstep) const
 {
     MNESourceEstimate p_sourceEstimate;
 
@@ -269,7 +269,7 @@ MNESourceEstimate PwlRapMusic::calculateInverse(const MatrixXd &data, float tmin
 
 //*************************************************************************************************************
 
-MNESourceEstimate PwlRapMusic::calculateInverse(const MatrixXd& p_matMeasurement, QList< DipolePair<double> > &p_RapDipoles)
+MNESourceEstimate PwlRapMusic::calculateInverse(const MatrixXd& p_matMeasurement, QList< DipolePair<double> > &p_RapDipoles) const
 {
     MNESourceEstimate p_SourceEstimate;
 

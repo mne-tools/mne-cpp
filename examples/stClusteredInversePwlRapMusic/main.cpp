@@ -98,15 +98,15 @@ int main(int argc, char *argv[])
 {
     QGuiApplication a(argc, argv);
 
-//    QFile t_fileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
-//    QFile t_fileFwd("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
-//    AnnotationSet t_annotationSet("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot", "./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot");
-//    SurfaceSet t_surfSet("./MNE-sample-data/subjects/sample/surf/lh.white", "./MNE-sample-data/subjects/sample/surf/rh.white");
+    QFile t_fileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+    QFile t_fileFwd("./MNE-sample-data/MEG/sample/sample_audvis-eeg-oct-6-fwd.fif");
+    AnnotationSet t_annotationSet("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot", "./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot");
+    SurfaceSet t_surfSet("./MNE-sample-data/subjects/sample/surf/lh.white", "./MNE-sample-data/subjects/sample/surf/rh.white");
 
-    QFile t_fileRaw("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw.fif");
-    QFile t_fileFwd("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-oct-6p-fwd.fif");
-    AnnotationSet t_annotationSet("E:/Data/sl_data/subjects/mind006/label/lh.aparc.a2009s.annot", "E:/Data/sl_data/subjects/mind006/label/rh.aparc.a2009s.annot");
-    SurfaceSet t_surfSet("E:/Data/sl_data/subjects/mind006/surf/lh.white", "E:/Data/sl_data/subjects/mind006/surf/rh.white");
+//    QFile t_fileRaw("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw.fif");
+//    QFile t_fileFwd("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-oct-6p-fwd.fif");
+//    AnnotationSet t_annotationSet("E:/Data/sl_data/subjects/mind006/label/lh.aparc.a2009s.annot", "E:/Data/sl_data/subjects/mind006/label/rh.aparc.a2009s.annot");
+//    SurfaceSet t_surfSet("E:/Data/sl_data/subjects/mind006/surf/lh.white", "E:/Data/sl_data/subjects/mind006/surf/rh.white");
 
 //    QFile t_fileRaw("E:/Data/sl_data/MEG/mind006/mind006_051209_median01_raw.fif");
 //    QFile t_fileFwd("E:/Data/sl_data/MEG/mind006/mind006_051209_median01_raw-oct-6-fwd.fif");
@@ -117,8 +117,11 @@ int main(int argc, char *argv[])
 
     qint32 numDipolePairs = 7;
 
+    qint32 samplesStcWindow = 100;
+    float stcOverlap = 0.0f;
+
     qint32 startSample = 0;
-    qint32 numSample = 10000;
+    qint32 numSample = 100000;
 
     bool in_samples = true;
     bool keep_comp = true;
@@ -152,12 +155,12 @@ int main(int argc, char *argv[])
     //   Set up pick list: MEG + STI 014 - bad channels
     //
     QStringList include;
-    include << "STI 014";
-    bool want_meg   = true;
-    bool want_eeg   = false;
+//    include << "STI 014";
+    bool want_meg   = false;
+    bool want_eeg   = true;
     bool want_stim  = false;
 
-    RowVectorXi picks = raw.info.pick_types(want_meg, want_eeg, want_stim, include, raw.info.bads);
+    RowVectorXi picks = raw.info.pick_types(want_meg, want_eeg, want_stim, include);//, raw.info.bads);
 
     //
     //   Set up projection
@@ -244,9 +247,80 @@ int main(int argc, char *argv[])
     //
     PwlRapMusic t_pwlRapMusic(t_clusteredFwd, false, numDipolePairs);
 
+    MNESourceEstimate sourceEstimate;
+
     float tstep = 1.0f/raw.info.sfreq;
 
-    MNESourceEstimate sourceEstimate = t_pwlRapMusic.calculateInverse(data, 0.0f, tstep);
+    float tmin;
+    if(in_samples)
+        tmin = from * tstep;
+    else
+        tmin = from;
+
+    //
+    // Rap MUSIC Source estimate
+    //
+    sourceEstimate.data = MatrixXd::Zero(t_clusteredFwd.nsource, data.cols());
+
+    //Results
+    sourceEstimate.vertices = VectorXi(t_clusteredFwd.src[0].vertno.size() + t_clusteredFwd.src[1].vertno.size());
+    sourceEstimate.vertices << t_clusteredFwd.src[0].vertno, t_clusteredFwd.src[1].vertno;
+
+    sourceEstimate.times = RowVectorXf::Zero(data.cols());
+    sourceEstimate.times[0] = tmin;
+    for(qint32 i = 1; i < sourceEstimate.times.size(); ++i)
+        sourceEstimate.times[i] = sourceEstimate.times[i-1] + tstep;
+    sourceEstimate.tmin = tmin;
+    sourceEstimate.tstep = tstep;
+
+
+    bool first = true;
+    bool last = false;
+
+    qint32 t_iNumSensors = data.rows();
+    qint32 t_iNumSteps = data.cols();
+
+    qint32 t_iSamplesOverlap = (qint32)floor(((float)samplesStcWindow)*stcOverlap);
+    qint32 t_iSamplesDiscard = t_iSamplesOverlap/2;
+
+    MatrixXd measData = MatrixXd::Zero(t_iNumSensors, samplesStcWindow);
+
+    qint32 curSample = 0;
+    qint32 curResultSample = 0;
+    qint32 stcWindowSize = samplesStcWindow - 2*t_iSamplesDiscard;
+
+    while(!last)
+    {
+        //Data
+        if(curSample + samplesStcWindow >= t_iNumSteps) //last
+        {
+            last = true;
+            measData = data.block(0, data.cols()-samplesStcWindow, t_iNumSensors, samplesStcWindow);
+        }
+        else
+            measData = data.block(0, curSample, t_iNumSensors, samplesStcWindow);
+
+
+        curSample += (samplesStcWindow - t_iSamplesOverlap);
+        if(first)
+            curSample -= t_iSamplesDiscard; //shift on start t_iSamplesDiscard backwards
+
+        //Calculate
+        MNESourceEstimate stcData = t_pwlRapMusic.calculateInverse(measData, 0.0f, tstep);
+
+        //Assign Result
+        if(last)
+            stcWindowSize = stcData.data.cols() - curResultSample;
+
+        sourceEstimate.data.block(0,curResultSample,sourceEstimate.data.rows(),stcWindowSize) =
+                                            stcData.data.block(0,0,stcData.data.rows(),stcWindowSize);
+
+        curResultSample += stcWindowSize;
+
+        if(first)
+            first = false;
+    }
+
     if(sourceEstimate.isEmpty())
         return 1;
 
@@ -271,50 +345,50 @@ int main(int argc, char *argv[])
 
 
 
-//    QList<Label> t_qListLabels;
-//    QList<RowVector4i> t_qListRGBAs;
+    QList<Label> t_qListLabels;
+    QList<RowVector4i> t_qListRGBAs;
 
-//    //ToDo overload toLabels using instead of t_surfSet rr of MNESourceSpace
-//    t_annotationSet.toLabels(t_surfSet, t_qListLabels, t_qListRGBAs);
+    //ToDo overload toLabels using instead of t_surfSet rr of MNESourceSpace
+    t_annotationSet.toLabels(t_surfSet, t_qListLabels, t_qListRGBAs);
 
-//    InverseView view(t_pwlRapMusic.getSourceSpace(), t_qListLabels, t_qListRGBAs, 24, true, false, false);//true);
+    InverseView view(t_pwlRapMusic.getSourceSpace(), t_qListLabels, t_qListRGBAs, 24, true, false, false);//true);
 
-//    if (view.stereoType() != QGLView::RedCyanAnaglyph)
-//        view.camera()->setEyeSeparation(0.3f);
-//    QStringList args = QCoreApplication::arguments();
-//    int w_pos = args.indexOf("-width");
-//    int h_pos = args.indexOf("-height");
-//    if (w_pos >= 0 && h_pos >= 0)
-//    {
-//        bool ok = true;
-//        int w = args.at(w_pos + 1).toInt(&ok);
-//        if (!ok)
-//        {
-//            qWarning() << "Could not parse width argument:" << args;
-//            return 1;
-//        }
-//        int h = args.at(h_pos + 1).toInt(&ok);
-//        if (!ok)
-//        {
-//            qWarning() << "Could not parse height argument:" << args;
-//            return 1;
-//        }
-//        view.resize(w, h);
-//    }
-//    else
-//    {
-//        view.resize(800, 600);
-//    }
-//    view.show();
+    if (view.stereoType() != QGLView::RedCyanAnaglyph)
+        view.camera()->setEyeSeparation(0.3f);
+    QStringList args = QCoreApplication::arguments();
+    int w_pos = args.indexOf("-width");
+    int h_pos = args.indexOf("-height");
+    if (w_pos >= 0 && h_pos >= 0)
+    {
+        bool ok = true;
+        int w = args.at(w_pos + 1).toInt(&ok);
+        if (!ok)
+        {
+            qWarning() << "Could not parse width argument:" << args;
+            return 1;
+        }
+        int h = args.at(h_pos + 1).toInt(&ok);
+        if (!ok)
+        {
+            qWarning() << "Could not parse height argument:" << args;
+            return 1;
+        }
+        view.resize(w, h);
+    }
+    else
+    {
+        view.resize(800, 600);
+    }
+    view.show();
 
-//    //Push Estimate
-//    view.pushSourceEstimate(sourceEstimate);
+    //Push Estimate
+    view.pushSourceEstimate(sourceEstimate);
 
-//    if(!t_sFileNameStc.isEmpty())
-//    {
-//        QFile t_fileClusteredStc(t_sFileNameStc);
-//        sourceEstimate.write(t_fileClusteredStc);
-//    }
+    if(!t_sFileNameStc.isEmpty())
+    {
+        QFile t_fileClusteredStc(t_sFileNameStc);
+        sourceEstimate.write(t_fileClusteredStc);
+    }
 
     return a.exec();//1;//a.exec();
 }
