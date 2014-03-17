@@ -119,8 +119,9 @@ int main(int argc, char *argv[])
     //QString data_location("D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2014_02_04_Lorenz_Esch_005");
     //QString data_location("D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2014_02_05_Uwe_Graichen_006");
     //QString data_location("D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2014_02_07_Lorenz_Esch_007");
-    QString data_location("D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2014_02_24_Lorenz_Esch_008");
+    //QString data_location("D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2014_02_24_Lorenz_Esch_008");
     //QString data_location("D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2014_02_25_Christoph_Dinh_009");
+    QString data_location("D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2014_03_17_Lorenz_Esch_010");
 
     //Forward solution
     //QFile t_fileFwd("D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/Lorenz-131212-Duke128-fwd.fif");
@@ -400,7 +401,8 @@ int main(int argc, char *argv[])
     QFile t_fileCov(t_sCovFileNameRel.prepend(data_location));
     QString t_sEventName = t_sEventFileNameRel.prepend(data_location);
 
-    qint32 event = 1;
+    qint32 event = 1; //254-right trigger | 253-left trigger | 252-beep
+
     qint32 k, p;
     fiff_int_t dest_comp = 0;
     bool keep_comp = false;
