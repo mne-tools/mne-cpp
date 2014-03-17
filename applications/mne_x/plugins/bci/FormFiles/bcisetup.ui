@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>846</width>
+    <width>894</width>
     <height>598</height>
    </rect>
   </property>
@@ -667,7 +667,7 @@
            <number>5</number>
           </property>
           <property name="maximum">
-           <double>10000.000000000000000</double>
+           <double>1000000.000000000000000</double>
           </property>
          </widget>
         </item>
@@ -677,7 +677,7 @@
            <number>5</number>
           </property>
           <property name="maximum">
-           <double>10000.000000000000000</double>
+           <double>1000000.000000000000000</double>
           </property>
          </widget>
         </item>
@@ -687,7 +687,7 @@
            <number>5</number>
           </property>
           <property name="maximum">
-           <double>10000.000000000000000</double>
+           <double>1000000.000000000000000</double>
           </property>
          </widget>
         </item>
@@ -761,7 +761,7 @@
            </size>
           </property>
           <property name="text">
-           <string>Load</string>
+           <string>Select</string>
           </property>
          </widget>
         </item>
@@ -826,7 +826,7 @@
            </size>
           </property>
           <property name="text">
-           <string>Load</string>
+           <string>Select</string>
           </property>
          </widget>
         </item>

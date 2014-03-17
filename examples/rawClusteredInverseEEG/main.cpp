@@ -140,8 +140,8 @@ int main(int argc, char *argv[])
     //////////////////////////////////////////// Interesting start ////////////////////////////////////////////////////////////////////
     //********************************** Involuntary Tapping ***********************************//
     //time read around events - note: trigger point is the pressing of the button, not the atual
-    float tmin = -2.0f;
-    float tmax = 2.0f;
+//    float tmin = -2.0f;
+//    float tmax = 2.0f;
 
 //    //Filtered 7-14Hz left tapping
 //    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_001_involuntary_left_tapping_filtered_7_14_raw.fif");
@@ -157,12 +157,12 @@ int main(int argc, char *argv[])
 //    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_involuntary_right_tapping_filtered_7_14_Averaged_");
 //    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_involuntary_right_tapping_filtered_7_14_Averaged_");
 
-    //Filtered 0.7-40Hz left tapping
-    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_001_involuntary_left_tapping_filtered_07_40_raw.fif");
-    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_001_base_filtered_07_40_raw-cov.fif");
-    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_involuntary_left_tapping_131_raw-eve.fif");
-    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_involuntary_left_tapping_filtered_07_40_Averaged_");
-    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_involuntary_left_tapping_filtered_07_40_Averaged_");
+//    //Filtered 0.7-40Hz left tapping
+//    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_001_involuntary_left_tapping_filtered_07_40_raw.fif");
+//    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_001_base_filtered_07_40_raw-cov.fif");
+//    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_involuntary_left_tapping_131_raw-eve.fif");
+//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_involuntary_left_tapping_filtered_07_40_Averaged_");
+//    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_involuntary_left_tapping_filtered_07_40_Averaged_");
 
 //    //Filtered 0.7-40Hz right tapping
 //    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_001_involuntary_right_tapping_filtered_07_40_raw.fif");
@@ -393,6 +393,18 @@ int main(int argc, char *argv[])
 //    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_right_MI_filtered_07_40_Averaged_");
 //    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_002_right_MI_filtered_07_40_Averaged_");
 
+    //*************************** BCI lefti right in one file finger tapping **************************//
+
+    //time read around events - note: trigger point is the pressing of the button, not the atual
+    float tmin = -1.0f;
+    float tmax = 1.0f;
+
+    //Filtered 7-14Hz left MI
+    QString t_sRawFileNameRel  ("/Original/EEG_data_001_voluntary_left_right_tapping_raw.fif");
+    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_002_base_filtered_7_14_raw-cov.fif");
+    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_voluntary_left_right_tapping_234_raw-eve.fif");
+    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_left_MI_filtered_7_14_Averaged_");
+    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_voluntary_right_tapping_raw_Averaged_");
 
     //##########################################################################################################################
 
@@ -401,7 +413,7 @@ int main(int argc, char *argv[])
     QFile t_fileCov(t_sCovFileNameRel.prepend(data_location));
     QString t_sEventName = t_sEventFileNameRel.prepend(data_location);
 
-    qint32 event = 1; //254-right trigger | 253-left trigger | 252-beep
+    qint32 event = 254; //254-right trigger | 253-left trigger | 252-beep
 
     qint32 k, p;
     fiff_int_t dest_comp = 0;
