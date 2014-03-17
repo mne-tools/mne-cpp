@@ -108,11 +108,11 @@ typedef struct Pair
 */
 class INVERSESHARED_EXPORT RapMusic : public IInverseAlgorithm
 {
-    //*************************************************************************************************************
-    //=============================================================================================================
+public:
+    //*********************************************************************************************************
+    //=========================================================================================================
     // TYPEDEFS
-    //=============================================================================================================
-
+    //=========================================================================================================
     typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> MatrixXT;  /**< Defines Eigen::Matrix<T, Eigen::Dynamic,
                                                                              Eigen::Dynamic> as MatrixXT type. */
     typedef Eigen::Matrix<double, Eigen::Dynamic, 6> MatrixX6T;              /**< Defines Eigen::Matrix<T, Eigen::Dynamic,
@@ -126,7 +126,6 @@ class INVERSESHARED_EXPORT RapMusic : public IInverseAlgorithm
     typedef Eigen::Matrix<double, 6, 1> Vector6T;                            /**< Defines Eigen::Matrix<T, 6, 1>
                                                                              as Vector6T type. */
 
-public:
 
     //=========================================================================================================
     /**
@@ -328,7 +327,6 @@ protected:
                         double p_valCor,
                         QList< DipolePair<double> > &p_RapDipoles);
 
-private:
     MNEForwardSolution m_ForwardSolution; /**< The Forward operator which should be scanned through*/
 
     int m_iN;               /**< Number of Sources to find*/
