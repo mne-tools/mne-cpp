@@ -112,37 +112,27 @@ void BCI::init()
 
     // Output streams
     m_pBCIOutputOne = PluginOutputData<NewRealTimeSampleArray>::create(this, "ControlSignal", "BCI output data One");
-    m_pBCIOutputOne->data()->setArraySize(1); //()
-    m_pBCIOutputOne->data()->setMaxValue(10);
-    m_pBCIOutputOne->data()->setMinValue(-10);
+    m_pBCIOutputOne->data()->setArraySize(1);
     m_pBCIOutputOne->data()->setName("Boundary");
     m_outputConnectors.append(m_pBCIOutputOne);
 
     m_pBCIOutputTwo = PluginOutputData<NewRealTimeSampleArray>::create(this, "ControlSignal", "BCI output data Two");
     m_pBCIOutputTwo->data()->setArraySize(1);
-    m_pBCIOutputTwo->data()->setMaxValue(15);//(5e-07);
-    m_pBCIOutputTwo->data()->setMinValue(0);//(-5e-07);
     m_pBCIOutputTwo->data()->setName("Left electrode var");
     m_outputConnectors.append(m_pBCIOutputTwo);
 
     m_pBCIOutputThree = PluginOutputData<NewRealTimeSampleArray>::create(this, "ControlSignal", "BCI output data Three");
     m_pBCIOutputThree->data()->setArraySize(1);
-    m_pBCIOutputThree->data()->setMaxValue(15);//(5e-07);
-    m_pBCIOutputThree->data()->setMinValue(0);//(-5e-07);
     m_pBCIOutputThree->data()->setName("Right electrode var");
     m_outputConnectors.append(m_pBCIOutputThree);
 
     m_pBCIOutputFour = PluginOutputData<NewRealTimeSampleArray>::create(this, "ControlSignal", "BCI output data Four");
     m_pBCIOutputFour->data()->setArraySize(1);
-    m_pBCIOutputFour->data()->setMaxValue(7e-05);
-    m_pBCIOutputFour->data()->setMinValue(-7e-05);
     m_pBCIOutputFour->data()->setName("Left electrode");
     m_outputConnectors.append(m_pBCIOutputFour);
 
     m_pBCIOutputFive = PluginOutputData<NewRealTimeSampleArray>::create(this, "ControlSignal", "BCI output data Five");
     m_pBCIOutputFive->data()->setArraySize(1);
-    m_pBCIOutputFive->data()->setMaxValue(7e-05);
-    m_pBCIOutputFive->data()->setMinValue(-7e-05);
     m_pBCIOutputFive->data()->setName("Right electrode");
     m_outputConnectors.append(m_pBCIOutputFive);
 
@@ -162,9 +152,13 @@ void BCI::init()
     m_bUseArtefactThresholdReduction = false;
     m_dSlidingWindowSize = 0.5;
     m_dTimeBetweenWindows = 0.5;
+    m_dDisplayRangeBoundary = 0.07;
+    m_dDisplayRangeVariances = 0.05;
+    m_dDisplayRangeElectrodes = 0.07;
     m_iNumberFeatures = 1;
     m_dThresholdValue = 30;
     m_iNumberFeaturesToDisplay = 30;
+    m_iFeatureCalculationType = 0;
 
     // Intitalise feature selection
     m_slChosenFeatureSensor << "LA4" << "RA4"; //<< "TEST";
@@ -222,6 +216,22 @@ bool BCI::start()
     m_pFiffInfo_Sensor = FiffInfo::SPtr();
 
     m_bFillSensorWindowFirstTime = true;
+
+    // Set display ranges for output channels
+    m_pBCIOutputOne->data()->setMaxValue(m_dDisplayRangeBoundary*1e-05);
+    m_pBCIOutputOne->data()->setMinValue(-m_dDisplayRangeBoundary*1e-05);
+
+    m_pBCIOutputTwo->data()->setMaxValue(m_dDisplayRangeVariances*1e-05);
+    m_pBCIOutputTwo->data()->setMinValue(-m_dDisplayRangeVariances*1e-05);
+
+    m_pBCIOutputThree->data()->setMaxValue(m_dDisplayRangeVariances*1e-05);
+    m_pBCIOutputThree->data()->setMinValue(-m_dDisplayRangeVariances*1e-05);
+
+    m_pBCIOutputFour->data()->setMaxValue(m_dDisplayRangeElectrodes*1e-05);
+    m_pBCIOutputFour->data()->setMinValue(-m_dDisplayRangeElectrodes*1e-05);
+
+    m_pBCIOutputFive->data()->setMaxValue(m_dDisplayRangeElectrodes*1e-05);
+    m_pBCIOutputFive->data()->setMinValue(-m_dDisplayRangeElectrodes*1e-05);
 
     m_bIsRunning = true;
 
@@ -418,8 +428,18 @@ QPair< int,QList<double> > BCI::applyFeatureCalcConcurrentlyOnSensorLevel(const 
     QList<double> features;
 
     // TODO: Divide into subsignals
-    features << data.squaredNorm(); // Compute variance
-    //features << abs(log10(data.squaredNorm())); // Compute log of variance
+    switch(m_iFeatureCalculationType)
+    {
+        case 0:
+            features << data.squaredNorm(); // Compute variance
+            break;
+        case 1:
+            features << abs(log10(data.squaredNorm())); // Compute log of variance
+            break;
+        default:
+            features << data.squaredNorm(); // Compute variance
+            break;
+    }
 
     return QPair< int,QList<double> >(chdata.first, features);
 }

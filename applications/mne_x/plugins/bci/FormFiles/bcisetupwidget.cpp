@@ -82,6 +82,12 @@ BCISetupWidget::BCISetupWidget(BCI* pBCI, QWidget* parent)
             this, &BCISetupWidget::setGeneralOptions);
     connect(ui.m_SpinBox_NumberFeaturesToDisplay, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
             this, &BCISetupWidget::setGeneralOptions);
+    connect(ui.m_doubleSpinBox_Boundary, static_cast<void (QDoubleSpinBox::*)()>(&QDoubleSpinBox::editingFinished),
+            this, &BCISetupWidget::setGeneralOptions);
+    connect(ui.m_doubleSpinBox_Variances, static_cast<void (QDoubleSpinBox::*)()>(&QDoubleSpinBox::editingFinished),
+            this, &BCISetupWidget::setGeneralOptions);
+    connect(ui.m_doubleSpinBox_Electrodes, static_cast<void (QDoubleSpinBox::*)()>(&QDoubleSpinBox::editingFinished),
+            this, &BCISetupWidget::setGeneralOptions);
 
     // Connect processing options
     connect(ui.m_checkBox_SubtractMean, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
@@ -98,6 +104,9 @@ BCISetupWidget::BCISetupWidget(BCI* pBCI, QWidget* parent)
             this, &BCISetupWidget::setProcessingOptions);
 
     // Connect classification options
+    connect(ui.m_comboBox_featureCalculationType, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+            this, &BCISetupWidget::setClassificationOptions);
+
     connect(ui.m_pushButton_LoadSensorBoundary, &QPushButton::released,
             this, &BCISetupWidget::changeLoadSensorBoundary);
     connect(ui.m_pushButton_LoadSourceBoundary, &QPushButton::released,
@@ -155,6 +164,9 @@ void BCISetupWidget::initGui()
     ui.m_checkBox_UseSourceData->setChecked(m_pBCI->m_bUseSourceData);
     ui.m_checkBox_DisplayFeatures->setChecked(m_pBCI->m_bDisplayFeatures);
     ui.m_SpinBox_NumberFeaturesToDisplay->setValue(m_pBCI->m_iNumberFeaturesToDisplay);
+    ui.m_doubleSpinBox_Boundary->setValue(m_pBCI->m_dDisplayRangeBoundary);
+    ui.m_doubleSpinBox_Variances->setValue(m_pBCI->m_dDisplayRangeVariances);
+    ui.m_doubleSpinBox_Electrodes->setValue(m_pBCI->m_dDisplayRangeElectrodes);
 
     // Processing options
     ui.m_checkBox_SubtractMean->setChecked(m_pBCI->m_bSubtractMean);
@@ -174,6 +186,7 @@ void BCISetupWidget::initGui()
     ui.m_label_TimeNeededForResultsDisplay->setText(ui.m_label_TimeNeededForResultsDisplay->text().append(" s"));
 
     // Classification boundaries
+    ui.m_comboBox_featureCalculationType->setCurrentIndex(m_pBCI->m_iFeatureCalculationType);
     QString temp = m_pBCI->m_qStringResourcePath;
     temp.append(QString("LDA_linear_boundary_Sensor.txt"));
     ui.m_lineEdit_SensorBoundary->setText(temp);
@@ -201,6 +214,9 @@ void BCISetupWidget::setGeneralOptions()
     m_pBCI->m_bUseSourceData = ui.m_checkBox_UseSourceData->isChecked();
     m_pBCI->m_bDisplayFeatures = ui.m_checkBox_DisplayFeatures->isChecked();
     m_pBCI->m_iNumberFeaturesToDisplay = ui.m_SpinBox_NumberFeaturesToDisplay->value();
+    m_pBCI->m_dDisplayRangeBoundary = ui.m_doubleSpinBox_Boundary->value();
+    m_pBCI->m_dDisplayRangeVariances = ui.m_doubleSpinBox_Variances->value();
+    m_pBCI->m_dDisplayRangeElectrodes = ui.m_doubleSpinBox_Electrodes->value();
 }
 
 
@@ -401,6 +417,14 @@ void BCISetupWidget::setFilterOptions()
     m_pBCI->m_dFilterUpperBound = ui.m_doubleSpinBox_FilterUpperBound->value();
     m_pBCI->m_iFilterOrder = ui.m_SpinBox_FilterOrder->value();
     m_pBCI->m_dParcksWidth = ui.m_doubleSpinBox_ParcksWidth->value();
+}
+
+
+//*************************************************************************************************************
+
+void BCISetupWidget::setClassificationOptions()
+{
+    m_pBCI->m_iFeatureCalculationType = ui.m_comboBox_featureCalculationType->currentIndex();
 }
 
 
