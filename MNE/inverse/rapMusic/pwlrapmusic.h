@@ -117,15 +117,15 @@ public:
 
     virtual ~PwlRapMusic();
 
-    virtual MNESourceEstimate calculateInverse(const MatrixXd& p_matMeasurement, QList< DipolePair<double> > &p_RapDipoles);
-
     virtual MNESourceEstimate calculateInverse(const FiffEvoked &p_fiffEvoked, bool pick_normal = false);
 
-    virtual MNESourceEstimate calculateInverse(const MatrixXd &data, float tmin, float tstep) const;
+    virtual MNESourceEstimate calculateInverse(const MatrixXd &data, float tmin, float tstep);
 
-    int PowellOffset(int p_iRow, int p_iNumPoints);
+    virtual MNESourceEstimate calculateInverse(const MatrixXd& p_matMeasurement, QList< DipolePair<double> > &p_RapDipoles);
 
-    void PowellIdxVec(int p_iRow, int p_iNumPoints, Eigen::VectorXi& p_pVecElements);
+    static int PowellOffset(int p_iRow, int p_iNumPoints);
+
+    static void PowellIdxVec(int p_iRow, int p_iNumPoints, Eigen::VectorXi& p_pVecElements);
 
 
     virtual const char* getName() const;
