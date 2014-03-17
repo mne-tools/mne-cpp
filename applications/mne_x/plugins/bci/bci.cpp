@@ -152,9 +152,9 @@ void BCI::init()
     m_bUseArtefactThresholdReduction = false;
     m_dSlidingWindowSize = 0.5;
     m_dTimeBetweenWindows = 0.5;
-    m_dDisplayRangeBoundary = 0.07;
-    m_dDisplayRangeVariances = 0.05;
-    m_dDisplayRangeElectrodes = 0.07;
+    m_dDisplayRangeBoundary = 15;
+    m_dDisplayRangeVariances = 5;
+    m_dDisplayRangeElectrodes = 7;
     m_iNumberFeatures = 1;
     m_dThresholdValue = 30;
     m_iNumberFeaturesToDisplay = 30;
@@ -217,37 +217,37 @@ bool BCI::start()
 
     m_bFillSensorWindowFirstTime = true;
 
-//    // Set display ranges for output channels
-//    m_pBCIOutputOne->data()->setMaxValue(m_dDisplayRangeBoundary*1e-05);
-//    m_pBCIOutputOne->data()->setMinValue(0);
-
-//    m_pBCIOutputTwo->data()->setMaxValue(m_dDisplayRangeVariances*1e-05);
-//    m_pBCIOutputTwo->data()->setMinValue(-m_dDisplayRangeVariances*1e-05);
-
-//    m_pBCIOutputThree->data()->setMaxValue(m_dDisplayRangeVariances*1e-05);
-//    m_pBCIOutputThree->data()->setMinValue(-m_dDisplayRangeVariances*1e-05);
-
-//    m_pBCIOutputFour->data()->setMaxValue(m_dDisplayRangeElectrodes*1e-05);
-//    m_pBCIOutputFour->data()->setMinValue(-m_dDisplayRangeElectrodes*1e-05);
-
-//    m_pBCIOutputFive->data()->setMaxValue(m_dDisplayRangeElectrodes*1e-05);
-//    m_pBCIOutputFive->data()->setMinValue(-m_dDisplayRangeElectrodes*1e-05);
-
-    // variance
-    m_pBCIOutputOne->data()->setMaxValue(15);
+    // Set display ranges for output channels
+    m_pBCIOutputOne->data()->setMaxValue(m_dDisplayRangeBoundary);
     m_pBCIOutputOne->data()->setMinValue(0);
 
-    m_pBCIOutputTwo->data()->setMaxValue(10e-08);
+    m_pBCIOutputTwo->data()->setMaxValue(m_dDisplayRangeVariances);
     m_pBCIOutputTwo->data()->setMinValue(0);
 
-    m_pBCIOutputThree->data()->setMaxValue(10e-08);
+    m_pBCIOutputThree->data()->setMaxValue(m_dDisplayRangeVariances);
     m_pBCIOutputThree->data()->setMinValue(0);
 
-    m_pBCIOutputFour->data()->setMaxValue(1e-05);
-    m_pBCIOutputFour->data()->setMinValue(-1e-05);
+    m_pBCIOutputFour->data()->setMaxValue(m_dDisplayRangeElectrodes);
+    m_pBCIOutputFour->data()->setMinValue(-m_dDisplayRangeElectrodes);
 
-    m_pBCIOutputFive->data()->setMaxValue(1e-05);
-    m_pBCIOutputFive->data()->setMinValue(-1e-05);
+    m_pBCIOutputFive->data()->setMaxValue(m_dDisplayRangeElectrodes);
+    m_pBCIOutputFive->data()->setMinValue(-m_dDisplayRangeElectrodes);
+
+//    // variance
+//    m_pBCIOutputOne->data()->setMaxValue(15);
+//    m_pBCIOutputOne->data()->setMinValue(0);
+
+//    m_pBCIOutputTwo->data()->setMaxValue(10e-08);
+//    m_pBCIOutputTwo->data()->setMinValue(0);
+
+//    m_pBCIOutputThree->data()->setMaxValue(10e-08);
+//    m_pBCIOutputThree->data()->setMinValue(0);
+
+//    m_pBCIOutputFour->data()->setMaxValue(1e-05);
+//    m_pBCIOutputFour->data()->setMinValue(-1e-05);
+
+//    m_pBCIOutputFive->data()->setMaxValue(1e-05);
+//    m_pBCIOutputFive->data()->setMinValue(-1e-05);
 
 //    // log variance
 //    m_pBCIOutputOne->data()->setMaxValue(5);
@@ -579,7 +579,7 @@ void BCI::run()
 {
     while(m_bIsRunning)
     {
-        // Deide which data to use
+        // Decide which data to use - sensor or source level data
         if(m_bUseSensorData)
             BCIOnSensorLevel();
         else
