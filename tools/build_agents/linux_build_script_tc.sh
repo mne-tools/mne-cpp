@@ -6,7 +6,7 @@ qmake -r
 make -j4
 
 # user package
-tar cfvz binaries_only_unix.tar.gz bin lib
+tar cfvz binaries_only_linux.tar.gz bin lib
 
 # development package
-tar cfvz binaries_all_unix.tar.gz *
+tar cfvz binaries_all_linux.tar.gz *
