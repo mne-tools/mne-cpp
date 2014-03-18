@@ -328,6 +328,60 @@ MNESourceEstimate RapMusic::calculateInverse(const FiffEvoked &p_fiffEvoked, boo
 
 //*************************************************************************************************************
 
+MNESourceEstimate RapMusic::calculateInverse(const MatrixXd &data, float tmin, float tstep) const
+{
+    MNESourceEstimate p_sourceEstimate;
+
+    if(data.rows() != m_iNumChannels)
+    {
+        std::cout << "Number of FiffEvoked channels (" << data.rows() << ") doesn't match the number of channels (" << m_iNumChannels << ") of the forward solution." << std::endl;
+        return p_sourceEstimate;
+    }
+    else
+        std::cout << "Number of FiffEvoked channels (" << data.rows() << ") matchs the number of channels (" << m_iNumChannels << ") of the forward solution." << std::endl;
+
+    //
+    // Rap MUSIC Source estimate
+    //
+    p_sourceEstimate.data = MatrixXd::Zero(m_ForwardSolution.nsource, data.cols());
+
+    //Results
+    p_sourceEstimate.vertices = VectorXi(m_ForwardSolution.src[0].vertno.size() + m_ForwardSolution.src[1].vertno.size());
+    p_sourceEstimate.vertices << m_ForwardSolution.src[0].vertno, m_ForwardSolution.src[1].vertno;
+
+    p_sourceEstimate.times = RowVectorXf::Zero(data.cols());
+    p_sourceEstimate.times[0] = tmin;
+    for(qint32 i = 1; i < p_sourceEstimate.times.size(); ++i)
+        p_sourceEstimate.times[i] = p_sourceEstimate.times[i-1] + tstep;
+    p_sourceEstimate.tmin = tmin;
+    p_sourceEstimate.tstep = tstep;
+
+    QList< DipolePair<double> > t_RapDipoles;
+    calculateInverse(data, t_RapDipoles);
+
+    for(qint32 i = 0; i < t_RapDipoles.size(); ++i)
+    {
+        double dip1 = sqrt( pow(t_RapDipoles[i].m_Dipole1.phi_x(),2) +
+                            pow(t_RapDipoles[i].m_Dipole1.phi_y(),2) +
+                            pow(t_RapDipoles[i].m_Dipole1.phi_z(),2) ) * t_RapDipoles[i].m_vCorrelation;
+
+        double dip2 = sqrt( pow(t_RapDipoles[i].m_Dipole2.phi_x(),2) +
+                            pow(t_RapDipoles[i].m_Dipole2.phi_y(),2) +
+                            pow(t_RapDipoles[i].m_Dipole2.phi_z(),2) ) * t_RapDipoles[i].m_vCorrelation;
+
+        RowVectorXd dip1Time = RowVectorXd::Constant(data.cols(), dip1);
+        RowVectorXd dip2Time = RowVectorXd::Constant(data.cols(), dip2);
+
+        p_sourceEstimate.data.block(t_RapDipoles[i].m_iIdx1, 0, 1, data.cols()) = dip1Time;
+        p_sourceEstimate.data.block(t_RapDipoles[i].m_iIdx2, 0, 1, data.cols()) = dip2Time;
+    }
+
+    return p_sourceEstimate;
+}
+
+
+//*************************************************************************************************************
+
 MNESourceEstimate RapMusic::calculateInverse(const MatrixXd& p_matMeasurement, QList< DipolePair<double> > &p_RapDipoles) const
 {
     MNESourceEstimate p_SourceEstimate;

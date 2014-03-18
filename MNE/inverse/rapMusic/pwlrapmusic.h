@@ -117,8 +117,31 @@ public:
 
     virtual ~PwlRapMusic();
 
+    //=========================================================================================================
+    /**
+    *
+    * Note: Since they are virtual they have to be implemented to be called. Even so the base class RAP MUSIC
+    *       implementation is called.
+    *
+    * @param[in] p_fiffEvoked
+    * @param[in] pick_normal
+    *
+    * @return
+    */
     virtual MNESourceEstimate calculateInverse(const FiffEvoked &p_fiffEvoked, bool pick_normal = false);
 
+    //=========================================================================================================
+    /**
+    *
+    * Note: Since they are virtual they have to be implemented to be called. Even so the base class RAP MUSIC
+    *       implementation is called.
+    *
+    * @param[in] data
+    * @param[in] tmin
+    * @param[in] tstep
+    *
+    * @return
+    */
     virtual MNESourceEstimate calculateInverse(const MatrixXd &data, float tmin, float tstep) const;
 
     virtual MNESourceEstimate calculateInverse(const MatrixXd& p_matMeasurement, QList< DipolePair<double> > &p_RapDipoles) const;
@@ -126,7 +149,6 @@ public:
     static int PowellOffset(int p_iRow, int p_iNumPoints);
 
     static void PowellIdxVec(int p_iRow, int p_iNumPoints, Eigen::VectorXi& p_pVecElements);
-
 
     virtual const char* getName() const;
 
