@@ -119,7 +119,7 @@ int main(int argc, char *argv[])
     float stcOverlap = 0.0f;
 
     qint32 startSample = 0;
-    qint32 numSample = 1000;
+    qint32 numSample = 20000;
 
     bool in_samples = true;
     bool keep_comp = true;
@@ -163,37 +163,6 @@ int main(int argc, char *argv[])
 //    }
 
     MNEForwardSolution t_SelectFwd = t_Fwd.pick_regions(t_qListLabelSelection);
-
-//    std::cout << "t_SelectFwd.nsource " << t_SelectFwd.nsource << std::endl;
-
-//    std::cout << "t_SelectFwd.sol->data.cols() " << t_SelectFwd.sol->data.cols() << std::endl;
-//    std::cout << "t_SelectFwd.sol->ncol " << t_SelectFwd.sol->ncol << std::endl;
-//    qDebug() << "t_SelectFwd.sol->col_names" << t_SelectFwd.sol->col_names;
-
-//    std::cout << "t_SelectFwd.sol_grad->data.cols() " << t_SelectFwd.sol_grad->data.cols() << std::endl;
-//    std::cout << "t_SelectFwd.sol_grad->data.rows() " << t_SelectFwd.sol_grad->data.rows() << std::endl;
-//    std::cout << "t_SelectFwd.sol_grad->ncol " << t_SelectFwd.sol_grad->ncol << std::endl;
-//    std::cout << "t_SelectFwd.sol_grad->nrow " << t_SelectFwd.sol_grad->nrow << std::endl;
-//    qDebug() << "t_SelectFwd.sol_grad->col_names" << t_SelectFwd.sol_grad->col_names;
-
-//    std::cout << "t_SelectFwd.source_rr.rows() " << t_SelectFwd.source_rr.rows() << std::endl;
-//    std::cout << "t_SelectFwd.source_rr.cols() " << t_SelectFwd.source_rr.cols() << std::endl;
-//    std::cout << "t_SelectFwd.source_nn.rows() " << t_SelectFwd.source_nn.rows() << std::endl;
-//    std::cout << "t_SelectFwd.source_nn.cols() " << t_SelectFwd.source_nn.cols() << std::endl;
-
-
-    std::cout << "t_SelectFwd.src[0].np " << t_SelectFwd.src[0].np << std::endl;
-
-    std::cout << "t_SelectFwd.src[0].nuse " << t_SelectFwd.src[0].nuse << std::endl;
-    std::cout << "t_SelectFwd.src[0].inuse.size() " << t_SelectFwd.src[0].inuse.size() << std::endl;
-    std::cout << "t_SelectFwd.src[0].vertno.size() " << t_SelectFwd.src[0].vertno.size() << std::endl;
-    std::cout << "t_SelectFwd.src[0].nuse_tri " << t_SelectFwd.src[0].nuse_tri << std::endl;
-    std::cout << "t_SelectFwd.src[0].use_tris.rows() " << t_SelectFwd.src[0].use_tris.rows() << std::endl;
-
-    std::cout << "t_SelectFwd.src[0].use_tri_cent.rows() " << t_SelectFwd.src[0].use_tri_cent.rows() << std::endl;
-    std::cout << "t_SelectFwd.src[0].use_tri_nn.rows() " << t_SelectFwd.src[0].use_tri_nn.rows() << std::endl;
-    std::cout << "t_SelectFwd.src[0].use_tri_area.rows() " << t_SelectFwd.src[0].use_tri_area.rows() << std::endl;
-
 
     //
     //   Setup for reading the raw data
@@ -292,7 +261,7 @@ int main(int argc, char *argv[])
     //
     // Cluster forward solution;
     //
-    MNEForwardSolution t_clusteredFwd = t_SelectFwd.cluster_forward_solution_ccr(t_annotationSet, 20);//40);
+    MNEForwardSolution t_clusteredFwd = t_SelectFwd.cluster_forward_solution_ccr(t_annotationSet, 20);//t_Fwd.cluster_forward_solution_ccr(t_annotationSet, 20);//40);
 
     //
     // Compute inverse solution
@@ -418,5 +387,5 @@ int main(int argc, char *argv[])
         sourceEstimate.write(t_fileClusteredStc);
     }
 
-    return a.exec();//1;//a.exec();
+    return a.exec();
 }
