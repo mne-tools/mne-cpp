@@ -28,7 +28,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Example of the computation of a single trial clustered inverse rap music
+* @brief    Example of the computation of a roi clustered inverse rap music
 *
 */
 
@@ -39,14 +39,12 @@
 //=============================================================================================================
 
 #include <fs/label.h>
-#include <fs/surface.h>
+#include <fs/surfaceset.h>
 #include <fs/annotationset.h>
 
 #include <fiff/fiff_evoked.h>
 #include <fiff/fiff.h>
 #include <mne/mne.h>
-
-#include <mne/mne_epoch_data_list.h>
 
 #include <mne/mne_sourceestimate.h>
 #include <inverse/rapMusic/pwlrapmusic.h>
@@ -121,7 +119,7 @@ int main(int argc, char *argv[])
     float stcOverlap = 0.0f;
 
     qint32 startSample = 0;
-    qint32 numSample = 100000;
+    qint32 numSample = 1000;
 
     bool in_samples = true;
     bool keep_comp = true;
@@ -142,6 +140,60 @@ int main(int argc, char *argv[])
     MNEForwardSolution t_Fwd(t_fileFwd);
     if(t_Fwd.isEmpty())
         return 1;
+
+    QList<Label> t_qListLabels;
+    QList<RowVector4i> t_qListRGBAs;
+
+    //ToDo overload toLabels using instead of t_surfSet rr of MNESourceSpace
+    t_annotationSet.toLabels(t_surfSet, t_qListLabels, t_qListRGBAs);
+
+    QList<Label> t_qListLabelSelection;
+
+    //LH
+    t_qListLabelSelection << t_qListLabels[28] << t_qListLabels[29] << t_qListLabels[45];
+    //RH
+    t_qListLabelSelection << t_qListLabels[103] << t_qListLabels[104] << t_qListLabels[120];
+
+//    std::cout << "t_qListLabelsTest.size " << t_qListLabelsTest.size() << std::endl;
+
+//    for(qint32 i = 0; i < t_qListLabelSelection.size(); ++i)
+//    {
+//        qDebug() << "Num" << i << t_qListLabelSelection[i].name;
+//        std::cout << t_qListLabelSelection[i].hemi << std::endl;
+//    }
+
+    MNEForwardSolution t_SelectFwd = t_Fwd.pick_regions(t_qListLabelSelection);
+
+//    std::cout << "t_SelectFwd.nsource " << t_SelectFwd.nsource << std::endl;
+
+//    std::cout << "t_SelectFwd.sol->data.cols() " << t_SelectFwd.sol->data.cols() << std::endl;
+//    std::cout << "t_SelectFwd.sol->ncol " << t_SelectFwd.sol->ncol << std::endl;
+//    qDebug() << "t_SelectFwd.sol->col_names" << t_SelectFwd.sol->col_names;
+
+//    std::cout << "t_SelectFwd.sol_grad->data.cols() " << t_SelectFwd.sol_grad->data.cols() << std::endl;
+//    std::cout << "t_SelectFwd.sol_grad->data.rows() " << t_SelectFwd.sol_grad->data.rows() << std::endl;
+//    std::cout << "t_SelectFwd.sol_grad->ncol " << t_SelectFwd.sol_grad->ncol << std::endl;
+//    std::cout << "t_SelectFwd.sol_grad->nrow " << t_SelectFwd.sol_grad->nrow << std::endl;
+//    qDebug() << "t_SelectFwd.sol_grad->col_names" << t_SelectFwd.sol_grad->col_names;
+
+//    std::cout << "t_SelectFwd.source_rr.rows() " << t_SelectFwd.source_rr.rows() << std::endl;
+//    std::cout << "t_SelectFwd.source_rr.cols() " << t_SelectFwd.source_rr.cols() << std::endl;
+//    std::cout << "t_SelectFwd.source_nn.rows() " << t_SelectFwd.source_nn.rows() << std::endl;
+//    std::cout << "t_SelectFwd.source_nn.cols() " << t_SelectFwd.source_nn.cols() << std::endl;
+
+
+    std::cout << "t_SelectFwd.src[0].np " << t_SelectFwd.src[0].np << std::endl;
+
+    std::cout << "t_SelectFwd.src[0].nuse " << t_SelectFwd.src[0].nuse << std::endl;
+    std::cout << "t_SelectFwd.src[0].inuse.size() " << t_SelectFwd.src[0].inuse.size() << std::endl;
+    std::cout << "t_SelectFwd.src[0].vertno.size() " << t_SelectFwd.src[0].vertno.size() << std::endl;
+    std::cout << "t_SelectFwd.src[0].nuse_tri " << t_SelectFwd.src[0].nuse_tri << std::endl;
+    std::cout << "t_SelectFwd.src[0].use_tris.rows() " << t_SelectFwd.src[0].use_tris.rows() << std::endl;
+
+    std::cout << "t_SelectFwd.src[0].use_tri_cent.rows() " << t_SelectFwd.src[0].use_tri_cent.rows() << std::endl;
+    std::cout << "t_SelectFwd.src[0].use_tri_nn.rows() " << t_SelectFwd.src[0].use_tri_nn.rows() << std::endl;
+    std::cout << "t_SelectFwd.src[0].use_tri_area.rows() " << t_SelectFwd.src[0].use_tri_area.rows() << std::endl;
+
 
     //
     //   Setup for reading the raw data
@@ -240,7 +292,7 @@ int main(int argc, char *argv[])
     //
     // Cluster forward solution;
     //
-    MNEForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution_ccr(t_annotationSet, 20);//40);
+    MNEForwardSolution t_clusteredFwd = t_SelectFwd.cluster_forward_solution_ccr(t_annotationSet, 20);//40);
 
     //
     // Compute inverse solution
@@ -326,30 +378,6 @@ int main(int argc, char *argv[])
 
     //Source Estimate end
     //########################################################################################
-
-//    //only one time point - P100
-//    qint32 sample = 0;
-//    for(qint32 i = 0; i < sourceEstimate.times.size(); ++i)
-//    {
-//        if(sourceEstimate.times(i) >= 0)
-//        {
-//            sample = i;
-//            break;
-//        }
-//    }
-//    sample += (qint32)ceil(0.106/sourceEstimate.tstep); //100ms
-//    sourceEstimate = sourceEstimate.reduce(sample, 1);
-
-
-
-
-
-
-    QList<Label> t_qListLabels;
-    QList<RowVector4i> t_qListRGBAs;
-
-    //ToDo overload toLabels using instead of t_surfSet rr of MNESourceSpace
-    t_annotationSet.toLabels(t_surfSet, t_qListLabels, t_qListRGBAs);
 
     InverseView view(t_pwlRapMusic.getSourceSpace(), t_qListLabels, t_qListRGBAs, 24, true, false, false);//true);
 

@@ -297,6 +297,16 @@ public:
 
     //=========================================================================================================
     /**
+    * Reduces a forward solution to selected regions
+    *
+    * @param[in] p_qListLabels  ROIs
+    *
+    * @return the reduced forward solution
+    */
+    MNEForwardSolution pick_regions(const QList<Label> &p_qListLabels) const;
+
+    //=========================================================================================================
+    /**
     * mne.fiff.pick_types_forward
     *
     * Pick by channel type and names from a forward operator
@@ -410,16 +420,6 @@ public:
     * @param[in] info       Fiff information
     */
     static void restrict_gain_matrix(MatrixXd &G, const FiffInfo &info);
-
-    //=========================================================================================================
-    /**
-    * Reduces a forward solution to selected regions
-    *
-    * @param[in] p_qListLabels  ROIs
-    *
-    * @return the reduced forward solution
-    */
-    MNEForwardSolution selectRegions(const QList<Label> &p_qListLabels) const;
 
     //=========================================================================================================
     /**

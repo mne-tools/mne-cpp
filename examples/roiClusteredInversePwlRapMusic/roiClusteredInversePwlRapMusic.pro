@@ -1,15 +1,14 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     examples.pro
+# @file     roiClusteredInversePwlRapMusic.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-#           Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
-# @date     July, 2012
+# @date     March, 2014
 #
 # @section  LICENSE
 #
-# Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2014, Christoph Dinh. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -30,44 +29,55 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds all examples of the mne-cpp project.
+# @brief    Builds example for roi clustered inverse rap music
 #
 #--------------------------------------------------------------------------------------------------------------
 
-include(../mne-cpp.pri)
+include(../../mne-cpp.pri)
 
-TEMPLATE = subdirs
+TEMPLATE = app
 
-SUBDIRS += \
-    readRaw \
-    readWriteRaw \
-    readFwd \
-    readEpochs \
-    readEvoked \
-    computeInverse \
-    computeInverseRaw \
-    makeInverseOperator \
-    findEvoked \
-    evokedGradAmp \
-    cancelNoise \
-    fiffIO \
-    matchingPursuit
+VERSION = $${MNE_CPP_VERSION}
 
-contains(MNECPP_CONFIG, isGui) {
-    qtHaveModule(3d) {
-        message(Qt3D available: readFwdDisp3D configured!)
-        SUBDIRS += \
-            clusteredInverse \
-            rawClusteredInverse \
-            rawClusteredInverseEEG \
-            readFwdDisp3D \
-            plotSurfaces \
-            lnt \
-            computeInverseRapMusic \
-            rawClusteredInverseRapMusic \
-            computeInversePwlRapMusic \
-            rawClusteredInversePwlRapMusic \
-            stClusteredInversePwlRapMusic  \
-            roiClusteredInversePwlRapMusic
-    }
+QT       += 3d
+
+CONFIG   += console
+CONFIG   -= app_bundle
+
+TARGET = roiClusteredInversePwlRapMusic
+
+CONFIG(debug, debug|release) {
+    TARGET = $$join(TARGET,,,d)
 }
+
+LIBS += -L$${MNE_LIBRARY_DIR}
+CONFIG(debug, debug|release) {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
+            -lMNE$${MNE_LIB_VERSION}Utilsd \
+            -lMNE$${MNE_LIB_VERSION}Fsd \
+            -lMNE$${MNE_LIB_VERSION}Fiffd \
+            -lMNE$${MNE_LIB_VERSION}Mned \
+            -lMNE$${MNE_LIB_VERSION}Inversed \
+            -lMNE$${MNE_LIB_VERSION}Dispd \
+            -lMNE$${MNE_LIB_VERSION}Disp3Dd
+}
+else {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
+            -lMNE$${MNE_LIB_VERSION}Utils \
+            -lMNE$${MNE_LIB_VERSION}Fs \
+            -lMNE$${MNE_LIB_VERSION}Fiff \
+            -lMNE$${MNE_LIB_VERSION}Mne \
+            -lMNE$${MNE_LIB_VERSION}Inverse \
+            -lMNE$${MNE_LIB_VERSION}Disp \
+            -lMNE$${MNE_LIB_VERSION}Disp3D
+}
+
+DESTDIR =  $${MNE_BINARY_DIR}
+
+SOURCES += \
+        main.cpp \
+
+HEADERS += \
+
+INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
+INCLUDEPATH += $${MNE_INCLUDE_DIR}
