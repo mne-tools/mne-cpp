@@ -249,7 +249,7 @@ bool DacqServer::getMeasInfo(FiffInfo& p_fiffInfo)
     for(qint32 i = 0; i < p_fiffInfo.chs.size(); ++i)
         p_fiffInfo.ch_names.append(p_fiffInfo.chs[i].ch_name);
 
-    printf("[done]\r\n", p_fiffInfo.chs.size());
+    printf("[done]\r\n %d", p_fiffInfo.chs.size());
     
     printf("measurement info read.\r\n");   
 
