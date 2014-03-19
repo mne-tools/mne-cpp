@@ -67,7 +67,9 @@ SOURCES += \
     ioutils.cpp \
     asaelc.cpp \
     parksmcclellan.cpp \
-    mp\mp.cpp
+    mp/adaptivemp.cpp \
+    mp/atom.cpp \
+    mp/mp.cpp
 
 HEADERS += \
     kmeans.h\
@@ -76,7 +78,9 @@ HEADERS += \
     ioutils.h \
     asaelc.h \
     parksmcclellan.h \
-    mp\mp.h
+    mp/adaptivemp.h \
+    mp/atom.h \
+    mp/mp.h
 
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}

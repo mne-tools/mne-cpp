@@ -40,6 +40,9 @@ TEMPLATE = app
 VERSION = $${MNE_CPP_VERSION}
 
 QT -= gui
+QT += widgets
+QT += network core widgets concurrent
+
 
 CONFIG   += console
 CONFIG   -= app_bundle
@@ -70,8 +73,12 @@ DESTDIR =  $${MNE_BINARY_DIR}
 
 SOURCES += \
         main.cpp \
+    mainwindow.cpp
 
 HEADERS += \
+    mainwindow.h
+
+#FORMS +=
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

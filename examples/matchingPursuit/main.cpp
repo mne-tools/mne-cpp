@@ -1,3 +1,4 @@
+//MATCHING PURSUIT
 //=============================================================================================================
 /**
 * @file     main.cpp
@@ -39,21 +40,26 @@
 // INCLUDES
 //=============================================================================================================
 
+
 #include <iostream>
 #include <vector>
 #include <math.h>
-
-
 #include <fiff/fiff.h>
 #include <mne/mne.h>
-
+#include <utils/mp/atom.h>
+#include <utils/mp/adaptivemp.h>
+#include "mainwindow.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtCore/QCoreApplication>
+//#include <QtCore/QCoreApplication>
+#include <QtGui>
+#include <QApplication>
+#include <QDateTime>
+
 
 
 //*************************************************************************************************************
@@ -63,6 +69,15 @@
 
 using namespace FIFFLIB;
 using namespace MNELIB;
+using namespace UTILSLIB;
+//using namespace DISPLIB;
+
+//=============================================================================================================
+// FORWARD DECLARATIONS
+
+MainWindow* mainWindow = NULL;
+
+//*************************************************************************************************************
 
 
 //*************************************************************************************************************
@@ -81,7 +96,13 @@ using namespace MNELIB;
 */
 int main(int argc, char *argv[])
 {
-    QCoreApplication a(argc, argv);
+    QApplication a(argc, argv);
+
+    //set application settings
+    QCoreApplication::setOrganizationName("DKnobl MHenfling");
+    QApplication::setApplicationName("MatchingPursuit Viewer");
+
+    mainWindow = new MainWindow();
 
     QFile t_fileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
 
@@ -161,7 +182,7 @@ int main(int argc, char *argv[])
             return -1;
         }
     }
-    //
+/*    //
     //   Read a data segment
     //   times output argument is optional
     //
@@ -183,8 +204,47 @@ int main(int argc, char *argv[])
 
 
     std::cout << data.block(0,0,10,10) << std::endl;
+*/
+//*************************************************************************************************************
+//=============================================================================================================
+// FirstSteps MHenfling MP Algorithm of Maciej Gratkowski BIOMAG Jena 01.10.2003
+//=============================================================================================================
 
+    QList<Atom> myAtomList;
+    QList<qreal> signal;
+    signal << 1.0 << 1.2 << 0.9 << 0.4 << 0 << 0 << 1 << 2 << 1.5 << -0.3;
+    qint32 it = 10;
+    qreal epsilon = 0.4;
+    adaptiveMP *var = new adaptiveMP();
+    myAtomList = var->MatchingPursuit(signal, it, epsilon);
+//    Plot::init();
+    mainWindow->show();
 
+/*    RowVectorXd sinus;
+    sinus = RowVectorXd::Zero(256);
+    double j = 0;
+    for(qint32 i = 0; i < 256; i++)
+    {
+
+        sinus(i) = sin(2*3.1416*40*0.25*j/256) + sin(2*3.1416*32*0.25*j/256);
+        std::cout << i<< "     "<< (sinus(i))<<"\n";
+        j++;
+    }
+    Eigen::FFT<double> fft;
+    //fft.SetFlag(fft.HalfSpectrum);
+    //QList<qreal> test;
+    //fft.fwd(test, sinus);
+    RowVectorXcd Autbut;
+    Autbut = RowVectorXcd::Zero(256);
+    fft.fwd(Autbut,sinus);
+    qint32 g = 0;
+    for(qint32 i = 0; i < 1024; i+=4)
+    {
+        std::cout << i<< "     "<< (abs(Autbut(g)))<<"\n";
+        g++;
+    }
+*/    //std::cout << i<< "     "<< (sinus(i))<<"\n";
+    printf("ich bin zurück");
     return a.exec();
 }
 
