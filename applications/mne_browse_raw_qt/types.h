@@ -1,16 +1,16 @@
 //=============================================================================================================
 /**
-* @file     mneoperator.h
+* @file     types.h
 * @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 *           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
 * @version  1.0
-* @date     February, 2014
+* @date     January, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Florian Schlembach, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Florian Schlembach, Christoph Dinh, Matti Hamalainen and Jens Haueisen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -31,50 +31,35 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains all MNEOperators.
+* @brief    Contains general application specific types
 *
 */
 
-#ifndef MNEOPERATOR_H
-#define MNEOPERATOR_H
+#ifndef TYPES_H
+#define TYPES_H
 
 //=============================================================================================================
 // INCLUDES
 
-//Qt
-#include <QObject>
+#include <QPair>
 
-//MNE
-#include <fiff/fiff.h>
+//Eigen
+#include <Eigen/Core>
+#include <Eigen/SparseCore>
 
-//=============================================================================================================
+//*************************************************************************************************************
 // NAMESPACES
+
+using namespace Eigen;
+
+namespace MNE_BROWSE_RAW_QT {
 
 //*************************************************************************************************************
 
-class MNEOperator
-{
-//    Q_OBJECT
-public:
-    enum OperatorType {
-        FILTER,
-        PCA,
-        AVERAGE
-    } m_OperatorType;
+typedef Matrix<double,Dynamic,Dynamic,RowMajor> MatrixXdR;
+typedef QPair<const double*,qint32> RowVectorPair;
+typedef QPair<int,int> QPairInts;
 
-    MNEOperator();
-    ~MNEOperator();
+} //end namespace MNE_BROWSE_RAW_QT
 
-    MNEOperator(const MNEOperator& obj);
-
-    MNEOperator(OperatorType type);
-
-    QString m_sName;
-
-signals:
-
-public slots:
-
-};
-
-#endif // MNEOPERATOR_H
+#endif // TYPES_H
