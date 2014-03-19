@@ -67,8 +67,8 @@ using namespace UTILSLIB;
 //=============================================================================================================
 
 BCI::BCI()
-: m_qStringResourcePath(qApp->applicationDirPath()+"/mne_x_plugins/resources/bci/"),
-  m_bProcessData(false)
+: m_qStringResourcePath(qApp->applicationDirPath()+"/mne_x_plugins/resources/bci/")
+, m_bProcessData(false)
 {
 }
 

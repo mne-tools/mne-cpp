@@ -193,7 +193,7 @@ public:
     fiff_int_t ntri;            /**< Number of available triangles */
     fiff_int_t coord_frame;     /**< Coil coordinate system definition */
     MatrixX3f rr;               /**< Source locations of available dipoles. */
-    MatrixX3f nn;               /**< Source normals of the used dipoles. */
+    MatrixX3f nn;               /**< Source normals of available dipoles. */
     MatrixX3i tris;             /**< Triangles */
     fiff_int_t nuse;            /**< Number of used dipoles. */
     VectorXi inuse;             /**< Used source points indicated by 1, 0 otherwise */

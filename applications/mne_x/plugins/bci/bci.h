@@ -284,9 +284,9 @@ private:
     ofstream                m_outStreamDebug;                   /**< Outputstream to generate debug file.*/
 
     bool                    m_bIsRunning;                       /**< Whether BCI is running.*/
+    QString                 m_qStringResourcePath;              /**< The path to the BCI resource directory.*/
     bool                    m_bProcessData;                     /**< Whether BCI is to get data out of the continous input data stream, i.e. the EEG data from sensor level.*/
     bool                    m_bTriggerActivated;                /**< Whether the trigger was activated.*/
-    QString                 m_qStringResourcePath;              /**< The path to the BCI resource directory.*/
     QMutex                  m_qMutex;                           /**< QMutex to guarantee thread safety.*/
 
     // Sensor level
