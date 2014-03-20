@@ -34,12 +34,10 @@
 *
 */
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
-
 
 #include <iostream>
 #include <vector>
@@ -49,33 +47,31 @@
 #include <utils/mp/atom.h>
 #include <utils/mp/adaptivemp.h>
 #include "mainwindow.h"
+#include <disp/plot.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-//#include <QtCore/QCoreApplication>
 #include <QtGui>
 #include <QApplication>
 #include <QDateTime>
-
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
 using namespace MNELIB;
 using namespace UTILSLIB;
-//using namespace DISPLIB;
+using namespace DISPLIB;
 
 //=============================================================================================================
 // FORWARD DECLARATIONS
 
 MainWindow* mainWindow = NULL;
+qint32 ReadFiffFile();
 
 //*************************************************************************************************************
 
@@ -102,8 +98,56 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationName("DKnobl MHenfling");
     QApplication::setApplicationName("MatchingPursuit Viewer");
 
+
+    //qint32 readFiffFile = ReadFiffFile();
+
+    QList<Atom> myAtomList;
+    qint32 it = 10;
+    qreal epsilon = 0.4;
+    adaptiveMP *adaptiveMp = new adaptiveMP();
+    qint32 t_iSize = 100;
+    VectorXd signal(t_iSize);
+
+    //Testsignal
+    for(int i = 0; i < t_iSize; ++i)
+    {
+        double t = 0.01 * i;
+        signal[i] = 7*sin(2 * 3.1416 * 4 * t)+ sin(2*3.1416 * 10 * t) + 0.7*sin(2 * 3.1416 * 0.4 * t) + 2*sin(2 * 3.1416 * 14 * t);
+    }
+
+    myAtomList = adaptiveMp->MatchingPursuit(signal, it, epsilon);
+
+    //Fouriertransformation
+    Eigen::FFT<double> fft;
+    VectorXcd fftSignal = VectorXcd::Zero(t_iSize);
+    fft.fwd(fftSignal, signal);
+
+    //Absolutbetrag
+    VectorXd absFftSignal = VectorXd::Zero(t_iSize);
+    for(qint32 i=0; i < t_iSize; i++)
+        absFftSignal[i] = abs(fftSignal[i]);
+
     mainWindow = new MainWindow();
 
+    //Plot Test
+//    Plot plot(absFftSignal);
+
+
+//    plot.setTitle("Test Plot");
+//    plot.setXLabel("X Axes");
+//    plot.setYLabel("Y Axes");
+
+//    plot.setWindowTitle("Corresponding function to MATLABs plot");
+//    plot.show();
+
+    //printf("ich bin zurück");
+    mainWindow->show();
+
+    return a.exec();
+}
+
+qint32 ReadFiffFile ()
+{
     QFile t_fileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
 
     float from = 42.956f;
@@ -135,25 +179,25 @@ int main(int argc, char *argv[])
     //
     qint32 k = 0;
     if (raw.info.projs.size() == 0)
-        printf("No projector specified for these data\n");
+       printf("No projector specified for these data\n");
     else
     {
         //
         //   Activate the projection items
         //
         for (k = 0; k < raw.info.projs.size(); ++k)
-            raw.info.projs[k].active = true;
+           raw.info.projs[k].active = true;
 
-        printf("%d projection items activated\n",raw.info.projs.size());
-        //
-        //   Create the projector
-        //
-        fiff_int_t nproj = raw.info.make_projector(raw.proj);
+       printf("%d projection items activated\n",raw.info.projs.size());
+       //
+       //   Create the projector
+       //
+       fiff_int_t nproj = raw.info.make_projector(raw.proj);
 
-        if (nproj == 0)
-            printf("The projection vectors do not apply to these channels\n");
-        else
-            printf("Created an SSP operator (subspace dimension = %d)\n",nproj);
+       if (nproj == 0)
+           printf("The projection vectors do not apply to these channels\n");
+       else
+           printf("Created an SSP operator (subspace dimension = %d)\n",nproj);
     }
 
     //
@@ -163,26 +207,26 @@ int main(int argc, char *argv[])
     qint32 dest_comp = -1;
 
     if (current_comp > 0)
-        printf("Current compensation grade : %d\n",current_comp);
+       printf("Current compensation grade : %d\n",current_comp);
 
     if (keep_comp)
         dest_comp = current_comp;
 
     if (current_comp != dest_comp)
     {
-        qDebug() << "This part needs to be debugged";
-        if(MNE::make_compensator(raw.info, current_comp, dest_comp, raw.comp))
-        {
-            raw.info.set_current_comp(dest_comp);
-            printf("Appropriate compensator added to change to grade %d.\n",dest_comp);
-        }
-        else
-        {
-            printf("Could not make the compensator\n");
-            return -1;
-        }
+       qDebug() << "This part needs to be debugged";
+       if(MNE::make_compensator(raw.info, current_comp, dest_comp, raw.comp))
+       {
+          raw.info.set_current_comp(dest_comp);
+          printf("Appropriate compensator added to change to grade %d.\n",dest_comp);
+       }
+       else
+       {
+          printf("Could not make the compensator\n");
+          return -1;
+       }
     }
-/*    //
+    //
     //   Read a data segment
     //   times output argument is optional
     //
@@ -196,59 +240,12 @@ int main(int argc, char *argv[])
 
     if (!readSuccessful)
     {
-        printf("Could not read raw segment.\n");
-        return -1;
+       printf("Could not read raw segment.\n");
+       return -1;
     }
 
     printf("Read %d samples.\n",(qint32)data.cols());
 
 
     std::cout << data.block(0,0,10,10) << std::endl;
-*/
-//*************************************************************************************************************
-//=============================================================================================================
-// FirstSteps MHenfling MP Algorithm of Maciej Gratkowski BIOMAG Jena 01.10.2003
-//=============================================================================================================
-
-    QList<Atom> myAtomList;
-    QList<qreal> signal;
-    signal << 1.0 << 1.2 << 0.9 << 0.4 << 0 << 0 << 1 << 2 << 1.5 << -0.3;
-    qint32 it = 10;
-    qreal epsilon = 0.4;
-    adaptiveMP *var = new adaptiveMP();
-    myAtomList = var->MatchingPursuit(signal, it, epsilon);
-//    Plot::init();
-    mainWindow->show();
-
-/*    RowVectorXd sinus;
-    sinus = RowVectorXd::Zero(256);
-    double j = 0;
-    for(qint32 i = 0; i < 256; i++)
-    {
-
-        sinus(i) = sin(2*3.1416*40*0.25*j/256) + sin(2*3.1416*32*0.25*j/256);
-        std::cout << i<< "     "<< (sinus(i))<<"\n";
-        j++;
-    }
-    Eigen::FFT<double> fft;
-    //fft.SetFlag(fft.HalfSpectrum);
-    //QList<qreal> test;
-    //fft.fwd(test, sinus);
-    RowVectorXcd Autbut;
-    Autbut = RowVectorXcd::Zero(256);
-    fft.fwd(Autbut,sinus);
-    qint32 g = 0;
-    for(qint32 i = 0; i < 1024; i+=4)
-    {
-        std::cout << i<< "     "<< (abs(Autbut(g)))<<"\n";
-        g++;
-    }
-*/    //std::cout << i<< "     "<< (sinus(i))<<"\n";
-    printf("ich bin zurück");
-    return a.exec();
 }
-
-//*************************************************************************************************************
-//=============================================================================================================
-// STATIC DEFINITIONS
-//=============================================================================================================

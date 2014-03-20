@@ -39,13 +39,14 @@ TEMPLATE = app
 
 VERSION = $${MNE_CPP_VERSION}
 
-QT -= gui
+#QT -= gui
 QT += widgets
 QT += network core widgets concurrent
 
-
 CONFIG   += console
 CONFIG   -= app_bundle
+
+
 
 TARGET = matchingPursuit
 

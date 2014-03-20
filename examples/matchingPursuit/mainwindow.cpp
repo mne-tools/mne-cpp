@@ -12,8 +12,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QLabel>
-#include <QTableView>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -33,12 +31,7 @@ using namespace DISPLIB;
 
 MainWindow::MainWindow(QWidget *parent) : QWidget(parent)
 {
-    //Plot::init();
-    label = new QLabel(this);
-    //label->setFrameStyle(QFrame::Panel | QFrame::Sunken);
-    label->setAlignment(Qt::AlignBottom | Qt::AlignRight);
-    label->setText("Test");
 
-    tableView = new QTableView(this);
-    tableView->setGeometry(20, 20, 500, 500);
+
+
 }
