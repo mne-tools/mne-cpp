@@ -119,7 +119,7 @@ int main(int argc, char *argv[])
     float stcOverlap = 0.0f;
 
     qint32 startSample = 0;
-    qint32 numSample = 20000;
+    qint32 numSample = 40000;
 
     bool in_samples = true;
     bool keep_comp = true;
