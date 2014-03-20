@@ -130,7 +130,7 @@ int main(int argc, char *argv[])
     mainWindow = new MainWindow();
 
     //Plot Test
-//    Plot plot(absFftSignal);
+    Plot plot(absFftSignal);
 
 
 //    plot.setTitle("Test Plot");

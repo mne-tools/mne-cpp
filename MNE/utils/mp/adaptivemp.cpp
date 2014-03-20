@@ -79,7 +79,7 @@ QList<Atom> adaptiveMP::MatchingPursuit (VectorXd signal,qint32 max_it,qreal eps
             it++;
         }
 
-        printf("ich verlasse mPursuit");
+        //printf("ich verlasse mPursuit");
         return atom;
 }
 
@@ -94,7 +94,7 @@ VectorXd adaptiveMP::GaussFunction (qint32 N, qreal s, qint32 p)
         qreal t = (n-p)/s;
         gauss[n] = exp(-3.1416*pow(t, 2))*pow(sqrt(s),(-1))*pow(2,(0.25));
     }
-    printf("ich verlasse gaussFunction");
+    //printf("ich verlasse gaussFunction");
     return gauss;
 }
 
@@ -109,7 +109,7 @@ VectorXcd adaptiveMP::ModulationFunction(qint32 N, qreal k)
 
         modulation[n] = std::polar(1/sqrt(N),exp(2*3.1416*k/N*n));
     }
-    printf("ich verlasse modulationFunction");
+    //printf("ich verlasse modulationFunction");
     return modulation;
 }
 
