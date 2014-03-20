@@ -143,6 +143,7 @@
 /bin/readFwdd
 /bin/readRawd
 /bin/readWriteRawd
+/bin/cache
 
 /lib/libdisp.so.1
 /lib/libdisp.so.1.0
