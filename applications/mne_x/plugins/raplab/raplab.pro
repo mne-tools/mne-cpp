@@ -1,16 +1,13 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     applications.pro
-# @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
-#           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-#           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
-#           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
+# @file     raplab.pro
+# @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
 # @version  1.0
-# @date     January, 2014
+# @date     March, 2014
 #
 # @section  LICENSE
 #
-# Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2014, Christoph Dinh. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -31,23 +28,25 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds the mne_browse_raw_qt project
+# @brief    This project file generates the makefile for the raplab plug-in.
 #
 #--------------------------------------------------------------------------------------------------------------
 
-include(../../../mne-cpp.pri)
+include(../../../../mne-cpp.pri)
 
-TEMPLATE = app
+TEMPLATE = lib
 
-QT += network core widgets concurrent
+CONFIG += plugin
 
-TARGET = mne_browse_raw_qt
+DEFINES += RAPLAB_LIBRARY
 
+QT += core widgets
+#QT += concurrent
+
+TARGET = raplab
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
-
-CONFIG += console #DEBUG
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
@@ -55,47 +54,53 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Utilsd \
             -lMNE$${MNE_LIB_VERSION}Fsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
-            -lMNE$${MNE_LIB_VERSION}Mned
+            -lMNE$${MNE_LIB_VERSION}Mned \
+            -lMNE$${MNE_LIB_VERSION}Inversed \
+            -lMNE$${MNE_LIB_VERSION}RtInvd \
+            -lxMeasd \
+            -lxDispd \
+            -lmne_xd
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
             -lMNE$${MNE_LIB_VERSION}Utils \
             -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \
-            -lMNE$${MNE_LIB_VERSION}Mne
+            -lMNE$${MNE_LIB_VERSION}Mne \
+            -lMNE$${MNE_LIB_VERSION}Inverse \
+            -lMNE$${MNE_LIB_VERSION}RtInv \
+            -lxMeas \
+            -lxDisp \
+            -lmne_x
 }
 
-DESTDIR = $${MNE_BINARY_DIR}
+DESTDIR = $${MNE_BINARY_DIR}/mne_x_plugins
 
-SOURCES += rawsettings.cpp\
-    main.cpp\
-    rawmodel.cpp \
-    mainwindow.cpp \
-    rawdelegate.cpp \
-    mneoperator.cpp \
-    filteroperator.cpp
+SOURCES += \
+        raplab.cpp \
+        FormFiles/raplabsetupwidget.cpp \
+        FormFiles/raplababoutwidget.cpp
 
-HEADERS += types.h\
-    info.h\
-    rawsettings.h\
-    rawmodel.h\
-    mainwindow.h \
-    rawdelegate.h \
-    mneoperator.h \
-    filteroperator.h
+HEADERS += \
+        raplab.h\
+        raplab_global.h \
+        FormFiles/raplabsetupwidget.h \
+        FormFiles/raplababoutwidget.h
 
-
-FORMS +=
+FORMS += \
+        FormFiles/raplabsetup.ui \
+        FormFiles/raplababout.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_X_INCLUDE_DIR}
 
-unix:!macx {
-    QMAKE_CXXFLAGS += -std=c++0x
-}
-macx {
-    QMAKE_CXXFLAGS = -mmacosx-version-min=10.7 -std=gnu0x -stdlib=libc+
-    CONFIG +=c++11
-}
+OTHER_FILES += raplab.json
 
+# Put generated form headers into the origin --> cause other src is pointing at them
+UI_DIR = $$PWD
+
+unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
+
+# suppress visibility warnings
+unix: QMAKE_CXXFLAGS += -Wno-attributes

@@ -10,7 +10,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Florian Schlembach, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Florian Schlembach, Christoph Dinh, Matti Hamalainen and Jens Haueisen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -44,19 +44,30 @@
 #ifndef RAWSETTINGS_H
 #define RAWSETTINGS_H
 
+
+//*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
+//=============================================================================================================
 
 #include "info.h"
 #include "types.h"
 
-//Qt
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
+
 #include <QObject>
 #include <QSettings>
 #include <QSize>
 
+
+//*************************************************************************************************************
 //=============================================================================================================
 // CONSTANTS
+//=============================================================================================================
 
 //MainWindow
 #define MAINWINDOW_WINDOW_SIZE_W 1200 //width of MainWindow
@@ -81,25 +92,26 @@
 #define DELEGATE_MAX_EOG 1e-3 // kind=FIFFV_EOG_CH
 #define DELEGATE_MAX_STIM 5 // kind=FIFFV_STIM_CH
 
+
+//*************************************************************************************************************
 //=============================================================================================================
-// NAMESPACE
+// DEFINE NAMESPACE MNE_BROWSE_RAW_QT
+//=============================================================================================================
 
 namespace MNE_BROWSE_RAW_QT {
 
-//*************************************************************************************************************
 
+//=============================================================================================================
+/**
+* DECLARE CLASS RawSettings
+*/
 class RawSettings : public QObject
 {
     Q_OBJECT
 public:
     RawSettings(QObject *parent = 0);
+
     ~RawSettings();
-
-signals:
-
-public slots:
-
-
 private:
     /**
      * init initializes all the application settings values from the macros
@@ -109,6 +121,6 @@ private:
     QSettings m_qSettings; /**< QSettings object that initializes all the RawSettings */
 };
 
-} //end namespace MNE_BROWSE_RAW_QT
+} //NAMESPACE
 
 #endif // RAWSETTINGS_H

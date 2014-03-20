@@ -1,16 +1,14 @@
 //=============================================================================================================
 /**
-* @file     mneoperator.cpp
-* @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
-*           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
+* @file     raplab_global.h
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2014
+* @date     February, 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Florian Schlembach, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -31,37 +29,31 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    MNEOperator class represents the base class of an arbitrary MNEOperator, e.g. FILTER,PCA,AVERAGE.
-*           All specific Operators must be derived from MNEOperator, see the FilterOperator class.
+* @brief    Contains the RapLab library export/import macros.
 *
 */
 
+#ifndef RAPLAB_GLOBAL_H
+#define RAPLAB_GLOBAL_H
 
-#include "mneoperator.h"
-
-MNEOperator::MNEOperator()
-//: QObject(parent)
-{
-}
 
 //*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
 
-MNEOperator::~MNEOperator()
-{
-}
+#include <QtCore/qglobal.h>
 
-//*************************************************************************************************************
-
-MNEOperator::MNEOperator(const MNEOperator& obj)
-{
-    m_OperatorType = obj.m_OperatorType;
-    m_sName = obj.m_sName;
-}
 
 //*************************************************************************************************************
+//=============================================================================================================
+// PREPROCESSOR DEFINES
+//=============================================================================================================
 
-MNEOperator::MNEOperator(OperatorType type)
-: /*QObject(parent),*/
-m_OperatorType(type)
-{
-}
+#if defined(RAPLAB_LIBRARY)
+#  define RAPLABSHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#else
+#  define RAPLABSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#endif
+
+#endif // RAPLAB_GLOBAL_H
