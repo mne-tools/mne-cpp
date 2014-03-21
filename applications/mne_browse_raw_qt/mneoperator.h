@@ -54,7 +54,6 @@
 
 class MNEOperator
 {
-//    Q_OBJECT
 public:
     enum OperatorType {
         FILTER,
@@ -63,11 +62,12 @@ public:
     } m_OperatorType;
 
     MNEOperator();
-    ~MNEOperator();
 
     MNEOperator(const MNEOperator& obj);
 
     MNEOperator(OperatorType type);
+
+    ~MNEOperator();
 
     QString m_sName;
 

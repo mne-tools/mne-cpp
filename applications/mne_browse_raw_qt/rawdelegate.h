@@ -50,7 +50,16 @@
 // INCLUDES
 //=============================================================================================================
 
-//Qt
+#include "rawmodel.h"
+#include "types.h"
+#include "rawsettings.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
+
 #include <QDebug>
 #include <QAbstractItemDelegate>
 #include <QPainter>
@@ -58,28 +67,39 @@
 #include <QPointF>
 #include <QRect>
 
-//MNE
+
+//*************************************************************************************************************
+//=============================================================================================================
+// MNE INCLUDES
+//=============================================================================================================
+
 #include <fiff/fiff.h>
 #include <mne/mne.h>
 
-//MNE_BROWSE_RAW_QT
-#include "rawmodel.h"
-#include "types.h"
-#include "rawsettings.h"
 
-//Eigen
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
 
+
+//*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
+//=============================================================================================================
 
 using namespace MNE_BROWSE_RAW_QT;
 using namespace Eigen;
 using namespace MNELIB;
 
-//=============================================================================================================
 
+//=============================================================================================================
+/**
+* DECLARE CLASS RawDelegate
+*/
 class RawDelegate : public QAbstractItemDelegate
 {
     Q_OBJECT
@@ -89,38 +109,35 @@ public:
     virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
     // Plots settings
-    double m_dPlotHeight; /**< The height of the plot */
+    double m_dPlotHeight;   /**< The height of the plot */
 
     // Scaling
-    double m_dMaxValue; /**< Maximum value of the data to plot  */
-    double m_dScaleY; /**< Maximum amplitude of plot (max is m_dPlotHeight/2) */
-    double m_dDx; /**< pixel difference to the next sample*/
-
-signals:
-
-public slots:
+    double m_dMaxValue;     /**< Maximum value of the data to plot  */
+    double m_dScaleY;       /**< Maximum amplitude of plot (max is m_dPlotHeight/2) */
+    double m_dDx;           /**< pixel difference to the next sample*/
 
 private:
+    //=========================================================================================================
     /**
-     * createPlotPath creates the QPointer path for the data plot.
-     *
-     * @param[in] index QModelIndex for accessing associated data and model object.
-     * @param[in,out] path The QPointerPath to create for the data plot.
-     */
+    * createPlotPath creates the QPointer path for the data plot.
+    *
+    * @param[in] index QModelIndex for accessing associated data and model object.
+    * @param[in,out] path The QPointerPath to create for the data plot.
+    */
     void createPlotPath(const QModelIndex &index, QPainterPath& path, QList<RowVectorPair>& listPairs) const;
 
+    //=========================================================================================================
     /**
-     * createGridPath Creates the QPointer path for the grid plot.
-     *
-     * @param[in,out] path The row vector of the data matrix <1 x nsamples>.
-     * @param[in] data The row vector of the data matrix <1 x nsamples>.
-     */
+    * createGridPath Creates the QPointer path for the grid plot.
+    *
+    * @param[in,out] path The row vector of the data matrix <1 x nsamples>.
+    * @param[in] data The row vector of the data matrix <1 x nsamples>.
+    */
     void createGridPath(QPainterPath& path, QList<RowVectorPair>& listPairs) const;
 
     //Settings
-    qint8 m_nhlines; /**< Number of horizontal lines for the grid plot */
+    qint8 m_nhlines;        /**< Number of horizontal lines for the grid plot */
     QSettings m_qSettings;
-
 };
 
 #endif // RAWDELEGATE_H

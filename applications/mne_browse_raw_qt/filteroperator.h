@@ -49,17 +49,30 @@
 #ifndef FILTEROPERATOR_H
 #define FILTEROPERATOR_H
 
+//*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
+//=============================================================================================================
 
-//MNE
 #include "mneoperator.h"
+#include "types.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// MNE INCLUDES
+//=============================================================================================================
+
 #include <fiff/fiff.h>
 #include <mne/mne.h>
 #include <utils/parksmcclellan.h>
-#include "types.h"
 
-//Eigen
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
 #include <Eigen/unsupported/FFT>
@@ -68,16 +81,22 @@
 #define EIGEN_FFTW_DEFAULT
 #endif
 
+
+//*************************************************************************************************************
 //=============================================================================================================
-// NAMESPACES
+// USED NAMESPACES
+//=============================================================================================================
 
 using namespace MNE_BROWSE_RAW_QT;
 using namespace MNELIB;
 using namespace Eigen;
 using namespace UTILSLIB;
 
-//*************************************************************************************************************
 
+//=============================================================================================================
+/**
+* DECLARE CLASS FilterOperator
+*/
 class FilterOperator : public MNEOperator
 {
 public:
@@ -91,6 +110,7 @@ public:
     FilterOperator();
     ~FilterOperator();
 
+    //=========================================================================================================
     /**
     * FilterOperator::FilterOperator
     * @param unique_name defines the name of the generated filter
@@ -102,6 +122,7 @@ public:
     */
     FilterOperator(QString unique_name, FilterType type, int order, double centerfreq, double bandwidth, double parkswidth, qint32 fftlength=4096);
 
+    //=========================================================================================================
     /**
      * @brief fftTransformCoeffs transforms the calculated filter coefficients to frequency-domain
      */
@@ -109,14 +130,14 @@ public:
 
     RowVectorXd applyFFTFilter(RowVectorXd& data);
 
-    int m_iFilterOrder; /**< represents the order of the filter instance */
-    int m_iFFTlength; /**< represents the filter length */
+    int m_iFilterOrder;     /**< represents the order of the filter instance */
+    int m_iFFTlength;       /**< represents the filter length */
 
-    RowVectorXd m_dCoeffA; /**< contains the forward filter coefficient set */
-    RowVectorXd m_dCoeffB; /**< contains the backward filter coefficient set (empty if FIR filter) */
+    RowVectorXd m_dCoeffA;  /**< contains the forward filter coefficient set */
+    RowVectorXd m_dCoeffB;  /**< contains the backward filter coefficient set (empty if FIR filter) */
 
-    RowVectorXcd m_dFFTCoeffA; /**< the FFT-transformed forward filter coefficient set, required for frequency-domain filtering, zero-padded to m_iFFTlength */
-    RowVectorXcd m_dFFTCoeffB; /**< the FFT-transformed backward filter coefficient set, required for frequency-domain filtering, zero-padded to m_iFFTlength */
+    RowVectorXcd m_dFFTCoeffA;  /**< the FFT-transformed forward filter coefficient set, required for frequency-domain filtering, zero-padded to m_iFFTlength */
+    RowVectorXcd m_dFFTCoeffB;  /**< the FFT-transformed backward filter coefficient set, required for frequency-domain filtering, zero-padded to m_iFFTlength */
 };
 
 #endif // FILTEROPERATOR_H
