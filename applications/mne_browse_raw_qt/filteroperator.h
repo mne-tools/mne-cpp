@@ -114,7 +114,6 @@ public:
     } m_Type;
 
     FilterOperator();
-    ~FilterOperator();
 
     //=========================================================================================================
     /**
@@ -127,6 +126,8 @@ public:
     * @param parkswidth determines the width of the filter slopes (steepness)
     */
     FilterOperator(QString unique_name, FilterType type, int order, double centerfreq, double bandwidth, double parkswidth, qint32 fftlength=4096);
+
+    ~FilterOperator();
 
     //=========================================================================================================
     /**
