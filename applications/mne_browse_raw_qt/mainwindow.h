@@ -63,14 +63,27 @@
 *           [3] http://qt-project.org/doc/qt-5/QSettings.html
 *
 */
-
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+//*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
+//=============================================================================================================
 
-//Qt
+#include "rawmodel.h"
+#include "rawdelegate.h"
+
+#include "info.h"
+#include "types.h"
+#include "rawsettings.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
+
 #include <QApplication>
 #include <QDebug>
 #include <QSettings>
@@ -100,32 +113,46 @@
 
 #include <QMessageBox>
 
-//MNE
+
+//*************************************************************************************************************
+//=============================================================================================================
+// MNE INCLUDES
+//=============================================================================================================
+
 #include <fiff/fiff.h>
 #include <mne/mne.h>
 #include <utils/parksmcclellan.h>
 
-//MNE_BROWSE_RAW_QT
-#include "rawmodel.h"
-#include "rawdelegate.h"
 
-#include "info.h"
-#include "types.h"
-#include "rawsettings.h"
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
 
-//Eigen
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
 
+
 //*************************************************************************************************************
-// namespaces
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
 
 using namespace Eigen;
 
+
 //*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE MNEBrowseRawQt
+//=============================================================================================================
 
-namespace MNE_BROWSE_RAW_QT {
+namespace MNEBrowseRawQt
+{
 
+//=============================================================================================================
+/**
+* DECLARE CLASS MainWindow
+*/
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -134,6 +161,7 @@ public:
     MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+    //=========================================================================================================
     /**
     * Writes to MainWindow log.
     *
@@ -144,29 +172,35 @@ public:
     void writeToLog(const QString& logMsg, LogKind lgknd, LogLevel lglvl);
 
 public slots:
+
+    //=========================================================================================================
     /**
-     * @brief customContextMenuRequested
-     * @param pos is the position, where the right-click occurred
-     */
+    * @brief customContextMenuRequested
+    * @param pos is the position, where the right-click occurred
+    */
     void customContextMenuRequested(QPoint pos);
 
+    //=========================================================================================================
     /**
-     * setScrollBarPosition sets the position of the horizontal scrollbar
-     * @param pos the absolute position of the scrollbar
-     */
+    * setScrollBarPosition sets the position of the horizontal scrollbar
+    * @param pos the absolute position of the scrollbar
+    */
     void setScrollBarPosition(int pos);
 
 private slots:
+    //=========================================================================================================
     /**
-     * openFile opens a file dialog that picks the fiff data file to analyze and invokes the setup methods.
-     */
+    * openFile opens a file dialog that picks the fiff data file to analyze and invokes the setup methods.
+    */
     void openFile();
 
+    //=========================================================================================================
     /**
-     * openFile opens a file dialog that lets choose the location and the file name of the fiff data file to write.
-     */
+    * openFile opens a file dialog that lets choose the location and the file name of the fiff data file to write.
+    */
     void writeFile();
 
+    //=========================================================================================================
     /**
      * about opens the about dialog
      */
@@ -176,41 +210,49 @@ signals:
     void testSignal();
 
 private:
+    //=========================================================================================================
     /**
-     * setupModel creates the RawModel object being part of the model/view framework of QT (derived from QAbstractTableModel)
-     */
+    * setupModel creates the RawModel object being part of the model/view framework of QT (derived from QAbstractTableModel)
+    */
     void setupModel();
 
+    //=========================================================================================================
     /**
-     * setupDelegate creates the RawDelegate object being part of the model/view framework of QT (derived from QAbstractItemDelegate)
-     */
+    * setupDelegate creates the RawDelegate object being part of the model/view framework of QT (derived from QAbstractItemDelegate)
+    */
     void setupDelegate();
 
+    //=========================================================================================================
     /**
-     * setupView sets up the QTableView being part of the model/view framework and connects them with previously created RawModel and RawDelegate.
-     */
+    * setupView sets up the QTableView being part of the model/view framework and connects them with previously created RawModel and RawDelegate.
+    */
     void setupView();
 
+    //=========================================================================================================
     /**
-     * setupLayout create and connects the individual elements of the layout.
-     */
+    * setupLayout create and connects the individual elements of the layout.
+    */
     void setupLayout();
 
+    //=========================================================================================================
     /**
-     * setupViewSettings set the settings of the view such as size policies, scrolling behaviour etc.
-     */
+    * setupViewSettings set the settings of the view such as size policies, scrolling behaviour etc.
+    */
     void setupViewSettings();
 
+    //=========================================================================================================
     /**
-     * createMenus sets up the filemenu
-     */
+    * createMenus sets up the filemenu
+    */
     void createMenus();
 
+    //=========================================================================================================
     /**
-     * createLogDockWindow creates the log window as a dock widget
-     */
+    * createLogDockWindow creates the log window as a dock widget
+    */
     void createLogDockWindow();
 
+    //=========================================================================================================
     /**
     * Sets the log level
     *
@@ -218,14 +260,16 @@ private:
     */
     void setLogLevel(LogLevel lvl);
 
+    //=========================================================================================================
     /**
-     * setWindow makes settings that are related to the MainWindow
-     */
+    * setWindow makes settings that are related to the MainWindow
+    */
     void setWindow();
 
+    //=========================================================================================================
     /**
-     * setWindowStatus sets the window status depending on m_pRawModel->m_bFileloaded
-     */
+    * setWindowStatus sets the window status depending on m_pRawModel->m_bFileloaded
+    */
     void setWindowStatus();
 
     QFile m_qFileRaw; /**< Fiff data file to read (set for convenience) */
@@ -247,6 +291,6 @@ private:
 
 };
 
-}
+} //NAMESPACE
 
 #endif // MAINWINDOW_H

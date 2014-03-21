@@ -119,13 +119,19 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNE_BROWSE_RAW_QT;
-
 using namespace Eigen;
 using namespace MNELIB;
 using namespace UTILSLIB;
 using namespace FIFFLIB;
 
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE MNEBrowseRawQt
+//=============================================================================================================
+
+namespace MNEBrowseRawQt
+{
 
 //=============================================================================================================
 /**
@@ -475,9 +481,11 @@ inline qint32 RawModel::absFiffCursor() const {
     return m_iAbsFiffCursor;
 }
 
+} // NAMESPACE
 
-Q_DECLARE_METATYPE(MatrixXdR);
-Q_DECLARE_METATYPE(RowVectorPair);
-Q_DECLARE_METATYPE(QList<RowVectorPair>);
+
+Q_DECLARE_METATYPE(MNEBrowseRawQt::MatrixXdR);
+Q_DECLARE_METATYPE(MNEBrowseRawQt::RowVectorPair);
+Q_DECLARE_METATYPE(QList<MNEBrowseRawQt::RowVectorPair>);
 
 #endif // RAWMODEL_H
