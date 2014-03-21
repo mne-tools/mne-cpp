@@ -64,13 +64,6 @@ FilterOperator::FilterOperator()
 
 //*************************************************************************************************************
 
-FilterOperator::~FilterOperator()
-{
-}
-
-
-//*************************************************************************************************************
-
 FilterOperator::FilterOperator(QString unique_name, FilterType type, int order, double centerfreq, double bandwidth, double parkswidth, qint32 fftlength)
 : MNEOperator(OperatorType::FILTER)
 , m_Type(type)
@@ -84,6 +77,13 @@ FilterOperator::FilterOperator(QString unique_name, FilterType type, int order, 
 
     //fft-transform m_dCoeffA in order to be able to perform frequency-domain filtering
     fftTransformCoeffs();
+}
+
+
+//*************************************************************************************************************
+
+FilterOperator::~FilterOperator()
+{
 }
 
 
