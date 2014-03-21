@@ -45,7 +45,6 @@
 *           [1] http://en.wikipedia.org/wiki/Parks%E2%80%93McClellan_filter_design_algorithm
 *           [2] http://en.wikipedia.org/wiki/Overlap_add
 */
-
 #ifndef FILTEROPERATOR_H
 #define FILTEROPERATOR_H
 
@@ -87,11 +86,18 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNE_BROWSE_RAW_QT;
 using namespace MNELIB;
 using namespace Eigen;
 using namespace UTILSLIB;
 
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE MNEBrowseRawQt
+//=============================================================================================================
+
+namespace MNEBrowseRawQt
+{
 
 //=============================================================================================================
 /**
@@ -139,5 +145,7 @@ public:
     RowVectorXcd m_dFFTCoeffA;  /**< the FFT-transformed forward filter coefficient set, required for frequency-domain filtering, zero-padded to m_iFFTlength */
     RowVectorXcd m_dFFTCoeffB;  /**< the FFT-transformed backward filter coefficient set, required for frequency-domain filtering, zero-padded to m_iFFTlength */
 };
+
+} // NAMESPACE
 
 #endif // FILTEROPERATOR_H

@@ -56,7 +56,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNE_BROWSE_RAW_QT;
+using namespace MNEBrowseRawQt;
 using namespace Eigen;
 using namespace MNELIB;
 
