@@ -108,17 +108,20 @@ namespace MNE_BROWSE_RAW_QT {
 class RawSettings : public QObject
 {
     Q_OBJECT
+
 public:
     RawSettings(QObject *parent = 0);
 
     ~RawSettings();
+
 private:
+    //=========================================================================================================
     /**
-     * init initializes all the application settings values from the macros
-     */
+    * init initializes all the application settings values from the macros
+    */
     void init();
 
-    QSettings m_qSettings; /**< QSettings object that initializes all the RawSettings */
+    QSettings m_qSettings;  /**< QSettings object that initializes all the RawSettings */
 };
 
 } //NAMESPACE
