@@ -67,21 +67,19 @@ using namespace MNELIB;
 using namespace UTILSLIB;
 using namespace DISPLIB;
 
+//*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
+//=============================================================================================================
 
 MainWindow* mainWindow = NULL;
 qint32 ReadFiffFile();
-
-//*************************************************************************************************************
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // MAIN
 //=============================================================================================================
 
-//=============================================================================================================
 /**
 * The function main marks the entry point of the program.
 * By default, main has the storage class extern.
@@ -128,24 +126,24 @@ int main(int argc, char *argv[])
     for(qint32 i=0; i < fftSignal.rows(); i++)
         absFftSignal[i] = -abs(fftSignal[i]);
     */
+
     mainWindow = new MainWindow();
+    //mainWindow->show();
 
     //Plot Test
     VectorXd test(signal.rows());
-    VectorXd approximation = VectorXd::Zero(signal.rows());
+    VectorXd approximation(signal.rows());
 
     for(qint32 i = 0; i < myAtomList.length(); i++)
     {
         GaborAtom paintAtom = myAtomList.at(i);
         test = paintAtom.CreateReal();
         for(qint32 j = 0; j < test.rows(); j++)
-            approximation[j] += test[j];
-
-        Plot *plot = new Plot(approximation);
-        //plot(test);
-        plot->show();
-
+            approximation[j] = test[j];
     }
+
+    //Plot *plot = new Plot(test);
+    //plot->show();
 
     //Plot plot(approximation, mainWindow);
 //    plot.setGeometry(0,0,mainWindow->width(),mainWindow->height());
@@ -160,7 +158,7 @@ int main(int argc, char *argv[])
     //sPlot.show();
 
     //printf("ich bin zurück");
-    //mainWindow->show();
+
 
     return a.exec();
 }
@@ -267,4 +265,6 @@ qint32 ReadFiffFile ()
 
 
     std::cout << data.block(0,0,10,10) << std::endl;
+
+    return -1;
 }

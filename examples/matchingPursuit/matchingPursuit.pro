@@ -39,7 +39,7 @@ TEMPLATE = app
 
 VERSION = $${MNE_CPP_VERSION}
 
-#QT -= gui
+QT += gui
 QT += widgets
 QT += network core widgets concurrent
 
@@ -76,14 +76,30 @@ DESTDIR =  $${MNE_BINARY_DIR}
 
 SOURCES += \
         main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \    
+    editorwindow.cpp \
+    enhancededitorwindow.cpp \
+    formulaeditor.cpp \
+    deletemessagebox.cpp
 
 HEADERS += \
-    mainwindow.h
+    mainwindow.h \
+    editorwindow.h \
+    enhancededitorwindow.h \
+    formulaeditor.h \
+    deletemessagebox.h
 
-#FORMS +=
+FORMS += \
+    editorwindow.ui \
+    enhancededitorwindow.ui \
+    formulaeditor.ui \
+    deletemessagebox.ui
+
+RESOURCES += \
+    Ressourcen.qrc
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
 unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
+
