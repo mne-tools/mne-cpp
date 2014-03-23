@@ -264,7 +264,7 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(AnnotationSet &p
             if (label_ids[i] != 0)
             {
                 QString curr_name = t_CurrentColorTable.struct_names[i];//obj.label2AtlasName(label(i));
-                printf("\tCluster %d / %d %s...", i+1, label_ids.rows(), curr_name.toUtf8().constData());
+                printf("\tCluster %d / %li %s...", i+1, label_ids.rows(), curr_name.toUtf8().constData());
 
                 //
                 // Get source space indeces
@@ -500,7 +500,7 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution_ccr(AnnotationSe
             if (label_ids[i] != 0)
             {
                 QString curr_name = t_CurrentColorTable.struct_names[i];//obj.label2AtlasName(label(i));
-                printf("\tCluster %d / %d %s...", i+1, label_ids.rows(), curr_name.toUtf8().constData());
+                printf("\tCluster %d / %li %s...", i+1, label_ids.rows(), curr_name.toUtf8().constData());
 
                 //
                 // Get source space indeces
@@ -780,7 +780,7 @@ FiffCov MNEForwardSolution::compute_depth_prior(const MatrixXd &Gain, const Fiff
         }
     }
 
-    printf("\tlimit = %d/%d = %f", n_limit + 1, d.size(), sqrt(limit / ws[0]));
+    printf("\tlimit = %d/%li = %f", n_limit + 1, d.size(), sqrt(limit / ws[0]));
     double scale = 1.0 / limit;
     printf("\tscale = %g exp = %g", scale, exp);
 
@@ -926,6 +926,58 @@ MNEForwardSolution MNEForwardSolution::pick_channels(const QStringList& include,
     }
 
     return fwd;
+}
+
+
+//*************************************************************************************************************
+
+MNEForwardSolution MNEForwardSolution::pick_regions(const QList<Label> &p_qListLabels) const
+{
+    VectorXi selVertices;
+
+    qint32 iSize = 0;
+    for(qint32 i = 0; i < p_qListLabels.size(); ++i)
+    {
+        VectorXi currentSelection;
+        this->src.label_src_vertno_sel(p_qListLabels[i], currentSelection);
+
+        selVertices.conservativeResize(iSize+currentSelection.size());
+        selVertices.block(iSize,0,currentSelection.size(),1) = currentSelection;
+        iSize = selVertices.size();
+    }
+
+    MNEMath::sort(selVertices, false);
+
+    MNEForwardSolution selectedFwd(*this);
+
+    MatrixX3f rr(selVertices.size(),3);
+    MatrixX3f nn(selVertices.size(),3);
+
+    for(qint32 i = 0; i < selVertices.size(); ++i)
+    {
+        rr.block(i, 0, 1, 3) = selectedFwd.source_rr.row(selVertices[i]);
+        nn.block(i, 0, 1, 3) = selectedFwd.source_nn.row(selVertices[i]);
+    }
+
+    selectedFwd.source_rr = rr;
+    selectedFwd.source_nn = nn;
+
+    VectorXi selSolIdcs = tripletSelection(selVertices);
+    MatrixXd G(selectedFwd.sol->data.rows(),selSolIdcs.size());
+//    selectedFwd.sol_grad; //ToDo
+    qint32 rows = G.rows();
+
+    for(qint32 i = 0; i < selSolIdcs.size(); ++i)
+        G.block(0, i, rows, 1) = selectedFwd.sol->data.col(selSolIdcs[i]);
+
+    selectedFwd.sol->data = G;
+    selectedFwd.sol->nrow = selectedFwd.sol->data.rows();
+    selectedFwd.sol->ncol = selectedFwd.sol->data.cols();
+    selectedFwd.nsource = selectedFwd.sol->ncol / 3;
+
+    selectedFwd.src = selectedFwd.src.pick_regions(p_qListLabels);
+
+    return selectedFwd;
 }
 
 
@@ -1619,7 +1671,7 @@ void MNEForwardSolution::restrict_gain_matrix(MatrixXd &G, const FiffInfo &info)
     // Figure out which ones have been used
     if(info.chs.size() != G.rows())
     {
-        printf("Error G.rows() and length of info.chs do not match: %d != %d", G.rows(), info.chs.size()); //ToDo throw
+        printf("Error G.rows() and length of info.chs do not match: %li != %i", G.rows(), info.chs.size()); //ToDo throw
         return;
     }
 
@@ -1629,7 +1681,7 @@ void MNEForwardSolution::restrict_gain_matrix(MatrixXd &G, const FiffInfo &info)
         for(qint32 i = 0; i < sel.size(); ++i)
             G.row(i) = G.row(sel[i]);
         G.conservativeResize(sel.size(), G.cols());
-        printf("\t%d planar channels", sel.size());
+        printf("\t%li planar channels", sel.size());
     }
     else
     {
@@ -1639,7 +1691,7 @@ void MNEForwardSolution::restrict_gain_matrix(MatrixXd &G, const FiffInfo &info)
             for(qint32 i = 0; i < sel.size(); ++i)
                 G.row(i) = G.row(sel[i]);
             G.conservativeResize(sel.size(), G.cols());
-            printf("\t%d magnetometer or axial gradiometer channels", sel.size());
+            printf("\t%li magnetometer or axial gradiometer channels", sel.size());
         }
         else
         {
@@ -1649,67 +1701,13 @@ void MNEForwardSolution::restrict_gain_matrix(MatrixXd &G, const FiffInfo &info)
                 for(qint32 i = 0; i < sel.size(); ++i)
                     G.row(i) = G.row(sel[i]);
                 G.conservativeResize(sel.size(), G.cols());
-                printf("\t%d EEG channels\n", sel.size());
+                printf("\t%li EEG channels\n", sel.size());
             }
             else
                 printf("Could not find MEG or EEG channels\n");
         }
     }
 }
-
-
-//*************************************************************************************************************
-
-MNEForwardSolution MNEForwardSolution::selectRegions(const QList<Label> &p_qListLabels) const
-{
-    VectorXi selVertices;
-
-    qint32 iSize = 0;
-    for(qint32 i = 0; i < p_qListLabels.size(); ++i)
-    {
-        VectorXi currentSelection;
-         this->src.label_src_vertno_sel(p_qListLabels[i], currentSelection);
-
-        selVertices.conservativeResize(iSize+currentSelection.size());
-        selVertices.block(iSize,0,currentSelection.size(),1) = currentSelection;
-        iSize = selVertices.size();
-    }
-
-    MNEMath::sort(selVertices, false);
-
-    MNEForwardSolution selectedFwd(*this);
-
-    MatrixX3f rr(selVertices.size(),3);
-    MatrixX3f nn(selVertices.size(),3);
-
-    for(qint32 i = 0; i < selVertices.size(); ++i)
-    {
-        rr.block(i, 0, 1, 3) = selectedFwd.source_rr.row(selVertices(i));
-        nn.block(i, 0, 1, 3) = selectedFwd.source_nn.row(selVertices(i));
-    }
-
-    selectedFwd.source_rr = rr;
-    selectedFwd.source_nn = nn;
-
-    VectorXi selSolIdcs = tripletSelection(selVertices);
-    MatrixXd G(selectedFwd.sol->data.rows(),selSolIdcs.size());
-//    selectedFwd.sol_grad; //ToDo
-    qint32 rows = G.rows();
-
-    for(qint32 i = 0; i < selSolIdcs.size(); ++i)
-        G.block(0, i, rows, 1) = selectedFwd.sol->data.col(selSolIdcs(i));
-
-    selectedFwd.sol->data = G;
-    selectedFwd.sol->nrow = selectedFwd.sol->data.rows();
-    selectedFwd.sol->ncol = selectedFwd.sol->data.cols();
-    selectedFwd.nsource = selectedFwd.sol->ncol / 3;
-
-    selectedFwd.src = selectedFwd.src.selectRegions(p_qListLabels);
-
-    return selectedFwd;
-}
-
-
 
 
 //*************************************************************************************************************

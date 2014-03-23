@@ -1,3 +1,8 @@
+/bin/computeInversePwlRapMusic
+/bin/rawClusteredInversePwlRapMusic
+/bin/rawClusteredInverseRapMusic
+/bin/roiClusteredInversePwlRapMusic
+/bin/stClusteredInversePwlRapMusic
 /bin/matchingPursuit
 /lib/libMNE1Disp.so.1
 /lib/libMNE1Disp.so.1.0
@@ -144,6 +149,11 @@
 /bin/readFwdd
 /bin/readRawd
 /bin/readWriteRawd
+/bin/computeInversePwlRapMusicd
+/bin/matchingPursuitd
+/bin/rawClusteredInversePwlRapMusicd
+/bin/rawClusteredInverseRapMusicd
+/bin/stClusteredInversePwlRapMusicd
 
 /lib/libdisp.so.1
 /lib/libdisp.so.1.0
@@ -300,3 +310,4 @@ bin/mne_browse_raw_qt.app/Contents/MacOS/mne_browse_raw_qt
 bin/mne_browse_raw_qt.app/Contents/PkgInfo
 /bin/mne_x_plugins/resources/tmsi/*.fif
 /bin/*.stc
+/examples/rawClusteredInversePwlRapMusic/*.user

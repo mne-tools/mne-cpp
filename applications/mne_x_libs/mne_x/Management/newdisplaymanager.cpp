@@ -112,18 +112,22 @@ NewDisplayManager::~NewDisplayManager()
 
 //*************************************************************************************************************
 
-QWidget* NewDisplayManager::show(IPlugin::OutputConnectorList &pOutputConnectorList, QSharedPointer<QTime>& pT)
+QWidget* NewDisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList, QSharedPointer<QTime>& pT, QList< QAction* >& qListActions)
 {
     QWidget* newDisp = new QWidget;
     QVBoxLayout* vboxLayout = new QVBoxLayout;
     QHBoxLayout* hboxLayout = new QHBoxLayout;
 
-    foreach (QSharedPointer< PluginOutputConnector > pPluginOutputConnector, pOutputConnectorList)
+    qListActions.clear();
+
+    foreach (QSharedPointer< PluginOutputConnector > pPluginOutputConnector, outputConnectorList)
     {
         if(pPluginOutputConnector.dynamicCast< PluginOutputData<NewRealTimeSampleArray> >())
         {
             QSharedPointer<NewRealTimeSampleArray>* pNewRealTimeSampleArray = &pPluginOutputConnector.dynamicCast< PluginOutputData<NewRealTimeSampleArray> >()->data();
             NewRealTimeSampleArrayWidget* rtsaWidget = new NewRealTimeSampleArrayWidget(*pNewRealTimeSampleArray, pT, newDisp);
+
+            qListActions.append(rtsaWidget->getDisplayActions());
 
             connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
                     rtsaWidget, &NewRealTimeSampleArrayWidget::update, Qt::BlockingQueuedConnection);
@@ -136,6 +140,8 @@ QWidget* NewDisplayManager::show(IPlugin::OutputConnectorList &pOutputConnectorL
             QSharedPointer<NewRealTimeMultiSampleArray>* pNewRealTimeMultiSampleArray = &pPluginOutputConnector.dynamicCast< PluginOutputData<NewRealTimeMultiSampleArray> >()->data();
             NewRealTimeMultiSampleArrayWidget* rtmsaWidget = new NewRealTimeMultiSampleArrayWidget(*pNewRealTimeMultiSampleArray, pT, newDisp);
 
+            qListActions.append(rtmsaWidget->getDisplayActions());
+
             connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
                     rtmsaWidget, &NewRealTimeMultiSampleArrayWidget::update, Qt::BlockingQueuedConnection);
 
@@ -147,6 +153,8 @@ QWidget* NewDisplayManager::show(IPlugin::OutputConnectorList &pOutputConnectorL
         {
             QSharedPointer<RealTimeSourceEstimate>* pRealTimeSourceEstimate = &pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeSourceEstimate> >()->data();
             RealTimeSourceEstimateWidget* rtseWidget = new RealTimeSourceEstimateWidget(*pRealTimeSourceEstimate, newDisp);//new RealTimeSourceEstimateWidget(*pRealTimeSourceEstimate, pT, newDisp);
+
+            qListActions.append(rtseWidget->getDisplayActions());
 
             connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
                     rtseWidget, &RealTimeSourceEstimateWidget::update, Qt::BlockingQueuedConnection);

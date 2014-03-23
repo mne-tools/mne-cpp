@@ -1,16 +1,16 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     mne_browse_raw_qt.pro
+# @file     applications.pro
 # @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
 #           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 #           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
 # @version  1.0
-# @date     February, 2013
+# @date     January, 2014
 #
 # @section  LICENSE
 #
-# Copyright (C) 2013, Christoph Dinh, Martin Luessi and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2014, Florian Schlembach, Christoph Dinh, Matti Hamalainen and Jens Haueisen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -31,15 +31,75 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds the mne-x project.
+# @brief    This project file builds the mne_browse_raw_qt project
 #
 #--------------------------------------------------------------------------------------------------------------
 
 include(../../mne-cpp.pri)
 
-TEMPLATE = subdirs
+TEMPLATE = app
 
-SUBDIRS += \
-    mne_browse_raw_qt
+QT += network core widgets concurrent
 
+TARGET = mne_browse_raw_qt
+
+CONFIG(debug, debug|release) {
+    TARGET = $$join(TARGET,,,d)
+}
+
+CONFIG += console #DEBUG
+
+LIBS += -L$${MNE_LIBRARY_DIR}
+CONFIG(debug, debug|release) {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
+            -lMNE$${MNE_LIB_VERSION}Utilsd \
+            -lMNE$${MNE_LIB_VERSION}Fsd \
+            -lMNE$${MNE_LIB_VERSION}Fiffd \
+            -lMNE$${MNE_LIB_VERSION}Mned
+}
+else {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
+            -lMNE$${MNE_LIB_VERSION}Utils \
+            -lMNE$${MNE_LIB_VERSION}Fs \
+            -lMNE$${MNE_LIB_VERSION}Fiff \
+            -lMNE$${MNE_LIB_VERSION}Mne
+}
+
+DESTDIR = $${MNE_BINARY_DIR}
+
+SOURCES += rawsettings.cpp\
+    main.cpp\
+    rawmodel.cpp \
+    mainwindow.cpp \
+    rawdelegate.cpp \
+    mneoperator.cpp \
+    filteroperator.cpp
+
+HEADERS += types.h\
+    info.h\
+    rawsettings.h\
+    rawmodel.h\
+    mainwindow.h \
+    rawdelegate.h \
+    mneoperator.h \
+    filteroperator.h
+
+
+FORMS +=
+
+INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
+INCLUDEPATH += $${MNE_INCLUDE_DIR}
+INCLUDEPATH += $${MNE_X_INCLUDE_DIR}
+
+unix:!macx {
+    QMAKE_CXXFLAGS += -std=c++0x
+    QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
+
+    # suppress visibility warnings
+    QMAKE_CXXFLAGS += -Wno-attributes
+}
+macx {
+    QMAKE_CXXFLAGS = -mmacosx-version-min=10.7 -std=gnu0x -stdlib=libc+
+    CONFIG +=c++11
+}
 

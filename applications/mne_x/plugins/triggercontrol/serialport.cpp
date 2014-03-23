@@ -128,24 +128,50 @@ void SerialPort::decodeana(QByteArray &t_incomingArray)
 
     t_incomingArray[0]=t_incomingArray[0] << 2;     // left shift to pop the type info (11)
 
+    char cVal = t_incomingArray[0];
+    void* voidVal = (void*)&cVal;
+    unsigned char* ucVal = (unsigned char*)voidVal;
+
+
 // decode channel
-         if (t_incomingArray.at(0) == 0x00) {AnChannel=1;}
-    else if (t_incomingArray.at(0)==0x10) {AnChannel=2;}
-    else if (t_incomingArray.at(0)==0x20) {AnChannel=3;}
-    else if (t_incomingArray.at(0)==0x40) {AnChannel=4;}
-    else if (t_incomingArray.at(0)==0x80) {AnChannel=5;}
-    else if (t_incomingArray.at(0)==0x30) {AnChannel=6;}
-    else if (t_incomingArray.at(0)==0x50) {AnChannel=7;}
-    else if (t_incomingArray.at(0)==0x90) {AnChannel=8;}
-    else if (t_incomingArray.at(0)==0x60) {AnChannel=9;}
-    else if (t_incomingArray.at(0)==0xA0) {AnChannel=10;}
-    else if (t_incomingArray.at(0)==0xC0) {AnChannel=11;}
-    else if (t_incomingArray.at(0)==0x70) {AnChannel=12;}
-    else if (t_incomingArray.at(0)==0xB0) {AnChannel=13;}
-    else if (t_incomingArray.at(0)==0xD0) {AnChannel=14;}
-    else if (t_incomingArray.at(0)==0xE0) {AnChannel=15;}
-    else if (t_incomingArray.at(0)==0xF0) {AnChannel=16;}
+         if (*ucVal== 0x00) {AnChannel=1;}
+    else if (*ucVal==0x10) {AnChannel=2;}
+    else if (*ucVal==0x20) {AnChannel=3;}
+    else if (*ucVal==0x40) {AnChannel=4;}
+    else if (*ucVal==0x80) {AnChannel=5;}
+    else if (*ucVal==0x30) {AnChannel=6;}
+    else if (*ucVal==0x50) {AnChannel=7;}
+    else if (*ucVal==0x90) {AnChannel=8;}
+    else if (*ucVal==0x60) {AnChannel=9;}
+    else if (*ucVal==0xA0) {AnChannel=10;}
+    else if (*ucVal==0xC0) {AnChannel=11;}
+    else if (*ucVal==0x70) {AnChannel=12;}
+    else if (*ucVal==0xB0) {AnChannel=13;}
+    else if (*ucVal==0xD0) {AnChannel=14;}
+    else if (*ucVal==0xE0) {AnChannel=15;}
+    else if (*ucVal==0xF0) {AnChannel=16;}
     else {std::cout << "Error during analog channel selection" << std::endl;}
+
+
+
+//// decode channel - old
+//         if (t_incomingArray.at(0) == 0x00) {AnChannel=1;}
+//    else if (t_incomingArray.at(0)==0x10) {AnChannel=2;}
+//    else if (t_incomingArray.at(0)==0x20) {AnChannel=3;}
+//    else if (t_incomingArray.at(0)==0x40) {AnChannel=4;}
+//    else if (t_incomingArray.at(0)==0x80) {AnChannel=5;}
+//    else if (t_incomingArray.at(0)==0x30) {AnChannel=6;}
+//    else if (t_incomingArray.at(0)==0x50) {AnChannel=7;}
+//    else if (t_incomingArray.at(0)==0x90) {AnChannel=8;}
+//    else if (t_incomingArray.at(0)==0x60) {AnChannel=9;}
+//    else if (t_incomingArray.at(0)==0xA0) {AnChannel=10;}
+//    else if (t_incomingArray.at(0)==0xC0) {AnChannel=11;}
+//    else if (t_incomingArray.at(0)==0x70) {AnChannel=12;}
+//    else if (t_incomingArray.at(0)==0xB0) {AnChannel=13;}
+//    else if (t_incomingArray.at(0)==0xD0) {AnChannel=14;}
+//    else if (t_incomingArray.at(0)==0xE0) {AnChannel=15;}
+//    else if (t_incomingArray.at(0)==0xF0) {AnChannel=16;}
+//    else {std::cout << "Error during analog channel selection" << std::endl;}
 
 
 

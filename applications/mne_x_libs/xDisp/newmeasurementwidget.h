@@ -123,8 +123,47 @@ public:
     * Pure virtual method.
     */
     virtual void init() = 0;
+
+    //=========================================================================================================
+    /**
+    * A list of display actions for the current measurement widget.
+    *
+    * @return a list of display actions
+    */
+    inline QList< QAction* > getDisplayActions();
+
+protected:
+    //=========================================================================================================
+    /**
+    * Adds a display action to the current measurement widget.
+    *
+    * @param [in] pAction  pointer to the action to be added to the measurement widget
+    */
+    inline void addDisplayAction(QAction* pAction);
+
+private:
+    QList< QAction* >   m_qListDisplayActions;  /**< List of display actions */
+
 };
 
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+QList< QAction* > NewMeasurementWidget::getDisplayActions()
+{
+    return m_qListDisplayActions;
 }
+
+
+//*************************************************************************************************************
+
+inline void NewMeasurementWidget::addDisplayAction(QAction* pAction)
+{
+    m_qListDisplayActions.append(pAction);
+}
+
+} //NAMESPACE
 
 #endif // NEWMEASUREMENTWIDGET_H

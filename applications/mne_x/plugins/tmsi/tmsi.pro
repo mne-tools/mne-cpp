@@ -93,7 +93,8 @@ SOURCES += \
         tmsiproducer.cpp \
         FormFiles/tmsisetupwidget.cpp \
         FormFiles/tmsiaboutwidget.cpp \
-        tmsidriver.cpp
+        tmsidriver.cpp \
+        FormFiles/tmsimanualannotationwidget.cpp
 
 HEADERS += \
         tmsi.h\
@@ -101,11 +102,13 @@ HEADERS += \
         tmsiproducer.h \
         FormFiles/tmsisetupwidget.h \
         FormFiles/tmsiaboutwidget.h \
-        tmsidriver.h
+        tmsidriver.h \
+        FormFiles/tmsimanualannotationwidget.h
 
 FORMS += \
         FormFiles/tmsisetup.ui \
-        FormFiles/tmsiabout.ui
+        FormFiles/tmsiabout.ui \
+        FormFiles/tmsimanualannotation.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
@@ -115,3 +118,8 @@ OTHER_FILES += tmsi.json
 
 # Put generated form headers into the origin --> cause other src is pointing at them
 UI_DIR = $${PWD}
+
+unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
+
+# suppress visibility warnings
+unix: QMAKE_CXXFLAGS += -Wno-attributes

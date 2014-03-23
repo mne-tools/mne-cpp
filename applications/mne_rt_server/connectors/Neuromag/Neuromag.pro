@@ -91,3 +91,5 @@ OTHER_FILES += neuromag.json
 
 # Put generated form headers into the origin --> cause other src is pointing at them
 UI_DIR = $${PWD}
+
+unix: QMAKE_CXXFLAGS += -Wno-attributes
