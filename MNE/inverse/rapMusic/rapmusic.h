@@ -108,11 +108,11 @@ typedef struct Pair
 */
 class INVERSESHARED_EXPORT RapMusic : public IInverseAlgorithm
 {
-    //*************************************************************************************************************
-    //=============================================================================================================
+public:
+    //*********************************************************************************************************
+    //=========================================================================================================
     // TYPEDEFS
-    //=============================================================================================================
-
+    //=========================================================================================================
     typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> MatrixXT;  /**< Defines Eigen::Matrix<T, Eigen::Dynamic,
                                                                              Eigen::Dynamic> as MatrixXT type. */
     typedef Eigen::Matrix<double, Eigen::Dynamic, 6> MatrixX6T;              /**< Defines Eigen::Matrix<T, Eigen::Dynamic,
@@ -126,7 +126,6 @@ class INVERSESHARED_EXPORT RapMusic : public IInverseAlgorithm
     typedef Eigen::Matrix<double, 6, 1> Vector6T;                            /**< Defines Eigen::Matrix<T, 6, 1>
                                                                              as Vector6T type. */
 
-public:
 
     //=========================================================================================================
     /**
@@ -142,7 +141,7 @@ public:
     * @param[in] p_bSparsed     True when sparse matrices should be used.
     * @param[in] p_iN           The number (default 2) of uncorrelated sources, which should be found. Starting with
     *                           the strongest.
-    * @param[in] p_dThr    The correlation threshold (default 0.5) at which the search for sources stops.
+    * @param[in] p_dThr         The correlation threshold (default 0.5) at which the search for sources stops.
     */
     RapMusic(MNEForwardSolution& p_pFwd, bool p_bSparsed, int p_iN = 2, double p_dThr = 0.5);
 
@@ -153,28 +152,19 @@ public:
     * Initializes the RAP MUSIC algorithm with the given model.
     *
     * @param[in] p_Fwd          The model which contains the gain matrix and its corresponding Grid matrix.
-    * @param[in] p_bSparsed    True when sparse matrices should be used.
-    * @param[in] p_iN   The number (default 2) of uncorrelated sources, which should be found. Starting with
-    *                   the strongest.
-    * @param[in] p_dThr    The correlation threshold (default 0.5) at which the search for sources stops.
+    * @param[in] p_bSparsed     True when sparse matrices should be used.
+    * @param[in] p_iN           The number (default 2) of uncorrelated sources, which should be found. Starting with
+    *                           the strongest.
+    * @param[in] p_dThr         The correlation threshold (default 0.5) at which the search for sources stops.
     * @return   true if successful initialized, false otherwise.
     */
     bool init(MNEForwardSolution& p_pFwd, bool p_bSparsed = false, int p_iN = 2, double p_dThr = 0.5);
 
-    virtual MNESourceEstimate calculateInverse(const MatrixXd& p_matMeasurement, QVector< DipolePair<double> > &p_RapDipoles);
-
     virtual MNESourceEstimate calculateInverse(const FiffEvoked &p_fiffEvoked, bool pick_normal = false);
 
-    virtual MNESourceEstimate calculateInverse(const MatrixXd &data, float tmin, float tstep) const
-    {
-        Q_UNUSED(data);
-        Q_UNUSED(tmin);
-        Q_UNUSED(tstep);
-        MNESourceEstimate p_sourceEstimate;
-        return p_sourceEstimate;
-    }
+    virtual MNESourceEstimate calculateInverse(const MatrixXd &data, float tmin, float tstep) const;
 
-
+    virtual MNESourceEstimate calculateInverse(const MatrixXd& p_matMeasurement, QList< DipolePair<double> > &p_RapDipoles) const;
 
     virtual const char* getName() const;
 
@@ -182,15 +172,14 @@ public:
 
     //=========================================================================================================
     /**
-    * Calculates the combination of n over 2 (nchoosek(n,2))
+    * Sets the source estimate attributes.
     *
-    * @param[in] n  The number of elements which should be combined with each other (n over 2)
-    * @return   The number of combinations
+    * @param[in] p_iSampStcWin  Samples per source localization window (default - 1 = not set)
+    * @param[in] p_fStcOverlap  Percentage of localization window overlap
     */
-    int nchoose2(int n);
+    void setStcAttr(int p_iSampStcWin, float p_fStcOverlap);
 
 protected:
-
     //=========================================================================================================
     /**
     * Computes the signal subspace Phi_s out of the measurement F.
@@ -200,7 +189,7 @@ protected:
     * @param[out] p_pMatPhi_s   The calculated signal subspace.
     * @return   The rank of the measurement F (named r lt. Mosher 1998, 1999)
     */
-    int calcPhi_s(const MatrixXT& p_matMeasurement, MatrixXT* &p_pMatPhi_s);
+    int calcPhi_s(const MatrixXT& p_matMeasurement, MatrixXT* &p_pMatPhi_s) const;
 
     //=========================================================================================================
     /**
@@ -215,7 +204,7 @@ protected:
     * @return   The maximal correlation c_1 of the subspace correlation of the current projected Lead Field
     *           combination and the projected measurement.
     */
-    double subcorr(MatrixX6T& p_matProj_G, const MatrixXT& p_pMatU_B);
+    static double subcorr(MatrixX6T& p_matProj_G, const MatrixXT& p_pMatU_B);
 
     //=========================================================================================================
     /**
@@ -233,7 +222,7 @@ protected:
     * @return   The maximal correlation c_1 of the subspace correlation of the current projected Lead Field
     *           combination and the projected measurement.
     */
-    double subcorr(MatrixX6T& p_matProj_G, const MatrixXT& p_matU_B, Vector6T& p_vec_phi_k_1);
+    static double subcorr(MatrixX6T& p_matProj_G, const MatrixXT& p_matU_B, Vector6T& p_vec_phi_k_1);
 
     //=========================================================================================================
     /**
@@ -245,10 +234,10 @@ protected:
     * @param[in] p_iIdxk_1  The current position in the manifold vector array A_k_1
     * @param[out] p_matA_k_1    The array of the manifold vectors.
     */
-    void calcA_k_1( const MatrixX6T& p_matG_k_1,
-                    const Vector6T& p_matPhi_k_1,
-                    const int p_iIdxk_1,
-                    MatrixXT& p_matA_k_1);
+    static void calcA_k_1(  const MatrixX6T& p_matG_k_1,
+                            const Vector6T& p_matPhi_k_1,
+                            const int p_iIdxk_1,
+                            MatrixXT& p_matA_k_1);
 
     //=========================================================================================================
     /**
@@ -257,7 +246,7 @@ protected:
     * @param[in] p_matA_k_1 The array of the manifold vectors.
     * @param[out] p_matOrthProj The orthogonal projector.
     */
-    void calcOrthProj(const MatrixXT& p_matA_k_1, MatrixXT& p_matOrthProj);
+    void calcOrthProj(const MatrixXT& p_matA_k_1, MatrixXT& p_matOrthProj) const;
 
     //=========================================================================================================
     /**
@@ -272,7 +261,7 @@ protected:
     */
     void calcPairCombinations(  const int p_iNumPoints,
                                 const int p_iNumCombinations,
-                                Pair** p_ppPairIdxCombinations);
+                                Pair** p_ppPairIdxCombinations) const;
 
     //=========================================================================================================
     /**
@@ -290,20 +279,20 @@ protected:
     * @param[out] p_iIdx1   The resulting index 1.
     * @param[out] p_iIdx2   The resulting index 2.
     */
-    void getPointPair(const int p_iPoints, const int p_iCurIdx, int &p_iIdx1, int &p_iIdx2);
+    static void getPointPair(const int p_iPoints, const int p_iCurIdx, int &p_iIdx1, int &p_iIdx2);
 
     //=========================================================================================================
     /**
     * Returns a gain matrix pair for the given indices
     *
-    * @param[in] p_matGainMarix The Lead Field matrix.
-    * @param[out] p_matGainMarix_Pair   Lead Field combination (dimension: m x 6)
-    * @param[in] p_iIdx1 first Lead Field index point
-    * @param[in] p_iIdx2 second Lead Field index point
+    * @param[in]    p_matGainMarix The Lead Field matrix.
+    * @param[out]   p_matGainMarix_Pair   Lead Field combination (dimension: m x 6)
+    * @param[in]    p_iIdx1 first Lead Field index point
+    * @param[in]    p_iIdx2 second Lead Field index point
     */
-    void getGainMatrixPair(     const MatrixXT& p_matGainMarix,
-                                MatrixX6T& p_matGainMarix_Pair,
-                                int p_iIdx1, int p_iIdx2);
+    static void getGainMatrixPair(  const MatrixXT& p_matGainMarix,
+                                    MatrixX6T& p_matGainMarix_Pair,
+                                    int p_iIdx1, int p_iIdx2);
 
     //=========================================================================================================
     /**
@@ -315,12 +304,11 @@ protected:
     * @param[in] p_valCor       Correlation value of the dipole pair.
     * @param[out] p_RapDipoles  the list of dipole pairs.
     */
-    void insertSource(  int p_iDipoleIdx1, int p_iDipoleIdx2,
+    static void insertSource(  int p_iDipoleIdx1, int p_iDipoleIdx2,
                         const Vector6T &p_vec_phi_k_1,
                         double p_valCor,
-                        QVector< DipolePair<double> > &p_RapDipoles);
+                        QList< DipolePair<double> > &p_RapDipoles);
 
-private:
     MNEForwardSolution m_ForwardSolution; /**< The Forward operator which should be scanned through*/
 
     int m_iN;               /**< Number of Sources to find*/
@@ -338,6 +326,10 @@ private:
 
     bool m_bIsInit; /**< Wether the algorithm is initialized. */
 
+    //Stc stuff
+    int m_iSamplesStcWindow;    /**< Number of samples per localization window */
+    float m_fStcOverlap;        /**< Percentage of localization window overlap */
+
     //=========================================================================================================
     /**
     * Returns the rank r of a singular value matrix based on non-zero singular values
@@ -346,7 +338,7 @@ private:
     * @param[in] p_matSigma diagonal matrix which contains the Singular values (Dimension n x n)
     * @return The rank r.
     */
-    inline int getRank(const MatrixXT& p_matSigma);
+    static inline int getRank(const MatrixXT& p_matSigma);
 
     //=========================================================================================================
     /**
@@ -358,7 +350,7 @@ private:
     * @param[out] p_matFull_Rank    The corresponding full rank matrix.
     * @param[in] type   Whether p_Mat is transposed, than rows and columns are changed.
     */
-    inline int useFullRank( const MatrixXT& p_Mat,
+    static inline int useFullRank( const MatrixXT& p_Mat,
                             const MatrixXT& p_matSigma_src,
                             MatrixXT& p_matFull_Rank,
                             int type = NOT_TRANSPOSED);
@@ -370,7 +362,7 @@ private:
     * @param[in] p_matF The matrix which should be transformed.
     * @return F * F^Transposed (we call it FFT ;))
     */
-    inline MatrixXT makeSquareMat(const MatrixXT& p_matF);
+    static inline MatrixXT makeSquareMat(const MatrixXT& p_matF);
 };
 
 //*************************************************************************************************************

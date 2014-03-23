@@ -59,6 +59,7 @@
 //=============================================================================================================
 
 using namespace BCIPlugin;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -77,19 +78,23 @@ BCISetupWidget::BCISetupWidget(BCI* pBCI, QWidget* parent)
             this, &BCISetupWidget::setGeneralOptions);
     connect(ui.m_checkBox_UseSensorData, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
             this, &BCISetupWidget::setGeneralOptions);
-    connect(ui.m_checkBox_UseThresholdArtefactReduction, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+    connect(ui.m_checkBox_DisplayFeatures, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
             this, &BCISetupWidget::setGeneralOptions);
-    connect(ui.m_SpinBox_ThresholdValue, static_cast<void (QDoubleSpinBox::*)()>(&QDoubleSpinBox::editingFinished),
+    connect(ui.m_SpinBox_NumberFeaturesToDisplay, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
             this, &BCISetupWidget::setGeneralOptions);
 
     // Connect processing options
     connect(ui.m_checkBox_SubtractMean, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
-            this, &BCISetupWidget::setGeneralOptions);
+            this, &BCISetupWidget::setProcessingOptions);
     connect(ui.m_doubleSpinBox_SlidingWindowSize, static_cast<void (QDoubleSpinBox::*)()>(&QDoubleSpinBox::editingFinished),
             this, &BCISetupWidget::setProcessingOptions);
-    connect(ui.m_spinBox_NumberSubSignals, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
+    connect(ui.m_spinBox_NumberFeatures, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
             this, &BCISetupWidget::setProcessingOptions);
     connect(ui.m_doubleSpinBox_TimeBetweenWindows, static_cast<void (QDoubleSpinBox::*)()>(&QDoubleSpinBox::editingFinished),
+            this, &BCISetupWidget::setProcessingOptions);
+    connect(ui.m_checkBox_UseThresholdArtefactReduction, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
+            this, &BCISetupWidget::setProcessingOptions);
+    connect(ui.m_SpinBox_ThresholdValue, static_cast<void (QDoubleSpinBox::*)()>(&QDoubleSpinBox::editingFinished),
             this, &BCISetupWidget::setProcessingOptions);
 
     // Connect classification options
@@ -148,18 +153,33 @@ void BCISetupWidget::initGui()
     // General options
     ui.m_checkBox_UseSensorData->setChecked(m_pBCI->m_bUseSensorData);
     ui.m_checkBox_UseSourceData->setChecked(m_pBCI->m_bUseSourceData);
-    ui.m_checkBox_UseThresholdArtefactReduction->setChecked(m_pBCI->m_bUseArtefactThresholdReduction);
-    ui.m_SpinBox_ThresholdValue->setValue(m_pBCI->m_dThresholdValue);
+    ui.m_checkBox_DisplayFeatures->setChecked(m_pBCI->m_bDisplayFeatures);
+    ui.m_SpinBox_NumberFeaturesToDisplay->setValue(m_pBCI->m_iNumberFeaturesToDisplay);
 
     // Processing options
     ui.m_checkBox_SubtractMean->setChecked(m_pBCI->m_bSubtractMean);
     ui.m_doubleSpinBox_SlidingWindowSize->setValue(m_pBCI->m_dSlidingWindowSize);
-    ui.m_spinBox_NumberSubSignals->setValue(m_pBCI->m_iNumberSubSignals);
     ui.m_doubleSpinBox_TimeBetweenWindows->setValue(m_pBCI->m_dTimeBetweenWindows);
+    ui.m_spinBox_NumberFeatures->setValue(m_pBCI->m_iNumberFeatures);
+    ui.m_checkBox_UseThresholdArtefactReduction->setChecked(m_pBCI->m_bUseArtefactThresholdReduction);
+    ui.m_SpinBox_ThresholdValue->setValue(m_pBCI->m_dThresholdValue);
 
-    // Classification options
-    ui.m_lineEdit_SensorBoundary->setText(m_pBCI->m_sSensorBoundaryPath);
-    ui.m_lineEdit_SourceBoundary->setText(m_pBCI->m_sSourceBoundaryPath);
+    // Init time displays
+    double totalProcessingTime = ui.m_doubleSpinBox_SlidingWindowSize->value() + (ui.m_doubleSpinBox_TimeBetweenWindows->value() * (ui.m_spinBox_NumberFeatures->value()-1));
+    ui.m_label_TotalProcessedTimeDisplay->setNum(totalProcessingTime);
+    ui.m_label_TotalProcessedTimeDisplay->setText(ui.m_label_TotalProcessedTimeDisplay->text().append(" s"));
+
+    double timeForNextResult = ui.m_doubleSpinBox_TimeBetweenWindows->value() * ui.m_spinBox_NumberFeatures->value();
+    ui.m_label_TimeNeededForResultsDisplay->setNum(timeForNextResult);
+    ui.m_label_TimeNeededForResultsDisplay->setText(ui.m_label_TimeNeededForResultsDisplay->text().append(" s"));
+
+    // Classification boundaries
+    QString temp = m_pBCI->m_qStringResourcePath;
+    temp.append(QString("LDA_linear_boundary_Sensor.txt"));
+    ui.m_lineEdit_SensorBoundary->setText(temp);
+    ui.m_lineEdit_SourceBoundary->setText(temp);
+    m_pBCI->m_vLoadedSensorBoundary = readBoundaryInformation(temp);
+    m_pBCI->m_vLoadedSourceBoundary = readBoundaryInformation(temp);
 
     // Filter options
     ui.m_checkBox_UseFilter->setChecked(m_pBCI->m_bUseFilter);
@@ -179,8 +199,8 @@ void BCISetupWidget::setGeneralOptions()
 {
     m_pBCI->m_bUseSensorData = ui.m_checkBox_UseSensorData->isChecked();
     m_pBCI->m_bUseSourceData = ui.m_checkBox_UseSourceData->isChecked();
-    m_pBCI->m_bUseArtefactThresholdReduction = ui.m_checkBox_UseThresholdArtefactReduction->isChecked();
-    m_pBCI->m_dThresholdValue = ui.m_SpinBox_ThresholdValue->value();
+    m_pBCI->m_bDisplayFeatures = ui.m_checkBox_DisplayFeatures->isChecked();
+    m_pBCI->m_iNumberFeaturesToDisplay = ui.m_SpinBox_NumberFeaturesToDisplay->value();
 }
 
 
@@ -190,8 +210,18 @@ void BCISetupWidget::setProcessingOptions()
 {
     m_pBCI->m_bSubtractMean = ui.m_checkBox_SubtractMean->isChecked();
     m_pBCI->m_dSlidingWindowSize = ui.m_doubleSpinBox_SlidingWindowSize->value();
-    m_pBCI->m_iNumberSubSignals = ui.m_spinBox_NumberSubSignals->value();
-    m_pBCI->m_dTimeBetweenWindows = ui.m_doubleSpinBox_TimeBetweenWindows->value();
+    m_pBCI->m_dTimeBetweenWindows = ui.m_doubleSpinBox_TimeBetweenWindows->value();    
+    m_pBCI->m_iNumberFeatures = ui.m_spinBox_NumberFeatures->value();
+    m_pBCI->m_bUseArtefactThresholdReduction = ui.m_checkBox_UseThresholdArtefactReduction->isChecked();
+    m_pBCI->m_dThresholdValue = ui.m_SpinBox_ThresholdValue->value();
+
+    double totalProcessingTime = ui.m_doubleSpinBox_SlidingWindowSize->value() + (ui.m_doubleSpinBox_TimeBetweenWindows->value() * (ui.m_spinBox_NumberFeatures->value()-1));
+    ui.m_label_TotalProcessedTimeDisplay->setNum(totalProcessingTime);
+    ui.m_label_TotalProcessedTimeDisplay->setText(ui.m_label_TotalProcessedTimeDisplay->text().append(" s"));
+
+    double timeForNextResult = ui.m_doubleSpinBox_TimeBetweenWindows->value() * ui.m_spinBox_NumberFeatures->value();
+    ui.m_label_TimeNeededForResultsDisplay->setNum(timeForNextResult);
+    ui.m_label_TimeNeededForResultsDisplay->setText(ui.m_label_TimeNeededForResultsDisplay->text().append(" s"));
 }
 
 
@@ -202,14 +232,15 @@ void BCISetupWidget::changeLoadSensorBoundary()
     QString path = QFileDialog::getOpenFileName(
                 this,
                 "Load decision boundary for sensor level",
-                "mne_x_plugins/resources/tmsi/",
+                "mne_x_plugins/resources/bci/LDA_linear_boundary.txt",
                  tr("Text files (*.txt)"));
 
     if(path==NULL)
         path = ui.m_lineEdit_SensorBoundary->text();
 
+    m_pBCI->m_vLoadedSensorBoundary = readBoundaryInformation(path);
+
     ui.m_lineEdit_SensorBoundary->setText(path);
-    m_pBCI->m_sSensorBoundaryPath = ui.m_lineEdit_SensorBoundary->text();
 }
 
 
@@ -220,14 +251,84 @@ void BCISetupWidget::changeLoadSourceBoundary()
     QString path = QFileDialog::getOpenFileName(
                 this,
                 "Load decision boundary for source level",
-                "mne_x_plugins/resources/tmsi/",
+                "mne_x_plugins/resources/bci/LDA_linear_boundary.txt",
                  tr("Text files (*.txt)"));
 
     if(path==NULL)
         path = ui.m_lineEdit_SourceBoundary->text();
 
+
+    m_pBCI->m_vLoadedSourceBoundary = readBoundaryInformation(path);
+
     ui.m_lineEdit_SourceBoundary->setText(path);
-    m_pBCI->m_sSourceBoundaryPath = ui.m_lineEdit_SourceBoundary->text();
+}
+
+
+//*************************************************************************************************************
+
+QVector<VectorXd> BCISetupWidget::readBoundaryInformation(QString path)
+{
+    QVector<VectorXd> boundary_final;
+
+    // Read boundary information generated with matlab
+    QFile file(path);
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        // Initialise boundaries with linear coefficients y = mx+c -> vector = [m c] -> default [1 0]
+        VectorXd const_temp(1);
+        const_temp << 0.0;
+        VectorXd linear_temp(2);
+        linear_temp << 1.0, 1.0;
+
+        boundary_final.push_back(const_temp);
+        boundary_final.push_back(linear_temp);
+
+        return boundary_final;
+    }
+
+    //Start reading from file
+    VectorXd const_temp;
+    VectorXd linear_temp;
+
+    QTextStream in(&file);
+
+    while(!in.atEnd())
+    {
+        QString line = in.readLine();
+
+        if(line.contains(QString("const")))
+        {
+            QStringList list_temp = line.split(QRegExp("\\s+"));
+
+            const_temp.resize(list_temp.at(1).toInt());
+
+            for(int i = 0; i<list_temp.at(1).toInt(); i++)
+            {
+                QString line_temp = in.readLine();
+                const_temp(i) = line_temp.toDouble();
+            }
+        }
+
+        if(line.contains(QString("linear")))
+        {
+            QStringList list_temp = line.split(QRegExp("\\s+"));
+
+            linear_temp.resize(list_temp.at(1).toInt());
+
+            for(int i = 0; i<list_temp.at(1).toInt(); i++)
+            {
+                QString line_temp = in.readLine();
+                linear_temp(i) = line_temp.toDouble();
+            }
+        }
+    }
+
+    file.close();
+
+    boundary_final.push_back(const_temp);
+    boundary_final.push_back(linear_temp);
+
+    return boundary_final;
 }
 
 

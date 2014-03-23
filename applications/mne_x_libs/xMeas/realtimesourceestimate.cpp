@@ -65,12 +65,12 @@ using namespace XMEASLIB;
 
 RealTimeSourceEstimate::RealTimeSourceEstimate(QObject *parent)
 : NewMeasurement(QMetaType::type("RealTimeSourceEstimate::SPtr"), parent)
+, m_bStcSend(true)
 , m_dSamplingRate(0)
 , m_fT(0)
 , m_iArraySize(600)
 , m_iCurIdx(0)
 , m_fCurTimePoint(0)
-, m_bStcSend(true)
 {
     m_MNEStc.data = MatrixXd(0,0);
     m_MNEStc.times = RowVectorXf(m_iArraySize);

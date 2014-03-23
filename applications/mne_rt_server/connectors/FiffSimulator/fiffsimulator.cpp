@@ -102,13 +102,15 @@ const QString FiffSimulator::Commands::SIMFILE      = "simfile";
 FiffSimulator::FiffSimulator()
 : m_pFiffProducer(new FiffProducer(this))
 //, m_sResourceDataPath(QString("%1/MNE-sample-data/MEG/sample/sample_audvis_raw.fif").arg(QCoreApplication::applicationDirPath()))
-, m_sResourceDataPath(QString("D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2014_02_24_Lorenz_Esch_008/Original/EEG_data_001_involuntary_right_tapping_raw.fif"))
+, m_sResourceDataPath(QString("D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2014_02_24_Lorenz_Esch_008/Original/EEG_data_001_involuntary_left_tapping_raw.fif"))
+//, m_sResourceDataPath(QString("D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2014_02_24_Lorenz_Esch_008/Original/EEG_data_001_base_raw.fif"))
+//, m_sResourceDataPath(QString("D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2014_02_24_Lorenz_Esch_008/Original/EEG_data_001_involuntary_right_tapping_raw.fif"))
 //, m_sResourceDataPath(QString("D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2014_02_24_Lorenz_Esch_008/Processed/filtered/EEG_data_001_involuntary_right_tapping_filtered_07_40_raw.fif"))
-, m_bIsRunning(false)
 , m_uiBufferSampleSize(100)//(4)
-, m_pRawMatrixBuffer(NULL)
 , m_AccelerationFactor(1.0)
 , m_TrueSamplingRate(0.0)
+, m_pRawMatrixBuffer(NULL)
+, m_bIsRunning(false)
 {
     this->init();
 }

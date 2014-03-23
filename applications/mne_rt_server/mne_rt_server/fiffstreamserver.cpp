@@ -97,6 +97,8 @@ void FiffStreamServer::comClist(Command p_command)
     }
     t_sOutput.append("\n");
     qobject_cast<MNERTServer*>(this->parent())->getCommandManager()["clist"].reply(t_sOutput);
+
+    Q_UNUSED(p_command);
 }
 
 
@@ -166,6 +168,8 @@ void FiffStreamServer::comStopAll(Command p_command)
     emit stopMeasFiffStreamClient(-1);
     QString str = QString("\tstop all FiffStreamClients from receiving raw buffers\r\n\n");
     qobject_cast<MNERTServer*>(this->parent())->getCommandManager()["stop-all"].reply(str);
+
+    Q_UNUSED(p_command);
 }
 
 

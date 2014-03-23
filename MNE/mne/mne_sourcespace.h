@@ -199,6 +199,16 @@ public:
 
     //=========================================================================================================
     /**
+    * Reduces a source space to selected regions
+    *
+    * @param[in] p_qListLabels  ROIs
+    *
+    * @return the reduced source space
+    */
+    MNESourceSpace pick_regions(const QList<Label> &p_qListLabels) const;
+
+    //=========================================================================================================
+    /**
     * ### MNE toolbox root function ###: Implementation of the mne_read_source_spaces function
     *
     * Reads source spaces from a fif file
@@ -211,16 +221,6 @@ public:
     * @return true if succeeded, false otherwise
     */
     static bool readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, FiffDirTree& p_Tree, MNESourceSpace& p_SourceSpace);
-
-    //=========================================================================================================
-    /**
-    * Reduces a source space to selected regions
-    *
-    * @param[in] p_qListLabels  ROIs
-    *
-    * @return the reduced source space
-    */
-    MNESourceSpace selectRegions(const QList<Label> &p_qListLabels) const;
 
     //=========================================================================================================
     /**

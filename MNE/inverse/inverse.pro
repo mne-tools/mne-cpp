@@ -65,12 +65,12 @@ else {
 
 # OpenMP
 win32 {
-    QMAKE_CXXFLAGS+= -openmp
-    QMAKE_LFLAGS +=  -openmp
+    QMAKE_CXXFLAGS  +=  -openmp
+    #QMAKE_LFLAGS    +=  -openmp
 }
 unix:!macx {
-    QMAKE_CXXFLAGS+= -fopenmp
-    QMAKE_LFLAGS +=  -fopenmp
+    QMAKE_CXXFLAGS  +=  -fopenmp
+    QMAKE_LFLAGS    +=  -fopenmp
 }
 
 DESTDIR = $${MNE_LIBRARY_DIR}
@@ -91,6 +91,7 @@ win32 {
 SOURCES += \
     minimumNorm/minimumnorm.cpp \
     rapMusic/rapmusic.cpp \
+    rapMusic/pwlrapmusic.cpp \
     rapMusic/dipole.cpp
 
 HEADERS +=\
@@ -98,6 +99,7 @@ HEADERS +=\
     IInverseAlgorithm.h \
     minimumNorm/minimumnorm.h \
     rapMusic/rapmusic.h \
+    rapMusic/pwlrapmusic.h \
     rapMusic/dipole.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}

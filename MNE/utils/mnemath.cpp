@@ -332,6 +332,19 @@ SparseMatrix<double>* MNEMath::make_block_diag(const MatrixXd &A, qint32 n)
 
 //*************************************************************************************************************
 
+int MNEMath::nchoose2(int n)
+{
+
+    //nchoosek(n, k) with k = 2, equals n*(n-1)*0.5
+
+    int t_iNumOfCombination = (int)(n*(n-1)*0.5);
+
+    return t_iNumOfCombination;
+}
+
+
+//*************************************************************************************************************
+
 qint32 MNEMath::rank(const MatrixXd& A, double tol)
 {
     JacobiSVD<MatrixXd> t_svdA(A);//U and V are not computed

@@ -221,6 +221,15 @@ public:
 
     //=========================================================================================================
     /**
+    * Calculates the combination of n over 2 (nchoosek(n,2))
+    *
+    * @param[in] n  The number of elements which should be combined with each other (n over 2)
+    * @return   The number of combinations
+    */
+    static int nchoose2(int n);
+
+    //=========================================================================================================
+    /**
     * ToDo make this a template function
     *
     * Returns the rank of a matrix A.

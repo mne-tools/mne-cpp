@@ -85,11 +85,11 @@ using namespace XMEASLIB;
 
 TriggerControl::TriggerControl()
 : m_pTriggerOutput(NULL)
-, m_iBaud(115000)
 , m_pSerialPort(new SerialPort) // initialize a new serial port
+, m_iBaud(115000)
+, m_pDataSingleChannel(new dBuffer(1024))
 , m_iNumChs(0)
 , m_bIsRunning(false)
-, m_pDataSingleChannel(new dBuffer(1024))
 , m_fs(1024)
 , m_dt(1/m_fs)
 , m_refFreq(0.5)
