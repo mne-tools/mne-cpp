@@ -41,7 +41,7 @@ class UTILSSHARED_EXPORT adaptiveMP
 public:
     adaptiveMP();
     VectorXd GaussFunction (qint32 N, qreal s, qint32 p);
-    QList<Atom> MatchingPursuit (VectorXd signal, qint32 max_it, qreal epsilon);
+    QList<GaborAtom> MatchingPursuit (MatrixXd signal, qint32 max_it, qreal epsilon);
     VectorXcd ModulationFunction(qint32 N, qreal k);
 };
 

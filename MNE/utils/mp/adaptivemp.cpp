@@ -12,7 +12,7 @@
 //=============================================================================================================
 
 using namespace UTILSLIB;
-using namespace Eigen;
+//using namespace Eigen;
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -26,49 +26,119 @@ adaptiveMP::adaptiveMP()
 
 //*************************************************************************************************************
 
-//MP Algorithmus von M. Gratkowski (nur einkanalig - single trial)
-QList<Atom> adaptiveMP::MatchingPursuit (VectorXd signal,qint32 max_it,qreal epsilon)
+//MP Algorithmus of M. Gratkowski
+QList<GaborAtom> adaptiveMP::MatchingPursuit (MatrixXd signal,qint32 max_it,qreal epsilon)
 {
-        QList<Atom> atom;
-        Eigen::FFT<double> fft;
-        qreal signalEnergy = 0;
-        VectorXd residuum = signal; //Residuum initialisiert mit signal
-        qint32 it = 0;                  //Iterationszähler
+        QList<GaborAtom> atomList;
+        Eigen::FFT<double> fft;        
+        MatrixXd residuum = signal; //residuum initialised with signal
+        qint32 it = 0;                  //iterationscounter
+        qint32 sampleCount = signal.rows();
+        qint32 channelCount = signal.cols();
+        VectorXd signalEnergy(channelCount);
 
-        //Berechnen der Signalenergie
-        for(qint32 sample = 0; sample < signal.rows(); sample++)
-            signalEnergy += (signal[sample] * signal[sample]);
+        //calculate signalenergy
+        for(qint32 channel = 0; channel < channelCount; channel++)
+            for(qint32 sample = 0; sample < sampleCount; sample++)
+                signalEnergy[channel] = (signal(sample, channel) * signal(sample, channel));
 
         while(it < max_it)
         {
-            //Variablen für dyadische Abtastung
-            qreal s = 1;
+            //variables for dyadic sampling
+            qreal s = 1;                                                    //scale
             qint32 j = 1;
+            VectorXd maxScalarProduct = RowVectorXd::Zero(channelCount);
 
-            while(s < signal.rows())
+            while(s < sampleCount)
             {
-                qreal k = 0;
-
-                qint32 p = floor(signal.rows()/2);    //halbe Sampleanzahl abgerundet bspw. 9/2 = 4
-                VectorXd envelope = GaussFunction(signal.rows(), s, p);
-                VectorXcd fftEnvelope = RowVectorXcd::Zero(signal.rows());
+                qreal k = 0;                                                //for modulation 2*pi*k/N
+                qint32 p = floor(sampleCount / 2);                          //translation
+                VectorXd envelope = GaborAtom::GaussFunction(sampleCount, s, p);
+                VectorXcd fftEnvelope = RowVectorXcd::Zero(sampleCount);
                 fft.fwd(fftEnvelope, envelope);
 
-                for(qint32 i = 0; i < signal.rows(); i++)
-                    std::cout << i<< "     "<< (abs(fftEnvelope[i]))<<"\n";
-
-                for(qint32 i = 0; i < signal.rows(); i++)
-                    std::cout << i<< "     "<< (envelope[i])<<"\n";
-
-
-                //QList<qreal> fftEnvelope = //todo hier fehlt fft
-
-               while(k <= signal.rows()/2)
+                while(k <= sampleCount/2)
                 {
-                    qint32 p = floor(signal.rows()/2);
-                    VectorXcd modulation = ModulationFunction(signal.rows(), k);
+                    p = floor(sampleCount/2);
+                    VectorXcd modulation = ModulationFunction(sampleCount, k);
+                    VectorXcd modulatedResid(sampleCount);
+                    VectorXcd fftModulatedResid;
+                    VectorXcd fftMEResid(sampleCount);
+                    VectorXd corrCoeffs;
+                    GaborAtom *gaborAtom = new GaborAtom(sampleCount, s, p, k, 0);
 
-                    k = k + pow(2,(-j))*signal.rows()/2;
+                    //iteration for multichannel
+                    for(qint32 chn = 0; chn < channelCount; chn++)
+                    {
+                        qint32 maxIndex = 0;
+                        qreal maximum;// = corrCoeffs[0];
+                        qreal phase = 0;
+                        qreal scalarProduct = 0;
+
+                        //complex correlation of signal and sinus-modulated gaussfunction
+                        for(qint32 l = 0; l< sampleCount; l++)
+                            modulatedResid[l] = residuum(l, chn) * modulation[l];
+                        fft.fwd(fftModulatedResid, modulatedResid);
+
+                        for( qint32 m = 0; m < sampleCount; m++)
+                           fftMEResid[m] = fftModulatedResid[m] * conj(fftEnvelope[m]);
+
+                        fft.inv(corrCoeffs, fftMEResid);
+                        maximum = corrCoeffs[0];
+
+                        //find index of maximum correlation-coefficient to use in translation
+                        for(qint32 i = 1; i < corrCoeffs.rows(); i++)
+                            if(maximum < corrCoeffs[i])
+                            {
+                                maximum = corrCoeffs[i];
+                                maxIndex = i;
+                            }
+
+                        //adapting translation p to create atomtranslation correctly
+                        if(maxIndex >= p) p = maxIndex - p;
+                        else p = maxIndex + p;
+
+                        //create complex Gaboratom
+                        VectorXcd complexGaborAtom = gaborAtom->CreateComplex();
+
+                        //calculate Inner Product: preparation to find the parameter phase
+                        std::complex<double> innerProduct(0, 0);
+
+                        for(qint32 i = 0; i < sampleCount; i++)
+                            innerProduct += residuum(i, chn) * conj(complexGaborAtom[i]);
+
+                        //calculate Phase to create realGaborAtoms
+                        phase = atan(imag(innerProduct) / real(innerProduct));
+                        VectorXd realGaborAtom = gaborAtom ->CreateReal();
+
+                        //Hint: inner Product is used to select the best matching Atom
+                        for(qint32 i= 0; i < sampleCount; i++)
+                            scalarProduct += realGaborAtom[i] * residuum(i, chn);
+
+                        //dbg why difference between complex innerProduct and qreal scalarProduct??
+
+                        //innerProduct = 0;//(0, 0);
+                        //for(qint32 i= 0; i < sampleCount; i++)
+                        //    innerProduct += (realGaborAtom[i] * residuum(i, chn), 0);
+
+                        //std::cout << real(innerProduct) << std::endl;
+                        //std::cout <<"\n"<< scalarProduct << std::endl;
+
+                        if(abs(scalarProduct) > abs(maxScalarProduct[chn]))
+                        {
+                            //set highest scalarproduct, in comparison to best matching atom
+                            maxScalarProduct[chn] = scalarProduct;
+                            gaborAtom->Scale = s;
+                            gaborAtom->Translation = p;
+                            gaborAtom->Modulation = k;
+                            gaborAtom->Phase = phase;
+                            atomList.append(*gaborAtom);
+                        }
+
+
+                    }
+
+                    k = k + pow(2,(-j))*sampleCount/2;
 
                 }
 
@@ -80,7 +150,7 @@ QList<Atom> adaptiveMP::MatchingPursuit (VectorXd signal,qint32 max_it,qreal eps
         }
 
         //printf("ich verlasse mPursuit");
-        return atom;
+        return atomList;
 }
 
 //*************************************************************************************************************
@@ -107,7 +177,7 @@ VectorXcd adaptiveMP::ModulationFunction(qint32 N, qreal k)
     for(qint32 n = 0; n < N; n++)
     {
 
-        modulation[n] = std::polar(1/sqrt(N),exp(2*3.1416*k/N*n));
+        modulation[n] = std::polar(1 / sqrt(N), 2 * 3.1416 * k / N * n);
     }
     //printf("ich verlasse modulationFunction");
     return modulation;
