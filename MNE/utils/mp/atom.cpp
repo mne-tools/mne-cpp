@@ -32,6 +32,66 @@ using namespace UTILSLIB;
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
+/*
+QList<qreal> Atom::Create(qint32 samples, qreal scale, qreal modulation, qreal phase)
+{
+    int i = 0;
+    QList<qreal> atomValues;
+
+
+    atomValues.clear();
+
+    if(atomType == Atom::Gauss)
+    {
+        if(scale != 0 && samples != 0)
+        {
+            while(i < samples)
+            {
+                qreal normI = (i - (qreal)samples / 2) / (qreal)scale;
+                qreal exponentGauss = -3.14159265 * normI * normI;
+                qreal gauss = pow(2, 0.25) * exp(exponentGauss);
+                qreal angle = 6.2831853 * modulation / samples * i + phase;
+
+                qreal result = (1/ sqrt(scale)) * gauss *  cos(angle);
+
+                atomValues.append(result);
+                i++;
+            }
+        }
+    }
+    else if(atomType == Atom::Chirp)
+    {
+        if(scale != 0 && samples != 0)
+        {
+            qint32 normChirp = 0;
+            if(chirp < 0)      normChirp = samples;
+
+            i = 0;
+            while( i < samples)
+            {
+                qreal normI = (i - (qreal)samples / 2) / (qreal)scale;
+                qreal exponentGauss = -3.14159265 * normI * normI;
+                qreal gauss = pow(2, 0.25) * exp(exponentGauss);
+                qreal angle = (6.2831853 * modulation / samples) * i + (chirp / 2) * pow((i - normChirp), 2)  + phase;
+                qreal result = (1/ sqrt(scale)) * gauss *  cos(angle);
+                atomValues.append(result);
+                i++;
+            }
+        }
+    }
+
+    return atomValues;
+}
+*/
+
+QStringList GaborAtom::CreateStringValues()
+{
+    VectorXd atomValues = CreateReal();
+    QStringList atomStringValues;
+    for(qint32 i = 0; i < atomValues.rows(); i++)
+        atomStringValues.append(QString("%1").arg(atomValues[i]));
+    return atomStringValues;
+}
 
 GaborAtom::GaborAtom(qint32 sampleCount, qreal scale, qint32 translation, qreal modulation, qreal phase, bool saveToRam)
 {
@@ -112,4 +172,36 @@ VectorXd GaborAtom::CreateReal()
             realAtom[i] = realAtom[i] / normAtom;
 
     return realAtom;
+}
+
+ChirpAtom::ChirpAtom(qint32 sampleCount, qreal scale, qint32 translation, qreal modulation, qreal phase, qreal chirp, bool saveToRam)
+{
+    ChirpAtom::SampleCount = sampleCount;
+    ChirpAtom::Scale = scale;
+    ChirpAtom::Translation = translation;
+    ChirpAtom::Modulation = modulation;
+    ChirpAtom::Phase = phase;
+    ChirpAtom::Chirp = chirp;
+    ChirpAtom::SaveToRam = saveToRam;
+}
+
+VectorXcd ChirpAtom::CreateComplex()
+{
+    VectorXcd vec;
+    return vec;
+}
+
+VectorXd ChirpAtom::CreateReal()
+{
+    VectorXd vec;
+    return vec;
+}
+
+QStringList ChirpAtom::CreateStringValues()
+{
+    VectorXd atomValues = CreateReal();
+    QStringList atomStringValues;
+    for(qint32 i = 0; i < atomValues.rows(); i++)
+        atomStringValues.append(QString("%1").arg(atomValues[i]));
+    return atomStringValues;
 }

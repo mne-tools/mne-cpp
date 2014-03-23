@@ -52,13 +52,33 @@ namespace UTILSLIB
     {
 
     public:
+        qreal Phase;
 
         GaborAtom(qint32 sampleCount, qreal scale, qint32 translation, qreal modulation, qreal phase, bool saveToRam = false);
-        qreal Phase;
+
         static VectorXd GaborAtom::GaussFunction (qint32 sampleCount, qreal scale, qint32 translation);
         VectorXcd GaborAtom::CreateComplex();
         VectorXd GaborAtom::CreateReal();
+        QStringList GaborAtom::CreateStringValues();
+
     };
+
+    class UTILSSHARED_EXPORT ChirpAtom : public Atom
+    {
+
+    public:
+
+        qreal Phase;
+        qreal Chirp;
+
+        ChirpAtom(qint32 sampleCount, qreal scale, qint32 translation, qreal modulation, qreal phase, qreal chirp, bool saveToRam = false);
+
+        VectorXcd ChirpAtom::CreateComplex();
+        VectorXd ChirpAtom::CreateReal();
+        QStringList ChirpAtom::CreateStringValues();
+
+    };
+
 
 }
 #endif // ATOM_H

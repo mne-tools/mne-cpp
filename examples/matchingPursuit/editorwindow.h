@@ -35,6 +35,12 @@ public:
     explicit EditorWindow(QWidget *parent = 0);
     ~EditorWindow();
 
+    enum AtomType
+    {
+             Gauss,
+             Chirp
+    };
+
 private:
 
     void readDicts();

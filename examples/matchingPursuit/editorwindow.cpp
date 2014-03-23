@@ -100,7 +100,7 @@ QList<qreal> chirpList;
 
 qint32 atomCount = 1;
 
-Atom::AtomType atomType;
+EditorWindow::AtomType atomType;
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -168,9 +168,9 @@ void EditorWindow::calcAtomCountAllCombined()
     if(phaseList.length() != 0) phaseCount = phaseList.length();
     if(chirpList.length() != 0) chirpCount = chirpList.length();
 
-    if(atomType == Atom::Gauss)
+    if(atomType == EditorWindow::Gauss)
         count = scaleCount  * moduCount * phaseCount;
-    else if( atomType == Atom::Chirp)
+    else if( atomType == EditorWindow::Chirp)
         count = scaleCount  * moduCount * phaseCount * chirpCount;
 
     if(count > 1000000)
@@ -1013,12 +1013,12 @@ void EditorWindow::on_rb_NegCountChirp_toggled()
 // Legt fest ob es sich um ein Gauss- oder Chirp- Atom handelt
 void EditorWindow::on_rb_GaussAtomType_toggled(bool checked)
 {
-    if(checked) atomType = Atom::Gauss;
+    if(checked) atomType = EditorWindow::Gauss;
 }
 
 void EditorWindow::on_rb_ChirpAtomType_toggled(bool checked)
 {
-    if(checked) atomType = Atom::Chirp;
+    if(checked) atomType = EditorWindow::Chirp;
 
     if(checked && ui->spb_AtomCount->value() == 1 && !allCombined)
     {
@@ -1051,8 +1051,7 @@ void EditorWindow::on_rb_ChirpAtomType_toggled(bool checked)
 
 // Berechnet alle Atome mit den eingestellten Parameter und speichert diese in einer Liste (und auf Platte)
 void EditorWindow::on_btt_CalcAtoms_clicked()
-{
-    Atom *atom = new Atom();
+{   
     QStringList resultList;
     resultList.clear();
 
@@ -1121,8 +1120,16 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
                             if(chirpList.length() == 1)    tempChirp = chirpList.at(0);
                             else                           tempChirp = chirpList.at(chirpCount);
 
-                            resultList = atom->CreateStringValues(ui->spb_AtomLength->value(), tempScale , tempModu, tempPhase, tempChirp, atomType);
-
+                            if(atomType == EditorWindow::Chirp)
+                             {
+                                ChirpAtom *cAtom = new ChirpAtom(ui->spb_AtomLength->value(), tempScale, 0, tempModu, tempPhase, tempChirp);
+                                resultList = cAtom->CreateStringValues();
+                            }
+                            else if(atomType == EditorWindow::Gauss)
+                            {
+                                GaborAtom *gAtom = new GaborAtom(ui->spb_AtomLength->value(), tempScale, 0, tempModu, tempPhase);
+                                resultList = gAtom->CreateStringValues();
+                            }
                             stream << QString("%1_ATOM_%2 \n scale: %3 modu: %4 phase: %5 chrip: %6").arg(partDictName).arg(atomIndex).arg(tempScale).arg(tempModu).arg(tempPhase).arg(tempChirp) << "\n";
                             for (QStringList::Iterator it = resultList.begin(); it != resultList.end(); it++)
                                 stream << *it << "\n";
@@ -1175,7 +1182,16 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
                 if(chirpList.length() == 1)    tempChirp = chirpList.at(0);
                 else                           tempChirp = chirpList.at(i);
 
-                resultList = atom->CreateStringValues(ui->spb_AtomLength->value(), tempScale , tempModu, tempPhase, tempChirp, atomType);
+                if(atomType == EditorWindow::Chirp)
+                 {
+                    ChirpAtom *cAtom = new ChirpAtom(ui->spb_AtomLength->value(), tempScale, 0, tempModu, tempPhase, tempChirp);
+                    resultList = cAtom->CreateStringValues();
+                }
+                else if(atomType == EditorWindow::Gauss)
+                {
+                    GaborAtom *gAtom = new GaborAtom(ui->spb_AtomLength->value(), tempScale,0 , tempModu, tempPhase);
+                    resultList = gAtom->CreateStringValues();
+                }
 
                 stream << QString("%1_ATOM_%2 \n scale: %3 modu: %4 phase: %5 chrip: %6").arg(partDictName).arg(i).arg(tempScale).arg(tempModu).arg(tempPhase).arg(tempChirp)  << "\n";
                 for (QStringList::Iterator it = resultList.begin(); it != resultList.end(); it++)
