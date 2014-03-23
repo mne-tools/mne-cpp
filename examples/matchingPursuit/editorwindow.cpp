@@ -625,7 +625,6 @@ void EditorWindow::on_chb_CombAllPara_toggled(bool checked)
     calcChirpValue();
 }
 
-
 void EditorWindow::on_spb_AtomLength_editingFinished()
 {
     // Setzt den maximalen Startwert für die Skalierung
@@ -636,7 +635,6 @@ void EditorWindow::on_spb_AtomLength_editingFinished()
     calcModuValue();
     calcPhaseValue();
     calcChirpValue();
-
 }
 
 // Anzahl der Atome einstellen (und Endwerte neuberechnen)
@@ -1205,7 +1203,7 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
 
     QListWidgetItem *item = new QListWidgetItem;
     item->setToolTip(QString("%1.pdict").arg(partDictName));
-    item->setIcon(QIcon(":images/icons/PartDictIcon.png"));
+    item->setIcon(QIcon(":/images/icons/PartDictIcon.png"));
     item->setText(partDictName);
 
     ui->list_AllDict->addItem(item);

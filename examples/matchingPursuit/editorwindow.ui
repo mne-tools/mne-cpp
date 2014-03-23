@@ -18,7 +18,7 @@
   </property>
   <property name="windowIcon">
    <iconset resource="Ressourcen.qrc">
-    <normaloff>:/icons/images/icons/spanner.png</normaloff>:/icons/images/icons/spanner.png</iconset>
+    <normaloff>:/images/icons/pen.png</normaloff>:/images/icons/pen.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -42,7 +42,7 @@
          <string/>
         </property>
         <property name="pixmap">
-         <pixmap resource="Ressourcen.qrc">:/icons/images/icons/sinus.png</pixmap>
+         <pixmap resource="Ressourcen.qrc">:/images/icons/sinus.png</pixmap>
         </property>
         <property name="scaledContents">
          <bool>true</bool>
@@ -1704,8 +1704,8 @@ p, li { white-space: pre-wrap; }
               <string>Wörterbuch erstellen</string>
              </property>
              <property name="icon">
-              <iconset>
-               <normaloff>:/Pics/Matching-Pursuit-Toolbox/Function_Icon_Set/accepted_48.png</normaloff>:/Pics/Matching-Pursuit-Toolbox/Function_Icon_Set/accepted_48.png</iconset>
+              <iconset resource="Ressourcen.qrc">
+               <normaloff>:/images/icons/accept.png</normaloff>:/images/icons/accept.png</iconset>
              </property>
             </widget>
            </item>
@@ -1749,7 +1749,7 @@ p, li { white-space: pre-wrap; }
          <string/>
         </property>
         <property name="pixmap">
-         <pixmap resource="Ressourcen.qrc">:/icons/images/icons/book.png</pixmap>
+         <pixmap resource="Ressourcen.qrc">:/images/icons/book.png</pixmap>
         </property>
         <property name="scaledContents">
          <bool>true</bool>
@@ -1832,7 +1832,7 @@ p, li { white-space: pre-wrap; }
            </property>
            <property name="icon">
             <iconset resource="Ressourcen.qrc">
-             <normaloff>:/icons/images/icons/greenArrowRight.png</normaloff>:/icons/images/icons/greenArrowRight.png</iconset>
+             <normaloff>:/images/icons/greenArrowRight.png</normaloff>:/images/icons/greenArrowRight.png</iconset>
            </property>
            <property name="iconSize">
             <size>
@@ -1858,7 +1858,7 @@ p, li { white-space: pre-wrap; }
            </property>
            <property name="icon">
             <iconset resource="Ressourcen.qrc">
-             <normaloff>:/icons/images/icons/greenArrowLeft.png</normaloff>:/icons/images/icons/greenArrowLeft.png</iconset>
+             <normaloff>:/images/icons/greenArrowLeft.png</normaloff>:/images/icons/greenArrowLeft.png</iconset>
            </property>
            <property name="iconSize">
             <size>
@@ -1947,8 +1947,8 @@ p, li { white-space: pre-wrap; }
             <string>Ausgewählte Wörterbücher löschen</string>
            </property>
            <property name="icon">
-            <iconset>
-             <normaloff>:/Pics/Matching-Pursuit-Toolbox/Function_Icon_Set/cancel_48.png</normaloff>:/Pics/Matching-Pursuit-Toolbox/Function_Icon_Set/cancel_48.png</iconset>
+            <iconset resource="Ressourcen.qrc">
+             <normaloff>:/images/icons/delete.png</normaloff>:/images/icons/delete.png</iconset>
            </property>
           </widget>
          </item>
@@ -2061,8 +2061,8 @@ p, li { white-space: pre-wrap; }
             <string>Neues Wörterbuch speichern...</string>
            </property>
            <property name="icon">
-            <iconset>
-             <normaloff>:/Pics/Matching-Pursuit-Toolbox/Function_Icon_Set/floppy_disk_48.png</normaloff>:/Pics/Matching-Pursuit-Toolbox/Function_Icon_Set/floppy_disk_48.png</iconset>
+            <iconset resource="Ressourcen.qrc">
+             <normaloff>:/images/icons/floppyDisk.png</normaloff>:/images/icons/floppyDisk.png</iconset>
            </property>
           </widget>
          </item>

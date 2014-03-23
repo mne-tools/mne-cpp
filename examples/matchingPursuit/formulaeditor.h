@@ -36,8 +36,6 @@ namespace Ui
     class Formulaeditor;
 }
 
-
-
 class Formulaeditor : public QWidget
 {
 
@@ -111,7 +109,7 @@ class AtomPaintWindow : public QWidget
     Q_OBJECT
 
 protected:
-   void paintEvent();
+   void paintEvent(QPaintEvent *event);
 public:
    void PaintSignal(QList<qreal> valueList, QSize windowSize);
 

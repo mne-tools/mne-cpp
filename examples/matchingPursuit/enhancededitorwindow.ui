@@ -14,7 +14,7 @@
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -30,7 +30,7 @@
   </property>
   <property name="windowIcon">
    <iconset resource="Ressourcen.qrc">
-    <normaloff>:/icons/images/icons/design.png</normaloff>:/icons/images/icons/design.png</iconset>
+    <normaloff>:/images/icons/design.png</normaloff>:/images/icons/design.png</iconset>
   </property>
   <layout class="QVBoxLayout" name="_2">
    <item>
@@ -146,8 +146,8 @@
         <string/>
        </property>
        <property name="icon">
-        <iconset>
-         <normaloff>:/Pics/Matching-Pursuit-Toolbox/Function_Icon_Set/119498563188281957tasto_8_architetto_franc_01.svg.hi.png</normaloff>:/Pics/Matching-Pursuit-Toolbox/Function_Icon_Set/119498563188281957tasto_8_architetto_franc_01.svg.hi.png</iconset>
+        <iconset resource="Ressourcen.qrc">
+         <normaloff>:/images/icons/delete.png</normaloff>:/images/icons/delete.png</iconset>
        </property>
       </widget>
      </item>
@@ -1696,6 +1696,10 @@
       <widget class="QPushButton" name="pushButton">
        <property name="text">
         <string>(Teil-) Wörterbuch speichern</string>
+       </property>
+       <property name="icon">
+        <iconset resource="Ressourcen.qrc">
+         <normaloff>:/images/icons/floppyDisk.png</normaloff>:/images/icons/floppyDisk.png</iconset>
        </property>
       </widget>
      </item>

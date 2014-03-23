@@ -101,7 +101,7 @@ Formulaeditor::~Formulaeditor()
     delete ui;
 }
 
-void AtomPaintWindow::paintEvent()
+void AtomPaintWindow::paintEvent(QPaintEvent *event)
 {    
     PaintSignal(atomList, QSize(510,200));
 }
