@@ -101,20 +101,24 @@ public:
     * Destroys the SerialPort.
     */
     ~SerialPort();
+
     //=========================================================================================================
     /**
-    * Initializes Settings as data bits or baud rate, parity, stop bits and flow control
+    * Initializes Settings as data bits or baud rate, parity, stop bits and flow control.
     *
     */
     void initSettings();
+
     //=========================================================================================================
     /**
-    * Checks all available serial ports for the one desired and initializes to that
+    * Checks all available serial ports for the one desired and initializes to that.
     *
-    */    void initPort();
+    */
+    void initPort();
+
     //=========================================================================================================
     /**
-    * Opens a channel to the serial port
+    * Opens a channel to the serial port.
     *
     */
     bool open();
@@ -122,103 +126,122 @@ public:
 
     //=========================================================================================================
     /**
-    * Closes the channel to the serial port
+    * Closes the channel to the serial port.
     *
     */    
 	void close();
 
     //=========================================================================================================
     /**
-    * Encodes the selected digital output channels according to a data transfer protocol (see manual)
+    * Encodes the selected digital output channels according to a data transfer protocol (see manual).
     *
     */
     void encodedig();
 
     //=========================================================================================================
     /**
-    * Encodes the selected analog output channel according to a data transfer protocol (see manual)
+    * Encodes the selected analog output channel according to a data transfer protocol (see manual).
     *
     */
     void encodeana();
 
-
     //=========================================================================================================
     /**
-    * Encodes a retrieve byte array according to a data transfer protocol (see manual)
+    * Encodes a retrieve byte array according to a data transfer protocol (see manual).
     *
     */
     void encoderetr();
 
     //=========================================================================================================
     /**
-    * Decodes the digital input information according to a data transfer protocol (see manual)
-    *
+    * Decodes the digital input information according to a data transfer protocol (see manual).
+    * @param [in] QByteArray input byte array according to transfer protocol (see manual).    *
     */
     void decodedig(QByteArray &t_incomingArray);
 
     //=========================================================================================================
     /**
-    * Decodes the analog input information according to a data transfer protocol (see manual)
-    *
+    * Decodes the analog input information according to a data transfer protocol (see manual).
+    * @param [in] QByteArray input byte array according to transfer protocol (see manual).
+
     */
     void decodeana(QByteArray &t_incomingArray);
 
     //=========================================================================================================
     /**
     * Sends a byte array to the configured serial port
-    *
+    * @param [in] QByteArray output byte array according to transfer protocol (see manual).
     */
     void sendData(const QByteArray &data);
 
     //=========================================================================================================
     /**
-    * Reads the input information after checking whether it is formally correct
+    * Reads the input information after checking whether it is formally correct.
     *
     */
     void readData();
 
 
-    QByteArray m_data;              /**< Holds the byte array*/
-    QVector<int> m_digchannel;      /**< Holds the currently selected digital output channel */
-    int m_motor;                    /**< Holds the currently selected analog output channel */
-    int m_analval;                  /**< Holds the current analog output value */
 
-    QVector<int> m_InAnChannelVal;  /**< Lists the analog values of the input channels*/
-    QVector<int> m_InActiveDig;     /**< Lists the digital states of the input channels*/
+    QByteArray          m_data;                     /**< Holds the byte array. */
+    QVector<int>        m_digchannel;               /**< Holds the currently selected digital output channel. */
+    int                 m_motor;                    /**< Holds the currently selected analog output channel. */
+    int                 m_analval;                  /**< Holds the current analog output value. */
 
+    QVector<int>        m_InAnChannelVal;           /**< Lists the analog values of the input channels .*/
+    QVector<int>        m_InActiveDig;              /**< Lists the digital states of the input channels. */
  
-    int m_retrievetyp;              /**< Holds the desired input mode (analog or digital)*/
-    int m_retrievechan;             /**< Holds the desired analog input channel*/
+    int                 m_retrievetyp;              /**< Holds the desired input mode (analog or digital). */
+    int                 m_retrievechan;             /**< Holds the desired analog input channel. */
 
-
-    int m_wiredChannel;             /**< Holds the channel which is connected to the TriggerControl Run Method*/
+    int                 m_wiredChannel;             /**< Holds the channel which is connected to the TriggerControl Run Method. */
 
     //=========================================================================================================
     /**
-    * ....
+    * Holds the information which are necessery to define the serial port.
+    * @param [in] name name of the port.
+    * @param [in] baudRate desired baud rate.
+    * @param [in] stringBaudRate desired baud rate as string.
+    * @param [in] dataBits desired data bits.
+    * @param [in] stringDataBits string of desired data bits.
+    * @param [in] parity desired parity.
+    * @param [in] stringParity string of desired parity.
+    * @param [in] stopBits desired stop bits.
+    * @param [in] stringStopBits string of desired stop bits.
+    * @param [in] flowControl desired flow control.
+    * @param [in] stringFlowControl string of desired flow control.
     */
     struct Settings {
-        QString name;
-        qint32 baudRate;
-        QString stringBaudRate;
+        QString             name;
+        qint32              baudRate;
+        QString             stringBaudRate;
         QSerialPort::DataBits dataBits;
-        QString stringDataBits;
+        QString             stringDataBits;
         QSerialPort::Parity parity;
-        QString stringParity;
+        QString             stringParity;
         QSerialPort::StopBits stopBits;
-        QString stringStopBits;
+        QString             stringStopBits;
         QSerialPort::FlowControl flowControl;
-        QString stringFlowControl;
+        QString             stringFlowControl;
     };
 
+
+//=========================================================================================================
+/**
+* returns the current settings
+*
+*/
     inline Settings& settings()
     {
         return m_currentSettings;
     }
 
+//=========================================================================================================
+
 signals:
-    void dataAvailable(const QByteArray);
-    void byteReceived();
+    void dataAvailable(const QByteArray);       /**< [...] .*/
+
+    void byteReceived();                        /**< [...] .*/
 
 
 protected:

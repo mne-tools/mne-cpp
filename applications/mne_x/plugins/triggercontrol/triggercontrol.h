@@ -135,44 +135,44 @@ public:
 
     //=========================================================================================================
     /**
-    * Initialise input and output connectors.
+    * Starts the TriggerControl by starting the triggercontrol's thread.
     */
     virtual bool start();
 
     //=========================================================================================================
     /**
-    * Initialise input and output connectors.
+    * Stops the TriggerControl by starting the triggercontrol's thread.
     */
     virtual bool stop();
 
     //=========================================================================================================
     /**
-    * Initialise input and output connectors.
+    * [...]
     */
     virtual IPlugin::PluginType getType() const;
 
     //=========================================================================================================
     /**
-    * Initialise input and output connectors.
+    * [...]
     */
     virtual QString getName() const;
 
 
     //=========================================================================================================
     /**
-    * Initialise input and output connectors.
+    * [...]
     */    
     virtual QWidget* setupWidget();
 
     //=========================================================================================================
     /**
-    * Initialise input and output connectors.
+    * [...]
     */
     void updateSingleChannel(XMEASLIB::NewMeasurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
-    * Initialise input and output connectors.
+    * [...]
     */
     void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
 
