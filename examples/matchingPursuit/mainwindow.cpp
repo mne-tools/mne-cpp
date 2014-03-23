@@ -6,11 +6,18 @@
 
 #include "mainwindow.h"
 #include <disp/plot.h>
+#include "editorwindow.h"
+#include "ui_editorwindow.h"
+#include "formulaeditor.h"
+#include "ui_formulaeditor.h"
+#include "enhancededitorwindow.h"
+#include "ui_enhancededitorwindow.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
+
 
 
 //*************************************************************************************************************
@@ -26,12 +33,19 @@ using namespace DISPLIB;
 //*************************************************************************************************************
 
 
+
 //*************************************************************************************************************
 
 
 MainWindow::MainWindow(QWidget *parent) : QWidget(parent)
-{
+{   
+    EditorWindow *x = new EditorWindow();
+    x->show();
 
+    Formulaeditor *fEditor = new Formulaeditor();
+    fEditor->show();
 
-
+    Enhancededitorwindow *ex = new Enhancededitorwindow();
+    ex->show();
 }
+

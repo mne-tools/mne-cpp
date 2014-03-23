@@ -5,6 +5,11 @@
 
 
 #include <QWidget>
+//Eigen
+#include <Eigen/Core>
+
+using namespace Eigen;
+
 
 class MainWindow : public QWidget
 {
@@ -16,6 +21,11 @@ signals:
 
 public slots:
 
+private:
+
+
 };
+
+
 
 #endif // MAINWINDOW_H
