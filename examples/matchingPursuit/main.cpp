@@ -101,47 +101,66 @@ int main(int argc, char *argv[])
 
     //qint32 readFiffFile = ReadFiffFile();
 
-    QList<Atom> myAtomList;
-    qint32 it = 10;
+    QList<GaborAtom> myAtomList;
+    qint32 it = 1;
     qreal epsilon = 0.4;
     adaptiveMP *adaptiveMp = new adaptiveMP();
-    qint32 t_iSize = 100;
-    VectorXd signal(t_iSize);
+    qint32 t_iSize = 40;
+    MatrixXd signal(t_iSize, 1);
 
     //Testsignal
-    for(int i = 0; i < t_iSize; ++i)
+    for(int i = 0; i < t_iSize; i++)
     {
         double t = 0.01 * i;
-        signal[i] = 7*sin(2 * 3.1416 * 4 * t)+ sin(2*3.1416 * 10 * t) + 0.7*sin(2 * 3.1416 * 0.4 * t) + 2*sin(2 * 3.1416 * 14 * t);
+        signal(i, 0) = sin(2 * 3.1416 * 4 * t);//+ sin(2*3.1416 * 10 * t) + 0.7*sin(2 * 3.1416 * 0.4 * t) + 2*sin(2 * 3.1416 * 14 * t);
     }
 
     myAtomList = adaptiveMp->MatchingPursuit(signal, it, epsilon);
-
+    /*
     //Fouriertransformation
     Eigen::FFT<double> fft;
+    fft.SetFlag(fft.HalfSpectrum);
     VectorXcd fftSignal = VectorXcd::Zero(t_iSize);
     fft.fwd(fftSignal, signal);
 
     //Absolutbetrag
-    VectorXd absFftSignal = VectorXd::Zero(t_iSize);
-    for(qint32 i=0; i < t_iSize; i++)
-        absFftSignal[i] = abs(fftSignal[i]);
-
+    VectorXd absFftSignal = VectorXd::Zero(fftSignal.rows());
+    for(qint32 i=0; i < fftSignal.rows(); i++)
+        absFftSignal[i] = -abs(fftSignal[i]);
+    */
     mainWindow = new MainWindow();
 
     //Plot Test
-    Plot plot(absFftSignal);
+    VectorXd test(signal.rows());
+    VectorXd approximation = VectorXd::Zero(signal.rows());
 
+    for(qint32 i = 0; i < myAtomList.length(); i++)
+    {
+        GaborAtom paintAtom = myAtomList.at(i);
+        test = paintAtom.CreateReal();
+        for(qint32 j = 0; j < test.rows(); j++)
+            approximation[j] += test[j];
+
+        Plot *plot = new Plot(approximation);
+        //plot(test);
+        plot->show();
+
+    }
+
+    //Plot plot(approximation, mainWindow);
+//    plot.setGeometry(0,0,mainWindow->width(),mainWindow->height());
+    //Plot sPlot(signal);
 
 //    plot.setTitle("Test Plot");
 //    plot.setXLabel("X Axes");
 //    plot.setYLabel("Y Axes");
 
 //    plot.setWindowTitle("Corresponding function to MATLABs plot");
-//    plot.show();
+    //plot.show();
+    //sPlot.show();
 
     //printf("ich bin zurück");
-    mainWindow->show();
+    //mainWindow->show();
 
     return a.exec();
 }

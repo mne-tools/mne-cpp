@@ -12,6 +12,9 @@
 #include <vector>
 #include <math.h>
 #include <utils/utils_global.h>
+#include <Eigen/Core>
+#include <Eigen/SparseCore>
+#include <Eigen/unsupported/FFT>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -22,40 +25,40 @@
 
 namespace UTILSLIB
 {
-//=============================================================================================================
-// NAMESPACES
+    //=============================================================================================================
+    // NAMESPACES
 
+    using namespace Eigen;
 
-//*************************************************************************************************************
+    //*************************************************************************************************************
 
+    #define PI 3.1415926535897932384626433832795
 
+    // Atomklasse zum Erstellen und Abrufen von Atomen und deren Parameter
+    class UTILSSHARED_EXPORT Atom// : public QObject
+    {
+       // Q_OBJECT
 
-// Atomklasse zum Erstellen und Abrufen von Atomen und deren Parameter
-class UTILSSHARED_EXPORT Atom : public QObject
-{
-    Q_OBJECT
+    public:
 
+        bool SaveToRam;
+        qint32 SampleCount;
+        qreal Scale;
+        qint32 Translation;
+        qreal Modulation;
+    };
 
+    class UTILSSHARED_EXPORT GaborAtom : public Atom
+    {
 
-public:
-//    enum AtomType
-//    {
-//             Gauss,
-//             Chirp
-//    };
+    public:
 
-    Atom();
-
-    qreal Samples;
-    qreal Scale;
-    qreal Modulation;
-    qreal Phase;
-    qreal ChirpValue;
-    //Atom::AtomType AType;
-
-    //QList<qreal> Create(qint32 samples, qreal scale, qreal modulation, qreal phase, qreal chirp = 0 /*,Atom::AtomType atomType = Gauss*/);
-    //QStringList  CreateStringValues(qint32 samples, qreal scale, qreal modulation, qreal phase, qreal chirp/*, Atom::AtomType atomType*/);
-};
+        GaborAtom(qint32 sampleCount, qreal scale, qint32 translation, qreal modulation, qreal phase, bool saveToRam = false);
+        qreal Phase;
+        static VectorXd GaborAtom::GaussFunction (qint32 sampleCount, qreal scale, qint32 translation);
+        VectorXcd GaborAtom::CreateComplex();
+        VectorXd GaborAtom::CreateReal();
+    };
 
 }
 #endif // ATOM_H
