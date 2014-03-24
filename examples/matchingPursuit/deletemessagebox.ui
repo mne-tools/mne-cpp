@@ -55,7 +55,7 @@
         <string/>
        </property>
        <property name="pixmap">
-        <pixmap resource="Ressourcen.qrc">:/Pics/Matching-Pursuit-Toolbox/Function_Icon_Set/warning_48.png</pixmap>
+        <pixmap resource="Ressourcen.qrc">:/images/icons/warning.png</pixmap>
        </property>
       </widget>
      </item>

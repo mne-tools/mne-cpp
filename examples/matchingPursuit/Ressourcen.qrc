@@ -1,26 +1,27 @@
 <RCC>
-    <qresource prefix="/icons">
-        <file>images/icons/accept.png</file>
-        <file>images/icons/book.png</file>
-        <file>images/icons/boxUpload.png</file>
-        <file>images/icons/cancel.png</file>
-        <file>images/icons/delete.png</file>
-        <file>images/icons/design.png</file>
-        <file>images/icons/DictIcon.png</file>
-        <file>images/icons/exclamation.png</file>
-        <file>images/icons/floppyDisk.png</file>
-        <file>images/icons/folder.png</file>
-        <file>images/icons/formel.png</file>
-        <file>images/icons/greenArrowLeft.png</file>
-        <file>images/icons/greenArrowRight.png</file>
-        <file>images/icons/logOut.png</file>
-        <file>images/icons/paper.png</file>
-        <file>images/icons/PartDictIcon.png</file>
-        <file>images/icons/pen.png</file>
-        <file>images/icons/questions.png</file>
-        <file>images/icons/ruler.png</file>
-        <file>images/icons/sinus.png</file>
-        <file>images/icons/spanner.png</file>
-        <file>images/icons/warning.png</file>
+    <qresource prefix="/images">
+        <file>icons/accept.png</file>
+        <file>icons/book.png</file>
+        <file>icons/boxUpload.png</file>
+        <file>icons/cancel.png</file>
+        <file>icons/delete.png</file>
+        <file>icons/design.png</file>
+        <file>icons/DictIcon.png</file>
+        <file>icons/exclamation.png</file>
+        <file>icons/floppyDisk.png</file>
+        <file>icons/folder.png</file>
+        <file>icons/formel.png</file>
+        <file>icons/greenArrowLeft.png</file>
+        <file>icons/greenArrowRight.png</file>
+        <file>icons/logOut.png</file>
+        <file>icons/openFile.png</file>
+        <file>icons/paper.png</file>
+        <file>icons/PartDictIcon.png</file>
+        <file>icons/pen.png</file>
+        <file>icons/questions.png</file>
+        <file>icons/ruler.png</file>
+        <file>icons/sinus.png</file>
+        <file>icons/spanner.png</file>
+        <file>icons/warning.png</file>
     </qresource>
 </RCC>

@@ -39,7 +39,7 @@ TEMPLATE = app
 
 VERSION = $${MNE_CPP_VERSION}
 
-QT += gui
+#QT -= gui
 QT += widgets
 QT += network core widgets concurrent
 
@@ -76,34 +76,18 @@ DESTDIR =  $${MNE_BINARY_DIR}
 
 SOURCES += \
         main.cpp \
-    editorwindow.cpp \
-    enhancededitorwindow.cpp \
-    formulaeditor.cpp \
-    deletemessagebox.cpp \
-    mainwindow.cpp \
-    processdurationmessagebox.cpp
+    mainwindow.cpp
 
 HEADERS += \
-    editorwindow.h \
-    enhancededitorwindow.h \
-    formulaeditor.h \
-    deletemessagebox.h \
     mainwindow.h \
-    processdurationmessagebox.h
+    ../../../../Uni/Design Projekt/Matching-Pursuit-Toolbox_1-1/editorwindow.h
 
-FORMS += \
-    editorwindow.ui \
-    enhancededitorwindow.ui \
-    formulaeditor.ui \
-    deletemessagebox.ui \
-    mainwindow.ui \
-    processdurationmessagebox.ui
-
-RESOURCES += \
-    Ressourcen.qrc
+#FORMS +=
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
 unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
 
+FORMS += \
+    ../../../../Uni/Design Projekt/Matching-Pursuit-Toolbox_1-1/editorwindow.ui

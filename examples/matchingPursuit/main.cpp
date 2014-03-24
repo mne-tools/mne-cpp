@@ -128,7 +128,7 @@ int main(int argc, char *argv[])
     */
 
     mainWindow = new MainWindow();
-    //mainWindow->show();
+    mainWindow->show();
 
     //Plot Test
     VectorXd test(signal.rows());

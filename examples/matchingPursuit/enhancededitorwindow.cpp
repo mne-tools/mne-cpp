@@ -31,8 +31,8 @@ Enhancededitorwindow::Enhancededitorwindow(QWidget *parent) :    QWidget(parent)
 {
     this->setAccessibleName("formel");
     ui->setupUi(this);
-    this->setFixedWidth(627);
-    this->setFixedHeight(160);
+    //this->setFixedWidth(627);
+    //this->setFixedHeight(160);
     QString contents;
     QFile formulaFile("Matching-Pursuit-Toolbox/user.fml");
     //if (formulaFile == ) return; //Aufpassen
@@ -41,7 +41,7 @@ Enhancededitorwindow::Enhancededitorwindow(QWidget *parent) :    QWidget(parent)
         while(!formulaFile.atEnd())
         {
             contents = formulaFile.readLine(0).constData();
-            ui->cb_AtomFormula->addItem(QIcon(":/Pics/Matching-Pursuit-Toolbox/Function_Icon_Set/formel.png"), contents.trimmed());
+            ui->cb_AtomFormula->addItem(QIcon(":/images/icons/formel.png"), contents.trimmed());
         }
     }
     formulaFile.close();
