@@ -1,9 +1,3 @@
-/bin/computeInversePwlRapMusic
-/bin/rawClusteredInversePwlRapMusic
-/bin/rawClusteredInverseRapMusic
-/bin/roiClusteredInversePwlRapMusic
-/bin/stClusteredInversePwlRapMusic
-/bin/matchingPursuit
 /lib/libMNE1Disp.so.1
 /lib/libMNE1Disp.so.1.0
 /lib/libMNE1Disp.so.1.0.0
@@ -154,6 +148,13 @@
 /bin/rawClusteredInversePwlRapMusicd
 /bin/rawClusteredInverseRapMusicd
 /bin/stClusteredInversePwlRapMusicd
+/bin/computeInversePwlRapMusic
+/bin/rawClusteredInversePwlRapMusic
+/bin/rawClusteredInverseRapMusic
+/bin/roiClusteredInversePwlRapMusic
+/bin/stClusteredInversePwlRapMusic
+/bin/matchingPursuit
+/bin/roiClusteredInversePwlRapMusicd
 
 /lib/libdisp.so.1
 /lib/libdisp.so.1.0
