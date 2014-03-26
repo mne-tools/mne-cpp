@@ -98,6 +98,8 @@ int main(int argc, char *argv[])
     QFile t_fileCov("./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
     QFile t_fileEvoked("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
     AnnotationSet t_annotationSet("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot", "./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot");
+    SurfaceSet t_surfSet("./MNE-sample-data/subjects/sample/surf/lh.white", "./MNE-sample-data/subjects/sample/surf/rh.white");
+
 
     QString t_sFileClusteredInverse("");//QFile t_fileClusteredInverse("./clusteredInverse-inv.fif");
 
@@ -106,7 +108,7 @@ int main(int argc, char *argv[])
     QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
 
     // Load data
-    fiff_int_t setno = 0;
+    fiff_int_t setno = 1;
     QPair<QVariant, QVariant> baseline(QVariant(), 0);
     FiffEvoked evoked(t_fileEvoked, setno, baseline);
     if(evoked.isEmpty())
@@ -150,24 +152,21 @@ int main(int argc, char *argv[])
     if(sourceEstimate.isEmpty())
         return 1;
 
-    // View activation time-series
-    std::cout << "\nsourceEstimate:\n" << sourceEstimate.data.block(0,0,10,10) << std::endl;
-    std::cout << "time\n" << sourceEstimate.times.block(0,0,1,10) << std::endl;
-    std::cout << "timeMin\n" << sourceEstimate.times[0] << std::endl;
-    std::cout << "timeMax\n" << sourceEstimate.times[sourceEstimate.times.size()-1] << std::endl;
-    std::cout << "time step\n" << sourceEstimate.tstep << std::endl;
+//    // View activation time-series
+//    std::cout << "\nsourceEstimate:\n" << sourceEstimate.data.block(0,0,10,10) << std::endl;
+//    std::cout << "time\n" << sourceEstimate.times.block(0,0,1,10) << std::endl;
+//    std::cout << "timeMin\n" << sourceEstimate.times[0] << std::endl;
+//    std::cout << "timeMax\n" << sourceEstimate.times[sourceEstimate.times.size()-1] << std::endl;
+//    std::cout << "time step\n" << sourceEstimate.tstep << std::endl;
 
     //Source Estimate end
     //########################################################################################
-
-    AnnotationSet t_annotSet("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot","./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot");
-    SurfaceSet t_surfSet("./MNE-sample-data/subjects/sample/surf/lh.white", "./MNE-sample-data/subjects/sample/surf/rh.white");
 
     QList<Label> t_qListLabels;
     QList<RowVector4i> t_qListRGBAs;
 
     //ToDo overload toLabels using instead of t_surfSet rr of MNESourceSpace
-    t_annotSet.toLabels(t_surfSet, t_qListLabels, t_qListRGBAs);
+    t_annotationSet.toLabels(t_surfSet, t_qListLabels, t_qListRGBAs);
 
     InverseView view(minimumNorm.getSourceSpace(), t_qListLabels, t_qListRGBAs, 24, true);
 
