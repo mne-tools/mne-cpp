@@ -438,8 +438,8 @@ void InverseView::updateActivation(QSharedPointer<Eigen::VectorXd> p_pVecActivat
 //            int r, g, b;
         QRgb qRgb;
 
-//        qRgb = ColorMap::valueToHotNegative1((double)iVal/255.0);
-        qRgb = ColorMap::valueToHotNegative2((double)iVal/255.0);
+        qRgb = ColorMap::valueToHotNegative1((double)iVal/255.0);
+//        qRgb = ColorMap::valueToHotNegative2((double)iVal/255.0);
 
 
 //            if(m_iColorMode == 0)
