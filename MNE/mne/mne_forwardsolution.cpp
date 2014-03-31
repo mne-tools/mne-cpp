@@ -460,13 +460,13 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution_ccr(AnnotationSe
 
 
 
-    KMeans t_kMeans(QString("cityblock"), QString("sample"), 5);//QString("sqeuclidean")//QString("sample")//cityblock
+//    KMeans t_kMeans(QString("cityblock"), QString("sample"), 5);//QString("sqeuclidean")//QString("sample")//cityblock
     MatrixXd t_LF_new;
 
     qint32 count;
     qint32 offset;
 
-    QList<MatrixXd> qListGainDist;
+//    QList<MatrixXd> qListGainDist;
 
     for(qint32 h = 0; h < this->src.size(); ++h )
     {
@@ -638,7 +638,7 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution_ccr(AnnotationSe
                     double sqec = sqrt((itIn->matRoiGOrig.block(0, j*3, itIn->matRoiGOrig.rows(), 3) - t_LF_partial.block(0, k*3, t_LF_partial.rows(), 3)).array().pow(2).sum());
                     double sqec_min = sqec;
                     qint32 j_min = 0;
-                    MatrixXd matGainDiff;
+//                    MatrixXd matGainDiff;
                     for(qint32 j = 1; j < itIn->idcs.rows(); ++j)
                     {
                         sqec = sqrt((itIn->matRoiGOrig.block(0, j*3, itIn->matRoiGOrig.rows(), 3) - t_LF_partial.block(0, k*3, t_LF_partial.rows(), 3)).array().pow(2).sum());
@@ -647,11 +647,11 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution_ccr(AnnotationSe
                         {
                             sqec_min = sqec;
                             j_min = j;
-                            matGainDiff = itIn->matRoiGOrig.block(0, j*3, itIn->matRoiGOrig.rows(), 3) - t_LF_partial.block(0, k*3, t_LF_partial.rows(), 3);
+//                            matGainDiff = itIn->matRoiGOrig.block(0, j*3, itIn->matRoiGOrig.rows(), 3) - t_LF_partial.block(0, k*3, t_LF_partial.rows(), 3);
                         }
                     }
 
-                    qListGainDist.append(matGainDiff);
+//                    qListGainDist.append(matGainDiff);
 
                     // Take the closest coordinates
                     qint32 sel_idx = itIn->idcs[j_min];
@@ -702,157 +702,155 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution_ccr(AnnotationSe
     }
 
 
+//    //
+//    // get mean and std of original gain matrix
+//    //
+//    double mean = 0;
+//    qint32 c = 0;
+//    for(qint32 i = 0; i < this->sol->data.rows(); ++i)
+//    {
+//        if(i % 3 == 1 || i%3 == 2)
+//        {
+//            for(qint32 j = 0; j < this->sol->data.cols(); ++j)
+//            {
+//                mean += this->sol->data(i,j);
+//                ++c;
+//            }
+//        }
+//    }
 
-    //
-    // get mean and std of original gain matrix
-    //
-    double mean = 0;
-    qint32 c = 0;
-    for(qint32 i = 0; i < this->sol->data.rows(); ++i)
-    {
-        if(i % 3 == 1 || i%3 == 2)
-        {
-            for(qint32 j = 0; j < this->sol->data.cols(); ++j)
-            {
-                mean += this->sol->data(i,j);
-                ++c;
-            }
-        }
-    }
+//    mean /= c;
+//    double var = 0;
+//    c = 0;
+//    for(qint32 i = 0; i < this->sol->data.rows(); ++i)
+//    {
+//        if(i % 3 == 1 || i%3 == 2)
+//        {
+//            for(qint32 j = 0; j < this->sol->data.cols(); ++j)
+//            {
+//                var += pow(this->sol->data(i,j) - mean,2);
+//                ++c;
+//            }
+//        }
+//    }
+//    var /= c - 1;
+//    var = sqrt(var);
+//    std::cout << "Original gain matrix (gradiometer):\n    mean: " << mean << "\n    var: " << var << std::endl;
 
-    mean /= c;
-    double var = 0;
-    c = 0;
-    for(qint32 i = 0; i < this->sol->data.rows(); ++i)
-    {
-        if(i % 3 == 1 || i%3 == 2)
-        {
-            for(qint32 j = 0; j < this->sol->data.cols(); ++j)
-            {
-                var += pow(this->sol->data(i,j) - mean,2);
-                ++c;
-            }
-        }
-    }
-    var /= c - 1;
-    var = sqrt(var);
-    std::cout << "Original gain matrix (gradiometer):\n    mean: " << mean << "\n    var: " << var << std::endl;
+//    mean = 0;
+//    c = 0;
+//    for(qint32 i = 0; i < this->sol->data.rows(); ++i)
+//    {
+//        if(i % 3 == 0)
+//        {
+//            for(qint32 j = 0; j < this->sol->data.cols(); ++j)
+//            {
+//                mean += this->sol->data(i,j);
+//                ++c;
+//            }
+//        }
+//    }
+//    mean /= c;
 
-    mean = 0;
-    c = 0;
-    for(qint32 i = 0; i < this->sol->data.rows(); ++i)
-    {
-        if(i % 3 == 0)
-        {
-            for(qint32 j = 0; j < this->sol->data.cols(); ++j)
-            {
-                mean += this->sol->data(i,j);
-                ++c;
-            }
-        }
-    }
-    mean /= c;
+//    var = 0;
+//    c = 0;
+//    for(qint32 i = 0; i < this->sol->data.rows(); ++i)
+//    {
+//        if(i % 3 == 0)
+//        {
+//            for(qint32 j = 0; j < this->sol->data.cols(); ++j)
+//            {
+//                var += pow(this->sol->data(i,j) - mean,2);
+//                ++c;
+//            }
+//        }
+//    }
+//    var /= c - 1;
+//    var = sqrt(var);
+//    std::cout << "Original gain matrix (magnetometer):\n    mean: " << mean << "\n    var: " << var << std::endl;
 
-    var = 0;
-    c = 0;
-    for(qint32 i = 0; i < this->sol->data.rows(); ++i)
-    {
-        if(i % 3 == 0)
-        {
-            for(qint32 j = 0; j < this->sol->data.cols(); ++j)
-            {
-                var += pow(this->sol->data(i,j) - mean,2);
-                ++c;
-            }
-        }
-    }
-    var /= c - 1;
-    var = sqrt(var);
-    std::cout << "Original gain matrix (magnetometer):\n    mean: " << mean << "\n    var: " << var << std::endl;
+//    //
+//    // get mean and std of original gain matrix mapping
+//    //
+//    mean = 0;
+//    c = 0;
+//    for(qint32 h = 0; h < qListGainDist.size(); ++h)
+//    {
+//        for(qint32 i = 0; i < qListGainDist[h].rows(); ++i)
+//        {
+//            if(i % 3 == 1 || i%3 == 2)
+//            {
+//                for(qint32 j = 0; j < qListGainDist[h].cols(); ++j)
+//                {
+//                    mean += qListGainDist[h](i,j);
+//                    ++c;
+//                }
+//            }
+//        }
+//    }
+//    mean /= c;
 
-    //
-    // get mean and std of original gain matrix mapping
-    //
-    mean = 0;
-    c = 0;
-    for(qint32 h = 0; h < qListGainDist.size(); ++h)
-    {
-        for(qint32 i = 0; i < qListGainDist[h].rows(); ++i)
-        {
-            if(i % 3 == 1 || i%3 == 2)
-            {
-                for(qint32 j = 0; j < qListGainDist[h].cols(); ++j)
-                {
-                    mean += qListGainDist[h](i,j);
-                    ++c;
-                }
-            }
-        }
-    }
-    mean /= c;
+//    var = 0;
+//    c = 0;
+//    for(qint32 h = 0; h < qListGainDist.size(); ++h)
+//    {
+//        for(qint32 i = 0; i < qListGainDist[h].rows(); ++i)
+//        {
+//            if(i % 3 == 1 || i%3 == 2)
+//            {
+//                for(qint32 j = 0; j < qListGainDist[h].cols(); ++j)
+//                {
+//                    var += pow(qListGainDist[i](i,j) - mean,2);
+//                    ++c;
+//                }
+//            }
+//        }
+//    }
 
-    var = 0;
-    c = 0;
-    for(qint32 h = 0; h < qListGainDist.size(); ++h)
-    {
-        for(qint32 i = 0; i < qListGainDist[h].rows(); ++i)
-        {
-            if(i % 3 == 1 || i%3 == 2)
-            {
-                for(qint32 j = 0; j < qListGainDist[h].cols(); ++j)
-                {
-                    var += pow(qListGainDist[i](i,j) - mean,2);
-                    ++c;
-                }
-            }
-        }
-    }
+//    var /= c - 1;
+//    var = sqrt(var);
 
-    var /= c - 1;
-    var = sqrt(var);
+//    std::cout << "Gain matrix offset mapping (gradiometer):\n    mean: " << mean << "\n    var: " << var << std::endl;
 
-    std::cout << "Gain matrix offset mapping (gradiometer):\n    mean: " << mean << "\n    var: " << var << std::endl;
+//    mean = 0;
+//    c = 0;
+//    for(qint32 h = 0; h < qListGainDist.size(); ++h)
+//    {
+//        for(qint32 i = 0; i < qListGainDist[h].rows(); ++i)
+//        {
+//            if(i % 3 == 0)
+//            {
+//                for(qint32 j = 0; j < qListGainDist[h].cols(); ++j)
+//                {
+//                    mean += qListGainDist[h](i,j);
+//                    ++c;
+//                }
+//            }
+//        }
+//    }
+//    mean /= c;
 
-    mean = 0;
-    c = 0;
-    for(qint32 h = 0; h < qListGainDist.size(); ++h)
-    {
-        for(qint32 i = 0; i < qListGainDist[h].rows(); ++i)
-        {
-            if(i % 3 == 0)
-            {
-                for(qint32 j = 0; j < qListGainDist[h].cols(); ++j)
-                {
-                    mean += qListGainDist[h](i,j);
-                    ++c;
-                }
-            }
-        }
-    }
-    mean /= c;
+//    var = 0;
+//    c = 0;
+//    for(qint32 h = 0; h < qListGainDist.size(); ++h)
+//    {
+//        for(qint32 i = 0; i < qListGainDist[h].rows(); ++i)
+//        {
+//            if(i % 3 == 0)
+//            {
+//                for(qint32 j = 0; j < qListGainDist[h].cols(); ++j)
+//                {
+//                    var += pow(qListGainDist[i](i,j) - mean,2);
+//                    ++c;
+//                }
+//            }
+//        }
+//    }
 
-    var = 0;
-    c = 0;
-    for(qint32 h = 0; h < qListGainDist.size(); ++h)
-    {
-        for(qint32 i = 0; i < qListGainDist[h].rows(); ++i)
-        {
-            if(i % 3 == 0)
-            {
-                for(qint32 j = 0; j < qListGainDist[h].cols(); ++j)
-                {
-                    var += pow(qListGainDist[i](i,j) - mean,2);
-                    ++c;
-                }
-            }
-        }
-    }
+//    var /= c - 1;
+//    var = sqrt(var);
 
-    var /= c - 1;
-    var = sqrt(var);
-
-    std::cout << "Gain matrix offset mapping (magnetometer):\n    mean: " << mean << "\n    var: " << var << std::endl;
-
+//    std::cout << "Gain matrix offset mapping (magnetometer):\n    mean: " << mean << "\n    var: " << var << std::endl;
 
 
     //
