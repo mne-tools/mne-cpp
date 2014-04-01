@@ -661,6 +661,9 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution_ccr(AnnotationSe
 
                     p_fwdOut.src[h].vertno[count] = this->src[h].vertno[sel_idx];
 
+//                    //vertices
+//                    std::cout << this->src[h].vertno[sel_idx] << ", ";
+
                     ++count;
                 }
             }
