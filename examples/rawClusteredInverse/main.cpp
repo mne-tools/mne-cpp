@@ -68,7 +68,7 @@
 #include <QSet>
 #include <QElapsedTimer>
 
-#define BENCHMARK
+//#define BENCHMARK
 
 
 //*************************************************************************************************************
@@ -523,7 +523,7 @@ int main(int argc, char *argv[])
     meanTime /= qVecElapsedTime.size();
     qDebug() << "MNE calculation took" << meanTime << "ms in average";
 
-#elif
+#else
     MNESourceEstimate sourceEstimate = minimumNorm.calculateInverse(evoked);
 #endif
 
