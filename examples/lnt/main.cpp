@@ -168,7 +168,7 @@ int main(int argc, char *argv[])
     //ToDo overload toLabels using instead of t_surfSet rr of MNESourceSpace
     t_annotationSet.toLabels(t_surfSet, t_qListLabels, t_qListRGBAs);
 
-    InverseView view(minimumNorm.getSourceSpace(), t_qListLabels, t_qListRGBAs, 24, true, true);
+    InverseView view(minimumNorm.getSourceSpace(), t_qListLabels, t_qListRGBAs, 24, true, false);
 
     if (view.stereoType() != QGLView::RedCyanAnaglyph)
         view.camera()->setEyeSeparation(0.3f);
@@ -198,6 +198,21 @@ int main(int argc, char *argv[])
     }
     view.setTitle(QString("Online Brain Monitoring - %1").arg(evoked.comment));
     view.show();
+
+
+    //only one time point - P100
+    qint32 sample = 0;
+    for(qint32 i = 0; i < sourceEstimate.times.size(); ++i)
+    {
+        if(sourceEstimate.times(i) >= 0.05f)
+        {
+            sample = i;
+            break;
+        }
+    }
+    sample += (qint32)ceil(0.106/sourceEstimate.tstep); //100ms
+    sourceEstimate = sourceEstimate.reduce(sample, 1);
+
 
     //Push Estimate
     view.pushSourceEstimate(sourceEstimate);
