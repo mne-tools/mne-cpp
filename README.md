@@ -44,9 +44,9 @@ To build MNE-CPP follow the wiki-guide:
 
 * (optional) [2. Install Qt Creator](https://github.com/mne-tools/mne-cpp/wiki/2.-Install-Qt-Creator): For convinience of the further processing it's recommended to install Qt Creator at this point.
 
-* (optional) [3. Install Qt 3D](https://github.com/mne-tools/mne-cpp/wiki/3.-Install-Qt3D): To use the MNE-CPP 3D libraries download and compile also the qt3d module. This step can be skipped when its intended to build mne-cpp for Neuromag Linux machines or no 3D support is requested.
+* (optional) [3. Install Qt 3D](https://github.com/mne-tools/mne-cpp/wiki/3.-Install-Qt3D): To use the MNE-CPP 3D libraries download and compile also the qt3d module. This step can be skipped when its intended to build MNE-CPP for Neuromag Linux machines or no 3D support is requested.
 
-* [4. Compile MNE-CPP](https://github.com/mne-tools/mne-cpp/wiki/4.-Compile-mne-cpp): Now you're ready to build the whole mne-cpp library.
+* [4. Compile MNE-CPP](https://github.com/mne-tools/mne-cpp/wiki/4.-Compile-mne-cpp): Now you're ready to build the whole MNE-CPP library.
 
 Mailing list
 ============
@@ -57,7 +57,7 @@ http://mail.nmr.mgh.harvard.edu/mailman/listinfo/mne_analysis
 Workflow to contribute
 =========================
 
-To contribute to MNE-CPP, first create an account on [github](http://github.com/). Once this is done, fork the [mne-cpp repository](http://github.com/mne-tools/mne-cpp) to have you own repository,
+To contribute to MNE-CPP, first create an account on [github](http://github.com/). Once this is done, fork the [MNE-CPP repository](http://github.com/mne-tools/mne-cpp) to have you own repository,
 clone it using 'git clone' on the computers where you want to work. Make
 your changes in your clone, push them to your github account, test them
 on several computer, and when you are happy with them, send a pull
