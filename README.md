@@ -1,4 +1,4 @@
-mne-cpp
+MNE-CPP
 =========
 
 MNE cross-platform standalone MEG/EEG (real-time) applications using [Qt5](http://qt-project.org/downloads)'s and [Eigen](http://eigen.tuxfamily.org)'s C++ libraries
@@ -37,7 +37,7 @@ Dependencies
 Building
 ========
 
-To build the MNE libraries [Qt5](http://qt-project.org/downloads) and a platform specific C++ compiler are required.
+To build the MNE-CPP libraries [Qt5](http://qt-project.org/downloads) and a platform specific C++ compiler are required.
 
 To build MNE-CPP follow the wiki-guide:
 * [1. Build Qt5](https://github.com/mne-tools/mne-cpp/wiki/1.-Build-Qt5): This page describes how to build Qt5 for desktop platforms [Windows](https://github.com/mne-tools/mne-cpp/wiki/1.-Build-Qt5#windows)/[Linux](https://github.com/mne-tools/mne-cpp/wiki/1.-Build-Qt5#linux)/[Mac OS X](https://github.com/mne-tools/mne-cpp/wiki/1.-Build-Qt5#mac-os-x). How to build Qt5 on embedded plaforms (DirectFB, EGLFS, KMS, Wayland, Windows embedded, QNX, VxWorks, INTEGRITY) or mobile platforms (Android, iOS, Windows 8 (WinRT), BlackBerry 10) you'll find [here](http://qt-project.org/doc/qt-5.0/qtdoc/platform-details.html).
