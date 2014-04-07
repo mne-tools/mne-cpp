@@ -66,6 +66,9 @@
 
 #include <QGuiApplication>
 #include <QSet>
+#include <QElapsedTimer>
+
+//#define BENCHMARK
 
 
 //*************************************************************************************************************
@@ -500,7 +503,29 @@ int main(int argc, char *argv[])
     // Compute inverse solution
     //
     MinimumNorm minimumNorm(inverse_operator, lambda2, method);
+
+#ifdef BENCHMARK
+    MNESourceEstimate sourceEstimate;
+    QList<qint64> qVecElapsedTime;
+    for(qint32 i = 0; i < 20; ++i)
+    {
+        //Benchmark time
+        QElapsedTimer timer;
+        timer.start();
+        sourceEstimate = minimumNorm.calculateInverse(evoked);
+        qVecElapsedTime.append(timer.elapsed());
+    }
+
+    double meanTime = 0.0;
+    for(qint32 i = 0; i < qVecElapsedTime.size(); ++i)
+        meanTime += qVecElapsedTime[i];
+
+    meanTime /= qVecElapsedTime.size();
+    qDebug() << "MNE calculation took" << meanTime << "ms in average";
+
+#else
     MNESourceEstimate sourceEstimate = minimumNorm.calculateInverse(evoked);
+#endif
 
     if(sourceEstimate.isEmpty())
         return 1;
