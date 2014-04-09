@@ -66,6 +66,9 @@
 
 #include <QGuiApplication>
 #include <QSet>
+#include <QElapsedTimer>
+
+#define BENCHMARK
 
 
 //*************************************************************************************************************
@@ -120,14 +123,14 @@ int main(int argc, char *argv[])
     QString t_sFileNameStc("");//("mind006_051209_auditory01.stc");
 
 
-    bool doMovie = true;//false;
+    bool doMovie = false;//true;//false;
 
     qint32 numDipolePairs = 7;
 
     qint32 event = 1;
 
-    float tmin = -0.2f;
-    float tmax = 0.4f;
+    float tmin = -0.0f;
+    float tmax = 0.1f;
 
     bool keep_comp = false;
     fiff_int_t dest_comp = 0;
@@ -460,7 +463,42 @@ int main(int argc, char *argv[])
     if(doMovie)
         t_pwlRapMusic.setStcAttr(200,0.5);
 
+
+#ifdef BENCHMARK
+    MNESourceEstimate sourceEstimate;
+    QList<qint64> qVecElapsedTime;
+    for(qint32 i = 0; i < 100; ++i)
+    {
+        //Benchmark time
+        QElapsedTimer timer;
+        timer.start();
+        sourceEstimate = t_pwlRapMusic.calculateInverse(pickedEvoked);
+        qVecElapsedTime.append(timer.elapsed());
+    }
+
+    double meanTime = 0.0;
+    qint32 offset = 19;
+    qint32 c = 0;
+    for(qint32 i = offset; i < qVecElapsedTime.size(); ++i)
+    {
+        meanTime += qVecElapsedTime[i];
+        ++c;
+    }
+
+    meanTime /= (double)c;
+
+    double varTime = 0;
+    for(qint32 i = offset; i < qVecElapsedTime.size(); ++i)
+        varTime += pow(qVecElapsedTime[i] - meanTime,2);
+
+    varTime /= (double)c - 1.0f;
+    varTime = sqrt(varTime);
+
+    qDebug() << "RAP-MUSIC calculation took" << meanTime << "+-" << varTime << "ms in average";
+
+#else
     MNESourceEstimate sourceEstimate = t_pwlRapMusic.calculateInverse(pickedEvoked);
+#endif
 
     if(sourceEstimate.isEmpty())
         return 1;
