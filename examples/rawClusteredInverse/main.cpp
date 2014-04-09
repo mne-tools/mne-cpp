@@ -102,9 +102,6 @@ int main(int argc, char *argv[])
 {
     QGuiApplication a(argc, argv);
 
-
-
-
 //    QFile t_fileFwd("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
 //    QFile t_fileCov("./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
 //    QFile t_fileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
@@ -118,7 +115,6 @@ int main(int argc, char *argv[])
     QString t_sEventName = "E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-eve.fif";
     AnnotationSet t_annotationSet("E:/Data/sl_data/subjects/mind006/label/lh.aparc.a2009s.annot", "E:/Data/sl_data/subjects/mind006/label/rh.aparc.a2009s.annot");
     SurfaceSet t_surfSet("E:/Data/sl_data/subjects/mind006/surf/lh.white", "E:/Data/sl_data/subjects/mind006/surf/rh.white");
-
 
     qint32 event = 1;
 
@@ -413,13 +409,6 @@ int main(int argc, char *argv[])
 
 
 
-
-
-
-
-
-
-
     //########################################################################################
     // Source Estimate
 
@@ -501,23 +490,41 @@ int main(int argc, char *argv[])
     MinimumNorm minimumNorm(inverse_operator, lambda2, method);
 
 #ifdef BENCHMARK
+    //
+    //   Set up the inverse according to the parameters
+    //
+    minimumNorm.doInverseSetup(vecSel.size(),false);
+
     MNESourceEstimate sourceEstimate;
     QList<qint64> qVecElapsedTime;
-    for(qint32 i = 0; i < 20; ++i)
+    for(qint32 i = 0; i < 100; ++i)
     {
         //Benchmark time
         QElapsedTimer timer;
         timer.start();
-        sourceEstimate = minimumNorm.calculateInverse(evoked);
+        sourceEstimate = minimumNorm.calculateInverse(evoked.data, evoked.times(0), evoked.times(1)-evoked.times(0));
         qVecElapsedTime.append(timer.elapsed());
     }
 
     double meanTime = 0.0;
-    for(qint32 i = 0; i < qVecElapsedTime.size(); ++i)
+    qint32 offset = 19;
+    qint32 c = 0;
+    for(qint32 i = offset; i < qVecElapsedTime.size(); ++i)
+    {
         meanTime += qVecElapsedTime[i];
+        ++c;
+    }
 
-    meanTime /= qVecElapsedTime.size();
-    qDebug() << "MNE calculation took" << meanTime << "ms in average";
+    meanTime /= (double)c;
+
+    double varTime = 0;
+    for(qint32 i = offset; i < qVecElapsedTime.size(); ++i)
+        varTime += pow(qVecElapsedTime[i] - meanTime,2);
+
+    varTime /= (double)c - 1.0f;
+    varTime = sqrt(varTime);
+
+    qDebug() << "MNE calculation took" << meanTime << "+-" << varTime << "ms in average";
 
 #else
     MNESourceEstimate sourceEstimate = minimumNorm.calculateInverse(evoked);
