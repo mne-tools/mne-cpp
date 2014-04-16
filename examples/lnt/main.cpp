@@ -97,15 +97,18 @@ int main(int argc, char *argv[])
     QFile t_fileFwd("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
     QFile t_fileCov("./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
     QFile t_fileEvoked("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
+    AnnotationSet t_annotationSet("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot", "./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot");
+    SurfaceSet t_surfSet("./MNE-sample-data/subjects/sample/surf/lh.white", "./MNE-sample-data/subjects/sample/surf/rh.white");
 
-    QFile t_fileClusteredInverse("./clusteredInverse-inv.fif");
 
-    double snr = 3.0;
+    QString t_sFileClusteredInverse("");//QFile t_fileClusteredInverse("./clusteredInverse-inv.fif");
+
+    double snr = 1.0;
     double lambda2 = 1.0 / pow(snr, 2);
-    QString method("sLORETA"); //"MNE" | "dSPM" | "sLORETA"
+    QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
 
     // Load data
-    fiff_int_t setno = 0;
+    fiff_int_t setno = 1;
     QPair<QVariant, QVariant> baseline(QVariant(), 0);
     FiffEvoked evoked(t_fileEvoked, setno, baseline);
     if(evoked.isEmpty())
@@ -116,8 +119,6 @@ int main(int argc, char *argv[])
     MNEForwardSolution t_Fwd(t_fileFwd);
     if(t_Fwd.isEmpty())
         return 1;
-
-    AnnotationSet t_annotationSet("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot", "./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot");
 
     FiffCov noise_cov(t_fileCov);
 
@@ -136,7 +137,11 @@ int main(int argc, char *argv[])
 
     MNEInverseOperator inverse_operator(info, t_clusteredFwd, noise_cov, 0.2f, 0.8f);
 
-    inverse_operator.write(t_fileClusteredInverse);
+    if(!t_sFileClusteredInverse.isEmpty())
+    {
+        QFile t_fileClusteredInverse(t_sFileClusteredInverse);
+        inverse_operator.write(t_fileClusteredInverse);
+    }
 
     //
     // Compute inverse solution
@@ -147,26 +152,23 @@ int main(int argc, char *argv[])
     if(sourceEstimate.isEmpty())
         return 1;
 
-    // View activation time-series
-    std::cout << "\nsourceEstimate:\n" << sourceEstimate.data.block(0,0,10,10) << std::endl;
-    std::cout << "time\n" << sourceEstimate.times.block(0,0,1,10) << std::endl;
-    std::cout << "timeMin\n" << sourceEstimate.times[0] << std::endl;
-    std::cout << "timeMax\n" << sourceEstimate.times[sourceEstimate.times.size()-1] << std::endl;
-    std::cout << "time step\n" << sourceEstimate.tstep << std::endl;
+//    // View activation time-series
+//    std::cout << "\nsourceEstimate:\n" << sourceEstimate.data.block(0,0,10,10) << std::endl;
+//    std::cout << "time\n" << sourceEstimate.times.block(0,0,1,10) << std::endl;
+//    std::cout << "timeMin\n" << sourceEstimate.times[0] << std::endl;
+//    std::cout << "timeMax\n" << sourceEstimate.times[sourceEstimate.times.size()-1] << std::endl;
+//    std::cout << "time step\n" << sourceEstimate.tstep << std::endl;
 
     //Source Estimate end
     //########################################################################################
-
-    AnnotationSet t_annotSet("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot","./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot");
-    SurfaceSet t_surfSet("./MNE-sample-data/subjects/sample/surf/lh.white", "./MNE-sample-data/subjects/sample/surf/rh.white");
 
     QList<Label> t_qListLabels;
     QList<RowVector4i> t_qListRGBAs;
 
     //ToDo overload toLabels using instead of t_surfSet rr of MNESourceSpace
-    t_annotSet.toLabels(t_surfSet, t_qListLabels, t_qListRGBAs);
+    t_annotationSet.toLabels(t_surfSet, t_qListLabels, t_qListRGBAs);
 
-    InverseView view(minimumNorm.getSourceSpace(), t_qListLabels, t_qListRGBAs, 24, true);
+    InverseView view(minimumNorm.getSourceSpace(), t_qListLabels, t_qListRGBAs, 24, true, false);
 
     if (view.stereoType() != QGLView::RedCyanAnaglyph)
         view.camera()->setEyeSeparation(0.3f);
@@ -196,6 +198,20 @@ int main(int argc, char *argv[])
     }
     view.setTitle(QString("Online Brain Monitoring - %1").arg(evoked.comment));
     view.show();
+
+
+//    //only one time point - P100
+//    qint32 sample = 0;
+//    for(qint32 i = 0; i < sourceEstimate.times.size(); ++i)
+//    {
+//        if(sourceEstimate.times(i) >= 0.05f)
+//        {
+//            sample = i;
+//            break;
+//        }
+//    }
+//    sample += (qint32)ceil(0.106/sourceEstimate.tstep); //100ms
+//    sourceEstimate = sourceEstimate.reduce(sample, 1);
 
     //Push Estimate
     view.pushSourceEstimate(sourceEstimate);
