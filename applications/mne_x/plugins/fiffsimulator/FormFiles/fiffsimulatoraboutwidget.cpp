@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mnertclientaboutwidget.h
+* @file     fiffsimulatoraboutwidget.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,20 +29,16 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the MneRtClientAboutWidget class.
+* @brief    Contains the implementation of the FiffSimulatorAboutWidget class.
 *
 */
-
-#ifndef MNERTCLIENTABOUTWIDGET_H
-#define MNERTCLIENTABOUTWIDGET_H
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_mnertclientabout.h"
+#include "fiffsimulatoraboutwidget.h"
 
 
 //*************************************************************************************************************
@@ -50,16 +46,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE MneRtClientPlugin
-//=============================================================================================================
-
-namespace MneRtClientPlugin
-{
 
 
 //*************************************************************************************************************
@@ -67,44 +53,24 @@ namespace MneRtClientPlugin
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace FiffSimulatorPlugin;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-
-//=============================================================================================================
-/**
-* DECLARE CLASS MneRtClientAboutWidget
-*
-* @brief The MneRtClientAboutWidget class provides the about dialog for the MneRtClient.
-*/
-class MneRtClientAboutWidget : public QDialog
+FiffSimulatorAboutWidget::FiffSimulatorAboutWidget(QWidget *parent)
+: QDialog(parent)
 {
-    Q_OBJECT
+    ui.setupUi(this);
+}
 
-public:
 
-    //=========================================================================================================
-    /**
-    * Constructs a MneRtClientAboutWidget dialog which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new MneRtClientAboutWidget becomes a window. If parent is another widget, MneRtClientAboutWidget becomes a child window inside parent. MneRtClientAboutWidget is deleted when its parent is deleted.
-    */
-    MneRtClientAboutWidget(QWidget *parent = 0);
+//*************************************************************************************************************
 
-    //=========================================================================================================
-    /**
-    * Destroys the MneRtClientAboutWidget.
-    * All MneRtClientAboutWidget's children are deleted first. The application exits if MneRtClientAboutWidget is the main widget.
-    */
-    ~MneRtClientAboutWidget();
+FiffSimulatorAboutWidget::~FiffSimulatorAboutWidget()
+{
 
-private:
-    Ui::MneRtClientAboutWidgetClass ui;    /**< Holds the user interface for the DummyAboutWidget.*/
-};
-
-} // NAMESPACE
-
-#endif // MNERTCLIENTABOUTWIDGET_H
+}

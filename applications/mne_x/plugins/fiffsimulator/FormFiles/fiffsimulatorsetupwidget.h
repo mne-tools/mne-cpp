@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mnertclientproducer.h
+* @file     fiffsimulatorsetupwidget.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the RTServerProducer class.
+* @brief    Contains the declaration of the FiffSimulatorSetupWidget class.
 *
 */
 
-#ifndef MNERTCLIENTPRODUCER_H
-#define MNERTCLIENTPRODUCER_H
+#ifndef FIFFSIMULATORSETUPWIDGET_H
+#define FIFFSIMULATORSETUPWIDGET_H
 
 
 //*************************************************************************************************************
@@ -42,15 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <generics/circularbuffer_old.h>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// MNE INCLUDES
-//=============================================================================================================
-
-#include <rtClient/rtdataclient.h>
+#include "../ui_fiffsimulatorsetup.h"
 
 
 //*************************************************************************************************************
@@ -58,26 +50,16 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QThread>
-#include <QMutex>
+#include <QWidget>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MneRtClientPlugin
+// DEFINE NAMESPACE FiffSimulatorPlugin
 //=============================================================================================================
 
-namespace MneRtClientPlugin
+namespace FiffSimulatorPlugin
 {
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-//using namespace IOBuffer;
-using namespace RTCLIENTLIB;
 
 
 //*************************************************************************************************************
@@ -85,91 +67,100 @@ using namespace RTCLIENTLIB;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class MneRtClient;
+class FiffSimulator;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS MneRtClientProducer
+* DECLARE CLASS FiffSimulatorSetupWidget
 *
-* @brief The MneRtClientProducer class provides a Rt Client data producer for a given sampling rate.
+* @brief The FiffSimulatorSetupWidget class provides the Fiff configuration window.
 */
-class MneRtClientProducer : public QThread
+class FiffSimulatorSetupWidget : public QWidget
 {
     Q_OBJECT
 
-    friend class MneRtClient;
-
 public:
+
     //=========================================================================================================
     /**
-    * Constructs a MneRtClientProducer.
+    * Constructs a FiffSimulatorSetupWidget which is a child of parent.
     *
-    * @param [in] p_pMneRtClient   a pointer to the corresponding MneRtClient.
+    * @param [in] p_pFiffSimulator   a pointer to the corresponding FiffSimulator.
+    * @param [in] parent        pointer to parent widget; If parent is 0, the new FiffSimulatorSetupWidget becomes a window. If parent is another widget, FiffSimulatorSetupWidget becomes a child window inside parent. FiffSimulatorSetupWidget is deleted when its parent is deleted.
     */
-    MneRtClientProducer(MneRtClient* p_pMneRtClient);
+    FiffSimulatorSetupWidget(FiffSimulator* p_pFiffSimulator, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the MneRtClientProducer.
+    * Destroys the FiffSimulatorSetupWidget.
+    * All FiffSimulatorSetupWidget's children are deleted first. The application exits if FiffSimulatorSetupWidget is the main widget.
     */
-    ~MneRtClientProducer();
+    ~FiffSimulatorSetupWidget();
 
     //=========================================================================================================
     /**
-    * Connects the data client.
+    * Inits the setup widget
+    */
+    void init();
+
+//slots
+    void bufferSizeEdited();        /**< Buffer size edited and set new buffer size.*/
+
+    void checkedRecordDataChanged();    /**< Record Data checkbox changed. */
+
+    //=========================================================================================================
+    /**
+    * Connector selection index changed
     *
-    * @param[in] p_sRtSeverIP   real-time server ip
+    * @param [in] idx   new connector combo box index
     */
-    void connectDataClient(QString p_sRtSeverIP);
+    void connectorIdxChanged(int idx);
 
-    //=========================================================================================================
-    /**
-    * Disconnects the data client.
-    */
-    void disconnectDataClient();
+    void printToLog(QString message);   /**< Implements printing messages to rtproc log.*/
 
-    //=========================================================================================================
-    /**
-    * Stops the MneRtClientProducer by stopping the producer's thread.
-    */
-    void stop();
+    void pressedFiffRecordFile();   /**< Triggers file dialog to select record file.*/
 
-signals:
-    //=========================================================================================================
-    /**
-    * Emitted when data clients connection status changed
-    *
-    * @param[in] p_bStatus  connection status
-    */
-    void dataConnectionChanged(bool p_bStatus);
+    void pressedConnect();          /**< Triggers a connection trial to rt_server.*/
 
-protected:
-    //=========================================================================================================
-    /**
-    * The starting point for the thread. After calling start(), the newly created thread calls this function.
-    * Returning from this method will end the execution of the thread.
-    * Pure virtual method inherited by QThread.
-    */
-    virtual void run();
+    void pressedSendCLI();          /**< Triggers a send request of a cli command.*/
+
+    void pressedConfigure();        /**< Triggers file dialog to configure the plugins.*/
+
+    void fiffInfoReceived();        /**< Triggered when new fiff info is recieved by producer and stored intor rt_server */
+
 
 private:
+    //=========================================================================================================
+    /**
+    * Set command connection status
+    *
+    * @param[in] p_bConnectionStatus    the connection status
+    */
+    void cmdConnectionChanged(bool p_bConnectionStatus);
 
-    QMutex producerMutex;
+    //=========================================================================================================
+    /**
+    * Shows the About Dialog
+    *
+    */
+    void showAboutDialog();
 
-    MneRtClient* m_pMneRtClient;    /**< Holds a pointer to corresponding MneRtClient.*/
-    bool        m_bIsRunning;       /**< Whether MneRtClientProducer is running.*/
+//    //=========================================================================================================
+//    /**
+//    * Shows the SQUID Control Dialog
+//    *
+//    */
+//    void SQUIDControlDialog();
 
-    QSharedPointer<RtDataClient> m_pRtDataClient;   /**< The data client.*/
-    bool m_bDataClientIsConnected;                  /**< If the data client is connected.*/
+    FiffSimulator*   m_pFiffSimulator;      /**< a pointer to corresponding mne rt client.*/
 
-    qint32 m_iDataClientId;
+    Ui::FiffSimulatorSetupWidgetClass ui; /**< the user interface for the MneRtClientSetupWidget.*/
 
-    //Acquisition flags
-    bool m_bFlagInfoRequest;    /**< Read Fiff Info flag */
-    bool m_bFlagMeasuring;      /**< Read Fiff raw Buffers */
+    bool m_bIsInit;                     /**< false when gui is not initialized jet. Prevents gui from already interacting when not initialized */
+
 };
 
 } // NAMESPACE
 
-#endif // MNERTCLIENTPRODUCER_H
+#endif // FIFFSIMULATORSETUPWIDGET_H

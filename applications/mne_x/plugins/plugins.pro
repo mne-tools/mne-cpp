@@ -42,10 +42,11 @@ SUBDIRS += \
     bci \
     ecgsimulator \
     mnertclient \
+    fiffsimulator \
     dummytoolbox \
     triggercontrol \
-	sourcelab \
-	raplab
+    sourcelab \
+    raplab
 #    rtsss \
 
 
