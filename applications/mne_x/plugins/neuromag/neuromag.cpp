@@ -372,7 +372,7 @@ IPlugin::PluginType Neuromag::getType() const
 
 QString Neuromag::getName() const
 {
-    return "RT Client";
+    return "Neuromag";
 }
 
 

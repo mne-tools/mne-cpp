@@ -372,7 +372,7 @@ IPlugin::PluginType FiffSimulator::getType() const
 
 QString FiffSimulator::getName() const
 {
-    return "RT Client";
+    return "Fiff Simulator";
 }
 
 
