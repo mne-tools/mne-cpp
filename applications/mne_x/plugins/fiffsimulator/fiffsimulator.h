@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mnertclientproducer.h
+* @file     fiffsimulator.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the RTServerProducer class.
+* @brief    Contains the declaration of the FiffSimulator class.
 *
 */
 
-#ifndef MNERTCLIENTPRODUCER_H
-#define MNERTCLIENTPRODUCER_H
+#ifndef FIFFSIMULATOR_H
+#define FIFFSIMULATOR_H
 
 
 //*************************************************************************************************************
@@ -42,7 +42,20 @@
 // INCLUDES
 //=============================================================================================================
 
+#include "fiffsimulator_global.h"
+
+#include <mne_x/Interfaces/ISensor.h>
 #include <generics/circularbuffer_old.h>
+#include <generics/circularmatrixbuffer.h>
+#include <xMeas/newrealtimemultisamplearray.h>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FIFF INCLUDES
+//=============================================================================================================
+
+#include <fiff/fiff_info.h>
 
 
 //*************************************************************************************************************
@@ -50,7 +63,7 @@
 // MNE INCLUDES
 //=============================================================================================================
 
-#include <rtClient/rtdataclient.h>
+#include <rtClient/rtcmdclient.h>
 
 
 //*************************************************************************************************************
@@ -58,16 +71,17 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QThread>
-#include <QMutex>
+#include <QtWidgets>
+#include <QVector>
+#include <QTimer>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MneRtClientPlugin
+// DEFINE NAMESPACE FiffSimulatorPlugin
 //=============================================================================================================
 
-namespace MneRtClientPlugin
+namespace FiffSimulatorPlugin
 {
 
 
@@ -76,8 +90,11 @@ namespace MneRtClientPlugin
 // USED NAMESPACES
 //=============================================================================================================
 
-//using namespace IOBuffer;
+using namespace MNEX;
+using namespace IOBuffer;
 using namespace RTCLIENTLIB;
+using namespace FIFFLIB;
+using namespace XMEASLIB;
 
 
 //*************************************************************************************************************
@@ -85,91 +102,146 @@ using namespace RTCLIENTLIB;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class MneRtClient;
+class FiffSimulatorProducer;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS MneRtClientProducer
+* DECLARE CLASS FiffSimulator
 *
-* @brief The MneRtClientProducer class provides a Rt Client data producer for a given sampling rate.
+* @brief The FiffSimulator class provides a RT server connection.
 */
-class MneRtClientProducer : public QThread
+class FIFFSIMULATORSHARED_EXPORT FiffSimulator : public ISensor
 {
     Q_OBJECT
+    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "fiffsimulator.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
+    Q_INTERFACES(MNEX::ISensor)
 
-    friend class MneRtClient;
+    friend class FiffSimulatorProducer;
+    friend class FiffSimulatorSetupWidget;
 
 public:
+
     //=========================================================================================================
     /**
-    * Constructs a MneRtClientProducer.
+    * Constructs a FiffSimulator.
+    */
+    FiffSimulator();
+
+    //=========================================================================================================
+    /**
+    * Destroys the FiffSimulator.
+    */
+    virtual ~FiffSimulator();
+
+    //=========================================================================================================
+    /**
+    * Clears the rt server
+    */
+    void clear();
+
+    //=========================================================================================================
+    /**
+    * Clone the plugin
+    */
+    virtual QSharedPointer<IPlugin> clone() const;
+
+    //=========================================================================================================
+    /**
+    * Initialise the FiffSimulator.
+    */
+    void init();
+
+    virtual bool start();
+    virtual bool stop();
+
+    virtual IPlugin::PluginType getType() const;
+    virtual QString getName() const;
+
+    virtual QWidget* setupWidget();
+
+//slots:
+    //=========================================================================================================
+    /**
+    * Change connector
     *
-    * @param [in] p_pMneRtClient   a pointer to the corresponding MneRtClient.
+    * @param[in] p_iNewConnectorId      new connector ID
     */
-    MneRtClientProducer(MneRtClient* p_pMneRtClient);
+    void changeConnector(qint32 p_iNewConnectorId);
 
     //=========================================================================================================
     /**
-    * Destroys the MneRtClientProducer.
+    * Connects the cmd client.
     */
-    ~MneRtClientProducer();
+    void connectCmdClient();
 
     //=========================================================================================================
     /**
-    * Connects the data client.
-    *
-    * @param[in] p_sRtSeverIP   real-time server ip
+    * Disconnects the cmd client.
     */
-    void connectDataClient(QString p_sRtSeverIP);
+    void disconnectCmdClient();
 
     //=========================================================================================================
     /**
-    * Disconnects the data client.
+    * Request FiffInfo using cmd client and producer (data client)
     */
-    void disconnectDataClient();
-
-    //=========================================================================================================
-    /**
-    * Stops the MneRtClientProducer by stopping the producer's thread.
-    */
-    void stop();
+    void requestInfo();
 
 signals:
     //=========================================================================================================
     /**
-    * Emitted when data clients connection status changed
+    * Emitted when command clients connection status changed
     *
     * @param[in] p_bStatus  connection status
     */
-    void dataConnectionChanged(bool p_bStatus);
+    void cmdConnectionChanged(bool p_bStatus);
 
-protected:
     //=========================================================================================================
     /**
-    * The starting point for the thread. After calling start(), the newly created thread calls this function.
-    * Returning from this method will end the execution of the thread.
-    * Pure virtual method inherited by QThread.
+    * Emitted when fiffInfo is available
     */
+    void fiffInfoAvailable();
+
+protected:
     virtual void run();
 
 private:
+    //=========================================================================================================
+    /**
+    * Initialises the output connector.
+    */
+    void initConnector();
 
-    QMutex producerMutex;
 
-    MneRtClient* m_pMneRtClient;    /**< Holds a pointer to corresponding MneRtClient.*/
-    bool        m_bIsRunning;       /**< Whether MneRtClientProducer is running.*/
+    QMutex rtServerMutex;
 
-    QSharedPointer<RtDataClient> m_pRtDataClient;   /**< The data client.*/
-    bool m_bDataClientIsConnected;                  /**< If the data client is connected.*/
 
-    qint32 m_iDataClientId;
+    QString m_sFiffSimulatorClientAlias;     /**< The rt server client alias.*/
 
-    //Acquisition flags
-    bool m_bFlagInfoRequest;    /**< Read Fiff Info flag */
-    bool m_bFlagMeasuring;      /**< Read Fiff raw Buffers */
+//    float           m_fSamplingRate;                /**< The sampling rate.*/
+//    int             m_iDownsamplingFactor;          /**< The down sampling factor.*/
+
+    PluginOutputData<NewRealTimeMultiSampleArray>::SPtr m_pRTMSA_FiffSimulator;   /**< The NewRealTimeMultiSampleArray to provide the rt_server Channels.*/
+
+    QSharedPointer<RtCmdClient> m_pRtCmdClient; /**< The command client.*/
+    bool m_bCmdClientIsConnected;               /**< If the command client is connected.*/
+
+    QString     m_sFiffSimulatorIP;               /**< The IP Adress of mne_rt_server.*/
+
+    QSharedPointer<FiffSimulatorProducer> m_pFiffSimulatorProducer;     /**< Holds the FiffSimulatorProducer.*/
+
+    QMap<qint32, QString> m_qMapConnectors;                 /**< Connector map.*/
+    qint32 m_iActiveConnectorId;                            /**< The active connector.*/
+
+    FiffInfo::SPtr m_pFiffInfo;                             /**< Fiff measurement info.*/
+    qint32 m_iBufferSize;                                   /**< The raw data buffer size.*/
+
+    QTimer m_cmdConnectionTimer;                            /**< Timer for convinient command client connection. When timer times out a connection is tried to be established. */
+
+    QSharedPointer<RawMatrixBuffer> m_pRawMatrixBuffer_In;  /**< Holds incoming raw data. */
 };
 
 } // NAMESPACE
 
-#endif // MNERTCLIENTPRODUCER_H
+#endif // FIFFSIMULATOR_H

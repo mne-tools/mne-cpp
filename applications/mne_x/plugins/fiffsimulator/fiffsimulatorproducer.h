@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mnertclientproducer.h
+* @file     fiffsimulatorproducer.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the RTServerProducer class.
+* @brief    Contains the declaration of the FiffSimulatorProducer class.
 *
 */
 
-#ifndef MNERTCLIENTPRODUCER_H
-#define MNERTCLIENTPRODUCER_H
+#ifndef FIFFSIMULATORPRODUCER_H
+#define FIFFSIMULATORPRODUCER_H
 
 
 //*************************************************************************************************************
@@ -64,10 +64,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MneRtClientPlugin
+// DEFINE NAMESPACE FiffSimulatorPlugin
 //=============================================================================================================
 
-namespace MneRtClientPlugin
+namespace FiffSimulatorPlugin
 {
 
 
@@ -85,35 +85,35 @@ using namespace RTCLIENTLIB;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class MneRtClient;
+class FiffSimulator;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS MneRtClientProducer
+* DECLARE CLASS FiffSimulatorProducer
 *
-* @brief The MneRtClientProducer class provides a Rt Client data producer for a given sampling rate.
+* @brief The FiffSimulatorProducer class provides a Fiff data producer for a given sampling rate.
 */
-class MneRtClientProducer : public QThread
+class FiffSimulatorProducer : public QThread
 {
     Q_OBJECT
 
-    friend class MneRtClient;
+    friend class FiffSimulator;
 
 public:
     //=========================================================================================================
     /**
-    * Constructs a MneRtClientProducer.
+    * Constructs a FiffSimulatorProducer.
     *
     * @param [in] p_pMneRtClient   a pointer to the corresponding MneRtClient.
     */
-    MneRtClientProducer(MneRtClient* p_pMneRtClient);
+    FiffSimulatorProducer(FiffSimulator* p_pFiffSimulator);
 
     //=========================================================================================================
     /**
-    * Destroys the MneRtClientProducer.
+    * Destroys the FiffSimulatorProducer.
     */
-    ~MneRtClientProducer();
+    ~FiffSimulatorProducer();
 
     //=========================================================================================================
     /**
@@ -157,8 +157,8 @@ private:
 
     QMutex producerMutex;
 
-    MneRtClient* m_pMneRtClient;    /**< Holds a pointer to corresponding MneRtClient.*/
-    bool        m_bIsRunning;       /**< Whether MneRtClientProducer is running.*/
+    FiffSimulator* m_pFiffSimulator;    /**< Holds a pointer to corresponding MneRtClient.*/
+    bool        m_bIsRunning;           /**< Whether MneRtClientProducer is running.*/
 
     QSharedPointer<RtDataClient> m_pRtDataClient;   /**< The data client.*/
     bool m_bDataClientIsConnected;                  /**< If the data client is connected.*/
@@ -172,4 +172,4 @@ private:
 
 } // NAMESPACE
 
-#endif // MNERTCLIENTPRODUCER_H
+#endif // FIFFSIMULATORPRODUCER_H
