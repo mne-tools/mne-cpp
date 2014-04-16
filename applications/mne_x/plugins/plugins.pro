@@ -43,6 +43,7 @@ SUBDIRS += \
     ecgsimulator \
     mnertclient \
     fiffsimulator \
+    neuromag \
     dummytoolbox \
     triggercontrol \
     sourcelab \
