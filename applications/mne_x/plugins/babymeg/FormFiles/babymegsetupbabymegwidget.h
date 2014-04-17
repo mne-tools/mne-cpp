@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     babymegrunwidget.cpp
+* @file     babymegsetupbabymegwidget.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,57 +29,80 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the BabyMegRunWidget class.
+* @brief    Contains the declaration of the BabyMEGSetupBabyMegWidget class.
 *
 */
+
+#ifndef BABYMEGSETUPBABYMEGWIDGET_H
+#define BABYMEGSETUPBABYMEGWIDGET_H
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "babymegrunwidget.h"
-#include "babymegaboutwidget.h"
-#include "../babymeg.h"
+#include <QWidget>
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
-using namespace BabyMegPlugin;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE MEMBER METHODS
-//=============================================================================================================
-
-BabyMegRunWidget::BabyMegRunWidget(BabyMeg *p_pBabyMeg, QWidget *parent)
-: QWidget(parent)
-, m_pBabyMeg(p_pBabyMeg)
-{
-    ui.setupUi(this);
-
-    connect(ui.m_qPushButton_About, SIGNAL(released()), this, SLOT(showAboutDialog()));
-
-    ui.m_qTextBrowser_Information->insertHtml(QString("Sampling Rate: %1sps").arg(1));
+namespace Ui {
+class BabyMEGSetupBabyMegWidget;
 }
 
 
 //*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE BabyMEGPlugin
+//=============================================================================================================
 
-BabyMegRunWidget::~BabyMegRunWidget()
+namespace BabyMEGPlugin
 {
-
-}
-
 
 //*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
 
-void BabyMegRunWidget::showAboutDialog()
+class BabyMEG;
+
+
+//=============================================================================================================
+/**
+* DECLARE CLASS BabyMEGSetupBabyMegWidget
+*
+* @brief The BabyMEGSetupBabyMegWidget class provides the BabyMEG configuration window.
+*/
+class BabyMEGSetupBabyMegWidget : public QWidget
 {
-    BabyMegAboutWidget aboutDialog(this);
-    aboutDialog.exec();
-}
+    Q_OBJECT
+    
+public:
+    typedef QSharedPointer<BabyMEGSetupBabyMegWidget> SPtr;              /**< Shared pointer type for BabyMEGSetupBabyMegWidget. */
+    typedef QSharedPointer<const BabyMEGSetupBabyMegWidget> ConstSPtr;   /**< Const shared pointer type for BabyMEGSetupBabyMegWidget. */
+
+    explicit BabyMEGSetupBabyMegWidget(BabyMEG* p_pBabyMEG, QWidget *parent = 0);
+    ~BabyMEGSetupBabyMegWidget();
+    
+private:
+    //=========================================================================================================
+    /**
+    * Shows the SQUID Control Dialog
+    *
+    */
+    void SQUIDControlDialog();
+
+    BabyMEG*   m_pBabyMEG;      /**< a pointer to corresponding mne rt client.*/
+
+    Ui::BabyMEGSetupBabyMegWidget *ui;
+
+};
+
+} // NAMESPACE
+
+#endif // BABYMEGSETUPBABYMEGWIDGET_H

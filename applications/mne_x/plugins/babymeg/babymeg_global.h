@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the RTServer library export/import macros.
+* @brief    Contains the BabyMEG library export/import macros.
 *
 */
 

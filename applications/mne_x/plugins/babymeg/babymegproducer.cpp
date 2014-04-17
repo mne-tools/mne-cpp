@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the BabyMegProducer class.
+* @brief    Contains the implementation of the BabyMEGProducer class.
 *
 */
 
@@ -47,7 +47,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace BabyMegPlugin;
+using namespace BabyMEGPlugin;
 
 
 //*************************************************************************************************************
@@ -55,9 +55,9 @@ using namespace BabyMegPlugin;
 // QT INCLUDES
 //=============================================================================================================
 
-BabyMegProducer::BabyMegProducer(BabyMeg* p_pBabyMeg)
-: m_pBabyMeg(p_pBabyMeg)
-, m_pRtDataClient(NULL)
+BabyMEGProducer::BabyMEGProducer(BabyMEG* p_pBabyMEG)
+: m_pBabyMEG(p_pBabyMEG)
+, m_pRtDataClient(0)
 , m_bDataClientIsConnected(false)
 , m_iDataClientId(-1)
 , m_bFlagInfoRequest(false)
@@ -68,19 +68,18 @@ BabyMegProducer::BabyMegProducer(BabyMeg* p_pBabyMeg)
 
 //*************************************************************************************************************
 
-BabyMegProducer::~BabyMegProducer()
+BabyMEGProducer::~BabyMEGProducer()
 {
-    if(m_pRtDataClient)
-        delete m_pRtDataClient;
+
 }
 
 
 //*************************************************************************************************************
 
-void BabyMegProducer::connectDataClient(QString p_sRtSeverIP)
+void BabyMEGProducer::connectDataClient(QString p_sRtSeverIP)
 {
-    if(!m_pRtDataClient)
-        m_pRtDataClient = new RtDataClient();
+    if(m_pRtDataClient.isNull())
+        m_pRtDataClient = QSharedPointer<RtDataClient>(new RtDataClient);
     else if(m_bDataClientIsConnected)
         this->disconnectDataClient();
 
@@ -100,7 +99,7 @@ void BabyMegProducer::connectDataClient(QString p_sRtSeverIP)
             //
             // set data client alias -> for convinience (optional)
             //
-            m_pRtDataClient->setClientAlias(m_pBabyMeg->m_sBabyMegClientAlias); // used in option 2 later on
+            m_pRtDataClient->setClientAlias(m_pBabyMEG->m_sBabyMEGClientAlias); // used in option 2 later on
 
             //
             // set new state
@@ -115,7 +114,7 @@ void BabyMegProducer::connectDataClient(QString p_sRtSeverIP)
 
 //*************************************************************************************************************
 
-void BabyMegProducer::disconnectDataClient()
+void BabyMEGProducer::disconnectDataClient()
 {
     if(m_bDataClientIsConnected)
     {
@@ -132,26 +131,27 @@ void BabyMegProducer::disconnectDataClient()
 
 //*************************************************************************************************************
 
-void BabyMegProducer::stop()
+void BabyMEGProducer::stop()
 {
     m_bIsRunning = false;
+    QThread::terminate();
     QThread::wait();
 }
 
 
 //*************************************************************************************************************
 
-void BabyMegProducer::run()
+void BabyMEGProducer::run()
 {
     //
     // Connect data client
     //
-    this->connectDataClient(m_pBabyMeg->m_sBabyMegIP);
+    this->connectDataClient(m_pBabyMEG->m_sBabyMEGIP);
 
     while(m_pRtDataClient->state() != QTcpSocket::ConnectedState)
     {
         msleep(100);
-        this->connectDataClient(m_pBabyMeg->m_sBabyMegIP);
+        this->connectDataClient(m_pBabyMEG->m_sBabyMEGIP);
     }
 
     msleep(1000);
@@ -172,10 +172,10 @@ void BabyMegProducer::run()
     {
         if(m_bFlagInfoRequest)
         {
-            m_pBabyMeg->rtServerMutex.lock();
-            m_pBabyMeg->m_pFiffInfo = m_pRtDataClient->readInfo();
-            emit m_pBabyMeg->fiffInfoAvailable();
-            m_pBabyMeg->rtServerMutex.unlock();
+            m_pBabyMEG->rtServerMutex.lock();
+            m_pBabyMEG->m_pFiffInfo = m_pRtDataClient->readInfo();
+            emit m_pBabyMEG->fiffInfoAvailable();
+            m_pBabyMEG->rtServerMutex.unlock();
 
             producerMutex.lock();
             m_bFlagInfoRequest = false;
@@ -184,15 +184,33 @@ void BabyMegProducer::run()
 
         if(m_bFlagMeasuring)
         {
-            m_pRtDataClient->readRawBuffer(m_pBabyMeg->m_pFiffInfo->nchan, t_matRawBuffer, kind);
+//            QByteArray buffer;
+//            QByteArray dat;
+
+//            int numBytes = m_pRtDataClient->bytesAvailable();
+//            qDebug() << "MNE_X. byte available: " << numBytes;
+//            if (numBytes > 0){
+//                dat = m_pRtDataClient->read(numBytes); // read all pending data
+//                qDebug()<<"[dat Size]"<<dat.size();
+//                if (!dat.isEmpty()){
+//                    buffer.append(dat); // and append it to your own buffer
+//                    qDebug()<<"[ReadToBuffer: Buffer Size]"<<buffer.size();
+//                }
+//                else
+//                {
+//                    qDebug()<<"[Empty dat: error]";
+//                }
+//            }
+
+            m_pRtDataClient->readRawBuffer(m_pBabyMEG->m_pFiffInfo->nchan, t_matRawBuffer, kind);
 
             if(kind == FIFF_DATA_BUFFER)
             {
                 to += t_matRawBuffer.cols();
-//                printf("Reading %d ... %d  =  %9.3f ... %9.3f secs...", from, to, ((float)from)/m_pBabyMeg->m_pFiffInfo->sfreq, ((float)to)/m_pBabyMeg->m_pFiffInfo->sfreq);
+//                printf("Reading %d ... %d  =  %9.3f ... %9.3f secs...", from, to, ((float)from)/m_pBabyMEG->m_pFiffInfo->sfreq, ((float)to)/m_pBabyMEG->m_pFiffInfo->sfreq);
                 from += t_matRawBuffer.cols();
 
-                m_pBabyMeg->m_pRawMatrixBuffer_In->push(&t_matRawBuffer);
+                m_pBabyMEG->m_pRawMatrixBuffer_In->push(&t_matRawBuffer);
             }
             else if(FIFF_DATA_BUFFER == FIFF_BLOCK_END)
                 m_bFlagMeasuring = false;

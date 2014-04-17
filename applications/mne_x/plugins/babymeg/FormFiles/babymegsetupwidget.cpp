@@ -40,6 +40,10 @@
 
 #include "babymegsetupwidget.h"
 #include "babymegaboutwidget.h"
+
+#include "babymegsetupbabymegwidget.h"
+//#include "babymegsquidcontroldgl.h"
+
 #include "../babymeg.h"
 
 
@@ -58,7 +62,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace BabyMegPlugin;
+using namespace BabyMEGPlugin;
 
 
 //*************************************************************************************************************
@@ -66,41 +70,48 @@ using namespace BabyMegPlugin;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BabyMegSetupWidget::BabyMegSetupWidget(BabyMeg* p_pBabyMeg, QWidget* parent)
+BabyMEGSetupWidget::BabyMEGSetupWidget(BabyMEG* p_pBabyMEG, QWidget* parent)
 : QWidget(parent)
-, m_pBabyMeg(p_pBabyMeg)
+, m_pBabyMEG(p_pBabyMEG)
 , m_bIsInit(false)
+, m_pBabyMEGSetupBabyMegWidget(new BabyMEGSetupBabyMegWidget(p_pBabyMEG))
 {
     ui.setupUi(this);
 
+    //Record data checkbox
+    connect(ui.m_qCheckBox_RecordData, &QCheckBox::stateChanged, this, &BabyMEGSetupWidget::checkedRecordDataChanged);
 
-    connect(ui.m_qCheckBox_RecordData, &QCheckBox::stateChanged, this, &BabyMegSetupWidget::checkedRecordDataChanged);
+    //Fiff record file
+    connect(ui.m_qPushButton_FiffRecordFile, &QPushButton::released, this, &BabyMEGSetupWidget::pressedFiffRecordFile);
 
-    //Fiff Record File
-    connect(ui.m_qPushButton_FiffRecordFile, &QPushButton::released, this, &BabyMegSetupWidget::pressedFiffRecordFile);
-
-    //Select Connector
+    //Select connector
     connect(ui.m_qComboBox_Connector, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-            this, &BabyMegSetupWidget::connectorIdxChanged);
+            this, &BabyMEGSetupWidget::connectorIdxChanged);
+
+    //Configure connector
+    connect(ui.m_qPushButton_Configure, &QCheckBox::released, this, &BabyMEGSetupWidget::pressedConfigure);
 
     //rt server connection
-    this->ui.m_qLineEdit_Ip->setText(m_pBabyMeg->m_sBabyMegIP);
+    this->ui.m_qLineEdit_Ip->setText(m_pBabyMEG->m_sBabyMEGIP);
 
-    connect(ui.m_qPushButton_Connect, &QPushButton::released, this, &BabyMegSetupWidget::pressedConnect);
+    connect(ui.m_qPushButton_Connect, &QPushButton::released, this, &BabyMEGSetupWidget::pressedConnect);
 
-    connect(m_pBabyMeg, &BabyMeg::cmdConnectionChanged, this, &BabyMegSetupWidget::cmdConnectionChanged);
+    connect(m_pBabyMEG, &BabyMEG::cmdConnectionChanged, this, &BabyMEGSetupWidget::cmdConnectionChanged);
 
     //rt server fiffInfo received
-    connect(m_pBabyMeg, &BabyMeg::fiffInfoAvailable, this, &BabyMegSetupWidget::fiffInfoReceived);
+    connect(m_pBabyMEG, &BabyMEG::fiffInfoAvailable, this, &BabyMEGSetupWidget::fiffInfoReceived);
 
     //Buffer
-    connect(ui.m_qLineEdit_BufferSize, &QLineEdit::editingFinished, this, &BabyMegSetupWidget::bufferSizeEdited);
+    connect(ui.m_qLineEdit_BufferSize, &QLineEdit::editingFinished, this, &BabyMEGSetupWidget::bufferSizeEdited);
 
     //CLI
-    connect(ui.m_qPushButton_SendCLI, &QPushButton::released, this, &BabyMegSetupWidget::pressedSendCLI);
+    connect(ui.m_qPushButton_SendCLI, &QPushButton::released, this, &BabyMEGSetupWidget::pressedSendCLI);
 
     //About
-    connect(ui.m_qPushButton_About, &QPushButton::released, this, &BabyMegSetupWidget::showAboutDialog);
+    connect(ui.m_qPushButton_About, &QPushButton::released, this, &BabyMEGSetupWidget::showAboutDialog);
+
+//    //SQUID Control
+//    connect(ui.m_qPushButton_SQUIDControl, &QPushButton::released, this, &BabyMEGSetupWidget::SQUIDControlDialog);
 
     this->init();
 }
@@ -108,7 +119,7 @@ BabyMegSetupWidget::BabyMegSetupWidget(BabyMeg* p_pBabyMeg, QWidget* parent)
 
 //*************************************************************************************************************
 
-BabyMegSetupWidget::~BabyMegSetupWidget()
+BabyMEGSetupWidget::~BabyMEGSetupWidget()
 {
 
 }
@@ -116,30 +127,30 @@ BabyMegSetupWidget::~BabyMegSetupWidget()
 
 //*************************************************************************************************************
 
-void BabyMegSetupWidget::init()
+void BabyMEGSetupWidget::init()
 {
     checkedRecordDataChanged();
-    cmdConnectionChanged(m_pBabyMeg->m_bCmdClientIsConnected);
+    cmdConnectionChanged(m_pBabyMEG->m_bCmdClientIsConnected);
 }
 
 
 //*************************************************************************************************************
 
-void BabyMegSetupWidget::bufferSizeEdited()
+void BabyMEGSetupWidget::bufferSizeEdited()
 {
     bool t_bSuccess = false;
     qint32 t_iBufferSize = ui.m_qLineEdit_BufferSize->text().toInt(&t_bSuccess);
 
     if(t_bSuccess && t_iBufferSize > 0)
-        m_pBabyMeg->m_iBufferSize = t_iBufferSize;
+        m_pBabyMEG->m_iBufferSize = t_iBufferSize;
     else
-        ui.m_qLineEdit_BufferSize->setText(QString("%1").arg(m_pBabyMeg->m_iBufferSize));
+        ui.m_qLineEdit_BufferSize->setText(QString("%1").arg(m_pBabyMEG->m_iBufferSize));
 }
 
 
 //*************************************************************************************************************
 
-void BabyMegSetupWidget::checkedRecordDataChanged()
+void BabyMEGSetupWidget::checkedRecordDataChanged()
 {
     if(ui.m_qCheckBox_RecordData->checkState() == Qt::Checked)
     {
@@ -160,16 +171,16 @@ void BabyMegSetupWidget::checkedRecordDataChanged()
 
 //*************************************************************************************************************
 
-void BabyMegSetupWidget::connectorIdxChanged(int idx)
+void BabyMEGSetupWidget::connectorIdxChanged(int idx)
 {
-    if(ui.m_qComboBox_Connector->itemData(idx).toInt() != m_pBabyMeg->m_iActiveConnectorId && m_bIsInit)
-        m_pBabyMeg->changeConnector(ui.m_qComboBox_Connector->itemData(idx).toInt());
+    if(ui.m_qComboBox_Connector->itemData(idx).toInt() != m_pBabyMEG->m_iActiveConnectorId && m_bIsInit)
+        m_pBabyMEG->changeConnector(ui.m_qComboBox_Connector->itemData(idx).toInt());
 }
 
 
 //*************************************************************************************************************
 
-void BabyMegSetupWidget::pressedFiffRecordFile()
+void BabyMEGSetupWidget::pressedFiffRecordFile()
 {
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save Fiff Record File"), "", tr("Fiff Record File (*.fif)"));
 
@@ -179,26 +190,26 @@ void BabyMegSetupWidget::pressedFiffRecordFile()
 
 //*************************************************************************************************************
 
-void BabyMegSetupWidget::pressedConnect()
+void BabyMEGSetupWidget::pressedConnect()
 {
-    if(m_pBabyMeg->m_bCmdClientIsConnected)
-        m_pBabyMeg->disconnectCmdClient();
+    if(m_pBabyMEG->m_bCmdClientIsConnected)
+        m_pBabyMEG->disconnectCmdClient();
     else
     {
-        m_pBabyMeg->m_sBabyMegIP = this->ui.m_qLineEdit_Ip->text();
-        m_pBabyMeg->connectCmdClient();
+        m_pBabyMEG->m_sBabyMEGIP = this->ui.m_qLineEdit_Ip->text();
+        m_pBabyMEG->connectCmdClient();
     }
 }
 
 
 //*************************************************************************************************************
 
-void BabyMegSetupWidget::pressedSendCLI()
+void BabyMEGSetupWidget::pressedSendCLI()
 {
-    if(m_pBabyMeg->m_bCmdClientIsConnected)
+    if(m_pBabyMEG->m_bCmdClientIsConnected)
     {
         this->printToLog(this->ui.m_qLineEdit_SendCLI->text());
-        QString t_sReply = m_pBabyMeg->m_pRtCmdClient->sendCLICommand(this->ui.m_qLineEdit_SendCLI->text());
+        QString t_sReply = m_pBabyMEG->m_pRtCmdClient->sendCLICommand(this->ui.m_qLineEdit_SendCLI->text());
         this->printToLog(t_sReply);
     }
 }
@@ -206,7 +217,15 @@ void BabyMegSetupWidget::pressedSendCLI()
 
 //*************************************************************************************************************
 
-void BabyMegSetupWidget::printToLog(QString logMsg)
+void BabyMEGSetupWidget::pressedConfigure()
+{
+    QString t_sConnector = ui.m_qComboBox_Connector->currentText();
+    m_pBabyMEGSetupBabyMegWidget->show();
+}
+
+//*************************************************************************************************************
+
+void BabyMEGSetupWidget::printToLog(QString logMsg)
 {
     ui.m_qTextBrowser_ServerMessage->insertPlainText(logMsg+"\n");
     //scroll down to the newest entry
@@ -218,7 +237,7 @@ void BabyMegSetupWidget::printToLog(QString logMsg)
 
 //*************************************************************************************************************
 
-void BabyMegSetupWidget::cmdConnectionChanged(bool p_bConnectionStatus)
+void BabyMEGSetupWidget::cmdConnectionChanged(bool p_bConnectionStatus)
 {
     m_bIsInit = false;
 
@@ -227,21 +246,21 @@ void BabyMegSetupWidget::cmdConnectionChanged(bool p_bConnectionStatus)
         //
         // set frequency txt
         //
-        if(m_pBabyMeg->m_pFiffInfo)
-            this->ui.m_qLabel_sps->setText(QString("%1").arg(m_pBabyMeg->m_pFiffInfo->sfreq));
+        if(m_pBabyMEG->m_pFiffInfo)
+            this->ui.m_qLabel_sps->setText(QString("%1").arg(m_pBabyMEG->m_pFiffInfo->sfreq));
 
         //
         // set buffer size txt
         //
-        this->ui.m_qLineEdit_BufferSize->setText(QString("%1").arg(m_pBabyMeg->m_iBufferSize));
+        this->ui.m_qLineEdit_BufferSize->setText(QString("%1").arg(m_pBabyMEG->m_iBufferSize));
 
         //
         // set connectors
         //
-        QMap<qint32, QString>::ConstIterator it = m_pBabyMeg->m_qMapConnectors.begin();
+        QMap<qint32, QString>::ConstIterator it = m_pBabyMEG->m_qMapConnectors.begin();
         qint32 idx = 0;
 
-        for(; it != m_pBabyMeg->m_qMapConnectors.end(); ++it)
+        for(; it != m_pBabyMEG->m_qMapConnectors.end(); ++it)
         {
             if(this->ui.m_qComboBox_Connector->findData(it.key()) == -1)
             {
@@ -251,7 +270,7 @@ void BabyMegSetupWidget::cmdConnectionChanged(bool p_bConnectionStatus)
             else
                 idx = this->ui.m_qComboBox_Connector->findData(it.key()) + 1;
         }
-        this->ui.m_qComboBox_Connector->setCurrentIndex(this->ui.m_qComboBox_Connector->findData(m_pBabyMeg->m_iActiveConnectorId));
+        this->ui.m_qComboBox_Connector->setCurrentIndex(this->ui.m_qComboBox_Connector->findData(m_pBabyMEG->m_iActiveConnectorId));
 
         //UI enables/disables
         this->ui.m_qLabel_ConnectionStatus->setText(QString("Connected"));
@@ -265,9 +284,9 @@ void BabyMegSetupWidget::cmdConnectionChanged(bool p_bConnectionStatus)
     else
     {
         //clear connectors --> ToDO create a clear function
-        m_pBabyMeg->m_qMapConnectors.clear();
+        m_pBabyMEG->m_qMapConnectors.clear();
         this->ui.m_qComboBox_Connector->clear();
-        m_pBabyMeg->m_iBufferSize = -1;
+        m_pBabyMEG->m_iBufferSize = -1;
 
         //UI enables/disables
         this->ui.m_qLabel_ConnectionStatus->setText(QString("Not connected"));
@@ -284,17 +303,26 @@ void BabyMegSetupWidget::cmdConnectionChanged(bool p_bConnectionStatus)
 
 //*************************************************************************************************************
 
-void BabyMegSetupWidget::fiffInfoReceived()
+void BabyMEGSetupWidget::fiffInfoReceived()
 {
-    if(m_pBabyMeg->m_pFiffInfo)
-        this->ui.m_qLabel_sps->setText(QString("%1").arg(m_pBabyMeg->m_pFiffInfo->sfreq));
+    if(m_pBabyMEG->m_pFiffInfo)
+        this->ui.m_qLabel_sps->setText(QString("%1").arg(m_pBabyMEG->m_pFiffInfo->sfreq));
 }
 
 
 //*************************************************************************************************************
 
-void BabyMegSetupWidget::showAboutDialog()
+void BabyMEGSetupWidget::showAboutDialog()
 {
-    BabyMegAboutWidget aboutDialog(this);
+    BabyMEGAboutWidget aboutDialog(this);
     aboutDialog.exec();
 }
+
+
+////*************************************************************************************************************
+
+//void BabyMEGSetupWidget::SQUIDControlDialog()
+//{
+//    BabyMEGSQUIDControlDgl SQUIDCtrlDlg(m_pBabyMEG,this);
+//    SQUIDCtrlDlg.exec();
+//}

@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the RTServerProducer class.
+* @brief    Contains the declaration of the BabyMEGProducer class.
 *
 */
 
@@ -64,10 +64,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE BabyMegPlugin
+// DEFINE NAMESPACE BabyMEGPlugin
 //=============================================================================================================
 
-namespace BabyMegPlugin
+namespace BabyMEGPlugin
 {
 
 
@@ -85,35 +85,35 @@ using namespace RTCLIENTLIB;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class BabyMeg;
+class BabyMEG;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS ECGProducer
+* DECLARE CLASS BabyMEGProducer
 *
-* @brief The ECGProducer class provides a ECG data producer for a given sampling rate.
+* @brief The BabyMEGProducer class provides a Rt Client data producer for a given sampling rate.
 */
-class BabyMegProducer : public QThread
+class BabyMEGProducer : public QThread
 {
     Q_OBJECT
 
-    friend class BabyMeg;
+    friend class BabyMEG;
 
 public:
     //=========================================================================================================
     /**
-    * Constructs a BabyMegProducer.
+    * Constructs a BabyMEGProducer.
     *
-    * @param [in] p_pBabyMeg   a pointer to the corresponding BabyMeg.
+    * @param [in] p_pBabyMEG   a pointer to the corresponding BabyMEG.
     */
-    BabyMegProducer(BabyMeg* p_pBabyMeg);
+    BabyMEGProducer(BabyMEG* p_pBabyMEG);
 
     //=========================================================================================================
     /**
-    * Destroys the BabyMegProducer.
+    * Destroys the BabyMEGProducer.
     */
-    ~BabyMegProducer();
+    ~BabyMEGProducer();
 
     //=========================================================================================================
     /**
@@ -131,7 +131,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Stops the BabyMegProducer by stopping the producer's thread.
+    * Stops the BabyMEGProducer by stopping the producer's thread.
     */
     void stop();
 
@@ -157,11 +157,11 @@ private:
 
     QMutex producerMutex;
 
-    BabyMeg*   m_pBabyMeg;    /**< Holds a pointer to corresponding BabyMeg.*/
-    bool        m_bIsRunning;   /**< Whether BabyMegProducer is running.*/
+    BabyMEG* m_pBabyMEG;    /**< Holds a pointer to corresponding BabyMEG.*/
+    bool        m_bIsRunning;       /**< Whether BabyMEGProducer is running.*/
 
-    RtDataClient* m_pRtDataClient;  /**< The data client.*/
-    bool m_bDataClientIsConnected;  /**< If the data client is connected.*/
+    QSharedPointer<RtDataClient> m_pRtDataClient;   /**< The data client.*/
+    bool m_bDataClientIsConnected;                  /**< If the data client is connected.*/
 
     qint32 m_iDataClientId;
 
