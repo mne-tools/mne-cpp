@@ -33,7 +33,7 @@
 #
 #--------------------------------------------------------------------------------------------------------------
 
-include(../../../mne-cpp.pri)
+include(../../../../mne-cpp.pri)
 
 TEMPLATE = lib
 
@@ -60,7 +60,6 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}RtClientd \
             -lxMeasd \
             -lxDispd \
-            -lxDtMngd \
             -lmne_xd
 }
 else {
@@ -73,33 +72,35 @@ else {
             -lMNE$${MNE_LIB_VERSION}RtClient \
             -lxMeas \
             -lxDisp \
-            -lxDtMng \
             -lmne_x
 }
 
 DESTDIR = $${MNE_BINARY_DIR}/mne_x_plugins
 
 SOURCES += \
-        babymeg.cpp \
-        FormFiles/babymegsetupwidget.cpp \
-        FormFiles/babymegrunwidget.cpp \
-        FormFiles/babymegaboutwidget.cpp \
-    directrecord.cpp \
-    babymegproducer.cpp
+        directrecord.cpp \
+    babymeg.cpp \
+    babymegproducer.cpp \
+    FormFiles/babymegsetupwidget.cpp \
+    FormFiles/babymegsetupbabymegwidget.cpp \
+    FormFiles/babymegaboutwidget.cpp \
+    FormFiles/babymegsquidcontroldgl.cpp
 
 HEADERS += \
-        babymeg.h\
-        babymeg_global.h \
-        FormFiles/babymegsetupwidget.h \
-        FormFiles/babymegrunwidget.h \
-        FormFiles/babymegaboutwidget.h \
-    directrecord.h \
-    babymegproducer.h
+        directrecord.h \
+    babymeg.h \
+    babymeg_global.h \
+    babymegproducer.h \
+    FormFiles/babymegsetupwidget.h \
+    FormFiles/babymegsetupbabymegwidget.h \
+    FormFiles/babymegaboutwidget.h \
+    FormFiles/babymegsquidcontroldgl.h
 
 FORMS += \
-        FormFiles/babymegsetup.ui \
-        FormFiles/babymegrun.ui \
-        FormFiles/babymegabout.ui
+    FormFiles/babymegsetupbabymeg.ui \
+    FormFiles/babymegsetup.ui \
+    FormFiles/babymegabout.ui \
+    FormFiles/babymegsquidcontroldgl.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
@@ -109,3 +110,8 @@ OTHER_FILES += babymeg.json
 
 # Put generated form headers into the origin --> cause other src is pointing at them
 UI_DIR = $${PWD}
+
+unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
+
+# suppress visibility warnings
+unix: QMAKE_CXXFLAGS += -Wno-attributes

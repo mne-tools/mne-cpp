@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the BabyMegSetupWidget class.
+* @brief    Contains the declaration of the BabyMEGSetupWidget class.
 *
 */
 
@@ -43,6 +43,7 @@
 //=============================================================================================================
 
 #include "../ui_babymegsetup.h"
+#include "babymegsetupbabymegwidget.h"
 
 
 //*************************************************************************************************************
@@ -50,15 +51,15 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
+#include <QWidget>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE BabyMegPlugin
+// DEFINE NAMESPACE BabyMEGPlugin
 //=============================================================================================================
 
-namespace BabyMegPlugin
+namespace BabyMEGPlugin
 {
 
 
@@ -67,16 +68,16 @@ namespace BabyMegPlugin
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class BabyMeg;
+class BabyMEG;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS BabyMegSetupWidget
+* DECLARE CLASS BabyMEGSetupWidget
 *
-* @brief The BabyMegSetupWidget class provides the ECG configuration window.
+* @brief The BabyMEGSetupWidget class provides the ECG configuration window.
 */
-class BabyMegSetupWidget : public QWidget
+class BabyMEGSetupWidget : public QWidget
 {
     Q_OBJECT
 
@@ -84,19 +85,19 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a BabyMegSetupWidget which is a child of parent.
+    * Constructs a BabyMEGSetupWidget which is a child of parent.
     *
-    * @param [in] p_pBabyMeg   a pointer to the corresponding BabyMeg.
-    * @param [in] parent        pointer to parent widget; If parent is 0, the new BabyMegSetupWidget becomes a window. If parent is another widget, BabyMegSetupWidget becomes a child window inside parent. BabyMegSetupWidget is deleted when its parent is deleted.
+    * @param [in] p_pBabyMEG   a pointer to the corresponding BabyMEG.
+    * @param [in] parent        pointer to parent widget; If parent is 0, the new BabyMEGSetupWidget becomes a window. If parent is another widget, BabyMEGSetupWidget becomes a child window inside parent. BabyMEGSetupWidget is deleted when its parent is deleted.
     */
-    BabyMegSetupWidget(BabyMeg* p_pBabyMeg, QWidget *parent = 0);
+    BabyMEGSetupWidget(BabyMEG* p_pBabyMEG, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the BabyMegSetupWidget.
-    * All BabyMegSetupWidget's children are deleted first. The application exits if BabyMegSetupWidget is the main widget.
+    * Destroys the BabyMEGSetupWidget.
+    * All BabyMEGSetupWidget's children are deleted first. The application exits if BabyMEGSetupWidget is the main widget.
     */
-    ~BabyMegSetupWidget();
+    ~BabyMEGSetupWidget();
 
     //=========================================================================================================
     /**
@@ -125,6 +126,8 @@ public:
 
     void pressedSendCLI();          /**< Triggers a send request of a cli command.*/
 
+    void pressedConfigure();        /**< Triggers file dialog to configure the plugins.*/
+
     void fiffInfoReceived();        /**< Triggered when new fiff info is recieved by producer and stored intor rt_server */
 
 
@@ -144,13 +147,20 @@ private:
     */
     void showAboutDialog();
 
-    BabyMeg*   m_pBabyMeg;    /**< Holds a pointer to corresponding ECGSimulator.*/
+//    //=========================================================================================================
+//    /**
+//    * Shows the SQUID Control Dialog
+//    *
+//    */
+//    void SQUIDControlDialog();
 
-    Ui::BabyMegSetupWidgetClass ui;       /**< Holds the user interface for the BabyMegSetupWidget.*/
+    BabyMEG*   m_pBabyMEG;      /**< a pointer to corresponding mne rt client.*/
 
-    bool m_bIsInit;     /**< false when gui is not initialized jet. Prevents gui from already interacting when not initialized */
+    Ui::BabyMEGSetupWidgetClass ui; /**< the user interface for the BabyMEGSetupWidget.*/
 
+    bool m_bIsInit;                     /**< false when gui is not initialized jet. Prevents gui from already interacting when not initialized */
 
+    BabyMEGSetupBabyMegWidget::SPtr m_pBabyMEGSetupBabyMegWidget;   /**< a pointer to mne rt client setup BabyMEG widget.*/
 };
 
 } // NAMESPACE

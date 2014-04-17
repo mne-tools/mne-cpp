@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     babymegrunwidget.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     babymegsquidcontroldgl.h
+* @author   Limin Sun <liminsun@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     May, 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2013, Limin Sun and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the BabyMegRunWidget class.
+* @brief    Contains the declaration of the BabyMEGSQUIDControlDGL class.
 *
 */
 
-#ifndef BABYMEGRUNWIDGET_H
-#define BABYMEGRUNWIDGET_H
+#ifndef BABYMEGSQUIDCONTROLDGL_H
+#define BABYMEGSQUIDCONTROLDGL_H
 
 
 //*************************************************************************************************************
@@ -42,23 +42,22 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_babymegrun.h"
-
+#include "../ui_babymegsquidcontroldgl.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
+#include <QDialog>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE BabyMegPlugin
+// DEFINE NAMESPACE BabyMEGPlugin
 //=============================================================================================================
 
-namespace BabyMegPlugin
+namespace BabyMEGPlugin
 {
 
 
@@ -66,52 +65,109 @@ namespace BabyMegPlugin
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
+class BabyMEG;
 
-class BabyMeg;
+//*************************************************************************************************************
+//=============================================================================================================
+// Structure definitions
+//=============================================================================================================
+struct FLLPara{
+    int Bias;
+    int Mod;
+    int Mode;
+    int PreGain;
+    int PostGain;
+    int slew;
+    int offset;
+    int LoPass;
+    int LPBW;
+    int HiPass;
+    int HPBW;
+    int AutoReset;
+    int ResetLock;
+    QString channame;
+};
+
+struct FLLConfig{
+    QList < FLLPara > m_Fll;
+
+};
+
+//*************************************************************************************************************
+//=============================================================================================================
+// GUI Status Machine Structure definitions
+//=============================================================================================================
+struct GUIStatMachine{
+    int CommType;
+    int ChannelSel;
+    int ChannelStat;
+    int OperMode;
+    int Retune;
+    int HeatThis;
+    int Atune;
+    int Reset;
+    int HeatAndTune;
+    int Save;
+    int _Save;
+    int GroupHeat;
+    int Last;
+    int Default;
+
+    int HighPass;
+    int LowPass;
+    int PreGain;
+    int PostGain;
+    int Slew;
+    float HeatTime;
+    float CoolTime;
+
+    int AutoRest;
+    int ResetLock;
+    float offset;
+    float bias;
+    float modulation;
+
+    int TuneCheck;
+    int Amp;
+    int IntegratorReset;
+    int MicroReset;
 
 
+};
 //=============================================================================================================
 /**
-* DECLARE CLASS BabyMegRunWidget
+* DECLARE CLASS BabyMEGSQUIDControlDgl
 *
-* @brief The BabyMegRunWidget class provides the ECG configuration window for the run mode.
+* @brief The BabyMEGSQUIDControlDgl class provides the SQUID control dialog.
 */
-class BabyMegRunWidget : public QWidget
+class BabyMEGSQUIDControlDgl : public QDialog
 {
     Q_OBJECT
 
+
 public:
-
-    //=========================================================================================================
-    /**
-    * Constructs a BabyMegRunWidget which is a child of parent.
-    *
-    * @param [in] simulator a pointer to the corresponding ECG Simulator.
-    * @param [in] parent pointer to parent widget; If parent is 0, the new BabyMegRunWidget becomes a window. If parent is another widget, BabyMegRunWidget becomes a child window inside parent. BabyMegRunWidget is deleted when its parent is deleted.
-    */
-    BabyMegRunWidget(BabyMeg* simulator, QWidget *parent = 0);
-
-    //=========================================================================================================
-    /**
-    * Destroys the BabyMegRunWidget.
-    * All BabyMegRunWidget's children are deleted first. The application exits if BabyMegRunWidget is the main widget.
-    */
-    ~BabyMegRunWidget();
-
-private slots:
-    //=========================================================================================================
-    /**
-    * Shows the About Dialog
-    *
-    */
-    void showAboutDialog();
-
+    explicit BabyMEGSQUIDControlDgl(BabyMEG* p_pBabyMEG,QWidget *parent = 0);
+    ~BabyMEGSQUIDControlDgl();
+    
 private:
-    BabyMeg* m_pBabyMeg;      /**< Holds a pointer to corresponding ECGSimulator.*/
+    Ui::BabyMEGSQUIDControlDgl *ui;
 
-    Ui::BabyMegRunClass ui;    /**< Holds the user interface for the BabyMegRunWidget.*/
+public:
+    BabyMEG*   m_pBabyMEG;
+    FLLConfig m_FLLConfig;
+    GUIStatMachine  m_GUISM;
+
+    void SendRetune();
+    void Cancel();
+    void SendCMD(QString CMDSTR);
+    void Init();
+    void InitChannels(QString sReply);
+    void InitGUIConfig(QString sFLLPara);
+    void ReplyCmdProc(QString sReply);
+    void UpdateGUI();
+    void SyncGUI();
+    QString GenChnInfo(QString);
 };
 
-} // NAMESPACE
-
-#endif // BABYMEGRUNWIDGET_H
+}//namespace
+#endif // BABYMEGSQUIDCONTROLDGL_H

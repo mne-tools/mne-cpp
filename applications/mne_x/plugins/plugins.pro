@@ -44,6 +44,7 @@ SUBDIRS += \
     mnertclient \
     fiffsimulator \
     neuromag \
+    babymeg \
     dummytoolbox \
     triggercontrol \
     sourcelab \
@@ -76,21 +77,13 @@ win32 { #Only compile the TMSI plugin if a windows system is used - TMSi driver 
 }
 else {
     message(TMSI plugin was not configured due to wrong OS (win32 needed)!)
-    }
-
-contains(MNECPP_CONFIG, babyMEG) {
-    message(BabyMEG plugin configured!)
-#    SUBDIRS +=
 }
-else {
-    message(RtServer plugin configured!)
-#    SUBDIRS += sourcelab 
 
 #    qtHaveModule(3d) {
 #        message(Qt3D available: brainmonitor library configured!)
 #        SUBDIRS += brainmonitor \
 #    }
-}
+
 
 #    filtertoolbox \
 #    gaborparticletoolbox \
@@ -99,14 +92,3 @@ else {
 #    roitoolbox \
 #    localizationtoolbox \
 #    prelocalizationtoolbox
-
-
-### BabyMEG alternative ###
-#contains(MNECPP_CONFIG, babyMEG) {
-#    message(BabyMEG plugin configured!)
-#    SUBDIRS += babymeg
-#}
-#else {
-#    message(RtServer plugin configured!)
-#    SUBDIRS += rtclient
-#}
