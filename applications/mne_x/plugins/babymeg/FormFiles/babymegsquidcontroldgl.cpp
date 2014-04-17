@@ -97,25 +97,28 @@ void BabyMEGSQUIDControlDgl::SyncGUI()
     SendCMD("SYNC");
 }
 
+
 void BabyMEGSQUIDControlDgl::SendCMD(QString CMDSTR)
 {
 
-    if(m_pBabyMEG->m_bCmdClientIsConnected)
-    {
-    //set the control field in FLL JSON value as CMDSTR
-    (*m_pBabyMEG->m_pRtCmdClient)["FLL"].pValues()[0].setValue(CMDSTR);
-    (*m_pBabyMEG->m_pRtCmdClient)["FLL"].send();
+//    if(m_pBabyMEG->m_bCmdClientIsConnected)
+//    {
+//    //set the control field in FLL JSON value as CMDSTR
+//    (*m_pBabyMEG->m_pRtCmdClient)["FLL"].pValues()[0].setValue(CMDSTR);
+//    (*m_pBabyMEG->m_pRtCmdClient)["FLL"].send();
 
-    this->ui->m_tx_info->setText(CMDSTR);
-    // Read reply
-    QString t_sReply = m_pBabyMEG->m_pRtCmdClient->readAvailableData();
+//    this->ui->m_tx_info->setText(CMDSTR);
+//    // Read reply
+//    QString t_sReply = m_pBabyMEG->m_pRtCmdClient->readAvailableData();
 
-    this->ui->m_tx_info->setText(QString("Reply:")+t_sReply);
+//    this->ui->m_tx_info->setText(QString("Reply:")+t_sReply);
 
-    ReplyCmdProc(t_sReply);
+//    ReplyCmdProc(t_sReply);
 
-    }
+//    }
 }
+
+
 void BabyMEGSQUIDControlDgl::ReplyCmdProc(QString sReply)
 {
 
