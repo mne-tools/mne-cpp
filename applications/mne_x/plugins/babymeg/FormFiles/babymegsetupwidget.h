@@ -43,7 +43,6 @@
 //=============================================================================================================
 
 #include "../ui_babymegsetup.h"
-#include "babymegsetupbabymegwidget.h"
 
 
 //*************************************************************************************************************
@@ -105,33 +104,15 @@ public:
     */
     void init();
 
-//slots
-    void bufferSizeEdited();        /**< Buffer size edited and set new buffer size.*/
-
     void checkedRecordDataChanged();    /**< Record Data checkbox changed. */
-
-    //=========================================================================================================
-    /**
-    * Connector selection index changed
-    *
-    * @param [in] idx   new connector combo box index
-    */
-    void connectorIdxChanged(int idx);
-
-    void printToLog(QString message);   /**< Implements printing messages to rtproc log.*/
-
-    void pressedFiffRecordFile();   /**< Triggers file dialog to select record file.*/
-
-    void pressedConnect();          /**< Triggers a connection trial to rt_server.*/
-
-    void pressedSendCLI();          /**< Triggers a send request of a cli command.*/
-
-    void pressedConfigure();        /**< Triggers file dialog to configure the plugins.*/
 
     void fiffInfoReceived();        /**< Triggered when new fiff info is recieved by producer and stored intor rt_server */
 
+    void pressedFiffRecordFile();   /**< Triggers file dialog to select record file.*/
+
 
 private:
+
     //=========================================================================================================
     /**
     * Set command connection status
@@ -147,20 +128,18 @@ private:
     */
     void showAboutDialog();
 
-//    //=========================================================================================================
-//    /**
-//    * Shows the SQUID Control Dialog
-//    *
-//    */
-//    void SQUIDControlDialog();
+    //=========================================================================================================
+    /**
+    * Shows the SQUID Control Dialog
+    *
+    */
+    void showSqdCtrlDialog();
 
     BabyMEG*   m_pBabyMEG;      /**< a pointer to corresponding mne rt client.*/
 
     Ui::BabyMEGSetupWidgetClass ui; /**< the user interface for the BabyMEGSetupWidget.*/
 
     bool m_bIsInit;                     /**< false when gui is not initialized jet. Prevents gui from already interacting when not initialized */
-
-    BabyMEGSetupBabyMegWidget::SPtr m_pBabyMEGSetupBabyMegWidget;   /**< a pointer to mne rt client setup BabyMEG widget.*/
 };
 
 } // NAMESPACE

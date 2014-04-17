@@ -43,6 +43,7 @@
 //=============================================================================================================
 
 #include "babymeg_global.h"
+#include "babymegclient.h"
 
 #include <mne_x/Interfaces/ISensor.h>
 #include <generics/circularbuffer_old.h>
@@ -102,8 +103,6 @@ using namespace XMEASLIB;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class BabyMEGProducer;
-//class ECGChannel;
 
 
 //=============================================================================================================
@@ -119,7 +118,6 @@ class BABYMEGSHARED_EXPORT BabyMEG : public ISensor
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(MNEX::ISensor)
 
-    friend class BabyMEGProducer;
     friend class BabyMEGSetupWidget;
     friend class BabyMEGSQUIDControlDgl;
 
@@ -163,32 +161,10 @@ public:
 
     virtual QWidget* setupWidget();
 
-//slots:
-    //=========================================================================================================
-    /**
-    * Change connector
-    *
-    * @param[in] p_iNewConnectorId      new connector ID
-    */
-    void changeConnector(qint32 p_iNewConnectorId);
+    void setFiffInfo(FIFFLIB::FiffInfo);
+    void setFiffData(QByteArray DATA);
+//    void setCMDData(QByteArray DATA);
 
-    //=========================================================================================================
-    /**
-    * Connects the cmd client.
-    */
-    void connectCmdClient();
-
-    //=========================================================================================================
-    /**
-    * Disconnects the cmd client.
-    */
-    void disconnectCmdClient();
-
-    //=========================================================================================================
-    /**
-    * Request FiffInfo using cmd client and producer (data client)
-    */
-    void requestInfo();
 
 signals:
     //=========================================================================================================
@@ -215,33 +191,21 @@ private:
     */
     void initConnector();
 
+    PluginOutputData<NewRealTimeMultiSampleArray>::SPtr m_pRTMSABabyMEG;   /**< The NewRealTimeMultiSampleArray to provide the rt_server Channels.*/
 
-    QMutex rtServerMutex;
+    QMutex mutex;
 
-
-    QString m_sBabyMEGClientAlias;     /**< The rt server client alias.*/
-
-//    float           m_fSamplingRate;                /**< The sampling rate.*/
-//    int             m_iDownsamplingFactor;          /**< The down sampling factor.*/
-
-    PluginOutputData<NewRealTimeMultiSampleArray>::SPtr m_pRTMSA_BabyMEG;   /**< The NewRealTimeMultiSampleArray to provide the rt_server Channels.*/
-
-    QSharedPointer<RtCmdClient> m_pRtCmdClient; /**< The command client.*/
-    bool m_bCmdClientIsConnected;               /**< If the command client is connected.*/
-
-    QString     m_sBabyMEGIP;               /**< The IP Adress of mne_rt_server.*/
-
-    QSharedPointer<BabyMEGProducer> m_pBabyMEGProducer;     /**< Holds the BabyMEGProducer.*/
-
-    QMap<qint32, QString> m_qMapConnectors;                 /**< Connector map.*/
-    qint32 m_iActiveConnectorId;                            /**< The active connector.*/
+    QSharedPointer<BabyMEGClient> myClient;
+    QSharedPointer<BabyMEGClient> myClientComm;
+    QSharedPointer<BabyMEGInfo>   pInfo;
+    bool DataStartFlag;
 
     FiffInfo::SPtr m_pFiffInfo;                             /**< Fiff measurement info.*/
     qint32 m_iBufferSize;                                   /**< The raw data buffer size.*/
 
-    QTimer m_cmdConnectionTimer;                            /**< Timer for convinient command client connection. When timer times out a connection is tried to be established. */
+    bool    m_bIsRunning;
 
-    QSharedPointer<RawMatrixBuffer> m_pRawMatrixBuffer_In;  /**< Holds incoming raw data. */
+    QSharedPointer<RawMatrixBuffer> m_pRawMatrixBuffer;  /**< Holds incoming raw data. */
 };
 
 } // NAMESPACE

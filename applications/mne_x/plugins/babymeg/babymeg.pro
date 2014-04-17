@@ -78,26 +78,23 @@ else {
 DESTDIR = $${MNE_BINARY_DIR}/mne_x_plugins
 
 SOURCES += \
-        directrecord.cpp \
     babymeg.cpp \
-    babymegproducer.cpp \
     FormFiles/babymegsetupwidget.cpp \
-    FormFiles/babymegsetupbabymegwidget.cpp \
     FormFiles/babymegaboutwidget.cpp \
-    FormFiles/babymegsquidcontroldgl.cpp
+    FormFiles/babymegsquidcontroldgl.cpp \
+    babymegclient.cpp \
+    babymeginfo.cpp
 
 HEADERS += \
-        directrecord.h \
     babymeg.h \
     babymeg_global.h \
-    babymegproducer.h \
     FormFiles/babymegsetupwidget.h \
-    FormFiles/babymegsetupbabymegwidget.h \
     FormFiles/babymegaboutwidget.h \
-    FormFiles/babymegsquidcontroldgl.h
+    FormFiles/babymegsquidcontroldgl.h \
+    babymegclient.h \
+    babymeginfo.h
 
 FORMS += \
-    FormFiles/babymegsetupbabymeg.ui \
     FormFiles/babymegsetup.ui \
     FormFiles/babymegabout.ui \
     FormFiles/babymegsquidcontroldgl.ui
