@@ -38,19 +38,13 @@ include(../../../mne-cpp.pri)
 
 TEMPLATE = subdirs
 
+#Sensors
 SUBDIRS += \
-    bci \
     ecgsimulator \
     mnertclient \
     fiffsimulator \
     neuromag \
     babymeg \
-    dummytoolbox \
-    triggercontrol \
-    sourcelab \
-    raplab
-#    rtsss \
-
 
 win32 { #Only compile the TMSI plugin if a windows system is used - TMSi driver is not available for linux yet
     contains(QMAKE_HOST.arch, x86_64) { #Compiling MNE-X FOR a 64bit system
@@ -78,6 +72,30 @@ win32 { #Only compile the TMSI plugin if a windows system is used - TMSi driver 
 else {
     message(TMSI plugin was not configured due to wrong OS (win32 needed)!)
 }
+
+
+#Algorithms
+SUBDIRS += \
+    bci \
+    dummytoolbox \
+    triggercontrol \
+    sourcelab \
+    raplab \
+    averaging
+#    rtsss \
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #    qtHaveModule(3d) {
 #        message(Qt3D available: brainmonitor library configured!)
