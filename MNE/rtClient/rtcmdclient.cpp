@@ -217,7 +217,6 @@ void RtCmdClient::requestCommands()
 
 //*************************************************************************************************************
 
-//QMap<qint32, QString>
 qint32 RtCmdClient::requestConnectors(QMap<qint32, QString> &p_qMapConnectors)
 {
     //Send
