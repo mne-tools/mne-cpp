@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     fiffsimulatorsetupwidget.h
+* @file     averagingsetupwidget.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,20 +29,19 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the FiffSimulatorSetupWidget class.
+* @brief    Contains the implementation of the AveragingSetupWidget class.
 *
 */
-
-#ifndef FIFFSIMULATORSETUPWIDGET_H
-#define FIFFSIMULATORSETUPWIDGET_H
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_fiffsimulatorsetup.h"
+#include "averagingsetupwidget.h"
+#include "averagingaboutwidget.h"
+
+#include "../averaging.h"
 
 
 //*************************************************************************************************************
@@ -50,95 +49,44 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QWidget>
+#include <QDebug>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE FiffSimulatorPlugin
+// USED NAMESPACES
 //=============================================================================================================
 
-namespace FiffSimulatorPlugin
-{
+using namespace AveragingPlugin;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-class FiffSimulator;
-
-
-//=============================================================================================================
-/**
-* DECLARE CLASS FiffSimulatorSetupWidget
-*
-* @brief The FiffSimulatorSetupWidget class provides the Fiff configuration window.
-*/
-class FiffSimulatorSetupWidget : public QWidget
+AveragingSetupWidget::AveragingSetupWidget(Averaging* toolbox, QWidget *parent)
+: QWidget(parent)
+, m_pAveraging(toolbox)
 {
-    Q_OBJECT
+    ui.setupUi(this);
 
-public:
-
-    //=========================================================================================================
-    /**
-    * Constructs a FiffSimulatorSetupWidget which is a child of parent.
-    *
-    * @param [in] p_pFiffSimulator   a pointer to the corresponding FiffSimulator.
-    * @param [in] parent        pointer to parent widget; If parent is 0, the new FiffSimulatorSetupWidget becomes a window. If parent is another widget, FiffSimulatorSetupWidget becomes a child window inside parent. FiffSimulatorSetupWidget is deleted when its parent is deleted.
-    */
-    FiffSimulatorSetupWidget(FiffSimulator* p_pFiffSimulator, QWidget *parent = 0);
-
-    //=========================================================================================================
-    /**
-    * Destroys the FiffSimulatorSetupWidget.
-    * All FiffSimulatorSetupWidget's children are deleted first. The application exits if FiffSimulatorSetupWidget is the main widget.
-    */
-    ~FiffSimulatorSetupWidget();
-
-    //=========================================================================================================
-    /**
-    * Inits the setup widget
-    */
-    void init();
-
-//slots
-    void bufferSizeEdited();        /**< Buffer size edited and set new buffer size.*/
-
-    void printToLog(QString message);   /**< Implements printing messages to rtproc log.*/
-
-    void pressedConnect();          /**< Triggers a connection trial to rt_server.*/
-
-    void pressedSendCLI();          /**< Triggers a send request of a cli command.*/
-
-    void fiffInfoReceived();        /**< Triggered when new fiff info is recieved by producer and stored intor rt_server */
+    connect(ui.m_qPushButton_About, SIGNAL(released()), this, SLOT(showAboutDialog()));
+}
 
 
-private:
-    //=========================================================================================================
-    /**
-    * Set command connection status
-    *
-    * @param[in] p_bConnectionStatus    the connection status
-    */
-    void cmdConnectionChanged(bool p_bConnectionStatus);
+//*************************************************************************************************************
 
-    //=========================================================================================================
-    /**
-    * Shows the About Dialog
-    */
-    void showAboutDialog();
+AveragingSetupWidget::~AveragingSetupWidget()
+{
 
-    FiffSimulator*   m_pFiffSimulator;      /**< a pointer to corresponding mne rt client.*/
+}
 
-    Ui::FiffSimulatorSetupWidgetClass ui; /**< the user interface for the MneRtClientSetupWidget.*/
 
-    bool m_bIsInit;                     /**< false when gui is not initialized jet. Prevents gui from already interacting when not initialized */
+//*************************************************************************************************************
 
-};
-
-} // NAMESPACE
-
-#endif // FIFFSIMULATORSETUPWIDGET_H
+void AveragingSetupWidget::showAboutDialog()
+{
+    AveragingAboutWidget aboutDialog(this);
+    aboutDialog.exec();
+}

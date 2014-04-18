@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     fiffsimulatorsetupwidget.h
+* @file     averaging.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the FiffSimulatorSetupWidget class.
+* @brief    Contains the declaration of the Averaging class.
 *
 */
 
-#ifndef FIFFSIMULATORSETUPWIDGET_H
-#define FIFFSIMULATORSETUPWIDGET_H
+#ifndef AVERAGING_H
+#define AVERAGING_H
 
 
 //*************************************************************************************************************
@@ -42,7 +42,11 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_fiffsimulatorsetup.h"
+#include "averaging_global.h"
+
+#include <mne_x/Interfaces/IAlgorithm.h>
+#include <generics/circularbuffer.h>
+#include <xMeas/newrealtimesamplearray.h>
 
 
 //*************************************************************************************************************
@@ -50,16 +54,26 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QWidget>
+#include <QtWidgets>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE FiffSimulatorPlugin
+// DEFINE NAMESPACE AveragingPlugin
 //=============================================================================================================
 
-namespace FiffSimulatorPlugin
+namespace AveragingPlugin
 {
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace MNEX;
+using namespace XMEASLIB;
+using namespace IOBuffer;
 
 
 //*************************************************************************************************************
@@ -67,78 +81,65 @@ namespace FiffSimulatorPlugin
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class FiffSimulator;
-
 
 //=============================================================================================================
 /**
-* DECLARE CLASS FiffSimulatorSetupWidget
+* DECLARE CLASS Averaging
 *
-* @brief The FiffSimulatorSetupWidget class provides the Fiff configuration window.
+* @brief The Averaging class provides a Averaging algorithm structure.
 */
-class FiffSimulatorSetupWidget : public QWidget
+class AVERAGINGSHARED_EXPORT Averaging : public IAlgorithm
 {
     Q_OBJECT
+    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "averaging.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
+    Q_INTERFACES(MNEX::IAlgorithm)
 
 public:
-
     //=========================================================================================================
     /**
-    * Constructs a FiffSimulatorSetupWidget which is a child of parent.
-    *
-    * @param [in] p_pFiffSimulator   a pointer to the corresponding FiffSimulator.
-    * @param [in] parent        pointer to parent widget; If parent is 0, the new FiffSimulatorSetupWidget becomes a window. If parent is another widget, FiffSimulatorSetupWidget becomes a child window inside parent. FiffSimulatorSetupWidget is deleted when its parent is deleted.
+    * Constructs a Averaging.
     */
-    FiffSimulatorSetupWidget(FiffSimulator* p_pFiffSimulator, QWidget *parent = 0);
+    Averaging();
 
     //=========================================================================================================
     /**
-    * Destroys the FiffSimulatorSetupWidget.
-    * All FiffSimulatorSetupWidget's children are deleted first. The application exits if FiffSimulatorSetupWidget is the main widget.
+    * Destroys the Averaging.
     */
-    ~FiffSimulatorSetupWidget();
+    ~Averaging();
 
     //=========================================================================================================
     /**
-    * Inits the setup widget
+    * Initialise input and output connectors.
     */
     void init();
 
-//slots
-    void bufferSizeEdited();        /**< Buffer size edited and set new buffer size.*/
+    //=========================================================================================================
+    /**
+    * Clone the plugin
+    */
+    virtual QSharedPointer<IPlugin> clone() const;
 
-    void printToLog(QString message);   /**< Implements printing messages to rtproc log.*/
+    virtual bool start();
+    virtual bool stop();
 
-    void pressedConnect();          /**< Triggers a connection trial to rt_server.*/
+    virtual IPlugin::PluginType getType() const;
+    virtual QString getName() const;
 
-    void pressedSendCLI();          /**< Triggers a send request of a cli command.*/
+    virtual QWidget* setupWidget();
 
-    void fiffInfoReceived();        /**< Triggered when new fiff info is recieved by producer and stored intor rt_server */
+    void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
 
+protected:
+    virtual void run();
 
 private:
-    //=========================================================================================================
-    /**
-    * Set command connection status
-    *
-    * @param[in] p_bConnectionStatus    the connection status
-    */
-    void cmdConnectionChanged(bool p_bConnectionStatus);
+    PluginInputData<NewRealTimeSampleArray>::SPtr   m_pAveragingInput;      /**< The RealTimeSampleArray of the Averaging input.*/
+    PluginOutputData<NewRealTimeSampleArray>::SPtr  m_pAveragingOutput;    /**< The RealTimeSampleArray of the Averaging output.*/
 
-    //=========================================================================================================
-    /**
-    * Shows the About Dialog
-    */
-    void showAboutDialog();
-
-    FiffSimulator*   m_pFiffSimulator;      /**< a pointer to corresponding mne rt client.*/
-
-    Ui::FiffSimulatorSetupWidgetClass ui; /**< the user interface for the MneRtClientSetupWidget.*/
-
-    bool m_bIsInit;                     /**< false when gui is not initialized jet. Prevents gui from already interacting when not initialized */
-
+    dBuffer::SPtr   m_pAveragingBuffer;      /**< Holds incoming data.*/
 };
 
 } // NAMESPACE
 
-#endif // FIFFSIMULATORSETUPWIDGET_H
+#endif // AVERAGING_H
