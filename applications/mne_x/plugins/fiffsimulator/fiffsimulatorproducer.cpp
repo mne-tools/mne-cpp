@@ -184,38 +184,16 @@ void FiffSimulatorProducer::run()
 
         if(m_bFlagMeasuring)
         {
-//            QByteArray buffer;
-//            QByteArray dat;
-
-//            int numBytes = m_pRtDataClient->bytesAvailable();
-//            qDebug() << "MNE_X. byte available: " << numBytes;
-//            if (numBytes > 0){
-//                dat = m_pRtDataClient->read(numBytes); // read all pending data
-//                qDebug()<<"[dat Size]"<<dat.size();
-//                if (!dat.isEmpty()){
-//                    buffer.append(dat); // and append it to your own buffer
-//                    qDebug()<<"[ReadToBuffer: Buffer Size]"<<buffer.size();
-//                }
-//                else
-//                {
-//                    qDebug()<<"[Empty dat: error]";
-//                }
-//            }
-
             m_pRtDataClient->readRawBuffer(m_pFiffSimulator->m_pFiffInfo->nchan, t_matRawBuffer, kind);
 
             if(kind == FIFF_DATA_BUFFER)
             {
                 to += t_matRawBuffer.cols();
-//                printf("Reading %d ... %d  =  %9.3f ... %9.3f secs...", from, to, ((float)from)/m_pMneRtClient->m_pFiffInfo->sfreq, ((float)to)/m_pMneRtClient->m_pFiffInfo->sfreq);
                 from += t_matRawBuffer.cols();
-
                 m_pFiffSimulator->m_pRawMatrixBuffer_In->push(&t_matRawBuffer);
             }
             else if(FIFF_DATA_BUFFER == FIFF_BLOCK_END)
                 m_bFlagMeasuring = false;
-
-//            printf("[done]\n");
         }
     }
 }

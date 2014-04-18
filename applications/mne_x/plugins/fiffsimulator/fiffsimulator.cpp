@@ -81,7 +81,6 @@ FiffSimulator::FiffSimulator()
 , m_pFiffSimulatorProducer(new FiffSimulatorProducer(this))
 , m_iBufferSize(-1)
 , m_pRawMatrixBuffer_In(0)
-/*m_pRTMSA_FiffSimulator(0)*/
 {
 
 }
@@ -114,15 +113,8 @@ void FiffSimulator::init()
     // Start FiffSimulatorProducer
     m_pFiffSimulatorProducer->start();
 
-
-//    //Convinience CMD connection timer --> ToDo get rid of that -> it interrupts acquistion when not connected
-//    connect(&m_cmdConnectionTimer, &QTimer::timeout, this, &FiffSimulator::connectCmdClient);
-
     //init channels when fiff info is available
     connect(this, &FiffSimulator::fiffInfoAvailable, this, &FiffSimulator::initConnector);
-
-//    //Start convinience timer
-//    m_cmdConnectionTimer.start(5000);
 
     //Try to connect the cmd client on start up using localhost connection
     this->connectCmdClient();
@@ -136,22 +128,9 @@ void FiffSimulator::init()
 
 void FiffSimulator::initConnector()
 {
-
-
-    qDebug() << "FiffSimulator::init()";
-
-//    if(m_pFiffInfo)
-//    {
-////        m_pFiffInfo->sfreq /= 100;
-//        m_pRTMSA_FiffSimulator = addProviderRealTimeMultiSampleArray_New(MSR_ID::MEGFiffSimulator_OUTPUT);
-//        m_pRTMSA_FiffSimulator->initFromFiffInfo(m_pFiffInfo);
-//        m_pRTMSA_FiffSimulator->setMultiArraySize(10);
-//    }
-
-
     if(m_pFiffInfo)
     {
-        m_pRTMSA_FiffSimulator = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "RtClient", "MNE Rt Client");
+        m_pRTMSA_FiffSimulator = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "FiffSimulator", "Fiff Simulator Output");
 
         m_pRTMSA_FiffSimulator->data()->initFromFiffInfo(m_pFiffInfo);
         m_pRTMSA_FiffSimulator->data()->setMultiArraySize(10);
@@ -225,9 +204,6 @@ void FiffSimulator::connectCmdClient()
     {
         rtServerMutex.lock();
 
-        //Stop convinience timer
-//        m_cmdConnectionTimer.stop();
-
         if(!m_bCmdClientIsConnected)
         {
             //
@@ -251,6 +227,12 @@ void FiffSimulator::connectCmdClient()
             //
             if(m_qMapConnectors.size() == 0)
                 m_iActiveConnectorId = m_pRtCmdClient->requestConnectors(m_qMapConnectors);
+
+
+            QMap<qint32, QString>::const_iterator it;
+            for(it = m_qMapConnectors.begin(); it != m_qMapConnectors.end(); ++it)
+                if(it.value().compare("Fiff File Simulator") == 0 && m_iActiveConnectorId != it.key())
+                    changeConnector(it.key());
 
             //
             // Read Buffer Size
@@ -382,8 +364,6 @@ QWidget* FiffSimulator::setupWidget()
 {
     FiffSimulatorSetupWidget* widget = new FiffSimulatorSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
 
-    //init dialog
-
     return widget;
 }
 
@@ -398,12 +378,9 @@ void FiffSimulator::run()
     {
         //pop matrix
         matValue = m_pRawMatrixBuffer_In->pop();
-//        std::cout << "matValue " << matValue.block(0,0,1,10) << std::endl;
 
         //emit values
         for(qint32 i = 0; i < matValue.cols(); ++i)
             m_pRTMSA_FiffSimulator->data()->setValue(matValue.col(i).cast<double>());
-//        for(qint32 i = 0; i < matValue.cols(); i += 100)
-//            m_pRTMSA_FiffSimulator->setValue(matValue.col(i).cast<double>());
     }
 }
