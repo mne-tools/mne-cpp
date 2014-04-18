@@ -82,7 +82,6 @@ SOURCES += \
     neuromag.cpp \
     neuromagproducer.cpp \
     FormFiles/neuromagsetupwidget.cpp \
-    FormFiles/neuromagsetupneuromagwidget.cpp \
     FormFiles/neuromagaboutwidget.cpp
 
 HEADERS += \
@@ -91,12 +90,10 @@ HEADERS += \
     neuromag.h \
     neuromagproducer.h \
     FormFiles/neuromagsetupwidget.h \
-    FormFiles/neuromagsetupneuromagwidget.h \
     FormFiles/neuromagaboutwidget.h
 
 FORMS += \
     FormFiles/neuromagsetup.ui \
-    FormFiles/neuromagsetupneuromag.ui \
     FormFiles/neuromagabout.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}

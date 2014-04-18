@@ -114,15 +114,8 @@ void Neuromag::init()
     // Start NeuromagProducer
     m_pNeuromagProducer->start();
 
-
-//    //Convinience CMD connection timer --> ToDo get rid of that -> it interrupts acquistion when not connected
-//    connect(&m_cmdConnectionTimer, &QTimer::timeout, this, &Neuromag::connectCmdClient);
-
     //init channels when fiff info is available
     connect(this, &Neuromag::fiffInfoAvailable, this, &Neuromag::initConnector);
-
-//    //Start convinience timer
-//    m_cmdConnectionTimer.start(5000);
 
     //Try to connect the cmd client on start up using localhost connection
     this->connectCmdClient();
@@ -136,19 +129,6 @@ void Neuromag::init()
 
 void Neuromag::initConnector()
 {
-
-
-    qDebug() << "Neuromag::init()";
-
-//    if(m_pFiffInfo)
-//    {
-////        m_pFiffInfo->sfreq /= 100;
-//        m_pRTMSA_Neuromag = addProviderRealTimeMultiSampleArray_New(MSR_ID::MEGNEUROMAG_OUTPUT);
-//        m_pRTMSA_Neuromag->initFromFiffInfo(m_pFiffInfo);
-//        m_pRTMSA_Neuromag->setMultiArraySize(10);
-//    }
-
-
     if(m_pFiffInfo)
     {
         m_pRTMSA_Neuromag = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "RtClient", "MNE Rt Client");
@@ -251,6 +231,11 @@ void Neuromag::connectCmdClient()
             //
             if(m_qMapConnectors.size() == 0)
                 m_iActiveConnectorId = m_pRtCmdClient->requestConnectors(m_qMapConnectors);
+
+            QMap<qint32, QString>::const_iterator it;
+            for(it = m_qMapConnectors.begin(); it != m_qMapConnectors.end(); ++it)
+                if(it.value().compare("Neuromag Connector") == 0 && m_iActiveConnectorId != it.key())
+                    changeConnector(it.key());
 
             //
             // Read Buffer Size

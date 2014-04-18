@@ -71,7 +71,6 @@ NeuromagSetupWidget::NeuromagSetupWidget(Neuromag* p_pNeuromag, QWidget* parent)
 : QWidget(parent)
 , m_pNeuromag(p_pNeuromag)
 , m_bIsInit(false)
-, m_pNeuromagSetupNeuromagWidget(new NeuromagSetupNeuromagWidget)
 {
     ui.setupUi(this);
 
@@ -80,13 +79,6 @@ NeuromagSetupWidget::NeuromagSetupWidget(Neuromag* p_pNeuromag, QWidget* parent)
 
     //Fiff record file
     connect(ui.m_qPushButton_FiffRecordFile, &QPushButton::released, this, &NeuromagSetupWidget::pressedFiffRecordFile);
-
-    //Select connector
-    connect(ui.m_qComboBox_Connector, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-            this, &NeuromagSetupWidget::connectorIdxChanged);
-
-    //Configure connector
-    connect(ui.m_qPushButton_Configure, &QCheckBox::released, this, &NeuromagSetupWidget::pressedConfigure);
 
     //rt server connection
     this->ui.m_qLineEdit_Ip->setText(m_pNeuromag->m_sNeuromagIP);
@@ -168,15 +160,6 @@ void NeuromagSetupWidget::checkedRecordDataChanged()
 
 //*************************************************************************************************************
 
-void NeuromagSetupWidget::connectorIdxChanged(int idx)
-{
-    if(ui.m_qComboBox_Connector->itemData(idx).toInt() != m_pNeuromag->m_iActiveConnectorId && m_bIsInit)
-        m_pNeuromag->changeConnector(ui.m_qComboBox_Connector->itemData(idx).toInt());
-}
-
-
-//*************************************************************************************************************
-
 void NeuromagSetupWidget::pressedFiffRecordFile()
 {
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save Fiff Record File"), "", tr("Fiff Record File (*.fif)"));
@@ -214,15 +197,6 @@ void NeuromagSetupWidget::pressedSendCLI()
 
 //*************************************************************************************************************
 
-void NeuromagSetupWidget::pressedConfigure()
-{
-    QString t_sConnector = ui.m_qComboBox_Connector->currentText();
-    if(t_sConnector == QString("Neuromag Connector"))
-        m_pNeuromagSetupNeuromagWidget->show();
-}
-
-//*************************************************************************************************************
-
 void NeuromagSetupWidget::printToLog(QString logMsg)
 {
     ui.m_qTextBrowser_ServerMessage->insertPlainText(logMsg+"\n");
@@ -255,20 +229,20 @@ void NeuromagSetupWidget::cmdConnectionChanged(bool p_bConnectionStatus)
         //
         // set connectors
         //
-        QMap<qint32, QString>::ConstIterator it = m_pNeuromag->m_qMapConnectors.begin();
-        qint32 idx = 0;
+//        QMap<qint32, QString>::ConstIterator it = m_pNeuromag->m_qMapConnectors.begin();
+//        qint32 idx = 0;
 
-        for(; it != m_pNeuromag->m_qMapConnectors.end(); ++it)
-        {
-            if(this->ui.m_qComboBox_Connector->findData(it.key()) == -1)
-            {
-                this->ui.m_qComboBox_Connector->insertItem(idx, it.value(), it.key());
-                ++idx;
-            }
-            else
-                idx = this->ui.m_qComboBox_Connector->findData(it.key()) + 1;
-        }
-        this->ui.m_qComboBox_Connector->setCurrentIndex(this->ui.m_qComboBox_Connector->findData(m_pNeuromag->m_iActiveConnectorId));
+//        for(; it != m_pNeuromag->m_qMapConnectors.end(); ++it)
+//        {
+//            if(this->ui.m_qComboBox_Connector->findData(it.key()) == -1)
+//            {
+//                this->ui.m_qComboBox_Connector->insertItem(idx, it.value(), it.key());
+//                ++idx;
+//            }
+//            else
+//                idx = this->ui.m_qComboBox_Connector->findData(it.key()) + 1;
+//        }
+//        this->ui.m_qComboBox_Connector->setCurrentIndex(this->ui.m_qComboBox_Connector->findData(m_pNeuromag->m_iActiveConnectorId));
 
         //UI enables/disables
         this->ui.m_qLabel_ConnectionStatus->setText(QString("Connected"));
@@ -283,7 +257,7 @@ void NeuromagSetupWidget::cmdConnectionChanged(bool p_bConnectionStatus)
     {
         //clear connectors --> ToDO create a clear function
         m_pNeuromag->m_qMapConnectors.clear();
-        this->ui.m_qComboBox_Connector->clear();
+//        this->ui.m_qComboBox_Connector->clear();
         m_pNeuromag->m_iBufferSize = -1;
 
         //UI enables/disables

@@ -43,7 +43,6 @@
 //=============================================================================================================
 
 #include "../ui_neuromagsetup.h"
-#include "neuromagsetupneuromagwidget.h"
 
 
 //*************************************************************************************************************
@@ -110,14 +109,6 @@ public:
 
     void checkedRecordDataChanged();    /**< Record Data checkbox changed. */
 
-    //=========================================================================================================
-    /**
-    * Connector selection index changed
-    *
-    * @param [in] idx   new connector combo box index
-    */
-    void connectorIdxChanged(int idx);
-
     void printToLog(QString message);   /**< Implements printing messages to rtproc log.*/
 
     void pressedFiffRecordFile();   /**< Triggers file dialog to select record file.*/
@@ -125,8 +116,6 @@ public:
     void pressedConnect();          /**< Triggers a connection trial to rt_server.*/
 
     void pressedSendCLI();          /**< Triggers a send request of a cli command.*/
-
-    void pressedConfigure();        /**< Triggers file dialog to configure the plugins.*/
 
     void fiffInfoReceived();        /**< Triggered when new fiff info is recieved by producer and stored intor rt_server */
 
@@ -159,8 +148,6 @@ private:
     Ui::NeuromagSetupWidgetClass ui; /**< the user interface for the NeuromagSetupWidget.*/
 
     bool m_bIsInit;                     /**< false when gui is not initialized jet. Prevents gui from already interacting when not initialized */
-
-    NeuromagSetupNeuromagWidget::SPtr m_pNeuromagSetupNeuromagWidget; /**< a pointer to mne rt client setup Neuromag widget.*/
 };
 
 } // NAMESPACE

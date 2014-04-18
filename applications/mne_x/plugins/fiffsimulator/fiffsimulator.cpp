@@ -228,7 +228,6 @@ void FiffSimulator::connectCmdClient()
             if(m_qMapConnectors.size() == 0)
                 m_iActiveConnectorId = m_pRtCmdClient->requestConnectors(m_qMapConnectors);
 
-
             QMap<qint32, QString>::const_iterator it;
             for(it = m_qMapConnectors.begin(); it != m_qMapConnectors.end(); ++it)
                 if(it.value().compare("Fiff File Simulator") == 0 && m_iActiveConnectorId != it.key())
