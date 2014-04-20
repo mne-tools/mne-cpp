@@ -49,6 +49,8 @@
 #include <QDateTime>
 #include <QThread>
 
+//#define USENEW 1
+
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
@@ -114,6 +116,46 @@ void RtCmdClient::sendCommandJSON(const Command &p_command)
         qDebug() << "Request: " << t_sCommand;
 
         // Send request
+#ifdef USENEW
+            QByteArray block;
+            QDataStream out(&block, QIODevice::WriteOnly);
+            out.setVersion(QDataStream::Qt_5_2);
+
+            out << (quint16)0;
+            out << t_sCommand;
+            out.device()->seek(0);
+            out << (quint16)(block.size() - sizeof(quint16));
+
+            this->write(block);
+            this->waitForBytesWritten();
+
+            // Receive response
+            QDataStream in(this);
+            in.setVersion(QDataStream::Qt_5_2);
+
+            quint16 blockSize = 0;
+
+            bool respComplete = false;
+
+            do
+            {
+                if (this->waitForReadyRead(100))
+                {
+                    if (blockSize == 0)
+                        if (this->bytesAvailable() >= (int)sizeof(quint16))
+                            in >> blockSize;
+                    else
+                    {
+                        if (this->bytesAvailable() >= blockSize)
+                        {
+                            in >> t_sReply;
+                            respComplete = true;
+                        }
+                    }
+                }
+            } while (!respComplete && blockSize < 65000);//Sanity Check -> allowed maximal blocksize is 65.000
+
+#else
         this->write(t_sCommand.toUtf8().constData(), t_sCommand.size());
         this->waitForBytesWritten();
 
@@ -133,6 +175,7 @@ void RtCmdClient::sendCommandJSON(const Command &p_command)
             qDebug() << "Response: " << t_qByteArrayRaw.size() << " bytes";
         } while (!respComplete);
         t_sReply = QString(t_qByteArrayRaw);
+#endif
     }
     else
     {
