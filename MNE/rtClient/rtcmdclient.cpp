@@ -39,6 +39,7 @@
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
+
 #include "rtcmdclient.h"
 
 //*************************************************************************************************************
@@ -49,7 +50,10 @@
 #include <QDateTime>
 #include <QThread>
 
-//#define USENEW 1
+#include <iostream>
+
+
+#define USENEW 1
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -113,13 +117,11 @@ void RtCmdClient::sendCommandJSON(const Command &p_command)
 
     if (this->state() == QAbstractSocket::ConnectedState)
     {
-        qDebug() << "Request: " << t_sCommand;
-
         // Send request
 #ifdef USENEW
             QByteArray block;
             QDataStream out(&block, QIODevice::WriteOnly);
-            out.setVersion(QDataStream::Qt_5_2);
+            out.setVersion(QDataStream::Qt_5_1);
 
             out << (quint16)0;
             out << t_sCommand;
@@ -131,7 +133,7 @@ void RtCmdClient::sendCommandJSON(const Command &p_command)
 
             // Receive response
             QDataStream in(this);
-            in.setVersion(QDataStream::Qt_5_2);
+            in.setVersion(QDataStream::Qt_5_1);
 
             quint16 blockSize = 0;
 
@@ -139,19 +141,17 @@ void RtCmdClient::sendCommandJSON(const Command &p_command)
 
             do
             {
-                if (this->waitForReadyRead(100))
+                this->waitForReadyRead(100);
+
+                if (blockSize == 0)
                 {
-                    if (blockSize == 0)
-                        if (this->bytesAvailable() >= (int)sizeof(quint16))
-                            in >> blockSize;
-                    else
-                    {
-                        if (this->bytesAvailable() >= blockSize)
-                        {
-                            in >> t_sReply;
-                            respComplete = true;
-                        }
-                    }
+                    if (this->bytesAvailable() >= (int)sizeof(quint16))
+                        in >> blockSize;
+                }
+                else if(this->bytesAvailable() >= blockSize)
+                {
+                    in >> t_sReply;
+                    respComplete = true;
                 }
             } while (!respComplete && blockSize < 65000);//Sanity Check -> allowed maximal blocksize is 65.000
 
