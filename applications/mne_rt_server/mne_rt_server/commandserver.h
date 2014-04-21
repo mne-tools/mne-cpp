@@ -142,7 +142,7 @@ signals:
     * @param[in] p_blockReply   The reply data
     * @param[in] p_iID          ID of the client thread to identify the target.
     */
-    void replyCommand(QByteArray p_blockReply, qint32 p_iID);
+    void replyCommand(QString p_blockReply, qint32 p_iID);
 
     //=========================================================================================================
     /**
