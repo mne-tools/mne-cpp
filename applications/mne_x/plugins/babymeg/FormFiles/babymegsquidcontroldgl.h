@@ -32,6 +32,9 @@
 * @brief    Contains the declaration of the BabyMEGSQUIDControlDGL class.
 *
 */
+/*
+ * revise this component by removing BabyMEG related.
+ */
 
 #ifndef BABYMEGSQUIDCONTROLDGL_H
 #define BABYMEGSQUIDCONTROLDGL_H
@@ -42,7 +45,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_babymegsquidcontroldgl.h"
+//#include "../ui_babymegsquidcontroldgl.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -50,6 +53,40 @@
 //=============================================================================================================
 
 #include <QDialog>
+#include <QScrollBar>
+#include <QDebug>
+
+#include <QVector>
+
+#include <qmath.h>
+#include <QGraphicsView>
+#include <QGraphicsScene>
+#include <QGraphicsItem>
+#include <QGraphicsLineItem>
+#include <QGraphicsRectItem>
+#include <QGraphicsTextItem>
+
+#include "globalobj.h"
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+//#include "include/3rdParty/Eigen/Core"
+#include <Eigen/Core>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace Eigen;
+
+namespace Ui
+{
+class BabyMEGSQUIDControlDgl;
+}//namespace
 
 
 //*************************************************************************************************************
@@ -65,7 +102,9 @@ namespace BabyMEGPlugin
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
+
 class BabyMEG;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -90,7 +129,6 @@ struct FLLPara{
 
 struct FLLConfig{
     QList < FLLPara > m_Fll;
-
 };
 
 //*************************************************************************************************************
@@ -132,8 +170,11 @@ struct GUIStatMachine{
     int IntegratorReset;
     int MicroReset;
 
+    int BarGraphSelect;
 
+    QVector <double> ParaGraph;
 };
+
 //=============================================================================================================
 /**
 * DECLARE CLASS BabyMEGSQUIDControlDgl
@@ -152,22 +193,83 @@ public:
 private:
     Ui::BabyMEGSQUIDControlDgl *ui;
 
+protected:
+     virtual void closeEvent( QCloseEvent * event );
+
 public:
     BabyMEG*   m_pBabyMEG;
     FLLConfig m_FLLConfig;
     GUIStatMachine  m_GUISM;
+    QVector <QGraphicsLineItem * > PolyLinePtr;
+    bool initplotflag;
+    QVector <QGraphicsRectItem * > PolyRectPtr;
+    bool initparaplotflag;
 
-    void SendRetune();
-    void Cancel();
     void SendCMD(QString CMDSTR);
-    void Init();
     void InitChannels(QString sReply);
     void InitGUIConfig(QString sFLLPara);
     void ReplyCmdProc(QString sReply);
     void UpdateGUI();
-    void SyncGUI();
     QString GenChnInfo(QString);
+    void UpdateInfo(QString newText);
+    void ProcCmd(QString cmd, int index, QString Info);
+    void InitTuneGraph();
+    void TuneGraphDispProc(MatrixXf tmp);
+    void UpdateParaGraph();
+
+public slots:
+
+    void RcvCMDData(QByteArray DATA);
+
+    void Cancel();
+    void Init();
+    void SyncGUI();
+
+    void Retune();
+    void Heat();
+    void Atune();
+    void Reset();
+    void HeatTune();
+
+    void Save();
+    void Save1();
+    void GroupHeat();
+    void Last();
+    void Default();
+
+    void TuneCheck();
+    void Amp();
+    void IntReset();
+    void MicroReset();
+
+    void CommType(int index);
+    void ChanSele(int index);
+    void OperMode(int index);
+    void HighPass(int index);
+    void LowPass1(int index);
+    void SlewSele(int index);
+    void PreGaini(int index);
+    void PostGain(int index);
+    void AutoRest(int index);
+    void RestLock(int index);
+    void BarGraph(int index);
+
+    void HeatTime();
+    void CoolTime();
+    void AdOffset();
+    void AdjuBias();
+    void AdjuModu();
+
+    void StartDisp();
+
+
+signals:
+    void SendCMDToMEGSource(QString CMDSTR);
+    void inittg();
+    void SCStart();
+    void SCStop();
 };
 
-}//namespace
+} //NAMESPACE
+
 #endif // BABYMEGSQUIDCONTROLDGL_H
