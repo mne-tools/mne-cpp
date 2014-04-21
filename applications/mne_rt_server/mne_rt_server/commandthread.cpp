@@ -161,7 +161,7 @@ void CommandThread::run()
             bool respComplete = false;
             t_FiffStreamIn >> blockSize;
 
-            while(!respComplete)
+            while(!respComplete && blockSize < 65000)//Sanity Check -> allowed maximal blocksize is 65.000
             {
                 if (t_qTcpSocket.bytesAvailable() >= blockSize)
                 {
