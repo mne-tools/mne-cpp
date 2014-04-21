@@ -41,7 +41,7 @@ CONFIG += plugin
 
 DEFINES += BABYMEG_LIBRARY
 
-QT += widgets
+QT += widgets opengl
 QT += network
 
 TARGET = babymeg
@@ -83,7 +83,10 @@ SOURCES += \
     FormFiles/babymegaboutwidget.cpp \
     FormFiles/babymegsquidcontroldgl.cpp \
     babymegclient.cpp \
-    babymeginfo.cpp
+    babymeginfo.cpp \
+    FormFiles/globalobj.cpp \
+    FormFiles/glwidget.cpp \
+    FormFiles/glwidget_OnDisp.cpp
 
 HEADERS += \
     babymeg.h \
@@ -92,7 +95,10 @@ HEADERS += \
     FormFiles/babymegaboutwidget.h \
     FormFiles/babymegsquidcontroldgl.h \
     babymegclient.h \
-    babymeginfo.h
+    babymeginfo.h \
+    FormFiles/globalobj.h \
+    FormFiles/glwidget.h \
+    FormFiles/glwidget_OnDisp.h
 
 FORMS += \
     FormFiles/babymegsetup.ui \

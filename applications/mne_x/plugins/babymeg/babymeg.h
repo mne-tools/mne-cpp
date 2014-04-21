@@ -166,6 +166,15 @@ public:
 //    void setCMDData(QByteArray DATA);
 
 
+
+    //=========================================================================================================
+    /**
+    * Returns information from FLL hardware
+    *
+    * @param[in] t_sFLLControlCommand  FLL command.
+    */
+    void comFLL(QString t_sFLLControlCommand);
+
 signals:
     //=========================================================================================================
     /**
@@ -180,6 +189,11 @@ signals:
     * Emitted when fiffInfo is available
     */
     void fiffInfoAvailable();
+
+
+
+
+    void DataToSquidCtrlGUI(MatrixXf tmp);
 
 protected:
     virtual void run();
