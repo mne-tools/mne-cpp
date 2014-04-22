@@ -138,7 +138,6 @@ void RtClient::run()
     //
     t_cmdClient.requestCommands();
 
-
     //
     // Inits
     //

@@ -225,8 +225,7 @@ QString Command::toStringReadySend() const
     QString t_sParameters;
     for(qint32 i = 0; i < m_qListParamNames.size(); ++i)
     {
-        qDebug() << m_qListParamValues[i];
-
+//        qDebug() << m_qListParamValues[i];
         t_sParameters.append(QString("\"%1\":\"%2\"").arg(m_qListParamNames[i]).arg(m_qListParamValues[i].toString()));
 
         if(i < m_qListParamNames.size()-1)
