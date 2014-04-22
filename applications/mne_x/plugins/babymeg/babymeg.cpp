@@ -109,7 +109,7 @@ void BabyMEG::init()
     pInfo = QSharedPointer<BabyMEGInfo>(new BabyMEGInfo());
     connect(pInfo.data(), &BabyMEGInfo::fiffInfoAvailable, this, &BabyMEG::setFiffInfo);
     connect(pInfo.data(), &BabyMEGInfo::SendDataPackage, this, &BabyMEG::setFiffData);
-//    connect(pInfo.data(), &BabyMEGInfo::SendCMDPackage, this, &BabyMEG::setCMDData);
+    connect(pInfo.data(), &BabyMEGInfo::SendCMDPackage, this, &BabyMEG::setCMDData);
 
     myClient = QSharedPointer<BabyMEGClient>(new BabyMEGClient(6340,this));
     myClient->SetInfo(pInfo);
@@ -176,8 +176,6 @@ void BabyMEG::clear()
     m_iBufferSize = -1;
 }
 
-
-
 //*************************************************************************************************************
 
 void BabyMEG::setFiffData(QByteArray DATA)
@@ -209,7 +207,7 @@ void BabyMEG::setFiffData(QByteArray DATA)
     }
     else
     {
-        std::cout << "Data coming" << std::endl; //"first ten elements \n" << rawData.block(0,0,1,10) << std::endl;
+//        std::cout << "Data coming" << std::endl; //"first ten elements \n" << rawData.block(0,0,1,10) << std::endl;
 
         emit DataToSquidCtrlGUI(rawData);
     }
@@ -223,6 +221,16 @@ void BabyMEG::setFiffInfo(FiffInfo p_FiffInfo)
     m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo(p_FiffInfo));
 
     m_iBufferSize = pInfo->dataLength;
+}
+
+//*************************************************************************************************************
+
+void BabyMEG::setCMDData(QByteArray DATA)
+{
+    qDebug()<<"------"<<DATA;
+//    m_commandManager["FLL"].reply(DATA);
+    emit SendCMDDataToSQUIDControl(DATA);
+    qDebug()<<"Data has been received.";
 }
 
 
