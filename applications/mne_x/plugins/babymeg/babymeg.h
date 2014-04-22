@@ -226,6 +226,9 @@ private:
     bool    m_bIsRunning;
 
     QSharedPointer<RawMatrixBuffer> m_pRawMatrixBuffer;  /**< Holds incoming raw data. */
+
+    QAction*                        m_pActionSetupProject;     /**< shows setup project dialog */
+
 };
 
 } // NAMESPACE
