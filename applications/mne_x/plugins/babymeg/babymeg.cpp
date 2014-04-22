@@ -128,7 +128,7 @@ void BabyMEG::init()
     myClientComm->SendCommandToBabyMEGShortConnection("INFO");
 
 
-//    myClient->ConnectToBabyMEG();
+    myClient->ConnectToBabyMEG();
 
 //    myClient->ConnectToBabyMEG();
 ////    myClient->DisConnectBabyMEG();
