@@ -76,8 +76,10 @@ using namespace UTILSLIB;
 
 BabyMEG::BabyMEG()
 : m_iBufferSize(-1)
+, m_sOutputFilePath(qApp->applicationDirPath()+"/mne_x_plugins/resources/babymeg/babymegtest.fif")
 , m_pRawMatrixBuffer(0)
 , m_bIsRunning(false)
+, m_bWriteToFile(true)
 {
 
 }
@@ -243,14 +245,35 @@ void BabyMEG::comFLL(QString t_sFLLControlCommand)
 //*************************************************************************************************************
 
 bool BabyMEG::start()
-{/*
-    // Initialize real time measurements
-    init();*/
+{
+    //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
+    if(this->isRunning())
+        QThread::wait();
+
+    //Setup writing to file
+    if(m_bWriteToFile)
+    {
+        //Initiate the stream for writing to the fif file
+        m_fileOut.setFileName(m_sOutputFilePath);
+        if(m_fileOut.exists())
+        {
+            QMessageBox msgBox;
+            msgBox.setText("The file you want to write already exists.");
+            msgBox.setInformativeText("Do you want to overwrite this file?");
+            msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+            int ret = msgBox.exec();
+            if(ret == QMessageBox::No)
+                return false;
+        }
+
+        m_pOutfid = Fiff::start_writing_raw(m_fileOut, *m_pFiffInfo, m_cals);
+        fiff_int_t first = 0;
+        m_pOutfid->write_int(FIFF_FIRST_SAMPLE, &first);
+    }
 
     // Start threads
     m_bIsRunning = true;
     myClient->ConnectToBabyMEG();
-
     // Start threads
     QThread::start();
 
@@ -262,16 +285,15 @@ bool BabyMEG::start()
 
 bool BabyMEG::stop()
 {
+    myClient->DisConnectBabyMEG();
+
     m_bIsRunning = false;
 
-    // Stop threads
-    QThread::terminate();
-    QThread::wait();
+    //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the pop function (acquire statement)
+    m_pRawMatrixBuffer->releaseFromPop();
 
     //Clear Buffers
     m_pRawMatrixBuffer->clear();
-
-    myClient->DisConnectBabyMEG();
 
     return true;
 }
@@ -311,16 +333,26 @@ void BabyMEG::run()
 {
 
     MatrixXf matValue;
-    while(true)
+
+    while(m_bIsRunning)
     {
         if(m_pRawMatrixBuffer)
         {
             //pop matrix
             matValue = m_pRawMatrixBuffer->pop();
 
+            //Write raw data to fif file
+            if(m_bWriteToFile)
+                m_pOutfid->write_raw_buffer(matValue.cast<double>(), m_cals);
+
+
             //emit values
             for(qint32 i = 0; i < matValue.cols(); ++i)
                 m_pRTMSABabyMEG->data()->setValue(matValue.col(i).cast<double>());
         }
     }
+
+    //Close the fif output stream
+    if(m_bWriteToFile)
+        m_pOutfid->finish_writing_raw();
 }
