@@ -57,6 +57,7 @@
 //=============================================================================================================
 
 #include <fiff/fiff_info.h>
+#include <fiff/fiff.h>
 
 
 //*************************************************************************************************************
@@ -216,6 +217,14 @@ private:
 
     FiffInfo::SPtr m_pFiffInfo;                             /**< Fiff measurement info.*/
     qint32 m_iBufferSize;                                   /**< The raw data buffer size.*/
+
+    bool                                m_bWriteToFile;     /**< Flag for for writing the received samples to a file. Defined by the user via the GUI.*/
+    QString                             m_sOutputFilePath;  /**< Holds the path for the sample output file. Defined by the user via the GUI.*/
+    QFile                               m_fileOut;          /**< QFile for writing to fif file.*/
+    FiffStream::SPtr                    m_pOutfid;          /**< FiffStream to write to.*/
+
+    MatrixXd                            m_cals;
+
 
     bool    m_bIsRunning;
 
