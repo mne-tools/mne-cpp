@@ -252,7 +252,8 @@ void FiffSimulator::disconnectCmdClient()
     if(m_bCmdClientIsConnected)
     {
         m_pRtCmdClient->disconnectFromHost();
-        m_pRtCmdClient->waitForDisconnected();
+        if(m_pRtCmdClient->ConnectedState != QTcpSocket::UnconnectedState)
+            m_pRtCmdClient->waitForDisconnected();
         rtServerMutex.lock();
         m_bCmdClientIsConnected = false;
         rtServerMutex.unlock();

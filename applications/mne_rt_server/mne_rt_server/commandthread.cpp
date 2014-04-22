@@ -135,7 +135,6 @@ void CommandThread::run()
             QByteArray block;
             QDataStream out(&block, QIODevice::WriteOnly);
             out.setVersion(QDataStream::Qt_5_1);
-
             out << (quint16)0;
             m_qMutex.lock();
             out << m_qSendData;
