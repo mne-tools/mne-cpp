@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/images">
+        <file alias="database.png">images/icons/database.png</file>
+    </qresource>
+</RCC>

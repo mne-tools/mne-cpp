@@ -81,7 +81,12 @@ BabyMEG::BabyMEG()
 , m_bIsRunning(false)
 , m_bWriteToFile(true)
 {
+    m_pActionSetupProject = new QAction(QIcon(":/database.png"), tr("Setup Project"),this);
+//    m_pActionSelectRoi->setShortcut(tr("F12"));
+    m_pActionSetupProject->setStatusTip(tr("Setup Project"));
+//    connect(m_pActionSelectRoi, &QAction::triggered, this, &NewRealTimeMultiSampleArrayWidget::showRoiSelectionWidget);
 
+    addPluginAction(m_pActionSetupProject);
 }
 
 
