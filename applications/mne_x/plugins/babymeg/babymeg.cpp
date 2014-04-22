@@ -44,6 +44,8 @@
 
 #include <utils/ioutils.h>
 
+#include <iostream>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -75,6 +77,7 @@ using namespace UTILSLIB;
 BabyMEG::BabyMEG()
 : m_iBufferSize(-1)
 , m_pRawMatrixBuffer(0)
+, m_bIsRunning(false)
 {
 
 }
@@ -116,6 +119,9 @@ void BabyMEG::init()
     myClientComm->start();
 
     myClientComm->SendCommandToBabyMEGShortConnection("INFO");
+
+
+    myClient->ConnectToBabyMEG();
 
 //    myClient->ConnectToBabyMEG();
 ////    myClient->DisConnectBabyMEG();
@@ -171,6 +177,7 @@ void BabyMEG::clear()
 }
 
 
+
 //*************************************************************************************************************
 
 void BabyMEG::setFiffData(QByteArray DATA)
@@ -191,12 +198,21 @@ void BabyMEG::setFiffData(QByteArray DATA)
     for(qint32 i = 0; i < rows*cols; ++i)
         IOUtils::swap_floatp(rawData.data()+i);
 
-//   std::cout << "first ten elements \n" << rawData.block(0,0,1,10) << std::endl;
 
-    if(!m_pRawMatrixBuffer)
-        m_pRawMatrixBuffer = CircularMatrixBuffer<float>::SPtr(new CircularMatrixBuffer<float>(40, rows, cols));
 
-    m_pRawMatrixBuffer->push(&rawData);
+    if(m_bIsRunning)
+    {
+        if(!m_pRawMatrixBuffer)
+            m_pRawMatrixBuffer = CircularMatrixBuffer<float>::SPtr(new CircularMatrixBuffer<float>(40, rows, cols));
+
+        m_pRawMatrixBuffer->push(&rawData);
+    }
+    else
+    {
+        std::cout << "Data coming" << std::endl; //"first ten elements \n" << rawData.block(0,0,1,10) << std::endl;
+
+        emit DataToSquidCtrlGUI(rawData);
+    }
 }
 
 
@@ -211,11 +227,25 @@ void BabyMEG::setFiffInfo(FiffInfo p_FiffInfo)
 
 
 //*************************************************************************************************************
+void BabyMEG::comFLL(QString t_sFLLControlCommand)
+{
+    qDebug()<<"FLL commands";
+
+    qDebug() << "BabyMeg Received" << t_sFLLControlCommand;
+    int strlen = t_sFLLControlCommand.size();
+    QByteArray Scmd = myClientComm->MGH_LM_Int2Byte(strlen);
+    QByteArray SC = QByteArray("COMS")+Scmd;
+    SC.append(t_sFLLControlCommand);
+    myClientComm->SendCommandToBabyMEGShortConnection(SC);
+}
+
+
+//*************************************************************************************************************
 
 bool BabyMEG::start()
-{
+{/*
     // Initialize real time measurements
-    init();
+    init();*/
 
     // Start threads
     m_bIsRunning = true;

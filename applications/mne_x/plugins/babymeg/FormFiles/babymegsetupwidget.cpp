@@ -149,7 +149,7 @@ void BabyMEGSetupWidget::pressedFiffRecordFile()
 
 void BabyMEGSetupWidget::cmdConnectionChanged(bool p_bConnectionStatus)
 {
-
+    Q_UNUSED(p_bConnectionStatus)
 }
 
 
