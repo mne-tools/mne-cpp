@@ -93,6 +93,7 @@ MainWindow::MainWindow(QWidget *parent)
 , m_bDisplayMax(false)
 , m_bIsRunning(false)
 , m_pToolBar(NULL)
+, m_pDynamicPluginToolBar(NULL)
 , m_pDynamicDisplayToolBar(NULL)
 , m_pLabelTime(NULL)
 , m_pTimer(NULL)
@@ -401,6 +402,19 @@ void MainWindow::createToolBars()
         m_pLabelTime->setText(QTime(0, 0).toString());
     }
 
+    //Plugin
+    if(m_pDynamicPluginToolBar)
+    {
+        removeToolBar(m_pDynamicPluginToolBar);
+        delete m_pDynamicPluginToolBar;
+        m_pDynamicPluginToolBar = NULL;
+    }
+    if(m_qListDynamicPluginActions.size() > 0)
+    {
+        m_pDynamicPluginToolBar = addToolBar(tr("Plugin Control"));
+        for(qint32 i = 0; i < m_qListDynamicPluginActions.size(); ++i)
+            m_pDynamicPluginToolBar->addAction(m_qListDynamicPluginActions[i]);
+    }
 
     //Display
     if(m_pDynamicDisplayToolBar)
@@ -411,7 +425,7 @@ void MainWindow::createToolBars()
     }
     if(m_qListDynamicDisplayActions.size() > 0)
     {
-        m_pDynamicDisplayToolBar = addToolBar(tr("Control"));
+        m_pDynamicDisplayToolBar = addToolBar(tr("Display"));
         for(qint32 i = 0; i < m_qListDynamicDisplayActions.size(); ++i)
             m_pDynamicDisplayToolBar->addAction(m_qListDynamicDisplayActions[i]);
     }
@@ -473,7 +487,11 @@ void MainWindow::createLogDockWindow()
 //Plugin stuff
 void MainWindow::updatePluginWidget(IPlugin::SPtr pPlugin)
 {
+    m_qListDynamicPluginActions.clear();
     m_qListDynamicDisplayActions.clear();
+
+    // Add Dynamic Plugin Actions
+    m_qListDynamicPluginActions.append(pPlugin->getPluginActions());
 
     //Garbage collecting
     if(m_pRunWidget)
