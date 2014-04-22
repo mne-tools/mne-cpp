@@ -163,9 +163,7 @@ public:
 
     void setFiffInfo(FIFFLIB::FiffInfo);
     void setFiffData(QByteArray DATA);
-//    void setCMDData(QByteArray DATA);
-
-
+    void setCMDData(QByteArray DATA);
 
     //=========================================================================================================
     /**
@@ -190,10 +188,9 @@ signals:
     */
     void fiffInfoAvailable();
 
-
-
-
     void DataToSquidCtrlGUI(MatrixXf tmp);
+    void SendCMDDataToSQUIDControl(QByteArray DATA);
+
 
 protected:
     virtual void run();
