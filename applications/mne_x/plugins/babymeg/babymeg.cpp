@@ -81,7 +81,7 @@ BabyMEG::BabyMEG()
 , m_bIsRunning(false)
 , m_bWriteToFile(true)
 {
-    m_pActionSetupProject = new QAction(QIcon(":/database.png"), tr("Setup Project"),this);
+    m_pActionSetupProject = new QAction(QIcon(":/images/database.png"), tr("Setup Project"),this);
 //    m_pActionSelectRoi->setShortcut(tr("F12"));
     m_pActionSetupProject->setStatusTip(tr("Setup Project"));
 //    connect(m_pActionSelectRoi, &QAction::triggered, this, &NewRealTimeMultiSampleArrayWidget::showRoiSelectionWidget);
@@ -128,7 +128,7 @@ void BabyMEG::init()
     myClientComm->SendCommandToBabyMEGShortConnection("INFO");
 
 
-    myClient->ConnectToBabyMEG();
+//    myClient->ConnectToBabyMEG();
 
 //    myClient->ConnectToBabyMEG();
 ////    myClient->DisConnectBabyMEG();
@@ -359,9 +359,9 @@ void BabyMEG::run()
                 m_pOutfid->write_raw_buffer(matValue.cast<double>(), m_cals);
 
 
-            //emit values
-            for(qint32 i = 0; i < matValue.cols(); ++i)
-                m_pRTMSABabyMEG->data()->setValue(matValue.col(i).cast<double>());
+//            //emit values
+//            for(qint32 i = 0; i < matValue.cols(); ++i)
+//                m_pRTMSABabyMEG->data()->setValue(matValue.col(i).cast<double>());
         }
     }
 

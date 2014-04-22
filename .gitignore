@@ -311,3 +311,4 @@ bin/mne_browse_raw_qt.app/Contents/PkgInfo
 /bin/mne_x_plugins/resources/tmsi/*.fif
 /bin/*.stc
 /examples/rawClusteredInversePwlRapMusic/*.user
+/bin/mne_x_plugins/resources/babymeg/*.fif
