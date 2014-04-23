@@ -38,17 +38,13 @@ include(../../../mne-cpp.pri)
 
 TEMPLATE = subdirs
 
+#Sensors
 SUBDIRS += \
-    bci \
     ecgsimulator \
     mnertclient \
     fiffsimulator \
-    dummytoolbox \
-    triggercontrol \
-    sourcelab \
-    raplab
-#    rtsss \
-
+    neuromag \
+    babymeg \
 
 win32 { #Only compile the TMSI plugin if a windows system is used - TMSi driver is not available for linux yet
     contains(QMAKE_HOST.arch, x86_64) { #Compiling MNE-X FOR a 64bit system
@@ -75,21 +71,37 @@ win32 { #Only compile the TMSI plugin if a windows system is used - TMSi driver 
 }
 else {
     message(TMSI plugin was not configured due to wrong OS (win32 needed)!)
-    }
-
-contains(MNECPP_CONFIG, babyMEG) {
-    message(BabyMEG plugin configured!)
-#    SUBDIRS +=
 }
-else {
-    message(RtServer plugin configured!)
-#    SUBDIRS += sourcelab 
+
+
+#Algorithms
+SUBDIRS += \
+    bci \
+    dummytoolbox \
+    triggercontrol \
+    sourcelab \
+    raplab \
+    averaging
+#    rtsss \
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #    qtHaveModule(3d) {
 #        message(Qt3D available: brainmonitor library configured!)
 #        SUBDIRS += brainmonitor \
 #    }
-}
+
 
 #    filtertoolbox \
 #    gaborparticletoolbox \
@@ -98,14 +110,3 @@ else {
 #    roitoolbox \
 #    localizationtoolbox \
 #    prelocalizationtoolbox
-
-
-### BabyMEG alternative ###
-#contains(MNECPP_CONFIG, babyMEG) {
-#    message(BabyMEG plugin configured!)
-#    SUBDIRS += babymeg
-#}
-#else {
-#    message(RtServer plugin configured!)
-#    SUBDIRS += rtclient
-#}

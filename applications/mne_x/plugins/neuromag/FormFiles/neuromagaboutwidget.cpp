@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     babymegrunwidget.cpp
+* @file     neuromagaboutwidget.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the BabyMegRunWidget class.
+* @brief    Contains the implementation of the MneRtClientAboutWidget class.
 *
 */
 
@@ -38,9 +38,14 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "babymegrunwidget.h"
-#include "babymegaboutwidget.h"
-#include "../babymeg.h"
+#include "neuromagaboutwidget.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
 
 
 //*************************************************************************************************************
@@ -48,7 +53,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace BabyMegPlugin;
+using namespace MneRtClientPlugin;
 
 
 //*************************************************************************************************************
@@ -56,30 +61,16 @@ using namespace BabyMegPlugin;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BabyMegRunWidget::BabyMegRunWidget(BabyMeg *p_pBabyMeg, QWidget *parent)
-: QWidget(parent)
-, m_pBabyMeg(p_pBabyMeg)
+NeuromagAboutWidget::NeuromagAboutWidget(QWidget *parent)
+: QDialog(parent)
 {
     ui.setupUi(this);
-
-    connect(ui.m_qPushButton_About, SIGNAL(released()), this, SLOT(showAboutDialog()));
-
-    ui.m_qTextBrowser_Information->insertHtml(QString("Sampling Rate: %1sps").arg(1));
 }
 
 
 //*************************************************************************************************************
 
-BabyMegRunWidget::~BabyMegRunWidget()
+NeuromagAboutWidget::~NeuromagAboutWidget()
 {
 
-}
-
-
-//*************************************************************************************************************
-
-void BabyMegRunWidget::showAboutDialog()
-{
-    BabyMegAboutWidget aboutDialog(this);
-    aboutDialog.exec();
 }
