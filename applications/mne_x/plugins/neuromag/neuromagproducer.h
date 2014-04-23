@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     babymegproducer.h
+* @file     neuromagproducer.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the RTServerProducer class.
+* @brief    Contains the declaration of the NeuromagProducer class.
 *
 */
 
-#ifndef BABYMEGPRODUCER_H
-#define BABYMEGPRODUCER_H
+#ifndef NEUROMAGPRODUCER_H
+#define NEUROMAGPRODUCER_H
 
 
 //*************************************************************************************************************
@@ -64,10 +64,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE BabyMegPlugin
+// DEFINE NAMESPACE MneRtClientPlugin
 //=============================================================================================================
 
-namespace BabyMegPlugin
+namespace MneRtClientPlugin
 {
 
 
@@ -85,35 +85,35 @@ using namespace RTCLIENTLIB;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class BabyMeg;
+class Neuromag;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS ECGProducer
+* DECLARE CLASS NeuromagProducer
 *
-* @brief The ECGProducer class provides a ECG data producer for a given sampling rate.
+* @brief The NeuromagProducer class provides a Rt Client data producer for a given sampling rate.
 */
-class BabyMegProducer : public QThread
+class NeuromagProducer : public QThread
 {
     Q_OBJECT
 
-    friend class BabyMeg;
+    friend class Neuromag;
 
 public:
     //=========================================================================================================
     /**
-    * Constructs a BabyMegProducer.
+    * Constructs a NeuromagProducer.
     *
-    * @param [in] p_pBabyMeg   a pointer to the corresponding BabyMeg.
+    * @param [in] p_pNeuromag   a pointer to the corresponding Neuromag.
     */
-    BabyMegProducer(BabyMeg* p_pBabyMeg);
+    NeuromagProducer(Neuromag* p_pNeuromag);
 
     //=========================================================================================================
     /**
-    * Destroys the BabyMegProducer.
+    * Destroys the NeuromagProducer.
     */
-    ~BabyMegProducer();
+    ~NeuromagProducer();
 
     //=========================================================================================================
     /**
@@ -131,7 +131,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Stops the BabyMegProducer by stopping the producer's thread.
+    * Stops the NeuromagProducer by stopping the producer's thread.
     */
     void stop();
 
@@ -157,11 +157,11 @@ private:
 
     QMutex producerMutex;
 
-    BabyMeg*   m_pBabyMeg;    /**< Holds a pointer to corresponding BabyMeg.*/
-    bool        m_bIsRunning;   /**< Whether BabyMegProducer is running.*/
+    Neuromag* m_pNeuromag;    /**< Holds a pointer to corresponding Neuromag.*/
+    bool        m_bIsRunning;       /**< Whether NeuromagProducer is running.*/
 
-    RtDataClient* m_pRtDataClient;  /**< The data client.*/
-    bool m_bDataClientIsConnected;  /**< If the data client is connected.*/
+    QSharedPointer<RtDataClient> m_pRtDataClient;   /**< The data client.*/
+    bool m_bDataClientIsConnected;                  /**< If the data client is connected.*/
 
     qint32 m_iDataClientId;
 
@@ -172,4 +172,4 @@ private:
 
 } // NAMESPACE
 
-#endif // BABYMEGPRODUCER_H
+#endif // NEUROMAGPRODUCER_H

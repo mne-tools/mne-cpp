@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>BabyMegRunClass</class>
- <widget class="QWidget" name="BabyMegRunClass">
+ <class>AveragingSetupWidgetClass</class>
+ <widget class="QWidget" name="AveragingSetupWidgetClass">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>ECGRun</string>
+   <string>DummySetupWidget</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -23,7 +23,7 @@
       </font>
      </property>
      <property name="text">
-      <string>RT Server</string>
+      <string>Dummy Toolbox Configuration</string>
      </property>
     </widget>
    </item>
@@ -45,25 +45,50 @@
    </item>
    <item>
     <layout class="QGridLayout" name="m_qGridLayout_main">
-     <item row="0" column="0" colspan="2">
-      <widget class="QGroupBox" name="m_qGroupBox_Information">
+     <item row="0" column="0">
+      <widget class="QGroupBox" name="m_qGroupBox_Properties">
        <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
          <horstretch>0</horstretch>
          <verstretch>0</verstretch>
         </sizepolicy>
        </property>
-       <property name="title">
-        <string>Information</string>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>100</height>
+        </size>
        </property>
-       <layout class="QGridLayout" name="gridLayout">
-        <item row="0" column="0">
-         <widget class="QTextBrowser" name="m_qTextBrowser_Information"/>
-        </item>
-       </layout>
+       <property name="title">
+        <string>Properties</string>
+       </property>
+       <property name="flat">
+        <bool>false</bool>
+       </property>
+       <layout class="QGridLayout" name="m_qGridLayout_Properties"/>
       </widget>
      </item>
      <item row="1" column="0">
+      <widget class="QGroupBox" name="m_qGroupBox_Channels">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>200</height>
+        </size>
+       </property>
+       <property name="title">
+        <string>Channels</string>
+       </property>
+       <layout class="QGridLayout" name="m_qGridLayout_Channels"/>
+      </widget>
+     </item>
+     <item row="3" column="1">
       <spacer name="m_qHorizontalSpacer_About">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -76,22 +101,34 @@
        </property>
       </spacer>
      </item>
-     <item row="1" column="1">
+     <item row="0" column="1" rowspan="3" colspan="2">
+      <widget class="QGroupBox" name="m_qGroupBox_Information">
+       <property name="title">
+        <string>Information</string>
+       </property>
+       <layout class="QGridLayout" name="m_qGridLayout_Information">
+        <item row="0" column="0">
+         <widget class="QTextBrowser" name="m_qTextBrowser_Information"/>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item row="3" column="2">
       <widget class="QPushButton" name="m_qPushButton_About">
        <property name="text">
         <string>About</string>
        </property>
       </widget>
      </item>
-     <item row="0" column="2">
-      <spacer name="m_qVerticalSpacer_Bottom">
+     <item row="2" column="0">
+      <spacer name="m_qVerticalSpacer_LeftRow">
        <property name="orientation">
         <enum>Qt::Vertical</enum>
        </property>
        <property name="sizeHint" stdset="0">
         <size>
          <width>20</width>
-         <height>142</height>
+         <height>40</height>
         </size>
        </property>
       </spacer>

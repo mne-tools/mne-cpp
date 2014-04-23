@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     babymegrunwidget.h
+* @file     neuromagsetupwidget.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the BabyMegRunWidget class.
+* @brief    Contains the declaration of the NeuromagSetupWidget class.
 *
 */
 
-#ifndef BABYMEGRUNWIDGET_H
-#define BABYMEGRUNWIDGET_H
+#ifndef NEUROMAGSETUPWIDGET_H
+#define NEUROMAGSETUPWIDGET_H
 
 
 //*************************************************************************************************************
@@ -42,7 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_babymegrun.h"
+#include "../ui_neuromagsetup.h"
 
 
 //*************************************************************************************************************
@@ -50,15 +50,15 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
+#include <QWidget>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE BabyMegPlugin
+// DEFINE NAMESPACE MneRtClientPlugin
 //=============================================================================================================
 
-namespace BabyMegPlugin
+namespace MneRtClientPlugin
 {
 
 
@@ -67,16 +67,16 @@ namespace BabyMegPlugin
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class BabyMeg;
+class Neuromag;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS BabyMegRunWidget
+* DECLARE CLASS NeuromagSetupWidget
 *
-* @brief The BabyMegRunWidget class provides the ECG configuration window for the run mode.
+* @brief The NeuromagSetupWidget class provides the ECG configuration window.
 */
-class BabyMegRunWidget : public QWidget
+class NeuromagSetupWidget : public QWidget
 {
     Q_OBJECT
 
@@ -84,21 +84,51 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a BabyMegRunWidget which is a child of parent.
+    * Constructs a NeuromagSetupWidget which is a child of parent.
     *
-    * @param [in] simulator a pointer to the corresponding ECG Simulator.
-    * @param [in] parent pointer to parent widget; If parent is 0, the new BabyMegRunWidget becomes a window. If parent is another widget, BabyMegRunWidget becomes a child window inside parent. BabyMegRunWidget is deleted when its parent is deleted.
+    * @param [in] p_pNeuromag   a pointer to the corresponding Neuromag.
+    * @param [in] parent        pointer to parent widget; If parent is 0, the new NeuromagSetupWidget becomes a window. If parent is another widget, NeuromagSetupWidget becomes a child window inside parent. NeuromagSetupWidget is deleted when its parent is deleted.
     */
-    BabyMegRunWidget(BabyMeg* simulator, QWidget *parent = 0);
+    NeuromagSetupWidget(Neuromag* p_pNeuromag, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the BabyMegRunWidget.
-    * All BabyMegRunWidget's children are deleted first. The application exits if BabyMegRunWidget is the main widget.
+    * Destroys the NeuromagSetupWidget.
+    * All NeuromagSetupWidget's children are deleted first. The application exits if NeuromagSetupWidget is the main widget.
     */
-    ~BabyMegRunWidget();
+    ~NeuromagSetupWidget();
 
-private slots:
+    //=========================================================================================================
+    /**
+    * Inits the setup widget
+    */
+    void init();
+
+//slots
+    void bufferSizeEdited();        /**< Buffer size edited and set new buffer size.*/
+
+    void checkedRecordDataChanged();    /**< Record Data checkbox changed. */
+
+    void printToLog(QString message);   /**< Implements printing messages to rtproc log.*/
+
+    void pressedFiffRecordFile();   /**< Triggers file dialog to select record file.*/
+
+    void pressedConnect();          /**< Triggers a connection trial to rt_server.*/
+
+    void pressedSendCLI();          /**< Triggers a send request of a cli command.*/
+
+    void fiffInfoReceived();        /**< Triggered when new fiff info is recieved by producer and stored intor rt_server */
+
+
+private:
+    //=========================================================================================================
+    /**
+    * Set command connection status
+    *
+    * @param[in] p_bConnectionStatus    the connection status
+    */
+    void cmdConnectionChanged(bool p_bConnectionStatus);
+
     //=========================================================================================================
     /**
     * Shows the About Dialog
@@ -106,12 +136,20 @@ private slots:
     */
     void showAboutDialog();
 
-private:
-    BabyMeg* m_pBabyMeg;      /**< Holds a pointer to corresponding ECGSimulator.*/
+//    //=========================================================================================================
+//    /**
+//    * Shows the SQUID Control Dialog
+//    *
+//    */
+//    void SQUIDControlDialog();
 
-    Ui::BabyMegRunClass ui;    /**< Holds the user interface for the BabyMegRunWidget.*/
+    Neuromag*   m_pNeuromag;      /**< a pointer to corresponding mne rt client.*/
+
+    Ui::NeuromagSetupWidgetClass ui; /**< the user interface for the NeuromagSetupWidget.*/
+
+    bool m_bIsInit;                     /**< false when gui is not initialized jet. Prevents gui from already interacting when not initialized */
 };
 
 } // NAMESPACE
 
-#endif // BABYMEGRUNWIDGET_H
+#endif // NEUROMAGSETUPWIDGET_H
