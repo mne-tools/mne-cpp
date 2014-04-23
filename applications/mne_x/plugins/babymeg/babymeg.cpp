@@ -76,10 +76,10 @@ using namespace UTILSLIB;
 
 BabyMEG::BabyMEG()
 : m_iBufferSize(-1)
-, m_sOutputFilePath(qApp->applicationDirPath()+"/mne_x_plugins/resources/babymeg/babymegtest.fif")
-, m_pRawMatrixBuffer(0)
-, m_bIsRunning(false)
 , m_bWriteToFile(true)
+, m_sOutputFilePath(qApp->applicationDirPath()+"/mne_x_plugins/resources/babymeg/babymegtest.fif")
+, m_bIsRunning(false)
+, m_pRawMatrixBuffer(0)
 {
     m_pActionSetupProject = new QAction(QIcon(":/images/database.png"), tr("Setup Project"),this);
 //    m_pActionSelectRoi->setShortcut(tr("F12"));
