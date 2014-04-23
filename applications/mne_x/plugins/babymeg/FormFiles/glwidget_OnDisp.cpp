@@ -104,6 +104,11 @@ void GLWidget_OnDisp::SetGLView(float xleft, float xright, float ydown, float yt
 }
 void GLWidget_OnDisp::SetdrawLines(MatrixXf tmp,int wise_type, int chnind, float x, float y, float w, float h)
 {
+    Q_UNUSED(x);
+    Q_UNUSED(y);
+    Q_UNUSED(w);
+    Q_UNUSED(h);
+
     m_tmp = tmp;
     m_row = m_tmp.rows();
     m_col = m_tmp.cols();
