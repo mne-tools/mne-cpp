@@ -121,6 +121,12 @@ BabyMEGSQUIDControlDgl::BabyMEGSQUIDControlDgl(BabyMEG* p_pBabyMEG,QWidget *pare
     //InitTuneGraph();
     initparaplotflag = false;
 
+    d_timeplot = new plotter();
+    ui->lay_tune->addWidget(d_timeplot);
+
+//    d_tuneplot = new plotter();
+//    ui->lay_tunepara->addWidget(d_tuneplot);
+
 
     this->Init();
     this->StartDisp();
@@ -134,34 +140,34 @@ BabyMEGSQUIDControlDgl::~BabyMEGSQUIDControlDgl()
 void BabyMEGSQUIDControlDgl::InitTuneGraph()
 {
 
-    QGraphicsScene * scene = new QGraphicsScene(ui->gv_tunegraph);
-    scene->setItemIndexMethod(QGraphicsScene::NoIndex);
-    scene->setSceneRect(ui->gv_tunegraph->rect());
+//    QGraphicsScene * scene = new QGraphicsScene(ui->gv_tunegraph);
+//    scene->setItemIndexMethod(QGraphicsScene::NoIndex);
+//    scene->setSceneRect(ui->gv_tunegraph->rect());
 
-    //scene->addText("Hello World");
+//    //scene->addText("Hello World");
 
-//    QBrush brush(QColor(0x70, 0x80, 0x50, 255));
-//    scene.setBackgroundBrush(brush);
+////    QBrush brush(QColor(0x70, 0x80, 0x50, 255));
+////    scene.setBackgroundBrush(brush);
 
-//    scene.setSceneRect(ui->gv_tunegraph->rect());
-//    QString newline = QString("InitTuneGraph:")+tr("x=%1").arg(ui->gv_tunegraph->rect().x())
-//            +tr("y=%1").arg(ui->gv_tunegraph->rect().y())
-//            +tr("width=%1").arg(ui->gv_tunegraph->rect().width())
-//            +tr("height=%1").arg(ui->gv_tunegraph->rect().height());
+////    scene.setSceneRect(ui->gv_tunegraph->rect());
+////    QString newline = QString("InitTuneGraph:")+tr("x=%1").arg(ui->gv_tunegraph->rect().x())
+////            +tr("y=%1").arg(ui->gv_tunegraph->rect().y())
+////            +tr("width=%1").arg(ui->gv_tunegraph->rect().width())
+////            +tr("height=%1").arg(ui->gv_tunegraph->rect().height());
 
-//    UpdateInfo(newline);
+////    UpdateInfo(newline);
 
 
-    //QGraphicsLineItem * PolyLine;
-    //PolyLine = new QGraphicsLineItem();
-    //scene->addItem(PolyLine);
-    //PolyLine->setLine(0,ui->gv_tunegraph->rect().height()/2,ui->gv_tunegraph->rect().width(),ui->gv_tunegraph->rect().height()/2);
+//    //QGraphicsLineItem * PolyLine;
+//    //PolyLine = new QGraphicsLineItem();
+//    //scene->addItem(PolyLine);
+//    //PolyLine->setLine(0,ui->gv_tunegraph->rect().height()/2,ui->gv_tunegraph->rect().width(),ui->gv_tunegraph->rect().height()/2);
 
-    ui->gv_tunegraph->setScene(scene);
-    ui->gv_tunegraph->setRenderHint(QPainter::Antialiasing);
-    ui->gv_tunegraph->setCacheMode(QGraphicsView::CacheBackground);
-    ui->gv_tunegraph->setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
-    //ui->gv_tunegraph->resize(400,600);
+//    ui->gv_tunegraph->setScene(scene);
+//    ui->gv_tunegraph->setRenderHint(QPainter::Antialiasing);
+//    ui->gv_tunegraph->setCacheMode(QGraphicsView::CacheBackground);
+//    ui->gv_tunegraph->setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
+//    //ui->gv_tunegraph->resize(400,600);
 
 }
 
@@ -173,6 +179,7 @@ void BabyMEGSQUIDControlDgl::StartDisp()
 void BabyMEGSQUIDControlDgl::closeEvent(QCloseEvent *event)
 {
     Q_UNUSED(event)
+    SendCMD("CANC");
     //emit SCStop();
 }
 void BabyMEGSQUIDControlDgl::UpdateParaGraph()
@@ -181,6 +188,29 @@ void BabyMEGSQUIDControlDgl::UpdateParaGraph()
     std::cout << "Update Para Graph \n" << initparaplotflag<< std::endl;
 
     int NumRect = m_GUISM.ParaGraph.size();
+
+//    float minval = 0.0;
+//    float maxval = 0.0;
+
+//    QVector <QPointF> F;
+
+//    for(int i=0; i<NumRect;i++){
+//        F.append(QPointF(i,m_GUISM.ParaGraph.at(i)));
+
+//        float t = m_GUISM.ParaGraph.at(i);
+//        if ( minval > t ) minval = t;
+//        if ( maxval < t ) maxval = t;
+//    }
+//    // plot tune parameters here
+//    settings_tune.minX = 0.0;
+//    settings_tune.maxX = NumRect;
+//    settings_tune.minY = minval;
+//    settings_tune.maxY = maxval;
+
+//    d_tuneplot->setPlotSettings(settings_tune);
+//    d_tuneplot->setCurveData(0,F);
+//    d_tuneplot->show();
+
     int hSideSpace = 30;
     int vSideSpace = 30;
     //(x1,y1) and (x2,y2)
@@ -273,98 +303,143 @@ void BabyMEGSQUIDControlDgl::UpdateParaGraph()
     }
 }
 
+float BabyMEGSQUIDControlDgl::mmin(MatrixXf tmp,int chan)
+{
+    int cols = tmp.cols();
+
+    float ret = 0.0;
+    for (int i=0; i<cols; i++)
+    {
+        if (ret > tmp(chan,i))
+            ret = tmp(chan,i);
+    }
+
+    return ret;
+}
+
+float BabyMEGSQUIDControlDgl::mmax(MatrixXf tmp,int chan)
+{
+    int cols = tmp.cols();
+
+    float ret = 0.0;
+    for (int i=0; i<cols; i++)
+    {
+        if (ret < tmp(chan,i))
+            ret = tmp(chan,i);
+    }
+
+    return ret;
+}
 void BabyMEGSQUIDControlDgl::TuneGraphDispProc(MatrixXf tmp)
 {
-//    std::cout << "first ten elements \n" << tmp.block(0,0,1,10) << std::endl;
+    std::cout << "first ten elements \n" << tmp.block(0,0,1,10) << std::endl;
 
-//    float * samples = tmp.data();
-
-//    int rows = tmp.rows();
     int cols = tmp.cols();
-//    int wise_type = 1;
-
-    int NumRect = cols;
-    int hSideSpace = 30;
-    int vSideSpace = 30;
-    //(x1,y1) and (x2,y2)
-    float x1 = 0+1.5*hSideSpace;
-    float y1 = 0+vSideSpace;
-    float x2 = ui->gv_tunegraph->rect().width()-2*hSideSpace;
-    float y2 = ui->gv_tunegraph->rect().height()-2*vSideSpace;
-    // define the x tick
-    float dis = (x2-x1)/(1.0*NumRect);
-
-
     int chanIndx = ui->m_Qcb_channel->currentIndex();
+    // plot the real time data here
+    settings.minX = 0.0;
+    settings.maxX = cols;
+    settings.minY = mmin(tmp,chanIndx);
+    settings.maxY = mmax(tmp,chanIndx);
 
-    float scale = 100000;
+    d_timeplot->setPlotSettings(settings);
 
-    if (initplotflag){
-        //update the tune graph
-        for(int i=0;i<cols-1;i++){
-            PolyLinePtr.at(i)->setLine(x1+i*dis,scale*tmp(chanIndx,i),x1+(i+1)*dis,scale*tmp(chanIndx,i+1));
-        }
-//        if(wise_type==0){ //0 --column wise
-//            for(int i=0;i<cols;i++){
-//                PolyLinePtr.at(i)->setLine(x1+i*dis,scale*samples[i*rows+chanIndx],x1+(i+1)*dis,scale*samples[(i+1)*rows+chanIndx]);
+
+    QVector <QPointF> F;
+
+    for(int i=0; i<cols;i++)
+        F.append(QPointF(i,tmp(chanIndx,i)));
+
+    d_timeplot->setCurveData(0,F);
+    d_timeplot->show();
+////    float * samples = tmp.data();
+
+////    int rows = tmp.rows();
+//
+////    int wise_type = 1;
+
+//    int NumRect = cols;
+//    int hSideSpace = 30;
+//    int vSideSpace = 30;
+//    //(x1,y1) and (x2,y2)
+//    float x1 = 0+1.5*hSideSpace;
+//    float y1 = 0+vSideSpace;
+//    float x2 = ui->gv_tunegraph->rect().width()-2*hSideSpace;
+//    float y2 = ui->gv_tunegraph->rect().height()-2*vSideSpace;
+//    // define the x tick
+//    float dis = (x2-x1)/(1.0*NumRect);
+
+
+//
+
+//    float scale = 1;//100000;
+
+//    if (initplotflag){
+//        //update the tune graph
+//        for(int i=0;i<cols-1;i++){
+//            PolyLinePtr.at(i)->setLine(x1+i*dis,scale*tmp(chanIndx,i),x1+(i+1)*dis,scale*tmp(chanIndx,i+1));
+//        }
+////        if(wise_type==0){ //0 --column wise
+////            for(int i=0;i<cols;i++){
+////                PolyLinePtr.at(i)->setLine(x1+i*dis,scale*samples[i*rows+chanIndx],x1+(i+1)*dis,scale*samples[(i+1)*rows+chanIndx]);
+////            }
+////        }
+////        else
+////        { // 1 -- raw wise
+////            for(int i=0;i<cols;i++){
+////                PolyLinePtr.at(i)->setLine(x1+i*dis,scale*samples[i+chanIndx*cols],x1+(i+1)*dis,scale*samples[(i+1)+chanIndx*cols]);
+////            }
+////        }
+//    }
+//    else
+//    {// the first time to plot
+//        QGraphicsScene * scene = new QGraphicsScene(ui->gv_tunegraph);
+//        scene->setItemIndexMethod(QGraphicsScene::NoIndex);
+//        scene->setSceneRect(ui->gv_tunegraph->rect());
+
+//        // plot ax
+//        //x1,y1 -> x2,y1
+//        scene->addLine(x1,y1,x2,y1,QPen(Qt::black));
+//        //x2,y1 -> x2,y2
+//        scene->addLine(x2,y1,x2,y2,QPen(Qt::black));
+//        //x2,y2 -> x1,y2
+//        scene->addLine(x2,y2,x1,y2,QPen(Qt::black));
+//        //x1,y2 -> x1,y1
+//        scene->addLine(x1,y2,x1,y1,QPen(Qt::black));
+
+//        //label
+//        QGraphicsTextItem * io = new QGraphicsTextItem;
+//        io->setPos(x2/2,y2+vSideSpace/2);
+//        io->setPlainText(QString(tr("%1").arg(fs)+"samples per second"));
+//        scene->addItem(io);
+
+//        QGraphicsTextItem * io1 = new QGraphicsTextItem;
+//        io1->setPos(x1-1.5*hSideSpace,y2);
+//        io1->setPlainText("Amplitude");
+//        io1->setRotation(-90);
+//        scene->addItem(io1);
+
+//        // plot lines
+//        for (int i=0;i< cols;i++){
+//            QGraphicsLineItem * PolyLine;
+//            PolyLine = new QGraphicsLineItem();
+//            scene->addItem(PolyLine);
+
+//            PolyLinePtr.append(PolyLine);
+
+//            if (i%500==0){//x-ticklabel
+//            QGraphicsTextItem * ticklabel = new QGraphicsTextItem;
+//            ticklabel->setPos(x1+i*dis-dis/2,y2+vSideSpace/8);
+//            ticklabel->setPlainText(tr("%1").arg(i));
+//            scene->addItem(ticklabel);
 //            }
 //        }
-//        else
-//        { // 1 -- raw wise
-//            for(int i=0;i<cols;i++){
-//                PolyLinePtr.at(i)->setLine(x1+i*dis,scale*samples[i+chanIndx*cols],x1+(i+1)*dis,scale*samples[(i+1)+chanIndx*cols]);
-//            }
-//        }
-    }
-    else
-    {// the first time to plot
-        QGraphicsScene * scene = new QGraphicsScene(ui->gv_tunegraph);
-        scene->setItemIndexMethod(QGraphicsScene::NoIndex);
-        scene->setSceneRect(ui->gv_tunegraph->rect());
-
-        // plot ax
-        //x1,y1 -> x2,y1
-        scene->addLine(x1,y1,x2,y1,QPen(Qt::black));
-        //x2,y1 -> x2,y2
-        scene->addLine(x2,y1,x2,y2,QPen(Qt::black));
-        //x2,y2 -> x1,y2
-        scene->addLine(x2,y2,x1,y2,QPen(Qt::black));
-        //x1,y2 -> x1,y1
-        scene->addLine(x1,y2,x1,y1,QPen(Qt::black));
-
-        //label
-        QGraphicsTextItem * io = new QGraphicsTextItem;
-        io->setPos(x2/2,y2+vSideSpace/2);
-        io->setPlainText(QString(tr("%1").arg(fs)+"samples per second"));
-        scene->addItem(io);
-
-        QGraphicsTextItem * io1 = new QGraphicsTextItem;
-        io1->setPos(x1-1.5*hSideSpace,y2);
-        io1->setPlainText("Amplitude");
-        io1->setRotation(-90);
-        scene->addItem(io1);
-
-        // plot lines
-        for (int i=0;i< cols;i++){
-            QGraphicsLineItem * PolyLine;
-            PolyLine = new QGraphicsLineItem();
-            scene->addItem(PolyLine);
-
-            PolyLinePtr.append(PolyLine);
-
-            if (i%500==0){//x-ticklabel
-            QGraphicsTextItem * ticklabel = new QGraphicsTextItem;
-            ticklabel->setPos(x1+i*dis-dis/2,y2+vSideSpace/8);
-            ticklabel->setPlainText(tr("%1").arg(i));
-            scene->addItem(ticklabel);
-            }
-        }
-        ui->gv_tunegraph->setScene(scene);
-        ui->gv_tunegraph->setRenderHint(QPainter::Antialiasing);
-        ui->gv_tunegraph->setCacheMode(QGraphicsView::CacheBackground);
-        ui->gv_tunegraph->setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
-        initplotflag = true;
-    }
+//        ui->gv_tunegraph->setScene(scene);
+//        ui->gv_tunegraph->setRenderHint(QPainter::Antialiasing);
+//        ui->gv_tunegraph->setCacheMode(QGraphicsView::CacheBackground);
+//        ui->gv_tunegraph->setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
+//        initplotflag = true;
+//    }
 
 //    QString newline = QString("New data arrived");
 //    UpdateInfo(newline);
