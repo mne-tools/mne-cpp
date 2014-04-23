@@ -67,7 +67,7 @@
 #include <QGraphicsTextItem>
 
 #include "globalobj.h"
-
+#include "plotter.h"
 //*************************************************************************************************************
 //=============================================================================================================
 // Eigen INCLUDES
@@ -82,6 +82,10 @@
 //=============================================================================================================
 
 using namespace Eigen;
+
+
+class plotter;
+class PlotSettings;
 
 namespace Ui
 {
@@ -205,6 +209,14 @@ public:
     QVector <QGraphicsRectItem * > PolyRectPtr;
     bool initparaplotflag;
 
+    PlotSettings settings;
+    PlotSettings settings_tune;
+
+    plotter *d_timeplot;
+    plotter *d_tuneplot;
+
+
+
     void SendCMD(QString CMDSTR);
     void InitChannels(QString sReply);
     void InitGUIConfig(QString sFLLPara);
@@ -216,6 +228,8 @@ public:
     void InitTuneGraph();
     void TuneGraphDispProc(MatrixXf tmp);
     void UpdateParaGraph();
+    float mmin(MatrixXf tmp,int chan);
+    float mmax(MatrixXf tmp,int chan);
 
 public slots:
 

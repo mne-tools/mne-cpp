@@ -23,20 +23,6 @@
    <bool>true</bool>
   </property>
   <layout class="QGridLayout" name="gridLayout_4">
-   <item row="3" column="0">
-    <layout class="QFormLayout" name="formLayout_4">
-     <property name="fieldGrowthPolicy">
-      <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
-     </property>
-     <item row="0" column="0">
-      <widget class="QPushButton" name="m_Qbn_Cancel">
-       <property name="text">
-        <string>Close</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
    <item row="2" column="0">
     <widget class="QGroupBox" name="groupBox_2">
      <property name="styleSheet">
@@ -83,318 +69,6 @@ background-color:rgb(216, 216, 216);</string>
        <string>SQUID Control</string>
       </attribute>
       <layout class="QGridLayout" name="gridLayout_8">
-       <item row="5" column="0" colspan="2">
-        <layout class="QFormLayout" name="formLayout_3">
-         <property name="fieldGrowthPolicy">
-          <enum>QFormLayout::ExpandingFieldsGrow</enum>
-         </property>
-         <item row="0" column="0">
-          <widget class="QLabel" name="label_16">
-           <property name="text">
-            <string>Tune Graph</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0" colspan="2">
-          <widget class="QGraphicsView" name="gv_tunegraph">
-           <property name="autoFillBackground">
-            <bool>false</bool>
-           </property>
-           <property name="backgroundBrush">
-            <brush brushstyle="NoBrush">
-             <color alpha="255">
-              <red>0</red>
-              <green>0</green>
-              <blue>0</blue>
-             </color>
-            </brush>
-           </property>
-           <property name="foregroundBrush">
-            <brush brushstyle="NoBrush">
-             <color alpha="255">
-              <red>85</red>
-              <green>170</green>
-              <blue>127</blue>
-             </color>
-            </brush>
-           </property>
-           <property name="interactive">
-            <bool>true</bool>
-           </property>
-           <property name="resizeAnchor">
-            <enum>QGraphicsView::AnchorViewCenter</enum>
-           </property>
-           <property name="viewportUpdateMode">
-            <enum>QGraphicsView::BoundingRectViewportUpdate</enum>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item row="0" column="0">
-        <layout class="QGridLayout" name="gridLayout_7">
-         <item row="0" column="0" colspan="2">
-          <widget class="QPushButton" name="m_Qbn_SyncGUI">
-           <property name="text">
-            <string>Sync GUI</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QLabel" name="label_2">
-           <property name="text">
-            <string>Channel</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="1">
-          <widget class="QComboBox" name="m_Qcb_channel"/>
-         </item>
-         <item row="1" column="1">
-          <widget class="QComboBox" name="m_Qcb_commtype">
-           <item>
-            <property name="text">
-             <string>Broadcast</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>GroupA</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>GroupB</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>GroupC</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>GroupD</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>GroupE</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>GroupF</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>GroupG</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>GroupH</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Single Channel</string>
-            </property>
-           </item>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QLabel" name="label">
-           <property name="text">
-            <string>CommType</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item row="1" column="0" rowspan="2">
-        <layout class="QGridLayout" name="gridLayout">
-         <item row="0" column="0">
-          <widget class="QLabel" name="label_3">
-           <property name="text">
-            <string>Operate Mode</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1">
-          <widget class="QComboBox" name="m_Qcb_opermode">
-           <item>
-            <property name="text">
-             <string>Off</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Run</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Tune</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Sleep</string>
-            </property>
-           </item>
-          </widget>
-         </item>
-         <item row="1" column="0">
-          <widget class="QPushButton" name="m_Qbn_retune">
-           <property name="text">
-            <string>Retune</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QPushButton" name="m_Qbn_heat">
-           <property name="text">
-            <string>Heat</string>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="0">
-          <widget class="QPushButton" name="m_Qbn_atune">
-           <property name="text">
-            <string>ATune</string>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="0">
-          <widget class="QPushButton" name="m_Qbn_reset">
-           <property name="text">
-            <string>Reset</string>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="0">
-          <widget class="QPushButton" name="m_Qbn_heatTune">
-           <property name="text">
-            <string>Heat &amp;&amp; Tune</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QPushButton" name="m_Qbn_save">
-           <property name="text">
-            <string>Save</string>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="1">
-          <widget class="QPushButton" name="m_Qbn_save1">
-           <property name="text">
-            <string>%$Save</string>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="1">
-          <widget class="QPushButton" name="m_Qbn_groupheat">
-           <property name="text">
-            <string>Group Heat</string>
-           </property>
-          </widget>
-         </item>
-         <item row="4" column="1">
-          <widget class="QPushButton" name="m_Qbn_last">
-           <property name="text">
-            <string>Last</string>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="1">
-          <widget class="QPushButton" name="m_Qbn_default">
-           <property name="text">
-            <string>Default</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item row="6" column="0" colspan="2">
-        <layout class="QGridLayout" name="gridLayout_13">
-         <item row="2" column="0">
-          <widget class="QGraphicsView" name="gv_paragraph"/>
-         </item>
-         <item row="0" column="0">
-          <widget class="QComboBox" name="m_Qcb_bar_graph_select">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <item>
-            <property name="text">
-             <string>Triangle Amplitudes</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>AutoReset</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Biases</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>High Passes</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Low Passes</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Modes</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Modulations</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Offsets</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Reset</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Slews</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>PreGains</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>PostGains</string>
-            </property>
-           </item>
-          </widget>
-         </item>
-        </layout>
-       </item>
        <item row="0" column="1" rowspan="3">
         <widget class="QGroupBox" name="groupBox">
          <property name="styleSheet">
@@ -764,6 +438,290 @@ background-color:rgb(216, 216, 216);</string>
          </layout>
         </widget>
        </item>
+       <item row="3" column="0">
+        <widget class="QLabel" name="label_16">
+         <property name="text">
+          <string>Tune Graph</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="0">
+        <layout class="QGridLayout" name="gridLayout_7">
+         <item row="0" column="0" colspan="2">
+          <widget class="QPushButton" name="m_Qbn_SyncGUI">
+           <property name="text">
+            <string>Sync GUI</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QLabel" name="label_2">
+           <property name="text">
+            <string>Channel</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QComboBox" name="m_Qcb_channel"/>
+         </item>
+         <item row="1" column="1">
+          <widget class="QComboBox" name="m_Qcb_commtype">
+           <item>
+            <property name="text">
+             <string>Broadcast</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>GroupA</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>GroupB</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>GroupC</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>GroupD</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>GroupE</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>GroupF</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>GroupG</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>GroupH</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Single Channel</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLabel" name="label">
+           <property name="text">
+            <string>CommType</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="1" column="0" rowspan="2">
+        <layout class="QGridLayout" name="gridLayout">
+         <item row="0" column="0">
+          <widget class="QLabel" name="label_3">
+           <property name="text">
+            <string>Operate Mode</string>
+           </property>
+          </widget>
+         </item>
+         <item row="0" column="1">
+          <widget class="QComboBox" name="m_Qcb_opermode">
+           <item>
+            <property name="text">
+             <string>Off</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Run</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Tune</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Sleep</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QPushButton" name="m_Qbn_retune">
+           <property name="text">
+            <string>Retune</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QPushButton" name="m_Qbn_heat">
+           <property name="text">
+            <string>Heat</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0">
+          <widget class="QPushButton" name="m_Qbn_atune">
+           <property name="text">
+            <string>ATune</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="0">
+          <widget class="QPushButton" name="m_Qbn_reset">
+           <property name="text">
+            <string>Reset</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0">
+          <widget class="QPushButton" name="m_Qbn_heatTune">
+           <property name="text">
+            <string>Heat &amp;&amp; Tune</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <widget class="QPushButton" name="m_Qbn_save">
+           <property name="text">
+            <string>Save</string>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QPushButton" name="m_Qbn_save1">
+           <property name="text">
+            <string>%$Save</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QPushButton" name="m_Qbn_groupheat">
+           <property name="text">
+            <string>Group Heat</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QPushButton" name="m_Qbn_last">
+           <property name="text">
+            <string>Last</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <widget class="QPushButton" name="m_Qbn_default">
+           <property name="text">
+            <string>Default</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <item row="5" column="0" colspan="2">
+        <layout class="QGridLayout" name="gridLayout_13">
+         <item row="0" column="0">
+          <widget class="QComboBox" name="m_Qcb_bar_graph_select">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+           <item>
+            <property name="text">
+             <string>Triangle Amplitudes</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>AutoReset</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Biases</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>High Passes</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Low Passes</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Modes</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Modulations</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Offsets</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Reset</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Slews</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>PreGains</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>PostGains</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="2" column="0">
+          <widget class="QGraphicsView" name="gv_paragraph"/>
+         </item>
+        </layout>
+       </item>
+       <item row="4" column="0" colspan="2">
+        <layout class="QFormLayout" name="lay_tune">
+         <property name="sizeConstraint">
+          <enum>QLayout::SetFixedSize</enum>
+         </property>
+         <property name="fieldGrowthPolicy">
+          <enum>QFormLayout::ExpandingFieldsGrow</enum>
+         </property>
+         <property name="horizontalSpacing">
+          <number>0</number>
+         </property>
+        </layout>
+       </item>
       </layout>
      </widget>
      <widget class="QWidget" name="tab_SQUID_STAT">
@@ -798,6 +756,20 @@ background-color:rgb(216, 216, 216);</string>
       </layout>
      </widget>
     </widget>
+   </item>
+   <item row="3" column="0">
+    <layout class="QFormLayout" name="formLayout_4">
+     <property name="fieldGrowthPolicy">
+      <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+     </property>
+     <item row="0" column="0">
+      <widget class="QPushButton" name="m_Qbn_Cancel">
+       <property name="text">
+        <string>Close</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
   </layout>
  </widget>
