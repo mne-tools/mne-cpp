@@ -104,12 +104,7 @@ public:
     */
     void init();
 
-    void checkedRecordDataChanged();    /**< Record Data checkbox changed. */
-
     void fiffInfoReceived();        /**< Triggered when new fiff info is recieved by producer and stored intor rt_server */
-
-    void pressedFiffRecordFile();   /**< Triggers file dialog to select record file.*/
-
 
 private:
 

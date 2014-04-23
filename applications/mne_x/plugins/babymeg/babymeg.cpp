@@ -41,6 +41,7 @@
 #include "babymeg.h"
 
 #include "FormFiles/babymegsetupwidget.h"
+#include "FormFiles/babymegprojectdialog.h"
 
 #include <utils/ioutils.h>
 
@@ -82,9 +83,9 @@ BabyMEG::BabyMEG()
 , m_pRawMatrixBuffer(0)
 {
     m_pActionSetupProject = new QAction(QIcon(":/images/database.png"), tr("Setup Project"),this);
-//    m_pActionSelectRoi->setShortcut(tr("F12"));
+//    m_pActionSetupProject->setShortcut(tr("F12"));
     m_pActionSetupProject->setStatusTip(tr("Setup Project"));
-//    connect(m_pActionSelectRoi, &QAction::triggered, this, &NewRealTimeMultiSampleArrayWidget::showRoiSelectionWidget);
+    connect(m_pActionSetupProject, &QAction::triggered, this, &BabyMEG::showProjectDialog);
 
     addPluginAction(m_pActionSetupProject);
 }
@@ -97,8 +98,8 @@ BabyMEG::~BabyMEG()
     if(this->isRunning())
         stop();
 
-    if(myClient->isConnected())
-        myClient->DisConnectBabyMEG();
+    if(myClient && myClient->isConnected())
+            myClient->DisConnectBabyMEG();
 }
 
 
@@ -166,6 +167,16 @@ void BabyMEG::clear()
     m_pFiffInfo.reset();
     m_iBufferSize = -1;
 }
+
+
+//*************************************************************************************************************
+
+void BabyMEG::showProjectDialog()
+{
+    BabyMEGProjectDialog projectDialog;
+    projectDialog.exec();
+}
+
 
 //*************************************************************************************************************
 
