@@ -78,7 +78,7 @@ BabyMEGClient::BabyMEGClient(int myPort, QObject *parent) :
         name = QString("localhost");
     qDebug()<< "- " + name;
     port = myPort;//6340;
-    SocketIsConnected = false;
+    m_bSocketIsConnected = false;
     SkipLoop = false;
     DataAcqStartFlag = false;
     numBlock = 0;
@@ -190,7 +190,7 @@ void BabyMEGClient::ConnectToBabyMEG()
 {
     // return true: sucessfully connect to babyMEG server
     //        false: fail.
-    SocketIsConnected = false;
+    m_bSocketIsConnected = false;
     // Connect to the server of babyMEG [labview]
     qDebug()<< "Client is started!";
 
@@ -203,7 +203,7 @@ void BabyMEGClient::ConnectToBabyMEG()
         tcpSocket->connectToHost(name,port,QIODevice::ReadWrite);
         if (tcpSocket->waitForConnected(5000))
         {
-            SocketIsConnected = true;
+            m_bSocketIsConnected = true;
             qDebug("Connect to BabyMEG Server ... Ok");
             //download parameters
             qDebug()<< "Send the initial parameter request";
@@ -229,7 +229,7 @@ void BabyMEGClient::ConnectToBabyMEG()
 
 void BabyMEGClient::DisConnectBabyMEG()
 {
-    if(SocketIsConnected && tcpSocket->state()==QAbstractSocket::ConnectedState)
+    if(m_bSocketIsConnected && tcpSocket->state()==QAbstractSocket::ConnectedState)
         SendCommand("QUIT");
 }
 
@@ -266,7 +266,7 @@ void BabyMEGClient::SendCommandToBabyMEGShortConnection(QByteArray s)
 void BabyMEGClient::SendCommandToBabyMEG()
 {
     qDebug()<<"Send Command";
-    if(SocketIsConnected && tcpSocket->state()==QAbstractSocket::ConnectedState)
+    if(m_bSocketIsConnected && tcpSocket->state()==QAbstractSocket::ConnectedState)
     {
         m_qMutex.lock();
         tcpSocket->write("COMD");
@@ -381,7 +381,7 @@ void BabyMEGClient::handleBuffer()
                 tcpSocket->disconnectFromHost();
                 if(tcpSocket->state() != QAbstractSocket::UnconnectedState)
                             tcpSocket->waitForDisconnected();
-                SocketIsConnected = false;
+                m_bSocketIsConnected = false;
                 qDebug()<< "Disconnect Server";
                 qDebug()<< "Client is End!";
                 qDebug()<< "You can close this application or restart to connect Server.";
@@ -404,7 +404,7 @@ void BabyMEGClient::handleBuffer()
                 tcpSocket->disconnectFromHost();
                 if(tcpSocket->state() != QAbstractSocket::UnconnectedState)
                             tcpSocket->waitForDisconnected();
-                SocketIsConnected = false;
+                m_bSocketIsConnected = false;
                 qDebug()<< "Disconnect Server";
                 break;
 
