@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>765</width>
-    <height>640</height>
+    <width>844</width>
+    <height>935</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -26,90 +26,7 @@
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
         <layout class="QGridLayout" name="m_qGridLayout_main">
-         <item row="5" column="2">
-          <widget class="QPushButton" name="m_qPushButton_About">
-           <property name="text">
-            <string>About</string>
-           </property>
-          </widget>
-         </item>
-         <item row="5" column="1">
-          <spacer name="m_qHorizontalSpacer_About">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item row="3" column="0">
-          <widget class="QGroupBox" name="m_qGroupBox_Preferences">
-           <property name="title">
-            <string>Preferences</string>
-           </property>
-           <layout class="QGridLayout" name="gridLayout">
-            <item row="5" column="1">
-             <widget class="QLabel" name="m_qLabel_sps">
-              <property name="frameShape">
-               <enum>QFrame::StyledPanel</enum>
-              </property>
-              <property name="text">
-               <string/>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="0">
-             <widget class="QLabel" name="m_qLabel_BufferSize">
-              <property name="text">
-               <string>Buffer [samples]:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="1">
-             <widget class="QLineEdit" name="m_qLineEdit_BufferSize">
-              <property name="text">
-               <string/>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="0" colspan="3">
-             <widget class="Line" name="line">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-             </widget>
-            </item>
-            <item row="5" column="0">
-             <widget class="QLabel" name="m_qLabel_sps_description">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="layoutDirection">
-               <enum>Qt::LeftToRight</enum>
-              </property>
-              <property name="text">
-               <string>Sampling Rate [sps]:</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="0">
-             <widget class="QPushButton" name="m_qPushButtonSqdCtrl">
-              <property name="text">
-               <string>Squid Control</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </widget>
-         </item>
-         <item row="0" column="0" rowspan="3">
+         <item row="0" column="0">
           <widget class="QGroupBox" name="m_qGroupBox_Acquisition">
            <property name="title">
             <string>Acquisition</string>
@@ -183,7 +100,70 @@
            </layout>
           </widget>
          </item>
-         <item row="0" column="1" rowspan="3" colspan="2">
+         <item row="1" column="0">
+          <widget class="QGroupBox" name="m_qGroupBox_Preferences">
+           <property name="title">
+            <string>Preferences</string>
+           </property>
+           <layout class="QGridLayout" name="gridLayout">
+            <item row="5" column="1">
+             <widget class="QLabel" name="m_qLabel_sps">
+              <property name="frameShape">
+               <enum>QFrame::StyledPanel</enum>
+              </property>
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="0">
+             <widget class="QLabel" name="m_qLabel_BufferSize">
+              <property name="text">
+               <string>Buffer [samples]:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="1">
+             <widget class="QLineEdit" name="m_qLineEdit_BufferSize">
+              <property name="text">
+               <string/>
+              </property>
+             </widget>
+            </item>
+            <item row="3" column="0" colspan="3">
+             <widget class="Line" name="line">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+             </widget>
+            </item>
+            <item row="5" column="0">
+             <widget class="QLabel" name="m_qLabel_sps_description">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="layoutDirection">
+               <enum>Qt::LeftToRight</enum>
+              </property>
+              <property name="text">
+               <string>Sampling Rate [sps]:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="0">
+             <widget class="QPushButton" name="m_qPushButtonSqdCtrl">
+              <property name="text">
+               <string>Squid Control</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </widget>
+         </item>
+         <item row="2" column="0" rowspan="2">
           <widget class="QGroupBox" name="m_qGroupBox_Information">
            <property name="minimumSize">
             <size>
@@ -195,23 +175,53 @@
             <string>Information</string>
            </property>
            <layout class="QGridLayout" name="m_qGridLayout_Information">
-            <item row="0" column="0">
+            <item row="1" column="0" rowspan="2">
              <widget class="QTextBrowser" name="m_qTextBrowser_Information"/>
             </item>
            </layout>
           </widget>
          </item>
-         <item row="3" column="1" rowspan="2" colspan="2">
-          <widget class="QGroupBox" name="m_qGroupBox_Channels">
-           <property name="title">
-            <string>Fiff Channel</string>
+         <item row="2" column="2">
+          <widget class="QPushButton" name="m_qPushButton_About">
+           <property name="text">
+            <string>About</string>
            </property>
-           <layout class="QGridLayout" name="m_qGridLayout_Channel">
-            <item row="0" column="0">
-             <widget class="QColumnView" name="m_qColumnView_Channels"/>
-            </item>
-           </layout>
           </widget>
+         </item>
+         <item row="0" column="1" rowspan="2" colspan="2">
+          <widget class="QLabel" name="m_qLabelBabyMEGImage">
+           <property name="minimumSize">
+            <size>
+             <width>434</width>
+             <height>536</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="pixmap">
+            <pixmap resource="../babymeg.qrc">:/images/babymeg.png</pixmap>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <spacer name="m_qHorizontalSpacer_About">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
          </item>
         </layout>
        </item>
@@ -244,6 +254,8 @@
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="../babymeg.qrc"/>
+ </resources>
  <connections/>
 </ui>
