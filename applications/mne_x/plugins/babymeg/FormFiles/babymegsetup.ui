@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>844</width>
-    <height>935</height>
+    <width>813</width>
+    <height>552</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -26,40 +26,14 @@
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
         <layout class="QGridLayout" name="m_qGridLayout_main">
-         <item row="0" column="1" colspan="2">
-          <widget class="QLabel" name="m_qLabelBabyMEGImage">
-           <property name="minimumSize">
-            <size>
-             <width>434</width>
-             <height>103</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>434</width>
-             <height>103</height>
-            </size>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="pixmap">
-            <pixmap resource="../babymeg.qrc">:/images/babymeg.png</pixmap>
-           </property>
-          </widget>
-         </item>
          <item row="0" column="0">
           <widget class="QGroupBox" name="m_qGroupBox_Acquisition">
            <property name="title">
             <string>Acquisition</string>
            </property>
            <layout class="QGridLayout" name="gridLayout">
-            <item row="6" column="2">
-             <widget class="QPushButton" name="m_qPushButton_FiffRecordFile">
-              <property name="text">
-               <string>...</string>
-              </property>
-             </widget>
+            <item row="2" column="1">
+             <widget class="QComboBox" name="m_qComboBox_ProjectSelection"/>
             </item>
             <item row="4" column="0" colspan="3">
              <widget class="Line" name="line_2">
@@ -68,10 +42,10 @@
               </property>
              </widget>
             </item>
-            <item row="3" column="0">
-             <widget class="QLabel" name="m_qLabel_SubjectDescription">
+            <item row="0" column="2">
+             <widget class="QCheckBox" name="m_qCheckBox_RecordData">
               <property name="text">
-               <string>Subject:</string>
+               <string>Record Data</string>
               </property>
              </widget>
             </item>
@@ -85,10 +59,17 @@
               </property>
              </widget>
             </item>
-            <item row="2" column="2">
-             <widget class="QPushButton" name="m_qPushButton_NewProject">
+            <item row="3" column="0">
+             <widget class="QLabel" name="m_qLabel_SubjectDescription">
               <property name="text">
-               <string>New Project</string>
+               <string>Subject:</string>
+              </property>
+             </widget>
+            </item>
+            <item row="6" column="2">
+             <widget class="QPushButton" name="m_qPushButton_FiffRecordFile">
+              <property name="text">
+               <string>...</string>
               </property>
              </widget>
             </item>
@@ -99,12 +80,6 @@
               </property>
              </widget>
             </item>
-            <item row="6" column="1">
-             <widget class="QLineEdit" name="m_qLineEdit_FiffRecordFile"/>
-            </item>
-            <item row="2" column="1">
-             <widget class="QComboBox" name="m_qComboBox_ProjectSelection"/>
-            </item>
             <item row="2" column="0">
              <widget class="QLabel" name="m_qLabel_ProjectDescription">
               <property name="text">
@@ -112,10 +87,13 @@
               </property>
              </widget>
             </item>
-            <item row="0" column="2">
-             <widget class="QCheckBox" name="m_qCheckBox_RecordData">
+            <item row="6" column="1">
+             <widget class="QLineEdit" name="m_qLineEdit_FiffRecordFile"/>
+            </item>
+            <item row="2" column="2">
+             <widget class="QPushButton" name="m_qPushButton_NewProject">
               <property name="text">
-               <string>Record Data</string>
+               <string>New Project</string>
               </property>
              </widget>
             </item>
@@ -185,12 +163,18 @@
            </layout>
           </widget>
          </item>
-         <item row="4" column="2">
-          <widget class="QPushButton" name="m_qPushButton_About">
-           <property name="text">
-            <string>About</string>
+         <item row="4" column="1">
+          <spacer name="m_qHorizontalSpacer_About">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
            </property>
-          </widget>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
          </item>
          <item row="1" column="1" rowspan="2" colspan="2">
           <widget class="QGroupBox" name="m_qGroupBox_Information">
@@ -210,18 +194,34 @@
            </layout>
           </widget>
          </item>
-         <item row="4" column="1">
-          <spacer name="m_qHorizontalSpacer_About">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
+         <item row="0" column="1" colspan="2">
+          <widget class="QLabel" name="m_qLabelBabyMEGImage">
+           <property name="minimumSize">
             <size>
-             <width>40</width>
-             <height>20</height>
+             <width>434</width>
+             <height>103</height>
             </size>
            </property>
-          </spacer>
+           <property name="maximumSize">
+            <size>
+             <width>434</width>
+             <height>103</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="pixmap">
+            <pixmap resource="../babymeg.qrc">:/images/babymeg.png</pixmap>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="2">
+          <widget class="QPushButton" name="m_qPushButton_About">
+           <property name="text">
+            <string>About</string>
+           </property>
+          </widget>
          </item>
         </layout>
        </item>
