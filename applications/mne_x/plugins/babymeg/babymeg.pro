@@ -79,32 +79,30 @@ DESTDIR = $${MNE_BINARY_DIR}/mne_x_plugins
 
 SOURCES += \
     babymeg.cpp \
+    babymegclient.cpp \
+    babymeginfo.cpp \
     FormFiles/babymegsetupwidget.cpp \
     FormFiles/babymegaboutwidget.cpp \
     FormFiles/babymegsquidcontroldgl.cpp \
-    babymegclient.cpp \
-    babymeginfo.cpp \
     FormFiles/globalobj.cpp \
     FormFiles/glwidget.cpp \
     FormFiles/glwidget_OnDisp.cpp \
-    FormFiles/glwidget_OnDisp.cpp \
-    plotter.cpp
-    FormFiles/babymegprojectdialog.cpp
+    FormFiles/babymegprojectdialog.cpp \
+    FormFiles/plotter.cpp
 
 HEADERS += \
     babymeg.h \
+    babymegclient.h \
+    babymeginfo.h \
     babymeg_global.h \
     FormFiles/babymegsetupwidget.h \
     FormFiles/babymegaboutwidget.h \
     FormFiles/babymegsquidcontroldgl.h \
-    babymegclient.h \
-    babymeginfo.h \
     FormFiles/globalobj.h \
     FormFiles/glwidget.h \
     FormFiles/glwidget_OnDisp.h \
-    FormFiles/glwidget_OnDisp.h \
-    plotter.h
-    FormFiles/babymegprojectdialog.h
+    FormFiles/babymegprojectdialog.h \
+    FormFiles/plotter.h \
 
 FORMS += \
     FormFiles/babymegsetup.ui \
