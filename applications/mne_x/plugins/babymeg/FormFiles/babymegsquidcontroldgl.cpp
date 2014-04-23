@@ -63,9 +63,10 @@ using namespace BabyMEGPlugin;
 //=============================================================================================================
 
 BabyMEGSQUIDControlDgl::BabyMEGSQUIDControlDgl(BabyMEG* p_pBabyMEG,QWidget *parent) :
-    QDialog(parent),
-    m_pBabyMEG(p_pBabyMEG),
-    ui(new Ui::BabyMEGSQUIDControlDgl)
+    QDialog(parent)
+  , ui(new Ui::BabyMEGSQUIDControlDgl)
+  , m_pBabyMEG(p_pBabyMEG)
+
 {
     connect(this,&BabyMEGSQUIDControlDgl::SendCMDToMEGSource,p_pBabyMEG,&BabyMEG::comFLL);
     connect(m_pBabyMEG,&BabyMEG::DataToSquidCtrlGUI,this,&BabyMEGSQUIDControlDgl::TuneGraphDispProc);
