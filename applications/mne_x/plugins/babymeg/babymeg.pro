@@ -86,7 +86,8 @@ SOURCES += \
     babymeginfo.cpp \
     FormFiles/globalobj.cpp \
     FormFiles/glwidget.cpp \
-    FormFiles/glwidget_OnDisp.cpp
+    FormFiles/glwidget_OnDisp.cpp \
+    FormFiles/babymegprojectdialog.cpp
 
 HEADERS += \
     babymeg.h \
@@ -98,12 +99,14 @@ HEADERS += \
     babymeginfo.h \
     FormFiles/globalobj.h \
     FormFiles/glwidget.h \
-    FormFiles/glwidget_OnDisp.h
+    FormFiles/glwidget_OnDisp.h \
+    FormFiles/babymegprojectdialog.h
 
 FORMS += \
     FormFiles/babymegsetup.ui \
     FormFiles/babymegabout.ui \
-    FormFiles/babymegsquidcontroldgl.ui
+    FormFiles/babymegsquidcontroldgl.ui \
+    FormFiles/babymegprojectdialog.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

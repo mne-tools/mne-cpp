@@ -76,13 +76,6 @@ BabyMEGSetupWidget::BabyMEGSetupWidget(BabyMEG* p_pBabyMEG, QWidget* parent)
 {
     ui.setupUi(this);
 
-    //Record data checkbox
-    connect(ui.m_qCheckBox_RecordData, &QCheckBox::stateChanged, this, &BabyMEGSetupWidget::checkedRecordDataChanged);
-
-    //Fiff record file
-    connect(ui.m_qPushButton_FiffRecordFile, &QPushButton::released, this, &BabyMEGSetupWidget::pressedFiffRecordFile);
-
-
     connect(m_pBabyMEG, &BabyMEG::cmdConnectionChanged, this, &BabyMEGSetupWidget::cmdConnectionChanged);
 
     //rt server fiffInfo received
@@ -110,38 +103,6 @@ BabyMEGSetupWidget::~BabyMEGSetupWidget()
 
 void BabyMEGSetupWidget::init()
 {
-    checkedRecordDataChanged();
-}
-
-
-//*************************************************************************************************************
-
-void BabyMEGSetupWidget::checkedRecordDataChanged()
-{
-    if(ui.m_qCheckBox_RecordData->checkState() == Qt::Checked)
-    {
-        ui.m_qComboBox_SubjectSelection->setEnabled(true);
-        ui.m_qPushButton_NewSubject->setEnabled(true);
-        ui.m_qLineEdit_FiffRecordFile->setEnabled(true);
-        ui.m_qPushButton_FiffRecordFile->setEnabled(true);
-    }
-    else
-    {
-        ui.m_qComboBox_SubjectSelection->setEnabled(false);
-        ui.m_qPushButton_NewSubject->setEnabled(false);
-        ui.m_qLineEdit_FiffRecordFile->setEnabled(false);
-        ui.m_qPushButton_FiffRecordFile->setEnabled(false);
-    }
-}
-
-
-//*************************************************************************************************************
-
-void BabyMEGSetupWidget::pressedFiffRecordFile()
-{
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Fiff Record File"), "", tr("Fiff Record File (*.fif)"));
-
-    ui.m_qLineEdit_FiffRecordFile->setText(fileName);
 }
 
 

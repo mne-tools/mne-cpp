@@ -154,6 +154,8 @@ public:
     */
     void init();
 
+    void showProjectDialog();
+
     virtual bool start();
     virtual bool stop();
 
