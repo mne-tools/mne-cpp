@@ -96,6 +96,9 @@ BabyMEG::~BabyMEG()
 {
     if(this->isRunning())
         stop();
+
+    if(myClient->isConnected())
+        myClient->DisConnectBabyMEG();
 }
 
 
@@ -127,13 +130,7 @@ void BabyMEG::init()
 
     myClientComm->SendCommandToBabyMEGShortConnection("INFO");
 
-
     myClient->ConnectToBabyMEG();
-
-//    myClient->ConnectToBabyMEG();
-////    myClient->DisConnectBabyMEG();
-//    m_bIsRunning = true;
-//    QThread::start();
 
     //init channels when fiff info is available
     connect(this, &BabyMEG::fiffInfoAvailable, this, &BabyMEG::initConnector);
@@ -147,19 +144,6 @@ void BabyMEG::init()
 
 void BabyMEG::initConnector()
 {
-
-
-    qDebug() << "BabyMEG::init()";
-
-//    if(m_pFiffInfo)
-//    {
-////        m_pFiffInfo->sfreq /= 100;
-//        m_pRTMSA_BabyMEG = addProviderRealTimeMultiSampleArray_New(MSR_ID::MEGBabyMEG_OUTPUT);
-//        m_pRTMSA_BabyMEG->initFromFiffInfo(m_pFiffInfo);
-//        m_pRTMSA_BabyMEG->setMultiArraySize(10);
-//    }
-
-
     if(m_pFiffInfo)
     {
         m_pRTMSABabyMEG = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "RtClient", "MNE Rt Client");
@@ -187,8 +171,6 @@ void BabyMEG::clear()
 
 void BabyMEG::setFiffData(QByteArray DATA)
 {
-//    qDebug() << "[BabyMEG] Data Size:"<<DATA.size();
-
     //get the first byte -- the data format
     int dformat = DATA.left(1).toInt();
 
@@ -202,7 +184,6 @@ void BabyMEG::setFiffData(QByteArray DATA)
 
     for(qint32 i = 0; i < rows*cols; ++i)
         IOUtils::swap_floatp(rawData.data()+i);
-
 
 
     if(m_bIsRunning)
@@ -263,6 +244,9 @@ bool BabyMEG::start()
     if(this->isRunning())
         QThread::wait();
 
+    if(!m_pRTMSABabyMEG)
+        initConnector();
+
     //Setup writing to file
     if(m_bWriteToFile)
     {
@@ -286,7 +270,9 @@ bool BabyMEG::start()
 
     // Start threads
     m_bIsRunning = true;
-    myClient->ConnectToBabyMEG();
+
+    if(!myClient->isConnected())
+        myClient->ConnectToBabyMEG();
     // Start threads
     QThread::start();
 
@@ -298,7 +284,8 @@ bool BabyMEG::start()
 
 bool BabyMEG::stop()
 {
-    myClient->DisConnectBabyMEG();
+    if(myClient->isConnected())
+        myClient->DisConnectBabyMEG();
 
     m_bIsRunning = false;
 
@@ -332,6 +319,9 @@ QString BabyMEG::getName() const
 
 QWidget* BabyMEG::setupWidget()
 {
+    if(!myClient->isConnected())
+        myClient->ConnectToBabyMEG();
+
     BabyMEGSetupWidget* widget = new BabyMEGSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
 
     //init dialog
@@ -358,10 +348,12 @@ void BabyMEG::run()
             if(m_bWriteToFile)
                 m_pOutfid->write_raw_buffer(matValue.cast<double>(), m_cals);
 
-
-//            //emit values
-//            for(qint32 i = 0; i < matValue.cols(); ++i)
-//                m_pRTMSABabyMEG->data()->setValue(matValue.col(i).cast<double>());
+            if(m_pRTMSABabyMEG)
+            {
+                //emit values
+                for(qint32 i = 0; i < matValue.cols(); ++i)
+                    m_pRTMSABabyMEG->data()->setValue(matValue.col(i).cast<double>());
+            }
         }
     }
 

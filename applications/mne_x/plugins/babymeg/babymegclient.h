@@ -77,71 +77,9 @@ public:
     * Constructs a BabyMEG.
     */
     explicit BabyMEGClient(int myPort, QObject *parent = 0);
+
     ~BabyMEGClient();
 
-public:
-    QString name;
-    int port;
-    bool SocketIsConnected;
-    bool SkipLoop;
-    bool DataAcqStartFlag;
-    QSharedPointer<BabyMEGInfo> myBabyMEGInfo;
-
-    QByteArray buffer;
-    int numBlock;
-    bool DataACK;
-
-private:
-    QTcpSocket *tcpSocket;
-    QMutex m_qMutex;
-signals:
-    void DataAcq();
-    void error(int socketError, const QString &message);
-
-public slots:
-    //=========================================================================================================
-    /**
-    * Connect to BabyMEG server
-    *
-    * @param[in] void.
-    */
-    void ConnectToBabyMEG();
-
-    //=========================================================================================================
-    /**
-    * DisConnect to BabyMEG server
-    *
-    * @param[in] void.
-    */
-    void DisConnectBabyMEG();
-
-    //=========================================================================================================
-    /**
-    * Send Command to BabyMEG server
-    *
-    * @param[in] void.
-    */
-    void SendCommandToBabyMEG();
-    void DisplayError(int socketError, const QString &message);
-
-    //=========================================================================================================
-    /**
-    * Read data from socket to a buffer
-    *
-    * @param[in] void.
-    */
-    void ReadToBuffer();
-    void run();
-
-    //=========================================================================================================
-    /**
-    * Send Command to BabyMEG command server with short sync connection
-    *
-    * @param[in] String s - the string will be sent to server.
-    */
-    void SendCommandToBabyMEGShortConnection(QByteArray s);
-
-public:
     //=========================================================================================================
     /**
     * Convert an integer (4 bytes) to a 4-byte array
@@ -216,6 +154,82 @@ public:
     * @param[in] void
     */
     void handleBuffer();
+
+    inline bool isConnected() const;
+
+signals:
+    void DataAcq();
+    void error(int socketError, const QString &message);
+
+public slots:
+    //=========================================================================================================
+    /**
+    * Connect to BabyMEG server
+    *
+    * @param[in] void.
+    */
+    void ConnectToBabyMEG();
+
+    //=========================================================================================================
+    /**
+    * DisConnect to BabyMEG server
+    *
+    * @param[in] void.
+    */
+    void DisConnectBabyMEG();
+
+    //=========================================================================================================
+    /**
+    * Send Command to BabyMEG server
+    *
+    * @param[in] void.
+    */
+    void SendCommandToBabyMEG();
+    void DisplayError(int socketError, const QString &message);
+
+    //=========================================================================================================
+    /**
+    * Read data from socket to a buffer
+    *
+    * @param[in] void.
+    */
+    void ReadToBuffer();
+    void run();
+
+    //=========================================================================================================
+    /**
+    * Send Command to BabyMEG command server with short sync connection
+    *
+    * @param[in] String s - the string will be sent to server.
+    */
+    void SendCommandToBabyMEGShortConnection(QByteArray s);
+
+public:
+    QString name;
+    int port;
+    bool SkipLoop;
+    bool DataAcqStartFlag;
+    QSharedPointer<BabyMEGInfo> myBabyMEGInfo;
+
+    QByteArray buffer;
+    int numBlock;
+    bool DataACK;
+
+private:
+    bool m_bSocketIsConnected;
+    QTcpSocket *tcpSocket;
+    QMutex m_qMutex;
+
 };
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline bool BabyMEGClient::isConnected() const
+{
+    return m_bSocketIsConnected;
+}
 
 #endif // BABYMEGCLIENT_H
