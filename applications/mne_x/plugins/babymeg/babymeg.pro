@@ -86,7 +86,8 @@ SOURCES += \
     babymeginfo.cpp \
     FormFiles/globalobj.cpp \
     FormFiles/glwidget.cpp \
-    FormFiles/glwidget_OnDisp.cpp
+    FormFiles/glwidget_OnDisp.cpp \
+    plotter.cpp
 
 HEADERS += \
     babymeg.h \
@@ -98,7 +99,8 @@ HEADERS += \
     babymeginfo.h \
     FormFiles/globalobj.h \
     FormFiles/glwidget.h \
-    FormFiles/glwidget_OnDisp.h
+    FormFiles/glwidget_OnDisp.h \
+    plotter.h
 
 FORMS += \
     FormFiles/babymegsetup.ui \
