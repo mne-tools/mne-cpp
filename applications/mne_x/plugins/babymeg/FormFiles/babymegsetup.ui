@@ -26,6 +26,48 @@
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
         <layout class="QGridLayout" name="m_qGridLayout_main">
+         <item row="1" column="2">
+          <widget class="QPushButton" name="m_qPushButton_About">
+           <property name="text">
+            <string>About</string>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="1">
+          <spacer name="m_qHorizontalSpacer_About">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item row="0" column="1" colspan="2">
+          <widget class="QLabel" name="m_qLabelBabyMEGImage">
+           <property name="minimumSize">
+            <size>
+             <width>434</width>
+             <height>103</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>434</width>
+             <height>103</height>
+            </size>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="pixmap">
+            <pixmap resource="../babymeg.qrc">:/images/babymeg.png</pixmap>
+           </property>
+          </widget>
+         </item>
          <item row="0" column="0">
           <widget class="QGroupBox" name="m_qGroupBox_Acquisition">
            <property name="title">
@@ -163,7 +205,7 @@
            </layout>
           </widget>
          </item>
-         <item row="2" column="0" rowspan="2">
+         <item row="2" column="0" colspan="3">
           <widget class="QGroupBox" name="m_qGroupBox_Information">
            <property name="minimumSize">
             <size>
@@ -180,48 +222,6 @@
             </item>
            </layout>
           </widget>
-         </item>
-         <item row="2" column="2">
-          <widget class="QPushButton" name="m_qPushButton_About">
-           <property name="text">
-            <string>About</string>
-           </property>
-          </widget>
-         </item>
-         <item row="0" column="1" rowspan="2" colspan="2">
-          <widget class="QLabel" name="m_qLabelBabyMEGImage">
-           <property name="minimumSize">
-            <size>
-             <width>434</width>
-             <height>536</height>
-            </size>
-           </property>
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="text">
-            <string/>
-           </property>
-           <property name="pixmap">
-            <pixmap resource="../babymeg.qrc">:/images/babymeg.png</pixmap>
-           </property>
-          </widget>
-         </item>
-         <item row="2" column="1">
-          <spacer name="m_qHorizontalSpacer_About">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
          </item>
         </layout>
        </item>
