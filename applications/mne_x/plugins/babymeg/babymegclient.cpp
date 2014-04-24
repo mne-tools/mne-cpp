@@ -199,7 +199,7 @@ void BabyMEGClient::ConnectToBabyMEG()
         this->start();
     }
 
-    for(int i=0;i<5;i++){
+    for(int i = 0;i < 0;i++){
         tcpSocket->connectToHost(name,port,QIODevice::ReadWrite);
         if (tcpSocket->waitForConnected(5000))
         {
@@ -216,8 +216,8 @@ void BabyMEGClient::ConnectToBabyMEG()
             return;
         }
         else{
-            qDebug("Connect to BabyMEG Server ... Fail");
-            qDebug("Try another time connection");
+            qDebug("Connection to BabyMEG server failed");
+            qDebug("Retry...");
         }
         qDebug("Please check the babyMEG server: if started");
     }
