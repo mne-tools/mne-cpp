@@ -37,7 +37,7 @@ include(../../../mne-cpp.pri)
 
 TEMPLATE = app
 
-QT += network
+QT += network concurrent
 QT -= gui
 
 CONFIG   += console
