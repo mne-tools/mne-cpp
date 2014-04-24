@@ -77,8 +77,8 @@ using namespace UTILSLIB;
 
 BabyMEG::BabyMEG()
 : m_iBufferSize(-1)
-, m_bWriteToFile(true)
-, m_sOutputFilePath(qApp->applicationDirPath()+"/mne_x_plugins/resources/babymeg/babymegtest.fif")
+, m_bWriteToFile(false)
+, m_sRecordFile(qApp->applicationDirPath()+"/mne_x_plugins/resources/babymeg/babymegtest.fif")
 , m_bIsRunning(false)
 , m_pRawMatrixBuffer(0)
 {
@@ -86,8 +86,13 @@ BabyMEG::BabyMEG()
 //    m_pActionSetupProject->setShortcut(tr("F12"));
     m_pActionSetupProject->setStatusTip(tr("Setup Project"));
     connect(m_pActionSetupProject, &QAction::triggered, this, &BabyMEG::showProjectDialog);
-
     addPluginAction(m_pActionSetupProject);
+
+    m_pActionRecordFile = new QAction(QIcon(":/images/record.png"), tr("Start Recording"),this);
+//    m_pActionSetupProject->setShortcut(tr("F12"));
+    m_pActionRecordFile->setStatusTip(tr("Start Recording"));
+    connect(m_pActionRecordFile, &QAction::triggered, this, &BabyMEG::startRecordingFile);
+    addPluginAction(m_pActionRecordFile);
 }
 
 
@@ -173,8 +178,48 @@ void BabyMEG::clear()
 
 void BabyMEG::showProjectDialog()
 {
-    BabyMEGProjectDialog projectDialog;
+    BabyMEGProjectDialog projectDialog(this);
     projectDialog.exec();
+}
+
+
+//*************************************************************************************************************
+
+void BabyMEG::startRecordingFile()
+{
+    //Setup writing to file
+    if(m_bWriteToFile)
+    {
+        m_pOutfid->finish_writing_raw();
+        m_bWriteToFile = false;
+    }
+
+    if(!m_pFiffInfo)
+    {
+        QMessageBox msgBox;
+        msgBox.setText("FiffInfo missing!");
+        msgBox.exec();
+        return;
+    }
+
+    //Initiate the stream for writing to the fif file
+    m_qFileOut.setFileName(m_sRecordFile);
+    if(m_qFileOut.exists())
+    {
+        QMessageBox msgBox;
+        msgBox.setText("The file you want to write already exists.");
+        msgBox.setInformativeText("Do you want to overwrite this file?");
+        msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+        int ret = msgBox.exec();
+        if(ret == QMessageBox::No)
+            return;
+    }
+
+    m_pOutfid = Fiff::start_writing_raw(m_qFileOut, *m_pFiffInfo, m_cals);
+    fiff_int_t first = 0;
+    m_pOutfid->write_int(FIFF_FIRST_SAMPLE, &first);
+
+    m_bWriteToFile = true;
 }
 
 
@@ -257,27 +302,6 @@ bool BabyMEG::start()
 
     if(!m_pRTMSABabyMEG)
         initConnector();
-
-    //Setup writing to file
-    if(m_bWriteToFile)
-    {
-        //Initiate the stream for writing to the fif file
-        m_fileOut.setFileName(m_sOutputFilePath);
-        if(m_fileOut.exists())
-        {
-            QMessageBox msgBox;
-            msgBox.setText("The file you want to write already exists.");
-            msgBox.setInformativeText("Do you want to overwrite this file?");
-            msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-            int ret = msgBox.exec();
-            if(ret == QMessageBox::No)
-                return false;
-        }
-
-        m_pOutfid = Fiff::start_writing_raw(m_fileOut, *m_pFiffInfo, m_cals);
-        fiff_int_t first = 0;
-        m_pOutfid->write_int(FIFF_FIRST_SAMPLE, &first);
-    }
 
     // Start threads
     m_bIsRunning = true;
@@ -370,5 +394,8 @@ void BabyMEG::run()
 
     //Close the fif output stream
     if(m_bWriteToFile)
+    {
         m_pOutfid->finish_writing_raw();
+        m_bWriteToFile = false;
+    }
 }

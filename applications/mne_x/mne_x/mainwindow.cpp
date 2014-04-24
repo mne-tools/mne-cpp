@@ -411,7 +411,7 @@ void MainWindow::createToolBars()
     }
     if(m_qListDynamicPluginActions.size() > 0)
     {
-        m_pDynamicPluginToolBar = addToolBar(tr("Plugin Control"));
+        m_pDynamicPluginToolBar = addToolBar(m_sCurPluginName + tr("Control"));
         for(qint32 i = 0; i < m_qListDynamicPluginActions.size(); ++i)
             m_pDynamicPluginToolBar->addAction(m_qListDynamicPluginActions[i]);
     }
@@ -492,6 +492,8 @@ void MainWindow::updatePluginWidget(IPlugin::SPtr pPlugin)
 
     // Add Dynamic Plugin Actions
     m_qListDynamicPluginActions.append(pPlugin->getPluginActions());
+
+    m_sCurPluginName = pPlugin->getName();
 
     //Garbage collecting
     if(m_pRunWidget)

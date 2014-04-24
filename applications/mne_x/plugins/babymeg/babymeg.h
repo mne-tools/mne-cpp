@@ -104,6 +104,7 @@ using namespace XMEASLIB;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+class BabyMEGProjectDialog;
 
 
 //=============================================================================================================
@@ -120,6 +121,7 @@ class BABYMEGSHARED_EXPORT BabyMEG : public ISensor
     Q_INTERFACES(MNEX::ISensor)
 
     friend class BabyMEGSetupWidget;
+    friend class BabyMEGProjectDialog;
     friend class BabyMEGSQUIDControlDgl;
 
 public:
@@ -155,6 +157,8 @@ public:
     void init();
 
     void showProjectDialog();
+
+    void startRecordingFile();
 
     virtual bool start();
     virtual bool stop();
@@ -218,8 +222,8 @@ private:
     qint32 m_iBufferSize;                                   /**< The raw data buffer size.*/
 
     bool                                m_bWriteToFile;     /**< Flag for for writing the received samples to a file. Defined by the user via the GUI.*/
-    QString                             m_sOutputFilePath;  /**< Holds the path for the sample output file. Defined by the user via the GUI.*/
-    QFile                               m_fileOut;          /**< QFile for writing to fif file.*/
+    QString                             m_sRecordFile;      /**< Holds the path for the sample output file. Defined by the user via the GUI.*/
+    QFile                               m_qFileOut;         /**< QFile for writing to fif file.*/
     FiffStream::SPtr                    m_pOutfid;          /**< FiffStream to write to.*/
 
     MatrixXd                            m_cals;
@@ -229,8 +233,8 @@ private:
 
     QSharedPointer<RawMatrixBuffer> m_pRawMatrixBuffer;  /**< Holds incoming raw data. */
 
-    QAction*                        m_pActionSetupProject;     /**< shows setup project dialog */
-
+    QAction*                        m_pActionSetupProject;      /**< shows setup project dialog */
+    QAction*                        m_pActionRecordFile;        /**< start recording action */
 };
 
 } // NAMESPACE

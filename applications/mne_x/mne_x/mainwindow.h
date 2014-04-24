@@ -242,6 +242,7 @@ private:
     QToolBar*                           m_pToolBar;                 /**< Holds the tool bar.*/
     QToolBar*                           m_pDynamicPluginToolBar;    /**< Holds the plugin tool bar.*/
     QToolBar*                           m_pDynamicDisplayToolBar;   /**< Holds the display tool bar.*/
+    QString                             m_sCurPluginName;           /**< The name which corresponds to the current selected plugin */
 
     QLabel*                             m_pLabelTime;      /**< Holds the display label for the running time.*/
     QSharedPointer<QTimer>              m_pTimer;           /**< timer of the main application*/
