@@ -117,10 +117,19 @@ public:
     */
     inline qint32 numClust() const;
 
+    //=========================================================================================================
+    /**
+    * Writes the cluster info to a file
+    *
+    * @param[in] p_sFileName    FileName to write to
+    */
+    void write(QString p_sFileName) const;
+
 public:
-    QList<VectorXi> clusterVertnos;    /**< Vertnos which belong to corresponding cluster. */
-    QList<VectorXd> clusterDistances;  /**< Distances to clusters centroid. */
-    QList<int> clusterLabelIds;        /**< Id (Label/ROI id) of the cluster. Entries can be non unique, since some Label/ROI consist of more than one cluster.*/
+    QList<VectorXi> clusterVertnos;     /**< Vertnos which belong to corresponding cluster. */
+    QList<MatrixX3f> clusterSource_rr;  /**< Cluster source locations */
+    QList<VectorXd> clusterDistances;   /**< Distances to clusters centroid. */
+    QList<int> clusterLabelIds;         /**< Id (Label/ROI id) of the cluster. Entries can be non unique, since some Label/ROI consist of more than one cluster.*/
 };
 
 //*************************************************************************************************************

@@ -313,3 +313,5 @@ bin/mne_browse_raw_qt.app/Contents/PkgInfo
 /bin/*.stc
 /examples/rawClusteredInversePwlRapMusic/*.user
 /bin/mne_x_plugins/resources/babymeg/*.fif
+/bin/ClusterInfoLH.txt
+/bin/ClusterInfoRH.txt
