@@ -203,6 +203,11 @@ protected:
     virtual void run();
 
 private:
+    void changeRecordingButton();
+
+    QSharedPointer<QTimer> m_pTimerRecordingChange;
+    qint16 m_iBlinkStatus;
+
     //=========================================================================================================
     /**
     * Initialises the output connector.
