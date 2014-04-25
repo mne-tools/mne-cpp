@@ -76,7 +76,8 @@ using namespace UTILSLIB;
 //=============================================================================================================
 
 BabyMEG::BabyMEG()
-: m_iBufferSize(-1)
+: m_iBlinkStatus(0)
+, m_iBufferSize(-1)
 , m_bWriteToFile(false)
 , m_sRecordFile(qApp->applicationDirPath()+"/mne_x_plugins/resources/babymeg/babymegtest.fif")
 , m_bIsRunning(false)
@@ -192,34 +193,42 @@ void BabyMEG::startRecordingFile()
     {
         m_pOutfid->finish_writing_raw();
         m_bWriteToFile = false;
+        m_pTimerRecordingChange->stop();
+        m_pActionRecordFile->setIcon(QIcon(":/images/record.png"));
     }
-
-    if(!m_pFiffInfo)
+    else
     {
-        QMessageBox msgBox;
-        msgBox.setText("FiffInfo missing!");
-        msgBox.exec();
-        return;
-    }
-
-    //Initiate the stream for writing to the fif file
-    m_qFileOut.setFileName(m_sRecordFile);
-    if(m_qFileOut.exists())
-    {
-        QMessageBox msgBox;
-        msgBox.setText("The file you want to write already exists.");
-        msgBox.setInformativeText("Do you want to overwrite this file?");
-        msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-        int ret = msgBox.exec();
-        if(ret == QMessageBox::No)
+        if(!m_pFiffInfo)
+        {
+            QMessageBox msgBox;
+            msgBox.setText("FiffInfo missing!");
+            msgBox.exec();
             return;
+        }
+
+        //Initiate the stream for writing to the fif file
+        m_qFileOut.setFileName(m_sRecordFile);
+        if(m_qFileOut.exists())
+        {
+            QMessageBox msgBox;
+            msgBox.setText("The file you want to write already exists.");
+            msgBox.setInformativeText("Do you want to overwrite this file?");
+            msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+            int ret = msgBox.exec();
+            if(ret == QMessageBox::No)
+                return;
+        }
+
+        m_pOutfid = Fiff::start_writing_raw(m_qFileOut, *m_pFiffInfo, m_cals);
+        fiff_int_t first = 0;
+        m_pOutfid->write_int(FIFF_FIRST_SAMPLE, &first);
+
+        m_bWriteToFile = true;
+
+        m_pTimerRecordingChange = QSharedPointer<QTimer>(new QTimer);
+        connect(m_pTimerRecordingChange.data(), &QTimer::timeout, this, &BabyMEG::changeRecordingButton);
+        m_pTimerRecordingChange->start(500);
     }
-
-    m_pOutfid = Fiff::start_writing_raw(m_qFileOut, *m_pFiffInfo, m_cals);
-    fiff_int_t first = 0;
-    m_pOutfid->write_int(FIFF_FIRST_SAMPLE, &first);
-
-    m_bWriteToFile = true;
 }
 
 
@@ -397,5 +406,22 @@ void BabyMEG::run()
     {
         m_pOutfid->finish_writing_raw();
         m_bWriteToFile = false;
+    }
+}
+
+
+//*************************************************************************************************************
+
+void BabyMEG::changeRecordingButton()
+{
+    if(m_iBlinkStatus == 0)
+    {
+        m_pActionRecordFile->setIcon(QIcon(":/images/record.png"));
+        m_iBlinkStatus = 1;
+    }
+    else
+    {
+        m_pActionRecordFile->setIcon(QIcon(":/images/babymeg.png"));
+        m_iBlinkStatus = 0;
     }
 }
