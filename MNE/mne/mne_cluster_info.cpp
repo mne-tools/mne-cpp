@@ -43,6 +43,15 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
+
+#include <QFile>
+#include <QTextStream>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
@@ -64,6 +73,37 @@ MNEClusterInfo::MNEClusterInfo()
 void MNEClusterInfo::clear()
 {
     clusterVertnos.clear();
+    clusterSource_rr.clear();
     clusterDistances.clear();
     clusterLabelIds.clear();
+}
+
+
+//*************************************************************************************************************
+
+void MNEClusterInfo::write(QString p_sFileName) const
+{
+    QFile file("./"+p_sFileName);
+    file.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream out(&file);
+    out << "MNE Cluster Info\n";
+
+    for(qint32 i = 0; i < clusterLabelIds.size(); ++i)
+    {
+        out << "\nLabel : " << clusterLabelIds[i] << "\n";
+        out << "Vertnos :\n";
+        for(qint32 j = 0; j < clusterVertnos[i].size(); ++j)
+            out << clusterVertnos[i][j] << ", ";
+        out << "\nDistances :\n";
+        for(qint32 j = 0; j < clusterDistances[i].size(); ++j)
+            out << clusterDistances[i][j] << ", ";
+        out << "\nrr :\n";
+        for(qint32 j = 0; j < clusterSource_rr[i].rows(); ++j)
+            out << clusterSource_rr[i](j,0) << ", " << clusterSource_rr[i](j,1) << ", " << clusterSource_rr[i](j,2) << "\n";
+
+        out << "\n";
+    }
+
+    // optional, as QFile destructor will already do it:
+    file.close();
 }

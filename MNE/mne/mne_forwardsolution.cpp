@@ -605,18 +605,24 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution_ccr(AnnotationSe
             {
                 VectorXi clusterIdcs = VectorXi::Zero(itOut->roiIdx.rows());
                 VectorXd clusterDistance = VectorXd::Zero(itOut->roiIdx.rows());
+                MatrixX3f clusterSource_rr = MatrixX3f::Zero(itOut->roiIdx.rows(), 3);
                 qint32 nClusterIdcs = 0;
                 for(qint32 k = 0; k < itOut->roiIdx.rows(); ++k)
                 {
                     if(itOut->roiIdx[k] == j)
                     {
                         clusterIdcs[nClusterIdcs] = itIn->idcs[k];
+
+                        qint32 offset = h == 0 ? 0 : this->src[0].nuse;
+                        clusterSource_rr.row(nClusterIdcs) = this->source_rr.row(offset + itIn->idcs[k]);
                         clusterDistance[nClusterIdcs] = itOut->D(k,j);
                         ++nClusterIdcs;
                     }
                 }
                 clusterIdcs.conservativeResize(nClusterIdcs);
+                clusterSource_rr.conservativeResize(nClusterIdcs,3);
                 p_fwdOut.src[h].cluster_info.clusterVertnos.append(clusterIdcs);
+                p_fwdOut.src[h].cluster_info.clusterSource_rr.append(clusterSource_rr);
                 p_fwdOut.src[h].cluster_info.clusterDistances.append(clusterDistance);
                 p_fwdOut.src[h].cluster_info.clusterLabelIds.append(label_ids[itOut->iLabelIdxOut]);
             }
