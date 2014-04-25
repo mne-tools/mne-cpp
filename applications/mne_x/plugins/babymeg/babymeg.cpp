@@ -421,7 +421,7 @@ void BabyMEG::changeRecordingButton()
     }
     else
     {
-        m_pActionRecordFile->setIcon(QIcon(":/images/babymeg.png"));
+        m_pActionRecordFile->setIcon(QIcon(":/images/record_active.png"));
         m_iBlinkStatus = 0;
     }
 }
