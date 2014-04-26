@@ -228,9 +228,9 @@ public:
     *
     * @return clustered MNE forward solution
     */
-    MNEForwardSolution cluster_forward_solution(AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize);
-
     MNEForwardSolution cluster_forward_solution_ccr(AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize);
+
+//    MNEForwardSolution cluster_forward_solution(AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize);
 
     //=========================================================================================================
     /**

@@ -72,10 +72,12 @@ MNEClusterInfo::MNEClusterInfo()
 
 void MNEClusterInfo::clear()
 {
+    clusterLabelIds.clear();
+    centroidVertno.clear();
+    centroidSource_rr.clear();
     clusterVertnos.clear();
     clusterSource_rr.clear();
     clusterDistances.clear();
-    clusterLabelIds.clear();
 }
 
 
@@ -91,6 +93,8 @@ void MNEClusterInfo::write(QString p_sFileName) const
     for(qint32 i = 0; i < clusterLabelIds.size(); ++i)
     {
         out << "\nLabel : " << clusterLabelIds[i] << "\n";
+        out << "Centroid Vertno : " << centroidVertno[i] << "\n";
+        out << "Centroid rr : " << centroidSource_rr[i](0) << ", " << clusterSource_rr[i](1) << ", " << clusterSource_rr[i](2) << "\n";
         out << "Vertnos :\n";
         for(qint32 j = 0; j < clusterVertnos[i].size(); ++j)
             out << clusterVertnos[i][j] << ", ";

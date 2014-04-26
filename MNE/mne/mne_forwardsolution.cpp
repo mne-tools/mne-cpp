@@ -166,276 +166,276 @@ void MNEForwardSolution::clear()
 
 //*************************************************************************************************************
 
-MNEForwardSolution MNEForwardSolution::cluster_forward_solution(AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize)
-{
-    MNEForwardSolution p_fwdOut = MNEForwardSolution(*this);
+//MNEForwardSolution MNEForwardSolution::cluster_forward_solution(AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize)
+//{
+//    MNEForwardSolution p_fwdOut = MNEForwardSolution(*this);
 
-    //
-    // Check consisty
-    //
-//    for(qint32 h = 0; h < this->src.hemispheres.size(); ++h )//obj.sizeForwardSolution)
+//    //
+//    // Check consisty
+//    //
+////    for(qint32 h = 0; h < this->src.hemispheres.size(); ++h )//obj.sizeForwardSolution)
+////    {
+////        if(this->src[h]->vertno.rows() !=  t_listAnnotation[h]->getLabel()->rows())
+////        {
+////            printf("Error: Annotation doesn't fit to Forward Solution: Vertice number is different!");
+////            return false;
+////        }
+////    }
+
+
+////    //DEBUG
+////    MatrixXd test(20,3);
+////    test << 0.537667139546100, 1.83388501459509, -2.25884686100365,
+////            0.862173320368121, 0.318765239858981, -1.30768829630527,
+////            -0.433592022305684, 0.342624466538650, 3.57839693972576,
+////            2.76943702988488, -1.34988694015652, 3.03492346633185,
+////            0.725404224946106, -0.0630548731896562, 0.714742903826096,
+////            -0.204966058299775, -0.124144348216312, 1.48969760778547,
+////            1.40903448980048, 1.41719241342961, 0.671497133608081,
+////            -1.20748692268504, 0.717238651328839, 1.63023528916473,
+////            0.488893770311789, 1.03469300991786, 0.726885133383238,
+////            -0.303440924786016, 0.293871467096658, -0.787282803758638,
+////            0.888395631757642, -1.14707010696915, -1.06887045816803,
+////            -0.809498694424876, -2.94428416199490, 1.43838029281510,
+////            0.325190539456198, -0.754928319169703, 1.37029854009523,
+////            -1.71151641885370, -0.102242446085491, -0.241447041607358,
+////            0.319206739165502, 0.312858596637428, -0.864879917324457,
+////            -0.0300512961962686, -0.164879019209038, 0.627707287528727,
+////            1.09326566903948, 1.10927329761440, -0.863652821988714,
+////            0.0773590911304249, -1.21411704361541, -1.11350074148676,
+////            -0.00684932810334806, 1.53263030828475, -0.769665913753682,
+////            0.371378812760058, -0.225584402271252, 1.11735613881447;
+
+////    std::cout << test << std::endl;
+
+////    VectorXi idx;
+////    MatrixXd ctrs;
+////    VectorXd sumd;
+////    MatrixXd D;
+
+////    KMeans testK(QString("cityblock"), QString("sample"), 5);//QString("sqeuclidean")//QString("sample")
+
+////    testK.calculate(test, 2, idx, ctrs, sumd, D);
+
+////    std::cout << "idx" << std::endl << idx << std::endl;
+////    std::cout << "ctrs" << std::endl << ctrs << std::endl;
+////    std::cout << "sumd" << std::endl << sumd << std::endl;
+////    std::cout << "D" << std::endl << D << std::endl;
+////    //DEBUG END
+
+
+//    KMeans t_kMeans(QString("cityblock"), QString("sample"), 5);//QString("sqeuclidean")//QString("sample")//cityblock
+//    MatrixXd t_LF_new;
+
+//    qint32 count;
+//    qint32 offset;
+
+//    for(qint32 h = 0; h < this->src.size(); ++h )//obj.sizeForwardSolution)
 //    {
-//        if(this->src[h]->vertno.rows() !=  t_listAnnotation[h]->getLabel()->rows())
+//        count = 0;
+//        offset = 0;
+
+//        // Offset for continuous indexing;
+//        if(h > 0)
+//            for(qint32 j = 0; j < h; ++j)
+//                offset += this->src[j].nuse;
+
+//        if(h == 0)
+//            printf("Cluster Left Hemisphere\n");
+//        else
+//            printf("Cluster Right Hemisphere\n");
+
+//        Colortable t_CurrentColorTable = p_AnnotationSet[h].getColortable();
+//        VectorXi label_ids = t_CurrentColorTable.getLabelIds();
+
+//        // Get label ids for every vertex
+//        VectorXi vertno_labeled = VectorXi::Zero(this->src[h].vertno.rows());
+
+//        //ToDo make this more universal -> using Label instead of annotations - obsolete when using Labels
+//        for(qint32 i = 0; i < vertno_labeled.rows(); ++i)
+//            vertno_labeled[i] = p_AnnotationSet[h].getLabelIds()[this->src[h].vertno[i]];
+
+//        //iterate over labels
+//        MatrixXd t_LF_partial;
+//        //ToDo OpenMP
+//        for (qint32 i = 0; i < label_ids.rows(); ++i)
 //        {
-//            printf("Error: Annotation doesn't fit to Forward Solution: Vertice number is different!");
-//            return false;
+
+//            if (label_ids[i] != 0)
+//            {
+//                QString curr_name = t_CurrentColorTable.struct_names[i];//obj.label2AtlasName(label(i));
+//                printf("\tCluster %d / %li %s...", i+1, label_ids.rows(), curr_name.toUtf8().constData());
+
+//                //
+//                // Get source space indeces
+//                //
+//                VectorXi idcs = VectorXi::Zero(vertno_labeled.rows());
+//                qint32 c = 0;
+
+//                //Select ROIs //change this use label info with a hash tabel
+//                for(qint32 j = 0; j < vertno_labeled.rows(); ++j)
+//                {
+//                    if(vertno_labeled[j] == label_ids[i])
+//                    {
+//                        idcs[c] = j;
+//                        ++c;
+//                    }
+//                }
+//                idcs.conservativeResize(c);
+
+//                //get selected LF
+//                MatrixXd t_LF(this->sol->data.rows(), idcs.rows()*3);
+
+//                for(qint32 j = 0; j < idcs.rows(); ++j)
+//                    t_LF.block(0, j*3, t_LF.rows(), 3) = this->sol->data.block(0, (idcs[j]+offset)*3, t_LF.rows(), 3);
+
+//                qint32 nSens = t_LF.rows();
+//                qint32 nSources = t_LF.cols()/3;
+//                qint32 nClusters = 0;
+
+//                if (nSources > 0)
+//                {
+//                    nClusters = ceil((double)nSources/(double)p_iClusterSize);
+
+//                    printf("%d Cluster(s)... ", nClusters);
+
+//                    t_LF_partial = MatrixXd::Zero(nSens,nClusters*3);
+
+//                    // Reshape Input data -> sources rows; sensors columns
+//                    MatrixXd t_sensLF(t_LF.cols()/3, 3*nSens);
+//                    for(qint32 j = 0; j < nSens; ++j)
+//                    {
+//                        for(qint32 k = 0; k < t_sensLF.rows(); ++k)
+//                            t_sensLF.block(k,j*3,1,3) = t_LF.block(j,k*3,1,3);
+//                    }
+
+//                    // Kmeans Reduction
+//                    VectorXi roiIdx;
+//                    MatrixXd ctrs;
+//                    VectorXd sumd;
+//                    MatrixXd D;
+
+//                    t_kMeans.calculate(t_sensLF, nClusters, roiIdx, ctrs, sumd, D);
+
+//                    //
+//                    // Assign the centroid for each cluster to the partial LF
+//                    //
+//                    for(qint32 j = 0; j < nSens; ++j)
+//                        for(qint32 k = 0; k < nClusters; ++k)
+//                            t_LF_partial.block(j, k*3, 1, 3) = ctrs.block(k,j*3,1,3);
+
+//                    //
+//                    // Get cluster indizes and its distances to the centroid
+//                    //
+//                    for(qint32 j = 0; j < nClusters; ++j)
+//                    {
+//                        VectorXi clusterIdcs = VectorXi::Zero(roiIdx.rows());
+//                        VectorXd clusterDistance = VectorXd::Zero(roiIdx.rows());
+//                        qint32 nClusterIdcs = 0;
+//                        for(qint32 k = 0; k < roiIdx.rows(); ++k)
+//                        {
+//                            if(roiIdx[k] == j)
+//                            {
+//                                clusterIdcs[nClusterIdcs] = idcs[k];
+//                                clusterDistance[nClusterIdcs] = D(k,j);
+//                                ++nClusterIdcs;
+//                            }
+//                        }
+//                        clusterIdcs.conservativeResize(nClusterIdcs);
+//                        p_fwdOut.src[h].cluster_info.clusterVertnos.append(clusterIdcs);
+//                        p_fwdOut.src[h].cluster_info.clusterDistances.append(clusterDistance);
+//                        p_fwdOut.src[h].cluster_info.clusterLabelIds.append(label_ids[i]);
+//                    }
+
+//                    //
+//                    // Assign partial LF to new LeadField
+//                    //
+//                    if(t_LF_partial.rows() > 0 && t_LF_partial.cols() > 0)
+//                    {
+//                        t_LF_new.conservativeResize(t_LF_partial.rows(), t_LF_new.cols() + t_LF_partial.cols());
+//                        t_LF_new.block(0, t_LF_new.cols() - t_LF_partial.cols(), t_LF_new.rows(), t_LF_partial.cols()) = t_LF_partial;
+
+//                        // Map the centroids to the closest rr
+//                        for(qint32 k = 0; k < nClusters; ++k)
+//                        {
+//                            qint32 j = 0;
+
+//                            double sqec = sqrt((t_LF.block(0, j*3, t_LF.rows(), 3) - t_LF_partial.block(0, k*3, t_LF_partial.rows(), 3)).array().pow(2).sum());
+//                            double sqec_min = sqec;
+//                            qint32 j_min = j;
+//                            for(qint32 j = 1; j < idcs.rows(); ++j)
+//                            {
+//                                sqec = sqrt((t_LF.block(0, j*3, t_LF.rows(), 3) - t_LF_partial.block(0, k*3, t_LF_partial.rows(), 3)).array().pow(2).sum());
+//                                if(sqec < sqec_min)
+//                                {
+//                                    sqec_min = sqec;
+//                                    j_min = j;
+//                                }
+//                            }
+
+//                            // Take the closest coordinates
+//                            qint32 sel_idx = idcs[j_min];
+//                            //ToDo store this in cluster info
+////                            p_fwdOut.src[h].rr.row(count) = this->src[h].rr.row(sel_idx);
+////                            p_fwdOut.src[h].nn.row(count) = MatrixXd::Zero(1,3);
+
+//                            p_fwdOut.src[h].vertno[count] = this->src[h].vertno[sel_idx];
+
+//                            ++count;
+//                        }
+//                    }
+//                    printf("[done]\n");
+//                }
+//                else
+//                {
+//                    printf("failed! Label contains no sources.\n");
+//                }
+//            }
 //        }
+
+//        //
+//        // Assemble new hemisphere information
+//        //
+////ToDo store this in cluster info
+////        p_fwdOut.src[h].rr.conservativeResize(count, 3);
+////        p_fwdOut.src[h].nn.conservativeResize(count, 3);
+//        p_fwdOut.src[h].vertno.conservativeResize(count);
+
+////        std::cout << "Vertno hemisphere:" << h << std::endl << p_fwdOut.src[h].vertno << std::endl;
+
+
+////        p_fwdOut.src[h].nuse_tri = 0;
+////        p_fwdOut.src[h].use_tris = MatrixX3i(0,3);
+
+
+////        if(p_fwdOut.src[h].rr.rows() > 0 && p_fwdOut.src[h].rr.cols() > 0)
+////        {
+////            if(h == 0)
+////            {
+////                p_fwdOut.source_rr = MatrixX3d(0,3);
+////                p_fwdOut.source_nn = MatrixX3d(0,3);
+////            }
+
+////            p_fwdOut.source_rr.conservativeResize(p_fwdOut.source_rr.rows() + p_fwdOut.src[h].rr.rows(),3);
+////            p_fwdOut.source_rr.block(p_fwdOut.source_rr.rows() -  p_fwdOut.src[h].rr.rows(), 0,  p_fwdOut.src[h].rr.rows(), 3) = p_fwdOut.src[h].rr;
+
+////            p_fwdOut.source_nn.conservativeResize(p_fwdOut.source_nn.rows() + p_fwdOut.src[h].nn.rows(),3);
+////            p_fwdOut.source_nn.block(p_fwdOut.source_nn.rows() -  p_fwdOut.src[h].nn.rows(), 0,  p_fwdOut.src[h].nn.rows(), 3) = p_fwdOut.src[h].nn;
+////        }
+
+//        printf("[done]\n");
 //    }
 
+//    //
+//    // Put it all together
+//    //
+//    p_fwdOut.sol->data = t_LF_new;
+//    p_fwdOut.sol->ncol = t_LF_new.cols();
 
-//    //DEBUG
-//    MatrixXd test(20,3);
-//    test << 0.537667139546100, 1.83388501459509, -2.25884686100365,
-//            0.862173320368121, 0.318765239858981, -1.30768829630527,
-//            -0.433592022305684, 0.342624466538650, 3.57839693972576,
-//            2.76943702988488, -1.34988694015652, 3.03492346633185,
-//            0.725404224946106, -0.0630548731896562, 0.714742903826096,
-//            -0.204966058299775, -0.124144348216312, 1.48969760778547,
-//            1.40903448980048, 1.41719241342961, 0.671497133608081,
-//            -1.20748692268504, 0.717238651328839, 1.63023528916473,
-//            0.488893770311789, 1.03469300991786, 0.726885133383238,
-//            -0.303440924786016, 0.293871467096658, -0.787282803758638,
-//            0.888395631757642, -1.14707010696915, -1.06887045816803,
-//            -0.809498694424876, -2.94428416199490, 1.43838029281510,
-//            0.325190539456198, -0.754928319169703, 1.37029854009523,
-//            -1.71151641885370, -0.102242446085491, -0.241447041607358,
-//            0.319206739165502, 0.312858596637428, -0.864879917324457,
-//            -0.0300512961962686, -0.164879019209038, 0.627707287528727,
-//            1.09326566903948, 1.10927329761440, -0.863652821988714,
-//            0.0773590911304249, -1.21411704361541, -1.11350074148676,
-//            -0.00684932810334806, 1.53263030828475, -0.769665913753682,
-//            0.371378812760058, -0.225584402271252, 1.11735613881447;
+//    p_fwdOut.nsource = p_fwdOut.sol->ncol/3;
 
-//    std::cout << test << std::endl;
-
-//    VectorXi idx;
-//    MatrixXd ctrs;
-//    VectorXd sumd;
-//    MatrixXd D;
-
-//    KMeans testK(QString("cityblock"), QString("sample"), 5);//QString("sqeuclidean")//QString("sample")
-
-//    testK.calculate(test, 2, idx, ctrs, sumd, D);
-
-//    std::cout << "idx" << std::endl << idx << std::endl;
-//    std::cout << "ctrs" << std::endl << ctrs << std::endl;
-//    std::cout << "sumd" << std::endl << sumd << std::endl;
-//    std::cout << "D" << std::endl << D << std::endl;
-//    //DEBUG END
-
-
-    KMeans t_kMeans(QString("cityblock"), QString("sample"), 5);//QString("sqeuclidean")//QString("sample")//cityblock
-    MatrixXd t_LF_new;
-
-    qint32 count;
-    qint32 offset;
-
-    for(qint32 h = 0; h < this->src.size(); ++h )//obj.sizeForwardSolution)
-    {
-        count = 0;
-        offset = 0;
-
-        // Offset for continuous indexing;
-        if(h > 0)
-            for(qint32 j = 0; j < h; ++j)
-                offset += this->src[j].nuse;
-
-        if(h == 0)
-            printf("Cluster Left Hemisphere\n");
-        else
-            printf("Cluster Right Hemisphere\n");
-
-        Colortable t_CurrentColorTable = p_AnnotationSet[h].getColortable();
-        VectorXi label_ids = t_CurrentColorTable.getLabelIds();
-
-        // Get label ids for every vertex
-        VectorXi vertno_labeled = VectorXi::Zero(this->src[h].vertno.rows());
-
-        //ToDo make this more universal -> using Label instead of annotations - obsolete when using Labels
-        for(qint32 i = 0; i < vertno_labeled.rows(); ++i)
-            vertno_labeled[i] = p_AnnotationSet[h].getLabelIds()[this->src[h].vertno[i]];
-
-        //iterate over labels
-        MatrixXd t_LF_partial;
-        //ToDo OpenMP
-        for (qint32 i = 0; i < label_ids.rows(); ++i)
-        {
-
-            if (label_ids[i] != 0)
-            {
-                QString curr_name = t_CurrentColorTable.struct_names[i];//obj.label2AtlasName(label(i));
-                printf("\tCluster %d / %li %s...", i+1, label_ids.rows(), curr_name.toUtf8().constData());
-
-                //
-                // Get source space indeces
-                //
-                VectorXi idcs = VectorXi::Zero(vertno_labeled.rows());
-                qint32 c = 0;
-
-                //Select ROIs //change this use label info with a hash tabel
-                for(qint32 j = 0; j < vertno_labeled.rows(); ++j)
-                {
-                    if(vertno_labeled[j] == label_ids[i])
-                    {
-                        idcs[c] = j;
-                        ++c;
-                    }
-                }
-                idcs.conservativeResize(c);
-
-                //get selected LF
-                MatrixXd t_LF(this->sol->data.rows(), idcs.rows()*3);
-
-                for(qint32 j = 0; j < idcs.rows(); ++j)
-                    t_LF.block(0, j*3, t_LF.rows(), 3) = this->sol->data.block(0, (idcs[j]+offset)*3, t_LF.rows(), 3);
-
-                qint32 nSens = t_LF.rows();
-                qint32 nSources = t_LF.cols()/3;
-                qint32 nClusters = 0;
-
-                if (nSources > 0)
-                {
-                    nClusters = ceil((double)nSources/(double)p_iClusterSize);
-
-                    printf("%d Cluster(s)... ", nClusters);
-
-                    t_LF_partial = MatrixXd::Zero(nSens,nClusters*3);
-
-                    // Reshape Input data -> sources rows; sensors columns
-                    MatrixXd t_sensLF(t_LF.cols()/3, 3*nSens);
-                    for(qint32 j = 0; j < nSens; ++j)
-                    {
-                        for(qint32 k = 0; k < t_sensLF.rows(); ++k)
-                            t_sensLF.block(k,j*3,1,3) = t_LF.block(j,k*3,1,3);
-                    }
-
-                    // Kmeans Reduction
-                    VectorXi roiIdx;
-                    MatrixXd ctrs;
-                    VectorXd sumd;
-                    MatrixXd D;
-
-                    t_kMeans.calculate(t_sensLF, nClusters, roiIdx, ctrs, sumd, D);
-
-                    //
-                    // Assign the centroid for each cluster to the partial LF
-                    //
-                    for(qint32 j = 0; j < nSens; ++j)
-                        for(qint32 k = 0; k < nClusters; ++k)
-                            t_LF_partial.block(j, k*3, 1, 3) = ctrs.block(k,j*3,1,3);
-
-                    //
-                    // Get cluster indizes and its distances to the centroid
-                    //
-                    for(qint32 j = 0; j < nClusters; ++j)
-                    {
-                        VectorXi clusterIdcs = VectorXi::Zero(roiIdx.rows());
-                        VectorXd clusterDistance = VectorXd::Zero(roiIdx.rows());
-                        qint32 nClusterIdcs = 0;
-                        for(qint32 k = 0; k < roiIdx.rows(); ++k)
-                        {
-                            if(roiIdx[k] == j)
-                            {
-                                clusterIdcs[nClusterIdcs] = idcs[k];
-                                clusterDistance[nClusterIdcs] = D(k,j);
-                                ++nClusterIdcs;
-                            }
-                        }
-                        clusterIdcs.conservativeResize(nClusterIdcs);
-                        p_fwdOut.src[h].cluster_info.clusterVertnos.append(clusterIdcs);
-                        p_fwdOut.src[h].cluster_info.clusterDistances.append(clusterDistance);
-                        p_fwdOut.src[h].cluster_info.clusterLabelIds.append(label_ids[i]);
-                    }
-
-                    //
-                    // Assign partial LF to new LeadField
-                    //
-                    if(t_LF_partial.rows() > 0 && t_LF_partial.cols() > 0)
-                    {
-                        t_LF_new.conservativeResize(t_LF_partial.rows(), t_LF_new.cols() + t_LF_partial.cols());
-                        t_LF_new.block(0, t_LF_new.cols() - t_LF_partial.cols(), t_LF_new.rows(), t_LF_partial.cols()) = t_LF_partial;
-
-                        // Map the centroids to the closest rr
-                        for(qint32 k = 0; k < nClusters; ++k)
-                        {
-                            qint32 j = 0;
-
-                            double sqec = sqrt((t_LF.block(0, j*3, t_LF.rows(), 3) - t_LF_partial.block(0, k*3, t_LF_partial.rows(), 3)).array().pow(2).sum());
-                            double sqec_min = sqec;
-                            qint32 j_min = j;
-                            for(qint32 j = 1; j < idcs.rows(); ++j)
-                            {
-                                sqec = sqrt((t_LF.block(0, j*3, t_LF.rows(), 3) - t_LF_partial.block(0, k*3, t_LF_partial.rows(), 3)).array().pow(2).sum());
-                                if(sqec < sqec_min)
-                                {
-                                    sqec_min = sqec;
-                                    j_min = j;
-                                }
-                            }
-
-                            // Take the closest coordinates
-                            qint32 sel_idx = idcs[j_min];
-                            //ToDo store this in cluster info
-//                            p_fwdOut.src[h].rr.row(count) = this->src[h].rr.row(sel_idx);
-//                            p_fwdOut.src[h].nn.row(count) = MatrixXd::Zero(1,3);
-
-                            p_fwdOut.src[h].vertno[count] = this->src[h].vertno[sel_idx];
-
-                            ++count;
-                        }
-                    }
-                    printf("[done]\n");
-                }
-                else
-                {
-                    printf("failed! Label contains no sources.\n");
-                }
-            }
-        }
-
-        //
-        // Assemble new hemisphere information
-        //
-//ToDo store this in cluster info
-//        p_fwdOut.src[h].rr.conservativeResize(count, 3);
-//        p_fwdOut.src[h].nn.conservativeResize(count, 3);
-        p_fwdOut.src[h].vertno.conservativeResize(count);
-
-//        std::cout << "Vertno hemisphere:" << h << std::endl << p_fwdOut.src[h].vertno << std::endl;
-
-
-//        p_fwdOut.src[h].nuse_tri = 0;
-//        p_fwdOut.src[h].use_tris = MatrixX3i(0,3);
-
-
-//        if(p_fwdOut.src[h].rr.rows() > 0 && p_fwdOut.src[h].rr.cols() > 0)
-//        {
-//            if(h == 0)
-//            {
-//                p_fwdOut.source_rr = MatrixX3d(0,3);
-//                p_fwdOut.source_nn = MatrixX3d(0,3);
-//            }
-
-//            p_fwdOut.source_rr.conservativeResize(p_fwdOut.source_rr.rows() + p_fwdOut.src[h].rr.rows(),3);
-//            p_fwdOut.source_rr.block(p_fwdOut.source_rr.rows() -  p_fwdOut.src[h].rr.rows(), 0,  p_fwdOut.src[h].rr.rows(), 3) = p_fwdOut.src[h].rr;
-
-//            p_fwdOut.source_nn.conservativeResize(p_fwdOut.source_nn.rows() + p_fwdOut.src[h].nn.rows(),3);
-//            p_fwdOut.source_nn.block(p_fwdOut.source_nn.rows() -  p_fwdOut.src[h].nn.rows(), 0,  p_fwdOut.src[h].nn.rows(), 3) = p_fwdOut.src[h].nn;
-//        }
-
-        printf("[done]\n");
-    }
-
-    //
-    // Put it all together
-    //
-    p_fwdOut.sol->data = t_LF_new;
-    p_fwdOut.sol->ncol = t_LF_new.cols();
-
-    p_fwdOut.nsource = p_fwdOut.sol->ncol/3;
-
-    return p_fwdOut;
-}
+//    return p_fwdOut;
+//}
 
 
 //*************************************************************************************************************
@@ -621,7 +621,13 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution_ccr(AnnotationSe
                 }
                 clusterIdcs.conservativeResize(nClusterIdcs);
                 clusterSource_rr.conservativeResize(nClusterIdcs,3);
-                p_fwdOut.src[h].cluster_info.clusterVertnos.append(clusterIdcs);
+                clusterDistance.conservativeResize(nClusterIdcs);
+
+                VectorXi clusterVertnos = VectorXi::Zero(clusterIdcs.size());
+                for(qint32 k = 0; k < clusterVertnos.size(); ++k)
+                    clusterVertnos(k) = this->src[h].vertno[clusterIdcs(k)];
+
+                p_fwdOut.src[h].cluster_info.clusterVertnos.append(clusterVertnos);
                 p_fwdOut.src[h].cluster_info.clusterSource_rr.append(clusterSource_rr);
                 p_fwdOut.src[h].cluster_info.clusterDistances.append(clusterDistance);
                 p_fwdOut.src[h].cluster_info.clusterLabelIds.append(label_ids[itOut->iLabelIdxOut]);
@@ -661,8 +667,9 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution_ccr(AnnotationSe
 
                     // Take the closest coordinates
                     qint32 sel_idx = itIn->idcs[j_min];
-                    //ToDo store this in cluster info
-//                    p_fwdOut.src[h].rr.row(count) = this->src[h].rr.row(sel_idx);
+
+                    p_fwdOut.src[h].cluster_info.centroidVertno.append(this->src[h].vertno[sel_idx]);
+                    p_fwdOut.src[h].cluster_info.centroidSource_rr.append(this->src[h].rr.row(sel_idx));
 //                    p_fwdOut.src[h].nn.row(count) = MatrixXd::Zero(1,3);
 
                     p_fwdOut.src[h].vertno[count] = this->src[h].vertno[sel_idx];
