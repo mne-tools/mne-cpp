@@ -225,7 +225,7 @@ void MNEForwardSolution::clear()
 
 
 //    KMeans t_kMeans(QString("cityblock"), QString("sample"), 5);//QString("sqeuclidean")//QString("sample")//cityblock
-//    MatrixXd t_LF_new;
+//    MatrixXd t_G_new;
 
 //    qint32 count;
 //    qint32 offset;
@@ -256,7 +256,7 @@ void MNEForwardSolution::clear()
 //            vertno_labeled[i] = p_AnnotationSet[h].getLabelIds()[this->src[h].vertno[i]];
 
 //        //iterate over labels
-//        MatrixXd t_LF_partial;
+//        MatrixXd t_G_partial;
 //        //ToDo OpenMP
 //        for (qint32 i = 0; i < label_ids.rows(); ++i)
 //        {
@@ -283,14 +283,14 @@ void MNEForwardSolution::clear()
 //                }
 //                idcs.conservativeResize(c);
 
-//                //get selected LF
-//                MatrixXd t_LF(this->sol->data.rows(), idcs.rows()*3);
+//                //get selected G
+//                MatrixXd t_G(this->sol->data.rows(), idcs.rows()*3);
 
 //                for(qint32 j = 0; j < idcs.rows(); ++j)
-//                    t_LF.block(0, j*3, t_LF.rows(), 3) = this->sol->data.block(0, (idcs[j]+offset)*3, t_LF.rows(), 3);
+//                    t_G.block(0, j*3, t_G.rows(), 3) = this->sol->data.block(0, (idcs[j]+offset)*3, t_G.rows(), 3);
 
-//                qint32 nSens = t_LF.rows();
-//                qint32 nSources = t_LF.cols()/3;
+//                qint32 nSens = t_G.rows();
+//                qint32 nSources = t_G.cols()/3;
 //                qint32 nClusters = 0;
 
 //                if (nSources > 0)
@@ -299,14 +299,14 @@ void MNEForwardSolution::clear()
 
 //                    printf("%d Cluster(s)... ", nClusters);
 
-//                    t_LF_partial = MatrixXd::Zero(nSens,nClusters*3);
+//                    t_G_partial = MatrixXd::Zero(nSens,nClusters*3);
 
 //                    // Reshape Input data -> sources rows; sensors columns
-//                    MatrixXd t_sensLF(t_LF.cols()/3, 3*nSens);
+//                    MatrixXd t_sensG(t_G.cols()/3, 3*nSens);
 //                    for(qint32 j = 0; j < nSens; ++j)
 //                    {
-//                        for(qint32 k = 0; k < t_sensLF.rows(); ++k)
-//                            t_sensLF.block(k,j*3,1,3) = t_LF.block(j,k*3,1,3);
+//                        for(qint32 k = 0; k < t_sensG.rows(); ++k)
+//                            t_sensG.block(k,j*3,1,3) = t_G.block(j,k*3,1,3);
 //                    }
 
 //                    // Kmeans Reduction
@@ -315,14 +315,14 @@ void MNEForwardSolution::clear()
 //                    VectorXd sumd;
 //                    MatrixXd D;
 
-//                    t_kMeans.calculate(t_sensLF, nClusters, roiIdx, ctrs, sumd, D);
+//                    t_kMeans.calculate(t_sensG, nClusters, roiIdx, ctrs, sumd, D);
 
 //                    //
-//                    // Assign the centroid for each cluster to the partial LF
+//                    // Assign the centroid for each cluster to the partial G
 //                    //
 //                    for(qint32 j = 0; j < nSens; ++j)
 //                        for(qint32 k = 0; k < nClusters; ++k)
-//                            t_LF_partial.block(j, k*3, 1, 3) = ctrs.block(k,j*3,1,3);
+//                            t_G_partial.block(j, k*3, 1, 3) = ctrs.block(k,j*3,1,3);
 
 //                    //
 //                    // Get cluster indizes and its distances to the centroid
@@ -348,24 +348,24 @@ void MNEForwardSolution::clear()
 //                    }
 
 //                    //
-//                    // Assign partial LF to new LeadField
+//                    // Assign partial G to new LeadField
 //                    //
-//                    if(t_LF_partial.rows() > 0 && t_LF_partial.cols() > 0)
+//                    if(t_G_partial.rows() > 0 && t_G_partial.cols() > 0)
 //                    {
-//                        t_LF_new.conservativeResize(t_LF_partial.rows(), t_LF_new.cols() + t_LF_partial.cols());
-//                        t_LF_new.block(0, t_LF_new.cols() - t_LF_partial.cols(), t_LF_new.rows(), t_LF_partial.cols()) = t_LF_partial;
+//                        t_G_new.conservativeResize(t_G_partial.rows(), t_G_new.cols() + t_G_partial.cols());
+//                        t_G_new.block(0, t_G_new.cols() - t_G_partial.cols(), t_G_new.rows(), t_G_partial.cols()) = t_G_partial;
 
 //                        // Map the centroids to the closest rr
 //                        for(qint32 k = 0; k < nClusters; ++k)
 //                        {
 //                            qint32 j = 0;
 
-//                            double sqec = sqrt((t_LF.block(0, j*3, t_LF.rows(), 3) - t_LF_partial.block(0, k*3, t_LF_partial.rows(), 3)).array().pow(2).sum());
+//                            double sqec = sqrt((t_G.block(0, j*3, t_G.rows(), 3) - t_G_partial.block(0, k*3, t_G_partial.rows(), 3)).array().pow(2).sum());
 //                            double sqec_min = sqec;
 //                            qint32 j_min = j;
 //                            for(qint32 j = 1; j < idcs.rows(); ++j)
 //                            {
-//                                sqec = sqrt((t_LF.block(0, j*3, t_LF.rows(), 3) - t_LF_partial.block(0, k*3, t_LF_partial.rows(), 3)).array().pow(2).sum());
+//                                sqec = sqrt((t_G.block(0, j*3, t_G.rows(), 3) - t_G_partial.block(0, k*3, t_G_partial.rows(), 3)).array().pow(2).sum());
 //                                if(sqec < sqec_min)
 //                                {
 //                                    sqec_min = sqec;
@@ -429,8 +429,8 @@ void MNEForwardSolution::clear()
 //    //
 //    // Put it all together
 //    //
-//    p_fwdOut.sol->data = t_LF_new;
-//    p_fwdOut.sol->ncol = t_LF_new.cols();
+//    p_fwdOut.sol->data = t_G_new;
+//    p_fwdOut.sol->ncol = t_G_new.cols();
 
 //    p_fwdOut.nsource = p_fwdOut.sol->ncol/3;
 
@@ -461,8 +461,27 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution_ccr(AnnotationSe
 
 
 //    KMeans t_kMeans(QString("cityblock"), QString("sample"), 5);//QString("sqeuclidean")//QString("sample")//cityblock
-    MatrixXd t_LF_new;
+    MatrixXd t_G_new;
 
+    //
+    //Whiten gain matrix before clustering -> cause diffenerent units Magnetometer, Gradiometer and EEG
+    //
+    MatrixXd t_G_whitened;
+    qint32 numSources = this->sol->data.cols();
+
+    MatrixXd t_Cov_G = this->sol->data * this->sol->data.adjoint();
+    VectorXd mu = this->sol->data.rowwise().sum();
+    mu /= numSources;
+//    t_Cov_G.array() -= numSources * (mu * mu.transpose()).array();
+//    t_Cov_G.array() /= (numSources - 1);
+
+//    VectorXd eig;
+//    MatrixXd eigvec;
+//    MNEMath::get_whitener(t_Cov_G, false, QString("Gain Matrix"), eig, eigvec);
+
+    //
+    // Sort cluster groups
+    //
     qint32 count;
     qint32 offset;
 
@@ -521,14 +540,14 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution_ccr(AnnotationSe
                 }
                 idcs.conservativeResize(c);
 
-                //get selected LF
-                MatrixXd t_LF(this->sol->data.rows(), idcs.rows()*3);
+                //get selected G
+                MatrixXd t_G(this->sol->data.rows(), idcs.rows()*3);
 
                 for(qint32 j = 0; j < idcs.rows(); ++j)
-                    t_LF.block(0, j*3, t_LF.rows(), 3) = this->sol->data.block(0, (idcs[j]+offset)*3, t_LF.rows(), 3);
+                    t_G.block(0, j*3, t_G.rows(), 3) = this->sol->data.block(0, (idcs[j]+offset)*3, t_G.rows(), 3);
 
-                qint32 nSens = t_LF.rows();
-                qint32 nSources = t_LF.cols()/3;
+                qint32 nSens = t_G.rows();
+                qint32 nSources = t_G.cols()/3;
 
                 if (nSources > 0)
                 {
@@ -538,17 +557,17 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution_ccr(AnnotationSe
                     t_sensG.iLabelIdxIn = i;
                     t_sensG.nClusters = ceil((double)nSources/(double)p_iClusterSize);
 
-                    t_sensG.matRoiGOrig = t_LF;
+                    t_sensG.matRoiGOrig = t_G;
 
                     printf("%d Cluster(s)... ", t_sensG.nClusters);
 
                     // Reshape Input data -> sources rows; sensors columns
-                    t_sensG.matRoiG = MatrixXd(t_LF.cols()/3, 3*nSens);
+                    t_sensG.matRoiG = MatrixXd(t_G.cols()/3, 3*nSens);
 
                     for(qint32 j = 0; j < nSens; ++j)
                     {
                         for(qint32 k = 0; k < t_sensG.matRoiG.rows(); ++k)
-                            t_sensG.matRoiG.block(k,j*3,1,3) = t_LF.block(j,k*3,1,3);
+                            t_sensG.matRoiG.block(k,j*3,1,3) = t_G.block(j,k*3,1,3);
                     }
 
                     m_qListRegionDataIn.append(t_sensG);
@@ -575,7 +594,7 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution_ccr(AnnotationSe
         //
         // Assign results
         //
-        MatrixXd t_LF_partial;
+        MatrixXd t_G_partial;
 
         qint32 nClusters;
         qint32 nSens;
@@ -587,16 +606,17 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution_ccr(AnnotationSe
         {
             nClusters = itOut->ctrs.rows();
             nSens = itOut->ctrs.cols()/3;
-            t_LF_partial = MatrixXd::Zero(nSens, nClusters*3);
+            t_G_partial = MatrixXd::Zero(nSens, nClusters*3);
 
 //            std::cout << "Number of Clusters: " << nClusters << " x " << nSens << std::endl;//itOut->iLabelIdcsOut << std::endl;
 
             //
-            // Assign the centroid for each cluster to the partial LF
+            // Assign the centroid for each cluster to the partial G
             //
+            //ToDo change this use indeces found with whitened data
             for(qint32 j = 0; j < nSens; ++j)
                 for(qint32 k = 0; k < nClusters; ++k)
-                    t_LF_partial.block(j, k*3, 1, 3) = itOut->ctrs.block(k,j*3,1,3);
+                    t_G_partial.block(j, k*3, 1, 3) = itOut->ctrs.block(k,j*3,1,3);
 
             //
             // Get cluster indizes and its distances to the centroid
@@ -635,31 +655,31 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution_ccr(AnnotationSe
 
 
             //
-            // Assign partial LF to new LeadField
+            // Assign partial G to new LeadField
             //
-            if(t_LF_partial.rows() > 0 && t_LF_partial.cols() > 0)
+            if(t_G_partial.rows() > 0 && t_G_partial.cols() > 0)
             {
-                t_LF_new.conservativeResize(t_LF_partial.rows(), t_LF_new.cols() + t_LF_partial.cols());
-                t_LF_new.block(0, t_LF_new.cols() - t_LF_partial.cols(), t_LF_new.rows(), t_LF_partial.cols()) = t_LF_partial;
+                t_G_new.conservativeResize(t_G_partial.rows(), t_G_new.cols() + t_G_partial.cols());
+                t_G_new.block(0, t_G_new.cols() - t_G_partial.cols(), t_G_new.rows(), t_G_partial.cols()) = t_G_partial;
 
                 // Map the centroids to the closest rr
                 for(qint32 k = 0; k < nClusters; ++k)
                 {
                     qint32 j = 0;
 
-                    double sqec = sqrt((itIn->matRoiGOrig.block(0, j*3, itIn->matRoiGOrig.rows(), 3) - t_LF_partial.block(0, k*3, t_LF_partial.rows(), 3)).array().pow(2).sum());
+                    double sqec = sqrt((itIn->matRoiGOrig.block(0, j*3, itIn->matRoiGOrig.rows(), 3) - t_G_partial.block(0, k*3, t_G_partial.rows(), 3)).array().pow(2).sum());
                     double sqec_min = sqec;
                     qint32 j_min = 0;
 //                    MatrixXd matGainDiff;
                     for(qint32 j = 1; j < itIn->idcs.rows(); ++j)
                     {
-                        sqec = sqrt((itIn->matRoiGOrig.block(0, j*3, itIn->matRoiGOrig.rows(), 3) - t_LF_partial.block(0, k*3, t_LF_partial.rows(), 3)).array().pow(2).sum());
+                        sqec = sqrt((itIn->matRoiGOrig.block(0, j*3, itIn->matRoiGOrig.rows(), 3) - t_G_partial.block(0, k*3, t_G_partial.rows(), 3)).array().pow(2).sum());
 
                         if(sqec < sqec_min)
                         {
                             sqec_min = sqec;
                             j_min = j;
-//                            matGainDiff = itIn->matRoiGOrig.block(0, j*3, itIn->matRoiGOrig.rows(), 3) - t_LF_partial.block(0, k*3, t_LF_partial.rows(), 3);
+//                            matGainDiff = itIn->matRoiGOrig.block(0, j*3, itIn->matRoiGOrig.rows(), 3) - t_G_partial.block(0, k*3, t_G_partial.rows(), 3);
                         }
                     }
 
@@ -872,8 +892,8 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution_ccr(AnnotationSe
     //
     // Put it all together
     //
-    p_fwdOut.sol->data = t_LF_new;
-    p_fwdOut.sol->ncol = t_LF_new.cols();
+    p_fwdOut.sol->data = t_G_new;
+    p_fwdOut.sol->ncol = t_G_new.cols();
 
     p_fwdOut.nsource = p_fwdOut.sol->ncol/3;
 
