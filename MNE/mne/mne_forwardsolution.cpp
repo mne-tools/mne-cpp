@@ -475,9 +475,9 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution_ccr(AnnotationSe
     t_Cov_G.array() -= numSources * (mu * mu.transpose()).array();
     t_Cov_G.array() /= (numSources - 1);
 
-//    VectorXd eig;
-//    MatrixXd eigvec;
-//    MNEMath::get_whitener(t_Cov_G, false, QString("Gain Matrix"), eig, eigvec);
+    VectorXd eig;
+    MatrixXd eigvec;
+    MNEMath::get_whitener(t_Cov_G, false, QString("Gain Matrix"), eig, eigvec);
 
     //
     // Sort cluster groups
