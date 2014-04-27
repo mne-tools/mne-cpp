@@ -472,8 +472,8 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution_ccr(AnnotationSe
     MatrixXd t_Cov_G = this->sol->data * this->sol->data.adjoint();
     VectorXd mu = this->sol->data.rowwise().sum();
     mu /= numSources;
-//    t_Cov_G.array() -= numSources * (mu * mu.transpose()).array();
-//    t_Cov_G.array() /= (numSources - 1);
+    t_Cov_G.array() -= numSources * (mu * mu.transpose()).array();
+    t_Cov_G.array() /= (numSources - 1);
 
 //    VectorXd eig;
 //    MatrixXd eigvec;
@@ -651,6 +651,7 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution_ccr(AnnotationSe
                 p_fwdOut.src[h].cluster_info.clusterSource_rr.append(clusterSource_rr);
                 p_fwdOut.src[h].cluster_info.clusterDistances.append(clusterDistance);
                 p_fwdOut.src[h].cluster_info.clusterLabelIds.append(label_ids[itOut->iLabelIdxOut]);
+                p_fwdOut.src[h].cluster_info.clusterLabelNames.append(t_CurrentColorTable.getNames()[itOut->iLabelIdxOut]);
             }
 
 
