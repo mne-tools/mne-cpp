@@ -466,18 +466,25 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution_ccr(AnnotationSe
     //
     //Whiten gain matrix before clustering -> cause diffenerent units Magnetometer, Gradiometer and EEG
     //
-    MatrixXd t_G_whitened;
-    qint32 numSources = this->sol->data.cols();
 
-    MatrixXd t_Cov_G = this->sol->data * this->sol->data.adjoint();
-    VectorXd mu = this->sol->data.rowwise().sum();
-    mu /= numSources;
-    t_Cov_G.array() -= numSources * (mu * mu.transpose()).array();
-    t_Cov_G.array() /= (numSources - 1);
 
-    VectorXd eig;
-    MatrixXd eigvec;
-    MNEMath::get_whitener(t_Cov_G, false, QString("Gain Matrix"), eig, eigvec);
+    //do whitening with noise cov
+    //forward.prepare_forward();
+
+//    MatrixXd t_G_whitened;
+//    qint32 numSources = this->sol->data.cols();
+
+//    MatrixXd t_Cov_G = this->sol->data * this->sol->data.adjoint();
+//    VectorXd mu = this->sol->data.rowwise().sum();
+//    mu /= numSources;
+//    t_Cov_G.array() -= numSources * (mu * mu.transpose()).array();
+//    t_Cov_G.array() /= (numSources - 1);
+
+//    VectorXd eig;
+//    MatrixXd eigvec;
+//    MNEMath::get_whitener(t_Cov_G, false, QString("Gain Matrix"), eig, eigvec);
+
+
 
     //
     // Sort cluster groups
