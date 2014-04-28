@@ -145,6 +145,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Returns the vertix indeces
+    *
+    * @return vertix indeces
+    */
+    inline const VectorXi getVertices() const;
+
+    //=========================================================================================================
+    /**
     * Returns the vertix labels
     *
     * @return vertix labels
@@ -153,11 +161,27 @@ public:
 
     //=========================================================================================================
     /**
+    * Returns the vertix labels
+    *
+    * @return vertix labels
+    */
+    inline const VectorXi getLabelIds() const;
+
+    //=========================================================================================================
+    /**
     * Returns the coloratable containing the label based nomenclature
     *
     * @return colortable
     */
     inline Colortable& getColortable();
+
+    //=========================================================================================================
+    /**
+    * Returns the coloratable containing the label based nomenclature
+    *
+    * @return colortable
+    */
+    inline const Colortable getColortable() const;
 
     //=========================================================================================================
     /**
@@ -215,7 +239,23 @@ inline VectorXi& Annotation::getVertices()
 
 //*************************************************************************************************************
 
+inline const VectorXi Annotation::getVertices() const
+{
+    return m_Vertices;
+}
+
+
+//*************************************************************************************************************
+
 inline VectorXi& Annotation::getLabelIds()
+{
+    return m_LabelIds;
+}
+
+
+//*************************************************************************************************************
+
+inline const VectorXi Annotation::getLabelIds() const
 {
     return m_LabelIds;
 }
@@ -228,6 +268,13 @@ inline Colortable& Annotation::getColortable()
     return m_Colortable;
 }
 
+
+//*************************************************************************************************************
+
+inline const Colortable Annotation::getColortable() const
+{
+    return m_Colortable;
+}
 
 } // NAMESPACE
 

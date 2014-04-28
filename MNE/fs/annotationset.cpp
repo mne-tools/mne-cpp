@@ -157,7 +157,39 @@ Annotation& AnnotationSet::operator[] (qint32 idx)
 
 //*************************************************************************************************************
 
+const Annotation AnnotationSet::operator[] (qint32 idx) const
+{
+    if(idx == 0)
+        return m_qMapAnnots[idx];
+    else if(idx == 1)
+        return m_qMapAnnots[idx];
+    else
+    {
+        qWarning("Warning: Index is not '0' or '1'! Returning '0'.");
+        return m_qMapAnnots[0];
+    }
+}
+
+
+//*************************************************************************************************************
+
 Annotation& AnnotationSet::operator[] (QString idt)
+{
+    if(idt.compare("lh") == 0)
+        return m_qMapAnnots[0];
+    else if(idt.compare("rh") == 0)
+        return m_qMapAnnots[1];
+    else
+    {
+        qWarning("Warning: Identifier is not 'lh' or 'rh'! Returning 'lh'.");
+        return m_qMapAnnots[0];
+    }
+}
+
+
+//*************************************************************************************************************
+
+const Annotation AnnotationSet::operator[] (QString idt) const
 {
     if(idt.compare("lh") == 0)
         return m_qMapAnnots[0];
