@@ -132,8 +132,13 @@ struct RegionDataOut
 */
 struct RegionData
 {
-    MatrixXd    matRoiG;        /**< Region gain matrix sources x sensors(x,y,z)*/
-    MatrixXd    matRoiGOrig;    /**< Region gain matrix sensors x sources(x,y,z)*/
+    MatrixXd    matRoiG;            /**< Reshaped region gain matrix sources x sensors(x,y,z)*/
+    MatrixXd    matRoiGWhitened;    /**< Reshaped whitened region gain matrix sources x sensors(x,y,z)*/
+    bool        bUseWhitened;       /**< Wheather indeces of whitened gain matrix should be used to calculate centroids */
+
+    MatrixXd    matRoiGOrig;            /**< Region gain matrix sensors x sources(x,y,z)*/
+    MatrixXd    matRoiGOrigWhitened;    /**< Whitened region gain matrix sensors x sources(x,y,z)*/
+
     qint32      nClusters;      /**< Number of clusters within this region */
 
     VectorXi    idcs;           /**< Get source space indeces */
@@ -155,8 +160,8 @@ struct RegionData
 };
 
 
-const static FiffCov::SPtr defaultCov;
-const static FiffInfo::SPtr defaultInfo;
+const static FiffCov defaultCov;
+const static FiffInfo defaultInfo;
 
 
 //=============================================================================================================
@@ -221,7 +226,7 @@ public:
     *
     * @return clustered MNE forward solution
     */
-    MNEForwardSolution cluster_forward_solution_ccr(const AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize, const FiffCov::SPtr p_pNoise_cov = defaultCov, const FiffInfo::SPtr p_pInfo = defaultInfo) const;
+    MNEForwardSolution cluster_forward_solution_ccr(const AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize, const FiffCov &p_pNoise_cov = defaultCov, const FiffInfo &p_pInfo = defaultInfo) const;
 
 //    MNEForwardSolution cluster_forward_solution(AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize);
 

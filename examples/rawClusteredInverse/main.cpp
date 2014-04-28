@@ -466,7 +466,7 @@ int main(int argc, char *argv[])
     //
     // Cluster forward solution;
     //
-    MNEForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution_ccr(t_annotationSet, 20);//40);
+    MNEForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution_ccr(t_annotationSet, 20, noise_cov, evoked.info);//40);
 
     t_clusteredFwd.src[0].cluster_info.write("ClusterInfoLH.txt");
     t_clusteredFwd.src[1].cluster_info.write("ClusterInfoRH.txt");
