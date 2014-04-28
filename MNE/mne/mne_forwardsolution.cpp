@@ -530,6 +530,9 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution_ccr(const Annota
         //Qt Concurrent List
         QList<RegionData> m_qListRegionDataIn;
 
+        //
+        // Generate cluster input data
+        //
         for (qint32 i = 0; i < label_ids.rows(); ++i)
         {
             if (label_ids[i] != 0)
@@ -608,6 +611,7 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution_ccr(const Annota
                 }
             }
         }
+
 
         //
         // Calculate clusters

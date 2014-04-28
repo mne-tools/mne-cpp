@@ -315,3 +315,5 @@ bin/mne_browse_raw_qt.app/Contents/PkgInfo
 /bin/mne_x_plugins/resources/babymeg/*.fif
 /bin/ClusterInfoLH.txt
 /bin/ClusterInfoRH.txt
+/bin/centroids_ClusterInfoLH.txt
+/bin/centroids_ClusterInfoRH.txt

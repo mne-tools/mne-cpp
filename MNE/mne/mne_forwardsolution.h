@@ -150,7 +150,32 @@ struct RegionData
         RegionDataOut p_RegionDataOut;
 
         KMeans t_kMeans(QString("cityblock"), QString("sample"), 5);
-        t_kMeans.calculate(this->matRoiG, this->nClusters, p_RegionDataOut.roiIdx, p_RegionDataOut.ctrs, p_RegionDataOut.sumd, p_RegionDataOut.D);
+
+        if(bUseWhitened)
+        {
+            t_kMeans.calculate(this->matRoiGWhitened, this->nClusters, p_RegionDataOut.roiIdx, p_RegionDataOut.ctrs, p_RegionDataOut.sumd, p_RegionDataOut.D);
+
+            MatrixXd newCtrs = MatrixXd::Zero(p_RegionDataOut.ctrs.rows(), p_RegionDataOut.ctrs.cols());
+            for(qint32 c = 0; c < p_RegionDataOut.ctrs.rows(); ++c)
+            {
+                qint32 num = 0;
+
+                for(qint32 idx = 0; idx < p_RegionDataOut.roiIdx.size(); ++idx)
+                {
+                    if(c == p_RegionDataOut.roiIdx[idx])
+                    {
+                        newCtrs.row(c) += this->matRoiG.row(idx); //just take whitened to get indeces calculate centroids using the original matrix
+                        ++num;
+                    }
+                }
+
+                if(num > 0)
+                    newCtrs.row(c) /= num;
+            }
+            p_RegionDataOut.ctrs = newCtrs; //Replace whitened with original
+        }
+        else
+            t_kMeans.calculate(this->matRoiG, this->nClusters, p_RegionDataOut.roiIdx, p_RegionDataOut.ctrs, p_RegionDataOut.sumd, p_RegionDataOut.D);
 
         p_RegionDataOut.iLabelIdxOut = this->iLabelIdxIn;
 
