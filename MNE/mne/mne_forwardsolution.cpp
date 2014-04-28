@@ -440,7 +440,7 @@ void MNEForwardSolution::clear()
 
 //*************************************************************************************************************
 
-MNEForwardSolution MNEForwardSolution::cluster_forward_solution_ccr(AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize)
+MNEForwardSolution MNEForwardSolution::cluster_forward_solution_ccr(const AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize, const FiffCov::SPtr p_pNoise_cov, const FiffInfo::SPtr p_pInfo) const
 {
     MNEForwardSolution p_fwdOut = MNEForwardSolution(*this);
 
@@ -466,10 +466,19 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution_ccr(AnnotationSe
     //
     //Whiten gain matrix before clustering -> cause diffenerent units Magnetometer, Gradiometer and EEG
     //
-
-
-    //do whitening with noise cov
-    //forward.prepare_forward();
+    if(p_pNoise_cov && p_pInfo)
+    {
+        FiffInfo p_outFwdInfo;
+        FiffCov p_outNoiseCov;
+        MatrixXd p_outWhitener;
+        qint32 p_outNumNonZero;
+        //do whitening with noise cov
+        this->prepare_forward(*p_pInfo, *p_pNoise_cov, false, p_outFwdInfo, t_G_new, p_outNoiseCov, p_outWhitener, p_outNumNonZero);
+        printf("\tWhitening the forward solution.\n");
+        t_G_new = p_outWhitener*t_G_new;
+    }
+    else
+        t_G_new = this->sol->data;
 
 //    MatrixXd t_G_whitened;
 //    qint32 numSources = this->sol->data.cols();
@@ -521,7 +530,7 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution_ccr(AnnotationSe
             vertno_labeled[i] = p_AnnotationSet[h].getLabelIds()[this->src[h].vertno[i]];
 
         //Qt Concurrent List
-        QList<RegionDataIn> m_qListRegionDataIn;
+        QList<RegionData> m_qListRegionDataIn;
 
         for (qint32 i = 0; i < label_ids.rows(); ++i)
         {
@@ -558,7 +567,7 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution_ccr(AnnotationSe
 
                 if (nSources > 0)
                 {
-                    RegionDataIn t_sensG;
+                    RegionData t_sensG;
 
                     t_sensG.idcs = idcs;
                     t_sensG.iLabelIdxIn = i;
@@ -593,7 +602,7 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution_ccr(AnnotationSe
         //
         printf("Clustering... ");
         QFuture< RegionDataOut > res;
-        res = QtConcurrent::mapped(m_qListRegionDataIn, &RegionDataIn::cluster);
+        res = QtConcurrent::mapped(m_qListRegionDataIn, &RegionData::cluster);
         res.waitForFinished();
         printf("[done]\n");
 
@@ -606,7 +615,7 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution_ccr(AnnotationSe
         qint32 nClusters;
         qint32 nSens;
         QFuture<RegionDataOut>::const_iterator itOut;
-        QList<RegionDataIn>::const_iterator itIn;
+        QList<RegionData>::const_iterator itIn;
         itIn = m_qListRegionDataIn.begin();
 
         for (itOut = res.constBegin(); itOut != res.constEnd(); ++itOut)

@@ -130,7 +130,7 @@ struct RegionDataOut
 /**
 * Gain matrix input data for one region, used for clustering
 */
-struct RegionDataIn
+struct RegionData
 {
     MatrixXd    matRoiG;        /**< Region gain matrix sources x sensors(x,y,z)*/
     MatrixXd    matRoiGOrig;    /**< Region gain matrix sensors x sources(x,y,z)*/
@@ -154,16 +154,9 @@ struct RegionDataIn
 
 };
 
-//RegionDataOut MNEForwardSolution::roiClustering(RegionDataIn p_RegionDataIn)
-//{
-//        // Kmeans Reduction
-//        RegionDataOut p_RegionDataOut;
 
-//        KMeans t_kMeans(QString("cityblock"), QString("sample"), 5);
-//        t_kMeans.calculate(p_RegionDataIn.matRoiG, p_RegionDataIn.nClusters, p_RegionDataOut.roiIdx, p_RegionDataOut.ctrs, p_RegionDataOut.sumd, p_RegionDataOut.D);
-
-//        return p_RegionDataOut;
-//}
+const static FiffCov::SPtr defaultCov;
+const static FiffInfo::SPtr defaultInfo;
 
 
 //=============================================================================================================
@@ -228,7 +221,7 @@ public:
     *
     * @return clustered MNE forward solution
     */
-    MNEForwardSolution cluster_forward_solution_ccr(AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize);
+    MNEForwardSolution cluster_forward_solution_ccr(const AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize, const FiffCov::SPtr p_pNoise_cov = defaultCov, const FiffInfo::SPtr p_pInfo = defaultInfo) const;
 
 //    MNEForwardSolution cluster_forward_solution(AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize);
 

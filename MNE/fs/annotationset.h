@@ -181,6 +181,16 @@ public:
 
     //=========================================================================================================
     /**
+    * Subscript operator [] to access annotation by index
+    *
+    * @param[in] idx    the hemisphere index (0 or 1).
+    *
+    * @return Annotation related to the parameter index.
+    */
+    const Annotation operator[] (qint32 idx) const;
+
+    //=========================================================================================================
+    /**
     * Subscript operator [] to access annotation by identifier
     *
     * @param[in] idt    the hemisphere identifier ("lh" or "rh").
@@ -188,6 +198,16 @@ public:
     * @return Annotation related to the parameter identifier.
     */
     Annotation& operator[] (QString idt);
+
+    //=========================================================================================================
+    /**
+    * Subscript operator [] to access annotation by identifier
+    *
+    * @param[in] idt    the hemisphere identifier ("lh" or "rh").
+    *
+    * @return Annotation related to the parameter identifier.
+    */
+    const Annotation operator[] (QString idt) const;
 
     //=========================================================================================================
     /**
