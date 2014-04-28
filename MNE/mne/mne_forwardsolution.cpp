@@ -440,7 +440,7 @@ void MNEForwardSolution::clear()
 
 //*************************************************************************************************************
 
-MNEForwardSolution MNEForwardSolution::cluster_forward_solution_ccr(const AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize, const FiffCov::SPtr p_pNoise_cov, const FiffInfo::SPtr p_pInfo) const
+MNEForwardSolution MNEForwardSolution::cluster_forward_solution_ccr(const AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize, const FiffCov &p_pNoise_cov, const FiffInfo &p_pInfo) const
 {
     MNEForwardSolution p_fwdOut = MNEForwardSolution(*this);
 
@@ -457,28 +457,26 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution_ccr(const Annota
 //    }
 
 
-
-
-
-//    KMeans t_kMeans(QString("cityblock"), QString("sample"), 5);//QString("sqeuclidean")//QString("sample")//cityblock
     MatrixXd t_G_new;
 
+    MatrixXd t_G_Whitened(0,0);
+    bool t_bUseWhitened = false;
     //
     //Whiten gain matrix before clustering -> cause diffenerent units Magnetometer, Gradiometer and EEG
     //
-    if(p_pNoise_cov && p_pInfo)
+    if(!p_pNoise_cov.isEmpty() && !p_pInfo.isEmpty())
     {
         FiffInfo p_outFwdInfo;
         FiffCov p_outNoiseCov;
         MatrixXd p_outWhitener;
         qint32 p_outNumNonZero;
         //do whitening with noise cov
-        this->prepare_forward(*p_pInfo, *p_pNoise_cov, false, p_outFwdInfo, t_G_new, p_outNoiseCov, p_outWhitener, p_outNumNonZero);
+        this->prepare_forward(p_pInfo, p_pNoise_cov, false, p_outFwdInfo, t_G_Whitened, p_outNoiseCov, p_outWhitener, p_outNumNonZero);
         printf("\tWhitening the forward solution.\n");
-        t_G_new = p_outWhitener*t_G_new;
+
+        t_G_Whitened = p_outWhitener*t_G_Whitened;
+        t_bUseWhitened = true;
     }
-    else
-        t_G_new = this->sol->data;
 
 //    MatrixXd t_G_whitened;
 //    qint32 numSources = this->sol->data.cols();
@@ -558,9 +556,14 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution_ccr(const Annota
 
                 //get selected G
                 MatrixXd t_G(this->sol->data.rows(), idcs.rows()*3);
+                MatrixXd t_G_Whitened_Roi(t_G_Whitened.rows(), idcs.rows()*3);
 
                 for(qint32 j = 0; j < idcs.rows(); ++j)
+                {
                     t_G.block(0, j*3, t_G.rows(), 3) = this->sol->data.block(0, (idcs[j]+offset)*3, t_G.rows(), 3);
+                    if(t_bUseWhitened)
+                        t_G_Whitened_Roi.block(0, j*3, t_G_Whitened_Roi.rows(), 3) = t_G_Whitened.block(0, (idcs[j]+offset)*3, t_G_Whitened_Roi.rows(), 3);
+                }
 
                 qint32 nSens = t_G.rows();
                 qint32 nSources = t_G.cols()/3;
@@ -574,17 +577,26 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution_ccr(const Annota
                     t_sensG.nClusters = ceil((double)nSources/(double)p_iClusterSize);
 
                     t_sensG.matRoiGOrig = t_G;
+                    if(t_bUseWhitened)
+                        t_sensG.matRoiGOrigWhitened = t_G_Whitened_Roi;
 
                     printf("%d Cluster(s)... ", t_sensG.nClusters);
 
                     // Reshape Input data -> sources rows; sensors columns
                     t_sensG.matRoiG = MatrixXd(t_G.cols()/3, 3*nSens);
+                    if(t_bUseWhitened)
+                        t_sensG.matRoiGWhitened = MatrixXd(t_G_Whitened_Roi.cols()/3, 3*nSens);
 
                     for(qint32 j = 0; j < nSens; ++j)
                     {
                         for(qint32 k = 0; k < t_sensG.matRoiG.rows(); ++k)
                             t_sensG.matRoiG.block(k,j*3,1,3) = t_G.block(j,k*3,1,3);
+                        if(t_bUseWhitened)
+                            for(qint32 k = 0; k < t_sensG.matRoiGWhitened.rows(); ++k)
+                                t_sensG.matRoiGWhitened.block(k,j*3,1,3) = t_G_Whitened_Roi.block(j,k*3,1,3);
                     }
+
+                    t_sensG.bUseWhitened = t_bUseWhitened;
 
                     m_qListRegionDataIn.append(t_sensG);
 
