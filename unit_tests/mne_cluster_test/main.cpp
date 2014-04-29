@@ -58,6 +58,8 @@
 
 #include <iostream>
 
+#include <fstream>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -466,17 +468,22 @@ int main(int argc, char *argv[])
     //
     // Cluster forward solution;
     //
-    MNEForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution_ccr(t_annotationSet, 20, noise_cov, evoked.info);
+    MatrixXd D;
+    MNEForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution_ccr(t_annotationSet, 20, D, noise_cov, evoked.info);
 
     t_clusteredFwd.src[0].cluster_info.write("ClusterInfoLH.txt");
     t_clusteredFwd.src[1].cluster_info.write("ClusterInfoRH.txt");
+
+    std::cout << "D " << D.rows() << " x " << D.cols() << std::endl;
 
     //
     // make an inverse operators
     //
     FiffInfo info = evoked.info;
 
-    MNEInverseOperator inverse_operator(info, t_clusteredFwd, noise_cov, 0.2f, 0.8f);
+    MNEInverseOperator inverse_operator_clustered(info, t_clusteredFwd, noise_cov, 0.2f, 0.8f);
+
+    MNEInverseOperator inverse_operator(info, t_Fwd, noise_cov, 0.2f, 0.8f);
 
     //
     // save clustered inverse
@@ -484,19 +491,21 @@ int main(int argc, char *argv[])
     if(!t_sFileNameClusteredInv.isEmpty())
     {
         QFile t_fileClusteredInverse(t_sFileNameClusteredInv);
-        inverse_operator.write(t_fileClusteredInverse);
+        inverse_operator_clustered.write(t_fileClusteredInverse);
     }
 
     //
     // Compute inverse solution
     //
+    MinimumNorm minimumNormClustered(inverse_operator_clustered, lambda2, method);
     MinimumNorm minimumNorm(inverse_operator, lambda2, method);
+
 
 #ifdef BENCHMARK
     //
     //   Set up the inverse according to the parameters
     //
-    minimumNorm.doInverseSetup(vecSel.size(),false);
+    minimumNormClustered.doInverseSetup(vecSel.size(),false);
 
     MNESourceEstimate sourceEstimate;
     QList<qint64> qVecElapsedTime;
@@ -505,7 +514,7 @@ int main(int argc, char *argv[])
         //Benchmark time
         QElapsedTimer timer;
         timer.start();
-        sourceEstimate = minimumNorm.calculateInverse(evoked.data, evoked.times(0), evoked.times(1)-evoked.times(0));
+        sourceEstimate = minimumNormClustered.calculateInverse(evoked.data, evoked.times(0), evoked.times(1)-evoked.times(0));
         qVecElapsedTime.append(timer.elapsed());
     }
 
@@ -530,18 +539,56 @@ int main(int argc, char *argv[])
     qDebug() << "MNE calculation took" << meanTime << "+-" << varTime << "ms in average";
 
 #else
+    MNESourceEstimate sourceEstimateClustered = minimumNormClustered.calculateInverse(evoked);
     MNESourceEstimate sourceEstimate = minimumNorm.calculateInverse(evoked);
 #endif
 
-    if(sourceEstimate.isEmpty())
+
+//    printf("[1]\n");
+//    MatrixXd M = D.transpose() * minimumNorm.getKernel();
+
+//    printf("[2]\n");
+//    MatrixXd M_clusterd = minimumNormClustered.getKernel();
+
+//    printf("[3]\n");
+//    MatrixXd R = M * t_Fwd.sol->data;
+
+//    printf("[4]\n");
+//    MatrixXd R_clustered = M_clusterd * t_Fwd.sol->data;
+
+//    std::cout << "DIM M_clusterd " << M_clusterd.rows() << " x " << M_clusterd.cols() << ", t_Fwd.sol->data: " << t_Fwd.sol->data.rows() << " x " << t_Fwd.sol->data.cols() << std::endl;
+
+
+//    printf("Start writing results\n");
+//    std::ofstream ofs_R("R.txt", std::ofstream::out);
+//    if (ofs_R.is_open())
+//    {
+//        printf("writing to R.txt\n");
+//        ofs_R << "R:\n" << R << '\n';
+//    }
+//    else
+//        printf("Not writing to R.txt\n");
+//    ofs_R.close();
+
+//    std::ofstream ofs_R_clustered("R_clustered.txt", std::ofstream::out);
+//    if (ofs_R_clustered.is_open())
+//    {
+//        printf("writing to R_clustered.txt\n");
+//        ofs_R_clustered << "R:\n" << R_clustered << '\n';
+//    }
+//    else
+//        printf("Not writing to R_clustered.txt\n");
+//    ofs_R_clustered.close();
+
+    if(sourceEstimateClustered.isEmpty())
         return 1;
 
     // View activation time-series
-    std::cout << "\nsourceEstimate:\n" << sourceEstimate.data.block(0,0,10,10) << std::endl;
-    std::cout << "time\n" << sourceEstimate.times.block(0,0,1,10) << std::endl;
-    std::cout << "timeMin\n" << sourceEstimate.times[0] << std::endl;
-    std::cout << "timeMax\n" << sourceEstimate.times[sourceEstimate.times.size()-1] << std::endl;
-    std::cout << "time step\n" << sourceEstimate.tstep << std::endl;
+    std::cout << "\nsourceEstimate:\n" << sourceEstimateClustered.data.block(0,0,10,10) << std::endl;
+    std::cout << "time\n" << sourceEstimateClustered.times.block(0,0,1,10) << std::endl;
+    std::cout << "timeMin\n" << sourceEstimateClustered.times[0] << std::endl;
+    std::cout << "timeMax\n" << sourceEstimateClustered.times[sourceEstimateClustered.times.size()-1] << std::endl;
+    std::cout << "time step\n" << sourceEstimateClustered.tstep << std::endl;
 
     //Condition Numbers
 //    MatrixXd mags(102, t_Fwd.sol->data.cols());
@@ -627,7 +674,7 @@ int main(int argc, char *argv[])
     //ToDo overload toLabels using instead of t_surfSet rr of MNESourceSpace
     t_annotationSet.toLabels(t_surfSet, t_qListLabels, t_qListRGBAs);
 
-    InverseView view(minimumNorm.getSourceSpace(), t_qListLabels, t_qListRGBAs, 24, true, false, true);
+    InverseView view(minimumNormClustered.getSourceSpace(), t_qListLabels, t_qListRGBAs, 24, true, false, true);
 
     if (view.stereoType() != QGLView::RedCyanAnaglyph)
         view.camera()->setEyeSeparation(0.3f);
@@ -658,12 +705,12 @@ int main(int argc, char *argv[])
     view.show();
 
     //Push Estimate
-    view.pushSourceEstimate(sourceEstimate);
+    view.pushSourceEstimate(sourceEstimateClustered);
 
     if(!t_sFileNameStc.isEmpty())
     {
         QFile t_fileClusteredStc(t_sFileNameStc);
-        sourceEstimate.write(t_fileClusteredStc);
+        sourceEstimateClustered.write(t_fileClusteredStc);
     }
 
 //*/
