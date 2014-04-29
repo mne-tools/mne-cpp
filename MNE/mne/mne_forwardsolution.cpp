@@ -447,6 +447,13 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution_ccr(const Annota
     //
     // Check consisty
     //
+
+    if(this->isFixedOrient())
+    {
+        printf("Error: Fixed orientation not implemented jet!\n");
+        return p_fwdOut;
+    }
+
 //    for(qint32 h = 0; h < this->src.hemispheres.size(); ++h )//obj.sizeForwardSolution)
 //    {
 //        if(this->src[h]->vertno.rows() !=  t_listAnnotation[h]->getLabel()->rows())
@@ -478,28 +485,11 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution_ccr(const Annota
         t_bUseWhitened = true;
     }
 
-//    MatrixXd t_G_whitened;
-//    qint32 numSources = this->sol->data.cols();
-
-//    MatrixXd t_Cov_G = this->sol->data * this->sol->data.adjoint();
-//    VectorXd mu = this->sol->data.rowwise().sum();
-//    mu /= numSources;
-//    t_Cov_G.array() -= numSources * (mu * mu.transpose()).array();
-//    t_Cov_G.array() /= (numSources - 1);
-
-//    VectorXd eig;
-//    MatrixXd eigvec;
-//    MNEMath::get_whitener(t_Cov_G, false, QString("Gain Matrix"), eig, eigvec);
-
-
-
     //
     // Sort cluster groups
     //
     qint32 count;
     qint32 offset;
-
-//    QList<MatrixXd> qListGainDist;
 
     for(qint32 h = 0; h < this->src.size(); ++h )
     {
@@ -622,6 +612,18 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution_ccr(const Annota
         res.waitForFinished();
         printf("[done]\n");
 
+        //
+        // Calculate cluster operator D (sources x clusters)
+        //
+        qint32 totalNumOfClust = 0;
+
+        QFuture<RegionDataOut>::const_iterator itOut;
+        for (itOut = res.constBegin(); itOut != res.constEnd(); ++itOut)
+            totalNumOfClust += itOut->ctrs.rows();
+
+        MatrixXd D(this->sol->data.cols(), totalNumOfClust);
+        //this->isFixedOrient();
+
 
         //
         // Assign results
@@ -630,7 +632,6 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution_ccr(const Annota
 
         qint32 nClusters;
         qint32 nSens;
-        QFuture<RegionDataOut>::const_iterator itOut;
         QList<RegionData>::const_iterator itIn;
         itIn = m_qListRegionDataIn.begin();
 
