@@ -159,6 +159,8 @@ public:
     */
     void setRegularization(float lambda);
 
+    inline MatrixXd& getKernel();
+
 private:
     MNEInverseOperator m_inverseOperator;   /**< The inverse operator */
     float m_fLambda;                        /**< Regularization parameter */
@@ -174,6 +176,16 @@ private:
     MatrixXd K;                             /**< Imaging kernel */
 
 };
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline MatrixXd& MinimumNorm::getKernel()
+{
+    return K;
+}
 
 } //NAMESPACE
 

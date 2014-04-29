@@ -122,7 +122,7 @@ struct RegionDataOut
     VectorXd    sumd;       /**< Sums of the distances to the centroid */
     MatrixXd    D;          /**< Distances to the centroid */
 
-    qint32      iLabelIdxOut;
+    qint32      iLabelIdxOut;   /**< Label ID */
 };
 
 
@@ -137,12 +137,12 @@ struct RegionData
     bool        bUseWhitened;       /**< Wheather indeces of whitened gain matrix should be used to calculate centroids */
 
     MatrixXd    matRoiGOrig;            /**< Region gain matrix sensors x sources(x,y,z)*/
-    MatrixXd    matRoiGOrigWhitened;    /**< Whitened region gain matrix sensors x sources(x,y,z)*/
+//    MatrixXd    matRoiGOrigWhitened;    /**< Whitened region gain matrix sensors x sources(x,y,z)*/
 
     qint32      nClusters;      /**< Number of clusters within this region */
 
     VectorXi    idcs;           /**< Get source space indeces */
-    qint32      iLabelIdxIn;
+    qint32      iLabelIdxIn;    /**< Label ID */
 
     RegionDataOut cluster() const
     {
@@ -187,6 +187,7 @@ struct RegionData
 
 const static FiffCov defaultCov;
 const static FiffInfo defaultInfo;
+static MatrixXd defaultD;
 
 
 //=============================================================================================================
@@ -246,12 +247,15 @@ public:
     * Cluster the forward solution and stores the result to p_fwdOut.
     * The clustering is done by using the provided annotations
     *
-    * @param[in] p_AnnotationSet    Annotation set containing the annotation of left & right hemisphere
-    * @param[in] p_iClusterSize     Maximal cluster size per roi
+    * @param[in]    p_AnnotationSet     Annotation set containing the annotation of left & right hemisphere
+    * @param[in]    p_iClusterSize      Maximal cluster size per roi
+    * @param[out]   p_D
+    * @param[in]    p_pNoise_cov
+    * @param[in]    p_pInfo
     *
     * @return clustered MNE forward solution
     */
-    MNEForwardSolution cluster_forward_solution_ccr(const AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize, const FiffCov &p_pNoise_cov = defaultCov, const FiffInfo &p_pInfo = defaultInfo) const;
+    MNEForwardSolution cluster_forward_solution_ccr(const AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize, MatrixXd& p_D = defaultD, const FiffCov &p_pNoise_cov = defaultCov, const FiffInfo &p_pInfo = defaultInfo) const;
 
 //    MNEForwardSolution cluster_forward_solution(AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize);
 

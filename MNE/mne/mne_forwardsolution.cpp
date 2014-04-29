@@ -440,14 +440,13 @@ void MNEForwardSolution::clear()
 
 //*************************************************************************************************************
 
-MNEForwardSolution MNEForwardSolution::cluster_forward_solution_ccr(const AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize, const FiffCov &p_pNoise_cov, const FiffInfo &p_pInfo) const
+MNEForwardSolution MNEForwardSolution::cluster_forward_solution_ccr(const AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize, MatrixXd& p_D, const FiffCov &p_pNoise_cov, const FiffInfo &p_pInfo) const
 {
     MNEForwardSolution p_fwdOut = MNEForwardSolution(*this);
 
     //
     // Check consisty
     //
-
     if(this->isFixedOrient())
     {
         printf("Error: Fixed orientation not implemented jet!\n");
@@ -462,9 +461,6 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution_ccr(const Annota
 //            return false;
 //        }
 //    }
-
-
-    MatrixXd t_G_new;
 
     MatrixXd t_G_Whitened(0,0);
     bool t_bUseWhitened = false;
@@ -485,11 +481,14 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution_ccr(const Annota
         t_bUseWhitened = true;
     }
 
+
     //
-    // Sort cluster groups
+    // Assemble input data
     //
     qint32 count;
     qint32 offset;
+
+    MatrixXd t_G_new;
 
     for(qint32 h = 0; h < this->src.size(); ++h )
     {
@@ -570,8 +569,8 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution_ccr(const Annota
                     t_sensG.nClusters = ceil((double)nSources/(double)p_iClusterSize);
 
                     t_sensG.matRoiGOrig = t_G;
-                    if(t_bUseWhitened)
-                        t_sensG.matRoiGOrigWhitened = t_G_Whitened_Roi;
+//                    if(t_bUseWhitened)
+//                        t_sensG.matRoiGOrigWhitened = t_G_Whitened_Roi;
 
                     printf("%d Cluster(s)... ", t_sensG.nClusters);
 
@@ -610,20 +609,6 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution_ccr(const Annota
         QFuture< RegionDataOut > res;
         res = QtConcurrent::mapped(m_qListRegionDataIn, &RegionData::cluster);
         res.waitForFinished();
-        printf("[done]\n");
-
-        //
-        // Calculate cluster operator D (sources x clusters)
-        //
-        qint32 totalNumOfClust = 0;
-
-        QFuture<RegionDataOut>::const_iterator itOut;
-        for (itOut = res.constBegin(); itOut != res.constEnd(); ++itOut)
-            totalNumOfClust += itOut->ctrs.rows();
-
-        MatrixXd D(this->sol->data.cols(), totalNumOfClust);
-        //this->isFixedOrient();
-
 
         //
         // Assign results
@@ -634,7 +619,7 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution_ccr(const Annota
         qint32 nSens;
         QList<RegionData>::const_iterator itIn;
         itIn = m_qListRegionDataIn.begin();
-
+        QFuture<RegionDataOut>::const_iterator itOut;
         for (itOut = res.constBegin(); itOut != res.constEnd(); ++itOut)
         {
             nClusters = itOut->ctrs.rows();
@@ -679,6 +664,7 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution_ccr(const Annota
                 VectorXi clusterVertnos = VectorXi::Zero(clusterIdcs.size());
                 for(qint32 k = 0; k < clusterVertnos.size(); ++k)
                     clusterVertnos(k) = this->src[h].vertno[clusterIdcs(k)];
+
 
                 p_fwdOut.src[h].cluster_info.clusterVertnos.append(clusterVertnos);
                 p_fwdOut.src[h].cluster_info.clusterSource_rr.append(clusterSource_rr);
@@ -741,35 +727,75 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution_ccr(const Annota
         //
         // Assemble new hemisphere information
         //
-//ToDo store this in cluster info
 //        p_fwdOut.src[h].rr.conservativeResize(count, 3);
 //        p_fwdOut.src[h].nn.conservativeResize(count, 3);
         p_fwdOut.src[h].vertno.conservativeResize(count);
 
-//        std::cout << "Vertno hemisphere:" << h << std::endl << p_fwdOut.src[h].vertno << std::endl;
-
-
-//        p_fwdOut.src[h].nuse_tri = 0;
-//        p_fwdOut.src[h].use_tris = MatrixX3i(0,3);
-
-
-//        if(p_fwdOut.src[h].rr.rows() > 0 && p_fwdOut.src[h].rr.cols() > 0)
-//        {
-//            if(h == 0)
-//            {
-//                p_fwdOut.source_rr = MatrixX3d(0,3);
-//                p_fwdOut.source_nn = MatrixX3d(0,3);
-//            }
-
-//            p_fwdOut.source_rr.conservativeResize(p_fwdOut.source_rr.rows() + p_fwdOut.src[h].rr.rows(),3);
-//            p_fwdOut.source_rr.block(p_fwdOut.source_rr.rows() -  p_fwdOut.src[h].rr.rows(), 0,  p_fwdOut.src[h].rr.rows(), 3) = p_fwdOut.src[h].rr;
-
-//            p_fwdOut.source_nn.conservativeResize(p_fwdOut.source_nn.rows() + p_fwdOut.src[h].nn.rows(),3);
-//            p_fwdOut.source_nn.block(p_fwdOut.source_nn.rows() -  p_fwdOut.src[h].nn.rows(), 0,  p_fwdOut.src[h].nn.rows(), 3) = p_fwdOut.src[h].nn;
-//        }
-
-//        printf("[done]\n");
+        printf("[done]\n");
     }
+
+
+    //
+    // Cluster operator D (sources x clusters)
+    //
+    qint32 totalNumOfClust = 0;
+    for (qint32 h = 0; h < 2; ++h)
+        totalNumOfClust += p_fwdOut.src[h].cluster_info.clusterVertnos.size();
+
+    if(this->isFixedOrient())
+        p_D = MatrixXd::Zero(this->sol->data.cols(), totalNumOfClust);
+    else
+        p_D = MatrixXd::Zero(this->sol->data.cols(), totalNumOfClust*3);
+
+    QList<VectorXi> t_vertnos = this->src.get_vertno();
+
+//    qDebug() << "Size: " << t_vertnos[0].size()  << t_vertnos[1].size();
+//    qDebug() << "this->sol->data.cols(): " << this->sol->data.cols();
+
+    qint32 currentCluster = 0;
+    for (qint32 h = 0; h < 2; ++h)
+    {
+        int hemiOffset = h == 0 ? 0 : p_fwdOut.src[0].cluster_info.clusterVertnos.size();
+        for(qint32 i = 0; i < p_fwdOut.src[h].cluster_info.clusterVertnos.size(); ++i)
+        {
+            VectorXi idx_sel;
+            MNEMath::intersect(t_vertnos[h], p_fwdOut.src[h].cluster_info.clusterVertnos[i], idx_sel);
+
+//            std::cout << "\nVertnos:\n" << t_vertnos[h] << std::endl;
+
+//            std::cout << "clusterVertnos[i]:\n" << p_fwdOut.src[h].cluster_info.clusterVertnos[i] << std::endl;
+
+            idx_sel.array() += hemiOffset;
+
+//            std::cout << "idx_sel]:\n" << idx_sel << std::endl;
+
+
+
+            double selectWeight = 1.0/idx_sel.size();
+            if(this->isFixedOrient())
+            {
+                for(qint32 j = 0; j < idx_sel.size(); ++j)
+                    p_D.col(currentCluster)[idx_sel(j)] = selectWeight;
+            }
+            else
+            {
+                qint32 clustOffset = currentCluster*3;
+                for(qint32 j = 0; j < idx_sel.size(); ++j)
+                {
+                    qint32 idx_sel_Offset = idx_sel(j)*3;
+                    //x
+                    p_D(idx_sel_Offset,clustOffset) = selectWeight;
+                    //y
+                    p_D(idx_sel_Offset+1, clustOffset+1) = selectWeight;
+                    //z
+                    p_D(idx_sel_Offset+2, clustOffset+2) = selectWeight;
+                }
+            }
+            ++currentCluster;
+        }
+    }
+
+//    std::cout << "D:\n" << D.row(0) << std::endl << D.row(1) << std::endl << D.row(2) << std::endl << D.row(3) << std::endl << D.row(4) << std::endl << D.row(5) << std::endl;
 
 
 //    //

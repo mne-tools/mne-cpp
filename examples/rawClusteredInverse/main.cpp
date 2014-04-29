@@ -466,7 +466,8 @@ int main(int argc, char *argv[])
     //
     // Cluster forward solution;
     //
-    MNEForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution_ccr(t_annotationSet, 20, noise_cov, evoked.info);
+    MatrixXd D;
+    MNEForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution_ccr(t_annotationSet, 20, D, noise_cov, evoked.info);
 
     //
     // make an inverse operators
