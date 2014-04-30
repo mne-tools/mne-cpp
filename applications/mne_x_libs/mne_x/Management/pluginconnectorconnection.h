@@ -138,13 +138,10 @@ private:
     */
     bool createConnection();
 
-    bool m_bConnectionState;
-
     IPlugin::SPtr m_pSender;
     IPlugin::SPtr m_pReceiver;
 
-    QMetaObject::Connection m_con;
-
+    QHash<QPair<QString, QString>, QMetaObject::Connection> m_qHashConnections; /**< QHash which holds the connections between sender and receiver QHash<QPair<Sender,Receiver>, Connection>. */
 };
 
 //*************************************************************************************************************
@@ -179,7 +176,7 @@ inline IPlugin::SPtr& PluginConnectorConnection::getReceiver()
 
 inline bool PluginConnectorConnection::isConnected()
 {
-    return m_bConnectionState;
+    return m_qHashConnections.size() > 0 ? true : false;
 }
 
 } // NAMESPACE
