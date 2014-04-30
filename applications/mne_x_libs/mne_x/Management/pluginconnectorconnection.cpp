@@ -146,7 +146,11 @@ bool PluginConnectorConnection::createConnection()
             break;
     }
 
-//    m_con = connect(sender.data(), &PluginOutputConnector::notify, receiver.data(), &PluginInputConnector::update);
+    //DEBUG
+    QHash<QPair<QString, QString>, QMetaObject::Connection>::iterator it;
+    for (it = m_qHashConnections.begin(); it != m_qHashConnections.end(); ++it)
+        qDebug() << "Connected: " << it.key().first << it.key().second;
+    //DEBUG
 
     return bConnected;
 }

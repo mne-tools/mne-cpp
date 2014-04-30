@@ -48,7 +48,6 @@
 //=============================================================================================================
 
 #include <QGridLayout>
-#include <QComboBox>
 
 
 //*************************************************************************************************************
@@ -93,7 +92,10 @@ PluginConnectorConnectionWidget::PluginConnectorConnectionWidget(PluginConnector
     for(qint32 i = 0; i < m_pPluginConnectorConnection->getSender()->getOutputConnectors().size(); ++i)
     {
         QComboBox* m_pComboBox = new QComboBox(this);
-        QLabel* m_pLabelOutput = new QLabel(m_pPluginConnectorConnection->getSender()->getOutputConnectors()[i]->getName(),this);
+        QString t_sSenderName = m_pPluginConnectorConnection->getSender()->getOutputConnectors()[i]->getName();
+        QLabel* m_pLabelOutput = new QLabel(t_sSenderName,this);
+        m_qMapSenderToReceiverConnections.insert(t_sSenderName,m_pComboBox);
+
         layout->addWidget(m_pLabelOutput,curRow,0);
 
         ConnectorDataType t_senderConnectorDataType = PluginConnectorConnection::getDataType(m_pPluginConnectorConnection->getSender()->getOutputConnectors()[i]);
@@ -111,6 +113,20 @@ PluginConnectorConnectionWidget::PluginConnectorConnectionWidget(PluginConnector
         ++curRow;
     }
 
+    //Look for existing connections
+    QHash<QPair<QString, QString>, QMetaObject::Connection>::iterator it;
+    for (it = pPluginConnectorConnection->m_qHashConnections.begin(); it != pPluginConnectorConnection->m_qHashConnections.end(); ++it)
+    {
+        QComboBox* m_pComboBox = m_qMapSenderToReceiverConnections[it.key().first];
+
+        for(qint32 i = 0; i < m_pComboBox->count(); ++i)
+            if(QString::compare(m_pComboBox->itemText(i), it.key().second) == 0)
+                m_pComboBox->setCurrentIndex(i);
+    }
+
+    //Connect Signals
+    foreach(QComboBox* m_pComboBox, m_qMapSenderToReceiverConnections)
+        connect(m_pComboBox, static_cast<void (QComboBox::*)(const QString &)>(&QComboBox::currentIndexChanged), this, &PluginConnectorConnectionWidget::updateReceiver);
 
     layout->addWidget(bottomFiller,curRow,0);
     ++curRow;
@@ -118,4 +134,37 @@ PluginConnectorConnectionWidget::PluginConnectorConnectionWidget(PluginConnector
     layout->addWidget(rightFiller,1,3,curRow-1,1);
 
     this->setLayout(layout);
+}
+
+
+//*************************************************************************************************************
+
+PluginConnectorConnectionWidget::~PluginConnectorConnectionWidget()
+{
+    m_qMapSenderToReceiverConnections.clear();
+}
+
+
+//*************************************************************************************************************
+
+void PluginConnectorConnectionWidget::updateReceiver(const QString &p_sCurrentReceiver)
+{
+    qDebug() << "PluginConnectorConnectionWidget::updateSelection" << p_sCurrentReceiver;
+
+    //get active control using focus
+    QString t_sCurrentSender;
+    QComboBox* t_qComboBox;
+    QMap<QString, QComboBox*>::iterator it;
+    for (it = m_qMapSenderToReceiverConnections.begin(); it != m_qMapSenderToReceiverConnections.end(); ++it)
+    {
+        if(it.value()->hasFocus())
+        {
+            t_sCurrentSender = it.key();
+            t_qComboBox = it.value();
+            qDebug() << it.key() << "has focus.";
+        }
+    }
+
+
+
 }
