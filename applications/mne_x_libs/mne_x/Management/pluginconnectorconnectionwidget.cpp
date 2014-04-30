@@ -149,7 +149,9 @@ PluginConnectorConnectionWidget::~PluginConnectorConnectionWidget()
 
 void PluginConnectorConnectionWidget::updateReceiver(const QString &p_sCurrentReceiver)
 {
-    qDebug() << "PluginConnectorConnectionWidget::updateSelection" << p_sCurrentReceiver;
+    //If selection is default
+    if(QString::compare(p_sCurrentReceiver, QString("----")) == 0)
+        return;
 
     //get active control using focus
     QString t_sCurrentSender;
@@ -161,10 +163,34 @@ void PluginConnectorConnectionWidget::updateReceiver(const QString &p_sCurrentRe
         {
             t_sCurrentSender = it.key();
             t_qComboBox = it.value();
-            qDebug() << it.key() << "has focus.";
+
+
+            qint32 i = 0;
+            for(i = 0; i < m_pPluginConnectorConnection->m_pSender->getOutputConnectors().size(); ++i)
+                if(m_pPluginConnectorConnection->m_pSender->getOutputConnectors()[i]->getName() == t_sCurrentSender)
+                    break;
+
+            qint32 j = 0;
+            for(j = 0; j < m_pPluginConnectorConnection->m_pSender->getOutputConnectors().size(); ++j)
+                if(m_pPluginConnectorConnection->m_pReceiver->getInputConnectors()[j]->getName() == p_sCurrentReceiver)
+                    break;
+
+            m_pPluginConnectorConnection->m_qHashConnections.insert(QPair<QString,QString>(m_pPluginConnectorConnection->m_pSender->getOutputConnectors()[i]->getName(),
+                                                                                           m_pPluginConnectorConnection->m_pReceiver->getInputConnectors()[j]->getName()),
+                                                                    connect(m_pPluginConnectorConnection->m_pSender->getOutputConnectors()[i].data(), &PluginOutputConnector::notify,
+                                                                            m_pPluginConnectorConnection->m_pReceiver->getInputConnectors()[j].data(), &PluginInputConnector::update, Qt::BlockingQueuedConnection));
         }
     }
 
-
-
+    //Disconnect the rest
+    for (it = m_qMapSenderToReceiverConnections.begin(); it != m_qMapSenderToReceiverConnections.end(); ++it)
+    {
+        if(it.value() != t_qComboBox && it.value()->currentText() == p_sCurrentReceiver)
+        {
+            QPair<QString, QString> t_qPair(it.key(),it.value()->currentText());
+            disconnect(m_pPluginConnectorConnection->m_qHashConnections[t_qPair]);
+            m_pPluginConnectorConnection->m_qHashConnections.remove(t_qPair);
+            it.value()->setCurrentIndex(0);
+        }
+    }
 }
