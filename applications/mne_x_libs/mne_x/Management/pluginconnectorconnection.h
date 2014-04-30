@@ -89,6 +89,9 @@ enum ConnectorDataType
 class MNE_X_SHARED_EXPORT PluginConnectorConnection : public QObject
 {
     Q_OBJECT
+
+    friend class PluginConnectorConnectionWidget;
+
 public:
     typedef QSharedPointer<PluginConnectorConnection> SPtr;             /**< Shared pointer type for PluginConnectorConnection. */
     typedef QSharedPointer<const PluginConnectorConnection> ConstSPtr;  /**< Const shared pointer type for PluginConnectorConnection. */
