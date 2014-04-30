@@ -755,7 +755,7 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution_ccr(const Annota
     qint32 currentCluster = 0;
     for (qint32 h = 0; h < 2; ++h)
     {
-        int hemiOffset = h == 0 ? 0 : p_fwdOut.src[0].cluster_info.clusterVertnos.size();
+        int hemiOffset = h == 0 ? 0 : t_vertnos[0].size();
         for(qint32 i = 0; i < p_fwdOut.src[h].cluster_info.clusterVertnos.size(); ++i)
         {
             VectorXi idx_sel;
