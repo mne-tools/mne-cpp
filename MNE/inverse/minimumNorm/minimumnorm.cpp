@@ -252,8 +252,6 @@ void MinimumNorm::doInverseSetup(qint32 nave, bool pick_normal)
 }
 
 
-
-
 //*************************************************************************************************************
 
 const char* MinimumNorm::getName() const

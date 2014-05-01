@@ -469,7 +469,7 @@ int main(int argc, char *argv[])
     // Cluster forward solution;
     //
     MatrixXd D;
-    MNEForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution_ccr(t_annotationSet, 20, D, noise_cov, evoked.info);
+    MNEForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution(t_annotationSet, 20, D, noise_cov, evoked.info);
 
     t_clusteredFwd.src[0].cluster_info.write("ClusterInfoLH.txt");
     t_clusteredFwd.src[1].cluster_info.write("ClusterInfoRH.txt");
@@ -544,13 +544,24 @@ int main(int argc, char *argv[])
 #endif
 
 
-    // R calculation
+
+    //Option c
+    qDebug() << "Cluster Kernel";
+    MatrixXd D_MT;
+    MatrixXd MT_clustered = minimumNorm.getPreparedInverseOperator().cluster_kernel(t_annotationSet, 20, D_MT);
+
+    qDebug() << "Cluster Kernel" << MT_clustered.rows() << "x" << MT_clustered.cols();
+
+    qDebug() << "D_MT" << D_MT.rows() << "x" << D_MT.cols();
+
+    // #### R calculation ####
     QFile t_fileFwdFixed("D:/Data/MEG/mind006/mind006_051209_auditory01_raw-oct-6-fwd-fixed.fif");
     MNEForwardSolution t_FwdFixed(t_fileFwdFixed);
     if(t_FwdFixed.isEmpty())
         return 1;
 //    qDebug() << "t_FwdFixed" << t_FwdFixed.sol->data.rows() << "x" << t_FwdFixed.sol->data.cols();
 
+    //Option b)
     printf("[1]\n");
     MatrixXd M = D.transpose() * minimumNorm.getKernel();
 
@@ -570,7 +581,7 @@ int main(int argc, char *argv[])
     M.resize(0,0);
     R.resize(0,0);
 
-//
+    //Option a)
     printf("[3]\n");
     MatrixXd M_clusterd = minimumNormClustered.getKernel();
 
@@ -590,7 +601,7 @@ int main(int argc, char *argv[])
     M_clusterd.resize(0,0);
     R_clustered.resize(0,0);
 
-//
+//Cluster Operator D
     std::ofstream ofs_D("D.txt", std::ofstream::out);
     if (ofs_D.is_open())
     {
@@ -601,7 +612,36 @@ int main(int argc, char *argv[])
         printf("Not writing to D.txt\n");
     ofs_D.close();
 
-    // R calculation end
+
+    //option c)
+    printf("[5]\n");
+    MatrixXd R_MT_clustered = MT_clustered.transpose() * t_FwdFixed.sol->data;
+
+    std::ofstream ofs_R_MT_clustered("R_MT_clustered.txt", std::ofstream::out);
+    if (ofs_R_MT_clustered.is_open())
+    {
+        printf("writing to R_MT_clustered.txt\n");
+        ofs_R_MT_clustered << R_MT_clustered << '\n';
+    }
+    else
+        printf("Not writing to R_MT_clustered.txt\n");
+    ofs_R_MT_clustered.close();
+
+    R_MT_clustered.resize(0,0);
+
+    //Cluster Operator D
+    std::ofstream ofs_D_MT("D_MT.txt", std::ofstream::out);
+    if (ofs_D_MT.is_open())
+    {
+        printf("writing to D_MT.txt\n");
+        ofs_D_MT << D_MT << '\n';
+    }
+    else
+        printf("Not writing to D_MT.txt\n");
+    ofs_D_MT.close();
+
+
+    // #### R calculation end ####
 
 
     if(sourceEstimateClustered.isEmpty())

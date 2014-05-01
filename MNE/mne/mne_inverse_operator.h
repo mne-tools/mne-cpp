@@ -105,6 +105,50 @@ using namespace FIFFLIB;
 using namespace Eigen;
 
 
+//=========================================================================================================
+/**
+* Gain matrix output data for one region, used for clustering
+*/
+struct RegionMTOut
+{
+    VectorXi    roiIdx;     /**< Region cluster indices */
+    MatrixXd    ctrs;       /**< Cluster centers */
+    VectorXd    sumd;       /**< Sums of the distances to the centroid */
+    MatrixXd    D;          /**< Distances to the centroid */
+
+    qint32      iLabelIdxOut;   /**< Label ID */
+};
+
+
+//=========================================================================================================
+/**
+* Gain matrix input data for one region, used for clustering
+*/
+struct RegionMT
+{
+    MatrixXd    matRoiMT;           /**< Reshaped region gain matrix sources x sensors(x,y,z)*/
+    MatrixXd    matRoiMTOrig;       /**< Region gain matrix sensors x sources(x,y,z)*/
+
+    qint32      nClusters;      /**< Number of clusters within this region */
+    VectorXi    idcs;           /**< Get source space indeces */
+    qint32      iLabelIdxIn;    /**< Label ID */
+
+    RegionMTOut cluster() const
+    {
+        // Kmeans Reduction
+        RegionMTOut p_RegionMTOut;
+
+        KMeans t_kMeans(QString("cityblock"), QString("sample"), 5);
+
+        t_kMeans.calculate(this->matRoiMT, this->nClusters, p_RegionMTOut.roiIdx, p_RegionMTOut.ctrs, p_RegionMTOut.sumd, p_RegionMTOut.D);
+
+        p_RegionMTOut.iLabelIdxOut = this->iLabelIdxIn;
+
+        return p_RegionMTOut;
+    }
+};
+
+
 //=============================================================================================================
 /**
 * Inverse operator
@@ -190,6 +234,18 @@ public:
 
     //=========================================================================================================
     /**
+    * Clusters the current kernel
+    *
+    * @param[in]    p_AnnotationSet     Annotation set containing the annotation of left & right hemisphere
+    * @param[in]    p_iClusterSize      Maximal cluster size per roi
+    * @param[out]   p_D                 The cluster operator
+    *
+    * @return the clustered kernel
+    */
+    MatrixXd cluster_kernel(const AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize, MatrixXd& p_D) const;
+
+    //=========================================================================================================
+    /**
     * Returns the current kernel
     *
     * @return the current kernel
@@ -203,6 +259,14 @@ public:
     * @return the current kernel
     */
     inline MatrixXd getKernel() const;
+
+    //=========================================================================================================
+    /**
+    * Has inverse operator fixed orientation?
+    *
+    * @return true if inverse operator has fixed orientation, false otherwise
+    */
+    inline bool isFixedOrient() const;
 
     //=========================================================================================================
     /**
@@ -327,6 +391,14 @@ inline MatrixXd& MNEInverseOperator::getKernel()
 inline MatrixXd MNEInverseOperator::getKernel() const
 {
     return m_K;
+}
+
+
+//*************************************************************************************************************
+
+inline bool MNEInverseOperator::isFixedOrient() const
+{
+    return this->source_ori == FIFFV_MNE_FIXED_ORI;
 }
 
 

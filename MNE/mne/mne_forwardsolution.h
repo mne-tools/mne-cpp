@@ -249,15 +249,13 @@ public:
     *
     * @param[in]    p_AnnotationSet     Annotation set containing the annotation of left & right hemisphere
     * @param[in]    p_iClusterSize      Maximal cluster size per roi
-    * @param[out]   p_D
+    * @param[out]   p_D                 The cluster operator
     * @param[in]    p_pNoise_cov
     * @param[in]    p_pInfo
     *
     * @return clustered MNE forward solution
     */
     MNEForwardSolution cluster_forward_solution(const AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize, MatrixXd& p_D = defaultD, const FiffCov &p_pNoise_cov = defaultCov, const FiffInfo &p_pInfo = defaultInfo) const;
-
-//    MNEForwardSolution cluster_forward_solution(AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize);
 
     //=========================================================================================================
     /**
