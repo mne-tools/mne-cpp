@@ -40,6 +40,8 @@
 
 #include "mne_inverse_operator.h"
 #include <fs/label.h>
+#include <QFuture>
+#include <QtConcurrent>
 
 
 //*************************************************************************************************************
@@ -325,8 +327,333 @@ bool MNEInverseOperator::check_ch_names(const FiffInfo &info) const
 
 //*************************************************************************************************************
 
+MatrixXd MNEInverseOperator::cluster_kernel(const AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize, MatrixXd& p_D) const
+{
+    MatrixXd p_outMT = this->m_K.transpose();
+
+    QList<MNEClusterInfo> t_qListMNEClusterInfo;
+    MNEClusterInfo t_MNEClusterInfo;
+    t_qListMNEClusterInfo.append(t_MNEClusterInfo);
+    t_qListMNEClusterInfo.append(t_MNEClusterInfo);
+
+    //
+    // Check consisty
+    //
+    if(this->isFixedOrient())
+    {
+        printf("Error: Fixed orientation not implemented jet!\n");
+        return p_outMT;
+    }
+
+//    qDebug() << "p_outMT" << p_outMT.rows() << "x" << p_outMT.cols();
+
+//    MatrixXd t_G_Whitened(0,0);
+//    bool t_bUseWhitened = false;
+//    //
+//    //Whiten gain matrix before clustering -> cause diffenerent units Magnetometer, Gradiometer and EEG
+//    //
+//    if(!p_pNoise_cov.isEmpty() && !p_pInfo.isEmpty())
+//    {
+//        FiffInfo p_outFwdInfo;
+//        FiffCov p_outNoiseCov;
+//        MatrixXd p_outWhitener;
+//        qint32 p_outNumNonZero;
+//        //do whitening with noise cov
+//        this->prepare_forward(p_pInfo, p_pNoise_cov, false, p_outFwdInfo, t_G_Whitened, p_outNoiseCov, p_outWhitener, p_outNumNonZero);
+//        printf("\tWhitening the forward solution.\n");
+
+//        t_G_Whitened = p_outWhitener*t_G_Whitened;
+//        t_bUseWhitened = true;
+//    }
 
 
+
+    //
+    // Assemble input data
+    //
+    qint32 count;
+    qint32 offset;
+
+    MatrixXd t_MT_new;
+
+    for(qint32 h = 0; h < this->src.size(); ++h )
+    {
+
+        count = 0;
+        offset = 0;
+
+        // Offset for continuous indexing;
+        if(h > 0)
+            for(qint32 j = 0; j < h; ++j)
+                offset += this->src[j].nuse;
+
+        if(h == 0)
+            printf("Cluster Left Hemisphere\n");
+        else
+            printf("Cluster Right Hemisphere\n");
+
+        Colortable t_CurrentColorTable = p_AnnotationSet[h].getColortable();
+        VectorXi label_ids = t_CurrentColorTable.getLabelIds();
+
+        // Get label ids for every vertex
+        VectorXi vertno_labeled = VectorXi::Zero(this->src[h].vertno.rows());
+
+        //ToDo make this more universal -> using Label instead of annotations - obsolete when using Labels
+        for(qint32 i = 0; i < vertno_labeled.rows(); ++i)
+            vertno_labeled[i] = p_AnnotationSet[h].getLabelIds()[this->src[h].vertno[i]];
+
+        //Qt Concurrent List
+        QList<RegionMT> m_qListRegionMTIn;
+
+        //
+        // Generate cluster input data
+        //
+        for (qint32 i = 0; i < label_ids.rows(); ++i)
+        {
+            if (label_ids[i] != 0)
+            {
+                QString curr_name = t_CurrentColorTable.struct_names[i];//obj.label2AtlasName(label(i));
+                printf("\tCluster %d / %li %s...", i+1, label_ids.rows(), curr_name.toUtf8().constData());
+
+                //
+                // Get source space indeces
+                //
+                VectorXi idcs = VectorXi::Zero(vertno_labeled.rows());
+                qint32 c = 0;
+
+                //Select ROIs //change this use label info with a hash tabel
+                for(qint32 j = 0; j < vertno_labeled.rows(); ++j)
+                {
+                    if(vertno_labeled[j] == label_ids[i])
+                    {
+                        idcs[c] = j;
+                        ++c;
+                    }
+                }
+                idcs.conservativeResize(c);
+
+                //get selected MT
+                MatrixXd t_MT(p_outMT.rows(), idcs.rows()*3);
+
+                for(qint32 j = 0; j < idcs.rows(); ++j)
+                    t_MT.block(0, j*3, t_MT.rows(), 3) = p_outMT.block(0, (idcs[j]+offset)*3, t_MT.rows(), 3);
+
+                qint32 nSens = t_MT.rows();
+                qint32 nSources = t_MT.cols()/3;
+
+                if (nSources > 0)
+                {
+                    RegionMT t_sensMT;
+
+                    t_sensMT.idcs = idcs;
+                    t_sensMT.iLabelIdxIn = i;
+                    t_sensMT.nClusters = ceil((double)nSources/(double)p_iClusterSize);
+
+                    t_sensMT.matRoiMTOrig = t_MT;
+
+                    printf("%d Cluster(s)... ", t_sensMT.nClusters);
+
+                    // Reshape Input data -> sources rows; sensors columns
+                    t_sensMT.matRoiMT = MatrixXd(t_MT.cols()/3, 3*nSens);
+
+                    for(qint32 j = 0; j < nSens; ++j)
+                        for(qint32 k = 0; k < t_sensMT.matRoiMT.rows(); ++k)
+                            t_sensMT.matRoiMT.block(k,j*3,1,3) = t_MT.block(j,k*3,1,3);
+
+                    m_qListRegionMTIn.append(t_sensMT);
+
+                    printf("[added]\n");
+                }
+                else
+                {
+                    printf("failed! Label contains no sources.\n");
+                }
+            }
+        }
+
+
+        //
+        // Calculate clusters
+        //
+        printf("Clustering... ");
+        QFuture< RegionMTOut > res;
+        res = QtConcurrent::mapped(m_qListRegionMTIn, &RegionMT::cluster);
+        res.waitForFinished();
+
+        //
+        // Assign results
+        //
+        MatrixXd t_MT_partial;
+
+        qint32 nClusters;
+        qint32 nSens;
+        QList<RegionMT>::const_iterator itIn;
+        itIn = m_qListRegionMTIn.begin();
+        QFuture<RegionMTOut>::const_iterator itOut;
+        for (itOut = res.constBegin(); itOut != res.constEnd(); ++itOut)
+        {
+            nClusters = itOut->ctrs.rows();
+            nSens = itOut->ctrs.cols()/3;
+            t_MT_partial = MatrixXd::Zero(nSens, nClusters*3);
+
+//            std::cout << "Number of Clusters: " << nClusters << " x " << nSens << std::endl;//itOut->iLabelIdcsOut << std::endl;
+
+            //
+            // Assign the centroid for each cluster to the partial G
+            //
+            //ToDo change this use indeces found with whitened data
+            for(qint32 j = 0; j < nSens; ++j)
+                for(qint32 k = 0; k < nClusters; ++k)
+                    t_MT_partial.block(j, k*3, 1, 3) = itOut->ctrs.block(k,j*3,1,3);
+
+            //
+            // Get cluster indizes and its distances to the centroid
+            //
+            for(qint32 j = 0; j < nClusters; ++j)
+            {
+                VectorXi clusterIdcs = VectorXi::Zero(itOut->roiIdx.rows());
+                VectorXd clusterDistance = VectorXd::Zero(itOut->roiIdx.rows());
+                qint32 nClusterIdcs = 0;
+                for(qint32 k = 0; k < itOut->roiIdx.rows(); ++k)
+                {
+                    if(itOut->roiIdx[k] == j)
+                    {
+                        clusterIdcs[nClusterIdcs] = itIn->idcs[k];
+
+                        qint32 offset = h == 0 ? 0 : this->src[0].nuse;
+                        clusterDistance[nClusterIdcs] = itOut->D(k,j);
+                        ++nClusterIdcs;
+                    }
+                }
+                clusterIdcs.conservativeResize(nClusterIdcs);
+                clusterDistance.conservativeResize(nClusterIdcs);
+
+                VectorXi clusterVertnos = VectorXi::Zero(clusterIdcs.size());
+                for(qint32 k = 0; k < clusterVertnos.size(); ++k)
+                    clusterVertnos(k) = this->src[h].vertno[clusterIdcs(k)];
+
+                t_qListMNEClusterInfo[h].clusterVertnos.append(clusterVertnos);
+
+            }
+
+
+            //
+            // Assign partial G to new LeadField
+            //
+            if(t_MT_partial.rows() > 0 && t_MT_partial.cols() > 0)
+            {
+                t_MT_new.conservativeResize(t_MT_partial.rows(), t_MT_new.cols() + t_MT_partial.cols());
+                t_MT_new.block(0, t_MT_new.cols() - t_MT_partial.cols(), t_MT_new.rows(), t_MT_partial.cols()) = t_MT_partial;
+
+                // Map the centroids to the closest rr
+                for(qint32 k = 0; k < nClusters; ++k)
+                {
+                    qint32 j = 0;
+
+                    double sqec = sqrt((itIn->matRoiMTOrig.block(0, j*3, itIn->matRoiMTOrig.rows(), 3) - t_MT_partial.block(0, k*3, t_MT_partial.rows(), 3)).array().pow(2).sum());
+                    double sqec_min = sqec;
+                    qint32 j_min = 0;
+//                    MatrixXd matGainDiff;
+                    for(qint32 j = 1; j < itIn->idcs.rows(); ++j)
+                    {
+                        sqec = sqrt((itIn->matRoiMTOrig.block(0, j*3, itIn->matRoiMTOrig.rows(), 3) - t_MT_partial.block(0, k*3, t_MT_partial.rows(), 3)).array().pow(2).sum());
+
+                        if(sqec < sqec_min)
+                        {
+                            sqec_min = sqec;
+                            j_min = j;
+//                            matGainDiff = itIn->matRoiGOrig.block(0, j*3, itIn->matRoiGOrig.rows(), 3) - t_G_partial.block(0, k*3, t_G_partial.rows(), 3);
+                        }
+                    }
+
+//                    qListGainDist.append(matGainDiff);
+
+                    // Take the closest coordinates
+                    qint32 sel_idx = itIn->idcs[j_min];
+
+//                    //vertices
+//                    std::cout << this->src[h].vertno[sel_idx] << ", ";
+
+                    ++count;
+                }
+            }
+
+            ++itIn;
+        }
+
+        printf("[done]\n");
+    }
+
+
+    //
+    // Cluster operator D (sources x clusters)
+    //
+    qint32 totalNumOfClust = 0;
+    for (qint32 h = 0; h < 2; ++h)
+        totalNumOfClust += t_qListMNEClusterInfo[h].clusterVertnos.size();
+
+    if(this->isFixedOrient())
+        p_D = MatrixXd::Zero(p_outMT.cols(), totalNumOfClust);
+    else
+        p_D = MatrixXd::Zero(p_outMT.cols(), totalNumOfClust*3);
+
+    QList<VectorXi> t_vertnos = this->src.get_vertno();
+
+//    qDebug() << "Size: " << t_vertnos[0].size()  << t_vertnos[1].size();
+//    qDebug() << "this->sol->data.cols(): " << this->sol->data.cols();
+
+    qint32 currentCluster = 0;
+    for (qint32 h = 0; h < 2; ++h)
+    {
+        int hemiOffset = h == 0 ? 0 : t_vertnos[0].size();
+        for(qint32 i = 0; i < t_qListMNEClusterInfo[h].clusterVertnos.size(); ++i)
+        {
+            VectorXi idx_sel;
+            MNEMath::intersect(t_vertnos[h], t_qListMNEClusterInfo[h].clusterVertnos[i], idx_sel);
+
+//            std::cout << "\nVertnos:\n" << t_vertnos[h] << std::endl;
+
+//            std::cout << "clusterVertnos[i]:\n" << t_qListMNEClusterInfo[h].clusterVertnos[i] << std::endl;
+
+            idx_sel.array() += hemiOffset;
+
+//            std::cout << "idx_sel]:\n" << idx_sel << std::endl;
+
+
+
+            double selectWeight = 1.0/idx_sel.size();
+            if(this->isFixedOrient())
+            {
+                for(qint32 j = 0; j < idx_sel.size(); ++j)
+                    p_D.col(currentCluster)[idx_sel(j)] = selectWeight;
+            }
+            else
+            {
+                qint32 clustOffset = currentCluster*3;
+                for(qint32 j = 0; j < idx_sel.size(); ++j)
+                {
+                    qint32 idx_sel_Offset = idx_sel(j)*3;
+                    //x
+                    p_D(idx_sel_Offset,clustOffset) = selectWeight;
+                    //y
+                    p_D(idx_sel_Offset+1, clustOffset+1) = selectWeight;
+                    //z
+                    p_D(idx_sel_Offset+2, clustOffset+2) = selectWeight;
+                }
+            }
+            ++currentCluster;
+        }
+    }
+
+//    std::cout << "D:\n" << D.row(0) << std::endl << D.row(1) << std::endl << D.row(2) << std::endl << D.row(3) << std::endl << D.row(4) << std::endl << D.row(5) << std::endl;
+
+    //
+    // Put it all together
+    //
+    p_outMT = t_MT_new;
+
+    return p_outMT;
+}
 
 
 //*************************************************************************************************************

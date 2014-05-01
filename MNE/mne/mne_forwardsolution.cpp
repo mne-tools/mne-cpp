@@ -170,6 +170,8 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const Annotation
 {
     MNEForwardSolution p_fwdOut = MNEForwardSolution(*this);
 
+//    qDebug() << "this->sol->data" << this->sol->data.rows() << "x" << this->sol->data.cols();
+
     //
     // Check consisty
     //
