@@ -544,56 +544,64 @@ int main(int argc, char *argv[])
 #endif
 
 
-//    printf("[1]\n");
-//    MatrixXd M = D.transpose() * minimumNorm.getKernel();
+    // R calculation
+    QFile t_fileFwdFixed("D:/Data/MEG/mind006/mind006_051209_auditory01_raw-oct-6-fwd-fixed.fif");
+    MNEForwardSolution t_FwdFixed(t_fileFwdFixed);
+    if(t_FwdFixed.isEmpty())
+        return 1;
+//    qDebug() << "t_FwdFixed" << t_FwdFixed.sol->data.rows() << "x" << t_FwdFixed.sol->data.cols();
 
-//    printf("[2]\n");
-//    MatrixXd R = M * t_Fwd.sol->data;
+    printf("[1]\n");
+    MatrixXd M = D.transpose() * minimumNorm.getKernel();
 
-//    std::ofstream ofs_R("R.txt", std::ofstream::out);
-//    if (ofs_R.is_open())
-//    {
-//        printf("writing to R.txt\n");
-//        ofs_R << R << '\n';
-//    }
-//    else
-//        printf("Not writing to R.txt\n");
-//    ofs_R.close();
+    printf("[2]\n");
+    MatrixXd R = M * t_FwdFixed.sol->data;
 
-//    M.resize(0,0);
-//    R.resize(0,0);
+    std::ofstream ofs_R("R.txt", std::ofstream::out);
+    if (ofs_R.is_open())
+    {
+        printf("writing to R.txt\n");
+        ofs_R << R << '\n';
+    }
+    else
+        printf("Not writing to R.txt\n");
+    ofs_R.close();
 
-////
-//    printf("[3]\n");
-//    MatrixXd M_clusterd = minimumNormClustered.getKernel();
+    M.resize(0,0);
+    R.resize(0,0);
 
-//    printf("[4]\n");
-//    MatrixXd R_clustered = M_clusterd * t_Fwd.sol->data;
+//
+    printf("[3]\n");
+    MatrixXd M_clusterd = minimumNormClustered.getKernel();
 
-//    std::ofstream ofs_R_clustered("R_clustered.txt", std::ofstream::out);
-//    if (ofs_R_clustered.is_open())
-//    {
-//        printf("writing to R_clustered.txt\n");
-//        ofs_R_clustered << R_clustered << '\n';
-//    }
-//    else
-//        printf("Not writing to R_clustered.txt\n");
-//    ofs_R_clustered.close();
+    printf("[4]\n");
+    MatrixXd R_clustered = M_clusterd * t_FwdFixed.sol->data;
 
-//    M_clusterd.resize(0,0);
-//    R_clustered.resize(0,0);
+    std::ofstream ofs_R_clustered("R_clustered.txt", std::ofstream::out);
+    if (ofs_R_clustered.is_open())
+    {
+        printf("writing to R_clustered.txt\n");
+        ofs_R_clustered << R_clustered << '\n';
+    }
+    else
+        printf("Not writing to R_clustered.txt\n");
+    ofs_R_clustered.close();
 
-////
-//    std::ofstream ofs_D("D.txt", std::ofstream::out);
-//    if (ofs_D.is_open())
-//    {
-//        printf("writing to D.txt\n");
-//        ofs_D << D << '\n';
-//    }
-//    else
-//        printf("Not writing to D.txt\n");
-//    ofs_D.close();
+    M_clusterd.resize(0,0);
+    R_clustered.resize(0,0);
 
+//
+    std::ofstream ofs_D("D.txt", std::ofstream::out);
+    if (ofs_D.is_open())
+    {
+        printf("writing to D.txt\n");
+        ofs_D << D << '\n';
+    }
+    else
+        printf("Not writing to D.txt\n");
+    ofs_D.close();
+
+    // R calculation end
 
 
     if(sourceEstimateClustered.isEmpty())
