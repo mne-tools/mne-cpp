@@ -133,7 +133,7 @@ MNEInverseOperator::~MNEInverseOperator()
 
 //*************************************************************************************************************
 
-bool MNEInverseOperator::assemble_kernel(const Label &label, QString method, bool pick_normal, MatrixXd &K, SparseMatrix<double> &noise_norm, QList<VectorXi> &vertno) const
+bool MNEInverseOperator::assemble_kernel(const Label &label, QString method, bool pick_normal, MatrixXd &K, SparseMatrix<double> &noise_norm, QList<VectorXi> &vertno)
 {
     MatrixXd t_eigen_leads = this->eigen_leads->data;
     MatrixXd t_source_cov = this->source_cov->data;
@@ -270,6 +270,9 @@ bool MNEInverseOperator::assemble_kernel(const Label &label, QString method, boo
     if(method.compare("MNE") == 0)
         noise_norm = SparseMatrix<double>();
 
+    //store assembled kernel
+    m_K = K;
+
     return true;
 }
 
@@ -318,6 +321,12 @@ bool MNEInverseOperator::check_ch_names(const FiffInfo &info) const
 
     return true;
 }
+
+
+//*************************************************************************************************************
+
+
+
 
 
 //*************************************************************************************************************

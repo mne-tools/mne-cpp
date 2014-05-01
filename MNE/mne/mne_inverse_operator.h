@@ -176,7 +176,7 @@ public:
     *
     * @return the assembled kernel
     */
-    bool assemble_kernel(const Label &label, QString method, bool pick_normal, MatrixXd &K, SparseMatrix<double> &noise_norm, QList<VectorXi> &vertno) const;
+    bool assemble_kernel(const Label &label, QString method, bool pick_normal, MatrixXd &K, SparseMatrix<double> &noise_norm, QList<VectorXi> &vertno);
 
     //=========================================================================================================
     /**
@@ -187,6 +187,22 @@ public:
     * @return true when successful, false otherwise
     */
     bool check_ch_names(const FiffInfo &info) const;
+
+    //=========================================================================================================
+    /**
+    * Returns the current kernel
+    *
+    * @return the current kernel
+    */
+    inline MatrixXd& getKernel();
+
+    //=========================================================================================================
+    /**
+    * Returns the current kernel
+    *
+    * @return the current kernel
+    */
+    inline MatrixXd getKernel() const;
 
     //=========================================================================================================
     /**
@@ -290,12 +306,31 @@ public:
     MatrixXd whitener;                      /**< Whitens the data */
     VectorXd reginv;                        /**< The diagonal matrix implementing. regularization and the inverse */
     SparseMatrix<double> noisenorm;         /**< These are the noise-normalization factors */
+
+private:
+    MatrixXd m_K;                           /**< Everytime a new kernel is assamebled a copy is stored here */
 };
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
+
+inline MatrixXd& MNEInverseOperator::getKernel()
+{
+    return m_K;
+}
+
+
+//*************************************************************************************************************
+
+inline MatrixXd MNEInverseOperator::getKernel() const
+{
+    return m_K;
+}
+
+
+//*************************************************************************************************************
 
 inline std::ostream& operator<<(std::ostream& out, const MNELIB::MNEInverseOperator &p_MNEInverseOperator)
 {
