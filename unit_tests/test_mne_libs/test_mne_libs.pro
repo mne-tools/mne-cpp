@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     mne_graph_test.pro
+# @file     test_mne_libs.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file generates the makefile to build the mne_graph_test app.
+# @brief    This project file generates the makefile for mne_lib_tests for algorithm validation.
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -37,10 +37,13 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = app
 
-QT += core gui
-QT += widgets
+QT += network
+QT -= gui
 
-TARGET = mne_graph_test
+CONFIG   += console
+CONFIG   -= app_bundle
+
+TARGET = test_mne_libs
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
@@ -48,34 +51,30 @@ CONFIG(debug, debug|release) {
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
-            -lMNE$${MNE_LIB_VERSION}Utilsd \
+    LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd \
             -lMNE$${MNE_LIB_VERSION}Fsd \
-            -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Mned \
-            -lMNE$${MNE_LIB_VERSION}Inversed \
-            -lMNE$${MNE_LIB_VERSION}Dispd
+            -lMNE$${MNE_LIB_VERSION}Fiffd \
+            -lMNE$${MNE_LIB_VERSION}Genericsd
 }
 else {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
-            -lMNE$${MNE_LIB_VERSION}Utils \
+    LIBS += -lMNE$${MNE_LIB_VERSION}Utils \
             -lMNE$${MNE_LIB_VERSION}Fs \
-            -lMNE$${MNE_LIB_VERSION}Fiff \
             -lMNE$${MNE_LIB_VERSION}Mne \
-            -lMNE$${MNE_LIB_VERSION}Inverse \
-            -lMNE$${MNE_LIB_VERSION}Disp
+            -lMNE$${MNE_LIB_VERSION}Fiff \
+            -lMNE$${MNE_LIB_VERSION}Generics
 }
 
-DESTDIR = $${MNE_BINARY_DIR}
+DESTDIR = $${PWD}/../../bin
 
-SOURCES += main.cpp
+SOURCES += \
+    main.cpp \
+    testmnelibs.cpp
 
-HEADERS  +=
 
-FORMS    +=
+HEADERS += \
+    testmnelibs.h
+
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
-
-# Put generated form headers into the origin --> cause other src is pointing at them
-UI_DIR = $$PWD

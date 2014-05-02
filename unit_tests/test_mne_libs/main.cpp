@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "mnelibtests.h"
+#include "testmnelibs.h"
 
 
 //*************************************************************************************************************
@@ -105,13 +105,13 @@ int main(int argc, char *argv[])
     QCoreApplication a(argc, argv);
     bool testResult;
     QString testName;
-    MNELibTests t_MneLibTests;
+    TestMNELibs t_TestMneLibs;
     //
     // Read FWD test
     //
     testName = QString("Read FWD");
     testStart(testName);
-    testResult = t_MneLibTests.checkFwdRead();
+    testResult = t_TestMneLibs.checkFwdRead();
     testEnd(testName,testResult);
     return a.exec();
 }

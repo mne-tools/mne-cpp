@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     mne_disp_test.pro
+# @file     test_mne_rt.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file generates the makefile to build the mne_disp_test app.
+# @brief    This project file generates the makefile for mne_rt_tests for rt validation.
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -37,11 +37,13 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = app
 
-QT += core gui
-QT += widgets
-QT += printsupport
+QT += network
+QT -= gui
 
-TARGET = mne_disp_test
+CONFIG   += console
+CONFIG   -= app_bundle
+
+TARGET = test_mne_rt
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
@@ -50,31 +52,21 @@ CONFIG(debug, debug|release) {
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
-            -lMNE$${MNE_LIB_VERSION}Utilsd \
-            -lMNE$${MNE_LIB_VERSION}Fsd \
-            -lMNE$${MNE_LIB_VERSION}Fiffd \
-            -lMNE$${MNE_LIB_VERSION}Mned
-
+            -lMNE$${MNE_LIB_VERSION}RtCommandd \
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
-            -lMNE$${MNE_LIB_VERSION}Utils \
-            -lMNE$${MNE_LIB_VERSION}Fs \
-            -lMNE$${MNE_LIB_VERSION}Fiff \
-            -lMNE$${MNE_LIB_VERSION}Mne
+            -lMNE$${MNE_LIB_VERSION}RtCommand \
 }
 
-DESTDIR = $${MNE_BINARY_DIR}
+DESTDIR = $${PWD}/../../bin
 
-SOURCES += main.cpp \
-        3rdParty/QCustomPlot/qcustomplot.cpp \
-        mnedisptest.cpp
+SOURCES += \
+    main.cpp \
+    dataparsertest.cpp
 
-HEADERS  += \
-        3rdParty/QCustomPlot/qcustomplot.h \
-        mnedisptest.h
+HEADERS += \
+    dataparsertest.h
 
+INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
-
-FORMS    += \
-    mnedisptest.ui

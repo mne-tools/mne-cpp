@@ -72,6 +72,7 @@ using namespace FSLIB;
 Surface::Surface()
 : m_fileName("")
 , hemi(-1)
+, surf("")
 {
 }
 
@@ -97,16 +98,71 @@ Surface::~Surface()
 
 void Surface::clear()
 {
-    m_fileName = QString("");
+    m_fileName.clear();
     hemi = -1;
-    rr = MatrixX3f(0,3);
-    tris = MatrixX3i(0,3);
+    surf.clear();
+    rr.resize(0,3);
+    tris.resize(0,3);
+    nn.resize(0,3);
+    curv.resize(0);
 }
 
 
 //*************************************************************************************************************
 
-bool Surface::read(const QString &p_sFileName, Surface &p_Surface)
+MatrixX3f Surface::compute_normals(const MatrixX3f& rr, const MatrixX3i& tris)
+{
+    printf("\tcomputing normals\n");
+    // first, compute triangle normals
+    MatrixX3f r1(tris.rows(),3); MatrixX3f r2(tris.rows(),3); MatrixX3f r3(tris.rows(),3);
+
+    for(qint32 i = 0; i < tris.rows(); ++i)
+    {
+        r1.row(i) = rr.row(tris(i, 0));
+        r2.row(i) = rr.row(tris(i, 1));
+        r3.row(i) = rr.row(tris(i, 2));
+    }
+
+    MatrixX3f x = r2 - r1;
+    MatrixX3f y = r3 - r1;
+    MatrixX3f tri_nn(x.rows(),y.cols());
+    tri_nn.col(0) = x.col(1).cwiseProduct(y.col(2)) - x.col(2).cwiseProduct(y.col(1));
+    tri_nn.col(1) = x.col(2).cwiseProduct(y.col(0)) - x.col(0).cwiseProduct(y.col(2));
+    tri_nn.col(2) = x.col(0).cwiseProduct(y.col(1)) - x.col(1).cwiseProduct(y.col(0));
+
+    //   Triangle normals and areas
+    MatrixX3f tmp = tri_nn.cwiseProduct(tri_nn);
+    VectorXf normSize = tmp.rowwise().sum();
+    normSize = normSize.cwiseSqrt();
+
+    for(qint32 i = 0; i < normSize.size(); ++i)
+        if(normSize(i) != 0)
+            tri_nn.row(i) /= normSize(i);
+
+    MatrixX3f nn = MatrixX3f::Zero(rr.rows(), 3);
+
+    for(qint32 p = 0; p < tris.rows(); ++p)
+    {
+        Vector3i verts = tris.row(p);
+        for(qint32 j = 0; j < verts.size(); ++j)
+            nn.row(verts(j)) = tri_nn.row(p);
+    }
+
+    tmp = nn.cwiseProduct(nn);
+    normSize = tmp.rowwise().sum();
+    normSize = normSize.cwiseSqrt();
+
+    for(qint32 i = 0; i < normSize.size(); ++i)
+        if(normSize(i) != 0)
+            nn.row(i) /= normSize(i);
+
+    return nn;
+}
+
+
+//*************************************************************************************************************
+
+bool Surface::read(const QString &p_sFileName, Surface &p_Surface, bool p_bLoadCurvature)
 {
     p_Surface.clear();
 
@@ -115,7 +171,7 @@ bool Surface::read(const QString &p_sFileName, Surface &p_Surface)
 
     if (!t_File.open(QIODevice::ReadOnly))
     {
-        printf("\tError: Couldn't open the file\n");
+        printf("\tError: Couldn't open the surface file\n");
         return false;
     }
 
@@ -261,11 +317,21 @@ bool Surface::read(const QString &p_sFileName, Surface &p_Surface)
     p_Surface.rr = verts.block(0,0,verts.rows(),3);
     p_Surface.tris = faces.block(0,0,faces.rows(),3);
 
+    p_Surface.nn = compute_normals(p_Surface.rr, p_Surface.tris);
+
     // hemi info
     if(t_File.fileName().contains("lh."))
         p_Surface.hemi = 0;
-    else
+    else if(t_File.fileName().contains("rh."))
         p_Surface.hemi = 1;
+    else
+    {
+        p_Surface.hemi = -1;
+        return false;
+    }
+
+    //Surface loaded
+    p_Surface.surf = t_File.fileName().right(4);
 
     t_File.close();
     printf("\tRead a surface with %d vertices from %s\n",nvert,p_sFileName.toLatin1().constData());
@@ -273,3 +339,52 @@ bool Surface::read(const QString &p_sFileName, Surface &p_Surface)
     return true;
 }
 
+
+//*************************************************************************************************************
+
+VectorXf Surface::read_curv(const QString &p_sFileName)
+{
+    VectorXf curv;
+
+    printf("Reading curvature...\n");
+    QFile t_File(p_sFileName);
+
+    if (!t_File.open(QIODevice::ReadOnly))
+    {
+        printf("\tError: Couldn't open the curvature file\n");
+        return curv;
+    }
+
+    QDataStream t_DataStream(&t_File);
+    t_DataStream.setByteOrder(QDataStream::BigEndian);
+
+    qint32 vnum = IOUtils::fread3(t_DataStream);
+    qint32 NEW_VERSION_MAGIC_NUMBER = 16777215;
+
+    if(vnum == NEW_VERSION_MAGIC_NUMBER)
+    {
+        vnum = IOUtils::fread3(t_DataStream);
+        qint32 fnum = IOUtils::fread3(t_DataStream);
+        qint32 vals_per_vertex = IOUtils::fread3(t_DataStream);
+
+        curv.resize(vnum, 1);
+        t_DataStream.readRawData((char *)curv.data(), vnum*sizeof(float));
+        for(qint32 i = 0; i < vnum; ++i)
+           IOUtils::swap_floatp(&curv(i));
+    }
+    else
+    {
+        qint32 fnum = IOUtils::fread3(t_DataStream);
+        qint16 iVal;
+        curv.resize(vnum, 1);
+        for(qint32 i = 0; i < vnum; ++i)
+        {
+            t_DataStream >> iVal;
+            IOUtils::swap_short(iVal);
+            curv(i) = ((float)iVal) / 100;
+        }
+    }
+    t_File.close();
+
+    return curv;
+}

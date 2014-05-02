@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     mne_lib_tests.h
+* @file     mnelibtests.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,72 +29,106 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     MNEEpochData class declaration.
+* @brief     implementation of the MNELibTests Class checkup routines.
 *
 */
 
-#ifndef MNELIBTESTS_H
-#define MNELIBTESTS_H
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "testmnelibs.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// MNE INCLUDES
 //=============================================================================================================
 
-#include <QObject>
+#include <mne/mne.h>
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE MNEUNITTESTS
-//=============================================================================================================
-
-namespace MNEUNITTESTS
-{
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-//using namespace FIFFLIB;
-//using namespace Eigen;
+using namespace MNEUNITTESTS;
+using namespace MNELIB;
 
 
+//*************************************************************************************************************
 //=============================================================================================================
-/**
-* MNELibTests provides checkup routines to check the MNE library functionality using the sample data set.
-*
-* @brief Checkup routines for the MNE library
-*/
-class MNELibTests : public QObject
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+TestMNELibs::TestMNELibs(QObject *parent)
+: QObject(parent)
 {
-    Q_OBJECT
-public:
-    //=========================================================================================================
-    /**
-    * Default constructor.
-    *
-    * @param[in] parent     Qt parent object
-    */
-    explicit MNELibTests(QObject *parent = 0);
+    MNEForwardSolution::SPtr t_pFwd(new MNEForwardSolution);
 
-    //=========================================================================================================
-    /**
-    * Test ID #1
-    *
-    * Checks forward solution reading functionality
-    *
-    * @return true if successful false otherwise
-    */
-    bool checkFwdRead();
+    QSharedPointer<MNEForwardSolution>  t_pFwdNew(new MNEForwardSolution);
 
-signals:
-    void checkupFailed(int ID);
 
-};
 
-} // NAMESPACE
 
-#endif // MNELIBTESTS_H
+
+    MNEForwardSolution* t_pFwdOld = new MNEForwardSolution();
+    delete t_pFwdOld;
+
+
+
+
+}
+
+
+//*************************************************************************************************************
+
+bool TestMNELibs::checkFwdRead()
+{
+
+    QString t_sFileName = "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif";
+    QFile t_File(t_sFileName);
+
+    double res = 1.792287958513768e+07;
+    double eps = res * 0.00001; // result might differ around 52 %
+
+    int bads = 2;
+
+    MNEForwardSolution t_ForwardSolution;
+    if(MNE::read_forward_solution(t_File, t_ForwardSolution))
+    {
+        double sum = t_ForwardSolution.sol->data.sum();
+
+        // data rows okay?
+        if(t_ForwardSolution.sol->nrow != 366-bads || t_ForwardSolution.sol->data.rows() != 366-bads)
+        {
+            printf("Number of rows not correct!\n");
+            emit checkupFailed(1);
+            return false;
+        }
+        // data cols okay?
+        else if(t_ForwardSolution.sol->ncol != 22494 || t_ForwardSolution.sol->data.cols() != 22494)
+        {
+            printf("Number of cols not correct!\n");
+            emit checkupFailed(1);
+            return false;
+        }
+        // checksum okay ?
+        else if(sum < res-eps || sum > res + eps)
+        {
+            printf("Check sum not correct!\n");
+            emit checkupFailed(1);
+            return false;
+        }
+
+        printf("\nChecksum MATLAB (excluding 2 bads) aim: %f; is: %f\n", res, sum);
+        return true;
+    }
+    else
+    {
+        emit checkupFailed(1);
+        return false;
+    }
+}

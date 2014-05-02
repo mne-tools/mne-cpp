@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     mnelibtests.cpp
+* @file     main.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2012
+* @date     July, 2013
 *
 * @section  LICENSE
 *
@@ -29,24 +29,48 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     implementation of the MNELibTests Class checkup routines.
+* @brief    Example of the computation of a rawClusteredInverse
 *
 */
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "mnelibtests.h"
+#include <fs/label.h>
+#include <fs/surface.h>
+#include <fs/annotationset.h>
+
+#include <fiff/fiff_evoked.h>
+#include <fiff/fiff.h>
+#include <mne/mne.h>
+
+#include <mne/mne_epoch_data_list.h>
+
+#include <mne/mne_sourceestimate.h>
+#include <inverse/minimumNorm/minimumnorm.h>
+
+#include <disp3D/inverseview.h>
+
+#include <utils/mnemath.h>
+
+#include <iostream>
+
+#include <fstream>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// MNE INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
-#include <mne/mne.h>
+#include <QGuiApplication>
+#include <QSet>
+#include <QElapsedTimer>
+
+//#define BENCHMARK
 
 
 //*************************************************************************************************************
@@ -54,81 +78,39 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNEUNITTESTS;
 using namespace MNELIB;
+using namespace FSLIB;
+using namespace FIFFLIB;
+using namespace INVERSELIB;
+using namespace DISP3DLIB;
+using namespace UTILSLIB;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// MAIN
 //=============================================================================================================
 
-MNELibTests::MNELibTests(QObject *parent)
-: QObject(parent)
+//=============================================================================================================
+/**
+* The function main marks the entry point of the program.
+* By default, main has the storage class extern.
+*
+* @param [in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
+* @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
+* @return the value that was set to exit() (which is 0 if exit() is called via quit()).
+*/
+int main(int argc, char *argv[])
 {
-    MNEForwardSolution::SPtr t_pFwd(new MNEForwardSolution);
+    QGuiApplication a(argc, argv);
 
-    QSharedPointer<MNEForwardSolution>  t_pFwdNew(new MNEForwardSolution);
+//    Vector3f v1, v2;
+//    v1 << 1, 2, 5;
+//    v2 << 3, 2, 4;
+//    Vector3f v3 = v1.cwiseProduct(v2);
+//    std::cout << "v3: " << v3 << std::endl;
 
+    SurfaceSet t_surfSet("./MNE-sample-data/subjects/sample/surf/lh.white", "./MNE-sample-data/subjects/sample/surf/rh.white");
 
-
-
-
-    MNEForwardSolution* t_pFwdOld = new MNEForwardSolution();
-    delete t_pFwdOld;
-
-
-
-
-}
-
-
-//*************************************************************************************************************
-
-bool MNELibTests::checkFwdRead()
-{
-
-    QString t_sFileName = "./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif";
-    QFile t_File(t_sFileName);
-
-    double res = 1.792287958513768e+07;
-    double eps = res * 0.00001; // result might differ around 52 %
-
-    int bads = 2;
-
-    MNEForwardSolution t_ForwardSolution;
-    if(MNE::read_forward_solution(t_File, t_ForwardSolution))
-    {
-        double sum = t_ForwardSolution.sol->data.sum();
-
-        // data rows okay?
-        if(t_ForwardSolution.sol->nrow != 366-bads || t_ForwardSolution.sol->data.rows() != 366-bads)
-        {
-            printf("Number of rows not correct!\n");
-            emit checkupFailed(1);
-            return false;
-        }
-        // data cols okay?
-        else if(t_ForwardSolution.sol->ncol != 22494 || t_ForwardSolution.sol->data.cols() != 22494)
-        {
-            printf("Number of cols not correct!\n");
-            emit checkupFailed(1);
-            return false;
-        }
-        // checksum okay ?
-        else if(sum < res-eps || sum > res + eps)
-        {
-            printf("Check sum not correct!\n");
-            emit checkupFailed(1);
-            return false;
-        }
-
-        printf("\nChecksum MATLAB (excluding 2 bads) aim: %f; is: %f\n", res, sum);
-        return true;
-    }
-    else
-    {
-        emit checkupFailed(1);
-        return false;
-    }
+    return a.exec();//1;//a.exec();
 }

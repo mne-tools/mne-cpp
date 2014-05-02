@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     clusteredInverse.pro
+# @file     test_mne_surface.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    Builds example for making an clustered inverse operator
+# @brief    Builds surface test
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -44,7 +44,7 @@ QT       += 3d
 CONFIG   += console
 CONFIG   -= app_bundle
 
-TARGET = mne_cluster_test
+TARGET = test_mne_surface
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)

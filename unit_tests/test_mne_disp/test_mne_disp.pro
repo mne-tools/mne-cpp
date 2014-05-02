@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     unit_tests.pro
+# @file     test_mne_disp.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -29,34 +29,52 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file generates the makefile to build the unit tests.
+# @brief    This project file generates the makefile to build the mne_disp_test app.
 #
 #--------------------------------------------------------------------------------------------------------------
 
-include(../mne-cpp.pri)
+include(../../mne-cpp.pri)
 
-TEMPLATE = subdirs
+TEMPLATE = app
 
-SUBDIRS += \
-    test_mne_libs \
-    test_mne_rt \
-    mne_x_plugin_com \
-    test_mne_future
+QT += core gui
+QT += widgets
+QT += printsupport
 
-contains(MNECPP_CONFIG, isGui) {
-    SUBDIRS += \
-        test_mne_disp \
-        test_mne_graph \
+TARGET = test_mne_disp
 
-    qtHaveModule(3d) {
-        isEqual(QT_MAJOR_VERSION, 5){
-#            isEqual(QT_MINOR_VERSION, 1){
-                message(Qt3D available && QTVersion >= Qt 5.1: mne 3D tests configured!)
-                SUBDIRS += \
-                    mne_3d_widget \
-                    test_mne_cluster \
-                    test_mne_surface
-#            }
-        }
-    }
+CONFIG(debug, debug|release) {
+    TARGET = $$join(TARGET,,,d)
 }
+
+LIBS += -L$${MNE_LIBRARY_DIR}
+CONFIG(debug, debug|release) {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
+            -lMNE$${MNE_LIB_VERSION}Utilsd \
+            -lMNE$${MNE_LIB_VERSION}Fsd \
+            -lMNE$${MNE_LIB_VERSION}Fiffd \
+            -lMNE$${MNE_LIB_VERSION}Mned
+
+}
+else {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
+            -lMNE$${MNE_LIB_VERSION}Utils \
+            -lMNE$${MNE_LIB_VERSION}Fs \
+            -lMNE$${MNE_LIB_VERSION}Fiff \
+            -lMNE$${MNE_LIB_VERSION}Mne
+}
+
+DESTDIR = $${MNE_BINARY_DIR}
+
+SOURCES += main.cpp \
+        3rdParty/QCustomPlot/qcustomplot.cpp \
+        mnedisptest.cpp
+
+HEADERS  += \
+        3rdParty/QCustomPlot/qcustomplot.h \
+        mnedisptest.h
+
+INCLUDEPATH += $${MNE_INCLUDE_DIR}
+
+FORMS    += \
+    mnedisptest.ui
