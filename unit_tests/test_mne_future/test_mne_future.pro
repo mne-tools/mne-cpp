@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     mne_rt_tests.pro
+# @file     mne_graph_test.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file generates the makefile for mne_rt_tests for rt validation.
+# @brief    This project file generates the makefile to build the mne_graph_test app.
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -37,13 +37,11 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = app
 
-QT += network
-QT -= gui
+QT += widgets concurrent
 
 CONFIG   += console
-CONFIG   -= app_bundle
 
-TARGET = mne_rt_tests
+TARGET = test_mne_future
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
@@ -51,22 +49,22 @@ CONFIG(debug, debug|release) {
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
-            -lMNE$${MNE_LIB_VERSION}RtCommandd \
+#    LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd
 }
 else {
-    LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
-            -lMNE$${MNE_LIB_VERSION}RtCommand \
+#    LIBS += -lMNE$${MNE_LIB_VERSION}Generics
 }
 
-DESTDIR = $${PWD}/../../bin
+DESTDIR = $${MNE_BINARY_DIR}
 
-SOURCES += \
-    main.cpp \
-    dataparsertest.cpp
+SOURCES += main.cpp
 
-HEADERS += \
-    dataparsertest.h
+HEADERS  +=
+
+FORMS    +=
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
+
+# Put generated form headers into the origin --> cause other src is pointing at them
+UI_DIR = $$PWD

@@ -42,7 +42,7 @@
 //=============================================================================================================
 
 #include "fs_global.h"
-
+#include <iostream>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -130,21 +130,54 @@ public:
 
     //=========================================================================================================
     /**
+    * Returns whether Surface is empty.
+    *
+    * @return true if is empty, false otherwise
+    */
+    inline bool isEmpty();
+
+    //=========================================================================================================
+    /**
     * mne_read_surface
     *
     * Reads a FreeSurfer surface file
     *
-    * @param[in] p_sFileName    The file to read
-    * @param[out] p_Surface     The read surface
+    * @param[in] p_sFileName        The file to read
+    * @param[out] p_Surface         The read surface
+    * @param[in] p_bLoadCurvature   True if the curvature should be read (optional, default = true)
     *
+    * @return true if read sucessful, false otherwise
     */
-    static bool read(const QString &p_sFileName, Surface &p_Surface);
+    static bool read(const QString &p_sFileName, Surface &p_Surface, bool p_bLoadCurvature = true);
+
+    //=========================================================================================================
+    /**
+    * reads a binary curvature file into a vector
+    *
+    * @return the read curvature
+    */
+    static VectorXf read_curv(const QString &p_sFileName);
+
+    //=========================================================================================================
+    /**
+    * Efficiently compute vertex normals for triangulated surface
+    *
+    * @param[in] rr     Vertex coordinates in meters
+    * @param[out] tris  The triangle descriptions
+    *
+    * @return The computed normals
+    */
+    static MatrixX3f compute_normals(const MatrixX3f& rr, const MatrixX3i& tris);
 
 public:
+    QString m_filePath; /**< Path to surf directory. */
     QString m_fileName; /**< Surface file name. */
     qint32 hemi;        /**< Hemisphere (lh = 0; rh = 1) */
+    QString surf;       /**< Name of the surface to load (eg. inflated, orig ...) */
     MatrixX3f rr;       /**< alias verts. Vertex coordinates in meters */
     MatrixX3i tris;     /**< alias faces. The triangle descriptions */
+    MatrixX3f nn;       /**< Normalized surface normals for vertices. */
+    VectorXf curv;      /**< FreeSurfer curvature data */
 };
 
 //*************************************************************************************************************
@@ -155,6 +188,14 @@ public:
 inline qint32 Surface::getHemi() const
 {
     return hemi;
+}
+
+
+//*************************************************************************************************************
+
+inline bool Surface::isEmpty()
+{
+    return hemi == -1;
 }
 
 } // NAMESPACE
