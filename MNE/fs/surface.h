@@ -107,7 +107,18 @@ public:
     * @param[in] p_sFile    Surface file name with path
     */
     explicit Surface(const QString& p_sFile);
-    
+
+    //=========================================================================================================
+    /**
+    * Construts the surface by reading it of the given file.
+    *
+    * @param[in] subject_id         Name of subject
+    * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh}
+    * @param[in] surf               Name of the surface to load (eg. inflated, orig ...)
+    * @param[in] subjects_dir       True if the curvature should be read (optional, default = true)
+    */
+    explicit Surface(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir);
+
     //=========================================================================================================
     /**
     * Destroys the Surface class.
@@ -143,6 +154,23 @@ public:
     * @return the surface
     */
     inline QString surf() const;
+
+    //=========================================================================================================
+    /**
+    * mne_read_surface
+    *
+    * Reads a FreeSurfer surface file
+    *
+    * @param[in] subject_id         Name of subject
+    * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh}
+    * @param[in] surf               Name of the surface to load (eg. inflated, orig ...)
+    * @param[in] subjects_dir       True if the curvature should be read (optional, default = true)
+    * @param[out] p_Surface         The read surface
+    * @param[in] p_bLoadCurvature   True if the curvature should be read (optional, default = true)
+    *
+    * @return true if read sucessful, false otherwise
+    */
+    static bool read(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir, Surface &p_Surface, bool p_bLoadCurvature = true);
 
     //=========================================================================================================
     /**
