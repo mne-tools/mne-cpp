@@ -104,9 +104,9 @@ public:
     /**
     * Construts the surface by reading it of the given file.
     *
-    * @param[in] p_sFileName    Surface file
+    * @param[in] p_sFile    Surface file name with path
     */
-    explicit Surface(const QString& p_sFileName);
+    explicit Surface(const QString& p_sFile);
     
     //=========================================================================================================
     /**
@@ -170,8 +170,8 @@ public:
     static MatrixX3f compute_normals(const MatrixX3f& rr, const MatrixX3i& tris);
 
 public:
-    QString m_filePath; /**< Path to surf directory. */
-    QString m_fileName; /**< Surface file name. */
+    QString m_sFilePath; /**< Path to surf directory. */
+    QString m_sFileName; /**< Surface file name. */
     qint32 hemi;        /**< Hemisphere (lh = 0; rh = 1) */
     QString surf;       /**< Name of the surface to load (eg. inflated, orig ...) */
     MatrixX3f rr;       /**< alias verts. Vertex coordinates in meters */
