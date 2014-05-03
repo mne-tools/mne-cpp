@@ -189,7 +189,6 @@ bool Surface::read(const QString &subject_id, qint32 hemi, const QString &surf, 
 }
 
 
-
 //*************************************************************************************************************
 
 bool Surface::read(const QString &p_sFile, Surface &p_Surface, bool p_bLoadCurvature)

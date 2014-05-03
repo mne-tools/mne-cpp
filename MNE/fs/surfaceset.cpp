@@ -64,15 +64,15 @@ SurfaceSet::SurfaceSet()
 
 //*************************************************************************************************************
 
-SurfaceSet::SurfaceSet(const Surface& p_sLHSurface, const Surface& p_sRHSurface)
+SurfaceSet::SurfaceSet(const Surface& p_LHSurface, const Surface& p_RHSurface)
 {
-    if(p_sLHSurface.hemi() == 0)
-        m_qMapSurfs.insert(0, p_sLHSurface);
+    if(p_LHSurface.hemi() == 0)
+        m_qMapSurfs.insert(0, p_LHSurface);
     else
         qWarning("Left hemisphere id is not 0. LH surface not assigned!");
 
-    if(p_sRHSurface.hemi() == 1)
-        m_qMapSurfs.insert(1, p_sRHSurface);
+    if(p_RHSurface.hemi() == 1)
+        m_qMapSurfs.insert(1, p_RHSurface);
     else
         qWarning("Right hemisphere id is not 1. RH surface not assigned!");
 
@@ -101,6 +101,20 @@ SurfaceSet::~SurfaceSet()
 void SurfaceSet::clear()
 {
     m_qMapSurfs.clear();
+}
+
+
+//*************************************************************************************************************
+
+void SurfaceSet::insert(const Surface& p_Surface)
+{
+    if(p_Surface.isEmpty())
+        return;
+
+    qint32 hemi = p_Surface.hemi();
+    m_qMapSurfs.remove(hemi);
+
+    m_qMapSurfs.insert(hemi, p_Surface);
 }
 
 
