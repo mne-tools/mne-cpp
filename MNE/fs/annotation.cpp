@@ -254,9 +254,9 @@ bool Annotation::read(const QString& p_sFileName, Annotation &p_Annotation)
 
 bool Annotation::toLabels(const Surface &p_surf, QList<Label> &p_qListLabels, QList<RowVector4i> &p_qListLabelRGBAs) const
 {
-    if(this->hemi != p_surf.hemi)
+    if(this->hemi != p_surf.hemi())
     {
-        qWarning("Annotation and surface hemisphere (annot = %d; surf = %d) do not match!\n", this->hemi, p_surf.hemi);
+        qWarning("Annotation and surface hemisphere (annot = %d; surf = %d) do not match!\n", this->hemi, p_surf.hemi());
         return false;
     }
 
@@ -277,7 +277,7 @@ bool Annotation::toLabels(const Surface &p_surf, QList<Label> &p_qListLabels, QL
     MatrixX4i label_rgbas = m_Colortable.getRGBAs();
 
     // load the vertex positions from surface
-    MatrixX3f vert_pos = p_surf.rr;
+    MatrixX3f vert_pos = p_surf.rr();
 
 //    qDebug() << label_rgbas.rows() << label_ids.size() << label_names.size();
 

@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Example of the computation of a rawClusteredInverse
+* @brief    mne Surface test
 *
 */
 
@@ -118,7 +118,7 @@ int main(int argc, char *argv[])
 
     Surface t_surf("D:/Data/subjects/mind006/surf/lh.pial");
 
-    std::cout << "Surface nn\n" << t_surf.nn.block(0,0,10,3) << std::endl;
+    std::cout << "Surface nn\n" << t_surf.nn().block(0,0,10,3) << std::endl;
 
     return a.exec();//1;//a.exec();
 }
