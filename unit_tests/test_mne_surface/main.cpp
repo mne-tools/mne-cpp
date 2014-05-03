@@ -112,5 +112,9 @@ int main(int argc, char *argv[])
 
     SurfaceSet t_surfSet("./MNE-sample-data/subjects/sample/surf/lh.white", "./MNE-sample-data/subjects/sample/surf/rh.white");
 
+    VectorXf curv = Surface::read_curv("D:/Data/subjects/mind006/surf/lh.curv");
+
+    std::cout << "curv\n" << curv.block(curv.size()-10,0,10,1) << std::endl;
+
     return a.exec();//1;//a.exec();
 }
