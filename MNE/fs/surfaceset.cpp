@@ -66,12 +66,12 @@ SurfaceSet::SurfaceSet()
 
 SurfaceSet::SurfaceSet(const Surface& p_sLHSurface, const Surface& p_sRHSurface)
 {
-    if(p_sLHSurface.getHemi() == 0)
+    if(p_sLHSurface.hemi() == 0)
         m_qMapSurfs.insert(0, p_sLHSurface);
     else
         qWarning("Left hemisphere id is not 0. LH surface not assigned!");
 
-    if(p_sRHSurface.getHemi() == 1)
+    if(p_sRHSurface.hemi() == 1)
         m_qMapSurfs.insert(1, p_sRHSurface);
     else
         qWarning("Right hemisphere id is not 1. RH surface not assigned!");

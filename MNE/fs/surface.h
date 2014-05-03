@@ -126,7 +126,7 @@ public:
     *
     * @return hemisphere id
     */
-    inline qint32 getHemi() const;
+    inline qint32 hemi() const;
 
     //=========================================================================================================
     /**
@@ -134,7 +134,15 @@ public:
     *
     * @return true if is empty, false otherwise
     */
-    inline bool isEmpty();
+    inline bool isEmpty() const;
+
+    //=========================================================================================================
+    /**
+    * Loaded surface (eg. inflated, orig ...)
+    *
+    * @return the surface
+    */
+    inline QString surf() const;
 
     //=========================================================================================================
     /**
@@ -169,15 +177,103 @@ public:
     */
     static MatrixX3f compute_normals(const MatrixX3f& rr, const MatrixX3i& tris);
 
-public:
-    QString m_sFilePath; /**< Path to surf directory. */
-    QString m_sFileName; /**< Surface file name. */
-    qint32 hemi;        /**< Hemisphere (lh = 0; rh = 1) */
-    QString surf;       /**< Name of the surface to load (eg. inflated, orig ...) */
-    MatrixX3f rr;       /**< alias verts. Vertex coordinates in meters */
-    MatrixX3i tris;     /**< alias faces. The triangle descriptions */
-    MatrixX3f nn;       /**< Normalized surface normals for vertices. */
-    VectorXf curv;      /**< FreeSurfer curvature data */
+    //=========================================================================================================
+    /**
+    * Coordinates of vertices (rr)
+    *
+    * @return coordinates of vertices
+    */
+    inline MatrixX3f& Surface::rr();
+
+    //=========================================================================================================
+    /**
+    * Coordinates of vertices (rr) const version
+    *
+    * @return coordinates of vertices
+    */
+    inline MatrixX3f Surface::rr() const;
+
+    //=========================================================================================================
+    /**
+    * The triangle descriptions
+    *
+    * @return triangle descriptions
+    */
+    inline MatrixX3i& Surface::tris();
+
+    //=========================================================================================================
+    /**
+    * The triangle descriptions const version
+    *
+    * @return triangle descriptions
+    */
+    inline MatrixX3i Surface::tris() const;
+
+    //=========================================================================================================
+    /**
+    * Normalized surface normals for each vertex
+    *
+    * @return surface normals
+    */
+    inline MatrixX3f& Surface::nn();
+
+    //=========================================================================================================
+    /**
+    * Normalized surface normals for each vertex
+    *
+    * @return surface normals
+    */
+    inline MatrixX3f Surface::nn() const;
+
+    //=========================================================================================================
+    /**
+    * FreeSurfer curvature
+    *
+    * @return the FreeSurfer curvature data
+    */
+    inline VectorXf& Surface::curv();
+
+    //=========================================================================================================
+    /**
+    * FreeSurfer curvature
+    *
+    * @return the FreeSurfer curvature data
+    */
+    inline VectorXf Surface::curv() const;
+
+    //=========================================================================================================
+    /**
+    * x coordinates of vertices (rr)
+    *
+    * @return x coordinates of vertices
+    */
+    inline VectorXf Surface::x() const;
+
+    //=========================================================================================================
+    /**
+    * y coordinates of vertices (rr)
+    *
+    * @return y coordinates of vertices
+    */
+    inline VectorXf Surface::y() const;
+
+    //=========================================================================================================
+    /**
+    * z coordinates of vertices (rr)
+    *
+    * @return z coordinates of vertices
+    */
+    inline VectorXf Surface::z() const;
+
+private:
+    QString m_sFilePath;    /**< Path to surf directory. */
+    QString m_sFileName;    /**< Surface file name. */
+    qint32 m_iHemi;         /**< Hemisphere (lh = 0; rh = 1) */
+    QString m_sSurf;        /**< Loaded surface (eg. inflated, orig ...) */
+    MatrixX3f m_matRR;      /**< alias verts. Vertex coordinates in meters */
+    MatrixX3i m_matTris;    /**< alias faces. The triangle descriptions */
+    MatrixX3f m_matNN;      /**< Normalized surface normals for each vertex. */
+    VectorXf m_vecCurv;     /**< FreeSurfer curvature data */
 };
 
 //*************************************************************************************************************
@@ -185,17 +281,113 @@ public:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline qint32 Surface::getHemi() const
+inline qint32 Surface::hemi() const
 {
-    return hemi;
+    return m_iHemi;
 }
 
 
 //*************************************************************************************************************
 
-inline bool Surface::isEmpty()
+inline bool Surface::isEmpty() const
 {
-    return hemi == -1;
+    return m_iHemi == -1;
+}
+
+
+//*************************************************************************************************************
+
+inline QString Surface::surf() const
+{
+    return m_sSurf;
+}
+
+
+//*************************************************************************************************************
+
+inline MatrixX3f& Surface::rr()
+{
+    return m_matRR;
+}
+
+
+//*************************************************************************************************************
+
+inline MatrixX3f Surface::rr() const
+{
+    return m_matRR;
+}
+
+
+//*************************************************************************************************************
+
+inline MatrixX3i& Surface::tris()
+{
+    return m_matTris;
+}
+
+
+//*************************************************************************************************************
+
+inline MatrixX3i Surface::tris() const
+{
+    return m_matTris;
+}
+
+
+//*************************************************************************************************************
+
+inline MatrixX3f& Surface::nn()
+{
+    return m_matNN;
+}
+
+
+//*************************************************************************************************************
+
+inline MatrixX3f Surface::nn() const
+{
+    return m_matNN;
+}
+
+
+//*************************************************************************************************************
+
+inline VectorXf& Surface::curv()
+{
+    return m_vecCurv;
+}
+
+
+//*************************************************************************************************************
+
+inline VectorXf Surface::curv() const
+{
+    return m_vecCurv;
+}
+
+
+//*************************************************************************************************************
+
+inline VectorXf Surface::x() const
+{
+    return m_matRR.col(0);
+}
+
+
+//*************************************************************************************************************
+
+inline VectorXf Surface::y() const
+{
+    return m_matRR.col(1);
+}
+
+
+//*************************************************************************************************************
+
+inline VectorXf Surface::z() const
+{
+    return m_matRR.col(2);
 }
 
 } // NAMESPACE

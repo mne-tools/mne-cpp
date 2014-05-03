@@ -72,8 +72,8 @@ using namespace FSLIB;
 Surface::Surface()
 : m_sFilePath("")
 , m_sFileName("")
-, hemi(-1)
-, surf("")
+, m_iHemi(-1)
+, m_sSurf("")
 {
 }
 
@@ -81,8 +81,8 @@ Surface::Surface()
 //*************************************************************************************************************
 
 Surface::Surface(const QString& p_sFile)
-: hemi(-1)
-, surf("")
+: m_iHemi(-1)
+, m_sSurf("")
 {
     Surface::read(p_sFile, *this);
 }
@@ -101,12 +101,12 @@ void Surface::clear()
 {
     m_sFilePath.clear();
     m_sFileName.clear();
-    hemi = -1;
-    surf.clear();
-    rr.resize(0,3);
-    tris.resize(0,3);
-    nn.resize(0,3);
-    curv.resize(0);
+    m_iHemi = -1;
+    m_sSurf.clear();
+    m_matRR.resize(0,3);
+    m_matTris.resize(0,3);
+    m_matNN.resize(0,3);
+    m_vecCurv.resize(0);
 }
 
 
@@ -329,31 +329,31 @@ bool Surface::read(const QString &p_sFile, Surface &p_Surface, bool p_bLoadCurva
     verts.transposeInPlace();
     verts.array() *= 0.001f;
 
-    p_Surface.rr = verts.block(0,0,verts.rows(),3);
-    p_Surface.tris = faces.block(0,0,faces.rows(),3);
+    p_Surface.m_matRR = verts.block(0,0,verts.rows(),3);
+    p_Surface.m_matTris = faces.block(0,0,faces.rows(),3);
 
-    p_Surface.nn = compute_normals(p_Surface.rr, p_Surface.tris);
+    p_Surface.m_matNN = compute_normals(p_Surface.m_matRR, p_Surface.m_matTris);
 
     // hemi info
     if(t_File.fileName().contains("lh."))
-        p_Surface.hemi = 0;
+        p_Surface.m_iHemi = 0;
     else if(t_File.fileName().contains("rh."))
-        p_Surface.hemi = 1;
+        p_Surface.m_iHemi = 1;
     else
     {
-        p_Surface.hemi = -1;
+        p_Surface.m_iHemi = -1;
         return false;
     }
 
     //Loaded surface
-    p_Surface.surf = t_File.fileName().right(4);
+    p_Surface.m_sSurf = t_File.fileName().right(4);
 
     //Load curvature
     if(p_bLoadCurvature)
     {
-        QString t_sCurvatureFile = QString("%1%2.curv").arg(p_Surface.m_sFilePath).arg(p_Surface.hemi == 0 ? "lh" : "rh");
+        QString t_sCurvatureFile = QString("%1%2.curv").arg(p_Surface.m_sFilePath).arg(p_Surface.m_iHemi == 0 ? "lh" : "rh");
         printf("\t");
-        p_Surface.curv = Surface::read_curv(t_sCurvatureFile);
+        p_Surface.m_vecCurv = Surface::read_curv(t_sCurvatureFile);
     }
 
     t_File.close();
