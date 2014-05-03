@@ -53,6 +53,8 @@
 
 #include "qglview.h"
 
+#include <QString>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -102,6 +104,17 @@ class DISP3DSHARED_EXPORT BrainView : public QGLView
 {
 public:
     BrainView();
+
+    //=========================================================================================================
+    /**
+    * Construts the brain view by reading a given surface.
+    *
+    * @param[in] p_sFile    Surface file name with path
+    */
+    explicit BrainView(const QString& p_sFile);
+
+private:
+    SurfaceSet m_SurfaceSet;
 };
 
 } // NAMESPACE

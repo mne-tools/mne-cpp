@@ -96,10 +96,10 @@ public:
     /**
     * Constructs a surface set by assembling given surfaces
     *
-    * @param[in] p_sLHSurface    Left hemisphere surface
-    * @param[in] p_sRHSurface    Right hemisphere surface
+    * @param[in] p_LHSurface    Left hemisphere surface
+    * @param[in] p_RHSurface    Right hemisphere surface
     */
-    explicit SurfaceSet(const Surface& p_sLHSurface, const Surface& p_sRHSurface);
+    explicit SurfaceSet(const Surface& p_LHSurface, const Surface& p_RHSurface);
 
     //=========================================================================================================
     /**
@@ -129,6 +129,14 @@ public:
     * @return true if SurfaceSet is empty
     */
     inline bool isEmpty() const;
+
+    //=========================================================================================================
+    /**
+    * Insert a surface
+    *
+    * @param[in] p_Surface  Surface to insert
+    */
+    void insert(const Surface& p_Surface);
 
     //=========================================================================================================
     /**

@@ -59,3 +59,12 @@ using namespace DISP3DLIB;
 BrainView::BrainView()
 {
 }
+
+
+//*************************************************************************************************************
+
+BrainView::BrainView(const QString& p_sFile)
+{
+    Surface t_Surf(p_sFile);
+    m_SurfaceSet.insert(t_Surf);
+}
