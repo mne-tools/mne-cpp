@@ -116,5 +116,9 @@ int main(int argc, char *argv[])
 
     std::cout << "curv\n" << curv.block(curv.size()-10,0,10,1) << std::endl;
 
+    Surface t_surf("D:/Data/subjects/mind006/surf/lh.pial");
+
+    std::cout << "Surface nn\n" << t_surf.nn.block(0,0,10,3) << std::endl;
+
     return a.exec();//1;//a.exec();
 }
