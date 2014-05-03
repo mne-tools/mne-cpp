@@ -81,10 +81,24 @@ Surface::Surface()
 //*************************************************************************************************************
 
 Surface::Surface(const QString& p_sFile)
-: m_iHemi(-1)
+: m_sFilePath("")
+, m_sFileName("")
+, m_iHemi(-1)
 , m_sSurf("")
 {
     Surface::read(p_sFile, *this);
+}
+
+
+//*************************************************************************************************************
+
+Surface::Surface(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir)
+: m_sFilePath("")
+, m_sFileName("")
+, m_iHemi(-1)
+, m_sSurf("")
+{
+    Surface::read(subject_id, hemi, surf, subjects_dir, *this);
 }
 
 
@@ -160,6 +174,20 @@ MatrixX3f Surface::compute_normals(const MatrixX3f& rr, const MatrixX3i& tris)
 
     return nn;
 }
+
+
+//*************************************************************************************************************
+
+bool Surface::read(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir, Surface &p_Surface, bool p_bLoadCurvature)
+{
+    if(hemi != 0 && hemi != 1)
+        return false;
+
+    QString p_sFile = QString("%1/%2/surf/%3.%4").arg(subjects_dir).arg(subject_id).arg(hemi == 0 ? "lh" : "rh").arg(surf);
+
+    return read(p_sFile, p_Surface, p_bLoadCurvature);
+}
+
 
 
 //*************************************************************************************************************
@@ -400,6 +428,7 @@ VectorXf Surface::read_curv(const QString &p_sFileName)
     else
     {
         qint32 fnum = IOUtils::fread3(t_DataStream);
+        Q_UNUSED(fnum)
         qint16 iVal;
         curv.resize(vnum, 1);
         for(qint32 i = 0; i < vnum; ++i)
