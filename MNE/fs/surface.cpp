@@ -357,7 +357,7 @@ bool Surface::read(const QString &p_sFile, Surface &p_Surface, bool p_bLoadCurva
     }
 
     t_File.close();
-    printf("\tRead a surface with %d vertices from %s\n",nvert,p_sFile.toLatin1().constData());
+    printf("\tRead a surface with %d vertices from %s\n[done]\n",nvert,p_sFile.toLatin1().constData());
 
     return true;
 }
