@@ -104,6 +104,18 @@ Surface::Surface(const QString &subject_id, qint32 hemi, const QString &surf, co
 
 //*************************************************************************************************************
 
+Surface::Surface(const QString &path, qint32 hemi, const QString &surf)
+: m_sFilePath("")
+, m_sFileName("")
+, m_iHemi(-1)
+, m_sSurf("")
+{
+    Surface::read(path, hemi, surf, *this);
+}
+
+
+//*************************************************************************************************************
+
 Surface::~Surface()
 {
 }
@@ -184,6 +196,19 @@ bool Surface::read(const QString &subject_id, qint32 hemi, const QString &surf, 
         return false;
 
     QString p_sFile = QString("%1/%2/surf/%3.%4").arg(subjects_dir).arg(subject_id).arg(hemi == 0 ? "lh" : "rh").arg(surf);
+
+    return read(p_sFile, p_Surface, p_bLoadCurvature);
+}
+
+
+//*************************************************************************************************************
+
+bool Surface::read(const QString &path, qint32 hemi, const QString &surf, Surface &p_Surface, bool p_bLoadCurvature)
+{
+    if(hemi != 0 && hemi != 1)
+        return false;
+
+    QString p_sFile = QString("%1/%2.%3").arg(path).arg(hemi == 0 ? "lh" : "rh").arg(surf);
 
     return read(p_sFile, p_Surface, p_bLoadCurvature);
 }

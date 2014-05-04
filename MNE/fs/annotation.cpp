@@ -107,6 +107,32 @@ void Annotation::clear()
 
 //*************************************************************************************************************
 
+bool Annotation::read(const QString &subject_id, qint32 hemi, const QString &atlas, const QString &subjects_dir, Annotation &p_Annotation)
+{
+    if(hemi != 0 && hemi != 1)
+        return false;
+
+    QString p_sFile = QString("%1/%2/label/%3.%4.annot").arg(subjects_dir).arg(subject_id).arg(hemi == 0 ? "lh" : "rh").arg(atlas);
+
+    return read(p_sFile, p_Annotation);
+}
+
+
+//*************************************************************************************************************
+
+bool Annotation::read(const QString &path, qint32 hemi, const QString &atlas, Annotation &p_Annotation)
+{
+    if(hemi != 0 && hemi != 1)
+        return false;
+
+    QString p_sFile = QString("%1/%2.%3.annot").arg(path).arg(hemi == 0 ? "lh" : "rh").arg(atlas);
+
+    return read(p_sFile, p_Annotation);
+}
+
+
+//*************************************************************************************************************
+
 bool Annotation::read(const QString& p_sFileName, Annotation &p_Annotation)
 {
     p_Annotation.clear();
@@ -238,9 +264,9 @@ bool Annotation::read(const QString& p_sFileName, Annotation &p_Annotation)
 
     // hemi info
     if(t_File.fileName().contains("lh."))
-        p_Annotation.hemi = 0;
+        p_Annotation.m_iHemi = 0;
     else
-        p_Annotation.hemi = 1;
+        p_Annotation.m_iHemi = 1;
 
     printf("[done]\n");
 
@@ -254,9 +280,9 @@ bool Annotation::read(const QString& p_sFileName, Annotation &p_Annotation)
 
 bool Annotation::toLabels(const Surface &p_surf, QList<Label> &p_qListLabels, QList<RowVector4i> &p_qListLabelRGBAs) const
 {
-    if(this->hemi != p_surf.hemi())
+    if(this->m_iHemi != p_surf.hemi())
     {
-        qWarning("Annotation and surface hemisphere (annot = %d; surf = %d) do not match!\n", this->hemi, p_surf.hemi());
+        qWarning("Annotation and surface hemisphere (annot = %d; surf = %d) do not match!\n", this->m_iHemi, p_surf.hemi());
         return false;
     }
 
@@ -314,11 +340,11 @@ bool Annotation::toLabels(const Surface &p_surf, QList<Label> &p_qListLabels, QL
             pos.row(j) = vert_pos.row(vertices[j]);
 
         values = VectorXd::Zero(count);
-        name = QString("%1-%2").arg(label_names[i]).arg(this->hemi == 0 ? "lh" : "rh");
+        name = QString("%1-%2").arg(label_names[i]).arg(this->m_iHemi == 0 ? "lh" : "rh");
 
         // put it all together
         //t_tris
-        p_qListLabels.append(Label(vertices, pos, values, this->hemi, name, label_id));
+        p_qListLabels.append(Label(vertices, pos, values, this->m_iHemi, name, label_id));
 
         // store the color
         p_qListLabelRGBAs.append(label_rgba);

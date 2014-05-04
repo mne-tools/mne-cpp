@@ -94,6 +94,27 @@ public:
 
     //=========================================================================================================
     /**
+    * Construts the surface set by reading it of the given files.
+    *
+    * @param[in] subject_id         Name of subject
+    * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh, 2 -> both}
+    * @param[in] surf               Name of the surface to load (eg. inflated, orig ...)
+    * @param[in] subjects_dir       Subjects directory
+    */
+    explicit SurfaceSet(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir);
+
+    //=========================================================================================================
+    /**
+    * Construts the surface set by reading it of the given files.
+    *
+    * @param[in] path               path to surface directory
+    * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh, 2 -> both}
+    * @param[in] surf               Name of the surface to load (eg. inflated, orig ...)
+    */
+    explicit SurfaceSet(const QString &path, qint32 hemi, const QString &surf);
+
+    //=========================================================================================================
+    /**
     * Constructs a surface set by assembling given surfaces
     *
     * @param[in] p_LHSurface    Left hemisphere surface
