@@ -108,7 +108,7 @@ int main(int argc, char *argv[])
 //    QFile t_fileCov("./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
 //    QFile t_fileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
 //    QString t_sEventName = "./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif";
-//    AnnotationSet t_annotationSet("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot", "./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot");
+//    AnnotationSet t_annotationSet("sample", 2, "aparc.a2009s", "./MNE-sample-data/subjects");
 //    SurfaceSet t_surfSet("sample", 2, "white", "./MNE-sample-data/subjects");
 
     QFile t_fileFwd("D:/Data/MEG/mind006/mind006_051209_auditory01_raw-oct-6p-fwd.fif");
