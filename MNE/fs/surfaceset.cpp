@@ -64,6 +64,46 @@ SurfaceSet::SurfaceSet()
 
 //*************************************************************************************************************
 
+SurfaceSet::SurfaceSet(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir)
+{
+    Surface t_Surface;
+    if(hemi == 0 || hemi == 1)
+    {
+        if(Surface::read(subject_id, hemi, surf, subjects_dir, t_Surface))
+            insert(t_Surface);
+    }
+    else if(hemi == 2)
+    {
+        if(Surface::read(subject_id, 0, surf, subjects_dir, t_Surface))
+            insert(t_Surface);
+        if(Surface::read(subject_id, 1, surf, subjects_dir, t_Surface))
+            insert(t_Surface);
+    }
+}
+
+
+//*************************************************************************************************************
+
+SurfaceSet::SurfaceSet(const QString &path, qint32 hemi, const QString &surf)
+{
+    Surface t_Surface;
+    if(hemi == 0 || hemi == 1)
+    {
+        if(Surface::read(path, hemi, surf, t_Surface))
+            insert(t_Surface);
+    }
+    else if(hemi == 2)
+    {
+        if(Surface::read(path, 0, surf, t_Surface))
+            insert(t_Surface);
+        if(Surface::read(path, 1, surf, t_Surface))
+            insert(t_Surface);
+    }
+}
+
+
+//*************************************************************************************************************
+
 SurfaceSet::SurfaceSet(const Surface& p_LHSurface, const Surface& p_RHSurface)
 {
     if(p_LHSurface.hemi() == 0)

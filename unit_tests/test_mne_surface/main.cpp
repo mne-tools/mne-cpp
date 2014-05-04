@@ -4,11 +4,11 @@
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2013
+* @date     May, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -32,7 +32,6 @@
 * @brief    mne Surface test
 *
 */
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -110,6 +109,7 @@ int main(int argc, char *argv[])
 //    Vector3f v3 = v1.cwiseProduct(v2);
 //    std::cout << "v3: " << v3 << std::endl;
 
+
     SurfaceSet t_surfSet("./MNE-sample-data/subjects/sample/surf/lh.white", "./MNE-sample-data/subjects/sample/surf/rh.white");
 
     VectorXf curv = Surface::read_curv("D:/Data/subjects/mind006/surf/lh.curv");
@@ -119,6 +119,17 @@ int main(int argc, char *argv[])
     Surface t_surf("D:/Data/subjects/mind006/surf/lh.pial");
 
     std::cout << "Surface nn\n" << t_surf.nn().block(0,0,10,3) << std::endl;
+
+    qDebug() << "[2]";
+    SurfaceSet t_surfSet2("./MNE-sample-data/subjects/sample/surf", 2, "inflated");
+
+    qDebug() << "[3]";
+    SurfaceSet t_surfSet3("sample", 2, "inflated", "./MNE-sample-data/subjects");
+
+    qDebug() << "[4]";
+    AnnotationSet t_annotationSet("sample", 2, "aparc.a2009s", "./MNE-sample-data/subjects");
+
+
 
     return a.exec();//1;//a.exec();
 }

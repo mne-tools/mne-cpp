@@ -121,6 +121,19 @@ public:
 
     //=========================================================================================================
     /**
+    * Construts the surface by reading it of the given file.
+    *
+    * @param[in] path               path to surface directory
+    * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh}
+    * @param[in] surf               Name of the surface to load (eg. inflated, orig ...)
+    *
+    * @return true if read sucessful, false otherwise
+    */
+    explicit Surface(const QString &path, qint32 hemi, const QString &surf);
+
+
+    //=========================================================================================================
+    /**
     * Destroys the Surface class.
     */
     ~Surface();
@@ -164,13 +177,29 @@ public:
     * @param[in] subject_id         Name of subject
     * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh}
     * @param[in] surf               Name of the surface to load (eg. inflated, orig ...)
-    * @param[in] subjects_dir       True if the curvature should be read (optional, default = true)
+    * @param[in] subjects_dir       Subjects directory
     * @param[out] p_Surface         The read surface
     * @param[in] p_bLoadCurvature   True if the curvature should be read (optional, default = true)
     *
     * @return true if read sucessful, false otherwise
     */
     static bool read(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir, Surface &p_Surface, bool p_bLoadCurvature = true);
+
+    //=========================================================================================================
+    /**
+    * mne_read_surface
+    *
+    * Reads a FreeSurfer surface file
+    *
+    * @param[in] path               path to surface directory
+    * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh}
+    * @param[in] surf               Name of the surface to load (eg. inflated, orig ...)
+    * @param[out] p_Surface         The read surface
+    * @param[in] p_bLoadCurvature   True if the curvature should be read (optional, default = true)
+    *
+    * @return true if read sucessful, false otherwise
+    */
+    static bool read(const QString &path, qint32 hemi, const QString &surf, Surface &p_Surface, bool p_bLoadCurvature = true);
 
     //=========================================================================================================
     /**
