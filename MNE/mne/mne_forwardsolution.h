@@ -149,7 +149,7 @@ struct RegionData
         // Kmeans Reduction
         RegionDataOut p_RegionDataOut;
 
-        KMeans t_kMeans(QString("cityblock"), QString("sample"), 5);
+        KMeans t_kMeans(QString("sqeuclidean"), QString("sample"), 5);//QString("cityblock")
 
         if(bUseWhitened)
         {

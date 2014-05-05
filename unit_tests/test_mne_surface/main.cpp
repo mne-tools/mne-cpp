@@ -110,28 +110,28 @@ int main(int argc, char *argv[])
 //    std::cout << "v3: " << v3 << std::endl;
 
 
-    SurfaceSet t_surfSet("./MNE-sample-data/subjects/sample/surf/lh.white", "./MNE-sample-data/subjects/sample/surf/rh.white");
+//    SurfaceSet t_surfSet("./MNE-sample-data/subjects/sample/surf/lh.white", "./MNE-sample-data/subjects/sample/surf/rh.white");
 
-    VectorXf curv = Surface::read_curv("D:/Data/subjects/mind006/surf/lh.curv");
+//    VectorXf curv = Surface::read_curv("D:/Data/subjects/mind006/surf/lh.curv");
 
-    std::cout << "curv\n" << curv.block(curv.size()-10,0,10,1) << std::endl;
+//    std::cout << "curv\n" << curv.block(curv.size()-10,0,10,1) << std::endl;
 
-    Surface t_surf("D:/Data/subjects/mind006/surf/lh.pial");
+//    Surface t_surf("D:/Data/subjects/mind006/surf/lh.pial");
 
-    std::cout << "Surface nn\n" << t_surf.nn().block(0,0,10,3) << std::endl;
+//    std::cout << "Surface nn\n" << t_surf.nn().block(0,0,10,3) << std::endl;
 
-    qDebug() << "[2]";
-    SurfaceSet t_surfSet2("./MNE-sample-data/subjects/sample/surf", 2, "inflated");
+//    qDebug() << "[2]";
+//    SurfaceSet t_surfSet2("./MNE-sample-data/subjects/sample/surf", 2, "inflated");
 
-    qDebug() << "[3]";
-    SurfaceSet t_surfSet3("sample", 2, "inflated", "./MNE-sample-data/subjects");
+//    qDebug() << "[3]";
+//    SurfaceSet t_surfSet3("sample", 2, "inflated", "./MNE-sample-data/subjects");
 
-    qDebug() << "[4]";
-    AnnotationSet t_annotationSet("sample", 2, "aparc.a2009s", "./MNE-sample-data/subjects");
+//    qDebug() << "[4]";
+//    AnnotationSet t_annotationSet("sample", 2, "aparc.a2009s", "./MNE-sample-data/subjects");
 
-    qDebug() << "[5]";
+//    qDebug() << "[5]";
 
-    BrainView t_brainView;
+    BrainView t_brainView("sample", 2, "inflated", "./MNE-sample-data/subjects");
 
     if (t_brainView.stereoType() != QGLView::RedCyanAnaglyph)
         t_brainView.camera()->setEyeSeparation(0.3f);

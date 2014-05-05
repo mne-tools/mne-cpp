@@ -52,6 +52,8 @@
 //=============================================================================================================
 
 #include "qglview.h"
+#include <QGeometryData>
+#include <QGLColorMaterial>
 
 #include <QString>
 
@@ -102,8 +104,27 @@ using namespace Eigen;
 */
 class DISP3DSHARED_EXPORT BrainView : public QGLView
 {
+    Q_OBJECT
 public:
+    typedef QSharedPointer<BrainView> SPtr;             /**< Shared pointer type for BrainView class. */
+    typedef QSharedPointer<const BrainView> ConstSPtr;  /**< Const shared pointer type for BrainView class. */
+
+    //=========================================================================================================
+    /**
+    * Default constructor
+    */
     BrainView();
+
+    //=========================================================================================================
+    /**
+    * Construts the BrainView set by reading it of the given surface.
+    *
+    * @param[in] subject_id         Name of subject
+    * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh, 2 -> both}
+    * @param[in] surf               Name of the surface to load (eg. inflated, orig ...)
+    * @param[in] subjects_dir       Subjects directory
+    */
+    explicit BrainView(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir);
 
     //=========================================================================================================
     /**
@@ -113,8 +134,72 @@ public:
     */
     explicit BrainView(const QString& p_sFile);
 
+
+    void init();
+
+protected:
+    //=========================================================================================================
+    /**
+    * Initializes the current GL context represented by painter.
+    *
+    * @param[in] painter    GL painter which should be initialized
+    */
+    void initializeGL(QGLPainter *painter);
+
+    //=========================================================================================================
+    /**
+    * Paints the scene onto painter. The color and depth buffers will have already been cleared, and the camera() position set.
+    *
+    * @param[in] painter    GL painter which is updated
+    */
+    void paintGL(QGLPainter *painter);
+
+    //=========================================================================================================
+    /**
+    * Processes the key press event e.
+    *
+    * @param[in] e      the key press event.
+    */
+    void keyPressEvent(QKeyEvent *e);
+
+    //=========================================================================================================
+    /**
+    * Processes the mouse move event e.
+    *
+    * @param[in] e      the mouse move event.
+    */
+    void mouseMoveEvent(QMouseEvent *e);
+
+    //=========================================================================================================
+    /**
+    * Processes the mouse press event e.
+    *
+    * @param[in] e      the mouse press event.
+    */
+    void mousePressEvent(QMouseEvent *e);
+
 private:
-    SurfaceSet m_SurfaceSet;
+    SurfaceSet m_SurfaceSet;    /**< Surface set */
+
+
+    // GL Stuff
+    bool m_bStereo;
+
+    float m_fOffsetZ;                               /**< Z offset for pop-out effect. */
+    float m_fOffsetZEye;                            /**< Z offset eye. */
+
+    QGLSceneNode *m_pSceneNodeBrain;                /**< Scene node of the hemisphere models. */
+    QGLSceneNode *m_pSceneNode;                     /**< Node of the scene. */
+
+    QGLLightModel *m_pLightModel;                   /**< The selected light model. */
+    QGLLightParameters *m_pLightParametersScene;    /**< The selected light parameters. */
+
+    QGLColorMaterial material;
+
+
+    QVector3D m_vecBoundingBoxMin;                  /**< X, Y, Z minima. */
+    QVector3D m_vecBoundingBoxMax;                  /**< X, Y, Z maxima. */
+    QVector3D m_vecBoundingBoxCenter;               /**< X, Y, Z center. */
 };
 
 } // NAMESPACE

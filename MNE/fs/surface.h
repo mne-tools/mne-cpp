@@ -240,15 +240,7 @@ public:
     *
     * @return coordinates of vertices
     */
-    inline MatrixX3f& Surface::rr();
-
-    //=========================================================================================================
-    /**
-    * Coordinates of vertices (rr) const version
-    *
-    * @return coordinates of vertices
-    */
-    inline MatrixX3f Surface::rr() const;
+    inline const MatrixX3f& Surface::rr() const;
 
     //=========================================================================================================
     /**
@@ -256,31 +248,15 @@ public:
     *
     * @return triangle descriptions
     */
-    inline MatrixX3i& Surface::tris();
+    inline const MatrixX3i& Surface::tris() const;
 
-    //=========================================================================================================
-    /**
-    * The triangle descriptions const version
-    *
-    * @return triangle descriptions
-    */
-    inline MatrixX3i Surface::tris() const;
-
-    //=========================================================================================================
-    /**
-    * Normalized surface normals for each vertex
-    *
-    * @return surface normals
-    */
-    inline MatrixX3f& Surface::nn();
-
-    //=========================================================================================================
-    /**
-    * Normalized surface normals for each vertex
-    *
-    * @return surface normals
-    */
-    inline MatrixX3f Surface::nn() const;
+//    //=========================================================================================================
+//    /**
+//    * Normalized surface normals for each vertex
+//    *
+//    * @return surface normals
+//    */
+//    inline const MatrixX3f& Surface::nn() const;
 
     //=========================================================================================================
     /**
@@ -288,39 +264,7 @@ public:
     *
     * @return the FreeSurfer curvature data
     */
-    inline VectorXf& Surface::curv();
-
-    //=========================================================================================================
-    /**
-    * FreeSurfer curvature
-    *
-    * @return the FreeSurfer curvature data
-    */
-    inline VectorXf Surface::curv() const;
-
-    //=========================================================================================================
-    /**
-    * x coordinates of vertices (rr)
-    *
-    * @return x coordinates of vertices
-    */
-    inline VectorXf Surface::x() const;
-
-    //=========================================================================================================
-    /**
-    * y coordinates of vertices (rr)
-    *
-    * @return y coordinates of vertices
-    */
-    inline VectorXf Surface::y() const;
-
-    //=========================================================================================================
-    /**
-    * z coordinates of vertices (rr)
-    *
-    * @return z coordinates of vertices
-    */
-    inline VectorXf Surface::z() const;
+    inline const VectorXf& Surface::curv() const;
 
 private:
     QString m_sFilePath;    /**< Path to surf directory. */
@@ -329,7 +273,7 @@ private:
     QString m_sSurf;        /**< Loaded surface (eg. inflated, orig ...) */
     MatrixX3f m_matRR;      /**< alias verts. Vertex coordinates in meters */
     MatrixX3i m_matTris;    /**< alias faces. The triangle descriptions */
-    MatrixX3f m_matNN;      /**< Normalized surface normals for each vertex. */
+//    MatrixX3f m_matNN;      /**< Normalized surface normals for each vertex. -> not needed since qglbuilder is doing that for us */
     VectorXf m_vecCurv;     /**< FreeSurfer curvature data */
 };
 
@@ -362,7 +306,7 @@ inline QString Surface::surf() const
 
 //*************************************************************************************************************
 
-inline MatrixX3f& Surface::rr()
+inline const MatrixX3f& Surface::rr() const
 {
     return m_matRR;
 }
@@ -370,81 +314,25 @@ inline MatrixX3f& Surface::rr()
 
 //*************************************************************************************************************
 
-inline MatrixX3f Surface::rr() const
-{
-    return m_matRR;
-}
-
-
-//*************************************************************************************************************
-
-inline MatrixX3i& Surface::tris()
+inline const MatrixX3i& Surface::tris() const
 {
     return m_matTris;
 }
 
 
-//*************************************************************************************************************
+////*************************************************************************************************************
 
-inline MatrixX3i Surface::tris() const
-{
-    return m_matTris;
-}
-
-
-//*************************************************************************************************************
-
-inline MatrixX3f& Surface::nn()
-{
-    return m_matNN;
-}
+//inline const MatrixX3f& Surface::nn() const
+//{
+//    return m_matNN;
+//}
 
 
 //*************************************************************************************************************
 
-inline MatrixX3f Surface::nn() const
-{
-    return m_matNN;
-}
-
-
-//*************************************************************************************************************
-
-inline VectorXf& Surface::curv()
+inline const VectorXf& Surface::curv() const
 {
     return m_vecCurv;
-}
-
-
-//*************************************************************************************************************
-
-inline VectorXf Surface::curv() const
-{
-    return m_vecCurv;
-}
-
-
-//*************************************************************************************************************
-
-inline VectorXf Surface::x() const
-{
-    return m_matRR.col(0);
-}
-
-
-//*************************************************************************************************************
-
-inline VectorXf Surface::y() const
-{
-    return m_matRR.col(1);
-}
-
-
-//*************************************************************************************************************
-
-inline VectorXf Surface::z() const
-{
-    return m_matRR.col(2);
 }
 
 } // NAMESPACE

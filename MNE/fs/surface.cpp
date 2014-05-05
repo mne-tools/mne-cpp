@@ -131,7 +131,7 @@ void Surface::clear()
     m_sSurf.clear();
     m_matRR.resize(0,3);
     m_matTris.resize(0,3);
-    m_matNN.resize(0,3);
+//    m_matNN.resize(0,3);
     m_vecCurv.resize(0);
 }
 
@@ -384,7 +384,8 @@ bool Surface::read(const QString &p_sFile, Surface &p_Surface, bool p_bLoadCurva
     p_Surface.m_matRR = verts.block(0,0,verts.rows(),3);
     p_Surface.m_matTris = faces.block(0,0,faces.rows(),3);
 
-    p_Surface.m_matNN = compute_normals(p_Surface.m_matRR, p_Surface.m_matTris);
+//    //not needed since qglbuilder is doing that for us
+//    p_Surface.m_matNN = compute_normals(p_Surface.m_matRR, p_Surface.m_matTris);
 
     // hemi info
     if(t_File.fileName().contains("lh."))
