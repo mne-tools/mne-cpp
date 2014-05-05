@@ -138,7 +138,7 @@ struct RegionMT
         // Kmeans Reduction
         RegionMTOut p_RegionMTOut;
 
-        KMeans t_kMeans(QString("cityblock"), QString("sample"), 5);
+        KMeans t_kMeans(QString("sqeuclidean"), QString("sample"), 5);//QString("cityblock")
 
         t_kMeans.calculate(this->matRoiMT, this->nClusters, p_RegionMTOut.roiIdx, p_RegionMTOut.ctrs, p_RegionMTOut.sumd, p_RegionMTOut.D);
 

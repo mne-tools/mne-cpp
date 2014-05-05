@@ -568,14 +568,14 @@ int main(int argc, char *argv[])
     printf("[2]\n");
     MatrixXd R = M * t_FwdFixed.sol->data;
 
-    std::ofstream ofs_R("R.txt", std::ofstream::out);
+    std::ofstream ofs_R("R_ec.txt", std::ofstream::out);
     if (ofs_R.is_open())
     {
-        printf("writing to R.txt\n");
+        printf("writing to R_ec.txt\n");
         ofs_R << R << '\n';
     }
     else
-        printf("Not writing to R.txt\n");
+        printf("Not writing to R_ec.txt\n");
     ofs_R.close();
 
     M.resize(0,0);
@@ -588,28 +588,28 @@ int main(int argc, char *argv[])
     printf("[4]\n");
     MatrixXd R_clustered = M_clusterd * t_FwdFixed.sol->data;
 
-    std::ofstream ofs_R_clustered("R_clustered.txt", std::ofstream::out);
+    std::ofstream ofs_R_clustered("R_clustered_ec.txt", std::ofstream::out);
     if (ofs_R_clustered.is_open())
     {
-        printf("writing to R_clustered.txt\n");
+        printf("writing to R_clustered_ec.txt\n");
         ofs_R_clustered << R_clustered << '\n';
     }
     else
-        printf("Not writing to R_clustered.txt\n");
+        printf("Not writing to R_clustered_ec.txt\n");
     ofs_R_clustered.close();
 
     M_clusterd.resize(0,0);
     R_clustered.resize(0,0);
 
 //Cluster Operator D
-    std::ofstream ofs_D("D.txt", std::ofstream::out);
+    std::ofstream ofs_D("D_ec.txt", std::ofstream::out);
     if (ofs_D.is_open())
     {
-        printf("writing to D.txt\n");
+        printf("writing to D_ec.txt\n");
         ofs_D << D << '\n';
     }
     else
-        printf("Not writing to D.txt\n");
+        printf("Not writing to D_ec.txt\n");
     ofs_D.close();
 
 
@@ -617,27 +617,27 @@ int main(int argc, char *argv[])
     printf("[5]\n");
     MatrixXd R_MT_clustered = MT_clustered.transpose() * t_FwdFixed.sol->data;
 
-    std::ofstream ofs_R_MT_clustered("R_MT_clustered.txt", std::ofstream::out);
+    std::ofstream ofs_R_MT_clustered("R_MT_clustered_ec.txt", std::ofstream::out);
     if (ofs_R_MT_clustered.is_open())
     {
-        printf("writing to R_MT_clustered.txt\n");
+        printf("writing to R_MT_clustered_ec.txt\n");
         ofs_R_MT_clustered << R_MT_clustered << '\n';
     }
     else
-        printf("Not writing to R_MT_clustered.txt\n");
+        printf("Not writing to R_MT_clustered_ec.txt\n");
     ofs_R_MT_clustered.close();
 
     R_MT_clustered.resize(0,0);
 
     //Cluster Operator D
-    std::ofstream ofs_D_MT("D_MT.txt", std::ofstream::out);
+    std::ofstream ofs_D_MT("D_MT_ec.txt", std::ofstream::out);
     if (ofs_D_MT.is_open())
     {
-        printf("writing to D_MT.txt\n");
+        printf("writing to D_MT_ec.txt\n");
         ofs_D_MT << D_MT << '\n';
     }
     else
-        printf("Not writing to D_MT.txt\n");
+        printf("Not writing to D_MT_ec.txt\n");
     ofs_D_MT.close();
 
 
