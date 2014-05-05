@@ -51,7 +51,7 @@
 #include <mne/mne_sourceestimate.h>
 #include <inverse/minimumNorm/minimumnorm.h>
 
-#include <disp3D/inverseview.h>
+#include <disp3D/brainview.h>
 
 #include <utils/mnemath.h>
 
@@ -129,6 +129,37 @@ int main(int argc, char *argv[])
     qDebug() << "[4]";
     AnnotationSet t_annotationSet("sample", 2, "aparc.a2009s", "./MNE-sample-data/subjects");
 
+    qDebug() << "[5]";
+
+    BrainView t_brainView;
+
+    if (t_brainView.stereoType() != QGLView::RedCyanAnaglyph)
+        t_brainView.camera()->setEyeSeparation(0.3f);
+    QStringList args = QCoreApplication::arguments();
+    int w_pos = args.indexOf("-width");
+    int h_pos = args.indexOf("-height");
+    if (w_pos >= 0 && h_pos >= 0)
+    {
+        bool ok = true;
+        int w = args.at(w_pos + 1).toInt(&ok);
+        if (!ok)
+        {
+            qWarning() << "Could not parse width argument:" << args;
+            return 1;
+        }
+        int h = args.at(h_pos + 1).toInt(&ok);
+        if (!ok)
+        {
+            qWarning() << "Could not parse height argument:" << args;
+            return 1;
+        }
+        t_brainView.resize(w, h);
+    }
+    else
+    {
+        t_brainView.resize(800, 600);
+    }
+    t_brainView.show();
 
 
     return a.exec();//1;//a.exec();
