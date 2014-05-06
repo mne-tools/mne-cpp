@@ -92,7 +92,7 @@ using namespace IOBuffer;
 class RTSSSSHARED_EXPORT RtSss : public IAlgorithm
 {
     Q_OBJECT
-//    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "rtsss.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "rtsss.json") //NEW Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(MNEX::IAlgorithm)
 
