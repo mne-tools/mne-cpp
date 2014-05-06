@@ -179,6 +179,84 @@ protected:
     void mousePressEvent(QMouseEvent *e);
 
 private:
+
+QPair < QList<VectorXi>, QList<VectorXi> > getCurvPatches(const Surface& surf)
+{
+    QPair < QList<VectorXi>, QList<VectorXi> > curvPatches;
+
+    if(surf.curv().size() <= 0)
+        return curvPatches;
+
+    VectorXi curPosCurv(surf.curv().size());
+    VectorXi curNegCurv(surf.curv().size());
+
+    bool lookingForPos = surf.curv()[0] > 0 ? true : false;
+
+    qint32 count = 0;
+
+    for(qint32 i = 0; i < surf.curv().size(); ++i)
+    {
+        if(lookingForPos && surf.curv()[i] >= 0)
+            curPosCurv[count] = i;
+        else if(!lookingForPos && surf.curv()[i] < 0)
+            curNegCurv[count] = i;
+        else
+        {
+            if(lookingForPos)
+            {
+                curPosCurv.conservativeResize(count);
+                curvPatches.first.append(curPosCurv);
+                count = 0;
+                curNegCurv.resize(surf.curv().size()-i);
+                curNegCurv[count] = i;
+                lookingForPos = false;
+            }
+            else
+            {
+                curNegCurv.conservativeResize(count);
+                curvPatches.second.append(curNegCurv);
+                count = 0;
+                curPosCurv.resize(surf.curv().size()-i);
+                curPosCurv[count] = i;
+                lookingForPos = true;
+            }
+        }
+        ++count;
+    }
+
+    return curvPatches;
+}
+
+
+//vertex_colors.c
+Matrix3f setup_curvature_colors (const Surface& surf)
+{
+    MatrixX3f col = MatrixX3f(surf.curv().size(), 3);
+    float curv_sum = 0.0f;
+
+    if (surf.curv().size() <= 0)
+        return col;
+
+    Vector3f posCurvColor; posCurvColor << 0.25, 0.25, 0.25;
+    Vector3f negCurvColor; negCurvColor << 0.375, 0.375, 0.375;
+
+    quint32 np = surf.curv().size();
+
+    for (quint32 k = 0; k < np; ++k)
+    {
+        curv_sum += abs(surf.curv()[k]);
+        col.row(k) = surf.curv()[k] > 0 ? posCurvColor : negCurvColor;
+    }
+
+    printf("Average curvature : %f\n",curv_sum/np);
+
+    return col;
+}
+
+
+
+
+
     SurfaceSet m_SurfaceSet;    /**< Surface set */
 
 

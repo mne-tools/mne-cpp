@@ -322,3 +322,8 @@ bin/mne_browse_raw_qt.app/Contents/PkgInfo
 /bin/R_clustered.txt
 /bin/D_MT.txt
 /bin/R_MT_clustered.txt
+/bin/D_MT_ec.txt
+/bin/D_ec.txt
+/bin/R_MT_clustered_ec.txt
+/bin/R_clustered_ec.txt
+/bin/R_ec.txt
