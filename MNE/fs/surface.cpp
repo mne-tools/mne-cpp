@@ -399,7 +399,7 @@ bool Surface::read(const QString &p_sFile, Surface &p_Surface, bool p_bLoadCurva
     }
 
     //Loaded surface
-    p_Surface.m_sSurf = t_File.fileName().right(4);
+    p_Surface.m_sSurf = t_File.fileName().mid((t_NameIdx+3),t_File.fileName().size() - (t_NameIdx+3));
 
     //Load curvature
     if(p_bLoadCurvature)
