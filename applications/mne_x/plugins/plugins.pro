@@ -40,7 +40,6 @@ TEMPLATE = subdirs
 
 #Sensors
 SUBDIRS += \
-#    bci \
     ecgsimulator \
     mnertclient \
     fiffsimulator \
@@ -49,8 +48,7 @@ SUBDIRS += \
     dummytoolbox \
     triggercontrol \
     sourcelab \
-    raplab \
-    rtsss
+    raplab
 
 win32 { #Only compile the TMSI plugin if a windows system is used - TMSi driver is not available for linux yet
     contains(QMAKE_HOST.arch, x86_64) { #Compiling MNE-X FOR a 64bit system
@@ -87,8 +85,8 @@ SUBDIRS += \
     triggercontrol \
     sourcelab \
     raplab \
-    averaging
-#    rtsss \
+    averaging \
+    rtsss
 
 
 
