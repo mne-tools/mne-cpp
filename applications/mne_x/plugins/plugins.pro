@@ -80,7 +80,6 @@ else {
 
 #Algorithms
 SUBDIRS += \
-    bci \
     dummytoolbox \
     triggercontrol \
     sourcelab \
@@ -88,6 +87,11 @@ SUBDIRS += \
     averaging \
     rtsss
 
+win32 {
+#Algorithms
+SUBDIRS += \
+    bci
+}
 
 
 

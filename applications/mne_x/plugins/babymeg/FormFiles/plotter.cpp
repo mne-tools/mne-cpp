@@ -1,5 +1,8 @@
 #include "plotter.h"
 
+#include <cmath>
+
+
 plotter::plotter(QWidget *parent)
     : QWidget(parent)
 {
@@ -160,7 +163,7 @@ void plotter::drawCurve(QPainter *painter)
     if(!rect.isValid()) return;
 
     painter->setClipRect(rect.adjusted(+1,+1,-1,-1));
-    QMapIterator <int, QVector<QPointF>> i(curveMap);
+    QMapIterator <int, QVector<QPointF> > i(curveMap);
     while (i.hasNext()) {
        i.next();
        int id = i.key();

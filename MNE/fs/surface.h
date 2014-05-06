@@ -240,7 +240,7 @@ public:
     *
     * @return coordinates of vertices
     */
-    inline const MatrixX3f& Surface::rr() const;
+    inline const MatrixX3f& rr() const;
 
     //=========================================================================================================
     /**
@@ -248,7 +248,7 @@ public:
     *
     * @return triangle descriptions
     */
-    inline const MatrixX3i& Surface::tris() const;
+    inline const MatrixX3i& tris() const;
 
     //=========================================================================================================
     /**
@@ -256,7 +256,7 @@ public:
     *
     * @return surface normals
     */
-    inline const MatrixX3f& Surface::nn() const;
+    inline const MatrixX3f& nn() const;
 
     //=========================================================================================================
     /**
@@ -264,7 +264,7 @@ public:
     *
     * @return the FreeSurfer curvature data
     */
-    inline const VectorXf& Surface::curv() const;
+    inline const VectorXf& curv() const;
 
 private:
     QString m_sFilePath;    /**< Path to surf directory. */
