@@ -85,13 +85,8 @@ SUBDIRS += \
     sourcelab \
     raplab \
     averaging \
+#    bci \
     rtsss
-
-win32 {
-#Algorithms
-SUBDIRS += \
-    bci
-}
 
 
 
