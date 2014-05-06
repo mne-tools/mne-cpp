@@ -69,6 +69,7 @@ using namespace DISP3DLIB;
 
 BrainView::BrainView()
 {
+    QFile::ReadOwner;
     init();
 }
 
@@ -107,96 +108,10 @@ void BrainView::init()
 
 void BrainView::initializeGL(QGLPainter *painter)
 {
-
-    if(m_SurfaceSet.size() == 0)
-        return;
-
-    // in the constructor construct a builder on the stack
-    QGLBuilder builder;
-
-    float fac = 100.0f; // too small vertices distances cause clipping errors --> 100 is a good value for freesurfer brain measures
-
-    builder << QGL::Faceted;
-    m_pSceneNodeBrain = builder.currentNode();
-
-    builder.pushNode();
-
-    // Collor palette
-    qint32 index;
-    QSharedPointer<QGLMaterialCollection> palette = builder.sceneNode()->palette(); // register color palette within the root node
-
-    //get bounding box
-
-    QMap<qint32, Surface>::const_iterator it = m_SurfaceSet.data().constBegin();
-
-    QVector3D min(it.value().rr().col(0).minCoeff(), it.value().rr().col(1).minCoeff(), it.value().rr().col(2).minCoeff());
-    QVector3D max(it.value().rr().col(0).maxCoeff(), it.value().rr().col(1).maxCoeff(), it.value().rr().col(2).maxCoeff());
-
-    for (it = m_SurfaceSet.data().begin()+1; it != m_SurfaceSet.data().end(); ++it)
-    {
-        for(qint32 i = 0; i < 3; ++i)
-        {
-            min[i] = min[i] > it.value().rr().col(i).minCoeff() ? it.value().rr().col(i).minCoeff() : min[i];
-            max[i] = max[i] < it.value().rr().col(i).maxCoeff() ? it.value().rr().col(i).maxCoeff() : max[i];
-        }
-    }
-    m_vecBoundingBoxMin = min;
-    m_vecBoundingBoxMax = max;
-
-    for(qint32 i = 0; i < 3; ++i)
-        m_vecBoundingBoxCenter[i] = (m_vecBoundingBoxMin[i]+m_vecBoundingBoxMax[i])/2.0f;
-
-
     //
-    // Build each surface in its separate node
+    // Generate surface scene
     //
-    for (it = m_SurfaceSet.data().begin(); it != m_SurfaceSet.data().end(); ++it)
-    {
-        builder.pushNode();
-        {
-            Matrix3Xf rr = it.value().rr().transpose();
-
-            //Centralize
-            for(qint32 i = 0; i < 3; ++i)
-                rr.row(i) = rr.row(i).array() - m_vecBoundingBoxCenter[i];
-
-
-            QGeometryData t_GeometryDataTri;
-
-            MatrixXf t_TriCoords = MatrixXf::Zero(3,3*(it.value().tris().rows()));
-            QArray<QColor4ub> cdata;
-            for(qint32 i = 0; i < it.value().tris().rows(); ++i)
-            {
-                for(qint32 j = 0; j < 3; ++j)
-                {
-                    t_TriCoords.col(i*3+j) = rr.col( it.value().tris()(i,j) );
-
-                    if(it.value().curv()[it.value().tris()(i,j)] >= 0)
-                        cdata.append(QColor( 50, 50, 50));//Sulci
-                    else
-                        cdata.append(QColor( 200, 200, 200));//Gyri
-                }
-            }
-
-            t_TriCoords *= fac;
-            t_GeometryDataTri.appendVertexArray(QArray<QVector3D>::fromRawData( reinterpret_cast<const QVector3D*>(t_TriCoords.data()), t_TriCoords.cols() ));
-
-            t_GeometryDataTri.appendColorArray(cdata);
-
-            //
-            //  Add triangles to current node
-            //
-            builder.addTriangles(t_GeometryDataTri);
-        }
-        // Go one level up
-        builder.popNode();
-    }
-
-
-    // Optimze current scene for display and calculate lightning normals
-    m_pSceneNode = builder.finalizedSceneNode();
-
-    m_pSceneNode->setParent(this);
+    generateSurfaceScene();
 
     //
     // Create light models
@@ -317,4 +232,102 @@ void BrainView::mousePressEvent(QMouseEvent *e)
     }
 
     QGLView::mousePressEvent(e);
+}
+
+
+//private
+//*************************************************************************************************************
+
+void BrainView::generateSurfaceScene()
+{
+    if(m_SurfaceSet.size() == 0)
+        return;
+
+    // in the constructor construct a builder on the stack
+    QGLBuilder builder;
+
+    float fac = 100.0f; // too small vertices distances cause clipping errors --> 100 is a good value for freesurfer brain measures
+
+    builder << QGL::Faceted;
+    m_pSceneNodeBrain = builder.currentNode();
+
+    builder.pushNode();
+
+    // Collor palette
+    qint32 index;
+    QSharedPointer<QGLMaterialCollection> palette = builder.sceneNode()->palette(); // register color palette within the root node
+
+    //
+    // get bounding box
+    //
+    QMap<qint32, Surface>::const_iterator it = m_SurfaceSet.data().constBegin();
+
+    QVector3D min(it.value().rr().col(0).minCoeff(), it.value().rr().col(1).minCoeff(), it.value().rr().col(2).minCoeff());
+    QVector3D max(it.value().rr().col(0).maxCoeff(), it.value().rr().col(1).maxCoeff(), it.value().rr().col(2).maxCoeff());
+
+    for (it = m_SurfaceSet.data().begin()+1; it != m_SurfaceSet.data().end(); ++it)
+    {
+        for(qint32 i = 0; i < 3; ++i)
+        {
+            min[i] = min[i] > it.value().rr().col(i).minCoeff() ? it.value().rr().col(i).minCoeff() : min[i];
+            max[i] = max[i] < it.value().rr().col(i).maxCoeff() ? it.value().rr().col(i).maxCoeff() : max[i];
+        }
+    }
+    m_vecBoundingBoxMin = min;
+    m_vecBoundingBoxMax = max;
+
+    for(qint32 i = 0; i < 3; ++i)
+        m_vecBoundingBoxCenter[i] = (m_vecBoundingBoxMin[i]+m_vecBoundingBoxMax[i])/2.0f;
+
+
+    //
+    // Build each surface in its separate node
+    //
+    for (it = m_SurfaceSet.data().begin(); it != m_SurfaceSet.data().end(); ++it)
+    {
+        builder.pushNode();
+        {
+            Matrix3Xf rr = it.value().rr().transpose();
+
+            //Centralize
+            for(qint32 i = 0; i < 3; ++i)
+                rr.row(i) = rr.row(i).array() - m_vecBoundingBoxCenter[i];
+
+
+            QGeometryData t_GeometryDataTri;
+
+            MatrixXf t_TriCoords = MatrixXf::Zero(3,3*(it.value().tris().rows()));
+            QArray<QColor4ub> cdata;
+            for(qint32 i = 0; i < it.value().tris().rows(); ++i)
+            {
+                for(qint32 j = 0; j < 3; ++j)
+                {
+                    t_TriCoords.col(i*3+j) = rr.col( it.value().tris()(i,j) );
+
+                    if(it.value().curv()[it.value().tris()(i,j)] >= 0)
+                        cdata.append(QColor( 50, 50, 50));//Sulci
+                    else
+                        cdata.append(QColor( 200, 200, 200));//Gyri
+                }
+            }
+
+            t_TriCoords *= fac;
+            t_GeometryDataTri.appendVertexArray(QArray<QVector3D>::fromRawData( reinterpret_cast<const QVector3D*>(t_TriCoords.data()), t_TriCoords.cols() ));
+
+            t_GeometryDataTri.appendColorArray(cdata);
+
+            //
+            //  Add triangles to current node
+            //
+            builder.addTriangles(t_GeometryDataTri);
+        }
+        // Go one level up
+        builder.popNode();
+    }
+
+
+    // Optimze current scene for display and calculate lightning normals
+    m_pSceneNode = builder.finalizedSceneNode();
+
+    m_pSceneNode->setParent(this);
 }
