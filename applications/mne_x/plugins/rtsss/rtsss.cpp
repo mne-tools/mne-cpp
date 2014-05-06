@@ -38,17 +38,10 @@
 // INCLUDES
 //=============================================================================================================
 
+//#include "dummytoolbox.h"
+//#include "FormFiles/dummysetupwidget.h"
 #include "rtsss.h"
-
-#include <xMeas/Measurement/sngchnmeasurement.h>
-#include <xMeas/Measurement/realtimesamplearray.h>
-#include <xMeas/Measurement/realtimemultisamplearray_new.h>
-
-#include <fiff/fiff_evoked.h>
-
 #include "FormFiles/rtssssetupwidget.h"
-#include "FormFiles/rtsssrunwidget.h"
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -64,8 +57,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
+//using namespace DummyToolboxPlugin;
 using namespace RtSssPlugin;
-using namespace FIFFLIB;
 using namespace MNEX;
 using namespace XMEASLIB;
 
@@ -76,10 +69,16 @@ using namespace XMEASLIB;
 //=============================================================================================================
 
 RtSss::RtSss()
-: m_bIsRunning(false)
-, m_bReceiveData(false)
+: m_pRTSAInput(NULL)
+, m_pRTSAOutput(NULL)
+, m_pRtSssBuffer(new dBuffer(1024))
+/*
+: m_pDummyInput(NULL)
+, m_pDummyOutput(NULL)
+, m_pDummyBuffer(new dBuffer(1024))
+*/
+
 {
-    m_PLG_ID = PLG_ID::RTSSS;
 }
 
 
@@ -93,11 +92,41 @@ RtSss::~RtSss()
 
 //*************************************************************************************************************
 
+QSharedPointer<IPlugin> RtSss::clone() const
+{
+    QSharedPointer<RtSss> pRtSssClone(new RtSss);
+    return pRtSssClone;
+}
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Creating required display instances and set configurations
+//=============================================================================================================
+
+void RtSss::init()
+{
+    // Input
+    m_pRTSAInput = PluginInputData<NewRealTimeSampleArray>::create(this, "RtSssIn", "RtSss input data");
+    connect(m_pRTSAInput.data(), &PluginInputConnector::notify, this, &RtSss::update, Qt::DirectConnection);
+    m_inputConnectors.append(m_pRTSAInput);
+
+    // Output
+    m_pRTSAOutput = PluginOutputData<NewRealTimeSampleArray>::create(this, "RtSssOut", "RtSss output data");
+    m_outputConnectors.append(m_pRTSAOutput);
+
+    m_pRTSAOutput->data()->setName("RtSss Output");
+    m_pRTSAOutput->data()->setUnit("mV");
+    m_pRTSAOutput->data()->setMinValue(-200);
+    m_pRTSAOutput->data()->setMaxValue(360);
+    m_pRTSAOutput->data()->setSamplingRate(256.0/1.0);
+}
+
+
+//*************************************************************************************************************
+
 bool RtSss::start()
 {
-    // Initialize displaying widgets
-    init();
-
     QThread::start();
     return true;
 }
@@ -107,13 +136,11 @@ bool RtSss::start()
 
 bool RtSss::stop()
 {
-    m_bIsRunning = false;
-
     // Stop threads
     QThread::terminate();
     QThread::wait();
 
-    m_bReceiveData = false;
+    m_pRtSssBuffer->clear();
 
     return true;
 }
@@ -121,17 +148,17 @@ bool RtSss::stop()
 
 //*************************************************************************************************************
 
-Type RtSss::getType() const
+IPlugin::PluginType RtSss::getType() const
 {
-    return _IRTAlgorithm;
+    return _IAlgorithm;
 }
 
 
 //*************************************************************************************************************
 
-const char* RtSss::getName() const
+QString RtSss::getName() const
 {
-    return "Real-Time SSS/SSP";
+    return "RtSss Toolbox";
 }
 
 
@@ -146,113 +173,34 @@ QWidget* RtSss::setupWidget()
 
 //*************************************************************************************************************
 
-QWidget* RtSss::runWidget()
+void RtSss::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 {
-    RtSssRunWidget* runWidget = new RtSssRunWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
-    return runWidget;
-}
+    QSharedPointer<NewRealTimeSampleArray> pRTSA = pMeasurement.dynamicCast<NewRealTimeSampleArray>();
 
-
-//*************************************************************************************************************
-
-void RtSss::update(Subject* pSubject)
-{
-    Measurement* meas = static_cast<Measurement*>(pSubject);
-
-    //MEG
-    if(!meas->isSingleChannel() && m_bReceiveData)
+    if(pRTSA)
     {
-        RealTimeMultiSampleArrayNew* pRTMSANew = static_cast<RealTimeMultiSampleArrayNew*>(pSubject);
-
-
-        if(pRTMSANew->getID() == MSR_ID::MEGMNERTCLIENT_OUTPUT)
+        for(unsigned char i = 0; i < pRTSA->getArraySize(); ++i)
         {
-            //Check if buffer initialized
-            if(!m_pRtSssBuffer)
-            {
-                m_pRtSssBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSANew->getNumChannels(), pRTMSANew->getMultiArraySize()));
-                Buffer::SPtr t_buf = m_pRtSssBuffer.staticCast<Buffer>();// unix fix
-                setAcceptorMeasurementBuffer(pRTMSANew->getID(), t_buf);
-            }
-
-            //Fiff information
-            if(!m_pFiffInfo)
-                m_pFiffInfo = pRTMSANew->getFiffInfo();
-
-            MatrixXd t_mat(pRTMSANew->getNumChannels(), pRTMSANew->getMultiArraySize());
-
-            //ToDo: Cast to specific Buffer
-            for(unsigned char i = 0; i < pRTMSANew->getMultiArraySize(); ++i)
-                t_mat.col(i) = pRTMSANew->getMultiSampleArray()[i];
-
-            getAcceptorMeasurementBuffer(pRTMSANew->getID()).staticCast<CircularMatrixBuffer<double> >()
-                    ->push(&t_mat);
+            double value = pRTSA->getSampleArray()[i];
+            m_pRtSssBuffer->push(value);
         }
-
     }
 }
+
 
 
 //*************************************************************************************************************
 
 void RtSss::run()
 {
-    m_bIsRunning = true;
-
-    //
-    // start receiving data
-    //
-//    m_bReceiveData = true;
-
-    //
-    // Read Fiff Info
-    //
-//    while(!m_pFiffInfo)
-//    {
-//        msleep(10);
-//        qDebug() << "Wait for fiff Info";
-//    }
-
-    //
-    // Main thread loop
-    //
-    while(m_bIsRunning)
+    while (true)
     {
-//        qint32 nrows = m_pRtSssBuffer->rows();
+        /* Dispatch the inputs */
+        double v = m_pRtSssBuffer->pop();
 
-//        if(nrows > 0) // check if init
-//        {
-//            /* Dispatch the inputs */
-//            MatrixXd t_mat = m_pRtSssBuffer->pop();
-//        }
+        //ToDo: Implement your algorithm here
 
-        msleep(1000);//DEBUG
+        m_pRTSAOutput->data()->setValue(v);
     }
 }
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Creating required display instances and set configurations
-//=============================================================================================================
-
-void RtSss::init()
-{
-    //Delete Buffer - will be initailzed with first incoming data
-    if(m_pRtSssBuffer)
-        m_pRtSssBuffer = CircularMatrixBuffer<double>::SPtr();
-
-    qDebug() << "#### SourceLab Init; MEGRTCLIENT_OUTPUT: " << MSR_ID::MEGMNERTCLIENT_OUTPUT;
-
-    this->addPlugin(PLG_ID::MNERTCLIENT);
-    Buffer::SPtr t_buf = m_pRtSssBuffer.staticCast<Buffer>(); //unix fix
-    this->addAcceptorMeasurementBuffer(MSR_ID::MEGMNERTCLIENT_OUTPUT, t_buf);
-
-//    m_pDummy_MSA_Output = addProviderRealTimeMultiSampleArray(MSR_ID::DUMMYTOOL_OUTPUT_II, 2);
-//    m_pDummy_MSA_Output->setName("Dummy Output II");
-//    m_pDummy_MSA_Output->setUnit("mV");
-//    m_pDummy_MSA_Output->setMinValue(-200);
-//    m_pDummy_MSA_Output->setMaxValue(360);
-//    m_pDummy_MSA_Output->setSamplingRate(256.0/1.0);
-
-}
