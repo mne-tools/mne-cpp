@@ -181,6 +181,14 @@ public:
 
     //=========================================================================================================
     /**
+    * The kind of Surfaces which are held by the SurfaceSet (eg. inflated, orig ...)
+    *
+    * @return the loaded surfaces (eg. inflated, orig ...)
+    */
+    inline QString surf() const;
+
+    //=========================================================================================================
+    /**
     * Subscript operator [] to access surface by index
     *
     * @param[in] idx    the hemisphere index (0 or 1).
@@ -228,7 +236,7 @@ public:
     inline qint32 size() const;
 
 private:
-    QMap<qint32, Surface> m_qMapSurfs;   /**< Hemisphere surfaces (lh = 0; rh = 1). */
+    QMap<qint32, Surface> m_qMapSurfs;  /**< Hemisphere surfaces (lh = 0; rh = 1). */
 };
 
 //*************************************************************************************************************
@@ -247,6 +255,17 @@ inline QMap<qint32, Surface>& SurfaceSet::data()
 inline bool SurfaceSet::isEmpty() const
 {
     return m_qMapSurfs.isEmpty();
+}
+
+
+//*************************************************************************************************************
+
+inline QString SurfaceSet::surf() const
+{
+    if(m_qMapSurfs.size() > 0)
+        return m_qMapSurfs.begin().value().surf();
+    else
+        return QString("");
 }
 
 

@@ -139,6 +139,11 @@ public:
     */
     explicit BrainView(const QString& p_sFile);
 
+    //=========================================================================================================
+    /**
+    * Default destructor
+    */
+    ~BrainView();
 
     void init();
 
@@ -186,9 +191,16 @@ protected:
 private:
     //=========================================================================================================
     /**
-    * Generates the surface and stores it in m_pSceneNodeBrain
+    * Generates the surface with corresponding curvature and stores it to m_pSceneNode
     */
-    void generateSurfaceScene();
+    void genCurvSurfScene();
+
+    //=========================================================================================================
+    /**
+    * Generates a plain surface and stores it to m_pSceneNode
+    */
+    void genPlainSurfScene();
+
 
 
     ViewOptions m_viewOptionFlags;
@@ -198,7 +210,8 @@ private:
 
 
     // GL Stuff
-    bool m_bStereo;
+    bool m_bStereo;             /**< Whether stereo is turned on. */
+    bool m_bRenderPerVertex;    /**< Whether rendering per vertex applies. */
 
     float m_fOffsetZ;                               /**< Z offset for pop-out effect. */
     float m_fOffsetZEye;                            /**< Z offset eye. */

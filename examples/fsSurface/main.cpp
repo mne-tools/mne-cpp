@@ -4,11 +4,11 @@
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     May, 2014
+* @date     July, 2012
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,35 +29,17 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    mne Surface test
+* @brief    Example of an FreeSurfer Surface application
 *
 */
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <fs/label.h>
-#include <fs/surface.h>
-#include <fs/annotationset.h>
-
-#include <fiff/fiff_evoked.h>
-#include <fiff/fiff.h>
-#include <mne/mne.h>
-
-#include <mne/mne_epoch_data_list.h>
-
-#include <mne/mne_sourceestimate.h>
-#include <inverse/minimumNorm/minimumnorm.h>
-
 #include <disp3D/brainview.h>
-
-#include <utils/mnemath.h>
-
-#include <iostream>
-
-#include <fstream>
 
 
 //*************************************************************************************************************
@@ -66,10 +48,6 @@
 //=============================================================================================================
 
 #include <QGuiApplication>
-#include <QSet>
-#include <QElapsedTimer>
-
-//#define BENCHMARK
 
 
 //*************************************************************************************************************
@@ -77,12 +55,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
 using namespace FSLIB;
-using namespace FIFFLIB;
-using namespace INVERSELIB;
 using namespace DISP3DLIB;
-using namespace UTILSLIB;
 
 
 //*************************************************************************************************************
@@ -103,63 +77,87 @@ int main(int argc, char *argv[])
 {
     QGuiApplication a(argc, argv);
 
-//    Vector3f v1, v2;
-//    v1 << 1, 2, 5;
-//    v2 << 3, 2, 4;
-//    Vector3f v3 = v1.cwiseProduct(v2);
-//    std::cout << "v3: " << v3 << std::endl;
-
-
-//    SurfaceSet t_surfSet("./MNE-sample-data/subjects/sample/surf/lh.white", "./MNE-sample-data/subjects/sample/surf/rh.white");
-
-//    VectorXf curv = Surface::read_curv("D:/Data/subjects/mind006/surf/lh.curv");
-
-//    std::cout << "curv\n" << curv.block(curv.size()-10,0,10,1) << std::endl;
-
-//    Surface t_surf("D:/Data/subjects/mind006/surf/lh.pial");
-
-//    std::cout << "Surface nn\n" << t_surf.nn().block(0,0,10,3) << std::endl;
-
-//    qDebug() << "[2]";
-//    SurfaceSet t_surfSet2("./MNE-sample-data/subjects/sample/surf", 2, "inflated");
-
-//    qDebug() << "[3]";
-//    SurfaceSet t_surfSet3("sample", 2, "inflated", "./MNE-sample-data/subjects");
-
-//    qDebug() << "[4]";
-//    AnnotationSet t_annotationSet("sample", 2, "aparc.a2009s", "./MNE-sample-data/subjects");
-
-//    qDebug() << "[5]";
-
-    BrainView t_brainView("sample", 2, "pial", "./MNE-sample-data/subjects");
-
-    if (t_brainView.stereoType() != QGLView::RedCyanAnaglyph)
-        t_brainView.camera()->setEyeSeparation(0.3f);
     QStringList args = QCoreApplication::arguments();
     int w_pos = args.indexOf("-width");
     int h_pos = args.indexOf("-height");
+    int w, h;
     if (w_pos >= 0 && h_pos >= 0)
     {
         bool ok = true;
-        int w = args.at(w_pos + 1).toInt(&ok);
+        w = args.at(w_pos + 1).toInt(&ok);
         if (!ok)
         {
             qWarning() << "Could not parse width argument:" << args;
             return 1;
         }
-        int h = args.at(h_pos + 1).toInt(&ok);
+        h = args.at(h_pos + 1).toInt(&ok);
         if (!ok)
         {
             qWarning() << "Could not parse height argument:" << args;
             return 1;
         }
-        t_brainView.resize(w, h);
     }
+
+    //
+    // pial
+    //
+    BrainView t_pialBrainView("sample", 2, "pial", "./MNE-sample-data/subjects");
+
+    if (t_pialBrainView.stereoType() != QGLView::RedCyanAnaglyph)
+        t_pialBrainView.camera()->setEyeSeparation(0.3f);
+
+    if (w_pos >= 0 && h_pos >= 0)
+        t_pialBrainView.resize(w, h);
     else
-    {
-        t_brainView.resize(800, 600);
-    }
-    t_brainView.show();
+        t_pialBrainView.resize(800, 600);
+
+    t_pialBrainView.setTitle(QString("Pial surface"));
+    t_pialBrainView.show();
+
+    //
+    // inflated
+    //
+    BrainView t_inflatedBrainView("sample", 2, "inflated", "./MNE-sample-data/subjects");
+
+    if (t_inflatedBrainView.stereoType() != QGLView::RedCyanAnaglyph)
+        t_inflatedBrainView.camera()->setEyeSeparation(0.3f);
+    if (w_pos >= 0 && h_pos >= 0)
+        t_inflatedBrainView.resize(w, h);
+    else
+        t_inflatedBrainView.resize(800, 600);
+
+    t_inflatedBrainView.setTitle(QString("Inflated surface"));
+    t_inflatedBrainView.show();
+
+    //
+    // orig
+    //
+    BrainView t_originBrainView("sample", 2, "orig", "./MNE-sample-data/subjects");
+
+    if (t_originBrainView.stereoType() != QGLView::RedCyanAnaglyph)
+        t_originBrainView.camera()->setEyeSeparation(0.3f);
+    if (w_pos >= 0 && h_pos >= 0)
+        t_originBrainView.resize(w, h);
+    else
+        t_originBrainView.resize(800, 600);
+
+    t_originBrainView.setTitle(QString("Orig surface"));
+    t_originBrainView.show();
+
+    //
+    // white
+    //
+    BrainView t_whiteBrainView("sample", 2, "white", "./MNE-sample-data/subjects");
+
+    if (t_whiteBrainView.stereoType() != QGLView::RedCyanAnaglyph)
+        t_whiteBrainView.camera()->setEyeSeparation(0.3f);
+    if (w_pos >= 0 && h_pos >= 0)
+        t_whiteBrainView.resize(w, h);
+    else
+        t_whiteBrainView.resize(800, 600);
+
+    t_whiteBrainView.setTitle(QString("White surface"));
+    t_whiteBrainView.show();
 
     return a.exec();
 }
