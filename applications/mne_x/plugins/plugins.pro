@@ -39,7 +39,7 @@ include(../../../mne-cpp.pri)
 TEMPLATE = subdirs
 
 SUBDIRS += \
-    bci \
+#    bci \
     ecgsimulator \
     mnertclient \
     fiffsimulator \
@@ -48,8 +48,8 @@ SUBDIRS += \
     dummytoolbox \
     triggercontrol \
     sourcelab \
-    raplab
-#    rtsss \
+    raplab \
+    rtsss
 
 
 win32 { #Only compile the TMSI plugin if a windows system is used - TMSi driver is not available for linux yet
