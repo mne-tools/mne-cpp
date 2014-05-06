@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     sourcelab_global.h
+* @file     rtsss_global.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the SourceLab library export/import macros.
+* @brief    Contains the RTSSS library export/import macros.
 *
 */
 
-#ifndef SOURCELAB_GLOBAL_H
-#define SOURCELAB_GLOBAL_H
+#ifndef RTSSS_GLOBAL_H
+#define RTSSS_GLOBAL_H
 
 
 //*************************************************************************************************************
