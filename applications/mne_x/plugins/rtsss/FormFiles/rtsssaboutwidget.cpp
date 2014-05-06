@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     dummyaboutwidget.cpp
+* @file     rtsssaboutwidget.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the DummyAboutWidget class.
+* @brief    Contains the implementation of the RtSssAboutWidget class.
 *
 */
 
@@ -38,6 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
+//#include "dummyaboutwidget.h"
 #include "rtsssaboutwidget.h"
 
 
@@ -55,7 +56,7 @@ using namespace RtSssPlugin;
 //=============================================================================================================
 
 RtSssAboutWidget::RtSssAboutWidget(QWidget *parent)
-: QDialog(parent)
+    : QDialog(parent)
 {
     ui.setupUi(this);
 }
