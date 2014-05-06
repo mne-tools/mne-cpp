@@ -97,7 +97,7 @@ BrainView::BrainView(const QString& p_sFile)
 
 void BrainView::init()
 {
-    m_bStereo = false;
+    m_bStereo = true;
     m_fOffsetZ = -100.0f;
     m_fOffsetZEye = 60.0f;
 }
@@ -146,66 +146,52 @@ void BrainView::initializeGL(QGLPainter *painter)
     for(qint32 i = 0; i < 3; ++i)
         m_vecBoundingBoxCenter[i] = (m_vecBoundingBoxMin[i]+m_vecBoundingBoxMax[i])/2.0f;
 
+
     //
     // Build each surface in its separate node
     //
     for (it = m_SurfaceSet.data().begin(); it != m_SurfaceSet.data().end(); ++it)
     {
-        builder.newNode();//create new hemisphere node
+        builder.pushNode();
         {
             Matrix3Xf rr = it.value().rr().transpose();
-
-            qDebug() << "it.value().rr().rows()" << it.value().rr().rows();
-
-            qDebug() << "it.value().curv().rows()" << it.value().curv().rows();
 
             //Centralize
             for(qint32 i = 0; i < 3; ++i)
                 rr.row(i) = rr.row(i).array() - m_vecBoundingBoxCenter[i];
 
-            builder.pushNode();
-
-            // add new ROI node when current ROI node is not empty
-            if(builder.currentNode()->count() > 0)
-                builder.newNode();
 
             QGeometryData t_GeometryDataTri;
 
-            MatrixXf t_TriCoords(3,3*(it.value().tris().rows()));
-
+            MatrixXf t_TriCoords = MatrixXf::Zero(3,3*(it.value().tris().rows()));
+            QArray<QColor4ub> cdata;
             for(qint32 i = 0; i < it.value().tris().rows(); ++i)
             {
-                t_TriCoords.col(i*3) = rr.col( it.value().tris()(i,0) );
-                t_TriCoords.col(i*3+1) = rr.col( it.value().tris()(i,1) );
-                t_TriCoords.col(i*3+2) = rr.col( it.value().tris()(i,2) );
+                for(qint32 j = 0; j < 3; ++j)
+                {
+                    t_TriCoords.col(i*3+j) = rr.col( it.value().tris()(i,j) );
+
+                    if(it.value().curv()[it.value().tris()(i,j)] >= 0)
+                        cdata.append(QColor( 50, 50, 50));//Sulci
+                    else
+                        cdata.append(QColor( 200, 200, 200));//Gyri
+                }
             }
 
             t_TriCoords *= fac;
             t_GeometryDataTri.appendVertexArray(QArray<QVector3D>::fromRawData( reinterpret_cast<const QVector3D*>(t_TriCoords.data()), t_TriCoords.cols() ));
 
+            t_GeometryDataTri.appendColorArray(cdata);
 
             //
             //  Add triangles to current node
             //
             builder.addTriangles(t_GeometryDataTri);
-
-            //
-            // Colorize Surface
-            //
-            QGLMaterial *t_pMaterialROI = new QGLMaterial();
-            int r = 100;
-            int g = 100;
-            int b = 100;
-            t_pMaterialROI->setColor(QColor(r,g,b,255));
-
-            index = palette->addMaterial(t_pMaterialROI);
-            builder.currentNode()->setMaterialIndex(index);
         }
         // Go one level up
         builder.popNode();
     }
-    // Go one level up
-    builder.popNode();
+
 
     // Optimze current scene for display and calculate lightning normals
     m_pSceneNode = builder.finalizedSceneNode();
@@ -218,8 +204,6 @@ void BrainView::initializeGL(QGLPainter *painter)
     m_pLightModel = new QGLLightModel(this);
     m_pLightModel->setAmbientSceneColor(Qt::white);
     m_pLightModel->setViewerPosition(QGLLightModel::LocalViewer);
-
-    m_pLightModel = new QGLLightModel(this);
 
     m_pLightParametersScene = new QGLLightParameters(this);
     m_pLightParametersScene->setPosition(QVector3D(0.0f, 0.0f, 3.0f));
@@ -265,8 +249,8 @@ void BrainView::paintGL(QGLPainter *painter)
 //        painter->setCamera(m_pCameraFrontal);
     painter->setLightModel(m_pLightModel);
 
-//        material.bind(painter);
-//        material.prepareToDraw(painter, painter->attributes());
+    material.bind(painter);
+    material.prepareToDraw(painter, painter->attributes());
 
     m_pSceneNode->draw(painter);
 

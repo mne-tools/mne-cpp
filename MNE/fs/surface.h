@@ -250,13 +250,13 @@ public:
     */
     inline const MatrixX3i& Surface::tris() const;
 
-//    //=========================================================================================================
-//    /**
-//    * Normalized surface normals for each vertex
-//    *
-//    * @return surface normals
-//    */
-//    inline const MatrixX3f& Surface::nn() const;
+    //=========================================================================================================
+    /**
+    * Normalized surface normals for each vertex
+    *
+    * @return surface normals
+    */
+    inline const MatrixX3f& Surface::nn() const;
 
     //=========================================================================================================
     /**
@@ -273,7 +273,7 @@ private:
     QString m_sSurf;        /**< Loaded surface (eg. inflated, orig ...) */
     MatrixX3f m_matRR;      /**< alias verts. Vertex coordinates in meters */
     MatrixX3i m_matTris;    /**< alias faces. The triangle descriptions */
-//    MatrixX3f m_matNN;      /**< Normalized surface normals for each vertex. -> not needed since qglbuilder is doing that for us */
+    MatrixX3f m_matNN;      /**< Normalized surface normals for each vertex. -> not needed since qglbuilder is doing that for us */
     VectorXf m_vecCurv;     /**< FreeSurfer curvature data */
 };
 
@@ -320,12 +320,12 @@ inline const MatrixX3i& Surface::tris() const
 }
 
 
-////*************************************************************************************************************
+//*************************************************************************************************************
 
-//inline const MatrixX3f& Surface::nn() const
-//{
-//    return m_matNN;
-//}
+inline const MatrixX3f& Surface::nn() const
+{
+    return m_matNN;
+}
 
 
 //*************************************************************************************************************
