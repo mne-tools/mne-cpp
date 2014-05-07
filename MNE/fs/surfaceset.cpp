@@ -79,6 +79,8 @@ SurfaceSet::SurfaceSet(const QString &subject_id, qint32 hemi, const QString &su
         if(Surface::read(subject_id, 1, surf, subjects_dir, t_Surface))
             insert(t_Surface);
     }
+
+    calcOffset();
 }
 
 
@@ -99,6 +101,8 @@ SurfaceSet::SurfaceSet(const QString &path, qint32 hemi, const QString &surf)
         if(Surface::read(path, 1, surf, t_Surface))
             insert(t_Surface);
     }
+
+    calcOffset();
 }
 
 
@@ -116,6 +120,7 @@ SurfaceSet::SurfaceSet(const Surface& p_LHSurface, const Surface& p_RHSurface)
     else
         qWarning("Right hemisphere id is not 1. RH surface not assigned!");
 
+    calcOffset();
 }
 
 
@@ -180,6 +185,8 @@ bool SurfaceSet::read(const QString& p_sLHFileName, const QString& p_sRHFileName
                 return false;
         }
     }
+
+    p_SurfaceSet.calcOffset();
 
     return true;
 }
@@ -248,3 +255,21 @@ Surface& SurfaceSet::operator[] (QString idt)
     }
 }
 
+
+//*************************************************************************************************************
+
+void SurfaceSet::calcOffset()
+{
+    //
+    // Correct inflated offset
+    //
+    if(m_qMapSurfs.size() == 2 && QString::compare(m_qMapSurfs.begin().value().surf(),"inflated") == 0)
+    {
+        float xOffset = m_qMapSurfs.find(0).value().rr().col(0).maxCoeff() - m_qMapSurfs.find(1).value().rr().col(0).minCoeff();
+        Vector3f vecLhOffset, vecRhOffset;
+        vecLhOffset << (xOffset/2.0f), 0, 0;
+        vecRhOffset << (-xOffset/2.0f), 0, 0;
+        m_qMapSurfs.find(0).value().offset() = vecLhOffset;
+        m_qMapSurfs.find(1).value().offset() = vecRhOffset;
+    }
+}

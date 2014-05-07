@@ -318,7 +318,6 @@ void BrainView::genCurvSurfScene()
     for(qint32 i = 0; i < 3; ++i)
         m_vecBoundingBoxCenter[i] = (m_vecBoundingBoxMin[i]+m_vecBoundingBoxMax[i])/2.0f;
 
-
     //
     // Build each surface in its separate node
     //
@@ -330,7 +329,7 @@ void BrainView::genCurvSurfScene()
 
             //Centralize
             for(qint32 i = 0; i < 3; ++i)
-                rr.row(i) = rr.row(i).array() - m_vecBoundingBoxCenter[i];
+                rr.row(i) = rr.row(i).array() - (m_vecBoundingBoxCenter[i] + it.value().offset()[i]);
 
 
             QGeometryData t_GeometryDataTri;

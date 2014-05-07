@@ -236,6 +236,12 @@ public:
     inline qint32 size() const;
 
 private:
+    //=========================================================================================================
+    /**
+    * Calculates the offset between two Surfaces and sets the offset to each surface accordingly
+    */
+    void calcOffset();
+
     QMap<qint32, Surface> m_qMapSurfs;  /**< Hemisphere surfaces (lh = 0; rh = 1). */
 };
 

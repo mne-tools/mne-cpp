@@ -202,12 +202,9 @@ private:
     void genPlainSurfScene();
 
 
-
     ViewOptions m_viewOptionFlags;
 
-
-    SurfaceSet m_SurfaceSet;    /**< Surface set */
-
+    SurfaceSet m_SurfaceSet;            /**< Surface set */
 
     // GL Stuff
     bool m_bStereo;             /**< Whether stereo is turned on. */
