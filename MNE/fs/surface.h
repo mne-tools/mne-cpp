@@ -266,6 +266,22 @@ public:
     */
     inline const VectorXf& curv() const;
 
+    //=========================================================================================================
+    /**
+    * Vector offset
+    *
+    * @return the offset vector
+    */
+    inline const Vector3f& offset() const;
+
+    //=========================================================================================================
+    /**
+    * Vector offset
+    *
+    * @return the offset vector
+    */
+    inline Vector3f& offset();
+
 private:
     QString m_sFilePath;    /**< Path to surf directory. */
     QString m_sFileName;    /**< Surface file name. */
@@ -275,6 +291,8 @@ private:
     MatrixX3i m_matTris;    /**< alias faces. The triangle descriptions */
     MatrixX3f m_matNN;      /**< Normalized surface normals for each vertex. -> not needed since qglbuilder is doing that for us */
     VectorXf m_vecCurv;     /**< FreeSurfer curvature data */
+
+    Vector3f m_vecOffset; /**< Surface offset */
 };
 
 //*************************************************************************************************************
@@ -333,6 +351,22 @@ inline const MatrixX3f& Surface::nn() const
 inline const VectorXf& Surface::curv() const
 {
     return m_vecCurv;
+}
+
+
+//*************************************************************************************************************
+
+inline const Vector3f& Surface::offset() const
+{
+    return m_vecOffset;
+}
+
+
+//*************************************************************************************************************
+
+inline Vector3f& Surface::offset()
+{
+    return m_vecOffset;
 }
 
 } // NAMESPACE

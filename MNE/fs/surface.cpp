@@ -74,6 +74,7 @@ Surface::Surface()
 , m_sFileName("")
 , m_iHemi(-1)
 , m_sSurf("")
+, m_vecOffset(Vector3f::Zero(3))
 {
 }
 
@@ -85,6 +86,7 @@ Surface::Surface(const QString& p_sFile)
 , m_sFileName("")
 , m_iHemi(-1)
 , m_sSurf("")
+, m_vecOffset(Vector3f::Zero(3))
 {
     Surface::read(p_sFile, *this);
 }
@@ -97,6 +99,7 @@ Surface::Surface(const QString &subject_id, qint32 hemi, const QString &surf, co
 , m_sFileName("")
 , m_iHemi(-1)
 , m_sSurf("")
+, m_vecOffset(Vector3f::Zero(3))
 {
     Surface::read(subject_id, hemi, surf, subjects_dir, *this);
 }
@@ -109,6 +112,7 @@ Surface::Surface(const QString &path, qint32 hemi, const QString &surf)
 , m_sFileName("")
 , m_iHemi(-1)
 , m_sSurf("")
+, m_vecOffset(Vector3f::Zero(3))
 {
     Surface::read(path, hemi, surf, *this);
 }
