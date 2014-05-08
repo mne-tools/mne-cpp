@@ -83,14 +83,16 @@ SOURCES += \
     geometryview.cpp \
     labelview.cpp \
     inverseview.cpp \
-    inverseviewproducer.cpp
+    inverseviewproducer.cpp \
+    brainview.cpp
 
 HEADERS += \
     disp3D_global.h \
     geometryview.h \
     labelview.h \
     inverseview.h \
-    inverseviewproducer.h
+    inverseviewproducer.h \
+    brainview.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

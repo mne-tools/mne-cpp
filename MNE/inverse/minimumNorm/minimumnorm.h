@@ -136,6 +136,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Get the prepared inverse operator.
+    *
+    * @return the prepared inverse operator
+    */
+    inline MNEInverseOperator& getPreparedInverseOperator();
+
+    //=========================================================================================================
+    /**
     * Set minimum norm algorithm method ("MNE" | "dSPM" | "sLORETA")
     *
     * @param[in] method   Use mininum norm, dSPM or sLORETA.
@@ -159,6 +167,8 @@ public:
     */
     void setRegularization(float lambda);
 
+    inline MatrixXd& getKernel();
+
 private:
     MNEInverseOperator m_inverseOperator;   /**< The inverse operator */
     float m_fLambda;                        /**< Regularization parameter */
@@ -174,6 +184,24 @@ private:
     MatrixXd K;                             /**< Imaging kernel */
 
 };
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline MatrixXd& MinimumNorm::getKernel()
+{
+    return K;
+}
+
+
+//*************************************************************************************************************
+
+inline MNEInverseOperator& MinimumNorm::getPreparedInverseOperator()
+{
+    return inv;
+}
 
 } //NAMESPACE
 

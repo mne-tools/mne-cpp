@@ -129,11 +129,19 @@ public:
 
     //=========================================================================================================
     /**
+    * Returns whether Annotation is empty.
+    *
+    * @return true if is empty, false otherwise
+    */
+    inline bool isEmpty() const;
+
+    //=========================================================================================================
+    /**
     * Returns the hemisphere id (0 = lh; 1 = rh)
     *
     * @return hemisphere id
     */
-    inline qint32 getHemi() const;
+    inline qint32 hemi() const;
 
     //=========================================================================================================
     /**
@@ -145,6 +153,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Returns the vertix indeces
+    *
+    * @return vertix indeces
+    */
+    inline const VectorXi getVertices() const;
+
+    //=========================================================================================================
+    /**
     * Returns the vertix labels
     *
     * @return vertix labels
@@ -153,11 +169,54 @@ public:
 
     //=========================================================================================================
     /**
+    * Returns the vertix labels
+    *
+    * @return vertix labels
+    */
+    inline const VectorXi getLabelIds() const;
+
+    //=========================================================================================================
+    /**
     * Returns the coloratable containing the label based nomenclature
     *
     * @return colortable
     */
     inline Colortable& getColortable();
+
+    //=========================================================================================================
+    /**
+    * Returns the coloratable containing the label based nomenclature
+    *
+    * @return colortable
+    */
+    inline const Colortable getColortable() const;
+
+    //=========================================================================================================
+    /**
+    * Reads a FreeSurfer annotation file
+    *
+    * @param[in] subject_id         Name of subject
+    * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh}
+    * @param[in] atlas              Name of the atlas to load (eg. aparc.a2009s, aparc, aparc.DKTatlas40, BA, BA.thresh, ...)
+    * @param[in] subjects_dir       Subjects directory
+    * @param[out] p_Annotation      The read annotation
+    *
+    * @return true if read sucessful, false otherwise
+    */
+    static bool read(const QString &subject_id, qint32 hemi, const QString &atlas, const QString &subjects_dir, Annotation &p_Annotation);
+
+    //=========================================================================================================
+    /**
+    * Reads a FreeSurfer annotation file
+    *
+    * @param[in] path               path to label directory
+    * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh}
+    * @param[in] atlas              Name of the atlas to load (eg. aparc.a2009s, aparc, aparc.DKTatlas40, BA, BA.thresh, ...)
+    * @param[out] p_Annotation      The read annotation
+    *
+    * @return true if read sucessful, false otherwise
+    */
+    static bool read(const QString &path, qint32 hemi, const QString &atlas, Annotation &p_Annotation);
 
     //=========================================================================================================
     /**
@@ -187,7 +246,7 @@ public:
 private:
     QString m_sFileName;        /**< Annotation file */
 
-    qint32 hemi;                /**< Hemisphere (lh = 0; rh = 1) */
+    qint32 m_iHemi;             /**< Hemisphere (lh = 0; rh = 1) */
     VectorXi m_Vertices;        /**< Vertice indeces */
     VectorXi m_LabelIds;        /**< Vertice label ids */
 
@@ -199,15 +258,29 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline qint32 Annotation::getHemi() const
+inline qint32 Annotation::hemi() const
 {
-    return hemi;
+    return m_iHemi;
+}
+
+//*************************************************************************************************************
+
+inline bool Annotation::isEmpty() const
+{
+    return m_iHemi == -1;
+}
+
+//*************************************************************************************************************
+
+inline VectorXi& Annotation::getVertices()
+{
+    return m_Vertices;
 }
 
 
 //*************************************************************************************************************
 
-inline VectorXi& Annotation::getVertices()
+inline const VectorXi Annotation::getVertices() const
 {
     return m_Vertices;
 }
@@ -223,11 +296,26 @@ inline VectorXi& Annotation::getLabelIds()
 
 //*************************************************************************************************************
 
+inline const VectorXi Annotation::getLabelIds() const
+{
+    return m_LabelIds;
+}
+
+
+//*************************************************************************************************************
+
 inline Colortable& Annotation::getColortable()
 {
     return m_Colortable;
 }
 
+
+//*************************************************************************************************************
+
+inline const Colortable Annotation::getColortable() const
+{
+    return m_Colortable;
+}
 
 } // NAMESPACE
 

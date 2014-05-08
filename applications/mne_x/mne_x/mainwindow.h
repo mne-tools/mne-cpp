@@ -229,7 +229,8 @@ private:
     QAction*                            m_pActionZoomOut;           /**< zoom out */
     QAction*                            m_pActionDisplayMax;        /**< show full screen mode */
 
-    QList< QAction* >                   m_qListDynamicDisplayActions; /**< dynamic display actions */
+    QList< QAction* >                   m_qListDynamicPluginActions;    /**< dynamic plugin actions */
+    QList< QAction* >                   m_qListDynamicDisplayActions;   /**< dynamic display actions */
 
     //Main Window Menu
     QMenu*                              m_pMenuFile;    /**< Holds the file menu.*/
@@ -239,7 +240,9 @@ private:
 
     // Tool bar
     QToolBar*                           m_pToolBar;                 /**< Holds the tool bar.*/
+    QToolBar*                           m_pDynamicPluginToolBar;    /**< Holds the plugin tool bar.*/
     QToolBar*                           m_pDynamicDisplayToolBar;   /**< Holds the display tool bar.*/
+    QString                             m_sCurPluginName;           /**< The name which corresponds to the current selected plugin */
 
     QLabel*                             m_pLabelTime;      /**< Holds the display label for the running time.*/
     QSharedPointer<QTimer>              m_pTimer;           /**< timer of the main application*/

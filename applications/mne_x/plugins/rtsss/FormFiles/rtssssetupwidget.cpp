@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     sourcelabsetupwidget.cpp
+* @file     rtssssetupwidget.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the SourceLabSetupWidget class.
+* @brief    Contains the implementation of the ECGSetupWidget class.
 *
 */
 
@@ -38,11 +38,12 @@
 // INCLUDES
 //=============================================================================================================
 
+//#include "dummysetupwidget.h"
+//#include "dummyaboutwidget.h"
+//#include "../dummytoolbox.h"
 #include "rtssssetupwidget.h"
 #include "rtsssaboutwidget.h"
-
 #include "../rtsss.h"
-
 
 //*************************************************************************************************************
 //=============================================================================================================

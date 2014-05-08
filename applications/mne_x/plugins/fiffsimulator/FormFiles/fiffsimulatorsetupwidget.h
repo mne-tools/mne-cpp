@@ -107,25 +107,11 @@ public:
 //slots
     void bufferSizeEdited();        /**< Buffer size edited and set new buffer size.*/
 
-    void checkedRecordDataChanged();    /**< Record Data checkbox changed. */
-
-    //=========================================================================================================
-    /**
-    * Connector selection index changed
-    *
-    * @param [in] idx   new connector combo box index
-    */
-    void connectorIdxChanged(int idx);
-
     void printToLog(QString message);   /**< Implements printing messages to rtproc log.*/
-
-    void pressedFiffRecordFile();   /**< Triggers file dialog to select record file.*/
 
     void pressedConnect();          /**< Triggers a connection trial to rt_server.*/
 
     void pressedSendCLI();          /**< Triggers a send request of a cli command.*/
-
-    void pressedConfigure();        /**< Triggers file dialog to configure the plugins.*/
 
     void fiffInfoReceived();        /**< Triggered when new fiff info is recieved by producer and stored intor rt_server */
 
@@ -142,16 +128,8 @@ private:
     //=========================================================================================================
     /**
     * Shows the About Dialog
-    *
     */
     void showAboutDialog();
-
-//    //=========================================================================================================
-//    /**
-//    * Shows the SQUID Control Dialog
-//    *
-//    */
-//    void SQUIDControlDialog();
 
     FiffSimulator*   m_pFiffSimulator;      /**< a pointer to corresponding mne rt client.*/
 

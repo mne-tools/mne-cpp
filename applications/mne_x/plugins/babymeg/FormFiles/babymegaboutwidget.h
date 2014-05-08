@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the BabyMegAboutWidget class.
+* @brief    Contains the declaration of the BabyMEGAboutWidget class.
 *
 */
 
@@ -55,10 +55,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE BabyMegPlugin
+// DEFINE NAMESPACE BabyMEGPlugin
 //=============================================================================================================
 
-namespace BabyMegPlugin
+namespace BabyMEGPlugin
 {
 
 
@@ -76,11 +76,11 @@ namespace BabyMegPlugin
 
 //=============================================================================================================
 /**
-* DECLARE CLASS BabyMegAboutWidget
+* DECLARE CLASS BabyMEGAboutWidget
 *
-* @brief The BabyMegAboutWidget class provides the about dialog for the BabyMeg.
+* @brief The BabyMEGAboutWidget class provides the about dialog for the BabyMEG.
 */
-class BabyMegAboutWidget : public QDialog
+class BabyMEGAboutWidget : public QDialog
 {
     Q_OBJECT
 
@@ -88,21 +88,21 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a BabyMegAboutWidget dialog which is a child of parent.
+    * Constructs a BabyMEGAboutWidget dialog which is a child of parent.
     *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new BabyMegAboutWidget becomes a window. If parent is another widget, BabyMegAboutWidget becomes a child window inside parent. ECGAboutWidget is deleted when its parent is deleted.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new BabyMEGAboutWidget becomes a window. If parent is another widget, BabyMEGAboutWidget becomes a child window inside parent. BabyMEGAboutWidget is deleted when its parent is deleted.
     */
-    BabyMegAboutWidget(QWidget *parent = 0);
+    BabyMEGAboutWidget(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the BabyMegAboutWidget.
-    * All BabyMegAboutWidget's children are deleted first. The application exits if BabyMegAboutWidget is the main widget.
+    * Destroys the BabyMEGAboutWidget.
+    * All BabyMEGAboutWidget's children are deleted first. The application exits if BabyMEGAboutWidget is the main widget.
     */
-    ~BabyMegAboutWidget();
+    ~BabyMEGAboutWidget();
 
 private:
-    Ui::BabyMegAboutWidgetClass ui;    /**< Holds the user interface for the DummyAboutWidget.*/
+    Ui::BabyMEGAboutWidgetClass ui;    /**< Holds the user interface for the DummyAboutWidget.*/
 };
 
 } // NAMESPACE
