@@ -63,11 +63,10 @@ using namespace XMEASLIB;
 
 PluginConnectorConnection::PluginConnectorConnection(IPlugin::SPtr sender, IPlugin::SPtr receiver, QObject *parent)
 : QObject(parent)
-, m_bConnectionState(false)
 , m_pSender(sender)
 , m_pReceiver(receiver)
 {
-    m_bConnectionState = createConnection();
+    createConnection();
 }
 
 
@@ -83,11 +82,11 @@ PluginConnectorConnection::~PluginConnectorConnection()
 
 void PluginConnectorConnection::clearConnection()
 {
-    if(m_bConnectionState)
-    {
-        disconnect(m_con);
-        m_bConnectionState = false;
-    }
+    QHash<QPair<QString, QString>, QMetaObject::Connection>::iterator it;
+    for (it = m_qHashConnections.begin(); it != m_qHashConnections.end(); ++it)
+        disconnect(it.value());
+
+    m_qHashConnections.clear();
 }
 
 
@@ -95,6 +94,7 @@ void PluginConnectorConnection::clearConnection()
 
 bool PluginConnectorConnection::createConnection()
 {
+    // Creat initial connection
     clearConnection();
 
     bool bConnected = false;
@@ -113,8 +113,8 @@ bool PluginConnectorConnection::createConnection()
             QSharedPointer< PluginInputData<NewRealTimeSampleArray> > receiverRTSA = m_pReceiver->getInputConnectors()[j].dynamicCast< PluginInputData<NewRealTimeSampleArray> >();
             if(senderRTSA && receiverRTSA)
             {
-                m_con = connect(m_pSender->getOutputConnectors()[i].data(), &PluginOutputConnector::notify,
-                        m_pReceiver->getInputConnectors()[j].data(), &PluginInputConnector::update, Qt::BlockingQueuedConnection);
+                m_qHashConnections.insert(QPair<QString,QString>(m_pSender->getOutputConnectors()[i]->getName(), m_pReceiver->getInputConnectors()[j]->getName()), connect(m_pSender->getOutputConnectors()[i].data(), &PluginOutputConnector::notify,
+                        m_pReceiver->getInputConnectors()[j].data(), &PluginInputConnector::update, Qt::BlockingQueuedConnection));
                 bConnected = true;
                 break;
             }
@@ -124,8 +124,8 @@ bool PluginConnectorConnection::createConnection()
             QSharedPointer< PluginInputData<NewRealTimeMultiSampleArray> > receiverRTMSA = m_pReceiver->getInputConnectors()[j].dynamicCast< PluginInputData<NewRealTimeMultiSampleArray> >();
             if(senderRTMSA && receiverRTMSA)
             {
-                m_con = connect(m_pSender->getOutputConnectors()[i].data(), &PluginOutputConnector::notify,
-                        m_pReceiver->getInputConnectors()[j].data(), &PluginInputConnector::update, Qt::BlockingQueuedConnection);
+                m_qHashConnections.insert(QPair<QString,QString>(m_pSender->getOutputConnectors()[i]->getName(), m_pReceiver->getInputConnectors()[j]->getName()), connect(m_pSender->getOutputConnectors()[i].data(), &PluginOutputConnector::notify,
+                        m_pReceiver->getInputConnectors()[j].data(), &PluginInputConnector::update, Qt::BlockingQueuedConnection));
                 bConnected = true;
                 break;
             }
@@ -135,8 +135,8 @@ bool PluginConnectorConnection::createConnection()
             QSharedPointer< PluginInputData<RealTimeSourceEstimate> > receiverRTSE = m_pReceiver->getInputConnectors()[j].dynamicCast< PluginInputData<RealTimeSourceEstimate> >();
             if(senderRTSE && receiverRTSE)
             {
-                m_con = connect(m_pSender->getOutputConnectors()[i].data(), &PluginOutputConnector::notify,
-                        m_pReceiver->getInputConnectors()[j].data(), &PluginInputConnector::update, Qt::BlockingQueuedConnection);
+                m_qHashConnections.insert(QPair<QString,QString>(m_pSender->getOutputConnectors()[i]->getName(), m_pReceiver->getInputConnectors()[j]->getName()), connect(m_pSender->getOutputConnectors()[i].data(), &PluginOutputConnector::notify,
+                        m_pReceiver->getInputConnectors()[j].data(), &PluginInputConnector::update, Qt::BlockingQueuedConnection));
                 bConnected = true;
                 break;
             }
@@ -146,8 +146,11 @@ bool PluginConnectorConnection::createConnection()
             break;
     }
 
-
-//    m_con = connect(sender.data(), &PluginOutputConnector::notify, receiver.data(), &PluginInputConnector::update);
+    //DEBUG
+    QHash<QPair<QString, QString>, QMetaObject::Connection>::iterator it;
+    for (it = m_qHashConnections.begin(); it != m_qHashConnections.end(); ++it)
+        qDebug() << "Connected: " << it.key().first << it.key().second;
+    //DEBUG
 
     return bConnected;
 }

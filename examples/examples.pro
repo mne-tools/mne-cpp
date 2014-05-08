@@ -68,6 +68,7 @@ contains(MNECPP_CONFIG, isGui) {
             computeInversePwlRapMusic \
             rawClusteredInversePwlRapMusic \
             stClusteredInversePwlRapMusic  \
-            roiClusteredInversePwlRapMusic
+            roiClusteredInversePwlRapMusic \
+            fsSurface
     }
 }

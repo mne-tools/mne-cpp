@@ -107,12 +107,33 @@ public:
 
     //=========================================================================================================
     /**
+    * Construts the surface set by reading it of the given files.
+    *
+    * @param[in] subject_id         Name of subject
+    * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh, 2 -> both}
+    * @param[in] atlas              Name of the atlas to load (eg. aparc.a2009s, aparc, aparc.DKTatlas40, BA, BA.thresh, ...)
+    * @param[in] subjects_dir       Subjects directory
+    */
+    explicit AnnotationSet(const QString &subject_id, qint32 hemi, const QString &atlas, const QString &subjects_dir);
+
+    //=========================================================================================================
+    /**
+    * Construts the surface set by reading it of the given files.
+    *
+    * @param[in] path               path to surface directory
+    * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh, 2 -> both}
+    * @param[in] atlas              Name of the atlas to load (eg. aparc.a2009s, aparc, aparc.DKTatlas40, BA, BA.thresh, ...)
+    */
+    explicit AnnotationSet(const QString &path, qint32 hemi, const QString &atlas);
+
+    //=========================================================================================================
+    /**
     * Constructs an annotation set by assembling given annotations
     *
-    * @param[in] p_sLHAnnotation    Left hemisphere annotation
-    * @param[in] p_sRHAnnotation    Right hemisphere annotation
+    * @param[in] p_LHAnnotation    Left hemisphere annotation
+    * @param[in] p_RHAnnotation    Right hemisphere annotation
     */
-    explicit AnnotationSet(const Annotation& p_sLHAnnotation, const Annotation& p_sRHAnnotation);
+    explicit AnnotationSet(const Annotation& p_LHAnnotation, const Annotation& p_RHAnnotation);
 
     //=========================================================================================================
     /**
@@ -142,6 +163,14 @@ public:
     * @return true if AnnotationSet is empty
     */
     inline bool isEmpty() const;
+
+    //=========================================================================================================
+    /**
+    * Insert an annotation
+    *
+    * @param[in] p_Annotation  Annotation to insert
+    */
+    void insert(const Annotation& p_Annotation);
 
     //=========================================================================================================
     /**
@@ -181,6 +210,16 @@ public:
 
     //=========================================================================================================
     /**
+    * Subscript operator [] to access annotation by index
+    *
+    * @param[in] idx    the hemisphere index (0 or 1).
+    *
+    * @return Annotation related to the parameter index.
+    */
+    const Annotation operator[] (qint32 idx) const;
+
+    //=========================================================================================================
+    /**
     * Subscript operator [] to access annotation by identifier
     *
     * @param[in] idt    the hemisphere identifier ("lh" or "rh").
@@ -188,6 +227,16 @@ public:
     * @return Annotation related to the parameter identifier.
     */
     Annotation& operator[] (QString idt);
+
+    //=========================================================================================================
+    /**
+    * Subscript operator [] to access annotation by identifier
+    *
+    * @param[in] idt    the hemisphere identifier ("lh" or "rh").
+    *
+    * @return Annotation related to the parameter identifier.
+    */
+    const Annotation operator[] (QString idt) const;
 
     //=========================================================================================================
     /**

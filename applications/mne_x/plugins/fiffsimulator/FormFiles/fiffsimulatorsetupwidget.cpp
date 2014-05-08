@@ -41,8 +41,6 @@
 #include "fiffsimulatorsetupwidget.h"
 #include "fiffsimulatoraboutwidget.h"
 
-//#include "mnertclientsquidcontroldgl.h"
-
 #include "../fiffsimulator.h"
 
 
@@ -76,19 +74,6 @@ FiffSimulatorSetupWidget::FiffSimulatorSetupWidget(FiffSimulator* p_pFiffSimulat
 {
     ui.setupUi(this);
 
-    //Record data checkbox
-    connect(ui.m_qCheckBox_RecordData, &QCheckBox::stateChanged, this, &FiffSimulatorSetupWidget::checkedRecordDataChanged);
-
-    //Fiff record file
-    connect(ui.m_qPushButton_FiffRecordFile, &QPushButton::released, this, &FiffSimulatorSetupWidget::pressedFiffRecordFile);
-
-    //Select connector
-    connect(ui.m_qComboBox_Connector, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-            this, &FiffSimulatorSetupWidget::connectorIdxChanged);
-
-    //Configure connector
-    connect(ui.m_qPushButton_Configure, &QCheckBox::released, this, &FiffSimulatorSetupWidget::pressedConfigure);
-
     //rt server connection
     this->ui.m_qLineEdit_Ip->setText(m_pFiffSimulator->m_sFiffSimulatorIP);
 
@@ -108,9 +93,6 @@ FiffSimulatorSetupWidget::FiffSimulatorSetupWidget(FiffSimulator* p_pFiffSimulat
     //About
     connect(ui.m_qPushButton_About, &QPushButton::released, this, &FiffSimulatorSetupWidget::showAboutDialog);
 
-//    //SQUID Control
-//    connect(ui.m_qPushButton_SQUIDControl, &QPushButton::released, this, &MneRtClientSetupWidget::SQUIDControlDialog);
-
     this->init();
 }
 
@@ -127,7 +109,6 @@ FiffSimulatorSetupWidget::~FiffSimulatorSetupWidget()
 
 void FiffSimulatorSetupWidget::init()
 {
-    checkedRecordDataChanged();
     cmdConnectionChanged(m_pFiffSimulator->m_bCmdClientIsConnected);
 }
 
@@ -143,46 +124,6 @@ void FiffSimulatorSetupWidget::bufferSizeEdited()
         m_pFiffSimulator->m_iBufferSize = t_iBufferSize;
     else
         ui.m_qLineEdit_BufferSize->setText(QString("%1").arg(m_pFiffSimulator->m_iBufferSize));
-}
-
-
-//*************************************************************************************************************
-
-void FiffSimulatorSetupWidget::checkedRecordDataChanged()
-{
-    if(ui.m_qCheckBox_RecordData->checkState() == Qt::Checked)
-    {
-        ui.m_qComboBox_SubjectSelection->setEnabled(true);
-        ui.m_qPushButton_NewSubject->setEnabled(true);
-        ui.m_qLineEdit_FiffRecordFile->setEnabled(true);
-        ui.m_qPushButton_FiffRecordFile->setEnabled(true);
-    }
-    else
-    {
-        ui.m_qComboBox_SubjectSelection->setEnabled(false);
-        ui.m_qPushButton_NewSubject->setEnabled(false);
-        ui.m_qLineEdit_FiffRecordFile->setEnabled(false);
-        ui.m_qPushButton_FiffRecordFile->setEnabled(false);
-    }
-}
-
-
-//*************************************************************************************************************
-
-void FiffSimulatorSetupWidget::connectorIdxChanged(int idx)
-{
-    if(ui.m_qComboBox_Connector->itemData(idx).toInt() != m_pFiffSimulator->m_iActiveConnectorId && m_bIsInit)
-        m_pFiffSimulator->changeConnector(ui.m_qComboBox_Connector->itemData(idx).toInt());
-}
-
-
-//*************************************************************************************************************
-
-void FiffSimulatorSetupWidget::pressedFiffRecordFile()
-{
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Save Fiff Record File"), "", tr("Fiff Record File (*.fif)"));
-
-    ui.m_qLineEdit_FiffRecordFile->setText(fileName);
 }
 
 
@@ -212,15 +153,6 @@ void FiffSimulatorSetupWidget::pressedSendCLI()
     }
 }
 
-
-//*************************************************************************************************************
-
-void FiffSimulatorSetupWidget::pressedConfigure()
-{
-    QString t_sConnector = ui.m_qComboBox_Connector->currentText();
-//    if(t_sConnector ==  QString("Fiff File Simulator"))
-//        m_pMneRtClientSetupFiffFileSimulatorWidget->show();
-}
 
 //*************************************************************************************************************
 
@@ -256,20 +188,20 @@ void FiffSimulatorSetupWidget::cmdConnectionChanged(bool p_bConnectionStatus)
         //
         // set connectors
         //
-        QMap<qint32, QString>::ConstIterator it = m_pFiffSimulator->m_qMapConnectors.begin();
-        qint32 idx = 0;
+//        QMap<qint32, QString>::ConstIterator it = m_pFiffSimulator->m_qMapConnectors.begin();
+//        qint32 idx = 0;
 
-        for(; it != m_pFiffSimulator->m_qMapConnectors.end(); ++it)
-        {
-            if(this->ui.m_qComboBox_Connector->findData(it.key()) == -1)
-            {
-                this->ui.m_qComboBox_Connector->insertItem(idx, it.value(), it.key());
-                ++idx;
-            }
-            else
-                idx = this->ui.m_qComboBox_Connector->findData(it.key()) + 1;
-        }
-        this->ui.m_qComboBox_Connector->setCurrentIndex(this->ui.m_qComboBox_Connector->findData(m_pFiffSimulator->m_iActiveConnectorId));
+//        for(; it != m_pFiffSimulator->m_qMapConnectors.end(); ++it)
+//        {
+//            if(this->ui.m_qComboBox_Connector->findData(it.key()) == -1)
+//            {
+//                this->ui.m_qComboBox_Connector->insertItem(idx, it.value(), it.key());
+//                ++idx;
+//            }
+//            else
+//                idx = this->ui.m_qComboBox_Connector->findData(it.key()) + 1;
+//        }
+//        this->ui.m_qComboBox_Connector->setCurrentIndex(this->ui.m_qComboBox_Connector->findData(m_pFiffSimulator->m_iActiveConnectorId));
 
         //UI enables/disables
         this->ui.m_qLabel_ConnectionStatus->setText(QString("Connected"));
@@ -284,7 +216,7 @@ void FiffSimulatorSetupWidget::cmdConnectionChanged(bool p_bConnectionStatus)
     {
         //clear connectors --> ToDO create a clear function
         m_pFiffSimulator->m_qMapConnectors.clear();
-        this->ui.m_qComboBox_Connector->clear();
+//        this->ui.m_qComboBox_Connector->clear();
         m_pFiffSimulator->m_iBufferSize = -1;
 
         //UI enables/disables
