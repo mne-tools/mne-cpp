@@ -440,7 +440,7 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const Annotation
                     p_fwdOut.src[h].cluster_info.centroidSource_rr.append(this->src[h].rr.row(sel_idx));
 //                    p_fwdOut.src[h].nn.row(count) = MatrixXd::Zero(1,3);
 
-                    p_fwdOut.src[h].vertno[count] = this->src[h].vertno[sel_idx];
+                    p_fwdOut.src[h].vertno[count] = this->src[h].vertno[sel_idx]; //ToDo resizing necessary?
 
 //                    //vertices
 //                    std::cout << this->src[h].vertno[sel_idx] << ", ";
@@ -684,6 +684,67 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const Annotation
     p_fwdOut.sol->ncol = t_G_new.cols();
 
     p_fwdOut.nsource = p_fwdOut.sol->ncol/3;
+
+    return p_fwdOut;
+}
+
+
+//*************************************************************************************************************
+
+MNEForwardSolution MNEForwardSolution::reduce_forward_solution(qint32 p_iNumDipoles, MatrixXd& p_D) const
+{
+    MNEForwardSolution p_fwdOut = MNEForwardSolution(*this);
+
+    bool isFixed = p_fwdOut.isFixedOrient();
+    qint32 np = isFixed ? p_fwdOut.sol->data.cols() : p_fwdOut.sol->data.cols()/3;
+
+    if(p_iNumDipoles > np)
+        return p_fwdOut;
+
+    VectorXi sel(p_iNumDipoles);
+
+    float t_fStep = (float)np/(float)p_iNumDipoles;
+
+    for(qint32 i = 0; i < p_iNumDipoles; ++i)
+    {
+        float t_fCurrent = ((float)i)*t_fStep;
+        sel[i] = (quint32)floor(t_fCurrent);
+    }
+
+    if(isFixed)
+    {
+        p_D = MatrixXd::Zero(p_fwdOut.sol->data.cols(), p_iNumDipoles);
+        for(qint32 i = 0; i < p_iNumDipoles; ++i)
+            p_D(sel[i], i) = 1;
+    }
+    else
+    {
+        p_D = MatrixXd::Zero(p_fwdOut.sol->data.cols(), p_iNumDipoles*3);
+        for(qint32 i = 0; i < p_iNumDipoles; ++i)
+            for(qint32 j = 0; j < 3; ++j)
+                p_D((sel[i]*3)+j, (i*3)+j) = 1;
+    }
+
+    // New gain matrix
+    p_fwdOut.sol->data = this->sol->data * p_D;
+
+    MatrixX3f rr(p_iNumDipoles,3);
+
+    MatrixX3f nn(p_iNumDipoles,3);
+
+
+    for(qint32 i = 0; i < p_iNumDipoles; ++i)
+    {
+        rr.row(i) = this->source_rr.row(sel(i));
+        nn.row(i) = this->source_nn.row(sel(i));
+    }
+
+    p_fwdOut.source_rr = rr;
+    p_fwdOut.source_nn = nn;
+
+    p_fwdOut.sol->ncol =  p_fwdOut.sol->data.cols();
+
+    p_fwdOut.nsource = p_iNumDipoles;
 
     return p_fwdOut;
 }

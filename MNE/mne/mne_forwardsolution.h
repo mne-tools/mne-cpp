@@ -439,6 +439,17 @@ public:
 
     //=========================================================================================================
     /**
+    * reduces the forward solution and stores the result to p_fwdOut.
+    *
+    * @param[in]    p_iNumDipoles   Desired number of dipoles
+    * @param[out]   p_D             The reduction operator
+    *
+    * @return reduced MNE forward solution
+    */
+    MNEForwardSolution reduce_forward_solution(qint32 p_iNumDipoles, MatrixXd& p_D) const;
+
+    //=========================================================================================================
+    /**
     * Restrict gain matrix entries for optimal depth weighting
     *
     * @param[in, out] G     Gain matrix to be restricted; result is stored in place.
