@@ -92,6 +92,20 @@ BrainView::BrainView(const QString &subject_id, qint32 hemi, const QString &surf
 
 //*************************************************************************************************************
 
+BrainView::BrainView(const QString &subject_id, qint32 hemi, const QString &surf, const QString &atlas, const QString &subjects_dir)
+: m_SurfaceSet(subject_id, hemi, surf, subjects_dir)
+, m_AnnotationSet(subject_id, hemi, atlas, subjects_dir)
+, m_pSceneNodeBrain(NULL)
+, m_pSceneNode(NULL)
+, m_pLightModel(NULL)
+, m_pLightParametersScene(NULL)
+{
+    init();
+}
+
+
+//*************************************************************************************************************
+
 BrainView::BrainView(const QString& p_sFile)
 : m_pSceneNodeBrain(NULL)
 , m_pSceneNode(NULL)

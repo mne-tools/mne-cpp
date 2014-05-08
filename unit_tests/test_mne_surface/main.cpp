@@ -131,7 +131,10 @@ int main(int argc, char *argv[])
 
 //    qDebug() << "[5]";
 
-    BrainView t_brainView("sample", 2, "pial", "./MNE-sample-data/subjects");
+
+
+//    BrainView t_brainView("sample", 2, "pial", "./MNE-sample-data/subjects");
+    BrainView t_brainView("sample", 2, "pial", "aparc.a2009s", "./MNE-sample-data/subjects");
 
     if (t_brainView.stereoType() != QGLView::RedCyanAnaglyph)
         t_brainView.camera()->setEyeSeparation(0.3f);
