@@ -481,9 +481,22 @@ int main(int argc, char *argv[])
     //
     FiffInfo info = evoked.info;
 
+    MatrixXd D_selected;
+    MNEForwardSolution t_selectedFwd = t_Fwd.reduce_forward_solution(t_clusteredFwd.isFixedOrient() ? t_clusteredFwd.sol->data.cols() : t_clusteredFwd.sol->data.cols()/3, D_selected);
+
+    qDebug() << "#### t_selectedFwd" << t_selectedFwd.sol->data.rows() << "x" << t_selectedFwd.sol->data.cols();
+
+    MNEInverseOperator inverse_operator_selected(info, t_selectedFwd, noise_cov, 0.2f, 0.8f);
+
+    qDebug() << "#### [1] ####";
+
     MNEInverseOperator inverse_operator_clustered(info, t_clusteredFwd, noise_cov, 0.2f, 0.8f);
 
+    qDebug() << "#### [2] ####";
+
     MNEInverseOperator inverse_operator(info, t_Fwd, noise_cov, 0.2f, 0.8f);
+
+    qDebug() << "#### [3] ####";
 
     //
     // save clustered inverse
@@ -497,6 +510,8 @@ int main(int argc, char *argv[])
     //
     // Compute inverse solution
     //
+
+    MinimumNorm minimumNormSelected(inverse_operator_selected, lambda2, method);
     MinimumNorm minimumNormClustered(inverse_operator_clustered, lambda2, method);
     MinimumNorm minimumNorm(inverse_operator, lambda2, method);
 
@@ -539,20 +554,23 @@ int main(int argc, char *argv[])
     qDebug() << "MNE calculation took" << meanTime << "+-" << varTime << "ms in average";
 
 #else
+    MNESourceEstimate sourceEstimateSelected = minimumNormSelected.calculateInverse(evoked);
     MNESourceEstimate sourceEstimateClustered = minimumNormClustered.calculateInverse(evoked);
     MNESourceEstimate sourceEstimate = minimumNorm.calculateInverse(evoked);
 #endif
 
 
+    qDebug() << "#### [4] ####";
+
 
     //Option c
-    qDebug() << "Cluster Kernel";
-    MatrixXd D_MT;
-    MatrixXd MT_clustered = minimumNorm.getPreparedInverseOperator().cluster_kernel(t_annotationSet, 20, D_MT);
+//    qDebug() << "Cluster Kernel";
+//    MatrixXd D_MT;
+//    MatrixXd MT_clustered = minimumNorm.getPreparedInverseOperator().cluster_kernel(t_annotationSet, 20, D_MT);
 
-    qDebug() << "Cluster Kernel" << MT_clustered.rows() << "x" << MT_clustered.cols();
+//    qDebug() << "Cluster Kernel" << MT_clustered.rows() << "x" << MT_clustered.cols();
 
-    qDebug() << "D_MT" << D_MT.rows() << "x" << D_MT.cols();
+//    qDebug() << "D_MT" << D_MT.rows() << "x" << D_MT.cols();
 
     // #### R calculation ####
     QFile t_fileFwdFixed("D:/Data/MEG/mind006/mind006_051209_auditory01_raw-oct-6-fwd-fixed.fif");
@@ -561,85 +579,116 @@ int main(int argc, char *argv[])
         return 1;
 //    qDebug() << "t_FwdFixed" << t_FwdFixed.sol->data.rows() << "x" << t_FwdFixed.sol->data.cols();
 
-    //Option b)
-    printf("[1]\n");
-    MatrixXd M = D.transpose() * minimumNorm.getKernel();
+//    //Option b)
+//    printf("[1]\n");
+//    MatrixXd M = D.transpose() * minimumNorm.getKernel();
 
-    printf("[2]\n");
-    MatrixXd R = M * t_FwdFixed.sol->data;
+//    printf("[2]\n");
+//    MatrixXd R = M * t_FwdFixed.sol->data;
 
-    std::ofstream ofs_R("R_ec.txt", std::ofstream::out);
-    if (ofs_R.is_open())
+//    std::ofstream ofs_R("R_ec.txt", std::ofstream::out);
+//    if (ofs_R.is_open())
+//    {
+//        printf("writing to R_ec.txt\n");
+//        ofs_R << R << '\n';
+//    }
+//    else
+//        printf("Not writing to R_ec.txt\n");
+//    ofs_R.close();
+
+//    M.resize(0,0);
+//    R.resize(0,0);
+
+//    //Option a)
+//    printf("[3]\n");
+//    MatrixXd M_clusterd = minimumNormClustered.getKernel();
+
+//    printf("[4]\n");
+//    MatrixXd R_clustered = M_clusterd * t_FwdFixed.sol->data;
+
+//    std::ofstream ofs_R_clustered("R_clustered_ec.txt", std::ofstream::out);
+//    if (ofs_R_clustered.is_open())
+//    {
+//        printf("writing to R_clustered_ec.txt\n");
+//        ofs_R_clustered << R_clustered << '\n';
+//    }
+//    else
+//        printf("Not writing to R_clustered_ec.txt\n");
+//    ofs_R_clustered.close();
+
+//    M_clusterd.resize(0,0);
+//    R_clustered.resize(0,0);
+
+////Cluster Operator D
+//    std::ofstream ofs_D("D_ec.txt", std::ofstream::out);
+//    if (ofs_D.is_open())
+//    {
+//        printf("writing to D_ec.txt\n");
+//        ofs_D << D << '\n';
+//    }
+//    else
+//        printf("Not writing to D_ec.txt\n");
+//    ofs_D.close();
+
+
+//    //option c)
+//    printf("[5]\n");
+//    MatrixXd R_MT_clustered = MT_clustered.transpose() * t_FwdFixed.sol->data;
+
+//    std::ofstream ofs_R_MT_clustered("R_MT_clustered_ec.txt", std::ofstream::out);
+//    if (ofs_R_MT_clustered.is_open())
+//    {
+//        printf("writing to R_MT_clustered_ec.txt\n");
+//        ofs_R_MT_clustered << R_MT_clustered << '\n';
+//    }
+//    else
+//        printf("Not writing to R_MT_clustered_ec.txt\n");
+//    ofs_R_MT_clustered.close();
+
+//    R_MT_clustered.resize(0,0);
+
+//    //Cluster Operator D
+//    std::ofstream ofs_D_MT("D_MT_ec.txt", std::ofstream::out);
+//    if (ofs_D_MT.is_open())
+//    {
+//        printf("writing to D_MT_ec.txt\n");
+//        ofs_D_MT << D_MT << '\n';
+//    }
+//    else
+//        printf("Not writing to D_MT_ec.txt\n");
+//    ofs_D_MT.close();
+
+
+
+    //option d)
+    printf("[6]\n");
+    MatrixXd M_selected = minimumNormSelected.getKernel();
+
+    printf("[7]\n");
+    MatrixXd R_selected= M_selected * t_FwdFixed.sol->data;
+
+    std::ofstream ofs_R_selected("R_selected.txt", std::ofstream::out);
+    if (ofs_R_selected.is_open())
     {
-        printf("writing to R_ec.txt\n");
-        ofs_R << R << '\n';
+        printf("writing to R_selected.txt\n");
+        ofs_R_selected << R_selected << '\n';
     }
     else
-        printf("Not writing to R_ec.txt\n");
-    ofs_R.close();
+        printf("Not writing to R_selected.txt\n");
+    ofs_R_selected.close();
 
-    M.resize(0,0);
-    R.resize(0,0);
-
-    //Option a)
-    printf("[3]\n");
-    MatrixXd M_clusterd = minimumNormClustered.getKernel();
-
-    printf("[4]\n");
-    MatrixXd R_clustered = M_clusterd * t_FwdFixed.sol->data;
-
-    std::ofstream ofs_R_clustered("R_clustered_ec.txt", std::ofstream::out);
-    if (ofs_R_clustered.is_open())
-    {
-        printf("writing to R_clustered_ec.txt\n");
-        ofs_R_clustered << R_clustered << '\n';
-    }
-    else
-        printf("Not writing to R_clustered_ec.txt\n");
-    ofs_R_clustered.close();
-
-    M_clusterd.resize(0,0);
-    R_clustered.resize(0,0);
-
-//Cluster Operator D
-    std::ofstream ofs_D("D_ec.txt", std::ofstream::out);
-    if (ofs_D.is_open())
-    {
-        printf("writing to D_ec.txt\n");
-        ofs_D << D << '\n';
-    }
-    else
-        printf("Not writing to D_ec.txt\n");
-    ofs_D.close();
-
-
-    //option c)
-    printf("[5]\n");
-    MatrixXd R_MT_clustered = MT_clustered.transpose() * t_FwdFixed.sol->data;
-
-    std::ofstream ofs_R_MT_clustered("R_MT_clustered_ec.txt", std::ofstream::out);
-    if (ofs_R_MT_clustered.is_open())
-    {
-        printf("writing to R_MT_clustered_ec.txt\n");
-        ofs_R_MT_clustered << R_MT_clustered << '\n';
-    }
-    else
-        printf("Not writing to R_MT_clustered_ec.txt\n");
-    ofs_R_MT_clustered.close();
-
-    R_MT_clustered.resize(0,0);
+    R_selected.resize(0,0);
 
     //Cluster Operator D
-    std::ofstream ofs_D_MT("D_MT_ec.txt", std::ofstream::out);
-    if (ofs_D_MT.is_open())
+    std::ofstream ofs_D_selected("D_selected.txt", std::ofstream::out);
+    if (ofs_D_selected.is_open())
     {
-        printf("writing to D_MT_ec.txt\n");
-        ofs_D_MT << D_MT << '\n';
+        printf("writing to D_selected.txt\n");
+        ofs_D_selected << D_selected << '\n';
     }
     else
-        printf("Not writing to D_MT_ec.txt\n");
-    ofs_D_MT.close();
-
+        printf("Not writing to D_selected.txt\n");
+    ofs_D_selected.close();
 
     // #### R calculation end ####
 
