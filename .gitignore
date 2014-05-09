@@ -327,3 +327,8 @@ bin/mne_browse_raw_qt.app/Contents/PkgInfo
 /bin/R_MT_clustered_ec.txt
 /bin/R_clustered_ec.txt
 /bin/R_ec.txt
+/bin/D_selected.txt
+/bin/R_selected.txt
+/bin/centroids_LH_full.txt
+/bin/centroids_LH_sel.txt
+/bin/centroids_RH_sel.txt
