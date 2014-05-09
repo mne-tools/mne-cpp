@@ -725,6 +725,53 @@ MNEForwardSolution MNEForwardSolution::reduce_forward_solution(qint32 p_iNumDipo
                 p_D((sel[i]*3)+j, (i*3)+j) = 1;
     }
 
+
+//    //find idx of hemi switch
+//    qint32 vertno_size = this->src[0].nuse;
+//    qint32 hIdx = 0;
+
+//    //LH
+//    VectorXi vertnosLH(this->src[0].nuse);
+//    for(qint32 i = 0; i < sel.size(); ++i)
+//    {
+//        if(sel[i] >= vertno_size)
+//        {
+//            hIdx = i;
+//            break;
+//        }
+//        vertnosLH[i] = this->src[0].vertno(sel[i]);
+//    }
+//    vertnosLH.conservativeResize(hIdx);
+
+//    QFile file_centroids_LH("./centroids_LH_sel.txt");
+//    file_centroids_LH.open(QIODevice::WriteOnly | QIODevice::Text);
+//    QTextStream out_centroids_LH(&file_centroids_LH);
+//    for(qint32 i = 0; i < vertnosLH.size(); ++i)
+//        out_centroids_LH << vertnosLH[i] << ", ";
+//    file_centroids_LH.close();
+
+//    QFile file_centroids_LH_full("./centroids_LH_full.txt");
+//    file_centroids_LH_full.open(QIODevice::WriteOnly | QIODevice::Text);
+//    QTextStream out_centroids_LH_full(&file_centroids_LH_full);
+//    for(qint32 i = 0; i < this->src[0].vertno.size(); ++i)
+//        out_centroids_LH_full << this->src[0].vertno[i] << ", ";
+//    file_centroids_LH_full.close();
+
+//    //RH
+//    VectorXi vertnosRH(sel.size() - hIdx);
+//    for(qint32 i = hIdx; i < sel.size(); ++i)
+//    {
+//        vertnosRH[i - hIdx] = this->src[1].vertno(sel[i] - hIdx);
+//    }
+
+//    QFile file_centroids_RH("./centroids_RH_sel.txt");
+//    file_centroids_RH.open(QIODevice::WriteOnly | QIODevice::Text);
+//    QTextStream out_centroids_RH(&file_centroids_RH);
+//    for(qint32 i = 0; i < vertnosRH.size(); ++i)
+//        out_centroids_RH << vertnosRH[i] << ", ";
+//    file_centroids_RH.close();
+//    //vertno end
+
     // New gain matrix
     p_fwdOut.sol->data = this->sol->data * p_D;
 
