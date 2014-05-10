@@ -223,10 +223,11 @@ private:
     */
     void genSurface();
 
-
+    //=========================================================================================================
+    /**
+    * Calculates the bounding box and stores it to m_vecBoundingBoxMin, m_vecBoundingBoxMax and m_vecBoundingBoxCenter.
+    */
     void calcBoundingBox();
-
-
 
     ViewOptions m_viewOptionFlags;
 
