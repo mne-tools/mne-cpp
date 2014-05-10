@@ -224,6 +224,9 @@ private:
     void genSurface();
 
 
+    void calcBoundingBox();
+
+
 
     ViewOptions m_viewOptionFlags;
 
