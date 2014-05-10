@@ -2,7 +2,7 @@
 /**
 * @file     brainview.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     May, 2014
 *
@@ -204,15 +204,25 @@ protected:
 private:
     //=========================================================================================================
     /**
-    * Generates the surface with corresponding curvature and stores it to m_pSceneNode
+    * Generates the geometry with attributes per vertex. Used to display e.g. the corresponding curvature.
+    * The generated scene is stored in m_pSceneNode.
     */
-    void genCurvSurfScene();
+    void genSurfacePerVertex();
 
     //=========================================================================================================
     /**
-    * Generates a plain surface and stores it to m_pSceneNode
+    * Generates the geometry with material per region. Used to display e.g. the brain atlas.
+    * The generated scene is stored in m_pSceneNode.
     */
-    void genPlainSurfScene();
+    void genSurfacePerRegion();
+
+    //=========================================================================================================
+    /**
+    * Generates the geometry with one material per hemisphere. Used to display e.g. an whole brain surface.
+    * The generated scene is stored in m_pSceneNode.
+    */
+    void genSurface();
+
 
 
     ViewOptions m_viewOptionFlags;
