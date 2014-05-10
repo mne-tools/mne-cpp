@@ -455,10 +455,10 @@ int main(int argc, char *argv[])
 //    if(evoked.isEmpty())
 //        return 1;
 
+
     MNEForwardSolution t_Fwd(t_fileFwd);
     if(t_Fwd.isEmpty())
         return 1;
-
 
     FiffCov noise_cov(t_fileCov);
 
@@ -481,8 +481,17 @@ int main(int argc, char *argv[])
     //
     FiffInfo info = evoked.info;
 
+
+
+
+    QFile t_fileSelectedFwd("D:/Data/MEG/mind006/mind006_051209_auditory01_raw-oct-5-fwd.fif");
+
+    MNEForwardSolution t_selectedRawFwd(t_fileSelectedFwd);
+    if(t_selectedRawFwd.isEmpty())
+        return 1;
+
     MatrixXd D_selected;
-    MNEForwardSolution t_selectedFwd = t_Fwd.reduce_forward_solution(t_clusteredFwd.isFixedOrient() ? t_clusteredFwd.sol->data.cols() : t_clusteredFwd.sol->data.cols()/3, D_selected);
+    MNEForwardSolution t_selectedFwd = t_selectedRawFwd.reduce_forward_solution(t_clusteredFwd.isFixedOrient() ? t_clusteredFwd.sol->data.cols() : t_clusteredFwd.sol->data.cols()/3, D_selected);
 
     qDebug() << "#### t_selectedFwd" << t_selectedFwd.sol->data.rows() << "x" << t_selectedFwd.sol->data.cols();
 
@@ -663,6 +672,9 @@ int main(int argc, char *argv[])
     //option d)
     printf("[6]\n");
     MatrixXd M_selected = minimumNormSelected.getKernel();
+
+    qDebug() << "M_selected: " << M_selected.rows() << "x" << M_selected.cols();
+
 
     printf("[7]\n");
     MatrixXd R_selected= M_selected * t_FwdFixed.sol->data;
