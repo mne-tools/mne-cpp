@@ -7,7 +7,7 @@ MNE_LIB_VERSION = 1
 # Eigen
 EIGEN_INCLUDE_DIR = $$EIGEN_INCLUDE_DIR
 isEmpty(EIGEN_INCLUDE_DIR) {
-    EIGEN_INCLUDE_DIR = $${PWD}/include/3rdParty
+    EIGEN_INCLUDE_DIR = $${PWD}/include/3rdParty/eigen3
 }
 # include
 MNE_INCLUDE_DIR = $$MNE_INCLUDE_DIR

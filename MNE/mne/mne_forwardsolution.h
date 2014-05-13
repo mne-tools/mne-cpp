@@ -70,7 +70,7 @@
 #include <Eigen/Core>
 #include <Eigen/SVD>
 #include <Eigen/Sparse>
-#include <Eigen/unsupported/KroneckerProduct>
+#include <unsupported/Eigen/KroneckerProduct>
 
 
 //*************************************************************************************************************
