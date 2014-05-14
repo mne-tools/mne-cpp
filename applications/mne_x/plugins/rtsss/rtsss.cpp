@@ -59,8 +59,10 @@
 
 //using namespace DummyToolboxPlugin;
 using namespace RtSssPlugin;
+using namespace FIFFLIB;
 using namespace MNEX;
 using namespace XMEASLIB;
+
 
 
 //*************************************************************************************************************
@@ -69,9 +71,12 @@ using namespace XMEASLIB;
 //=============================================================================================================
 
 RtSss::RtSss()
-: m_pRTSAInput(NULL)
-, m_pRTSAOutput(NULL)
-, m_pRtSssBuffer(new dBuffer(1024))
+: m_bIsRunning(false)
+, m_bReceiveData(false)
+, m_bProcessData(false)
+//, m_pRTSAInput(NULL)
+//, m_pRTSAOutput(NULL)
+//, m_pRtSssBuffer(new dBuffer(1024))
 /*
 : m_pDummyInput(NULL)
 , m_pDummyOutput(NULL)
@@ -106,10 +111,14 @@ QSharedPointer<IPlugin> RtSss::clone() const
 
 void RtSss::init()
 {
+    //Delete Buffer - will be initailzed with first incoming data
+    if(!m_pRtSssBuffer.isNull())
+        m_pRtSssBuffer = CircularMatrixBuffer<double>::SPtr();
+
     // Input
-    m_pRTSAInput = PluginInputData<NewRealTimeSampleArray>::create(this, "RtSssIn", "RtSss input data");
-    connect(m_pRTSAInput.data(), &PluginInputConnector::notify, this, &RtSss::update, Qt::DirectConnection);
-    m_inputConnectors.append(m_pRTSAInput);
+    m_pRTMSAInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "RtSssIn", "RtSss input data");
+    connect(m_pRTMSAInput.data(), &PluginInputConnector::notify, this, &RtSss::update, Qt::DirectConnection);
+    m_inputConnectors.append(m_pRTMSAInput);
 
     // Output
     m_pRTSAOutput = PluginOutputData<NewRealTimeSampleArray>::create(this, "RtSssOut", "RtSss output data");
@@ -136,11 +145,16 @@ bool RtSss::start()
 
 bool RtSss::stop()
 {
+    m_bIsRunning = false;
+
     // Stop threads
     QThread::terminate();
     QThread::wait();
 
-    m_pRtSssBuffer->clear();
+    if(m_pRtSssBuffer)
+        m_pRtSssBuffer->clear();
+
+    m_bReceiveData = false;
 
     return true;
 }
@@ -175,14 +189,28 @@ QWidget* RtSss::setupWidget()
 
 void RtSss::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 {
-    QSharedPointer<NewRealTimeSampleArray> pRTSA = pMeasurement.dynamicCast<NewRealTimeSampleArray>();
+//    QSharedPointer<NewRealTimeSampleArray> pRTSA = pMeasurement.dynamicCast<NewRealTimeSampleArray>();
+    QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<NewRealTimeMultiSampleArray>();
 
-    if(pRTSA)
+    if(pRTMSA && m_bReceiveData)
     {
-        for(unsigned char i = 0; i < pRTSA->getArraySize(); ++i)
+        //Check if buffer initialized
+        if(!m_pRtSssBuffer)
+            m_pRtSssBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSA->getNumChannels(), pRTMSA->getMultiArraySize()));
+
+        //Fiff information
+        if(!m_pFiffInfo)
+            m_pFiffInfo = pRTMSA->getFiffInfo();
+
+        if(m_bProcessData)
         {
-            double value = pRTSA->getSampleArray()[i];
-            m_pRtSssBuffer->push(value);
+            MatrixXd t_mat(pRTMSA->getNumChannels(), pRTMSA->getMultiArraySize());
+
+
+            for(unsigned char i = 0; i < pRTMSA->getMultiArraySize(); ++i)
+                t_mat.col(i) = pRTMSA->getMultiSampleArray()[i];
+
+            m_pRtSssBuffer->push(&t_mat);
         }
     }
 }
@@ -193,14 +221,35 @@ void RtSss::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
 void RtSss::run()
 {
-    while (true)
+    m_bIsRunning = true;
+
+    //
+    // start receiving data
+    //
+    m_bReceiveData = true;
+
+    // Read Fiff Info
+    //
+    while(!m_pFiffInfo)
+        msleep(10);// Wait for fiff Info
+    //
+    qint32 nchan = m_pFiffInfo->nchan;
+    std::cout << "number of channels: " << nchan << std::endl;
+
+    // start processing data
+    //
+    m_bProcessData = true;
+
+    while(m_bIsRunning)
     {
-        /* Dispatch the inputs */
-        double v = m_pRtSssBuffer->pop();
+        qint32 nrows = m_pRtSssBuffer->rows();
 
-        //ToDo: Implement your algorithm here
-
-        m_pRTSAOutput->data()->setValue(v);
+        if(nrows > 0) // check if init
+        {
+            /* Dispatch the inputs */
+             MatrixXd t_mat = m_pRtSssBuffer->pop();
+        }
+//        m_pRTSAOutput->data()->setValue(v);
     }
 }
 

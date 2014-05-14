@@ -46,8 +46,14 @@
 
 #include <mne_x/Interfaces/IAlgorithm.h>
 #include <generics/circularbuffer.h>
-#include <xMeas/newrealtimesamplearray.h>
+#include <generics/circularmatrixbuffer.h>
 
+#include <xMeas/realtimesourceestimate.h>
+#include <xMeas/newrealtimesamplearray.h>
+#include <xMeas/newrealtimemultisamplearray.h>
+
+#include <fiff/fiff_info.h>
+#include <fiff/fiff_evoked.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -72,6 +78,7 @@ namespace RtSssPlugin
 //=============================================================================================================
 
 using namespace MNEX;
+using namespace FIFFLIB;
 using namespace XMEASLIB;
 using namespace IOBuffer;
 
@@ -143,11 +150,17 @@ private:
     PluginOutputData<NewRealTimeSampleArray>::SPtr  m_pRTSAOutput;    /**< The RealTimeSampleArray of the RtSss output.*/
 
     //  from sourcelab.h
-//    PluginInputData<NewRealTimeMultiSampleArray>::SPtr  m_pRTMSAInput;  /**< The RealTimeMultiSampleArray input.*/
-//    PluginOutputData<RealTimeSourceEstimate>::SPtr      m_pRTSEOutput;  /**< The RealTimeSourceEstimate output.*/
+    PluginInputData<NewRealTimeMultiSampleArray>::SPtr  m_pRTMSAInput;  /**< The RealTimeMultiSampleArray input.*/
+    PluginOutputData<RealTimeSourceEstimate>::SPtr      m_pRTSEOutput;  /**< The RealTimeSourceEstimate output.*/
 
-//    dBuffer::SPtr   m_pDummyBuffer;      /**< Holds incoming data.*/
-    dBuffer::SPtr   m_pRtSssBuffer;      /**< Holds incoming data.*/
+    bool m_bIsRunning;      /**< If source lab is running */
+    bool m_bReceiveData;    /**< If thread is ready to receive data */
+    bool m_bProcessData;    /**< If data should be received for processing */
+
+    FiffInfo::SPtr              m_pFiffInfo;        /**< Fiff information. */
+
+    CircularMatrixBuffer<double>::SPtr m_pRtSssBuffer;   /**< Holds incoming rt server data.*/
+//    dBuffer::SPtr   m_pRtSssBuffer;      /**< Holds incoming data.*/
 };
 
 } // NAMESPACE
