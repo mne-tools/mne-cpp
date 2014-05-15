@@ -61,7 +61,7 @@
 #include <QThread>
 #include <QTableView>
 
-#define NEWTABLEVIEW 1
+//#define NEWTABLEVIEW 1
 
 
 //*************************************************************************************************************
