@@ -143,6 +143,9 @@ MainWindow::~MainWindow()
 
 void MainWindow::clear()
 {
+    if(m_bIsRunning)
+        this->stopMeasurement();
+
     //garbage collection
     m_pPluginSceneManager.reset();
 
