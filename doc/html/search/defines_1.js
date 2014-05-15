@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['client_5fid',['CLIENT_ID',['../types__definitions_8h.html#ac1f93977e0ad074b5cf49d97824293c9',1,'types_definitions.h']]]
+  ['bcishared_5fexport',['BCISHARED_EXPORT',['../bci__global_8h.html#a8f37c214d271a5eeebf10370a1557d3a',1,'bci_global.h']]],
+  ['brainmonitorshared_5fexport',['BRAINMONITORSHARED_EXPORT',['../brainmonitor__global_8h.html#a727bd11cb842e602f4585770111db92e',1,'brainmonitor_global.h']]]
 ];

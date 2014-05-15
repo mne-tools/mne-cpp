@@ -9,9 +9,11 @@ var searchData=
   ['tmsimanualannotationwidget',['TMSIManualAnnotationWidget',['../class_t_m_s_i_plugin_1_1_t_m_s_i_manual_annotation_widget.html',1,'TMSIPlugin']]],
   ['tmsiproducer',['TMSIProducer',['../class_t_m_s_i_plugin_1_1_t_m_s_i_producer.html',1,'TMSIPlugin']]],
   ['tmsisetupwidget',['TMSISetupWidget',['../class_t_m_s_i_plugin_1_1_t_m_s_i_setup_widget.html',1,'TMSIPlugin']]],
+  ['trigger',['Trigger',['../struct_trigger.html',1,'']]],
   ['triggercontrol',['TriggerControl',['../class_trigger_control_plugin_1_1_trigger_control.html',1,'TriggerControlPlugin']]],
   ['triggercontrolaboutwidget',['TriggerControlAboutWidget',['../class_trigger_control_plugin_1_1_trigger_control_about_widget.html',1,'TriggerControlPlugin']]],
   ['triggercontrolaboutwidgetclass',['TriggerControlAboutWidgetClass',['../class_ui_1_1_trigger_control_about_widget_class.html',1,'Ui']]],
   ['triggercontrolsetupwidget',['TriggerControlSetupWidget',['../class_trigger_control_plugin_1_1_trigger_control_setup_widget.html',1,'TriggerControlPlugin']]],
-  ['triggercontrolsetupwidgetclass',['TriggerControlSetupWidgetClass',['../class_ui_1_1_trigger_control_setup_widget_class.html',1,'Ui']]]
+  ['triggercontrolsetupwidgetclass',['TriggerControlSetupWidgetClass',['../class_ui_1_1_trigger_control_setup_widget_class.html',1,'Ui']]],
+  ['triggerline',['TriggerLine',['../struct_trigger_line.html',1,'']]]
 ];

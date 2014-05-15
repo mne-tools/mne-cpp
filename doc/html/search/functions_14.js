@@ -8,6 +8,7 @@ var searchData=
   ['updateinvop',['updateInvOp',['../class_rap_lab_plugin_1_1_rap_lab.html#a0a891f8581b2047e2911147984e79a7c',1,'RapLabPlugin::RapLab::updateInvOp()'],['../class_source_lab_plugin_1_1_source_lab.html#ac9737d76b57632cd75cda9a30e70a75e',1,'SourceLabPlugin::SourceLab::updateInvOp()']]],
   ['updatemaps',['updateMaps',['../class_d_i_s_p_l_i_b_1_1_image_sc.html#aa6ff49df9c77959a4a11200a170cfe4f',1,'DISPLIB::ImageSc']]],
   ['updateoperators',['updateOperators',['../class_m_n_e_browse_raw_qt_1_1_raw_model.html#ac2712820e08b9a418031997d8293a68f',1,'MNEBrowseRawQt::RawModel::updateOperators(QModelIndex chan)'],['../class_m_n_e_browse_raw_qt_1_1_raw_model.html#a49904ce5f881b0ad4430d7bcfa264b86',1,'MNEBrowseRawQt::RawModel::updateOperators(QModelIndexList chlist)'],['../class_m_n_e_browse_raw_qt_1_1_raw_model.html#a5a211c6de27fab445ae9fa9411ebb749',1,'MNEBrowseRawQt::RawModel::updateOperators()']]],
+  ['updatereceiver',['updateReceiver',['../class_m_n_e_x_1_1_plugin_connector_connection_widget.html#a60abb043f924ac70e9ae3ec02474f870',1,'MNEX::PluginConnectorConnectionWidget']]],
   ['updatescrollpos',['updateScrollPos',['../class_m_n_e_browse_raw_qt_1_1_raw_model.html#af2f300aa109777ee1c023624ad56a806',1,'MNEBrowseRawQt::RawModel']]],
   ['updatesensor',['updateSensor',['../class_b_c_i_plugin_1_1_b_c_i.html#a1869ac55121fdc79e0bcb684505b1f4e',1,'BCIPlugin::BCI']]],
   ['updatesinglechannel',['updateSingleChannel',['../class_trigger_control_plugin_1_1_trigger_control.html#a70782e7a4c23138c6a3f33c7ad623465',1,'TriggerControlPlugin::TriggerControl']]],

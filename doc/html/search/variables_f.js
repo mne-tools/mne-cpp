@@ -15,6 +15,6 @@ var searchData=
   ['source_5frr',['source_rr',['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a26f0a506b8f0fafc4cfa3860dc8dcc1e',1,'MNELIB::MNEForwardSolution']]],
   ['src',['src',['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a3d61876581eba25731926eb070d5a1fd',1,'MNELIB::MNEForwardSolution::src()'],['../class_m_n_e_l_i_b_1_1_m_n_e_inverse_operator.html#a8074f2dd4963041afbe819487d0e3bd2',1,'MNELIB::MNEInverseOperator::src()']]],
   ['struct_5fnames',['struct_names',['../class_f_s_l_i_b_1_1_colortable.html#ab7804162918de82c37e9bac3943ff98e',1,'FSLIB::Colortable']]],
-  ['sumd',['sumd',['../struct_m_n_e_l_i_b_1_1_region_data_out.html#aea3fb7e01c9ed8be2aaa7364f7104e15',1,'MNELIB::RegionDataOut']]],
+  ['sumd',['sumd',['../struct_m_n_e_l_i_b_1_1_region_data_out.html#aea3fb7e01c9ed8be2aaa7364f7104e15',1,'MNELIB::RegionDataOut::sumd()'],['../struct_m_n_e_l_i_b_1_1_region_m_t_out.html#a28dcf5b5700d88bf01e971f9ab7bd39f',1,'MNELIB::RegionMTOut::sumd()']]],
   ['surf_5fori',['surf_ori',['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#aee695468986dd2e920b5cad332a5a6a1',1,'MNELIB::MNEForwardSolution']]]
 ];

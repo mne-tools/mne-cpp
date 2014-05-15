@@ -2,16 +2,10 @@ var searchData=
 [
   ['babymegaboutwidget_2ecpp',['babymegaboutwidget.cpp',['../babymegaboutwidget_8cpp.html',1,'']]],
   ['babymegaboutwidget_2eh',['babymegaboutwidget.h',['../babymegaboutwidget_8h.html',1,'']]],
-  ['babymegclient_2ecpp',['babymegclient.cpp',['../babymegclient_8cpp.html',1,'']]],
-  ['babymegclient_2eh',['babymegclient.h',['../babymegclient_8h.html',1,'']]],
-  ['babymeginfo_2ecpp',['babymeginfo.cpp',['../babymeginfo_8cpp.html',1,'']]],
-  ['babymeginfo_2eh',['babymeginfo.h',['../babymeginfo_8h.html',1,'']]],
-  ['babymegproducer_2ecpp',['babymegproducer.cpp',['../babymegproducer_8cpp.html',1,'']]],
-  ['babymegproducer_2eh',['babymegproducer.h',['../babymegproducer_8h.html',1,'']]],
-  ['babymegrunwidget_2ecpp',['babymegrunwidget.cpp',['../babymegrunwidget_8cpp.html',1,'']]],
-  ['babymegrunwidget_2eh',['babymegrunwidget.h',['../babymegrunwidget_8h.html',1,'']]],
   ['babymegsetupwidget_2ecpp',['babymegsetupwidget.cpp',['../babymegsetupwidget_8cpp.html',1,'']]],
   ['babymegsetupwidget_2eh',['babymegsetupwidget.h',['../babymegsetupwidget_8h.html',1,'']]],
+  ['babymegsquidcontroldgl_2ecpp',['babymegsquidcontroldgl.cpp',['../babymegsquidcontroldgl_8cpp.html',1,'']]],
+  ['babymegsquidcontroldgl_2eh',['babymegsquidcontroldgl.h',['../babymegsquidcontroldgl_8h.html',1,'']]],
   ['bci_2ecpp',['bci.cpp',['../bci_8cpp.html',1,'']]],
   ['bci_2eh',['bci.h',['../bci_8h.html',1,'']]],
   ['bci_5fglobal_2eh',['bci_global.h',['../bci__global_8h.html',1,'']]],
@@ -29,6 +23,8 @@ var searchData=
   ['brainmonitorrunwidget_2ecpp',['brainmonitorrunwidget.cpp',['../brainmonitorrunwidget_8cpp.html',1,'']]],
   ['brainmonitorrunwidget_2eh',['brainmonitorrunwidget.h',['../brainmonitorrunwidget_8h.html',1,'']]],
   ['brainmonitorsetupwidget_2eh',['brainmonitorsetupwidget.h',['../brainmonitorsetupwidget_8h.html',1,'']]],
+  ['brainview_2ecpp',['brainview.cpp',['../brainview_8cpp.html',1,'']]],
+  ['brainview_2eh',['brainview.h',['../brainview_8h.html',1,'']]],
   ['buffer_2ecpp',['buffer.cpp',['../buffer_8cpp.html',1,'']]],
   ['buffer_2eh',['buffer.h',['../buffer_8h.html',1,'']]]
 ];
