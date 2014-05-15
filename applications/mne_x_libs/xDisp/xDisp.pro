@@ -104,7 +104,9 @@ SOURCES += \
     newrealtimesamplearraywidget.cpp \
     newrealtimemultisamplearraywidget.cpp \
     roi.cpp \
-    roiselectionwidget.cpp
+    roiselectionwidget.cpp \
+    helpers/realtimemultisamplearraymodel.cpp \
+    helpers/realtimemultisamplearraydelegate.cpp
 
 HEADERS += \
     xdisp_global.h \
@@ -118,7 +120,9 @@ HEADERS += \
     newrealtimesamplearraywidget.h \
     newrealtimemultisamplearraywidget.h \
     roi.h \
-    roiselectionwidget.h
+    roiselectionwidget.h \
+    helpers/realtimemultisamplearraymodel.h \
+    helpers/realtimemultisamplearraydelegate.h
 
 FORMS += \
     realtimemultisamplearraywidget.ui \
@@ -151,3 +155,5 @@ header_files.files = ./*.h
 header_files.path = $${MNE_X_INCLUDE_DIR}/xDisp
 
 INSTALLS += header_files
+
+OTHER_FILES +=

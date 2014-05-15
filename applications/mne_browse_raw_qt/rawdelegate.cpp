@@ -67,13 +67,12 @@ using namespace MNELIB;
 //=============================================================================================================
 
 RawDelegate::RawDelegate(QObject *parent)
-: m_qSettings()
+: QAbstractItemDelegate(parent)
+, m_qSettings()
 {
     m_dPlotHeight = m_qSettings.value("RawDelegate/plotheight").toDouble();
     m_dDx = m_qSettings.value("RawDelegate/dx").toDouble();
     m_nhlines = m_qSettings.value("RawDelegate/nhlines").toDouble();
-
-    Q_UNUSED(parent);
 }
 
 
