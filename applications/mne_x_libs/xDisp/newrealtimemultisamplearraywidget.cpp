@@ -72,7 +72,6 @@
 
 #include <QDebug>
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
@@ -142,6 +141,11 @@ NewRealTimeMultiSampleArrayWidget::NewRealTimeMultiSampleArrayWidget(QSharedPoin
     //connect(ui.m_qSpinBox_Min, SIGNAL(valueChanged(int)), this, SLOT(minValueChanged(int)));
 
     setMouseTracking(true);
+
+
+#ifdef NEWTABLEVIEW
+    m_pTableView = new QTableView(this);
+#endif
 }
 
 
@@ -229,10 +233,30 @@ void NewRealTimeMultiSampleArrayWidget::minValueChanged(double minValue)
 
 void NewRealTimeMultiSampleArrayWidget::update(XMEASLIB::NewMeasurement::SPtr)
 {
+#ifdef NEWTABLEVIEW
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#else
+    //ToDo put most of this in a parallel thread -> to big for process in notifier
     if(m_pRTMSA_New->getMultiSampleArray().size() > 0)
     {
-//        qDebug() << "update" << m_pRTMSA_New->getMultiSampleArray().size();
-
         VectorXd vecValue;
         QVector< VectorXd > matSamples = m_pRTMSA_New->getMultiSampleArray();
 
@@ -319,6 +343,8 @@ void NewRealTimeMultiSampleArrayWidget::update(XMEASLIB::NewMeasurement::SPtr)
     }
     else
         qWarning() << "NewRealTimeMultiSampleArrayWidget::update; getMultiArraySize():" << m_pRTMSA_New->getMultiArraySize() << "getMultiSampleArray():" << m_pRTMSA_New->getMultiSampleArray().size();
+
+#endif
 }
 
 
