@@ -1,10 +1,10 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     MNE.pro
+# @file     pyio.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
-# @date     July, 2012
+# @date     June, 2013
 #
 # @section  LICENSE
 #
@@ -29,34 +29,64 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds all MNE libraries.
+# @brief    This project file builds the pyio library.
 #
 #--------------------------------------------------------------------------------------------------------------
 
-include(../mne-cpp.pri)
+include(../../mne-cpp.pri)
 
-TEMPLATE = subdirs
+TEMPLATE = lib
 
-SUBDIRS += \
-    generics \
-    utils \
-    fs \
-    fiff \
-    mne \
-    pyio \
-    inverse \
-    rtCommand \
-    rtClient \
-    rtInv \
+QT  -= gui
 
+DEFINES += PYIO_LIBRARY
 
-contains(MNECPP_CONFIG, isGui) {
-    SUBDIRS += disp
-
-    qtHaveModule(3d) {
-        message(Qt3D available: disp3D library configured!)
-        SUBDIRS += disp3D
-    }
+TARGET = PyIO
+TARGET = $$join(TARGET,,MNE$${MNE_LIB_VERSION},)
+CONFIG(debug, debug|release) {
+    TARGET = $$join(TARGET,,,d)
 }
 
-CONFIG += ordered
+LIBS += -L$${MNE_LIBRARY_DIR}
+CONFIG(debug, debug|release) {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Utilsd
+}
+else {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Utils
+}
+
+DESTDIR = $${MNE_LIBRARY_DIR}
+
+#
+# win32: copy dll's to bin dir
+# unix: add lib folder to LD_LIBRARY_PATH
+#
+win32 {
+    FILE = $${DESTDIR}/$${TARGET}.dll
+    BINDIR = $${DESTDIR}/../bin
+    FILE ~= s,/,\\,g
+    BINDIR ~= s,/,\\,g
+    QMAKE_POST_LINK += $${QMAKE_COPY} $$quote($${FILE}) $$quote($${BINDIR}) $$escape_expand(\\n\\t)
+}
+
+SOURCES += \
+    pyio.cpp
+
+HEADERS += \
+    pyio_global.h \
+    pyio.h \
+    swig/numpy.i
+
+
+INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
+INCLUDEPATH += $${MNE_INCLUDE_DIR}
+
+# Install headers to include directory
+header_files.files = ./*.h
+header_files.path = $${MNE_INCLUDE_DIR}/pyio
+
+INSTALLS += header_files
+
+FORMS +=
+
+unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
