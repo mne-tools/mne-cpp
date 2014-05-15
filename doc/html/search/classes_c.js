@@ -1,6 +1,12 @@
 var searchData=
 [
   ['neuromag',['Neuromag',['../class_neuromag_plugin_1_1_neuromag.html',1,'NeuromagPlugin']]],
+  ['neuromag',['Neuromag',['../class_mne_rt_client_plugin_1_1_neuromag.html',1,'MneRtClientPlugin']]],
+  ['neuromagaboutwidget',['NeuromagAboutWidget',['../class_mne_rt_client_plugin_1_1_neuromag_about_widget.html',1,'MneRtClientPlugin']]],
+  ['neuromagaboutwidgetclass',['NeuromagAboutWidgetClass',['../class_ui_1_1_neuromag_about_widget_class.html',1,'Ui']]],
+  ['neuromagproducer',['NeuromagProducer',['../class_mne_rt_client_plugin_1_1_neuromag_producer.html',1,'MneRtClientPlugin']]],
+  ['neuromagsetupwidget',['NeuromagSetupWidget',['../class_mne_rt_client_plugin_1_1_neuromag_setup_widget.html',1,'MneRtClientPlugin']]],
+  ['neuromagsetupwidgetclass',['NeuromagSetupWidgetClass',['../class_ui_1_1_neuromag_setup_widget_class.html',1,'Ui']]],
   ['newdisplaymanager',['NewDisplayManager',['../class_m_n_e_x_1_1_new_display_manager.html',1,'MNEX']]],
   ['newmeasurement',['NewMeasurement',['../class_x_m_e_a_s_l_i_b_1_1_new_measurement.html',1,'XMEASLIB']]],
   ['newmeasurementwidget',['NewMeasurementWidget',['../class_x_d_i_s_p_l_i_b_1_1_new_measurement_widget.html',1,'XDISPLIB']]],

@@ -10,7 +10,7 @@ var searchData=
   ['encoderetr',['encoderetr',['../class_trigger_control_plugin_1_1_serial_port.html#a5ed41a2dc0bc5b406df1fd20fbd30eed',1,'TriggerControlPlugin::SerialPort']]],
   ['end_5fblock',['end_block',['../class_f_i_f_f_l_i_b_1_1_fiff.html#aaf5fdbeca3cbb7e2bd7be5d62d175e37',1,'FIFFLIB::Fiff::end_block()'],['../class_f_i_f_f_l_i_b_1_1_fiff_stream.html#a904df8f48da1564a8d5a975a22aa6b54',1,'FIFFLIB::FiffStream::end_block()']]],
   ['end_5ffile',['end_file',['../class_f_i_f_f_l_i_b_1_1_fiff.html#a694dadabbf0b775d91b5a0477ddc3f98',1,'FIFFLIB::Fiff::end_file()'],['../class_f_i_f_f_l_i_b_1_1_fiff_stream.html#ae1aa8744d83c7aee9dc57c2f9c9919a8',1,'FIFFLIB::FiffStream::end_file()']]],
-  ['enqueue',['EnQueue',['../class_baby_m_e_g_info.html#a002a14f7b937b16a7f14835efa3e3e64',1,'BabyMEGInfo']]],
+  ['enqueue',['EnQueue',['../class_baby_m_e_g_info.html#a002a14f7b937b16a7f14835efa3e3e64',1,'BabyMEGInfo::EnQueue(QByteArray DataIn)'],['../class_baby_m_e_g_info.html#a002a14f7b937b16a7f14835efa3e3e64',1,'BabyMEGInfo::EnQueue(QByteArray DataIn)']]],
   ['eventfilter',['eventFilter',['../class_b_c_i_plugin_1_1_b_c_i_setup_widget.html#a1ba9a97ef17ef5cd7fec4f4f7c02af47',1,'BCIPlugin::BCISetupWidget']]],
   ['evokedpoststim',['evokedPostStim',['../class_r_t_i_n_v_l_i_b_1_1_rt_ave.html#afb6dc4dc94f580f7bf837a2723caac48',1,'RTINVLIB::RtAve']]],
   ['evokedprestim',['evokedPreStim',['../class_r_t_i_n_v_l_i_b_1_1_rt_ave.html#afcd67cf178d9b292c06aca49a19d77f9',1,'RTINVLIB::RtAve']]],

@@ -9,7 +9,6 @@ var searchData=
   ['directrecord',['DirectRecord',['../class_direct_record.html',1,'']]],
   ['dummyaboutwidget',['DummyAboutWidget',['../class_dummy_toolbox_plugin_1_1_dummy_about_widget.html',1,'DummyToolboxPlugin']]],
   ['dummyaboutwidgetclass',['DummyAboutWidgetClass',['../class_ui_1_1_dummy_about_widget_class.html',1,'Ui']]],
-  ['dummyrunwidgetclass',['DummyRunWidgetClass',['../class_ui_1_1_dummy_run_widget_class.html',1,'Ui']]],
   ['dummysetupwidget',['DummySetupWidget',['../class_dummy_toolbox_plugin_1_1_dummy_setup_widget.html',1,'DummyToolboxPlugin']]],
   ['dummysetupwidgetclass',['DummySetupWidgetClass',['../class_ui_1_1_dummy_setup_widget_class.html',1,'Ui']]],
   ['dummytoolbox',['DummyToolbox',['../class_dummy_toolbox_plugin_1_1_dummy_toolbox.html',1,'DummyToolboxPlugin']]]

@@ -22,7 +22,6 @@ var searchData=
   ['mnertclientaboutwidget',['MneRtClientAboutWidget',['../class_mne_rt_client_plugin_1_1_mne_rt_client_about_widget.html',1,'MneRtClientPlugin']]],
   ['mnertclientaboutwidgetclass',['MneRtClientAboutWidgetClass',['../class_ui_1_1_mne_rt_client_about_widget_class.html',1,'Ui']]],
   ['mnertclientproducer',['MneRtClientProducer',['../class_mne_rt_client_plugin_1_1_mne_rt_client_producer.html',1,'MneRtClientPlugin']]],
-  ['mnertclientrunclass',['MneRtClientRunClass',['../class_ui_1_1_mne_rt_client_run_class.html',1,'Ui']]],
   ['mnertclientsetupbabymegwidget',['MneRtClientSetupBabyMegWidget',['../class_mne_rt_client_plugin_1_1_mne_rt_client_setup_baby_meg_widget.html',1,'MneRtClientPlugin']]],
   ['mnertclientsetupbabymegwidget',['MneRtClientSetupBabyMegWidget',['../class_ui_1_1_mne_rt_client_setup_baby_meg_widget.html',1,'Ui']]],
   ['mnertclientsetupfifffilesimulatorwidget',['MneRtClientSetupFiffFileSimulatorWidget',['../class_mne_rt_client_plugin_1_1_mne_rt_client_setup_fiff_file_simulator_widget.html',1,'MneRtClientPlugin']]],
