@@ -46,6 +46,10 @@ namespace UTILSLIB
         qreal Scale;
         qint32 Translation;
         qreal Modulation;
+        qreal MaxScalarProduct;
+        MatrixXd Residuum;
+        //qreal NormAtom;
+
     };
 
     class UTILSSHARED_EXPORT GaborAtom : public Atom
@@ -53,12 +57,11 @@ namespace UTILSLIB
 
     public:
         qreal Phase;
-
-        GaborAtom(qint32 sampleCount, qreal scale, qint32 translation, qreal modulation, qreal phase, bool saveToRam = false);
+        GaborAtom();
 
         static VectorXd GaborAtom::GaussFunction (qint32 sampleCount, qreal scale, qint32 translation);
-        VectorXcd GaborAtom::CreateComplex();
-        VectorXd GaborAtom::CreateReal();
+        VectorXcd GaborAtom::CreateComplex(qint32 sampleCount, qreal scale, qint32 translation, qreal modulation);
+        VectorXd GaborAtom::CreateReal(qint32 sampleCount, qreal scale, qint32 translation, qreal modulation, qreal phase);
         QStringList GaborAtom::CreateStringValues();
 
     };

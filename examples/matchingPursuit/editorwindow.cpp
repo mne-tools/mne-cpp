@@ -1125,7 +1125,7 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
                             }
                             else if(atomType == EditorWindow::Gauss)
                             {
-                                GaborAtom *gAtom = new GaborAtom(ui->spb_AtomLength->value(), tempScale, 0, tempModu, tempPhase);
+                                GaborAtom *gAtom = new GaborAtom();//ui->spb_AtomLength->value(), tempScale, 0, tempModu, tempPhase);
                                 resultList = gAtom->CreateStringValues();
                             }
                             stream << QString("%1_ATOM_%2 \n scale: %3 modu: %4 phase: %5 chrip: %6").arg(partDictName).arg(atomIndex).arg(tempScale).arg(tempModu).arg(tempPhase).arg(tempChirp) << "\n";
@@ -1187,7 +1187,7 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
                 }
                 else if(atomType == EditorWindow::Gauss)
                 {
-                    GaborAtom *gAtom = new GaborAtom(ui->spb_AtomLength->value(), tempScale,0 , tempModu, tempPhase);
+                    GaborAtom *gAtom = new GaborAtom();//ui->spb_AtomLength->value(), tempScale,0 , tempModu, tempPhase);
                     resultList = gAtom->CreateStringValues();
                 }
 

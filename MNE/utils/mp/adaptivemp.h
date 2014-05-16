@@ -19,19 +19,17 @@
 #include <Eigen/SparseCore>
 #include <Eigen/unsupported/FFT>
 
-//*************************************************************************************************************
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-//#include <QtCore/QCoreApplication>
-
 namespace UTILSLIB
 {
 //=============================================================================================================
 // NAMESPACES
 
 using namespace Eigen;
+using namespace std;
+
+//*************************************************************************************************************
+
+enum ReturnValue{RETURNATOM, RETURNPARAMETERS};
 
 //*************************************************************************************************************
 
@@ -40,11 +38,14 @@ class UTILSSHARED_EXPORT adaptiveMP
 
 public:
     adaptiveMP();
-    VectorXd GaussFunction (qint32 N, qreal s, qint32 p);
     QList<GaborAtom> MatchingPursuit (MatrixXd signal, qint32 max_it, qreal epsilon);
     VectorXcd ModulationFunction(qint32 N, qreal k);
+    VectorXd adaptiveMP::CalculateAtom(qint32 sampleCount, qreal scale, qint32 translation, qreal modulation, qint32 channel, MatrixXd residuum, ReturnValue returnValue);
+
 };
 
 }
+
+
 
 #endif // ADAPTIVEMP_H

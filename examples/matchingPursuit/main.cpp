@@ -100,65 +100,154 @@ int main(int argc, char *argv[])
     //qint32 readFiffFile = ReadFiffFile();
 
     QList<GaborAtom> myAtomList;
-    qint32 it = 1;
-    qreal epsilon = 0.4;
+    qint32 it = 100;
+    qreal epsilon = 0.01;
     adaptiveMP *adaptiveMp = new adaptiveMP();
-    qint32 t_iSize = 40;
-    MatrixXd signal(t_iSize, 1);
+    qint32 t_iSize = 512;
+    MatrixXd signal (t_iSize, 1);
+    MatrixXd residuum = signal;
 
     //Testsignal
-    for(int i = 0; i < t_iSize; i++)
+    GaborAtom *testSignal1 = new GaborAtom();//t_iSize, 40, 180, 40, 0.8);
+    VectorXd t1 = testSignal1->CreateReal(t_iSize, 40, 180, 40, 0.8);//Samples, Scale, translat, modulat(symmetric to size/2, phase
+    VectorXd t2 = testSignal1->CreateReal(t_iSize, 80, 52, 50, PI);
+    VectorXd t5 = testSignal1->CreateReal(t_iSize, 20, 57, 95.505, PI);
+    VectorXd t6 = testSignal1->CreateReal(t_iSize, 10, 40, 120, 0.5);
+    VectorXd t7 = testSignal1->CreateReal(t_iSize, 150, 0, 30, PI/2);
+    VectorXd t8 = testSignal1->CreateReal(t_iSize, 256, 128, 12, 0);
+    VectorXd t9 = testSignal1->CreateReal(t_iSize, 80, 70, 10, 2.7);
+    VectorXd t3 = testSignal1->CreateReal(t_iSize, 180, 40, 40, -0.3);
+    VectorXd t4 = testSignal1->CreateReal(t_iSize, 210, 200, 46, 1);
+    VectorXd t0 = testSignal1->CreateReal(t_iSize, 56, 58, 60, 0.6);
+    VectorXd tSig(t_iSize);
+
+    for(qint32 i = 0; i < t_iSize; i++)
     {
-        double t = 0.01 * i;
-        signal(i, 0) = sin(2 * 3.1416 * 4 * t);//+ sin(2*3.1416 * 10 * t) + 0.7*sin(2 * 3.1416 * 0.4 * t) + 2*sin(2 * 3.1416 * 14 * t);
+        signal(i, 0) =  10 * t1[i] +  10 * t2[i] + 15 * t5[i] + 2 * cos(qreal(i) / 5.0) + 10 * t8[i] + 10 * t7[i]+ 8 * t6[i] + 5 * t4[i] + 20 *t3[i]+ 11 * t0[i] + 20 * t9[i];
+        //signal(i, 0) = 100* t8[i];//2 * cos(qreal(i) / 5.0);
+
+        if(i == 149) signal(i, 0) += 25;
+        signal(i, 0) += 7 * (sin(qreal(i*i))/ 15.0);
     }
+    //find  maximum of signal
+    qreal maximum = 0;
 
+    for(qint32 i = 1; i < t_iSize; i++)
+        if(abs(maximum) < abs(signal(i,0)))
+            maximum = signal(i,0);
+    std::cout << "hoechste Amplitude im Signal:    " << maximum << "\n";
+
+    //plot testsignal
+    for(qint32 i = 0; i < t_iSize; i++)
+        tSig[i] = signal(i, 0);
+
+    Plot *sPlot = new Plot(tSig);
+    sPlot->setTitle("Signalplot");
+    sPlot->show();
+    //tessignal ende
+
+    //run MP Algorithm
     myAtomList = adaptiveMp->MatchingPursuit(signal, it, epsilon);
-    /*
-    //Fouriertransformation
-    Eigen::FFT<double> fft;
-    fft.SetFlag(fft.HalfSpectrum);
-    VectorXcd fftSignal = VectorXcd::Zero(t_iSize);
-    fft.fwd(fftSignal, signal);
 
-    //Absolutbetrag
-    VectorXd absFftSignal = VectorXd::Zero(fftSignal.rows());
-    for(qint32 i=0; i < fftSignal.rows(); i++)
-        absFftSignal[i] = -abs(fftSignal[i]);
-    */
+    //temporary calculating residue and atoms for plotting
+    //residuum = signal;
 
-    mainWindow = new MainWindow();
-    mainWindow->show();
+        for(qint32 i = 0; i < myAtomList.length(); i++)
+        {
+            GaborAtom gaborAtom = myAtomList.at(i);
+            residuum = gaborAtom.Residuum;
+            VectorXd bestMatch = gaborAtom.CreateReal(gaborAtom.SampleCount, gaborAtom.Scale, gaborAtom.Translation, gaborAtom.Modulation, gaborAtom.Phase);//256, 20, 57, 95.505, PI);//
 
-    //Plot Test
-    VectorXd test(signal.rows());
-    VectorXd approximation(signal.rows());
+            //for(qint32 jj = 0; jj < gaborAtom.SampleCount; jj++)
+            //    residuum(jj,0) -= gaborAtom.MaxScalarProduct * bestMatch[jj];
+
+            VectorXd plotResiduum = VectorXd::Zero(t_iSize);
+
+            for(qint32 ij = 0; ij < t_iSize; ij++)
+            {
+                plotResiduum[ij] = gaborAtom.Residuum(ij,0);
+            }
+
+            QString title;          // string which will contain the result
+            Plot *rPlot = new Plot(plotResiduum);
+            title.append(QString("Resid: %1").arg(i));
+            rPlot->setTitle(title);
+            //rPlot->show();
+
+            //find  maximum of Atom
+            maximum = 0;
+            for(qint32 ki = 1; ki < t_iSize; ki++)
+                if(abs(maximum) < abs(gaborAtom.MaxScalarProduct * bestMatch[ki]))
+                    maximum = gaborAtom.MaxScalarProduct * bestMatch[ki];
+            std::cout << "hoechste Amplitude im Atom " << i << ":    " << maximum << "\n";
+
+            //find  maximum of Residuum
+            maximum = 0;
+            for(qint32 mi = 1; mi < t_iSize; mi++)
+                if(abs(maximum) < abs(residuum(mi,0)))
+                    maximum = residuum(mi,0);
+            std::cout << "hoechste Amplitude im Residuum " << i << ":    " << maximum << "\n";
+            //delete gaborAtom;
+
+        }
+
+    //plot result of mp algorithm
+    VectorXd approximation = VectorXd::Zero(signal.rows());
 
     for(qint32 i = 0; i < myAtomList.length(); i++)
     {
-        GaborAtom paintAtom = myAtomList.at(i);
-        test = paintAtom.CreateReal();
-        for(qint32 j = 0; j < test.rows(); j++)
-            approximation[j] = test[j];
+        GaborAtom gaborAtom = myAtomList.at(i);//new GaborAtom;
+        //paintAtom = myAtomList.at(i);
+        qint32 var1 = (gaborAtom.SampleCount);
+        qreal var2 = (gaborAtom.Scale);
+        qint32 var3 = (gaborAtom.Translation);
+        qreal var4 = gaborAtom.Modulation;
+        qreal var5 = gaborAtom.Phase;
+        //qreal var6 = gaborAtom.MaxScalarProduct;
+        std::cout << "Parameter die Residuum bauen:\n   "<< " scale:  "  << var2 << " transl: " << var3 <<" modul: " << var4 <<" phase: " << var5 <<"\n";
+        //std::cout << atan(1000000000)*180/PI << "\n";
+        approximation += gaborAtom.MaxScalarProduct * gaborAtom.CreateReal(var1, var2, var3, var4, var5);
+
+        QString title;          // string which will contain the title
+
+        //plot atoms found
+        Plot *atPlot = new Plot(gaborAtom.CreateReal(var1, var2, var3, var4, var5));
+        title.append(QString("Atom: %1").arg(i));
+        atPlot->setTitle(title);
+        //atPlot->show();
     }
 
-    //Plot *plot = new Plot(test);
-    //plot->show();
+    maximum = 0;
+    for(qint32 i = 1; i < t_iSize; i++)
+        if(abs(maximum) < abs(approximation[i]))
+            maximum = approximation[i];
+    std::cout << "hoechste Amplitude in Approximation ohne Residuum:    " << maximum << "\n";
 
-    //Plot plot(approximation, mainWindow);
-//    plot.setGeometry(0,0,mainWindow->width(),mainWindow->height());
-    //Plot sPlot(signal);
+    //plot approximation
+    Plot *aPlot = new Plot(approximation);
+    aPlot->setTitle("Approximation ohne Residuum");
+    aPlot->show();
 
-//    plot.setTitle("Test Plot");
-//    plot.setXLabel("X Axes");
-//    plot.setYLabel("Y Axes");
+    for(qint32 i = 0; i < t_iSize; i++)
+        approximation[i] += residuum(i,0);
 
-//    plot.setWindowTitle("Corresponding function to MATLABs plot");
-    //plot.show();
-    //sPlot.show();
+    //ploat approxiamtion and residuum
+    Plot *arPlot = new Plot(approximation);
+    arPlot->setTitle("Approximation mit Residuum");
+    arPlot->show();
 
-    //printf("ich bin zurück");
+    //plot residuum
+    VectorXd plotResiduum = VectorXd::Zero(t_iSize);
+    for(qint32 i = 0; i < t_iSize; i++)
+    {
+        plotResiduum[i] = residuum(i,0);
+    }
+    Plot *rPlot = new Plot(plotResiduum);
+    rPlot->setTitle("Residuum");
+    rPlot->show();
 
+    //mainWindow = new MainWindow();
+    //mainWindow->show();
 
     return a.exec();
 }
