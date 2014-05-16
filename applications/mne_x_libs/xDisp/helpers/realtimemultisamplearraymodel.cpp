@@ -130,3 +130,17 @@ QVariant RealTimeMultiSampleArrayModel::headerData(int section, Qt::Orientation 
 
     return QVariant();
 }
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayModel::setChannelInfo(QList<RealTimeSampleArrayChInfo> &chInfo)
+{
+    beginResetModel();
+
+
+    m_qListChInfo = chInfo;
+
+
+    endResetModel();
+}

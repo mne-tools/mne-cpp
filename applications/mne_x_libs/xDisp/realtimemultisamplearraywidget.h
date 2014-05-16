@@ -44,6 +44,8 @@
 
 #include "xdisp_global.h"
 #include "newmeasurementwidget.h"
+#include "helpers/realtimemultisamplearraymodel.h"
+#include "helpers/realtimemultisamplearraydelegate.h"
 
 
 //*************************************************************************************************************
@@ -52,17 +54,9 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
-#include <QSet>
 #include <QList>
-#include <QVector>
-#include <QPainterPath>
-#include <QMutex>
-#include <QThread>
 #include <QTableView>
 #include <QAction>
-#include <QVBoxLayout>
-
-#define NEWTABLEVIEW 1
 
 
 //*************************************************************************************************************
@@ -224,14 +218,19 @@ protected:
     virtual void wheelEvent(QWheelEvent* wheelEvent);
 
 private:
+    RealTimeMultiSampleArrayModel*      m_pRTMSAModel;
+    RealTimeMultiSampleArrayDelegate*   m_pRTMSADelegate;
+    QTableView* m_pTableView;                               /**< the QTableView being part of the model/view framework of Qt */
+
     QSharedPointer<NewRealTimeMultiSampleArray> m_pRTMSA_New;       /**< The real-time sample array measurement. */
 
-    void actualize();                                               /**< Actualize member variables. Like y position, scaling factor, middle value of the frame and the highest sampling rate to calculate the sample width.*/
+    bool m_bInitialized;
 
-    QTableView *m_pTableView; /**< the QTableView being part of the model/view framework of Qt */
+    QList<RealTimeSampleArrayChInfo> m_qListChInfo;         /**< Channel info list. ToDo: check if this is obsolete later on*/
 
 
-    QAction*                        m_pActionSelectRoi;     /**< show roi select widget ToDo move this to the actual view-> and make a dynamical menu*/
+
+    QAction*    m_pActionSelectRoi;                         /**< show roi select widget ToDo move this to the actual view-> and make a dynamical menu*/
 
     void showRoiSelectionWidget();                          /**< Implements the show roi selection widget. ToDo: Move this to the actual widget*/
 

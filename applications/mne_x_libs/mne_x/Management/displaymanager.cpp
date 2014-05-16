@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-//#define NEWRTMSAWIDGET 1
+#define NEWRTMSAWIDGET 1
 
 #include "displaymanager.h"
 

@@ -12,13 +12,10 @@ public:
     virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
     virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
-    // Plots settings
-    float m_fPlotHeight;   /**< The height of the plot */
-
-    // Scaling
-    float m_fMaxValue;     /**< Maximum value of the data to plot  */
-    float m_fScaleY;       /**< Maximum amplitude of plot (max is m_dPlotHeight/2) */
-    float m_fDx;           /**< pixel difference to the next sample*/
+    inline float getHeight()
+    {
+        return m_fPlotHeight;
+    }
 
 private:
     //=========================================================================================================
@@ -42,6 +39,16 @@ private:
     //Settings
     qint8 m_nhlines;        /**< Number of horizontal lines for the grid plot */
 //    QSettings m_qSettings;
+
+
+    // Plots settings
+    float m_fPlotHeight;   /**< The height of the plot */
+
+    // Scaling
+    float m_fMaxValue;     /**< Maximum value of the data to plot  */
+    float m_fScaleY;       /**< Maximum amplitude of plot (max is m_dPlotHeight/2) */
+    float m_fDx;           /**< pixel difference to the next sample*/
+
 };
 
 #endif // REALTIMEMULTISAMPLEARRAYDELEGATE_H
