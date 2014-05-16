@@ -173,16 +173,15 @@ void RealTimeMultiSampleArrayWidget::init()
             delete m_pRTMSADelegate;
         m_pRTMSADelegate = new RealTimeMultiSampleArrayDelegate(this);
 
-        m_pRTMSADelegate->setParentTableView(m_pTableView);
-
         m_pTableView->setModel(m_pRTMSAModel);
         m_pTableView->setItemDelegate(m_pRTMSADelegate);
-
 
         //set some size settings for m_pTableView
         m_pTableView->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
 
         m_pTableView->setShowGrid(false);
+
+        m_pTableView->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch); //Stretch 2 column to maximal width
         m_pTableView->horizontalHeader()->hide();
         m_pTableView->verticalHeader()->setDefaultSectionSize(m_pRTMSADelegate->getHeight());
 

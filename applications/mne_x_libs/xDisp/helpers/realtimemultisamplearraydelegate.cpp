@@ -15,7 +15,6 @@
 
 RealTimeMultiSampleArrayDelegate::RealTimeMultiSampleArrayDelegate(QObject *parent)
 : QAbstractItemDelegate(parent)
-, m_pTableView(NULL)
 {
     m_fPlotHeight = 80;//m_qSettings.value("RawDelegate/plotheight").toDouble();
     m_nhlines = 10;//m_qSettings.value("RawDelegate/nhlines").toDouble();
@@ -83,7 +82,7 @@ void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOpti
     //            //Plot data path
     //            path = QPainterPath(QPointF(0,0));//QPointF(option.rect.x()+t_rtmsaModel->relFiffCursor(),option.rect.y()));
 
-                createPlotPath(index,path,data);
+                createPlotPath(index,option,path,data);
 
                 painter->translate(0,m_fPlotHeight/2);
 
@@ -125,7 +124,7 @@ QSize RealTimeMultiSampleArrayDelegate::sizeHint(const QStyleOptionViewItem &opt
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, QPainterPath& path, QVector<float>& data) const
+void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QVector<float>& data) const
 {
     //get maximum range of respective channel type (range value in FiffChInfo does not seem to contain a reasonable value)
     qint32 kind = (static_cast<const RealTimeMultiSampleArrayModel*>(index.model()))->m_qListChInfo[index.row()].getKind();
@@ -161,9 +160,7 @@ void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, 
     float y_base = path.currentPosition().y();
     QPointF qSamplePosition;
 
-    float fDx = 1.0f;
-    if(m_pTableView)
-        fDx = ((float)m_pTableView->width()) / (static_cast<const RealTimeMultiSampleArrayModel*>(index.model()))->m_iMaxSamples;
+    float fDx = ((float)option.rect.width()) / (static_cast<const RealTimeMultiSampleArrayModel*>(index.model()))->m_iMaxSamples;
 
     //create lines from one to the next sample
     for(qint32 i = 0; i < data.size(); ++i) {
@@ -184,7 +181,7 @@ void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, 
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayDelegate::createGridPath(const QModelIndex &index, QPainterPath& path, QList< QVector<float> >& data) const
+void RealTimeMultiSampleArrayDelegate::createGridPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QList< QVector<float> >& data) const
 {
     //horizontal lines
     float distance = m_fPlotHeight/m_nhlines;
@@ -192,9 +189,7 @@ void RealTimeMultiSampleArrayDelegate::createGridPath(const QModelIndex &index, 
     QPointF startpos = path.currentPosition();
 
 
-    float fDx = 1.0f;
-    if(m_pTableView)
-        fDx = ((float)m_pTableView->width()) / (static_cast<const RealTimeMultiSampleArrayModel*>(index.model()))->m_iMaxSamples;
+    float fDx = ((float)option.rect.width()) / (static_cast<const RealTimeMultiSampleArrayModel*>(index.model()))->m_iMaxSamples;
 
     QPointF endpoint(path.currentPosition().x()+data[0].size()*data.size()*fDx,path.currentPosition().y());
 
