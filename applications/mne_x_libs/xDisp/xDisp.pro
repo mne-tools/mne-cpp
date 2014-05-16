@@ -100,7 +100,6 @@ SOURCES += \
     textwidget.cpp \
     progressbarwidget.cpp \
     numericwidget.cpp \
-    realtimemultisamplearray_new_widget.cpp \
     newrealtimesamplearraywidget.cpp \
     newrealtimemultisamplearraywidget.cpp \
     roi.cpp \
@@ -116,7 +115,6 @@ HEADERS += \
     textwidget.h \
     progressbarwidget.h \
     numericwidget.h \
-    realtimemultisamplearray_new_widget.h \
     newrealtimesamplearraywidget.h \
     newrealtimemultisamplearraywidget.h \
     roi.h \

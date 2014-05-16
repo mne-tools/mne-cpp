@@ -40,7 +40,7 @@
 
 #include <mne_x/Management/pluginmanager.h>
 #include <mne_x/Management/pluginscenemanager.h>
-#include <mne_x/Management/newdisplaymanager.h>
+#include <mne_x/Management/displaymanager.h>
 
 #include <xDisp/roiselectionwidget.h>
 
@@ -89,7 +89,7 @@ MainWindow::MainWindow(QWidget *parent)
 : QMainWindow(parent)
 , m_pStartUpWidget(new StartUpWidget(this))
 , m_pRunWidget(NULL)
-, m_pDisplayManager(new NewDisplayManager(this))
+, m_pDisplayManager(new DisplayManager(this))
 , m_bDisplayMax(false)
 , m_bIsRunning(false)
 , m_pToolBar(NULL)
