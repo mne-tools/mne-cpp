@@ -1,8 +1,36 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include <mne/mne.h>
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
 
 #include <QMainWindow>
 #include <QtGui>
+
+#include <QAbstractTableModel>
+#include <QImage>
+
+
+#include <QAbstractItemDelegate>
+#include <QFontMetrics>
+#include <QModelIndex>
+#include <QSize>
+
+//=============================================================================================================
+// USED NAMESPACES
+
+using namespace MNELIB;
+
+//=============================================================================================================
+
 
 namespace Ui
 {
@@ -35,12 +63,13 @@ private:
     Ui::MainWindow *ui;    
     GraphWindow *callGraphWindow;
     //AtomWindow *callAtomWindow;
-    //ResiduumWindow *callResiduumWindow;
-    Atom *atom;
+    //ResiduumWindow *callResiduumWindow;    
     void OpenFile();
     QList<qreal> NormSignal(QList<qreal> signalSamples);
-    QStringList correlation(QList<qreal> signalSamples, QList<qreal> atomSamples, QString atomName);
-    QList<qreal> mpCalc(QFile& dictionary, QList<qreal> signalSamples, qint32 iterationsCount);
+    //QStringList correlation(VectorXd signalSamples, QList<qreal> atomSamples, QString atomName);
+    //VectorXd mpCalc(QFile& dictionary, VectorXd signalSamples, qint32 iterationsCount);
+    qint32 MainWindow::ReadFiffFile(QString fileName);
+    void MainWindow::ReadMatlabFile(QString fileName);
 };
 
 // Widget in dem das Eingangssignal gezeichnet wird
@@ -51,9 +80,57 @@ class GraphWindow : public QWidget
 protected:
    void paintEvent(QPaintEvent *event);
 public:
-   void PaintSignal(QList<qreal> valueList, QList<qreal> residuumValues, QColor color, QSize windowSize);
+   void PaintSignal(VectorXd signalSamples, VectorXd residuumSamples, QColor color, QSize windowSize);
 
 };
+
+//*************************************************************************************************************
+//=============================================================================================================
+
+ class SignalModel : public QAbstractTableModel
+ {
+     Q_OBJECT
+
+ public:
+     SignalModel(QObject *parent = 0);
+
+     void setSignal(const MatrixXd &signal);
+
+     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
+     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
+
+     virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+     virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
+
+ private:
+     MatrixXd modelSignal;
+ };
+
+//***************************************************************************************************************
+
+class QAbstractItemModel;
+class QObject;
+class QPainter;
+
+static const int ItemSize = 256;
+
+class SignalDelegate : public QAbstractItemDelegate
+{
+    Q_OBJECT
+
+public:
+    SignalDelegate(QObject *parent = 0);
+    virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index ) const;
+
+public slots:
+
+private:
+
+};
+
+//*************************************************************************************************************
+//=============================================================================================================
 
 // Widget in dem das Atom gezeichnet wird
 class AtomWindow : public QWidget//, QTableWidgetItem
@@ -74,33 +151,6 @@ class ResiduumWindow : public QWidget //, QTableWidgetItem
    //void paintEvent(QPaintEvent *event);
 
 };
-
-// Atomklasse zum Erstellen und Abrufen von Atomen und deren Parameter
-class Atom : public QObject
-{
-    Q_OBJECT
-
-
-
-public:    
-    enum AtomType
-    {
-             Gauss,
-             Chirp
-    };
-
-    qreal Samples;
-    qreal Scale;
-    qreal Modulation;
-    qreal Phase;
-    qreal ChirpValue;
-    Atom::AtomType AType;
-
-    QList<qreal> Create(qint32 samples, qreal scale, qreal modulation, qreal phase, qreal chirp = 0, Atom::AtomType atomType = Gauss);
-    QStringList  CreateStringValues(qint32 samples, qreal scale, qreal modulation, qreal phase, qreal chirp, Atom::AtomType atomType);
-};
-
-
 
 /*template <class type>
 class Q2DVector : public QVector< QVector<type> >
