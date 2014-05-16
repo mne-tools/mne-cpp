@@ -47,13 +47,14 @@ public:
 
     void setChannelInfo(QList<RealTimeSampleArrayChInfo> &chInfo);
 
+    void addData(const QVector<VectorXd> &data);
+
 private:
     QList<RealTimeSampleArrayChInfo> m_qListChInfo; /**< Channel info list.*/
 
     //Fiff data structure
-    QVector<VectorXd> m_data;        /**< List that holds the fiff matrix data <n_channels x n_samples> */
-
-
+    QVector<VectorXd> m_dataCurrent;        /**< List that holds the fiff matrix data <n_channels x n_samples> */
+    QVector<VectorXd> m_dataLast;        /**< List that holds the fiff matrix data <n_channels x n_samples> */
 };
 
 #endif // REALTIMEMULTISAMPLEARRAYMODEL_H

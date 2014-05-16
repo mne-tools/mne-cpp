@@ -44,6 +44,7 @@
 #include "xmeas_global.h"
 
 #include <fiff/fiff_constants.h>
+#include <fiff/fiff_types.h>
 
 
 //*************************************************************************************************************
@@ -166,7 +167,7 @@ public:
     *
     * @param [in] unit of the data.
     */
-    inline void setUnit(const QString& unit);
+    inline void setUnit(fiff_int_t unit);
 
     //=========================================================================================================
     /**
@@ -174,14 +175,14 @@ public:
     *
     * @return the unit of the data of measurement.
     */
-    inline const QString& getUnit() const;
+    inline fiff_int_t getUnit() const;
 
 private:
     QString     m_qStringChName;    /**< The channel name.*/
     double      m_dMinValue;        /**< The minimal value.*/
     double      m_dMaxValue;        /**< The maximal value.*/
     qint32      m_iKind;            /**< The channel kind.*/
-    QString     m_qString_Unit;     /**< Unit of the data of the measurement.*/
+    fiff_int_t  m_iUnit;     /**< Unit of the data of the measurement.*/
 
 };
 
@@ -256,17 +257,17 @@ inline double RealTimeSampleArrayChInfo::getMaxValue() const
 
 //*************************************************************************************************************
 
-inline void RealTimeSampleArrayChInfo::setUnit(const QString& unit)
+inline void RealTimeSampleArrayChInfo::setUnit(fiff_int_t unit)
 {
-    m_qString_Unit = unit;
+    m_iUnit = unit;
 }
 
 
 //*************************************************************************************************************
 
-inline const QString& RealTimeSampleArrayChInfo::getUnit() const
+inline fiff_int_t RealTimeSampleArrayChInfo::getUnit() const
 {
-    return m_qString_Unit;
+    return m_iUnit;
 }
 
 } // NAMESPACE

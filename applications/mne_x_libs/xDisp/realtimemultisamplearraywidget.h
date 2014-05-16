@@ -222,7 +222,7 @@ private:
     RealTimeMultiSampleArrayDelegate*   m_pRTMSADelegate;
     QTableView* m_pTableView;                               /**< the QTableView being part of the model/view framework of Qt */
 
-    QSharedPointer<NewRealTimeMultiSampleArray> m_pRTMSA_New;       /**< The real-time sample array measurement. */
+    QSharedPointer<NewRealTimeMultiSampleArray> m_pRTMSA;       /**< The real-time sample array measurement. */
 
     bool m_bInitialized;
 
