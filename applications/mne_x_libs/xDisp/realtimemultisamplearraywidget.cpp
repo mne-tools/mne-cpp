@@ -67,8 +67,12 @@
 #include <QPainter>
 #include <QTimer>
 #include <QTime>
+#include <QVBoxLayout>
+#include <QHeaderView>
 
 #include <QMessageBox>
+
+#include <QScroller>
 
 #include <QDebug>
 
@@ -99,7 +103,11 @@ enum Tool
 
 RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA_New, QSharedPointer<QTime> &pTime, QWidget* parent)
 : NewMeasurementWidget(parent)
+, m_pRTMSAModel(NULL)
+, m_pRTMSADelegate(NULL)
+, m_pTableView(NULL)
 , m_pRTMSA_New(pRTMSA_New)
+, m_bInitialized(false)
 {
     m_pActionSelectRoi = new QAction(QIcon(":/images/selectRoi.png"), tr("Shows the region selection widget (F12)"),this);
     m_pActionSelectRoi->setShortcut(tr("F12"));
@@ -108,6 +116,8 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
 
     addDisplayAction(m_pActionSelectRoi);
 
+    if(m_pTableView)
+        delete m_pTableView;
     m_pTableView = new QTableView;
 
     //set vertical layout
@@ -117,6 +127,8 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
 
     //set layouts
     this->setLayout(rtmsaLayout);
+
+    init();
 }
 
 
@@ -132,6 +144,11 @@ RealTimeMultiSampleArrayWidget::~RealTimeMultiSampleArrayWidget()
 
 void RealTimeMultiSampleArrayWidget::update(XMEASLIB::NewMeasurement::SPtr)
 {
+    if(!m_bInitialized)
+    {
+        m_qListChInfo = m_pRTMSA_New->chInfo();
+        init();
+    }
 
 }
 
@@ -140,7 +157,52 @@ void RealTimeMultiSampleArrayWidget::update(XMEASLIB::NewMeasurement::SPtr)
 
 void RealTimeMultiSampleArrayWidget::init()
 {
+    if(m_qListChInfo.size() > 0)
+    {
+        if(m_pRTMSAModel)
+            delete m_pRTMSAModel;
+        m_pRTMSAModel = new RealTimeMultiSampleArrayModel(this);
 
+        m_pRTMSAModel->setChannelInfo(m_qListChInfo);
+
+        if(m_pRTMSADelegate)
+            delete m_pRTMSADelegate;
+        m_pRTMSADelegate = new RealTimeMultiSampleArrayDelegate(this);
+
+        m_pTableView->setModel(m_pRTMSAModel);
+        m_pTableView->setItemDelegate(m_pRTMSADelegate);
+
+
+
+
+
+
+        //set some size settings for m_pTableView
+        m_pTableView->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+
+        m_pTableView->setShowGrid(false);
+        m_pTableView->horizontalHeader()->hide();
+        m_pTableView->verticalHeader()->setDefaultSectionSize(m_pRTMSADelegate->getHeight());
+
+        m_pTableView->setAutoScroll(false);
+        m_pTableView->setColumnHidden(0,true); //because content is plotted jointly with column=1
+
+        m_pTableView->resizeColumnsToContents();
+
+        m_pTableView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
+
+//        //set context menu
+//        m_pTableView->setContextMenuPolicy(Qt::CustomContextMenu);
+//        connect(m_pTableView,SIGNAL(customContextMenuRequested(QPoint)),this,SLOT(customContextMenuRequested(QPoint)));
+
+        //activate kinetic scrolling
+        QScroller::grabGesture(m_pTableView,QScroller::MiddleMouseButtonGesture);
+
+
+
+
+        m_bInitialized = true;
+    }
 }
 
 

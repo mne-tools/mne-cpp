@@ -14,7 +14,7 @@
 RealTimeMultiSampleArrayDelegate::RealTimeMultiSampleArrayDelegate(QObject *parent)
 : QAbstractItemDelegate(parent)
 {
-    m_fPlotHeight = 10;//m_qSettings.value("RawDelegate/plotheight").toDouble();
+    m_fPlotHeight = 80;//m_qSettings.value("RawDelegate/plotheight").toDouble();
 //    m_dDx = m_qSettings.value("RawDelegate/dx").toDouble();
     m_nhlines = 10;//m_qSettings.value("RawDelegate/nhlines").toDouble();
 
@@ -27,66 +27,66 @@ RealTimeMultiSampleArrayDelegate::RealTimeMultiSampleArrayDelegate(QObject *pare
 void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     switch(index.column()) {
-    case 0: { //chnames
-        painter->save();
+        case 0: { //chnames
+            painter->save();
 
-        painter->rotate(-90);
-        painter->drawText(QRectF(-option.rect.y()-m_fPlotHeight,0,m_fPlotHeight,20),Qt::AlignCenter,index.model()->data(index,Qt::DisplayRole).toString());
+//            painter->rotate(-90);
+//            painter->drawText(QRectF(-option.rect.y()-m_fPlotHeight,0,m_fPlotHeight,20),Qt::AlignCenter,index.model()->data(index,Qt::DisplayRole).toString());
 
-        painter->restore();
-        break;
-    }
-    case 1: { //data plot
-        painter->save();
-
-        //draw special background when channel is marked as bad
-        QVariant v = index.model()->data(index,Qt::BackgroundRole);
-        if(v.canConvert<QBrush>() && !(option.state & QStyle::State_Selected)) {
-            QPointF oldBO = painter->brushOrigin();
-            painter->setBrushOrigin(option.rect.topLeft());
-            painter->fillRect(option.rect, qvariant_cast<QBrush>(v));
-            painter->setBrushOrigin(oldBO);
+            painter->restore();
+            break;
         }
+        case 1: { //data plot
+//            painter->save();
 
-        //Highlight selected channels
-        if(option.state & QStyle::State_Selected) {
-            QPointF oldBO = painter->brushOrigin();
-            painter->setBrushOrigin(option.rect.topLeft());
-            painter->fillRect(option.rect, option.palette.highlight());
-            painter->setBrushOrigin(oldBO);
+//            //draw special background when channel is marked as bad
+//            QVariant v = index.model()->data(index,Qt::BackgroundRole);
+//            if(v.canConvert<QBrush>() && !(option.state & QStyle::State_Selected)) {
+//                QPointF oldBO = painter->brushOrigin();
+//                painter->setBrushOrigin(option.rect.topLeft());
+//                painter->fillRect(option.rect, qvariant_cast<QBrush>(v));
+//                painter->setBrushOrigin(oldBO);
+//            }
+
+//            //Highlight selected channels
+//            if(option.state & QStyle::State_Selected) {
+//                QPointF oldBO = painter->brushOrigin();
+//                painter->setBrushOrigin(option.rect.topLeft());
+//                painter->fillRect(option.rect, option.palette.highlight());
+//                painter->setBrushOrigin(oldBO);
+//            }
+
+//            //Get data
+//            QVariant variant = index.model()->data(index,Qt::DisplayRole);
+//            QList< QVector<float> > data = variant.value< QList< QVector<float> > >();
+//            const RealTimeMultiSampleArrayModel* t_rtmsaModel = (static_cast<const RealTimeMultiSampleArrayModel*>(index.model()));
+
+//            QPainterPath path(QPointF(0,0));//QPointF(option.rect.x()+t_rtmsaModel->relFiffCursor()-1,option.rect.y()));
+
+//            //Plot grid
+//            painter->setRenderHint(QPainter::Antialiasing, false);
+//            createGridPath(path,data);
+
+//            painter->save();
+//            QPen pen;
+//            pen.setStyle(Qt::DotLine);
+//            pen.setWidthF(0.5);
+//            painter->setPen(pen);
+//            painter->drawPath(path);
+//            painter->restore();
+
+//            //Plot data path
+//            path = QPainterPath(QPointF(0,0));//QPointF(option.rect.x()+t_rtmsaModel->relFiffCursor(),option.rect.y()));
+//            createPlotPath(index,path,data);
+
+//            painter->translate(0,m_fPlotHeight/2);
+
+//            painter->setRenderHint(QPainter::Antialiasing, true);
+//            painter->drawPath(path);
+
+//            painter->restore();
+            break;
         }
-
-        //Get data
-        QVariant variant = index.model()->data(index,Qt::DisplayRole);
-        QList< QVector<float> > data = variant.value< QList< QVector<float> > >();
-        const RealTimeMultiSampleArrayModel* t_rtmsaModel = (static_cast<const RealTimeMultiSampleArrayModel*>(index.model()));
-
-        QPainterPath path(QPointF(0,0));//QPointF(option.rect.x()+t_rtmsaModel->relFiffCursor()-1,option.rect.y()));
-
-        //Plot grid
-        painter->setRenderHint(QPainter::Antialiasing, false);
-        createGridPath(path,data);
-
-        painter->save();
-        QPen pen;
-        pen.setStyle(Qt::DotLine);
-        pen.setWidthF(0.5);
-        painter->setPen(pen);
-        painter->drawPath(path);
-        painter->restore();
-
-        //Plot data path
-        path = QPainterPath(QPointF(0,0));//QPointF(option.rect.x()+t_rtmsaModel->relFiffCursor(),option.rect.y()));
-        createPlotPath(index,path,data);
-
-        painter->translate(0,m_fPlotHeight/2);
-
-        painter->setRenderHint(QPainter::Antialiasing, true);
-        painter->drawPath(path);
-
-        painter->restore();
-        break;
-    }
     }
 
 }
