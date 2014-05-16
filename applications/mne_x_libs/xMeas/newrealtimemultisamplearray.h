@@ -78,7 +78,7 @@ using namespace FIFFLIB;
 
 //=========================================================================================================
 /**
-* DECLARE CLASS NewRealTimeMultiSampleArray
+* DECLARE CLASS NewRealTimeMultiSampleArray -> ToDo check feasibilty of QAbstractTableModel
 *
 * @brief The RealTimeMultiSampleArrayNew class is the base class of every RealTimeMultiSampleArrayNew Measurement.
 */

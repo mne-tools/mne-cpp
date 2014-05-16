@@ -55,6 +55,7 @@
 #include <QThread>
 #include <QCoreApplication>
 #include <QSharedPointer>
+#include <QAction>
 
 
 //*************************************************************************************************************
@@ -148,6 +149,14 @@ public:
 
     //=========================================================================================================
     /**
+    * A list of actions for the current plugin.
+    *
+    * @return a list of plugin actions
+    */
+    inline QList< QAction* > getPluginActions();
+
+    //=========================================================================================================
+    /**
     * Returns the plugin type.
     * Pure virtual method.
     *
@@ -195,14 +204,46 @@ protected:
     */
     virtual void run() = 0;
 
+    //=========================================================================================================
+    /**
+    * Adds a plugin action to the current measurement widget.
+    *
+    * @param [in] pAction  pointer to the action to be added to the measurement widget
+    */
+    inline void addPluginAction(QAction* pAction);
+
     InputConnectorList m_inputConnectors;    /**< Set of input connectors associated with this plug-in. */
     OutputConnectorList m_outputConnectors;  /**< Set of output connectors associated with this plug-in. */
+
+private:
+    QList< QAction* >   m_qListPluginActions;  /**< List of plugin actions */
 };
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
+
+inline bool IPlugin::multiInstanceAllowed() const
+{
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+QList< QAction* > IPlugin::getPluginActions()
+{
+    return m_qListPluginActions;
+}
+
+
+//*************************************************************************************************************
+
+inline void IPlugin::addPluginAction(QAction* pAction)
+{
+    m_qListPluginActions.append(pAction);
+}
 
 } //Namespace
 

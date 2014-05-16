@@ -246,6 +246,8 @@ void MinimumNorm::doInverseSetup(qint32 nave, bool pick_normal)
     printf("Computing inverse...");
     inv.assemble_kernel(label, m_sMethod, pick_normal, K, noise_norm, vertno);
 
+    std::cout << "K " << K.rows() << " x " << K.cols() << std::endl;
+
     inverseSetup = true;
 }
 

@@ -35,9 +35,26 @@
 *
 */
 
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
 #include "rawmodel.h"
 
+
 //*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace MNEBrowseRawQt;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
 
 RawModel::RawModel(QObject *parent)
 : QAbstractTableModel(parent)
@@ -52,6 +69,7 @@ RawModel::RawModel(QObject *parent)
     m_reloadPos = m_qSettings.value("RawModel/reload_pos").toInt();
     m_maxWindows = m_qSettings.value("RawModel/max_windows").toInt();
 }
+
 
 //*************************************************************************************************************
 
@@ -96,9 +114,9 @@ RawModel::RawModel(QFile &qFile, QObject *parent)
     });
 }
 
-//=============================================================================================================
-//virtual functions
 
+//*************************************************************************************************************
+//virtual functions
 int RawModel::rowCount(const QModelIndex & /*parent*/) const
 {
     if(!m_chInfolist.empty())
@@ -106,10 +124,14 @@ int RawModel::rowCount(const QModelIndex & /*parent*/) const
     else return 0;
 }
 
+
+//*************************************************************************************************************
+
 int RawModel::columnCount(const QModelIndex & /*parent*/) const
 {
     return 2;
 }
+
 
 //*************************************************************************************************************
 
@@ -175,6 +197,7 @@ QVariant RawModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
+
 //*************************************************************************************************************
 
 QVariant RawModel::headerData(int section, Qt::Orientation orientation, int role) const
@@ -206,6 +229,7 @@ QVariant RawModel::headerData(int section, Qt::Orientation orientation, int role
 
     return QVariant();
 }
+
 
 //*************************************************************************************************************
 
@@ -256,6 +280,8 @@ void RawModel::genStdFilterOps()
 }
 
 
+//*************************************************************************************************************
+
 bool RawModel::loadFiffData(QFile& qFile)
 {
     beginResetModel();
@@ -290,6 +316,7 @@ bool RawModel::loadFiffData(QFile& qFile)
     return true;
 }
 
+
 //*************************************************************************************************************
 
 bool RawModel::writeFiffData(QFile &qFile)
@@ -304,10 +331,10 @@ bool RawModel::writeFiffData(QFile &qFile)
     else return false;
 }
 
-//=============================================================================================================
+
+//*************************************************************************************************************
 //non-virtual functions
 //private
-
 void RawModel::loadFiffInfos()
 {
     //loads chinfos
@@ -317,6 +344,7 @@ void RawModel::loadFiffInfos()
     //loads fiffInfo
     m_fiffInfo = m_pfiffIO->m_qlistRaw[0]->info;
 }
+
 
 //*************************************************************************************************************
 
@@ -342,6 +370,7 @@ void RawModel::clearModel() {
 
     qDebug("RawModel cleared.");
 }
+
 
 //*************************************************************************************************************
 
@@ -389,6 +418,7 @@ void RawModel::resetPosition(qint32 position) {
     emit scrollBarValueChange(m_iAbsFiffCursor-firstSample()+m_iWindowSize/2);
 }
 
+
 //*************************************************************************************************************
 
 void RawModel::reloadFiffData(bool before) {
@@ -433,6 +463,8 @@ void RawModel::reloadFiffData(bool before) {
     m_reloadFutureWatcher.setFuture(future);
 
 }
+
+
 //*************************************************************************************************************
 
 QPair<MatrixXd,MatrixXd> RawModel::readSegment(fiff_int_t from, fiff_int_t to) {
@@ -448,9 +480,9 @@ QPair<MatrixXd,MatrixXd> RawModel::readSegment(fiff_int_t from, fiff_int_t to) {
     return datatime;
 }
 
-//=============================================================================================================
-//public SLOTS
 
+//*************************************************************************************************************
+//public SLOTS
 void RawModel::updateScrollPos(int value) {
     m_iCurAbsScrollPos = firstSample()+value;
     qDebug() << "RawModel: absolute Fiff Scroll Cursor" << m_iCurAbsScrollPos << "(m_iAbsFiffCursor" << m_iAbsFiffCursor << ", sizeOfPreloadedData" << sizeOfPreloadedData() << ")";
@@ -474,6 +506,7 @@ void RawModel::updateScrollPos(int value) {
     }
 }
 
+
 //*************************************************************************************************************
 
 void RawModel::markChBad(QModelIndexList chlist, bool status)
@@ -495,6 +528,7 @@ void RawModel::markChBad(QModelIndexList chlist, bool status)
         emit dataChanged(chlist[i],chlist[i]);
     }
 }
+
 
 //*************************************************************************************************************
 
@@ -524,6 +558,7 @@ void RawModel::applyOperator(QModelIndex chan, const QSharedPointer<MNEOperator>
     emit dataChanged(chan,chan);
 }
 
+
 //*************************************************************************************************************
 
 void RawModel::applyOperator(QModelIndexList chlist, const QSharedPointer<MNEOperator>& operatorPtr, bool reset)
@@ -540,6 +575,7 @@ void RawModel::applyOperator(QModelIndexList chlist, const QSharedPointer<MNEOpe
 
     qDebug() << "RawModel: using FilterType" << operatorPtr->m_sName;
 }
+
 
 //*************************************************************************************************************
 
@@ -569,12 +605,14 @@ void RawModel::applyOperatorsConcurrently(QPair<int,RowVectorXd>& chdata)
 //    return chdata;
 }
 
+
 //*************************************************************************************************************
 
 void RawModel::updateOperators(QModelIndex chan) {
     for(qint32 i=0; i < m_assignedOperators.values(chan.row()).size(); ++i)
         applyOperator(chan,m_assignedOperators.values(chan.row())[i],true);
 }
+
 
 //*************************************************************************************************************
 
@@ -590,11 +628,13 @@ void RawModel::updateOperators(QModelIndexList chlist) {
     }
 }
 
+
 //*************************************************************************************************************
 
 void RawModel::updateOperators() {
     updateOperators(QModelIndexList());
 }
+
 
 //*************************************************************************************************************
 
@@ -621,6 +661,7 @@ void RawModel::undoFilter(QModelIndexList chlist, const QSharedPointer<MNEOperat
     }
 }
 
+
 //*************************************************************************************************************
 
 void RawModel::undoFilter(QModelIndexList chlist)
@@ -631,6 +672,7 @@ void RawModel::undoFilter(QModelIndexList chlist)
     }
 }
 
+
 //*************************************************************************************************************
 
 void RawModel::undoFilter()
@@ -638,9 +680,9 @@ void RawModel::undoFilter()
     m_assignedOperators.clear();
 }
 
+
 //*************************************************************************************************************
 //private SLOTS
-
 void RawModel::insertReloadedData(QPair<MatrixXd,MatrixXd> dataTimesPair) {
     //extend m_data with reloaded data
     if(m_bReloadBefore) {
@@ -675,6 +717,7 @@ void RawModel::insertReloadedData(QPair<MatrixXd,MatrixXd> dataTimesPair) {
 
     qDebug() << "RawModel: Fiff data REloaded from " << dataTimesPair.second.coeff(0) << "secs to" << dataTimesPair.second.coeff(dataTimesPair.second.cols()-1) << "secs";
 }
+
 
 //*************************************************************************************************************
 
@@ -715,6 +758,7 @@ void RawModel::updateOperatorsConcurrently()
     qDebug() << "RawModel: operatorFutureWatcher on!";
 }
 
+
 //*************************************************************************************************************
 
 void RawModel::insertProcessedData(int index)
@@ -730,6 +774,7 @@ void RawModel::insertProcessedData(int index)
 
     if(index==listFilteredChs.last()) m_bProcessing = false;
 }
+
 
 //*************************************************************************************************************
 

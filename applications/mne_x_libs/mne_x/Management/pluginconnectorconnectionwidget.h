@@ -50,6 +50,7 @@
 
 #include <QLabel>
 #include <QWidget>
+#include <QComboBox>
 
 
 //*************************************************************************************************************
@@ -89,6 +90,21 @@ public:
     */
     PluginConnectorConnectionWidget(PluginConnectorConnection* pPluginConnectorConnection, QWidget *parent = 0);
 
+    //=========================================================================================================
+    /**
+    * Destructor
+    *
+    */
+    ~PluginConnectorConnectionWidget();
+
+    //=========================================================================================================
+    /**
+    * New selection in one of the combo box
+    *
+    * @param [in] p_sCurrentReceiver   the receivers name
+    */
+    void updateReceiver(const QString &p_sCurrentReceiver);
+
 signals:
 
 public slots:
@@ -98,6 +114,8 @@ private:
     QLabel* m_pLabel;                                           /**< Holds the start up widget label. */
 
     PluginConnectorConnection*  m_pPluginConnectorConnection;   /**< a pointer to corresponding PluginConnectorConnection.*/
+
+    QMap<QString, QComboBox*> m_qMapSenderToReceiverConnections;/**< To each output a possible list of inputs. */
 
 };
 

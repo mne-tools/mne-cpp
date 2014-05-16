@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     MNELibraries.pro
+# @file     MNE.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -43,6 +43,7 @@ SUBDIRS += \
     fs \
     fiff \
     mne \
+    pyio \
     inverse \
     rtCommand \
     rtClient \

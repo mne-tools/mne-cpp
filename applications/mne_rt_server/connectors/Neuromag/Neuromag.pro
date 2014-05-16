@@ -43,7 +43,7 @@ DEFINES += NEUROMAG_LIBRARY
 
 #DEFINES += DACQ_OLD_CONNECTION_SCHEME # HP-UX
 
-QT += network
+QT += network concurrent
 QT -= gui
 
 TARGET = Neuromag

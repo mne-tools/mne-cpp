@@ -35,13 +35,26 @@
 *           to reimplement the full feature set of mne_browse_raw and even extend these.
 */
 
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
 #include "mainwindow.h"
 
-//*************************************************************************************************************
-
-using namespace MNE_BROWSE_RAW_QT;
 
 //*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace MNEBrowseRawQt;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
 
 MainWindow::MainWindow(QWidget *parent)
 : QMainWindow(parent)
@@ -63,11 +76,13 @@ MainWindow::MainWindow(QWidget *parent)
     setWindowStatus();
 }
 
+
 //*************************************************************************************************************
 
 MainWindow::~MainWindow()
 {
 }
+
 
 //*************************************************************************************************************
 
@@ -77,12 +92,14 @@ void MainWindow::setupModel()
     m_pRawModel = new RawModel(m_qFileRaw,this);
 }
 
+
 //*************************************************************************************************************
 
 void MainWindow::setupDelegate()
 {
     m_pRawDelegate = new RawDelegate(this);
 }
+
 
 //*************************************************************************************************************
 
@@ -98,6 +115,7 @@ void MainWindow::setupView()
 
 }
 
+
 //*************************************************************************************************************
 
 void MainWindow::setupLayout() {
@@ -112,6 +130,7 @@ void MainWindow::setupLayout() {
 
     setCentralWidget(window);
 }
+
 
 //*************************************************************************************************************
 
@@ -144,6 +163,7 @@ void MainWindow::setupViewSettings() {
     connect(m_pRawModel,SIGNAL(scrollBarValueChange(int)),this,SLOT(setScrollBarPosition(int)));
 }
 
+
 //*************************************************************************************************************
 
 void MainWindow::createMenus() {
@@ -173,6 +193,7 @@ void MainWindow::createMenus() {
     menuBar()->addMenu(helpMenu);
 }
 
+
 //*************************************************************************************************************
 
 void MainWindow::setWindow() {
@@ -180,6 +201,7 @@ void MainWindow::setWindow() {
     resize(m_qSettings.value("MainWindow/size").toSize());
     this->move(50,50);
 }
+
 
 //*************************************************************************************************************
 
@@ -203,9 +225,9 @@ void MainWindow::setWindowStatus() {
     m_pTableView->resizeColumnsToContents();
 }
 
-//=============================================================================================================
-//Log
 
+//*************************************************************************************************************
+//Log
 void MainWindow::createLogDockWindow()
 {
     //Log TextBrowser
@@ -221,6 +243,7 @@ void MainWindow::createLogDockWindow()
     //Set standard LogLevel
     setLogLevel(_LogLvMax);
 }
+
 
 //*************************************************************************************************************
 
@@ -243,6 +266,7 @@ void MainWindow::writeToLog(const QString& logMsg, LogKind lgknd, LogLevel lglvl
     }
 }
 
+
 //*************************************************************************************************************
 
 void MainWindow::setLogLevel(LogLevel lvl)
@@ -262,9 +286,9 @@ void MainWindow::setLogLevel(LogLevel lvl)
     m_eLogLevelCurrent = lvl;
 }
 
-//=============================================================================================================
-// SLOTS
 
+//*************************************************************************************************************
+// SLOTS
 void MainWindow::openFile()
 {
     QString filename = QFileDialog::getOpenFileName(this,QString("Open fiff data file"),QString("./MNE-sample-data/MEG/sample/"),tr("fif data files (*.fif)"));
@@ -284,6 +308,7 @@ void MainWindow::openFile()
     setScrollBarPosition(0);
 }
 
+
 //*************************************************************************************************************
 
 void MainWindow::writeFile()
@@ -294,6 +319,7 @@ void MainWindow::writeFile()
     if(!m_pRawModel->writeFiffData(t_fileRaw))
         qDebug() << "MainWindow: ERROR writing fiff data file" << t_fileRaw.fileName() << "!";
 }
+
 
 //*************************************************************************************************************
 
@@ -385,6 +411,7 @@ void MainWindow::customContextMenuRequested(QPoint pos)
     menu->popup(m_pTableView->viewport()->mapToGlobal(pos));
 }
 
+
 //*************************************************************************************************************
 
 void MainWindow::setScrollBarPosition(int pos)
@@ -392,6 +419,7 @@ void MainWindow::setScrollBarPosition(int pos)
     m_pTableView->horizontalScrollBar()->setValue(pos);
     qDebug() << "MainWindow: m_iAbsFiffCursor position set to" << (m_pRawModel->firstSample()+pos);
 }
+
 
 //*************************************************************************************************************
 

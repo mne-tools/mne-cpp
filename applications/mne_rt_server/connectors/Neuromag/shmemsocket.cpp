@@ -139,7 +139,7 @@ int ShmemSocket::receive_tag (FiffTag::SPtr& p_pTag)
 
     /* A sanity check to survive at least some crazy messages */
 
-    if (mess.kind > 20000 || mess.size > (size_t) 100000000)
+    if (mess.kind > 20000 || (unsigned long) mess.size > (size_t) 100000000)
     {
         printf("ALERT: Unreasonable data received, skipping! (size=%d)(kind=%d)", mess.kind, mess.size);
         //dacq_log("ALERT: Unreasonable data received, skipping! (size=%d)(kind=%d)", mess.kind, mess.size);
@@ -151,14 +151,14 @@ int ShmemSocket::receive_tag (FiffTag::SPtr& p_pTag)
     p_pTag->type = mess.type;
     p_pTag->next = 0;
 
-    if (mess.size > (size_t) 0)
+    if ((unsigned long) mess.size > (size_t) 0)
     {
         p_pTag->resize(mess.size);
     }
 
 //    qDebug() << mess.loc << " " << mess.size << " " << mess.shmem_buf << " " << mess.shmem_loc;
 
-    if (mess.loc < 0 && mess.size > (size_t) 0 && mess.shmem_buf < 0 && mess.shmem_loc < 0)
+    if (mess.loc < 0 && (unsigned long) mess.size > (size_t) 0 && mess.shmem_buf < 0 && mess.shmem_loc < 0)
     {
         fromlen = sizeof(from);
         rlen = recvfrom(m_iShmemSock, (void *)p_pTag->data(), mess.size, 0, (sockaddr *)(&from), &fromlen);
@@ -172,7 +172,7 @@ int ShmemSocket::receive_tag (FiffTag::SPtr& p_pTag)
 //        if (mess.type == FIFFT_STRING)
 //            data[mess.size] = '\0';
     }
-    else if (mess.size > (size_t) 0) {
+    else if ((unsigned long) mess.size > (size_t) 0) {
         /*
          * Copy data from shared memory
          */

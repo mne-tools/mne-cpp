@@ -7,7 +7,7 @@ MNE_LIB_VERSION = 1
 # Eigen
 EIGEN_INCLUDE_DIR = $$EIGEN_INCLUDE_DIR
 isEmpty(EIGEN_INCLUDE_DIR) {
-    EIGEN_INCLUDE_DIR = $${PWD}/include/3rdParty
+    EIGEN_INCLUDE_DIR = $${PWD}/include/3rdParty/eigen3
 }
 # include
 MNE_INCLUDE_DIR = $$MNE_INCLUDE_DIR
@@ -32,7 +32,6 @@ isEmpty( MNE_BINARY_DIR ) {
 #QT Packages use new qtHaveModule(<package>):
 #MNE cpp config
 MNECPP_CONFIG += isGui
-#MNECPP_CONFIG += babyMEG
 
 QMAKE_TARGET_PRODUCT = mne-cpp
 QMAKE_TARGET_DESCRIPTION = MNE Qt 5 based C++ library.

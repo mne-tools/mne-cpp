@@ -37,7 +37,7 @@ include(../../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-QT += widgets
+QT += widgets svg xml
 
 qtHaveModule(3d) {
     QT += 3d
@@ -94,27 +94,35 @@ win32 {
 }
 
 SOURCES += \
-        measurementwidget.cpp \
-        newmeasurementwidget.cpp \
-        realtimemultisamplearraywidget.cpp \
-        textwidget.cpp \
-        progressbarwidget.cpp \
-        numericwidget.cpp \
-        realtimemultisamplearray_new_widget.cpp \
-        newrealtimesamplearraywidget.cpp \
-        newrealtimemultisamplearraywidget.cpp
+    measurementwidget.cpp \
+    newmeasurementwidget.cpp \
+    realtimemultisamplearraywidget.cpp \
+    textwidget.cpp \
+    progressbarwidget.cpp \
+    numericwidget.cpp \
+    realtimemultisamplearray_new_widget.cpp \
+    newrealtimesamplearraywidget.cpp \
+    newrealtimemultisamplearraywidget.cpp \
+    roi.cpp \
+    roiselectionwidget.cpp \
+    helpers/realtimemultisamplearraymodel.cpp \
+    helpers/realtimemultisamplearraydelegate.cpp
 
 HEADERS += \
-        xdisp_global.h \
-        measurementwidget.h \
-        newmeasurementwidget.h \
-        realtimemultisamplearraywidget.h \
-        textwidget.h \
-        progressbarwidget.h \
-        numericwidget.h \
-        realtimemultisamplearray_new_widget.h \
-        newrealtimesamplearraywidget.h \
-        newrealtimemultisamplearraywidget.h
+    xdisp_global.h \
+    measurementwidget.h \
+    newmeasurementwidget.h \
+    realtimemultisamplearraywidget.h \
+    textwidget.h \
+    progressbarwidget.h \
+    numericwidget.h \
+    realtimemultisamplearray_new_widget.h \
+    newrealtimesamplearraywidget.h \
+    newrealtimemultisamplearraywidget.h \
+    roi.h \
+    roiselectionwidget.h \
+    helpers/realtimemultisamplearraymodel.h \
+    helpers/realtimemultisamplearraydelegate.h
 
 FORMS += \
     realtimemultisamplearraywidget.ui \
@@ -131,6 +139,10 @@ qtHaveModule(3d) {
     HEADERS += realtimesourceestimatewidget.h
 }
 
+
+RESOURCES += \
+    xDisp.qrc
+
 UI_DIR = $${PWD}
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
@@ -143,3 +155,5 @@ header_files.files = ./*.h
 header_files.path = $${MNE_X_INCLUDE_DIR}/xDisp
 
 INSTALLS += header_files
+
+OTHER_FILES +=

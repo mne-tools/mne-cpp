@@ -71,6 +71,7 @@
 //=============================================================================================================
 
 #include "types.h"
+#include "filteroperator.h"
 
 
 //*************************************************************************************************************
@@ -96,7 +97,7 @@
 
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
-#include <Eigen/unsupported/FFT>
+#include <unsupported/Eigen/FFT>
 
 #ifndef EIGEN_FFTW_DEFAULT
 #define EIGEN_FFTW_DEFAULT
@@ -111,21 +112,31 @@
 #include <fiff/fiff.h>
 #include <mne/mne.h>
 #include <utils/parksmcclellan.h>
-#include "filteroperator.h"
 
 
+//*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
-
-using namespace MNE_BROWSE_RAW_QT;
+//=============================================================================================================
 
 using namespace Eigen;
 using namespace MNELIB;
 using namespace UTILSLIB;
 using namespace FIFFLIB;
 
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE MNEBrowseRawQt
 //=============================================================================================================
 
+namespace MNEBrowseRawQt
+{
+
+//=============================================================================================================
+/**
+* DECLARE CLASS RawModel
+*/
 class RawModel : public QAbstractTableModel
 {
     Q_OBJECT
@@ -137,7 +148,7 @@ public:
     virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 
-    //METHODS
+    //=========================================================================================================
     /**
     * loadFiffData loads fiff data file.
     *
@@ -145,274 +156,336 @@ public:
     */
     bool loadFiffData(QFile& qFile);
 
+
+    //=========================================================================================================
     /**
-     * writeFiffData writes a new fiff data file
-     * @param p_IODevice fiff data file to write
-     * @return
-     */
+    * writeFiffData writes a new fiff data file
+    *
+    * @param p_IODevice fiff data file to write
+    * @return
+    */
     bool writeFiffData(QFile &qFile);
 
     //VARIABLES
-    bool m_bFileloaded; /**< true when a Fiff file is loaded */
+    bool m_bFileloaded;         /**< true when a Fiff file is loaded */
 
     //Fiff data structure
-    QList<MatrixXdR> m_data; /**< List that holds the fiff matrix data <n_channels x n_samples> */
-    QList<MatrixXdR> m_procData; /**< List that holds the processed fiff matrix data <n_channels x n_samples> */
-    QList<MatrixXdR> m_times; /**< List that holds the time axis [in secs] */
+    QList<MatrixXdR> m_data;        /**< List that holds the fiff matrix data <n_channels x n_samples> */
+    QList<MatrixXdR> m_procData;    /**< List that holds the processed fiff matrix data <n_channels x n_samples> */
+    QList<MatrixXdR> m_times;       /**< List that holds the time axis [in secs] */
 
     QList<FiffChInfo> m_chInfolist; /**< List of FiffChInfo objects that holds the corresponding channels information */
-    FiffInfo m_fiffInfo; /**< fiff info of whole fiff file */
+    FiffInfo m_fiffInfo;            /**< fiff info of whole fiff file */
 
     //Filter operators
-    QMap<QString,QSharedPointer<MNEOperator> > m_Operators; /**< generated MNEOperator types (FilterOperator,PCA etc.) */
+    QMap<QString,QSharedPointer<MNEOperator> > m_Operators;     /**< generated MNEOperator types (FilterOperator,PCA etc.) */
     QMap<int,QSharedPointer<MNEOperator> > m_assignedOperators; /**< Map of MNEOperator types to channels*/
 
     //Settings
     QSettings m_qSettings;
 
-    qint32 m_iAbsFiffCursor; /**< Cursor that points to the current position in the fiff data file [in samples] */
-    qint32 m_iCurAbsScrollPos; /**< the current (absolute) ScrollPosition in the fiff data file */
+    qint32 m_iAbsFiffCursor;    /**< Cursor that points to the current position in the fiff data file [in samples] */
+    qint32 m_iCurAbsScrollPos;  /**< the current (absolute) ScrollPosition in the fiff data file */
 
-    qint32 m_iWindowSize; /**< Length of window to load [in samples] */
-    qint32 m_reloadPos; /**< Distance that the current window needs to be off the ends of m_data[i] [in samples] */
-    qint8 m_maxWindows; /**< number of windows that are at maximum remained in m_data */
-    qint16 m_iFilterTaps; /**< Number of Filter taps */
+    qint32 m_iWindowSize;   /**< Length of window to load [in samples] */
+    qint32 m_reloadPos;     /**< Distance that the current window needs to be off the ends of m_data[i] [in samples] */
+    qint8 m_maxWindows;     /**< number of windows that are at maximum remained in m_data */
+    qint16 m_iFilterTaps;   /**< Number of Filter taps */
 
-    QSharedPointer<FiffIO> m_pfiffIO; /**< FiffIO objects, which holds all the information of the fiff data (excluding the samples!) */
+    QSharedPointer<FiffIO> m_pfiffIO;   /**< FiffIO objects, which holds all the information of the fiff data (excluding the samples!) */
 
 private:
-    //METHODS
+    //=========================================================================================================
     /**
-     * genStdFilters generates a set of standard FilterOperators
-     */
+    * genStdFilters generates a set of standard FilterOperators
+    */
     void genStdFilterOps();
 
+    //=========================================================================================================
     /**
     * Loads fiff infos to m_chInfolist abd m_fiffInfo.
     *
     */
     void loadFiffInfos();
 
+    //=========================================================================================================
     /**
-     * clearModel clears all model's members
-     */
+    * clearModel clears all model's members
+    */
     void clearModel();
 
+    //=========================================================================================================
     /**
-     * resetPosition reset the position of the current m_iAbsFiffCursor if a ScrollBar position is selected, whose data is not yet loaded.
-     *
-     * @param position where the new data block of the fiff file should be loaded.
-     */
+    * resetPosition reset the position of the current m_iAbsFiffCursor if a ScrollBar position is selected, whose data is not yet loaded.
+    *
+    * @param position where the new data block of the fiff file should be loaded.
+    */
     void resetPosition(qint32 position);
 
+    //=========================================================================================================
     /**
-     * reloadFiffData
-     *
-     * @param before
-     */
+    * reloadFiffData
+    *
+    * @param before
+    */
     void reloadFiffData(bool before);
 
+    //=========================================================================================================
     /**
-     * @brief readSegment is the wrapper method to read a segment from the raw fiff file
-     * @param from the start point to read from the file
-     * @param to the end point to read from the file
-     * @return the data and times matrices
-     */
+    * @brief readSegment is the wrapper method to read a segment from the raw fiff file
+    * @param from the start point to read from the file
+    * @param to the end point to read from the file
+    * @return the data and times matrices
+    */
     QPair<MatrixXd,MatrixXd> readSegment(fiff_int_t from, fiff_int_t to);
 
     //VARIABLES
     //Reload control
-    bool m_bStartReached; /**< signals, whether the start of the fiff data file is reached */
-    bool m_bEndReached; /**< signals, whether the end of the fiff data file is reached */
-    bool m_bReloadBefore; /**< bool value indicating if data was reloaded before (1) or after (0) the existing data */
+    bool m_bStartReached;   /**< signals, whether the start of the fiff data file is reached */
+    bool m_bEndReached;     /**< signals, whether the end of the fiff data file is reached */
+    bool m_bReloadBefore;   /**< bool value indicating if data was reloaded before (1) or after (0) the existing data */
 
     //Concurrent reloading
-    QFutureWatcher<QPair<MatrixXd,MatrixXd> > m_reloadFutureWatcher; /**< QFutureWatcher for watching process of reloading fiff data */
-    bool m_bReloading; /**< signals when the reloading is ongoing */
+    QFutureWatcher<QPair<MatrixXd,MatrixXd> > m_reloadFutureWatcher;    /**< QFutureWatcher for watching process of reloading fiff data */
+    bool m_bReloading;                                                  /**< signals when the reloading is ongoing */
 
     //Concurrent processing
 //    QFutureWatcher<QPair<int,RowVectorXd> > m_operatorFutureWatcher; /**< QFutureWatcher for watching process of applying Operators to reloaded fiff data */
-    QFutureWatcher<void> m_operatorFutureWatcher; /**< QFutureWatcher for watching process of applying Operators to reloaded fiff data */
+    QFutureWatcher<void> m_operatorFutureWatcher;   /**< QFutureWatcher for watching process of applying Operators to reloaded fiff data */
     QList<QPair<int,RowVectorXd> > m_listTmpChData; /**< contains pairs with a channel number and the corresponding RowVectorXd */
-    bool m_bProcessing; /**< true when processing in a background-thread is ongoing*/
+    bool m_bProcessing;                             /**< true when processing in a background-thread is ongoing*/
 
-    QMutex m_Mutex; /**< mutex for locking against simultaenous access to shared objects > */
+    QMutex m_Mutex;     /**< mutex for locking against simultaenous access to shared objects > */
 
 signals:
+    //=========================================================================================================
     /**
-     * dataReloaded is emitted when data reloading has finished in the background-thread
-     */
+    * dataReloaded is emitted when data reloading has finished in the background-thread
+    */
     void dataReloaded();
 
+    //=========================================================================================================
     /**
-     * scrollBarValueChange is emitted if a change of the horizontal ScrollBar value is requested by the RawModel
-     * @param pos is the requested relative scroll position (0 equals beginning of ScrollBar)
-     */
+    * scrollBarValueChange is emitted if a change of the horizontal ScrollBar value is requested by the RawModel
+    * @param pos is the requested relative scroll position (0 equals beginning of ScrollBar)
+    */
     void scrollBarValueChange(int pos);
 
 public slots:
+    //=========================================================================================================
     /**
-     * updateScrollPos checks, whether the actual position of the QScrollBar demands for a fiff data reload (depending on m_reloadPos and m_iCurAbsScrollPos)
-     *
-     * @param value the position of QScrollBar
-     */
+    * updateScrollPos checks, whether the actual position of the QScrollBar demands for a fiff data reload (depending on m_reloadPos and m_iCurAbsScrollPos)
+    *
+    * @param value the position of QScrollBar
+    */
     void updateScrollPos(int value);
 
+    //=========================================================================================================
     /**
-     * markChBad marks the selected channels as bad/good in m_chInfolist
-     * @param chlist is the list of indices that are selected for marking
-     * @param status, status=1 -> mark as bad, status=0 -> mark as good
-     */
+    * markChBad marks the selected channels as bad/good in m_chInfolist
+    * @param chlist is the list of indices that are selected for marking
+    * @param status, status=1 -> mark as bad, status=0 -> mark as good
+    */
     void markChBad(QModelIndexList chlist, bool status);
 
+    //=========================================================================================================
     /**
-     * applyOperator applies assigend operators to channel
-     * @param index selects the channel to process
-     * @param filter
-     */
+    * applyOperator applies assigend operators to channel
+    * @param index selects the channel to process
+    * @param filter
+    */
     void applyOperator(QModelIndex chan, const QSharedPointer<MNEOperator> &operatorPtr, bool reset=false);
 
+    //=========================================================================================================
     /**
-     * applyOperator applies operators to channels
-     * @param chlist selects the channels to process
-     * @param filter
-     */
+    * applyOperator applies operators to channels
+    * @param chlist selects the channels to process
+    * @param filter
+    */
     void applyOperator(QModelIndexList chlist, const QSharedPointer<MNEOperator> &operatorPtr, bool reset=false);
 
+    //=========================================================================================================
     /**
-     * applyOperatorsConcurrently updates all applied MNEOperators to a given RowVectorXd and modifies it in-place
-     * @param chdata[in,out] represents the channel data as a RowVectorXd
-     */
+    * applyOperatorsConcurrently updates all applied MNEOperators to a given RowVectorXd and modifies it in-place
+    * @param chdata[in,out] represents the channel data as a RowVectorXd
+    */
     void applyOperatorsConcurrently(QPair<int, RowVectorXd>& chdata);
 
+    //=========================================================================================================
     /**
-     * updateOperators updates all set operator to channels according to m_assignedOperators
-     * @param chan the channel to which the operators shall be updated
-     */
+    * updateOperators updates all set operator to channels according to m_assignedOperators
+    * @param chan the channel to which the operators shall be updated
+    */
     void updateOperators(QModelIndex chan);
 
+    //=========================================================================================================
     /**
-     * updateOperators is an overloaded function to update the operators to a channel list
-     * @param chlist
-     */
+    * updateOperators is an overloaded function to update the operators to a channel list
+    * @param chlist
+    */
     void updateOperators(QModelIndexList chlist);
 
     /**
-     * updateOperators is an overloaded function that updates all channels according to m_assignedOperators
-     */
+    * updateOperators is an overloaded function that updates all channels according to m_assignedOperators
+    */
     void updateOperators();
 
+    //=========================================================================================================
     /**
-     * undoFilter undoes the filtering operation for filter operations of the type
-     * @param chlist selects the channels to filter
-     * @param type determines the filter type TPassType to choose for the undo operation
-     */
+    * undoFilter undoes the filtering operation for filter operations of the type
+    * @param chlist selects the channels to filter
+    * @param type determines the filter type TPassType to choose for the undo operation
+    */
     void undoFilter(QModelIndexList chlist, const QSharedPointer<MNEOperator> &filterPtr);
 
+    //=========================================================================================================
     /**
-     * undoFilter undoes the filtering operation for all filter operations
-     * @param chlist selects the channels to filter
-     */
+    * undoFilter undoes the filtering operation for all filter operations
+    * @param chlist selects the channels to filter
+    */
     void undoFilter(QModelIndexList chlist);
 
+    //=========================================================================================================
     /**
-     * undoFilter undoes the filtering operation for all filter operations for all channels
-     */
+    * undoFilter undoes the filtering operation for all filter operations for all channels
+    */
     void undoFilter();
 
 private slots:
+    //=========================================================================================================
     /**
-     * insertReloadedData inserts the reloaded data when the background has finished the operation
-     * @param dataTimesPair contains the reloaded matrices of the data and times so it can be inserted into m_data and m_times
-     */
+    * insertReloadedData inserts the reloaded data when the background has finished the operation
+    * @param dataTimesPair contains the reloaded matrices of the data and times so it can be inserted into m_data and m_times
+    */
     void insertReloadedData(QPair<MatrixXd,MatrixXd> dataTimesPair);
 
+    //=========================================================================================================
     /**
-     * updateOperatorsConcurrently runs the processing of the MNEOperators in a background-thread
-     */
+    * updateOperatorsConcurrently runs the processing of the MNEOperators in a background-thread
+    */
     void updateOperatorsConcurrently();
 
+    //=========================================================================================================
     /**
-     * insertProcessedData inserts the processed data into m_procData when background-thread has finished (this method would be used for QtConcurrent::mapped)
-     * @param index represents the row index in m_procData
-     */
+    * insertProcessedData inserts the processed data into m_procData when background-thread has finished (this method would be used for QtConcurrent::mapped)
+    * @param index represents the row index in m_procData
+    */
     void insertProcessedData(int index);
 
+    //=========================================================================================================
     /**
-     * insertProcessedData inserts the processed data into m_procData when background-thread has finished (this method would be used for QtConcurrent::map)
-     */
+    * insertProcessedData inserts the processed data into m_procData when background-thread has finished (this method would be used for QtConcurrent::map)
+    */
     void insertProcessedData();
 
-//inline
 public:
+    //=========================================================================================================
     /**
-     * sizeOfFiffData
-     *
-     * @return the size of the total data contained in the loaded Fiff file
-     */
-    inline qint32 sizeOfFiffData() {
-        if(!m_pfiffIO->m_qlistRaw.empty())
-            return (m_pfiffIO->m_qlistRaw[0]->last_samp-m_pfiffIO->m_qlistRaw[0]->first_samp);
-        else return 0;
-    }
+    * sizeOfFiffData
+    *
+    * @return the size of the total data contained in the loaded Fiff file
+    */
+    inline qint32 sizeOfFiffData();
 
+    //=========================================================================================================
     /**
-     * firstSample
-     *
-     * @return the first sample of the loaded Fiff file
-     */
-    inline qint32 firstSample() const {
-        if(!m_pfiffIO->m_qlistRaw.empty())
-            return m_pfiffIO->m_qlistRaw[0]->first_samp;
-        else return 0;
-    }
+    * firstSample
+    *
+    * @return the first sample of the loaded Fiff file
+    */
+    inline qint32 firstSample() const;
 
+    //=========================================================================================================
     /**
-     * lastSample
-     *
-     * @return the last sample of the loaded Fiff file
-     */
-    inline qint32 lastSample() const {
-        if(!m_pfiffIO->m_qlistRaw.empty())
-            return m_pfiffIO->m_qlistRaw[0]->last_samp;
-        else return 0;
-    }
+    * lastSample
+    *
+    * @return the last sample of the loaded Fiff file
+    */
+    inline qint32 lastSample() const;
 
+    //=========================================================================================================
     /**
-     * sizeOfPreloadedData
-     *
-     * @return size of loaded m_data
-     */
-    inline qint32 sizeOfPreloadedData() const {
-        if(!m_data.empty()) {
-            return m_data.size()*m_iWindowSize;
-        }
-        else return 0;
-    }
+    * sizeOfPreloadedData
+    *
+    * @return size of loaded m_data
+    */
+    inline qint32 sizeOfPreloadedData() const;
 
+    //=========================================================================================================
     /**
-     * relFiffCursor
-     *
-     * @return the relative cursor in the fiff file
-     */
-    inline qint32 relFiffCursor() const {
-        return (m_iAbsFiffCursor - m_pfiffIO->m_qlistRaw[0]->first_samp);
-    }
+    * relFiffCursor
+    *
+    * @return the relative cursor in the fiff file
+    */
+    inline qint32 relFiffCursor() const;
 
+    //=========================================================================================================
     /**
-     * absFiffCursor (introduced for consistency reasons)
-     *
-     * @return the absolute cursor in the fiff file
-     */
-    inline qint32 absFiffCursor() const {
-        return m_iAbsFiffCursor;
-    }
-
+    * absFiffCursor (introduced for consistency reasons)
+    *
+    * @return the absolute cursor in the fiff file
+    */
+    inline qint32 absFiffCursor() const;
 };
 
-Q_DECLARE_METATYPE(MatrixXdR);
-Q_DECLARE_METATYPE(RowVectorPair);
-Q_DECLARE_METATYPE(QList<RowVectorPair>);
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
 
+inline qint32 RawModel::sizeOfFiffData() {
+    if(!m_pfiffIO->m_qlistRaw.empty())
+        return (m_pfiffIO->m_qlistRaw[0]->last_samp-m_pfiffIO->m_qlistRaw[0]->first_samp);
+    else return 0;
+}
+
+
+//*************************************************************************************************************
+
+inline qint32 RawModel::firstSample() const {
+    if(!m_pfiffIO->m_qlistRaw.empty())
+        return m_pfiffIO->m_qlistRaw[0]->first_samp;
+    else return 0;
+}
+
+
+//*************************************************************************************************************
+
+inline qint32 RawModel::lastSample() const {
+    if(!m_pfiffIO->m_qlistRaw.empty())
+        return m_pfiffIO->m_qlistRaw[0]->last_samp;
+    else return 0;
+}
+
+
+//*************************************************************************************************************
+
+inline qint32 RawModel::sizeOfPreloadedData() const {
+    if(!m_data.empty()) {
+        return m_data.size()*m_iWindowSize;
+    }
+    else return 0;
+}
+
+
+//*************************************************************************************************************
+
+inline qint32 RawModel::relFiffCursor() const {
+    return (m_iAbsFiffCursor - m_pfiffIO->m_qlistRaw[0]->first_samp);
+}
+
+
+//*************************************************************************************************************
+
+inline qint32 RawModel::absFiffCursor() const {
+    return m_iAbsFiffCursor;
+}
+
+} // NAMESPACE
+
+
+Q_DECLARE_METATYPE(MNEBrowseRawQt::MatrixXdR);
+Q_DECLARE_METATYPE(MNEBrowseRawQt::RowVectorPair);
+Q_DECLARE_METATYPE(QList<MNEBrowseRawQt::RowVectorPair>);
 
 #endif // RAWMODEL_H

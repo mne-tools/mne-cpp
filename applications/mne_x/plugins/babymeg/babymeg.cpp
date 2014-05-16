@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the BabyMeg class.
+* @brief    Contains the implementation of the BabyMEG class.
 *
 */
 
@@ -39,12 +39,13 @@
 //=============================================================================================================
 
 #include "babymeg.h"
-#include "babymegproducer.h"
 
 #include "FormFiles/babymegsetupwidget.h"
-#include "FormFiles/babymegrunwidget.h"
+#include "FormFiles/babymegprojectdialog.h"
 
 #include <utils/ioutils.h>
+
+#include <iostream>
 
 
 //*************************************************************************************************************
@@ -65,7 +66,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace BabyMegPlugin;
+using namespace BabyMEGPlugin;
 using namespace UTILSLIB;
 
 
@@ -74,87 +75,100 @@ using namespace UTILSLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BabyMeg::BabyMeg()
-: m_pRTMSA_BabyMeg(0)
-, m_sBabyMegClientAlias("mne-x")
-, m_pRtCmdClient(NULL)
-, m_pBabyMegProducer(new BabyMegProducer(this))
-, m_sBabyMegIP("127.0.0.1")//("172.21.16.88")//("127.0.0.1")
-, m_bCmdClientIsConnected(false)
+BabyMEG::BabyMEG()
+: m_iBlinkStatus(0)
 , m_iBufferSize(-1)
-, m_pRawMatrixBuffer_In(NULL)
+, m_bWriteToFile(false)
+, m_sRecordFile(qApp->applicationDirPath()+"/mne_x_plugins/resources/babymeg/babymegtest.fif")
+, m_bIsRunning(false)
+, m_pRawMatrixBuffer(0)
 {
-    m_PLG_ID = PLG_ID::BABYMEG;
+    m_pActionSetupProject = new QAction(QIcon(":/images/database.png"), tr("Setup Project"),this);
+//    m_pActionSetupProject->setShortcut(tr("F12"));
+    m_pActionSetupProject->setStatusTip(tr("Setup Project"));
+    connect(m_pActionSetupProject, &QAction::triggered, this, &BabyMEG::showProjectDialog);
+    addPluginAction(m_pActionSetupProject);
 
-    // Start BabyMegProducer
-    m_pBabyMegProducer->start();
+    m_pActionRecordFile = new QAction(QIcon(":/images/record.png"), tr("Start Recording"),this);
+//    m_pActionSetupProject->setShortcut(tr("F12"));
+    m_pActionRecordFile->setStatusTip(tr("Start Recording"));
+    connect(m_pActionRecordFile, &QAction::triggered, this, &BabyMEG::startRecordingFile);
+    addPluginAction(m_pActionRecordFile);
+}
 
 
-//    //Convinience CMD connection timer --> ToDo get rid of that -> it interrupts acquistion when not connected
-//    connect(&m_cmdConnectionTimer, &QTimer::timeout, this, &BabyMeg::connectCmdClient);
+//*************************************************************************************************************
+
+BabyMEG::~BabyMEG()
+{
+    if(this->isRunning())
+        stop();
+
+    if(myClient && myClient->isConnected())
+            myClient->DisConnectBabyMEG();
+}
+
+
+//*************************************************************************************************************
+
+QSharedPointer<IPlugin> BabyMEG::clone() const
+{
+    QSharedPointer<BabyMEG> pBabyMEGClone(new BabyMEG());
+    return pBabyMEGClone;
+}
+
+
+//*************************************************************************************************************
+
+void BabyMEG::init()
+{
+    //BabyMEG Inits
+    pInfo = QSharedPointer<BabyMEGInfo>(new BabyMEGInfo());
+    connect(pInfo.data(), &BabyMEGInfo::fiffInfoAvailable, this, &BabyMEG::setFiffInfo);
+    connect(pInfo.data(), &BabyMEGInfo::SendDataPackage, this, &BabyMEG::setFiffData);
+    connect(pInfo.data(), &BabyMEGInfo::SendCMDPackage, this, &BabyMEG::setCMDData);
+
+    myClient = QSharedPointer<BabyMEGClient>(new BabyMEGClient(6340,this));
+    myClient->SetInfo(pInfo);
+    myClient->start();
+    myClientComm = QSharedPointer<BabyMEGClient>(new BabyMEGClient(6341,this));
+    myClientComm->SetInfo(pInfo);
+    myClientComm->start();
+
+    myClientComm->SendCommandToBabyMEGShortConnection("INFO");
+
+    myClient->ConnectToBabyMEG();
 
     //init channels when fiff info is available
-    connect(this, &BabyMeg::fiffInfoAvailable, this, &BabyMeg::init);
-
-//    //Start convinience timer
-//    m_cmdConnectionTimer.start(5000);
-
-    //Try to connect the cmd client on start up using localhost connection
-    this->connectCmdClient();
+    connect(this, &BabyMEG::fiffInfoAvailable, this, &BabyMEG::initConnector);
 }
 
 
 //*************************************************************************************************************
+//=============================================================================================================
+// Create measurement instances and config them
+//=============================================================================================================
 
-BabyMeg::~BabyMeg()
+void BabyMEG::initConnector()
 {
-    if(m_pRtCmdClient)
-        delete m_pRtCmdClient;
-
-    if(m_pRawMatrixBuffer_In)
-        delete m_pRawMatrixBuffer_In;
-}
-
-
-//*************************************************************************************************************
-
-void BabyMeg::changeConnector(qint32 p_iNewConnectorId)
-{
-    if(p_iNewConnectorId != m_iActiveConnectorId)
+    if(m_pFiffInfo)
     {
-        // read meas info
-        (*m_pRtCmdClient)["selcon"].pValues()[0].setValue(p_iNewConnectorId);
-        (*m_pRtCmdClient)["selcon"].send();
+        m_pRTMSABabyMEG = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "RtClient", "MNE Rt Client");
 
-        m_iActiveConnectorId = p_iNewConnectorId;
+        m_pRTMSABabyMEG->data()->initFromFiffInfo(m_pFiffInfo);
+        m_pRTMSABabyMEG->data()->setMultiArraySize(10);
 
-        // clear all and request everything new
-        clear();
+        m_pRTMSABabyMEG->data()->setVisibility(true);
 
-        //
-        // request available commands
-        //
-        m_pRtCmdClient->requestCommands();
-
-        //
-        // Read Info
-        //
-        if(!m_pFiffInfo)
-            requestInfo();
-
-        //
-        // Read Buffer Size
-        //
-        m_iBufferSize = m_pRtCmdClient->requestBufsize();
-
-        emit cmdConnectionChanged(m_bCmdClientIsConnected);
+        m_outputConnectors.append(m_pRTMSABabyMEG);
     }
+
 }
 
 
 //*************************************************************************************************************
 
-void BabyMeg::clear()
+void BabyMEG::clear()
 {
     m_pFiffInfo.reset();
     m_iBufferSize = -1;
@@ -163,151 +177,148 @@ void BabyMeg::clear()
 
 //*************************************************************************************************************
 
-void BabyMeg::connectCmdClient()
+void BabyMEG::showProjectDialog()
 {
-    if(!m_pRtCmdClient)
-        m_pRtCmdClient = new RtCmdClient();
-    else if(m_bCmdClientIsConnected)
-        this->disconnectCmdClient();
+    BabyMEGProjectDialog projectDialog(this);
+    projectDialog.exec();
+}
 
-    m_pRtCmdClient->connectToHost(m_sBabyMegIP);
-    m_pRtCmdClient->waitForConnected(1000);
 
-    if(m_pRtCmdClient->state() == QTcpSocket::ConnectedState)
+//*************************************************************************************************************
+
+void BabyMEG::startRecordingFile()
+{
+    //Setup writing to file
+    if(m_bWriteToFile)
     {
-        rtServerMutex.lock();
-
-        //Stop convinience timer
-//        m_cmdConnectionTimer.stop();
-
-        if(!m_bCmdClientIsConnected)
+        m_pOutfid->finish_writing_raw();
+        m_bWriteToFile = false;
+        m_pTimerRecordingChange->stop();
+        m_pActionRecordFile->setIcon(QIcon(":/images/record.png"));
+    }
+    else
+    {
+        if(!m_pFiffInfo)
         {
-            //
-            // request available commands
-            //
-            m_pRtCmdClient->requestCommands();
-
-            //
-            // set cmd client is connected
-            //
-            m_bCmdClientIsConnected = true;
-
-            //
-            // Read Info
-            //
-            if(!m_pFiffInfo)
-                requestInfo();
-
-            //
-            // Read Connectors
-            //
-            if(m_qMapConnectors.size() == 0)
-                m_iActiveConnectorId = m_pRtCmdClient->requestConnectors(m_qMapConnectors);
-
-            //
-            // Read Buffer Size
-            //
-            m_iBufferSize = m_pRtCmdClient->requestBufsize();
-
-            emit cmdConnectionChanged(m_bCmdClientIsConnected);
+            QMessageBox msgBox;
+            msgBox.setText("FiffInfo missing!");
+            msgBox.exec();
+            return;
         }
-        rtServerMutex.unlock();
+
+        //Initiate the stream for writing to the fif file
+        m_qFileOut.setFileName(m_sRecordFile);
+        if(m_qFileOut.exists())
+        {
+            QMessageBox msgBox;
+            msgBox.setText("The file you want to write already exists.");
+            msgBox.setInformativeText("Do you want to overwrite this file?");
+            msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+            int ret = msgBox.exec();
+            if(ret == QMessageBox::No)
+                return;
+        }
+
+        m_pOutfid = Fiff::start_writing_raw(m_qFileOut, *m_pFiffInfo, m_cals);
+        fiff_int_t first = 0;
+        m_pOutfid->write_int(FIFF_FIRST_SAMPLE, &first);
+
+        m_bWriteToFile = true;
+
+        m_pTimerRecordingChange = QSharedPointer<QTimer>(new QTimer);
+        connect(m_pTimerRecordingChange.data(), &QTimer::timeout, this, &BabyMEG::changeRecordingButton);
+        m_pTimerRecordingChange->start(500);
     }
 }
 
 
 //*************************************************************************************************************
 
-void BabyMeg::disconnectCmdClient()
+void BabyMEG::setFiffData(QByteArray DATA)
 {
-    if(m_bCmdClientIsConnected)
+    //get the first byte -- the data format
+    int dformat = DATA.left(1).toInt();
+
+    DATA.remove(0,1);
+    qint32 rows = m_pFiffInfo->nchan;
+    qint32 cols = (DATA.size()/dformat)/rows;
+
+    qDebug() << "[BabyMEG] Matrix " << rows << "x" << cols << " [Data bytes:" << dformat << "]";
+
+    MatrixXf rawData(Map<MatrixXf>( (float*)DATA.data(),rows, cols ));
+
+    for(qint32 i = 0; i < rows*cols; ++i)
+        IOUtils::swap_floatp(rawData.data()+i);
+
+
+    if(m_bIsRunning)
     {
-        m_pRtCmdClient->disconnectFromHost();
-        m_pRtCmdClient->waitForDisconnected();
-        rtServerMutex.lock();
-        m_bCmdClientIsConnected = false;
-        rtServerMutex.unlock();
-        emit cmdConnectionChanged(m_bCmdClientIsConnected);
-    }
-}
+        if(!m_pRawMatrixBuffer)
+            m_pRawMatrixBuffer = CircularMatrixBuffer<float>::SPtr(new CircularMatrixBuffer<float>(40, rows, cols));
 
-
-//*************************************************************************************************************
-
-void BabyMeg::requestInfo()
-{
-    if(m_pBabyMegProducer->m_iDataClientId > -1 && m_bCmdClientIsConnected)
-    {
-        // read meas info
-        (*m_pRtCmdClient)["measinfo"].pValues()[0].setValue(m_pBabyMegProducer->m_iDataClientId);
-        (*m_pRtCmdClient)["measinfo"].send();
-
-        m_pBabyMegProducer->producerMutex.lock();
-        m_pBabyMegProducer->m_bFlagInfoRequest = true;
-        m_pBabyMegProducer->producerMutex.unlock();
+        m_pRawMatrixBuffer->push(&rawData);
     }
     else
-        qWarning() << "BabyMegProducer is not connected!";
+    {
+//        std::cout << "Data coming" << std::endl; //"first ten elements \n" << rawData.block(0,0,1,10) << std::endl;
+
+        emit DataToSquidCtrlGUI(rawData);
+    }
 }
 
 
 //*************************************************************************************************************
 
-bool BabyMeg::start()
+void BabyMEG::setFiffInfo(FiffInfo p_FiffInfo)
 {
-    if(m_bCmdClientIsConnected && m_pFiffInfo)
-    {
-        // Initialize real time measurements
-        init();
+    m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo(p_FiffInfo));
 
-        //Set buffer size
-        (*m_pRtCmdClient)["bufsize"].pValues()[0].setValue(m_iBufferSize);
-        (*m_pRtCmdClient)["bufsize"].send();
+    m_iBufferSize = pInfo->dataLength;
+}
 
-        // Buffer
-        if(m_pRawMatrixBuffer_In)
-            delete m_pRawMatrixBuffer_In;
-        m_pRawMatrixBuffer_In = new RawMatrixBuffer(8,m_pFiffInfo->nchan,m_iBufferSize);
+//*************************************************************************************************************
 
-        // Start threads
-        QThread::start();
+void BabyMEG::setCMDData(QByteArray DATA)
+{
+    qDebug()<<"------"<<DATA;
+//    m_commandManager["FLL"].reply(DATA);
+    emit SendCMDDataToSQUIDControl(DATA);
+    qDebug()<<"Data has been received.";
+}
 
-        // Start Measurement at rt_Server
-        // start measurement
-        (*m_pRtCmdClient)["start"].pValues()[0].setValue(m_pBabyMegProducer->m_iDataClientId);
-        (*m_pRtCmdClient)["start"].send();
 
-        m_pBabyMegProducer->producerMutex.lock();
-        m_pBabyMegProducer->m_bFlagMeasuring = true;
-        m_pBabyMegProducer->producerMutex.unlock();
-        m_pBabyMegProducer->start();
+//*************************************************************************************************************
+void BabyMEG::comFLL(QString t_sFLLControlCommand)
+{
+    qDebug()<<"FLL commands";
 
-        return true;
-    }
-    else
-        return false;
+    qDebug() << "BabyMeg Received" << t_sFLLControlCommand;
+    int strlen = t_sFLLControlCommand.size();
+    QByteArray Scmd = myClientComm->MGH_LM_Int2Byte(strlen);
+    QByteArray SC = QByteArray("COMS")+Scmd;
+    SC.append(t_sFLLControlCommand);
+    myClientComm->SendCommandToBabyMEGShortConnection(SC);
 }
 
 
 //*************************************************************************************************************
 
-bool BabyMeg::stop()
+bool BabyMEG::start()
 {
-    if(m_bCmdClientIsConnected) //ToDo replace this with is running
-    {
-        // Stop Measurement at rt_Server
-        (*m_pRtCmdClient)["stop-all"].send();
+    //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
+    if(this->isRunning())
+        QThread::wait();
 
-        m_pBabyMegProducer->producerMutex.lock();
-        m_pBabyMegProducer->m_bFlagMeasuring = false;
-        m_pBabyMegProducer->producerMutex.unlock();
-    }
+    if(!m_pRTMSABabyMEG)
+        initConnector();
 
-    // Stop threads
-    QThread::terminate();
-    QThread::wait();
+    // Start threads
+    m_bIsRunning = true;
 
-    //Clear Buffers
+    if(!myClient->isConnected())
+        myClient->ConnectToBabyMEG();
+    // Start threads
+    QThread::start();
 
     return true;
 }
@@ -315,7 +326,26 @@ bool BabyMeg::stop()
 
 //*************************************************************************************************************
 
-Type BabyMeg::getType() const
+bool BabyMEG::stop()
+{
+    if(myClient->isConnected())
+        myClient->DisConnectBabyMEG();
+
+    m_bIsRunning = false;
+
+    //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the pop function (acquire statement)
+    m_pRawMatrixBuffer->releaseFromPop();
+
+    //Clear Buffers
+    m_pRawMatrixBuffer->clear();
+
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+IPlugin::PluginType BabyMEG::getType() const
 {
     return _ISensor;
 }
@@ -323,17 +353,20 @@ Type BabyMeg::getType() const
 
 //*************************************************************************************************************
 
-const char* BabyMeg::getName() const
+QString BabyMEG::getName() const
 {
-    return "RT Server";
+    return "BabyMEG";
 }
 
 
 //*************************************************************************************************************
 
-QWidget* BabyMeg::setupWidget()
+QWidget* BabyMEG::setupWidget()
 {
-    BabyMegSetupWidget* widget = new BabyMegSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
+    if(!myClient->isConnected())
+        myClient->ConnectToBabyMEG();
+
+    BabyMEGSetupWidget* widget = new BabyMEGSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
 
     //init dialog
 
@@ -343,50 +376,52 @@ QWidget* BabyMeg::setupWidget()
 
 //*************************************************************************************************************
 
-QWidget* BabyMeg::runWidget()
+void BabyMEG::run()
 {
-    BabyMegRunWidget* widget = new BabyMegRunWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
-    return widget;
-}
 
+    MatrixXf matValue;
 
-//*************************************************************************************************************
-//=============================================================================================================
-// Create measurement instances and config them
-//=============================================================================================================
-
-void BabyMeg::init()
-{
-    qDebug() << "BabyMeg::init()";
-
-    if(m_pFiffInfo)
+    while(m_bIsRunning)
     {
-//        m_pFiffInfo->sfreq /= 100;
-        m_pRTMSA_BabyMeg = addProviderRealTimeMultiSampleArray_New(MSR_ID::MEGRTCLIENT_OUTPUT);//Same as rt server - cause one should only run at one time
-        m_pRTMSA_BabyMeg->initFromFiffInfo(m_pFiffInfo);
-        m_pRTMSA_BabyMeg->setMultiArraySize(10);
-        m_pRTMSA_BabyMeg->setVisibility(true);
+        if(m_pRawMatrixBuffer)
+        {
+            //pop matrix
+            matValue = m_pRawMatrixBuffer->pop();
+
+            //Write raw data to fif file
+            if(m_bWriteToFile)
+                m_pOutfid->write_raw_buffer(matValue.cast<double>(), m_cals);
+
+            if(m_pRTMSABabyMEG)
+            {
+                //emit values
+                for(qint32 i = 0; i < matValue.cols(); ++i)
+                    m_pRTMSABabyMEG->data()->setValue(matValue.col(i).cast<double>());
+            }
+        }
+    }
+
+    //Close the fif output stream
+    if(m_bWriteToFile)
+    {
+        m_pOutfid->finish_writing_raw();
+        m_bWriteToFile = false;
     }
 }
 
 
 //*************************************************************************************************************
 
-void BabyMeg::run()
+void BabyMEG::changeRecordingButton()
 {
-
-    MatrixXf matValue;
-    while(true)
+    if(m_iBlinkStatus == 0)
     {
-        //pop matrix
-        matValue = m_pRawMatrixBuffer_In->pop();
-
-//        std::cout << "matValue " << matValue.block(0,0,1,50) << std::endl;
-
-        //emit values
-        for(qint32 i = 0; i < matValue.cols(); ++i)
-            m_pRTMSA_BabyMeg->setValue(matValue.col(i).cast<double>());
-//        for(qint32 i = 0; i < matValue.cols(); i += 100)
-//            m_pRTMSA_BabyMeg->setValue(matValue.col(i).cast<double>());
+        m_pActionRecordFile->setIcon(QIcon(":/images/record.png"));
+        m_iBlinkStatus = 1;
+    }
+    else
+    {
+        m_pActionRecordFile->setIcon(QIcon(":/images/record_active.png"));
+        m_iBlinkStatus = 0;
     }
 }

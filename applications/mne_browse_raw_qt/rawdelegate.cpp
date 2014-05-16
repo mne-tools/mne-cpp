@@ -35,26 +35,46 @@
 *
 */
 
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
 
 #include "rawdelegate.h"
 
-#include <QBrush>
 
 //*************************************************************************************************************
+//=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
 
-using namespace MNE_BROWSE_RAW_QT;
+#include <QBrush>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace MNEBrowseRawQt;
 using namespace Eigen;
 using namespace MNELIB;
 
+
 //*************************************************************************************************************
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
 
 RawDelegate::RawDelegate(QObject *parent)
-: m_qSettings()
+: QAbstractItemDelegate(parent)
+, m_qSettings()
 {
     m_dPlotHeight = m_qSettings.value("RawDelegate/plotheight").toDouble();
     m_dDx = m_qSettings.value("RawDelegate/dx").toDouble();
     m_nhlines = m_qSettings.value("RawDelegate/nhlines").toDouble();
 }
+
 
 //*************************************************************************************************************
 
@@ -125,6 +145,7 @@ void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, c
 
 }
 
+
 //*************************************************************************************************************
 
 QSize RawDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
@@ -146,7 +167,8 @@ QSize RawDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelInde
     return size;
 }
 
-//=============================================================================================================
+
+//*************************************************************************************************************
 
 void RawDelegate::createPlotPath(const QModelIndex &index, QPainterPath& path, QList<RowVectorPair>& listPairs) const
 {
@@ -204,6 +226,7 @@ void RawDelegate::createPlotPath(const QModelIndex &index, QPainterPath& path, Q
 //    qDebug("Plot-PainterPath created!");
 }
 
+
 //*************************************************************************************************************
 
 void RawDelegate::createGridPath(QPainterPath& path, QList<RowVectorPair>& listPairs) const
@@ -222,4 +245,3 @@ void RawDelegate::createGridPath(QPainterPath& path, QList<RowVectorPair>& listP
 
 //    qDebug("Grid-PainterPath created!");
 }
-

@@ -42,6 +42,8 @@
 #include <mne_x/Management/pluginscenemanager.h>
 #include <mne_x/Management/newdisplaymanager.h>
 
+#include <xDisp/roiselectionwidget.h>
+
 //GUI
 #include "mainwindow.h"
 #include "runwidget.h"
@@ -87,8 +89,12 @@ MainWindow::MainWindow(QWidget *parent)
 : QMainWindow(parent)
 , m_pStartUpWidget(new StartUpWidget(this))
 , m_pRunWidget(NULL)
+, m_pDisplayManager(new NewDisplayManager(this))
 , m_bDisplayMax(false)
 , m_bIsRunning(false)
+, m_pToolBar(NULL)
+, m_pDynamicPluginToolBar(NULL)
+, m_pDynamicDisplayToolBar(NULL)
 , m_pLabelTime(NULL)
 , m_pTimer(NULL)
 , m_pTime(new QTime(0, 0))
@@ -96,7 +102,6 @@ MainWindow::MainWindow(QWidget *parent)
 , m_pPluginGui(NULL)
 , m_pPluginManager(new PluginManager(this))
 , m_pPluginSceneManager(new PluginSceneManager(this))
-, m_pDisplayManager(new NewDisplayManager(this))
 , m_eLogLevelCurrent(_LogLvMax)
 {
     qDebug() << "Clinical Sensing and Analysis - Version" << CInfo::AppVersion();
@@ -138,12 +143,14 @@ MainWindow::~MainWindow()
 
 void MainWindow::clear()
 {
+    if(m_bIsRunning)
+        this->stopMeasurement();
+
     //garbage collection
     m_pPluginSceneManager.reset();
 
     if(m_pPluginGui)
         delete m_pPluginGui;
-
 }
 
 
@@ -335,7 +342,7 @@ void MainWindow::createActions()
 
     m_pActionDisplayMax = new QAction(QIcon(":/images/displayMax.png"), tr("Maximize current Display (F11)"), this);
     m_pActionDisplayMax->setShortcut(tr("F11"));
-    m_pActionDisplayMax->setStatusTip(tr("Maximizes the current Display (F11)"));
+    m_pActionDisplayMax->setStatusTip(tr("Maximizes the current display (F11)"));
     connect(m_pActionDisplayMax, SIGNAL(triggered()), this, SLOT(toggleDisplayMax()));
 }
 
@@ -372,27 +379,60 @@ void MainWindow::createMenus()
 
 void MainWindow::createToolBars()
 {
-    m_pToolBar = addToolBar(tr("File"));
-    m_pToolBar->addAction(m_pActionRun);
-    m_pToolBar->addAction(m_pActionStop);
-    m_pActionStop->setEnabled(false);
+    //Control
+    if(!m_pToolBar)
+    {
+        m_pToolBar = addToolBar(tr("Control"));
+        m_pToolBar->addAction(m_pActionRun);
+        m_pToolBar->addAction(m_pActionStop);
+        m_pActionStop->setEnabled(false);
 
-    m_pToolBar->addSeparator();
+        m_pToolBar->addSeparator();
 
-    m_pToolBar->addAction(m_pActionZoomStd);
-    m_pToolBar->addAction(m_pActionZoomIn);
-    m_pToolBar->addAction(m_pActionZoomOut);
-    m_pToolBar->addAction(m_pActionDisplayMax);
-    m_pActionZoomStd->setEnabled(false);
-    m_pActionZoomIn->setEnabled(false);
-    m_pActionZoomOut->setEnabled(false);
-    m_pActionDisplayMax->setEnabled(false);
+        m_pToolBar->addAction(m_pActionZoomStd);
+        m_pToolBar->addAction(m_pActionZoomIn);
+        m_pToolBar->addAction(m_pActionZoomOut);
+        m_pToolBar->addAction(m_pActionDisplayMax);
+        m_pActionZoomStd->setEnabled(false);
+        m_pActionZoomIn->setEnabled(false);
+        m_pActionZoomOut->setEnabled(false);
+        m_pActionDisplayMax->setEnabled(false);
 
-    m_pToolBar->addSeparator();
+        m_pToolBar->addSeparator();
 
-    m_pLabelTime = new QLabel;
-    m_pToolBar->addWidget(m_pLabelTime);
-    m_pLabelTime->setText(QTime(0, 0).toString());
+        m_pLabelTime = new QLabel;
+        m_pToolBar->addWidget(m_pLabelTime);
+        m_pLabelTime->setText(QTime(0, 0).toString());
+    }
+
+    //Plugin
+    if(m_pDynamicPluginToolBar)
+    {
+        removeToolBar(m_pDynamicPluginToolBar);
+        delete m_pDynamicPluginToolBar;
+        m_pDynamicPluginToolBar = NULL;
+    }
+    if(m_qListDynamicPluginActions.size() > 0)
+    {
+        m_pDynamicPluginToolBar = addToolBar(m_sCurPluginName + tr("Control"));
+        for(qint32 i = 0; i < m_qListDynamicPluginActions.size(); ++i)
+            m_pDynamicPluginToolBar->addAction(m_qListDynamicPluginActions[i]);
+    }
+
+    //Display
+    if(m_pDynamicDisplayToolBar)
+    {
+        removeToolBar(m_pDynamicDisplayToolBar);
+        delete m_pDynamicDisplayToolBar;
+        m_pDynamicDisplayToolBar = NULL;
+    }
+    if(m_qListDynamicDisplayActions.size() > 0)
+    {
+        m_pDynamicDisplayToolBar = addToolBar(tr("Display"));
+        for(qint32 i = 0; i < m_qListDynamicDisplayActions.size(); ++i)
+            m_pDynamicDisplayToolBar->addAction(m_qListDynamicDisplayActions[i]);
+    }
+
 }
 
 
@@ -429,7 +469,6 @@ void MainWindow::createPluginDockWindow()
 
 void MainWindow::createLogDockWindow()
 {
-
     //Log TextBrowser
     m_pDockWidget_Log = new QDockWidget(tr("Log"), this);
 
@@ -451,6 +490,14 @@ void MainWindow::createLogDockWindow()
 //Plugin stuff
 void MainWindow::updatePluginWidget(IPlugin::SPtr pPlugin)
 {
+    m_qListDynamicPluginActions.clear();
+    m_qListDynamicDisplayActions.clear();
+
+    // Add Dynamic Plugin Actions
+    m_qListDynamicPluginActions.append(pPlugin->getPluginActions());
+
+    m_sCurPluginName = pPlugin->getName();
+
     //Garbage collecting
     if(m_pRunWidget)
     {
@@ -465,13 +512,11 @@ void MainWindow::updatePluginWidget(IPlugin::SPtr pPlugin)
     }
     else
     {
-
-
         if(!m_bIsRunning)
             setCentralWidget(pPlugin->setupWidget());
         else
         {
-            m_pRunWidget = new RunWidget( m_pDisplayManager->show(pPlugin->getOutputConnectors(), m_pTime));
+            m_pRunWidget = new RunWidget( m_pDisplayManager->show(pPlugin->getOutputConnectors(), m_pTime, m_qListDynamicDisplayActions));
 
             m_pRunWidget->show();
 
@@ -484,6 +529,8 @@ void MainWindow::updatePluginWidget(IPlugin::SPtr pPlugin)
                 setCentralWidget(m_pRunWidget);
         }
     }
+
+    this->createToolBars();
 }
 
 

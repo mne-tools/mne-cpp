@@ -46,7 +46,6 @@ SUBDIRS += \
     readEvoked \
     computeInverse \
     computeInverseRaw \
-    computeInverseRapMusic \
     makeInverseOperator \
     findEvoked \
     evokedGradAmp \
@@ -63,6 +62,13 @@ contains(MNECPP_CONFIG, isGui) {
             rawClusteredInverseEEG \
             readFwdDisp3D \
             plotSurfaces \
-            lnt
+            lnt \
+            computeInverseRapMusic \
+            rawClusteredInverseRapMusic \
+            computeInversePwlRapMusic \
+            rawClusteredInversePwlRapMusic \
+            stClusteredInversePwlRapMusic  \
+            roiClusteredInversePwlRapMusic \
+            fsSurface
     }
 }

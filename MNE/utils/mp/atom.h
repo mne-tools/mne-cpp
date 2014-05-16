@@ -14,7 +14,7 @@
 #include <utils/utils_global.h>
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
-#include <Eigen/unsupported/FFT>
+#include <unsupported/Eigen/FFT>
 
 //*************************************************************************************************************
 //=============================================================================================================

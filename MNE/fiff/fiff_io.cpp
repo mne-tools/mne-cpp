@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     fiff_obj.cpp
+* @file     fiff_io.cpp
 * @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>

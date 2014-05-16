@@ -43,6 +43,8 @@
 #include "newrealtimemultisamplearraywidget.h"
 //#include "annotationwindow.h"
 
+#include "roiselectionwidget.h"
+
 #include <xMeas/newrealtimemultisamplearray.h>
 
 #include <Eigen/Core>
@@ -69,7 +71,6 @@
 #include <QMessageBox>
 
 #include <QDebug>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -116,6 +117,27 @@ NewRealTimeMultiSampleArrayWidget::NewRealTimeMultiSampleArrayWidget(QSharedPoin
 , m_pTime(pTime)
 , m_pTimeCurrentDisplay(0)
 {
+    m_pActionSelectRoi = new QAction(QIcon(":/images/selectRoi.png"), tr("Shows the region selection widget (F12)"),this);
+    m_pActionSelectRoi->setShortcut(tr("F12"));
+    m_pActionSelectRoi->setStatusTip(tr("Shows the region selection widget (F12)"));
+    connect(m_pActionSelectRoi, &QAction::triggered, this, &NewRealTimeMultiSampleArrayWidget::showRoiSelectionWidget);
+
+    addDisplayAction(m_pActionSelectRoi);
+
+#ifdef NEWTABLEVIEW
+
+    m_pTableView = new QTableView;
+
+    //set vertical layout
+    QVBoxLayout *rtmsaLayout = new QVBoxLayout(this);
+
+    rtmsaLayout->addWidget(m_pTableView);
+
+    //set layouts
+    this->setLayout(rtmsaLayout);
+
+
+#else
     ui.setupUi(this);
     ui.m_qLabel_Tool->hide();
 
@@ -132,6 +154,7 @@ NewRealTimeMultiSampleArrayWidget::NewRealTimeMultiSampleArrayWidget(QSharedPoin
     //connect(ui.m_qSpinBox_Min, SIGNAL(valueChanged(int)), this, SLOT(minValueChanged(int)));
 
     setMouseTracking(true);
+#endif
 }
 
 
@@ -139,8 +162,18 @@ NewRealTimeMultiSampleArrayWidget::NewRealTimeMultiSampleArrayWidget(QSharedPoin
 
 NewRealTimeMultiSampleArrayWidget::~NewRealTimeMultiSampleArrayWidget()
 {
+#ifdef NEWTABLEVIEW
+
+
+
+
+
+
+
+#else
     // Clear sampling rate vector
     NewRealTimeMultiSampleArrayWidget::s_listSamplingRates.clear();
+#endif
 }
 
 
@@ -148,6 +181,15 @@ NewRealTimeMultiSampleArrayWidget::~NewRealTimeMultiSampleArrayWidget()
 
 void NewRealTimeMultiSampleArrayWidget::actualize()
 {
+#ifdef NEWTABLEVIEW
+
+
+
+
+
+
+
+#else
     m_dPosY = ui.m_qFrame->pos().y();//+0.5*ui.m_qFrame->height();
 
 
@@ -178,6 +220,7 @@ void NewRealTimeMultiSampleArrayWidget::actualize()
 //    // Set new sample widths
 //    foreach(NewRealTimeMultiSampleArrayWidget* pRTMSAW, DisplayManager::getRTMSANewWidgets().values())
 //        pRTMSAW->m_dSampleWidth = dMax/pRTMSAW->m_pRTMSA_New->getSamplingRate();
+#endif
 }
 
 
@@ -185,7 +228,17 @@ void NewRealTimeMultiSampleArrayWidget::actualize()
 
 void NewRealTimeMultiSampleArrayWidget::stopAnnotation()
 {
+#ifdef NEWTABLEVIEW
+
+
+
+
+
+
+
+#else
     m_bToolInUse = !m_bToolInUse;
+#endif
 }
 
 
@@ -193,12 +246,22 @@ void NewRealTimeMultiSampleArrayWidget::stopAnnotation()
 
 void NewRealTimeMultiSampleArrayWidget::maxValueChanged(double maxValue)
 {
+#ifdef NEWTABLEVIEW
+
+
+
+
+
+
+
+#else
 //    m_pRTMSA_New->setMaxValue(maxValue);
     for(quint32 i = 0; i < m_pRTMSA_New->getNumChannels(); ++i)
             m_pRTMSA_New->chInfo()[i].setMaxValue(maxValue);
 
 //    ui.m_qLabel_MaxValue->setText(QString::number(maxValue));
     actualize();
+#endif
 }
 
 
@@ -206,12 +269,22 @@ void NewRealTimeMultiSampleArrayWidget::maxValueChanged(double maxValue)
 
 void NewRealTimeMultiSampleArrayWidget::minValueChanged(double minValue)
 {
+#ifdef NEWTABLEVIEW
+
+
+
+
+
+
+
+#else
 //    m_pRTMSA_New->setMinValue(minValue);
     for(quint32 i = 0; i < m_pRTMSA_New->getNumChannels(); ++i)
         m_pRTMSA_New->chInfo()[i].setMaxValue(minValue);
 
 //    ui.m_qLabel_MinValue->setText(QString::number(minValue));
     actualize();
+#endif
 }
 
 
@@ -219,10 +292,18 @@ void NewRealTimeMultiSampleArrayWidget::minValueChanged(double minValue)
 
 void NewRealTimeMultiSampleArrayWidget::update(XMEASLIB::NewMeasurement::SPtr)
 {
+#ifdef NEWTABLEVIEW
+
+
+
+
+
+
+
+#else
+    //ToDo put most of this in a parallel thread -> to big for process in notifier
     if(m_pRTMSA_New->getMultiSampleArray().size() > 0)
     {
-//        qDebug() << "update" << m_pRTMSA_New->getMultiSampleArray().size();
-
         VectorXd vecValue;
         QVector< VectorXd > matSamples = m_pRTMSA_New->getMultiSampleArray();
 
@@ -309,6 +390,8 @@ void NewRealTimeMultiSampleArrayWidget::update(XMEASLIB::NewMeasurement::SPtr)
     }
     else
         qWarning() << "NewRealTimeMultiSampleArrayWidget::update; getMultiArraySize():" << m_pRTMSA_New->getMultiArraySize() << "getMultiSampleArray():" << m_pRTMSA_New->getMultiSampleArray().size();
+
+#endif
 }
 
 
@@ -316,6 +399,15 @@ void NewRealTimeMultiSampleArrayWidget::update(XMEASLIB::NewMeasurement::SPtr)
 
 void NewRealTimeMultiSampleArrayWidget::init()
 {
+#ifdef NEWTABLEVIEW
+
+
+
+
+
+
+
+#else
     ui.m_qLabel_Caption->setText(m_pRTMSA_New->getName());
 //    ui.m_qLabel_MinValue->setText(QString::number(m_pRTSM->getMinValue()));
 //    ui.m_qLabel_MaxValue->setText(QString::number(m_pRTSM->getMaxValue()));
@@ -352,6 +444,7 @@ void NewRealTimeMultiSampleArrayWidget::init()
     m_pTimeCurrentDisplay = QSharedPointer<QTime>(new QTime(0, 0));
 
     actualize();
+#endif
 }
 
 
@@ -359,6 +452,15 @@ void NewRealTimeMultiSampleArrayWidget::init()
 
 void NewRealTimeMultiSampleArrayWidget::paintEvent(QPaintEvent*)
 {
+#ifdef NEWTABLEVIEW
+
+
+
+
+
+
+
+#else
     QPainter painter(this);
 
 
@@ -625,6 +727,7 @@ void NewRealTimeMultiSampleArrayWidget::paintEvent(QPaintEvent*)
             painter.drawText(iEndX+14, iEndY-8, tr("%1%2").arg(fMagnitude, 0, 'e', 3).arg(m_pRTMSA_New->chInfo()[0].getUnit()));// ToDo Precision should be part of preferences
         }
     }
+#endif
 }
 
 
@@ -632,8 +735,18 @@ void NewRealTimeMultiSampleArrayWidget::paintEvent(QPaintEvent*)
 
 void NewRealTimeMultiSampleArrayWidget::resizeEvent(QResizeEvent*)
 {
+#ifdef NEWTABLEVIEW
+
+
+
+
+
+
+
+#else
     m_bStartFlag = true; //start new painting
     actualize();
+#endif
 }
 
 
@@ -641,6 +754,16 @@ void NewRealTimeMultiSampleArrayWidget::resizeEvent(QResizeEvent*)
 
 void NewRealTimeMultiSampleArrayWidget::keyPressEvent(QKeyEvent* keyEvent)
 {
+#ifdef NEWTABLEVIEW
+
+
+
+
+
+
+
+#else
+    Q_UNUSED(keyEvent);
 //    if(keyEvent->key() == Qt::UpArrow)
 //    {
 //        if(m_uiFirstChannel + m_uiNumChannels < m_pRTMSA_New->getNumChannels())
@@ -653,6 +776,9 @@ void NewRealTimeMultiSampleArrayWidget::keyPressEvent(QKeyEvent* keyEvent)
 //    }
 
 //    QWidget::keyPressEvent(keyEvent);
+
+    Q_UNUSED(keyEvent);
+#endif
 }
 
 
@@ -660,6 +786,15 @@ void NewRealTimeMultiSampleArrayWidget::keyPressEvent(QKeyEvent* keyEvent)
 
 void NewRealTimeMultiSampleArrayWidget::mousePressEvent(QMouseEvent* mouseEvent)
 {
+#ifdef NEWTABLEVIEW
+
+
+
+
+
+
+
+#else
     m_qPointMouseStartPosition = m_qPointMouseEndPosition = mouseEvent->pos();
     if(mouseEvent->button() == Qt::LeftButton)
     {
@@ -671,6 +806,7 @@ void NewRealTimeMultiSampleArrayWidget::mousePressEvent(QMouseEvent* mouseEvent)
         m_bScaling = true;
         m_bPosition = false;
     }
+#endif
 }
 
 
@@ -678,8 +814,18 @@ void NewRealTimeMultiSampleArrayWidget::mousePressEvent(QMouseEvent* mouseEvent)
 
 void NewRealTimeMultiSampleArrayWidget::mouseMoveEvent(QMouseEvent* mouseEvent)
 {
+#ifdef NEWTABLEVIEW
+
+
+
+
+
+
+
+#else
     if(m_bMeasurement || m_bScaling)
         m_qPointMouseEndPosition = mouseEvent->pos();
+#endif
 }
 
 
@@ -687,9 +833,19 @@ void NewRealTimeMultiSampleArrayWidget::mouseMoveEvent(QMouseEvent* mouseEvent)
 
 void NewRealTimeMultiSampleArrayWidget::mouseReleaseEvent(QMouseEvent*)
 {
+#ifdef NEWTABLEVIEW
+
+
+
+
+
+
+
+#else
     m_bMeasurement = false;
     m_bPosition = true;
     m_bScaling = false;
+#endif
 }
 
 
@@ -697,6 +853,15 @@ void NewRealTimeMultiSampleArrayWidget::mouseReleaseEvent(QMouseEvent*)
 
 void NewRealTimeMultiSampleArrayWidget::mouseDoubleClickEvent(QMouseEvent*)
 {
+#ifdef NEWTABLEVIEW
+
+
+
+
+
+
+
+#else
     switch((Tool)m_ucToolIndex)
     {
         case Freeze:
@@ -720,6 +885,7 @@ void NewRealTimeMultiSampleArrayWidget::mouseDoubleClickEvent(QMouseEvent*)
     }
 
     m_bToolInUse = !m_bToolInUse;
+#endif
 }
 
 
@@ -727,6 +893,15 @@ void NewRealTimeMultiSampleArrayWidget::mouseDoubleClickEvent(QMouseEvent*)
 
 void NewRealTimeMultiSampleArrayWidget::wheelEvent(QWheelEvent* wheelEvent)
 {
+#ifdef NEWTABLEVIEW
+
+
+
+
+
+
+
+#else
     if(wheelEvent->delta() < 0)
     {
         if((qint32)m_uiFirstChannel - (qint32)m_uiNumChannels >= 0)
@@ -773,6 +948,19 @@ void NewRealTimeMultiSampleArrayWidget::wheelEvent(QWheelEvent* wheelEvent)
 
 //    connect( m_pTimerToolDisplay, SIGNAL(timeout()), ui.m_qLabel_Tool, SLOT(hide()));
 //    m_pTimerToolDisplay->start(2000);
+#endif
+
+}
+
+
+//*************************************************************************************************************
+
+void NewRealTimeMultiSampleArrayWidget::showRoiSelectionWidget()
+{
+    if(!m_pRoiSelectionWidget)
+        m_pRoiSelectionWidget = QSharedPointer<XDISPLIB::RoiSelectionWidget>(new XDISPLIB::RoiSelectionWidget);
+
+    m_pRoiSelectionWidget->show();
 
 }
 

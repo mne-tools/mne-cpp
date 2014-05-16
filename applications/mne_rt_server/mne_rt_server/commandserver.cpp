@@ -156,11 +156,10 @@ void CommandServer::prepareReply(QString p_sReply, Command p_command)
     //Currently only one parsing thread per time
     qint32 t_iThreadID = m_iCurrentCommandThreadID;
 
-    QByteArray t_blockReply;
-    t_blockReply.append(p_sReply);
-
     //print
-    printf("%s",t_blockReply.data());
+//    printf("%s",p_sReply.toLatin1().constData());
 
-    emit replyCommand(t_blockReply, t_iThreadID);
+    emit replyCommand(p_sReply, t_iThreadID);
+
+    Q_UNUSED(p_command);
 }
