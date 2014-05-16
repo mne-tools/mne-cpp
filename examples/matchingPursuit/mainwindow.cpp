@@ -1,7 +1,21 @@
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include <iostream>
+#include <vector>
+#include <math.h>
+#include <fiff/fiff.h>
+#include <mne/mne.h>
+#include <utils/mp/atom.h>
+#include <utils/mp/adaptivemp.h>
+#include <disp/plot.h>
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "QtGui"
 #include "math.h"
+#include "mainwindow.h"
+#include "ui_mainwindow.h"
 #include "editorwindow.h"
 #include "ui_editorwindow.h"
 #include "formulaeditor.h"
@@ -10,18 +24,46 @@
 #include "ui_enhancededitorwindow.h"
 #include "processdurationmessagebox.h"
 #include "ui_processdurationmessagebox.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include "QtGui"
 #include <QFileDialog>
 #include <QHeaderView>
 #include <QMessageBox>
 
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace MNELIB;
+using namespace UTILSLIB;
+using namespace DISPLIB;
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+MatrixXd _datas;
+MatrixXd _times;
+
+//*************************************************************************************************************
+//=============================================================================================================
+// MAIN
+//=============================================================================================================
 
 qreal sollEnergie = 0;
 qreal signalEnergie = 0;
-qint32 valueLength;
 
-QList<qreal> globalValueList;
-QList<qreal> globalAtomList;
-QList<qreal> globalResiduumList;
+VectorXd signalVector;
+VectorXd globalAtomList;
+VectorXd residuumVector;
 
 QList<QStringList> globalResultAtomList;
 qint32 processValue = 0;
@@ -41,10 +83,11 @@ MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::
     ui->sb_Iterations->setMaximum(9999);        // Legt das Maximum der Iterationsschritte fest
     ui->sb_Iterations->setMinimum(1);           // Legt das Minimum der Iterationsschritte fest
 
-    atom = new Atom();
+    //atom = new Atom();
 
     ui->l_Graph->addWidget(callGraphWindow);
     ui->tb_ResEnergy->setText(tr("0,1"));
+
     // Erstellt die Konfigdatei bei Initalizierung
     bool hasEntry1 = false;
     bool hasEntry2 = false;
@@ -114,17 +157,18 @@ MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::
 
     for(int i = 0; i < fileList.length(); i++)
         ui->cb_Dicts->addItem(QIcon(":/images/icons/DictIcon.png"), fileList.at(i).baseName());
-
+/*
     // Ergebnisstabelle anpassen
     QStringList headerList;
     headerList << "Atomname" << "Atom" << "Energie (%)" << "Residuum";
-    ui->tw_Results->setColumnCount(4);
-    ui->tw_Results->setHorizontalHeaderLabels(headerList);
-    QHeaderView *headerView = ui->tw_Results->horizontalHeader();
+    ui->tbv_Results->setColumnCount(4);
+    ui->tbv_Results->setHorizontalHeaderLabels(headerList);
+    QHeaderView *headerView = ui->tbv_Results->horizontalHeader();
     headerView->setSectionResizeMode(0, QHeaderView::Interactive);
     headerView->setSectionResizeMode(1, QHeaderView::Stretch);
     headerView->setSectionResizeMode(2, QHeaderView::Interactive);
     headerView->setSectionResizeMode(3, QHeaderView::Stretch);
+*/
 }
 
 MainWindow::~MainWindow()
@@ -132,10 +176,12 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+
+
 void MainWindow::OpenFile()
 {
     QFileDialog* fileDia;
-    QString fileName = fileDia->getOpenFileName(this, "Bitte ein Signal auswählen",QDir::currentPath(),"Signal(*.txt)");
+    QString fileName = fileDia->getOpenFileName(this, "Bitte ein Signal auswählen",QDir::currentPath(),"(*.fif *.txt)");
     if(fileName.isNull()) return;
 
     QFile file(fileName);
@@ -145,15 +191,166 @@ void MainWindow::OpenFile()
         tr("Das Signal konnte nicht geöffnet werden."));
         return;
     }
+    file.close();
 
+    if(fileName.endsWith(".fif", Qt::CaseInsensitive))
+        ReadFiffFile(fileName);
+    else
+        ReadMatlabFile(fileName);
+    if(_datas.cols() != 0)
+    {
+        signalVector = VectorXd::Zero(4000);
+        for(qint32 i = 0; i < 4000; i++)
+        {
+            signalVector[i] = _datas(0, i);
+            std::cout << signalVector[i] << "\n";
+        }
+    }
+    update();
+
+    MatrixXd test(4, signalVector.rows());
+
+    for(qint32 m = 0; m < 4; m++)
+        for(qint32 i = 0; i < signalVector.rows(); i++)
+            if(m == 1) test(m, i) = signalVector[i] * sin(i);
+            else test(m, i) = signalVector[i];
+
+
+    SignalModel *model = new SignalModel(this);
+    model->setSignal(test);
+    ui->tbv_Results->setModel(model);
+    SignalDelegate *delegate = new SignalDelegate(this);
+    ui->tbv_Results->setItemDelegate(delegate);
+
+    ui->tbv_Results->update();
+    ui->tbv_Results->resizeColumnsToContents();
+}
+
+qint32 MainWindow::ReadFiffFile(QString fileName)
+{
+    QFile t_fileRaw(fileName);
+
+    float from = 42.956f;
+    float to = 320.670f;
+
+    bool in_samples = false;
+
+    bool keep_comp = true;
+
+    //
+    //   Setup for reading the raw data
+    //
+    FiffRawData raw(t_fileRaw);
+
+    //
+    //   Set up pick list: MEG + STI 014 - bad channels
+    //
+    //
+    QStringList include;
+    include << "STI 014";
+    bool want_meg   = true;
+    bool want_eeg   = false;
+    bool want_stim  = false;
+
+    RowVectorXi picks = raw.info.pick_types(want_meg, want_eeg, want_stim, include, raw.info.bads);
+
+    //
+    //   Set up projection
+    //
+    qint32 k = 0;
+    if (raw.info.projs.size() == 0)
+       printf("No projector specified for these data\n");
+    else
+    {
+        //
+        //   Activate the projection items
+        //
+        for (k = 0; k < raw.info.projs.size(); ++k)
+           raw.info.projs[k].active = true;
+
+       printf("%d projection items activated\n",raw.info.projs.size());
+       //
+       //   Create the projector
+       //
+       fiff_int_t nproj = raw.info.make_projector(raw.proj);
+
+       if (nproj == 0)
+           printf("The projection vectors do not apply to these channels\n");
+       else
+           printf("Created an SSP operator (subspace dimension = %d)\n",nproj);
+    }
+
+    //
+    //   Set up the CTF compensator
+    //
+    qint32 current_comp = raw.info.get_current_comp();
+    qint32 dest_comp = -1;
+
+    if (current_comp > 0)
+       printf("Current compensation grade : %d\n",current_comp);
+
+    if (keep_comp)
+        dest_comp = current_comp;
+
+    if (current_comp != dest_comp)
+    {
+       qDebug() << "This part needs to be debugged";
+       if(MNE::make_compensator(raw.info, current_comp, dest_comp, raw.comp))
+       {
+          raw.info.set_current_comp(dest_comp);
+          printf("Appropriate compensator added to change to grade %d.\n",dest_comp);
+       }
+       else
+       {
+          printf("Could not make the compensator\n");
+          return -1;
+       }
+    }
+    //
+    //   Read a data segment
+    //   times output argument is optional
+    //
+    bool readSuccessful = false;
+
+
+    if (in_samples)
+        readSuccessful = raw.read_raw_segment(_datas, _times, (qint32)from, (qint32)to, picks);
+    else
+        readSuccessful = raw.read_raw_segment_times(_datas, _times, from, to, picks);
+
+    if (!readSuccessful)
+    {
+       printf("Could not read raw segment.\n");
+       return -1;
+    }
+
+    printf("Read %d samples.\n",(qint32)_datas.cols());
+
+
+    std::cout << _datas.block(0,0,10,10) << std::endl;
+
+    return 0;
+}
+
+void MainWindow::ReadMatlabFile(QString fileName)
+{
+    QFile file(fileName);
     QString contents;
-    globalValueList.clear();
+    QList<QString> strList;
+    file.open(QIODevice::ReadOnly);
+    while(!file.atEnd())
+    {
+        strList.append(file.readLine(0).constData());
+    }
     int rowNumber = 0;
+    signalVector = VectorXd::Zero(strList.length());
+    file.close();
+    file.open(QIODevice::ReadOnly);
     while(!file.atEnd())
     {
         contents = file.readLine(0).constData();
 
-        bool isFloat;       
+        bool isFloat;
         qreal value = contents.toFloat(&isFloat);
         if(!isFloat)
         {
@@ -161,32 +358,31 @@ void MainWindow::OpenFile()
             QMessageBox::warning(this, tr("Fehler"),
             errorSignal);
             return;
-        }       
-        globalValueList.append(value);
-        valueLength = globalValueList.length();
+        }
+        signalVector[rowNumber] = value;
         rowNumber++;
     }
 
+
     file.close();
     signalEnergie = 0;
-    for(qint32 i = 0; i < globalValueList.length(); i++)
-        signalEnergie += (globalValueList.at(i) * globalValueList.at(i));
-    update();
+    for(qint32 i = 0; i < signalVector.rows(); i++)
+        signalEnergie += (signalVector[i] * signalVector[i]);
 }
 
 void GraphWindow::paintEvent(QPaintEvent* event)
 {
-    PaintSignal(globalValueList, globalResiduumList, Qt::red, this->size());
+    PaintSignal(signalVector, residuumVector, Qt::red, this->size());
 }
 
-void GraphWindow::PaintSignal(QList<qreal> valueList, QList<qreal> residuumValues, QColor color, QSize windowSize)
+void GraphWindow::PaintSignal(VectorXd signalSamples, VectorXd residuumSamples, QColor color, QSize windowSize)
 {
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing, true);
     painter.fillRect(0,0,windowSize.width(),windowSize.height(),QBrush(Qt::white));
 
 
-    if(valueList.length() > 0)
+    if(signalSamples.rows() > 0)
     {
         qint32 borderMarginHeigth = 15;     // verkleinert Zeichenfläche von GraphWindow um borderMargin Pixel in der Höhe
         qint32 borderMarginWidth = 5;       // verkleinert Zeichenfläche von GraphWindow um borderMargin Pixel in der Breite
@@ -202,9 +398,9 @@ void GraphWindow::PaintSignal(QList<qreal> valueList, QList<qreal> residuumValue
         QPolygonF polygonsResiduum;
 
         internListValue.clear();
-        while(i < valueList.length())
+        while(i < signalSamples.rows())
         {
-                internListValue.append(valueList.at(i));            //TODO wie blöd
+                internListValue.append(signalSamples[i]);
                 i++;
         }
 
@@ -213,13 +409,13 @@ void GraphWindow::PaintSignal(QList<qreal> valueList, QList<qreal> residuumValue
 
         // Maximum und Minimum des Signals finden
         i = 0;
-        while(i < valueList.length())
+        while(i < signalSamples.rows())
         {
-            if(valueList.at(i) > maxPos)
-                maxPos = valueList.at(i);
+            if(signalSamples[i] > maxPos)
+                maxPos = signalSamples[i];
 
-            if(valueList.at(i) < maxNeg )
-                maxNeg = valueList.at(i);
+            if(signalSamples[i] < maxNeg )
+                maxNeg = signalSamples[i];
             i++;
         }
 
@@ -243,7 +439,7 @@ void GraphWindow::PaintSignal(QList<qreal> valueList, QList<qreal> residuumValue
         while(drawFactor > 0)
         {
             i = 0;
-            while(i < valueList.length())
+            while(i < signalSamples.rows())
             {
                 qreal replaceValue = internListValue.at(i) * 10;
                 internListValue.replace(i, replaceValue);
@@ -263,9 +459,9 @@ void GraphWindow::PaintSignal(QList<qreal> valueList, QList<qreal> residuumValue
 
 
         // Achsenbeschriftung skalieren
-        qreal scaleXText = (qreal)valueList.length() / (qreal)20;   //Signallänge teilen
-        qreal scaleYText = (qreal)maxmax / (qreal)10;               // Signalwerte werden in 15tel unterteilt für y-Achsenbeschriftung (16 Werte)
-        qint32 negScale =  round(maxNeg * 10 / maxmax);             // Startfaktor für y-Achsenbeschriftung
+        qreal scaleXText = (qreal)signalSamples.rows() / (qreal)20;     //Signallänge teilen
+        qreal scaleYText = (qreal)maxmax / (qreal)10;                   // Signalwerte werden in 15tel unterteilt für y-Achsenbeschriftung (16 Werte)
+        qint32 negScale =  round(maxNeg * 10 / maxmax);                 // Startfaktor für y-Achsenbeschriftung
 
         //Bestimmen der Länge des Beschriftungstextes der y-Achse für Verschiebung der y-Achse nach rechts (damit Text nicht über Achse geschrieben wird)
         qint32 k = 0;
@@ -288,7 +484,7 @@ void GraphWindow::PaintSignal(QList<qreal> valueList, QList<qreal> residuumValue
         while((windowSize.width() - maxStrLenght -borderMarginWidth) % 20)borderMarginWidth++;
 
         // Signal skalieren
-        qreal scaleX = ((qreal)(windowSize.width() - maxStrLenght - borderMarginWidth))/ (qreal)valueList.length();
+        qreal scaleX = ((qreal)(windowSize.width() - maxStrLenght - borderMarginWidth))/ (qreal)signalSamples.rows();
         qreal scaleY = (qreal)(windowSize.height() - borderMarginHeigth) / (qreal)maxmax;
 
         //Achsen skalieren
@@ -311,10 +507,10 @@ void GraphWindow::PaintSignal(QList<qreal> valueList, QList<qreal> residuumValue
             {
                 // Eintragen der skalierten Signalpunkte
                 qint32 h = 0;
-                while(h < valueList.length())
+                while(h < signalSamples.rows())
                 {
-                    if(residuumValues.length() == valueList.length())
-                        polygonsResiduum.append(QPointF((h * scaleX) + maxStrLenght,  -((residuumValues.at(h) * scaleY + ((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2))));
+                    if(residuumSamples.rows() == signalSamples.rows())
+                        polygonsResiduum.append(QPointF((h * scaleX) + maxStrLenght,  -((residuumSamples[i] * scaleY + ((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2))));
 
                     polygons.append(QPointF((h * scaleX) + maxStrLenght,  -((internListValue.at(h) * scaleY + ((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2))));
                     h++;
@@ -343,74 +539,13 @@ void GraphWindow::PaintSignal(QList<qreal> valueList, QList<qreal> residuumValue
 
         painter.drawPolyline(polygons);                  // Signal zeichnen
         painter.setPen(color);
-        if(residuumValues.length() == valueList.length())
+        if(residuumSamples.rows() == residuumSamples.rows())
         {
              painter.setPen(color);
-            painter.drawPolyline(polygonsResiduum);         // Residuum zeichnen
+             painter.drawPolyline(polygonsResiduum);         // Residuum zeichnen
         }
     }
     painter.end();    
-}
-
-// Erstellt die Atomwerte in eine Stringliste bei übergabe der Parameter
-QStringList Atom::CreateStringValues(qint32 samples, qreal scale, qreal modulation, qreal phase, qreal chirp, Atom::AtomType atomType)
-{
-    QList<qreal> atomValues = Create(samples, scale, modulation, phase, chirp,atomType);
-    QStringList atomStringValues;
-    for(qint32 i = 0; i < atomValues.length(); i++)
-        atomStringValues.append(QString("%1").arg(atomValues.at(i)));
-    return atomStringValues;
-}
-
-// Erstellt die Atomwerte in eine Liste bei übergabe der Parameter
-QList<qreal> Atom::Create(qint32 samples, qreal scale, qreal modulation, qreal phase, qreal chirp, Atom::AtomType atomType)
-{
-    int i = 0;
-    QList<qreal> atomValues;
-
-
-    atomValues.clear();
-
-    if(atomType == Atom::Gauss)
-    {
-        if(scale != 0 && samples != 0)
-        {
-            while(i < samples)
-            {
-                qreal normI = (i - (qreal)samples / 2) / (qreal)scale;
-                qreal exponentGauss = -3.14159265 * normI * normI;
-                qreal gauss = pow(2, 0.25) * exp(exponentGauss);
-                qreal angle = 6.2831853 * modulation / samples * i + phase;
-
-                qreal result = (1/ sqrt(scale)) * gauss *  cos(angle);
-
-                atomValues.append(result);
-                i++;
-            }
-        }        
-    }
-    else if(atomType == Atom::Chirp)
-    {
-        if(scale != 0 && samples != 0)
-        {
-            qint32 normChirp = 0;
-            if(chirp < 0)      normChirp = samples;
-
-            i = 0;
-            while( i < samples)
-            {
-                qreal normI = (i - (qreal)samples / 2) / (qreal)scale;
-                qreal exponentGauss = -3.14159265 * normI * normI;
-                qreal gauss = pow(2, 0.25) * exp(exponentGauss);
-                qreal angle = (6.2831853 * modulation / samples) * i + (chirp / 2) * pow((i - normChirp), 2)  + phase;
-                qreal result = (1/ sqrt(scale)) * gauss *  cos(angle);
-                atomValues.append(result);
-                i++;
-            }
-        }       
-    }
-
-    return atomValues;    
 }
 
 // Startet MP-algorithmus
@@ -420,7 +555,7 @@ void MainWindow::on_btt_Calc_clicked()
     ui->progressBarCalc->setValue(0);
     ui->progressBarCalc->setHidden(false);
 
-    if(globalValueList.isEmpty())
+    if(signalVector.rows() == 0)
     {
         QString title = "Hinweis";
         QString text = "Es wurde noch kein Signal eingelesen!";
@@ -495,14 +630,14 @@ void MainWindow::on_btt_Calc_clicked()
     if(ui->rb_StandardDictionary->isChecked())
     {        
         QFile stdDict("Matching-Pursuit-Toolbox/stdDictionary.dict");
-        globalResiduumList =  mpCalc(stdDict, globalValueList, 0);
+        //residuumVector =  mpCalc(stdDict, signalVector, 0);
         update();
     }
     else if(ui->rb_OwnDictionary->isChecked())
     {
 
         QFile ownDict(QString("Matching-Pursuit-Toolbox/%1.dict").arg(ui->cb_Dicts->currentText()));
-        globalResiduumList =  mpCalc(ownDict, globalValueList, 0);
+        //residuumVector =  mpCalc(ownDict, signalVector, 0);
         update();
     }
     else if(ui->rb_TreebasedDictionary->isChecked())
@@ -511,9 +646,9 @@ void MainWindow::on_btt_Calc_clicked()
     }
 }
 
-
+/*
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-QList<qreal> MainWindow::mpCalc(QFile &currentDict, QList<qreal> signalSamples, qint32 iterationsCount)
+VectorXd MainWindow::mpCalc(QFile &currentDict, VectorXd signalSamples, qint32 iterationsCount)
 {
     bool isDouble = false;
 
@@ -530,14 +665,14 @@ QList<qreal> MainWindow::mpCalc(QFile &currentDict, QList<qreal> signalSamples, 
     QStringList bestAtom;
     QList<qreal> atomSamples;
     QList<QStringList> correlationList;
-    QList<qreal> originalSignalSamples;
-    QList<qreal> residuum;
-    QList<qreal> bestCorrAtomSamples;
-    QList<qreal> normBestCorrAtomSamples;
+    VectorXd originalSignalSamples;
+    VectorXd residuum;
+    VectorXd bestCorrAtomSamples;
+    VectorXd normBestCorrAtomSamples;
 
-    residuum.clear();
-    bestCorrAtomSamples.clear();
-    normBestCorrAtomSamples.clear();
+    residuum(0);
+    bestCorrAtomSamples(0);
+    normBestCorrAtomSamples(0);
     originalSignalSamples = signalSamples;    
 
     // Liest das Wörterbuch aus und gibt die Samples und den Namen an die Skalarfunktion weiter
@@ -552,7 +687,7 @@ QList<qreal> MainWindow::mpCalc(QFile &currentDict, QList<qreal> signalSamples, 
                 break;
             }
         }
-
+        qint32 i = 0;
         while(!currentDict.atEnd())
         {
             while(!currentDict.atEnd())
@@ -576,6 +711,7 @@ QList<qreal> MainWindow::mpCalc(QFile &currentDict, QList<qreal> signalSamples, 
                     break;
             }
             correlationList.append(correlation(originalSignalSamples, atomSamples, atomName));
+
             atomSamples.clear();
         }
         currentDict.close();
@@ -595,6 +731,7 @@ QList<qreal> MainWindow::mpCalc(QFile &currentDict, QList<qreal> signalSamples, 
         if (currentDict.open (QIODevice::ReadOnly))
         {
             bool hasFound = false;
+            qint32 j = 0;
             while(!currentDict.atEnd() )
             {
                 contents = currentDict.readLine();
@@ -606,7 +743,10 @@ QList<qreal> MainWindow::mpCalc(QFile &currentDict, QList<qreal> signalSamples, 
                         contents = currentDict.readLine();
                         sample = contents.toDouble(&isDouble);
                         if(isDouble)
-                            bestCorrAtomSamples.append(sample);
+                        {
+                            bestCorrAtomSamples[j] = sample;
+                            j++;
+                        }
                         if(currentDict.atEnd())
                             break;
                     }
@@ -621,36 +761,38 @@ QList<qreal> MainWindow::mpCalc(QFile &currentDict, QList<qreal> signalSamples, 
         //**************************** Im Moment weil Testwörterbücher nicht nomiert ***********************************
 
         qreal normFacktorAtom = 0;
-        for(qint32 i = 0; i < bestCorrAtomSamples.length(); i++)
-            normFacktorAtom += bestCorrAtomSamples.at(i)* bestCorrAtomSamples.at(i);
+        for(qint32 i = 0; i < bestCorrAtomSamples.rows(); i++)
+            normFacktorAtom += bestCorrAtomSamples[i]* bestCorrAtomSamples[i];
         normFacktorAtom = sqrt(normFacktorAtom);
 
-        for(qint32 i = 0; i < bestCorrAtomSamples.length(); i++)
-            normBestCorrAtomSamples.append((bestCorrAtomSamples.at(i) / normFacktorAtom) * bestCorrValue);
+        for(qint32 i = 0; i < bestCorrAtomSamples.rows(); i++)
+            normBestCorrAtomSamples[i] = (bestCorrAtomSamples[i] / normFacktorAtom) * bestCorrValue;
 
         //**************************************************************************************************************
 
         // Subtraktion des Atoms vom Signal
-        for(qint32 m = 0; m < normBestCorrAtomSamples.length(); m++)
+        for(qint32 m = 0; m < normBestCorrAtomSamples.rows(); m++)
         {
-            signalSamples.append(0);
-            signalSamples.prepend(0);
+            // TODO:
+            //signalSamples.append(0);
+            //signalSamples.prepend(0);
         }
 
         residuum = signalSamples;
-        for(qint32 i = 0; i < normBestCorrAtomSamples.length(); i++)
+        for(qint32 i = 0; i < normBestCorrAtomSamples.rows(); i++)
         {
-            residuum.insert(normBestCorrAtomSamples.length() + i + bestCorrStartIndex, signalSamples.at(normBestCorrAtomSamples.length() + i + bestCorrStartIndex) - normBestCorrAtomSamples.at(i));
-            residuum.removeAt(normBestCorrAtomSamples.length() + i + bestCorrStartIndex + 1);
+            residuum[normBestCorrAtomSamples.rows() + i + bestCorrStartIndex] = signalSamples[normBestCorrAtomSamples.rows() + i + bestCorrStartIndex] - normBestCorrAtomSamples[i];
+            //residuum.removeAt(normBestCorrAtomSamples.rows() + i + bestCorrStartIndex + 1);
         }
 
         // Löscht die Nullen wieder
-        for(qint32 j = 0; j < normBestCorrAtomSamples.length(); j++)
+        for(qint32 j = 0; j < normBestCorrAtomSamples.rows(); j++)
         {
-            residuum.removeAt(0);
-            residuum.removeAt(residuum.length() - 1);
-            signalSamples.removeAt(0);
-            signalSamples.removeAt(signalSamples.length() - 1);
+            // TODO:
+            //residuum.removeAt(0);
+            //residuum.removeAt(residuum.rows() - 1);
+            //signalSamples.removeAt(0);
+            //signalSamples.removeAt(signalSamples.rows() - 1);
         }
 
         iterationsCount++;
@@ -660,8 +802,8 @@ QList<qreal> MainWindow::mpCalc(QFile &currentDict, QList<qreal> signalSamples, 
         bestAtom.append(QString("%1").arg(bestCorrStartIndex));
         bestAtom.append(QString("%1").arg(bestCorrValue));
         QString newSignalString = "";
-        for(qint32 i = 0; i < normBestCorrAtomSamples.length(); i++)
-            newSignalString.append(QString("%1/n").arg(normBestCorrAtomSamples.at(i)));
+        for(qint32 i = 0; i < normBestCorrAtomSamples.rows(); i++)
+            newSignalString.append(QString("%1/n").arg(normBestCorrAtomSamples[i]));
 
         bestAtom.append(newSignalString);
         globalResultAtomList.append(bestAtom);
@@ -685,9 +827,9 @@ QList<qreal> MainWindow::mpCalc(QFile &currentDict, QList<qreal> signalSamples, 
         if (newSignal.open (QIODevice::WriteOnly| QIODevice::Append))
         {
             QTextStream stream( &newSignal );
-            for(qint32 i = 0; i < residuum.length(); i++)
+            for(qint32 i = 0; i < residuum.rows(); i++)
             {
-                QString temp = QString("%1").arg(residuum.at(i));
+                QString temp = QString("%1").arg(residuum[i]);
                 stream << temp << "\n";
             }
         }
@@ -702,8 +844,8 @@ QList<qreal> MainWindow::mpCalc(QFile &currentDict, QList<qreal> signalSamples, 
 
         // Berechnet die Energie des Atoms mit dem NormFaktor des Signals
         qreal normAtomEnergie = 0;
-        for(qint32 i = 0; i < normBestCorrAtomSamples.length(); i++)
-            normAtomEnergie += normBestCorrAtomSamples.at(i) * normBestCorrAtomSamples.at(i);
+        for(qint32 i = 0; i < normBestCorrAtomSamples.rows(); i++)
+            normAtomEnergie += normBestCorrAtomSamples[i] * normBestCorrAtomSamples[i];
 
         QTableWidgetItem* atomEnergieItem = new QTableWidgetItem(QString("%1").arg(normAtomEnergie / signalEnergie * 100));
 
@@ -719,8 +861,8 @@ QList<qreal> MainWindow::mpCalc(QFile &currentDict, QList<qreal> signalSamples, 
 
 
         ui->lb_IterationsProgressValue->setText(QString("%1").arg(iterationsCount));
-        for(qint32 i = 0; i < residuum.length(); i++)
-            residuumEnergie += residuum.at(i) * residuum.at(i);
+        for(qint32 i = 0; i < residuum.rows(); i++)
+            residuumEnergie += residuum[i] * residuum[i];
         if(residuumEnergie == 0)    ui->lb_RestEnergieResiduumValue->setText("0%");
         else    ui->lb_RestEnergieResiduumValue->setText(QString("%1%").arg(residuumEnergie / signalEnergie * 100));
 
@@ -760,14 +902,14 @@ QList<qreal> MainWindow::mpCalc(QFile &currentDict, QList<qreal> signalSamples, 
 
 
 // Berechnung das Skalarprodukt zwischen Atom und Signal
-QStringList MainWindow::correlation(QList<qreal> signalSamples, QList<qreal> atomSamples, QString atomName)
+QStringList MainWindow::correlation(VectorXd signalSamples, QList<qreal> atomSamples, QString atomName)
 {    
     qreal sum = 0;
     qint32 index = 0;
     qreal maximum = 0;
     qreal sumAtom = 0;
 
-    QList<qreal> originalSignalList = signalSamples;
+    VectorXd originalSignalList = signalSamples;
     QList<qreal> tempList;
     QList<qreal> scalarList;    
     QStringList resultList;
@@ -792,18 +934,18 @@ QStringList MainWindow::correlation(QList<qreal> signalSamples, QList<qreal> ato
     // Fuellt das Signal vorne und hinten mit nullen auf damit Randwertproblem umgangen wird
     for(qint32 l = 0; l < atomSamples.length() - 1; l++)
     {
-        signalSamples.append(0);
-        signalSamples.prepend(0);
+        //signalSamples.append(0);
+        //signalSamples.prepend(0);
     }
 
     //******************************************************************************************************************
 
-    for(qint32 j = 0; j < originalSignalList.length() + atomSamples.length() -1; j++)
+    for(qint32 j = 0; j < originalSignalList.rows() + atomSamples.length() -1; j++)
     {
         // Inners Produkt des Signalteils mit dem Atom
         for(qint32 g = 0; g < atomSamples.length(); g++)
         {
-            tempList.append(signalSamples.at(g + j) * atomSamples.at(g));
+            tempList.append(signalSamples[g + j] * atomSamples.at(g));
             sum += tempList.at(g);
         }
         scalarList.append(sum);
@@ -831,11 +973,12 @@ QStringList MainWindow::correlation(QList<qreal> signalSamples, QList<qreal> ato
     // dem Index des höchsten Korrelationswertes minus die halbe Atomlänge,
 
 }
+*/
 
 void AtomWindow::paintEvent(QPaintEvent* event)
 {
     GraphWindow *win = new GraphWindow();
-    win->PaintSignal(globalValueList, globalResiduumList, Qt::red, this->size());
+    win->PaintSignal(signalVector, residuumVector, Qt::red, this->size());
 }
 
 /*void ResiduumWindow::paintEvent(QPaintEvent* event)
@@ -880,3 +1023,174 @@ void MainWindow::on_btt_OpenSignal_clicked()
 {
     OpenFile();
 }
+
+//-----------------------------------------------------------------------------------------------------------------
+//*****************************************************************************************************************
+
+SignalModel::SignalModel(QObject *parent): QAbstractTableModel(parent)
+{
+
+}
+
+ void SignalModel::setSignal(const MatrixXd &signal)
+ {
+     modelSignal = signal;
+     //reset();
+ }
+
+ int SignalModel::rowCount(const QModelIndex & /* parent */) const
+ {
+     return modelSignal.rows();
+ }
+
+ int SignalModel::columnCount(const QModelIndex & /* parent */) const
+ {
+     return 2;
+ }
+
+ QVariant SignalModel::data(const QModelIndex &index, int role) const
+ {
+     if (!index.isValid() || role != Qt::DisplayRole)
+         return QVariant();
+
+     QVariant v;
+     QList<double> sampleList;
+     for(qint32 i = 0; i < modelSignal.cols(); i++)
+        sampleList.append(modelSignal(0, i));
+
+     v.setValue(sampleList);
+     return v;
+ }
+
+ QVariant SignalModel::headerData(int /* section */, Qt::Orientation /* orientation */, int role) const
+ {
+     return QVariant("Test");
+ }
+
+ //------------------------------------------------------------------------------------------------------------
+
+ SignalDelegate::SignalDelegate(QObject *parent)
+      : QAbstractItemDelegate(parent)
+  {
+
+  }
+
+  void SignalDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+  {
+      // Get Data
+      QVariant variant = index.model()->data(index,Qt::DisplayRole);
+      QList<double> sampleList = variant.value<QList<double>>();
+      VectorXd signalSamples = VectorXd::Zero(sampleList.length());
+      for(int i = 0; i < sampleList.length(); i++)
+          signalSamples[i] = sampleList.at(i);
+
+
+      painter->save();
+      QSize windowSize;
+      windowSize.setHeight(30);
+      windowSize.setWidth(700);
+      painter->setRenderHint(QPainter::Antialiasing, true);      
+
+      //VectorXd signalSamples = signalVector;
+
+      if(signalSamples.rows() > 0 && index.column() == 1)
+      {
+          qint32 borderMarginHeigth = 2;      // verkleinert Zeichenfläche von GraphWindow um borderMargin Pixel in der Höhe
+          qint32 borderMarginWidth = 2;       // verkleinert Zeichenfläche von GraphWindow um borderMargin Pixel in der Breite
+          qint32 i = 0;                       // Laufindex
+          qreal maxNeg = 0;                   // Kleinster Signalwert
+          qreal maxPos = 0;                   // groesster Signalwert
+          qreal absMin = 0;                   // Minimum der Absolutbetraege von maxNeg und maxPos
+          qint32 drawFactor = 0;              // Verschiebungsfaktor für Nachkommastellen (linear)
+          qint32 startDrawFactor = 1;         // Verschiebungsfaktor für Nachkommastellen (exponentiell-Basis 10)
+          qint32 decimalPlace = 0;            // Nachkommastellen für Achsenbeschriftung
+          QPolygonF polygons;                 // Punkte zum Zeichnen des eingelesenen Signals
+          QList<qreal> internListValue;       // interne representation der y-Werte des Signals (nur für grafische Darstellung)
+
+          internListValue.clear();
+          while(i < signalSamples.rows())
+          {
+                  internListValue.append(signalSamples[i]);
+                  i++;
+          }
+
+          // Fenster weiss übermalen          
+          painter->fillRect(option.rect.x(),option.rect.y(),windowSize.width(),windowSize.height(),QBrush(Qt::white));
+
+          // Maximum und Minimum des Signals finden
+          i = 0;
+          while(i < signalSamples.rows())
+          {
+              if(signalSamples[i] > maxPos)
+                  maxPos = signalSamples[i];
+
+              if(signalSamples[i] < maxNeg )
+                  maxNeg = signalSamples[i];
+              i++;
+          }
+
+          if(maxPos > fabs(maxNeg)) absMin = maxNeg;      // findet das absolute Minimum der beiden globalen Extremwerte (maxPos, maxNeg)
+          else     absMin = maxPos;
+
+          if(absMin != 0)                                 // absMin darf nicht null sein: sonst Endlosschleife
+          {
+              while(true)                                 // um wieviel muss die Nachkommastelle verschoben werden?
+              {
+                  if(fabs(absMin) < 1)                    // Bei Signalen, bei denen absMin betragsmäßig größer 1 ist, muss keine Nachkommastelle verschoben werden
+                  {
+                      absMin = absMin * 10;
+                      drawFactor++;                       // Verschiebungfaktor (zählt die Anzahl der Nachkommastellen um die verschoben wurde
+                  }
+                  if(fabs(absMin) >= 1) break;
+              }
+          }
+
+          // Verschiebung der Nachkommastellen um drawFactor für alle Signalpunkte und anschließende Übernahme in interne Liste
+          while(drawFactor > 0)
+          {
+              i = 0;
+              while(i < signalSamples.rows())
+              {
+                  qreal replaceValue = internListValue.at(i) * 10;
+                  internListValue.replace(i, replaceValue);
+                  i++;
+              }
+              startDrawFactor = startDrawFactor * 10;
+              decimalPlace++;
+              maxPos = maxPos * 10;
+              maxNeg = maxNeg * 10;
+              drawFactor--;
+          }
+
+          qreal maxmax;
+          // Absolute Signalhöhe
+          if(maxNeg <= 0)     maxmax = maxPos - maxNeg;
+          else  maxmax = maxPos + maxNeg;
+
+          // Signal skalieren
+          qreal scaleX = ((qreal)(windowSize.width() - borderMarginWidth)) / (qreal)signalSamples.rows();
+          qreal scaleY = (qreal)(windowSize.height() - borderMarginHeigth) / (qreal)maxmax;
+
+          // Eintragen der skalierten Signalpunkte
+          qint32 h = 0;
+
+          while(h < signalSamples.rows())
+          {
+              polygons.append(QPointF(h * scaleX + option.rect.x(), option.rect.y() - ((internListValue.at(h) * scaleY - (windowSize.height()) + borderMarginHeigth / 2))));
+              h++;
+          }
+
+          painter->drawPolyline(polygons);                  // Signal zeichnen
+      }
+      painter->restore();
+      //painter->end();
+
+      std::cout << "PaintEnde \n";
+  }
+
+  QSize SignalDelegate::sizeHint(const QStyleOptionViewItem & option , const QModelIndex & index) const
+  {
+      if(index.column() == 0) return QSize(100, 30);
+      else return QSize(700, 30);
+
+  }
