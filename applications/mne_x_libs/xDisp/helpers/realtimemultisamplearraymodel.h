@@ -47,6 +47,8 @@ public:
 
     void setChannelInfo(QList<RealTimeSampleArrayChInfo> &chInfo);
 
+    void setSamplingInfo(float sps, float T, float dest_sps  = 100.0f);
+
     void addData(const QVector<VectorXd> &data);
 
 private:
@@ -55,6 +57,12 @@ private:
     //Fiff data structure
     QVector<VectorXd> m_dataCurrent;        /**< List that holds the fiff matrix data <n_channels x n_samples> */
     QVector<VectorXd> m_dataLast;        /**< List that holds the fiff matrix data <n_channels x n_samples> */
+
+    float m_fSps;           /**< Sampling rate */
+    float m_fT;             /**< Time window */
+    qint32 m_iDownsampling; /**< Down sampling factor */
+    qint32 m_iMaxSamples;   /**< Max samples per window */
+    qint32 m_iCurrentSample; /**< Accurate Downsampling */
 };
 
 #endif // REALTIMEMULTISAMPLEARRAYMODEL_H

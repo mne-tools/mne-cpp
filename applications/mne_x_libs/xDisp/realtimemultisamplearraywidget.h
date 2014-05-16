@@ -228,6 +228,7 @@ private:
 
     QList<RealTimeSampleArrayChInfo> m_qListChInfo;         /**< Channel info list. ToDo: check if this is obsolete later on*/
 
+    float m_fSamplingRate;  /**< Sampling Rate */
 
 
     QAction*    m_pActionSelectRoi;                         /**< show roi select widget ToDo move this to the actual view-> and make a dynamical menu*/

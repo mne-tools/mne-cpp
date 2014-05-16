@@ -15,9 +15,9 @@
 
 RealTimeMultiSampleArrayDelegate::RealTimeMultiSampleArrayDelegate(QObject *parent)
 : QAbstractItemDelegate(parent)
+, m_pTableView(NULL)
 {
     m_fPlotHeight = 80;//m_qSettings.value("RawDelegate/plotheight").toDouble();
-    m_fDx = 1.0f;//m_qSettings.value("RawDelegate/dx").toDouble();
     m_nhlines = 10;//m_qSettings.value("RawDelegate/nhlines").toDouble();
 
 //    Q_UNUSED(parent);
@@ -161,6 +161,10 @@ void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, 
     float y_base = path.currentPosition().y();
     QPointF qSamplePosition;
 
+    float fDx = 1.0f;
+    if(m_pTableView)
+        fDx = ((float)m_pTableView->width()) / (static_cast<const RealTimeMultiSampleArrayModel*>(index.model()))->m_iMaxSamples;
+
     //create lines from one to the next sample
     for(qint32 i = 0; i < data.size(); ++i) {
         float val = data[i];
@@ -169,7 +173,7 @@ void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, 
         float newY = y_base+fValue;
 
         qSamplePosition.setY(newY);
-        qSamplePosition.setX(path.currentPosition().x()+m_fDx);
+        qSamplePosition.setX(path.currentPosition().x()+fDx);
 
         path.lineTo(qSamplePosition);
     }
@@ -180,13 +184,19 @@ void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, 
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayDelegate::createGridPath(QPainterPath& path, QList< QVector<float> >& data) const
+void RealTimeMultiSampleArrayDelegate::createGridPath(const QModelIndex &index, QPainterPath& path, QList< QVector<float> >& data) const
 {
     //horizontal lines
     float distance = m_fPlotHeight/m_nhlines;
 
     QPointF startpos = path.currentPosition();
-    QPointF endpoint(path.currentPosition().x()+data[0].size()*data.size()*m_fDx,path.currentPosition().y());
+
+
+    float fDx = 1.0f;
+    if(m_pTableView)
+        fDx = ((float)m_pTableView->width()) / (static_cast<const RealTimeMultiSampleArrayModel*>(index.model()))->m_iMaxSamples;
+
+    QPointF endpoint(path.currentPosition().x()+data[0].size()*data.size()*fDx,path.currentPosition().y());
 
     for(qint8 i=0; i < m_nhlines-1; ++i) {
         endpoint.setY(endpoint.y()+distance);

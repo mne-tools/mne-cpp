@@ -108,6 +108,7 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
 , m_pTableView(NULL)
 , m_pRTMSA(pRTMSA)
 , m_bInitialized(false)
+, m_fSamplingRate(1024)
 {
     m_pActionSelectRoi = new QAction(QIcon(":/images/selectRoi.png"), tr("Shows the region selection widget (F12)"),this);
     m_pActionSelectRoi->setShortcut(tr("F12"));
@@ -147,6 +148,7 @@ void RealTimeMultiSampleArrayWidget::update(XMEASLIB::NewMeasurement::SPtr)
     if(!m_bInitialized)
     {
         m_qListChInfo = m_pRTMSA->chInfo();
+        m_fSamplingRate = m_pRTMSA->getSamplingRate();
         init();
     }
     else
@@ -165,17 +167,16 @@ void RealTimeMultiSampleArrayWidget::init()
         m_pRTMSAModel = new RealTimeMultiSampleArrayModel(this);
 
         m_pRTMSAModel->setChannelInfo(m_qListChInfo);
+        m_pRTMSAModel->setSamplingInfo(m_fSamplingRate, 10, 128);
 
         if(m_pRTMSADelegate)
             delete m_pRTMSADelegate;
         m_pRTMSADelegate = new RealTimeMultiSampleArrayDelegate(this);
 
+        m_pRTMSADelegate->setParentTableView(m_pTableView);
+
         m_pTableView->setModel(m_pRTMSAModel);
         m_pTableView->setItemDelegate(m_pRTMSADelegate);
-
-
-
-
 
 
         //set some size settings for m_pTableView
@@ -211,7 +212,6 @@ void RealTimeMultiSampleArrayWidget::init()
 
 void RealTimeMultiSampleArrayWidget::resizeEvent(QResizeEvent*)
 {
-
 }
 
 
