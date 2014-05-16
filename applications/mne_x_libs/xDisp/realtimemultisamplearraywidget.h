@@ -160,14 +160,6 @@ public:
     virtual void init();
 
 protected:
-    //=========================================================================================================
-    /**
-    * Is called to paint the incoming real-time data.
-    * Function is painting the real-time curve, the grid, the measurement curve (when left button is pressed) and is calculating the zoom (when right button is pressed -> ToDo it's maybe better done in press event directly).
-    *
-    * @param [in] event pointer to PaintEvent -> not used.
-    */
-    virtual void paintEvent( QPaintEvent* event );
 
     //=========================================================================================================
     /**
@@ -231,82 +223,13 @@ protected:
     */
     virtual void wheelEvent(QWheelEvent* wheelEvent);
 
-private slots:
-
-    //=========================================================================================================
-    /**
-    * Stops the Annotation
-    */
-    void stopAnnotation();
-
-    //=========================================================================================================
-    /**
-    * Sets a new maximal value to the real time sample array.
-    * This is used for zooming functionality.
-    */
-    void maxValueChanged(double maxValue);
-
-    //=========================================================================================================
-    /**
-    * Sets a new minimal value to the real time sample array.
-    * This is used for zooming functionality.
-    */
-    void minValueChanged(double);
-
 private:
     QSharedPointer<NewRealTimeMultiSampleArray> m_pRTMSA_New;       /**< The real-time sample array measurement. */
 
     void actualize();                                               /**< Actualize member variables. Like y position, scaling factor, middle value of the frame and the highest sampling rate to calculate the sample width.*/
 
-#ifdef NEWTABLEVIEW
-
     QTableView *m_pTableView; /**< the QTableView being part of the model/view framework of Qt */
 
-#else
-    Ui::NewRealTimeMultiSampleArrayClass   ui;                      /**< The user interface of the RealTimeSampleArray widget. */
-
-    quint32                         m_uiMaxNumChannels;
-    quint32                         m_uiNumChannels;
-    quint32                          m_uiFirstChannel;
-
-    QPainterPath                    m_qPainterPath;                 /**< The current painter path which is the real-time curve. */
-    QPainterPath                    m_qPainterPathTest;
-    QVector<QPainterPath>           m_qVecPainterPath;
-    QVector<QPolygonF>              m_qVecPolygonF; //New
-
-    QPainterPath                    m_qPainterPath_Freeze;          /**< The frozen painter path which is the frozen real-time curve. */
-    QPainterPath                    m_qPainterPath_FreezeTest;
-    QVector<QPainterPath>           m_qVecPainterPath_Freeze;
-    QVector<QPolygonF>              m_qVecPolygonF_Freeze; //New
-
-    QMutex                          m_qMutex;                       /**< A mutex to make the access to the painter path thread safe. */
-    bool                            m_bMeasurement;                 /**< Current status whether curve measurement is active (left mouse). */
-    bool                            m_bPosition;                    /**< Current status whether current coordinates should be shown. */
-    bool                            m_bFrozen;                      /**< Current status whether curve is frozen. */
-    bool                            m_bScaling;                     /**< Current status whether scaling of curve is active. */
-    bool                            m_bToolInUse;                   /**< Current status whether tool (annotation/freezing) is active. */
-    QPoint                          m_qPointMouseStartPosition;     /**< Mouse start position which is the position where mouse was first pressed. */
-    QPoint                          m_qPointMouseEndPosition;       /**< Mouse end position which is current mouse position. */
-    float                           m_fScaleFactor;                 /**< Current scaling factor -> renewed over actualize. */
-    double                          m_dMinValue_init;               /**< The initial minimal value */
-    double                          m_dMaxValue_init;               /**< The initial maximal value */
-    qint32                          m_iSamples;                     /**< The current number of samples. */
-    qint32                          m_iSampleCount;                 /**< The current sample count. */
-    double                          m_dMiddle;                      /**< The current middle value depending on the current scaling factor -> renewed over actualize. */
-    double                          m_dPosition;                    /**< The start position which is the x position of the frame. */
-    double                          m_dSampleWidth;                 /**< Sample distance to synchronize all real-time sample array widgets independent from their sampling rate. */
-    double                          m_dPosX;                        /**< The x position of the frame. */
-    double                          m_dPosY;                        /**< The middle y position of the frame. */
-    bool                            m_bStartFlag;                   /**< Status whether the real-time curve should be restarted. */
-    std::vector<QString>            m_vecTool;                      /**< The available tools. */
-    unsigned char                   m_ucToolIndex;                  /**< The selected tool index. */
-    QSharedPointer<QTimer>          m_pTimerToolDisplay;            /**< Timer for blending the tool label. */
-    QSharedPointer<QTimer>          m_pTimerUpdate;                 /**< Timer which is caring about a continuous paint update of the widget. */
-    QSharedPointer<QTime>           m_pTime;                        /**< The application time. */
-    QSharedPointer<QTime>           m_pTimeCurrentDisplay;          /**< Time which corresponds to the x starting position of each segment. */
-    static QList<double>            s_listSamplingRates;            /**< All real-time sample array sampling rates of the current display. */
-
-#endif
 
     QAction*                        m_pActionSelectRoi;     /**< show roi select widget ToDo move this to the actual view-> and make a dynamical menu*/
 
