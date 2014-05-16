@@ -18,11 +18,6 @@ public:
         return m_fPlotHeight;
     }
 
-    void setParentTableView(QTableView *pTableView)
-    {
-        m_pTableView = pTableView;
-    }
-
 private:
     //=========================================================================================================
     /**
@@ -31,7 +26,7 @@ private:
     * @param[in] index QModelIndex for accessing associated data and model object.
     * @param[in,out] path The QPointerPath to create for the data plot.
     */
-    void createPlotPath(const QModelIndex &index, QPainterPath& path, QVector<float>& data) const;
+    void createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QVector<float>& data) const;
 
     //=========================================================================================================
     /**
@@ -40,7 +35,7 @@ private:
     * @param[in,out] path The row vector of the data matrix <1 x nsamples>.
     * @param[in] data The row vector of the data matrix <1 x nsamples>.
     */
-    void createGridPath(const QModelIndex &index, QPainterPath& path, QList<  QVector<float> >& data) const;
+    void createGridPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QList<  QVector<float> >& data) const;
 
     //Settings
     qint8 m_nhlines;        /**< Number of horizontal lines for the grid plot */
@@ -53,8 +48,6 @@ private:
     // Scaling
     float m_fMaxValue;     /**< Maximum value of the data to plot  */
     float m_fScaleY;       /**< Maximum amplitude of plot (max is m_dPlotHeight/2) */
-
-    QTableView* m_pTableView;   /**< Holds connected table view to determine display width */
 };
 
 #endif // REALTIMEMULTISAMPLEARRAYDELEGATE_H
