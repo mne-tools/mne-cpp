@@ -101,12 +101,12 @@ enum Tool
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA_New, QSharedPointer<QTime> &pTime, QWidget* parent)
+RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA, QSharedPointer<QTime> &pTime, QWidget* parent)
 : NewMeasurementWidget(parent)
 , m_pRTMSAModel(NULL)
 , m_pRTMSADelegate(NULL)
 , m_pTableView(NULL)
-, m_pRTMSA_New(pRTMSA_New)
+, m_pRTMSA(pRTMSA)
 , m_bInitialized(false)
 {
     m_pActionSelectRoi = new QAction(QIcon(":/images/selectRoi.png"), tr("Shows the region selection widget (F12)"),this);
@@ -146,10 +146,11 @@ void RealTimeMultiSampleArrayWidget::update(XMEASLIB::NewMeasurement::SPtr)
 {
     if(!m_bInitialized)
     {
-        m_qListChInfo = m_pRTMSA_New->chInfo();
+        m_qListChInfo = m_pRTMSA->chInfo();
         init();
     }
-
+    else
+        m_pRTMSAModel->addData(m_pRTMSA->getMultiSampleArray());
 }
 
 

@@ -25,7 +25,7 @@ private:
     * @param[in] index QModelIndex for accessing associated data and model object.
     * @param[in,out] path The QPointerPath to create for the data plot.
     */
-    void createPlotPath(const QModelIndex &index, QPainterPath& path, QList< QVector<float> >& data) const;
+    void createPlotPath(const QModelIndex &index, QPainterPath& path, QVector<float>& data) const;
 
     //=========================================================================================================
     /**
