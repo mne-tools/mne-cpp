@@ -4,6 +4,7 @@
 #include <QAbstractItemDelegate>
 #include <QTableView>
 
+
 class RealTimeMultiSampleArrayDelegate : public QAbstractItemDelegate
 {
     Q_OBJECT
@@ -26,7 +27,7 @@ private:
     * @param[in] index QModelIndex for accessing associated data and model object.
     * @param[in,out] path The QPointerPath to create for the data plot.
     */
-    void createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QVector<float>& data) const;
+    void createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QPainterPath& lastPath, QVector<float>& data, QVector<float>& lastData) const;
 
     //=========================================================================================================
     /**
