@@ -59,11 +59,21 @@ QVariant RealTimeMultiSampleArrayModel::data(const QModelIndex &index, int role)
             switch(role) {
                 case Qt::DisplayRole: {
                     //pack all adjacent (after reload) RowVectorPairs into a QList
-                    QVector<float> qVector;
-                    for(qint16 i=0; i < m_dataCurrent.size(); ++i)
-                        qVector.append(m_dataCurrent[i](index.row()));
+                    QList< QVector<float> > qListVector;
 
-                    v.setValue(qVector);
+                    // data
+                    QVector<float> data;
+                    for(qint16 i=0; i < m_dataCurrent.size(); ++i)
+                        data.append(m_dataCurrent[i](index.row()));
+                    qListVector.append(data);
+
+                    // last data
+                    QVector<float> lastData;
+                    for(qint16 i=0; i < m_dataLast.size(); ++i)
+                        lastData.append(m_dataLast[i](index.row()));
+                    qListVector.append(lastData);
+
+                    v.setValue(qListVector);
                     return v;
                     break;
                 }

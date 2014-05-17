@@ -59,7 +59,7 @@ void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOpti
 
             //Get data
             QVariant variant = index.model()->data(index,Qt::DisplayRole);
-            QVector<float> data = variant.value< QVector<float> >();
+            QList< QVector<float> > data = variant.value< QList< QVector<float> > >();
 
             if(data.size()>0)
             {
@@ -79,15 +79,24 @@ void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOpti
     //            painter->drawPath(path);
     //            painter->restore();
 
-    //            //Plot data path
-    //            path = QPainterPath(QPointF(0,0));//QPointF(option.rect.x()+t_rtmsaModel->relFiffCursor(),option.rect.y()));
+                //Plot data path
+                path = QPainterPath(QPointF(option.rect.x(),option.rect.y()));//QPointF(option.rect.x()+t_rtmsaModel->relFiffCursor(),option.rect.y()));
+                QPainterPath lastPath(QPointF(option.rect.x(),option.rect.y()));
 
-                createPlotPath(index,option,path,data);
+                createPlotPath(index, option, path, lastPath, data[0], data[1]);
 
+                painter->save();
                 painter->translate(0,m_fPlotHeight/2);
-
                 painter->setRenderHint(QPainter::Antialiasing, true);
+                painter->setPen(QPen(Qt::darkBlue, 1, Qt::SolidLine));
                 painter->drawPath(path);
+                painter->restore();
+
+                //Plot last data path
+                painter->translate(0,m_fPlotHeight/2);
+                painter->setRenderHint(QPainter::Antialiasing, true);
+                painter->setPen(QPen(Qt::darkBlue, 1, Qt::SolidLine));
+                painter->drawPath(lastPath);
 
                 painter->restore();
             }
@@ -124,7 +133,7 @@ QSize RealTimeMultiSampleArrayDelegate::sizeHint(const QStyleOptionViewItem &opt
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QVector<float>& data) const
+void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QPainterPath& lastPath, QVector<float>& data, QVector<float>& lastData) const
 {
     //get maximum range of respective channel type (range value in FiffChInfo does not seem to contain a reasonable value)
     qint32 kind = (static_cast<const RealTimeMultiSampleArrayModel*>(index.model()))->m_qListChInfo[index.row()].getKind();
@@ -162,8 +171,23 @@ void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, 
 
     float fDx = ((float)option.rect.width()) / (static_cast<const RealTimeMultiSampleArrayModel*>(index.model()))->m_iMaxSamples;
 
+    //Move to initial starting point
+    if(data.size() > 0)
+    {
+        float val = data[0];
+        fValue = val*fScaleY;
+
+        float newY = y_base+fValue;
+
+        qSamplePosition.setY(newY);
+        qSamplePosition.setX(path.currentPosition().x());
+
+        path.moveTo(qSamplePosition);
+    }
+
     //create lines from one to the next sample
-    for(qint32 i = 0; i < data.size(); ++i) {
+    qint32 i;
+    for(i = 1; i < data.size(); ++i) {
         float val = data[i];
         fValue = val*fScaleY;
 
@@ -173,6 +197,23 @@ void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, 
         qSamplePosition.setX(path.currentPosition().x()+fDx);
 
         path.lineTo(qSamplePosition);
+    }
+
+    //create lines from one to the next sample for last path
+    qint32 offset = 10;
+    qSamplePosition.setX(qSamplePosition.x() + fDx*offset);
+    lastPath.moveTo(qSamplePosition);
+
+    for(i += offset; i < lastData.size(); ++i) {
+        float val = lastData[i];
+        fValue = val*fScaleY;
+
+        float newY = y_base+fValue;
+
+        qSamplePosition.setY(newY);
+        qSamplePosition.setX(lastPath.currentPosition().x()+fDx);
+
+        lastPath.lineTo(qSamplePosition);
     }
 
 //    qDebug("Plot-PainterPath created!");
