@@ -14,11 +14,6 @@ public:
     virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
     virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
-    inline float getHeight()
-    {
-        return m_fPlotHeight;
-    }
-
 private:
     //=========================================================================================================
     /**
@@ -41,10 +36,6 @@ private:
     //Settings
     qint8 m_nhlines;        /**< Number of horizontal lines for the grid plot */
 //    QSettings m_qSettings;
-
-
-    // Plots settings
-    float m_fPlotHeight;   /**< The height of the plot */
 
     // Scaling
     float m_fMaxValue;     /**< Maximum value of the data to plot  */
