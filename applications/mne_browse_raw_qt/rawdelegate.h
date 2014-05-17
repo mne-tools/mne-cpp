@@ -116,7 +116,7 @@ public:
     virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
     // Plots settings
-    double m_dPlotHeight;   /**< The height of the plot */
+    double m_dDefaultPlotHeight;   /**< The height of the plot */
 
     // Scaling
     double m_dMaxValue;     /**< Maximum value of the data to plot  */
@@ -131,7 +131,7 @@ private:
     * @param[in] index QModelIndex for accessing associated data and model object.
     * @param[in,out] path The QPointerPath to create for the data plot.
     */
-    void createPlotPath(const QModelIndex &index, QPainterPath& path, QList<RowVectorPair>& listPairs) const;
+    void createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QList<RowVectorPair>& listPairs) const;
 
     //=========================================================================================================
     /**
@@ -140,7 +140,7 @@ private:
     * @param[in,out] path The row vector of the data matrix <1 x nsamples>.
     * @param[in] data The row vector of the data matrix <1 x nsamples>.
     */
-    void createGridPath(QPainterPath& path, QList<RowVectorPair>& listPairs) const;
+    void createGridPath(QPainterPath& path, const QStyleOptionViewItem &option, QList<RowVectorPair>& listPairs) const;
 
     //Settings
     qint8 m_nhlines;        /**< Number of horizontal lines for the grid plot */
