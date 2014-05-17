@@ -16,7 +16,6 @@
 RealTimeMultiSampleArrayDelegate::RealTimeMultiSampleArrayDelegate(QObject *parent)
 : QAbstractItemDelegate(parent)
 {
-    m_fPlotHeight = 80;//m_qSettings.value("RawDelegate/plotheight").toDouble();
     m_nhlines = 10;//m_qSettings.value("RawDelegate/nhlines").toDouble();
 
 //    Q_UNUSED(parent);
@@ -27,12 +26,13 @@ RealTimeMultiSampleArrayDelegate::RealTimeMultiSampleArrayDelegate(QObject *pare
 
 void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
+    float t_fPlotHeight = option.rect.height();
     switch(index.column()) {
         case 0: { //chnames
             painter->save();
 
             painter->rotate(-90);
-            painter->drawText(QRectF(-option.rect.y()-m_fPlotHeight,0,m_fPlotHeight,20),Qt::AlignCenter,index.model()->data(index,Qt::DisplayRole).toString());
+            painter->drawText(QRectF(-option.rect.y()-t_fPlotHeight,0,t_fPlotHeight,20),Qt::AlignCenter,index.model()->data(index,Qt::DisplayRole).toString());
 
             painter->restore();
             break;
@@ -86,14 +86,14 @@ void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOpti
                 createPlotPath(index, option, path, lastPath, data[0], data[1]);
 
                 painter->save();
-                painter->translate(0,m_fPlotHeight/2);
+                painter->translate(0,t_fPlotHeight/2);
                 painter->setRenderHint(QPainter::Antialiasing, true);
                 painter->setPen(QPen(Qt::darkBlue, 1, Qt::SolidLine));
                 painter->drawPath(path);
                 painter->restore();
 
                 //Plot last data path
-                painter->translate(0,m_fPlotHeight/2);
+                painter->translate(0,t_fPlotHeight/2);
                 painter->setRenderHint(QPainter::Antialiasing, true);
                 painter->setPen(QPen(Qt::darkBlue, 1, Qt::SolidLine));
                 painter->drawPath(lastPath);
@@ -115,7 +115,7 @@ QSize RealTimeMultiSampleArrayDelegate::sizeHint(const QStyleOptionViewItem &opt
 
     switch(index.column()) {
     case 0:
-        size = QSize(20,m_fPlotHeight);
+        size = QSize(20,option.rect.height());
         break;
     case 1:
         QList< QVector<float> > data = index.model()->data(index).value< QList<QVector<float> > >();
@@ -164,7 +164,7 @@ void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, 
     }
 
     float fValue;
-    float fScaleY = m_fPlotHeight/(2*fMaxValue);
+    float fScaleY = option.rect.height()/(2*fMaxValue);
 
     float y_base = path.currentPosition().y();
     QPointF qSamplePosition;
@@ -225,7 +225,7 @@ void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, 
 void RealTimeMultiSampleArrayDelegate::createGridPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QList< QVector<float> >& data) const
 {
     //horizontal lines
-    float distance = m_fPlotHeight/m_nhlines;
+    float distance = option.rect.height()/m_nhlines;
 
     QPointF startpos = path.currentPosition();
 

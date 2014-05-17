@@ -183,7 +183,7 @@ void RealTimeMultiSampleArrayWidget::init()
 
         m_pTableView->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch); //Stretch 2 column to maximal width
         m_pTableView->horizontalHeader()->hide();
-        m_pTableView->verticalHeader()->setDefaultSectionSize(m_pRTMSADelegate->getHeight());
+        m_pTableView->verticalHeader()->setDefaultSectionSize(80.0f);//Row Height
 
         m_pTableView->setAutoScroll(false);
         m_pTableView->setColumnHidden(0,true); //because content is plotted jointly with column=1
