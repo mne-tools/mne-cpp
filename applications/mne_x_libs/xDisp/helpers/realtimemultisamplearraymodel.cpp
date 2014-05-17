@@ -164,8 +164,6 @@ void RealTimeMultiSampleArrayModel::setSamplingInfo(float sps, float T, float de
 
 void RealTimeMultiSampleArrayModel::addData(const QVector<VectorXd> &data)
 {
-    beginResetModel();
-
     //Downsampling ->ToDo make this more accurate
     qint32 i;
     for(i = m_iCurrentSample; i < data.size(); i += m_iDownsampling)
@@ -181,5 +179,9 @@ void RealTimeMultiSampleArrayModel::addData(const QVector<VectorXd> &data)
         m_dataCurrent.remove(0, m_iMaxSamples);
     }
 
-    endResetModel();
+    //Update data content
+    QModelIndex topLeft = this->index(0,1);
+    QModelIndex bottomRight = this->index(m_qListChInfo.size()-1,1);
+    QVector<int> roles; roles << Qt::DisplayRole;
+    emit dataChanged(topLeft, bottomRight, roles);
 }
