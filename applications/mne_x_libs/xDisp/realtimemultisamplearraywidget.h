@@ -153,6 +153,9 @@ public:
     */
     virtual void init();
 
+public slots:
+    void channelContextMenu(QPoint pos);
+
 protected:
 
     //=========================================================================================================
