@@ -8,6 +8,7 @@
 //=============================================================================================================
 
 #include <xMeas/realtimesamplearraychinfo.h>
+#include <fiff/fiff_types.h>
 
 
 //*************************************************************************************************************
@@ -25,6 +26,7 @@
 //=============================================================================================================
 
 using namespace XMEASLIB;
+using namespace FIFFLIB;
 using namespace Eigen;
 
 
@@ -35,8 +37,6 @@ using namespace Eigen;
 class RealTimeMultiSampleArrayModel : public QAbstractTableModel
 {
     Q_OBJECT
-
-    friend class RealTimeMultiSampleArrayDelegate;
 public:
     RealTimeMultiSampleArrayModel(QObject *parent = 0);
 
@@ -51,8 +51,20 @@ public:
 
     void addData(const QVector<VectorXd> &data);
 
+    fiff_int_t getKind(qint32 row) const;
+
+    fiff_int_t getUnit(qint32 row) const;
+
+    inline qint32 getMaxSamples() const;
+
+    void selectRows(const QVector<qint32> &selection);
+
+    void resetSelection();
+
 private:
     QList<RealTimeSampleArrayChInfo> m_qListChInfo; /**< Channel info list.*/
+
+    QMap<int,int> m_qMapIdxRowSelection;            /**< Selection mapping.*/
 
     //Fiff data structure
     QVector<VectorXd> m_dataCurrent;        /**< List that holds the fiff matrix data <n_channels x n_samples> */
@@ -64,5 +76,11 @@ private:
     qint32 m_iMaxSamples;   /**< Max samples per window */
     qint32 m_iCurrentSample; /**< Accurate Downsampling */
 };
+
+
+inline qint32 RealTimeMultiSampleArrayModel::getMaxSamples() const
+{
+    return m_iMaxSamples;
+}
 
 #endif // REALTIMEMULTISAMPLEARRAYMODEL_H

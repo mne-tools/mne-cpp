@@ -135,13 +135,15 @@ QSize RealTimeMultiSampleArrayDelegate::sizeHint(const QStyleOptionViewItem &opt
 
 void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QPainterPath& lastPath, QVector<float>& data, QVector<float>& lastData) const
 {
+    const RealTimeMultiSampleArrayModel* t_pModel = static_cast<const RealTimeMultiSampleArrayModel*>(index.model());
+
     //get maximum range of respective channel type (range value in FiffChInfo does not seem to contain a reasonable value)
-    qint32 kind = (static_cast<const RealTimeMultiSampleArrayModel*>(index.model()))->m_qListChInfo[index.row()].getKind();
+    qint32 kind = t_pModel->getKind(index.row());
     float fMaxValue = 1e-9f;
 
     switch(kind) {
         case FIFFV_MEG_CH: {
-            qint32 unit = (static_cast<const RealTimeMultiSampleArrayModel*>(index.model()))->m_qListChInfo[index.row()].getUnit();
+            qint32 unit =t_pModel->getUnit(index.row());
             if(unit == FIFF_UNIT_T_M) {
                 fMaxValue = 1e-10f;// m_qSettings.value("RawDelegate/max_meg_grad").toDouble();
             }
@@ -169,7 +171,7 @@ void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, 
     float y_base = path.currentPosition().y();
     QPointF qSamplePosition;
 
-    float fDx = ((float)option.rect.width()) / (static_cast<const RealTimeMultiSampleArrayModel*>(index.model()))->m_iMaxSamples;
+    float fDx = ((float)option.rect.width()) / t_pModel->getMaxSamples();
 
     //Move to initial starting point
     if(data.size() > 0)
@@ -230,7 +232,7 @@ void RealTimeMultiSampleArrayDelegate::createGridPath(const QModelIndex &index, 
     QPointF startpos = path.currentPosition();
 
 
-    float fDx = ((float)option.rect.width()) / (static_cast<const RealTimeMultiSampleArrayModel*>(index.model()))->m_iMaxSamples;
+    float fDx = ((float)option.rect.width()) / (static_cast<const RealTimeMultiSampleArrayModel*>(index.model()))->getMaxSamples();
 
     QPointF endpoint(path.currentPosition().x()+data[0].size()*data.size()*fDx,path.currentPosition().y());
 

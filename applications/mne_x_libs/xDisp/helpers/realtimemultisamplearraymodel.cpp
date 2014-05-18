@@ -25,8 +25,8 @@ RealTimeMultiSampleArrayModel::RealTimeMultiSampleArrayModel(QObject *parent)
 //virtual functions
 int RealTimeMultiSampleArrayModel::rowCount(const QModelIndex & /*parent*/) const
 {
-    if(!m_qListChInfo.empty())
-        return m_qListChInfo.size();
+    if(!m_qMapIdxRowSelection.empty())
+        return m_qMapIdxRowSelection.size();
     else
         return 0;
 }
@@ -48,9 +48,11 @@ QVariant RealTimeMultiSampleArrayModel::data(const QModelIndex &index, int role)
         return QVariant();
 
     if (index.isValid()) {
+        qint32 row = m_qMapIdxRowSelection[index.row()];
+
         //******** first column (chname) ********
         if(index.column() == 0 && role == Qt::DisplayRole)
-            return QVariant(m_qListChInfo[index.row()].getChannelName());
+            return QVariant(m_qListChInfo[row].getChannelName());
 
         //******** second column (data plot) ********
         if(index.column()==1) {
@@ -63,14 +65,14 @@ QVariant RealTimeMultiSampleArrayModel::data(const QModelIndex &index, int role)
 
                     // data
                     QVector<float> data;
-                    for(qint16 i=0; i < m_dataCurrent.size(); ++i)
-                        data.append(m_dataCurrent[i](index.row()));
+                    for(qint32 i = 0; i < m_dataCurrent.size(); ++i)
+                        data.append(m_dataCurrent[i](row));
                     qListVector.append(data);
 
                     // last data
                     QVector<float> lastData;
-                    for(qint16 i=0; i < m_dataLast.size(); ++i)
-                        lastData.append(m_dataLast[i](index.row()));
+                    for(qint32 i=0; i < m_dataLast.size(); ++i)
+                        lastData.append(m_dataLast[i](row));
                     qListVector.append(lastData);
 
                     v.setValue(qListVector);
@@ -78,10 +80,10 @@ QVariant RealTimeMultiSampleArrayModel::data(const QModelIndex &index, int role)
                     break;
                 }
                 case Qt::BackgroundRole: {
-//                    if(m_fiffInfo.bads.contains(m_chInfolist[index.row()].ch_name)) {
+//                    if(m_fiffInfo.bads.contains(m_chInfolist[row].ch_name)) {
 //                        QBrush brush;
 //                        brush.setStyle(Qt::SolidPattern);
-//    //                    qDebug() << m_chInfolist[index.row()].ch_name << "is marked as bad, index:" << index.row();
+//    //                    qDebug() << m_chInfolist[row].ch_name << "is marked as bad, index:" << row;
 //                        brush.setColor(Qt::red);
 //                        return QVariant(brush);
 //                    }
@@ -139,6 +141,8 @@ void RealTimeMultiSampleArrayModel::setChannelInfo(QList<RealTimeSampleArrayChIn
     beginResetModel();
     m_qListChInfo = chInfo;
     endResetModel();
+
+    resetSelection();
 }
 
 
@@ -184,4 +188,69 @@ void RealTimeMultiSampleArrayModel::addData(const QVector<VectorXd> &data)
     QModelIndex bottomRight = this->index(m_qListChInfo.size()-1,1);
     QVector<int> roles; roles << Qt::DisplayRole;
     emit dataChanged(topLeft, bottomRight, roles);
+}
+
+
+//*************************************************************************************************************
+
+fiff_int_t RealTimeMultiSampleArrayModel::getKind(qint32 row) const
+{
+    if(row < m_qMapIdxRowSelection.size())
+    {
+        qint32 chRow = m_qMapIdxRowSelection[row];
+        return m_qListChInfo[chRow].getKind();;
+    }
+    else
+        return 0;
+
+}
+
+
+//*************************************************************************************************************
+
+fiff_int_t RealTimeMultiSampleArrayModel::getUnit(qint32 row) const
+{
+    if(row < m_qMapIdxRowSelection.size())
+    {
+        qint32 chRow = m_qMapIdxRowSelection[row];
+        return m_qListChInfo[chRow].getUnit();;
+    }
+    else
+        return -1;
+}
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayModel::selectRows(const QVector<qint32> &selection)
+{
+    beginResetModel();
+
+    m_qMapIdxRowSelection.clear();
+
+    qint32 count = 0;
+    for(qint32 i = 0; i < selection.size(); ++i)
+    {
+        if(selection[i] < m_qListChInfo.size())
+        {
+            m_qMapIdxRowSelection.insert(count,selection[i]);
+            ++count;
+        }
+    }
+
+    endResetModel();
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayModel::resetSelection()
+{
+    beginResetModel();
+
+    m_qMapIdxRowSelection.clear();
+
+    for(qint32 i = 0; i < m_qListChInfo.size(); ++i)
+        m_qMapIdxRowSelection.insert(i,i);
+
+    endResetModel();
 }
