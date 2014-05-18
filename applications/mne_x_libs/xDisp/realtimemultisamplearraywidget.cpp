@@ -236,19 +236,33 @@ void RealTimeMultiSampleArrayWidget::channelContextMenu(QPoint pos)
     //get selected items
     QModelIndexList selected = m_pTableView->selectionModel()->selectedIndexes();
 
-    QVector<qint32> vecSelection;
+//    // Lambda C++11 version
+//    QVector<qint32> vecSelection;
+//    for(qint32 i = 0; i < selected.size(); ++i)
+//        if(selected[i].column() == 1)
+//            vecSelection.append(m_pRTMSAModel->getIdxSelMap()[selected[i].row()]);
+
+//    //create custom context menu and actions
+//    QMenu *menu = new QMenu(this);
+
+//    //select channels
+//    QAction* doSelection = menu->addAction(tr("Apply selection"));
+//    connect(doSelection,&QAction::triggered, [=](){
+//        m_pRTMSAModel->selectRows(vecSelection);
+//    });
+
+    // non C++11 alternative
+    m_qVecCurrentSelection.clear();
     for(qint32 i = 0; i < selected.size(); ++i)
         if(selected[i].column() == 1)
-            vecSelection.append(m_pRTMSAModel->getIdxSelMap()[selected[i].row()]);
+            m_qVecCurrentSelection.append(m_pRTMSAModel->getIdxSelMap()[selected[i].row()]);
 
     //create custom context menu and actions
     QMenu *menu = new QMenu(this);
 
     //select channels
     QAction* doSelection = menu->addAction(tr("Apply selection"));
-    connect(doSelection,&QAction::triggered, [=](){
-        m_pRTMSAModel->selectRows(vecSelection);
-    });
+    connect(doSelection, &QAction::triggered, this, &RealTimeMultiSampleArrayWidget::applySelection);
 
     //undo selection
     QAction* undoApplySelection = menu->addAction(tr("Undo selection"));
@@ -323,4 +337,12 @@ void RealTimeMultiSampleArrayWidget::showRoiSelectionWidget()
 
     m_pRoiSelectionWidget->show();
 
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayWidget::applySelection()
+{
+    m_pRTMSAModel->selectRows(m_qVecCurrentSelection);
 }
