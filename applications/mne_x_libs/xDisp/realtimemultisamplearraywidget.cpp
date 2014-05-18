@@ -192,6 +192,22 @@ void RealTimeMultiSampleArrayWidget::init()
 
         m_pTableView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
 
+
+        //TEST
+
+//        QVector<qint32> selection;
+
+//        selection.append(366);
+//        selection.append(2);
+//        selection.append(2);
+//        selection.append(0);
+//        selection.append(1);
+//        selection.append(2);
+
+//        m_pRTMSAModel->selectRows(selection);
+
+        //TEST END
+
 //        //set context menu
 //        m_pTableView->setContextMenuPolicy(Qt::CustomContextMenu);
 //        connect(m_pTableView,SIGNAL(customContextMenuRequested(QPoint)),this,SLOT(customContextMenuRequested(QPoint)));
