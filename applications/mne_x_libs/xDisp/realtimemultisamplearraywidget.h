@@ -235,11 +235,11 @@ private:
 
 
     QAction*    m_pActionSelectRoi;                         /**< show roi select widget ToDo move this to the actual view-> and make a dynamical menu*/
-
     void showRoiSelectionWidget();                          /**< Implements the show roi selection widget. ToDo: Move this to the actual widget*/
-
     QSharedPointer<XDISPLIB::RoiSelectionWidget> m_pRoiSelectionWidget;    /**< ROI selection widget, ToDo: move this to the xDisp */
 
+    QVector<qint32> m_qVecCurrentSelection;
+    void applySelection();
 };
 
 } // NAMESPACE
