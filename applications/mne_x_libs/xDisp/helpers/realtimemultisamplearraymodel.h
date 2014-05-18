@@ -57,14 +57,17 @@ public:
 
     inline qint32 getMaxSamples() const;
 
+    inline const QMap<qint32,qint32>& getIdxSelMap() const;
+
     void selectRows(const QVector<qint32> &selection);
 
     void resetSelection();
 
+
 private:
     QList<RealTimeSampleArrayChInfo> m_qListChInfo; /**< Channel info list.*/
 
-    QMap<int,int> m_qMapIdxRowSelection;            /**< Selection mapping.*/
+    QMap<qint32,qint32> m_qMapIdxRowSelection;            /**< Selection mapping.*/
 
     //Fiff data structure
     QVector<VectorXd> m_dataCurrent;        /**< List that holds the fiff matrix data <n_channels x n_samples> */
@@ -82,5 +85,13 @@ inline qint32 RealTimeMultiSampleArrayModel::getMaxSamples() const
 {
     return m_iMaxSamples;
 }
+
+
+inline const QMap<qint32,qint32>& RealTimeMultiSampleArrayModel::getIdxSelMap() const
+{
+    return m_qMapIdxRowSelection;
+}
+
+
 
 #endif // REALTIMEMULTISAMPLEARRAYMODEL_H

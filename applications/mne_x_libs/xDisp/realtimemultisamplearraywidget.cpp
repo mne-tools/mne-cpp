@@ -69,7 +69,7 @@
 #include <QTime>
 #include <QVBoxLayout>
 #include <QHeaderView>
-
+#include <QMenu>
 #include <QMessageBox>
 
 #include <QScroller>
@@ -192,6 +192,9 @@ void RealTimeMultiSampleArrayWidget::init()
 
         m_pTableView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
 
+        //set context menu
+        m_pTableView->setContextMenuPolicy(Qt::CustomContextMenu);
+        connect(m_pTableView,SIGNAL(customContextMenuRequested(QPoint)),this,SLOT(channelContextMenu(QPoint)));
 
         //TEST
 
@@ -220,6 +223,39 @@ void RealTimeMultiSampleArrayWidget::init()
 
         m_bInitialized = true;
     }
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayWidget::channelContextMenu(QPoint pos)
+{
+    //obtain index where index was clicked
+    QModelIndex index = m_pTableView->indexAt(pos);
+
+    //get selected items
+    QModelIndexList selected = m_pTableView->selectionModel()->selectedIndexes();
+
+    QVector<qint32> vecSelection;
+    for(qint32 i = 0; i < selected.size(); ++i)
+        if(selected[i].column() == 1)
+            vecSelection.append(m_pRTMSAModel->getIdxSelMap()[selected[i].row()]);
+
+    //create custom context menu and actions
+    QMenu *menu = new QMenu(this);
+
+    //select channels
+    QAction* doSelection = menu->addAction(tr("Apply selection"));
+    connect(doSelection,&QAction::triggered, [=](){
+        m_pRTMSAModel->selectRows(vecSelection);
+    });
+
+    //undo selection
+    QAction* undoApplySelection = menu->addAction(tr("Undo selection"));
+    connect(undoApplySelection,&QAction::triggered, m_pRTMSAModel, &RealTimeMultiSampleArrayModel::resetSelection);
+
+    //show context menu
+    menu->popup(m_pTableView->viewport()->mapToGlobal(pos));
 }
 
 
