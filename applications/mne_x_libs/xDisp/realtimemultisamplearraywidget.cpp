@@ -265,8 +265,8 @@ void RealTimeMultiSampleArrayWidget::channelContextMenu(QPoint pos)
     connect(doSelection, &QAction::triggered, this, &RealTimeMultiSampleArrayWidget::applySelection);
 
     //undo selection
-    QAction* undoApplySelection = menu->addAction(tr("Undo selection"));
-    connect(undoApplySelection,&QAction::triggered, m_pRTMSAModel, &RealTimeMultiSampleArrayModel::resetSelection);
+    QAction* resetAppliedSelection = menu->addAction(tr("Reset selection"));
+    connect(resetAppliedSelection,&QAction::triggered, m_pRTMSAModel, &RealTimeMultiSampleArrayModel::resetSelection);
 
     //show context menu
     menu->popup(m_pTableView->viewport()->mapToGlobal(pos));
