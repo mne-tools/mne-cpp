@@ -1,14 +1,20 @@
-#include "inversemodel.h"
+#include "stcmodel.h"
+#include <mne/mne_sourceestimate.h>
 
-InverseModel::InverseModel(QObject *parent)
+using namespace MNELIB;
+
+
+StcModel::StcModel(QObject *parent)
 : QAbstractTableModel(parent)
+, m_iDownsampling(20)
+, m_iCurrentSample(0)
 {
 }
 
 
 //*************************************************************************************************************
 //virtual functions
-int InverseModel::rowCount(const QModelIndex & /*parent*/) const
+int StcModel::rowCount(const QModelIndex & /*parent*/) const
 {
 //    if(!m_qMapIdxRowSelection.empty())
 //        return m_qMapIdxRowSelection.size();
@@ -19,7 +25,7 @@ int InverseModel::rowCount(const QModelIndex & /*parent*/) const
 
 //*************************************************************************************************************
 
-int InverseModel::columnCount(const QModelIndex & /*parent*/) const
+int StcModel::columnCount(const QModelIndex & /*parent*/) const
 {
     return 2;
 }
@@ -27,7 +33,7 @@ int InverseModel::columnCount(const QModelIndex & /*parent*/) const
 
 //*************************************************************************************************************
 
-QVariant InverseModel::data(const QModelIndex &index, int role) const
+QVariant StcModel::data(const QModelIndex &index, int role) const
 {
 //    if(role != Qt::DisplayRole && role != Qt::BackgroundRole)
 //        return QVariant();
@@ -88,7 +94,7 @@ QVariant InverseModel::data(const QModelIndex &index, int role) const
 
 //*************************************************************************************************************
 
-QVariant InverseModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant StcModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
 //    if(role != Qt::DisplayRole && role != Qt::TextAlignmentRole)
 //        return QVariant();
@@ -116,4 +122,31 @@ QVariant InverseModel::headerData(int section, Qt::Orientation orientation, int 
 //    }
 
     return QVariant();
+}
+
+
+//*************************************************************************************************************
+
+void StcModel::addData(const MNESourceEstimate &stc)
+{
+    //Downsampling ->ToDo make this more accurate
+    qint32 i;
+    for(i = m_iCurrentSample; i < stc.data.cols(); i += m_iDownsampling)
+        m_data.append(stc.data.col(i));
+
+    //store for next buffer
+    m_iCurrentSample = i - stc.data.cols();
+
+//    //ToDo separate worker thread? ToDo 2000 -> size of screen
+//    if(m_dataCurrent.size() > m_iMaxSamples)
+//    {
+//        m_dataLast = m_dataCurrent.mid(0,m_iMaxSamples); // Store last data to keep as background in the display
+//        m_dataCurrent.remove(0, m_iMaxSamples);
+//    }
+
+//    //Update data content
+//    QModelIndex topLeft = this->index(0,1);
+//    QModelIndex bottomRight = this->index(m_qListChInfo.size()-1,1);
+//    QVector<int> roles; roles << Qt::DisplayRole;
+//    emit dataChanged(topLeft, bottomRight, roles);
 }

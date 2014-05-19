@@ -17,6 +17,13 @@
 //=============================================================================================================
 
 #include <QAbstractTableModel>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
 #include <Eigen/Core>
 
 
@@ -70,8 +77,8 @@ private:
     QMap<qint32,qint32> m_qMapIdxRowSelection;            /**< Selection mapping.*/
 
     //Fiff data structure
-    QVector<VectorXd> m_dataCurrent;        /**< List that holds the fiff matrix data <n_channels x n_samples> */
-    QVector<VectorXd> m_dataLast;        /**< List that holds the fiff matrix data <n_channels x n_samples> */
+    QVector<VectorXd> m_dataCurrent;        /**< List that holds the current data*/
+    QVector<VectorXd> m_dataLast;           /**< List that holds the last data */
 
     float m_fSps;           /**< Sampling rate */
     float m_fT;             /**< Time window */
