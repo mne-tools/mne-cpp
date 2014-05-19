@@ -34,19 +34,21 @@ isEmpty( MNE_BINARY_DIR ) {
 MNECPP_CONFIG += withGui
 #MNECPP_CONFIG += withPython
 
-
 contains(MNECPP_CONFIG, withPython) {
     message(Configure Python!)
+
+    PYTHON_DIR = $$system(python $${PWD}/tools/pytools/python.pwd.py)
+
     # include
     PYTHON_INCLUDE_DIR = $$PYTHON_INCLUDE_DIR
     isEmpty( PYTHON_INCLUDE_DIR ) {
-        PYTHON_INCLUDE_DIR = C:/Python33/include
+        PYTHON_INCLUDE_DIR = $$system(python $${PWD}/tools/pytools/python.include.py)
     }
 
     # lib
     PYTHON_LIBRARY_DIR = $$PYTHON_LIBRARY_DIR
     isEmpty( PYTHON_LIBRARY_DIR ) {
-        PYTHON_LIBRARY_DIR = C:/Python33/libs
+        PYTHON_LIBRARY_DIR = $${PYTHON_DIR}/libs
     }
 }
 
