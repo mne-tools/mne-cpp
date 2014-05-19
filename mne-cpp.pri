@@ -31,8 +31,25 @@ isEmpty( MNE_BINARY_DIR ) {
 
 #QT Packages use new qtHaveModule(<package>):
 #MNE cpp config
-MNECPP_CONFIG += isGui
+MNECPP_CONFIG += withGui
+#MNECPP_CONFIG += withPython
+
+
+contains(MNECPP_CONFIG, withPython) {
+    message(Configure Python!)
+    # include
+    PYTHON_INCLUDE_DIR = $$PYTHON_INCLUDE_DIR
+    isEmpty( PYTHON_INCLUDE_DIR ) {
+        PYTHON_INCLUDE_DIR = C:/Python33/include
+    }
+
+    # lib
+    PYTHON_LIBRARY_DIR = $$PYTHON_LIBRARY_DIR
+    isEmpty( PYTHON_LIBRARY_DIR ) {
+        PYTHON_LIBRARY_DIR = C:/Python33/libs
+    }
+}
 
 QMAKE_TARGET_PRODUCT = mne-cpp
 QMAKE_TARGET_DESCRIPTION = MNE Qt 5 based C++ library.
-QMAKE_TARGET_COPYRIGHT = Copyright (C) 2012 Authors of mne-cpp. All rights reserved.
+QMAKE_TARGET_COPYRIGHT = Copyright (C) 2014 Authors of mne-cpp. All rights reserved.
