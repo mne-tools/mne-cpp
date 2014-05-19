@@ -9,9 +9,8 @@ class InverseDelegate : public QAbstractItemDelegate
 public:
     InverseDelegate(QObject *parent = 0);
 
-signals:
+private:
 
-public slots:
 
 };
 
