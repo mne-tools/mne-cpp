@@ -85,8 +85,8 @@ SOURCES += \
     inverseview.cpp \
     inverseviewproducer.cpp \
     brainview.cpp \
-    helpers/inversemodel.cpp \
-    helpers/inversedelegate.cpp
+    helpers/inversedelegate.cpp \
+    helpers/inversemodel.cpp
 
 HEADERS += \
     disp3D_global.h \
@@ -95,8 +95,8 @@ HEADERS += \
     inverseview.h \
     inverseviewproducer.h \
     brainview.h \
-    helpers/inversemodel.h \
-    helpers/inversedelegate.h
+    helpers/inversedelegate.h \
+    helpers/inversemodel.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
