@@ -34,7 +34,7 @@ private:
     void createGridPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QList<  QVector<float> >& data) const;
 
     //Settings
-    qint8 m_nhlines;        /**< Number of horizontal lines for the grid plot */
+    qint32 m_nVLines;       /**< Number of vertical lines for the grid plot */
 //    QSettings m_qSettings;
 
     // Scaling
