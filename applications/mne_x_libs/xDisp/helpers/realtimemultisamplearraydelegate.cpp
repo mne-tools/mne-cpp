@@ -88,7 +88,12 @@ void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOpti
                 painter->save();
                 painter->translate(0,t_fPlotHeight/2);
                 painter->setRenderHint(QPainter::Antialiasing, true);
-                painter->setPen(QPen(Qt::darkBlue, 1, Qt::SolidLine));
+
+                if(option.state & QStyle::State_Selected)
+                    painter->setPen(QPen(Qt::red, 1, Qt::SolidLine));
+                else
+                    painter->setPen(QPen(Qt::darkBlue, 1, Qt::SolidLine));
+
                 painter->drawPath(path);
                 painter->restore();
 
