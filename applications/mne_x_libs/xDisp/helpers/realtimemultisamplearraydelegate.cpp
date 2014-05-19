@@ -16,7 +16,7 @@
 RealTimeMultiSampleArrayDelegate::RealTimeMultiSampleArrayDelegate(QObject *parent)
 : QAbstractItemDelegate(parent)
 {
-    m_nhlines = 10;//m_qSettings.value("RawDelegate/nhlines").toDouble();
+    m_nVLines = 9;//m_qSettings.value("RawDelegate/nhlines").toDouble();
 
 //    Q_UNUSED(parent);
 }
@@ -41,7 +41,7 @@ void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOpti
             painter->save();
 
             //draw special background when channel is marked as bad
-            QVariant v = index.model()->data(index,Qt::BackgroundRole);
+//            QVariant v = index.model()->data(index,Qt::BackgroundRole);
 //            if(v.canConvert<QBrush>() && !(option.state & QStyle::State_Selected)) {
 //                QPointF oldBO = painter->brushOrigin();
 //                painter->setBrushOrigin(option.rect.topLeft());
@@ -67,17 +67,17 @@ void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOpti
 
                 QPainterPath path(QPointF(option.rect.x(),option.rect.y()));//QPointF(option.rect.x()+t_rtmsaModel->relFiffCursor()-1,option.rect.y()));
 
-    //            //Plot grid
-    //            painter->setRenderHint(QPainter::Antialiasing, false);
-    //            createGridPath(path,data);
+                //Plot grid
+                painter->setRenderHint(QPainter::Antialiasing, false);
+                createGridPath(index, option, path,data);
 
-    //            painter->save();
-    //            QPen pen;
-    //            pen.setStyle(Qt::DotLine);
-    //            pen.setWidthF(0.5);
-    //            painter->setPen(pen);
-    //            painter->drawPath(path);
-    //            painter->restore();
+                painter->save();
+                QPen pen;
+                pen.setStyle(Qt::DotLine);
+                pen.setWidthF(0.5);
+                painter->setPen(pen);
+                painter->drawPath(path);
+                painter->restore();
 
                 //Plot data path
                 path = QPainterPath(QPointF(option.rect.x(),option.rect.y()));//QPointF(option.rect.x()+t_rtmsaModel->relFiffCursor(),option.rect.y()));
@@ -227,19 +227,16 @@ void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, 
 void RealTimeMultiSampleArrayDelegate::createGridPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QList< QVector<float> >& data) const
 {
     //horizontal lines
-    float distance = option.rect.height()/m_nhlines;
+    float distance = option.rect.width()/(m_nVLines+1);
 
-    QPointF startpos = path.currentPosition();
+    float yStart = option.rect.topLeft().y();
 
+    float yEnd = option.rect.bottomRight().y();
 
-    float fDx = ((float)option.rect.width()) / (static_cast<const RealTimeMultiSampleArrayModel*>(index.model()))->getMaxSamples();
-
-    QPointF endpoint(path.currentPosition().x()+data[0].size()*data.size()*fDx,path.currentPosition().y());
-
-    for(qint8 i=0; i < m_nhlines-1; ++i) {
-        endpoint.setY(endpoint.y()+distance);
-        path.moveTo(startpos.x(),endpoint.y());
-        path.lineTo(endpoint);
+    for(qint8 i = 0; i < m_nVLines; ++i) {
+        float x = distance*(i+1);
+        path.moveTo(x,yStart);
+        path.lineTo(x,yEnd);
     }
 
 //    qDebug("Grid-PainterPath created!");
