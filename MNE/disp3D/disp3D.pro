@@ -37,7 +37,7 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = lib
 
-QT       += widgets 3d
+QT       += widgets 3d concurrent
 
 DEFINES += DISP3D_LIBRARY
 
@@ -86,7 +86,8 @@ SOURCES += \
     inverseviewproducer.cpp \
     brainview.cpp \
     helpers/stcmodel.cpp \
-    helpers/stcdelegate.cpp
+    helpers/stcdelegate.cpp \
+    helpers/stcworker.cpp
 
 HEADERS += \
     disp3D_global.h \
@@ -96,7 +97,8 @@ HEADERS += \
     inverseviewproducer.h \
     brainview.h \
     helpers/stcmodel.h \
-    helpers/stcdelegate.h
+    helpers/stcdelegate.h \
+    helpers/stcworker.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

@@ -7,14 +7,24 @@
 #include <iostream>
 
 
+
 using namespace MNELIB;
 
 
 StcModel::StcModel(QObject *parent)
 : QAbstractTableModel(parent)
+, m_pThread(new QThread)
+, m_pWorker(new StcWorker)
+, m_bRTMode(true)
 , m_iDownsampling(20)
 , m_iCurrentSample(0)
 {
+    qRegisterMetaType<MatrixXd>("MatrixXd");
+
+    m_pWorker->moveToThread(m_pThread.data());
+    connect(m_pThread.data(), &QThread::started, m_pWorker.data(), &StcWorker::process);
+    m_pThread->start();
+
 }
 
 
@@ -174,3 +184,4 @@ void StcModel::setVertices(const VectorXi &vertnos)
 {
     m_vertices = vertnos;
 }
+
