@@ -1,6 +1,19 @@
 #ifndef STCMODEL_H
 #define STCMODEL_H
 
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "../disp3D_global.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
+
 #include <QAbstractTableModel>
 
 
@@ -32,7 +45,7 @@ using namespace Eigen;
 using namespace MNELIB;
 
 
-class StcModel : public QAbstractTableModel
+class DISP3DSHARED_EXPORT StcModel : public QAbstractTableModel
 {
     Q_OBJECT
 public:
@@ -45,9 +58,12 @@ public:
 
     void addData(const MNESourceEstimate &stc);
 
+    void setVertices(const VectorXi &vertnos);
+
 private:
     QVector<VectorXd> m_data;   /**< List that holds the fiff matrix data <n_channels x n_samples> */
 
+    VectorXi m_vertices;
 
     qint32 m_iDownsampling;     /**< Down sampling factor */
     qint32 m_iCurrentSample;    /**< Downsampling */

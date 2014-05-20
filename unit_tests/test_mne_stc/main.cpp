@@ -52,7 +52,7 @@
 #include <mne/mne_sourceestimate.h>
 #include <inverse/minimumNorm/minimumnorm.h>
 
-#include <disp3D/inverseview.h>
+#include <disp3D/helpers/stcmodel.h>
 
 #include <utils/mnemath.h>
 
@@ -70,8 +70,6 @@
 #include <QSet>
 #include <QElapsedTimer>
 
-//#define BENCHMARK
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -82,7 +80,7 @@ using namespace MNELIB;
 using namespace FSLIB;
 using namespace FIFFLIB;
 using namespace INVERSELIB;
-using namespace DISP3DLIB;
+//using namespace DISP3DLIB;
 using namespace UTILSLIB;
 
 
@@ -116,8 +114,14 @@ int main(int argc, char *argv[])
     QFile t_fileRaw("D:/Data/MEG/mind006/mind006_051209_auditory01_raw.fif");
     QString t_sEventName = "D:/Data/MEG/mind006/mind006_051209_auditory01_raw-eve.fif";
     AnnotationSet t_annotationSet("mind006", 2, "aparc.a2009s", "D:/Data/subjects");
-    SurfaceSet t_surfSet("mind006", 2, "white", "D:/Data/subjects");
+//    SurfaceSet t_surfSet("mind006", 2, "white", "D:/Data/subjects");
 
+
+
+
+
+
+/*
     qint32 event = 1;
 
     float tmin = -0.2f;
@@ -418,7 +422,7 @@ int main(int argc, char *argv[])
     QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
 
     QString t_sFileNameClusteredInv("");
-    QString t_sFileNameStc("mind006_051209_auditory01.stc");
+    QString t_sFileNameStc("mind006_051209_auditory01_test.stc");
 
     // Parse command line parameters
     for(qint32 i = 0; i < argc; ++i)
@@ -471,41 +475,12 @@ int main(int argc, char *argv[])
     MatrixXd D;
     MNEForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution(t_annotationSet, 20, D, noise_cov, evoked.info);
 
-    t_clusteredFwd.src[0].cluster_info.write("ClusterInfoLH.txt");
-    t_clusteredFwd.src[1].cluster_info.write("ClusterInfoRH.txt");
-
-    std::cout << "D " << D.rows() << " x " << D.cols() << std::endl;
-
     //
     // make an inverse operators
     //
     FiffInfo info = evoked.info;
 
-
-
-
-    QFile t_fileSelectedFwd("D:/Data/MEG/mind006/mind006_051209_auditory01_raw-oct-5-fwd.fif");
-
-    MNEForwardSolution t_selectedRawFwd(t_fileSelectedFwd);
-    if(t_selectedRawFwd.isEmpty())
-        return 1;
-
-    MatrixXd D_selected;
-    MNEForwardSolution t_selectedFwd = t_selectedRawFwd.reduce_forward_solution(t_clusteredFwd.isFixedOrient() ? t_clusteredFwd.sol->data.cols() : t_clusteredFwd.sol->data.cols()/3, D_selected);
-
-    qDebug() << "#### t_selectedFwd" << t_selectedFwd.sol->data.rows() << "x" << t_selectedFwd.sol->data.cols();
-
-    MNEInverseOperator inverse_operator_selected(info, t_selectedFwd, noise_cov, 0.2f, 0.8f);
-
-    qDebug() << "#### [1] ####";
-
     MNEInverseOperator inverse_operator_clustered(info, t_clusteredFwd, noise_cov, 0.2f, 0.8f);
-
-    qDebug() << "#### [2] ####";
-
-    MNEInverseOperator inverse_operator(info, t_Fwd, noise_cov, 0.2f, 0.8f);
-
-    qDebug() << "#### [3] ####";
 
     //
     // save clustered inverse
@@ -520,189 +495,9 @@ int main(int argc, char *argv[])
     // Compute inverse solution
     //
 
-    MinimumNorm minimumNormSelected(inverse_operator_selected, lambda2, method);
     MinimumNorm minimumNormClustered(inverse_operator_clustered, lambda2, method);
-    MinimumNorm minimumNorm(inverse_operator, lambda2, method);
 
-
-#ifdef BENCHMARK
-    //
-    //   Set up the inverse according to the parameters
-    //
-    minimumNormClustered.doInverseSetup(vecSel.size(),false);
-
-    MNESourceEstimate sourceEstimate;
-    QList<qint64> qVecElapsedTime;
-    for(qint32 i = 0; i < 100; ++i)
-    {
-        //Benchmark time
-        QElapsedTimer timer;
-        timer.start();
-        sourceEstimate = minimumNormClustered.calculateInverse(evoked.data, evoked.times(0), evoked.times(1)-evoked.times(0));
-        qVecElapsedTime.append(timer.elapsed());
-    }
-
-    double meanTime = 0.0;
-    qint32 offset = 19;
-    qint32 c = 0;
-    for(qint32 i = offset; i < qVecElapsedTime.size(); ++i)
-    {
-        meanTime += qVecElapsedTime[i];
-        ++c;
-    }
-
-    meanTime /= (double)c;
-
-    double varTime = 0;
-    for(qint32 i = offset; i < qVecElapsedTime.size(); ++i)
-        varTime += pow(qVecElapsedTime[i] - meanTime,2);
-
-    varTime /= (double)c - 1.0f;
-    varTime = sqrt(varTime);
-
-    qDebug() << "MNE calculation took" << meanTime << "+-" << varTime << "ms in average";
-
-#else
-    MNESourceEstimate sourceEstimateSelected = minimumNormSelected.calculateInverse(evoked);
     MNESourceEstimate sourceEstimateClustered = minimumNormClustered.calculateInverse(evoked);
-    MNESourceEstimate sourceEstimate = minimumNorm.calculateInverse(evoked);
-#endif
-
-
-    qDebug() << "#### [4] ####";
-
-
-    //Option c
-//    qDebug() << "Cluster Kernel";
-//    MatrixXd D_MT;
-//    MatrixXd MT_clustered = minimumNorm.getPreparedInverseOperator().cluster_kernel(t_annotationSet, 20, D_MT);
-
-//    qDebug() << "Cluster Kernel" << MT_clustered.rows() << "x" << MT_clustered.cols();
-
-//    qDebug() << "D_MT" << D_MT.rows() << "x" << D_MT.cols();
-
-    // #### R calculation ####
-    QFile t_fileFwdFixed("D:/Data/MEG/mind006/mind006_051209_auditory01_raw-oct-6-fwd-fixed.fif");
-    MNEForwardSolution t_FwdFixed(t_fileFwdFixed);
-    if(t_FwdFixed.isEmpty())
-        return 1;
-//    qDebug() << "t_FwdFixed" << t_FwdFixed.sol->data.rows() << "x" << t_FwdFixed.sol->data.cols();
-
-//    //Option b)
-//    printf("[1]\n");
-//    MatrixXd M = D.transpose() * minimumNorm.getKernel();
-
-//    printf("[2]\n");
-//    MatrixXd R = M * t_FwdFixed.sol->data;
-
-//    std::ofstream ofs_R("R_ec.txt", std::ofstream::out);
-//    if (ofs_R.is_open())
-//    {
-//        printf("writing to R_ec.txt\n");
-//        ofs_R << R << '\n';
-//    }
-//    else
-//        printf("Not writing to R_ec.txt\n");
-//    ofs_R.close();
-
-//    M.resize(0,0);
-//    R.resize(0,0);
-
-//    //Option a)
-//    printf("[3]\n");
-//    MatrixXd M_clusterd = minimumNormClustered.getKernel();
-
-//    printf("[4]\n");
-//    MatrixXd R_clustered = M_clusterd * t_FwdFixed.sol->data;
-
-//    std::ofstream ofs_R_clustered("R_clustered_ec.txt", std::ofstream::out);
-//    if (ofs_R_clustered.is_open())
-//    {
-//        printf("writing to R_clustered_ec.txt\n");
-//        ofs_R_clustered << R_clustered << '\n';
-//    }
-//    else
-//        printf("Not writing to R_clustered_ec.txt\n");
-//    ofs_R_clustered.close();
-
-//    M_clusterd.resize(0,0);
-//    R_clustered.resize(0,0);
-
-////Cluster Operator D
-//    std::ofstream ofs_D("D_ec.txt", std::ofstream::out);
-//    if (ofs_D.is_open())
-//    {
-//        printf("writing to D_ec.txt\n");
-//        ofs_D << D << '\n';
-//    }
-//    else
-//        printf("Not writing to D_ec.txt\n");
-//    ofs_D.close();
-
-
-//    //option c)
-//    printf("[5]\n");
-//    MatrixXd R_MT_clustered = MT_clustered.transpose() * t_FwdFixed.sol->data;
-
-//    std::ofstream ofs_R_MT_clustered("R_MT_clustered_ec.txt", std::ofstream::out);
-//    if (ofs_R_MT_clustered.is_open())
-//    {
-//        printf("writing to R_MT_clustered_ec.txt\n");
-//        ofs_R_MT_clustered << R_MT_clustered << '\n';
-//    }
-//    else
-//        printf("Not writing to R_MT_clustered_ec.txt\n");
-//    ofs_R_MT_clustered.close();
-
-//    R_MT_clustered.resize(0,0);
-
-//    //Cluster Operator D
-//    std::ofstream ofs_D_MT("D_MT_ec.txt", std::ofstream::out);
-//    if (ofs_D_MT.is_open())
-//    {
-//        printf("writing to D_MT_ec.txt\n");
-//        ofs_D_MT << D_MT << '\n';
-//    }
-//    else
-//        printf("Not writing to D_MT_ec.txt\n");
-//    ofs_D_MT.close();
-
-
-
-    //option d)
-    printf("[6]\n");
-    MatrixXd M_selected = minimumNormSelected.getKernel();
-
-    qDebug() << "M_selected: " << M_selected.rows() << "x" << M_selected.cols();
-
-
-    printf("[7]\n");
-    MatrixXd R_selected= M_selected * t_FwdFixed.sol->data;
-
-    std::ofstream ofs_R_selected("R_selected.txt", std::ofstream::out);
-    if (ofs_R_selected.is_open())
-    {
-        printf("writing to R_selected.txt\n");
-        ofs_R_selected << R_selected << '\n';
-    }
-    else
-        printf("Not writing to R_selected.txt\n");
-    ofs_R_selected.close();
-
-    R_selected.resize(0,0);
-
-    //Cluster Operator D
-    std::ofstream ofs_D_selected("D_selected.txt", std::ofstream::out);
-    if (ofs_D_selected.is_open())
-    {
-        printf("writing to D_selected.txt\n");
-        ofs_D_selected << D_selected << '\n';
-    }
-    else
-        printf("Not writing to D_selected.txt\n");
-    ofs_D_selected.close();
-
-    // #### R calculation end ####
 
 
     if(sourceEstimateClustered.isEmpty())
@@ -715,122 +510,15 @@ int main(int argc, char *argv[])
     std::cout << "timeMax\n" << sourceEstimateClustered.times[sourceEstimateClustered.times.size()-1] << std::endl;
     std::cout << "time step\n" << sourceEstimateClustered.tstep << std::endl;
 
-    //Condition Numbers
-//    MatrixXd mags(102, t_Fwd.sol->data.cols());
-//    qint32 count = 0;
-//    for(qint32 i = 2; i < 306; i += 3)
-//    {
-//        mags.row(count) = t_Fwd.sol->data.row(i);
-//        ++count;
-//    }
-//    MatrixXd magsClustered(102, t_clusteredFwd.sol->data.cols());
-//    count = 0;
-//    for(qint32 i = 2; i < 306; i += 3)
-//    {
-//        magsClustered.row(count) = t_clusteredFwd.sol->data.row(i);
-//        ++count;
-//    }
-
-//    MatrixXd grads(204, t_Fwd.sol->data.cols());
-//    count = 0;
-//    for(qint32 i = 0; i < 306; i += 3)
-//    {
-//        grads.row(count) = t_Fwd.sol->data.row(i);
-//        ++count;
-//        grads.row(count) = t_Fwd.sol->data.row(i+1);
-//        ++count;
-//    }
-//    MatrixXd gradsClustered(204, t_clusteredFwd.sol->data.cols());
-//    count = 0;
-//    for(qint32 i = 0; i < 306; i += 3)
-//    {
-//        gradsClustered.row(count) = t_clusteredFwd.sol->data.row(i);
-//        ++count;
-//        gradsClustered.row(count) = t_clusteredFwd.sol->data.row(i+1);
-//        ++count;
-//    }
-
-    VectorXd s;
-
-    double t_dConditionNumber = MNEMath::getConditionNumber(t_Fwd.sol->data, s);
-    double t_dConditionNumberClustered = MNEMath::getConditionNumber(t_clusteredFwd.sol->data, s);
-
-
-    std::cout << "Condition Number:\n" << t_dConditionNumber << std::endl;
-    std::cout << "Clustered Condition Number:\n" << t_dConditionNumberClustered << std::endl;
-
-    std::cout << "ForwardSolution" << t_Fwd.sol->data.block(0,0,10,10) << std::endl;
-
-    std::cout << "Clustered ForwardSolution" << t_clusteredFwd.sol->data.block(0,0,10,10) << std::endl;
-
-
-//    double t_dConditionNumberMags = MNEMath::getConditionNumber(mags, s);
-//    double t_dConditionNumberMagsClustered = MNEMath::getConditionNumber(magsClustered, s);
-
-//    std::cout << "Condition Number Magnetometers:\n" << t_dConditionNumberMags << std::endl;
-//    std::cout << "Clustered Condition Number Magnetometers:\n" << t_dConditionNumberMagsClustered << std::endl;
-
-//    double t_dConditionNumberGrads = MNEMath::getConditionNumber(grads, s);
-//    double t_dConditionNumberGradsClustered = MNEMath::getConditionNumber(gradsClustered, s);
-
-//    std::cout << "Condition Number Gradiometers:\n" << t_dConditionNumberGrads << std::endl;
-//    std::cout << "Clustered Condition Number Gradiometers:\n" << t_dConditionNumberGradsClustered << std::endl;
-
 
     //Source Estimate end
     //########################################################################################
 
-//    //only one time point - P100
-//    qint32 sample = 0;
-//    for(qint32 i = 0; i < sourceEstimate.times.size(); ++i)
-//    {
-//        if(sourceEstimate.times(i) >= 0)
-//        {
-//            sample = i;
-//            break;
-//        }
-//    }
-//    sample += (qint32)ceil(0.106/sourceEstimate.tstep); //100ms
-//    sourceEstimate = sourceEstimate.reduce(sample, 1);
-
     QList<Label> t_qListLabels;
     QList<RowVector4i> t_qListRGBAs;
 
-    //ToDo overload toLabels using instead of t_surfSet rr of MNESourceSpace
-    t_annotationSet.toLabels(t_surfSet, t_qListLabels, t_qListRGBAs);
-
-    InverseView view(minimumNormClustered.getSourceSpace(), t_qListLabels, t_qListRGBAs, 24, true, false, true);
-
-    if (view.stereoType() != QGLView::RedCyanAnaglyph)
-        view.camera()->setEyeSeparation(0.3f);
-    QStringList args = QCoreApplication::arguments();
-    int w_pos = args.indexOf("-width");
-    int h_pos = args.indexOf("-height");
-    if (w_pos >= 0 && h_pos >= 0)
-    {
-        bool ok = true;
-        int w = args.at(w_pos + 1).toInt(&ok);
-        if (!ok)
-        {
-            qWarning() << "Could not parse width argument:" << args;
-            return 1;
-        }
-        int h = args.at(h_pos + 1).toInt(&ok);
-        if (!ok)
-        {
-            qWarning() << "Could not parse height argument:" << args;
-            return 1;
-        }
-        view.resize(w, h);
-    }
-    else
-    {
-        view.resize(800, 600);
-    }
-    view.show();
-
-    //Push Estimate
-    view.pushSourceEstimate(sourceEstimateClustered);
+//    //ToDo overload toLabels using instead of t_surfSet rr of MNESourceSpace
+//    t_annotationSet.toLabels(t_surfSet, t_qListLabels, t_qListRGBAs);
 
     if(!t_sFileNameStc.isEmpty())
     {
@@ -839,5 +527,26 @@ int main(int argc, char *argv[])
     }
 
 //*/
+
+
+//DEBUG
+    QString t_sFileNameStc("mind006_051209_auditory01_test.stc");
+    MNESourceEstimate sourceEstimateClustered;
+
+    if(!t_sFileNameStc.isEmpty())
+    {
+        QFile t_fileClusteredStc(t_sFileNameStc);
+        MNESourceEstimate::read(t_fileClusteredStc, sourceEstimateClustered);
+    }
+
+    qDebug() << "sourceEstimateClustered" << sourceEstimateClustered.data.rows() << "x" << sourceEstimateClustered.data.cols();
+
+
+
+    StcModel t_StcModel;
+
+    t_StcModel.addData(sourceEstimateClustered);
+
+
     return a.exec();//1;//a.exec();
 }
