@@ -1,5 +1,11 @@
 #include "stcmodel.h"
+
 #include <mne/mne_sourceestimate.h>
+
+#include <QDebug>
+
+#include <iostream>
+
 
 using namespace MNELIB;
 
@@ -129,10 +135,20 @@ QVariant StcModel::headerData(int section, Qt::Orientation orientation, int role
 
 void StcModel::addData(const MNESourceEstimate &stc)
 {
+//    qDebug() << "m_vertices.size()" << m_vertices.size();
+
+    if(m_vertices.size() < stc.data.rows())
+        setVertices(stc.vertices);
+
     //Downsampling ->ToDo make this more accurate
     qint32 i;
     for(i = m_iCurrentSample; i < stc.data.cols(); i += m_iDownsampling)
         m_data.append(stc.data.col(i));
+
+//    qDebug() << "StcModel::addData" << stc.data.rows();
+//    qDebug() << "MNESourceEstimate" << stc.vertices.size();
+//    qDebug() << "m_vertices.size()" << m_vertices.size();
+//    std::cout << "Vertices\n" << stc.vertices << std::endl;
 
     //store for next buffer
     m_iCurrentSample = i - stc.data.cols();
@@ -149,4 +165,12 @@ void StcModel::addData(const MNESourceEstimate &stc)
 //    QModelIndex bottomRight = this->index(m_qListChInfo.size()-1,1);
 //    QVector<int> roles; roles << Qt::DisplayRole;
 //    emit dataChanged(topLeft, bottomRight, roles);
+}
+
+
+//*************************************************************************************************************
+
+void StcModel::setVertices(const VectorXi &vertnos)
+{
+    m_vertices = vertnos;
 }
