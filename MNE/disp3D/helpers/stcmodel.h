@@ -8,6 +8,8 @@
 
 #include "../disp3D_global.h"
 
+#include "stcworker.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -15,6 +17,7 @@
 //=============================================================================================================
 
 #include <QAbstractTableModel>
+#include <QThread>
 
 
 //*************************************************************************************************************
@@ -60,7 +63,18 @@ public:
 
     void setVertices(const VectorXi &vertnos);
 
+signals:
+
+
+
 private:
+    QSharedPointer<QThread>    m_pThread;
+    StcWorker::SPtr  m_pWorker;
+
+
+    bool m_bRTMode;
+
+
     QVector<VectorXd> m_data;   /**< List that holds the fiff matrix data <n_channels x n_samples> */
 
     VectorXi m_vertices;
@@ -69,5 +83,7 @@ private:
     qint32 m_iCurrentSample;    /**< Downsampling */
 
 };
+
+Q_DECLARE_METATYPE(Eigen::MatrixXd);
 
 #endif // STCMODEL_H
