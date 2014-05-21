@@ -114,6 +114,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Attempts to close the socket. If there is pending data waiting to be written, QAbstractSocket will enter
+    * ClosingState and wait until all data has been written. Eventually, it will enter UnconnectedState and
+    * emit the disconnected() signal.
+    */
+    virtual void disconnectFromHost();
+
+    //=========================================================================================================
+    /**
     * Requests the ID at mne_rt_server and returns it
     *
     * @return the requested id

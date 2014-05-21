@@ -55,7 +55,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QApplication>
+#include <QCoreApplication>
 #include <QtConcurrent>
 #include <QFuture>
 #include <QVector>
@@ -105,7 +105,7 @@ void joinVectors(VectorXd &reduceResult, const VectorXd &partial) {
 */
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
+    QCoreApplication a(argc, argv);
 
     VectorXd vecZero = VectorXd::Zero(20);
 

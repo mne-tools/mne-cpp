@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     newdisplaymanager.cpp
+* @file     displaymanager.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the NewDisplayManager Class.
+* @brief    Implementation of the DisplayManager Class.
 *
 */
 
@@ -38,11 +38,17 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "newdisplaymanager.h"
+#define NEWRTMSAWIDGET 1
+
+#include "displaymanager.h"
 
 
 #include <xDisp/newrealtimesamplearraywidget.h>
+#ifdef NEWRTMSAWIDGET
+#include <xDisp/realtimemultisamplearraywidget.h>
+#else
 #include <xDisp/newrealtimemultisamplearraywidget.h>
+#endif
 
 #if defined(QT3D_LIBRARY_AVAILABLE)
 #include <xDisp/realtimesourceestimatewidget.h>
@@ -95,7 +101,7 @@ using namespace XMEASLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-NewDisplayManager::NewDisplayManager(QObject* parent)
+DisplayManager::DisplayManager(QObject* parent)
 : QObject(parent)
 {
 
@@ -104,7 +110,7 @@ NewDisplayManager::NewDisplayManager(QObject* parent)
 
 //*************************************************************************************************************
 
-NewDisplayManager::~NewDisplayManager()
+DisplayManager::~DisplayManager()
 {
     clean();
 }
@@ -112,7 +118,7 @@ NewDisplayManager::~NewDisplayManager()
 
 //*************************************************************************************************************
 
-QWidget* NewDisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList, QSharedPointer<QTime>& pT, QList< QAction* >& qListActions)
+QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList, QSharedPointer<QTime>& pT, QList< QAction* >& qListActions)
 {
     QWidget* newDisp = new QWidget;
     QVBoxLayout* vboxLayout = new QVBoxLayout;
@@ -138,6 +144,17 @@ QWidget* NewDisplayManager::show(IPlugin::OutputConnectorList &outputConnectorLi
         else if(pPluginOutputConnector.dynamicCast< PluginOutputData<NewRealTimeMultiSampleArray> >())
         {
             QSharedPointer<NewRealTimeMultiSampleArray>* pNewRealTimeMultiSampleArray = &pPluginOutputConnector.dynamicCast< PluginOutputData<NewRealTimeMultiSampleArray> >()->data();
+#ifdef NEWRTMSAWIDGET
+            RealTimeMultiSampleArrayWidget* rtmsaWidget = new RealTimeMultiSampleArrayWidget(*pNewRealTimeMultiSampleArray, pT, newDisp);
+
+            qListActions.append(rtmsaWidget->getDisplayActions());
+
+            connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
+                    rtmsaWidget, &RealTimeMultiSampleArrayWidget::update, Qt::BlockingQueuedConnection);
+
+            vboxLayout->addWidget(rtmsaWidget);
+            rtmsaWidget->init();
+#else
             NewRealTimeMultiSampleArrayWidget* rtmsaWidget = new NewRealTimeMultiSampleArrayWidget(*pNewRealTimeMultiSampleArray, pT, newDisp);
 
             qListActions.append(rtmsaWidget->getDisplayActions());
@@ -147,6 +164,7 @@ QWidget* NewDisplayManager::show(IPlugin::OutputConnectorList &outputConnectorLi
 
             vboxLayout->addWidget(rtmsaWidget);
             rtmsaWidget->init();
+#endif
         }
     #if defined(QT3D_LIBRARY_AVAILABLE)
         else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeSourceEstimate> >())
@@ -189,7 +207,7 @@ QWidget* NewDisplayManager::show(IPlugin::OutputConnectorList &outputConnectorLi
 
 //*************************************************************************************************************
 
-void NewDisplayManager::clean()
+void DisplayManager::clean()
 {
     qDebug() << "DisplayManager::clean()";
 }

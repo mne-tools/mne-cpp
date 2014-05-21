@@ -37,7 +37,7 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = subdirs
 
-contains(MNECPP_CONFIG, isGui) {
+contains(MNECPP_CONFIG, withGui) {
     SUBDIRS += \
         xMeas \
         xDisp \
