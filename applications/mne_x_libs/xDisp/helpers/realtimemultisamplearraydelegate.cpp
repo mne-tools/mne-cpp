@@ -16,9 +16,7 @@
 RealTimeMultiSampleArrayDelegate::RealTimeMultiSampleArrayDelegate(QObject *parent)
 : QAbstractItemDelegate(parent)
 {
-    m_nVLines = 9;//m_qSettings.value("RawDelegate/nhlines").toDouble();
 
-//    Q_UNUSED(parent);
 }
 
 
@@ -210,7 +208,7 @@ void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, 
     }
 
     //create lines from one to the next sample for last path
-    qint32 offset = 10;
+    qint32 offset = t_pModel->numVLines() + 1;
     qSamplePosition.setX(qSamplePosition.x() + fDx*offset);
     lastPath.moveTo(qSamplePosition);
 
@@ -234,18 +232,21 @@ void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, 
 
 void RealTimeMultiSampleArrayDelegate::createGridPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QList< QVector<float> >& data) const
 {
-    //horizontal lines
-    float distance = option.rect.width()/(m_nVLines+1);
+    const RealTimeMultiSampleArrayModel* t_pModel = static_cast<const RealTimeMultiSampleArrayModel*>(index.model());
 
-    float yStart = option.rect.topLeft().y();
+    if(t_pModel->numVLines() > 0)
+    {
+        //horizontal lines
+        float distance = option.rect.width()/(t_pModel->numVLines()+1);
 
-    float yEnd = option.rect.bottomRight().y();
+        float yStart = option.rect.topLeft().y();
 
-    for(qint8 i = 0; i < m_nVLines; ++i) {
-        float x = distance*(i+1);
-        path.moveTo(x,yStart);
-        path.lineTo(x,yEnd);
+        float yEnd = option.rect.bottomRight().y();
+
+        for(qint8 i = 0; i < t_pModel->numVLines(); ++i) {
+            float x = distance*(i+1);
+            path.moveTo(x,yStart);
+            path.lineTo(x,yEnd);
+        }
     }
-
-//    qDebug("Grid-PainterPath created!");
 }

@@ -54,7 +54,7 @@ public:
 
     void setChannelInfo(QList<RealTimeSampleArrayChInfo> &chInfo);
 
-    void setSamplingInfo(float sps, float T, float dest_sps  = 100.0f);
+    void setSamplingInfo(float sps, int T, float dest_sps  = 100.0f);
 
     void addData(const QVector<VectorXd> &data);
 
@@ -70,6 +70,7 @@ public:
 
     void resetSelection();
 
+    inline qint32 numVLines() const;
 
 private:
     QList<RealTimeSampleArrayChInfo> m_qListChInfo; /**< Channel info list.*/
@@ -81,7 +82,7 @@ private:
     QVector<VectorXd> m_dataLast;           /**< List that holds the last data */
 
     float m_fSps;           /**< Sampling rate */
-    float m_fT;             /**< Time window */
+    qint32 m_iT;             /**< Time window */
     qint32 m_iDownsampling; /**< Down sampling factor */
     qint32 m_iMaxSamples;   /**< Max samples per window */
     qint32 m_iCurrentSample; /**< Accurate Downsampling */
@@ -99,6 +100,11 @@ inline const QMap<qint32,qint32>& RealTimeMultiSampleArrayModel::getIdxSelMap() 
     return m_qMapIdxRowSelection;
 }
 
+
+inline qint32 RealTimeMultiSampleArrayModel::numVLines() const
+{
+    return (m_iT - 1);
+}
 
 
 #endif // REALTIMEMULTISAMPLEARRAYMODEL_H
