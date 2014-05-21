@@ -17,6 +17,7 @@ RealTimeMultiSampleArrayModel::RealTimeMultiSampleArrayModel(QObject *parent)
 , m_iDownsampling(10)
 , m_iMaxSamples(1024)
 , m_iCurrentSample(0)
+, m_bIsFreezed(false)
 {
 }
 
@@ -255,4 +256,20 @@ void RealTimeMultiSampleArrayModel::resetSelection()
         m_qMapIdxRowSelection.insert(i,i);
 
     endResetModel();
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayModel::toggleFreez(const QModelIndex &)
+{
+    m_bIsFreezed = !m_bIsFreezed;
+
+    qDebug() << "Toggle Freez";
+
+    //Update data content
+    QModelIndex topLeft = this->index(0,1);
+    QModelIndex bottomRight = this->index(m_qListChInfo.size()-1,1);
+    QVector<int> roles; roles << Qt::DisplayRole;
+    emit dataChanged(topLeft, bottomRight, roles);
 }
