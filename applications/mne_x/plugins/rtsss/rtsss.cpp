@@ -1,7 +1,7 @@
 //=============================================================================================================
 /**
 * @file     rtsss.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @author   Seok Lew <slew@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     February, 2013
@@ -42,6 +42,7 @@
 //#include "FormFiles/dummysetupwidget.h"
 #include "rtsss.h"
 #include "FormFiles/rtssssetupwidget.h"
+#include "rtsssalgo.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -111,6 +112,8 @@ QSharedPointer<IPlugin> RtSss::clone() const
 
 void RtSss::init()
 {
+    std::cout << "*********** Initialization ************" << std::endl;
+
     //Delete Buffer - will be initailzed with first incoming data
     if(!m_pRtSssBuffer.isNull())
         m_pRtSssBuffer = CircularMatrixBuffer<double>::SPtr();
@@ -129,6 +132,7 @@ void RtSss::init()
     m_pRTSAOutput->data()->setMinValue(-200);
     m_pRTSAOutput->data()->setMaxValue(360);
     m_pRTSAOutput->data()->setSamplingRate(256.0/1.0);
+
 }
 
 
@@ -136,6 +140,8 @@ void RtSss::init()
 
 bool RtSss::start()
 {
+    std::cout << "*********** Start ************" << std::endl;
+
     QThread::start();
     return true;
 }
@@ -145,6 +151,8 @@ bool RtSss::start()
 
 bool RtSss::stop()
 {
+    std::cout << "*********** Stop ************" << std::endl;
+
     m_bIsRunning = false;
 
     // Stop threads
@@ -189,7 +197,8 @@ QWidget* RtSss::setupWidget()
 
 void RtSss::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 {
-//    QSharedPointer<NewRealTimeSampleArray> pRTSA = pMeasurement.dynamicCast<NewRealTimeSampleArray>();
+//    std::cout << "*********** Update ************" << std::endl;
+
     QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<NewRealTimeMultiSampleArray>();
 
     if(pRTMSA && m_bReceiveData)
@@ -205,8 +214,6 @@ void RtSss::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
         if(m_bProcessData)
         {
             MatrixXd t_mat(pRTMSA->getNumChannels(), pRTMSA->getMultiArraySize());
-
-
             for(unsigned char i = 0; i < pRTMSA->getMultiArraySize(); ++i)
                 t_mat.col(i) = pRTMSA->getMultiSampleArray()[i];
 
@@ -221,6 +228,10 @@ void RtSss::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
 void RtSss::run()
 {
+
+    RtSssAlgo rsss;
+    QList<MatrixXd> lineqn, sssRR;
+
     m_bIsRunning = true;
 
     //
@@ -232,24 +243,58 @@ void RtSss::run()
     //
     while(!m_pFiffInfo)
         msleep(10);// Wait for fiff Info
-    //
-    qint32 nchan = m_pFiffInfo->nchan;
-    std::cout << "number of channels: " << nchan << std::endl;
+
+    // Find the number of MEG channel
+    qint32 nmegchan = 0;
+    for (qint32 i=0; i<m_pFiffInfo->nchan; ++i)
+        if(m_pFiffInfo->chs[i].kind == FIFFV_MEG_CH)
+            nmegchan ++;
+    std::cout << "number of meg channels: " << nmegchan << " out of " << m_pFiffInfo->nchan << std::endl;
 
     // start processing data
     //
     m_bProcessData = true;
 
+    qint32 nrows = m_pRtSssBuffer->rows();
+//    std::cout << "number of rows: " << nrows << std::endl;
+
     while(m_bIsRunning)
     {
-        qint32 nrows = m_pRtSssBuffer->rows();
+
+        nrows = m_pRtSssBuffer->rows();
 
         if(nrows > 0) // check if init
         {
-            /* Dispatch the inputs */
-             MatrixXd t_mat = m_pRtSssBuffer->pop();
+            // * Dispatch the inputs * //
+            MatrixXd t_mat = m_pRtSssBuffer->pop();
+            std::cout << "size of t_mat (run): " << t_mat.rows() << " x " << t_mat.cols() << std::endl;
+
+            qint32 k = 0;
+            MatrixXd meg_mat(nmegchan, t_mat.cols());
+
+            for(unsigned char i = 0; i < t_mat.rows(); ++i)
+                if(m_pFiffInfo->chs[i].kind == FIFFV_MEG_CH)
+                {
+//                    meg_mat.row(k) = t_mat.row(i);
+                    k++;
+                }
+            std::cout << "k= " << k << std::endl;
+//            m_pRtSssMegBuffer->push(&meg_mat);
+
+            std::cout << "size meg_mat: " << meg_mat.rows() << " x " << meg_mat.cols() << std::endl;
+
+
+//             std::cout << "Building linear equation ! " << std::endl;
+//             lineqn = rsss.buildLinearEqn();
+
+//             std::cout << "size of m_pRtSssBuffer " << t_mat.rows() << " x " << t_mat.cols() << ",   ";
+//             std::cout << ", t_mat " << t_mat(0);
         }
 //        m_pRTSAOutput->data()->setValue(v);
     }
+
+    m_bProcessData = false;
+    m_bReceiveData = false;
+
 }
 

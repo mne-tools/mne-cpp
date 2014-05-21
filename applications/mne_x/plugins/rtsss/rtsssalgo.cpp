@@ -2,6 +2,7 @@
 /**
 * @file     rtsssalgo.cpp
 * @author   Seok Lew <slew@nmr.mgh.harvard.edu>;
+*           Xin Li <xinli@cmu.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     June, 2013
