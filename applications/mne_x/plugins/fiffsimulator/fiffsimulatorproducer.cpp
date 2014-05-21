@@ -206,7 +206,6 @@ void FiffSimulatorProducer::run()
                 to += t_matRawBuffer.cols();
                 from += t_matRawBuffer.cols();
                 m_pFiffSimulator->m_pRawMatrixBuffer_In->push(&t_matRawBuffer);
-                qDebug() << "Pushed Data" << t_matRawBuffer.rows() << "x" << t_matRawBuffer.cols();
             }
             else if(FIFF_DATA_BUFFER == FIFF_BLOCK_END)
                 m_bFlagMeasuring = false;
