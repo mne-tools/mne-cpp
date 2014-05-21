@@ -72,6 +72,8 @@ public:
 
     inline qint32 numVLines() const;
 
+    void toggleFreez(const QModelIndex &);
+
 private:
     QList<RealTimeSampleArrayChInfo> m_qListChInfo; /**< Channel info list.*/
 
@@ -81,11 +83,13 @@ private:
     QVector<VectorXd> m_dataCurrent;        /**< List that holds the current data*/
     QVector<VectorXd> m_dataLast;           /**< List that holds the last data */
 
-    float m_fSps;           /**< Sampling rate */
-    qint32 m_iT;             /**< Time window */
-    qint32 m_iDownsampling; /**< Down sampling factor */
-    qint32 m_iMaxSamples;   /**< Max samples per window */
-    qint32 m_iCurrentSample; /**< Accurate Downsampling */
+    float m_fSps;               /**< Sampling rate */
+    qint32 m_iT;                /**< Time window */
+    qint32 m_iDownsampling;     /**< Down sampling factor */
+    qint32 m_iMaxSamples;       /**< Max samples per window */
+    qint32 m_iCurrentSample;    /**< Accurate Downsampling */
+
+    bool m_bIsFreezed;       /**< Is freezed */
 };
 
 
