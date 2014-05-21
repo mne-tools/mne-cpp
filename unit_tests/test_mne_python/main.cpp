@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     newdisplaymanager.h
+* @file     main.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     August, 2013
+* @date     May, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,101 +29,58 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of the NewDisplayManager Class.
+* @brief    mne Surface test
 *
 */
-
-#ifndef NEWDISPLAYMANAGER_H
-#define NEWDISPLAYMANAGER_H
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../mne_x_global.h"
-#include "../Interfaces/IPlugin.h"
+#include <Python.h>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
-#include <QSharedPointer>
-#include <QTime>
-#include <QHash>
-#include <QWidget>
-#include <QLabel>
-#include <QString>
+#include <QGuiApplication>
+#include <QDebug>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// USED NAMESPACES
 //=============================================================================================================
 
-class QVBoxLayout;
-class QHBoxLayout;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNEX
+// MAIN
 //=============================================================================================================
-
-namespace MNEX
-{
 
 //=============================================================================================================
 /**
-* DECLARE CLASS NewDisplayManager
+* The function main marks the entry point of the program.
+* By default, main has the storage class extern.
 *
-* @brief The NewDisplayManager class handles current displayed widgets.
+* @param [in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
+* @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
+* @return the value that was set to exit() (which is 0 if exit() is called via quit()).
 */
-class MNE_X_SHARED_EXPORT NewDisplayManager : public QObject
+int main(int argc, char *argv[])
 {
-    Q_OBJECT
-public:
-    typedef QSharedPointer<NewDisplayManager> SPtr;               /**< Shared pointer type for NewDisplayManager. */
-    typedef QSharedPointer<const NewDisplayManager> ConstSPtr;    /**< Const shared pointer type for NewDisplayManager. */
+    QGuiApplication a(argc, argv);
 
-    //=========================================================================================================
-    /**
-    * Constructs a NewDisplayManager.
-    */
-    NewDisplayManager(QObject* parent = 0);
+//    Py_SetProgramName(argv[0]);  /* optional but recommended */
+    Py_Initialize();
+    PyRun_SimpleString("from time import time,ctime\n"
+                       "print 'Today is',ctime(time())\n");
+    Py_Finalize();
 
-    //=========================================================================================================
-    /**
-    * Destroys the NewDisplayManager.
-    */
-    virtual ~NewDisplayManager();
 
-    //=========================================================================================================
-    /**
-    * Shows a widget containing all current measurement widgets.
-    *
-    * @param [in] outputConnectorList   output connector list
-    * @param [in] pT                    global timer
-    * @param [out] qListActions         a list of actions containing all measurent widget actions
-    *
-    * @return a pointer to the widget containing all measurement widgets.
-    */
-    QWidget* show(IPlugin::OutputConnectorList &outputConnectorList, QSharedPointer<QTime>& pT, QList< QAction* >& qListActions);
-
-    //=========================================================================================================
-    /**
-    * Cleans all measurement widget hash's.
-    */
-    void clean();
-
-private:
-    QList<QMetaObject::Connection>   m_pListWidgetConnections;       /**< all widget connections.*/
-
-};
-
-} // NAMESPACE
-
-#endif // NEWDISPLAYMANAGER_H
+    return a.exec();
+}

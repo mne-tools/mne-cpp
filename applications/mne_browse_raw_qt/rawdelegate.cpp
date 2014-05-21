@@ -67,13 +67,12 @@ using namespace MNELIB;
 //=============================================================================================================
 
 RawDelegate::RawDelegate(QObject *parent)
-: m_qSettings()
+: QAbstractItemDelegate(parent)
+, m_qSettings()
 {
-    m_dPlotHeight = m_qSettings.value("RawDelegate/plotheight").toDouble();
+    m_dDefaultPlotHeight = m_qSettings.value("RawDelegate/plotheight").toDouble();
     m_dDx = m_qSettings.value("RawDelegate/dx").toDouble();
     m_nhlines = m_qSettings.value("RawDelegate/nhlines").toDouble();
-
-    Q_UNUSED(parent);
 }
 
 
@@ -81,12 +80,13 @@ RawDelegate::RawDelegate(QObject *parent)
 
 void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
+    float t_fPlotHeight = option.rect.height();
     switch(index.column()) {
     case 0: { //chnames
         painter->save();
 
         painter->rotate(-90);
-        painter->drawText(QRectF(-option.rect.y()-m_dPlotHeight,0,m_dPlotHeight,20),Qt::AlignCenter,index.model()->data(index,Qt::DisplayRole).toString());
+        painter->drawText(QRectF(-option.rect.y()-t_fPlotHeight,0,t_fPlotHeight,20),Qt::AlignCenter,index.model()->data(index,Qt::DisplayRole).toString());
 
         painter->restore();
         break;
@@ -120,7 +120,7 @@ void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, c
 
         //Plot grid
         painter->setRenderHint(QPainter::Antialiasing, false);
-        createGridPath(path,listPairs);
+        createGridPath(path,option,listPairs);
 
         painter->save();
         QPen pen;
@@ -132,9 +132,9 @@ void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, c
 
         //Plot data path
         path = QPainterPath(QPointF(option.rect.x()+t_rawModel->relFiffCursor(),option.rect.y()));
-        createPlotPath(index,path,listPairs);
+        createPlotPath(index, option, path, listPairs);
 
-        painter->translate(0,m_dPlotHeight/2);
+        painter->translate(0,t_fPlotHeight/2);
 
         painter->setRenderHint(QPainter::Antialiasing, true);
         painter->drawPath(path);
@@ -155,13 +155,13 @@ QSize RawDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelInde
 
     switch(index.column()) {
     case 0:
-        size = QSize(20,m_dPlotHeight);
+        size = QSize(20,option.rect.height());
         break;
     case 1:
         QList<RowVectorPair> listPairs = index.model()->data(index).value<QList<RowVectorPair> >();
         qint32 nsamples = (static_cast<const RawModel*>(index.model()))->lastSample()-(static_cast<const RawModel*>(index.model()))->firstSample();
 
-        size = QSize(nsamples*m_dDx,m_dPlotHeight);
+        size = QSize(nsamples*m_dDx,option.rect.height());
         break;
     }
 
@@ -173,7 +173,7 @@ QSize RawDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelInde
 
 //*************************************************************************************************************
 
-void RawDelegate::createPlotPath(const QModelIndex &index, QPainterPath& path, QList<RowVectorPair>& listPairs) const
+void RawDelegate::createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QList<RowVectorPair>& listPairs) const
 {
     //get maximum range of respective channel type (range value in FiffChInfo does not seem to contain a reasonable value)
     qint32 kind = (static_cast<const RawModel*>(index.model()))->m_chInfolist[index.row()].kind;
@@ -204,7 +204,7 @@ void RawDelegate::createPlotPath(const QModelIndex &index, QPainterPath& path, Q
     }
 
     double dValue;
-    double dScaleY = m_dPlotHeight/(2*dMaxValue);
+    double dScaleY = option.rect.height()/(2*dMaxValue);
 
     double y_base = path.currentPosition().y();
     QPointF qSamplePosition;
@@ -232,10 +232,10 @@ void RawDelegate::createPlotPath(const QModelIndex &index, QPainterPath& path, Q
 
 //*************************************************************************************************************
 
-void RawDelegate::createGridPath(QPainterPath& path, QList<RowVectorPair>& listPairs) const
+void RawDelegate::createGridPath(QPainterPath& path, const QStyleOptionViewItem &option, QList<RowVectorPair>& listPairs) const
 {
     //horizontal lines
-    double distance = m_dPlotHeight/m_nhlines;
+    double distance = option.rect.height()/m_nhlines;
 
     QPointF startpos = path.currentPosition();
     QPointF endpoint(path.currentPosition().x()+listPairs[0].second*listPairs.size()*m_dDx,path.currentPosition().y());

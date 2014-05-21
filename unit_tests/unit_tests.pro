@@ -43,7 +43,7 @@ SUBDIRS += \
     mne_x_plugin_com \
     test_mne_future
 
-contains(MNECPP_CONFIG, isGui) {
+contains(MNECPP_CONFIG, withGui) {
     SUBDIRS += \
         test_mne_disp \
         test_mne_graph \
@@ -55,8 +55,14 @@ contains(MNECPP_CONFIG, isGui) {
                 SUBDIRS += \
                     mne_3d_widget \
                     test_mne_cluster \
-                    test_mne_surface
+                    test_mne_surface \
+                    test_mne_stc
 #            }
         }
     }
+}
+
+contains(MNECPP_CONFIG, withPython) {
+    SUBDIRS += \
+        test_mne_python
 }
