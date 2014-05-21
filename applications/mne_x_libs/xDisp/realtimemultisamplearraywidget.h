@@ -58,6 +58,7 @@
 #include <QTableView>
 #include <QAction>
 #include <QSpinBox>
+#include <QDoubleSpinBox>
 
 
 //*************************************************************************************************************
@@ -225,6 +226,18 @@ private:
     RealTimeMultiSampleArrayModel*      m_pRTMSAModel;
     RealTimeMultiSampleArrayDelegate*   m_pRTMSADelegate;
     QTableView* m_pTableView;                               /**< the QTableView being part of the model/view framework of Qt */
+
+    float m_fDefaultSectionSize;                            /**< Default row height */
+    float m_fZoomFactor;                                    /**< Zoom factor */
+    QDoubleSpinBox* m_pDoubleSpinBoxZoom;                   /**< Adjust Zoom Factor */
+
+    //=========================================================================================================
+    /**
+    * Sets new zoom factor
+    *
+    * @param [in] zoomFac  time window size;
+    */
+    void zoomChanged(double zoomFac);
 
     QSharedPointer<NewRealTimeMultiSampleArray> m_pRTMSA;       /**< The real-time sample array measurement. */
 
