@@ -37,7 +37,7 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = app
 
-QT += widgets concurrent
+QT += concurrent
 
 CONFIG   += console
 
