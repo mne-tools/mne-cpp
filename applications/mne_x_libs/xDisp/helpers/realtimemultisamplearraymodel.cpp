@@ -13,7 +13,7 @@
 RealTimeMultiSampleArrayModel::RealTimeMultiSampleArrayModel(QObject *parent)
 : QAbstractTableModel(parent)
 , m_fSps(1024.0f)
-, m_fT(10)
+, m_iT(10)
 , m_iDownsampling(10)
 , m_iMaxSamples(1024)
 , m_iCurrentSample(0)
@@ -148,7 +148,7 @@ void RealTimeMultiSampleArrayModel::setChannelInfo(QList<RealTimeSampleArrayChIn
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayModel::setSamplingInfo(float sps, float T, float dest_sps)
+void RealTimeMultiSampleArrayModel::setSamplingInfo(float sps, int T, float dest_sps)
 {
     beginResetModel();
 
@@ -156,6 +156,8 @@ void RealTimeMultiSampleArrayModel::setSamplingInfo(float sps, float T, float de
         m_iDownsampling = (qint32)ceil(sps/dest_sps);
     else
         m_iDownsampling = 1;
+
+    m_iT = T;
 
     float maxSamples = sps * T;
     m_iMaxSamples = (qint32)ceil(maxSamples/(sps/dest_sps)); // Max Samples / Downsampling

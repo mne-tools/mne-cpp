@@ -423,11 +423,13 @@ void MainWindow::createToolBars()
         delete m_pDynamicDisplayToolBar;
         m_pDynamicDisplayToolBar = NULL;
     }
-    if(m_qListDynamicDisplayActions.size() > 0)
+    if(m_qListDynamicDisplayActions.size() > 0 || m_qListDynamicDisplayWidgets.size() > 0)
     {
         m_pDynamicDisplayToolBar = addToolBar(tr("Display"));
         for(qint32 i = 0; i < m_qListDynamicDisplayActions.size(); ++i)
             m_pDynamicDisplayToolBar->addAction(m_qListDynamicDisplayActions[i]);
+        for(qint32 i = 0; i < m_qListDynamicDisplayWidgets.size(); ++i)
+            m_pDynamicDisplayToolBar->addWidget(m_qListDynamicDisplayWidgets[i]);
     }
 
 }
@@ -489,6 +491,7 @@ void MainWindow::updatePluginWidget(IPlugin::SPtr pPlugin)
 {
     m_qListDynamicPluginActions.clear();
     m_qListDynamicDisplayActions.clear();
+    m_qListDynamicDisplayWidgets.clear();
 
     if(!pPlugin.isNull())
     {
@@ -515,7 +518,7 @@ void MainWindow::updatePluginWidget(IPlugin::SPtr pPlugin)
                 setCentralWidget(pPlugin->setupWidget());
             else
             {
-                m_pRunWidget = new RunWidget( m_pDisplayManager->show(pPlugin->getOutputConnectors(), m_pTime, m_qListDynamicDisplayActions));
+                m_pRunWidget = new RunWidget( m_pDisplayManager->show(pPlugin->getOutputConnectors(), m_pTime, m_qListDynamicDisplayActions, m_qListDynamicDisplayWidgets));
 
                 m_pRunWidget->show();
 

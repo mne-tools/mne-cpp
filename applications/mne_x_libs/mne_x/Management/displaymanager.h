@@ -108,10 +108,11 @@ public:
     * @param [in] outputConnectorList   output connector list
     * @param [in] pT                    global timer
     * @param [out] qListActions         a list of actions containing all measurent widget actions
+    * @param [out] qListWidgets         a list of widgets containing all measurent widget tool widgets
     *
     * @return a pointer to the widget containing all measurement widgets.
     */
-    QWidget* show(IPlugin::OutputConnectorList &outputConnectorList, QSharedPointer<QTime>& pT, QList< QAction* >& qListActions);
+    QWidget* show(IPlugin::OutputConnectorList &outputConnectorList, QSharedPointer<QTime>& pT, QList< QAction* >& qListActions, QList< QWidget* >& qListWidgets);
 
     //=========================================================================================================
     /**

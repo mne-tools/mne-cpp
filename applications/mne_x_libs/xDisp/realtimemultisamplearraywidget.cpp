@@ -108,13 +108,22 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
 , m_pTableView(NULL)
 , m_pRTMSA(pRTMSA)
 , m_bInitialized(false)
+, m_iT(10)
 , m_fSamplingRate(1024)
+, m_fDesiredSamplingRate(128)
 {
+    m_pSpinBoxTimeScale = new QSpinBox(this);
+    m_pSpinBoxTimeScale->setMinimum(1);
+    m_pSpinBoxTimeScale->setMaximum(20);
+    m_pSpinBoxTimeScale->setValue(m_iT);
+    m_pSpinBoxTimeScale->setSuffix(" s");
+    connect(m_pSpinBoxTimeScale, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &RealTimeMultiSampleArrayWidget::timeWindowChanged);
+    addDisplayWidget(m_pSpinBoxTimeScale);
+
     m_pActionSelectRoi = new QAction(QIcon(":/images/selectRoi.png"), tr("Shows the region selection widget (F12)"),this);
     m_pActionSelectRoi->setShortcut(tr("F12"));
     m_pActionSelectRoi->setStatusTip(tr("Shows the region selection widget (F12)"));
     connect(m_pActionSelectRoi, &QAction::triggered, this, &RealTimeMultiSampleArrayWidget::showRoiSelectionWidget);
-
     addDisplayAction(m_pActionSelectRoi);
 
     if(m_pTableView)
@@ -167,7 +176,7 @@ void RealTimeMultiSampleArrayWidget::init()
         m_pRTMSAModel = new RealTimeMultiSampleArrayModel(this);
 
         m_pRTMSAModel->setChannelInfo(m_qListChInfo);
-        m_pRTMSAModel->setSamplingInfo(m_fSamplingRate, 10, 128);
+        m_pRTMSAModel->setSamplingInfo(m_fSamplingRate, m_iT, m_fDesiredSamplingRate);
 
         if(m_pRTMSADelegate)
             delete m_pRTMSADelegate;
@@ -198,9 +207,6 @@ void RealTimeMultiSampleArrayWidget::init()
 
         //activate kinetic scrolling
         QScroller::grabGesture(m_pTableView,QScroller::MiddleMouseButtonGesture);
-
-
-
 
         m_bInitialized = true;
     }
@@ -311,13 +317,21 @@ void RealTimeMultiSampleArrayWidget::wheelEvent(QWheelEvent* wheelEvent)
 
 //*************************************************************************************************************
 
+void RealTimeMultiSampleArrayWidget::timeWindowChanged(int T)
+{
+    m_iT = T;
+    m_pRTMSAModel->setSamplingInfo(m_fSamplingRate, T, m_fDesiredSamplingRate);
+}
+
+
+//*************************************************************************************************************
+
 void RealTimeMultiSampleArrayWidget::showRoiSelectionWidget()
 {
     if(!m_pRoiSelectionWidget)
         m_pRoiSelectionWidget = QSharedPointer<XDISPLIB::RoiSelectionWidget>(new XDISPLIB::RoiSelectionWidget);
 
     m_pRoiSelectionWidget->show();
-
 }
 
 
