@@ -93,8 +93,6 @@ FiffSimulator::~FiffSimulator()
 {
     if(this->isRunning())
         stop();
-    if(m_pFiffSimulatorProducer->isRunning())
-        m_pFiffSimulatorProducer->stop();
 }
 
 
