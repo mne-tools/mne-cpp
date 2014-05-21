@@ -236,7 +236,7 @@ void SerialPort::encodeana()
     m_data.clear();
 
 
-//denote control bytes
+//denote control bites
     m_data[0] = m_data[0]|0x40;
     m_data[1] = m_data[1]|0x01;
     m_data[2] = m_data[2]|0x02;
@@ -384,7 +384,7 @@ void SerialPort::encodedig()
         m_data[1] = m_data[1]|0x01;
         m_data[2] = m_data[2]|0x02;
         m_data[3] = m_data[3]|0x03;
-        qDebug() << m_retrievechan << endl;
+
         if (m_retrievechan == 1){m_data[1] = m_data[1]|0x00;}           // 0000 0000   first analoge In-Channel
         else if (m_retrievechan == 2){m_data[1] = m_data[1]|0x04;}      // 0000 0100   second first analoge In-Channel
 

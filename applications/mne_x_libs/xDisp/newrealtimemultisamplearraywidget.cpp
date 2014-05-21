@@ -72,7 +72,6 @@
 
 #include <QDebug>
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
@@ -118,9 +117,6 @@ NewRealTimeMultiSampleArrayWidget::NewRealTimeMultiSampleArrayWidget(QSharedPoin
 , m_pTime(pTime)
 , m_pTimeCurrentDisplay(0)
 {
-    ui.setupUi(this);
-    ui.m_qLabel_Tool->hide();
-
     m_pActionSelectRoi = new QAction(QIcon(":/images/selectRoi.png"), tr("Shows the region selection widget (F12)"),this);
     m_pActionSelectRoi->setShortcut(tr("F12"));
     m_pActionSelectRoi->setStatusTip(tr("Shows the region selection widget (F12)"));
@@ -128,6 +124,8 @@ NewRealTimeMultiSampleArrayWidget::NewRealTimeMultiSampleArrayWidget(QSharedPoin
 
     addDisplayAction(m_pActionSelectRoi);
 
+    ui.setupUi(this);
+    ui.m_qLabel_Tool->hide();
 
     // Add tool names to vector
     m_vecTool.push_back("Freeze");
@@ -229,10 +227,9 @@ void NewRealTimeMultiSampleArrayWidget::minValueChanged(double minValue)
 
 void NewRealTimeMultiSampleArrayWidget::update(XMEASLIB::NewMeasurement::SPtr)
 {
+    //ToDo put most of this in a parallel thread -> to big for process in notifier
     if(m_pRTMSA_New->getMultiSampleArray().size() > 0)
     {
-//        qDebug() << "update" << m_pRTMSA_New->getMultiSampleArray().size();
-
         VectorXd vecValue;
         QVector< VectorXd > matSamples = m_pRTMSA_New->getMultiSampleArray();
 
@@ -798,6 +795,7 @@ void NewRealTimeMultiSampleArrayWidget::showRoiSelectionWidget()
         m_pRoiSelectionWidget = QSharedPointer<XDISPLIB::RoiSelectionWidget>(new XDISPLIB::RoiSelectionWidget);
 
     m_pRoiSelectionWidget->show();
+
 }
 
 

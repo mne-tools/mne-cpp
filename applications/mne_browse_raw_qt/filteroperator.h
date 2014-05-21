@@ -74,7 +74,7 @@
 
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
-#include <Eigen/unsupported/FFT>
+#include <unsupported/Eigen/FFT>
 
 #ifndef EIGEN_FFTW_DEFAULT
 #define EIGEN_FFTW_DEFAULT

@@ -2,8 +2,7 @@
 /**
 * @file     brainview.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Daniel Strohmeier <daniel.strohmeier@tu-ilmenau.de>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     May, 2014
 *
@@ -152,11 +151,11 @@ void BrainView::initializeGL(QGLPainter *painter)
     qDebug() << "m_SurfaceSet.surf()" << m_SurfaceSet.surf();
     if(QString::compare(m_SurfaceSet.surf(),"inflated") == 0)// || m_viewOptionFlags.testFlag(BrainView::ShowCurvature))
     {
-        genCurvSurfScene();
+        genSurfacePerVertex();
     }
     else
     {
-        genPlainSurfScene();
+        genSurface();
     }
 
 
@@ -289,7 +288,7 @@ void BrainView::mousePressEvent(QMouseEvent *e)
 //private
 //*************************************************************************************************************
 
-void BrainView::genCurvSurfScene()
+void BrainView::genSurfacePerVertex()
 {
     if(m_SurfaceSet.size() == 0)
         return;
@@ -313,28 +312,12 @@ void BrainView::genCurvSurfScene()
     //
     // get bounding box
     //
-    QMap<qint32, Surface>::const_iterator it = m_SurfaceSet.data().constBegin();
-
-    QVector3D min(it.value().rr().col(0).minCoeff(), it.value().rr().col(1).minCoeff(), it.value().rr().col(2).minCoeff());
-    QVector3D max(it.value().rr().col(0).maxCoeff(), it.value().rr().col(1).maxCoeff(), it.value().rr().col(2).maxCoeff());
-
-    for (it = m_SurfaceSet.data().begin()+1; it != m_SurfaceSet.data().end(); ++it)
-    {
-        for(qint32 i = 0; i < 3; ++i)
-        {
-            min[i] = min[i] > it.value().rr().col(i).minCoeff() ? it.value().rr().col(i).minCoeff() : min[i];
-            max[i] = max[i] < it.value().rr().col(i).maxCoeff() ? it.value().rr().col(i).maxCoeff() : max[i];
-        }
-    }
-    m_vecBoundingBoxMin = min;
-    m_vecBoundingBoxMax = max;
-
-    for(qint32 i = 0; i < 3; ++i)
-        m_vecBoundingBoxCenter[i] = (m_vecBoundingBoxMin[i]+m_vecBoundingBoxMax[i])/2.0f;
+    calcBoundingBox();
 
     //
     // Build each surface in its separate node
     //
+    QMap<qint32, Surface>::const_iterator it = m_SurfaceSet.data().constBegin();
     for (it = m_SurfaceSet.data().begin(); it != m_SurfaceSet.data().end(); ++it)
     {
         builder.pushNode();
@@ -388,7 +371,7 @@ void BrainView::genCurvSurfScene()
 
 //*************************************************************************************************************
 
-void BrainView::genPlainSurfScene()
+void BrainView::genSurfacePerRegion()
 {
     if(m_SurfaceSet.size() == 0)
         return;
@@ -418,29 +401,12 @@ void BrainView::genPlainSurfScene()
     //
     // get bounding box
     //
-    QMap<qint32, Surface>::const_iterator it = m_SurfaceSet.data().constBegin();
-
-    QVector3D min(it.value().rr().col(0).minCoeff(), it.value().rr().col(1).minCoeff(), it.value().rr().col(2).minCoeff());
-    QVector3D max(it.value().rr().col(0).maxCoeff(), it.value().rr().col(1).maxCoeff(), it.value().rr().col(2).maxCoeff());
-
-    for (it = m_SurfaceSet.data().begin()+1; it != m_SurfaceSet.data().end(); ++it)
-    {
-        for(qint32 i = 0; i < 3; ++i)
-        {
-            min[i] = min[i] > it.value().rr().col(i).minCoeff() ? it.value().rr().col(i).minCoeff() : min[i];
-            max[i] = max[i] < it.value().rr().col(i).maxCoeff() ? it.value().rr().col(i).maxCoeff() : max[i];
-        }
-    }
-    m_vecBoundingBoxMin = min;
-    m_vecBoundingBoxMax = max;
-
-    for(qint32 i = 0; i < 3; ++i)
-        m_vecBoundingBoxCenter[i] = (m_vecBoundingBoxMin[i]+m_vecBoundingBoxMax[i])/2.0f;
-
+    calcBoundingBox();
 
     //
     // Build each surface in its separate node
     //
+    QMap<qint32, Surface>::const_iterator it = m_SurfaceSet.data().constBegin();
     for (it = m_SurfaceSet.data().begin(); it != m_SurfaceSet.data().end(); ++it)
     {
         builder.pushNode();
@@ -485,4 +451,115 @@ void BrainView::genPlainSurfScene()
     m_pSceneNode = builder.finalizedSceneNode();
 
     m_pSceneNode->setParent(this);
+}
+
+
+//*************************************************************************************************************
+
+void BrainView::genSurface()
+{
+    if(m_SurfaceSet.size() == 0)
+        return;
+
+    if(m_pSceneNode)
+    {
+        delete m_pSceneNode;
+        m_pSceneNode = NULL;
+    }
+
+    // in the constructor construct a builder on the stack
+    QGLBuilder builder;
+
+    float fac = 100.0f; // too small vertices distances cause clipping errors --> 100 is a good value for freesurfer brain measures
+
+    builder << QGL::Smooth;//QGL::Faceted;
+    m_pSceneNodeBrain = builder.currentNode();
+
+    builder.pushNode();
+
+    //
+    // Collor palette
+    //
+    qint32 index;
+    QSharedPointer<QGLMaterialCollection> palette = builder.sceneNode()->palette(); // register color palette within the root node
+
+    //
+    // get bounding box
+    //
+    calcBoundingBox();
+
+    //
+    // Build each surface in its separate node
+    //
+
+    QMap<qint32, Surface>::const_iterator it = m_SurfaceSet.data().constBegin();
+    for (it = m_SurfaceSet.data().begin(); it != m_SurfaceSet.data().end(); ++it)
+    {
+        builder.pushNode();
+        {
+            Matrix3Xf rr = it.value().rr().transpose();
+
+            //Centralize
+            for(qint32 i = 0; i < 3; ++i)
+                rr.row(i) = rr.row(i).array() - m_vecBoundingBoxCenter[i];
+
+
+            QGeometryData t_GeometryDataTri;
+
+            MatrixXf t_TriCoords = MatrixXf::Zero(3,3*(it.value().tris().rows()));
+            for(qint32 i = 0; i < it.value().tris().rows(); ++i)
+                for(qint32 j = 0; j < 3; ++j)
+                    t_TriCoords.col(i*3+j) = rr.col( it.value().tris()(i,j) );
+
+            t_TriCoords *= fac;
+            t_GeometryDataTri.appendVertexArray(QArray<QVector3D>::fromRawData( reinterpret_cast<const QVector3D*>(t_TriCoords.data()), t_TriCoords.cols() ));
+
+            //
+            //  Add triangles to current node
+            //
+            builder.addTriangles(t_GeometryDataTri);
+
+            //
+            // Colorize Surface
+            //
+            QGLMaterial *t_pMaterialROI = new QGLMaterial();
+            t_pMaterialROI->setColor(QColor(100,100,100,230));
+            index = palette->addMaterial(t_pMaterialROI);
+            builder.currentNode()->setMaterialIndex(index);
+        }
+        // Go one level up
+        builder.popNode();
+    }
+
+    m_bRenderPerVertex = false;
+
+    // Optimze current scene for display and calculate lightning normals
+    m_pSceneNode = builder.finalizedSceneNode();
+
+    m_pSceneNode->setParent(this);
+}
+
+
+//*************************************************************************************************************
+
+void BrainView::calcBoundingBox()
+{
+    QMap<qint32, Surface>::const_iterator it = m_SurfaceSet.data().constBegin();
+
+    QVector3D min(it.value().rr().col(0).minCoeff(), it.value().rr().col(1).minCoeff(), it.value().rr().col(2).minCoeff());
+    QVector3D max(it.value().rr().col(0).maxCoeff(), it.value().rr().col(1).maxCoeff(), it.value().rr().col(2).maxCoeff());
+
+    for (it = m_SurfaceSet.data().begin()+1; it != m_SurfaceSet.data().end(); ++it)
+    {
+        for(qint32 i = 0; i < 3; ++i)
+        {
+            min[i] = min[i] > it.value().rr().col(i).minCoeff() ? it.value().rr().col(i).minCoeff() : min[i];
+            max[i] = max[i] < it.value().rr().col(i).maxCoeff() ? it.value().rr().col(i).maxCoeff() : max[i];
+        }
+    }
+    m_vecBoundingBoxMin = min;
+    m_vecBoundingBoxMax = max;
+
+    for(qint32 i = 0; i < 3; ++i)
+        m_vecBoundingBoxCenter[i] = (m_vecBoundingBoxMin[i]+m_vecBoundingBoxMax[i])/2.0f;
 }

@@ -59,6 +59,7 @@
 #include <QPainterPath>
 #include <QMutex>
 #include <QThread>
+#include <QTableView>
 
 
 //*************************************************************************************************************
@@ -250,9 +251,11 @@ private slots:
     void minValueChanged(double);
 
 private:
-    void actualize();                                               /**< Actualize member variables. Like y position, scaling factor, middle value of the frame and the highest sampling rate to calculate the sample width.*/
-    Ui::NewRealTimeMultiSampleArrayClass   ui;                      /**< The user interface of the RealTimeSampleArray widget. */
     QSharedPointer<NewRealTimeMultiSampleArray> m_pRTMSA_New;       /**< The real-time sample array measurement. */
+
+    void actualize();                                               /**< Actualize member variables. Like y position, scaling factor, middle value of the frame and the highest sampling rate to calculate the sample width.*/
+
+    Ui::NewRealTimeMultiSampleArrayClass   ui;                      /**< The user interface of the RealTimeSampleArray widget. */
 
     quint32                         m_uiMaxNumChannels;
     quint32                         m_uiNumChannels;
@@ -305,4 +308,4 @@ private:
 
 } // NAMESPACE
 
-#endif // REALTIMEMULTISAMPLEARRAYNEWWIDGET_H
+#endif // NEWREALTIMEMULTISAMPLEARRAYNEWWIDGET_H
