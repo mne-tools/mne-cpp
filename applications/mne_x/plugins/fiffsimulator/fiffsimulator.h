@@ -222,24 +222,28 @@ private:
 //    float           m_fSamplingRate;                /**< The sampling rate.*/
 //    int             m_iDownsamplingFactor;          /**< The down sampling factor.*/
 
-    PluginOutputData<NewRealTimeMultiSampleArray>::SPtr m_pRTMSA_FiffSimulator;   /**< The NewRealTimeMultiSampleArray to provide the rt_server Channels.*/
+    PluginOutputData<NewRealTimeMultiSampleArray>::SPtr m_pRTMSA_FiffSimulator;     /**< The NewRealTimeMultiSampleArray to provide the rt_server Channels.*/
 
-    QSharedPointer<RtCmdClient> m_pRtCmdClient; /**< The command client.*/
-    bool m_bCmdClientIsConnected;               /**< If the command client is connected.*/
+    QSharedPointer<RtCmdClient>                         m_pRtCmdClient;             /**< The command client.*/
+    bool                                                m_bCmdClientIsConnected;    /**< If the command client is connected.*/
 
-    QString     m_sFiffSimulatorIP;             /**< The IP Adress of mne_rt_server.*/
+    QString                                             m_sFiffSimulatorIP;         /**< The IP Adress of mne_rt_server.*/
+    QSharedPointer<FiffSimulatorProducer>               m_pFiffSimulatorProducer;   /**< Holds the FiffSimulatorProducer.*/
 
-    QSharedPointer<FiffSimulatorProducer> m_pFiffSimulatorProducer; /**< Holds the FiffSimulatorProducer.*/
 
-    QMap<qint32, QString> m_qMapConnectors;                 /**< Connector map.*/
-    qint32 m_iActiveConnectorId;                            /**< The active connector.*/
+    QMap<qint32, QString>   m_qMapConnectors;               /**< Connector map.*/
+    qint32                  m_iActiveConnectorId;           /**< The active connector.*/
 
-    FiffInfo::SPtr m_pFiffInfo;                             /**< Fiff measurement info.*/
-    qint32 m_iBufferSize;                                   /**< The raw data buffer size.*/
 
-    QTimer m_cmdConnectionTimer;                            /**< Timer for convinient command client connection. When timer times out a connection is tried to be established. */
+    FiffInfo::SPtr  m_pFiffInfo;                            /**< Fiff measurement info.*/
+    qint32          m_iBufferSize;                          /**< The raw data buffer size.*/
+
+    QTimer          m_cmdConnectionTimer;                   /**< Timer for convinient command client connection. When timer times out a connection is tried to be established. */
 
     QSharedPointer<RawMatrixBuffer> m_pRawMatrixBuffer_In;  /**< Holds incoming raw data. */
+
+    bool                            m_bIsRunning;           /**< Whether FiffSimulator is running.*/
+
 };
 
 } // NAMESPACE

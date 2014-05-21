@@ -70,7 +70,7 @@
 #include <Eigen/Core>
 #include <Eigen/SVD>
 #include <Eigen/Sparse>
-#include <Eigen/unsupported/KroneckerProduct>
+#include <unsupported/Eigen/KroneckerProduct>
 
 
 //*************************************************************************************************************
@@ -436,6 +436,17 @@ public:
     static bool read(QIODevice& p_IODevice, MNEForwardSolution& fwd, bool force_fixed = false, bool surf_ori = false, const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList, bool bExcludeBads = true);
 
     //ToDo readFromStream
+
+    //=========================================================================================================
+    /**
+    * reduces the forward solution and stores the result to p_fwdOut.
+    *
+    * @param[in]    p_iNumDipoles   Desired number of dipoles
+    * @param[out]   p_D             The reduction operator
+    *
+    * @return reduced MNE forward solution
+    */
+    MNEForwardSolution reduce_forward_solution(qint32 p_iNumDipoles, MatrixXd& p_D) const;
 
     //=========================================================================================================
     /**

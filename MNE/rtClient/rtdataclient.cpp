@@ -74,6 +74,15 @@ void RtDataClient::connectToHost(const QString& p_sRtServerHostName)
 
 //*************************************************************************************************************
 
+void RtDataClient::disconnectFromHost()
+{
+    QTcpSocket::disconnectFromHost();
+    m_clientID = -1;
+}
+
+
+//*************************************************************************************************************
+
 qint32 RtDataClient::getClientId()
 {
     if(m_clientID == -1)

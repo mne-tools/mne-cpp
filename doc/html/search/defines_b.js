@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['tmsishared_5fexport',['TMSISHARED_EXPORT',['../tmsi__global_8h.html#a0ab921a00b4a1b734b2abc10b7d5434b',1,'tmsi_global.h']]]
+  ['socket_5fumask',['SOCKET_UMASK',['../types__definitions_8h.html#a20b85b65e230cf18d6423c80973b5929',1,'types_definitions.h']]],
+  ['sourcelabshared_5fexport',['SOURCELABSHARED_EXPORT',['../sourcelab__global_8h.html#a157a09b1db1881ab7c178cefeac78d1d',1,'sourcelab_global.h']]]
 ];

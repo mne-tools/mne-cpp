@@ -137,7 +137,6 @@ bool PluginGui::removePlugin(IPlugin::SPtr pPlugin)
         if(!pPlugin->multiInstanceAllowed())
         {
             QString sPluginName = pPlugin->getName();
-            ;
 
             foreach (QAction *action, m_pActionGroupPlugins->actions())
             {

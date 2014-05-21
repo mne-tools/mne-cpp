@@ -40,5 +40,6 @@ var searchData=
   ['triggercontrolsetupwidget',['TriggerControlSetupWidget',['../class_trigger_control_plugin_1_1_trigger_control_setup_widget.html#a806196255f6f53112ce5cdb02dd8c39f',1,'TriggerControlPlugin::TriggerControlSetupWidget']]],
   ['triggered',['triggered',['../class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command_manager.html#aacc0233908903bf8d02356fb7a971f21',1,'RTCOMMANDLIB::CommandManager']]],
   ['tripletselection',['tripletSelection',['../class_m_n_e_l_i_b_1_1_m_n_e_forward_solution.html#a0f2f18b5ea97b20e227927e9f938d394',1,'MNELIB::MNEForwardSolution']]],
+  ['tris',['tris',['../class_f_s_l_i_b_1_1_surface.html#a878222645281e470be3b1cb507926886',1,'FSLIB::Surface']]],
   ['type',['type',['../class_x_m_e_a_s_l_i_b_1_1_new_measurement.html#a29e173fdd5dab68f945035d335d513f7',1,'XMEASLIB::NewMeasurement']]]
 ];

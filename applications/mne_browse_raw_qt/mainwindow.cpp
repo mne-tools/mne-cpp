@@ -140,7 +140,7 @@ void MainWindow::setupViewSettings() {
 
     m_pTableView->setShowGrid(false);
     m_pTableView->horizontalHeader()->hide();
-    m_pTableView->verticalHeader()->setDefaultSectionSize(m_pRawDelegate->m_dPlotHeight);
+    m_pTableView->verticalHeader()->setDefaultSectionSize(m_pRawDelegate->m_dDefaultPlotHeight);
 
     m_pTableView->setAutoScroll(false);
     m_pTableView->setColumnHidden(0,true); //because content is plotted jointly with column=1

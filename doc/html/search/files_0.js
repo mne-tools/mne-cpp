@@ -7,5 +7,12 @@ var searchData=
   ['arrow_2ecpp',['arrow.cpp',['../arrow_8cpp.html',1,'']]],
   ['arrow_2eh',['arrow.h',['../arrow_8h.html',1,'']]],
   ['asaelc_2ecpp',['asaelc.cpp',['../asaelc_8cpp.html',1,'']]],
-  ['asaelc_2eh',['asaelc.h',['../asaelc_8h.html',1,'']]]
+  ['asaelc_2eh',['asaelc.h',['../asaelc_8h.html',1,'']]],
+  ['averaging_2ecpp',['averaging.cpp',['../averaging_8cpp.html',1,'']]],
+  ['averaging_2eh',['averaging.h',['../averaging_8h.html',1,'']]],
+  ['averaging_5fglobal_2eh',['averaging_global.h',['../averaging__global_8h.html',1,'']]],
+  ['averagingaboutwidget_2ecpp',['averagingaboutwidget.cpp',['../averagingaboutwidget_8cpp.html',1,'']]],
+  ['averagingaboutwidget_2eh',['averagingaboutwidget.h',['../averagingaboutwidget_8h.html',1,'']]],
+  ['averagingsetupwidget_2ecpp',['averagingsetupwidget.cpp',['../averagingsetupwidget_8cpp.html',1,'']]],
+  ['averagingsetupwidget_2eh',['averagingsetupwidget.h',['../averagingsetupwidget_8h.html',1,'']]]
 ];

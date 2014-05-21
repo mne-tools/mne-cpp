@@ -81,7 +81,7 @@ void FiffSimulatorProducer::connectDataClient(QString p_sRtSeverIP)
     if(m_pRtDataClient.isNull())
         m_pRtDataClient = QSharedPointer<RtDataClient>(new RtDataClient);
     else if(m_bDataClientIsConnected)
-        this->disconnectDataClient();
+        return;
 
     m_pRtDataClient->connectToHost(p_sRtSeverIP);
     m_pRtDataClient->waitForConnected(1000);
@@ -133,9 +133,23 @@ void FiffSimulatorProducer::disconnectDataClient()
 
 void FiffSimulatorProducer::stop()
 {
+    //Wait until this thread (Producer) is stopped
     m_bIsRunning = false;
-    QThread::terminate();
-    QThread::wait();
+    m_bFlagMeasuring = false;
+
+    if(m_pFiffSimulator->m_bCmdClientIsConnected) //ToDo replace this with is running
+    {
+        // Stop Measurement at rt_Server
+        (*m_pFiffSimulator->m_pRtCmdClient)["stop-all"].send();
+    }
+
+    //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the push function (acquire statement)
+    m_pFiffSimulator->m_pRawMatrixBuffer_In->releaseFromPush();
+
+    while(this->isRunning())
+        m_bIsRunning = false;
+
+    this->disconnectDataClient();
 }
 
 
@@ -157,6 +171,7 @@ void FiffSimulatorProducer::run()
     msleep(1000);
 
     m_bIsRunning = true;
+    m_bFlagMeasuring = true;
 
     //
     // Inits

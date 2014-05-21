@@ -440,7 +440,7 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const Annotation
                     p_fwdOut.src[h].cluster_info.centroidSource_rr.append(this->src[h].rr.row(sel_idx));
 //                    p_fwdOut.src[h].nn.row(count) = MatrixXd::Zero(1,3);
 
-                    p_fwdOut.src[h].vertno[count] = this->src[h].vertno[sel_idx];
+                    p_fwdOut.src[h].vertno[count] = this->src[h].vertno[sel_idx]; //ToDo resizing necessary?
 
 //                    //vertices
 //                    std::cout << this->src[h].vertno[sel_idx] << ", ";
@@ -684,6 +684,114 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const Annotation
     p_fwdOut.sol->ncol = t_G_new.cols();
 
     p_fwdOut.nsource = p_fwdOut.sol->ncol/3;
+
+    return p_fwdOut;
+}
+
+
+//*************************************************************************************************************
+
+MNEForwardSolution MNEForwardSolution::reduce_forward_solution(qint32 p_iNumDipoles, MatrixXd& p_D) const
+{
+    MNEForwardSolution p_fwdOut = MNEForwardSolution(*this);
+
+    bool isFixed = p_fwdOut.isFixedOrient();
+    qint32 np = isFixed ? p_fwdOut.sol->data.cols() : p_fwdOut.sol->data.cols()/3;
+
+    if(p_iNumDipoles > np)
+        return p_fwdOut;
+
+    VectorXi sel(p_iNumDipoles);
+
+    float t_fStep = (float)np/(float)p_iNumDipoles;
+
+    for(qint32 i = 0; i < p_iNumDipoles; ++i)
+    {
+        float t_fCurrent = ((float)i)*t_fStep;
+        sel[i] = (quint32)floor(t_fCurrent);
+    }
+
+    if(isFixed)
+    {
+        p_D = MatrixXd::Zero(p_fwdOut.sol->data.cols(), p_iNumDipoles);
+        for(qint32 i = 0; i < p_iNumDipoles; ++i)
+            p_D(sel[i], i) = 1;
+    }
+    else
+    {
+        p_D = MatrixXd::Zero(p_fwdOut.sol->data.cols(), p_iNumDipoles*3);
+        for(qint32 i = 0; i < p_iNumDipoles; ++i)
+            for(qint32 j = 0; j < 3; ++j)
+                p_D((sel[i]*3)+j, (i*3)+j) = 1;
+    }
+
+
+//    //find idx of hemi switch
+//    qint32 vertno_size = this->src[0].nuse;
+//    qint32 hIdx = 0;
+
+//    //LH
+//    VectorXi vertnosLH(this->src[0].nuse);
+//    for(qint32 i = 0; i < sel.size(); ++i)
+//    {
+//        if(sel[i] >= vertno_size)
+//        {
+//            hIdx = i;
+//            break;
+//        }
+//        vertnosLH[i] = this->src[0].vertno(sel[i]);
+//    }
+//    vertnosLH.conservativeResize(hIdx);
+
+//    QFile file_centroids_LH("./centroids_LH_sel.txt");
+//    file_centroids_LH.open(QIODevice::WriteOnly | QIODevice::Text);
+//    QTextStream out_centroids_LH(&file_centroids_LH);
+//    for(qint32 i = 0; i < vertnosLH.size(); ++i)
+//        out_centroids_LH << vertnosLH[i] << ", ";
+//    file_centroids_LH.close();
+
+//    QFile file_centroids_LH_full("./centroids_LH_full.txt");
+//    file_centroids_LH_full.open(QIODevice::WriteOnly | QIODevice::Text);
+//    QTextStream out_centroids_LH_full(&file_centroids_LH_full);
+//    for(qint32 i = 0; i < this->src[0].vertno.size(); ++i)
+//        out_centroids_LH_full << this->src[0].vertno[i] << ", ";
+//    file_centroids_LH_full.close();
+
+//    //RH
+//    VectorXi vertnosRH(sel.size() - hIdx);
+//    for(qint32 i = hIdx; i < sel.size(); ++i)
+//    {
+//        vertnosRH[i - hIdx] = this->src[1].vertno(sel[i] - hIdx);
+//    }
+
+//    QFile file_centroids_RH("./centroids_RH_sel.txt");
+//    file_centroids_RH.open(QIODevice::WriteOnly | QIODevice::Text);
+//    QTextStream out_centroids_RH(&file_centroids_RH);
+//    for(qint32 i = 0; i < vertnosRH.size(); ++i)
+//        out_centroids_RH << vertnosRH[i] << ", ";
+//    file_centroids_RH.close();
+//    //vertno end
+
+    // New gain matrix
+    p_fwdOut.sol->data = this->sol->data * p_D;
+
+    MatrixX3f rr(p_iNumDipoles,3);
+
+    MatrixX3f nn(p_iNumDipoles,3);
+
+
+    for(qint32 i = 0; i < p_iNumDipoles; ++i)
+    {
+        rr.row(i) = this->source_rr.row(sel(i));
+        nn.row(i) = this->source_nn.row(sel(i));
+    }
+
+    p_fwdOut.source_rr = rr;
+    p_fwdOut.source_nn = nn;
+
+    p_fwdOut.sol->ncol =  p_fwdOut.sol->data.cols();
+
+    p_fwdOut.nsource = p_iNumDipoles;
 
     return p_fwdOut;
 }

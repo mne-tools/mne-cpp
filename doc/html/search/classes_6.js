@@ -22,6 +22,11 @@ var searchData=
   ['fiffrawdata',['FiffRawData',['../class_f_i_f_f_l_i_b_1_1_fiff_raw_data.html',1,'FIFFLIB']]],
   ['fiffrawdir',['FiffRawDir',['../class_f_i_f_f_l_i_b_1_1_fiff_raw_dir.html',1,'FIFFLIB']]],
   ['fiffsimulator',['FiffSimulator',['../class_fiff_simulator_plugin_1_1_fiff_simulator.html',1,'FiffSimulatorPlugin']]],
+  ['fiffsimulatoraboutwidget',['FiffSimulatorAboutWidget',['../class_fiff_simulator_plugin_1_1_fiff_simulator_about_widget.html',1,'FiffSimulatorPlugin']]],
+  ['fiffsimulatoraboutwidgetclass',['FiffSimulatorAboutWidgetClass',['../class_ui_1_1_fiff_simulator_about_widget_class.html',1,'Ui']]],
+  ['fiffsimulatorproducer',['FiffSimulatorProducer',['../class_fiff_simulator_plugin_1_1_fiff_simulator_producer.html',1,'FiffSimulatorPlugin']]],
+  ['fiffsimulatorsetupwidget',['FiffSimulatorSetupWidget',['../class_fiff_simulator_plugin_1_1_fiff_simulator_setup_widget.html',1,'FiffSimulatorPlugin']]],
+  ['fiffsimulatorsetupwidgetclass',['FiffSimulatorSetupWidgetClass',['../class_ui_1_1_fiff_simulator_setup_widget_class.html',1,'Ui']]],
   ['fiffstream',['FiffStream',['../class_f_i_f_f_l_i_b_1_1_fiff_stream.html',1,'FIFFLIB']]],
   ['fiffstreamserver',['FiffStreamServer',['../class_r_t_s_e_r_v_e_r_1_1_fiff_stream_server.html',1,'RTSERVER']]],
   ['fiffstreamthread',['FiffStreamThread',['../class_r_t_s_e_r_v_e_r_1_1_fiff_stream_thread.html',1,'RTSERVER']]],
@@ -29,5 +34,7 @@ var searchData=
   ['filterdata',['FilterData',['../class_u_t_i_l_s_l_i_b_1_1_filter_data.html',1,'UTILSLIB']]],
   ['filteroperator',['FilterOperator',['../class_m_n_e_browse_raw_qt_1_1_filter_operator.html',1,'MNEBrowseRawQt']]],
   ['fllconfig',['FLLConfig',['../struct_mne_rt_client_plugin_1_1_f_l_l_config.html',1,'MneRtClientPlugin']]],
-  ['fllpara',['FLLPara',['../struct_mne_rt_client_plugin_1_1_f_l_l_para.html',1,'MneRtClientPlugin']]]
+  ['fllconfig',['FLLConfig',['../struct_baby_m_e_g_plugin_1_1_f_l_l_config.html',1,'BabyMEGPlugin']]],
+  ['fllpara',['FLLPara',['../struct_mne_rt_client_plugin_1_1_f_l_l_para.html',1,'MneRtClientPlugin']]],
+  ['fllpara',['FLLPara',['../struct_baby_m_e_g_plugin_1_1_f_l_l_para.html',1,'BabyMEGPlugin']]]
 ];
