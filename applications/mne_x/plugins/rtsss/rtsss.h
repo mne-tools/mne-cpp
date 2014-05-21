@@ -1,7 +1,7 @@
 //=============================================================================================================
 /**
 * @file     rtsss.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @author   Seok Lew <slew@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     February, 2013
@@ -52,6 +52,7 @@
 #include <xMeas/newrealtimesamplearray.h>
 #include <xMeas/newrealtimemultisamplearray.h>
 
+#include <fiff/fiff.h>
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_evoked.h>
 
@@ -149,9 +150,9 @@ private:
     PluginInputData<NewRealTimeSampleArray>::SPtr   m_pRTSAInput;      /**< The RealTimeSampleArray of the RtSss input.*/
     PluginOutputData<NewRealTimeSampleArray>::SPtr  m_pRTSAOutput;    /**< The RealTimeSampleArray of the RtSss output.*/
 
-    //  from sourcelab.h
     PluginInputData<NewRealTimeMultiSampleArray>::SPtr  m_pRTMSAInput;  /**< The RealTimeMultiSampleArray input.*/
-    PluginOutputData<RealTimeSourceEstimate>::SPtr      m_pRTSEOutput;  /**< The RealTimeSourceEstimate output.*/
+    PluginOutputData<NewRealTimeMultiSampleArray>::SPtr      m_pRTMSAOutput;  /**< The RealTimeMultiSampleArray output.*/
+
 
     bool m_bIsRunning;      /**< If source lab is running */
     bool m_bReceiveData;    /**< If thread is ready to receive data */
@@ -159,8 +160,12 @@ private:
 
     FiffInfo::SPtr              m_pFiffInfo;        /**< Fiff information. */
 
+    FiffRawData m_pFiffRaw;
+
     CircularMatrixBuffer<double>::SPtr m_pRtSssBuffer;   /**< Holds incoming rt server data.*/
-//    dBuffer::SPtr   m_pRtSssBuffer;      /**< Holds incoming data.*/
+    CircularMatrixBuffer<double>::SPtr m_pRtSssMegBuffer;   /**< Holds incoming rt server data.*/
+
+    //    dBuffer::SPtr   m_pRtSssBuffer;      /**< Holds incoming data.*/
 };
 
 } // NAMESPACE
