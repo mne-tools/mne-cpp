@@ -112,9 +112,6 @@ void FiffSimulator::init()
     // Start FiffSimulatorProducer
     m_pFiffSimulatorProducer->start();
 
-    while(!m_pFiffSimulatorProducer->m_bIsRunning)
-        msleep(1);
-
     //init channels when fiff info is available
     connect(this, &FiffSimulator::fiffInfoAvailable, this, &FiffSimulator::initConnector);
 
