@@ -59,6 +59,9 @@ void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOpti
             QVariant variant = index.model()->data(index,Qt::DisplayRole);
             QList< QVector<float> > data = variant.value< QList< QVector<float> > >();
 
+
+            const RealTimeMultiSampleArrayModel* t_pModel = static_cast<const RealTimeMultiSampleArrayModel*>(index.model());
+
             if(data.size()>0)
             {
     //            const RealTimeMultiSampleArrayModel* t_rtmsaModel = (static_cast<const RealTimeMultiSampleArrayModel*>(index.model()));
@@ -88,9 +91,9 @@ void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOpti
                 painter->setRenderHint(QPainter::Antialiasing, true);
 
                 if(option.state & QStyle::State_Selected)
-                    painter->setPen(QPen(Qt::red, 1, Qt::SolidLine));
+                    painter->setPen(QPen(t_pModel->isFreezed() ? Qt::darkRed : Qt::red, 1, Qt::SolidLine));
                 else
-                    painter->setPen(QPen(Qt::darkBlue, 1, Qt::SolidLine));
+                    painter->setPen(QPen(t_pModel->isFreezed() ? Qt::darkGray : Qt::darkBlue, 1, Qt::SolidLine));
 
                 painter->drawPath(path);
                 painter->restore();
@@ -99,9 +102,9 @@ void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOpti
                 painter->translate(0,t_fPlotHeight/2);
                 painter->setRenderHint(QPainter::Antialiasing, true);
                 if(option.state & QStyle::State_Selected)
-                    painter->setPen(QPen(Qt::red, 1, Qt::SolidLine));
+                    painter->setPen(QPen(t_pModel->isFreezed() ? Qt::darkRed : Qt::red, 1, Qt::SolidLine));
                 else
-                    painter->setPen(QPen(Qt::darkBlue, 1, Qt::SolidLine));
+                    painter->setPen(QPen(t_pModel->isFreezed() ? Qt::darkGray : Qt::darkBlue, 1, Qt::SolidLine));
                 painter->drawPath(lastPath);
 
                 painter->restore();
@@ -162,7 +165,7 @@ void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, 
             break;
         }
         case FIFFV_EOG_CH: {
-            fMaxValue = 1e-3; //m_qSettings.value("RawDelegate/max_eog").toDouble();
+            fMaxValue = 1e-3f; //m_qSettings.value("RawDelegate/max_eog").toDouble();
             break;
         }
         case FIFFV_STIM_CH: {
