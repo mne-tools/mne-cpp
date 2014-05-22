@@ -113,9 +113,6 @@ void Neuromag::init()
     // Start NeuromagProducer
     m_pNeuromagProducer->start();
 
-    while(!m_pNeuromagProducer->m_bIsRunning)
-        msleep(1);
-
     //init channels when fiff info is available
     connect(this, &Neuromag::fiffInfoAvailable, this, &Neuromag::initConnector);
 
