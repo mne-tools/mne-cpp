@@ -72,7 +72,10 @@ public:
 
     inline qint32 numVLines() const;
 
-    void toggleFreez(const QModelIndex &);
+    void toggleFreeze(const QModelIndex &);
+
+    inline bool isFreezed() const;
+
 
 private:
     QList<RealTimeSampleArrayChInfo> m_qListChInfo; /**< Channel info list.*/
@@ -82,6 +85,9 @@ private:
     //Fiff data structure
     QVector<VectorXd> m_dataCurrent;        /**< List that holds the current data*/
     QVector<VectorXd> m_dataLast;           /**< List that holds the last data */
+
+    QVector<VectorXd> m_dataCurrentFreeze;        /**< List that holds the current data when freezed*/
+    QVector<VectorXd> m_dataLastFreeze;           /**< List that holds the last data when freezed*/
 
     float m_fSps;               /**< Sampling rate */
     qint32 m_iT;                /**< Time window */
@@ -110,5 +116,10 @@ inline qint32 RealTimeMultiSampleArrayModel::numVLines() const
     return (m_iT - 1);
 }
 
+
+inline bool RealTimeMultiSampleArrayModel::isFreezed() const
+{
+    return m_bIsFreezed;
+}
 
 #endif // REALTIMEMULTISAMPLEARRAYMODEL_H
