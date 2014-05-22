@@ -77,10 +77,11 @@ Neuromag::Neuromag()
 : m_sNeuromagClientAlias("mne-x")
 , m_pRtCmdClient(NULL)
 , m_bCmdClientIsConnected(false)
-, m_sNeuromagIP("127.0.0.1")//("172.21.16.88")//("127.0.0.1")
+, m_sNeuromagIP("172.21.16.88")//("127.0.0.1")
 , m_pNeuromagProducer(new NeuromagProducer(this))
 , m_iBufferSize(-1)
 , m_pRawMatrixBuffer_In(0)
+, m_bIsRunning(false)
 /*m_pRTMSA_Neuromag(0)*/
 {
 
@@ -93,8 +94,6 @@ Neuromag::~Neuromag()
 {
     if(this->isRunning())
         stop();
-    if(m_pNeuromagProducer->isRunning())
-        m_pNeuromagProducer->stop();
 }
 
 
@@ -113,6 +112,9 @@ void Neuromag::init()
 {
     // Start NeuromagProducer
     m_pNeuromagProducer->start();
+
+    while(!m_pNeuromagProducer->m_bIsRunning)
+        msleep(1);
 
     //init channels when fiff info is available
     connect(this, &Neuromag::fiffInfoAvailable, this, &Neuromag::initConnector);
@@ -269,8 +271,11 @@ void Neuromag::disconnectCmdClient()
 
 void Neuromag::requestInfo()
 {
+    qDebug() << "Neuromag::requestInfo()";
     if(m_pNeuromagProducer->m_iDataClientId > -1 && m_bCmdClientIsConnected)
     {
+        qDebug() << "send measinfo";
+
         // read meas info
         (*m_pRtCmdClient)["measinfo"].pValues()[0].setValue(m_pNeuromagProducer->m_iDataClientId);
         (*m_pRtCmdClient)["measinfo"].send();
@@ -288,6 +293,10 @@ void Neuromag::requestInfo()
 
 bool Neuromag::start()
 {
+    //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
+    if(this->isRunning())
+        QThread::wait();
+
     if(m_bCmdClientIsConnected && m_pFiffInfo)
     {
         // Initialize real time measurements
@@ -300,18 +309,25 @@ bool Neuromag::start()
         // Buffer
         m_pRawMatrixBuffer_In = QSharedPointer<RawMatrixBuffer>(new RawMatrixBuffer(8,m_pFiffInfo->nchan,m_iBufferSize));
 
+        m_bIsRunning = true;
+
         // Start threads
         QThread::start();
+
+        m_pNeuromagProducer->start();
+
+        while(!m_pNeuromagProducer->m_bFlagMeasuring)
+            msleep(1);
 
         // Start Measurement at rt_Server
         // start measurement
         (*m_pRtCmdClient)["start"].pValues()[0].setValue(m_pNeuromagProducer->m_iDataClientId);
         (*m_pRtCmdClient)["start"].send();
 
-        m_pNeuromagProducer->producerMutex.lock();
-        m_pNeuromagProducer->m_bFlagMeasuring = true;
-        m_pNeuromagProducer->producerMutex.unlock();
-        m_pNeuromagProducer->start();
+//        m_pNeuromagProducer->producerMutex.lock();
+//        m_pNeuromagProducer->m_bFlagMeasuring = true;
+//        m_pNeuromagProducer->producerMutex.unlock();
+//        m_pNeuromagProducer->start();
 
         return true;
     }
@@ -324,24 +340,38 @@ bool Neuromag::start()
 
 bool Neuromag::stop()
 {
-    if(m_bCmdClientIsConnected) //ToDo replace this with is running
-    {
-        // Stop Measurement at rt_Server
-        (*m_pRtCmdClient)["stop-all"].send();
+    m_pNeuromagProducer->stop();
 
-        m_pNeuromagProducer->producerMutex.lock();
-        m_pNeuromagProducer->m_bFlagMeasuring = false;
-        m_pNeuromagProducer->producerMutex.unlock();
-    }
+    //Wait until this thread (TMSI) is stopped
+    m_bIsRunning = false;
 
-    // Stop threads
-    QThread::terminate();
-    QThread::wait();
+    //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the pop function (acquire statement)
+    m_pRawMatrixBuffer_In->releaseFromPop();
 
-    //Clear Buffers
     m_pRawMatrixBuffer_In->clear();
 
+    m_pRTMSA_Neuromag->data()->clear();
+
     return true;
+
+//    if(m_bCmdClientIsConnected) //ToDo replace this with is running
+//    {
+//        // Stop Measurement at rt_Server
+//        (*m_pRtCmdClient)["stop-all"].send();
+
+//        m_pNeuromagProducer->producerMutex.lock();
+//        m_pNeuromagProducer->m_bFlagMeasuring = false;
+//        m_pNeuromagProducer->producerMutex.unlock();
+//    }
+
+//    // Stop threads
+//    QThread::terminate();
+//    QThread::wait();
+
+//    //Clear Buffers
+//    m_pRawMatrixBuffer_In->clear();
+
+//    return true;
 }
 
 
@@ -379,16 +409,13 @@ void Neuromag::run()
 {
 
     MatrixXf matValue;
-    while(true)
+    while(m_bIsRunning)
     {
         //pop matrix
         matValue = m_pRawMatrixBuffer_In->pop();
-//        std::cout << "matValue " << matValue.block(0,0,1,10) << std::endl;
 
         //emit values
         for(qint32 i = 0; i < matValue.cols(); ++i)
             m_pRTMSA_Neuromag->data()->setValue(matValue.col(i).cast<double>());
-//        for(qint32 i = 0; i < matValue.cols(); i += 100)
-//            m_pRTMSA_Neuromag->setValue(matValue.col(i).cast<double>());
     }
 }
