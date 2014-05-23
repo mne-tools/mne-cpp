@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/images">
+        <file alias="fiffsimulator.png">images/fiffsimulator.png</file>
+    </qresource>
+</RCC>
