@@ -13,10 +13,11 @@
 RealTimeMultiSampleArrayModel::RealTimeMultiSampleArrayModel(QObject *parent)
 : QAbstractTableModel(parent)
 , m_fSps(1024.0f)
-, m_fT(10)
+, m_iT(10)
 , m_iDownsampling(10)
 , m_iMaxSamples(1024)
 , m_iCurrentSample(0)
+, m_bIsFreezed(false)
 {
 }
 
@@ -63,19 +64,38 @@ QVariant RealTimeMultiSampleArrayModel::data(const QModelIndex &index, int role)
                     //pack all adjacent (after reload) RowVectorPairs into a QList
                     QList< QVector<float> > qListVector;
 
-                    // data
-                    QVector<float> data;
-                    for(qint32 i = 0; i < m_dataCurrent.size(); ++i)
-                        data.append(m_dataCurrent[i](row));
-                    qListVector.append(data);
+                    if(m_bIsFreezed)
+                    {
+                        // data freeze
+                        QVector<float> data;
+                        for(qint32 i = 0; i < m_dataCurrentFreeze.size(); ++i)
+                            data.append(m_dataCurrentFreeze[i](row));
+                        qListVector.append(data);
 
-                    // last data
-                    QVector<float> lastData;
-                    for(qint32 i=0; i < m_dataLast.size(); ++i)
-                        lastData.append(m_dataLast[i](row));
-                    qListVector.append(lastData);
+                        // last data freeze
+                        QVector<float> lastData;
+                        for(qint32 i=0; i < m_dataLastFreeze.size(); ++i)
+                            lastData.append(m_dataLastFreeze[i](row));
+                        qListVector.append(lastData);
 
-                    v.setValue(qListVector);
+                        v.setValue(qListVector);
+                    }
+                    else
+                    {
+                        // data
+                        QVector<float> data;
+                        for(qint32 i = 0; i < m_dataCurrent.size(); ++i)
+                            data.append(m_dataCurrent[i](row));
+                        qListVector.append(data);
+
+                        // last data
+                        QVector<float> lastData;
+                        for(qint32 i=0; i < m_dataLast.size(); ++i)
+                            lastData.append(m_dataLast[i](row));
+                        qListVector.append(lastData);
+
+                        v.setValue(qListVector);
+                    }
                     return v;
                     break;
                 }
@@ -148,7 +168,7 @@ void RealTimeMultiSampleArrayModel::setChannelInfo(QList<RealTimeSampleArrayChIn
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayModel::setSamplingInfo(float sps, float T, float dest_sps)
+void RealTimeMultiSampleArrayModel::setSamplingInfo(float sps, int T, float dest_sps)
 {
     beginResetModel();
 
@@ -156,6 +176,8 @@ void RealTimeMultiSampleArrayModel::setSamplingInfo(float sps, float T, float de
         m_iDownsampling = (qint32)ceil(sps/dest_sps);
     else
         m_iDownsampling = 1;
+
+    m_iT = T;
 
     float maxSamples = sps * T;
     m_iMaxSamples = (qint32)ceil(maxSamples/(sps/dest_sps)); // Max Samples / Downsampling
@@ -253,4 +275,24 @@ void RealTimeMultiSampleArrayModel::resetSelection()
         m_qMapIdxRowSelection.insert(i,i);
 
     endResetModel();
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayModel::toggleFreeze(const QModelIndex &)
+{
+    m_bIsFreezed = !m_bIsFreezed;
+
+    if(m_bIsFreezed)
+    {
+        m_dataCurrentFreeze = m_dataCurrent;
+        m_dataLastFreeze = m_dataLast;
+    }
+
+    //Update data content
+    QModelIndex topLeft = this->index(0,1);
+    QModelIndex bottomRight = this->index(m_qListChInfo.size()-1,1);
+    QVector<int> roles; roles << Qt::DisplayRole;
+    emit dataChanged(topLeft, bottomRight, roles);
 }

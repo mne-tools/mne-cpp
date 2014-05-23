@@ -83,7 +83,7 @@ VectorXd find(MatrixXd, int);
 double stdev(VectorXd);
 VectorXd eigen_LTE(VectorXd V, double tol);
 VectorXd eigen_LT_index(VectorXd V, double tol);
-VectorXd eigen_LT_index_test(VectorXd V, int);
+VectorXd eigen_LT_index_test(int);
 VectorXd eigen_GT(VectorXd V, double tol);
 VectorXd eigen_AND(VectorXd V1, VectorXd V2);
 
@@ -100,6 +100,12 @@ public:
     QList<MatrixXd> getSSSOLS(MatrixXd EqnIn, MatrixXd EqnOut, MatrixXd EqnA, MatrixXd EqnB);
     QList<MatrixXd> getLinEqn();
 
+    void setMEGInfo(FiffInfo::SPtr fiffinfo);
+    qint32 getNumMEGCh();
+    void setMEGsignal(MatrixXd megfrombuffer);
+
+//    FiffInfo::SPtr fiffInfo;
+
 private:
     void getCoilInfoVectorView();
     void getCoilInfoVectorView4Sim();
@@ -115,7 +121,8 @@ private:
     QList<QString> CoilName, CoilTk;
     QList<MatrixXd> CoilRk, CoilWk;
     VectorXi CoilNk, CoilGrad;
-    VectorXd MEGIn, MEGOut, MEGNoise, MEGData;
+    VectorXd MEGIn, MEGOut, MEGNoise;
+    MatrixXd MEGData;
 
     Vector3d Origin;
     MatrixXd BInX, BInY, BInZ, BOutX, BOutY, BOutZ;
@@ -126,7 +133,7 @@ private:
     VectorXd PHI_X, PHI_Y, PHI_Z;
     VectorXd THETA_X, THETA_Y, THETA_Z;
 
-    FiffInfo::SPtr m_pFiffInfo;     /**< Fiff information. */
+//    FiffInfo::SPtr m_pFiffInfo;     /**< Fiff information. */
 };
 
 #endif // RTSSSALGO_H

@@ -62,6 +62,7 @@ NeuromagProducer::NeuromagProducer(Neuromag* p_pNeuromag)
 , m_iDataClientId(-1)
 , m_bFlagInfoRequest(false)
 , m_bFlagMeasuring(false)
+, m_bIsRunning(false)
 {
 }
 
@@ -81,7 +82,7 @@ void NeuromagProducer::connectDataClient(QString p_sRtSeverIP)
     if(m_pRtDataClient.isNull())
         m_pRtDataClient = QSharedPointer<RtDataClient>(new RtDataClient);
     else if(m_bDataClientIsConnected)
-        this->disconnectDataClient();
+        return;
 
     m_pRtDataClient->connectToHost(p_sRtSeverIP);
     m_pRtDataClient->waitForConnected(1000);
@@ -133,9 +134,27 @@ void NeuromagProducer::disconnectDataClient()
 
 void NeuromagProducer::stop()
 {
+    //Wait until this thread (Producer) is stopped
     m_bIsRunning = false;
-    QThread::terminate();
-    QThread::wait();
+    m_bFlagMeasuring = false;
+
+    if(m_pNeuromag->m_bCmdClientIsConnected) //ToDo replace this with is running
+    {
+        // Stop Measurement at rt_Server
+        (*m_pNeuromag->m_pRtCmdClient)["stop-all"].send();
+    }
+
+    //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the push function (acquire statement)
+    m_pNeuromag->m_pRawMatrixBuffer_In->releaseFromPush();
+
+    while(this->isRunning())
+        m_bIsRunning = false;
+
+    this->disconnectDataClient();
+
+//    m_bIsRunning = false;
+//    QThread::terminate();
+//    QThread::wait();
 }
 
 
@@ -143,6 +162,8 @@ void NeuromagProducer::stop()
 
 void NeuromagProducer::run()
 {
+    qDebug() << "void NeuromagProducer::run()" << m_pNeuromag->m_sNeuromagIP;
+
     //
     // Connect data client
     //
@@ -154,9 +175,13 @@ void NeuromagProducer::run()
         this->connectDataClient(m_pNeuromag->m_sNeuromagIP);
     }
 
+
+    qDebug() << "void NeuromagProducer::run() connected";
+
     msleep(1000);
 
     m_bIsRunning = true;
+    m_bFlagMeasuring = true;
 
     //
     // Inits

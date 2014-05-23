@@ -106,15 +106,35 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
 , m_pRTMSAModel(NULL)
 , m_pRTMSADelegate(NULL)
 , m_pTableView(NULL)
+, m_fDefaultSectionSize(80.0f)
+, m_fZoomFactor(1.0f)
 , m_pRTMSA(pRTMSA)
 , m_bInitialized(false)
+, m_iT(10)
 , m_fSamplingRate(1024)
+, m_fDesiredSamplingRate(128)
 {
+    m_pDoubleSpinBoxZoom = new QDoubleSpinBox(this);
+    m_pDoubleSpinBoxZoom->setMinimum(0.3);
+    m_pDoubleSpinBoxZoom->setMaximum(4.0);
+    m_pDoubleSpinBoxZoom->setSingleStep(0.1);
+    m_pDoubleSpinBoxZoom->setValue(1.0);
+    m_pDoubleSpinBoxZoom->setSuffix(" x");
+    connect(m_pDoubleSpinBoxZoom, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &RealTimeMultiSampleArrayWidget::zoomChanged);
+    addDisplayWidget(m_pDoubleSpinBoxZoom);
+
+    m_pSpinBoxTimeScale = new QSpinBox(this);
+    m_pSpinBoxTimeScale->setMinimum(1);
+    m_pSpinBoxTimeScale->setMaximum(20);
+    m_pSpinBoxTimeScale->setValue(m_iT);
+    m_pSpinBoxTimeScale->setSuffix(" s");
+    connect(m_pSpinBoxTimeScale, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &RealTimeMultiSampleArrayWidget::timeWindowChanged);
+    addDisplayWidget(m_pSpinBoxTimeScale);
+
     m_pActionSelectRoi = new QAction(QIcon(":/images/selectRoi.png"), tr("Shows the region selection widget (F12)"),this);
     m_pActionSelectRoi->setShortcut(tr("F12"));
     m_pActionSelectRoi->setStatusTip(tr("Shows the region selection widget (F12)"));
     connect(m_pActionSelectRoi, &QAction::triggered, this, &RealTimeMultiSampleArrayWidget::showRoiSelectionWidget);
-
     addDisplayAction(m_pActionSelectRoi);
 
     if(m_pTableView)
@@ -167,11 +187,13 @@ void RealTimeMultiSampleArrayWidget::init()
         m_pRTMSAModel = new RealTimeMultiSampleArrayModel(this);
 
         m_pRTMSAModel->setChannelInfo(m_qListChInfo);
-        m_pRTMSAModel->setSamplingInfo(m_fSamplingRate, 10, 128);
+        m_pRTMSAModel->setSamplingInfo(m_fSamplingRate, m_iT, m_fDesiredSamplingRate);
 
         if(m_pRTMSADelegate)
             delete m_pRTMSADelegate;
         m_pRTMSADelegate = new RealTimeMultiSampleArrayDelegate(this);
+
+        connect(m_pTableView, &QTableView::doubleClicked, m_pRTMSAModel, &RealTimeMultiSampleArrayModel::toggleFreeze);
 
         m_pTableView->setModel(m_pRTMSAModel);
         m_pTableView->setItemDelegate(m_pRTMSADelegate);
@@ -183,7 +205,7 @@ void RealTimeMultiSampleArrayWidget::init()
 
         m_pTableView->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch); //Stretch 2 column to maximal width
         m_pTableView->horizontalHeader()->hide();
-        m_pTableView->verticalHeader()->setDefaultSectionSize(80.0f);//Row Height
+        m_pTableView->verticalHeader()->setDefaultSectionSize(m_fZoomFactor*m_fDefaultSectionSize);//Row Height
 
         m_pTableView->setAutoScroll(false);
         m_pTableView->setColumnHidden(0,true); //because content is plotted jointly with column=1
@@ -198,9 +220,6 @@ void RealTimeMultiSampleArrayWidget::init()
 
         //activate kinetic scrolling
         QScroller::grabGesture(m_pTableView,QScroller::MiddleMouseButtonGesture);
-
-
-
 
         m_bInitialized = true;
     }
@@ -308,6 +327,24 @@ void RealTimeMultiSampleArrayWidget::wheelEvent(QWheelEvent* wheelEvent)
 
 }
 
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayWidget::zoomChanged(double zoomFac)
+{
+    m_fZoomFactor = zoomFac;
+
+    m_pTableView->verticalHeader()->setDefaultSectionSize(m_fZoomFactor*m_fDefaultSectionSize);//Row Height
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayWidget::timeWindowChanged(int T)
+{
+    m_iT = T;
+    m_pRTMSAModel->setSamplingInfo(m_fSamplingRate, T, m_fDesiredSamplingRate);
+}
+
 
 //*************************************************************************************************************
 
@@ -317,7 +354,6 @@ void RealTimeMultiSampleArrayWidget::showRoiSelectionWidget()
         m_pRoiSelectionWidget = QSharedPointer<XDISPLIB::RoiSelectionWidget>(new XDISPLIB::RoiSelectionWidget);
 
     m_pRoiSelectionWidget->show();
-
 }
 
 

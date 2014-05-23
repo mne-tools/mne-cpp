@@ -54,23 +54,23 @@ QList<MatrixXd> RtSssAlgo::buildLinearEqn()
     int LInRR, LOutRR, LIn, LOut;
 //    MatrixXd EqnInRR, EqnOutRR, EqnIn, EqnOut;
 
-    int MagScale;
-    int MACHINE_TYPE = VECTORVIEW;
+//    int MagScale;
+//    int MACHINE_TYPE = VECTORVIEW;
 
-    if (MACHINE_TYPE == VECTORVIEW)
-    {
-        MagScale = 100;
-        std::cout << "loading coil information (VectorView).....";
-        getCoilInfoVectorView();
-        std::cout << "loading coil information (VectorView)..... ** finished **"  << endl;
-    }
-    else if (MACHINE_TYPE == BABYMEG)
-    {
-        MagScale = 1;
-        std::cout << "loading coil information (BabyMEG).....";
-        getCoilInfoBabyMEG4Sim();
-        std::cout << "loading coil information (BabyMEG)..... ** finisehd **" << endl;
-    }
+//    if (MACHINE_TYPE == VECTORVIEW)
+//    {
+//        MagScale = 100;
+//        std::cout << "loading coil information (VectorView).....";
+//        getCoilInfoVectorView();
+//        std::cout << "loading coil information (VectorView)..... ** finished **"  << endl;
+//    }
+//    else if (MACHINE_TYPE == BABYMEG)
+//    {
+//        MagScale = 1;
+//        std::cout << "loading coil information (BabyMEG).....";
+//        getCoilInfoBabyMEG4Sim();
+//        std::cout << "loading coil information (BabyMEG)..... ** finisehd **" << endl;
+//    }
 
     LInRR = 5;
     LOutRR = 4;
@@ -86,9 +86,7 @@ QList<MatrixXd> RtSssAlgo::buildLinearEqn()
     EqnIn = Eqn[0];
     EqnOut = Eqn[1];
 
-
 //  build linear equation
-    VectorXd CoilScale;
 //    MatrixXd EqnARR(NumCoil, EqnInRR.cols()+EqnOutRR.cols());
 //    MatrixXd EqnA(NumCoil, EqnIn.cols()+EqnOut.cols());
 //    MatrixXd EqnB(NumCoil,1);
@@ -96,16 +94,30 @@ QList<MatrixXd> RtSssAlgo::buildLinearEqn()
     EqnA.resize(NumCoil, EqnIn.cols()+EqnOut.cols());
     EqnB.resize(NumCoil,1);
 
+    // Find out if coils are all gradiometers, all magnetometers, or both.
+    // When both gradiometers and magnetometers are used,
+    //      MagScale facor of 100 must be appiled to magnetomters.
+    float MagScale;
+    if ((0 < CoilGrad.sum()) && (CoilGrad.sum() < NumCoil))  MagScale = 100;
+    else MagScale = 1;
+
+    VectorXd CoilScale;
     CoilScale.setOnes(NumCoil);
     for(int i=0; i<NumCoil; i++)
+    {
         if (CoilGrad(i) == 0) CoilScale(i) = MagScale;
-
+//        std::cout <<  "i=" << i << "CoilGrad: " << CoilGrad(i) << ",  CoilScale: " << CoilScale(i) << std::endl;
+    }
     EqnARR << EqnInRR, EqnOutRR;
     EqnA << EqnIn, EqnOut;
 
     EqnARR = CoilScale.asDiagonal() * EqnARR;
     EqnA = CoilScale.asDiagonal() * EqnA;
+//        std::cout << "pass 1" << std::endl;
+//        std::cout << "MEGData: " << MEGData.rows() << " x " << MEGData.cols() << std::endl;
     EqnB = CoilScale.asDiagonal() * MEGData;
+//        std::cout << "EqnB: " << EqnB.rows() << " x " << EqnB.cols() << std::endl;
+//    std::cout << "pass 2" << std::endl;
 
 //    LinEqn.append(EqnInRR);
 //    LinEqn.append(EqnOutRR);
@@ -123,284 +135,106 @@ QList<MatrixXd> RtSssAlgo::buildLinearEqn()
 //    std::cout << "EqnA ************************************" << endl << EqnA << endl << endl;
 //    std::cout << "EqnB ************************************" << endl << EqnB.transpose() << endl;
 
-    std::cout << "building SSS linear equation .....finished !" << endl;
+//    std::cout << "building SSS linear equation .....finished !" << endl;
 
     return LinEqn;
 }
 
-void RtSssAlgo::getCoilInfoVectorView()
+void RtSssAlgo::setMEGInfo(FiffInfo::SPtr fiffInfo)
 {
+
+    // Set origin of head(?) coordinate
     Origin.resize(3);
     Origin << 0.0, 0.0, 0.04;
 
-    // Load Fiff info
-    QFile t_fileRaw("/autofs/cluster/fusion/slew/GitHub/mne-cpp/bin/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
-    FiffRawData raw(t_fileRaw);
+    // Find the number of MEG channels
+    qint32 nmegchan = 0;
+    for (qint32 i=0; i<fiffInfo->nchan; ++i)
+        if(fiffInfo->chs[i].kind == FIFFV_MEG_CH)
+            nmegchan ++;
 
-    cout << "number of chs: " << raw.info.nchan << endl;
+    NumCoil = nmegchan;
+    std::cout << "number of meg channels: " << NumCoil << " out of " << fiffInfo->nchan << std::endl;
 
-    // coil type - name
-    CoilTk.append(QString::number(3012));
-    CoilTk.append(QString::number(3024));
-    std::cout << CoilTk[0].toStdString() << "  " << CoilTk[1].toStdString() << endl;
+//    CoilTk.append("VV_PLANAR_T1");
+//    CoilTk.append("VV_MAG_T1");
 
-    CoilGrad.resize(306);
-    int nmegcoil=0;
-    for (int i=0; i<raw.info.nchan; i++ )
+    // Number of coil integration points for a coil
+    CoilNk.resize(NumCoil);
+
+    // Coordinate of coil integrating points:  This is assigned to CoilRk.
+    //      7001 (babyMEG inlayer magnetometer): 7 pts
+    //      7002 (babyMEG outlayer magnetometer): 7 pts
+    //      3012 (VectorView planar grdiometer, Type 1): 8 pts
+    //      3024 (VectorView magnetometer,Type 3): 9 pts
+    MatrixXd C7001intpts7(3,7), C7002intpts7(3,7), C3012intpts8(3,8), C3024intpts9(3,9);
+    C7001intpts7 << 0.000000, 0.000000, 0.000000, 0.0040825, 0.000000, 0.000000, -0.0040825, 0.000000, 0.000000,  0.0020412, 0.0035356, 0.000000, 0.0020412, -0.0035356, 0.000000, -0.0020412, 0.0035356, 0.000000, -0.0020412, -0.0035356, 0.000000;
+    C7002intpts7 << 0.000000, 0.000000, 0.000000, 0.0081650, 0.000000, 0.000000, -0.0081650, 0.000000, 0.000000,  0.0040824, 0.0070712, 0.000000, 0.0040824, -0.0070712, 0.000000, -0.0040824, 0.0070712, 0.000000, -0.0040824, -0.0070712, 0.000000;
+    C3012intpts8 << 0.0059, -0.0059, 0.0059, -0.0059, 0.0108, -0.0108, 0.0108, -0.0108, 0.0067, 0.0067, -0.0067, -0.0067, 0.0067, 0.0067, -0.0067, -0.0067, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003;
+    C3024intpts9 << 0.0000, 0.0100, -0.0100, 0.0100, -0.0100, 0.0000, 0.0000, 0.0100, -0.0100, 0.0000, 0.0100, 0.0100, -0.0100, -0.0100, 0.0100, -0.0100, 0.0000, 0.0000, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003;
+
+    // Coil point weight:  This is assinged to CoilWk
+    MatrixXd C7001Wintpts7(1,7), C7002Wintpts7(1,7), C3012Wintpts8(1,8), C3024Wintpts9(1,9);
+    C7001Wintpts7 << 0.25, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125;
+    C7002Wintpts7 << 0.25, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125;
+    C3012Wintpts8 << 14.9790,  -14.9790,   14.9790,  -14.9790,   14.9790,  -14.9790,   14.9790,  -14.9790;
+    C3024Wintpts9 << 0.1975,    0.0772,    0.0772,    0.0772,    0.0772,    0.1235,    0.1235,    0.1235,    0.1235;
+
+    qint32 cid = 0;
+    CoilGrad.setZero(NumCoil);
+
+    for (qint32 i=0; i<fiffInfo->nchan; ++i)
     {
-        // kind = 1(MEG), 2(EEG), 3(STI...)
-        // coil_type = 3012(planar gradiometer),  3024(magnetometer)
-        if ((raw.info.chs[i].kind == 1 ) && ((raw.info.chs[i].coil_type == 3012) || (raw.info.chs[i].coil_type == 3024)))
+        if(fiffInfo->chs[i].kind == FIFFV_MEG_CH)
         {
-            CoilName.append(QString::number(raw.info.chs[i].coil_type));
-//            std::cout << "coil no[" << nmegcoil <<"] "<< CoilName[nmegcoil].toStdString() << "   ";
+            CoilT.append(fiffInfo->chs[i].coil_trans);
+            CoilName.append(fiffInfo->chs[i].ch_name);
 
-            CoilT.append(raw.info.chs[i].coil_trans);
+            switch (fiffInfo->chs[i].coil_type)
+            {
+                case 3012:
+                    CoilGrad(cid) = 1;
+                    CoilNk(cid) = 8;
+                    CoilRk.append(C3012intpts8);
+                    CoilWk.append(C3012Wintpts8);
+                    break;
 
-            if (raw.info.chs[i].coil_type == 3012)  CoilGrad(nmegcoil) = 1;
-            else    CoilGrad(nmegcoil) = 0;
-//            std::cout << CoilGrad(nmegcoil) << "   ,";
+                case 3024:
+                    CoilGrad(cid) = 0;
+                    CoilNk(cid) = 9;
+                    CoilRk.append(C3024intpts9);
+                    CoilWk.append(C3024Wintpts9);
+                    break;
 
-            nmegcoil++;
+                case 7001:
+                    CoilGrad(cid) = 0;
+                    CoilNk(cid) = 7;
+                    CoilRk.append(C7001intpts7);
+                    CoilWk.append(C7001Wintpts7);
+                    break;
+
+                case 7002:
+                    CoilGrad(cid) = 0;
+                    CoilNk(cid) = 7;
+                    CoilRk.append(C7002intpts7);
+                    CoilWk.append(C7002Wintpts7);
+                    break;
+
+            }
+//        std::cout << fiffInfo->chs[i].coil_type << ", CoilNk(" << cid << "): " << CoilNk(cid) << std::endl;
+            cid++;
         }
     }
-    cout << endl << "meg coil cnt: " << nmegcoil << endl;
-    NumCoil = nmegcoil;
 
-    // Number of integration points for each coil type:  8 pts(3012),  9 pts(3024)
-    CoilNk.resize(2);
-    CoilNk << 8, 9;
+//    std::cout << "loading MEGData ....";
+//    ifstream inMEGData("/autofs/cluster/fusion/slew/MEG_realtime/mne-matlab-master/matlab/DATA_test_sim/VectorView/MEGData.txt",ios::in);
+//    MEGData.resize(NumCoil,1);
+//    VectorXd tmpvec(NumCoil);
+//    for(int k=0; k<NumCoil; k++)    inMEGData >> tmpvec(k);
+//    MEGData.col(0) = tmpvec;
+//    inMEGData.close();
 
-    // Coordinate of coil integrating points:  8 pts(3012),  9 pts(3024)
-    MatrixXd Cintpts8(3,8), Cintpts9(3,9);
-    Cintpts8 << 0.0059, -0.0059, 0.0059, -0.0059, 0.0108, -0.0108, 0.0108, -0.0108, 0.0067, 0.0067, -0.0067, -0.0067, 0.0067, 0.0067, -0.0067, -0.0067, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003;
-    Cintpts9 << 0.0000, 0.0100, -0.0100, 0.0100, -0.0100, 0.0000, 0.0000, 0.0100, -0.0100, 0.0000, 0.0100, 0.0100, -0.0100, -0.0100, 0.0100, -0.0100, 0.0000, 0.0000, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003;
-    CoilRk.append(Cintpts8);
-    CoilRk.append(Cintpts9);
-
-    // Coil point weight: 8 pts(3012),  9 pts(3024)
-    MatrixXd CWintpts8(1,8), CWintpts9(1,9);
-    CWintpts8 << 14.9790,  -14.9790,   14.9790,  -14.9790,   14.9790,  -14.9790,   14.9790,  -14.9790;
-    CWintpts9 << 0.1975,    0.0772,    0.0772,    0.0772,    0.0772,    0.1235,    0.1235,    0.1235,    0.1235;
-    CoilWk.append(CWintpts8);
-    CoilWk.append(CWintpts9);
-
-    std::cout << "loading MEGData ....";
-    ifstream inMEGData("/autofs/cluster/fusion/slew/MEG_realtime/mne-matlab-master/matlab/DATA_test_sim/VectorView/MEGData.txt",ios::in);
-    MEGData.resize(NumCoil);
-    for(int k=0; k<NumCoil; k++)    inMEGData >> MEGData(k);
-    inMEGData.close();
-//    std::cout << MEGData << endl;
-    std::cout << " finished !" << endl;
 }
-
-//  Read FIFF coil configuration and assign them to the Coil class variables
-//    such as CoilName,CoilT,CoilTk, CoilNk, CoilRk, CoilWk, CoilGrad.
-void RtSssAlgo::getCoilInfoVectorView4Sim()
-{
-    QString str;
-
-    NumCoil = 306;
-    cout << "Num of Coil = " << NumCoil << endl;
-
-//    simulation data from test1_sim.mat
-    Origin.resize(3);
-    Origin << 0.0, 0.0, 0.04;
-
-    std::cout << "loading MEGIn ....";
-    ifstream inMEGIn("/autofs/cluster/fusion/slew/MEG_realtime/mne-matlab-master/matlab/DATA_test_sim/VectorView/MEGIn.txt",ios::in);
-    MEGIn.resize(NumCoil);
-    for (int k=0; k<NumCoil; k++)   inMEGIn >> MEGIn(k);
-    inMEGIn.close();
-//    std::cout << MEGIn << endl;
-    std::cout << " finished !" << endl;
-
-    std::cout << "loading MEGOut ....";
-    ifstream inMEGOut("/autofs/cluster/fusion/slew/MEG_realtime/mne-matlab-master/matlab/DATA_test_sim/VectorView/MEGOut.txt",ios::in);
-    MEGOut.resize(NumCoil);
-    for(int k=0; k<NumCoil; k++)    inMEGOut >> MEGOut(k);
-    inMEGOut.close();
-//    std::cout << MEGOut << endl;
-    std::cout << " finished !" << endl;
-
-    std::cout << "loading MEGNoise ....";
-    ifstream inMEGNoise("/autofs/cluster/fusion/slew/MEG_realtime/mne-matlab-master/matlab/DATA_test_sim/VectorView/MEGNoise.txt",ios::in);
-    MEGNoise.resize(NumCoil);
-    for(int k=0; k<NumCoil; k++)    inMEGNoise >> MEGNoise(k);
-    inMEGNoise.close();
-//    std::cout << MEGNoise << endl;
-    std::cout << " finished !" << endl;
-
-    std::cout << "loading MEGData ....";
-    ifstream inMEGData("/autofs/cluster/fusion/slew/MEG_realtime/mne-matlab-master/matlab/DATA_test_sim/VectorView/MEGData.txt",ios::in);
-    MEGData.resize(NumCoil);
-    for(int k=0; k<NumCoil; k++)    inMEGData >> MEGData(k);
-    inMEGData.close();
-//    std::cout << MEGData << endl;
-    std::cout << " finished !" << endl;
-
-    // name per coil
-    for (int i=0; i<NumCoil; i++)
-    {
-        if (i%3 == 0)
-            CoilName.append("VV_PLANAR_T1");
-        else if (i%3 ==1)
-            CoilName.append("VV_PLANAR_T1");
-        else
-            CoilName.append("VV_MAG_T1");
-    }
-//    std:cout << CoilName[0] << ",  " << CoilName[1] << ",  " << CoilName[2] << endl;
-
-    // transformation matrix per coil
-    std::cout << "loading coil transformation matrix ....";
-    ifstream inCT("/autofs/cluster/fusion/slew/MEG_realtime/mne-matlab-master/matlab/DATA_coil_def/VectorView/CoilT.txt",ios::in);
-    MatrixXd tmat(4,4);
-    for(int k=0; k<NumCoil; k++)
-    {
-        for(int i=0; i<4; i++)
-            for(int j=0; j<4; j++)
-            {
-                inCT >> tmat(i,j);
-            }
-        CoilT.append(tmat);
-    }
-    inCT.close();
-//    std::cout << CoilT[305] << endl;
-    std::cout << " finished !" << endl;
-
-    // coil type - name
-    CoilTk.append("VV_PLANAR_T1");
-    CoilTk.append("VV_MAG_T1");
-//    std::cout << CoilTk[0] << ",  " << CoilTk[1] << endl;
-
-
-    // coil type - Number of integration points for each coil type
-    CoilNk.resize(2);
-    CoilNk << 8, 9;
-
-    // coil type - Coordinate of integrating points
-    MatrixXd Cintpts8(3,8), Cintpts9(3,9);
-    Cintpts8 << 0.0059, -0.0059, 0.0059, -0.0059, 0.0108, -0.0108, 0.0108, -0.0108, 0.0067, 0.0067, -0.0067, -0.0067, 0.0067, 0.0067, -0.0067, -0.0067, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003;
-    Cintpts9 << 0.0000, 0.0100, -0.0100, 0.0100, -0.0100, 0.0000, 0.0000, 0.0100, -0.0100, 0.0000, 0.0100, 0.0100, -0.0100, -0.0100, 0.0100, -0.0100, 0.0000, 0.0000, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003;
-    CoilRk.append(Cintpts8);
-    CoilRk.append(Cintpts9);
-
-    // Coil type - Coil point weight
-    MatrixXd CWintpts8(1,8), CWintpts9(1,9);
-    CWintpts8 << 14.9790,  -14.9790,   14.9790,  -14.9790,   14.9790,  -14.9790,   14.9790,  -14.9790;
-    CWintpts9 << 0.1975,    0.0772,    0.0772,    0.0772,    0.0772,    0.1235,    0.1235,    0.1235,    0.1235;
-    CoilWk.append(CWintpts8);
-    CoilWk.append(CWintpts9);
-
-    // Gradiometer ?
-    CoilGrad.resize(NumCoil);
-    CoilGrad << 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0;
-//    std::cout << CoilGrad << endl;
-}
-
-//  Read FIFF coil configuration and assign them to the Coil class variables
-//    such as CoilName,CoilT,CoilTk, CoilNk, CoilRk, CoilWk, CoilGrad.
-void RtSssAlgo::getCoilInfoBabyMEG4Sim()
-{
-    int NumCoilIn = 270;
-    int NumCoilOut = 105;
-
-    NumCoil = NumCoilIn + NumCoilOut;
-    cout << "Num of Coil = " << NumCoil << endl;
-
-//    simulation data from test1_sim.mat
-    Origin.resize(3);
-    Origin << 0.0, 0.0, 0.04;
-
-    std::cout << "loading MEGIn ....";
-    ifstream inMEGIn("/autofs/cluster/fusion/slew/MEG_realtime/mne-matlab-master/matlab/DATA_test_sim/BabyMEG/MEGIn2.txt",ios::in);
-    MEGIn.resize(NumCoil);
-    for (int k=0; k<NumCoil; k++)   inMEGIn >> MEGIn(k);
-    inMEGIn.close();
-//    std::cout << MEGIn << endl;
-    std::cout << " finished !" << endl;
-
-    std::cout << "loading MEGOut ....";
-    ifstream inMEGOut("/autofs/cluster/fusion/slew/MEG_realtime/mne-matlab-master/matlab/DATA_test_sim/BabyMEG/MEGOut2.txt",ios::in);
-    MEGOut.resize(NumCoil);
-    for(int k=0; k<NumCoil; k++)    inMEGOut >> MEGOut(k);
-    inMEGOut.close();
-//    std::cout << MEGOut << endl;
-    std::cout << " finished !" << endl;
-
-    std::cout << "loading MEGNoise ....";
-    ifstream inMEGNoise("/autofs/cluster/fusion/slew/MEG_realtime/mne-matlab-master/matlab/DATA_test_sim/BabyMEG/MEGNoise.txt",ios::in);
-    MEGNoise.resize(NumCoil);
-    for(int k=0; k<NumCoil; k++)    inMEGNoise >> MEGNoise(k);
-    inMEGNoise.close();
-//    std::cout << MEGNoise << endl;
-    std::cout << " finished !" << endl;
-
-    std::cout << "loading MEGData ....";
-    ifstream inMEGData("/autofs/cluster/fusion/slew/MEG_realtime/mne-matlab-master/matlab/DATA_test_sim/BabyMEG/MEGData2.txt",ios::in);
-    MEGData.resize(NumCoil);
-    for(int k=0; k<NumCoil; k++)    inMEGData >> MEGData(k);
-    inMEGData.close();
-//    std::cout << MEGData << endl;
-    std::cout << " finished !" << endl;
-
-    // name per coil
-    for (int i=0; i<NumCoilIn; i++)
-        CoilName.append("BSQ2_In_Layer");
-    for (int i=0; i<NumCoilOut; i++)
-        CoilName.append("BSQ2_Out_Layer");
-
-//    std:cout << CoilName[0] << ",  " << CoilName[1] << ",  " << CoilName[2] << endl;
-
-    // transformation matrix per coil
-    std::cout << "loading coil transformation matrix ....";
-    ifstream inCT("/autofs/cluster/fusion/slew/MEG_realtime/mne-matlab-master/matlab/DATA_coil_def/BabyMEG/CoilT.txt",ios::in);
-    MatrixXd tmat(4,4);
-    for(int k=0; k<NumCoil; k++)
-    {
-        for(int i=0; i<4; i++)
-            for(int j=0; j<4; j++)
-            {
-                inCT >> tmat(i,j);
-            }
-        CoilT.append(tmat);
-    }
-    inCT.close();
-//    std::cout << CoilT[305] << endl;
-    std::cout << " finished !" << endl;
-
-
-    // coil type - name
-    CoilTk.append("BSQ2_In_Layer");
-    CoilTk.append("BSQ2_Out_Layer");
-//    std::cout << CoilTk[0] << ",  " << CoilTk[1] << endl;
-
-
-    // coil type - Number of integration points for each coil type
-    CoilNk.resize(2);
-    CoilNk << 7, 7;
-
-    // coil type - Coordinate of integrating points
-    MatrixXd CintptsInlayer(3,7), CintptsOutlayer(3,7);
-    CintptsInlayer << 0.000000, 0.000000, 0.000000, 0.0040825, 0.000000, 0.000000, -0.0040825, 0.000000, 0.000000,  0.0020412, 0.0035356, 0.000000, 0.0020412, -0.0035356, 0.000000, -0.0020412, 0.0035356, 0.000000, -0.0020412, -0.0035356, 0.000000;
-    CintptsOutlayer << 0.000000, 0.000000, 0.000000, 0.0081650, 0.000000, 0.000000, -0.0081650; 0.000000, 0.000000,  0.0040824, 0.0070712, 0.000000, 0.0040824, -0.0070712; 0.000000, -0.0040824, 0.0070712, 0.000000, -0.0040824, -0.0070712, 0.000000;
-    CoilRk.append(CintptsInlayer);
-    CoilRk.append(CintptsOutlayer);
-
-    // Coil type - Coil point weight
-    MatrixXd CWintptsInlayer(1,7), CWintptsOutlayer(1,7);
-    CWintptsInlayer << 0.25, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125;
-    CWintptsOutlayer = CWintptsInlayer;
-    CoilWk.append(CWintptsInlayer);
-    CoilWk.append(CWintptsOutlayer);
-
-    // BabyMEG consists of magnetometers only
-//    CoilGrad.resize(NumCoil);
-    CoilGrad.setZero(NumCoil);
-//    std::cout << CoilGrad << endl;
-}
-
-
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //% build linear equation for SSS
@@ -426,7 +260,7 @@ void RtSssAlgo::getCoilInfoBabyMEG4Sim()
 QList<MatrixXd> RtSssAlgo::getSSSEqn(int LIn, int LOut)
 {
     int NumBIn, NumBOut;
-    int coil_index=1;
+//    int coil_index=1;
     double RScale;
     VectorXd coil_distance, coil_clocation(4,1), coil_vector(4,1);
     MatrixXd coil_location;
@@ -454,24 +288,28 @@ QList<MatrixXd> RtSssAlgo::getSSSEqn(int LIn, int LOut)
 
     for(int i = 0; i<NumCoil; i++)
     {
-        if (CoilName[i] == CoilTk[0])
-            coil_index = 0;
-        else if (CoilName[i] == CoilTk[1])
-            coil_index = 1;
-        else
-        {
-            cout<< "There is no matching coil" << endl;
-            exit(1);
-        }
+//        if (CoilName[i] == CoilTk[0])
+//            coil_index = 0;
+//        else if (CoilName[i] == CoilTk[1])
+//            coil_index = 1;
+//        else
+//        {
+//            cout<< "There is no matching coil" << endl;
+//            exit(1);
+//        }
 
 //    % calculate coil orientation
         coil_vector = CoilT[i].block(0,2,3,1);
 
 //    % calculate coil locations (multiple points)
-        int NumCoilPts = CoilNk(coil_index);
+//        int NumCoilPts = CoilNk(coil_index);
+        qint32 NumCoilPts = CoilNk(i);
         MatrixXd tmpmat; tmpmat.setOnes(4,NumCoilPts);
 
-        tmpmat.topRows(3) = CoilRk[coil_index];
+//        tmpmat.topRows(3) = CoilRk[coil_index];
+//        std::cout << "CoilRk: " << CoilRk[i].rows() << " x " << CoilRk[i].cols()  << std::endl;
+        tmpmat.topRows(3) = CoilRk[i];
+
         coil_location = CoilT[i] * tmpmat;
         tmpmat = coil_location.topRows(3);   coil_location.resize(3,NumCoilPts);   coil_location = tmpmat;
         coil_location = coil_location - Origin.replicate(1,NumCoilPts);
@@ -488,8 +326,10 @@ QList<MatrixXd> RtSssAlgo::getSSSEqn(int LIn, int LOut)
 //        std::cout << "b_in: Coil= " << i+1 << endl << b_in << endl;
 //        std::cout << "b_out: Coil= " << i+1 << endl << b_out << endl;
 
-        EqnIn.block(i,0,1,NumBIn) = CoilWk[coil_index] * b_in;
-        EqnOut.block(i,0,1,NumBOut) = CoilWk[coil_index] * b_out;
+//        EqnIn.block(i,0,1,NumBIn) = CoilWk[coil_index] * b_in;
+//        EqnOut.block(i,0,1,NumBOut) = CoilWk[coil_index] * b_out;
+        EqnIn.block(i,0,1,NumBIn) = CoilWk[i] * b_in;
+        EqnOut.block(i,0,1,NumBOut) = CoilWk[i] * b_out;
     }
 
     Eqn.append(EqnIn);
@@ -704,7 +544,6 @@ void RtSssAlgo::getSSSBasis(VectorXd X, VectorXd Y, VectorXd Z, int LIn, int LOu
 //        std::cout << "BOutX" << endl << BOutX << endl;
 //        std::cout << "BOutY" << endl << BOutY << endl;
 //        std::cout << "BOutZ" << endl << BOutZ << endl;
-
 }
 
 
@@ -787,9 +626,6 @@ void RtSssAlgo::getSphereToCartesianVector()
     THETA_Z = -THETA.array().sin();
 }
 
-
-
-
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //% SSS by robust regression (subspace iteration & low-rank update)
 //% -- RR_K1 is determined by bi-square function (w = 0.75 at RR_K1)
@@ -837,6 +673,8 @@ QList<MatrixXd> RtSssAlgo::getSSSRR(MatrixXd EqnIn, MatrixXd EqnOut, MatrixXd Eq
 //  % weight threshold for robust regression
     double WeightThres = 1 - 1e-6;
 
+//    std::cout << "ok 0" << std::endl;
+
 //  % initialization
     NumBIn = EqnIn.cols();
     NumBOut = EqnOut.cols();
@@ -844,48 +682,49 @@ QList<MatrixXd> RtSssAlgo::getSSSRR(MatrixXd EqnIn, MatrixXd EqnOut, MatrixXd Eq
     NumExp = EqnB.cols();
 
 //ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
-    QFile t_fileRaw("/autofs/cluster/fusion/slew/GitHub/mne-cpp/bin/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
-    FiffRawData raw(t_fileRaw);
+//    QFile t_fileRaw("/autofs/cluster/fusion/slew/GitHub/mne-cpp/bin/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+//    FiffRawData raw(t_fileRaw);
 
-    QStringList include;
-    include << "STI 014";
-    bool want_meg   = true;
-    bool want_eeg   = false;
-    bool want_stim  = false;
+//    QStringList include;
+//    include << "STI 014";
+//    bool want_meg   = true;
+//    bool want_eeg   = false;
+//    bool want_stim  = false;
 
-    RowVectorXi picks = raw.info.pick_types(want_meg, want_eeg, want_stim, include, raw.info.bads);
+//    RowVectorXi picks = raw.info.pick_types(want_meg, want_eeg, want_stim, include, raw.info.bads);
 
-    float from = 42.956f;
-    float to = 320.670f;
-    bool in_samples = false;
-    bool readSuccessful = false;
-    MatrixXd data;
-    MatrixXd times;
-    if (in_samples)
-        readSuccessful = raw.read_raw_segment(data, times, (qint32)from, (qint32)to, picks);
-    else
-        readSuccessful = raw.read_raw_segment_times(data, times, from, to, picks);
+//    float from = 42.956f;
+//    float to = 320.670f;
+//    bool in_samples = false;
+//    bool readSuccessful = false;
+//    MatrixXd data;
+//    MatrixXd times;
+//    if (in_samples)
+//        readSuccessful = raw.read_raw_segment(data, times, (qint32)from, (qint32)to, picks);
+//    else
+//        readSuccessful = raw.read_raw_segment_times(data, times, from, to, picks);
 
-    if (!readSuccessful)
-    {
-        printf("Could not read raw segment.\n");
-        exit(1);
-    }
+//    if (!readSuccessful)
+//    {
+//        printf("Could not read raw segment.\n");
+//        exit(1);
+//    }
+//
+////    printf("Read %d samples.\n",(qint32)data.cols());
+////    printf("Read %d channels.\n",(qint32)data.rows());
+////    std::cout << data.block(0,0,10,10) << std::endl;
+//
+//    int start_sample = 0;
+//    int end_sample = 20;
 
-//    printf("Read %d samples.\n",(qint32)data.cols());
-//    printf("Read %d channels.\n",(qint32)data.rows());
-//    std::cout << data.block(0,0,10,10) << std::endl;
-
-
-    int start_sample = 0;
-    int end_sample = 20;
-
-    EqnB = data.block(0, start_sample, NumCoil, end_sample-start_sample+1);
-    NumCoil = EqnB.rows();
-    NumExp = EqnB.cols();
-    printf("%d samples,  %d channels \n",(qint32)EqnB.cols(), (qint32)EqnB.rows());
+//    EqnB = data.block(0, start_sample, NumCoil, end_sample-start_sample+1);
+//    NumCoil = EqnB.rows();
+//    NumExp = EqnB.cols();
+//    printf("%d samples,  %d channels \n",(qint32)EqnB.cols(), (qint32)EqnB.rows());
 
 //cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+
+//    std::cout << "ok 1" << std::endl;
 
     EqnRRInv = (EqnARR.transpose() * EqnARR).inverse();
     EqnInv = (EqnA.transpose() * EqnA).inverse();
@@ -898,11 +737,13 @@ QList<MatrixXd> RtSssAlgo::getSSSRR(MatrixXd EqnIn, MatrixXd EqnOut, MatrixXd Eq
     RR_K2 = 4.685;
     RR_K1 = qSqrt(1-qSqrt(3)/2) * RR_K2;
 
+//    std::cout << "ok 2" << std::endl;
+
     for(int i=0; i<NumExp; i++)
     {
 //      % solve OLS solution
         sol_X = EqnRRInv * (EqnARR.transpose() * EqnB.col(i));
-//        std::cout << "sol_X ************************" << endl << sol_X.transpose() << endl;
+        std::cout << "sol_X ************************" << endl << sol_X.transpose() << endl;
 
 //      % scale linear equation
         eqn_err = EqnARR * sol_X - EqnB.col(i);
@@ -917,11 +758,12 @@ QList<MatrixXd> RtSssAlgo::getSSSRR(MatrixXd EqnIn, MatrixXd EqnOut, MatrixXd Eq
 //        for (int h=0; h<2; h++)
         {
             cnt++;
+            cout << "while cnt: " << cnt << endl;
             sol_X_old = sol_X;
 //            Weight(:,i) = (eqn_err <= RR_K1) + (eqn_err > RR_K1 & eqn_err <= RR_K2) .* (1-(eqn_err-RR_K1).^2/(RR_K2-RR_K1)^2).^2;
 //            Weight.col(i) = eigen_LTE(eqn_err, RR_K1) + eigen_AND(eigen_GT(eqn_err, RR_K1),eigen_LTE(eqn_err, RR_K2));
             Weight.col(i) = eigen_LTE(eqn_err,RR_K1).array() + eigen_AND(eigen_GT(eqn_err,RR_K1),eigen_LTE(eqn_err,RR_K2)).array() * (1 - ((eqn_err.array()-RR_K1).pow(2)) / pow(RR_K2-RR_K1,2) ).pow(2);
-//            std::cout << "Weight **************************" << endl << Weight.transpose() << endl;
+            std::cout << "Weight **************************" << endl << Weight.transpose() << endl;
 
 //          % weight_index = find(Weight(:,i) < WeightThres);
             weight_index = eigen_LT_index(Weight.col(i), WeightThres);
@@ -1024,7 +866,6 @@ QList<MatrixXd> RtSssAlgo::getSSSRR(MatrixXd EqnIn, MatrixXd EqnOut, MatrixXd Eq
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //function [SSSIn,SSSOut,ErrRel] = get_SSS_OLS(EqnIn,EqnOut,EqnA,EqnB)
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
 QList<MatrixXd> RtSssAlgo::getSSSOLS(MatrixXd EqnIn, MatrixXd EqnOut, MatrixXd EqnA, MatrixXd EqnB)
 {
     int NumBIn, NumBOut, NumCoil, NumExp;
@@ -1087,31 +928,45 @@ QList<MatrixXd> RtSssAlgo::getSSSOLS(MatrixXd EqnIn, MatrixXd EqnOut, MatrixXd E
     SSSIn.setZero(NumCoil,NumExp);
     SSSOut.setZero(NumCoil,NumExp);
     ErrRel.setZero(NumExp);
-    cout << "PASS * 1 ******" << endl;
+//    cout << "PASS * 1 ******" << endl;
     for (int i=0; i<NumExp; i++)
     {
 //      % solve OLS solution
         sol_X = EqnRRInv * (EqnA.transpose() * EqnB.col(i));
-            cout << "PASS * 2 ******" << endl;
+//            cout << "PASS * 2 ******" << endl;
         ErrRel(i) = (EqnA * sol_X - EqnB.col(i)).norm() / EqnB.col(i).norm();
-            cout << "PASS * 3 ******" << endl;
+//            cout << "PASS * 3 ******" << endl;
         sol_in = sol_X.block(0,0,NumBIn,1);
-            cout << "PASS * 4 ******" << endl;
+//            cout << "PASS * 4 ******" << endl;
         sol_out = sol_X.block(NumBIn,0, NumBOut,1);    // probably NumBIn+0 is correct.  Please debug !!!!
 
 //      % recover internal/external MEG siganl
         SSSIn.col(i) = EqnIn * sol_in;
         SSSOut.col(i) = EqnOut * sol_out;
-            cout << "PASS * 5 ******" << endl;
+//            cout << "PASS * 5 ******" << endl;
     }
 
-        cout << "PASS * 10 ******" << endl;
+//        cout << "PASS * 10 ******" << endl;
 
     OLSsss.append(SSSIn);
     OLSsss.append(SSSOut);
     OLSsss.append(ErrRel);
 
     return OLSsss;
+}
+
+// Return number of meg channels
+qint32 RtSssAlgo::getNumMEGCh()
+{
+    return NumCoil;
+}
+
+// Set MEG signal
+//void RtSssAlgo::setMEGsignal(VectorXd megfrombuffer)
+void RtSssAlgo::setMEGsignal(MatrixXd megfrombuffer)
+{
+    MEGData = megfrombuffer;
+//        std::cout << "MEGData: " << MEGData.rows() << " x " << MEGData.cols() << std::endl;
 }
 
 QList<MatrixXd> RtSssAlgo::getLinEqn()
@@ -1126,6 +981,285 @@ QList<MatrixXd> RtSssAlgo::getLinEqn()
 
     return LinEqn;
 }
+
+//  Read FIFF coil configuration and assign them to the Coil class variables
+//    such as CoilName,CoilT,CoilTk, CoilNk, CoilRk, CoilWk, CoilGrad.
+void RtSssAlgo::getCoilInfoBabyMEG4Sim()
+{
+    int NumCoilIn = 270;
+    int NumCoilOut = 105;
+
+    NumCoil = NumCoilIn + NumCoilOut;
+    cout << "Num of Coil = " << NumCoil << endl;
+
+//    simulation data from test1_sim.mat
+    Origin.resize(3);
+    Origin << 0.0, 0.0, 0.04;
+
+    std::cout << "loading MEGIn ....";
+    ifstream inMEGIn("/autofs/cluster/fusion/slew/MEG_realtime/mne-matlab-master/matlab/DATA_test_sim/BabyMEG/MEGIn2.txt",ios::in);
+    MEGIn.resize(NumCoil);
+    for (int k=0; k<NumCoil; k++)   inMEGIn >> MEGIn(k);
+    inMEGIn.close();
+//    std::cout << MEGIn << endl;
+    std::cout << " finished !" << endl;
+
+    std::cout << "loading MEGOut ....";
+    ifstream inMEGOut("/autofs/cluster/fusion/slew/MEG_realtime/mne-matlab-master/matlab/DATA_test_sim/BabyMEG/MEGOut2.txt",ios::in);
+    MEGOut.resize(NumCoil);
+    for(int k=0; k<NumCoil; k++)    inMEGOut >> MEGOut(k);
+    inMEGOut.close();
+//    std::cout << MEGOut << endl;
+    std::cout << " finished !" << endl;
+
+    std::cout << "loading MEGNoise ....";
+    ifstream inMEGNoise("/autofs/cluster/fusion/slew/MEG_realtime/mne-matlab-master/matlab/DATA_test_sim/BabyMEG/MEGNoise.txt",ios::in);
+    MEGNoise.resize(NumCoil);
+    for(int k=0; k<NumCoil; k++)    inMEGNoise >> MEGNoise(k);
+    inMEGNoise.close();
+//    std::cout << MEGNoise << endl;
+    std::cout << " finished !" << endl;
+
+    std::cout << "loading MEGData ....";
+    ifstream inMEGData("/autofs/cluster/fusion/slew/MEG_realtime/mne-matlab-master/matlab/DATA_test_sim/BabyMEG/MEGData2.txt",ios::in);
+    MEGData.resize(NumCoil,1);
+    VectorXd tmpvec(NumCoil);
+    for(int k=0; k<NumCoil; k++)    inMEGData >> tmpvec(k);
+    MEGData.col(0) = tmpvec;
+    inMEGData.close();
+//    std::cout << MEGData << endl;
+    std::cout << " finished !" << endl;
+
+    // name per coil
+    for (int i=0; i<NumCoilIn; i++)
+        CoilName.append("BSQ2_In_Layer");
+    for (int i=0; i<NumCoilOut; i++)
+        CoilName.append("BSQ2_Out_Layer");
+
+//    std:cout << CoilName[0] << ",  " << CoilName[1] << ",  " << CoilName[2] << endl;
+
+    // transformation matrix per coil
+    std::cout << "loading coil transformation matrix ....";
+    ifstream inCT("/autofs/cluster/fusion/slew/MEG_realtime/mne-matlab-master/matlab/DATA_coil_def/BabyMEG/CoilT.txt",ios::in);
+    MatrixXd tmat(4,4);
+    for(int k=0; k<NumCoil; k++)
+    {
+        for(int i=0; i<4; i++)
+            for(int j=0; j<4; j++)
+            {
+                inCT >> tmat(i,j);
+            }
+        CoilT.append(tmat);
+    }
+    inCT.close();
+//    std::cout << CoilT[305] << endl;
+    std::cout << " finished !" << endl;
+
+
+    // coil type - name
+    CoilTk.append("BSQ2_In_Layer");
+    CoilTk.append("BSQ2_Out_Layer");
+//    std::cout << CoilTk[0] << ",  " << CoilTk[1] << endl;
+
+
+    // coil type - Number of integration points for each coil type
+    CoilNk.resize(2);
+    CoilNk << 7, 7;
+
+    // coil type - Coordinate of integrating points
+    MatrixXd CintptsInlayer(3,7), CintptsOutlayer(3,7);
+    CintptsInlayer << 0.000000, 0.000000, 0.000000, 0.0040825, 0.000000, 0.000000, -0.0040825, 0.000000, 0.000000,  0.0020412, 0.0035356, 0.000000, 0.0020412, -0.0035356, 0.000000, -0.0020412, 0.0035356, 0.000000, -0.0020412, -0.0035356, 0.000000;
+    CintptsOutlayer << 0.000000, 0.000000, 0.000000, 0.0081650, 0.000000, 0.000000, -0.0081650, 0.000000, 0.000000,  0.0040824, 0.0070712, 0.000000, 0.0040824, -0.0070712, 0.000000, -0.0040824, 0.0070712, 0.000000, -0.0040824, -0.0070712, 0.000000;
+    CoilRk.append(CintptsInlayer);
+    CoilRk.append(CintptsOutlayer);
+
+    // Coil type - Coil point weight
+    MatrixXd CWintptsInlayer(1,7), CWintptsOutlayer(1,7);
+    CWintptsInlayer << 0.25, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125;
+    CWintptsOutlayer = CWintptsInlayer;
+    CoilWk.append(CWintptsInlayer);
+    CoilWk.append(CWintptsOutlayer);
+
+    // BabyMEG consists of magnetometers only
+//    CoilGrad.resize(NumCoil);
+    CoilGrad.setZero(NumCoil);
+//    std::cout << CoilGrad << endl;
+}
+
+void RtSssAlgo::getCoilInfoVectorView()
+{
+    Origin.resize(3);
+    Origin << 0.0, 0.0, 0.04;
+
+    // Load Fiff info
+    QFile t_fileRaw("/autofs/cluster/fusion/slew/GitHub/mne-cpp/bin/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+    FiffRawData raw(t_fileRaw);
+
+    cout << "number of chs: " << raw.info.nchan << endl;
+
+    // coil type - name
+    CoilTk.append(QString::number(3012));
+    CoilTk.append(QString::number(3024));
+    std::cout << CoilTk[0].toStdString() << "  " << CoilTk[1].toStdString() << endl;
+
+    CoilGrad.resize(306);
+    int nmegcoil=0;
+    for (int i=0; i<raw.info.nchan; i++ )
+    {
+        // kind = 1(MEG), 2(EEG), 3(STI...)
+        // coil_type = 3012(planar gradiometer),  3024(magnetometer)
+        if ((raw.info.chs[i].kind == 1 ) && ((raw.info.chs[i].coil_type == 3012) || (raw.info.chs[i].coil_type == 3024)))
+        {
+            CoilName.append(QString::number(raw.info.chs[i].coil_type));
+//            std::cout << "coil no[" << nmegcoil <<"] "<< CoilName[nmegcoil].toStdString() << "   ";
+
+            CoilT.append(raw.info.chs[i].coil_trans);
+
+            if (raw.info.chs[i].coil_type == 3012)  CoilGrad(nmegcoil) = 1;
+            else    CoilGrad(nmegcoil) = 0;
+//            std::cout << CoilGrad(nmegcoil) << "   ,";
+
+            nmegcoil++;
+        }
+    }
+    cout << endl << "meg coil cnt: " << nmegcoil << endl;
+    NumCoil = nmegcoil;
+
+    // Number of integration points for each coil type:  8 pts(3012),  9 pts(3024)
+    CoilNk.resize(2);
+    CoilNk << 8, 9;
+
+    // Coordinate of coil integrating points:  8 pts(3012),  9 pts(3024)
+    MatrixXd Cintpts8(3,8), Cintpts9(3,9);
+    Cintpts8 << 0.0059, -0.0059, 0.0059, -0.0059, 0.0108, -0.0108, 0.0108, -0.0108, 0.0067, 0.0067, -0.0067, -0.0067, 0.0067, 0.0067, -0.0067, -0.0067, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003;
+    Cintpts9 << 0.0000, 0.0100, -0.0100, 0.0100, -0.0100, 0.0000, 0.0000, 0.0100, -0.0100, 0.0000, 0.0100, 0.0100, -0.0100, -0.0100, 0.0100, -0.0100, 0.0000, 0.0000, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003;
+    CoilRk.append(Cintpts8);
+    CoilRk.append(Cintpts9);
+
+    // Coil point weight: 8 pts(3012),  9 pts(3024)
+    MatrixXd CWintpts8(1,8), CWintpts9(1,9);
+    CWintpts8 << 14.9790,  -14.9790,   14.9790,  -14.9790,   14.9790,  -14.9790,   14.9790,  -14.9790;
+    CWintpts9 << 0.1975,    0.0772,    0.0772,    0.0772,    0.0772,    0.1235,    0.1235,    0.1235,    0.1235;
+    CoilWk.append(CWintpts8);
+    CoilWk.append(CWintpts9);
+
+    std::cout << "loading MEGData ....";
+    ifstream inMEGData("/autofs/cluster/fusion/slew/MEG_realtime/mne-matlab-master/matlab/DATA_test_sim/VectorView/MEGData.txt",ios::in);
+    MEGData.resize(NumCoil,1);
+    VectorXd tmpvec(NumCoil);
+    for(int k=0; k<NumCoil; k++)    inMEGData >> tmpvec(k);
+    MEGData.col(0) = tmpvec;
+    inMEGData.close();
+//    std::cout << MEGData << endl;
+    std::cout << " finished !" << endl;
+}
+
+//  Read FIFF coil configuration and assign them to the Coil class variables
+//    such as CoilName,CoilT,CoilTk, CoilNk, CoilRk, CoilWk, CoilGrad.
+void RtSssAlgo::getCoilInfoVectorView4Sim()
+{
+    QString str;
+
+    NumCoil = 306;
+    cout << "Num of Coil = " << NumCoil << endl;
+
+//    simulation data from test1_sim.mat
+    Origin.resize(3);
+    Origin << 0.0, 0.0, 0.04;
+
+    std::cout << "loading MEGIn ....";
+    ifstream inMEGIn("/autofs/cluster/fusion/slew/MEG_realtime/mne-matlab-master/matlab/DATA_test_sim/VectorView/MEGIn.txt",ios::in);
+    MEGIn.resize(NumCoil);
+    for (int k=0; k<NumCoil; k++)   inMEGIn >> MEGIn(k);
+    inMEGIn.close();
+//    std::cout << MEGIn << endl;
+    std::cout << " finished !" << endl;
+
+    std::cout << "loading MEGOut ....";
+    ifstream inMEGOut("/autofs/cluster/fusion/slew/MEG_realtime/mne-matlab-master/matlab/DATA_test_sim/VectorView/MEGOut.txt",ios::in);
+    MEGOut.resize(NumCoil);
+    for(int k=0; k<NumCoil; k++)    inMEGOut >> MEGOut(k);
+    inMEGOut.close();
+//    std::cout << MEGOut << endl;
+    std::cout << " finished !" << endl;
+
+    std::cout << "loading MEGNoise ....";
+    ifstream inMEGNoise("/autofs/cluster/fusion/slew/MEG_realtime/mne-matlab-master/matlab/DATA_test_sim/VectorView/MEGNoise.txt",ios::in);
+    MEGNoise.resize(NumCoil);
+    for(int k=0; k<NumCoil; k++)    inMEGNoise >> MEGNoise(k);
+    inMEGNoise.close();
+//    std::cout << MEGNoise << endl;
+    std::cout << " finished !" << endl;
+
+    std::cout << "loading MEGData ....";
+    ifstream inMEGData("/autofs/cluster/fusion/slew/MEG_realtime/mne-matlab-master/matlab/DATA_test_sim/VectorView/MEGData.txt",ios::in);
+    MEGData.resize(NumCoil,1);
+    VectorXd tmpvec(NumCoil);
+    for(int k=0; k<NumCoil; k++)    inMEGData >> tmpvec(k);
+    MEGData.col(0) = tmpvec;
+    inMEGData.close();
+//    std::cout << MEGData << endl;
+    std::cout << " finished !" << endl;
+
+    // name per coil
+    for (int i=0; i<NumCoil; i++)
+    {
+        if (i%3 == 0)
+            CoilName.append("VV_PLANAR_T1");
+        else if (i%3 ==1)
+            CoilName.append("VV_PLANAR_T1");
+        else
+            CoilName.append("VV_MAG_T1");
+    }
+//    std:cout << CoilName[0] << ",  " << CoilName[1] << ",  " << CoilName[2] << endl;
+
+    // transformation matrix per coil
+    std::cout << "loading coil transformation matrix ....";
+    ifstream inCT("/autofs/cluster/fusion/slew/MEG_realtime/mne-matlab-master/matlab/DATA_coil_def/VectorView/CoilT.txt",ios::in);
+    MatrixXd tmat(4,4);
+    for(int k=0; k<NumCoil; k++)
+    {
+        for(int i=0; i<4; i++)
+            for(int j=0; j<4; j++)
+            {
+                inCT >> tmat(i,j);
+            }
+        CoilT.append(tmat);
+    }
+    inCT.close();
+//    std::cout << CoilT[305] << endl;
+    std::cout << " finished !" << endl;
+
+    // coil type - name
+    CoilTk.append("VV_PLANAR_T1");
+    CoilTk.append("VV_MAG_T1");
+//    std::cout << CoilTk[0] << ",  " << CoilTk[1] << endl;
+
+
+    // coil type - Number of integration points for each coil type
+    CoilNk.resize(2);
+    CoilNk << 8, 9;
+
+    // coil type - Coordinate of integrating points
+    MatrixXd Cintpts8(3,8), Cintpts9(3,9);
+    Cintpts8 << 0.0059, -0.0059, 0.0059, -0.0059, 0.0108, -0.0108, 0.0108, -0.0108, 0.0067, 0.0067, -0.0067, -0.0067, 0.0067, 0.0067, -0.0067, -0.0067, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003;
+    Cintpts9 << 0.0000, 0.0100, -0.0100, 0.0100, -0.0100, 0.0000, 0.0000, 0.0100, -0.0100, 0.0000, 0.0100, 0.0100, -0.0100, -0.0100, 0.0100, -0.0100, 0.0000, 0.0000, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003;
+    CoilRk.append(Cintpts8);
+    CoilRk.append(Cintpts9);
+
+    // Coil type - Coil point weight
+    MatrixXd CWintpts8(1,8), CWintpts9(1,9);
+    CWintpts8 << 14.9790,  -14.9790,   14.9790,  -14.9790,   14.9790,  -14.9790,   14.9790,  -14.9790;
+    CWintpts9 << 0.1975,    0.0772,    0.0772,    0.0772,    0.0772,    0.1235,    0.1235,    0.1235,    0.1235;
+    CoilWk.append(CWintpts8);
+    CoilWk.append(CWintpts9);
+
+    // Gradiometer ?
+    CoilGrad.resize(NumCoil);
+    CoilGrad << 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0;
+//    std::cout << CoilGrad << endl;
+}
+
 
 // Legendre Polyn0mial
 MatrixXd legendre(int l, VectorXd x)
@@ -1312,7 +1446,8 @@ VectorXd eigen_LT_index(VectorXd V, double tol)
     return outIdx.head(cnt);
 }
 
-VectorXd eigen_LT_index_test(VectorXd V, int cnt)
+//VectorXd eigen_LT_index_test(VectorXd V, int cnt)
+VectorXd eigen_LT_index_test(int cnt)
 {
     VectorXd outIdx = VectorXd::Zero(cnt+1);
 
@@ -1322,3 +1457,4 @@ VectorXd eigen_LT_index_test(VectorXd V, int cnt)
 //    std::cout << "outIdx: " << outIdx.rows() << " x " << outIdx.cols() << ",  cnt: " << cnt << endl;
             return outIdx;
 }
+
