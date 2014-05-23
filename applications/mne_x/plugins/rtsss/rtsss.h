@@ -56,6 +56,8 @@
 #include <fiff/fiff_info.h>
 #include <fiff/fiff_evoked.h>
 
+#include <Eigen/Dense>
+
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
@@ -160,10 +162,7 @@ private:
 
     FiffInfo::SPtr              m_pFiffInfo;        /**< Fiff information. */
 
-    FiffRawData m_pFiffRaw;
-
     CircularMatrixBuffer<double>::SPtr m_pRtSssBuffer;   /**< Holds incoming rt server data.*/
-    CircularMatrixBuffer<double>::SPtr m_pRtSssMegBuffer;   /**< Holds incoming rt server data.*/
 
     //    dBuffer::SPtr   m_pRtSssBuffer;      /**< Holds incoming data.*/
 };

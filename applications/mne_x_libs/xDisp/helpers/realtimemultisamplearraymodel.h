@@ -54,7 +54,7 @@ public:
 
     void setChannelInfo(QList<RealTimeSampleArrayChInfo> &chInfo);
 
-    void setSamplingInfo(float sps, float T, float dest_sps  = 100.0f);
+    void setSamplingInfo(float sps, int T, float dest_sps  = 100.0f);
 
     void addData(const QVector<VectorXd> &data);
 
@@ -70,6 +70,12 @@ public:
 
     void resetSelection();
 
+    inline qint32 numVLines() const;
+
+    void toggleFreeze(const QModelIndex &);
+
+    inline bool isFreezed() const;
+
 
 private:
     QList<RealTimeSampleArrayChInfo> m_qListChInfo; /**< Channel info list.*/
@@ -80,11 +86,16 @@ private:
     QVector<VectorXd> m_dataCurrent;        /**< List that holds the current data*/
     QVector<VectorXd> m_dataLast;           /**< List that holds the last data */
 
-    float m_fSps;           /**< Sampling rate */
-    float m_fT;             /**< Time window */
-    qint32 m_iDownsampling; /**< Down sampling factor */
-    qint32 m_iMaxSamples;   /**< Max samples per window */
-    qint32 m_iCurrentSample; /**< Accurate Downsampling */
+    QVector<VectorXd> m_dataCurrentFreeze;        /**< List that holds the current data when freezed*/
+    QVector<VectorXd> m_dataLastFreeze;           /**< List that holds the last data when freezed*/
+
+    float m_fSps;               /**< Sampling rate */
+    qint32 m_iT;                /**< Time window */
+    qint32 m_iDownsampling;     /**< Down sampling factor */
+    qint32 m_iMaxSamples;       /**< Max samples per window */
+    qint32 m_iCurrentSample;    /**< Accurate Downsampling */
+
+    bool m_bIsFreezed;       /**< Is freezed */
 };
 
 
@@ -100,5 +111,15 @@ inline const QMap<qint32,qint32>& RealTimeMultiSampleArrayModel::getIdxSelMap() 
 }
 
 
+inline qint32 RealTimeMultiSampleArrayModel::numVLines() const
+{
+    return (m_iT - 1);
+}
+
+
+inline bool RealTimeMultiSampleArrayModel::isFreezed() const
+{
+    return m_bIsFreezed;
+}
 
 #endif // REALTIMEMULTISAMPLEARRAYMODEL_H

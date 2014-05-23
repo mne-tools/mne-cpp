@@ -230,7 +230,9 @@ private:
     QAction*                            m_pActionDisplayMax;        /**< show full screen mode */
 
     QList< QAction* >                   m_qListDynamicPluginActions;    /**< dynamic plugin actions */
+    QList< QWidget* >                   m_qListDynamicPluginWidgets;    /**< dynamic plugin widgets */
     QList< QAction* >                   m_qListDynamicDisplayActions;   /**< dynamic display actions */
+    QList< QWidget* >                   m_qListDynamicDisplayWidgets;   /**< dynamic display widgets */
 
     //Main Window Menu
     QMenu*                              m_pMenuFile;    /**< Holds the file menu.*/

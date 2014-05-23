@@ -244,24 +244,24 @@ void RtSss::run()
     while(!m_pFiffInfo)
         msleep(10);// Wait for fiff Info
 
+    // Set MEG channel infomation
+    rsss.setMEGInfo(m_pFiffInfo);
+
     // Find the number of MEG channel
-    qint32 nmegchan = 0;
-    for (qint32 i=0; i<m_pFiffInfo->nchan; ++i)
-        if(m_pFiffInfo->chs[i].kind == FIFFV_MEG_CH)
-            nmegchan ++;
-    std::cout << "number of meg channels: " << nmegchan << " out of " << m_pFiffInfo->nchan << std::endl;
+    qint32 nmegchan = rsss.getNumMEGCh();
+//    std::cout << "number of meg channels: " << nmegchan << std::endl;
 
     // start processing data
-    //
     m_bProcessData = true;
-
-    qint32 nrows = m_pRtSssBuffer->rows();
-//    std::cout << "number of rows: " << nrows << std::endl;
+    qint32 cntrun = 0;
 
     while(m_bIsRunning)
     {
+        std::cout << "Run count: " << ++cntrun << std::endl;
 
-        nrows = m_pRtSssBuffer->rows();
+//        if (cntrun == 2) stop();
+
+        qint32 nrows = m_pRtSssBuffer->rows();
 
         if(nrows > 0) // check if init
         {
@@ -272,23 +272,23 @@ void RtSss::run()
             qint32 k = 0;
             MatrixXd meg_mat(nmegchan, t_mat.cols());
 
-            for(unsigned char i = 0; i < t_mat.rows(); ++i)
+            for(qint32 i = 0; i <t_mat.cols(); ++i)
                 if(m_pFiffInfo->chs[i].kind == FIFFV_MEG_CH)
                 {
-//                    meg_mat.row(k) = t_mat.row(i);
+                    meg_mat.row(k) = t_mat.row(i);
                     k++;
                 }
-            std::cout << "k= " << k << std::endl;
-//            m_pRtSssMegBuffer->push(&meg_mat);
-
             std::cout << "size meg_mat: " << meg_mat.rows() << " x " << meg_mat.cols() << std::endl;
+            rsss.setMEGsignal(meg_mat.col(0));
+//            rsss.setMEGsignal(meg_mat);
 
+            std::cout << "building SSS linear equation .....";
+            lineqn = rsss.buildLinearEqn();
+            std::cout << " finished !" << std::endl;
 
-//             std::cout << "Building linear equation ! " << std::endl;
-//             lineqn = rsss.buildLinearEqn();
-
-//             std::cout << "size of m_pRtSssBuffer " << t_mat.rows() << " x " << t_mat.cols() << ",   ";
-//             std::cout << ", t_mat " << t_mat(0);
+            std::cout << "running rtSSS .....";
+            sssRR = rsss.getSSSRR(lineqn[0], lineqn[1], lineqn[2], lineqn[3], lineqn[4]);
+            std::cout << " finished! " << std::endl;
         }
 //        m_pRTSAOutput->data()->setValue(v);
     }

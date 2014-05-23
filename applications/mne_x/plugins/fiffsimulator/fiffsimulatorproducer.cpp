@@ -62,6 +62,7 @@ FiffSimulatorProducer::FiffSimulatorProducer(FiffSimulator* p_pFiffSimulator)
 , m_iDataClientId(-1)
 , m_bFlagInfoRequest(false)
 , m_bFlagMeasuring(false)
+, m_bIsRunning(false)
 {
 }
 
