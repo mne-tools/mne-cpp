@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>600</width>
-    <height>562</height>
+    <width>817</width>
+    <height>700</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,192 +15,8 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QLabel" name="m_qLabel_Headline">
-     <property name="font">
-      <font>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>SourceLab Configuration</string>
-     </property>
-    </widget>
-   </item>
-   <item>
-    <spacer name="m_qVerticalSpacer_Headline">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeType">
-      <enum>QSizePolicy::Fixed</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>20</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item>
     <layout class="QGridLayout" name="m_qGridLayout_main">
      <item row="3" column="0">
-      <widget class="QGroupBox" name="m_qGroupBox_Channels">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>200</height>
-        </size>
-       </property>
-       <property name="title">
-        <string>Channels</string>
-       </property>
-       <layout class="QGridLayout" name="m_qGridLayout_Channels">
-        <item row="0" column="1">
-         <widget class="QSpinBox" name="m_qSpinBoxStimChannel">
-          <property name="maximum">
-           <number>26</number>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0">
-         <widget class="QLabel" name="m_qLabelStimChannel">
-          <property name="text">
-           <string>Stimulus Channel</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </item>
-     <item row="5" column="2">
-      <widget class="QPushButton" name="m_qPushButton_About">
-       <property name="text">
-        <string>About</string>
-       </property>
-      </widget>
-     </item>
-     <item row="0" column="0">
-      <widget class="QGroupBox" name="m_qGroupBox_ForwardSolution">
-       <property name="title">
-        <string>Forward Model</string>
-       </property>
-       <property name="flat">
-        <bool>false</bool>
-       </property>
-       <layout class="QGridLayout" name="m_qGridLayout_Fwd">
-        <item row="0" column="0" colspan="2">
-         <widget class="QLineEdit" name="m_qLineEdit_FwdFileName">
-          <property name="minimumSize">
-           <size>
-            <width>140</width>
-            <height>0</height>
-           </size>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="2">
-         <widget class="QPushButton" name="m_qPushButton_FwdFileDialog">
-          <property name="text">
-           <string>...</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </item>
-     <item row="0" column="1" rowspan="5" colspan="2">
-      <widget class="QGroupBox" name="m_qGroupBox_Information">
-       <property name="title">
-        <string>Information</string>
-       </property>
-       <layout class="QGridLayout" name="m_qGridLayout_Information">
-        <item row="0" column="0">
-         <widget class="QTextBrowser" name="m_qTextBrowser_Information"/>
-        </item>
-       </layout>
-      </widget>
-     </item>
-     <item row="4" column="0">
-      <spacer name="m_qVerticalSpacer_LeftRow">
-       <property name="orientation">
-        <enum>Qt::Vertical</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>20</width>
-         <height>40</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item row="5" column="1">
-      <spacer name="m_qHorizontalSpacer_About">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item row="1" column="0">
-      <widget class="QGroupBox" name="m_qGroupBox_AtlasDir">
-       <property name="title">
-        <string>Brain Atlas Directory</string>
-       </property>
-       <layout class="QGridLayout" name="m_qGridLayout_AtlasDir">
-        <item row="0" column="2">
-         <widget class="QPushButton" name="m_qPushButton_AtlasDirDialog">
-          <property name="text">
-           <string>...</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="2">
-         <widget class="QLabel" name="m_qLabel_atlasStat">
-          <property name="frameShape">
-           <enum>QFrame::Panel</enum>
-          </property>
-          <property name="frameShadow">
-           <enum>QFrame::Sunken</enum>
-          </property>
-          <property name="text">
-           <string>not loaded</string>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="0" colspan="2">
-         <widget class="QLineEdit" name="m_qLineEdit_AtlasDirName">
-          <property name="minimumSize">
-           <size>
-            <width>140</width>
-            <height>0</height>
-           </size>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QLabel" name="m_qLabel_atlas">
-          <property name="text">
-           <string>(lh+rh).aparc.a2009s.annot</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
-     </item>
-     <item row="2" column="0">
       <widget class="QGroupBox" name="m_qGroupBox_SurfaceDir">
        <property name="title">
         <string>Surface Directory</string>
@@ -246,11 +62,221 @@
        </layout>
       </widget>
      </item>
+     <item row="4" column="0">
+      <widget class="QProgressBar" name="progressBar">
+       <property name="value">
+        <number>24</number>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="1">
+      <spacer name="m_qHorizontalSpacerTitle">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item row="9" column="3">
+      <widget class="QPushButton" name="m_qPushButton_About">
+       <property name="text">
+        <string>About</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QGroupBox" name="m_qGroupBox_AtlasDir">
+       <property name="title">
+        <string>Brain Atlas Directory</string>
+       </property>
+       <layout class="QGridLayout" name="m_qGridLayout_AtlasDir">
+        <item row="0" column="2">
+         <widget class="QPushButton" name="m_qPushButton_AtlasDirDialog">
+          <property name="text">
+           <string>...</string>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="2">
+         <widget class="QLabel" name="m_qLabel_atlasStat">
+          <property name="frameShape">
+           <enum>QFrame::Panel</enum>
+          </property>
+          <property name="frameShadow">
+           <enum>QFrame::Sunken</enum>
+          </property>
+          <property name="text">
+           <string>not loaded</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0" colspan="2">
+         <widget class="QLineEdit" name="m_qLineEdit_AtlasDirName">
+          <property name="minimumSize">
+           <size>
+            <width>140</width>
+            <height>0</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="0">
+         <widget class="QLabel" name="m_qLabel_atlas">
+          <property name="text">
+           <string>(lh+rh).aparc.a2009s.annot</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item row="1" column="0">
+      <widget class="QGroupBox" name="m_qGroupBox_ForwardSolution">
+       <property name="title">
+        <string>Forward Model</string>
+       </property>
+       <property name="flat">
+        <bool>false</bool>
+       </property>
+       <layout class="QGridLayout" name="m_qGridLayout_Fwd">
+        <item row="0" column="0" colspan="2">
+         <widget class="QLineEdit" name="m_qLineEdit_FwdFileName">
+          <property name="minimumSize">
+           <size>
+            <width>140</width>
+            <height>0</height>
+           </size>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <widget class="QPushButton" name="m_qPushButton_FwdFileDialog">
+          <property name="text">
+           <string>...</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item row="0" column="2" colspan="2">
+      <widget class="QLabel" name="m_qLabelSourceLabImage">
+       <property name="text">
+        <string/>
+       </property>
+       <property name="pixmap">
+        <pixmap resource="../sourcelab.qrc">:/images/sourcelab.png</pixmap>
+       </property>
+      </widget>
+     </item>
+     <item row="9" column="1" colspan="2">
+      <spacer name="m_qHorizontalSpacer_About">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item row="1" column="1" rowspan="8" colspan="3">
+      <widget class="QGroupBox" name="m_qGroupBox_Information">
+       <property name="title">
+        <string>Information</string>
+       </property>
+       <layout class="QGridLayout" name="m_qGridLayout_Information">
+        <item row="0" column="0">
+         <widget class="QTextBrowser" name="m_qTextBrowser_Information"/>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item row="5" column="0">
+      <widget class="QPushButton" name="pushButton">
+       <property name="text">
+        <string>PushButton</string>
+       </property>
+      </widget>
+     </item>
+     <item row="6" column="0">
+      <widget class="QGroupBox" name="m_qGroupBox_Channels">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="title">
+        <string>Channels</string>
+       </property>
+       <layout class="QGridLayout" name="m_qGridLayout_Channels">
+        <item row="0" column="1">
+         <widget class="QSpinBox" name="m_qSpinBoxStimChannel">
+          <property name="maximum">
+           <number>26</number>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="0">
+         <widget class="QLabel" name="m_qLabelStimChannel">
+          <property name="text">
+           <string>Stimulus Channel</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item row="7" column="0" rowspan="2">
+      <spacer name="m_qVerticalSpacer_LeftRow">
+       <property name="orientation">
+        <enum>Qt::Vertical</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>20</width>
+         <height>40</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
     </layout>
+   </item>
+   <item>
+    <spacer name="m_qVerticalSpacer_Headline">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
    </item>
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="../sourcelab.qrc"/>
+ </resources>
  <connections/>
 </ui>
