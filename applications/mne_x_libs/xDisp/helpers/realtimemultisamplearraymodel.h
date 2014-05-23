@@ -62,6 +62,8 @@ public:
 
     fiff_int_t getUnit(qint32 row) const;
 
+    fiff_int_t getCoil(qint32 row) const;
+
     inline qint32 getMaxSamples() const;
 
     inline const QMap<qint32,qint32>& getIdxSelMap() const;
