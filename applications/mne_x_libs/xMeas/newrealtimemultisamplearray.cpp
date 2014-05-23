@@ -111,6 +111,7 @@ void NewRealTimeMultiSampleArray::initFromFiffInfo(FiffInfo::SPtr &p_pFiffInfo)
         RealTimeSampleArrayChInfo initChInfo;
         initChInfo.setChannelName(p_pFiffInfo->chs[i].ch_name);
 
+        // set channel Unit
         initChInfo.setUnit(p_pFiffInfo->chs[i].unit);
 
         //Treat stimulus channels different
@@ -210,6 +211,9 @@ void NewRealTimeMultiSampleArray::initFromFiffInfo(FiffInfo::SPtr &p_pFiffInfo)
 
         // set channel Kind
         initChInfo.setKind(p_pFiffInfo->chs[i].kind);
+
+        // set channel coil
+        initChInfo.setCoil(p_pFiffInfo->chs[i].coil_type);
 
         m_qListChInfo.append(initChInfo);
     }
