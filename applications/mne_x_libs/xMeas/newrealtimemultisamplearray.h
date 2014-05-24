@@ -125,6 +125,22 @@ public:
 
     //=========================================================================================================
     /**
+    * Returns the file name of the layout file.
+    *
+    * @return the file name of the layout file.
+    */
+    inline const QString& getLayoutFileName() const;
+
+    //=========================================================================================================
+    /**
+    * Sets the file name of the layout.
+    *
+    * @param[in] layout which should be set.
+    */
+    inline void setLayoutFileName(const QString& layout);
+
+    //=========================================================================================================
+    /**
     * Sets the sampling rate of the RealTimeMultiSampleArrayNew Measurement.
     *
     * @param[in] dSamplingRate the sampling rate of the RealTimeMultiSampleArrayNew.
@@ -208,6 +224,7 @@ public:
 private:
     FiffInfo::SPtr              m_pFiffInfo_orig;   /**< Original Fiff Info if initialized by fiff info. */
 
+    QString                     m_sLayoutFilenName; /**< Layout file name. */
     double                      m_dSamplingRate;    /**< Sampling rate of the RealTimeSampleArray.*/
     VectorXd                    m_vecValue;         /**< The current attached sample vector.*/
     unsigned char               m_ucMultiArraySize; /**< Sample size of the multi sample array.*/
@@ -225,6 +242,25 @@ inline void NewRealTimeMultiSampleArray::clear()
 {
     m_matSamples.clear();
 }
+
+
+//*************************************************************************************************************
+
+inline const QString& NewRealTimeMultiSampleArray::getLayoutFileName() const
+{
+    return m_sLayoutFilenName;
+}
+
+
+//*************************************************************************************************************
+
+inline void NewRealTimeMultiSampleArray::setLayoutFileName(const QString& layout)
+{
+    m_sLayoutFilenName = layout;
+}
+
+
+//*************************************************************************************************************
 
 inline void NewRealTimeMultiSampleArray::setSamplingRate(double dSamplingRate)
 {
