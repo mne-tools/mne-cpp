@@ -1,7 +1,10 @@
 <MNEXSensorLayout Device="VectorView 306">
-  <Sensors Type="MEG" Number="306">
-    <Sensor>%%</Sensor>
+  <Sensors Type="MEG" NumChannels="306">
+    <Sensor ChannelNumber="0111" ChannelType="Mag" SensorID="1.1" />
+    <Sensor ChannelNumber="0112" ChannelType="Grad" SensorID="1.1" />
+    <Sensor ChannelNumber="0113" ChannelType="Grad" SensorID="1.1" />
   </Sensors>
+  <Sensors Type="EEG">%%</Sensors>
   <SensorGroups>
     <Group>%%</Group>
   </SensorGroups>
