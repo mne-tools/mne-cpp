@@ -1,0 +1,8 @@
+<MNEXSensorLayout Device="VectorView 306">
+  <Sensors Type="MEG" Number="306">
+    <Sensor>%%</Sensor>
+  </Sensors>
+  <SensorGroups>
+    <Group>%%</Group>
+  </SensorGroups>
+</MNEXSensorLayout>
