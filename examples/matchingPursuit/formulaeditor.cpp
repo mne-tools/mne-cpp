@@ -77,7 +77,7 @@ Formulaeditor::Formulaeditor(QWidget *parent) :    QWidget(parent),    ui(new Ui
     m_strStandardFunction.append("LN");
     m_strStandardFunction.append("LOG");
     m_strStandardFunction.append("EXP");
-    m_strStandardFunction.append("SIN"); //muß in der Reihenfolge nach SINH stehen!!!
+    m_strStandardFunction.append("SIN"); //must be addended behind SINH!!!
     m_strStandardFunction.append("COS");
     m_strStandardFunction.append("TAN");
     m_strStandardFunction.append("COT");
@@ -115,29 +115,29 @@ void AtomPaintWindow::PaintSignal(QList<qreal> valueList, QSize windowSize)
 
     if(valueList.length() > 0)
     {
-        qint32 borderMarginHeigth = 15;     // verkleinert Zeichenfläche von GraphWindow um borderMargin Pixel in der Höhe
-        qint32 borderMarginWidth = 5;       // verkleinert Zeichenfläche von GraphWindow um borderMargin Pixel in der Breite
-        qint32 i = 0;                       // Laufindex
-        qreal maxNeg = 0;                   // Kleinster Signalwert
-        qreal maxPos = 0;                   // groesster Signalwert
-        qreal absMin = 0;                   // Minimum der Absolutbetraege von maxNeg und maxPos
-        qint32 drawFactor = 0;              // Verschiebungsfaktor für Nachkommastellen (linear)
-        qint32 startDrawFactor = 1;         // Verschiebungsfaktor für Nachkommastellen (exponentiell-Basis 10)
-        qint32 decimalPlace = 0;            // Nachkommastellen für Achsenbeschriftung        
-        QPolygonF polygon;                  // Punkte zum Zeichnen des eingelesenen Signals
-        QList<qreal> internListValue;       // interne representation der y-Werte des Signals (nur für grafische Darstellung)
+        qint32 borderMarginHeigth = 15;     // reduce paintspace in GraphWindow of borderMargin pixels
+        qint32 borderMarginWidth = 5;       // reduce paintspace in GraphWindow of borderMargin pixels
+        qint32 i = 0;
+        qreal maxNeg = 0;                   // smalest signalvalue
+        qreal maxPos = 0;                   // highest signalvalue
+        qreal absMin = 0;                   // minimum of abs(maxNeg and maxPos)
+        qint32 drawFactor = 0;              // shift factor for decimal places (linear)
+        qint32 startDrawFactor = 1;         // shift factor for decimal places (exponential-base 10)
+        qint32 decimalPlace = 0;            // decimal places for axis title
+        QPolygonF polygon;                  // points for drwing the signal
+        QList<qreal> internListValue;       // intern representation of y-axis values of the signal (for painting only)
 
         internListValue.clear();
         while(i < valueList.length())
         {
-                internListValue.append(valueList.at(i));            //TODO wie blöd
+                internListValue.append(valueList.at(i));            //TODO stupid
                 i++;
         }
 
-        // Fenster weiss übermalen
+        // paint window white
         painter.fillRect(0,0,windowSize.width(),windowSize.height(),QBrush(Qt::white));
 
-        // Maximum und Minimum des Signals finden
+        // find min and max of signal
         i = 0;
         while(i < valueList.length())
         {
@@ -149,23 +149,23 @@ void AtomPaintWindow::PaintSignal(QList<qreal> valueList, QSize windowSize)
             i++;
         }
 
-        if(maxPos > fabs(maxNeg)) absMin = maxNeg;      // findet das absolute Minimum der beiden globalen Extremwerte (maxPos, maxNeg)
+        if(maxPos > fabs(maxNeg)) absMin = maxNeg;      // find absolute minimum of (maxPos, maxNeg)
         else     absMin = maxPos;
 
-        if(absMin != 0)                                 // absMin darf nicht null sein: sonst Endlosschleife
+        if(absMin != 0)                                 // absMin must not be zero
         {
-            while(true)                                 // um wieviel muss die Nachkommastelle verschoben werden?
+            while(true)                                 // shift factor for decimal places?
             {
-                if(fabs(absMin) < 1)                    // Bei Signalen, bei denen absMin betragsmäßig größer 1 ist, muss keine Nachkommastelle verschoben werden
+                if(fabs(absMin) < 1)                    // if absMin > 1 , no shift of decimal places nescesary
                 {
                     absMin = absMin * 10;
-                    drawFactor++;                       // Verschiebungfaktor (zählt die Anzahl der Nachkommastellen um die verschoben wurde
+                    drawFactor++;                       // shiftfactor counter
                 }
                 if(fabs(absMin) >= 1) break;
             }
         }
 
-        // Verschiebung der Nachkommastellen um drawFactor für alle Signalpunkte und anschließende Übernahme in interne Liste
+        // shift of decimal places with drawFactor for all signalpoints and save to intern list
         while(drawFactor > 0)
         {
             i = 0;
@@ -183,16 +183,16 @@ void AtomPaintWindow::PaintSignal(QList<qreal> valueList, QSize windowSize)
         }
 
         qreal maxmax;
-        // Absolute Signalhöhe
+        // absolute signalheight
         if(maxNeg <= 0)     maxmax = maxPos - maxNeg;
         else  maxmax = maxPos + maxNeg;
 
 
-        // Achsenbeschriftung skalieren        
-        qreal scaleYText = (qreal)maxmax / (qreal)10;               // Signalwerte werden in 15tel unterteilt für y-Achsenbeschriftung (16 Werte)
-        qint32 negScale =  round(maxNeg * 10 / maxmax);             // Startfaktor für y-Achsenbeschriftung
+        // scale axis title
+        qreal scaleYText = (qreal)maxmax / (qreal)10;
+        qint32 negScale =  round(maxNeg * 10 / maxmax);
 
-        //Bestimmen der Länge des Beschriftungstextes der y-Achse für Verschiebung der y-Achse nach rechts (damit Text nicht über Achse geschrieben wird)
+        //find lenght of text of y-axis for shift of y-axis to the right (so the text will stay readable and is not painted into the y-axis
         qint32 k = 0;
         qint32 negScale2 = negScale;
         qint32 maxStrLenght = 0;
@@ -200,8 +200,8 @@ void AtomPaintWindow::PaintSignal(QList<qreal> valueList, QSize windowSize)
         {
             QString string2;
 
-            qreal scaledYText = negScale2 * scaleYText / (qreal)startDrawFactor;                                     // Skalenwert Y-Achse
-            string2  = QString::number(scaledYText, 'f', decimalPlace + 1);                                          // Skalenwert als String mit richtiger Nachkommastelle (Genauigkeit je nach Signalwertebereich)
+            qreal scaledYText = negScale2 * scaleYText / (qreal)startDrawFactor;    // scale value y-axis
+            string2  = QString::number(scaledYText, 'f', decimalPlace + 1);         // scale in string with correct decimal places (precision depends on signal codomain)
 
             if(string2.length()> maxStrLenght) maxStrLenght = string2.length();
 
@@ -210,23 +210,23 @@ void AtomPaintWindow::PaintSignal(QList<qreal> valueList, QSize windowSize)
         }
         maxStrLenght = 6 + maxStrLenght * 6;
 
-        //todo abstand einstellen damit hinten der achsentext mit hinpasst
+        //todo adjust distance for last text
         //while(((windowSize.width() - maxStrLenght - borderMarginWidth)*100) % 15)  borderMarginWidth++;
 
         qreal inStartValue = startValue;
         qreal inEndValue = endValue;        
 
-        // Signal skalieren
+        // scale signal
         qreal scaleX = ((qreal)(windowSize.width() - maxStrLenght - 6 * borderMarginWidth))/ ((qreal)valueList.length() - 1);
         qreal scaleY = (qreal)(windowSize.height() - borderMarginHeigth) / (qreal)maxmax;
 
-        //Achsen skalieren
+        //scale axis
         qreal scaleXAchse = (qreal)(windowSize.width() - maxStrLenght - 6 * borderMarginWidth) / (qreal)15;
         qreal scaleYAchse = (qreal)(windowSize.height() - borderMarginHeigth) / (qreal)10;
 
-        // Position der Achsbeschriftung der x-Achse
+        // position of title of x-axis
         qint32 xAxisTextPos = 8;
-        if(maxNeg == 0) xAxisTextPos = -10; // wenn Signal nur positiv: Beschriftung oberhalb der Achse
+        if(maxNeg == 0) xAxisTextPos = -10; // if signal only positiv: titles above axis
 
         i = 1;
 
@@ -244,13 +244,13 @@ void AtomPaintWindow::PaintSignal(QList<qreal> valueList, QSize windowSize)
         {
             QString string;
 
-            qreal scaledYText = negScale * scaleYText / (qreal)startDrawFactor;                                    // Skalenwert Y-Achse
+            qreal scaledYText = negScale * scaleYText / (qreal)startDrawFactor; // scale value y-axis
 
-            string  = QString::number(scaledYText, 'f', decimalPlace + 1);                                          // Skalenwert als String mit richtiger Nachkommastelle (Genauigkeit je nach Signalwertebereich)
+            string  = QString::number(scaledYText, 'f', decimalPlace + 1);      // scale in string with correct decimal places (precision depends on signal codomain)
 
-            if(negScale == 0)                                                                                       // x-Achse erreicht (y-Wert = 0)
+            if(negScale == 0)                                                   // x-axis reached (y-value = 0)
             {
-                // Eintragen der skalierten Signalpunkte
+                // append scaled signalpoints
                 qint32 h = 0;
                 while(h < valueList.length())
                 {
@@ -258,29 +258,29 @@ void AtomPaintWindow::PaintSignal(QList<qreal> valueList, QSize windowSize)
                     h++;
                 }
 
-                // X-Achse zeichnen
+                // paint x-axis
                 qreal j = 0;
                 inStartValue = startValue;                
                 while(inStartValue <= inEndValue)
                 {
                     QString str;
-                    painter.drawText(j * scaleXAchse + maxStrLenght + 3, -(((i - 1) * scaleYAchse)-(windowSize.height())) + xAxisTextPos, str.append(QString::number(inStartValue, 'f', decimalPlaceX)));      // Skalenwert X-Achse
-                    painter.drawLine(j * scaleXAchse + maxStrLenght + 10, -(((i - 1) * scaleYAchse)-(windowSize.height() - borderMarginHeigth / 2 - 2)), j * scaleXAchse + maxStrLenght + 10 , -(((i - 1) * scaleYAchse)-(windowSize.height() - borderMarginHeigth / 2 + 2)));   // Anstriche X-Achse
+                    painter.drawText(j * scaleXAchse + maxStrLenght + 3, -(((i - 1) * scaleYAchse)-(windowSize.height())) + xAxisTextPos, str.append(QString::number(inStartValue, 'f', decimalPlaceX)));      // scale value x-axis
+                    painter.drawLine(j * scaleXAchse + maxStrLenght + 10, -(((i - 1) * scaleYAchse)-(windowSize.height() - borderMarginHeigth / 2 - 2)), j * scaleXAchse + maxStrLenght + 10 , -(((i - 1) * scaleYAchse)-(windowSize.height() - borderMarginHeigth / 2 + 2)));   // marks of x-axis
                     j++;
                     inStartValue += internStepWidth;
                 }
                 painter.drawLine(maxStrLenght, -(((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2), windowSize.width()-5, -(((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2));
             }
 
-            painter.drawText(3, -((i - 1) * scaleYAchse - windowSize.height()) - borderMarginHeigth/2 + 4, string);     // Skalenwert Y-Achse zeichen
-            painter.drawLine(maxStrLenght - 2, -(((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2), maxStrLenght + 2, -(((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2));  // Anstriche Y-Achse
+            painter.drawText(3, -((i - 1) * scaleYAchse - windowSize.height()) - borderMarginHeigth/2 + 4, string);     // paint scale value y-axis
+            painter.drawLine(maxStrLenght - 2, -(((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2), maxStrLenght + 2, -(((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2));  // marks of y-axis
             i++;
             negScale++;
         }
 
-        painter.drawLine(maxStrLenght, 2, maxStrLenght, windowSize.height() - 2);     // Y-Achse zeichen
+        painter.drawLine(maxStrLenght, 2, maxStrLenght, windowSize.height() - 2);     // paint y-axis
 
-        painter.drawPolyline(polygon);                 // Signal zeichen
+        painter.drawPolyline(polygon);                 // paint signal
     }
     painter.end();
 }
@@ -494,7 +494,7 @@ void Formulaeditor::on_btt_Test_clicked()
     FormulaParser.SetFunctConst(6, ui->tb_G->text().toFloat());
     FormulaParser.SetFunctConst(7, ui->tb_H->text().toFloat());
 
-    double retValue = FormulaParser.Calculation(ui->tb_Formula->text(), ui->dsb_StartValue->value());  // TODO Float oder nur Int bei X
+    double retValue = FormulaParser.Calculation(ui->tb_Formula->text(), ui->dsb_StartValue->value());  // TODO Float or only Int at X
 
     if(errorText.isEmpty())
     {
@@ -543,7 +543,7 @@ void Formulaeditor::on_btt_Test_clicked()
     update();
 }
 
-// Tritt ein wenn der Button "Speichern" geklickt wird.
+// access when "Speichern" clicked
 void Formulaeditor::on_btt_Save_clicked()
 {    
     QFile saveFile("Matching-Pursuit-Toolbox/user.fml");
@@ -563,7 +563,7 @@ void Formulaeditor::on_btt_Save_clicked()
 }
 
 //**********************************************************************************************************************
-// Formelmethoden ******************************************************************************************************
+// formula methods ******************************************************************************************************
 //**********************************************************************************************************************
 
 qreal Formulaeditor::SignFactor(qint32& nPosition, QString& strCharacter)
@@ -582,7 +582,7 @@ void Formulaeditor::StripFormula(QString &strFormula)
 
     if (strFormula.length() < 1) return;
 
-    // Kommas durch Punkte ersetzen, alles runde Klammern
+    // replace comma by points all round brackets
     strFormula.replace("PI", "3.14159265358979323846");
     strFormula.replace("pi", "3.14159265358979323846");
     strFormula.replace("Pi", "3.14159265358979323846");
@@ -610,7 +610,7 @@ void Formulaeditor::StripFormula(QString &strFormula)
     strFormula.replace("(log(x))","log(x)");
     strFormula.replace("(ln(x))","ln(x)");
 
-    // Einschließende Klammern beseitigen
+    // delete enclosing marks
     for (qint32 i = 0; i < strFormula.length(); i++)
     {
         if(QString::compare(strFormula.at(i), "(") == 0)
@@ -626,7 +626,7 @@ void Formulaeditor::StripFormula(QString &strFormula)
 
         if (level == 0 && i < strFormula.length() - 1)
         {
-            level = -1; // Markierung
+            level = -1; // marker
             break;
         }
     }
@@ -639,7 +639,7 @@ void Formulaeditor::StripFormula(QString &strFormula)
         }
     }
 
-    // Führende und abschließende Leerzeichen und positive Vorzeichen entfernen
+    // delete whitespaces and positive signs
     while (strFormula.at(0) == '+'
            || strFormula.at(0) == ' ')
     {
@@ -647,7 +647,7 @@ void Formulaeditor::StripFormula(QString &strFormula)
     }
     strFormula.trimmed();
 
-    //Alle unnötigen Klammern beseitigen
+    //remove unused brackets
     qint32 Pos[1000];
     qint32 j = 0;
     level = 0;
@@ -673,12 +673,12 @@ void Formulaeditor::StripFormula(QString &strFormula)
             level--;
             if (level > 0 && strFormula.at(i+1) == ')')
             {
-                //rechte Klammer
+                //right bracket
                 QString left = strFormula.left(i);
                 QString mid = strFormula.mid(i+1);
                 strFormula = left + "|" + mid;
 
-                //linke Klammer
+                //left bracket
                 left = strFormula.left(Pos[level] + 1);
                 mid = strFormula.mid(Pos[level+1] + 1);
                 strFormula = left + "|" + mid;
@@ -798,7 +798,7 @@ double Formulaeditor::Factor(qint32& nPosition, QString& strCharacter)
     qint32 wI = 0, wL = 0, wBeginn = 0, wError = 0;
 
     if	(strCharacter == strChar_(0)) return 0.0;
-    // ließt eine Zahl aus und speichert diese als float in der variablen f
+    // read digit and save as float in f
     if (((strCharacter >= "0") && (strCharacter <= "9")) || (strCharacter == "."))
     {
         wBeginn = nPosition;
@@ -852,7 +852,7 @@ double Formulaeditor::Factor(qint32& nPosition, QString& strCharacter)
                     gefunden = true;
                     nPosition = nPosition + wL - 1;
                     Char_n(nPosition, strCharacter);
-                    // ! Rekursion !!!!!!!!!!!!!!!!!!!!!!
+                    // ! recursion !!!!!!!!!!!!!!!!!!!!!!
                     f = Factor(nPosition, strCharacter);
                     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                     if (strFunktionUpper == "ABS")
@@ -973,7 +973,7 @@ double Formulaeditor::Factor(qint32& nPosition, QString& strCharacter)
 
 void Formulaeditor::SetFunctConst(int index, double val)
 {
-    //zwischen 0 und 9
+    //between 0 and 9
     if (index >= 0 && index < 9)   m_dFunctionConstant[index] = val;
     else errorText = QString("Programmfehler in SetFunctConst()");
 }
@@ -1004,13 +1004,13 @@ double Formulaeditor::cot(double x)
 
 double Formulaeditor::DEG(double x /* rad */)
 {
-    // liefert den Winkel eines arithmetischen Ausdrucks im Gradmaß.
+    // returns angle in grad
     return x * 180.0 / PI;
 }
 
 double Formulaeditor::RAD(double x /* grad */)
 {
-    // liefert das Bogenmaß eines im Gradmaß vorliegenden Winkels.
+    // returns angle in rad
     return x * PI / 180.0;
 }
 

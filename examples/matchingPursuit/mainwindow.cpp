@@ -69,7 +69,7 @@ QList<QStringList> globalResultAtomList;
 qint32 processValue = 0;
 
 
-// Initialisierungsaufruf
+// constructor
 MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
@@ -80,15 +80,15 @@ MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::
 
     callGraphWindow->setMaximumHeight(220);
 
-    ui->sb_Iterations->setMaximum(9999);        // Legt das Maximum der Iterationsschritte fest
-    ui->sb_Iterations->setMinimum(1);           // Legt das Minimum der Iterationsschritte fest
+    ui->sb_Iterations->setMaximum(9999);        // max iterations
+    ui->sb_Iterations->setMinimum(1);           // min iterations
 
     //atom = new Atom();
 
     ui->l_Graph->addWidget(callGraphWindow);
     ui->tb_ResEnergy->setText(tr("0,1"));
 
-    // Erstellt die Konfigdatei bei Initalizierung
+    // build config file at init
     bool hasEntry1 = false;
     bool hasEntry2 = false;
     bool hasEntry3 = false;
@@ -158,7 +158,7 @@ MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::
     for(int i = 0; i < fileList.length(); i++)
         ui->cb_Dicts->addItem(QIcon(":/images/icons/DictIcon.png"), fileList.at(i).baseName());
 /*
-    // Ergebnisstabelle anpassen
+    // adjust result table
     QStringList headerList;
     headerList << "Atomname" << "Atom" << "Energie (%)" << "Residuum";
     ui->tbv_Results->setColumnCount(4);
@@ -384,17 +384,17 @@ void GraphWindow::PaintSignal(VectorXd signalSamples, VectorXd residuumSamples, 
 
     if(signalSamples.rows() > 0)
     {
-        qint32 borderMarginHeigth = 15;     // verkleinert Zeichenfläche von GraphWindow um borderMargin Pixel in der Höhe
-        qint32 borderMarginWidth = 5;       // verkleinert Zeichenfläche von GraphWindow um borderMargin Pixel in der Breite
-        qint32 i = 0;                       // Laufindex
-        qreal maxNeg = 0;                   // Kleinster Signalwert
-        qreal maxPos = 0;                   // groesster Signalwert
-        qreal absMin = 0;                   // Minimum der Absolutbetraege von maxNeg und maxPos
-        qint32 drawFactor = 0;              // Verschiebungsfaktor für Nachkommastellen (linear)
-        qint32 startDrawFactor = 1;         // Verschiebungsfaktor für Nachkommastellen (exponentiell-Basis 10)
-        qint32 decimalPlace = 0;            // Nachkommastellen für Achsenbeschriftung
-        QPolygonF polygons;                 // Punkte zum Zeichnen des eingelesenen Signals
-        QList<qreal> internListValue;       // interne representation der y-Werte des Signals (nur für grafische Darstellung)
+        qint32 borderMarginHeigth = 15;     // reduce paintspace in GraphWindow of borderMargin pixels
+        qint32 borderMarginWidth = 5;       // reduce paintspace in GraphWindow of borderMargin pixels
+        qint32 i = 0;
+        qreal maxNeg = 0;                   // smalest signalvalue
+        qreal maxPos = 0;                   // highest signalvalue
+        qreal absMin = 0;                   // minimum of abs(maxNeg and maxPos)
+        qint32 drawFactor = 0;              // shift factor for decimal places (linear)
+        qint32 startDrawFactor = 1;         // shift factor for decimal places (exponential-base 10)
+        qint32 decimalPlace = 0;            // decimal places for axis title
+        QPolygonF polygons;                 // points for drwing the signal
+        QList<qreal> internListValue;       // intern representation of y-axis values of the signal (for painting only)
         QPolygonF polygonsResiduum;
 
         internListValue.clear();
@@ -404,10 +404,10 @@ void GraphWindow::PaintSignal(VectorXd signalSamples, VectorXd residuumSamples, 
                 i++;
         }
 
-        // Fenster weiss übermalen
+        // paint window white
         painter.fillRect(0,0,windowSize.width(),windowSize.height(),QBrush(Qt::white));
 
-        // Maximum und Minimum des Signals finden
+        // find min and max of signal
         i = 0;
         while(i < signalSamples.rows())
         {
@@ -419,23 +419,23 @@ void GraphWindow::PaintSignal(VectorXd signalSamples, VectorXd residuumSamples, 
             i++;
         }
 
-        if(maxPos > fabs(maxNeg)) absMin = maxNeg;       // findet das absolute Minimum der beiden globalen Extremwerte (maxPos, maxNeg)
+        if(maxPos > fabs(maxNeg)) absMin = maxNeg;        // find absolute minimum of (maxPos, maxNeg)
         else     absMin = maxPos;
 
-        if(absMin != 0)                                 // absMin darf nicht null sein: sonst Endlosschleife
+        if(absMin != 0)                                   // absMin must not be zero
         {
-            while(true)                                 // um wieviel muss die Nachkommastelle verschoben werden?
+            while(true)                                   // shift factor for decimal places?
             {
-                if(fabs(absMin) < 1)                     // Bei Signalen, bei denen absMin betragsmäßig größer 1 ist, muss keine Nachkommastelle verschoben werden
+                if(fabs(absMin) < 1)                      // if absMin > 1 , no shift of decimal places nescesary
                 {
                     absMin = absMin * 10;
-                    drawFactor++;                       // Verschiebungfaktor (zählt die Anzahl der Nachkommastellen um die verschoben wurde
+                    drawFactor++;                         // shiftfactor counter
                 }
                 if(fabs(absMin) >= 1) break;
             }
         }
 
-        // Verschiebung der Nachkommastellen um drawFactor für alle Signalpunkte und anschließende Übernahme in interne Liste
+        // shift of decimal places with drawFactor for all signalpoints and save to intern list
         while(drawFactor > 0)
         {
             i = 0;
@@ -453,17 +453,17 @@ void GraphWindow::PaintSignal(VectorXd signalSamples, VectorXd residuumSamples, 
         }
 
         qreal maxmax;
-        // Absolute Signalhöhe
+        // absolute signalheight
         if(maxNeg <= 0)     maxmax = maxPos - maxNeg;
         else  maxmax = maxPos + maxNeg;
 
 
-        // Achsenbeschriftung skalieren
-        qreal scaleXText = (qreal)signalSamples.rows() / (qreal)20;     //Signallänge teilen
-        qreal scaleYText = (qreal)maxmax / (qreal)10;                   // Signalwerte werden in 15tel unterteilt für y-Achsenbeschriftung (16 Werte)
-        qint32 negScale =  round(maxNeg * 10 / maxmax);                 // Startfaktor für y-Achsenbeschriftung
+        // scale axis title
+        qreal scaleXText = (qreal)signalSamples.rows() / (qreal)20;     // divide signallegnth
+        qreal scaleYText = (qreal)maxmax / (qreal)10;
+        qint32 negScale =  round(maxNeg * 10 / maxmax);
 
-        //Bestimmen der Länge des Beschriftungstextes der y-Achse für Verschiebung der y-Achse nach rechts (damit Text nicht über Achse geschrieben wird)
+        //find lenght of text of y-axis for shift of y-axis to the right (so the text will stay readable and is not painted into the y-axis
         qint32 k = 0;
         qint32 negScale2 = negScale;
         qint32 maxStrLenght = 0;
@@ -483,17 +483,17 @@ void GraphWindow::PaintSignal(VectorXd signalSamples, VectorXd residuumSamples, 
 
         while((windowSize.width() - maxStrLenght -borderMarginWidth) % 20)borderMarginWidth++;
 
-        // Signal skalieren
+        // scale signal
         qreal scaleX = ((qreal)(windowSize.width() - maxStrLenght - borderMarginWidth))/ (qreal)signalSamples.rows();
         qreal scaleY = (qreal)(windowSize.height() - borderMarginHeigth) / (qreal)maxmax;
 
-        //Achsen skalieren
+        //scale axis
         qreal scaleXAchse = (qreal)(windowSize.width() - maxStrLenght - borderMarginWidth) / (qreal)20;
         qreal scaleYAchse = (qreal)(windowSize.height() - borderMarginHeigth) / (qreal)10;
 
-        // Position der Achsbeschriftung der x-Achse
+        // position of title of x-axis
         qint32 xAxisTextPos = 8;
-        if(maxNeg == 0) xAxisTextPos = -10; // wenn Signal nur positiv: Beschriftung oberhalb der Achse
+        if(maxNeg == 0) xAxisTextPos = -10; // if signal only positiv: titles above axis
 
         i = 1;
         while(i <= 11)
@@ -505,7 +505,7 @@ void GraphWindow::PaintSignal(VectorXd signalSamples, VectorXd residuumSamples, 
 
             if(negScale == 0)                                                                                       // x-Achse erreicht (y-Wert = 0)
             {
-                // Eintragen der skalierten Signalpunkte
+                // append scaled signalpoints
                 qint32 h = 0;
                 while(h < signalSamples.rows())
                 {
@@ -516,7 +516,7 @@ void GraphWindow::PaintSignal(VectorXd signalSamples, VectorXd residuumSamples, 
                     h++;
                 }
 
-                // X-Achse zeichnen
+                // paint x-axis
                 qint32 j = 1;
                 while(j <= 21)
                 {
@@ -535,20 +535,20 @@ void GraphWindow::PaintSignal(VectorXd signalSamples, VectorXd residuumSamples, 
             negScale++;
         }
 
-        painter.drawLine(maxStrLenght, 2, maxStrLenght, windowSize.height() - 2);     // Y-Achse zeichen
+        painter.drawLine(maxStrLenght, 2, maxStrLenght, windowSize.height() - 2);     // paint y-axis
 
-        painter.drawPolyline(polygons);                  // Signal zeichnen
+        painter.drawPolyline(polygons);                  // paint signal
         painter.setPen(color);
         if(residuumSamples.rows() == residuumSamples.rows())
         {
              painter.setPen(color);
-             painter.drawPolyline(polygonsResiduum);         // Residuum zeichnen
+             painter.drawPolyline(polygonsResiduum);         // paint residuum
         }
     }
     painter.end();    
 }
 
-// Startet MP-algorithmus
+// starts MP-algorithm
 void MainWindow::on_btt_Calc_clicked()
 {
     processValue = 0;
@@ -647,6 +647,7 @@ void MainWindow::on_btt_Calc_clicked()
 }
 
 /*
+ * TODO: Calc MP (new)
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 VectorXd MainWindow::mpCalc(QFile &currentDict, VectorXd signalSamples, qint32 iterationsCount)
 {
@@ -991,34 +992,34 @@ void MainWindow::on_btt_Close_clicked()
     close();
 }
 
-// Öffnet den Wörterbucheditor
+// Opens Dictionaryeditor
 void MainWindow::on_actionW_rterbucheditor_triggered()
 {
     EditorWindow *x = new EditorWindow();
     x->show();
 }
 
-// Öffnet den Erweiterten Wörterbucheditor
+// opens advanced Dictionaryeditor
 void MainWindow::on_actionErweiterter_W_rterbucheditor_triggered()
 {
     Enhancededitorwindow *x = new Enhancededitorwindow();
     x->show();
 }
 
-// Öffnet den Formeleditor
+// opens formula editor
 void MainWindow::on_actionAtomformeleditor_triggered()
 {
     Formulaeditor *x = new Formulaeditor();
     x->show();
 }
 
-// Öffnet Filedialog zum Signal einlesen
+// opens Filedialog for read signal (contextmenue)
 void MainWindow::on_actionNeu_triggered()
 {
     OpenFile();
 }
 
-// Öffnet Filedialog zum Signal einlesen
+// opens Filedialog for read signal (button)
 void MainWindow::on_btt_OpenSignal_clicked()
 {
     OpenFile();
@@ -1095,17 +1096,17 @@ SignalModel::SignalModel(QObject *parent): QAbstractTableModel(parent)
 
       if(signalSamples.rows() > 0 && index.column() == 1)
       {
-          qint32 borderMarginHeigth = 2;      // verkleinert Zeichenfläche von GraphWindow um borderMargin Pixel in der Höhe
-          qint32 borderMarginWidth = 2;       // verkleinert Zeichenfläche von GraphWindow um borderMargin Pixel in der Breite
-          qint32 i = 0;                       // Laufindex
-          qreal maxNeg = 0;                   // Kleinster Signalwert
-          qreal maxPos = 0;                   // groesster Signalwert
-          qreal absMin = 0;                   // Minimum der Absolutbetraege von maxNeg und maxPos
-          qint32 drawFactor = 0;              // Verschiebungsfaktor für Nachkommastellen (linear)
-          qint32 startDrawFactor = 1;         // Verschiebungsfaktor für Nachkommastellen (exponentiell-Basis 10)
-          qint32 decimalPlace = 0;            // Nachkommastellen für Achsenbeschriftung
-          QPolygonF polygons;                 // Punkte zum Zeichnen des eingelesenen Signals
-          QList<qreal> internListValue;       // interne representation der y-Werte des Signals (nur für grafische Darstellung)
+          qint32 borderMarginHeigth = 2;      // reduce paintspace in GraphWindow of borderMargin pixels
+          qint32 borderMarginWidth = 2;       // reduce paintspace in GraphWindow of borderMargin pixels
+          qint32 i = 0;
+          qreal maxNeg = 0;                   // smalest signalvalue
+          qreal maxPos = 0;                   // highest signalvalue
+          qreal absMin = 0;                   // minimum of abs(maxNeg and maxPos)
+          qint32 drawFactor = 0;              // shift factor for decimal places (linear)
+          qint32 startDrawFactor = 1;         // shift factor for decimal places (exponential-base 10)
+          qint32 decimalPlace = 0;            // decimal places for axis title
+          QPolygonF polygons;                 // points for drwing the signal
+          QList<qreal> internListValue;       // intern representation of y-axis values of the signal (for painting only)
 
           internListValue.clear();
           while(i < signalSamples.rows())
@@ -1114,10 +1115,10 @@ SignalModel::SignalModel(QObject *parent): QAbstractTableModel(parent)
                   i++;
           }
 
-          // Fenster weiss übermalen          
+          // paint window white
           painter->fillRect(option.rect.x(),option.rect.y(),windowSize.width(),windowSize.height(),QBrush(Qt::white));
 
-          // Maximum und Minimum des Signals finden
+          // find min and max of signal
           i = 0;
           while(i < signalSamples.rows())
           {
@@ -1129,23 +1130,23 @@ SignalModel::SignalModel(QObject *parent): QAbstractTableModel(parent)
               i++;
           }
 
-          if(maxPos > fabs(maxNeg)) absMin = maxNeg;      // findet das absolute Minimum der beiden globalen Extremwerte (maxPos, maxNeg)
+          if(maxPos > fabs(maxNeg)) absMin = maxNeg;      // find absolute minimum of (maxPos, maxNeg)
           else     absMin = maxPos;
 
-          if(absMin != 0)                                 // absMin darf nicht null sein: sonst Endlosschleife
+          if(absMin != 0)                                 // absMin must not be zero
           {
-              while(true)                                 // um wieviel muss die Nachkommastelle verschoben werden?
+              while(true)                                 // shift factor for decimal places?
               {
-                  if(fabs(absMin) < 1)                    // Bei Signalen, bei denen absMin betragsmäßig größer 1 ist, muss keine Nachkommastelle verschoben werden
+                  if(fabs(absMin) < 1)                    // if absMin > 1 , no shift of decimal places nescesary
                   {
                       absMin = absMin * 10;
-                      drawFactor++;                       // Verschiebungfaktor (zählt die Anzahl der Nachkommastellen um die verschoben wurde
+                      drawFactor++;                       // shiftfactor counter
                   }
                   if(fabs(absMin) >= 1) break;
               }
           }
 
-          // Verschiebung der Nachkommastellen um drawFactor für alle Signalpunkte und anschließende Übernahme in interne Liste
+          // shift of decimal places with drawFactor for all signalpoints and save to intern list
           while(drawFactor > 0)
           {
               i = 0;
@@ -1163,15 +1164,15 @@ SignalModel::SignalModel(QObject *parent): QAbstractTableModel(parent)
           }
 
           qreal maxmax;
-          // Absolute Signalhöhe
+          // absolute signalheight
           if(maxNeg <= 0)     maxmax = maxPos - maxNeg;
           else  maxmax = maxPos + maxNeg;
 
-          // Signal skalieren
+          // scale signal
           qreal scaleX = ((qreal)(windowSize.width() - borderMarginWidth)) / (qreal)signalSamples.rows();
           qreal scaleY = (qreal)(windowSize.height() - borderMarginHeigth) / (qreal)maxmax;
 
-          // Eintragen der skalierten Signalpunkte
+          // append scaled signalpoints
           qint32 h = 0;
 
           while(h < signalSamples.rows())
@@ -1180,7 +1181,7 @@ SignalModel::SignalModel(QObject *parent): QAbstractTableModel(parent)
               h++;
           }
 
-          painter->drawPolyline(polygons);                  // Signal zeichnen
+          painter->drawPolyline(polygons);                  // paint signal
       }
       painter->restore();
       //painter->end();

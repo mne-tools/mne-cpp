@@ -103,7 +103,6 @@ private:
 
 };
 
-// Widget in dem das Atom gezeichnet wird
 class AtomPaintWindow : public QWidget
 {
     Q_OBJECT

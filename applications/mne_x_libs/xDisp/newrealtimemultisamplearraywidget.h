@@ -61,8 +61,6 @@
 #include <QThread>
 #include <QTableView>
 
-//#define NEWTABLEVIEW 1
-
 
 
 //*************************************************************************************************************
@@ -248,17 +246,11 @@ private slots:
     void minValueChanged(double);
 
 private:
-
-#ifdef NEWTABLEVIEW
-
-    QTableView *m_pTableView; /**< the QTableView being part of the model/view framework of Qt */
-
-#endif
-
+    QSharedPointer<NewRealTimeMultiSampleArray> m_pRTMSA_New;       /**< The real-time sample array measurement. */
 
     void actualize();                                               /**< Actualize member variables. Like y position, scaling factor, middle value of the frame and the highest sampling rate to calculate the sample width.*/
+
     Ui::NewRealTimeMultiSampleArrayClass   ui;                      /**< The user interface of the RealTimeSampleArray widget. */
-    QSharedPointer<NewRealTimeMultiSampleArray> m_pRTMSA_New;       /**< The real-time sample array measurement. */
 
     quint32                         m_uiMaxNumChannels;
     quint32                         m_uiNumChannels;
@@ -305,4 +297,4 @@ private:
 
 } // NAMESPACE
 
-#endif // REALTIMEMULTISAMPLEARRAYNEWWIDGET_H
+#endif // NEWREALTIMEMULTISAMPLEARRAYNEWWIDGET_H

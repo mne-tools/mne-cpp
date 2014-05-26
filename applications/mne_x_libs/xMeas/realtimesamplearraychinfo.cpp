@@ -66,7 +66,7 @@ RealTimeSampleArrayChInfo::RealTimeSampleArrayChInfo()
 , m_dMinValue(-80000)
 , m_dMaxValue(80000)
 , m_iKind(0)
-, m_qString_Unit("")
+, m_iUnit(-1)
 {
 
 }

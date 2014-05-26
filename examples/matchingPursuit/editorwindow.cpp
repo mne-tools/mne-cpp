@@ -154,7 +154,7 @@ void EditorWindow::readDicts()
     if(ui->list_AllDict->count() > 1)   ui->list_AllDict->itemAt(0, 0)->setSelected(true);
 }
 
-// Berechent die Anzahl der Atome wenn Allekombinieren an ist
+// calculates number of atoms if "combine all"
 void EditorWindow::calcAtomCountAllCombined()
 {
     qint32 count = 0;
@@ -175,14 +175,14 @@ void EditorWindow::calcAtomCountAllCombined()
 
     if(count > 1000000)
     {
-        QMessageBox::warning(this, tr("Fehler"),
+        QMessageBox::warning(this, tr("Fehler"), //todo localisation (language??)
         tr("Die Anzahl der zu berechnenden Atome ist zu groß."));
         return;
     }
     ui->spb_AtomCount->setValue(count);
 }
 
-// Berechnung der Parameterwerte mit linearer Schrittweite
+// calculates parameters for linear stepwidth
 QList<qreal> EditorWindow::calcLinPosParameters(qreal startValue, qreal linStepValue)
 {
     QList<qreal> resultList;
@@ -199,7 +199,7 @@ QList<qreal> EditorWindow::calcLinPosParameters(qreal startValue, qreal linStepV
     return resultList;
 }
 
-// Berechnung der Parameterwerte mit linearer Schrittweite (negativ)
+// calculates parameters for linear stepwidth (negativ)
 QList<qreal> EditorWindow::calcLinNegParameters(qreal startValue, qreal linStepValue)
 {
     QList<qreal> resultList;
@@ -216,7 +216,7 @@ QList<qreal> EditorWindow::calcLinNegParameters(qreal startValue, qreal linStepV
     return resultList;
 }
 
-// Berechnung der Parameterwerte mit expotentieller Schrittweite (positiv)
+// calculates parameters for exponential stepwidth (positiv)
 QList<qreal> EditorWindow::calcExpPosParameters(qreal startValue, qreal expStepValue)
 {
     QList<qreal> resultList;
@@ -233,7 +233,7 @@ QList<qreal> EditorWindow::calcExpPosParameters(qreal startValue, qreal expStepV
     return resultList;
 }
 
-// Berechnung der Parameterwerte mit expotentieller Schrittweite (negativ)
+// calculates parameters for exponential stepwidth (negativ)
 QList<qreal> EditorWindow::calcExpNegParameters(qreal startValue, qreal expStepValue)
 {
     QList<qreal> resultList;
@@ -250,7 +250,7 @@ QList<qreal> EditorWindow::calcExpNegParameters(qreal startValue, qreal expStepV
     return resultList;
 }
 
-// Berechnet die Skalierungsparamterwerte und speichert sie in eine Liste
+// calculate scale and save to list
 QList<qreal> EditorWindow::calcParameterValuesScale(qreal startValue, qreal linStepValue, qreal expStepValue)
 {
     QList<qreal> resultList;
@@ -272,7 +272,7 @@ QList<qreal> EditorWindow::calcParameterValuesScale(qreal startValue, qreal linS
     return resultList;
 }
 
-// Berechnet die Skalierungsparamterwerte und speichert sie in eine Liste (AllCombined)
+// calculate scale and save to list (AllCombined)
 QList<qreal> EditorWindow::calcAllCombParameterValuesScale(qreal startValue, qreal endvalue, qreal linStepValue, qreal expStepValue)
 {
     QList<qreal> resultList;
@@ -293,7 +293,7 @@ QList<qreal> EditorWindow::calcAllCombParameterValuesScale(qreal startValue, qre
     return resultList;
 }
 
-// Berechnet die Modulationsparamterwerte und speichert sie in eine Liste
+// calculate modulation and save to list
 QList<qreal> EditorWindow::calcParameterValuesModu(qreal startValue, qreal linStepValue, qreal expStepValue)
 {
     QList<qreal> resultList;
@@ -315,7 +315,7 @@ QList<qreal> EditorWindow::calcParameterValuesModu(qreal startValue, qreal linSt
     return resultList;
 }
 
-// Berechnet die Modulationsparamterwerte und speichert sie in eine Liste (AllCombined)
+// calculate modulation and save to list (AllCombined)
 QList<qreal> EditorWindow::calcAllCombParameterValuesModu(qreal startValue, qreal endvalue, qreal linStepValue, qreal expStepValue)
 {
     QList<qreal> resultList;
@@ -336,7 +336,7 @@ QList<qreal> EditorWindow::calcAllCombParameterValuesModu(qreal startValue, qrea
     return resultList;
 }
 
-// Berechnet die Phaseparameterwerte und speichert sie in eine Liste
+// calculate phase and save to list
 QList<qreal> EditorWindow::calcParameterValuesPhase(qreal startValue, qreal linStepValue, qreal expStepValue)
 {
     QList<qreal> resultList;
@@ -358,7 +358,7 @@ QList<qreal> EditorWindow::calcParameterValuesPhase(qreal startValue, qreal linS
     return resultList;
 }
 
-// Berechnet die Phasenparamterwerte und speichert sie in eine Liste (AllCombined)
+// calculate phase and save to list (AllCombined)
 QList<qreal> EditorWindow::calcAllCombParameterValuesPhase(qreal startValue, qreal endvalue, qreal linStepValue, qreal expStepValue)
 {
     QList<qreal> resultList;
@@ -379,7 +379,7 @@ QList<qreal> EditorWindow::calcAllCombParameterValuesPhase(qreal startValue, qre
     return resultList;
 }
 
-// Berechnet die Chirpparamterwerte und speichert sie in eine Liste
+// calculate chirp and save to list
 QList<qreal> EditorWindow::calcParameterValuesChirp(qreal startValue, qreal linStepValue, qreal expStepValue)
 {
     QList<qreal> resultList;
@@ -401,7 +401,7 @@ QList<qreal> EditorWindow::calcParameterValuesChirp(qreal startValue, qreal linS
     return resultList;
 }
 
-// Berechnet die Chirpparamterwerte und speichert sie in eine Liste (AllCombined)
+// calculate chirp and save to list (AllCombined)
 QList<qreal> EditorWindow::calcAllCombParameterValuesChirp(qreal startValue, qreal endvalue, qreal linStepValue, qreal expStepValue)
 {
     QList<qreal> resultList;
@@ -422,7 +422,7 @@ QList<qreal> EditorWindow::calcAllCombParameterValuesChirp(qreal startValue, qre
     return resultList;
 }
 
-//  Berechnet die Skalierungspparameter
+//  handle scale
 void EditorWindow::calcScaleValue()
 {
     if(allCombined)
@@ -445,7 +445,7 @@ void EditorWindow::calcScaleValue()
     }
 }
 
-// Berechnet die Modulationsparameter
+// handle modulation
 void EditorWindow::calcModuValue()
 {
     if(allCombined)
@@ -465,7 +465,7 @@ void EditorWindow::calcModuValue()
         moduList = calcParameterValuesModu(startValueModu, linStepWidthModu, expStepWidthModu);
 }
 
-// Berechnet die Phasenparameter
+// handle phase
 void EditorWindow::calcPhaseValue()
 {
     if(allCombined)
@@ -485,7 +485,7 @@ void EditorWindow::calcPhaseValue()
         phaseList = calcParameterValuesPhase(startValuePhase, linStepWidthPhase, expStepWidthPhase);
 }
 
-// Berechnet die Chirpparameter
+// handle chirp
 void EditorWindow::calcChirpValue()
 {
     if(allCombined)
@@ -505,7 +505,7 @@ void EditorWindow::calcChirpValue()
         chirpList = calcParameterValuesChirp(startValueChirp, linStepWidthChirp, expStepWidthChirp);   
 }
 
-// Tritt ein, wenn der Name geändert wird
+// access if namechange of PartDictName
 void EditorWindow::on_tb_PartDictName_editingFinished()
 {
     partDictName = ui->tb_PartDictName->text();
@@ -516,7 +516,7 @@ void EditorWindow::on_tb_PartDictName_editingFinished()
     calcChirpValue();
 }
 
-// Tritt ein, wenn Alle-Kombinieren geklickt wird
+// access if "All combined"
 void EditorWindow::on_chb_CombAllPara_toggled(bool checked)
 {
     allCombined = checked;
@@ -627,7 +627,7 @@ void EditorWindow::on_chb_CombAllPara_toggled(bool checked)
 
 void EditorWindow::on_spb_AtomLength_editingFinished()
 {
-    // Setzt den maximalen Startwert für die Skalierung
+    // set max startvalue of scale
     ui->dspb_StartValueScale->setMaximum(10 * ui->spb_AtomLength->value());
     startValueScale = ui->dspb_StartValueScale->value();
 
@@ -637,7 +637,7 @@ void EditorWindow::on_spb_AtomLength_editingFinished()
     calcChirpValue();
 }
 
-// Anzahl der Atome einstellen (und Endwerte neuberechnen)
+// set number of atoms (recalculate stopvalues)
 void EditorWindow::on_spb_AtomCount_valueChanged(int arg1)
 {
     atomCount = ui->spb_AtomCount->value();
@@ -736,7 +736,7 @@ void EditorWindow::on_spb_AtomCount_valueChanged(int arg1)
     calcChirpValue();
 }
 
-// Parameter: Skalierung
+// for scale
 void EditorWindow::on_dspb_StartValueScale_editingFinished()
 {
     startValueScale = ui->dspb_StartValueScale->value();
@@ -803,7 +803,7 @@ void EditorWindow::on_rb_NegCountScale_toggled()
         scaleList = calcParameterValuesScale(startValueScale, linStepWidthScale, expStepWidthScale);
 }
 
-// Parameter: Modulation
+// for modulation
 void EditorWindow::on_dspb_StartValueModu_editingFinished()
 {
     startValueModu = ui->dspb_StartValueModu->value();
@@ -870,7 +870,7 @@ void EditorWindow::on_rb_NegCountModu_toggled()
         moduList = calcParameterValuesModu(startValueModu, linStepWidthModu, expStepWidthModu);
 }
 
-// Parameter: Phase
+// for phase
 void EditorWindow::on_dspb_StartValuePhase_editingFinished()
 {
     startValuePhase = ui->dspb_StartValuePhase->value();
@@ -937,7 +937,7 @@ void EditorWindow::on_rb_NegCountPhase_toggled()
         phaseList = calcParameterValuesPhase(startValuePhase, linStepWidthPhase, expStepWidthPhase);
 }
 
-// Parameter: Chirp
+// for chirp
 void EditorWindow::on_dspb_StartValueChirp_editingFinished()
 {
     startValueChirp = ui->dspb_StartValueChirp->value();
@@ -1008,7 +1008,7 @@ void EditorWindow::on_rb_NegCountChirp_toggled()
         chirpList = calcParameterValuesChirp(startValueChirp, linStepWidthChirp, expStepWidthChirp);
 }
 
-// Legt fest ob es sich um ein Gauss- oder Chirp- Atom handelt
+// check out whether gauss or chirp
 void EditorWindow::on_rb_GaussAtomType_toggled(bool checked)
 {
     if(checked) atomType = EditorWindow::Gauss;
@@ -1034,8 +1034,6 @@ void EditorWindow::on_rb_ChirpAtomType_toggled(bool checked)
         ui->rb_NegCountChirp->setDisabled(true);
         ui->lb_EndValueChirp->setDisabled(true);
         ui->dspb_EndValueChirp->setDisabled(true);
-
-        //ui->dspb_EndValueChirp->s
     }
     else if(checked)
     {
@@ -1047,7 +1045,7 @@ void EditorWindow::on_rb_ChirpAtomType_toggled(bool checked)
 }
 
 
-// Berechnet alle Atome mit den eingestellten Parameter und speichert diese in einer Liste (und auf Platte)
+// calc all atoms with choosen params and save to list and to drive
 void EditorWindow::on_btt_CalcAtoms_clicked()
 {   
     QStringList resultList;

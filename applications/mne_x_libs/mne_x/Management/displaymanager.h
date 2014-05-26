@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     newdisplaymanager.h
+* @file     displaymanager.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of the NewDisplayManager Class.
+* @brief    Declaration of the DisplayManager Class.
 *
 */
 
-#ifndef NEWDISPLAYMANAGER_H
-#define NEWDISPLAYMANAGER_H
+#ifndef DISPLAYMANAGER_H
+#define DISPLAYMANAGER_H
 
 
 //*************************************************************************************************************
@@ -78,28 +78,28 @@ namespace MNEX
 
 //=============================================================================================================
 /**
-* DECLARE CLASS NewDisplayManager
+* DECLARE CLASS DisplayManager
 *
-* @brief The NewDisplayManager class handles current displayed widgets.
+* @brief The DisplayManager class handles current displayed widgets.
 */
-class MNE_X_SHARED_EXPORT NewDisplayManager : public QObject
+class MNE_X_SHARED_EXPORT DisplayManager : public QObject
 {
     Q_OBJECT
 public:
-    typedef QSharedPointer<NewDisplayManager> SPtr;               /**< Shared pointer type for NewDisplayManager. */
-    typedef QSharedPointer<const NewDisplayManager> ConstSPtr;    /**< Const shared pointer type for NewDisplayManager. */
+    typedef QSharedPointer<DisplayManager> SPtr;               /**< Shared pointer type for DisplayManager. */
+    typedef QSharedPointer<const DisplayManager> ConstSPtr;    /**< Const shared pointer type for DisplayManager. */
 
     //=========================================================================================================
     /**
-    * Constructs a NewDisplayManager.
+    * Constructs a DisplayManager.
     */
-    NewDisplayManager(QObject* parent = 0);
+    DisplayManager(QObject* parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the NewDisplayManager.
+    * Destroys the DisplayManager.
     */
-    virtual ~NewDisplayManager();
+    virtual ~DisplayManager();
 
     //=========================================================================================================
     /**
@@ -122,4 +122,4 @@ private:
 
 } // NAMESPACE
 
-#endif // NEWDISPLAYMANAGER_H
+#endif // DISPLAYMANAGER_H

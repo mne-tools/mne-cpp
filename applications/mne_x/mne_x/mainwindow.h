@@ -104,7 +104,7 @@ class StartUpWidget;
 class PluginGui;
 class PluginManager;
 class PluginSceneManager;
-class NewDisplayManager;
+class DisplayManager;
 
 class IPlugin;
 
@@ -186,7 +186,7 @@ private:
 
     //Run
     RunWidget* m_pRunWidget;                                /**< The run widget */
-    QSharedPointer<NewDisplayManager> m_pDisplayManager;    /**< display manager */
+    QSharedPointer<DisplayManager> m_pDisplayManager;    /**< display manager */
 
     bool m_bDisplayMax;                 /**< whether full screen mode is activated.*/
     bool m_bIsRunning;                  /**< whether program/plugins is/are started.*/

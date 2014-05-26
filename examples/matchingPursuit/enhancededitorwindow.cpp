@@ -54,7 +54,7 @@ Enhancededitorwindow::~Enhancededitorwindow()
     delete ui;
 }
 
-// Tritt ein wenn "alle kombinieren" toogelt
+// when "all combined" toogelt
 void Enhancededitorwindow::on_chb_allCombined_toggled(bool checked)
 {
     if(checked)
@@ -84,13 +84,13 @@ void Enhancededitorwindow::on_chb_allCombined_toggled(bool checked)
 }
 
 
-// Tritt ein nach dem die Atomanzahl geändert wurde
+// when number of atoms was changed
 void Enhancededitorwindow::on_sb_Atomcount_editingFinished()
 {
 
 }
 
-// Tritt ein wenn sich die Atomanzahl ändert!
+// when number of atoms is changing
 void Enhancededitorwindow::on_sb_Atomcount_valueChanged(int arg1)
 {
     if(ui->sb_Atomcount->value() <= 1)
@@ -117,7 +117,7 @@ void Enhancededitorwindow::on_sb_Atomcount_valueChanged(int arg1)
     }
 }
 
-// Tritt ein wenn die Formel geändert wird.
+// when formula is changed
 void Enhancededitorwindow::on_cb_AtomFormula_currentIndexChanged(const QString &arg1)
 {
     QList<QChar> foundChar;
@@ -181,7 +181,7 @@ void Enhancededitorwindow::on_cb_AtomFormula_currentIndexChanged(const QString &
     }
 
     resize(minimumSize());
-    setFixedHeight(sizeHint().height()); // Somit größe vom User nicht änderbar
+    setFixedHeight(sizeHint().height()); // no user access
 }
 
 

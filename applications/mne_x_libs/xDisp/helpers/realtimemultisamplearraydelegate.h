@@ -2,6 +2,8 @@
 #define REALTIMEMULTISAMPLEARRAYDELEGATE_H
 
 #include <QAbstractItemDelegate>
+#include <QTableView>
+
 
 class RealTimeMultiSampleArrayDelegate : public QAbstractItemDelegate
 {
@@ -12,14 +14,6 @@ public:
     virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
     virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
-    // Plots settings
-    float m_fPlotHeight;   /**< The height of the plot */
-
-    // Scaling
-    float m_fMaxValue;     /**< Maximum value of the data to plot  */
-    float m_fScaleY;       /**< Maximum amplitude of plot (max is m_dPlotHeight/2) */
-    float m_fDx;           /**< pixel difference to the next sample*/
-
 private:
     //=========================================================================================================
     /**
@@ -28,7 +22,7 @@ private:
     * @param[in] index QModelIndex for accessing associated data and model object.
     * @param[in,out] path The QPointerPath to create for the data plot.
     */
-    void createPlotPath(const QModelIndex &index, QPainterPath& path, QList< QVector<float> >& data) const;
+    void createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QPainterPath& lastPath, QVector<float>& data, QVector<float>& lastData) const;
 
     //=========================================================================================================
     /**
@@ -37,11 +31,15 @@ private:
     * @param[in,out] path The row vector of the data matrix <1 x nsamples>.
     * @param[in] data The row vector of the data matrix <1 x nsamples>.
     */
-    void createGridPath(QPainterPath& path, QList<  QVector<float> >& data) const;
+    void createGridPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QList<  QVector<float> >& data) const;
 
     //Settings
-    qint8 m_nhlines;        /**< Number of horizontal lines for the grid plot */
+    qint32 m_nVLines;       /**< Number of vertical lines for the grid plot */
 //    QSettings m_qSettings;
+
+    // Scaling
+    float m_fMaxValue;     /**< Maximum value of the data to plot  */
+    float m_fScaleY;       /**< Maximum amplitude of plot (max is m_dPlotHeight/2) */
 };
 
 #endif // REALTIMEMULTISAMPLEARRAYDELEGATE_H

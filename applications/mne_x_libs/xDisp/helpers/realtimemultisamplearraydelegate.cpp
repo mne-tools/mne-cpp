@@ -4,6 +4,8 @@
 
 #include <QPainter>
 #include <QPainterPath>
+#include <QDebug>
+#include <QThread>
 
 
 //*************************************************************************************************************
@@ -14,9 +16,7 @@
 RealTimeMultiSampleArrayDelegate::RealTimeMultiSampleArrayDelegate(QObject *parent)
 : QAbstractItemDelegate(parent)
 {
-    m_fPlotHeight = 10;//m_qSettings.value("RawDelegate/plotheight").toDouble();
-//    m_dDx = m_qSettings.value("RawDelegate/dx").toDouble();
-    m_nhlines = 10;//m_qSettings.value("RawDelegate/nhlines").toDouble();
+    m_nVLines = 9;//m_qSettings.value("RawDelegate/nhlines").toDouble();
 
 //    Q_UNUSED(parent);
 }
@@ -26,67 +26,82 @@ RealTimeMultiSampleArrayDelegate::RealTimeMultiSampleArrayDelegate(QObject *pare
 
 void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
+    float t_fPlotHeight = option.rect.height();
     switch(index.column()) {
-    case 0: { //chnames
-        painter->save();
+        case 0: { //chnames
+            painter->save();
 
-        painter->rotate(-90);
-        painter->drawText(QRectF(-option.rect.y()-m_fPlotHeight,0,m_fPlotHeight,20),Qt::AlignCenter,index.model()->data(index,Qt::DisplayRole).toString());
+            painter->rotate(-90);
+            painter->drawText(QRectF(-option.rect.y()-t_fPlotHeight,0,t_fPlotHeight,20),Qt::AlignCenter,index.model()->data(index,Qt::DisplayRole).toString());
 
-        painter->restore();
-        break;
-    }
-    case 1: { //data plot
-        painter->save();
-
-        //draw special background when channel is marked as bad
-        QVariant v = index.model()->data(index,Qt::BackgroundRole);
-        if(v.canConvert<QBrush>() && !(option.state & QStyle::State_Selected)) {
-            QPointF oldBO = painter->brushOrigin();
-            painter->setBrushOrigin(option.rect.topLeft());
-            painter->fillRect(option.rect, qvariant_cast<QBrush>(v));
-            painter->setBrushOrigin(oldBO);
+            painter->restore();
+            break;
         }
+        case 1: { //data plot
+            painter->save();
 
-        //Highlight selected channels
-        if(option.state & QStyle::State_Selected) {
-            QPointF oldBO = painter->brushOrigin();
-            painter->setBrushOrigin(option.rect.topLeft());
-            painter->fillRect(option.rect, option.palette.highlight());
-            painter->setBrushOrigin(oldBO);
+            //draw special background when channel is marked as bad
+//            QVariant v = index.model()->data(index,Qt::BackgroundRole);
+//            if(v.canConvert<QBrush>() && !(option.state & QStyle::State_Selected)) {
+//                QPointF oldBO = painter->brushOrigin();
+//                painter->setBrushOrigin(option.rect.topLeft());
+//                painter->fillRect(option.rect, qvariant_cast<QBrush>(v));
+//                painter->setBrushOrigin(oldBO);
+//            }
+
+//            //Highlight selected channels
+//            if(option.state & QStyle::State_Selected) {
+//                QPointF oldBO = painter->brushOrigin();
+//                painter->setBrushOrigin(option.rect.topLeft());
+//                painter->fillRect(option.rect, option.palette.highlight());
+//                painter->setBrushOrigin(oldBO);
+//            }
+
+            //Get data
+            QVariant variant = index.model()->data(index,Qt::DisplayRole);
+            QList< QVector<float> > data = variant.value< QList< QVector<float> > >();
+
+            if(data.size()>0)
+            {
+    //            const RealTimeMultiSampleArrayModel* t_rtmsaModel = (static_cast<const RealTimeMultiSampleArrayModel*>(index.model()));
+
+                QPainterPath path(QPointF(option.rect.x(),option.rect.y()));//QPointF(option.rect.x()+t_rtmsaModel->relFiffCursor()-1,option.rect.y()));
+
+                //Plot grid
+                painter->setRenderHint(QPainter::Antialiasing, false);
+                createGridPath(index, option, path,data);
+
+                painter->save();
+                QPen pen;
+                pen.setStyle(Qt::DotLine);
+                pen.setWidthF(0.5);
+                painter->setPen(pen);
+                painter->drawPath(path);
+                painter->restore();
+
+                //Plot data path
+                path = QPainterPath(QPointF(option.rect.x(),option.rect.y()));//QPointF(option.rect.x()+t_rtmsaModel->relFiffCursor(),option.rect.y()));
+                QPainterPath lastPath(QPointF(option.rect.x(),option.rect.y()));
+
+                createPlotPath(index, option, path, lastPath, data[0], data[1]);
+
+                painter->save();
+                painter->translate(0,t_fPlotHeight/2);
+                painter->setRenderHint(QPainter::Antialiasing, true);
+                painter->setPen(QPen(Qt::darkBlue, 1, Qt::SolidLine));
+                painter->drawPath(path);
+                painter->restore();
+
+                //Plot last data path
+                painter->translate(0,t_fPlotHeight/2);
+                painter->setRenderHint(QPainter::Antialiasing, true);
+                painter->setPen(QPen(Qt::darkBlue, 1, Qt::SolidLine));
+                painter->drawPath(lastPath);
+
+                painter->restore();
+            }
+            break;
         }
-
-        //Get data
-        QVariant variant = index.model()->data(index,Qt::DisplayRole);
-        QList< QVector<float> > data = variant.value< QList< QVector<float> > >();
-        const RealTimeMultiSampleArrayModel* t_rtmsaModel = (static_cast<const RealTimeMultiSampleArrayModel*>(index.model()));
-
-        QPainterPath path(QPointF(0,0));//QPointF(option.rect.x()+t_rtmsaModel->relFiffCursor()-1,option.rect.y()));
-
-        //Plot grid
-        painter->setRenderHint(QPainter::Antialiasing, false);
-        createGridPath(path,data);
-
-        painter->save();
-        QPen pen;
-        pen.setStyle(Qt::DotLine);
-        pen.setWidthF(0.5);
-        painter->setPen(pen);
-        painter->drawPath(path);
-        painter->restore();
-
-        //Plot data path
-        path = QPainterPath(QPointF(0,0));//QPointF(option.rect.x()+t_rtmsaModel->relFiffCursor(),option.rect.y()));
-        createPlotPath(index,path,data);
-
-        painter->translate(0,m_fPlotHeight/2);
-
-        painter->setRenderHint(QPainter::Antialiasing, true);
-        painter->drawPath(path);
-
-        painter->restore();
-        break;
-    }
     }
 
 }
@@ -100,7 +115,7 @@ QSize RealTimeMultiSampleArrayDelegate::sizeHint(const QStyleOptionViewItem &opt
 
     switch(index.column()) {
     case 0:
-        size = QSize(20,m_fPlotHeight);
+        size = QSize(20,option.rect.height());
         break;
     case 1:
         QList< QVector<float> > data = index.model()->data(index).value< QList<QVector<float> > >();
@@ -118,57 +133,89 @@ QSize RealTimeMultiSampleArrayDelegate::sizeHint(const QStyleOptionViewItem &opt
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, QPainterPath& path, QList< QVector<float> >& data) const
+void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QPainterPath& lastPath, QVector<float>& data, QVector<float>& lastData) const
 {
-    //get maximum range of respective channel type (range value in FiffChInfo does not seem to contain a reasonable value)
-    qint32 kind = (static_cast<const RealTimeMultiSampleArrayModel*>(index.model()))->m_qListChInfo[index.row()].getKind();
-    float fMaxValue = 1e-9;
+    const RealTimeMultiSampleArrayModel* t_pModel = static_cast<const RealTimeMultiSampleArrayModel*>(index.model());
 
-//    switch(kind) {
-//        case FIFFV_MEG_CH: {
-//            qint32 unit = (static_cast<const RealTimeMultiSampleArrayModel*>(index.model()))->m_pfiffIO->m_qlistRaw[0]->info.chs[index.row()].unit;
-//            if(unit == FIFF_UNIT_T_M) {
-//                dMaxValue = m_qSettings.value("RawDelegate/max_meg_grad").toDouble();
-//            }
-//            else if(unit == FIFF_UNIT_T)
-//                dMaxValue = m_qSettings.value("RawDelegate/max_meg_mag").toDouble();
-//            break;
-//        }
-//        case FIFFV_EEG_CH: {
-//            dMaxValue = m_qSettings.value("RawDelegate/max_eeg").toDouble();
-//            break;
-//        }
-//        case FIFFV_EOG_CH: {
-//            dMaxValue = m_qSettings.value("RawDelegate/max_eog").toDouble();
-//            break;
-//        }
-//        case FIFFV_STIM_CH: {
-//            dMaxValue = m_qSettings.value("RawDelegate/max_stim").toDouble();
-//            break;
-//        }
-//    }
+    //get maximum range of respective channel type (range value in FiffChInfo does not seem to contain a reasonable value)
+    qint32 kind = t_pModel->getKind(index.row());
+    float fMaxValue = 1e-9f;
+
+    switch(kind) {
+        case FIFFV_MEG_CH: {
+            qint32 unit =t_pModel->getUnit(index.row());
+            if(unit == FIFF_UNIT_T_M) {
+                fMaxValue = 1e-10f;// m_qSettings.value("RawDelegate/max_meg_grad").toDouble();
+            }
+            else if(unit == FIFF_UNIT_T)
+                fMaxValue = 1e-11f;// m_qSettings.value("RawDelegate/max_meg_mag").toDouble();
+            break;
+        }
+        case FIFFV_EEG_CH: {
+            fMaxValue = 1e-4f;// m_qSettings.value("RawDelegate/max_eeg").toDouble();
+            break;
+        }
+        case FIFFV_EOG_CH: {
+            fMaxValue = 1e-3; //m_qSettings.value("RawDelegate/max_eog").toDouble();
+            break;
+        }
+        case FIFFV_STIM_CH: {
+            fMaxValue = 5; //m_qSettings.value("RawDelegate/max_stim").toDouble();
+            break;
+        }
+    }
 
     float fValue;
-    float fScaleY = m_fPlotHeight/(2*fMaxValue);
+    float fScaleY = option.rect.height()/(2*fMaxValue);
 
     float y_base = path.currentPosition().y();
     QPointF qSamplePosition;
 
-    //plot all rows from list of pairs
-    for(qint8 i=0; i < data.size(); ++i) {
-        //create lines from one to the next sample
-        for(qint32 j=0; j < data[i].size(); ++j)
-        {
-            float val = data[i][j];
-            fValue = val*fScaleY;
+    float fDx = ((float)option.rect.width()) / t_pModel->getMaxSamples();
 
-            float newY = y_base+fValue;
+    //Move to initial starting point
+    if(data.size() > 0)
+    {
+        float val = data[0];
+        fValue = val*fScaleY;
 
-            qSamplePosition.setY(newY);
-            qSamplePosition.setX(path.currentPosition().x()+m_fDx);
+        float newY = y_base+fValue;
 
-            path.lineTo(qSamplePosition);
-        }
+        qSamplePosition.setY(newY);
+        qSamplePosition.setX(path.currentPosition().x());
+
+        path.moveTo(qSamplePosition);
+    }
+
+    //create lines from one to the next sample
+    qint32 i;
+    for(i = 1; i < data.size(); ++i) {
+        float val = data[i];
+        fValue = val*fScaleY;
+
+        float newY = y_base+fValue;
+
+        qSamplePosition.setY(newY);
+        qSamplePosition.setX(path.currentPosition().x()+fDx);
+
+        path.lineTo(qSamplePosition);
+    }
+
+    //create lines from one to the next sample for last path
+    qint32 offset = 10;
+    qSamplePosition.setX(qSamplePosition.x() + fDx*offset);
+    lastPath.moveTo(qSamplePosition);
+
+    for(i += offset; i < lastData.size(); ++i) {
+        float val = lastData[i];
+        fValue = val*fScaleY;
+
+        float newY = y_base+fValue;
+
+        qSamplePosition.setY(newY);
+        qSamplePosition.setX(lastPath.currentPosition().x()+fDx);
+
+        lastPath.lineTo(qSamplePosition);
     }
 
 //    qDebug("Plot-PainterPath created!");
@@ -177,18 +224,19 @@ void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, 
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayDelegate::createGridPath(QPainterPath& path, QList< QVector<float> >& data) const
+void RealTimeMultiSampleArrayDelegate::createGridPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QList< QVector<float> >& data) const
 {
     //horizontal lines
-    float distance = m_fPlotHeight/m_nhlines;
+    float distance = option.rect.width()/(m_nVLines+1);
 
-    QPointF startpos = path.currentPosition();
-    QPointF endpoint(path.currentPosition().x()+data[0].size()*data.size()*m_fDx,path.currentPosition().y());
+    float yStart = option.rect.topLeft().y();
 
-    for(qint8 i=0; i < m_nhlines-1; ++i) {
-        endpoint.setY(endpoint.y()+distance);
-        path.moveTo(startpos.x(),endpoint.y());
-        path.lineTo(endpoint);
+    float yEnd = option.rect.bottomRight().y();
+
+    for(qint8 i = 0; i < m_nVLines; ++i) {
+        float x = distance*(i+1);
+        path.moveTo(x,yStart);
+        path.lineTo(x,yEnd);
     }
 
 //    qDebug("Grid-PainterPath created!");

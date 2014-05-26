@@ -40,7 +40,6 @@ namespace Ui
 class GraphWindow;
 class Atom;
 
-// Haupfenster
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -72,7 +71,7 @@ private:
     void MainWindow::ReadMatlabFile(QString fileName);
 };
 
-// Widget in dem das Eingangssignal gezeichnet wird
+// Widget to paint inputsignal
 class GraphWindow : public QWidget
 {
     Q_OBJECT
@@ -132,7 +131,7 @@ private:
 //*************************************************************************************************************
 //=============================================================================================================
 
-// Widget in dem das Atom gezeichnet wird
+// Widget to paint atom
 class AtomWindow : public QWidget//, QTableWidgetItem
 {
     Q_OBJECT
@@ -142,7 +141,7 @@ class AtomWindow : public QWidget//, QTableWidgetItem
 
 };
 
-// Widget in dem das Residuum gezeichnet wird
+// Widget to paint residuum
 class ResiduumWindow : public QWidget //, QTableWidgetItem
 {
    // Q_OBJECT
