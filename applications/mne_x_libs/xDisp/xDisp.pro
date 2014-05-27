@@ -105,7 +105,12 @@ SOURCES += \
     roi.cpp \
     roiselectionwidget.cpp \
     helpers/realtimemultisamplearraymodel.cpp \
-    helpers/realtimemultisamplearraydelegate.cpp
+    helpers/realtimemultisamplearraydelegate.cpp \
+    helpers/sensorgroup.cpp \
+    helpers/sensoritem.cpp \
+    helpers/sensorlayout.cpp \
+    helpers/sensormodel.cpp \
+    helpers/sensorwidget.cpp
 
 HEADERS += \
     xdisp_global.h \
@@ -120,7 +125,12 @@ HEADERS += \
     roi.h \
     roiselectionwidget.h \
     helpers/realtimemultisamplearraymodel.h \
-    helpers/realtimemultisamplearraydelegate.h
+    helpers/realtimemultisamplearraydelegate.h \
+    helpers/sensorgroup.h \
+    helpers/sensoritem.h \
+    helpers/sensorlayout.h \
+    helpers/sensormodel.h \
+    helpers/sensorwidget.h
 
 FORMS += \
     realtimemultisamplearraywidget.ui \

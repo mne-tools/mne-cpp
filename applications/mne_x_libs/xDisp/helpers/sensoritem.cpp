@@ -1,15 +1,18 @@
 #include "sensoritem.h"
 
-SensorItem::SensorItem(const QString& chName, const QPointF& coordinate)
-: m_sChName(chName)
+#include <QDebug>
+
+SensorItem::SensorItem(const QString& chName, const QPointF& coordinate, QGraphicsItem *parent)
+: QGraphicsObject(parent)
+, m_sChName(chName)
 , m_qPointFCoord(coordinate)
 , m_fWidth(28)
 , m_fHeight(16)
+, m_bIsSelected(false)
 {
-    m_qColor = Qt::red;
     setZValue((int)(m_qPointFCoord.x() + m_qPointFCoord.y()) % 2);
 
-//    setFlags(ItemIsSelectable | ItemIsMovable);
+    setFlags(ItemIsSelectable);// | ItemIsMovable);
     setAcceptHoverEvents(true);
 }
 
@@ -28,7 +31,12 @@ QPainterPath SensorItem::shape() const
 
 void SensorItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    painter->setPen(m_qColor);
+    Q_UNUSED(widget)
+
+    if (option->state & QStyle::State_MouseOver)
+        painter->setBrush(Qt::lightGray);
+
+    painter->setPen(m_bIsSelected ? Qt::red : Qt::darkBlue);
     painter->drawRect(QRectF(0, 0, m_fWidth, m_fHeight));
 
     painter->setFont(QFont("Helvetica [Cronyx]", 6));
@@ -142,8 +150,10 @@ void SensorItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
 //    QGraphicsItem::mouseMoveEvent(event);
 //}
 
-//void SensorItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
-//{
-//    QGraphicsItem::mouseReleaseEvent(event);
-//    update();
-//}
+void SensorItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+{
+    QGraphicsItem::mouseReleaseEvent(event);
+    m_bIsSelected = !m_bIsSelected;
+    emit itemChanged(this);
+    update();
+}

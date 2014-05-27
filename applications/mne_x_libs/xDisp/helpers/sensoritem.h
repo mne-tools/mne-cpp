@@ -1,31 +1,62 @@
 #ifndef SENSORITEM_H
 #define SENSORITEM_H
 
-#include <QGraphicsItem>
+#include <QGraphicsObject>
 #include <QStyleOptionGraphicsItem>
 #include <QPainter>
 
-class SensorItem : public QGraphicsItem
+class SensorItem : public QGraphicsObject
 {
+    Q_OBJECT
 public:
-    SensorItem(const QString& chName, const QPointF& coordinate);
+    SensorItem(const QString& chName, const QPointF& coordinate, QGraphicsItem *parent = 0);
 
     QRectF boundingRect() const;
     QPainterPath shape() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *item, QWidget *widget);
 
-//protected:
+    inline const QString& getChannelName() const;
+
+    inline bool isSelected() const;
+
+    inline void setSelected(bool selected);
+
+
+protected:
 //    void mousePressEvent(QGraphicsSceneMouseEvent *event);
 //    void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
-//    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+
+signals:
+    void itemChanged(SensorItem* item);
 
 private:
     QString m_sChName;
     QPointF m_qPointFCoord;
-    QColor m_qColor;
     float m_fWidth;
     float m_fHeight;
-    QVector<QPointF> stuff;
+    bool m_bIsSelected;
 };
+
+
+
+
+inline const QString& SensorItem::getChannelName() const
+{
+    return m_sChName;
+}
+
+
+inline bool SensorItem::isSelected() const
+{
+    return m_bIsSelected;
+}
+
+
+inline void SensorItem::setSelected(bool selected)
+{
+    m_bIsSelected = selected;
+    update();
+}
 
 #endif // SENSORITEM_H

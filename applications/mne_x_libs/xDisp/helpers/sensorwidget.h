@@ -13,7 +13,18 @@ class SensorWidget : public QWidget
 public:
     SensorWidget(QWidget *parent = 0);
 
+    void SensorWidget::createUI();
+
+    void drawChannels();
+
     void setModel(SensorModel *model);
+
+//    void setRTMSA();
+
+
+    void contextUpdate(const QModelIndex & topLeft, const QModelIndex & bottomRight, const QVector<int> & roles = QVector<int> ());
+
+    void contextUpdate();
 
 signals:
 

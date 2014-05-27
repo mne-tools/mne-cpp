@@ -4,7 +4,7 @@
 #include <QList>
 #include <QStringList>
 #include <QPointF>
-#include <QDomElement>
+#include <QtXml/QDomElement>
 
 class SensorLayout
 {
@@ -12,6 +12,9 @@ public:
     SensorLayout();
 
     static SensorLayout parseSensorLayout(const QDomElement &sensorLayoutElement);
+
+
+    inline const QString& getName() const;
 
     inline QStringList channels() const;
 
@@ -25,7 +28,7 @@ public:
 
 private:
 
-    QString m_sType;
+    QString m_sName;
 
     QStringList m_qListChannels;
     QStringList m_qListShortChannelNames;
@@ -33,6 +36,11 @@ private:
 
 };
 
+
+inline const QString& SensorLayout::getName() const
+{
+    return m_sName;
+}
 
 inline QStringList SensorLayout::channels() const
 {
