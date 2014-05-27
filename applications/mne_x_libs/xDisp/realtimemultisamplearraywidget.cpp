@@ -252,10 +252,10 @@ void RealTimeMultiSampleArrayWidget::channelContextMenu(QPoint pos)
 //    });
 
     // non C++11 alternative
-    m_qVecCurrentSelection.clear();
+    m_qListCurrentSelection.clear();
     for(qint32 i = 0; i < selected.size(); ++i)
         if(selected[i].column() == 1)
-            m_qVecCurrentSelection.append(m_pRTMSAModel->getIdxSelMap()[selected[i].row()]);
+            m_qListCurrentSelection.append(m_pRTMSAModel->getIdxSelMap()[selected[i].row()]);
 
     //create custom context menu and actions
     QMenu *menu = new QMenu(this);
@@ -361,5 +361,5 @@ void RealTimeMultiSampleArrayWidget::showRoiSelectionWidget()
 
 void RealTimeMultiSampleArrayWidget::applySelection()
 {
-    m_pRTMSAModel->selectRows(m_qVecCurrentSelection);
+    m_pRTMSAModel->selectRows(m_qListCurrentSelection);
 }

@@ -68,7 +68,7 @@ public:
 
     inline const QMap<qint32,qint32>& getIdxSelMap() const;
 
-    void selectRows(const QVector<qint32> &selection);
+    void selectRows(const QList<qint32> &selection);
 
     void resetSelection();
 
