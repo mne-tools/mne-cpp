@@ -110,9 +110,10 @@ void SensorWidget::drawChannels()
 
         for(qint32 i = 0; i < m_pSensorModel->rowCount(); ++i)
         {
-            QString name = m_pSensorModel->data(i, 0).toString();
-            QPointF loc = m_pSensorModel->data(i, 1).toPointF();
-            SensorItem *item = new SensorItem(name, loc);
+            QString shortChName = m_pSensorModel->data(i, 0).toString();
+            QString fullChName = m_pSensorModel->data(i, 1).toString();
+            QPointF loc = m_pSensorModel->data(i, 2).toPointF();
+            SensorItem *item = new SensorItem(shortChName, fullChName, loc);
             item->setPos(loc);
 
             connect(item, &SensorItem::itemChanged, m_pSensorModel, &SensorModel::updateChannelState);

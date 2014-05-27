@@ -16,7 +16,7 @@ public:
 
     inline const QString& getName() const;
 
-    inline QStringList channels() const;
+    inline QStringList fullChNames() const;
 
     inline QStringList shortChNames() const;
 
@@ -30,7 +30,7 @@ private:
 
     QString m_sName;
 
-    QStringList m_qListChannels;
+    QStringList m_qListFullChannelNames;
     QStringList m_qListShortChannelNames;
     QList<QPointF> m_qListLocations;
 
@@ -42,9 +42,9 @@ inline const QString& SensorLayout::getName() const
     return m_sName;
 }
 
-inline QStringList SensorLayout::channels() const
+inline QStringList SensorLayout::fullChNames() const
 {
-    return m_qListChannels;
+    return m_qListFullChannelNames;
 }
 
 
@@ -55,7 +55,7 @@ inline QStringList SensorLayout::shortChNames() const
 
 inline qint32 SensorLayout::numChannels() const
 {
-    return m_qListChannels.size();
+    return m_qListFullChannelNames.size();
 }
 
 inline QList<QPointF> SensorLayout::loc() const

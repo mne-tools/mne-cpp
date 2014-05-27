@@ -2,9 +2,10 @@
 
 #include <QDebug>
 
-SensorItem::SensorItem(const QString& chName, const QPointF& coordinate, QGraphicsItem *parent)
+SensorItem::SensorItem(const QString& fullChName, const QString& shortChName, const QPointF& coordinate, QGraphicsItem *parent)
 : QGraphicsObject(parent)
-, m_sChName(chName)
+, m_sFullChName(fullChName)
+, m_sShortChName(shortChName)
 , m_qPointFCoord(coordinate)
 , m_fWidth(28)
 , m_fHeight(16)
@@ -40,7 +41,7 @@ void SensorItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
     painter->drawRect(QRectF(0, 0, m_fWidth, m_fHeight));
 
     painter->setFont(QFont("Helvetica [Cronyx]", 6));
-    painter->drawText(QPointF(0+2,m_fHeight-3), m_sChName);
+    painter->drawText(QPointF(0+2,m_fHeight-3), m_sShortChName);
 
 //    Q_UNUSED(widget);
 
