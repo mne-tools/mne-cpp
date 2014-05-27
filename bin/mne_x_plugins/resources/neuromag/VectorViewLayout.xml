@@ -1,11 +1,45 @@
 <MNEXSensorLayout Device="VectorView 306">
-  <Sensors Type="MEG" NumChannels="306">
-    <Sensor ChannelNumber="0111" ChannelType="Mag" SensorID="1.1" />
-    <Sensor ChannelNumber="0112" ChannelType="Grad" SensorID="1.1" />
-    <Sensor ChannelNumber="0113" ChannelType="Grad" SensorID="1.1" />
-  </Sensors>
-  <Sensors Type="EEG">%%</Sensors>
+  <SensorLayouts NumLayouts="2">
+    <Sensors Type="MEG" NumChannels="306">
+      <Sensor ChannelNumber="0111" ChannelType="Mag" SensorID="1.1" plot_x="15.5" plot_y="40.5" />
+      <Sensor ChannelNumber="0112" ChannelType="Grad" SensorID="1.1" plot_x="9.4" plot_y="37.5" />
+      <Sensor ChannelNumber="0113" ChannelType="Grad" SensorID="1.1" plot_x="9.4" plot_y="43.5" />
+      <Sensor ChannelNumber="0121" ChannelType="Mag" SensorID="1.2" plot_x="32.3" plot_y="34.2" />
+      <Sensor ChannelNumber="0122" ChannelType="Grad" SensorID="1.2" plot_x="26.3" plot_y="37.2" />
+      <Sensor ChannelNumber="0123" ChannelType="Grad" SensorID="1.2" plot_x="26.3" plot_y="31.2" />
+      <Sensor ChannelNumber="0131" ChannelType="Mag" SensorID="1.3" plot_x="22.3" plot_y="60.8" />
+      <Sensor ChannelNumber="0132" ChannelType="Grad" SensorID="1.3" plot_x="16.2" plot_y="63.8" />
+      <Sensor ChannelNumber="0133" ChannelType="Grad" SensorID="1.3" plot_x="16.2" plot_y="57.8" />
+      <Sensor ChannelNumber="0141" ChannelType="Mag" SensorID="1.4" plot_x="6.3" plot_y="74.5" />
+      <Sensor ChannelNumber="0142" ChannelType="Grad" SensorID="1.4" plot_x="0.2" plot_y="71.5" />
+      <Sensor ChannelNumber="0143" ChannelType="Grad" SensorID="1.4" plot_x="0.2" plot_y="77.5" />
+      <Sensor ChannelNumber="0211" ChannelType="Mag" SensorID="2.1" plot_x="36.7" plot_y="63.0" />
+      <Sensor ChannelNumber="0212" ChannelType="Grad" SensorID="2.1" plot_x="30.6" plot_y="60.0" />
+      <Sensor ChannelNumber="0213" ChannelType="Grad" SensorID="2.1" plot_x="30.6" plot_y="66.0" />
+      <Sensor ChannelNumber="0221" ChannelType="Mag" SensorID="2.2" plot_x="52.0" plot_y="62.2" />
+      <Sensor ChannelNumber="0222" ChannelType="Grad" SensorID="2.2" plot_x="45.9" plot_y="65.2" />
+      <Sensor ChannelNumber="0223" ChannelType="Grad" SensorID="2.2" plot_x="45.9" plot_y="59.2" />
+      <Sensor ChannelNumber="ToDo 0111" ChannelType="Mag" SensorID="2.3" plot_x="15.5" plot_y="40.5" />
+      <Sensor ChannelNumber="0112" ChannelType="Grad" SensorID="2.3" plot_x="9.4" plot_y="37.5" />
+      <Sensor ChannelNumber="0113" ChannelType="Grad" SensorID="2.3" plot_x="9.4" plot_y="43.5" />
+      <Sensor ChannelNumber="0111" ChannelType="Mag" SensorID="2.4" plot_x="15.5" plot_y="40.5" />
+      <Sensor ChannelNumber="0112" ChannelType="Grad" SensorID="2.4" plot_x="9.4" plot_y="37.5" />
+      <Sensor ChannelNumber="0113" ChannelType="Grad" SensorID="2.4" plot_x="9.4" plot_y="43.5" />
+      <Sensor ChannelNumber="0111" ChannelType="Mag" SensorID="3.1" plot_x="15.5" plot_y="40.5" />
+      <Sensor ChannelNumber="0112" ChannelType="Grad" SensorID="3.1" plot_x="9.4" plot_y="37.5" />
+      <Sensor ChannelNumber="0113" ChannelType="Grad" SensorID="3.1" plot_x="9.4" plot_y="43.5" />
+      <Sensor ChannelNumber="0111" ChannelType="Mag" SensorID="3.2" plot_x="15.5" plot_y="40.5" />
+      <Sensor ChannelNumber="0112" ChannelType="Grad" SensorID="3.2" plot_x="9.4" plot_y="37.5" />
+      <Sensor ChannelNumber="0113" ChannelType="Grad" SensorID="3.2" plot_x="9.4" plot_y="43.5" />
+      <Sensor ChannelNumber="0111" ChannelType="Mag" SensorID="3.3" plot_x="15.5" plot_y="40.5" />
+      <Sensor ChannelNumber="0112" ChannelType="Grad" SensorID="3.3" plot_x="9.4" plot_y="37.5" />
+      <Sensor ChannelNumber="0113" ChannelType="Grad" SensorID="3.3" plot_x="9.4" plot_y="43.5" />
+    </Sensors>
+    <Sensors Type="EEG" NumChannels="66"></Sensors>
+  </SensorLayouts>
   <SensorGroups>
-    <Group>%%</Group>
+    <Group GroupName="MEG1" NumChannels="4">MEG 0111:MEG 0112:MEG 0113:MEG 0121</Group>
+    <Group GroupName="MEG2" NumChannels="3">MEG 0221:MEG 0222:MEG 0223</Group>
+    <Group GroupName="MEG3" NumChannels="3">MEG 0221:MEG 0222:MEG 0223</Group>
   </SensorGroups>
 </MNEXSensorLayout>
