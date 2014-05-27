@@ -136,6 +136,8 @@ void FiffSimulator::initConnector()
 
         m_pRTMSA_FiffSimulator->data()->setVisibility(true);
 
+        m_pRTMSA_FiffSimulator->data()->setXMLLayoutFile("./mne_x_plugins/resources/neuromag/VectorViewLayout.xml");
+
         m_outputConnectors.append(m_pRTMSA_FiffSimulator);
     }
 }

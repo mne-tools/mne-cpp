@@ -135,6 +135,7 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
     m_pActionSelectRoi = new QAction(QIcon(":/images/selectRoi.png"), tr("Shows the region selection widget (F12)"),this);
     m_pActionSelectRoi->setShortcut(tr("F12"));
     m_pActionSelectRoi->setStatusTip(tr("Shows the region selection widget (F12)"));
+    m_pActionSelectRoi->setVisible(false);
     connect(m_pActionSelectRoi, &QAction::triggered, this, &RealTimeMultiSampleArrayWidget::showRoiSelectionWidget);
     addDisplayAction(m_pActionSelectRoi);
 
@@ -149,16 +150,6 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
 
     //set layouts
     this->setLayout(rtmsaLayout);
-
-
-    //DEBUG
-    QString fileName("D:/GitHub/mne-cpp/bin/mne_x_plugins/resources/neuromag/VectorViewLayout.xml");
-
-    QFile file(fileName);
-    if (!file.open(QFile::ReadOnly | QFile::Text))
-        qDebug() << QString("Cannot read file %1:\n%2.").arg(fileName).arg(file.errorString());
-    else
-        m_pSensorModel = new SensorModel(&file, this);
 
     init();
 }
@@ -180,6 +171,17 @@ void RealTimeMultiSampleArrayWidget::update(XMEASLIB::NewMeasurement::SPtr)
     {
         m_qListChInfo = m_pRTMSA->chInfo();
         m_fSamplingRate = m_pRTMSA->getSamplingRate();
+
+        QFile file(m_pRTMSA->getXMLLayoutFile());
+        if (!file.open(QFile::ReadOnly | QFile::Text))
+            qDebug() << QString("Cannot read file %1:\n%2.").arg(m_pRTMSA->getXMLLayoutFile()).arg(file.errorString());
+        else
+        {
+            m_pSensorModel = new SensorModel(&file, this);
+            m_pSensorModel->mapChannelInfo(m_qListChInfo);
+            m_pActionSelectRoi->setVisible(true);
+        }
+
         init();
     }
     else

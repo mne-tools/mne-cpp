@@ -4,8 +4,12 @@
 #include <QAbstractTableModel>
 #include <QDebug>
 
+
+#include <xMeas/realtimesamplearraychinfo.h>
+
 #include "sensorlayout.h"
 #include "sensorgroup.h"
+
 
 class SensorItem;
 
@@ -24,15 +28,30 @@ public:
 
     virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
 
+
+
     inline QList<SensorLayout> getSensorLayouts() const;
 
     inline qint32 getNumLayouts() const;
 
-    inline QList<SensorGroup> getSensorGroups() const;
-
     inline qint32 getCurrentLayout() const;
 
     void setCurrentLayout(int id);
+
+
+
+
+    inline QList<SensorGroup> getSensorGroups() const;
+
+
+
+
+
+    void mapChannelInfo(const QList<XMEASLIB::RealTimeSampleArrayChInfo>& chInfoList);
+
+
+
+
 
     void updateChannelState(SensorItem* item);
 
@@ -50,8 +69,8 @@ private:
     QList<SensorGroup> m_qListSensorGroups;
 
     QMap<qint32, bool>      m_qMapSelection;
-    QMap<QString, qint32>   m_qMapNameId;
-    QMap<qint32, QString>   m_qMapIdName;
+    QMap<QString, qint32>   m_qMapNameId;       /**< Fast lookup between channel name and its index.*/
+    QMap<qint32, QString>   m_qMapIdName;       /**< Fast lookup between index and channel name.*/
 };
 
 

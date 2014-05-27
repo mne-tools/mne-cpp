@@ -38,7 +38,7 @@ int SensorModel::rowCount(const QModelIndex &parent) const
 int SensorModel::columnCount(const QModelIndex &parent) const
 {
     Q_UNUSED(parent)
-    return 3;
+    return 4;
 }
 
 QVariant SensorModel::data(const QModelIndex &index, int role) const
@@ -46,19 +46,23 @@ QVariant SensorModel::data(const QModelIndex &index, int role) const
     if (index.isValid()) {
         qint32 row = index.row();//m_qMapIdxRowSelection[index.row()];
 
-        //******** first column (chname) ********
+        //******** first column (short ChName) ********
         if(index.column() == 0)// && role == Qt::DisplayRole)
             return QVariant(m_qListSensorLayouts[m_iCurrentLayoutId].shortChNames()[row]);
 
-        //******** second column (Position) ********
-        if(index.column() == 1)
+        //******** second column (full ChName) ********
+        if(index.column() == 1)// && role == Qt::DisplayRole)
+            return QVariant(m_qListSensorLayouts[m_iCurrentLayoutId].shortChNames()[row]);
+
+        //******** third column (Position) ********
+        if(index.column() == 2)
             return QVariant(m_qListSensorLayouts[m_iCurrentLayoutId].loc()[row]);
 
 //            switch(role) {
 //                case Qt::DisplayRole: {
 
-        //******** third column (selected) ********
-        if(index.column() == 2)
+        //******** fourth column (selected) ********
+        if(index.column() == 3)
             return QVariant(true);
     }
 
@@ -139,6 +143,24 @@ void SensorModel::setCurrentLayout(int id)
 
     if(oldLayout != m_iCurrentLayoutId)
         emit newLayout();
+}
+
+
+
+void SensorModel::mapChannelInfo(const QList<XMEASLIB::RealTimeSampleArrayChInfo>& chInfoList)
+{
+    m_qMapSelection.clear();
+    m_qMapNameId.clear();
+    m_qMapIdName.clear();
+    for(qint32 i = 0; i < chInfoList.size(); ++i)
+    {
+        m_qMapSelection.insert(i,true);
+        m_qMapNameId.insert(chInfoList.at(i).getChannelName(), i);
+        m_qMapIdName.insert(i, chInfoList.at(i).getChannelName());
+    }
+
+
+    qDebug() << "m_qMapSelection" << m_qMapSelection;
 }
 
 
