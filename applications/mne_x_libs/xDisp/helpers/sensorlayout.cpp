@@ -13,11 +13,11 @@ SensorLayout SensorLayout::parseSensorLayout(const QDomElement &sensorLayoutElem
 
     qint32 t_iNumChannels = sensorLayoutElement.attribute("NumChannels", 0).toInt();
 
-    layout.m_sType = sensorLayoutElement.attribute("Type", "");
+    layout.m_sName = sensorLayoutElement.attribute("Type", "");
 
     QDomElement childSensor = sensorLayoutElement.firstChildElement("Sensor");
     while (!childSensor.isNull()) {
-        QString chName = layout.m_sType.isEmpty() ? childSensor.attribute("ChannelNumber") : QString("%1 %2").arg(layout.m_sType).arg(childSensor.attribute("ChannelNumber"));
+        QString chName = layout.m_sName.isEmpty() ? childSensor.attribute("ChannelNumber") : QString("%1 %2").arg(layout.m_sName).arg(childSensor.attribute("ChannelNumber"));
         layout.m_qListChannels.append(chName);
         layout.m_qListShortChannelNames.append(childSensor.attribute("ChannelNumber"));
         float plot_x = childSensor.attribute("plot_x").toFloat()*5; //mm to pixel

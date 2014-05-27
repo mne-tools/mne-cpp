@@ -1,4 +1,5 @@
 #include "sensormodel.h"
+#include "sensoritem.h"
 #include <QDebug>
 
 SensorModel::SensorModel(QObject *parent)
@@ -17,8 +18,17 @@ SensorModel::SensorModel(QIODevice* device, QObject *parent)
 }
 
 
+
+void SensorModel::createSelection()
+{
+    QList<qint32> listSelection = m_qMapSelection.keys(true);
+    emit newSelection(listSelection);
+}
+
+
 int SensorModel::rowCount(const QModelIndex &parent) const
 {
+    Q_UNUSED(parent)
     if(m_qListSensorLayouts.size() > 0 && m_iCurrentLayoutId < m_qListSensorLayouts.size())
         return m_qListSensorLayouts[m_iCurrentLayoutId].numChannels();
     else
@@ -27,7 +37,8 @@ int SensorModel::rowCount(const QModelIndex &parent) const
 
 int SensorModel::columnCount(const QModelIndex &parent) const
 {
-    return 0;
+    Q_UNUSED(parent)
+    return 3;
 }
 
 QVariant SensorModel::data(const QModelIndex &index, int role) const
@@ -40,11 +51,15 @@ QVariant SensorModel::data(const QModelIndex &index, int role) const
             return QVariant(m_qListSensorLayouts[m_iCurrentLayoutId].shortChNames()[row]);
 
         //******** second column (Position) ********
-        if(index.column()==1)
+        if(index.column() == 1)
             return QVariant(m_qListSensorLayouts[m_iCurrentLayoutId].loc()[row]);
 
 //            switch(role) {
 //                case Qt::DisplayRole: {
+
+        //******** third column (selected) ********
+        if(index.column() == 2)
+            return QVariant(true);
     }
 
     return QVariant();
@@ -111,12 +126,24 @@ bool SensorModel::read(QIODevice* device)
 
 
 
-void SensorModel::setCurrentLayout(qint32 id)
+void SensorModel::setCurrentLayout(int id)
 {
     beginResetModel();
+
+    int oldLayout = m_iCurrentLayoutId;
 
     if(id >= 0 && id < m_qListSensorLayouts.size())
         m_iCurrentLayoutId = id;
 
     endResetModel();
+
+    if(oldLayout != m_iCurrentLayoutId)
+        emit newLayout();
 }
+
+
+void SensorModel::updateChannelState(SensorItem* item)
+{
+    qDebug() << "SensorModel::updateChannelState" << item->isSelected();
+}
+

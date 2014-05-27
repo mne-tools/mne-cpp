@@ -113,6 +113,7 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
 , m_iT(10)
 , m_fSamplingRate(1024)
 , m_fDesiredSamplingRate(128)
+, m_pSensorModel(NULL)
 {
     m_pDoubleSpinBoxZoom = new QDoubleSpinBox(this);
     m_pDoubleSpinBoxZoom->setMinimum(0.3);
@@ -148,6 +149,16 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
 
     //set layouts
     this->setLayout(rtmsaLayout);
+
+
+    //DEBUG
+    QString fileName("D:/GitHub/mne-cpp/bin/mne_x_plugins/resources/neuromag/VectorViewLayout.xml");
+
+    QFile file(fileName);
+    if (!file.open(QFile::ReadOnly | QFile::Text))
+        qDebug() << QString("Cannot read file %1:\n%2.").arg(fileName).arg(file.errorString());
+    else
+        m_pSensorModel = new SensorModel(&file, this);
 
     init();
 }
@@ -350,10 +361,21 @@ void RealTimeMultiSampleArrayWidget::timeWindowChanged(int T)
 
 void RealTimeMultiSampleArrayWidget::showRoiSelectionWidget()
 {
-    if(!m_pRoiSelectionWidget)
-        m_pRoiSelectionWidget = QSharedPointer<XDISPLIB::RoiSelectionWidget>(new XDISPLIB::RoiSelectionWidget);
+//    if(!m_pRoiSelectionWidget)
+//        m_pRoiSelectionWidget = QSharedPointer<XDISPLIB::RoiSelectionWidget>(new XDISPLIB::RoiSelectionWidget);
 
-    m_pRoiSelectionWidget->show();
+//    m_pRoiSelectionWidget->show();
+
+    if(!m_pSensorSelectionWidget)
+    {
+        m_pSensorSelectionWidget = QSharedPointer<SensorWidget>(new SensorWidget);
+
+        m_pSensorSelectionWidget->setWindowTitle("Channel Selection");
+
+        if(m_pSensorModel)
+            m_pSensorSelectionWidget->setModel(m_pSensorModel);
+    }
+    m_pSensorSelectionWidget->show();
 }
 
 

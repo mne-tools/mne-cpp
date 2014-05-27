@@ -47,6 +47,8 @@
 #include "helpers/realtimemultisamplearraymodel.h"
 #include "helpers/realtimemultisamplearraydelegate.h"
 
+#include "helpers/sensorwidget.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -259,9 +261,14 @@ private:
     */
     void timeWindowChanged(int T);
 
-    QAction*    m_pActionSelectRoi;                         /**< show roi select widget */
-    void showRoiSelectionWidget();                          /**< Implements the show roi selection widget.*/
-    QSharedPointer<XDISPLIB::RoiSelectionWidget> m_pRoiSelectionWidget;    /**< ROI selection widget. */
+    QAction*    m_pActionSelectRoi;                                     /**< show roi select widget */
+    void showRoiSelectionWidget();                                      /**< Implements the show roi selection widget.*/
+    QSharedPointer<XDISPLIB::RoiSelectionWidget> m_pRoiSelectionWidget; /**< ROI selection widget. ToDo Obsolete*/
+
+    SensorModel* m_pSensorModel;                            /**< Sensor model for channel selection */
+    QSharedPointer<SensorWidget> m_pSensorSelectionWidget;  /**< Sensor selection widget. */
+
+
 
     QList<qint32> m_qListCurrentSelection;
     void applySelection();

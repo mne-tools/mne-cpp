@@ -19,43 +19,71 @@ SensorWidget::SensorWidget(QWidget *parent)
 
     m_pGraphicsView->setScene(m_pGraphicsScene);
 
+    createUI();
 
-    QToolButton *selection1 = new QToolButton;
-    QToolButton *selection2 = new QToolButton;
-    QToolButton *selection3 = new QToolButton;
-
-    QVBoxLayout *layoutSelection = new QVBoxLayout;
-    layoutSelection->addWidget(selection1);
-    layoutSelection->addWidget(selection2);
-    layoutSelection->addWidget(selection3);
+}
 
 
-    QToolButton *MEGLayout = new QToolButton;
-    MEGLayout->setText(tr("MEG"));
-    MEGLayout->setCheckable(true);
-    MEGLayout->setChecked(true);
-    QToolButton *EEGLayout = new QToolButton;
-    EEGLayout->setText(tr("EEG"));
-    EEGLayout->setCheckable(true);
-    EEGLayout->setChecked(false);
 
-    QButtonGroup *buttonGroup = new QButtonGroup;
-    buttonGroup->setExclusive(true);
-    buttonGroup->addButton(MEGLayout);
-    buttonGroup->addButton(EEGLayout);
-
-    QHBoxLayout *layoutButtonGroup = new QHBoxLayout;
-    layoutButtonGroup->addWidget(MEGLayout);
-    layoutButtonGroup->addWidget(EEGLayout);
-
-    QGridLayout *topLayout = new QGridLayout;
-    topLayout->addWidget(m_pGraphicsView, 0, 0);
-    topLayout->addLayout(layoutSelection, 0, 1);
-    topLayout->addLayout(layoutButtonGroup, 1, 0);
+void SensorWidget::contextUpdate(const QModelIndex & topLeft, const QModelIndex & bottomRight, const QVector<int> & roles)
+{
+    Q_UNUSED(topLeft)
+    Q_UNUSED(bottomRight)
+    Q_UNUSED(roles)
+    contextUpdate();
+}
 
 
-    setLayout(topLayout);
+void SensorWidget::contextUpdate()
+{
 
+}
+
+void SensorWidget::createUI()
+{
+    if(m_pSensorModel)
+    {
+
+        QVBoxLayout *layoutSelection = new QVBoxLayout;
+        for(qint32 i = 0; i < m_pSensorModel->getSensorGroups().size(); ++i)
+        {
+            QToolButton *sensorSelectionButton = new QToolButton;
+            sensorSelectionButton->setText(m_pSensorModel->getSensorGroups()[i].getGroupName());
+            layoutSelection->addWidget(sensorSelectionButton);
+        }
+
+
+        QButtonGroup *buttonGroup = new QButtonGroup;
+        buttonGroup->setExclusive(true);
+
+        QHBoxLayout *layoutButtonGroup = new QHBoxLayout;
+
+        for(qint32 i = 0; i < m_pSensorModel->getNumLayouts(); ++i)
+        {
+            QToolButton *buttonLayout = new QToolButton;
+            buttonLayout->setText(m_pSensorModel->getSensorLayouts()[i].getName());
+            buttonLayout->setCheckable(true);
+
+            if(i == 0)
+                buttonLayout->setChecked(true);
+            else
+                buttonLayout->setChecked(false);
+
+            buttonGroup->addButton(buttonLayout, i);
+
+            layoutButtonGroup->addWidget(buttonLayout);
+        }
+
+        connect(buttonGroup, static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::buttonClicked), m_pSensorModel, &SensorModel::setCurrentLayout);
+
+
+        QGridLayout *topLayout = new QGridLayout;
+        topLayout->addWidget(m_pGraphicsView, 0, 0);
+        topLayout->addLayout(layoutSelection, 0, 1);
+        topLayout->addLayout(layoutButtonGroup, 1, 0);
+
+        setLayout(topLayout);
+    }
 }
 
 
@@ -63,18 +91,32 @@ void SensorWidget::setModel(SensorModel *model)
 {
     m_pSensorModel = model;
 
+    drawChannels();
 
-//    QGraphicsItem *item = new SensorItem(QPointF(1.0, 20.0));
-////    item->setPos(QPointF(i, j));
-//    m_pGraphicsScene->addItem(item);
+    connect(m_pSensorModel, &QAbstractTableModel::dataChanged, this, static_cast<void (SensorWidget::*)(const QModelIndex &, const QModelIndex &, const QVector<int> &)>(&SensorWidget::contextUpdate));
+    connect(m_pSensorModel, &QAbstractTableModel::modelReset, this, static_cast<void (SensorWidget::*)(void)>(&SensorWidget::contextUpdate));
 
-    for(qint32 i = 0; i < m_pSensorModel->rowCount(); ++i)
+    connect(m_pSensorModel, &SensorModel::newLayout, this, &SensorWidget::drawChannels);
+
+    createUI();
+}
+
+
+void SensorWidget::drawChannels()
+{
+    if(m_pGraphicsScene)
     {
-        QString name = m_pSensorModel->data(i, 0).toString();
-        QPointF loc = m_pSensorModel->data(i, 1).toPointF();
-        QGraphicsItem *item = new SensorItem(name, loc);
-        item->setPos(loc);
-        m_pGraphicsScene->addItem(item);
-    }
+        m_pGraphicsScene->clear();
 
+        for(qint32 i = 0; i < m_pSensorModel->rowCount(); ++i)
+        {
+            QString name = m_pSensorModel->data(i, 0).toString();
+            QPointF loc = m_pSensorModel->data(i, 1).toPointF();
+            SensorItem *item = new SensorItem(name, loc);
+            item->setPos(loc);
+
+            connect(item, &SensorItem::itemChanged, m_pSensorModel, &SensorModel::updateChannelState);
+            m_pGraphicsScene->addItem(item);
+        }
+    }
 }
