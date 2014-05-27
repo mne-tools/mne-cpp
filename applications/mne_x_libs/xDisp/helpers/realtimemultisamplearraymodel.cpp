@@ -255,9 +255,10 @@ fiff_int_t RealTimeMultiSampleArrayModel::getCoil(qint32 row) const
         return FIFFV_COIL_NONE;
 }
 
+
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayModel::selectRows(const QVector<qint32> &selection)
+void RealTimeMultiSampleArrayModel::selectRows(const QList<qint32> &selection)
 {
     beginResetModel();
 

@@ -263,7 +263,7 @@ private:
     void showRoiSelectionWidget();                          /**< Implements the show roi selection widget.*/
     QSharedPointer<XDISPLIB::RoiSelectionWidget> m_pRoiSelectionWidget;    /**< ROI selection widget. */
 
-    QVector<qint32> m_qVecCurrentSelection;
+    QList<qint32> m_qListCurrentSelection;
     void applySelection();
 };
 
