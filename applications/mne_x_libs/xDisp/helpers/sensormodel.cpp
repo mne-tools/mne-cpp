@@ -43,6 +43,7 @@ int SensorModel::columnCount(const QModelIndex &parent) const
 
 QVariant SensorModel::data(const QModelIndex &index, int role) const
 {
+    Q_UNUSED(role)
     if (index.isValid()) {
         qint32 row = index.row();//m_qMapIdxRowSelection[index.row()];
 
@@ -52,7 +53,7 @@ QVariant SensorModel::data(const QModelIndex &index, int role) const
 
         //******** second column (full ChName) ********
         if(index.column() == 1)// && role == Qt::DisplayRole)
-            return QVariant(m_qListSensorLayouts[m_iCurrentLayoutId].shortChNames()[row]);
+            return QVariant(m_qListSensorLayouts[m_iCurrentLayoutId].fullChNames()[row]);
 
         //******** third column (Position) ********
         if(index.column() == 2)
@@ -63,7 +64,11 @@ QVariant SensorModel::data(const QModelIndex &index, int role) const
 
         //******** fourth column (selected) ********
         if(index.column() == 3)
-            return QVariant(true);
+        {
+            QString fullName = m_qListSensorLayouts[m_iCurrentLayoutId].fullChNames()[row];
+            qint32 chNum = m_qMapNameId[fullName];
+            return QVariant(m_qMapSelection[chNum]);
+        }
     }
 
     return QVariant();
@@ -158,14 +163,31 @@ void SensorModel::mapChannelInfo(const QList<XMEASLIB::RealTimeSampleArrayChInfo
         m_qMapNameId.insert(chInfoList.at(i).getChannelName(), i);
         m_qMapIdName.insert(i, chInfoList.at(i).getChannelName());
     }
-
-
-    qDebug() << "m_qMapSelection" << m_qMapSelection;
 }
 
 
 void SensorModel::updateChannelState(SensorItem* item)
 {
-    qDebug() << "SensorModel::updateChannelState" << item->isSelected();
+    m_qMapSelection[item->getChNumber()] = item->isSelected();
+    createSelection();
 }
 
+
+
+void SensorModel::silentUpdateSelection(const QList<qint32>& selection)
+{
+    qDebug() << "SensorModel::silentUpdateSelection(const QList<qint32>& selection)";
+
+    QMap<qint32, bool>::iterator it;
+    for (it = m_qMapSelection.begin(); it != m_qMapSelection.end(); ++it)
+        it.value() = false;
+
+    for(qint32 i = 0; i < selection.size(); ++i)
+        m_qMapSelection[selection[i]] = true;
+
+    //Update data content
+    QModelIndex topLeft = this->index(0,3);
+    QModelIndex bottomRight = this->index(m_qMapSelection.size()-1,3);
+    QVector<int> roles; roles << Qt::DisplayRole;
+    emit dataChanged(topLeft, bottomRight, roles);
+}

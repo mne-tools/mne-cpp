@@ -274,6 +274,8 @@ void RealTimeMultiSampleArrayModel::selectRows(const QList<qint32> &selection)
         }
     }
 
+    emit newSelection(selection);
+
     endResetModel();
 }
 

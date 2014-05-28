@@ -269,9 +269,9 @@ private:
     QSharedPointer<SensorWidget> m_pSensorSelectionWidget;  /**< Sensor selection widget. */
 
 
-
-    QList<qint32> m_qListCurrentSelection;
-    void applySelection();
+    QList<qint32> m_qListCurrentSelection;      /**< Current selection list -> hack around C++11 lambda  */
+    void applySelection();                      /**< apply the in m_qListCurrentSelection stored selection -> hack around C++11 lambda */
+    void resetSelection();                      /**< reset the in m_qListCurrentSelection stored selection -> hack around C++11 lambda */
 };
 
 } // NAMESPACE

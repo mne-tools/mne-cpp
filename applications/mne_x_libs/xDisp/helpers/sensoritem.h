@@ -9,15 +9,15 @@ class SensorItem : public QGraphicsObject
 {
     Q_OBJECT
 public:
-    SensorItem(const QString& fullChName, const QString& shortChName, const QPointF& coordinate, QGraphicsItem *parent = 0);
+    SensorItem(const QString& dispChName, qint32 chNumber, const QPointF& coordinate, QGraphicsItem *parent = 0);
 
     QRectF boundingRect() const;
     QPainterPath shape() const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *item, QWidget *widget);
 
-    inline const QString& getFullChannelName() const;
+    inline const QString& getDisplayChName() const;
 
-    inline const QString& getShortChannelName() const;
+    inline qint32 getChNumber() const;
 
     inline bool isSelected() const;
 
@@ -33,8 +33,8 @@ signals:
     void itemChanged(SensorItem* item);
 
 private:
-    QString m_sFullChName;
-    QString m_sShortChName;
+    QString m_sDisplayChName;
+    qint32 m_iChNumber;
     QPointF m_qPointFCoord;
     float m_fWidth;
     float m_fHeight;
@@ -42,18 +42,18 @@ private:
 };
 
 
-
-
-inline const QString& SensorItem::getFullChannelName() const
+inline const QString& SensorItem::getDisplayChName() const
 {
-    return m_sFullChName;
+    return m_sDisplayChName;
 }
 
 
-inline const QString& SensorItem::getShortChannelName() const
+
+inline qint32 SensorItem::getChNumber() const
 {
-    return m_sShortChName;
+    return m_iChNumber;
 }
+
 
 
 inline bool SensorItem::isSelected() const

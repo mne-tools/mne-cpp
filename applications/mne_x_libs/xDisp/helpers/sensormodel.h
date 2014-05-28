@@ -36,6 +36,11 @@ public:
 
     inline qint32 getCurrentLayout() const;
 
+
+
+    inline const QMap<QString, qint32>& getNameIdMap() const;
+
+
     void setCurrentLayout(int id);
 
 
@@ -54,6 +59,9 @@ public:
 
 
     void updateChannelState(SensorItem* item);
+
+
+    void silentUpdateSelection(const QList<qint32>& selection);
 
 signals:
     void newSelection(QList<qint32> selection);
@@ -101,6 +109,12 @@ inline QList<SensorGroup> SensorModel::getSensorGroups() const
 inline qint32 SensorModel::getCurrentLayout() const
 {
     return m_iCurrentLayoutId;
+}
+
+
+inline const QMap<QString, qint32>& SensorModel::getNameIdMap() const
+{
+    return m_qMapNameId;
 }
 
 

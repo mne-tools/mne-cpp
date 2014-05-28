@@ -2,16 +2,16 @@
 
 #include <QDebug>
 
-SensorItem::SensorItem(const QString& fullChName, const QString& shortChName, const QPointF& coordinate, QGraphicsItem *parent)
+SensorItem::SensorItem(const QString& dispChName, qint32 chNumber, const QPointF& coordinate, QGraphicsItem *parent)
 : QGraphicsObject(parent)
-, m_sFullChName(fullChName)
-, m_sShortChName(shortChName)
+, m_sDisplayChName(dispChName)
+, m_iChNumber(chNumber)
 , m_qPointFCoord(coordinate)
 , m_fWidth(28)
 , m_fHeight(16)
 , m_bIsSelected(false)
 {
-    setZValue((int)(m_qPointFCoord.x() + m_qPointFCoord.y()) % 2);
+    setZValue(m_iChNumber);
 
     setFlags(ItemIsSelectable);// | ItemIsMovable);
     setAcceptHoverEvents(true);
@@ -41,7 +41,7 @@ void SensorItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
     painter->drawRect(QRectF(0, 0, m_fWidth, m_fHeight));
 
     painter->setFont(QFont("Helvetica [Cronyx]", 6));
-    painter->drawText(QPointF(0+2,m_fHeight-3), m_sShortChName);
+    painter->drawText(QPointF(0+2,m_fHeight-3), m_sDisplayChName);
 
 //    Q_UNUSED(widget);
 
