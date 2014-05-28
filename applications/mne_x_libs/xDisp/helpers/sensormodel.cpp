@@ -168,12 +168,10 @@ void SensorModel::mapChannelInfo(const QList<XMEASLIB::RealTimeSampleArrayChInfo
 {
     m_qMapSelection.clear();
     m_qMapNameId.clear();
-    m_qMapIdName.clear();
     for(qint32 i = 0; i < chInfoList.size(); ++i)
     {
         m_qMapSelection.insert(i,true);
         m_qMapNameId.insert(chInfoList.at(i).getChannelName(), i);
-        m_qMapIdName.insert(i, chInfoList.at(i).getChannelName());
     }
 }
 

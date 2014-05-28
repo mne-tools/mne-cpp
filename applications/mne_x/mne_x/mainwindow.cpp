@@ -42,8 +42,6 @@
 #include <mne_x/Management/pluginscenemanager.h>
 #include <mne_x/Management/displaymanager.h>
 
-#include <xDisp/roiselectionwidget.h>
-
 //GUI
 #include "mainwindow.h"
 #include "runwidget.h"

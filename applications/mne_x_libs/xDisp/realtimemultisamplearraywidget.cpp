@@ -43,8 +43,6 @@
 #include "realtimemultisamplearraywidget.h"
 //#include "annotationwindow.h"
 
-#include "roiselectionwidget.h"
-
 #include <xMeas/newrealtimemultisamplearray.h>
 
 #include <Eigen/Core>
@@ -132,12 +130,12 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
     connect(m_pSpinBoxTimeScale, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &RealTimeMultiSampleArrayWidget::timeWindowChanged);
     addDisplayWidget(m_pSpinBoxTimeScale);
 
-    m_pActionSelectRoi = new QAction(QIcon(":/images/selectRoi.png"), tr("Shows the region selection widget (F12)"),this);
-    m_pActionSelectRoi->setShortcut(tr("F12"));
-    m_pActionSelectRoi->setStatusTip(tr("Shows the region selection widget (F12)"));
-    m_pActionSelectRoi->setVisible(false);
-    connect(m_pActionSelectRoi, &QAction::triggered, this, &RealTimeMultiSampleArrayWidget::showRoiSelectionWidget);
-    addDisplayAction(m_pActionSelectRoi);
+    m_pActionSelectSensors = new QAction(QIcon(":/images/selectSensors.png"), tr("Shows the region selection widget (F12)"),this);
+    m_pActionSelectSensors->setShortcut(tr("F12"));
+    m_pActionSelectSensors->setStatusTip(tr("Shows the region selection widget (F12)"));
+    m_pActionSelectSensors->setVisible(false);
+    connect(m_pActionSelectSensors, &QAction::triggered, this, &RealTimeMultiSampleArrayWidget::showSensorSelectionWidget);
+    addDisplayAction(m_pActionSelectSensors);
 
     if(m_pTableView)
         delete m_pTableView;
@@ -179,7 +177,7 @@ void RealTimeMultiSampleArrayWidget::update(XMEASLIB::NewMeasurement::SPtr)
         {
             m_pSensorModel = new SensorModel(&file, this);
             m_pSensorModel->mapChannelInfo(m_qListChInfo);
-            m_pActionSelectRoi->setVisible(true);
+            m_pActionSelectSensors->setVisible(true);
         }
 
         init();
@@ -362,13 +360,8 @@ void RealTimeMultiSampleArrayWidget::timeWindowChanged(int T)
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayWidget::showRoiSelectionWidget()
+void RealTimeMultiSampleArrayWidget::showSensorSelectionWidget()
 {
-//    if(!m_pRoiSelectionWidget)
-//        m_pRoiSelectionWidget = QSharedPointer<XDISPLIB::RoiSelectionWidget>(new XDISPLIB::RoiSelectionWidget);
-
-//    m_pRoiSelectionWidget->show();
-
     if(!m_pSensorSelectionWidget)
     {
         m_pSensorSelectionWidget = QSharedPointer<SensorWidget>(new SensorWidget);

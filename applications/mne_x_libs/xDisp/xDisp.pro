@@ -102,8 +102,6 @@ SOURCES += \
     numericwidget.cpp \
     newrealtimesamplearraywidget.cpp \
     newrealtimemultisamplearraywidget.cpp \
-    roi.cpp \
-    roiselectionwidget.cpp \
     helpers/realtimemultisamplearraymodel.cpp \
     helpers/realtimemultisamplearraydelegate.cpp \
     helpers/sensorgroup.cpp \
@@ -122,8 +120,6 @@ HEADERS += \
     numericwidget.h \
     newrealtimesamplearraywidget.h \
     newrealtimemultisamplearraywidget.h \
-    roi.h \
-    roiselectionwidget.h \
     helpers/realtimemultisamplearraymodel.h \
     helpers/realtimemultisamplearraydelegate.h \
     helpers/sensorgroup.h \
