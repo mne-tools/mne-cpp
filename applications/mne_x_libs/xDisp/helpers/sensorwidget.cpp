@@ -45,20 +45,27 @@ void SensorWidget::createUI()
 {
     if(m_pSensorModel)
     {
+        // Sensor Selection
+        QButtonGroup *qBGSensorSelection = new QButtonGroup;
+        qBGSensorSelection->setExclusive(true);
 
-        QVBoxLayout *layoutSelection = new QVBoxLayout;
+        QVBoxLayout *VBoxSensorSelection = new QVBoxLayout;
         for(qint32 i = 0; i < m_pSensorModel->getSensorGroups().size(); ++i)
         {
             QToolButton *sensorSelectionButton = new QToolButton;
             sensorSelectionButton->setText(m_pSensorModel->getSensorGroups()[i].getGroupName());
-            layoutSelection->addWidget(sensorSelectionButton);
+            qBGSensorSelection->addButton(sensorSelectionButton,i);
+            VBoxSensorSelection->addWidget(sensorSelectionButton);
         }
 
+        connect(qBGSensorSelection, static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::buttonClicked), m_pSensorModel, &SensorModel::applySensorGroup);
 
-        QButtonGroup *buttonGroup = new QButtonGroup;
-        buttonGroup->setExclusive(true);
 
-        QHBoxLayout *layoutButtonGroup = new QHBoxLayout;
+        // Layout Selection
+        QButtonGroup *qBGLayout = new QButtonGroup;
+        qBGLayout->setExclusive(true);
+
+        QHBoxLayout *HBoxButtonGroupLayout = new QHBoxLayout;
 
         for(qint32 i = 0; i < m_pSensorModel->getNumLayouts(); ++i)
         {
@@ -71,18 +78,18 @@ void SensorWidget::createUI()
             else
                 buttonLayout->setChecked(false);
 
-            buttonGroup->addButton(buttonLayout, i);
+            qBGLayout->addButton(buttonLayout, i);
 
-            layoutButtonGroup->addWidget(buttonLayout);
+            HBoxButtonGroupLayout->addWidget(buttonLayout);
         }
 
-        connect(buttonGroup, static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::buttonClicked), m_pSensorModel, &SensorModel::setCurrentLayout);
+        connect(qBGLayout, static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::buttonClicked), m_pSensorModel, &SensorModel::setCurrentLayout);
 
 
         QGridLayout *topLayout = new QGridLayout;
         topLayout->addWidget(m_pGraphicsView, 0, 0);
-        topLayout->addLayout(layoutSelection, 0, 1);
-        topLayout->addLayout(layoutButtonGroup, 1, 0);
+        topLayout->addLayout(VBoxSensorSelection, 0, 1);
+        topLayout->addLayout(HBoxButtonGroupLayout, 1, 0);
 
         setLayout(topLayout);
     }
