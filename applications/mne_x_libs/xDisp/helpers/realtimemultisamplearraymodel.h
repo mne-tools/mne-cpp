@@ -78,6 +78,8 @@ public:
 
     inline bool isFreezed() const;
 
+signals:
+    void newSelection(QList<qint32> selection);
 
 private:
     QList<RealTimeSampleArrayChInfo> m_qListChInfo; /**< Channel info list.*/

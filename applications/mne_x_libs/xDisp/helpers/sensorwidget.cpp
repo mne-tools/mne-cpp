@@ -36,7 +36,9 @@ void SensorWidget::contextUpdate(const QModelIndex & topLeft, const QModelIndex 
 
 void SensorWidget::contextUpdate()
 {
+    qDebug() << "SensorWidget::contextUpdate()";
 
+    drawChannels();
 }
 
 void SensorWidget::createUI()
@@ -110,10 +112,14 @@ void SensorWidget::drawChannels()
 
         for(qint32 i = 0; i < m_pSensorModel->rowCount(); ++i)
         {
-            QString shortChName = m_pSensorModel->data(i, 0).toString();
+            QString dispChName = m_pSensorModel->data(i, 0).toString();
             QString fullChName = m_pSensorModel->data(i, 1).toString();
             QPointF loc = m_pSensorModel->data(i, 2).toPointF();
-            SensorItem *item = new SensorItem(shortChName, fullChName, loc);
+            qint32 chNum = m_pSensorModel->getNameIdMap()[fullChName];
+            SensorItem *item = new SensorItem(dispChName, chNum, loc);
+            item->setSelected(m_pSensorModel->data(i, 3).toBool());
+
+            //            qDebug() << "m_pSensorModel->getNameIdMap()" << m_pSensorModel->getNameIdMap()[fullChName];
             item->setPos(loc);
 
             connect(item, &SensorItem::itemChanged, m_pSensorModel, &SensorModel::updateChannelState);

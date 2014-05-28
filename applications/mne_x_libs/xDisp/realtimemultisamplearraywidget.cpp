@@ -280,6 +280,7 @@ void RealTimeMultiSampleArrayWidget::channelContextMenu(QPoint pos)
     //undo selection
     QAction* resetAppliedSelection = menu->addAction(tr("Reset selection"));
     connect(resetAppliedSelection,&QAction::triggered, m_pRTMSAModel, &RealTimeMultiSampleArrayModel::resetSelection);
+    connect(resetAppliedSelection,&QAction::triggered, this, &RealTimeMultiSampleArrayWidget::resetSelection);
 
     //show context menu
     menu->popup(m_pTableView->viewport()->mapToGlobal(pos));
@@ -375,7 +376,12 @@ void RealTimeMultiSampleArrayWidget::showRoiSelectionWidget()
         m_pSensorSelectionWidget->setWindowTitle("Channel Selection");
 
         if(m_pSensorModel)
+        {
             m_pSensorSelectionWidget->setModel(m_pSensorModel);
+
+            connect(m_pSensorModel, &SensorModel::newSelection, m_pRTMSAModel, &RealTimeMultiSampleArrayModel::selectRows);
+        }
+
     }
     m_pSensorSelectionWidget->show();
 }
@@ -386,4 +392,20 @@ void RealTimeMultiSampleArrayWidget::showRoiSelectionWidget()
 void RealTimeMultiSampleArrayWidget::applySelection()
 {
     m_pRTMSAModel->selectRows(m_qListCurrentSelection);
+
+    m_pSensorModel->silentUpdateSelection(m_qListCurrentSelection);
 }
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayWidget::resetSelection()
+{
+    // non C++11 alternative
+    m_qListCurrentSelection.clear();
+    for(qint32 i = 0; i < m_qListChInfo.size(); ++i)
+        m_qListCurrentSelection.append(i);
+
+    applySelection();
+}
+
