@@ -75,7 +75,6 @@ private:
 
     QMap<qint32, bool>      m_qMapSelection;
     QMap<QString, qint32>   m_qMapNameId;       /**< Fast lookup between channel name and its index.*/
-    QMap<qint32, QString>   m_qMapIdName;       /**< Fast lookup between index and channel name.*/
 };
 
 

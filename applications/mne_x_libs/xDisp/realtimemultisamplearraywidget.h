@@ -89,8 +89,6 @@ namespace XDISPLIB
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class RoiSelectionWidget;
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -261,9 +259,8 @@ private:
     */
     void timeWindowChanged(int T);
 
-    QAction*    m_pActionSelectRoi;                                     /**< show roi select widget */
-    void showRoiSelectionWidget();                                      /**< Implements the show roi selection widget.*/
-    QSharedPointer<XDISPLIB::RoiSelectionWidget> m_pRoiSelectionWidget; /**< ROI selection widget. ToDo Obsolete*/
+    QAction*    m_pActionSelectSensors;                                     /**< show roi select widget */
+    void showSensorSelectionWidget();                                      /**< Implements the show roi selection widget.*/
 
     SensorModel* m_pSensorModel;                            /**< Sensor model for channel selection */
     QSharedPointer<SensorWidget> m_pSensorSelectionWidget;  /**< Sensor selection widget. */
