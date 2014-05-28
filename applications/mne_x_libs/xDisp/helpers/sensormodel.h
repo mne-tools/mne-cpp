@@ -40,9 +40,9 @@ public:
 
     inline const QMap<QString, qint32>& getNameIdMap() const;
 
+    void applySensorGroup(int id);
 
     void setCurrentLayout(int id);
-
 
 
 
@@ -53,9 +53,6 @@ public:
 
 
     void mapChannelInfo(const QList<XMEASLIB::RealTimeSampleArrayChInfo>& chInfoList);
-
-
-
 
 
     void updateChannelState(SensorItem* item);

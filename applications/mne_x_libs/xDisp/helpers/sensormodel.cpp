@@ -135,6 +135,18 @@ bool SensorModel::read(QIODevice* device)
 
 
 
+
+void SensorModel::applySensorGroup(int id)
+{
+    QList<qint32> selection;
+
+    for(qint32 i = 0; i < m_qListSensorGroups[id].getChannelNames().size(); ++i)
+        selection.append(m_qMapNameId[m_qListSensorGroups[id].getChannelNames()[i]]);
+
+    emit newSelection(selection);
+    silentUpdateSelection(selection);
+}
+
 void SensorModel::setCurrentLayout(int id)
 {
     beginResetModel();

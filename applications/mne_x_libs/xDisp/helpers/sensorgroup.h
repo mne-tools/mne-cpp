@@ -14,6 +14,9 @@ public:
 
     inline const QString& getGroupName() const;
 
+
+    inline const QStringList& getChannelNames() const;
+
 private:
     QString m_sGroupName;
 
@@ -25,6 +28,12 @@ private:
 inline const QString& SensorGroup::getGroupName() const
 {
     return m_sGroupName;
+}
+
+
+inline const QStringList& SensorGroup::getChannelNames() const
+{
+    return m_qListChannels;
 }
 
 #endif // SENSORGROUP_H
