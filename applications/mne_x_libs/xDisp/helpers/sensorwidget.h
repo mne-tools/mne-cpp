@@ -13,7 +13,7 @@ class SensorWidget : public QWidget
 public:
     SensorWidget(QWidget *parent = 0);
 
-    void SensorWidget::createUI();
+    void createUI();
 
     void drawChannels();
 
