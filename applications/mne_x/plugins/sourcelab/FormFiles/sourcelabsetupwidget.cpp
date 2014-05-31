@@ -107,6 +107,25 @@ SourceLabSetupWidget::~SourceLabSetupWidget()
 
 //*************************************************************************************************************
 
+void SourceLabSetupWidget::setClusteringState()
+{
+    ui.m_qPushButonStartClustering->setEnabled(false);
+    ui.m_qPushButonStartClustering->setText("Clustering...");
+}
+
+
+//*************************************************************************************************************
+
+void SourceLabSetupWidget::setSetupState()
+{
+    ui.m_qPushButonStartClustering->setEnabled(true);
+    ui.m_qPushButonStartClustering->setText("Start Clustering");
+}
+
+
+
+//*************************************************************************************************************
+
 void SourceLabSetupWidget::showAboutDialog()
 {
     SourceLabAboutWidget aboutDialog(this);

@@ -41,8 +41,7 @@ CONFIG += plugin
 
 DEFINES += SOURCELAB_LIBRARY
 
-QT += core widgets
-#QT += concurrent
+QT += core widgets concurrent
 
 TARGET = sourcelab
 CONFIG(debug, debug|release) {

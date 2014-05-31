@@ -49,7 +49,7 @@
 //=============================================================================================================
 
 #include <QtCore/QtPlugin>
-//#include <QtConcurrent>
+#include <QtConcurrent>
 #include <QDebug>
 
 
@@ -72,6 +72,7 @@ SourceLab::SourceLab()
 : m_bIsRunning(false)
 , m_bReceiveData(false)
 , m_bProcessData(false)
+, m_bFinishedClustering(false)
 , m_qFileFwdSolution("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif")
 , m_sAtlasDir("./MNE-sample-data/subjects/sample/label")
 , m_sSurfaceDir("./MNE-sample-data/subjects/sample/surf")
@@ -114,10 +115,6 @@ void SourceLab::init()
     m_pAnnotationSet = AnnotationSet::SPtr(new AnnotationSet(m_sAtlasDir+"/lh.aparc.a2009s.annot", m_sAtlasDir+"/rh.aparc.a2009s.annot"));
     m_pSurfaceSet = SurfaceSet::SPtr(new SurfaceSet(m_sSurfaceDir+"/lh.white", m_sSurfaceDir+"/rh.white"));
 
-
-    //ToDo accelerate this
-    m_pClusteredFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(m_pFwd->cluster_forward_solution(*m_pAnnotationSet.data(), 40)));
-
     //Delete Buffer - will be initailzed with first incoming data
     if(!m_pSourceLabBuffer.isNull())
         m_pSourceLabBuffer = CircularMatrixBuffer<double>::SPtr();
@@ -130,56 +127,37 @@ void SourceLab::init()
     // Output
     m_pRTSEOutput = PluginOutputData<RealTimeSourceEstimate>::create(this, "SourceLabOut", "SourceLab output data");
     m_outputConnectors.append(m_pRTSEOutput);
-
     m_pRTSEOutput->data()->setName("Real-Time Source Estimate");
     m_pRTSEOutput->data()->setAnnotSet(m_pAnnotationSet);
     m_pRTSEOutput->data()->setSurfSet(m_pSurfaceSet);
-//    m_pRTSEOutput->data()->setSrc(m_pFwd->src); // Is done after clustering -> m_pClusteredFwd
-    m_pRTSEOutput->data()->setSrc(m_pClusteredFwd->src);
-
     m_pRTSEOutput->data()->setSamplingRate(600/m_iDownSample);
 
+    // start clustering
+    QFuture<void> future = QtConcurrent::run(this, &SourceLab::doClustering);
+
+}
 
 
+//*************************************************************************************************************
 
-//    // Output
-//    m_pDummyOutput = PluginOutputData<NewRealTimeSampleArray>::create(this, "DummyOut", "Dummy output data");
-//    m_outputConnectors.append(m_pDummyOutput);
+void SourceLab::doClustering()
+{
+    emit clusteringStarted();
+    m_bFinishedClustering = false;
+    m_pClusteredFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(m_pFwd->cluster_forward_solution(*m_pAnnotationSet.data(), 40)));
 
-//    m_pDummyOutput->data()->setName("Dummy Output");
-//    m_pDummyOutput->data()->setUnit("mV");
-//    m_pDummyOutput->data()->setMinValue(-200);
-//    m_pDummyOutput->data()->setMaxValue(360);
-//    m_pDummyOutput->data()->setSamplingRate(256.0/1.0);
-
-
+    finishedClustering();
+}
 
 
+//*************************************************************************************************************
 
+void SourceLab::finishedClustering()
+{
+    m_pRTSEOutput->data()->setSrc(m_pClusteredFwd->src);
 
-
-
-
-
-
-
-
-
-
-//    this->addPlugin(PLG_ID::MNERTCLIENT);
-//    Buffer::SPtr t_buf = m_pSourceLabBuffer.staticCast<Buffer>(); //unix fix
-//    this->addAcceptorMeasurementBuffer(MSR_ID::MEGMNERTCLIENT_OUTPUT, t_buf);
-
-
-
-//    m_pRTSE_SourceLab = addProviderRealTimeSourceEstimate(MSR_ID::SOURCELAB_OUTPUT);
-//    m_pRTSE_SourceLab->setName("Real-Time Source Estimate");
-////    m_pRTSE_SourceLab->initFromFiffInfo(m_pFiffInfo);
-//    m_pRTSE_SourceLab->setArraySize(10);
-//    m_pRTSE_SourceLab->setVisibility(true);
-
-
-
+    m_bFinishedClustering = true;
+    emit clusteringFinished();
 }
 
 
@@ -187,8 +165,13 @@ void SourceLab::init()
 
 bool SourceLab::start()
 {
-    QThread::start();
-    return true;
+    if(m_bFinishedClustering)
+    {
+        QThread::start();
+        return true;
+    }
+    else
+        return false;
 }
 
 
@@ -198,9 +181,14 @@ bool SourceLab::stop()
 {
     m_bIsRunning = false;
 
-    // Stop threads
-    QThread::terminate();
-    QThread::wait();
+    if(m_bProcessData) // Only clear if buffers have been initialised
+    {
+        m_pSourceLabBuffer->releaseFromPop();
+        m_pSourceLabBuffer->releaseFromPush();
+    }
+
+    // Stop filling buffers with data from the inputs
+    m_bProcessData = false;
 
     if(m_pRtCov->isRunning())
         m_pRtCov->stop();
@@ -238,6 +226,14 @@ QString SourceLab::getName() const
 QWidget* SourceLab::setupWidget()
 {
     SourceLabSetupWidget* setupWidget = new SourceLabSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
+
+    if(!m_bFinishedClustering)
+        setupWidget->setClusteringState();
+
+    connect(this, &SourceLab::clusteringStarted, setupWidget, &SourceLabSetupWidget::setClusteringState);
+    connect(this, &SourceLab::clusteringFinished, setupWidget, &SourceLabSetupWidget::setSetupState);
+
+
     return setupWidget;
 }
 
@@ -419,8 +415,6 @@ void SourceLab::run()
                 //Average Data
                 m_pRtAve->append(t_mat);
 
-
-
                 mutex.lock();
                 if(m_pMinimumNorm && m_qVecEvokedData.size() > 0 && skip_count > 2)
                 {
@@ -446,9 +440,6 @@ void SourceLab::run()
 
                 ++skip_count;
             }
-
-
-
         }
     }
 }
