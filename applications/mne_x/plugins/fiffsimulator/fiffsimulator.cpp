@@ -91,7 +91,7 @@ FiffSimulator::FiffSimulator()
 
 FiffSimulator::~FiffSimulator()
 {
-    if(this->isRunning())
+    if(m_pFiffSimulatorProducer->isRunning() || this->isRunning())
         stop();
 }
 
@@ -332,17 +332,21 @@ bool FiffSimulator::start()
 
 bool FiffSimulator::stop()
 {
-    m_pFiffSimulatorProducer->stop();
+    if(m_pFiffSimulatorProducer->isRunning())
+        m_pFiffSimulatorProducer->stop();
 
-    //Wait until this thread (TMSI) is stopped
-    m_bIsRunning = false;
+    if(this->isRunning())
+    {
+        //Wait until this thread (TMSI) is stopped
+        m_bIsRunning = false;
 
-    //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the pop function (acquire statement)
-    m_pRawMatrixBuffer_In->releaseFromPop();
+        //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the pop function (acquire statement)
+        m_pRawMatrixBuffer_In->releaseFromPop();
 
-    m_pRawMatrixBuffer_In->clear();
+        m_pRawMatrixBuffer_In->clear();
 
-    m_pRTMSA_FiffSimulator->data()->clear();
+        m_pRTMSA_FiffSimulator->data()->clear();
+    }
 
     return true;
 }
