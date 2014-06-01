@@ -87,7 +87,8 @@ RtAve::RtAve(quint32 numAverages, quint32 p_iPreStimSamples, quint32 p_iPostStim
 
 RtAve::~RtAve()
 {
-    stop();
+    if(this->isRunning())
+        stop();
 }
 
 
@@ -284,6 +285,7 @@ bool RtAve::start()
 
     return true;
 }
+
 
 //*************************************************************************************************************
 

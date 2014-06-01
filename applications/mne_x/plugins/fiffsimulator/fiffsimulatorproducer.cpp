@@ -147,9 +147,6 @@ void FiffSimulatorProducer::stop()
     //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the push function (acquire statement)
     m_pFiffSimulator->m_pRawMatrixBuffer_In->releaseFromPush();
 
-    while(this->isRunning())
-        m_bIsRunning = false;
-
     this->disconnectDataClient();
 }
 
@@ -158,20 +155,24 @@ void FiffSimulatorProducer::stop()
 
 void FiffSimulatorProducer::run()
 {
+    m_bIsRunning = true;
     //
     // Connect data client
     //
     this->connectDataClient(m_pFiffSimulator->m_sFiffSimulatorIP);
 
+    qint32 count = 0;
     while(m_pRtDataClient->state() != QTcpSocket::ConnectedState)
     {
         msleep(100);
         this->connectDataClient(m_pFiffSimulator->m_sFiffSimulatorIP);
+        ++count;
+        if(count > 2)
+            return;
     }
 
     msleep(1000);
 
-    m_bIsRunning = true;
     m_bFlagMeasuring = true;
 
     //

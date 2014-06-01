@@ -82,7 +82,8 @@ RtCov::RtCov(qint32 p_iMaxSamples, FiffInfo::SPtr p_pFiffInfo, QObject *parent)
 
 RtCov::~RtCov()
 {
-    stop();
+    if(this->isRunning())
+        stop();
 }
 
 
@@ -101,10 +102,27 @@ void RtCov::append(const MatrixXd &p_DataSegment)
 
 //*************************************************************************************************************
 
+bool RtCov::start()
+{
+    //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
+    if(this->isRunning())
+        QThread::wait();
+
+    m_bIsRunning = true;
+
+    return true;
+}
+
+
+//*************************************************************************************************************
+
 bool RtCov::stop()
 {
     m_bIsRunning = false;
-    QThread::wait();
+
+    m_pRawMatrixBuffer->releaseFromPop();
+
+    m_pRawMatrixBuffer->clear();
 
     return true;
 }
@@ -114,9 +132,6 @@ bool RtCov::stop()
 
 void RtCov::run()
 {
-    m_bIsRunning = true;
-
-
     quint32 n_samples = 0;
 
     FiffCov::SPtr cov(new FiffCov());
