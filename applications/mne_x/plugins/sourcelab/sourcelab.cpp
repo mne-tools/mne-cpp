@@ -165,8 +165,13 @@ void SourceLab::finishedClustering()
 
 bool SourceLab::start()
 {
+    //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
+    if(this->isRunning())
+        QThread::wait();
+
     if(m_bFinishedClustering)
     {
+        m_bIsRunning = true;
         QThread::start();
         return true;
     }
@@ -232,7 +237,6 @@ QWidget* SourceLab::setupWidget()
 
     connect(this, &SourceLab::clusteringStarted, setupWidget, &SourceLabSetupWidget::setClusteringState);
     connect(this, &SourceLab::clusteringFinished, setupWidget, &SourceLabSetupWidget::setSetupState);
-
 
     return setupWidget;
 }
@@ -319,8 +323,6 @@ void SourceLab::updateInvOp(MNEInverseOperator::SPtr p_pInvOp)
 
 void SourceLab::run()
 {
-    m_bIsRunning = true;
-
     //
     // Cluster forward solution;
     //
