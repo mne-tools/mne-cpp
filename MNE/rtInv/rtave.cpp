@@ -277,7 +277,10 @@ void RtAve::assemblePreStimulus(const QList<QPair<QList<qint32>, MatrixXd> > &p_
 bool RtAve::stop()
 {
     m_bIsRunning = false;
-    QThread::wait();
+
+    m_pRawMatrixBuffer->releaseFromPop();
+
+    m_pRawMatrixBuffer->clear();
 
     return true;
 }
