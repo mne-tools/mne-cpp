@@ -174,7 +174,7 @@ void FiffSimulatorProducer::run()
         msleep(100);
         this->connectDataClient(m_pFiffSimulator->m_sFiffSimulatorIP);
         ++count;
-        if(count > 4 || !m_bIsRunning)
+        if(count > 10 || !m_bIsRunning)
             return;
     }
 
