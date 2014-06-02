@@ -217,41 +217,41 @@ bool BCI::start()
 
     m_bFillSensorWindowFirstTime = true;
 
-    // Set display ranges for output channels
-    m_pBCIOutputOne->data()->setMaxValue(m_dDisplayRangeBoundary);
-    m_pBCIOutputOne->data()->setMinValue(0);
+//    // Set display ranges for output channels
+//    m_pBCIOutputOne->data()->setMaxValue(m_dDisplayRangeBoundary);
+//    m_pBCIOutputOne->data()->setMinValue(-m_dDisplayRangeBoundary);
 
-    m_pBCIOutputTwo->data()->setMaxValue(m_dDisplayRangeVariances);
-    m_pBCIOutputTwo->data()->setMinValue(0);
-
-    m_pBCIOutputThree->data()->setMaxValue(m_dDisplayRangeVariances);
-    m_pBCIOutputThree->data()->setMinValue(0);
-
-    m_pBCIOutputFour->data()->setMaxValue(m_dDisplayRangeElectrodes);
-    m_pBCIOutputFour->data()->setMinValue(-m_dDisplayRangeElectrodes);
-
-    m_pBCIOutputFive->data()->setMaxValue(m_dDisplayRangeElectrodes);
-    m_pBCIOutputFive->data()->setMinValue(-m_dDisplayRangeElectrodes);
-
-//    // variance
-//    m_pBCIOutputOne->data()->setMaxValue(15);
-//    m_pBCIOutputOne->data()->setMinValue(0);
-
-//    m_pBCIOutputTwo->data()->setMaxValue(10e-08);
+//    m_pBCIOutputTwo->data()->setMaxValue(m_dDisplayRangeVariances);
 //    m_pBCIOutputTwo->data()->setMinValue(0);
 
-//    m_pBCIOutputThree->data()->setMaxValue(10e-08);
+//    m_pBCIOutputThree->data()->setMaxValue(m_dDisplayRangeVariances);
 //    m_pBCIOutputThree->data()->setMinValue(0);
 
-//    m_pBCIOutputFour->data()->setMaxValue(1e-05);
-//    m_pBCIOutputFour->data()->setMinValue(-1e-05);
+//    m_pBCIOutputFour->data()->setMaxValue(m_dDisplayRangeElectrodes);
+//    m_pBCIOutputFour->data()->setMinValue(-m_dDisplayRangeElectrodes);
 
-//    m_pBCIOutputFive->data()->setMaxValue(1e-05);
-//    m_pBCIOutputFive->data()->setMinValue(-1e-05);
+//    m_pBCIOutputFive->data()->setMaxValue(m_dDisplayRangeElectrodes);
+//    m_pBCIOutputFive->data()->setMinValue(-m_dDisplayRangeElectrodes);
+
+    // variance
+    m_pBCIOutputOne->data()->setMaxValue(5);
+    m_pBCIOutputOne->data()->setMinValue(-5);
+
+    m_pBCIOutputTwo->data()->setMaxValue(10);
+    m_pBCIOutputTwo->data()->setMinValue(0);
+
+    m_pBCIOutputThree->data()->setMaxValue(10);
+    m_pBCIOutputThree->data()->setMinValue(0);
+
+    m_pBCIOutputFour->data()->setMaxValue(1e-05);
+    m_pBCIOutputFour->data()->setMinValue(-1e-05);
+
+    m_pBCIOutputFive->data()->setMaxValue(1e-05);
+    m_pBCIOutputFive->data()->setMinValue(-1e-05);
 
 //    // log variance
-//    m_pBCIOutputOne->data()->setMaxValue(5);
-//    m_pBCIOutputOne->data()->setMinValue(0);
+//    m_pBCIOutputOne->data()->setMaxValue(10);
+//    m_pBCIOutputOne->data()->setMinValue(-10);
 
 //    m_pBCIOutputTwo->data()->setMaxValue(15);
 //    m_pBCIOutputTwo->data()->setMinValue(0);
@@ -259,11 +259,11 @@ bool BCI::start()
 //    m_pBCIOutputThree->data()->setMaxValue(15);
 //    m_pBCIOutputThree->data()->setMinValue(0);
 
-//    m_pBCIOutputFour->data()->setMaxValue(1e-05);
-//    m_pBCIOutputFour->data()->setMinValue(-1e-05);
+//    m_pBCIOutputFour->data()->setMaxValue(10e-04);
+//    m_pBCIOutputFour->data()->setMinValue(-10e-04);
 
-//    m_pBCIOutputFive->data()->setMaxValue(1e-05);
-//    m_pBCIOutputFive->data()->setMinValue(-1e-05);
+//    m_pBCIOutputFive->data()->setMaxValue(10e-04);
+//    m_pBCIOutputFive->data()->setMinValue(-10e-04);
 
     m_bIsRunning = true;
 
