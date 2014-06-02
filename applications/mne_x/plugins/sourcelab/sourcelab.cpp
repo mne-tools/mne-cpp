@@ -398,6 +398,8 @@ void SourceLab::run()
             /* Dispatch the inputs */
             MatrixXd t_mat = m_pSourceLabBuffer->pop();
 
+            qDebug() << "received data" << t_mat.rows();
+
             //Add to covariance estimation
             m_pRtCov->append(t_mat);
 

@@ -14,9 +14,5 @@ SensorGroup SensorGroup::parseSensorGroup(const QDomElement &sensorGroupElement)
     group.m_iNumChannels = sensorGroupElement.attribute("NumChannels", "");
     group.m_qListChannels = sensorGroupElement.text().split(":");
 
-    qDebug() << "group.m_sGroupName" << group.m_sGroupName;
-    qDebug() << "group.m_iNumChannels" << group.m_iNumChannels;
-    qDebug() << "group.m_qListChannels" << group.m_qListChannels;
-
     return group;
 }

@@ -144,17 +144,17 @@ void NeuromagProducer::stop()
         (*m_pNeuromag->m_pRtCmdClient)["stop-all"].send();
     }
 
-    //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the push function (acquire statement)
-    m_pNeuromag->m_pRawMatrixBuffer_In->releaseFromPush();
-
-    while(this->isRunning())
-        m_bIsRunning = false;
+    if(m_pNeuromag->m_pRawMatrixBuffer_In)
+    {
+        //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the push function (acquire statement)
+        m_pNeuromag->m_pRawMatrixBuffer_In->releaseFromPush();
+    }
 
     this->disconnectDataClient();
 
-//    m_bIsRunning = false;
-//    QThread::terminate();
-//    QThread::wait();
+    //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
+    if(this->isRunning())
+        QThread::wait();
 }
 
 
@@ -162,25 +162,24 @@ void NeuromagProducer::stop()
 
 void NeuromagProducer::run()
 {
-    qDebug() << "void NeuromagProducer::run()" << m_pNeuromag->m_sNeuromagIP;
-
+    m_bIsRunning = true;
     //
     // Connect data client
     //
     this->connectDataClient(m_pNeuromag->m_sNeuromagIP);
 
+    qint32 count = 0;
     while(m_pRtDataClient->state() != QTcpSocket::ConnectedState)
     {
         msleep(100);
         this->connectDataClient(m_pNeuromag->m_sNeuromagIP);
+        ++count;
+        if(count > 10 || !m_bIsRunning)
+            return;
     }
-
-
-    qDebug() << "void NeuromagProducer::run() connected";
 
     msleep(1000);
 
-    m_bIsRunning = true;
     m_bFlagMeasuring = true;
 
     //

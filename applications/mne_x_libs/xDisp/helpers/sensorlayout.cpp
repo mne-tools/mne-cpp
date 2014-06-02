@@ -17,7 +17,7 @@ SensorLayout SensorLayout::parseSensorLayout(const QDomElement &sensorLayoutElem
 
     QDomElement childSensor = sensorLayoutElement.firstChildElement("Sensor");
     while (!childSensor.isNull()) {
-        QString chName = layout.m_sName.isEmpty() ? childSensor.attribute("ChannelNumber") : QString("%1 %2").arg(layout.m_sName).arg(childSensor.attribute("ChannelNumber"));
+        QString chName = layout.m_sName.isEmpty() ? childSensor.attribute("ChannelNumber") : QString("%1%2").arg(layout.m_sName).arg(childSensor.attribute("ChannelNumber"));
         layout.m_qListFullChannelNames.append(chName);
         layout.m_qListShortChannelNames.append(childSensor.attribute("ChannelNumber"));
         float plot_x = childSensor.attribute("plot_x").toFloat()*5; //mm to pixel
