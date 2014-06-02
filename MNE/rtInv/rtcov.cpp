@@ -109,6 +109,7 @@ bool RtCov::start()
         QThread::wait();
 
     m_bIsRunning = true;
+    QThread::start();
 
     return true;
 }

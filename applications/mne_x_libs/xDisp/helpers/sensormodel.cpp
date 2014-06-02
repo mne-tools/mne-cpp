@@ -121,14 +121,8 @@ bool SensorModel::read(QIODevice* device)
         childGroup = childGroup.nextSiblingElement("Group");
     }
 
-
-
-
-    qDebug() << root.tagName();//domDocument.toString();
-    qDebug() << t_sDevice;
-
-
-
+//    qDebug() << root.tagName();//domDocument.toString();
+//    qDebug() << t_sDevice;
 
     return true;
 }
