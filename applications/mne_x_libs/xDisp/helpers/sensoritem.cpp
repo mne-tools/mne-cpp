@@ -2,13 +2,12 @@
 
 #include <QDebug>
 
-SensorItem::SensorItem(const QString& dispChName, qint32 chNumber, const QPointF& coordinate, QGraphicsItem *parent)
+SensorItem::SensorItem(const QString& dispChName, qint32 chNumber, const QPointF& coordinate, const QSizeF& size, QGraphicsItem *parent)
 : QGraphicsObject(parent)
 , m_sDisplayChName(dispChName)
 , m_iChNumber(chNumber)
 , m_qPointFCoord(coordinate)
-, m_fWidth(28)
-, m_fHeight(16)
+, m_qSizeFDim(size)
 , m_bIsSelected(false)
 {
     setZValue(m_iChNumber);
@@ -20,13 +19,13 @@ SensorItem::SensorItem(const QString& dispChName, qint32 chNumber, const QPointF
 
 QRectF SensorItem::boundingRect() const
 {
-    return QRectF(0, 0, m_fWidth, m_fHeight);
+    return QRectF(QPointF(0,0), m_qSizeFDim);
 }
 
 QPainterPath SensorItem::shape() const
 {
     QPainterPath path;
-    path.addRect(0, 0, m_fWidth, m_fHeight);
+    path.addRect(QRectF(QPointF(0,0), m_qSizeFDim));
     return path;
 }
 
@@ -38,10 +37,10 @@ void SensorItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
         painter->setBrush(Qt::lightGray);
 
     painter->setPen(m_bIsSelected ? Qt::red : Qt::darkBlue);
-    painter->drawRect(QRectF(0, 0, m_fWidth, m_fHeight));
+    painter->drawRect(QRectF(QPointF(0,0), m_qSizeFDim));
 
     painter->setFont(QFont("Helvetica [Cronyx]", 6));
-    painter->drawText(QPointF(0+2,m_fHeight-3), m_sDisplayChName);
+    painter->drawText(QPointF(0+2,m_qSizeFDim.height()-3), m_sDisplayChName);
 
 //    Q_UNUSED(widget);
 
