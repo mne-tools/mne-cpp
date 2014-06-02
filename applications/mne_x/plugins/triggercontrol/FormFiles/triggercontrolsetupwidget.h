@@ -108,23 +108,46 @@ public:
 
 
 private slots:
+    //=========================================================================================================
+    /**
+    * Sets up a connection with the serial port
+    *
+    */
     void on_m_qPushButton_Connect_released();
-
+    //=========================================================================================================
+    /**
+    * Disconnects from the serial port
+    *
+    */
     void on_m_qPushButton_Disconnect_released();
-
+    //=========================================================================================================
+    /**
+    * Reads the digital output information from the terminal, encodes the output and sends it via the serial port
+    *
+    */
     void on_m_qPushButton_Send_released();
-
-
+    //=========================================================================================================
+    /**
+    * Reads the analog output information from the terminal, encodes the output and sends it via the serial port
+    */
     void on_m_qPushButton_Sendanalog_released();
-
-
-
+    //=========================================================================================================
+    /**
+    * Sends a retrieve request for digital information to the serial port
+    *
+    */
     void on_m_qPushButton_RetrieveDigitalInfo_released();
-
-
-
+    //=========================================================================================================
+    /**
+    * Sends a retrieve request for analog information to the serial port
+    *
+    */
     void on_m_qPushButton_RetrieveAnalogInfo_released();
-
+    //=========================================================================================================
+    /**
+    * Connects a selected channel to the TriggerControl stimulation channel
+    *
+    */
     void on_m_qPushButton_ConnectChannel_released();
 
 private:
@@ -143,9 +166,9 @@ private:
     void showSettings();
 
 
-    TriggerControl* m_pTriggerControl;
+    TriggerControl* m_pTriggerControl;          /**< Holds a pointer to the TriggerControl widget.*/
 
-    Ui::TriggerControlSetupWidgetClass ui;       /**< Holds the user interface for the TriggerControlSetupWidget.*/
+    Ui::TriggerControlSetupWidgetClass ui;      /**< Holds the user interface for the TriggerControlSetupWidget.*/
 };
 
 } // NAMESPACE

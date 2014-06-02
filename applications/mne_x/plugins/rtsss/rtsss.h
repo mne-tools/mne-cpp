@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the SourceLab class.
+* @brief    Contains the declaration of the RTSSS class.
 *
 */
 
@@ -44,13 +44,9 @@
 
 #include "rtsss_global.h"
 
-#include <mne_x/Interfaces/IRTAlgorithm.h>
-
-#include <generics/circularmatrixbuffer.h>
-
-#include <fiff/fiff_info.h>
-
-#include <xMeas/Measurement/realtimemultisamplearray.h>
+#include <mne_x/Interfaces/IAlgorithm.h>
+#include <generics/circularbuffer.h>
+#include <xMeas/newrealtimesamplearray.h>
 
 
 //*************************************************************************************************************
@@ -59,12 +55,11 @@
 //=============================================================================================================
 
 #include <QtWidgets>
-#include <QFile>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE RtSssPlugin
+// DEFINE NAMESPACE RTSSSPlugin
 //=============================================================================================================
 
 namespace RtSssPlugin
@@ -76,8 +71,8 @@ namespace RtSssPlugin
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
 using namespace MNEX;
+using namespace XMEASLIB;
 using namespace IOBuffer;
 
 
@@ -89,62 +84,70 @@ using namespace IOBuffer;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS SourceLab
+* DECLARE CLASS RTSSS
 *
-* @brief The SourceLab class provides a dummy algorithm structure.
+* @brief The RtSss class provides a rtsss algorithm structure.
 */
-class RTSSSSHARED_EXPORT RtSss : public IRTAlgorithm
+//class DUMMYTOOLBOXSHARED_EXPORT DummyToolbox : public IAlgorithm
+class RTSSSSHARED_EXPORT RtSss : public IAlgorithm
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "rtsss.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "rtsss.json") //NEW Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(MNEX::IRTAlgorithm)
+    Q_INTERFACES(MNEX::IAlgorithm)
 
 public:
-
     //=========================================================================================================
     /**
     * Constructs a RtSss.
     */
+//    DummyToolbox();
     RtSss();
+
     //=========================================================================================================
     /**
     * Destroys the RtSss.
     */
+//    ~DummyToolbox();
     ~RtSss();
+
+    //=========================================================================================================
+    /**
+    * Initialise input and output connectors.
+    */
+    void init();
+
+    //=========================================================================================================
+    /**
+    * Clone the plugin
+    */
+    virtual QSharedPointer<IPlugin> clone() const;
 
     virtual bool start();
     virtual bool stop();
 
-    virtual Type getType() const;
-    virtual const char* getName() const;
+    virtual IPlugin::PluginType getType() const;
+    virtual QString getName() const;
 
     virtual QWidget* setupWidget();
-    virtual QWidget* runWidget();
 
-    virtual void update(Subject* pSubject);
-
-signals:
+    void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
 
 protected:
     virtual void run();
 
 private:
-    //=========================================================================================================
-    /**
-    * Initialise the SourceLab.
-    */
-    void init();
+//    PluginInputData<NewRealTimeSampleArray>::SPtr   m_pDummyInput;      /**< The RealTimeSampleArray of the DummyToolbox input.*/
+//    PluginOutputData<NewRealTimeSampleArray>::SPtr  m_pDummyOutput;    /**< The RealTimeSampleArray of the DummyToolbox output.*/
+    PluginInputData<NewRealTimeSampleArray>::SPtr   m_pRTSAInput;      /**< The RealTimeSampleArray of the RtSss input.*/
+    PluginOutputData<NewRealTimeSampleArray>::SPtr  m_pRTSAOutput;    /**< The RealTimeSampleArray of the RtSss output.*/
 
-    QMutex mutex;
+    //  from sourcelab.h
+//    PluginInputData<NewRealTimeMultiSampleArray>::SPtr  m_pRTMSAInput;  /**< The RealTimeMultiSampleArray input.*/
+//    PluginOutputData<RealTimeSourceEstimate>::SPtr      m_pRTSEOutput;  /**< The RealTimeSourceEstimate output.*/
 
-    CircularMatrixBuffer<double>::SPtr m_pRtSssBuffer;   /**< Holds incoming rt server data.*/
-
-    bool m_bIsRunning;      /**< If source lab is running */
-    bool m_bReceiveData;    /**< If thread is ready to receive data */
-
-    FiffInfo::SPtr m_pFiffInfo;     /**< Fiff information. */
-
+//    dBuffer::SPtr   m_pDummyBuffer;      /**< Holds incoming data.*/
+    dBuffer::SPtr   m_pRtSssBuffer;      /**< Holds incoming data.*/
 };
 
 } // NAMESPACE

@@ -93,7 +93,10 @@ class SerialPort;
 /**
 * DECLARE CLASS TriggerControl
 *
-* @brief The TriggerControl ....
+
+* @brief The TriggerControl is a MNE-X plugin which contains an intuitive terminal for manual
+* configurations of output channels and an automated processing of connected signal channels.
+*
 */
 class TRIGGERCONTROLSHARED_EXPORT TriggerControl : public IAlgorithm
 {
@@ -130,29 +133,78 @@ public:
     */
     virtual QSharedPointer<IPlugin> clone() const;
 
+    //=========================================================================================================
+    /**
+    * Starts the TriggerControl by starting the triggercontrol's thread.
+    */
     virtual bool start();
+
+    //=========================================================================================================
+    /**
+    * Stops the TriggerControl by starting the triggercontrol's thread.
+    */
     virtual bool stop();
 
+    //=========================================================================================================
+    /**
+    * [...]
+    */
     virtual IPlugin::PluginType getType() const;
+
+    //=========================================================================================================
+    /**
+    * [...]
+    */
     virtual QString getName() const;
 
+
+    //=========================================================================================================
+    /**
+    * [...]
+    */    
     virtual QWidget* setupWidget();
 
+    //=========================================================================================================
+    /**
+    * [...]
+    */
     void updateSingleChannel(XMEASLIB::NewMeasurement::SPtr pMeasurement);
 
+    //=========================================================================================================
+    /**
+    * [...]
+    */
     void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
-//
+
+    //=========================================================================================================
+    /**
+    * Initialise input and output connectors.
+    */
     void byteReceived();
 
+
+
 signals:
+//    void sendByte(int value);
     void sendByte(int value, int channel);
 
 
 protected:
+
+    //=========================================================================================================
+    /**
+    * Runs the run method
+    */
     virtual void run();
 
+    //=========================================================================================================
+    /**
+    * Sets or Unsets the HardWired channel from the terminal function (see manual)
+    */
 
     void sendByteTo(int value, int channel);
+
+
 
 private:
     PluginOutputData<NewRealTimeSampleArray>::SPtr  m_pTriggerOutput;   /**< The RealTimeSampleArray of the trigger output.*/
@@ -166,7 +218,6 @@ private:
     QSharedPointer<SerialPort> m_pSerialPort;
 
     qint32 m_iBaud;
-
 
     QMutex m_qMutex;
 

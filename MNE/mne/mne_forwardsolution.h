@@ -70,7 +70,7 @@
 #include <Eigen/Core>
 #include <Eigen/SVD>
 #include <Eigen/Sparse>
-#include <Eigen/unsupported/KroneckerProduct>
+#include <unsupported/Eigen/KroneckerProduct>
 
 
 //*************************************************************************************************************
@@ -122,7 +122,7 @@ struct RegionDataOut
     VectorXd    sumd;       /**< Sums of the distances to the centroid */
     MatrixXd    D;          /**< Distances to the centroid */
 
-    qint32      iLabelIdxOut;
+    qint32      iLabelIdxOut;   /**< Label ID */
 };
 
 
@@ -130,22 +130,52 @@ struct RegionDataOut
 /**
 * Gain matrix input data for one region, used for clustering
 */
-struct RegionDataIn
+struct RegionData
 {
-    MatrixXd    matRoiG;        /**< Region gain matrix sources x sensors(x,y,z)*/
-    MatrixXd    matRoiGOrig;    /**< Region gain matrix sensors x sources(x,y,z)*/
+    MatrixXd    matRoiG;            /**< Reshaped region gain matrix sources x sensors(x,y,z)*/
+    MatrixXd    matRoiGWhitened;    /**< Reshaped whitened region gain matrix sources x sensors(x,y,z)*/
+    bool        bUseWhitened;       /**< Wheather indeces of whitened gain matrix should be used to calculate centroids */
+
+    MatrixXd    matRoiGOrig;            /**< Region gain matrix sensors x sources(x,y,z)*/
+//    MatrixXd    matRoiGOrigWhitened;    /**< Whitened region gain matrix sensors x sources(x,y,z)*/
+
     qint32      nClusters;      /**< Number of clusters within this region */
 
     VectorXi    idcs;           /**< Get source space indeces */
-    qint32      iLabelIdxIn;
+    qint32      iLabelIdxIn;    /**< Label ID */
 
     RegionDataOut cluster() const
     {
         // Kmeans Reduction
         RegionDataOut p_RegionDataOut;
 
-        KMeans t_kMeans(QString("cityblock"), QString("sample"), 5);
-        t_kMeans.calculate(this->matRoiG, this->nClusters, p_RegionDataOut.roiIdx, p_RegionDataOut.ctrs, p_RegionDataOut.sumd, p_RegionDataOut.D);
+        KMeans t_kMeans(QString("cityblock"), QString("sample"), 5);//QString("cityblock")sqeuclidean
+
+        if(bUseWhitened)
+        {
+            t_kMeans.calculate(this->matRoiGWhitened, this->nClusters, p_RegionDataOut.roiIdx, p_RegionDataOut.ctrs, p_RegionDataOut.sumd, p_RegionDataOut.D);
+
+            MatrixXd newCtrs = MatrixXd::Zero(p_RegionDataOut.ctrs.rows(), p_RegionDataOut.ctrs.cols());
+            for(qint32 c = 0; c < p_RegionDataOut.ctrs.rows(); ++c)
+            {
+                qint32 num = 0;
+
+                for(qint32 idx = 0; idx < p_RegionDataOut.roiIdx.size(); ++idx)
+                {
+                    if(c == p_RegionDataOut.roiIdx[idx])
+                    {
+                        newCtrs.row(c) += this->matRoiG.row(idx); //just take whitened to get indeces calculate centroids using the original matrix
+                        ++num;
+                    }
+                }
+
+                if(num > 0)
+                    newCtrs.row(c) /= num;
+            }
+            p_RegionDataOut.ctrs = newCtrs; //Replace whitened with original
+        }
+        else
+            t_kMeans.calculate(this->matRoiG, this->nClusters, p_RegionDataOut.roiIdx, p_RegionDataOut.ctrs, p_RegionDataOut.sumd, p_RegionDataOut.D);
 
         p_RegionDataOut.iLabelIdxOut = this->iLabelIdxIn;
 
@@ -154,16 +184,10 @@ struct RegionDataIn
 
 };
 
-//RegionDataOut MNEForwardSolution::roiClustering(RegionDataIn p_RegionDataIn)
-//{
-//        // Kmeans Reduction
-//        RegionDataOut p_RegionDataOut;
 
-//        KMeans t_kMeans(QString("cityblock"), QString("sample"), 5);
-//        t_kMeans.calculate(p_RegionDataIn.matRoiG, p_RegionDataIn.nClusters, p_RegionDataOut.roiIdx, p_RegionDataOut.ctrs, p_RegionDataOut.sumd, p_RegionDataOut.D);
-
-//        return p_RegionDataOut;
-//}
+const static FiffCov defaultCov;
+const static FiffInfo defaultInfo;
+static MatrixXd defaultD;
 
 
 //=============================================================================================================
@@ -223,14 +247,15 @@ public:
     * Cluster the forward solution and stores the result to p_fwdOut.
     * The clustering is done by using the provided annotations
     *
-    * @param[in] p_AnnotationSet    Annotation set containing the annotation of left & right hemisphere
-    * @param[in] p_iClusterSize     Maximal cluster size per roi
+    * @param[in]    p_AnnotationSet     Annotation set containing the annotation of left & right hemisphere
+    * @param[in]    p_iClusterSize      Maximal cluster size per roi
+    * @param[out]   p_D                 The cluster operator
+    * @param[in]    p_pNoise_cov
+    * @param[in]    p_pInfo
     *
     * @return clustered MNE forward solution
     */
-    MNEForwardSolution cluster_forward_solution(AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize);
-
-    MNEForwardSolution cluster_forward_solution_ccr(AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize);
+    MNEForwardSolution cluster_forward_solution(const AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize, MatrixXd& p_D = defaultD, const FiffCov &p_pNoise_cov = defaultCov, const FiffInfo &p_pInfo = defaultInfo) const;
 
     //=========================================================================================================
     /**
@@ -411,6 +436,17 @@ public:
     static bool read(QIODevice& p_IODevice, MNEForwardSolution& fwd, bool force_fixed = false, bool surf_ori = false, const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList, bool bExcludeBads = true);
 
     //ToDo readFromStream
+
+    //=========================================================================================================
+    /**
+    * reduces the forward solution and stores the result to p_fwdOut.
+    *
+    * @param[in]    p_iNumDipoles   Desired number of dipoles
+    * @param[out]   p_D             The reduction operator
+    *
+    * @return reduced MNE forward solution
+    */
+    MNEForwardSolution reduce_forward_solution(qint32 p_iNumDipoles, MatrixXd& p_D) const;
 
     //=========================================================================================================
     /**

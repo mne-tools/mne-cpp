@@ -66,6 +66,9 @@
 
 #include <QGuiApplication>
 #include <QSet>
+#include <QElapsedTimer>
+
+//#define BENCHMARK
 
 
 //*************************************************************************************************************
@@ -99,12 +102,22 @@ int main(int argc, char *argv[])
 {
     QGuiApplication a(argc, argv);
 
+//    QFile t_fileFwd("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
+//    QFile t_fileCov("./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
 //    QFile t_fileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
-    QFile t_fileRaw("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw.fif");
+//    QString t_sEventName = "./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif";
+//    AnnotationSet t_annotationSet("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot", "./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot");
+//    SurfaceSet t_surfSet("./MNE-sample-data/subjects/sample/surf/lh.white", "./MNE-sample-data/subjects/sample/surf/rh.white");
+
+    QFile t_fileFwd("D:/Data/MEG/mind006/mind006_051209_auditory01_raw-oct-6p-fwd.fif");
+    QFile t_fileCov("D:/Data/MEG/mind006/mind006_051209_auditory01_raw-cov.fif");
+    QFile t_fileRaw("D:/Data/MEG/mind006/mind006_051209_auditory01_raw.fif");
+    QString t_sEventName = "D:/Data/MEG/mind006/mind006_051209_auditory01_raw-eve.fif";
+    AnnotationSet t_annotationSet("D:/Data/subjects/mind006/label/lh.aparc.a2009s.annot", "D:/Data/subjects/mind006/label/rh.aparc.a2009s.annot");
+    SurfaceSet t_surfSet("D:/Data/subjects/mind006/surf/lh.white", "D:/Data/subjects/mind006/surf/rh.white");
 
     qint32 event = 1;
-//    QString t_sEventName = "./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif";
-    QString t_sEventName = "E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-eve.fif";
+
     float tmin = -0.2f;
     float tmax = 0.4f;
 
@@ -396,29 +409,8 @@ int main(int argc, char *argv[])
 
 
 
-
-
-
-
-
-
-
     //########################################################################################
     // Source Estimate
-
-//    QFile t_fileFwd("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
-//    QFile t_fileCov("./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
-//    QFile t_fileEvoked("./MNE-sample-data/MEG/sample/sample_audvis-ave.fif");
-
-//    QFile t_fileFwd("/home/chdinh/sl_data/MEG/mind006/mind006_051209_auditory01_raw-oct-6p-fwd.fif");
-//    QFile t_fileCov("/home/chdinh/sl_data/MEG/mind006/mind006_051209_auditory01_raw-cov.fif");
-//    QFile t_fileEvoked("/home/chdinh/sl_data/MEG/mind006/mind006_051209_auditory01_raw-ave.fif");
-
-
-    QFile t_fileFwd("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-oct-6p-fwd.fif");
-    QFile t_fileCov("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-cov.fif");
-//    QFile t_fileEvoked("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-ave.fif");
-
 
     double snr = 1.0f;//0.1f;//1.0f;//3.0f;//0.1f;//3.0f;
     QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
@@ -465,10 +457,6 @@ int main(int argc, char *argv[])
     if(t_Fwd.isEmpty())
         return 1;
 
-//    AnnotationSet t_annotationSet("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot", "./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot");
-//    AnnotationSet t_annotationSet("/home/chdinh/sl_data/subjects/mind006/label/lh.aparc.a2009s.annot", "/home/chdinh/sl_data/subjects/mind006/label/rh.aparc.a2009s.annot");
-    AnnotationSet t_annotationSet("E:/Data/sl_data/subjects/mind006/label/lh.aparc.a2009s.annot", "E:/Data/sl_data/subjects/mind006/label/rh.aparc.a2009s.annot");
-
 
     FiffCov noise_cov(t_fileCov);
 
@@ -478,7 +466,8 @@ int main(int argc, char *argv[])
     //
     // Cluster forward solution;
     //
-    MNEForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution_ccr(t_annotationSet, 20);//40);
+    MatrixXd D;
+    MNEForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution(t_annotationSet, 20, D, noise_cov, evoked.info);
 
     //
     // make an inverse operators
@@ -500,7 +489,47 @@ int main(int argc, char *argv[])
     // Compute inverse solution
     //
     MinimumNorm minimumNorm(inverse_operator, lambda2, method);
+
+#ifdef BENCHMARK
+    //
+    //   Set up the inverse according to the parameters
+    //
+    minimumNorm.doInverseSetup(vecSel.size(),false);
+
+    MNESourceEstimate sourceEstimate;
+    QList<qint64> qVecElapsedTime;
+    for(qint32 i = 0; i < 100; ++i)
+    {
+        //Benchmark time
+        QElapsedTimer timer;
+        timer.start();
+        sourceEstimate = minimumNorm.calculateInverse(evoked.data, evoked.times(0), evoked.times(1)-evoked.times(0));
+        qVecElapsedTime.append(timer.elapsed());
+    }
+
+    double meanTime = 0.0;
+    qint32 offset = 19;
+    qint32 c = 0;
+    for(qint32 i = offset; i < qVecElapsedTime.size(); ++i)
+    {
+        meanTime += qVecElapsedTime[i];
+        ++c;
+    }
+
+    meanTime /= (double)c;
+
+    double varTime = 0;
+    for(qint32 i = offset; i < qVecElapsedTime.size(); ++i)
+        varTime += pow(qVecElapsedTime[i] - meanTime,2);
+
+    varTime /= (double)c - 1.0f;
+    varTime = sqrt(varTime);
+
+    qDebug() << "MNE calculation took" << meanTime << "+-" << varTime << "ms in average";
+
+#else
     MNESourceEstimate sourceEstimate = minimumNorm.calculateInverse(evoked);
+#endif
 
     if(sourceEstimate.isEmpty())
         return 1;
@@ -576,10 +605,6 @@ int main(int argc, char *argv[])
 
     //Source Estimate end
     //########################################################################################
-
-//    SurfaceSet t_surfSet("./MNE-sample-data/subjects/sample/surf/lh.white", "./MNE-sample-data/subjects/sample/surf/rh.white");
-//    SurfaceSet t_surfSet("/home/chdinh/sl_data/subjects/mind006/surf/lh.white", "/home/chdinh/sl_data/subjects/mind006/surf/rh.white");
-    SurfaceSet t_surfSet("E:/Data/sl_data/subjects/mind006/surf/lh.white", "E:/Data/sl_data/subjects/mind006/surf/rh.white");
 
 //    //only one time point - P100
 //    qint32 sample = 0;

@@ -66,6 +66,9 @@
 
 #include <QGuiApplication>
 #include <QSet>
+#include <QElapsedTimer>
+
+#define BENCHMARK
 
 
 //*************************************************************************************************************
@@ -105,29 +108,29 @@ int main(int argc, char *argv[])
 //    AnnotationSet t_annotationSet("./MNE-sample-data/subjects/sample/label/lh.aparc.a2009s.annot", "./MNE-sample-data/subjects/sample/label/rh.aparc.a2009s.annot");
 //    SurfaceSet t_surfSet("./MNE-sample-data/subjects/sample/surf/lh.white", "./MNE-sample-data/subjects/sample/surf/rh.white");
 
-//    QFile t_fileRaw("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw.fif");
-//    QString t_sEventName = "E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-eve.fif";
-//    QFile t_fileFwd("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-oct-6p-fwd.fif");
-//    AnnotationSet t_annotationSet("E:/Data/sl_data/subjects/mind006/label/lh.aparc.a2009s.annot", "E:/Data/sl_data/subjects/mind006/label/rh.aparc.a2009s.annot");
-//    SurfaceSet t_surfSet("E:/Data/sl_data/subjects/mind006/surf/lh.white", "E:/Data/sl_data/subjects/mind006/surf/rh.white");
-
-    QFile t_fileRaw("E:/Data/sl_data/MEG/mind006/mind006_051209_median01_raw.fif");
-    QString t_sEventName = "E:/Data/sl_data/MEG/mind006/mind006_051209_median01_raw-eve.fif";
-    QFile t_fileFwd("E:/Data/sl_data/MEG/mind006/mind006_051209_median01_raw-oct-6-fwd.fif");
+    QFile t_fileRaw("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw.fif");
+    QString t_sEventName = "E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-eve.fif";
+    QFile t_fileFwd("E:/Data/sl_data/MEG/mind006/mind006_051209_auditory01_raw-oct-6p-fwd.fif");
     AnnotationSet t_annotationSet("E:/Data/sl_data/subjects/mind006/label/lh.aparc.a2009s.annot", "E:/Data/sl_data/subjects/mind006/label/rh.aparc.a2009s.annot");
     SurfaceSet t_surfSet("E:/Data/sl_data/subjects/mind006/surf/lh.white", "E:/Data/sl_data/subjects/mind006/surf/rh.white");
+
+//    QFile t_fileRaw("E:/Data/sl_data/MEG/mind006/mind006_051209_median01_raw.fif");
+//    QString t_sEventName = "E:/Data/sl_data/MEG/mind006/mind006_051209_median01_raw-eve.fif";
+//    QFile t_fileFwd("E:/Data/sl_data/MEG/mind006/mind006_051209_median01_raw-oct-6-fwd.fif");
+//    AnnotationSet t_annotationSet("E:/Data/sl_data/subjects/mind006/label/lh.aparc.a2009s.annot", "E:/Data/sl_data/subjects/mind006/label/rh.aparc.a2009s.annot");
+//    SurfaceSet t_surfSet("E:/Data/sl_data/subjects/mind006/surf/lh.white", "E:/Data/sl_data/subjects/mind006/surf/rh.white");
 
     QString t_sFileNameStc("");//("mind006_051209_auditory01.stc");
 
 
-    bool doMovie = true;//false;
+    bool doMovie = false;//true;//false;
 
     qint32 numDipolePairs = 7;
 
     qint32 event = 1;
 
-    float tmin = -0.2f;
-    float tmax = 0.4f;
+    float tmin = -0.0f;
+    float tmax = 0.1f;
 
     bool keep_comp = false;
     fiff_int_t dest_comp = 0;
@@ -420,15 +423,19 @@ int main(int argc, char *argv[])
 
 //    vecSel << 65, 22, 47, 55, 16, 29, 14, 36, 57, 97, 89, 46, 9, 93, 83, 52, 71, 52, 3, 96;
 
-    //Option 3 Newest
+//    //Option 3 Newest
 //    VectorXi vecSel(10);
 
 //    vecSel << 0, 96, 80, 55, 66, 25, 26, 2, 55, 58, 6, 88;
 
 
+//    VectorXi vecSel(1);
+
+//    vecSel << 0;//2,3;
+
     VectorXi vecSel(1);
 
-    vecSel << 0;
+    vecSel << 2;
 
 
     std::cout << "Select following epochs to average:\n" << vecSel << std::endl;
@@ -446,7 +453,7 @@ int main(int argc, char *argv[])
     //
     // Cluster forward solution;
     //
-    MNEForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution_ccr(t_annotationSet, 20);//40);
+    MNEForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution(t_annotationSet, 20);//40);
 
     //
     // Compute inverse solution
@@ -456,7 +463,42 @@ int main(int argc, char *argv[])
     if(doMovie)
         t_pwlRapMusic.setStcAttr(200,0.5);
 
+
+#ifdef BENCHMARK
+    MNESourceEstimate sourceEstimate;
+    QList<qint64> qVecElapsedTime;
+    for(qint32 i = 0; i < 100; ++i)
+    {
+        //Benchmark time
+        QElapsedTimer timer;
+        timer.start();
+        sourceEstimate = t_pwlRapMusic.calculateInverse(pickedEvoked);
+        qVecElapsedTime.append(timer.elapsed());
+    }
+
+    double meanTime = 0.0;
+    qint32 offset = 19;
+    qint32 c = 0;
+    for(qint32 i = offset; i < qVecElapsedTime.size(); ++i)
+    {
+        meanTime += qVecElapsedTime[i];
+        ++c;
+    }
+
+    meanTime /= (double)c;
+
+    double varTime = 0;
+    for(qint32 i = offset; i < qVecElapsedTime.size(); ++i)
+        varTime += pow(qVecElapsedTime[i] - meanTime,2);
+
+    varTime /= (double)c - 1.0f;
+    varTime = sqrt(varTime);
+
+    qDebug() << "RAP-MUSIC calculation took" << meanTime << "+-" << varTime << "ms in average";
+
+#else
     MNESourceEstimate sourceEstimate = t_pwlRapMusic.calculateInverse(pickedEvoked);
+#endif
 
     if(sourceEstimate.isEmpty())
         return 1;

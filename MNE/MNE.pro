@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     MNELibraries.pro
+# @file     MNE.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -48,14 +48,17 @@ SUBDIRS += \
     rtClient \
     rtInv \
 
-
-contains(MNECPP_CONFIG, isGui) {
+contains(MNECPP_CONFIG, withGui) {
     SUBDIRS += disp
 
     qtHaveModule(3d) {
         message(Qt3D available: disp3D library configured!)
         SUBDIRS += disp3D
     }
+}
+
+contains(MNECPP_CONFIG, withPython) {
+    SUBDIRS += pyio
 }
 
 CONFIG += ordered

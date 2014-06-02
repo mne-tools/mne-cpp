@@ -43,6 +43,15 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
+
+#include <QFile>
+#include <QTextStream>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
@@ -63,7 +72,55 @@ MNEClusterInfo::MNEClusterInfo()
 
 void MNEClusterInfo::clear()
 {
-    clusterVertnos.clear();
-    clusterDistances.clear();
+    clusterLabelNames.clear();
     clusterLabelIds.clear();
+    centroidVertno.clear();
+    centroidSource_rr.clear();
+    clusterVertnos.clear();
+    clusterSource_rr.clear();
+    clusterDistances.clear();
+}
+
+
+//*************************************************************************************************************
+
+void MNEClusterInfo::write(QString p_sFileName) const
+{
+    QFile file("./"+p_sFileName);
+    file.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream out(&file);
+    out << "MNE Cluster Info\n";
+
+    for(qint32 i = 0; i < clusterLabelIds.size(); ++i)
+    {
+        out << "\nLabel : " << clusterLabelNames[i] << "\n";
+        out << "Label ID : " << clusterLabelIds[i] << "\n";
+        out << "Centroid Vertno : " << centroidVertno[i] << "\n";
+        out << "Centroid rr : " << centroidSource_rr[i](0) << ", " << clusterSource_rr[i](1) << ", " << clusterSource_rr[i](2) << "\n";
+        out << "Vertnos :\n";
+        for(qint32 j = 0; j < clusterVertnos[i].size(); ++j)
+            out << clusterVertnos[i][j] << ", ";
+        out << "\nDistances :\n";
+        for(qint32 j = 0; j < clusterDistances[i].size(); ++j)
+            out << clusterDistances[i][j] << ", ";
+        out << "\nrr :\n";
+        for(qint32 j = 0; j < clusterSource_rr[i].rows(); ++j)
+            out << clusterSource_rr[i](j,0) << ", " << clusterSource_rr[i](j,1) << ", " << clusterSource_rr[i](j,2) << "\n";
+
+        out << "\n";
+    }
+
+    // optional, as QFile destructor will already do it:
+    file.close();
+
+
+    QFile file_centroids("./centroids_"+p_sFileName);
+    file_centroids.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream out_centroids(&file_centroids);
+
+    for(qint32 i = 0; i < clusterLabelIds.size(); ++i)
+        out_centroids << centroidVertno[i] << ", ";
+
+    // optional, as QFile destructor will already do it:
+    file_centroids.close();
 }

@@ -74,11 +74,6 @@ class QTime;
 class QDockWidget;
 class QTextBrowser;
 
-//ToDo Move this to the xDisp
-namespace XDISPLIB
-{
-class RoiSelectionWidget;
-}
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -104,7 +99,7 @@ class StartUpWidget;
 class PluginGui;
 class PluginManager;
 class PluginSceneManager;
-class NewDisplayManager;
+class DisplayManager;
 
 class IPlugin;
 
@@ -186,7 +181,7 @@ private:
 
     //Run
     RunWidget* m_pRunWidget;                                /**< The run widget */
-    QSharedPointer<NewDisplayManager> m_pDisplayManager;    /**< display manager */
+    QSharedPointer<DisplayManager> m_pDisplayManager;    /**< display manager */
 
     bool m_bDisplayMax;                 /**< whether full screen mode is activated.*/
     bool m_bIsRunning;                  /**< whether program/plugins is/are started.*/
@@ -229,7 +224,10 @@ private:
     QAction*                            m_pActionZoomOut;           /**< zoom out */
     QAction*                            m_pActionDisplayMax;        /**< show full screen mode */
 
-    QList< QAction* >                   m_qListDynamicDisplayActions; /**< dynamic display actions */
+    QList< QAction* >                   m_qListDynamicPluginActions;    /**< dynamic plugin actions */
+    QList< QWidget* >                   m_qListDynamicPluginWidgets;    /**< dynamic plugin widgets */
+    QList< QAction* >                   m_qListDynamicDisplayActions;   /**< dynamic display actions */
+    QList< QWidget* >                   m_qListDynamicDisplayWidgets;   /**< dynamic display widgets */
 
     //Main Window Menu
     QMenu*                              m_pMenuFile;    /**< Holds the file menu.*/
@@ -239,7 +237,9 @@ private:
 
     // Tool bar
     QToolBar*                           m_pToolBar;                 /**< Holds the tool bar.*/
+    QToolBar*                           m_pDynamicPluginToolBar;    /**< Holds the plugin tool bar.*/
     QToolBar*                           m_pDynamicDisplayToolBar;   /**< Holds the display tool bar.*/
+    QString                             m_sCurPluginName;           /**< The name which corresponds to the current selected plugin */
 
     QLabel*                             m_pLabelTime;      /**< Holds the display label for the running time.*/
     QSharedPointer<QTimer>              m_pTimer;           /**< timer of the main application*/

@@ -55,11 +55,8 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Fsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Mned \
-            -lMNE$${MNE_LIB_VERSION}Inversed \
-            -lMNE$${MNE_LIB_VERSION}RtInvd \
             -lxMeasd \
             -lxDispd \
-            -lxDtMngd \
             -lmne_xd
 }
 else {
@@ -68,11 +65,8 @@ else {
             -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lMNE$${MNE_LIB_VERSION}Mne \
-            -lMNE$${MNE_LIB_VERSION}Inverse \
-            -lMNE$${MNE_LIB_VERSION}RtInv \
             -lxMeas \
             -lxDisp \
-            -lxDtMng \
             -lmne_x
 }
 
@@ -81,19 +75,23 @@ DESTDIR = $${MNE_BINARY_DIR}/mne_x_plugins
 SOURCES += \
         rtsss.cpp \
         FormFiles/rtssssetupwidget.cpp \
-        FormFiles/rtsssrunwidget.cpp \
-        FormFiles/rtsssaboutwidget.cpp
+#        FormFiles/rtsssrunwidget.cpp \
+        FormFiles/rtsssaboutwidget.cpp \
+        rtsssalgo.cpp \
+    rtsssalgo_test.cpp
 
 HEADERS += \
         rtsss.h\
         rtsss_global.h \
         FormFiles/rtssssetupwidget.h \
-        FormFiles/rtsssrunwidget.h \
-        FormFiles/rtsssaboutwidget.h
+#        FormFiles/rtsssrunwidget.h \
+        FormFiles/rtsssaboutwidget.h \
+        rtsssalgo.h \
+    rtsssalgo_test.h
 
 FORMS += \
         FormFiles/rtssssetup.ui \
-        FormFiles/rtsssrun.ui \
+#        FormFiles/rtsssrun.ui \
         FormFiles/rtsssabout.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
@@ -104,3 +102,8 @@ OTHER_FILES += rtsss.json
 
 # Put generated form headers into the origin --> cause other src is pointing at them
 UI_DIR = $$PWD
+
+unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
+
+# suppress visibility warnings
+unix: QMAKE_CXXFLAGS += -Wno-attributes

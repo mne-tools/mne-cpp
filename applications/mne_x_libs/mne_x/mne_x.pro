@@ -103,7 +103,7 @@ SOURCES += \
     Management/pluginconnectorconnection.cpp \
     Management/pluginconnectorconnectionwidget.cpp \
     Management/pluginscenemanager.cpp \
-    Management/newdisplaymanager.cpp
+    Management/displaymanager.cpp
 
 HEADERS += \
     mne_x_global.h \
@@ -120,7 +120,7 @@ HEADERS += \
     Management/pluginconnectorconnection.h \
     Management/pluginconnectorconnectionwidget.h \
     Management/pluginscenemanager.h \
-    Management/newdisplaymanager.h
+    Management/displaymanager.h
 
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}

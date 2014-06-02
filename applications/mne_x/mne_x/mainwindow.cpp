@@ -40,9 +40,7 @@
 
 #include <mne_x/Management/pluginmanager.h>
 #include <mne_x/Management/pluginscenemanager.h>
-#include <mne_x/Management/newdisplaymanager.h>
-
-#include <xDisp/roiselectionwidget.h>
+#include <mne_x/Management/displaymanager.h>
 
 //GUI
 #include "mainwindow.h"
@@ -89,10 +87,11 @@ MainWindow::MainWindow(QWidget *parent)
 : QMainWindow(parent)
 , m_pStartUpWidget(new StartUpWidget(this))
 , m_pRunWidget(NULL)
-, m_pDisplayManager(new NewDisplayManager(this))
+, m_pDisplayManager(new DisplayManager(this))
 , m_bDisplayMax(false)
 , m_bIsRunning(false)
 , m_pToolBar(NULL)
+, m_pDynamicPluginToolBar(NULL)
 , m_pDynamicDisplayToolBar(NULL)
 , m_pLabelTime(NULL)
 , m_pTimer(NULL)
@@ -142,11 +141,11 @@ MainWindow::~MainWindow()
 
 void MainWindow::clear()
 {
+    if(m_bIsRunning)
+        this->stopMeasurement();
+
     //garbage collection
     m_pPluginSceneManager.reset();
-
-    if(m_pPluginGui)
-        delete m_pPluginGui;
 }
 
 
@@ -401,6 +400,21 @@ void MainWindow::createToolBars()
         m_pLabelTime->setText(QTime(0, 0).toString());
     }
 
+    //Plugin
+    if(m_pDynamicPluginToolBar)
+    {
+        removeToolBar(m_pDynamicPluginToolBar);
+        delete m_pDynamicPluginToolBar;
+        m_pDynamicPluginToolBar = NULL;
+    }
+    if(m_qListDynamicPluginActions.size() > 0 || m_qListDynamicPluginWidgets.size() > 0)
+    {
+        m_pDynamicPluginToolBar = addToolBar(m_sCurPluginName + tr("Control"));
+        for(qint32 i = 0; i < m_qListDynamicPluginActions.size(); ++i)
+            m_pDynamicPluginToolBar->addAction(m_qListDynamicPluginActions[i]);
+        for(qint32 i = 0; i < m_qListDynamicPluginWidgets.size(); ++i)
+            m_pDynamicPluginToolBar->addWidget(m_qListDynamicPluginWidgets[i]);
+    }
 
     //Display
     if(m_pDynamicDisplayToolBar)
@@ -409,11 +423,13 @@ void MainWindow::createToolBars()
         delete m_pDynamicDisplayToolBar;
         m_pDynamicDisplayToolBar = NULL;
     }
-    if(m_qListDynamicDisplayActions.size() > 0)
+    if(m_qListDynamicDisplayActions.size() > 0 || m_qListDynamicDisplayWidgets.size() > 0)
     {
-        m_pDynamicDisplayToolBar = addToolBar(tr("Control"));
+        m_pDynamicDisplayToolBar = addToolBar(tr("Display"));
         for(qint32 i = 0; i < m_qListDynamicDisplayActions.size(); ++i)
             m_pDynamicDisplayToolBar->addAction(m_qListDynamicDisplayActions[i]);
+        for(qint32 i = 0; i < m_qListDynamicDisplayWidgets.size(); ++i)
+            m_pDynamicDisplayToolBar->addWidget(m_qListDynamicDisplayWidgets[i]);
     }
 
 }
@@ -473,38 +489,55 @@ void MainWindow::createLogDockWindow()
 //Plugin stuff
 void MainWindow::updatePluginWidget(IPlugin::SPtr pPlugin)
 {
+    m_qListDynamicPluginActions.clear();
+    m_qListDynamicPluginWidgets.clear();
     m_qListDynamicDisplayActions.clear();
+    m_qListDynamicDisplayWidgets.clear();
 
-    //Garbage collecting
-    if(m_pRunWidget)
+    if(!pPlugin.isNull())
     {
-        delete m_pRunWidget;
-        m_pRunWidget = NULL;
-    }
+        // Add Dynamic Plugin Actions
+        m_qListDynamicPluginActions.append(pPlugin->getPluginActions());
+        m_qListDynamicPluginWidgets.append(pPlugin->getPluginWidgets());
 
-    if(pPlugin.isNull())
-    {
-        QWidget* pWidget = new QWidget;
-        setCentralWidget(pWidget);
+        m_sCurPluginName = pPlugin->getName();
+
+        //Garbage collecting
+        if(m_pRunWidget)
+        {
+            delete m_pRunWidget;
+            m_pRunWidget = NULL;
+        }
+
+        if(pPlugin.isNull())
+        {
+            QWidget* pWidget = new QWidget;
+            setCentralWidget(pWidget);
+        }
+        else
+        {
+            if(!m_bIsRunning)
+                setCentralWidget(pPlugin->setupWidget());
+            else
+            {
+                m_pRunWidget = new RunWidget( m_pDisplayManager->show(pPlugin->getOutputConnectors(), m_pTime, m_qListDynamicDisplayActions, m_qListDynamicDisplayWidgets));
+
+                m_pRunWidget->show();
+
+                if(m_bDisplayMax)//ToDo send events to main window
+                {
+                    m_pRunWidget->showFullScreen();
+                    connect(m_pRunWidget, &RunWidget::displayClosed, this, &MainWindow::toggleDisplayMax);
+                }
+                else
+                    setCentralWidget(m_pRunWidget);
+            }
+        }
     }
     else
     {
-        if(!m_bIsRunning)
-            setCentralWidget(pPlugin->setupWidget());
-        else
-        {
-            m_pRunWidget = new RunWidget( m_pDisplayManager->show(pPlugin->getOutputConnectors(), m_pTime, m_qListDynamicDisplayActions));
-
-            m_pRunWidget->show();
-
-            if(m_bDisplayMax)//ToDo send events to main window
-            {
-                m_pRunWidget->showFullScreen();
-                connect(m_pRunWidget, &RunWidget::displayClosed, this, &MainWindow::toggleDisplayMax);
-            }
-            else
-                setCentralWidget(m_pRunWidget);
-        }
+        QWidget* t_pWidgetEmpty = new QWidget;
+        setCentralWidget(t_pWidgetEmpty);
     }
 
     this->createToolBars();

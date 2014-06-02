@@ -87,6 +87,9 @@ INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_X_INCLUDE_DIR}
 
+RESOURCES += \
+    ecgsimulator.qrc
+
 OTHER_FILES += ecgsimulator.json
 
 # Put generated form headers into the origin --> cause other src is pointing at them

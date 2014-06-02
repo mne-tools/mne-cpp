@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the BabyMegAboutWidget class.
+* @brief    Contains the implementation of the BabyMEGAboutWidget class.
 *
 */
 
@@ -53,7 +53,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace BabyMegPlugin;
+using namespace BabyMEGPlugin;
 
 
 //*************************************************************************************************************
@@ -61,7 +61,7 @@ using namespace BabyMegPlugin;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-BabyMegAboutWidget::BabyMegAboutWidget(QWidget *parent)
+BabyMEGAboutWidget::BabyMEGAboutWidget(QWidget *parent)
 : QDialog(parent)
 {
     ui.setupUi(this);
@@ -70,7 +70,7 @@ BabyMegAboutWidget::BabyMegAboutWidget(QWidget *parent)
 
 //*************************************************************************************************************
 
-BabyMegAboutWidget::~BabyMegAboutWidget()
+BabyMEGAboutWidget::~BabyMEGAboutWidget()
 {
 
 }

@@ -90,7 +90,7 @@ public:
     /**
     * Constructs a MneRtClientAboutWidget dialog which is a child of parent.
     *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new MneRtClientAboutWidget becomes a window. If parent is another widget, MneRtClientAboutWidget becomes a child window inside parent. ECGAboutWidget is deleted when its parent is deleted.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new MneRtClientAboutWidget becomes a window. If parent is another widget, MneRtClientAboutWidget becomes a child window inside parent. MneRtClientAboutWidget is deleted when its parent is deleted.
     */
     MneRtClientAboutWidget(QWidget *parent = 0);
 

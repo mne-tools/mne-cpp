@@ -132,6 +132,14 @@ public:
     */
     inline QList< QAction* > getDisplayActions();
 
+    //=========================================================================================================
+    /**
+    * A list of display widgets for the current measurement widget.
+    *
+    * @return a list of display widgets
+    */
+    inline QList< QWidget* > getDisplayWidgets();
+
 protected:
     //=========================================================================================================
     /**
@@ -141,8 +149,17 @@ protected:
     */
     inline void addDisplayAction(QAction* pAction);
 
+    //=========================================================================================================
+    /**
+    * Adds a display widgetto the current measurement widget, which is attached to the toolbar
+    *
+    * @param [in] pWidget  pointer to the widget to be added to the measurement widget
+    */
+    inline void addDisplayWidget(QWidget* pWidget);
+
 private:
-    QList< QAction* >   m_qListDisplayActions;  /**< List of display actions */
+    QList< QAction* >   m_qListDisplayActions;      /**< List of display actions */
+    QList< QWidget* >   m_qListDisplayWidgets;       /**< List of display widgets to attach to the toolbar */
 
 };
 
@@ -159,9 +176,25 @@ QList< QAction* > NewMeasurementWidget::getDisplayActions()
 
 //*************************************************************************************************************
 
+QList< QWidget* > NewMeasurementWidget::getDisplayWidgets()
+{
+    return m_qListDisplayWidgets;
+}
+
+
+//*************************************************************************************************************
+
 inline void NewMeasurementWidget::addDisplayAction(QAction* pAction)
 {
     m_qListDisplayActions.append(pAction);
+}
+
+
+//*************************************************************************************************************
+
+inline void NewMeasurementWidget::addDisplayWidget(QWidget* pWidget)
+{
+    m_qListDisplayWidgets.append(pWidget);
 }
 
 } //NAMESPACE

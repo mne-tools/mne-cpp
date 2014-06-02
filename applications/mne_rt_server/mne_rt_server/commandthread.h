@@ -63,7 +63,7 @@ public:
 
     ~CommandThread();
 
-    void attachCommandReply(QByteArray p_blockReply, qint32 p_iID);
+    void attachCommandReply(QString p_blockReply, qint32 p_iID);
 
     void run();
 
@@ -80,7 +80,7 @@ private:
     qint32 m_iThreadID;
 
     QMutex m_qMutex;
-    QByteArray m_qSendBlock;
+    QString m_qSendData;
 
 };
 

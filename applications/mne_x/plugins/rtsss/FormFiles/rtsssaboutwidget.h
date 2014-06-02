@@ -42,6 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
+//#include "../ui_dummyabout.h"
 #include "../ui_rtsssabout.h"
 
 
@@ -58,6 +59,7 @@
 // DEFINE NAMESPACE RtSssPlugin
 //=============================================================================================================
 
+//namespace DummyToolboxPlugin
 namespace RtSssPlugin
 {
 
@@ -78,20 +80,21 @@ public:
     /**
     * Constructs a RtSssAboutWidget dialog which is a child of parent.
     *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new RtSssAboutWidget becomes a window. If parent is another widget, DummyAboutWidget becomes a child window inside parent. DummyAboutWidget is deleted when its parent is deleted.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new RtSssAboutWidget becomes a window. If parent is another widget, RtSssAboutWidget becomes a child window inside parent. RtSssAboutWidget is deleted when its parent is deleted.
     */
+//    DummyAboutWidget(QWidget *parent = 0);
     RtSssAboutWidget(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
     * Destroys the RtSssAboutWidget.
-    * All DummyAboutWidget's children are deleted first. The application exits if RtSssAboutWidget is the main widget.
+    * All RtSssAboutWidget's children are deleted first. The application exits if RtSssAboutWidget is the main widget.
     */
     ~RtSssAboutWidget();
 
 private:
 
-    Ui::RtSssAboutWidgetClass ui;   /**< Holds the user interface for the RtSssAboutWidget.*/
+    Ui::RtSssAboutWidgetClass ui;		/**< Holds the user interface for the RtSssAboutWidget.*/
 
 };
 

@@ -66,15 +66,56 @@ AnnotationSet::AnnotationSet()
 
 //*************************************************************************************************************
 
-AnnotationSet::AnnotationSet(const Annotation& p_sLHAnnotation, const Annotation& p_sRHAnnotation)
+AnnotationSet::AnnotationSet(const QString &subject_id, qint32 hemi, const QString &atlas, const QString &subjects_dir)
 {
-    if(p_sLHAnnotation.getHemi() == 0)
-        m_qMapAnnots.insert(0, p_sLHAnnotation);
+    Annotation t_Annotation;
+    if(hemi == 0 || hemi == 1)
+    {
+        if(Annotation::read(subject_id, hemi, atlas, subjects_dir, t_Annotation))
+            insert(t_Annotation);
+    }
+    else if(hemi == 2)
+    {
+        if(Annotation::read(subject_id, 0, atlas, subjects_dir, t_Annotation))
+            insert(t_Annotation);
+        if(Annotation::read(subject_id, 1, atlas, subjects_dir, t_Annotation))
+            insert(t_Annotation);
+    }
+
+}
+
+
+//*************************************************************************************************************
+
+AnnotationSet::AnnotationSet(const QString &path, qint32 hemi, const QString &atlas)
+{
+    Annotation t_Annotation;
+    if(hemi == 0 || hemi == 1)
+    {
+        if(Annotation::read(path, hemi, atlas, t_Annotation))
+            insert(t_Annotation);
+    }
+    else if(hemi == 2)
+    {
+        if(Annotation::read(path, 0, atlas, t_Annotation))
+            insert(t_Annotation);
+        if(Annotation::read(path, 1, atlas, t_Annotation))
+            insert(t_Annotation);
+    }
+}
+
+
+//*************************************************************************************************************
+
+AnnotationSet::AnnotationSet(const Annotation& p_LHAnnotation, const Annotation& p_RHAnnotation)
+{
+    if(p_LHAnnotation.hemi() == 0)
+        m_qMapAnnots.insert(0, p_LHAnnotation);
     else
         qWarning("Left hemisphere id is not 0. LH annotation not assigned!");
 
-    if(p_sRHAnnotation.getHemi() == 1)
-        m_qMapAnnots.insert(1, p_sRHAnnotation);
+    if(p_RHAnnotation.hemi() == 1)
+        m_qMapAnnots.insert(1, p_RHAnnotation);
     else
         qWarning("Right hemisphere id is not 1. RH annotation not assigned!");
 
@@ -96,6 +137,20 @@ AnnotationSet::AnnotationSet(const QString& p_sLHFileName, const QString& p_sRHF
 void AnnotationSet::clear()
 {
     m_qMapAnnots.clear();
+}
+
+
+//*************************************************************************************************************
+
+void AnnotationSet::insert(const Annotation& p_Annotation)
+{
+    if(p_Annotation.isEmpty())
+        return;
+
+    qint32 hemi = p_Annotation.hemi();
+    m_qMapAnnots.remove(hemi);
+
+    m_qMapAnnots.insert(hemi, p_Annotation);
 }
 
 
@@ -157,7 +212,39 @@ Annotation& AnnotationSet::operator[] (qint32 idx)
 
 //*************************************************************************************************************
 
+const Annotation AnnotationSet::operator[] (qint32 idx) const
+{
+    if(idx == 0)
+        return m_qMapAnnots[idx];
+    else if(idx == 1)
+        return m_qMapAnnots[idx];
+    else
+    {
+        qWarning("Warning: Index is not '0' or '1'! Returning '0'.");
+        return m_qMapAnnots[0];
+    }
+}
+
+
+//*************************************************************************************************************
+
 Annotation& AnnotationSet::operator[] (QString idt)
+{
+    if(idt.compare("lh") == 0)
+        return m_qMapAnnots[0];
+    else if(idt.compare("rh") == 0)
+        return m_qMapAnnots[1];
+    else
+    {
+        qWarning("Warning: Identifier is not 'lh' or 'rh'! Returning 'lh'.");
+        return m_qMapAnnots[0];
+    }
+}
+
+
+//*************************************************************************************************************
+
+const Annotation AnnotationSet::operator[] (QString idt) const
 {
     if(idt.compare("lh") == 0)
         return m_qMapAnnots[0];

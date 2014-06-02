@@ -42,6 +42,7 @@
 //=============================================================================================================
 
 #include "fs_global.h"
+#include <iostream>
 
 
 //*************************************************************************************************************
@@ -104,10 +105,34 @@ public:
     /**
     * Construts the surface by reading it of the given file.
     *
-    * @param[in] p_sFileName    Surface file
+    * @param[in] p_sFile    Surface file name with path
     */
-    explicit Surface(const QString& p_sFileName);
-    
+    explicit Surface(const QString& p_sFile);
+
+    //=========================================================================================================
+    /**
+    * Construts the surface by reading it of the given file.
+    *
+    * @param[in] subject_id         Name of subject
+    * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh}
+    * @param[in] surf               Name of the surface to load (eg. inflated, orig ...)
+    * @param[in] subjects_dir       True if the curvature should be read (optional, default = true)
+    */
+    explicit Surface(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir);
+
+    //=========================================================================================================
+    /**
+    * Construts the surface by reading it of the given file.
+    *
+    * @param[in] path               path to surface directory
+    * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh}
+    * @param[in] surf               Name of the surface to load (eg. inflated, orig ...)
+    *
+    * @return true if read sucessful, false otherwise
+    */
+    explicit Surface(const QString &path, qint32 hemi, const QString &surf);
+
+
     //=========================================================================================================
     /**
     * Destroys the Surface class.
@@ -126,7 +151,23 @@ public:
     *
     * @return hemisphere id
     */
-    inline qint32 getHemi() const;
+    inline qint32 hemi() const;
+
+    //=========================================================================================================
+    /**
+    * Returns whether Surface is empty.
+    *
+    * @return true if is empty, false otherwise
+    */
+    inline bool isEmpty() const;
+
+    //=========================================================================================================
+    /**
+    * Loaded surface (eg. inflated, orig ...)
+    *
+    * @return the surface
+    */
+    inline QString surf() const;
 
     //=========================================================================================================
     /**
@@ -134,17 +175,125 @@ public:
     *
     * Reads a FreeSurfer surface file
     *
-    * @param[in] p_sFileName    The file to read
-    * @param[out] p_Surface     The read surface
+    * @param[in] subject_id         Name of subject
+    * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh}
+    * @param[in] surf               Name of the surface to load (eg. inflated, orig ...)
+    * @param[in] subjects_dir       Subjects directory
+    * @param[out] p_Surface         The read surface
+    * @param[in] p_bLoadCurvature   True if the curvature should be read (optional, default = true)
     *
+    * @return true if read sucessful, false otherwise
     */
-    static bool read(const QString &p_sFileName, Surface &p_Surface);
+    static bool read(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir, Surface &p_Surface, bool p_bLoadCurvature = true);
 
-public:
-    QString m_fileName; /**< Surface file name. */
-    qint32 hemi;        /**< Hemisphere (lh = 0; rh = 1) */
-    MatrixX3f rr;       /**< alias verts. Vertex coordinates in meters */
-    MatrixX3i tris;     /**< alias faces. The triangle descriptions */
+    //=========================================================================================================
+    /**
+    * mne_read_surface
+    *
+    * Reads a FreeSurfer surface file
+    *
+    * @param[in] path               path to surface directory
+    * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh}
+    * @param[in] surf               Name of the surface to load (eg. inflated, orig ...)
+    * @param[out] p_Surface         The read surface
+    * @param[in] p_bLoadCurvature   True if the curvature should be read (optional, default = true)
+    *
+    * @return true if read sucessful, false otherwise
+    */
+    static bool read(const QString &path, qint32 hemi, const QString &surf, Surface &p_Surface, bool p_bLoadCurvature = true);
+
+    //=========================================================================================================
+    /**
+    * mne_read_surface
+    *
+    * Reads a FreeSurfer surface file
+    *
+    * @param[in] p_sFileName        The file to read
+    * @param[out] p_Surface         The read surface
+    * @param[in] p_bLoadCurvature   True if the curvature should be read (optional, default = true)
+    *
+    * @return true if read sucessful, false otherwise
+    */
+    static bool read(const QString &p_sFileName, Surface &p_Surface, bool p_bLoadCurvature = true);
+
+    //=========================================================================================================
+    /**
+    * reads a binary curvature file into a vector
+    *
+    * @return the read curvature
+    */
+    static VectorXf read_curv(const QString &p_sFileName);
+
+    //=========================================================================================================
+    /**
+    * Efficiently compute vertex normals for triangulated surface
+    *
+    * @param[in] rr     Vertex coordinates in meters
+    * @param[out] tris  The triangle descriptions
+    *
+    * @return The computed normals
+    */
+    static MatrixX3f compute_normals(const MatrixX3f& rr, const MatrixX3i& tris);
+
+    //=========================================================================================================
+    /**
+    * Coordinates of vertices (rr)
+    *
+    * @return coordinates of vertices
+    */
+    inline const MatrixX3f& rr() const;
+
+    //=========================================================================================================
+    /**
+    * The triangle descriptions
+    *
+    * @return triangle descriptions
+    */
+    inline const MatrixX3i& tris() const;
+
+    //=========================================================================================================
+    /**
+    * Normalized surface normals for each vertex
+    *
+    * @return surface normals
+    */
+    inline const MatrixX3f& nn() const;
+
+    //=========================================================================================================
+    /**
+    * FreeSurfer curvature
+    *
+    * @return the FreeSurfer curvature data
+    */
+    inline const VectorXf& curv() const;
+
+    //=========================================================================================================
+    /**
+    * Vector offset
+    *
+    * @return the offset vector
+    */
+    inline const Vector3f& offset() const;
+
+    //=========================================================================================================
+    /**
+    * Vector offset
+    *
+    * @return the offset vector
+    */
+    inline Vector3f& offset();
+
+private:
+    QString m_sFilePath;    /**< Path to surf directory. */
+    QString m_sFileName;    /**< Surface file name. */
+    qint32 m_iHemi;         /**< Hemisphere (lh = 0; rh = 1) */
+    QString m_sSurf;        /**< Loaded surface (eg. inflated, orig ...) */
+    MatrixX3f m_matRR;      /**< alias verts. Vertex coordinates in meters */
+    MatrixX3i m_matTris;    /**< alias faces. The triangle descriptions */
+    MatrixX3f m_matNN;      /**< Normalized surface normals for each vertex. -> not needed since qglbuilder is doing that for us */
+    VectorXf m_vecCurv;     /**< FreeSurfer curvature data */
+
+    Vector3f m_vecOffset; /**< Surface offset */
 };
 
 //*************************************************************************************************************
@@ -152,9 +301,73 @@ public:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline qint32 Surface::getHemi() const
+inline qint32 Surface::hemi() const
 {
-    return hemi;
+    return m_iHemi;
+}
+
+
+//*************************************************************************************************************
+
+inline bool Surface::isEmpty() const
+{
+    return m_iHemi == -1;
+}
+
+
+//*************************************************************************************************************
+
+inline QString Surface::surf() const
+{
+    return m_sSurf;
+}
+
+
+//*************************************************************************************************************
+
+inline const MatrixX3f& Surface::rr() const
+{
+    return m_matRR;
+}
+
+
+//*************************************************************************************************************
+
+inline const MatrixX3i& Surface::tris() const
+{
+    return m_matTris;
+}
+
+
+//*************************************************************************************************************
+
+inline const MatrixX3f& Surface::nn() const
+{
+    return m_matNN;
+}
+
+
+//*************************************************************************************************************
+
+inline const VectorXf& Surface::curv() const
+{
+    return m_vecCurv;
+}
+
+
+//*************************************************************************************************************
+
+inline const Vector3f& Surface::offset() const
+{
+    return m_vecOffset;
+}
+
+
+//*************************************************************************************************************
+
+inline Vector3f& Surface::offset()
+{
+    return m_vecOffset;
 }
 
 } // NAMESPACE
