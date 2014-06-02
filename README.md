@@ -31,7 +31,7 @@ Requirements
 Dependencies
 ============
 
-[Qt5](http://qt-project.org/downloads)
+[>= Qt5.2](http://qt-project.org/downloads)
 
 
 Building
