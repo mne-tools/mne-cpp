@@ -1,0 +1,23 @@
+var searchData=
+[
+  ['babymeg',['BabyMEG',['../class_baby_m_e_g_plugin_1_1_baby_m_e_g.html#aab056584dd43354a277a04ebd6652071',1,'BabyMEGPlugin::BabyMEG']]],
+  ['babymegaboutwidget',['BabyMEGAboutWidget',['../class_baby_m_e_g_plugin_1_1_baby_m_e_g_about_widget.html#aa19d84344f962fd6ec743d92fd347c62',1,'BabyMEGPlugin::BabyMEGAboutWidget']]],
+  ['babymegclient',['BabyMEGClient',['../class_baby_m_e_g_client.html#a2b1953207f4af0dc4350ae6300e4abcf',1,'BabyMEGClient::BabyMEGClient(int myPort, QObject *parent=0)'],['../class_baby_m_e_g_client.html#a2b1953207f4af0dc4350ae6300e4abcf',1,'BabyMEGClient::BabyMEGClient(int myPort, QObject *parent=0)']]],
+  ['babymeginfo',['BabyMEGInfo',['../class_baby_m_e_g_info.html#a346edf2849a36c9f3f3da7588a4a2bb0',1,'BabyMEGInfo::BabyMEGInfo()'],['../class_baby_m_e_g_info.html#a346edf2849a36c9f3f3da7588a4a2bb0',1,'BabyMEGInfo::BabyMEGInfo()']]],
+  ['babymegsetupwidget',['BabyMEGSetupWidget',['../class_baby_m_e_g_plugin_1_1_baby_m_e_g_setup_widget.html#ae0c995f9e2ebe7e52561a1f5561d15a3',1,'BabyMEGPlugin::BabyMEGSetupWidget']]],
+  ['bci',['BCI',['../class_b_c_i_plugin_1_1_b_c_i.html#afe7d74a933d914016da2b437bddc0b3b',1,'BCIPlugin::BCI']]],
+  ['bciaboutwidget',['BCIAboutWidget',['../class_b_c_i_plugin_1_1_b_c_i_about_widget.html#abfd441ef1f362c52accbbca57b41a54a',1,'BCIPlugin::BCIAboutWidget']]],
+  ['bcifeaturewindow',['BCIFeatureWindow',['../class_b_c_i_plugin_1_1_b_c_i_feature_window.html#aac9eb225acdadc8cbbeea3917d868b9c',1,'BCIPlugin::BCIFeatureWindow']]],
+  ['bcisetupwidget',['BCISetupWidget',['../class_b_c_i_plugin_1_1_b_c_i_setup_widget.html#a583b05e56053b2f289cecfddb32be73a',1,'BCIPlugin::BCISetupWidget']]],
+  ['boneb',['boneB',['../class_d_i_s_p_l_i_b_1_1_color_map.html#abb251bb7603ba90d567f8c2d44d06745',1,'DISPLIB::ColorMap']]],
+  ['boneg',['boneG',['../class_d_i_s_p_l_i_b_1_1_color_map.html#ad15b6e9517fecd18bc6c6654662f3cb2',1,'DISPLIB::ColorMap']]],
+  ['boner',['boneR',['../class_d_i_s_p_l_i_b_1_1_color_map.html#a476f9ed39c73ad05a556cd3860b1af90',1,'DISPLIB::ColorMap']]],
+  ['brainmonitoraboutwidget',['BrainMonitorAboutWidget',['../class_brain_monitor_plugin_1_1_brain_monitor_about_widget.html#a1d667e5cc2e4501a56868caa026fd1d1',1,'BrainMonitorPlugin::BrainMonitorAboutWidget']]],
+  ['brainmonitorrunwidget',['BrainMonitorRunWidget',['../class_brain_monitor_plugin_1_1_brain_monitor_run_widget.html#a83490ab15da010c60daa321185b90e5e',1,'BrainMonitorPlugin::BrainMonitorRunWidget']]],
+  ['brainmonitorsetupwidget',['BrainMonitorSetupWidget',['../class_brain_monitor_plugin_1_1_brain_monitor_setup_widget.html#a706d09900699769cafaa9c180b0e01c1',1,'BrainMonitorPlugin::BrainMonitorSetupWidget']]],
+  ['brainview',['BrainView',['../class_d_i_s_p3_d_l_i_b_1_1_brain_view.html#ad37273d6fd7ad16fc06f71385396ee9f',1,'DISP3DLIB::BrainView::BrainView()'],['../class_d_i_s_p3_d_l_i_b_1_1_brain_view.html#a4a8fa70494483efc56abd6b0ac633fb0',1,'DISP3DLIB::BrainView::BrainView(const QString &amp;subject_id, qint32 hemi, const QString &amp;surf, const QString &amp;subjects_dir)'],['../class_d_i_s_p3_d_l_i_b_1_1_brain_view.html#a53257ad41ac0490bce0fdb5a8eed396e',1,'DISP3DLIB::BrainView::BrainView(const QString &amp;subject_id, qint32 hemi, const QString &amp;surf, const QString &amp;atlas, const QString &amp;subjects_dir)'],['../class_d_i_s_p3_d_l_i_b_1_1_brain_view.html#a3ec70de4d06d3343458b3ed6656c3fa4',1,'DISP3DLIB::BrainView::BrainView(const QString &amp;p_sFile)']]],
+  ['buffer',['Buffer',['../class_i_o_buffer_1_1_buffer.html#a2071703c082f507144349ffbccf6b2f3',1,'IOBuffer::Buffer']]],
+  ['buffersizeedited',['bufferSizeEdited',['../class_fiff_simulator_plugin_1_1_fiff_simulator_setup_widget.html#aef433720d14e1c4b0cf843c3b82e2c7a',1,'FiffSimulatorPlugin::FiffSimulatorSetupWidget::bufferSizeEdited()'],['../class_mne_rt_client_plugin_1_1_mne_rt_client_setup_widget.html#a691481c2bcae6c6de354a1930d2095ac',1,'MneRtClientPlugin::MneRtClientSetupWidget::bufferSizeEdited()'],['../class_mne_rt_client_plugin_1_1_neuromag_setup_widget.html#af8d24e216e6afa5b6dd28df20dd12104',1,'MneRtClientPlugin::NeuromagSetupWidget::bufferSizeEdited()']]],
+  ['buildversion',['BuildVersion',['../class_m_n_e_browse_raw_qt_1_1_c_info.html#a708426e6a8b48fc8a74d2b5e0ab65bf2',1,'MNEBrowseRawQt::CInfo::BuildVersion()'],['../class_m_n_e_x_1_1_c_info.html#a3b38fd2a3b1cad1dce858f4ca5e3a517',1,'MNEX::CInfo::BuildVersion()']]],
+  ['bytereceived',['byteReceived',['../class_trigger_control_plugin_1_1_serial_port.html#a46ee46f072bd9fdfddf2a13488f6bbb3',1,'TriggerControlPlugin::SerialPort::byteReceived()'],['../class_trigger_control_plugin_1_1_trigger_control.html#a848dc2f422f232ff3a1cbdf5c1cc5851',1,'TriggerControlPlugin::TriggerControl::byteReceived()']]]
+];

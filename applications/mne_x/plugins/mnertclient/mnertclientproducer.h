@@ -90,9 +90,9 @@ class MneRtClient;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS ECGProducer
+* DECLARE CLASS MneRtClientProducer
 *
-* @brief The ECGProducer class provides a ECG data producer for a given sampling rate.
+* @brief The MneRtClientProducer class provides a Rt Client data producer for a given sampling rate.
 */
 class MneRtClientProducer : public QThread
 {

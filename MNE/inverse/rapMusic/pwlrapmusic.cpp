@@ -175,7 +175,7 @@ MNESourceEstimate PwlRapMusic::calculateInverse(const MatrixXd& p_matMeasurement
 //    }
     p_RapDipoles.clear();
 
-    std::cout << "##### Calculation of RAP MUSIC started ######\n\n";
+    std::cout << "##### Calculation of PWL RAP MUSIC started ######\n\n";
 
     MatrixXT t_matProj_Phi_s(t_matOrthProj.rows(), t_pMatPhi_s->cols());
     //new Version: Calculate projection before
@@ -339,7 +339,7 @@ MNESourceEstimate PwlRapMusic::calculateInverse(const MatrixXd& p_matMeasurement
         //ToDo
     }
 
-    std::cout << "##### Calculation of RAP MUSIC completed ######"<< std::endl << std::endl << std::endl;
+    std::cout << "##### Calculation of PWL RAP MUSIC completed ######"<< std::endl << std::endl << std::endl;
 
     end = clock();
 

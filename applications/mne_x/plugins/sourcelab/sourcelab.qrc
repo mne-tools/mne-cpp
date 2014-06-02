@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/images">
+        <file alias="sourcelab.png">images/sourcelab.png</file>
+    </qresource>
+</RCC>

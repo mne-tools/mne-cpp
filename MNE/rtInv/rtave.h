@@ -142,7 +142,13 @@ public:
 
     //=========================================================================================================
     /**
-    * Stops the RtCov by stopping the producer's thread.
+    * Starts the RtAve by starting the producer's thread.
+    */
+    virtual bool start();
+
+    //=========================================================================================================
+    /**
+    * Stops the RtAve by stopping the producer's thread.
     *
     * @return true if succeeded, false otherwise
     */

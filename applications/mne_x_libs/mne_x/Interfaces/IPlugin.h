@@ -55,6 +55,7 @@
 #include <QThread>
 #include <QCoreApplication>
 #include <QSharedPointer>
+#include <QAction>
 
 
 //*************************************************************************************************************
@@ -148,6 +149,22 @@ public:
 
     //=========================================================================================================
     /**
+    * A list of actions for the current plugin.
+    *
+    * @return a list of plugin actions
+    */
+    inline QList< QAction* > getPluginActions();
+
+    //=========================================================================================================
+    /**
+    * A list of plugin widgets for the current plugin.
+    *
+    * @return a list of plugin widgets
+    */
+    inline QList< QWidget* > getPluginWidgets();
+
+    //=========================================================================================================
+    /**
     * Returns the plugin type.
     * Pure virtual method.
     *
@@ -195,17 +212,70 @@ protected:
     */
     virtual void run() = 0;
 
+    //=========================================================================================================
+    /**
+    * Adds a plugin action to the current plugin.
+    *
+    * @param [in] pAction  pointer to the action to be added to the plugin
+    */
+    inline void addPluginAction(QAction* pAction);
+
+    //=========================================================================================================
+    /**
+    * Adds a plugin widget to the current plugin.
+    *
+    * @param [in] pWidget  pointer to the widget to be added to the plugin
+    */
+    inline void addPluginWidget(QWidget* pWidget);
+
     InputConnectorList m_inputConnectors;    /**< Set of input connectors associated with this plug-in. */
     OutputConnectorList m_outputConnectors;  /**< Set of output connectors associated with this plug-in. */
+
+private:
+    QList< QAction* >   m_qListPluginActions;  /**< List of plugin actions */
+    QList< QWidget* >   m_qListPluginWidgets;  /**< List of plugin widgets */
 };
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
+
 inline bool IPlugin::multiInstanceAllowed() const
 {
     return true;
+}
+
+
+//*************************************************************************************************************
+
+inline QList< QAction* > IPlugin::getPluginActions()
+{
+    return m_qListPluginActions;
+}
+
+
+//*************************************************************************************************************
+
+inline QList< QWidget* > IPlugin::getPluginWidgets()
+{
+    return m_qListPluginWidgets;
+}
+
+
+//*************************************************************************************************************
+
+inline void IPlugin::addPluginAction(QAction* pAction)
+{
+    m_qListPluginActions.append(pAction);
+}
+
+
+//*************************************************************************************************************
+
+inline void IPlugin::addPluginWidget(QWidget* pWidget)
+{
+    m_qListPluginWidgets.append(pWidget);
 }
 
 } //Namespace

@@ -216,8 +216,8 @@ MNESourceEstimate RapMusic::calculateInverse(const FiffEvoked &p_fiffEvoked, boo
         std::cout << "Number of FiffEvoked channels (" << p_fiffEvoked.data.rows() << ") doesn't match the number of channels (" << m_iNumChannels << ") of the forward solution." << std::endl;
         return p_sourceEstimate;
     }
-    else
-        std::cout << "Number of FiffEvoked channels (" << p_fiffEvoked.data.rows() << ") matchs the number of channels (" << m_iNumChannels << ") of the forward solution." << std::endl;
+//    else
+//        std::cout << "Number of FiffEvoked channels (" << p_fiffEvoked.data.rows() << ") matchs the number of channels (" << m_iNumChannels << ") of the forward solution." << std::endl;
 
     //
     // Rap MUSIC Source estimate
@@ -337,8 +337,8 @@ MNESourceEstimate RapMusic::calculateInverse(const MatrixXd &data, float tmin, f
         std::cout << "Number of FiffEvoked channels (" << data.rows() << ") doesn't match the number of channels (" << m_iNumChannels << ") of the forward solution." << std::endl;
         return p_sourceEstimate;
     }
-    else
-        std::cout << "Number of FiffEvoked channels (" << data.rows() << ") matchs the number of channels (" << m_iNumChannels << ") of the forward solution." << std::endl;
+//    else
+//        std::cout << "Number of FiffEvoked channels (" << data.rows() << ") matchs the number of channels (" << m_iNumChannels << ") of the forward solution." << std::endl;
 
     //
     // Rap MUSIC Source estimate

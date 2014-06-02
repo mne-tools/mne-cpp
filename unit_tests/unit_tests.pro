@@ -38,22 +38,31 @@ include(../mne-cpp.pri)
 TEMPLATE = subdirs
 
 SUBDIRS += \
-    mne_lib_tests \
-    mne_rt_tests \
+    test_mne_libs \
+    test_mne_rt \
     mne_x_plugin_com \
-    mne_future_test
+    test_mne_future
 
-contains(MNECPP_CONFIG, isGui) {
+contains(MNECPP_CONFIG, withGui) {
     SUBDIRS += \
-#        mne_disp_test \
-        mne_graph_test \
+        test_mne_disp \
+        test_mne_graph \
 
     qtHaveModule(3d) {
         isEqual(QT_MAJOR_VERSION, 5){
-            isEqual(QT_MINOR_VERSION, 1){
+#            isEqual(QT_MINOR_VERSION, 1){
                 message(Qt3D available && QTVersion >= Qt 5.1: mne 3D tests configured!)
-                SUBDIRS += mne_3d_widget
-            }
+                SUBDIRS += \
+                    mne_3d_widget \
+                    test_mne_cluster \
+                    test_mne_surface \
+                    test_mne_stc
+#            }
         }
     }
+}
+
+contains(MNECPP_CONFIG, withPython) {
+    SUBDIRS += \
+        test_mne_python
 }

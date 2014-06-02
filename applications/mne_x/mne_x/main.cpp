@@ -180,7 +180,9 @@ int main(int argc, char *argv[])
 
     splashscreen->finish(mainWin);
 
-    qInstallMessageHandler(customMessageHandler);
+    //ToDo Check the message handler and FiffSimulator
+
+//    qInstallMessageHandler(customMessageHandler);
 
 
 //    //DEBUG

@@ -1,0 +1,27 @@
+var searchData=
+[
+  ['babymeg',['BabyMEG',['../class_baby_m_e_g_plugin_1_1_baby_m_e_g.html',1,'BabyMEGPlugin']]],
+  ['babymegaboutwidget',['BabyMEGAboutWidget',['../class_baby_m_e_g_plugin_1_1_baby_m_e_g_about_widget.html',1,'BabyMEGPlugin']]],
+  ['babymegaboutwidgetclass',['BabyMEGAboutWidgetClass',['../class_ui_1_1_baby_m_e_g_about_widget_class.html',1,'Ui']]],
+  ['babymegclient',['BabyMEGClient',['../class_baby_m_e_g_client.html',1,'']]],
+  ['babymeginfo',['BabyMEGInfo',['../class_baby_m_e_g_info.html',1,'']]],
+  ['babymegprojectdialog',['BabyMEGProjectDialog',['../class_baby_m_e_g_plugin_1_1_baby_m_e_g_project_dialog.html',1,'BabyMEGPlugin']]],
+  ['babymegprojectdialog',['BabyMEGProjectDialog',['../class_ui_1_1_baby_m_e_g_project_dialog.html',1,'Ui']]],
+  ['babymegsetupwidget',['BabyMEGSetupWidget',['../class_baby_m_e_g_plugin_1_1_baby_m_e_g_setup_widget.html',1,'BabyMEGPlugin']]],
+  ['babymegsetupwidgetclass',['BabyMEGSetupWidgetClass',['../class_ui_1_1_baby_m_e_g_setup_widget_class.html',1,'Ui']]],
+  ['babymegsquidcontroldgl',['BabyMEGSQUIDControlDgl',['../class_baby_m_e_g_plugin_1_1_baby_m_e_g_s_q_u_i_d_control_dgl.html',1,'BabyMEGPlugin']]],
+  ['babymegsquidcontroldgl',['BabyMEGSQUIDControlDgl',['../class_ui_1_1_baby_m_e_g_s_q_u_i_d_control_dgl.html',1,'Ui']]],
+  ['bci',['BCI',['../class_b_c_i_plugin_1_1_b_c_i.html',1,'BCIPlugin']]],
+  ['bciaboutwidget',['BCIAboutWidget',['../class_b_c_i_plugin_1_1_b_c_i_about_widget.html',1,'BCIPlugin']]],
+  ['bciaboutwidgetclass',['BCIAboutWidgetClass',['../class_ui_1_1_b_c_i_about_widget_class.html',1,'Ui']]],
+  ['bcifeaturewindow',['BCIFeatureWindow',['../class_b_c_i_plugin_1_1_b_c_i_feature_window.html',1,'BCIPlugin']]],
+  ['bcifeaturewindowclass',['BCIFeatureWindowClass',['../class_ui_1_1_b_c_i_feature_window_class.html',1,'Ui']]],
+  ['bcisetupclass',['BCISetupClass',['../class_ui_1_1_b_c_i_setup_class.html',1,'Ui']]],
+  ['bcisetupwidget',['BCISetupWidget',['../class_b_c_i_plugin_1_1_b_c_i_setup_widget.html',1,'BCIPlugin']]],
+  ['brainmonitor',['BrainMonitor',['../class_brain_monitor_plugin_1_1_brain_monitor.html',1,'BrainMonitorPlugin']]],
+  ['brainmonitoraboutwidget',['BrainMonitorAboutWidget',['../class_brain_monitor_plugin_1_1_brain_monitor_about_widget.html',1,'BrainMonitorPlugin']]],
+  ['brainmonitorrunwidget',['BrainMonitorRunWidget',['../class_brain_monitor_plugin_1_1_brain_monitor_run_widget.html',1,'BrainMonitorPlugin']]],
+  ['brainmonitorsetupwidget',['BrainMonitorSetupWidget',['../class_brain_monitor_plugin_1_1_brain_monitor_setup_widget.html',1,'BrainMonitorPlugin']]],
+  ['brainview',['BrainView',['../class_d_i_s_p3_d_l_i_b_1_1_brain_view.html',1,'DISP3DLIB']]],
+  ['buffer',['Buffer',['../class_i_o_buffer_1_1_buffer.html',1,'IOBuffer']]]
+];

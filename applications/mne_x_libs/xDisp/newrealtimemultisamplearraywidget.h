@@ -59,6 +59,7 @@
 #include <QPainterPath>
 #include <QMutex>
 #include <QThread>
+#include <QTableView>
 
 
 //*************************************************************************************************************
@@ -86,8 +87,6 @@ namespace XDISPLIB
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
-
-class RoiSelectionWidget;
 
 
 //*************************************************************************************************************
@@ -250,9 +249,11 @@ private slots:
     void minValueChanged(double);
 
 private:
-    void actualize();                                               /**< Actualize member variables. Like y position, scaling factor, middle value of the frame and the highest sampling rate to calculate the sample width.*/
-    Ui::NewRealTimeMultiSampleArrayClass   ui;                      /**< The user interface of the RealTimeSampleArray widget. */
     QSharedPointer<NewRealTimeMultiSampleArray> m_pRTMSA_New;       /**< The real-time sample array measurement. */
+
+    void actualize();                                               /**< Actualize member variables. Like y position, scaling factor, middle value of the frame and the highest sampling rate to calculate the sample width.*/
+
+    Ui::NewRealTimeMultiSampleArrayClass   ui;                      /**< The user interface of the RealTimeSampleArray widget. */
 
     quint32                         m_uiMaxNumChannels;
     quint32                         m_uiNumChannels;
@@ -294,15 +295,8 @@ private:
     QSharedPointer<QTime>           m_pTime;                        /**< The application time. */
     QSharedPointer<QTime>           m_pTimeCurrentDisplay;          /**< Time which corresponds to the x starting position of each segment. */
     static QList<double>            s_listSamplingRates;            /**< All real-time sample array sampling rates of the current display. */
-
-    QAction*                        m_pActionSelectRoi;     /**< show roi select widget ToDo move this to the actual view-> and make a dynamical menu*/
-
-    void showRoiSelectionWidget();                          /**< Implements the show roi selection widget. ToDo: Move this to the actual widget*/
-
-    QSharedPointer<XDISPLIB::RoiSelectionWidget> m_pRoiSelectionWidget;    /**< ROI selection widget, ToDo: move this to the xDisp */
-
 };
 
 } // NAMESPACE
 
-#endif // REALTIMEMULTISAMPLEARRAYNEWWIDGET_H
+#endif // NEWREALTIMEMULTISAMPLEARRAYNEWWIDGET_H
