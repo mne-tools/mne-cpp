@@ -8,7 +8,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -71,41 +71,103 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a SensorItem which is a child of parent.
+    * The outer bounds of the item as a rectangle.
     *
-    * @param [in] dispChName    channel name to display
-    * @param [in] chNumber      channel number to store
-    * @param [in] coordinate    coordinates of the item
-    * @param [in] size          size of the item
-    * @param [in] parent        parent of item
+    * @return the outer bounds of the item as a rectangle.
     */
     QRectF boundingRect() const;
-    QPainterPath shape() const;
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *item, QWidget *widget);
 
+    //=========================================================================================================
+    /**
+    * The shape of this item as a QPainterPath in local coordinates.
+    *
+    * @return the shape of this item as a QPainterPath in local coordinates.
+    */
+    QPainterPath shape() const;
+
+    //=========================================================================================================
+    /**
+    * Paints the contents of an item in local coordinates.
+    *
+    * @param [in] painter   painter used to paint
+    * @param [in] option    style options for the item
+    * @param [in] widget    points to the widget that is being painted on
+    */
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget = 0);
+
+    //=========================================================================================================
+    /**
+    * Returns the channel display name.
+    *
+    * @return the name to display
+    */
     inline const QString& getDisplayChName() const;
 
+    //=========================================================================================================
+    /**
+    * Returns the channel number.
+    *
+    * @return the channel number
+    */
     inline qint32 getChNumber() const;
 
+    //=========================================================================================================
+    /**
+    * Returns the channel selection state
+    *
+    * @return whether channel is selected
+    */
     inline bool isSelected() const;
 
+    //=========================================================================================================
+    /**
+    * Set the selection state
+    *
+    * @param [in] selected      sthe new selection state
+    */
     inline void setSelected(bool selected);
 
 
 protected:
-//    void mousePressEvent(QGraphicsSceneMouseEvent *event);
-//    void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
+    //=========================================================================================================
+    /**
+    * Receive mouse press events for this item.
+    *
+    * @param [in] event     the mouse event
+    */
+    void mousePressEvent(QGraphicsSceneMouseEvent *event);
+
+    //=========================================================================================================
+    /**
+    * Receive mouse move events for this item.
+    *
+    * @param [in] event     the mouse event
+    */
+    void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
+
+    //=========================================================================================================
+    /**
+    * Receive mouse release events for this item.
+    *
+    * @param [in] event     the mouse event
+    */
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 
 signals:
+    //=========================================================================================================
+    /**
+    * If item changed
+    *
+    * @param [in] item      the sensor item itself
+    */
     void itemChanged(SensorItem* item);
 
 private:
-    QString m_sDisplayChName;
-    qint32 m_iChNumber;
-    QPointF m_qPointFCoord;
-    QSizeF m_qSizeFDim;
-    bool m_bIsSelected;
+    QString m_sDisplayChName;   /**< channel name to display */
+    qint32 m_iChNumber;         /**< channel number */
+    QPointF m_qPointFCoord;     /**< item coordinates */
+    QSizeF m_qSizeFDim;         /**< item dimensions */
+    bool m_bIsSelected;         /**< channel selection state */
 };
 
 
