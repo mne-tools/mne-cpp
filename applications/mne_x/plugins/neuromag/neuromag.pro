@@ -100,6 +100,9 @@ INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_X_INCLUDE_DIR}
 
+RESOURCES += \
+    neuromag.qrc
+
 OTHER_FILES += \
     neuromag.json
 

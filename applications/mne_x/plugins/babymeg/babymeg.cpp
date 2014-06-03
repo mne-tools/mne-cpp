@@ -156,7 +156,7 @@ void BabyMEG::initConnector()
         m_pRTMSABabyMEG = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "RtClient", "MNE Rt Client");
 
         m_pRTMSABabyMEG->data()->initFromFiffInfo(m_pFiffInfo);
-        m_pRTMSABabyMEG->data()->setMultiArraySize(10);
+        m_pRTMSABabyMEG->data()->setMultiArraySize(500);
 
         m_pRTMSABabyMEG->data()->setSamplingRate(m_pFiffInfo->sfreq);
 

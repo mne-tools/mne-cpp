@@ -98,6 +98,9 @@ INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_X_INCLUDE_DIR}
 
+RESOURCES += \
+    fiffsimulator.qrc
+
 OTHER_FILES += \
     fiffsimulator.json
 
@@ -108,6 +111,3 @@ unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
 
 # suppress visibility warnings
 unix: QMAKE_CXXFLAGS += -Wno-attributes
-
-RESOURCES += \
-    fiffsimulator.qrc

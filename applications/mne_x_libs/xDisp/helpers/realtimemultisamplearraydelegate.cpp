@@ -157,7 +157,12 @@ void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, 
                 fMaxValue = 1e-10f;// m_qSettings.value("RawDelegate/max_meg_grad").toDouble();
             }
             else if(unit == FIFF_UNIT_T)
-                fMaxValue = 1e-11f;// m_qSettings.value("RawDelegate/max_meg_mag").toDouble();
+            {
+                if(t_pModel->getCoil(index.row()) == FIFFV_COIL_BABY_MAG)
+                    fMaxValue = 1e-4f;
+                else
+                    fMaxValue = 1e-11f;// m_qSettings.value("RawDelegate/max_meg_mag").toDouble();
+            }
             break;
         }
         case FIFFV_EEG_CH: {

@@ -67,7 +67,8 @@ using namespace XMEASLIB;
 //=============================================================================================================
 
 DummyToolbox::DummyToolbox()
-: m_pDummyInput(NULL)
+: m_bIsRunning(false)
+, m_pDummyInput(NULL)
 , m_pDummyOutput(NULL)
 , m_pDummyBuffer(new dBuffer(1024))
 {
@@ -78,7 +79,8 @@ DummyToolbox::DummyToolbox()
 
 DummyToolbox::~DummyToolbox()
 {
-    stop();
+    if(this->isRunning())
+        stop();
 }
 
 
@@ -119,6 +121,11 @@ void DummyToolbox::init()
 
 bool DummyToolbox::start()
 {
+    //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
+    if(this->isRunning())
+        QThread::wait();
+
+    m_bIsRunning = true;
     QThread::start();
     return true;
 }
@@ -128,9 +135,10 @@ bool DummyToolbox::start()
 
 bool DummyToolbox::stop()
 {
-    // Stop threads
-    QThread::terminate();
-    QThread::wait();
+    m_bIsRunning = false;
+
+    m_pDummyBuffer->releaseFromPop();
+    m_pDummyBuffer->releaseFromPush();
 
     m_pDummyBuffer->clear();
 
@@ -185,7 +193,7 @@ void DummyToolbox::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
 void DummyToolbox::run()
 {
-    while (true)
+    while(m_bIsRunning)
     {
         /* Dispatch the inputs */
         double v = m_pDummyBuffer->pop();

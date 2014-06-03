@@ -43,8 +43,6 @@
 #include "realtimemultisamplearraywidget.h"
 //#include "annotationwindow.h"
 
-#include "roiselectionwidget.h"
-
 #include <xMeas/newrealtimemultisamplearray.h>
 
 #include <Eigen/Core>
@@ -113,6 +111,7 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
 , m_iT(10)
 , m_fSamplingRate(1024)
 , m_fDesiredSamplingRate(128)
+, m_pSensorModel(NULL)
 {
     m_pDoubleSpinBoxZoom = new QDoubleSpinBox(this);
     m_pDoubleSpinBoxZoom->setMinimum(0.3);
@@ -131,11 +130,12 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
     connect(m_pSpinBoxTimeScale, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &RealTimeMultiSampleArrayWidget::timeWindowChanged);
     addDisplayWidget(m_pSpinBoxTimeScale);
 
-    m_pActionSelectRoi = new QAction(QIcon(":/images/selectRoi.png"), tr("Shows the region selection widget (F12)"),this);
-    m_pActionSelectRoi->setShortcut(tr("F12"));
-    m_pActionSelectRoi->setStatusTip(tr("Shows the region selection widget (F12)"));
-    connect(m_pActionSelectRoi, &QAction::triggered, this, &RealTimeMultiSampleArrayWidget::showRoiSelectionWidget);
-    addDisplayAction(m_pActionSelectRoi);
+    m_pActionSelectSensors = new QAction(QIcon(":/images/selectSensors.png"), tr("Shows the region selection widget (F12)"),this);
+    m_pActionSelectSensors->setShortcut(tr("F12"));
+    m_pActionSelectSensors->setStatusTip(tr("Shows the region selection widget (F12)"));
+    m_pActionSelectSensors->setVisible(false);
+    connect(m_pActionSelectSensors, &QAction::triggered, this, &RealTimeMultiSampleArrayWidget::showSensorSelectionWidget);
+    addDisplayAction(m_pActionSelectSensors);
 
     if(m_pTableView)
         delete m_pTableView;
@@ -169,6 +169,17 @@ void RealTimeMultiSampleArrayWidget::update(XMEASLIB::NewMeasurement::SPtr)
     {
         m_qListChInfo = m_pRTMSA->chInfo();
         m_fSamplingRate = m_pRTMSA->getSamplingRate();
+
+        QFile file(m_pRTMSA->getXMLLayoutFile());
+        if (!file.open(QFile::ReadOnly | QFile::Text))
+            qDebug() << QString("Cannot read file %1:\n%2.").arg(m_pRTMSA->getXMLLayoutFile()).arg(file.errorString());
+        else
+        {
+            m_pSensorModel = new SensorModel(&file, this);
+            m_pSensorModel->mapChannelInfo(m_qListChInfo);
+            m_pActionSelectSensors->setVisible(true);
+        }
+
         init();
     }
     else
@@ -252,10 +263,10 @@ void RealTimeMultiSampleArrayWidget::channelContextMenu(QPoint pos)
 //    });
 
     // non C++11 alternative
-    m_qVecCurrentSelection.clear();
+    m_qListCurrentSelection.clear();
     for(qint32 i = 0; i < selected.size(); ++i)
         if(selected[i].column() == 1)
-            m_qVecCurrentSelection.append(m_pRTMSAModel->getIdxSelMap()[selected[i].row()]);
+            m_qListCurrentSelection.append(m_pRTMSAModel->getIdxSelMap()[selected[i].row()]);
 
     //create custom context menu and actions
     QMenu *menu = new QMenu(this);
@@ -267,6 +278,7 @@ void RealTimeMultiSampleArrayWidget::channelContextMenu(QPoint pos)
     //undo selection
     QAction* resetAppliedSelection = menu->addAction(tr("Reset selection"));
     connect(resetAppliedSelection,&QAction::triggered, m_pRTMSAModel, &RealTimeMultiSampleArrayModel::resetSelection);
+    connect(resetAppliedSelection,&QAction::triggered, this, &RealTimeMultiSampleArrayWidget::resetSelection);
 
     //show context menu
     menu->popup(m_pTableView->viewport()->mapToGlobal(pos));
@@ -348,12 +360,23 @@ void RealTimeMultiSampleArrayWidget::timeWindowChanged(int T)
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayWidget::showRoiSelectionWidget()
+void RealTimeMultiSampleArrayWidget::showSensorSelectionWidget()
 {
-    if(!m_pRoiSelectionWidget)
-        m_pRoiSelectionWidget = QSharedPointer<XDISPLIB::RoiSelectionWidget>(new XDISPLIB::RoiSelectionWidget);
+    if(!m_pSensorSelectionWidget)
+    {
+        m_pSensorSelectionWidget = QSharedPointer<SensorWidget>(new SensorWidget);
 
-    m_pRoiSelectionWidget->show();
+        m_pSensorSelectionWidget->setWindowTitle("Channel Selection");
+
+        if(m_pSensorModel)
+        {
+            m_pSensorSelectionWidget->setModel(m_pSensorModel);
+
+            connect(m_pSensorModel, &SensorModel::newSelection, m_pRTMSAModel, &RealTimeMultiSampleArrayModel::selectRows);
+        }
+
+    }
+    m_pSensorSelectionWidget->show();
 }
 
 
@@ -361,5 +384,21 @@ void RealTimeMultiSampleArrayWidget::showRoiSelectionWidget()
 
 void RealTimeMultiSampleArrayWidget::applySelection()
 {
-    m_pRTMSAModel->selectRows(m_qVecCurrentSelection);
+    m_pRTMSAModel->selectRows(m_qListCurrentSelection);
+
+    m_pSensorModel->silentUpdateSelection(m_qListCurrentSelection);
 }
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayWidget::resetSelection()
+{
+    // non C++11 alternative
+    m_qListCurrentSelection.clear();
+    for(qint32 i = 0; i < m_qListChInfo.size(); ++i)
+        m_qListCurrentSelection.append(i);
+
+    applySelection();
+}
+

@@ -238,12 +238,27 @@ fiff_int_t RealTimeMultiSampleArrayModel::getUnit(qint32 row) const
         return m_qListChInfo[chRow].getUnit();;
     }
     else
-        return -1;
+        return FIFF_UNIT_NONE;
 }
+
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayModel::selectRows(const QVector<qint32> &selection)
+fiff_int_t RealTimeMultiSampleArrayModel::getCoil(qint32 row) const
+{
+    if(row < m_qMapIdxRowSelection.size())
+    {
+        qint32 chRow = m_qMapIdxRowSelection[row];
+        return m_qListChInfo[chRow].getCoil();;
+    }
+    else
+        return FIFFV_COIL_NONE;
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayModel::selectRows(const QList<qint32> &selection)
 {
     beginResetModel();
 
@@ -258,6 +273,8 @@ void RealTimeMultiSampleArrayModel::selectRows(const QVector<qint32> &selection)
             ++count;
         }
     }
+
+    emit newSelection(selection);
 
     endResetModel();
 }
