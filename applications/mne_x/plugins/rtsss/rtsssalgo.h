@@ -101,6 +101,7 @@ public:
     QList<MatrixXd> getLinEqn();
 
     void setMEGInfo(FiffInfo::SPtr fiffinfo);
+    void setSSSParameter(QList<int>);
     qint32 getNumMEGCh();
     void setMEGsignal(MatrixXd megfrombuffer);
 
@@ -110,13 +111,13 @@ private:
     void getCoilInfoVectorView();
     void getCoilInfoVectorView4Sim();
     void getCoilInfoBabyMEG4Sim();
-    QList<MatrixXd> getSSSEqn(int, int);
-    void getSSSBasis(VectorXd, VectorXd, VectorXd, int, int);
+    QList<MatrixXd> getSSSEqn(qint32, qint32);
+    void getSSSBasis(VectorXd, VectorXd, VectorXd, qint32, qint32);
     void getCartesianToSpherCoordinate(VectorXd, VectorXd, VectorXd);
     void getSphereToCartesianVector();
     int strmatch(char, char);
 
-    int NumCoil;
+    qint32 NumCoil;
     QList<MatrixXd> CoilT;
     QList<QString> CoilName, CoilTk;
     QList<MatrixXd> CoilRk, CoilWk;
@@ -124,6 +125,7 @@ private:
     VectorXd MEGIn, MEGOut, MEGNoise;
     MatrixXd MEGData;
 
+    qint32 LInRR, LOutRR, LInOLS, LOutOLS;
     Vector3d Origin;
     MatrixXd BInX, BInY, BInZ, BOutX, BOutY, BOutZ;
     MatrixXd EqnInRR, EqnOutRR, EqnIn, EqnOut, EqnARR, EqnA, EqnB;

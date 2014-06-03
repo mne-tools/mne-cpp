@@ -51,7 +51,7 @@ QList<MatrixXd> RtSssAlgo::buildLinearEqn()
 {
     QList<MatrixXd> Eqn, EqnRR;
     QList<MatrixXd> LinEqn;
-    int LInRR, LOutRR, LIn, LOut;
+    qint32 LIn, LOut;
 //    MatrixXd EqnInRR, EqnOutRR, EqnIn, EqnOut;
 
 //    int MagScale;
@@ -72,16 +72,15 @@ QList<MatrixXd> RtSssAlgo::buildLinearEqn()
 //        std::cout << "loading coil information (BabyMEG)..... ** finisehd **" << endl;
 //    }
 
-    LInRR = 5;
-    LOutRR = 4;
-    LIn = 8;
-    LOut = 4;
-
 //  Compute SSS equation
-    EqnRR = getSSSEqn(LInRR, LOutRR);
+    LIn = LInRR;
+    LOut = LOutRR;
+    EqnRR = getSSSEqn(LIn, LOut);
     EqnInRR = EqnRR[0];
     EqnOutRR = EqnRR[1];
 
+    LIn = LInOLS;
+    LOut = LOutOLS;
     Eqn = getSSSEqn(LIn, LOut);
     EqnIn = Eqn[0];
     EqnOut = Eqn[1];
@@ -108,6 +107,7 @@ QList<MatrixXd> RtSssAlgo::buildLinearEqn()
         if (CoilGrad(i) == 0) CoilScale(i) = MagScale;
 //        std::cout <<  "i=" << i << "CoilGrad: " << CoilGrad(i) << ",  CoilScale: " << CoilScale(i) << std::endl;
     }
+
     EqnARR << EqnInRR, EqnOutRR;
     EqnA << EqnIn, EqnOut;
 
@@ -138,6 +138,19 @@ QList<MatrixXd> RtSssAlgo::buildLinearEqn()
 //    std::cout << "building SSS linear equation .....finished !" << endl;
 
     return LinEqn;
+}
+
+void RtSssAlgo::setSSSParameter(QList<int> expansionOrder)
+{
+//    LInRR = 5;
+//    LOutRR = 4;
+//    LInOLS = 8;
+//    LOutOLS = 4;
+
+    LInRR = expansionOrder[0];
+    LOutRR = expansionOrder[1];
+    LInOLS = expansionOrder[2];
+    LOutOLS = expansionOrder[3];
 }
 
 void RtSssAlgo::setMEGInfo(FiffInfo::SPtr fiffInfo)
@@ -236,6 +249,9 @@ void RtSssAlgo::setMEGInfo(FiffInfo::SPtr fiffInfo)
 
 }
 
+
+
+
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //% build linear equation for SSS
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -257,7 +273,7 @@ void RtSssAlgo::setMEGInfo(FiffInfo::SPtr fiffInfo)
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //      function [EqnIn,EqnOut] = get_SSS_Eqn(Origin,LIn,LOut,CoilTk,CoilNk,CoilWk,CoilRk,CoilName,CoilT)
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-QList<MatrixXd> RtSssAlgo::getSSSEqn(int LIn, int LOut)
+QList<MatrixXd> RtSssAlgo::getSSSEqn(qint32 LIn, qint32 LOut)
 {
     int NumBIn, NumBOut;
 //    int coil_index=1;
@@ -358,7 +374,7 @@ QList<MatrixXd> RtSssAlgo::getSSSEqn(int LIn, int LOut)
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //      function [BInX,BInY,BInZ,BOutX,BOutY,BOutZ] = get_SSS_Basis(X,Y,Z,LIn,LOut)
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-void RtSssAlgo::getSSSBasis(VectorXd X, VectorXd Y, VectorXd Z, int LIn, int LOut)
+void RtSssAlgo::getSSSBasis(VectorXd X, VectorXd Y, VectorXd Z, qint32 LIn, qint32 LOut)
 {
     int NumSample, NumBIn, NumBOut;
     int LMax;

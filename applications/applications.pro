@@ -43,7 +43,7 @@ SUBDIRS += \
 contains(MNECPP_CONFIG, withGui) {
     SUBDIRS += \
         mne_x_libs \
-        mne_browse_raw_qt \
+#        mne_browse_raw_qt \
         mne_x
 
     qtHaveModule(3d) {

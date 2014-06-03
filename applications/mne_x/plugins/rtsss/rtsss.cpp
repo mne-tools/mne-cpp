@@ -38,8 +38,6 @@
 // INCLUDES
 //=============================================================================================================
 
-//#include "dummytoolbox.h"
-//#include "FormFiles/dummysetupwidget.h"
 #include "rtsss.h"
 #include "FormFiles/rtssssetupwidget.h"
 #include "rtsssalgo.h"
@@ -58,7 +56,6 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-//using namespace DummyToolboxPlugin;
 using namespace RtSssPlugin;
 using namespace FIFFLIB;
 using namespace MNEX;
@@ -124,15 +121,8 @@ void RtSss::init()
     m_inputConnectors.append(m_pRTMSAInput);
 
     // Output
-    m_pRTSAOutput = PluginOutputData<NewRealTimeSampleArray>::create(this, "RtSssOut", "RtSss output data");
-    m_outputConnectors.append(m_pRTSAOutput);
-
-    m_pRTSAOutput->data()->setName("RtSss Output");
-    m_pRTSAOutput->data()->setUnit("mV");
-    m_pRTSAOutput->data()->setMinValue(-200);
-    m_pRTSAOutput->data()->setMaxValue(360);
-    m_pRTSAOutput->data()->setSamplingRate(256.0/1.0);
-
+    m_pRTMSAOutput = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "RtSssOut", "RtSss output data");
+    m_outputConnectors.append(m_pRTMSAOutput);
 }
 
 
@@ -188,10 +178,47 @@ QString RtSss::getName() const
 
 QWidget* RtSss::setupWidget()
 {
-    RtSssSetupWidget* setupWidget = new RtSssSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
-    return setupWidget;
+    std::cout << "*********** SetUpWidget ************" << std::endl;
+
+    RtSssSetupWidget* widget = new RtSssSetupWidget(this);  //widget is later distroyed by CentralWidget - so it has to be created everytime new
+
+    connect(widget, &RtSssSetupWidget::signalNewLinRR, this, &RtSss::setLinRR);
+    connect(widget, &RtSssSetupWidget::signalNewLoutRR, this, &RtSss::setLoutRR);
+    connect(widget, &RtSssSetupWidget::signalNewLin, this, &RtSss::setLin);
+    connect(widget, &RtSssSetupWidget::signalNewLout, this, &RtSss::setLout);
+
+    LinRR = widget->getLinRR();
+    LoutRR = widget->getLoutRR();
+    Lin = widget->getLin();
+    Lout = widget->getLout();
+
+    return widget;
 }
 
+
+void RtSss::setLinRR(int val)
+{
+//    std::cout <<" new LinRR: " << val << std::endl;
+    LinRR = val;
+}
+
+void RtSss::setLoutRR(int val)
+{
+//    std::cout <<" new LoutRR: " << val << std::endl;
+    LoutRR = val;
+}
+
+void RtSss::setLin(int val)
+{
+//    std::cout <<" new Lin: " << val << std::endl;
+    Lin = val;
+}
+
+void RtSss::setLout(int val)
+{
+//    std::cout <<" new Lout: " << val << std::endl;
+    Lout = val;
+}
 
 //*************************************************************************************************************
 
@@ -223,7 +250,6 @@ void RtSss::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 }
 
 
-
 //*************************************************************************************************************
 
 void RtSss::run()
@@ -247,6 +273,13 @@ void RtSss::run()
     // Set MEG channel infomation
     rsss.setMEGInfo(m_pFiffInfo);
 
+    // Init output
+    m_pRTMSAOutput->data()->initFromFiffInfo(m_pFiffInfo);
+    m_pRTMSAOutput->data()->setMultiArraySize(10);
+    m_pRTMSAOutput->data()->setVisibility(true);
+
+    std::cout << "LinRR (run): " << LinRR << ", LoutRR (run): " << LoutRR <<", Lin (run): " << Lin <<", Lout (run): " << Lout << std::endl;
+
     // Find the number of MEG channel
     qint32 nmegchan = rsss.getNumMEGCh();
 //    std::cout << "number of meg channels: " << nmegchan << std::endl;
@@ -257,7 +290,7 @@ void RtSss::run()
 
     while(m_bIsRunning)
     {
-        std::cout << "Run count: " << ++cntrun << std::endl;
+        std::cout << "Run count: " << ++cntrun << ", " ; //<< std::endl;
 
 //        if (cntrun == 2) stop();
 
@@ -267,7 +300,7 @@ void RtSss::run()
         {
             // * Dispatch the inputs * //
             MatrixXd t_mat = m_pRtSssBuffer->pop();
-            std::cout << "size of t_mat (run): " << t_mat.rows() << " x " << t_mat.cols() << std::endl;
+//            std::cout << "size of t_mat (run): " << t_mat.rows() << " x " << t_mat.cols() << std::endl;
 
             qint32 k = 0;
             MatrixXd meg_mat(nmegchan, t_mat.cols());
@@ -278,19 +311,22 @@ void RtSss::run()
                     meg_mat.row(k) = t_mat.row(i);
                     k++;
                 }
-            std::cout << "size meg_mat: " << meg_mat.rows() << " x " << meg_mat.cols() << std::endl;
+//            std::cout << "size meg_mat: " << meg_mat.rows() << " x " << meg_mat.cols() << std::endl;
             rsss.setMEGsignal(meg_mat.col(0));
 //            rsss.setMEGsignal(meg_mat);
 
-            std::cout << "building SSS linear equation .....";
-            lineqn = rsss.buildLinearEqn();
-            std::cout << " finished !" << std::endl;
+//            std::cout << "building SSS linear equation .....";
+//            lineqn = rsss.buildLinearEqn();
+//            std::cout << " finished !" << std::endl;
 
-            std::cout << "running rtSSS .....";
-            sssRR = rsss.getSSSRR(lineqn[0], lineqn[1], lineqn[2], lineqn[3], lineqn[4]);
-            std::cout << " finished! " << std::endl;
+//            std::cout << "running rtSSS .....";
+//            sssRR = rsss.getSSSRR(lineqn[0], lineqn[1], lineqn[2], lineqn[3], lineqn[4]);
+//            std::cout << " finished! " << std::endl;
+
+            m_pRTMSAOutput->data()->setValue(meg_mat.col(0).cast<double>());
+
         }
-//        m_pRTSAOutput->data()->setValue(v);
+
     }
 
     m_bProcessData = false;
