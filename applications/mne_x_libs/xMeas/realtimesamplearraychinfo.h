@@ -177,13 +177,29 @@ public:
     */
     inline fiff_int_t getUnit() const;
 
+    //=========================================================================================================
+    /**
+    * Sets the coil of the RealTimeSampleArray sensor.
+    *
+    * @param [in] coil description of the sensor.
+    */
+    inline void setCoil(fiff_int_t coil);
+
+    //=========================================================================================================
+    /**
+    * Returns the coil type of the RealTimeSampleArray sensor.
+    *
+    * @return the coil type of the sensor.
+    */
+    inline fiff_int_t getCoil() const;
+
 private:
     QString     m_qStringChName;    /**< The channel name.*/
     double      m_dMinValue;        /**< The minimal value.*/
     double      m_dMaxValue;        /**< The maximal value.*/
     qint32      m_iKind;            /**< The channel kind.*/
-    fiff_int_t  m_iUnit;     /**< Unit of the data of the measurement.*/
-
+    fiff_int_t  m_iUnit;            /**< Unit of the data of the measurement.*/
+    fiff_int_t  m_iCoilType;        /**< What kind of coil. */
 };
 
 
@@ -268,6 +284,22 @@ inline void RealTimeSampleArrayChInfo::setUnit(fiff_int_t unit)
 inline fiff_int_t RealTimeSampleArrayChInfo::getUnit() const
 {
     return m_iUnit;
+}
+
+
+//*************************************************************************************************************
+
+inline void RealTimeSampleArrayChInfo::setCoil(fiff_int_t coil)
+{
+    m_iCoilType = coil;
+}
+
+
+//*************************************************************************************************************
+
+inline fiff_int_t RealTimeSampleArrayChInfo::getCoil() const
+{
+    return m_iCoilType;
 }
 
 } // NAMESPACE

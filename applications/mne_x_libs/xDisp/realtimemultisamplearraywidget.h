@@ -47,6 +47,8 @@
 #include "helpers/realtimemultisamplearraymodel.h"
 #include "helpers/realtimemultisamplearraydelegate.h"
 
+#include "helpers/sensorwidget.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -86,8 +88,6 @@ namespace XDISPLIB
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
-
-class RoiSelectionWidget;
 
 
 //*************************************************************************************************************
@@ -259,12 +259,16 @@ private:
     */
     void timeWindowChanged(int T);
 
-    QAction*    m_pActionSelectRoi;                         /**< show roi select widget */
-    void showRoiSelectionWidget();                          /**< Implements the show roi selection widget.*/
-    QSharedPointer<XDISPLIB::RoiSelectionWidget> m_pRoiSelectionWidget;    /**< ROI selection widget. */
+    QAction*    m_pActionSelectSensors;                                     /**< show roi select widget */
+    void showSensorSelectionWidget();                                      /**< Implements the show roi selection widget.*/
 
-    QVector<qint32> m_qVecCurrentSelection;
-    void applySelection();
+    SensorModel* m_pSensorModel;                            /**< Sensor model for channel selection */
+    QSharedPointer<SensorWidget> m_pSensorSelectionWidget;  /**< Sensor selection widget. */
+
+
+    QList<qint32> m_qListCurrentSelection;      /**< Current selection list -> hack around C++11 lambda  */
+    void applySelection();                      /**< apply the in m_qListCurrentSelection stored selection -> hack around C++11 lambda */
+    void resetSelection();                      /**< reset the in m_qListCurrentSelection stored selection -> hack around C++11 lambda */
 };
 
 } // NAMESPACE

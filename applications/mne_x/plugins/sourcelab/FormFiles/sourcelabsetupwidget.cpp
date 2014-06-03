@@ -55,6 +55,7 @@
 
 #include <QDebug>
 #include <QFileDialog>
+#include <QtConcurrent>
 
 
 //*************************************************************************************************************
@@ -94,6 +95,7 @@ SourceLabSetupWidget::SourceLabSetupWidget(SourceLab* toolbox, QWidget *parent)
     connect(ui.m_qPushButton_FwdFileDialog, &QPushButton::released, this, &SourceLabSetupWidget::showFwdFileDialog);
     connect(ui.m_qPushButton_AtlasDirDialog, &QPushButton::released, this, &SourceLabSetupWidget::showAtlasDirDialog);
     connect(ui.m_qPushButton_SurfaceDirDialog, &QPushButton::released, this, &SourceLabSetupWidget::showSurfaceDirDialog);
+    connect(ui.m_qPushButonStartClustering, &QPushButton::released, this, &SourceLabSetupWidget::clusteringTriggered);
 }
 
 
@@ -102,6 +104,33 @@ SourceLabSetupWidget::SourceLabSetupWidget(SourceLab* toolbox, QWidget *parent)
 SourceLabSetupWidget::~SourceLabSetupWidget()
 {
 
+}
+
+
+//*************************************************************************************************************
+
+void SourceLabSetupWidget::setClusteringState()
+{
+    ui.m_qPushButonStartClustering->setEnabled(false);
+    ui.m_qPushButonStartClustering->setText("Clustering...");
+}
+
+
+//*************************************************************************************************************
+
+void SourceLabSetupWidget::setSetupState()
+{
+    ui.m_qPushButonStartClustering->setEnabled(true);
+    ui.m_qPushButonStartClustering->setText("Start Clustering");
+}
+
+
+//*************************************************************************************************************
+
+void SourceLabSetupWidget::clusteringTriggered()
+{
+    // start clustering
+    QFuture<void> future = QtConcurrent::run(m_pSourceLab, &SourceLab::doClustering);
 }
 
 

@@ -114,6 +114,9 @@ INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_X_INCLUDE_DIR}
 
+RESOURCES += \
+    babymeg.qrc
+
 OTHER_FILES += babymeg.json
 
 # Put generated form headers into the origin --> cause other src is pointing at them
@@ -124,5 +127,3 @@ unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
 # suppress visibility warnings
 unix: QMAKE_CXXFLAGS += -Wno-attributes
 
-RESOURCES += \
-    babymeg.qrc

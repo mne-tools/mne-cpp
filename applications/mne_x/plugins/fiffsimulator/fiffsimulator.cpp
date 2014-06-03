@@ -77,7 +77,7 @@ FiffSimulator::FiffSimulator()
 : m_sFiffSimulatorClientAlias("mne-x")
 , m_pRtCmdClient(NULL)
 , m_bCmdClientIsConnected(false)
-, m_sFiffSimulatorIP("127.0.0.1")//("127.0.0.1")//("172.21.16.88")
+, m_sFiffSimulatorIP("127.0.0.1")//("172.21.16.88")
 , m_pFiffSimulatorProducer(new FiffSimulatorProducer(this))
 , m_iBufferSize(-1)
 , m_pRawMatrixBuffer_In(0)
@@ -91,7 +91,7 @@ FiffSimulator::FiffSimulator()
 
 FiffSimulator::~FiffSimulator()
 {
-    if(this->isRunning())
+    if(m_pFiffSimulatorProducer->isRunning() || this->isRunning())
         stop();
 }
 
@@ -132,9 +132,11 @@ void FiffSimulator::initConnector()
         m_pRTMSA_FiffSimulator = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "FiffSimulator", "Fiff Simulator Output");
 
         m_pRTMSA_FiffSimulator->data()->initFromFiffInfo(m_pFiffInfo);
-        m_pRTMSA_FiffSimulator->data()->setMultiArraySize(10);
+        m_pRTMSA_FiffSimulator->data()->setMultiArraySize(100);
 
         m_pRTMSA_FiffSimulator->data()->setVisibility(true);
+
+        m_pRTMSA_FiffSimulator->data()->setXMLLayoutFile("./mne_x_plugins/resources/FiffSimulator/VectorViewSimLayout.xml");
 
         m_outputConnectors.append(m_pRTMSA_FiffSimulator);
     }
@@ -268,6 +270,9 @@ void FiffSimulator::disconnectCmdClient()
 
 void FiffSimulator::requestInfo()
 {
+    while(!(m_pFiffSimulatorProducer->m_iDataClientId > -1 && m_bCmdClientIsConnected))
+        qWarning() << "FiffSimulatorProducer is not running! Retry...";
+
     if(m_pFiffSimulatorProducer->m_iDataClientId > -1 && m_bCmdClientIsConnected)
     {
         // read meas info
@@ -315,7 +320,6 @@ bool FiffSimulator::start()
 
         // Start Measurement at rt_Server
         // start measurement
-        qDebug() << "m_pFiffSimulatorProducer->m_iDataClientId" << m_pFiffSimulatorProducer->m_iDataClientId;
         (*m_pRtCmdClient)["start"].pValues()[0].setValue(m_pFiffSimulatorProducer->m_iDataClientId);
         (*m_pRtCmdClient)["start"].send();
 
@@ -330,17 +334,21 @@ bool FiffSimulator::start()
 
 bool FiffSimulator::stop()
 {
-    m_pFiffSimulatorProducer->stop();
+    if(m_pFiffSimulatorProducer->isRunning())
+        m_pFiffSimulatorProducer->stop();
 
-    //Wait until this thread (TMSI) is stopped
+    //Wait until this thread is stopped
     m_bIsRunning = false;
 
-    //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the pop function (acquire statement)
-    m_pRawMatrixBuffer_In->releaseFromPop();
+    if(this->isRunning())
+    {
+        //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the pop function (acquire statement)
+        m_pRawMatrixBuffer_In->releaseFromPop();
 
-    m_pRawMatrixBuffer_In->clear();
+        m_pRawMatrixBuffer_In->clear();
 
-    m_pRTMSA_FiffSimulator->data()->clear();
+        m_pRTMSA_FiffSimulator->data()->clear();
+    }
 
     return true;
 }

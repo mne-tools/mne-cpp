@@ -141,6 +141,9 @@ public:
     */
     void init();
 
+    void doClustering();
+    void finishedClustering();
+
     virtual bool start();
     virtual bool stop();
 
@@ -175,6 +178,19 @@ public:
     */
     void updateInvOp(MNEInverseOperator::SPtr p_pInvOp);
 
+signals:
+    //=========================================================================================================
+    /**
+    * Signal when clsutering is started
+    */
+    void clusteringStarted();
+
+    //=========================================================================================================
+    /**
+    * Signal when clsutering has finished
+    */
+    void clusteringFinished();
+
 protected:
     virtual void run();
 
@@ -196,6 +212,8 @@ private:
     QFile                       m_qFileFwdSolution; /**< File to forward solution. */
     MNEForwardSolution::SPtr    m_pFwd;             /**< Forward solution. */
     MNEForwardSolution::SPtr    m_pClusteredFwd;    /**< Clustered forward solution. */
+
+    bool m_bFinishedClustering;                     /**< If clustered forward solution is available. */
 
     QString                     m_sAtlasDir;        /**< File to Atlas. */
     AnnotationSet::SPtr         m_pAnnotationSet;   /**< Annotation set. */

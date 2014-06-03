@@ -66,7 +66,8 @@ RealTimeSampleArrayChInfo::RealTimeSampleArrayChInfo()
 , m_dMinValue(-80000)
 , m_dMaxValue(80000)
 , m_iKind(0)
-, m_iUnit(-1)
+, m_iUnit(FIFF_UNIT_NONE)
+, m_iCoilType(FIFFV_COIL_NONE)
 {
 
 }

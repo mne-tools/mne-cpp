@@ -62,11 +62,13 @@ public:
 
     fiff_int_t getUnit(qint32 row) const;
 
+    fiff_int_t getCoil(qint32 row) const;
+
     inline qint32 getMaxSamples() const;
 
     inline const QMap<qint32,qint32>& getIdxSelMap() const;
 
-    void selectRows(const QVector<qint32> &selection);
+    void selectRows(const QList<qint32> &selection);
 
     void resetSelection();
 
@@ -76,6 +78,8 @@ public:
 
     inline bool isFreezed() const;
 
+signals:
+    void newSelection(QList<qint32> selection);
 
 private:
     QList<RealTimeSampleArrayChInfo> m_qListChInfo; /**< Channel info list.*/

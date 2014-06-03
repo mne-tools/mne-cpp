@@ -144,13 +144,17 @@ void FiffSimulatorProducer::stop()
         (*m_pFiffSimulator->m_pRtCmdClient)["stop-all"].send();
     }
 
-    //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the push function (acquire statement)
-    m_pFiffSimulator->m_pRawMatrixBuffer_In->releaseFromPush();
-
-    while(this->isRunning())
-        m_bIsRunning = false;
+    if(m_pFiffSimulator->m_pRawMatrixBuffer_In)
+    {
+        //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the push function (acquire statement)
+        m_pFiffSimulator->m_pRawMatrixBuffer_In->releaseFromPush();
+    }
 
     this->disconnectDataClient();
+
+    //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
+    if(this->isRunning())
+        QThread::wait();
 }
 
 
@@ -158,20 +162,24 @@ void FiffSimulatorProducer::stop()
 
 void FiffSimulatorProducer::run()
 {
+    m_bIsRunning = true;
     //
     // Connect data client
     //
     this->connectDataClient(m_pFiffSimulator->m_sFiffSimulatorIP);
 
+    qint32 count = 0;
     while(m_pRtDataClient->state() != QTcpSocket::ConnectedState)
     {
         msleep(100);
         this->connectDataClient(m_pFiffSimulator->m_sFiffSimulatorIP);
+        ++count;
+        if(count > 10 || !m_bIsRunning)
+            return;
     }
 
     msleep(1000);
 
-    m_bIsRunning = true;
     m_bFlagMeasuring = true;
 
     //

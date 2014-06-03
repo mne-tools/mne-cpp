@@ -41,8 +41,7 @@ CONFIG += plugin
 
 DEFINES += SOURCELAB_LIBRARY
 
-QT += core widgets
-#QT += concurrent
+QT += core widgets concurrent
 
 TARGET = sourcelab
 CONFIG(debug, debug|release) {
@@ -95,6 +94,9 @@ FORMS += \
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_X_INCLUDE_DIR}
+
+RESOURCES += \
+    sourcelab.qrc
 
 OTHER_FILES += sourcelab.json
 

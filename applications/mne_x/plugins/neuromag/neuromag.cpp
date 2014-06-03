@@ -82,7 +82,6 @@ Neuromag::Neuromag()
 , m_iBufferSize(-1)
 , m_pRawMatrixBuffer_In(0)
 , m_bIsRunning(false)
-/*m_pRTMSA_Neuromag(0)*/
 {
 
 }
@@ -92,7 +91,7 @@ Neuromag::Neuromag()
 
 Neuromag::~Neuromag()
 {
-    if(this->isRunning())
+    if(m_pNeuromagProducer->isRunning() || this->isRunning())
         stop();
 }
 
@@ -133,9 +132,11 @@ void Neuromag::initConnector()
         m_pRTMSA_Neuromag = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "RtClient", "MNE Rt Client");
 
         m_pRTMSA_Neuromag->data()->initFromFiffInfo(m_pFiffInfo);
-        m_pRTMSA_Neuromag->data()->setMultiArraySize(10);
+        m_pRTMSA_Neuromag->data()->setMultiArraySize(100);
 
         m_pRTMSA_Neuromag->data()->setVisibility(true);
+
+        m_pRTMSA_Neuromag->data()->setXMLLayoutFile("./mne_x_plugins/resources/Neuromag/VectorViewLayout.xml");
 
         m_outputConnectors.append(m_pRTMSA_Neuromag);
     }
@@ -204,9 +205,6 @@ void Neuromag::connectCmdClient()
     {
         rtServerMutex.lock();
 
-        //Stop convinience timer
-//        m_cmdConnectionTimer.stop();
-
         if(!m_bCmdClientIsConnected)
         {
             //
@@ -268,11 +266,11 @@ void Neuromag::disconnectCmdClient()
 
 void Neuromag::requestInfo()
 {
-    qDebug() << "Neuromag::requestInfo()";
+    while(!(m_pNeuromagProducer->m_iDataClientId > -1 && m_bCmdClientIsConnected))
+        qWarning() << "NeuromagProducer is not running! Retry...";
+
     if(m_pNeuromagProducer->m_iDataClientId > -1 && m_bCmdClientIsConnected)
     {
-        qDebug() << "send measinfo";
-
         // read meas info
         (*m_pRtCmdClient)["measinfo"].pValues()[0].setValue(m_pNeuromagProducer->m_iDataClientId);
         (*m_pRtCmdClient)["measinfo"].send();
@@ -321,11 +319,6 @@ bool Neuromag::start()
         (*m_pRtCmdClient)["start"].pValues()[0].setValue(m_pNeuromagProducer->m_iDataClientId);
         (*m_pRtCmdClient)["start"].send();
 
-//        m_pNeuromagProducer->producerMutex.lock();
-//        m_pNeuromagProducer->m_bFlagMeasuring = true;
-//        m_pNeuromagProducer->producerMutex.unlock();
-//        m_pNeuromagProducer->start();
-
         return true;
     }
     else
@@ -337,38 +330,23 @@ bool Neuromag::start()
 
 bool Neuromag::stop()
 {
-    m_pNeuromagProducer->stop();
+    if(m_pNeuromagProducer->isRunning())
+        m_pNeuromagProducer->stop();
 
     //Wait until this thread (TMSI) is stopped
     m_bIsRunning = false;
 
-    //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the pop function (acquire statement)
-    m_pRawMatrixBuffer_In->releaseFromPop();
+    if(this->isRunning())
+    {
+        //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the pop function (acquire statement)
+        m_pRawMatrixBuffer_In->releaseFromPop();
 
-    m_pRawMatrixBuffer_In->clear();
+        m_pRawMatrixBuffer_In->clear();
 
-    m_pRTMSA_Neuromag->data()->clear();
+        m_pRTMSA_Neuromag->data()->clear();
+    }
 
     return true;
-
-//    if(m_bCmdClientIsConnected) //ToDo replace this with is running
-//    {
-//        // Stop Measurement at rt_Server
-//        (*m_pRtCmdClient)["stop-all"].send();
-
-//        m_pNeuromagProducer->producerMutex.lock();
-//        m_pNeuromagProducer->m_bFlagMeasuring = false;
-//        m_pNeuromagProducer->producerMutex.unlock();
-//    }
-
-//    // Stop threads
-//    QThread::terminate();
-//    QThread::wait();
-
-//    //Clear Buffers
-//    m_pRawMatrixBuffer_In->clear();
-
-//    return true;
 }
 
 
@@ -393,8 +371,6 @@ QString Neuromag::getName() const
 QWidget* Neuromag::setupWidget()
 {
     NeuromagSetupWidget* widget = new NeuromagSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
-
-    //init dialog
 
     return widget;
 }
