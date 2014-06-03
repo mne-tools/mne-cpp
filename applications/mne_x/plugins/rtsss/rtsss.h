@@ -143,6 +143,11 @@ public:
 
     void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
 
+    void setLinRR(int);
+    void setLoutRR(int);
+    void setLin(int);
+    void setLout(int);
+
 protected:
     virtual void run();
 
@@ -163,6 +168,8 @@ private:
     FiffInfo::SPtr              m_pFiffInfo;        /**< Fiff information. */
 
     CircularMatrixBuffer<double>::SPtr m_pRtSssBuffer;   /**< Holds incoming rt server data.*/
+
+    int LinRR, LoutRR, Lin, Lout;
 
     //    dBuffer::SPtr   m_pRtSssBuffer;      /**< Holds incoming data.*/
 };

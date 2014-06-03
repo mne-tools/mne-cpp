@@ -105,6 +105,16 @@ public:
     */
     ~RtSssSetupWidget();
 
+    int getLinRR();
+    int getLoutRR();
+    int getLin();
+    int getLout();
+
+signals:
+    void signalNewLinRR(int val);
+    void signalNewLoutRR(int val);
+    void signalNewLin(int val);
+    void signalNewLout(int val);
 
 private slots:
     //=========================================================================================================
@@ -113,6 +123,10 @@ private slots:
     *
     */
     void showAboutDialog();
+    void setNewLinRR(int);
+    void setNewLoutRR(int);
+    void setNewLin(int);
+    void setNewLout(int);
 
 private:
 
