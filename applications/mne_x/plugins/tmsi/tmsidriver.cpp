@@ -69,6 +69,7 @@ TMSIDriver::TMSIDriver(TMSIProducer* pTMSIProducer)
 , m_bWriteDriverDebugToFile(false)
 , m_sOutputFilePath("/mne_x_plugins/resources/tmsi")
 , m_bUseCommonAverage(false)
+, m_bMeasureImpedances(false)
 {
     //Initialise NULL pointers
     m_oLibHandle = NULL ;
@@ -114,6 +115,7 @@ TMSIDriver::TMSIDriver(TMSIProducer* pTMSIProducer)
     __load_dll_func__(m_oFpGetDeviceList, PGETDEVICELIST, "GetDeviceList");
     __load_dll_func__(m_oFpGetFrontEndInfo, PGETFRONTENDINFO, "GetFrontEndInfo");
     __load_dll_func__(m_oFpSetRefCalculation, PSETREFCALCULATION, "SetRefCalculation");
+    __load_dll_func__(m_oFpSetMeasuringMode, PSETMEASURINGMODE, "SetMeasuringMode");
 
     cout << "Plugin TMSI - INFO - TMSIDriver() - Successfully loaded all DLL functions" << endl;
 }
@@ -137,7 +139,8 @@ bool TMSIDriver::initDevice(int iNumberOfChannels,
                             bool bUseUnitOffset,
                             bool bWriteDriverDebugToFile,
                             QString sOutpuFilePath,
-                            bool bUseCommonAverage)
+                            bool bUseCommonAverage,
+                            bool bMeasureImpedance)
 {
     //Check if the driver DLL was loaded
     if(!m_bDllLoaded)
@@ -153,6 +156,7 @@ bool TMSIDriver::initDevice(int iNumberOfChannels,
     m_bWriteDriverDebugToFile = bWriteDriverDebugToFile;
     m_sOutputFilePath = sOutpuFilePath;
     m_bUseCommonAverage = bUseCommonAverage;
+    m_bMeasureImpedances = bMeasureImpedance;
 
     //Open file to write to
     if(m_bWriteDriverDebugToFile)

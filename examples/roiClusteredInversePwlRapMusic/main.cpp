@@ -283,12 +283,8 @@ int main(int argc, char *argv[])
     //
     // Cluster forward solution;
     //
-<<<<<<< HEAD
-    //MNEForwardSolution t_clusteredFwd = t_SelectFwd.cluster_forward_solution_ccr(t_annotationSet, 20);//t_Fwd.cluster_forward_solution_ccr(t_annotationSet, 20);//40);
-    MNEForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution_ccr(t_annotationSet, 20);//t_Fwd.cluster_forward_solution_ccr(t_annotationSet, 20);//40);
-=======
     MNEForwardSolution t_clusteredFwd = t_SelectFwd.cluster_forward_solution(t_annotationSet, 20);//t_Fwd.cluster_forward_solution_ccr(t_annotationSet, 20);//40);
->>>>>>> ac84dce2d97d6fbf723b9513f3e8e115cff68ab0
+
 
     //
     // Compute inverse solution

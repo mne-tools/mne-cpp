@@ -96,7 +96,8 @@ void TMSIProducer::start(int iNumberOfChannels,
                               bUseUnitOffset,
                               bWriteDriverDebugToFile,
                               sOutputFilePath,
-                              bUseCommonAverage))
+                              bUseCommonAverage,
+                              false))
     {
         m_bIsRunning = true;
         QThread::start();

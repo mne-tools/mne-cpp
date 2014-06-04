@@ -172,6 +172,8 @@ typedef int             ( __stdcall * PLIBRARYEXIT)     (IN HANDLE Handle);
 typedef char**          ( __stdcall * PGETDEVICELIST)   (IN HANDLE Handle, IN OUT int *NrOfFrontEnds);
 typedef BOOLEAN         ( __stdcall * PGETFRONTENDINFO) (IN HANDLE Handle, IN OUT FRONTENDINFO *FrontEndInfo );
 typedef BOOLEAN         ( __stdcall * PSETREFCALCULATION) (IN HANDLE Handle, IN int OnOrOff );
+typedef BOOLEAN         ( __stdcall * PSETMEASURINGMODE) (IN HANDLE Handle, IN ULONG *Mode, IN int Value );
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -259,6 +261,7 @@ public:
     * @param [in] sOutpuFilePath Holds the path for the output file. Defined by the user via the GUI.
     * @param [out] bool returns true if device was successfully initialised, false otherwise.
     * @param [in] bUseCommonAverage Flag for using common average when recording EEG data. Defined by the user via the GUI.
+    * @param [in] bMeasureImpedance Flag for measuring impedances.
     */
     bool initDevice(int iNumberOfChannels,
                     int iSamplingFrequency,
@@ -268,7 +271,8 @@ public:
                     bool bUseUnitOffset,
                     bool bWriteDriverDebugToFile,
                     QString sOutpuFilePath,
-                    bool bUseCommonAverage);
+                    bool bUseCommonAverage,
+                    bool bMeasureImpedance);
 
     //=========================================================================================================
     /**
@@ -295,6 +299,7 @@ private:
     bool                m_bUsePreprocessing;            /**< Flag for using preprocessing actions for the EEG data. Defined by the user via the GUI.*/
     QString             m_sOutputFilePath;              /**< Holds the path for the output file. Defined by the user via the GUI.*/
     bool                m_bUseCommonAverage;            /**< Flag for using common average.*/
+    bool                m_bMeasureImpedances;           /**< Flag for impedance measuring mode.*/
 
     //Handler
     HANDLE              m_HandleMaster;                 /**< The handler used to communciate with the device.*/
@@ -330,6 +335,7 @@ private:
     PGETDEVICELIST      m_oFpGetDeviceList;
     PGETFRONTENDINFO    m_oFpGetFrontEndInfo;
     PSETREFCALCULATION  m_oFpSetRefCalculation;
+    PSETMEASURINGMODE   m_oFpSetMeasuringMode;
 };
 
 } // NAMESPACE
