@@ -1,10 +1,10 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     applications.pro
+# @file     rtsss.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
-# @date     May, 2013
+# @date     July, 2012
 #
 # @section  LICENSE
 #
@@ -18,7 +18,7 @@
 #       the following disclaimer in the documentation and/or other materials provided with the distribution.
 #     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
 #       to endorse or promote products derived from this software without specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 # WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 # PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
@@ -29,29 +29,81 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds all applications.
+# @brief    This project file generates the makefile for the rtsss plug-in.
 #
 #--------------------------------------------------------------------------------------------------------------
 
-include(../mne-cpp.pri)
+include(../../../../mne-cpp.pri)
 
-TEMPLATE = subdirs
+TEMPLATE = lib
 
-SUBDIRS += \
-    mne_rt_server
+CONFIG += plugin
 
-contains(MNECPP_CONFIG, withGui) {
-    SUBDIRS += \
-        mne_x_libs \
-        mne_x \
-        mne_browse_raw_qt
+DEFINES += RTSSS_LIBRARY
 
-    qtHaveModule(3d) {
-        message(Qt3D available: disp3D library configured!)
-        SUBDIRS += \
-            mne_viewer \
-            mne_viewer_parent
-    }
+QT += core widgets
+
+TARGET = rtsss
+CONFIG(debug, debug|release) {
+    TARGET = $$join(TARGET,,,d)
 }
 
-CONFIG += ordered
+LIBS += -L$${MNE_LIBRARY_DIR}
+CONFIG(debug, debug|release) {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
+            -lMNE$${MNE_LIB_VERSION}Utilsd \
+            -lMNE$${MNE_LIB_VERSION}Fsd \
+            -lMNE$${MNE_LIB_VERSION}Fiffd \
+            -lMNE$${MNE_LIB_VERSION}Mned \
+            -lxMeasd \
+            -lxDispd \
+            -lmne_xd
+}
+else {
+    LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
+            -lMNE$${MNE_LIB_VERSION}Utils \
+            -lMNE$${MNE_LIB_VERSION}Fs \
+            -lMNE$${MNE_LIB_VERSION}Fiff \
+            -lMNE$${MNE_LIB_VERSION}Mne \
+            -lxMeas \
+            -lxDisp \
+            -lmne_x
+}
+
+DESTDIR = $${MNE_BINARY_DIR}/mne_x_plugins
+
+SOURCES += \
+        rtsss.cpp \
+        FormFiles/rtssssetupwidget.cpp \
+#        FormFiles/rtsssrunwidget.cpp \
+        FormFiles/rtsssaboutwidget.cpp \
+        rtsssalgo.cpp \
+    rtsssalgo_test.cpp
+
+HEADERS += \
+        rtsss.h\
+        rtsss_global.h \
+        FormFiles/rtssssetupwidget.h \
+#        FormFiles/rtsssrunwidget.h \
+        FormFiles/rtsssaboutwidget.h \
+        rtsssalgo.h \
+    rtsssalgo_test.h
+
+FORMS += \
+        FormFiles/rtssssetup.ui \
+#        FormFiles/rtsssrun.ui \
+        FormFiles/rtsssabout.ui
+
+INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
+INCLUDEPATH += $${MNE_INCLUDE_DIR}
+INCLUDEPATH += $${MNE_X_INCLUDE_DIR}
+
+OTHER_FILES += rtsss.json
+
+# Put generated form headers into the origin --> cause other src is pointing at them
+UI_DIR = $$PWD
+
+unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
+
+# suppress visibility warnings
+unix: QMAKE_CXXFLAGS += -Wno-attributes
