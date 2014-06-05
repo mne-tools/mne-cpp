@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     rtsssaboutwidget.cpp
+* @file     rthpi_global.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,42 +29,31 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the RtSssAboutWidget class.
+* @brief    Contains the RTHPI library export/import macros.
 *
 */
 
-//*************************************************************************************************************
-//=============================================================================================================
-// INCLUDES
-//=============================================================================================================
-
-//#include "dummyaboutwidget.h"
-#include "rtsssaboutwidget.h"
+#ifndef RTHPI_GLOBAL_H
+#define RTHPI_GLOBAL_H
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// QT INCLUDES
 //=============================================================================================================
 
-using namespace RtSssPlugin;
+#include <QtCore/qglobal.h>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// PREPROCESSOR DEFINES
 //=============================================================================================================
 
-RtSssAboutWidget::RtSssAboutWidget(QWidget *parent)
-    : QDialog(parent)
-{
-    ui.setupUi(this);
-}
+#if defined(RTHPI_LIBRARY)
+#  define RTHPISHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#else
+#  define RTHPISHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#endif
 
-
-//*************************************************************************************************************
-
-RtSssAboutWidget::~RtSssAboutWidget()
-{
-
-}
+#endif // RTHPI_GLOBAL_H

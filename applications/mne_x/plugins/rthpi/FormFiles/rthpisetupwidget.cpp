@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     dummyrunwidget.cpp
+* @file     rtssssetupwidget.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the RtSssRunWidget class.
+* @brief    Contains the implementation of the ECGSetupWidget class.
 *
 */
 
@@ -38,10 +38,19 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "rtsssrunwidget.h"
-#include "rtsssaboutwidget.h"
+//#include "dummysetupwidget.h"
+//#include "dummyaboutwidget.h"
+//#include "../dummytoolbox.h"
+#include "rthpisetupwidget.h"
+#include "rthpiaboutwidget.h"
+#include "../rthpi.h"
 
-#include "../rtsss.h"
+//*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -49,7 +58,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace RtSssPlugin;
+using namespace RtHpiPlugin;
 
 
 //*************************************************************************************************************
@@ -57,9 +66,9 @@ using namespace RtSssPlugin;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RtSssRunWidget::RtSssRunWidget(RtSss* toolbox, QWidget *parent)
+RtHpiSetupWidget::RtHpiSetupWidget(RtHpi* toolbox, QWidget *parent)
 : QWidget(parent)
-, m_pRtSss(toolbox)
+, m_pRtHpi(toolbox)
 {
     ui.setupUi(this);
 
@@ -69,7 +78,7 @@ RtSssRunWidget::RtSssRunWidget(RtSss* toolbox, QWidget *parent)
 
 //*************************************************************************************************************
 
-RtSssRunWidget::~RtSssRunWidget()
+RtHpiSetupWidget::~RtHpiSetupWidget()
 {
 
 }
@@ -77,22 +86,8 @@ RtSssRunWidget::~RtSssRunWidget()
 
 //*************************************************************************************************************
 
-void RtSssRunWidget::writeToLog(QString p_sLogMsg)
+void RtHpiSetupWidget::showAboutDialog()
 {
-    ui.m_qTextBrowser_Information->insertHtml(p_sLogMsg);
-
-    ui.m_qTextBrowser_Information->insertPlainText("\n"); // new line
-    //scroll down to the newest entry
-    QTextCursor c = ui.m_qTextBrowser_Information->textCursor();
-    c.movePosition(QTextCursor::End);
-    ui.m_qTextBrowser_Information->setTextCursor(c);
-}
-
-
-//*************************************************************************************************************
-
-void RtSssRunWidget::showAboutDialog()
-{
-    RtSssAboutWidget aboutDialog(this);
+    RtHpiAboutWidget aboutDialog(this);
     aboutDialog.exec();
 }

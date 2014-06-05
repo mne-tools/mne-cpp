@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     rtsssrunwidget.h
+* @file     rthpiaboutwidget.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the RtSssRunWidget class.
+* @brief    Contains the declaration of the RtHpiAboutWidget class.
 *
 */
 
-#ifndef RTSSSRUNWIDGET_H
-#define RTSSSRUNWIDGET_H
+#ifndef RTHPIABOUTWIDGET_H
+#define RTHPIABOUTWIDGET_H
 
 
 //*************************************************************************************************************
@@ -42,7 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_rtsssrun.h"
+#include "../ui_rthpiabout.h"
 
 
 //*************************************************************************************************************
@@ -55,34 +55,21 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE RtSssPlugin
+// DEFINE NAMESPACE RtHpiPlugin
 //=============================================================================================================
 
-namespace RtSssPlugin
+//namespace DummyToolboxPlugin
+namespace RtHpiPlugin
 {
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-class RtSss;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS SourceLabRunWidget
+* DECLARE CLASS RtHpiAboutWidget
 *
-* @brief The SourceLabRunWidget class provides the SourceLab configuration window for the run mode.
+* @brief The RtHpiAboutWidget class provides the about dialog for the RtHpi.
 */
-class RtSssRunWidget : public QWidget
+class RtHpiAboutWidget : public QDialog
 {
     Q_OBJECT
 
@@ -90,43 +77,25 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a RtSssRunWidget which is a child of parent.
+    * Constructs a RtHpiAboutWidget dialog which is a child of parent.
     *
-    * @param [in] toolbox   a pointer to the corresponding RtSss.
-    * @param [in] parent    pointer to parent widget; If parent is 0, the new RtSssRunWidget becomes a window. If parent is another widget, DummyRunWidget becomes a child window inside parent. RtSssRunWidget is deleted when its parent is deleted.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new RtHpiAboutWidget becomes a window. If parent is another widget, RtHpiAboutWidget becomes a child window inside parent. RtHpiAboutWidget is deleted when its parent is deleted.
     */
-    RtSssRunWidget(RtSss* toolbox, QWidget *parent = 0);
+    RtHpiAboutWidget(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the RtSssRunWidget.
-    * All RtSssRunWidget's children are deleted first. The application exits if RtSssRunWidget is the main widget.
+    * Destroys the RtHpiAboutWidget.
+    * All RtHpiAboutWidget's children are deleted first. The application exits if RtHpiAboutWidget is the main widget.
     */
-    ~RtSssRunWidget();
-
-    //=========================================================================================================
-    /**
-    * Writes to SourceLab run log
-    *
-    * @param[in] p_sLogMsg     status message to append
-    */
-    void writeToLog(QString p_sLogMsg);
-
-private slots:
-    //=========================================================================================================
-    /**
-    * Shows the About Dialog
-    *
-    */
-    void showAboutDialog();
+    ~RtHpiAboutWidget();
 
 private:
 
-    RtSss*    m_pRtSss;     /**< Holds a pointer to corresponding RtSss.*/
+    Ui::RtHpiAboutWidgetClass ui;		/**< Holds the user interface for the RtHpiAboutWidget.*/
 
-    Ui::RtSssRunWidgetClass ui; /**< Holds the user interface for the RtSssRunWidget.*/
 };
 
 } // NAMESPACE
 
-#endif // RTSSSRUNWIDGET_H
+#endif // RTHPIABOUTWIDGET_H

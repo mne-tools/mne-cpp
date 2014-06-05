@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     rtsss.cpp
+* @file     rthpi.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the RtSss class.
+* @brief    Contains the implementation of the RtHpi class.
 *
 */
 
@@ -38,10 +38,8 @@
 // INCLUDES
 //=============================================================================================================
 
-//#include "dummytoolbox.h"
-//#include "FormFiles/dummysetupwidget.h"
-#include "rtsss.h"
-#include "FormFiles/rtssssetupwidget.h"
+#include "rthpi.h"
+#include "FormFiles/rthpisetupwidget.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -57,8 +55,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-//using namespace DummyToolboxPlugin;
-using namespace RtSssPlugin;
+using namespace RtHpiPlugin;
 using namespace MNEX;
 using namespace XMEASLIB;
 
@@ -68,34 +65,31 @@ using namespace XMEASLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RtSss::RtSss()
-: m_pRTSAInput(NULL)
-, m_pRTSAOutput(NULL)
-, m_pRtSssBuffer(new dBuffer(1024))
-/*
-: m_pDummyInput(NULL)
-, m_pDummyOutput(NULL)
-, m_pDummyBuffer(new dBuffer(1024))
-*/
-
+RtHpi::RtHpi()
+: m_bIsRunning(false)
+, m_bProcessData(false)
+, m_pRTMSAInput(NULL)
+, m_pRTMSAOutput(NULL)
+, m_pRtHpiBuffer(CircularMatrixBuffer<double>::SPtr())
 {
 }
 
 
 //*************************************************************************************************************
 
-RtSss::~RtSss()
+RtHpi::~RtHpi()
 {
-    stop();
+    if(this->isRunning())
+        stop();
 }
 
 
 //*************************************************************************************************************
 
-QSharedPointer<IPlugin> RtSss::clone() const
+QSharedPointer<IPlugin> RtHpi::clone() const
 {
-    QSharedPointer<RtSss> pRtSssClone(new RtSss);
-    return pRtSssClone;
+    QSharedPointer<RtHpi> pRtHpiClone(new RtHpi);
+    return pRtHpiClone;
 }
 
 
@@ -104,43 +98,72 @@ QSharedPointer<IPlugin> RtSss::clone() const
 // Creating required display instances and set configurations
 //=============================================================================================================
 
-void RtSss::init()
+void RtHpi::init()
 {
-    // Input
-    m_pRTSAInput = PluginInputData<NewRealTimeSampleArray>::create(this, "RtSssIn", "RtSss input data");
-    connect(m_pRTSAInput.data(), &PluginInputConnector::notify, this, &RtSss::update, Qt::DirectConnection);
-    m_inputConnectors.append(m_pRTSAInput);
+    //init channels when fiff info is available
+    connect(this, &RtHpi::fiffInfoAvailable, this, &RtHpi::initConnector);
 
-    // Output
-    m_pRTSAOutput = PluginOutputData<NewRealTimeSampleArray>::create(this, "RtSssOut", "RtSss output data");
-    m_outputConnectors.append(m_pRTSAOutput);
-
-    m_pRTSAOutput->data()->setName("RtSss Output");
-    m_pRTSAOutput->data()->setUnit("mV");
-    m_pRTSAOutput->data()->setMinValue(-200);
-    m_pRTSAOutput->data()->setMaxValue(360);
-    m_pRTSAOutput->data()->setSamplingRate(256.0/1.0);
+    //Delete Buffer - will be initailzed with first incoming data
+    if(!m_pRtHpiBuffer.isNull())
+        m_pRtHpiBuffer = CircularMatrixBuffer<double>::SPtr();
 }
 
 
 //*************************************************************************************************************
 
-bool RtSss::start()
+void RtHpi::initConnector()
 {
+    if(m_pFiffInfo)
+    {
+        // Input
+        m_pRTMSAInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "Rt HPI In", "RT HPI input data");
+        connect(m_pRTMSAInput.data(), &PluginInputConnector::notify, this, &RtHpi::update, Qt::DirectConnection);
+        m_inputConnectors.append(m_pRTMSAInput);
+
+        // Output
+        m_pRTMSAOutput = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "Rt HPI Out", "RT HPI output data");
+        m_outputConnectors.append(m_pRTMSAOutput);
+
+        m_pRTMSAOutput->data()->setMultiArraySize(100);
+        m_pRTMSAOutput->data()->setVisibility(true);
+    }
+}
+
+
+//*************************************************************************************************************
+
+bool RtHpi::start()
+{
+    //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
+    if(this->isRunning())
+        QThread::wait();
+
+    m_bIsRunning = true;
+
+    // Start threads
     QThread::start();
+
     return true;
 }
 
 
 //*************************************************************************************************************
 
-bool RtSss::stop()
+bool RtHpi::stop()
 {
-    // Stop threads
-    QThread::terminate();
-    QThread::wait();
+    //Wait until this thread is stopped
+    m_bIsRunning = false;
 
-    m_pRtSssBuffer->clear();
+    if(this->isRunning())
+    {
+        //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the pop function (acquire statement)
+        m_pRtHpiBuffer->releaseFromPop();
+        m_pRtHpiBuffer->releaseFromPush();
+
+        m_pRtHpiBuffer->clear();
+
+        m_pRTMSAOutput->data()->clear();
+    }
 
     return true;
 }
@@ -148,7 +171,7 @@ bool RtSss::stop()
 
 //*************************************************************************************************************
 
-IPlugin::PluginType RtSss::getType() const
+IPlugin::PluginType RtHpi::getType() const
 {
     return _IAlgorithm;
 }
@@ -156,33 +179,46 @@ IPlugin::PluginType RtSss::getType() const
 
 //*************************************************************************************************************
 
-QString RtSss::getName() const
+QString RtHpi::getName() const
 {
-    return "RtSss Toolbox";
+    return "RtHpi Toolbox";
 }
 
 
 //*************************************************************************************************************
 
-QWidget* RtSss::setupWidget()
+QWidget* RtHpi::setupWidget()
 {
-    RtSssSetupWidget* setupWidget = new RtSssSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
+    RtHpiSetupWidget* setupWidget = new RtHpiSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
     return setupWidget;
 }
 
 
 //*************************************************************************************************************
 
-void RtSss::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
+void RtHpi::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 {
-    QSharedPointer<NewRealTimeSampleArray> pRTSA = pMeasurement.dynamicCast<NewRealTimeSampleArray>();
+    QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<NewRealTimeMultiSampleArray>();
 
-    if(pRTSA)
+    if(pRTMSA)
     {
-        for(unsigned char i = 0; i < pRTSA->getArraySize(); ++i)
+
+        //Check if buffer initialized
+        if(!m_pRtHpiBuffer)
+            m_pRtHpiBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSA->getNumChannels(), pRTMSA->getMultiArraySize()));
+
+        //Fiff information
+        if(!m_pFiffInfo)
+            m_pFiffInfo = pRTMSA->getFiffInfo();
+
+        if(m_bProcessData)
         {
-            double value = pRTSA->getSampleArray()[i];
-            m_pRtSssBuffer->push(value);
+            MatrixXd t_mat(pRTMSA->getNumChannels(), pRTMSA->getMultiArraySize());
+
+            for(qint32 i = 0; i < pRTMSA->getMultiArraySize(); ++i)
+                t_mat.col(i) = pRTMSA->getMultiSampleArray()[i];
+
+            m_pRtHpiBuffer->push(&t_mat);
         }
     }
 }
@@ -191,16 +227,16 @@ void RtSss::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
 //*************************************************************************************************************
 
-void RtSss::run()
+void RtHpi::run()
 {
     while (true)
     {
         /* Dispatch the inputs */
-        double v = m_pRtSssBuffer->pop();
+        double v = m_pRtHpiBuffer->pop();
 
         //ToDo: Implement your algorithm here
 
-        m_pRTSAOutput->data()->setValue(v);
+        m_pRTMSAOutput->data()->setValue(v);
     }
 }
 
