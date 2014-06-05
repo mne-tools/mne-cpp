@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     rtssssetupwidget.h
+* @file     rtsssaboutwidget.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,29 +29,16 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the RtSssSetupWidget class.
+* @brief    Contains the implementation of the RtSssAboutWidget class.
 *
 */
-
-#ifndef RTSSSSETUPWIDGET_H
-#define RTSSSSETUPWIDGET_H
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-//#include "../ui_dummysetup.h"
-#include "../ui_rtssssetup.h"
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QtWidgets>
+#include "rthpiaboutwidget.h"
 
 
 //*************************************************************************************************************
@@ -59,68 +46,24 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE RtSssPlugin
-//=============================================================================================================
-
-namespace RtSssPlugin
-{
+using namespace RtHpiPlugin;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-class RtSss;
-
-
-//=============================================================================================================
-/**
-* DECLARE CLASS RtSssSetupWidget
-*
-* @brief The RtSssSetupWidget class provides the RtSss configuration window.
-*/
-class RtSssSetupWidget : public QWidget
+RtHpiAboutWidget::RtHpiAboutWidget(QWidget *parent)
+    : QDialog(parent)
 {
-    Q_OBJECT
-
-public:
-
-    //=========================================================================================================
-    /**
-    * Constructs a RtSssSetupWidget which is a child of parent.
-    *
-    * @param [in] toolbox a pointer to the corresponding RtSss.
-    * @param [in] parent pointer to parent widget; If parent is 0, the new RtSssSetupWidget becomes a window. If parent is another widget, RtSssSetupWidget becomes a child window inside parent. RtSssSetupWidget is deleted when its parent is deleted.
-    */
-    RtSssSetupWidget(RtSss* toolbox, QWidget *parent = 0);
-
-    //=========================================================================================================
-    /**
-    * Destroys the RtSssSetupWidget.
-    * All RtSssSetupWidget's children are deleted first. The application exits if RtSssSetupWidget is the main widget.
-    */
-    ~RtSssSetupWidget();
+    ui.setupUi(this);
+}
 
 
-private slots:
-    //=========================================================================================================
-    /**
-    * Shows the About Dialog
-    *
-    */
-    void showAboutDialog();
+//*************************************************************************************************************
 
-private:
+RtHpiAboutWidget::~RtHpiAboutWidget()
+{
 
-    RtSss* m_pRtSss;	/**< Holds a pointer to corresponding RtSss.*/
-
-    Ui::RtSssSetupWidgetClass ui;	/**< Holds the user interface for the RtSssSetupWidget.*/
-};
-
-} // NAMESPACE
-
-#endif // RTSSSSETUPWIDGET_H
+}

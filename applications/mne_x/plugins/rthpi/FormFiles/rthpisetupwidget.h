@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     rtsss.h
+* @file     rthpisetupwidget.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the RTSSS class.
+* @brief    Contains the declaration of the RtHpiSetupWidget class.
 *
 */
 
-#ifndef RTSSS_H
-#define RTSSS_H
+#ifndef RTHPISETUPWIDGET_H
+#define RTHPISETUPWIDGET_H
 
 
 //*************************************************************************************************************
@@ -42,11 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "rtsss_global.h"
-
-#include <mne_x/Interfaces/IAlgorithm.h>
-#include <generics/circularbuffer.h>
-#include <xMeas/newrealtimesamplearray.h>
+#include "../ui_rthpisetup.h"
 
 
 //*************************************************************************************************************
@@ -59,21 +55,17 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE RTSSSPlugin
+// USED NAMESPACES
 //=============================================================================================================
-
-namespace RtSssPlugin
-{
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// DEFINE NAMESPACE RtHpiPlugin
 //=============================================================================================================
 
-using namespace MNEX;
-using namespace XMEASLIB;
-using namespace IOBuffer;
+namespace RtHpiPlugin
+{
 
 
 //*************************************************************************************************************
@@ -81,75 +73,53 @@ using namespace IOBuffer;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+class RtHpi;
+
 
 //=============================================================================================================
 /**
-* DECLARE CLASS RTSSS
+* DECLARE CLASS RtHpiSetupWidget
 *
-* @brief The RtSss class provides a rtsss algorithm structure.
+* @brief The RtHpiSetupWidget class provides the RtHpi configuration window.
 */
-//class DUMMYTOOLBOXSHARED_EXPORT DummyToolbox : public IAlgorithm
-class RTSSSSHARED_EXPORT RtSss : public IAlgorithm
+class RtHpiSetupWidget : public QWidget
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "rtsss.json") //NEW Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
-    // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(MNEX::IAlgorithm)
 
 public:
-    //=========================================================================================================
-    /**
-    * Constructs a RtSss.
-    */
-//    DummyToolbox();
-    RtSss();
 
     //=========================================================================================================
     /**
-    * Destroys the RtSss.
+    * Constructs a RtHpiSetupWidget which is a child of parent.
+    *
+    * @param [in] toolbox a pointer to the corresponding RtHpi.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new RtHpiSetupWidget becomes a window. If parent is another widget, RtHpiSetupWidget becomes a child window inside parent. RtHpiSetupWidget is deleted when its parent is deleted.
     */
-//    ~DummyToolbox();
-    ~RtSss();
+    RtHpiSetupWidget(RtHpi* toolbox, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Initialise input and output connectors.
+    * Destroys the RtHpiSetupWidget.
+    * All RtHpiSetupWidget's children are deleted first. The application exits if RtHpiSetupWidget is the main widget.
     */
-    void init();
+    ~RtHpiSetupWidget();
 
+
+private slots:
     //=========================================================================================================
     /**
-    * Clone the plugin
+    * Shows the About Dialog
+    *
     */
-    virtual QSharedPointer<IPlugin> clone() const;
-
-    virtual bool start();
-    virtual bool stop();
-
-    virtual IPlugin::PluginType getType() const;
-    virtual QString getName() const;
-
-    virtual QWidget* setupWidget();
-
-    void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
-
-protected:
-    virtual void run();
+    void showAboutDialog();
 
 private:
-//    PluginInputData<NewRealTimeSampleArray>::SPtr   m_pDummyInput;      /**< The RealTimeSampleArray of the DummyToolbox input.*/
-//    PluginOutputData<NewRealTimeSampleArray>::SPtr  m_pDummyOutput;    /**< The RealTimeSampleArray of the DummyToolbox output.*/
-    PluginInputData<NewRealTimeSampleArray>::SPtr   m_pRTSAInput;      /**< The RealTimeSampleArray of the RtSss input.*/
-    PluginOutputData<NewRealTimeSampleArray>::SPtr  m_pRTSAOutput;    /**< The RealTimeSampleArray of the RtSss output.*/
 
-    //  from sourcelab.h
-//    PluginInputData<NewRealTimeMultiSampleArray>::SPtr  m_pRTMSAInput;  /**< The RealTimeMultiSampleArray input.*/
-//    PluginOutputData<RealTimeSourceEstimate>::SPtr      m_pRTSEOutput;  /**< The RealTimeSourceEstimate output.*/
+    RtHpi* m_pRtHpi;	/**< Holds a pointer to corresponding RtHpi.*/
 
-//    dBuffer::SPtr   m_pDummyBuffer;      /**< Holds incoming data.*/
-    dBuffer::SPtr   m_pRtSssBuffer;      /**< Holds incoming data.*/
+    Ui::RtHpiSetupWidgetClass ui;	/**< Holds the user interface for the RtHpiSetupWidget.*/
 };
 
 } // NAMESPACE
 
-#endif // RTSSS_H
+#endif // RTHPISETUPWIDGET_H

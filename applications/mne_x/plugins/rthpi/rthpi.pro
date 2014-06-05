@@ -1,14 +1,14 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     rtsss.pro
-# @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+# @file     rthpi.pro
+# @author   Chiran Doshi <chiran.doshi@childrens.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
-# @date     July, 2012
+# @date     July, 2014
 #
 # @section  LICENSE
 #
-# Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2014, Chiran Doshi and Matti Hamalainen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file generates the makefile for the rtsss plug-in.
+# @brief    This project file generates the makefile for the rthpi plug-in.
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -39,11 +39,11 @@ TEMPLATE = lib
 
 CONFIG += plugin
 
-DEFINES += RTSSS_LIBRARY
+DEFINES += RTHPI_LIBRARY
 
 QT += core widgets
 
-TARGET = rtsss
+TARGET = rthpi
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
@@ -73,32 +73,25 @@ else {
 DESTDIR = $${MNE_BINARY_DIR}/mne_x_plugins
 
 SOURCES += \
-        rtsss.cpp \
-        FormFiles/rtssssetupwidget.cpp \
-#        FormFiles/rtsssrunwidget.cpp \
-        FormFiles/rtsssaboutwidget.cpp \
-        rtsssalgo.cpp \
-    rtsssalgo_test.cpp
+        rthpi.cpp \
+        FormFiles/rthpisetupwidget.cpp \
+        FormFiles/rthpiaboutwidget.cpp
 
 HEADERS += \
-        rtsss.h\
-        rtsss_global.h \
-        FormFiles/rtssssetupwidget.h \
-#        FormFiles/rtsssrunwidget.h \
-        FormFiles/rtsssaboutwidget.h \
-        rtsssalgo.h \
-    rtsssalgo_test.h
+        rthpi.h\
+        rthpi_global.h \
+        FormFiles/rthpisetupwidget.h \
+        FormFiles/rthpiaboutwidget.h
 
 FORMS += \
-        FormFiles/rtssssetup.ui \
-#        FormFiles/rtsssrun.ui \
-        FormFiles/rtsssabout.ui
+        FormFiles/rthpisetup.ui \
+        FormFiles/rthpiabout.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_X_INCLUDE_DIR}
 
-OTHER_FILES += rtsss.json
+OTHER_FILES += rthpi.json
 
 # Put generated form headers into the origin --> cause other src is pointing at them
 UI_DIR = $$PWD
