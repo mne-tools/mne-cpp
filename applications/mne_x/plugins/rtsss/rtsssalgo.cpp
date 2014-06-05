@@ -115,7 +115,7 @@ QList<MatrixXd> RtSssAlgo::buildLinearEqn()
     EqnA = CoilScale.asDiagonal() * EqnA;
 //        std::cout << "pass 1" << std::endl;
 //        std::cout << "MEGData: " << MEGData.rows() << " x " << MEGData.cols() << std::endl;
-    EqnB = CoilScale.asDiagonal() * MEGData;
+//    EqnB = CoilScale.asDiagonal() * MEGData;
 //        std::cout << "EqnB: " << EqnB.rows() << " x " << EqnB.cols() << std::endl;
 //    std::cout << "pass 2" << std::endl;
 
@@ -125,7 +125,9 @@ QList<MatrixXd> RtSssAlgo::buildLinearEqn()
     LinEqn.append(EqnOut);
     LinEqn.append(EqnARR);
     LinEqn.append(EqnA);
-    LinEqn.append(EqnB);
+//    LinEqn.append(EqnB);
+    LinEqn.append(CoilScale.asDiagonal());
+
 
 //    std::cout << "EqnInRR *********************************" << endl << EqnInRR << endl << endl;
 //    std::cout << "EqnOutRR ********************************" << endl << EqnOutRR << endl << endl;
@@ -759,7 +761,7 @@ QList<MatrixXd> RtSssAlgo::getSSSRR(MatrixXd EqnIn, MatrixXd EqnOut, MatrixXd Eq
     {
 //      % solve OLS solution
         sol_X = EqnRRInv * (EqnARR.transpose() * EqnB.col(i));
-        std::cout << "sol_X ************************" << endl << sol_X.transpose() << endl;
+//        std::cout << "sol_X ************************" << endl << sol_X.transpose() << endl;
 
 //      % scale linear equation
         eqn_err = EqnARR * sol_X - EqnB.col(i);
@@ -774,12 +776,12 @@ QList<MatrixXd> RtSssAlgo::getSSSRR(MatrixXd EqnIn, MatrixXd EqnOut, MatrixXd Eq
 //        for (int h=0; h<2; h++)
         {
             cnt++;
-            cout << "while cnt: " << cnt << endl;
+//            cout << "while cnt: " << cnt << endl;
             sol_X_old = sol_X;
 //            Weight(:,i) = (eqn_err <= RR_K1) + (eqn_err > RR_K1 & eqn_err <= RR_K2) .* (1-(eqn_err-RR_K1).^2/(RR_K2-RR_K1)^2).^2;
 //            Weight.col(i) = eigen_LTE(eqn_err, RR_K1) + eigen_AND(eigen_GT(eqn_err, RR_K1),eigen_LTE(eqn_err, RR_K2));
             Weight.col(i) = eigen_LTE(eqn_err,RR_K1).array() + eigen_AND(eigen_GT(eqn_err,RR_K1),eigen_LTE(eqn_err,RR_K2)).array() * (1 - ((eqn_err.array()-RR_K1).pow(2)) / pow(RR_K2-RR_K1,2) ).pow(2);
-            std::cout << "Weight **************************" << endl << Weight.transpose() << endl;
+//            std::cout << "Weight **************************" << endl << Weight.transpose() << endl;
 
 //          % weight_index = find(Weight(:,i) < WeightThres);
             weight_index = eigen_LT_index(Weight.col(i), WeightThres);
@@ -978,12 +980,12 @@ qint32 RtSssAlgo::getNumMEGCh()
 }
 
 // Set MEG signal
-//void RtSssAlgo::setMEGsignal(VectorXd megfrombuffer)
-void RtSssAlgo::setMEGsignal(MatrixXd megfrombuffer)
-{
-    MEGData = megfrombuffer;
-//        std::cout << "MEGData: " << MEGData.rows() << " x " << MEGData.cols() << std::endl;
-}
+//void RtSssAlgo::setMEGsignal(MatrixXd megfrombuffer)
+//{
+//    MEGData = megfrombuffer;
+//    EqnB = megfrombuffer;
+////        std::cout << "MEGData: " << MEGData.rows() << " x " << MEGData.cols() << std::endl;
+//}
 
 QList<MatrixXd> RtSssAlgo::getLinEqn()
 {

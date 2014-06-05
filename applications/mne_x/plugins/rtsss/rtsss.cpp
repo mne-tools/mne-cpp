@@ -75,12 +75,6 @@ RtSss::RtSss()
 //, m_pRTSAInput(NULL)
 //, m_pRTSAOutput(NULL)
 //, m_pRtSssBuffer(new dBuffer(1024))
-/*
-: m_pDummyInput(NULL)
-, m_pDummyOutput(NULL)
-, m_pDummyBuffer(new dBuffer(1024))
-*/
-
 {
 }
 
@@ -240,11 +234,11 @@ void RtSss::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
         if(m_bProcessData)
         {
-            MatrixXd t_mat(pRTMSA->getNumChannels(), pRTMSA->getMultiArraySize());
+            MatrixXd in_mat(pRTMSA->getNumChannels(), pRTMSA->getMultiArraySize());
             for(unsigned char i = 0; i < pRTMSA->getMultiArraySize(); ++i)
-                t_mat.col(i) = pRTMSA->getMultiSampleArray()[i];
+                in_mat.col(i) = pRTMSA->getMultiSampleArray()[i];
 
-            m_pRtSssBuffer->push(&t_mat);
+            m_pRtSssBuffer->push(&in_mat);
         }
     }
 }
@@ -275,58 +269,60 @@ void RtSss::run()
 
     // Init output
     m_pRTMSAOutput->data()->initFromFiffInfo(m_pFiffInfo);
-    m_pRTMSAOutput->data()->setMultiArraySize(10);
+    m_pRTMSAOutput->data()->setMultiArraySize(100);
+//    m_pRTMSAOutput->data()->setSamplingRate(m_pFiffInfo->sfreq);
     m_pRTMSAOutput->data()->setVisibility(true);
 
-    std::cout << "LinRR (run): " << LinRR << ", LoutRR (run): " << LoutRR <<", Lin (run): " << Lin <<", Lout (run): " << Lout << std::endl;
+    qDebug() << "LinRR (run): " << LinRR << ", LoutRR (run): " << LoutRR <<", Lin (run): " << Lin <<", Lout (run): " << Lout;
+    QList<int> expOrder;
+    expOrder << LinRR << LoutRR << Lin << Lout;
+    rsss.setSSSParameter(expOrder);
 
     // Find the number of MEG channel
     qint32 nmegchan = rsss.getNumMEGCh();
 //    std::cout << "number of meg channels: " << nmegchan << std::endl;
 
+//    std::cout << "building SSS linear equation .....";
+    qDebug() << "building SSS linear equation .....";
+    lineqn = rsss.buildLinearEqn();
+    qDebug() << " finished (run)!";
+
     // start processing data
     m_bProcessData = true;
-    qint32 cntrun = 0;
 
     while(m_bIsRunning)
     {
-        std::cout << "Run count: " << ++cntrun << ", " ; //<< std::endl;
-
-//        if (cntrun == 2) stop();
-
         qint32 nrows = m_pRtSssBuffer->rows();
 
         if(nrows > 0) // check if init
         {
             // * Dispatch the inputs * //
-            MatrixXd t_mat = m_pRtSssBuffer->pop();
-//            std::cout << "size of t_mat (run): " << t_mat.rows() << " x " << t_mat.cols() << std::endl;
+            MatrixXd in_mat = m_pRtSssBuffer->pop();
+//            std::cout << "size of in_mat (run): " << in_mat.rows() << " x " << in_mat.cols() << std::endl;
 
-            qint32 k = 0;
-            MatrixXd meg_mat(nmegchan, t_mat.cols());
+            for(qint32 i = 0; i <in_mat.cols(); ++i)
+            {
+/*
+//              When MEG channels don't start from the first row and may be mixed with other channels
+                qint32 m = 0;
+                MatrixXd meg_mat(nmegchan, 1);
+                for(qint32 j = 0; j < in_mat.rows(); ++j)
+                    if(m_pFiffInfo->chs[j].kind == FIFFV_MEG_CH)
+                    {
+                        meg_mat(m,0) = in_mat(j,i);
+                        m++;
+                    }
 
-            for(qint32 i = 0; i <t_mat.cols(); ++i)
-                if(m_pFiffInfo->chs[i].kind == FIFFV_MEG_CH)
-                {
-                    meg_mat.row(k) = t_mat.row(i);
-                    k++;
-                }
-//            std::cout << "size meg_mat: " << meg_mat.rows() << " x " << meg_mat.cols() << std::endl;
-            rsss.setMEGsignal(meg_mat.col(0));
-//            rsss.setMEGsignal(meg_mat);
+//                std::cout << "size meg_mat: " << meg_mat.rows() << " x " << meg_mat.cols() << std::endl;
+                  sssRR = rsss.getSSSRR(lineqn[0], lineqn[1], lineqn[2], lineqn[3], lineqn[4]*meg_mat);
+*/
 
-//            std::cout << "building SSS linear equation .....";
-//            lineqn = rsss.buildLinearEqn();
-//            std::cout << " finished !" << std::endl;
-
-//            std::cout << "running rtSSS .....";
-//            sssRR = rsss.getSSSRR(lineqn[0], lineqn[1], lineqn[2], lineqn[3], lineqn[4]);
-//            std::cout << " finished! " << std::endl;
-
-            m_pRTMSAOutput->data()->setValue(meg_mat.col(0).cast<double>());
-
+//                qDebug() << "running rtSSS .....";
+                sssRR = rsss.getSSSRR(lineqn[0], lineqn[1], lineqn[2], lineqn[3], lineqn[4]*in_mat.block(0,i,nmegchan,1));
+                in_mat.block(0,i,nmegchan,1) = sssRR[0];
+                m_pRTMSAOutput->data()->setValue(in_mat.col(i));
+            }
         }
-
     }
 
     m_bProcessData = false;
