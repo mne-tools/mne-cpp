@@ -75,7 +75,7 @@ typedef std::complex<double> cplxd;
 MatrixXd legendre(int, VectorXd);
 float plgndr(int l, int m, float x);
 double factorial(int);
-QList<MatrixXd> getSSSRR(MatrixXd, MatrixXd, MatrixXd, MatrixXd, MatrixXd);
+//QList<MatrixXd> getSSSRR(MatrixXd, MatrixXd, MatrixXd, MatrixXd, MatrixXd);
 VectorXd hypot(VectorXd, VectorXd);
 VectorXd atan2vec(VectorXd, VectorXd);
 VectorXd find(MatrixXd, int);
@@ -94,8 +94,6 @@ public:
     ~RtSssAlgo();
 
     QList<MatrixXd> buildLinearEqn();
-//    QList<MatrixXd> getSSSRR();
-//    QList<MatrixXd> getSSSOLS();
     QList<MatrixXd> getSSSRR(MatrixXd EqnIn, MatrixXd EqnOut, MatrixXd EqnARR, MatrixXd EqnA, MatrixXd EqnB);
     QList<MatrixXd> getSSSOLS(MatrixXd EqnIn, MatrixXd EqnOut, MatrixXd EqnA, MatrixXd EqnB);
     QList<MatrixXd> getLinEqn();
@@ -103,9 +101,7 @@ public:
     void setMEGInfo(FiffInfo::SPtr fiffinfo);
     void setSSSParameter(QList<int>);
     qint32 getNumMEGCh();
-    void setMEGsignal(MatrixXd megfrombuffer);
-
-//    FiffInfo::SPtr fiffInfo;
+//    void setMEGsignal(MatrixXd megfrombuffer);
 
 private:
     void getCoilInfoVectorView();
