@@ -62,7 +62,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns the channel number.
+    * Returns the parsed sensor group
     *
     * @param [in] sensorGroupElement    the xml element which contains the sensor group
     *
