@@ -66,6 +66,7 @@ NewRealTimeMultiSampleArray::NewRealTimeMultiSampleArray(QObject *parent)
 : NewMeasurement(QMetaType::type("NewRealTimeMultiSampleArray::SPtr"), parent)
 , m_dSamplingRate(0)
 , m_ucMultiArraySize(10)
+, m_bChInfoIsInit(false)
 {
 }
 
@@ -84,6 +85,8 @@ void NewRealTimeMultiSampleArray::init(QList<RealTimeSampleArrayChInfo> &chInfo)
 {
     m_qListChInfo = chInfo;
 
+    m_bChInfoIsInit = true;
+
 //    m_qListChInfo.clear();
 //    for(quint32 i = 0; i < uiNumChannels; ++i)
 //    {
@@ -100,6 +103,7 @@ void NewRealTimeMultiSampleArray::init(QList<RealTimeSampleArrayChInfo> &chInfo)
 void NewRealTimeMultiSampleArray::initFromFiffInfo(FiffInfo::SPtr &p_pFiffInfo)
 {
     m_qListChInfo.clear();
+    m_bChInfoIsInit = false;
 
     bool t_bIsBabyMEG = false;
 
@@ -223,6 +227,8 @@ void NewRealTimeMultiSampleArray::initFromFiffInfo(FiffInfo::SPtr &p_pFiffInfo)
 
 
     m_pFiffInfo_orig = p_pFiffInfo;
+
+    m_bChInfoIsInit = true;
 }
 
 

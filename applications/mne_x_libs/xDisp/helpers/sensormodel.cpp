@@ -249,8 +249,6 @@ void SensorModel::updateChannelState(SensorItem* item)
 
 void SensorModel::silentUpdateSelection(const QList<qint32>& selection)
 {
-    qDebug() << "SensorModel::silentUpdateSelection(const QList<qint32>& selection)";
-
     QMap<qint32, bool>::iterator it;
     for (it = m_qMapSelection.begin(); it != m_qMapSelection.end(); ++it)
         it.value() = false;
@@ -260,7 +258,10 @@ void SensorModel::silentUpdateSelection(const QList<qint32>& selection)
 
     //Update data content
     QModelIndex topLeft = this->index(0,3);
+
     QModelIndex bottomRight = this->index(m_qMapSelection.size()-1,3);
+
     QVector<int> roles; roles << Qt::DisplayRole;
+
     emit dataChanged(topLeft, bottomRight, roles);
 }

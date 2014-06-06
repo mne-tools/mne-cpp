@@ -167,20 +167,27 @@ void RealTimeMultiSampleArrayWidget::update(XMEASLIB::NewMeasurement::SPtr)
 {
     if(!m_bInitialized)
     {
-        m_qListChInfo = m_pRTMSA->chInfo();
-        m_fSamplingRate = m_pRTMSA->getSamplingRate();
-
-        QFile file(m_pRTMSA->getXMLLayoutFile());
-        if (!file.open(QFile::ReadOnly | QFile::Text))
-            qDebug() << QString("Cannot read file %1:\n%2.").arg(m_pRTMSA->getXMLLayoutFile()).arg(file.errorString());
-        else
+        if(m_pRTMSA->isChInit())
         {
-            m_pSensorModel = new SensorModel(&file, this);
-            m_pSensorModel->mapChannelInfo(m_qListChInfo);
-            m_pActionSelectSensors->setVisible(true);
-        }
+            m_qListChInfo = m_pRTMSA->chInfo();
+            m_fSamplingRate = m_pRTMSA->getSamplingRate();
 
-        init();
+            QFile file(m_pRTMSA->getXMLLayoutFile());
+            if (!file.open(QFile::ReadOnly | QFile::Text))
+            {
+                qDebug() << QString("Cannot read file %1:\n%2.").arg(m_pRTMSA->getXMLLayoutFile()).arg(file.errorString());
+                m_pSensorModel = new SensorModel(this);
+                m_pSensorModel->mapChannelInfo(m_qListChInfo);
+            }
+            else
+            {
+                m_pSensorModel = new SensorModel(&file, this);
+                m_pSensorModel->mapChannelInfo(m_qListChInfo);
+                m_pActionSelectSensors->setVisible(true);
+            }
+
+            init();
+        }
     }
     else
         m_pRTMSAModel->addData(m_pRTMSA->getMultiSampleArray());
