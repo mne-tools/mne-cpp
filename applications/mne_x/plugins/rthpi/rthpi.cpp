@@ -100,6 +100,18 @@ QSharedPointer<IPlugin> RtHpi::clone() const
 
 void RtHpi::init()
 {
+    // Input
+    m_pRTMSAInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "Rt HPI In", "RT HPI input data");
+    connect(m_pRTMSAInput.data(), &PluginInputConnector::notify, this, &RtHpi::update, Qt::DirectConnection);
+    m_inputConnectors.append(m_pRTMSAInput);
+
+    // Output
+    m_pRTMSAOutput = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "Rt HPI Out", "RT HPI output data");
+    m_outputConnectors.append(m_pRTMSAOutput);
+
+    m_pRTMSAOutput->data()->setMultiArraySize(100);
+    m_pRTMSAOutput->data()->setVisibility(true);
+
     //init channels when fiff info is available
     connect(this, &RtHpi::fiffInfoAvailable, this, &RtHpi::initConnector);
 
@@ -113,20 +125,9 @@ void RtHpi::init()
 
 void RtHpi::initConnector()
 {
+    qDebug() << "void RtHpi::initConnector()";
     if(m_pFiffInfo)
-    {
-        // Input
-        m_pRTMSAInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "Rt HPI In", "RT HPI input data");
-        connect(m_pRTMSAInput.data(), &PluginInputConnector::notify, this, &RtHpi::update, Qt::DirectConnection);
-        m_inputConnectors.append(m_pRTMSAInput);
-
-        // Output
-        m_pRTMSAOutput = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "Rt HPI Out", "RT HPI output data");
-        m_outputConnectors.append(m_pRTMSAOutput);
-
-        m_pRTMSAOutput->data()->setMultiArraySize(100);
-        m_pRTMSAOutput->data()->setVisibility(true);
-    }
+        m_pRTMSAOutput->data()->initFromFiffInfo(m_pFiffInfo);
 }
 
 
@@ -154,7 +155,7 @@ bool RtHpi::stop()
     //Wait until this thread is stopped
     m_bIsRunning = false;
 
-    if(this->isRunning())
+    if(m_bProcessData)
     {
         //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the pop function (acquire statement)
         m_pRtHpiBuffer->releaseFromPop();
@@ -209,7 +210,10 @@ void RtHpi::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
         //Fiff information
         if(!m_pFiffInfo)
+        {
             m_pFiffInfo = pRTMSA->getFiffInfo();
+            emit fiffInfoAvailable();
+        }
 
         if(m_bProcessData)
         {
@@ -229,14 +233,28 @@ void RtHpi::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
 void RtHpi::run()
 {
-    while (true)
+    //
+    // Read Fiff Info
+    //
+    while(!m_pFiffInfo)
+        msleep(10);// Wait for fiff Info
+
+
+    m_bProcessData = true;
+
+
+    while (m_bIsRunning)
     {
-        /* Dispatch the inputs */
-        double v = m_pRtHpiBuffer->pop();
+        if(m_bProcessData)
+        {
+            /* Dispatch the inputs */
+            MatrixXd t_mat = m_pRtHpiBuffer->pop();
 
-        //ToDo: Implement your algorithm here
+            //ToDo: Implement your algorithm here
 
-        m_pRTMSAOutput->data()->setValue(v);
+            for(qint32 i = 0; i < t_mat.cols(); ++i)
+                m_pRTMSAOutput->data()->setValue(t_mat.col(i));
+        }
     }
 }
 
