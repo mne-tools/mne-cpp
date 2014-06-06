@@ -38,9 +38,9 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>210</y>
+     <y>110</y>
      <width>361</width>
-     <height>71</height>
+     <height>171</height>
     </rect>
    </property>
    <property name="html">
@@ -51,7 +51,9 @@ p, li { white-space: pre-wrap; }
 &lt;table border=&quot;0&quot; style=&quot;-qt-table-type: root; margin-top:4px; margin-bottom:4px; margin-left:4px; margin-right:4px;&quot;&gt;
 &lt;tr&gt;
 &lt;td style=&quot;border: none;&quot;&gt;
-&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Copyright © 2013 Christoph Dinh, Matti Hämäläinen. All rights reserved.&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</string>
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Copyright © 2014 Seok Lew, Matti Hämäläinen. All rights reserved.&lt;/p&gt;
+&lt;p style=&quot;-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Acknowledgement: This algorithm is implemented based on a paper, 'Real-Time Robust Signal Space Separation for Magnetoencephalography', by Chenlei Guo, Xin Li, Samu Taulu, Wei Wang, and Douglas J. Weber, published in IEEE Transactions on Biomedical Engieering Vol 57, p1856~1866, August 2010.&lt;/p&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
   </widget>
  </widget>
