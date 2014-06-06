@@ -203,7 +203,6 @@ void RtHpi::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
     if(pRTMSA)
     {
-
         //Check if buffer initialized
         if(!m_pRtHpiBuffer)
             m_pRtHpiBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSA->getNumChannels(), pRTMSA->getMultiArraySize()));
@@ -239,9 +238,7 @@ void RtHpi::run()
     while(!m_pFiffInfo)
         msleep(10);// Wait for fiff Info
 
-
     m_bProcessData = true;
-
 
     while (m_bIsRunning)
     {
