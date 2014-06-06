@@ -264,3 +264,4 @@ void NewRealTimeMultiSampleArray::setValue(VectorXd v)
         m_matSamples.clear();
     }
 }
+
