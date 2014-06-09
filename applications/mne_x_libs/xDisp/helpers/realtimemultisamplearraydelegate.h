@@ -45,6 +45,16 @@
 #include <QTableView>
 
 
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE XDISPLIB
+//=============================================================================================================
+
+namespace XDISPLIB
+{
+
+
 //=============================================================================================================
 /**
 * DECLARE CLASS RealTimeMultiSampleArrayDelegate
@@ -110,5 +120,7 @@ private:
     float m_fMaxValue;     /**< Maximum value of the data to plot  */
     float m_fScaleY;       /**< Maximum amplitude of plot (max is m_dPlotHeight/2) */
 };
+
+} // NAMESPACE
 
 #endif // REALTIMEMULTISAMPLEARRAYDELEGATE_H
