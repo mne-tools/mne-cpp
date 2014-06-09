@@ -7,6 +7,7 @@ var searchData=
   ['dipole',['Dipole',['../class_i_n_v_e_r_s_e_l_i_b_1_1_dipole.html',1,'INVERSELIB']]],
   ['dipolepair',['DipolePair',['../struct_i_n_v_e_r_s_e_l_i_b_1_1_dipole_pair.html',1,'INVERSELIB']]],
   ['directrecord',['DirectRecord',['../class_direct_record.html',1,'']]],
+  ['displaymanager',['DisplayManager',['../class_m_n_e_x_1_1_display_manager.html',1,'MNEX']]],
   ['dummyaboutwidget',['DummyAboutWidget',['../class_dummy_toolbox_plugin_1_1_dummy_about_widget.html',1,'DummyToolboxPlugin']]],
   ['dummyaboutwidgetclass',['DummyAboutWidgetClass',['../class_ui_1_1_dummy_about_widget_class.html',1,'Ui']]],
   ['dummysetupwidget',['DummySetupWidget',['../class_dummy_toolbox_plugin_1_1_dummy_setup_widget.html',1,'DummyToolboxPlugin']]],

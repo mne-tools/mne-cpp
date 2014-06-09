@@ -6,6 +6,8 @@ var searchData=
   ['dipole_2eh',['dipole.h',['../dipole_8h.html',1,'']]],
   ['disp3d_5fglobal_2eh',['disp3D_global.h',['../disp3_d__global_8h.html',1,'']]],
   ['disp_5fglobal_2eh',['disp_global.h',['../disp__global_8h.html',1,'']]],
+  ['displaymanager_2ecpp',['displaymanager.cpp',['../displaymanager_8cpp.html',1,'']]],
+  ['displaymanager_2eh',['displaymanager.h',['../displaymanager_8h.html',1,'']]],
   ['dummyaboutwidget_2ecpp',['dummyaboutwidget.cpp',['../dummyaboutwidget_8cpp.html',1,'']]],
   ['dummyaboutwidget_2eh',['dummyaboutwidget.h',['../dummyaboutwidget_8h.html',1,'']]],
   ['dummysetupwidget_2ecpp',['dummysetupwidget.cpp',['../dummysetupwidget_8cpp.html',1,'']]],

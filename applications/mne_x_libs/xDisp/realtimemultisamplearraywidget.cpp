@@ -113,6 +113,8 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
 , m_fDesiredSamplingRate(128)
 , m_pSensorModel(NULL)
 {
+    Q_UNUSED(pTime)
+
     m_pDoubleSpinBoxZoom = new QDoubleSpinBox(this);
     m_pDoubleSpinBoxZoom->setMinimum(0.3);
     m_pDoubleSpinBoxZoom->setMaximum(4.0);
@@ -294,8 +296,9 @@ void RealTimeMultiSampleArrayWidget::channelContextMenu(QPoint pos)
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayWidget::resizeEvent(QResizeEvent*)
+void RealTimeMultiSampleArrayWidget::resizeEvent(QResizeEvent* resizeEvent)
 {
+    Q_UNUSED(resizeEvent)
 }
 
 
@@ -303,7 +306,7 @@ void RealTimeMultiSampleArrayWidget::resizeEvent(QResizeEvent*)
 
 void RealTimeMultiSampleArrayWidget::keyPressEvent(QKeyEvent* keyEvent)
 {
-
+    Q_UNUSED(keyEvent)
 }
 
 
@@ -311,7 +314,7 @@ void RealTimeMultiSampleArrayWidget::keyPressEvent(QKeyEvent* keyEvent)
 
 void RealTimeMultiSampleArrayWidget::mousePressEvent(QMouseEvent* mouseEvent)
 {
-
+    Q_UNUSED(mouseEvent)
 }
 
 
@@ -319,23 +322,23 @@ void RealTimeMultiSampleArrayWidget::mousePressEvent(QMouseEvent* mouseEvent)
 
 void RealTimeMultiSampleArrayWidget::mouseMoveEvent(QMouseEvent* mouseEvent)
 {
-
+    Q_UNUSED(mouseEvent)
 }
 
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayWidget::mouseReleaseEvent(QMouseEvent*)
+void RealTimeMultiSampleArrayWidget::mouseReleaseEvent(QMouseEvent* mouseEvent)
 {
-
+    Q_UNUSED(mouseEvent)
 }
 
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayWidget::mouseDoubleClickEvent(QMouseEvent*)
+void RealTimeMultiSampleArrayWidget::mouseDoubleClickEvent(QMouseEvent* mouseEvent)
 {
-
+    Q_UNUSED(mouseEvent)
 }
 
 
@@ -343,7 +346,7 @@ void RealTimeMultiSampleArrayWidget::mouseDoubleClickEvent(QMouseEvent*)
 
 void RealTimeMultiSampleArrayWidget::wheelEvent(QWheelEvent* wheelEvent)
 {
-
+    Q_UNUSED(wheelEvent)
 }
 
 //*************************************************************************************************************
