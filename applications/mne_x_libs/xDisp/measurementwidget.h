@@ -131,6 +131,6 @@ public:
     virtual void init() = 0;
 };
 
-}
+} // NAMESPACE
 
 #endif // MEASUREMENTWIDGET_H
