@@ -156,10 +156,15 @@ public:
     virtual void init();
 
 public slots:
+    //=========================================================================================================
+    /**
+    * Show channel context menu
+    *
+    * @param [in] pos   Position to popup the conext menu.
+    */
     void channelContextMenu(QPoint pos);
 
 protected:
-
     //=========================================================================================================
     /**
     * Is called when RealTimeSampleArrayWidget is resized.
@@ -223,14 +228,6 @@ protected:
     virtual void wheelEvent(QWheelEvent* wheelEvent);
 
 private:
-    RealTimeMultiSampleArrayModel*      m_pRTMSAModel;
-    RealTimeMultiSampleArrayDelegate*   m_pRTMSADelegate;
-    QTableView* m_pTableView;                               /**< the QTableView being part of the model/view framework of Qt */
-
-    float m_fDefaultSectionSize;                            /**< Default row height */
-    float m_fZoomFactor;                                    /**< Zoom factor */
-    QDoubleSpinBox* m_pDoubleSpinBoxZoom;                   /**< Adjust Zoom Factor */
-
     //=========================================================================================================
     /**
     * Sets new zoom factor
@@ -238,18 +235,6 @@ private:
     * @param [in] zoomFac  time window size;
     */
     void zoomChanged(double zoomFac);
-
-    QSharedPointer<NewRealTimeMultiSampleArray> m_pRTMSA;       /**< The real-time sample array measurement. */
-
-    bool m_bInitialized;
-
-    QList<RealTimeSampleArrayChInfo> m_qListChInfo;         /**< Channel info list. ToDo: check if this is obsolete later on*/
-
-    qint32 m_iT;                        /**< Display window size in seconds */
-    float m_fSamplingRate;              /**< Sampling rate */
-    float m_fDesiredSamplingRate;       /**< Desired display sampling rate */
-
-    QSpinBox*   m_pSpinBoxTimeScale;                        /**< time scale spin box */
 
     //=========================================================================================================
     /**
@@ -259,16 +244,43 @@ private:
     */
     void timeWindowChanged(int T);
 
-    QAction*    m_pActionSelectSensors;                                     /**< show roi select widget */
-    void showSensorSelectionWidget();                                      /**< Implements the show roi selection widget.*/
+    //=========================================================================================================
+    /**
+    * Shows sensor selection widget
+    */
+    void showSensorSelectionWidget();
+
+    RealTimeMultiSampleArrayModel*      m_pRTMSAModel;      /**< RTMSA data model */
+    RealTimeMultiSampleArrayDelegate*   m_pRTMSADelegate;   /**< RTMSA data delegate */
+    QTableView* m_pTableView;                               /**< the QTableView being part of the model/view framework of Qt */
+
+    float m_fDefaultSectionSize;                            /**< Default row height */
+    float m_fZoomFactor;                                    /**< Zoom factor */
+    QDoubleSpinBox* m_pDoubleSpinBoxZoom;                   /**< Adjust Zoom Factor */
+
+
+    QSharedPointer<NewRealTimeMultiSampleArray> m_pRTMSA;   /**< The real-time sample array measurement. */
+
+    bool m_bInitialized;                                    /**< Is Initialized */
+
+    QList<RealTimeSampleArrayChInfo> m_qListChInfo;         /**< Channel info list. ToDo: check if this is obsolete later on*/
+
+    qint32 m_iT;                                            /**< Display window size in seconds */
+    float m_fSamplingRate;                                  /**< Sampling rate */
+    float m_fDesiredSamplingRate;                           /**< Desired display sampling rate */
+
+    QSpinBox*   m_pSpinBoxTimeScale;                        /**< Time scale spin box */
+
+    QAction*    m_pActionSelectSensors;                     /**< show roi select widget */
+
 
     SensorModel* m_pSensorModel;                            /**< Sensor model for channel selection */
     QSharedPointer<SensorWidget> m_pSensorSelectionWidget;  /**< Sensor selection widget. */
 
 
-    QList<qint32> m_qListCurrentSelection;      /**< Current selection list -> hack around C++11 lambda  */
-    void applySelection();                      /**< apply the in m_qListCurrentSelection stored selection -> hack around C++11 lambda */
-    void resetSelection();                      /**< reset the in m_qListCurrentSelection stored selection -> hack around C++11 lambda */
+    QList<qint32> m_qListCurrentSelection;  /**< Current selection list -> hack around C++11 lambda  */
+    void applySelection();                  /**< apply the in m_qListCurrentSelection stored selection -> hack around C++11 lambda */
+    void resetSelection();                  /**< reset the in m_qListCurrentSelection stored selection -> hack around C++11 lambda */
 };
 
 } // NAMESPACE
