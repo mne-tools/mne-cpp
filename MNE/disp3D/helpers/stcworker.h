@@ -16,9 +16,10 @@
 //=============================================================================================================
 
 #include <QObject>
-#include <QVector>
+#include <QList>
 #include <QThread>
 #include <QSharedPointer>
+#include <QMutex>
 
 
 //*************************************************************************************************************
@@ -44,13 +45,17 @@ public:
 
 //    void setIntervall(int intervall);
 
-    void addData();
+    void addData(QList<VectorXd> &data);
 
     void process();
 
+signals:
+    void stcSample(VectorXd sample);
+
 private:
 
-    QVector<VectorXd> m_data;   /**< List that holds the fiff matrix data <n_channels x n_samples> */
+    QMutex m_qMutex;
+    QList<VectorXd> m_data;   /**< List that holds the fiff matrix data <n_channels x n_samples> */
 
 
 

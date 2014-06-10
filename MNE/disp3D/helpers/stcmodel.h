@@ -10,6 +10,10 @@
 
 #include "stcworker.h"
 
+#include <fs/label.h>
+#include <fs/surfaceset.h>
+#include <fs/annotationset.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -46,6 +50,7 @@ namespace MNELIB
 
 using namespace Eigen;
 using namespace MNELIB;
+using namespace FSLIB;
 
 
 class DISP3DSHARED_EXPORT StcModel : public QAbstractTableModel
@@ -61,6 +66,11 @@ public:
 
     void addData(const MNESourceEstimate &stc);
 
+    void init(const AnnotationSet &annotationSet, const SurfaceSet &surfSet);
+
+
+    void setStcSample(const VectorXd &sample);
+
     void setVertices(const VectorXi &vertnos);
 
 signals:
@@ -68,19 +78,29 @@ signals:
 
 
 private:
-    QSharedPointer<QThread>    m_pThread;
-    StcWorker::SPtr  m_pWorker;
+    QSharedPointer<QThread> m_pThread;
+    StcWorker::SPtr         m_pWorker;
 
 
     bool m_bRTMode;
-
-
-    QVector<VectorXd> m_data;   /**< List that holds the fiff matrix data <n_channels x n_samples> */
+    bool m_bIsInit;
 
     VectorXi m_vertices;
 
     qint32 m_iDownsampling;     /**< Down sampling factor */
     qint32 m_iCurrentSample;    /**< Downsampling */
+
+
+
+
+    //ROI Stuff
+    VectorXd m_vecCurrentStc;
+
+    QList<Label> m_qListLabels;
+    QList<RowVector4i> m_qListRGBAs;
+
+    AnnotationSet m_annotationSet;
+    SurfaceSet m_surfSet;
 
 };
 

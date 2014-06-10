@@ -185,10 +185,10 @@ QSize RealTimeMultiSampleArrayDelegate::sizeHint(const QStyleOptionViewItem &opt
 //        qint32 nsamples = (static_cast<const RealTimeMultiSampleArrayModel*>(index.model()))->lastSample()-(static_cast<const RealTimeMultiSampleArrayModel*>(index.model()))->firstSample();
 
 //        size = QSize(nsamples*m_dDx,m_dPlotHeight);
+        Q_UNUSED(option);
         break;
     }
 
-    Q_UNUSED(option);
 
     return size;
 }

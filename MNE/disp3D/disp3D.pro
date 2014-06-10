@@ -86,8 +86,8 @@ SOURCES += \
     inverseviewproducer.cpp \
     brainview.cpp \
     helpers/stcmodel.cpp \
-    helpers/stcdelegate.cpp \
-    helpers/stcworker.cpp
+    helpers/stcworker.cpp \
+    helpers/stctabledelegate.cpp
 
 HEADERS += \
     disp3D_global.h \
@@ -97,8 +97,8 @@ HEADERS += \
     inverseviewproducer.h \
     brainview.h \
     helpers/stcmodel.h \
-    helpers/stcdelegate.h \
-    helpers/stcworker.h
+    helpers/stcworker.h \
+    helpers/stctabledelegate.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
