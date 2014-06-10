@@ -84,6 +84,7 @@ private:
 
     bool m_bRTMode;
     bool m_bIsInit;
+    bool m_bIntervallSet;
 
     VectorXi m_vertices;
 
