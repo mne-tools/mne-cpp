@@ -49,6 +49,10 @@ public:
 
     void process();
 
+    void setInterval(int usec);
+
+    void setLoop(bool looping);
+
 signals:
     void stcSample(VectorXd sample);
 
@@ -56,9 +60,10 @@ private:
 
     QMutex m_qMutex;
     QList<VectorXd> m_data;   /**< List that holds the fiff matrix data <n_channels x n_samples> */
+    bool m_bIsLooping;
 
-
-
+    qint32 m_iCurrentSample;
+    qint32 m_iUSecIntervall;
 };
 
 #endif // STCWORKER_H
