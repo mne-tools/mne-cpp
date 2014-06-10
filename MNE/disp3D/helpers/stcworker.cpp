@@ -12,9 +12,12 @@ StcWorker::StcWorker(QObject *parent) :
 
 //*************************************************************************************************************
 
-void StcWorker::addData()
+void StcWorker::addData(QList<VectorXd> &data)
 {
-    qDebug() << "addData" << QThread::currentThread();
+//    qDebug() << "addData" << QThread::currentThread();
+    m_qMutex.lock();
+    m_data.append(data);
+    m_qMutex.unlock();
 }
 
 
@@ -24,7 +27,12 @@ void StcWorker::process()
 {
     while(true)
     {
-        qDebug() << "generateData" << QThread::currentThread();
-        QThread::msleep(500);
+        QThread::msleep(30);
+        if(!m_data.isEmpty())
+        {
+            qDebug() << "process currentThread" << QThread::currentThread();
+            emit stcSample(m_data.front());
+            m_data.pop_front();
+        }
     }
 }
