@@ -246,9 +246,9 @@ void BabyMEGInfo::MGH_LM_Parse_Para(QByteArray cmdstr)
         //qDebug()<<t_ch.ch_name;
         t_ch.scanno = i;
         t_ch.logno = i+1;
-        //t_ch.cal = 1;
-        t_ch.cal = lm_ch_scales.at(i).toFloat(); // set scale
-        qDebug()<<t_ch.cal;
+        t_ch.cal = 1;
+        t_ch.unit_mul = lm_ch_scales.at(i).toFloat(); // set scale
+        //qDebug()<<t_ch.cal;
         t_ch.range = 1;
         t_ch.loc.setZero(12,1);
 
@@ -266,7 +266,7 @@ void BabyMEGInfo::MGH_LM_Parse_Para(QByteArray cmdstr)
         t_ch.loc(10,0) = lm_ch_pos11.at(i).toDouble();
         t_ch.loc(11,0) = lm_ch_pos12.at(i).toDouble();
 
-        qDebug()<<t_ch.loc(0,0)<<t_ch.loc(1,0)<<t_ch.loc(2,0);
+        //qDebug()<<t_ch.loc(0,0)<<t_ch.loc(1,0)<<t_ch.loc(2,0);
 
         QString type = t_ch.ch_name.left(3);
         int ntype = 0;
