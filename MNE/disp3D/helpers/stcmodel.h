@@ -95,7 +95,9 @@ private:
 
 
     //ROI Stuff
-    VectorXd m_vecCurrentStc;
+    VectorXd m_vecCurStc;
+    VectorXd m_vecCurRelStc;
+    double m_dStcNorm;
 
     QList<Label> m_qListLabels;
     QList<RowVector4i> m_qListRGBAs;

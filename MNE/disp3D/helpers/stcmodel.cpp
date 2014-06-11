@@ -21,6 +21,7 @@ StcModel::StcModel(QObject *parent)
 , m_bIntervallSet(false)
 , m_iDownsampling(20)
 , m_iCurrentSample(0)
+, m_dStcNorm(3.0)
 {
     qRegisterMetaType<MatrixXd>("MatrixXd");
     qRegisterMetaType<VectorXd>("VectorXd");
@@ -53,7 +54,7 @@ int StcModel::rowCount(const QModelIndex & /*parent*/) const
 
 int StcModel::columnCount(const QModelIndex & /*parent*/) const
 {
-    return 5;
+    return 6;
 }
 
 
@@ -67,25 +68,38 @@ QVariant StcModel::data(const QModelIndex &index, int role) const
     if (index.isValid()) {
         qint32 row = index.row();
 
-        //******** first column (index) ********
-        if(index.column() == 0 && role == Qt::DisplayRole)
-            return QVariant(row);
-
-        //******** second column (vertex) ********
-        if(index.column() == 1)
-            return QVariant(m_vertices(row));
-
-        //******** third column (stc data) ********
-        if(index.column() == 2 && m_bIsInit)
-            return QVariant(m_vecCurrentStc(row));
-
-        //******** fourth column (roi name) ********
-        if(index.column() == 3)
-            return QVariant(m_qListLabels[row].name);
-
-        //******** fourth column (roi name) ********
-        if(index.column() == 4)
-            return QVariant(QColor(m_qListRGBAs[row](0),m_qListRGBAs[row](1),m_qListRGBAs[row](2),255));
+        switch(index.column()) {
+            case 0: { // index
+                if(role == Qt::DisplayRole)
+                    return QVariant(row);
+                break;
+            }
+            case 1: { // vertex
+                if(role == Qt::DisplayRole)
+                    return QVariant(m_vertices(row));
+                break;
+            }
+            case 2: { // stc data
+                if(m_bIsInit && role == Qt::DisplayRole)
+                    return QVariant(m_vecCurStc(row));
+                break;
+            }
+            case 3: { // relative stc data
+                if(m_bIsInit && role == Qt::DisplayRole)
+                    return QVariant(m_vecCurRelStc(row));
+                break;
+            }
+            case 4: { // roi name
+                if(role == Qt::DisplayRole)
+                    return QVariant(m_qListLabels[row].name);
+                break;
+            }
+            case 5: { // roi color
+                if(role == Qt::DisplayRole)
+                    return QVariant(QColor(m_qListRGBAs[row](0),m_qListRGBAs[row](1),m_qListRGBAs[row](2),255));
+                break;
+            }
+        }
     } // end index.valid() check
 
     return QVariant();
@@ -101,22 +115,24 @@ QVariant StcModel::headerData(int section, Qt::Orientation orientation, int role
 
     if(orientation == Qt::Horizontal) {
         switch(section) {
-        case 0: //index column
-            return QVariant("Index");
-        case 1: //vertex column
-            return QVariant("Vertex");
-        case 2: //stc data column
-            return QVariant("STC");
-        case 3: //roi name column
-            return QVariant("ROI Name");
-//            switch(role) {
-//            case Qt::DisplayRole:
-//                return QVariant("data plot");
-//            case Qt::TextAlignmentRole:
-//                return QVariant(Qt::AlignLeft);
-//            }
-        case 4: //roi color column
-            return QVariant("ROI Color");
+            case 0: //index column
+                return QVariant("Index");
+            case 1: //vertex column
+                return QVariant("Vertex");
+            case 2: //stc data column
+                return QVariant("STC");
+            case 3: //realtive stc data column
+                return QVariant("Relative STC");
+            case 4: //roi name column
+                return QVariant("ROI Name");
+    //            switch(role) {
+    //            case Qt::DisplayRole:
+    //                return QVariant("data plot");
+    //            case Qt::TextAlignmentRole:
+    //                return QVariant(Qt::AlignLeft);
+    //            }
+            case 5: //roi color column
+                return QVariant("ROI Color");
         }
     }
     else if(orientation == Qt::Vertical) {
@@ -173,7 +189,8 @@ void StcModel::init(const AnnotationSet &annotationSet, const SurfaceSet &surfSe
     m_annotationSet = annotationSet;
     m_surfSet = surfSet;
     m_annotationSet.toLabels(m_surfSet, m_qListLabels, m_qListRGBAs);
-    m_vecCurrentStc = VectorXd::Zero(m_qListLabels.size());
+    m_vecCurStc = VectorXd::Zero(m_qListLabels.size());
+    m_vecCurRelStc = VectorXd::Zero(m_qListLabels.size());;
     endResetModel();
     m_bIsInit = true;
 }
@@ -183,7 +200,9 @@ void StcModel::init(const AnnotationSet &annotationSet, const SurfaceSet &surfSe
 
 void StcModel::setStcSample(const VectorXd &sample)
 {
-    m_vecCurrentStc = sample;
+    m_vecCurStc = sample;
+
+    m_vecCurRelStc = sample/m_dStcNorm;
 
     //Update data content
     QModelIndex topLeft = this->index(0,2);
