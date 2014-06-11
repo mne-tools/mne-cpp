@@ -1,4 +1,4 @@
-MNE-CPP
+MNE-CPP 
 =========
 
 MNE cross-platform standalone MEG/EEG (real-time) applications using [Qt5](http://qt-project.org/downloads)'s and [Eigen](http://eigen.tuxfamily.org)'s C++ libraries
