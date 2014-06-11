@@ -19,13 +19,14 @@ StcModel::StcModel(QObject *parent)
 , m_bRTMode(true)
 , m_bIsInit(false)
 , m_bIntervallSet(false)
-, m_iDownsampling(20)
+, m_iDownSampling(20)
 , m_iCurrentSample(0)
-, m_dStcNormMax(5.0)
+, m_dStcNormMax(10.0)
 , m_dStcNorm(1.0)
 {
     qRegisterMetaType<MatrixXd>("MatrixXd");
     qRegisterMetaType<VectorXd>("VectorXd");
+    qRegisterMetaType<Matrix3Xf>("Matrix3Xf");
 
     m_pWorker->moveToThread(m_pThread.data());
     connect(m_pThread.data(), &QThread::started, m_pWorker.data(), &StcWorker::process);
@@ -55,7 +56,7 @@ int StcModel::rowCount(const QModelIndex & /*parent*/) const
 
 int StcModel::columnCount(const QModelIndex & /*parent*/) const
 {
-    return 6;
+    return 7;
 }
 
 
@@ -90,14 +91,27 @@ QVariant StcModel::data(const QModelIndex &index, int role) const
                     return QVariant(m_vecCurRelStc(row));
                 break;
             }
-            case 4: { // roi name
+            case 4: { // Label
                 if(role == Qt::DisplayRole)
-                    return QVariant(m_qListLabels[row].name);
+                {
+                    QVariant v;
+                    v.setValue(m_qListLabels[row]);
+                    return v;
+                }
                 break;
             }
-            case 5: { // roi color
+            case 5: { // Color
                 if(role == Qt::DisplayRole)
                     return QVariant(QColor(m_qListRGBAs[row](0),m_qListRGBAs[row](1),m_qListRGBAs[row](2),255));
+                break;
+            }
+            case 6: { // Tri RRs
+                if(role == Qt::DisplayRole)
+                {
+                    QVariant v;
+                    v.setValue(m_qListTriRRs[row]);
+                    return v;
+                }
                 break;
             }
         }
@@ -125,9 +139,11 @@ QVariant StcModel::headerData(int section, Qt::Orientation orientation, int role
             case 3: //realtive stc data column
                 return QVariant("Relative STC");
             case 4: //roi name column
-                return QVariant("ROI Name");
+                return QVariant("Label");
             case 5: //roi color column
-                return QVariant("ROI Color");
+                return QVariant("Color");
+            case 6: //roi Tri Coords
+                return QVariant("Tri Coords");
         }
     }
     else if(orientation == Qt::Vertical) {
@@ -159,7 +175,7 @@ void StcModel::addData(const MNESourceEstimate &stc)
     //Downsampling ->ToDo make this more accurate
     qint32 i;
     QList<VectorXd> data;
-    for(i = m_iCurrentSample; i < stc.data.cols(); i += m_iDownsampling)
+    for(i = m_iCurrentSample; i < stc.data.cols(); i += m_iDownSampling)
         data.append(stc.data.col(i));
 
     m_pWorker->addData(data);
@@ -184,6 +200,40 @@ void StcModel::init(const AnnotationSet &annotationSet, const SurfaceSet &surfSe
     m_annotationSet = annotationSet;
     m_surfSet = surfSet;
     m_annotationSet.toLabels(m_surfSet, m_qListLabels, m_qListRGBAs);
+
+    for(qint32 h = 0; h < m_annotationSet.size(); ++h)
+    {
+        MatrixX3i tris;
+        MatrixX3f rr = m_surfSet[h].rr();
+
+        //
+        // Create each ROI
+        //
+        for(qint32 k = 0; k < m_qListLabels.size(); ++k)
+        {
+            //check if label hemi fits current hemi
+            if(m_qListLabels[k].hemi != h)
+                continue;
+
+            //Ggenerate label tri information
+            tris = m_qListLabels[k].selectTris(m_surfSet[h]);
+
+
+            Matrix3Xf triCoords(3,3*tris.rows());
+
+            for(qint32 i = 0; i < tris.rows(); ++i)
+            {
+                triCoords.col(i*3) = rr.row( tris(i,0) ).transpose();
+                triCoords.col(i*3+1) = rr.row( tris(i,1) ).transpose();
+                triCoords.col(i*3+2) = rr.row( tris(i,2) ).transpose();
+            }
+
+            m_qListTriRRs.append(triCoords);
+        }
+    }
+
+
+
     m_vecCurStc = VectorXd::Zero(m_qListLabels.size());
     m_vecCurRelStc = VectorXd::Zero(m_qListLabels.size());;
     endResetModel();
@@ -215,11 +265,24 @@ void StcModel::setStcSample(const VectorXd &sample)
 
     m_vecCurRelStc = sample/m_dStcNorm;
 
-    //Update data content
+    //Update data content -> Bug in QTableView which updates the whole table http://qt-project.org/forums/viewthread/14723
     QModelIndex topLeft = this->index(0,2);
-    QModelIndex bottomRight = this->index(m_qListLabels.size()-1,2);
+    QModelIndex bottomRight = this->index(m_qListLabels.size()-1,3);
     QVector<int> roles; roles << Qt::DisplayRole;
-    emit dataChanged(topLeft, bottomRight);
+    emit dataChanged(topLeft, bottomRight, roles);
+
+    //Alternative for Table View -> Do update per item instead
+//    QModelIndex topLeft, bottomRight;
+//    QVector<int> roles; roles << Qt::DisplayRole;
+//    for(qint32 i = 0; i < m_qListLabels.size(); ++i)
+//    {
+//        topLeft = this->index(i,2);
+//        bottomRight = this->index(i,2);
+//        emit dataChanged(topLeft, bottomRight, roles);
+//        topLeft = this->index(i,3);
+//        bottomRight = this->index(i,3);
+//        emit dataChanged(topLeft, bottomRight, roles);
+//    }
 }
 
 
