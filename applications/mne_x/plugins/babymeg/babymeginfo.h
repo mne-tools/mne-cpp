@@ -81,6 +81,20 @@ public:
     int dataLength;
     double sfreq;
     QStringList lm_ch_names;
+    // parameters of single channel
+    QStringList lm_ch_scales;
+    QStringList lm_ch_pos1;
+    QStringList lm_ch_pos2;
+    QStringList lm_ch_pos3;
+    QStringList lm_ch_pos4;
+    QStringList lm_ch_pos5;
+    QStringList lm_ch_pos6;
+    QStringList lm_ch_pos7;
+    QStringList lm_ch_pos8;
+    QStringList lm_ch_pos9;
+    QStringList lm_ch_pos10;
+    QStringList lm_ch_pos11;
+    QStringList lm_ch_pos12;
 
     //BB_QUEUE
     QQueue<QByteArray> g_queue;
