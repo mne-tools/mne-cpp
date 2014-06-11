@@ -1,6 +1,9 @@
 #include "stctabledelegate.h"
+#include "stcmodel.h" //Declar MetaType Eigen::Matrix3Xf; FSLIB::Label
 #include <QPainter>
 #include <QDebug>
+
+using namespace Eigen;
 
 StcTableDelegate::StcTableDelegate(QObject *parent)
 : QAbstractItemDelegate(parent)
@@ -45,21 +48,29 @@ void StcTableDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
             painter->restore();
             break;
         }
-        case 4: { //roi name
+        case 4: { //Label
             painter->save();
 
-            painter->drawText(option.rect,Qt::AlignVCenter|Qt::AlignLeft,index.model()->data(index,Qt::DisplayRole).toString());
+            painter->drawText(option.rect,Qt::AlignVCenter|Qt::AlignLeft,index.model()->data(index,Qt::DisplayRole).value<Label>().name);
 
             painter->restore();
             break;
         }
-        case 5: { //roi color
+        case 5: { //Color
             painter->save();
 
             QColor c = index.model()->data(index,Qt::DisplayRole).value<QColor>();
 
             painter->setPen(c);
             painter->drawText(option.rect,Qt::AlignVCenter|Qt::AlignLeft,c.name());
+
+            painter->restore();
+            break;
+        }
+        case 6: { //Tri Coords
+            painter->save();
+
+            painter->drawText(option.rect,Qt::AlignVCenter|Qt::AlignLeft,QString("%1").arg(index.model()->data(index,Qt::DisplayRole).value<Matrix3Xf>().cols()));
 
             painter->restore();
             break;

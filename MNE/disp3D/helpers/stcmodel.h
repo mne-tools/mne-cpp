@@ -93,7 +93,7 @@ private:
 
     VectorXi m_vertices;
 
-    qint32 m_iDownsampling;     /**< Down sampling factor */
+    qint32 m_iDownSampling;     /**< Downsampling factor */
     qint32 m_iCurrentSample;    /**< Downsampling */
 
 
@@ -110,12 +110,14 @@ private:
 
     QList<Label> m_qListLabels;
     QList<RowVector4i> m_qListRGBAs;
+    QList<Matrix3Xf> m_qListTriRRs;
 
     AnnotationSet m_annotationSet;
     SurfaceSet m_surfSet;
 
 };
 
-Q_DECLARE_METATYPE(Eigen::MatrixXd);
+Q_DECLARE_METATYPE(Eigen::Matrix3Xf);
+Q_DECLARE_METATYPE(FSLIB::Label);
 
 #endif // STCMODEL_H
