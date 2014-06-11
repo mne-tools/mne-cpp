@@ -71,6 +71,8 @@
 #include <QSet>
 #include <QElapsedTimer>
 #include <QTableView>
+#include <QGridLayout>
+#include <QLabel>
 
 
 //*************************************************************************************************************
@@ -119,25 +121,40 @@ int main(int argc, char *argv[])
     qDebug() << "sourceEstimateClustered" << sourceEstimateClustered.data.rows() << "x" << sourceEstimateClustered.data.cols();
 
 
+    QWidget* pWidget = new QWidget;
+    QGridLayout *mainLayout = new QGridLayout;
 
     QTableView* pTableView = new QTableView;
-
     StcModel* pStcModel = new StcModel;
-
     pStcModel->init(t_annotationSet, t_surfSet);
-
     StcTableDelegate* pStcTableDelegate = new StcTableDelegate;
-
-
     pTableView->setModel(pStcModel);
     pTableView->setItemDelegate(pStcTableDelegate);
-
     pTableView->setColumnHidden(0,true); //because content is plotted jointly with column=1
 
-//    pTableView->resizeColumnsToContents();
+    QLabel * pLabelNorm = new QLabel("Norm");
+    QSlider* pSliderNorm = new QSlider(Qt::Vertical);
+    QObject::connect(pSliderNorm, &QSlider::valueChanged, pStcModel, &StcModel::setNormalization);
+    pSliderNorm->setMinimum(1);
+    pSliderNorm->setMaximum(100);
+    pSliderNorm->setValue(50);
 
-    pTableView->show();
-    pTableView->resize(800,600);
+    QLabel * pLabelAverage = new QLabel("Average");
+    QSlider* pSliderAverage = new QSlider(Qt::Horizontal);
+    QObject::connect(pSliderAverage, &QSlider::valueChanged, pStcModel, &StcModel::setAverage);
+    pSliderAverage->setMinimum(1);
+    pSliderAverage->setMaximum(5000);
+    pSliderAverage->setValue(500);
+
+    mainLayout->addWidget(pTableView,0,0,2,2);
+    mainLayout->addWidget(pLabelNorm,0,3);
+    mainLayout->addWidget(pSliderNorm,1,3);
+    mainLayout->addWidget(pLabelAverage,3,0);
+    mainLayout->addWidget(pSliderAverage,3,1);
+
+    pWidget->setLayout(mainLayout);
+    pWidget->show();
+    pWidget->resize(800,600);
 
     pStcModel->addData(sourceEstimateClustered);
 

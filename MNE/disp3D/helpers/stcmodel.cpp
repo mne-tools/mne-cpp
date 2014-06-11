@@ -21,7 +21,8 @@ StcModel::StcModel(QObject *parent)
 , m_bIntervallSet(false)
 , m_iDownsampling(20)
 , m_iCurrentSample(0)
-, m_dStcNorm(3.0)
+, m_dStcNormMax(5.0)
+, m_dStcNorm(1.0)
 {
     qRegisterMetaType<MatrixXd>("MatrixXd");
     qRegisterMetaType<VectorXd>("VectorXd");
@@ -110,7 +111,7 @@ QVariant StcModel::data(const QModelIndex &index, int role) const
 
 QVariant StcModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-    if(role != Qt::DisplayRole && role != Qt::TextAlignmentRole)
+    if(role != Qt::DisplayRole)// && role != Qt::TextAlignmentRole)
         return QVariant();
 
     if(orientation == Qt::Horizontal) {
@@ -125,12 +126,6 @@ QVariant StcModel::headerData(int section, Qt::Orientation orientation, int role
                 return QVariant("Relative STC");
             case 4: //roi name column
                 return QVariant("ROI Name");
-    //            switch(role) {
-    //            case Qt::DisplayRole:
-    //                return QVariant("data plot");
-    //            case Qt::TextAlignmentRole:
-    //                return QVariant(Qt::AlignLeft);
-    //            }
             case 5: //roi color column
                 return QVariant("ROI Color");
         }
@@ -193,6 +188,22 @@ void StcModel::init(const AnnotationSet &annotationSet, const SurfaceSet &surfSe
     m_vecCurRelStc = VectorXd::Zero(m_qListLabels.size());;
     endResetModel();
     m_bIsInit = true;
+}
+
+
+//*************************************************************************************************************
+
+void StcModel::setAverage(qint32 samples)
+{
+    m_pWorker->setAverage(samples);
+}
+
+
+//*************************************************************************************************************
+
+void StcModel::setNormalization(qint32 fraction)
+{
+    m_dStcNorm = (m_dStcNormMax/100.0) * (double)fraction;
 }
 
 
