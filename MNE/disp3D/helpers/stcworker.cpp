@@ -7,6 +7,7 @@
 StcWorker::StcWorker(QObject *parent)
 : QObject(parent)
 , m_bIsLooping(true)
+, m_iAverageSamples(1)
 , m_iCurrentSample(0)
 , m_iUSecIntervall(100)
 {
@@ -25,11 +26,21 @@ void StcWorker::addData(QList<VectorXd> &data)
 
 //*************************************************************************************************************
 
+void StcWorker::clear()
+{
+    m_qMutex.lock();
+    m_data.clear();
+    m_qMutex.unlock();
+}
+
+
+//*************************************************************************************************************
+
 void StcWorker::process()
 {
     while(true)
     {
-        QThread::usleep(m_iUSecIntervall);
+        QThread::usleep(m_iUSecIntervall*m_iAverageSamples);
         if(!m_data.isEmpty())
         {
             if(m_bIsLooping)
@@ -45,6 +56,15 @@ void StcWorker::process()
         }
     }
 }
+
+
+//*************************************************************************************************************
+
+void StcWorker::setAverage(qint32 samples)
+{
+    m_iAverageSamples = samples;
+}
+
 
 //*************************************************************************************************************
 

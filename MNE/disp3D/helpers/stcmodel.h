@@ -68,6 +68,11 @@ public:
 
     void init(const AnnotationSet &annotationSet, const SurfaceSet &surfSet);
 
+    //1..10000
+    void setAverage(qint32 samples);
+
+    //1..100
+    void setNormalization(qint32 fraction);
 
     void setStcSample(const VectorXd &sample);
 
@@ -81,10 +86,10 @@ private:
     QSharedPointer<QThread> m_pThread;
     StcWorker::SPtr         m_pWorker;
 
-
     bool m_bRTMode;
     bool m_bIsInit;
     bool m_bIntervallSet;
+
 
     VectorXi m_vertices;
 
@@ -93,11 +98,15 @@ private:
 
 
 
+    VectorXd m_vecCurStc;
+    double m_dStcNormMax;
+    double m_dStcNorm;
+    VectorXd m_vecCurRelStc;
+
+    //ToDo implement this model as a state pattern -> to be used as ROIStc model and full Stc model
 
     //ROI Stuff
-    VectorXd m_vecCurStc;
-    VectorXd m_vecCurRelStc;
-    double m_dStcNorm;
+
 
     QList<Label> m_qListLabels;
     QList<RowVector4i> m_qListRGBAs;

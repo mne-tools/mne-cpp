@@ -47,7 +47,11 @@ public:
 
     void addData(QList<VectorXd> &data);
 
+    void clear();
+
     void process();
+
+    void setAverage(qint32 samples);
 
     void setInterval(int usec);
 
@@ -62,6 +66,7 @@ private:
     QList<VectorXd> m_data;   /**< List that holds the fiff matrix data <n_channels x n_samples> */
     bool m_bIsLooping;
 
+    qint32 m_iAverageSamples;
     qint32 m_iCurrentSample;
     qint32 m_iUSecIntervall;
 };
