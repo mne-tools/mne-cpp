@@ -37,7 +37,7 @@ void StcTableDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
             painter->restore();
             break;
         }
-        case 3: { //roi name
+        case 3: { //stc relative value
             painter->save();
 
             painter->drawText(option.rect,Qt::AlignVCenter|Qt::AlignLeft,index.model()->data(index,Qt::DisplayRole).toString());
@@ -45,7 +45,15 @@ void StcTableDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
             painter->restore();
             break;
         }
-        case 4: { //roi color
+        case 4: { //roi name
+            painter->save();
+
+            painter->drawText(option.rect,Qt::AlignVCenter|Qt::AlignLeft,index.model()->data(index,Qt::DisplayRole).toString());
+
+            painter->restore();
+            break;
+        }
+        case 5: { //roi color
             painter->save();
 
             QColor c = index.model()->data(index,Qt::DisplayRole).value<QColor>();
