@@ -41,7 +41,7 @@
 #include "displaymanager.h"
 
 
-#include <xDisp/newrealtimesamplearraywidget.h>
+#include <xDisp/realtimesamplearraywidget.h>
 
 #include <xDisp/realtimemultisamplearraywidget.h>
 
@@ -125,14 +125,14 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
     {
         if(pPluginOutputConnector.dynamicCast< PluginOutputData<NewRealTimeSampleArray> >())
         {
-            QSharedPointer<NewRealTimeSampleArray>* pNewRealTimeSampleArray = &pPluginOutputConnector.dynamicCast< PluginOutputData<NewRealTimeSampleArray> >()->data();
-            NewRealTimeSampleArrayWidget* rtsaWidget = new NewRealTimeSampleArrayWidget(*pNewRealTimeSampleArray, pT, newDisp);
+            QSharedPointer<NewRealTimeSampleArray>* pRealTimeSampleArray = &pPluginOutputConnector.dynamicCast< PluginOutputData<NewRealTimeSampleArray> >()->data();
+            RealTimeSampleArrayWidget* rtsaWidget = new RealTimeSampleArrayWidget(*pRealTimeSampleArray, pT, newDisp);
 
             qListActions.append(rtsaWidget->getDisplayActions());
             qListWidgets.append(rtsaWidget->getDisplayWidgets());
 
             connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
-                    rtsaWidget, &NewRealTimeSampleArrayWidget::update, Qt::BlockingQueuedConnection);
+                    rtsaWidget, &RealTimeSampleArrayWidget::update, Qt::BlockingQueuedConnection);
 
             vboxLayout->addWidget(rtsaWidget);
             rtsaWidget->init();

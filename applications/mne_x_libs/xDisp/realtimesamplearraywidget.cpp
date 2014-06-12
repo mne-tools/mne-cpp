@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     newrealtimesamplearraywidget.cpp
+* @file     realtimesamplearraywidget.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the NewRealTimeSampleArrayWidget Class.
+* @brief    Implementation of the RealTimeSampleArrayWidget Class.
 *
 */
 
@@ -40,7 +40,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "newrealtimesamplearraywidget.h"
+#include "realtimesamplearraywidget.h"
 //#include "annotationwindow.h"
 
 #include <xMeas/newrealtimesamplearray.h>
@@ -82,7 +82,7 @@ using namespace XMEASLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-NewRealTimeSampleArrayWidget::NewRealTimeSampleArrayWidget(QSharedPointer<NewRealTimeSampleArray> &pRTSA, QSharedPointer<QTime> &pTime, QWidget* parent)
+RealTimeSampleArrayWidget::RealTimeSampleArrayWidget(QSharedPointer<NewRealTimeSampleArray> &pRTSA, QSharedPointer<QTime> &pTime, QWidget* parent)
 : NewMeasurementWidget(parent)
 , m_pRTSA(pRTSA)
 , m_bMeasurement(false)
@@ -121,17 +121,17 @@ NewRealTimeSampleArrayWidget::NewRealTimeSampleArrayWidget(QSharedPointer<NewRea
 
 //*************************************************************************************************************
 
-NewRealTimeSampleArrayWidget::~NewRealTimeSampleArrayWidget()
+RealTimeSampleArrayWidget::~RealTimeSampleArrayWidget()
 {
 //    qDebug() << "NewRealTimeSampleArrayWidget deleted";
     // Clear sampling rate vector
-    NewRealTimeSampleArrayWidget::s_listSamplingRates.clear();
+    RealTimeSampleArrayWidget::s_listSamplingRates.clear();
 }
 
 
 //*************************************************************************************************************
 
-void NewRealTimeSampleArrayWidget::actualize()
+void RealTimeSampleArrayWidget::actualize()
 {
     m_dPosY = ui.m_qFrame->pos().y()+0.5*ui.m_qFrame->height();
 
@@ -154,7 +154,7 @@ void NewRealTimeSampleArrayWidget::actualize()
         return;
 
     // Add current sampling rate to s_listSamplingRates
-    NewRealTimeSampleArrayWidget::s_listSamplingRates << m_pRTSA->getSamplingRate();
+    RealTimeSampleArrayWidget::s_listSamplingRates << m_pRTSA->getSamplingRate();
 
     // Find maximal sampling rate in s_listSamplingRates
     double dMax = 0;
@@ -169,7 +169,7 @@ void NewRealTimeSampleArrayWidget::actualize()
 
 //*************************************************************************************************************
 
-void NewRealTimeSampleArrayWidget::stopAnnotation()
+void RealTimeSampleArrayWidget::stopAnnotation()
 {
     m_bToolInUse = !m_bToolInUse;
 }
@@ -177,7 +177,7 @@ void NewRealTimeSampleArrayWidget::stopAnnotation()
 
 //*************************************************************************************************************
 
-void NewRealTimeSampleArrayWidget::maxValueChanged(double maxValue)
+void RealTimeSampleArrayWidget::maxValueChanged(double maxValue)
 {
     m_pRTSA->setMaxValue(maxValue);
 //    ui.m_qLabel_MaxValue->setText(QString::number(maxValue));
@@ -187,7 +187,7 @@ void NewRealTimeSampleArrayWidget::maxValueChanged(double maxValue)
 
 //*************************************************************************************************************
 
-void NewRealTimeSampleArrayWidget::minValueChanged(double minValue)
+void RealTimeSampleArrayWidget::minValueChanged(double minValue)
 {
     m_pRTSA->setMinValue(minValue);
 //    ui.m_qLabel_MinValue->setText(QString::number(minValue));
@@ -197,7 +197,7 @@ void NewRealTimeSampleArrayWidget::minValueChanged(double minValue)
 
 //*************************************************************************************************************
 
-void NewRealTimeSampleArrayWidget::update(XMEASLIB::NewMeasurement::SPtr)
+void RealTimeSampleArrayWidget::update(XMEASLIB::NewMeasurement::SPtr)
 {
     if(m_pRTSA->getSampleArray().size() > 0)
     {
@@ -241,7 +241,7 @@ void NewRealTimeSampleArrayWidget::update(XMEASLIB::NewMeasurement::SPtr)
 
 //*************************************************************************************************************
 
-void NewRealTimeSampleArrayWidget::init()
+void RealTimeSampleArrayWidget::init()
 {
     ui.m_qLabel_Caption->setText(m_pRTSA->getName());
 //    ui.m_qLabel_MinValue->setText(QString::number(m_pRTSA->getMinValue()));
@@ -267,7 +267,7 @@ void NewRealTimeSampleArrayWidget::init()
 
 //*************************************************************************************************************
 
-void NewRealTimeSampleArrayWidget::paintEvent(QPaintEvent*)
+void RealTimeSampleArrayWidget::paintEvent(QPaintEvent*)
 {
     QPainter painter(this);
 
@@ -525,7 +525,7 @@ void NewRealTimeSampleArrayWidget::paintEvent(QPaintEvent*)
 
 //*************************************************************************************************************
 
-void NewRealTimeSampleArrayWidget::resizeEvent(QResizeEvent*)
+void RealTimeSampleArrayWidget::resizeEvent(QResizeEvent*)
 {
     m_bStartFlag = true; //start new painting
     actualize();
@@ -533,7 +533,7 @@ void NewRealTimeSampleArrayWidget::resizeEvent(QResizeEvent*)
 
 //*************************************************************************************************************
 
-void NewRealTimeSampleArrayWidget::mousePressEvent(QMouseEvent* mouseEvent)
+void RealTimeSampleArrayWidget::mousePressEvent(QMouseEvent* mouseEvent)
 {
     m_qPointMouseStartPosition = m_qPointMouseEndPosition = mouseEvent->pos();
     if(mouseEvent->button() == Qt::LeftButton)
@@ -551,7 +551,7 @@ void NewRealTimeSampleArrayWidget::mousePressEvent(QMouseEvent* mouseEvent)
 
 //*************************************************************************************************************
 
-void NewRealTimeSampleArrayWidget::mouseMoveEvent(QMouseEvent* mouseEvent)
+void RealTimeSampleArrayWidget::mouseMoveEvent(QMouseEvent* mouseEvent)
 {
     if(m_bMeasurement || m_bScaling)
         m_qPointMouseEndPosition = mouseEvent->pos();
@@ -560,7 +560,7 @@ void NewRealTimeSampleArrayWidget::mouseMoveEvent(QMouseEvent* mouseEvent)
 
 //*************************************************************************************************************
 
-void NewRealTimeSampleArrayWidget::mouseReleaseEvent(QMouseEvent*)
+void RealTimeSampleArrayWidget::mouseReleaseEvent(QMouseEvent*)
 {
     m_bMeasurement = false;
     m_bPosition = true;
@@ -570,7 +570,7 @@ void NewRealTimeSampleArrayWidget::mouseReleaseEvent(QMouseEvent*)
 
 //*************************************************************************************************************
 
-void NewRealTimeSampleArrayWidget::mouseDoubleClickEvent(QMouseEvent*)
+void RealTimeSampleArrayWidget::mouseDoubleClickEvent(QMouseEvent*)
 {
     switch((Tool)m_ucToolIndex)
     {
@@ -592,7 +592,7 @@ void NewRealTimeSampleArrayWidget::mouseDoubleClickEvent(QMouseEvent*)
 
 //*************************************************************************************************************
 
-void NewRealTimeSampleArrayWidget::wheelEvent(QWheelEvent* wheelEvent)
+void RealTimeSampleArrayWidget::wheelEvent(QWheelEvent* wheelEvent)
 {
     if(m_bToolInUse)
         return;
@@ -628,4 +628,4 @@ void NewRealTimeSampleArrayWidget::wheelEvent(QWheelEvent* wheelEvent)
 // STATIC DEFINITIONS
 //=============================================================================================================
 
-QList<double>       NewRealTimeSampleArrayWidget::s_listSamplingRates;
+QList<double>       RealTimeSampleArrayWidget::s_listSamplingRates;
