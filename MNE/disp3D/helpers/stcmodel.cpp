@@ -201,10 +201,44 @@ void StcModel::init(const AnnotationSet &annotationSet, const SurfaceSet &surfSe
     m_surfSet = surfSet;
     m_annotationSet.toLabels(m_surfSet, m_qListLabels, m_qListRGBAs);
 
+    // MIN MAX
+    for(qint32 h = 0; h < m_annotationSet.size(); ++h)
+    {
+        if(h == 0)
+        {
+            m_vecMinRR.setX(m_surfSet[h].rr().col(0).minCoeff()); // X
+            m_vecMinRR.setY(m_surfSet[h].rr().col(1).minCoeff()); // Y
+            m_vecMinRR.setZ(m_surfSet[h].rr().col(2).minCoeff()); // Z
+            m_vecMaxRR.setX(m_surfSet[h].rr().col(0).maxCoeff()); // X
+            m_vecMaxRR.setY(m_surfSet[h].rr().col(1).maxCoeff()); // Y
+            m_vecMaxRR.setZ(m_surfSet[h].rr().col(2).maxCoeff()); // Z
+        }
+        else
+        {
+            m_vecMinRR.setX(m_vecMinRR.x() < m_surfSet[h].rr().col(0).minCoeff() ? m_vecMinRR.x() : m_surfSet[h].rr().col(0).minCoeff()); // X
+            m_vecMinRR.setY(m_vecMinRR.y() < m_surfSet[h].rr().col(1).minCoeff() ? m_vecMinRR.y() : m_surfSet[h].rr().col(1).minCoeff()); // Y
+            m_vecMinRR.setZ(m_vecMinRR.z() < m_surfSet[h].rr().col(2).minCoeff() ? m_vecMinRR.z() : m_surfSet[h].rr().col(2).minCoeff()); // Z
+            m_vecMaxRR.setX(m_vecMaxRR.x() > m_surfSet[h].rr().col(0).maxCoeff() ? m_vecMaxRR.x() : m_surfSet[h].rr().col(0).maxCoeff()); // X
+            m_vecMaxRR.setY(m_vecMaxRR.y() > m_surfSet[h].rr().col(1).maxCoeff() ? m_vecMaxRR.y() : m_surfSet[h].rr().col(1).maxCoeff()); // Y
+            m_vecMaxRR.setZ(m_vecMaxRR.z() > m_surfSet[h].rr().col(2).maxCoeff() ? m_vecMaxRR.z() : m_surfSet[h].rr().col(2).maxCoeff()); // Z
+        }
+    }
+
+    QVector3D vecCenterRR;
+    vecCenterRR.setX((m_vecMinRR.x()+m_vecMaxRR.x())/2.0f);
+    vecCenterRR.setY((m_vecMinRR.y()+m_vecMaxRR.y())/2.0f);
+    vecCenterRR.setZ((m_vecMinRR.z()+m_vecMaxRR.z())/2.0f);
+
+    // Regions
     for(qint32 h = 0; h < m_annotationSet.size(); ++h)
     {
         MatrixX3i tris;
         MatrixX3f rr = m_surfSet[h].rr();
+
+        //Centralize
+        rr.col(0) = rr.col(0).array() - vecCenterRR.x();
+        rr.col(1) = rr.col(1).array() - vecCenterRR.y();
+        rr.col(2) = rr.col(2).array() - vecCenterRR.z();
 
         //
         // Create each ROI

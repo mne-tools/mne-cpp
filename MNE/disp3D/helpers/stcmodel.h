@@ -22,6 +22,7 @@
 
 #include <QAbstractTableModel>
 #include <QThread>
+#include <QVector3D>
 
 
 //*************************************************************************************************************
@@ -61,12 +62,28 @@ public:
 
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const ;
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
+
+    //=========================================================================================================
+    /**
+    * Data for the row and column and given display role
+    *
+    * @param [in] row       index row
+    * @param [in] column    index column
+    * @param [in] role      display role to access
+    *
+    * @return the accessed data
+    */
+    inline QVariant data(int row, int column, int role = Qt::DisplayRole) const;
+
     virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
     virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 
     void addData(const MNESourceEstimate &stc);
 
     void init(const AnnotationSet &annotationSet, const SurfaceSet &surfSet);
+
+    inline QVector3D getMin() const;
+    inline QVector3D getMax() const;
 
     //1..10000
     void setAverage(qint32 samples);
@@ -115,7 +132,36 @@ private:
     AnnotationSet m_annotationSet;
     SurfaceSet m_surfSet;
 
+    QVector3D m_vecMinRR;                  /**< X, Y, Z minima. */
+    QVector3D m_vecMaxRR;                  /**< X, Y, Z maxima. */
 };
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline QVariant StcModel::data(int row, int column, int role) const
+{
+    return data(index(row, column), role);
+}
+
+
+//*************************************************************************************************************
+
+inline QVector3D StcModel::getMin() const
+{
+    return m_vecMinRR;
+}
+
+
+//*************************************************************************************************************
+
+inline QVector3D StcModel::getMax() const
+{
+    return m_vecMaxRR;
+}
 
 Q_DECLARE_METATYPE(Eigen::Matrix3Xf);
 Q_DECLARE_METATYPE(FSLIB::Label);
