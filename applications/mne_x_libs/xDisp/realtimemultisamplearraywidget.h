@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     newrealtimemultisamplearray_new_widget.h
+* @file     realtimemultisamplearraywidget.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of the RealTimeMultiSampleArrayNewWidget Class.
+* @brief    Declaration of the RealTimeMultiSampleArrayWidget Class.
 *
 */
 
-#ifndef REALTIMEMULTISAMPLEARRAYNEWWIDGET_H
-#define REALTIMEMULTISAMPLEARRAYNEWWIDGET_H
+#ifndef REALTIMEMULTISAMPLEARRAYWIDGET_H
+#define REALTIMEMULTISAMPLEARRAYWIDGET_H
 
 
 //*************************************************************************************************************
@@ -285,4 +285,4 @@ private:
 
 } // NAMESPACE
 
-#endif // REALTIMEMULTISAMPLEARRAYNEWWIDGET_H
+#endif // REALTIMEMULTISAMPLEARRAYWIDGET_H
