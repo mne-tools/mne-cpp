@@ -30,11 +30,9 @@ StcModel::StcModel(QObject *parent)
 
     m_pWorker->moveToThread(m_pThread.data());
     connect(m_pThread.data(), &QThread::started, m_pWorker.data(), &StcWorker::process);
-
     connect(m_pWorker.data(), &StcWorker::stcSample, this, &StcModel::setStcSample);
 
     m_pWorker->setLoop(true);
-
 
     m_pThread->start();
 
