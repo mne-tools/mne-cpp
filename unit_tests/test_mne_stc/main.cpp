@@ -52,6 +52,8 @@
 #include <mne/mne_sourceestimate.h>
 #include <inverse/minimumNorm/minimumnorm.h>
 
+
+#include <disp3D/helpers/stcview.h>
 #include <disp3D/helpers/stcmodel.h>
 #include <disp3D/helpers/stctabledelegate.h>
 
@@ -120,9 +122,11 @@ int main(int argc, char *argv[])
 
     qDebug() << "sourceEstimateClustered" << sourceEstimateClustered.data.rows() << "x" << sourceEstimateClustered.data.cols();
 
-
-    QWidget* pWidget = new QWidget;
-    QGridLayout *mainLayout = new QGridLayout;
+    //
+    // QDebugTable
+    //
+    QWidget* pWidgetTable = new QWidget;
+    QGridLayout *mainLayoutTable = new QGridLayout;
 
     QTableView* pTableView = new QTableView;
     StcModel* pStcModel = new StcModel;
@@ -146,18 +150,56 @@ int main(int argc, char *argv[])
     pSliderAverage->setMaximum(5000);
     pSliderAverage->setValue(500);
 
-    mainLayout->addWidget(pTableView,0,0,2,2);
-    mainLayout->addWidget(pLabelNorm,0,3);
-    mainLayout->addWidget(pSliderNorm,1,3);
-    mainLayout->addWidget(pLabelAverage,3,0);
-    mainLayout->addWidget(pSliderAverage,3,1);
+    mainLayoutTable->addWidget(pTableView,0,0,2,2);
+    mainLayoutTable->addWidget(pLabelNorm,0,3);
+    mainLayoutTable->addWidget(pSliderNorm,1,3);
+    mainLayoutTable->addWidget(pLabelAverage,3,0);
+    mainLayoutTable->addWidget(pSliderAverage,3,1);
 
-    pWidget->setLayout(mainLayout);
-    pWidget->show();
-    pWidget->resize(800,600);
+    pWidgetTable->setLayout(mainLayoutTable);
+    pWidgetTable->show();
+    pWidgetTable->resize(800,600);
 
     pStcModel->addData(sourceEstimateClustered);
 
+
+    //
+    // STC view
+    //
+    QWidget* pWidgetView = new QWidget;
+    QGridLayout *mainLayoutView = new QGridLayout;
+
+    QLabel * pLabelNormView = new QLabel("Norm");
+    QSlider* pSliderNormView = new QSlider(Qt::Vertical);
+    QObject::connect(pSliderNormView, &QSlider::valueChanged, pStcModel, &StcModel::setNormalization);
+    pSliderNormView->setMinimum(1);
+    pSliderNormView->setMaximum(100);
+    pSliderNormView->setValue(50);
+
+    QLabel * pLabelAverageView = new QLabel("Average");
+    QSlider* pSliderAverageView = new QSlider(Qt::Horizontal);
+    QObject::connect(pSliderAverageView, &QSlider::valueChanged, pStcModel, &StcModel::setAverage);
+    pSliderAverageView->setMinimum(1);
+    pSliderAverageView->setMaximum(5000);
+    pSliderAverageView->setValue(500);
+
+    StcView* view = new StcView;
+    view->setModel(pStcModel);
+
+    if (view->stereoType() != QGLView::RedCyanAnaglyph)
+        view->camera()->setEyeSeparation(0.3f);
+
+    QWidget *pWidgetContainer = QWidget::createWindowContainer(view);
+
+    mainLayoutView->addWidget(pWidgetContainer,0,0,2,2);
+    mainLayoutView->addWidget(pLabelNormView,0,3);
+    mainLayoutView->addWidget(pSliderNormView,1,3);
+    mainLayoutView->addWidget(pLabelAverageView,3,0);
+    mainLayoutView->addWidget(pSliderAverageView,3,1);
+
+    pWidgetView->setLayout(mainLayoutView);
+    pWidgetView->show();
+    pWidgetView->resize(800,600);
 
     return a.exec();//1;//a.exec();
 }

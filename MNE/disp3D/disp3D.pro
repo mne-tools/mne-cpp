@@ -87,7 +87,8 @@ SOURCES += \
     brainview.cpp \
     helpers/stcmodel.cpp \
     helpers/stcworker.cpp \
-    helpers/stctabledelegate.cpp
+    helpers/stctabledelegate.cpp \
+    helpers/stcview.cpp
 
 HEADERS += \
     disp3D_global.h \
@@ -98,7 +99,8 @@ HEADERS += \
     brainview.h \
     helpers/stcmodel.h \
     helpers/stcworker.h \
-    helpers/stctabledelegate.h
+    helpers/stctabledelegate.h \
+    helpers/stcview.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
