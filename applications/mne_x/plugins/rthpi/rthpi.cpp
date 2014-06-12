@@ -37,7 +37,8 @@
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
-
+#include <Eigen/Dense>
+#include <iostream>
 #include "rthpi.h"
 #include "FormFiles/rthpisetupwidget.h"
 
@@ -240,6 +241,8 @@ void RtHpi::run()
 
     m_bProcessData = true;
 
+    QVector<MatrixXd> buffer;
+
     while (m_bIsRunning)
     {
         if(m_bProcessData)
@@ -247,11 +250,18 @@ void RtHpi::run()
             /* Dispatch the inputs */
             MatrixXd t_mat = m_pRtHpiBuffer->pop();
 
-            //ToDo: Implement your algorithm here
+            buffer.push(t_mat);
+
+            if(buffer.size() > 10)
+            {
+                //ToDo: Implement your algorithm here
+
+
+                buffer.clear();
+            }
 
             for(qint32 i = 0; i < t_mat.cols(); ++i)
                 m_pRTMSAOutput->data()->setValue(t_mat.col(i));
         }
     }
 }
-
