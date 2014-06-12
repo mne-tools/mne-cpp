@@ -38,17 +38,12 @@
 // INCLUDES
 //=============================================================================================================
 
-#define NEWRTMSAWIDGET 1
-
 #include "displaymanager.h"
 
 
 #include <xDisp/newrealtimesamplearraywidget.h>
-#ifdef NEWRTMSAWIDGET
+
 #include <xDisp/realtimemultisamplearraywidget.h>
-#else
-#include <xDisp/newrealtimemultisamplearraywidget.h>
-#endif
 
 #if defined(QT3D_LIBRARY_AVAILABLE)
 #include <xDisp/realtimesourceestimatewidget.h>
@@ -145,7 +140,6 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
         else if(pPluginOutputConnector.dynamicCast< PluginOutputData<NewRealTimeMultiSampleArray> >())
         {
             QSharedPointer<NewRealTimeMultiSampleArray>* pNewRealTimeMultiSampleArray = &pPluginOutputConnector.dynamicCast< PluginOutputData<NewRealTimeMultiSampleArray> >()->data();
-#ifdef NEWRTMSAWIDGET
             RealTimeMultiSampleArrayWidget* rtmsaWidget = new RealTimeMultiSampleArrayWidget(*pNewRealTimeMultiSampleArray, pT, newDisp);
 
             qListActions.append(rtmsaWidget->getDisplayActions());
@@ -156,18 +150,6 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
 
             vboxLayout->addWidget(rtmsaWidget);
             rtmsaWidget->init();
-#else
-            NewRealTimeMultiSampleArrayWidget* rtmsaWidget = new NewRealTimeMultiSampleArrayWidget(*pNewRealTimeMultiSampleArray, pT, newDisp);
-
-            qListActions.append(rtmsaWidget->getDisplayActions());
-            qListWidgets.append(rtmsaWidget->getDisplayWidgets());
-
-            connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
-                    rtmsaWidget, &NewRealTimeMultiSampleArrayWidget::update, Qt::BlockingQueuedConnection);
-
-            vboxLayout->addWidget(rtmsaWidget);
-            rtmsaWidget->init();
-#endif
         }
     #if defined(QT3D_LIBRARY_AVAILABLE)
         else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeSourceEstimate> >())
