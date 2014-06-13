@@ -38,7 +38,7 @@ void StcWorker::clear()
 
 void StcWorker::process()
 {
-    VectorXd m_vecAverage(0);
+    VectorXd m_vecAverage(0,0);
 
     while(true)
     {
