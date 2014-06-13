@@ -335,7 +335,7 @@ void BabyMEGSQUIDControlDgl::TuneGraphDispProc(MatrixXf tmp)
     std::cout << "first ten elements \n" << tmp.block(0,0,1,10) << std::endl;
 
     int cols = tmp.cols();
-    int chanIndx = ui->m_Qcb_channel->currentIndex();
+    int chanIndx = 1;//ui->m_Qcb_channel->currentIndex();
     // plot the real time data here
     settings.minX = 0.0;
     settings.maxX = cols;
