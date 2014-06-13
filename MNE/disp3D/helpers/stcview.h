@@ -9,6 +9,7 @@
 #include <QGLColorMaterial>
 #include <QSharedPointer>
 #include <QList>
+#include <QVector>
 #include <QMap>
 
 
@@ -20,6 +21,8 @@ class DISP3DSHARED_EXPORT StcView : public QGLView
     Q_OBJECT
 public:
     StcView(QWindow *parent = 0);
+
+    void dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int> ());
 
     void setModel(StcModel* model);
 

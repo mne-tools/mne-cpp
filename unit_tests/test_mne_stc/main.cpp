@@ -109,7 +109,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
 
     AnnotationSet t_annotationSet("mind006", 2, "aparc.a2009s", "D:/Data/subjects");
-    SurfaceSet t_surfSet("mind006", 2, "white", "D:/Data/subjects");
+    SurfaceSet t_surfSet("mind006", 2, "inflated", "D:/Data/subjects");
 
     QString t_sFileNameStc("mind006_051209_auditory01_test.stc");
     MNESourceEstimate sourceEstimateClustered;
@@ -131,6 +131,7 @@ int main(int argc, char *argv[])
     QTableView* pTableView = new QTableView;
     StcModel* pStcModel = new StcModel;
     pStcModel->init(t_annotationSet, t_surfSet);
+    pStcModel->setLoop(true);
     StcTableDelegate* pStcTableDelegate = new StcTableDelegate;
     pTableView->setModel(pStcModel);
     pTableView->setItemDelegate(pStcTableDelegate);
@@ -147,7 +148,7 @@ int main(int argc, char *argv[])
     QSlider* pSliderAverage = new QSlider(Qt::Horizontal);
     QObject::connect(pSliderAverage, &QSlider::valueChanged, pStcModel, &StcModel::setAverage);
     pSliderAverage->setMinimum(1);
-    pSliderAverage->setMaximum(5000);
+    pSliderAverage->setMaximum(500);
     pSliderAverage->setValue(500);
 
     mainLayoutTable->addWidget(pTableView,0,0,2,2);
@@ -159,9 +160,6 @@ int main(int argc, char *argv[])
     pWidgetTable->setLayout(mainLayoutTable);
     pWidgetTable->show();
     pWidgetTable->resize(800,600);
-
-    pStcModel->addData(sourceEstimateClustered);
-
 
     //
     // STC view
@@ -180,8 +178,8 @@ int main(int argc, char *argv[])
     QSlider* pSliderAverageView = new QSlider(Qt::Horizontal);
     QObject::connect(pSliderAverageView, &QSlider::valueChanged, pStcModel, &StcModel::setAverage);
     pSliderAverageView->setMinimum(1);
-    pSliderAverageView->setMaximum(5000);
-    pSliderAverageView->setValue(500);
+    pSliderAverageView->setMaximum(500);
+    pSliderAverageView->setValue(100);
 
     StcView* view = new StcView;
     view->setModel(pStcModel);
@@ -198,8 +196,23 @@ int main(int argc, char *argv[])
     mainLayoutView->addWidget(pSliderAverageView,3,1);
 
     pWidgetView->setLayout(mainLayoutView);
+
+    //connect the sliders
+
+    QObject::connect(pSliderNorm, &QSlider::valueChanged, pSliderNormView, &QSlider::setValue);
+    QObject::connect(pSliderAverage, &QSlider::valueChanged, pSliderAverageView, &QSlider::setValue);
+
+    QObject::connect(pSliderNormView, &QSlider::valueChanged, pSliderNorm, &QSlider::setValue);
+    QObject::connect(pSliderAverageView, &QSlider::valueChanged, pSliderAverage, &QSlider::setValue);
+
     pWidgetView->show();
     pWidgetView->resize(800,600);
+
+    //
+    // Add Data
+    //
+    qDebug() << "sourceEstimateClustered" << sourceEstimateClustered.data.cols();
+    pStcModel->addData(sourceEstimateClustered);
 
     return a.exec();//1;//a.exec();
 }

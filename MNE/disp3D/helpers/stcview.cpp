@@ -5,8 +5,11 @@
 
 #include "stcmodel.h"
 
+#include <disp/colormap.h>
 
 #include <QMouseEvent>
+
+using namespace DISPLIB;
 
 
 StcView::StcView(QWindow *parent)
@@ -19,10 +22,43 @@ StcView::StcView(QWindow *parent)
 }
 
 
+//*************************************************************************************************************
+
+void StcView::dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
+{
+    //check wether realtive stc data column (3) has changed
+    if(topLeft.column() > 3 || bottomRight.column() < 3)
+        return;
+
+    for(qint32 i = 0; i < m_pSceneNode->palette()->size(); ++i)
+    {
+        //ToDo label id check -> necessary?
+        //qint32 colorIdx = m_qListMapLabelIdIndex[h][labelId];
+
+        qint32 iVal = m_pModel->data(i,3).toDouble() * 255;
+
+        iVal = iVal > 255 ? 255 : iVal < 0 ? 0 : iVal;
+
+        QRgb qRgb;
+        qRgb = ColorMap::valueToHotNegative1((double)iVal/255.0);
+//        qRgb = ColorMap::valueToHotNegative2((double)iVal/255.0);
+//        qRgb = ColorMap::valueToHot((double)iVal/255.0);
+
+        m_pSceneNode->palette()->material(i)->setSpecularColor(QColor(qRgb));
+    }
+
+    this->update();
+}
+
+
+//*************************************************************************************************************
+
 void StcView::setModel(StcModel* model)
 {
     m_pModel = model;
+    connect(m_pModel, &StcModel::dataChanged, this, &StcView::dataChanged);
 }
+
 
 //*************************************************************************************************************
 
