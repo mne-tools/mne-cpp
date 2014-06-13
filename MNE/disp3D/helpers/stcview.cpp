@@ -16,6 +16,7 @@ StcView::StcView(QWindow *parent)
 : QGLView(parent)
 , m_pModel(NULL)
 , m_bStereo(true)
+, m_stereoType(QGLView::StretchedLeftRight)
 {
     m_fOffsetZ = -100.0f;
     m_fOffsetZEye = 60.0f;
@@ -159,7 +160,7 @@ void StcView::initializeGL(QGLPainter *painter)
     //
     if (m_bStereo) {
 //        this->setStereoType(QGLView::RedCyanAnaglyph);
-        this->setStereoType(QGLView::StretchedLeftRight);
+        this->setStereoType(m_stereoType);
 //        camera()->setEyeSeparation(0.4f);
 //        m_pCameraFrontal->setEyeSeparation(0.1f);
 

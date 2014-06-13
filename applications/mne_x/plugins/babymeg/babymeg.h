@@ -158,7 +158,7 @@ public:
 
     void showProjectDialog();
 
-    void startRecordingFile();
+    void toggleRecordingFile();
 
     virtual bool start();
     virtual bool stop();

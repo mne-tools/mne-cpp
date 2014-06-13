@@ -92,7 +92,7 @@ BabyMEG::BabyMEG()
     m_pActionRecordFile = new QAction(QIcon(":/images/record.png"), tr("Start Recording"),this);
 //    m_pActionSetupProject->setShortcut(tr("F12"));
     m_pActionRecordFile->setStatusTip(tr("Start Recording"));
-    connect(m_pActionRecordFile, &QAction::triggered, this, &BabyMEG::startRecordingFile);
+    connect(m_pActionRecordFile, &QAction::triggered, this, &BabyMEG::toggleRecordingFile);
     addPluginAction(m_pActionRecordFile);
 }
 
@@ -188,7 +188,7 @@ void BabyMEG::showProjectDialog()
 
 //*************************************************************************************************************
 
-void BabyMEG::startRecordingFile()
+void BabyMEG::toggleRecordingFile()
 {
     //Setup writing to file
     if(m_bWriteToFile)
@@ -407,10 +407,7 @@ void BabyMEG::run()
 
     //Close the fif output stream
     if(m_bWriteToFile)
-    {
-        m_pOutfid->finish_writing_raw();
-        m_bWriteToFile = false;
-    }
+        this->toggleRecordingFile();
 }
 
 
