@@ -73,6 +73,7 @@ private:
     StcModel* m_pModel;
 
     bool m_bStereo;
+    QGLView::StereoType m_stereoType;
 
     float m_fOffsetZ;                               /**< Z offset for pop-out effect. */
     float m_fOffsetZEye;                            /**< Z offset eye. */
