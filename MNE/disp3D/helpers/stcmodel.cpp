@@ -19,8 +19,6 @@ StcModel::StcModel(QObject *parent)
 , m_bRTMode(true)
 , m_bIsInit(false)
 , m_bIntervallSet(false)
-, m_iDownSampling(20)
-, m_iCurrentSample(0)
 , m_dStcNormMax(10.0)
 , m_dStcNorm(1.0)
 {
@@ -165,18 +163,12 @@ void StcModel::addData(const MNESourceEstimate &stc)
     if(!m_bIsInit)
         return;
 
-//    qDebug() << "m_vertices.size()" << m_vertices.size();
-
     if(m_vertices.size() != stc.data.rows())
         setVertices(stc.vertices);
 
-    //Downsampling ->ToDo make this more accurate
-    qint32 i;
     QList<VectorXd> data;
-    for(i = m_iCurrentSample; i < stc.data.cols(); i += m_iDownSampling)
+    for(qint32 i = 0; i < stc.data.cols(); ++i)
         data.append(stc.data.col(i));
-
-    m_pWorker->addData(data);
 
     if(!m_bIntervallSet)
     {
@@ -185,8 +177,7 @@ void StcModel::addData(const MNESourceEstimate &stc)
         m_bIntervallSet = true;
     }
 
-    //store for next buffer
-    m_iCurrentSample = i - stc.data.cols();
+    m_pWorker->addData(data);
 }
 
 
@@ -199,24 +190,34 @@ void StcModel::init(const AnnotationSet &annotationSet, const SurfaceSet &surfSe
     m_surfSet = surfSet;
     m_annotationSet.toLabels(m_surfSet, m_qListLabels, m_qListRGBAs);
 
+    qDebug() << "surfSet" << QString::compare(surfSet.surf(),"inflated");
+
+    float lhOffset = 0;
+    float rhOffset = 0;
     // MIN MAX
     for(qint32 h = 0; h < m_annotationSet.size(); ++h)
     {
         if(h == 0)
         {
-            m_vecMinRR.setX(m_surfSet[h].rr().col(0).minCoeff()); // X
+            if(QString::compare(surfSet.surf(),"inflated") == 0)
+                lhOffset = m_surfSet[h].rr().col(0).maxCoeff(); // X
+
+            m_vecMinRR.setX(m_surfSet[h].rr().col(0).minCoeff()-lhOffset); // X
             m_vecMinRR.setY(m_surfSet[h].rr().col(1).minCoeff()); // Y
             m_vecMinRR.setZ(m_surfSet[h].rr().col(2).minCoeff()); // Z
-            m_vecMaxRR.setX(m_surfSet[h].rr().col(0).maxCoeff()); // X
+            m_vecMaxRR.setX(m_surfSet[h].rr().col(0).maxCoeff()-lhOffset); // X
             m_vecMaxRR.setY(m_surfSet[h].rr().col(1).maxCoeff()); // Y
             m_vecMaxRR.setZ(m_surfSet[h].rr().col(2).maxCoeff()); // Z
         }
         else
         {
-            m_vecMinRR.setX(m_vecMinRR.x() < m_surfSet[h].rr().col(0).minCoeff() ? m_vecMinRR.x() : m_surfSet[h].rr().col(0).minCoeff()); // X
+            if(QString::compare(surfSet.surf(),"inflated") == 0)
+                rhOffset = m_surfSet[h].rr().col(0).maxCoeff(); // X
+
+            m_vecMinRR.setX(m_vecMinRR.x() < m_surfSet[h].rr().col(0).minCoeff()+rhOffset ? m_vecMinRR.x() : m_surfSet[h].rr().col(0).minCoeff()+rhOffset); // X
             m_vecMinRR.setY(m_vecMinRR.y() < m_surfSet[h].rr().col(1).minCoeff() ? m_vecMinRR.y() : m_surfSet[h].rr().col(1).minCoeff()); // Y
             m_vecMinRR.setZ(m_vecMinRR.z() < m_surfSet[h].rr().col(2).minCoeff() ? m_vecMinRR.z() : m_surfSet[h].rr().col(2).minCoeff()); // Z
-            m_vecMaxRR.setX(m_vecMaxRR.x() > m_surfSet[h].rr().col(0).maxCoeff() ? m_vecMaxRR.x() : m_surfSet[h].rr().col(0).maxCoeff()); // X
+            m_vecMaxRR.setX(m_vecMaxRR.x() > m_surfSet[h].rr().col(0).maxCoeff()+rhOffset ? m_vecMaxRR.x() : m_surfSet[h].rr().col(0).maxCoeff()+rhOffset); // X
             m_vecMaxRR.setY(m_vecMaxRR.y() > m_surfSet[h].rr().col(1).maxCoeff() ? m_vecMaxRR.y() : m_surfSet[h].rr().col(1).maxCoeff()); // Y
             m_vecMaxRR.setZ(m_vecMaxRR.z() > m_surfSet[h].rr().col(2).maxCoeff() ? m_vecMaxRR.z() : m_surfSet[h].rr().col(2).maxCoeff()); // Z
         }
@@ -234,9 +235,22 @@ void StcModel::init(const AnnotationSet &annotationSet, const SurfaceSet &surfSe
         MatrixX3f rr = m_surfSet[h].rr();
 
         //Centralize
-        rr.col(0) = rr.col(0).array() - vecCenterRR.x();
-        rr.col(1) = rr.col(1).array() - vecCenterRR.y();
-        rr.col(2) = rr.col(2).array() - vecCenterRR.z();
+        if(QString::compare(surfSet.surf(),"inflated") == 0)
+        {
+            if(h == 0) //X
+                rr.col(0) = (rr.col(0).array() - lhOffset) - vecCenterRR.x();
+            else
+                rr.col(0) = (rr.col(0).array() + rhOffset) - vecCenterRR.x();
+        }
+        else
+            rr.col(0) = rr.col(0).array() - vecCenterRR.x(); // X
+
+        rr.col(1) = rr.col(1).array() - vecCenterRR.y(); // Y
+        rr.col(2) = rr.col(2).array() - vecCenterRR.z(); // Z
+
+
+
+
 
         //
         // Create each ROI
@@ -264,8 +278,6 @@ void StcModel::init(const AnnotationSet &annotationSet, const SurfaceSet &surfSe
         }
     }
 
-
-
     m_vecCurStc = VectorXd::Zero(m_qListLabels.size());
     m_vecCurRelStc = VectorXd::Zero(m_qListLabels.size());;
     endResetModel();
@@ -278,6 +290,14 @@ void StcModel::init(const AnnotationSet &annotationSet, const SurfaceSet &surfSe
 void StcModel::setAverage(qint32 samples)
 {
     m_pWorker->setAverage(samples);
+}
+
+
+//*************************************************************************************************************
+
+void StcModel::setLoop(bool looping)
+{
+    m_pWorker->setLoop(looping);
 }
 
 

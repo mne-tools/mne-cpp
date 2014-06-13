@@ -88,15 +88,14 @@ public:
     //1..10000
     void setAverage(qint32 samples);
 
+    void setLoop(bool looping);
+
     //1..100
     void setNormalization(qint32 fraction);
 
     void setStcSample(const VectorXd &sample);
 
     void setVertices(const VectorXi &vertnos);
-
-signals:
-
 
 
 private:
@@ -109,11 +108,6 @@ private:
 
 
     VectorXi m_vertices;
-
-    qint32 m_iDownSampling;     /**< Downsampling factor */
-    qint32 m_iCurrentSample;    /**< Downsampling */
-
-
 
     VectorXd m_vecCurStc;
     double m_dStcNormMax;
