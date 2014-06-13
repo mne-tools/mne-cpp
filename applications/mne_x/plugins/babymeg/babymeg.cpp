@@ -43,6 +43,8 @@
 #include "FormFiles/babymegsetupwidget.h"
 #include "FormFiles/babymegprojectdialog.h"
 
+#include "FormFiles/babymegsquidcontroldgl.h"
+
 #include <utils/ioutils.h>
 
 #include <iostream>
@@ -94,6 +96,12 @@ BabyMEG::BabyMEG()
     m_pActionRecordFile->setStatusTip(tr("Start Recording"));
     connect(m_pActionRecordFile, &QAction::triggered, this, &BabyMEG::toggleRecordingFile);
     addPluginAction(m_pActionRecordFile);
+
+    m_pActionSqdCtrl = new QAction(QIcon(":/images/sqdctrl.png"), tr("Squid Control"),this);
+//    m_pActionSetupProject->setShortcut(tr("F12"));
+    m_pActionSqdCtrl->setStatusTip(tr("Squid Control"));
+    connect(m_pActionSqdCtrl, &QAction::triggered, this, &BabyMEG::showSqdCtrlDialog);
+    addPluginAction(m_pActionSqdCtrl);
 }
 
 
@@ -188,6 +196,14 @@ void BabyMEG::showProjectDialog()
 
 //*************************************************************************************************************
 
+void BabyMEG::showSqdCtrlDialog()
+{
+    BabyMEGSQUIDControlDgl SQUIDCtrlDlg(this);
+    SQUIDCtrlDlg.exec();
+}
+
+//*************************************************************************************************************
+
 void BabyMEG::toggleRecordingFile()
 {
     //Setup writing to file
@@ -260,12 +276,14 @@ void BabyMEG::setFiffData(QByteArray DATA)
 
         m_pRawMatrixBuffer->push(&rawData);
     }
-    else
-    {
-//        std::cout << "Data coming" << std::endl; //"first ten elements \n" << rawData.block(0,0,1,10) << std::endl;
+//    else
+//    {
+////        std::cout << "Data coming" << std::endl; //"first ten elements \n" << rawData.block(0,0,1,10) << std::endl;
 
-        emit DataToSquidCtrlGUI(rawData);
-    }
+//        emit DataToSquidCtrlGUI(rawData);
+//    }
+
+    emit DataToSquidCtrlGUI(rawData);
 }
 
 
