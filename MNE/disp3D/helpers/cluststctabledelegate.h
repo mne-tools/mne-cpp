@@ -1,5 +1,5 @@
-#ifndef STCTABLEDELEGATE_H
-#define STCTABLEDELEGATE_H
+#ifndef CLUSTSTCTABLEDELEGATE_H
+#define CLUSTSTCTABLEDELEGATE_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -9,12 +9,16 @@
 #include "../disp3D_global.h"
 
 #include <QAbstractItemDelegate>
+#include <QSharedPointer>
 
-class DISP3DSHARED_EXPORT StcTableDelegate : public QAbstractItemDelegate
+class DISP3DSHARED_EXPORT ClustStcTableDelegate : public QAbstractItemDelegate
 {
     Q_OBJECT
 public:
-    StcTableDelegate(QObject *parent = 0);
+    typedef QSharedPointer<ClustStcTableDelegate> SPtr;            /**< Shared pointer type for ClustStcTableDelegate class. */
+    typedef QSharedPointer<const ClustStcTableDelegate> ConstSPtr; /**< Const shared pointer type for ClustStcTableDelegate class. */
+
+    ClustStcTableDelegate(QObject *parent = 0);
 
     //=========================================================================================================
     /**
@@ -41,4 +45,4 @@ private:
 
 };
 
-#endif // STCTABLEDELEGATE_H
+#endif // CLUSTSTCTABLEDELEGATE_H

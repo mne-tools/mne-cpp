@@ -1,5 +1,5 @@
-#ifndef STCMODEL_H
-#define STCMODEL_H
+#ifndef CLUSTSTCMODEL_H
+#define CLUSTSTCMODEL_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -8,7 +8,7 @@
 
 #include "../disp3D_global.h"
 
-#include "stcworker.h"
+#include "cluststcworker.h"
 
 #include <fs/label.h>
 #include <fs/surfaceset.h>
@@ -54,11 +54,14 @@ using namespace MNELIB;
 using namespace FSLIB;
 
 
-class DISP3DSHARED_EXPORT StcModel : public QAbstractTableModel
+class DISP3DSHARED_EXPORT ClustStcModel : public QAbstractTableModel
 {
     Q_OBJECT
 public:
-    StcModel(QObject *parent = 0);
+    typedef QSharedPointer<ClustStcModel> SPtr;            /**< Shared pointer type for ClustStcModel class. */
+    typedef QSharedPointer<const ClustStcModel> ConstSPtr; /**< Const shared pointer type for ClustStcModel class. */
+
+    ClustStcModel(QObject *parent = 0);
 
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const ;
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
@@ -100,10 +103,11 @@ public:
 
 private:
     QSharedPointer<QThread> m_pThread;
-    StcWorker::SPtr         m_pWorker;
+    ClustStcWorker::SPtr         m_pWorker;
 
     bool m_bRTMode;
-    bool m_bIsInit;
+    bool m_bModelInit;
+    bool m_bDataInit;
     bool m_bIntervallSet;
 
 
@@ -136,7 +140,7 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline QVariant StcModel::data(int row, int column, int role) const
+inline QVariant ClustStcModel::data(int row, int column, int role) const
 {
     return data(index(row, column), role);
 }
@@ -144,7 +148,7 @@ inline QVariant StcModel::data(int row, int column, int role) const
 
 //*************************************************************************************************************
 
-inline QVector3D StcModel::getMin() const
+inline QVector3D ClustStcModel::getMin() const
 {
     return m_vecMinRR;
 }
@@ -152,7 +156,7 @@ inline QVector3D StcModel::getMin() const
 
 //*************************************************************************************************************
 
-inline QVector3D StcModel::getMax() const
+inline QVector3D ClustStcModel::getMax() const
 {
     return m_vecMaxRR;
 }
@@ -160,4 +164,4 @@ inline QVector3D StcModel::getMax() const
 Q_DECLARE_METATYPE(Eigen::Matrix3Xf);
 Q_DECLARE_METATYPE(FSLIB::Label);
 
-#endif // STCMODEL_H
+#endif // CLUSTSTCMODEL_H

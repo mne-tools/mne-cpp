@@ -1,4 +1,4 @@
-#include "stcmodel.h"
+#include "cluststcmodel.h"
 
 #include <mne/mne_sourceestimate.h>
 
@@ -12,12 +12,13 @@
 using namespace MNELIB;
 
 
-StcModel::StcModel(QObject *parent)
+ClustStcModel::ClustStcModel(QObject *parent)
 : QAbstractTableModel(parent)
 , m_pThread(new QThread)
-, m_pWorker(new StcWorker)
+, m_pWorker(new ClustStcWorker)
 , m_bRTMode(true)
-, m_bIsInit(false)
+, m_bModelInit(false)
+, m_bDataInit(false)
 , m_bIntervallSet(false)
 , m_dStcNormMax(10.0)
 , m_dStcNorm(1.0)
@@ -27,8 +28,8 @@ StcModel::StcModel(QObject *parent)
     qRegisterMetaType<Matrix3Xf>("Matrix3Xf");
 
     m_pWorker->moveToThread(m_pThread.data());
-    connect(m_pThread.data(), &QThread::started, m_pWorker.data(), &StcWorker::process);
-    connect(m_pWorker.data(), &StcWorker::stcSample, this, &StcModel::setStcSample);
+    connect(m_pThread.data(), &QThread::started, m_pWorker.data(), &ClustStcWorker::process);
+    connect(m_pWorker.data(), &ClustStcWorker::stcSample, this, &ClustStcModel::setStcSample);
 
     m_pWorker->setLoop(true);
 
@@ -39,7 +40,7 @@ StcModel::StcModel(QObject *parent)
 
 //*************************************************************************************************************
 //virtual functions
-int StcModel::rowCount(const QModelIndex & /*parent*/) const
+int ClustStcModel::rowCount(const QModelIndex & /*parent*/) const
 {
     if(!m_qListLabels.empty())
         return m_qListLabels.size();
@@ -50,15 +51,15 @@ int StcModel::rowCount(const QModelIndex & /*parent*/) const
 
 //*************************************************************************************************************
 
-int StcModel::columnCount(const QModelIndex & /*parent*/) const
+int ClustStcModel::columnCount(const QModelIndex & /*parent*/) const
 {
-    return 7;
+    return 8;
 }
 
 
 //*************************************************************************************************************
 
-QVariant StcModel::data(const QModelIndex &index, int role) const
+QVariant ClustStcModel::data(const QModelIndex &index, int role) const
 {
     if(role != Qt::DisplayRole && role != Qt::BackgroundRole)
         return QVariant();
@@ -73,17 +74,17 @@ QVariant StcModel::data(const QModelIndex &index, int role) const
                 break;
             }
             case 1: { // vertex
-                if(role == Qt::DisplayRole)
+                if(m_bDataInit && role == Qt::DisplayRole)
                     return QVariant(m_vertices(row));
                 break;
             }
             case 2: { // stc data
-                if(m_bIsInit && role == Qt::DisplayRole)
+                if(m_bDataInit && role == Qt::DisplayRole)
                     return QVariant(m_vecCurStc(row));
                 break;
             }
             case 3: { // relative stc data
-                if(m_bIsInit && role == Qt::DisplayRole)
+                if(m_bDataInit && role == Qt::DisplayRole)
                     return QVariant(m_vecCurRelStc(row));
                 break;
             }
@@ -110,6 +111,10 @@ QVariant StcModel::data(const QModelIndex &index, int role) const
                 }
                 break;
             }
+            case 7: { // Num Centroids
+                return QVariant();
+                break;
+            }
         }
     } // end index.valid() check
 
@@ -119,7 +124,7 @@ QVariant StcModel::data(const QModelIndex &index, int role) const
 
 //*************************************************************************************************************
 
-QVariant StcModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant ClustStcModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if(role != Qt::DisplayRole)// && role != Qt::TextAlignmentRole)
         return QVariant();
@@ -140,6 +145,8 @@ QVariant StcModel::headerData(int section, Qt::Orientation orientation, int role
                 return QVariant("Color");
             case 6: //roi Tri Coords
                 return QVariant("Tri Coords");
+            case 7: //num Centroids
+                return QVariant("Centroids");
         }
     }
     else if(orientation == Qt::Vertical) {
@@ -156,15 +163,18 @@ QVariant StcModel::headerData(int section, Qt::Orientation orientation, int role
 
 //*************************************************************************************************************
 
-void StcModel::addData(const MNESourceEstimate &stc)
+void ClustStcModel::addData(const MNESourceEstimate &stc)
 {
-//    qDebug() << "addData currentThread" << QThread::currentThread();
-
-    if(!m_bIsInit)
+    if(!m_bModelInit)
         return;
 
     if(m_vertices.size() != stc.data.rows())
+    {
+        //TODO MAP data 416 to labels 150!!!!!!!!
+        //ToDo Map the indices to the regions
         setVertices(stc.vertices);
+        m_bDataInit = true;
+    }
 
     QList<VectorXd> data;
     for(qint32 i = 0; i < stc.data.cols(); ++i)
@@ -183,14 +193,12 @@ void StcModel::addData(const MNESourceEstimate &stc)
 
 //*************************************************************************************************************
 
-void StcModel::init(const AnnotationSet &annotationSet, const SurfaceSet &surfSet)
+void ClustStcModel::init(const AnnotationSet &annotationSet, const SurfaceSet &surfSet)
 {
     beginResetModel();
     m_annotationSet = annotationSet;
     m_surfSet = surfSet;
     m_annotationSet.toLabels(m_surfSet, m_qListLabels, m_qListRGBAs);
-
-    qDebug() << "surfSet" << QString::compare(surfSet.surf(),"inflated");
 
     float lhOffset = 0;
     float rhOffset = 0;
@@ -249,9 +257,6 @@ void StcModel::init(const AnnotationSet &annotationSet, const SurfaceSet &surfSe
         rr.col(2) = rr.col(2).array() - vecCenterRR.z(); // Z
 
 
-
-
-
         //
         // Create each ROI
         //
@@ -278,16 +283,16 @@ void StcModel::init(const AnnotationSet &annotationSet, const SurfaceSet &surfSe
         }
     }
 
-    m_vecCurStc = VectorXd::Zero(m_qListLabels.size());
-    m_vecCurRelStc = VectorXd::Zero(m_qListLabels.size());;
+    m_vecCurStc = VectorXd::Zero(416);//m_qListLabels.size(),1);
+    m_vecCurRelStc = VectorXd::Zero(416);//m_qListLabels.size(),1);;
     endResetModel();
-    m_bIsInit = true;
+    m_bModelInit = true;
 }
 
 
 //*************************************************************************************************************
 
-void StcModel::setAverage(qint32 samples)
+void ClustStcModel::setAverage(qint32 samples)
 {
     m_pWorker->setAverage(samples);
 }
@@ -295,7 +300,7 @@ void StcModel::setAverage(qint32 samples)
 
 //*************************************************************************************************************
 
-void StcModel::setLoop(bool looping)
+void ClustStcModel::setLoop(bool looping)
 {
     m_pWorker->setLoop(looping);
 }
@@ -303,7 +308,7 @@ void StcModel::setLoop(bool looping)
 
 //*************************************************************************************************************
 
-void StcModel::setNormalization(qint32 fraction)
+void ClustStcModel::setNormalization(qint32 fraction)
 {
     m_dStcNorm = (m_dStcNormMax/100.0) * (double)fraction;
 }
@@ -311,7 +316,7 @@ void StcModel::setNormalization(qint32 fraction)
 
 //*************************************************************************************************************
 
-void StcModel::setStcSample(const VectorXd &sample)
+void ClustStcModel::setStcSample(const VectorXd &sample)
 {
     m_vecCurStc = sample;
 
@@ -340,7 +345,7 @@ void StcModel::setStcSample(const VectorXd &sample)
 
 //*************************************************************************************************************
 
-void StcModel::setVertices(const VectorXi &vertnos)
+void ClustStcModel::setVertices(const VectorXi &vertnos)
 {
     m_vertices = vertnos;
 }

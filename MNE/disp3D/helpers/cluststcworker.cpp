@@ -1,23 +1,23 @@
-#include "stcworker.h"
+#include "cluststcworker.h"
 
 #include <QDebug>
 
 
-StcWorker::StcWorker(QObject *parent)
+ClustStcWorker::ClustStcWorker(QObject *parent)
 : QObject(parent)
 , m_bIsLooping(true)
 , m_iAverageSamples(10)
 , m_iCurrentSample(0)
 , m_iUSecIntervall(100)
 {
+    m_data.clear();
 }
 
 
 //*************************************************************************************************************
 
-void StcWorker::addData(QList<VectorXd> &data)
+void ClustStcWorker::addData(QList<VectorXd> &data)
 {
-    qDebug() << "addData" << data.size();
     m_qMutex.lock();
     m_data.append(data);
     m_qMutex.unlock();
@@ -26,7 +26,7 @@ void StcWorker::addData(QList<VectorXd> &data)
 
 //*************************************************************************************************************
 
-void StcWorker::clear()
+void ClustStcWorker::clear()
 {
     m_qMutex.lock();
     m_data.clear();
@@ -36,7 +36,7 @@ void StcWorker::clear()
 
 //*************************************************************************************************************
 
-void StcWorker::process()
+void ClustStcWorker::process()
 {
     VectorXd m_vecAverage(0,0);
 
@@ -60,14 +60,12 @@ void StcWorker::process()
                 else
                     m_vecAverage += m_data.front();
 
-//                qDebug() << "non Loop" << m_iCurrentSample;
                 m_data.pop_front();
             }
             ++m_iCurrentSample;
 
             if(m_iCurrentSample%m_iAverageSamples == 0)
             {
-//                qDebug() << "emit" << m_iAverageSamples;
                 m_vecAverage /= (double)m_iAverageSamples;
                 emit stcSample(m_vecAverage);
                 m_vecAverage = VectorXd::Zero(m_vecAverage.rows());
@@ -81,7 +79,7 @@ void StcWorker::process()
 
 //*************************************************************************************************************
 
-void StcWorker::setAverage(qint32 samples)
+void ClustStcWorker::setAverage(qint32 samples)
 {
     m_iAverageSamples = samples;
 }
@@ -89,7 +87,7 @@ void StcWorker::setAverage(qint32 samples)
 
 //*************************************************************************************************************
 
-void StcWorker::setInterval(int usec)
+void ClustStcWorker::setInterval(int usec)
 {
     m_iUSecIntervall = usec;
 }
@@ -97,7 +95,7 @@ void StcWorker::setInterval(int usec)
 
 //*************************************************************************************************************
 
-void StcWorker::setLoop(bool looping)
+void ClustStcWorker::setLoop(bool looping)
 {
     m_bIsLooping = looping;
 }
