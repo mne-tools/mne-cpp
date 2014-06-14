@@ -1,20 +1,20 @@
-#include "stctabledelegate.h"
-#include "stcmodel.h" //Declar MetaType Eigen::Matrix3Xf; FSLIB::Label
+#include "cluststctabledelegate.h"
+#include "cluststcmodel.h" //Declar MetaType Eigen::Matrix3Xf; FSLIB::Label
 #include <QPainter>
 #include <QDebug>
 
 using namespace Eigen;
 
-StcTableDelegate::StcTableDelegate(QObject *parent)
+ClustStcTableDelegate::ClustStcTableDelegate(QObject *parent)
 : QAbstractItemDelegate(parent)
 {
 }
 
 //*************************************************************************************************************
 
-void StcTableDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+void ClustStcTableDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-    float t_fPlotHeight = option.rect.height();
+//    float t_fPlotHeight = option.rect.height();
     switch(index.column()) {
         case 0: { //index
             painter->save();
@@ -82,7 +82,7 @@ void StcTableDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
 
 //*************************************************************************************************************
 
-QSize StcTableDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
+QSize ClustStcTableDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     QSize size;
 

@@ -1,9 +1,9 @@
-#include "stcview.h"
+#include "cluststcview.h"
 
 #include "qglbuilder.h"
 #include "qglcube.h"
 
-#include "stcmodel.h"
+#include "cluststcmodel.h"
 
 #include <disp/colormap.h>
 
@@ -12,11 +12,16 @@
 using namespace DISPLIB;
 
 
-StcView::StcView(QWindow *parent)
+ClustStcView::ClustStcView(bool isStereo, QGLView::StereoType stereoType, QWindow *parent)
 : QGLView(parent)
 , m_pModel(NULL)
-, m_bStereo(true)
-, m_stereoType(QGLView::StretchedLeftRight)
+, m_bIsInitialized(false)
+, m_bStereo(isStereo)
+, m_stereoType(stereoType)//QGLView::StretchedLeftRight)//QGLView::RedCyanAnaglyph
+, m_pSceneNodeBrain(NULL)
+, m_pSceneNode(NULL)
+, m_pLightModel(NULL)
+, m_pLightParametersScene(NULL)
 {
     m_fOffsetZ = -100.0f;
     m_fOffsetZEye = 60.0f;
@@ -25,8 +30,11 @@ StcView::StcView(QWindow *parent)
 
 //*************************************************************************************************************
 
-void StcView::dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
+void ClustStcView::dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles)
 {
+    if(!m_bIsInitialized)
+        return;
+
     //check wether realtive stc data column (3) has changed
     if(topLeft.column() > 3 || bottomRight.column() < 3)
         return;
@@ -54,16 +62,16 @@ void StcView::dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomR
 
 //*************************************************************************************************************
 
-void StcView::setModel(StcModel* model)
+void ClustStcView::setModel(ClustStcModel* model)
 {
     m_pModel = model;
-    connect(m_pModel, &StcModel::dataChanged, this, &StcView::dataChanged);
+    connect(m_pModel, &ClustStcModel::dataChanged, this, &ClustStcView::dataChanged);
 }
 
 
 //*************************************************************************************************************
 
-void StcView::initializeGL(QGLPainter *painter)
+void ClustStcView::initializeGL(QGLPainter *painter)
 {
     if(!m_pModel)
         return;
@@ -74,6 +82,8 @@ void StcView::initializeGL(QGLPainter *painter)
     float fac = 100.0f; // too small vertices distances cause clipping errors --> 100 is a good value for freesurfer brain measures
 
     builder << QGL::Faceted;
+    if(m_pSceneNodeBrain)
+        delete m_pSceneNodeBrain;
     m_pSceneNodeBrain = builder.currentNode();
 
     builder.pushNode();
@@ -139,18 +149,24 @@ void StcView::initializeGL(QGLPainter *painter)
 //    builder.popNode();
 
     // Optimze current scene for display and calculate lightning normals
+    if(m_pSceneNode)
+        delete m_pSceneNode;
     m_pSceneNode = builder.finalizedSceneNode();
     m_pSceneNode->setParent(this);
 
     //
     // Create light models
     //
+    if(m_pLightModel)
+        delete m_pLightModel;
     m_pLightModel = new QGLLightModel(this);
     m_pLightModel->setAmbientSceneColor(Qt::white);
     m_pLightModel->setViewerPosition(QGLLightModel::LocalViewer);
 
     m_pLightModel = new QGLLightModel(this);
 
+    if(m_pLightParametersScene)
+        delete m_pLightParametersScene;
     m_pLightParametersScene = new QGLLightParameters(this);
     m_pLightParametersScene->setPosition(QVector3D(0.0f, 0.0f, 3.0f));
     painter->setMainLight(m_pLightParametersScene);
@@ -159,7 +175,6 @@ void StcView::initializeGL(QGLPainter *painter)
     // Set stereo type
     //
     if (m_bStereo) {
-//        this->setStereoType(QGLView::RedCyanAnaglyph);
         this->setStereoType(m_stereoType);
 //        camera()->setEyeSeparation(0.4f);
 //        m_pCameraFrontal->setEyeSeparation(0.1f);
@@ -179,12 +194,13 @@ void StcView::initializeGL(QGLPainter *painter)
 //    //set background to light white
     glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
 
+    m_bIsInitialized = true;
 }
 
 
 //*************************************************************************************************************
 
-void StcView::paintGL(QGLPainter *painter)
+void ClustStcView::paintGL(QGLPainter *painter)
 {
     glEnable(GL_BLEND); // enable transparency
 
@@ -211,7 +227,7 @@ void StcView::paintGL(QGLPainter *painter)
 
 //*************************************************************************************************************
 
-void StcView::keyPressEvent(QKeyEvent *e)
+void ClustStcView::keyPressEvent(QKeyEvent *e)
 {
     camera()->setCenter(QVector3D(0,0,0));
 
@@ -233,7 +249,7 @@ void StcView::keyPressEvent(QKeyEvent *e)
 
 //*************************************************************************************************************
 
-void StcView::mouseMoveEvent(QMouseEvent *e)
+void ClustStcView::mouseMoveEvent(QMouseEvent *e)
 {
     camera()->setCenter(QVector3D(0,0,0));
 
@@ -255,7 +271,7 @@ void StcView::mouseMoveEvent(QMouseEvent *e)
 
 //*************************************************************************************************************
 
-void StcView::mousePressEvent(QMouseEvent *e)
+void ClustStcView::mousePressEvent(QMouseEvent *e)
 {
     if(e->buttons() & Qt::RightButton)
     {

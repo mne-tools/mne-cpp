@@ -1,5 +1,5 @@
-#ifndef STCWORKER_H
-#define STCWORKER_H
+#ifndef CLUSTSTCWORKER_H
+#define CLUSTSTCWORKER_H
 
 
 //*************************************************************************************************************
@@ -32,14 +32,14 @@
 using namespace Eigen;
 
 
-class StcWorker : public QObject
+class ClustStcWorker : public QObject
 {
     Q_OBJECT
 public:
-    typedef QSharedPointer<StcWorker> SPtr;            /**< Shared pointer type for StcWorker class. */
-    typedef QSharedPointer<const StcWorker> ConstSPtr; /**< Const shared pointer type for StcWorker class. */
+    typedef QSharedPointer<ClustStcWorker> SPtr;            /**< Shared pointer type for StcWorker class. */
+    typedef QSharedPointer<const ClustStcWorker> ConstSPtr; /**< Const shared pointer type for StcWorker class. */
 
-    StcWorker(QObject *parent = 0);
+    ClustStcWorker(QObject *parent = 0);
 
 //    void setIntervall(int intervall);
 
@@ -69,4 +69,4 @@ private:
     qint32 m_iUSecIntervall;
 };
 
-#endif // STCWORKER_H
+#endif // CLUSTSTCWORKER_H

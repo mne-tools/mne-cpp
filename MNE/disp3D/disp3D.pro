@@ -85,10 +85,11 @@ SOURCES += \
     inverseview.cpp \
     inverseviewproducer.cpp \
     brainview.cpp \
-    helpers/stcmodel.cpp \
-    helpers/stcworker.cpp \
-    helpers/stctabledelegate.cpp \
-    helpers/stcview.cpp
+    newbrainview.cpp \
+    helpers/cluststcmodel.cpp \
+    helpers/cluststcview.cpp \
+    helpers/cluststcworker.cpp \
+    helpers/cluststctabledelegate.cpp
 
 HEADERS += \
     disp3D_global.h \
@@ -97,10 +98,11 @@ HEADERS += \
     inverseview.h \
     inverseviewproducer.h \
     brainview.h \
-    helpers/stcmodel.h \
-    helpers/stcworker.h \
-    helpers/stctabledelegate.h \
-    helpers/stcview.h
+    newbrainview.h \
+    helpers/cluststcmodel.h \
+    helpers/cluststctabledelegate.h \
+    helpers/cluststcview.h \
+    helpers/cluststcworker.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

@@ -1,5 +1,5 @@
-#ifndef STCVIEW_H
-#define STCVIEW_H
+#ifndef CLUSTSTCVIEW_H
+#define CLUSTSTCVIEW_H
 
 
 #include "../disp3D_global.h"
@@ -13,18 +13,21 @@
 #include <QMap>
 
 
-class StcModel;
+class ClustStcModel;
 
 
-class DISP3DSHARED_EXPORT StcView : public QGLView
+class DISP3DSHARED_EXPORT ClustStcView : public QGLView
 {
     Q_OBJECT
 public:
-    StcView(QWindow *parent = 0);
+    typedef QSharedPointer<ClustStcView> SPtr;            /**< Shared pointer type for ClustStcView class. */
+    typedef QSharedPointer<const ClustStcView> ConstSPtr; /**< Const shared pointer type for ClustStcView class. */
+
+    ClustStcView(bool isStereo = true, QGLView::StereoType stereo = QGLView::RedCyanAnaglyph, QWindow *parent = 0);
 
     void dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int> ());
 
-    void setModel(StcModel* model);
+    void setModel(ClustStcModel* model);
 
 protected:
     //=========================================================================================================
@@ -70,7 +73,9 @@ protected:
 
 
 private:
-    StcModel* m_pModel;
+    ClustStcModel* m_pModel;
+
+    bool m_bIsInitialized;
 
     bool m_bStereo;
     QGLView::StereoType m_stereoType;
@@ -85,13 +90,8 @@ private:
 
     QGLColorMaterial material;
 
-
-    QVector3D m_vecBoundingBoxMin;                  /**< X, Y, Z minima. */
-    QVector3D m_vecBoundingBoxMax;                  /**< X, Y, Z maxima. */
-    QVector3D m_vecBoundingBoxCenter;               /**< X, Y, Z center. */
-
     QMap<qint32, qint32> m_qMapLabelIdIndex;
 
 };
 
-#endif // STCVIEW_H
+#endif // CLUSTSTCVIEW_H
