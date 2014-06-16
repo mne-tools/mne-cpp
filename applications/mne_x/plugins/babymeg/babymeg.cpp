@@ -294,6 +294,7 @@ void BabyMEG::setFiffInfo(FiffInfo p_FiffInfo)
     m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo(p_FiffInfo));
 
     m_iBufferSize = pInfo->dataLength;
+    sfreq = pInfo->sfreq;
 }
 
 //*************************************************************************************************************
