@@ -49,7 +49,8 @@
 
 #include <QtCore/QtPlugin>
 #include <QDebug>
-
+#include <QFuture>
+#include <QtConcurrent/QtConcurrentMap>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -300,26 +301,12 @@ void RtSss::run()
             MatrixXd in_mat = m_pRtSssBuffer->pop();
 //            std::cout << "size of in_mat (run): " << in_mat.rows() << " x " << in_mat.cols() << std::endl;
 
+            sssRR = rsss.getSSSRR(lineqn[0], lineqn[1], lineqn[2], lineqn[3], lineqn[4]*in_mat.block(0,0,nmegchan,in_mat.cols()));
+//            std::cout << "size of sssRR[0] (run): " << sssRR[0].rows() << " x " << sssRR[0].cols() << std::endl;
+
             for(qint32 i = 0; i <in_mat.cols(); ++i)
             {
-/*
-//              When MEG channels don't start from the first row and may be mixed with other channels
-                qint32 m = 0;
-                MatrixXd meg_mat(nmegchan, 1);
-                for(qint32 j = 0; j < in_mat.rows(); ++j)
-                    if(m_pFiffInfo->chs[j].kind == FIFFV_MEG_CH)
-                    {
-                        meg_mat(m,0) = in_mat(j,i);
-                        m++;
-                    }
-
-//                std::cout << "size meg_mat: " << meg_mat.rows() << " x " << meg_mat.cols() << std::endl;
-                  sssRR = rsss.getSSSRR(lineqn[0], lineqn[1], lineqn[2], lineqn[3], lineqn[4]*meg_mat);
-*/
-
-//                qDebug() << "running rtSSS .....";
-                sssRR = rsss.getSSSRR(lineqn[0], lineqn[1], lineqn[2], lineqn[3], lineqn[4]*in_mat.block(0,i,nmegchan,1));
-                in_mat.block(0,i,nmegchan,1) = sssRR[0];
+                in_mat.block(0,i,nmegchan,1) = sssRR[0].col(i);
                 m_pRTMSAOutput->data()->setValue(in_mat.col(i));
             }
         }
@@ -330,3 +317,26 @@ void RtSss::run()
 
 }
 
+//*****************************************************************************************
+//  When MEG channels don't start from the first row and may be mixed with other channels
+//*****************************************************************************************
+/*
+for(qint32 i = 0; i <in_mat.cols(); ++i)
+{
+//  When MEG channels don't start from the first row and may be mixed with other channels
+    qint32 m = 0;
+    MatrixXd meg_mat(nmegchan, 1);
+    for(qint32 j = 0; j < in_mat.rows(); ++j)
+        if(m_pFiffInfo->chs[j].kind == FIFFV_MEG_CH)
+        {
+            meg_mat(m,0) = in_mat(j,i);
+            m++;
+        }
+
+//                std::cout << "size meg_mat: " << meg_mat.rows() << " x " << meg_mat.cols() << std::endl;
+      sssRR = rsss.getSSSRR(lineqn[0], lineqn[1], lineqn[2], lineqn[3], lineqn[4]*meg_mat);
+
+    in_mat.block(0,i,nmegchan,1) = sssRR[0];
+    m_pRTMSAOutput->data()->setValue(in_mat.col(i));
+}
+*/
