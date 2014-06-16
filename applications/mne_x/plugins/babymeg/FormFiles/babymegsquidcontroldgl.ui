@@ -447,24 +447,24 @@ background-color:rgb(216, 216, 216);</string>
        </item>
        <item row="0" column="0">
         <layout class="QGridLayout" name="gridLayout_7">
-         <item row="0" column="0" colspan="2">
+         <item row="1" column="0" colspan="2">
           <widget class="QPushButton" name="m_Qbn_SyncGUI">
            <property name="text">
             <string>Sync GUI</string>
            </property>
           </widget>
          </item>
-         <item row="2" column="0">
+         <item row="6" column="0">
           <widget class="QLabel" name="label_2">
            <property name="text">
             <string>Channel</string>
            </property>
           </widget>
          </item>
-         <item row="2" column="1">
+         <item row="6" column="1">
           <widget class="QComboBox" name="m_Qcb_channel"/>
          </item>
-         <item row="1" column="1">
+         <item row="5" column="1">
           <widget class="QComboBox" name="m_Qcb_commtype">
            <item>
             <property name="text">
@@ -518,7 +518,7 @@ background-color:rgb(216, 216, 216);</string>
            </item>
           </widget>
          </item>
-         <item row="1" column="0">
+         <item row="5" column="0">
           <widget class="QLabel" name="label">
            <property name="text">
             <string>CommType</string>
@@ -704,8 +704,8 @@ background-color:rgb(216, 216, 216);</string>
            </item>
           </widget>
          </item>
-         <item row="2" column="0">
-          <widget class="QGraphicsView" name="gv_paragraph"/>
+         <item row="1" column="0">
+          <widget class="QTableWidget" name="tbw_parameters"/>
          </item>
         </layout>
        </item>
@@ -761,6 +761,12 @@ background-color:rgb(216, 216, 216);</string>
     <layout class="QFormLayout" name="formLayout_4">
      <property name="fieldGrowthPolicy">
       <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+     </property>
+     <property name="horizontalSpacing">
+      <number>6</number>
+     </property>
+     <property name="verticalSpacing">
+      <number>1</number>
      </property>
      <item row="0" column="0">
       <widget class="QPushButton" name="m_Qbn_Cancel">
