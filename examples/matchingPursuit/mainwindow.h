@@ -67,8 +67,8 @@ private:
     QList<qreal> NormSignal(QList<qreal> signalSamples);
     //QStringList correlation(VectorXd signalSamples, QList<qreal> atomSamples, QString atomName);
     //VectorXd mpCalc(QFile& dictionary, VectorXd signalSamples, qint32 iterationsCount);
-    qint32 MainWindow::ReadFiffFile(QString fileName);
-    void MainWindow::ReadMatlabFile(QString fileName);
+    qint32 ReadFiffFile(QString fileName);
+    void ReadMatlabFile(QString fileName);
 };
 
 // Widget to paint inputsignal
