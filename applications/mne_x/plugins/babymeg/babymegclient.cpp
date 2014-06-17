@@ -239,6 +239,15 @@ void BabyMEGClient::DisConnectBabyMEG()
 void BabyMEGClient::SendCommandToBabyMEGShortConnection(QByteArray s)
 {
     qDebug() << "SendCommandToBabyMEGShortConnection";
+
+    bool connected = (tcpSocket->state() == QTcpSocket::ConnectedState);
+    if(connected)
+    {
+        tcpSocket->disconnectFromHost();
+        if(tcpSocket->state() != QAbstractSocket::UnconnectedState)
+                    tcpSocket->waitForDisconnected();
+    }
+
     tcpSocket->connectToHost(name,port,QIODevice::ReadWrite);
     if (tcpSocket->waitForConnected(10000))
     {
@@ -247,7 +256,7 @@ void BabyMEGClient::SendCommandToBabyMEGShortConnection(QByteArray s)
 
         if(tcpSocket->state()==QAbstractSocket::ConnectedState)
         {
-            qDebug()<<"Send String [" << s << "]";
+            qDebug()<<"Send String [" << s << "]\n"<<"length["<<s.size()<<"]\n";
             tcpSocket->write(s);
 //            int strlen = s.size();
 //            QByteArray Scmd = MGH_LM_Int2Byte(strlen);
@@ -255,6 +264,10 @@ void BabyMEGClient::SendCommandToBabyMEGShortConnection(QByteArray s)
 //            tcpSocket->write(Scmd);
 //            tcpSocket->write("SLM");
             tcpSocket->waitForBytesWritten();
+        }
+        else
+        {
+            qDebug()<<"Connect state is abnormal:"<<tcpSocket->state();
         }
     }
 

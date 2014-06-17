@@ -207,15 +207,15 @@ public:
     QVector <QGraphicsLineItem * > PolyLinePtr;
     bool initplotflag;
     QVector <QGraphicsRectItem * > PolyRectPtr;
-    bool initparaplotflag;
 
     PlotSettings settings;
     PlotSettings settings_tune;
 
     plotter *d_timeplot;
-    plotter *d_tuneplot;
 
-
+    int TableRows;
+    int TableCols;
+    QList < QString > chanNames;
 
     void SendCMD(QString CMDSTR);
     void InitChannels(QString sReply);
@@ -273,9 +273,6 @@ public slots:
     void AdOffset();
     void AdjuBias();
     void AdjuModu();
-
-    void StartDisp();
-
 
 signals:
     void SendCMDToMEGSource(QString CMDSTR);
