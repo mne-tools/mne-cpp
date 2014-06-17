@@ -40,7 +40,7 @@ public:
     adaptiveMP();
     QList<GaborAtom> MatchingPursuit (MatrixXd signal, qint32 max_it, qreal epsilon);
     VectorXcd ModulationFunction(qint32 N, qreal k);
-    VectorXd adaptiveMP::CalculateAtom(qint32 sampleCount, qreal scale, qint32 translation, qreal modulation, qint32 channel, MatrixXd residuum, ReturnValue returnValue);
+    VectorXd CalculateAtom(qint32 sampleCount, qreal scale, qint32 translation, qreal modulation, qint32 channel, MatrixXd residuum, ReturnValue returnValue);
 
 };
 

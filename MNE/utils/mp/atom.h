@@ -59,10 +59,10 @@ namespace UTILSLIB
         qreal Phase;
         GaborAtom();
 
-        static VectorXd GaborAtom::GaussFunction (qint32 sampleCount, qreal scale, qint32 translation);
-        VectorXcd GaborAtom::CreateComplex(qint32 sampleCount, qreal scale, qint32 translation, qreal modulation);
-        VectorXd GaborAtom::CreateReal(qint32 sampleCount, qreal scale, qint32 translation, qreal modulation, qreal phase);
-        QStringList GaborAtom::CreateStringValues();
+        static VectorXd GaussFunction (qint32 sampleCount, qreal scale, qint32 translation);
+        VectorXcd CreateComplex(qint32 sampleCount, qreal scale, qint32 translation, qreal modulation);
+        VectorXd CreateReal(qint32 sampleCount, qreal scale, qint32 translation, qreal modulation, qreal phase);
+        QStringList CreateStringValues();
 
     };
 
@@ -76,9 +76,9 @@ namespace UTILSLIB
 
         ChirpAtom(qint32 sampleCount, qreal scale, qint32 translation, qreal modulation, qreal phase, qreal chirp, bool saveToRam = false);
 
-        VectorXcd ChirpAtom::CreateComplex();
-        VectorXd ChirpAtom::CreateReal();
-        QStringList ChirpAtom::CreateStringValues();
+        VectorXcd CreateComplex();
+        VectorXd CreateReal();
+        QStringList CreateStringValues();
 
     };
 

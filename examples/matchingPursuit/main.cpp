@@ -211,7 +211,8 @@ int main(int argc, char *argv[])
         QString title;          // string which will contain the title
 
         //plot atoms found
-        Plot *atPlot = new Plot(gaborAtom.CreateReal(var1, var2, var3, var4, var5));
+        VectorXd tmp = gaborAtom.CreateReal(var1, var2, var3, var4, var5);
+        Plot *atPlot = new Plot(tmp);
         title.append(QString("Atom: %1").arg(i));
         atPlot->setTitle(title);
         //atPlot->show();

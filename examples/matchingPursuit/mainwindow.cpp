@@ -1080,7 +1080,7 @@ SignalModel::SignalModel(QObject *parent): QAbstractTableModel(parent)
   {
       // Get Data
       QVariant variant = index.model()->data(index,Qt::DisplayRole);
-      QList<double> sampleList = variant.value<QList<double>>();
+      QList<double> sampleList = variant.value< QList<double> >();
       VectorXd signalSamples = VectorXd::Zero(sampleList.length());
       for(int i = 0; i < sampleList.length(); i++)
           signalSamples[i] = sampleList.at(i);
