@@ -243,6 +243,10 @@ private:
     QAction*                        m_pActionSetupProject;      /**< shows setup project dialog */
     QAction*                        m_pActionRecordFile;        /**< start recording action */
     QAction*                        m_pActionSqdCtrl;           /**< show squid control */
+
+
+public:
+    double sfreq;
 };
 
 } // NAMESPACE
