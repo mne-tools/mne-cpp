@@ -185,7 +185,12 @@ void ClustStcView::initializeGL(QGLPainter *painter)
         camera()->setFieldOfView(30);
         camera()->setEye(QVector3D(0,0,m_fOffsetZEye));
         //LNdT DEMO end
-
+    }
+    else
+    {
+        camera()->setCenter(QVector3D(0,0,m_fOffsetZ));
+        camera()->setFieldOfView(30);
+        camera()->setEye(QVector3D(0,0,m_fOffsetZEye));
     }
 
 //    //set background to light grey-blue
