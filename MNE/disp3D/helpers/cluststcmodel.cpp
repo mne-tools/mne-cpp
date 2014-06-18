@@ -53,7 +53,7 @@ int ClustStcModel::rowCount(const QModelIndex & /*parent*/) const
 
 int ClustStcModel::columnCount(const QModelIndex & /*parent*/) const
 {
-    return 8;
+    return 7;
 }
 
 
@@ -111,10 +111,6 @@ QVariant ClustStcModel::data(const QModelIndex &index, int role) const
                 }
                 break;
             }
-            case 7: { // Num Centroids
-                return QVariant();
-                break;
-            }
         }
     } // end index.valid() check
 
@@ -145,8 +141,6 @@ QVariant ClustStcModel::headerData(int section, Qt::Orientation orientation, int
                 return QVariant("Color");
             case 6: //roi Tri Coords
                 return QVariant("Tri Coords");
-            case 7: //num Centroids
-                return QVariant("Centroids");
         }
     }
     else if(orientation == Qt::Vertical) {
