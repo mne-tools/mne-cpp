@@ -120,7 +120,7 @@ int main(int argc, char *argv[])
 
 
     AnnotationSet t_annotationSet("mind006", 2, "aparc.a2009s", "D:/Data/subjects");
-    SurfaceSet t_surfSet("mind006", 2, "inflated", "D:/Data/subjects");
+    SurfaceSet t_surfSet("mind006", 2, "white", "D:/Data/subjects");
 
     QString t_sFileNameStc("mind006_051209_auditory01_test.stc");
     MNESourceEstimate sourceEstimateClustered;
@@ -195,7 +195,7 @@ int main(int argc, char *argv[])
     pSliderAverageView->setMaximum(500);
     pSliderAverageView->setValue(100);
 
-    ClustStcView* clustView = new ClustStcView;
+    ClustStcView* clustView = new ClustStcView(true, QGLView::RedCyanAnaglyph);//(false); (true, QGLView::StretchedLeftRight); (true, QGLView::RedCyanAnaglyph);
     clustView->setModel(pClustStcModel);
 
     if (clustView->stereoType() != QGLView::RedCyanAnaglyph)
@@ -227,7 +227,7 @@ int main(int argc, char *argv[])
     //
     pClustStcModel->addData(sourceEstimateClustered);
 
-    clustView->setStereoType(QGLView::StretchedLeftRight);
+//    clustView->setStereoType(QGLView::StretchedLeftRight);
 
 //*/
 

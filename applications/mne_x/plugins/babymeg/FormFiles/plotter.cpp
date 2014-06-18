@@ -12,13 +12,13 @@ plotter::plotter(QWidget *parent)
     setFocusPolicy(Qt::StrongFocus);
     rubberBandIsShown = false;
 
-    zoomInButton = new QToolButton(this);
-    zoomInButton->adjustSize();
-    connect(zoomInButton,SIGNAL(clicked()), this, SLOT(zoomIn()));
+//    zoomInButton = new QToolButton(this);
+//    zoomInButton->adjustSize();
+//    connect(zoomInButton,SIGNAL(clicked()), this, SLOT(zoomIn()));
 
-    zoomOutButton = new QToolButton(this);
-    zoomOutButton->adjustSize();
-    connect(zoomOutButton,SIGNAL(clicked()), this, SLOT(zoomOut()));
+//    zoomOutButton = new QToolButton(this);
+//    zoomOutButton->adjustSize();
+//    connect(zoomOutButton,SIGNAL(clicked()), this, SLOT(zoomOut()));
 
     setPlotSettings(PlotSettings());
 
@@ -29,33 +29,33 @@ void plotter::setPlotSettings(const PlotSettings &settings)
     zoomStack.clear();
     zoomStack.append(settings);
     curZoom = 0;
-    zoomInButton->hide();
-    zoomOutButton->hide();
+//    zoomInButton->hide();
+//    zoomOutButton->hide();
     refreshPixmap();
 }
 
 
-void plotter::zoomOut()
-{
-    if(curZoom > 0){
-        --curZoom;
-        zoomOutButton->setEnabled(curZoom > 0);
-        zoomInButton->setEnabled(true);
-        zoomInButton->show();
-        refreshPixmap();
-    }
-}
+//void plotter::zoomOut()
+//{
+//    if(curZoom > 0){
+//        --curZoom;
+//        zoomOutButton->setEnabled(curZoom > 0);
+//        zoomInButton->setEnabled(true);
+//        zoomInButton->show();
+//        refreshPixmap();
+//    }
+//}
 
-void plotter::zoomIn()
-{
-    if(curZoom < zoomStack.count() - 1){
-        ++curZoom;
-        zoomInButton->setEnabled(curZoom < zoomStack.count() - 1);
-        zoomOutButton->setEnabled(true);
-        zoomOutButton->show();
-        refreshPixmap();
-    }
-}
+//void plotter::zoomIn()
+//{
+//    if(curZoom < zoomStack.count() - 1){
+//        ++curZoom;
+//        zoomInButton->setEnabled(curZoom < zoomStack.count() - 1);
+//        zoomOutButton->setEnabled(true);
+//        zoomOutButton->show();
+//        refreshPixmap();
+//    }
+//}
 
 void plotter::setCurveData(int id, const QVector<QPointF> &data)
 {
@@ -84,33 +84,34 @@ void plotter::paintEvent(QPaintEvent * /*event*/)
     QStylePainter painter(this);
     painter.drawPixmap(0,0,pixmap);
 
-    if(rubberBandIsShown){
-        painter.setPen(palette().light().color());
-        painter.drawRect(rubberBandRect.normalized().adjusted(0,0,-1,-1));
-    }
+//    if(rubberBandIsShown){
+//        painter.setPen(palette().light().color());
+//        painter.drawRect(rubberBandRect.normalized().adjusted(0,0,-1,-1));
+//    }
 
-    if(hasFocus())
-    {
-        QStyleOptionFocusRect option;
-        option.initFrom(this);
-        option.backgroundColor = palette().dark().color();
-        painter.drawPrimitive(QStyle::PE_FrameFocusRect, option);
-    }
+//    if(hasFocus())
+//    {
+//        QStyleOptionFocusRect option;
+//        option.initFrom(this);
+//        option.backgroundColor = palette().dark().color();
+//        painter.drawPrimitive(QStyle::PE_FrameFocusRect, option);
+//    }
 }
 
 void plotter::resizeEvent(QResizeEvent * /*event*/)
 {
-    int x = width() - (zoomInButton->width() + zoomOutButton->width() + 10);
+//    int x = width() - (zoomInButton->width() + zoomOutButton->width() + 10);
 
-    zoomInButton->move(x,5);
-    zoomOutButton->move(x + zoomInButton->width() +5, 5);
+//    zoomInButton->move(x,5);
+//    zoomOutButton->move(x + zoomInButton->width() +5, 5);
     refreshPixmap();
 }
 
 void plotter::refreshPixmap()
 {
     pixmap = QPixmap(size());
-    pixmap.fill(this, 0, 0);
+    //pixmap.fill(this, 0, 0);
+
 
     QPainter painter(&pixmap);
     painter.initFrom(this);
@@ -121,7 +122,7 @@ void plotter::refreshPixmap()
 
 void plotter::drawGrid(QPainter *painter)
 {
-    QRect rect(xMargin, Margin, width()-2*xMargin, height() -2*Margin);
+    QRect rect(xMargin+20, Margin-10, width()-2*xMargin, height() -2*Margin);
     if(!rect.isValid()) return;
 
     PlotSettings settings = zoomStack[curZoom];
@@ -139,6 +140,9 @@ void plotter::drawGrid(QPainter *painter)
         painter->drawText(x,rect.bottom()+5,100,20,Qt::AlignLeft, QString::number(label));
     }
 
+    painter->drawText(rect.left(),rect.bottom()+20,rect.width(),20,Qt::AlignCenter, settings.xlabel);
+
+
     for(int j=0; j<=settings.numYTicks;++j)
     {
         int y = rect.bottom() - (j*(rect.height()-1)/settings.numYTicks);
@@ -147,9 +151,12 @@ void plotter::drawGrid(QPainter *painter)
         painter->drawLine(rect.left(),y,rect.right(),y);
         painter->setPen(light);
         painter->drawLine(rect.left()+5 ,y, rect.left(),y);
-        painter->drawText(rect.left()- xMargin -20, y-10, 100,20,
+        painter->drawText(rect.left()- xMargin -30, y-10, 100,20,
                           Qt::AlignVCenter|Qt::AlignRight, QString::number(label));
     }
+
+    //painter->drawText(rect.left()-10, rect.bottom(), rect.height(),20,Qt::AlignVCenter|Qt::AlignCenter, settings.ylabel);
+
     painter->drawRect(rect.adjusted(0,0,-1,-1));
 
 }
@@ -159,7 +166,7 @@ void plotter::drawCurve(QPainter *painter)
     static const QColor colorForIds[6] = {Qt::red,Qt::green,Qt::blue,Qt::cyan,Qt::magenta,Qt::yellow};
 
     PlotSettings settings = zoomStack[curZoom];
-    QRect rect(xMargin, Margin, width()-2*xMargin, height()-2*Margin);
+    QRect rect(xMargin+20, Margin-10, width()-2*xMargin, height()-2*Margin);
     if(!rect.isValid()) return;
 
     painter->setClipRect(rect.adjusted(+1,+1,-1,-1));
