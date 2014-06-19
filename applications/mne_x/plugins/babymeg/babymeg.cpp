@@ -43,7 +43,6 @@
 #include "FormFiles/babymegsetupwidget.h"
 #include "FormFiles/babymegprojectdialog.h"
 
-#include "FormFiles/babymegsquidcontroldgl.h"
 
 #include <utils/ioutils.h>
 
@@ -102,6 +101,7 @@ BabyMEG::BabyMEG()
     m_pActionSqdCtrl->setStatusTip(tr("Squid Control"));
     connect(m_pActionSqdCtrl, &QAction::triggered, this, &BabyMEG::showSqdCtrlDialog);
     addPluginAction(m_pActionSqdCtrl);
+
 }
 
 
@@ -114,6 +114,7 @@ BabyMEG::~BabyMEG()
 
     if(myClient && myClient->isConnected())
             myClient->DisConnectBabyMEG();
+
 }
 
 
@@ -149,6 +150,7 @@ void BabyMEG::init()
 
     //init channels when fiff info is available
     connect(this, &BabyMEG::fiffInfoAvailable, this, &BabyMEG::initConnector);
+
 }
 
 
@@ -172,7 +174,6 @@ void BabyMEG::initConnector()
 
         m_outputConnectors.append(m_pRTMSABabyMEG);
     }
-
 }
 
 
@@ -198,8 +199,18 @@ void BabyMEG::showProjectDialog()
 
 void BabyMEG::showSqdCtrlDialog()
 {
-    BabyMEGSQUIDControlDgl SQUIDCtrlDlg(this);
-    SQUIDCtrlDlg.exec();
+    //BabyMEGSQUIDControlDgl SQUIDCtrlDlg(this);
+    //SQUIDCtrlDlg.exec();
+    // added by Limin for nonmodal dialog
+    if (SQUIDCtrlDlg == NULL)
+        SQUIDCtrlDlg = QSharedPointer<BabyMEGSQUIDControlDgl>(new BabyMEGSQUIDControlDgl(this));
+
+    if (!SQUIDCtrlDlg->isVisible())
+    {
+        SQUIDCtrlDlg->show();
+        SQUIDCtrlDlg->raise();
+        SQUIDCtrlDlg->Init();
+    }
 }
 
 //*************************************************************************************************************

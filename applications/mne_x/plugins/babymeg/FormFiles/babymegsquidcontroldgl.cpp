@@ -119,6 +119,8 @@ BabyMEGSQUIDControlDgl::BabyMEGSQUIDControlDgl(BabyMEG* p_pBabyMEG,QWidget *pare
 
     //connect(ui->m_Qbn_Init,&QPushButton::released, this, &BabyMEGSQUIDControlDgl::Init);
 
+    setModal(false);
+
     // init the table for dispalying SQUID parameters
     TableRows = 80;
     TableCols = 10;
@@ -142,7 +144,7 @@ BabyMEGSQUIDControlDgl::BabyMEGSQUIDControlDgl(BabyMEG* p_pBabyMEG,QWidget *pare
     d_timeplot = new plotter();
     ui->lay_tune->addWidget(d_timeplot);
 
-    this->Init();
+    //this->Init();
 }
 
 BabyMEGSQUIDControlDgl::~BabyMEGSQUIDControlDgl()
@@ -199,7 +201,7 @@ float BabyMEGSQUIDControlDgl::mmax(MatrixXf tmp,int chan)
 }
 void BabyMEGSQUIDControlDgl::TuneGraphDispProc(MatrixXf tmp)
 {
-    std::cout << "first ten elements \n" << tmp.block(0,0,1,10) << std::endl;
+//    std::cout << "first ten elements \n" << tmp.block(0,0,1,10) << std::endl;
 
     int cols = tmp.cols();
     int chanIndx = ui->m_Qcb_channel->currentIndex();//1;//
