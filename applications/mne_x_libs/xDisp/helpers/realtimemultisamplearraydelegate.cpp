@@ -247,5 +247,7 @@ void RealTimeMultiSampleArrayDelegate::createGridPath(const QModelIndex &index, 
         path.lineTo(x,yEnd);
     }
 
+    Q_UNUSED(index);
+    Q_UNUSED(data);
 //    qDebug("Grid-PainterPath created!");
 }
