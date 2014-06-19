@@ -241,7 +241,7 @@ void RtHpi::run()
 
     m_bProcessData = true;
 
-    QVector<MatrixXd> buffer;
+    MatrixXd buffer;
 
     while (m_bIsRunning)
     {
