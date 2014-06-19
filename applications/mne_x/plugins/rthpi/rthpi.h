@@ -86,8 +86,25 @@ using namespace IOBuffer;
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// Declare all structures to be used
 //=============================================================================================================
+
+struct coilParam {
+    Eigen::MatrixXd pos;
+    Eigen::MatrixXd mom;
+};
+
+struct dipError {
+    double error;
+    Eigen::MatrixXd moment;
+};
+
+struct sens {
+    Eigen::MatrixXd coilpos;
+    Eigen::MatrixXd coilori;
+    Eigen::MatrixXd tra;
+};
+
 
 
 //=============================================================================================================
@@ -139,6 +156,14 @@ public:
 
     void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
 
+    dipError dipfitError (Eigen::MatrixXd, Eigen::MatrixXd, struct sens);
+    Eigen::MatrixXd ft_compute_leadfield(Eigen::MatrixXd, struct sens);
+    Eigen::MatrixXd magnetic_dipole(Eigen::MatrixXd, Eigen::MatrixXd, Eigen::MatrixXd);
+    coilParam dipfit(struct coilParam, struct sens, Eigen::MatrixXd);
+    coilParam fminsearch(Eigen::MatrixXd,int, int, int, Eigen::MatrixXd, struct sens);
+    static bool compar (int, int);
+    Eigen::MatrixXd pinv(Eigen::MatrixXd);
+
 signals:
     //=========================================================================================================
     /**
@@ -166,6 +191,9 @@ private:
 
     bool m_bIsRunning;      /**< If source lab is running */
     bool m_bProcessData;    /**< If data should be received for processing */
+
+    static std::vector <double>base_arr;
+
 };
 
 } // NAMESPACE
