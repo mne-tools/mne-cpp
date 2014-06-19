@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     babymeg.h
+* @file     newbrainview.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     May, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,43 +29,22 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the BabyMEG class.
+* @brief    NewBrainView class declaration
 *
 */
 
-#ifndef BABYMEG_H
-#define BABYMEG_H
-
+#ifndef NEWBRAINVIEW_H
+#define NEWBRAINVIEW_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "babymeg_global.h"
-#include "babymegclient.h"
+#include "disp3D_global.h"
 
-#include <mne_x/Interfaces/ISensor.h>
-#include <generics/circularbuffer_old.h>
-#include <generics/circularmatrixbuffer.h>
-#include <xMeas/newrealtimemultisamplearray.h>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FIFF INCLUDES
-//=============================================================================================================
-
-#include <fiff/fiff_info.h>
-#include <fiff/fiff.h>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// MNE INCLUDES
-//=============================================================================================================
-
-#include <rtClient/rtcmdclient.h>
+#include <fs/surfaceset.h>
+#include <fs/annotationset.h>
 
 
 //*************************************************************************************************************
@@ -73,30 +52,18 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
-#include <QVector>
-#include <QTimer>
+#include <QWidget>
+#include <QString>
+#include <QTableView>
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE BabyMEGPlugin
+// Eigen INCLUDES
 //=============================================================================================================
 
-namespace BabyMEGPlugin
-{
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace MNEX;
-using namespace IOBuffer;
-using namespace RTCLIENTLIB;
-using namespace FIFFLIB;
-using namespace XMEASLIB;
+#include <Eigen/Core>
 
 
 //*************************************************************************************************************
@@ -104,151 +71,114 @@ using namespace XMEASLIB;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class BabyMEGProjectDialog;
+class ClustStcModel;
+class ClustStcTableDelegate;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE DISP3DLIB
+//=============================================================================================================
+
+namespace DISP3DLIB
+{
+
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace FSLIB;
+using namespace Eigen;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS BabyMEG
+* ToDo: derive this from geometryview!
+* Visualizes FreeSurfer surfaces.
 *
-* @brief The BabyMEG class provides a RT server connection.
+* @brief FreeSurfer surface visualisation
 */
-class BABYMEGSHARED_EXPORT BabyMEG : public ISensor
+class DISP3DSHARED_EXPORT NewBrainView : public QWidget
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "babymeg.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
-    // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(MNEX::ISensor)
-
-    friend class BabyMEGSetupWidget;
-    friend class BabyMEGProjectDialog;
-    friend class BabyMEGSQUIDControlDgl;
-
 public:
+    typedef QSharedPointer<NewBrainView> SPtr;             /**< Shared pointer type for NewBrainView class. */
+    typedef QSharedPointer<const NewBrainView> ConstSPtr;  /**< Const shared pointer type for NewBrainView class. */
+
+    enum ViewOption {
+        ShowCurvature = 0x0
+    };
+    Q_DECLARE_FLAGS(ViewOptions, ViewOption)
 
     //=========================================================================================================
     /**
-    * Constructs a BabyMEG.
+    * Default constructor
     */
-    BabyMEG();
+    NewBrainView(QWidget * parent = 0, Qt::WindowFlags f = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the BabyMEG.
-    */
-    virtual ~BabyMEG();
-
-    //=========================================================================================================
-    /**
-    * Clears the rt server
-    */
-    void clear();
-
-    //=========================================================================================================
-    /**
-    * Clone the plugin
-    */
-    virtual QSharedPointer<IPlugin> clone() const;
-
-    //=========================================================================================================
-    /**
-    * Initialise the BabyMEG.
-    */
-    void init();
-
-    void showProjectDialog();
-
-    void showSqdCtrlDialog();
-
-    void toggleRecordingFile();
-
-    virtual bool start();
-    virtual bool stop();
-
-    virtual IPlugin::PluginType getType() const;
-    virtual QString getName() const;
-
-    virtual QWidget* setupWidget();
-
-    void setFiffInfo(FIFFLIB::FiffInfo);
-    void setFiffData(QByteArray DATA);
-    void setCMDData(QByteArray DATA);
-
-    //=========================================================================================================
-    /**
-    * Returns information from FLL hardware
+    * Construts the NewBrainView set by reading it of the given surface.
     *
-    * @param[in] t_sFLLControlCommand  FLL command.
+    * @param[in] subject_id         Name of subject
+    * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh, 2 -> both}
+    * @param[in] surf               Name of the surface to load (eg. inflated, orig ...)
+    * @param[in] subjects_dir       Subjects directory
     */
-    void comFLL(QString t_sFLLControlCommand);
+    explicit NewBrainView(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir, QWidget * parent = 0, Qt::WindowFlags f = 0);
 
-signals:
     //=========================================================================================================
     /**
-    * Emitted when command clients connection status changed
+    * Construts the NewBrainView set by reading it of the given surface.
     *
-    * @param[in] p_bStatus  connection status
+    * @param[in] subject_id         Name of subject
+    * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh, 2 -> both}
+    * @param[in] surf               Name of the surface to load (eg. inflated, orig ...)
+    * @param[in] atlas              Name of the atlas to load (eg. aparc.a2009s, aparc, aparc.DKTatlas40, BA, BA.thresh, ...)
+    * @param[in] subjects_dir       Subjects directory
     */
-    void cmdConnectionChanged(bool p_bStatus);
+    explicit NewBrainView(const QString &subject_id, qint32 hemi, const QString &surf, const QString &atlas, const QString &subjects_dir, QWidget * parent = 0, Qt::WindowFlags f = 0);
 
     //=========================================================================================================
     /**
-    * Emitted when fiffInfo is available
+    * Construts the brain view by reading a given surface.
+    *
+    * @param[in] p_sFile    Surface file name with path
     */
-    void fiffInfoAvailable();
+    explicit NewBrainView(const QString& p_sFile, QWidget * parent = 0, Qt::WindowFlags f = 0);
 
-    void DataToSquidCtrlGUI(MatrixXf tmp);
-    void SendCMDDataToSQUIDControl(QByteArray DATA);
+    //=========================================================================================================
+    /**
+    * Default destructor
+    */
+    ~NewBrainView();
 
+    void init(const AnnotationSet &annotationSet, const SurfaceSet &surfSet);
 
-protected:
-    virtual void run();
+    void showDebugTable();
 
 private:
-    void changeRecordingButton();
+    ViewOptions m_viewOptionFlags;
 
-    QSharedPointer<QTimer> m_pTimerRecordingChange;
-    qint16 m_iBlinkStatus;
+    SurfaceSet m_SurfaceSet;            /**< Surface set */
+    AnnotationSet m_AnnotationSet;      /**< Annotation set */
 
-    //=========================================================================================================
-    /**
-    * Initialises the output connector.
-    */
-    void initConnector();
+    bool m_bShowClustModel;
+    QSharedPointer<ClustStcModel> m_pClustStcModel;
 
-    PluginOutputData<NewRealTimeMultiSampleArray>::SPtr m_pRTMSABabyMEG;   /**< The NewRealTimeMultiSampleArray to provide the rt_server Channels.*/
-
-    QMutex mutex;
-
-    QSharedPointer<BabyMEGClient> myClient;
-    QSharedPointer<BabyMEGClient> myClientComm;
-    QSharedPointer<BabyMEGInfo>   pInfo;
-    bool DataStartFlag;
-
-    FiffInfo::SPtr m_pFiffInfo;                             /**< Fiff measurement info.*/
-    qint32 m_iBufferSize;                                   /**< The raw data buffer size.*/
-
-    bool                                m_bWriteToFile;     /**< Flag for for writing the received samples to a file. Defined by the user via the GUI.*/
-    QString                             m_sRecordFile;      /**< Holds the path for the sample output file. Defined by the user via the GUI.*/
-    QFile                               m_qFileOut;         /**< QFile for writing to fif file.*/
-    FiffStream::SPtr                    m_pOutfid;          /**< FiffStream to write to.*/
-
-    MatrixXd                            m_cals;
-
-
-    bool    m_bIsRunning;
-
-    QSharedPointer<RawMatrixBuffer> m_pRawMatrixBuffer;  /**< Holds incoming raw data. */
-
-    QAction*                        m_pActionSetupProject;      /**< shows setup project dialog */
-    QAction*                        m_pActionRecordFile;        /**< start recording action */
-    QAction*                        m_pActionSqdCtrl;           /**< show squid control */
-
-
-public:
-    double sfreq;
+    QSharedPointer<QWidget> m_pWidgetTable;
+    QSharedPointer<ClustStcTableDelegate> m_pClustStcTableDelegate;
 };
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(NewBrainView::ViewOptions)
 
 } // NAMESPACE
 
-#endif // BABYMEG_H
+#endif // NEWBRAINVIEW_H

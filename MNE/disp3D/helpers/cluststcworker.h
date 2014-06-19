@@ -1,13 +1,11 @@
-#ifndef STCWORKER_H
-#define STCWORKER_H
+#ifndef CLUSTSTCWORKER_H
+#define CLUSTSTCWORKER_H
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
-
-#include "../disp3D_global.h"
 
 
 //*************************************************************************************************************
@@ -16,9 +14,10 @@
 //=============================================================================================================
 
 #include <QObject>
-#include <QVector>
+#include <QList>
 #include <QThread>
 #include <QSharedPointer>
+#include <QMutex>
 
 
 //*************************************************************************************************************
@@ -33,27 +32,41 @@
 using namespace Eigen;
 
 
-class DISP3DSHARED_EXPORT StcWorker : public QObject
+class ClustStcWorker : public QObject
 {
     Q_OBJECT
 public:
-    typedef QSharedPointer<StcWorker> SPtr;            /**< Shared pointer type for StcWorker class. */
-    typedef QSharedPointer<const StcWorker> ConstSPtr; /**< Const shared pointer type for StcWorker class. */
+    typedef QSharedPointer<ClustStcWorker> SPtr;            /**< Shared pointer type for StcWorker class. */
+    typedef QSharedPointer<const ClustStcWorker> ConstSPtr; /**< Const shared pointer type for StcWorker class. */
 
-    StcWorker(QObject *parent = 0);
+    ClustStcWorker(QObject *parent = 0);
 
 //    void setIntervall(int intervall);
 
-    void addData();
+    void addData(QList<VectorXd> &data);
+
+    void clear();
 
     void process();
 
+    void setAverage(qint32 samples);
+
+    void setInterval(int usec);
+
+    void setLoop(bool looping);
+
+signals:
+    void stcSample(VectorXd sample);
+
 private:
 
-    QVector<VectorXd> m_data;   /**< List that holds the fiff matrix data <n_channels x n_samples> */
+    QMutex m_qMutex;
+    QList<VectorXd> m_data;   /**< List that holds the fiff matrix data <n_channels x n_samples> */
+    bool m_bIsLooping;
 
-
-
+    qint32 m_iAverageSamples;
+    qint32 m_iCurrentSample;
+    qint32 m_iUSecIntervall;
 };
 
-#endif // STCWORKER_H
+#endif // CLUSTSTCWORKER_H
