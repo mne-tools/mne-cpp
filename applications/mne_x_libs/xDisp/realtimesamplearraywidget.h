@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     newrealtimesamplearraywidget.h
+* @file     realtimesamplearraywidget.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of the NewRealTimeSampleArrayWidget Class.
+* @brief    Declaration of the RealTimeSampleArrayWidget Class.
 *
 */
 
-#ifndef NEWREALTIMESAMPLEARRAYWIDGET_H
-#define NEWREALTIMESAMPLEARRAYWIDGET_H
+#ifndef REALTIMESAMPLEARRAYWIDGET_H
+#define REALTIMESAMPLEARRAYWIDGET_H
 
 
 //*************************************************************************************************************
@@ -44,7 +44,7 @@
 
 #include "xdisp_global.h"
 #include "newmeasurementwidget.h"
-#include "ui_newrealtimesamplearraywidget.h"
+#include "ui_realtimesamplearraywidget.h"
 
 
 //*************************************************************************************************************
@@ -94,25 +94,25 @@ using namespace XMEASLIB;
 *
 * @brief The NewRealTimeSampleArrayWidget class provides a real-time curve display.
 */
-class XDISPSHARED_EXPORT NewRealTimeSampleArrayWidget : public NewMeasurementWidget
+class XDISPSHARED_EXPORT RealTimeSampleArrayWidget : public NewMeasurementWidget
 {
     Q_OBJECT
 public:
     //=========================================================================================================
     /**
-    * Constructs a NewRealTimeSampleArrayWidget which is a child of parent.
+    * Constructs a RealTimeSampleArrayWidget which is a child of parent.
     *
     * @param [in] pRTSA pointer to real-time sample array measurement.
     * @param [in] pTime pointer to application time.
     * @param [in] parent pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
     */
-    NewRealTimeSampleArrayWidget(QSharedPointer<NewRealTimeSampleArray> &pRTSA, QSharedPointer<QTime> &pTime, QWidget* parent = 0);
+    RealTimeSampleArrayWidget(QSharedPointer<NewRealTimeSampleArray> &pRTSA, QSharedPointer<QTime> &pTime, QWidget* parent = 0);
 
     //=========================================================================================================
     /**
     * Destroys the NewRealTimeSampleArrayWidget.
     */
-    ~NewRealTimeSampleArrayWidget();
+    ~RealTimeSampleArrayWidget();
 
     //=========================================================================================================
     /**
@@ -215,7 +215,7 @@ private slots:
 
 private:
     void actualize();                                               /**< Actualize member variables. Like y position, scaling factor, middle value of the frame and the highest sampling rate to calculate the sample width.*/
-    Ui::NewRealTimeSampleArrayClass    ui;                          /**< the user interface of the RealTimeSampleArray widget. */
+    Ui::RealTimeSampleArrayClass    ui;                             /**< the user interface of the RealTimeSampleArray widget. */
     QSharedPointer<NewRealTimeSampleArray> m_pRTSA;                 /**< the real-time sample array measurement. */
     QPainterPath                    m_qPainterPath;                 /**< the current painter path which is the real-time curve. */
     QPainterPath                    m_qPainterPath_Freeze;          /**< the frozen painter path which is the frozen real-time curve. */
@@ -248,4 +248,4 @@ private:
 
 } // NAMESPACE
 
-#endif // NEWREALTIMESAMPLEARRAYWIDGET_H
+#endif // REALTIMESAMPLEARRAYWIDGET_H

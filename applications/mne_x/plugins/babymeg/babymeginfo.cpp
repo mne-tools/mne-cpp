@@ -128,6 +128,21 @@ void BabyMEGInfo::MGH_LM_Get_Channel_Info(QByteArray cmdstr)
     QStringList sList = MGH_LM_Exact_Single_Channel_Info(cmdstr);
 
     lm_ch_names.clear();
+    lm_ch_scales.clear();
+    lm_ch_pos1.clear();
+    lm_ch_pos2.clear();
+    lm_ch_pos3.clear();
+    lm_ch_pos4.clear();
+    lm_ch_pos5.clear();
+    lm_ch_pos6.clear();
+    lm_ch_pos7.clear();
+    lm_ch_pos8.clear();
+    lm_ch_pos9.clear();
+    lm_ch_pos10.clear();
+    lm_ch_pos11.clear();
+    lm_ch_pos12.clear();
+
+
     // parse the information for each channel
     for(qint32 k =0; k<sList.size(); k++)
     {
@@ -138,6 +153,32 @@ void BabyMEGInfo::MGH_LM_Get_Channel_Info(QByteArray cmdstr)
             {
                 lm_ch_names.append(t.left(z));
                 //qDebug()<<t.left(z);
+                //extract the substring contained channel information: scale and coil positions
+                QString tt = t.mid(z);
+                //qDebug()<<tt;
+                //extract value array from tt by separated char ","
+                QStringList schp = tt.split(",");
+
+                // scale
+                lm_ch_scales.append(schp.at(0));
+                // positions : x,y,z and units of x,y,z
+                lm_ch_pos1.append(schp.at(1));
+                lm_ch_pos2.append(schp.at(2));
+                lm_ch_pos3.append(schp.at(3));
+                lm_ch_pos4.append(schp.at(4));
+                lm_ch_pos5.append(schp.at(5));
+                lm_ch_pos6.append(schp.at(6));
+                lm_ch_pos7.append(schp.at(7));
+                lm_ch_pos8.append(schp.at(8));
+                lm_ch_pos9.append(schp.at(9));
+                lm_ch_pos10.append(schp.at(10));
+                lm_ch_pos11.append(schp.at(11));
+                lm_ch_pos12.append(schp.at(12));
+
+//                qDebug()<<lm_ch_scales;
+//                qDebug()<<lm_ch_pos2;
+
+
             }
         }
     }
@@ -206,8 +247,26 @@ void BabyMEGInfo::MGH_LM_Parse_Para(QByteArray cmdstr)
         t_ch.scanno = i;
         t_ch.logno = i+1;
         t_ch.cal = 1;
+        t_ch.unit_mul = lm_ch_scales.at(i).toFloat(); // set scale
+        //qDebug()<<t_ch.cal;
         t_ch.range = 1;
         t_ch.loc.setZero(12,1);
+
+        //set loc
+        t_ch.loc(0,0) = lm_ch_pos1.at(i).toDouble();
+        t_ch.loc(1,0) = lm_ch_pos2.at(i).toDouble();
+        t_ch.loc(2,0) = lm_ch_pos3.at(i).toDouble();
+        t_ch.loc(3,0) = lm_ch_pos4.at(i).toDouble();
+        t_ch.loc(4,0) = lm_ch_pos5.at(i).toDouble();
+        t_ch.loc(5,0) = lm_ch_pos6.at(i).toDouble();
+        t_ch.loc(6,0) = lm_ch_pos7.at(i).toDouble();
+        t_ch.loc(7,0) = lm_ch_pos8.at(i).toDouble();
+        t_ch.loc(8,0) = lm_ch_pos9.at(i).toDouble();
+        t_ch.loc(9,0) = lm_ch_pos10.at(i).toDouble();
+        t_ch.loc(10,0) = lm_ch_pos11.at(i).toDouble();
+        t_ch.loc(11,0) = lm_ch_pos12.at(i).toDouble();
+
+        //qDebug()<<t_ch.loc(0,0)<<t_ch.loc(1,0)<<t_ch.loc(2,0);
 
         QString type = t_ch.ch_name.left(3);
         int ntype = 0;

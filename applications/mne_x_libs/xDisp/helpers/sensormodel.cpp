@@ -214,6 +214,9 @@ void SensorModel::applySensorGroup(int id)
     silentUpdateSelection(selection);
 }
 
+
+//*************************************************************************************************************
+
 void SensorModel::setCurrentLayout(int id)
 {
     beginResetModel();
