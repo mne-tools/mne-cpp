@@ -238,74 +238,74 @@ void RtHpi::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
 void RtHpi::run()
 {
-    Eigen::MatrixXd data;
-    struct sens sensors;
-    struct coilParam coil;
-    float a, b, c;
-    int num_sensors = 270, i;
-    std::string line;
+//    Eigen::MatrixXd data;
+//    struct sens sensors;
+//    struct coilParam coil;
+//    float a, b, c;
+//    int num_sensors = 270, i;
+//    std::string line;
 
-    /*********************************************************************************/
-    // Read the sensor locations
-    sensors.coilpos = Eigen::MatrixXd::Zero(num_sensors,3);
-    i=0;
-    std::ifstream myfile ("C:\\Users\\cdoshi\\Desktop\\HPI_min\\FieldTrip_DipoleFit_BabyMEG\\simulation_seok\\sensorspos.txt");
-    if (myfile.is_open())
-    {
-      while ( getline (myfile,line) )
-      {
-        sscanf_s (line.c_str(),"%f %f %f",&a, &b, &c);
-        sensors.coilpos(i,0) = a;sensors.coilpos(i,1) = b;sensors.coilpos(i,2) = c;
-        i++;
-      }
-      myfile.close();
-    }
-    myfile.close();
-    /*********************************************************************************/
-    // Read the sensor orientations
-    sensors.coilori = Eigen::MatrixXd::Zero(num_sensors,3);
-    i=0;
-    myfile.open("C:\\Users\\cdoshi\\Desktop\\HPI_min\\FieldTrip_DipoleFit_BabyMEG\\simulation_seok\\sensorsori.txt");
-    if (myfile.is_open())
-    {
-      while ( getline (myfile,line) )
-      {
-        sscanf_s (line.c_str(),"%f %f %f",&a, &b, &c);
-        sensors.coilori(i,0) = a;sensors.coilori(i,1) = b;sensors.coilori(i,2) = c;
-        i++;
-      }
-      myfile.close();
-    }
-    myfile.close();
+//    /*********************************************************************************/
+//    // Read the sensor locations
+//    sensors.coilpos = Eigen::MatrixXd::Zero(num_sensors,3);
+//    i=0;
+//    std::ifstream myfile ("C:\\Users\\cdoshi\\Desktop\\HPI_min\\FieldTrip_DipoleFit_BabyMEG\\simulation_seok\\sensorspos.txt");
+//    if (myfile.is_open())
+//    {
+//      while ( getline (myfile,line) )
+//      {
+//        sscanf_s (line.c_str(),"%f %f %f",&a, &b, &c);
+//        sensors.coilpos(i,0) = a;sensors.coilpos(i,1) = b;sensors.coilpos(i,2) = c;
+//        i++;
+//      }
+//      myfile.close();
+//    }
+//    myfile.close();
+//    /*********************************************************************************/
+//    // Read the sensor orientations
+//    sensors.coilori = Eigen::MatrixXd::Zero(num_sensors,3);
+//    i=0;
+//    myfile.open("C:\\Users\\cdoshi\\Desktop\\HPI_min\\FieldTrip_DipoleFit_BabyMEG\\simulation_seok\\sensorsori.txt");
+//    if (myfile.is_open())
+//    {
+//      while ( getline (myfile,line) )
+//      {
+//        sscanf_s (line.c_str(),"%f %f %f",&a, &b, &c);
+//        sensors.coilori(i,0) = a;sensors.coilori(i,1) = b;sensors.coilori(i,2) = c;
+//        i++;
+//      }
+//      myfile.close();
+//    }
+//    myfile.close();
 
-    /*********************************************************************************/
-    // sensors tra
-    sensors.tra = Eigen::MatrixXd::Identity(num_sensors,num_sensors);
+//    /*********************************************************************************/
+//    // sensors tra
+//    sensors.tra = Eigen::MatrixXd::Identity(num_sensors,num_sensors);
 
-    /*********************************************************************************/
-    // Read the data for 1st dipole
-    data = Eigen::MatrixXd::Zero(num_sensors,1);
-    i=0;
-    myfile.open("C:\\Users\\cdoshi\\Desktop\\HPI_min\\FieldTrip_DipoleFit_BabyMEG\\simulation_seok\\data_dipole1.txt");
-    if (myfile.is_open())
-    {
-      while ( getline (myfile,line) )
-      {
-        sscanf_s (line.c_str(),"%f",&a);
-        data(i,0) = a;
-        i++;
-      }
-      myfile.close();
-    }
-    myfile.close();
+//    /*********************************************************************************/
+//    // Read the data for 1st dipole
+//    data = Eigen::MatrixXd::Zero(num_sensors,1);
+//    i=0;
+//    myfile.open("C:\\Users\\cdoshi\\Desktop\\HPI_min\\FieldTrip_DipoleFit_BabyMEG\\simulation_seok\\data_dipole1.txt");
+//    if (myfile.is_open())
+//    {
+//      while ( getline (myfile,line) )
+//      {
+//        sscanf_s (line.c_str(),"%f",&a);
+//        data(i,0) = a;
+//        i++;
+//      }
+//      myfile.close();
+//    }
+//    myfile.close();
 
-    /*********************************************************************************/
-    coil.pos = Eigen::MatrixXd::Zero(1,3);
-    coil.mom = Eigen::MatrixXd::Zero(1,3);
+//    /*********************************************************************************/
+//    coil.pos = Eigen::MatrixXd::Zero(1,3);
+//    coil.mom = Eigen::MatrixXd::Zero(1,3);
 
-    coil = dipfit(coil, sensors, data);
+//    coil = dipfit(coil, sensors, data);
 
-    std::cout << coil.pos << std::endl;
+//    std::cout << coil.pos << std::endl;
 
 
     //
@@ -316,6 +316,11 @@ void RtHpi::run()
 
     m_bProcessData = true;
 
+    // TODO : find indices of all good channels of inner layer for localization and indices of reference channels
+
+    int samF = m_pFiffInfo->sfreq, blockSize = 100; // Find out the block size detail
+    int numLoc = 3; // Number of times to localize in a second
+    int numBlock = (samF/blockSize)/numLoc;
     QVector<MatrixXd> buffer;
 
     while (m_bIsRunning)
@@ -327,12 +332,15 @@ void RtHpi::run()
 
             buffer.append(t_mat);
 
-            if(buffer.size() > 10)
+            if(buffer.size() >= numBlock)
             {
+                // TODO: Append the buffer data into a matrix variable
+                // TODO: Seperate block of data of inner layer channels and reference
+                // TODO: Get the amplitude and phase of all channels. Use that for coil localization
+
                 coil = dipfit(coil, sensors, data);
 
                 std::cout << coil.pos << std::endl;
-
 
                 buffer.clear();
             }
