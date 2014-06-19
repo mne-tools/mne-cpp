@@ -129,6 +129,8 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
     //set layouts
     this->setLayout(rtmsaLayout);
 
+    Q_UNUSED(pTime);
+
     init();
 }
 
@@ -265,7 +267,7 @@ void RealTimeMultiSampleArrayWidget::resizeEvent(QResizeEvent*)
 
 void RealTimeMultiSampleArrayWidget::keyPressEvent(QKeyEvent* keyEvent)
 {
-
+    Q_UNUSED(keyEvent);
 }
 
 
@@ -273,7 +275,7 @@ void RealTimeMultiSampleArrayWidget::keyPressEvent(QKeyEvent* keyEvent)
 
 void RealTimeMultiSampleArrayWidget::mousePressEvent(QMouseEvent* mouseEvent)
 {
-
+    Q_UNUSED(mouseEvent);
 }
 
 
@@ -281,7 +283,7 @@ void RealTimeMultiSampleArrayWidget::mousePressEvent(QMouseEvent* mouseEvent)
 
 void RealTimeMultiSampleArrayWidget::mouseMoveEvent(QMouseEvent* mouseEvent)
 {
-
+    Q_UNUSED(mouseEvent);
 }
 
 
@@ -305,7 +307,7 @@ void RealTimeMultiSampleArrayWidget::mouseDoubleClickEvent(QMouseEvent*)
 
 void RealTimeMultiSampleArrayWidget::wheelEvent(QWheelEvent* wheelEvent)
 {
-
+    Q_UNUSED(wheelEvent);
 }
 
 
