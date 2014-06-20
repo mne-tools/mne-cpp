@@ -104,7 +104,7 @@ QSharedPointer<IPlugin> RtSss::clone() const
 
 void RtSss::init()
 {
-    std::cout << "*********** Initialization ************" << std::endl;
+    qDebug() << "*********** Initialization ************";
 
     //Delete Buffer - will be initailzed with first incoming data
     if(!m_pRtSssBuffer.isNull())
@@ -125,7 +125,7 @@ void RtSss::init()
 
 bool RtSss::start()
 {
-    std::cout << "*********** Start ************" << std::endl;
+    qDebug() << "*********** Start ************";
 
     QThread::start();
     return true;
@@ -136,7 +136,7 @@ bool RtSss::start()
 
 bool RtSss::stop()
 {
-    std::cout << "*********** Stop ************" << std::endl;
+    qDebug() << "*********** Stop *************";
 
     m_bIsRunning = false;
 
@@ -173,7 +173,7 @@ QString RtSss::getName() const
 
 QWidget* RtSss::setupWidget()
 {
-    std::cout << "*********** SetUpWidget ************" << std::endl;
+    qDebug()  << "*********** SetUpWidget ************";
 
     RtSssSetupWidget* widget = new RtSssSetupWidget(this);  //widget is later distroyed by CentralWidget - so it has to be created everytime new
 
@@ -193,25 +193,25 @@ QWidget* RtSss::setupWidget()
 
 void RtSss::setLinRR(int val)
 {
-//    std::cout <<" new LinRR: " << val << std::endl;
+//   qDebug() <<" new LinRR: " << val;
     LinRR = val;
 }
 
 void RtSss::setLoutRR(int val)
 {
-//    std::cout <<" new LoutRR: " << val << std::endl;
+//    qDebug()  <<" new LoutRR: " << val;
     LoutRR = val;
 }
 
 void RtSss::setLin(int val)
 {
-//    std::cout <<" new Lin: " << val << std::endl;
+//    qDebug()  <<" new Lin: " << val;
     Lin = val;
 }
 
 void RtSss::setLout(int val)
 {
-//    std::cout <<" new Lout: " << val << std::endl;
+//    qDebug()  <<" new Lout: " << val;
     Lout = val;
 }
 
@@ -219,7 +219,7 @@ void RtSss::setLout(int val)
 
 void RtSss::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 {
-//    std::cout << "*********** Update ************" << std::endl;
+//    qDebug()  << "*********** Update ************";
 
     QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<NewRealTimeMultiSampleArray>();
 
@@ -255,7 +255,6 @@ void RtSss::run()
 
     m_bIsRunning = true;
 
-    //
     // start receiving data
     //
     m_bReceiveData = true;
@@ -268,41 +267,72 @@ void RtSss::run()
     // Set MEG channel infomation
     rsss.setMEGInfo(m_pFiffInfo);
 
-    // Init output
+    // Initialize output
+    //
     m_pRTMSAOutput->data()->initFromFiffInfo(m_pFiffInfo);
     m_pRTMSAOutput->data()->setMultiArraySize(100);
 //    m_pRTMSAOutput->data()->setSamplingRate(m_pFiffInfo->sfreq);
     m_pRTMSAOutput->data()->setVisibility(true);
 
+    // Load and set the number of spherical harmonics expansion
+    //
     qDebug() << "LinRR (run): " << LinRR << ", LoutRR (run): " << LoutRR <<", Lin (run): " << Lin <<", Lout (run): " << Lout;
     QList<int> expOrder;
     expOrder << LinRR << LoutRR << Lin << Lout;
     rsss.setSSSParameter(expOrder);
 
     // Find the number of MEG channel
+    //
     qint32 nmegchan = rsss.getNumMEGCh();
-//    std::cout << "number of meg channels: " << nmegchan << std::endl;
+//    qDebug() << "number of meg channels: " << nmegchan;
 
-//    std::cout << "building SSS linear equation .....";
+    // Find a starting MEG channel index fiff
+    // When the MEG recording of the first channel is saved starting from the first row in the signal matrix, the startID_MEGch will be 0.
+    // When the MEG recording of the first channel is saved starting not from the first row and being followed by others like EEG,
+    //   the startID_MEGch will be the first encounter of MEG channel other than zero.
+    //
+    qint32 startID_MEGch = 0;
+    for(qint32 i = 0; i < m_pFiffInfo->nchan; ++i)
+        if(m_pFiffInfo->chs[i].kind == FIFFV_MEG_CH)
+        {
+            startID_MEGch = i;
+            break;
+        }
+//    qDebug() << "strat id: " << startID_MEGch;
+
+    //  Build linear equation
+    //
     qDebug() << "building SSS linear equation .....";
     lineqn = rsss.buildLinearEqn();
-    qDebug() << " finished (run)!";
+    qDebug() << "..finished (run)!";
 
     // start processing data
     m_bProcessData = true;
+    qint32 HEADMOV_COR_cnt = 1 ;
 
+    qDebug() << "rtSSS started.....";
     while(m_bIsRunning)
     {
+        // When new head movement correction presented, lineqn must be rebuilt for rtSSS
+        if (HEADMOV_COR_cnt == 1)
+        {
+            qDebug() << "rebuilt SSS linear equation .....";
+            lineqn = rsss.buildLinearEqn();
+            HEADMOV_COR_cnt = 0;
+        }
+        else HEADMOV_COR_cnt++;
+
         qint32 nrows = m_pRtSssBuffer->rows();
+        qDebug() << "rtsss";
 
         if(nrows > 0) // check if init
         {
             // * Dispatch the inputs * //
             MatrixXd in_mat = m_pRtSssBuffer->pop();
-//            std::cout << "size of in_mat (run): " << in_mat.rows() << " x " << in_mat.cols() << std::endl;
+//            qDebug() << "size of in_mat (run): " << in_mat.rows() << " x " << in_mat.cols();
 
-            sssRR = rsss.getSSSRR(lineqn[0], lineqn[1], lineqn[2], lineqn[3], lineqn[4]*in_mat.block(0,0,nmegchan,in_mat.cols()));
-//            std::cout << "size of sssRR[0] (run): " << sssRR[0].rows() << " x " << sssRR[0].cols() << std::endl;
+            sssRR = rsss.getSSSRR(lineqn[0], lineqn[1], lineqn[2], lineqn[3], lineqn[4]*in_mat.block(startID_MEGch,0,nmegchan,in_mat.cols()));
+//            qDebug() <<  "size of sssRR[0] (run): " << sssRR[0].rows() << " x " << sssRR[0].cols();
 
             for(qint32 i = 0; i <in_mat.cols(); ++i)
             {
@@ -314,29 +344,5 @@ void RtSss::run()
 
     m_bProcessData = false;
     m_bReceiveData = false;
-
+    qDebug() << "rtSSS stopped.";
 }
-
-//*****************************************************************************************
-//  When MEG channels don't start from the first row and may be mixed with other channels
-//*****************************************************************************************
-/*
-for(qint32 i = 0; i <in_mat.cols(); ++i)
-{
-//  When MEG channels don't start from the first row and may be mixed with other channels
-    qint32 m = 0;
-    MatrixXd meg_mat(nmegchan, 1);
-    for(qint32 j = 0; j < in_mat.rows(); ++j)
-        if(m_pFiffInfo->chs[j].kind == FIFFV_MEG_CH)
-        {
-            meg_mat(m,0) = in_mat(j,i);
-            m++;
-        }
-
-//                std::cout << "size meg_mat: " << meg_mat.rows() << " x " << meg_mat.cols() << std::endl;
-      sssRR = rsss.getSSSRR(lineqn[0], lineqn[1], lineqn[2], lineqn[3], lineqn[4]*meg_mat);
-
-    in_mat.block(0,i,nmegchan,1) = sssRR[0];
-    m_pRTMSAOutput->data()->setValue(in_mat.col(i));
-}
-*/

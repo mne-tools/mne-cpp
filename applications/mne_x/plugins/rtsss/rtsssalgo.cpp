@@ -2,7 +2,6 @@
 /**
 * @file     rtsssalgo.cpp
 * @author   Seok Lew <slew@nmr.mgh.harvard.edu>;
-*           Xin Li <xinli@cmu.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     June, 2013
@@ -32,6 +31,9 @@
 *
 * @brief    Contains the implementation of the RtSssAlgo class.
 *
+* @remarks  This rtsssalgo is implemented based on a paper, 'Real-Time Robust Signal Space Separation for Magnetoencephalography',
+*           authored by Chenlei Guo, Xin Li, Samu Taulu, Wei Wang, and Douglas J. Weber,
+*           published in IEEE Transactions on Biomedical Engieering Vol 57, p1856~1866, August 2010.
 */
 
 #include "rtsssalgo.h"
@@ -898,6 +900,7 @@ QList<MatrixXd> RtSssAlgo::getSSSOLS(MatrixXd EqnIn, MatrixXd EqnOut, MatrixXd E
     NumCoil = EqnB.rows();
     NumExp = EqnB.cols();
 
+/*
     //ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
     QFile t_fileRaw("/autofs/cluster/fusion/slew/GitHub/mne-cpp/bin/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
     FiffRawData raw(t_fileRaw);
@@ -939,7 +942,7 @@ QList<MatrixXd> RtSssAlgo::getSSSOLS(MatrixXd EqnIn, MatrixXd EqnOut, MatrixXd E
     NumCoil = EqnB.rows();
     NumExp = EqnB.cols();
     printf("%d samples,  %d channels \n",(qint32)EqnB.cols(), (qint32)EqnB.rows());
-
+*/
     //cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
     EqnRRInv = (EqnA.transpose() * EqnA).inverse();
