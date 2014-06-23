@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     realtimesamplearray_new_widget.cpp
+* @file     realtimesamplearraywidget.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -113,6 +113,8 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
 , m_fDesiredSamplingRate(128)
 , m_pSensorModel(NULL)
 {
+    Q_UNUSED(pTime)
+
     m_pDoubleSpinBoxZoom = new QDoubleSpinBox(this);
     m_pDoubleSpinBoxZoom->setMinimum(0.3);
     m_pDoubleSpinBoxZoom->setMaximum(4.0);
@@ -167,20 +169,27 @@ void RealTimeMultiSampleArrayWidget::update(XMEASLIB::NewMeasurement::SPtr)
 {
     if(!m_bInitialized)
     {
-        m_qListChInfo = m_pRTMSA->chInfo();
-        m_fSamplingRate = m_pRTMSA->getSamplingRate();
-
-        QFile file(m_pRTMSA->getXMLLayoutFile());
-        if (!file.open(QFile::ReadOnly | QFile::Text))
-            qDebug() << QString("Cannot read file %1:\n%2.").arg(m_pRTMSA->getXMLLayoutFile()).arg(file.errorString());
-        else
+        if(m_pRTMSA->isChInit())
         {
-            m_pSensorModel = new SensorModel(&file, this);
-            m_pSensorModel->mapChannelInfo(m_qListChInfo);
-            m_pActionSelectSensors->setVisible(true);
-        }
+            m_qListChInfo = m_pRTMSA->chInfo();
+            m_fSamplingRate = m_pRTMSA->getSamplingRate();
 
-        init();
+            QFile file(m_pRTMSA->getXMLLayoutFile());
+            if (!file.open(QFile::ReadOnly | QFile::Text))
+            {
+                qDebug() << QString("Cannot read file %1:\n%2.").arg(m_pRTMSA->getXMLLayoutFile()).arg(file.errorString());
+                m_pSensorModel = new SensorModel(this);
+                m_pSensorModel->mapChannelInfo(m_qListChInfo);
+            }
+            else
+            {
+                m_pSensorModel = new SensorModel(&file, this);
+                m_pSensorModel->mapChannelInfo(m_qListChInfo);
+                m_pActionSelectSensors->setVisible(true);
+            }
+
+            init();
+        }
     }
     else
         m_pRTMSAModel->addData(m_pRTMSA->getMultiSampleArray());
@@ -287,8 +296,9 @@ void RealTimeMultiSampleArrayWidget::channelContextMenu(QPoint pos)
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayWidget::resizeEvent(QResizeEvent*)
+void RealTimeMultiSampleArrayWidget::resizeEvent(QResizeEvent* resizeEvent)
 {
+    Q_UNUSED(resizeEvent)
 }
 
 
@@ -296,7 +306,7 @@ void RealTimeMultiSampleArrayWidget::resizeEvent(QResizeEvent*)
 
 void RealTimeMultiSampleArrayWidget::keyPressEvent(QKeyEvent* keyEvent)
 {
-
+    Q_UNUSED(keyEvent)
 }
 
 
@@ -304,7 +314,7 @@ void RealTimeMultiSampleArrayWidget::keyPressEvent(QKeyEvent* keyEvent)
 
 void RealTimeMultiSampleArrayWidget::mousePressEvent(QMouseEvent* mouseEvent)
 {
-
+    Q_UNUSED(mouseEvent)
 }
 
 
@@ -312,23 +322,23 @@ void RealTimeMultiSampleArrayWidget::mousePressEvent(QMouseEvent* mouseEvent)
 
 void RealTimeMultiSampleArrayWidget::mouseMoveEvent(QMouseEvent* mouseEvent)
 {
-
+    Q_UNUSED(mouseEvent)
 }
 
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayWidget::mouseReleaseEvent(QMouseEvent*)
+void RealTimeMultiSampleArrayWidget::mouseReleaseEvent(QMouseEvent* mouseEvent)
 {
-
+    Q_UNUSED(mouseEvent)
 }
 
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayWidget::mouseDoubleClickEvent(QMouseEvent*)
+void RealTimeMultiSampleArrayWidget::mouseDoubleClickEvent(QMouseEvent* mouseEvent)
 {
-
+    Q_UNUSED(mouseEvent)
 }
 
 
@@ -336,7 +346,7 @@ void RealTimeMultiSampleArrayWidget::mouseDoubleClickEvent(QMouseEvent*)
 
 void RealTimeMultiSampleArrayWidget::wheelEvent(QWheelEvent* wheelEvent)
 {
-
+    Q_UNUSED(wheelEvent)
 }
 
 //*************************************************************************************************************

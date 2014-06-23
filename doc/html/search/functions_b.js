@@ -9,5 +9,6 @@ var searchData=
   ['loadconnectors',['loadConnectors',['../class_r_t_s_e_r_v_e_r_1_1_connector_manager.html#ade5c3d3fe0247ba56ca42de5d4eb69a1',1,'RTSERVER::ConnectorManager']]],
   ['loadfiffdata',['loadFiffData',['../class_m_n_e_browse_raw_qt_1_1_raw_model.html#a08da0e94d983b510cec0eaff994ba955',1,'MNEBrowseRawQt::RawModel']]],
   ['loadplugins',['loadPlugins',['../class_m_n_e_x_1_1_plugin_manager.html#a3c173f8d3ded1a24bf5def3c49e66e4e',1,'MNEX::PluginManager']]],
+  ['loc',['loc',['../class_sensor_layout.html#aa77b504174ae33b083bb801b8a5cb6dc',1,'SensorLayout']]],
   ['lookfortrigger',['lookForTrigger',['../class_b_c_i_plugin_1_1_b_c_i.html#ab289555bd3392eeee5575260ebcb3d91',1,'BCIPlugin::BCI']]]
 ];

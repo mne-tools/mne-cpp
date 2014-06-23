@@ -5,6 +5,7 @@ var searchData=
   ['has_5ftag',['has_tag',['../class_f_i_f_f_l_i_b_1_1_fiff_dir_tree.html#ace0a94dbb1d7d86bbf5099ec78ec2e0c',1,'FIFFLIB::FiffDirTree']]],
   ['hascommand',['hasCommand',['../class_r_t_c_l_i_e_n_t_l_i_b_1_1_rt_cmd_client.html#a774043b4b8188d7eb26b3752ba6174f4',1,'RTCLIENTLIB::RtCmdClient::hasCommand()'],['../class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command_manager.html#a74df8bdf7c86112b9a53ab073eb61586',1,'RTCOMMANDLIB::CommandManager::hasCommand()']]],
   ['hasthresholdartefact',['hasThresholdArtefact',['../class_b_c_i_plugin_1_1_b_c_i.html#ab654eb1f00cfb30417539e903355801f',1,'BCIPlugin::BCI']]],
+  ['headerdata',['headerData',['../class_real_time_multi_sample_array_model.html#adae1715059d58ecee189e302087c9734',1,'RealTimeMultiSampleArrayModel']]],
   ['hemi',['hemi',['../class_f_s_l_i_b_1_1_annotation.html#a1e8f9eea93f3cd36a03e37b5eb1d112e',1,'FSLIB::Annotation::hemi()'],['../class_f_s_l_i_b_1_1_surface.html#aa263c80bd07a39251a2d7975253a446d',1,'FSLIB::Surface::hemi()']]],
   ['hexdisplay',['HexDisplay',['../class_baby_m_e_g_client.html#a5e63c6b9804ddcfdd9c6ad6781a26b22',1,'BabyMEGClient::HexDisplay(double a)'],['../class_baby_m_e_g_client.html#a5e63c6b9804ddcfdd9c6ad6781a26b22',1,'BabyMEGClient::HexDisplay(double a)']]],
   ['hotb',['hotB',['../class_d_i_s_p_l_i_b_1_1_color_map.html#ac943f066da416006a699ff1474231939',1,'DISPLIB::ColorMap']]],

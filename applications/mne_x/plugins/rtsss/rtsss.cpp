@@ -1,7 +1,7 @@
 //=============================================================================================================
 /**
 * @file     rtsss.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @author   Seok Lew <slew@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     February, 2013
@@ -38,10 +38,9 @@
 // INCLUDES
 //=============================================================================================================
 
-//#include "dummytoolbox.h"
-//#include "FormFiles/dummysetupwidget.h"
 #include "rtsss.h"
 #include "FormFiles/rtssssetupwidget.h"
+#include "rtsssalgo.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -57,10 +56,11 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-//using namespace DummyToolboxPlugin;
 using namespace RtSssPlugin;
+using namespace FIFFLIB;
 using namespace MNEX;
 using namespace XMEASLIB;
+
 
 
 //*************************************************************************************************************
@@ -69,15 +69,12 @@ using namespace XMEASLIB;
 //=============================================================================================================
 
 RtSss::RtSss()
-: m_pRTSAInput(NULL)
-, m_pRTSAOutput(NULL)
-, m_pRtSssBuffer(new dBuffer(1024))
-/*
-: m_pDummyInput(NULL)
-, m_pDummyOutput(NULL)
-, m_pDummyBuffer(new dBuffer(1024))
-*/
-
+: m_bIsRunning(false)
+, m_bReceiveData(false)
+, m_bProcessData(false)
+//, m_pRTSAInput(NULL)
+//, m_pRTSAOutput(NULL)
+//, m_pRtSssBuffer(new dBuffer(1024))
 {
 }
 
@@ -106,20 +103,20 @@ QSharedPointer<IPlugin> RtSss::clone() const
 
 void RtSss::init()
 {
+    std::cout << "*********** Initialization ************" << std::endl;
+
+    //Delete Buffer - will be initailzed with first incoming data
+    if(!m_pRtSssBuffer.isNull())
+        m_pRtSssBuffer = CircularMatrixBuffer<double>::SPtr();
+
     // Input
-    m_pRTSAInput = PluginInputData<NewRealTimeSampleArray>::create(this, "RtSssIn", "RtSss input data");
-    connect(m_pRTSAInput.data(), &PluginInputConnector::notify, this, &RtSss::update, Qt::DirectConnection);
-    m_inputConnectors.append(m_pRTSAInput);
+    m_pRTMSAInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "RtSssIn", "RtSss input data");
+    connect(m_pRTMSAInput.data(), &PluginInputConnector::notify, this, &RtSss::update, Qt::DirectConnection);
+    m_inputConnectors.append(m_pRTMSAInput);
 
     // Output
-    m_pRTSAOutput = PluginOutputData<NewRealTimeSampleArray>::create(this, "RtSssOut", "RtSss output data");
-    m_outputConnectors.append(m_pRTSAOutput);
-
-    m_pRTSAOutput->data()->setName("RtSss Output");
-    m_pRTSAOutput->data()->setUnit("mV");
-    m_pRTSAOutput->data()->setMinValue(-200);
-    m_pRTSAOutput->data()->setMaxValue(360);
-    m_pRTSAOutput->data()->setSamplingRate(256.0/1.0);
+    m_pRTMSAOutput = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "RtSssOut", "RtSss output data");
+    m_outputConnectors.append(m_pRTMSAOutput);
 }
 
 
@@ -127,6 +124,8 @@ void RtSss::init()
 
 bool RtSss::start()
 {
+    std::cout << "*********** Start ************" << std::endl;
+
     QThread::start();
     return true;
 }
@@ -136,11 +135,18 @@ bool RtSss::start()
 
 bool RtSss::stop()
 {
+    std::cout << "*********** Stop ************" << std::endl;
+
+    m_bIsRunning = false;
+
     // Stop threads
     QThread::terminate();
     QThread::wait();
 
-    m_pRtSssBuffer->clear();
+    if(m_pRtSssBuffer)
+        m_pRtSssBuffer->clear();
+
+    m_bReceiveData = false;
 
     return true;
 }
@@ -166,41 +172,161 @@ QString RtSss::getName() const
 
 QWidget* RtSss::setupWidget()
 {
-    RtSssSetupWidget* setupWidget = new RtSssSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
-    return setupWidget;
+    std::cout << "*********** SetUpWidget ************" << std::endl;
+
+    RtSssSetupWidget* widget = new RtSssSetupWidget(this);  //widget is later distroyed by CentralWidget - so it has to be created everytime new
+
+    connect(widget, &RtSssSetupWidget::signalNewLinRR, this, &RtSss::setLinRR);
+    connect(widget, &RtSssSetupWidget::signalNewLoutRR, this, &RtSss::setLoutRR);
+    connect(widget, &RtSssSetupWidget::signalNewLin, this, &RtSss::setLin);
+    connect(widget, &RtSssSetupWidget::signalNewLout, this, &RtSss::setLout);
+
+    LinRR = widget->getLinRR();
+    LoutRR = widget->getLoutRR();
+    Lin = widget->getLin();
+    Lout = widget->getLout();
+
+    return widget;
 }
 
+
+void RtSss::setLinRR(int val)
+{
+//    std::cout <<" new LinRR: " << val << std::endl;
+    LinRR = val;
+}
+
+void RtSss::setLoutRR(int val)
+{
+//    std::cout <<" new LoutRR: " << val << std::endl;
+    LoutRR = val;
+}
+
+void RtSss::setLin(int val)
+{
+//    std::cout <<" new Lin: " << val << std::endl;
+    Lin = val;
+}
+
+void RtSss::setLout(int val)
+{
+//    std::cout <<" new Lout: " << val << std::endl;
+    Lout = val;
+}
 
 //*************************************************************************************************************
 
 void RtSss::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 {
-    QSharedPointer<NewRealTimeSampleArray> pRTSA = pMeasurement.dynamicCast<NewRealTimeSampleArray>();
+//    std::cout << "*********** Update ************" << std::endl;
 
-    if(pRTSA)
+    QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<NewRealTimeMultiSampleArray>();
+
+    if(pRTMSA && m_bReceiveData)
     {
-        for(unsigned char i = 0; i < pRTSA->getArraySize(); ++i)
+        //Check if buffer initialized
+        if(!m_pRtSssBuffer)
+            m_pRtSssBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSA->getNumChannels(), pRTMSA->getMultiArraySize()));
+
+        //Fiff information
+        if(!m_pFiffInfo)
+            m_pFiffInfo = pRTMSA->getFiffInfo();
+
+        if(m_bProcessData)
         {
-            double value = pRTSA->getSampleArray()[i];
-            m_pRtSssBuffer->push(value);
+            MatrixXd in_mat(pRTMSA->getNumChannels(), pRTMSA->getMultiArraySize());
+            for(unsigned char i = 0; i < pRTMSA->getMultiArraySize(); ++i)
+                in_mat.col(i) = pRTMSA->getMultiSampleArray()[i];
+
+            m_pRtSssBuffer->push(&in_mat);
         }
     }
 }
-
 
 
 //*************************************************************************************************************
 
 void RtSss::run()
 {
-    while (true)
+
+    RtSssAlgo rsss;
+    QList<MatrixXd> lineqn, sssRR;
+
+    m_bIsRunning = true;
+
+    //
+    // start receiving data
+    //
+    m_bReceiveData = true;
+
+    // Read Fiff Info
+    //
+    while(!m_pFiffInfo)
+        msleep(10);// Wait for fiff Info
+
+    // Set MEG channel infomation
+    rsss.setMEGInfo(m_pFiffInfo);
+
+    // Init output
+    m_pRTMSAOutput->data()->initFromFiffInfo(m_pFiffInfo);
+    m_pRTMSAOutput->data()->setMultiArraySize(100);
+//    m_pRTMSAOutput->data()->setSamplingRate(m_pFiffInfo->sfreq);
+    m_pRTMSAOutput->data()->setVisibility(true);
+
+    qDebug() << "LinRR (run): " << LinRR << ", LoutRR (run): " << LoutRR <<", Lin (run): " << Lin <<", Lout (run): " << Lout;
+    QList<int> expOrder;
+    expOrder << LinRR << LoutRR << Lin << Lout;
+    rsss.setSSSParameter(expOrder);
+
+    // Find the number of MEG channel
+    qint32 nmegchan = rsss.getNumMEGCh();
+//    std::cout << "number of meg channels: " << nmegchan << std::endl;
+
+//    std::cout << "building SSS linear equation .....";
+    qDebug() << "building SSS linear equation .....";
+    lineqn = rsss.buildLinearEqn();
+    qDebug() << " finished (run)!";
+
+    // start processing data
+    m_bProcessData = true;
+
+    while(m_bIsRunning)
     {
-        /* Dispatch the inputs */
-        double v = m_pRtSssBuffer->pop();
+        qint32 nrows = m_pRtSssBuffer->rows();
 
-        //ToDo: Implement your algorithm here
+        if(nrows > 0) // check if init
+        {
+            // * Dispatch the inputs * //
+            MatrixXd in_mat = m_pRtSssBuffer->pop();
+//            std::cout << "size of in_mat (run): " << in_mat.rows() << " x " << in_mat.cols() << std::endl;
 
-        m_pRTSAOutput->data()->setValue(v);
+            for(qint32 i = 0; i <in_mat.cols(); ++i)
+            {
+/*
+//              When MEG channels don't start from the first row and may be mixed with other channels
+                qint32 m = 0;
+                MatrixXd meg_mat(nmegchan, 1);
+                for(qint32 j = 0; j < in_mat.rows(); ++j)
+                    if(m_pFiffInfo->chs[j].kind == FIFFV_MEG_CH)
+                    {
+                        meg_mat(m,0) = in_mat(j,i);
+                        m++;
+                    }
+
+//                std::cout << "size meg_mat: " << meg_mat.rows() << " x " << meg_mat.cols() << std::endl;
+                  sssRR = rsss.getSSSRR(lineqn[0], lineqn[1], lineqn[2], lineqn[3], lineqn[4]*meg_mat);
+*/
+
+//                qDebug() << "running rtSSS .....";
+                sssRR = rsss.getSSSRR(lineqn[0], lineqn[1], lineqn[2], lineqn[3], lineqn[4]*in_mat.block(0,i,nmegchan,1));
+                in_mat.block(0,i,nmegchan,1) = sssRR[0];
+                m_pRTMSAOutput->data()->setValue(in_mat.col(i));
+            }
+        }
     }
+
+    m_bProcessData = false;
+    m_bReceiveData = false;
+
 }
 
