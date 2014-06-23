@@ -170,6 +170,12 @@ public:
     */
     virtual bool stop();
 
+    //=========================================================================================================
+    /**
+    * Opens a dialog to check the impedance values
+    */
+    void showImpedanceDialog();
+
     virtual IPlugin::PluginType getType() const;
     virtual QString getName() const;
 
@@ -228,6 +234,8 @@ private:
     MatrixXf                            m_matOldMatrix;                     /**< Last received sample matrix by the tmsiproducer/tmsidriver class. Used for simple HP filtering.*/
 
     QMutex                              m_qMutex;                           /**< Holds the threads mutex.*/
+
+    QAction*                            m_pActionImpedance;                 /**< shows setup project dialog */
 };
 
 } // NAMESPACE

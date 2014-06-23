@@ -72,6 +72,12 @@ TMSI::TMSI()
 , m_pRawMatrixBuffer_In(0)
 , m_pTMSIProducer(new TMSIProducer(this))
 {
+    // Create impedance action bar item
+    m_pActionImpedance = new QAction(QIcon(":/images/icons/impedances.png"), tr("Check impedance values"), this);
+//    m_pActionSetupProject->setShortcut(tr("F12"));
+    m_pActionImpedance->setStatusTip(tr("Check impedance values"));
+    connect(m_pActionImpedance, &QAction::triggered, this, &TMSI::showImpedanceDialog);
+    addPluginAction(m_pActionImpedance);
 }
 
 
@@ -700,3 +706,17 @@ void TMSI::run()
 
     //std::cout<<"EXITING - TMSI::run()"<<std::endl;
 }
+
+
+//*************************************************************************************************************
+
+void TMSI::showImpedanceDialog()
+{
+//    BabyMEGProjectDialog projectDialog(this);
+//    projectDialog.exec();
+}
+
+
+
+
+
