@@ -519,8 +519,8 @@ MatrixXd MNEInverseOperator::cluster_kernel(const AnnotationSet &p_AnnotationSet
                     if(itOut->roiIdx[k] == j)
                     {
                         clusterIdcs[nClusterIdcs] = itIn->idcs[k];
-
-                        qint32 offset = h == 0 ? 0 : this->src[0].nuse;
+//                        qint32 offset = h == 0 ? 0 : this->src[0].nuse;
+//                        Q_UNUSED(offset)
                         clusterDistance[nClusterIdcs] = itOut->D(k,j);
                         ++nClusterIdcs;
                     }
@@ -569,7 +569,8 @@ MatrixXd MNEInverseOperator::cluster_kernel(const AnnotationSet &p_AnnotationSet
 //                    qListGainDist.append(matGainDiff);
 
                     // Take the closest coordinates
-                    qint32 sel_idx = itIn->idcs[j_min];
+//                    qint32 sel_idx = itIn->idcs[j_min];
+//                    Q_UNUSED(sel_idx)
 
 //                    //vertices
 //                    std::cout << this->src[h].vertno[sel_idx] << ", ";

@@ -87,6 +87,8 @@ BabyMEGSetupWidget::BabyMEGSetupWidget(BabyMEG* p_pBabyMEG, QWidget* parent)
     //SQUID Control
     connect(ui.m_qPushButtonSqdCtrl, &QPushButton::released, this, &BabyMEGSetupWidget::showSqdCtrlDialog);
 
+    ui.m_qPushButtonSqdCtrl->setVisible(false);
+
     this->init();
 }
 
@@ -136,6 +138,6 @@ void BabyMEGSetupWidget::showAboutDialog()
 
 void BabyMEGSetupWidget::showSqdCtrlDialog()
 {
-    BabyMEGSQUIDControlDgl SQUIDCtrlDlg(m_pBabyMEG,this);
-    SQUIDCtrlDlg.exec();
+//    BabyMEGSQUIDControlDgl SQUIDCtrlDlg(m_pBabyMEG,this);
+//    SQUIDCtrlDlg.exec();
 }

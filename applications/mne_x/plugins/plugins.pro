@@ -86,7 +86,8 @@ SUBDIRS += \
     raplab \
     averaging \
 #    bci \
-    rtsss
+    rtsss \
+    rthpi
 
 
 

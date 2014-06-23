@@ -45,6 +45,9 @@
 #include "babymeg_global.h"
 #include "babymegclient.h"
 
+#include "FormFiles/babymegsquidcontroldgl.h"
+
+
 #include <mne_x/Interfaces/ISensor.h>
 #include <generics/circularbuffer_old.h>
 #include <generics/circularmatrixbuffer.h>
@@ -158,7 +161,9 @@ public:
 
     void showProjectDialog();
 
-    void startRecordingFile();
+    void showSqdCtrlDialog();
+
+    void toggleRecordingFile();
 
     virtual bool start();
     virtual bool stop();
@@ -223,6 +228,8 @@ private:
     QSharedPointer<BabyMEGInfo>   pInfo;
     bool DataStartFlag;
 
+    QSharedPointer<BabyMEGSQUIDControlDgl> SQUIDCtrlDlg; // added by Dr. Limin Sun for nonmodal dialog
+
     FiffInfo::SPtr m_pFiffInfo;                             /**< Fiff measurement info.*/
     qint32 m_iBufferSize;                                   /**< The raw data buffer size.*/
 
@@ -240,6 +247,11 @@ private:
 
     QAction*                        m_pActionSetupProject;      /**< shows setup project dialog */
     QAction*                        m_pActionRecordFile;        /**< start recording action */
+    QAction*                        m_pActionSqdCtrl;           /**< show squid control */
+
+
+public:
+    double sfreq;
 };
 
 } // NAMESPACE

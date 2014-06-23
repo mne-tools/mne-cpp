@@ -52,7 +52,11 @@
 #include <mne/mne_sourceestimate.h>
 #include <inverse/minimumNorm/minimumnorm.h>
 
-#include <disp3D/helpers/stcmodel.h>
+
+#include <disp3D/newbrainview.h>
+#include <disp3D/helpers/cluststcview.h>
+#include <disp3D/helpers/cluststcmodel.h>
+#include <disp3D/helpers/cluststctabledelegate.h>
 
 #include <utils/mnemath.h>
 
@@ -66,9 +70,12 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QGuiApplication>
+#include <QApplication>
 #include <QSet>
 #include <QElapsedTimer>
+#include <QTableView>
+#include <QGridLayout>
+#include <QLabel>
 
 
 //*************************************************************************************************************
@@ -80,7 +87,7 @@ using namespace MNELIB;
 using namespace FSLIB;
 using namespace FIFFLIB;
 using namespace INVERSELIB;
-//using namespace DISP3DLIB;
+using namespace DISP3DLIB;
 using namespace UTILSLIB;
 
 
@@ -100,436 +107,21 @@ using namespace UTILSLIB;
 */
 int main(int argc, char *argv[])
 {
-    QGuiApplication a(argc, argv);
+    QApplication a(argc, argv);
 
-//    QFile t_fileFwd("./MNE-sample-data/MEG/sample/sample_audvis-meg-eeg-oct-6-fwd.fif");
-//    QFile t_fileCov("./MNE-sample-data/MEG/sample/sample_audvis-cov.fif");
-//    QFile t_fileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
-//    QString t_sEventName = "./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif";
-//    AnnotationSet t_annotationSet("sample", 2, "aparc.a2009s", "./MNE-sample-data/subjects");
-//    SurfaceSet t_surfSet("sample", 2, "white", "./MNE-sample-data/subjects");
 
-    QFile t_fileFwd("D:/Data/MEG/mind006/mind006_051209_auditory01_raw-oct-6p-fwd.fif");
-    QFile t_fileCov("D:/Data/MEG/mind006/mind006_051209_auditory01_raw-cov.fif");
-    QFile t_fileRaw("D:/Data/MEG/mind006/mind006_051209_auditory01_raw.fif");
-    QString t_sEventName = "D:/Data/MEG/mind006/mind006_051209_auditory01_raw-eve.fif";
+//    NewBrainView *pBrainView = new NewBrainView("mind006", 2, "inflated", "aparc.a2009s", "D:/Data/subjects");
+//    pBrainView->show();
+//    pBrainView->resize(800,600);
+
+//    pBrainView->showDebugTable();
+
+
+
+
     AnnotationSet t_annotationSet("mind006", 2, "aparc.a2009s", "D:/Data/subjects");
-//    SurfaceSet t_surfSet("mind006", 2, "white", "D:/Data/subjects");
+    SurfaceSet t_surfSet("mind006", 2, "white", "D:/Data/subjects");
 
-
-
-
-
-
-/*
-    qint32 event = 1;
-
-    float tmin = -0.2f;
-    float tmax = 0.4f;
-
-    bool keep_comp = false;
-    fiff_int_t dest_comp = 0;
-    bool pick_all  = true;
-
-    qint32 k, p;
-
-    //
-    //   Setup for reading the raw data
-    //
-    FiffRawData raw(t_fileRaw);
-
-    RowVectorXi picks;
-    if (pick_all)
-    {
-        //
-        // Pick all
-        //
-        picks.resize(raw.info.nchan);
-
-        for(k = 0; k < raw.info.nchan; ++k)
-            picks(k) = k;
-        //
-    }
-    else
-    {
-        QStringList include;
-        include << "STI 014";
-        bool want_meg   = true;
-        bool want_eeg   = false;
-        bool want_stim  = false;
-
-//        picks = Fiff::pick_types(raw.info, want_meg, want_eeg, want_stim, include, raw.info.bads);
-        picks = raw.info.pick_types(want_meg, want_eeg, want_stim, include, raw.info.bads);//prefer member function
-    }
-
-    QStringList ch_names;
-    for(k = 0; k < picks.cols(); ++k)
-        ch_names << raw.info.ch_names[picks(0,k)];
-
-    //
-    //   Set up projection
-    //
-    if (raw.info.projs.size() == 0)
-        printf("No projector specified for these data\n");
-    else
-    {
-        //
-        //   Activate the projection items
-        //
-        for (k = 0; k < raw.info.projs.size(); ++k)
-            raw.info.projs[k].active = true;
-
-        printf("%d projection items activated\n",raw.info.projs.size());
-        //
-        //   Create the projector
-        //
-//        fiff_int_t nproj = MNE::make_projector_info(raw.info, raw.proj); Using the member function instead
-        fiff_int_t nproj = raw.info.make_projector(raw.proj);
-
-        if (nproj == 0)
-        {
-            printf("The projection vectors do not apply to these channels\n");
-        }
-        else
-        {
-            printf("Created an SSP operator (subspace dimension = %d)\n",nproj);
-        }
-    }
-
-    //
-    //   Set up the CTF compensator
-    //
-//    qint32 current_comp = MNE::get_current_comp(raw.info);
-    qint32 current_comp = raw.info.get_current_comp();
-    if (current_comp > 0)
-        printf("Current compensation grade : %d\n",current_comp);
-
-    if (keep_comp)
-        dest_comp = current_comp;
-
-    if (current_comp != dest_comp)
-    {
-        qDebug() << "This part needs to be debugged";
-        if(MNE::make_compensator(raw.info, current_comp, dest_comp, raw.comp))
-        {
-//            raw.info.chs = MNE::set_current_comp(raw.info.chs,dest_comp);
-            raw.info.set_current_comp(dest_comp);
-            printf("Appropriate compensator added to change to grade %d.\n",dest_comp);
-        }
-        else
-        {
-            printf("Could not make the compensator\n");
-            return 0;
-        }
-    }
-    //
-    //  Read the events
-    //
-    QFile t_EventFile;
-    MatrixXi events;
-    if (t_sEventName.size() == 0)
-    {
-        p = t_fileRaw.fileName().indexOf(".fif");
-        if (p > 0)
-        {
-            t_sEventName = t_fileRaw.fileName().replace(p, 4, "-eve.fif");
-        }
-        else
-        {
-            printf("Raw file name does not end properly\n");
-            return 0;
-        }
-//        events = mne_read_events(t_sEventName);
-
-        t_EventFile.setFileName(t_sEventName);
-        MNE::read_events(t_EventFile, events);
-        printf("Events read from %s\n",t_sEventName.toUtf8().constData());
-    }
-    else
-    {
-        //
-        //   Binary file
-        //
-        p = t_fileRaw.fileName().indexOf(".fif");
-        if (p > 0)
-        {
-            t_EventFile.setFileName(t_sEventName);
-            if(!MNE::read_events(t_EventFile, events))
-            {
-                printf("Error while read events.\n");
-                return 0;
-            }
-            printf("Binary event file %s read\n",t_sEventName.toUtf8().constData());
-        }
-        else
-        {
-            //
-            //   Text file
-            //
-            printf("Text file %s is not supported jet.\n",t_sEventName.toUtf8().constData());
-//            try
-//                events = load(eventname);
-//            catch
-//                error(me,mne_omit_first_line(lasterr));
-//            end
-//            if size(events,1) < 1
-//                error(me,'No data in the event file');
-//            end
-//            //
-//            //   Convert time to samples if sample number is negative
-//            //
-//            for p = 1:size(events,1)
-//                if events(p,1) < 0
-//                    events(p,1) = events(p,2)*raw.info.sfreq;
-//                end
-//            end
-//            //
-//            //    Select the columns of interest (convert to integers)
-//            //
-//            events = int32(events(:,[1 3 4]));
-//            //
-//            //    New format?
-//            //
-//            if events(1,2) == 0 && events(1,3) == 0
-//                fprintf(1,'The text event file %s is in the new format\n',eventname);
-//                if events(1,1) ~= raw.first_samp
-//                    error(me,'This new format event file is not compatible with the raw data');
-//                end
-//            else
-//                fprintf(1,'The text event file %s is in the old format\n',eventname);
-//                //
-//                //   Offset with first sample
-//                //
-//                events(:,1) = events(:,1) + raw.first_samp;
-//            end
-        }
-    }
-
-    //
-    //    Select the desired events
-    //
-    qint32 count = 0;
-    MatrixXi selected = MatrixXi::Zero(1, events.rows());
-    for (p = 0; p < events.rows(); ++p)
-    {
-        if (events(p,1) == 0 && events(p,2) == event)
-        {
-            selected(0,count) = p;
-            ++count;
-        }
-    }
-    selected.conservativeResize(1, count);
-    if (count > 0)
-        printf("%d matching events found\n",count);
-    else
-    {
-        printf("No desired events found.\n");
-        return 0;
-    }
-
-
-    fiff_int_t event_samp, from, to;
-    MatrixXd timesDummy;
-
-    MNEEpochDataList data;
-
-    MNEEpochData* epoch = NULL;
-
-    MatrixXd times;
-
-    for (p = 0; p < count; ++p)
-    {
-        //
-        //       Read a data segment
-        //
-        event_samp = events(selected(p),0);
-        from = event_samp + tmin*raw.info.sfreq;
-        to   = event_samp + floor(tmax*raw.info.sfreq + 0.5);
-
-        epoch = new MNEEpochData();
-
-        if(raw.read_raw_segment(epoch->epoch, timesDummy, from, to, picks))
-        {
-            if (p == 0)
-            {
-                times.resize(1, to-from+1);
-                for (qint32 i = 0; i < times.cols(); ++i)
-                    times(0, i) = ((float)(from-event_samp+i)) / raw.info.sfreq;
-            }
-
-            epoch->event = event;
-            epoch->tmin = ((float)(from)-(float)(raw.first_samp))/raw.info.sfreq;
-            epoch->tmax = ((float)(to)-(float)(raw.first_samp))/raw.info.sfreq;
-
-            data.append(MNEEpochData::SPtr(epoch));//List takes ownwership of the pointer - no delete need
-        }
-        else
-        {
-            printf("Can't read the event data segments");
-            return 0;
-        }
-    }
-
-    if(data.size() > 0)
-    {
-        printf("Read %d epochs, %d samples each.\n",data.size(),(qint32)data[0]->epoch.cols());
-
-        //DEBUG
-        std::cout << data[0]->epoch.block(0,0,10,10) << std::endl;
-        qDebug() << data[0]->epoch.rows() << " x " << data[0]->epoch.cols();
-
-        std::cout << times.block(0,0,1,10) << std::endl;
-        qDebug() << times.rows() << " x " << times.cols();
-    }
-
-    //
-    // calculate the average
-    //
-//    //Option 1
-//    qint32 numAverages = 99;
-//    VectorXi vecSel(numAverages);
-//    srand (time(NULL)); // initialize random seed
-
-//    for(qint32 i = 0; i < vecSel.size(); ++i)
-//    {
-//        qint32 val = rand() % data.size();
-//        vecSel(i) = val;
-//    }
-
-//    //Option 2
-//    VectorXi vecSel(20);
-
-////    vecSel << 76, 74, 13, 61, 97, 94, 75, 71, 60, 56, 26, 57, 56, 0, 52, 72, 33, 86, 96, 67;
-
-//    vecSel << 65, 22, 47, 55, 16, 29, 14, 36, 57, 97, 89, 46, 9, 93, 83, 52, 71, 52, 3, 96;
-
-    //Option 3 Newest
-    VectorXi vecSel(10);
-
-    vecSel << 0, 96, 80, 55, 66, 25, 26, 2, 55, 58, 6, 88;
-
-
-    std::cout << "Select following epochs to average:\n" << vecSel << std::endl;
-
-    FiffEvoked evoked = data.average(raw.info, tmin*raw.info.sfreq, floor(tmax*raw.info.sfreq + 0.5), vecSel);
-
-
-
-    //########################################################################################
-    // Source Estimate
-
-    double snr = 1.0f;//0.1f;//1.0f;//3.0f;//0.1f;//3.0f;
-    QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
-
-    QString t_sFileNameClusteredInv("");
-    QString t_sFileNameStc("mind006_051209_auditory01_test.stc");
-
-    // Parse command line parameters
-    for(qint32 i = 0; i < argc; ++i)
-    {
-        if(strcmp(argv[i], "-snr") == 0 || strcmp(argv[i], "--snr") == 0)
-        {
-            if(i + 1 < argc)
-                snr = atof(argv[i+1]);
-        }
-        else if(strcmp(argv[i], "-method") == 0 || strcmp(argv[i], "--method") == 0)
-        {
-            if(i + 1 < argc)
-                method = QString::fromUtf8(argv[i+1]);
-        }
-        else if(strcmp(argv[i], "-inv") == 0 || strcmp(argv[i], "--inv") == 0)
-        {
-            if(i + 1 < argc)
-                t_sFileNameClusteredInv = QString::fromUtf8(argv[i+1]);
-        }
-        else if(strcmp(argv[i], "-stc") == 0 || strcmp(argv[i], "--stc") == 0)
-        {
-            if(i + 1 < argc)
-                t_sFileNameStc = QString::fromUtf8(argv[i+1]);
-        }
-    }
-
-    double lambda2 = 1.0 / pow(snr, 2);
-    qDebug() << "Start calculation with: SNR" << snr << "; Lambda" << lambda2 << "; Method" << method << "; stc:" << t_sFileNameStc;
-
-//    // Load data
-//    fiff_int_t setno = 1;
-//    QPair<QVariant, QVariant> baseline(QVariant(), 0);
-//    FiffEvoked evoked(t_fileEvoked, setno, baseline);
-//    if(evoked.isEmpty())
-//        return 1;
-
-
-    MNEForwardSolution t_Fwd(t_fileFwd);
-    if(t_Fwd.isEmpty())
-        return 1;
-
-    FiffCov noise_cov(t_fileCov);
-
-    // regularize noise covariance
-    noise_cov = noise_cov.regularize(evoked.info, 0.05, 0.05, 0.1, true);
-
-    //
-    // Cluster forward solution;
-    //
-    MatrixXd D;
-    MNEForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution(t_annotationSet, 20, D, noise_cov, evoked.info);
-
-    //
-    // make an inverse operators
-    //
-    FiffInfo info = evoked.info;
-
-    MNEInverseOperator inverse_operator_clustered(info, t_clusteredFwd, noise_cov, 0.2f, 0.8f);
-
-    //
-    // save clustered inverse
-    //
-    if(!t_sFileNameClusteredInv.isEmpty())
-    {
-        QFile t_fileClusteredInverse(t_sFileNameClusteredInv);
-        inverse_operator_clustered.write(t_fileClusteredInverse);
-    }
-
-    //
-    // Compute inverse solution
-    //
-
-    MinimumNorm minimumNormClustered(inverse_operator_clustered, lambda2, method);
-
-    MNESourceEstimate sourceEstimateClustered = minimumNormClustered.calculateInverse(evoked);
-
-
-    if(sourceEstimateClustered.isEmpty())
-        return 1;
-
-    // View activation time-series
-    std::cout << "\nsourceEstimate:\n" << sourceEstimateClustered.data.block(0,0,10,10) << std::endl;
-    std::cout << "time\n" << sourceEstimateClustered.times.block(0,0,1,10) << std::endl;
-    std::cout << "timeMin\n" << sourceEstimateClustered.times[0] << std::endl;
-    std::cout << "timeMax\n" << sourceEstimateClustered.times[sourceEstimateClustered.times.size()-1] << std::endl;
-    std::cout << "time step\n" << sourceEstimateClustered.tstep << std::endl;
-
-
-    //Source Estimate end
-    //########################################################################################
-
-    QList<Label> t_qListLabels;
-    QList<RowVector4i> t_qListRGBAs;
-
-//    //ToDo overload toLabels using instead of t_surfSet rr of MNESourceSpace
-//    t_annotationSet.toLabels(t_surfSet, t_qListLabels, t_qListRGBAs);
-
-    if(!t_sFileNameStc.isEmpty())
-    {
-        QFile t_fileClusteredStc(t_sFileNameStc);
-        sourceEstimateClustered.write(t_fileClusteredStc);
-    }
-
-//*/
-
-
-//DEBUG
     QString t_sFileNameStc("mind006_051209_auditory01_test.stc");
     MNESourceEstimate sourceEstimateClustered;
 
@@ -539,14 +131,105 @@ int main(int argc, char *argv[])
         MNESourceEstimate::read(t_fileClusteredStc, sourceEstimateClustered);
     }
 
-    qDebug() << "sourceEstimateClustered" << sourceEstimateClustered.data.rows() << "x" << sourceEstimateClustered.data.cols();
+//    qDebug() << "sourceEstimateClustered" << sourceEstimateClustered.data.rows() << "x" << sourceEstimateClustered.data.cols();
+
+    ClustStcModel* pClustStcModel = new ClustStcModel;
+    pClustStcModel->init(t_annotationSet, t_surfSet);
+    pClustStcModel->setLoop(true);
+
+    //
+    // QDebugTable
+    //
+    QWidget* pWidgetTable = new QWidget;
+    QGridLayout *mainLayoutTable = new QGridLayout;
+
+    QTableView* pTableView = new QTableView;
+    ClustStcTableDelegate* pClustStcTableDelegate = new ClustStcTableDelegate;
+    pTableView->setModel(pClustStcModel);
+    pTableView->setItemDelegate(pClustStcTableDelegate);
+    pTableView->setColumnHidden(0,true); //because content is plotted jointly with column=1
+
+    QLabel * pLabelNorm = new QLabel("Norm");
+    QSlider* pSliderNorm = new QSlider(Qt::Vertical);
+    QObject::connect(pSliderNorm, &QSlider::valueChanged, pClustStcModel, &ClustStcModel::setNormalization);
+    pSliderNorm->setMinimum(1);
+    pSliderNorm->setMaximum(100);
+    pSliderNorm->setValue(60);
+
+    QLabel * pLabelAverage = new QLabel("Average");
+    QSlider* pSliderAverage = new QSlider(Qt::Horizontal);
+    QObject::connect(pSliderAverage, &QSlider::valueChanged, pClustStcModel, &ClustStcModel::setAverage);
+    pSliderAverage->setMinimum(1);
+    pSliderAverage->setMaximum(500);
+    pSliderAverage->setValue(100);
+
+    mainLayoutTable->addWidget(pTableView,0,0,2,2);
+    mainLayoutTable->addWidget(pLabelNorm,0,3);
+    mainLayoutTable->addWidget(pSliderNorm,1,3);
+    mainLayoutTable->addWidget(pLabelAverage,3,0);
+    mainLayoutTable->addWidget(pSliderAverage,3,1);
+
+    pWidgetTable->setLayout(mainLayoutTable);
+    pWidgetTable->show();
+    pWidgetTable->resize(800,600);
+    pWidgetTable->setWindowTitle("Stc Table");
 
 
+    //
+    // STC view
+    //
+    QWidget* pWidgetView = new QWidget;
+    QGridLayout *mainLayoutView = new QGridLayout;
 
-    StcModel t_StcModel;
+    QLabel * pLabelNormView = new QLabel("Norm");
+    QSlider* pSliderNormView = new QSlider(Qt::Vertical);
+    QObject::connect(pSliderNormView, &QSlider::valueChanged, pClustStcModel, &ClustStcModel::setNormalization);
+    pSliderNormView->setMinimum(1);
+    pSliderNormView->setMaximum(100);
+    pSliderNormView->setValue(60);
 
-    t_StcModel.addData(sourceEstimateClustered);
+    QLabel * pLabelAverageView = new QLabel("Average");
+    QSlider* pSliderAverageView = new QSlider(Qt::Horizontal);
+    QObject::connect(pSliderAverageView, &QSlider::valueChanged, pClustStcModel, &ClustStcModel::setAverage);
+    pSliderAverageView->setMinimum(1);
+    pSliderAverageView->setMaximum(500);
+    pSliderAverageView->setValue(100);
 
+    ClustStcView* clustView = new ClustStcView(true, QGLView::RedCyanAnaglyph);//(false); (true, QGLView::StretchedLeftRight); (true, QGLView::RedCyanAnaglyph);
+    clustView->setModel(pClustStcModel);
+
+    if (clustView->stereoType() != QGLView::RedCyanAnaglyph)
+        clustView->camera()->setEyeSeparation(0.3f);
+
+    QWidget *pWidgetContainer = QWidget::createWindowContainer(clustView);
+
+    mainLayoutView->addWidget(pWidgetContainer,0,0,2,2);
+    mainLayoutView->addWidget(pLabelNormView,0,3);
+    mainLayoutView->addWidget(pSliderNormView,1,3);
+    mainLayoutView->addWidget(pLabelAverageView,3,0);
+    mainLayoutView->addWidget(pSliderAverageView,3,1);
+
+    pWidgetView->setLayout(mainLayoutView);
+
+    //connect the sliders
+
+    QObject::connect(pSliderNorm, &QSlider::valueChanged, pSliderNormView, &QSlider::setValue);
+    QObject::connect(pSliderAverage, &QSlider::valueChanged, pSliderAverageView, &QSlider::setValue);
+
+    QObject::connect(pSliderNormView, &QSlider::valueChanged, pSliderNorm, &QSlider::setValue);
+    QObject::connect(pSliderAverageView, &QSlider::valueChanged, pSliderAverage, &QSlider::setValue);
+
+    pWidgetView->show();
+    pWidgetView->resize(800,600);
+
+    //
+    // Add Data
+    //
+    pClustStcModel->addData(sourceEstimateClustered);
+
+//    clustView->setStereoType(QGLView::StretchedLeftRight);
+
+//*/
 
     return a.exec();//1;//a.exec();
 }

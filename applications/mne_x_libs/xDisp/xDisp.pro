@@ -100,8 +100,7 @@ SOURCES += \
     textwidget.cpp \
     progressbarwidget.cpp \
     numericwidget.cpp \
-    newrealtimesamplearraywidget.cpp \
-    newrealtimemultisamplearraywidget.cpp \
+    realtimesamplearraywidget.cpp \
     helpers/realtimemultisamplearraymodel.cpp \
     helpers/realtimemultisamplearraydelegate.cpp \
     helpers/sensorgroup.cpp \
@@ -118,8 +117,7 @@ HEADERS += \
     textwidget.h \
     progressbarwidget.h \
     numericwidget.h \
-    newrealtimesamplearraywidget.h \
-    newrealtimemultisamplearraywidget.h \
+    realtimesamplearraywidget.h \
     helpers/realtimemultisamplearraymodel.h \
     helpers/realtimemultisamplearraydelegate.h \
     helpers/sensorgroup.h \
@@ -129,13 +127,10 @@ HEADERS += \
     helpers/sensorwidget.h
 
 FORMS += \
-    realtimemultisamplearraywidget.ui \
     textwidget.ui \
     progressbarwidget.ui \
     numericwidget.ui \
-    realtimemultisamplearray_new_widget.ui \
-    newrealtimesamplearraywidget.ui \
-    newrealtimemultisamplearraywidget.ui
+    realtimesamplearraywidget.ui
 
 qtHaveModule(3d) {
     SOURCES += realtimesourceestimatewidget.cpp

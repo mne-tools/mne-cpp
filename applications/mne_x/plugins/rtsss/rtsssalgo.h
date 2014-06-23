@@ -1,3 +1,39 @@
+//=============================================================================================================
+/**
+* @file     rtsssalgo.h
+* @author   Seok Lew <slew@nmr.mgh.harvard.edu>;
+*           Xin Li <xinli@cmu.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+* @version  1.0
+* @date     June, 2013
+*
+* @section  LICENSE
+*
+* Copyright (C) 2013, Seok Lew and Matti Hamalainen. All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+* the following conditions are met:
+*     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+*       following disclaimer.
+*     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+*       the following disclaimer in the documentation and/or other materials provided with the distribution.
+*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*       to endorse or promote products derived from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+*
+* @brief    Contains the declaration of the RtSssAlgo class.
+*
+*/
+
 #ifndef RTSSSALGO_H
 #define RTSSSALGO_H
 
@@ -39,7 +75,7 @@ typedef std::complex<double> cplxd;
 MatrixXd legendre(int, VectorXd);
 float plgndr(int l, int m, float x);
 double factorial(int);
-QList<MatrixXd> getSSSRR(MatrixXd, MatrixXd, MatrixXd, MatrixXd, MatrixXd);
+//QList<MatrixXd> getSSSRR(MatrixXd, MatrixXd, MatrixXd, MatrixXd, MatrixXd);
 VectorXd hypot(VectorXd, VectorXd);
 VectorXd atan2vec(VectorXd, VectorXd);
 VectorXd find(MatrixXd, int);
@@ -47,7 +83,7 @@ VectorXd find(MatrixXd, int);
 double stdev(VectorXd);
 VectorXd eigen_LTE(VectorXd V, double tol);
 VectorXd eigen_LT_index(VectorXd V, double tol);
-VectorXd eigen_LT_index_test(VectorXd V, int);
+VectorXd eigen_LT_index_test(int);
 VectorXd eigen_GT(VectorXd V, double tol);
 VectorXd eigen_AND(VectorXd V1, VectorXd V2);
 
@@ -58,29 +94,34 @@ public:
     ~RtSssAlgo();
 
     QList<MatrixXd> buildLinearEqn();
-//    QList<MatrixXd> getSSSRR();
-//    QList<MatrixXd> getSSSOLS();
     QList<MatrixXd> getSSSRR(MatrixXd EqnIn, MatrixXd EqnOut, MatrixXd EqnARR, MatrixXd EqnA, MatrixXd EqnB);
     QList<MatrixXd> getSSSOLS(MatrixXd EqnIn, MatrixXd EqnOut, MatrixXd EqnA, MatrixXd EqnB);
     QList<MatrixXd> getLinEqn();
+
+    void setMEGInfo(FiffInfo::SPtr fiffinfo);
+    void setSSSParameter(QList<int>);
+    qint32 getNumMEGCh();
+//    void setMEGsignal(MatrixXd megfrombuffer);
 
 private:
     void getCoilInfoVectorView();
     void getCoilInfoVectorView4Sim();
     void getCoilInfoBabyMEG4Sim();
-    QList<MatrixXd> getSSSEqn(int, int);
-    void getSSSBasis(VectorXd, VectorXd, VectorXd, int, int);
+    QList<MatrixXd> getSSSEqn(qint32, qint32);
+    void getSSSBasis(VectorXd, VectorXd, VectorXd, qint32, qint32);
     void getCartesianToSpherCoordinate(VectorXd, VectorXd, VectorXd);
     void getSphereToCartesianVector();
     int strmatch(char, char);
 
-    int NumCoil;
+    qint32 NumCoil;
     QList<MatrixXd> CoilT;
     QList<QString> CoilName, CoilTk;
     QList<MatrixXd> CoilRk, CoilWk;
     VectorXi CoilNk, CoilGrad;
-    VectorXd MEGIn, MEGOut, MEGNoise, MEGData;
+    VectorXd MEGIn, MEGOut, MEGNoise;
+    MatrixXd MEGData;
 
+    qint32 LInRR, LOutRR, LInOLS, LOutOLS;
     Vector3d Origin;
     MatrixXd BInX, BInY, BInZ, BOutX, BOutY, BOutZ;
     MatrixXd EqnInRR, EqnOutRR, EqnIn, EqnOut, EqnARR, EqnA, EqnB;
@@ -90,7 +131,7 @@ private:
     VectorXd PHI_X, PHI_Y, PHI_Z;
     VectorXd THETA_X, THETA_Y, THETA_Z;
 
-    FiffInfo::SPtr m_pFiffInfo;     /**< Fiff information. */
+//    FiffInfo::SPtr m_pFiffInfo;     /**< Fiff information. */
 };
 
 #endif // RTSSSALGO_H

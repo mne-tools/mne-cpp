@@ -1,11 +1,65 @@
+//=============================================================================================================
+/**
+* @file     realtimemultisamplearraydelegate.cpp
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+* @version  1.0
+* @date     May, 2014
+*
+* @section  LICENSE
+*
+* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+* the following conditions are met:
+*     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+*       following disclaimer.
+*     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+*       the following disclaimer in the documentation and/or other materials provided with the distribution.
+*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*       to endorse or promote products derived from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+*
+* @brief    Implementation of the RealTimeMultiSampleArrayDelegate Class.
+*
+*/
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
 #include "realtimemultisamplearraydelegate.h"
 
 #include "realtimemultisamplearraymodel.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
 
 #include <QPainter>
 #include <QPainterPath>
 #include <QDebug>
 #include <QThread>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace XDISPLIB;
 
 
 //*************************************************************************************************************
@@ -62,7 +116,7 @@ void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOpti
 
             const RealTimeMultiSampleArrayModel* t_pModel = static_cast<const RealTimeMultiSampleArrayModel*>(index.model());
 
-            if(data.size()>0)
+            if(data.size() > 0)
             {
     //            const RealTimeMultiSampleArrayModel* t_rtmsaModel = (static_cast<const RealTimeMultiSampleArrayModel*>(index.model()));
 
@@ -70,7 +124,7 @@ void RealTimeMultiSampleArrayDelegate::paint(QPainter *painter, const QStyleOpti
 
                 //Plot grid
                 painter->setRenderHint(QPainter::Antialiasing, false);
-                createGridPath(index, option, path,data);
+                createGridPath(index, option, path, data);
 
                 painter->save();
                 QPen pen;
@@ -131,10 +185,10 @@ QSize RealTimeMultiSampleArrayDelegate::sizeHint(const QStyleOptionViewItem &opt
 //        qint32 nsamples = (static_cast<const RealTimeMultiSampleArrayModel*>(index.model()))->lastSample()-(static_cast<const RealTimeMultiSampleArrayModel*>(index.model()))->firstSample();
 
 //        size = QSize(nsamples*m_dDx,m_dPlotHeight);
+        Q_UNUSED(option);
         break;
     }
 
-    Q_UNUSED(option);
 
     return size;
 }
@@ -190,8 +244,8 @@ void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, 
     //Move to initial starting point
     if(data.size() > 0)
     {
-        float val = data[0];
-        fValue = val*fScaleY;
+//        float val = data[0];
+        fValue = 0;//(val-data[0])*fScaleY;
 
         float newY = y_base+fValue;
 
@@ -204,7 +258,7 @@ void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, 
     //create lines from one to the next sample
     qint32 i;
     for(i = 1; i < data.size(); ++i) {
-        float val = data[i];
+        float val = data[i] - data[0]; //remove first sample data[0] as offset
         fValue = val*fScaleY;
 
         float newY = y_base+fValue;
@@ -216,12 +270,12 @@ void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, 
     }
 
     //create lines from one to the next sample for last path
-    qint32 offset = t_pModel->numVLines() + 1;
-    qSamplePosition.setX(qSamplePosition.x() + fDx*offset);
+    qint32 sample_offset = t_pModel->numVLines() + 1;
+    qSamplePosition.setX(qSamplePosition.x() + fDx*sample_offset);
     lastPath.moveTo(qSamplePosition);
 
-    for(i += offset; i < lastData.size(); ++i) {
-        float val = lastData[i];
+    for(i += sample_offset; i < lastData.size(); ++i) {
+        float val = lastData[i] - lastData[0]; //remove first sample lastData[0] as offset
         fValue = val*fScaleY;
 
         float newY = y_base+fValue;
@@ -231,8 +285,6 @@ void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, 
 
         lastPath.lineTo(qSamplePosition);
     }
-
-//    qDebug("Plot-PainterPath created!");
 }
 
 
@@ -240,6 +292,8 @@ void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, 
 
 void RealTimeMultiSampleArrayDelegate::createGridPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QList< QVector<float> >& data) const
 {
+    Q_UNUSED(data)
+
     const RealTimeMultiSampleArrayModel* t_pModel = static_cast<const RealTimeMultiSampleArrayModel*>(index.model());
 
     if(t_pModel->numVLines() > 0)

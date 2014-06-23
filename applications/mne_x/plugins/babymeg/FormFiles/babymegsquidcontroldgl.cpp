@@ -116,201 +116,70 @@ BabyMEGSQUIDControlDgl::BabyMEGSQUIDControlDgl(BabyMEG* p_pBabyMEG,QWidget *pare
     connect(ui->m_Qbn_bias,&QPushButton::released, this, &BabyMEGSQUIDControlDgl::AdjuBias);
     connect(ui->m_Qbn_mod,&QPushButton::released, this, &BabyMEGSQUIDControlDgl::AdjuModu);
 
-    // init
+
+    //connect(ui->m_Qbn_Init,&QPushButton::released, this, &BabyMEGSQUIDControlDgl::Init);
+
+    setModal(false);
+
+    // init the table for dispalying SQUID parameters
+    TableRows = 80;
+    TableCols = 10;
+    ui->tbw_parameters->setRowCount(TableRows);
+    ui->tbw_parameters->setColumnCount(TableCols);
+    for (int i=0; i<TableCols; i++)
+        ui->tbw_parameters->setColumnWidth(i,70);
+    //
+    ui->tbw_parameters->setHorizontalHeaderLabels(QString("Channel;Value;Channel;Value;Channel;Value;Channel;Value;Channel;Value;Channel;Value").split(";"));
+
+    for (int i=0; i<TableRows;i++)
+        for(int j=0;j<TableCols;j++)
+            ui->tbw_parameters->setItem(i,j,new QTableWidgetItem(" "));
+
+    ui->tbw_parameters->setCurrentCell(0,0);
+    // End of init parameter table
+
+    // init the plot
     initplotflag = false;
-    //InitTuneGraph();
-    initparaplotflag = false;
 
     d_timeplot = new plotter();
     ui->lay_tune->addWidget(d_timeplot);
 
-//    d_tuneplot = new plotter();
-//    ui->lay_tunepara->addWidget(d_tuneplot);
-
-
-    this->Init();
-    this->StartDisp();
+    //this->Init();
 }
 
 BabyMEGSQUIDControlDgl::~BabyMEGSQUIDControlDgl()
 {
+    delete d_timeplot;
     delete ui;
-}
-
-void BabyMEGSQUIDControlDgl::InitTuneGraph()
-{
-
-//    QGraphicsScene * scene = new QGraphicsScene(ui->gv_tunegraph);
-//    scene->setItemIndexMethod(QGraphicsScene::NoIndex);
-//    scene->setSceneRect(ui->gv_tunegraph->rect());
-
-//    //scene->addText("Hello World");
-
-////    QBrush brush(QColor(0x70, 0x80, 0x50, 255));
-////    scene.setBackgroundBrush(brush);
-
-////    scene.setSceneRect(ui->gv_tunegraph->rect());
-////    QString newline = QString("InitTuneGraph:")+tr("x=%1").arg(ui->gv_tunegraph->rect().x())
-////            +tr("y=%1").arg(ui->gv_tunegraph->rect().y())
-////            +tr("width=%1").arg(ui->gv_tunegraph->rect().width())
-////            +tr("height=%1").arg(ui->gv_tunegraph->rect().height());
-
-////    UpdateInfo(newline);
-
-
-//    //QGraphicsLineItem * PolyLine;
-//    //PolyLine = new QGraphicsLineItem();
-//    //scene->addItem(PolyLine);
-//    //PolyLine->setLine(0,ui->gv_tunegraph->rect().height()/2,ui->gv_tunegraph->rect().width(),ui->gv_tunegraph->rect().height()/2);
-
-//    ui->gv_tunegraph->setScene(scene);
-//    ui->gv_tunegraph->setRenderHint(QPainter::Antialiasing);
-//    ui->gv_tunegraph->setCacheMode(QGraphicsView::CacheBackground);
-//    ui->gv_tunegraph->setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
-//    //ui->gv_tunegraph->resize(400,600);
-
-}
-
-void BabyMEGSQUIDControlDgl::StartDisp()
-{
-    //emit SCStart();
 }
 
 void BabyMEGSQUIDControlDgl::closeEvent(QCloseEvent *event)
 {
     Q_UNUSED(event)
     SendCMD("CANC");
-    //emit SCStop();
 }
 void BabyMEGSQUIDControlDgl::UpdateParaGraph()
 {
-
-    std::cout << "Update Para Graph \n" << initparaplotflag<< std::endl;
-
     int NumRect = m_GUISM.ParaGraph.size();
 
-//    float minval = 0.0;
-//    float maxval = 0.0;
-
-//    QVector <QPointF> F;
-
-//    for(int i=0; i<NumRect;i++){
-//        F.append(QPointF(i,m_GUISM.ParaGraph.at(i)));
-
-//        float t = m_GUISM.ParaGraph.at(i);
-//        if ( minval > t ) minval = t;
-//        if ( maxval < t ) maxval = t;
-//    }
-//    // plot tune parameters here
-//    settings_tune.minX = 0.0;
-//    settings_tune.maxX = NumRect;
-//    settings_tune.minY = minval;
-//    settings_tune.maxY = maxval;
-
-//    d_tuneplot->setPlotSettings(settings_tune);
-//    d_tuneplot->setCurveData(0,F);
-//    d_tuneplot->show();
-
-    int hSideSpace = 30;
-    int vSideSpace = 30;
-    //(x1,y1) and (x2,y2)
-    float x1 = 0+1.5*hSideSpace;
-    float y1 = 0+vSideSpace;
-    float x2 = ui->gv_paragraph->rect().width()-2*hSideSpace;
-    float y2 = ui->gv_paragraph->rect().height()-2*vSideSpace;
-    // define the x tick
-    float dis = (x2-x1)/(1.0*NumRect);
-
-    if (initparaplotflag)
+    for (int i=0; i< NumRect ; i++)
     {
-        for (int i=0;i<NumRect;i++)
-            PolyRectPtr.at(i)->setRect(x1+i*dis,y2/2,dis/2,m_GUISM.ParaGraph.at(i)+10);
+        int ro = floor(i/(TableCols/2));
+        int co = i - ro*(TableCols/2);
+        ui->tbw_parameters->item(ro,1+2*co)->setText(tr("%1").arg(m_GUISM.ParaGraph.at(i)));
+        ui->tbw_parameters->item(ro,0+2*co)->setText(chanNames.at(i));
     }
-    else
-    {
-        QGraphicsScene * scene = new QGraphicsScene(ui->gv_paragraph);
-        scene->setItemIndexMethod(QGraphicsScene::NoIndex);
-        scene->setSceneRect(ui->gv_paragraph->rect());
 
-        // plot the ax
-        //x1,y1 -> x2,y1
-        scene->addLine(x1,y1,x2,y1,QPen(Qt::black));
-        //x2,y1 -> x2,y2
-        scene->addLine(x2,y1,x2,y2,QPen(Qt::black));
-        //x2,y2 -> x1,y2
-        scene->addLine(x2,y2,x1,y2,QPen(Qt::black));
-        //x1,y2 -> x1,y1
-        scene->addLine(x1,y2,x1,y1,QPen(Qt::black));
-
-        //label
-        QGraphicsTextItem * io = new QGraphicsTextItem;
-        io->setPos(x2/2,y2+vSideSpace/2);
-        io->setPlainText("Channels");
-        scene->addItem(io);
-
-        QGraphicsTextItem * io1 = new QGraphicsTextItem;
-        io1->setPos(x1-1.5*hSideSpace,y2);
-        io1->setPlainText(ui->m_Qcb_bar_graph_select->currentText());
-        io1->setRotation(-90);
-        scene->addItem(io1);
-
-        // define the y tick
-        int NumTick = 3;
-
-        QVector <float> ylabel;
-        QVector <float> ycoor;
-
-        ycoor.append(y2);
-        ylabel.append(-10);
-
-        ycoor.append(y2/2);
-        ylabel.append(0);
-
-        ycoor.append(y1);
-        ylabel.append(10);
-
-        for (int j=0;j<NumTick;j++){
-            QGraphicsTextItem * yticklabel = new QGraphicsTextItem;
-            yticklabel->setPos(x1-hSideSpace/2,ycoor.at(j));
-            yticklabel->setPlainText(tr("%1").arg(ylabel.at(j)));
-            scene->addItem(yticklabel);
-         }
-
-        // plot bars
-        for (int i=0;i<NumRect;i++){
-            QGraphicsRectItem * barRect;
-            barRect = new QGraphicsRectItem(x1+i*dis,y2/2,
-                                            dis/2,m_GUISM.ParaGraph.at(i)+10);
-            scene->addItem(barRect);
-            barRect->setBrush(* new QBrush(Qt::blue));
-
-            PolyRectPtr.append(barRect);
-
-            if (i%50==0){//xlabel
-            QGraphicsTextItem * ticklabel = new QGraphicsTextItem;
-            ticklabel->setPos(x1+i*dis-dis/2,y2+vSideSpace/8);
-            ticklabel->setPlainText(tr("%1").arg(i));
-            scene->addItem(ticklabel);
-            }
-
-        }
-        ui->gv_paragraph->setScene(scene);
-        ui->gv_paragraph->setRenderHint(QPainter::Antialiasing);
-        ui->gv_paragraph->setCacheMode(QGraphicsView::CacheBackground);
-        ui->gv_paragraph->setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
-
-        initparaplotflag = true;
-    }
 }
 
 float BabyMEGSQUIDControlDgl::mmin(MatrixXf tmp,int chan)
 {
     int cols = tmp.cols();
 
-    float ret = 0.0;
+    float ret = tmp(chan,0);
     for (int i=0; i<cols; i++)
     {
-        if (ret > tmp(chan,i))
+        if (tmp(chan,i) < ret)
             ret = tmp(chan,i);
     }
 
@@ -321,10 +190,10 @@ float BabyMEGSQUIDControlDgl::mmax(MatrixXf tmp,int chan)
 {
     int cols = tmp.cols();
 
-    float ret = 0.0;
+    float ret = tmp(chan,0);
     for (int i=0; i<cols; i++)
     {
-        if (ret < tmp(chan,i))
+        if (tmp(chan,i) > ret)
             ret = tmp(chan,i);
     }
 
@@ -332,18 +201,20 @@ float BabyMEGSQUIDControlDgl::mmax(MatrixXf tmp,int chan)
 }
 void BabyMEGSQUIDControlDgl::TuneGraphDispProc(MatrixXf tmp)
 {
-    std::cout << "first ten elements \n" << tmp.block(0,0,1,10) << std::endl;
+//    std::cout << "first ten elements \n" << tmp.block(0,0,1,10) << std::endl;
 
     int cols = tmp.cols();
-    int chanIndx = ui->m_Qcb_channel->currentIndex();
+    int chanIndx = ui->m_Qcb_channel->currentIndex();//1;//
     // plot the real time data here
     settings.minX = 0.0;
     settings.maxX = cols;
     settings.minY = mmin(tmp,chanIndx);
     settings.maxY = mmax(tmp,chanIndx);
+    settings.xlabel = QString("%1 samples/second").arg(m_pBabyMEG->sfreq) ;
+    //settings.ylabel = QString("Amplify");
 
     d_timeplot->setPlotSettings(settings);
-
+//    qDebug()<<"minY"<<settings.minY<<"maxY"<<settings.maxY;
 
     QVector <QPointF> F;
 
@@ -352,97 +223,6 @@ void BabyMEGSQUIDControlDgl::TuneGraphDispProc(MatrixXf tmp)
 
     d_timeplot->setCurveData(0,F);
     d_timeplot->show();
-////    float * samples = tmp.data();
-
-////    int rows = tmp.rows();
-//
-////    int wise_type = 1;
-
-//    int NumRect = cols;
-//    int hSideSpace = 30;
-//    int vSideSpace = 30;
-//    //(x1,y1) and (x2,y2)
-//    float x1 = 0+1.5*hSideSpace;
-//    float y1 = 0+vSideSpace;
-//    float x2 = ui->gv_tunegraph->rect().width()-2*hSideSpace;
-//    float y2 = ui->gv_tunegraph->rect().height()-2*vSideSpace;
-//    // define the x tick
-//    float dis = (x2-x1)/(1.0*NumRect);
-
-
-//
-
-//    float scale = 1;//100000;
-
-//    if (initplotflag){
-//        //update the tune graph
-//        for(int i=0;i<cols-1;i++){
-//            PolyLinePtr.at(i)->setLine(x1+i*dis,scale*tmp(chanIndx,i),x1+(i+1)*dis,scale*tmp(chanIndx,i+1));
-//        }
-////        if(wise_type==0){ //0 --column wise
-////            for(int i=0;i<cols;i++){
-////                PolyLinePtr.at(i)->setLine(x1+i*dis,scale*samples[i*rows+chanIndx],x1+(i+1)*dis,scale*samples[(i+1)*rows+chanIndx]);
-////            }
-////        }
-////        else
-////        { // 1 -- raw wise
-////            for(int i=0;i<cols;i++){
-////                PolyLinePtr.at(i)->setLine(x1+i*dis,scale*samples[i+chanIndx*cols],x1+(i+1)*dis,scale*samples[(i+1)+chanIndx*cols]);
-////            }
-////        }
-//    }
-//    else
-//    {// the first time to plot
-//        QGraphicsScene * scene = new QGraphicsScene(ui->gv_tunegraph);
-//        scene->setItemIndexMethod(QGraphicsScene::NoIndex);
-//        scene->setSceneRect(ui->gv_tunegraph->rect());
-
-//        // plot ax
-//        //x1,y1 -> x2,y1
-//        scene->addLine(x1,y1,x2,y1,QPen(Qt::black));
-//        //x2,y1 -> x2,y2
-//        scene->addLine(x2,y1,x2,y2,QPen(Qt::black));
-//        //x2,y2 -> x1,y2
-//        scene->addLine(x2,y2,x1,y2,QPen(Qt::black));
-//        //x1,y2 -> x1,y1
-//        scene->addLine(x1,y2,x1,y1,QPen(Qt::black));
-
-//        //label
-//        QGraphicsTextItem * io = new QGraphicsTextItem;
-//        io->setPos(x2/2,y2+vSideSpace/2);
-//        io->setPlainText(QString(tr("%1").arg(fs)+"samples per second"));
-//        scene->addItem(io);
-
-//        QGraphicsTextItem * io1 = new QGraphicsTextItem;
-//        io1->setPos(x1-1.5*hSideSpace,y2);
-//        io1->setPlainText("Amplitude");
-//        io1->setRotation(-90);
-//        scene->addItem(io1);
-
-//        // plot lines
-//        for (int i=0;i< cols;i++){
-//            QGraphicsLineItem * PolyLine;
-//            PolyLine = new QGraphicsLineItem();
-//            scene->addItem(PolyLine);
-
-//            PolyLinePtr.append(PolyLine);
-
-//            if (i%500==0){//x-ticklabel
-//            QGraphicsTextItem * ticklabel = new QGraphicsTextItem;
-//            ticklabel->setPos(x1+i*dis-dis/2,y2+vSideSpace/8);
-//            ticklabel->setPlainText(tr("%1").arg(i));
-//            scene->addItem(ticklabel);
-//            }
-//        }
-//        ui->gv_tunegraph->setScene(scene);
-//        ui->gv_tunegraph->setRenderHint(QPainter::Antialiasing);
-//        ui->gv_tunegraph->setCacheMode(QGraphicsView::CacheBackground);
-//        ui->gv_tunegraph->setViewportUpdateMode(QGraphicsView::BoundingRectViewportUpdate);
-//        initplotflag = true;
-//    }
-
-//    QString newline = QString("New data arrived");
-//    UpdateInfo(newline);
 
 }
 
@@ -657,13 +437,13 @@ void BabyMEGSQUIDControlDgl::Init()
 {
     // Send the init command to labview to call SQUID VI.
     //SendCMD("INIC");
+    qDebug()<<"Send init command\n";
     SendCMD("INIT");
 }
 
 void BabyMEGSQUIDControlDgl::Cancel()
 {
     SendCMD("CANC");
-    //emit SCStop();
     this->close();
 }
 
@@ -681,7 +461,6 @@ void BabyMEGSQUIDControlDgl::RcvCMDData(QByteArray DATA)
 {
     QString t_sReply(DATA);
 
-    //ui->m_tx_info->setText(QString("Reply:")+t_sReply);
     QString newline = QString("Reply:")+t_sReply;
     UpdateInfo(newline);
 
@@ -702,18 +481,22 @@ void BabyMEGSQUIDControlDgl::ReplyCmdProc(QString sReply)
     else if(cmd=="UPDE") fcmd = 4;
     else if(cmd=="BUTN") fcmd = 5;
 
-//    qDebug() << "Reply Command String ------------------ \n" << sReply ;
-//    qDebug() << "Reply Command ------------------ \n" << cmd ;
+    //qDebug() << "Reply Command String ------------------ \n" << sReply ;
+    //qDebug() << "Reply Command ------------------ \n" << cmd ;
 
     switch (fcmd)
     {
     case 1:
         // if the reply is coming from INIT command, then initialize the FLL config.
         tmp = sReply.split("#");
+
+        //qDebug()<<"reply string:\n"<<tmp[0];
         //get the channels
         //load channel information from files
-        tmp[1] = GenChnInfo(tmp[1]);
-        InitChannels(tmp[1]);
+        //tmp[1] = GenChnInfo(tmp[1]);
+
+        InitChannels(tmp[2]);
+
         //init GUI controls
         InitGUIConfig(tmp[0]);
         UpdateGUI();
@@ -748,8 +531,11 @@ QString BabyMEGSQUIDControlDgl::GenChnInfo(QString nChan)
 
 void BabyMEGSQUIDControlDgl::InitChannels(QString sReply)
 {
-    QList < QString > tmp = sReply.split("|");
-    ui->m_Qcb_channel->addItems(tmp);
+//    QList < QString > tmp = sReply.split("|");
+//    ui->m_Qcb_channel->addItems(tmp);
+
+    chanNames =  sReply.split("|");
+    ui->m_Qcb_channel->addItems(chanNames);
 
 }
 
@@ -897,9 +683,9 @@ void BabyMEGSQUIDControlDgl::UpdateGUI()
     ui->m_Qcb_bar_graph_select->setCurrentIndex( m_GUISM.BarGraphSelect);
 
     //Update Bar Graph  -- m_GUISM.ParaGraph
-    std::cout << "Start Update Para Graph ------------------ \n" <<std::endl;
+    //std::cout << "Start Update Para Graph ------------------ \n" <<std::endl;
     UpdateParaGraph();
-    std::cout << "End Update Para Graph ------------------ \n" <<std::endl;
+    //std::cout << "End Update Para Graph ------------------ \n" <<std::endl;
 
 }
 void BabyMEGSQUIDControlDgl::InitGUIConfig(QString sReply)

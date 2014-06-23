@@ -43,6 +43,7 @@
 #include "FormFiles/babymegsetupwidget.h"
 #include "FormFiles/babymegprojectdialog.h"
 
+
 #include <utils/ioutils.h>
 
 #include <iostream>
@@ -92,8 +93,15 @@ BabyMEG::BabyMEG()
     m_pActionRecordFile = new QAction(QIcon(":/images/record.png"), tr("Start Recording"),this);
 //    m_pActionSetupProject->setShortcut(tr("F12"));
     m_pActionRecordFile->setStatusTip(tr("Start Recording"));
-    connect(m_pActionRecordFile, &QAction::triggered, this, &BabyMEG::startRecordingFile);
+    connect(m_pActionRecordFile, &QAction::triggered, this, &BabyMEG::toggleRecordingFile);
     addPluginAction(m_pActionRecordFile);
+
+    m_pActionSqdCtrl = new QAction(QIcon(":/images/sqdctrl.png"), tr("Squid Control"),this);
+//    m_pActionSetupProject->setShortcut(tr("F12"));
+    m_pActionSqdCtrl->setStatusTip(tr("Squid Control"));
+    connect(m_pActionSqdCtrl, &QAction::triggered, this, &BabyMEG::showSqdCtrlDialog);
+    addPluginAction(m_pActionSqdCtrl);
+
 }
 
 
@@ -106,6 +114,7 @@ BabyMEG::~BabyMEG()
 
     if(myClient && myClient->isConnected())
             myClient->DisConnectBabyMEG();
+
 }
 
 
@@ -141,6 +150,7 @@ void BabyMEG::init()
 
     //init channels when fiff info is available
     connect(this, &BabyMEG::fiffInfoAvailable, this, &BabyMEG::initConnector);
+
 }
 
 
@@ -164,7 +174,6 @@ void BabyMEG::initConnector()
 
         m_outputConnectors.append(m_pRTMSABabyMEG);
     }
-
 }
 
 
@@ -188,7 +197,25 @@ void BabyMEG::showProjectDialog()
 
 //*************************************************************************************************************
 
-void BabyMEG::startRecordingFile()
+void BabyMEG::showSqdCtrlDialog()
+{
+    //BabyMEGSQUIDControlDgl SQUIDCtrlDlg(this);
+    //SQUIDCtrlDlg.exec();
+    // added by Limin for nonmodal dialog
+    if (SQUIDCtrlDlg == NULL)
+        SQUIDCtrlDlg = QSharedPointer<BabyMEGSQUIDControlDgl>(new BabyMEGSQUIDControlDgl(this));
+
+    if (!SQUIDCtrlDlg->isVisible())
+    {
+        SQUIDCtrlDlg->show();
+        SQUIDCtrlDlg->raise();
+        SQUIDCtrlDlg->Init();
+    }
+}
+
+//*************************************************************************************************************
+
+void BabyMEG::toggleRecordingFile()
 {
     //Setup writing to file
     if(m_bWriteToFile)
@@ -260,12 +287,14 @@ void BabyMEG::setFiffData(QByteArray DATA)
 
         m_pRawMatrixBuffer->push(&rawData);
     }
-    else
-    {
-//        std::cout << "Data coming" << std::endl; //"first ten elements \n" << rawData.block(0,0,1,10) << std::endl;
+//    else
+//    {
+////        std::cout << "Data coming" << std::endl; //"first ten elements \n" << rawData.block(0,0,1,10) << std::endl;
 
-        emit DataToSquidCtrlGUI(rawData);
-    }
+//        emit DataToSquidCtrlGUI(rawData);
+//    }
+
+    emit DataToSquidCtrlGUI(rawData);
 }
 
 
@@ -276,6 +305,7 @@ void BabyMEG::setFiffInfo(FiffInfo p_FiffInfo)
     m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo(p_FiffInfo));
 
     m_iBufferSize = pInfo->dataLength;
+    sfreq = pInfo->sfreq;
 }
 
 //*************************************************************************************************************
@@ -407,10 +437,7 @@ void BabyMEG::run()
 
     //Close the fif output stream
     if(m_bWriteToFile)
-    {
-        m_pOutfid->finish_writing_raw();
-        m_bWriteToFile = false;
-    }
+        this->toggleRecordingFile();
 }
 
 
