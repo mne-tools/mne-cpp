@@ -72,9 +72,8 @@ TMSI::TMSI()
 , m_pRawMatrixBuffer_In(0)
 , m_pTMSIProducer(new TMSIProducer(this))
 {
-    // Create impedance action bar item
-    m_pActionImpedance = new QAction(QIcon(":/images/icons/impedances.png"), tr("Check impedance values"), this);
-//    m_pActionSetupProject->setShortcut(tr("F12"));
+    // Create impedance action bar item/button
+    m_pActionImpedance = new QAction(QIcon(":/images/impedances.png"), tr("Check impedance values"), this);
     m_pActionImpedance->setStatusTip(tr("Check impedance values"));
     connect(m_pActionImpedance, &QAction::triggered, this, &TMSI::showImpedanceDialog);
     addPluginAction(m_pActionImpedance);
@@ -127,6 +126,7 @@ void TMSI::init()
     m_bBeepTrigger = false;
     m_bUseCommonAverage = true;
     m_bUseKeyboardTrigger = true;
+    m_bCheckImpedances = false;
 
     m_iTriggerType = 0;
 
@@ -500,7 +500,8 @@ bool TMSI::start()
                        m_bUseUnitOffset,
                        m_bWriteDriverDebugToFile,
                        m_sOutputFilePath,
-                       m_bUseCommonAverage);
+                       m_bUseCommonAverage,
+                       m_bCheckImpedances);
 
     if(m_pTMSIProducer->isRunning())
     {
@@ -594,8 +595,19 @@ void TMSI::run()
     {
         //std::cout<<"TMSI::run(s)"<<std::endl;
 
+        // Check impedances - send to dialog and return from this function
+        if(m_pTMSIProducer->isRunning() && m_bCheckImpedances)
+        {
+            std::cout<<"pop before"<<endl;
+            MatrixXf matValue = m_pRawMatrixBuffer_In->pop();
+            std::cout<<"pop after"<<endl;
+            //Dialog->dislpayNewValues(&matValue)
+
+            cout<<matValue<<endl;
+        }
+
         //pop matrix only if the producer thread is running
-        if(m_pTMSIProducer->isRunning())
+        if(m_pTMSIProducer->isRunning() && !m_bCheckImpedances)
         {
             MatrixXf matValue = m_pRawMatrixBuffer_In->pop();
 
@@ -712,8 +724,47 @@ void TMSI::run()
 
 void TMSI::showImpedanceDialog()
 {
-//    BabyMEGProjectDialog projectDialog(this);
-//    projectDialog.exec();
+    m_bCheckImpedances = true;
+
+    // Open Impedance dialog
+    if(m_pTmsiImpedanceWidget == NULL)
+        m_pTmsiImpedanceWidget = QSharedPointer<TmsiImpedanceWidget>(new TmsiImpedanceWidget(this));
+
+    if(!m_pTmsiImpedanceWidget->isVisible())
+    {
+        m_pTmsiImpedanceWidget->show();
+        m_pTmsiImpedanceWidget->raise();
+    }
+
+    //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
+    if(this->isRunning())
+        QThread::wait();
+
+    //Buffer
+    m_pRawMatrixBuffer_In = QSharedPointer<RawMatrixBuffer>(new RawMatrixBuffer(8, m_iNumberOfChannels, m_iSamplesPerBlock));
+
+    m_pTMSIProducer->start(m_iNumberOfChannels,
+                       m_iSamplingFreq,
+                       m_iSamplesPerBlock,
+                       m_bUseChExponent,
+                       m_bUseUnitGain,
+                       m_bUseUnitOffset,
+                       m_bWriteDriverDebugToFile,
+                       m_sOutputFilePath,
+                       m_bUseCommonAverage,
+                       m_bCheckImpedances);
+
+    if(m_pTMSIProducer->isRunning())
+    {
+        m_bIsRunning = true;
+        QThread::start();
+        return;
+    }
+    else
+    {
+        qWarning() << "Plugin TMSI - ERROR - TMSIProducer thread could not be started - Either the device is turned off (check your OS device manager) or the driver DLL (TMSiSDK.dll / TMSiSDK32bit.dll) is not installed in the system32 / SysWOW64 directory" << endl;
+        return;
+    }
 }
 
 

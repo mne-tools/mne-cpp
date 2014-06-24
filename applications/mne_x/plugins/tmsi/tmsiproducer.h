@@ -115,6 +115,7 @@ public:
     * @param [in] bWriteDriverDebugToFile Flag for writing the received samples to a file. Defined by the user via the GUI.
     * @param [in] bUseUnitOffset Flag for using the channels unit offset. Defined by the user via the GUI.
     * @param [in] bUseCommonAverage Flag for using common average when recording EEG data. Defined by the user via the GUI.
+    * @param [in] bMeasureImpedance Flag for measuring impedances.
     */
     virtual void start(int iNumberOfChannels,
                        int iSamplingFrequency,
@@ -124,7 +125,8 @@ public:
                        bool bUseUnitOffset,
                        bool bWriteDriverDebugToFile,
                        QString sOutputFilePath,
-                       bool bUseCommonAverage);
+                       bool bUseCommonAverage,
+                       bool bMeasureImpedance);
 
     //=========================================================================================================
     /**
