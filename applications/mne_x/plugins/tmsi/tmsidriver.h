@@ -172,7 +172,7 @@ typedef int             ( __stdcall * PLIBRARYEXIT)     (IN HANDLE Handle);
 typedef char**          ( __stdcall * PGETDEVICELIST)   (IN HANDLE Handle, IN OUT int *NrOfFrontEnds);
 typedef BOOLEAN         ( __stdcall * PGETFRONTENDINFO) (IN HANDLE Handle, IN OUT FRONTENDINFO *FrontEndInfo );
 typedef BOOLEAN         ( __stdcall * PSETREFCALCULATION) (IN HANDLE Handle, IN int OnOrOff );
-typedef BOOLEAN         ( __stdcall * PSETMEASURINGMODE) (IN HANDLE Handle, IN ULONG *Mode, IN int Value );
+typedef BOOLEAN         ( __stdcall * PSETMEASURINGMODE) (IN HANDLE Handle, IN ULONG Mode, IN int Value );
 typedef BOOLEAN         ( __stdcall * PGETERRORCODE) (IN HANDLE Handle);
 
 

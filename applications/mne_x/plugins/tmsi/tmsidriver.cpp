@@ -207,21 +207,21 @@ bool TMSIDriver::initDevice(int iNumberOfChannels,
     }
 
     // Turn on the impendance mode
-//    ULONG impedanceMode = 3;
-//    ULONG normalMode = 0;
+    ULONG impedanceMode = 3;
+    ULONG normalMode = 0;
 
-//    if(m_bMeasureImpedances)
-//    {
-//        if(m_oFpSetMeasuringMode(m_HandleMaster, &impedanceMode, 1))
-//            cout << "Plugin TMSI - INFO - Now measuring impedances" << endl;
-//        else
-//        {
-//            int ErrorCode = m_oFpGetErrorCode(m_HandleMaster);
-//            cout << "Unable to set Measuremode impedance, errorcode = " << ErrorCode << endl;
-//        }
-//    }
-//    else
-//        m_oFpSetMeasuringMode(m_HandleMaster, &normalMode, 0);
+    if(m_bMeasureImpedances)
+    {
+        if(m_oFpSetMeasuringMode(m_HandleMaster, impedanceMode, 1))
+            cout << "Plugin TMSI - INFO - Now measuring impedances" << endl;
+        else
+        {
+            int ErrorCode = m_oFpGetErrorCode(m_HandleMaster);
+            cout << "Unable to set Measuremode impedance, errorcode = " << ErrorCode << endl;
+        }
+    }
+    else
+        m_oFpSetMeasuringMode(m_HandleMaster, normalMode, 0);
 
     //Get information about the connected device
     FRONTENDINFO FrontEndInfo;
