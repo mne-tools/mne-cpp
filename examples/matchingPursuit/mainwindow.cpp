@@ -11,6 +11,7 @@
 #include <utils/mp/atom.h>
 #include <utils/mp/adaptivemp.h>
 #include <disp/plot.h>
+
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "math.h"
@@ -24,7 +25,6 @@
 #include "ui_enhancededitorwindow.h"
 #include "processdurationmessagebox.h"
 #include "ui_processdurationmessagebox.h"
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -57,6 +57,13 @@ MatrixXd _times;
 //=============================================================================================================
 // MAIN
 //=============================================================================================================
+enum TruncationCriterion
+{
+    Iterations,
+    SignalEnergie,
+    Both
+};
+
 
 qreal sollEnergie = 0;
 qreal signalEnergie = 0;
@@ -176,8 +183,6 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-
-
 void MainWindow::OpenFile()
 {
     QFileDialog* fileDia;
@@ -207,7 +212,8 @@ void MainWindow::OpenFile()
         }
     }
     update();
-
+    // TODO: Ergebnisanzeige
+    /*
     MatrixXd test(4, signalVector.rows());
 
     for(qint32 m = 0; m < 4; m++)
@@ -224,6 +230,7 @@ void MainWindow::OpenFile()
 
     ui->tbv_Results->update();
     ui->tbv_Results->resizeColumnsToContents();
+    */
 }
 
 qint32 MainWindow::ReadFiffFile(QString fileName)
@@ -551,9 +558,14 @@ void GraphWindow::PaintSignal(VectorXd signalSamples, VectorXd residuumSamples, 
 // starts MP-algorithm
 void MainWindow::on_btt_Calc_clicked()
 {
+    TruncationCriterion criterion;
     processValue = 0;
     ui->progressBarCalc->setValue(0);
     ui->progressBarCalc->setHidden(false);
+    if(ui->chb_Iterations->checkState() == Qt::Checked)
+        criterion = TruncationCriterion::Iterations;
+    if(ui->chb_Iterations->checkState() == Qt::Checked && ui->chb_ResEnergy->checkState() == Qt::Checked)
+        criterion = TruncationCriterion::Both;
 
     if(signalVector.rows() == 0)
     {
@@ -562,7 +574,7 @@ void MainWindow::on_btt_Calc_clicked()
         QMessageBox msgBox(QMessageBox::Warning, title, text, QMessageBox::Ok, this);
         msgBox.exec();
 
-        return;
+        //return;
     }
 
     if(ui->chb_Iterations->checkState()  == Qt::Unchecked && ui->chb_ResEnergy->checkState() == Qt::Unchecked)
@@ -573,8 +585,9 @@ void MainWindow::on_btt_Calc_clicked()
         msgBox.exec();
         return;
     }
-    //ui->tb_ResEnergy->text().replace(",",".");
-    if(((ui->tb_ResEnergy->text().toFloat() <= 1 && ui->tb_ResEnergy->isEnabled()) && (ui->sb_Iterations->value() >= 500 && ui->sb_Iterations->isEnabled())) || (ui->tb_ResEnergy->text().toFloat() <= 1 && ui->tb_ResEnergy->isEnabled() && !ui->sb_Iterations->isEnabled()) || (ui->sb_Iterations->value() >= 500 && ui->sb_Iterations->isEnabled() && !ui->tb_ResEnergy->isEnabled()) )
+    QString resEnergy = ui->tb_ResEnergy->text();
+    resEnergy.replace(",", ".");
+    if(((resEnergy.toFloat() <= 1 && ui->tb_ResEnergy->isEnabled()) && (ui->sb_Iterations->value() >= 500 && ui->sb_Iterations->isEnabled())) || (resEnergy.toFloat() <= 1 && ui->tb_ResEnergy->isEnabled() && !ui->sb_Iterations->isEnabled()) || (ui->sb_Iterations->value() >= 500 && ui->sb_Iterations->isEnabled() && !ui->tb_ResEnergy->isEnabled()) )
     {
         QFile configFile("Matching-Pursuit-Toolbox/Matching-Pursuit-Toolbox.config");
         bool showMsgBox = false;
@@ -642,14 +655,17 @@ void MainWindow::on_btt_Calc_clicked()
     }
     else if(ui->rb_TreebasedDictionary->isChecked())
     {
-        CalcAdaptivMP();
+        CalcAdaptivMP(ui->sb_Iterations->value(), criterion);
     }
 }
 
-void MainWindow::CalcAdaptivMP()
+void MainWindow::CalcAdaptivMP(int iterations, TruncationCriterion criterion)
 {
     QList<GaborAtom> myAtomList;
-    qint32 it = 5;//100;
+    qint32 it = 1000;
+    if(criterion == TruncationCriterion::Iterations || criterion == TruncationCriterion::Both)
+       it = iterations;
+
     qreal epsilon = 0.001;
     adaptiveMP *adaptiveMp = new adaptiveMP();
     qint32 t_iSize = 256;
@@ -673,14 +689,12 @@ void MainWindow::CalcAdaptivMP()
 
     for(qint32 i = 0; i < t_iSize; i++)
     {
-            signal(i, 0) =  10 * t1[i] +  10 * t2[i] + 15 * t5[i] + 2 * cos(qreal(i) / 5.0);// + 10 * t8[i] + 10 * t7[i]+ 8 * t6[i] + 5 * t4[i] + 20 *t3[i]+ 11 * t0[i] + 20 * t9[i];
-            //signal(i, 0) = 100* t8[i];//2 * cos(qreal(i) / 5.0);
-
+        signal(i, 0) =  10 * t1[i] +  10 * t2[i] + 15 * t5[i] + 2 * cos(qreal(i) / 5.0);// + 10 * t8[i] + 10 * t7[i]+ 8 * t6[i] + 5 * t4[i] + 20 *t3[i]+ 11 * t0[i] + 20 * t9[i];
+        //signal(i, 0) = 100* t8[i];//2 * cos(qreal(i) / 5.0);
             if(i == 149)
                 signal(i, 0) += 25;
-                //signal(i, 0) += 7 * (sin(qreal(i*i))/ 15.0);
+               //signal(i, 0) += 7 * (sin(qreal(i*i))/ 15.0);
     }
-
 
     //find  maximum of signal
     qreal maximum = 0;
