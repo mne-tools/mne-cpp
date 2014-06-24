@@ -34,11 +34,13 @@ using namespace MNELIB;
 
 namespace Ui
 {
-    class MainWindow;
+    class MainWindow;  
 }
 
+enum TruncationCriterion;
 class GraphWindow;
 class Atom;
+
 
 class MainWindow : public QMainWindow
 {
@@ -59,6 +61,7 @@ private slots:
     void on_btt_OpenSignal_clicked();
 
 private:
+
     Ui::MainWindow *ui;    
     GraphWindow *callGraphWindow;
     //AtomWindow *callAtomWindow;
@@ -69,7 +72,7 @@ private:
     //VectorXd mpCalc(QFile& dictionary, VectorXd signalSamples, qint32 iterationsCount);
     qint32 ReadFiffFile(QString fileName);
     void ReadMatlabFile(QString fileName);
-    void MainWindow::CalcAdaptivMP();
+    void CalcAdaptivMP(int iterations, TruncationCriterion criterion);
 };
 
 // Widget to paint inputsignal
