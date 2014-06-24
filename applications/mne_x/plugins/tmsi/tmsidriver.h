@@ -173,6 +173,7 @@ typedef char**          ( __stdcall * PGETDEVICELIST)   (IN HANDLE Handle, IN OU
 typedef BOOLEAN         ( __stdcall * PGETFRONTENDINFO) (IN HANDLE Handle, IN OUT FRONTENDINFO *FrontEndInfo );
 typedef BOOLEAN         ( __stdcall * PSETREFCALCULATION) (IN HANDLE Handle, IN int OnOrOff );
 typedef BOOLEAN         ( __stdcall * PSETMEASURINGMODE) (IN HANDLE Handle, IN ULONG *Mode, IN int Value );
+typedef BOOLEAN         ( __stdcall * PGETERRORCODE) (IN HANDLE Handle);
 
 
 //*************************************************************************************************************
@@ -204,6 +205,50 @@ class TMSIProducer;
     var = (type)::GetProcAddress(m_oLibHandle, name); \
     if(!var) \
         cout<< "Plugin TMSI - ERROR - Error loading method " << name << "\n"; \
+
+// Measurement modes:
+#define MEASURE_MODE_NORMAL			((ULONG)0x0)
+#define MEASURE_MODE_IMPEDANCE		((ULONG)0x1)
+#define MEASURE_MODE_CALIBRATION	((ULONG)0x2)
+
+#define MEASURE_MODE_IMPEDANCE_EX	((ULONG)0x3)
+#define MEASURE_MODE_CALIBRATION_EX	((ULONG)0x4)
+
+// for MEASURE_MODE_IMPEDANCE:
+#define IC_OHM_002	0 /*!< 2K Impedance limit */
+#define IC_OHM_005	1 /*!<  5K Impedance limit */
+#define IC_OHM_010	2 /*!<  10K Impedance limit */
+#define IC_OHM_020	3 /*!<  20K Impedance limit */
+#define IC_OHM_050	4 /*!<  50K Impedance limit */
+#define IC_OHM_100	5 /*!<  100K Impedance limit */
+#define IC_OHM_200	6 /*!<  200K Impedance limit */
+
+// for MEASURE_MODE_CALIBRATION:
+#define IC_VOLT_050 0	/*!< 50 uV t-t Calibration voltage */
+#define IC_VOLT_100 1	/*!< 100 uV t-t Calibration voltage */
+#define IC_VOLT_200 2	/*!< 200 uV t-t Calibration voltage */
+#define IC_VOLT_500 3	/*!< 500 uV t-t Calibration voltage */
+
+ // for Signat Format
+#define SF_UNSIGNED 0x0   // Unsigned integer
+#define SF_INTEGER  0x1	  // signed integer
+
+// integer overflow value for analog channels
+#define OVERFLOW_32BITS ((long) 0x80000000)
+// Get Signal info
+
+#define SIGNAL_NAME 40
+
+// Unit defines
+#define UNIT_UNKNOWN 0	// Used for digital inputs or if the driver cannot determine the units of a channel
+#define UNIT_VOLT 1		// Channel measures voltage
+#define UNIT_PERCENT 2	// Channel measures a percentage
+#define UNIT_BPM 3		// Beats per minute
+#define UNIT_BAR 4		// Pressure in bar
+#define UNIT_PSI 5		// Pressure in psi
+#define UNIT_MH20 6		// Pressure calibrated to meters water
+#define UNIT_MHG 7		// Pressure calibrated to meters mercury
+#define UNIT_BIT 8		// Used for digital inputs
 
 // Check windows
 //#if defined (TAKE_TMSISDK_DLL)
@@ -336,6 +381,7 @@ private:
     PGETFRONTENDINFO    m_oFpGetFrontEndInfo;
     PSETREFCALCULATION  m_oFpSetRefCalculation;
     PSETMEASURINGMODE   m_oFpSetMeasuringMode;
+    PGETERRORCODE       m_oFpGetErrorCode;
 };
 
 } // NAMESPACE

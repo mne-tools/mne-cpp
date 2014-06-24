@@ -94,7 +94,8 @@ SOURCES += \
         FormFiles/tmsisetupwidget.cpp \
         FormFiles/tmsiaboutwidget.cpp \
         tmsidriver.cpp \
-        FormFiles/tmsimanualannotationwidget.cpp
+        FormFiles/tmsimanualannotationwidget.cpp \
+    FormFiles/tmsiimpedancewidget.cpp
 
 HEADERS += \
         tmsi.h\
@@ -103,12 +104,14 @@ HEADERS += \
         FormFiles/tmsisetupwidget.h \
         FormFiles/tmsiaboutwidget.h \
         tmsidriver.h \
-        FormFiles/tmsimanualannotationwidget.h
+        FormFiles/tmsimanualannotationwidget.h \
+    FormFiles/tmsiimpedancewidget.h
 
 FORMS += \
         FormFiles/tmsisetup.ui \
         FormFiles/tmsiabout.ui \
-        FormFiles/tmsimanualannotation.ui
+        FormFiles/tmsimanualannotation.ui \
+    FormFiles/tmsiimpedancewidget.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

@@ -67,9 +67,9 @@
 #include <QTime>
 #include <QtConcurrent/QtConcurrent>
 
-
 #include "FormFiles/tmsisetupwidget.h"
 #include "FormFiles/tmsimanualannotationwidget.h"
+#include "FormFiles/tmsiimpedancewidget.h"
 
 
 //*************************************************************************************************************
@@ -216,6 +216,7 @@ private:
     bool                                m_bBeepTrigger;                     /**< Flag for using a trigger input.*/
     bool                                m_bUseCommonAverage;                /**< Flag for using common average.*/
     bool                                m_bUseKeyboardTrigger;              /**< Flag for using the keyboard as a trigger input.*/
+    bool                                m_bCheckImpedances;                 /**< Flag for checking the impedances of the EEG amplifier.*/
 
     int                                 m_iTriggerType;                     /**< Holds the trigger type | 0 - no trigger activated, 254 - left, 253 - right, 252 - beep.*/
 
@@ -236,6 +237,8 @@ private:
     QMutex                              m_qMutex;                           /**< Holds the threads mutex.*/
 
     QAction*                            m_pActionImpedance;                 /**< shows setup project dialog */
+
+    QSharedPointer<TmsiImpedanceWidget> m_pTmsiImpedanceWidget;             /**< Widget for checking the impedances*/
 };
 
 } // NAMESPACE
