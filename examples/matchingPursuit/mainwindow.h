@@ -69,6 +69,7 @@ private:
     //VectorXd mpCalc(QFile& dictionary, VectorXd signalSamples, qint32 iterationsCount);
     qint32 ReadFiffFile(QString fileName);
     void ReadMatlabFile(QString fileName);
+    void MainWindow::CalcAdaptivMP();
 };
 
 // Widget to paint inputsignal

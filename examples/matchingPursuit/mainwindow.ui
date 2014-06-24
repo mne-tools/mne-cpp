@@ -102,7 +102,7 @@
          <item row="1" column="4">
           <widget class="QRadioButton" name="rb_TreebasedDictionary">
            <property name="text">
-            <string>Treebased</string>
+            <string>adapitve MP</string>
            </property>
            <property name="checked">
             <bool>false</bool>

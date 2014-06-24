@@ -98,12 +98,12 @@ int main(int argc, char *argv[])
 
 
     //qint32 readFiffFile = ReadFiffFile();
-
+/*
     QList<GaborAtom> myAtomList;
-    qint32 it = 100;
-    qreal epsilon = 0.01;
+    qint32 it = 5;//100;
+    qreal epsilon = 0.001;
     adaptiveMP *adaptiveMp = new adaptiveMP();
-    qint32 t_iSize = 512;
+    qint32 t_iSize = 256;
     MatrixXd signal (t_iSize, 1);
     MatrixXd residuum = signal;
 
@@ -123,11 +123,11 @@ int main(int argc, char *argv[])
 
     for(qint32 i = 0; i < t_iSize; i++)
     {
-        signal(i, 0) =  10 * t1[i] +  10 * t2[i] + 15 * t5[i] + 2 * cos(qreal(i) / 5.0) + 10 * t8[i] + 10 * t7[i]+ 8 * t6[i] + 5 * t4[i] + 20 *t3[i]+ 11 * t0[i] + 20 * t9[i];
+        signal(i, 0) =  10 * t1[i] +  10 * t2[i] + 15 * t5[i] + 2 * cos(qreal(i) / 5.0);// + 10 * t8[i] + 10 * t7[i]+ 8 * t6[i] + 5 * t4[i] + 20 *t3[i]+ 11 * t0[i] + 20 * t9[i];
         //signal(i, 0) = 100* t8[i];//2 * cos(qreal(i) / 5.0);
 
         if(i == 149) signal(i, 0) += 25;
-        signal(i, 0) += 7 * (sin(qreal(i*i))/ 15.0);
+        //signal(i, 0) += 7 * (sin(qreal(i*i))/ 15.0);
     }
     //find  maximum of signal
     qreal maximum = 0;
@@ -246,9 +246,9 @@ int main(int argc, char *argv[])
     Plot *rPlot = new Plot(plotResiduum);
     rPlot->setTitle("Residuum");
     rPlot->show();
-
-    //mainWindow = new MainWindow();
-    //mainWindow->show();
+*/
+    mainWindow = new MainWindow();
+    mainWindow->show();
 
     return a.exec();
 }
