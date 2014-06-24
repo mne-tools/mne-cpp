@@ -85,8 +85,6 @@ SOURCES += \
     FormFiles/babymegaboutwidget.cpp \
     FormFiles/babymegsquidcontroldgl.cpp \
     FormFiles/globalobj.cpp \
-    FormFiles/glwidget.cpp \
-    FormFiles/glwidget_OnDisp.cpp \
     FormFiles/babymegprojectdialog.cpp \
     FormFiles/plotter.cpp
 
@@ -99,8 +97,6 @@ HEADERS += \
     FormFiles/babymegaboutwidget.h \
     FormFiles/babymegsquidcontroldgl.h \
     FormFiles/globalobj.h \
-    FormFiles/glwidget.h \
-    FormFiles/glwidget_OnDisp.h \
     FormFiles/babymegprojectdialog.h \
     FormFiles/plotter.h \
 
