@@ -103,8 +103,10 @@ public:
 
     void setMEGInfo(FiffInfo::SPtr fiffinfo);
     void setSSSParameter(QList<int>);
-    qint32 getNumMEGCh();
-//    void setMEGsignal(MatrixXd megfrombuffer);
+    qint32 getNumMEGChan();
+    qint32 getNumMEGChanUsed();
+    qint32 getNumMEGBadChan();
+    VectorXi getBadChan();
 
 private:
     void getCoilInfoVectorView();
@@ -116,7 +118,8 @@ private:
     void getSphereToCartesianVector();
     int strmatch(char, char);
 
-    qint32 NumCoil;
+    qint32 NumMEGChan, NumCoil, NumBadCoil;
+    VectorXi BadChan;
     QList<MatrixXd> CoilT;
     QList<QString> CoilName, CoilTk;
     QList<MatrixXd> CoilRk, CoilWk;

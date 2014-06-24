@@ -73,9 +73,6 @@ RtSss::RtSss()
 : m_bIsRunning(false)
 , m_bReceiveData(false)
 , m_bProcessData(false)
-//, m_pRTSAInput(NULL)
-//, m_pRTSAOutput(NULL)
-//, m_pRtSssBuffer(new dBuffer(1024))
 {
 }
 
@@ -251,7 +248,7 @@ void RtSss::run()
 {
 
     RtSssAlgo rsss;
-    QList<MatrixXd> lineqn, sssRR;
+    QList<MatrixXd> lineqn, sssOut;
 
     m_bIsRunning = true;
 
@@ -264,27 +261,26 @@ void RtSss::run()
     while(!m_pFiffInfo)
         msleep(10);// Wait for fiff Info
 
-    // Set MEG channel infomation
-    rsss.setMEGInfo(m_pFiffInfo);
-
     // Initialize output
-    //
     m_pRTMSAOutput->data()->initFromFiffInfo(m_pFiffInfo);
     m_pRTMSAOutput->data()->setMultiArraySize(100);
-//    m_pRTMSAOutput->data()->setSamplingRate(m_pFiffInfo->sfreq);
+    // m_pRTMSAOutput->data()->setSamplingRate(m_pFiffInfo->sfreq);
     m_pRTMSAOutput->data()->setVisibility(true);
 
+    // Set MEG channel infomation to rtSSS
+    rsss.setMEGInfo(m_pFiffInfo);
+
+    // Get channel information
+    qint32 nmegchan = rsss.getNumMEGChan();
+    qint32 nmegchanused = rsss.getNumMEGChanUsed();
+    qDebug() << "number of meg channels(run): " << nmegchan;
+    VectorXi badch = rsss.getBadChan();
+
     // Load and set the number of spherical harmonics expansion
-    //
     qDebug() << "LinRR (run): " << LinRR << ", LoutRR (run): " << LoutRR <<", Lin (run): " << Lin <<", Lout (run): " << Lout;
     QList<int> expOrder;
     expOrder << LinRR << LoutRR << Lin << Lout;
     rsss.setSSSParameter(expOrder);
-
-    // Find the number of MEG channel
-    //
-    qint32 nmegchan = rsss.getNumMEGCh();
-//    qDebug() << "number of meg channels: " << nmegchan;
 
     // Find a starting MEG channel index fiff
     // When the MEG recording of the first channel is saved starting from the first row in the signal matrix, the startID_MEGch will be 0.
@@ -301,44 +297,62 @@ void RtSss::run()
 //    qDebug() << "strat id: " << startID_MEGch;
 
     //  Build linear equation
-    //
     qDebug() << "building SSS linear equation .....";
     lineqn = rsss.buildLinearEqn();
-    qDebug() << "..finished (run)!";
+
+    qDebug() << "..finished !!";
 
     // start processing data
     m_bProcessData = true;
-    qint32 HEADMOV_COR_cnt = 1 ;
+    qint32 HEADMOV_COR_cnt = 2 ;
 
     qDebug() << "rtSSS started.....";
     while(m_bIsRunning)
     {
         // When new head movement correction presented, lineqn must be rebuilt for rtSSS
-        if (HEADMOV_COR_cnt == 1)
+        if (HEADMOV_COR_cnt == 2)
         {
-            qDebug() << "rebuilt SSS linear equation .....";
             lineqn = rsss.buildLinearEqn();
+            qDebug() << "rebuilt SSS linear equation .....";
             HEADMOV_COR_cnt = 0;
         }
         else HEADMOV_COR_cnt++;
 
         qint32 nrows = m_pRtSssBuffer->rows();
         qDebug() << "rtsss";
-
         if(nrows > 0) // check if init
         {
             // * Dispatch the inputs * //
             MatrixXd in_mat = m_pRtSssBuffer->pop();
 //            qDebug() << "size of in_mat (run): " << in_mat.rows() << " x " << in_mat.cols();
 
-            sssRR = rsss.getSSSRR(lineqn[0], lineqn[1], lineqn[2], lineqn[3], lineqn[4]*in_mat.block(startID_MEGch,0,nmegchan,in_mat.cols()));
+            //  Remove bad channel signals
+            MatrixXd in_mat_used(nmegchanused, in_mat.cols());
+//            qDebug() << "size of in_mat_used (run): " << in_mat_used.rows() << " x " << in_mat_used.cols();
+            for(qint32 i = 0, k = 0; i < nmegchan; ++i)
+                if (badch(i) == 0)
+                {
+                    in_mat_used.row(k) = in_mat.row(i);
+                    k++;
+                }
+
+            sssOut = rsss.getSSSRR(lineqn[0], lineqn[1], lineqn[2], lineqn[3], lineqn[4]*in_mat_used);
+//            sssOut = rsss.getSSSOLS(lineqn[0], lineqn[1], lineqn[3], lineqn[4]*in_mat_used);
+//            sssRR = rsss.getSSSRR(lineqn[0], lineqn[1], lineqn[2], lineqn[3], lineqn[4]*in_mat_used.block(startID_MEGch,0,nmegchanused,in_mat_used.cols()));
+//            sssRR = rsss.getSSSRR(lineqn[0], lineqn[1], lineqn[2], lineqn[3], lineqn[4]*in_mat.block(startID_MEGch,0,nmegchan,in_mat.cols()));
 //            qDebug() <<  "size of sssRR[0] (run): " << sssRR[0].rows() << " x " << sssRR[0].cols();
 
+            // Replace raw signal by SSS signal
+            for(qint32 i = 0, k = 0; i < nmegchan; ++i)
+                if (badch(i) == 0)
+                {
+                    in_mat.row(i) = sssOut[0].row(k);
+                    k++;
+                }
+
+            // Display signal after SSS
             for(qint32 i = 0; i <in_mat.cols(); ++i)
-            {
-                in_mat.block(0,i,nmegchan,1) = sssRR[0].col(i);
                 m_pRTMSAOutput->data()->setValue(in_mat.col(i));
-            }
         }
     }
 
