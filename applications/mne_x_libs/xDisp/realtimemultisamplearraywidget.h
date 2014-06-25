@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     newrealtimemultisamplearray_new_widget.h
+* @file     realtimemultisamplearraywidget.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of the RealTimeMultiSampleArrayNewWidget Class.
+* @brief    Declaration of the RealTimeMultiSampleArrayWidget Class.
 *
 */
 
-#ifndef REALTIMEMULTISAMPLEARRAYNEWWIDGET_H
-#define REALTIMEMULTISAMPLEARRAYNEWWIDGET_H
+#ifndef REALTIMEMULTISAMPLEARRAYWIDGET_H
+#define REALTIMEMULTISAMPLEARRAYWIDGET_H
 
 
 //*************************************************************************************************************
@@ -47,6 +47,8 @@
 #include "helpers/realtimemultisamplearraymodel.h"
 #include "helpers/realtimemultisamplearraydelegate.h"
 
+#include "helpers/sensorwidget.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -57,6 +59,8 @@
 #include <QList>
 #include <QTableView>
 #include <QAction>
+#include <QSpinBox>
+#include <QDoubleSpinBox>
 
 
 //*************************************************************************************************************
@@ -84,8 +88,6 @@ namespace XDISPLIB
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
-
-class RoiSelectionWidget;
 
 
 //*************************************************************************************************************
@@ -154,10 +156,15 @@ public:
     virtual void init();
 
 public slots:
+    //=========================================================================================================
+    /**
+    * Show channel context menu
+    *
+    * @param [in] pos   Position to popup the conext menu.
+    */
     void channelContextMenu(QPoint pos);
 
 protected:
-
     //=========================================================================================================
     /**
     * Is called when RealTimeSampleArrayWidget is resized.
@@ -221,27 +228,61 @@ protected:
     virtual void wheelEvent(QWheelEvent* wheelEvent);
 
 private:
-    RealTimeMultiSampleArrayModel*      m_pRTMSAModel;
-    RealTimeMultiSampleArrayDelegate*   m_pRTMSADelegate;
+    //=========================================================================================================
+    /**
+    * Sets new zoom factor
+    *
+    * @param [in] zoomFac  time window size;
+    */
+    void zoomChanged(double zoomFac);
+
+    //=========================================================================================================
+    /**
+    * Sets new time window size
+    *
+    * @param [in] T  time window size;
+    */
+    void timeWindowChanged(int T);
+
+    //=========================================================================================================
+    /**
+    * Shows sensor selection widget
+    */
+    void showSensorSelectionWidget();
+
+    RealTimeMultiSampleArrayModel*      m_pRTMSAModel;      /**< RTMSA data model */
+    RealTimeMultiSampleArrayDelegate*   m_pRTMSADelegate;   /**< RTMSA data delegate */
     QTableView* m_pTableView;                               /**< the QTableView being part of the model/view framework of Qt */
 
-    QSharedPointer<NewRealTimeMultiSampleArray> m_pRTMSA;       /**< The real-time sample array measurement. */
+    float m_fDefaultSectionSize;                            /**< Default row height */
+    float m_fZoomFactor;                                    /**< Zoom factor */
+    QDoubleSpinBox* m_pDoubleSpinBoxZoom;                   /**< Adjust Zoom Factor */
 
-    bool m_bInitialized;
+
+    QSharedPointer<NewRealTimeMultiSampleArray> m_pRTMSA;   /**< The real-time sample array measurement. */
+
+    bool m_bInitialized;                                    /**< Is Initialized */
 
     QList<RealTimeSampleArrayChInfo> m_qListChInfo;         /**< Channel info list. ToDo: check if this is obsolete later on*/
 
-    float m_fSamplingRate;  /**< Sampling Rate */
+    qint32 m_iT;                                            /**< Display window size in seconds */
+    float m_fSamplingRate;                                  /**< Sampling rate */
+    float m_fDesiredSamplingRate;                           /**< Desired display sampling rate */
+
+    QSpinBox*   m_pSpinBoxTimeScale;                        /**< Time scale spin box */
+
+    QAction*    m_pActionSelectSensors;                     /**< show roi select widget */
 
 
-    QAction*    m_pActionSelectRoi;                         /**< show roi select widget ToDo move this to the actual view-> and make a dynamical menu*/
-    void showRoiSelectionWidget();                          /**< Implements the show roi selection widget. ToDo: Move this to the actual widget*/
-    QSharedPointer<XDISPLIB::RoiSelectionWidget> m_pRoiSelectionWidget;    /**< ROI selection widget, ToDo: move this to the xDisp */
+    SensorModel* m_pSensorModel;                            /**< Sensor model for channel selection */
+    QSharedPointer<SensorWidget> m_pSensorSelectionWidget;  /**< Sensor selection widget. */
 
-    QVector<qint32> m_qVecCurrentSelection;
-    void applySelection();
+
+    QList<qint32> m_qListCurrentSelection;  /**< Current selection list -> hack around C++11 lambda  */
+    void applySelection();                  /**< apply the in m_qListCurrentSelection stored selection -> hack around C++11 lambda */
+    void resetSelection();                  /**< reset the in m_qListCurrentSelection stored selection -> hack around C++11 lambda */
 };
 
 } // NAMESPACE
 
-#endif // REALTIMEMULTISAMPLEARRAYNEWWIDGET_H
+#endif // REALTIMEMULTISAMPLEARRAYWIDGET_H

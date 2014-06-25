@@ -99,6 +99,9 @@
  * \li Tim Kunze tim.kunze@tu-ilmenau.de 2014
  * \li Luise Lang luise.lang@tu-ilmenau.de 2014
  * \li Felix Arndt felix.arndt@tu-ilmenau.de 2014
+ * \li Daniel Knobl daniel.knobl@tu-ilmenau.de 2014
+ * \li Seok Lew slew@nmr.mgh.harvard.edu 2014
+ * \li Chiran Doshi chiran.doshi@childrens.harvard.edu 2014
  *
  */
 

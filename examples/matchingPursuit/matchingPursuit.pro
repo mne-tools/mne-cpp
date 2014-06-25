@@ -39,10 +39,14 @@ TEMPLATE = app
 
 VERSION = $${MNE_CPP_VERSION}
 
-QT -= gui
+QT += gui
+QT += widgets
+QT += network core widgets concurrent
 
 CONFIG   += console
 CONFIG   -= app_bundle
+
+
 
 TARGET = matchingPursuit
 
@@ -56,24 +60,50 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Utilsd \
             -lMNE$${MNE_LIB_VERSION}Fsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
-            -lMNE$${MNE_LIB_VERSION}Mned
+            -lMNE$${MNE_LIB_VERSION}Mned \
+            -lMNE$${MNE_LIB_VERSION}Dispd
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
             -lMNE$${MNE_LIB_VERSION}Utils \
             -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \
-            -lMNE$${MNE_LIB_VERSION}Mne
+            -lMNE$${MNE_LIB_VERSION}Mne \
+            -lMNE$${MNE_LIB_VERSION}Disp
 }
 
 DESTDIR =  $${MNE_BINARY_DIR}
 
 SOURCES += \
         main.cpp \
+    editorwindow.cpp \
+    enhancededitorwindow.cpp \
+    formulaeditor.cpp \
+    deletemessagebox.cpp \
+    mainwindow.cpp \
+    processdurationmessagebox.cpp
 
 HEADERS += \
+    editorwindow.h \
+    enhancededitorwindow.h \
+    formulaeditor.h \
+    deletemessagebox.h \
+    mainwindow.h \
+    processdurationmessagebox.h
+
+FORMS += \
+    editorwindow.ui \
+    enhancededitorwindow.ui \
+    formulaeditor.ui \
+    deletemessagebox.ui \
+    mainwindow.ui \
+    processdurationmessagebox.ui
+
+RESOURCES += \
+    Ressourcen.qrc
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 
 unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
+

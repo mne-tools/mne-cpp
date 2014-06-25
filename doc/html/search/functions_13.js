@@ -21,6 +21,7 @@ var searchData=
   ['tofiffid',['toFiffID',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a227960340883c81cbc0614dca1a17dd6',1,'FIFFLIB::FiffTag']]],
   ['tofloat',['toFloat',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#aa36b1845c6f83d65fb73f60205c02849',1,'FIFFLIB::FiffTag']]],
   ['tofloatmatrix',['toFloatMatrix',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a0737ad664a5a324795492a5b388e4a90',1,'FIFFLIB::FiffTag']]],
+  ['togglefreeze',['toggleFreeze',['../class_real_time_multi_sample_array_model.html#acb1bd2085c09022df817270659ca341a',1,'RealTimeMultiSampleArrayModel']]],
   ['toint',['toInt',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#a88f8094d1f3b876708bd3d5779a30a49',1,'FIFFLIB::FiffTag']]],
   ['tointmatrix',['toIntMatrix',['../class_f_i_f_f_l_i_b_1_1_fiff_tag.html#ae6e352d3ff566884190c7ce52896f94d',1,'FIFFLIB::FiffTag']]],
   ['tojsonobject',['toJsonObject',['../class_r_t_c_o_m_m_a_n_d_l_i_b_1_1_command.html#a5ec7afa7dd94358a01ee72329a190486',1,'RTCOMMANDLIB::Command']]],

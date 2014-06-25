@@ -241,6 +241,9 @@ private:
     QTimer m_cmdConnectionTimer;                            /**< Timer for convinient command client connection. When timer times out a connection is tried to be established. */
 
     QSharedPointer<RawMatrixBuffer> m_pRawMatrixBuffer_In;  /**< Holds incoming raw data. */
+
+    bool                            m_bIsRunning;           /**< Whether FiffSimulator is running.*/
+
 };
 
 } // NAMESPACE

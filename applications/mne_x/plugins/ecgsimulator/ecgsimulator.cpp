@@ -112,6 +112,7 @@ QSharedPointer<IPlugin> ECGSimulator::clone() const
 //=============================================================================================================
 // Create measurement instances and config them
 //=============================================================================================================
+
 void ECGSimulator::init()
 {
     if(m_pECGChannel_ECG_I->isEnabled())

@@ -170,230 +170,231 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160;<span class="comment">//=============================================================================================================</span></div>
 <div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;<span class="comment">// Create measurement instances and config them</span></div>
 <div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;<span class="comment">//=============================================================================================================</span></div>
-<div class="line"><a name="l00115"></a><span class="lineno"><a class="line" href="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator.html#a7ac8de7f4bc84b842461cc2e3bcd1b28">  115</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator.html#a7ac8de7f4bc84b842461cc2e3bcd1b28">ECGSimulator::init</a>()</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;{</div>
-<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;    <span class="keywordflow">if</span>(m_pECGChannel_ECG_I-&gt;isEnabled())</div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    {</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;        m_pRTSA_ECG_I_new = <a class="code" href="class_m_n_e_x_1_1_plugin_output_data.html#a52a436ad77f0236e54e737665bf038f6">PluginOutputData&lt;NewRealTimeSampleArray&gt;::create</a>(<span class="keyword">this</span>, <span class="stringliteral">&quot;ECG I&quot;</span>, <span class="stringliteral">&quot;ECG I output data&quot;</span>);</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;        <a class="code" href="class_m_n_e_x_1_1_i_plugin.html#a9ab1fe463c2984418c495fafe96d6f84">m_outputConnectors</a>.append(m_pRTSA_ECG_I_new);</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;    }</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;    <span class="keywordflow">if</span>(m_pECGChannel_ECG_II-&gt;isEnabled())</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    {</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;        m_pRTSA_ECG_II_new = <a class="code" href="class_m_n_e_x_1_1_plugin_output_data.html#a52a436ad77f0236e54e737665bf038f6">PluginOutputData&lt;NewRealTimeSampleArray&gt;::create</a>(<span class="keyword">this</span>, <span class="stringliteral">&quot;ECG II&quot;</span>, <span class="stringliteral">&quot;ECG II output data&quot;</span>);</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;        <a class="code" href="class_m_n_e_x_1_1_i_plugin.html#a9ab1fe463c2984418c495fafe96d6f84">m_outputConnectors</a>.append(m_pRTSA_ECG_II_new);</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;    }</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;    <span class="keywordflow">if</span>(m_pECGChannel_ECG_III-&gt;isEnabled())</div>
-<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    {</div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;        m_pRTSA_ECG_III_new = <a class="code" href="class_m_n_e_x_1_1_plugin_output_data.html#a52a436ad77f0236e54e737665bf038f6">PluginOutputData&lt;NewRealTimeSampleArray&gt;::create</a>(<span class="keyword">this</span>, <span class="stringliteral">&quot;ECG III&quot;</span>, <span class="stringliteral">&quot;ECG III output data&quot;</span>);</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;        <a class="code" href="class_m_n_e_x_1_1_i_plugin.html#a9ab1fe463c2984418c495fafe96d6f84">m_outputConnectors</a>.append(m_pRTSA_ECG_III_new);</div>
-<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;    }</div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;}</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;</div>
+<div class="line"><a name="l00116"></a><span class="lineno"><a class="line" href="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator.html#a7ac8de7f4bc84b842461cc2e3bcd1b28">  116</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator.html#a7ac8de7f4bc84b842461cc2e3bcd1b28">ECGSimulator::init</a>()</div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;{</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;    <span class="keywordflow">if</span>(m_pECGChannel_ECG_I-&gt;isEnabled())</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;    {</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;        m_pRTSA_ECG_I_new = <a class="code" href="class_m_n_e_x_1_1_plugin_output_data.html#a52a436ad77f0236e54e737665bf038f6">PluginOutputData&lt;NewRealTimeSampleArray&gt;::create</a>(<span class="keyword">this</span>, <span class="stringliteral">&quot;ECG I&quot;</span>, <span class="stringliteral">&quot;ECG I output data&quot;</span>);</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;        <a class="code" href="class_m_n_e_x_1_1_i_plugin.html#a9ab1fe463c2984418c495fafe96d6f84">m_outputConnectors</a>.append(m_pRTSA_ECG_I_new);</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;    }</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;    <span class="keywordflow">if</span>(m_pECGChannel_ECG_II-&gt;isEnabled())</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;    {</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;        m_pRTSA_ECG_II_new = <a class="code" href="class_m_n_e_x_1_1_plugin_output_data.html#a52a436ad77f0236e54e737665bf038f6">PluginOutputData&lt;NewRealTimeSampleArray&gt;::create</a>(<span class="keyword">this</span>, <span class="stringliteral">&quot;ECG II&quot;</span>, <span class="stringliteral">&quot;ECG II output data&quot;</span>);</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;        <a class="code" href="class_m_n_e_x_1_1_i_plugin.html#a9ab1fe463c2984418c495fafe96d6f84">m_outputConnectors</a>.append(m_pRTSA_ECG_II_new);</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;    }</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;</div>
+<div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160;    <span class="keywordflow">if</span>(m_pECGChannel_ECG_III-&gt;isEnabled())</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;    {</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;        m_pRTSA_ECG_III_new = <a class="code" href="class_m_n_e_x_1_1_plugin_output_data.html#a52a436ad77f0236e54e737665bf038f6">PluginOutputData&lt;NewRealTimeSampleArray&gt;::create</a>(<span class="keyword">this</span>, <span class="stringliteral">&quot;ECG III&quot;</span>, <span class="stringliteral">&quot;ECG III output data&quot;</span>);</div>
+<div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;        <a class="code" href="class_m_n_e_x_1_1_i_plugin.html#a9ab1fe463c2984418c495fafe96d6f84">m_outputConnectors</a>.append(m_pRTSA_ECG_III_new);</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;    }</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;}</div>
 <div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;</div>
-<div class="line"><a name="l00139"></a><span class="lineno"><a class="line" href="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator.html#abaede1dc82d9c23562d0f770db8e6f4b">  139</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator.html#abaede1dc82d9c23562d0f770db8e6f4b">ECGSimulator::initChannels</a>()</div>
-<div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;{</div>
-<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;    m_pECGChannel_ECG_I-&gt;initChannel();</div>
-<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;    m_pECGChannel_ECG_II-&gt;initChannel();</div>
-<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;    m_pECGChannel_ECG_III-&gt;initChannel();</div>
-<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;</div>
-<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;    <span class="keywordflow">if</span>(m_pECGChannel_ECG_I-&gt;isEnabled())</div>
-<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;    {</div>
-<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;        <span class="keywordtype">double</span> diff = m_pECGChannel_ECG_I-&gt;getMaximum() - m_pECGChannel_ECG_I-&gt;getMinimum();</div>
-<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;</div>
-<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;        m_pRTSA_ECG_I_new-&gt;data()-&gt;setName(<span class="stringliteral">&quot;ECG I&quot;</span>);</div>
-<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;        m_pRTSA_ECG_I_new-&gt;data()-&gt;setUnit(<span class="stringliteral">&quot;mV&quot;</span>);</div>
-<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;</div>
-<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;        m_pRTSA_ECG_I_new-&gt;data()-&gt;setMinValue(m_pECGChannel_ECG_I-&gt;getMinimum()-diff/10);</div>
-<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;        m_pRTSA_ECG_I_new-&gt;data()-&gt;setMaxValue(m_pECGChannel_ECG_I-&gt;getMaximum()+diff/10);</div>
-<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;        m_pRTSA_ECG_I_new-&gt;data()-&gt;setArraySize(10);</div>
-<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;        m_pRTSA_ECG_I_new-&gt;data()-&gt;setSamplingRate(m_fSamplingRate/m_iDownsamplingFactor);</div>
-<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;        m_pRTSA_ECG_I_new-&gt;data()-&gt;setVisibility(m_pECGChannel_ECG_I-&gt;isVisible());</div>
-<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;    }</div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;</div>
-<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;    <span class="keywordflow">if</span>(m_pECGChannel_ECG_II-&gt;isEnabled())</div>
-<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;    {</div>
-<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;        <span class="keywordtype">double</span> diff = m_pECGChannel_ECG_II-&gt;getMaximum() - m_pECGChannel_ECG_II-&gt;getMinimum();</div>
-<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;</div>
-<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;        m_pRTSA_ECG_II_new-&gt;data()-&gt;setName(<span class="stringliteral">&quot;ECG II&quot;</span>);</div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;        m_pRTSA_ECG_II_new-&gt;data()-&gt;setUnit(<span class="stringliteral">&quot;mV&quot;</span>);</div>
-<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;</div>
-<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;        m_pRTSA_ECG_II_new-&gt;data()-&gt;setMinValue(m_pECGChannel_ECG_II-&gt;getMinimum()-diff/10);</div>
-<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;        m_pRTSA_ECG_II_new-&gt;data()-&gt;setMaxValue(m_pECGChannel_ECG_II-&gt;getMaximum()+diff/10);</div>
-<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;        m_pRTSA_ECG_II_new-&gt;data()-&gt;setArraySize(10);</div>
-<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;        m_pRTSA_ECG_II_new-&gt;data()-&gt;setSamplingRate(m_fSamplingRate/m_iDownsamplingFactor);</div>
-<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;        m_pRTSA_ECG_II_new-&gt;data()-&gt;setVisibility(m_pECGChannel_ECG_II-&gt;isVisible());</div>
-<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;    }</div>
-<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;</div>
-<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;    <span class="keywordflow">if</span>(m_pECGChannel_ECG_III-&gt;isEnabled())</div>
-<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;    {</div>
-<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;        <span class="keywordtype">double</span> diff = m_pECGChannel_ECG_III-&gt;getMaximum() - m_pECGChannel_ECG_III-&gt;getMinimum();</div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;</div>
-<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;        m_pRTSA_ECG_III_new-&gt;data()-&gt;setName(<span class="stringliteral">&quot;ECG III&quot;</span>);</div>
-<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;        m_pRTSA_ECG_III_new-&gt;data()-&gt;setUnit(<span class="stringliteral">&quot;mV&quot;</span>);</div>
-<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;</div>
-<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;        m_pRTSA_ECG_III_new-&gt;data()-&gt;setMinValue(m_pECGChannel_ECG_III-&gt;getMinimum()-diff/10);</div>
-<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;        m_pRTSA_ECG_III_new-&gt;data()-&gt;setMaxValue(m_pECGChannel_ECG_III-&gt;getMaximum()+diff/10);</div>
-<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;        m_pRTSA_ECG_III_new-&gt;data()-&gt;setArraySize(10);</div>
-<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;        m_pRTSA_ECG_III_new-&gt;data()-&gt;setSamplingRate(m_fSamplingRate/m_iDownsamplingFactor);</div>
-<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;        m_pRTSA_ECG_III_new-&gt;data()-&gt;setVisibility(m_pECGChannel_ECG_III-&gt;isVisible());</div>
-<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;    }</div>
-<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;}</div>
-<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;</div>
+<div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;</div>
+<div class="line"><a name="l00140"></a><span class="lineno"><a class="line" href="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator.html#abaede1dc82d9c23562d0f770db8e6f4b">  140</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator.html#abaede1dc82d9c23562d0f770db8e6f4b">ECGSimulator::initChannels</a>()</div>
+<div class="line"><a name="l00141"></a><span class="lineno">  141</span>&#160;{</div>
+<div class="line"><a name="l00142"></a><span class="lineno">  142</span>&#160;    m_pECGChannel_ECG_I-&gt;initChannel();</div>
+<div class="line"><a name="l00143"></a><span class="lineno">  143</span>&#160;    m_pECGChannel_ECG_II-&gt;initChannel();</div>
+<div class="line"><a name="l00144"></a><span class="lineno">  144</span>&#160;    m_pECGChannel_ECG_III-&gt;initChannel();</div>
+<div class="line"><a name="l00145"></a><span class="lineno">  145</span>&#160;</div>
+<div class="line"><a name="l00146"></a><span class="lineno">  146</span>&#160;    <span class="keywordflow">if</span>(m_pECGChannel_ECG_I-&gt;isEnabled())</div>
+<div class="line"><a name="l00147"></a><span class="lineno">  147</span>&#160;    {</div>
+<div class="line"><a name="l00148"></a><span class="lineno">  148</span>&#160;        <span class="keywordtype">double</span> diff = m_pECGChannel_ECG_I-&gt;getMaximum() - m_pECGChannel_ECG_I-&gt;getMinimum();</div>
+<div class="line"><a name="l00149"></a><span class="lineno">  149</span>&#160;</div>
+<div class="line"><a name="l00150"></a><span class="lineno">  150</span>&#160;        m_pRTSA_ECG_I_new-&gt;data()-&gt;setName(<span class="stringliteral">&quot;ECG I&quot;</span>);</div>
+<div class="line"><a name="l00151"></a><span class="lineno">  151</span>&#160;        m_pRTSA_ECG_I_new-&gt;data()-&gt;setUnit(<span class="stringliteral">&quot;mV&quot;</span>);</div>
+<div class="line"><a name="l00152"></a><span class="lineno">  152</span>&#160;</div>
+<div class="line"><a name="l00153"></a><span class="lineno">  153</span>&#160;        m_pRTSA_ECG_I_new-&gt;data()-&gt;setMinValue(m_pECGChannel_ECG_I-&gt;getMinimum()-diff/10);</div>
+<div class="line"><a name="l00154"></a><span class="lineno">  154</span>&#160;        m_pRTSA_ECG_I_new-&gt;data()-&gt;setMaxValue(m_pECGChannel_ECG_I-&gt;getMaximum()+diff/10);</div>
+<div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;        m_pRTSA_ECG_I_new-&gt;data()-&gt;setArraySize(10);</div>
+<div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;        m_pRTSA_ECG_I_new-&gt;data()-&gt;setSamplingRate(m_fSamplingRate/m_iDownsamplingFactor);</div>
+<div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;        m_pRTSA_ECG_I_new-&gt;data()-&gt;setVisibility(m_pECGChannel_ECG_I-&gt;isVisible());</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;    }</div>
+<div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;</div>
+<div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;    <span class="keywordflow">if</span>(m_pECGChannel_ECG_II-&gt;isEnabled())</div>
+<div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;    {</div>
+<div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;        <span class="keywordtype">double</span> diff = m_pECGChannel_ECG_II-&gt;getMaximum() - m_pECGChannel_ECG_II-&gt;getMinimum();</div>
+<div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;        m_pRTSA_ECG_II_new-&gt;data()-&gt;setName(<span class="stringliteral">&quot;ECG II&quot;</span>);</div>
+<div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;        m_pRTSA_ECG_II_new-&gt;data()-&gt;setUnit(<span class="stringliteral">&quot;mV&quot;</span>);</div>
+<div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;</div>
+<div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;        m_pRTSA_ECG_II_new-&gt;data()-&gt;setMinValue(m_pECGChannel_ECG_II-&gt;getMinimum()-diff/10);</div>
+<div class="line"><a name="l00168"></a><span class="lineno">  168</span>&#160;        m_pRTSA_ECG_II_new-&gt;data()-&gt;setMaxValue(m_pECGChannel_ECG_II-&gt;getMaximum()+diff/10);</div>
+<div class="line"><a name="l00169"></a><span class="lineno">  169</span>&#160;        m_pRTSA_ECG_II_new-&gt;data()-&gt;setArraySize(10);</div>
+<div class="line"><a name="l00170"></a><span class="lineno">  170</span>&#160;        m_pRTSA_ECG_II_new-&gt;data()-&gt;setSamplingRate(m_fSamplingRate/m_iDownsamplingFactor);</div>
+<div class="line"><a name="l00171"></a><span class="lineno">  171</span>&#160;        m_pRTSA_ECG_II_new-&gt;data()-&gt;setVisibility(m_pECGChannel_ECG_II-&gt;isVisible());</div>
+<div class="line"><a name="l00172"></a><span class="lineno">  172</span>&#160;    }</div>
+<div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;</div>
+<div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;    <span class="keywordflow">if</span>(m_pECGChannel_ECG_III-&gt;isEnabled())</div>
+<div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;    {</div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;        <span class="keywordtype">double</span> diff = m_pECGChannel_ECG_III-&gt;getMaximum() - m_pECGChannel_ECG_III-&gt;getMinimum();</div>
+<div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;</div>
+<div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;        m_pRTSA_ECG_III_new-&gt;data()-&gt;setName(<span class="stringliteral">&quot;ECG III&quot;</span>);</div>
+<div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;        m_pRTSA_ECG_III_new-&gt;data()-&gt;setUnit(<span class="stringliteral">&quot;mV&quot;</span>);</div>
+<div class="line"><a name="l00180"></a><span class="lineno">  180</span>&#160;</div>
+<div class="line"><a name="l00181"></a><span class="lineno">  181</span>&#160;        m_pRTSA_ECG_III_new-&gt;data()-&gt;setMinValue(m_pECGChannel_ECG_III-&gt;getMinimum()-diff/10);</div>
+<div class="line"><a name="l00182"></a><span class="lineno">  182</span>&#160;        m_pRTSA_ECG_III_new-&gt;data()-&gt;setMaxValue(m_pECGChannel_ECG_III-&gt;getMaximum()+diff/10);</div>
+<div class="line"><a name="l00183"></a><span class="lineno">  183</span>&#160;        m_pRTSA_ECG_III_new-&gt;data()-&gt;setArraySize(10);</div>
+<div class="line"><a name="l00184"></a><span class="lineno">  184</span>&#160;        m_pRTSA_ECG_III_new-&gt;data()-&gt;setSamplingRate(m_fSamplingRate/m_iDownsamplingFactor);</div>
+<div class="line"><a name="l00185"></a><span class="lineno">  185</span>&#160;        m_pRTSA_ECG_III_new-&gt;data()-&gt;setVisibility(m_pECGChannel_ECG_III-&gt;isVisible());</div>
+<div class="line"><a name="l00186"></a><span class="lineno">  186</span>&#160;    }</div>
+<div class="line"><a name="l00187"></a><span class="lineno">  187</span>&#160;}</div>
 <div class="line"><a name="l00188"></a><span class="lineno">  188</span>&#160;</div>
-<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;</div>
-<div class="line"><a name="l00191"></a><span class="lineno"><a class="line" href="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator.html#ae4429c8ba6120b11064b5cc11a681ea8">  191</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator.html#ae4429c8ba6120b11064b5cc11a681ea8">ECGSimulator::start</a>()</div>
-<div class="line"><a name="l00192"></a><span class="lineno">  192</span>&#160;{</div>
-<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;    <span class="comment">//Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.</span></div>
-<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;    <span class="keywordflow">if</span>(this-&gt;isRunning())</div>
-<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;        QThread::wait();</div>
-<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;</div>
-<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;    <a class="code" href="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator.html#abaede1dc82d9c23562d0f770db8e6f4b">initChannels</a>();</div>
-<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;</div>
-<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;    <span class="comment">// Start threads</span></div>
-<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;    m_pECGProducer-&gt;start();</div>
-<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;</div>
-<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;    <span class="keywordflow">if</span>(m_pECGProducer-&gt;isRunning())</div>
-<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;    {</div>
-<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;        m_bIsRunning = <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;        QThread::start();</div>
-<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;    }</div>
-<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;    {</div>
-<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;        qWarning() &lt;&lt; <span class="stringliteral">&quot;Plugin TMSI - ERROR - TMSIProducer thread could not be started - Either the device is turned off (check your OS device manager) or the driver DLL (TMSiSDK.dll / TMSiSDK32bit.dll) is not installed in the system32 / SysWOW64 directory&quot;</span> &lt;&lt; endl;</div>
-<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;    }</div>
-<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;}</div>
-<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;</div>
+<div class="line"><a name="l00189"></a><span class="lineno">  189</span>&#160;</div>
+<div class="line"><a name="l00190"></a><span class="lineno">  190</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00191"></a><span class="lineno">  191</span>&#160;</div>
+<div class="line"><a name="l00192"></a><span class="lineno"><a class="line" href="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator.html#ae4429c8ba6120b11064b5cc11a681ea8">  192</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator.html#ae4429c8ba6120b11064b5cc11a681ea8">ECGSimulator::start</a>()</div>
+<div class="line"><a name="l00193"></a><span class="lineno">  193</span>&#160;{</div>
+<div class="line"><a name="l00194"></a><span class="lineno">  194</span>&#160;    <span class="comment">//Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.</span></div>
+<div class="line"><a name="l00195"></a><span class="lineno">  195</span>&#160;    <span class="keywordflow">if</span>(this-&gt;isRunning())</div>
+<div class="line"><a name="l00196"></a><span class="lineno">  196</span>&#160;        QThread::wait();</div>
+<div class="line"><a name="l00197"></a><span class="lineno">  197</span>&#160;</div>
+<div class="line"><a name="l00198"></a><span class="lineno">  198</span>&#160;    <a class="code" href="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator.html#abaede1dc82d9c23562d0f770db8e6f4b">initChannels</a>();</div>
+<div class="line"><a name="l00199"></a><span class="lineno">  199</span>&#160;</div>
+<div class="line"><a name="l00200"></a><span class="lineno">  200</span>&#160;    <span class="comment">// Start threads</span></div>
+<div class="line"><a name="l00201"></a><span class="lineno">  201</span>&#160;    m_pECGProducer-&gt;start();</div>
+<div class="line"><a name="l00202"></a><span class="lineno">  202</span>&#160;</div>
+<div class="line"><a name="l00203"></a><span class="lineno">  203</span>&#160;    <span class="keywordflow">if</span>(m_pECGProducer-&gt;isRunning())</div>
+<div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;    {</div>
+<div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;        m_bIsRunning = <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;        QThread::start();</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;    }</div>
+<div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;    {</div>
+<div class="line"><a name="l00211"></a><span class="lineno">  211</span>&#160;        qWarning() &lt;&lt; <span class="stringliteral">&quot;Plugin TMSI - ERROR - TMSIProducer thread could not be started - Either the device is turned off (check your OS device manager) or the driver DLL (TMSiSDK.dll / TMSiSDK32bit.dll) is not installed in the system32 / SysWOW64 directory&quot;</span> &lt;&lt; endl;</div>
+<div class="line"><a name="l00212"></a><span class="lineno">  212</span>&#160;        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a name="l00213"></a><span class="lineno">  213</span>&#160;    }</div>
+<div class="line"><a name="l00214"></a><span class="lineno">  214</span>&#160;}</div>
 <div class="line"><a name="l00215"></a><span class="lineno">  215</span>&#160;</div>
-<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;</div>
-<div class="line"><a name="l00218"></a><span class="lineno"><a class="line" href="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator.html#af4f7f055783d487b9c4fb52d212d821b">  218</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator.html#af4f7f055783d487b9c4fb52d212d821b">ECGSimulator::stop</a>()</div>
-<div class="line"><a name="l00219"></a><span class="lineno">  219</span>&#160;{</div>
-<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;    <span class="comment">// Stop threads</span></div>
-<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;    m_pECGProducer-&gt;stop();</div>
-<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;</div>
-<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;    <span class="comment">//Wait until this thread (TMSI) is stopped</span></div>
-<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;    m_bIsRunning = <span class="keyword">false</span>;</div>
-<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;</div>
+<div class="line"><a name="l00216"></a><span class="lineno">  216</span>&#160;</div>
+<div class="line"><a name="l00217"></a><span class="lineno">  217</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00218"></a><span class="lineno">  218</span>&#160;</div>
+<div class="line"><a name="l00219"></a><span class="lineno"><a class="line" href="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator.html#af4f7f055783d487b9c4fb52d212d821b">  219</a></span>&#160;<span class="keywordtype">bool</span> <a class="code" href="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator.html#af4f7f055783d487b9c4fb52d212d821b">ECGSimulator::stop</a>()</div>
+<div class="line"><a name="l00220"></a><span class="lineno">  220</span>&#160;{</div>
+<div class="line"><a name="l00221"></a><span class="lineno">  221</span>&#160;    <span class="comment">// Stop threads</span></div>
+<div class="line"><a name="l00222"></a><span class="lineno">  222</span>&#160;    m_pECGProducer-&gt;stop();</div>
+<div class="line"><a name="l00223"></a><span class="lineno">  223</span>&#160;</div>
+<div class="line"><a name="l00224"></a><span class="lineno">  224</span>&#160;    <span class="comment">//Wait until this thread (TMSI) is stopped</span></div>
+<div class="line"><a name="l00225"></a><span class="lineno">  225</span>&#160;    m_bIsRunning = <span class="keyword">false</span>;</div>
 <div class="line"><a name="l00226"></a><span class="lineno">  226</span>&#160;</div>
-<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;    <span class="comment">//In case the semaphore blocks the thread -&gt; Release the QSemaphore and let it exit from the pop function (acquire statement)</span></div>
-<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;    m_pInBuffer_I-&gt;releaseFromPop();</div>
-<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;    m_pInBuffer_I-&gt;clear();</div>
-<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;    m_pInBuffer_II-&gt;releaseFromPop();</div>
-<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;    m_pInBuffer_II-&gt;clear();</div>
-<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;    m_pInBuffer_III-&gt;releaseFromPop();</div>
-<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;    m_pInBuffer_III-&gt;clear();</div>
-<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;</div>
+<div class="line"><a name="l00227"></a><span class="lineno">  227</span>&#160;</div>
+<div class="line"><a name="l00228"></a><span class="lineno">  228</span>&#160;    <span class="comment">//In case the semaphore blocks the thread -&gt; Release the QSemaphore and let it exit from the pop function (acquire statement)</span></div>
+<div class="line"><a name="l00229"></a><span class="lineno">  229</span>&#160;    m_pInBuffer_I-&gt;releaseFromPop();</div>
+<div class="line"><a name="l00230"></a><span class="lineno">  230</span>&#160;    m_pInBuffer_I-&gt;clear();</div>
+<div class="line"><a name="l00231"></a><span class="lineno">  231</span>&#160;    m_pInBuffer_II-&gt;releaseFromPop();</div>
+<div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;    m_pInBuffer_II-&gt;clear();</div>
+<div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;    m_pInBuffer_III-&gt;releaseFromPop();</div>
+<div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;    m_pInBuffer_III-&gt;clear();</div>
 <div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;</div>
-<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;    <span class="comment">//Clear Buffers</span></div>
-<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;    m_pECGChannel_ECG_I-&gt;clear();</div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;    m_pECGChannel_ECG_II-&gt;clear();</div>
-<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;    m_pECGChannel_ECG_III-&gt;clear();</div>
-<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;</div>
-<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;    m_pInBuffer_I-&gt;clear();</div>
-<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;    m_pInBuffer_II-&gt;clear();</div>
-<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;    m_pInBuffer_III-&gt;clear();</div>
-<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;</div>
-<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
-<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;}</div>
-<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;</div>
+<div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;</div>
+<div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;    <span class="comment">//Clear Buffers</span></div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;    m_pECGChannel_ECG_I-&gt;clear();</div>
+<div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;    m_pECGChannel_ECG_II-&gt;clear();</div>
+<div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;    m_pECGChannel_ECG_III-&gt;clear();</div>
+<div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;</div>
+<div class="line"><a name="l00242"></a><span class="lineno">  242</span>&#160;    m_pInBuffer_I-&gt;clear();</div>
+<div class="line"><a name="l00243"></a><span class="lineno">  243</span>&#160;    m_pInBuffer_II-&gt;clear();</div>
+<div class="line"><a name="l00244"></a><span class="lineno">  244</span>&#160;    m_pInBuffer_III-&gt;clear();</div>
+<div class="line"><a name="l00245"></a><span class="lineno">  245</span>&#160;</div>
+<div class="line"><a name="l00246"></a><span class="lineno">  246</span>&#160;    <span class="keywordflow">return</span> <span class="keyword">true</span>;</div>
+<div class="line"><a name="l00247"></a><span class="lineno">  247</span>&#160;}</div>
 <div class="line"><a name="l00248"></a><span class="lineno">  248</span>&#160;</div>
-<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;</div>
-<div class="line"><a name="l00251"></a><span class="lineno"><a class="line" href="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator.html#ac7453e7e9c21fadb6b924c9f2c5489c1">  251</a></span>&#160;<a class="code" href="class_m_n_e_x_1_1_i_plugin.html#a9bc9c5236c0160850e64cea0f9367f1e">IPlugin::PluginType</a> <a class="code" href="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator.html#ac7453e7e9c21fadb6b924c9f2c5489c1">ECGSimulator::getType</a>()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00252"></a><span class="lineno">  252</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="class_m_n_e_x_1_1_i_plugin.html#a9bc9c5236c0160850e64cea0f9367f1ea6ef97eff3760b2e561e078c233844ed8">_ISensor</a>;</div>
-<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;}</div>
-<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;</div>
+<div class="line"><a name="l00249"></a><span class="lineno">  249</span>&#160;</div>
+<div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00251"></a><span class="lineno">  251</span>&#160;</div>
+<div class="line"><a name="l00252"></a><span class="lineno"><a class="line" href="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator.html#ac7453e7e9c21fadb6b924c9f2c5489c1">  252</a></span>&#160;<a class="code" href="class_m_n_e_x_1_1_i_plugin.html#a9bc9c5236c0160850e64cea0f9367f1e">IPlugin::PluginType</a> <a class="code" href="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator.html#ac7453e7e9c21fadb6b924c9f2c5489c1">ECGSimulator::getType</a>()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00253"></a><span class="lineno">  253</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00254"></a><span class="lineno">  254</span>&#160;    <span class="keywordflow">return</span> <a class="code" href="class_m_n_e_x_1_1_i_plugin.html#a9bc9c5236c0160850e64cea0f9367f1ea6ef97eff3760b2e561e078c233844ed8">_ISensor</a>;</div>
+<div class="line"><a name="l00255"></a><span class="lineno">  255</span>&#160;}</div>
 <div class="line"><a name="l00256"></a><span class="lineno">  256</span>&#160;</div>
-<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;</div>
-<div class="line"><a name="l00259"></a><span class="lineno"><a class="line" href="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator.html#a2283842e3acfbed9af7d9077e640deee">  259</a></span>&#160;QString <a class="code" href="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator.html#a2283842e3acfbed9af7d9077e640deee">ECGSimulator::getName</a>()<span class="keyword"> const</span></div>
-<div class="line"><a name="l00260"></a><span class="lineno">  260</span>&#160;<span class="keyword"></span>{</div>
-<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;    <span class="keywordflow">return</span> <span class="stringliteral">&quot;ECG Simulator&quot;</span>;</div>
-<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;}</div>
-<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;</div>
+<div class="line"><a name="l00257"></a><span class="lineno">  257</span>&#160;</div>
+<div class="line"><a name="l00258"></a><span class="lineno">  258</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00259"></a><span class="lineno">  259</span>&#160;</div>
+<div class="line"><a name="l00260"></a><span class="lineno"><a class="line" href="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator.html#a2283842e3acfbed9af7d9077e640deee">  260</a></span>&#160;QString <a class="code" href="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator.html#a2283842e3acfbed9af7d9077e640deee">ECGSimulator::getName</a>()<span class="keyword"> const</span></div>
+<div class="line"><a name="l00261"></a><span class="lineno">  261</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00262"></a><span class="lineno">  262</span>&#160;    <span class="keywordflow">return</span> <span class="stringliteral">&quot;ECG Simulator&quot;</span>;</div>
+<div class="line"><a name="l00263"></a><span class="lineno">  263</span>&#160;}</div>
 <div class="line"><a name="l00264"></a><span class="lineno">  264</span>&#160;</div>
-<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;</div>
-<div class="line"><a name="l00267"></a><span class="lineno"><a class="line" href="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator.html#a74e2b6947a502ecd14ec3396cd54c5a5">  267</a></span>&#160;QWidget* <a class="code" href="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator.html#a74e2b6947a502ecd14ec3396cd54c5a5">ECGSimulator::setupWidget</a>()</div>
-<div class="line"><a name="l00268"></a><span class="lineno">  268</span>&#160;{</div>
-<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;    <a class="code" href="class_e_c_g_simulator_plugin_1_1_e_c_g_setup_widget.html">ECGSetupWidget</a>* widget = <span class="keyword">new</span> <a class="code" href="class_e_c_g_simulator_plugin_1_1_e_c_g_setup_widget.html">ECGSetupWidget</a>(<span class="keyword">this</span>);<span class="comment">//widget is later distroyed by CentralWidget - so it has to be created everytime new</span></div>
-<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;</div>
-<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;    <span class="comment">//init dialog</span></div>
-<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;    widget-&gt;<a class="code" href="class_e_c_g_simulator_plugin_1_1_e_c_g_setup_widget.html#a843b29a89f70dc2253cf731be77639fd">initSamplingFactors</a>();</div>
-<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;    widget-&gt;<a class="code" href="class_e_c_g_simulator_plugin_1_1_e_c_g_setup_widget.html#a174089d40b543632c55f546414186156">initSelectedChannelFile</a>();</div>
-<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;    widget-&gt;<a class="code" href="class_e_c_g_simulator_plugin_1_1_e_c_g_setup_widget.html#a6c0bcfa0be445366c4a987833bf6c58c">initChannelStates</a>();</div>
-<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;</div>
-<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;    <span class="keywordflow">return</span> widget;</div>
-<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;}</div>
-<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;</div>
+<div class="line"><a name="l00265"></a><span class="lineno">  265</span>&#160;</div>
+<div class="line"><a name="l00266"></a><span class="lineno">  266</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00267"></a><span class="lineno">  267</span>&#160;</div>
+<div class="line"><a name="l00268"></a><span class="lineno"><a class="line" href="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator.html#a74e2b6947a502ecd14ec3396cd54c5a5">  268</a></span>&#160;QWidget* <a class="code" href="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator.html#a74e2b6947a502ecd14ec3396cd54c5a5">ECGSimulator::setupWidget</a>()</div>
+<div class="line"><a name="l00269"></a><span class="lineno">  269</span>&#160;{</div>
+<div class="line"><a name="l00270"></a><span class="lineno">  270</span>&#160;    <a class="code" href="class_e_c_g_simulator_plugin_1_1_e_c_g_setup_widget.html">ECGSetupWidget</a>* widget = <span class="keyword">new</span> <a class="code" href="class_e_c_g_simulator_plugin_1_1_e_c_g_setup_widget.html">ECGSetupWidget</a>(<span class="keyword">this</span>);<span class="comment">//widget is later distroyed by CentralWidget - so it has to be created everytime new</span></div>
+<div class="line"><a name="l00271"></a><span class="lineno">  271</span>&#160;</div>
+<div class="line"><a name="l00272"></a><span class="lineno">  272</span>&#160;    <span class="comment">//init dialog</span></div>
+<div class="line"><a name="l00273"></a><span class="lineno">  273</span>&#160;    widget-&gt;<a class="code" href="class_e_c_g_simulator_plugin_1_1_e_c_g_setup_widget.html#a843b29a89f70dc2253cf731be77639fd">initSamplingFactors</a>();</div>
+<div class="line"><a name="l00274"></a><span class="lineno">  274</span>&#160;    widget-&gt;<a class="code" href="class_e_c_g_simulator_plugin_1_1_e_c_g_setup_widget.html#a174089d40b543632c55f546414186156">initSelectedChannelFile</a>();</div>
+<div class="line"><a name="l00275"></a><span class="lineno">  275</span>&#160;    widget-&gt;<a class="code" href="class_e_c_g_simulator_plugin_1_1_e_c_g_setup_widget.html#a6c0bcfa0be445366c4a987833bf6c58c">initChannelStates</a>();</div>
+<div class="line"><a name="l00276"></a><span class="lineno">  276</span>&#160;</div>
+<div class="line"><a name="l00277"></a><span class="lineno">  277</span>&#160;    <span class="keywordflow">return</span> widget;</div>
+<div class="line"><a name="l00278"></a><span class="lineno">  278</span>&#160;}</div>
 <div class="line"><a name="l00279"></a><span class="lineno">  279</span>&#160;</div>
-<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;</div>
-<div class="line"><a name="l00282"></a><span class="lineno"><a class="line" href="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator.html#a2cbaef4e5de22ab9387dbc47f66a2118">  282</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator.html#a2cbaef4e5de22ab9387dbc47f66a2118">ECGSimulator::run</a>()</div>
-<div class="line"><a name="l00283"></a><span class="lineno">  283</span>&#160;{</div>
-<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;    <span class="keywordtype">double</span> dValue_I = 0;</div>
-<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;    <span class="keywordtype">double</span> dValue_II = 0;</div>
-<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;    <span class="keywordtype">double</span> dValue_III = 0;</div>
-<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;</div>
-<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;    <span class="keywordflow">while</span>(m_bIsRunning)</div>
-<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;    {</div>
-<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;        <span class="comment">//pop matrix only if the producer thread is running</span></div>
-<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;        <span class="keywordflow">if</span>(m_pECGProducer-&gt;isRunning())</div>
-<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;        {</div>
-<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;            <span class="keywordflow">if</span>(m_pECGChannel_ECG_I-&gt;isEnabled())</div>
-<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;            {</div>
-<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;                dValue_I = m_pInBuffer_I-&gt;pop();</div>
-<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;                m_pRTSA_ECG_I_new-&gt;data()-&gt;setValue(dValue_I);</div>
-<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;            }</div>
-<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;            <span class="keywordflow">if</span>(m_pECGChannel_ECG_II-&gt;isEnabled())</div>
-<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;            {</div>
-<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;                dValue_II = m_pInBuffer_II-&gt;pop();</div>
-<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;                m_pRTSA_ECG_II_new-&gt;data()-&gt;setValue(dValue_II);</div>
-<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;            }</div>
-<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;            <span class="keywordflow">if</span>(m_pECGChannel_ECG_III-&gt;isEnabled())</div>
-<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;            {</div>
-<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;                dValue_III = m_pInBuffer_III-&gt;pop();</div>
-<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;                m_pRTSA_ECG_III_new-&gt;data()-&gt;setValue(dValue_III);</div>
-<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;            }</div>
-<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;        }</div>
-<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;    }</div>
-<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;}</div>
+<div class="line"><a name="l00280"></a><span class="lineno">  280</span>&#160;</div>
+<div class="line"><a name="l00281"></a><span class="lineno">  281</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00282"></a><span class="lineno">  282</span>&#160;</div>
+<div class="line"><a name="l00283"></a><span class="lineno"><a class="line" href="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator.html#a2cbaef4e5de22ab9387dbc47f66a2118">  283</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator.html#a2cbaef4e5de22ab9387dbc47f66a2118">ECGSimulator::run</a>()</div>
+<div class="line"><a name="l00284"></a><span class="lineno">  284</span>&#160;{</div>
+<div class="line"><a name="l00285"></a><span class="lineno">  285</span>&#160;    <span class="keywordtype">double</span> dValue_I = 0;</div>
+<div class="line"><a name="l00286"></a><span class="lineno">  286</span>&#160;    <span class="keywordtype">double</span> dValue_II = 0;</div>
+<div class="line"><a name="l00287"></a><span class="lineno">  287</span>&#160;    <span class="keywordtype">double</span> dValue_III = 0;</div>
+<div class="line"><a name="l00288"></a><span class="lineno">  288</span>&#160;</div>
+<div class="line"><a name="l00289"></a><span class="lineno">  289</span>&#160;    <span class="keywordflow">while</span>(m_bIsRunning)</div>
+<div class="line"><a name="l00290"></a><span class="lineno">  290</span>&#160;    {</div>
+<div class="line"><a name="l00291"></a><span class="lineno">  291</span>&#160;        <span class="comment">//pop matrix only if the producer thread is running</span></div>
+<div class="line"><a name="l00292"></a><span class="lineno">  292</span>&#160;        <span class="keywordflow">if</span>(m_pECGProducer-&gt;isRunning())</div>
+<div class="line"><a name="l00293"></a><span class="lineno">  293</span>&#160;        {</div>
+<div class="line"><a name="l00294"></a><span class="lineno">  294</span>&#160;            <span class="keywordflow">if</span>(m_pECGChannel_ECG_I-&gt;isEnabled())</div>
+<div class="line"><a name="l00295"></a><span class="lineno">  295</span>&#160;            {</div>
+<div class="line"><a name="l00296"></a><span class="lineno">  296</span>&#160;                dValue_I = m_pInBuffer_I-&gt;pop();</div>
+<div class="line"><a name="l00297"></a><span class="lineno">  297</span>&#160;                m_pRTSA_ECG_I_new-&gt;data()-&gt;setValue(dValue_I);</div>
+<div class="line"><a name="l00298"></a><span class="lineno">  298</span>&#160;            }</div>
+<div class="line"><a name="l00299"></a><span class="lineno">  299</span>&#160;            <span class="keywordflow">if</span>(m_pECGChannel_ECG_II-&gt;isEnabled())</div>
+<div class="line"><a name="l00300"></a><span class="lineno">  300</span>&#160;            {</div>
+<div class="line"><a name="l00301"></a><span class="lineno">  301</span>&#160;                dValue_II = m_pInBuffer_II-&gt;pop();</div>
+<div class="line"><a name="l00302"></a><span class="lineno">  302</span>&#160;                m_pRTSA_ECG_II_new-&gt;data()-&gt;setValue(dValue_II);</div>
+<div class="line"><a name="l00303"></a><span class="lineno">  303</span>&#160;            }</div>
+<div class="line"><a name="l00304"></a><span class="lineno">  304</span>&#160;            <span class="keywordflow">if</span>(m_pECGChannel_ECG_III-&gt;isEnabled())</div>
+<div class="line"><a name="l00305"></a><span class="lineno">  305</span>&#160;            {</div>
+<div class="line"><a name="l00306"></a><span class="lineno">  306</span>&#160;                dValue_III = m_pInBuffer_III-&gt;pop();</div>
+<div class="line"><a name="l00307"></a><span class="lineno">  307</span>&#160;                m_pRTSA_ECG_III_new-&gt;data()-&gt;setValue(dValue_III);</div>
+<div class="line"><a name="l00308"></a><span class="lineno">  308</span>&#160;            }</div>
+<div class="line"><a name="l00309"></a><span class="lineno">  309</span>&#160;        }</div>
+<div class="line"><a name="l00310"></a><span class="lineno">  310</span>&#160;    }</div>
+<div class="line"><a name="l00311"></a><span class="lineno">  311</span>&#160;}</div>
 <div class="ttc" id="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator_html_ad04551d57a879d07bbd1576f2ae637a7"><div class="ttname"><a href="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator.html#ad04551d57a879d07bbd1576f2ae637a7">ECGSimulatorPlugin::ECGSimulator::ECGSimulator</a></div><div class="ttdeci">ECGSimulator()</div><div class="ttdef"><b>Definition:</b> <a href="ecgsimulator_8cpp_source.html#l00075">ecgsimulator.cpp:75</a></div></div>
 <div class="ttc" id="class_m_n_e_x_1_1_i_plugin_html_a9bc9c5236c0160850e64cea0f9367f1e"><div class="ttname"><a href="class_m_n_e_x_1_1_i_plugin.html#a9bc9c5236c0160850e64cea0f9367f1e">MNEX::IPlugin::PluginType</a></div><div class="ttdeci">PluginType</div><div class="ttdef"><b>Definition:</b> <a href="_i_plugin_8h_source.html#l00100">IPlugin.h:100</a></div></div>
 <div class="ttc" id="class_e_c_g_simulator_plugin_1_1_e_c_g_setup_widget_html_a843b29a89f70dc2253cf731be77639fd"><div class="ttname"><a href="class_e_c_g_simulator_plugin_1_1_e_c_g_setup_widget.html#a843b29a89f70dc2253cf731be77639fd">ECGSimulatorPlugin::ECGSetupWidget::initSamplingFactors</a></div><div class="ttdeci">void initSamplingFactors()</div><div class="ttdef"><b>Definition:</b> <a href="ecgsetupwidget_8cpp_source.html#l00133">ecgsetupwidget.cpp:133</a></div></div>
 <div class="ttc" id="ecgproducer_8h_html"><div class="ttname"><a href="ecgproducer_8h.html">ecgproducer.h</a></div><div class="ttdoc">Contains the declaration of the ECGProducer class. </div></div>
-<div class="ttc" id="class_m_n_e_x_1_1_i_plugin_html_a9ab1fe463c2984418c495fafe96d6f84"><div class="ttname"><a href="class_m_n_e_x_1_1_i_plugin.html#a9ab1fe463c2984418c495fafe96d6f84">MNEX::IPlugin::m_outputConnectors</a></div><div class="ttdeci">OutputConnectorList m_outputConnectors</div><div class="ttdef"><b>Definition:</b> <a href="_i_plugin_8h_source.html#l00216">IPlugin.h:216</a></div></div>
-<div class="ttc" id="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator_html_abaede1dc82d9c23562d0f770db8e6f4b"><div class="ttname"><a href="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator.html#abaede1dc82d9c23562d0f770db8e6f4b">ECGSimulatorPlugin::ECGSimulator::initChannels</a></div><div class="ttdeci">void initChannels()</div><div class="ttdef"><b>Definition:</b> <a href="ecgsimulator_8cpp_source.html#l00139">ecgsimulator.cpp:139</a></div></div>
+<div class="ttc" id="class_m_n_e_x_1_1_i_plugin_html_a9ab1fe463c2984418c495fafe96d6f84"><div class="ttname"><a href="class_m_n_e_x_1_1_i_plugin.html#a9ab1fe463c2984418c495fafe96d6f84">MNEX::IPlugin::m_outputConnectors</a></div><div class="ttdeci">OutputConnectorList m_outputConnectors</div><div class="ttdef"><b>Definition:</b> <a href="_i_plugin_8h_source.html#l00232">IPlugin.h:232</a></div></div>
+<div class="ttc" id="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator_html_abaede1dc82d9c23562d0f770db8e6f4b"><div class="ttname"><a href="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator.html#abaede1dc82d9c23562d0f770db8e6f4b">ECGSimulatorPlugin::ECGSimulator::initChannels</a></div><div class="ttdeci">void initChannels()</div><div class="ttdef"><b>Definition:</b> <a href="ecgsimulator_8cpp_source.html#l00140">ecgsimulator.cpp:140</a></div></div>
 <div class="ttc" id="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator_html_ac927c7bc12a9774f02b324b370c77a3e"><div class="ttname"><a href="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator.html#ac927c7bc12a9774f02b324b370c77a3e">ECGSimulatorPlugin::ECGSimulator::~ECGSimulator</a></div><div class="ttdeci">virtual ~ECGSimulator()</div><div class="ttdef"><b>Definition:</b> <a href="ecgsimulator_8cpp_source.html#l00094">ecgsimulator.cpp:94</a></div></div>
-<div class="ttc" id="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator_html_a7ac8de7f4bc84b842461cc2e3bcd1b28"><div class="ttname"><a href="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator.html#a7ac8de7f4bc84b842461cc2e3bcd1b28">ECGSimulatorPlugin::ECGSimulator::init</a></div><div class="ttdeci">virtual void init()</div><div class="ttdef"><b>Definition:</b> <a href="ecgsimulator_8cpp_source.html#l00115">ecgsimulator.cpp:115</a></div></div>
+<div class="ttc" id="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator_html_a7ac8de7f4bc84b842461cc2e3bcd1b28"><div class="ttname"><a href="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator.html#a7ac8de7f4bc84b842461cc2e3bcd1b28">ECGSimulatorPlugin::ECGSimulator::init</a></div><div class="ttdeci">virtual void init()</div><div class="ttdef"><b>Definition:</b> <a href="ecgsimulator_8cpp_source.html#l00116">ecgsimulator.cpp:116</a></div></div>
 <div class="ttc" id="class_e_c_g_simulator_plugin_1_1_e_c_g_sim_channel_html"><div class="ttname"><a href="class_e_c_g_simulator_plugin_1_1_e_c_g_sim_channel.html">ECGSimulatorPlugin::ECGSimChannel</a></div><div class="ttdoc">The ECGChannel class provides a ECG channel. </div><div class="ttdef"><b>Definition:</b> <a href="ecgsimchannel_8h_source.html#l00084">ecgsimchannel.h:84</a></div></div>
-<div class="ttc" id="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator_html_a2cbaef4e5de22ab9387dbc47f66a2118"><div class="ttname"><a href="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator.html#a2cbaef4e5de22ab9387dbc47f66a2118">ECGSimulatorPlugin::ECGSimulator::run</a></div><div class="ttdeci">virtual void run()</div><div class="ttdef"><b>Definition:</b> <a href="ecgsimulator_8cpp_source.html#l00282">ecgsimulator.cpp:282</a></div></div>
+<div class="ttc" id="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator_html_a2cbaef4e5de22ab9387dbc47f66a2118"><div class="ttname"><a href="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator.html#a2cbaef4e5de22ab9387dbc47f66a2118">ECGSimulatorPlugin::ECGSimulator::run</a></div><div class="ttdeci">virtual void run()</div><div class="ttdef"><b>Definition:</b> <a href="ecgsimulator_8cpp_source.html#l00283">ecgsimulator.cpp:283</a></div></div>
 <div class="ttc" id="ecgsetupwidget_8h_html"><div class="ttname"><a href="ecgsetupwidget_8h.html">ecgsetupwidget.h</a></div><div class="ttdoc">Contains the declaration of the ECGSetupWidget class. </div></div>
-<div class="ttc" id="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator_html_ac7453e7e9c21fadb6b924c9f2c5489c1"><div class="ttname"><a href="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator.html#ac7453e7e9c21fadb6b924c9f2c5489c1">ECGSimulatorPlugin::ECGSimulator::getType</a></div><div class="ttdeci">virtual IPlugin::PluginType getType() const </div><div class="ttdef"><b>Definition:</b> <a href="ecgsimulator_8cpp_source.html#l00251">ecgsimulator.cpp:251</a></div></div>
+<div class="ttc" id="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator_html_ac7453e7e9c21fadb6b924c9f2c5489c1"><div class="ttname"><a href="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator.html#ac7453e7e9c21fadb6b924c9f2c5489c1">ECGSimulatorPlugin::ECGSimulator::getType</a></div><div class="ttdeci">virtual IPlugin::PluginType getType() const </div><div class="ttdef"><b>Definition:</b> <a href="ecgsimulator_8cpp_source.html#l00252">ecgsimulator.cpp:252</a></div></div>
 <div class="ttc" id="ecgsimulator_8h_html"><div class="ttname"><a href="ecgsimulator_8h.html">ecgsimulator.h</a></div><div class="ttdoc">Contains the declaration of the ECGSimulator class. </div></div>
 <div class="ttc" id="class_e_c_g_simulator_plugin_1_1_e_c_g_producer_html"><div class="ttname"><a href="class_e_c_g_simulator_plugin_1_1_e_c_g_producer.html">ECGSimulatorPlugin::ECGProducer</a></div><div class="ttdoc">The ECGProducer class provides a ECG data producer for a given sampling rate. </div><div class="ttdef"><b>Definition:</b> <a href="ecgproducer_8h_source.html#l00087">ecgproducer.h:87</a></div></div>
-<div class="ttc" id="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator_html_af4f7f055783d487b9c4fb52d212d821b"><div class="ttname"><a href="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator.html#af4f7f055783d487b9c4fb52d212d821b">ECGSimulatorPlugin::ECGSimulator::stop</a></div><div class="ttdeci">virtual bool stop()</div><div class="ttdef"><b>Definition:</b> <a href="ecgsimulator_8cpp_source.html#l00218">ecgsimulator.cpp:218</a></div></div>
-<div class="ttc" id="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator_html_a74e2b6947a502ecd14ec3396cd54c5a5"><div class="ttname"><a href="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator.html#a74e2b6947a502ecd14ec3396cd54c5a5">ECGSimulatorPlugin::ECGSimulator::setupWidget</a></div><div class="ttdeci">virtual QWidget * setupWidget()</div><div class="ttdef"><b>Definition:</b> <a href="ecgsimulator_8cpp_source.html#l00267">ecgsimulator.cpp:267</a></div></div>
+<div class="ttc" id="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator_html_af4f7f055783d487b9c4fb52d212d821b"><div class="ttname"><a href="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator.html#af4f7f055783d487b9c4fb52d212d821b">ECGSimulatorPlugin::ECGSimulator::stop</a></div><div class="ttdeci">virtual bool stop()</div><div class="ttdef"><b>Definition:</b> <a href="ecgsimulator_8cpp_source.html#l00219">ecgsimulator.cpp:219</a></div></div>
+<div class="ttc" id="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator_html_a74e2b6947a502ecd14ec3396cd54c5a5"><div class="ttname"><a href="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator.html#a74e2b6947a502ecd14ec3396cd54c5a5">ECGSimulatorPlugin::ECGSimulator::setupWidget</a></div><div class="ttdeci">virtual QWidget * setupWidget()</div><div class="ttdef"><b>Definition:</b> <a href="ecgsimulator_8cpp_source.html#l00268">ecgsimulator.cpp:268</a></div></div>
 <div class="ttc" id="class_e_c_g_simulator_plugin_1_1_e_c_g_setup_widget_html_a6c0bcfa0be445366c4a987833bf6c58c"><div class="ttname"><a href="class_e_c_g_simulator_plugin_1_1_e_c_g_setup_widget.html#a6c0bcfa0be445366c4a987833bf6c58c">ECGSimulatorPlugin::ECGSetupWidget::initChannelStates</a></div><div class="ttdeci">void initChannelStates()</div><div class="ttdef"><b>Definition:</b> <a href="ecgsetupwidget_8cpp_source.html#l00162">ecgsetupwidget.cpp:162</a></div></div>
 <div class="ttc" id="class_m_n_e_x_1_1_i_plugin_html_a9bc9c5236c0160850e64cea0f9367f1ea6ef97eff3760b2e561e078c233844ed8"><div class="ttname"><a href="class_m_n_e_x_1_1_i_plugin.html#a9bc9c5236c0160850e64cea0f9367f1ea6ef97eff3760b2e561e078c233844ed8">MNEX::IPlugin::_ISensor</a></div><div class="ttdef"><b>Definition:</b> <a href="_i_plugin_8h_source.html#l00102">IPlugin.h:102</a></div></div>
-<div class="ttc" id="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator_html_ae4429c8ba6120b11064b5cc11a681ea8"><div class="ttname"><a href="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator.html#ae4429c8ba6120b11064b5cc11a681ea8">ECGSimulatorPlugin::ECGSimulator::start</a></div><div class="ttdeci">virtual bool start()</div><div class="ttdef"><b>Definition:</b> <a href="ecgsimulator_8cpp_source.html#l00191">ecgsimulator.cpp:191</a></div></div>
+<div class="ttc" id="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator_html_ae4429c8ba6120b11064b5cc11a681ea8"><div class="ttname"><a href="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator.html#ae4429c8ba6120b11064b5cc11a681ea8">ECGSimulatorPlugin::ECGSimulator::start</a></div><div class="ttdeci">virtual bool start()</div><div class="ttdef"><b>Definition:</b> <a href="ecgsimulator_8cpp_source.html#l00192">ecgsimulator.cpp:192</a></div></div>
 <div class="ttc" id="class_e_c_g_simulator_plugin_1_1_e_c_g_setup_widget_html_a174089d40b543632c55f546414186156"><div class="ttname"><a href="class_e_c_g_simulator_plugin_1_1_e_c_g_setup_widget.html#a174089d40b543632c55f546414186156">ECGSimulatorPlugin::ECGSetupWidget::initSelectedChannelFile</a></div><div class="ttdeci">void initSelectedChannelFile()</div><div class="ttdef"><b>Definition:</b> <a href="ecgsetupwidget_8cpp_source.html#l00142">ecgsetupwidget.cpp:142</a></div></div>
 <div class="ttc" id="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator_html_a14c395357143a42cadadf6c6f7c3bedd"><div class="ttname"><a href="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator.html#a14c395357143a42cadadf6c6f7c3bedd">ECGSimulatorPlugin::ECGSimulator::clone</a></div><div class="ttdeci">virtual QSharedPointer&lt; IPlugin &gt; clone() const </div><div class="ttdef"><b>Definition:</b> <a href="ecgsimulator_8cpp_source.html#l00104">ecgsimulator.cpp:104</a></div></div>
 <div class="ttc" id="class_m_n_e_x_1_1_plugin_output_data_html_a52a436ad77f0236e54e737665bf038f6"><div class="ttname"><a href="class_m_n_e_x_1_1_plugin_output_data.html#a52a436ad77f0236e54e737665bf038f6">MNEX::PluginOutputData::create</a></div><div class="ttdeci">static QSharedPointer&lt; PluginOutputData&lt; T &gt; &gt; create(IPlugin *parent, const QString &amp;name, const QString &amp;descr)</div><div class="ttdef"><b>Definition:</b> <a href="pluginoutputdata_8h_source.html#l00126">pluginoutputdata.h:126</a></div></div>
-<div class="ttc" id="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator_html_a2283842e3acfbed9af7d9077e640deee"><div class="ttname"><a href="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator.html#a2283842e3acfbed9af7d9077e640deee">ECGSimulatorPlugin::ECGSimulator::getName</a></div><div class="ttdeci">virtual QString getName() const </div><div class="ttdef"><b>Definition:</b> <a href="ecgsimulator_8cpp_source.html#l00259">ecgsimulator.cpp:259</a></div></div>
+<div class="ttc" id="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator_html_a2283842e3acfbed9af7d9077e640deee"><div class="ttname"><a href="class_e_c_g_simulator_plugin_1_1_e_c_g_simulator.html#a2283842e3acfbed9af7d9077e640deee">ECGSimulatorPlugin::ECGSimulator::getName</a></div><div class="ttdeci">virtual QString getName() const </div><div class="ttdef"><b>Definition:</b> <a href="ecgsimulator_8cpp_source.html#l00260">ecgsimulator.cpp:260</a></div></div>
 <div class="ttc" id="class_e_c_g_simulator_plugin_1_1_e_c_g_setup_widget_html"><div class="ttname"><a href="class_e_c_g_simulator_plugin_1_1_e_c_g_setup_widget.html">ECGSimulatorPlugin::ECGSetupWidget</a></div><div class="ttdoc">The ECGSetupWidget class provides the ECG configuration window. </div><div class="ttdef"><b>Definition:</b> <a href="ecgsetupwidget_8h_source.html#l00078">ecgsetupwidget.h:78</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed May 14 2014 23:18:17 for MNE-CPP by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Jun 9 2014 15:58:04 for MNE-CPP by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.7
 </small></address>

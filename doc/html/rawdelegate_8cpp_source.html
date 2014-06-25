@@ -123,26 +123,26 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00067"></a><span class="lineno">   67</span>&#160;<span class="comment">//=============================================================================================================</span></div>
 <div class="line"><a name="l00068"></a><span class="lineno">   68</span>&#160;</div>
 <div class="line"><a name="l00069"></a><span class="lineno">   69</span>&#160;RawDelegate::RawDelegate(QObject *parent)</div>
-<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;: m_qSettings()</div>
-<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;{</div>
-<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;    m_dPlotHeight = m_qSettings.value(<span class="stringliteral">&quot;RawDelegate/plotheight&quot;</span>).toDouble();</div>
-<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    m_dDx = m_qSettings.value(<span class="stringliteral">&quot;RawDelegate/dx&quot;</span>).toDouble();</div>
-<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    m_nhlines = m_qSettings.value(<span class="stringliteral">&quot;RawDelegate/nhlines&quot;</span>).toDouble();</div>
-<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;</div>
-<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;    Q_UNUSED(parent);</div>
-<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;}</div>
+<div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;: QAbstractItemDelegate(parent)</div>
+<div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;, m_qSettings()</div>
+<div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160;{</div>
+<div class="line"><a name="l00073"></a><span class="lineno">   73</span>&#160;    m_dDefaultPlotHeight = m_qSettings.value(<span class="stringliteral">&quot;RawDelegate/plotheight&quot;</span>).toDouble();</div>
+<div class="line"><a name="l00074"></a><span class="lineno">   74</span>&#160;    m_dDx = m_qSettings.value(<span class="stringliteral">&quot;RawDelegate/dx&quot;</span>).toDouble();</div>
+<div class="line"><a name="l00075"></a><span class="lineno">   75</span>&#160;    m_nhlines = m_qSettings.value(<span class="stringliteral">&quot;RawDelegate/nhlines&quot;</span>).toDouble();</div>
+<div class="line"><a name="l00076"></a><span class="lineno">   76</span>&#160;}</div>
+<div class="line"><a name="l00077"></a><span class="lineno">   77</span>&#160;</div>
 <div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160;</div>
-<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;</div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;</div>
-<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<span class="keywordtype">void</span> RawDelegate::paint(QPainter *painter, <span class="keyword">const</span> QStyleOptionViewItem &amp;option, <span class="keyword">const</span> QModelIndex &amp;index)<span class="keyword"> const</span></div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;<span class="keywordtype">void</span> RawDelegate::paint(QPainter *painter, <span class="keyword">const</span> QStyleOptionViewItem &amp;option, <span class="keyword">const</span> QModelIndex &amp;index)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;<span class="keyword"></span>{</div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    <span class="keywordtype">float</span> t_fPlotHeight = option.rect.height();</div>
 <div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    <span class="keywordflow">switch</span>(index.column()) {</div>
 <div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    <span class="keywordflow">case</span> 0: { <span class="comment">//chnames</span></div>
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;        painter-&gt;save();</div>
 <div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;</div>
 <div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;        painter-&gt;rotate(-90);</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;        painter-&gt;drawText(QRectF(-option.rect.y()-<a class="code" href="class_m_n_e_browse_raw_qt_1_1_raw_delegate.html#a531f0471d70026593d4c10b49b61679a">m_dPlotHeight</a>,0,<a class="code" href="class_m_n_e_browse_raw_qt_1_1_raw_delegate.html#a531f0471d70026593d4c10b49b61679a">m_dPlotHeight</a>,20),Qt::AlignCenter,index.model()-&gt;data(index,Qt::DisplayRole).toString());</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;        painter-&gt;drawText(QRectF(-option.rect.y()-t_fPlotHeight,0,t_fPlotHeight,20),Qt::AlignCenter,index.model()-&gt;data(index,Qt::DisplayRole).toString());</div>
 <div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;</div>
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;        painter-&gt;restore();</div>
 <div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;        <span class="keywordflow">break</span>;</div>
@@ -176,7 +176,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;</div>
 <div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;        <span class="comment">//Plot grid</span></div>
 <div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;        painter-&gt;setRenderHint(QPainter::Antialiasing, <span class="keyword">false</span>);</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;        createGridPath(path,listPairs);</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;        createGridPath(path,option,listPairs);</div>
 <div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;</div>
 <div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;        painter-&gt;save();</div>
 <div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;        QPen pen;</div>
@@ -188,9 +188,9 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;</div>
 <div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160;        <span class="comment">//Plot data path</span></div>
 <div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;        path = QPainterPath(QPointF(option.rect.x()+t_rawModel-&gt;relFiffCursor(),option.rect.y()));</div>
-<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;        createPlotPath(index,path,listPairs);</div>
+<div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160;        createPlotPath(index, option, path, listPairs);</div>
 <div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;</div>
-<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;        painter-&gt;translate(0,m_dPlotHeight/2);</div>
+<div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160;        painter-&gt;translate(0,t_fPlotHeight/2);</div>
 <div class="line"><a name="l00138"></a><span class="lineno">  138</span>&#160;</div>
 <div class="line"><a name="l00139"></a><span class="lineno">  139</span>&#160;        painter-&gt;setRenderHint(QPainter::Antialiasing, <span class="keyword">true</span>);</div>
 <div class="line"><a name="l00140"></a><span class="lineno">  140</span>&#160;        painter-&gt;drawPath(path);</div>
@@ -211,13 +211,13 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00155"></a><span class="lineno">  155</span>&#160;</div>
 <div class="line"><a name="l00156"></a><span class="lineno">  156</span>&#160;    <span class="keywordflow">switch</span>(index.column()) {</div>
 <div class="line"><a name="l00157"></a><span class="lineno">  157</span>&#160;    <span class="keywordflow">case</span> 0:</div>
-<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;        size = QSize(20,m_dPlotHeight);</div>
+<div class="line"><a name="l00158"></a><span class="lineno">  158</span>&#160;        size = QSize(20,option.rect.height());</div>
 <div class="line"><a name="l00159"></a><span class="lineno">  159</span>&#160;        <span class="keywordflow">break</span>;</div>
 <div class="line"><a name="l00160"></a><span class="lineno">  160</span>&#160;    <span class="keywordflow">case</span> 1:</div>
 <div class="line"><a name="l00161"></a><span class="lineno">  161</span>&#160;        QList&lt;RowVectorPair&gt; listPairs = index.model()-&gt;data(index).value&lt;QList&lt;RowVectorPair&gt; &gt;();</div>
 <div class="line"><a name="l00162"></a><span class="lineno">  162</span>&#160;        qint32 nsamples = (<span class="keyword">static_cast&lt;</span><span class="keyword">const </span><a class="code" href="class_m_n_e_browse_raw_qt_1_1_raw_model.html">RawModel</a>*<span class="keyword">&gt;</span>(index.model()))-&gt;lastSample()-(<span class="keyword">static_cast&lt;</span><span class="keyword">const </span><a class="code" href="class_m_n_e_browse_raw_qt_1_1_raw_model.html">RawModel</a>*<span class="keyword">&gt;</span>(index.model()))-&gt;firstSample();</div>
 <div class="line"><a name="l00163"></a><span class="lineno">  163</span>&#160;</div>
-<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;        size = QSize(nsamples*<a class="code" href="class_m_n_e_browse_raw_qt_1_1_raw_delegate.html#a2f78aae39cf5831c17975d4dec874618">m_dDx</a>,m_dPlotHeight);</div>
+<div class="line"><a name="l00164"></a><span class="lineno">  164</span>&#160;        size = QSize(nsamples*<a class="code" href="class_m_n_e_browse_raw_qt_1_1_raw_delegate.html#a2f78aae39cf5831c17975d4dec874618">m_dDx</a>,option.rect.height());</div>
 <div class="line"><a name="l00165"></a><span class="lineno">  165</span>&#160;        <span class="keywordflow">break</span>;</div>
 <div class="line"><a name="l00166"></a><span class="lineno">  166</span>&#160;    }</div>
 <div class="line"><a name="l00167"></a><span class="lineno">  167</span>&#160;</div>
@@ -229,7 +229,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00173"></a><span class="lineno">  173</span>&#160;</div>
 <div class="line"><a name="l00174"></a><span class="lineno">  174</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
 <div class="line"><a name="l00175"></a><span class="lineno">  175</span>&#160;</div>
-<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;<span class="keywordtype">void</span> RawDelegate::createPlotPath(<span class="keyword">const</span> QModelIndex &amp;index, QPainterPath&amp; path, QList&lt;RowVectorPair&gt;&amp; listPairs)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00176"></a><span class="lineno">  176</span>&#160;<span class="keywordtype">void</span> RawDelegate::createPlotPath(<span class="keyword">const</span> QModelIndex &amp;index, <span class="keyword">const</span> QStyleOptionViewItem &amp;option, QPainterPath&amp; path, QList&lt;RowVectorPair&gt;&amp; listPairs)<span class="keyword"> const</span></div>
 <div class="line"><a name="l00177"></a><span class="lineno">  177</span>&#160;<span class="keyword"></span>{</div>
 <div class="line"><a name="l00178"></a><span class="lineno">  178</span>&#160;    <span class="comment">//get maximum range of respective channel type (range value in FiffChInfo does not seem to contain a reasonable value)</span></div>
 <div class="line"><a name="l00179"></a><span class="lineno">  179</span>&#160;    qint32 kind = (<span class="keyword">static_cast&lt;</span><span class="keyword">const </span><a class="code" href="class_m_n_e_browse_raw_qt_1_1_raw_model.html">RawModel</a>*<span class="keyword">&gt;</span>(index.model()))-&gt;m_chInfolist[index.row()].kind;</div>
@@ -260,7 +260,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00204"></a><span class="lineno">  204</span>&#160;    }</div>
 <div class="line"><a name="l00205"></a><span class="lineno">  205</span>&#160;</div>
 <div class="line"><a name="l00206"></a><span class="lineno">  206</span>&#160;    <span class="keywordtype">double</span> dValue;</div>
-<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;    <span class="keywordtype">double</span> dScaleY = m_dPlotHeight/(2*dMaxValue);</div>
+<div class="line"><a name="l00207"></a><span class="lineno">  207</span>&#160;    <span class="keywordtype">double</span> dScaleY = option.rect.height()/(2*dMaxValue);</div>
 <div class="line"><a name="l00208"></a><span class="lineno">  208</span>&#160;</div>
 <div class="line"><a name="l00209"></a><span class="lineno">  209</span>&#160;    <span class="keywordtype">double</span> y_base = path.currentPosition().y();</div>
 <div class="line"><a name="l00210"></a><span class="lineno">  210</span>&#160;    QPointF qSamplePosition;</div>
@@ -288,10 +288,10 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00232"></a><span class="lineno">  232</span>&#160;</div>
 <div class="line"><a name="l00233"></a><span class="lineno">  233</span>&#160;<span class="comment">//*************************************************************************************************************</span></div>
 <div class="line"><a name="l00234"></a><span class="lineno">  234</span>&#160;</div>
-<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;<span class="keywordtype">void</span> RawDelegate::createGridPath(QPainterPath&amp; path, QList&lt;RowVectorPair&gt;&amp; listPairs)<span class="keyword"> const</span></div>
+<div class="line"><a name="l00235"></a><span class="lineno">  235</span>&#160;<span class="keywordtype">void</span> RawDelegate::createGridPath(QPainterPath&amp; path, <span class="keyword">const</span> QStyleOptionViewItem &amp;option, QList&lt;RowVectorPair&gt;&amp; listPairs)<span class="keyword"> const</span></div>
 <div class="line"><a name="l00236"></a><span class="lineno">  236</span>&#160;<span class="keyword"></span>{</div>
 <div class="line"><a name="l00237"></a><span class="lineno">  237</span>&#160;    <span class="comment">//horizontal lines</span></div>
-<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;    <span class="keywordtype">double</span> distance = m_dPlotHeight/m_nhlines;</div>
+<div class="line"><a name="l00238"></a><span class="lineno">  238</span>&#160;    <span class="keywordtype">double</span> distance = option.rect.height()/m_nhlines;</div>
 <div class="line"><a name="l00239"></a><span class="lineno">  239</span>&#160;</div>
 <div class="line"><a name="l00240"></a><span class="lineno">  240</span>&#160;    QPointF startpos = path.currentPosition();</div>
 <div class="line"><a name="l00241"></a><span class="lineno">  241</span>&#160;    QPointF endpoint(path.currentPosition().x()+listPairs[0].second*listPairs.size()*<a class="code" href="class_m_n_e_browse_raw_qt_1_1_raw_delegate.html#a2f78aae39cf5831c17975d4dec874618">m_dDx</a>,path.currentPosition().y());</div>
@@ -306,13 +306,12 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
 <div class="line"><a name="l00250"></a><span class="lineno">  250</span>&#160;}</div>
 <div class="ttc" id="class_m_n_e_browse_raw_qt_1_1_raw_delegate_html_a2f78aae39cf5831c17975d4dec874618"><div class="ttname"><a href="class_m_n_e_browse_raw_qt_1_1_raw_delegate.html#a2f78aae39cf5831c17975d4dec874618">MNEBrowseRawQt::RawDelegate::m_dDx</a></div><div class="ttdeci">double m_dDx</div><div class="ttdef"><b>Definition:</b> <a href="rawdelegate_8h_source.html#l00124">rawdelegate.h:124</a></div></div>
 <div class="ttc" id="class_m_n_e_browse_raw_qt_1_1_raw_model_html"><div class="ttname"><a href="class_m_n_e_browse_raw_qt_1_1_raw_model.html">MNEBrowseRawQt::RawModel</a></div><div class="ttdef"><b>Definition:</b> <a href="rawmodel_8h_source.html#l00140">rawmodel.h:140</a></div></div>
-<div class="ttc" id="class_m_n_e_browse_raw_qt_1_1_raw_delegate_html_a531f0471d70026593d4c10b49b61679a"><div class="ttname"><a href="class_m_n_e_browse_raw_qt_1_1_raw_delegate.html#a531f0471d70026593d4c10b49b61679a">MNEBrowseRawQt::RawDelegate::m_dPlotHeight</a></div><div class="ttdeci">double m_dPlotHeight</div><div class="ttdef"><b>Definition:</b> <a href="rawdelegate_8h_source.html#l00119">rawdelegate.h:119</a></div></div>
 <div class="ttc" id="fiff__constants_8h_html_ae772550aceede71f6a7595227c44e261"><div class="ttname"><a href="fiff__constants_8h.html#ae772550aceede71f6a7595227c44e261">FIFF_UNIT_T_M</a></div><div class="ttdeci">#define FIFF_UNIT_T_M</div><div class="ttdef"><b>Definition:</b> <a href="fiff__constants_8h_source.html#l00741">fiff_constants.h:741</a></div></div>
 <div class="ttc" id="rawdelegate_8h_html"><div class="ttname"><a href="rawdelegate_8h.html">rawdelegate.h</a></div><div class="ttdoc">This class represents the delegate of the model/view framework of mne_browse_raw_qt application...</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
-Generated on Wed May 14 2014 23:18:16 for MNE-CPP by &#160;<a href="http://www.doxygen.org/index.html">
+Generated on Mon Jun 9 2014 15:58:02 for MNE-CPP by &#160;<a href="http://www.doxygen.org/index.html">
 <img class="footer" src="doxygen.png" alt="doxygen"/>
 </a> 1.8.7
 </small></address>

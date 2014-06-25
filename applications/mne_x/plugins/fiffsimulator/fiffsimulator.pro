@@ -98,6 +98,9 @@ INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_X_INCLUDE_DIR}
 
+RESOURCES += \
+    fiffsimulator.qrc
+
 OTHER_FILES += \
     fiffsimulator.json
 

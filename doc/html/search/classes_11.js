@@ -31,6 +31,8 @@ var searchData=
   ['ui_5fraplabsetupwidgetclass',['Ui_RapLabSetupWidgetClass',['../class_ui___rap_lab_setup_widget_class.html',1,'']]],
   ['ui_5frealtimemultisamplearrayclass',['Ui_RealTimeMultiSampleArrayClass',['../class_ui___real_time_multi_sample_array_class.html',1,'']]],
   ['ui_5frealtimemultisamplearraynewclass',['Ui_RealTimeMultiSampleArrayNewClass',['../class_ui___real_time_multi_sample_array_new_class.html',1,'']]],
+  ['ui_5frthpiaboutwidgetclass',['Ui_RtHpiAboutWidgetClass',['../class_ui___rt_hpi_about_widget_class.html',1,'']]],
+  ['ui_5frthpisetupwidgetclass',['Ui_RtHpiSetupWidgetClass',['../class_ui___rt_hpi_setup_widget_class.html',1,'']]],
   ['ui_5frtsssaboutwidgetclass',['Ui_RtSssAboutWidgetClass',['../class_ui___rt_sss_about_widget_class.html',1,'']]],
   ['ui_5frtssssetupwidgetclass',['Ui_RtSssSetupWidgetClass',['../class_ui___rt_sss_setup_widget_class.html',1,'']]],
   ['ui_5fsettingswidget',['Ui_SettingsWidget',['../class_ui___settings_widget.html',1,'']]],

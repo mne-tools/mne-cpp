@@ -6,8 +6,6 @@ var searchData=
   ['neuromagproducer_2eh',['neuromagproducer.h',['../neuromagproducer_8h.html',1,'']]],
   ['neuromagsetupwidget_2ecpp',['neuromagsetupwidget.cpp',['../neuromagsetupwidget_8cpp.html',1,'']]],
   ['neuromagsetupwidget_2eh',['neuromagsetupwidget.h',['../neuromagsetupwidget_8h.html',1,'']]],
-  ['newdisplaymanager_2ecpp',['newdisplaymanager.cpp',['../newdisplaymanager_8cpp.html',1,'']]],
-  ['newdisplaymanager_2eh',['newdisplaymanager.h',['../newdisplaymanager_8h.html',1,'']]],
   ['newmeasurement_2ecpp',['newmeasurement.cpp',['../newmeasurement_8cpp.html',1,'']]],
   ['newmeasurement_2eh',['newmeasurement.h',['../newmeasurement_8h.html',1,'']]],
   ['newmeasurementwidget_2eh',['newmeasurementwidget.h',['../newmeasurementwidget_8h.html',1,'']]],
