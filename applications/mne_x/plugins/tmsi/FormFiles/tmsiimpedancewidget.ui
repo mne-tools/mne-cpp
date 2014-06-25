@@ -13,6 +13,25 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="1">
+    <widget class="QPushButton" name="m_pushButton_takeScreenshot">
+     <property name="text">
+      <string>Take Screenshot</string>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="0" rowspan="3">
+    <widget class="QGraphicsView" name="m_graphicsView_impedanceView"/>
+   </item>
+   <item row="2" column="1">
+    <widget class="QPushButton" name="m_pushButton_stop">
+     <property name="text">
+      <string>Stop</string>
+     </property>
+    </widget>
+   </item>
+  </layout>
  </widget>
  <resources/>
  <connections/>

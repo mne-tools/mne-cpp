@@ -595,15 +595,12 @@ void TMSI::run()
     {
         //std::cout<<"TMSI::run(s)"<<std::endl;
 
-        // Check impedances - send to dialog and return from this function
+        // Check impedances - send new impedance values to graphic scene
         if(m_pTMSIProducer->isRunning() && m_bCheckImpedances)
         {
-            std::cout<<"pop before"<<endl;
             MatrixXf matValue = m_pRawMatrixBuffer_In->pop();
-            std::cout<<"pop after"<<endl;
-            //Dialog->dislpayNewValues(&matValue)
 
-            cout<<matValue<<endl;
+            m_pTmsiImpedanceWidget->updateGraphicScene(/*matValue*/);
         }
 
         //pop matrix only if the producer thread is running
@@ -614,12 +611,10 @@ void TMSI::run()
             // Set Beep trigger (if activated)
             if(m_bBeepTrigger && m_qTimerTrigger.elapsed() >= m_iTriggerInterval)
             {
-                QFuture<void> future = QtConcurrent::run(Beep, 450, 700);
+                QtConcurrent::run(Beep, 450, 700);
                 //Set trigger in received data samples - just for one sample, so that this event is easy to detect
                 matValue(136, m_iSamplesPerBlock-1) = 252;
                 m_qTimerTrigger.restart();
-
-                Q_UNUSED(future);
             }
 
             // Set keyboard trigger (if activated and !=0)
