@@ -31,7 +31,7 @@ Requirements
 Dependencies
 ============
 
-[Qt5](http://qt-project.org/downloads)
+[>= Qt5.2](http://qt-project.org/downloads)
 
 
 Building
@@ -47,6 +47,8 @@ To build MNE-CPP follow the wiki-guide:
 * (optional) [3. Install Qt 3D](https://github.com/mne-tools/mne-cpp/wiki/3.-Install-Qt3D): To use the MNE-CPP 3D libraries download and compile also the qt3d module. This step can be skipped when its intended to build MNE-CPP for Neuromag Linux machines or no 3D support is requested.
 
 * [4. Compile MNE-CPP](https://github.com/mne-tools/mne-cpp/wiki/4.-Compile-mne-cpp): Now you're ready to build the whole MNE-CPP library.
+
+* [5. Post Setup Steps](https://github.com/mne-tools/mne-cpp/wiki/5.-Post-Setup-Steps): The last step shows how to setup the environment variables. 
 
 Mailing list
 ============

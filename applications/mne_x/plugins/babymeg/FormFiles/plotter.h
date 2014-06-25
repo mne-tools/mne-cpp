@@ -26,9 +26,9 @@ public:
     QSize minimumSizeHint() const;
     QSize sizeHint() const;
 
-public slots:
-    void zoomIn();
-    void zoomOut();
+//public slots:
+//    void zoomIn();
+//    void zoomOut();
 
 protected:
     void paintEvent(QPaintEvent *event);
@@ -39,11 +39,13 @@ private:
     void refreshPixmap();
     void drawGrid(QPainter *painter);
     void drawCurve(QPainter *painter);
+    void drawRotatedText(QPainter *painter, int x, int y, const QString &text);
+
 
     enum {Margin = 30, xMargin = 80};
 
-    QToolButton *zoomInButton;
-    QToolButton *zoomOutButton;
+//    QToolButton *zoomInButton;
+//    QToolButton *zoomOutButton;
     QMap<int, QVector<QPointF> > curveMap;
     QVector<PlotSettings> zoomStack;
     int curZoom;
@@ -71,6 +73,8 @@ public:
     double minY;
     double maxY;
     int numYTicks;
+    QString xlabel;
+    QString ylabel;
 
 private:
     static void adjustAxis(double &min, double &max, int &numTicks);

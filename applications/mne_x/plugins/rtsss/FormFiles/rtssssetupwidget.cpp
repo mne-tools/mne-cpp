@@ -38,12 +38,10 @@
 // INCLUDES
 //=============================================================================================================
 
-//#include "dummysetupwidget.h"
-//#include "dummyaboutwidget.h"
-//#include "../dummytoolbox.h"
 #include "rtssssetupwidget.h"
 #include "rtsssaboutwidget.h"
 #include "../rtsss.h"
+#include "../rtsssalgo.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -73,6 +71,13 @@ RtSssSetupWidget::RtSssSetupWidget(RtSss* toolbox, QWidget *parent)
     ui.setupUi(this);
 
     connect(ui.m_qPushButton_About, SIGNAL(released()), this, SLOT(showAboutDialog()));
+
+    connect(ui.m_qSpinBox_LinRR, SIGNAL(valueChanged (int)), this, SLOT(setNewLinRR(int)));
+
+    connect(ui.m_qSpinBox_LinRR, SIGNAL(valueChanged (int)), this, SLOT(setNewLinRR(int)));
+    connect(ui.m_qSpinBox_LoutRR, SIGNAL(valueChanged (int)), this, SLOT(setNewLoutRR(int)));
+    connect(ui.m_qSpinBox_Lin, SIGNAL(valueChanged (int)), this, SLOT(setNewLin(int)));
+    connect(ui.m_qSpinBox_Lout, SIGNAL(valueChanged (int)), this, SLOT(setNewLout(int)));
 }
 
 
@@ -81,6 +86,56 @@ RtSssSetupWidget::RtSssSetupWidget(RtSss* toolbox, QWidget *parent)
 RtSssSetupWidget::~RtSssSetupWidget()
 {
 
+}
+
+
+//*************************************************************************************************************
+
+void RtSssSetupWidget::setNewLinRR(int val)
+{
+    std::cout << "###### Emitted LinRR(set): " << val << std::endl;
+    emit signalNewLinRR(val);
+}
+
+void RtSssSetupWidget::setNewLoutRR(int val)
+{
+    std::cout << "###### Emitted LoutRR(set): " << val << std::endl;
+    emit signalNewLoutRR(val);
+}
+
+void RtSssSetupWidget::setNewLin(int val)
+{
+    std::cout << "###### Emitted Lin(set): " << val << std::endl;
+    emit signalNewLin(val);
+}
+
+void RtSssSetupWidget::setNewLout(int val)
+{
+    std::cout << "###### Emitted Lout(set): " << val << std::endl;
+    emit signalNewLout(val);
+}
+
+
+//*************************************************************************************************************
+
+int RtSssSetupWidget::getLinRR()
+{
+    return ui.m_qSpinBox_LinRR->value();
+}
+
+int RtSssSetupWidget::getLoutRR()
+{
+    return ui.m_qSpinBox_LoutRR->value();
+}
+
+int RtSssSetupWidget::getLin()
+{
+    return ui.m_qSpinBox_Lin->value();
+}
+
+int RtSssSetupWidget::getLout()
+{
+    return ui.m_qSpinBox_Lout->value();
 }
 
 

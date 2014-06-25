@@ -87,7 +87,8 @@ RtAve::RtAve(quint32 numAverages, quint32 p_iPreStimSamples, quint32 p_iPostStim
 
 RtAve::~RtAve()
 {
-    stop();
+    if(this->isRunning())
+        stop();
 }
 
 
@@ -274,10 +275,28 @@ void RtAve::assemblePreStimulus(const QList<QPair<QList<qint32>, MatrixXd> > &p_
 
 //*************************************************************************************************************
 
+bool RtAve::start()
+{
+    //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
+    if(this->isRunning())
+        QThread::wait();
+
+    m_bIsRunning = true;
+    QThread::start();
+
+    return true;
+}
+
+
+//*************************************************************************************************************
+
 bool RtAve::stop()
 {
     m_bIsRunning = false;
-    QThread::wait();
+
+    m_pRawMatrixBuffer->releaseFromPop();
+
+    m_pRawMatrixBuffer->clear();
 
     return true;
 }
@@ -287,9 +306,6 @@ bool RtAve::stop()
 
 void RtAve::run()
 {
-    m_bIsRunning = true;
-
-
     //
     // Inits & Clears
     //

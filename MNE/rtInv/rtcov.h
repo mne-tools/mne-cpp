@@ -137,6 +137,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Starts the RtCov by starting the producer's thread.
+    *
+    * @return true if succeeded, false otherwise
+    */
+    virtual bool start();
+
+    //=========================================================================================================
+    /**
     * Stops the RtCov by stopping the producer's thread.
     *
     * @return true if succeeded, false otherwise

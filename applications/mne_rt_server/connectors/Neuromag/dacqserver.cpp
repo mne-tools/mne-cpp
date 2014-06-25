@@ -421,13 +421,42 @@ void DacqServer::run()
                     t_nSamplesNew = t_nSamples + m_pNeuromag->m_uiBufferSampleSize - 1;
                     printf("Reading %d ... %d  =  %9.3f ... %9.3f secs...", t_nSamples, t_nSamplesNew, ((float)t_nSamples) / sfreq, ((float)t_nSamplesNew) / sfreq );
                     t_nSamples += m_pNeuromag->m_uiBufferSampleSize;
-                    
-                    MatrixXf* t_pMatrix = new MatrixXf( (Map<MatrixXi>( (int*) t_pTag->data(), nchan, m_pNeuromag->m_uiBufferSampleSize)).cast<float>());
 
-//                    std::cout << "Matrix Xf " << t_pMatrix->block(0,0,1,4);
+                    float a;
+                    float meg_mag_multiplier = 1.0;
+                    float meg_grad_multiplier = 1.0;
+                    float eeg_multiplier = 1.0;
+
+                    MatrixXf* t_pMatrix = new MatrixXf(nchan, m_pNeuromag->m_uiBufferSampleSize);
+
+                    fiff_int_t *data32 = (fiff_int_t *)t_pTag->data();
+                    for (qint32 ch = 0; ch < nchan; ch++) {
+                        switch(m_pNeuromag->m_info.chs[ch].kind) {
+                            case FIFFV_MAGN_CH:
+                                if (m_pNeuromag->m_info.chs[ch].unit == FIFF_UNIT_T_M)
+                                    a = meg_grad_multiplier;
+                                else
+                                    a = meg_mag_multiplier;
+                                break;
+                            case FIFFV_EL_CH:
+                                a = eeg_multiplier;
+                                break;
+                            default:
+                                a = 1.0;
+                        }
+                        for (qint32 ns = 0; ns < m_pNeuromag->m_uiBufferSampleSize; ns++)
+                            (*t_pMatrix)(ch,ns) = a * m_pNeuromag->m_info.chs[ch].cal * m_pNeuromag->m_info.chs[ch].range * data32[nchan*ns+ch];
+                    }
+
                     m_pNeuromag->m_pRawMatrixBuffer->push(t_pMatrix);
 
                     delete t_pMatrix;
+/*                    
+                    MatrixXf* t_pMatrix = new MatrixXf( (Map<MatrixXi>( (int*) t_pTag->data(), nchan, m_pNeuromag->m_uiBufferSampleSize)).cast<float>());
+//                    std::cout << "Matrix Xf " << t_pMatrix->block(0,0,1,4);
+                    m_pNeuromag->m_pRawMatrixBuffer->push(t_pMatrix);
+                    delete t_pMatrix;
+*/
                     printf(" [done]\r\n");
                 }
                 break;

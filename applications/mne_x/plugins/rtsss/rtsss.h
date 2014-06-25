@@ -1,7 +1,7 @@
 //=============================================================================================================
 /**
 * @file     rtsss.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @author   Seok Lew <slew@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     February, 2013
@@ -46,8 +46,17 @@
 
 #include <mne_x/Interfaces/IAlgorithm.h>
 #include <generics/circularbuffer.h>
-#include <xMeas/newrealtimesamplearray.h>
+#include <generics/circularmatrixbuffer.h>
 
+#include <xMeas/realtimesourceestimate.h>
+#include <xMeas/newrealtimesamplearray.h>
+#include <xMeas/newrealtimemultisamplearray.h>
+
+#include <fiff/fiff.h>
+#include <fiff/fiff_info.h>
+#include <fiff/fiff_evoked.h>
+
+#include <Eigen/Dense>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -72,6 +81,7 @@ namespace RtSssPlugin
 //=============================================================================================================
 
 using namespace MNEX;
+using namespace FIFFLIB;
 using namespace XMEASLIB;
 using namespace IOBuffer;
 
@@ -133,6 +143,11 @@ public:
 
     void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
 
+    void setLinRR(int);
+    void setLoutRR(int);
+    void setLin(int);
+    void setLout(int);
+
 protected:
     virtual void run();
 
@@ -142,12 +157,21 @@ private:
     PluginInputData<NewRealTimeSampleArray>::SPtr   m_pRTSAInput;      /**< The RealTimeSampleArray of the RtSss input.*/
     PluginOutputData<NewRealTimeSampleArray>::SPtr  m_pRTSAOutput;    /**< The RealTimeSampleArray of the RtSss output.*/
 
-    //  from sourcelab.h
-//    PluginInputData<NewRealTimeMultiSampleArray>::SPtr  m_pRTMSAInput;  /**< The RealTimeMultiSampleArray input.*/
-//    PluginOutputData<RealTimeSourceEstimate>::SPtr      m_pRTSEOutput;  /**< The RealTimeSourceEstimate output.*/
+    PluginInputData<NewRealTimeMultiSampleArray>::SPtr  m_pRTMSAInput;  /**< The RealTimeMultiSampleArray input.*/
+    PluginOutputData<NewRealTimeMultiSampleArray>::SPtr      m_pRTMSAOutput;  /**< The RealTimeMultiSampleArray output.*/
 
-//    dBuffer::SPtr   m_pDummyBuffer;      /**< Holds incoming data.*/
-    dBuffer::SPtr   m_pRtSssBuffer;      /**< Holds incoming data.*/
+
+    bool m_bIsRunning;      /**< If source lab is running */
+    bool m_bReceiveData;    /**< If thread is ready to receive data */
+    bool m_bProcessData;    /**< If data should be received for processing */
+
+    FiffInfo::SPtr              m_pFiffInfo;        /**< Fiff information. */
+
+    CircularMatrixBuffer<double>::SPtr m_pRtSssBuffer;   /**< Holds incoming rt server data.*/
+
+    int LinRR, LoutRR, Lin, Lout;
+
+    //    dBuffer::SPtr   m_pRtSssBuffer;      /**< Holds incoming data.*/
 };
 
 } // NAMESPACE

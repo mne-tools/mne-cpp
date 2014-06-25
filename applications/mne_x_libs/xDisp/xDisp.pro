@@ -100,12 +100,14 @@ SOURCES += \
     textwidget.cpp \
     progressbarwidget.cpp \
     numericwidget.cpp \
-    newrealtimesamplearraywidget.cpp \
-    newrealtimemultisamplearraywidget.cpp \
-    roi.cpp \
-    roiselectionwidget.cpp \
+    realtimesamplearraywidget.cpp \
     helpers/realtimemultisamplearraymodel.cpp \
-    helpers/realtimemultisamplearraydelegate.cpp
+    helpers/realtimemultisamplearraydelegate.cpp \
+    helpers/sensorgroup.cpp \
+    helpers/sensoritem.cpp \
+    helpers/sensorlayout.cpp \
+    helpers/sensormodel.cpp \
+    helpers/sensorwidget.cpp
 
 HEADERS += \
     xdisp_global.h \
@@ -115,21 +117,20 @@ HEADERS += \
     textwidget.h \
     progressbarwidget.h \
     numericwidget.h \
-    newrealtimesamplearraywidget.h \
-    newrealtimemultisamplearraywidget.h \
-    roi.h \
-    roiselectionwidget.h \
+    realtimesamplearraywidget.h \
     helpers/realtimemultisamplearraymodel.h \
-    helpers/realtimemultisamplearraydelegate.h
+    helpers/realtimemultisamplearraydelegate.h \
+    helpers/sensorgroup.h \
+    helpers/sensoritem.h \
+    helpers/sensorlayout.h \
+    helpers/sensormodel.h \
+    helpers/sensorwidget.h
 
 FORMS += \
-    realtimemultisamplearraywidget.ui \
     textwidget.ui \
     progressbarwidget.ui \
     numericwidget.ui \
-    realtimemultisamplearray_new_widget.ui \
-    newrealtimesamplearraywidget.ui \
-    newrealtimemultisamplearraywidget.ui
+    realtimesamplearraywidget.ui
 
 qtHaveModule(3d) {
     SOURCES += realtimesourceestimatewidget.cpp

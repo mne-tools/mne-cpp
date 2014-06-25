@@ -134,6 +134,8 @@ protected:
     virtual void run();
 
 private:
+    bool m_bIsRunning;
+
     PluginInputData<NewRealTimeSampleArray>::SPtr   m_pDummyInput;      /**< The RealTimeSampleArray of the DummyToolbox input.*/
     PluginOutputData<NewRealTimeSampleArray>::SPtr  m_pDummyOutput;    /**< The RealTimeSampleArray of the DummyToolbox output.*/
 

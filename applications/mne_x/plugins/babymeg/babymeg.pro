@@ -85,8 +85,6 @@ SOURCES += \
     FormFiles/babymegaboutwidget.cpp \
     FormFiles/babymegsquidcontroldgl.cpp \
     FormFiles/globalobj.cpp \
-    FormFiles/glwidget.cpp \
-    FormFiles/glwidget_OnDisp.cpp \
     FormFiles/babymegprojectdialog.cpp \
     FormFiles/plotter.cpp
 
@@ -99,8 +97,6 @@ HEADERS += \
     FormFiles/babymegaboutwidget.h \
     FormFiles/babymegsquidcontroldgl.h \
     FormFiles/globalobj.h \
-    FormFiles/glwidget.h \
-    FormFiles/glwidget_OnDisp.h \
     FormFiles/babymegprojectdialog.h \
     FormFiles/plotter.h \
 
@@ -114,6 +110,9 @@ INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_X_INCLUDE_DIR}
 
+RESOURCES += \
+    babymeg.qrc
+
 OTHER_FILES += babymeg.json
 
 # Put generated form headers into the origin --> cause other src is pointing at them
@@ -124,5 +123,3 @@ unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
 # suppress visibility warnings
 unix: QMAKE_CXXFLAGS += -Wno-attributes
 
-RESOURCES += \
-    babymeg.qrc

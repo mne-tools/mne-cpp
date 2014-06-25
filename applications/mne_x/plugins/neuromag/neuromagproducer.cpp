@@ -62,6 +62,7 @@ NeuromagProducer::NeuromagProducer(Neuromag* p_pNeuromag)
 , m_iDataClientId(-1)
 , m_bFlagInfoRequest(false)
 , m_bFlagMeasuring(false)
+, m_bIsRunning(false)
 {
 }
 
@@ -81,7 +82,7 @@ void NeuromagProducer::connectDataClient(QString p_sRtSeverIP)
     if(m_pRtDataClient.isNull())
         m_pRtDataClient = QSharedPointer<RtDataClient>(new RtDataClient);
     else if(m_bDataClientIsConnected)
-        this->disconnectDataClient();
+        return;
 
     m_pRtDataClient->connectToHost(p_sRtSeverIP);
     m_pRtDataClient->waitForConnected(1000);
@@ -133,9 +134,27 @@ void NeuromagProducer::disconnectDataClient()
 
 void NeuromagProducer::stop()
 {
+    //Wait until this thread (Producer) is stopped
     m_bIsRunning = false;
-    QThread::terminate();
-    QThread::wait();
+    m_bFlagMeasuring = false;
+
+    if(m_pNeuromag->m_bCmdClientIsConnected) //ToDo replace this with is running
+    {
+        // Stop Measurement at rt_Server
+        (*m_pNeuromag->m_pRtCmdClient)["stop-all"].send();
+    }
+
+    if(m_pNeuromag->m_pRawMatrixBuffer_In)
+    {
+        //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the push function (acquire statement)
+        m_pNeuromag->m_pRawMatrixBuffer_In->releaseFromPush();
+    }
+
+    this->disconnectDataClient();
+
+    //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
+    if(this->isRunning())
+        QThread::wait();
 }
 
 
@@ -143,20 +162,25 @@ void NeuromagProducer::stop()
 
 void NeuromagProducer::run()
 {
+    m_bIsRunning = true;
     //
     // Connect data client
     //
     this->connectDataClient(m_pNeuromag->m_sNeuromagIP);
 
+    qint32 count = 0;
     while(m_pRtDataClient->state() != QTcpSocket::ConnectedState)
     {
         msleep(100);
         this->connectDataClient(m_pNeuromag->m_sNeuromagIP);
+        ++count;
+        if(count > 10 || !m_bIsRunning)
+            return;
     }
 
     msleep(1000);
 
-    m_bIsRunning = true;
+    m_bFlagMeasuring = true;
 
     //
     // Inits
