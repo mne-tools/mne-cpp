@@ -126,6 +126,7 @@ class TMSISHARED_EXPORT TMSI : public ISensor
 
     friend class TMSIProducer;
     friend class TMSISetupWidget;
+    friend class TmsiImpedanceWidget;
 
 public:
     //=========================================================================================================

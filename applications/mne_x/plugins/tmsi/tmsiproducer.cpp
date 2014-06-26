@@ -121,7 +121,7 @@ void TMSIProducer::stop()
     while(this->isRunning())
         m_bIsRunning = false;
 
-    //Uinitialise device only after the thread stopped
+    //Unitialise device only after the thread stopped
     m_pTMSIDriver->uninitDevice();
 }
 
