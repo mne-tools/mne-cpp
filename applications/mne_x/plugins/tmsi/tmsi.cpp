@@ -506,9 +506,10 @@ bool TMSI::start()
     if(m_pTMSIProducer->isRunning())
     {
         // Init BCIFeatureWindow for visualization
-        if(m_bUseKeyboardTrigger)
+        m_tmsiManualAnnotationWidget = QSharedPointer<TMSIManualAnnotationWidget>(new TMSIManualAnnotationWidget(this));
+
+        if(m_bUseKeyboardTrigger && !m_bCheckImpedances)
         {
-            m_tmsiManualAnnotationWidget = QSharedPointer<TMSIManualAnnotationWidget>(new TMSIManualAnnotationWidget(this));
             m_tmsiManualAnnotationWidget->initGui();
             m_tmsiManualAnnotationWidget->show();
         }
@@ -598,9 +599,10 @@ void TMSI::run()
         // Check impedances - send new impedance values to graphic scene
         if(m_pTMSIProducer->isRunning() && m_bCheckImpedances)
         {
+            cout<<"Receiving impedance values"<<endl;
             MatrixXf matValue = m_pRawMatrixBuffer_In->pop();
 
-            m_pTmsiImpedanceWidget->updateGraphicScene(/*matValue*/);
+            m_pTmsiImpedanceWidget->updateGraphicScene(matValue);
         }
 
         //pop matrix only if the producer thread is running
@@ -719,8 +721,6 @@ void TMSI::run()
 
 void TMSI::showImpedanceDialog()
 {
-    m_bCheckImpedances = true;
-
     // Open Impedance dialog
     if(m_pTmsiImpedanceWidget == NULL)
         m_pTmsiImpedanceWidget = QSharedPointer<TmsiImpedanceWidget>(new TmsiImpedanceWidget(this));
@@ -731,35 +731,7 @@ void TMSI::showImpedanceDialog()
         m_pTmsiImpedanceWidget->raise();
     }
 
-    //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
-    if(this->isRunning())
-        QThread::wait();
-
-    //Buffer
-    m_pRawMatrixBuffer_In = QSharedPointer<RawMatrixBuffer>(new RawMatrixBuffer(8, m_iNumberOfChannels, m_iSamplesPerBlock));
-
-    m_pTMSIProducer->start(m_iNumberOfChannels,
-                       m_iSamplingFreq,
-                       m_iSamplesPerBlock,
-                       m_bUseChExponent,
-                       m_bUseUnitGain,
-                       m_bUseUnitOffset,
-                       m_bWriteDriverDebugToFile,
-                       m_sOutputFilePath,
-                       m_bUseCommonAverage,
-                       m_bCheckImpedances);
-
-    if(m_pTMSIProducer->isRunning())
-    {
-        m_bIsRunning = true;
-        QThread::start();
-        return;
-    }
-    else
-    {
-        qWarning() << "Plugin TMSI - ERROR - TMSIProducer thread could not be started - Either the device is turned off (check your OS device manager) or the driver DLL (TMSiSDK.dll / TMSiSDK32bit.dll) is not installed in the system32 / SysWOW64 directory" << endl;
-        return;
-    }
+    m_pTmsiImpedanceWidget->initGraphicScene();
 }
 
 
