@@ -440,7 +440,12 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const Annotation
                     p_fwdOut.src[h].cluster_info.centroidSource_rr.append(this->src[h].rr.row(sel_idx));
 //                    p_fwdOut.src[h].nn.row(count) = MatrixXd::Zero(1,3);
 
-                    p_fwdOut.src[h].vertno[count] = this->src[h].vertno[sel_idx]; //ToDo resizing necessary?
+//                    // Option 1 closest vertno
+//                    p_fwdOut.src[h].vertno[count] = this->src[h].vertno[sel_idx]; //ToDo resizing necessary?
+                    // Option 2 label ID
+                    p_fwdOut.src[h].vertno[count] = p_fwdOut.src[h].cluster_info.clusterLabelIds[count];
+
+
 
 //                    //vertices
 //                    std::cout << this->src[h].vertno[sel_idx] << ", ";
