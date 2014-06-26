@@ -57,6 +57,9 @@ void ClustStcView::dataChanged(const QModelIndex &topLeft, const QModelIndex &bo
     }
 
     this->update();
+
+    Q_UNUSED( roles );
+
 }
 
 

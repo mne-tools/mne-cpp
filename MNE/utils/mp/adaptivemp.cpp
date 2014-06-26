@@ -247,7 +247,7 @@ QList<GaborAtom> adaptiveMP::MatchingPursuit (MatrixXd signal,qint32 max_it,qrea
 
                 x1=0; xn=0; xnp1=0;//find index of max, second max, min of vf.
 
-                for(qint32 i=0; i < vf.size(); ++i)
+                for(quint32 i=0; i < vf.size(); ++i)
                 {
                     if(vf[i]<vf[x1])      x1 = i;
                     if(vf[i]>vf[xnp1])    xnp1 = i;
@@ -256,13 +256,13 @@ QList<GaborAtom> adaptiveMP::MatchingPursuit (MatrixXd signal,qint32 max_it,qrea
 
                 xn = x1;
 
-                for(qint32 i=0; i<vf.size();++i) if(vf[i]<vf[xnp1] && vf[i]>vf[xn])  xn=i;
+                for(quint32 i=0; i<vf.size();++i) if(vf[i]<vf[xnp1] && vf[i]>vf[xn])  xn=i;
 
                 //x1, xn, xnp1 are found
 
                 std::vector<double> xg(N, 0);//xg: centroid of the N best vertexes
 
-                for(qint32 i=0; i<x.size(); ++i) if(i!=xnp1) std::transform(xg.begin(), xg.end(), x[i].begin(), xg.begin(), std::plus<double>() );
+                for(quint32 i=0; i<x.size(); ++i) if(i!=xnp1) std::transform(xg.begin(), xg.end(), x[i].begin(), xg.begin(), std::plus<double>() );
 
                 std::transform(xg.begin(), xg.end(), x[xnp1].begin(), xcentroid_new.begin(), std::plus<double>());
                 std::transform(xg.begin(), xg.end(), xg.begin(), std::bind2nd(std::divides<double>(), N) );
@@ -353,7 +353,7 @@ QList<GaborAtom> adaptiveMP::MatchingPursuit (MatrixXd signal,qint32 max_it,qrea
                         std::copy(xc.begin(), xc.end(), x[xnp1].begin() );
 
                     else
-                        for( qint32 i=0; i<x.size(); ++i )
+                        for( quint32 i=0; i<x.size(); ++i )
                             if( i!=x1 )
                                 for(qint32 j=0; j<N; ++j)
                                     x[i][j] = x[x1][j] + h * ( x[i][j]-x[x1][j] );
