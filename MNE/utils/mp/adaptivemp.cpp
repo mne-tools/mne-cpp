@@ -141,7 +141,7 @@ QList<GaborAtom> adaptiveMP::MatchingPursuit (MatrixXd signal,qint32 max_it,qrea
         k = 0;
         s = sampleCount;
         p = floor(sampleCount / 2);
-        j = floor(log2(sampleCount));
+        j = floor(log(sampleCount) / log(2));
         phase = 0;
 
         for(qint32 chn = 0; chn < channelCount; ++chn)
