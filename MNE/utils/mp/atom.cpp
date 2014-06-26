@@ -107,6 +107,7 @@ VectorXd GaborAtom::CreateReal(qint32 sampleCount, qreal scale, qint32 translati
         {
             qreal t = (qreal(i) - translation) / scale;
             realAtom[i] = envelope[i] * cos(2 * PI * modulation / sampleCount * qreal(i) + phase);
+            Q_UNUSED(t);
         }
     }
 
