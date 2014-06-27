@@ -110,7 +110,7 @@ private:
     /**
     * Adds an electrode item to the QGraphicScene.
     */
-    void addElectrodeItem(QString electrodeName, QVector2D position);
+    void addElectrodeItem(QString electrodeName, QVector2D position, QColor color);
 
     //=========================================================================================================
     /**
