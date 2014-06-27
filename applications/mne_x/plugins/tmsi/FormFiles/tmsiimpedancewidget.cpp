@@ -83,29 +83,39 @@ TmsiImpedanceWidget::~TmsiImpedanceWidget()
 
 void TmsiImpedanceWidget::updateGraphicScene(MatrixXf &matValue)
 {
-    for(int i = 0; i<m_qmElectrodeIndex.size(); i++)
+    QList<QGraphicsItem *> itemList = m_scene.items();
+
+
+    for(int i = 0; i<itemList.size(); i++)
     {
-        // Find item in scene
-        QVector2D position = m_qmElectrodePositions[m_qmElectrodeIndex[i]];
-        //QList<QGraphicsItem *> itemList = m_scene.itemAt(QPointF(position.x(), position.y()));
-
-        cout<<position.x()<<" "<<position.y()<<endl;
-
-        // Repaint item depending on the current impedance value
-//        if(!itemList.isEmpty())
-//        {
-            QGraphicsEllipseItem *item = (QGraphicsEllipseItem *)m_scene.itemAt(QPointF(position.x(), position.y()), QTransform());
-            item->setBrush(QBrush(Qt::cyan));
-//        }
+       TmsiElectrodeItem *item = (TmsiElectrodeItem *) itemList.at(i);
+       item->setColor(QColor(qrand() % 256, qrand() % 256, qrand() % 256));
     }
+
+    m_scene.update(m_scene.sceneRect());
+
+//    m_scene.update();
+//    for(int i = 0; i<m_qmElectrodeIndex.size(); i++)
+//    {
+//        // Find item in scene
+//        QVector2D position = m_qmElectrodePositions[m_qmElectrodeIndex[i]];
+//        //QList<QGraphicsItem *> itemList = m_scene.itemAt(QPointF(position.x(), position.y()));
+
+//        cout<<position.x()<<" "<<position.y()<<endl;
+
+//        // Repaint item depending on the current impedance value
+////        if(!itemList.isEmpty())
+////        {
+//            QGraphicsEllipseItem *item = (QGraphicsEllipseItem *)m_scene.itemAt(QPointF(position.x(), position.y()), QTransform());
+//            item->setBrush(QBrush(Qt::cyan));
+////        }
+//    }
 }
 
 //*************************************************************************************************************
 
 void TmsiImpedanceWidget::initGraphicScene()
 {
-    //m_scene.addText("Hello, world!");
-
     // Load standard layout file
     AsAElc *asaObject = new AsAElc();
     QVector< QVector<double> > elcLocation3D;
@@ -128,17 +138,16 @@ void TmsiImpedanceWidget::initGraphicScene()
     for(int i = 0; i<elcLocation2D.size(); i++)
     {
         QVector2D position(elcLocation2D[i][0],elcLocation2D[i][1]);
-        addElectrodeItem("Test", position);
+        addElectrodeItem(elcChannelNames.at(i), position, QColor(qrand() % 256, qrand() % 256, qrand() % 256));
     }
 }
 
 //*************************************************************************************************************
 
-void TmsiImpedanceWidget::addElectrodeItem(QString electrodeName, QVector2D position)
+void TmsiImpedanceWidget::addElectrodeItem(QString electrodeName, QVector2D position, QColor color)
 {
-    TmsiElectrodeItem *item = new TmsiElectrodeItem(electrodeName, QPointF(position.x(), position.y()), QColor(qrand() % 256, qrand() % 256, qrand() % 256));
+    TmsiElectrodeItem *item = new TmsiElectrodeItem(electrodeName, QPointF(position.x(), position.y()), color);
     m_scene.addItem(item);
-    //m_scene.addEllipse(position.x(), position.y(), 10, 10, QPen(), QBrush(Qt::cyan));
 }
 
 //*************************************************************************************************************
