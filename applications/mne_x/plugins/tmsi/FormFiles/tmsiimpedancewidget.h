@@ -88,7 +88,7 @@ public:
     /**
     * Updates the values of the electrodes placed in the QGraphicsScene.
     */
-    void updateGraphicScene(MatrixXf &matValue);
+    void updateGraphicScene(VectorXd matValue);
 
     //=========================================================================================================
     /**
@@ -101,10 +101,9 @@ private:
 
     QGraphicsScene              m_scene;
 
-    QMap<QString, QVector2D>    m_qmElectrodePositions;
-    QMap<int, QString>          m_qmElectrodeIndex;
+    QMap< QString, int >        m_qmElectrodeNameIndex;
 
-    Ui::TmsiImpedanceWidget     *ui;
+    Ui::TmsiImpedanceWidget*    ui;
 
     //=========================================================================================================
     /**
