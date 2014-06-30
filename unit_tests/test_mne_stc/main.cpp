@@ -122,7 +122,7 @@ int main(int argc, char *argv[])
     AnnotationSet t_annotationSet("mind006", 2, "aparc.a2009s", "D:/Data/subjects");
     SurfaceSet t_surfSet("mind006", 2, "white", "D:/Data/subjects");
 
-    QString t_sFileNameStc("mind006_051209_auditory01_test.stc");
+    QString t_sFileNameStc("test_mind006_051209_auditory01.stc");//"mind006_051209_auditory01_test.stc");
     MNESourceEstimate sourceEstimateClustered;
 
     if(!t_sFileNameStc.isEmpty())
