@@ -34,6 +34,12 @@
 *
 */
 
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
 #include "tmsiimpedancewidget.h"
 #include "ui_tmsiimpedancewidget.h"
 
@@ -61,11 +67,13 @@ TmsiImpedanceWidget::TmsiImpedanceWidget(TMSI* p_pTMSI, QWidget *parent)
 {
     ui->setupUi(this);
 
+    // Init GUI stuff
     ui->m_graphicsView_impedanceView->setScene(&m_scene);
-
+    ui->m_graphicsView_impedanceView->setInteractive(true);
     ui->m_graphicsView_impedanceView->show();
+    ui->m_pushButton_stop->setEnabled(false);
 
-    // Connect buttons
+    // Connect buttons of this widget
     connect(ui->m_pushButton_stop, &QPushButton::released, this, &TmsiImpedanceWidget::stopImpedanceMeasurement);
     connect(ui->m_pushButton_start, &QPushButton::released, this, &TmsiImpedanceWidget::startImpedanceMeasurement);
     connect(ui->m_pushButton_takeScreenshot, &QPushButton::released, this, &TmsiImpedanceWidget::takeScreenshot);
@@ -81,35 +89,36 @@ TmsiImpedanceWidget::~TmsiImpedanceWidget()
 
 //*************************************************************************************************************
 
-void TmsiImpedanceWidget::updateGraphicScene(MatrixXf &matValue)
+void TmsiImpedanceWidget::updateGraphicScene(VectorXd matValue)
 {
+    // Get scene items
     QList<QGraphicsItem *> itemList = m_scene.items();
 
+    // Update color and impedance values of each electrode item
+    int matIndex = 0;
+    double impedanceValue = 0.0;
 
     for(int i = 0; i<itemList.size(); i++)
     {
-       TmsiElectrodeItem *item = (TmsiElectrodeItem *) itemList.at(i);
-       item->setColor(QColor(qrand() % 256, qrand() % 256, qrand() % 256));
+        TmsiElectrodeItem *item = (TmsiElectrodeItem *) itemList.at(i);
+
+        // find matrix index for given electrode name
+        matIndex = m_qmElectrodeNameIndex[item->getElectrodeName()];
+        if(matIndex<matValue.rows())
+        {
+            impedanceValue = matValue[matIndex];
+
+            // set new color and impedance value
+            item->setColor(QColor(qrand() % 256, qrand() % 256, qrand() % 256));
+            item->setImpedanceValue(impedanceValue);
+        }
+        else
+            qDebug()<<"TmsiImpedanceWidget - ERROR - There were more items in the scene than samples received from the device - Check the current layout!"<<endl;
     }
 
     m_scene.update(m_scene.sceneRect());
 
-//    m_scene.update();
-//    for(int i = 0; i<m_qmElectrodeIndex.size(); i++)
-//    {
-//        // Find item in scene
-//        QVector2D position = m_qmElectrodePositions[m_qmElectrodeIndex[i]];
-//        //QList<QGraphicsItem *> itemList = m_scene.itemAt(QPointF(position.x(), position.y()));
-
-//        cout<<position.x()<<" "<<position.y()<<endl;
-
-//        // Repaint item depending on the current impedance value
-////        if(!itemList.isEmpty())
-////        {
-//            QGraphicsEllipseItem *item = (QGraphicsEllipseItem *)m_scene.itemAt(QPointF(position.x(), position.y()), QTransform());
-//            item->setBrush(QBrush(Qt::cyan));
-////        }
-//    }
+    ui->m_graphicsView_impedanceView->fitInView(m_scene.sceneRect(), Qt::KeepAspectRatio);
 }
 
 //*************************************************************************************************************
@@ -122,17 +131,17 @@ void TmsiImpedanceWidget::initGraphicScene()
     QVector< QVector<double> > elcLocation2D;
     QString unit;
     QStringList elcChannelNames;
-    QString sElcFilePath = QString("./mne_x_plugins/resources/tmsi/loc_files/standard_waveguard128.elc");
+    QString sElcFilePath = QString("./mne_x_plugins/resources/tmsi/loc_files/standard_waveguard256.elc");
 
     if(!asaObject->readElcFile(sElcFilePath, elcChannelNames, elcLocation3D, elcLocation2D, unit))
-        qDebug() << "Error: Reading elc file.";
-
-    // Transform to QMap
-    for(int i = 0; i<elcLocation2D.size(); i++)
     {
-        m_qmElectrodePositions.insert(elcChannelNames.at(i), QVector2D(elcLocation2D[i][0], elcLocation2D[i][1]));
-        m_qmElectrodeIndex.insert(i, elcChannelNames.at(i));
+        qDebug() << "Error: Reading elc file.";
+        return;
     }
+
+    // Generate lookup table for channel names and index
+    for(int i = 0; i<elcLocation2D.size(); i++)
+        m_qmElectrodeNameIndex.insert(elcChannelNames.at(i), i);
 
     // Add electrodes to scene
     for(int i = 0; i<elcLocation2D.size(); i++)
@@ -140,6 +149,8 @@ void TmsiImpedanceWidget::initGraphicScene()
         QVector2D position(elcLocation2D[i][0],elcLocation2D[i][1]);
         addElectrodeItem(elcChannelNames.at(i), position, QColor(qrand() % 256, qrand() % 256, qrand() % 256));
     }
+
+    ui->m_graphicsView_impedanceView->fitInView(m_scene.itemsBoundingRect(), Qt::KeepAspectRatio);
 }
 
 //*************************************************************************************************************
@@ -154,31 +165,80 @@ void TmsiImpedanceWidget::addElectrodeItem(QString electrodeName, QVector2D posi
 
 void TmsiImpedanceWidget::startImpedanceMeasurement()
 {
-    m_pTMSI->m_bCheckImpedances = true;
-
-    m_pTMSI->start();
+    if(m_pTMSI->start())
+    {
+        m_pTMSI->m_bCheckImpedances = true;
+        ui->m_pushButton_stop->setEnabled(true);
+        ui->m_pushButton_start->setEnabled(false);
+    }
 }
 
 //*************************************************************************************************************
 
 void TmsiImpedanceWidget::stopImpedanceMeasurement()
 {
-    m_pTMSI->m_bCheckImpedances = false;
-
-    m_pTMSI->stop();
+    if(m_pTMSI->stop())
+    {
+        m_pTMSI->m_bCheckImpedances = false;
+        ui->m_pushButton_stop->setEnabled(false);
+        ui->m_pushButton_start->setEnabled(true);
+    }
 }
 
 //*************************************************************************************************************
 
 void TmsiImpedanceWidget::takeScreenshot()
 {
+    // scale view in a way that all items are visible for the screenshot, then transform back
+//    QTransform temp = ui->m_graphicsView_impedanceView->transform();
+//    ui->m_graphicsView_impedanceView->fitInView(m_scene.sceneRect());
 
+    // Open file dialog
+    QDate date;
+    QString fileName = QFileDialog::getSaveFileName(this,
+                                                    "Save Screenshot",
+                                                    QString("%1_%2_%3_Impedances_").arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day()),
+                                                    "Image (*.png)");
+
+    // Generate screenshot
+    QPixmap pixMap = QPixmap::grabWidget(ui->m_graphicsView_impedanceView);
+    pixMap.save(fileName);
+
+//    ui->m_graphicsView_impedanceView->setTransform(temp);
 }
 
 //*************************************************************************************************************
 
 void TmsiImpedanceWidget::loadLayout()
 {
+    QString sElcFilePath = QFileDialog::getOpenFileName(this,
+                                                        tr("Open Layout"),
+                                                        "./mne_x_plugins/resources/tmsi/loc_files/",
+                                                        tr("Layout Files (*.elc)"));
 
+    // Load standard layout file
+    AsAElc *asaObject = new AsAElc();
+    QVector< QVector<double> > elcLocation3D;
+    QVector< QVector<double> > elcLocation2D;
+    QString unit;
+    QStringList elcChannelNames;
+
+    if(!asaObject->readElcFile(sElcFilePath, elcChannelNames, elcLocation3D, elcLocation2D, unit))
+        qDebug() << "Error: Reading elc file.";
+    else
+        m_scene.clear();
+
+    // Clean old map -> Generate lookup table for channel names and index
+    m_qmElectrodeNameIndex.clear();
+
+    for(int i = 0; i<elcLocation2D.size(); i++)
+        m_qmElectrodeNameIndex.insert(elcChannelNames.at(i), i);
+
+    // Add electrodes to scene
+    for(int i = 0; i<elcLocation2D.size(); i++)
+    {
+        QVector2D position(elcLocation2D[i][0],elcLocation2D[i][1]);
+        addElectrodeItem(elcChannelNames.at(i), position, QColor(qrand() % 256, qrand() % 256, qrand() % 256));
+    }
 }
 

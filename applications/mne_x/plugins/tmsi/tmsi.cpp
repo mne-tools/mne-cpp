@@ -599,10 +599,10 @@ void TMSI::run()
         // Check impedances - send new impedance values to graphic scene
         if(m_pTMSIProducer->isRunning() && m_bCheckImpedances)
         {
-            cout<<"Receiving impedance values"<<endl;
             MatrixXf matValue = m_pRawMatrixBuffer_In->pop();
 
-            m_pTmsiImpedanceWidget->updateGraphicScene(matValue);
+            for(qint32 i = 0; i < matValue.cols(); ++i)
+                m_pTmsiImpedanceWidget->updateGraphicScene(matValue.col(i).cast<double>());
         }
 
         //pop matrix only if the producer thread is running
@@ -721,17 +721,20 @@ void TMSI::run()
 
 void TMSI::showImpedanceDialog()
 {
-    // Open Impedance dialog
-    if(m_pTmsiImpedanceWidget == NULL)
-        m_pTmsiImpedanceWidget = QSharedPointer<TmsiImpedanceWidget>(new TmsiImpedanceWidget(this));
-
-    if(!m_pTmsiImpedanceWidget->isVisible())
+    // Open Impedance dialog only if no sampling process is active
+    if(!m_bIsRunning)
     {
-        m_pTmsiImpedanceWidget->show();
-        m_pTmsiImpedanceWidget->raise();
-    }
+        if(m_pTmsiImpedanceWidget == NULL)
+            m_pTmsiImpedanceWidget = QSharedPointer<TmsiImpedanceWidget>(new TmsiImpedanceWidget(this));
 
-    m_pTmsiImpedanceWidget->initGraphicScene();
+        if(!m_pTmsiImpedanceWidget->isVisible())
+        {
+            m_pTmsiImpedanceWidget->show();
+            m_pTmsiImpedanceWidget->raise();
+        }
+
+        m_pTmsiImpedanceWidget->initGraphicScene();
+    }
 }
 
 

@@ -96,7 +96,8 @@ SOURCES += \
         tmsidriver.cpp \
         FormFiles/tmsimanualannotationwidget.cpp \
         FormFiles/tmsiimpedancewidget.cpp \
-    tmsielectrodeitem.cpp
+        tmsielectrodeitem.cpp \
+    tmsiimpedanceview.cpp
 
 HEADERS += \
         tmsi.h\
@@ -107,7 +108,8 @@ HEADERS += \
         tmsidriver.h \
         FormFiles/tmsimanualannotationwidget.h \
         FormFiles/tmsiimpedancewidget.h \
-    tmsielectrodeitem.h
+        tmsielectrodeitem.h \
+    tmsiimpedanceview.h
 
 FORMS += \
         FormFiles/tmsisetup.ui \
