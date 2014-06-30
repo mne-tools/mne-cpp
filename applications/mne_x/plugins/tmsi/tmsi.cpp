@@ -725,7 +725,7 @@ void TMSI::showImpedanceDialog()
     if(!m_bIsRunning)
     {
         if(m_pTmsiImpedanceWidget == NULL)
-            m_pTmsiImpedanceWidget = QSharedPointer<TmsiImpedanceWidget>(new TmsiImpedanceWidget(this));
+            m_pTmsiImpedanceWidget = QSharedPointer<TMSIImpedanceWidget>(new TMSIImpedanceWidget(this));
 
         if(!m_pTmsiImpedanceWidget->isVisible())
         {

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>TmsiImpedanceWidget</class>
- <widget class="QWidget" name="TmsiImpedanceWidget">
+ <class>TMSIImpedanceWidget</class>
+ <widget class="QWidget" name="TMSIImpedanceWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -22,7 +22,7 @@
     </widget>
    </item>
    <item row="0" column="0" rowspan="5">
-    <widget class="TMSIPlugin::TmsiImpedanceView" name="m_graphicsView_impedanceView"/>
+    <widget class="TMSIPlugin::TMSIImpedanceView" name="m_graphicsView_impedanceView"/>
    </item>
    <item row="4" column="1">
     <widget class="QPushButton" name="m_pushButton_stop">
@@ -49,7 +49,7 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>TMSIPlugin::TmsiImpedanceView</class>
+   <class>TMSIPlugin::TMSIImpedanceView</class>
    <extends>QGraphicsView</extends>
    <header>tmsiimpedanceview.h</header>
   </customwidget>

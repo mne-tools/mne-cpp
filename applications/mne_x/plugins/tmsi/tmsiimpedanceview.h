@@ -1,9 +1,9 @@
 //=============================================================================================================
 /**
-* @file     tmsiimpedancewidget.h
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
+* @file     tmsiimpedanceview.h
+* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
 * @date     June, 2014
 *
@@ -30,35 +30,26 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the TmsiImpedanceWidget class.
+* @brief    Contains the declaration of the TmsiImpedanceView class.
 *
 */
 
-#ifndef TMSIIMPEDANCEWIDGET_H
-#define TMSIIMPEDANCEWIDGET_H
+#ifndef TMSIIMPEDANCEVIEW_H
+#define TMSIIMPEDANCEVIEW_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
+#include <iostream>
 
-#include <utils/asaelc.h>
-#include "../tmsielectrodeitem.h"
-
-#include <xMeas/newrealtimemultisamplearray.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
-
-#include <QWidget>
-#include <QGraphicsScene>
-#include <QtSvg/QSvgGenerator>
-
-namespace Ui {
-class TMSIImpedanceWidget;
-}
+#include <QGraphicsView>
+#include <QWheelEvent>
 
 
 //*************************************************************************************************************
@@ -66,88 +57,30 @@ class TMSIImpedanceWidget;
 // DEFINE NAMESPACE TMSIPlugin
 //=============================================================================================================
 
+
 namespace TMSIPlugin
 {
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace Eigen;
-using namespace UTILSLIB;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-class TMSI;
-
-
-class TMSIImpedanceWidget : public QWidget
+class TMSIImpedanceView : public QGraphicsView
 {
     Q_OBJECT
 
 public:
-    explicit TMSIImpedanceWidget(TMSI* p_pTMSI, QWidget *parent = 0);
-    ~TMSIImpedanceWidget();
-
     //=========================================================================================================
     /**
-    * Updates the values of the electrodes placed in the QGraphicsScene.
+    * Constructs a TMSIImpedanceView.
     */
-    void updateGraphicScene(VectorXd matValue);
-
-    //=========================================================================================================
-    /**
-    * Initialises the 2D positions of the electrodes in the QGraphicsScene.
-    */
-    void initGraphicScene();
+    explicit TMSIImpedanceView(QWidget *parent = 0);
 
 private:
-    TMSI*                       m_pTMSI;                    /**< The pointer back to the TMSI plugin.*/
-
-    QGraphicsScene              m_scene;                    /**< The QGraphicScene.*/
-
-    QMap< QString, int >        m_qmElectrodeNameIndex;     /**< Lookup table for electrode name and their corresponding index in the received data matrix.*/
-
-    Ui::TMSIImpedanceWidget*    ui;                         /**< The user interface for the TMSIImpedanceWidget.*/
-
     //=========================================================================================================
     /**
-    * Adds an electrode item to the QGraphicScene.
+    * Reimplemented wheel event used for zoomin in and out of the scene.
     */
-    void addElectrodeItem(QString electrodeName, QVector2D position, QColor color);
-
-    //=========================================================================================================
-    /**
-    * Start the measurement process.
-    */
-    void startImpedanceMeasurement();
-
-    //=========================================================================================================
-    /**
-    * Stops the measurement process.
-    */
-    void stopImpedanceMeasurement();
-
-    //=========================================================================================================
-    /**
-    * Takes a screenshot of the current view.
-    */
-    void takeScreenshot();
-
-    //=========================================================================================================
-    /**
-    * Loads a layout from file.
-    */
-    void loadLayout();
+    void wheelEvent(QWheelEvent * event);
 
 };
 
 } // NAMESPACE
 
-#endif // TMSIIMPEDANCEWIDGET_H
+#endif // TMSIIMPEDANCEVIEW_H

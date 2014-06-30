@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the TmsiImpedanceWidget class.
+* @brief    Contains the declaration of the TMSIImpedanceWidget class.
 *
 */
 
@@ -60,47 +60,47 @@ using namespace TMSIPlugin;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-TmsiImpedanceWidget::TmsiImpedanceWidget(TMSI* p_pTMSI, QWidget *parent)
+TMSIImpedanceWidget::TMSIImpedanceWidget(TMSI* p_pTMSI, QWidget *parent)
 : m_pTMSI(p_pTMSI)
 , QWidget(parent)
-, ui(new Ui::TmsiImpedanceWidget)
+, ui(new Ui::TMSIImpedanceWidget)
 {
     ui->setupUi(this);
 
     // Init GUI stuff
     ui->m_graphicsView_impedanceView->setScene(&m_scene);
-    ui->m_graphicsView_impedanceView->setInteractive(true);
     ui->m_graphicsView_impedanceView->show();
+
     ui->m_pushButton_stop->setEnabled(false);
 
     // Connect buttons of this widget
-    connect(ui->m_pushButton_stop, &QPushButton::released, this, &TmsiImpedanceWidget::stopImpedanceMeasurement);
-    connect(ui->m_pushButton_start, &QPushButton::released, this, &TmsiImpedanceWidget::startImpedanceMeasurement);
-    connect(ui->m_pushButton_takeScreenshot, &QPushButton::released, this, &TmsiImpedanceWidget::takeScreenshot);
-    connect(ui->m_pushButton_loadLayout, &QPushButton::released, this, &TmsiImpedanceWidget::loadLayout);
+    connect(ui->m_pushButton_stop, &QPushButton::released, this, &TMSIImpedanceWidget::stopImpedanceMeasurement);
+    connect(ui->m_pushButton_start, &QPushButton::released, this, &TMSIImpedanceWidget::startImpedanceMeasurement);
+    connect(ui->m_pushButton_takeScreenshot, &QPushButton::released, this, &TMSIImpedanceWidget::takeScreenshot);
+    connect(ui->m_pushButton_loadLayout, &QPushButton::released, this, &TMSIImpedanceWidget::loadLayout);
 }
 
 //*************************************************************************************************************
 
-TmsiImpedanceWidget::~TmsiImpedanceWidget()
+TMSIImpedanceWidget::~TMSIImpedanceWidget()
 {
     delete ui;
 }
 
 //*************************************************************************************************************
 
-void TmsiImpedanceWidget::updateGraphicScene(VectorXd matValue)
+void TMSIImpedanceWidget::updateGraphicScene(VectorXd matValue)
 {
     // Get scene items
     QList<QGraphicsItem *> itemList = m_scene.items();
 
-    // Update color and impedance values of each electrode item
+    // Update color and impedance values for each electrode item
     int matIndex = 0;
     double impedanceValue = 0.0;
 
     for(int i = 0; i<itemList.size(); i++)
     {
-        TmsiElectrodeItem *item = (TmsiElectrodeItem *) itemList.at(i);
+        TMSIElectrodeItem *item = (TMSIElectrodeItem *) itemList.at(i);
 
         // find matrix index for given electrode name
         matIndex = m_qmElectrodeNameIndex[item->getElectrodeName()];
@@ -117,14 +117,15 @@ void TmsiImpedanceWidget::updateGraphicScene(VectorXd matValue)
     }
 
     m_scene.update(m_scene.sceneRect());
-
-    ui->m_graphicsView_impedanceView->fitInView(m_scene.sceneRect(), Qt::KeepAspectRatio);
 }
 
 //*************************************************************************************************************
 
-void TmsiImpedanceWidget::initGraphicScene()
+void TMSIImpedanceWidget::initGraphicScene()
 {
+    // Clear all items from scene
+    m_scene.clear();
+
     // Load standard layout file
     AsAElc *asaObject = new AsAElc();
     QVector< QVector<double> > elcLocation3D;
@@ -139,7 +140,7 @@ void TmsiImpedanceWidget::initGraphicScene()
         return;
     }
 
-    // Generate lookup table for channel names and index
+    // Generate lookup table for channel names and index and corresponding index
     for(int i = 0; i<elcLocation2D.size(); i++)
         m_qmElectrodeNameIndex.insert(elcChannelNames.at(i), i);
 
@@ -149,21 +150,19 @@ void TmsiImpedanceWidget::initGraphicScene()
         QVector2D position(elcLocation2D[i][0],elcLocation2D[i][1]);
         addElectrodeItem(elcChannelNames.at(i), position, QColor(qrand() % 256, qrand() % 256, qrand() % 256));
     }
-
-    ui->m_graphicsView_impedanceView->fitInView(m_scene.itemsBoundingRect(), Qt::KeepAspectRatio);
 }
 
 //*************************************************************************************************************
 
-void TmsiImpedanceWidget::addElectrodeItem(QString electrodeName, QVector2D position, QColor color)
+void TMSIImpedanceWidget::addElectrodeItem(QString electrodeName, QVector2D position, QColor color)
 {
-    TmsiElectrodeItem *item = new TmsiElectrodeItem(electrodeName, QPointF(position.x(), position.y()), color);
+    TMSIElectrodeItem *item = new TMSIElectrodeItem(electrodeName, QPointF(position.x(), position.y()), color);
     m_scene.addItem(item);
 }
 
 //*************************************************************************************************************
 
-void TmsiImpedanceWidget::startImpedanceMeasurement()
+void TMSIImpedanceWidget::startImpedanceMeasurement()
 {
     if(m_pTMSI->start())
     {
@@ -175,7 +174,7 @@ void TmsiImpedanceWidget::startImpedanceMeasurement()
 
 //*************************************************************************************************************
 
-void TmsiImpedanceWidget::stopImpedanceMeasurement()
+void TMSIImpedanceWidget::stopImpedanceMeasurement()
 {
     if(m_pTMSI->stop())
     {
@@ -187,29 +186,48 @@ void TmsiImpedanceWidget::stopImpedanceMeasurement()
 
 //*************************************************************************************************************
 
-void TmsiImpedanceWidget::takeScreenshot()
+void TMSIImpedanceWidget::takeScreenshot()
 {
-    // scale view in a way that all items are visible for the screenshot, then transform back
-//    QTransform temp = ui->m_graphicsView_impedanceView->transform();
-//    ui->m_graphicsView_impedanceView->fitInView(m_scene.sceneRect());
-
     // Open file dialog
     QDate date;
     QString fileName = QFileDialog::getSaveFileName(this,
                                                     "Save Screenshot",
-                                                    QString("%1_%2_%3_Impedances_").arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day()),
-                                                    "Image (*.png)");
+                                                    QString("%1/%2_%3_%4_Impedances").arg(QStandardPaths::writableLocation(QStandardPaths::DesktopLocation)).arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day()),
+                                                    tr("Vector graphic(*.svg);;Images (*.png)"));
 
-    // Generate screenshot
-    QPixmap pixMap = QPixmap::grabWidget(ui->m_graphicsView_impedanceView);
-    pixMap.save(fileName);
+    if(!fileName.isEmpty())
+    {
+        // scale view in a way that all items are visible for the screenshot, then transform back
+        QTransform temp = ui->m_graphicsView_impedanceView->transform();
+        ui->m_graphicsView_impedanceView->fitInView(m_scene.sceneRect(), Qt::KeepAspectRatio);
 
-//    ui->m_graphicsView_impedanceView->setTransform(temp);
+        // Generate screenshot
+        if(fileName.contains(".svg"))
+        {
+            QSvgGenerator svgGen;
+
+            svgGen.setFileName(fileName);
+            QRectF rect = m_scene.sceneRect();
+            svgGen.setSize(QSize(rect.height(), rect.width()));
+            svgGen.setViewBox(QRect(0, 0, rect.height(), rect.width()));
+
+            QPainter painter(&svgGen);
+            m_scene.render(&painter);
+        }
+
+        if(fileName.contains(".png"))
+        {
+            QPixmap pixMap = QPixmap::grabWidget(ui->m_graphicsView_impedanceView);
+            pixMap.save(fileName);
+        }
+
+        ui->m_graphicsView_impedanceView->setTransform(temp);
+    }
 }
 
 //*************************************************************************************************************
 
-void TmsiImpedanceWidget::loadLayout()
+void TMSIImpedanceWidget::loadLayout()
 {
     QString sElcFilePath = QFileDialog::getOpenFileName(this,
                                                         tr("Open Layout"),
@@ -228,7 +246,7 @@ void TmsiImpedanceWidget::loadLayout()
     else
         m_scene.clear();
 
-    // Clean old map -> Generate lookup table for channel names and index
+    // Clean old map -> Generate lookup table for channel names and corresponding index
     m_qmElectrodeNameIndex.clear();
 
     for(int i = 0; i<elcLocation2D.size(); i++)
