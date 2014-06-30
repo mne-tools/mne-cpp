@@ -61,7 +61,7 @@ else {
     }
 }
 
-QT += core widgets
+QT += core widgets svg
 
 TARGET = tmsi
 CONFIG(debug, debug|release) {

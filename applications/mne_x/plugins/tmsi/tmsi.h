@@ -126,7 +126,7 @@ class TMSISHARED_EXPORT TMSI : public ISensor
 
     friend class TMSIProducer;
     friend class TMSISetupWidget;
-    friend class TmsiImpedanceWidget;
+    friend class TMSIImpedanceWidget;
 
 public:
     //=========================================================================================================
@@ -239,7 +239,7 @@ private:
 
     QAction*                            m_pActionImpedance;                 /**< shows setup project dialog */
 
-    QSharedPointer<TmsiImpedanceWidget> m_pTmsiImpedanceWidget;             /**< Widget for checking the impedances*/
+    QSharedPointer<TMSIImpedanceWidget> m_pTmsiImpedanceWidget;             /**< Widget for checking the impedances*/
 };
 
 } // NAMESPACE

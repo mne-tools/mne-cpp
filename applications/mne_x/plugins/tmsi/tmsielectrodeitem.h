@@ -1,9 +1,9 @@
 //=============================================================================================================
 /**
-* @file     tmsiimpedancewidget.h
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
+* @file     tmsielectrodeitem.h
+* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
 * @date     June, 2014
 *
@@ -30,36 +30,22 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the TmsiImpedanceWidget class.
+* @brief    Contains the declaration of the TMSIElectrodeItem class.
 *
 */
 
-#ifndef TMSIIMPEDANCEWIDGET_H
-#define TMSIIMPEDANCEWIDGET_H
-
-//*************************************************************************************************************
-//=============================================================================================================
-// INCLUDES
-//=============================================================================================================
-
-#include <utils/asaelc.h>
-#include "../tmsielectrodeitem.h"
-
-#include <xMeas/newrealtimemultisamplearray.h>
+#ifndef TMSIELECTRODEITEM_H
+#define TMSIELECTRODEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QWidget>
-#include <QGraphicsScene>
-#include <QtSvg/QSvgGenerator>
-
-namespace Ui {
-class TMSIImpedanceWidget;
-}
-
+#include <QGraphicsItem>
+#include <QString>
+#include <QColor>
+#include <QPainter>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -69,85 +55,67 @@ class TMSIImpedanceWidget;
 namespace TMSIPlugin
 {
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace Eigen;
-using namespace UTILSLIB;
 
-
-//*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
+/**
+* TMSIElectrodeItem...
+*
+* @brief The TMSIElectrodeItem class provides a new data structure for sotring impedance values.
+*/
 
-class TMSI;
-
-
-class TMSIImpedanceWidget : public QWidget
+class TMSIElectrodeItem : public QGraphicsItem
 {
-    Q_OBJECT
 
 public:
-    explicit TMSIImpedanceWidget(TMSI* p_pTMSI, QWidget *parent = 0);
-    ~TMSIImpedanceWidget();
+    //=========================================================================================================
+    /**
+    * Constructs a TMSIElectrodeItem.
+    */
+    TMSIElectrodeItem(QString electrodeName, QPointF electrodePosition, QColor electrodeColor);
 
     //=========================================================================================================
     /**
-    * Updates the values of the electrodes placed in the QGraphicsScene.
+    * Sets the color of the electrode item.
     */
-    void updateGraphicScene(VectorXd matValue);
+    void setColor(QColor electrodeColor);
 
     //=========================================================================================================
     /**
-    * Initialises the 2D positions of the electrodes in the QGraphicsScene.
+    * Returns the bounding rect of the electrode item. This rect describes the area which the item uses to plot in.
     */
-    void initGraphicScene();
+    QRectF boundingRect() const;
+
+    //=========================================================================================================
+    /**
+    * Reimplemented paint function.
+    */
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+
+    //=========================================================================================================
+    /**
+    * Returns the electrode name.
+    */
+    QString getElectrodeName();
+
+    //=========================================================================================================
+    /**
+    * Sets the impedance value.
+    */
+    void setImpedanceValue(double impedanceValue);
 
 private:
-    TMSI*                       m_pTMSI;                    /**< The pointer back to the TMSI plugin.*/
-
-    QGraphicsScene              m_scene;                    /**< The QGraphicScene.*/
-
-    QMap< QString, int >        m_qmElectrodeNameIndex;     /**< Lookup table for electrode name and their corresponding index in the received data matrix.*/
-
-    Ui::TMSIImpedanceWidget*    ui;                         /**< The user interface for the TMSIImpedanceWidget.*/
-
-    //=========================================================================================================
-    /**
-    * Adds an electrode item to the QGraphicScene.
-    */
-    void addElectrodeItem(QString electrodeName, QVector2D position, QColor color);
-
-    //=========================================================================================================
-    /**
-    * Start the measurement process.
-    */
-    void startImpedanceMeasurement();
-
-    //=========================================================================================================
-    /**
-    * Stops the measurement process.
-    */
-    void stopImpedanceMeasurement();
-
-    //=========================================================================================================
-    /**
-    * Takes a screenshot of the current view.
-    */
-    void takeScreenshot();
-
-    //=========================================================================================================
-    /**
-    * Loads a layout from file.
-    */
-    void loadLayout();
+    QString m_sElectrodeName;           /**< Holds the electrode name.*/
+    QPointF m_qpElectrodePosition;      /**< Holds the electrode 2D position in the scene.*/
+    QColor m_cElectrodeColor;           /**< Holds the current electrode color.*/
+    double m_dImpedanceValue;           /**< Holds the current electrode impedance value.*/
 
 };
 
 } // NAMESPACE
 
-#endif // TMSIIMPEDANCEWIDGET_H
+#endif // TMSIELECTRODEITEM_H
