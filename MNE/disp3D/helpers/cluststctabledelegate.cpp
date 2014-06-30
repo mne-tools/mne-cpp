@@ -51,7 +51,7 @@ void ClustStcTableDelegate::paint(QPainter *painter, const QStyleOptionViewItem 
         case 4: { //Label
             painter->save();
 
-            painter->drawText(option.rect,Qt::AlignVCenter|Qt::AlignLeft,index.model()->data(index,Qt::DisplayRole).value<Label>().name);
+            painter->drawText(option.rect,Qt::AlignVCenter|Qt::AlignLeft,QString("%1 (%2)").arg(index.model()->data(index,Qt::DisplayRole).value<Label>().label_id).arg(index.model()->data(index,Qt::DisplayRole).value<Label>().name));
 
             painter->restore();
             break;
