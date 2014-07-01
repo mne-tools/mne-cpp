@@ -146,6 +146,18 @@ private:
     */
     void loadLayout();
 
+    //=========================================================================================================
+    /**
+    * Updates position of all electrodes in the scene.
+    */
+    void updateElectrodePositions();
+
+    //=========================================================================================================
+    /**
+    * Reimplemnted closing event handler. Used to stop the measurement when closing the widget.
+    */
+    void closeEvent(QCloseEvent *event);
+
 };
 
 } // NAMESPACE

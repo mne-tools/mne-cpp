@@ -46,6 +46,8 @@
 #include <QString>
 #include <QColor>
 #include <QPainter>
+#include <QStaticText>
+#include <iostream>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -107,6 +109,12 @@ public:
     * Sets the impedance value.
     */
     void setImpedanceValue(double impedanceValue);
+
+    //=========================================================================================================
+    /**
+    * Updates the electrodes position.
+    */
+    void setPosition(QPointF newPosition);
 
 private:
     QString m_sElectrodeName;           /**< Holds the electrode name.*/
