@@ -60,7 +60,17 @@ using namespace std;
 TMSIImpedanceView::TMSIImpedanceView(QWidget *parent) :
     QGraphicsView(parent)
 {
+    // Enable scene interactions
     this->setInteractive(true);
+
+    // Set scene rectangle
+    this->setSceneRect(-500, -500, 1000, 1000);
+
+    // Disable scroll bars - only use drag mode to navigate through scene
+    this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+    // Activate dragging
     this->setDragMode(QGraphicsView::ScrollHandDrag);
 }
 
@@ -69,10 +79,18 @@ TMSIImpedanceView::TMSIImpedanceView(QWidget *parent) :
 void TMSIImpedanceView::wheelEvent(QWheelEvent *event)
 {
     if(event->angleDelta().y()>0) // wheel was rotated forward
-        this->scale(2,2);
+        this->scale(1.5,1.5);
 
     if(event->angleDelta().y()<0) // wheel was rotated backward
-        this->scale(0.5,0.5);
+        this->scale(0.66,0.66);
+}
+
+//*************************************************************************************************************
+
+void TMSIImpedanceView::resizeEvent(QResizeEvent* event)
+{
+    Q_UNUSED(event);
+    this->fitInView(this->scene()->sceneRect(), Qt::KeepAspectRatio);
 }
 
 
