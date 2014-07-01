@@ -77,7 +77,13 @@ private:
     /**
     * Reimplemented wheel event used for zoomin in and out of the scene.
     */
-    void wheelEvent(QWheelEvent * event);
+    void wheelEvent(QWheelEvent* event);
+
+    //=========================================================================================================
+    /**
+    * Reimplemented resize event used scaling fitting the scene into the view after a resize occured.
+    */
+    void resizeEvent(QResizeEvent* event);
 
 };
 

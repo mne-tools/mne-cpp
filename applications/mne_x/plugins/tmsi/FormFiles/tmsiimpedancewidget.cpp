@@ -119,7 +119,7 @@ void TMSIImpedanceWidget::updateGraphicScene(VectorXd matValue)
             item->setImpedanceValue(impedanceValue);
         }
         else
-            qDebug()<<"TmsiImpedanceWidget - ERROR - There were more items in the scene than samples received from the device - Check the current layout!"<<endl;
+            qDebug()<<"TMSIImpedanceWidget - ERROR - There were more items in the scene than samples received from the device - Check the current layout!"<<endl;
     }
 
     m_scene.update(m_scene.sceneRect());
@@ -138,7 +138,7 @@ void TMSIImpedanceWidget::initGraphicScene()
     QVector< QVector<double> > elcLocation2D;
     QString unit;
     QStringList elcChannelNames;
-    QString sElcFilePath = QString("./mne_x_plugins/resources/tmsi/loc_files/standard_waveguard256.elc");
+    QString sElcFilePath = QString("./mne_x_plugins/resources/tmsi/loc_files/standard_waveguard8.elc");
 
     if(!asaObject->readElcFile(sElcFilePath, elcChannelNames, elcLocation3D, elcLocation2D, unit))
     {
@@ -146,7 +146,7 @@ void TMSIImpedanceWidget::initGraphicScene()
         return;
     }
 
-    // Generate lookup table for channel names and index and corresponding index
+    // Generate lookup table for channel names to corresponding matrix/vector index
     for(int i = 0; i<elcLocation2D.size(); i++)
         m_qmElectrodeNameIndex.insert(elcChannelNames.at(i), i);
 
@@ -170,24 +170,30 @@ void TMSIImpedanceWidget::addElectrodeItem(QString electrodeName, QVector2D posi
 
 void TMSIImpedanceWidget::startImpedanceMeasurement()
 {
+    m_pTMSI->m_bCheckImpedances = true;
+
     if(m_pTMSI->start())
     {
-        m_pTMSI->m_bCheckImpedances = true;
         ui->m_pushButton_stop->setEnabled(true);
         ui->m_pushButton_start->setEnabled(false);
     }
+    else
+        m_pTMSI->m_bCheckImpedances = false;
 }
 
 //*************************************************************************************************************
 
 void TMSIImpedanceWidget::stopImpedanceMeasurement()
 {
+    m_pTMSI->m_bCheckImpedances = false;
+
     if(m_pTMSI->stop())
     {
-        m_pTMSI->m_bCheckImpedances = false;
         ui->m_pushButton_stop->setEnabled(false);
         ui->m_pushButton_start->setEnabled(true);
     }
+    else
+        m_pTMSI->m_bCheckImpedances = true;
 }
 
 //*************************************************************************************************************
@@ -238,7 +244,7 @@ void TMSIImpedanceWidget::loadLayout()
     QString sElcFilePath = QFileDialog::getOpenFileName(this,
                                                         tr("Open Layout"),
                                                         "./mne_x_plugins/resources/tmsi/loc_files/",
-                                                        tr("Layout Files (*.elc)"));
+                                                        tr("ELC layout file (*.elc)"));
 
     // Load standard layout file
     AsAElc *asaObject = new AsAElc();
