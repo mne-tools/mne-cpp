@@ -48,6 +48,7 @@
 //=============================================================================================================
 
 using namespace TMSIPlugin;
+using namespace std;
 
 
 //*************************************************************************************************************
@@ -88,15 +89,15 @@ void TMSIElectrodeItem::paint(QPainter *painter, const QStyleOptionGraphicsItem 
     painter->drawEllipse(-15, -15, 30, 30);
 
     // Plot electrode name
-    painter->setPen(QPen(Qt::black, 1));
-    painter->setFont(QFont("Arial", 10));
-    painter->drawText(-10, -20, m_sElectrodeName);
+    QStaticText staticElectrodeName = QStaticText(m_sElectrodeName);
+    QSizeF sizeText = staticElectrodeName.size();
+    painter->drawStaticText(-15+((30-sizeText.width())/2), -32, staticElectrodeName);
 
     // Plot electrodes impedance value
     QString impedanceValueToString;
-    painter->setPen(QPen(Qt::white, 1));
-    painter->setFont(QFont("Arial", 10));
-    painter->drawText(-3, 5, impedanceValueToString.setNum(m_dImpedanceValue));
+    QStaticText staticElectrodeValue = QStaticText(impedanceValueToString.setNum(m_dImpedanceValue));
+    QSizeF sizeValue = staticElectrodeValue.size();
+    painter->drawStaticText(-15+((30-sizeValue.width())/2), 19, staticElectrodeValue);
 
     this->setPos(m_qpElectrodePosition);
 }
@@ -122,8 +123,12 @@ void TMSIElectrodeItem::setImpedanceValue(double impedanceValue)
     m_dImpedanceValue = impedanceValue;
 }
 
+//*************************************************************************************************************
 
-
+void TMSIElectrodeItem::setPosition(QPointF newPosition)
+{
+    m_qpElectrodePosition = newPosition;
+}
 
 
 

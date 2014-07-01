@@ -64,7 +64,7 @@ TMSIImpedanceView::TMSIImpedanceView(QWidget *parent) :
     this->setInteractive(true);
 
     // Set scene rectangle
-    this->setSceneRect(-500, -500, 1000, 1000);
+    this->setSceneRect(-2500, -2500, 5000, 5000);
 
     // Disable scroll bars - only use drag mode to navigate through scene
     this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -90,8 +90,9 @@ void TMSIImpedanceView::wheelEvent(QWheelEvent *event)
 void TMSIImpedanceView::resizeEvent(QResizeEvent* event)
 {
     Q_UNUSED(event);
-    this->fitInView(this->scene()->sceneRect(), Qt::KeepAspectRatio);
+    this->fitInView(this->scene()->itemsBoundingRect(), Qt::KeepAspectRatio);
 }
+
 
 
 
