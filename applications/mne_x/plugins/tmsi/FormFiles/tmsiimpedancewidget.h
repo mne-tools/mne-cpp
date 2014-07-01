@@ -158,6 +158,12 @@ private:
     */
     void closeEvent(QCloseEvent *event);
 
+    //=========================================================================================================
+    /**
+    * Saves the current labels and impedance values to a ASI formated file.
+    */
+    void saveToFile();
+
 };
 
 } // NAMESPACE

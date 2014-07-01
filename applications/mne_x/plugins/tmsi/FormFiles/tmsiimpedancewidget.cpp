@@ -84,6 +84,7 @@ TMSIImpedanceWidget::TMSIImpedanceWidget(TMSI* p_pTMSI, QWidget *parent)
     connect(ui->m_pushButton_start, &QPushButton::released, this, &TMSIImpedanceWidget::startImpedanceMeasurement);
     connect(ui->m_pushButton_takeScreenshot, &QPushButton::released, this, &TMSIImpedanceWidget::takeScreenshot);
     connect(ui->m_pushButton_loadLayout, &QPushButton::released, this, &TMSIImpedanceWidget::loadLayout);
+    connect(ui->m_pushButton_saveValues, &QPushButton::released, this, &TMSIImpedanceWidget::saveToFile);
     connect(ui->m_doubleSpinBox_scaleValue, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
             this, &TMSIImpedanceWidget::updateElectrodePositions);
 }
@@ -307,5 +308,32 @@ void TMSIImpedanceWidget::closeEvent(QCloseEvent *event)
     Q_UNUSED(event);
 
     // On window close event -> stop impedance measurement
-    stopImpedanceMeasurement();
+    if(m_pTMSI->m_bIsRunning)
+        stopImpedanceMeasurement();
+}
+
+//*************************************************************************************************************
+
+void TMSIImpedanceWidget::saveToFile()
+{
+    // Open file dialog
+    QDate date;
+    QString fileName = QFileDialog::getSaveFileName(this,
+                                                    "Save impedance values",
+                                                    QString("%1/%2_%3_%4_Impedances").arg(QStandardPaths::writableLocation(QStandardPaths::DesktopLocation)).arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day()),
+                                                    tr("Text file (*.txt)"));
+
+    ofstream outputFileStream;
+    outputFileStream.open(fileName.toStdString(), ios::trunc); //ios::trunc deletes old file data
+
+    QList<QGraphicsItem *> itemList = m_scene.items();
+
+    // Update position
+    for(int i = 0; i<itemList.size(); i++)
+    {
+        TMSIElectrodeItem *item = (TMSIElectrodeItem *) itemList.at(i);
+        outputFileStream << item->getElectrodeName().toStdString() << ": " << item->getImpedanceValue() << endl;
+    }
+
+    outputFileStream.close();
 }

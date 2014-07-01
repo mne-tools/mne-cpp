@@ -361,7 +361,7 @@ private:
     QVector <FLOAT>     m_vUnitGain;                    /**< Contains the unit gain for every channel available by the device.*/
     QVector <FLOAT>     m_vUnitOffSet;                  /**< Contains the unit offset for every channel available by the device.*/
     LONG*               m_lSignalBuffer;                /**< Buffer in which the device can write the samples -> these values get read out by the getSampleMatrix(...) function.*/
-    LONG                m_lSignalBufferSize ;           /**< Size of m_ulSignalBuffer = (samples per block) * (number of channels) * 4 (4 because every signal value takes 4 bytes - see TMSi SDK documentation).*/
+    LONG                m_lSignalBufferSize;            /**< Size of m_ulSignalBuffer = (samples per block) * (number of channels) * 4 (4 because every signal value takes 4 bytes - see TMSi SDK documentation).*/
     ofstream            m_outputFileStream;             /**< fstream for writing the driver debug informations to a txt file.*/
     QVector <double>    m_vSampleBlockBuffer;           /**< Buffer to store all the incoming smaples. This is the buffer which is getting read from.*/
 

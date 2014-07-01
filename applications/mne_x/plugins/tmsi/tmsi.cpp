@@ -125,7 +125,7 @@ void TMSI::init()
     m_bIsRunning = false;
     m_bBeepTrigger = false;
     m_bUseCommonAverage = true;
-    m_bUseKeyboardTrigger = true;
+    m_bUseKeyboardTrigger = false;
     m_bCheckImpedances = false;
 
     m_iTriggerType = 0;
