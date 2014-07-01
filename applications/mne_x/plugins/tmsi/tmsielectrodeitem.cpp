@@ -125,6 +125,13 @@ void TMSIElectrodeItem::setImpedanceValue(double impedanceValue)
 
 //*************************************************************************************************************
 
+double TMSIElectrodeItem::getImpedanceValue()
+{
+    return m_dImpedanceValue;
+}
+
+//*************************************************************************************************************
+
 void TMSIElectrodeItem::setPosition(QPointF newPosition)
 {
     m_qpElectrodePosition = newPosition;

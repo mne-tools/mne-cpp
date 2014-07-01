@@ -112,6 +112,12 @@ public:
 
     //=========================================================================================================
     /**
+    * Returns the impedance value.
+    */
+    double getImpedanceValue();
+
+    //=========================================================================================================
+    /**
     * Updates the electrodes position.
     */
     void setPosition(QPointF newPosition);
