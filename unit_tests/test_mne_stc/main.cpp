@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Example of the computation of a rawClusteredInverse
+* @brief    Example of the computation of a test mne stc
 *
 */
 
@@ -119,8 +119,8 @@ int main(int argc, char *argv[])
 
 
 
-    AnnotationSet t_annotationSet("mind006", 2, "aparc.a2009s", "D:/Data/subjects");
-    SurfaceSet t_surfSet("mind006", 2, "white", "D:/Data/subjects");
+    AnnotationSet t_annotationSet("mind006", 2, "aparc.a2009s", "E:/Data/subjects");
+    SurfaceSet t_surfSet("mind006", 2, "white", "E:/Data/subjects");
 
     QString t_sFileNameStc("test_mind006_051209_auditory01.stc");//"mind006_051209_auditory01_test.stc");
     MNESourceEstimate sourceEstimateClustered;
