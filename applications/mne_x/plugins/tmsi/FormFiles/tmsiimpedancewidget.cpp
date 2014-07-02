@@ -61,6 +61,7 @@
 
 using namespace TMSIPlugin;
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -70,11 +71,15 @@ TMSIImpedanceWidget::TMSIImpedanceWidget(TMSI* p_pTMSI, QWidget *parent)
 : m_pTMSI(p_pTMSI)
 , QWidget(parent)
 , ui(new Ui::TMSIImpedanceWidget)
+, m_dMaxImpedance(100000)
 {
     ui->setupUi(this);
 
+    // Init colormap object
+    m_cbColorMap = QSharedPointer<ColorMap>(new ColorMap());
+
     // Init GUI stuff
-    m_qGScene = new TMSIImpedanceScene();//QSharedPointer<TMSIImpedanceScene>(new TMSIImpedanceScene(this));
+    m_qGScene = new TMSIImpedanceScene();
     ui->m_graphicsView_impedanceView->setScene(m_qGScene);
     ui->m_graphicsView_impedanceView->show();
 
@@ -121,12 +126,15 @@ void TMSIImpedanceWidget::updateGraphicScene(VectorXd matValue)
         matIndex = m_qmElectrodeNameIndex[item->getElectrodeName()];
         impedanceValue = matValue[matIndex];
 
-        // set new color and impedance value
-        item->setColor(QColor(qrand() % 256, qrand() % 256, qrand() % 256));
+        // set new color and impedance value. Clip received impedance value if > predefined max impedance value
+        if(impedanceValue>m_dMaxImpedance || impedanceValue<0)
+            impedanceValue = m_dMaxImpedance;
+
+        item->setColor(m_cbColorMap->valueToJet(impedanceValue/m_dMaxImpedance));
         item->setImpedanceValue(impedanceValue);
     }
 
-    m_qGScene->update(m_qGScene->sceneRect());
+    m_qGScene->update(m_qGScene->itemsBoundingRect());
 }
 
 //*************************************************************************************************************
@@ -158,18 +166,15 @@ void TMSIImpedanceWidget::initGraphicScene()
     for(int i = 0; i<elcLocation2D.size(); i++)
     {
         QVector2D position(elcLocation2D[i][1]*-4.5,elcLocation2D[i][0]*-4.5); // swap x y to rotate 90°, multiply to mirror by x and y axis, multiply by to scale
-        addElectrodeItem(elcChannelNames.at(i), position, QColor(qrand() % 256, qrand() % 256, qrand() % 256));
+        addElectrodeItem(elcChannelNames.at(i), position);
     }
-
-    // Fit view to scene
-    // ui->m_graphicsView_impedanceView->fitInView(m_qGScene->itemsBoundingRect(), Qt::KeepAspectRatio);
 }
 
 //*************************************************************************************************************
 
-void TMSIImpedanceWidget::addElectrodeItem(QString electrodeName, QVector2D position, QColor color)
+void TMSIImpedanceWidget::addElectrodeItem(QString electrodeName, QVector2D position)
 {
-    TMSIElectrodeItem *item = new TMSIElectrodeItem(electrodeName, QPointF(position.x(), position.y()), color);
+    TMSIElectrodeItem *item = new TMSIElectrodeItem(electrodeName, QPointF(position.x(), position.y()), QColor(m_cbColorMap->valueToJet(1)));
     m_qGScene->addItem(item);
 }
 
@@ -275,11 +280,9 @@ void TMSIImpedanceWidget::loadLayout()
     for(int i = 0; i<elcLocation2D.size(); i++)
     {
         QVector2D position(elcLocation2D[i][1]*-4.5,elcLocation2D[i][0]*-4.5); // swap x y to rotate 90°, multiply to mirror by x and y axis, multiply by to scale
-        addElectrodeItem(elcChannelNames.at(i), position, QColor(qrand() % 256, qrand() % 256, qrand() % 256));
-    }
 
-    // Fit view to scene
-    // ui->m_graphicsView_impedanceView->fitInView(m_qGScene->itemsBoundingRect(), Qt::KeepAspectRatio);
+        addElectrodeItem(elcChannelNames.at(i), position);
+    }
 }
 
 //*************************************************************************************************************

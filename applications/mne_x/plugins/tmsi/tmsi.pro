@@ -73,6 +73,7 @@ CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
             -lMNE$${MNE_LIB_VERSION}Utilsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
+            -lMNE$${MNE_LIB_VERSION}Dispd \
             -lxMeasd \
             -lxDispd \
             -lmne_xd
@@ -81,6 +82,7 @@ else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
             -lMNE$${MNE_LIB_VERSION}Utils \
             -lMNE$${MNE_LIB_VERSION}Fiff \
+            -lMNE$${MNE_LIB_VERSION}Disp \
             -lxMeas \
             -lxDisp \
             -lmne_x
@@ -97,8 +99,8 @@ SOURCES += \
         FormFiles/tmsimanualannotationwidget.cpp \
         FormFiles/tmsiimpedancewidget.cpp \
         tmsielectrodeitem.cpp \
-    tmsiimpedanceview.cpp \
-    tmsiimpedancescene.cpp
+        tmsiimpedanceview.cpp \
+        tmsiimpedancescene.cpp
 
 HEADERS += \
         tmsi.h\
@@ -110,8 +112,8 @@ HEADERS += \
         FormFiles/tmsimanualannotationwidget.h \
         FormFiles/tmsiimpedancewidget.h \
         tmsielectrodeitem.h \
-    tmsiimpedanceview.h \
-    tmsiimpedancescene.h
+        tmsiimpedanceview.h \
+        tmsiimpedancescene.h
 
 FORMS += \
         FormFiles/tmsisetup.ui \

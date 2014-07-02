@@ -57,8 +57,8 @@ using namespace std;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-TMSIImpedanceView::TMSIImpedanceView(QWidget *parent) :
-    QGraphicsView(parent)
+TMSIImpedanceView::TMSIImpedanceView(QWidget *parent)
+: QGraphicsView(parent)
 {
     // Enable scene interactions
     this->setInteractive(true);
@@ -79,10 +79,10 @@ TMSIImpedanceView::TMSIImpedanceView(QWidget *parent) :
 void TMSIImpedanceView::wheelEvent(QWheelEvent* event)
 {
     if(event->angleDelta().y()>0) // wheel was rotated forward
-        this->scale(1.5,1.5);
+        this->scale(1.25,1.25);
 
     if(event->angleDelta().y()<0) // wheel was rotated backward
-        this->scale(0.66,0.66);
+        this->scale(0.75,0.75);
 }
 
 //*************************************************************************************************************
@@ -93,10 +93,10 @@ void TMSIImpedanceView::resizeEvent(QResizeEvent* event)
     this->fitInView(this->scene()->itemsBoundingRect(), Qt::KeepAspectRatio);
 }
 
-////*************************************************************************************************************
+//*************************************************************************************************************
 
-//void TMSIImpedanceView::mousePressEvent(QMouseEvent* event)
-//{
-//    if(event->button() == Qt::MidButton)
-//        this->fitInView(this->scene()->itemsBoundingRect(), Qt::KeepAspectRatio);
-//}
+void TMSIImpedanceView::mouseDoubleClickEvent(QMouseEvent* event)
+{
+    Q_UNUSED(event);
+    this->fitInView(this->scene()->itemsBoundingRect(), Qt::KeepAspectRatio);
+}
