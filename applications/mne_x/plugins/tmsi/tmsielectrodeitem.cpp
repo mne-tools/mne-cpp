@@ -68,7 +68,7 @@ TMSIElectrodeItem::TMSIElectrodeItem(QString electrodeName, QPointF electrodePos
 
 QRectF TMSIElectrodeItem::boundingRect() const
 {
-    return QRectF(-25, -35, 50, 60);
+    return QRectF(-25, -35, 50, 70);
 }
 
 //*************************************************************************************************************
@@ -135,6 +135,13 @@ double TMSIElectrodeItem::getImpedanceValue()
 void TMSIElectrodeItem::setPosition(QPointF newPosition)
 {
     m_qpElectrodePosition = newPosition;
+}
+
+//*************************************************************************************************************
+
+QPointF TMSIElectrodeItem::getPosition()
+{
+    return m_qpElectrodePosition;
 }
 
 

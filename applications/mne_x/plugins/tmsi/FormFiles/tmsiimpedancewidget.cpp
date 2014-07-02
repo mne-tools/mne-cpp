@@ -74,7 +74,8 @@ TMSIImpedanceWidget::TMSIImpedanceWidget(TMSI* p_pTMSI, QWidget *parent)
     ui->setupUi(this);
 
     // Init GUI stuff
-    ui->m_graphicsView_impedanceView->setScene(&m_scene);
+    m_qGScene = new TMSIImpedanceScene();//QSharedPointer<TMSIImpedanceScene>(new TMSIImpedanceScene(this));
+    ui->m_graphicsView_impedanceView->setScene(m_qGScene);
     ui->m_graphicsView_impedanceView->show();
 
     ui->m_pushButton_stop->setEnabled(false);
@@ -85,8 +86,6 @@ TMSIImpedanceWidget::TMSIImpedanceWidget(TMSI* p_pTMSI, QWidget *parent)
     connect(ui->m_pushButton_takeScreenshot, &QPushButton::released, this, &TMSIImpedanceWidget::takeScreenshot);
     connect(ui->m_pushButton_loadLayout, &QPushButton::released, this, &TMSIImpedanceWidget::loadLayout);
     connect(ui->m_pushButton_saveValues, &QPushButton::released, this, &TMSIImpedanceWidget::saveToFile);
-    connect(ui->m_doubleSpinBox_scaleValue, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            this, &TMSIImpedanceWidget::updateElectrodePositions);
 }
 
 //*************************************************************************************************************
@@ -101,7 +100,7 @@ TMSIImpedanceWidget::~TMSIImpedanceWidget()
 void TMSIImpedanceWidget::updateGraphicScene(VectorXd matValue)
 {
     // Get scene items
-    QList<QGraphicsItem *> itemList = m_scene.items();
+    QList<QGraphicsItem *> itemList = m_qGScene->items();
 
     // Update color and impedance values for each electrode item
     int matIndex = 0;
@@ -127,7 +126,7 @@ void TMSIImpedanceWidget::updateGraphicScene(VectorXd matValue)
         item->setImpedanceValue(impedanceValue);
     }
 
-    m_scene.update(m_scene.sceneRect());
+    m_qGScene->update(m_qGScene->sceneRect());
 }
 
 //*************************************************************************************************************
@@ -135,7 +134,7 @@ void TMSIImpedanceWidget::updateGraphicScene(VectorXd matValue)
 void TMSIImpedanceWidget::initGraphicScene()
 {
     // Clear all items from scene
-    m_scene.clear();
+    m_qGScene->clear();
 
     // Load standard layout file
     AsAElc *asaObject = new AsAElc();
@@ -143,7 +142,7 @@ void TMSIImpedanceWidget::initGraphicScene()
     QVector< QVector<double> > elcLocation2D;
     QString unit;
     QStringList elcChannelNames;
-    QString sElcFilePath = QString("./mne_x_plugins/resources/tmsi/loc_files/standard_waveguard8.elc");
+    QString sElcFilePath = QString("./mne_x_plugins/resources/tmsi/loc_files/standard_waveguard128.elc");
 
     if(!asaObject->readElcFile(sElcFilePath, elcChannelNames, elcLocation3D, elcLocation2D, unit))
     {
@@ -158,12 +157,12 @@ void TMSIImpedanceWidget::initGraphicScene()
     // Add electrodes to scene
     for(int i = 0; i<elcLocation2D.size(); i++)
     {
-        QVector2D position(elcLocation2D[i][1]*-2,elcLocation2D[i][0]*-2); // swap x y to rotate 90°, multiply to mirror by x and y axis, multiply by to scale
+        QVector2D position(elcLocation2D[i][1]*-4.5,elcLocation2D[i][0]*-4.5); // swap x y to rotate 90°, multiply to mirror by x and y axis, multiply by to scale
         addElectrodeItem(elcChannelNames.at(i), position, QColor(qrand() % 256, qrand() % 256, qrand() % 256));
     }
 
     // Fit view to scene
-    // ui->m_graphicsView_impedanceView->fitInView(m_scene.itemsBoundingRect(), Qt::KeepAspectRatio);
+    // ui->m_graphicsView_impedanceView->fitInView(m_qGScene->itemsBoundingRect(), Qt::KeepAspectRatio);
 }
 
 //*************************************************************************************************************
@@ -171,7 +170,7 @@ void TMSIImpedanceWidget::initGraphicScene()
 void TMSIImpedanceWidget::addElectrodeItem(QString electrodeName, QVector2D position, QColor color)
 {
     TMSIElectrodeItem *item = new TMSIElectrodeItem(electrodeName, QPointF(position.x(), position.y()), color);
-    m_scene.addItem(item);
+    m_qGScene->addItem(item);
 }
 
 //*************************************************************************************************************
@@ -219,7 +218,7 @@ void TMSIImpedanceWidget::takeScreenshot()
     {
         // scale view in a way that all items are visible for the screenshot, then transform back
         QTransform temp = ui->m_graphicsView_impedanceView->transform();
-        ui->m_graphicsView_impedanceView->fitInView(m_scene.itemsBoundingRect(), Qt::KeepAspectRatio);
+        ui->m_graphicsView_impedanceView->fitInView(m_qGScene->itemsBoundingRect(), Qt::KeepAspectRatio);
 
         // Generate screenshot
         if(fileName.contains(".svg"))
@@ -227,12 +226,12 @@ void TMSIImpedanceWidget::takeScreenshot()
             QSvgGenerator svgGen;
 
             svgGen.setFileName(fileName);
-            QRectF rect = m_scene.sceneRect();
+            QRectF rect = m_qGScene->sceneRect();
             svgGen.setSize(QSize(rect.height(), rect.width()));
             svgGen.setViewBox(QRect(0, 0, rect.height(), rect.width()));
 
             QPainter painter(&svgGen);
-            m_scene.render(&painter);
+            m_qGScene->render(&painter);
         }
 
         if(fileName.contains(".png"))
@@ -264,7 +263,7 @@ void TMSIImpedanceWidget::loadLayout()
     if(!asaObject->readElcFile(sElcFilePath, elcChannelNames, elcLocation3D, elcLocation2D, unit))
         qDebug() << "Error: Reading elc file.";
     else
-        m_scene.clear();
+        m_qGScene->clear();
 
     // Clean old map -> Generate lookup table for channel names and corresponding index
     m_qmElectrodeNameIndex.clear();
@@ -275,30 +274,12 @@ void TMSIImpedanceWidget::loadLayout()
     // Add electrodes to scene
     for(int i = 0; i<elcLocation2D.size(); i++)
     {
-        QVector2D position(elcLocation2D[i][1]*-2,elcLocation2D[i][0]*-2); // swap x y to rotate 90°, multiply to mirror by x and y axis, multiply by to scale
+        QVector2D position(elcLocation2D[i][1]*-4.5,elcLocation2D[i][0]*-4.5); // swap x y to rotate 90°, multiply to mirror by x and y axis, multiply by to scale
         addElectrodeItem(elcChannelNames.at(i), position, QColor(qrand() % 256, qrand() % 256, qrand() % 256));
     }
 
     // Fit view to scene
-    // ui->m_graphicsView_impedanceView->fitInView(m_scene.itemsBoundingRect(), Qt::KeepAspectRatio);
-}
-
-//*************************************************************************************************************
-
-void TMSIImpedanceWidget::updateElectrodePositions()
-{
-    // Get scene items
-    QList<QGraphicsItem *> itemList = m_scene.items();
-
-    // Update position
-    for(int i = 0; i<itemList.size(); i++)
-    {
-        TMSIElectrodeItem *item = (TMSIElectrodeItem *) itemList.at(i);
-
-        item->setPosition(item->pos()*ui->m_doubleSpinBox_scaleValue->value());
-    }
-
-    m_scene.update(m_scene.sceneRect());
+    // ui->m_graphicsView_impedanceView->fitInView(m_qGScene->itemsBoundingRect(), Qt::KeepAspectRatio);
 }
 
 //*************************************************************************************************************
@@ -326,7 +307,7 @@ void TMSIImpedanceWidget::saveToFile()
     ofstream outputFileStream;
     outputFileStream.open(fileName.toStdString(), ios::trunc); //ios::trunc deletes old file data
 
-    QList<QGraphicsItem *> itemList = m_scene.items();
+    QList<QGraphicsItem *> itemList = m_qGScene->items();
 
     // Update position
     for(int i = 0; i<itemList.size(); i++)
