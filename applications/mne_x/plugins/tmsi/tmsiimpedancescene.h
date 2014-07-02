@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     tmsiimpedanceview.h
+* @file     tmsiimpedancescene.h
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
@@ -30,18 +30,17 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the TMSIImpedanceView class.
+* @brief    Contains the declaration of the TMSIImpedanceScene class.
 *
 */
 
-#ifndef TMSIIMPEDANCEVIEW_H
-#define TMSIIMPEDANCEVIEW_H
+#ifndef TMSIIMPEDANCESCENE_H
+#define TMSIIMPEDANCESCENE_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
-#include <iostream>
 #include <tmsielectrodeitem.h>
 
 
@@ -49,8 +48,8 @@
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
-#include <QGraphicsView>
-#include <QWheelEvent>
+#include <QGraphicsScene>
+#include <QGraphicsSceneMouseEvent>
 
 
 //*************************************************************************************************************
@@ -61,38 +60,49 @@
 namespace TMSIPlugin
 {
 
-class TMSIImpedanceView : public QGraphicsView
+
+class TMSIImpedanceScene : public QGraphicsScene
 {
     Q_OBJECT
 
 public:
     //=========================================================================================================
     /**
-    * Constructs a TMSIImpedanceView.
+    * Constructs a TMSIImpedanceScene.
     */
-    explicit TMSIImpedanceView(QWidget *parent = 0);
+    explicit TMSIImpedanceScene(QObject *parent = 0);
 
 private:
-    //=========================================================================================================
-    /**
-    * Reimplemented wheel event used for zoomin in and out of the scene.
-    */
-    void wheelEvent(QWheelEvent* event);
+    QPointF     m_mousePosition;                /**< Holds the mouse position.*/
+    bool        m_bRightMouseKeyPressed;        /**< Whether the right mouse button was pressed.*/
 
-    //=========================================================================================================
-    /**
-    * Reimplemented resize event used scaling fitting the scene into the view after a resize occured.
-    */
-    void resizeEvent(QResizeEvent* event);
 
     //=========================================================================================================
     /**
     * Reimplemented mouse press event handler.
     */
-    void mouseDoubleClickEvent(QMouseEvent* event);
+    void mousePressEvent(QGraphicsSceneMouseEvent * event);
+
+    //=========================================================================================================
+    /**
+    * Reimplemented mouse move event handler.
+    */
+    void mouseMoveEvent(QGraphicsSceneMouseEvent * event);
+
+    //=========================================================================================================
+    /**
+    * Reimplemented mouse release event handler.
+    */
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent * event);
+
+    //=========================================================================================================
+    /**
+    * Updates position of all electrodes in the scene.
+    */
+    void scaleElectrodePositions(double scaleFactor);
 
 };
 
 } // NAMESPACE
 
-#endif // TMSIIMPEDANCEVIEW_H
+#endif // TMSIIMPEDANCESCENE_H

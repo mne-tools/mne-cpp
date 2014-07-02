@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     tmsielectrodeitem.cpp
+* @file     tmsiimpedancescene.h
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the TmsiElectrodeItem class.
+* @brief    Contains the implementation of the TMSIImpedanceScene class.
 *
 */
 
@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "tmsielectrodeitem.h"
+#include "tmsiimpedancescene.h"
 
 
 //*************************************************************************************************************
@@ -56,101 +56,67 @@ using namespace std;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-TMSIElectrodeItem::TMSIElectrodeItem(QString electrodeName, QPointF electrodePosition, QColor electrodeColor)
-: m_sElectrodeName(electrodeName)
-, m_qpElectrodePosition(electrodePosition)
-, m_cElectrodeColor(electrodeColor)
-, m_dImpedanceValue(0.0)
+TMSIImpedanceScene::TMSIImpedanceScene(QObject *parent)
+: QGraphicsScene(parent)
+, m_bRightMouseKeyPressed(false)
 {
+
 }
 
 //*************************************************************************************************************
 
-QRectF TMSIElectrodeItem::boundingRect() const
+void TMSIImpedanceScene::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
-    return QRectF(-25, -35, 50, 70);
+    if(event->button() == Qt::RightButton)
+        m_bRightMouseKeyPressed = true;
+
+    QGraphicsScene::mousePressEvent(event);
 }
 
 //*************************************************************************************************************
 
-void TMSIElectrodeItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void TMSIImpedanceScene::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 {
-    Q_UNUSED(option);
-    Q_UNUSED(widget);
+    if(m_bRightMouseKeyPressed)
+    {
+        if(m_mousePosition.x()-event->scenePos().x() > 0) // user moved mouse to the left while pressing the right mouse key
+            scaleElectrodePositions(0.99);
 
-    // Plot shadow
-    painter->setPen(Qt::NoPen);
-    painter->setBrush(Qt::darkGray);
-    painter->drawEllipse(-12, -12, 30, 30);
+        if(m_mousePosition.x()-event->scenePos().x() < 0) // user moved mouse to the right while pressing the right mouse key
+            scaleElectrodePositions(1.01);
+    }
 
-    // Plot colored circle
-    painter->setPen(QPen(Qt::black, 1));
-    painter->setBrush(QBrush(m_cElectrodeColor));
-    painter->drawEllipse(-15, -15, 30, 30);
+    m_mousePosition = event->scenePos();
 
-    // Plot electrode name
-    QStaticText staticElectrodeName = QStaticText(m_sElectrodeName);
-    QSizeF sizeText = staticElectrodeName.size();
-    painter->drawStaticText(-15+((30-sizeText.width())/2), -32, staticElectrodeName);
-
-    // Plot electrodes impedance value
-    QString impedanceValueToString;
-    QStaticText staticElectrodeValue = QStaticText(QString("%1 %2").arg(impedanceValueToString.setNum(m_dImpedanceValue)).arg("Ohm"));
-    QSizeF sizeValue = staticElectrodeValue.size();
-    painter->drawStaticText(-15+((30-sizeValue.width())/2), 19, staticElectrodeValue);
-
-    this->setPos(m_qpElectrodePosition);
+    QGraphicsScene::mouseMoveEvent(event);
 }
 
 //*************************************************************************************************************
 
-void TMSIElectrodeItem::setColor(QColor electrodeColor)
+void TMSIImpedanceScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 {
-    m_cElectrodeColor = electrodeColor;
+    if(event->button() == Qt::RightButton)
+        m_bRightMouseKeyPressed = false;
+
+    QGraphicsScene::mouseReleaseEvent(event);
 }
 
 //*************************************************************************************************************
 
-QString TMSIElectrodeItem::getElectrodeName()
+void TMSIImpedanceScene::scaleElectrodePositions(double scaleFactor)
 {
-    return m_sElectrodeName;
+    // Get scene items
+    QList<QGraphicsItem *> itemList = this->items();
+
+    // Update position
+    for(int i = 0; i<itemList.size(); i++)
+    {
+        TMSIElectrodeItem* item = (TMSIElectrodeItem *) itemList.at(i);
+
+        item->setPosition(item->getPosition()*scaleFactor);
+    }
+
+    this->update(this->itemsBoundingRect());
 }
-
-//*************************************************************************************************************
-
-void TMSIElectrodeItem::setImpedanceValue(double impedanceValue)
-{
-    m_dImpedanceValue = impedanceValue;
-}
-
-//*************************************************************************************************************
-
-double TMSIElectrodeItem::getImpedanceValue()
-{
-    return m_dImpedanceValue;
-}
-
-//*************************************************************************************************************
-
-void TMSIElectrodeItem::setPosition(QPointF newPosition)
-{
-    m_qpElectrodePosition = newPosition;
-}
-
-//*************************************************************************************************************
-
-QPointF TMSIElectrodeItem::getPosition()
-{
-    return m_qpElectrodePosition;
-}
-
-
-
-
-
-
-
-
-
 
 

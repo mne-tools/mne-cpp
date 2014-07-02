@@ -45,6 +45,7 @@
 #include <utils/asaelc.h>
 #include "../tmsielectrodeitem.h"
 #include "../tmsiimpedancescene.h"
+#include "disp/colormap.h"
 
 #include <xMeas/newrealtimemultisamplearray.h>
 
@@ -78,7 +79,7 @@ namespace TMSIPlugin
 
 using namespace Eigen;
 using namespace UTILSLIB;
-
+using namespace DISPLIB;
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -117,11 +118,15 @@ private:
 
     Ui::TMSIImpedanceWidget*                    ui;                         /**< The user interface for the TMSIImpedanceWidget.*/
 
+    QSharedPointer<ColorMap>                    m_cbColorMap;               /**< The pointer the colormap object.*/
+
+    double                                      m_dMaxImpedance;            /**< Maximum impedance value. This is a fixed value to scale the color map.*/
+
     //=========================================================================================================
     /**
     * Adds an electrode item to the QGraphicScene.
     */
-    void addElectrodeItem(QString electrodeName, QVector2D position, QColor color);
+    void addElectrodeItem(QString electrodeName, QVector2D position);
 
     //=========================================================================================================
     /**
