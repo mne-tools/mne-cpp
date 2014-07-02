@@ -122,6 +122,12 @@ public:
     */
     void setPosition(QPointF newPosition);
 
+    //=========================================================================================================
+    /**
+    * Updates the electrodes position.
+    */
+    QPointF getPosition();
+
 private:
     QString m_sElectrodeName;           /**< Holds the electrode name.*/
     QPointF m_qpElectrodePosition;      /**< Holds the electrode 2D position in the scene.*/

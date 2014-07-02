@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the TmsiImpedanceView class.
+* @brief    Contains the declaration of the TMSIImpedanceView class.
 *
 */
 
@@ -42,6 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 #include <iostream>
+#include <tmsielectrodeitem.h>
 
 
 //*************************************************************************************************************
@@ -56,7 +57,6 @@
 //=============================================================================================================
 // DEFINE NAMESPACE TMSIPlugin
 //=============================================================================================================
-
 
 namespace TMSIPlugin
 {
@@ -84,6 +84,12 @@ private:
     * Reimplemented resize event used scaling fitting the scene into the view after a resize occured.
     */
     void resizeEvent(QResizeEvent* event);
+
+    //=========================================================================================================
+    /**
+    * Reimplemented mouse press event handler.
+    */
+    //void mousePressEvent(QMouseEvent* event);
 
 };
 

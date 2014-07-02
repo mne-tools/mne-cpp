@@ -64,7 +64,7 @@ TMSIImpedanceView::TMSIImpedanceView(QWidget *parent) :
     this->setInteractive(true);
 
     // Set scene rectangle
-    this->setSceneRect(-2500, -2500, 5000, 5000);
+    this->setSceneRect(-25000, -25000, 50000, 50000);
 
     // Disable scroll bars - only use drag mode to navigate through scene
     this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -76,7 +76,7 @@ TMSIImpedanceView::TMSIImpedanceView(QWidget *parent) :
 
 //*************************************************************************************************************
 
-void TMSIImpedanceView::wheelEvent(QWheelEvent *event)
+void TMSIImpedanceView::wheelEvent(QWheelEvent* event)
 {
     if(event->angleDelta().y()>0) // wheel was rotated forward
         this->scale(1.5,1.5);
@@ -93,6 +93,10 @@ void TMSIImpedanceView::resizeEvent(QResizeEvent* event)
     this->fitInView(this->scene()->itemsBoundingRect(), Qt::KeepAspectRatio);
 }
 
+////*************************************************************************************************************
 
-
-
+//void TMSIImpedanceView::mousePressEvent(QMouseEvent* event)
+//{
+//    if(event->button() == Qt::MidButton)
+//        this->fitInView(this->scene()->itemsBoundingRect(), Qt::KeepAspectRatio);
+//}

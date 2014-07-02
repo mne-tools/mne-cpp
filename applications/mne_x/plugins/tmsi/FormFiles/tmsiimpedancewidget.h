@@ -44,6 +44,7 @@
 
 #include <utils/asaelc.h>
 #include "../tmsielectrodeitem.h"
+#include "../tmsiimpedancescene.h"
 
 #include <xMeas/newrealtimemultisamplearray.h>
 
@@ -108,13 +109,13 @@ public:
     void initGraphicScene();
 
 private:
-    TMSI*                       m_pTMSI;                    /**< The pointer back to the TMSI plugin.*/
+    TMSI*                                       m_pTMSI;                    /**< The pointer back to the TMSI plugin.*/
 
-    QGraphicsScene              m_scene;                    /**< The QGraphicScene.*/
+    TMSIImpedanceScene*                         m_qGScene;                  /**< The QGraphicScene.*/
 
-    QMap< QString, int >        m_qmElectrodeNameIndex;     /**< Lookup table for electrode name and their corresponding index in the received data matrix.*/
+    QMap< QString, int >                        m_qmElectrodeNameIndex;     /**< Lookup table for electrode name and their corresponding index in the received data matrix.*/
 
-    Ui::TMSIImpedanceWidget*    ui;                         /**< The user interface for the TMSIImpedanceWidget.*/
+    Ui::TMSIImpedanceWidget*                    ui;                         /**< The user interface for the TMSIImpedanceWidget.*/
 
     //=========================================================================================================
     /**
@@ -148,12 +149,6 @@ private:
 
     //=========================================================================================================
     /**
-    * Updates position of all electrodes in the scene.
-    */
-    void updateElectrodePositions();
-
-    //=========================================================================================================
-    /**
     * Reimplemnted closing event handler. Used to stop the measurement when closing the widget.
     */
     void closeEvent(QCloseEvent *event);
@@ -163,7 +158,6 @@ private:
     * Saves the current labels and impedance values to a ASI formated file.
     */
     void saveToFile();
-
 };
 
 } // NAMESPACE
