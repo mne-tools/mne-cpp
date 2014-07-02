@@ -23,6 +23,7 @@
 #include <QAbstractTableModel>
 #include <QThread>
 #include <QVector3D>
+#include <QMap>
 
 
 //*************************************************************************************************************
@@ -98,7 +99,7 @@ public:
 
     void setStcSample(const VectorXd &sample);
 
-    void setVertices(const VectorXi &vertnos);
+    void setVertLabelIDs(const VectorXi &vertLabelIDs);
 
 
 private:
@@ -111,7 +112,11 @@ private:
     bool m_bIntervallSet;
 
 
-    VectorXi m_vertices;
+    VectorXi m_vertLabelIds;
+
+    QMap<qint32, qint32> m_qMapLabelIdChannelLH;
+    QMap<qint32, qint32> m_qMapLabelIdChannelRH;
+
 
     VectorXd m_vecCurStc;
     double m_dStcNormMax;

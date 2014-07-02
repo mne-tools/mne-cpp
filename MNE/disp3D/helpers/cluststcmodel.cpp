@@ -75,7 +75,7 @@ QVariant ClustStcModel::data(const QModelIndex &index, int role) const
             }
             case 1: { // vertex
                 if(m_bDataInit && role == Qt::DisplayRole)
-                    return QVariant(m_vertices(row));
+                    return QVariant(m_vertLabelIds(row));
                 break;
             }
             case 2: { // stc data
@@ -162,11 +162,11 @@ void ClustStcModel::addData(const MNESourceEstimate &stc)
     if(!m_bModelInit)
         return;
 
-    if(m_vertices.size() != stc.data.rows())
+    if(m_vertLabelIds.size() != stc.data.rows())
     {
         //TODO MAP data 416 to labels 150!!!!!!!!
         //ToDo Map the indices to the regions
-        setVertices(stc.vertices);
+        setVertLabelIDs(stc.vertices);
         m_bDataInit = true;
     }
 
@@ -339,8 +339,37 @@ void ClustStcModel::setStcSample(const VectorXd &sample)
 
 //*************************************************************************************************************
 
-void ClustStcModel::setVertices(const VectorXi &vertnos)
+void ClustStcModel::setVertLabelIDs(const VectorXi &vertLabelIDs)
 {
-    m_vertices = vertnos;
+    QMap<qint32, qint32> t_qMapLabelIdChannel;
+    for(qint32 i = 0; i < vertLabelIDs.size(); ++i)
+        t_qMapLabelIdChannel.insertMulti(vertLabelIDs(i),i);
+
+
+    QList<qint32> qListLastIdcs = t_qMapLabelIdChannel.values(vertLabelIDs(vertLabelIDs.size() - 1));
+
+    qint32 lhIdx = 0;
+    qint32 maxIdx = qListLastIdcs[0];
+    qint32 minIdx = qListLastIdcs[0];
+
+    for(qint32 i = 0; i < qListLastIdcs.size(); ++i)
+    {
+        if(maxIdx < qListLastIdcs[i])
+            maxIdx = qListLastIdcs[i];
+        if(minIdx > qListLastIdcs[i])
+            minIdx = qListLastIdcs[i];
+    }
+
+    qint32 upperBound = maxIdx - (maxIdx*0.25);
+    for(qint32 i = 0; i < qListLastIdcs.size(); ++i)
+    {
+        if(lhIdx < qListLastIdcs[i] && qListLastIdcs[i] < upperBound)
+            lhIdx = qListLastIdcs[i];
+    }
+
+    qDebug() << "lhIdx" << lhIdx;
+    qDebug() << "qListLastIdcs" << qListLastIdcs;
+
+    m_vertLabelIds = vertLabelIDs;
 }
 
