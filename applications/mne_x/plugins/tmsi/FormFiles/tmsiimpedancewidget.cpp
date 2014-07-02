@@ -91,6 +91,8 @@ TMSIImpedanceWidget::TMSIImpedanceWidget(TMSI* p_pTMSI, QWidget *parent)
     connect(ui->m_pushButton_takeScreenshot, &QPushButton::released, this, &TMSIImpedanceWidget::takeScreenshot);
     connect(ui->m_pushButton_loadLayout, &QPushButton::released, this, &TMSIImpedanceWidget::loadLayout);
     connect(ui->m_pushButton_saveValues, &QPushButton::released, this, &TMSIImpedanceWidget::saveToFile);
+    connect(ui->m_pushButton_Help, &QPushButton::released, this, &TMSIImpedanceWidget::helpDialog);
+
 }
 
 //*************************************************************************************************************
@@ -104,6 +106,7 @@ TMSIImpedanceWidget::~TMSIImpedanceWidget()
 
 void TMSIImpedanceWidget::updateGraphicScene(VectorXd matValue)
 {
+    m_mutex.lock();
     // Get scene items
     QList<QGraphicsItem *> itemList = m_qGScene->items();
 
@@ -135,6 +138,7 @@ void TMSIImpedanceWidget::updateGraphicScene(VectorXd matValue)
     }
 
     m_qGScene->update(m_qGScene->itemsBoundingRect());
+    m_mutex.unlock();
 }
 
 //*************************************************************************************************************
@@ -320,4 +324,13 @@ void TMSIImpedanceWidget::saveToFile()
     }
 
     outputFileStream.close();
+}
+
+//*************************************************************************************************************
+
+void TMSIImpedanceWidget::helpDialog()
+{
+    QMessageBox msgBox;
+    msgBox.setText("Shortcuts and usage:\n- Use mouse wheel to zoom.\n- Hold and move right mouse button to scale the electrode positions in the scene.\n- Double click to fit the scene into the view.");
+    msgBox.exec();
 }

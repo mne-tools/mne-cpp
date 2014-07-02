@@ -54,6 +54,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QMutex>
 #include <QWidget>
 #include <QGraphicsScene>
 #include <QtSvg/QSvgGenerator>
@@ -122,6 +123,8 @@ private:
 
     double                                      m_dMaxImpedance;            /**< Maximum impedance value. This is a fixed value to scale the color map.*/
 
+    QMutex                                      m_mutex;
+
     //=========================================================================================================
     /**
     * Adds an electrode item to the QGraphicScene.
@@ -163,6 +166,12 @@ private:
     * Saves the current labels and impedance values to a ASI formated file.
     */
     void saveToFile();
+
+    //=========================================================================================================
+    /**
+    * Open a help dialog.
+    */
+    void helpDialog();
 };
 
 } // NAMESPACE
