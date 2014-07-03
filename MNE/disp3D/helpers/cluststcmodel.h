@@ -97,7 +97,12 @@ using namespace Eigen;
 using namespace MNELIB;
 using namespace FSLIB;
 
-
+//=============================================================================================================
+/**
+* Source estimation informations are provided in a table. They can be accessed via data(row, col).
+*
+* @brief Table model which prepares source estimate information
+*/
 class DISP3DSHARED_EXPORT ClustStcModel : public QAbstractTableModel
 {
     Q_OBJECT
