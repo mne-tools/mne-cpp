@@ -72,6 +72,9 @@ TMSIImpedanceView::TMSIImpedanceView(QWidget *parent)
 
     // Activate dragging
     this->setDragMode(QGraphicsView::ScrollHandDrag);
+
+    // Zoom to mouse cursor position
+    setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
 }
 
 //*************************************************************************************************************
@@ -84,7 +87,8 @@ void TMSIImpedanceView::wheelEvent(QWheelEvent* event)
     if(event->angleDelta().y()<0) // wheel was rotated backward
         this->scale(0.75,0.75);
 
-    QGraphicsView::wheelEvent(event);
+    // Don't call superclass handler here as wheel is normally used for moving scrollbars
+    //QGraphicsView::wheelEvent(event);
 }
 
 //*************************************************************************************************************
