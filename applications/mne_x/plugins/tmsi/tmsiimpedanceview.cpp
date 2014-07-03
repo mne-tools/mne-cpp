@@ -83,6 +83,8 @@ void TMSIImpedanceView::wheelEvent(QWheelEvent* event)
 
     if(event->angleDelta().y()<0) // wheel was rotated backward
         this->scale(0.75,0.75);
+
+    QGraphicsView::wheelEvent(event);
 }
 
 //*************************************************************************************************************
@@ -91,6 +93,8 @@ void TMSIImpedanceView::resizeEvent(QResizeEvent* event)
 {
     Q_UNUSED(event);
     this->fitInView(this->scene()->itemsBoundingRect(), Qt::KeepAspectRatio);
+
+    QGraphicsView::resizeEvent(event);
 }
 
 //*************************************************************************************************************
@@ -99,4 +103,6 @@ void TMSIImpedanceView::mouseDoubleClickEvent(QMouseEvent* event)
 {
     Q_UNUSED(event);
     this->fitInView(this->scene()->itemsBoundingRect(), Qt::KeepAspectRatio);
+
+    QGraphicsView::mouseDoubleClickEvent(event);
 }

@@ -56,9 +56,10 @@ using namespace std;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-TMSIImpedanceScene::TMSIImpedanceScene(QObject *parent)
+TMSIImpedanceScene::TMSIImpedanceScene(QGraphicsView* view, QObject* parent)
 : QGraphicsScene(parent)
 , m_bRightMouseKeyPressed(false)
+, m_qvView(view)
 {
 
 }
@@ -106,17 +107,19 @@ void TMSIImpedanceScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 void TMSIImpedanceScene::scaleElectrodePositions(double scaleFactor)
 {
     // Get scene items
-    QList<QGraphicsItem *> itemList = this->items();
+    QList< QGraphicsItem *> itemList = this->items();
 
     // Update position
     for(int i = 0; i<itemList.size(); i++)
     {
         TMSIElectrodeItem* item = (TMSIElectrodeItem *) itemList.at(i);
 
+        // Set both positions -> dunno why :-)
         item->setPosition(item->getPosition()*scaleFactor);
+        item->setPos(item->pos()*scaleFactor);
     }
 
-    this->update(this->itemsBoundingRect());
+    this->update(this->sceneRect());
 }
 
 
