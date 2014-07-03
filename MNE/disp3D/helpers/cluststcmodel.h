@@ -129,6 +129,7 @@ private:
 
 
     QList<Label> m_qListLabels;
+    qint32 m_iLHSize;
     QList<RowVector4i> m_qListRGBAs;
     QList<Matrix3Xf> m_qListTriRRs;
 
@@ -167,6 +168,7 @@ inline QVector3D ClustStcModel::getMax() const
 }
 
 Q_DECLARE_METATYPE(Eigen::Matrix3Xf);
+Q_DECLARE_METATYPE(Eigen::VectorXd);
 Q_DECLARE_METATYPE(FSLIB::Label);
 
 #endif // CLUSTSTCMODEL_H

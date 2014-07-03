@@ -12,10 +12,11 @@
 using namespace DISPLIB;
 
 
-ClustStcView::ClustStcView(bool isStereo, QGLView::StereoType stereoType, QWindow *parent)
+ClustStcView::ClustStcView(bool showRegions, bool isStereo, QGLView::StereoType stereoType, QWindow *parent)
 : QGLView(parent)
 , m_pModel(NULL)
 , m_bIsInitialized(false)
+, m_bShowRegions(showRegions)
 , m_bStereo(isStereo)
 , m_stereoType(stereoType)//QGLView::StretchedLeftRight)//QGLView::RedCyanAnaglyph
 , m_pSceneNodeBrain(NULL)
@@ -44,7 +45,7 @@ void ClustStcView::dataChanged(const QModelIndex &topLeft, const QModelIndex &bo
         //ToDo label id check -> necessary?
         //qint32 colorIdx = m_qListMapLabelIdIndex[h][labelId];
 
-        qint32 iVal = m_pModel->data(i,3).toDouble() * 255;
+        qint32 iVal = m_pModel->data(i,3).value<VectorXd>().maxCoeff() * 255;
 
         iVal = iVal > 255 ? 255 : iVal < 0 ? 0 : iVal;
 
@@ -136,7 +137,10 @@ void ClustStcView::initializeGL(QGLPainter *painter)
                     //
                     QGLMaterial *t_pMaterialROI = new QGLMaterial();
 
-                    t_pMaterialROI->setColor(m_pModel->data(k,5,Qt::DisplayRole).value<QColor>());
+                    if(m_bShowRegions)
+                        t_pMaterialROI->setColor(m_pModel->data(k,5,Qt::DisplayRole).value<QColor>());
+                    else
+                        t_pMaterialROI->setColor(QColor(100,100,100,230));
 
                     index = palette->addMaterial(t_pMaterialROI);
                     builder.currentNode()->setMaterialIndex(index);
