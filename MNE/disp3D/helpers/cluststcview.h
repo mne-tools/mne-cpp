@@ -23,7 +23,7 @@ public:
     typedef QSharedPointer<ClustStcView> SPtr;            /**< Shared pointer type for ClustStcView class. */
     typedef QSharedPointer<const ClustStcView> ConstSPtr; /**< Const shared pointer type for ClustStcView class. */
 
-    ClustStcView(bool isStereo = true, QGLView::StereoType stereo = QGLView::RedCyanAnaglyph, QWindow *parent = 0);
+    ClustStcView(bool showRegions = true, bool isStereo = true, QGLView::StereoType stereo = QGLView::RedCyanAnaglyph, QWindow *parent = 0);
 
     void dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int> ());
 
@@ -77,6 +77,8 @@ private:
 
     bool m_bIsInitialized;
 
+    bool m_bShowRegions;
+
     bool m_bStereo;
     QGLView::StereoType m_stereoType;
 
@@ -87,6 +89,8 @@ private:
 
     QGLLightModel *m_pLightModel;                   /**< The selected light model. */
     QGLLightParameters *m_pLightParametersScene;    /**< The selected light parameters. */
+
+    bool m_bColorize;
 
     QGLColorMaterial material;
 

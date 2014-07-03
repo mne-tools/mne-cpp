@@ -195,7 +195,7 @@ int main(int argc, char *argv[])
     pSliderAverageView->setMaximum(500);
     pSliderAverageView->setValue(100);
 
-    ClustStcView* clustView = new ClustStcView(true, QGLView::RedCyanAnaglyph);//(false); (true, QGLView::StretchedLeftRight); (true, QGLView::RedCyanAnaglyph);
+    ClustStcView* clustView = new ClustStcView(false, true, QGLView::RedCyanAnaglyph);//(false); (true, QGLView::StretchedLeftRight); (true, QGLView::RedCyanAnaglyph);
     clustView->setModel(pClustStcModel);
 
     if (clustView->stereoType() != QGLView::RedCyanAnaglyph)

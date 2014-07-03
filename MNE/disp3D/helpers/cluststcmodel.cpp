@@ -75,17 +75,32 @@ QVariant ClustStcModel::data(const QModelIndex &index, int role) const
             }
             case 1: { // vertex
                 if(m_bDataInit && role == Qt::DisplayRole)
-                    return QVariant(m_vertLabelIds(row));
+                    return QVariant(m_qListLabels[row].label_id);//m_vertLabelIds(row));
                 break;
             }
-            case 2: { // stc data
+            case 2: // stc data
+            case 3: // relative stc data
+            {
                 if(m_bDataInit && role == Qt::DisplayRole)
-                    return QVariant(m_vecCurStc(row));
-                break;
-            }
-            case 3: { // relative stc data
-                if(m_bDataInit && role == Qt::DisplayRole)
-                    return QVariant(m_vecCurRelStc(row));
+                {
+                    QList<qint32> selVec;
+                    QVariant v;
+                    if(row < m_iLHSize)
+                        selVec = m_qMapLabelIdChannelLH.values(m_qListLabels[row].label_id);
+                    else
+                        selVec = m_qMapLabelIdChannelRH.values(m_qListLabels[row].label_id);
+
+                    VectorXd valVec(selVec.size());
+
+                    if(index.column() == 2) //stc data
+                        for(qint32 i = 0; i < selVec.size(); ++i)
+                            valVec(i) = m_vecCurStc(selVec[i]);
+                    else // relative stc data
+                        for(qint32 i = 0; i < selVec.size(); ++i)
+                            valVec(i) = m_vecCurRelStc(selVec[i]);
+                    v.setValue(valVec);
+                    return v;//m_vecCurStc(row));
+                }
                 break;
             }
             case 4: { // Label
@@ -130,7 +145,7 @@ QVariant ClustStcModel::headerData(int section, Qt::Orientation orientation, int
             case 0: //index column
                 return QVariant("Index");
             case 1: //vertex column
-                return QVariant("Vertex");
+                return QVariant("Vertex/Label ID");
             case 2: //stc data column
                 return QVariant("STC");
             case 3: //realtive stc data column
@@ -277,6 +292,11 @@ void ClustStcModel::init(const AnnotationSet &annotationSet, const SurfaceSet &s
         }
     }
 
+    m_iLHSize = 0;
+    for(qint32 k = 0; k < m_qListLabels.size(); ++k)
+        if(m_qListLabels[k].hemi == 0)
+            ++m_iLHSize;
+
     m_vecCurStc = VectorXd::Zero(416);//m_qListLabels.size(),1);
     m_vecCurRelStc = VectorXd::Zero(416);//m_qListLabels.size(),1);;
     endResetModel();
@@ -367,8 +387,18 @@ void ClustStcModel::setVertLabelIDs(const VectorXi &vertLabelIDs)
             lhIdx = qListLastIdcs[i];
     }
 
-    qDebug() << "lhIdx" << lhIdx;
-    qDebug() << "qListLastIdcs" << qListLastIdcs;
+    m_qMapLabelIdChannelLH.clear();
+    m_qMapLabelIdChannelRH.clear();
+
+
+    QMap<qint32, qint32>::iterator it;
+    for (it = t_qMapLabelIdChannel.begin(); it != t_qMapLabelIdChannel.end(); ++it)
+    {
+        if(it.value() <= lhIdx)
+            m_qMapLabelIdChannelLH.insertMulti(it.key(),it.value());
+        else
+            m_qMapLabelIdChannelRH.insertMulti(it.key(),it.value());
+    }
 
     m_vertLabelIds = vertLabelIDs;
 }
