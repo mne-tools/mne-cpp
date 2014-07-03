@@ -171,6 +171,8 @@ void TMSIImpedanceWidget::initGraphicScene()
         QVector2D position(elcLocation2D[i][1]*-4.5,elcLocation2D[i][0]*-4.5); // swap x y to rotate 90°, multiply to mirror by x and y axis, multiply by to scale
         addElectrodeItem(elcChannelNames.at(i), position);
     }
+
+    ui->m_graphicsView_impedanceView->fitInView(m_qGScene->itemsBoundingRect(), Qt::KeepAspectRatio);
 }
 
 //*************************************************************************************************************
@@ -178,6 +180,7 @@ void TMSIImpedanceWidget::initGraphicScene()
 void TMSIImpedanceWidget::addElectrodeItem(QString electrodeName, QVector2D position)
 {
     TMSIElectrodeItem *item = new TMSIElectrodeItem(electrodeName, QPointF(position.x(), position.y()), QColor(m_cbColorMap->valueToJet(1)), m_qmElectrodeNameIndex[electrodeName]);
+    item->setPos(QPointF(position.x(), position.y()));
     m_qGScene->addItem(item);
 }
 
@@ -286,6 +289,8 @@ void TMSIImpedanceWidget::loadLayout()
 
         addElectrodeItem(elcChannelNames.at(i), position);
     }
+
+    ui->m_graphicsView_impedanceView->fitInView(m_qGScene->itemsBoundingRect(), Qt::KeepAspectRatio);
 }
 
 //*************************************************************************************************************
