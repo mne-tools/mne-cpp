@@ -227,19 +227,15 @@ void TMSIImpedanceWidget::takeScreenshot()
 
     if(!fileName.isEmpty())
     {
-        // scale view in a way that all items are visible for the screenshot, then transform back
-        QTransform temp = ui->m_graphicsView_impedanceView->transform();
-        ui->m_graphicsView_impedanceView->fitInView(m_qGScene->itemsBoundingRect(), Qt::KeepAspectRatio);
-
         // Generate screenshot
         if(fileName.contains(".svg"))
         {
             QSvgGenerator svgGen;
 
             svgGen.setFileName(fileName);
-            QRectF rect = m_qGScene->sceneRect();
-            svgGen.setSize(QSize(rect.height(), rect.width()));
-            svgGen.setViewBox(QRect(0, 0, rect.height(), rect.width()));
+            QRectF rect = m_qGScene->itemsBoundingRect();
+            svgGen.setSize(QSize(rect.width(), rect.height()));
+            svgGen.setViewBox(QRect(0, 0, rect.width(), rect.height()));
 
             QPainter painter(&svgGen);
             m_qGScene->render(&painter);
@@ -250,8 +246,6 @@ void TMSIImpedanceWidget::takeScreenshot()
             QPixmap pixMap = QPixmap::grabWidget(ui->m_graphicsView_impedanceView);
             pixMap.save(fileName);
         }
-
-        ui->m_graphicsView_impedanceView->setTransform(temp);
     }
 }
 
