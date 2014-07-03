@@ -57,7 +57,9 @@
 #include <QMutex>
 #include <QWidget>
 #include <QGraphicsScene>
+#include <QtAlgorithms>
 #include <QtSvg/QSvgGenerator>
+
 
 namespace Ui {
 class TMSIImpedanceWidget;
@@ -123,8 +125,6 @@ private:
 
     double                                      m_dMaxImpedance;            /**< Maximum impedance value. This is a fixed value to scale the color map.*/
 
-    QMutex                                      m_mutex;
-
     //=========================================================================================================
     /**
     * Adds an electrode item to the QGraphicScene.
@@ -172,6 +172,7 @@ private:
     * Open a help dialog.
     */
     void helpDialog();
+
 };
 
 } // NAMESPACE

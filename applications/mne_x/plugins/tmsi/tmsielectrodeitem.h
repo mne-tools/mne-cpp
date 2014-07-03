@@ -39,6 +39,14 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include <iostream>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
@@ -47,7 +55,7 @@
 #include <QColor>
 #include <QPainter>
 #include <QStaticText>
-#include <iostream>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -78,7 +86,7 @@ public:
     /**
     * Constructs a TMSIElectrodeItem.
     */
-    TMSIElectrodeItem(QString electrodeName, QPointF electrodePosition, QColor electrodeColor);
+    TMSIElectrodeItem(QString electrodeName, QPointF electrodePosition, QColor electrodeColor, int channelIndex);
 
     //=========================================================================================================
     /**
@@ -128,12 +136,18 @@ public:
     */
     QPointF getPosition();
 
-private:
-    QString m_sElectrodeName;           /**< Holds the electrode name.*/
-    QPointF m_qpElectrodePosition;      /**< Holds the electrode 2D position in the scene.*/
-    QColor m_cElectrodeColor;           /**< Holds the current electrode color.*/
-    double m_dImpedanceValue;           /**< Holds the current electrode impedance value.*/
+    //=========================================================================================================
+    /**
+    * Returns the device channel index of the electrode.
+    */
+    int getChannelIndex();
 
+private:
+    QString     m_sElectrodeName;           /**< Holds the electrode name.*/
+    QPointF     m_qpElectrodePosition;      /**< Holds the electrode 2D position in the scene.*/
+    QColor      m_cElectrodeColor;          /**< Holds the current electrode color.*/
+    double      m_dImpedanceValue;          /**< Holds the current electrode impedance value.*/
+    int         m_iChannelIndex;            /**< Holds the corresonding channel index.*/
 };
 
 } // NAMESPACE

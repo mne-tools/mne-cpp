@@ -56,11 +56,12 @@ using namespace std;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-TMSIElectrodeItem::TMSIElectrodeItem(QString electrodeName, QPointF electrodePosition, QColor electrodeColor)
+TMSIElectrodeItem::TMSIElectrodeItem(QString electrodeName, QPointF electrodePosition, QColor electrodeColor, int channelIndex)
 : m_sElectrodeName(electrodeName)
 , m_qpElectrodePosition(electrodePosition)
 , m_cElectrodeColor(electrodeColor)
 , m_dImpedanceValue(0.0)
+, m_iChannelIndex(channelIndex)
 {
 }
 
@@ -95,7 +96,7 @@ void TMSIElectrodeItem::paint(QPainter *painter, const QStyleOptionGraphicsItem 
 
     // Plot electrodes impedance value
     QString impedanceValueToString;
-    QStaticText staticElectrodeValue = QStaticText(QString("%1 %2").arg(impedanceValueToString.setNum(m_dImpedanceValue)).arg("Ohm"));
+    QStaticText staticElectrodeValue = QStaticText(QString("%1 %2").arg(impedanceValueToString.setNum(m_dImpedanceValue/1000)).arg("kOhm"));
     QSizeF sizeValue = staticElectrodeValue.size();
     painter->drawStaticText(-15+((30-sizeValue.width())/2), 19, staticElectrodeValue);
 
@@ -144,6 +145,12 @@ QPointF TMSIElectrodeItem::getPosition()
     return m_qpElectrodePosition;
 }
 
+//*************************************************************************************************************
+
+int TMSIElectrodeItem::getChannelIndex()
+{
+    return m_iChannelIndex;
+}
 
 
 

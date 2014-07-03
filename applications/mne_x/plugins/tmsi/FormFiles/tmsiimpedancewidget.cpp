@@ -106,7 +106,6 @@ TMSIImpedanceWidget::~TMSIImpedanceWidget()
 
 void TMSIImpedanceWidget::updateGraphicScene(VectorXd matValue)
 {
-    m_mutex.lock();
     // Get scene items
     QList<QGraphicsItem *> itemList = m_qGScene->items();
 
@@ -117,7 +116,7 @@ void TMSIImpedanceWidget::updateGraphicScene(VectorXd matValue)
     if(itemList.size()>matValue.rows())
     {
         qDebug()<<"TMSIImpedanceWidget - ERROR - There were more items in the scene than samples received from the device - Check the current layout! Stopping measurement porcess!"<<endl;
-        stopImpedanceMeasurement();
+        //stopImpedanceMeasurement();
         return;
     }
 
@@ -138,7 +137,6 @@ void TMSIImpedanceWidget::updateGraphicScene(VectorXd matValue)
     }
 
     m_qGScene->update(m_qGScene->itemsBoundingRect());
-    m_mutex.unlock();
 }
 
 //*************************************************************************************************************
@@ -178,7 +176,7 @@ void TMSIImpedanceWidget::initGraphicScene()
 
 void TMSIImpedanceWidget::addElectrodeItem(QString electrodeName, QVector2D position)
 {
-    TMSIElectrodeItem *item = new TMSIElectrodeItem(electrodeName, QPointF(position.x(), position.y()), QColor(m_cbColorMap->valueToJet(1)));
+    TMSIElectrodeItem *item = new TMSIElectrodeItem(electrodeName, QPointF(position.x(), position.y()), QColor(m_cbColorMap->valueToJet(1)), m_qmElectrodeNameIndex[electrodeName]);
     m_qGScene->addItem(item);
 }
 
@@ -302,6 +300,12 @@ void TMSIImpedanceWidget::closeEvent(QCloseEvent *event)
 
 //*************************************************************************************************************
 
+// This function is needed to sort the QList
+bool compareChannelIndex(TMSIElectrodeItem* a, TMSIElectrodeItem* b)
+{
+    return a->getChannelIndex() < b->getChannelIndex();
+}
+
 void TMSIImpedanceWidget::saveToFile()
 {
     // Open file dialog
@@ -316,11 +320,19 @@ void TMSIImpedanceWidget::saveToFile()
 
     QList<QGraphicsItem *> itemList = m_qGScene->items();
 
-    // Update position
+    // Convert to QList with TMSIElectrodeItem's
+    QList<TMSIElectrodeItem *> itemListNew;
     for(int i = 0; i<itemList.size(); i++)
+        itemListNew.append((TMSIElectrodeItem *)itemList.at(i));
+
+    // Sort list corresponding to the channelIndex
+    sort(itemListNew.begin(), itemListNew.end(), compareChannelIndex);
+
+    // Update position
+    for(int i = 0; i<itemListNew.size(); i++)
     {
-        TMSIElectrodeItem *item = (TMSIElectrodeItem *) itemList.at(i);
-        outputFileStream << item->getElectrodeName().toStdString() << ": " << item->getImpedanceValue() << endl;
+        TMSIElectrodeItem *item = itemListNew.at(i);
+        outputFileStream << i << " " << item->getElectrodeName().toStdString() << " " << item->getImpedanceValue() << endl;
     }
 
     outputFileStream.close();
@@ -331,6 +343,6 @@ void TMSIImpedanceWidget::saveToFile()
 void TMSIImpedanceWidget::helpDialog()
 {
     QMessageBox msgBox;
-    msgBox.setText("Shortcuts and usage:\n- Use mouse wheel to zoom.\n- Hold and move right mouse button to scale the electrode positions in the scene.\n- Double click to fit the scene into the view.");
+    msgBox.setText("Usage:\n- Use mouse wheel to zoom.\n- Hold and move right mouse button to scale the electrode positions in the scene.\n- Double click to fit the scene into the view.");
     msgBox.exec();
 }
