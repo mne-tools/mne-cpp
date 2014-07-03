@@ -90,7 +90,6 @@ private:
     * Reimplemented mouse press event handler.
     */
     void mouseDoubleClickEvent(QMouseEvent* event);
-
 };
 
 } // NAMESPACE

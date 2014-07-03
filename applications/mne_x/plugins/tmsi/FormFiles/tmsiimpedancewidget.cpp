@@ -79,7 +79,7 @@ TMSIImpedanceWidget::TMSIImpedanceWidget(TMSI* p_pTMSI, QWidget *parent)
     m_cbColorMap = QSharedPointer<ColorMap>(new ColorMap());
 
     // Init GUI stuff
-    m_qGScene = new TMSIImpedanceScene();
+    m_qGScene = new TMSIImpedanceScene(ui->m_graphicsView_impedanceView);
     ui->m_graphicsView_impedanceView->setScene(m_qGScene);
     ui->m_graphicsView_impedanceView->show();
 
@@ -112,15 +112,16 @@ void TMSIImpedanceWidget::updateGraphicScene(VectorXd matValue)
     // Update color and impedance values for each electrode item
     int matIndex = 0;
     double impedanceValue = 0.0;
+    int numberItems = itemList.size();
 
     if(itemList.size()>matValue.rows())
     {
-        qDebug()<<"TMSIImpedanceWidget - ERROR - There were more items in the scene than samples received from the device - Check the current layout! Stopping measurement porcess!"<<endl;
-        //stopImpedanceMeasurement();
+        qDebug()<<"TMSIImpedanceWidget - ERROR - There were more items in the scene than samples received from the device - Check the current layout! Only available channels will be displayed!"<<endl;
+        numberItems = matValue.rows();
         return;
     }
 
-    for(int i = 0; i<itemList.size(); i++)
+    for(int i = 0; i<numberItems; i++)
     {
         TMSIElectrodeItem *item = (TMSIElectrodeItem *) itemList.at(i);
 

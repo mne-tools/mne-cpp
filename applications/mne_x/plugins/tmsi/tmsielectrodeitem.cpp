@@ -96,7 +96,7 @@ void TMSIElectrodeItem::paint(QPainter *painter, const QStyleOptionGraphicsItem 
 
     // Plot electrodes impedance value
     QString impedanceValueToString;
-    QStaticText staticElectrodeValue = QStaticText(QString("%1 %2").arg(impedanceValueToString.setNum(m_dImpedanceValue/1000)).arg("kOhm"));
+    QStaticText staticElectrodeValue = QStaticText(QString("%1 %2").arg(impedanceValueToString.setNum(m_dImpedanceValue/1000)).arg("kOhm")); // transform to kilo ohm (divide by 1000)
     QSizeF sizeValue = staticElectrodeValue.size();
     painter->drawStaticText(-15+((30-sizeValue.width())/2), 19, staticElectrodeValue);
 
