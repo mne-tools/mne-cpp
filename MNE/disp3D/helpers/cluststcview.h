@@ -74,7 +74,12 @@ namespace DISP3DLIB
 
 class ClustStcModel;
 
-
+//=============================================================================================================
+/**
+* 3D view to display cluster stc model data in a stereoscopic view
+*
+* @brief 3D Display
+*/
 class DISP3DSHARED_EXPORT ClustStcView : public QGLView
 {
     Q_OBJECT

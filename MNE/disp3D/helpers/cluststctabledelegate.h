@@ -61,6 +61,12 @@
 namespace DISP3DLIB
 {
 
+//=============================================================================================================
+/**
+* Delegate to view stc model data in a table view
+*
+* @brief Delegate for QTableView
+*/
 class DISP3DSHARED_EXPORT ClustStcTableDelegate : public QAbstractItemDelegate
 {
     Q_OBJECT
