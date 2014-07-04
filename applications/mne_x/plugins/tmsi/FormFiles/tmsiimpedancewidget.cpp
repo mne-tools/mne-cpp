@@ -67,8 +67,8 @@ using namespace TMSIPlugin;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-TMSIImpedanceWidget::TMSIImpedanceWidget(TMSI* p_pTMSI, QWidget *parent)
-: m_pTMSI(p_pTMSI)
+TMSIImpedanceWidget::TMSIImpedanceWidget(TMSI* pTMSI, QWidget *parent)
+: m_pTMSI(pTMSI)
 , QWidget(parent)
 , ui(new Ui::TMSIImpedanceWidget)
 , m_dMaxImpedance(100000)
@@ -343,6 +343,6 @@ void TMSIImpedanceWidget::saveToFile()
 void TMSIImpedanceWidget::helpDialog()
 {
     QMessageBox msgBox;
-    msgBox.setText("Usage:\n- Use mouse wheel to zoom.\n- Hold and move right mouse button to scale the electrode positions in the scene.\n- Double click to fit the scene into the view.");
+    msgBox.setText("- Use mouse wheel to zoom.\n- Hold and move right mouse button to scale the electrode positions in the scene.\n- Double click to fit the scene into the view.");
     msgBox.exec();
 }

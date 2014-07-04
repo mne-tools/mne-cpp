@@ -91,13 +91,18 @@ using namespace DISPLIB;
 
 class TMSI;
 
-
+//=============================================================================================================
+/**
+* DECLARE CLASS TMSIImpedanceWidget
+*
+* @brief The TMSIImpedanceWidget class provides the TMSIImpedanceWidget configuration window.
+*/
 class TMSIImpedanceWidget : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit TMSIImpedanceWidget(TMSI* p_pTMSI, QWidget *parent = 0);
+    explicit TMSIImpedanceWidget(TMSI* pTMSI, QWidget *parent = 0);
     ~TMSIImpedanceWidget();
 
     //=========================================================================================================

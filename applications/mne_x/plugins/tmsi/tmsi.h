@@ -70,6 +70,7 @@
 #include "FormFiles/tmsisetupwidget.h"
 #include "FormFiles/tmsimanualannotationwidget.h"
 #include "FormFiles/tmsiimpedancewidget.h"
+#include "FormFiles/tmsisetupprojectwidget.h"
 
 
 //*************************************************************************************************************
@@ -127,6 +128,7 @@ class TMSISHARED_EXPORT TMSI : public ISensor
     friend class TMSIProducer;
     friend class TMSISetupWidget;
     friend class TMSIImpedanceWidget;
+    friend class TMSISetupProjectWidget;
 
 public:
     //=========================================================================================================
@@ -171,12 +173,6 @@ public:
     */
     virtual bool stop();
 
-    //=========================================================================================================
-    /**
-    * Opens a dialog to check the impedance values
-    */
-    void showImpedanceDialog();
-
     virtual IPlugin::PluginType getType() const;
     virtual QString getName() const;
 
@@ -193,9 +189,37 @@ protected:
     */
     virtual void run();
 
+
+    //=========================================================================================================
+    /**
+    * Opens a widget to check the impedance values
+    */
+    void showImpedanceDialog();
+
+    //=========================================================================================================
+    /**
+    * Opens a dialog to setup the project to check the impedance values
+    */
+    void showSetupProjectDialog();
+
+    //=========================================================================================================
+    /**
+    * Starts data recording
+    */
+    void showStartRecording();
+
+    //=========================================================================================================
+    /**
+    * Implements blinking recording button
+    */
+    void changeRecordingButton();
+
 private:
     PluginOutputData<NewRealTimeMultiSampleArray>::SPtr m_pRMTSA_TMSI;      /**< The RealTimeSampleArray to provide the EEG data.*/
     QSharedPointer<TMSIManualAnnotationWidget> m_tmsiManualAnnotationWidget;/**< Widget for manually annotation the trigger during session.*/
+    QSharedPointer<TMSIImpedanceWidget> m_pTmsiImpedanceWidget;             /**< Widget for checking the impedances*/
+    QSharedPointer<TMSISetupProjectWidget> m_pTmsiSetupProjectWidget;       /**< Widget for checking the impedances*/
+
 
     QString                             m_qStringResourcePath;              /**< The path to the EEG resource directory.*/
 
@@ -237,9 +261,13 @@ private:
 
     QMutex                              m_qMutex;                           /**< Holds the threads mutex.*/
 
-    QAction*                            m_pActionImpedance;                 /**< shows setup project dialog */
+    QAction*                            m_pActionImpedance;                 /**< shows impedance widget */
+    QAction*                            m_pActionSetupProject;              /**< shows setup project dialog */
+    QAction*                            m_pActionStartRecording;            /**< starts to record data */
 
-    QSharedPointer<TMSIImpedanceWidget> m_pTmsiImpedanceWidget;             /**< Widget for checking the impedances*/
+    QSharedPointer<QTimer>              m_pTimerRecordingChange;
+    qint16                              m_iBlinkStatus;
+
 };
 
 } // NAMESPACE
