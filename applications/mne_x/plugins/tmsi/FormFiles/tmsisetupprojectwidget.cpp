@@ -64,11 +64,12 @@ TMSISetupProjectWidget::TMSISetupProjectWidget(TMSI* pTMSI, QWidget *parent)
     ui->setupUi(this);
 
     // Connect write to file options
-    connect(ui->m_pushButton_ChangeOutputDir, &QPushButton::released, this, &TMSISetupProjectWidget::changeOutputFileDir);
-    connect(ui->m_lineEdit_outputDir, &QLineEdit::textChanged, this, &TMSISetupProjectWidget::setOutputTextField);
+    connect(ui->m_qPushButton_NewProject, &QPushButton::released, this, &TMSISetupProjectWidget::changeProject);
+    connect(ui->m_qPushButton_NewSubject, &QPushButton::released, this, &TMSISetupProjectWidget::changeSubject);
+    connect(ui->m_qPushButton_FiffRecordFile, &QPushButton::released, this, &TMSISetupProjectWidget::changeOutputFile);
 
     //Connect EEG hat
-    connect(ui->m_pushButton_ChangeEEGHatDir, &QPushButton::released, this, &TMSISetupProjectWidget::changeHatDir);
+    connect(ui->m_qPushButton_EEGCap, &QPushButton::released, this, &TMSISetupProjectWidget::changeCap);
 }
 
 
@@ -79,15 +80,15 @@ TMSISetupProjectWidget::~TMSISetupProjectWidget()
     delete ui;
 }
 
+
 //*************************************************************************************************************
 
-void TMSISetupProjectWidget::changeOutputFileDir()
+void TMSISetupProjectWidget::changeProject()
 {
-//    QString path = QFileDialog::getSaveFileName(
-//                this,
-//                "Save to fif file",
-//                "mne_x_plugins/resources/tmsi/EEG_data_001_raw.fif",
-//                 tr("Fif files (*.fif)"));
+    QString path = QFileDialog::getExistingDirectory(this, tr("Open Project Directory"),
+                                                     "/home",
+                                                     QFileDialog::ShowDirsOnly
+                                                     | QFileDialog::DontResolveSymlinks);
 
 //    if(path==NULL)
 //        path = ui.m_lineEdit_outputDir->text();
@@ -99,21 +100,47 @@ void TMSISetupProjectWidget::changeOutputFileDir()
 
 //*************************************************************************************************************
 
-void TMSISetupProjectWidget::setOutputTextField()
+void TMSISetupProjectWidget::changeSubject()
 {
+    QString path = QFileDialog::getExistingDirectory(this, tr("Open Subject Directory"),
+                                                     "/home",
+                                                     QFileDialog::ShowDirsOnly
+                                                     | QFileDialog::DontResolveSymlinks);
+
+//    if(path==NULL)
+//        path = ui.m_lineEdit_outputDir->text();
+
+//    ui.m_lineEdit_outputDir->setText(path);
 //    m_pTMSI->m_sOutputFilePath = ui.m_lineEdit_outputDir->text();
 }
 
 
 //*************************************************************************************************************
 
-void TMSISetupProjectWidget::changeHatDir()
+void TMSISetupProjectWidget::changeOutputFile()
 {
-//    QString path = QFileDialog::getOpenFileName(
-//                this,
-//                "Change file for current used EEG hat",
-//                "mne_x_plugins/resources/tmsi/loc_files",
-//                 tr("Electrode location files (*.elc)"));
+    QString path = QFileDialog::getSaveFileName(
+                this,
+                "Save to fif file",
+                "mne_x_plugins/resources/tmsi/EEG_data_001_raw.fif",
+                 tr("Fif files (*.fif)"));
+
+//    if(path==NULL)
+//        path = ui.m_lineEdit_outputDir->text();
+
+//    ui.m_lineEdit_outputDir->setText(path);
+//    m_pTMSI->m_sOutputFilePath = ui.m_lineEdit_outputDir->text();
+}
+
+
+//*************************************************************************************************************
+
+void TMSISetupProjectWidget::changeCap()
+{
+    QString path = QFileDialog::getOpenFileName(this,
+                                                "Change EEG cap layout",
+                                                "mne_x_plugins/resources/tmsi/loc_files",
+                                                 tr("Electrode location files (*.elc)"));
 
 //    if(path==NULL)
 //        path = ui.m_lineEdit_CurrentEEGHat->text();

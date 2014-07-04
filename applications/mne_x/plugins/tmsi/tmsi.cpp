@@ -743,7 +743,7 @@ void TMSI::showSetupProjectDialog()
 
     if(!m_pTmsiSetupProjectWidget->isVisible())
     {
-        m_pTmsiSetupProjectWidget->setWindowTitle("TMSI Plugin - Setup project");
+        m_pTmsiSetupProjectWidget->setWindowTitle("TMSI EEG Connector - Setup project");
         m_pTmsiSetupProjectWidget->show();
         m_pTmsiSetupProjectWidget->raise();
     }

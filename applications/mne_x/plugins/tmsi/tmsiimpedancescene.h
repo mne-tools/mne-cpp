@@ -61,7 +61,12 @@
 namespace TMSIPlugin
 {
 
-
+//=============================================================================================================
+/**
+* TMSIImpedanceScene...
+*
+* @brief The TMSIImpedanceScene class provides a reimplemented QGraphicsScene.
+*/
 class TMSIImpedanceScene : public QGraphicsScene
 {
     Q_OBJECT

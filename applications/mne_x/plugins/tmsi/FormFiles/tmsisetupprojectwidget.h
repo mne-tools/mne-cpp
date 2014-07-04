@@ -92,24 +92,31 @@ private:
 
     //=========================================================================================================
     /**
-    * Sets the dir where the output file is saved
+    * Sets the project dir
     *
     */
-    void changeOutputFileDir();
+    void changeProject();
+
+    //=========================================================================================================
+    /**
+    * Sets the subject dir
+    *
+    */
+    void changeSubject();
 
     //=========================================================================================================
     /**
     * Sets the dir where the output file is saved
     *
     */
-    void setOutputTextField();
+    void changeOutputFile();
 
     //=========================================================================================================
     /**
-    * Sets the dir where the eeg hat file is located
+    * Sets the dir where the eeg cap file is located
     *
     */
-    void changeHatDir();
+    void changeCap();
 };
 
 } // NAMESPACE

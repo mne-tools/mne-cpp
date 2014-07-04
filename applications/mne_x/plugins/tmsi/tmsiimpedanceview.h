@@ -61,6 +61,13 @@
 namespace TMSIPlugin
 {
 
+
+//=============================================================================================================
+/**
+* TMSIImpedanceView...
+*
+* @brief The TMSIImpedanceView class provides a reimplemented QGraphicsView.
+*/
 class TMSIImpedanceView : public QGraphicsView
 {
     Q_OBJECT

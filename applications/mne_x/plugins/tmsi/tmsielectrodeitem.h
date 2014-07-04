@@ -75,9 +75,8 @@ namespace TMSIPlugin
 /**
 * TMSIElectrodeItem...
 *
-* @brief The TMSIElectrodeItem class provides a new data structure for sotring impedance values.
+* @brief The TMSIElectrodeItem class provides a new data structure for impedance values.
 */
-
 class TMSIElectrodeItem : public QGraphicsItem
 {
 
