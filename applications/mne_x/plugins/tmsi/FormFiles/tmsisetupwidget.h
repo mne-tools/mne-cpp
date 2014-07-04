@@ -130,31 +130,10 @@ private:
 
     //=========================================================================================================
     /**
-    * Sets flag for writing the received samples to a file.
+    * Sets flag for writing to a file.
     *
     */
     void setWriteToFile();
-
-    //=========================================================================================================
-    /**
-    * Sets the dir where the output file is saved
-    *
-    */
-    void changeOutputFileDir();
-
-    //=========================================================================================================
-    /**
-    * Sets the dir where the output file is saved
-    *
-    */
-    void setOutputTextField();
-
-    //=========================================================================================================
-    /**
-    * Sets the dir where the eeg hat file is located
-    *
-    */
-    void changeHatDir();
 
     //=========================================================================================================
     /**
@@ -170,9 +149,9 @@ private:
     */
     void showAboutDialog();
 
-    TMSI*           m_pTMSI;                    /**< a pointer to corresponding TMSI.*/
+    TMSI*               m_pTMSI;                 /**< a pointer to corresponding TMSI.*/
 
-    Ui::TMSISetupClass ui;                      /**< the user interface for the TMSISetupWidget.*/
+    Ui::TMSISetupClass  ui;                      /**< the user interface for the TMSISetupWidget.*/
 };
 
 } // NAMESPACE

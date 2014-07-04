@@ -100,7 +100,8 @@ SOURCES += \
         FormFiles/tmsiimpedancewidget.cpp \
         tmsielectrodeitem.cpp \
         tmsiimpedanceview.cpp \
-        tmsiimpedancescene.cpp
+        tmsiimpedancescene.cpp \
+    FormFiles/tmsisetupprojectwidget.cpp
 
 HEADERS += \
         tmsi.h\
@@ -113,13 +114,15 @@ HEADERS += \
         FormFiles/tmsiimpedancewidget.h \
         tmsielectrodeitem.h \
         tmsiimpedanceview.h \
-        tmsiimpedancescene.h
+        tmsiimpedancescene.h \
+    FormFiles/tmsisetupprojectwidget.h
 
 FORMS += \
         FormFiles/tmsisetup.ui \
         FormFiles/tmsiabout.ui \
         FormFiles/tmsimanualannotation.ui \
-        FormFiles/tmsiimpedancewidget.ui
+        FormFiles/tmsiimpedancewidget.ui \
+    FormFiles/tmsisetupprojectwidget.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

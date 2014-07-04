@@ -72,6 +72,18 @@ TMSI::TMSI()
 , m_pRawMatrixBuffer_In(0)
 , m_pTMSIProducer(new TMSIProducer(this))
 {
+    // Create record file option action bar item/button
+    m_pActionSetupProject = new QAction(QIcon(":/images/database.png"), tr("Setup project"), this);
+    m_pActionSetupProject->setStatusTip(tr("Setup project"));
+    connect(m_pActionSetupProject, &QAction::triggered, this, &TMSI::showSetupProjectDialog);
+    addPluginAction(m_pActionSetupProject);
+
+    // Create start recordin action bar item/button
+    m_pActionStartRecording = new QAction(QIcon(":/images/record.png"), tr("Start recording data to fif file"), this);
+    m_pActionStartRecording->setStatusTip(tr("Start recording data to fif file"));
+    connect(m_pActionStartRecording, &QAction::triggered, this, &TMSI::showStartRecording);
+    addPluginAction(m_pActionStartRecording);
+
     // Create impedance action bar item/button
     m_pActionImpedance = new QAction(QIcon(":/images/impedances.png"), tr("Check impedance values"), this);
     m_pActionImpedance->setStatusTip(tr("Check impedance values"));
@@ -459,30 +471,8 @@ bool TMSI::start()
     if(m_bBeepTrigger)
         m_qTimerTrigger.start();
 
-    //Setup writing to file
-    if(m_bWriteToFile)
-    {
-        //Initiate the stream for writing to the fif file
-        m_fileOut.setFileName(m_sOutputFilePath);
-        if(m_fileOut.exists())
-        {
-            QMessageBox msgBox;
-            msgBox.setText("The file you want to write already exists.");
-            msgBox.setInformativeText("Do you want to overwrite this file?");
-            msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-            int ret = msgBox.exec();
-            if(ret == QMessageBox::No)
-                return false;
-        }
-
-        setUpFiffInfo();
-
-        m_pOutfid = Fiff::start_writing_raw(m_fileOut, *m_pFiffInfo, m_cals);
-        fiff_int_t first = 0;
-        m_pOutfid->write_int(FIFF_FIRST_SAMPLE, &first);
-    }
-    else
-        setUpFiffInfo();
+    //Setup fiff info
+    setUpFiffInfo();
 
     //Set the channel size of the RMTSA - this needs to be done here and NOT in the init() function because the user can change the number of channels during runtime
     m_pRMTSA_TMSI->data()->initFromFiffInfo(m_pFiffInfo);
@@ -711,7 +701,12 @@ void TMSI::run()
 
     //Close the fif output stream
     if(m_bWriteToFile)
+    {
         m_pOutfid->finish_writing_raw();
+        m_bWriteToFile = false;
+        m_pTimerRecordingChange->stop();
+        m_pActionStartRecording->setIcon(QIcon(":/images/record.png"));
+    }
 
     //std::cout<<"EXITING - TMSI::run()"<<std::endl;
 }
@@ -738,6 +733,93 @@ void TMSI::showImpedanceDialog()
     }
 }
 
+//*************************************************************************************************************
+
+void TMSI::showSetupProjectDialog()
+{
+    // Open setup project widget
+    if(m_pTmsiSetupProjectWidget == NULL)
+        m_pTmsiSetupProjectWidget = QSharedPointer<TMSISetupProjectWidget>(new TMSISetupProjectWidget(this));
+
+    if(!m_pTmsiSetupProjectWidget->isVisible())
+    {
+        m_pTmsiSetupProjectWidget->setWindowTitle("TMSI Plugin - Setup project");
+        m_pTmsiSetupProjectWidget->show();
+        m_pTmsiSetupProjectWidget->raise();
+    }
+}
+
+//*************************************************************************************************************
+
+void TMSI::showStartRecording()
+{
+    //Setup writing to file
+    if(m_bWriteToFile)
+    {
+        m_pOutfid->finish_writing_raw();
+        m_bWriteToFile = false;
+        m_pTimerRecordingChange->stop();
+        m_pActionStartRecording->setIcon(QIcon(":/images/record.png"));
+    }
+    else
+    {
+        if(!m_bIsRunning)
+        {
+            QMessageBox msgBox;
+            msgBox.setText("Start data acquisition first!");
+            msgBox.exec();
+            return;
+        }
+
+        if(!m_pFiffInfo)
+        {
+            QMessageBox msgBox;
+            msgBox.setText("FiffInfo missing!");
+            msgBox.exec();
+            return;
+        }
+
+        //Initiate the stream for writing to the fif file
+        m_fileOut.setFileName(m_sOutputFilePath);
+        if(m_fileOut.exists())
+        {
+            QMessageBox msgBox;
+            msgBox.setText("The file you want to write already exists.");
+            msgBox.setInformativeText("Do you want to overwrite this file?");
+            msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+            int ret = msgBox.exec();
+            if(ret == QMessageBox::No)
+                return;
+        }
+
+        m_pOutfid = Fiff::start_writing_raw(m_fileOut, *m_pFiffInfo, m_cals);
+        fiff_int_t first = 0;
+        m_pOutfid->write_int(FIFF_FIRST_SAMPLE, &first);
+
+        m_bWriteToFile = true;
+
+        m_pTimerRecordingChange = QSharedPointer<QTimer>(new QTimer);
+        connect(m_pTimerRecordingChange.data(), &QTimer::timeout, this, &TMSI::changeRecordingButton);
+        m_pTimerRecordingChange->start(500);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void TMSI::changeRecordingButton()
+{
+    if(m_iBlinkStatus == 0)
+    {
+        m_pActionStartRecording->setIcon(QIcon(":/images/record.png"));
+        m_iBlinkStatus = 1;
+    }
+    else
+    {
+        m_pActionStartRecording->setIcon(QIcon(":/images/record_active.png"));
+        m_iBlinkStatus = 0;
+    }
+}
 
 
 
