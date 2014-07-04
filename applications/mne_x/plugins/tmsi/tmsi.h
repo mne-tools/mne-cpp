@@ -189,7 +189,6 @@ protected:
     */
     virtual void run();
 
-
     //=========================================================================================================
     /**
     * Opens a widget to check the impedance values
@@ -265,8 +264,8 @@ private:
     QAction*                            m_pActionSetupProject;              /**< shows setup project dialog */
     QAction*                            m_pActionStartRecording;            /**< starts to record data */
 
-    QSharedPointer<QTimer>              m_pTimerRecordingChange;
-    qint16                              m_iBlinkStatus;
+    QSharedPointer<QTimer>              m_pTimerRecordingChange;            /**< timer to control blinking of the recording icon */
+    qint16                              m_iBlinkStatus;                     /**< flag for recording icon blinking */
 
 };
 
