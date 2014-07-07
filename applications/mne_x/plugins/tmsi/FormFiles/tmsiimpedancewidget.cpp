@@ -243,8 +243,13 @@ void TMSIImpedanceWidget::takeScreenshot()
 
         if(fileName.contains(".png"))
         {
-            QPixmap pixMap = QPixmap::grabWidget(ui->m_graphicsView_impedanceView);
-            pixMap.save(fileName);
+            m_qGScene->setSceneRect(m_qGScene->itemsBoundingRect());                          // Re-shrink the scene to it's bounding contents
+            QImage image(m_qGScene->sceneRect().size().toSize(), QImage::Format_ARGB32);  // Create the image with the exact size of the shrunk scene
+            image.fill(Qt::transparent);                                              // Start all pixels transparent
+
+            QPainter painter(&image);
+            m_qGScene->render(&painter);
+            image.save(fileName);
         }
     }
 }
