@@ -197,7 +197,7 @@ public:
     MatrixX3i tris;             /**< Triangles */
     fiff_int_t nuse;            /**< Number of used dipoles. */
     VectorXi inuse;             /**< Used source points indicated by 1, 0 otherwise */
-    VectorXi vertno;            /**< Zero based (different to MATLAB) indices of the used vertices*/
+    VectorXi vertno;            /**< Zero based (different to MATLAB) indices of the used vertices/If label based clustered gain matrix vertno contains label IDs*/
     qint32 nuse_tri;            /**< Number of used triangles. */
     MatrixX3i use_tris;         /**< Triangle information of the used triangles. */
     VectorXi nearest;           /**< All indeces mapped to the indeces of the used vertices (using option -cps during mne_setup_source_space) */

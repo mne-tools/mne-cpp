@@ -2,7 +2,6 @@
 /**
 * @file     rtsssalgo.h
 * @author   Seok Lew <slew@nmr.mgh.harvard.edu>;
-*           Xin Li <xinli@cmu.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     June, 2013
@@ -32,6 +31,10 @@
 *
 * @brief    Contains the declaration of the RtSssAlgo class.
 *
+* @remarks  This rtsssalgo is implemented based on a paper, 'Real-Time Robust Signal Space Separation for Magnetoencephalography',
+*           authored by Chenlei Guo, Xin Li, Samu Taulu, Wei Wang, and Douglas J. Weber,
+*           published in IEEE Transactions on Biomedical Engieering Vol 57, p1856~1866, August 2010.
+
 */
 
 #ifndef RTSSSALGO_H
@@ -100,8 +103,10 @@ public:
 
     void setMEGInfo(FiffInfo::SPtr fiffinfo);
     void setSSSParameter(QList<int>);
-    qint32 getNumMEGCh();
-//    void setMEGsignal(MatrixXd megfrombuffer);
+    qint32 getNumMEGChan();
+    qint32 getNumMEGChanUsed();
+    qint32 getNumMEGBadChan();
+    VectorXi getBadChan();
 
 private:
     void getCoilInfoVectorView();
@@ -113,7 +118,8 @@ private:
     void getSphereToCartesianVector();
     int strmatch(char, char);
 
-    qint32 NumCoil;
+    qint32 NumMEGChan, NumCoil, NumBadCoil;
+    VectorXi BadChan;
     QList<MatrixXd> CoilT;
     QList<QString> CoilName, CoilTk;
     QList<MatrixXd> CoilRk, CoilWk;

@@ -157,9 +157,21 @@ void plotter::drawGrid(QPainter *painter)
 
     //painter->drawText(rect.left()-10, rect.bottom(), rect.height(),20,Qt::AlignVCenter|Qt::AlignCenter, settings.ylabel);
 
+    drawRotatedText(painter, rect.left()-80, rect.bottom()-40, settings.ylabel);
     painter->drawRect(rect.adjusted(0,0,-1,-1));
 
 }
+
+
+void plotter::drawRotatedText(QPainter *painter, int x, int y, const QString &text)
+{
+    painter->save();
+    painter->translate(x, y);
+    painter->rotate(270); // or 90
+    painter->drawText(0, 0, text);
+    painter->restore();
+}
+
 
 void plotter::drawCurve(QPainter *painter)
 {
