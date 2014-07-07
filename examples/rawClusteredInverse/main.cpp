@@ -416,7 +416,7 @@ int main(int argc, char *argv[])
     QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
 
     QString t_sFileNameClusteredInv("");
-    QString t_sFileNameStc("mind006_051209_auditory01.stc");
+    QString t_sFileNameStc("test_mind006_051209_auditory01.stc");
 
     // Parse command line parameters
     for(qint32 i = 0; i < argc; ++i)

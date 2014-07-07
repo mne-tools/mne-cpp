@@ -48,6 +48,8 @@ To build MNE-CPP follow the wiki-guide:
 
 * [4. Compile MNE-CPP](https://github.com/mne-tools/mne-cpp/wiki/4.-Compile-mne-cpp): Now you're ready to build the whole MNE-CPP library.
 
+* [5. Post Setup Steps](https://github.com/mne-tools/mne-cpp/wiki/5.-Post-Setup-Steps): The last step shows how to setup the environment variables. 
+
 Mailing list
 ============
 
