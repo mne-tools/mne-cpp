@@ -1,21 +1,79 @@
+//=============================================================================================================
+/**
+* @file     cluststcview.cpp
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Daniel Strohmeier <daniel.strohmeier@tu-ilmenau.de>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+* @version  1.0
+* @date     June, 2014
+*
+* @section  LICENSE
+*
+* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+* the following conditions are met:
+*     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+*       following disclaimer.
+*     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+*       the following disclaimer in the documentation and/or other materials provided with the distribution.
+*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*       to endorse or promote products derived from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+*
+* @brief    Implementation of the ClustStcView class.
+*
+*/
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
 #include "cluststcview.h"
-
-#include "qglbuilder.h"
-#include "qglcube.h"
-
 #include "cluststcmodel.h"
 
 #include <disp/colormap.h>
 
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
+
+#include "qglbuilder.h"
+#include "qglcube.h"
 #include <QMouseEvent>
 
+
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
 using namespace DISPLIB;
+using namespace DISP3DLIB;
 
 
-ClustStcView::ClustStcView(bool isStereo, QGLView::StereoType stereoType, QWindow *parent)
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+ClustStcView::ClustStcView(bool showRegions, bool isStereo, QGLView::StereoType stereoType, QWindow *parent)
 : QGLView(parent)
 , m_pModel(NULL)
 , m_bIsInitialized(false)
+, m_bShowRegions(showRegions)
 , m_bStereo(isStereo)
 , m_stereoType(stereoType)//QGLView::StretchedLeftRight)//QGLView::RedCyanAnaglyph
 , m_pSceneNodeBrain(NULL)
@@ -44,7 +102,7 @@ void ClustStcView::dataChanged(const QModelIndex &topLeft, const QModelIndex &bo
         //ToDo label id check -> necessary?
         //qint32 colorIdx = m_qListMapLabelIdIndex[h][labelId];
 
-        qint32 iVal = m_pModel->data(i,3).toDouble() * 255;
+        qint32 iVal = m_pModel->data(i,3).value<VectorXd>().maxCoeff() * 255;
 
         iVal = iVal > 255 ? 255 : iVal < 0 ? 0 : iVal;
 
@@ -57,6 +115,9 @@ void ClustStcView::dataChanged(const QModelIndex &topLeft, const QModelIndex &bo
     }
 
     this->update();
+
+    Q_UNUSED( roles );
+
 }
 
 
@@ -133,7 +194,10 @@ void ClustStcView::initializeGL(QGLPainter *painter)
                     //
                     QGLMaterial *t_pMaterialROI = new QGLMaterial();
 
-                    t_pMaterialROI->setColor(m_pModel->data(k,5,Qt::DisplayRole).value<QColor>());
+                    if(m_bShowRegions)
+                        t_pMaterialROI->setColor(m_pModel->data(k,5,Qt::DisplayRole).value<QColor>());
+                    else
+                        t_pMaterialROI->setColor(QColor(100,100,100,230));
 
                     index = palette->addMaterial(t_pMaterialROI);
                     builder.currentNode()->setMaterialIndex(index);

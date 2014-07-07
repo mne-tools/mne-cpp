@@ -39,7 +39,7 @@
 //=============================================================================================================
 #include <QPen>
 #include <QGLWidget>
-#include "glwidget_OnDisp.h"
+//#include "glwidget_OnDisp.h"
 
 #include <QDebug>
 
@@ -211,7 +211,7 @@ void BabyMEGSQUIDControlDgl::TuneGraphDispProc(MatrixXf tmp)
     settings.minY = mmin(tmp,chanIndx);
     settings.maxY = mmax(tmp,chanIndx);
     settings.xlabel = QString("%1 samples/second").arg(m_pBabyMEG->sfreq) ;
-    //settings.ylabel = QString("Amplify");
+    settings.ylabel = QString("Amplitude [rel. unit]");
 
     d_timeplot->setPlotSettings(settings);
 //    qDebug()<<"minY"<<settings.minY<<"maxY"<<settings.maxY;
