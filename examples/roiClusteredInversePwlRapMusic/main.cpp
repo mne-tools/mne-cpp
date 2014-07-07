@@ -106,16 +106,38 @@ int main(int argc, char *argv[])
 //    AnnotationSet t_annotationSet("E:/Data/sl_data/subjects/mind006/label/lh.aparc.a2009s.annot", "E:/Data/sl_data/subjects/mind006/label/rh.aparc.a2009s.annot");
 //    SurfaceSet t_surfSet("E:/Data/sl_data/subjects/mind006/surf/lh.white", "E:/Data/sl_data/subjects/mind006/surf/rh.white");
 
-    QFile t_fileRaw("E:/Data/sl_data/MEG/mind006/mind006_051209_median01_raw.fif");
-    QFile t_fileFwd("E:/Data/sl_data/MEG/mind006/mind006_051209_median01_raw-oct-6-fwd.fif");
-    AnnotationSet t_annotationSet("E:/Data/sl_data/subjects/mind006/label/lh.aparc.a2009s.annot", "E:/Data/sl_data/subjects/mind006/label/rh.aparc.a2009s.annot");
-    SurfaceSet t_surfSet("E:/Data/sl_data/subjects/mind006/surf/lh.white", "E:/Data/sl_data/subjects/mind006/surf/rh.white");
+//    QFile t_fileRaw("E:/Data/sl_data/MEG/mind006/mind006_051209_median01_raw.fif");
+//    QFile t_fileFwd("E:/Data/sl_data/MEG/mind006/mind006_051209_median01_raw-oct-6-fwd.fif");
+//    AnnotationSet t_annotationSet("E:/Data/sl_data/subjects/mind006/label/lh.aparc.a2009s.annot", "E:/Data/sl_data/subjects/mind006/label/rh.aparc.a2009s.annot");
+//    SurfaceSet t_surfSet("E:/Data/sl_data/subjects/mind006/surf/lh.white", "E:/Data/sl_data/subjects/mind006/surf/rh.white");
 
-    QString t_sFileNameStc("");//("mind006_051209_auditory01.stc");
+//    QFile t_fileRaw("D:/Dropbox/Masterarbeit DB/Messdaten/mind006/mind006_051209_index01_raw.fif");
+//    QFile t_fileFwd("D:/Dropbox/Masterarbeit DB/Messdaten/mind006/mind006_051209_index01_raw-oct-6-fwd.fif");
+//    AnnotationSet t_annotationSet("D:/Dropbox/Masterarbeit DB/Messdaten/mind006/label/lh.aparc.a2009s.annot", "D:/Dropbox/Masterarbeit DB/Messdaten/mind006/label/rh.aparc.a2009s.annot");
+//    SurfaceSet t_surfSet("D:/Dropbox/Masterarbeit DB/Messdaten/mind006/surf/lh.white", "D:/Dropbox/Masterarbeit DB/Messdaten/mind006/surf/rh.white");
+//    QString t_sFileNameStc("D:/Dropbox/Masterarbeit DB/Messdaten/mind006/mind006_051209_index01_raw_RAP.stc");
+
+//    QFile t_fileRaw("D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2014_03_17_Lorenz_Esch_010/Processed/averaged/EEG_data_001_voluntary_left_tapping_raw_Averaged_-1_1_108.fif");
+//    QFile t_fileFwd("D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/Lorenz-140128-Duke128-fwd.fif");
+//    AnnotationSet t_annotationSet("D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/atlas/lh.aparc.a2009s.annot", "D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/atlas/rh.aparc.a2009s.annot");
+//    SurfaceSet t_surfSet("D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/surface/lh.white", "D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/surface/rh.white");
+//    QString t_sFileNameStc("D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2014_03_17_Lorenz_Esch_010/Processed/stc/EEG_data_001_voluntary_left_tapping_raw_Averaged_-1_1_108_RAP.stc");
+
+    QFile t_fileRaw("D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2014_02_04_Lorenz_Esch_005/Processed/averaged/EEG_data_002_voluntary_right_tapping_filtered_07_40_Averaged_-1_1_184.fif");
+    QFile t_fileFwd("D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/Lorenz-140128-Duke128-fwd.fif");
+    AnnotationSet t_annotationSet("D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/atlas/lh.aparc.a2009s.annot", "D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/atlas/rh.aparc.a2009s.annot");
+    SurfaceSet t_surfSet("D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/surface/lh.white", "D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/surface/rh.white");
+    QString t_sFileNameStc("D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2014_02_04_Lorenz_Esch_005/Processed/stc/EEG_data_002_voluntary_right_tapping_filtered_07_40_Averaged_-1_1_184_RAP.stc");
+
+//    QFile t_fileRaw("D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2014_03_17_Lorenz_Esch_010/Processed/filtered/EEG_data_001_voluntary_left_right_tapping_filtered_07_40_raw.fif");
+//    QFile t_fileFwd("D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/Lorenz-140128-Duke128-fwd.fif");
+//    AnnotationSet t_annotationSet("D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/atlas/lh.aparc.a2009s.annot", "D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/atlas/rh.aparc.a2009s.annot");
+//    SurfaceSet t_surfSet("D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/surface/lh.white", "D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/surface/rh.white");
+//    QString t_sFileNameStc("D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2014_03_17_Lorenz_Esch_010/Processed/stc/EEG_data_001_voluntary_left_right_tapping_filtered_07_40_raw_RAP.stc");
 
     qint32 numDipolePairs = 7;
 
-    qint32 samplesStcWindow = 100;
+    qint32 samplesStcWindow = 300;
     float stcOverlap = 0.0f;
 
     qint32 startSample = 0;
@@ -150,16 +172,16 @@ int main(int argc, char *argv[])
     QList<Label> t_qListLabelSelection;
 
     //LH
-    t_qListLabelSelection << t_qListLabels[28] << t_qListLabels[29] << t_qListLabels[45];
+    t_qListLabelSelection << t_qListLabels[28] << t_qListLabels[29] << t_qListLabels[45] << t_qListLabels[66];
     //RH
-    t_qListLabelSelection << t_qListLabels[103] << t_qListLabels[104] << t_qListLabels[120];
+    t_qListLabelSelection << t_qListLabels[103] << t_qListLabels[104] << t_qListLabels[120]<< t_qListLabels[141];
 
-//    std::cout << "t_qListLabelsTest.size " << t_qListLabelsTest.size() << std::endl;
+//    std::cout << "t_qListLabels.size " << t_qListLabels.size() << std::endl;
 
-//    for(qint32 i = 0; i < t_qListLabelSelection.size(); ++i)
+//    for(qint32 i = 0; i < t_qListLabels.size(); ++i)
 //    {
-//        qDebug() << "Num" << i << t_qListLabelSelection[i].name;
-//        std::cout << t_qListLabelSelection[i].hemi << std::endl;
+//        qDebug() << "Num" << i << t_qListLabels[i].name;
+//        std::cout << t_qListLabels[i].hemi << std::endl;
 //    }
 
     MNEForwardSolution t_SelectFwd = t_Fwd.pick_regions(t_qListLabelSelection);
@@ -177,8 +199,8 @@ int main(int argc, char *argv[])
     //
     QStringList include;
 //    include << "STI 014";
-    bool want_meg   = true;
-    bool want_eeg   = false;
+    bool want_meg   = false;
+    bool want_eeg   = true;
     bool want_stim  = false;
 
     RowVectorXi picks = raw.info.pick_types(want_meg, want_eeg, want_stim, include);//, raw.info.bads);
@@ -263,6 +285,7 @@ int main(int argc, char *argv[])
     //
     MNEForwardSolution t_clusteredFwd = t_SelectFwd.cluster_forward_solution(t_annotationSet, 20);//t_Fwd.cluster_forward_solution_ccr(t_annotationSet, 20);//40);
 
+
     //
     // Compute inverse solution
     //
@@ -344,6 +367,13 @@ int main(int argc, char *argv[])
 
     if(sourceEstimate.isEmpty())
         return 1;
+
+    // Write stc to file
+    if(!t_sFileNameStc.isEmpty())
+    {
+        QFile t_fileClusteredStc(t_sFileNameStc);
+        sourceEstimate.write(t_fileClusteredStc);
+    }
 
     //Source Estimate end
     //########################################################################################
