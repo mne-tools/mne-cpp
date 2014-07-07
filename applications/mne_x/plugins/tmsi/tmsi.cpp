@@ -72,6 +72,23 @@ TMSI::TMSI()
 , m_pRawMatrixBuffer_In(0)
 , m_pTMSIProducer(new TMSIProducer(this))
 {
+    // Create record file option action bar item/button
+    m_pActionSetupProject = new QAction(QIcon(":/images/database.png"), tr("Setup project"), this);
+    m_pActionSetupProject->setStatusTip(tr("Setup project"));
+    connect(m_pActionSetupProject, &QAction::triggered, this, &TMSI::showSetupProjectDialog);
+    addPluginAction(m_pActionSetupProject);
+
+    // Create start recordin action bar item/button
+    m_pActionStartRecording = new QAction(QIcon(":/images/record.png"), tr("Start recording data to fif file"), this);
+    m_pActionStartRecording->setStatusTip(tr("Start recording data to fif file"));
+    connect(m_pActionStartRecording, &QAction::triggered, this, &TMSI::showStartRecording);
+    addPluginAction(m_pActionStartRecording);
+
+    // Create impedance action bar item/button
+    m_pActionImpedance = new QAction(QIcon(":/images/impedances.png"), tr("Check impedance values"), this);
+    m_pActionImpedance->setStatusTip(tr("Check impedance values"));
+    connect(m_pActionImpedance, &QAction::triggered, this, &TMSI::showImpedanceDialog);
+    addPluginAction(m_pActionImpedance);
 }
 
 
@@ -120,11 +137,14 @@ void TMSI::init()
     m_bIsRunning = false;
     m_bBeepTrigger = false;
     m_bUseCommonAverage = true;
-    m_bUseKeyboardTrigger = true;
+    m_bUseKeyboardTrigger = false;
+    m_bCheckImpedances = false;
 
     m_iTriggerType = 0;
 
-    m_sOutputFilePath = QString("./mne_x_plugins/resources/tmsi/EEG_data_001_raw.fif");
+    QDate date;
+    m_sOutputFilePath = QString ("%1Sequence_01/Subject_01/%2_%3_%4_EEG_001_raw.fif").arg(m_qStringResourcePath).arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day());
+
     m_sElcFilePath = QString("./mne_x_plugins/resources/tmsi/loc_files/Lorenz-Duke128-28-11-2013.elc");
 
     m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo());
@@ -453,30 +473,8 @@ bool TMSI::start()
     if(m_bBeepTrigger)
         m_qTimerTrigger.start();
 
-    //Setup writing to file
-    if(m_bWriteToFile)
-    {
-        //Initiate the stream for writing to the fif file
-        m_fileOut.setFileName(m_sOutputFilePath);
-        if(m_fileOut.exists())
-        {
-            QMessageBox msgBox;
-            msgBox.setText("The file you want to write already exists.");
-            msgBox.setInformativeText("Do you want to overwrite this file?");
-            msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-            int ret = msgBox.exec();
-            if(ret == QMessageBox::No)
-                return false;
-        }
-
-        setUpFiffInfo();
-
-        m_pOutfid = Fiff::start_writing_raw(m_fileOut, *m_pFiffInfo, m_cals);
-        fiff_int_t first = 0;
-        m_pOutfid->write_int(FIFF_FIRST_SAMPLE, &first);
-    }
-    else
-        setUpFiffInfo();
+    //Setup fiff info
+    setUpFiffInfo();
 
     //Set the channel size of the RMTSA - this needs to be done here and NOT in the init() function because the user can change the number of channels during runtime
     m_pRMTSA_TMSI->data()->initFromFiffInfo(m_pFiffInfo);
@@ -494,14 +492,16 @@ bool TMSI::start()
                        m_bUseUnitOffset,
                        m_bWriteDriverDebugToFile,
                        m_sOutputFilePath,
-                       m_bUseCommonAverage);
+                       m_bUseCommonAverage,
+                       m_bCheckImpedances);
 
     if(m_pTMSIProducer->isRunning())
     {
         // Init BCIFeatureWindow for visualization
-        if(m_bUseKeyboardTrigger)
+        m_tmsiManualAnnotationWidget = QSharedPointer<TMSIManualAnnotationWidget>(new TMSIManualAnnotationWidget(this));
+
+        if(m_bUseKeyboardTrigger && !m_bCheckImpedances)
         {
-            m_tmsiManualAnnotationWidget = QSharedPointer<TMSIManualAnnotationWidget>(new TMSIManualAnnotationWidget(this));
             m_tmsiManualAnnotationWidget->initGui();
             m_tmsiManualAnnotationWidget->show();
         }
@@ -588,20 +588,27 @@ void TMSI::run()
     {
         //std::cout<<"TMSI::run(s)"<<std::endl;
 
+        // Check impedances - send new impedance values to graphic scene
+        if(m_pTMSIProducer->isRunning() && m_bCheckImpedances)
+        {
+            MatrixXf matValue = m_pRawMatrixBuffer_In->pop();
+
+            for(qint32 i = 0; i < matValue.cols(); ++i)
+                m_pTmsiImpedanceWidget->updateGraphicScene(matValue.col(i).cast<double>());
+        }
+
         //pop matrix only if the producer thread is running
-        if(m_pTMSIProducer->isRunning())
+        if(m_pTMSIProducer->isRunning() && !m_bCheckImpedances)
         {
             MatrixXf matValue = m_pRawMatrixBuffer_In->pop();
 
             // Set Beep trigger (if activated)
             if(m_bBeepTrigger && m_qTimerTrigger.elapsed() >= m_iTriggerInterval)
             {
-                QFuture<void> future = QtConcurrent::run(Beep, 450, 700);
+                QtConcurrent::run(Beep, 450, 700);
                 //Set trigger in received data samples - just for one sample, so that this event is easy to detect
                 matValue(136, m_iSamplesPerBlock-1) = 252;
                 m_qTimerTrigger.restart();
-
-                Q_UNUSED(future);
             }
 
             // Set keyboard trigger (if activated and !=0)
@@ -696,7 +703,151 @@ void TMSI::run()
 
     //Close the fif output stream
     if(m_bWriteToFile)
+    {
         m_pOutfid->finish_writing_raw();
+        m_bWriteToFile = false;
+        m_pTimerRecordingChange->stop();
+        m_pActionStartRecording->setIcon(QIcon(":/images/record.png"));
+    }
 
     //std::cout<<"EXITING - TMSI::run()"<<std::endl;
 }
+
+
+//*************************************************************************************************************
+
+void TMSI::showImpedanceDialog()
+{
+    // Open Impedance dialog only if no sampling process is active
+    if(!m_bIsRunning)
+    {
+        if(m_pTmsiImpedanceWidget == NULL)
+            m_pTmsiImpedanceWidget = QSharedPointer<TMSIImpedanceWidget>(new TMSIImpedanceWidget(this));
+
+        if(!m_pTmsiImpedanceWidget->isVisible())
+        {
+            m_pTmsiImpedanceWidget->setWindowTitle("MNE-X - Measure impedances");
+            m_pTmsiImpedanceWidget->show();
+            m_pTmsiImpedanceWidget->raise();
+        }
+
+        m_pTmsiImpedanceWidget->initGraphicScene();
+    }
+}
+
+//*************************************************************************************************************
+
+void TMSI::showSetupProjectDialog()
+{
+    // Open setup project widget
+    if(m_pTmsiSetupProjectWidget == NULL)
+        m_pTmsiSetupProjectWidget = QSharedPointer<TMSISetupProjectWidget>(new TMSISetupProjectWidget(this));
+
+    if(!m_pTmsiSetupProjectWidget->isVisible())
+    {
+        m_pTmsiSetupProjectWidget->setWindowTitle("TMSI EEG Connector - Setup project");
+        m_pTmsiSetupProjectWidget->initGui();
+        m_pTmsiSetupProjectWidget->show();
+        m_pTmsiSetupProjectWidget->raise();
+    }
+}
+
+//*************************************************************************************************************
+
+void TMSI::showStartRecording()
+{
+    //Setup writing to file
+    if(m_bWriteToFile)
+    {
+        m_pOutfid->finish_writing_raw();
+        m_bWriteToFile = false;
+        m_pTimerRecordingChange->stop();
+        m_pActionStartRecording->setIcon(QIcon(":/images/record.png"));
+    }
+    else
+    {
+        if(!m_bIsRunning)
+        {
+            QMessageBox msgBox;
+            msgBox.setText("Start data acquisition first!");
+            msgBox.exec();
+            return;
+        }
+
+        if(!m_pFiffInfo)
+        {
+            QMessageBox msgBox;
+            msgBox.setText("FiffInfo missing!");
+            msgBox.exec();
+            return;
+        }
+
+        //Initiate the stream for writing to the fif file
+        m_fileOut.setFileName(m_sOutputFilePath);
+        if(m_fileOut.exists())
+        {
+            QMessageBox msgBox;
+            msgBox.setText("The file you want to write already exists.");
+            msgBox.setInformativeText("Do you want to overwrite this file?");
+            msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+            int ret = msgBox.exec();
+            if(ret == QMessageBox::No)
+                return;
+        }
+
+        // Check if path exists -> otherwise create it
+        QStringList list = m_sOutputFilePath.split("/");
+        list.removeLast(); // remove file name
+        QString fileDir = list.join("/");
+
+        if(!dirExists(fileDir.toStdString()))
+        {
+            QDir dir;
+            dir.mkpath(fileDir);
+        }
+
+        m_pOutfid = Fiff::start_writing_raw(m_fileOut, *m_pFiffInfo, m_cals);
+        fiff_int_t first = 0;
+        m_pOutfid->write_int(FIFF_FIRST_SAMPLE, &first);
+
+        m_bWriteToFile = true;
+
+        m_pTimerRecordingChange = QSharedPointer<QTimer>(new QTimer);
+        connect(m_pTimerRecordingChange.data(), &QTimer::timeout, this, &TMSI::changeRecordingButton);
+        m_pTimerRecordingChange->start(500);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void TMSI::changeRecordingButton()
+{
+    if(m_iBlinkStatus == 0)
+    {
+        m_pActionStartRecording->setIcon(QIcon(":/images/record.png"));
+        m_iBlinkStatus = 1;
+    }
+    else
+    {
+        m_pActionStartRecording->setIcon(QIcon(":/images/record_active.png"));
+        m_iBlinkStatus = 0;
+    }
+}
+
+
+//*************************************************************************************************************
+
+bool TMSI::dirExists(const std::string& dirName_in)
+{
+    DWORD ftyp = GetFileAttributesA(dirName_in.c_str());
+    if (ftyp == INVALID_FILE_ATTRIBUTES)
+        return false;  //something is wrong with your path!
+
+    if (ftyp & FILE_ATTRIBUTE_DIRECTORY)
+        return true;   // this is a directory!
+
+    return false;    // this is not a directory!
+}
+
+

@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
-* @file     tmsisetupwidget.h
+* @file     tmsiimpedanceview.h
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     September, 2013
+* @date     June, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,28 +30,27 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the TMSISetupWidget class.
+* @brief    Contains the declaration of the TMSIImpedanceView class.
 *
 */
 
-#ifndef TMSISETUPWIDGET_H
-#define TMSISETUPWIDGET_H
-
+#ifndef TMSIIMPEDANCEVIEW_H
+#define TMSIIMPEDANCEVIEW_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
+#include <iostream>
+#include <tmsielectrodeitem.h>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
-
-#include <QtWidgets>
-#include "../ui_tmsisetup.h"
-#include "tmsiimpedanceview.h"
+#include <QGraphicsView>
+#include <QWheelEvent>
 
 
 //*************************************************************************************************************
@@ -63,97 +62,43 @@ namespace TMSIPlugin
 {
 
 
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-class TMSI;
-
-
 //=============================================================================================================
 /**
-* DECLARE CLASS TMSISetupWidget
+* TMSIImpedanceView...
 *
-* @brief The TMSISetupWidget class provides the TMSI configuration window.
+* @brief The TMSIImpedanceView class provides a reimplemented QGraphicsView.
 */
-class TMSISetupWidget : public QWidget
+class TMSIImpedanceView : public QGraphicsView
 {
     Q_OBJECT
+
 public:
-
     //=========================================================================================================
     /**
-    * Constructs a TMSISetupWidget which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new TMSISetupWidget becomes a window. If parent is another widget, TMSISetupWidget becomes a child window inside parent. TMSISetupWidget is deleted when its parent is deleted.
-    * @param [in] pTMSI a pointer to the corresponding ECGSimulator.
+    * Constructs a TMSIImpedanceView.
     */
-    TMSISetupWidget(TMSI* pTMSI, QWidget *parent = 0);
-
-    //=========================================================================================================
-    /**
-    * Destroys the TMSISetupWidget.
-    * All TMSISetupWidget's children are deleted first. The application exits if TMSISetupWidget is the main widget.
-    */
-    ~TMSISetupWidget();
-
-    //=========================================================================================================
-    /**
-    * Initializes the Connector's GUI properties.
-    *
-    */
-    void initGui();
+    explicit TMSIImpedanceView(QWidget *parent = 0);
 
 private:
+    //=========================================================================================================
+    /**
+    * Reimplemented wheel event used for zoomin in and out of the scene.
+    */
+    void wheelEvent(QWheelEvent* event);
 
     //=========================================================================================================
     /**
-    * Sets the device sampling properties.
-    *
+    * Reimplemented resize event used scaling fitting the scene into the view after a resize occured.
     */
-    void setDeviceSamplingProperties();
+    void resizeEvent(QResizeEvent* event);
 
     //=========================================================================================================
     /**
-    * Sets the preprocessing properties.
-    *
+    * Reimplemented mouse press event handler.
     */
-    void setPreprocessing();
-
-    //=========================================================================================================
-    /**
-    * Sets the postprocessing properties.
-    *
-    */
-    void setPostprocessing();
-
-    //=========================================================================================================
-    /**
-    * Sets flag for writing to a file.
-    *
-    */
-    void setWriteToFile();
-
-    //=========================================================================================================
-    /**
-    * Sets the triggering properties
-    *
-    */
-    void setTriggerProperties();
-
-    //=========================================================================================================
-    /**
-    * Shows the About Dialog
-    *
-    */
-    void showAboutDialog();
-
-    TMSI*               m_pTMSI;                 /**< a pointer to corresponding TMSI.*/
-
-    Ui::TMSISetupClass  ui;                      /**< the user interface for the TMSISetupWidget.*/
+    void mouseDoubleClickEvent(QMouseEvent* event);
 };
 
 } // NAMESPACE
 
-#endif // TMSISETUPWIDGET_H
+#endif // TMSIIMPEDANCEVIEW_H
