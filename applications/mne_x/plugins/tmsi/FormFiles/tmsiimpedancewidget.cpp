@@ -235,7 +235,7 @@ void TMSIImpedanceWidget::takeScreenshot()
             svgGen.setFileName(fileName);
             QRectF rect = m_qGScene->itemsBoundingRect();
             svgGen.setSize(QSize(rect.width(), rect.height()));
-            svgGen.setViewBox(QRect(0, 0, rect.width(), rect.height()));
+            //svgGen.setViewBox(QRect(0, 0, rect.width(), rect.height()));
 
             QPainter painter(&svgGen);
             m_qGScene->render(&painter);
