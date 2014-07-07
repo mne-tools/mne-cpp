@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Example of the computation of a rawClusteredInverse
+* @brief    Example of the computation of a test mne stc
 *
 */
 
@@ -119,10 +119,10 @@ int main(int argc, char *argv[])
 
 
 
-    AnnotationSet t_annotationSet("mind006", 2, "aparc.a2009s", "D:/Data/subjects");
-    SurfaceSet t_surfSet("mind006", 2, "white", "D:/Data/subjects");
+    AnnotationSet t_annotationSet("mind006", 2, "aparc.a2009s", "E:/Data/subjects");
+    SurfaceSet t_surfSet("mind006", 2, "white", "E:/Data/subjects");
 
-    QString t_sFileNameStc("mind006_051209_auditory01_test.stc");
+    QString t_sFileNameStc("test_mind006_051209_auditory01.stc");//"mind006_051209_auditory01_test.stc");
     MNESourceEstimate sourceEstimateClustered;
 
     if(!t_sFileNameStc.isEmpty())
@@ -195,7 +195,7 @@ int main(int argc, char *argv[])
     pSliderAverageView->setMaximum(500);
     pSliderAverageView->setValue(100);
 
-    ClustStcView* clustView = new ClustStcView(true, QGLView::RedCyanAnaglyph);//(false); (true, QGLView::StretchedLeftRight); (true, QGLView::RedCyanAnaglyph);
+    ClustStcView* clustView = new ClustStcView(false, true, QGLView::RedCyanAnaglyph);//(false); (true, QGLView::StretchedLeftRight); (true, QGLView::RedCyanAnaglyph);
     clustView->setModel(pClustStcModel);
 
     if (clustView->stereoType() != QGLView::RedCyanAnaglyph)
