@@ -71,8 +71,11 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class ClustStcModel;
-class ClustStcTableDelegate;
+namespace DISP3DLIB
+{
+    class ClustStcModel;
+    class ClustStcTableDelegate;
+}
 
 
 //*************************************************************************************************************
