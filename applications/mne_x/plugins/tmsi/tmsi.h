@@ -44,6 +44,7 @@
 //=============================================================================================================
 #include <iostream>
 #include <fstream>
+#include <direct.h>
 
 #include "tmsi_global.h"
 
@@ -213,12 +214,17 @@ protected:
     */
     void changeRecordingButton();
 
+    //=========================================================================================================
+    /**
+    * Checks if a dir exists
+    */
+    bool dirExists(const std::string& dirName_in);
+
 private:
     PluginOutputData<NewRealTimeMultiSampleArray>::SPtr m_pRMTSA_TMSI;      /**< The RealTimeSampleArray to provide the EEG data.*/
     QSharedPointer<TMSIManualAnnotationWidget> m_tmsiManualAnnotationWidget;/**< Widget for manually annotation the trigger during session.*/
     QSharedPointer<TMSIImpedanceWidget> m_pTmsiImpedanceWidget;             /**< Widget for checking the impedances*/
     QSharedPointer<TMSISetupProjectWidget> m_pTmsiSetupProjectWidget;       /**< Widget for checking the impedances*/
-
 
     QString                             m_qStringResourcePath;              /**< The path to the EEG resource directory.*/
 
