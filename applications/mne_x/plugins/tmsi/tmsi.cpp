@@ -142,7 +142,9 @@ void TMSI::init()
 
     m_iTriggerType = 0;
 
-    m_sOutputFilePath = QString("./mne_x_plugins/resources/tmsi/EEG_data_001_raw.fif");
+    QDate date;
+    m_sOutputFilePath = QString ("%1Sequence_01/Subject_01/%2_%3_%4_EEG_001_raw.fif").arg(m_qStringResourcePath).arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day());
+
     m_sElcFilePath = QString("./mne_x_plugins/resources/tmsi/loc_files/Lorenz-Duke128-28-11-2013.elc");
 
     m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo());
@@ -744,6 +746,7 @@ void TMSI::showSetupProjectDialog()
     if(!m_pTmsiSetupProjectWidget->isVisible())
     {
         m_pTmsiSetupProjectWidget->setWindowTitle("TMSI EEG Connector - Setup project");
+        m_pTmsiSetupProjectWidget->initGui();
         m_pTmsiSetupProjectWidget->show();
         m_pTmsiSetupProjectWidget->raise();
     }
@@ -792,6 +795,17 @@ void TMSI::showStartRecording()
                 return;
         }
 
+        // Check if path exists -> otherwise create it
+        QStringList list = m_sOutputFilePath.split("/");
+        list.removeLast(); // remove file name
+        QString fileDir = list.join("/");
+
+        if(!dirExists(fileDir.toStdString()))
+        {
+            QDir dir;
+            dir.mkpath(fileDir);
+        }
+
         m_pOutfid = Fiff::start_writing_raw(m_fileOut, *m_pFiffInfo, m_cals);
         fiff_int_t first = 0;
         m_pOutfid->write_int(FIFF_FIRST_SAMPLE, &first);
@@ -822,5 +836,18 @@ void TMSI::changeRecordingButton()
 }
 
 
+//*************************************************************************************************************
+
+bool TMSI::dirExists(const std::string& dirName_in)
+{
+    DWORD ftyp = GetFileAttributesA(dirName_in.c_str());
+    if (ftyp == INVALID_FILE_ATTRIBUTES)
+        return false;  //something is wrong with your path!
+
+    if (ftyp & FILE_ATTRIBUTE_DIRECTORY)
+        return true;   // this is a directory!
+
+    return false;    // this is not a directory!
+}
 
 

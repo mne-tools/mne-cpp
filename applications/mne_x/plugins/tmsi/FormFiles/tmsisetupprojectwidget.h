@@ -82,8 +82,28 @@ class TMSISetupProjectWidget : public QWidget
     Q_OBJECT
 
 public:
+    //=========================================================================================================
+    /**
+    * Constructs a TMSISetupProjectWidget which is a child of parent.
+    *
+    * @param [in] parent pointer to parent widget; If parent is 0, the new TMSISetupProjectWidget becomes a window. If parent is another widget, TMSISetupWidget becomes a child window inside parent. TMSISetupWidget is deleted when its parent is deleted.
+    * @param [in] pTMSI a pointer to the corresponding ECGSimulator.
+    */
     explicit TMSISetupProjectWidget(TMSI* pTMSI, QWidget *parent = 0);
+
+    //=========================================================================================================
+    /**
+    * Destructs a TMSISetupProjectWidget which is a child of parent.
+    *
+    */
     ~TMSISetupProjectWidget();
+
+    //=========================================================================================================
+    /**
+    * Inits the GUI
+    *
+    */
+    void initGui();
 
 private:
     TMSI*                           m_pTMSI;        /**< a pointer to corresponding TMSI.*/
@@ -95,14 +115,14 @@ private:
     * Sets the project dir
     *
     */
-    void changeProject();
+    void addProject();
 
     //=========================================================================================================
     /**
     * Sets the subject dir
     *
     */
-    void changeSubject();
+    void addSubject();
 
     //=========================================================================================================
     /**
@@ -117,6 +137,13 @@ private:
     *
     */
     void changeCap();
+
+    //=========================================================================================================
+    /**
+    * Generates new file path based onthe project and subject parameters
+    *
+    */
+    void generateFilePath(int index = 0);
 };
 
 } // NAMESPACE
