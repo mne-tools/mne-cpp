@@ -43,9 +43,9 @@ public:
 
 private:
 
-    void readDicts();
+    void read_dicts();
 
-    void calcScaleValue();
+    void calc_scale_value();
     void calcModuValue();
     void calcPhaseValue();
     void calcChirpValue();
