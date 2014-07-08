@@ -333,16 +333,16 @@ void MainWindow::loadEvents()
         m_qFileRaw.close();
     m_qFileRaw.setFileName(filename);
 
-//    if(m_pRawModel->loadFiffData(m_qFileRaw)) {
-//        qDebug() << "Fiff data file" << filename << "loaded.";
-//    }
-//    else
-//        qDebug("ERROR loading fiff data file %s",filename.toLatin1().data());
+    if(m_pEventModel->loadEventData(m_qFileRaw)) {
+        qDebug() << "Fiff event data file" << filename << "loaded.";
+    }
+    else
+        qDebug("ERROR loading fiff event data file %s",filename.toLatin1().data());
 
-//    setWindowStatus();
+    setWindowStatus();
 
-//    //set position of QScrollArea
-//    setScrollBarPosition(0);
+    //set position of QScrollArea
+    setScrollBarPosition(0);
 }
 
 
