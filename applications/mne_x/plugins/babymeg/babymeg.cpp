@@ -424,10 +424,9 @@ void BabyMEG::run()
             if(m_bWriteToFile)
                 m_pOutfid->write_raw_buffer(matValue.cast<double>(), m_cals);
 
-
             if(m_pRTMSABabyMEG)
             {
-//                std::cout << "matValue" << matValue.block(0,0,2,2) << std::endl;
+                //std::cout << "matValue" << matValue.block(0,0,2,2) << std::endl;
                 //emit values
                 for(qint32 i = 0; i < matValue.cols(); ++i)
                     m_pRTMSABabyMEG->data()->setValue(matValue.col(i).cast<double>());

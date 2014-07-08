@@ -97,16 +97,9 @@ TMSISetupWidget::TMSISetupWidget(TMSI* pTMSI, QWidget* parent)
     connect(ui.m_checkBox_UseFFT, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
             this, &TMSISetupWidget::setPostprocessing);
 
-    //Connect write to file
+    //Connect debug file
     connect(ui.m_checkBox_WriteDriverDebugToFile, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
             this, &TMSISetupWidget::setWriteToFile);
-    connect(ui.m_checkBox_WriteToFile, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
-            this, &TMSISetupWidget::setWriteToFile);
-    connect(ui.m_pushButton_ChangeOutputDir, &QPushButton::released, this, &TMSISetupWidget::changeOutputFileDir);
-    connect(ui.m_lineEdit_outputDir, &QLineEdit::textChanged, this, &TMSISetupWidget::setOutputTextField);
-
-    //Connect EEG hat
-    connect(ui.m_pushButton_ChangeEEGHatDir, &QPushButton::released, this, &TMSISetupWidget::changeHatDir);
 
     //Connect trigger properties
     connect(ui.m_spinBox_BeepLength, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
@@ -165,11 +158,6 @@ void TMSISetupWidget::initGui()
 
     //Init write to file
     ui.m_checkBox_WriteDriverDebugToFile->setChecked(m_pTMSI->m_bWriteDriverDebugToFile);
-    ui.m_checkBox_WriteToFile->setChecked(m_pTMSI->m_bWriteToFile);
-    ui.m_lineEdit_outputDir->setText(m_pTMSI->m_sOutputFilePath);
-
-    //Init EEG hat
-    ui.m_lineEdit_CurrentEEGHat->setText(m_pTMSI->m_sElcFilePath);
 
     //Init trigger properties
     ui.m_spinBox_BeepLength->setValue(m_pTMSI->m_iTriggerInterval);
@@ -215,55 +203,8 @@ void TMSISetupWidget::setPostprocessing()
 
 void TMSISetupWidget::setWriteToFile()
 {
-    m_pTMSI->m_sOutputFilePath = ui.m_lineEdit_outputDir->text();
-    m_pTMSI->m_bWriteToFile = ui.m_checkBox_WriteToFile->isChecked();
     m_pTMSI->m_bWriteDriverDebugToFile = ui.m_checkBox_WriteDriverDebugToFile->isChecked();
 }
-
-
-//*************************************************************************************************************
-
-void TMSISetupWidget::changeOutputFileDir()
-{
-    QString path = QFileDialog::getSaveFileName(
-                this,
-                "Save to fif file",
-                "mne_x_plugins/resources/tmsi/EEG_data_001_raw.fif",
-                 tr("Fif files (*.fif)"));
-
-    if(path==NULL)
-        path = ui.m_lineEdit_outputDir->text();
-
-    ui.m_lineEdit_outputDir->setText(path);
-    m_pTMSI->m_sOutputFilePath = ui.m_lineEdit_outputDir->text();
-}
-
-
-//*************************************************************************************************************
-
-void TMSISetupWidget::setOutputTextField()
-{
-    m_pTMSI->m_sOutputFilePath = ui.m_lineEdit_outputDir->text();
-}
-
-
-//*************************************************************************************************************
-
-void TMSISetupWidget::changeHatDir()
-{
-    QString path = QFileDialog::getOpenFileName(
-                this,
-                "Change file for current used EEG hat",
-                "mne_x_plugins/resources/tmsi/loc_files",
-                 tr("Electrode location files (*.elc)"));
-
-    if(path==NULL)
-        path = ui.m_lineEdit_CurrentEEGHat->text();
-
-    ui.m_lineEdit_CurrentEEGHat->setText(path);
-    m_pTMSI->m_sElcFilePath = ui.m_lineEdit_CurrentEEGHat->text();
-}
-
 
 //*************************************************************************************************************
 
