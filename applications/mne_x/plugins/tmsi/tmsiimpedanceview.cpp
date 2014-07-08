@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
-* @file     tmsiproducer.cpp
+* @file     tmsiimpedanceview.h
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     September, 2013
+* @date     June, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,20 +30,17 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the TMSIProducer class.
+* @brief    Contains the implementation of the TMSIImpedanceView class.
 *
 */
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "tmsiproducer.h"
-#include "tmsi.h"
-#include "tmsidriver.h"
-
-#include <QDebug>
+#include "tmsiimpedanceview.h"
 
 
 //*************************************************************************************************************
@@ -52,6 +49,7 @@
 //=============================================================================================================
 
 using namespace TMSIPlugin;
+using namespace std;
 
 
 //*************************************************************************************************************
@@ -59,88 +57,56 @@ using namespace TMSIPlugin;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-TMSIProducer::TMSIProducer(TMSI* pTMSI)
-: m_pTMSI(pTMSI)
-, m_pTMSIDriver(new TMSIDriver(this))
-, m_bIsRunning(true)
+TMSIImpedanceView::TMSIImpedanceView(QWidget *parent)
+: QGraphicsView(parent)
 {
-}
+    // Enable scene interactions
+    this->setInteractive(true);
 
+    // Set scene rectangle
+    this->setSceneRect(-25000, -25000, 50000, 50000);
+
+    // Disable scroll bars - only use drag mode to navigate through scene
+    this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    this->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+    // Activate dragging
+    this->setDragMode(QGraphicsView::ScrollHandDrag);
+
+    // Zoom to mouse cursor position
+    setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
+}
 
 //*************************************************************************************************************
 
-TMSIProducer::~TMSIProducer()
+void TMSIImpedanceView::wheelEvent(QWheelEvent* event)
 {
-    //cout << "TMSIProducer::~TMSIProducer()" << endl;
-}
+    if(event->angleDelta().y()>0) // wheel was rotated forward
+        this->scale(1.25,1.25);
 
+    if(event->angleDelta().y()<0) // wheel was rotated backward
+        this->scale(0.75,0.75);
+
+    // Don't call superclass handler here as wheel is normally used for moving scrollbars
+    //QGraphicsView::wheelEvent(event);
+}
 
 //*************************************************************************************************************
 
-void TMSIProducer::start(int iNumberOfChannels,
-                     int iSamplingFrequency,
-                     int iSamplesPerBlock,
-                     bool bUseChExponent,
-                     bool bUseUnitGain,
-                     bool bUseUnitOffset,
-                     bool bWriteDriverDebugToFile,
-                     QString sOutputFilePath,
-                     bool bUseCommonAverage,
-                     bool bMeasureImpedance)
+void TMSIImpedanceView::resizeEvent(QResizeEvent* event)
 {
-    //Initialise device
-    if(m_pTMSIDriver->initDevice(iNumberOfChannels,
-                              iSamplingFrequency,
-                              iSamplesPerBlock,
-                              bUseChExponent,
-                              bUseUnitGain,
-                              bUseUnitOffset,
-                              bWriteDriverDebugToFile,
-                              sOutputFilePath,
-                              bUseCommonAverage,
-                              bMeasureImpedance))
-    {
-        m_bIsRunning = true;
-        QThread::start();
-    }
-    else
-        m_bIsRunning = false;
-}
+    Q_UNUSED(event);
+    this->fitInView(this->scene()->itemsBoundingRect(), Qt::KeepAspectRatio);
 
+    QGraphicsView::resizeEvent(event);
+}
 
 //*************************************************************************************************************
 
-void TMSIProducer::stop()
+void TMSIImpedanceView::mouseDoubleClickEvent(QMouseEvent* event)
 {
-    //Wait until this thread (TMSIProducer) is stopped
-    m_bIsRunning = false;
+    Q_UNUSED(event);
+    this->fitInView(this->scene()->itemsBoundingRect(), Qt::KeepAspectRatio);
 
-    //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the push function (acquire statement)
-    m_pTMSI->m_pRawMatrixBuffer_In->releaseFromPush();
-
-    while(this->isRunning())
-        m_bIsRunning = false;
-
-    //Unitialise device only after the thread stopped
-    m_pTMSIDriver->uninitDevice();
+    QGraphicsView::mouseDoubleClickEvent(event);
 }
-
-
-//*************************************************************************************************************
-
-void TMSIProducer::run()
-{
-    MatrixXf matRawBuffer(m_pTMSI->m_iNumberOfChannels, m_pTMSI->m_iSamplesPerBlock);
-
-    while(m_bIsRunning)
-    {
-        //std::cout<<"TMSIProducer::run()"<<std::endl;
-        //Get the TMSi EEG data out of the device buffer and write received data to circular buffer
-        if(m_pTMSIDriver->getSampleMatrixValue(matRawBuffer))
-            m_pTMSI->m_pRawMatrixBuffer_In->push(&matRawBuffer);
-    }
-
-    //std::cout<<"EXITING - TMSIProducer::run()"<<std::endl;
-}
-
-

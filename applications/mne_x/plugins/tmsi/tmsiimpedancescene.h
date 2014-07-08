@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
-* @file     tmsisetupwidget.h
+* @file     tmsiimpedancescene.h
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     September, 2013
+* @date     June, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,28 +30,27 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the TMSISetupWidget class.
+* @brief    Contains the declaration of the TMSIImpedanceScene class.
 *
 */
 
-#ifndef TMSISETUPWIDGET_H
-#define TMSISETUPWIDGET_H
-
+#ifndef TMSIIMPEDANCESCENE_H
+#define TMSIIMPEDANCESCENE_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
+#include <tmsielectrodeitem.h>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
-
-#include <QtWidgets>
-#include "../ui_tmsisetup.h"
-#include "tmsiimpedanceview.h"
+#include <QGraphicsScene>
+#include <QGraphicsView>
+#include <QGraphicsSceneMouseEvent>
 
 
 //*************************************************************************************************************
@@ -62,98 +61,54 @@
 namespace TMSIPlugin
 {
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-class TMSI;
-
-
 //=============================================================================================================
 /**
-* DECLARE CLASS TMSISetupWidget
+* TMSIImpedanceScene...
 *
-* @brief The TMSISetupWidget class provides the TMSI configuration window.
+* @brief The TMSIImpedanceScene class provides a reimplemented QGraphicsScene.
 */
-class TMSISetupWidget : public QWidget
+class TMSIImpedanceScene : public QGraphicsScene
 {
     Q_OBJECT
+
 public:
-
     //=========================================================================================================
     /**
-    * Constructs a TMSISetupWidget which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new TMSISetupWidget becomes a window. If parent is another widget, TMSISetupWidget becomes a child window inside parent. TMSISetupWidget is deleted when its parent is deleted.
-    * @param [in] pTMSI a pointer to the corresponding ECGSimulator.
+    * Constructs a TMSIImpedanceScene.
     */
-    TMSISetupWidget(TMSI* pTMSI, QWidget *parent = 0);
-
-    //=========================================================================================================
-    /**
-    * Destroys the TMSISetupWidget.
-    * All TMSISetupWidget's children are deleted first. The application exits if TMSISetupWidget is the main widget.
-    */
-    ~TMSISetupWidget();
-
-    //=========================================================================================================
-    /**
-    * Initializes the Connector's GUI properties.
-    *
-    */
-    void initGui();
+    explicit TMSIImpedanceScene(QGraphicsView* view, QObject *parent = 0);
 
 private:
+    QPointF         m_mousePosition;                /**< Holds the mouse position.*/
+    bool            m_bRightMouseKeyPressed;        /**< Whether the right mouse button was pressed.*/
+    QGraphicsView*  m_qvView;                       /**< Holds the view which visualizes this scene.*/
 
     //=========================================================================================================
     /**
-    * Sets the device sampling properties.
-    *
+    * Reimplemented mouse press event handler.
     */
-    void setDeviceSamplingProperties();
+    void mousePressEvent(QGraphicsSceneMouseEvent * event);
 
     //=========================================================================================================
     /**
-    * Sets the preprocessing properties.
-    *
+    * Reimplemented mouse move event handler.
     */
-    void setPreprocessing();
+    void mouseMoveEvent(QGraphicsSceneMouseEvent * event);
 
     //=========================================================================================================
     /**
-    * Sets the postprocessing properties.
-    *
+    * Reimplemented mouse release event handler.
     */
-    void setPostprocessing();
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent * event);
 
     //=========================================================================================================
     /**
-    * Sets flag for writing to a file.
-    *
+    * Updates position of all electrodes in the scene.
     */
-    void setWriteToFile();
+    void scaleElectrodePositions(double scaleFactor);
 
-    //=========================================================================================================
-    /**
-    * Sets the triggering properties
-    *
-    */
-    void setTriggerProperties();
-
-    //=========================================================================================================
-    /**
-    * Shows the About Dialog
-    *
-    */
-    void showAboutDialog();
-
-    TMSI*               m_pTMSI;                 /**< a pointer to corresponding TMSI.*/
-
-    Ui::TMSISetupClass  ui;                      /**< the user interface for the TMSISetupWidget.*/
 };
 
 } // NAMESPACE
 
-#endif // TMSISETUPWIDGET_H
+#endif // TMSIIMPEDANCESCENE_H
