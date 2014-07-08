@@ -81,7 +81,8 @@ void BCIFeatureWindow::initGui()
 {
     m_scene.clear();
 
-    m_dFeatureMax = 15;//1e-08;
+    m_dFeatureMax =  m_pBCI->m_dDisplayRangeBoundary;//15;//1e-08;
+    m_dFeatureMax = 15;
     m_iScale = 600;
 
     addBoundaryLineToScene();
@@ -147,16 +148,17 @@ void BCIFeatureWindow::paintFeaturesToScene(MyQList features, bool bTriggerActiv
             double featureA = features.at(i).at(0);
             double featureB = features.at(i).at(1);
 
-//            if(featureA > m_dFeatureMax)
-//                m_dFeatureMax = featureA;
+            if(featureA > m_dFeatureMax)
+                m_dFeatureMax = featureA;
 
-//            if(featureB > m_dFeatureMax)
-//                m_dFeatureMax = featureB;
+            if(featureB > m_dFeatureMax)
+                m_dFeatureMax = featureB;
 
             QRectF rect(featureA*(m_iScale/m_dFeatureMax), featureB*(m_iScale/m_dFeatureMax), 5, 5);
 
-//            std::cout<<"Scaled: "<< featureA*(m_iScale/m_dFeatureMax) <<" "<< featureB*(m_iScale/m_dFeatureMax) << endl;
-//            std::cout<<"Unscaled: "<< featureA <<" "<< featureB << endl;
+            std::cout<<"Scaled: "<< featureA*(m_iScale/m_dFeatureMax) <<" "<< featureB*(m_iScale/m_dFeatureMax) << endl;
+            std::cout<<"Unscaled: "<< featureA <<" "<< featureB << endl;
+            //std::cout<<"m_dFeatureMax: "<< m_dFeatureMax <<endl;
 
             // Add ellipse to scene
             if(bTriggerActivated)
@@ -165,7 +167,7 @@ void BCIFeatureWindow::paintFeaturesToScene(MyQList features, bool bTriggerActiv
                 m_scene.addEllipse(rect, QPen(Qt::black));
         }
 
-        ui.m_graphicsView_featureVisualization->fitInView(m_scene.sceneRect());
+        //ui.m_graphicsView_featureVisualization->fitInView(m_scene.sceneRect());
     }
 }
 
