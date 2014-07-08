@@ -73,7 +73,8 @@ SOURCES += rawsettings.cpp\
     mainwindow.cpp \
     rawdelegate.cpp \
     mneoperator.cpp \
-    filteroperator.cpp
+    filteroperator.cpp \
+    eventmodel.cpp
 
 HEADERS += types.h\
     info.h\
@@ -82,7 +83,8 @@ HEADERS += types.h\
     mainwindow.h \
     rawdelegate.h \
     mneoperator.h \
-    filteroperator.h
+    filteroperator.h \
+    eventmodel.h
 
 
 FORMS +=

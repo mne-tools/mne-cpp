@@ -178,6 +178,9 @@ void MainWindow::createMenus() {
     openAction->setShortcuts(QKeySequence::SaveAs);
     connect(writeAction, SIGNAL(triggered()), this, SLOT(writeFile()));
 
+    QAction *loadEvents = fileMenu->addAction(tr("&Load Events..."));
+    connect(loadEvents, SIGNAL(triggered()), this, SLOT(loadEvents()));
+
     QAction *quitAction = fileMenu->addAction(tr("E&xit"));
     quitAction->setShortcuts(QKeySequence::Quit);
     connect(quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
@@ -318,6 +321,28 @@ void MainWindow::writeFile()
 
     if(!m_pRawModel->writeFiffData(t_fileRaw))
         qDebug() << "MainWindow: ERROR writing fiff data file" << t_fileRaw.fileName() << "!";
+}
+
+
+//*************************************************************************************************************
+
+void MainWindow::loadEvents()
+{
+    QString filename = QFileDialog::getOpenFileName(this,QString("Open fiff event data file"),QString("./MNE-sample-data/MEG/sample/"),tr("fif event data files (*-eve.fif);;fif data files (*.fif)"));
+    if(m_qFileRaw.isOpen())
+        m_qFileRaw.close();
+    m_qFileRaw.setFileName(filename);
+
+//    if(m_pRawModel->loadFiffData(m_qFileRaw)) {
+//        qDebug() << "Fiff data file" << filename << "loaded.";
+//    }
+//    else
+//        qDebug("ERROR loading fiff data file %s",filename.toLatin1().data());
+
+//    setWindowStatus();
+
+//    //set position of QScrollArea
+//    setScrollBarPosition(0);
 }
 
 
