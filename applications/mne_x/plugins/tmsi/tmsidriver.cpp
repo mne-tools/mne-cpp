@@ -69,6 +69,7 @@ TMSIDriver::TMSIDriver(TMSIProducer* pTMSIProducer)
 , m_bWriteDriverDebugToFile(false)
 , m_sOutputFilePath("/mne_x_plugins/resources/tmsi")
 , m_bUseCommonAverage(false)
+, m_bMeasureImpedances(false)
 {
     //Initialise NULL pointers
     m_oLibHandle = NULL ;
@@ -114,6 +115,8 @@ TMSIDriver::TMSIDriver(TMSIProducer* pTMSIProducer)
     __load_dll_func__(m_oFpGetDeviceList, PGETDEVICELIST, "GetDeviceList");
     __load_dll_func__(m_oFpGetFrontEndInfo, PGETFRONTENDINFO, "GetFrontEndInfo");
     __load_dll_func__(m_oFpSetRefCalculation, PSETREFCALCULATION, "SetRefCalculation");
+    __load_dll_func__(m_oFpSetMeasuringMode, PSETMEASURINGMODE, "SetMeasuringMode");
+    __load_dll_func__(m_oFpGetErrorCode, PGETERRORCODE, "GetErrorCode");
 
     cout << "Plugin TMSI - INFO - TMSIDriver() - Successfully loaded all DLL functions" << endl;
 }
@@ -137,7 +140,8 @@ bool TMSIDriver::initDevice(int iNumberOfChannels,
                             bool bUseUnitOffset,
                             bool bWriteDriverDebugToFile,
                             QString sOutpuFilePath,
-                            bool bUseCommonAverage)
+                            bool bUseCommonAverage,
+                            bool bMeasureImpedance)
 {
     //Check if the driver DLL was loaded
     if(!m_bDllLoaded)
@@ -153,6 +157,7 @@ bool TMSIDriver::initDevice(int iNumberOfChannels,
     m_bWriteDriverDebugToFile = bWriteDriverDebugToFile;
     m_sOutputFilePath = sOutpuFilePath;
     m_bUseCommonAverage = bUseCommonAverage;
+    m_bMeasureImpedances = bMeasureImpedance;
 
     //Open file to write to
     if(m_bWriteDriverDebugToFile)
@@ -191,7 +196,7 @@ bool TMSIDriver::initDevice(int iNumberOfChannels,
     char *DeviceLocator = DeviceList[0] ;
     Status = m_oFpOpen(m_HandleMaster, DeviceLocator);
 
-    //Stop the device from sampling. Reason for this: just in case the device was not stopped correctly after the last sampling process
+    //Stop the device from sampling. Just in case the device was not stopped correctly after the last sampling process
     m_oFpStop(m_HandleMaster);
 
     if(!Status)
@@ -200,6 +205,23 @@ bool TMSIDriver::initDevice(int iNumberOfChannels,
         m_oFpLibraryExit(m_HandleMaster);
         return false;
     }
+
+    // Turn on the impendance mode
+    ULONG impedanceMode = 3;
+    ULONG normalMode = 0;
+
+    if(m_bMeasureImpedances)
+    {
+        if(m_oFpSetMeasuringMode(m_HandleMaster, impedanceMode, 1))
+            cout << "Plugin TMSI - INFO - Now measuring impedances" << endl;
+        else
+        {
+            int ErrorCode = m_oFpGetErrorCode(m_HandleMaster);
+            cout << "Unable to set Measuremode impedance, errorcode = " << ErrorCode << endl;
+        }
+    }
+    else
+        m_oFpSetMeasuringMode(m_HandleMaster, normalMode, 0);
 
     //Get information about the connected device
     FRONTENDINFO FrontEndInfo;

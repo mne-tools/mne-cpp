@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
-* @file     tmsiproducer.h
-* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+* @file     tmsiimpedancewidget.h
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     September, 2013
+* @date     June, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,28 +30,40 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the TMSIProducer class.
+* @brief    Contains the declaration of the TmsiImpedanceWidget class.
 *
 */
 
-#ifndef TMSIPRODUCER_H
-#define TMSIPRODUCER_H
-
+#ifndef TMSIIMPEDANCEWIDGET_H
+#define TMSIIMPEDANCEWIDGET_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <generics/circularbuffer.h>
+#include <utils/asaelc.h>
+#include "../tmsielectrodeitem.h"
+#include "../tmsiimpedancescene.h"
+#include "disp/colormap.h"
 
+#include <xMeas/newrealtimemultisamplearray.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QThread>
+#include <QMutex>
+#include <QWidget>
+#include <QGraphicsScene>
+#include <QtAlgorithms>
+#include <QtSvg/QSvgGenerator>
+
+
+namespace Ui {
+class TMSIImpedanceWidget;
+}
 
 
 //*************************************************************************************************************
@@ -68,8 +80,9 @@ namespace TMSIPlugin
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace IOBuffer;
-
+using namespace Eigen;
+using namespace UTILSLIB;
+using namespace DISPLIB;
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -77,80 +90,96 @@ using namespace IOBuffer;
 //=============================================================================================================
 
 class TMSI;
-class TMSIDriver;
-
 
 //=============================================================================================================
 /**
-* DECLARE CLASS EEGProducer
+* DECLARE CLASS TMSIImpedanceWidget
 *
-* @brief The EEGProducer class provides a EEG data producer for a given sampling rate.
+* @brief The TMSIImpedanceWidget class provides the TMSIImpedanceWidget configuration window.
 */
-class TMSIProducer : public QThread
+class TMSIImpedanceWidget : public QWidget
 {
+    Q_OBJECT
+
 public:
-    //=========================================================================================================
-    /**
-    * Constructs a TMSIProducer.
-    *
-    * @param [in] pTMSI a pointer to the corresponding TMSI class.
-    */
-    TMSIProducer(TMSI* pTMSI);
+    explicit TMSIImpedanceWidget(TMSI* pTMSI, QWidget *parent = 0);
+    ~TMSIImpedanceWidget();
 
     //=========================================================================================================
     /**
-    * Destroys the TMSIProducer.
+    * Updates the values of the electrodes placed in the QGraphicsScene.
     */
-    ~TMSIProducer();
+    void updateGraphicScene(VectorXd matValue);
 
     //=========================================================================================================
     /**
-    * Starts the TMSIProducer by starting the producer's thread and initialising the device.
-    * @param [in] iNumberOfChannels The number of channels defined by the user via the GUI.
-    * @param [in] iSamplingFrequency The sampling frequency defined by the user via the GUI (in Hertz).
-    * @param [in] iSamplesPerBlock The samples per block defined by the user via the GUI.
-    * @param [in] bUseChExponent Flag for using the channels exponent. Defined by the user via the GUI.
-    * @param [in] bUseUnitGain Flag for using the channels unit gain. Defined by the user via the GUI.
-    * @param [in] sOutpuFilePath Holds the path for the output file. Defined by the user via the GUI.
-    * @param [in] bWriteDriverDebugToFile Flag for writing the received samples to a file. Defined by the user via the GUI.
-    * @param [in] bUseUnitOffset Flag for using the channels unit offset. Defined by the user via the GUI.
-    * @param [in] bUseCommonAverage Flag for using common average when recording EEG data. Defined by the user via the GUI.
-    * @param [in] bMeasureImpedance Flag for measuring impedances.
+    * Initialises the 2D positions of the electrodes in the QGraphicsScene.
     */
-    virtual void start(int iNumberOfChannels,
-                       int iSamplingFrequency,
-                       int iSamplesPerBlock,
-                       bool bUseChExponent,
-                       bool bUseUnitGain,
-                       bool bUseUnitOffset,
-                       bool bWriteDriverDebugToFile,
-                       QString sOutputFilePath,
-                       bool bUseCommonAverage,
-                       bool bMeasureImpedance);
-
-    //=========================================================================================================
-    /**
-    * Stops the TMSIProducer by stopping the producer's thread.
-    */
-    void stop();
-
-protected:
-    //=========================================================================================================
-    /**
-    * The starting point for the thread. After calling start(), the newly created thread calls this function.
-    * Returning from this method will end the execution of the thread.
-    * Pure virtual method inherited by QThread.
-    */
-    virtual void run();
+    void initGraphicScene();
 
 private:
-    TMSI*                       m_pTMSI;            /**< A pointer to the corresponding TMSI class.*/
-    QSharedPointer<TMSIDriver>  m_pTMSIDriver;      /**< A pointer to the corresponding TMSI driver class.*/
+    TMSI*                                       m_pTMSI;                    /**< The pointer back to the TMSI plugin.*/
 
-    bool                        m_bIsRunning;       /**< Whether TMSIProducer is running.*/
+    TMSIImpedanceScene*                         m_qGScene;                  /**< The QGraphicScene.*/
+
+    QMap< QString, int >                        m_qmElectrodeNameIndex;     /**< Lookup table for electrode name and their corresponding index in the received data matrix.*/
+
+    Ui::TMSIImpedanceWidget*                    ui;                         /**< The user interface for the TMSIImpedanceWidget.*/
+
+    QSharedPointer<ColorMap>                    m_cbColorMap;               /**< The pointer the colormap object.*/
+
+    double                                      m_dMaxImpedance;            /**< Maximum impedance value. This is a fixed value to scale the color map.*/
+
+    //=========================================================================================================
+    /**
+    * Adds an electrode item to the QGraphicScene.
+    */
+    void addElectrodeItem(QString electrodeName, QVector2D position);
+
+    //=========================================================================================================
+    /**
+    * Start the measurement process.
+    */
+    void startImpedanceMeasurement();
+
+    //=========================================================================================================
+    /**
+    * Stops the measurement process.
+    */
+    void stopImpedanceMeasurement();
+
+    //=========================================================================================================
+    /**
+    * Takes a screenshot of the current view.
+    */
+    void takeScreenshot();
+
+    //=========================================================================================================
+    /**
+    * Loads a layout from file.
+    */
+    void loadLayout();
+
+    //=========================================================================================================
+    /**
+    * Reimplemnted closing event handler. Used to stop the measurement when closing the widget.
+    */
+    void closeEvent(QCloseEvent *event);
+
+    //=========================================================================================================
+    /**
+    * Saves the current labels and impedance values to a ASI formated file.
+    */
+    void saveToFile();
+
+    //=========================================================================================================
+    /**
+    * Open a help dialog.
+    */
+    void helpDialog();
 
 };
 
 } // NAMESPACE
 
-#endif // TMSIPRODUCER_H
+#endif // TMSIIMPEDANCEWIDGET_H

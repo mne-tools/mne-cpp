@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
-* @file     tmsiproducer.h
+* @file     tmsielectrodeitem.h
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     September, 2013
+* @date     June, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,20 +30,19 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the TMSIProducer class.
+* @brief    Contains the declaration of the TMSIElectrodeItem class.
 *
 */
 
-#ifndef TMSIPRODUCER_H
-#define TMSIPRODUCER_H
-
+#ifndef TMSIELECTRODEITEM_H
+#define TMSIELECTRODEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <generics/circularbuffer.h>
+#include <iostream>
 
 
 //*************************************************************************************************************
@@ -51,7 +50,11 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QThread>
+#include <QGraphicsItem>
+#include <QString>
+#include <QColor>
+#include <QPainter>
+#include <QStaticText>
 
 
 //*************************************************************************************************************
@@ -62,95 +65,90 @@
 namespace TMSIPlugin
 {
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace IOBuffer;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-class TMSI;
-class TMSIDriver;
-
 
 //=============================================================================================================
 /**
-* DECLARE CLASS EEGProducer
+* TMSIElectrodeItem...
 *
-* @brief The EEGProducer class provides a EEG data producer for a given sampling rate.
+* @brief The TMSIElectrodeItem class provides a new data structure for impedance values.
 */
-class TMSIProducer : public QThread
+class TMSIElectrodeItem : public QGraphicsItem
 {
+
 public:
     //=========================================================================================================
     /**
-    * Constructs a TMSIProducer.
-    *
-    * @param [in] pTMSI a pointer to the corresponding TMSI class.
+    * Constructs a TMSIElectrodeItem.
     */
-    TMSIProducer(TMSI* pTMSI);
+    TMSIElectrodeItem(QString electrodeName, QPointF electrodePosition, QColor electrodeColor, int channelIndex);
 
     //=========================================================================================================
     /**
-    * Destroys the TMSIProducer.
+    * Sets the color of the electrode item.
     */
-    ~TMSIProducer();
+    void setColor(QColor electrodeColor);
 
     //=========================================================================================================
     /**
-    * Starts the TMSIProducer by starting the producer's thread and initialising the device.
-    * @param [in] iNumberOfChannels The number of channels defined by the user via the GUI.
-    * @param [in] iSamplingFrequency The sampling frequency defined by the user via the GUI (in Hertz).
-    * @param [in] iSamplesPerBlock The samples per block defined by the user via the GUI.
-    * @param [in] bUseChExponent Flag for using the channels exponent. Defined by the user via the GUI.
-    * @param [in] bUseUnitGain Flag for using the channels unit gain. Defined by the user via the GUI.
-    * @param [in] sOutpuFilePath Holds the path for the output file. Defined by the user via the GUI.
-    * @param [in] bWriteDriverDebugToFile Flag for writing the received samples to a file. Defined by the user via the GUI.
-    * @param [in] bUseUnitOffset Flag for using the channels unit offset. Defined by the user via the GUI.
-    * @param [in] bUseCommonAverage Flag for using common average when recording EEG data. Defined by the user via the GUI.
-    * @param [in] bMeasureImpedance Flag for measuring impedances.
+    * Returns the bounding rect of the electrode item. This rect describes the area which the item uses to plot in.
     */
-    virtual void start(int iNumberOfChannels,
-                       int iSamplingFrequency,
-                       int iSamplesPerBlock,
-                       bool bUseChExponent,
-                       bool bUseUnitGain,
-                       bool bUseUnitOffset,
-                       bool bWriteDriverDebugToFile,
-                       QString sOutputFilePath,
-                       bool bUseCommonAverage,
-                       bool bMeasureImpedance);
+    QRectF boundingRect() const;
 
     //=========================================================================================================
     /**
-    * Stops the TMSIProducer by stopping the producer's thread.
+    * Reimplemented paint function.
     */
-    void stop();
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
-protected:
     //=========================================================================================================
     /**
-    * The starting point for the thread. After calling start(), the newly created thread calls this function.
-    * Returning from this method will end the execution of the thread.
-    * Pure virtual method inherited by QThread.
+    * Returns the electrode name.
     */
-    virtual void run();
+    QString getElectrodeName();
+
+    //=========================================================================================================
+    /**
+    * Sets the impedance value.
+    */
+    void setImpedanceValue(double impedanceValue);
+
+    //=========================================================================================================
+    /**
+    * Returns the impedance value.
+    */
+    double getImpedanceValue();
+
+    //=========================================================================================================
+    /**
+    * Updates the electrodes position.
+    */
+    void setPosition(QPointF newPosition);
+
+    //=========================================================================================================
+    /**
+    * Updates the electrodes position.
+    */
+    QPointF getPosition();
+
+    //=========================================================================================================
+    /**
+    * Returns the device channel index of the electrode.
+    */
+    int getChannelIndex();
 
 private:
-    TMSI*                       m_pTMSI;            /**< A pointer to the corresponding TMSI class.*/
-    QSharedPointer<TMSIDriver>  m_pTMSIDriver;      /**< A pointer to the corresponding TMSI driver class.*/
-
-    bool                        m_bIsRunning;       /**< Whether TMSIProducer is running.*/
-
+    QString     m_sElectrodeName;           /**< Holds the electrode name.*/
+    QPointF     m_qpElectrodePosition;      /**< Holds the electrode 2D position in the scene.*/
+    QColor      m_cElectrodeColor;          /**< Holds the current electrode color.*/
+    double      m_dImpedanceValue;          /**< Holds the current electrode impedance value.*/
+    int         m_iChannelIndex;            /**< Holds the corresonding channel index.*/
 };
 
 } // NAMESPACE
 
-#endif // TMSIPRODUCER_H
+#endif // TMSIELECTRODEITEM_H
