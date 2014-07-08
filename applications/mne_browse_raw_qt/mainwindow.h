@@ -72,6 +72,7 @@
 //=============================================================================================================
 
 #include "rawmodel.h"
+#include "eventmodel.h"
 #include "rawdelegate.h"
 
 #include "info.h"
@@ -284,6 +285,7 @@ private:
 
     //modelview framework
     RawModel *m_pRawModel; /**< the QAbstractTable model being part of the model/view framework of Qt */
+    EventModel *m_pEventModel; /**< the QAbstractTable event model being part of the model/view framework of Qt */
     QTableView *m_pTableView; /**< the QTableView being part of the model/view framework of Qt */
     RawDelegate *m_pRawDelegate; /**< the QAbstractDelegate being part of the model/view framework of Qt */
 
