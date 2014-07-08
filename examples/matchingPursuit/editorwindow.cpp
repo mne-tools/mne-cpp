@@ -110,7 +110,7 @@ EditorWindow::EditorWindow(QWidget *parent) :    QMainWindow(parent),    ui(new 
 {
     this->setAccessibleName("simple");
     ui->setupUi(this);
-    readDicts();
+    read_dicts();
 }
 
 EditorWindow::~EditorWindow()
@@ -118,7 +118,7 @@ EditorWindow::~EditorWindow()
     delete ui;
 }
 
-void EditorWindow::readDicts()
+void EditorWindow::read_dicts()
 {
     QDir dictDir = QDir("Matching-Pursuit-Toolbox");
 
@@ -423,7 +423,7 @@ QList<qreal> EditorWindow::calcAllCombParameterValuesChirp(qreal startValue, qre
 }
 
 //  handle scale
-void EditorWindow::calcScaleValue()
+void EditorWindow::calc_scale_value()
 {
     if(allCombined)
     {
@@ -510,7 +510,7 @@ void EditorWindow::on_tb_PartDictName_editingFinished()
 {
     partDictName = ui->tb_PartDictName->text();
 
-    calcScaleValue();
+    calc_scale_value();
     calcModuValue();
     calcPhaseValue();
     calcChirpValue();
@@ -619,7 +619,7 @@ void EditorWindow::on_chb_CombAllPara_toggled(bool checked)
         }
     }
 
-    calcScaleValue();
+    calc_scale_value();
     calcModuValue();
     calcPhaseValue();
     calcChirpValue();
@@ -631,7 +631,7 @@ void EditorWindow::on_spb_AtomLength_editingFinished()
     ui->dspb_StartValueScale->setMaximum(10 * ui->spb_AtomLength->value());
     startValueScale = ui->dspb_StartValueScale->value();
 
-    calcScaleValue();
+    calc_scale_value();
     calcModuValue();
     calcPhaseValue();
     calcChirpValue();
@@ -730,7 +730,7 @@ void EditorWindow::on_spb_AtomCount_valueChanged(int arg1)
         ui->lb_ExpNChirp->setEnabled(ui->rb_ExpStepChirp->isChecked());
     }
 
-    calcScaleValue();
+    calc_scale_value();
     calcModuValue();
     calcPhaseValue();
     calcChirpValue();
@@ -740,13 +740,13 @@ void EditorWindow::on_spb_AtomCount_valueChanged(int arg1)
 void EditorWindow::on_dspb_StartValueScale_editingFinished()
 {
     startValueScale = ui->dspb_StartValueScale->value();
-    calcScaleValue();
+    calc_scale_value();
 }
 
 void EditorWindow::on_dspb_EndValueScale_editingFinished()
 {
     endValueScale = ui->dspb_EndValueScale->value();
-    calcScaleValue();
+    calc_scale_value();
 }
 
 void EditorWindow::on_rb_NoStepScale_toggled(bool checked)
@@ -764,31 +764,31 @@ void EditorWindow::on_rb_NoStepScale_toggled(bool checked)
         ui->lb_CountDirectionScale->setDisabled(true);
         ui->fr_CountDirectionScale->setDisabled(true);
     }
-    calcScaleValue();
+    calc_scale_value();
 }
 
 void EditorWindow::on_rb_LinStepScale_toggled(bool checked)
 {
     if(checked) linStepWidthScale = ui->dspb_LinStepScale->value();
-    calcScaleValue();
+    calc_scale_value();
 }
 
 void EditorWindow::on_rb_ExpStepScale_toggled(bool checked)
 {
     if(checked) expStepWidthScale = ui->dspb_ExpStepScale->value();
-    calcScaleValue();
+    calc_scale_value();
 }
 
 void EditorWindow::on_dspb_LinStepScale_editingFinished()
 {
     linStepWidthScale = ui->dspb_LinStepScale->value();
-    calcScaleValue();
+    calc_scale_value();
 }
 
 void EditorWindow::on_dspb_ExpStepScale_editingFinished()
 {
     expStepWidthScale = ui->dspb_ExpStepScale->value();
-    calcScaleValue();
+    calc_scale_value();
 }
 
 void EditorWindow::on_rb_PosCountScale_toggled()
@@ -1404,7 +1404,7 @@ void EditorWindow::on_btt_SaveDicts_clicked()
     newFile.close();
 
     ui->list_AllDict->clear();
-    readDicts();
+    read_dicts();
     ui->list_NewDict->clear();
     ui->tb_DictName->clear();
 

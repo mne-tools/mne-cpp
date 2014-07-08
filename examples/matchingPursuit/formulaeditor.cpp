@@ -783,7 +783,7 @@ double Formulaeditor::Char_n(int& nPosition, QString& strCharacter)
     return nPosition;
 }
 
-void Formulaeditor::SetFormula(QString Formula)
+void Formulaeditor::set_formula(QString Formula)
 {
     m_strFormula = Formula;
 }
