@@ -46,7 +46,7 @@
 #include <fstream>
 #include <direct.h>
 
-#include "tmsi_global.h"
+#include "eegosports_global.h"
 
 #include <mne_x/Interfaces/ISensor.h>
 #include <generics/circularmatrixbuffer.h>
@@ -68,10 +68,8 @@
 #include <QTime>
 #include <QtConcurrent/QtConcurrent>
 
-#include "FormFiles/tmsisetupwidget.h"
-#include "FormFiles/tmsimanualannotationwidget.h"
-#include "FormFiles/tmsiimpedancewidget.h"
-#include "FormFiles/tmsisetupprojectwidget.h"
+#include "FormFiles/eegosportssetupwidget.h"
+#include "FormFiles/eegosportssetupprojectwidget.h"
 
 
 //*************************************************************************************************************
@@ -119,10 +117,10 @@ class EEGoSportsProducer;
 *
 * @brief The EEGoSports class provides a EEG connector. In order for this plugin to work properly the driver dll "RTINST.dll" must be installed in the system directory. This dll is automatically copied in the system directory during the driver installtion of the TMSi Refa device.
 */
-class EEGoSportsSHARED_EXPORT EEGoSports : public ISensor
+class EEGOSPORTSSHARED_EXPORT EEGoSports : public ISensor
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "tmsi.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "eegosports.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(MNEX::ISensor)
 
@@ -179,8 +177,6 @@ public:
 
     virtual QWidget* setupWidget();
 
-    void setKeyboardTriggerType(int type);
-
 protected:
     //=========================================================================================================
     /**
@@ -189,12 +185,6 @@ protected:
     * Pure virtual method inherited by QThread.
     */
     virtual void run();
-
-    //=========================================================================================================
-    /**
-    * Opens a widget to check the impedance values
-    */
-    void showImpedanceDialog();
 
     //=========================================================================================================
     /**
@@ -222,9 +212,7 @@ protected:
 
 private:
     PluginOutputData<NewRealTimeMultiSampleArray>::SPtr m_pRMTSA_EEGoSports;      /**< The RealTimeSampleArray to provide the EEG data.*/
-    QSharedPointer<EEGoSportsManualAnnotationWidget> m_tmsiManualAnnotationWidget;/**< Widget for manually annotation the trigger during session.*/
-    QSharedPointer<EEGoSportsImpedanceWidget> m_pTmsiImpedanceWidget;             /**< Widget for checking the impedances*/
-    QSharedPointer<EEGoSportsSetupProjectWidget> m_pTmsiSetupProjectWidget;       /**< Widget for checking the impedances*/
+    QSharedPointer<EEGoSportsSetupProjectWidget> m_pEEGoSportsSetupProjectWidget; /**< Widget for checking the impedances*/
 
     QString                             m_qStringResourcePath;              /**< The path to the EEG resource directory.*/
 
@@ -242,13 +230,9 @@ private:
     bool                                m_bWriteDriverDebugToFile;          /**< Flag for for writing driver debug informstions to a file. Defined by the user via the GUI.*/
     bool                                m_bUseFiltering;                    /**< Flag for writing the received samples to a file. Defined by the user via the GUI.*/
     bool                                m_bIsRunning;                       /**< Whether EEGoSports is running.*/
-    bool                                m_bUseFFT;                          /**< Flag for using FFT. Defined by the user via the GUI.*/
     bool                                m_bBeepTrigger;                     /**< Flag for using a trigger input.*/
     bool                                m_bUseCommonAverage;                /**< Flag for using common average.*/
-    bool                                m_bUseKeyboardTrigger;              /**< Flag for using the keyboard as a trigger input.*/
     bool                                m_bCheckImpedances;                 /**< Flag for checking the impedances of the EEG amplifier.*/
-
-    int                                 m_iTriggerType;                     /**< Holds the trigger type | 0 - no trigger activated, 254 - left, 253 - right, 252 - beep.*/
 
     ofstream                            m_outputFileStream;                 /**< fstream for writing the samples values to txt file.*/
     QString                             m_sOutputFilePath;                  /**< Holds the path for the sample output file. Defined by the user via the GUI.*/
@@ -260,13 +244,12 @@ private:
 
     QSharedPointer<RawMatrixBuffer>     m_pRawMatrixBuffer_In;              /**< Holds incoming raw data.*/
 
-    QSharedPointer<EEGoSportsProducer>        m_pEEGoSportsProducer;                    /**< the EEGoSportsProducer.*/
+    QSharedPointer<EEGoSportsProducer>  m_pEEGoSportsProducer;              /**< the EEGoSportsProducer.*/
 
     MatrixXf                            m_matOldMatrix;                     /**< Last received sample matrix by the tmsiproducer/tmsidriver class. Used for simple HP filtering.*/
 
     QMutex                              m_qMutex;                           /**< Holds the threads mutex.*/
 
-    QAction*                            m_pActionImpedance;                 /**< shows impedance widget */
     QAction*                            m_pActionSetupProject;              /**< shows setup project dialog */
     QAction*                            m_pActionStartRecording;            /**< starts to record data */
 

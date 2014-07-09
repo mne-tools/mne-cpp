@@ -39,9 +39,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "tmsisetupprojectwidget.h"
-#include "ui_tmsisetupprojectwidget.h"
-#include "../tmsi.h"
+#include "eegosportssetupprojectwidget.h"
+#include "ui_eegosportssetupprojectwidget.h"
+#include "../eegosports.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -150,7 +150,7 @@ void EEGoSportsSetupProjectWidget::changeOutputFile()
     QString path = QFileDialog::getSaveFileName(
                 this,
                 "Save to fif file",
-                "mne_x_plugins/resources/tmsi/EEG_data_001_raw.fif",
+                "mne_x_plugins/resources/eegosports/EEG_data_001_raw.fif",
                  tr("Fif files (*.fif)"));
 
     if(path==NULL)

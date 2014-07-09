@@ -48,7 +48,8 @@ SUBDIRS += \
     dummytoolbox \
     triggercontrol \
     sourcelab \
-    raplab
+    raplab \
+    eegosports
 
 win32 { #Only compile the TMSI plugin if a windows system is used - TMSi driver is not available for linux yet
     contains(QMAKE_HOST.arch, x86_64) { #Compiling MNE-X FOR a 64bit system
@@ -75,6 +76,33 @@ win32 { #Only compile the TMSI plugin if a windows system is used - TMSi driver 
 }
 else {
     message(TMSI plugin was not configured due to wrong OS (win32 needed)!)
+}
+
+win32 { #Only compile the eegosports plugin if a windows system is used - EEGoSports driver is not available for linux yet
+    contains(QMAKE_HOST.arch, x86_64) { #Compiling MNE-X FOR a 64bit system
+        exists(C:/Windows/System32/eego.dll) {
+            message(Compiling MNE-X FOR a 64bit system: TMSI plugin configured! EEGoSports Driver found!)
+            SUBDIRS += eegosports
+        }
+    }
+    else {
+        exists(C:/Windows/SysWOW64/eego.dll) { #Compiling MNE-X FOR a 32bit system ON a 64bit system
+            message(Compiling MNE-X FOR a 32bit system ON a 64bit system: EEGoSports plugin configured! EEGoSports Driver found!)
+            SUBDIRS += eegosports
+        }
+        else {
+            exists(C:/Windows/System32/eego.dll) { #Compiling MNE-X FOR a 32bit system ON a 32bit system
+                message(Compiling MNE-X FOR a 32bit system ON a 32bit system: EEGoSports plugin configured! EEGoSports Driver found!)
+                SUBDIRS += eegosports
+            }
+            else {
+                message(EEGoSports plugin not configured! TMSi Driver not found!)
+            }
+        }
+    }
+}
+else {
+    message(EEGoSports plugin was not configured due to wrong OS (win32 needed)!)
 }
 
 

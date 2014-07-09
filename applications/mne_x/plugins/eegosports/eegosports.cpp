@@ -68,7 +68,7 @@ using namespace EEGoSportsPlugin;
 
 EEGoSports::EEGoSports()
 : m_pRMTSA_EEGoSports(0)
-, m_qStringResourcePath(qApp->applicationDirPath()+"/mne_x_plugins/resources/tmsi/")
+, m_qStringResourcePath(qApp->applicationDirPath()+"/mne_x_plugins/resources/eegosports/")
 , m_pRawMatrixBuffer_In(0)
 , m_pEEGoSportsProducer(new EEGoSportsProducer(this))
 {
@@ -83,12 +83,6 @@ EEGoSports::EEGoSports()
     m_pActionStartRecording->setStatusTip(tr("Start recording data to fif file"));
     connect(m_pActionStartRecording, &QAction::triggered, this, &EEGoSports::showStartRecording);
     addPluginAction(m_pActionStartRecording);
-
-    // Create impedance action bar item/button
-    m_pActionImpedance = new QAction(QIcon(":/images/impedances.png"), tr("Check impedance values"), this);
-    m_pActionImpedance->setStatusTip(tr("Check impedance values"));
-    connect(m_pActionImpedance, &QAction::triggered, this, &EEGoSports::showImpedanceDialog);
-    addPluginAction(m_pActionImpedance);
 }
 
 
@@ -133,19 +127,15 @@ void EEGoSports::init()
     m_bWriteToFile = false;
     m_bWriteDriverDebugToFile = false;
     m_bUseFiltering = false;
-    m_bUseFFT = false;
     m_bIsRunning = false;
     m_bBeepTrigger = false;
     m_bUseCommonAverage = true;
-    m_bUseKeyboardTrigger = false;
     m_bCheckImpedances = false;
-
-    m_iTriggerType = 0;
 
     QDate date;
     m_sOutputFilePath = QString ("%1Sequence_01/Subject_01/%2_%3_%4_EEG_001_raw.fif").arg(m_qStringResourcePath).arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day());
 
-    m_sElcFilePath = QString("./mne_x_plugins/resources/tmsi/loc_files/Lorenz-Duke128-28-11-2013.elc");
+    m_sElcFilePath = QString("./mne_x_plugins/resources/eegosports/loc_files/Lorenz-Duke128-28-11-2013.elc");
 
     m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo());
 
@@ -497,15 +487,6 @@ bool EEGoSports::start()
 
     if(m_pEEGoSportsProducer->isRunning())
     {
-        // Init BCIFeatureWindow for visualization
-        m_tmsiManualAnnotationWidget = QSharedPointer<EEGoSportsManualAnnotationWidget>(new EEGoSportsManualAnnotationWidget(this));
-
-        if(m_bUseKeyboardTrigger && !m_bCheckImpedances)
-        {
-            m_tmsiManualAnnotationWidget->initGui();
-            m_tmsiManualAnnotationWidget->show();
-        }
-
         m_bIsRunning = true;
         QThread::start();
         return true;
@@ -534,8 +515,6 @@ bool EEGoSports::stop()
     m_pRawMatrixBuffer_In->clear();
 
     m_pRMTSA_EEGoSports->data()->clear();
-
-    m_tmsiManualAnnotationWidget->hide();
 
     return true;
 }
@@ -572,30 +551,11 @@ QWidget* EEGoSports::setupWidget()
 
 //*************************************************************************************************************
 
-void EEGoSports::setKeyboardTriggerType(int type)
-{
-    m_qMutex.lock();
-        m_iTriggerType =type;
-    m_qMutex.unlock();
-}
-
-
-//*************************************************************************************************************
-
 void EEGoSports::run()
 {
     while(m_bIsRunning)
     {
         //std::cout<<"EEGoSports::run(s)"<<std::endl;
-
-        // Check impedances - send new impedance values to graphic scene
-        if(m_pEEGoSportsProducer->isRunning() && m_bCheckImpedances)
-        {
-            MatrixXf matValue = m_pRawMatrixBuffer_In->pop();
-
-            for(qint32 i = 0; i < matValue.cols(); ++i)
-                m_pTmsiImpedanceWidget->updateGraphicScene(matValue.col(i).cast<double>());
-        }
 
         //pop matrix only if the producer thread is running
         if(m_pEEGoSportsProducer->isRunning() && !m_bCheckImpedances)
@@ -611,10 +571,6 @@ void EEGoSports::run()
                 m_qTimerTrigger.restart();
             }
 
-            // Set keyboard trigger (if activated and !=0)
-            if(m_bUseKeyboardTrigger && m_iTriggerType!=0)
-                matValue(136, m_iSamplesPerBlock-1) = m_iTriggerType;
-
             //Write raw data to fif file
             if(m_bWriteToFile)
                 m_pOutfid->write_raw_buffer(matValue.cast<double>(), m_cals);
@@ -626,51 +582,6 @@ void EEGoSports::run()
 
                 matValue = matValue - m_matOldMatrix;
                 m_matOldMatrix = temp;
-
-                //    //Check filter class - will be removed in the future - testing purpose only!
-                //    FilterTools* filterObject = new FilterTools();
-
-                //    //kaiser window testing
-                //    qint32 numberCoeff = 51;
-                //    QVector<float> impulseResponse(numberCoeff);
-                //    filterObject->createDynamicFilter(QString('LP'), numberCoeff, (float)0.3, impulseResponse);
-
-                //    ofstream outputFileStream("mne_x_plugins/resources/tmsi/filterToolsTest.txt", ios::out);
-
-                //    outputFileStream << "impulseResponse:\n";
-                //    for(int i=0; i<impulseResponse.size(); i++)
-                //        outputFileStream << impulseResponse[i] << " ";
-                //    outputFileStream << endl;
-
-                //    //convolution testing
-                //    QVector<float> in (12, 2);
-                //    QVector<float> kernel (4, 2);
-
-                //    QVector<float> out = filterObject->convolve(in, kernel);
-
-                //    outputFileStream << "convolution result:\n";
-                //    for(int i=0; i<out.size(); i++)
-                //        outputFileStream << out[i] << " ";
-                //    outputFileStream << endl;
-            }
-
-            // TODO: Perform a fft if wanted by the user
-            if(m_bUseFFT)
-            {
-                QElapsedTimer timer;
-                timer.start();
-
-                FFT<float> fft;
-                Matrix<complex<float>, 138, 16> freq;
-
-                for(qint32 i = 0; i < matValue.rows(); ++i)
-                    fft.fwd(freq.row(i), matValue.row(i));
-
-//                cout<<"FFT postprocessing done in "<<timer.nsecsElapsed()<<" nanosec"<<endl;
-//                cout<<"matValue before FFT:"<<endl<<matValue<<endl;
-//                cout<<"freq after FFT:"<<endl<<freq<<endl;
-//                matValue = freq.cwiseAbs();
-//                cout<<"matValue after FFT:"<<endl<<matValue<<endl;
             }
 
             //Change values of the trigger channel for better plotting - this change is not saved in the produced fif file
@@ -695,9 +606,6 @@ void EEGoSports::run()
             //emit values to real time multi sample array
             for(qint32 i = 0; i < matValue.cols(); ++i)
                 m_pRMTSA_EEGoSports->data()->setValue(matValue.col(i).cast<double>());
-
-            // Reset keyboard trigger
-            m_iTriggerType = 0;
         }
     }
 
@@ -716,39 +624,18 @@ void EEGoSports::run()
 
 //*************************************************************************************************************
 
-void EEGoSports::showImpedanceDialog()
-{
-    // Open Impedance dialog only if no sampling process is active
-    if(!m_bIsRunning)
-    {
-        if(m_pTmsiImpedanceWidget == NULL)
-            m_pTmsiImpedanceWidget = QSharedPointer<EEGoSportsImpedanceWidget>(new EEGoSportsImpedanceWidget(this));
-
-        if(!m_pTmsiImpedanceWidget->isVisible())
-        {
-            m_pTmsiImpedanceWidget->setWindowTitle("MNE-X - Measure impedances");
-            m_pTmsiImpedanceWidget->show();
-            m_pTmsiImpedanceWidget->raise();
-        }
-
-        m_pTmsiImpedanceWidget->initGraphicScene();
-    }
-}
-
-//*************************************************************************************************************
-
 void EEGoSports::showSetupProjectDialog()
 {
     // Open setup project widget
-    if(m_pTmsiSetupProjectWidget == NULL)
-        m_pTmsiSetupProjectWidget = QSharedPointer<EEGoSportsSetupProjectWidget>(new EEGoSportsSetupProjectWidget(this));
+    if(m_pEEGoSportsSetupProjectWidget == NULL)
+        m_pEEGoSportsSetupProjectWidget = QSharedPointer<EEGoSportsSetupProjectWidget>(new EEGoSportsSetupProjectWidget(this));
 
-    if(!m_pTmsiSetupProjectWidget->isVisible())
+    if(!m_pEEGoSportsSetupProjectWidget->isVisible())
     {
-        m_pTmsiSetupProjectWidget->setWindowTitle("EEGoSports EEG Connector - Setup project");
-        m_pTmsiSetupProjectWidget->initGui();
-        m_pTmsiSetupProjectWidget->show();
-        m_pTmsiSetupProjectWidget->raise();
+        m_pEEGoSportsSetupProjectWidget->setWindowTitle("EEGoSports EEG Connector - Setup project");
+        m_pEEGoSportsSetupProjectWidget->initGui();
+        m_pEEGoSportsSetupProjectWidget->show();
+        m_pEEGoSportsSetupProjectWidget->raise();
     }
 }
 

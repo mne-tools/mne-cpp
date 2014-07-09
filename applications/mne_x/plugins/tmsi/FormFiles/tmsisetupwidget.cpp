@@ -153,9 +153,6 @@ void TMSISetupWidget::initGui()
     //Init preprocessing
     ui.m_checkBox_UseFiltering->setChecked(m_pTMSI->m_bUseFiltering);
 
-    //Init postprocessing
-    ui.m_checkBox_UseFFT->setChecked(m_pTMSI->m_bUseFFT);
-
     //Init write to file
     ui.m_checkBox_WriteDriverDebugToFile->setChecked(m_pTMSI->m_bWriteDriverDebugToFile);
 

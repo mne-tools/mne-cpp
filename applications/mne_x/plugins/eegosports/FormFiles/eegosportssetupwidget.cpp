@@ -39,9 +39,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "tmsisetupwidget.h"
-#include "tmsiaboutwidget.h"
-#include "../tmsi.h"
+#include "eegosportssetupwidget.h"
+#include "eegosportsaboutwidget.h"
+#include "../eegosports.h"
 
 
 //*************************************************************************************************************
@@ -92,10 +92,6 @@ EEGoSportsSetupWidget::EEGoSportsSetupWidget(EEGoSports* pEEGoSports, QWidget* p
     //Connect preprocessing
     connect(ui.m_checkBox_UseFiltering, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
             this, &EEGoSportsSetupWidget::setPreprocessing);
-
-    //Connect postprocessing
-    connect(ui.m_checkBox_UseFFT, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
-            this, &EEGoSportsSetupWidget::setPostprocessing);
 
     //Connect debug file
     connect(ui.m_checkBox_WriteDriverDebugToFile, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
@@ -153,17 +149,12 @@ void EEGoSportsSetupWidget::initGui()
     //Init preprocessing
     ui.m_checkBox_UseFiltering->setChecked(m_pEEGoSports->m_bUseFiltering);
 
-    //Init postprocessing
-    ui.m_checkBox_UseFFT->setChecked(m_pEEGoSports->m_bUseFFT);
-
     //Init write to file
     ui.m_checkBox_WriteDriverDebugToFile->setChecked(m_pEEGoSports->m_bWriteDriverDebugToFile);
 
     //Init trigger properties
     ui.m_spinBox_BeepLength->setValue(m_pEEGoSports->m_iTriggerInterval);
     ui.m_checkBox_EnableBeep->setChecked(m_pEEGoSports->m_bBeepTrigger);
-
-    ui.m_checkBox_EnableKeyboardTrigger->setChecked(m_pEEGoSports->m_bUseKeyboardTrigger);
 }
 
 
@@ -195,7 +186,6 @@ void EEGoSportsSetupWidget::setPreprocessing()
 
 void EEGoSportsSetupWidget::setPostprocessing()
 {
-    m_pEEGoSports->m_bUseFFT = ui.m_checkBox_UseFFT->isChecked();
 }
 
 
@@ -212,7 +202,6 @@ void EEGoSportsSetupWidget::setTriggerProperties()
 {
     m_pEEGoSports->m_iTriggerInterval = ui.m_spinBox_BeepLength->value();
     m_pEEGoSports->m_bBeepTrigger = ui.m_checkBox_EnableBeep->isChecked();
-    m_pEEGoSports->m_bUseKeyboardTrigger = ui.m_checkBox_EnableKeyboardTrigger->isChecked();
 }
 
 
