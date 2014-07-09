@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
-* @file     tmsiproducer.cpp
+* @file     tmsielectrodeitem.cpp
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     September, 2013
+* @date     June, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the TMSIProducer class.
+* @brief    Contains the implementation of the TmsiElectrodeItem class.
 *
 */
 
@@ -39,11 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "tmsiproducer.h"
-#include "tmsi.h"
-#include "tmsidriver.h"
-
-#include <QDebug>
+#include "tmsielectrodeitem.h"
 
 
 //*************************************************************************************************************
@@ -52,6 +48,7 @@
 //=============================================================================================================
 
 using namespace TMSIPlugin;
+using namespace std;
 
 
 //*************************************************************************************************************
@@ -59,88 +56,108 @@ using namespace TMSIPlugin;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-TMSIProducer::TMSIProducer(TMSI* pTMSI)
-: m_pTMSI(pTMSI)
-, m_pTMSIDriver(new TMSIDriver(this))
-, m_bIsRunning(true)
+TMSIElectrodeItem::TMSIElectrodeItem(QString electrodeName, QPointF electrodePosition, QColor electrodeColor, int channelIndex)
+: m_sElectrodeName(electrodeName)
+, m_qpElectrodePosition(electrodePosition)
+, m_cElectrodeColor(electrodeColor)
+, m_dImpedanceValue(0.0)
+, m_iChannelIndex(channelIndex)
 {
 }
-
 
 //*************************************************************************************************************
 
-TMSIProducer::~TMSIProducer()
+QRectF TMSIElectrodeItem::boundingRect() const
 {
-    //cout << "TMSIProducer::~TMSIProducer()" << endl;
+    return QRectF(-25, -35, 50, 70);
 }
-
 
 //*************************************************************************************************************
 
-void TMSIProducer::start(int iNumberOfChannels,
-                     int iSamplingFrequency,
-                     int iSamplesPerBlock,
-                     bool bUseChExponent,
-                     bool bUseUnitGain,
-                     bool bUseUnitOffset,
-                     bool bWriteDriverDebugToFile,
-                     QString sOutputFilePath,
-                     bool bUseCommonAverage,
-                     bool bMeasureImpedance)
+void TMSIElectrodeItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    //Initialise device
-    if(m_pTMSIDriver->initDevice(iNumberOfChannels,
-                              iSamplingFrequency,
-                              iSamplesPerBlock,
-                              bUseChExponent,
-                              bUseUnitGain,
-                              bUseUnitOffset,
-                              bWriteDriverDebugToFile,
-                              sOutputFilePath,
-                              bUseCommonAverage,
-                              bMeasureImpedance))
-    {
-        m_bIsRunning = true;
-        QThread::start();
-    }
-    else
-        m_bIsRunning = false;
-}
+    Q_UNUSED(option);
+    Q_UNUSED(widget);
 
+    // Plot shadow
+    painter->setPen(Qt::NoPen);
+    painter->setBrush(Qt::darkGray);
+    painter->drawEllipse(-12, -12, 30, 30);
+
+    // Plot colored circle
+    painter->setPen(QPen(Qt::black, 1));
+    painter->setBrush(QBrush(m_cElectrodeColor));
+    painter->drawEllipse(-15, -15, 30, 30);
+
+    // Plot electrode name
+    QStaticText staticElectrodeName = QStaticText(m_sElectrodeName);
+    QSizeF sizeText = staticElectrodeName.size();
+    painter->drawStaticText(-15+((30-sizeText.width())/2), -32, staticElectrodeName);
+
+    // Plot electrodes impedance value
+    QString impedanceValueToString;
+    QStaticText staticElectrodeValue = QStaticText(QString("%1 %2").arg(impedanceValueToString.setNum(m_dImpedanceValue/1000)).arg("kOhm")); // transform to kilo ohm (divide by 1000)
+    QSizeF sizeValue = staticElectrodeValue.size();
+    painter->drawStaticText(-15+((30-sizeValue.width())/2), 19, staticElectrodeValue);
+
+    this->setPos(m_qpElectrodePosition);
+}
 
 //*************************************************************************************************************
 
-void TMSIProducer::stop()
+void TMSIElectrodeItem::setColor(QColor electrodeColor)
 {
-    //Wait until this thread (TMSIProducer) is stopped
-    m_bIsRunning = false;
-
-    //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the push function (acquire statement)
-    m_pTMSI->m_pRawMatrixBuffer_In->releaseFromPush();
-
-    while(this->isRunning())
-        m_bIsRunning = false;
-
-    //Unitialise device only after the thread stopped
-    m_pTMSIDriver->uninitDevice();
+    m_cElectrodeColor = electrodeColor;
 }
-
 
 //*************************************************************************************************************
 
-void TMSIProducer::run()
+QString TMSIElectrodeItem::getElectrodeName()
 {
-    MatrixXf matRawBuffer(m_pTMSI->m_iNumberOfChannels, m_pTMSI->m_iSamplesPerBlock);
-
-    while(m_bIsRunning)
-    {
-        //std::cout<<"TMSIProducer::run()"<<std::endl;
-        //Get the TMSi EEG data out of the device buffer and write received data to circular buffer
-        if(m_pTMSIDriver->getSampleMatrixValue(matRawBuffer))
-            m_pTMSI->m_pRawMatrixBuffer_In->push(&matRawBuffer);
-    }
-
-    //std::cout<<"EXITING - TMSIProducer::run()"<<std::endl;
+    return m_sElectrodeName;
 }
+
+//*************************************************************************************************************
+
+void TMSIElectrodeItem::setImpedanceValue(double impedanceValue)
+{
+    m_dImpedanceValue = impedanceValue;
+}
+
+//*************************************************************************************************************
+
+double TMSIElectrodeItem::getImpedanceValue()
+{
+    return m_dImpedanceValue;
+}
+
+//*************************************************************************************************************
+
+void TMSIElectrodeItem::setPosition(QPointF newPosition)
+{
+    m_qpElectrodePosition = newPosition;
+}
+
+//*************************************************************************************************************
+
+QPointF TMSIElectrodeItem::getPosition()
+{
+    return m_qpElectrodePosition;
+}
+
+//*************************************************************************************************************
+
+int TMSIElectrodeItem::getChannelIndex()
+{
+    return m_iChannelIndex;
+}
+
+
+
+
+
+
+
+
 
 

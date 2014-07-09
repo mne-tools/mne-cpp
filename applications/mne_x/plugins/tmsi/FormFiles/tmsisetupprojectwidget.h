@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
-* @file     tmsiproducer.h
-* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+* @file     tmsisetupprojectwidget.h
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     September, 2013
+* @date     July 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,20 +30,17 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the TMSIProducer class.
+* @brief    Contains the declaration of the TMSISetupProjectWidget class.
 *
 */
 
-#ifndef TMSIPRODUCER_H
-#define TMSIPRODUCER_H
-
+#ifndef TMSISETUPPROJECTWIDGET_H
+#define TMSISETUPPROJECTWIDGET_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
-
-#include <generics/circularbuffer.h>
 
 
 //*************************************************************************************************************
@@ -51,8 +48,11 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QThread>
+#include <QWidget>
 
+namespace Ui {
+class TMSISetupProjectWidget;
+}
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -65,92 +65,87 @@ namespace TMSIPlugin
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace IOBuffer;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
 class TMSI;
-class TMSIDriver;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS EEGProducer
+* DECLARE CLASS TMSISetupProjectWidget
 *
-* @brief The EEGProducer class provides a EEG data producer for a given sampling rate.
+* @brief The TMSISetupProjectWidget class provides the TMSISetupProjectWidget configuration window.
 */
-class TMSIProducer : public QThread
+class TMSISetupProjectWidget : public QWidget
 {
+    Q_OBJECT
+
 public:
     //=========================================================================================================
     /**
-    * Constructs a TMSIProducer.
+    * Constructs a TMSISetupProjectWidget which is a child of parent.
     *
-    * @param [in] pTMSI a pointer to the corresponding TMSI class.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new TMSISetupProjectWidget becomes a window. If parent is another widget, TMSISetupWidget becomes a child window inside parent. TMSISetupWidget is deleted when its parent is deleted.
+    * @param [in] pTMSI a pointer to the corresponding ECGSimulator.
     */
-    TMSIProducer(TMSI* pTMSI);
+    explicit TMSISetupProjectWidget(TMSI* pTMSI, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the TMSIProducer.
+    * Destructs a TMSISetupProjectWidget which is a child of parent.
+    *
     */
-    ~TMSIProducer();
+    ~TMSISetupProjectWidget();
 
     //=========================================================================================================
     /**
-    * Starts the TMSIProducer by starting the producer's thread and initialising the device.
-    * @param [in] iNumberOfChannels The number of channels defined by the user via the GUI.
-    * @param [in] iSamplingFrequency The sampling frequency defined by the user via the GUI (in Hertz).
-    * @param [in] iSamplesPerBlock The samples per block defined by the user via the GUI.
-    * @param [in] bUseChExponent Flag for using the channels exponent. Defined by the user via the GUI.
-    * @param [in] bUseUnitGain Flag for using the channels unit gain. Defined by the user via the GUI.
-    * @param [in] sOutpuFilePath Holds the path for the output file. Defined by the user via the GUI.
-    * @param [in] bWriteDriverDebugToFile Flag for writing the received samples to a file. Defined by the user via the GUI.
-    * @param [in] bUseUnitOffset Flag for using the channels unit offset. Defined by the user via the GUI.
-    * @param [in] bUseCommonAverage Flag for using common average when recording EEG data. Defined by the user via the GUI.
-    * @param [in] bMeasureImpedance Flag for measuring impedances.
+    * Inits the GUI
+    *
     */
-    virtual void start(int iNumberOfChannels,
-                       int iSamplingFrequency,
-                       int iSamplesPerBlock,
-                       bool bUseChExponent,
-                       bool bUseUnitGain,
-                       bool bUseUnitOffset,
-                       bool bWriteDriverDebugToFile,
-                       QString sOutputFilePath,
-                       bool bUseCommonAverage,
-                       bool bMeasureImpedance);
-
-    //=========================================================================================================
-    /**
-    * Stops the TMSIProducer by stopping the producer's thread.
-    */
-    void stop();
-
-protected:
-    //=========================================================================================================
-    /**
-    * The starting point for the thread. After calling start(), the newly created thread calls this function.
-    * Returning from this method will end the execution of the thread.
-    * Pure virtual method inherited by QThread.
-    */
-    virtual void run();
+    void initGui();
 
 private:
-    TMSI*                       m_pTMSI;            /**< A pointer to the corresponding TMSI class.*/
-    QSharedPointer<TMSIDriver>  m_pTMSIDriver;      /**< A pointer to the corresponding TMSI driver class.*/
+    TMSI*                           m_pTMSI;        /**< a pointer to corresponding TMSI.*/
 
-    bool                        m_bIsRunning;       /**< Whether TMSIProducer is running.*/
+    Ui::TMSISetupProjectWidget*     ui;             /**< the user interface for the TMSISetupWidget.*/
 
+    //=========================================================================================================
+    /**
+    * Sets the project dir
+    *
+    */
+    void addProject();
+
+    //=========================================================================================================
+    /**
+    * Sets the subject dir
+    *
+    */
+    void addSubject();
+
+    //=========================================================================================================
+    /**
+    * Sets the dir where the output file is saved
+    *
+    */
+    void changeOutputFile();
+
+    //=========================================================================================================
+    /**
+    * Sets the dir where the eeg cap file is located
+    *
+    */
+    void changeCap();
+
+    //=========================================================================================================
+    /**
+    * Generates new file path based onthe project and subject parameters
+    *
+    */
+    void generateFilePath(int index = 0);
 };
 
 } // NAMESPACE
 
-#endif // TMSIPRODUCER_H
+#endif // TMSISETUPPROJECTWIDGET_H
