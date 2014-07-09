@@ -23,7 +23,7 @@
       </font>
      </property>
      <property name="text">
-      <string>TMSi EEG Connector</string>
+      <string>EEGoSports Connector</string>
      </property>
     </widget>
    </item>
@@ -193,6 +193,9 @@
         <string>Other options</string>
        </property>
        <layout class="QFormLayout" name="formLayout_3">
+        <property name="fieldGrowthPolicy">
+         <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+        </property>
         <item row="0" column="0">
          <widget class="QCheckBox" name="m_checkBox_EnableBeep">
           <property name="text">
@@ -216,23 +219,6 @@
           </property>
          </widget>
         </item>
-        <item row="4" column="0">
-         <widget class="QCheckBox" name="m_checkBox_UseFFT">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="text">
-           <string>Use FFT</string>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="0">
-         <widget class="QCheckBox" name="m_checkBox_UseFiltering">
-          <property name="text">
-           <string>Enable preprocessing (HP)</string>
-          </property>
-         </widget>
-        </item>
         <item row="1" column="0">
          <widget class="QCheckBox" name="m_checkBox_EnableKeyboardTrigger">
           <property name="text">
@@ -250,6 +236,13 @@
           </property>
           <property name="orientation">
            <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item row="3" column="0">
+         <widget class="QCheckBox" name="m_checkBox_UseFiltering">
+          <property name="text">
+           <string>Enable preprocessing (HP)</string>
           </property>
          </widget>
         </item>

@@ -74,21 +74,12 @@ EEGoSportsDriver::EEGoSportsDriver(EEGoSportsProducer* pEEGoSportsProducer)
     //Initialise NULL pointers
     m_oLibHandle = NULL ;
     m_HandleMaster = NULL;
-    m_PSPDPMasterDevicePath = NULL;
     m_lSignalBuffer = NULL;
 
-    //Open library
-//    TCHAR Path[MAX_PATH];
-//    GetSystemDirectory(Path, sizeof(Path) / sizeof(TCHAR) );
-//    lstrcat(Path, _T("\\TMSiSDK.dll"));
-//    m_oLibHandle = LoadLibrary(Path);
-
     //Check which driver dll to take: TMSiSDK.dll oder TMSiSDK32bit.dll
-//    if(EEGOSPORTSSDK)
 #ifdef TAKE_EEGOSPORTSSDK_DLL //32 bit system & 64 bit (with 64 bit compiler)
         m_oLibHandle = ::LoadLibrary(L"C:\\Windows\\System32\\eego.dll");
 #elif TAKE_EEGOSPORTSSDK_32_DLL //64 bit (with 32 bit compiler)
-//    if(EEGOSPORTSSDK32)
         m_oLibHandle = ::LoadLibrary(L"C:\\Windows\\SysWOW64\\eego.dll");
 #endif
 
@@ -101,22 +92,38 @@ EEGoSportsDriver::EEGoSportsDriver(EEGoSportsProducer* pEEGoSportsProducer)
     }
 
     //Load DLL methods for initializing the driver
-    __load_dll_func__(m_oFpOpen, POPEN, "Open");
-    __load_dll_func__(m_oFpClose, PCLOSE, "Close");
-    __load_dll_func__(m_oFpStart, PSTART, "Start");
-    __load_dll_func__(m_oFpStop, PSTOP, "Stop");
-    __load_dll_func__(m_oFpGetSignalFormat, PGETSIGNALFORMAT, "GetSignalFormat");
-    __load_dll_func__(m_oFpSetSignalBuffer, PSETSIGNALBUFFER, "SetSignalBuffer");
-    __load_dll_func__(m_oFpGetSamples, PGETSAMPLES, "GetSamples");
-    __load_dll_func__(m_oFpGetBufferInfo, PGETBUFFERINFO, "GetBufferInfo");
-    __load_dll_func__(m_oFpFree, PFREE, "Free");
-    __load_dll_func__(m_oFpLibraryInit, PLIBRARYINIT, "LibraryInit");
-    __load_dll_func__(m_oFpLibraryExit, PLIBRARYEXIT, "LibraryExit");
-    __load_dll_func__(m_oFpGetDeviceList, PGETDEVICELIST, "GetDeviceList");
-    __load_dll_func__(m_oFpGetFrontEndInfo, PGETFRONTENDINFO, "GetFrontEndInfo");
-    __load_dll_func__(m_oFpSetRefCalculation, PSETREFCALCULATION, "SetRefCalculation");
-    __load_dll_func__(m_oFpSetMeasuringMode, PSETMEASURINGMODE, "SetMeasuringMode");
-    __load_dll_func__(m_oFpGetErrorCode, PGETERRORCODE, "GetErrorCode");
+    __load_dll_func__(m_oFpCreateAmplifier, CREATEAMPLIFIER, "CreateAmplifier");
+
+    if(m_oFpCreateAmplifier == NULL)
+    {
+        cout << "Plugin EEGoSports - ERROR - Couldn't load Method: CreateAmplifier from DLL" << endl;
+        return;
+    }
+
+    HRESULT hres = (*m_oFpCreateAmplifier)(&m_pAmplifier);
+    if(FAILED(hres) || !m_pAmplifier)
+    {
+        cout << "Plugin EEGoSports - ERROR - Couldn't create amplifier! HRESULT: " << hres << endl;
+        return;
+    }
+
+//    __load_dll_func__(m_oFpOpen, CREATEAMPLIFIER, "CreateAmplifier");
+//    __load_dll_func__(m_oFpOpen, POPEN, "Open");
+//    __load_dll_func__(m_oFpClose, PCLOSE, "Close");
+//    __load_dll_func__(m_oFpStart, PSTART, "Start");
+//    __load_dll_func__(m_oFpStop, PSTOP, "Stop");
+//    __load_dll_func__(m_oFpGetSignalFormat, PGETSIGNALFORMAT, "GetSignalFormat");
+//    __load_dll_func__(m_oFpSetSignalBuffer, PSETSIGNALBUFFER, "SetSignalBuffer");
+//    __load_dll_func__(m_oFpGetSamples, PGETSAMPLES, "GetSamples");
+//    __load_dll_func__(m_oFpGetBufferInfo, PGETBUFFERINFO, "GetBufferInfo");
+//    __load_dll_func__(m_oFpFree, PFREE, "Free");
+//    __load_dll_func__(m_oFpLibraryInit, PLIBRARYINIT, "LibraryInit");
+//    __load_dll_func__(m_oFpLibraryExit, PLIBRARYEXIT, "LibraryExit");
+//    __load_dll_func__(m_oFpGetDeviceList, PGETDEVICELIST, "GetDeviceList");
+//    __load_dll_func__(m_oFpGetFrontEndInfo, PGETFRONTENDINFO, "GetFrontEndInfo");
+//    __load_dll_func__(m_oFpSetRefCalculation, PSETREFCALCULATION, "SetRefCalculation");
+//    __load_dll_func__(m_oFpSetMeasuringMode, PSETMEASURINGMODE, "SetMeasuringMode");
+//    __load_dll_func__(m_oFpGetErrorCode, PGETERRORCODE, "GetErrorCode");
 
     cout << "Plugin EEGoSports - INFO - EEGoSportsDriver() - Successfully loaded all DLL functions" << endl;
 }
@@ -163,146 +170,128 @@ bool EEGoSportsDriver::initDevice(int iNumberOfChannels,
     if(m_bWriteDriverDebugToFile)
         m_outputFileStream.open("mne_x_plugins/resources/tmsi/TMSi_Driver_Debug.txt", ios::trunc); //ios::trunc deletes old file data
 
-    //Check if device handler already exists and a connection was established before
-//    if(m_HandleMaster != NULL)
-//    {
-//        m_oFpClose(m_HandleMaster);
-//        m_HandleMaster = NULL;
-//    }
-    int ErrorCode = 0;
-    m_HandleMaster = m_oFpLibraryInit(TMSiConnectionUSB, &ErrorCode);
+    // Initialise device
+    HRESULT hr;
+    LPTSTR szDevString = NULL;
 
-    if( ErrorCode != 0 )
+    UINT numDevices;
+    if(FAILED(m_pAmplifier->EnumDevices(&numDevices)))
     {
-        cout << "Plugin EEGoSports - ERROR - initDevice() - Can not initialize library" << endl;
+        cout << "Plugin EEGoSports - ERROR - Couldn't get device numbers!" << endl;
         return false;
     }
 
-    //Get the device list of connected devices
-    char **DeviceList = NULL;
-    int NrOfDevices=0;
-
-    DeviceList = m_oFpGetDeviceList(m_HandleMaster, &NrOfDevices);
-
-    if( NrOfDevices == 0 )
+    for(UINT i = 0; i < numDevices; i++)
     {
-        cout << "Plugin EEGoSports - ERROR - initDevice() - Frontend list NOT available - Maybe no devices are connected" << endl;
-        m_oFpLibraryExit(m_HandleMaster);
-        return false;
-    }
-
-    //Open device
-    BOOLEAN Status;
-    char *DeviceLocator = DeviceList[0] ;
-    Status = m_oFpOpen(m_HandleMaster, DeviceLocator);
-
-    //Stop the device from sampling. Just in case the device was not stopped correctly after the last sampling process
-    m_oFpStop(m_HandleMaster);
-
-    if(!Status)
-    {
-        cout << "Plugin EEGoSports - ERROR - initDevice() - Failed to open connected device" << endl;
-        m_oFpLibraryExit(m_HandleMaster);
-        return false;
-    }
-
-    // Turn on the impendance mode
-    ULONG impedanceMode = 3;
-    ULONG normalMode = 0;
-
-    if(m_bMeasureImpedances)
-    {
-        if(m_oFpSetMeasuringMode(m_HandleMaster, impedanceMode, 1))
-            cout << "Plugin EEGoSports - INFO - Now measuring impedances" << endl;
-        else
+        LPTSTR szName;
+        if(FAILED(m_pAmplifier->EnumDevices(i, &szName)))
         {
-            int ErrorCode = m_oFpGetErrorCode(m_HandleMaster);
-            cout << "Unable to set Measuremode impedance, errorcode = " << ErrorCode << endl;
-        }
-    }
-    else
-        m_oFpSetMeasuringMode(m_HandleMaster, normalMode, 0);
-
-    //Get information about the connected device
-    FRONTENDINFO FrontEndInfo;
-    Status = m_oFpGetFrontEndInfo(m_HandleMaster, &FrontEndInfo);
-    unsigned short serial, hwVersion, swVersion, baseSf, maxRS232, nrOfChannels;
-
-    if(!Status)
-        cout << "Plugin EEGoSports - ERROR - initDevice() - FrontendInfo NOT available" << endl;
-    else
-    {
-        serial = FrontEndInfo.Serial;
-        hwVersion = FrontEndInfo.HwVersion;
-        swVersion = FrontEndInfo.SwVersion;
-        baseSf = FrontEndInfo.BaseSf;
-        maxRS232 = FrontEndInfo.maxRS232;
-        nrOfChannels = FrontEndInfo.NrOfChannels;
-    }
-
-    // Set Ref Calculation
-    if(m_bUseCommonAverage)
-    {
-        BOOLEAN setRefCalculation = m_oFpSetRefCalculation(m_HandleMaster, 1);
-        if(setRefCalculation)
-            cout << "Plugin EEGoSports - INFO - initDevice() - Common average now active" << endl;
-        else
-            cout << "Plugin EEGoSports - INFO - initDevice() - Common average is inactive (Could not be initiated)" << endl;
-    }
-
-    //Get information about the signal format created by the device - UnitExponent, UnitGain, UnitOffSet
-    PSIGNAL_FORMAT pSignalFormat = m_oFpGetSignalFormat(m_HandleMaster, NULL);
-
-    if(pSignalFormat != NULL)
-    {
-        wcscpy_s(m_wcDeviceName, pSignalFormat->PortName);
-        m_ulSerialNumber = pSignalFormat->SerialNumber;
-        m_uiNumberOfAvailableChannels = pSignalFormat[0].Elements;
-
-        if(m_bWriteDriverDebugToFile)
-            m_outputFileStream << "Found "<< m_wcDeviceName << " device (" << m_ulSerialNumber << ") with " << m_uiNumberOfAvailableChannels << " available channels" << endl << endl;
-
-        for(uint i = 0 ; i < m_uiNumberOfAvailableChannels; i++ )
-        {
-            m_vExponentChannel.push_back(pSignalFormat[i].UnitExponent);
-            m_vUnitGain.push_back(pSignalFormat[i].UnitGain);
-            m_vUnitOffSet.push_back(pSignalFormat[i].UnitOffSet);
-
-            if(m_bWriteDriverDebugToFile)
-                m_outputFileStream << "Channel number: " << i << " has type " << pSignalFormat[i].Type << " , format " << pSignalFormat[i].Format << " exponent " << pSignalFormat[i].UnitExponent << " gain " << pSignalFormat[i].UnitGain << " offset " << pSignalFormat[i].UnitOffSet << endl;
+            cout << "Plugin EEGoSports - ERROR - Couldn't get device name!" << endl;
+            return false;
         }
 
-        if(m_bWriteDriverDebugToFile)
-            m_outputFileStream << endl;
+        cout<<"Found device: "<<szName<<endl;
+
+        // Make sure to get no simulation device. This should be no problem with later versions
+        QString temp;
+        temp = temp.fromWCharArray(szName);
+        if(!temp.contains("SIM"))
+        {
+            szDevString = szName;
+            break;
+        }
     }
 
-    //Initialise and set up (sample rate/frequency and buffer size) the internal driver signal buffer which is used by the driver to store the value
-    ULONG iSamplingFrequencyMilliHertz = m_uiSamplingFrequency*1000;    //Times 1000 because the driver works in millihertz
-    ULONG iBufferSize = MAX_BUFFER_SIZE;                                //see TMSi doc file for more info. This size is not defined in bytes but in the number of elements which are to be sampled. A sample in this case is one conversion result for all input channels..
-
-    if(!m_oFpSetSignalBuffer(m_HandleMaster, &iSamplingFrequencyMilliHertz, &iBufferSize))
+    if( !szDevString )
     {
-        cout << "Plugin EEGoSports - ERROR - initDevice() - Failed to allocate signal buffer" << endl;
-        m_oFpLibraryExit(m_HandleMaster);
+        cout << "Plugin EEGoSports - ERROR - No connected device found!" << endl;
         return false;
     }
 
-    //Start the sampling process
-    bool start = m_oFpStart(m_HandleMaster);
-    if(!start)
+    // Make the USB handshake and setup internal states for communication with the hardware
+    if( FAILED(m_pAmplifier->Connect(szDevString)))
     {
-        cout << "Plugin EEGoSports - ERROR - initDevice() - Failed to start the sampling procedure" << endl;
-        m_oFpLibraryExit(m_HandleMaster);
+        cout << "Plugin EEGoSports - ERROR - Connect call failed!" << endl;
         return false;
     }
 
-    //Create the buffers
-    //The sampling frequency is not needed here because it is only used to specify the internal buffer size used by the driver with setSignalBuffer()
-    m_lSignalBufferSize = m_uiSamplesPerBlock*m_uiNumberOfAvailableChannels*4;
-    m_lSignalBuffer = new LONG[m_lSignalBufferSize];
+    // Better safe than sorry
+    Sleep(100);
 
-    cout << "Plugin EEGoSports - INFO - initDevice() - The device has been connected and initialised successfully" << endl;
+    // Set it to a defined state
+    m_pAmplifier->Reset();
+
+    // Better safe than sorry
+    Sleep(100);
+
+    // reset the overcurrent protection
+    EEGO_CONFIG conf;
+    memset(&conf,0,sizeof(EEGO_CONFIG));
+    conf.BITS.bUnlockOCP = 1;
+    m_pAmplifier->SetConfig(conf);
+
+    // This takes a while. Better wait
+    Sleep(100);
+
+    // Aanything over 2kHZ is not supported and chances are high that they just don't work.
+    if(FAILED(m_pAmplifier->SetSamplingRate((EEGO_RATE)m_uiSamplingFrequency)))
+    {
+        cout << "Plugin EEGoSports - ERROR - Can not set sampling frequency: " << m_uiSamplingFrequency << endl;
+        return false;
+    }
+
+    // use this with mV or set gain directly. Again, look into eego.h for acceptable values
+    //EEGO_GAIN gain = GetGainForSignalRange(1000);
+
+    // It is possible to set those for each individually. Again: not tested, not supported
+//    m_pAmplifier->SetSignalGain( gain, EegoDriver::EEGO_ADC_A);
+//    m_pAmplifier->SetSignalGain( gain, EegoDriver::EEGO_ADC_B);
+//    m_pAmplifier->SetSignalGain( gain, EegoDriver::EEGO_ADC_C);
+//    m_pAmplifier->SetSignalGain( gain, EegoDriver::EEGO_ADC_D);
+//    m_pAmplifier->SetSignalGain( gain, EegoDriver::EEGO_ADC_E);
+//    m_pAmplifier->SetSignalGain( gain, EegoDriver::EEGO_ADC_F);
+//    m_pAmplifier->SetSignalGain( gain, EegoDriver::EEGO_ADC_G);
+//    m_pAmplifier->SetSignalGain( gain, EegoDriver::EEGO_ADC_H);
+//    m_pAmplifier->SetSignalGain( gain, EegoDriver::EEGO_ADC_S);
+
+    Sleep(100);
+
+    // We are measuring here so better leave the DAC off
+    hr = m_pAmplifier->SetDriverAmplitude(0);
+    hr |= m_pAmplifier->SetDriverPeriod(0);
+
+    if(FAILED(hr))
+        return false;
+
+    // This takes a while. Better wait
+    Sleep(100);
+
+    USHORT firmwareVersion;
+    m_pAmplifier->GetFirmwareVersion(&firmwareVersion);
+
+    cout<<"Firmware version is: "<<firmwareVersion<<endl;
+
     m_bInitDeviceSuccess = true;
+
+    // Start the sampling
+    if(!m_pAmplifier)
+        return false;
+
+    EEGO_RATE rate;
+    EEGO_GAIN gain;
+
+    // You can get the set values from the device, too. We are using it here only for debug purposes
+    m_pAmplifier->GetSamplingRate(&rate);
+    m_pAmplifier->GetSignalGain(&gain, EEGO_ADC_A);
+
+    cout << "Starting Device with sampling rate: " << m_uiSamplingFrequency << "hz and a gain of: " << gain << "\n";
+
+    // With this call we tell the amplifier and driver stack to start streaming
+    if(FAILED(m_pAmplifier->SetMode(EEGO_MODE_STREAMING)))
+        return false;
+
+    Sleep(100);
+
     return true;
 }
 
@@ -335,24 +324,19 @@ bool EEGoSportsDriver::uninitDevice()
         m_outputFileStream.clear();
     }
 
-    if(!m_oFpStop(m_HandleMaster))
-    {
-        cout << "Plugin EEGoSports - ERROR - uninitDevice() - Failed to stop the device" << endl;
+    if(!m_pAmplifier)
         return false;
-    }
 
-    if(!m_oFpClose(m_HandleMaster))
-    {
-        cout << "Plugin EEGoSports - ERROR - uninitDevice() - Failed to close the device" << endl;
+    if(FAILED(m_pAmplifier->SetMode(EEGO_MODE_IDLE)))
         return false;
-    }
 
-    m_oFpLibraryExit(m_HandleMaster);
+    m_pAmplifier->Disconnect();
+    m_pAmplifier->Release();
+    m_pAmplifier = NULL;
 
     //Reset to NULL pointers
     m_oLibHandle = NULL ;
     m_HandleMaster = NULL;
-    m_PSPDPMasterDevicePath = NULL;
     m_lSignalBuffer = NULL;
 
     cout << "Plugin EEGoSports - INFO - uninitDevice() - Successfully uninitialised the device" << endl;
@@ -375,90 +359,90 @@ bool EEGoSportsDriver::uninitDevice()
         return false;
     }
 
-    sampleMatrix.setZero(); // Clear matrix - set all elements to zero
-    uint iSamplesWrittenToMatrix = 0;
-    int channelMax = 0;
-    int sampleMax = 0;
-    int sampleIterator = 0;
+//    sampleMatrix.setZero(); // Clear matrix - set all elements to zero
+//    uint iSamplesWrittenToMatrix = 0;
+//    int channelMax = 0;
+//    int sampleMax = 0;
+//    int sampleIterator = 0;
 
-    //get samples from device until the complete matrix is filled, i.e. the samples per block size is met
-    while(iSamplesWrittenToMatrix < m_uiSamplesPerBlock)
-    {
-        //Get sample block from device
-        LONG ulSizeSamples = m_oFpGetSamples(m_HandleMaster, (PULONG)m_lSignalBuffer, m_lSignalBufferSize);
-        LONG ulNumSamplesReceived = ulSizeSamples/(m_uiNumberOfAvailableChannels*4);
+//    //get samples from device until the complete matrix is filled, i.e. the samples per block size is met
+//    while(iSamplesWrittenToMatrix < m_uiSamplesPerBlock)
+//    {
+//        //Get sample block from device
+//        LONG ulSizeSamples = m_oFpGetSamples(m_HandleMaster, (PULONG)m_lSignalBuffer, m_lSignalBufferSize);
+//        LONG ulNumSamplesReceived = ulSizeSamples/(m_uiNumberOfAvailableChannels*4);
 
-        //Only do the next steps if there was at least one sample received, otherwise skip and wait until at least one sample was received
-        if(ulNumSamplesReceived > 0)
-        {
-            int actualSamplesWritten = 0; //Holds the number of samples which are actually written to the matrix in this while procedure
-
-            //Write the received samples to an extra buffer, so that they are not getting lost if too many samples were received. These are then written to the next matrix (block)
-            for(int i=0; i<ulNumSamplesReceived; i++)
-            {
-                for(uint j=i*m_uiNumberOfAvailableChannels; j<(i*m_uiNumberOfAvailableChannels)+m_uiNumberOfChannels; j++)
-                    m_vSampleBlockBuffer.push_back((double)m_lSignalBuffer[j]);
-            }
-
-            //If the number of available channels is smaller than the number defined by the user -> set the channelMax to the smaller number
-            if(m_uiNumberOfAvailableChannels < m_uiNumberOfChannels)
-                channelMax = m_uiNumberOfAvailableChannels;
-            else
-                channelMax = m_uiNumberOfChannels;
-
-            //If the number of the samples which were already written to the matrix plus the last received number of samples is larger then the defined block size
-            //-> only fill until the matrix is completeley filled with samples. The other (unused) samples are still stored in the vector buffer m_vSampleBlockBuffer and will be used in the next matrix which is to be sent to the circular buffer
-            if(iSamplesWrittenToMatrix + ulNumSamplesReceived > m_uiSamplesPerBlock)
-                sampleMax = m_uiSamplesPerBlock - iSamplesWrittenToMatrix + sampleIterator;
-            else
-                sampleMax = ulNumSamplesReceived + sampleIterator;
-
-            //Read the needed number of samples from the vector buffer to store them in the matrix
-            for(; sampleIterator < sampleMax; sampleIterator++)
-            {
-                for(int channelIterator = 0; channelIterator < channelMax; channelIterator++)
-                {
-                    sampleMatrix(channelIterator, sampleIterator) = ((m_vSampleBlockBuffer.first() * (m_bUseUnitGain ? m_vUnitGain[channelIterator] : 1)) + (m_bUseUnitOffset ? m_vUnitOffSet[channelIterator] : 0)) * (m_bUseChExponent ? pow(10., (double)m_vExponentChannel[channelIterator]) : 1);
-                    m_vSampleBlockBuffer.pop_front();
-                }
-
-                actualSamplesWritten ++;
-            }
-
-            iSamplesWrittenToMatrix = iSamplesWrittenToMatrix + actualSamplesWritten;
-        }
-
-//        if(m_outputFileStream.is_open() && m_bWriteDriverDebugToFile)
+//        //Only do the next steps if there was at least one sample received, otherwise skip and wait until at least one sample was received
+//        if(ulNumSamplesReceived > 0)
 //        {
-//            m_outputFileStream << "ulSizeSamples: " << ulSizeSamples << endl;
-//            m_outputFileStream << "ulNumSamplesReceived: " << ulNumSamplesReceived << endl;
-//            m_outputFileStream << "sampleMax: " << sampleMax << endl;
-//            m_outputFileStream << "sampleIterator: " << sampleIterator << endl;
-//            m_outputFileStream << "iSamplesWrittenToMatrix: " << iSamplesWrittenToMatrix << endl << endl;
+//            int actualSamplesWritten = 0; //Holds the number of samples which are actually written to the matrix in this while procedure
+
+//            //Write the received samples to an extra buffer, so that they are not getting lost if too many samples were received. These are then written to the next matrix (block)
+//            for(int i=0; i<ulNumSamplesReceived; i++)
+//            {
+//                for(uint j=i*m_uiNumberOfAvailableChannels; j<(i*m_uiNumberOfAvailableChannels)+m_uiNumberOfChannels; j++)
+//                    m_vSampleBlockBuffer.push_back((double)m_lSignalBuffer[j]);
+//            }
+
+//            //If the number of available channels is smaller than the number defined by the user -> set the channelMax to the smaller number
+//            if(m_uiNumberOfAvailableChannels < m_uiNumberOfChannels)
+//                channelMax = m_uiNumberOfAvailableChannels;
+//            else
+//                channelMax = m_uiNumberOfChannels;
+
+//            //If the number of the samples which were already written to the matrix plus the last received number of samples is larger then the defined block size
+//            //-> only fill until the matrix is completeley filled with samples. The other (unused) samples are still stored in the vector buffer m_vSampleBlockBuffer and will be used in the next matrix which is to be sent to the circular buffer
+//            if(iSamplesWrittenToMatrix + ulNumSamplesReceived > m_uiSamplesPerBlock)
+//                sampleMax = m_uiSamplesPerBlock - iSamplesWrittenToMatrix + sampleIterator;
+//            else
+//                sampleMax = ulNumSamplesReceived + sampleIterator;
+
+//            //Read the needed number of samples from the vector buffer to store them in the matrix
+//            for(; sampleIterator < sampleMax; sampleIterator++)
+//            {
+//                for(int channelIterator = 0; channelIterator < channelMax; channelIterator++)
+//                {
+//                    sampleMatrix(channelIterator, sampleIterator) = ((m_vSampleBlockBuffer.first() * (m_bUseUnitGain ? m_vUnitGain[channelIterator] : 1)) + (m_bUseUnitOffset ? m_vUnitOffSet[channelIterator] : 0)) * (m_bUseChExponent ? pow(10., (double)m_vExponentChannel[channelIterator]) : 1);
+//                    m_vSampleBlockBuffer.pop_front();
+//                }
+
+//                actualSamplesWritten ++;
+//            }
+
+//            iSamplesWrittenToMatrix = iSamplesWrittenToMatrix + actualSamplesWritten;
 //        }
-    }
 
-    if(/*m_outputFileStream.is_open() &&*/ m_bWriteDriverDebugToFile)
-    {
-        //Get device buffer info
-        ULONG ulOverflow;
-        ULONG ulPercentFull;
-        m_oFpGetBufferInfo(m_HandleMaster, &ulOverflow, &ulPercentFull);
+////        if(m_outputFileStream.is_open() && m_bWriteDriverDebugToFile)
+////        {
+////            m_outputFileStream << "ulSizeSamples: " << ulSizeSamples << endl;
+////            m_outputFileStream << "ulNumSamplesReceived: " << ulNumSamplesReceived << endl;
+////            m_outputFileStream << "sampleMax: " << sampleMax << endl;
+////            m_outputFileStream << "sampleIterator: " << sampleIterator << endl;
+////            m_outputFileStream << "iSamplesWrittenToMatrix: " << iSamplesWrittenToMatrix << endl << endl;
+////        }
+//    }
 
-        m_outputFileStream <<  "Unit offset: " << endl;
-        for(int w = 0; w<<m_vUnitOffSet.size(); w++)
-            cout << float(m_vUnitOffSet[w]) << "  ";
-        m_outputFileStream << endl << endl;
+//    if(/*m_outputFileStream.is_open() &&*/ m_bWriteDriverDebugToFile)
+//    {
+//        //Get device buffer info
+//        ULONG ulOverflow;
+//        ULONG ulPercentFull;
+//        m_oFpGetBufferInfo(m_HandleMaster, &ulOverflow, &ulPercentFull);
 
-        m_outputFileStream <<  "Unit gain: " << endl;
-        for(int w = 0; w<<m_vUnitGain.size(); w++)
-            m_outputFileStream << float(m_vUnitGain[w]) << "  ";
-        m_outputFileStream << endl << endl;
+//        m_outputFileStream <<  "Unit offset: " << endl;
+//        for(int w = 0; w<<m_vUnitOffSet.size(); w++)
+//            cout << float(m_vUnitOffSet[w]) << "  ";
+//        m_outputFileStream << endl << endl;
 
-        m_outputFileStream << "----------<See output file for sample matrix>----------" <<endl<<endl;
-        m_outputFileStream << "----------<Internal driver buffer is "<<ulPercentFull<<" full>----------"<<endl;
-        m_outputFileStream << "----------<Internal driver overflow is "<<ulOverflow<< ">----------"<<endl;
-    }
+//        m_outputFileStream <<  "Unit gain: " << endl;
+//        for(int w = 0; w<<m_vUnitGain.size(); w++)
+//            m_outputFileStream << float(m_vUnitGain[w]) << "  ";
+//        m_outputFileStream << endl << endl;
+
+//        m_outputFileStream << "----------<See output file for sample matrix>----------" <<endl<<endl;
+//        m_outputFileStream << "----------<Internal driver buffer is "<<ulPercentFull<<" full>----------"<<endl;
+//        m_outputFileStream << "----------<Internal driver overflow is "<<ulOverflow<< ">----------"<<endl;
+//    }
 
     return true;
 }

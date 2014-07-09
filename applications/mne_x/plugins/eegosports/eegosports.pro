@@ -49,7 +49,7 @@ contains(QMAKE_HOST.arch, x86_64) { #Compiling MNE-X FOR a 64bit system
 }
 else {
     exists(C:/Windows/SysWOW64/eego.dll) { #Compiling MNE-X FOR a 32bit system ON a 64bit system
-		message(EEGOSPORTS.pro warning: EEGoSports Driver DLL for 32 bit system not found!)
+        DEFINES += TAKE_EEGOSPORTSSDK_32_DLL
     }
     else {
         exists(C:/Windows/System32/eego.dll) { #Compiling MNE-X FOR a 32bit system ON a 32bit system
@@ -91,29 +91,26 @@ else {
 DESTDIR = $${MNE_BINARY_DIR}/mne_x_plugins
 
 SOURCES += \
-        EEGoSports.cpp \
-        EEGoSportsproducer.cpp \
-        FormFiles/EEGoSportssetupwidget.cpp \
-        FormFiles/EEGoSportsaboutwidget.cpp \
-        EEGoSportsdriver.cpp \
-        FormFiles/EEGoSportsmanualannotationwidget.cpp \
-		FormFiles/EEGoSportssetupprojectwidget.cpp
+        eegosports.cpp \
+        eegosportsproducer.cpp \
+        FormFiles/eegosportssetupwidget.cpp \
+        FormFiles/eegosportsaboutwidget.cpp \
+        eegosportsdriver.cpp \
+        FormFiles/eegosportssetupprojectwidget.cpp
 
 HEADERS += \
-        EEGoSports.h\
-        EEGoSports_global.h \
-        EEGoSportsproducer.h \
-        FormFiles/EEGoSportssetupwidget.h \
-        FormFiles/EEGoSportsaboutwidget.h \
-        EEGoSportsdriver.h \
-        FormFiles/EEGoSportsmanualannotationwidget.h \
-		FormFiles/EEGoSportssetupprojectwidget.h
+        eegosports.h\
+        eegosports_global.h \
+        eegosportsproducer.h \
+        FormFiles/eegosportssetupwidget.h \
+        FormFiles/eegosportsaboutwidget.h \
+        eegosportsdriver.h \
+        FormFiles/eegosportssetupprojectwidget.h
 
 FORMS += \
-        FormFiles/EEGoSportssetup.ui \
-        FormFiles/EEGoSportsabout.ui \
-        FormFiles/EEGoSportsmanualannotation.ui \
-		FormFiles/EEGoSportssetupprojectwidget.ui
+        FormFiles/eegosportssetup.ui \
+        FormFiles/eegosportssetupprojectwidget.ui \
+        FormFiles/eegosportsabout.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
