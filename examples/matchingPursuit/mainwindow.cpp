@@ -81,7 +81,7 @@ qint32 processValue = 0;
 MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    //ui->progressBarCalc->setHidden(true);
+    ui->progressBarCalc->setHidden(true);
 
     callGraphWindow = new GraphWindow();    
     callGraphWindow->setMinimumHeight(220);
