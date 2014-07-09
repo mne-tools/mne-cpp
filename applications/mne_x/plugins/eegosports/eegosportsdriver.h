@@ -83,7 +83,7 @@ namespace EEGoSportsPlugin
 //=============================================================================================================
 
 // define a pointer CREATEAMPLIFIER to a function which is taking a void HANDLE and returns a HRESULT value
-typedef HRESULT         ( __stdcall * CREATEAMPLIFIER)            (IAmplifier** ppObject);
+typedef HRESULT         (* CREATEAMPLIFIER)            (IAmplifier** ppObject);
 
 
 //*************************************************************************************************************
@@ -182,7 +182,7 @@ public:
     bool uninitDevice();
 
 private:
-    EEGoSportsProducer*       m_pEEGoSportsProducer;                /**< A pointer to the corresponding EEGoSportsProducer class.*/
+    EEGoSportsProducer* m_pEEGoSportsProducer;          /**< A pointer to the corresponding EEGoSportsProducer class.*/
 
     //Flags
     bool                m_bInitDeviceSuccess;           /**< Flag which defines if the device initialisation was successfull.*/
@@ -202,13 +202,11 @@ private:
     bool                m_bMeasureImpedances;           /**< Flag for impedance measuring mode.*/
 
     //Handler
-    HANDLE              m_HandleMaster;                 /**< The handler used to communciate with the device.*/
     HINSTANCE           m_oLibHandle;                   /**< The handler used to load the driver dll/lib.*/
 
     //Device info
     WCHAR               m_wcDeviceName[40];             /**< Contains the connected device name.*/
     ULONG               m_ulSerialNumber;               /**< Contains the connected device serial number.*/
-    //PSP_DEVICE_PATH     m_PSPDPMasterDevicePath;        /**< Contains the connected devicePath (used to get/open the device handler).*/
     ULONG               m_uiNumberOfAvailableChannels;  /**< Holds the available number of channels offered by the device.*/
 
     //Signal info
@@ -224,22 +222,6 @@ private:
 
     //Variables used for loading the TMSiSDK.dll methods. Note: Not all functions are used by this class at the moment.
     CREATEAMPLIFIER       m_oFpCreateAmplifier;
-//    POPEN               m_oFpOpen;
-//    PCLOSE              m_oFpClose;
-//    PSTART              m_oFpStart;
-//    PSTOP               m_oFpStop;
-//    PGETSIGNALFORMAT    m_oFpGetSignalFormat;
-//    PSETSIGNALBUFFER    m_oFpSetSignalBuffer;
-//    PGETSAMPLES         m_oFpGetSamples;
-//    PGETBUFFERINFO      m_oFpGetBufferInfo;
-//    PFREE               m_oFpFree;
-//    PLIBRARYINIT        m_oFpLibraryInit;
-//    PLIBRARYEXIT        m_oFpLibraryExit;
-//    PGETDEVICELIST      m_oFpGetDeviceList;
-//    PGETFRONTENDINFO    m_oFpGetFrontEndInfo;
-//    PSETREFCALCULATION  m_oFpSetRefCalculation;
-//    PSETMEASURINGMODE   m_oFpSetMeasuringMode;
-//    PGETERRORCODE       m_oFpGetErrorCode;
 };
 
 } // NAMESPACE

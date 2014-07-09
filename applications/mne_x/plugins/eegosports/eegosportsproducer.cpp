@@ -130,7 +130,9 @@ void EEGoSportsProducer::stop()
 
 void EEGoSportsProducer::run()
 {
+    cout << "1" << endl;
     MatrixXf matRawBuffer(m_pEEGoSports->m_iNumberOfChannels, m_pEEGoSports->m_iSamplesPerBlock);
+    cout << "2" << endl;
 
     while(m_bIsRunning)
     {
