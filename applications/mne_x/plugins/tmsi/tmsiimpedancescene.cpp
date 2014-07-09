@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
-* @file     tmsiproducer.cpp
+* @file     tmsiimpedancescene.h
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     September, 2013
+* @date     June, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the TMSIProducer class.
+* @brief    Contains the implementation of the TMSIImpedanceScene class.
 *
 */
 
@@ -39,11 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "tmsiproducer.h"
-#include "tmsi.h"
-#include "tmsidriver.h"
-
-#include <QDebug>
+#include "tmsiimpedancescene.h"
 
 
 //*************************************************************************************************************
@@ -52,6 +48,7 @@
 //=============================================================================================================
 
 using namespace TMSIPlugin;
+using namespace std;
 
 
 //*************************************************************************************************************
@@ -59,88 +56,70 @@ using namespace TMSIPlugin;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-TMSIProducer::TMSIProducer(TMSI* pTMSI)
-: m_pTMSI(pTMSI)
-, m_pTMSIDriver(new TMSIDriver(this))
-, m_bIsRunning(true)
+TMSIImpedanceScene::TMSIImpedanceScene(QGraphicsView* view, QObject* parent)
+: QGraphicsScene(parent)
+, m_bRightMouseKeyPressed(false)
+, m_qvView(view)
 {
-}
 
+}
 
 //*************************************************************************************************************
 
-TMSIProducer::~TMSIProducer()
+void TMSIImpedanceScene::mousePressEvent(QGraphicsSceneMouseEvent* event)
 {
-    //cout << "TMSIProducer::~TMSIProducer()" << endl;
-}
+    if(event->button() == Qt::RightButton)
+        m_bRightMouseKeyPressed = true;
 
+    QGraphicsScene::mousePressEvent(event);
+}
 
 //*************************************************************************************************************
 
-void TMSIProducer::start(int iNumberOfChannels,
-                     int iSamplingFrequency,
-                     int iSamplesPerBlock,
-                     bool bUseChExponent,
-                     bool bUseUnitGain,
-                     bool bUseUnitOffset,
-                     bool bWriteDriverDebugToFile,
-                     QString sOutputFilePath,
-                     bool bUseCommonAverage,
-                     bool bMeasureImpedance)
+void TMSIImpedanceScene::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
 {
-    //Initialise device
-    if(m_pTMSIDriver->initDevice(iNumberOfChannels,
-                              iSamplingFrequency,
-                              iSamplesPerBlock,
-                              bUseChExponent,
-                              bUseUnitGain,
-                              bUseUnitOffset,
-                              bWriteDriverDebugToFile,
-                              sOutputFilePath,
-                              bUseCommonAverage,
-                              bMeasureImpedance))
+    if(m_bRightMouseKeyPressed)
     {
-        m_bIsRunning = true;
-        QThread::start();
-    }
-    else
-        m_bIsRunning = false;
-}
+        if(m_mousePosition.x()-event->scenePos().x() > 0) // user moved mouse to the left while pressing the right mouse key
+            scaleElectrodePositions(0.99);
 
-
-//*************************************************************************************************************
-
-void TMSIProducer::stop()
-{
-    //Wait until this thread (TMSIProducer) is stopped
-    m_bIsRunning = false;
-
-    //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the push function (acquire statement)
-    m_pTMSI->m_pRawMatrixBuffer_In->releaseFromPush();
-
-    while(this->isRunning())
-        m_bIsRunning = false;
-
-    //Unitialise device only after the thread stopped
-    m_pTMSIDriver->uninitDevice();
-}
-
-
-//*************************************************************************************************************
-
-void TMSIProducer::run()
-{
-    MatrixXf matRawBuffer(m_pTMSI->m_iNumberOfChannels, m_pTMSI->m_iSamplesPerBlock);
-
-    while(m_bIsRunning)
-    {
-        //std::cout<<"TMSIProducer::run()"<<std::endl;
-        //Get the TMSi EEG data out of the device buffer and write received data to circular buffer
-        if(m_pTMSIDriver->getSampleMatrixValue(matRawBuffer))
-            m_pTMSI->m_pRawMatrixBuffer_In->push(&matRawBuffer);
+        if(m_mousePosition.x()-event->scenePos().x() < 0) // user moved mouse to the right while pressing the right mouse key
+            scaleElectrodePositions(1.01);
     }
 
-    //std::cout<<"EXITING - TMSIProducer::run()"<<std::endl;
+    m_mousePosition = event->scenePos();
+
+    QGraphicsScene::mouseMoveEvent(event);
+}
+
+//*************************************************************************************************************
+
+void TMSIImpedanceScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
+{
+    if(event->button() == Qt::RightButton)
+        m_bRightMouseKeyPressed = false;
+
+    QGraphicsScene::mouseReleaseEvent(event);
+}
+
+//*************************************************************************************************************
+
+void TMSIImpedanceScene::scaleElectrodePositions(double scaleFactor)
+{
+    // Get scene items
+    QList< QGraphicsItem *> itemList = this->items();
+
+    // Update position
+    for(int i = 0; i<itemList.size(); i++)
+    {
+        TMSIElectrodeItem* item = (TMSIElectrodeItem *) itemList.at(i);
+
+        // Set both positions -> dunno why :-)
+        item->setPosition(item->getPosition()*scaleFactor);
+        item->setPos(item->pos()*scaleFactor);
+    }
+
+    this->update(this->sceneRect());
 }
 
 
