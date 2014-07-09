@@ -213,7 +213,7 @@ void MainWindow::OpenFile()
     }
     update();
     // TODO: Ergebnisanzeige
-    /*
+
     MatrixXd test(4, signalVector.rows());
 
     for(qint32 m = 0; m < 4; m++)
@@ -230,7 +230,7 @@ void MainWindow::OpenFile()
 
     ui->tbv_Results->update();
     ui->tbv_Results->resizeColumnsToContents();
-    */
+
 }
 
 qint32 MainWindow::ReadFiffFile(QString fileName)
@@ -689,13 +689,46 @@ void MainWindow::CalcAdaptivMP(int iterations, TruncationCriterion criterion)
 
     for(qint32 i = 0; i < t_iSize; i++)
     {
-        signal(i, 0) =  10 * t1[i] +  10 * t2[i] + 15 * t5[i] + 2 * cos(qreal(i) / 5.0);// + 10 * t8[i] + 10 * t7[i]+ 8 * t6[i] + 5 * t4[i] + 20 *t3[i]+ 11 * t0[i] + 20 * t9[i];
+        signal(i, 0) =/*  10 * t1[i] +  10 * t2[i] + 15 * t5[i] + 2 * */cos(qreal(i) / (25));// + 10 * t8[i] + 10 * t7[i]+ 8 * t6[i] + 5 * t4[i] + 20 *t3[i]+ 11 * t0[i] + 20 * t9[i];
         //signal(i, 0) = 100* t8[i];//2 * cos(qreal(i) / 5.0);
-            if(i == 149)
-                signal(i, 0) += 25;
+        //    if(i == 149)
+        //        signal(i, 0) += 25;
                //signal(i, 0) += 7 * (sin(qreal(i*i))/ 15.0);
     }
 
+    VectorXd autocorr = VectorXd::Zero(256);
+    VectorXd intgr = VectorXd::Zero(256);
+    //for(qint32 pp = 0; pp < 100; pp++)
+
+        for(qint32 j = 0; j < 256; j++)
+        {
+            // Inners Produkt des Signalteils mit dem Atom
+            qint32 g = 0;
+            qint32 gj = 0;
+            qint32 p = 0;
+
+            while (gj < 256)
+            {
+                if((g + j) == 256)
+                    p = j* (-1);
+                autocorr[j] += (signal((p+j), 0) * signal(g, 0));
+                if (j==0)
+                    intgr[j] = autocorr[j];
+                else
+                    intgr[j] = intgr[j-1] + autocorr[j];
+                //sum += tempList.at(g);
+                g++;
+                gj++;
+                p++;
+            }
+
+        }
+
+
+        Plot *aCorrPlot = new Plot(intgr);
+    //title.append("Acorr:");
+    aCorrPlot->setTitle("title");
+    aCorrPlot->show();
     //find  maximum of signal
     qreal maximum = 0;
 
@@ -782,7 +815,7 @@ void MainWindow::CalcAdaptivMP(int iterations, TruncationCriterion criterion)
         Plot *atPlot = new Plot(tmp);
         title.append(QString("Atom: %1").arg(i));
         atPlot->setTitle(title);
-        //atPlot->show();
+        atPlot->show();
     }
 
     maximum = 0;
