@@ -234,7 +234,7 @@ bool EventModel::loadEventData(QFile& qFile)
     // Read events
     MatrixXi events;
 
-    if(!MNE::read_events(t_EventFile, events))
+    if(!MNE::read_events(qFile, events))
     {
         qDebug() << "Error while read events.";
         return false;
@@ -243,13 +243,40 @@ bool EventModel::loadEventData(QFile& qFile)
     qDebug() << QString("Events read from %1").arg(qFile.fileName());
 
     //set loaded fiff event data
-    m_data.append(t_data);
-    m_procData.append(MatrixXdR::Zero(t_data.rows(),t_data.cols()));
-    m_times.append(t_times);
+//    m_data.append(t_data);
+//    m_procData.append(MatrixXdR::Zero(t_data.rows(),t_data.cols()));
+//    m_times.append(t_times);
 
-    loadFiffInfos();
-    genStdFilterOps();
+//    loadFiffInfos();
+//    genStdFilterOps();
 
     endResetModel();
     return true;
+}
+
+
+//*************************************************************************************************************
+
+void EventModel::clearModel()
+{
+//    //FiffIO object
+//    m_pfiffIO.clear();
+//    m_fiffInfo.clear();
+//    m_chInfolist.clear();
+
+//    //data model structure
+//    m_data.clear();
+//    m_procData.clear();
+//    m_times.clear();
+
+//    //MNEOperators
+//    m_assignedOperators.clear();
+
+//    //View parameters
+//    m_iAbsFiffCursor = 0;
+//    m_iCurAbsScrollPos = 0;
+//    m_bStartReached = false;
+//    m_bEndReached = false;
+
+//    qDebug("RawModel cleared.");
 }

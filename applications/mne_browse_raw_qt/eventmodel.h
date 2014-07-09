@@ -135,6 +135,13 @@ public:
     * @param p_IODevice fiff data event file to write
     */
     bool loadEventData(QFile& qFile);
+
+private:
+    //=========================================================================================================
+    /**
+    * clearModel clears all model's members
+    */
+    void clearModel();
 };
 
 } // NAMESPACE
