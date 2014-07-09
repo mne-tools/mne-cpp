@@ -117,7 +117,7 @@ void EEGoSports::init()
 
     //default values used by the setupGUI class must be set here
     m_iSamplingFreq = 1024;
-    m_iNumberOfChannels = 138;
+    m_iNumberOfChannels = 64;
     m_iSamplesPerBlock = 16;
     m_iTriggerInterval = 5000;
 
@@ -567,7 +567,7 @@ void EEGoSports::run()
             {
                 QtConcurrent::run(Beep, 450, 700);
                 //Set trigger in received data samples - just for one sample, so that this event is easy to detect
-                matValue(136, m_iSamplesPerBlock-1) = 252;
+                //matValue(136, m_iSamplesPerBlock-1) = 252;
                 m_qTimerTrigger.restart();
             }
 
@@ -575,7 +575,7 @@ void EEGoSports::run()
             if(m_bWriteToFile)
                 m_pOutfid->write_raw_buffer(matValue.cast<double>(), m_cals);
 
-            // TODO: Use preprocessing if wanted by the user
+            // Use preprocessing if wanted by the user
             if(m_bUseFiltering)
             {
                 MatrixXf temp = matValue;

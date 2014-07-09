@@ -60,28 +60,27 @@ EEGoSportsDriver::EEGoSportsDriver(EEGoSportsProducer* pEEGoSportsProducer)
 : m_pEEGoSportsProducer(pEEGoSportsProducer)
 , m_bDllLoaded(true)
 , m_bInitDeviceSuccess(false)
-, m_uiNumberOfChannels(138)
+, m_uiNumberOfChannels(64)
 , m_uiSamplingFrequency(1024)
-, m_uiSamplesPerBlock(1)
+, m_uiSamplesPerBlock(16)
 , m_bUseChExponent(false)
 , m_bUseUnitGain(false)
 , m_bUseUnitOffset(false)
 , m_bWriteDriverDebugToFile(false)
-, m_sOutputFilePath("/mne_x_plugins/resources/tmsi")
+, m_sOutputFilePath("/mne_x_plugins/resources/eegosports")
 , m_bUseCommonAverage(false)
 , m_bMeasureImpedances(false)
 {
     //Initialise NULL pointers
     m_oLibHandle = NULL ;
-    m_HandleMaster = NULL;
     m_lSignalBuffer = NULL;
 
     //Check which driver dll to take: TMSiSDK.dll oder TMSiSDK32bit.dll
-#ifdef TAKE_EEGOSPORTSSDK_DLL //32 bit system & 64 bit (with 64 bit compiler)
-        m_oLibHandle = ::LoadLibrary(L"C:\\Windows\\System32\\eego.dll");
-#elif TAKE_EEGOSPORTSSDK_32_DLL //64 bit (with 32 bit compiler)
-        m_oLibHandle = ::LoadLibrary(L"C:\\Windows\\SysWOW64\\eego.dll");
-#endif
+    #ifdef TAKE_EEGOSPORTSSDK_DLL //32 bit system & 64 bit (with 64 bit compiler)
+            m_oLibHandle = ::LoadLibrary(L"C:\\Windows\\System32\\eego.dll");
+    #elif TAKE_EEGOSPORTSSDK_32_DLL //64 bit (with 32 bit compiler)
+            m_oLibHandle = ::LoadLibrary(L"C:\\Windows\\SysWOW64\\eego.dll");
+    #endif
 
     //If dll can't be open return
     if( m_oLibHandle == NULL)
@@ -93,37 +92,6 @@ EEGoSportsDriver::EEGoSportsDriver(EEGoSportsProducer* pEEGoSportsProducer)
 
     //Load DLL methods for initializing the driver
     __load_dll_func__(m_oFpCreateAmplifier, CREATEAMPLIFIER, "CreateAmplifier");
-
-    if(m_oFpCreateAmplifier == NULL)
-    {
-        cout << "Plugin EEGoSports - ERROR - Couldn't load Method: CreateAmplifier from DLL" << endl;
-        return;
-    }
-
-    HRESULT hres = (*m_oFpCreateAmplifier)(&m_pAmplifier);
-    if(FAILED(hres) || !m_pAmplifier)
-    {
-        cout << "Plugin EEGoSports - ERROR - Couldn't create amplifier! HRESULT: " << hres << endl;
-        return;
-    }
-
-//    __load_dll_func__(m_oFpOpen, CREATEAMPLIFIER, "CreateAmplifier");
-//    __load_dll_func__(m_oFpOpen, POPEN, "Open");
-//    __load_dll_func__(m_oFpClose, PCLOSE, "Close");
-//    __load_dll_func__(m_oFpStart, PSTART, "Start");
-//    __load_dll_func__(m_oFpStop, PSTOP, "Stop");
-//    __load_dll_func__(m_oFpGetSignalFormat, PGETSIGNALFORMAT, "GetSignalFormat");
-//    __load_dll_func__(m_oFpSetSignalBuffer, PSETSIGNALBUFFER, "SetSignalBuffer");
-//    __load_dll_func__(m_oFpGetSamples, PGETSAMPLES, "GetSamples");
-//    __load_dll_func__(m_oFpGetBufferInfo, PGETBUFFERINFO, "GetBufferInfo");
-//    __load_dll_func__(m_oFpFree, PFREE, "Free");
-//    __load_dll_func__(m_oFpLibraryInit, PLIBRARYINIT, "LibraryInit");
-//    __load_dll_func__(m_oFpLibraryExit, PLIBRARYEXIT, "LibraryExit");
-//    __load_dll_func__(m_oFpGetDeviceList, PGETDEVICELIST, "GetDeviceList");
-//    __load_dll_func__(m_oFpGetFrontEndInfo, PGETFRONTENDINFO, "GetFrontEndInfo");
-//    __load_dll_func__(m_oFpSetRefCalculation, PSETREFCALCULATION, "SetRefCalculation");
-//    __load_dll_func__(m_oFpSetMeasuringMode, PSETMEASURINGMODE, "SetMeasuringMode");
-//    __load_dll_func__(m_oFpGetErrorCode, PGETERRORCODE, "GetErrorCode");
 
     cout << "Plugin EEGoSports - INFO - EEGoSportsDriver() - Successfully loaded all DLL functions" << endl;
 }
@@ -168,7 +136,15 @@ bool EEGoSportsDriver::initDevice(int iNumberOfChannels,
 
     //Open file to write to
     if(m_bWriteDriverDebugToFile)
-        m_outputFileStream.open("mne_x_plugins/resources/tmsi/TMSi_Driver_Debug.txt", ios::trunc); //ios::trunc deletes old file data
+        m_outputFileStream.open("mne_x_plugins/resources/eegosports/EEGoSports_Driver_Debug.txt", ios::trunc); //ios::trunc deletes old file data
+
+    // Get device handler
+    HRESULT hres = (*m_oFpCreateAmplifier)(&m_pAmplifier);
+    if(FAILED(hres) || !m_pAmplifier)
+    {
+        cout << "Plugin EEGoSports - ERROR - Couldn't create amplifier! HRESULT: " << hres << endl;
+        return false;
+    }
 
     // Initialise device
     HRESULT hr;
@@ -200,6 +176,8 @@ bool EEGoSportsDriver::initDevice(int iNumberOfChannels,
             szDevString = szName;
             break;
         }
+
+        delete szName;
     }
 
     if( !szDevString )
@@ -271,8 +249,6 @@ bool EEGoSportsDriver::initDevice(int iNumberOfChannels,
 
     cout<<"Firmware version is: "<<firmwareVersion<<endl;
 
-    m_bInitDeviceSuccess = true;
-
     // Start the sampling
     if(!m_pAmplifier)
         return false;
@@ -291,6 +267,10 @@ bool EEGoSportsDriver::initDevice(int iNumberOfChannels,
         return false;
 
     Sleep(100);
+
+    cout << "Plugin EEGoSports - INFO - initDevice() - Successfully initialised the device" << endl;
+
+    m_bInitDeviceSuccess = true;
 
     return true;
 }
@@ -332,11 +312,9 @@ bool EEGoSportsDriver::uninitDevice()
 
     m_pAmplifier->Disconnect();
     m_pAmplifier->Release();
-    m_pAmplifier = NULL;
 
     //Reset to NULL pointers
-    m_oLibHandle = NULL ;
-    m_HandleMaster = NULL;
+    m_pAmplifier = NULL;
     m_lSignalBuffer = NULL;
 
     cout << "Plugin EEGoSports - INFO - uninitDevice() - Successfully uninitialised the device" << endl;
@@ -358,6 +336,8 @@ bool EEGoSportsDriver::uninitDevice()
         cout << "Plugin EEGoSports - ERROR - getSampleMatrixValue() - Cannot start to get samples from device because device was not initialised correctly" << endl;
         return false;
     }
+
+    sampleMatrix = MatrixXf::Zero(m_uiNumberOfChannels, m_uiSamplesPerBlock);
 
 //    sampleMatrix.setZero(); // Clear matrix - set all elements to zero
 //    uint iSamplesWrittenToMatrix = 0;
