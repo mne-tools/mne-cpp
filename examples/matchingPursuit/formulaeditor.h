@@ -47,7 +47,7 @@ public:
     ~Formulaeditor();
     QString GetFormula();
     void StripFormula(QString& strFormula);
-    void SetFormula(QString Formula);
+    void set_formula(QString Formula);
     void SetFunctConst(int index, double val);
     double Calculation(QString strFormula, qreal xValue, bool strip  =true);
     
