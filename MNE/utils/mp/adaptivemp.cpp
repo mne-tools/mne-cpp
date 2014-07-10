@@ -59,11 +59,12 @@ QList<GaborAtom> adaptiveMP::MatchingPursuit (MatrixXd signal,qint32 max_it,qrea
         //variables for dyadic sampling
         qreal s = 1;                            //scale
         qint32 j = 1;
-        qreal maxScalarProduct = 0;             //inner product for choosing the best matching atom
+        qreal maxScalarProduct = 0;             //inner product for choosing the best matching atom        
         qreal k = 0;                            //for modulation 2*pi*k/N
         qint32 p = floor(sampleCount / 2);      //translation
         GaborAtom *gaborAtom = new GaborAtom();
         gaborAtom->SampleCount = sampleCount;
+        gaborAtom->energy = 0;
         qreal phase = 0;
 
         while(s < sampleCount)
@@ -387,8 +388,11 @@ QList<GaborAtom> adaptiveMP::MatchingPursuit (MatrixXd signal,qint32 max_it,qrea
             for(qint32 j = 0; j < gaborAtom->SampleCount; j++)
             {
                 residuum(j,chn) -= gaborAtom->MaxScalarProduct * bestMatch[j];
-                residuumEnergy[chn] -= (gaborAtom->MaxScalarProduct * bestMatch[j]) * (gaborAtom->MaxScalarProduct * bestMatch[j]);
+                gaborAtom->energy += (gaborAtom->MaxScalarProduct * bestMatch[j]) * (gaborAtom->MaxScalarProduct * bestMatch[j]);
             }
+
+            residuumEnergy[chn] -= gaborAtom->energy;//(gaborAtom->MaxScalarProduct * bestMatch[j]) * (gaborAtom->MaxScalarProduct * bestMatch[j]);
+
 
             gaborAtom->Residuum = residuum;
             atomList.append(*gaborAtom);
