@@ -72,7 +72,7 @@ private:
     //VectorXd mpCalc(QFile& dictionary, VectorXd signalSamples, qint32 iterationsCount);
     qint32 ReadFiffFile(QString fileName);
     void ReadMatlabFile(QString fileName);
-    void CalcAdaptivMP(int iterations, TruncationCriterion criterion);
+    void CalcAdaptivMP(MatrixXd signal, int iterations, TruncationCriterion criterion);
 };
 
 //*************************************************************************************************************
@@ -84,7 +84,7 @@ class GraphWindow : public QWidget
 protected:
    void paintEvent(QPaintEvent *event);
 public:
-   void PaintSignal(VectorXd signalSamples, VectorXd residuumSamples, QColor color, QSize windowSize);
+   void PaintSignal(MatrixXd signalMatrix, VectorXd residuumSamples, QColor color, QSize windowSize);
 
 };
 
@@ -97,7 +97,7 @@ class AtomSumWindow : public QWidget
 protected:
    void paintEvent(QPaintEvent *event);
 public:
-   void PaintAtomSum(VectorXd signalSamples, QSize windowSize);
+   void PaintAtomSum(VectorXd signalSamples, QSize windowSize, qreal signalMaximum, qreal signalNegativeMaximum);
 
 };
 
@@ -110,7 +110,7 @@ class ResiduumWindow : public QWidget //, QTableWidgetItem
   protected:
     void paintEvent(QPaintEvent *event);
 public:
-   void PaintResiduum(VectorXd signalSamples, QSize windowSize);
+   void PaintResiduum(VectorXd signalSamples, QSize windowSize, qreal maxPos, qreal maxNeg);
 
 
 };
