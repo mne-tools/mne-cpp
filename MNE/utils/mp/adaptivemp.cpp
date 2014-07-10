@@ -27,7 +27,7 @@ adaptiveMP::adaptiveMP()
 //*************************************************************************************************************
 
 //MP Algorithm of M. Gratkowski
-QList<GaborAtom> adaptiveMP::MatchingPursuit (MatrixXd signal,qint32 max_it,qreal epsilon)
+QList<GaborAtom> adaptiveMP::MatchingPursuit (MatrixXd signal, qint32 max_it, qreal epsilon)
 {
     QList<GaborAtom> atomList;
     Eigen::FFT<double> fft;

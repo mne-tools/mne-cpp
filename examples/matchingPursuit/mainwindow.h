@@ -52,12 +52,13 @@ public:
 private slots:
 
     void on_btt_Calc_clicked();
-    void on_btt_Close_clicked();
     void on_actionW_rterbucheditor_triggered();
     void on_actionAtomformeleditor_triggered();
     void on_actionErweiterter_W_rterbucheditor_triggered();
     void on_actionNeu_triggered();
     void on_btt_OpenSignal_clicked();
+
+    void on_tbv_Results_cellClicked(int row, int column);
 
 private:
 
