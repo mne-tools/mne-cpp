@@ -66,13 +66,17 @@ enum TruncationCriterion
     Both
 };
 
-qreal sollEnergie = 0;
-qreal signalEnergie = 0;
+qreal _sollEnergie = 0;
+qreal _signalEnergie = 0;
+qreal _signalMaximum = 0;
+qreal _signalNegativeScale = 0;
+qreal _maxPos = 0;
+qreal _maxNeg = 0;
 
-VectorXd signalVector;
-VectorXd globalAtomList;
-VectorXd residuumVector;
-VectorXd atomSumVector;
+MatrixXd _signalMatrix(0, 0);
+VectorXd _globalAtomList;
+VectorXd _residuumVector;
+VectorXd _atomSumVector;
 QList<GaborAtom> myAtomList;
 
 QList<QStringList> globalResultAtomList;
@@ -213,13 +217,12 @@ void MainWindow::open_file()
     else
         ReadMatlabFile(fileName);
     if(_datas.cols() != 0)
-    {
-        signalVector = VectorXd::Zero(4000);
-        for(qint32 i = 0; i < 4000; i++)
-        {
-            signalVector[i] = _datas(0, i);
-            std::cout << signalVector[i] << "\n";
-        }
+    {       
+        // TODO: geeigneten Signalausschnitt suchen
+        _signalMatrix.resize(2000,2);
+        for(qint32 channels = 0; channels < 2; channels++)
+            for(qint32 i = 0; i < 2000; i++)
+                _signalMatrix(i, channels) = _datas(channels, i);
     }
     update();   
 }
@@ -341,7 +344,7 @@ void MainWindow::ReadMatlabFile(QString fileName)
         strList.append(file.readLine(0).constData());
     }
     int rowNumber = 0;
-    signalVector = VectorXd::Zero(strList.length());
+    _signalMatrix.resize(strList.length(), 1);
     file.close();
     file.open(QIODevice::ReadOnly);
     while(!file.atEnd())
@@ -357,15 +360,15 @@ void MainWindow::ReadMatlabFile(QString fileName)
             errorSignal);
             return;
         }
-        signalVector[rowNumber] = value;
+        _signalMatrix(rowNumber, 0) = value;
         rowNumber++;
     }
 
 
     file.close();
-    signalEnergie = 0;
-    for(qint32 i = 0; i < signalVector.rows(); i++)
-        signalEnergie += (signalVector[i] * signalVector[i]);
+    _signalEnergie = 0;
+    for(qint32 i = 0; i < _signalMatrix.rows(); i++)
+        _signalEnergie += (_signalMatrix(i, 0) * _signalMatrix(i, 0));
 }
 
 //*************************************************************************************************************************************
@@ -373,17 +376,17 @@ void MainWindow::ReadMatlabFile(QString fileName)
 
 void GraphWindow::paintEvent(QPaintEvent* event)
 {
-    PaintSignal(signalVector, residuumVector, Qt::red, this->size());
+    PaintSignal(_signalMatrix, _residuumVector, Qt::red, this->size());
 }
 
-void GraphWindow::PaintSignal(VectorXd signalSamples, VectorXd residuumSamples, QColor color, QSize windowSize)
+void GraphWindow::PaintSignal(MatrixXd signalMatrix, VectorXd residuumSamples, QColor color, QSize windowSize)
 {
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing, true);
     painter.fillRect(0,0,windowSize.width(),windowSize.height(),QBrush(Qt::white));
 
 
-    if(signalSamples.rows() > 0)
+    if(signalMatrix.rows() > 0)
     {
         qint32 borderMarginHeigth = 15;     // reduce paintspace in GraphWindow of borderMargin pixels
         qint32 borderMarginWidth = 5;       // reduce paintspace in GraphWindow of borderMargin pixels
@@ -394,29 +397,21 @@ void GraphWindow::PaintSignal(VectorXd signalSamples, VectorXd residuumSamples, 
         qint32 drawFactor = 0;              // shift factor for decimal places (linear)
         qint32 startDrawFactor = 1;         // shift factor for decimal places (exponential-base 10)
         qint32 decimalPlace = 0;            // decimal places for axis title
-        QPolygonF polygons;                 // points for drwing the signal
-        QList<qreal> internListValue;       // intern representation of y-axis values of the signal (for painting only)
-        QPolygonF polygonsResiduum;
-
-        internListValue.clear();
-        while(i < signalSamples.rows())
-        {
-                internListValue.append(signalSamples[i]);
-                i++;
-        }
+        QList<QPolygonF> polygons;          // points for drwing the signal
+        MatrixXd internSignalMatrix = signalMatrix; // intern representation of y-axis values of the signal (for painting only)
 
         // paint window white
         painter.fillRect(0,0,windowSize.width(),windowSize.height(),QBrush(Qt::white));
 
         // find min and max of signal
         i = 0;
-        while(i < signalSamples.rows())
+        while(i < signalMatrix.rows())
         {
-            if(signalSamples[i] > maxPos)
-                maxPos = signalSamples[i];
+            if(signalMatrix(i, 0) > maxPos)
+                maxPos = signalMatrix(i, 0);
 
-            if(signalSamples[i] < maxNeg )
-                maxNeg = signalSamples[i];
+            if(signalMatrix(i, 0) < maxNeg )
+                maxNeg = signalMatrix(i, 0);
             i++;
         }
 
@@ -434,18 +429,16 @@ void GraphWindow::PaintSignal(VectorXd signalSamples, VectorXd residuumSamples, 
                 }
                 if(fabs(absMin) >= 1) break;
             }
-        }
+        }        
 
         // shift of decimal places with drawFactor for all signalpoints and save to intern list
         while(drawFactor > 0)
         {
-            i = 0;
-            while(i < signalSamples.rows())
-            {
-                qreal replaceValue = internListValue.at(i) * 10;
-                internListValue.replace(i, replaceValue);
-                i++;
-            }
+
+            for(qint32 channel = 0; channel < signalMatrix.cols(); channel++)
+                for(qint32 sample = 0; sample < signalMatrix.rows(); sample++)
+                    internSignalMatrix(sample, channel) *= 10;
+
             startDrawFactor = startDrawFactor * 10;
             decimalPlace++;
             maxPos = maxPos * 10;
@@ -453,17 +446,21 @@ void GraphWindow::PaintSignal(VectorXd signalSamples, VectorXd residuumSamples, 
             drawFactor--;
         }
 
+        _maxPos = maxPos;       // to globe MAx and Minvalue;
+        _maxNeg = maxNeg;
+
         qreal maxmax;
         // absolute signalheight
         if(maxNeg <= 0)     maxmax = maxPos - maxNeg;
         else  maxmax = maxPos + maxNeg;
 
+        _signalMaximum = maxmax;
 
         // scale axis title
-        qreal scaleXText = (qreal)signalSamples.rows() / (qreal)20;     // divide signallegnth
+        qreal scaleXText = (qreal)signalMatrix.rows() / (qreal)20;     // divide signallegnth
         qreal scaleYText = (qreal)maxmax / (qreal)10;
         qint32 negScale =  floor((maxNeg * 10 / maxmax)+0.5);
-
+        _signalNegativeScale = negScale;
         //find lenght of text of y-axis for shift of y-axis to the right (so the text will stay readable and is not painted into the y-axis
         qint32 k = 0;
         qint32 negScale2 = negScale;
@@ -485,7 +482,7 @@ void GraphWindow::PaintSignal(VectorXd signalSamples, VectorXd residuumSamples, 
         while((windowSize.width() - maxStrLenght -borderMarginWidth) % 20)borderMarginWidth++;
 
         // scale signal
-        qreal scaleX = ((qreal)(windowSize.width() - maxStrLenght - borderMarginWidth))/ (qreal)signalSamples.rows();
+        qreal scaleX = ((qreal)(windowSize.width() - maxStrLenght - borderMarginWidth))/ (qreal)signalMatrix.rows();
         qreal scaleY = (qreal)(windowSize.height() - borderMarginHeigth) / (qreal)maxmax;
 
         //scale axis
@@ -507,14 +504,16 @@ void GraphWindow::PaintSignal(VectorXd signalSamples, VectorXd residuumSamples, 
             if(negScale == 0)                                                                                       // x-Achse erreicht (y-Wert = 0)
             {
                 // append scaled signalpoints
-                qint32 h = 0;
-                while(h < signalSamples.rows())
+                for(qint32 channel = 0; channel < signalMatrix.cols(); channel++)       // over all Channels
                 {
-                    if(residuumSamples.rows() == signalSamples.rows())
-                        polygonsResiduum.append(QPointF((h * scaleX) + maxStrLenght,  -((residuumSamples[i] * scaleY + ((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2))));
-
-                    polygons.append(QPointF((h * scaleX) + maxStrLenght,  -((internListValue.at(h) * scaleY + ((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2))));
-                    h++;
+                    QPolygonF poly;
+                    qint32 h = 0;
+                    while(h < signalMatrix.rows())
+                    {
+                        poly.append(QPointF((h * scaleX) + maxStrLenght,  -((internSignalMatrix(h, channel) * scaleY + ((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2))));
+                        h++;
+                    }
+                    polygons.append(poly);
                 }
 
                 // paint x-axis
@@ -538,12 +537,11 @@ void GraphWindow::PaintSignal(VectorXd signalSamples, VectorXd residuumSamples, 
 
         painter.drawLine(maxStrLenght, 2, maxStrLenght, windowSize.height() - 2);     // paint y-axis
 
-        painter.drawPolyline(polygons);                  // paint signal
-        painter.setPen(color);
-        if(residuumSamples.rows() == residuumSamples.rows())
+        for(qint32 channel = 0; channel < signalMatrix.cols(); channel++)             // Butterfly
         {
-             painter.setPen(color);
-             painter.drawPolyline(polygonsResiduum);         // paint residuum
+            if(channel == 1)
+                painter.setPen(color);
+            painter.drawPolyline(polygons.at(channel));                               // paint signal
         }
     }
     painter.end();    
@@ -554,10 +552,10 @@ void GraphWindow::PaintSignal(VectorXd signalSamples, VectorXd residuumSamples, 
 
 void AtomSumWindow::paintEvent(QPaintEvent* event)
 {
-   PaintAtomSum(atomSumVector, this->size());
+   PaintAtomSum(_atomSumVector, this->size(), _signalMaximum, _signalNegativeScale);
 }
 
-void AtomSumWindow::PaintAtomSum(VectorXd signalSamples, QSize windowSize)
+void AtomSumWindow::PaintAtomSum(VectorXd signalSamples, QSize windowSize, qreal signalMaximum, qreal signalNegativeMaximum)
 {
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing, true);
@@ -577,7 +575,6 @@ void AtomSumWindow::PaintAtomSum(VectorXd signalSamples, QSize windowSize)
         qint32 decimalPlace = 0;            // decimal places for axis title
         QPolygonF polygons;                 // points for drwing the signal
         QList<qreal> internListValue;       // intern representation of y-axis values of the signal (for painting only)
-        QPolygonF polygonsResiduum;
 
         internListValue.clear();
         while(i < signalSamples.rows())
@@ -588,7 +585,7 @@ void AtomSumWindow::PaintAtomSum(VectorXd signalSamples, QSize windowSize)
 
         // paint window white
         painter.fillRect(0,0,windowSize.width(),windowSize.height(),QBrush(Qt::white));
-
+        /*
         // find min and max of signal
         i = 0;
         while(i < signalSamples.rows())
@@ -599,7 +596,8 @@ void AtomSumWindow::PaintAtomSum(VectorXd signalSamples, QSize windowSize)
             if(signalSamples[i] < maxNeg )
                 maxNeg = signalSamples[i];
             i++;
-        }
+        }*/
+
 
         if(maxPos > fabs(maxNeg)) absMin = maxNeg;        // find absolute minimum of (maxPos, maxNeg)
         else     absMin = maxPos;
@@ -633,21 +631,15 @@ void AtomSumWindow::PaintAtomSum(VectorXd signalSamples, QSize windowSize)
             maxNeg = maxNeg * 10;
             drawFactor--;
         }
-
-        qreal maxmax;
-        // absolute signalheight
-        if(maxNeg <= 0)     maxmax = maxPos - maxNeg;
-        else  maxmax = maxPos + maxNeg;
-
-
+        maxPos = _maxPos;
+        maxNeg = _maxNeg;
         // scale axis title
         qreal scaleXText = (qreal)signalSamples.rows() / (qreal)20;     // divide signallegnth
-        qreal scaleYText = (qreal)maxmax / (qreal)10;
-        qint32 negScale =  floor((maxNeg * 10 / maxmax)+0.5);
+        qreal scaleYText = (qreal)signalMaximum / (qreal)10;
 
         //find lenght of text of y-axis for shift of y-axis to the right (so the text will stay readable and is not painted into the y-axis
         qint32 k = 0;
-        qint32 negScale2 = negScale;
+        qint32 negScale2 = maxNeg;
         qint32 maxStrLenght = 0;
         while(k < 16)
         {
@@ -667,7 +659,7 @@ void AtomSumWindow::PaintAtomSum(VectorXd signalSamples, QSize windowSize)
 
         // scale signal
         qreal scaleX = ((qreal)(windowSize.width() - maxStrLenght - borderMarginWidth))/ (qreal)signalSamples.rows();
-        qreal scaleY = (qreal)(windowSize.height() - borderMarginHeigth) / (qreal)maxmax;
+        qreal scaleY = (qreal)(windowSize.height() - borderMarginHeigth) / (qreal)signalMaximum;
 
         //scale axis
         qreal scaleXAchse = (qreal)(windowSize.width() - maxStrLenght - borderMarginWidth) / (qreal)20;
@@ -682,10 +674,10 @@ void AtomSumWindow::PaintAtomSum(VectorXd signalSamples, QSize windowSize)
         {
             QString string;
 
-            qreal scaledYText = negScale * scaleYText / (qreal)startDrawFactor;                                    // Skalenwert Y-Achse
+            qreal scaledYText = signalNegativeMaximum * scaleYText / (qreal)startDrawFactor;                                    // Skalenwert Y-Achse
             string  = QString::number(scaledYText, 'f', decimalPlace + 1);                                          // Skalenwert als String mit richtiger Nachkommastelle (Genauigkeit je nach Signalwertebereich)
 
-            if(negScale == 0)                                                                                       // x-Achse erreicht (y-Wert = 0)
+            if(signalNegativeMaximum == 0)                                                                                       // x-Achse erreicht (y-Wert = 0)
             {
                 // append scaled signalpoints
                 qint32 h = 0;
@@ -711,7 +703,7 @@ void AtomSumWindow::PaintAtomSum(VectorXd signalSamples, QSize windowSize)
             painter.drawText(3, -((i - 1) * scaleYAchse - windowSize.height()) - borderMarginHeigth/2 + 4, string);     // Skalenwert Y-Achse zeichen
             painter.drawLine(maxStrLenght - 2, -(((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2), maxStrLenght + 2, -(((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2));  // Anstriche Y-Achse
             i++;
-            negScale++;
+            signalNegativeMaximum++;
         }
 
         painter.drawLine(maxStrLenght, 2, maxStrLenght, windowSize.height() - 2);     // paint y-axis
@@ -829,10 +821,10 @@ void AtomSumWindow::PaintAtomSum(VectorXd signalSamples, QSize windowSize)
 
 void ResiduumWindow::paintEvent(QPaintEvent* event)
 {
-   PaintResiduum(residuumVector, this->size());
+   PaintResiduum(_residuumVector, this->size(), _signalMaximum, _signalNegativeScale);
 }
 
-void ResiduumWindow::PaintResiduum(VectorXd signalSamples, QSize windowSize)
+void ResiduumWindow::PaintResiduum(VectorXd signalSamples, QSize windowSize, qreal signalMaximum, qreal signalNegativeMaximum)
 {
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing, true);
@@ -844,15 +836,12 @@ void ResiduumWindow::PaintResiduum(VectorXd signalSamples, QSize windowSize)
         qint32 borderMarginHeigth = 15;     // reduce paintspace in GraphWindow of borderMargin pixels
         qint32 borderMarginWidth = 5;       // reduce paintspace in GraphWindow of borderMargin pixels
         qint32 i = 0;
-        qreal maxNeg = 0;                   // smalest signalvalue
-        qreal maxPos = 0;                   // highest signalvalue
-        qreal absMin = 0;                   // minimum of abs(maxNeg and maxPos)
-        qint32 drawFactor = 0;              // shift factor for decimal places (linear)
+        qreal maxNeg = _maxNeg;             // smalest signalvalue vom AusgangsSignal
+        qreal maxPos = _maxPos;             // highest signalvalue vom AusgangsSignal
         qint32 startDrawFactor = 1;         // shift factor for decimal places (exponential-base 10)
         qint32 decimalPlace = 0;            // decimal places for axis title
         QPolygonF polygons;                 // points for drwing the signal
         QList<qreal> internListValue;       // intern representation of y-axis values of the signal (for painting only)
-        QPolygonF polygonsResiduum;
 
         internListValue.clear();
         while(i < signalSamples.rows())
@@ -860,76 +849,23 @@ void ResiduumWindow::PaintResiduum(VectorXd signalSamples, QSize windowSize)
                 internListValue.append(signalSamples[i]);
                 i++;
         }
-
         // paint window white
         painter.fillRect(0,0,windowSize.width(),windowSize.height(),QBrush(Qt::white));
 
-        // find min and max of signal
-        i = 0;
-        while(i < signalSamples.rows())
-        {
-            if(signalSamples[i] > maxPos)
-                maxPos = signalSamples[i];
-
-            if(signalSamples[i] < maxNeg )
-                maxNeg = signalSamples[i];
-            i++;
-        }
-
-        if(maxPos > fabs(maxNeg)) absMin = maxNeg;        // find absolute minimum of (maxPos, maxNeg)
-        else     absMin = maxPos;
-
-        if(absMin != 0)                                   // absMin must not be zero
-        {
-            while(true)                                   // shift factor for decimal places?
-            {
-                if(fabs(absMin) < 1)                      // if absMin > 1 , no shift of decimal places nescesary
-                {
-                    absMin = absMin * 10;
-                    drawFactor++;                         // shiftfactor counter
-                }
-                if(fabs(absMin) >= 1) break;
-            }
-        }
-
-        // shift of decimal places with drawFactor for all signalpoints and save to intern list
-        while(drawFactor > 0)
-        {
-            i = 0;
-            while(i < signalSamples.rows())
-            {
-                qreal replaceValue = internListValue.at(i) * 10;
-                internListValue.replace(i, replaceValue);
-                i++;
-            }
-            startDrawFactor = startDrawFactor * 10;
-            decimalPlace++;
-            maxPos = maxPos * 10;
-            maxNeg = maxNeg * 10;
-            drawFactor--;
-        }
-
-        qreal maxmax;
-        // absolute signalheight
-        if(maxNeg <= 0)     maxmax = maxPos - maxNeg;
-        else  maxmax = maxPos + maxNeg;
-
-
         // scale axis title
         qreal scaleXText = (qreal)signalSamples.rows() / (qreal)20;     // divide signallegnth
-        qreal scaleYText = (qreal)maxmax / (qreal)10;
-        qint32 negScale =  floor((maxNeg * 10 / maxmax)+0.5);
+        qreal scaleYText = (qreal)signalMaximum / (qreal)10;
 
         //find lenght of text of y-axis for shift of y-axis to the right (so the text will stay readable and is not painted into the y-axis
         qint32 k = 0;
-        qint32 negScale2 = negScale;
+        qint32 negScale2 = maxNeg;
         qint32 maxStrLenght = 0;
         while(k < 16)
         {
             QString string2;
 
-            qreal scaledYText = negScale2 * scaleYText / (qreal)startDrawFactor;                                     // Skalenwert Y-Achse
-            string2  = QString::number(scaledYText, 'f', decimalPlace + 1);                                          // Skalenwert als String mit richtiger Nachkommastelle (Genauigkeit je nach Signalwertebereich)
+            qreal scaledYText = negScale2 * scaleYText;                                     // Skalenwert Y-Achse
+            string2  = QString::number(scaledYText, 'f', decimalPlace + 1);                 // Skalenwert als String mit richtiger Nachkommastelle (Genauigkeit je nach Signalwertebereich)
 
             if(string2.length()>maxStrLenght) maxStrLenght = string2.length();
 
@@ -942,7 +878,7 @@ void ResiduumWindow::PaintResiduum(VectorXd signalSamples, QSize windowSize)
 
         // scale signal
         qreal scaleX = ((qreal)(windowSize.width() - maxStrLenght - borderMarginWidth))/ (qreal)signalSamples.rows();
-        qreal scaleY = (qreal)(windowSize.height() - borderMarginHeigth) / (qreal)maxmax;
+        qreal scaleY = (qreal)(windowSize.height() - borderMarginHeigth) / (qreal)signalMaximum;
 
         //scale axis
         qreal scaleXAchse = (qreal)(windowSize.width() - maxStrLenght - borderMarginWidth) / (qreal)20;
@@ -957,10 +893,10 @@ void ResiduumWindow::PaintResiduum(VectorXd signalSamples, QSize windowSize)
         {
             QString string;
 
-            qreal scaledYText = negScale * scaleYText / (qreal)startDrawFactor;                                    // Skalenwert Y-Achse
+            qreal scaledYText = signalNegativeMaximum * scaleYText / (qreal)startDrawFactor;                                    // Skalenwert Y-Achse
             string  = QString::number(scaledYText, 'f', decimalPlace + 1);                                          // Skalenwert als String mit richtiger Nachkommastelle (Genauigkeit je nach Signalwertebereich)
 
-            if(negScale == 0)                                                                                       // x-Achse erreicht (y-Wert = 0)
+            if(signalNegativeMaximum == 0)                                                                                       // x-Achse erreicht (y-Wert = 0)
             {
                 // append scaled signalpoints
                 qint32 h = 0;
@@ -975,6 +911,7 @@ void ResiduumWindow::PaintResiduum(VectorXd signalSamples, QSize windowSize)
                 while(j <= 21)
                 {
                     QString str;
+
                     painter.drawText(j * scaleXAchse + maxStrLenght - 7, -(((i - 1) * scaleYAchse)-(windowSize.height())) + xAxisTextPos, str.append(QString("%1").arg((j * scaleXText))));      // Skalenwert
                     painter.drawLine(j * scaleXAchse + maxStrLenght, -(((i - 1) * scaleYAchse)-(windowSize.height() - borderMarginHeigth / 2 - 2)), j * scaleXAchse + maxStrLenght , -(((i - 1) * scaleYAchse)-(windowSize.height() - borderMarginHeigth / 2 + 2)));   // Anstriche
                     j++;
@@ -985,117 +922,14 @@ void ResiduumWindow::PaintResiduum(VectorXd signalSamples, QSize windowSize)
             painter.drawText(3, -((i - 1) * scaleYAchse - windowSize.height()) - borderMarginHeigth/2 + 4, string);     // Skalenwert Y-Achse zeichen
             painter.drawLine(maxStrLenght - 2, -(((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2), maxStrLenght + 2, -(((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2));  // Anstriche Y-Achse
             i++;
-            negScale++;
+            signalNegativeMaximum++;
         }
 
         painter.drawLine(maxStrLenght, 2, maxStrLenght, windowSize.height() - 2);     // paint y-axis
 
         painter.drawPolyline(polygons);                  // paint signal
-
     }
     painter.end();
-
-    /*
-    QPainter painter(this);
-    painter.setRenderHint(QPainter::Antialiasing, true);
-    painter.fillRect(0,0, windowSize.width(), windowSize.height(),QBrush(Qt::white));
-
-    painter.save();
-    painter.setRenderHint(QPainter::Antialiasing, true);
-
-    //VectorXd signalSamples = signalVector;
-
-    if(signalSamples.rows() > 0)
-    {
-        qint32 borderMarginHeigth = 2;      // reduce paintspace in GraphWindow of borderMargin pixels
-        qint32 borderMarginWidth = 2;       // reduce paintspace in GraphWindow of borderMargin pixels
-        qint32 i = 0;
-        qreal maxNeg = 0;                   // smalest signalvalue
-        qreal maxPos = 0;                   // highest signalvalue
-        qreal absMin = 0;                   // minimum of abs(maxNeg and maxPos)
-        qint32 drawFactor = 0;              // shift factor for decimal places (linear)
-        qint32 startDrawFactor = 1;         // shift factor for decimal places (exponential-base 10)
-        qint32 decimalPlace = 0;            // decimal places for axis title
-        QPolygonF polygons;                 // points for drwing the signal
-        QList<qreal> internListValue;       // intern representation of y-axis values of the signal (for painting only)
-
-        internListValue.clear();
-        while(i < signalSamples.rows())
-        {
-                internListValue.append(signalSamples[i]);
-                i++;
-        }
-
-        // find min and max of signal
-        i = 0;
-        while(i < signalSamples.rows())
-        {
-            if(signalSamples[i] > maxPos)
-                maxPos = signalSamples[i];
-
-            if(signalSamples[i] < maxNeg )
-                maxNeg = signalSamples[i];
-            i++;
-        }
-
-        if(maxPos > fabs(maxNeg)) absMin = maxNeg;      // find absolute minimum of (maxPos, maxNeg)
-        else     absMin = maxPos;
-
-        if(absMin != 0)                                 // absMin must not be zero
-        {
-            while(true)                                 // shift factor for decimal places?
-            {
-                if(fabs(absMin) < 1)                    // if absMin > 1 , no shift of decimal places nescesary
-                {
-                    absMin = absMin * 10;
-                    drawFactor++;                       // shiftfactor counter
-                }
-                if(fabs(absMin) >= 1) break;
-            }
-        }
-
-        // shift of decimal places with drawFactor for all signalpoints and save to intern list
-        while(drawFactor > 0)
-        {
-            i = 0;
-            while(i < signalSamples.rows())
-            {
-                qreal replaceValue = internListValue.at(i) * 10;
-                internListValue.replace(i, replaceValue);
-                i++;
-            }
-            startDrawFactor = startDrawFactor * 10;
-            decimalPlace++;
-            maxPos = maxPos * 10;
-            maxNeg = maxNeg * 10;
-            drawFactor--;
-        }
-
-        qreal maxmax;
-        // absolute signalheight
-        if(maxNeg <= 0)     maxmax = maxPos - maxNeg;
-        else  maxmax = maxPos + maxNeg;
-
-        // scale signal
-        qreal scaleX = ((qreal)(windowSize.width() - borderMarginWidth)) / (qreal)signalSamples.rows();
-        qreal scaleY = (qreal)(windowSize.height() - borderMarginHeigth) / (qreal)maxmax;
-
-        // append scaled signalpoints
-        qint32 h = 0;
-
-        while(h < signalSamples.rows())
-        {
-            polygons.append(QPointF(h * scaleX, -((internListValue.at(h) * scaleY - (windowSize.height()) + borderMarginHeigth / 2))));
-            h++;
-        }
-
-        painter.drawPolyline(polygons);                  // paint signal
-    }
-    painter.restore();
-    //painter->end();
-
-    std::cout << "PaintEnde \n";
-    */
 }
 
 // starts MP-algorithm
@@ -1110,7 +944,7 @@ void MainWindow::on_btt_Calc_clicked()
     if(ui->chb_Iterations->checkState() == Qt::Checked && ui->chb_ResEnergy->checkState() == Qt::Checked)
         criterion = TruncationCriterion::Both;
 
-    if(signalVector.rows() == 0)
+    if(_signalMatrix.rows() == 0)
     {
         QString title = "Hinweis";
         QString text = "Es wurde noch kein Signal eingelesen!";
@@ -1180,7 +1014,7 @@ void MainWindow::on_btt_Calc_clicked()
             ui->tb_ResEnergy->selectAll();
             return;
         }
-        sollEnergie =  signalEnergie / 100 * prozentValue;
+        _sollEnergie =  _signalEnergie / 100 * prozentValue;
     } 
     else if(ui->rb_OwnDictionary->isChecked())
     {
@@ -1191,11 +1025,11 @@ void MainWindow::on_btt_Calc_clicked()
     }
     else if(ui->rb_adativMp->isChecked())
     {
-        CalcAdaptivMP(ui->sb_Iterations->value(), criterion);
+        CalcAdaptivMP(_signalMatrix, ui->sb_Iterations->value(), criterion);
     }    
 }
 
-void MainWindow::CalcAdaptivMP(int iterations, TruncationCriterion criterion)
+void MainWindow::CalcAdaptivMP(MatrixXd signal, int iterations, TruncationCriterion criterion)
 {
 
     qint32 it = 1000;
@@ -1205,7 +1039,7 @@ void MainWindow::CalcAdaptivMP(int iterations, TruncationCriterion criterion)
     qreal epsilon = 0.001;
     adaptiveMP *adaptiveMp = new adaptiveMP();
     qint32 t_iSize = 256;
-    MatrixXd signal (t_iSize, 1);
+    //MatrixXd signal (t_iSize, 1);
     MatrixXd residuum = signal;
 
     //Testsignal
@@ -1222,7 +1056,7 @@ void MainWindow::CalcAdaptivMP(int iterations, TruncationCriterion criterion)
     VectorXd t0 = testSignal1->CreateReal(t_iSize, 56, 58, 60, 0.6);
     VectorXd tSig(t_iSize);
 
-
+    /*
     for(qint32 i = 0; i < t_iSize; i++)
     {
         signal(i, 0) =  10 * t1[i] +  10 * t2[i] + 15 * t5[i] + 2 * cos(qreal(i) / 5.0);// + 10 * t8[i] + 10 * t7[i]+ 8 * t6[i] + 5 * t4[i] + 20 *t3[i]+ 11 * t0[i] + 20 * t9[i];
@@ -1231,7 +1065,7 @@ void MainWindow::CalcAdaptivMP(int iterations, TruncationCriterion criterion)
                 signal(i, 0) += 25;
                //signal(i, 0) += 7 * (sin(qreal(i*i))/ 15.0);
     }
-
+    */
     //find  maximum of signal
     qreal maximum = 0;
 
@@ -1406,7 +1240,7 @@ void MainWindow::CalcAdaptivMP(int iterations, TruncationCriterion criterion)
 
 
     // in Graph malen
-    atomSumVector = approximation;
+    _atomSumVector = approximation;
     update();
 
 
@@ -1426,7 +1260,7 @@ void MainWindow::CalcAdaptivMP(int iterations, TruncationCriterion criterion)
     }
 
     // in Graph malen
-    residuumVector = plotResiduum;
+    _residuumVector = plotResiduum;
     update();
 
     Plot *rPlot = new Plot(plotResiduum);
@@ -1441,14 +1275,14 @@ void MainWindow::on_tbv_Results_cellClicked(int row, int column)
     if(firstItem->checkState())
     {
         firstItem->setCheckState(Qt::Unchecked);
-        atomSumVector -= atom.MaxScalarProduct * atom.CreateReal(atom.SampleCount, atom.Scale, atom.Translation, atom.Modulation, atom.Phase);
-        residuumVector += atom.MaxScalarProduct * atom.CreateReal(atom.SampleCount, atom.Scale, atom.Translation, atom.Modulation, atom.Phase);
+        _atomSumVector -= atom.MaxScalarProduct * atom.CreateReal(atom.SampleCount, atom.Scale, atom.Translation, atom.Modulation, atom.Phase);
+        _residuumVector += atom.MaxScalarProduct * atom.CreateReal(atom.SampleCount, atom.Scale, atom.Translation, atom.Modulation, atom.Phase);
     }
     else
     {
         firstItem->setCheckState(Qt::Checked);
-        atomSumVector += atom.MaxScalarProduct * atom.CreateReal(atom.SampleCount, atom.Scale, atom.Translation, atom.Modulation, atom.Phase);
-        residuumVector -= atom.MaxScalarProduct * atom.CreateReal(atom.SampleCount, atom.Scale, atom.Translation, atom.Modulation, atom.Phase);
+        _atomSumVector += atom.MaxScalarProduct * atom.CreateReal(atom.SampleCount, atom.Scale, atom.Translation, atom.Modulation, atom.Phase);
+        _residuumVector -= atom.MaxScalarProduct * atom.CreateReal(atom.SampleCount, atom.Scale, atom.Translation, atom.Modulation, atom.Phase);
     }
     update();
 }
