@@ -65,6 +65,8 @@
 #include <Eigen/SparseCore>
 #include <unsupported/Eigen/FFT>
 
+
+
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE NAMESPACE UTILSLIB
@@ -89,9 +91,9 @@ enum ReturnValue{RETURNATOM, RETURNPARAMETERS};
 //*************************************************************************************************************
 
 class UTILSSHARED_EXPORT adaptiveMP
-{
+{    
 
-public:
+public:    
     adaptiveMP();
     QList<GaborAtom> MatchingPursuit (MatrixXd signal, qint32 max_it, qreal epsilon);
     VectorXcd ModulationFunction(qint32 N, qreal k);

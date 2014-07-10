@@ -73,6 +73,7 @@ VectorXd signalVector;
 VectorXd globalAtomList;
 VectorXd residuumVector;
 VectorXd atomSumVector;
+QList<GaborAtom> myAtomList;
 
 QList<QStringList> globalResultAtomList;
 qint32 processValue = 0;
@@ -108,12 +109,13 @@ MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::
     ui->splitter->setStretchFactor(1,4);
     ui->tb_ResEnergy->setText(tr("0,1"));
 
-    ui->tbv_Results->setColumnCount(4);
-    ui->tbv_Results->setHorizontalHeaderLabels(QString("scale;translation;modulation;phase").split(";"));
-    ui->tbv_Results->setColumnWidth(0,40);
-    ui->tbv_Results->setColumnWidth(1,70);
-    ui->tbv_Results->setColumnWidth(2,70);
+    ui->tbv_Results->setColumnCount(5);
+    ui->tbv_Results->setHorizontalHeaderLabels(QString("energy\n[%];scale\n[sec];trans\n[sec];modu\n[Hz];phase\n[rad]").split(";"));
+    ui->tbv_Results->setColumnWidth(0,50);
+    ui->tbv_Results->setColumnWidth(1,40);
+    ui->tbv_Results->setColumnWidth(2,40);
     ui->tbv_Results->setColumnWidth(3,40);
+    ui->tbv_Results->setColumnWidth(4,40);
 
     // build config file at init
     bool hasEntry1 = false;
@@ -1195,7 +1197,7 @@ void MainWindow::on_btt_Calc_clicked()
 
 void MainWindow::CalcAdaptivMP(int iterations, TruncationCriterion criterion)
 {
-    QList<GaborAtom> myAtomList;
+
     qint32 it = 1000;
     if(criterion == TruncationCriterion::Iterations || criterion == TruncationCriterion::Both)
        it = iterations;
@@ -1247,36 +1249,66 @@ void MainWindow::CalcAdaptivMP(int iterations, TruncationCriterion criterion)
     //sPlot->show();
     //tessignal ende
 
-    //run MP Algorithm
+    //run MP Algorithm    
+    ui->progressBarCalc->setMinimum(0);
+    ui->progressBarCalc->setMaximum(100);
+
     myAtomList = adaptiveMp->MatchingPursuit(signal, it, epsilon);
+    //ui->progressBarCalc->setValue(var);
 
     // results in tableView
     //************************************************************************************************************************************
 
     ui->tbv_Results->setRowCount(myAtomList.length());
+    VectorXd signalEnergy = VectorXd::Zero(signal.cols());
+    VectorXd residuumEnergy = VectorXd::Zero(signal.cols());
+    //calculate signalenergy
+    for(qint32 channel = 0; channel < signal.cols(); channel++)
+    {
+        for(qint32 sample = 0; sample < signal.rows(); sample++)
+            signalEnergy[channel] += (signal(sample, channel) * signal(sample, channel));
+    }
+
+    residuumEnergy[0] = signalEnergy[0];
 
     for(qint32 i = 0; i < myAtomList.length(); i++)
     {
-        //QTableWidgetItem* atomEnergieItem = new QTableWidgetItem(QString("%1").arg(myAtomList[i].MaxScalarProdu));
+        qreal procentAtomEnergie = 0;
+        if(signalEnergy[0] != 0) // TODO: Multichannel
+        {
+            procentAtomEnergie = 100 * myAtomList[i].energy / signalEnergy[0];
+            residuumEnergy[0] -= myAtomList[i].energy;
+        }
+
+        QTableWidgetItem* atomEnergieItem = new QTableWidgetItem(QString::number(procentAtomEnergie, 'f', 2));
         QTableWidgetItem* atomScaleItem = new QTableWidgetItem(QString::number(myAtomList[i].Scale, 'g', 3));
-        QTableWidgetItem* atomTranslationItem = new QTableWidgetItem(QString("%1").arg(myAtomList[i].Translation));
+        QTableWidgetItem* atomTranslationItem = new QTableWidgetItem(QString::number(myAtomList[i].Translation, 'g', 3));
         QTableWidgetItem* atomModulationItem = new QTableWidgetItem(QString::number(myAtomList[i].Modulation, 'g', 3));
         QTableWidgetItem* atomPhaseItem = new QTableWidgetItem(QString::number(myAtomList[i].Phase, 'g', 3));
 
-        //ui->tbv_Results->setItem(i, 0, atomNumberItem);
-        ui->tbv_Results->setItem(i, 0, atomScaleItem);
-        ui->tbv_Results->setItem(i, 1, atomTranslationItem);
-        ui->tbv_Results->setItem(i, 2, atomModulationItem);
-        ui->tbv_Results->setItem(i, 3, atomPhaseItem);
+
+        atomEnergieItem->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
+        atomScaleItem->setFlags(Qt::ItemIsEnabled);
+        atomTranslationItem->setFlags(Qt::ItemIsEnabled);
+        atomModulationItem->setFlags(Qt::ItemIsEnabled);
+        atomPhaseItem->setFlags(Qt::ItemIsEnabled);
+
+        atomEnergieItem->setCheckState(Qt::Checked);
+
+        atomEnergieItem->setTextAlignment(0x0082);
+        atomScaleItem->setTextAlignment(0x0082);
+        atomTranslationItem->setTextAlignment(0x0082);
+        atomModulationItem->setTextAlignment(0x0082);
+        atomPhaseItem->setTextAlignment(0x0082);
+        ui->tbv_Results->setItem(i, 0, atomEnergieItem);
+        ui->tbv_Results->setItem(i, 1, atomScaleItem);
+        ui->tbv_Results->setItem(i, 2, atomTranslationItem);
+        ui->tbv_Results->setItem(i, 3, atomModulationItem);
+        ui->tbv_Results->setItem(i, 4, atomPhaseItem);
     }
-
-    /*
-    // Berechnet die Energie des Atoms mit dem NormFaktor des Signals
-    qreal normAtomEnergie = 0;
-    for(qint32 i = 0; i < normBestCorrAtomSamples.rows(); i++)
-        normAtomEnergie += normBestCorrAtomSamples[i] * normBestCorrAtomSamples[i];
-    */
-
+    if(signalEnergy[0] != 0) // TODO: Multichannel
+        residuumEnergy[0] = 100 * residuumEnergy[0] / signalEnergy[0];
+    ui->lb_RestEnergieResiduumValue->setText(QString::number(residuumEnergy[0], 'f', 2) + "%");
     /*
     ui->lb_IterationsProgressValue->setText(QString("%1").arg(iterationsCount));
     for(qint32 i = 0; i < residuum.rows(); i++)
@@ -1400,6 +1432,25 @@ void MainWindow::CalcAdaptivMP(int iterations, TruncationCriterion criterion)
     Plot *rPlot = new Plot(plotResiduum);
     rPlot->setTitle("Residuum");
     //rPlot->show();
+}
+
+void MainWindow::on_tbv_Results_cellClicked(int row, int column)
+{
+    QTableWidgetItem* firstItem = ui->tbv_Results->item(row, 0);
+    GaborAtom atom = myAtomList.at(row);
+    if(firstItem->checkState())
+    {
+        firstItem->setCheckState(Qt::Unchecked);
+        atomSumVector -= atom.MaxScalarProduct * atom.CreateReal(atom.SampleCount, atom.Scale, atom.Translation, atom.Modulation, atom.Phase);
+        residuumVector += atom.MaxScalarProduct * atom.CreateReal(atom.SampleCount, atom.Scale, atom.Translation, atom.Modulation, atom.Phase);
+    }
+    else
+    {
+        firstItem->setCheckState(Qt::Checked);
+        atomSumVector += atom.MaxScalarProduct * atom.CreateReal(atom.SampleCount, atom.Scale, atom.Translation, atom.Modulation, atom.Phase);
+        residuumVector -= atom.MaxScalarProduct * atom.CreateReal(atom.SampleCount, atom.Scale, atom.Translation, atom.Modulation, atom.Phase);
+    }
+    update();
 }
 
 /*
@@ -1732,11 +1783,6 @@ QStringList MainWindow::correlation(VectorXd signalSamples, QList<qreal> atomSam
 }
 */
 
-void MainWindow::on_btt_Close_clicked()
-{
-    close();
-}
-
 // Opens Dictionaryeditor
 void MainWindow::on_actionW_rterbucheditor_triggered()
 {
@@ -1772,3 +1818,5 @@ void MainWindow::on_btt_OpenSignal_clicked()
 
 //-----------------------------------------------------------------------------------------------------------------
 //*****************************************************************************************************************
+
+
