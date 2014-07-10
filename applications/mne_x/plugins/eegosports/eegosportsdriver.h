@@ -220,6 +220,8 @@ private:
 
     IAmplifier*         m_pAmplifier;                   /**< Interface to the driver.*/
 
+    uint                m_nLastTriggerValue;            /**< Important if you want to use triggers; The last TTL value.*/
+
     //Variables used for loading the TMSiSDK.dll methods. Note: Not all functions are used by this class at the moment.
     CREATEAMPLIFIER       m_oFpCreateAmplifier;
 };

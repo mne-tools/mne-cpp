@@ -196,13 +196,13 @@ bool EEGoSportsDriver::initDevice(int iNumberOfChannels,
     }
 
     // This takes a while. Better wait
-    Sleep(100);
+    //Sleep(100);
 
     // Reset device - Set it to a defined state
     m_pAmplifier->Reset();
 
     // This takes a while. Better wait
-    Sleep(100);
+    //Sleep(100);
 
     // reset the overcurrent protection
     EEGO_CONFIG conf;
@@ -211,7 +211,7 @@ bool EEGoSportsDriver::initDevice(int iNumberOfChannels,
     m_pAmplifier->SetConfig(conf);
 
     // This takes a while. Better wait
-    Sleep(100);
+    //Sleep(100);
 
     // Set sampling frequency - Anything over 2kHZ is not supported and chances are high that they just don't work.
     if(FAILED(m_pAmplifier->SetSamplingRate((EEGO_RATE)m_uiSamplingFrequency)))
@@ -242,7 +242,7 @@ bool EEGoSportsDriver::initDevice(int iNumberOfChannels,
         return false;
 
     // This takes a while. Better wait
-    Sleep(100);
+    //Sleep(100);
 
     // Get firmware version
     USHORT firmwareVersion;
@@ -267,7 +267,7 @@ bool EEGoSportsDriver::initDevice(int iNumberOfChannels,
     if(FAILED(m_pAmplifier->SetMode(EEGO_MODE_STREAMING)))
         return false;
 
-    Sleep(100);
+    //Sleep(100);
 
     cout << "Plugin EEGoSports - INFO - initDevice() - Successfully initialised the device" << endl;
 
@@ -343,6 +343,60 @@ bool EEGoSportsDriver::uninitDevice()
     }
 
     sampleMatrix = MatrixXf::Zero(m_uiNumberOfChannels, m_uiSamplesPerBlock);
+
+    // OpenVibe code
+    HRESULT hr;
+
+    if(!m_pAmplifier)
+        return false;
+
+    // Fetch data from device/driver like this:
+    IBuffer* pBuffer; // The data storage
+    if(FAILED(hr = m_pAmplifier->GetData(&pBuffer))) // Fill the storage with data. Data is delivered only once
+    {
+        cout << "Plugin EEGoSports - ERROR - Getting Data from device failed! HRESULT: " << hr << endl;
+        return false;
+    }
+
+    // copy data from IBuffer to whatever structure you like to have.
+    UINT nAmountOfSamples = pBuffer->GetSampleCount();
+    //cout << "nAmountOfSamples: " << nAmountOfSamples << endl;
+    UINT nAmountOfChannels = pBuffer->GetChannelCount();
+    //cout << "nAmountOfChannels: " << nAmountOfChannels << endl;
+
+    // The data is stored in µV, use this constant for conversion
+    float dLSBToSi = 1e-6;
+
+    // calculate start of unwritten data;
+    for(UINT sample = 0; sample < nAmountOfSamples; sample++)
+    {
+        for(UINT channel = 0; channel < nAmountOfChannels; channel++)
+        {
+            int lValue = pBuffer->GetBuffer(channel, sample);
+
+            float sample = float( lValue * dLSBToSi); // Put the sample into whatever structure you want now.
+            //cout << sample << " ";
+
+            // check for triggers
+            if(channel == EEGO_CHANNEL_TRG)
+            {
+                const uint currentTriggers = (uint)(lValue);
+                const uint currentNewTriggers = currentTriggers & ~m_nLastTriggerValue; // Calculate which bits are new
+                m_nLastTriggerValue = currentTriggers; // Save value for next trigger detection
+
+                if(currentNewTriggers != 0)
+                {
+                    // Yay a trigger! Use it however you want
+                }
+            }
+        }
+    }
+
+    // Memory cleanup
+    pBuffer->Release();
+    pBuffer = NULL;
+
+    return true;
 
 //    sampleMatrix.setZero(); // Clear matrix - set all elements to zero
 //    uint iSamplesWrittenToMatrix = 0;
