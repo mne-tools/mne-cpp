@@ -43,7 +43,8 @@ QStringList GaborAtom::CreateStringValues()
 
 GaborAtom::GaborAtom()
 {
-
+    energy = 0;
+    MaxScalarProduct = 0;
 }
 
 VectorXd GaborAtom::GaussFunction (qint32 sampleCount, qreal scale, qint32 translation)

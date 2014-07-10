@@ -48,6 +48,7 @@ namespace UTILSLIB
         qreal Modulation;
         qreal MaxScalarProduct;
         MatrixXd Residuum;
+        qreal energy;
         //qreal NormAtom;
 
     };
