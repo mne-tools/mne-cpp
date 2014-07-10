@@ -14,11 +14,8 @@
 
 #include <QMainWindow>
 #include <QtGui>
-
 #include <QAbstractTableModel>
 #include <QImage>
-
-
 #include <QAbstractItemDelegate>
 #include <QFontMetrics>
 #include <QModelIndex>

@@ -1,15 +1,15 @@
-//MATCHING PURSUIT
 //=============================================================================================================
 /**
-* @file     main.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+* @file     editorwindow.cpp
+* @author   Martin Henfling <martin.henfling@tu-ilmenau.de>;
+*           Daniel Knobl <daniel.knobl@tu-ilmenau.de>;
+*           Sebastian Krause <sebastian.krause@tu-ilmenau.de>
 * @version  1.0
-* @date     July, 2012
+* @date     July, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Martin Henfling, Daniel Knobl and Sebastian Krause. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Example of reading raw data
+* @brief    Implementation of the EditorWindow class.
 *
 */
 
@@ -40,11 +40,11 @@
 //=============================================================================================================
 
 #include <utils/mp/atom.h>
+
 #include "mainwindow.h"
 #include "editorwindow.h"
 #include "ui_editorwindow.h"
 #include "stdio.h"
-
 #include "deletemessagebox.h"
 #include "ui_deletemessagebox.h"
 
@@ -155,7 +155,7 @@ void EditorWindow::read_dicts()
 }
 
 // calculates number of atoms if "combine all"
-void EditorWindow::calcAtomCountAllCombined()
+void EditorWindow::calc_atom_count_all_combined()
 {
     qint32 count = 0;
     qint32 scaleCount = 1;
@@ -176,7 +176,7 @@ void EditorWindow::calcAtomCountAllCombined()
     if(count > 1000000)
     {
         QMessageBox::warning(this, tr("Fehler"), //todo localisation (language??)
-        tr("Die Anzahl der zu berechnenden Atome ist zu groß."));
+        tr("Die Anzahl der zu berechnenden Atome ist zu groï¿½."));
         return;
     }
     ui->spb_AtomCount->setValue(count);
@@ -250,7 +250,7 @@ QList<qreal> EditorWindow::calcExpNegParameters(qreal startValue, qreal expStepV
     return resultList;
 }
 
-// calculate scale and save to list
+// calculates scale and save to list
 QList<qreal> EditorWindow::calcParameterValuesScale(qreal startValue, qreal linStepValue, qreal expStepValue)
 {
     QList<qreal> resultList;
@@ -272,7 +272,7 @@ QList<qreal> EditorWindow::calcParameterValuesScale(qreal startValue, qreal linS
     return resultList;
 }
 
-// calculate scale and save to list (AllCombined)
+// calculates scale and save to list (AllCombined)
 QList<qreal> EditorWindow::calcAllCombParameterValuesScale(qreal startValue, qreal endvalue, qreal linStepValue, qreal expStepValue)
 {
     QList<qreal> resultList;
@@ -293,7 +293,7 @@ QList<qreal> EditorWindow::calcAllCombParameterValuesScale(qreal startValue, qre
     return resultList;
 }
 
-// calculate modulation and save to list
+// calculates modulation and save to list
 QList<qreal> EditorWindow::calcParameterValuesModu(qreal startValue, qreal linStepValue, qreal expStepValue)
 {
     QList<qreal> resultList;
@@ -315,7 +315,7 @@ QList<qreal> EditorWindow::calcParameterValuesModu(qreal startValue, qreal linSt
     return resultList;
 }
 
-// calculate modulation and save to list (AllCombined)
+// calculates modulation and save to list (AllCombined)
 QList<qreal> EditorWindow::calcAllCombParameterValuesModu(qreal startValue, qreal endvalue, qreal linStepValue, qreal expStepValue)
 {
     QList<qreal> resultList;
@@ -336,7 +336,7 @@ QList<qreal> EditorWindow::calcAllCombParameterValuesModu(qreal startValue, qrea
     return resultList;
 }
 
-// calculate phase and save to list
+// calculates phase and save to list
 QList<qreal> EditorWindow::calcParameterValuesPhase(qreal startValue, qreal linStepValue, qreal expStepValue)
 {
     QList<qreal> resultList;
@@ -358,7 +358,7 @@ QList<qreal> EditorWindow::calcParameterValuesPhase(qreal startValue, qreal linS
     return resultList;
 }
 
-// calculate phase and save to list (AllCombined)
+// calculates phase and save to list (AllCombined)
 QList<qreal> EditorWindow::calcAllCombParameterValuesPhase(qreal startValue, qreal endvalue, qreal linStepValue, qreal expStepValue)
 {
     QList<qreal> resultList;
@@ -379,7 +379,7 @@ QList<qreal> EditorWindow::calcAllCombParameterValuesPhase(qreal startValue, qre
     return resultList;
 }
 
-// calculate chirp and save to list
+// calculates chirp and save to list
 QList<qreal> EditorWindow::calcParameterValuesChirp(qreal startValue, qreal linStepValue, qreal expStepValue)
 {
     QList<qreal> resultList;
@@ -401,7 +401,7 @@ QList<qreal> EditorWindow::calcParameterValuesChirp(qreal startValue, qreal linS
     return resultList;
 }
 
-// calculate chirp and save to list (AllCombined)
+// calculates chirp and save to list (AllCombined)
 QList<qreal> EditorWindow::calcAllCombParameterValuesChirp(qreal startValue, qreal endvalue, qreal linStepValue, qreal expStepValue)
 {
     QList<qreal> resultList;
@@ -436,7 +436,7 @@ void EditorWindow::calc_scale_value()
             ui->dspb_EndValueScale->setValue(startValueScale);
         }    
         scaleList = calcAllCombParameterValuesScale(startValueScale, endValueScale, linStepWidthScale, expStepWidthScale);
-        calcAtomCountAllCombined();
+        calc_atom_count_all_combined();
     }
     else
     {
@@ -446,7 +446,7 @@ void EditorWindow::calc_scale_value()
 }
 
 // handle modulation
-void EditorWindow::calcModuValue()
+void EditorWindow::calc_modu_value()
 {
     if(allCombined)
     {
@@ -459,14 +459,14 @@ void EditorWindow::calcModuValue()
             ui->dspb_EndValueModu->setValue(startValueModu);
         }
         moduList = calcAllCombParameterValuesModu(startValueModu, endValueModu, linStepWidthModu, expStepWidthModu);
-        calcAtomCountAllCombined();
+        calc_atom_count_all_combined();
     }
     else
         moduList = calcParameterValuesModu(startValueModu, linStepWidthModu, expStepWidthModu);
 }
 
 // handle phase
-void EditorWindow::calcPhaseValue()
+void EditorWindow::calc_phase_value()
 {
     if(allCombined)
     {
@@ -479,14 +479,14 @@ void EditorWindow::calcPhaseValue()
             ui->dspb_EndValuePhase->setValue(startValuePhase);
         }
         phaseList = calcAllCombParameterValuesPhase(startValuePhase, endValuePhase, linStepWidthPhase, expStepWidthPhase);
-        calcAtomCountAllCombined();
+        calc_atom_count_all_combined();
     }
     else
         phaseList = calcParameterValuesPhase(startValuePhase, linStepWidthPhase, expStepWidthPhase);
 }
 
 // handle chirp
-void EditorWindow::calcChirpValue()
+void EditorWindow::calc_chirp_value()
 {
     if(allCombined)
     {
@@ -499,7 +499,7 @@ void EditorWindow::calcChirpValue()
             ui->dspb_EndValueChirp->setValue(startValueChirp);
         }
         chirpList = calcAllCombParameterValuesChirp(startValueChirp, endValueChirp, linStepWidthChirp, expStepWidthChirp);
-        calcAtomCountAllCombined();
+        calc_atom_count_all_combined();
     }
     else
         chirpList = calcParameterValuesChirp(startValueChirp, linStepWidthChirp, expStepWidthChirp);   
@@ -511,9 +511,9 @@ void EditorWindow::on_tb_PartDictName_editingFinished()
     partDictName = ui->tb_PartDictName->text();
 
     calc_scale_value();
-    calcModuValue();
-    calcPhaseValue();
-    calcChirpValue();
+    calc_modu_value();
+    calc_phase_value();
+    calc_chirp_value();
 }
 
 // access if "All combined"
@@ -620,9 +620,9 @@ void EditorWindow::on_chb_CombAllPara_toggled(bool checked)
     }
 
     calc_scale_value();
-    calcModuValue();
-    calcPhaseValue();
-    calcChirpValue();
+    calc_modu_value();
+    calc_phase_value();
+    calc_chirp_value();
 }
 
 void EditorWindow::on_spb_AtomLength_editingFinished()
@@ -632,9 +632,9 @@ void EditorWindow::on_spb_AtomLength_editingFinished()
     startValueScale = ui->dspb_StartValueScale->value();
 
     calc_scale_value();
-    calcModuValue();
-    calcPhaseValue();
-    calcChirpValue();
+    calc_modu_value();
+    calc_phase_value();
+    calc_chirp_value();
 }
 
 // set number of atoms (recalculate stopvalues)
@@ -731,9 +731,9 @@ void EditorWindow::on_spb_AtomCount_valueChanged(int arg1)
     }
 
     calc_scale_value();
-    calcModuValue();
-    calcPhaseValue();
-    calcChirpValue();
+    calc_modu_value();
+    calc_phase_value();
+    calc_chirp_value();
 }
 
 // for scale
@@ -807,13 +807,13 @@ void EditorWindow::on_rb_NegCountScale_toggled()
 void EditorWindow::on_dspb_StartValueModu_editingFinished()
 {
     startValueModu = ui->dspb_StartValueModu->value();
-    calcModuValue();
+    calc_modu_value();
 }
 
 void EditorWindow::on_dspb_EndValueModu_editingFinished()
 {
     endValueModu = ui->dspb_EndValueModu->value();
-    calcModuValue();
+    calc_modu_value();
 }
 
 void EditorWindow::on_rb_NoStepModu_toggled(bool checked)
@@ -831,31 +831,31 @@ void EditorWindow::on_rb_NoStepModu_toggled(bool checked)
         ui->lb_CountDirectionModu->setDisabled(true);
         ui->fr_CountDirectionModu->setDisabled(true);
     }
-    calcModuValue();
+    calc_modu_value();
 }
 
 void EditorWindow::on_rb_LinStepModu_toggled(bool checked)
 {
     if(checked) linStepWidthModu = ui->dspb_LinStepModu->value();
-    calcModuValue();
+    calc_modu_value();
 }
 
 void EditorWindow::on_rb_ExpStepModu_toggled(bool checked)
 {
     if(checked) expStepWidthModu = ui->dspb_ExpStepModu->value();
-    calcModuValue();
+    calc_modu_value();
 }
 
 void EditorWindow::on_dspb_LinStepModu_editingFinished()
 {
     linStepWidthModu = ui->dspb_LinStepModu->value();
-    calcModuValue();
+    calc_modu_value();
 }
 
 void EditorWindow::on_dspb_ExpStepModu_editingFinished()
 {
     expStepWidthModu = ui->dspb_ExpStepModu->value();
-    calcModuValue();
+    calc_modu_value();
 }
 
 void EditorWindow::on_rb_PosCountModu_toggled()
@@ -874,13 +874,13 @@ void EditorWindow::on_rb_NegCountModu_toggled()
 void EditorWindow::on_dspb_StartValuePhase_editingFinished()
 {
     startValuePhase = ui->dspb_StartValuePhase->value();
-    calcPhaseValue();
+    calc_phase_value();
 }
 
 void EditorWindow::on_dspb_EndValuePhase_editingFinished()
 {
     endValuePhase = ui->dspb_EndValuePhase->value();
-    calcPhaseValue();
+    calc_phase_value();
 }
 
 void EditorWindow::on_rb_NoStepPhase_toggled(bool checked)
@@ -898,31 +898,31 @@ void EditorWindow::on_rb_NoStepPhase_toggled(bool checked)
         ui->lb_CountDirectionPhase->setDisabled(true);
         ui->fr_CountDirectionPhase->setDisabled(true);
     }
-    calcPhaseValue();
+    calc_phase_value();
 }
 
 void EditorWindow::on_rb_LinStepPhase_toggled(bool checked)
 {
     if(checked) linStepWidthPhase = ui->dspb_LinStepPhase->value();
-    calcPhaseValue();
+    calc_phase_value();
 }
 
 void EditorWindow::on_rb_ExpStepPhase_toggled(bool checked)
 {
     if(checked) expStepWidthPhase = ui->dspb_ExpStepPhase->value();
-    calcPhaseValue();
+    calc_phase_value();
 }
 
 void EditorWindow::on_dspb_LinStepPhase_editingFinished()
 {
     linStepWidthPhase = ui->dspb_LinStepPhase->value();
-    calcPhaseValue();
+    calc_phase_value();
 }
 
 void EditorWindow::on_dspb_ExpStepPhase_editingFinished()
 {
     expStepWidthPhase = ui->dspb_ExpStepPhase->value();
-    calcPhaseValue();
+    calc_phase_value();
 }
 
 void EditorWindow::on_rb_PosCountPhase_toggled()
@@ -941,13 +941,13 @@ void EditorWindow::on_rb_NegCountPhase_toggled()
 void EditorWindow::on_dspb_StartValueChirp_editingFinished()
 {
     startValueChirp = ui->dspb_StartValueChirp->value();
-    calcChirpValue();
+    calc_chirp_value();
 }
 
 void EditorWindow::on_dspb_EndValueChirp_editingFinished()
 {
     endValueChirp = ui->dspb_EndValueChirp->value();
-    calcChirpValue();
+    calc_chirp_value();
 }
 
 void EditorWindow::on_rb_NoStepChirp_toggled(bool checked)
@@ -969,31 +969,31 @@ void EditorWindow::on_rb_NoStepChirp_toggled(bool checked)
         ui->rb_NegCountChirp->setDisabled(true);
         ui->rb_PosCountChirp->setDisabled(true);
     }
-    calcChirpValue();
+    calc_chirp_value();
 }
 
 void EditorWindow::on_rb_LinStepChirp_toggled(bool checked)
 {
      if(checked) linStepWidthChirp = ui->dspb_LinStepChirp->value();
-     calcChirpValue();
+     calc_chirp_value();
 }
 
 void EditorWindow::on_rb_ExpStepChirp_toggled(bool checked)
 {
     if(checked) expStepWidthChirp  = ui->dspb_ExpStepChirp->value();
-    calcChirpValue();
+    calc_chirp_value();
 }
 
 void EditorWindow::on_dspb_LinStepChirp_editingFinished()
 {
     linStepWidthChirp = ui->dspb_LinStepChirp->value();
-    calcChirpValue();
+    calc_chirp_value();
 }
 
 void EditorWindow::on_dspb_ExpStepChirp_editingFinished()
 {
     expStepWidthChirp = ui->dspb_ExpStepChirp->value();
-    calcChirpValue();
+    calc_chirp_value();
 }
 
 void EditorWindow::on_rb_PosCountChirp_toggled()
@@ -1008,7 +1008,7 @@ void EditorWindow::on_rb_NegCountChirp_toggled()
         chirpList = calcParameterValuesChirp(startValueChirp, linStepWidthChirp, expStepWidthChirp);
 }
 
-// check out whether gauss or chirp
+// check whether gauss or chirp
 void EditorWindow::on_rb_GaussAtomType_toggled(bool checked)
 {
     if(checked) atomType = EditorWindow::Gauss;
@@ -1045,7 +1045,7 @@ void EditorWindow::on_rb_ChirpAtomType_toggled(bool checked)
 }
 
 
-// calc all atoms with choosen params and save to list and to drive
+// calc all atoms with choosen parameters and save to list and to drive
 void EditorWindow::on_btt_CalcAtoms_clicked()
 {   
     QStringList resultList;
@@ -1148,13 +1148,13 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
                 {
                     if(ui->rb_NoStepScale->isChecked() && ui->rb_NoStepModu->isChecked() && ui->rb_NoStepPhase->isChecked() && ui->rb_NoStepChirp)
                     {
-                        QMessageBox::warning(this, tr("Warnung"),QString("Es werden %1 identische  Atome erstellt. Bitte ändern Sie die Atomanzahl auf 1 oder lassen Sie einen Parameter variieren.").arg(ui->spb_AtomCount->value()));
+                        QMessageBox::warning(this, tr("Warnung"),QString("Es werden %1 identische  Atome erstellt. Bitte ï¿½ndern Sie die Atomanzahl auf 1 oder lassen Sie einen Parameter variieren.").arg(ui->spb_AtomCount->value()));
                         return;
                     }
                 }
                 else if(ui->rb_NoStepScale->isChecked() && ui->rb_NoStepModu->isChecked() && ui->rb_NoStepPhase->isChecked())
                 {
-                    QMessageBox::warning(this, tr("Warnung"),QString("Es werden %1 identische  Atome erstellt. Bitte ändern Sie die Atomanzahl auf 1 oder lassen Sie einen Parameter variieren.").arg(ui->spb_AtomCount->value()));
+                    QMessageBox::warning(this, tr("Warnung"),QString("Es werden %1 identische  Atome erstellt. Bitte ï¿½ndern Sie die Atomanzahl auf 1 oder lassen Sie einen Parameter variieren.").arg(ui->spb_AtomCount->value()));
                     return;
                 }
             }
@@ -1338,7 +1338,7 @@ void EditorWindow::on_btt_SaveDicts_clicked()
     if(ui->tb_DictName->text().isEmpty())
     {
         QMessageBox::warning(this, tr("Fehler"),
-        tr("Es wurde kein Name für das Wörterbuch vergeben."));
+        tr("Es wurde kein Name fï¿½r das Wï¿½rterbuch vergeben."));
         ui->tb_DictName->setFocus();
         return;
     }
@@ -1356,7 +1356,7 @@ void EditorWindow::on_btt_SaveDicts_clicked()
         if(QString::compare(fileInfo.baseName(), ui->tb_DictName->text()) == 0)
         {
                 QMessageBox::warning(this, tr("Fehler"),
-                tr("Der Name für das Wörterbuch ist schon vergeben."));
+                tr("Der Name fï¿½r das Wï¿½rterbuch ist schon vergeben."));
                 ui->tb_DictName->setFocus();
                 ui->tb_DictName->selectAll();
                 return;

@@ -35,7 +35,7 @@ Enhancededitorwindow::Enhancededitorwindow(QWidget *parent) :    QWidget(parent)
     //this->setFixedHeight(160);
     QString contents;
     QFile formulaFile("Matching-Pursuit-Toolbox/user.fml");
-    //if (formulaFile == ) return; //Aufpassen
+
     if (formulaFile.open(QIODevice::ReadOnly | QIODevice::Text))
     {
         while(!formulaFile.atEnd())
