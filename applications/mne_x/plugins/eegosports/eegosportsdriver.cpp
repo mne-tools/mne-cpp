@@ -134,7 +134,7 @@ bool EEGoSportsDriver::initDevice(int iNumberOfChannels,
     m_bUseCommonAverage = bUseCommonAverage;
     m_bMeasureImpedances = bMeasureImpedance;
 
-    //Open file to write to
+    //Open debug file to write to
     if(m_bWriteDriverDebugToFile)
         m_outputFileStream.open("mne_x_plugins/resources/eegosports/EEGoSports_Driver_Debug.txt", ios::trunc); //ios::trunc deletes old file data
 
@@ -150,6 +150,7 @@ bool EEGoSportsDriver::initDevice(int iNumberOfChannels,
     HRESULT hr;
     LPTSTR szDevString = NULL;
 
+    // Get number and names of connected devices
     UINT numDevices;
     if(FAILED(m_pAmplifier->EnumDevices(&numDevices)))
     {
@@ -157,6 +158,7 @@ bool EEGoSportsDriver::initDevice(int iNumberOfChannels,
         return false;
     }
 
+    // Get name of first connected device in the device list which is not a simulated device
     for(UINT i = 0; i < numDevices; i++)
     {
         LPTSTR szName;
@@ -165,8 +167,6 @@ bool EEGoSportsDriver::initDevice(int iNumberOfChannels,
             cout << "Plugin EEGoSports - ERROR - Couldn't get device name!" << endl;
             return false;
         }
-
-        cout<<"Found device: "<<szName<<endl;
 
         // Make sure to get no simulation device. This should be no problem with later versions
         QString temp;
@@ -186,20 +186,22 @@ bool EEGoSportsDriver::initDevice(int iNumberOfChannels,
         return false;
     }
 
-    // Make the USB handshake and setup internal states for communication with the hardware
+    //cout<<"Found device: "<<szDevString<<endl;
+
+    // Connect device - Make the USB handshake and setup internal states for communication with the hardware
     if( FAILED(m_pAmplifier->Connect(szDevString)))
     {
         cout << "Plugin EEGoSports - ERROR - Connect call failed!" << endl;
         return false;
     }
 
-    // Better safe than sorry
+    // This takes a while. Better wait
     Sleep(100);
 
-    // Set it to a defined state
+    // Reset device - Set it to a defined state
     m_pAmplifier->Reset();
 
-    // Better safe than sorry
+    // This takes a while. Better wait
     Sleep(100);
 
     // reset the overcurrent protection
@@ -211,14 +213,14 @@ bool EEGoSportsDriver::initDevice(int iNumberOfChannels,
     // This takes a while. Better wait
     Sleep(100);
 
-    // Aanything over 2kHZ is not supported and chances are high that they just don't work.
+    // Set sampling frequency - Anything over 2kHZ is not supported and chances are high that they just don't work.
     if(FAILED(m_pAmplifier->SetSamplingRate((EEGO_RATE)m_uiSamplingFrequency)))
     {
         cout << "Plugin EEGoSports - ERROR - Can not set sampling frequency: " << m_uiSamplingFrequency << endl;
         return false;
     }
 
-    // use this with mV or set gain directly. Again, look into eego.h for acceptable values
+    // Set gain - use this with mV or set gain directly. Again, look into eego.h for acceptable values
     //EEGO_GAIN gain = GetGainForSignalRange(1000);
 
     // It is possible to set those for each individually. Again: not tested, not supported
@@ -232,8 +234,6 @@ bool EEGoSportsDriver::initDevice(int iNumberOfChannels,
 //    m_pAmplifier->SetSignalGain( gain, EegoDriver::EEGO_ADC_H);
 //    m_pAmplifier->SetSignalGain( gain, EegoDriver::EEGO_ADC_S);
 
-    Sleep(100);
-
     // We are measuring here so better leave the DAC off
     hr = m_pAmplifier->SetDriverAmplitude(0);
     hr |= m_pAmplifier->SetDriverPeriod(0);
@@ -244,23 +244,24 @@ bool EEGoSportsDriver::initDevice(int iNumberOfChannels,
     // This takes a while. Better wait
     Sleep(100);
 
+    // Get firmware version
     USHORT firmwareVersion;
     m_pAmplifier->GetFirmwareVersion(&firmwareVersion);
 
-    cout<<"Firmware version is: "<<firmwareVersion<<endl;
+    //cout<<"Firmware version is: "<<firmwareVersion<<endl;
 
-    // Start the sampling
+    // Start the sampling process
     if(!m_pAmplifier)
         return false;
 
+    // You can get the set values from the device, too. We are using it here only for debug purposes
     EEGO_RATE rate;
     EEGO_GAIN gain;
 
-    // You can get the set values from the device, too. We are using it here only for debug purposes
     m_pAmplifier->GetSamplingRate(&rate);
     m_pAmplifier->GetSignalGain(&gain, EEGO_ADC_A);
 
-    cout << "Starting Device with sampling rate: " << m_uiSamplingFrequency << "hz and a gain of: " << gain << "\n";
+    // cout << "Starting Device with sampling rate: " << m_uiSamplingFrequency << "hz and a gain of: " << gain << "\n";
 
     // With this call we tell the amplifier and driver stack to start streaming
     if(FAILED(m_pAmplifier->SetMode(EEGO_MODE_STREAMING)))
@@ -270,6 +271,7 @@ bool EEGoSportsDriver::initDevice(int iNumberOfChannels,
 
     cout << "Plugin EEGoSports - INFO - initDevice() - Successfully initialised the device" << endl;
 
+    // Set flag for successfull initialisation true
     m_bInitDeviceSuccess = true;
 
     return true;
@@ -304,12 +306,15 @@ bool EEGoSportsDriver::uninitDevice()
         m_outputFileStream.clear();
     }
 
+    // If global device handle is not defined return false
     if(!m_pAmplifier)
         return false;
 
+    // Stop device sampling - Set device to idle mode
     if(FAILED(m_pAmplifier->SetMode(EEGO_MODE_IDLE)))
         return false;
 
+    // Disconnect and release handle
     m_pAmplifier->Disconnect();
     m_pAmplifier->Release();
 
