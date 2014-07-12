@@ -8,7 +8,7 @@
 * @date     July, 2014
 *
 * ported to mne-cpp by Martin Henfling and Daniel Knobl in May 2014
-* original code was
+* original code was implemented in Matlab Code by Marcij Gratkowski
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -34,7 +34,6 @@
 *           used as Source and reference.
 *
 */
-//MATCHING PURSUIT
 
 #ifndef ADAPTIVEMP_H
 #define ADAPTIVEMP_H
@@ -86,23 +85,84 @@ using namespace std;
 
 //=============================================================================================================
 
-enum ReturnValue{RETURNATOM, RETURNPARAMETERS};
+enum ReturnValue{RETURNATOM, RETURNPARAMETERS}; /**< deciding whether to return a real atom or its parameters*/
 
 //*************************************************************************************************************
+/**
+* DECLARE CLASS adaptiveMP
+*
+* @brief The adaptiveMP class provides functions several calculating functions to run the Matching Pursuit Algorithm
+*/
+class UTILSSHARED_EXPORT AdaptiveMp
+{
 
-class UTILSSHARED_EXPORT adaptiveMP
-{    
+public:
 
-public:    
-    adaptiveMP();
-    QList<GaborAtom> MatchingPursuit (MatrixXd signal, qint32 max_it, qreal epsilon);
-    VectorXcd ModulationFunction(qint32 N, qreal k);
-    VectorXd CalculateAtom(qint32 sampleCount, qreal scale, qint32 translation, qreal modulation, qint32 channel, MatrixXd residuum, ReturnValue returnValue);
+    /**
+    * adaptiveMP_adaptiveMP
+    *
+    * ### MP toolbox function ###
+    *
+    * Constructor
+    *
+    * constructs adaptiveMP class
+    *
+    */
+    AdaptiveMp();
+
+    //=========================================================================================================
+    /**
+    * adaptiveMP_matching_pursuit
+    *
+    * ### MP Algorithm ###
+    *
+    * running the MP Algorithm introduced by Mallat and Zhang
+    *
+    * @param[in] signal    Matrix containing single or mulitchannel signals
+    * @param[in] max_it    maximum number of iterations of MP Algorithm
+    * @param[in] epsilon   threshold for number of iterations of MP Algorithm
+    *
+    * @return result of MP Algorithm as QList of GaborAtoms
+    */
+    QList<GaborAtom> matching_pursuit (MatrixXd signal, qint32 max_it, qreal epsilon);
+
+    //=========================================================================================================
+    /**
+    * adaptiveMP_modulation_function
+    *
+    * ### MP toolbox root function ###
+    *
+    * calculates a complex function for modulating signals in MP Algorithm
+    *
+    * @param[in] N    number of samples
+    * @param[in] k    factor of modulationfrequency
+    *
+    * @return complex modulationvector
+    */
+    VectorXcd modulation_function(qint32 N, qreal k);
+
+    //=========================================================================================================
+    /**
+    * adaptiveMP_calculate_atom
+    *
+    * ### MP toolbox root function ###
+    *
+    * calculates real gabor atoms for MP Algorithm
+    *
+    * @param[in] sampleCount    number of samples in the atom
+    * @param[in] scale          scale of atom
+    * @param[in] translation    translation of atom
+    * @param[in] modulation     modulation of atom
+    * @param[in] channel        number of signalchannels
+    * @param[in] residuum       the signalresiduun after each MP Algorithm iterationstep
+    * @param[in] returnValue    declare what kind of information should be returned
+    *
+    * @return depending on returnValue returning the real atom calculated or the manipulated parameters: scale, translation, modulation, phase, scalarproduct
+    */
+    VectorXd calculate_atom(qint32 sampleCount, qreal scale, qint32 translation, qreal modulation, qint32 channel, MatrixXd residuum, ReturnValue return_value);
 
 };
 
-}
-
-
+}   // NAMESPACE
 
 #endif // ADAPTIVEMP_H
