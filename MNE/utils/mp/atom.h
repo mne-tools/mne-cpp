@@ -42,12 +42,12 @@ namespace UTILSLIB
     public:
 
         bool SaveToRam;
-        qint32 SampleCount;
-        qreal Scale;
-        qint32 Translation;
-        qreal Modulation;
-        qreal MaxScalarProduct;
-        MatrixXd Residuum;
+        qint32 sample_count;
+        qreal scale;
+        qint32 translation;
+        qreal modulation;
+        qreal max_scalar_product;
+        MatrixXd residuum;
         qreal energy;
         //qreal NormAtom;
 
@@ -57,12 +57,12 @@ namespace UTILSLIB
     {
 
     public:
-        qreal Phase;
+        qreal phase;
         GaborAtom();
 
-        static VectorXd GaussFunction (qint32 sampleCount, qreal scale, qint32 translation);
-        VectorXcd CreateComplex(qint32 sampleCount, qreal scale, qint32 translation, qreal modulation);
-        VectorXd CreateReal(qint32 sampleCount, qreal scale, qint32 translation, qreal modulation, qreal phase);
+        static VectorXd gauss_function (qint32 sample_count, qreal scale, qint32 translation);
+        VectorXcd create_complex(qint32 sample_count, qreal scale, qint32 translation, qreal modulation);
+        VectorXd create_real(qint32 sample_count, qreal scale, qint32 translation, qreal modulation, qreal phase);
         QStringList CreateStringValues();
 
     };
@@ -72,8 +72,8 @@ namespace UTILSLIB
 
     public:
 
-        qreal Phase;
-        qreal Chirp;
+        qreal phase;
+        qreal chirp;
 
         ChirpAtom(qint32 sampleCount, qreal scale, qint32 translation, qreal modulation, qreal phase, qreal chirp, bool saveToRam = false);
 

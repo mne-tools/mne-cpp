@@ -34,7 +34,7 @@ using namespace UTILSLIB;
 
 QStringList GaborAtom::CreateStringValues()
 {
-    VectorXd atomValues = CreateReal(GaborAtom::SampleCount, GaborAtom::Scale, GaborAtom::Translation, GaborAtom::Modulation, GaborAtom::Phase);
+    VectorXd atomValues = create_real(GaborAtom::sample_count, GaborAtom::scale, GaborAtom::translation, GaborAtom::modulation, GaborAtom::phase);
     QStringList atomStringValues;
     for(qint32 i = 0; i < atomValues.rows(); i++)
         atomStringValues.append(QString("%1").arg(atomValues[i]));
@@ -44,14 +44,14 @@ QStringList GaborAtom::CreateStringValues()
 GaborAtom::GaborAtom()
 {
     energy = 0;
-    MaxScalarProduct = 0;
+    max_scalar_product = 0;
 }
 
-VectorXd GaborAtom::GaussFunction (qint32 sampleCount, qreal scale, qint32 translation)
+VectorXd GaborAtom::gauss_function (qint32 sample_count, qreal scale, qint32 translation)
 {
-    VectorXd gauss = VectorXd::Zero(sampleCount);
+    VectorXd gauss = VectorXd::Zero(sample_count);
 
-    for(qint32 n = 0; n < sampleCount; n++)
+    for(qint32 n = 0; n < sample_count; n++)
     {
         qreal t = (qreal(n)-translation)/scale;
         gauss[n] = exp(-PI * pow(t, 2))*pow(sqrt(scale),(-1))*pow(qreal(2),(0.25));
@@ -60,79 +60,79 @@ VectorXd GaborAtom::GaussFunction (qint32 sampleCount, qreal scale, qint32 trans
     return gauss;
 }
 
-VectorXcd GaborAtom::CreateComplex(qint32 sampleCount, qreal scale, qint32 translation, qreal modulation)
+VectorXcd GaborAtom::create_complex(qint32 sample_count, qreal scale, qint32 translation, qreal modulation)
 {
-    VectorXcd complexAtom(sampleCount);
-    qreal normAtom = 0;
+    VectorXcd complex_atom(sample_count);
+    qreal norm_atom = 0;
 
     //if scale == signalLength and translation == middle of signal there is no window or envelope necessary
     //thats a simplification to save calculation time and reduces the windowing effects
-    if(scale == sampleCount && translation == floor(sampleCount / 2))
-        for(qint32 i = 0; i < sampleCount; i++)
-            complexAtom[i] = std::polar(1 / sqrt(qreal(sampleCount)), 2 * PI * modulation / qreal(sampleCount) * qreal(i));
+    if(scale == sample_count && translation == floor(sample_count / 2))
+        for(qint32 i = 0; i < sample_count; i++)
+            complex_atom[i] = std::polar(1 / sqrt(qreal(sample_count)), 2 * PI * modulation / qreal(sample_count) * qreal(i));
 
     //else scale is smaler than signalLength and translation is not in the middle an envelopement is required
     else
-        for(qint32 i = 0; i < sampleCount; i++)
+        for(qint32 i = 0; i < sample_count; i++)
         {
             qreal t = (qreal(i) - qreal(translation)) / qreal(scale);
-            complexAtom[i] = std::polar(1 / sqrt(sampleCount) * pow(2.0, 0.25) * exp( -PI * pow(t, 2.0))
-                                              , 2 * PI * modulation / qreal(sampleCount) * qreal(i));
+            complex_atom[i] = std::polar(1 / sqrt(sample_count) * pow(2.0, 0.25) * exp( -PI * pow(t, 2.0))
+                                              , 2 * PI * modulation / qreal(sample_count) * qreal(i));
         }
 
     //normalization
-    for(qint32 i = 0; i < sampleCount; i++)
-        normAtom += pow(abs(complexAtom[i]), 2.0);
+    for(qint32 i = 0; i < sample_count; i++)
+        norm_atom += pow(abs(complex_atom[i]), 2.0);
 
-    normAtom = sqrt(normAtom);
+    norm_atom = sqrt(norm_atom);
 
-    if(normAtom != 0)
-        for(qint32 i = 0; i < sampleCount; i++)
-            complexAtom[i] = complexAtom[i] / normAtom;
+    if(norm_atom != 0)
+        for(qint32 i = 0; i < sample_count; i++)
+            complex_atom[i] = complex_atom[i] / norm_atom;
 
-    return complexAtom;
+    return complex_atom;
 }
 
-VectorXd GaborAtom::CreateReal(qint32 sampleCount, qreal scale, qint32 translation, qreal modulation, qreal phase)
+VectorXd GaborAtom::create_real(qint32 sample_count, qreal scale, qint32 translation, qreal modulation, qreal phase)
 {
-    VectorXd realAtom(sampleCount);
-    qreal normAtom = 0;
+    VectorXd real_atom(sample_count);
+    qreal norm_atom = 0;
 
-    if(scale == sampleCount)
-        for(qint32 i = 0; i < sampleCount; i++)
-            realAtom[i] = 1 / sqrt(sampleCount) * cos( 2 * PI * modulation / sampleCount * qreal(i) + phase);
+    if(scale == sample_count)
+        for(qint32 i = 0; i < sample_count; i++)
+            real_atom[i] = 1 / sqrt(sample_count) * cos( 2 * PI * modulation / sample_count * qreal(i) + phase);
     else
     {
-        VectorXd envelope = GaborAtom::GaussFunction(sampleCount, scale, translation);
-        for(qint32 i = 0; i < sampleCount; i++)
+        VectorXd envelope = GaborAtom::gauss_function(sample_count, scale, translation);
+        for(qint32 i = 0; i < sample_count; i++)
         {
             qreal t = (qreal(i) - translation) / scale;
-            realAtom[i] = envelope[i] * cos(2 * PI * modulation / sampleCount * qreal(i) + phase);
+            real_atom[i] = envelope[i] * cos(2 * PI * modulation / sample_count * qreal(i) + phase);
             Q_UNUSED(t);
         }
     }
 
     //normalization
-    for(qint32 i = 0; i < sampleCount; i++)
-        normAtom += pow(realAtom[i], 2);
+    for(qint32 i = 0; i < sample_count; i++)
+        norm_atom += pow(real_atom[i], 2);
 
-    normAtom = sqrt(normAtom);
+    norm_atom = sqrt(norm_atom);
 
-    if(normAtom != 0)
-        for(qint32 i = 0; i < sampleCount; i++)
-            realAtom[i] = realAtom[i] / normAtom;
+    if(norm_atom != 0)
+        for(qint32 i = 0; i < sample_count; i++)
+            real_atom[i] = real_atom[i] / norm_atom;
 
-    return realAtom; //length of the vector realAtom is 1 after normalization
+    return real_atom; //length of the vector realAtom is 1 after normalization
 }
 
-ChirpAtom::ChirpAtom(qint32 sampleCount, qreal scale, qint32 translation, qreal modulation, qreal phase, qreal chirp, bool saveToRam)
+ChirpAtom::ChirpAtom(qint32 sample_count, qreal scale, qint32 translation, qreal modulation, qreal phase, qreal chirp, bool saveToRam)
 {
-    ChirpAtom::SampleCount = sampleCount;
-    ChirpAtom::Scale = scale;
-    ChirpAtom::Translation = translation;
-    ChirpAtom::Modulation = modulation;
-    ChirpAtom::Phase = phase;
-    ChirpAtom::Chirp = chirp;
+    ChirpAtom::sample_count = sample_count;
+    ChirpAtom::scale = scale;
+    ChirpAtom::translation = translation;
+    ChirpAtom::modulation = modulation;
+    ChirpAtom::phase = phase;
+    ChirpAtom::chirp = chirp;
     ChirpAtom::SaveToRam = saveToRam;
 }
 
