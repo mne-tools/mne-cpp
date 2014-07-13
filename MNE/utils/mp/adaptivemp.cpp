@@ -8,7 +8,7 @@
 * @date     July, 2014
 *
 * ported to mne-cpp by Martin Henfling and Daniel Knobl in May 2014
-* original code was implemented in Matlab Code by Marcij Gratkowski
+* original code was implemented in Matlab Code by Maciej Gratkowski
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,7 +30,7 @@
 *
 *
 * @brief    Implemetation of the Matching Pursuit Algorithm introduced by Stephane Mallat and Zhifeng Zhang.
-*           Matlabimplemetation of Marcij Gratkowski is used as Source and reference.
+*           Matlabimplemetation of Maciej Gratkowski is used as Source and reference.
 *
 */
 
@@ -170,7 +170,7 @@ QList<GaborAtom> AdaptiveMp::matching_pursuit (MatrixXd signal, qint32 max_it, q
             j++;
             s = pow(2.0,j);
         }
-        std::cout << "gefundene Parameter " << it << ":\n   " << gabor_Atom->scale << "     " << gabor_Atom->translation <<
+        std::cout << "found parameters " << it << ":\n   " << gabor_Atom->scale << "     " << gabor_Atom->translation <<
                      "      " << gabor_Atom->modulation << "      " << gabor_Atom->phase << "\n";
 
         //replace atoms with s==N and p = floor(N/2) by such atoms that do not have an envelope
@@ -201,7 +201,7 @@ QList<GaborAtom> AdaptiveMp::matching_pursuit (MatrixXd signal, qint32 max_it, q
             }
 
         }
-        std::cout << "gefundene Parameter nach ersetung NoEnvelope " << it << ":\n   " << gabor_Atom->scale << "     " << gabor_Atom->translation <<
+        std::cout << "found params after reset with NoEnvelope " << it << ":\n   " << gabor_Atom->scale << "     " << gabor_Atom->translation <<
                      "      " << gabor_Atom->modulation << "      " << gabor_Atom->phase << "\n";
 
         //Maximisation Simplex Algorithm implemented by Bozoa Jia, adapted to the MP Algorithm by Martin Henfling. Copyright (C) 2010 Botao Jia
@@ -412,7 +412,7 @@ QList<GaborAtom> AdaptiveMp::matching_pursuit (MatrixXd signal, qint32 max_it, q
                 gabor_Atom->max_scalar_product   = max_scalar_product;
             }
 
-            std::cout <<  "Parameter nach Optimierung " << it << ":\n   " << gabor_Atom->scale << "     " << gabor_Atom->translation <<
+            std::cout <<  "parameters after optimization " << it << ":\n   " << gabor_Atom->scale << "     " << gabor_Atom->translation <<
                                 "      " << gabor_Atom->modulation << "      " << gabor_Atom->phase << "\n\n";
             if(cnt==iterations)//max number of iteration achieves before tol is satisfied
                 std::cout<<"Simplex Iteration limit of "<<iterations<<" achieved, result may not be optimal"  <<std::endl;

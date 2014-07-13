@@ -8,7 +8,7 @@
 * @date     July, 2014
 *
 * ported to mne-cpp by Martin Henfling and Daniel Knobl in May 2014
-* original code was implemented in Matlab Code by Marcij Gratkowski
+* original code was implemented in Matlab Code by Maciej Gratkowski
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,7 +30,7 @@
 *
 *
 * @brief    ADAPIVEMP class declaration, providing the implemetation of the Matching Pursuit Algorithm
-*           introduced by Stephane Mallat and Zhifeng Zhang. Matlabimplemetation of Marcij Gratkowski is
+*           introduced by Stephane Mallat and Zhifeng Zhang. Matlabimplemetation of Maciej Gratkowski is
 *           used as Source and reference.
 *
 */
@@ -63,7 +63,7 @@
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
 #include <unsupported/Eigen/FFT>
-
+#include <QThread>
 
 
 //*************************************************************************************************************
@@ -93,8 +93,9 @@ enum ReturnValue{RETURNATOM, RETURNPARAMETERS}; /**< deciding whether to return 
 *
 * @brief The adaptiveMP class provides functions several calculating functions to run the Matching Pursuit Algorithm
 */
-class UTILSSHARED_EXPORT AdaptiveMp
+class UTILSSHARED_EXPORT AdaptiveMp : public QThread
 {
+    Q_OBJECT
 
 public:
 

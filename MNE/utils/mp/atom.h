@@ -68,7 +68,6 @@
 
 #include <QtCore/QCoreApplication>
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE NAMESPACE UTILSLIB
@@ -95,9 +94,9 @@ using namespace Eigen;
 *
 * @brief basic core parameters of atoms
 */
-class UTILSSHARED_EXPORT Atom// : public QObject // Atomklasse zum Erstellen und Abrufen von Atomen und deren Parameter
+class UTILSSHARED_EXPORT Atom// : public QObject // Atom class to build and call atoms or their parameters
 {
-       // Q_OBJECT
+    // Q_OBJECT
 public:
 
     bool SaveToRam;
