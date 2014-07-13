@@ -1037,7 +1037,7 @@ void MainWindow::CalcAdaptivMP(MatrixXd signal, int iterations, TruncationCriter
        it = iterations;
 
     qreal epsilon = 0.001;
-    AdaptiveMp *adaptiveMp = new AdaptiveMp();
+    AdaptiveMp *adaptive_Mp = new AdaptiveMp();
     qint32 t_iSize = 256;
     //MatrixXd signal (t_iSize, 1);
     MatrixXd residuum = signal;
@@ -1087,7 +1087,7 @@ void MainWindow::CalcAdaptivMP(MatrixXd signal, int iterations, TruncationCriter
     ui->progressBarCalc->setMinimum(0);
     ui->progressBarCalc->setMaximum(100);
 
-    myAtomList = adaptiveMp->matching_pursuit(signal, it, epsilon);
+    myAtomList = adaptive_Mp->matching_pursuit(signal, it, epsilon);
     //ui->progressBarCalc->setValue(var);
 
     // results in tableView

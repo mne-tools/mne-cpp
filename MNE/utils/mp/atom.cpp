@@ -8,7 +8,7 @@
 * @date     July, 2014
 *
 * ported to mne-cpp by Martin Henfling and Daniel Knobl in May 2014
-* from original code by Marcij Gratkowski
+* from original code by Maciej Gratkowski
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -31,7 +31,7 @@
 *
 * @brief    Implemetation of root funtions needed to perform the Matching Pursuit Algorithm introduced
 *           by Stephane Mallat and Zhifeng Zhang.
-*           Matlabimplemetation of Marcij Gratkowski is used as Source and reference.
+*           Matlabimplemetation of Maciej Gratkowski is used as Source and reference.
 *
 */
 
