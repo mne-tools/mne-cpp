@@ -1,4 +1,44 @@
-//MATCHING PURSUIT
+//=============================================================================================================
+/**
+* @file     atom.cpp
+* @author   Martin Henfling <martin.henfling@tu-ilmenau.de>
+*           Daniel Knobl <daniel.knobl@tu-ilmenau.de>
+*
+* @version  1.0
+* @date     July, 2014
+*
+* ported to mne-cpp by Martin Henfling and Daniel Knobl in May 2014
+* from original code by Marcij Gratkowski
+*
+* Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+* the following conditions are met:
+*     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+*       following disclaimer.
+*     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+*       the following disclaimer in the documentation and/or other materials provided with the distribution.
+*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*       to endorse or promote products derived from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+*
+* @brief    Implemetation of root funtions needed to perform the Matching Pursuit Algorithm introduced
+*           by Stephane Mallat and Zhifeng Zhang.
+*           Matlabimplemetation of Marcij Gratkowski is used as Source and reference.
+*
+*/
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
 
 #include "atom.h"
 
@@ -41,11 +81,15 @@ QStringList GaborAtom::CreateStringValues()
     return atomStringValues;
 }
 
+//*************************************************************************************************************
+
 GaborAtom::GaborAtom()
 {
     energy = 0;
     max_scalar_product = 0;
 }
+
+//*************************************************************************************************************
 
 VectorXd GaborAtom::gauss_function (qint32 sample_count, qreal scale, qint32 translation)
 {
@@ -59,6 +103,8 @@ VectorXd GaborAtom::gauss_function (qint32 sample_count, qreal scale, qint32 tra
 
     return gauss;
 }
+
+//*************************************************************************************************************
 
 VectorXcd GaborAtom::create_complex(qint32 sample_count, qreal scale, qint32 translation, qreal modulation)
 {
@@ -93,6 +139,8 @@ VectorXcd GaborAtom::create_complex(qint32 sample_count, qreal scale, qint32 tra
     return complex_atom;
 }
 
+//*************************************************************************************************************
+
 VectorXd GaborAtom::create_real(qint32 sample_count, qreal scale, qint32 translation, qreal modulation, qreal phase)
 {
     VectorXd real_atom(sample_count);
@@ -125,6 +173,8 @@ VectorXd GaborAtom::create_real(qint32 sample_count, qreal scale, qint32 transla
     return real_atom; //length of the vector realAtom is 1 after normalization
 }
 
+//*************************************************************************************************************
+
 ChirpAtom::ChirpAtom(qint32 sample_count, qreal scale, qint32 translation, qreal modulation, qreal phase, qreal chirp, bool saveToRam)
 {
     ChirpAtom::sample_count = sample_count;
@@ -136,17 +186,23 @@ ChirpAtom::ChirpAtom(qint32 sample_count, qreal scale, qint32 translation, qreal
     ChirpAtom::SaveToRam = saveToRam;
 }
 
+//*************************************************************************************************************
+
 VectorXcd ChirpAtom::CreateComplex()
 {
     VectorXcd vec;
     return vec;
 }
 
+//*************************************************************************************************************
+
 VectorXd ChirpAtom::CreateReal()
 {
     VectorXd vec;
     return vec;
 }
+
+//*************************************************************************************************************
 
 QStringList ChirpAtom::CreateStringValues()
 {
