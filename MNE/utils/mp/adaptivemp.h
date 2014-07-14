@@ -112,6 +112,14 @@ public:
     AdaptiveMp();
 
     //=========================================================================================================
+
+    qint32 it = 0;
+    VectorXd signal_energy;// = VectorXd::Zero(channel_count);
+    //VectorXd residuum_energy;// = VectorXd::Zero(channel_count);
+    //VectorXd energy_threshold;// = VectorXd::Zero(channel_count);
+    qreal current_energy = 0;
+
+    //=========================================================================================================
     /**
     * adaptiveMP_matching_pursuit
     *
@@ -161,6 +169,14 @@ public:
     * @return depending on returnValue returning the real atom calculated or the manipulated parameters: scale, translation, modulation, phase, scalarproduct
     */
     VectorXd calculate_atom(qint32 sampleCount, qreal scale, qint32 translation, qreal modulation, qint32 channel, MatrixXd residuum, ReturnValue return_value);
+
+//=========================================================================================================
+
+private slots:
+    void iteration_counter();
+
+signals:
+    void iteration_params(qint32 current_iteration, qreal current_energy);
 
 };
 
