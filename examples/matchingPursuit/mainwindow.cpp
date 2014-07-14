@@ -62,12 +62,12 @@ MatrixXd _times;
 enum TruncationCriterion
 {
     Iterations,
-    SignalEnergie,
+    SignalEnergy,
     Both
 };
 
-qreal _sollEnergie = 0;
-qreal _signalEnergie = 0;
+qreal _sollEnergy = 0;
+qreal _signalEnergy = 0;
 qreal _signalMaximum = 0;
 qreal _signalNegativeScale = 0;
 qreal _maxPos = 0;
@@ -366,9 +366,9 @@ void MainWindow::ReadMatlabFile(QString fileName)
 
 
     file.close();
-    _signalEnergie = 0;
+    _signalEnergy = 0;
     for(qint32 i = 0; i < _signalMatrix.rows(); i++)
-        _signalEnergie += (_signalMatrix(i, 0) * _signalMatrix(i, 0));
+        _signalEnergy += (_signalMatrix(i, 0) * _signalMatrix(i, 0));
 }
 
 //*************************************************************************************************************************************
@@ -951,7 +951,7 @@ void MainWindow::on_btt_Calc_clicked()
         QMessageBox msgBox(QMessageBox::Warning, title, text, QMessageBox::Ok, this);
         msgBox.exec();
 
-        //return;
+        return;
     }
 
     if(ui->chb_Iterations->checkState()  == Qt::Unchecked && ui->chb_ResEnergy->checkState() == Qt::Unchecked)
@@ -1014,7 +1014,7 @@ void MainWindow::on_btt_Calc_clicked()
             ui->tb_ResEnergy->selectAll();
             return;
         }
-        _sollEnergie =  _signalEnergie / 100 * prozentValue;
+        _sollEnergy =  _signalEnergy / 100 * prozentValue;
     } 
     else if(ui->rb_OwnDictionary->isChecked())
     {
@@ -1029,6 +1029,16 @@ void MainWindow::on_btt_Calc_clicked()
     }    
 }
 
+//*************************************************************************************************************
+
+void MainWindow::iteration_counter(qint32 current_iteration, qreal current_energy)
+{
+    qint32 local_copy_iteration = current_iteration;
+    ui->progressBarCalc->setValue(local_copy_iteration);
+}
+
+//*************************************************************************************************************
+
 void MainWindow::CalcAdaptivMP(MatrixXd signal, int iterations, TruncationCriterion criterion)
 {
 
@@ -1036,11 +1046,13 @@ void MainWindow::CalcAdaptivMP(MatrixXd signal, int iterations, TruncationCriter
     if(criterion == TruncationCriterion::Iterations || criterion == TruncationCriterion::Both)
        it = iterations;
 
-    qreal epsilon = 0.001;
+    qreal epsilon = 0.0000000000001;
     AdaptiveMp *adaptive_Mp = new AdaptiveMp();
     qint32 t_iSize = 256;
     //MatrixXd signal (t_iSize, 1);
     MatrixXd residuum = signal;
+
+    //connect(adaptive_Mp, SIGNAL(iteration_number(qint32)), this, SLOT(iteration_counter(qint32)));
 
     //Testsignal
     GaborAtom *testSignal1 = new GaborAtom();//t_iSize, 40, 180, 40, 0.8);
@@ -1083,11 +1095,18 @@ void MainWindow::CalcAdaptivMP(MatrixXd signal, int iterations, TruncationCriter
     //sPlot->show();
     //tessignal ende
 
-    //run MP Algorithm    
+    //set and update progressbar
     ui->progressBarCalc->setMinimum(0);
-    ui->progressBarCalc->setMaximum(100);
 
-    myAtomList = adaptive_Mp->matching_pursuit(signal, it, epsilon);
+    if (ui->chb_Iterations);
+    ui->progressBarCalc->setMaximum(ui->sb_Iterations->value());
+    //else if (ui->chb_ResEnergy);
+    //ui->progressBarCalc->setMaximum(adaptive_Mp->signal_energy[0]);
+
+    connect(adaptive_Mp, SIGNAL(iteration_params(qint32, qreal)), this, SLOT(iteration_counter(qint32, qreal)));
+
+    //run MP Algorithm
+    myAtomList = adaptive_Mp->matching_pursuit(signal, ui->sb_Iterations->value(), epsilon);
     //ui->progressBarCalc->setValue(var);
 
     // results in tableView

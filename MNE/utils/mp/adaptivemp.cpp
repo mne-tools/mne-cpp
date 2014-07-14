@@ -67,11 +67,11 @@ QList<GaborAtom> AdaptiveMp::matching_pursuit (MatrixXd signal, qint32 max_it, q
     QList<GaborAtom> atom_list;
     Eigen::FFT<double> fft;
     MatrixXd residuum = signal; //residuum initialised with signal
-    qint32 it = 0;              //iterationscounter
+    //qint32 it = 0;              //iterationscounter
     qint32 sample_count = signal.rows();
     qint32 channel_count = signal.cols();
     qint32 signal_channel = 0;
-    VectorXd signal_energy = VectorXd::Zero(channel_count);
+    signal_energy = VectorXd::Zero(channel_count);
     VectorXd residuum_energy = VectorXd::Zero(channel_count);
     VectorXd energy_threshold = VectorXd::Zero(channel_count);
 
@@ -427,7 +427,7 @@ QList<GaborAtom> AdaptiveMp::matching_pursuit (MatrixXd signal, qint32 max_it, q
             }
 
             residuum_energy[chn] -= gabor_Atom->energy;//(gaborAtom->max_scalar_product * bestMatch[j]) * (gaborAtom->max_scalar_product * bestMatch[j]);
-
+            current_energy = (signal_energy[chn] * (1 - energy_threshold[chn])) - residuum_energy[chn];
 
             gabor_Atom->residuum = residuum;
             atom_list.append(*gabor_Atom);
@@ -435,6 +435,9 @@ QList<GaborAtom> AdaptiveMp::matching_pursuit (MatrixXd signal, qint32 max_it, q
 
         delete gabor_Atom;
         it++;
+        //current_iteration++;
+        iteration_counter();
+
     }//end iterations
     return atom_list;
 }
@@ -497,4 +500,10 @@ VectorXd AdaptiveMp::calculate_atom(qint32 sample_count, qreal scale, qint32 tra
     }
 }
 
+//*************************************************************************************************************
+
+void AdaptiveMp::iteration_counter()
+{
+    emit iteration_params(it, current_energy);
+}
 
