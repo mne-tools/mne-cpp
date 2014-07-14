@@ -62,12 +62,12 @@ MatrixXd _times;
 enum TruncationCriterion
 {
     Iterations,
-    SignalEnergie,
+    SignalEnergy,
     Both
 };
 
-qreal _sollEnergie = 0;
-qreal _signalEnergie = 0;
+qreal _sollEnergy = 0;
+qreal _signalEnergy = 0;
 qreal _signalMaximum = 0;
 qreal _signalNegativeScale = 0;
 qreal _maxPos = 0;
@@ -219,10 +219,10 @@ void MainWindow::open_file()
     if(_datas.cols() != 0)
     {       
         // TODO: geeigneten Signalausschnitt suchen
-        _signalMatrix.resize(2000,2);
+        _signalMatrix.resize(1024,2);
         for(qint32 channels = 0; channels < 2; channels++)
-            for(qint32 i = 0; i < 2000; i++)
-                _signalMatrix(i, channels) = _datas(channels, i);
+            for(qint32 i = 0; i < 1024; i++)
+                _signalMatrix(i, channels) = _datas(channels, i) * 100000000000;
     }
     update();   
 }
@@ -366,9 +366,9 @@ void MainWindow::ReadMatlabFile(QString fileName)
 
 
     file.close();
-    _signalEnergie = 0;
+    _signalEnergy = 0;
     for(qint32 i = 0; i < _signalMatrix.rows(); i++)
-        _signalEnergie += (_signalMatrix(i, 0) * _signalMatrix(i, 0));
+        _signalEnergy += (_signalMatrix(i, 0) * _signalMatrix(i, 0));
 }
 
 //*************************************************************************************************************************************
@@ -939,10 +939,13 @@ void MainWindow::on_btt_Calc_clicked()
     processValue = 0;
     ui->progressBarCalc->setValue(0);
     ui->progressBarCalc->setHidden(false);
-    if(ui->chb_Iterations->checkState() == Qt::Checked)
+
+    if(ui->chb_Iterations->isChecked() && !ui->chb_ResEnergy->isChecked())
         criterion = TruncationCriterion::Iterations;
-    if(ui->chb_Iterations->checkState() == Qt::Checked && ui->chb_ResEnergy->checkState() == Qt::Checked)
+    if(ui->chb_Iterations->isChecked() && ui->chb_ResEnergy->isChecked())
         criterion = TruncationCriterion::Both;
+    if(ui->chb_ResEnergy->isChecked() && !ui->chb_Iterations->isChecked())
+        criterion = TruncationCriterion::SignalEnergy;
 
     if(_signalMatrix.rows() == 0)
     {
@@ -951,7 +954,7 @@ void MainWindow::on_btt_Calc_clicked()
         QMessageBox msgBox(QMessageBox::Warning, title, text, QMessageBox::Ok, this);
         msgBox.exec();
 
-        //return;
+        return;
     }
 
     if(ui->chb_Iterations->checkState()  == Qt::Unchecked && ui->chb_ResEnergy->checkState() == Qt::Unchecked)
@@ -962,9 +965,11 @@ void MainWindow::on_btt_Calc_clicked()
         msgBox.exec();
         return;
     }
-    QString resEnergy = ui->tb_ResEnergy->text();
-    resEnergy.replace(",", ".");
-    if(((resEnergy.toFloat() <= 1 && ui->tb_ResEnergy->isEnabled()) && (ui->sb_Iterations->value() >= 500 && ui->sb_Iterations->isEnabled())) || (resEnergy.toFloat() <= 1 && ui->tb_ResEnergy->isEnabled() && !ui->sb_Iterations->isEnabled()) || (ui->sb_Iterations->value() >= 500 && ui->sb_Iterations->isEnabled() && !ui->tb_ResEnergy->isEnabled()) )
+
+    QString res_energy_str = ui->tb_ResEnergy->text();
+    res_energy_str.replace(",", ".");
+
+    if(((res_energy_str.toFloat() <= 1 && ui->tb_ResEnergy->isEnabled()) && (ui->sb_Iterations->value() >= 500 && ui->sb_Iterations->isEnabled())) || (res_energy_str.toFloat() <= 1 && ui->tb_ResEnergy->isEnabled() && !ui->sb_Iterations->isEnabled()) || (ui->sb_Iterations->value() >= 500 && ui->sb_Iterations->isEnabled() && !ui->tb_ResEnergy->isEnabled()) )
     {
         QFile configFile("Matching-Pursuit-Toolbox/Matching-Pursuit-Toolbox.config");
         bool showMsgBox = false;
@@ -992,8 +997,10 @@ void MainWindow::on_btt_Calc_clicked()
     if(ui->chb_ResEnergy->isChecked())
     {
         bool ok;
+        //QString res_energy_str = ui->tb_ResEnergy->text();
+        //res_energy_str.replace(",", ".");
+        qreal percent_value = res_energy_str.toFloat(&ok);
 
-        qreal prozentValue = ui->tb_ResEnergy->text().toFloat(&ok);
         if(!ok)
         {
             QString title = "Fehler";
@@ -1004,7 +1011,7 @@ void MainWindow::on_btt_Calc_clicked()
             ui->tb_ResEnergy->selectAll();
             return;
         }
-        if(prozentValue >= 100)
+        if(percent_value >= 100)
         {
             QString title = "Fehler";
             QString text = "Bitte geben eine Zahl kleiner als 100% ein.";
@@ -1014,9 +1021,10 @@ void MainWindow::on_btt_Calc_clicked()
             ui->tb_ResEnergy->selectAll();
             return;
         }
-        _sollEnergie =  _signalEnergie / 100 * prozentValue;
+        _sollEnergy =  _signalEnergy / 100 * percent_value;
     } 
-    else if(ui->rb_OwnDictionary->isChecked())
+
+    if(ui->rb_OwnDictionary->isChecked())
     {
 
         QFile ownDict(QString("Matching-Pursuit-Toolbox/%1.dict").arg(ui->cb_Dicts->currentText()));
@@ -1025,35 +1033,46 @@ void MainWindow::on_btt_Calc_clicked()
     }
     else if(ui->rb_adativMp->isChecked())
     {
-        CalcAdaptivMP(_signalMatrix, ui->sb_Iterations->value(), criterion);
+        CalcAdaptivMP(_signalMatrix, criterion);
     }    
 }
 
-void MainWindow::CalcAdaptivMP(MatrixXd signal, int iterations, TruncationCriterion criterion)
+//*************************************************************************************************************
+
+void MainWindow::iteration_counter(qint32 current_iteration, qreal current_energy)
 {
+    qint32 local_copy_iteration = current_iteration;
+    ui->progressBarCalc->setValue(local_copy_iteration);
 
-    qint32 it = 1000;
-    if(criterion == TruncationCriterion::Iterations || criterion == TruncationCriterion::Both)
-       it = iterations;
+}
 
-    qreal epsilon = 0.001;
-    adaptiveMP *adaptiveMp = new adaptiveMP();
+//*************************************************************************************************************
+
+void MainWindow::CalcAdaptivMP(MatrixXd signal, TruncationCriterion criterion)
+{
+    //qint32 it = 1000;
+    //if(criterion == TruncationCriterion::Iterations || criterion == TruncationCriterion::Both)
+    //   it = iterations;
+
+    //qreal epsilon = 0.0000000000001;
+    AdaptiveMp *adaptive_Mp = new AdaptiveMp();
     qint32 t_iSize = 256;
     //MatrixXd signal (t_iSize, 1);
     MatrixXd residuum = signal;
 
+
     //Testsignal
     GaborAtom *testSignal1 = new GaborAtom();//t_iSize, 40, 180, 40, 0.8);
-    VectorXd t1 = testSignal1->CreateReal(t_iSize, 40, 180, 40, 0.8);//Samples, Scale, translat, modulat(symmetric to size/2, phase
-    VectorXd t2 = testSignal1->CreateReal(t_iSize, 80, 52, 50, PI);
-    VectorXd t5 = testSignal1->CreateReal(t_iSize, 20, 57, 95.505, PI);
-    VectorXd t6 = testSignal1->CreateReal(t_iSize, 10, 40, 120, 0.5);
-    VectorXd t7 = testSignal1->CreateReal(t_iSize, 150, 0, 30, PI/2);
-    VectorXd t8 = testSignal1->CreateReal(t_iSize, 256, 128, 12, 0);
-    VectorXd t9 = testSignal1->CreateReal(t_iSize, 80, 70, 10, 2.7);
-    VectorXd t3 = testSignal1->CreateReal(t_iSize, 180, 40, 40, -0.3);
-    VectorXd t4 = testSignal1->CreateReal(t_iSize, 210, 200, 46, 1);
-    VectorXd t0 = testSignal1->CreateReal(t_iSize, 56, 58, 60, 0.6);
+    VectorXd t1 = testSignal1->create_real(t_iSize, 40, 180, 40, 0.8);//Samples, Scale, translat, modulat(symmetric to size/2, phase
+    VectorXd t2 = testSignal1->create_real(t_iSize, 80, 52, 50, PI);
+    VectorXd t5 = testSignal1->create_real(t_iSize, 20, 57, 95.505, PI);
+    VectorXd t6 = testSignal1->create_real(t_iSize, 10, 40, 120, 0.5);
+    VectorXd t7 = testSignal1->create_real(t_iSize, 150, 0, 30, PI/2);
+    VectorXd t8 = testSignal1->create_real(t_iSize, 256, 128, 12, 0);
+    VectorXd t9 = testSignal1->create_real(t_iSize, 80, 70, 10, 2.7);
+    VectorXd t3 = testSignal1->create_real(t_iSize, 180, 40, 40, -0.3);
+    VectorXd t4 = testSignal1->create_real(t_iSize, 210, 200, 46, 1);
+    VectorXd t0 = testSignal1->create_real(t_iSize, 56, 58, 60, 0.6);
     VectorXd tSig(t_iSize);
 
     /*
@@ -1083,11 +1102,46 @@ void MainWindow::CalcAdaptivMP(MatrixXd signal, int iterations, TruncationCriter
     //sPlot->show();
     //tessignal ende
 
-    //run MP Algorithm    
+    //set and update progressbar
     ui->progressBarCalc->setMinimum(0);
-    ui->progressBarCalc->setMaximum(100);
+    //ui->progressBarCalc->setMaximum(100);
+    //ui->progressBarCalc->setValue(0.01);
+    //ui->progressBarCalc->setHidden(false);
 
-    myAtomList = adaptiveMp->MatchingPursuit(signal, it, epsilon);
+    //connect(adaptive_Mp, SIGNAL(iteration_params(qint32, qreal)), this, SLOT(iteration_counter(qint32, qreal)));
+
+    switch(criterion)
+    {
+        case Iterations:
+        {
+            connect(adaptive_Mp, SIGNAL(iteration_params(qint32, qreal)), this, SLOT(iteration_counter(qint32, qreal)));
+            ui->progressBarCalc->setMaximum(ui->sb_Iterations->value());
+            myAtomList = adaptive_Mp->matching_pursuit(signal, ui->sb_Iterations->value(), qreal(MININT32));
+        }
+        break;
+
+        case SignalEnergy:
+        {
+            connect(adaptive_Mp, SIGNAL(iteration_params(qint32, qreal)), this, SLOT(iteration_counter(qint32, qreal)));
+            QString res_energy_str = ui->tb_ResEnergy->text();
+            res_energy_str.replace(",", ".");
+            ui->progressBarCalc->setMaximum(100 - res_energy_str.toFloat());
+            myAtomList = adaptive_Mp->matching_pursuit(signal, MAXINT32, (ui->tb_ResEnergy->text().toFloat()));
+        }
+        break;
+
+        case Both:
+        {
+            ui->progressBarCalc->setMaximum(1000);
+            connect(adaptive_Mp, SIGNAL(iteration_params(qint32, qreal)), this, SLOT(iteration_counter(qint32, qreal)));
+            myAtomList = adaptive_Mp->matching_pursuit(signal, ui->sb_Iterations->value(), (ui->tb_ResEnergy->text().toDouble()));
+        }
+        break;
+    }
+    //connect(adaptive_Mp, SIGNAL(iteration_params(qint32, qreal)), this, SLOT(iteration_counter(qint32, qreal)));
+
+    //run MP Algorithm
+
     //ui->progressBarCalc->setValue(var);
 
     // results in tableView
@@ -1115,10 +1169,10 @@ void MainWindow::CalcAdaptivMP(MatrixXd signal, int iterations, TruncationCriter
         }
 
         QTableWidgetItem* atomEnergieItem = new QTableWidgetItem(QString::number(procentAtomEnergie, 'f', 2));
-        QTableWidgetItem* atomScaleItem = new QTableWidgetItem(QString::number(myAtomList[i].Scale, 'g', 3));
-        QTableWidgetItem* atomTranslationItem = new QTableWidgetItem(QString::number(myAtomList[i].Translation, 'g', 3));
-        QTableWidgetItem* atomModulationItem = new QTableWidgetItem(QString::number(myAtomList[i].Modulation, 'g', 3));
-        QTableWidgetItem* atomPhaseItem = new QTableWidgetItem(QString::number(myAtomList[i].Phase, 'g', 3));
+        QTableWidgetItem* atomScaleItem = new QTableWidgetItem(QString::number(myAtomList[i].scale, 'g', 3));
+        QTableWidgetItem* atomTranslationItem = new QTableWidgetItem(QString::number(myAtomList[i].translation, 'g', 3));
+        QTableWidgetItem* atomModulationItem = new QTableWidgetItem(QString::number(myAtomList[i].modulation, 'g', 3));
+        QTableWidgetItem* atomPhaseItem = new QTableWidgetItem(QString::number(myAtomList[i].phase, 'g', 3));
 
 
         atomEnergieItem->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
@@ -1164,8 +1218,8 @@ void MainWindow::CalcAdaptivMP(MatrixXd signal, int iterations, TruncationCriter
         for(qint32 i = 0; i < myAtomList.length(); i++)
         {
             GaborAtom gaborAtom = myAtomList.at(i);
-            residuum = gaborAtom.Residuum;
-            VectorXd bestMatch = gaborAtom.CreateReal(gaborAtom.SampleCount, gaborAtom.Scale, gaborAtom.Translation, gaborAtom.Modulation, gaborAtom.Phase);//256, 20, 57, 95.505, PI);//
+            residuum = gaborAtom.residuum;
+            VectorXd bestMatch = gaborAtom.create_real(gaborAtom.sample_count, gaborAtom.scale, gaborAtom.translation, gaborAtom.modulation, gaborAtom.phase);//256, 20, 57, 95.505, PI);//
 
             //for(qint32 jj = 0; jj < gaborAtom.SampleCount; jj++)
             //    residuum(jj,0) -= gaborAtom.MaxScalarProduct * bestMatch[jj];
@@ -1174,7 +1228,7 @@ void MainWindow::CalcAdaptivMP(MatrixXd signal, int iterations, TruncationCriter
 
             for(qint32 ij = 0; ij < t_iSize; ij++)
             {
-                plotResiduum[ij] = gaborAtom.Residuum(ij,0);
+                plotResiduum[ij] = gaborAtom.residuum(ij,0);
             }
 
             QString title;          // string which will contain the result
@@ -1186,8 +1240,8 @@ void MainWindow::CalcAdaptivMP(MatrixXd signal, int iterations, TruncationCriter
             //find  maximum of Atom
             maximum = 0;
             for(qint32 ki = 1; ki < t_iSize; ki++)
-                if(abs(maximum) < abs(gaborAtom.MaxScalarProduct * bestMatch[ki]))
-                    maximum = gaborAtom.MaxScalarProduct * bestMatch[ki];
+                if(abs(maximum) < abs(gaborAtom.max_scalar_product * bestMatch[ki]))
+                    maximum = gaborAtom.max_scalar_product * bestMatch[ki];
             std::cout << "hoechste Amplitude im Atom " << i << ":    " << maximum << "\n";
 
             //find  maximum of Residuum
@@ -1207,20 +1261,20 @@ void MainWindow::CalcAdaptivMP(MatrixXd signal, int iterations, TruncationCriter
     {
         GaborAtom gaborAtom = myAtomList.at(i);//new GaborAtom;
         //paintAtom = myAtomList.at(i);
-        qint32 var1 = (gaborAtom.SampleCount);
-        qreal var2 = (gaborAtom.Scale);
-        qint32 var3 = (gaborAtom.Translation);
-        qreal var4 = gaborAtom.Modulation;
-        qreal var5 = gaborAtom.Phase;
+        qint32 var1 = (gaborAtom.sample_count);
+        qreal var2 = (gaborAtom.scale);
+        qint32 var3 = (gaborAtom.translation);
+        qreal var4 = gaborAtom.modulation;
+        qreal var5 = gaborAtom.phase;
         //qreal var6 = gaborAtom.MaxScalarProduct;
         std::cout << "Parameter die Residuum bauen:\n   "<< " scale:  "  << var2 << " transl: " << var3 <<" modul: " << var4 <<" phase: " << var5 <<"\n";
         //std::cout << atan(1000000000)*180/PI << "\n";
-        approximation += gaborAtom.MaxScalarProduct * gaborAtom.CreateReal(var1, var2, var3, var4, var5);
+        approximation += gaborAtom.max_scalar_product * gaborAtom.create_real(var1, var2, var3, var4, var5);
 
         QString title;          // string which will contain the title
 
         //plot atoms found
-        VectorXd tmp = gaborAtom.CreateReal(var1, var2, var3, var4, var5);
+        VectorXd tmp = gaborAtom.create_real(var1, var2, var3, var4, var5);
         Plot *atPlot = new Plot(tmp);
         title.append(QString("Atom: %1").arg(i));
         atPlot->setTitle(title);
@@ -1275,14 +1329,14 @@ void MainWindow::on_tbv_Results_cellClicked(int row, int column)
     if(firstItem->checkState())
     {
         firstItem->setCheckState(Qt::Unchecked);
-        _atomSumVector -= atom.MaxScalarProduct * atom.CreateReal(atom.SampleCount, atom.Scale, atom.Translation, atom.Modulation, atom.Phase);
-        _residuumVector += atom.MaxScalarProduct * atom.CreateReal(atom.SampleCount, atom.Scale, atom.Translation, atom.Modulation, atom.Phase);
+        _atomSumVector -= atom.max_scalar_product * atom.create_real(atom.sample_count, atom.scale, atom.translation, atom.modulation, atom.phase);
+        _residuumVector += atom.max_scalar_product * atom.create_real(atom.sample_count, atom.scale, atom.translation, atom.modulation, atom.phase);
     }
     else
     {
         firstItem->setCheckState(Qt::Checked);
-        _atomSumVector += atom.MaxScalarProduct * atom.CreateReal(atom.SampleCount, atom.Scale, atom.Translation, atom.Modulation, atom.Phase);
-        _residuumVector -= atom.MaxScalarProduct * atom.CreateReal(atom.SampleCount, atom.Scale, atom.Translation, atom.Modulation, atom.Phase);
+        _atomSumVector += atom.max_scalar_product * atom.create_real(atom.sample_count, atom.scale, atom.translation, atom.modulation, atom.phase);
+        _residuumVector -= atom.max_scalar_product * atom.create_real(atom.sample_count, atom.scale, atom.translation, atom.modulation, atom.phase);
     }
     update();
 }
