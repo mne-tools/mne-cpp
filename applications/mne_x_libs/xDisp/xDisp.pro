@@ -97,9 +97,6 @@ SOURCES += \
     measurementwidget.cpp \
     newmeasurementwidget.cpp \
     realtimemultisamplearraywidget.cpp \
-    textwidget.cpp \
-    progressbarwidget.cpp \
-    numericwidget.cpp \
     realtimesamplearraywidget.cpp \
     helpers/realtimemultisamplearraymodel.cpp \
     helpers/realtimemultisamplearraydelegate.cpp \
@@ -114,9 +111,6 @@ HEADERS += \
     measurementwidget.h \
     newmeasurementwidget.h \
     realtimemultisamplearraywidget.h \
-    textwidget.h \
-    progressbarwidget.h \
-    numericwidget.h \
     realtimesamplearraywidget.h \
     helpers/realtimemultisamplearraymodel.h \
     helpers/realtimemultisamplearraydelegate.h \
@@ -127,9 +121,6 @@ HEADERS += \
     helpers/sensorwidget.h
 
 FORMS += \
-    textwidget.ui \
-    progressbarwidget.ui \
-    numericwidget.ui \
     realtimesamplearraywidget.ui
 
 qtHaveModule(3d) {

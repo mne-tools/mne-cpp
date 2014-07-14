@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     averaging.h
+* @file     covariance.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the Averaging class.
+* @brief    Contains the declaration of the Covariance class.
 *
 */
 
-#ifndef AVERAGING_H
-#define AVERAGING_H
+#ifndef COVARIANCE_H
+#define COVARIANCE_H
 
 
 //*************************************************************************************************************
@@ -42,7 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "averaging_global.h"
+#include "covariance_global.h"
 
 #include <mne_x/Interfaces/IAlgorithm.h>
 #include <generics/circularmatrixbuffer.h>
@@ -67,10 +67,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE AveragingPlugin
+// DEFINE NAMESPACE CovariancePlugin
 //=============================================================================================================
 
-namespace AveragingPlugin
+namespace CovariancePlugin
 {
 
 
@@ -92,29 +92,29 @@ using namespace IOBuffer;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS Averaging
+* DECLARE CLASS Covariance
 *
-* @brief The Averaging class provides a Averaging algorithm structure.
+* @brief The Covariance class provides a Covariance algorithm structure.
 */
-class AVERAGINGSHARED_EXPORT Averaging : public IAlgorithm
+class COVARIANCESHARED_EXPORT Covariance : public IAlgorithm
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "averaging.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "covariance.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(MNEX::IAlgorithm)
 
 public:
     //=========================================================================================================
     /**
-    * Constructs a Averaging.
+    * Constructs a Covariance.
     */
-    Averaging();
+    Covariance();
 
     //=========================================================================================================
     /**
-    * Destroys the Averaging.
+    * Destroys the Covariance.
     */
-    ~Averaging();
+    ~Covariance();
 
     //=========================================================================================================
     /**
@@ -155,18 +155,19 @@ private:
     */
     void initConnector();
 
-    PluginInputData<NewRealTimeMultiSampleArray>::SPtr   m_pAveragingInput;      /**< The RealTimeSampleArray of the Averaging input.*/
-//    PluginOutputData<NewRealTimeMultiSampleArray>::SPtr  m_pAveragingOutput;    /**< The RealTimeSampleArray of the Averaging output.*/
+    PluginInputData<NewRealTimeMultiSampleArray>::SPtr   m_pCovarianceInput;        /**< The NewRealTimeMultiSampleArray of the Covariance input.*/
+//    PluginOutputData<NewRealTimeMultiSampleArray>::SPtr  m_pCovarianceOutput;       /**< The NewRealTimeMultiSampleArray of the Covariance output.*/
 
-    FiffInfo::SPtr  m_pFiffInfo;                            /**< Fiff measurement info.*/
+    FiffInfo::SPtr  m_pFiffInfo;                                /**< Fiff measurement info.*/
 
-    CircularMatrixBuffer<double>::SPtr   m_pAveragingBuffer;      /**< Holds incoming data.*/
+    CircularMatrixBuffer<double>::SPtr   m_pCovarianceBuffer;   /**< Holds incoming data.*/
 
     bool m_bIsRunning;      /**< If source lab is running */
     bool m_bProcessData;    /**< If data should be received for processing */
+
 
 };
 
 } // NAMESPACE
 
-#endif // AVERAGING_H
+#endif // COVARIANCE_H
