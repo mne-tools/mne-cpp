@@ -91,7 +91,8 @@ SOURCES += \
     realtimesamplearraychinfo.cpp \
     newnumeric.cpp \
     newmeasurement.cpp \
-    measurementtypes.cpp
+    measurementtypes.cpp \
+    realtimeevoked.cpp
 
 
 HEADERS += \
@@ -110,7 +111,8 @@ HEADERS += \
     realtimesamplearraychinfo.h \
     newnumeric.h \
     newmeasurement.h \
-    measurementtypes.h
+    measurementtypes.h \
+    realtimeevoked.h
 
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
