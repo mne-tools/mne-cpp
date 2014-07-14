@@ -85,7 +85,6 @@ QList<GaborAtom> AdaptiveMp::matching_pursuit (MatrixXd signal, qint32 max_it, q
         residuum_energy[channel] = signal_energy[channel];
     }
 
-
     //TODO multichannel!! Not working yet: problem is energy_threshold-->when should i increase signal_channel? may change order of loops for that
     //connecting atoms to the channel, thing to think about....
 
@@ -434,8 +433,7 @@ QList<GaborAtom> AdaptiveMp::matching_pursuit (MatrixXd signal, qint32 max_it, q
         }//end Maximisation Copyright (C) 2010 Botao Jia
 
         delete gabor_Atom;
-        it++;
-        //current_iteration++;
+        it++;        
         iteration_counter();
 
     }//end iterations

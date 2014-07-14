@@ -939,10 +939,13 @@ void MainWindow::on_btt_Calc_clicked()
     processValue = 0;
     ui->progressBarCalc->setValue(0);
     ui->progressBarCalc->setHidden(false);
-    if(ui->chb_Iterations->checkState() == Qt::Checked)
+
+    if(ui->chb_Iterations->isChecked() && !ui->chb_ResEnergy->isChecked())
         criterion = TruncationCriterion::Iterations;
-    if(ui->chb_Iterations->checkState() == Qt::Checked && ui->chb_ResEnergy->checkState() == Qt::Checked)
+    if(ui->chb_Iterations->isChecked() && ui->chb_ResEnergy->isChecked())
         criterion = TruncationCriterion::Both;
+    if(ui->chb_ResEnergy->isChecked() && !ui->chb_Iterations->isChecked())
+        criterion = TruncationCriterion::SignalEnergy;
 
     if(_signalMatrix.rows() == 0)
     {
@@ -962,9 +965,11 @@ void MainWindow::on_btt_Calc_clicked()
         msgBox.exec();
         return;
     }
-    QString resEnergy = ui->tb_ResEnergy->text();
-    resEnergy.replace(",", ".");
-    if(((resEnergy.toFloat() <= 1 && ui->tb_ResEnergy->isEnabled()) && (ui->sb_Iterations->value() >= 500 && ui->sb_Iterations->isEnabled())) || (resEnergy.toFloat() <= 1 && ui->tb_ResEnergy->isEnabled() && !ui->sb_Iterations->isEnabled()) || (ui->sb_Iterations->value() >= 500 && ui->sb_Iterations->isEnabled() && !ui->tb_ResEnergy->isEnabled()) )
+
+    QString res_energy_str = ui->tb_ResEnergy->text();
+    res_energy_str.replace(",", ".");
+
+    if(((res_energy_str.toFloat() <= 1 && ui->tb_ResEnergy->isEnabled()) && (ui->sb_Iterations->value() >= 500 && ui->sb_Iterations->isEnabled())) || (res_energy_str.toFloat() <= 1 && ui->tb_ResEnergy->isEnabled() && !ui->sb_Iterations->isEnabled()) || (ui->sb_Iterations->value() >= 500 && ui->sb_Iterations->isEnabled() && !ui->tb_ResEnergy->isEnabled()) )
     {
         QFile configFile("Matching-Pursuit-Toolbox/Matching-Pursuit-Toolbox.config");
         bool showMsgBox = false;
@@ -992,8 +997,10 @@ void MainWindow::on_btt_Calc_clicked()
     if(ui->chb_ResEnergy->isChecked())
     {
         bool ok;
+        //QString res_energy_str = ui->tb_ResEnergy->text();
+        //res_energy_str.replace(",", ".");
+        qreal percent_value = res_energy_str.toFloat(&ok);
 
-        qreal prozentValue = ui->tb_ResEnergy->text().toFloat(&ok);
         if(!ok)
         {
             QString title = "Fehler";
@@ -1004,7 +1011,7 @@ void MainWindow::on_btt_Calc_clicked()
             ui->tb_ResEnergy->selectAll();
             return;
         }
-        if(prozentValue >= 100)
+        if(percent_value >= 100)
         {
             QString title = "Fehler";
             QString text = "Bitte geben eine Zahl kleiner als 100% ein.";
@@ -1014,9 +1021,10 @@ void MainWindow::on_btt_Calc_clicked()
             ui->tb_ResEnergy->selectAll();
             return;
         }
-        _sollEnergy =  _signalEnergy / 100 * prozentValue;
+        _sollEnergy =  _signalEnergy / 100 * percent_value;
     } 
-    else if(ui->rb_OwnDictionary->isChecked())
+
+    if(ui->rb_OwnDictionary->isChecked())
     {
 
         QFile ownDict(QString("Matching-Pursuit-Toolbox/%1.dict").arg(ui->cb_Dicts->currentText()));
@@ -1025,7 +1033,7 @@ void MainWindow::on_btt_Calc_clicked()
     }
     else if(ui->rb_adativMp->isChecked())
     {
-        CalcAdaptivMP(_signalMatrix, ui->sb_Iterations->value(), criterion);
+        CalcAdaptivMP(_signalMatrix, criterion);
     }    
 }
 
@@ -1035,24 +1043,23 @@ void MainWindow::iteration_counter(qint32 current_iteration, qreal current_energ
 {
     qint32 local_copy_iteration = current_iteration;
     ui->progressBarCalc->setValue(local_copy_iteration);
+
 }
 
 //*************************************************************************************************************
 
-void MainWindow::CalcAdaptivMP(MatrixXd signal, int iterations, TruncationCriterion criterion)
+void MainWindow::CalcAdaptivMP(MatrixXd signal, TruncationCriterion criterion)
 {
+    //qint32 it = 1000;
+    //if(criterion == TruncationCriterion::Iterations || criterion == TruncationCriterion::Both)
+    //   it = iterations;
 
-    qint32 it = 1000;
-    if(criterion == TruncationCriterion::Iterations || criterion == TruncationCriterion::Both)
-       it = iterations;
-
-    qreal epsilon = 0.0000000000001;
+    //qreal epsilon = 0.0000000000001;
     AdaptiveMp *adaptive_Mp = new AdaptiveMp();
     qint32 t_iSize = 256;
     //MatrixXd signal (t_iSize, 1);
     MatrixXd residuum = signal;
 
-    //connect(adaptive_Mp, SIGNAL(iteration_number(qint32)), this, SLOT(iteration_counter(qint32)));
 
     //Testsignal
     GaborAtom *testSignal1 = new GaborAtom();//t_iSize, 40, 180, 40, 0.8);
@@ -1097,16 +1104,44 @@ void MainWindow::CalcAdaptivMP(MatrixXd signal, int iterations, TruncationCriter
 
     //set and update progressbar
     ui->progressBarCalc->setMinimum(0);
+    //ui->progressBarCalc->setMaximum(100);
+    //ui->progressBarCalc->setValue(0.01);
+    //ui->progressBarCalc->setHidden(false);
 
-    if (ui->chb_Iterations);
-    ui->progressBarCalc->setMaximum(ui->sb_Iterations->value());
-    //else if (ui->chb_ResEnergy);
-    //ui->progressBarCalc->setMaximum(adaptive_Mp->signal_energy[0]);
+    //connect(adaptive_Mp, SIGNAL(iteration_params(qint32, qreal)), this, SLOT(iteration_counter(qint32, qreal)));
 
-    connect(adaptive_Mp, SIGNAL(iteration_params(qint32, qreal)), this, SLOT(iteration_counter(qint32, qreal)));
+    switch(criterion)
+    {
+        case Iterations:
+        {
+            connect(adaptive_Mp, SIGNAL(iteration_params(qint32, qreal)), this, SLOT(iteration_counter(qint32, qreal)));
+            ui->progressBarCalc->setMaximum(ui->sb_Iterations->value());
+            myAtomList = adaptive_Mp->matching_pursuit(signal, ui->sb_Iterations->value(), qreal(MININT32));
+        }
+        break;
+
+        case SignalEnergy:
+        {
+            connect(adaptive_Mp, SIGNAL(iteration_params(qint32, qreal)), this, SLOT(iteration_counter(qint32, qreal)));
+            QString res_energy_str = ui->tb_ResEnergy->text();
+            res_energy_str.replace(",", ".");
+            ui->progressBarCalc->setMaximum(100 - res_energy_str.toFloat());
+            myAtomList = adaptive_Mp->matching_pursuit(signal, MAXINT32, (ui->tb_ResEnergy->text().toFloat()));
+        }
+        break;
+
+        case Both:
+        {
+            ui->progressBarCalc->setMaximum(1000);
+            connect(adaptive_Mp, SIGNAL(iteration_params(qint32, qreal)), this, SLOT(iteration_counter(qint32, qreal)));
+            myAtomList = adaptive_Mp->matching_pursuit(signal, ui->sb_Iterations->value(), (ui->tb_ResEnergy->text().toDouble()));
+        }
+        break;
+    }
+    //connect(adaptive_Mp, SIGNAL(iteration_params(qint32, qreal)), this, SLOT(iteration_counter(qint32, qreal)));
 
     //run MP Algorithm
-    myAtomList = adaptive_Mp->matching_pursuit(signal, ui->sb_Iterations->value(), epsilon);
+
     //ui->progressBarCalc->setValue(var);
 
     // results in tableView
