@@ -60,6 +60,8 @@ private slots:
 
     void on_tbv_Results_cellClicked(int row, int column);
 
+    void iteration_counter(qint32 current_iteration, qreal current_energy);
+
 private:
 
     Ui::MainWindow *ui;    
@@ -72,7 +74,8 @@ private:
     //VectorXd mpCalc(QFile& dictionary, VectorXd signalSamples, qint32 iterationsCount);
     qint32 ReadFiffFile(QString fileName);
     void ReadMatlabFile(QString fileName);
-    void CalcAdaptivMP(MatrixXd signal, int iterations, TruncationCriterion criterion);
+    void CalcAdaptivMP(MatrixXd signal, TruncationCriterion criterion);
+
 };
 
 //*************************************************************************************************************
