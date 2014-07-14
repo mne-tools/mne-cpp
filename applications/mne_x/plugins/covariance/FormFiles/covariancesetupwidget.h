@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     averaging.h
+* @file     covariancesetupwidget.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the Averaging class.
+* @brief    Contains the declaration of the CovarianceSetupWidget class.
 *
 */
 
-#ifndef AVERAGING_H
-#define AVERAGING_H
+#ifndef COVARIANCESETUPWIDGET_H
+#define COVARIANCESETUPWIDGET_H
 
 
 //*************************************************************************************************************
@@ -42,19 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "averaging_global.h"
-
-#include <mne_x/Interfaces/IAlgorithm.h>
-#include <generics/circularmatrixbuffer.h>
-#include <xMeas/newrealtimemultisamplearray.h>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FIFF INCLUDES
-//=============================================================================================================
-
-#include <fiff/fiff_info.h>
+#include "../ui_covariancesetup.h"
 
 
 //*************************************************************************************************************
@@ -67,21 +55,17 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE AveragingPlugin
+// USED NAMESPACES
 //=============================================================================================================
-
-namespace AveragingPlugin
-{
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// DEFINE NAMESPACE CovariancePlugin
 //=============================================================================================================
 
-using namespace MNEX;
-using namespace XMEASLIB;
-using namespace IOBuffer;
+namespace CovariancePlugin
+{
 
 
 //*************************************************************************************************************
@@ -89,84 +73,53 @@ using namespace IOBuffer;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+class Covariance;
+
 
 //=============================================================================================================
 /**
-* DECLARE CLASS Averaging
+* DECLARE CLASS CovarianceSetupWidget
 *
-* @brief The Averaging class provides a Averaging algorithm structure.
+* @brief The CovarianceSetupWidget class provides the CovarianceToolbox configuration window.
 */
-class AVERAGINGSHARED_EXPORT Averaging : public IAlgorithm
+class CovarianceSetupWidget : public QWidget
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "averaging.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
-    // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(MNEX::IAlgorithm)
 
 public:
-    //=========================================================================================================
-    /**
-    * Constructs a Averaging.
-    */
-    Averaging();
 
     //=========================================================================================================
     /**
-    * Destroys the Averaging.
+    * Constructs a CovarianceSetupWidget which is a child of parent.
+    *
+    * @param [in] toolbox a pointer to the corresponding Covariance toolbox.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new CovarianceSetupWidget becomes a window. If parent is another widget, CovarianceSetupWidget becomes a child window inside parent. CovarianceSetupWidget is deleted when its parent is deleted.
     */
-    ~Averaging();
+    CovarianceSetupWidget(Covariance* toolbox, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Initialise input and output connectors.
+    * Destroys the CovarianceSetupWidget.
+    * All CovarianceSetupWidget's children are deleted first. The application exits if CovarianceSetupWidget is the main widget.
     */
-    void init();
+    ~CovarianceSetupWidget();
 
+
+private slots:
     //=========================================================================================================
     /**
-    * Clone the plugin
+    * Shows the About Dialog
+    *
     */
-    virtual QSharedPointer<IPlugin> clone() const;
-
-    virtual bool start();
-    virtual bool stop();
-
-    virtual IPlugin::PluginType getType() const;
-    virtual QString getName() const;
-
-    virtual QWidget* setupWidget();
-
-    void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
-
-signals:
-    //=========================================================================================================
-    /**
-    * Emitted when fiffInfo is available
-    */
-    void fiffInfoAvailable();
-
-protected:
-    virtual void run();
+    void showAboutDialog();
 
 private:
-    //=========================================================================================================
-    /**
-    * Initialises the output connector.
-    */
-    void initConnector();
 
-    PluginInputData<NewRealTimeMultiSampleArray>::SPtr   m_pAveragingInput;      /**< The RealTimeSampleArray of the Averaging input.*/
-//    PluginOutputData<NewRealTimeMultiSampleArray>::SPtr  m_pAveragingOutput;    /**< The RealTimeSampleArray of the Averaging output.*/
+    Covariance* m_pCovariance;        /**< Holds a pointer to corresponding Covariance.*/
 
-    FiffInfo::SPtr  m_pFiffInfo;                            /**< Fiff measurement info.*/
-
-    CircularMatrixBuffer<double>::SPtr   m_pAveragingBuffer;      /**< Holds incoming data.*/
-
-    bool m_bIsRunning;      /**< If source lab is running */
-    bool m_bProcessData;    /**< If data should be received for processing */
-
+    Ui::CovarianceSetupWidgetClass ui;   /**< Holds the user interface for the CovarianceSetupWidget.*/
 };
 
 } // NAMESPACE
 
-#endif // AVERAGING_H
+#endif // COVARIANCESETUPWIDGET_H
