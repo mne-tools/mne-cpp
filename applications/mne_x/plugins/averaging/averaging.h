@@ -47,6 +47,7 @@
 #include <mne_x/Interfaces/IAlgorithm.h>
 #include <generics/circularmatrixbuffer.h>
 #include <xMeas/newrealtimemultisamplearray.h>
+#include <xMeas/realtimeevoked.h>
 
 
 //*************************************************************************************************************
@@ -155,8 +156,8 @@ private:
     */
     void initConnector();
 
-    PluginInputData<NewRealTimeMultiSampleArray>::SPtr   m_pAveragingInput;      /**< The RealTimeSampleArray of the Averaging input.*/
-//    PluginOutputData<NewRealTimeMultiSampleArray>::SPtr  m_pAveragingOutput;    /**< The RealTimeSampleArray of the Averaging output.*/
+    PluginInputData<NewRealTimeMultiSampleArray>::SPtr   m_pAveragingInput;     /**< The RealTimeSampleArray of the Averaging input.*/
+    PluginOutputData<RealTimeEvoked>::SPtr  m_pAveragingOutput;                 /**< The RealTimeEvoked of the Averaging output.*/
 
     FiffInfo::SPtr  m_pFiffInfo;                            /**< Fiff measurement info.*/
 
