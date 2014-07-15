@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     newrealtimemultisamplearray.h
+* @file     realtimeevoked.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the NewRealTimeMultiSampleArray class.
+* @brief    Contains the declaration of the RealTimeEvoked class.
 *
 */
 
-#ifndef NEWREALTIMEMULTISAMPLEARRAY_H
-#define NEWREALTIMEMULTISAMPLEARRAY_H
+#ifndef REALTIMEEVOKED_H
+#define REALTIMEEVOKED_H
 
 
 //*************************************************************************************************************
@@ -78,34 +78,28 @@ using namespace FIFFLIB;
 
 //=========================================================================================================
 /**
-* DECLARE CLASS NewRealTimeMultiSampleArray -> ToDo check feasibilty of QAbstractTableModel
+* DECLARE CLASS RealTimeEvoked -> ToDo check feasibilty of QAbstractTableModel
 *
 * @brief The RealTimeMultiSampleArrayNew class is the base class of every RealTimeMultiSampleArrayNew Measurement.
 */
-class XMEASSHARED_EXPORT NewRealTimeMultiSampleArray : public NewMeasurement
+class XMEASSHARED_EXPORT RealTimeEvoked : public NewMeasurement
 {
     Q_OBJECT
 public:
-    typedef QSharedPointer<NewRealTimeMultiSampleArray> SPtr;               /**< Shared pointer type for NewRealTimeMultiSampleArray. */
-    typedef QSharedPointer<const NewRealTimeMultiSampleArray> ConstSPtr;    /**< Const shared pointer type for NewRealTimeMultiSampleArray. */
+    typedef QSharedPointer<RealTimeEvoked> SPtr;               /**< Shared pointer type for RealTimeEvoked. */
+    typedef QSharedPointer<const RealTimeEvoked> ConstSPtr;    /**< Const shared pointer type for RealTimeEvoked. */
 
     //=========================================================================================================
     /**
     * Constructs a RealTimeMultiSampleArrayNew.
     */
-    explicit NewRealTimeMultiSampleArray(QObject *parent = 0);
+    explicit RealTimeEvoked(QObject *parent = 0);
 
     //=========================================================================================================
     /**
     * Destroys the RealTimeMultiSampleArrayNew.
     */
-    virtual ~NewRealTimeMultiSampleArray();
-
-    //=========================================================================================================
-    /**
-    * Clears all the data stored in the buffer.
-    */
-    void clear();
+    virtual ~RealTimeEvoked();
 
     //=========================================================================================================
     /**
@@ -149,22 +143,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Sets the sampling rate of the RealTimeMultiSampleArrayNew Measurement.
-    *
-    * @param[in] dSamplingRate the sampling rate of the RealTimeMultiSampleArrayNew.
-    */
-    inline void setSamplingRate(double dSamplingRate);
-
-    //=========================================================================================================
-    /**
-    * Returns the sampling rate of the RealTimeMultiSampleArrayNew Measurement.
-    *
-    * @return the sampling rate of the RealTimeMultiSampleArrayNew.
-    */
-    inline double getSamplingRate() const;
-
-    //=========================================================================================================
-    /**
     * Returns the number of channels.
     *
     * @return the number of values which are gathered before a notify() is called.
@@ -189,35 +167,11 @@ public:
 
     //=========================================================================================================
     /**
-    * Sets the number of sample vectors which should be gathered before attached observers are notified by calling the Subject notify() method.
+    * New data block to distribute
     *
-    * @param [in] ucMultiArraySize the number of values.
+    * @param [in] v the value which is should be distributed.
     */
-    inline void setMultiArraySize(unsigned char ucMultiArraySize);
-
-    //=========================================================================================================
-    /**
-    * Returns the number of values which should be gathered before attached observers are notified by calling the Subject notify() method.
-    *
-    * @return the number of values which are gathered before a notify() is called.
-    */
-    inline unsigned char getMultiArraySize() const;
-
-    //=========================================================================================================
-    /**
-    * Returns the gathered multi sample array.
-    *
-    * @return the current multi sample array.
-    */
-    inline const QVector< VectorXd >& getMultiSampleArray();
-
-    //=========================================================================================================
-    /**
-    * Attaches a value to the sample array vector.
-    *
-    * @param [in] v the value which is attached to the sample array vector.
-    */
-    virtual void setValue(VectorXd v);
+    virtual void setValue(MatrixXd v);
 
     //=========================================================================================================
     /**
@@ -226,16 +180,13 @@ public:
     *
     * @return the last attached value.
     */
-    virtual VectorXd getValue() const;
+    virtual MatrixXd getValue() const;
 
 private:
     FiffInfo::SPtr              m_pFiffInfo_orig;   /**< Original Fiff Info if initialized by fiff info. */
 
     QString                     m_sXMLLayoutFile;   /**< Layout file name. */
-    double                      m_dSamplingRate;    /**< Sampling rate of the RealTimeSampleArray.*/
-    VectorXd                    m_vecValue;         /**< The current attached sample vector.*/
-    unsigned char               m_ucMultiArraySize; /**< Sample size of the multi sample array.*/
-    QVector< VectorXd >         m_matSamples;       /**< The multi sample array.*/
+    MatrixXd                    m_matValue;         /**< The current attached sample vector.*/
     QList<RealTimeSampleArrayChInfo> m_qListChInfo; /**< Channel info list.*/
     bool                        m_bChInfoIsInit;    /**< If channel info is initialized.*/
 };
@@ -246,15 +197,10 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline void NewRealTimeMultiSampleArray::clear()
-{
-    m_matSamples.clear();
-}
-
 
 //*************************************************************************************************************
 
-inline bool NewRealTimeMultiSampleArray::isChInit() const
+inline bool RealTimeEvoked::isChInit() const
 {
     return m_bChInfoIsInit;
 }
@@ -262,7 +208,7 @@ inline bool NewRealTimeMultiSampleArray::isChInit() const
 
 //*************************************************************************************************************
 
-inline const QString& NewRealTimeMultiSampleArray::getXMLLayoutFile() const
+inline const QString& RealTimeEvoked::getXMLLayoutFile() const
 {
     return m_sXMLLayoutFile;
 }
@@ -270,7 +216,7 @@ inline const QString& NewRealTimeMultiSampleArray::getXMLLayoutFile() const
 
 //*************************************************************************************************************
 
-inline void NewRealTimeMultiSampleArray::setXMLLayoutFile(const QString& layout)
+inline void RealTimeEvoked::setXMLLayoutFile(const QString& layout)
 {
     m_sXMLLayoutFile = layout;
 }
@@ -278,23 +224,7 @@ inline void NewRealTimeMultiSampleArray::setXMLLayoutFile(const QString& layout)
 
 //*************************************************************************************************************
 
-inline void NewRealTimeMultiSampleArray::setSamplingRate(double dSamplingRate)
-{
-    m_dSamplingRate = dSamplingRate;
-}
-
-
-//*************************************************************************************************************
-
-inline double NewRealTimeMultiSampleArray::getSamplingRate() const
-{
-    return m_dSamplingRate;
-}
-
-
-//*************************************************************************************************************
-
-inline unsigned int NewRealTimeMultiSampleArray::getNumChannels() const
+inline unsigned int RealTimeEvoked::getNumChannels() const
 {
     return m_qListChInfo.size();
 }
@@ -302,7 +232,7 @@ inline unsigned int NewRealTimeMultiSampleArray::getNumChannels() const
 
 //*************************************************************************************************************
 
-inline QList<RealTimeSampleArrayChInfo>& NewRealTimeMultiSampleArray::chInfo()
+inline QList<RealTimeSampleArrayChInfo>& RealTimeEvoked::chInfo()
 {
     return m_qListChInfo;
 }
@@ -310,41 +240,13 @@ inline QList<RealTimeSampleArrayChInfo>& NewRealTimeMultiSampleArray::chInfo()
 
 //*************************************************************************************************************
 
-inline FiffInfo::SPtr& NewRealTimeMultiSampleArray::getFiffInfo()
+inline FiffInfo::SPtr& RealTimeEvoked::getFiffInfo()
 {
     return m_pFiffInfo_orig;
 }
 
-
-//*************************************************************************************************************
-
-inline void NewRealTimeMultiSampleArray::setMultiArraySize(unsigned char ucMultiArraySize)
-{
-    //Obsolete unsigned char can't be bigger
-//    if(ucArraySize > 255)
-//        m_ucArraySize = 255;
-//    else
-        m_ucMultiArraySize = ucMultiArraySize;
-}
-
-
-//*************************************************************************************************************
-
-unsigned char NewRealTimeMultiSampleArray::getMultiArraySize() const
-{
-    return m_ucMultiArraySize;
-}
-
-
-//*************************************************************************************************************
-
-inline const QVector< VectorXd >& NewRealTimeMultiSampleArray::getMultiSampleArray()
-{
-    return m_matSamples;
-}
-
 } // NAMESPACE
 
-Q_DECLARE_METATYPE(XMEASLIB::NewRealTimeMultiSampleArray::SPtr)
+Q_DECLARE_METATYPE(XMEASLIB::RealTimeEvoked::SPtr)
 
 #endif // REALTIMEMULTISAMPLEARRAYNEW_H
