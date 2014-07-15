@@ -58,7 +58,7 @@ private slots:
     void on_actionNeu_triggered();
     void on_btt_OpenSignal_clicked();
     void on_tbv_Results_cellClicked(int row, int column);
-    void iteration_counter(qint32 current_iteration, qreal current_energy);
+    void iteration_counter(qint32 current_iteration, qint32 max_iterations, qreal current_energy, qreal max_energy);
     void slot_changed(const QModelIndex&, const QModelIndex&);
 
 private:
