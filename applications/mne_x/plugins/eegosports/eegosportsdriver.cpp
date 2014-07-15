@@ -225,9 +225,9 @@ bool EEGoSportsDriver::initDevice(int iNumberOfChannels,
     m_pAmplifier->SetSignalGain(gain, EEGO_ADC_H);
     m_pAmplifier->SetSignalGain(gain, EEGO_ADC_S);
 
-    // We are measuring here so better leave the DAC off
-    hr = m_pAmplifier->SetDriverAmplitude(160);
-    hr |= m_pAmplifier->SetDriverPeriod(500);
+    // We are measuring here so better leave the DAC off. Use it to create a rectangular test signal.
+    hr = m_pAmplifier->SetDriverAmplitude(250);
+    hr |= m_pAmplifier->SetDriverPeriod(1000);
 
     if(FAILED(hr))
         return false;
