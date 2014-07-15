@@ -120,20 +120,18 @@ void EEGoSports::init()
     m_iNumberOfChannels = 64;
     m_iSamplesPerBlock = 16;
     m_iTriggerInterval = 5000;
-
     m_bUseChExponent = true;
     m_bWriteToFile = false;
     m_bWriteDriverDebugToFile = false;
     m_bUseFiltering = false;
     m_bIsRunning = false;
     m_bBeepTrigger = false;
-    m_bUseCommonAverage = true;
     m_bCheckImpedances = false;
 
     QDate date;
     m_sOutputFilePath = QString ("%1Sequence_01/Subject_01/%2_%3_%4_EEG_001_raw.fif").arg(m_qStringResourcePath).arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day());
 
-    m_sElcFilePath = QString("./mne_x_plugins/resources/eegosports/loc_files/Lorenz-Duke128-28-11-2013.elc");
+    m_sElcFilePath = QString("./mne_x_plugins/resources/eegosports/loc_files/standard_waveguard64.elc");
 
     m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo());
 
@@ -237,10 +235,15 @@ void EEGoSports::setUpFiffInfo()
     digPoint.ident = FIFFV_POINT_LPA;//digitizerInfo.size();
 
     //Set EEG electrode location - Convert from mm to m
-    digPoint.r[0] = elcLocation3D[indexLE2][0]*0.001;
-    digPoint.r[1] = elcLocation3D[indexLE2][1]*0.001;
-    digPoint.r[2] = (elcLocation3D[indexLE2][2]-10)*0.001;
-    digitizerInfo.push_back(digPoint);
+    if(indexLE2!=-1)
+    {
+        digPoint.r[0] = elcLocation3D[indexLE2][0]*0.001;
+        digPoint.r[1] = elcLocation3D[indexLE2][1]*0.001;
+        digPoint.r[2] = (elcLocation3D[indexLE2][2]-10)*0.001;
+        digitizerInfo.push_back(digPoint);
+    }
+    else
+        cout<<"Plugin TMSI - ERROR - LE2 not found. Check loaded layout."<<endl;
 
     //Append nasion value to digitizer data. Take location of Z1 electrode minus 6 cm as approximation.
     int indexZ1 = elcChannelNames.indexOf("Z1");
@@ -248,10 +251,15 @@ void EEGoSports::setUpFiffInfo()
     digPoint.ident = FIFFV_POINT_NASION;//digitizerInfo.size();
 
     //Set EEG electrode location - Convert from mm to m
-    digPoint.r[0] = elcLocation3D[indexZ1][0]*0.001;
-    digPoint.r[1] = elcLocation3D[indexZ1][1]*0.001;
-    digPoint.r[2] = (elcLocation3D[indexZ1][2]-60)*0.001;
-    digitizerInfo.push_back(digPoint);
+    if(indexZ1!=-1)
+    {
+        digPoint.r[0] = elcLocation3D[indexZ1][0]*0.001;
+        digPoint.r[1] = elcLocation3D[indexZ1][1]*0.001;
+        digPoint.r[2] = (elcLocation3D[indexZ1][2]-60)*0.001;
+        digitizerInfo.push_back(digPoint);
+    }
+    else
+        cout<<"Plugin TMSI - ERROR - Z1 not found. Check loaded layout."<<endl;
 
     //Append RAP value to digitizer data. Take location of RE2 electrode minus 1 cm as approximation.
     int indexRE2 = elcChannelNames.indexOf("RE2");
@@ -259,10 +267,15 @@ void EEGoSports::setUpFiffInfo()
     digPoint.ident = FIFFV_POINT_RPA;//digitizerInfo.size();
 
     //Set EEG electrode location - Convert from mm to m
-    digPoint.r[0] = elcLocation3D[indexRE2][0]*0.001;
-    digPoint.r[1] = elcLocation3D[indexRE2][1]*0.001;
-    digPoint.r[2] = (elcLocation3D[indexRE2][2]-10)*0.001;
-    digitizerInfo.push_back(digPoint);
+    if(indexRE2!=-1)
+    {
+        digPoint.r[0] = elcLocation3D[indexRE2][0]*0.001;
+        digPoint.r[1] = elcLocation3D[indexRE2][1]*0.001;
+        digPoint.r[2] = (elcLocation3D[indexRE2][2]-10)*0.001;
+        digitizerInfo.push_back(digPoint);
+    }
+    else
+        cout<<"Plugin TMSI - ERROR - RE2 not found. Check loaded layout."<<endl;
 
     //Add EEG electrode positions as digitizers
     for(int i=0; i<numberEEGCh; i++)
@@ -353,46 +366,6 @@ void EEGoSports::setUpFiffInfo()
             //cout<<i<<endl<<fChInfo.eeg_loc<<endl;
         }
 
-        //Bipolar channels
-        if(i>=128 && i<=131)
-        {
-            //Set channel type
-            fChInfo.kind = FIFFV_MISC_CH;
-
-            sChType = QString("BIPO ");
-            fChInfo.ch_name = sChType.append(sChType.number(i-128));
-        }
-
-        //Auxilary input channels
-        if(i>=132 && i<=135)
-        {
-            //Set channel type
-            fChInfo.kind = FIFFV_MISC_CH;
-
-            sChType = QString("AUX ");
-            fChInfo.ch_name = sChType.append(sChType.number(i-132));
-        }
-
-        //Digital input channel
-        if(i==136)
-        {
-            //Set channel type
-            fChInfo.kind = FIFFV_STIM_CH;
-
-            sChType = QString("STI 014");
-            fChInfo.ch_name = sChType;
-        }
-
-        //Internally generated test signal - ramp signal
-        if(i==137)
-        {
-            //Set channel type
-            fChInfo.kind = FIFFV_MISC_CH;
-
-            sChType = QString("TEST RAMP");
-            fChInfo.ch_name = sChType;
-        }
-
         QSLChNames << sChType;
 
         m_pFiffInfo->chs.append(fChInfo);
@@ -478,7 +451,6 @@ bool EEGoSports::start()
                        m_bUseChExponent,
                        m_bWriteDriverDebugToFile,
                        m_sOutputFilePath,
-                       m_bUseCommonAverage,
                        m_bCheckImpedances);
 
     if(m_pEEGoSportsProducer->isRunning())

@@ -83,7 +83,6 @@ void EEGoSportsProducer::start(int iNumberOfChannels,
                      bool bUseChExponent,
                      bool bWriteDriverDebugToFile,
                      QString sOutputFilePath,
-                     bool bUseCommonAverage,
                      bool bMeasureImpedance)
 {
     //Initialise device
@@ -93,7 +92,6 @@ void EEGoSportsProducer::start(int iNumberOfChannels,
                               bUseChExponent,
                               bWriteDriverDebugToFile,
                               sOutputFilePath,
-                              bUseCommonAverage,
                               bMeasureImpedance))
     {
         m_bIsRunning = true;

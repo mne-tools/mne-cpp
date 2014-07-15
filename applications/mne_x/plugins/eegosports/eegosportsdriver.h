@@ -158,7 +158,6 @@ public:
     * @param [in] bWriteDriverDebugToFile Flag for writing driver debug information to a file. Defined by the user via the GUI.
     * @param [in] sOutpuFilePath Holds the path for the output file. Defined by the user via the GUI.
     * @param [out] bool returns true if device was successfully initialised, false otherwise.
-    * @param [in] bUseCommonAverage Flag for using common average when recording EEG data. Defined by the user via the GUI.
     * @param [in] bMeasureImpedance Flag for measuring impedances.
     */
     bool initDevice(int iNumberOfChannels,
@@ -167,7 +166,6 @@ public:
                     bool bUseChExponent,
                     bool bWriteDriverDebugToFile,
                     QString sOutpuFilePath,
-                    bool bUseCommonAverage,
                     bool bMeasureImpedance);
 
     //=========================================================================================================
@@ -192,7 +190,6 @@ private:
     bool                m_bWriteDriverDebugToFile;      /**< Flag for for writing driver debug informstions to a file. Defined by the user via the GUI.*/
     bool                m_bUsePreprocessing;            /**< Flag for using preprocessing actions for the EEG data. Defined by the user via the GUI.*/
     QString             m_sOutputFilePath;              /**< Holds the path for the output file. Defined by the user via the GUI.*/
-    bool                m_bUseCommonAverage;            /**< Flag for using common average.*/
     bool                m_bMeasureImpedances;           /**< Flag for impedance measuring mode.*/
 
     //Handler
@@ -218,6 +215,13 @@ private:
 
     //Variables used for loading the TMSiSDK.dll methods. Note: Not all functions are used by this class at the moment.
     CREATEAMPLIFIER       m_oFpCreateAmplifier;
+
+    //=========================================================================================================
+    /**
+    * Sets the gain.
+    * @param [in] range .
+    */
+    EEGoSportsPlugin::EEGO_GAIN GetGainForSignalRange(int range);
 };
 
 } // NAMESPACE
