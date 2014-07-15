@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     averaging.cpp
+* @file     covariance.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the Averaging class.
+* @brief    Contains the implementation of the Covariance class.
 *
 */
 
@@ -38,8 +38,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "averaging.h"
-#include "FormFiles/averagingsetupwidget.h"
+#include "covariance.h"
+#include "FormFiles/covariancesetupwidget.h"
 
 
 //*************************************************************************************************************
@@ -56,7 +56,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace AveragingPlugin;
+using namespace CovariancePlugin;
 using namespace MNEX;
 using namespace XMEASLIB;
 
@@ -66,19 +66,19 @@ using namespace XMEASLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Averaging::Averaging()
+Covariance::Covariance()
 : m_bIsRunning(false)
 , m_bProcessData(false)
-, m_pAveragingInput(NULL)
-//, m_pAveragingOutput(NULL)
-, m_pAveragingBuffer(CircularMatrixBuffer<double>::SPtr())
+, m_pCovarianceInput(NULL)
+//, m_pCovarianceOutput(NULL)
+, m_pCovarianceBuffer(CircularMatrixBuffer<double>::SPtr())
 {
 }
 
 
 //*************************************************************************************************************
 
-Averaging::~Averaging()
+Covariance::~Covariance()
 {
     if(this->isRunning())
         stop();
@@ -87,10 +87,10 @@ Averaging::~Averaging()
 
 //*************************************************************************************************************
 
-QSharedPointer<IPlugin> Averaging::clone() const
+QSharedPointer<IPlugin> Covariance::clone() const
 {
-    QSharedPointer<Averaging> pAveragingClone(new Averaging);
-    return pAveragingClone;
+    QSharedPointer<Covariance> pCovarianceClone(new Covariance);
+    return pCovarianceClone;
 }
 
 
@@ -99,37 +99,38 @@ QSharedPointer<IPlugin> Averaging::clone() const
 // Creating required display instances and set configurations
 //=============================================================================================================
 
-void Averaging::init()
+void Covariance::init()
 {
     // Input
-    m_pAveragingInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "AveragingIn", "Averaging input data");
-    connect(m_pAveragingInput.data(), &PluginInputConnector::notify, this, &Averaging::update, Qt::DirectConnection);
-    m_inputConnectors.append(m_pAveragingInput);
+    m_pCovarianceInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "CovarianceIn", "Covariance input data");
+    connect(m_pCovarianceInput.data(), &PluginInputConnector::notify, this, &Covariance::update, Qt::DirectConnection);
+    m_inputConnectors.append(m_pCovarianceInput);
 
 //    // Output
-//    m_pAveragingOutput = PluginOutputData<NewRealTimeSampleArray>::create(this, "AveragingOut", "Averaging output data");
-//    m_outputConnectors.append(m_pAveragingOutput);
+//    m_pCovarianceOutput = PluginOutputData<NewRealTimeSampleArray>::create(this, "CovarianceOut", "Covariance output data");
+//    m_outputConnectors.append(m_pCovarianceOutput);
 
-//    m_pAveragingOutput->data()->setName("Averaging Output");
-//    m_pAveragingOutput->data()->setUnit("mV");
-//    m_pAveragingOutput->data()->setMinValue(-200);
-//    m_pAveragingOutput->data()->setMaxValue(360);
-//    m_pAveragingOutput->data()->setSamplingRate(256.0/1.0);
+//    m_pCovarianceOutput->data()->setName("Covariance Output");
+//    m_pCovarianceOutput->data()->setUnit("mV");
+//    m_pCovarianceOutput->data()->setMinValue(-200);
+//    m_pCovarianceOutput->data()->setMaxValue(360);
+//    m_pCovarianceOutput->data()->setSamplingRate(256.0/1.0);
+
 
     //init channels when fiff info is available
-    connect(this, &Averaging::fiffInfoAvailable, this, &Averaging::initConnector);
+    connect(this, &Covariance::fiffInfoAvailable, this, &Covariance::initConnector);
 
     //Delete Buffer - will be initailzed with first incoming data
-    if(!m_pAveragingBuffer.isNull())
-        m_pAveragingBuffer = CircularMatrixBuffer<double>::SPtr();
+    if(!m_pCovarianceBuffer.isNull())
+        m_pCovarianceBuffer = CircularMatrixBuffer<double>::SPtr();
 }
 
 
 //*************************************************************************************************************
 
-void Averaging::initConnector()
+void Covariance::initConnector()
 {
-    qDebug() << "void Averaging::initConnector()";
+    qDebug() << "void Covariance::initConnector()";
 //    if(m_pFiffInfo)
 //        m_pRTMSAOutput->data()->initFromFiffInfo(m_pFiffInfo);
 }
@@ -137,7 +138,7 @@ void Averaging::initConnector()
 
 //*************************************************************************************************************
 
-bool Averaging::start()
+bool Covariance::start()
 {
     //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
     if(this->isRunning())
@@ -154,7 +155,7 @@ bool Averaging::start()
 
 //*************************************************************************************************************
 
-bool Averaging::stop()
+bool Covariance::stop()
 {
     //Wait until this thread is stopped
     m_bIsRunning = false;
@@ -162,21 +163,20 @@ bool Averaging::stop()
     if(m_bProcessData)
     {
         //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the pop function (acquire statement)
-        m_pAveragingBuffer->releaseFromPop();
-        m_pAveragingBuffer->releaseFromPush();
+        m_pCovarianceBuffer->releaseFromPop();
+        m_pCovarianceBuffer->releaseFromPush();
 
-        m_pAveragingBuffer->clear();
+        m_pCovarianceBuffer->clear();
 
 //        m_pRTMSAOutput->data()->clear();
     }
-
     return true;
 }
 
 
 //*************************************************************************************************************
 
-IPlugin::PluginType Averaging::getType() const
+IPlugin::PluginType Covariance::getType() const
 {
     return _IAlgorithm;
 }
@@ -184,32 +184,32 @@ IPlugin::PluginType Averaging::getType() const
 
 //*************************************************************************************************************
 
-QString Averaging::getName() const
+QString Covariance::getName() const
 {
-    return "Averaging";
+    return "Covariance";
 }
 
 
 //*************************************************************************************************************
 
-QWidget* Averaging::setupWidget()
+QWidget* Covariance::setupWidget()
 {
-    AveragingSetupWidget* setupWidget = new AveragingSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
+    CovarianceSetupWidget* setupWidget = new CovarianceSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
     return setupWidget;
 }
 
 
 //*************************************************************************************************************
 
-void Averaging::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
+void Covariance::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 {
     QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<NewRealTimeMultiSampleArray>();
 
     if(pRTMSA)
     {
         //Check if buffer initialized
-        if(!m_pAveragingBuffer)
-            m_pAveragingBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSA->getNumChannels(), pRTMSA->getMultiArraySize()));
+        if(!m_pCovarianceBuffer)
+            m_pCovarianceBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSA->getNumChannels(), pRTMSA->getMultiArraySize()));
 
         //Fiff information
         if(!m_pFiffInfo)
@@ -226,7 +226,7 @@ void Averaging::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
             for(qint32 i = 0; i < pRTMSA->getMultiArraySize(); ++i)
                 t_mat.col(i) = pRTMSA->getMultiSampleArray()[i];
 
-            m_pAveragingBuffer->push(&t_mat);
+            m_pCovarianceBuffer->push(&t_mat);
         }
     }
 }
@@ -235,7 +235,7 @@ void Averaging::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
 //*************************************************************************************************************
 
-void Averaging::run()
+void Covariance::run()
 {
     //
     // Read Fiff Info
@@ -250,15 +250,12 @@ void Averaging::run()
         if(m_bProcessData)
         {
             /* Dispatch the inputs */
-            MatrixXd t_mat = m_pAveragingBuffer->pop();
-
-
-            qDebug() << "Averaging Pop";
+            MatrixXd t_mat = m_pCovarianceBuffer->pop();
 
             //ToDo: Implement your algorithm here
 
 //            for(qint32 i = 0; i < t_mat.cols(); ++i)
-//                m_pAveragingBuffer->data()->setValue(t_mat.col(i));
+//                m_pCovarianceOutput->data()->setValue(t_mat.col(i));
         }
     }
 }

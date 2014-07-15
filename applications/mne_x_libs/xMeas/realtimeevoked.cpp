@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     realtimemultisamplearray_new.cpp
+* @file     realtimeevoked.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     July, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the RealTimeMultiSampleArrayNew class.
+* @brief    Contains the implementation of the RealTimeEvoked class.
 *
 */
 
@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "newrealtimemultisamplearray.h"
+#include "realtimeevoked.h"
 
 
 //*************************************************************************************************************
@@ -62,10 +62,8 @@ using namespace XMEASLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-NewRealTimeMultiSampleArray::NewRealTimeMultiSampleArray(QObject *parent)
-: NewMeasurement(QMetaType::type("NewRealTimeMultiSampleArray::SPtr"), parent)
-, m_dSamplingRate(0)
-, m_ucMultiArraySize(10)
+RealTimeEvoked::RealTimeEvoked(QObject *parent)
+: NewMeasurement(QMetaType::type("RealTimeEvoked::SPtr"), parent)
 , m_bChInfoIsInit(false)
 {
 }
@@ -73,7 +71,7 @@ NewRealTimeMultiSampleArray::NewRealTimeMultiSampleArray(QObject *parent)
 
 //*************************************************************************************************************
 
-NewRealTimeMultiSampleArray::~NewRealTimeMultiSampleArray()
+RealTimeEvoked::~RealTimeEvoked()
 {
 
 }
@@ -81,26 +79,17 @@ NewRealTimeMultiSampleArray::~NewRealTimeMultiSampleArray()
 
 //*************************************************************************************************************
 
-void NewRealTimeMultiSampleArray::init(QList<RealTimeSampleArrayChInfo> &chInfo)
+void RealTimeEvoked::init(QList<RealTimeSampleArrayChInfo> &chInfo)
 {
     m_qListChInfo = chInfo;
 
     m_bChInfoIsInit = true;
-
-//    m_qListChInfo.clear();
-//    for(quint32 i = 0; i < uiNumChannels; ++i)
-//    {
-//        RealTimeSampleArrayChInfo initChInfo;
-//        QString string;
-//        initChInfo.setChannelName(string.number(i+1));
-//        m_qListChInfo.append(initChInfo);
-//    }
 }
 
 
 //*************************************************************************************************************
 
-void NewRealTimeMultiSampleArray::initFromFiffInfo(FiffInfo::SPtr &p_pFiffInfo)
+void RealTimeEvoked::initFromFiffInfo(FiffInfo::SPtr &p_pFiffInfo)
 {
     m_qListChInfo.clear();
     m_bChInfoIsInit = false;
@@ -222,10 +211,6 @@ void NewRealTimeMultiSampleArray::initFromFiffInfo(FiffInfo::SPtr &p_pFiffInfo)
         m_qListChInfo.append(initChInfo);
     }
 
-    //Sampling rate
-    m_dSamplingRate = p_pFiffInfo->sfreq;
-
-
     m_pFiffInfo_orig = p_pFiffInfo;
 
     m_bChInfoIsInit = true;
@@ -234,21 +219,20 @@ void NewRealTimeMultiSampleArray::initFromFiffInfo(FiffInfo::SPtr &p_pFiffInfo)
 
 //*************************************************************************************************************
 
-VectorXd NewRealTimeMultiSampleArray::getValue() const
+MatrixXd RealTimeEvoked::getValue() const
 {
-    return m_vecValue;
+    return m_matValue;
 }
 
 
 //*************************************************************************************************************
 
-void NewRealTimeMultiSampleArray::setValue(VectorXd v)
+void RealTimeEvoked::setValue(MatrixXd v)
 {
     //check vector size
-    if(v.size() != m_qListChInfo.size())
+    if(v.rows() != m_qListChInfo.size())
         qCritical() << "Error Occured in RealTimeMultiSampleArrayNew::setVector: Vector size does not matche the number of channels! ";
 
-    //ToDo
 //    //Check if maximum exceeded //ToDo speed this up
 //    for(qint32 i = 0; i < v.size(); ++i)
 //    {
@@ -257,12 +241,7 @@ void NewRealTimeMultiSampleArray::setValue(VectorXd v)
 //    }
 
     //Store
-    m_vecValue = v;
-    m_matSamples.push_back(m_vecValue);
-    if(m_matSamples.size() >= m_ucMultiArraySize)
-    {
-        emit notify();
-        m_matSamples.clear();
-    }
+    m_matValue = v;
+    emit notify();
 }
 
