@@ -63,7 +63,7 @@
       <widget class="QWidget" name="layoutWidget">
        <layout class="QVBoxLayout" name="verticalLayout">
         <item>
-         <widget class="QComboBox" name="comboBox"/>
+         <widget class="QComboBox" name="cb_channels"/>
         </item>
         <item>
          <widget class="QFrame" name="frame">
