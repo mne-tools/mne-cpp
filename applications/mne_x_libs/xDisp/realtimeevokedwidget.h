@@ -44,8 +44,8 @@
 
 #include "xdisp_global.h"
 #include "newmeasurementwidget.h"
-#include "helpers/realtimemultisamplearraymodel.h"
-#include "helpers/realtimemultisamplearraydelegate.h"
+#include "helpers/realtimeevokedmodel.h"
+#include "helpers/realtimebutterflyplot.h"
 
 #include "helpers/sensorwidget.h"
 
@@ -57,7 +57,6 @@
 
 #include <QSharedPointer>
 #include <QList>
-#include <QTableView>
 #include <QAction>
 #include <QSpinBox>
 #include <QDoubleSpinBox>
@@ -250,9 +249,8 @@ private:
     */
     void showSensorSelectionWidget();
 
-    RealTimeMultiSampleArrayModel*      m_pRTMSAModel;      /**< RTMSA data model */
-    RealTimeMultiSampleArrayDelegate*   m_pRTMSADelegate;   /**< RTMSA data delegate */
-    QTableView* m_pTableView;                               /**< the QTableView being part of the model/view framework of Qt */
+    RealTimeEvokedModel*        m_pRTEModel;            /**< RTE data model */
+    RealTimeButterflyPlot*      m_pButterflyPlot;       /**< Butterfly plot */
 
     float m_fDefaultSectionSize;                            /**< Default row height */
     float m_fZoomFactor;                                    /**< Zoom factor */
