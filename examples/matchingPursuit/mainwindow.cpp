@@ -73,7 +73,10 @@ qreal _signalNegativeScale = 0;
 qreal _maxPos = 0;
 qreal _maxNeg = 0;
 
+QList<QColor> _colors;
+
 MatrixXd _signalMatrix(0, 0);
+MatrixXd _original_signal_Matrix(0,0);
 VectorXd _globalAtomList;
 VectorXd _residuumVector;
 VectorXd _atomSumVector;
@@ -190,6 +193,20 @@ MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::
 
     for(int i = 0; i < fileList.length(); i++)
         ui->cb_Dicts->addItem(QIcon(":/images/icons/DictIcon.png"), fileList.at(i).baseName());
+
+
+    MatrixXd m(5,3);
+    m << 1, 2, 3,
+         4, 5, 6,
+         7, 8, 9,
+        10, 11, 12,
+        13, 14, 15;
+
+    VectorXd v(3);
+    v << 7, 5, 3;
+
+    add_row_at(m, v, 2);
+
 }
 
 MainWindow::~MainWindow()
@@ -200,31 +217,137 @@ MainWindow::~MainWindow()
 void MainWindow::open_file()
 {
     QFileDialog* fileDia;
-    QString fileName = fileDia->getOpenFileName(this, "Bitte ein Signal auswaehlen",QDir::currentPath(),"(*.fif *.txt)");
+    QString fileName = fileDia->getOpenFileName(this, "Please select signalfile.",QDir::currentPath(),"(*.fif *.txt)");
     if(fileName.isNull()) return;
 
     QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly))
     {
         QMessageBox::warning(this, tr("Fehler"),
-        tr("Das Signal konnte nicht geoeffnet werden."));
+        tr("error: disable to open signalfile."));
         return;
     }
     file.close();
 
-    if(fileName.endsWith(".fif", Qt::CaseInsensitive))
-        ReadFiffFile(fileName);
-    else
-        ReadMatlabFile(fileName);
-    if(_datas.cols() != 0)
-    {       
-        // TODO: geeigneten Signalausschnitt suchen
-        _signalMatrix.resize(1024,2);
-        for(qint32 channels = 0; channels < 2; channels++)
+    this->model = new QStandardItemModel;
+    connect(this->model, SIGNAL(dataChanged ( const QModelIndex&, const QModelIndex&)), this, SLOT(slot_changed(const QModelIndex&, const QModelIndex&)));
+
+    _colors.clear();
+    _colors.append(QColor(0, 0, 0));
+    if(fileName.endsWith(".fif", Qt::CaseInsensitive))        
+    {    ReadFiffFile(fileName);
+        // TODO: find good signal part
+        _signalMatrix.resize(1024,5);
+        _original_signal_Matrix.resize(1024,5);
+        for(qint32 channels = 0; channels < 5; channels++)
+        {
+            _colors.append(QColor::fromHsv(qrand() % 256, 255, 190));
+            this->item = new QStandardItem;
+
+            this->item->setText(QString("Channel %1").arg(channels));
+            this->item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
+            this->item->setData(Qt::Checked, Qt::CheckStateRole);
+
+            this->model->insertRow(channels, this->item);
+            this->items.push_back(this->item);
+
             for(qint32 i = 0; i < 1024; i++)
                 _signalMatrix(i, channels) = _datas(channels, i) * 100000000000;
+        }
+        _original_signal_Matrix = _signalMatrix;
+        ui->cb_channels->setModel(this->model);
     }
+    else
+        ReadMatlabFile(fileName);
+
     update();   
+}
+
+void MainWindow::slot_changed(const QModelIndex& topLeft, const QModelIndex& bottomRight)
+{
+    QStandardItem* item = this->items[topLeft.row()];
+    if(item->checkState() == Qt::Unchecked)
+    {
+       _signalMatrix = remove_column(_signalMatrix, topLeft.row());
+    }
+    else if(item->checkState() == Qt::Checked)
+    {
+       VectorXd vec = _original_signal_Matrix.col(topLeft.row());
+       _signalMatrix =  add_column_at(_signalMatrix,  vec,  topLeft.row());
+    }
+    update();
+}
+
+MatrixXd MainWindow::add_row_at(MatrixXd& matrix, VectorXd& rowData, qint32 rowNumber)
+{
+   std::cout << "\n-------------before---------------\n";
+   std::cout << matrix;
+
+   matrix.conservativeResize(matrix.rows() + 1, Eigen::NoChange);
+
+   qint32 i = rowNumber;
+   while(i < matrix.rows())
+   {
+        RowVectorXd vec1 = VectorXd::Zero(matrix.rows());
+        vec1 = matrix.row(i);
+        matrix.row(i) = rowData;
+        rowData = vec1;
+        i++;
+   }
+   std::cout << "\n------------after---------------\n";
+   std::cout << matrix;
+
+   return matrix;
+
+}
+
+MatrixXd MainWindow::add_column_at(MatrixXd& matrix, VectorXd& rowData, qint32 colNumber)
+{
+   //std::cout << "\n-------------before---------------\n";
+   //std::cout << matrix;
+
+   matrix.conservativeResize(Eigen::NoChange, matrix.cols() + 1);
+
+   qint32 i = colNumber;
+   while(i < matrix.cols())
+   {
+        RowVectorXd vec1 = VectorXd::Zero(matrix.cols());
+        vec1 = matrix.col(i);
+        matrix.col(i) = rowData;
+        rowData = vec1;
+        i++;
+   }
+   //std::cout << "\n------------after---------------\n";
+   //std::cout << matrix;
+
+   return matrix;
+
+}
+
+MatrixXd MainWindow::remove_row(MatrixXd& matrix, qint32 rowToRemove)
+{
+    qint32 numRows = matrix.rows()-1;
+    qint32 numCols = matrix.cols();
+
+    if( rowToRemove < numRows )
+        matrix.block(rowToRemove,0,numRows-rowToRemove,numCols) = matrix.block(rowToRemove+1,0,numRows-rowToRemove,numCols);
+
+    matrix.conservativeResize(numRows,numCols);
+
+    return matrix;
+}
+
+MatrixXd MainWindow::remove_column(MatrixXd& matrix, qint32 colToRemove)
+{
+    qint32 numRows = matrix.rows();
+    qint32 numCols = matrix.cols()-1;
+
+    if( colToRemove < numCols )
+        matrix.block(0,colToRemove,numRows,numCols-colToRemove) = matrix.block(0,colToRemove+1,numRows,numCols-colToRemove);
+
+    matrix.conservativeResize(numRows,numCols);
+
+    return matrix;
 }
 
 qint32 MainWindow::ReadFiffFile(QString fileName)
@@ -232,7 +355,7 @@ qint32 MainWindow::ReadFiffFile(QString fileName)
     QFile t_fileRaw(fileName);
 
     float from = 42.956f;
-    float to = 320.670f;
+    float to = 50.670f;
 
     bool in_samples = false;
 
@@ -355,8 +478,8 @@ void MainWindow::ReadMatlabFile(QString fileName)
         qreal value = contents.toFloat(&isFloat);
         if(!isFloat)
         {
-            QString errorSignal = QString("Das Signal konnte nicht vollstaendig interpretiert werden. Die Zeile %1 der Datei %2 konnte nicht gelesen werden.").arg(rowNumber).arg(fileName);
-            QMessageBox::warning(this, tr("Fehler"),
+            QString errorSignal = QString("The signal could not completly read. Line %1 from file %2 coud not be readed.").arg(rowNumber).arg(fileName);
+            QMessageBox::warning(this, tr("error"),
             errorSignal);
             return;
         }
@@ -376,10 +499,10 @@ void MainWindow::ReadMatlabFile(QString fileName)
 
 void GraphWindow::paintEvent(QPaintEvent* event)
 {
-    PaintSignal(_signalMatrix, _residuumVector, Qt::red, this->size());
+    PaintSignal(_signalMatrix, _residuumVector, _colors, this->size());
 }
 
-void GraphWindow::PaintSignal(MatrixXd signalMatrix, VectorXd residuumSamples, QColor color, QSize windowSize)
+void GraphWindow::PaintSignal(MatrixXd signalMatrix, VectorXd residuumSamples, QList<QColor> colors, QSize windowSize)
 {
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing, true);
@@ -397,7 +520,7 @@ void GraphWindow::PaintSignal(MatrixXd signalMatrix, VectorXd residuumSamples, Q
         qint32 drawFactor = 0;              // shift factor for decimal places (linear)
         qint32 startDrawFactor = 1;         // shift factor for decimal places (exponential-base 10)
         qint32 decimalPlace = 0;            // decimal places for axis title
-        QList<QPolygonF> polygons;          // points for drwing the signal
+        QList<QPolygonF> polygons;          // points for drawing the signal
         MatrixXd internSignalMatrix = signalMatrix; // intern representation of y-axis values of the signal (for painting only)
 
         // paint window white
@@ -537,10 +660,12 @@ void GraphWindow::PaintSignal(MatrixXd signalMatrix, VectorXd residuumSamples, Q
 
         painter.drawLine(maxStrLenght, 2, maxStrLenght, windowSize.height() - 2);     // paint y-axis
 
+
+
         for(qint32 channel = 0; channel < signalMatrix.cols(); channel++)             // Butterfly
         {
-            if(channel == 1)
-                painter.setPen(color);
+            QPen pen(_colors.at(channel), 0.5, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+            painter.setPen(pen);
             painter.drawPolyline(polygons.at(channel));                               // paint signal
         }
     }
