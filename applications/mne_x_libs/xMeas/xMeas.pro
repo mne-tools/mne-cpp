@@ -77,40 +77,26 @@ win32 {
 }
 
 SOURCES += \
-    Measurement/text.cpp \
-    Measurement/realtimemultisamplearray.cpp \
-    Measurement/progressbar.cpp \
-    Measurement/numeric.cpp \
-    Measurement/sngchnmeasurement.cpp \
-    Measurement/measurement.cpp \
-    Measurement/mltchnmeasurement.cpp \
-    Measurement/realtimemultisamplearray_new.cpp \
     realtimesourceestimate.cpp \
     newrealtimesamplearray.cpp \
     newrealtimemultisamplearray.cpp \
     realtimesamplearraychinfo.cpp \
     newnumeric.cpp \
     newmeasurement.cpp \
-    measurementtypes.cpp
+    measurementtypes.cpp \
+    realtimeevoked.cpp
 
 
 HEADERS += \
     xmeas_global.h \
-    Measurement/text.h \
-    Measurement/realtimemultisamplearray.h \
-    Measurement/progressbar.h \
-    Measurement/numeric.h \
-    Measurement/sngchnmeasurement.h \
-    Measurement/measurement.h \
-    Measurement/mltchnmeasurement.h \
-    Measurement/realtimemultisamplearray_new.h \
     realtimesourceestimate.h \
     newrealtimesamplearray.h \
     newrealtimemultisamplearray.h \
     realtimesamplearraychinfo.h \
     newnumeric.h \
     newmeasurement.h \
-    measurementtypes.h
+    measurementtypes.h \
+    realtimeevoked.h
 
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}

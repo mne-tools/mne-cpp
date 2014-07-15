@@ -63,7 +63,7 @@
 
 #include <fiff/fiff.h>
 #include <fiff/fiff_info.h>
-#include <xMeas/Measurement/realtimemultisamplearray_new.h>
+//#include <xMeas/Measurement/realtimemultisamplearray_new.h>
 
 #define BABYMEG 1
 #define VECTORVIEW 2
@@ -71,7 +71,7 @@
 using namespace Eigen;
 using namespace std;
 using namespace FIFFLIB;
-using namespace XMEASLIB;
+//using namespace XMEASLIB;
 
 typedef std::complex<double> cplxd;
 

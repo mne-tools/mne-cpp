@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     averaging.pro
+# @file     covariance.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file generates the makefile for the averaging plug-in.
+# @brief    This project file generates the makefile for the covariance plug-in.
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -39,11 +39,11 @@ TEMPLATE = lib
 
 CONFIG += plugin
 
-DEFINES += AVERAGING_LIBRARY
+DEFINES += COVARIANCE_LIBRARY
 
 QT += core widgets
 
-TARGET = averaging
+TARGET = covariance
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
@@ -65,26 +65,26 @@ else {
 DESTDIR = $${MNE_BINARY_DIR}/mne_x_plugins
 
 SOURCES += \
-    averaging.cpp \
-    FormFiles/averagingsetupwidget.cpp \
-    FormFiles/averagingaboutwidget.cpp
+    covariance.cpp \
+    FormFiles/covariancesetupwidget.cpp \
+    FormFiles/covarianceaboutwidget.cpp
 
 HEADERS += \
-    averaging_global.h \
-    averaging.h \
-    FormFiles/averagingsetupwidget.h \
-    FormFiles/averagingaboutwidget.h
+    covariance_global.h \
+    covariance.h \
+    FormFiles/covariancesetupwidget.h \
+    FormFiles/covarianceaboutwidget.h
 
 FORMS += \
-    FormFiles/averagingsetup.ui \
-    FormFiles/averagingabout.ui
+    FormFiles/covariancesetup.ui \
+    FormFiles/covarianceabout.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_X_INCLUDE_DIR}
 
 OTHER_FILES += \
-    averaging.json
+    covariance.json
 
 # Put generated form headers into the origin --> cause other src is pointing at them
 UI_DIR = $$PWD
