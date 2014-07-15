@@ -21,7 +21,7 @@
 #include <complex>
 
 #include <fiff/fiff_info.h>
-#include <xMeas/Measurement/realtimemultisamplearray_new.h>
+//#include <xMeas/Measurement/realtimemultisamplearray_new.h>
 
 //using namespace MNEX;
 
@@ -29,7 +29,7 @@
 using namespace Eigen;
 using namespace std;
 using namespace FIFFLIB;
-using namespace XMEASLIB;
+//using namespace XMEASLIB;
 
 typedef std::complex<double> cplxd;
 

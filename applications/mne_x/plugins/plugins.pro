@@ -112,6 +112,7 @@ SUBDIRS += \
     sourcelab \
     raplab \
     averaging \
+    covariance \
 #    bci \
     rtsss \
     rthpi
