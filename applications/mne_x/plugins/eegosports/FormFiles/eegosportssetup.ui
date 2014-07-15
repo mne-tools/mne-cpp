@@ -154,16 +154,6 @@
           </property>
          </widget>
         </item>
-        <item row="4" column="0">
-         <widget class="QCheckBox" name="m_checkBox_UseCommonAverage">
-          <property name="enabled">
-           <bool>true</bool>
-          </property>
-          <property name="text">
-           <string>Use Common Average</string>
-          </property>
-         </widget>
-        </item>
         <item row="3" column="0" colspan="2">
          <widget class="Line" name="line_2">
           <property name="minimumSize">
@@ -177,7 +167,7 @@
           </property>
          </widget>
         </item>
-        <item row="5" column="0">
+        <item row="4" column="0">
          <widget class="QCheckBox" name="m_checkBox_WriteDriverDebugToFile">
           <property name="text">
            <string>Driver Debug File</string>

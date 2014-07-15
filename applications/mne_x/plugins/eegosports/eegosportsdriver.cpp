@@ -66,7 +66,6 @@ EEGoSportsDriver::EEGoSportsDriver(EEGoSportsProducer* pEEGoSportsProducer)
 , m_bUseChExponent(false)
 , m_bWriteDriverDebugToFile(false)
 , m_sOutputFilePath("/mne_x_plugins/resources/eegosports")
-, m_bUseCommonAverage(false)
 , m_bMeasureImpedances(false)
 {
     //Initialise NULL pointers
@@ -111,7 +110,6 @@ bool EEGoSportsDriver::initDevice(int iNumberOfChannels,
                             bool bUseChExponent,
                             bool bWriteDriverDebugToFile,
                             QString sOutpuFilePath,
-                            bool bUseCommonAverage,
                             bool bMeasureImpedance)
 {
     //Check if the driver DLL was loaded
@@ -125,7 +123,6 @@ bool EEGoSportsDriver::initDevice(int iNumberOfChannels,
     m_bUseChExponent = bUseChExponent;
     m_bWriteDriverDebugToFile = bWriteDriverDebugToFile;
     m_sOutputFilePath = sOutpuFilePath;
-    m_bUseCommonAverage = bUseCommonAverage;
     m_bMeasureImpedances = bMeasureImpedance;
 
     //Open debug file to write to
@@ -215,22 +212,22 @@ bool EEGoSportsDriver::initDevice(int iNumberOfChannels,
     }
 
     // Set gain - use this with mV or set gain directly. Again, look into eego.h for acceptable values
-    //EEGO_GAIN gain = GetGainForSignalRange(1000);
+    EEGO_GAIN gain = GetGainForSignalRange(1000);
 
     // It is possible to set those for each individually. Again: not tested, not supported
-//    m_pAmplifier->SetSignalGain( gain, EegoDriver::EEGO_ADC_A);
-//    m_pAmplifier->SetSignalGain( gain, EegoDriver::EEGO_ADC_B);
-//    m_pAmplifier->SetSignalGain( gain, EegoDriver::EEGO_ADC_C);
-//    m_pAmplifier->SetSignalGain( gain, EegoDriver::EEGO_ADC_D);
-//    m_pAmplifier->SetSignalGain( gain, EegoDriver::EEGO_ADC_E);
-//    m_pAmplifier->SetSignalGain( gain, EegoDriver::EEGO_ADC_F);
-//    m_pAmplifier->SetSignalGain( gain, EegoDriver::EEGO_ADC_G);
-//    m_pAmplifier->SetSignalGain( gain, EegoDriver::EEGO_ADC_H);
-//    m_pAmplifier->SetSignalGain( gain, EegoDriver::EEGO_ADC_S);
+    m_pAmplifier->SetSignalGain(gain, EEGO_ADC_A);
+    m_pAmplifier->SetSignalGain(gain, EEGO_ADC_B);
+    m_pAmplifier->SetSignalGain(gain, EEGO_ADC_C);
+    m_pAmplifier->SetSignalGain(gain, EEGO_ADC_D);
+    m_pAmplifier->SetSignalGain(gain, EEGO_ADC_E);
+    m_pAmplifier->SetSignalGain(gain, EEGO_ADC_F);
+    m_pAmplifier->SetSignalGain(gain, EEGO_ADC_G);
+    m_pAmplifier->SetSignalGain(gain, EEGO_ADC_H);
+    m_pAmplifier->SetSignalGain(gain, EEGO_ADC_S);
 
     // We are measuring here so better leave the DAC off
-    hr = m_pAmplifier->SetDriverAmplitude(0);
-    hr |= m_pAmplifier->SetDriverPeriod(0);
+    hr = m_pAmplifier->SetDriverAmplitude(160);
+    hr |= m_pAmplifier->SetDriverPeriod(500);
 
     if(FAILED(hr))
         return false;
@@ -250,7 +247,6 @@ bool EEGoSportsDriver::initDevice(int iNumberOfChannels,
 
     // You can get the set values from the device, too. We are using it here only for debug purposes
     EEGO_RATE rate;
-    EEGO_GAIN gain;
 
     m_pAmplifier->GetSamplingRate(&rate);
     m_pAmplifier->GetSignalGain(&gain, EEGO_ADC_A);
@@ -258,7 +254,7 @@ bool EEGoSportsDriver::initDevice(int iNumberOfChannels,
     // cout << "Starting Device with sampling rate: " << m_uiSamplingFrequency << "hz and a gain of: " << gain << "\n";
 
     // With this call we tell the amplifier and driver stack to start streaming
-    if(FAILED(m_pAmplifier->SetMode(EEGO_MODE_STREAMING)))
+    if(FAILED(m_pAmplifier->SetMode(EEGO_MODE_CALIBRATION))) //EEGO_MODE_CALIBRATION EEGO_MODE_STREAMING
         return false;
 
     //Sleep(100);
@@ -323,7 +319,7 @@ bool EEGoSportsDriver::uninitDevice()
 
 //*************************************************************************************************************
 
- bool EEGoSportsDriver::getSampleMatrixValue(MatrixXf& sampleMatrix)
+bool EEGoSportsDriver::getSampleMatrixValue(MatrixXf& sampleMatrix)
 {
     //Check if the driver DLL was loaded
     if(!m_bDllLoaded)
@@ -336,65 +332,6 @@ bool EEGoSportsDriver::uninitDevice()
         return false;
     }
 
-//    //*************************************************************************************************************
-//    // Open Vibe solution
-//    sampleMatrix = MatrixXf::Zero(m_uiNumberOfChannels, m_uiSamplesPerBlock);
-
-//    // OpenVibe code
-//    HRESULT hr;
-
-//    if(!m_pAmplifier)
-//        return false;
-
-//    // Fetch data from device/driver like this:
-//    IBuffer* pBuffer; // The data storage
-//    if(FAILED(hr = m_pAmplifier->GetData(&pBuffer))) // Fill the storage with data. Data is delivered only once
-//    {
-//        cout << "Plugin EEGoSports - ERROR - Getting Data from device failed! HRESULT: " << hr << endl;
-//        return false;
-//    }
-
-//    // copy data from IBuffer to whatever structure you like to have.
-//    UINT nAmountOfSamples = pBuffer->GetSampleCount();
-//    //cout << "nAmountOfSamples: " << nAmountOfSamples << endl;
-//    UINT nAmountOfChannels = pBuffer->GetChannelCount();
-//    //cout << "nAmountOfChannels: " << nAmountOfChannels << endl;
-
-//    // The data is stored in µV, use this constant for conversion
-//    double dLSBToSi = 1e-6;
-
-//    // calculate start of unwritten data;
-//    for(UINT sample = 0; sample < nAmountOfSamples; sample++)
-//    {
-//        for(UINT channel = 0; channel < nAmountOfChannels; channel++)
-//        {
-//            int lValue = pBuffer->GetBuffer(channel, sample);
-
-//            float sample = float(m_bUseChExponent ? lValue * dLSBToSi : lValue); // Put the sample into whatever structure you want now.
-//            //cout << sample << " ";
-
-//            // check for triggers
-//            if(channel == EEGO_CHANNEL_TRG)
-//            {
-//                const uint currentTriggers = (uint)(lValue);
-//                const uint currentNewTriggers = currentTriggers & ~m_nLastTriggerValue; // Calculate which bits are new
-//                m_nLastTriggerValue = currentTriggers; // Save value for next trigger detection
-
-//                if(currentNewTriggers != 0)
-//                {
-//                    // Yay a trigger! Use it however you want
-//                }
-//            }
-//        }
-//    }
-
-//    // Memory cleanup
-//    pBuffer->Release();
-//    pBuffer = NULL;
-
-//    return true;
-
-    //*************************************************************************************************************
     if(!m_pAmplifier)
         return false;
 
@@ -419,7 +356,7 @@ bool EEGoSportsDriver::uninitDevice()
 
         //Get sample and channel infos from device
         m_uiNumberOfAvailableChannels = pBuffer->GetChannelCount();
-        UINT ulNumSamplesReceived = pBuffer->GetSampleCount();
+        int ulNumSamplesReceived = pBuffer->GetSampleCount();
 
         //Only do the next steps if there was at least one sample received, otherwise skip and wait until at least one sample was received
         if(ulNumSamplesReceived > 0)
@@ -434,8 +371,8 @@ bool EEGoSportsDriver::uninitDevice()
                 channelMax = m_uiNumberOfChannels;
 
             //Write the received samples to an extra buffer, so that they are not getting lost if too many samples were received. These are then written to the next matrix (block)
-            for(UINT sample = 0; sample < ulNumSamplesReceived; sample++)
-                for(UINT channel = 0; channel < channelMax; channel++)
+            for(int sample = 0; sample < ulNumSamplesReceived; sample++)
+                for(int channel = 0; channel < channelMax; channel++)
                     m_vSampleBlockBuffer.push_back(m_bUseChExponent ? pBuffer->GetBuffer(channel, sample) * 1e-6 : pBuffer->GetBuffer(channel, sample));
 
             //If the number of the samples which were already written to the matrix plus the last received number of samples is larger then the defined block size
@@ -474,5 +411,96 @@ bool EEGoSportsDriver::uninitDevice()
     }
 
     return true;
+
+    //    //*************************************************************************************************************
+    //    // Open Vibe solution
+    //    sampleMatrix = MatrixXf::Zero(m_uiNumberOfChannels, m_uiSamplesPerBlock);
+
+    //    // OpenVibe code
+    //    HRESULT hr;
+
+    //    if(!m_pAmplifier)
+    //        return false;
+
+    //    // Fetch data from device/driver like this:
+    //    IBuffer* pBuffer; // The data storage
+    //    if(FAILED(hr = m_pAmplifier->GetData(&pBuffer))) // Fill the storage with data. Data is delivered only once
+    //    {
+    //        cout << "Plugin EEGoSports - ERROR - Getting Data from device failed! HRESULT: " << hr << endl;
+    //        return false;
+    //    }
+
+    //    // copy data from IBuffer to whatever structure you like to have.
+    //    UINT nAmountOfSamples = pBuffer->GetSampleCount();
+    //    //cout << "nAmountOfSamples: " << nAmountOfSamples << endl;
+    //    UINT nAmountOfChannels = pBuffer->GetChannelCount();
+    //    //cout << "nAmountOfChannels: " << nAmountOfChannels << endl;
+
+    //    // The data is stored in µV, use this constant for conversion
+    //    double dLSBToSi = 1e-6;
+
+    //    // calculate start of unwritten data;
+    //    for(UINT sample = 0; sample < nAmountOfSamples; sample++)
+    //    {
+    //        for(UINT channel = 0; channel < nAmountOfChannels; channel++)
+    //        {
+    //            int lValue = pBuffer->GetBuffer(channel, sample);
+
+    //            float sample = float(m_bUseChExponent ? lValue * dLSBToSi : lValue); // Put the sample into whatever structure you want now.
+    //            //cout << sample << " ";
+
+    //            // check for triggers
+    //            if(channel == EEGO_CHANNEL_TRG)
+    //            {
+    //                const uint currentTriggers = (uint)(lValue);
+    //                const uint currentNewTriggers = currentTriggers & ~m_nLastTriggerValue; // Calculate which bits are new
+    //                m_nLastTriggerValue = currentTriggers; // Save value for next trigger detection
+
+    //                if(currentNewTriggers != 0)
+    //                {
+    //                    // Yay a trigger! Use it however you want
+    //                }
+    //            }
+    //        }
+    //    }
+
+    //    // Memory cleanup
+    //    pBuffer->Release();
+    //    pBuffer = NULL;
+
+    //    return true;
 }
 
+
+//*************************************************************************************************************
+
+EEGoSportsPlugin::EEGO_GAIN EEGoSportsDriver::GetGainForSignalRange(int range)
+{
+    cout<<range<<endl;
+    using namespace EEGoSportsPlugin;
+    double idealGain = 1800. / range; // 1800 == MAX RANGE with only 1X amplification
+    int realGain = 0; // The minimal gain
+
+    if(EEGO_GAIN_1X <= idealGain && realGain <= EEGO_GAIN_1X)
+        realGain = EEGO_GAIN_1X;
+
+    if(EEGO_GAIN_2X <= idealGain && realGain <= EEGO_GAIN_2X)
+        realGain = EEGO_GAIN_2X;
+
+    if(EEGO_GAIN_3X <= idealGain && realGain <= EEGO_GAIN_3X)
+        realGain = EEGO_GAIN_3X;
+
+    if(EEGO_GAIN_4X <= idealGain && realGain <= EEGO_GAIN_4X)
+        realGain = EEGO_GAIN_4X;
+
+    if(EEGO_GAIN_6X <= idealGain && realGain <= EEGO_GAIN_6X)
+        realGain = EEGO_GAIN_6X;
+
+    if(EEGO_GAIN_8X <= idealGain && realGain <= EEGO_GAIN_8X)
+        realGain = EEGO_GAIN_8X;
+
+    if(EEGO_GAIN_12X <= idealGain && realGain <= EEGO_GAIN_12X)
+        realGain = EEGO_GAIN_12X;
+
+    return (EEGO_GAIN)realGain;
+}

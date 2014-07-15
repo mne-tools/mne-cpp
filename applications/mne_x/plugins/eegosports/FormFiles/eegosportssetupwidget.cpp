@@ -78,8 +78,6 @@ EEGoSportsSetupWidget::EEGoSportsSetupWidget(EEGoSports* pEEGoSports, QWidget* p
             this, &EEGoSportsSetupWidget::setDeviceSamplingProperties);
     connect(ui.m_spinBox_SamplesPerBlock, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
             this, &EEGoSportsSetupWidget::setDeviceSamplingProperties);
-    connect(ui.m_checkBox_UseCommonAverage, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
-            this, &EEGoSportsSetupWidget::setDeviceSamplingProperties);
 
     //Connect channel corrections
     connect(ui.m_checkBox_UseChExponent, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
@@ -135,7 +133,6 @@ void EEGoSportsSetupWidget::initGui()
     ui.m_spinBox_SamplingFreq->setValue(m_pEEGoSports->m_iSamplingFreq);
     ui.m_spinBox_NumberOfChannels->setValue(m_pEEGoSports->m_iNumberOfChannels);
     ui.m_spinBox_SamplesPerBlock->setValue(m_pEEGoSports->m_iSamplesPerBlock);
-    ui.m_checkBox_UseCommonAverage->setChecked(m_pEEGoSports->m_bUseCommonAverage);
 
     //Init channel corrections
     ui.m_checkBox_UseChExponent->setChecked(m_pEEGoSports->m_bUseChExponent);
@@ -161,7 +158,6 @@ void EEGoSportsSetupWidget::setDeviceSamplingProperties()
     m_pEEGoSports->m_iSamplesPerBlock = ui.m_spinBox_SamplesPerBlock->value();
 
     m_pEEGoSports->m_bUseChExponent = ui.m_checkBox_UseChExponent->isChecked();
-    m_pEEGoSports->m_bUseCommonAverage = ui.m_checkBox_UseCommonAverage->isChecked();
 }
 
 

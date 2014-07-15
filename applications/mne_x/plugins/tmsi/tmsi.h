@@ -158,7 +158,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Sets up the fiff info with the current data chosen by the user.
+    * Sets up the fiff info with the current data chosen by the user. Note: Only works for ANT Neuro Waveguard Duke caps.
     */
     void setUpFiffInfo();
 
