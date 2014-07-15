@@ -147,7 +147,7 @@
              <item row="6" column="2">
               <widget class="QLineEdit" name="tb_ResEnergy">
                <property name="enabled">
-                <bool>false</bool>
+                <bool>true</bool>
                </property>
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -175,10 +175,10 @@
              <item row="6" column="0" colspan="2">
               <widget class="QCheckBox" name="chb_ResEnergy">
                <property name="text">
-                <string>residuum ernergy:</string>
+                <string>residuum energy:</string>
                </property>
                <property name="checked">
-                <bool>false</bool>
+                <bool>true</bool>
                </property>
               </widget>
              </item>
