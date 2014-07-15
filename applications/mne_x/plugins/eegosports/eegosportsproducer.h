@@ -110,7 +110,6 @@ public:
     * @param [in] iSamplingFrequency The sampling frequency defined by the user via the GUI (in Hertz).
     * @param [in] iSamplesPerBlock The samples per block defined by the user via the GUI.
     * @param [in] bUseChExponent Flag for using the channels exponent. Defined by the user via the GUI.
-    * @param [in] bUseUnitGain Flag for using the channels unit gain. Defined by the user via the GUI.
     * @param [in] sOutpuFilePath Holds the path for the output file. Defined by the user via the GUI.
     * @param [in] bWriteDriverDebugToFile Flag for writing the received samples to a file. Defined by the user via the GUI.
     * @param [in] bUseUnitOffset Flag for using the channels unit offset. Defined by the user via the GUI.
@@ -121,8 +120,6 @@ public:
                        int iSamplingFrequency,
                        int iSamplesPerBlock,
                        bool bUseChExponent,
-                       bool bUseUnitGain,
-                       bool bUseUnitOffset,
                        bool bWriteDriverDebugToFile,
                        QString sOutputFilePath,
                        bool bUseCommonAverage,

@@ -84,10 +84,6 @@ EEGoSportsSetupWidget::EEGoSportsSetupWidget(EEGoSports* pEEGoSports, QWidget* p
     //Connect channel corrections
     connect(ui.m_checkBox_UseChExponent, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
             this, &EEGoSportsSetupWidget::setDeviceSamplingProperties);
-    connect(ui.m_checkBox_UseUnitGain, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
-            this, &EEGoSportsSetupWidget::setDeviceSamplingProperties);
-    connect(ui.m_checkBox_UseUnitOffset, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
-            this, &EEGoSportsSetupWidget::setDeviceSamplingProperties);
 
     //Connect preprocessing
     connect(ui.m_checkBox_UseFiltering, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
@@ -143,8 +139,6 @@ void EEGoSportsSetupWidget::initGui()
 
     //Init channel corrections
     ui.m_checkBox_UseChExponent->setChecked(m_pEEGoSports->m_bUseChExponent);
-    ui.m_checkBox_UseUnitGain->setChecked(m_pEEGoSports->m_bUseUnitGain);
-    ui.m_checkBox_UseUnitOffset->setChecked(m_pEEGoSports->m_bUseUnitOffset);
 
     //Init preprocessing
     ui.m_checkBox_UseFiltering->setChecked(m_pEEGoSports->m_bUseFiltering);
@@ -167,9 +161,6 @@ void EEGoSportsSetupWidget::setDeviceSamplingProperties()
     m_pEEGoSports->m_iSamplesPerBlock = ui.m_spinBox_SamplesPerBlock->value();
 
     m_pEEGoSports->m_bUseChExponent = ui.m_checkBox_UseChExponent->isChecked();
-    m_pEEGoSports->m_bUseUnitGain = ui.m_checkBox_UseUnitGain->isChecked();
-    m_pEEGoSports->m_bUseUnitOffset = ui.m_checkBox_UseUnitOffset->isChecked();
-
     m_pEEGoSports->m_bUseCommonAverage = ui.m_checkBox_UseCommonAverage->isChecked();
 }
 

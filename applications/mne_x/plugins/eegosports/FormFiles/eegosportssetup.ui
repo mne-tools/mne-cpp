@@ -255,24 +255,13 @@
         <string>Correction options</string>
        </property>
        <layout class="QFormLayout" name="formLayout">
+        <property name="fieldGrowthPolicy">
+         <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+        </property>
         <item row="0" column="0">
-         <widget class="QCheckBox" name="m_checkBox_UseUnitGain">
-          <property name="text">
-           <string>Use unit gain</string>
-          </property>
-         </widget>
-        </item>
-        <item row="1" column="0">
          <widget class="QCheckBox" name="m_checkBox_UseChExponent">
           <property name="text">
            <string>Use channel's exponent</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="0">
-         <widget class="QCheckBox" name="m_checkBox_UseUnitOffset">
-          <property name="text">
-           <string>Use unit offset</string>
           </property>
          </widget>
         </item>
