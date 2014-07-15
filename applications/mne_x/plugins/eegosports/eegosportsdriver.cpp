@@ -64,8 +64,6 @@ EEGoSportsDriver::EEGoSportsDriver(EEGoSportsProducer* pEEGoSportsProducer)
 , m_uiSamplingFrequency(1024)
 , m_uiSamplesPerBlock(16)
 , m_bUseChExponent(false)
-, m_bUseUnitGain(false)
-, m_bUseUnitOffset(false)
 , m_bWriteDriverDebugToFile(false)
 , m_sOutputFilePath("/mne_x_plugins/resources/eegosports")
 , m_bUseCommonAverage(false)
@@ -111,8 +109,6 @@ bool EEGoSportsDriver::initDevice(int iNumberOfChannels,
                             int iSamplingFrequency,
                             int iSamplesPerBlock,
                             bool bUseChExponent,
-                            bool bUseUnitGain,
-                            bool bUseUnitOffset,
                             bool bWriteDriverDebugToFile,
                             QString sOutpuFilePath,
                             bool bUseCommonAverage,
@@ -127,8 +123,6 @@ bool EEGoSportsDriver::initDevice(int iNumberOfChannels,
     m_uiSamplingFrequency = iSamplingFrequency;
     m_uiSamplesPerBlock = iSamplesPerBlock;
     m_bUseChExponent = bUseChExponent;
-    m_bUseUnitGain = bUseUnitGain;
-    m_bUseUnitOffset = bUseUnitOffset;
     m_bWriteDriverDebugToFile = bWriteDriverDebugToFile;
     m_sOutputFilePath = sOutpuFilePath;
     m_bUseCommonAverage = bUseCommonAverage;
@@ -342,146 +336,142 @@ bool EEGoSportsDriver::uninitDevice()
         return false;
     }
 
-    sampleMatrix = MatrixXf::Zero(m_uiNumberOfChannels, m_uiSamplesPerBlock);
+//    //*************************************************************************************************************
+//    // Open Vibe solution
+//    sampleMatrix = MatrixXf::Zero(m_uiNumberOfChannels, m_uiSamplesPerBlock);
 
-    // OpenVibe code
-    HRESULT hr;
+//    // OpenVibe code
+//    HRESULT hr;
 
+//    if(!m_pAmplifier)
+//        return false;
+
+//    // Fetch data from device/driver like this:
+//    IBuffer* pBuffer; // The data storage
+//    if(FAILED(hr = m_pAmplifier->GetData(&pBuffer))) // Fill the storage with data. Data is delivered only once
+//    {
+//        cout << "Plugin EEGoSports - ERROR - Getting Data from device failed! HRESULT: " << hr << endl;
+//        return false;
+//    }
+
+//    // copy data from IBuffer to whatever structure you like to have.
+//    UINT nAmountOfSamples = pBuffer->GetSampleCount();
+//    //cout << "nAmountOfSamples: " << nAmountOfSamples << endl;
+//    UINT nAmountOfChannels = pBuffer->GetChannelCount();
+//    //cout << "nAmountOfChannels: " << nAmountOfChannels << endl;
+
+//    // The data is stored in µV, use this constant for conversion
+//    double dLSBToSi = 1e-6;
+
+//    // calculate start of unwritten data;
+//    for(UINT sample = 0; sample < nAmountOfSamples; sample++)
+//    {
+//        for(UINT channel = 0; channel < nAmountOfChannels; channel++)
+//        {
+//            int lValue = pBuffer->GetBuffer(channel, sample);
+
+//            float sample = float(m_bUseChExponent ? lValue * dLSBToSi : lValue); // Put the sample into whatever structure you want now.
+//            //cout << sample << " ";
+
+//            // check for triggers
+//            if(channel == EEGO_CHANNEL_TRG)
+//            {
+//                const uint currentTriggers = (uint)(lValue);
+//                const uint currentNewTriggers = currentTriggers & ~m_nLastTriggerValue; // Calculate which bits are new
+//                m_nLastTriggerValue = currentTriggers; // Save value for next trigger detection
+
+//                if(currentNewTriggers != 0)
+//                {
+//                    // Yay a trigger! Use it however you want
+//                }
+//            }
+//        }
+//    }
+
+//    // Memory cleanup
+//    pBuffer->Release();
+//    pBuffer = NULL;
+
+//    return true;
+
+    //*************************************************************************************************************
     if(!m_pAmplifier)
         return false;
 
-    // Fetch data from device/driver like this:
-    IBuffer* pBuffer; // The data storage
-    if(FAILED(hr = m_pAmplifier->GetData(&pBuffer))) // Fill the storage with data. Data is delivered only once
+    // Init stuff
+    sampleMatrix.setZero(); // Clear matrix - set all elements to zero
+    uint iSamplesWrittenToMatrix = 0;
+    int channelMax = 0;
+    int sampleMax = 0;
+    int sampleIterator = 0;
+
+    //get samples from device until the complete matrix is filled, i.e. the samples per block size is met
+    while(iSamplesWrittenToMatrix < m_uiSamplesPerBlock)
     {
-        cout << "Plugin EEGoSports - ERROR - Getting Data from device failed! HRESULT: " << hr << endl;
-        return false;
-    }
+        // Fetch data from device/driver like this:
+        IBuffer* pBuffer; // The data storage
 
-    // copy data from IBuffer to whatever structure you like to have.
-    UINT nAmountOfSamples = pBuffer->GetSampleCount();
-    //cout << "nAmountOfSamples: " << nAmountOfSamples << endl;
-    UINT nAmountOfChannels = pBuffer->GetChannelCount();
-    //cout << "nAmountOfChannels: " << nAmountOfChannels << endl;
-
-    // The data is stored in µV, use this constant for conversion
-    float dLSBToSi = 1e-6;
-
-    // calculate start of unwritten data;
-    for(UINT sample = 0; sample < nAmountOfSamples; sample++)
-    {
-        for(UINT channel = 0; channel < nAmountOfChannels; channel++)
+        if(FAILED(m_pAmplifier->GetData(&pBuffer))) // Fill the storage with data. Data is delivered only once
         {
-            int lValue = pBuffer->GetBuffer(channel, sample);
+            cout << "Plugin EEGoSports - ERROR - Getting Data from device failed! " << endl;
+            return false;
+        }
 
-            float sample = float( lValue * dLSBToSi); // Put the sample into whatever structure you want now.
-            //cout << sample << " ";
+        //Get sample and channel infos from device
+        m_uiNumberOfAvailableChannels = pBuffer->GetChannelCount();
+        UINT ulNumSamplesReceived = pBuffer->GetSampleCount();
 
-            // check for triggers
-            if(channel == EEGO_CHANNEL_TRG)
+        //Only do the next steps if there was at least one sample received, otherwise skip and wait until at least one sample was received
+        if(ulNumSamplesReceived > 0)
+        {
+            //cout<<"Sample received"<<endl;
+            int actualSamplesWritten = 0; //Holds the number of samples which are actually written to the matrix in this while procedure
+
+            //If the number of available channels is smaller than the number defined by the user -> set the channelMax to the smaller number
+            if(m_uiNumberOfAvailableChannels < m_uiNumberOfChannels)
+                channelMax = m_uiNumberOfAvailableChannels;
+            else
+                channelMax = m_uiNumberOfChannels;
+
+            //Write the received samples to an extra buffer, so that they are not getting lost if too many samples were received. These are then written to the next matrix (block)
+            for(UINT sample = 0; sample < ulNumSamplesReceived; sample++)
+                for(UINT channel = 0; channel < channelMax; channel++)
+                    m_vSampleBlockBuffer.push_back(m_bUseChExponent ? pBuffer->GetBuffer(channel, sample) * 1e-6 : pBuffer->GetBuffer(channel, sample));
+
+            //If the number of the samples which were already written to the matrix plus the last received number of samples is larger then the defined block size
+            //-> only fill until the matrix is completeley filled with samples. The other (unused) samples are still stored in the vector buffer m_vSampleBlockBuffer and will be used in the next matrix which is to be sent to the circular buffer
+            if(iSamplesWrittenToMatrix + ulNumSamplesReceived > m_uiSamplesPerBlock)
+                sampleMax = m_uiSamplesPerBlock - iSamplesWrittenToMatrix + sampleIterator;
+            else
+                sampleMax = ulNumSamplesReceived + sampleIterator;
+
+            //Read the needed number of samples from the vector buffer to store them in the matrix
+            for(; sampleIterator < sampleMax; sampleIterator++)
             {
-                const uint currentTriggers = (uint)(lValue);
-                const uint currentNewTriggers = currentTriggers & ~m_nLastTriggerValue; // Calculate which bits are new
-                m_nLastTriggerValue = currentTriggers; // Save value for next trigger detection
-
-                if(currentNewTriggers != 0)
+                for(int channelIterator = 0; channelIterator < channelMax; channelIterator++)
                 {
-                    // Yay a trigger! Use it however you want
+                    sampleMatrix(channelIterator, sampleIterator) = m_vSampleBlockBuffer.first();
+                    m_vSampleBlockBuffer.pop_front();
                 }
+
+                actualSamplesWritten ++;
             }
+
+            iSamplesWrittenToMatrix = iSamplesWrittenToMatrix + actualSamplesWritten;
+        }
+
+        // Memory cleanup
+        pBuffer->Release();
+        pBuffer = NULL;
+
+        if(m_outputFileStream.is_open() && m_bWriteDriverDebugToFile)
+        {
+            m_outputFileStream << "ulNumSamplesReceived: " << ulNumSamplesReceived << endl;
+            m_outputFileStream << "sampleMax: " << sampleMax << endl;
+            m_outputFileStream << "sampleIterator: " << sampleIterator << endl;
+            m_outputFileStream << "iSamplesWrittenToMatrix: " << iSamplesWrittenToMatrix << endl << endl;
         }
     }
-
-    // Memory cleanup
-    pBuffer->Release();
-    pBuffer = NULL;
-
-    return true;
-
-//    sampleMatrix.setZero(); // Clear matrix - set all elements to zero
-//    uint iSamplesWrittenToMatrix = 0;
-//    int channelMax = 0;
-//    int sampleMax = 0;
-//    int sampleIterator = 0;
-
-//    //get samples from device until the complete matrix is filled, i.e. the samples per block size is met
-//    while(iSamplesWrittenToMatrix < m_uiSamplesPerBlock)
-//    {
-//        //Get sample block from device
-//        LONG ulSizeSamples = m_oFpGetSamples(m_HandleMaster, (PULONG)m_lSignalBuffer, m_lSignalBufferSize);
-//        LONG ulNumSamplesReceived = ulSizeSamples/(m_uiNumberOfAvailableChannels*4);
-
-//        //Only do the next steps if there was at least one sample received, otherwise skip and wait until at least one sample was received
-//        if(ulNumSamplesReceived > 0)
-//        {
-//            int actualSamplesWritten = 0; //Holds the number of samples which are actually written to the matrix in this while procedure
-
-//            //Write the received samples to an extra buffer, so that they are not getting lost if too many samples were received. These are then written to the next matrix (block)
-//            for(int i=0; i<ulNumSamplesReceived; i++)
-//            {
-//                for(uint j=i*m_uiNumberOfAvailableChannels; j<(i*m_uiNumberOfAvailableChannels)+m_uiNumberOfChannels; j++)
-//                    m_vSampleBlockBuffer.push_back((double)m_lSignalBuffer[j]);
-//            }
-
-//            //If the number of available channels is smaller than the number defined by the user -> set the channelMax to the smaller number
-//            if(m_uiNumberOfAvailableChannels < m_uiNumberOfChannels)
-//                channelMax = m_uiNumberOfAvailableChannels;
-//            else
-//                channelMax = m_uiNumberOfChannels;
-
-//            //If the number of the samples which were already written to the matrix plus the last received number of samples is larger then the defined block size
-//            //-> only fill until the matrix is completeley filled with samples. The other (unused) samples are still stored in the vector buffer m_vSampleBlockBuffer and will be used in the next matrix which is to be sent to the circular buffer
-//            if(iSamplesWrittenToMatrix + ulNumSamplesReceived > m_uiSamplesPerBlock)
-//                sampleMax = m_uiSamplesPerBlock - iSamplesWrittenToMatrix + sampleIterator;
-//            else
-//                sampleMax = ulNumSamplesReceived + sampleIterator;
-
-//            //Read the needed number of samples from the vector buffer to store them in the matrix
-//            for(; sampleIterator < sampleMax; sampleIterator++)
-//            {
-//                for(int channelIterator = 0; channelIterator < channelMax; channelIterator++)
-//                {
-//                    sampleMatrix(channelIterator, sampleIterator) = ((m_vSampleBlockBuffer.first() * (m_bUseUnitGain ? m_vUnitGain[channelIterator] : 1)) + (m_bUseUnitOffset ? m_vUnitOffSet[channelIterator] : 0)) * (m_bUseChExponent ? pow(10., (double)m_vExponentChannel[channelIterator]) : 1);
-//                    m_vSampleBlockBuffer.pop_front();
-//                }
-
-//                actualSamplesWritten ++;
-//            }
-
-//            iSamplesWrittenToMatrix = iSamplesWrittenToMatrix + actualSamplesWritten;
-//        }
-
-////        if(m_outputFileStream.is_open() && m_bWriteDriverDebugToFile)
-////        {
-////            m_outputFileStream << "ulSizeSamples: " << ulSizeSamples << endl;
-////            m_outputFileStream << "ulNumSamplesReceived: " << ulNumSamplesReceived << endl;
-////            m_outputFileStream << "sampleMax: " << sampleMax << endl;
-////            m_outputFileStream << "sampleIterator: " << sampleIterator << endl;
-////            m_outputFileStream << "iSamplesWrittenToMatrix: " << iSamplesWrittenToMatrix << endl << endl;
-////        }
-//    }
-
-//    if(/*m_outputFileStream.is_open() &&*/ m_bWriteDriverDebugToFile)
-//    {
-//        //Get device buffer info
-//        ULONG ulOverflow;
-//        ULONG ulPercentFull;
-//        m_oFpGetBufferInfo(m_HandleMaster, &ulOverflow, &ulPercentFull);
-
-//        m_outputFileStream <<  "Unit offset: " << endl;
-//        for(int w = 0; w<<m_vUnitOffSet.size(); w++)
-//            cout << float(m_vUnitOffSet[w]) << "  ";
-//        m_outputFileStream << endl << endl;
-
-//        m_outputFileStream <<  "Unit gain: " << endl;
-//        for(int w = 0; w<<m_vUnitGain.size(); w++)
-//            m_outputFileStream << float(m_vUnitGain[w]) << "  ";
-//        m_outputFileStream << endl << endl;
-
-//        m_outputFileStream << "----------<See output file for sample matrix>----------" <<endl<<endl;
-//        m_outputFileStream << "----------<Internal driver buffer is "<<ulPercentFull<<" full>----------"<<endl;
-//        m_outputFileStream << "----------<Internal driver overflow is "<<ulOverflow<< ">----------"<<endl;
-//    }
 
     return true;
 }

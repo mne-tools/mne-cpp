@@ -155,8 +155,6 @@ public:
     * @param [in] iSamplingFrequency sampling frequency specified by the user.
     * @param [in] iSamplesPerBlock samples per block specified by the user.
     * @param [in] bUseChExponent Flag for using the channels exponent. Defined by the user via the GUI.
-    * @param [in] bUseUnitGain Flag for using the channels unit gain. Defined by the user via the GUI.
-    * @param [in] bUseUnitOffset Flag for using the channels unit offset. Defined by the user via the GUI.
     * @param [in] bWriteDriverDebugToFile Flag for writing driver debug information to a file. Defined by the user via the GUI.
     * @param [in] sOutpuFilePath Holds the path for the output file. Defined by the user via the GUI.
     * @param [out] bool returns true if device was successfully initialised, false otherwise.
@@ -167,8 +165,6 @@ public:
                     int iSamplingFrequency,
                     int iSamplesPerBlock,
                     bool bUseChExponent,
-                    bool bUseUnitGain,
-                    bool bUseUnitOffset,
                     bool bWriteDriverDebugToFile,
                     QString sOutpuFilePath,
                     bool bUseCommonAverage,
@@ -193,8 +189,6 @@ private:
     uint                m_uiSamplingFrequency;          /**< The sampling frequency defined by the user via the GUI (in Hertz).*/
     uint                m_uiSamplesPerBlock;            /**< The samples per block defined by the user via the GUI.*/
     bool                m_bUseChExponent;               /**< Flag for using the channels exponent. Defined by the user via the GUI.*/
-    bool                m_bUseUnitGain;                 /**< Flag for using the channels unit gain. Defined by the user via the GUI.*/
-    bool                m_bUseUnitOffset;               /**< Flag for using the channels unit offset. Defined by the user via the GUI.*/
     bool                m_bWriteDriverDebugToFile;      /**< Flag for for writing driver debug informstions to a file. Defined by the user via the GUI.*/
     bool                m_bUsePreprocessing;            /**< Flag for using preprocessing actions for the EEG data. Defined by the user via the GUI.*/
     QString             m_sOutputFilePath;              /**< Holds the path for the output file. Defined by the user via the GUI.*/

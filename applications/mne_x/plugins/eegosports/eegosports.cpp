@@ -122,8 +122,6 @@ void EEGoSports::init()
     m_iTriggerInterval = 5000;
 
     m_bUseChExponent = true;
-    m_bUseUnitGain = true;
-    m_bUseUnitOffset = true;
     m_bWriteToFile = false;
     m_bWriteDriverDebugToFile = false;
     m_bUseFiltering = false;
@@ -478,8 +476,6 @@ bool EEGoSports::start()
                        m_iSamplingFreq,
                        m_iSamplesPerBlock,
                        m_bUseChExponent,
-                       m_bUseUnitGain,
-                       m_bUseUnitOffset,
                        m_bWriteDriverDebugToFile,
                        m_sOutputFilePath,
                        m_bUseCommonAverage,
