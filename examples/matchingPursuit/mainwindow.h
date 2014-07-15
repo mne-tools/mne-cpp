@@ -57,10 +57,9 @@ private slots:
     void on_actionErweiterter_W_rterbucheditor_triggered();
     void on_actionNeu_triggered();
     void on_btt_OpenSignal_clicked();
-
     void on_tbv_Results_cellClicked(int row, int column);
-
     void iteration_counter(qint32 current_iteration, qreal current_energy);
+    void slot_changed(const QModelIndex&, const QModelIndex&);
 
 private:
 
@@ -68,6 +67,9 @@ private:
     GraphWindow *callGraphWindow;
     AtomSumWindow *callAtomSumWindow;
     ResiduumWindow *callResidumWindow;
+    QStandardItemModel* model;
+    QStandardItem* item;
+    std::vector<QStandardItem*> items;
     void open_file();
     QList<qreal> NormSignal(QList<qreal> signalSamples);
     //QStringList correlation(VectorXd signalSamples, QList<qreal> atomSamples, QString atomName);
@@ -75,6 +77,10 @@ private:
     qint32 ReadFiffFile(QString fileName);
     void ReadMatlabFile(QString fileName);
     void CalcAdaptivMP(MatrixXd signal, TruncationCriterion criterion);
+    MatrixXd remove_column(MatrixXd& matrix, qint32 colToRemove);
+    MatrixXd remove_row(MatrixXd& matrix, qint32 rowToRemove);
+    MatrixXd add_row_at(MatrixXd& matrix, VectorXd &rowData, qint32 rowNumber);
+    MatrixXd add_column_at(MatrixXd& matrix, VectorXd& rowData, qint32 colNumber);
 
 };
 
@@ -87,7 +93,7 @@ class GraphWindow : public QWidget
 protected:
    void paintEvent(QPaintEvent *event);
 public:
-   void PaintSignal(MatrixXd signalMatrix, VectorXd residuumSamples, QColor color, QSize windowSize);
+   void PaintSignal(MatrixXd signalMatrix, VectorXd residuumSamples, QList<QColor> colors, QSize windowSize);
 
 };
 
