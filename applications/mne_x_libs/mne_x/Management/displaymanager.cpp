@@ -42,17 +42,16 @@
 
 
 #include <xDisp/realtimesamplearraywidget.h>
-
 #include <xDisp/realtimemultisamplearraywidget.h>
-
 #if defined(QT3D_LIBRARY_AVAILABLE)
 #include <xDisp/realtimesourceestimatewidget.h>
 #endif
+#include <xDisp/realtimeevokedwidget.h>
 
 #include <xMeas/newrealtimesamplearray.h>
 #include <xMeas/newrealtimemultisamplearray.h>
-
 #include <xMeas/realtimesourceestimate.h>
+#include <xMeas/realtimeevoked.h>
 
 
 //#include <xDisp/measurementwidget.h>
@@ -167,6 +166,21 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
             rtseWidget->init();
         }
     #endif
+        else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeEvoked> >())
+        {
+            QSharedPointer<RealTimeEvoked>* pRealTimeEvoked = &pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeEvoked> >()->data();
+
+            RealTimeEvokedWidget* rteWidget = new RealTimeEvokedWidget(*pRealTimeEvoked, pT, newDisp);
+
+            qListActions.append(rteWidget->getDisplayActions());
+            qListWidgets.append(rteWidget->getDisplayWidgets());
+
+            connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
+                    rteWidget, &RealTimeEvokedWidget::update, Qt::BlockingQueuedConnection);
+
+            vboxLayout->addWidget(rteWidget);
+            rteWidget->init();
+        }
     }
 
 //    // Add all widgets but NumericWidgets to layout and display them
