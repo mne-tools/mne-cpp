@@ -136,7 +136,7 @@ void EEGoSports::init()
     m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo());
 
     //Initialise matrix used to perform a very simple high pass filter operation
-    m_matOldMatrix = MatrixXf::Zero(m_iNumberOfChannels, m_iSamplesPerBlock);
+    //m_matOldMatrix = MatrixXf::Zero(m_iNumberOfChannels, m_iSamplesPerBlock);
 }
 
 
@@ -444,6 +444,7 @@ bool EEGoSports::start()
 
     //Buffer
     m_pRawMatrixBuffer_In = QSharedPointer<RawMatrixBuffer>(new RawMatrixBuffer(8, m_iNumberOfChannels, m_iSamplesPerBlock));
+    m_qListReceivedSamples.clear();
 
     m_pEEGoSportsProducer->start(m_iNumberOfChannels,
                        m_iSamplingFreq,
@@ -484,7 +485,19 @@ bool EEGoSports::stop()
 
     m_pRMTSA_EEGoSports->data()->clear();
 
+    m_qListReceivedSamples.clear();
+
     return true;
+}
+
+
+//*************************************************************************************************************
+
+void EEGoSports::setSampleData(MatrixXf &matRawBuffer)
+{
+    m_mutex.lock();
+        m_qListReceivedSamples.append(matRawBuffer);
+    m_mutex.unlock();
 }
 
 
@@ -526,9 +539,19 @@ void EEGoSports::run()
         //std::cout<<"EEGoSports::run(s)"<<std::endl;
 
         //pop matrix only if the producer thread is running
-        if(m_pEEGoSportsProducer->isRunning() && !m_bCheckImpedances)
+        if(m_pEEGoSportsProducer->isRunning())
         {
-            MatrixXf matValue = m_pRawMatrixBuffer_In->pop();
+            //MatrixXf matValue = m_pRawMatrixBuffer_In->pop();
+            MatrixXf matValue;
+
+            m_mutex.lock();
+            if(m_qListReceivedSamples.isEmpty() == false)
+            {
+                //cout<<m_qListReceivedSamples.size()<<endl;
+                matValue = m_qListReceivedSamples.first();
+                m_qListReceivedSamples.removeFirst();
+            }
+            m_mutex.unlock();
 
             // Set Beep trigger (if activated)
             if(m_bBeepTrigger && m_qTimerTrigger.elapsed() >= m_iTriggerInterval)
@@ -550,25 +573,6 @@ void EEGoSports::run()
 
                 matValue = matValue - m_matOldMatrix;
                 m_matOldMatrix = temp;
-            }
-
-            //Change values of the trigger channel for better plotting - this change is not saved in the produced fif file
-            if(m_iNumberOfChannels>137)
-            {
-                for(int i = 0; i<matValue.row(137).cols(); i++)
-                {
-                    // Left keyboard or capacitive
-                    if(matValue.row(136)[i] == 254)
-                        matValue.row(136)[i] = 4000;
-
-                    // Right keyboard
-                    if(matValue.row(136)[i] == 253)
-                        matValue.row(136)[i] = 8000;
-
-                    // Beep
-                    if(matValue.row(136)[i] == 252)
-                        matValue.row(136)[i] = 2000;
-                }
             }
 
             //emit values to real time multi sample array

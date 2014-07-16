@@ -44,6 +44,7 @@
 //=============================================================================================================
 
 #include <generics/circularbuffer.h>
+#include <Eigen/Eigen>
 
 
 //*************************************************************************************************************
@@ -69,6 +70,7 @@ namespace EEGoSportsPlugin
 //=============================================================================================================
 
 using namespace IOBuffer;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -139,11 +141,10 @@ protected:
     virtual void run();
 
 private:
-    EEGoSports*                       m_pEEGoSports;            /**< A pointer to the corresponding EEGoSports class.*/
-    QSharedPointer<EEGoSportsDriver>  m_pEEGoSportsDriver;      /**< A pointer to the corresponding EEGoSports driver class.*/
+    EEGoSports*                         m_pEEGoSports;              /**< A pointer to the corresponding EEGoSports class.*/
+    QSharedPointer<EEGoSportsDriver>    m_pEEGoSportsDriver;        /**< A pointer to the corresponding EEGoSports driver class.*/
 
-    bool                        m_bIsRunning;       /**< Whether EEGoSportsProducer is running.*/
-
+    bool                                m_bIsRunning;               /**< Whether EEGoSportsProducer is running.*/
 };
 
 } // NAMESPACE

@@ -153,6 +153,7 @@ void EEGoSportsSetupWidget::initGui()
 
 void EEGoSportsSetupWidget::setDeviceSamplingProperties()
 {
+    cout<<"editing finished"<<endl;
     m_pEEGoSports->m_iSamplingFreq = ui.m_spinBox_SamplingFreq->value();
     m_pEEGoSports->m_iNumberOfChannels = ui.m_spinBox_NumberOfChannels->value();
     m_pEEGoSports->m_iSamplesPerBlock = ui.m_spinBox_SamplesPerBlock->value();
