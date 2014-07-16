@@ -107,9 +107,7 @@ RealTimeEvokedWidget::RealTimeEvokedWidget(QSharedPointer<RealTimeEvoked> pRTE, 
 , m_fZoomFactor(1.0f)
 , m_pRTE(pRTE)
 , m_bInitialized(false)
-, m_iT(10)
 , m_fSamplingRate(1024)
-, m_fDesiredSamplingRate(128)
 , m_pSensorModel(NULL)
 {
     Q_UNUSED(pTime)
@@ -122,14 +120,6 @@ RealTimeEvokedWidget::RealTimeEvokedWidget(QSharedPointer<RealTimeEvoked> pRTE, 
     m_pDoubleSpinBoxZoom->setSuffix(" x");
     connect(m_pDoubleSpinBoxZoom, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &RealTimeEvokedWidget::zoomChanged);
     addDisplayWidget(m_pDoubleSpinBoxZoom);
-
-    m_pSpinBoxTimeScale = new QSpinBox(this);
-    m_pSpinBoxTimeScale->setMinimum(1);
-    m_pSpinBoxTimeScale->setMaximum(20);
-    m_pSpinBoxTimeScale->setValue(m_iT);
-    m_pSpinBoxTimeScale->setSuffix(" s");
-    connect(m_pSpinBoxTimeScale, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &RealTimeEvokedWidget::timeWindowChanged);
-    addDisplayWidget(m_pSpinBoxTimeScale);
 
     m_pActionSelectSensors = new QAction(QIcon(":/images/selectSensors.png"), tr("Shows the region selection widget (F12)"),this);
     m_pActionSelectSensors->setShortcut(tr("F12"));
@@ -190,8 +180,8 @@ void RealTimeEvokedWidget::update(XMEASLIB::NewMeasurement::SPtr)
             init();
         }
     }
-//    else
-//        m_pRTMSAModel->addData(m_pRTE->getMultiSampleArray());
+    else
+        m_pRTEModel->addData(m_pRTE->getValue());
 }
 
 
@@ -206,9 +196,9 @@ void RealTimeEvokedWidget::init()
         m_pRTEModel = new RealTimeEvokedModel(this);
 
         m_pRTEModel->setChannelInfo(m_qListChInfo);
-        m_pRTEModel->setSamplingInfo(m_fSamplingRate, m_iT, m_fDesiredSamplingRate);
+        m_pRTEModel->setSamplingInfo(m_fSamplingRate);
 
-//        m_pButterflyPlot->setModel(m_pRTEModel);
+        m_pButterflyPlot->setModel(m_pRTEModel);
 
 
 
@@ -350,6 +340,7 @@ void RealTimeEvokedWidget::wheelEvent(QWheelEvent* wheelEvent)
     Q_UNUSED(wheelEvent)
 }
 
+
 //*************************************************************************************************************
 
 void RealTimeEvokedWidget::zoomChanged(double zoomFac)
@@ -357,15 +348,6 @@ void RealTimeEvokedWidget::zoomChanged(double zoomFac)
     m_fZoomFactor = zoomFac;
 
 //    m_pTableView->verticalHeader()->setDefaultSectionSize(m_fZoomFactor*m_fDefaultSectionSize);//Row Height
-}
-
-
-//*************************************************************************************************************
-
-void RealTimeEvokedWidget::timeWindowChanged(int T)
-{
-    m_iT = T;
-//    m_pRTMSAModel->setSamplingInfo(m_fSamplingRate, T, m_fDesiredSamplingRate);
 }
 
 
