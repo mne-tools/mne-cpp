@@ -166,6 +166,8 @@ private:
     bool m_bIsRunning;      /**< If source lab is running */
     bool m_bProcessData;    /**< If data should be received for processing */
 
+    int m_iDebugNumChannels;
+
 };
 
 } // NAMESPACE
