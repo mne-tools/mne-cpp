@@ -172,6 +172,12 @@ public:
     */
     virtual bool stop();
 
+    //=========================================================================================================
+    /**
+    * Set/Add received samples to a QList.
+    */
+    void setSampleData(MatrixXf &matRawBuffer);
+
     virtual IPlugin::PluginType getType() const;
     virtual QString getName() const;
 
@@ -252,6 +258,10 @@ private:
 
     QSharedPointer<QTimer>              m_pTimerRecordingChange;            /**< timer to control blinking of the recording icon */
     qint16                              m_iBlinkStatus;                     /**< flag for recording icon blinking */
+
+    QList<MatrixXf>                     m_qListReceivedSamples;             /**< list with alle the received samples in form of differentley sized matrices. */
+
+    QMutex                              m_mutex;
 
 };
 

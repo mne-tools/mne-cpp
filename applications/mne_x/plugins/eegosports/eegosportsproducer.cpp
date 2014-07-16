@@ -124,14 +124,14 @@ void EEGoSportsProducer::stop()
 
 void EEGoSportsProducer::run()
 {
-    MatrixXf matRawBuffer(m_pEEGoSports->m_iNumberOfChannels, m_pEEGoSports->m_iSamplesPerBlock);
-
     while(m_bIsRunning)
     {
         //std::cout<<"EEGoSportsProducer::run()"<<std::endl;
-        //Get the TMSi EEG data out of the device buffer and write received data to circular buffer
+        //Get the TMSi EEG data out of the device buffer and write received data to a QList
+        MatrixXf matRawBuffer;
+
         if(m_pEEGoSportsDriver->getSampleMatrixValue(matRawBuffer))
-            m_pEEGoSports->m_pRawMatrixBuffer_In->push(&matRawBuffer);
+            m_pEEGoSports->setSampleData(matRawBuffer);
     }
 
     //std::cout<<"EXITING - EEGoSportsProducer::run()"<<std::endl;
