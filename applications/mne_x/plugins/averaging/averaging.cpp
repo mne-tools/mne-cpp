@@ -106,15 +106,9 @@ void Averaging::init()
     connect(m_pAveragingInput.data(), &PluginInputConnector::notify, this, &Averaging::update, Qt::DirectConnection);
     m_inputConnectors.append(m_pAveragingInput);
 
-//    // Output
-//    m_pAveragingOutput = PluginOutputData<NewRealTimeSampleArray>::create(this, "AveragingOut", "Averaging output data");
-//    m_outputConnectors.append(m_pAveragingOutput);
-
-//    m_pAveragingOutput->data()->setName("Averaging Output");
-//    m_pAveragingOutput->data()->setUnit("mV");
-//    m_pAveragingOutput->data()->setMinValue(-200);
-//    m_pAveragingOutput->data()->setMaxValue(360);
-//    m_pAveragingOutput->data()->setSamplingRate(256.0/1.0);
+    // Output
+    m_pAveragingOutput = PluginOutputData<RealTimeEvoked>::create(this, "AveragingOut", "Averaging Output Data");
+    m_outputConnectors.append(m_pAveragingOutput);
 
     //init channels when fiff info is available
     connect(this, &Averaging::fiffInfoAvailable, this, &Averaging::initConnector);
