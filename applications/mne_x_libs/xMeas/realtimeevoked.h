@@ -171,7 +171,7 @@ public:
     *
     * @param [in] v the value which is should be distributed.
     */
-    virtual void setValue(MatrixXd v);
+    virtual void setValue(MatrixXd& v);
 
     //=========================================================================================================
     /**
