@@ -104,7 +104,10 @@ SOURCES += \
     helpers/sensoritem.cpp \
     helpers/sensorlayout.cpp \
     helpers/sensormodel.cpp \
-    helpers/sensorwidget.cpp
+    helpers/sensorwidget.cpp \
+    helpers/realtimeevokedmodel.cpp \
+    realtimeevokedwidget.cpp \
+    helpers/realtimebutterflyplot.cpp
 
 HEADERS += \
     xdisp_global.h \
@@ -118,7 +121,10 @@ HEADERS += \
     helpers/sensoritem.h \
     helpers/sensorlayout.h \
     helpers/sensormodel.h \
-    helpers/sensorwidget.h
+    helpers/sensorwidget.h \
+    helpers/realtimeevokedmodel.h \
+    realtimeevokedwidget.h \
+    helpers/realtimebutterflyplot.h
 
 FORMS += \
     realtimesamplearraywidget.ui
