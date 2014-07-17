@@ -110,7 +110,6 @@ public:
     * Starts the EEGoSportsProducer by starting the producer's thread and initialising the device.
     * @param [in] iNumberOfChannels The number of channels defined by the user via the GUI.
     * @param [in] iSamplingFrequency The sampling frequency defined by the user via the GUI (in Hertz).
-    * @param [in] iSamplesPerBlock The samples per block defined by the user via the GUI.
     * @param [in] bUseChExponent Flag for using the channels exponent. Defined by the user via the GUI.
     * @param [in] sOutpuFilePath Holds the path for the output file. Defined by the user via the GUI.
     * @param [in] bWriteDriverDebugToFile Flag for writing the received samples to a file. Defined by the user via the GUI.
@@ -119,7 +118,6 @@ public:
     */
     virtual void start(int iNumberOfChannels,
                        int iSamplingFrequency,
-                       int iSamplesPerBlock,
                        bool bUseChExponent,
                        bool bWriteDriverDebugToFile,
                        QString sOutputFilePath,

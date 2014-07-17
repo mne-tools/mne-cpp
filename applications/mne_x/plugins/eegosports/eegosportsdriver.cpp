@@ -62,7 +62,6 @@ EEGoSportsDriver::EEGoSportsDriver(EEGoSportsProducer* pEEGoSportsProducer)
 , m_bInitDeviceSuccess(false)
 , m_uiNumberOfChannels(64)
 , m_uiSamplingFrequency(1024)
-, m_uiSamplesPerBlock(16)
 , m_bUseChExponent(false)
 , m_bWriteDriverDebugToFile(false)
 , m_sOutputFilePath("/mne_x_plugins/resources/eegosports")
@@ -70,7 +69,6 @@ EEGoSportsDriver::EEGoSportsDriver(EEGoSportsProducer* pEEGoSportsProducer)
 {
     //Initialise NULL pointers
     m_oLibHandle = NULL ;
-    m_lSignalBuffer = NULL;
 
     //Check which driver dll to take: TMSiSDK.dll oder TMSiSDK32bit.dll
     #ifdef TAKE_EEGOSPORTSSDK_DLL //32 bit system & 64 bit (with 64 bit compiler)
@@ -106,7 +104,6 @@ EEGoSportsDriver::~EEGoSportsDriver()
 
 bool EEGoSportsDriver::initDevice(int iNumberOfChannels,
                             int iSamplingFrequency,
-                            int iSamplesPerBlock,
                             bool bUseChExponent,
                             bool bWriteDriverDebugToFile,
                             QString sOutpuFilePath,
@@ -119,7 +116,6 @@ bool EEGoSportsDriver::initDevice(int iNumberOfChannels,
     //Set global variables
     m_uiNumberOfChannels = iNumberOfChannels;
     m_uiSamplingFrequency = iSamplingFrequency;
-    m_uiSamplesPerBlock = iSamplesPerBlock;
     m_bUseChExponent = bUseChExponent;
     m_bWriteDriverDebugToFile = bWriteDriverDebugToFile;
     m_sOutputFilePath = sOutpuFilePath;
@@ -226,10 +222,10 @@ bool EEGoSportsDriver::initDevice(int iNumberOfChannels,
     m_pAmplifier->SetSignalGain(gain, EEGO_ADC_S);
 
     // We are measuring here so better leave the DAC off. Use it to create a rectangular test signal.
-    hr = m_pAmplifier->SetDriverAmplitude(250);
-    hr |= m_pAmplifier->SetDriverPeriod(1000);
-//    hr = m_pAmplifier->SetDriverAmplitude(0);
-//    hr |= m_pAmplifier->SetDriverPeriod(0);
+//    hr = m_pAmplifier->SetDriverAmplitude(250);
+//    hr |= m_pAmplifier->SetDriverPeriod(1000);
+    hr = m_pAmplifier->SetDriverAmplitude(0);
+    hr |= m_pAmplifier->SetDriverPeriod(0);
 
     if(FAILED(hr))
         return false;
@@ -256,7 +252,7 @@ bool EEGoSportsDriver::initDevice(int iNumberOfChannels,
     cout << "Starting Device with sampling rate: " << rate << "hz and a gain of: " << gain << "\n";
 
     // With this call we tell the amplifier and driver stack to start streaming
-    if(FAILED(m_pAmplifier->SetMode(EEGO_MODE_CALIBRATION))) //EEGO_MODE_CALIBRATION EEGO_MODE_STREAMING
+    if(FAILED(m_pAmplifier->SetMode(EEGO_MODE_STREAMING))) //EEGO_MODE_CALIBRATION EEGO_MODE_STREAMING EEGO_MODE_IMPEDANCE_CHA EEGO_MODE_IMPEDANCE_REF
         return false;
 
     Sleep(100);
@@ -274,9 +270,6 @@ bool EEGoSportsDriver::initDevice(int iNumberOfChannels,
 
 bool EEGoSportsDriver::uninitDevice()
 {
-    //Clear the buffer which is used to store the received samples
-    m_vSampleBlockBuffer.clear();
-
     //Check if the device was initialised
     if(!m_bInitDeviceSuccess)
     {
@@ -312,7 +305,6 @@ bool EEGoSportsDriver::uninitDevice()
 
     //Reset to NULL pointers
     m_pAmplifier = NULL;
-    m_lSignalBuffer = NULL;
 
     cout << "Plugin EEGoSports - INFO - uninitDevice() - Successfully uninitialised the device" << endl;
     return true;
@@ -360,8 +352,15 @@ bool EEGoSportsDriver::getSampleMatrixValue(MatrixXf& sampleMatrix)
         // Memory cleanup
         pBuffer->Release();
         pBuffer = NULL;
+
+        if(m_outputFileStream.is_open() && m_bWriteDriverDebugToFile)
+            m_outputFileStream << "ulNumSamplesReceived: " << ulNumSamplesReceived << endl;
+
         return true;
     }
+
+    if(m_outputFileStream.is_open() && m_bWriteDriverDebugToFile)
+        m_outputFileStream << "ulNumSamplesReceived: " << ulNumSamplesReceived << endl;
 
     // Memory cleanup
     pBuffer->Release();

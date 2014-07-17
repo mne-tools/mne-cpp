@@ -448,7 +448,6 @@ bool EEGoSports::start()
 
     m_pEEGoSportsProducer->start(m_iNumberOfChannels,
                        m_iSamplingFreq,
-                       m_iSamplesPerBlock,
                        m_bUseChExponent,
                        m_bWriteDriverDebugToFile,
                        m_sOutputFilePath,

@@ -127,34 +127,14 @@
            <number>1</number>
           </property>
           <property name="maximum">
-           <number>138</number>
+           <number>80</number>
           </property>
           <property name="value">
-           <number>138</number>
+           <number>80</number>
           </property>
          </widget>
         </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="m_qLabel_SamplesPerBlock">
-          <property name="text">
-           <string>Samples taken per block:</string>
-          </property>
-         </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="QSpinBox" name="m_spinBox_SamplesPerBlock">
-          <property name="minimum">
-           <number>16</number>
-          </property>
-          <property name="maximum">
-           <number>512</number>
-          </property>
-          <property name="value">
-           <number>16</number>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="0" colspan="2">
+        <item row="2" column="0" colspan="2">
          <widget class="Line" name="line_2">
           <property name="minimumSize">
            <size>
@@ -167,7 +147,7 @@
           </property>
          </widget>
         </item>
-        <item row="4" column="0">
+        <item row="3" column="0">
          <widget class="QCheckBox" name="m_checkBox_WriteDriverDebugToFile">
           <property name="text">
            <string>Driver Debug File</string>

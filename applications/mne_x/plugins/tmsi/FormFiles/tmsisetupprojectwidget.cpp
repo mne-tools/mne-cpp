@@ -76,6 +76,12 @@ TMSISetupProjectWidget::TMSISetupProjectWidget(TMSI* pTMSI, QWidget *parent)
 
     //Connect EEG hat
     connect(ui->m_qPushButton_EEGCap, &QPushButton::released, this, &TMSISetupProjectWidget::changeCap);
+
+    // Connect QLineEdit's
+    connect(ui->m_qLineEdit_EEGCap, static_cast<void (QLineEdit::*)(const QString &)>(&QLineEdit::textEdited),
+            this, &TMSISetupProjectWidget::changeQLineEdits);
+    connect(ui->m_qLineEdit_FiffRecordFile, static_cast<void (QLineEdit::*)(const QString &)>(&QLineEdit::textEdited),
+            this, &TMSISetupProjectWidget::changeQLineEdits);
 }
 
 
@@ -198,4 +204,13 @@ void TMSISetupProjectWidget::generateFilePath(int index)
 
     ui->m_qLineEdit_FiffRecordFile->setText(resourcePath);
     m_pTMSI->m_sOutputFilePath = resourcePath;
+}
+
+
+//*************************************************************************************************************
+
+void TMSISetupProjectWidget::changeQLineEdits()
+{
+    m_pTMSI->m_sElcFilePath = ui->m_qLineEdit_EEGCap->text();
+    m_pTMSI->m_sOutputFilePath = ui->m_qLineEdit_FiffRecordFile->text();
 }
