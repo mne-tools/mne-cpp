@@ -194,7 +194,7 @@ MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::
     for(int i = 0; i < fileList.length(); i++)
         ui->cb_Dicts->addItem(QIcon(":/images/icons/DictIcon.png"), fileList.at(i).baseName());
 
-
+    /*
     MatrixXd m(5,3);
     m << 1, 2, 3,
          4, 5, 6,
@@ -206,6 +206,7 @@ MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::
     v << 7, 5, 3;
 
     add_row_at(m, v, 2);
+    */
 
 }
 
@@ -247,7 +248,6 @@ void MainWindow::open_file()
             this->item->setText(QString("Channel %1").arg(channels));
             this->item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
             this->item->setData(Qt::Checked, Qt::CheckStateRole);
-
             this->model->insertRow(channels, this->item);
             this->items.push_back(this->item);
 
@@ -280,11 +280,12 @@ void MainWindow::slot_changed(const QModelIndex& topLeft, const QModelIndex& bot
 
 MatrixXd MainWindow::add_row_at(MatrixXd& matrix, VectorXd& rowData, qint32 rowNumber)
 {
-   std::cout << "\n-------------before---------------\n";
-   std::cout << matrix;
+   //std::cout << "\n-------------before---------------\n";
+   //std::cout << matrix;
 
    matrix.conservativeResize(matrix.rows() + 1, Eigen::NoChange);
-
+   if(rowNumber > matrix.rows())
+       matrix.row(matrix.rows() - 1) = rowData;
    qint32 i = rowNumber;
    while(i < matrix.rows())
    {
@@ -294,8 +295,9 @@ MatrixXd MainWindow::add_row_at(MatrixXd& matrix, VectorXd& rowData, qint32 rowN
         rowData = vec1;
         i++;
    }
-   std::cout << "\n------------after---------------\n";
-   std::cout << matrix;
+
+   //std::cout << "\n------------after---------------\n";
+   //std::cout << matrix;
 
    return matrix;
 
@@ -307,7 +309,8 @@ MatrixXd MainWindow::add_column_at(MatrixXd& matrix, VectorXd& rowData, qint32 c
    //std::cout << matrix;
 
    matrix.conservativeResize(Eigen::NoChange, matrix.cols() + 1);
-
+   if(colNumber > matrix.cols())
+       matrix.col(matrix.cols() - 1) = rowData;
    qint32 i = colNumber;
    while(i < matrix.cols())
    {
@@ -1164,10 +1167,34 @@ void MainWindow::on_btt_Calc_clicked()
 
 //*************************************************************************************************************
 
-void MainWindow::iteration_counter(qint32 current_iteration, qreal current_energy)
+void MainWindow::iteration_counter(qint32 current_iteration, qint32 max_iterations, qreal current_energy, qreal max_energy)
 {
-    qint32 local_copy_iteration = current_iteration;
-    ui->progressBarCalc->setValue(local_copy_iteration);
+    QString res_energy_str = ui->tb_ResEnergy->text();
+    res_energy_str.replace(",", ".");
+    qreal percent = res_energy_str.toFloat();
+
+    ui->lb_IterationsProgressValue->setText(QString::number(current_iteration));
+    //ui->progressBarCalc->setMaximum(100000 * (max_energy - (0.01 * percent * max_energy)));
+    //ui->progressBarCalc->setValue(100000 * current_energy);
+
+    ui->progressBarCalc->setMaximum(max_iterations);
+
+    if(max_iterations > 1000)
+         ui->progressBarCalc->setMaximum(100);
+
+    ui->progressBarCalc->setValue(current_iteration);
+    //update();
+/*
+    if((max_energy - current_energy) < (0.01 * percent * max_energy))//if remaining energy is less than threshold, but the user wants to perform more iterations, then the progressbar needs the reset on iterationcounts
+    {
+        ui->progressBarCalc->setMaximum(max_iterations);
+        ui->progressBarCalc->setValue(current_iteration);
+    }
+    */
+    if((current_iteration == max_iterations) || (max_energy - current_energy) < (0.01 * percent * max_energy))
+        ui->progressBarCalc->setValue(ui->progressBarCalc->maximum());
+
+    //ui->lb_IterationsProgressValue->setText("0");
 
 }
 
@@ -1175,6 +1202,8 @@ void MainWindow::iteration_counter(qint32 current_iteration, qreal current_energ
 
 void MainWindow::CalcAdaptivMP(MatrixXd signal, TruncationCriterion criterion)
 {
+    //ui->lb_IterationsProgressValue->setText();
+
     //qint32 it = 1000;
     //if(criterion == TruncationCriterion::Iterations || criterion == TruncationCriterion::Both)
     //   it = iterations;
@@ -1234,32 +1263,27 @@ void MainWindow::CalcAdaptivMP(MatrixXd signal, TruncationCriterion criterion)
     //ui->progressBarCalc->setHidden(false);
 
     //connect(adaptive_Mp, SIGNAL(iteration_params(qint32, qreal)), this, SLOT(iteration_counter(qint32, qreal)));
+    connect(adaptive_Mp, SIGNAL(iteration_params(qint32, qint32, qreal, qreal)), this, SLOT(iteration_counter(qint32, qint32, qreal, qreal)));
+    QString res_energy_str = ui->tb_ResEnergy->text();
+    res_energy_str.replace(",", ".");
 
     switch(criterion)
     {
         case Iterations:
         {
-            connect(adaptive_Mp, SIGNAL(iteration_params(qint32, qreal)), this, SLOT(iteration_counter(qint32, qreal)));
-            ui->progressBarCalc->setMaximum(ui->sb_Iterations->value());
             myAtomList = adaptive_Mp->matching_pursuit(signal, ui->sb_Iterations->value(), qreal(MININT32));
         }
         break;
 
         case SignalEnergy:
         {
-            connect(adaptive_Mp, SIGNAL(iteration_params(qint32, qreal)), this, SLOT(iteration_counter(qint32, qreal)));
-            QString res_energy_str = ui->tb_ResEnergy->text();
-            res_energy_str.replace(",", ".");
-            ui->progressBarCalc->setMaximum(100 - res_energy_str.toFloat());
-            myAtomList = adaptive_Mp->matching_pursuit(signal, MAXINT32, (ui->tb_ResEnergy->text().toFloat()));
+            myAtomList = adaptive_Mp->matching_pursuit(signal, MAXINT32, res_energy_str.toFloat());
         }
         break;
 
         case Both:
         {
-            ui->progressBarCalc->setMaximum(1000);
-            connect(adaptive_Mp, SIGNAL(iteration_params(qint32, qreal)), this, SLOT(iteration_counter(qint32, qreal)));
-            myAtomList = adaptive_Mp->matching_pursuit(signal, ui->sb_Iterations->value(), (ui->tb_ResEnergy->text().toDouble()));
+            myAtomList = adaptive_Mp->matching_pursuit(signal, ui->sb_Iterations->value(), res_energy_str.toFloat());
         }
         break;
     }

@@ -62,8 +62,10 @@ AdaptiveMp::AdaptiveMp()
 //*************************************************************************************************************
 
 //MP Algorithm of M. Gratkowski
-QList<GaborAtom> AdaptiveMp::matching_pursuit (MatrixXd signal, qint32 max_it, qreal epsilon)
+QList<GaborAtom> AdaptiveMp::matching_pursuit (MatrixXd signal, qint32 max_iterations, qreal epsilon)
 {
+    max_it = max_iterations;
+    qreal var = epsilon;
     QList<GaborAtom> atom_list;
     Eigen::FFT<double> fft;
     MatrixXd residuum = signal; //residuum initialised with signal
@@ -71,24 +73,24 @@ QList<GaborAtom> AdaptiveMp::matching_pursuit (MatrixXd signal, qint32 max_it, q
     qint32 sample_count = signal.rows();
     qint32 channel_count = signal.cols();
     qint32 signal_channel = 0;
-    signal_energy = VectorXd::Zero(channel_count);
-    VectorXd residuum_energy = VectorXd::Zero(channel_count);
-    VectorXd energy_threshold = VectorXd::Zero(channel_count);
+    signal_energy = 0;//VectorXd::Zero(channel_count);
+    qreal residuum_energy = 0;//VectorXd residuum_energy = VectorXd::Zero(channel_count);
+    qreal energy_threshold = 0;//VectorXd energy_threshold = VectorXd::Zero(channel_count);
 
     //calculate signal_energy
     for(qint32 channel = 0; channel < channel_count; channel++)
     {
         for(qint32 sample = 0; sample < sample_count; sample++)
-            signal_energy[channel] += (signal(sample, channel) * signal(sample, channel));
+            signal_energy/*[channel]*/ += (signal(sample, channel) * signal(sample, channel));
 
-        energy_threshold[channel] = epsilon * signal_energy[channel];
-        residuum_energy[channel] = signal_energy[channel];
+        energy_threshold/*[channel]*/ = 0.01 * epsilon * signal_energy;//[channel];
+        residuum_energy/*[channel]*/ = signal_energy;//[channel];
     }
 
     //TODO multichannel!! Not working yet: problem is energy_threshold-->when should i increase signal_channel? may change order of loops for that
     //connecting atoms to the channel, thing to think about....
 
-    while(it < max_it && energy_threshold[signal_channel] <= residuum_energy[signal_channel] )
+    while(it < max_iterations && (energy_threshold/*[signal_channel]*/ < residuum_energy/*[signal_channel]*/ ))
     {
         //variables for dyadic sampling
         qreal s = 1;                            //scale
@@ -425,15 +427,16 @@ QList<GaborAtom> AdaptiveMp::matching_pursuit (MatrixXd signal, qint32 max_it, q
                 gabor_Atom->energy += (gabor_Atom->max_scalar_product * bestMatch[j]) * (gabor_Atom->max_scalar_product * bestMatch[j]);
             }
 
-            residuum_energy[chn] -= gabor_Atom->energy;//(gaborAtom->max_scalar_product * bestMatch[j]) * (gaborAtom->max_scalar_product * bestMatch[j]);
-            current_energy = (signal_energy[chn] * (1 - energy_threshold[chn])) - residuum_energy[chn];
+            residuum_energy/*[chn]*/ -= gabor_Atom->energy;//(gaborAtom->max_scalar_product * bestMatch[j]) * (gaborAtom->max_scalar_product * bestMatch[j]);
+            current_energy += gabor_Atom->energy;//(signal_energy/*[chn]*/ * (1 - energy_threshold/*[chn]*/)) - residuum_energy;//[chn];
 
             gabor_Atom->residuum = residuum;
             atom_list.append(*gabor_Atom);
         }//end Maximisation Copyright (C) 2010 Botao Jia
 
         delete gabor_Atom;
-        it++;        
+        it++;
+        //current_energy = qreal(max_it);
         iteration_counter();
 
     }//end iterations
@@ -502,6 +505,6 @@ VectorXd AdaptiveMp::calculate_atom(qint32 sample_count, qreal scale, qint32 tra
 
 void AdaptiveMp::iteration_counter()
 {
-    emit iteration_params(it, current_energy);
+    emit iteration_params(it, max_it, current_energy, signal_energy);
 }
 
