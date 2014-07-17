@@ -114,7 +114,8 @@ public:
     //=========================================================================================================
 
     qint32 it = 0;
-    VectorXd signal_energy;// = VectorXd::Zero(channel_count);
+    qint32 max_it = 0;
+    qreal signal_energy = 0;//VectorXd signal_energy;// = VectorXd::Zero(channel_count);
     //VectorXd residuum_energy;// = VectorXd::Zero(channel_count);
     //VectorXd energy_threshold;// = VectorXd::Zero(channel_count);
     qreal current_energy = 0;
@@ -133,7 +134,7 @@ public:
     *
     * @return result of MP Algorithm as QList of GaborAtoms
     */
-    QList<GaborAtom> matching_pursuit (MatrixXd signal, qint32 max_it, qreal epsilon);
+    QList<GaborAtom> matching_pursuit (MatrixXd signal, qint32 max_iterations, qreal epsilon);
 
     //=========================================================================================================
     /**
@@ -175,8 +176,10 @@ public:
 private slots:
     void iteration_counter();
 
+    //=========================================================================================================
+
 signals:
-    void iteration_params(qint32 current_iteration, qreal current_energy);
+    void iteration_params(qint32 current_iteration, qint32 max_iteration, qreal current_energy, qreal max_energy);
 
 };
 
