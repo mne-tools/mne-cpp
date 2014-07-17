@@ -67,11 +67,12 @@ using namespace XMEASLIB;
 //=============================================================================================================
 
 Averaging::Averaging()
-: m_bIsRunning(false)
-, m_bProcessData(false)
-, m_pAveragingInput(NULL)
+: m_pAveragingInput(NULL)
 //, m_pAveragingOutput(NULL)
 , m_pAveragingBuffer(CircularMatrixBuffer<double>::SPtr())
+, m_bIsRunning(false)
+, m_bProcessData(false)
+, m_iDebugNumChannels(-1)
 {
 }
 
@@ -106,15 +107,9 @@ void Averaging::init()
     connect(m_pAveragingInput.data(), &PluginInputConnector::notify, this, &Averaging::update, Qt::DirectConnection);
     m_inputConnectors.append(m_pAveragingInput);
 
-//    // Output
-//    m_pAveragingOutput = PluginOutputData<NewRealTimeSampleArray>::create(this, "AveragingOut", "Averaging output data");
-//    m_outputConnectors.append(m_pAveragingOutput);
-
-//    m_pAveragingOutput->data()->setName("Averaging Output");
-//    m_pAveragingOutput->data()->setUnit("mV");
-//    m_pAveragingOutput->data()->setMinValue(-200);
-//    m_pAveragingOutput->data()->setMaxValue(360);
-//    m_pAveragingOutput->data()->setSamplingRate(256.0/1.0);
+    // Output
+    m_pAveragingOutput = PluginOutputData<RealTimeEvoked>::create(this, "AveragingOut", "Averaging Output Data");
+    m_outputConnectors.append(m_pAveragingOutput);
 
     //init channels when fiff info is available
     connect(this, &Averaging::fiffInfoAvailable, this, &Averaging::initConnector);
@@ -129,9 +124,11 @@ void Averaging::init()
 
 void Averaging::initConnector()
 {
-    qDebug() << "void Averaging::initConnector()";
-//    if(m_pFiffInfo)
-//        m_pRTMSAOutput->data()->initFromFiffInfo(m_pFiffInfo);
+    if(m_pFiffInfo)
+    {
+        m_pAveragingOutput->data()->initFromFiffInfo(m_pFiffInfo);
+        m_iDebugNumChannels = m_pAveragingOutput->data()->getNumChannels();
+    }
 }
 
 
@@ -245,6 +242,10 @@ void Averaging::run()
 
     m_bProcessData = true;
 
+
+
+    qint32 count = 0;//DEBUG
+
     while (m_bIsRunning)
     {
         if(m_bProcessData)
@@ -252,13 +253,20 @@ void Averaging::run()
             /* Dispatch the inputs */
             MatrixXd t_mat = m_pAveragingBuffer->pop();
 
+            // DEBUG
+            if(count > 20)
+            {
+                if(m_iDebugNumChannels > 0)
+                {
+                    MatrixXd test = MatrixXd::Random(m_iDebugNumChannels, 4000);
 
-            qDebug() << "Averaging Pop";
+                    m_pAveragingOutput->data()->setValue(test);
+                }
 
-            //ToDo: Implement your algorithm here
-
-//            for(qint32 i = 0; i < t_mat.cols(); ++i)
-//                m_pAveragingBuffer->data()->setValue(t_mat.col(i));
+                count = 0;
+            }
+            // DEBUG End
+            ++count;
         }
     }
 }
