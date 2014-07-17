@@ -144,6 +144,13 @@ private:
     *
     */
     void generateFilePath(int index = 0);
+
+    //=========================================================================================================
+    /**
+    * Changes the EEG cap and file path variables in the EEGoSports class
+    *
+    */
+    void changeQLineEdits();
 };
 
 } // NAMESPACE

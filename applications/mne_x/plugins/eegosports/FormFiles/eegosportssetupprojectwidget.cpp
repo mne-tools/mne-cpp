@@ -74,8 +74,14 @@ EEGoSportsSetupProjectWidget::EEGoSportsSetupProjectWidget(EEGoSports* pEEGoSpor
     connect(ui->m_qComboBox_ProjectSelection, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
             this, &EEGoSportsSetupProjectWidget::generateFilePath);
 
-    //Connect EEG hat
+    // Connect EEG hat
     connect(ui->m_qPushButton_EEGCap, &QPushButton::released, this, &EEGoSportsSetupProjectWidget::changeCap);
+
+    // Connect QLineEdit's
+    connect(ui->m_qLineEdit_EEGCap, static_cast<void (QLineEdit::*)(const QString &)>(&QLineEdit::textEdited),
+            this, &EEGoSportsSetupProjectWidget::changeQLineEdits);
+    connect(ui->m_qLineEdit_FiffRecordFile, static_cast<void (QLineEdit::*)(const QString &)>(&QLineEdit::textEdited),
+            this, &EEGoSportsSetupProjectWidget::changeQLineEdits);
 }
 
 
@@ -198,4 +204,13 @@ void EEGoSportsSetupProjectWidget::generateFilePath(int index)
 
     ui->m_qLineEdit_FiffRecordFile->setText(resourcePath);
     m_pEEGoSports->m_sOutputFilePath = resourcePath;
+}
+
+
+//*************************************************************************************************************
+
+void EEGoSportsSetupProjectWidget::changeQLineEdits()
+{
+    m_pEEGoSports->m_sElcFilePath = ui->m_qLineEdit_EEGCap->text();
+    m_pEEGoSports->m_sOutputFilePath = ui->m_qLineEdit_FiffRecordFile->text();
 }

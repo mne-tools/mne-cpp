@@ -153,7 +153,6 @@ public:
     * Initialise device.
     * @param [in] iNumberOfChannels number of channels specified by the user.
     * @param [in] iSamplingFrequency sampling frequency specified by the user.
-    * @param [in] iSamplesPerBlock samples per block specified by the user.
     * @param [in] bUseChExponent Flag for using the channels exponent. Defined by the user via the GUI.
     * @param [in] bWriteDriverDebugToFile Flag for writing driver debug information to a file. Defined by the user via the GUI.
     * @param [in] sOutpuFilePath Holds the path for the output file. Defined by the user via the GUI.
@@ -162,7 +161,6 @@ public:
     */
     bool initDevice(int iNumberOfChannels,
                     int iSamplingFrequency,
-                    int iSamplesPerBlock,
                     bool bUseChExponent,
                     bool bWriteDriverDebugToFile,
                     QString sOutpuFilePath,
@@ -185,7 +183,6 @@ private:
     //User definitons
     uint                m_uiNumberOfChannels;           /**< The number of channels defined by the user via the GUI.*/
     uint                m_uiSamplingFrequency;          /**< The sampling frequency defined by the user via the GUI (in Hertz).*/
-    uint                m_uiSamplesPerBlock;            /**< The samples per block defined by the user via the GUI.*/
     bool                m_bUseChExponent;               /**< Flag for using the channels exponent. Defined by the user via the GUI.*/
     bool                m_bWriteDriverDebugToFile;      /**< Flag for for writing driver debug informstions to a file. Defined by the user via the GUI.*/
     bool                m_bUsePreprocessing;            /**< Flag for using preprocessing actions for the EEG data. Defined by the user via the GUI.*/
@@ -196,21 +193,11 @@ private:
     HINSTANCE           m_oLibHandle;                   /**< The handler used to load the driver dll/lib.*/
 
     //Device info
-    WCHAR               m_wcDeviceName[40];             /**< Contains the connected device name.*/
-    ULONG               m_ulSerialNumber;               /**< Contains the connected device serial number.*/
     ULONG               m_uiNumberOfAvailableChannels;  /**< Holds the available number of channels offered by the device.*/
 
     //Signal info
-    QVector <LONG>      m_vExponentChannel;             /**< Contains the exponents for every channel available by the device.*/
-    QVector <FLOAT>     m_vUnitGain;                    /**< Contains the unit gain for every channel available by the device.*/
-    QVector <FLOAT>     m_vUnitOffSet;                  /**< Contains the unit offset for every channel available by the device.*/
-    LONG*               m_lSignalBuffer;                /**< Buffer in which the device can write the samples -> these values get read out by the getSampleMatrix(...) function.*/
-    LONG                m_lSignalBufferSize;            /**< Size of m_ulSignalBuffer = (samples per block) * (number of channels) * 4 (4 because every signal value takes 4 bytes - see TMSi SDK documentation).*/
     ofstream            m_outputFileStream;             /**< fstream for writing the driver debug informations to a txt file.*/
-    QVector <double>    m_vSampleBlockBuffer;           /**< Buffer to store all the incoming smaples. This is the buffer which is getting read from.*/
-
     IAmplifier*         m_pAmplifier;                   /**< Interface to the driver.*/
-
     uint                m_nLastTriggerValue;            /**< Important if you want to use triggers; The last TTL value.*/
 
     //Variables used for loading the TMSiSDK.dll methods. Note: Not all functions are used by this class at the moment.

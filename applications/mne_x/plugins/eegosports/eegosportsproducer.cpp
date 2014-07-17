@@ -79,7 +79,6 @@ EEGoSportsProducer::~EEGoSportsProducer()
 
 void EEGoSportsProducer::start(int iNumberOfChannels,
                      int iSamplingFrequency,
-                     int iSamplesPerBlock,
                      bool bUseChExponent,
                      bool bWriteDriverDebugToFile,
                      QString sOutputFilePath,
@@ -88,7 +87,6 @@ void EEGoSportsProducer::start(int iNumberOfChannels,
     //Initialise device
     if(m_pEEGoSportsDriver->initDevice(iNumberOfChannels,
                               iSamplingFrequency,
-                              iSamplesPerBlock,
                               bUseChExponent,
                               bWriteDriverDebugToFile,
                               sOutputFilePath,

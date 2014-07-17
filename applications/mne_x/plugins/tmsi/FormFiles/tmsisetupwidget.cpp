@@ -72,11 +72,11 @@ TMSISetupWidget::TMSISetupWidget(TMSI* pTMSI, QWidget* parent)
     ui.setupUi(this);
 
     //Connect device sampling properties
-    connect(ui.m_spinBox_SamplingFreq, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
+    connect(ui.m_spinBox_SamplingFreq, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             this, &TMSISetupWidget::setDeviceSamplingProperties);
-    connect(ui.m_spinBox_NumberOfChannels, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
+    connect(ui.m_spinBox_NumberOfChannels, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             this, &TMSISetupWidget::setDeviceSamplingProperties);
-    connect(ui.m_spinBox_SamplesPerBlock, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
+    connect(ui.m_spinBox_SamplesPerBlock, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             this, &TMSISetupWidget::setDeviceSamplingProperties);
     connect(ui.m_checkBox_UseCommonAverage, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
             this, &TMSISetupWidget::setDeviceSamplingProperties);
@@ -102,7 +102,7 @@ TMSISetupWidget::TMSISetupWidget(TMSI* pTMSI, QWidget* parent)
             this, &TMSISetupWidget::setWriteToFile);
 
     //Connect trigger properties
-    connect(ui.m_spinBox_BeepLength, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
+    connect(ui.m_spinBox_BeepLength, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             this, &TMSISetupWidget::setTriggerProperties);
     connect(ui.m_checkBox_EnableBeep, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
             this, &TMSISetupWidget::setTriggerProperties);
@@ -168,6 +168,7 @@ void TMSISetupWidget::initGui()
 
 void TMSISetupWidget::setDeviceSamplingProperties()
 {
+    cout<<"changing "<<endl;
     m_pTMSI->m_iSamplingFreq = ui.m_spinBox_SamplingFreq->value();
     m_pTMSI->m_iNumberOfChannels = ui.m_spinBox_NumberOfChannels->value();
     m_pTMSI->m_iSamplesPerBlock = ui.m_spinBox_SamplesPerBlock->value();

@@ -72,11 +72,9 @@ EEGoSportsSetupWidget::EEGoSportsSetupWidget(EEGoSports* pEEGoSports, QWidget* p
     ui.setupUi(this);
 
     //Connect device sampling properties
-    connect(ui.m_spinBox_SamplingFreq, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
+    connect(ui.m_spinBox_SamplingFreq, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             this, &EEGoSportsSetupWidget::setDeviceSamplingProperties);
-    connect(ui.m_spinBox_NumberOfChannels, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
-            this, &EEGoSportsSetupWidget::setDeviceSamplingProperties);
-    connect(ui.m_spinBox_SamplesPerBlock, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
+    connect(ui.m_spinBox_NumberOfChannels, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             this, &EEGoSportsSetupWidget::setDeviceSamplingProperties);
 
     //Connect channel corrections
@@ -92,7 +90,7 @@ EEGoSportsSetupWidget::EEGoSportsSetupWidget(EEGoSports* pEEGoSports, QWidget* p
             this, &EEGoSportsSetupWidget::setWriteToFile);
 
     //Connect trigger properties
-    connect(ui.m_spinBox_BeepLength, static_cast<void (QSpinBox::*)()>(&QSpinBox::editingFinished),
+    connect(ui.m_spinBox_BeepLength, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
             this, &EEGoSportsSetupWidget::setTriggerProperties);
     connect(ui.m_checkBox_EnableBeep, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
             this, &EEGoSportsSetupWidget::setTriggerProperties);
@@ -132,7 +130,6 @@ void EEGoSportsSetupWidget::initGui()
     //Init device sampling properties
     ui.m_spinBox_SamplingFreq->setValue(m_pEEGoSports->m_iSamplingFreq);
     ui.m_spinBox_NumberOfChannels->setValue(m_pEEGoSports->m_iNumberOfChannels);
-    ui.m_spinBox_SamplesPerBlock->setValue(m_pEEGoSports->m_iSamplesPerBlock);
 
     //Init channel corrections
     ui.m_checkBox_UseChExponent->setChecked(m_pEEGoSports->m_bUseChExponent);
@@ -153,10 +150,8 @@ void EEGoSportsSetupWidget::initGui()
 
 void EEGoSportsSetupWidget::setDeviceSamplingProperties()
 {
-    cout<<"editing finished"<<endl;
     m_pEEGoSports->m_iSamplingFreq = ui.m_spinBox_SamplingFreq->value();
     m_pEEGoSports->m_iNumberOfChannels = ui.m_spinBox_NumberOfChannels->value();
-    m_pEEGoSports->m_iSamplesPerBlock = ui.m_spinBox_SamplesPerBlock->value();
 
     m_pEEGoSports->m_bUseChExponent = ui.m_checkBox_UseChExponent->isChecked();
 }
