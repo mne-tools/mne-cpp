@@ -222,8 +222,8 @@ bool EEGoSportsDriver::initDevice(int iNumberOfChannels,
     m_pAmplifier->SetSignalGain(gain, EEGO_ADC_S);
 
     // We are measuring here so better leave the DAC off. Use it to create a rectangular test signal.
-//    hr = m_pAmplifier->SetDriverAmplitude(250);
-//    hr |= m_pAmplifier->SetDriverPeriod(1000);
+//    hr = m_pAmplifier->SetDriverAmplitude(1000);
+//    hr |= m_pAmplifier->SetDriverPeriod(50);
     hr = m_pAmplifier->SetDriverAmplitude(0);
     hr |= m_pAmplifier->SetDriverPeriod(0);
 
@@ -250,6 +250,10 @@ bool EEGoSportsDriver::initDevice(int iNumberOfChannels,
     m_pAmplifier->GetSignalGain(&gain, EEGO_ADC_A);
 
     cout << "Starting Device with sampling rate: " << rate << "hz and a gain of: " << gain << "\n";
+
+    // Always set device to idle first -> otherwise it could get confused
+    if(FAILED(m_pAmplifier->SetMode(EEGO_MODE_IDLE)))
+        return false;
 
     // With this call we tell the amplifier and driver stack to start streaming
     if(FAILED(m_pAmplifier->SetMode(EEGO_MODE_STREAMING))) //EEGO_MODE_CALIBRATION EEGO_MODE_STREAMING EEGO_MODE_IMPEDANCE_CHA EEGO_MODE_IMPEDANCE_REF
