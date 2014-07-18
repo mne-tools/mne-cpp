@@ -131,15 +131,14 @@ void TMSIImpedanceWidget::updateGraphicScene(VectorXd matValue)
         impedanceValue = matValue[matIndex];
 
         // set new color and impedance value. Clip received impedance value if > predefined max impedance value
-        if(impedanceValue>m_dMaxImpedance || impedanceValue<0)
-            impedanceValue = m_dMaxImpedance;
-
+//        if(impedanceValue>m_dMaxImpedance || impedanceValue<0)
+//            impedanceValue = m_dMaxImpedance;
 
         // For testing purposes only!
-        impedanceValue = ui->m_verticalSlider_manualImpedanceValue->value();
+        //impedanceValue = ui->m_verticalSlider_manualImpedanceValue->value();
 
-        //double scale = ui->m_doubleSpinBox_manualImpedanceValueScale->value();
-        double scale = 0.000053;
+        double scale = ui->m_doubleSpinBox_manualImpedanceValueScale->value();
+        //double scale = 0.000053;
         //cout << scale <<endl;
         double valueScaledNormalized = (scale*impedanceValue)/(scale*impedanceValue+1);
 
