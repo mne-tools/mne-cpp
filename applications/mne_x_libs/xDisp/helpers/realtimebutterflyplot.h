@@ -17,7 +17,8 @@
 //=============================================================================================================
 
 #include <QWidget>
-#include <QTimer>
+#include <QPolygonF>
+#include <QColor>
 #include <QSharedPointer>
 
 
@@ -51,9 +52,21 @@ protected:
     virtual void paintEvent( QPaintEvent* event );
 
 private:
+    //=========================================================================================================
+    /**
+    * createPlotPath creates the QPointer path for the data plot.
+    *
+    * @param[in] index QModelIndex for accessing associated data and model object.
+    * @param[in,out] path The QPointerPath to create for the data plot.
+    */
+    void createPlotPath(qint32 row, QPainterPath& path) const;
+
     RealTimeEvokedModel* m_pRealTimeEvokedModel;
 
-    QSharedPointer<QTimer> m_pTimerUpdate;
+    QList<QColor>       m_qListColors;
+    qint32              m_iNumChannels;
+
+    bool m_bIsInit;
 
 };
 

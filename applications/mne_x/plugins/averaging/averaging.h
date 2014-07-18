@@ -64,6 +64,7 @@
 //=============================================================================================================
 
 #include <QtWidgets>
+#include <QSpinBox>
 
 
 //*************************************************************************************************************
@@ -135,6 +136,10 @@ public:
     virtual IPlugin::PluginType getType() const;
     virtual QString getName() const;
 
+    void preStimChanged(qint32 samples);
+
+    void postStimChanged(qint32 samples);
+
     virtual QWidget* setupWidget();
 
     void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
@@ -145,6 +150,12 @@ signals:
     * Emitted when fiffInfo is available
     */
     void fiffInfoAvailable();
+
+    //=========================================================================================================
+    /**
+    * Emitted when either pre or post stimulus number changed
+    */
+    void sampleNumChanged();
 
 protected:
     virtual void run();
@@ -159,12 +170,19 @@ private:
     PluginInputData<NewRealTimeMultiSampleArray>::SPtr   m_pAveragingInput;     /**< The RealTimeSampleArray of the Averaging input.*/
     PluginOutputData<RealTimeEvoked>::SPtr  m_pAveragingOutput;                 /**< The RealTimeEvoked of the Averaging output.*/
 
-    FiffInfo::SPtr  m_pFiffInfo;                            /**< Fiff measurement info.*/
+    FiffInfo::SPtr  m_pFiffInfo;        /**< Fiff measurement info.*/
+    QList<qint32> m_qListStimChs;       /**< Stimulus channels.*/
 
     CircularMatrixBuffer<double>::SPtr   m_pAveragingBuffer;      /**< Holds incoming data.*/
 
     bool m_bIsRunning;      /**< If source lab is running */
     bool m_bProcessData;    /**< If data should be received for processing */
+
+    QSpinBox* m_pSpinBoxPreStimSamples;
+    QSpinBox* m_pSpinBoxPostStimSamples;
+
+    qint32 m_iPreStimSamples;
+    qint32 m_iPostStimSamples;
 
     int m_iDebugNumChannels;
 
