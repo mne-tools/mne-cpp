@@ -72,8 +72,29 @@ Averaging::Averaging()
 , m_pAveragingBuffer(CircularMatrixBuffer<double>::SPtr())
 , m_bIsRunning(false)
 , m_bProcessData(false)
+, m_pSpinBoxPreStimSamples(NULL)
+, m_pSpinBoxPostStimSamples(NULL)
+, m_iPreStimSamples(200)
+, m_iPostStimSamples(1000)
 , m_iDebugNumChannels(-1)
 {
+
+//    m_pSpinBoxPreStimSamples = new QSpinBox;
+//    m_pSpinBoxPreStimSamples->setMinimum(1);
+//    m_pSpinBoxPreStimSamples->setMaximum(10000);
+//    m_pSpinBoxPreStimSamples->setSingleStep(1);
+//    m_pSpinBoxPreStimSamples->setValue(m_iPreStimSamples);
+//    connect(m_pSpinBoxPreStimSamples, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &Averaging::preStimChanged);
+//    addPluginWidget(m_pSpinBoxPreStimSamples);
+
+//    m_pSpinBoxPostStimSamples = new QSpinBox;
+//    m_pSpinBoxPostStimSamples->setMinimum(1);
+//    m_pSpinBoxPostStimSamples->setMaximum(10000);
+//    m_pSpinBoxPostStimSamples->setSingleStep(1);
+//    m_pSpinBoxPostStimSamples->setValue(m_iPostStimSamples);
+//    connect(m_pSpinBoxPostStimSamples, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &Averaging::postStimChanged);
+//    addPluginWidget(m_pSpinBoxPostStimSamples);
+
 }
 
 
@@ -102,6 +123,7 @@ QSharedPointer<IPlugin> Averaging::clone() const
 
 void Averaging::init()
 {
+
     // Input
     m_pAveragingInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "AveragingIn", "Averaging input data");
     connect(m_pAveragingInput.data(), &PluginInputConnector::notify, this, &Averaging::update, Qt::DirectConnection);
@@ -189,6 +211,24 @@ QString Averaging::getName() const
 
 //*************************************************************************************************************
 
+void Averaging::preStimChanged(qint32 samples)
+{
+    m_iPreStimSamples = samples;
+    emit sampleNumChanged();
+}
+
+
+//*************************************************************************************************************
+
+void Averaging::postStimChanged(qint32 samples)
+{
+    m_iPostStimSamples = samples;
+    emit sampleNumChanged();
+}
+
+
+//*************************************************************************************************************
+
 QWidget* Averaging::setupWidget()
 {
     AveragingSetupWidget* setupWidget = new AveragingSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
@@ -240,9 +280,16 @@ void Averaging::run()
     while(!m_pFiffInfo)
         msleep(10);// Wait for fiff Info
 
+    for(qint32 i = 0; i < m_pFiffInfo->chs.size(); ++i)
+    {
+        if(m_pFiffInfo->chs[i].kind == FIFFV_STIM_CH)
+        {
+            qDebug() << "Stim" << i << "Name" << m_pFiffInfo->chs[i].ch_name;
+            m_qListStimChs.append(i);
+        }
+    }
+
     m_bProcessData = true;
-
-
 
     qint32 count = 0;//DEBUG
 
@@ -254,7 +301,7 @@ void Averaging::run()
             MatrixXd t_mat = m_pAveragingBuffer->pop();
 
             // DEBUG
-            if(count > 20)
+            if(count > 10)
             {
                 if(m_iDebugNumChannels > 0)
                 {
