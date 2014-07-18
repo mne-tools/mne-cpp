@@ -1,12 +1,24 @@
 #ifndef REALTIMEBUTTERFLYPLOT_H
 #define REALTIMEBUTTERFLYPLOT_H
 
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
 #include "../xdisp_global.h"
 
 #include "realtimeevokedmodel.h"
 
 
+//*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
 #include <QWidget>
+#include <QTimer>
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
@@ -28,12 +40,20 @@ public:
 
     void dataUpdate(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles = QVector<int>());
 
-signals:
-
-public slots:
+protected:
+    //=========================================================================================================
+    /**
+    * Is called to paint the incoming real-time data block.
+    * Function is painting the real-time butterfly plot
+    *
+    * @param [in] event pointer to PaintEvent -> not used.
+    */
+    virtual void paintEvent( QPaintEvent* event );
 
 private:
     RealTimeEvokedModel* m_pRealTimeEvokedModel;
+
+    QSharedPointer<QTimer> m_pTimerUpdate;
 
 };
 

@@ -12,7 +12,10 @@
 // Qt INCLUDES
 //=============================================================================================================
 
+#include <QPainter>
 #include <QDebug>
+#include <iostream>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -30,7 +33,12 @@ using namespace XDISPLIB;
 RealTimeButterflyPlot::RealTimeButterflyPlot(QWidget *parent)
 : QWidget(parent)
 , m_pRealTimeEvokedModel(NULL)
+, m_pTimerUpdate(new QTimer(this))
 {
+    // Start timer
+    connect(m_pTimerUpdate.data(), SIGNAL(timeout()), this, SLOT(update())); //ToDo Qt5 syntax
+
+    m_pTimerUpdate->start(25);
 }
 
 
@@ -39,5 +47,29 @@ RealTimeButterflyPlot::RealTimeButterflyPlot(QWidget *parent)
 void RealTimeButterflyPlot::dataUpdate(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles)
 {
     qDebug() << "RealTimeButterflyPlot::dataUpdate";
+
+    std::cout << "vec\n" << m_pRealTimeEvokedModel->data(0,1).value<RowVectorXd>() << std::endl;
 }
 
+
+//*************************************************************************************************************
+
+void RealTimeButterflyPlot::paintEvent(QPaintEvent*)
+{
+    QPainter painter(this);
+
+    painter.setPen(QPen(Qt::gray, 1, Qt::DashLine));
+
+
+    //*************************************************************************************************************
+    //=============================================================================================================
+    // Draw grid in X direction (each 100ms)
+    //=============================================================================================================
+
+    for(unsigned short i = 1; i <= 2; ++i)
+    {
+        painter.drawLine(10, 10, 20, 10);
+    }
+
+
+}
