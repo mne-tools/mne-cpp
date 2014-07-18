@@ -122,6 +122,18 @@ public:
 
     //=========================================================================================================
     /**
+    * Data for the row and column and given display role
+    *
+    * @param [in] row       index row
+    * @param [in] column    index column
+    * @param [in] role      display role to access
+    *
+    * @return the accessed data
+    */
+    inline QVariant data(int row, int column, int role = Qt::DisplayRole) const;
+
+    //=========================================================================================================
+    /**
     * Returns the data stored under the given role for the item referred to by the index.
     *
     * @param[in] index      determines item location
@@ -279,6 +291,14 @@ private:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
+
+inline QVariant RealTimeEvokedModel::data(int row, int column, int role) const
+{
+    return data(index(row, column), role);
+}
+
+
+//*************************************************************************************************************
 
 inline const QMap<qint32,qint32>& RealTimeEvokedModel::getIdxSelMap() const
 {
