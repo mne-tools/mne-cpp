@@ -155,6 +155,9 @@ inline CommandManager& MNERTServer::getCommandManager()
 
 } // NAMESPACE
 
-Q_DECLARE_METATYPE(Eigen::MatrixXf);
+#ifndef metatype_matrixxf
+#define metatype_matrixxf
+Q_DECLARE_METATYPE(Eigen::MatrixXf);    /**< Provides QT META type declaration of the Eigen::MatrixXf type. For signal/slot usage.*/
+#endif
 
 #endif // MNE_RT_SERVER_H

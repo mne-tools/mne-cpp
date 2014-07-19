@@ -100,6 +100,10 @@ public:
     */
     RealTimeEvokedModel(QObject *parent = 0);
 
+    inline bool isInit() const;
+
+    inline qint32 getNumSamples() const;
+
     //=========================================================================================================
     /**
     * Returns the number of rows under the given parent. When the parent is valid it means that rowCount is returning the number of children of parent.
@@ -119,6 +123,18 @@ public:
     * @return number of columns
     */
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
+
+    //=========================================================================================================
+    /**
+    * Data for the row and column and given display role
+    *
+    * @param [in] row       index row
+    * @param [in] column    index column
+    * @param [in] role      display role to access
+    *
+    * @return the accessed data
+    */
+    inline QVariant data(int row, int column, int role = Qt::DisplayRole) const;
 
     //=========================================================================================================
     /**
@@ -156,10 +172,8 @@ public:
     * Sets the sampling information and calculates the resulting downsampling factor between actual sps and desired sps
     *
     * @param[in] sps        Samples per second of incomming data
-    * @param[in] T          Time window length to display
-    * @param[in] dest_sps   Desired samples per second -> resulting downsampling is calculated out of this.
     */
-    void setSamplingInfo(float sps, int T, float dest_sps  = 128.0f);
+    void setSamplingInfo(float sps);
 
     //=========================================================================================================
     /**
@@ -167,7 +181,7 @@ public:
     *
     * @param[in] data       data to add (Time points of channel samples)
     */
-    void addData(const QVector<VectorXd> &data);
+    void addData(const MatrixXd &data);
 
     //=========================================================================================================
     /**
@@ -268,17 +282,12 @@ private:
     QMap<qint32,qint32> m_qMapIdxRowSelection;      /**< Selection mapping.*/
 
     //Fiff data structure
-    QVector<VectorXd> m_dataCurrent;        /**< List that holds the current data*/
-    QVector<VectorXd> m_dataLast;           /**< List that holds the last data */
+    MatrixXd m_matData;        /**< List that holds the data*/
+    MatrixXd m_matDataFreeze;  /**< List that holds the data when freezed*/
 
-    QVector<VectorXd> m_dataCurrentFreeze;  /**< List that holds the current data when freezed*/
-    QVector<VectorXd> m_dataLastFreeze;     /**< List that holds the last data when freezed*/
+    bool m_bIsInit;
 
     float m_fSps;               /**< Sampling rate */
-    qint32 m_iT;                /**< Time window */
-    qint32 m_iDownsampling;     /**< Down sampling factor */
-    qint32 m_iMaxSamples;       /**< Max samples per window */
-    qint32 m_iCurrentSample;    /**< Accurate Downsampling */
 
     bool m_bIsFreezed;          /**< Display is freezed */
 };
@@ -289,9 +298,25 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline qint32 RealTimeEvokedModel::getMaxSamples() const
+
+inline bool RealTimeEvokedModel::isInit() const
 {
-    return m_iMaxSamples;
+    return m_bIsInit;
+}
+
+
+//*************************************************************************************************************
+
+inline qint32 RealTimeEvokedModel::getNumSamples() const
+{
+    return m_bIsInit ? m_matData.cols() : 0;
+}
+
+//*************************************************************************************************************
+
+inline QVariant RealTimeEvokedModel::data(int row, int column, int role) const
+{
+    return data(index(row, column), role);
 }
 
 
@@ -307,7 +332,7 @@ inline const QMap<qint32,qint32>& RealTimeEvokedModel::getIdxSelMap() const
 
 inline qint32 RealTimeEvokedModel::numVLines() const
 {
-    return (m_iT - 1);
+    return (qint32)(m_matData.cols()/m_fSps) - 1;
 }
 
 
@@ -319,5 +344,10 @@ inline bool RealTimeEvokedModel::isFreezed() const
 }
 
 } // NAMESPACE
+
+#ifndef metatype_rowvectorxd
+#define metatype_rowvectorxd
+Q_DECLARE_METATYPE(Eigen::RowVectorXd);    /**< Provides QT META type declaration of the Eigen::RowVectorXd type. For signal/slot usage.*/
+#endif
 
 #endif // REALTIMEEVOKEDMODEL_H

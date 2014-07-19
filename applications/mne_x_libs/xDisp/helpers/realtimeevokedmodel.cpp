@@ -55,13 +55,12 @@ using namespace XDISPLIB;
 
 RealTimeEvokedModel::RealTimeEvokedModel(QObject *parent)
 : QAbstractTableModel(parent)
+, m_matData(MatrixXd(0,0))
+, m_matDataFreeze(MatrixXd(0,0))
 , m_fSps(1024.0f)
-, m_iT(10)
-, m_iDownsampling(10)
-, m_iMaxSamples(1024)
-, m_iCurrentSample(0)
 , m_bIsFreezed(false)
 {
+
 }
 
 
@@ -105,39 +104,21 @@ QVariant RealTimeEvokedModel::data(const QModelIndex &index, int role) const
             switch(role) {
                 case Qt::DisplayRole: {
                     //pack all adjacent (after reload) RowVectorPairs into a QList
-                    QList< QVector<float> > qListVector;
+                    RowVectorXd rowVec;
 
                     if(m_bIsFreezed)
                     {
                         // data freeze
-                        QVector<float> data;
-                        for(qint32 i = 0; i < m_dataCurrentFreeze.size(); ++i)
-                            data.append(m_dataCurrentFreeze[i](row));
-                        qListVector.append(data);
+                        rowVec = m_matDataFreeze.row(row);
 
-                        // last data freeze
-                        QVector<float> lastData;
-                        for(qint32 i=0; i < m_dataLastFreeze.size(); ++i)
-                            lastData.append(m_dataLastFreeze[i](row));
-                        qListVector.append(lastData);
-
-                        v.setValue(qListVector);
+                        v.setValue(rowVec);
                     }
                     else
                     {
                         // data
-                        QVector<float> data;
-                        for(qint32 i = 0; i < m_dataCurrent.size(); ++i)
-                            data.append(m_dataCurrent[i](row));
-                        qListVector.append(data);
+                        rowVec = m_matData.row(row);
 
-                        // last data
-                        QVector<float> lastData;
-                        for(qint32 i=0; i < m_dataLast.size(); ++i)
-                            lastData.append(m_dataLast[i](row));
-                        qListVector.append(lastData);
-
-                        v.setValue(qListVector);
+                        v.setValue(rowVec);
                     }
                     return v;
                     break;
@@ -211,42 +192,20 @@ void RealTimeEvokedModel::setChannelInfo(QList<RealTimeSampleArrayChInfo> &chInf
 
 //*************************************************************************************************************
 
-void RealTimeEvokedModel::setSamplingInfo(float sps, int T, float dest_sps)
+void RealTimeEvokedModel::setSamplingInfo(float sps)
 {
     beginResetModel();
-
-    if(sps > dest_sps)
-        m_iDownsampling = (qint32)ceil(sps/dest_sps);
-    else
-        m_iDownsampling = 1;
-
-    m_iT = T;
-
-    float maxSamples = sps * T;
-    m_iMaxSamples = (qint32)ceil(maxSamples/(sps/dest_sps)); // Max Samples / Downsampling
-
+    m_fSps = sps;
     endResetModel();
 }
 
 
 //*************************************************************************************************************
 
-void RealTimeEvokedModel::addData(const QVector<VectorXd> &data)
+void RealTimeEvokedModel::addData(const MatrixXd &data)
 {
-    //Downsampling ->ToDo make this more accurate
-    qint32 i;
-    for(i = m_iCurrentSample; i < data.size(); i += m_iDownsampling)
-        m_dataCurrent.append(data[i]);
-
-    //store for next buffer
-    m_iCurrentSample = i - data.size();
-
-    //ToDo separate worker thread? ToDo 2000 -> size of screen
-    if(m_dataCurrent.size() > m_iMaxSamples)
-    {
-        m_dataLast = m_dataCurrent.mid(0,m_iMaxSamples); // Store last data to keep as background in the display
-        m_dataCurrent.remove(0, m_iMaxSamples);
-    }
+    m_matData = data;
+    m_bIsInit = true;
 
     //Update data content
     QModelIndex topLeft = this->index(0,1);
@@ -345,10 +304,7 @@ void RealTimeEvokedModel::toggleFreeze(const QModelIndex &)
     m_bIsFreezed = !m_bIsFreezed;
 
     if(m_bIsFreezed)
-    {
-        m_dataCurrentFreeze = m_dataCurrent;
-        m_dataLastFreeze = m_dataLast;
-    }
+        m_matDataFreeze = m_matData;
 
     //Update data content
     QModelIndex topLeft = this->index(0,1);
