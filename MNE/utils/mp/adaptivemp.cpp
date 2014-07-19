@@ -66,7 +66,7 @@ QList<GaborAtom> AdaptiveMp::matching_pursuit (MatrixXd signal, qint32 max_itera
 {
     max_it = max_iterations;
     qreal var = epsilon;
-    QList<GaborAtom> atom_list;
+    //QList<GaborAtom> atom_list;
     Eigen::FFT<double> fft;
     MatrixXd residuum = signal; //residuum initialised with signal
     //qint32 it = 0;              //iterationscounter
@@ -231,7 +231,7 @@ QList<GaborAtom> AdaptiveMp::matching_pursuit (MatrixXd signal, qint32 max_itera
                                                      //h: full contraction to x1
             std::vector<double> xcentroid_old(N,0);  //simplex center * (N+1)
             std::vector<double> xcentroid_new(N,0);  //simplex center * (N+1)
-            std::vector<double> vf(N+1,0);           //f evaluated at simplex vertexes
+            std::vector<double> vf(N+1,0);           //f evaluated at simplex vertices
             qint32 x1 = 0, xn = 0, xnp1 = 0;         //x1:   f(x1) = min { f(x1), f(x2)...f(x_{n+1} }
                                                      //xnp1: f(xnp1) = max { f(x1), f(x2)...f(x_{n+1} }
                                                      //xn:   f(xn)<f(xnp1) && f(xn)> all other f(x_i)
@@ -505,6 +505,6 @@ VectorXd AdaptiveMp::calculate_atom(qint32 sample_count, qreal scale, qint32 tra
 
 void AdaptiveMp::iteration_counter()
 {
-    emit iteration_params(it, max_it, current_energy, signal_energy);
+    emit iteration_params(it, max_it, current_energy, signal_energy, atom_list);
 }
 
