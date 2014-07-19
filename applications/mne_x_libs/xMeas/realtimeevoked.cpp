@@ -227,7 +227,7 @@ MatrixXd RealTimeEvoked::getValue() const
 
 //*************************************************************************************************************
 
-void RealTimeEvoked::setValue(MatrixXd v)
+void RealTimeEvoked::setValue(MatrixXd& v)
 {
     //check vector size
     if(v.rows() != m_qListChInfo.size())

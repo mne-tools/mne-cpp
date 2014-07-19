@@ -263,9 +263,7 @@ private:
 
     QList<RealTimeSampleArrayChInfo> m_qListChInfo;         /**< Channel info list. ToDo: check if this is obsolete later on*/
 
-    qint32 m_iT;                                            /**< Display window size in seconds */
     float m_fSamplingRate;                                  /**< Sampling rate */
-    float m_fDesiredSamplingRate;                           /**< Desired display sampling rate */
 
     QSpinBox*   m_pSpinBoxTimeScale;                        /**< Time scale spin box */
 
