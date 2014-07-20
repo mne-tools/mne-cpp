@@ -35,6 +35,7 @@
 #include <QFileDialog>
 #include <QHeaderView>
 #include <QMessageBox>
+#include <QMap>
 
 #include "QtGui"
 
@@ -82,14 +83,18 @@ VectorXd _residuumVector;
 VectorXd _atomSumVector;
 QList<GaborAtom> myAtomList;
 
+
 QList<QStringList> globalResultAtomList;
 qint32 processValue = 0;
+
+//*************************************************************************************************************************************
 
 // constructor
 MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::MainWindow)
 {    
     ui->setupUi(this);
     ui->progressBarCalc->setHidden(true);
+    //ui->tbv_Results->setRowCount(1999);
 
     callGraphWindow = new GraphWindow();    
     callGraphWindow->setMinimumHeight(220);
@@ -118,7 +123,7 @@ MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::
 
     ui->tbv_Results->setColumnCount(5);
     ui->tbv_Results->setHorizontalHeaderLabels(QString("energy\n[%];scale\n[sec];trans\n[sec];modu\n[Hz];phase\n[rad]").split(";"));
-    ui->tbv_Results->setColumnWidth(0,50);
+    ui->tbv_Results->setColumnWidth(0,55);
     ui->tbv_Results->setColumnWidth(1,40);
     ui->tbv_Results->setColumnWidth(2,40);
     ui->tbv_Results->setColumnWidth(3,40);
@@ -193,27 +198,16 @@ MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::
 
     for(int i = 0; i < fileList.length(); i++)
         ui->cb_Dicts->addItem(QIcon(":/images/icons/DictIcon.png"), fileList.at(i).baseName());
-
-    /*
-    MatrixXd m(5,3);
-    m << 1, 2, 3,
-         4, 5, 6,
-         7, 8, 9,
-        10, 11, 12,
-        13, 14, 15;
-
-    VectorXd v(3);
-    v << 7, 5, 3;
-
-    add_row_at(m, v, 2);
-    */
-
 }
+
+//*************************************************************************************************************************************
 
 MainWindow::~MainWindow()
 {
     delete ui;
 }
+
+//*************************************************************************************************************************************
 
 void MainWindow::open_file()
 {
@@ -231,7 +225,7 @@ void MainWindow::open_file()
     file.close();
 
     this->model = new QStandardItemModel;
-    connect(this->model, SIGNAL(dataChanged ( const QModelIndex&, const QModelIndex&)), this, SLOT(slot_changed(const QModelIndex&, const QModelIndex&)));
+    connect(this->model, SIGNAL(dataChanged ( const QModelIndex&, const QModelIndex&)), this, SLOT(cb_selection_changed(const QModelIndex&, const QModelIndex&)));
 
     _colors.clear();
     _colors.append(QColor(0, 0, 0));
@@ -263,7 +257,9 @@ void MainWindow::open_file()
     update();   
 }
 
-void MainWindow::slot_changed(const QModelIndex& topLeft, const QModelIndex& bottomRight)
+//*************************************************************************************************************************************
+
+void MainWindow::cb_selection_changed(const QModelIndex& topLeft, const QModelIndex& bottomRight)
 {
     QStandardItem* item = this->items[topLeft.row()];
     if(item->checkState() == Qt::Unchecked)
@@ -277,6 +273,8 @@ void MainWindow::slot_changed(const QModelIndex& topLeft, const QModelIndex& bot
     }
     update();
 }
+
+//*************************************************************************************************************************************
 
 MatrixXd MainWindow::add_row_at(MatrixXd& matrix, VectorXd& rowData, qint32 rowNumber)
 {
@@ -303,6 +301,8 @@ MatrixXd MainWindow::add_row_at(MatrixXd& matrix, VectorXd& rowData, qint32 rowN
 
 }
 
+//*************************************************************************************************************************************
+
 MatrixXd MainWindow::add_column_at(MatrixXd& matrix, VectorXd& rowData, qint32 colNumber)
 {
    //std::cout << "\n-------------before---------------\n";
@@ -327,6 +327,8 @@ MatrixXd MainWindow::add_column_at(MatrixXd& matrix, VectorXd& rowData, qint32 c
 
 }
 
+//*************************************************************************************************************************************
+
 MatrixXd MainWindow::remove_row(MatrixXd& matrix, qint32 rowToRemove)
 {
     qint32 numRows = matrix.rows()-1;
@@ -340,6 +342,8 @@ MatrixXd MainWindow::remove_row(MatrixXd& matrix, qint32 rowToRemove)
     return matrix;
 }
 
+//*************************************************************************************************************************************
+
 MatrixXd MainWindow::remove_column(MatrixXd& matrix, qint32 colToRemove)
 {
     qint32 numRows = matrix.rows();
@@ -352,6 +356,8 @@ MatrixXd MainWindow::remove_column(MatrixXd& matrix, qint32 colToRemove)
 
     return matrix;
 }
+
+//*************************************************************************************************************************************
 
 qint32 MainWindow::ReadFiffFile(QString fileName)
 {
@@ -459,6 +465,8 @@ qint32 MainWindow::ReadFiffFile(QString fileName)
     return 0;
 }
 
+//*************************************************************************************************************************************
+
 void MainWindow::ReadMatlabFile(QString fileName)
 {
     QFile file(fileName);
@@ -512,7 +520,7 @@ void GraphWindow::PaintSignal(MatrixXd signalMatrix, VectorXd residuumSamples, Q
     painter.fillRect(0,0,windowSize.width(),windowSize.height(),QBrush(Qt::white));
 
 
-    if(signalMatrix.rows() > 0)
+    if(signalMatrix.rows() > 0 && signalMatrix.cols() > 0)
     {
         qint32 borderMarginHeigth = 15;     // reduce paintspace in GraphWindow of borderMargin pixels
         qint32 borderMarginWidth = 5;       // reduce paintspace in GraphWindow of borderMargin pixels
@@ -835,7 +843,8 @@ void AtomSumWindow::PaintAtomSum(VectorXd signalSamples, QSize windowSize, qreal
         }
 
         painter.drawLine(maxStrLenght, 2, maxStrLenght, windowSize.height() - 2);     // paint y-axis
-
+        QPen pen(Qt::black, 0.5, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+        painter.setPen(pen);
         painter.drawPolyline(polygons);                  // paint signal
     }
     painter.end();
@@ -1054,15 +1063,18 @@ void ResiduumWindow::PaintResiduum(VectorXd signalSamples, QSize windowSize, qre
         }
 
         painter.drawLine(maxStrLenght, 2, maxStrLenght, windowSize.height() - 2);     // paint y-axis
-
+        QPen pen(Qt::black, 0.5, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+        painter.setPen(pen);
         painter.drawPolyline(polygons);                  // paint signal
     }
     painter.end();
 }
 
+//*************************************************************************************************************************************
+
 // starts MP-algorithm
 void MainWindow::on_btt_Calc_clicked()
-{
+{    
     TruncationCriterion criterion;
     processValue = 0;
     ui->progressBarCalc->setValue(0);
@@ -1165,7 +1177,7 @@ void MainWindow::on_btt_Calc_clicked()
     }    
 }
 
-//*************************************************************************************************************
+//*************************************************************************************************************************************
 
 void MainWindow::iteration_counter(qint32 current_iteration, qint32 max_iterations, qreal current_energy, qreal max_energy, QList<GaborAtom> atom_res_list)
 {
@@ -1176,15 +1188,45 @@ void MainWindow::iteration_counter(qint32 current_iteration, qint32 max_iteratio
 
     qreal residuum_energy = 100 * (max_energy - current_energy) / max_energy;
 
-//remaining energy and iterations update
-
+    //remaining energy and iterations update
     ui->lb_IterationsProgressValue->setText(QString::number(current_iteration));
     ui->lb_RestEnergieResiduumValue->setText(QString::number(residuum_energy, 'f', 2) + "%");
 
-//current atoms list update
-//todo: make it less complicated
-    ui->tbv_Results->setRowCount(atom_res_list.length());
+    /*
+    GaborAtom a = atom_res_list.last();
+    qint32 index = atom_res_list.count() - 1;
+    qreal percent_atom_energy = 100 * a.energy / max_energy;
 
+    QTableWidgetItem* atomEnergieItem = new QTableWidgetItem(QString::number(percent_atom_energy, 'f', 2));
+    QTableWidgetItem* atomScaleItem = new QTableWidgetItem(QString::number(a.scale, 'g', 3));
+    QTableWidgetItem* atomTranslationItem = new QTableWidgetItem(QString::number(a.translation, 'g', 3));
+    QTableWidgetItem* atomModulationItem = new QTableWidgetItem(QString::number(a.modulation, 'g', 3));
+    QTableWidgetItem* atomPhaseItem = new QTableWidgetItem(QString::number(a.phase, 'g', 3));
+
+
+    atomEnergieItem->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
+    atomScaleItem->setFlags(Qt::ItemIsEnabled);
+    atomTranslationItem->setFlags(Qt::ItemIsEnabled);
+    atomModulationItem->setFlags(Qt::ItemIsEnabled);
+    atomPhaseItem->setFlags(Qt::ItemIsEnabled);
+
+    atomEnergieItem->setCheckState(Qt::Checked);
+
+    atomEnergieItem->setTextAlignment(0x0082);
+    atomScaleItem->setTextAlignment(0x0082);
+    atomTranslationItem->setTextAlignment(0x0082);
+    atomModulationItem->setTextAlignment(0x0082);
+    atomPhaseItem->setTextAlignment(0x0082);
+    ui->tbv_Results->setItem(index, 1, atomScaleItem);
+    ui->tbv_Results->setItem(index, 2, atomTranslationItem);
+    ui->tbv_Results->setItem(index, 3, atomModulationItem);
+    ui->tbv_Results->setItem(index, 0, atomEnergieItem);
+    ui->tbv_Results->setItem(index, 4, atomPhaseItem);atom_res_list.last();
+    */
+
+    //current atoms list update
+    //todo: make it less complicated
+    ui->tbv_Results->setRowCount(atom_res_list.length());
     for(qint32 i = 0; i < atom_res_list.length(); i++)
     {
         qreal percent_atom_energy = 100 * atom_res_list[i].energy / max_energy;
@@ -1215,8 +1257,7 @@ void MainWindow::iteration_counter(qint32 current_iteration, qint32 max_iteratio
         ui->tbv_Results->setItem(i, 3, atomModulationItem);
         ui->tbv_Results->setItem(i, 4, atomPhaseItem);
     }
-
-//progressbar update
+    //progressbar update
 
     ui->progressBarCalc->setMaximum(max_iterations);
 
@@ -1229,7 +1270,7 @@ void MainWindow::iteration_counter(qint32 current_iteration, qint32 max_iteratio
         ui->progressBarCalc->setValue(ui->progressBarCalc->maximum());
 }
 
-//*************************************************************************************************************
+//*************************************************************************************************************************************
 
 void MainWindow::CalcAdaptivMP(MatrixXd signal, TruncationCriterion criterion)
 {
@@ -1241,7 +1282,7 @@ void MainWindow::CalcAdaptivMP(MatrixXd signal, TruncationCriterion criterion)
 
     //qreal epsilon = 0.0000000000001;
     AdaptiveMp *adaptive_Mp = new AdaptiveMp();
-    qint32 t_iSize = 256;
+    qint32 t_iSize = signal.rows();
     //MatrixXd signal (t_iSize, 1);
     MatrixXd residuum = signal;
 
@@ -1386,6 +1427,7 @@ void MainWindow::CalcAdaptivMP(MatrixXd signal, TruncationCriterion criterion)
     if(signalEnergy[0] != 0) // TODO: Multichannel
         residuumEnergy[0] = 100 * residuumEnergy[0] / signalEnergy[0];
     ui->lb_RestEnergieResiduumValue->setText(QString::number(residuumEnergy[0], 'f', 2) + "%");
+
     /*
     ui->lb_IterationsProgressValue->setText(QString("%1").arg(iterationsCount));
     for(qint32 i = 0; i < residuum.rows(); i++)
@@ -1895,5 +1937,16 @@ void MainWindow::on_btt_OpenSignal_clicked()
 
 //-----------------------------------------------------------------------------------------------------------------
 //*****************************************************************************************************************
+/*
+QMap<int, bool> matrix_select;
 
+void MatrixXdS::set_selected(int index)
+{
+    this->row(index);
+}
 
+bool MatrixXdS::is_selected(int index)
+{
+
+}
+*/
