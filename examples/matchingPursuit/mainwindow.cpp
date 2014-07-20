@@ -87,7 +87,7 @@ qint32 processValue = 0;
 
 // constructor
 MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::MainWindow)
-{
+{    
     ui->setupUi(this);
     ui->progressBarCalc->setHidden(true);
 
@@ -1167,15 +1167,56 @@ void MainWindow::on_btt_Calc_clicked()
 
 //*************************************************************************************************************
 
-void MainWindow::iteration_counter(qint32 current_iteration, qint32 max_iterations, qreal current_energy, qreal max_energy)
+void MainWindow::iteration_counter(qint32 current_iteration, qint32 max_iterations, qreal current_energy, qreal max_energy, QList<GaborAtom> atom_res_list)
 {
+    update();
     QString res_energy_str = ui->tb_ResEnergy->text();
     res_energy_str.replace(",", ".");
     qreal percent = res_energy_str.toFloat();
 
+    qreal residuum_energy = 100 * (max_energy - current_energy) / max_energy;
+
+//remaining energy and iterations update
+
     ui->lb_IterationsProgressValue->setText(QString::number(current_iteration));
-    //ui->progressBarCalc->setMaximum(100000 * (max_energy - (0.01 * percent * max_energy)));
-    //ui->progressBarCalc->setValue(100000 * current_energy);
+    ui->lb_RestEnergieResiduumValue->setText(QString::number(residuum_energy, 'f', 2) + "%");
+
+//current atoms list update
+//todo: make it less complicated
+    ui->tbv_Results->setRowCount(atom_res_list.length());
+
+    for(qint32 i = 0; i < atom_res_list.length(); i++)
+    {
+        qreal percent_atom_energy = 100 * atom_res_list[i].energy / max_energy;
+
+        QTableWidgetItem* atomEnergieItem = new QTableWidgetItem(QString::number(percent_atom_energy, 'f', 2));
+        QTableWidgetItem* atomScaleItem = new QTableWidgetItem(QString::number(atom_res_list[i].scale, 'g', 3));
+        QTableWidgetItem* atomTranslationItem = new QTableWidgetItem(QString::number(atom_res_list[i].translation, 'g', 3));
+        QTableWidgetItem* atomModulationItem = new QTableWidgetItem(QString::number(atom_res_list[i].modulation, 'g', 3));
+        QTableWidgetItem* atomPhaseItem = new QTableWidgetItem(QString::number(atom_res_list[i].phase, 'g', 3));
+
+
+        atomEnergieItem->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
+        atomScaleItem->setFlags(Qt::ItemIsEnabled);
+        atomTranslationItem->setFlags(Qt::ItemIsEnabled);
+        atomModulationItem->setFlags(Qt::ItemIsEnabled);
+        atomPhaseItem->setFlags(Qt::ItemIsEnabled);
+
+        atomEnergieItem->setCheckState(Qt::Checked);
+
+        atomEnergieItem->setTextAlignment(0x0082);
+        atomScaleItem->setTextAlignment(0x0082);
+        atomTranslationItem->setTextAlignment(0x0082);
+        atomModulationItem->setTextAlignment(0x0082);
+        atomPhaseItem->setTextAlignment(0x0082);
+        ui->tbv_Results->setItem(i, 0, atomEnergieItem);
+        ui->tbv_Results->setItem(i, 1, atomScaleItem);
+        ui->tbv_Results->setItem(i, 2, atomTranslationItem);
+        ui->tbv_Results->setItem(i, 3, atomModulationItem);
+        ui->tbv_Results->setItem(i, 4, atomPhaseItem);
+    }
+
+//progressbar update
 
     ui->progressBarCalc->setMaximum(max_iterations);
 
@@ -1183,19 +1224,9 @@ void MainWindow::iteration_counter(qint32 current_iteration, qint32 max_iteratio
          ui->progressBarCalc->setMaximum(100);
 
     ui->progressBarCalc->setValue(current_iteration);
-    //update();
-/*
-    if((max_energy - current_energy) < (0.01 * percent * max_energy))//if remaining energy is less than threshold, but the user wants to perform more iterations, then the progressbar needs the reset on iterationcounts
-    {
-        ui->progressBarCalc->setMaximum(max_iterations);
-        ui->progressBarCalc->setValue(current_iteration);
-    }
-    */
-    if((current_iteration == max_iterations) || (max_energy - current_energy) < (0.01 * percent * max_energy))
+
+    if(((current_iteration == max_iterations) || (max_energy - current_energy) < (0.01 * percent * max_energy))&&ui->chb_ResEnergy->isChecked())//&&ui->chb_Iterations->isChecked())
         ui->progressBarCalc->setValue(ui->progressBarCalc->maximum());
-
-    //ui->lb_IterationsProgressValue->setText("0");
-
 }
 
 //*************************************************************************************************************
@@ -1213,7 +1244,6 @@ void MainWindow::CalcAdaptivMP(MatrixXd signal, TruncationCriterion criterion)
     qint32 t_iSize = 256;
     //MatrixXd signal (t_iSize, 1);
     MatrixXd residuum = signal;
-
 
     //Testsignal
     GaborAtom *testSignal1 = new GaborAtom();//t_iSize, 40, 180, 40, 0.8);
@@ -1263,9 +1293,19 @@ void MainWindow::CalcAdaptivMP(MatrixXd signal, TruncationCriterion criterion)
     //ui->progressBarCalc->setHidden(false);
 
     //connect(adaptive_Mp, SIGNAL(iteration_params(qint32, qreal)), this, SLOT(iteration_counter(qint32, qreal)));
-    connect(adaptive_Mp, SIGNAL(iteration_params(qint32, qint32, qreal, qreal)), this, SLOT(iteration_counter(qint32, qint32, qreal, qreal)));
+    connect(adaptive_Mp, SIGNAL(iteration_params(qint32, qint32, qreal, qreal, QList<GaborAtom>)), this, SLOT(iteration_counter(qint32, qint32, qreal, qreal, QList<GaborAtom>)));
     QString res_energy_str = ui->tb_ResEnergy->text();
     res_energy_str.replace(",", ".");
+
+    //todo threading
+    QThread* adaptive_Mp_Thread = new QThread;
+    adaptive_Mp->moveToThread(adaptive_Mp_Thread);
+    //todo connect thread
+    connect(adaptive_Mp_Thread, SIGNAL(started()), adaptive_Mp, SLOT(matching_pursuit(MatrixXd,qint32,qreal)));
+    connect(adaptive_Mp, SIGNAL(finished()), adaptive_Mp_Thread, SLOT(quit()));
+    connect(adaptive_Mp, SIGNAL(finished()), adaptive_Mp, SLOT(deleteLater()));
+    connect(adaptive_Mp_Thread, SIGNAL(finished()), adaptive_Mp_Thread, SLOT(deleteLater()));
+    adaptive_Mp_Thread->start();
 
     switch(criterion)
     {
