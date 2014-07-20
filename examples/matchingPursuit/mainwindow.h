@@ -61,7 +61,7 @@ private slots:
     void on_btt_OpenSignal_clicked();
     void on_tbv_Results_cellClicked(int row, int column);
     void iteration_counter(qint32 current_iteration, qint32 max_iterations, qreal current_energy, qreal max_energy, QList<GaborAtom> atom_res_list);
-    void slot_changed(const QModelIndex&, const QModelIndex&);
+    void cb_selection_changed(const QModelIndex&, const QModelIndex&);
 
 private:
 
@@ -114,7 +114,7 @@ public:
 
 //*************************************************************************************************************
 // Widget to paint residuum
-class ResiduumWindow : public QWidget //, QTableWidgetItem
+class ResiduumWindow : public QWidget
 {
     Q_OBJECT
 
@@ -127,6 +127,19 @@ public:
 };
 
 //*************************************************************************************************************
+/*
+class MatrixXdS : public MatrixXd
+{
+    Q_OBJECT
+
+
+public:
+   void set_selected(int index);
+   bool is_selected(int index);
+
+
+};
+*/
 //=============================================================================================================
 
 
