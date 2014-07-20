@@ -55,9 +55,12 @@ using namespace XDISPLIB;
 
 RealTimeEvokedModel::RealTimeEvokedModel(QObject *parent)
 : QAbstractTableModel(parent)
+, m_matData(MatrixXd(0,0))
+, m_matDataFreeze(MatrixXd(0,0))
 , m_fSps(1024.0f)
 , m_bIsFreezed(false)
 {
+
 }
 
 
@@ -202,6 +205,7 @@ void RealTimeEvokedModel::setSamplingInfo(float sps)
 void RealTimeEvokedModel::addData(const MatrixXd &data)
 {
     m_matData = data;
+    m_bIsInit = true;
 
     //Update data content
     QModelIndex topLeft = this->index(0,1);
