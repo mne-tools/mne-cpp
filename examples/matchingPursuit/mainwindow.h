@@ -60,8 +60,11 @@ private slots:
     void on_actionNeu_triggered();
     void on_btt_OpenSignal_clicked();
     void on_tbv_Results_cellClicked(int row, int column);
-    void iteration_counter(qint32 current_iteration, qint32 max_iterations, qreal current_energy, qreal max_energy, QList<GaborAtom> atom_res_list);
+    void recieve_result(qint32 current_iteration, qint32 max_iterations, qreal current_energy, qreal max_energy, QList<GaborAtom> atom_res_list);
     void slot_changed(const QModelIndex&, const QModelIndex&);
+
+signals:
+    void send_input(MatrixXd send_signal, qint32 send_max_iterations, qreal send_epsilon);
 
 private:
 
