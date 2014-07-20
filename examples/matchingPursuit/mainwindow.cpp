@@ -1167,7 +1167,7 @@ void MainWindow::on_btt_Calc_clicked()
 
 //*************************************************************************************************************
 
-void MainWindow::iteration_counter(qint32 current_iteration, qint32 max_iterations, qreal current_energy, qreal max_energy, QList<GaborAtom> atom_res_list)
+void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations, qreal current_energy, qreal max_energy, QList<GaborAtom> atom_res_list)
 {
     update();
     QString res_energy_str = ui->tb_ResEnergy->text();
@@ -1292,38 +1292,47 @@ void MainWindow::CalcAdaptivMP(MatrixXd signal, TruncationCriterion criterion)
     //ui->progressBarCalc->setValue(0.01);
     //ui->progressBarCalc->setHidden(false);
 
-    //connect(adaptive_Mp, SIGNAL(iteration_params(qint32, qreal)), this, SLOT(iteration_counter(qint32, qreal)));
-    connect(adaptive_Mp, SIGNAL(iteration_params(qint32, qint32, qreal, qreal, QList<GaborAtom>)), this, SLOT(iteration_counter(qint32, qint32, qreal, qreal, QList<GaborAtom>)));
+    connect(adaptive_Mp, SIGNAL(current_result(qint32, qint32, qreal, qreal, QList<GaborAtom>)), this, SLOT(recieve_result(qint32, qint32, qreal, qreal, QList<GaborAtom>)));
+    connect(this, SIGNAL(send_input(MatrixXd, qint32, qreal)), adaptive_Mp, SLOT(recieve_input(MatrixXd, qint32, qreal)));
     QString res_energy_str = ui->tb_ResEnergy->text();
     res_energy_str.replace(",", ".");
 
     //todo threading
     QThread* adaptive_Mp_Thread = new QThread;
     adaptive_Mp->moveToThread(adaptive_Mp_Thread);
+    qRegisterMetaType<Eigen::MatrixXd>("MatrixXd");
+    //qRegisterMetaType<MNELIB::GaborAtom>("GaborAtom");
+
+
     //todo connect thread
-    connect(adaptive_Mp_Thread, SIGNAL(started()), adaptive_Mp, SLOT(matching_pursuit(MatrixXd,qint32,qreal)));
+    connect(this, SIGNAL(send_input(MatrixXd, qint32, qreal)), adaptive_Mp, SLOT(recieve_input(MatrixXd, qint32, qreal)));
+    connect(adaptive_Mp, SIGNAL(current_result(qint32, qint32, qreal, qreal, QList<GaborAtom>)), this, SLOT(recieve_result(qint32, qint32, qreal, qreal, QList<GaborAtom>)));
+
+    connect(adaptive_Mp_Thread, SIGNAL(started()), adaptive_Mp, SLOT(process()));
     connect(adaptive_Mp, SIGNAL(finished()), adaptive_Mp_Thread, SLOT(quit()));
     connect(adaptive_Mp, SIGNAL(finished()), adaptive_Mp, SLOT(deleteLater()));
     connect(adaptive_Mp_Thread, SIGNAL(finished()), adaptive_Mp_Thread, SLOT(deleteLater()));
-    adaptive_Mp_Thread->start();
+    //adaptive_Mp_Thread->start();
 
     switch(criterion)
     {
         case Iterations:
         {
-            myAtomList = adaptive_Mp->matching_pursuit(signal, ui->sb_Iterations->value(), qreal(MININT32));
+            emit send_input(signal, ui->sb_Iterations->value(), qreal(MININT32));
+            adaptive_Mp_Thread->start();
+            //adaptive_Mp->matching_pursuit(signal, ui->sb_Iterations->value(), qreal(MININT32));
         }
         break;
 
         case SignalEnergy:
         {
-            myAtomList = adaptive_Mp->matching_pursuit(signal, MAXINT32, res_energy_str.toFloat());
+        //    myAtomList = adaptive_Mp->matching_pursuit(signal, MAXINT32, res_energy_str.toFloat());
         }
         break;
 
         case Both:
         {
-            myAtomList = adaptive_Mp->matching_pursuit(signal, ui->sb_Iterations->value(), res_energy_str.toFloat());
+        //myAtomList = adaptive_Mp->matching_pursuit(signal, ui->sb_Iterations->value(), res_energy_str.toFloat());
         }
         break;
     }
