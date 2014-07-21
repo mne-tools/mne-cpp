@@ -93,7 +93,8 @@ qint32 processValue = 0;
 MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::MainWindow)
 {    
     ui->setupUi(this);
-    ui->progressBarCalc->setHidden(true);
+    ui->progressBarCalc->setMinimum(0);
+    ui->progressBarCalc->setHidden(true);    
     //ui->tbv_Results->setRowCount(1999);
 
     callGraphWindow = new GraphWindow();    
@@ -1179,7 +1180,7 @@ void MainWindow::on_btt_Calc_clicked()
 
 //*************************************************************************************************************
 
-void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations, qreal current_energy, qreal max_energy, QList<GaborAtom> atom_res_list)
+void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations, qreal current_energy, qreal max_energy, gabor_atom_list atom_res_list)
 {
     update();
     QString res_energy_str = ui->tb_ResEnergy->text();
@@ -1239,73 +1240,32 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
 
     if(((current_iteration == max_iterations) || (max_energy - current_energy) < (0.01 * percent * max_energy))&&ui->chb_ResEnergy->isChecked())//&&ui->chb_Iterations->isChecked())
         ui->progressBarCalc->setValue(ui->progressBarCalc->maximum());
+
+    //recieve the resulting atomparams
+    myAtomList.append(atom_res_list.last());
+    GaborAtom gaborAtom = atom_res_list.last();
+
+    //plot result of mp algorithm, this is buggy!!!!!!!! take a look daniel plz
+    VectorXd discret_atom = gaborAtom.create_real(gaborAtom.sample_count, gaborAtom.scale, gaborAtom.translation, gaborAtom.modulation, gaborAtom.phase);
+    _atomSumVector += gaborAtom.max_scalar_product * discret_atom;
+    _residuumVector -= gaborAtom.max_scalar_product * discret_atom;
+
+    update();
 }
 
 //*************************************************************************************************************
 
 void MainWindow::CalcAdaptivMP(MatrixXd signal, TruncationCriterion criterion)
 {
-    //ui->lb_IterationsProgressValue->setText();
-
-    //qint32 it = 1000;
-    //if(criterion == TruncationCriterion::Iterations || criterion == TruncationCriterion::Both)
-    //   it = iterations;
-
-    //qreal epsilon = 0.0000000000001;
+    //TODO: clean up that mess
     AdaptiveMp *adaptive_Mp = new AdaptiveMp();
-    qint32 t_iSize = signal.rows();
-    //MatrixXd signal (t_iSize, 1);
-    MatrixXd residuum = signal;
+    _atomSumVector = VectorXd::Zero(signal.rows());
+    _residuumVector = signal;
 
-    //Testsignal
-    GaborAtom *testSignal1 = new GaborAtom();//t_iSize, 40, 180, 40, 0.8);
-    VectorXd t1 = testSignal1->create_real(t_iSize, 40, 180, 40, 0.8);//Samples, Scale, translat, modulat(symmetric to size/2, phase
-    VectorXd t2 = testSignal1->create_real(t_iSize, 80, 52, 50, PI);
-    VectorXd t5 = testSignal1->create_real(t_iSize, 20, 57, 95.505, PI);
-    VectorXd t6 = testSignal1->create_real(t_iSize, 10, 40, 120, 0.5);
-    VectorXd t7 = testSignal1->create_real(t_iSize, 150, 0, 30, PI/2);
-    VectorXd t8 = testSignal1->create_real(t_iSize, 256, 128, 12, 0);
-    VectorXd t9 = testSignal1->create_real(t_iSize, 80, 70, 10, 2.7);
-    VectorXd t3 = testSignal1->create_real(t_iSize, 180, 40, 40, -0.3);
-    VectorXd t4 = testSignal1->create_real(t_iSize, 210, 200, 46, 1);
-    VectorXd t0 = testSignal1->create_real(t_iSize, 56, 58, 60, 0.6);
-    VectorXd tSig(t_iSize);
-
-    /*
-    for(qint32 i = 0; i < t_iSize; i++)
-    {
-        signal(i, 0) =  10 * t1[i] +  10 * t2[i] + 15 * t5[i] + 2 * cos(qreal(i) / 5.0);// + 10 * t8[i] + 10 * t7[i]+ 8 * t6[i] + 5 * t4[i] + 20 *t3[i]+ 11 * t0[i] + 20 * t9[i];
-        //signal(i, 0) = 100* t8[i];//2 * cos(qreal(i) / 5.0);
-            if(i == 149)
-                signal(i, 0) += 25;
-               //signal(i, 0) += 7 * (sin(qreal(i*i))/ 15.0);
-    }
-    */
-    //find  maximum of signal
-    qreal maximum = 0;
-
-    for(qint32 i = 1; i < t_iSize; i++)
-        if(abs(maximum) < abs(signal(i,0)))
-            maximum = signal(i,0);
-    std::cout << "hoechste Amplitude im Signal:    " << maximum << "\n";
-
-    //plot testsignal
-    for(qint32 i = 0; i < t_iSize; i++)
-        tSig[i] = signal(i, 0);
-
-    Plot *sPlot = new Plot(tSig);
-    sPlot->setTitle("Signalplot");
-    //sPlot->show();
-    //tessignal ende
-
-    //set and update progressbar
-    ui->progressBarCalc->setMinimum(0);
-    //ui->progressBarCalc->setMaximum(100);
-    //ui->progressBarCalc->setValue(0.01);
-    //ui->progressBarCalc->setHidden(false);
-
-    connect(adaptive_Mp, SIGNAL(current_result(qint32, qint32, qreal, qreal, QList<GaborAtom>)), this, SLOT(recieve_result(qint32, qint32, qreal, qreal, QList<GaborAtom>)));
+    connect(adaptive_Mp, SIGNAL(current_result(qint32, qint32, qreal, qreal, gabor_atom_list)),
+                    this, SLOT(recieve_result(qint32, qint32, qreal, qreal, gabor_atom_list)));
     connect(this, SIGNAL(send_input(MatrixXd, qint32, qreal)), adaptive_Mp, SLOT(recieve_input(MatrixXd, qint32, qreal)));
+
     QString res_energy_str = ui->tb_ResEnergy->text();
     res_energy_str.replace(",", ".");
 
@@ -1314,17 +1274,16 @@ void MainWindow::CalcAdaptivMP(MatrixXd signal, TruncationCriterion criterion)
     adaptive_Mp->moveToThread(adaptive_Mp_Thread);
     qRegisterMetaType<Eigen::MatrixXd>("MatrixXd");
     //qRegisterMetaType<MNELIB::GaborAtom>("GaborAtom");
-
+    qRegisterMetaType<gabor_atom_list>("gabor_atom_list");
 
     //todo connect thread
     connect(this, SIGNAL(send_input(MatrixXd, qint32, qreal)), adaptive_Mp, SLOT(recieve_input(MatrixXd, qint32, qreal)));
-    connect(adaptive_Mp, SIGNAL(current_result(qint32, qint32, qreal, qreal, QList<GaborAtom>)), this, SLOT(recieve_result(qint32, qint32, qreal, qreal, QList<GaborAtom>)));
-
+    connect(adaptive_Mp, SIGNAL(current_result(qint32, qint32, qreal, qreal, gabor_atom_list)),
+                 this, SLOT(recieve_result(qint32, qint32, qreal, qreal, gabor_atom_list)));
     connect(adaptive_Mp_Thread, SIGNAL(started()), adaptive_Mp, SLOT(process()));
     connect(adaptive_Mp, SIGNAL(finished()), adaptive_Mp_Thread, SLOT(quit()));
     connect(adaptive_Mp, SIGNAL(finished()), adaptive_Mp, SLOT(deleteLater()));
     connect(adaptive_Mp_Thread, SIGNAL(finished()), adaptive_Mp_Thread, SLOT(deleteLater()));
-    //adaptive_Mp_Thread->start();
 
     switch(criterion)
     {
@@ -1338,200 +1297,25 @@ void MainWindow::CalcAdaptivMP(MatrixXd signal, TruncationCriterion criterion)
 
         case SignalEnergy:
         {
+            //must be debugged, thread is not ending like i want it to
+            emit send_input(signal, MAXINT32, res_energy_str.toFloat());
+            adaptive_Mp_Thread->start();
         //    myAtomList = adaptive_Mp->matching_pursuit(signal, MAXINT32, res_energy_str.toFloat());
         }
         break;
 
         case Both:
         {
-        //myAtomList = adaptive_Mp->matching_pursuit(signal, ui->sb_Iterations->value(), res_energy_str.toFloat());
+            //must be debugged, thread is not ending like i want it to
+            emit send_input(signal, ui->sb_Iterations->value(), res_energy_str.toFloat());
+            adaptive_Mp_Thread->start();
+            //adaptive_Mp->matching_pursuit(signal, ui->sb_Iterations->value(), res_energy_str.toFloat());
         }
         break;
     }
-    //connect(adaptive_Mp, SIGNAL(iteration_params(qint32, qreal)), this, SLOT(iteration_counter(qint32, qreal)));
-
-    //run MP Algorithm
-
-    //ui->progressBarCalc->setValue(var);
-
-    // results in tableView
-    //************************************************************************************************************************************
-
-    ui->tbv_Results->setRowCount(myAtomList.length());
-    VectorXd signalEnergy = VectorXd::Zero(signal.cols());
-    VectorXd residuumEnergy = VectorXd::Zero(signal.cols());
-    //calculate signalenergy
-    for(qint32 channel = 0; channel < signal.cols(); channel++)
-    {
-        for(qint32 sample = 0; sample < signal.rows(); sample++)
-            signalEnergy[channel] += (signal(sample, channel) * signal(sample, channel));
-    }
-
-    residuumEnergy[0] = signalEnergy[0];
-
-    for(qint32 i = 0; i < myAtomList.length(); i++)
-    {
-        qreal procentAtomEnergie = 0;
-        if(signalEnergy[0] != 0) // TODO: Multichannel
-        {
-            procentAtomEnergie = 100 * myAtomList[i].energy / signalEnergy[0];
-            residuumEnergy[0] -= myAtomList[i].energy;
-        }
-
-        QTableWidgetItem* atomEnergieItem = new QTableWidgetItem(QString::number(procentAtomEnergie, 'f', 2));
-        QTableWidgetItem* atomScaleItem = new QTableWidgetItem(QString::number(myAtomList[i].scale, 'g', 3));
-        QTableWidgetItem* atomTranslationItem = new QTableWidgetItem(QString::number(myAtomList[i].translation, 'g', 3));
-        QTableWidgetItem* atomModulationItem = new QTableWidgetItem(QString::number(myAtomList[i].modulation, 'g', 3));
-        QTableWidgetItem* atomPhaseItem = new QTableWidgetItem(QString::number(myAtomList[i].phase, 'g', 3));
-
-
-        atomEnergieItem->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
-        atomScaleItem->setFlags(Qt::ItemIsEnabled);
-        atomTranslationItem->setFlags(Qt::ItemIsEnabled);
-        atomModulationItem->setFlags(Qt::ItemIsEnabled);
-        atomPhaseItem->setFlags(Qt::ItemIsEnabled);
-
-        atomEnergieItem->setCheckState(Qt::Checked);
-
-        atomEnergieItem->setTextAlignment(0x0082);
-        atomScaleItem->setTextAlignment(0x0082);
-        atomTranslationItem->setTextAlignment(0x0082);
-        atomModulationItem->setTextAlignment(0x0082);
-        atomPhaseItem->setTextAlignment(0x0082);
-        ui->tbv_Results->setItem(i, 0, atomEnergieItem);
-        ui->tbv_Results->setItem(i, 1, atomScaleItem);
-        ui->tbv_Results->setItem(i, 2, atomTranslationItem);
-        ui->tbv_Results->setItem(i, 3, atomModulationItem);
-        ui->tbv_Results->setItem(i, 4, atomPhaseItem);
-    }
-    if(signalEnergy[0] != 0) // TODO: Multichannel
-        residuumEnergy[0] = 100 * residuumEnergy[0] / signalEnergy[0];
-    ui->lb_RestEnergieResiduumValue->setText(QString::number(residuumEnergy[0], 'f', 2) + "%");
-
-    /*
-    ui->lb_IterationsProgressValue->setText(QString("%1").arg(iterationsCount));
-    for(qint32 i = 0; i < residuum.rows(); i++)
-        residuumEnergie += residuum[i] * residuum[i];
-    if(residuumEnergie == 0)    ui->lb_RestEnergieResiduumValue->setText("0%");
-    else    ui->lb_RestEnergieResiduumValue->setText(QString("%1%").arg(residuumEnergie / signalEnergie * 100));
-    */
-
-
-    //************************************************************************************************************************************
-
-
-
-
-
-    //temporary calculating residue and atoms for plotting
-    //residuum = signal;
-
-        for(qint32 i = 0; i < myAtomList.length(); i++)
-        {
-            GaborAtom gaborAtom = myAtomList.at(i);
-            residuum = gaborAtom.residuum;
-            VectorXd bestMatch = gaborAtom.create_real(gaborAtom.sample_count, gaborAtom.scale, gaborAtom.translation, gaborAtom.modulation, gaborAtom.phase);//256, 20, 57, 95.505, PI);//
-
-            //for(qint32 jj = 0; jj < gaborAtom.SampleCount; jj++)
-            //    residuum(jj,0) -= gaborAtom.MaxScalarProduct * bestMatch[jj];
-
-            VectorXd plotResiduum = VectorXd::Zero(t_iSize);
-
-            for(qint32 ij = 0; ij < t_iSize; ij++)
-            {
-                plotResiduum[ij] = gaborAtom.residuum(ij,0);
-            }
-
-            QString title;          // string which will contain the result
-            Plot *rPlot = new Plot(plotResiduum);
-            title.append(QString("Resid: %1").arg(i));
-            rPlot->setTitle(title);
-            //rPlot->show();
-
-            //find  maximum of Atom
-            maximum = 0;
-            for(qint32 ki = 1; ki < t_iSize; ki++)
-                if(abs(maximum) < abs(gaborAtom.max_scalar_product * bestMatch[ki]))
-                    maximum = gaborAtom.max_scalar_product * bestMatch[ki];
-            std::cout << "hoechste Amplitude im Atom " << i << ":    " << maximum << "\n";
-
-            //find  maximum of Residuum
-            maximum = 0;
-            for(qint32 mi = 1; mi < t_iSize; mi++)
-                if(abs(maximum) < abs(residuum(mi,0)))
-                    maximum = residuum(mi,0);
-            std::cout << "hoechste Amplitude im Residuum " << i << ":    " << maximum << "\n";
-            //delete gaborAtom;
-
-        }
-
-    //plot result of mp algorithm
-    VectorXd approximation = VectorXd::Zero(signal.rows());
-
-    for(qint32 i = 0; i < myAtomList.length(); i++)
-    {
-        GaborAtom gaborAtom = myAtomList.at(i);//new GaborAtom;
-        //paintAtom = myAtomList.at(i);
-        qint32 var1 = (gaborAtom.sample_count);
-        qreal var2 = (gaborAtom.scale);
-        qint32 var3 = (gaborAtom.translation);
-        qreal var4 = gaborAtom.modulation;
-        qreal var5 = gaborAtom.phase;
-        //qreal var6 = gaborAtom.MaxScalarProduct;
-        std::cout << "Parameter die Residuum bauen:\n   "<< " scale:  "  << var2 << " transl: " << var3 <<" modul: " << var4 <<" phase: " << var5 <<"\n";
-        //std::cout << atan(1000000000)*180/PI << "\n";
-        approximation += gaborAtom.max_scalar_product * gaborAtom.create_real(var1, var2, var3, var4, var5);
-
-        QString title;          // string which will contain the title
-
-        //plot atoms found
-        VectorXd tmp = gaborAtom.create_real(var1, var2, var3, var4, var5);
-        Plot *atPlot = new Plot(tmp);
-        title.append(QString("Atom: %1").arg(i));
-        atPlot->setTitle(title);
-        //atPlot->show();
-    }
-
-    maximum = 0;
-    for(qint32 i = 1; i < t_iSize; i++)
-        if(abs(maximum) < abs(approximation[i]))
-            maximum = approximation[i];
-    std::cout << "hoechste Amplitude in Approximation ohne Residuum:    " << maximum << "\n";
-
-    //plot approximation
-    Plot *aPlot = new Plot(approximation);
-    aPlot->setTitle("Approximation ohne Residuum");
-    //aPlot->show();
-
-
-    // in Graph malen
-    _atomSumVector = approximation;
-    update();
-
-
-    for(qint32 i = 0; i < t_iSize; i++)
-        approximation[i] += residuum(i,0);
-
-    //ploat approxiamtion and residuum
-    Plot *arPlot = new Plot(approximation);
-    arPlot->setTitle("Approximation mit Residuum");
-    //arPlot->show();
-
-    //plot residuum
-    VectorXd plotResiduum = VectorXd::Zero(t_iSize);
-    for(qint32 i = 0; i < t_iSize; i++)
-    {
-        plotResiduum[i] = residuum(i,0);
-    }
-
-    // in Graph malen
-    _residuumVector = plotResiduum;
-    update();
-
-    Plot *rPlot = new Plot(plotResiduum);
-    rPlot->setTitle("Residuum");
-    //rPlot->show();
 }
+
+//************************************************************************************************************************************
 
 void MainWindow::on_tbv_Results_cellClicked(int row, int column)
 {

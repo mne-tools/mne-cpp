@@ -99,6 +99,8 @@ class UTILSSHARED_EXPORT AdaptiveMp : public QThread
 
 public:
 
+    typedef QList<GaborAtom> gabor_atom_list;
+
     /**
     * adaptiveMP_adaptiveMP
     *
@@ -186,7 +188,7 @@ public slots:
     //=========================================================================================================
 
 signals:
-    void current_result(qint32 current_iteration, qint32 max_iteration, qreal current_energy, qreal max_energy, QList<GaborAtom> atom_list);
+    void current_result(qint32 current_iteration, qint32 max_iteration, qreal current_energy, qreal max_energy, gabor_atom_list atom_list);
     void finished();
 };
 
