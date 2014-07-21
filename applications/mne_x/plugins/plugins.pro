@@ -45,6 +45,7 @@ SUBDIRS += \
     fiffsimulator \
     neuromag \
     babymeg \
+    noise \
     dummytoolbox \
     triggercontrol \
     sourcelab \

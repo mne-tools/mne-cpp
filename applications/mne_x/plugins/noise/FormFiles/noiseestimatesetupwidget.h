@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
-* @file     averaging.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     noiseestimatesetupwidget.h
+* @author   Limin Sun <liminsun@nmr.mgh.harvard.edu>
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     July, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Limin Sun, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,12 +30,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the Averaging class.
+* @brief    Contains the declaration of the NoiseEstimateSetupWidget class.
 *
 */
 
-#ifndef AVERAGING_H
-#define AVERAGING_H
+#ifndef NOISEESTIMATESETUPWIDGET_H
+#define NOISEESTIMATESETUPWIDGET_H
 
 
 //*************************************************************************************************************
@@ -42,21 +43,16 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "averaging_global.h"
-
-#include <mne_x/Interfaces/IAlgorithm.h>
-#include <generics/circularmatrixbuffer.h>
-#include <xMeas/newrealtimemultisamplearray.h>
-#include <xMeas/realtimeevoked.h>
+#include "../ui_noiseestimatesetup.h"
+#include "plotter.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FIFF INCLUDES
+// Eigen INCLUDES
 //=============================================================================================================
 
-#include <fiff/fiff_info.h>
-
+#include <Eigen/Core>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -64,26 +60,21 @@
 //=============================================================================================================
 
 #include <QtWidgets>
-#include <QSpinBox>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE AveragingPlugin
-//=============================================================================================================
-
-namespace AveragingPlugin
-{
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
+using namespace Eigen;
 
-using namespace MNEX;
-using namespace XMEASLIB;
-using namespace IOBuffer;
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE RtHpiPlugin
+//=============================================================================================================
+
+namespace NoiseEstimatePlugin
+{
 
 
 //*************************************************************************************************************
@@ -91,103 +82,57 @@ using namespace IOBuffer;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+class NoiseEstimate;
+
 
 //=============================================================================================================
 /**
-* DECLARE CLASS Averaging
+* DECLARE CLASS NoiseEstimateSetupWidget
 *
-* @brief The Averaging class provides a Averaging algorithm structure.
+* @brief The NoiseEstimateSetupWidget class provides the NoiseEstimate configuration window.
 */
-class AVERAGINGSHARED_EXPORT Averaging : public IAlgorithm
+class NoiseEstimateSetupWidget : public QWidget
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "averaging.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
-    // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(MNEX::IAlgorithm)
 
 public:
-    //=========================================================================================================
-    /**
-    * Constructs a Averaging.
-    */
-    Averaging();
 
     //=========================================================================================================
     /**
-    * Destroys the Averaging.
+    * Constructs a NoiseEstimateSetupWidget which is a child of parent.
+    *
+    * @param [in] toolbox a pointer to the corresponding NoiseEstimate.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new NoiseEstimateSetupWidget becomes a window. If parent is another widget, RtHpiSetupWidget becomes a child window inside parent. RtHpiSetupWidget is deleted when its parent is deleted.
     */
-    ~Averaging();
+    NoiseEstimateSetupWidget(NoiseEstimate* toolbox, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Initialise input and output connectors.
+    * Destroys the NoiseEstimateSetupWidget.
+    * All NoiseEstimateSetupWidget's children are deleted first. The application exits if NoiseEstimateSetupWidget is the main widget.
     */
-    void init();
+    ~NoiseEstimateSetupWidget();
 
-    //=========================================================================================================
-    /**
-    * Clone the plugin
-    */
-    virtual QSharedPointer<IPlugin> clone() const;
+    void init(qint32 nFFTidx, double fs);
+    void chgChannelInx(int idx);
+    void chgnFFT(QString tx);
+    void Update(MatrixXf data);
+    void Replot(/*MatrixXd tmp*/);
+    float mmin(MatrixXd tmp,int chan);
+    float mmax(MatrixXd tmp,int chan);
 
-    virtual bool start();
-    virtual bool stop();
+    PlotSettings settings;
+    plotter *d_timeplot;
 
-    virtual IPlugin::PluginType getType() const;
-    virtual QString getName() const;
-
-    void preStimChanged(qint32 samples);
-
-    void postStimChanged(qint32 samples);
-
-    virtual QWidget* setupWidget();
-
-    void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
-
-signals:
-    //=========================================================================================================
-    /**
-    * Emitted when fiffInfo is available
-    */
-    void fiffInfoAvailable();
-
-    //=========================================================================================================
-    /**
-    * Emitted when either pre or post stimulus number changed
-    */
-    void sampleNumChanged();
-
-protected:
-    virtual void run();
+private slots:
 
 private:
-    //=========================================================================================================
-    /**
-    * Initialises the output connector.
-    */
-    void initConnector();
 
-    PluginInputData<NewRealTimeMultiSampleArray>::SPtr   m_pAveragingInput;     /**< The RealTimeSampleArray of the Averaging input.*/
-    PluginOutputData<RealTimeEvoked>::SPtr  m_pAveragingOutput;                 /**< The RealTimeEvoked of the Averaging output.*/
+    NoiseEstimate* m_pNoiseEstimate;	/**< Holds a pointer to corresponding RtHpi.*/
 
-    FiffInfo::SPtr  m_pFiffInfo;        /**< Fiff measurement info.*/
-    QList<qint32> m_qListStimChs;       /**< Stimulus channels.*/
-
-    CircularMatrixBuffer<double>::SPtr   m_pAveragingBuffer;      /**< Holds incoming data.*/
-
-    bool m_bIsRunning;      /**< If source lab is running */
-    bool m_bProcessData;    /**< If data should be received for processing */
-
-    QSpinBox* m_pSpinBoxPreStimSamples;
-    QSpinBox* m_pSpinBoxPostStimSamples;
-
-    qint32 m_iPreStimSamples;
-    qint32 m_iPostStimSamples;
-
-    int m_iDebugNumChannels;
-
+    Ui::NoiseEstimateSetupWidgetClass ui;	/**< Holds the user interface for the RtHpiSetupWidget.*/
 };
 
 } // NAMESPACE
 
-#endif // AVERAGING_H
+#endif // NoiseEstimateSETUPWIDGET_H
