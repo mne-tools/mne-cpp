@@ -48,6 +48,7 @@
 #include <generics/circularmatrixbuffer.h>
 #include <xMeas/newrealtimemultisamplearray.h>
 #include <xMeas/realtimeevoked.h>
+#include <rtInv/rtave.h>
 
 
 //*************************************************************************************************************
@@ -56,6 +57,7 @@
 //=============================================================================================================
 
 #include <fiff/fiff_info.h>
+#include <fiff/fiff_evoked.h>
 
 
 //*************************************************************************************************************
@@ -84,6 +86,8 @@ namespace AveragingPlugin
 using namespace MNEX;
 using namespace XMEASLIB;
 using namespace IOBuffer;
+using namespace FIFFLIB;
+using namespace RTINVLIB;
 
 
 //*************************************************************************************************************
@@ -140,6 +144,8 @@ public:
 
     void postStimChanged(qint32 samples);
 
+    void appendEvoked(FiffEvoked::SPtr p_pEvoked);
+
     virtual QWidget* setupWidget();
 
     void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
@@ -167,6 +173,10 @@ private:
     */
     void initConnector();
 
+
+    QMutex mutex;
+
+
     PluginInputData<NewRealTimeMultiSampleArray>::SPtr   m_pAveragingInput;     /**< The RealTimeSampleArray of the Averaging input.*/
     PluginOutputData<RealTimeEvoked>::SPtr  m_pAveragingOutput;                 /**< The RealTimeEvoked of the Averaging output.*/
 
@@ -178,11 +188,19 @@ private:
     bool m_bIsRunning;      /**< If source lab is running */
     bool m_bProcessData;    /**< If data should be received for processing */
 
+    RtAve::SPtr m_pRtAve;   /**< Real-time average. */
+
     QSpinBox* m_pSpinBoxPreStimSamples;
     QSpinBox* m_pSpinBoxPostStimSamples;
 
     qint32 m_iPreStimSamples;
     qint32 m_iPostStimSamples;
+
+    qint32 m_iNumAverages;
+
+    qint32 m_iStimChan;
+
+    QVector<FiffEvoked::SPtr>   m_qVecEvokedData;   /**< Evoked data set */
 
     int m_iDebugNumChannels;
 
