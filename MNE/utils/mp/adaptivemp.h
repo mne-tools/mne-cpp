@@ -99,6 +99,8 @@ class UTILSSHARED_EXPORT AdaptiveMp : public QThread
 
 public:
 
+    typedef QList<GaborAtom> gabor_atom_list;
+
     /**
     * adaptiveMP_adaptiveMP
     *
@@ -120,6 +122,9 @@ public:
     //VectorXd energy_threshold;// = VectorXd::Zero(channel_count);
     qreal current_energy = 0;
     QList<GaborAtom> atom_list;
+    MatrixXd signal;
+    qint32 max_iterations;
+    qreal epsilon;
 
     //=========================================================================================================
     /**
@@ -175,14 +180,16 @@ public:
 //=========================================================================================================
 
 public slots:
-    void iteration_counter();
-    QList<GaborAtom> matching_pursuit (MatrixXd signal, qint32 max_iterations, qreal epsilon);
+    void send_result();
+    void matching_pursuit (MatrixXd signal, qint32 max_iterations, qreal epsilon);
+    void process();
+    void recieve_input(MatrixXd signal, qint32 max_iterations, qreal epsilon);
 
     //=========================================================================================================
 
 signals:
-    void iteration_params(qint32 current_iteration, qint32 max_iteration, qreal current_energy, qreal max_energy, QList<GaborAtom> atom_list);
-
+    void current_result(qint32 current_iteration, qint32 max_iteration, qreal current_energy, qreal max_energy, gabor_atom_list atom_list);
+    void finished();
 };
 
 }   // NAMESPACE
