@@ -101,32 +101,30 @@ void RealTimeButterflyPlot::createPlotPath(qint32 row, QPainterPath& path) const
     float fMaxValue = 1e-9f;
 
     switch(kind) {
-        case FIFFV_MEG_CH: {
-            qint32 unit = m_pRealTimeEvokedModel->getUnit(row);
-            if(unit == FIFF_UNIT_T_M) {
-                fMaxValue = 1e-10f;// m_qSettings.value("RawDelegate/max_meg_grad").toDouble();
-            }
-            else if(unit == FIFF_UNIT_T)
-            {
-                if(m_pRealTimeEvokedModel->getCoil(row) == FIFFV_COIL_BABY_MAG)
-                    fMaxValue = 1e-4f;
-                else
-                    fMaxValue = 1e-11f;// m_qSettings.value("RawDelegate/max_meg_mag").toDouble();
-            }
-            break;
-        }
+//        case FIFFV_MEG_CH: {
+//            qint32 unit = m_pRealTimeEvokedModel->getUnit(row);
+//            if(unit == FIFF_UNIT_T_M) {
+//                fMaxValue = 1e-10f;// m_qSettings.value("RawDelegate/max_meg_grad").toDouble();
+//            }
+//            else if(unit == FIFF_UNIT_T)
+//            {
+//                if(m_pRealTimeEvokedModel->getCoil(row) == FIFFV_COIL_BABY_MAG)
+//                    fMaxValue = 1e-4f;
+//                else
+//                    fMaxValue = 1e-11f;// m_qSettings.value("RawDelegate/max_meg_mag").toDouble();
+//            }
+//            break;
+//        }
         case FIFFV_EEG_CH: {
-            fMaxValue = 1e-4f;// m_qSettings.value("RawDelegate/max_eeg").toDouble();
+            fMaxValue = 1e-5f;// m_qSettings.value("RawDelegate/max_eeg").toDouble();
             break;
         }
-        case FIFFV_EOG_CH: {
-            fMaxValue = 1e-3f; //m_qSettings.value("RawDelegate/max_eog").toDouble();
-            break;
-        }
-        case FIFFV_STIM_CH: {
-            fMaxValue = 5; //m_qSettings.value("RawDelegate/max_stim").toDouble();
-            break;
-        }
+//        case FIFFV_EOG_CH: {
+//            fMaxValue = 1e-3f; //m_qSettings.value("RawDelegate/max_eog").toDouble();
+//            break;
+//        }
+        default:
+            return;
     }
 
     float fValue;
