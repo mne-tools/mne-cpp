@@ -62,7 +62,7 @@ AdaptiveMp::AdaptiveMp()
 //*************************************************************************************************************
 
 //MP Algorithm of M. Gratkowski
-QList<GaborAtom> AdaptiveMp::matching_pursuit (MatrixXd signal, qint32 max_iterations, qreal epsilon)
+void AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal epsilon)
 {
     max_it = max_iterations;
     qreal var = epsilon;
@@ -437,10 +437,11 @@ QList<GaborAtom> AdaptiveMp::matching_pursuit (MatrixXd signal, qint32 max_itera
         delete gabor_Atom;
         it++;
         //current_energy = qreal(max_it);
-        iteration_counter();
+        send_result();
 
     }//end iterations
-    return atom_list;
+    //return atom_list;
+    emit finished();
 }
 
 //*************************************************************************************************************
@@ -503,8 +504,21 @@ VectorXd AdaptiveMp::calculate_atom(qint32 sample_count, qreal scale, qint32 tra
 
 //*************************************************************************************************************
 
-void AdaptiveMp::iteration_counter()
+void AdaptiveMp::send_result()
 {
-    emit iteration_params(it, max_it, current_energy, signal_energy, atom_list);
+    emit current_result(it, max_it, current_energy, signal_energy, atom_list);
+}
+
+//*************************************************************************************************************
+void AdaptiveMp::process()
+{
+    //recieve_input(signal, max_iterations, epsilon);
+    matching_pursuit(signal, max_iterations, epsilon);
+}
+
+//*************************************************************************************************************
+void AdaptiveMp::recieve_input(Eigen::MatrixXd signal, qint32 max_iterations, qreal epsilon)
+{
+  matching_pursuit(signal, max_iterations, epsilon);
 }
 
