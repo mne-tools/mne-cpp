@@ -1,14 +1,14 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     averaging.pro
-# @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+# @file     noise.pro
+# @author   Liminsun <liminsun@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
 # @date     July, 2014
 #
 # @section  LICENSE
 #
-# Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
+# Copyright (C) 2014, Limin Sun and Matti Hamalainen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file generates the makefile for the averaging plug-in.
+# @brief    This project file generates the makefile for the rthpi plug-in.
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -39,11 +39,11 @@ TEMPLATE = lib
 
 CONFIG += plugin
 
-DEFINES += AVERAGING_LIBRARY
+DEFINES += NOISE_ESTIMATE_LIBRARY
 
 QT += core widgets
 
-TARGET = averaging
+TARGET = noise
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
@@ -53,8 +53,8 @@ CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
             -lMNE$${MNE_LIB_VERSION}Utilsd \
             -lMNE$${MNE_LIB_VERSION}Fsd \
-            -lMNE$${MNE_LIB_VERSION}Mned \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
+            -lMNE$${MNE_LIB_VERSION}Mned \
             -lxMeasd \
             -lxDispd \
             -lmne_xd
@@ -63,8 +63,8 @@ else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
             -lMNE$${MNE_LIB_VERSION}Utils \
             -lMNE$${MNE_LIB_VERSION}Fs \
-            -lMNE$${MNE_LIB_VERSION}Mne \
             -lMNE$${MNE_LIB_VERSION}Fiff \
+            -lMNE$${MNE_LIB_VERSION}Mne \
             -lxMeas \
             -lxDisp \
             -lmne_x
@@ -73,26 +73,24 @@ else {
 DESTDIR = $${MNE_BINARY_DIR}/mne_x_plugins
 
 SOURCES += \
-    averaging.cpp \
-    FormFiles/averagingsetupwidget.cpp \
-    FormFiles/averagingaboutwidget.cpp
+    noise_estimate.cpp \
+    FormFiles/noiseestimatesetupwidget.cpp \
+    FormFiles/plotter.cpp
 
 HEADERS += \
-    averaging_global.h \
-    averaging.h \
-    FormFiles/averagingsetupwidget.h \
-    FormFiles/averagingaboutwidget.h
+    noise_estimate.h \
+    noise_estimate_global.h \
+    FormFiles/noiseestimatesetupwidget.h \
+    FormFiles/plotter.h
 
 FORMS += \
-    FormFiles/averagingsetup.ui \
-    FormFiles/averagingabout.ui
+    FormFiles/noiseestimatesetup.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_X_INCLUDE_DIR}
 
-OTHER_FILES += \
-    averaging.json
+OTHER_FILES += noise.json
 
 # Put generated form headers into the origin --> cause other src is pointing at them
 UI_DIR = $$PWD

@@ -100,6 +100,10 @@ public:
     */
     RealTimeEvokedModel(QObject *parent = 0);
 
+    inline bool isInit() const;
+
+    inline qint32 getNumSamples() const;
+
     //=========================================================================================================
     /**
     * Returns the number of rows under the given parent. When the parent is valid it means that rowCount is returning the number of children of parent.
@@ -119,6 +123,18 @@ public:
     * @return number of columns
     */
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
+
+    //=========================================================================================================
+    /**
+    * Data for the row and column and given display role
+    *
+    * @param [in] row       index row
+    * @param [in] column    index column
+    * @param [in] role      display role to access
+    *
+    * @return the accessed data
+    */
+    inline QVariant data(int row, int column, int role = Qt::DisplayRole) const;
 
     //=========================================================================================================
     /**
@@ -269,6 +285,8 @@ private:
     MatrixXd m_matData;        /**< List that holds the data*/
     MatrixXd m_matDataFreeze;  /**< List that holds the data when freezed*/
 
+    bool m_bIsInit;
+
     float m_fSps;               /**< Sampling rate */
 
     bool m_bIsFreezed;          /**< Display is freezed */
@@ -279,6 +297,30 @@ private:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
+
+
+inline bool RealTimeEvokedModel::isInit() const
+{
+    return m_bIsInit;
+}
+
+
+//*************************************************************************************************************
+
+inline qint32 RealTimeEvokedModel::getNumSamples() const
+{
+    return m_bIsInit ? m_matData.cols() : 0;
+}
+
+//*************************************************************************************************************
+
+inline QVariant RealTimeEvokedModel::data(int row, int column, int role) const
+{
+    return data(index(row, column), role);
+}
+
+
+//*************************************************************************************************************
 
 inline const QMap<qint32,qint32>& RealTimeEvokedModel::getIdxSelMap() const
 {

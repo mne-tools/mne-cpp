@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
-* @file     averaging.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     noise_estimate.cpp
+* @author   Limin Sun <liminsun@nmr.mgh.harvard.edu>;
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     July, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Limin Sun, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the Averaging class.
+* @brief    Contains the implementation of the NoiseEstimate class.
 *
 */
 
@@ -38,9 +39,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "averaging.h"
-#include "FormFiles/averagingsetupwidget.h"
-
+#include "noise_estimate.h"
+#include "FormFiles/noiseestimatesetupwidget.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -56,7 +56,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace AveragingPlugin;
+using namespace NoiseEstimatePlugin;
 using namespace MNEX;
 using namespace XMEASLIB;
 
@@ -66,41 +66,19 @@ using namespace XMEASLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-Averaging::Averaging()
-: m_pAveragingInput(NULL)
-//, m_pAveragingOutput(NULL)
-, m_pAveragingBuffer(CircularMatrixBuffer<double>::SPtr())
-, m_bIsRunning(false)
+NoiseEstimate::NoiseEstimate()
+: m_bIsRunning(false)
 , m_bProcessData(false)
-, m_pSpinBoxPreStimSamples(NULL)
-, m_pSpinBoxPostStimSamples(NULL)
-, m_iPreStimSamples(200)
-, m_iPostStimSamples(1000)
-, m_iDebugNumChannels(-1)
+, m_pRTMSAInput(NULL)
+, m_pRTMSAOutput(NULL)
+, m_pBuffer(CircularMatrixBuffer<double>::SPtr())
 {
-
-//    m_pSpinBoxPreStimSamples = new QSpinBox;
-//    m_pSpinBoxPreStimSamples->setMinimum(1);
-//    m_pSpinBoxPreStimSamples->setMaximum(10000);
-//    m_pSpinBoxPreStimSamples->setSingleStep(1);
-//    m_pSpinBoxPreStimSamples->setValue(m_iPreStimSamples);
-//    connect(m_pSpinBoxPreStimSamples, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &Averaging::preStimChanged);
-//    addPluginWidget(m_pSpinBoxPreStimSamples);
-
-//    m_pSpinBoxPostStimSamples = new QSpinBox;
-//    m_pSpinBoxPostStimSamples->setMinimum(1);
-//    m_pSpinBoxPostStimSamples->setMaximum(10000);
-//    m_pSpinBoxPostStimSamples->setSingleStep(1);
-//    m_pSpinBoxPostStimSamples->setValue(m_iPostStimSamples);
-//    connect(m_pSpinBoxPostStimSamples, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &Averaging::postStimChanged);
-//    addPluginWidget(m_pSpinBoxPostStimSamples);
-
 }
 
 
 //*************************************************************************************************************
 
-Averaging::~Averaging()
+NoiseEstimate::~NoiseEstimate()
 {
     if(this->isRunning())
         stop();
@@ -109,10 +87,10 @@ Averaging::~Averaging()
 
 //*************************************************************************************************************
 
-QSharedPointer<IPlugin> Averaging::clone() const
+QSharedPointer<IPlugin> NoiseEstimate::clone() const
 {
-    QSharedPointer<Averaging> pAveragingClone(new Averaging);
-    return pAveragingClone;
+    QSharedPointer<NoiseEstimate> pNoiseEstimateClone(new NoiseEstimate);
+    return pNoiseEstimateClone;
 }
 
 
@@ -121,42 +99,50 @@ QSharedPointer<IPlugin> Averaging::clone() const
 // Creating required display instances and set configurations
 //=============================================================================================================
 
-void Averaging::init()
+void NoiseEstimate::init()
 {
-
     // Input
-    m_pAveragingInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "AveragingIn", "Averaging input data");
-    connect(m_pAveragingInput.data(), &PluginInputConnector::notify, this, &Averaging::update, Qt::DirectConnection);
-    m_inputConnectors.append(m_pAveragingInput);
+    m_pRTMSAInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "Noise Estimatge In", "Noise Estimate input data");
+    connect(m_pRTMSAInput.data(), &PluginInputConnector::notify, this, &NoiseEstimate::update, Qt::DirectConnection);
+    m_inputConnectors.append(m_pRTMSAInput);
 
     // Output
-    m_pAveragingOutput = PluginOutputData<RealTimeEvoked>::create(this, "AveragingOut", "Averaging Output Data");
-    m_outputConnectors.append(m_pAveragingOutput);
+    m_pRTMSAOutput = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "Noise Estimate Out", "Noise Estimate output data");
+    m_outputConnectors.append(m_pRTMSAOutput);
+
+    m_pRTMSAOutput->data()->setMultiArraySize(100);
+    m_pRTMSAOutput->data()->setVisibility(true);
 
     //init channels when fiff info is available
-    connect(this, &Averaging::fiffInfoAvailable, this, &Averaging::initConnector);
+    connect(this, &NoiseEstimate::fiffInfoAvailable, this, &NoiseEstimate::initConnector);
 
     //Delete Buffer - will be initailzed with first incoming data
-    if(!m_pAveragingBuffer.isNull())
-        m_pAveragingBuffer = CircularMatrixBuffer<double>::SPtr();
+    if(!m_pBuffer.isNull())
+        m_pBuffer = CircularMatrixBuffer<double>::SPtr();
 }
 
 
 //*************************************************************************************************************
 
-void Averaging::initConnector()
+void NoiseEstimate::initConnector()
 {
-    if(m_pFiffInfo)
-    {
-        m_pAveragingOutput->data()->initFromFiffInfo(m_pFiffInfo);
-        m_iDebugNumChannels = m_pAveragingOutput->data()->getNumChannels();
+    qDebug() << "void NoiseEstimate::initConnector()";
+    if(m_pFiffInfo){
+        m_pRTMSAOutput->data()->initFromFiffInfo(m_pFiffInfo);
     }
+    else
+    {
+        m_iFFTlength = 0;
+        m_Fs = 0;
+    }
+
+
 }
 
 
 //*************************************************************************************************************
 
-bool Averaging::start()
+bool NoiseEstimate::start()
 {
     //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
     if(this->isRunning())
@@ -173,7 +159,7 @@ bool Averaging::start()
 
 //*************************************************************************************************************
 
-bool Averaging::stop()
+bool NoiseEstimate::stop()
 {
     //Wait until this thread is stopped
     m_bIsRunning = false;
@@ -181,12 +167,12 @@ bool Averaging::stop()
     if(m_bProcessData)
     {
         //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the pop function (acquire statement)
-        m_pAveragingBuffer->releaseFromPop();
-        m_pAveragingBuffer->releaseFromPush();
+        m_pBuffer->releaseFromPop();
+        m_pBuffer->releaseFromPush();
 
-        m_pAveragingBuffer->clear();
+        m_pBuffer->clear();
 
-//        m_pRTMSAOutput->data()->clear();
+        m_pRTMSAOutput->data()->clear();
     }
 
     return true;
@@ -195,7 +181,7 @@ bool Averaging::stop()
 
 //*************************************************************************************************************
 
-IPlugin::PluginType Averaging::getType() const
+IPlugin::PluginType NoiseEstimate::getType() const
 {
     return _IAlgorithm;
 }
@@ -203,50 +189,37 @@ IPlugin::PluginType Averaging::getType() const
 
 //*************************************************************************************************************
 
-QString Averaging::getName() const
+QString NoiseEstimate::getName() const
 {
-    return "Averaging";
+    return "NoiseEstimate Toolbox";
 }
 
 
 //*************************************************************************************************************
 
-void Averaging::preStimChanged(qint32 samples)
+QWidget* NoiseEstimate::setupWidget()
 {
-    m_iPreStimSamples = samples;
-    emit sampleNumChanged();
-}
+    NoiseEstimateSetupWidget* setupWidget = new NoiseEstimateSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
 
+    connect(this,&NoiseEstimate::SetNoisePara,setupWidget,&NoiseEstimateSetupWidget::init);
+    //connect(this,&NoiseEstimate::RePlot,setupWidget,&NoiseEstimateSetupWidget::Update);
 
-//*************************************************************************************************************
-
-void Averaging::postStimChanged(qint32 samples)
-{
-    m_iPostStimSamples = samples;
-    emit sampleNumChanged();
-}
-
-
-//*************************************************************************************************************
-
-QWidget* Averaging::setupWidget()
-{
-    AveragingSetupWidget* setupWidget = new AveragingSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
     return setupWidget;
+
 }
 
 
 //*************************************************************************************************************
 
-void Averaging::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
+void NoiseEstimate::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 {
     QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<NewRealTimeMultiSampleArray>();
 
     if(pRTMSA)
     {
         //Check if buffer initialized
-        if(!m_pAveragingBuffer)
-            m_pAveragingBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSA->getNumChannels(), pRTMSA->getMultiArraySize()));
+        if(!m_pBuffer)
+            m_pBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSA->getNumChannels(), pRTMSA->getMultiArraySize()));
 
         //Fiff information
         if(!m_pFiffInfo)
@@ -255,7 +228,6 @@ void Averaging::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
             emit fiffInfoAvailable();
         }
 
-
         if(m_bProcessData)
         {
             MatrixXd t_mat(pRTMSA->getNumChannels(), pRTMSA->getMultiArraySize());
@@ -263,7 +235,7 @@ void Averaging::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
             for(qint32 i = 0; i < pRTMSA->getMultiArraySize(); ++i)
                 t_mat.col(i) = pRTMSA->getMultiSampleArray()[i];
 
-            m_pAveragingBuffer->push(&t_mat);
+            m_pBuffer->push(&t_mat);
         }
     }
 }
@@ -272,7 +244,7 @@ void Averaging::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
 //*************************************************************************************************************
 
-void Averaging::run()
+void NoiseEstimate::run()
 {
     //
     // Read Fiff Info
@@ -280,40 +252,73 @@ void Averaging::run()
     while(!m_pFiffInfo)
         msleep(10);// Wait for fiff Info
 
-    for(qint32 i = 0; i < m_pFiffInfo->chs.size(); ++i)
-    {
-        if(m_pFiffInfo->chs[i].kind == FIFFV_STIM_CH)
-        {
-            qDebug() << "Stim" << i << "Name" << m_pFiffInfo->chs[i].ch_name;
-            m_qListStimChs.append(i);
-        }
-    }
-
     m_bProcessData = true;
-
-    qint32 count = 0;//DEBUG
 
     while (m_bIsRunning)
     {
         if(m_bProcessData)
         {
+
+            if(m_pFiffInfo){
+                //emit nFFT and sample rate to the setup widget
+                m_iFFTlength = 4096;
+                m_Fs = m_pFiffInfo.data()->sfreq;
+
+                emit SetNoisePara(m_iFFTlength,m_Fs);
+            }
+
             /* Dispatch the inputs */
-            MatrixXd t_mat = m_pAveragingBuffer->pop();
+            MatrixXd t_mat = m_pBuffer->pop();
 
-            // DEBUG
-            if(count > 10)
-            {
-                if(m_iDebugNumChannels > 0)
-                {
-                    MatrixXd test = MatrixXd::Random(m_iDebugNumChannels, 4000);
+            MatrixXd psdx(t_mat.rows(),m_iFFTlength/2+1);
 
-                    m_pAveragingOutput->data()->setValue(test);
+            //ToDo: Implement your algorithm here
+            for(qint32 i = 0; i < t_mat.rows(); ++i){//FFT calculation by row
+                RowVectorXd data;//(t_mat.cols());
+//                for(qint32 j=0; j<t_mat.cols();j++)
+//                {
+//                    data(j) = t_mat(i,j);
+//                }
+
+                data = t_mat.row(i);
+
+                //zero-pad data to m_iFFTlength
+                RowVectorXd t_dataZeroPad = RowVectorXd::Zero(m_iFFTlength);
+                t_dataZeroPad.head(data.cols()) = data;
+
+                //generate fft object
+                Eigen::FFT<double> fft;
+                fft.SetFlag(fft.HalfSpectrum);
+
+                //fft-transform data sequence
+                RowVectorXcd t_freqData;
+                fft.fwd(t_freqData,t_dataZeroPad);
+
+                // calculate spectrum from FFT
+                RowVectorXcd xdft(m_iFFTlength/2+1);
+
+                for(qint32 j=0; j<m_iFFTlength/2+1;j++)
+                {                    
+                    xdft(j) = t_freqData(j);
+                    double mag_abs = t_freqData(i,j).real()* t_freqData(i,j).real() +  t_freqData(i,j).imag()*t_freqData(i,j).imag();
+
+                    psdx(i,j) = (1.0/(m_Fs*m_iFFTlength))* mag_abs;
                 }
 
-                count = 0;
+                for(qint32 j=1; j<m_iFFTlength/2;j++)
+                {
+                    psdx(i,j) = 2.0*psdx(j);
+                }
+
+
+                //emit RePlot(psdx);
+
             }
-            // DEBUG End
-            ++count;
+
+//            std::cout << psdx(0,0) << std::endl;
+
+//            for(qint32 i = 0; i < t_mat.cols(); ++i)
+//                m_pRTMSAOutput->data()->setValue(t_mat.col(i));
         }
     }
 }
