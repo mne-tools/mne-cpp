@@ -108,6 +108,8 @@ public:
     MatrixXd residuum;
     qreal energy;
     //qreal NormAtom;
+    QList<qreal> phase_list;
+    QList<qreal> max_scalar_list;
 
 };
 
