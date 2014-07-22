@@ -65,14 +65,10 @@ AdaptiveMp::AdaptiveMp()
 void AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal epsilon)
 {
     max_it = max_iterations;
-    qreal var = epsilon;
-    //QList<GaborAtom> atom_list;
     Eigen::FFT<double> fft;
     MatrixXd residuum = signal; //residuum initialised with signal
-    //qint32 it = 0;              //iterationscounter
     qint32 sample_count = signal.rows();
     qint32 channel_count = signal.cols();
-    qint32 signal_channel = 0;
     signal_energy = 0;//VectorXd::Zero(channel_count);
     qreal residuum_energy = 0;//VectorXd residuum_energy = VectorXd::Zero(channel_count);
     qreal energy_threshold = 0;//VectorXd energy_threshold = VectorXd::Zero(channel_count);
@@ -123,7 +119,7 @@ void AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal 
                 //iteration for multichannel
                 for(qint32 chn = 0; chn < channel_count; ++chn)
                 {
-                    qint32 max_index = 0;
+                    quint32 max_index = 0;
                     qreal maximum = 0;
                     phase = 0;
 
@@ -413,34 +409,42 @@ void AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal 
                 gabor_Atom->max_scalar_product   = max_scalar_product;
             }
 
-            std::cout <<  "parameters after optimization " << it << ":\n   "<< "scale: " << gabor_Atom->scale << " transl.: " << gabor_Atom->translation <<
-                          " modu: " << gabor_Atom->modulation << " phase: " << gabor_Atom->phase << " max Scalar product: " << gabor_Atom->max_scalar_product << "\n\n";
             if(cnt==iterations)//max number of iteration achieves before tol is satisfied
                 std::cout<<"Simplex Iteration limit of "<<iterations<<" achieved, result may not be optimal"  <<std::endl;
 
+        }//end Maximisation for channels Copyright (C) 2010 Botao Jia
+
+        std::cout <<  "parameters after optimization " << it << ":\n   "<< "scale: " << gabor_Atom->scale << " transl.: " << gabor_Atom->translation <<
+                      " modu: " << gabor_Atom->modulation << " phase: " << gabor_Atom->phase << " max Scalar product: " << gabor_Atom->max_scalar_product << "\n\n";
+
+        //calc multichannel parameters phase and max_scalar_product
+        for(qint32 chn = 0; chn < channel_count; ++chn)
+        {
+            VectorXd channel_params = calculate_atom(sample_count, gabor_Atom->scale, gabor_Atom->translation, gabor_Atom->modulation, chn, residuum, RETURNPARAMETERS);
+            gabor_Atom->phase_list.append(channel_params[3]);
+            gabor_Atom->max_scalar_list.append(channel_params[4]);
+
             //substract best matching Atom from Residuum in each channel
-            VectorXd bestMatch = gabor_Atom->create_real(gabor_Atom->sample_count, gabor_Atom->scale, gabor_Atom->translation, gabor_Atom->modulation, gabor_Atom->phase);
+            VectorXd bestMatch = gabor_Atom->create_real(gabor_Atom->sample_count, gabor_Atom->scale, gabor_Atom->translation, gabor_Atom->modulation, gabor_Atom->phase_list.at(chn));
 
             for(qint32 j = 0; j < gabor_Atom->sample_count; j++)
             {
-                residuum(j,chn) -= gabor_Atom->max_scalar_product * bestMatch[j];
-                gabor_Atom->energy += (gabor_Atom->max_scalar_product * bestMatch[j]) * (gabor_Atom->max_scalar_product * bestMatch[j]);
+                residuum(j,chn) -= gabor_Atom->max_scalar_list.at(chn) * bestMatch[j];
+                gabor_Atom->energy += (gabor_Atom->max_scalar_list.at(chn) * bestMatch[j]) * (gabor_Atom->max_scalar_list.at(chn) * bestMatch[j]);
             }
 
-            residuum_energy/*[chn]*/ -= gabor_Atom->energy;//(gaborAtom->max_scalar_product * bestMatch[j]) * (gaborAtom->max_scalar_product * bestMatch[j]);
-            current_energy += gabor_Atom->energy;//(signal_energy/*[chn]*/ * (1 - energy_threshold/*[chn]*/)) - residuum_energy;//[chn];
+            residuum_energy -= gabor_Atom->energy;
+            current_energy += gabor_Atom->energy;
 
             gabor_Atom->residuum = residuum;
-            atom_list.append(*gabor_Atom);
-        }//end Maximisation Copyright (C) 2010 Botao Jia
+        }
+        atom_list.append(*gabor_Atom);
 
         delete gabor_Atom;
         it++;
-        //current_energy = qreal(max_it);
         send_result();
 
-    }//end iterations
-    //return atom_list;
+    }//end iterations    
     emit finished();
 }
 
