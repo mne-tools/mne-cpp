@@ -40,6 +40,7 @@
 
 #include "averaging.h"
 #include "FormFiles/averagingsetupwidget.h"
+#include "FormFiles/averagingsettingswidget.h"
 
 #include <iostream>
 
@@ -74,31 +75,18 @@ Averaging::Averaging()
 , m_pAveragingBuffer(CircularMatrixBuffer<double>::SPtr())
 , m_bIsRunning(false)
 , m_bProcessData(false)
-, m_pSpinBoxPreStimSamples(NULL)
-, m_pSpinBoxPostStimSamples(NULL)
 , m_iPreStimSamples(750)
 , m_iPostStimSamples(750)
 , m_iNumAverages(10)
 , m_iStimChan(0)
-, m_iDebugNumChannels(-1)
+, m_pAveragingWidget(AveragingSettingsWidget::SPtr())
+, m_pActionShowAdjustment(Q_NULLPTR)
 {
-
-//    m_pSpinBoxPreStimSamples = new QSpinBox;
-//    m_pSpinBoxPreStimSamples->setMinimum(1);
-//    m_pSpinBoxPreStimSamples->setMaximum(10000);
-//    m_pSpinBoxPreStimSamples->setSingleStep(1);
-//    m_pSpinBoxPreStimSamples->setValue(m_iPreStimSamples);
-//    connect(m_pSpinBoxPreStimSamples, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &Averaging::preStimChanged);
-//    addPluginWidget(m_pSpinBoxPreStimSamples);
-
-//    m_pSpinBoxPostStimSamples = new QSpinBox;
-//    m_pSpinBoxPostStimSamples->setMinimum(1);
-//    m_pSpinBoxPostStimSamples->setMaximum(10000);
-//    m_pSpinBoxPostStimSamples->setSingleStep(1);
-//    m_pSpinBoxPostStimSamples->setValue(m_iPostStimSamples);
-//    connect(m_pSpinBoxPostStimSamples, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &Averaging::postStimChanged);
-//    addPluginWidget(m_pSpinBoxPostStimSamples);
-
+    m_pActionShowAdjustment = new QAction(QIcon(":/images/averaging.png"), tr("Averaging Adjustments"),this);
+//    m_pActionSetupProject->setShortcut(tr("F12"));
+    m_pActionShowAdjustment->setStatusTip(tr("Averaging Adjustments"));
+    connect(m_pActionShowAdjustment, &QAction::triggered, this, &Averaging::showAveragingWidget);
+    addPluginAction(m_pActionShowAdjustment);
 }
 
 
@@ -151,10 +139,7 @@ void Averaging::init()
 void Averaging::initConnector()
 {
     if(m_pFiffInfo)
-    {
         m_pAveragingOutput->data()->initFromFiffInfo(m_pFiffInfo);
-        m_iDebugNumChannels = m_pAveragingOutput->data()->getNumChannels();
-    }
 }
 
 
@@ -242,6 +227,16 @@ QWidget* Averaging::setupWidget()
 
 //*************************************************************************************************************
 
+void Averaging::showAveragingWidget()
+{
+    if(!m_pAveragingWidget)
+        m_pAveragingWidget = AveragingSettingsWidget::SPtr(new AveragingSettingsWidget(this));
+    m_pAveragingWidget->show();
+}
+
+
+//*************************************************************************************************************
+
 void Averaging::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 {
     QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<NewRealTimeMultiSampleArray>();
@@ -318,8 +313,6 @@ void Averaging::run()
 
     m_pRtAve->start();
 
-//    qint32 count = 0;//DEBUG
-
     while (m_bIsRunning)
     {
         if(m_bProcessData)
@@ -335,13 +328,10 @@ void Averaging::run()
             {
                 FiffEvoked t_fiffEvoked = *m_qVecEvokedData[0].data();
 
-//                qDebug() << "Fiff Evoked" << count;//DEBUG
-
                 m_pAveragingOutput->data()->setValue(t_fiffEvoked.data);
 
                 m_qVecEvokedData.pop_front();
 
-//                ++count;//DEBUG
             }
             mutex.unlock();
 

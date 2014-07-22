@@ -180,10 +180,11 @@ QVariant RealTimeEvokedModel::headerData(int section, Qt::Orientation orientatio
 
 //*************************************************************************************************************
 
-void RealTimeEvokedModel::setChannelInfo(QList<RealTimeSampleArrayChInfo> &chInfo)
+void RealTimeEvokedModel::setChannelInfo(QList<RealTimeSampleArrayChInfo> &chInfo, QList<QColor> &chColor)
 {
     beginResetModel();
     m_qListChInfo = chInfo;
+    m_qListChColors = chColor;
     endResetModel();
 
     resetSelection();
@@ -217,16 +218,29 @@ void RealTimeEvokedModel::addData(const MatrixXd &data)
 
 //*************************************************************************************************************
 
+QColor RealTimeEvokedModel::getColor(qint32 row) const
+{
+    if(row < m_qMapIdxRowSelection.size())
+    {
+        qint32 chRow = m_qMapIdxRowSelection[row];
+        return m_qListChColors[chRow];
+    }
+    else
+        return QColor();
+}
+
+
+//*************************************************************************************************************
+
 fiff_int_t RealTimeEvokedModel::getKind(qint32 row) const
 {
     if(row < m_qMapIdxRowSelection.size())
     {
         qint32 chRow = m_qMapIdxRowSelection[row];
-        return m_qListChInfo[chRow].getKind();;
+        return m_qListChInfo[chRow].getKind();
     }
     else
         return 0;
-
 }
 
 
