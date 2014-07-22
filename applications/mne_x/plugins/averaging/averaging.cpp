@@ -41,6 +41,8 @@
 #include "averaging.h"
 #include "FormFiles/averagingsetupwidget.h"
 
+#include <iostream>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -74,8 +76,10 @@ Averaging::Averaging()
 , m_bProcessData(false)
 , m_pSpinBoxPreStimSamples(NULL)
 , m_pSpinBoxPostStimSamples(NULL)
-, m_iPreStimSamples(200)
-, m_iPostStimSamples(1000)
+, m_iPreStimSamples(750)
+, m_iPostStimSamples(750)
+, m_iNumAverages(10)
+, m_iStimChan(0)
 , m_iDebugNumChannels(-1)
 {
 
@@ -269,6 +273,21 @@ void Averaging::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 }
 
 
+//*************************************************************************************************************
+
+void Averaging::appendEvoked(FiffEvoked::SPtr p_pEvoked)
+{
+//    qDebug() << "void Averaging::appendEvoked";// << p_pEvoked->comment;
+    qDebug() << p_pEvoked->comment;
+    if(p_pEvoked->comment == QString("Stim %1").arg(m_iStimChan))
+    {
+//        qDebug()<< p_pEvoked->comment << "append";
+        mutex.lock();
+        m_qVecEvokedData.push_back(p_pEvoked);
+        mutex.unlock();
+    }
+}
+
 
 //*************************************************************************************************************
 
@@ -291,29 +310,41 @@ void Averaging::run()
 
     m_bProcessData = true;
 
-    qint32 count = 0;//DEBUG
+    //
+    // Init Real-Time average
+    //
+    m_pRtAve = RtAve::SPtr(new RtAve(m_iNumAverages, m_iPreStimSamples, m_iPostStimSamples, m_pFiffInfo));
+    connect(m_pRtAve.data(), &RtAve::evokedStim, this, &Averaging::appendEvoked);
+
+    m_pRtAve->start();
+
+//    qint32 count = 0;//DEBUG
 
     while (m_bIsRunning)
     {
         if(m_bProcessData)
         {
             /* Dispatch the inputs */
-            MatrixXd t_mat = m_pAveragingBuffer->pop();
+            MatrixXd rawSegment = m_pAveragingBuffer->pop();
 
-            // DEBUG
-            if(count > 10)
+            m_pRtAve->append(rawSegment);
+
+
+            mutex.lock();
+            if(m_qVecEvokedData.size() > 0)
             {
-                if(m_iDebugNumChannels > 0)
-                {
-                    MatrixXd test = MatrixXd::Random(m_iDebugNumChannels, 4000);
+                FiffEvoked t_fiffEvoked = *m_qVecEvokedData[0].data();
 
-                    m_pAveragingOutput->data()->setValue(test);
-                }
+//                qDebug() << "Fiff Evoked" << count;//DEBUG
 
-                count = 0;
+                m_pAveragingOutput->data()->setValue(t_fiffEvoked.data);
+
+                m_qVecEvokedData.pop_front();
+
+//                ++count;//DEBUG
             }
-            // DEBUG End
-            ++count;
+            mutex.unlock();
+
         }
     }
 }
