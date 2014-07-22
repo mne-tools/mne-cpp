@@ -97,7 +97,7 @@ void AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal 
         qint32 j = 1;
         qreal max_scalar_product = 0;             //inner product for choosing the best matching atom
         qreal k = 0;                            //for modulation 2*pi*k/N
-        qint32 p = floor(sample_count / 2);      //translation
+        quint32 p = floor(sample_count / 2);      //translation
         GaborAtom *gabor_Atom = new GaborAtom();
         gabor_Atom->sample_count = sample_count;
         gabor_Atom->energy = 0;
@@ -171,8 +171,8 @@ void AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal 
             j++;
             s = pow(2.0,j);
         }
-        std::cout << "found parameters " << it << ":\n   " << gabor_Atom->scale << "     " << gabor_Atom->translation <<
-                     "      " << gabor_Atom->modulation << "      " << gabor_Atom->phase << "\n";
+        std::cout << "found parameters " << it << ":\n   "<< "scale: " << gabor_Atom->scale << " transl.: " << gabor_Atom->translation <<
+                     " modu: " << gabor_Atom->modulation << " phase: " << gabor_Atom->phase << " max Scalar product: " << gabor_Atom->max_scalar_product << "\n";
 
         //replace atoms with s==N and p = floor(N/2) by such atoms that do not have an envelope
         k = 0;
@@ -202,8 +202,8 @@ void AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal 
             }
 
         }
-        std::cout << "found params after reset with NoEnvelope " << it << ":\n   " << gabor_Atom->scale << "     " << gabor_Atom->translation <<
-                     "      " << gabor_Atom->modulation << "      " << gabor_Atom->phase << "\n";
+        std::cout << "found params after reset with NoEnvelope " << it << ":\n   "<< "scale: " << gabor_Atom->scale << " transl.: " << gabor_Atom->translation <<
+                     " modu: " << gabor_Atom->modulation << " phase: " << gabor_Atom->phase << " max Scalar product: " << gabor_Atom->max_scalar_product << "\n";
 
         //Maximisation Simplex Algorithm implemented by Bozoa Jia, adapted to the MP Algorithm by Martin Henfling. Copyright (C) 2010 Botao Jia
         //todo change to clean use of EIGEN, @present its mixed with Namespace std and <vector>
@@ -413,8 +413,8 @@ void AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal 
                 gabor_Atom->max_scalar_product   = max_scalar_product;
             }
 
-            std::cout <<  "parameters after optimization " << it << ":\n   " << gabor_Atom->scale << "     " << gabor_Atom->translation <<
-                                "      " << gabor_Atom->modulation << "      " << gabor_Atom->phase << "\n\n";
+            std::cout <<  "parameters after optimization " << it << ":\n   "<< "scale: " << gabor_Atom->scale << " transl.: " << gabor_Atom->translation <<
+                          " modu: " << gabor_Atom->modulation << " phase: " << gabor_Atom->phase << " max Scalar product: " << gabor_Atom->max_scalar_product << "\n\n";
             if(cnt==iterations)//max number of iteration achieves before tol is satisfied
                 std::cout<<"Simplex Iteration limit of "<<iterations<<" achieved, result may not be optimal"  <<std::endl;
 
@@ -459,7 +459,7 @@ VectorXcd AdaptiveMp::modulation_function(qint32 N, qreal k)
 
 //*************************************************************************************************************
 
-VectorXd AdaptiveMp::calculate_atom(qint32 sample_count, qreal scale, qint32 translation, qreal modulation, qint32 channel, MatrixXd residuum, ReturnValue return_value)
+VectorXd AdaptiveMp::calculate_atom(qint32 sample_count, qreal scale, quint32 translation, qreal modulation, qint32 channel, MatrixXd residuum, ReturnValue return_value)
 {
     GaborAtom *gabor_Atom = new GaborAtom();
     qreal phase = 0;
