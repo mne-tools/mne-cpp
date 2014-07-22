@@ -57,6 +57,7 @@
 #include <QSharedPointer>
 #include <QVector>
 #include <QList>
+#include <QColor>
 
 
 //*************************************************************************************************************
@@ -151,11 +152,20 @@ public:
 
     //=========================================================================================================
     /**
+    * Returns the number of channels.
+    *
+    * @return the number of values which are gathered before a notify() is called.
+    */
+    inline QList<QColor>& chColor();
+
+    //=========================================================================================================
+    /**
     * Returns the reference to the channel list.
     *
     * @return the reference to the channel list.
     */
     inline QList<RealTimeSampleArrayChInfo>& chInfo();
+
 
     //=========================================================================================================
     /**
@@ -182,13 +192,24 @@ public:
     */
     virtual MatrixXd getValue() const;
 
+    //=========================================================================================================
+    /**
+    * Returns whether RealTimeEvoked contains values
+    *
+    * @return whether RealTimeEvoked contains values.
+    */
+    inline bool containsValues() const;
+
 private:
     FiffInfo::SPtr              m_pFiffInfo_orig;   /**< Original Fiff Info if initialized by fiff info. */
 
     QString                     m_sXMLLayoutFile;   /**< Layout file name. */
     MatrixXd                    m_matValue;         /**< The current attached sample vector.*/
+
+    QList<QColor>               m_qListChColors;    /**< Channel color for butterfly plot.*/
     QList<RealTimeSampleArrayChInfo> m_qListChInfo; /**< Channel info list.*/
     bool                        m_bChInfoIsInit;    /**< If channel info is initialized.*/
+    bool                        m_bContainsValues;  /**< If values are stored.*/
 };
 
 
@@ -197,8 +218,6 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-
-//*************************************************************************************************************
 
 inline bool RealTimeEvoked::isChInit() const
 {
@@ -232,6 +251,14 @@ inline unsigned int RealTimeEvoked::getNumChannels() const
 
 //*************************************************************************************************************
 
+inline QList<QColor>& RealTimeEvoked::chColor()
+{
+    return m_qListChColors;
+}
+
+
+//*************************************************************************************************************
+
 inline QList<RealTimeSampleArrayChInfo>& RealTimeEvoked::chInfo()
 {
     return m_qListChInfo;
@@ -243,6 +270,14 @@ inline QList<RealTimeSampleArrayChInfo>& RealTimeEvoked::chInfo()
 inline FiffInfo::SPtr& RealTimeEvoked::getFiffInfo()
 {
     return m_pFiffInfo_orig;
+}
+
+
+//*************************************************************************************************************
+
+inline bool RealTimeEvoked::containsValues() const
+{
+    return m_bContainsValues;
 }
 
 } // NAMESPACE

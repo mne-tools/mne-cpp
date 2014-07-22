@@ -69,8 +69,6 @@
 
 #include <QPaintEvent>
 #include <QPainter>
-#include <QTimer>
-#include <QTime>
 #include <QVBoxLayout>
 #include <QHeaderView>
 #include <QMenu>
@@ -110,7 +108,6 @@ RealTimeEvokedWidget::RealTimeEvokedWidget(QSharedPointer<RealTimeEvoked> pRTE, 
 : NewMeasurementWidget(parent)
 , m_pRTEModel(NULL)
 , m_pButterflyPlot(NULL)
-, m_fDefaultSectionSize(80.0f)
 , m_fZoomFactor(1.0f)
 , m_pRTE(pRTE)
 , m_bInitialized(false)
@@ -147,7 +144,7 @@ RealTimeEvokedWidget::RealTimeEvokedWidget(QSharedPointer<RealTimeEvoked> pRTE, 
     //set layouts
     this->setLayout(rteLayout);
 
-    init();
+    getData();
 }
 
 
@@ -163,11 +160,20 @@ RealTimeEvokedWidget::~RealTimeEvokedWidget()
 
 void RealTimeEvokedWidget::update(XMEASLIB::NewMeasurement::SPtr)
 {
+    getData();
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeEvokedWidget::getData()
+{
     if(!m_bInitialized)
     {
         if(m_pRTE->isChInit())
         {
             m_qListChInfo = m_pRTE->chInfo();
+            m_qListChColors = m_pRTE->chColor();
             m_fSamplingRate = 0;//m_pRTE->getSamplingRate();
 
             QFile file(m_pRTE->getXMLLayoutFile());
@@ -186,11 +192,12 @@ void RealTimeEvokedWidget::update(XMEASLIB::NewMeasurement::SPtr)
 
             init();
         }
+        if(m_pRTE->containsValues())
+            m_pRTEModel->addData(m_pRTE->getValue());
     }
     else
         m_pRTEModel->addData(m_pRTE->getValue());
 }
-
 
 //*************************************************************************************************************
 
@@ -202,7 +209,7 @@ void RealTimeEvokedWidget::init()
             delete m_pRTEModel;
         m_pRTEModel = new RealTimeEvokedModel(this);
 
-        m_pRTEModel->setChannelInfo(m_qListChInfo);
+        m_pRTEModel->setChannelInfo(m_qListChInfo, m_qListChColors);
         m_pRTEModel->setSamplingInfo(m_fSamplingRate);
 
         m_pButterflyPlot->setModel(m_pRTEModel);
