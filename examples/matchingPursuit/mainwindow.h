@@ -63,6 +63,7 @@ private slots:
     void on_tbv_Results_cellClicked(int row, int column);
     void cb_selection_changed(const QModelIndex&, const QModelIndex&);
     void recieve_result(qint32 current_iteration, qint32 max_iterations, qreal current_energy, qreal max_energy, gabor_atom_list atom_res_list);
+    void calc_thread_finished();
 
 signals:
 

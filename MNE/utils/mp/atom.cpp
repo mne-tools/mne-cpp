@@ -91,7 +91,7 @@ GaborAtom::GaborAtom()
 
 //*************************************************************************************************************
 
-VectorXd GaborAtom::gauss_function (qint32 sample_count, qreal scale, qint32 translation)
+VectorXd GaborAtom::gauss_function (qint32 sample_count, qreal scale, quint32 translation)
 {
     VectorXd gauss = VectorXd::Zero(sample_count);
 
@@ -106,7 +106,7 @@ VectorXd GaborAtom::gauss_function (qint32 sample_count, qreal scale, qint32 tra
 
 //*************************************************************************************************************
 
-VectorXcd GaborAtom::create_complex(qint32 sample_count, qreal scale, qint32 translation, qreal modulation)
+VectorXcd GaborAtom::create_complex(qint32 sample_count, qreal scale, quint32 translation, qreal modulation)
 {
     VectorXcd complex_atom(sample_count);
     qreal norm_atom = 0;
@@ -141,7 +141,7 @@ VectorXcd GaborAtom::create_complex(qint32 sample_count, qreal scale, qint32 tra
 
 //*************************************************************************************************************
 
-VectorXd GaborAtom::create_real(qint32 sample_count, qreal scale, qint32 translation, qreal modulation, qreal phase)
+VectorXd GaborAtom::create_real(qint32 sample_count, qreal scale, quint32 translation, qreal modulation, qreal phase)
 {
     VectorXd real_atom(sample_count);
     qreal norm_atom = 0;
@@ -175,7 +175,7 @@ VectorXd GaborAtom::create_real(qint32 sample_count, qreal scale, qint32 transla
 
 //*************************************************************************************************************
 
-ChirpAtom::ChirpAtom(qint32 sample_count, qreal scale, qint32 translation, qreal modulation, qreal phase, qreal chirp, bool saveToRam)
+ChirpAtom::ChirpAtom(qint32 sample_count, qreal scale, quint32 translation, qreal modulation, qreal phase, qreal chirp, bool saveToRam)
 {
     ChirpAtom::sample_count = sample_count;
     ChirpAtom::scale = scale;

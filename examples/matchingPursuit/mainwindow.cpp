@@ -74,6 +74,7 @@ qreal _signal_negative_scale = 0;
 qreal _max_pos = 0;
 qreal _max_neg = 0;
 qreal _draw_factor = 0;
+QMap<qint32, bool> select_channel_map;
 
 QList<QColor> _colors;
 
@@ -218,6 +219,7 @@ void MainWindow::open_file()
     this->model = new QStandardItemModel;
     connect(this->model, SIGNAL(dataChanged ( const QModelIndex&, const QModelIndex&)), this, SLOT(cb_selection_changed(const QModelIndex&, const QModelIndex&)));
 
+
     QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly))
     {
@@ -233,10 +235,10 @@ void MainWindow::open_file()
     {    ReadFiffFile(fileName);
         _signal_matrix.resize(1024,5);
         _original_signal_matrix.resize(1024,5);
-        // TODO: find good fiff signal part
+        // ToDo: find good fiff signal part
         for(qint32 channels = 0; channels < 5; channels++)
             for(qint32 i = 0; i < 1024; i++)
-                _signal_matrix(i, channels) = _datas(channels, i);
+                _signal_matrix(i, channels) = _datas(channels, i);// * 10000000000;
     }
     else
     {
@@ -257,6 +259,7 @@ void MainWindow::open_file()
         this->item->setData(Qt::Checked, Qt::CheckStateRole);
         this->model->insertRow(channels, this->item);
         this->items.push_back(this->item);
+        select_channel_map.insert(channels, true);
     }
     ui->cb_channels->setModel(this->model);
 
@@ -271,84 +274,33 @@ void MainWindow::open_file()
 void MainWindow::cb_selection_changed(const QModelIndex& topLeft, const QModelIndex& bottomRight)
 {
     QStandardItem* item = this->items[topLeft.row()];
-    if(item->checkState() == Qt::Unchecked)
+    if(item->checkState() == Qt::Unchecked)    
+        select_channel_map[topLeft.row()] = false;
+    else if(item->checkState() == Qt::Checked)    
+        select_channel_map[topLeft.row()] = true;
+
+    qint32 size = 0;
+
+    for(qint32 i = 0; i < _original_signal_matrix.cols(); i++)
     {
-       _signal_matrix = remove_column(_signal_matrix, topLeft.row());
+        if(select_channel_map[i] == true)
+            size++;
     }
-    else if(item->checkState() == Qt::Checked)
+
+    _signal_matrix.resize(_original_signal_matrix.rows(), size);
+    qint32 selected_chn = 0;
+
+    for(qint32 channels = 0; channels < _original_signal_matrix.cols(); channels++)
     {
-       VectorXd vec = _original_signal_matrix.col(topLeft.row());
-       _signal_matrix =  add_column_at(_signal_matrix,  vec,  topLeft.row());
+
+
+        if(select_channel_map[channels] == true)
+        {
+            _signal_matrix.col(selected_chn) = _original_signal_matrix.col(channels);
+            selected_chn++;
+        }
     }
     update();
-}
-
-//*************************************************************************************************************************************
-
-MatrixXd MainWindow::add_row_at(MatrixXd& matrix, VectorXd& rowData, qint32 rowNumber)
-{
-   matrix.conservativeResize(matrix.rows() + 1, Eigen::NoChange);
-   if(rowNumber > matrix.rows())
-       matrix.row(matrix.rows() - 1) = rowData;
-   qint32 i = rowNumber;
-   while(i < matrix.rows())
-   {
-        RowVectorXd vec1 = VectorXd::Zero(matrix.rows());
-        vec1 = matrix.row(i);
-        matrix.row(i) = rowData;
-        rowData = vec1;
-        i++;
-   }
-   return matrix;
-}
-
-//*************************************************************************************************************************************
-
-MatrixXd MainWindow::add_column_at(MatrixXd& matrix, VectorXd& rowData, qint32 colNumber)
-{
-    matrix.conservativeResize(Eigen::NoChange, matrix.cols() + 1);
-   if(colNumber > matrix.cols())
-       matrix.col(matrix.cols() - 1) = rowData;
-   qint32 i = colNumber;
-   while(i < matrix.cols())
-   {
-        RowVectorXd vec1 = VectorXd::Zero(matrix.cols());
-        vec1 = matrix.col(i);
-        matrix.col(i) = rowData;
-        rowData = vec1;
-        i++;
-   }
-   return matrix;
-}
-
-//*************************************************************************************************************************************
-
-MatrixXd MainWindow::remove_row(MatrixXd& matrix, qint32 rowToRemove)
-{
-    qint32 numRows = matrix.rows()-1;
-    qint32 numCols = matrix.cols();
-
-    if( rowToRemove < numRows )
-        matrix.block(rowToRemove,0,numRows-rowToRemove,numCols) = matrix.block(rowToRemove+1,0,numRows-rowToRemove,numCols);
-
-    matrix.conservativeResize(numRows,numCols);
-
-    return matrix;
-}
-
-//*************************************************************************************************************************************
-
-MatrixXd MainWindow::remove_column(MatrixXd& matrix, qint32 colToRemove)
-{
-    qint32 numRows = matrix.rows();
-    qint32 numCols = matrix.cols()-1;
-
-    if( colToRemove < numCols )
-        matrix.block(0,colToRemove,numRows,numCols-colToRemove) = matrix.block(0,colToRemove+1,numRows,numCols-colToRemove);
-
-    matrix.conservativeResize(numRows,numCols);
-
-    return matrix;
 }
 
 //*************************************************************************************************************************************
@@ -533,15 +485,19 @@ void GraphWindow::PaintSignal(MatrixXd signalMatrix, VectorXd residuumSamples, Q
         painter.fillRect(0,0,windowSize.width(),windowSize.height(),QBrush(Qt::white));
 
         // find min and max of signal
-        i = 0;
-        while(i < signalMatrix.rows())
-        {
-            if(signalMatrix(i, 0) > maxPos)
-                maxPos = signalMatrix(i, 0);
 
-            if(signalMatrix(i, 0) < maxNeg )
-                maxNeg = signalMatrix(i, 0);
-            i++;
+        for(qint32 channels = 0; channels < _signal_matrix.cols(); channels++)
+        {
+            i = 0;
+            while(i < signalMatrix.rows())
+            {
+                if(signalMatrix(i, channels) > maxPos)
+                    maxPos = signalMatrix(i, channels);
+
+                if(signalMatrix(i, channels) < maxNeg )
+                    maxNeg = signalMatrix(i, channels);
+                i++;
+            }
         }
 
         if(maxPos > fabs(maxNeg)) absMin = maxNeg;        // find absolute minimum of (maxPos, maxNeg)
@@ -587,7 +543,7 @@ void GraphWindow::PaintSignal(MatrixXd signalMatrix, VectorXd residuumSamples, Q
         _signal_maximum = maxmax;
 
         // scale axis title
-        qreal scaleXText = (qreal)signalMatrix.rows() / (qreal)20;     // divide signallegnth
+        qreal scaleXText = (qreal)signalMatrix.rows() / (qreal)20;     // divide signallength
         qreal scaleYText = (qreal)maxmax / (qreal)10;
         qint32 negScale =  floor((maxNeg * 10 / maxmax)+0.5);
         _signal_negative_scale = negScale;
@@ -1027,10 +983,9 @@ void MainWindow::on_btt_Calc_clicked()
 
 //*************************************************************************************************************
 
-qint32 counter = 1;
 void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations, qreal current_energy, qreal max_energy, gabor_atom_list atom_res_list)
 {
-    update();
+    //update();
     QString res_energy_str = ui->tb_ResEnergy->text();
     res_energy_str.replace(",", ".");
     qreal percent = res_energy_str.toFloat();
@@ -1095,13 +1050,17 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
     //plot result of mp algorithm, this is buggy: du läufst durch den slot doppelt so oft durch wie du atom findest... daswegen sind alle paints doppelt so groß bzw klein: siehe Counter
     VectorXd discret_atom = gaborAtom.create_real(gaborAtom.sample_count, gaborAtom.scale, gaborAtom.translation, gaborAtom.modulation, gaborAtom.phase);
 
-    std::cout << "Counter: " << counter << '\n';
-    counter++;
-
     _atom_sum_vector += gaborAtom.max_scalar_product * discret_atom;
     _residuum_vector -= gaborAtom.max_scalar_product * discret_atom;
 
     update();
+}
+
+//*************************************************************************************************************
+
+void MainWindow::calc_thread_finished()
+{
+    ui->btt_Calc->setText("ENDE");
 }
 
 //*************************************************************************************************************
@@ -1111,23 +1070,17 @@ void MainWindow::CalcAdaptivMP(MatrixXd signal, TruncationCriterion criterion)
     //TODO: clean up that mess
     AdaptiveMp *adaptive_Mp = new AdaptiveMp();
     _atom_sum_vector = VectorXd::Zero(signal.rows());
-    _residuum_vector = signal;
-
-    connect(adaptive_Mp, SIGNAL(current_result(qint32, qint32, qreal, qreal, gabor_atom_list)),
-                    this, SLOT(recieve_result(qint32, qint32, qreal, qreal, gabor_atom_list)));
-    connect(this, SIGNAL(send_input(MatrixXd, qint32, qreal)), adaptive_Mp, SLOT(recieve_input(MatrixXd, qint32, qreal)));
-
+    _residuum_vector = signal.col(0);
     QString res_energy_str = ui->tb_ResEnergy->text();
     res_energy_str.replace(",", ".");
 
-    //todo threading
+    //threading
     QThread* adaptive_Mp_Thread = new QThread;
     adaptive_Mp->moveToThread(adaptive_Mp_Thread);
     qRegisterMetaType<Eigen::MatrixXd>("MatrixXd");
-    //qRegisterMetaType<MNELIB::GaborAtom>("GaborAtom");
     qRegisterMetaType<gabor_atom_list>("gabor_atom_list");
 
-    //todo connect thread
+    //connect(this, SIGNAL(send_input(MatrixXd, qint32, qreal)), adaptive_Mp, SLOT(recieve_input(MatrixXd, qint32, qreal)));
     connect(this, SIGNAL(send_input(MatrixXd, qint32, qreal)), adaptive_Mp, SLOT(recieve_input(MatrixXd, qint32, qreal)));
     connect(adaptive_Mp, SIGNAL(current_result(qint32, qint32, qreal, qreal, gabor_atom_list)),
                  this, SLOT(recieve_result(qint32, qint32, qreal, qreal, gabor_atom_list)));
@@ -1135,6 +1088,7 @@ void MainWindow::CalcAdaptivMP(MatrixXd signal, TruncationCriterion criterion)
     connect(adaptive_Mp, SIGNAL(finished()), adaptive_Mp_Thread, SLOT(quit()));
     connect(adaptive_Mp, SIGNAL(finished()), adaptive_Mp, SLOT(deleteLater()));
     connect(adaptive_Mp_Thread, SIGNAL(finished()), adaptive_Mp_Thread, SLOT(deleteLater()));
+    connect(adaptive_Mp_Thread, SIGNAL(finished()), this, SLOT(calc_thread_finished()));
 
     switch(criterion)
     {
@@ -1142,7 +1096,6 @@ void MainWindow::CalcAdaptivMP(MatrixXd signal, TruncationCriterion criterion)
         {
             emit send_input(signal, ui->sb_Iterations->value(), qreal(MININT32));
             adaptive_Mp_Thread->start();
-            //adaptive_Mp->matching_pursuit(signal, ui->sb_Iterations->value(), qreal(MININT32));
         }
         break;
 
@@ -1150,8 +1103,7 @@ void MainWindow::CalcAdaptivMP(MatrixXd signal, TruncationCriterion criterion)
         {
             //must be debugged, thread is not ending like i want it to
             emit send_input(signal, MAXINT32, res_energy_str.toFloat());
-            adaptive_Mp_Thread->start();
-        //    myAtomList = adaptive_Mp->matching_pursuit(signal, MAXINT32, res_energy_str.toFloat());
+            adaptive_Mp_Thread->start();        
         }
         break;
 
@@ -1160,7 +1112,6 @@ void MainWindow::CalcAdaptivMP(MatrixXd signal, TruncationCriterion criterion)
             //must be debugged, thread is not ending like i want it to
             emit send_input(signal, ui->sb_Iterations->value(), res_energy_str.toFloat());
             adaptive_Mp_Thread->start();
-            //adaptive_Mp->matching_pursuit(signal, ui->sb_Iterations->value(), res_energy_str.toFloat());
         }
         break;
     }
@@ -1172,9 +1123,10 @@ void MainWindow::on_tbv_Results_cellClicked(int row, int column)
 {
     QTableWidgetItem* firstItem = ui->tbv_Results->item(row, 0);
     GaborAtom atom = _my_atom_list.at(row);
+
     if(firstItem->checkState())
     {
-        firstItem->setCheckState(Qt::Unchecked);
+        firstItem->setCheckState(Qt::Unchecked);        
         _atom_sum_vector -= atom.max_scalar_product * atom.create_real(atom.sample_count, atom.scale, atom.translation, atom.modulation, atom.phase);
         _residuum_vector += atom.max_scalar_product * atom.create_real(atom.sample_count, atom.scale, atom.translation, atom.modulation, atom.phase);
     }
