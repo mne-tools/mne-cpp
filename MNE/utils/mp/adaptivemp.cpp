@@ -433,11 +433,12 @@ void AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal 
                 gabor_Atom->energy += (gabor_Atom->max_scalar_list.at(chn) * bestMatch[j]) * (gabor_Atom->max_scalar_list.at(chn) * bestMatch[j]);
             }
 
-            residuum_energy -= gabor_Atom->energy;
-            current_energy += gabor_Atom->energy;
-
             gabor_Atom->residuum = residuum;
         }
+
+        residuum_energy -= gabor_Atom->energy;
+        current_energy += gabor_Atom->energy;
+
         atom_list.append(*gabor_Atom);
 
         delete gabor_Atom;

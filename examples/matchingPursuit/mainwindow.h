@@ -102,7 +102,7 @@ class GraphWindow : public QWidget
 protected:
    void paintEvent(QPaintEvent *event);
 public:
-   void PaintSignal(MatrixXd signalMatrix, VectorXd residuumSamples, QList<QColor> colors, QSize windowSize);
+   void PaintSignal(MatrixXd signalMatrix, QSize windowSize);
 
 };
 
@@ -115,7 +115,7 @@ class AtomSumWindow : public QWidget
 protected:
    void paintEvent(QPaintEvent *event);
 public:
-   void PaintAtomSum(VectorXd signalSamples, QSize windowSize, qreal signalMaximum, qreal signalNegativeMaximum);
+   void PaintAtomSum(MatrixXd atom_matrix, QSize windowSize, qreal signalMaximum, qreal signalNegativeMaximum);
 
 };
 
@@ -128,7 +128,7 @@ class ResiduumWindow : public QWidget
   protected:
     void paintEvent(QPaintEvent *event);
 public:
-   void PaintResiduum(VectorXd signalSamples, QSize windowSize, qreal maxPos, qreal maxNeg);
+   void PaintResiduum(MatrixXd residuum_matrix, QSize windowSize, qreal maxPos, qreal maxNeg);
 
 
 };
