@@ -146,7 +146,7 @@ public:
     *
     * @return Vector with gaussfunction content
     */
-    static VectorXd gauss_function (qint32 sample_count, qreal scale, qint32 translation);
+    static VectorXd gauss_function (qint32 sample_count, qreal scale, quint32 translation);
 
     //=========================================================================================================
     /**
@@ -163,7 +163,7 @@ public:
     *
     * @return complex Vector with GaborAtom
     */
-    VectorXcd create_complex(qint32 sample_count, qreal scale, qint32 translation, qreal modulation);
+    VectorXcd create_complex(qint32 sample_count, qreal scale, quint32 translation, qreal modulation);
 
     //=========================================================================================================
     /**
@@ -181,7 +181,7 @@ public:
     *
     * @return real Vector with GaborAtom
     */
-    VectorXd create_real(qint32 sample_count, qreal scale, qint32 translation, qreal modulation, qreal phase);
+    VectorXd create_real(qint32 sample_count, qreal scale, quint32 translation, qreal modulation, qreal phase);
 
     //=========================================================================================================
     /**
@@ -205,7 +205,7 @@ public:
         qreal phase;
         qreal chirp;
 
-        ChirpAtom(qint32 sampleCount, qreal scale, qint32 translation, qreal modulation, qreal phase, qreal chirp, bool saveToRam = false);
+        ChirpAtom(qint32 sampleCount, qreal scale, quint32 translation, qreal modulation, qreal phase, qreal chirp, bool saveToRam = false);
 
         VectorXcd CreateComplex();
         VectorXd CreateReal();
