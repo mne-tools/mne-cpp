@@ -42,7 +42,6 @@ class ResiduumWindow;
 class AtomSumWindow;
 class Atom;
 
-
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -62,12 +61,11 @@ private slots:
     void on_actionNeu_triggered();
     void on_btt_OpenSignal_clicked();
     void on_tbv_Results_cellClicked(int row, int column);
-    //void iteration_counter(qint32 current_iteration, qint32 max_iterations, qreal current_energy, qreal max_energy, QList<GaborAtom> atom_res_list);
     void cb_selection_changed(const QModelIndex&, const QModelIndex&);
     void recieve_result(qint32 current_iteration, qint32 max_iterations, qreal current_energy, qreal max_energy, gabor_atom_list atom_res_list);
-    //void slot_changed(const QModelIndex&, const QModelIndex&);
 
 signals:
+
     void send_input(MatrixXd send_signal, qint32 send_max_iterations, qreal send_epsilon);
 
 private:
@@ -79,17 +77,18 @@ private:
     QStandardItemModel* model;
     QStandardItem* item;
     std::vector<QStandardItem*> items;
+
     void open_file();
-    QList<qreal> NormSignal(QList<qreal> signalSamples);
-    //QStringList correlation(VectorXd signalSamples, QList<qreal> atomSamples, QString atomName);
-    //VectorXd mpCalc(QFile& dictionary, VectorXd signalSamples, qint32 iterationsCount);
-    qint32 ReadFiffFile(QString fileName);
     void ReadMatlabFile(QString fileName);
     void CalcAdaptivMP(MatrixXd signal, TruncationCriterion criterion);
+    qint32 ReadFiffFile(QString fileName);
+    QList<qreal> NormSignal(QList<qreal> signalSamples);
     MatrixXd remove_column(MatrixXd& matrix, qint32 colToRemove);
     MatrixXd remove_row(MatrixXd& matrix, qint32 rowToRemove);
     MatrixXd add_row_at(MatrixXd& matrix, VectorXd &rowData, qint32 rowNumber);
     MatrixXd add_column_at(MatrixXd& matrix, VectorXd& rowData, qint32 colNumber);
+    //QStringList correlation(VectorXd signalSamples, QList<qreal> atomSamples, QString atomName);
+    //VectorXd mpCalc(QFile& dictionary, VectorXd signalSamples, qint32 iterationsCount);
 
 };
 
