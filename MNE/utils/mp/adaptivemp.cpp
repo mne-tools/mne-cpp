@@ -126,11 +126,13 @@ void AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal 
                     //complex correlation of signal and sinus-modulated gaussfunction
                     for(qint32 l = 0; l< sample_count; l++)
                         modulated_resid[l] = residuum(l, chn) * modulation[l];
+                    //modulated_resid = residuum.row(chn) * modulation;
 
                     fft.fwd(fft_modulated_resid, modulated_resid);
 
                     for( qint32 m = 0; m < sample_count; m++)
-                        fft_m_e_resid[m] = fft_modulated_resid[m] * conj(fft_envelope[m]);
+                    fft_m_e_resid[m] = fft_modulated_resid[m] * conj(fft_envelope[m]);
+                    //fft_m_e_resid = fft_modulated_resid * conj(fft_envelope);
 
                     fft.inv(corr_coeffs, fft_m_e_resid);
                     maximum = corr_coeffs[0];
@@ -284,7 +286,6 @@ void AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal 
                 {
                     if(vf[i]<vf[x1])      x1 = i;
                     if(vf[i]>vf[xnp1])    xnp1 = i;
-
                 }
 
                 xn = x1;
@@ -326,7 +327,7 @@ void AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal 
 
                 //create targetfunction of realGaborAtom and Residuum
                 double fxr = 0;
-                for(qint32 k = 0; k < atom_fxr.rows(); k++) fxr -=atom_fxr[k]*residuum(k,0);
+                for(qint32 k = 0; k < atom_fxr.rows(); k++) fxr -=atom_fxr[k]*residuum(k,chn);//ToDo: old residuum(k,0)
 
                 //double fxr = target;//record function at xr
 
@@ -349,7 +350,7 @@ void AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal 
 
                     //create targetfunction of realGaborAtom and Residuum
                     double fxe = 0;
-                    for(qint32 k = 0; k < atom_fxe.rows(); k++) fxe -=atom_fxe[k]*residuum(k,0);
+                    for(qint32 k = 0; k < atom_fxe.rows(); k++) fxe -=atom_fxe[k]*residuum(k,chn);//ToDo: old residuum(k,0)
 
                     if( fxe < fxr ) std::copy(xe.begin(), xe.end(), x[xnp1].begin() );
                     else std::copy(xr.begin(), xr.end(), x[xnp1].begin() );
@@ -380,7 +381,7 @@ void AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal 
                     double fxc = 0;
 
                     for(qint32 k = 0; k < atom_fxc.rows(); k++)
-                        fxc -=atom_fxc[k]*residuum(k,0);
+                        fxc -=atom_fxc[k]*residuum(k,chn);//ToDo: old residuum(k,0)
 
                     if( fxc < vf[xnp1] )
                         std::copy(xc.begin(), xc.end(), x[xnp1].begin() );
@@ -399,7 +400,7 @@ void AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal 
             else
                 atom_fxc_params = AdaptiveMp::calculate_atom(sample_count, x[x1][0], x[x1][1], x[x1][2], chn, residuum, RETURNPARAMETERS);
 
-            if(abs(atom_fxc_params[4]) > abs(max_scalar_product))
+            if(abs(atom_fxc_params[4]) > abs(max_scalar_product) && atom_fxc_params[0] < sample_count && atom_fxc_params[0] > 0 && atom_fxc_params[1] < sample_count && atom_fxc_params[1] > 0)
             {
                 max_scalar_product = atom_fxc_params[4];             //scalarProduct
                 gabor_Atom->scale              = atom_fxc_params[0];//scale
@@ -438,6 +439,8 @@ void AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal 
 
         residuum_energy -= gabor_Atom->energy;
         current_energy += gabor_Atom->energy;
+
+        std::cout << "energy of residuum: " << residuum_energy << "\n";
 
         atom_list.append(*gabor_Atom);
 
