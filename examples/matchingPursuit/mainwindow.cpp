@@ -77,11 +77,12 @@ qreal _draw_factor = 0;
 QMap<qint32, bool> select_channel_map;
 
 QList<QColor> _colors;
+QList<QColor> _original_colors;
 
 MatrixXd _signal_matrix(0, 0);
 MatrixXd _original_signal_matrix(0,0);
-VectorXd _residuum_vector;
-VectorXd _atom_sum_vector;
+MatrixXd _residuum_matrix(0,0);
+MatrixXd _atom_sum_matrix(0,0);
 QList<GaborAtom> _my_atom_list;
 //QList<QStringList> _result_atom_list;
 
@@ -233,11 +234,11 @@ void MainWindow::open_file()
 
     if(fileName.endsWith(".fif", Qt::CaseInsensitive))        
     {    ReadFiffFile(fileName);
-        _signal_matrix.resize(1024,5);
-        _original_signal_matrix.resize(1024,5);
+        _signal_matrix.resize(256,5);
+        _original_signal_matrix.resize(256,5);
         // ToDo: find good fiff signal part
         for(qint32 channels = 0; channels < 5; channels++)
-            for(qint32 i = 0; i < 1024; i++)
+            for(qint32 i = 0; i < 256; i++)
                 _signal_matrix(i, channels) = _datas(channels, i);// * 10000000000;
     }
     else
@@ -262,9 +263,9 @@ void MainWindow::open_file()
         select_channel_map.insert(channels, true);
     }
     ui->cb_channels->setModel(this->model);
-
-    _atom_sum_vector = VectorXd::Zero(_signal_matrix.rows());
-    _residuum_vector = VectorXd::Zero(_signal_matrix.rows());
+    _original_colors = _colors;
+    _atom_sum_matrix.resize(_signal_matrix.rows(), _signal_matrix.cols());
+    _residuum_matrix.resize(_signal_matrix.rows(), _signal_matrix.cols());
 
     update();   
 }
@@ -281,25 +282,25 @@ void MainWindow::cb_selection_changed(const QModelIndex& topLeft, const QModelIn
 
     qint32 size = 0;
 
-    for(qint32 i = 0; i < _original_signal_matrix.cols(); i++)
-    {
+    for(qint32 i = 0; i < _original_signal_matrix.cols(); i++)    
         if(select_channel_map[i] == true)
             size++;
-    }
+
 
     _signal_matrix.resize(_original_signal_matrix.rows(), size);
+    _atom_sum_matrix.resize(_original_signal_matrix.rows(), size);
+    _residuum_matrix.resize(_original_signal_matrix.rows(), size);
+
+    _colors.clear();
     qint32 selected_chn = 0;
 
-    for(qint32 channels = 0; channels < _original_signal_matrix.cols(); channels++)
-    {
-
-
+    for(qint32 channels = 0; channels < _original_signal_matrix.cols(); channels++)    
         if(select_channel_map[channels] == true)
         {
+            _colors.append(_original_colors.at(channels));
             _signal_matrix.col(selected_chn) = _original_signal_matrix.col(channels);
             selected_chn++;
         }
-    }
     update();
 }
 
@@ -309,8 +310,8 @@ qint32 MainWindow::ReadFiffFile(QString fileName)
 {
     QFile t_fileRaw(fileName);
 
-    float from = 42.956f;
-    float to = 50.670f;
+    float from = 47.000f;
+    float to = 49.000f;
 
     bool in_samples = false;
 
@@ -455,12 +456,12 @@ void MainWindow::ReadMatlabFile(QString fileName)
 
 void GraphWindow::paintEvent(QPaintEvent* event)
 {
-    PaintSignal(_signal_matrix, _residuum_vector, _colors, this->size());
+    PaintSignal(_signal_matrix, this->size());
 }
 
 //*************************************************************************************************************************************
 
-void GraphWindow::PaintSignal(MatrixXd signalMatrix, VectorXd residuumSamples, QList<QColor> colors, QSize windowSize)
+void GraphWindow::PaintSignal(MatrixXd signalMatrix, QSize windowSize)
 {
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing, true);
@@ -639,12 +640,12 @@ void GraphWindow::PaintSignal(MatrixXd signalMatrix, VectorXd residuumSamples, Q
 
 void AtomSumWindow::paintEvent(QPaintEvent* event)
 {
-   PaintAtomSum(_atom_sum_vector, this->size(), _signal_maximum, _signal_negative_scale);
+   PaintAtomSum(_atom_sum_matrix, this->size(), _signal_maximum, _signal_negative_scale);
 }
 
 //*************************************************************************************************************************************
 
-void AtomSumWindow::PaintAtomSum(VectorXd signalSamples, QSize windowSize, qreal signalMaximum, qreal signalNegativeMaximum)
+void AtomSumWindow::PaintAtomSum(MatrixXd atom_matrix, QSize windowSize, qreal signalMaximum, qreal signalNegativeMaximum)
 {
     // paint window white
     QPainter painter(this);
@@ -652,7 +653,7 @@ void AtomSumWindow::PaintAtomSum(VectorXd signalSamples, QSize windowSize, qreal
     painter.fillRect(0,0,windowSize.width(),windowSize.height(),QBrush(Qt::white));
 
     // can also checked of zerovector, then you paint no empty axis
-    if(signalSamples.rows() > 0 && _signal_matrix.rows() > 0 && _signal_matrix.cols() > 0)
+    if(atom_matrix.rows() > 0 && atom_matrix.cols() > 0  && _signal_matrix.rows() > 0 && _signal_matrix.cols() > 0)
     {
         qint32 borderMarginHeigth = 15;                     // reduce paintspace in GraphWindow of borderMargin pixels
         qint32 borderMarginWidth = 5;                       // reduce paintspace in GraphWindow of borderMargin pixels
@@ -661,13 +662,15 @@ void AtomSumWindow::PaintAtomSum(VectorXd signalSamples, QSize windowSize, qreal
         qint32 drawFactor = _draw_factor;                   // shift factor for decimal places (linear)
         qint32 startDrawFactor = 1;                         // shift factor for decimal places (exponential-base 10)
         qint32 decimalPlace = 0;                            // decimal places for axis title
-        QPolygonF polygons;                                 // points for drwing the signal
-        VectorXd internSignalVector = signalSamples;        // intern representation of y-axis values of the signal (for painting only)
+        QList<QPolygonF> polygons;                          // points for drawing the signal
+        MatrixXd internSignalMatrix = atom_matrix;          // intern representation of y-axis values of the signal (for painting only)
+
 
         while(drawFactor > 0)
         {
-            for(qint32 sample = 0; sample < signalSamples.rows(); sample++)
-                internSignalVector(sample) *= 10;
+            for(qint32 channels = 0; channels < atom_matrix.cols(); channels++)
+                for(qint32 sample = 0; sample < atom_matrix.rows(); sample++)
+                    internSignalMatrix(sample, channels) *= 10;
 
             startDrawFactor = startDrawFactor * 10;
             decimalPlace++;
@@ -677,7 +680,7 @@ void AtomSumWindow::PaintAtomSum(VectorXd signalSamples, QSize windowSize, qreal
 
 
         // scale axis title
-        qreal scaleXText = (qreal)signalSamples.rows() / (qreal)20;     // divide signallegnth
+        qreal scaleXText = (qreal)atom_matrix.rows() / (qreal)20;     // divide signallegnth
         qreal scaleYText = (qreal)signalMaximum / (qreal)10;
 
         //find lenght of text of y-axis for shift of y-axis to the right (so the text will stay readable and is not painted into the y-axis
@@ -701,7 +704,7 @@ void AtomSumWindow::PaintAtomSum(VectorXd signalSamples, QSize windowSize, qreal
         while((windowSize.width() - maxStrLenght -borderMarginWidth) % 20)borderMarginWidth++;
 
         // scale signal
-        qreal scaleX = ((qreal)(windowSize.width() - maxStrLenght - borderMarginWidth))/ (qreal)signalSamples.rows();
+        qreal scaleX = ((qreal)(windowSize.width() - maxStrLenght - borderMarginWidth))/ (qreal)atom_matrix.rows();
         qreal scaleY = (qreal)(windowSize.height() - borderMarginHeigth) / (qreal)signalMaximum;
 
         //scale axis
@@ -723,11 +726,17 @@ void AtomSumWindow::PaintAtomSum(VectorXd signalSamples, QSize windowSize, qreal
             if(signalNegativeMaximum == 0)                                                           // x-Axis reached (y-value = 0)
             {
                 // append scaled signalpoints
-                qint32 h = 0;
-                while(h < signalSamples.rows())
+                for(qint32 channel = 0; channel < atom_matrix.cols(); channel++)       // over all Channels
                 {
-                    polygons.append(QPointF((h * scaleX) + maxStrLenght,  -((internSignalVector[h] * scaleY + ((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2))));
-                    h++;
+                    // append scaled signalpoints
+                    QPolygonF poly;
+                    qint32 h = 0;
+                    while(h < atom_matrix.rows())
+                    {
+                        poly.append(QPointF((h * scaleX) + maxStrLenght,  -((internSignalMatrix(h, channel) * scaleY + ((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2))));
+                        h++;
+                    }
+                    polygons.append(poly);
                 }
 
                 // paint x-axis
@@ -748,11 +757,14 @@ void AtomSumWindow::PaintAtomSum(VectorXd signalSamples, QSize windowSize, qreal
             i++;
             signalNegativeMaximum++;
         }
-
         painter.drawLine(maxStrLenght, 2, maxStrLenght, windowSize.height() - 2);     // paint y-axis
-        QPen pen(Qt::black, 0.5, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
-        painter.setPen(pen);
-        painter.drawPolyline(polygons);                  // paint signal
+
+        for(qint32 channel = 0; channel < atom_matrix.cols(); channel++)             // Butterfly
+        {
+            QPen pen(_colors.at(channel), 0.5, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+            painter.setPen(pen);
+            painter.drawPolyline(polygons.at(channel));                               // paint signal
+        }
     }
     painter.end();
 }
@@ -761,34 +773,35 @@ void AtomSumWindow::PaintAtomSum(VectorXd signalSamples, QSize windowSize, qreal
 
 void ResiduumWindow::paintEvent(QPaintEvent* event)
 {
-   PaintResiduum(_residuum_vector, this->size(), _signal_maximum, _signal_negative_scale);
+   PaintResiduum(_residuum_matrix, this->size(), _signal_maximum, _signal_negative_scale);
 }
 
 //*************************************************************************************************************************************
 
-void ResiduumWindow::PaintResiduum(VectorXd signalSamples, QSize windowSize, qreal signalMaximum, qreal signalNegativeMaximum)
+void ResiduumWindow::PaintResiduum(MatrixXd residuum_matrix, QSize windowSize, qreal signalMaximum, qreal signalNegativeMaximum)
 {
     // paint window white
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing, true);
     painter.fillRect(0,0,windowSize.width(),windowSize.height(),QBrush(Qt::white));
 
-    if(signalSamples.rows() > 0 && _signal_matrix.rows() > 0 && _signal_matrix.cols() > 0)
+    if(residuum_matrix.rows() > 0 && residuum_matrix.cols() > 0 && _signal_matrix.rows() > 0 && _signal_matrix.cols() > 0)
     {
         qint32 borderMarginHeigth = 15;                 // reduce paintspace in GraphWindow of borderMargin pixels
         qint32 borderMarginWidth = 5;                   // reduce paintspace in GraphWindow of borderMargin pixels
         qint32 i = 0;
         qreal maxNeg = _max_neg;                        // smalest signalvalue vom AusgangsSignal
-        qint32 drawFactor = _draw_factor;   // shift factor for decimal places (linear)
-        qint32 startDrawFactor = 1;         // shift factor for decimal places (exponential-base 10)
+        qint32 drawFactor = _draw_factor;               // shift factor for decimal places (linear)
+        qint32 startDrawFactor = 1;                     // shift factor for decimal places (exponential-base 10)
         qint32 decimalPlace = 0;                        // decimal places for axis title
-        QPolygonF polygons;                             // points for drwing the signal
-        VectorXd internSignalVector = signalSamples;    // intern representation of y-axis values of the signal (for painting only)
+        QList<QPolygonF> polygons;                      // points for drawing the signal
+        MatrixXd internSignalVector = residuum_matrix;  // intern representation of y-axis values of the signal (for painting only)
 
         while(drawFactor > 0)
         {
-            for(qint32 sample = 0; sample < signalSamples.rows(); sample++)
-                internSignalVector(sample) *= 10;
+            for(qint32 channels = 0; channels < residuum_matrix.cols(); channels++)
+                for(qint32 sample = 0; sample < residuum_matrix.rows(); sample++)
+                    internSignalVector(sample,channels) *= 10;
 
             startDrawFactor = startDrawFactor * 10;
             decimalPlace++;
@@ -797,7 +810,7 @@ void ResiduumWindow::PaintResiduum(VectorXd signalSamples, QSize windowSize, qre
         }
 
         // scale axis title
-        qreal scaleXText = (qreal)signalSamples.rows() / (qreal)20;     // divide signallegnth
+        qreal scaleXText = (qreal)residuum_matrix.rows() / (qreal)20;     // divide signallegnth
         qreal scaleYText = (qreal)signalMaximum / (qreal)10;
 
         //find lenght of text of y-axis for shift of y-axis to the right (so the text will stay readable and is not painted into the y-axis
@@ -821,7 +834,7 @@ void ResiduumWindow::PaintResiduum(VectorXd signalSamples, QSize windowSize, qre
         while((windowSize.width() - maxStrLenght -borderMarginWidth) % 20)borderMarginWidth++;
 
         // scale signal
-        qreal scaleX = ((qreal)(windowSize.width() - maxStrLenght - borderMarginWidth))/ (qreal)signalSamples.rows();
+        qreal scaleX = ((qreal)(windowSize.width() - maxStrLenght - borderMarginWidth))/ (qreal)residuum_matrix.rows();
         qreal scaleY = (qreal)(windowSize.height() - borderMarginHeigth) / (qreal)signalMaximum;
 
         //scale axis
@@ -843,11 +856,18 @@ void ResiduumWindow::PaintResiduum(VectorXd signalSamples, QSize windowSize, qre
             if(signalNegativeMaximum == 0)                                                          // x-axis reached (y-value = 0)
             {
                 // append scaled signalpoints
-                qint32 h = 0;
-                while(h < signalSamples.rows())
+                for(qint32 channel = 0; channel < residuum_matrix.cols(); channel++)       // over all Channels
                 {
-                    polygons.append(QPointF((h * scaleX) + maxStrLenght,  -((internSignalVector[h] * scaleY + ((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2))));
-                    h++;
+                    // append scaled signalpoints
+                    QPolygonF poly;
+                    // append scaled signalpoints
+                    qint32 h = 0;
+                    while(h < residuum_matrix.rows())
+                    {
+                        poly.append(QPointF((h * scaleX) + maxStrLenght,  -((internSignalVector(h, channel) * scaleY + ((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2))));
+                        h++;
+                    }
+                    polygons.append(poly);
                 }
 
                 // paint x-axis
@@ -869,10 +889,14 @@ void ResiduumWindow::PaintResiduum(VectorXd signalSamples, QSize windowSize, qre
             signalNegativeMaximum++;
         }
 
-        painter.drawLine(maxStrLenght, 2, maxStrLenght, windowSize.height() - 2);     // paint y-axis
-        QPen pen(Qt::black, 0.5, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
-        painter.setPen(pen);
-        painter.drawPolyline(polygons);                  // paint signal
+        painter.drawLine(maxStrLenght, 2, maxStrLenght, windowSize.height() - 2);       // paint y-axis
+
+        for(qint32 channel = 0; channel < residuum_matrix.cols(); channel++)            // Butterfly
+        {
+            QPen pen(_colors.at(channel), 0.5, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+            painter.setPen(pen);
+            painter.drawPolyline(polygons.at(channel));                               // paint signal
+        }
     }
     painter.end();
 }
@@ -1009,7 +1033,7 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
         QTableWidgetItem* atomScaleItem = new QTableWidgetItem(QString::number(atom_res_list[i].scale, 'g', 3));
         QTableWidgetItem* atomTranslationItem = new QTableWidgetItem(QString::number(atom_res_list[i].translation, 'g', 3));
         QTableWidgetItem* atomModulationItem = new QTableWidgetItem(QString::number(atom_res_list[i].modulation, 'g', 3));
-        QTableWidgetItem* atomPhaseItem = new QTableWidgetItem(QString::number(atom_res_list[i].phase, 'g', 3));
+        QTableWidgetItem* atomPhaseItem = new QTableWidgetItem(QString::number(atom_res_list[i].phase_list.first(), 'g', 3));
 
 
         atomEnergieItem->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
@@ -1048,11 +1072,17 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
     GaborAtom gaborAtom = atom_res_list.last();
 
     //plot result of mp algorithm, this is buggy: du läufst durch den slot doppelt so oft durch wie du atom findest... daswegen sind alle paints doppelt so groß bzw klein: siehe Counter
-    VectorXd discret_atom = gaborAtom.create_real(gaborAtom.sample_count, gaborAtom.scale, gaborAtom.translation, gaborAtom.modulation, gaborAtom.phase);
+    for(qint32 i = 0; i < _signal_matrix.cols(); i++)
+    {
+        VectorXd discret_atom = gaborAtom.create_real(gaborAtom.sample_count, gaborAtom.scale, gaborAtom.translation, gaborAtom.modulation, gaborAtom.phase_list.at(i));
 
-    _atom_sum_vector += gaborAtom.max_scalar_product * discret_atom;
-    _residuum_vector -= gaborAtom.max_scalar_product * discret_atom;
 
+
+
+    _atom_sum_matrix.col(i) += gaborAtom.max_scalar_list.at(i) * discret_atom;
+    //std::cout << _atom_sum_matrix.col(i) << "\n";
+    _residuum_matrix.col(i) -= gaborAtom.max_scalar_list.at(i)  * discret_atom;
+    }
     update();
 }
 
@@ -1069,8 +1099,9 @@ void MainWindow::CalcAdaptivMP(MatrixXd signal, TruncationCriterion criterion)
 {
     //TODO: clean up that mess
     AdaptiveMp *adaptive_Mp = new AdaptiveMp();
-    _atom_sum_vector = VectorXd::Zero(signal.rows());
-    _residuum_vector = signal.col(0);
+    _atom_sum_matrix = MatrixXd::Zero(signal.rows(), signal.cols());
+    std::cout << _atom_sum_matrix << "\n";
+    _residuum_matrix = signal;
     QString res_energy_str = ui->tb_ResEnergy->text();
     res_energy_str.replace(",", ".");
 
@@ -1126,15 +1157,21 @@ void MainWindow::on_tbv_Results_cellClicked(int row, int column)
 
     if(firstItem->checkState())
     {
-        firstItem->setCheckState(Qt::Unchecked);        
-        _atom_sum_vector -= atom.max_scalar_product * atom.create_real(atom.sample_count, atom.scale, atom.translation, atom.modulation, atom.phase);
-        _residuum_vector += atom.max_scalar_product * atom.create_real(atom.sample_count, atom.scale, atom.translation, atom.modulation, atom.phase);
+        firstItem->setCheckState(Qt::Unchecked);
+        for(qint32 channels = 0; channels < atom.phase_list.length(); channels++)
+        {
+            _atom_sum_matrix.col(channels) -= atom.max_scalar_list.at(channels) * atom.create_real(atom.sample_count, atom.scale, atom.translation, atom.modulation, atom.phase_list.at(channels));
+            _residuum_matrix.col(channels) += atom.max_scalar_list.at(channels) * atom.create_real(atom.sample_count, atom.scale, atom.translation, atom.modulation, atom.phase_list.at(channels));
+        }
     }
     else
     {
         firstItem->setCheckState(Qt::Checked);
-        _atom_sum_vector += atom.max_scalar_product * atom.create_real(atom.sample_count, atom.scale, atom.translation, atom.modulation, atom.phase);
-        _residuum_vector -= atom.max_scalar_product * atom.create_real(atom.sample_count, atom.scale, atom.translation, atom.modulation, atom.phase);
+        for(qint32 channels = 0; channels < atom.phase_list.length(); channels++)
+        {
+            _atom_sum_matrix.col(channels) += atom.max_scalar_list.at(channels) * atom.create_real(atom.sample_count, atom.scale, atom.translation, atom.modulation, atom.phase_list.at(channels));
+            _residuum_matrix.col(channels) -= atom.max_scalar_list.at(channels) * atom.create_real(atom.sample_count, atom.scale, atom.translation, atom.modulation, atom.phase_list.at(channels));
+        }
     }
     update();
 }
