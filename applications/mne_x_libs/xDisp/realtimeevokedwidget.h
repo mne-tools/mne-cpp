@@ -150,6 +150,12 @@ public:
 
     //=========================================================================================================
     /**
+    * Is called when new data are available.
+    */
+    virtual void getData();
+
+    //=========================================================================================================
+    /**
     * Initialise the RealTimeEvokedWidget.
     */
     virtual void init();
@@ -237,14 +243,6 @@ private:
 
     //=========================================================================================================
     /**
-    * Sets new time window size
-    *
-    * @param [in] T  time window size;
-    */
-    void timeWindowChanged(int T);
-
-    //=========================================================================================================
-    /**
     * Shows sensor selection widget
     */
     void showSensorSelectionWidget();
@@ -252,27 +250,22 @@ private:
     RealTimeEvokedModel*        m_pRTEModel;            /**< RTE data model */
     RealTimeButterflyPlot*      m_pButterflyPlot;       /**< Butterfly plot */
 
-    float m_fDefaultSectionSize;                            /**< Default row height */
     float m_fZoomFactor;                                    /**< Zoom factor */
     QDoubleSpinBox* m_pDoubleSpinBoxZoom;                   /**< Adjust Zoom Factor */
-
 
     QSharedPointer<RealTimeEvoked> m_pRTE;                  /**< The real-time evoked measurement. */
 
     bool m_bInitialized;                                    /**< Is Initialized */
 
-    QList<RealTimeSampleArrayChInfo> m_qListChInfo;         /**< Channel info list. ToDo: check if this is obsolete later on*/
+    QList<QColor>                       m_qListChColors;    /**< Channel color for butterfly plot.*/
+    QList<RealTimeSampleArrayChInfo>    m_qListChInfo;      /**< Channel info list. ToDo: check if this is obsolete later on*/
 
     float m_fSamplingRate;                                  /**< Sampling rate */
 
-    QSpinBox*   m_pSpinBoxTimeScale;                        /**< Time scale spin box */
-
     QAction*    m_pActionSelectSensors;                     /**< show roi select widget */
-
 
     SensorModel* m_pSensorModel;                            /**< Sensor model for channel selection */
     QSharedPointer<SensorWidget> m_pSensorSelectionWidget;  /**< Sensor selection widget. */
-
 
     QList<qint32> m_qListCurrentSelection;  /**< Current selection list -> hack around C++11 lambda  */
     void applySelection();                  /**< apply the in m_qListCurrentSelection stored selection -> hack around C++11 lambda */

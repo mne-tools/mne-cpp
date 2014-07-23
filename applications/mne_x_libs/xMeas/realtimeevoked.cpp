@@ -40,6 +40,8 @@
 
 #include "realtimeevoked.h"
 
+#include <time.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -65,6 +67,7 @@ using namespace XMEASLIB;
 RealTimeEvoked::RealTimeEvoked(QObject *parent)
 : NewMeasurement(QMetaType::type("RealTimeEvoked::SPtr"), parent)
 , m_bChInfoIsInit(false)
+, m_bContainsValues(false)
 {
 }
 
@@ -99,8 +102,12 @@ void RealTimeEvoked::initFromFiffInfo(FiffInfo::SPtr &p_pFiffInfo)
     if(p_pFiffInfo->acq_pars == "BabyMEG")
         t_bIsBabyMEG = true;
 
+    qsrand(time(NULL));
+    m_qListChColors.clear();
     for(qint32 i = 0; i < p_pFiffInfo->nchan; ++i)
     {
+         m_qListChColors.append(QColor(qrand() % 256, qrand() % 256, qrand() % 256));
+
         RealTimeSampleArrayChInfo initChInfo;
         initChInfo.setChannelName(p_pFiffInfo->chs[i].ch_name);
 
@@ -243,5 +250,8 @@ void RealTimeEvoked::setValue(MatrixXd& v)
     //Store
     m_matValue = v;
     emit notify();
+
+    if(!m_bContainsValues)
+        m_bContainsValues = true;
 }
 
