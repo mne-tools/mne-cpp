@@ -216,9 +216,6 @@
            <number>5</number>
           </property>
           <item>
-           <widget class="QComboBox" name="cb_channels"/>
-          </item>
-          <item>
            <widget class="QPushButton" name="btt_OpenSignal">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -233,6 +230,9 @@
              <string>read signal</string>
             </property>
            </widget>
+          </item>
+          <item>
+           <widget class="QComboBox" name="cb_channels"/>
           </item>
           <item>
            <widget class="QPushButton" name="btt_Calc">

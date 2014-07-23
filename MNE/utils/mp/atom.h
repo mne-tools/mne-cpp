@@ -7,6 +7,10 @@
 * @version  1.0
 * @date     July, 2014
 *
+* @section  LICENSE
+*
+* Copyright (C) 2014, Daniel Knobl and Martin Henfling All rights reserved.
+*
 * atom class declaration
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
@@ -107,7 +111,6 @@ public:
     qreal max_scalar_product;
     MatrixXd residuum;
     qreal energy;
-    //qreal NormAtom;
     QList<qreal> phase_list;
     QList<qreal> max_scalar_list;
 
@@ -195,7 +198,7 @@ public:
     *
     * @return GaborAtom as String
     */
-    QStringList CreateStringValues();
+    QStringList GaborAtom::CreateStringValues(qint32 sample_count, qreal scale, qint32 translation, qreal modulation, qreal phase);
 
 };
 

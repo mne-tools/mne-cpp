@@ -7,6 +7,10 @@
 * @version  1.0
 * @date     July, 2014
 *
+* @section  LICENSE
+*
+* Copyright (C) 2014, Daniel Knobl and Martin Henfling All rights reserved.
+*
 * ported to mne-cpp by Martin Henfling and Daniel Knobl in May 2014
 * from original code by Maciej Gratkowski
 *
@@ -72,9 +76,9 @@ using namespace UTILSLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-QStringList GaborAtom::CreateStringValues()
+QStringList GaborAtom::CreateStringValues(qint32 sample_count, qreal scale, qint32 translation, qreal modulation, qreal phase)
 {
-    VectorXd atomValues = create_real(GaborAtom::sample_count, GaborAtom::scale, GaborAtom::translation, GaborAtom::modulation, GaborAtom::phase);
+    VectorXd atomValues = create_real(sample_count, scale, translation, modulation, phase);
     QStringList atomStringValues;
     for(qint32 i = 0; i < atomValues.rows(); i++)
         atomStringValues.append(QString("%1").arg(atomValues[i]));
