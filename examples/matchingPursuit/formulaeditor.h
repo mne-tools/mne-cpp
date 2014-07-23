@@ -1,3 +1,39 @@
+//=============================================================================================================
+/**
+* @file     formulaeditor.h
+* @author   Martin Henfling <martin.henfling@tu-ilmenau.de>;
+*           Daniel Knobl <daniel.knobl@tu-ilmenau.de>;
+*           Sebastian Krause <sebastian.krause@tu-ilmenau.de>
+* @version  1.0
+* @date     July, 2014
+*
+* @section  LICENSE
+*
+* Copyright (C) 2014, Martin Henfling, Daniel Knobl and Sebastian Krause. All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+* the following conditions are met:
+*     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+*       following disclaimer.
+*     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+*       the following disclaimer in the documentation and/or other materials provided with the distribution.
+*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*       to endorse or promote products derived from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+*
+* @brief    FormulaEditor class declaration which allows the definition of individual atomformulas for the
+*           usage in FixDictMp-Algorithm.
+*/
+
 #ifndef FORMULAEDITOR_H
 #define FORMULAEDITOR_H
 //*************************************************************************************************************
@@ -46,10 +82,10 @@ public:
     explicit Formulaeditor(QWidget *parent = 0);
     ~Formulaeditor();
     QString GetFormula();
-    void StripFormula(QString& strFormula);
+    void strip_formula(QString& strFormula);
     void set_formula(QString Formula);
-    void SetFunctConst(int index, double val);
-    double Calculation(QString strFormula, qreal xValue, bool strip  =true);
+    void set_funct_const(int index, double val);
+    double calculation(QString strFormula, qreal xValue, bool strip  =true);
     
 private slots:
 
@@ -80,15 +116,15 @@ private:
     double m_dFunctionConstant[ANZFUNKTKONST];
     QStringList m_strStandardFunction;
 
-    qreal SignFactor(qint32 &nPosition, QString& strCharacter);
-    double Expression(int& nPosition, QString& strCharacter);
-    double SimpleExpression(int& nPosition, QString& strCharacter);
-    double Term(int& nPosition, QString& strCharacter);
-    double Factor(qint32 &nPosition, QString& strCharacter);
-    double Char_n(int& nPosition, QString& strCharacter);
-    QString strChar_(QString DecimalZahl);
+    qreal sign_factor(qint32 &nPosition, QString& strCharacter);
+    double expression(int& nPosition, QString& strCharacter);
+    double simple_expression(int& nPosition, QString& strCharacter);
+    double term(int& nPosition, QString& strCharacter);
+    double factor(qint32 &nPosition, QString& strCharacter);
+    double char_n(int& nPosition, QString& strCharacter);
+    QString str_char(QString DecimalZahl);
 
-    QString GetNextToken(QString& strSrc, const QString strDelim);
+    QString get_next_token(QString& strSrc, const QString strDelim);
     double SINQ(double Winkel_grad);
     double COSQ(double Winkel_grad);
     double DEG(double x /* rad */) ;
@@ -108,9 +144,9 @@ class AtomPaintWindow : public QWidget
     Q_OBJECT
 
 protected:
-   void paintEvent(QPaintEvent *event);
+   void paint_event(QPaintEvent *event);
 public:
-   void PaintSignal(QList<qreal> valueList, QSize windowSize);
+   void paint_signal(QList<qreal> valueList, QSize windowSize);
 
 };
 
