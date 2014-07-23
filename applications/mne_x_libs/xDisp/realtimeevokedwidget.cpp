@@ -111,7 +111,6 @@ RealTimeEvokedWidget::RealTimeEvokedWidget(QSharedPointer<RealTimeEvoked> pRTE, 
 , m_fZoomFactor(1.0f)
 , m_pRTE(pRTE)
 , m_bInitialized(false)
-, m_fSamplingRate(1024)
 , m_pSensorModel(NULL)
 {
     Q_UNUSED(pTime)
@@ -173,8 +172,6 @@ void RealTimeEvokedWidget::getData()
         if(m_pRTE->isChInit())
         {
             m_qListChInfo = m_pRTE->chInfo();
-            m_qListChColors = m_pRTE->chColor();
-            m_fSamplingRate = 0;//m_pRTE->getSamplingRate();
 
             QFile file(m_pRTE->getXMLLayoutFile());
             if (!file.open(QFile::ReadOnly | QFile::Text))
@@ -209,8 +206,7 @@ void RealTimeEvokedWidget::init()
             delete m_pRTEModel;
         m_pRTEModel = new RealTimeEvokedModel(this);
 
-        m_pRTEModel->setChannelInfo(m_qListChInfo, m_qListChColors);
-        m_pRTEModel->setSamplingInfo(m_fSamplingRate);
+        m_pRTEModel->setRTE(m_pRTE);
 
         m_pButterflyPlot->setModel(m_pRTEModel);
 

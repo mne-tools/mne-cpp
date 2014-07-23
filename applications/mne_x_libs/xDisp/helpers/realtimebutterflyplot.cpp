@@ -67,6 +67,20 @@ void RealTimeButterflyPlot::paintEvent(QPaintEvent*)
 
     if(m_bIsInit)
     {
+        //Stimulus bar
+        if(m_pRealTimeEvokedModel->getNumSamples() > 0)
+        {
+
+            painter.save();
+            painter.setPen(QPen(Qt::black, 1, Qt::DashLine));
+
+            float ratio = ((float)m_pRealTimeEvokedModel->getNumPreStimSamples())/((float)m_pRealTimeEvokedModel->getNumSamples());
+            qint32 posX = (qint32)((this->width()-2)*ratio);
+            painter.drawLine(posX, 1, posX, this->height()-2);
+
+            painter.restore();
+        }
+
         painter.translate(0,this->height()/2);
 
         for(qint32 r = 0; r < m_iNumChannels; ++r)

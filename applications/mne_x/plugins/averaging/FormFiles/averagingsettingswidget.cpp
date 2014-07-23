@@ -35,7 +35,7 @@ AveragingSettingsWidget::AveragingSettingsWidget(Averaging *toolbox, QWidget *pa
     m_pSpinBoxPreStimSamples->setMaximum(10000);
     m_pSpinBoxPreStimSamples->setSingleStep(1);
     m_pSpinBoxPreStimSamples->setValue(m_pAveragingToolbox->m_iPreStimSamples);
-//    connect(m_pSpinBoxPreStimSamples, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &Averaging::preStimChanged);
+    connect(m_pSpinBoxPreStimSamples, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), m_pAveragingToolbox, &Averaging::preStimChanged);
     t_pGridLayout->addWidget(m_pSpinBoxPreStimSamples,0,2,1,1);
 
     QLabel* t_pLabelPostStim = new QLabel;
@@ -47,7 +47,7 @@ AveragingSettingsWidget::AveragingSettingsWidget(Averaging *toolbox, QWidget *pa
     m_pSpinBoxPostStimSamples->setMaximum(10000);
     m_pSpinBoxPostStimSamples->setSingleStep(1);
     m_pSpinBoxPostStimSamples->setValue(m_pAveragingToolbox->m_iPostStimSamples);
-//    connect(m_pSpinBoxPostStimSamples, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &Averaging::postStimChanged);
+    connect(m_pSpinBoxPostStimSamples, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), m_pAveragingToolbox, &Averaging::postStimChanged);
     t_pGridLayout->addWidget(m_pSpinBoxPostStimSamples,1,2,1,1);
 //    addPluginWidget(m_pSpinBoxPostStimSamples);
 

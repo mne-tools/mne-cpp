@@ -76,7 +76,7 @@ Averaging::Averaging()
 , m_bIsRunning(false)
 , m_bProcessData(false)
 , m_iPreStimSamples(750)
-, m_iPostStimSamples(750)
+, m_iPostStimSamples(400)//750)
 , m_iNumAverages(10)
 , m_iStimChan(0)
 , m_pAveragingWidget(AveragingSettingsWidget::SPtr())
@@ -122,6 +122,7 @@ void Averaging::init()
 
     // Output
     m_pAveragingOutput = PluginOutputData<RealTimeEvoked>::create(this, "AveragingOut", "Averaging Output Data");
+    m_pAveragingOutput->data()->setPreStimSamples(m_iPreStimSamples);
     m_outputConnectors.append(m_pAveragingOutput);
 
     //init channels when fiff info is available
@@ -232,6 +233,7 @@ QString Averaging::getName() const
 void Averaging::preStimChanged(qint32 samples)
 {
     m_iPreStimSamples = samples;
+    m_pAveragingOutput->data()->setPreStimSamples(m_iPreStimSamples);
     emit sampleNumChanged();
 }
 
