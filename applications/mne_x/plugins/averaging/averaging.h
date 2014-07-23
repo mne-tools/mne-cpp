@@ -95,6 +95,8 @@ using namespace RTINVLIB;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+class AveragingSettingsWidget;
+
 
 //=============================================================================================================
 /**
@@ -108,6 +110,8 @@ class AVERAGINGSHARED_EXPORT Averaging : public IAlgorithm
     Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "averaging.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(MNEX::IAlgorithm)
+
+    friend class AveragingSettingsWidget;
 
 public:
     //=========================================================================================================
@@ -150,6 +154,8 @@ public:
 
     void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
 
+    void showAveragingWidget();
+
 signals:
     //=========================================================================================================
     /**
@@ -190,9 +196,6 @@ private:
 
     RtAve::SPtr m_pRtAve;   /**< Real-time average. */
 
-    QSpinBox* m_pSpinBoxPreStimSamples;
-    QSpinBox* m_pSpinBoxPostStimSamples;
-
     qint32 m_iPreStimSamples;
     qint32 m_iPostStimSamples;
 
@@ -202,7 +205,9 @@ private:
 
     QVector<FiffEvoked::SPtr>   m_qVecEvokedData;   /**< Evoked data set */
 
-    int m_iDebugNumChannels;
+    QSharedPointer<AveragingSettingsWidget> m_pAveragingWidget;
+
+    QAction* m_pActionShowAdjustment;
 
 };
 
