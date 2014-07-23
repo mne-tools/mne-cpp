@@ -164,8 +164,9 @@ public:
     * Sets corresponding channel information
     *
     * @param [in] chInfo        The corresponding channel information list
+    * @param [in] chColorList   The channel color information list
     */
-    void setChannelInfo(QList<RealTimeSampleArrayChInfo> &chInfo);
+    void setChannelInfo(QList<RealTimeSampleArrayChInfo> &chInfo, QList<QColor> &chColor);
 
     //=========================================================================================================
     /**
@@ -182,6 +183,16 @@ public:
     * @param[in] data       data to add (Time points of channel samples)
     */
     void addData(const MatrixXd &data);
+
+    //=========================================================================================================
+    /**
+    * Returns the color of a given channel number
+    *
+    * @param[in] row    row number which correspodns to a given channel
+    *
+    * @return color of given channel number
+    */
+    QColor getColor(qint32 row) const;
 
     //=========================================================================================================
     /**
@@ -277,7 +288,8 @@ signals:
     void newSelection(QList<qint32> selection);
 
 private:
-    QList<RealTimeSampleArrayChInfo> m_qListChInfo; /**< Channel info list.*/
+    QList<RealTimeSampleArrayChInfo>    m_qListChInfo;      /**< Channel info list.*/
+    QList<QColor>                       m_qListChColors;    /**< Channel color information.*/
 
     QMap<qint32,qint32> m_qMapIdxRowSelection;      /**< Selection mapping.*/
 

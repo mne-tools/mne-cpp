@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/images">
+        <file alias="averaging.png">images/icons/averaging.png</file>
+    </qresource>
+</RCC>
