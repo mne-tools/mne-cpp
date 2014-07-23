@@ -69,7 +69,8 @@ SOURCES += \
     parksmcclellan.cpp \
     filterdata.cpp \
     mp/adaptivemp.cpp \
-    mp/atom.cpp
+    mp/atom.cpp \
+    mp/fixdictmp.cpp
 
 HEADERS += \
     kmeans.h\
@@ -80,7 +81,8 @@ HEADERS += \
     parksmcclellan.h \
     filterdata.h \
     mp/adaptivemp.h \
-    mp/atom.h
+    mp/atom.h \
+    mp/fixdictmp.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
