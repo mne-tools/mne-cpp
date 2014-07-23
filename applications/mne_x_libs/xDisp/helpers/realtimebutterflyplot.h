@@ -63,7 +63,6 @@ private:
 
     RealTimeEvokedModel* m_pRealTimeEvokedModel;
 
-    QList<QColor>       m_qListColors;
     qint32              m_iNumChannels;
 
     bool m_bIsInit;
