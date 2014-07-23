@@ -103,6 +103,7 @@ private slots:
     void on_btt_OpenSignal_clicked();
     void on_tbv_Results_cellClicked(int row, int column);
     void cb_selection_changed(const QModelIndex&, const QModelIndex&);
+    void tbv_selection_changed(const QModelIndex& topLeft, const QModelIndex& bottomRight);
     void recieve_result(qint32 current_iteration, qint32 max_iterations, qreal current_energy, qreal max_energy, gabor_atom_list atom_res_list);
     void calc_thread_finished();
 
@@ -116,9 +117,13 @@ private:
     GraphWindow *callGraphWindow;
     AtomSumWindow *callAtomSumWindow;
     ResiduumWindow *callResidumWindow;
-    QStandardItemModel* model;
-    QStandardItem* item;
-    std::vector<QStandardItem*> items;
+    QStandardItemModel* cb_model;
+    QStandardItem* cb_item;
+    std::vector<QStandardItem*> cb_items;
+
+    QStandardItemModel* tbv_model;
+    QStandardItem* tbv_item;
+    std::vector<QStandardItem*> tbv_items;
 
     void open_file();
     void read_matlab_file(QString fileName);
