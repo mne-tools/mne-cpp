@@ -10,6 +10,7 @@
 #include <mne/mne.h>
 #include <utils/mp/atom.h>
 #include <utils/mp/adaptivemp.h>
+#include <utils/mp/fixdictmp.h>
 #include <disp/plot.h>
 
 #include "mainwindow.h"
@@ -92,6 +93,12 @@ QList<GaborAtom> _my_atom_list;
 // constructor
 MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::MainWindow)
 {    
+    FixDictMp* testFixDictMp = new FixDictMp();
+
+    qint32 var = testFixDictMp->test();
+
+    cout << "Testout  "<< var;
+
     ui->setupUi(this);
     ui->progressBarCalc->setMinimum(0);
     ui->progressBarCalc->setHidden(true);    
@@ -234,11 +241,11 @@ void MainWindow::open_file()
 
     if(fileName.endsWith(".fif", Qt::CaseInsensitive))        
     {    ReadFiffFile(fileName);
-        _signal_matrix.resize(256,5);
-        _original_signal_matrix.resize(256,5);
+        _signal_matrix.resize(512,5);
+        _original_signal_matrix.resize(512,5);
         // ToDo: find good fiff signal part
         for(qint32 channels = 0; channels < 5; channels++)
-            for(qint32 i = 0; i < 256; i++)
+            for(qint32 i = 0; i < 512; i++)
                 _signal_matrix(i, channels) = _datas(channels, i);// * 10000000000;
     }
     else
@@ -1056,32 +1063,33 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
         ui->tbv_Results->setItem(i, 4, atomPhaseItem);
     }
 
-    //progressbar update
-    ui->progressBarCalc->setMaximum(max_iterations);
+    qint32 prgrsbar_adapt = 99;
 
-    if(max_iterations > 1000)
-         ui->progressBarCalc->setMaximum(100);
+    //progressbar update
+    if(max_iterations > 1999 && current_iteration < 100)
+             ui->progressBarCalc->setMaximum(100);
+    if(ui->chb_ResEnergy->isChecked() && (current_iteration >= (prgrsbar_adapt)) && (max_energy - current_energy) > (0.01 * percent * max_energy))
+        ui->progressBarCalc->setMaximum(current_iteration + 5);
+    if(max_iterations < 1999)
+        ui->progressBarCalc->setMaximum(max_iterations);
+
 
     ui->progressBarCalc->setValue(current_iteration);
 
-    if(((current_iteration == max_iterations) || (max_energy - current_energy) < (0.01 * percent * max_energy))&&ui->chb_ResEnergy->isChecked())//&&ui->chb_Iterations->isChecked())
+    if(((current_iteration == max_iterations) || (max_energy - current_energy) < (0.01 * percent * max_energy))&&ui->chb_ResEnergy->isChecked())
         ui->progressBarCalc->setValue(ui->progressBarCalc->maximum());
 
     //recieve the resulting atomparams
     _my_atom_list.append(atom_res_list.last());
     GaborAtom gaborAtom = atom_res_list.last();
 
-    //plot result of mp algorithm, this is buggy: du läufst durch den slot doppelt so oft durch wie du atom findest... daswegen sind alle paints doppelt so groß bzw klein: siehe Counter
     for(qint32 i = 0; i < _signal_matrix.cols(); i++)
     {
         VectorXd discret_atom = gaborAtom.create_real(gaborAtom.sample_count, gaborAtom.scale, gaborAtom.translation, gaborAtom.modulation, gaborAtom.phase_list.at(i));
 
-
-
-
-    _atom_sum_matrix.col(i) += gaborAtom.max_scalar_list.at(i) * discret_atom;
-    //std::cout << _atom_sum_matrix.col(i) << "\n";
-    _residuum_matrix.col(i) -= gaborAtom.max_scalar_list.at(i)  * discret_atom;
+        _atom_sum_matrix.col(i) += gaborAtom.max_scalar_list.at(i) * discret_atom;
+        //std::cout << _atom_sum_matrix.col(i) << "\n";
+        _residuum_matrix.col(i) -= gaborAtom.max_scalar_list.at(i)  * discret_atom;
     }
     update();
 }
