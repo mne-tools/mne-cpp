@@ -257,10 +257,7 @@ private:
 
     bool m_bInitialized;                                    /**< Is Initialized */
 
-    QList<QColor>                       m_qListChColors;    /**< Channel color for butterfly plot.*/
     QList<RealTimeSampleArrayChInfo>    m_qListChInfo;      /**< Channel info list. ToDo: check if this is obsolete later on*/
-
-    float m_fSamplingRate;                                  /**< Sampling rate */
 
     QAction*    m_pActionSelectSensors;                     /**< show roi select widget */
 
