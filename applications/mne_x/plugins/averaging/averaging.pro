@@ -77,13 +77,15 @@ DESTDIR = $${MNE_BINARY_DIR}/mne_x_plugins
 SOURCES += \
     averaging.cpp \
     FormFiles/averagingsetupwidget.cpp \
-    FormFiles/averagingaboutwidget.cpp
+    FormFiles/averagingaboutwidget.cpp \
+    FormFiles/averagingsettingswidget.cpp
 
 HEADERS += \
     averaging_global.h \
     averaging.h \
     FormFiles/averagingsetupwidget.h \
-    FormFiles/averagingaboutwidget.h
+    FormFiles/averagingaboutwidget.h \
+    FormFiles/averagingsettingswidget.h
 
 FORMS += \
     FormFiles/averagingsetup.ui \
@@ -103,3 +105,6 @@ unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
 
 # suppress visibility warnings
 unix: QMAKE_CXXFLAGS += -Wno-attributes
+
+RESOURCES += \
+    averaging.qrc

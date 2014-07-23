@@ -6,8 +6,6 @@
 
 #include "realtimebutterflyplot.h"
 
-#include <time.h>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -47,12 +45,7 @@ void RealTimeButterflyPlot::dataUpdate(const QModelIndex& topLeft, const QModelI
 {
     if(!m_bIsInit && m_pRealTimeEvokedModel->isInit())
     {
-        qsrand(time(NULL));
         m_iNumChannels = m_pRealTimeEvokedModel->rowCount();
-        m_qListColors.clear();
-        for(qint32 i = 0; i < m_iNumChannels; ++i)
-            m_qListColors.append(QColor(qrand() % 256, qrand() % 256, qrand() % 256));
-
         m_bIsInit = true;
     }
 
@@ -78,8 +71,38 @@ void RealTimeButterflyPlot::paintEvent(QPaintEvent*)
 
         for(qint32 r = 0; r < m_iNumChannels; ++r)
         {
+            qint32 kind = m_pRealTimeEvokedModel->getKind(r);
+
+            //ToDo display only selected kinds
+            switch(kind) {
+//                case FIFFV_MEG_CH: {
+//                    qint32 unit = m_pRealTimeEvokedModel->getUnit(row);
+//                    if(unit == FIFF_UNIT_T_M) {
+//                        fMaxValue = 1e-10f;// m_qSettings.value("RawDelegate/max_meg_grad").toDouble();
+//                    }
+//                    else if(unit == FIFF_UNIT_T)
+//                    {
+//                        if(m_pRealTimeEvokedModel->getCoil(row) == FIFFV_COIL_BABY_MAG)
+//                            fMaxValue = 1e-4f;
+//                        else
+//                            fMaxValue = 1e-11f;// m_qSettings.value("RawDelegate/max_meg_mag").toDouble();
+//                    }
+//                    break;
+//                }
+                case FIFFV_EEG_CH: {
+                    break;
+                }
+//                case FIFFV_EOG_CH: {
+//                    fMaxValue = 1e-3f; //m_qSettings.value("RawDelegate/max_eog").toDouble();
+//                    break;
+//                }
+                default:
+                    continue;
+            }
+
+
             painter.save();
-            painter.setPen(QPen(m_qListColors[r], 1));
+            painter.setPen(QPen(m_pRealTimeEvokedModel->getColor(r), 1));
 
             QPainterPath path(QPointF(1,0));
             createPlotPath(r,path);
@@ -101,28 +124,28 @@ void RealTimeButterflyPlot::createPlotPath(qint32 row, QPainterPath& path) const
     float fMaxValue = 1e-9f;
 
     switch(kind) {
-//        case FIFFV_MEG_CH: {
-//            qint32 unit = m_pRealTimeEvokedModel->getUnit(row);
-//            if(unit == FIFF_UNIT_T_M) {
-//                fMaxValue = 1e-10f;// m_qSettings.value("RawDelegate/max_meg_grad").toDouble();
-//            }
-//            else if(unit == FIFF_UNIT_T)
-//            {
-//                if(m_pRealTimeEvokedModel->getCoil(row) == FIFFV_COIL_BABY_MAG)
-//                    fMaxValue = 1e-4f;
-//                else
-//                    fMaxValue = 1e-11f;// m_qSettings.value("RawDelegate/max_meg_mag").toDouble();
-//            }
-//            break;
-//        }
+        case FIFFV_MEG_CH: {
+            qint32 unit = m_pRealTimeEvokedModel->getUnit(row);
+            if(unit == FIFF_UNIT_T_M) {
+                fMaxValue = 1e-10f;// m_qSettings.value("RawDelegate/max_meg_grad").toDouble();
+            }
+            else if(unit == FIFF_UNIT_T)
+            {
+                if(m_pRealTimeEvokedModel->getCoil(row) == FIFFV_COIL_BABY_MAG)
+                    fMaxValue = 1e-4f;
+                else
+                    fMaxValue = 1e-11f;// m_qSettings.value("RawDelegate/max_meg_mag").toDouble();
+            }
+            break;
+        }
         case FIFFV_EEG_CH: {
             fMaxValue = 1e-5f;// m_qSettings.value("RawDelegate/max_eeg").toDouble();
             break;
         }
-//        case FIFFV_EOG_CH: {
-//            fMaxValue = 1e-3f; //m_qSettings.value("RawDelegate/max_eog").toDouble();
-//            break;
-//        }
+        case FIFFV_EOG_CH: {
+            fMaxValue = 1e-3f; //m_qSettings.value("RawDelegate/max_eog").toDouble();
+            break;
+        }
         default:
             return;
     }
