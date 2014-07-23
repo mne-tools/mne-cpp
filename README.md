@@ -50,14 +50,16 @@ To build MNE-CPP follow the wiki-guide:
 
 * [5. Post Setup Steps](https://github.com/mne-tools/mne-cpp/wiki/5.-Post-Setup-Steps): The last step shows how to setup the environment variables. 
 
-Mailing list
-============
+Contact information
+===================
 
-http://mail.nmr.mgh.harvard.edu/mailman/listinfo/mne_analysis
+Homepage: http://www.tu-ilmenau.de/mne-cpp
+
+Mailing List: http://mail.nmr.mgh.harvard.edu/mailman/listinfo/mne_analysis
 
 
 Workflow to contribute
-=========================
+======================
 
 To contribute to MNE-CPP, first create an account on [github](http://github.com/). Once this is done, fork the [MNE-CPP repository](http://github.com/mne-tools/mne-cpp) to have you own repository,
 clone it using 'git clone' on the computers where you want to work. Make
