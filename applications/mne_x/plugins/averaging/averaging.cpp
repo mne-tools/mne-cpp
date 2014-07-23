@@ -115,7 +115,6 @@ QSharedPointer<IPlugin> Averaging::clone() const
 
 void Averaging::init()
 {
-
     // Input
     m_pAveragingInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "AveragingIn", "Averaging input data");
     connect(m_pAveragingInput.data(), &PluginInputConnector::notify, this, &Averaging::update, Qt::DirectConnection);
@@ -139,7 +138,37 @@ void Averaging::init()
 void Averaging::initConnector()
 {
     if(m_pFiffInfo)
+    {
         m_pAveragingOutput->data()->initFromFiffInfo(m_pFiffInfo);
+
+        m_qListModalities.clear();
+        bool hasMag = false;
+        bool hasGrad = false;
+        bool hasEEG = false;
+        bool hasEOG = false;
+        for(qint32 i = 0; i < m_pFiffInfo->nchan; ++i)
+        {
+            if(m_pFiffInfo->chs[i].kind == FIFFV_MEG_CH)
+            {
+                if(!hasMag &&  m_pFiffInfo->chs[i].unit == FIFF_UNIT_T)
+                    hasMag = true;
+                else if(!hasGrad &&  m_pFiffInfo->chs[i].unit == FIFF_UNIT_T_M)
+                    hasGrad = true;
+            }
+            else if(!hasEEG && m_pFiffInfo->chs[i].kind == FIFFV_EEG_CH)
+                hasEEG = true;
+            else if(!hasEOG && m_pFiffInfo->chs[i].kind == FIFFV_EOG_CH)
+                hasEOG = true;
+        }
+        if(hasMag)
+            m_qListModalities.append(QPair<QString,bool>("MAG",true));
+        if(hasGrad)
+            m_qListModalities.append(QPair<QString,bool>("GRAD",true));
+        if(hasEEG)
+            m_qListModalities.append(QPair<QString,bool>("EEG",true));
+        if(hasEOG)
+            m_qListModalities.append(QPair<QString,bool>("EOG",true));
+    }
 }
 
 
@@ -229,8 +258,7 @@ QWidget* Averaging::setupWidget()
 
 void Averaging::showAveragingWidget()
 {
-    if(!m_pAveragingWidget)
-        m_pAveragingWidget = AveragingSettingsWidget::SPtr(new AveragingSettingsWidget(this));
+    m_pAveragingWidget = AveragingSettingsWidget::SPtr(new AveragingSettingsWidget(this));
     m_pAveragingWidget->show();
 }
 

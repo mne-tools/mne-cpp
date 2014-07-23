@@ -189,6 +189,8 @@ private:
     FiffInfo::SPtr  m_pFiffInfo;        /**< Fiff measurement info.*/
     QList<qint32> m_qListStimChs;       /**< Stimulus channels.*/
 
+    QList< QPair<QString, bool> > m_qListModalities; /**< List Modalities.*/
+
     CircularMatrixBuffer<double>::SPtr   m_pAveragingBuffer;      /**< Holds incoming data.*/
 
     bool m_bIsRunning;      /**< If source lab is running */
