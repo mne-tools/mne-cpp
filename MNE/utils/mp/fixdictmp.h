@@ -1,14 +1,16 @@
 //=============================================================================================================
 /**
-* @file     adaptivemp.h
+* @file     fixdict.h
 * @author   Martin Henfling <martin.henfling@tu-ilmenau.de>
 *           Daniel Knobl <daniel.knobl@tu-ilmenau.de>
+*           Sebastian Krause <sebastian.krause@tu.ilmenau.de
 *
 * @version  1.0
 * @date     July, 2014
 *
-* ported to mne-cpp by Martin Henfling and Daniel Knobl in May 2014
-* original code was implemented in Matlab Code by Maciej Gratkowski
+* @section  LICENSE
+*
+* Copyright (C) 2014, Sebastian Krause,Daniel Knobl and Martin Henfling All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,9 +31,8 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    ADAPIVEMP class declaration, providing the implemetation of the Matching Pursuit Algorithm
-*           introduced by Stephane Mallat and Zhifeng Zhang. Matlabimplemetation of Maciej Gratkowski is
-*           used as Source and reference.
+* @brief    FIXDICTMP class declaration, providing the implemetation of the Matching Pursuit Algorithm
+*           using precalculated atom dictionaries.
 *
 */
 
@@ -63,8 +64,15 @@
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
 #include <unsupported/Eigen/FFT>
-#include <QThread>
 
+//*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QThread>
+#include <QFile>
+#include <QStringList>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -86,7 +94,7 @@ using namespace std;
 /**
 * DECLARE CLASS FixDictMp
 *
-* @brief The adaptiveMP class provides functions several calculating functions to run the Matching Pursuit Algorithm
+* @brief The fixdictMP class provides functions several calculating functions to run the Matching Pursuit Algorithm
 */
 class UTILSSHARED_EXPORT FixDictMp : public QThread
 {
@@ -97,7 +105,7 @@ public:
     //typedef QList<GaborAtom> gabor_atom_list;
 
     /**
-    * adaptiveMP_adaptiveMP
+    * fixdictMp_fixdictMP
     *
     * ### MP toolbox function ###
     *
@@ -109,7 +117,11 @@ public:
     FixDictMp();
 
     qint32 test();
-//=========================================================================================================
+
+    QList<GaborAtom> matching_pursuit(QFile &currentDict, VectorXd signalSamples, qint32 iterationsCount);
+
+    QStringList correlation(VectorXd signalSamples, QList<qreal> atomSamples, QString atomName);
+    //=========================================================================================================
 
 public slots:
     //void send_result();
@@ -123,5 +135,7 @@ signals:
     //void current_result(qint32 current_iteration, qint32 max_iteration, qreal current_energy, qreal max_energy, gabor_atom_list atom_list);
     //void finished();
 };//class
+
 }//NAMESPACE
+
 #endif // FIXDICTMP_H

@@ -7,6 +7,10 @@
 * @version  1.0
 * @date     July, 2014
 *
+* @section  LICENSE
+*
+* Copyright (C) 2014, Daniel Knobl and Martin Henfling All rights reserved.
+*
 * ported to mne-cpp by Martin Henfling and Daniel Knobl in May 2014
 * original code was implemented in Matlab Code by Maciej Gratkowski
 *
@@ -63,8 +67,13 @@
 #include <Eigen/Core>
 #include <Eigen/SparseCore>
 #include <unsupported/Eigen/FFT>
-#include <QThread>
 
+//*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QThread>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -81,7 +90,6 @@ namespace UTILSLIB
 
 using namespace Eigen;
 using namespace std;
-
 
 //=============================================================================================================
 
@@ -117,9 +125,7 @@ public:
 
     qint32 it = 0;
     qint32 max_it = 0;
-    qreal signal_energy = 0;//VectorXd signal_energy;// = VectorXd::Zero(channel_count);
-    //VectorXd residuum_energy;// = VectorXd::Zero(channel_count);
-    //VectorXd energy_threshold;// = VectorXd::Zero(channel_count);
+    qreal signal_energy = 0;
     qreal current_energy = 0;
     QList<GaborAtom> atom_list;
     MatrixXd signal;
@@ -127,7 +133,7 @@ public:
     qreal epsilon;
 
     //=========================================================================================================
-    /**
+    /*
     * adaptiveMP_matching_pursuit
     *
     * ### MP Algorithm ###
@@ -177,19 +183,22 @@ public:
     */
     VectorXd calculate_atom(qint32 sampleCount, qreal scale, quint32 translation, qreal modulation, qint32 channel, MatrixXd residuum, ReturnValue return_value);
 
-//=========================================================================================================
+    //=========================================================================================================
 
 public slots:
+
     void send_result();
-    void matching_pursuit (MatrixXd signal, qint32 max_iterations, qreal epsilon);
+    QList<GaborAtom> matching_pursuit (MatrixXd signal, qint32 max_iterations, qreal epsilon);
     void process();
     void recieve_input(MatrixXd signal, qint32 max_iterations, qreal epsilon);
 
     //=========================================================================================================
 
 signals:
+
     void current_result(qint32 current_iteration, qint32 max_iteration, qreal current_energy, qreal max_energy, gabor_atom_list atom_list);
     void finished();
+
 };
 
 }   // NAMESPACE

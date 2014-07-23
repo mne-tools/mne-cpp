@@ -1001,7 +1001,6 @@ void MainWindow::on_btt_Calc_clicked()
 
     if(ui->rb_OwnDictionary->isChecked())
     {
-
         QFile ownDict(QString("Matching-Pursuit-Toolbox/%1.dict").arg(ui->cb_Dicts->currentText()));
         //residuumVector =  mpCalc(ownDict, signalVector, 0);
         update();

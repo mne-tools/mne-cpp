@@ -1,14 +1,17 @@
 //=============================================================================================================
 /**
-* @file     AdaptiveMp.cpp
+* @file     fixdictmp.cpp
 * @author   Martin Henfling <martin.henfling@tu-ilmenau.de>
 *           Daniel Knobl <daniel.knobl@tu-ilmenau.de>
+*           Sebastian Krause <sebastian.krause@tu-ilmenau.de>
 *
 * @version  1.0
 * @date     July, 2014
+
+* @section  LICENSE
 *
-* ported to mne-cpp by Martin Henfling and Daniel Knobl in May 2014
-* original code was implemented in Matlab Code by Maciej Gratkowski
+* Copyright (C) 2014, Sebastian Krause,Daniel Knobl and Martin Henfling All rights reserved.
+*
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,8 +32,8 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implemetation of the Matching Pursuit Algorithm introduced by Stephane Mallat and Zhifeng Zhang.
-*           Matlabimplemetation of Maciej Gratkowski is used as Source and reference.
+* @brief    Implemetation of the Matching Pursuit Algorithm using static atom dictionaries to find best matching
+*           aproximation of signals.
 *
 */
 
@@ -68,11 +71,11 @@ qint32 FixDictMp::test()
 
 }
 
-/*
- * TODO: Calc MP (new)
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-VectorXd MainWindow::mpCalc(QFile &currentDict, VectorXd signalSamples, qint32 iterationsCount)
+QList<GaborAtom> FixDictMp::matching_pursuit(QFile &currentDict, VectorXd signalSamples, qint32 iterationsCount)
 {
+    GaborAtom* gabor_Atom = new GaborAtom;
+    QList<GaborAtom> result_list;
     bool isDouble = false;
 
     qint32 atomCount = 0;
@@ -98,7 +101,7 @@ VectorXd MainWindow::mpCalc(QFile &currentDict, VectorXd signalSamples, qint32 i
     normBestCorrAtomSamples(0);
     originalSignalSamples = signalSamples;
 
-    // Liest das Woerterbuch aus und gibt die Samples und den Namen an die Skalarfunktion weiter
+    // reading dictionary and give samples and name to scalar function
     if (currentDict.open (QIODevice::ReadOnly))
     {
         while(!currentDict.atEnd())
@@ -139,7 +142,7 @@ VectorXd MainWindow::mpCalc(QFile &currentDict, VectorXd signalSamples, qint32 i
         }
         currentDict.close();
 
-        // Sucht aus allen verglichenen Atomen das beste passende herraus
+        // find best matching atom in correlation list
         for(qint32 i = 0; i < correlationList.length(); i++)
         {
             if(fabs(correlationList.at(i).at(2).toDouble()) > fabs(bestCorrValue))
@@ -150,7 +153,7 @@ VectorXd MainWindow::mpCalc(QFile &currentDict, VectorXd signalSamples, qint32 i
             }
         }
 
-        // Sucht das passende Atom im Woerterbuch und traegt des Werte in eine Liste
+        // find the best matching in dictionary and save content (samples) to list
         if (currentDict.open (QIODevice::ReadOnly))
         {
             bool hasFound = false;
@@ -180,7 +183,7 @@ VectorXd MainWindow::mpCalc(QFile &currentDict, VectorXd signalSamples, qint32 i
         }
         currentDict.close();
 
-        // Quadratische Normierung des Atoms auf den Betrag 1 und Multiplikation mit dem Skalarproduktkoeffizenten
+        /*// Quadratische Normierung des Atoms auf den Betrag 1 und Multiplikation mit dem Skalarproduktkoeffizenten
         //**************************** Im Moment weil Testwoerterbuecher nicht nomiert ***********************************
 
         qreal normFacktorAtom = 0;
@@ -192,6 +195,7 @@ VectorXd MainWindow::mpCalc(QFile &currentDict, VectorXd signalSamples, qint32 i
             normBestCorrAtomSamples[i] = (bestCorrAtomSamples[i] / normFacktorAtom) * bestCorrValue;
 
         //**************************************************************************************************************
+        */
 
         // Subtraktion des Atoms vom Signal
         for(qint32 m = 0; m < normBestCorrAtomSamples.rows(); m++)
@@ -228,10 +232,16 @@ VectorXd MainWindow::mpCalc(QFile &currentDict, VectorXd signalSamples, qint32 i
         for(qint32 i = 0; i < normBestCorrAtomSamples.rows(); i++)
             newSignalString.append(QString("%1/n").arg(normBestCorrAtomSamples[i]));
 
+        gabor_Atom->scale              = 0;//scale
+        gabor_Atom->translation        = 0;//translation
+        gabor_Atom->modulation         = 0;//phase
+        gabor_Atom->phase              = 0;
+        gabor_Atom->max_scalar_product = 0;
+
         bestAtom.append(newSignalString);
-        globalResultAtomList.append(bestAtom);
+        result_list.append(*gabor_Atom);
 
-
+        /*ToDo
         //***************** DEBUGGOUT **********************************************************************************
         QFile newSignal("Matching-Pursuit-Toolbox/newSignal.txt");
         if(!newSignal.exists())
@@ -318,19 +328,19 @@ VectorXd MainWindow::mpCalc(QFile &currentDict, VectorXd signalSamples, qint32 i
 
             if(sollEnergie < residuumEnergie)
                 residuum = mpCalc(currentDict, residuum, iterationsCount);
-        }
+        }*/
     }
-    return residuum;
+    return result_list;
 }
 
 
-// Berechnung das Skalarprodukt zwischen Atom und Signal
-QStringList MainWindow::correlation(VectorXd signalSamples, QList<qreal> atomSamples, QString atomName)
+// calc scalarproduct of Atom and Signal
+QStringList FixDictMp::correlation(VectorXd signalSamples, QList<qreal> atomSamples, QString atomName)
 {
     qreal sum = 0;
     qint32 index = 0;
     qreal maximum = 0;
-    qreal sumAtom = 0;
+    //qreal sumAtom = 0;
 
     VectorXd originalSignalList = signalSamples;
     QList<qreal> tempList;
@@ -340,7 +350,7 @@ QStringList MainWindow::correlation(VectorXd signalSamples, QList<qreal> atomSam
     resultList.clear();
     tempList.clear();
 
-    // Quadratische Normierung des Atoms auf den Betrag 1
+    /*// Quadratische Normierung des Atoms auf den Betrag 1
     //**************************** Im Moment weil Testwoerterbuecher nicht nomiert ***************************************
 
     for(qint32 i = 0; i < atomSamples.length(); i++)
@@ -360,12 +370,12 @@ QStringList MainWindow::correlation(VectorXd signalSamples, QList<qreal> atomSam
         //signalSamples.append(0);
         //signalSamples.prepend(0);
     }
-
+    */
     //******************************************************************************************************************
 
     for(qint32 j = 0; j < originalSignalList.rows() + atomSamples.length() -1; j++)
     {
-        // Inners Produkt des Signalteils mit dem Atom
+        // Inner Product des of Atom and Signal
         for(qint32 g = 0; g < atomSamples.length(); g++)
         {
             tempList.append(signalSamples[g + j] * atomSamples.at(g));
@@ -376,7 +386,7 @@ QStringList MainWindow::correlation(VectorXd signalSamples, QList<qreal> atomSam
         sum = 0;
     }
 
-    //Maximum und Index des Skalarproduktes finden unabhaengig ob positiv oder negativ
+    //find Maximum and Index of Scalarproduct
     for(qint32 k = 0; k < scalarList.length(); k++)
     {
         if(fabs(maximum) < fabs(scalarList.at(k)))
@@ -386,7 +396,7 @@ QStringList MainWindow::correlation(VectorXd signalSamples, QList<qreal> atomSam
         }
     }
 
-    // Liste mit dem Name des Atoms, Index und hoechster Korrelationskoeffizent
+    // List of Atomname, Index and max correlation coefficient
     resultList.append(atomName);
     resultList.append(QString("%1").arg(index -atomSamples.length() + 1));     // Gibt den Signalindex fuer den Startpunkt des Atoms wieder
     resultList.append(QString("%1").arg(maximum));
@@ -396,5 +406,5 @@ QStringList MainWindow::correlation(VectorXd signalSamples, QList<qreal> atomSam
     // dem Index des hoechsten Korrelationswertes minus die halbe Atomlaenge,
 
 }
-*/
+
 

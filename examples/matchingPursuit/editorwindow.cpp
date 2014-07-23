@@ -1051,7 +1051,7 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
     QStringList resultList;
     resultList.clear();
 
-    QString savePath = QString(":/Matching-Pursuit-Toolbox/%1.pdict").arg(partDictName);
+    QString savePath = QString("Matching-Pursuit-Toolbox/%1.pdict").arg(partDictName);
     QFile dict(savePath);
 
     if(partDictName.isEmpty())
@@ -1124,7 +1124,7 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
                             else if(atomType == EditorWindow::Gauss)
                             {
                                 GaborAtom *gAtom = new GaborAtom();//ui->spb_AtomLength->value(), tempScale, 0, tempModu, tempPhase);
-                                resultList = gAtom->CreateStringValues();
+                                resultList = gAtom->CreateStringValues(ui->spb_AtomLength->value(), tempScale, 0, tempModu, tempPhase);
                             }
                             stream << QString("%1_ATOM_%2 \n scale: %3 modu: %4 phase: %5 chrip: %6").arg(partDictName).arg(atomIndex).arg(tempScale).arg(tempModu).arg(tempPhase).arg(tempChirp) << "\n";
                             for (QStringList::Iterator it = resultList.begin(); it != resultList.end(); it++)
@@ -1140,7 +1140,7 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
                 chirpCount++;
             }            
         }
-        else
+        else //all params combined
         {
             if(ui->spb_AtomCount->value() != 1)
             {
@@ -1186,7 +1186,7 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
                 else if(atomType == EditorWindow::Gauss)
                 {
                     GaborAtom *gAtom = new GaborAtom();//ui->spb_AtomLength->value(), tempScale,0 , tempModu, tempPhase);
-                    resultList = gAtom->CreateStringValues();
+                    resultList = gAtom->CreateStringValues(ui->spb_AtomLength->value(), tempScale, 0, tempModu, tempPhase);
                 }
 
                 stream << QString("%1_ATOM_%2 \n scale: %3 modu: %4 phase: %5 chrip: %6").arg(partDictName).arg(i).arg(tempScale).arg(tempModu).arg(tempPhase).arg(tempChirp)  << "\n";
