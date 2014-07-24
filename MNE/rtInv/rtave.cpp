@@ -434,7 +434,7 @@ void RtAve::run()
                             //
                             this->assemblePostStimulus(t_qListRawMatBuf, t_iStimIndex);
 
-                            qDebug() << "Stimulus" << t_iStimIndex << "; Buffer Size" << m_qListQListPreStimBuf[t_iStimIndex].size();
+                            qDebug() << m_pFiffInfo->ch_names[m_qListStimChannelIdcs[t_iStimIndex]] << ": Buffer Size" << m_qListQListPreStimBuf[t_iStimIndex].size();
                             //
                             // Prestimulus average
                             //
@@ -484,18 +484,19 @@ void RtAve::run()
                                 //
                                 // Emit evoked
                                 //
+                                QString t_sStimChName = m_pFiffInfo->ch_names[m_qListStimChannelIdcs[t_iStimIndex]];
                                 FiffEvoked::SPtr t_pEvokedPreStim(new FiffEvoked(t_preStimEvoked));
-                                t_pEvokedPreStim->comment = QString("Stim %1").arg(t_iStimIndex);
+                                t_pEvokedPreStim->comment = t_sStimChName;
                                 t_pEvokedPreStim->data = m_qListPreStimAve[t_iStimIndex];
                                 emit evokedPreStim(t_pEvokedPreStim);
 
                                 FiffEvoked::SPtr t_pEvokedPostStim(new FiffEvoked(t_postStimEvoked));
-                                t_pEvokedPostStim->comment = QString("Stim %1").arg(t_iStimIndex);
+                                t_pEvokedPostStim->comment = t_sStimChName;
                                 t_pEvokedPostStim->data = m_qListPostStimAve[t_iStimIndex];
                                 emit evokedPostStim(t_pEvokedPostStim);
 
                                 FiffEvoked::SPtr t_pEvokedStim(new FiffEvoked(t_stimEvoked));
-                                t_pEvokedStim->comment = QString("Stim %1").arg(t_iStimIndex);
+                                t_pEvokedStim->comment = t_sStimChName;
                                 t_pEvokedStim->data = m_qListStimAve[t_iStimIndex];
                                 emit evokedStim(t_pEvokedStim);
                             }
