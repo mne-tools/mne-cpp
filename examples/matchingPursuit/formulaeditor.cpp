@@ -1,3 +1,38 @@
+//=============================================================================================================
+/**
+* @file     formulaeditor.cpp
+* @author   Martin Henfling <martin.henfling@tu-ilmenau.de>;
+*           Daniel Knobl <daniel.knobl@tu-ilmenau.de>;
+*           Sebastian Krause <sebastian.krause@tu-ilmenau.de>
+* @version  1.0
+* @date     July, 2014
+*
+* @section  LICENSE
+*
+* Copyright (C) 2014, Martin Henfling, Daniel Knobl and Sebastian Krause. All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+* the following conditions are met:
+*     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+*       following disclaimer.
+*     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+*       the following disclaimer in the documentation and/or other materials provided with the distribution.
+*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*       to endorse or promote products derived from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+*
+* @brief    Implementation of FormulaEditor class.
+*/
+
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
@@ -102,12 +137,12 @@ Formulaeditor::~Formulaeditor()
     delete ui;
 }
 
-void AtomPaintWindow::paintEvent(QPaintEvent *event)
+void AtomPaintWindow::paint_event(QPaintEvent *event)
 {    
-    PaintSignal(atomList, QSize(510,200));
+    paint_signal(atomList, QSize(510,200));
 }
 
-void AtomPaintWindow::PaintSignal(QList<qreal> valueList, QSize windowSize)
+void AtomPaintWindow::paint_signal(QList<qreal> valueList, QSize windowSize)
 {
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing, true);
@@ -486,16 +521,16 @@ void Formulaeditor::on_btt_Test_clicked()
 {
     Formulaeditor FormulaParser;
 
-    FormulaParser.SetFunctConst(0, ui->tb_A->text().toFloat());
-    FormulaParser.SetFunctConst(1, ui->tb_B->text().toFloat());
-    FormulaParser.SetFunctConst(2, ui->tb_C->text().toFloat());
-    FormulaParser.SetFunctConst(3, ui->tb_D->text().toFloat());
-    FormulaParser.SetFunctConst(4, ui->tb_E->text().toFloat());
-    FormulaParser.SetFunctConst(5, ui->tb_F->text().toFloat());
-    FormulaParser.SetFunctConst(6, ui->tb_G->text().toFloat());
-    FormulaParser.SetFunctConst(7, ui->tb_H->text().toFloat());
+    FormulaParser.set_funct_const(0, ui->tb_A->text().toFloat());
+    FormulaParser.set_funct_const(1, ui->tb_B->text().toFloat());
+    FormulaParser.set_funct_const(2, ui->tb_C->text().toFloat());
+    FormulaParser.set_funct_const(3, ui->tb_D->text().toFloat());
+    FormulaParser.set_funct_const(4, ui->tb_E->text().toFloat());
+    FormulaParser.set_funct_const(5, ui->tb_F->text().toFloat());
+    FormulaParser.set_funct_const(6, ui->tb_G->text().toFloat());
+    FormulaParser.set_funct_const(7, ui->tb_H->text().toFloat());
 
-    double retValue = FormulaParser.Calculation(ui->tb_Formula->text(), ui->dsb_StartValue->value());  // TODO Float or only Int at X
+    double retValue = FormulaParser.calculation(ui->tb_Formula->text(), ui->dsb_StartValue->value());  // TODO Float or only Int at X
 
     if(errorText.isEmpty())
     {
@@ -527,13 +562,13 @@ void Formulaeditor::on_btt_Test_clicked()
     {
         while(internStartValue  <= endValue)
         {
-            resultsList.append(FormulaParser.Calculation(ui->tb_Formula->text(), internStartValue ));
+            resultsList.append(FormulaParser.calculation(ui->tb_Formula->text(), internStartValue ));
             internStartValue  += stepWidth;
         }
     }
     else
     {
-        qreal result = FormulaParser.Calculation(ui->tb_Formula->text(), internStartValue );
+        qreal result = FormulaParser.calculation(ui->tb_Formula->text(), internStartValue );
         ui->lb_Result->setText(QString("Ergebnis = %1").arg(result));
     }
 
@@ -567,17 +602,17 @@ void Formulaeditor::on_btt_Save_clicked()
 // formula methods ******************************************************************************************************
 //**********************************************************************************************************************
 
-qreal Formulaeditor::SignFactor(qint32& nPosition, QString& strCharacter)
+qreal Formulaeditor::sign_factor(qint32& nPosition, QString& strCharacter)
 {
   if (strCharacter == "-")
     {
-        Char_n(nPosition, strCharacter);
-        return (-1.0) * Factor(nPosition, strCharacter);
+        char_n(nPosition, strCharacter);
+        return (-1.0) * factor(nPosition, strCharacter);
     }
-  else return Factor(nPosition, strCharacter);
+  else return factor(nPosition, strCharacter);
 }
 
-void Formulaeditor::StripFormula(QString &strFormula)
+void Formulaeditor::strip_formula(QString &strFormula)
 {
     qint32 level = 0;
 
@@ -691,7 +726,7 @@ void Formulaeditor::StripFormula(QString &strFormula)
     strFormula.replace("|", "");
 }
 
-double Formulaeditor::Calculation(QString strFormula, qreal xValue, bool strip)
+double Formulaeditor::calculation(QString strFormula, qreal xValue, bool strip)
 {
     qint32  nPosition;
     QString strCharacter;
@@ -701,51 +736,51 @@ double Formulaeditor::Calculation(QString strFormula, qreal xValue, bool strip)
 
     m_strErrortext = "";
 
-    if (strip) StripFormula(strFormula);
+    if (strip) strip_formula(strFormula);
 
     m_strFunction = strFormula;
     m_dFktValue = xValue;
     if (m_dFktValue == 0)
     m_dFktValue = FLT_MIN;
     nPosition = 0;
-    Char_n(nPosition, strCharacter);
+    char_n(nPosition, strCharacter);
 
-    ergebnis = Expression(nPosition, strCharacter);
+    ergebnis = expression(nPosition, strCharacter);
 
     return ergebnis;
 }
 
-double Formulaeditor::Expression(int& nPosition, QString& strCharacter)
+double Formulaeditor::expression(int& nPosition, QString& strCharacter)
 {
   QString strOperator;
-  double erg = SimpleExpression(nPosition, strCharacter);
+  double erg = simple_expression(nPosition, strCharacter);
   while (strCharacter == "+" || strCharacter == "-")
   {
     strOperator = strCharacter;
-    Char_n(nPosition, strCharacter);
+    char_n(nPosition, strCharacter);
     if (strOperator == "+")
-        erg += SimpleExpression(nPosition, strCharacter);
+        erg += simple_expression(nPosition, strCharacter);
     else if (strOperator == "-")
-        erg -= SimpleExpression(nPosition, strCharacter);
+        erg -= simple_expression(nPosition, strCharacter);
   }
 
   return erg;
 }
 
-double Formulaeditor::SimpleExpression(int& nPosition, QString& strCharacter)
+double Formulaeditor::simple_expression(int& nPosition, QString& strCharacter)
 {
     double s,dum;
     QString strOperator;
-    s = Term(nPosition, strCharacter);
+    s = term(nPosition, strCharacter);
     while (strCharacter == "*" || strCharacter == "/")
     {
         strOperator = strCharacter;
-        Char_n(nPosition, strCharacter);
+        char_n(nPosition, strCharacter);
         if (strOperator == "*")
-            s = s * Term(nPosition, strCharacter);
+            s = s * term(nPosition, strCharacter);
         else if (strOperator == "/")
         {
-            dum = Term(nPosition, strCharacter);
+            dum = term(nPosition, strCharacter);
             if (dum != 0)   s = s / dum;
             else    errorText = QString("Dividieren durch 0 ist nicht möglich.");
         }
@@ -753,14 +788,14 @@ double Formulaeditor::SimpleExpression(int& nPosition, QString& strCharacter)
     return s;
 }
 
-double Formulaeditor::Term(int& nPosition, QString& strCharacter)
+double Formulaeditor::term(int& nPosition, QString& strCharacter)
 {
   qreal t,vz;
-  t = SignFactor(nPosition, strCharacter);
+  t = sign_factor(nPosition, strCharacter);
   while (strCharacter == "^")
   {
-      Char_n(nPosition, strCharacter);
-      vz = SignFactor(nPosition, strCharacter);
+      char_n(nPosition, strCharacter);
+      vz = sign_factor(nPosition, strCharacter);
 
       if ((t <= 0 && fabs(vz) <= 1) || (t <= 0 && vz != qint32(vz))) errorText = QString("Radizieren negativer Zahlen ist im Reelen nicht möglich.");
       else    t = pow(t,vz);
@@ -768,7 +803,7 @@ double Formulaeditor::Term(int& nPosition, QString& strCharacter)
   return t;
 }
 
-double Formulaeditor::Char_n(int& nPosition, QString& strCharacter)
+double Formulaeditor::char_n(int& nPosition, QString& strCharacter)
 {
     do
     {
@@ -776,7 +811,7 @@ double Formulaeditor::Char_n(int& nPosition, QString& strCharacter)
         if (nPosition <= m_strFunction.length())
             strCharacter = m_strFunction.mid(nPosition - 1, 1);
         else
-            strCharacter = strChar_("?");
+            strCharacter = str_char("?");
     }
     while (strCharacter == " ");
 
@@ -793,12 +828,12 @@ QString Formulaeditor::GetFormula()
     return m_strFormula;
 }
 
-double Formulaeditor::Factor(qint32& nPosition, QString& strCharacter)
+double Formulaeditor::factor(qint32& nPosition, QString& strCharacter)
 {
     qreal f = 0.0;
     qint32 wI = 0, wL = 0, wBeginn = 0, wError = 0;
 
-    if	(strCharacter == strChar_(0)) return 0.0;
+    if	(strCharacter == str_char(0)) return 0.0;
     // read digit and save as float in f
     if (((strCharacter >= "0") && (strCharacter <= "9")) || (strCharacter == "."))
     {
@@ -806,7 +841,7 @@ double Formulaeditor::Factor(qint32& nPosition, QString& strCharacter)
 
         do
         {
-            Char_n(nPosition, strCharacter);
+            char_n(nPosition, strCharacter);
         }
         while ((((strCharacter >= "0") && (strCharacter <= "9")) || (strCharacter == ".")));
 
@@ -814,7 +849,7 @@ double Formulaeditor::Factor(qint32& nPosition, QString& strCharacter)
         {
             do
             {
-                Char_n(nPosition, strCharacter);
+                char_n(nPosition, strCharacter);
             }
             while (!(((qint8)strCharacter.at(0).digitValue() >= 0) && ((qint8)strCharacter.at(0).digitValue() <=  9))  || (strCharacter.at(0) == '.'));
         }
@@ -827,14 +862,14 @@ double Formulaeditor::Factor(qint32& nPosition, QString& strCharacter)
         QString strCharacterUpper = strCharacter.toUpper();
         if (strCharacter == "(")
         {
-            Char_n(nPosition, strCharacter);
-            f = Expression(nPosition, strCharacter);
+            char_n(nPosition, strCharacter);
+            f = expression(nPosition, strCharacter);
             if (strCharacter == ")")
-                Char_n(nPosition, strCharacter);
+                char_n(nPosition, strCharacter);
         }
         else if (strCharacterUpper == "X")
         {
-            Char_n(nPosition, strCharacter);
+            char_n(nPosition, strCharacter);
             f = m_dFktValue;
         }
         else
@@ -852,9 +887,9 @@ double Formulaeditor::Factor(qint32& nPosition, QString& strCharacter)
                 {
                     gefunden = true;
                     nPosition = nPosition + wL - 1;
-                    Char_n(nPosition, strCharacter);
+                    char_n(nPosition, strCharacter);
                     // ! recursion !!!!!!!!!!!!!!!!!!!!!!
-                    f = Factor(nPosition, strCharacter);
+                    f = factor(nPosition, strCharacter);
                     //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
                     if (strFunktionUpper == "ABS")
                         f = fabs(f);
@@ -946,7 +981,7 @@ double Formulaeditor::Factor(qint32& nPosition, QString& strCharacter)
             }
             if (!gefunden)
             {
-                Char_n(nPosition, strCharacter);
+                char_n(nPosition, strCharacter);
                 if (strCharacterUpper == "A")
                     f = m_dFunctionConstant[0];
                 else if (strCharacterUpper == "B")
@@ -972,14 +1007,14 @@ double Formulaeditor::Factor(qint32& nPosition, QString& strCharacter)
     return f;
 }
 
-void Formulaeditor::SetFunctConst(int index, double val)
+void Formulaeditor::set_funct_const(int index, double val)
 {
     //between 0 and 9
     if (index >= 0 && index < 9)   m_dFunctionConstant[index] = val;
     else errorText = QString("Programmfehler in SetFunctConst()");
 }
 
-QString Formulaeditor::strChar_(QString DecimalZahl)
+QString Formulaeditor::str_char(QString DecimalZahl)
 {
     if(DecimalZahl == "?")        return QString("?");
     else        return DecimalZahl;
@@ -1015,7 +1050,7 @@ double Formulaeditor::RAD(double x /* grad */)
     return x * PI / 180.0;
 }
 
-QString Formulaeditor::GetNextToken(QString &strSrc, const QString strDelim)
+QString Formulaeditor::get_next_token(QString &strSrc, const QString strDelim)
 {
     QString token;
     int idx = strSrc.indexOf(strDelim);
