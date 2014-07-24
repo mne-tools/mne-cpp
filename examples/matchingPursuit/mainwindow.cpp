@@ -1,3 +1,38 @@
+//=============================================================================================================
+/**
+* @file     mainwindow.cpp
+* @author   Martin Henfling <martin.henfling@tu-ilmenau.de>;
+*           Daniel Knobl <daniel.knobl@tu-ilmenau.de>;
+*           Sebastian Krause <sebastian.krause@tu-ilmenau.de>
+* @version  1.0
+* @date     July, 2014
+*
+* @section  LICENSE
+*
+* Copyright (C) 2014, Martin Henfling, Daniel Knobl and Sebastian Krause. All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+* the following conditions are met:
+*     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+*       following disclaimer.
+*     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+*       the following disclaimer in the documentation and/or other materials provided with the distribution.
+*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*       to endorse or promote products derived from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+*
+* @brief    Implementation of MainWindow class.
+*/
+
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
@@ -54,20 +89,8 @@ using namespace DISPLIB;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-MatrixXd _datas;
-MatrixXd _times;
 
-//*************************************************************************************************************
-//=============================================================================================================
-// MAIN
-//=============================================================================================================
-enum TruncationCriterion
-{
-    Iterations,
-    SignalEnergy,
-    Both
-};
-
+bool _tbv_is_loading = false;
 qreal _soll_energy = 0;
 qreal _signal_energy = 0;
 qreal _signal_maximum = 0;
@@ -79,14 +102,28 @@ QMap<qint32, bool> select_channel_map;
 
 QList<QColor> _colors;
 QList<QColor> _original_colors;
+QList<GaborAtom> _my_atom_list;
 
+MatrixXd _datas;
+MatrixXd _times;
 MatrixXd _signal_matrix(0, 0);
 MatrixXd _original_signal_matrix(0,0);
 MatrixXd _residuum_matrix(0,0);
 MatrixXd _atom_sum_matrix(0,0);
-QList<GaborAtom> _my_atom_list;
+
 //QList<QStringList> _result_atom_list;
 
+//*************************************************************************************************************
+//=============================================================================================================
+// MAIN
+//=============================================================================================================
+
+enum TruncationCriterion
+{
+    Iterations,
+    SignalEnergy,
+    Both
+};
 
 //*************************************************************************************************************************************
 
@@ -136,6 +173,9 @@ MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::
     ui->tbv_Results->setColumnWidth(2,40);
     ui->tbv_Results->setColumnWidth(3,40);
     ui->tbv_Results->setColumnWidth(4,40);
+
+    connect(ui->tbv_Results->model(), SIGNAL(dataChanged ( const QModelIndex&, const QModelIndex&)), this, SLOT(tbv_selection_changed(const QModelIndex&, const QModelIndex&)));
+
 
     // build config file at init
     bool hasEntry1 = false;
@@ -223,9 +263,9 @@ void MainWindow::open_file()
     QString fileName = fileDia->getOpenFileName(this, "Please select signalfile.",QDir::currentPath(),"(*.fif *.txt)");
     if(fileName.isNull()) return;
 
-    this->items.clear();
-    this->model = new QStandardItemModel;
-    connect(this->model, SIGNAL(dataChanged ( const QModelIndex&, const QModelIndex&)), this, SLOT(cb_selection_changed(const QModelIndex&, const QModelIndex&)));
+    this->cb_items.clear();
+    this->cb_model = new QStandardItemModel;
+    connect(this->cb_model, SIGNAL(dataChanged ( const QModelIndex&, const QModelIndex&)), this, SLOT(cb_selection_changed(const QModelIndex&, const QModelIndex&)));
 
 
     QFile file(fileName);
@@ -240,7 +280,7 @@ void MainWindow::open_file()
     _colors.append(QColor(0, 0, 0));
 
     if(fileName.endsWith(".fif", Qt::CaseInsensitive))        
-    {    ReadFiffFile(fileName);
+    {    read_fiff_file(fileName);
         _signal_matrix.resize(512,5);
         _original_signal_matrix.resize(512,5);
         // ToDo: find good fiff signal part
@@ -251,7 +291,7 @@ void MainWindow::open_file()
     else
     {
         _signal_matrix.resize(0,0);
-        ReadMatlabFile(fileName);
+        read_matlab_file(fileName);
         _original_signal_matrix.resize(_signal_matrix.rows(), _signal_matrix.cols());
     }
 
@@ -260,16 +300,16 @@ void MainWindow::open_file()
     {
         _colors.append(QColor::fromHsv(qrand() % 256, 255, 190));
 
-        this->item = new QStandardItem;
+        this->cb_item = new QStandardItem;
 
-        this->item->setText(QString("Channel %1").arg(channels));
-        this->item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
-        this->item->setData(Qt::Checked, Qt::CheckStateRole);
-        this->model->insertRow(channels, this->item);
-        this->items.push_back(this->item);
+        this->cb_item->setText(QString("Channel %1").arg(channels));
+        this->cb_item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
+        this->cb_item->setData(Qt::Checked, Qt::CheckStateRole);
+        this->cb_model->insertRow(channels, this->cb_item);
+        this->cb_items.push_back(this->cb_item);
         select_channel_map.insert(channels, true);
     }
-    ui->cb_channels->setModel(this->model);
+    ui->cb_channels->setModel(this->cb_model);
     _original_colors = _colors;
     _atom_sum_matrix.resize(_signal_matrix.rows(), _signal_matrix.cols());
     _residuum_matrix.resize(_signal_matrix.rows(), _signal_matrix.cols());
@@ -281,10 +321,10 @@ void MainWindow::open_file()
 
 void MainWindow::cb_selection_changed(const QModelIndex& topLeft, const QModelIndex& bottomRight)
 {
-    QStandardItem* item = this->items[topLeft.row()];
-    if(item->checkState() == Qt::Unchecked)    
+    QStandardItem* cb_item = this->cb_items[topLeft.row()];
+    if(cb_item->checkState() == Qt::Unchecked)
         select_channel_map[topLeft.row()] = false;
-    else if(item->checkState() == Qt::Checked)    
+    else if(cb_item->checkState() == Qt::Checked)
         select_channel_map[topLeft.row()] = true;
 
     qint32 size = 0;
@@ -313,7 +353,7 @@ void MainWindow::cb_selection_changed(const QModelIndex& topLeft, const QModelIn
 
 //*************************************************************************************************************************************
 
-qint32 MainWindow::ReadFiffFile(QString fileName)
+qint32 MainWindow::read_fiff_file(QString fileName)
 {
     QFile t_fileRaw(fileName);
 
@@ -399,7 +439,6 @@ qint32 MainWindow::ReadFiffFile(QString fileName)
     //
     bool readSuccessful = false;
 
-
     if (in_samples)
         readSuccessful = raw.read_raw_segment(_datas, _times, (qint32)from, (qint32)to, picks);
     else
@@ -421,7 +460,7 @@ qint32 MainWindow::ReadFiffFile(QString fileName)
 
 //*************************************************************************************************************************************
 
-void MainWindow::ReadMatlabFile(QString fileName)
+void MainWindow::read_matlab_file(QString fileName)
 {
     QFile file(fileName);
     QString contents;
@@ -645,7 +684,7 @@ void GraphWindow::PaintSignal(MatrixXd signalMatrix, QSize windowSize)
 
 //*************************************************************************************************************************************
 
-void AtomSumWindow::paintEvent(QPaintEvent* event)
+ void AtomSumWindow::paintEvent(QPaintEvent* event)
 {
    PaintAtomSum(_atom_sum_matrix, this->size(), _signal_maximum, _signal_negative_scale);
 }
@@ -913,6 +952,17 @@ void ResiduumWindow::PaintResiduum(MatrixXd residuum_matrix, QSize windowSize, q
 // starts MP-algorithm
 void MainWindow::on_btt_Calc_clicked()
 {    
+    // ToDo: paused Thread
+    if(ui->btt_Calc->text() == "break")
+        return;
+
+    ui->frame->setEnabled(false);
+    ui->btt_OpenSignal->setEnabled(false);
+    ui->btt_Calc->setText("break");
+    ui->tbv_Results->setEnabled(false);
+    ui->cb_channels->setEnabled(false);
+
+
     TruncationCriterion criterion;    
     ui->progressBarCalc->setValue(0);
     ui->progressBarCalc->setHidden(false);
@@ -1007,7 +1057,7 @@ void MainWindow::on_btt_Calc_clicked()
     }
     else if(ui->rb_adativMp->isChecked())
     {
-        CalcAdaptivMP(_signal_matrix, criterion);
+        calc_adaptiv_mp(_signal_matrix, criterion);
     }    
 }
 
@@ -1015,7 +1065,8 @@ void MainWindow::on_btt_Calc_clicked()
 
 void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations, qreal current_energy, qreal max_energy, gabor_atom_list atom_res_list)
 {
-    //update();
+    _tbv_is_loading = true;
+    //update();    
     QString res_energy_str = ui->tb_ResEnergy->text();
     res_energy_str.replace(",", ".");
     qreal percent = res_energy_str.toFloat();
@@ -1030,6 +1081,7 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
     //current atoms list update
     //todo: make it less complicated
     ui->tbv_Results->setRowCount(atom_res_list.length());
+    _my_atom_list.append(atom_res_list.last());
 
     for(qint32 i = 0; i < atom_res_list.length(); i++)
     {
@@ -1061,7 +1113,6 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
         ui->tbv_Results->setItem(i, 3, atomModulationItem);
         ui->tbv_Results->setItem(i, 4, atomPhaseItem);
     }
-
     qint32 prgrsbar_adapt = 99;
 
     //progressbar update
@@ -1078,8 +1129,7 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
     if(((current_iteration == max_iterations) || (max_energy - current_energy) < (0.01 * percent * max_energy))&&ui->chb_ResEnergy->isChecked())
         ui->progressBarCalc->setValue(ui->progressBarCalc->maximum());
 
-    //recieve the resulting atomparams
-    _my_atom_list.append(atom_res_list.last());
+    //recieve the resulting atomparams    
     GaborAtom gaborAtom = atom_res_list.last();
 
     for(qint32 i = 0; i < _signal_matrix.cols(); i++)
@@ -1087,8 +1137,35 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
         VectorXd discret_atom = gaborAtom.create_real(gaborAtom.sample_count, gaborAtom.scale, gaborAtom.translation, gaborAtom.modulation, gaborAtom.phase_list.at(i));
 
         _atom_sum_matrix.col(i) += gaborAtom.max_scalar_list.at(i) * discret_atom;
-        //std::cout << _atom_sum_matrix.col(i) << "\n";
         _residuum_matrix.col(i) -= gaborAtom.max_scalar_list.at(i)  * discret_atom;
+    }
+    update();
+    _tbv_is_loading = false;
+}
+
+void MainWindow::tbv_selection_changed(const QModelIndex& topLeft, const QModelIndex& bottomRight)
+{
+    if(_tbv_is_loading)
+        return;
+    cout << "selected row " << topLeft.row() << "\n";
+    QTableWidgetItem* firstItem = ui->tbv_Results->item(topLeft.row(), 0);
+    GaborAtom  atom = _my_atom_list.at(topLeft.row());
+
+    if(firstItem->checkState())
+    {
+        for(qint32 channels = 0; channels < atom.phase_list.length(); channels++)
+        {
+            _atom_sum_matrix.col(channels) += atom.max_scalar_list.at(channels) * atom.create_real(atom.sample_count, atom.scale, atom.translation, atom.modulation, atom.phase_list.at(channels));
+            _residuum_matrix.col(channels) -= atom.max_scalar_list.at(channels) * atom.create_real(atom.sample_count, atom.scale, atom.translation, atom.modulation, atom.phase_list.at(channels));
+        }
+    }
+    else
+    {
+        for(qint32 channels = 0; channels < atom.phase_list.length(); channels++)
+        {
+            _atom_sum_matrix.col(channels) -= atom.max_scalar_list.at(channels) * atom.create_real(atom.sample_count, atom.scale, atom.translation, atom.modulation, atom.phase_list.at(channels));
+            _residuum_matrix.col(channels) += atom.max_scalar_list.at(channels) * atom.create_real(atom.sample_count, atom.scale, atom.translation, atom.modulation, atom.phase_list.at(channels));
+        }
     }
     update();
 }
@@ -1097,12 +1174,16 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
 
 void MainWindow::calc_thread_finished()
 {
-    ui->btt_Calc->setText("ENDE");
+    ui->frame->setEnabled(true);
+    ui->btt_OpenSignal->setEnabled(true);
+    ui->btt_Calc->setText("calculate");
+    ui->tbv_Results->setEnabled(true);
+    ui->cb_channels->setEnabled(true);
 }
 
 //*************************************************************************************************************
 
-void MainWindow::CalcAdaptivMP(MatrixXd signal, TruncationCriterion criterion)
+void MainWindow::calc_adaptiv_mp(MatrixXd signal, TruncationCriterion criterion)
 {
     //TODO: clean up that mess
     AdaptiveMp *adaptive_Mp = new AdaptiveMp();
@@ -1159,6 +1240,7 @@ void MainWindow::CalcAdaptivMP(MatrixXd signal, TruncationCriterion criterion)
 
 void MainWindow::on_tbv_Results_cellClicked(int row, int column)
 {
+    /*
     QTableWidgetItem* firstItem = ui->tbv_Results->item(row, 0);
     GaborAtom atom = _my_atom_list.at(row);
 
@@ -1181,6 +1263,7 @@ void MainWindow::on_tbv_Results_cellClicked(int row, int column)
         }
     }
     update();
+    */
 }
 
 /*
