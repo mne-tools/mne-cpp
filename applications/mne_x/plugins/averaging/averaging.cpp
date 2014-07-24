@@ -76,7 +76,7 @@ Averaging::Averaging()
 , m_bIsRunning(false)
 , m_bProcessData(false)
 , m_iPreStimSamples(750)
-, m_iPostStimSamples(750)
+, m_iPostStimSamples(400)//750)
 , m_iNumAverages(10)
 , m_iStimChan(0)
 , m_pAveragingWidget(AveragingSettingsWidget::SPtr())
@@ -115,7 +115,6 @@ QSharedPointer<IPlugin> Averaging::clone() const
 
 void Averaging::init()
 {
-
     // Input
     m_pAveragingInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "AveragingIn", "Averaging input data");
     connect(m_pAveragingInput.data(), &PluginInputConnector::notify, this, &Averaging::update, Qt::DirectConnection);
@@ -123,6 +122,7 @@ void Averaging::init()
 
     // Output
     m_pAveragingOutput = PluginOutputData<RealTimeEvoked>::create(this, "AveragingOut", "Averaging Output Data");
+    m_pAveragingOutput->data()->setPreStimSamples(m_iPreStimSamples);
     m_outputConnectors.append(m_pAveragingOutput);
 
     //init channels when fiff info is available
@@ -136,10 +136,50 @@ void Averaging::init()
 
 //*************************************************************************************************************
 
+void Averaging::changeNumAverages(qint32 numAve)
+{
+    m_iNumAverages = numAve;
+    if(m_pRtAve)
+        m_pRtAve->setAverages(numAve);
+}
+
+
+//*************************************************************************************************************
+
 void Averaging::initConnector()
 {
     if(m_pFiffInfo)
+    {
         m_pAveragingOutput->data()->initFromFiffInfo(m_pFiffInfo);
+
+        m_qListModalities.clear();
+        bool hasMag = false;
+        bool hasGrad = false;
+        bool hasEEG = false;
+        bool hasEOG = false;
+        for(qint32 i = 0; i < m_pFiffInfo->nchan; ++i)
+        {
+            if(m_pFiffInfo->chs[i].kind == FIFFV_MEG_CH)
+            {
+                if(!hasMag &&  m_pFiffInfo->chs[i].unit == FIFF_UNIT_T)
+                    hasMag = true;
+                else if(!hasGrad &&  m_pFiffInfo->chs[i].unit == FIFF_UNIT_T_M)
+                    hasGrad = true;
+            }
+            else if(!hasEEG && m_pFiffInfo->chs[i].kind == FIFFV_EEG_CH)
+                hasEEG = true;
+            else if(!hasEOG && m_pFiffInfo->chs[i].kind == FIFFV_EOG_CH)
+                hasEOG = true;
+        }
+        if(hasMag)
+            m_qListModalities.append(QPair<QString,bool>("MAG",true));
+        if(hasGrad)
+            m_qListModalities.append(QPair<QString,bool>("GRAD",true));
+        if(hasEEG)
+            m_qListModalities.append(QPair<QString,bool>("EEG",true));
+        if(hasEOG)
+            m_qListModalities.append(QPair<QString,bool>("EOG",true));
+    }
 }
 
 
@@ -200,16 +240,17 @@ QString Averaging::getName() const
 
 //*************************************************************************************************************
 
-void Averaging::preStimChanged(qint32 samples)
+void Averaging::changePreStim(qint32 samples)
 {
     m_iPreStimSamples = samples;
+    m_pAveragingOutput->data()->setPreStimSamples(m_iPreStimSamples);
     emit sampleNumChanged();
 }
 
 
 //*************************************************************************************************************
 
-void Averaging::postStimChanged(qint32 samples)
+void Averaging::changePostStim(qint32 samples)
 {
     m_iPostStimSamples = samples;
     emit sampleNumChanged();
@@ -229,8 +270,7 @@ QWidget* Averaging::setupWidget()
 
 void Averaging::showAveragingWidget()
 {
-    if(!m_pAveragingWidget)
-        m_pAveragingWidget = AveragingSettingsWidget::SPtr(new AveragingSettingsWidget(this));
+    m_pAveragingWidget = AveragingSettingsWidget::SPtr(new AveragingSettingsWidget(this));
     m_pAveragingWidget->show();
 }
 
@@ -273,7 +313,7 @@ void Averaging::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 void Averaging::appendEvoked(FiffEvoked::SPtr p_pEvoked)
 {
 //    qDebug() << "void Averaging::appendEvoked";// << p_pEvoked->comment;
-    qDebug() << p_pEvoked->comment;
+//    qDebug() << p_pEvoked->comment;
     if(p_pEvoked->comment == QString("Stim %1").arg(m_iStimChan))
     {
 //        qDebug()<< p_pEvoked->comment << "append";
@@ -321,7 +361,6 @@ void Averaging::run()
             MatrixXd rawSegment = m_pAveragingBuffer->pop();
 
             m_pRtAve->append(rawSegment);
-
 
             mutex.lock();
             if(m_qVecEvokedData.size() > 0)
