@@ -1,5 +1,7 @@
-mkdir Git
-cd Git
+mkdir ~/Qt
+cd ~/Qt
+mkdir depot
+cd depot
 git clone https://git.gitorious.org/qt/qt5.git qt5
 cd qt5
 git checkout stable
@@ -10,7 +12,9 @@ make -j8
 make install
 make docs -j8
 make install_docs
-cd ..
+cd ~
+mkdir Git
+cd Git
 git clone https://github.com/mne-tools/mne-cpp.git mne-cpp
 cd mne-cpp
 ~/Qt/Qt5.3.1-opengl/bin/qmake -r
