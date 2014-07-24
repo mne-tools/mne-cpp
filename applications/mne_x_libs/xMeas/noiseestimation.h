@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     realtimeevoked.h
+* @file     noiseestimation.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the RealTimeEvoked class.
+* @brief    Contains the declaration of the NoiseEstimation class.
 *
 */
 
-#ifndef REALTIMEEVOKED_H
-#define REALTIMEEVOKED_H
+#ifndef NOISEESTIMATION_H
+#define NOISEESTIMATION_H
 
 
 //*************************************************************************************************************
@@ -79,28 +79,28 @@ using namespace FIFFLIB;
 
 //=========================================================================================================
 /**
-* DECLARE CLASS RealTimeEvoked -> ToDo check feasibilty of QAbstractTableModel
+* DECLARE CLASS NoiseEstimation
 *
 * @brief The RealTimeMultiSampleArrayNew class is the base class of every RealTimeMultiSampleArrayNew Measurement.
 */
-class XMEASSHARED_EXPORT RealTimeEvoked : public NewMeasurement
+class XMEASSHARED_EXPORT NoiseEstimation : public NewMeasurement
 {
     Q_OBJECT
 public:
-    typedef QSharedPointer<RealTimeEvoked> SPtr;               /**< Shared pointer type for RealTimeEvoked. */
-    typedef QSharedPointer<const RealTimeEvoked> ConstSPtr;    /**< Const shared pointer type for RealTimeEvoked. */
+    typedef QSharedPointer<NoiseEstimation> SPtr;               /**< Shared pointer type for NoiseEstimation. */
+    typedef QSharedPointer<const NoiseEstimation> ConstSPtr;    /**< Const shared pointer type for NoiseEstimation. */
 
     //=========================================================================================================
     /**
     * Constructs a RealTimeMultiSampleArrayNew.
     */
-    explicit RealTimeEvoked(QObject *parent = 0);
+    explicit NoiseEstimation(QObject *parent = 0);
 
     //=========================================================================================================
     /**
     * Destroys the RealTimeMultiSampleArrayNew.
     */
-    virtual ~RealTimeEvoked();
+    virtual ~NoiseEstimation();
 
     //=========================================================================================================
     /**
@@ -211,9 +211,9 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns whether RealTimeEvoked contains values
+    * Returns whether NoiseEstimation contains values
     *
-    * @return whether RealTimeEvoked contains values.
+    * @return whether NoiseEstimation contains values.
     */
     inline bool containsValues() const;
 
@@ -238,7 +238,7 @@ private:
 //=============================================================================================================
 
 
-inline bool RealTimeEvoked::isChInit() const
+inline bool NoiseEstimation::isChInit() const
 {
     return m_bChInfoIsInit;
 }
@@ -246,7 +246,7 @@ inline bool RealTimeEvoked::isChInit() const
 
 //*************************************************************************************************************
 
-inline const QString& RealTimeEvoked::getXMLLayoutFile() const
+inline const QString& NoiseEstimation::getXMLLayoutFile() const
 {
     return m_sXMLLayoutFile;
 }
@@ -254,7 +254,7 @@ inline const QString& RealTimeEvoked::getXMLLayoutFile() const
 
 //*************************************************************************************************************
 
-inline void RealTimeEvoked::setXMLLayoutFile(const QString& layout)
+inline void NoiseEstimation::setXMLLayoutFile(const QString& layout)
 {
     m_sXMLLayoutFile = layout;
 }
@@ -262,7 +262,7 @@ inline void RealTimeEvoked::setXMLLayoutFile(const QString& layout)
 
 //*************************************************************************************************************
 
-inline unsigned int RealTimeEvoked::getNumChannels() const
+inline unsigned int NoiseEstimation::getNumChannels() const
 {
     return m_qListChInfo.size();
 }
@@ -270,7 +270,7 @@ inline unsigned int RealTimeEvoked::getNumChannels() const
 
 //*************************************************************************************************************
 
-inline qint32 RealTimeEvoked::getNumPreStimSamples() const
+inline qint32 NoiseEstimation::getNumPreStimSamples() const
 {
     return m_iNumPreStimSamples;
 }
@@ -278,7 +278,7 @@ inline qint32 RealTimeEvoked::getNumPreStimSamples() const
 
 //*************************************************************************************************************
 
-inline QList<QColor>& RealTimeEvoked::chColor()
+inline QList<QColor>& NoiseEstimation::chColor()
 {
     return m_qListChColors;
 }
@@ -286,7 +286,7 @@ inline QList<QColor>& RealTimeEvoked::chColor()
 
 //*************************************************************************************************************
 
-inline QList<RealTimeSampleArrayChInfo>& RealTimeEvoked::chInfo()
+inline QList<RealTimeSampleArrayChInfo>& NoiseEstimation::chInfo()
 {
     return m_qListChInfo;
 }
@@ -294,7 +294,7 @@ inline QList<RealTimeSampleArrayChInfo>& RealTimeEvoked::chInfo()
 
 //*************************************************************************************************************
 
-inline FiffInfo::SPtr& RealTimeEvoked::getFiffInfo()
+inline FiffInfo::SPtr& NoiseEstimation::getFiffInfo()
 {
     return m_pFiffInfo_orig;
 }
@@ -302,13 +302,13 @@ inline FiffInfo::SPtr& RealTimeEvoked::getFiffInfo()
 
 //*************************************************************************************************************
 
-inline bool RealTimeEvoked::containsValues() const
+inline bool NoiseEstimation::containsValues() const
 {
     return m_bContainsValues;
 }
 
 } // NAMESPACE
 
-Q_DECLARE_METATYPE(XMEASLIB::RealTimeEvoked::SPtr)
+Q_DECLARE_METATYPE(XMEASLIB::NoiseEstimation::SPtr)
 
-#endif // REALTIMEEVOKED_H
+#endif // NOISEESTIMATION_H
