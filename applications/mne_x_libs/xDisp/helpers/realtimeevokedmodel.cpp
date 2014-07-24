@@ -95,7 +95,7 @@ QVariant RealTimeEvokedModel::data(const QModelIndex &index, int role) const
 
         //******** first column (chname) ********
         if(index.column() == 0 && role == Qt::DisplayRole)
-            return QVariant(m_qListChInfo[row].getChannelName());
+            return QVariant(m_pRTE->chInfo()[row].getChannelName());
 
         //******** second column (data plot) ********
         if(index.column()==1) {
@@ -180,24 +180,13 @@ QVariant RealTimeEvokedModel::headerData(int section, Qt::Orientation orientatio
 
 //*************************************************************************************************************
 
-void RealTimeEvokedModel::setChannelInfo(QList<RealTimeSampleArrayChInfo> &chInfo, QList<QColor> &chColor)
+void RealTimeEvokedModel::setRTE(QSharedPointer<RealTimeEvoked> &pRTE)
 {
     beginResetModel();
-    m_qListChInfo = chInfo;
-    m_qListChColors = chColor;
+    m_pRTE = pRTE;
     endResetModel();
 
     resetSelection();
-}
-
-
-//*************************************************************************************************************
-
-void RealTimeEvokedModel::setSamplingInfo(float sps)
-{
-    beginResetModel();
-    m_fSps = sps;
-    endResetModel();
 }
 
 
@@ -210,7 +199,7 @@ void RealTimeEvokedModel::addData(const MatrixXd &data)
 
     //Update data content
     QModelIndex topLeft = this->index(0,1);
-    QModelIndex bottomRight = this->index(m_qListChInfo.size()-1,1);
+    QModelIndex bottomRight = this->index(m_pRTE->chInfo().size()-1,1);
     QVector<int> roles; roles << Qt::DisplayRole;
     emit dataChanged(topLeft, bottomRight, roles);
 }
@@ -223,7 +212,7 @@ QColor RealTimeEvokedModel::getColor(qint32 row) const
     if(row < m_qMapIdxRowSelection.size())
     {
         qint32 chRow = m_qMapIdxRowSelection[row];
-        return m_qListChColors[chRow];
+        return m_pRTE->chColor()[chRow];
     }
     else
         return QColor();
@@ -237,7 +226,7 @@ fiff_int_t RealTimeEvokedModel::getKind(qint32 row) const
     if(row < m_qMapIdxRowSelection.size())
     {
         qint32 chRow = m_qMapIdxRowSelection[row];
-        return m_qListChInfo[chRow].getKind();
+        return m_pRTE->chInfo()[chRow].getKind();
     }
     else
         return 0;
@@ -251,7 +240,7 @@ fiff_int_t RealTimeEvokedModel::getUnit(qint32 row) const
     if(row < m_qMapIdxRowSelection.size())
     {
         qint32 chRow = m_qMapIdxRowSelection[row];
-        return m_qListChInfo[chRow].getUnit();;
+        return m_pRTE->chInfo()[chRow].getUnit();
     }
     else
         return FIFF_UNIT_NONE;
@@ -265,7 +254,7 @@ fiff_int_t RealTimeEvokedModel::getCoil(qint32 row) const
     if(row < m_qMapIdxRowSelection.size())
     {
         qint32 chRow = m_qMapIdxRowSelection[row];
-        return m_qListChInfo[chRow].getCoil();;
+        return m_pRTE->chInfo()[chRow].getCoil();
     }
     else
         return FIFFV_COIL_NONE;
@@ -283,7 +272,7 @@ void RealTimeEvokedModel::selectRows(const QList<qint32> &selection)
     qint32 count = 0;
     for(qint32 i = 0; i < selection.size(); ++i)
     {
-        if(selection[i] < m_qListChInfo.size())
+        if(selection[i] < m_pRTE->chInfo().size())
         {
             m_qMapIdxRowSelection.insert(count,selection[i]);
             ++count;
@@ -304,7 +293,7 @@ void RealTimeEvokedModel::resetSelection()
 
     m_qMapIdxRowSelection.clear();
 
-    for(qint32 i = 0; i < m_qListChInfo.size(); ++i)
+    for(qint32 i = 0; i < m_pRTE->chInfo().size(); ++i)
         m_qMapIdxRowSelection.insert(i,i);
 
     endResetModel();
@@ -322,7 +311,7 @@ void RealTimeEvokedModel::toggleFreeze(const QModelIndex &)
 
     //Update data content
     QModelIndex topLeft = this->index(0,1);
-    QModelIndex bottomRight = this->index(m_qListChInfo.size()-1,1);
+    QModelIndex bottomRight = this->index(m_pRTE->chInfo().size()-1,1);
     QVector<int> roles; roles << Qt::DisplayRole;
     emit dataChanged(topLeft, bottomRight, roles);
 }

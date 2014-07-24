@@ -150,6 +150,23 @@ public:
     */
     inline unsigned int getNumChannels() const;
 
+
+    //=========================================================================================================
+    /**
+    * Returns the number of pre-stimulus samples
+    *
+    * @return the number of pre-stimulus samples
+    */
+    inline qint32 getNumPreStimSamples() const;
+
+    //=========================================================================================================
+    /**
+    * Selects the given list of channel indeces and unselect all other channels
+    *
+    * @param[in] numSamples     number of pre stimulus samples to set
+    */
+    void setPreStimSamples(qint32 numSamples);
+
     //=========================================================================================================
     /**
     * Returns the number of channels.
@@ -206,6 +223,8 @@ private:
     QString                     m_sXMLLayoutFile;   /**< Layout file name. */
     MatrixXd                    m_matValue;         /**< The current attached sample vector.*/
 
+    qint32                  m_iNumPreStimSamples;   /**< Number of pre-stimulus samples */
+
     QList<QColor>               m_qListChColors;    /**< Channel color for butterfly plot.*/
     QList<RealTimeSampleArrayChInfo> m_qListChInfo; /**< Channel info list.*/
     bool                        m_bChInfoIsInit;    /**< If channel info is initialized.*/
@@ -246,6 +265,14 @@ inline void RealTimeEvoked::setXMLLayoutFile(const QString& layout)
 inline unsigned int RealTimeEvoked::getNumChannels() const
 {
     return m_qListChInfo.size();
+}
+
+
+//*************************************************************************************************************
+
+inline qint32 RealTimeEvoked::getNumPreStimSamples() const
+{
+    return m_iNumPreStimSamples;
 }
 
 
