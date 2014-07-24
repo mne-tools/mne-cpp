@@ -144,7 +144,7 @@ class GraphWindow : public QWidget
 protected:
    void paintEvent(QPaintEvent *event);
 public:
-   void PaintSignal(MatrixXd signalMatrix, QSize windowSize);
+   void paint_signal(MatrixXd signalMatrix, QSize windowSize);
 
 };
 
@@ -157,7 +157,24 @@ class AtomSumWindow : public QWidget
 protected:
    void paintEvent(QPaintEvent *event);
 public:
-   void PaintAtomSum(MatrixXd atom_matrix, QSize windowSize, qreal signalMaximum, qreal signalNegativeMaximum);
+
+   //=========================================================================================================
+   /**
+   * AtomSumWIndow_paint_atom_sum
+   *
+   * ### MP toolbox GUI function ###
+   *
+   * painting sum of found atoms in butterfly plot
+   *
+   * @param[in] atom_matrix    matrix of found atoms for each channel
+   * @param[in] windowSize
+   * @param[in] signalMaximum
+   * @param[in] signalNegativeMaximum
+   *
+   *
+   * @return void
+   */
+   void paint_atom_sum(MatrixXd atom_matrix, QSize windowSize, qreal signalMaximum, qreal signalNegativeMaximum);
 
 };
 
