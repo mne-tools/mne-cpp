@@ -88,41 +88,8 @@
              <property name="spacing">
               <number>5</number>
              </property>
-             <item row="8" column="0" colspan="2">
-              <widget class="QRadioButton" name="rb_adativMp">
-               <property name="text">
-                <string>adaptive MP</string>
-               </property>
-               <property name="checked">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="0" colspan="2">
-              <widget class="QLabel" name="lb_Criterion">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="text">
-                <string>truncation criterion</string>
-               </property>
-              </widget>
-             </item>
-             <item row="9" column="0">
-              <widget class="QRadioButton" name="rb_OwnDictionary">
-               <property name="text">
-                <string>own dictionary:</string>
-               </property>
-              </widget>
-             </item>
              <item row="4" column="2">
               <widget class="QSpinBox" name="sb_Iterations">
-               <property name="enabled">
-                <bool>true</bool>
-               </property>
                <property name="alignment">
                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                </property>
@@ -138,34 +105,6 @@
                </property>
                <property name="text">
                 <string>%</string>
-               </property>
-              </widget>
-             </item>
-             <item row="6" column="2">
-              <widget class="QLineEdit" name="tb_ResEnergy">
-               <property name="enabled">
-                <bool>true</bool>
-               </property>
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="maximumSize">
-                <size>
-                 <width>50</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-               <property name="layoutDirection">
-                <enum>Qt::LeftToRight</enum>
-               </property>
-               <property name="maxLength">
-                <number>6</number>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                </property>
               </widget>
              </item>
@@ -199,6 +138,75 @@
                  <width>70</width>
                  <height>0</height>
                 </size>
+               </property>
+              </widget>
+             </item>
+             <item row="8" column="0" colspan="2">
+              <widget class="QRadioButton" name="rb_adativMp">
+               <property name="text">
+                <string>adaptive MP</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0" colspan="2">
+              <widget class="QLabel" name="lb_Criterion">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string>truncation criterion</string>
+               </property>
+              </widget>
+             </item>
+             <item row="9" column="0">
+              <widget class="QRadioButton" name="rb_OwnDictionary">
+               <property name="text">
+                <string>own dictionary:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="6" column="2">
+              <widget class="QDoubleSpinBox" name="dsb_energy">
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+               <property name="decimals">
+                <number>1</number>
+               </property>
+               <property name="minimum">
+                <double>0.100000000000000</double>
+               </property>
+              </widget>
+             </item>
+             <item row="10" column="2">
+              <widget class="QSpinBox" name="sb_sample_rate">
+               <property name="maximumSize">
+                <size>
+                 <width>60</width>
+                 <height>16777215</height>
+                </size>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+               <property name="minimum">
+                <number>1</number>
+               </property>
+               <property name="maximum">
+                <number>999999</number>
+               </property>
+              </widget>
+             </item>
+             <item row="10" column="0" colspan="2">
+              <widget class="QLabel" name="label">
+               <property name="text">
+                <string>sample rate:</string>
                </property>
               </widget>
              </item>
@@ -630,22 +638,6 @@
     <hint type="destinationlabel">
      <x>561</x>
      <y>190</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>chb_ResEnergy</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>tb_ResEnergy</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>73</x>
-     <y>128</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>190</x>
-     <y>127</y>
     </hint>
    </hints>
   </connection>
