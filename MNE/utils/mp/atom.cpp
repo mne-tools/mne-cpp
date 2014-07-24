@@ -216,3 +216,9 @@ QStringList ChirpAtom::CreateStringValues()
         atomStringValues.append(QString("%1").arg(atomValues[i]));
     return atomStringValues;
 }
+
+//*************************************************************************************************************
+
+GaborAtom::~GaborAtom()
+{
+}

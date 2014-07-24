@@ -105,9 +105,7 @@ class UTILSSHARED_EXPORT AdaptiveMp : public QThread
 {
     Q_OBJECT
 
-public:
-
-    typedef QList<GaborAtom> gabor_atom_list;
+public:    
 
     /**
     * adaptiveMP_adaptiveMP
@@ -122,7 +120,21 @@ public:
     AdaptiveMp();
 
     //=========================================================================================================
+    /**
+    * adaptiveMP_adaptiveMP
+    *
+    * ### MP toolbox function ###
+    *
+    * Deconstructor
+    *
+    * deconstructs adaptiveMP class
+    *
+    */
+    ~AdaptiveMp();
 
+    //=========================================================================================================
+
+    typedef QList<GaborAtom> gabor_atom_list;
     qint32 it = 0;
     qint32 max_it = 0;
     qreal signal_energy = 0;
