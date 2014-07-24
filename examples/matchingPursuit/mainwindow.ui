@@ -470,6 +470,7 @@
     <addaction name="actionW_rterbucheditor"/>
     <addaction name="actionErweiterter_W_rterbucheditor"/>
     <addaction name="actionAtomformeleditor"/>
+    <addaction name="actionCreate_treebased_dictionary"/>
    </widget>
    <widget class="QMenu" name="menuInfo">
     <property name="title">
@@ -587,6 +588,11 @@
    </property>
    <property name="text">
     <string>atom formula editor</string>
+   </property>
+  </action>
+  <action name="actionCreate_treebased_dictionary">
+   <property name="text">
+    <string>create treebased dictionary</string>
    </property>
   </action>
  </widget>
