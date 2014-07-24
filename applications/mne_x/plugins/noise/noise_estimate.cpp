@@ -70,7 +70,7 @@ NoiseEstimate::NoiseEstimate()
 : m_bIsRunning(false)
 , m_bProcessData(false)
 , m_pRTMSAInput(NULL)
-, m_pRTMSAOutput(NULL)
+, m_pNEOutput(NULL)
 , m_pBuffer(CircularMatrixBuffer<double>::SPtr())
 {
 }
@@ -107,11 +107,11 @@ void NoiseEstimate::init()
     m_inputConnectors.append(m_pRTMSAInput);
 
     // Output
-    m_pRTMSAOutput = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "Noise Estimate Out", "Noise Estimate output data");
-    m_outputConnectors.append(m_pRTMSAOutput);
+    m_pNEOutput = PluginOutputData<NoiseEstimation>::create(this, "Noise Estimate Out", "Noise Estimate output data");
+    m_outputConnectors.append(m_pNEOutput);
 
-    m_pRTMSAOutput->data()->setMultiArraySize(100);
-    m_pRTMSAOutput->data()->setVisibility(true);
+//    m_pRTMSAOutput->data()->setMultiArraySize(100);
+//    m_pRTMSAOutput->data()->setVisibility(true);
 
     //init channels when fiff info is available
     connect(this, &NoiseEstimate::fiffInfoAvailable, this, &NoiseEstimate::initConnector);
@@ -127,14 +127,14 @@ void NoiseEstimate::init()
 void NoiseEstimate::initConnector()
 {
     qDebug() << "void NoiseEstimate::initConnector()";
-    if(m_pFiffInfo){
-        m_pRTMSAOutput->data()->initFromFiffInfo(m_pFiffInfo);
-    }
-    else
-    {
-        m_iFFTlength = 0;
-        m_Fs = 0;
-    }
+//    if(m_pFiffInfo){
+//        m_pNEOutput->data()->initFromFiffInfo(m_pFiffInfo);
+//    }
+//    else
+//    {
+//        m_iFFTlength = 0;
+//        m_Fs = 0;
+//    }
 
 
 }
@@ -172,7 +172,7 @@ bool NoiseEstimate::stop()
 
         m_pBuffer->clear();
 
-        m_pRTMSAOutput->data()->clear();
+//        m_pNEOutput->data()->clear();
     }
 
     return true;
@@ -254,31 +254,28 @@ void NoiseEstimate::run()
 
     m_bProcessData = true;
 
+    long ncount = 1; // for spectrum average
+
+    MatrixXd sum_psdx;
+
     while (m_bIsRunning)
     {
         if(m_bProcessData)
         {
-
-            if(m_pFiffInfo){
-                //emit nFFT and sample rate to the setup widget
-                m_iFFTlength = 4096;
-                m_Fs = m_pFiffInfo.data()->sfreq;
-
-                emit SetNoisePara(m_iFFTlength,m_Fs);
-            }
-
             /* Dispatch the inputs */
             MatrixXd t_mat = m_pBuffer->pop();
 
-            MatrixXd psdx(t_mat.rows(),m_iFFTlength/2+1);
-
             //ToDo: Implement your algorithm here
+            MatrixXd psdx(t_mat.rows(),m_iFFTlength/2+1);
+            MatrixXd t_psdx(t_mat.rows(),m_iFFTlength/2+1);
+
+            if (ncount == 1)
+            {
+                sum_psdx = t_psdx;
+            }
+
             for(qint32 i = 0; i < t_mat.rows(); ++i){//FFT calculation by row
-                RowVectorXd data;//(t_mat.cols());
-//                for(qint32 j=0; j<t_mat.cols();j++)
-//                {
-//                    data(j) = t_mat(i,j);
-//                }
+                RowVectorXd data;
 
                 data = t_mat.row(i);
 
@@ -310,12 +307,27 @@ void NoiseEstimate::run()
                     psdx(i,j) = 2.0*psdx(j);
                 }
 
+                for(qint32 j=0; j<m_iFFTlength/2+1;j++)
+                {
+                    sum_psdx(i,j) += psdx(i,j);
+                }
+
+
+                for(qint32 j=0; j<m_iFFTlength/2+1;j++)
+                {
+                    t_psdx(i,j) = 10.0*log10(sum_psdx(i,j)/ncount);
+                }
+
 
                 //emit RePlot(psdx);
 
+            }//row computing is done
+            ncount ++;
+            if (ncount == 0)
+            {
+                ncount = 1;
             }
-
-//            std::cout << psdx(0,0) << std::endl;
+//            std::cout << t_psdx(0,1) << std::endl;
 
 //            for(qint32 i = 0; i < t_mat.cols(); ++i)
 //                m_pRTMSAOutput->data()->setValue(t_mat.col(i));
