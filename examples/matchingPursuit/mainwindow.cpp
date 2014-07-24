@@ -160,7 +160,7 @@ MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::
     ui->l_res->addWidget(callResidumWindow);
 
     ui->splitter->setStretchFactor(1,4);
-    ui->tb_ResEnergy->setText(tr("0.1"));
+    ui->dsb_energy->setValue(0.1);
 
     ui->tbv_Results->setColumnCount(5);
     ui->tbv_Results->setHorizontalHeaderLabels(QString("energy\n[%];scale\n[sec];trans\n[sec];modu\n[Hz];phase\n[rad]").split(";"));
@@ -234,8 +234,6 @@ MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::
         configFile.close();
     }
 
-
-
     QStringList filterList;
     filterList.append("*.dict");
     QFileInfoList fileList =  dir.entryInfoList(filterList);
@@ -256,19 +254,18 @@ MainWindow::~MainWindow()
 void MainWindow::open_file()
 {
     QFileDialog* fileDia;
-    QString fileName = fileDia->getOpenFileName(this, "Please select signalfile.",QDir::currentPath(),"(*.fif *.txt)");
+    QString fileName = fileDia->getOpenFileName(this, "Please select signal file.",QDir::currentPath(),"(*.fif *.txt)");
     if(fileName.isNull()) return;
 
     this->cb_items.clear();
     this->cb_model = new QStandardItemModel;
-    connect(this->cb_model, SIGNAL(dataChanged ( const QModelIndex&, const QModelIndex&)), this, SLOT(cb_selection_changed(const QModelIndex&, const QModelIndex&)));
-
+    ui->sb_sample_rate->setEnabled(true);
 
     QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly))
     {
         QMessageBox::warning(this, tr("Error"),
-        tr("error: disable to open signalfile."));
+        tr("error: disable to open signal file."));
         return;
     }
     file.close();    
@@ -277,11 +274,11 @@ void MainWindow::open_file()
 
     if(fileName.endsWith(".fif", Qt::CaseInsensitive))        
     {    read_fiff_file(fileName);
-        _signal_matrix.resize(512,5);
-        _original_signal_matrix.resize(512,5);
+        _signal_matrix.resize(_datas.cols(),5);
+        _original_signal_matrix.resize(_datas.cols(),5);
         // ToDo: find good fiff signal part
         for(qint32 channels = 0; channels < 5; channels++)
-            for(qint32 i = 0; i < 512; i++)
+            for(qint32 i = 0; i < _datas.cols(); i++)
                 _signal_matrix(i, channels) = _datas(channels, i);// * 10000000000;
     }
     else
@@ -361,8 +358,8 @@ qint32 MainWindow::read_fiff_file(QString fileName)
 {
     QFile t_fileRaw(fileName);
 
-    float from = 47.000f;
-    float to = 49.000f;
+    float from = 47.151f;
+    float to = 48.000f;
 
     bool in_samples = false;
 
@@ -455,7 +452,8 @@ qint32 MainWindow::read_fiff_file(QString fileName)
     }
 
     printf("Read %d samples.\n",(qint32)_datas.cols());
-
+    ui->sb_sample_rate->setValue(raw.info.sfreq);
+    ui->sb_sample_rate->setEnabled(false);
 
     std::cout << _datas.block(0,0,10,10) << std::endl;
 
@@ -999,10 +997,7 @@ void MainWindow::on_btt_Calc_clicked()
         return;
     }
 
-    QString res_energy_str = ui->tb_ResEnergy->text();
-    res_energy_str.replace(",", ".");
-
-    if(((res_energy_str.toFloat() <= 1 && ui->tb_ResEnergy->isEnabled()) && (ui->sb_Iterations->value() >= 500 && ui->sb_Iterations->isEnabled())) || (res_energy_str.toFloat() <= 1 && ui->tb_ResEnergy->isEnabled() && !ui->sb_Iterations->isEnabled()) || (ui->sb_Iterations->value() >= 500 && ui->sb_Iterations->isEnabled() && !ui->tb_ResEnergy->isEnabled()) )
+    if(((ui->dsb_energy->value() <= 1 && ui->dsb_energy->isEnabled()) && (ui->sb_Iterations->value() >= 500 && ui->sb_Iterations->isEnabled())) || (ui->dsb_energy->value() <= 1 && ui->dsb_energy->isEnabled() && !ui->sb_Iterations->isEnabled()) || (ui->sb_Iterations->value() >= 500 && ui->sb_Iterations->isEnabled() && !ui->dsb_energy->isEnabled()) )
     {
         QFile configFile("Matching-Pursuit-Toolbox/Matching-Pursuit-Toolbox.config");
         bool showMsgBox = false;
@@ -1029,30 +1024,17 @@ void MainWindow::on_btt_Calc_clicked()
 
     if(ui->chb_ResEnergy->isChecked())
     {
-        bool ok;
-        qreal percent_value = res_energy_str.toFloat(&ok);
-
-        if(!ok)
-        {
-            QString title = "Error";
-            QString text = "No correct number at energy criterion.";
-            QMessageBox msgBox(QMessageBox::Warning, title, text, QMessageBox::Ok, this);
-            msgBox.exec();
-            ui->tb_ResEnergy->setFocus();
-            ui->tb_ResEnergy->selectAll();
-            return;
-        }
-        if(percent_value >= 100)
+        if(ui->dsb_energy->value() >= 100)
         {
             QString title = "Error";
             QString text = "Please enter a number less than 100.";
             QMessageBox msgBox(QMessageBox::Warning, title, text, QMessageBox::Ok, this);
             msgBox.exec();
-            ui->tb_ResEnergy->setFocus();
-            ui->tb_ResEnergy->selectAll();
+            ui->dsb_energy->setFocus();
+            ui->dsb_energy->selectAll();
             return;
         }
-        _soll_energy =  _signal_energy / 100 * percent_value;
+        _soll_energy =  _signal_energy / 100 * ui->dsb_energy->value();
     } 
 
     if(ui->rb_OwnDictionary->isChecked())
@@ -1072,10 +1054,8 @@ void MainWindow::on_btt_Calc_clicked()
 void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations, qreal current_energy, qreal max_energy, gabor_atom_list atom_res_list)
 {
     _tbv_is_loading = true;
-    //update();    
-    QString res_energy_str = ui->tb_ResEnergy->text();
-    res_energy_str.replace(",", ".");
-    qreal percent = res_energy_str.toFloat();
+    //update();
+    qreal percent = ui->dsb_energy->value();
 
     qreal residuum_energy = 100 * (max_energy - current_energy) / max_energy;
 
@@ -1120,10 +1100,11 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
         ui->tbv_Results->setItem(i, 4, atomPhaseItem);
     }*/
     qreal percent_atom_energy = 100 * atom_res_list.last().energy / max_energy;
+    qreal sample_rate = ui->sb_sample_rate->value();
 
     QTableWidgetItem* atomEnergieItem = new QTableWidgetItem(QString::number(percent_atom_energy, 'f', 2));
-    QTableWidgetItem* atomScaleItem = new QTableWidgetItem(QString::number(atom_res_list.last().scale, 'g', 3));
-    QTableWidgetItem* atomTranslationItem = new QTableWidgetItem(QString::number(atom_res_list.last().translation, 'g', 3));
+    QTableWidgetItem* atomScaleItem = new QTableWidgetItem(QString::number(atom_res_list.last().scale / sample_rate, 'g', 3));
+    QTableWidgetItem* atomTranslationItem = new QTableWidgetItem(QString::number(atom_res_list.last().translation / sample_rate, 'g', 3));
     QTableWidgetItem* atomModulationItem = new QTableWidgetItem(QString::number(atom_res_list.last().modulation, 'g', 3));
     QTableWidgetItem* atomPhaseItem = new QTableWidgetItem(QString::number(atom_res_list.last().phase_list.first(), 'g', 3));
 
@@ -1222,8 +1203,7 @@ void MainWindow::calc_adaptiv_mp(MatrixXd signal, TruncationCriterion criterion)
     AdaptiveMp *adaptive_Mp = new AdaptiveMp();
     _atom_sum_matrix = MatrixXd::Zero(signal.rows(), signal.cols());
     _residuum_matrix = signal;
-    QString res_energy_str = ui->tb_ResEnergy->text();
-    res_energy_str.replace(",", ".");
+    qreal res_energy = ui->dsb_energy->value();
 
     //threading
     QThread* adaptive_Mp_Thread = new QThread;
@@ -1252,7 +1232,7 @@ void MainWindow::calc_adaptiv_mp(MatrixXd signal, TruncationCriterion criterion)
         case SignalEnergy:
         {
             //must be debugged, thread is not ending like i want it to
-            emit send_input(signal, MAXINT32, res_energy_str.toFloat());
+            emit send_input(signal, MAXINT32, res_energy);
             adaptive_Mp_Thread->start();        
         }
         break;
@@ -1260,7 +1240,7 @@ void MainWindow::calc_adaptiv_mp(MatrixXd signal, TruncationCriterion criterion)
         case Both:
         {
             //must be debugged, thread is not ending like i want it to
-            emit send_input(signal, ui->sb_Iterations->value(), res_energy_str.toFloat());
+            emit send_input(signal, ui->sb_Iterations->value(), res_energy);
             adaptive_Mp_Thread->start();
         }
         break;

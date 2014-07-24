@@ -260,13 +260,13 @@ QList<qreal> EditorWindow::calc_parameter_values_scale(qreal startValue, qreal l
         resultList.append(startValue);
     else if(ui->rb_LinStepScale->isChecked())
     {
-        if(ui->rb_PosCountScale->isChecked()) resultList = calcLinPosParameters(startValue, linStepValue);
-        else resultList = calcLinNegParameters(startValue, linStepValue);
+        if(ui->rb_PosCountScale->isChecked()) resultList = calc_lin_pos_parameters(startValue, linStepValue);
+        else resultList = calc_lin_neg_parameters(startValue, linStepValue);
     }
     else if(ui->rb_ExpStepScale->isChecked())
     {
-        if(ui->rb_PosCountScale->isChecked()) resultList = calcExpPosParameters(startValue, expStepValue);
-        else resultList = calcExpNegParameters(startValue, expStepValue);
+        if(ui->rb_PosCountScale->isChecked()) resultList = calc_exp_pos_parameters(startValue, expStepValue);
+        else resultList = calc_exp_neg_parameters(startValue, expStepValue);
     }
     if(!resultList.isEmpty()) ui->dspb_EndValueScale->setValue(resultList.last());
     return resultList;
@@ -303,13 +303,13 @@ QList<qreal> EditorWindow::calc_parameter_values_modu(qreal startValue, qreal li
         resultList.append(startValue);
     else if(ui->rb_LinStepModu->isChecked())
     {
-        if(ui->rb_PosCountModu->isChecked()) resultList = calcLinPosParameters(startValue, linStepValue);
-        else resultList = calcLinNegParameters(startValue, linStepValue);
+        if(ui->rb_PosCountModu->isChecked()) resultList = calc_lin_pos_parameters(startValue, linStepValue);
+        else resultList =  calc_lin_neg_parameters(startValue, linStepValue);
     }
     else if(ui->rb_ExpStepModu->isChecked())
     {
-        if(ui->rb_PosCountModu->isChecked()) resultList = calcExpPosParameters(startValue, expStepValue);
-        else resultList = calcExpNegParameters(startValue, expStepValue);
+        if(ui->rb_PosCountModu->isChecked()) resultList =  calc_exp_pos_parameters(startValue, expStepValue);
+        else resultList = calc_exp_neg_parameters(startValue, expStepValue);
     }
     if(!resultList.isEmpty()) ui->dspb_EndValueModu->setValue(resultList.last());
     return resultList;
@@ -346,13 +346,13 @@ QList<qreal> EditorWindow::calc_parameter_values_phase(qreal startValue, qreal l
         resultList.append(startValue);
     else if(ui->rb_LinStepPhase->isChecked())
     {
-        if(ui->rb_PosCountPhase->isChecked()) resultList = calcLinPosParameters(startValue, linStepValue);
-        else resultList = calcLinNegParameters(startValue, linStepValue);
+        if(ui->rb_PosCountPhase->isChecked()) resultList = calc_lin_pos_parameters(startValue, linStepValue);
+        else resultList = calc_lin_neg_parameters(startValue, linStepValue);
     }
     else if(ui->rb_ExpStepPhase->isChecked())
     {
-        if(ui->rb_PosCountPhase->isChecked()) resultList = calcExpPosParameters(startValue, expStepValue);
-        else resultList = calcExpNegParameters(startValue, expStepValue);
+        if(ui->rb_PosCountPhase->isChecked()) resultList = calc_exp_pos_parameters(startValue, expStepValue);
+        else resultList = calc_exp_neg_parameters(startValue, expStepValue);
     }
     if(!resultList.isEmpty()) ui->dspb_EndValuePhase->setValue(resultList.last());
     return resultList;
@@ -389,13 +389,13 @@ QList<qreal> EditorWindow::calc_parameter_values_chirp(qreal startValue, qreal l
         resultList.append(startValue);
     else if(ui->rb_LinStepChirp->isChecked())
     {
-        if(ui->rb_PosCountChirp->isChecked()) resultList = calcLinPosParameters(startValue, linStepValue);
-        else resultList = calcLinNegParameters(startValue, linStepValue);
+        if(ui->rb_PosCountChirp->isChecked()) resultList = calc_lin_pos_parameters(startValue, linStepValue);
+        else resultList = calc_lin_neg_parameters(startValue, linStepValue);
     }
     else if(ui->rb_ExpStepChirp->isChecked())
     {
-        if(ui->rb_PosCountChirp->isChecked()) resultList = calcExpPosParameters(startValue, expStepValue);
-        else resultList = calcExpNegParameters(startValue, expStepValue);
+        if(ui->rb_PosCountChirp->isChecked()) resultList = calc_exp_pos_parameters(startValue, expStepValue);
+        else resultList = calc_exp_neg_parameters(startValue, expStepValue);
     }
     if(!resultList.isEmpty()) ui->dspb_EndValuePhase->setValue(resultList.last());
     return resultList;
@@ -502,7 +502,7 @@ void EditorWindow::calc_chirp_value()
         calc_atom_count_all_combined();
     }
     else
-        chirpList = calcParameterValuesChirp(startValueChirp, linStepWidthChirp, expStepWidthChirp);
+        chirpList = calc_parameter_values_chirp(startValueChirp, linStepWidthChirp, expStepWidthChirp);
 }
 
 // access if namechange of PartDictName
