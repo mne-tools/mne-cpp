@@ -123,7 +123,7 @@ public:
 
     QStringList correlation(VectorXd signalSamples, QList<qreal> atomSamples, QString atomName);
 
-    static void create_tree_dict(QList<GaborAtom>);
+    static void create_tree_dict(QString save_path);
     //=========================================================================================================
 
 public slots:

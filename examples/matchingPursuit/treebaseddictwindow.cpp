@@ -57,6 +57,7 @@
 #include <QApplication>
 #include <QModelIndex>
 #include <QMessageBox>
+#include <QtXml/QtXml>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -79,38 +80,59 @@ TreebasedDictWindow::~TreebasedDictWindow()
 
 void TreebasedDictWindow::on_btt_calc_treebased_clicked()
 {
-    GaborAtom *temp_atom = new GaborAtom;
-    QList<GaborAtom> atoms_to_dict;
     qint32 sample_count = ui->spb_AtomLength->value();
-    qint32 scale = 1;
-    qint32 count = 0;
 
-    while(scale < sample_count)
+    qint32 count = 0;
+    qreal phase = 0;
+    qreal modulation = 0;
+
+    _treebased_dict_name = ui->tb_treebased_dict_name->text();
+    QString save_path = QString("Matching-Pursuit-Toolbox/%1.tbd").arg(_treebased_dict_name);
+
+    QFile file(save_path);
+    file.open(QIODevice::WriteOnly);
+
+    QXmlStreamWriter xmlWriter(&file);
+    xmlWriter.setAutoFormatting(true);
+    xmlWriter.writeStartDocument();
+
+    xmlWriter.writeStartElement("All built Atoms for Treebased MP");
+    xmlWriter.writeTextElement("sample_count: ", QString::number(sample_count));
+
+    for(qint32 scale = 1; scale <= sample_count; scale+= sample_count / 16)
     {
-        qreal modulation = 0;
-        for(quint32 translation = 0; translation < sample_count; translation++)
+        for(qint32 translation = 0; translation < sample_count; translation+= sample_count / 16)
         {
-            qreal phase = 0;
+            modulation = 0;
             while(modulation < floor(sample_count/2))
             {
+                phase = 0;
                 while(phase < 2 * PI)
-                {
-                    temp_atom->sample_count = sample_count;
-                    temp_atom->scale = scale;
-                    temp_atom->modulation = modulation;
-                    temp_atom->phase_list.append(phase);
+                {                    
+                    xmlWriter.writeStartElement(QString("Atom %1").arg(count));
+                    xmlWriter.writeTextElement("scale: ", QString::number(scale));
+                    xmlWriter.writeTextElement("translation: ", QString::number(translation));
+                    xmlWriter.writeTextElement("modulation: ", QString::number(modulation));
+                    xmlWriter.writeTextElement("phase: ", QString::number(phase));
+                    xmlWriter.writeEndElement();
+
                     count++;
-                    std::cout << count << "\n";
-
-                    //atoms_to_dict.append(*temp_atom);
-
-                    phase += (2*PI)/ sample_count;
+                    phase += 16 * 2*PI / sample_count;//(4*PI)/360;
                 }
-                modulation += 0.5;
+                modulation += sample_count / 32;//floor(5/100*sample_count);
             }
         }
-        scale++;
     }
-    //FixDictMp::create_tree_dict(atoms_to_dict);
-    delete temp_atom;
+
+    xmlWriter.writeEndElement();
+    xmlWriter.writeEndDocument();
+    file.close();
+    std::cout << count << "\n";
+    FixDictMp::create_tree_dict(save_path);
+
+}
+
+void TreebasedDictWindow::on_tb_treebased_dict_name_editingFinished()
+{
+    //_treebased_dict_name = ui->tb_PartDictName->text();
 }

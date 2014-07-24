@@ -407,8 +407,61 @@ QStringList FixDictMp::correlation(VectorXd signalSamples, QList<qreal> atomSamp
 
 }
 
-void FixDictMp::create_tree_dict(QList<GaborAtom>)
+void FixDictMp::create_tree_dict(QString save_path)
 {
+    QDomDocument xml_file;
+    QFile file(save_path);
+    //qint32 count = 0;
 
+    if (!file.open(QFile::ReadOnly | QFile::Text))
+    {
+        std::cout << "Error: Cannot read file " << qPrintable(save_path)
+         << ": " << qPrintable(file.errorString())
+         << std::endl;
+    }
+
+    xml_file.setContent(&file);
+
+    /* // Extract the root markup
+    QDomElement Component = xml_file.firstChild().toElement();
+
+    // Loop while there is a child
+    while(!Component.isNull())
+    {
+        // Check if the child tag name is COMPONENT
+        if (Component.tagName()=="scale")
+        {
+
+            // Read and display the component ID
+            QString ID=Component.attribute("ID","No ID");
+
+            // Get the first child of the component
+            QDomElement Child=Component.firstChild().toElement();
+
+            QString Name;
+            double Value;
+
+            // Read each child of the component node
+            while (!Child.isNull())
+            {
+                // Read Name and value
+                if (Child.tagName()=="NAME") Name=Child.firstChild().toText().data();
+                if (Child.tagName()=="VALUE") Value=Child.firstChild().toText().data().toDouble();
+
+                // Next child
+                Child = Child.nextSibling().toElement();
+            }
+
+            // Display component data
+            std::cout << "Component " << ID.toStdString().c_str() << std::endl;
+            std::cout << "   Name  = " << Name.toStdString().c_str() << std::endl;
+            std::cout << "   Value = " << Value << std::endl;
+            std::cout << std::endl;
+        }
+
+        // Next component
+        Component = Component.nextSibling().toElement();
+    }*/
+
+    file.close();
 }
-
