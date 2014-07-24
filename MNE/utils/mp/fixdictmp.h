@@ -73,6 +73,7 @@
 #include <QThread>
 #include <QFile>
 #include <QStringList>
+#include <QtXml/QtXml>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -121,6 +122,8 @@ public:
     QList<GaborAtom> matching_pursuit(QFile &currentDict, VectorXd signalSamples, qint32 iterationsCount);
 
     QStringList correlation(VectorXd signalSamples, QList<qreal> atomSamples, QString atomName);
+
+    static void create_tree_dict(QList<GaborAtom>);
     //=========================================================================================================
 
 public slots:

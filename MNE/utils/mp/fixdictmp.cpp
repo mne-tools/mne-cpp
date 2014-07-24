@@ -407,4 +407,8 @@ QStringList FixDictMp::correlation(VectorXd signalSamples, QList<qreal> atomSamp
 
 }
 
+void FixDictMp::create_tree_dict(QList<GaborAtom>)
+{
+
+}
 
