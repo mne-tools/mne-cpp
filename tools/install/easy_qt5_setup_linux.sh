@@ -1,5 +1,5 @@
-mkdir Qt
-cd Qt
+mkdir ~/Qt
+cd ~/Qt
 mkdir depot
 cd depot
 git clone https://git.gitorious.org/qt/qt5.git qt5
