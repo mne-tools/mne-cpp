@@ -44,7 +44,6 @@
 //=============================================================================================================
 
 #include "../ui_noiseestimatesetup.h"
-#include "plotter.h"
 
 
 //*************************************************************************************************************
@@ -114,15 +113,12 @@ public:
     ~NoiseEstimateSetupWidget();
 
     void init(qint32 nFFTidx, double fs);
-    void chgChannelInx(int idx);
     void chgnFFT(QString tx);
     void Update(MatrixXf data);
     void Replot(/*MatrixXd tmp*/);
-    float mmin(MatrixXd tmp,int chan);
-    float mmax(MatrixXd tmp,int chan);
+//    float mmin(MatrixXd tmp,int chan);
+//    float mmax(MatrixXd tmp,int chan);
 
-    PlotSettings settings;
-    plotter *d_timeplot;
 
 private slots:
 
