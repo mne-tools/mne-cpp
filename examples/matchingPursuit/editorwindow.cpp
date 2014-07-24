@@ -183,7 +183,7 @@ void EditorWindow::calc_atom_count_all_combined()
 }
 
 // calculates parameters for linear stepwidth
-QList<qreal> EditorWindow::calcLinPosParameters(qreal startValue, qreal linStepValue)
+QList<qreal> EditorWindow::calc_lin_pos_parameters(qreal startValue, qreal linStepValue)
 {
     QList<qreal> resultList;
     qint32 i = 0;
@@ -200,7 +200,7 @@ QList<qreal> EditorWindow::calcLinPosParameters(qreal startValue, qreal linStepV
 }
 
 // calculates parameters for linear stepwidth (negativ)
-QList<qreal> EditorWindow::calcLinNegParameters(qreal startValue, qreal linStepValue)
+QList<qreal> EditorWindow::calc_lin_neg_parameters(qreal startValue, qreal linStepValue)
 {
     QList<qreal> resultList;
     qint32 i = 0;
@@ -217,7 +217,7 @@ QList<qreal> EditorWindow::calcLinNegParameters(qreal startValue, qreal linStepV
 }
 
 // calculates parameters for exponential stepwidth (positiv)
-QList<qreal> EditorWindow::calcExpPosParameters(qreal startValue, qreal expStepValue)
+QList<qreal> EditorWindow::calc_exp_pos_parameters(qreal startValue, qreal expStepValue)
 {
     QList<qreal> resultList;
     qint32 i = 0;
@@ -234,7 +234,7 @@ QList<qreal> EditorWindow::calcExpPosParameters(qreal startValue, qreal expStepV
 }
 
 // calculates parameters for exponential stepwidth (negativ)
-QList<qreal> EditorWindow::calcExpNegParameters(qreal startValue, qreal expStepValue)
+QList<qreal> EditorWindow::calc_exp_neg_parameters(qreal startValue, qreal expStepValue)
 {
     QList<qreal> resultList;
     qint32 i = 0;
@@ -251,7 +251,7 @@ QList<qreal> EditorWindow::calcExpNegParameters(qreal startValue, qreal expStepV
 }
 
 // calculates scale and save to list
-QList<qreal> EditorWindow::calcParameterValuesScale(qreal startValue, qreal linStepValue, qreal expStepValue)
+QList<qreal> EditorWindow::calc_parameter_values_scale(qreal startValue, qreal linStepValue, qreal expStepValue)
 {
     QList<qreal> resultList;
     resultList.clear();
@@ -260,20 +260,20 @@ QList<qreal> EditorWindow::calcParameterValuesScale(qreal startValue, qreal linS
         resultList.append(startValue);
     else if(ui->rb_LinStepScale->isChecked())
     {
-        if(ui->rb_PosCountScale->isChecked()) resultList = calcLinPosParameters(startValue, linStepValue);
-        else resultList = calcLinNegParameters(startValue, linStepValue);
+        if(ui->rb_PosCountScale->isChecked()) resultList = calc_lin_pos_parameters(startValue, linStepValue);
+        else resultList = calc_lin_neg_parameters(startValue, linStepValue);
     }
     else if(ui->rb_ExpStepScale->isChecked())
     {
-        if(ui->rb_PosCountScale->isChecked()) resultList = calcExpPosParameters(startValue, expStepValue);
-        else resultList = calcExpNegParameters(startValue, expStepValue);
+        if(ui->rb_PosCountScale->isChecked()) resultList = calc_exp_pos_parameters(startValue, expStepValue);
+        else resultList = calc_exp_neg_parameters(startValue, expStepValue);
     }
     if(!resultList.isEmpty()) ui->dspb_EndValueScale->setValue(resultList.last());
     return resultList;
 }
 
 // calculates scale and save to list (AllCombined)
-QList<qreal> EditorWindow::calcAllCombParameterValuesScale(qreal startValue, qreal endvalue, qreal linStepValue, qreal expStepValue)
+QList<qreal> EditorWindow::calc_all_comb_parameter_values_scale(qreal startValue, qreal endvalue, qreal linStepValue, qreal expStepValue)
 {
     QList<qreal> resultList;
     resultList.clear();
@@ -283,18 +283,18 @@ QList<qreal> EditorWindow::calcAllCombParameterValuesScale(qreal startValue, qre
     else if(ui->rb_LinStepScale->isChecked())
     {
         atomCount = temp / linStepValue + 1;
-        resultList = calcLinPosParameters(startValue, linStepValue);
+        resultList = calc_lin_pos_parameters(startValue, linStepValue);
     }
     else if(ui->rb_ExpStepScale->isChecked())
     {
         atomCount = pow(temp, (1/ expStepValue)) + 1;
-        resultList = calcExpPosParameters(startValue, expStepValue);
+        resultList = calc_exp_pos_parameters(startValue, expStepValue);
     }
     return resultList;
 }
 
 // calculates modulation and save to list
-QList<qreal> EditorWindow::calcParameterValuesModu(qreal startValue, qreal linStepValue, qreal expStepValue)
+QList<qreal> EditorWindow::calc_parameter_values_modu(qreal startValue, qreal linStepValue, qreal expStepValue)
 {
     QList<qreal> resultList;
     resultList.clear();
@@ -303,20 +303,20 @@ QList<qreal> EditorWindow::calcParameterValuesModu(qreal startValue, qreal linSt
         resultList.append(startValue);
     else if(ui->rb_LinStepModu->isChecked())
     {
-        if(ui->rb_PosCountModu->isChecked()) resultList = calcLinPosParameters(startValue, linStepValue);
-        else resultList = calcLinNegParameters(startValue, linStepValue);
+        if(ui->rb_PosCountModu->isChecked()) resultList = calc_lin_pos_parameters(startValue, linStepValue);
+        else resultList =  calc_lin_neg_parameters(startValue, linStepValue);
     }
     else if(ui->rb_ExpStepModu->isChecked())
     {
-        if(ui->rb_PosCountModu->isChecked()) resultList = calcExpPosParameters(startValue, expStepValue);
-        else resultList = calcExpNegParameters(startValue, expStepValue);
+        if(ui->rb_PosCountModu->isChecked()) resultList =  calc_exp_pos_parameters(startValue, expStepValue);
+        else resultList = calc_exp_neg_parameters(startValue, expStepValue);
     }
     if(!resultList.isEmpty()) ui->dspb_EndValueModu->setValue(resultList.last());
     return resultList;
 }
 
 // calculates modulation and save to list (AllCombined)
-QList<qreal> EditorWindow::calcAllCombParameterValuesModu(qreal startValue, qreal endvalue, qreal linStepValue, qreal expStepValue)
+QList<qreal> EditorWindow::calc_all_comb_parameter_values_modu(qreal startValue, qreal endvalue, qreal linStepValue, qreal expStepValue)
 {
     QList<qreal> resultList;
     resultList.clear();
@@ -326,18 +326,18 @@ QList<qreal> EditorWindow::calcAllCombParameterValuesModu(qreal startValue, qrea
     else if(ui->rb_LinStepModu->isChecked())
     {
         atomCount = temp / linStepValue + 1;
-        resultList = calcLinPosParameters(startValue, linStepValue);
+        resultList = calc_lin_pos_parameters(startValue, linStepValue);
     }
     if(ui->rb_ExpStepModu->isChecked())
     {
         atomCount = pow(temp, (1.0/ expStepValue)) + 1;
-        resultList = calcExpPosParameters(startValue, expStepValue);
+        resultList = calc_exp_pos_parameters(startValue, expStepValue);
     }
     return resultList;
 }
 
 // calculates phase and save to list
-QList<qreal> EditorWindow::calcParameterValuesPhase(qreal startValue, qreal linStepValue, qreal expStepValue)
+QList<qreal> EditorWindow::calc_parameter_values_phase(qreal startValue, qreal linStepValue, qreal expStepValue)
 {
     QList<qreal> resultList;
     resultList.clear();
@@ -346,20 +346,20 @@ QList<qreal> EditorWindow::calcParameterValuesPhase(qreal startValue, qreal linS
         resultList.append(startValue);
     else if(ui->rb_LinStepPhase->isChecked())
     {
-        if(ui->rb_PosCountPhase->isChecked()) resultList = calcLinPosParameters(startValue, linStepValue);
-        else resultList = calcLinNegParameters(startValue, linStepValue);
+        if(ui->rb_PosCountPhase->isChecked()) resultList = calc_lin_pos_parameters(startValue, linStepValue);
+        else resultList = calc_lin_neg_parameters(startValue, linStepValue);
     }
     else if(ui->rb_ExpStepPhase->isChecked())
     {
-        if(ui->rb_PosCountPhase->isChecked()) resultList = calcExpPosParameters(startValue, expStepValue);
-        else resultList = calcExpNegParameters(startValue, expStepValue);
+        if(ui->rb_PosCountPhase->isChecked()) resultList = calc_exp_pos_parameters(startValue, expStepValue);
+        else resultList = calc_exp_neg_parameters(startValue, expStepValue);
     }
     if(!resultList.isEmpty()) ui->dspb_EndValuePhase->setValue(resultList.last());
     return resultList;
 }
 
 // calculates phase and save to list (AllCombined)
-QList<qreal> EditorWindow::calcAllCombParameterValuesPhase(qreal startValue, qreal endvalue, qreal linStepValue, qreal expStepValue)
+QList<qreal> EditorWindow::calc_all_comb_parameter_values_phase(qreal startValue, qreal endvalue, qreal linStepValue, qreal expStepValue)
 {
     QList<qreal> resultList;
     resultList.clear();
@@ -369,18 +369,18 @@ QList<qreal> EditorWindow::calcAllCombParameterValuesPhase(qreal startValue, qre
     else if(ui->rb_LinStepPhase->isChecked())
     {
         atomCount = temp / linStepValue + 1;
-        resultList = calcLinPosParameters(startValue, linStepValue);
+        resultList = calc_lin_pos_parameters(startValue, linStepValue);
     }
     else if(ui->rb_ExpStepPhase->isChecked())
     {
         atomCount = pow(temp, (1/ expStepValue)) + 1;
-        resultList = calcExpPosParameters(startValue, expStepValue);
+        resultList = calc_exp_pos_parameters(startValue, expStepValue);
     }
     return resultList;
 }
 
 // calculates chirp and save to list
-QList<qreal> EditorWindow::calcParameterValuesChirp(qreal startValue, qreal linStepValue, qreal expStepValue)
+QList<qreal> EditorWindow::calc_parameter_values_chirp(qreal startValue, qreal linStepValue, qreal expStepValue)
 {
     QList<qreal> resultList;
     resultList.clear();
@@ -389,20 +389,20 @@ QList<qreal> EditorWindow::calcParameterValuesChirp(qreal startValue, qreal linS
         resultList.append(startValue);
     else if(ui->rb_LinStepChirp->isChecked())
     {
-        if(ui->rb_PosCountChirp->isChecked()) resultList = calcLinPosParameters(startValue, linStepValue);
-        else resultList = calcLinNegParameters(startValue, linStepValue);
+        if(ui->rb_PosCountChirp->isChecked()) resultList = calc_lin_pos_parameters(startValue, linStepValue);
+        else resultList = calc_lin_neg_parameters(startValue, linStepValue);
     }
     else if(ui->rb_ExpStepChirp->isChecked())
     {
-        if(ui->rb_PosCountChirp->isChecked()) resultList = calcExpPosParameters(startValue, expStepValue);
-        else resultList = calcExpNegParameters(startValue, expStepValue);
+        if(ui->rb_PosCountChirp->isChecked()) resultList = calc_exp_pos_parameters(startValue, expStepValue);
+        else resultList = calc_exp_neg_parameters(startValue, expStepValue);
     }
     if(!resultList.isEmpty()) ui->dspb_EndValuePhase->setValue(resultList.last());
     return resultList;
 }
 
 // calculates chirp and save to list (AllCombined)
-QList<qreal> EditorWindow::calcAllCombParameterValuesChirp(qreal startValue, qreal endvalue, qreal linStepValue, qreal expStepValue)
+QList<qreal> EditorWindow::calc_all_comb_parameter_values_chirp(qreal startValue, qreal endvalue, qreal linStepValue, qreal expStepValue)
 {
     QList<qreal> resultList;
     resultList.clear();
@@ -412,12 +412,12 @@ QList<qreal> EditorWindow::calcAllCombParameterValuesChirp(qreal startValue, qre
     else if(ui->rb_LinStepChirp->isChecked())
     {
         atomCount = temp / linStepValue + 1;
-        resultList = calcLinPosParameters(startValue, linStepValue);
+        resultList = calc_lin_pos_parameters(startValue, linStepValue);
     }
     else if(ui->rb_ExpStepChirp->isChecked())
     {
         atomCount = pow(temp, (1/ expStepValue)) + 1;
-        resultList = calcExpPosParameters(startValue, expStepValue);
+        resultList = calc_exp_pos_parameters(startValue, expStepValue);
     }
     return resultList;
 }
@@ -435,13 +435,13 @@ void EditorWindow::calc_scale_value()
             ui->dspb_EndValueScale->setMinimum(startValueScale);
             ui->dspb_EndValueScale->setValue(startValueScale);
         }
-        scaleList = calcAllCombParameterValuesScale(startValueScale, endValueScale, linStepWidthScale, expStepWidthScale);
+        scaleList = calc_all_comb_parameter_values_scale(startValueScale, endValueScale, linStepWidthScale, expStepWidthScale);
         calc_atom_count_all_combined();
     }
     else
     {
         ui->dspb_EndValueScale->setMinimum(0.05);
-        scaleList = calcParameterValuesScale(startValueScale, linStepWidthScale, expStepWidthScale);
+        scaleList = calc_parameter_values_scale(startValueScale, linStepWidthScale, expStepWidthScale);
     }
 }
 
@@ -458,11 +458,11 @@ void EditorWindow::calc_modu_value()
             ui->dspb_EndValueModu->setMinimum(startValueModu);
             ui->dspb_EndValueModu->setValue(startValueModu);
         }
-        moduList = calcAllCombParameterValuesModu(startValueModu, endValueModu, linStepWidthModu, expStepWidthModu);
+        moduList = calc_all_comb_parameter_values_modu(startValueModu, endValueModu, linStepWidthModu, expStepWidthModu);
         calc_atom_count_all_combined();
     }
     else
-        moduList = calcParameterValuesModu(startValueModu, linStepWidthModu, expStepWidthModu);
+        moduList = calc_parameter_values_modu(startValueModu, linStepWidthModu, expStepWidthModu);
 }
 
 // handle phase
@@ -478,11 +478,11 @@ void EditorWindow::calc_phase_value()
             ui->dspb_EndValuePhase->setMinimum(startValuePhase);
             ui->dspb_EndValuePhase->setValue(startValuePhase);
         }
-        phaseList = calcAllCombParameterValuesPhase(startValuePhase, endValuePhase, linStepWidthPhase, expStepWidthPhase);
+        phaseList = calc_all_comb_parameter_values_phase(startValuePhase, endValuePhase, linStepWidthPhase, expStepWidthPhase);
         calc_atom_count_all_combined();
     }
     else
-        phaseList = calcParameterValuesPhase(startValuePhase, linStepWidthPhase, expStepWidthPhase);
+        phaseList = calc_parameter_values_phase(startValuePhase, linStepWidthPhase, expStepWidthPhase);
 }
 
 // handle chirp
@@ -498,11 +498,11 @@ void EditorWindow::calc_chirp_value()
             ui->dspb_EndValueChirp->setMinimum(startValueChirp);
             ui->dspb_EndValueChirp->setValue(startValueChirp);
         }
-        chirpList = calcAllCombParameterValuesChirp(startValueChirp, endValueChirp, linStepWidthChirp, expStepWidthChirp);
+        chirpList = calc_all_comb_parameter_values_chirp(startValueChirp, endValueChirp, linStepWidthChirp, expStepWidthChirp);
         calc_atom_count_all_combined();
     }
     else
-        chirpList = calcParameterValuesChirp(startValueChirp, linStepWidthChirp, expStepWidthChirp);
+        chirpList = calc_parameter_values_chirp(startValueChirp, linStepWidthChirp, expStepWidthChirp);
 }
 
 // access if namechange of PartDictName
@@ -794,13 +794,13 @@ void EditorWindow::on_dspb_ExpStepScale_editingFinished()
 void EditorWindow::on_rb_PosCountScale_toggled()
 {
     if(!allCombined)
-        scaleList = calcParameterValuesScale(startValueScale, linStepWidthScale, expStepWidthScale);
+        scaleList = calc_parameter_values_scale(startValueScale, linStepWidthScale, expStepWidthScale);
 }
 
 void EditorWindow::on_rb_NegCountScale_toggled()
 {
     if(!allCombined)
-        scaleList = calcParameterValuesScale(startValueScale, linStepWidthScale, expStepWidthScale);
+        scaleList = calc_parameter_values_scale(startValueScale, linStepWidthScale, expStepWidthScale);
 }
 
 // for modulation
@@ -861,13 +861,13 @@ void EditorWindow::on_dspb_ExpStepModu_editingFinished()
 void EditorWindow::on_rb_PosCountModu_toggled()
 {
     if(allCombined)
-        moduList = calcParameterValuesModu(startValueModu, linStepWidthModu, expStepWidthModu);
+        moduList = calc_parameter_values_modu(startValueModu, linStepWidthModu, expStepWidthModu);
 }
 
 void EditorWindow::on_rb_NegCountModu_toggled()
 {
     if(allCombined)
-        moduList = calcParameterValuesModu(startValueModu, linStepWidthModu, expStepWidthModu);
+        moduList = calc_parameter_values_modu(startValueModu, linStepWidthModu, expStepWidthModu);
 }
 
 // for phase
@@ -928,13 +928,13 @@ void EditorWindow::on_dspb_ExpStepPhase_editingFinished()
 void EditorWindow::on_rb_PosCountPhase_toggled()
 {
     if(allCombined)
-        phaseList = calcParameterValuesPhase(startValuePhase, linStepWidthPhase, expStepWidthPhase);
+        phaseList = calc_parameter_values_phase(startValuePhase, linStepWidthPhase, expStepWidthPhase);
 }
 
 void EditorWindow::on_rb_NegCountPhase_toggled()
 {
     if(allCombined)
-        phaseList = calcParameterValuesPhase(startValuePhase, linStepWidthPhase, expStepWidthPhase);
+        phaseList = calc_parameter_values_phase(startValuePhase, linStepWidthPhase, expStepWidthPhase);
 }
 
 // for chirp
@@ -999,13 +999,13 @@ void EditorWindow::on_dspb_ExpStepChirp_editingFinished()
 void EditorWindow::on_rb_PosCountChirp_toggled()
 {
     if(allCombined)
-        chirpList = calcParameterValuesChirp(startValueChirp, linStepWidthChirp, expStepWidthChirp);
+        chirpList = calc_parameter_values_chirp(startValueChirp, linStepWidthChirp, expStepWidthChirp);
 }
 
 void EditorWindow::on_rb_NegCountChirp_toggled()
 {
     if(allCombined)
-        chirpList = calcParameterValuesChirp(startValueChirp, linStepWidthChirp, expStepWidthChirp);
+        chirpList = calc_parameter_values_chirp(startValueChirp, linStepWidthChirp, expStepWidthChirp);
 }
 
 // check whether gauss or chirp

@@ -84,20 +84,20 @@ private:
 
     void calc_atom_count_all_combined();
 
-    QList<qreal> calcLinPosParameters(qreal startValue, qreal linStepValue);
-    QList<qreal> calcLinNegParameters(qreal startValue, qreal expStepValue);
-    QList<qreal> calcExpPosParameters(qreal startValue, qreal linStepValue);
-    QList<qreal> calcExpNegParameters(qreal startValue, qreal linStepValue);
+    QList<qreal> calc_lin_pos_parameters(qreal startValue, qreal linStepValue);
+    QList<qreal> calc_lin_neg_parameters(qreal startValue, qreal expStepValue);
+    QList<qreal> calc_exp_pos_parameters(qreal startValue, qreal linStepValue);
+    QList<qreal> calc_exp_neg_parameters(qreal startValue, qreal linStepValue);
 
-    QList<qreal> calcAllCombParameterValuesScale(qreal startValue, qreal endvalue, qreal linStepValue, qreal expStepValue);
-    QList<qreal> calcAllCombParameterValuesModu(qreal startValue, qreal endvalue, qreal linStepValue, qreal expStepValue);
-    QList<qreal> calcAllCombParameterValuesPhase(qreal startValue, qreal endvalue, qreal linStepValue, qreal expStepValue);
-    QList<qreal> calcAllCombParameterValuesChirp(qreal startValue, qreal endvalue, qreal linStepValue, qreal expStepValue);
+    QList<qreal> calc_all_comb_parameter_values_scale(qreal startValue, qreal endvalue, qreal linStepValue, qreal expStepValue);
+    QList<qreal> calc_all_comb_parameter_values_modu(qreal startValue, qreal endvalue, qreal linStepValue, qreal expStepValue);
+    QList<qreal> calc_all_comb_parameter_values_phase(qreal startValue, qreal endvalue, qreal linStepValue, qreal expStepValue);
+    QList<qreal> calc_all_comb_parameter_values_chirp(qreal startValue, qreal endvalue, qreal linStepValue, qreal expStepValue);
 
-    QList<qreal> calcParameterValuesScale(qreal startValue, qreal linStepValue, qreal expStepValue);
-    QList<qreal> calcParameterValuesModu(qreal startValue, qreal linStepValue, qreal expStepValue);
-    QList<qreal> calcParameterValuesPhase(qreal startValue, qreal linStepValue, qreal expStepValue);
-    QList<qreal> calcParameterValuesChirp(qreal startValue, qreal linStepValue, qreal expStepValue);
+    QList<qreal> calc_parameter_values_scale(qreal startValue, qreal linStepValue, qreal expStepValue);
+    QList<qreal> calc_parameter_values_modu(qreal startValue, qreal linStepValue, qreal expStepValue);
+    QList<qreal> calc_parameter_values_phase(qreal startValue, qreal linStepValue, qreal expStepValue);
+    QList<qreal> calc_parameter_values_chirp(qreal startValue, qreal linStepValue, qreal expStepValue);
 
 
 private slots:
