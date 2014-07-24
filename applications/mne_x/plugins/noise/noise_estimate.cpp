@@ -70,7 +70,7 @@ NoiseEstimate::NoiseEstimate()
 : m_bIsRunning(false)
 , m_bProcessData(false)
 , m_pRTMSAInput(NULL)
-, m_pRTMSAOutput(NULL)
+, m_pNEOutput(NULL)
 , m_pBuffer(CircularMatrixBuffer<double>::SPtr())
 {
 }
@@ -107,11 +107,11 @@ void NoiseEstimate::init()
     m_inputConnectors.append(m_pRTMSAInput);
 
     // Output
-    m_pRTMSAOutput = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "Noise Estimate Out", "Noise Estimate output data");
-    m_outputConnectors.append(m_pRTMSAOutput);
+    m_pNEOutput = PluginOutputData<NoiseEstimation>::create(this, "Noise Estimate Out", "Noise Estimate output data");
+    m_outputConnectors.append(m_pNEOutput);
 
-    m_pRTMSAOutput->data()->setMultiArraySize(100);
-    m_pRTMSAOutput->data()->setVisibility(true);
+//    m_pRTMSAOutput->data()->setMultiArraySize(100);
+//    m_pRTMSAOutput->data()->setVisibility(true);
 
     //init channels when fiff info is available
     connect(this, &NoiseEstimate::fiffInfoAvailable, this, &NoiseEstimate::initConnector);
@@ -127,14 +127,14 @@ void NoiseEstimate::init()
 void NoiseEstimate::initConnector()
 {
     qDebug() << "void NoiseEstimate::initConnector()";
-    if(m_pFiffInfo){
-        m_pRTMSAOutput->data()->initFromFiffInfo(m_pFiffInfo);
-    }
-    else
-    {
-        m_iFFTlength = 0;
-        m_Fs = 0;
-    }
+//    if(m_pFiffInfo){
+//        m_pNEOutput->data()->initFromFiffInfo(m_pFiffInfo);
+//    }
+//    else
+//    {
+//        m_iFFTlength = 0;
+//        m_Fs = 0;
+//    }
 
 
 }
@@ -172,7 +172,7 @@ bool NoiseEstimate::stop()
 
         m_pBuffer->clear();
 
-        m_pRTMSAOutput->data()->clear();
+//        m_pNEOutput->data()->clear();
     }
 
     return true;

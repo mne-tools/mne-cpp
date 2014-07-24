@@ -47,11 +47,13 @@
 #include <xDisp/realtimesourceestimatewidget.h>
 #endif
 #include <xDisp/realtimeevokedwidget.h>
+#include <xDisp/noiseestimationwidget.h>
 
 #include <xMeas/newrealtimesamplearray.h>
 #include <xMeas/newrealtimemultisamplearray.h>
 #include <xMeas/realtimesourceestimate.h>
 #include <xMeas/realtimeevoked.h>
+#include <xMeas/noiseestimation.h>
 
 
 //#include <xDisp/measurementwidget.h>
@@ -180,6 +182,21 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
 
             vboxLayout->addWidget(rteWidget);
             rteWidget->init();
+        }
+        else if(pPluginOutputConnector.dynamicCast< PluginOutputData<NoiseEstimation> >())
+        {
+            QSharedPointer<NoiseEstimation>* pNoiseEstimation = &pPluginOutputConnector.dynamicCast< PluginOutputData<NoiseEstimation> >()->data();
+
+            NoiseEstimationWidget* neWidget = new NoiseEstimationWidget(*pNoiseEstimation, pT, newDisp);
+
+            qListActions.append(neWidget->getDisplayActions());
+            qListWidgets.append(neWidget->getDisplayWidgets());
+
+            connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
+                    neWidget, &NoiseEstimationWidget::update, Qt::BlockingQueuedConnection);
+
+            vboxLayout->addWidget(neWidget);
+            neWidget->init();
         }
     }
 

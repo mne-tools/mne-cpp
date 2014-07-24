@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
-* @file     noise_estimate.h
-* @author   Limin Sun <liminsun@nmr.mgh.harvard.edu>
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     noiseestimationwidget.h
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2014
+* @date     February, 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Limin Sun, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the RTHPI class.
+* @brief    Declaration of the NoiseEstimationWidget Class.
 *
 */
 
-#ifndef NOISE_ESTIMATE_H
-#define NOISE_ESTIMATE_H
+#ifndef NOISEESTIMATIONWIDGET_H
+#define NOISEESTIMATIONWIDGET_H
 
 
 //*************************************************************************************************************
@@ -43,28 +42,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "noise_estimate_global.h"
-
-#include <mne_x/Interfaces/IAlgorithm.h>
-#include <generics/circularmatrixbuffer.h>
-#include <xMeas/newrealtimemultisamplearray.h>
-#include <xMeas/noiseestimation.h>
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Eigen INCLUDES
-//=============================================================================================================
-
-#include <Eigen/Core>
-#include <Eigen/SparseCore>
-#include <unsupported/Eigen/FFT>
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FIFF INCLUDES
-//=============================================================================================================
-
-#include <fiff/fiff_info.h>
+#include "xdisp_global.h"
+#include "newmeasurementwidget.h"
 
 
 //*************************************************************************************************************
@@ -72,26 +51,11 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE RtHpiPlugin
-//=============================================================================================================
-
-namespace NoiseEstimatePlugin
-{
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace MNEX;
-using namespace XMEASLIB;
-using namespace IOBuffer;
+#include <QSharedPointer>
+#include <QList>
+#include <QAction>
+#include <QSpinBox>
+#include <QDoubleSpinBox>
 
 
 //*************************************************************************************************************
@@ -99,103 +63,105 @@ using namespace IOBuffer;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+class QTime;
+
+namespace XMEASLIB
+{
+class NoiseEstimation;
+}
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE XDISPLIB
+//=============================================================================================================
+
+namespace XDISPLIB
+{
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace XMEASLIB;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// ENUMERATIONS
+//=============================================================================================================
+
+////=============================================================================================================
+///**
+//* Tool enumeration.
+//*/
+//enum Tool
+//{
+//    Freeze     = 0,       /**< Freezing tool. */
+//    Annotation = 1        /**< Annotation tool. */
+//};
+
 
 //=============================================================================================================
 /**
-* DECLARE CLASS RTHPI
+* DECLARE CLASS NoiseEstimationWidget
 *
-* @brief The NoiseEstimate class provides a NoiseEstimate algorithm structure.
+* @brief The NoiseEstimationWidget class provides a equalizer display
 */
-//class DUMMYTOOLBOXSHARED_EXPORT DummyToolbox : public IAlgorithm
-class NOISE_ESTIMATESHARED_EXPORT NoiseEstimate : public IAlgorithm
+class XDISPSHARED_EXPORT NoiseEstimationWidget : public NewMeasurementWidget
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "noise.json") //NEW Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
-    // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(MNEX::IAlgorithm)
 
 public:
     //=========================================================================================================
     /**
-    * Constructs a RtHpi.
+    * Constructs a NoiseEstimationWidget which is a child of parent.
+    *
+    * @param [in] pNE           pointer to noise estimation measurement.
+    * @param [in] pTime         pointer to application time.
+    * @param [in] parent        pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
     */
-    NoiseEstimate();
+    NoiseEstimationWidget(QSharedPointer<NoiseEstimation> pNE, QSharedPointer<QTime> &pTime, QWidget* parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the RtHpi.
+    * Destroys the NoiseEstimationWidget.
     */
-    ~NoiseEstimate();
+    ~NoiseEstimationWidget();
 
     //=========================================================================================================
     /**
-    * Initialise input and output connectors.
+    * Is called when new data are available.
+    *
+    * @param [in] pMeasurement  pointer to measurement -> not used because its direct attached to the measurement.
     */
-    void init();
+    virtual void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
-    * Clone the plugin
+    * Is called when new data are available.
     */
-    virtual QSharedPointer<IPlugin> clone() const;
+    virtual void getData();
 
-    virtual bool start();
-    virtual bool stop();
-
-    virtual IPlugin::PluginType getType() const;
-    virtual QString getName() const;
-
-    virtual QWidget* setupWidget();
-
-    void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
-
-signals:
     //=========================================================================================================
     /**
-    * Emitted when fiffInfo is available
+    * Initialise the NoiseEstimationWidget.
     */
-    void fiffInfoAvailable();
-    //=========================================================================================================
-    /**
-    * Emitted Noise parameters
-    */
-    void SetNoisePara(qint32 nFFT, int fs);
-    //=========================================================================================================
-    /**
-    * Emitted data to plot
-    */
-    //void RePlot(MatrixXf psdx);
-
-protected:
-    virtual void run();
+    virtual void init();
 
 private:
-    //=========================================================================================================
-    /**
-    * Initialises the output connector.
-    */
-    void initConnector();
+    QSharedPointer<NoiseEstimation> m_pNE;                  /**< The noise estimation measurement. */
 
-    PluginInputData<NewRealTimeMultiSampleArray>::SPtr   m_pRTMSAInput;     /**< The NewRealTimeMultiSampleArray of the noise plugin input.*/
-    PluginOutputData<NoiseEstimation>::SPtr  m_pNEOutput;                   /**< The NE of the noise plugin output.*/
-
-
-    FiffInfo::SPtr  m_pFiffInfo;                        /**< Fiff measurement info.*/
-
-    CircularMatrixBuffer<double>::SPtr   m_pBuffer;     /**< Holds incoming data.*/
-
-    bool m_bIsRunning;      /**< If source lab is running */
-    bool m_bProcessData;    /**< If data should be received for processing */
-
-public:
-    double m_Fs;
-    qint32 m_iFFTlength;
-
-    MatrixXd psdx;
-    long ncount;
-
+    bool m_bInitialized;                                    /**< Is Initialized */
 };
 
 } // NAMESPACE
 
-#endif // NOISE_ESTIMATE_H
+#endif // NOISEESTIMATIONWIDGET_H
