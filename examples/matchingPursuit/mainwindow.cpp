@@ -61,6 +61,8 @@
 #include "ui_enhancededitorwindow.h"
 #include "processdurationmessagebox.h"
 #include "ui_processdurationmessagebox.h"
+#include "treebaseddictwindow.h"
+#include "ui_treebaseddictwindow.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -1684,3 +1686,9 @@ bool MatrixXdS::is_selected(int index)
 
 }
 */
+
+void MainWindow::on_actionCreate_treebased_dictionary_triggered()
+{
+    TreebasedDictWindow *x = new TreebasedDictWindow();
+    x->show();
+}
