@@ -124,12 +124,12 @@ RealTimeEvokedWidget::RealTimeEvokedWidget(QSharedPointer<RealTimeEvoked> pRTE, 
     connect(m_pDoubleSpinBoxZoom, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &RealTimeEvokedWidget::zoomChanged);
     addDisplayWidget(m_pDoubleSpinBoxZoom);
 
-    m_pActionSelectSensors = new QAction(QIcon(":/images/selectSensors.png"), tr("Shows the region selection widget (F12)"),this);
-    m_pActionSelectSensors->setShortcut(tr("F12"));
-    m_pActionSelectSensors->setStatusTip(tr("Shows the region selection widget (F12)"));
-    m_pActionSelectSensors->setVisible(false);
-    connect(m_pActionSelectSensors, &QAction::triggered, this, &RealTimeEvokedWidget::showSensorSelectionWidget);
-    addDisplayAction(m_pActionSelectSensors);
+//    m_pActionSelectSensors = new QAction(QIcon(":/images/selectSensors.png"), tr("Shows the region selection widget (F12)"),this);
+//    m_pActionSelectSensors->setShortcut(tr("F12"));
+//    m_pActionSelectSensors->setStatusTip(tr("Shows the region selection widget (F12)"));
+//    m_pActionSelectSensors->setVisible(false);
+//    connect(m_pActionSelectSensors, &QAction::triggered, this, &RealTimeEvokedWidget::showSensorSelectionWidget);
+//    addDisplayAction(m_pActionSelectSensors);
 
     if(m_pButterflyPlot)
         delete m_pButterflyPlot;
@@ -173,19 +173,19 @@ void RealTimeEvokedWidget::getData()
         {
             m_qListChInfo = m_pRTE->chInfo();
 
-            QFile file(m_pRTE->getXMLLayoutFile());
-            if (!file.open(QFile::ReadOnly | QFile::Text))
-            {
-                qDebug() << QString("Cannot read file %1:\n%2.").arg(m_pRTE->getXMLLayoutFile()).arg(file.errorString());
-                m_pSensorModel = new SensorModel(this);
-                m_pSensorModel->mapChannelInfo(m_qListChInfo);
-            }
-            else
-            {
-                m_pSensorModel = new SensorModel(&file, this);
-                m_pSensorModel->mapChannelInfo(m_qListChInfo);
-                m_pActionSelectSensors->setVisible(true);
-            }
+//            QFile file(m_pRTE->getXMLLayoutFile());
+//            if (!file.open(QFile::ReadOnly | QFile::Text))
+//            {
+//                qDebug() << QString("Cannot read file %1:\n%2.").arg(m_pRTE->getXMLLayoutFile()).arg(file.errorString());
+//                m_pSensorModel = new SensorModel(this);
+//                m_pSensorModel->mapChannelInfo(m_qListChInfo);
+//            }
+//            else
+//            {
+//                m_pSensorModel = new SensorModel(&file, this);
+//                m_pSensorModel->mapChannelInfo(m_qListChInfo);
+//                m_pActionSelectSensors->setVisible(true);
+//            }
 
             init();
         }
