@@ -234,6 +234,14 @@ MatrixXd RealTimeEvoked::getValue() const
 
 //*************************************************************************************************************
 
+void RealTimeEvoked::setPreStimSamples(qint32 numSamples)
+{
+    m_iNumPreStimSamples = numSamples;
+}
+
+
+//*************************************************************************************************************
+
 void RealTimeEvoked::setValue(MatrixXd& v)
 {
     //check vector size
