@@ -136,6 +136,16 @@ void Averaging::init()
 
 //*************************************************************************************************************
 
+void Averaging::changeNumAverages(qint32 numAve)
+{
+    m_iNumAverages = numAve;
+    if(m_pRtAve)
+        m_pRtAve->setAverages(numAve);
+}
+
+
+//*************************************************************************************************************
+
 void Averaging::initConnector()
 {
     if(m_pFiffInfo)
@@ -230,7 +240,7 @@ QString Averaging::getName() const
 
 //*************************************************************************************************************
 
-void Averaging::preStimChanged(qint32 samples)
+void Averaging::changePreStim(qint32 samples)
 {
     m_iPreStimSamples = samples;
     m_pAveragingOutput->data()->setPreStimSamples(m_iPreStimSamples);
@@ -240,7 +250,7 @@ void Averaging::preStimChanged(qint32 samples)
 
 //*************************************************************************************************************
 
-void Averaging::postStimChanged(qint32 samples)
+void Averaging::changePostStim(qint32 samples)
 {
     m_iPostStimSamples = samples;
     emit sampleNumChanged();
@@ -303,7 +313,7 @@ void Averaging::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 void Averaging::appendEvoked(FiffEvoked::SPtr p_pEvoked)
 {
 //    qDebug() << "void Averaging::appendEvoked";// << p_pEvoked->comment;
-    qDebug() << p_pEvoked->comment;
+//    qDebug() << p_pEvoked->comment;
     if(p_pEvoked->comment == QString("Stim %1").arg(m_iStimChan))
     {
 //        qDebug()<< p_pEvoked->comment << "append";
@@ -351,7 +361,6 @@ void Averaging::run()
             MatrixXd rawSegment = m_pAveragingBuffer->pop();
 
             m_pRtAve->append(rawSegment);
-
 
             mutex.lock();
             if(m_qVecEvokedData.size() > 0)

@@ -153,7 +153,7 @@ void RealTimeButterflyPlot::createPlotPath(qint32 row, QPainterPath& path) const
             break;
         }
         case FIFFV_EEG_CH: {
-            fMaxValue = 1e-5f;// m_qSettings.value("RawDelegate/max_eeg").toDouble();
+            fMaxValue = 1e-4f;// m_qSettings.value("RawDelegate/max_eeg").toDouble();
             break;
         }
         case FIFFV_EOG_CH: {

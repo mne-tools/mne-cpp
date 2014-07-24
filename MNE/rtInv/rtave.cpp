@@ -96,12 +96,20 @@ RtAve::~RtAve()
 
 void RtAve::append(const MatrixXd &p_DataSegment)
 {
-//    if(m_pRawMatrixBuffer) // ToDo handle change buffersize
-
+    // ToDo handle change buffersize
     if(!m_pRawMatrixBuffer)
         m_pRawMatrixBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(128, p_DataSegment.rows(), p_DataSegment.cols()));
 
     m_pRawMatrixBuffer->push(&p_DataSegment);
+}
+
+
+//*************************************************************************************************************
+
+void RtAve::setAverages(qint32 numAve)
+{
+    m_iNumAverages = numAve;
+    emit numAveragesChanged();
 }
 
 
@@ -121,8 +129,6 @@ void RtAve::assemblePostStimulus(const QList<QPair<QList<qint32>, MatrixXd> > &p
         //Stimulus channel row
         qint32 t_iRowIdx = m_qListStimChannelIdcs[p_iStimIdx];
 
-//        qDebug() << t_iRowIdx << ": " << p_qListRawMatBuf[t_iBuffWithStim].second.row(t_iRowIdx);
-
         qint32 nSampleCount = 0;
 
         MatrixXd t_matPostStim(nrows, m_iPostStimSamples);
@@ -132,7 +138,6 @@ void RtAve::assemblePostStimulus(const QList<QPair<QList<qint32>, MatrixXd> > &p
 
         qint32 pos = 0;
         p_qListRawMatBuf[t_iBuffWithStim].second.row(t_iRowIdx).maxCoeff(&pos);
-//        std::cout << "Position: " << pos << std::endl;
 
         //
         // assemble poststimulus
@@ -146,15 +151,11 @@ void RtAve::assemblePostStimulus(const QList<QPair<QList<qint32>, MatrixXd> > &p
             {
                 t_matPostStim.block(0, 0, nrows, t_iSize) = p_qListRawMatBuf[t_iBuffWithStim].second.block(0, pos, nrows, t_iSize);
                 nSampleCount += t_iSize;
-
-//                qDebug() << "t_matPostStim.block" << nSampleCount;
             }
             else
             {
                 t_matPostStim.block(0, 0, nrows, m_iPostStimSamples) = p_qListRawMatBuf[t_iBuffWithStim].second.block(0, pos, nrows, m_iPostStimSamples);
                 nSampleCount = m_iPostStimSamples;
-
-//                qDebug() << "t_matPostStim.block" << nSampleCount;
             }
 
             ++t_curBufIdx;
@@ -177,8 +178,6 @@ void RtAve::assemblePostStimulus(const QList<QPair<QList<qint32>, MatrixXd> > &p
             }
 
             ++t_curBufIdx;
-
-//            qDebug() << "Sample count" << nSampleCount;
         }
 
         //
@@ -205,9 +204,6 @@ void RtAve::assemblePreStimulus(const QList<QPair<QList<qint32>, MatrixXd> > &p_
         //Stimulus channel row
         qint32 t_iRowIdx = m_qListStimChannelIdcs[p_iStimIdx];
 
-        std::cout << t_iRowIdx
-                     << ": " << p_qListRawMatBuf[t_iBuffWithStim].second.row(t_iRowIdx) << std::endl;
-
         qint32 nSampleCount = m_iPreStimSamples;
 
         MatrixXd t_matPreStim(nrows, m_iPreStimSamples);
@@ -217,7 +213,6 @@ void RtAve::assemblePreStimulus(const QList<QPair<QList<qint32>, MatrixXd> > &p_
 
         qint32 pos = 0;
         p_qListRawMatBuf[t_iBuffWithStim].second.row(t_iRowIdx).maxCoeff(&pos);
-//        qDebug() << "Position: " << pos;
 
         //
         // assemble prestimulus
@@ -231,13 +226,11 @@ void RtAve::assemblePreStimulus(const QList<QPair<QList<qint32>, MatrixXd> > &p_
             {
                 t_matPreStim.block(0, t_iStart, nrows, pos) = p_qListRawMatBuf[t_iBuffWithStim].second.block(0, 0, nrows, pos);
                 nSampleCount -= pos;
-//                qDebug() << "t_matPreStim.block a" << nSampleCount;
             }
             else
             {
                 t_matPreStim.block(0, 0, nrows, m_iPreStimSamples) = p_qListRawMatBuf[t_iBuffWithStim].second.block(0, -t_iStart, nrows, m_iPreStimSamples);
                 nSampleCount = 0;
-//                qDebug() << "t_matPreStim.block b" << nSampleCount;
             }
 
             --t_curBufIdx;
@@ -246,25 +239,20 @@ void RtAve::assemblePreStimulus(const QList<QPair<QList<qint32>, MatrixXd> > &p_
         // remaining samples
         while(nSampleCount > 0)
         {
-//            qDebug() << "#1" << "Current buffer" << t_curBufIdx;
             t_iStart = nSampleCount - ncols;
 
             if(t_iStart >= 0)
             {
-//                qDebug() << "#2a";
                 t_matPreStim.block(0, t_iStart, nrows, ncols) = p_qListRawMatBuf[t_curBufIdx].second.block(0, 0, nrows, ncols);
                 nSampleCount -= ncols;
             }
             else
             {
-//                qDebug() << "#2b" << "sample count" << nSampleCount << "t_iStart" << t_iStart;
                 t_matPreStim.block(0, 0, nrows, nSampleCount) = p_qListRawMatBuf[t_curBufIdx].second.block(0, -t_iStart, nrows, nSampleCount);
                 nSampleCount = 0;
             }
 
             --t_curBufIdx;
-
-//            qDebug() << "Sample count" << nSampleCount;
         }
 
         //
@@ -425,8 +413,6 @@ void RtAve::run()
                 //
                 // Average
                 //
-//                qDebug() << t_qListRawMatBuf.size()/2;
-//                qDebug() << (float)(m_iPreStimSamples + t_nSamplesPerBuf)/((float)t_nSamplesPerBuf);
                 float ratio = (float)m_iPreStimSamples/((float)(m_iPreStimSamples+m_iPostStimSamples));
                 qint32 t_iBuffWithStim = t_qListRawMatBuf.size()*ratio;
 
@@ -448,12 +434,15 @@ void RtAve::run()
                             //
                             this->assemblePostStimulus(t_qListRawMatBuf, t_iStimIndex);
 
-//                            qDebug() << "Buffers of pre-stimulus" << t_iStimIndex << ":" << m_qListQListPreStimBuf[t_iStimIndex].size();
+                            qDebug() << "Stimulus" << t_iStimIndex << "; Buffer Size" << m_qListQListPreStimBuf[t_iStimIndex].size();
                             //
                             // Prestimulus average
                             //
                             if(m_qListQListPreStimBuf[t_iStimIndex].size() >= m_iNumAverages)
                             {
+                                while(m_qListQListPreStimBuf[t_iStimIndex].size() >= (m_iNumAverages+1))//if meanwhile number of averages was reduced
+                                    m_qListQListPreStimBuf[t_iStimIndex].pop_front();
+
                                 m_qListPreStimAve[t_iStimIndex] = m_qListQListPreStimBuf[t_iStimIndex][0];
                                 for(j = 1; j < m_qListQListPreStimBuf[t_iStimIndex].size(); ++j)
                                     m_qListPreStimAve[t_iStimIndex] += m_qListQListPreStimBuf[t_iStimIndex][j];
@@ -461,17 +450,16 @@ void RtAve::run()
                                 m_qListPreStimAve[t_iStimIndex].array() /= (double)m_iNumAverages;
 
                                 m_qListQListPreStimBuf[t_iStimIndex].pop_front();
-
-//                                qDebug() << "Pre-stim average" << t_iStimIndex;
                             }
 
-
-//                            qDebug() << "Buffers of post-stimulus" << t_iStimIndex << ":" << m_qListQVectorPostStimBuf[t_iStimIndex].size();
                             //
                             // Poststimulus average
                             //
                             if(m_qListQListPostStimBuf[t_iStimIndex].size() >= m_iNumAverages)
                             {
+                                while(m_qListQListPostStimBuf[t_iStimIndex].size() >= (m_iNumAverages+1))//if meanwhile number of averages was reduced
+                                    m_qListQListPostStimBuf[t_iStimIndex].pop_front();
+
                                 m_qListPostStimAve[t_iStimIndex] = m_qListQListPostStimBuf[t_iStimIndex][0];
                                 for(j = 1; j < m_qListQListPostStimBuf[t_iStimIndex].size(); ++j)
                                     m_qListPostStimAve[t_iStimIndex] += m_qListQListPostStimBuf[t_iStimIndex][j];
@@ -479,8 +467,6 @@ void RtAve::run()
                                 m_qListPostStimAve[t_iStimIndex].array() /= (double)m_iNumAverages;
 
                                 m_qListQListPostStimBuf[t_iStimIndex].pop_front();
-
-//                                qDebug() << "Post-stim average" << t_iStimIndex;
                             }
 
                             //if averages are available -> buffers are filled and first average is stored
@@ -494,7 +480,6 @@ void RtAve::run()
                                 m_qListStimAve[t_iStimIndex].block(0,0,m_qListPreStimAve[t_iStimIndex].rows(),m_qListPreStimAve[t_iStimIndex].cols()) = m_qListPreStimAve[t_iStimIndex];
                                 // Post
                                 m_qListStimAve[t_iStimIndex].block(0,m_qListPreStimAve[t_iStimIndex].cols(),m_qListPostStimAve[t_iStimIndex].rows(),m_qListPostStimAve[t_iStimIndex].cols()) = m_qListPostStimAve[t_iStimIndex];
-
 
                                 //
                                 // Emit evoked
@@ -513,7 +498,6 @@ void RtAve::run()
                                 t_pEvokedStim->comment = QString("Stim %1").arg(t_iStimIndex);
                                 t_pEvokedStim->data = m_qListStimAve[t_iStimIndex];
                                 emit evokedStim(t_pEvokedStim);
-//                                qDebug() << "Evoked emitted" << t_pEvokedPreStim->comment;
                             }
                         }
                     }
