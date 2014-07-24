@@ -398,8 +398,8 @@ QStringList FixDictMp::correlation(VectorXd signalSamples, QList<qreal> atomSamp
 
     // List of Atomname, Index and max correlation coefficient
     resultList.append(atomName);
-    resultList.append(QString("%1").arg(index -atomSamples.length() + 1));     // Gibt den Signalindex fuer den Startpunkt des Atoms wieder
-    resultList.append(QString("%1").arg(maximum));
+    resultList.append(QString("%1").arg(index -atomSamples.length() + 1));     // for translation
+    resultList.append(QString("%1").arg(maximum)); //for scaling
 
     return resultList;
     // die Stelle, an der die Korrelation am groessten ist ergibt sich aus:
