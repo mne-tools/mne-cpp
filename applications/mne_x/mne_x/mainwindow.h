@@ -57,6 +57,7 @@
 #include <QVBoxLayout>
 #include <QContextMenuEvent>
 #include <QSharedPointer>
+#include <QShortcut>
 
 
 //*************************************************************************************************************
