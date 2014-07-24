@@ -107,6 +107,8 @@ private slots:
     void recieve_result(qint32 current_iteration, qint32 max_iterations, qreal current_energy, qreal max_energy, gabor_atom_list atom_res_list);
     void calc_thread_finished();
 
+    void on_actionCreate_treebased_dictionary_triggered();
+
 signals:
 
     void send_input(MatrixXd send_signal, qint32 send_max_iterations, qreal send_epsilon);

@@ -81,7 +81,8 @@ SOURCES += \
     formulaeditor.cpp \
     deletemessagebox.cpp \
     mainwindow.cpp \
-    processdurationmessagebox.cpp
+    processdurationmessagebox.cpp \
+    treebaseddictwindow.cpp
 
 HEADERS += \
     editorwindow.h \
@@ -89,7 +90,8 @@ HEADERS += \
     formulaeditor.h \
     deletemessagebox.h \
     mainwindow.h \
-    processdurationmessagebox.h
+    processdurationmessagebox.h \
+    treebaseddictwindow.h
 
 FORMS += \
     editorwindow.ui \
@@ -97,7 +99,8 @@ FORMS += \
     formulaeditor.ui \
     deletemessagebox.ui \
     mainwindow.ui \
-    processdurationmessagebox.ui
+    processdurationmessagebox.ui \
+    treebaseddictwindow.ui
 
 RESOURCES += \
     Ressourcen.qrc

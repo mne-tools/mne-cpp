@@ -1,24 +1,24 @@
 //=============================================================================================================
 /**
-* @file     editorwindow.h
-* @author   Martin Henfling <martin.henfling@tu-ilmenau.de>;
-*           Daniel Knobl <daniel.knobl@tu-ilmenau.de>;
-*           Sebastian Krause <sebastian.krause@tu-ilmenau.de>
-* @version  1.0
-* @date     July, 2014
+* @file editorwindow.h
+* @author Martin Henfling <martin.henfling@tu-ilmenau.de>;
+* Daniel Knobl <daniel.knobl@tu-ilmenau.de>;
+* Sebastian Krause <sebastian.krause@tu-ilmenau.de>
+* @version 1.0
+* @date July, 2014
 *
-* @section  LICENSE
+* @section LICENSE
 *
 * Copyright (C) 2014, Martin Henfling, Daniel Knobl and Sebastian Krause. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
-*     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
-*       following disclaimer.
-*     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
-*       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
-*       to endorse or promote products derived from this software without specific prior written permission.
+* * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+* following disclaimer.
+* * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+* the following disclaimer in the documentation and/or other materials provided with the distribution.
+* * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+* to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
@@ -30,10 +30,10 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Editorwindow class declaration which enables the generation of individual dictionaries. Gaussian
-*           atoms (with parameters scale, modulation and phase) or chirp atoms could be created and saved as
-*           part dictionaries. For using the atoms for decompostion it's necessary to build an entire
-*           dictionary from serveral (minimum one) part dictionaries.
+* @brief Editorwindow class declaration which enables the generation of individual dictionaries. Gaussian
+* atoms (with parameters scale, modulation and phase) or chirp atoms could be created and saved as
+* part dictionaries. For using the atoms for decompostion it's necessary to build an entire
+* dictionary from serveral (minimum one) part dictionaries.
 *
 */
 
@@ -185,7 +185,7 @@ private slots:
 
     void on_dspb_EndValuePhase_editingFinished();
 
-    void on_dspb_EndValueChirp_editingFinished();   
+    void on_dspb_EndValueChirp_editingFinished();
 
     void on_btt_ToNewDict_clicked();
 

@@ -1,24 +1,24 @@
 //=============================================================================================================
 /**
-* @file     editorwindow.cpp
-* @author   Martin Henfling <martin.henfling@tu-ilmenau.de>;
-*           Daniel Knobl <daniel.knobl@tu-ilmenau.de>;
-*           Sebastian Krause <sebastian.krause@tu-ilmenau.de>
-* @version  1.0
-* @date     July, 2014
+* @file editorwindow.cpp
+* @author Martin Henfling <martin.henfling@tu-ilmenau.de>;
+* Daniel Knobl <daniel.knobl@tu-ilmenau.de>;
+* Sebastian Krause <sebastian.krause@tu-ilmenau.de>
+* @version 1.0
+* @date July, 2014
 *
-* @section  LICENSE
+* @section LICENSE
 *
 * Copyright (C) 2014, Martin Henfling, Daniel Knobl and Sebastian Krause. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
-*     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
-*       following disclaimer.
-*     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
-*       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
-*       to endorse or promote products derived from this software without specific prior written permission.
+* * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+* following disclaimer.
+* * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+* the following disclaimer in the documentation and/or other materials provided with the distribution.
+* * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+* to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the EditorWindow class.
+* @brief Implementation of the EditorWindow class.
 *
 */
 
@@ -106,7 +106,7 @@ EditorWindow::AtomType atomType;
 //=============================================================================================================
 // MAIN
 //=============================================================================================================
-EditorWindow::EditorWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::EditorWindow)
+EditorWindow::EditorWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::EditorWindow)
 {
     this->setAccessibleName("simple");
     ui->setupUi(this);
@@ -126,7 +126,7 @@ void EditorWindow::read_dicts()
     filterList.append("*.dict");
     filterList.append("*.pdict");
 
-    QFileInfoList fileList =  dictDir.entryInfoList(filterList);    
+    QFileInfoList fileList = dictDir.entryInfoList(filterList);
 
     for(int i = 0; i < fileList.length(); i++)
     {
@@ -151,7 +151,7 @@ void EditorWindow::read_dicts()
 
         ui->list_AllDict->addItem(item);
     }
-    if(ui->list_AllDict->count() > 1)   ui->list_AllDict->itemAt(0, 0)->setSelected(true);
+    if(ui->list_AllDict->count() > 1) ui->list_AllDict->itemAt(0, 0)->setSelected(true);
 }
 
 // calculates number of atoms if "combine all"
@@ -164,14 +164,14 @@ void EditorWindow::calc_atom_count_all_combined()
     qint32 chirpCount = 1;
 
     if(scaleList.length() != 0) scaleCount = scaleList.length();
-    if(moduList.length() != 0)  moduCount = moduList.length();
+    if(moduList.length() != 0) moduCount = moduList.length();
     if(phaseList.length() != 0) phaseCount = phaseList.length();
     if(chirpList.length() != 0) chirpCount = chirpList.length();
 
     if(atomType == EditorWindow::Gauss)
-        count = scaleCount  * moduCount * phaseCount;
+        count = scaleCount * moduCount * phaseCount;
     else if( atomType == EditorWindow::Chirp)
-        count = scaleCount  * moduCount * phaseCount * chirpCount;
+        count = scaleCount * moduCount * phaseCount * chirpCount;
 
     if(count > 1000000)
     {
@@ -192,7 +192,7 @@ QList<qreal> EditorWindow::calc_lin_pos_parameters(qreal startValue, qreal linSt
     i = 0;
     while(i < atomCount)
     {
-        result =  startValue + (i * linStepValue);
+        result = startValue + (i * linStepValue);
         resultList.append(result);
         i++;
     }
@@ -209,7 +209,7 @@ QList<qreal> EditorWindow::calc_lin_neg_parameters(qreal startValue, qreal linSt
     i = 0;
     while(i < atomCount)
     {
-        result =  startValue - (i * linStepValue);
+        result = startValue - (i * linStepValue);
         resultList.append(result);
         i++;
     }
@@ -226,7 +226,7 @@ QList<qreal> EditorWindow::calc_exp_pos_parameters(qreal startValue, qreal expSt
     i = 0;
     while(i < atomCount)
     {
-        result =  startValue + pow(i, expStepValue);
+        result = startValue + pow(i, expStepValue);
         resultList.append(result);
         i++;
     }
@@ -243,7 +243,7 @@ QList<qreal> EditorWindow::calc_exp_neg_parameters(qreal startValue, qreal expSt
     i = 0;
     while(i < atomCount)
     {
-        result =  startValue - pow(i, expStepValue);
+        result = startValue - pow(i, expStepValue);
         resultList.append(result);
         i++;
     }
@@ -260,15 +260,15 @@ QList<qreal> EditorWindow::calc_parameter_values_scale(qreal startValue, qreal l
         resultList.append(startValue);
     else if(ui->rb_LinStepScale->isChecked())
     {
-        if(ui->rb_PosCountScale->isChecked())   resultList = calc_lin_pos_parameters(startValue, linStepValue);
-        else                                    resultList = calc_lin_neg_parameters(startValue, linStepValue);
+        if(ui->rb_PosCountScale->isChecked()) resultList = calcLinPosParameters(startValue, linStepValue);
+        else resultList = calcLinNegParameters(startValue, linStepValue);
     }
     else if(ui->rb_ExpStepScale->isChecked())
     {
-        if(ui->rb_PosCountScale->isChecked())   resultList = calc_exp_pos_parameters(startValue, expStepValue);
-        else                                    resultList = calc_exp_neg_parameters(startValue, expStepValue);
+        if(ui->rb_PosCountScale->isChecked()) resultList = calcExpPosParameters(startValue, expStepValue);
+        else resultList = calcExpNegParameters(startValue, expStepValue);
     }
-    if(!resultList.isEmpty())   ui->dspb_EndValueScale->setValue(resultList.last());
+    if(!resultList.isEmpty()) ui->dspb_EndValueScale->setValue(resultList.last());
     return resultList;
 }
 
@@ -303,15 +303,15 @@ QList<qreal> EditorWindow::calc_parameter_values_modu(qreal startValue, qreal li
         resultList.append(startValue);
     else if(ui->rb_LinStepModu->isChecked())
     {
-        if(ui->rb_PosCountModu->isChecked())    resultList = calc_lin_pos_parameters(startValue, linStepValue);
-        else                                    resultList = calc_lin_neg_parameters(startValue, linStepValue);
+        if(ui->rb_PosCountModu->isChecked()) resultList = calcLinPosParameters(startValue, linStepValue);
+        else resultList = calcLinNegParameters(startValue, linStepValue);
     }
     else if(ui->rb_ExpStepModu->isChecked())
     {
-        if(ui->rb_PosCountModu->isChecked())   resultList = calc_exp_pos_parameters(startValue, expStepValue);
-        else                                   resultList = calc_exp_neg_parameters(startValue, expStepValue);
+        if(ui->rb_PosCountModu->isChecked()) resultList = calcExpPosParameters(startValue, expStepValue);
+        else resultList = calcExpNegParameters(startValue, expStepValue);
     }
-    if(!resultList.isEmpty())   ui->dspb_EndValueModu->setValue(resultList.last());
+    if(!resultList.isEmpty()) ui->dspb_EndValueModu->setValue(resultList.last());
     return resultList;
 }
 
@@ -329,7 +329,7 @@ QList<qreal> EditorWindow::calc_all_comb_parameter_values_modu(qreal startValue,
         resultList = calc_lin_pos_parameters(startValue, linStepValue);
     }
     if(ui->rb_ExpStepModu->isChecked())
-    {        
+    {
         atomCount = pow(temp, (1.0/ expStepValue)) + 1;
         resultList = calc_exp_pos_parameters(startValue, expStepValue);
     }
@@ -346,15 +346,15 @@ QList<qreal> EditorWindow::calc_parameter_values_phase(qreal startValue, qreal l
         resultList.append(startValue);
     else if(ui->rb_LinStepPhase->isChecked())
     {
-        if(ui->rb_PosCountPhase->isChecked())   resultList = calc_lin_pos_parameters(startValue, linStepValue);
-        else                                    resultList = calc_lin_neg_parameters(startValue, linStepValue);
+        if(ui->rb_PosCountPhase->isChecked()) resultList = calcLinPosParameters(startValue, linStepValue);
+        else resultList = calcLinNegParameters(startValue, linStepValue);
     }
     else if(ui->rb_ExpStepPhase->isChecked())
     {
-        if(ui->rb_PosCountPhase->isChecked())   resultList = calc_exp_pos_parameters(startValue, expStepValue);
-        else                                    resultList = calc_exp_neg_parameters(startValue, expStepValue);
+        if(ui->rb_PosCountPhase->isChecked()) resultList = calcExpPosParameters(startValue, expStepValue);
+        else resultList = calcExpNegParameters(startValue, expStepValue);
     }
-    if(!resultList.isEmpty())   ui->dspb_EndValuePhase->setValue(resultList.last());
+    if(!resultList.isEmpty()) ui->dspb_EndValuePhase->setValue(resultList.last());
     return resultList;
 }
 
@@ -389,15 +389,15 @@ QList<qreal> EditorWindow::calc_parameter_values_chirp(qreal startValue, qreal l
         resultList.append(startValue);
     else if(ui->rb_LinStepChirp->isChecked())
     {
-        if(ui->rb_PosCountChirp->isChecked())   resultList = calc_lin_pos_parameters(startValue, linStepValue);
-        else                                    resultList = calc_lin_neg_parameters(startValue, linStepValue);
+        if(ui->rb_PosCountChirp->isChecked()) resultList = calcLinPosParameters(startValue, linStepValue);
+        else resultList = calcLinNegParameters(startValue, linStepValue);
     }
     else if(ui->rb_ExpStepChirp->isChecked())
     {
-        if(ui->rb_PosCountChirp->isChecked())   resultList = calc_exp_pos_parameters(startValue, expStepValue);
-        else                                    resultList = calc_exp_neg_parameters(startValue, expStepValue);
+        if(ui->rb_PosCountChirp->isChecked()) resultList = calcExpPosParameters(startValue, expStepValue);
+        else resultList = calcExpNegParameters(startValue, expStepValue);
     }
-    if(!resultList.isEmpty())   ui->dspb_EndValuePhase->setValue(resultList.last());
+    if(!resultList.isEmpty()) ui->dspb_EndValuePhase->setValue(resultList.last());
     return resultList;
 }
 
@@ -410,7 +410,7 @@ QList<qreal> EditorWindow::calc_all_comb_parameter_values_chirp(qreal startValue
     if(ui->rb_NoStepChirp->isChecked())
         resultList.append(startValue);
     else if(ui->rb_LinStepChirp->isChecked())
-    {        
+    {
         atomCount = temp / linStepValue + 1;
         resultList = calc_lin_pos_parameters(startValue, linStepValue);
     }
@@ -422,19 +422,19 @@ QList<qreal> EditorWindow::calc_all_comb_parameter_values_chirp(qreal startValue
     return resultList;
 }
 
-//  handle scale
+// handle scale
 void EditorWindow::calc_scale_value()
 {
     if(allCombined)
     {
         ui->dspb_EndValueScale->setDisabled(ui->rb_NoStepScale->isChecked());
-        if(ui->rb_LinStepScale->isChecked())        ui->dspb_EndValueScale->setMinimum(startValueScale + linStepWidthScale);
-        else if(ui->rb_ExpStepScale->isChecked())  ui->dspb_EndValueScale->setMinimum(startValueScale + 1);
+        if(ui->rb_LinStepScale->isChecked()) ui->dspb_EndValueScale->setMinimum(startValueScale + linStepWidthScale);
+        else if(ui->rb_ExpStepScale->isChecked()) ui->dspb_EndValueScale->setMinimum(startValueScale + 1);
         else
         {
             ui->dspb_EndValueScale->setMinimum(startValueScale);
             ui->dspb_EndValueScale->setValue(startValueScale);
-        }    
+        }
         scaleList = calc_all_comb_parameter_values_scale(startValueScale, endValueScale, linStepWidthScale, expStepWidthScale);
         calc_atom_count_all_combined();
     }
@@ -451,8 +451,8 @@ void EditorWindow::calc_modu_value()
     if(allCombined)
     {
         ui->dspb_EndValueModu->setDisabled(ui->rb_NoStepModu->isChecked());
-        if(ui->rb_LinStepModu->isChecked())        ui->dspb_EndValueModu->setMinimum(startValueModu + linStepWidthModu);
-        else if(ui->rb_ExpStepModu->isChecked())  ui->dspb_EndValueModu->setMinimum(startValueModu + 1);
+        if(ui->rb_LinStepModu->isChecked()) ui->dspb_EndValueModu->setMinimum(startValueModu + linStepWidthModu);
+        else if(ui->rb_ExpStepModu->isChecked()) ui->dspb_EndValueModu->setMinimum(startValueModu + 1);
         else
         {
             ui->dspb_EndValueModu->setMinimum(startValueModu);
@@ -471,8 +471,8 @@ void EditorWindow::calc_phase_value()
     if(allCombined)
     {
         ui->dspb_EndValuePhase->setDisabled(ui->rb_NoStepPhase->isChecked());
-        if(ui->rb_LinStepPhase->isChecked())        ui->dspb_EndValuePhase->setMinimum(startValuePhase + linStepWidthPhase);
-        else if(ui->rb_ExpStepPhase->isChecked())  ui->dspb_EndValuePhase->setMinimum(startValuePhase + 1);
+        if(ui->rb_LinStepPhase->isChecked()) ui->dspb_EndValuePhase->setMinimum(startValuePhase + linStepWidthPhase);
+        else if(ui->rb_ExpStepPhase->isChecked()) ui->dspb_EndValuePhase->setMinimum(startValuePhase + 1);
         else
         {
             ui->dspb_EndValuePhase->setMinimum(startValuePhase);
@@ -491,8 +491,8 @@ void EditorWindow::calc_chirp_value()
     if(allCombined)
     {
         ui->dspb_EndValueChirp->setDisabled(ui->rb_NoStepChirp->isChecked());
-        if(ui->rb_LinStepChirp->isChecked())        ui->dspb_EndValueChirp->setMinimum(startValueChirp + linStepWidthChirp);
-        else if(ui->rb_ExpStepChirp->isChecked())  ui->dspb_EndValueChirp->setMinimum(startValueChirp + 1);
+        if(ui->rb_LinStepChirp->isChecked()) ui->dspb_EndValueChirp->setMinimum(startValueChirp + linStepWidthChirp);
+        else if(ui->rb_ExpStepChirp->isChecked()) ui->dspb_EndValueChirp->setMinimum(startValueChirp + 1);
         else
         {
             ui->dspb_EndValueChirp->setMinimum(startValueChirp);
@@ -502,7 +502,7 @@ void EditorWindow::calc_chirp_value()
         calc_atom_count_all_combined();
     }
     else
-        chirpList = calc_parameter_values_chirp(startValueChirp, linStepWidthChirp, expStepWidthChirp);
+        chirpList = calcParameterValuesChirp(startValueChirp, linStepWidthChirp, expStepWidthChirp);
 }
 
 // access if namechange of PartDictName
@@ -574,20 +574,20 @@ void EditorWindow::on_chb_CombAllPara_toggled(bool checked)
     ui->dspb_EndValuePhase->setDisabled(ui->rb_NoStepPhase->isChecked());
     ui->dspb_EndValueChirp->setDisabled(ui->rb_NoStepChirp->isChecked());
 
-    if(ui->rb_LinStepScale->isChecked())   ui->dspb_EndValueScale->setMinimum(startValueScale + linStepWidthScale);
-    else if(ui->rb_ExpStepScale->isChecked())   ui->dspb_EndValueScale->setMinimum(startValueScale + 1);
+    if(ui->rb_LinStepScale->isChecked()) ui->dspb_EndValueScale->setMinimum(startValueScale + linStepWidthScale);
+    else if(ui->rb_ExpStepScale->isChecked()) ui->dspb_EndValueScale->setMinimum(startValueScale + 1);
     else ui->dspb_EndValueScale->setValue(startValueScale);
 
-    if(ui->rb_LinStepModu->isChecked())   ui->dspb_EndValueModu->setMinimum(startValueModu + linStepWidthModu);
-    else if(ui->rb_ExpStepModu->isChecked())   ui->dspb_EndValueModu->setMinimum(startValueModu + 1);
+    if(ui->rb_LinStepModu->isChecked()) ui->dspb_EndValueModu->setMinimum(startValueModu + linStepWidthModu);
+    else if(ui->rb_ExpStepModu->isChecked()) ui->dspb_EndValueModu->setMinimum(startValueModu + 1);
     else ui->dspb_EndValueModu->setValue(startValueModu);
 
-    if(ui->rb_LinStepPhase->isChecked())   ui->dspb_EndValuePhase->setMinimum(startValuePhase + linStepWidthPhase);
-    else if(ui->rb_ExpStepPhase->isChecked())   ui->dspb_EndValuePhase->setMinimum(startValuePhase + 1);
+    if(ui->rb_LinStepPhase->isChecked()) ui->dspb_EndValuePhase->setMinimum(startValuePhase + linStepWidthPhase);
+    else if(ui->rb_ExpStepPhase->isChecked()) ui->dspb_EndValuePhase->setMinimum(startValuePhase + 1);
     else ui->dspb_EndValuePhase->setValue(startValuePhase);
 
-    if(ui->rb_LinStepChirp->isChecked())   ui->dspb_EndValueChirp->setMinimum(startValueChirp + linStepWidthChirp);
-    else if(ui->rb_ExpStepChirp->isChecked())   ui->dspb_EndValueChirp->setMinimum(startValueChirp + 1);
+    if(ui->rb_LinStepChirp->isChecked()) ui->dspb_EndValueChirp->setMinimum(startValueChirp + linStepWidthChirp);
+    else if(ui->rb_ExpStepChirp->isChecked()) ui->dspb_EndValueChirp->setMinimum(startValueChirp + 1);
     else ui->dspb_EndValueChirp->setValue(startValueChirp);
 
     if(!checked)
@@ -752,7 +752,7 @@ void EditorWindow::on_dspb_EndValueScale_editingFinished()
 void EditorWindow::on_rb_NoStepScale_toggled(bool checked)
 {
     if(checked) ui->lb_StartValueScale->setText("Wert:");
-    else        ui->lb_StartValueScale->setText("Startwert:");
+    else ui->lb_StartValueScale->setText("Startwert:");
     ui->lb_EndValueScale->setDisabled(checked);
     if(!checked)
     {
@@ -819,7 +819,7 @@ void EditorWindow::on_dspb_EndValueModu_editingFinished()
 void EditorWindow::on_rb_NoStepModu_toggled(bool checked)
 {
     if(checked) ui->lb_StartValueModu->setText("Wert:");
-    else        ui->lb_StartValueModu->setText("Startwert:");
+    else ui->lb_StartValueModu->setText("Startwert:");
     ui->lb_EndValueModu->setDisabled(checked);
     if(!checked)
     {
@@ -886,7 +886,7 @@ void EditorWindow::on_dspb_EndValuePhase_editingFinished()
 void EditorWindow::on_rb_NoStepPhase_toggled(bool checked)
 {
     if(checked) ui->lb_StartValuePhase->setText("Wert:");
-    else        ui->lb_StartValuePhase->setText("Startwert:");
+    else ui->lb_StartValuePhase->setText("Startwert:");
     ui->lb_EndValuePhase->setDisabled(checked);
     if(!checked)
     {
@@ -953,7 +953,7 @@ void EditorWindow::on_dspb_EndValueChirp_editingFinished()
 void EditorWindow::on_rb_NoStepChirp_toggled(bool checked)
 {
     if(checked) ui->lb_StartValueChirp->setText("Wert:");
-    else        ui->lb_StartValueChirp->setText("Startwert:");
+    else ui->lb_StartValueChirp->setText("Startwert:");
     ui->lb_EndValueChirp->setDisabled(checked);
     if(!checked)
     {
@@ -980,7 +980,7 @@ void EditorWindow::on_rb_LinStepChirp_toggled(bool checked)
 
 void EditorWindow::on_rb_ExpStepChirp_toggled(bool checked)
 {
-    if(checked) expStepWidthChirp  = ui->dspb_ExpStepChirp->value();
+    if(checked) expStepWidthChirp = ui->dspb_ExpStepChirp->value();
     calc_chirp_value();
 }
 
@@ -1047,7 +1047,7 @@ void EditorWindow::on_rb_ChirpAtomType_toggled(bool checked)
 
 // calc all atoms with choosen parameters and save to list and to drive
 void EditorWindow::on_btt_CalcAtoms_clicked()
-{   
+{
     QStringList resultList;
     resultList.clear();
 
@@ -1066,7 +1066,7 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
     while(k < ui->list_AllDict->count())
     {
         if(QString::compare(partDictName, ui->list_AllDict->item(k)->text()) == 0)
-        {       QMessageBox::warning(this, tr("Fehler"),
+        { QMessageBox::warning(this, tr("Fehler"),
                 tr("Der Name ist schon vergeben."));
 
                 ui->tb_PartDictName->setFocus();
@@ -1079,7 +1079,7 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
     if (dict.open (QIODevice::WriteOnly| QIODevice::Append))
     {
         QTextStream stream( &dict );
-        stream << QString("atomcount = %1 ").arg(atomCount)  << "\n";
+        stream << QString("atomcount = %1 ").arg(atomCount) << "\n";
 
         if(ui->chb_CombAllPara->isChecked())
         {
@@ -1101,20 +1101,20 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
                         while(scaleCount < scaleList.length())
                         {
                             qreal tempScale = 0;
-                            if(scaleList.length() == 1)    tempScale = scaleList.at(0);
-                            else                           tempScale = scaleList.at(scaleCount);
+                            if(scaleList.length() == 1) tempScale = scaleList.at(0);
+                            else tempScale = scaleList.at(scaleCount);
 
                             qreal tempModu = 0;
-                            if(moduList.length() ==1)      tempModu = moduList.at(0);
-                            else                           tempModu = moduList.at(moduCount);
+                            if(moduList.length() ==1) tempModu = moduList.at(0);
+                            else tempModu = moduList.at(moduCount);
 
                             qreal tempPhase = 0;
-                            if(phaseList.length() == 1)    tempPhase = phaseList.at(0);
-                            else                           tempPhase = phaseList.at(phaseCount);
+                            if(phaseList.length() == 1) tempPhase = phaseList.at(0);
+                            else tempPhase = phaseList.at(phaseCount);
 
                             qreal tempChirp = 0;
-                            if(chirpList.length() == 1)    tempChirp = chirpList.at(0);
-                            else                           tempChirp = chirpList.at(chirpCount);
+                            if(chirpList.length() == 1) tempChirp = chirpList.at(0);
+                            else tempChirp = chirpList.at(chirpCount);
 
                             if(atomType == EditorWindow::Chirp)
                              {
@@ -1138,7 +1138,7 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
                     phaseCount++;
                 }
                 chirpCount++;
-            }            
+            }
         }
         else //all params combined
         {
@@ -1148,13 +1148,13 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
                 {
                     if(ui->rb_NoStepScale->isChecked() && ui->rb_NoStepModu->isChecked() && ui->rb_NoStepPhase->isChecked() && ui->rb_NoStepChirp)
                     {
-                        QMessageBox::warning(this, tr("Warnung"),QString("Es werden %1 identische  Atome erstellt. Bitte �ndern Sie die Atomanzahl auf 1 oder lassen Sie einen Parameter variieren.").arg(ui->spb_AtomCount->value()));
+                        QMessageBox::warning(this, tr("Warnung"),QString("Es werden %1 identische Atome erstellt. Bitte �ndern Sie die Atomanzahl auf 1 oder lassen Sie einen Parameter variieren.").arg(ui->spb_AtomCount->value()));
                         return;
                     }
                 }
                 else if(ui->rb_NoStepScale->isChecked() && ui->rb_NoStepModu->isChecked() && ui->rb_NoStepPhase->isChecked())
                 {
-                    QMessageBox::warning(this, tr("Warnung"),QString("Es werden %1 identische  Atome erstellt. Bitte �ndern Sie die Atomanzahl auf 1 oder lassen Sie einen Parameter variieren.").arg(ui->spb_AtomCount->value()));
+                    QMessageBox::warning(this, tr("Warnung"),QString("Es werden %1 identische Atome erstellt. Bitte �ndern Sie die Atomanzahl auf 1 oder lassen Sie einen Parameter variieren.").arg(ui->spb_AtomCount->value()));
                     return;
                 }
             }
@@ -1163,20 +1163,20 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
             while (i < atomCount)
             {
                 qreal tempScale = 0;
-                if(scaleList.length() == 1)    tempScale = scaleList.at(0);
-                else                           tempScale = scaleList.at(i);
+                if(scaleList.length() == 1) tempScale = scaleList.at(0);
+                else tempScale = scaleList.at(i);
 
                 qreal tempModu = 0;
-                if(moduList.length() ==1)      tempModu = moduList.at(0);
-                else                           tempModu = moduList.at(i);
+                if(moduList.length() ==1) tempModu = moduList.at(0);
+                else tempModu = moduList.at(i);
 
                 qreal tempPhase = 0;
-                if(phaseList.length() == 1)    tempPhase = phaseList.at(0);
-                else                           tempPhase = phaseList.at(i);
+                if(phaseList.length() == 1) tempPhase = phaseList.at(0);
+                else tempPhase = phaseList.at(i);
 
                 qreal tempChirp = 0;
-                if(chirpList.length() == 1)    tempChirp = chirpList.at(0);
-                else                           tempChirp = chirpList.at(i);
+                if(chirpList.length() == 1) tempChirp = chirpList.at(0);
+                else tempChirp = chirpList.at(i);
 
                 if(atomType == EditorWindow::Chirp)
                  {
@@ -1189,12 +1189,12 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
                     resultList = gAtom->CreateStringValues(ui->spb_AtomLength->value(), tempScale, 0, tempModu, tempPhase);
                 }
 
-                stream << QString("%1_ATOM_%2 \n scale: %3 modu: %4 phase: %5 chrip: %6").arg(partDictName).arg(i).arg(tempScale).arg(tempModu).arg(tempPhase).arg(tempChirp)  << "\n";
+                stream << QString("%1_ATOM_%2 \n scale: %3 modu: %4 phase: %5 chrip: %6").arg(partDictName).arg(i).arg(tempScale).arg(tempModu).arg(tempPhase).arg(tempChirp) << "\n";
                 for (QStringList::Iterator it = resultList.begin(); it != resultList.end(); it++)
                     stream << *it << "\n";
 
                 i++;
-            }            
+            }
         }
         dict.close();
     }
@@ -1205,7 +1205,7 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
     item->setText(partDictName);
 
     ui->list_AllDict->addItem(item);
-    if(ui->list_AllDict->count() > 1)   ui->list_AllDict->itemAt(0, 0)->setSelected(true);
+    if(ui->list_AllDict->count() > 1) ui->list_AllDict->itemAt(0, 0)->setSelected(true);
 }
 
 void EditorWindow::on_btt_ToNewDict_clicked()
@@ -1219,8 +1219,8 @@ void EditorWindow::on_btt_ToNewDict_clicked()
         item->setSelected(false);
         delete item;
     }
-    if(ui->list_AllDict->count() > 0)   ui->list_AllDict->itemAt(0,0)->setSelected(true);
-    if(ui->list_NewDict->count() > 0)   ui->btt_SaveDicts->setEnabled(true);
+    if(ui->list_AllDict->count() > 0) ui->list_AllDict->itemAt(0,0)->setSelected(true);
+    if(ui->list_NewDict->count() > 0) ui->btt_SaveDicts->setEnabled(true);
 }
 
 void EditorWindow::on_list_AllDict_doubleClicked()
@@ -1230,8 +1230,8 @@ void EditorWindow::on_list_AllDict_doubleClicked()
 
     item->setSelected(false);
     delete item;
-    if(ui->list_AllDict->count() > 0)   ui->list_AllDict->itemAt(0,0)->setSelected(true);
-    if(ui->list_NewDict->count() > 0)   ui->btt_SaveDicts->setEnabled(true);
+    if(ui->list_AllDict->count() > 0) ui->list_AllDict->itemAt(0,0)->setSelected(true);
+    if(ui->list_NewDict->count() > 0) ui->btt_SaveDicts->setEnabled(true);
 
 }
 
@@ -1246,8 +1246,8 @@ void EditorWindow::on_btt_ToAlldict_clicked()
         item->setSelected(false);
         delete item;
     }
-    if(ui->list_NewDict->count() > 1)    ui->list_NewDict->itemAt(0,0)->setSelected(true);
-    if(ui->list_NewDict->count() == 0)   ui->btt_SaveDicts->setEnabled(false);
+    if(ui->list_NewDict->count() > 1) ui->list_NewDict->itemAt(0,0)->setSelected(true);
+    if(ui->list_NewDict->count() == 0) ui->btt_SaveDicts->setEnabled(false);
 }
 
 void EditorWindow::on_list_NewDict_doubleClicked()
@@ -1257,8 +1257,8 @@ void EditorWindow::on_list_NewDict_doubleClicked()
 
     item->setSelected(false);
     delete item;
-    if(ui->list_NewDict->count() > 1)        ui->list_NewDict->itemAt(0,0)->setSelected(true);
-    if(ui->list_NewDict->count() == 0)   ui->btt_SaveDicts->setEnabled(false);
+    if(ui->list_NewDict->count() > 1) ui->list_NewDict->itemAt(0,0)->setSelected(true);
+    if(ui->list_NewDict->count() == 0) ui->btt_SaveDicts->setEnabled(false);
 }
 
 void EditorWindow::on_btt_DeleteDict_clicked()
@@ -1348,7 +1348,7 @@ void EditorWindow::on_btt_SaveDicts_clicked()
     QStringList filterList;
     filterList.append("*.dict");
 
-    QFileInfoList fileList =  dictDir.entryInfoList(filterList);
+    QFileInfoList fileList = dictDir.entryInfoList(filterList);
 
     for(qint32 i = 0; i < fileList.length(); i++)
     {
@@ -1398,7 +1398,7 @@ void EditorWindow::on_btt_SaveDicts_clicked()
             sum += atomCountList.at(i);
 
         stream.seek(0);
-        stream << QString("atomcount = %1").arg(sum)  << "\n";
+        stream << QString("atomcount = %1").arg(sum) << "\n";
     }
 
     newFile.close();
