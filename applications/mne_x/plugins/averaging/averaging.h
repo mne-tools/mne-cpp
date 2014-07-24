@@ -132,6 +132,8 @@ public:
     */
     void init();
 
+    void changeNumAverages(qint32 numAve);
+
     //=========================================================================================================
     /**
     * Clone the plugin
@@ -144,9 +146,9 @@ public:
     virtual IPlugin::PluginType getType() const;
     virtual QString getName() const;
 
-    void preStimChanged(qint32 samples);
+    void changePreStim(qint32 samples);
 
-    void postStimChanged(qint32 samples);
+    void changePostStim(qint32 samples);
 
     void appendEvoked(FiffEvoked::SPtr p_pEvoked);
 
@@ -188,6 +190,8 @@ private:
 
     FiffInfo::SPtr  m_pFiffInfo;        /**< Fiff measurement info.*/
     QList<qint32> m_qListStimChs;       /**< Stimulus channels.*/
+
+    QList< QPair<QString, bool> > m_qListModalities; /**< List Modalities.*/
 
     CircularMatrixBuffer<double>::SPtr   m_pAveragingBuffer;      /**< Holds incoming data.*/
 

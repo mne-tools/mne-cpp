@@ -180,8 +180,9 @@ private:
     StartUpWidget* m_pStartUpWidget;    /**< holds the StartUpWidget.*/
 
     //Run
-    RunWidget* m_pRunWidget;                                /**< The run widget */
-    QSharedPointer<DisplayManager> m_pDisplayManager;    /**< display manager */
+    RunWidget* m_pRunWidget;                            /**< The run widget */
+    QShortcut* m_pRunWidgetClose;                       /**< Run widget close shortcut */
+    QSharedPointer<DisplayManager> m_pDisplayManager;   /**< display manager */
 
     bool m_bDisplayMax;                 /**< whether full screen mode is activated.*/
     bool m_bIsRunning;                  /**< whether program/plugins is/are started.*/
