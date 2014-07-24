@@ -71,7 +71,6 @@
 #include <QSharedPointer>
 #include <QSet>
 #include <QList>
-#include <QVector>
 
 
 //*************************************************************************************************************
@@ -142,6 +141,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Sets the number of averages
+    *
+    * @param[in] numAve     new number of averages
+    */
+    void setAverages(qint32 numAve);
+
+    //=========================================================================================================
+    /**
     * Starts the RtAve by starting the producer's thread.
     */
     virtual bool start();
@@ -186,6 +193,12 @@ signals:
     * @param[out] p_pEvokedStim     The evoked stimulus data
     */
     void evokedStim(FIFFLIB::FiffEvoked::SPtr p_pEvokedStim);
+
+    //=========================================================================================================
+    /**
+    * Emitted when number of averages changed
+    */
+    void numAveragesChanged();
 
 protected:
     //=========================================================================================================
@@ -235,8 +248,8 @@ private:
 
 //    QList<fiff_int_t>  m_qSetAspectKinds;   /**< List of aspects to average. Each aspect is averaged separetely and released stored in evoked data.*/
 
-    QList<QVector<MatrixXd> > m_qListQVectorPreStimBuf;     /**< assembles the pre stimulus data */
-    QList<QVector<MatrixXd> > m_qListQVectorPostStimBuf;    /**< assembles the post stimulus data */
+    QList<QList<MatrixXd> > m_qListQListPreStimBuf;     /**< assembles the pre stimulus data */
+    QList<QList<MatrixXd> > m_qListQListPostStimBuf;    /**< assembles the post stimulus data */
 
     QList<MatrixXd> m_qListPreStimAve;     /**< the current pre stimulus average */
     QList<MatrixXd> m_qListPostStimAve;    /**< the current post stimulus average */

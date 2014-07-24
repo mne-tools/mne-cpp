@@ -524,6 +524,7 @@ void MainWindow::updatePluginWidget(IPlugin::SPtr pPlugin)
                 {
                     m_pRunWidget->showFullScreen();
                     connect(m_pRunWidget, &RunWidget::displayClosed, this, &MainWindow::toggleDisplayMax);
+                    m_pRunWidgetClose = new QShortcut(QKeySequence(Qt::Key_Escape), m_pRunWidget, SLOT(close()));
                 }
                 else
                     setCentralWidget(m_pRunWidget);
