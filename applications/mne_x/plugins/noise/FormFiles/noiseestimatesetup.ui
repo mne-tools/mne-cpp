@@ -48,7 +48,14 @@
    </item>
    <item>
     <layout class="QGridLayout" name="m_qGridLayout_main">
-     <item row="3" column="0">
+     <item row="4" column="0">
+      <widget class="QLabel" name="m_qlabel_fs">
+       <property name="text">
+        <string/>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
       <widget class="QComboBox" name="m_cb_nFFT">
        <item>
         <property name="text">
@@ -82,58 +89,24 @@
        </item>
       </widget>
      </item>
-     <item row="4" column="0">
+     <item row="3" column="0">
       <widget class="QLabel" name="label_2">
        <property name="text">
         <string>sample rate:</string>
        </property>
       </widget>
      </item>
-     <item row="2" column="0">
+     <item row="1" column="0">
       <widget class="QLabel" name="label">
        <property name="text">
         <string>nFFT</string>
        </property>
+       <property name="alignment">
+        <set>Qt::AlignCenter</set>
+       </property>
       </widget>
      </item>
-     <item row="1" column="0">
-      <widget class="QGroupBox" name="m_qGroupBox_Channels">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>200</height>
-        </size>
-       </property>
-       <property name="title">
-        <string>Channels</string>
-       </property>
-       <layout class="QGridLayout" name="m_qGridLayout_Channels">
-        <item row="0" column="0">
-         <widget class="QComboBox" name="m_qcbChannel"/>
-        </item>
-        <item row="1" column="0">
-         <spacer name="verticalSpacer">
-          <property name="orientation">
-           <enum>Qt::Vertical</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>20</width>
-            <height>40</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-       </layout>
-      </widget>
-     </item>
-     <item row="7" column="1">
+     <item row="6" column="1">
       <spacer name="m_qHorizontalSpacer_About">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -146,7 +119,7 @@
        </property>
       </spacer>
      </item>
-     <item row="0" column="1" rowspan="7" colspan="2">
+     <item row="0" column="1" rowspan="6" colspan="2">
       <widget class="QGroupBox" name="m_qGroupBox_Information">
        <property name="title">
         <string/>
@@ -158,7 +131,7 @@
        </layout>
       </widget>
      </item>
-     <item row="6" column="0">
+     <item row="5" column="0">
       <spacer name="m_qVerticalSpacer_LeftRow">
        <property name="orientation">
         <enum>Qt::Vertical</enum>
@@ -170,13 +143,6 @@
         </size>
        </property>
       </spacer>
-     </item>
-     <item row="5" column="0">
-      <widget class="QLabel" name="m_qlabel_fs">
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
      </item>
     </layout>
    </item>
