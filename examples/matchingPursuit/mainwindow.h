@@ -82,6 +82,7 @@ class GraphWindow;
 class ResiduumWindow;
 class AtomSumWindow;
 class Atom;
+class YAxisWindow;
 
 class MainWindow : public QMainWindow
 {
@@ -109,6 +110,8 @@ private slots:
 
     void on_actionCreate_treebased_dictionary_triggered();
 
+    void on_sb_sample_rate_editingFinished();
+
 signals:
 
     void send_input(MatrixXd send_signal, qint32 send_max_iterations, qreal send_epsilon);
@@ -119,6 +122,7 @@ private:
     GraphWindow *callGraphWindow;
     AtomSumWindow *callAtomSumWindow;
     ResiduumWindow *callResidumWindow;
+    YAxisWindow *callYAxisWindow;
     QStandardItemModel* cb_model;
     QStandardItem* cb_item;
     std::vector<QStandardItem*> cb_items;
@@ -222,22 +226,32 @@ public:
     //=========================================================================================================
 };
 
-//*************************************************************************************************************
-/*
-class MatrixXdS : public MatrixXd
+// Widget to paint y-axis
+class YAxisWindow : public QWidget
 {
     Q_OBJECT
 
+protected:
+   void paintEvent(QPaintEvent *event);
 
 public:
-   void set_selected(int index);
-   bool is_selected(int index);
-
-
+   //==========================================================================================================
+   /**
+   * YAxisWindow_paint_signal
+   *
+   * ### MP toolbox GUI function ###
+   *
+   * painting y-axis of chosen channels in butterfly plot
+   *
+   * @param[in] signalMatrix    matrix of input signal
+   * @param[in] windowSize      size (height,width) of window
+   *
+   * @return void
+   */
+   void paint_axis(MatrixXd signalMatrix, QSize windowSize);
+   //==========================================================================================================
 };
-*/
-//=============================================================================================================
 
-
+//*************************************************************************************************************
 
 #endif // MAINWINDOW_H
