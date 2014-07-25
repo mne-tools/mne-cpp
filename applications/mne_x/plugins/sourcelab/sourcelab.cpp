@@ -78,7 +78,7 @@ SourceLab::SourceLab()
 , m_sSurfaceDir("./MNE-sample-data/subjects/sample/surf")
 , m_iNumAverages(10)
 , m_bSingleTrial(false)
-, m_iStimChan(0)
+, m_sStimChan("STI 001")
 , m_iDownSample(4)
 {
 
@@ -280,10 +280,9 @@ void SourceLab::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
 void SourceLab::appendEvoked(FiffEvoked::SPtr p_pEvoked)
 {
-    if(p_pEvoked->comment == QString("Stim %1").arg(m_iStimChan))
+    if(p_pEvoked->comment == m_sStimChan)
     {
-        std::cout << p_pEvoked->comment.toLatin1().constData() << " append" << std::endl;
-
+//        std::cout << p_pEvoked->comment.toLatin1().constData() << " append" << std::endl;
         mutex.lock();
         m_qVecEvokedData.push_back(p_pEvoked);
         mutex.unlock();

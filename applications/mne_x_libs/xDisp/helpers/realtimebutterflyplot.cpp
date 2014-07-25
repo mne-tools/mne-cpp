@@ -74,8 +74,8 @@ void RealTimeButterflyPlot::paintEvent(QPaintEvent*)
             painter.save();
             painter.setPen(QPen(Qt::black, 1, Qt::DashLine));
 
-            float ratio = ((float)m_pRealTimeEvokedModel->getNumPreStimSamples())/((float)m_pRealTimeEvokedModel->getNumSamples());
-            qint32 posX = (qint32)((this->width()-2)*ratio);
+            float fDx = (float)(this->width()-2) / (float)m_pRealTimeEvokedModel->getNumSamples();
+            float posX = fDx * ((float)m_pRealTimeEvokedModel->getNumPreStimSamples() + 1.0f);
             painter.drawLine(posX, 1, posX, this->height()-2);
 
             painter.restore();
@@ -169,7 +169,7 @@ void RealTimeButterflyPlot::createPlotPath(qint32 row, QPainterPath& path) const
 
     //restrictions for paint performance
     float fWinMaxVal = ((float)this->height()-2)/2.0f;
-    qint32 iDownSampling = (m_pRealTimeEvokedModel->getNumSamples() * 8 / (this->width()-2));
+    qint32 iDownSampling = (m_pRealTimeEvokedModel->getNumSamples() * 4 / (this->width()-2));
     if(iDownSampling < 1)
         iDownSampling = 1;
 
@@ -177,14 +177,14 @@ void RealTimeButterflyPlot::createPlotPath(qint32 row, QPainterPath& path) const
     QPointF qSamplePosition;
 
     float fDx = (float)(this->width()-2) / (float)m_pRealTimeEvokedModel->getNumSamples();//((float)option.rect.width()) / t_pModel->getMaxSamples();
-    fDx *= iDownSampling;
+//    fDx *= iDownSampling;
 
     RowVectorXd rowVec = m_pRealTimeEvokedModel->data(row,1).value<RowVectorXd>();
     //Move to initial starting point
     if(rowVec.size() > 0)
     {
-//        float val = data[0];
-        fValue = 0;//(val-data[0])*fScaleY;
+        float val = rowVec[0];
+        fValue = (val-rowVec[m_pRealTimeEvokedModel->getNumPreStimSamples()-1])*fScaleY;
 
         float newY = y_base+fValue;
 
@@ -196,15 +196,23 @@ void RealTimeButterflyPlot::createPlotPath(qint32 row, QPainterPath& path) const
 
     //create lines from one to the next sample
     qint32 i;
-    for(i = 1; i < rowVec.size(); i += iDownSampling) {
-        float val = rowVec[i] - rowVec[0]; //remove first sample data[0] as offset
-        fValue = val*fScaleY;
+    for(i = 1; i < rowVec.size(); ++i) {
 
-        fValue = fValue > fWinMaxVal ? fWinMaxVal : fValue < -fWinMaxVal ? -fWinMaxVal : fValue;
+        if(i != m_pRealTimeEvokedModel->getNumPreStimSamples())
+        {
+            float val = rowVec[i] - rowVec[m_pRealTimeEvokedModel->getNumPreStimSamples()-1]; //remove first sample data[0] as offset
+            fValue = val*fScaleY;
 
-        float newY = y_base+fValue;
+            fValue = fValue > fWinMaxVal ? fWinMaxVal : fValue < -fWinMaxVal ? -fWinMaxVal : fValue;
 
-        qSamplePosition.setY(newY);
+            float newY = y_base+fValue;
+
+            qSamplePosition.setY(newY);
+        }
+        else
+            qSamplePosition.setY(y_base);
+
+
         qSamplePosition.setX(path.currentPosition().x()+fDx);
 
         path.lineTo(qSamplePosition);
