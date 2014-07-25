@@ -40,8 +40,6 @@
 
 #include "noiseestimation.h"
 
-#include <time.h>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -102,12 +100,8 @@ void NoiseEstimation::initFromFiffInfo(FiffInfo::SPtr &p_pFiffInfo)
     if(p_pFiffInfo->acq_pars == "BabyMEG")
         t_bIsBabyMEG = true;
 
-    qsrand(time(NULL));
-    m_qListChColors.clear();
     for(qint32 i = 0; i < p_pFiffInfo->nchan; ++i)
     {
-         m_qListChColors.append(QColor(qrand() % 256, qrand() % 256, qrand() % 256));
-
         RealTimeSampleArrayChInfo initChInfo;
         initChInfo.setChannelName(p_pFiffInfo->chs[i].ch_name);
 
@@ -229,14 +223,6 @@ void NoiseEstimation::initFromFiffInfo(FiffInfo::SPtr &p_pFiffInfo)
 MatrixXd NoiseEstimation::getValue() const
 {
     return m_matValue;
-}
-
-
-//*************************************************************************************************************
-
-void NoiseEstimation::setPreStimSamples(qint32 numSamples)
-{
-    m_iNumPreStimSamples = numSamples;
 }
 
 

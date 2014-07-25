@@ -1,9 +1,18 @@
 #ifndef AVERAGINGSETTINGSWIDGET_H
 #define AVERAGINGSETTINGSWIDGET_H
 
+//*************************************************************************************************************
+//=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
+
 #include <QWidget>
 #include <QSpinBox>
 #include <QPair>
+
+#include <QComboBox>
+#include <QCheckBox>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -44,6 +53,7 @@ signals:
 public slots:
 
 private:
+    QComboBox* m_pComboBoxChSelection;
     Averaging* m_pAveragingToolbox;
     QSpinBox* m_pSpinBoxNumAverages;
     QSpinBox* m_pSpinBoxPreStimSamples;

@@ -128,52 +128,11 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns the file name of the xml layout file.
-    *
-    * @return the file name of the layout file.
-    */
-    inline const QString& getXMLLayoutFile() const;
-
-    //=========================================================================================================
-    /**
-    * Sets the file name of the xml layout.
-    *
-    * @param[in] layout which should be set.
-    */
-    inline void setXMLLayoutFile(const QString& layout);
-
-    //=========================================================================================================
-    /**
     * Returns the number of channels.
     *
     * @return the number of values which are gathered before a notify() is called.
     */
     inline unsigned int getNumChannels() const;
-
-
-    //=========================================================================================================
-    /**
-    * Returns the number of pre-stimulus samples
-    *
-    * @return the number of pre-stimulus samples
-    */
-    inline qint32 getNumPreStimSamples() const;
-
-    //=========================================================================================================
-    /**
-    * Selects the given list of channel indeces and unselect all other channels
-    *
-    * @param[in] numSamples     number of pre stimulus samples to set
-    */
-    void setPreStimSamples(qint32 numSamples);
-
-    //=========================================================================================================
-    /**
-    * Returns the number of channels.
-    *
-    * @return the number of values which are gathered before a notify() is called.
-    */
-    inline QList<QColor>& chColor();
 
     //=========================================================================================================
     /**
@@ -220,13 +179,10 @@ public:
 private:
     FiffInfo::SPtr              m_pFiffInfo_orig;   /**< Original Fiff Info if initialized by fiff info. */
 
-    QString                     m_sXMLLayoutFile;   /**< Layout file name. */
     MatrixXd                    m_matValue;         /**< The current attached sample vector.*/
 
-    qint32                  m_iNumPreStimSamples;   /**< Number of pre-stimulus samples */
-
-    QList<QColor>               m_qListChColors;    /**< Channel color for butterfly plot.*/
     QList<RealTimeSampleArrayChInfo> m_qListChInfo; /**< Channel info list.*/
+
     bool                        m_bChInfoIsInit;    /**< If channel info is initialized.*/
     bool                        m_bContainsValues;  /**< If values are stored.*/
 };
@@ -246,41 +202,9 @@ inline bool NoiseEstimation::isChInit() const
 
 //*************************************************************************************************************
 
-inline const QString& NoiseEstimation::getXMLLayoutFile() const
-{
-    return m_sXMLLayoutFile;
-}
-
-
-//*************************************************************************************************************
-
-inline void NoiseEstimation::setXMLLayoutFile(const QString& layout)
-{
-    m_sXMLLayoutFile = layout;
-}
-
-
-//*************************************************************************************************************
-
 inline unsigned int NoiseEstimation::getNumChannels() const
 {
     return m_qListChInfo.size();
-}
-
-
-//*************************************************************************************************************
-
-inline qint32 NoiseEstimation::getNumPreStimSamples() const
-{
-    return m_iNumPreStimSamples;
-}
-
-
-//*************************************************************************************************************
-
-inline QList<QColor>& NoiseEstimation::chColor()
-{
-    return m_qListChColors;
 }
 
 

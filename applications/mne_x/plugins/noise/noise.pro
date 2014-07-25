@@ -74,14 +74,12 @@ DESTDIR = $${MNE_BINARY_DIR}/mne_x_plugins
 
 SOURCES += \
     noise_estimate.cpp \
-    FormFiles/noiseestimatesetupwidget.cpp \
-    FormFiles/plotter.cpp
+    FormFiles/noiseestimatesetupwidget.cpp
 
 HEADERS += \
     noise_estimate.h \
     noise_estimate_global.h \
-    FormFiles/noiseestimatesetupwidget.h \
-    FormFiles/plotter.h
+    FormFiles/noiseestimatesetupwidget.h
 
 FORMS += \
     FormFiles/noiseestimatesetup.ui
