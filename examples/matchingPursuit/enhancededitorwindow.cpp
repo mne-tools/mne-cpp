@@ -62,7 +62,9 @@
 //=============================================================================================================
 // MAIN
 //=============================================================================================================
-Enhancededitorwindow::Enhancededitorwindow(QWidget *parent) :    QWidget(parent),    ui(new Ui::Enhancededitorwindow)
+
+//constructor
+Enhancededitorwindow::Enhancededitorwindow(QWidget *parent): QWidget(parent), ui(new Ui::Enhancededitorwindow)
 {
     this->setAccessibleName("formel");
     ui->setupUi(this);
