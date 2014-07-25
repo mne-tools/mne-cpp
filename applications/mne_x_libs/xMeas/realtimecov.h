@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     realtimeevoked.h
+* @file     realtimecov.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the RealTimeEvoked class.
+* @brief    Contains the declaration of the RealTimeCov class.
 *
 */
 
-#ifndef REALTIMEEVOKED_H
-#define REALTIMEEVOKED_H
+#ifndef REALTIMECOV_H
+#define REALTIMECOV_H
 
 
 //*************************************************************************************************************
@@ -46,7 +46,7 @@
 #include "newmeasurement.h"
 #include "realtimesamplearraychinfo.h"
 
-#include <fiff/fiff_evoked.h>
+#include <fiff/fiff_cov.h>
 
 
 //*************************************************************************************************************
@@ -79,84 +79,36 @@ using namespace FIFFLIB;
 
 //=========================================================================================================
 /**
-* DECLARE CLASS RealTimeEvoked -> ToDo check feasibilty of QAbstractTableModel
+* DECLARE CLASS RealTimeCov -> ToDo check feasibilty of QAbstractTableModel
 *
 * @brief The RealTimeMultiSampleArrayNew class is the base class of every RealTimeMultiSampleArrayNew Measurement.
 */
-class XMEASSHARED_EXPORT RealTimeEvoked : public NewMeasurement
+class XMEASSHARED_EXPORT RealTimeCov : public NewMeasurement
 {
     Q_OBJECT
 public:
-    typedef QSharedPointer<RealTimeEvoked> SPtr;               /**< Shared pointer type for RealTimeEvoked. */
-    typedef QSharedPointer<const RealTimeEvoked> ConstSPtr;    /**< Const shared pointer type for RealTimeEvoked. */
+    typedef QSharedPointer<RealTimeCov> SPtr;               /**< Shared pointer type for RealTimeCov. */
+    typedef QSharedPointer<const RealTimeCov> ConstSPtr;    /**< Const shared pointer type for RealTimeCov. */
 
     //=========================================================================================================
     /**
     * Constructs a RealTimeMultiSampleArrayNew.
     */
-    explicit RealTimeEvoked(QObject *parent = 0);
+    explicit RealTimeCov(QObject *parent = 0);
 
     //=========================================================================================================
     /**
     * Destroys the RealTimeMultiSampleArrayNew.
     */
-    virtual ~RealTimeEvoked();
+    virtual ~RealTimeCov();
 
     //=========================================================================================================
     /**
-    * Returns the file name of the xml layout file.
+    * New covariance to distribute
     *
-    * @return the file name of the layout file.
+    * @param [in] v     the covariance which should be distributed.
     */
-    inline const QString& getXMLLayoutFile() const;
-
-    //=========================================================================================================
-    /**
-    * Sets the file name of the xml layout.
-    *
-    * @param[in] layout which should be set.
-    */
-    inline void setXMLLayoutFile(const QString& layout);
-
-    //=========================================================================================================
-    /**
-    * Returns the number of channels.
-    *
-    * @return the number of values which are gathered before a notify() is called.
-    */
-    inline unsigned int getNumChannels() const;
-
-    //=========================================================================================================
-    /**
-    * Returns the number of pre-stimulus samples
-    *
-    * @return the number of pre-stimulus samples
-    */
-    inline qint32 getNumPreStimSamples() const;
-
-    //=========================================================================================================
-    /**
-    * Returns the number of channels.
-    *
-    * @return the number of values which are gathered before a notify() is called.
-    */
-    inline QList<QColor>& chColor();
-
-    //=========================================================================================================
-    /**
-    * Returns the reference to the channel list.
-    *
-    * @return the reference to the channel list.
-    */
-    inline QList<RealTimeSampleArrayChInfo>& chInfo();
-
-    //=========================================================================================================
-    /**
-    * New devoked to distribute
-    *
-    * @param [in] v     the evoked which should be distributed.
-    */
-    virtual void setValue(FiffEvoked& v);
+    virtual void setValue(FiffCov& v);
 
     //=========================================================================================================
     /**
@@ -165,33 +117,19 @@ public:
     *
     * @return the last attached value.
     */
-    virtual FiffEvoked::SPtr& getValue();
+    virtual FiffCov::SPtr& getValue();
 
     //=========================================================================================================
     /**
-    * Returns whether RealTimeEvoked contains values
+    * Returns whether RealTimeCov contains values
     *
-    * @return whether RealTimeEvoked contains values.
+    * @return whether RealTimeCov contains values.
     */
-    inline bool isInitialized() const;
+    inline bool containsValues() const;
 
 private:
-    //=========================================================================================================
-    /**
-    * Init channel infos using fiff info
-    *
-    * @param[in] p_fiffInfo     Info to init from
-    */
-    void init(FiffInfo &p_fiffInfo);
+    FiffCov::SPtr               m_pFiffCov;     /**< Covariance data set */
 
-    FiffEvoked::SPtr            m_pFiffEvoked;      /**< Evoked data set */
-
-    QString                     m_sXMLLayoutFile;   /**< Layout file name. */
-
-    qint32                      m_iPreStimSamples;  /**< Number of pre-stimulus samples */
-
-    QList<QColor>               m_qListChColors;    /**< Channel color for butterfly plot.*/
-    QList<RealTimeSampleArrayChInfo> m_qListChInfo; /**< Channel info list.*/
     bool                        m_bInitialized;     /**< If values are stored.*/
 };
 
@@ -201,61 +139,13 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline const QString& RealTimeEvoked::getXMLLayoutFile() const
-{
-    return m_sXMLLayoutFile;
-}
-
-
-//*************************************************************************************************************
-
-inline void RealTimeEvoked::setXMLLayoutFile(const QString& layout)
-{
-    m_sXMLLayoutFile = layout;
-}
-
-
-//*************************************************************************************************************
-
-inline unsigned int RealTimeEvoked::getNumChannels() const
-{
-    return m_qListChInfo.size();
-}
-
-
-//*************************************************************************************************************
-
-inline qint32 RealTimeEvoked::getNumPreStimSamples() const
-{
-    return m_iPreStimSamples;
-}
-
-
-//*************************************************************************************************************
-
-inline QList<QColor>& RealTimeEvoked::chColor()
-{
-    return m_qListChColors;
-}
-
-
-//*************************************************************************************************************
-
-inline QList<RealTimeSampleArrayChInfo>& RealTimeEvoked::chInfo()
-{
-    return m_qListChInfo;
-}
-
-
-//*************************************************************************************************************
-
-inline bool RealTimeEvoked::isInitialized() const
+inline bool RealTimeCov::containsValues() const
 {
     return m_bInitialized;
 }
 
 } // NAMESPACE
 
-Q_DECLARE_METATYPE(XMEASLIB::RealTimeEvoked::SPtr)
+Q_DECLARE_METATYPE(XMEASLIB::RealTimeCov::SPtr)
 
-#endif // REALTIMEEVOKED_H
+#endif // REALTIMECOV_H
