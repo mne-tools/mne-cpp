@@ -1107,12 +1107,8 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
 
     qreal phase = atom_res_list.last().phase_list.first();
 
-    qreal phase_divider = 1;
-    if(atom_res_list.last().phase_list.first() != 0 && atom_res_list.last().phase_list.first() > 2*PI)
-    {
-        phase_divider = (atom_res_list.last().phase_list.first()/ (2*PI));
-        phase = atom_res_list.last().phase_list.first() - atom_res_list.last().phase_list.first()/phase_divider;
-    }
+    if(atom_res_list.last().phase_list.first() > 2*PI)
+         phase = atom_res_list.last().phase_list.first() - 2*PI;
 
     QTableWidgetItem* atomEnergieItem = new QTableWidgetItem(QString::number(percent_atom_energy, 'f', 2));
     QTableWidgetItem* atomScaleItem = new QTableWidgetItem(QString::number(atom_res_list.last().scale / sample_rate, 'g', 3));
