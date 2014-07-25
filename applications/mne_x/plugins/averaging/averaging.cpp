@@ -122,7 +122,7 @@ void Averaging::init()
 
     // Output
     m_pAveragingOutput = PluginOutputData<RealTimeEvoked>::create(this, "AveragingOut", "Averaging Output Data");
-    m_pAveragingOutput->data()->setPreStimSamples(m_iPreStimSamples);
+    m_pAveragingOutput->data()->setAveInfo(m_iPreStimSamples, m_iNumAverages);
     m_outputConnectors.append(m_pAveragingOutput);
 
     //init channels when fiff info is available
@@ -150,7 +150,7 @@ void Averaging::initConnector()
 {
     if(m_pFiffInfo)
     {
-        m_pAveragingOutput->data()->initFromFiffInfo(m_pFiffInfo);
+        m_pAveragingOutput->data()->init(m_pFiffInfo);
 
         m_qListModalities.clear();
         bool hasMag = false;
@@ -252,7 +252,7 @@ void Averaging::changeStimChannel(qint32 index)
 void Averaging::changePreStim(qint32 samples)
 {
     m_iPreStimSamples = samples;
-    m_pAveragingOutput->data()->setPreStimSamples(m_iPreStimSamples);
+    m_pAveragingOutput->data()->setAveInfo(m_iPreStimSamples, m_iNumAverages);
     emit sampleNumChanged();
 }
 
