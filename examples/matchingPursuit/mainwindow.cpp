@@ -170,7 +170,10 @@ MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::
     ui->tbv_Results->setColumnWidth(3,40);
     ui->tbv_Results->setColumnWidth(4,40);
 
+    this->cb_model = new QStandardItemModel;
+    connect(this->cb_model, SIGNAL(dataChanged ( const QModelIndex&, const QModelIndex&)), this, SLOT(cb_selection_changed(const QModelIndex&, const QModelIndex&)));
     connect(ui->tbv_Results->model(), SIGNAL(dataChanged ( const QModelIndex&, const QModelIndex&)), this, SLOT(tbv_selection_changed(const QModelIndex&, const QModelIndex&)));
+
 
 
     // build config file at init
@@ -258,7 +261,7 @@ void MainWindow::open_file()
     if(fileName.isNull()) return;
 
     this->cb_items.clear();
-    this->cb_model = new QStandardItemModel;
+
     ui->sb_sample_rate->setEnabled(true);
 
     QFile file(fileName);
@@ -1102,11 +1105,20 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
     qreal percent_atom_energy = 100 * atom_res_list.last().energy / max_energy;
     qreal sample_rate = ui->sb_sample_rate->value();
 
+    qreal phase = atom_res_list.last().phase_list.first();
+
+    qreal phase_divider = 1;
+    if(atom_res_list.last().phase_list.first() != 0 && atom_res_list.last().phase_list.first() > 2*PI)
+    {
+        phase_divider = (atom_res_list.last().phase_list.first()/ (2*PI));
+        phase = atom_res_list.last().phase_list.first() - atom_res_list.last().phase_list.first()/phase_divider;
+    }
+
     QTableWidgetItem* atomEnergieItem = new QTableWidgetItem(QString::number(percent_atom_energy, 'f', 2));
     QTableWidgetItem* atomScaleItem = new QTableWidgetItem(QString::number(atom_res_list.last().scale / sample_rate, 'g', 3));
     QTableWidgetItem* atomTranslationItem = new QTableWidgetItem(QString::number(atom_res_list.last().translation / sample_rate, 'g', 3));
-    QTableWidgetItem* atomModulationItem = new QTableWidgetItem(QString::number(atom_res_list.last().modulation, 'g', 3));
-    QTableWidgetItem* atomPhaseItem = new QTableWidgetItem(QString::number(atom_res_list.last().phase_list.first(), 'g', 3));
+    QTableWidgetItem* atomModulationItem = new QTableWidgetItem(QString::number(atom_res_list.last().modulation * sample_rate / atom_res_list.last().sample_count, 'g', 3));
+    QTableWidgetItem* atomPhaseItem = new QTableWidgetItem(QString::number(phase, 'g', 3));
 
 
     atomEnergieItem->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
