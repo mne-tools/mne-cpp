@@ -170,11 +170,9 @@ public:
 
     //=========================================================================================================
     /**
-    * Adds multiple time points (QVector) for a channel set (VectorXd)
-    *
-    * @param[in] data       data to add (Time points of channel samples)
+    * Update stored data
     */
-    void addData(const MatrixXd &data);
+    void updateData();
 
     //=========================================================================================================
     /**
