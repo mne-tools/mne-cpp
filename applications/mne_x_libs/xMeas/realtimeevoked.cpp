@@ -66,9 +66,11 @@ using namespace XMEASLIB;
 
 RealTimeEvoked::RealTimeEvoked(QObject *parent)
 : NewMeasurement(QMetaType::type("RealTimeEvoked::SPtr"), parent)
-, m_bChInfoIsInit(false)
-, m_bContainsValues(false)
+, m_pFiffEvoked(new FiffEvoked)
+, m_bInfoIsInit(false)
+, m_bInitialized(false)
 {
+
 }
 
 
@@ -82,20 +84,10 @@ RealTimeEvoked::~RealTimeEvoked()
 
 //*************************************************************************************************************
 
-void RealTimeEvoked::init(QList<RealTimeSampleArrayChInfo> &chInfo)
-{
-    m_qListChInfo = chInfo;
-
-    m_bChInfoIsInit = true;
-}
-
-
-//*************************************************************************************************************
-
-void RealTimeEvoked::initFromFiffInfo(FiffInfo::SPtr &p_pFiffInfo)
+void RealTimeEvoked::init(FiffInfo::SPtr &p_pFiffInfo)
 {
     m_qListChInfo.clear();
-    m_bChInfoIsInit = false;
+    m_bInfoIsInit = false;
 
     bool t_bIsBabyMEG = false;
 
@@ -218,25 +210,29 @@ void RealTimeEvoked::initFromFiffInfo(FiffInfo::SPtr &p_pFiffInfo)
         m_qListChInfo.append(initChInfo);
     }
 
-    m_pFiffInfo_orig = p_pFiffInfo;
+    m_pFiffEvoked->setInfo(*p_pFiffInfo);
 
-    m_bChInfoIsInit = true;
+    m_bInfoIsInit = true;
 }
 
 
 //*************************************************************************************************************
 
-MatrixXd RealTimeEvoked::getValue() const
+FiffEvoked::SPtr& RealTimeEvoked::getValue()
 {
-    return m_matValue;
+    return m_pFiffEvoked;
 }
 
 
 //*************************************************************************************************************
 
-void RealTimeEvoked::setPreStimSamples(qint32 numSamples)
+void RealTimeEvoked::setAveInfo(qint32 numPreStimSamples, qint32 numOfAverages)
 {
-    m_iNumPreStimSamples = numSamples;
+    m_iPreStimSamples = numPreStimSamples;
+    m_pFiffEvoked->nave = numOfAverages;
+    m_pFiffEvoked->aspect_kind = FIFFV_ASPECT_AVERAGE;
+
+    m_bInitialized = false;
 }
 
 
@@ -254,12 +250,26 @@ void RealTimeEvoked::setValue(MatrixXd& v)
 //        if(v[i] < m_qListChInfo[i].getMinValue()) v[i] = m_qListChInfo[i].getMinValue();
 //        else if(v[i] > m_qListChInfo[i].getMaxValue()) v[i] = m_qListChInfo[i].getMaxValue();
 //    }
+    if(m_pFiffEvoked->data.cols() != v.cols())
+        m_bInitialized = false;
 
     //Store
-    m_matValue = v;
-    emit notify();
+    m_pFiffEvoked->data = v;
 
-    if(!m_bContainsValues)
-        m_bContainsValues = true;
+    if(!m_bInitialized & m_bInfoIsInit)
+    {
+        m_bInitialized = true;
+
+        float T = 1.0/m_pFiffEvoked->info.sfreq;
+        m_pFiffEvoked->times.resize(m_pFiffEvoked->data.cols());
+        m_pFiffEvoked->times[0] = -T*m_iPreStimSamples;
+        for(qint32 i = 1; i < m_pFiffEvoked->times.size(); ++i)
+            m_pFiffEvoked->times[i] = m_pFiffEvoked->times[i-1] + T;
+        m_pFiffEvoked->first = m_pFiffEvoked->times[0];
+        m_pFiffEvoked->last = m_pFiffEvoked->times[m_pFiffEvoked->times.size()-1];
+    }
+
+    if(m_bInitialized)
+        emit notify();
 }
 
