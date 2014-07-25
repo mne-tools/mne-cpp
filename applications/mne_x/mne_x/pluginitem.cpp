@@ -128,7 +128,9 @@ void PluginItem::paint(QPainter * painter, const QStyleOptionGraphicsItem * opti
 //            break;
 //    }
 
-    painter->drawText(-m_iWidth/2+4,-m_iHeight/2+14,m_pPlugin->getName().mid(0,10));
+    painter->drawText(-m_iWidth/2+4,-m_iHeight/2+14,m_pPlugin->getName().mid(0,8));
+
+    painter->drawText(-m_iWidth/2+4,-m_iHeight/2+28,m_pPlugin->getName().mid(8,8));
 
 }
 
