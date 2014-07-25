@@ -70,11 +70,11 @@ NoiseEstimateSetupWidget::NoiseEstimateSetupWidget(NoiseEstimate* toolbox, QWidg
     ui.setupUi(this);
 
 //    connect(ui.m_qPushButton_About, SIGNAL(released()), this, SLOT(showAboutDialog()));
-    connect(ui.m_qcbChannel,SIGNAL(currentIndexChanged(int)), this, SLOT(chgChannelInx));
-    connect(ui.m_cb_nFFT,SIGNAL(currentTextChanged(QString)), this, SLOT(chgnFFT));
+//    connect(ui.m_qcbChannel,SIGNAL(currentIndexChanged(int)), this, SLOT(chgChannelInx));
+//    connect(ui.m_cb_nFFT,SIGNAL(currentTextChanged(QString)), this, SLOT(chgnFFT));
 
-    d_timeplot = new plotter();
-    ui.m_layNoise->addWidget(d_timeplot);
+//    d_timeplot = new plotter();
+//    ui.m_layNoise->addWidget(d_timeplot);
 
 }
 
@@ -104,11 +104,6 @@ void NoiseEstimateSetupWidget::init(qint32 nFFT, double fs)
 }
 
 void NoiseEstimateSetupWidget::Update(MatrixXf data)
-{
-
-}
-
-void NoiseEstimateSetupWidget::chgChannelInx(int idx)
 {
 
 }
@@ -144,30 +139,30 @@ void NoiseEstimateSetupWidget::Replot(/*MatrixXd tmp*/)
 */
 }
 
-float NoiseEstimateSetupWidget::mmin(MatrixXd tmp,int chan)
-{
-    int cols = tmp.cols();
+//float NoiseEstimateSetupWidget::mmin(MatrixXd tmp,int chan)
+//{
+//    int cols = tmp.cols();
 
-    float ret = tmp(chan,0);
-    for (int i=0; i<cols; i++)
-    {
-        if (tmp(chan,i) < ret)
-            ret = tmp(chan,i);
-    }
+//    float ret = tmp(chan,0);
+//    for (int i=0; i<cols; i++)
+//    {
+//        if (tmp(chan,i) < ret)
+//            ret = tmp(chan,i);
+//    }
 
-    return ret;
-}
+//    return ret;
+//}
 
-float NoiseEstimateSetupWidget::mmax(MatrixXd tmp,int chan)
-{
-    int cols = tmp.cols();
+//float NoiseEstimateSetupWidget::mmax(MatrixXd tmp,int chan)
+//{
+//    int cols = tmp.cols();
 
-    float ret = tmp(chan,0);
-    for (int i=0; i<cols; i++)
-    {
-        if (tmp(chan,i) > ret)
-            ret = tmp(chan,i);
-    }
+//    float ret = tmp(chan,0);
+//    for (int i=0; i<cols; i++)
+//    {
+//        if (tmp(chan,i) > ret)
+//            ret = tmp(chan,i);
+//    }
 
-    return ret;
-}
+//    return ret;
+//}

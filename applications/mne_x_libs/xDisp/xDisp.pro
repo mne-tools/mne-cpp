@@ -107,7 +107,8 @@ SOURCES += \
     helpers/sensorwidget.cpp \
     helpers/realtimeevokedmodel.cpp \
     realtimeevokedwidget.cpp \
-    helpers/realtimebutterflyplot.cpp
+    helpers/realtimebutterflyplot.cpp \
+    noiseestimationwidget.cpp
 
 HEADERS += \
     xdisp_global.h \
@@ -124,7 +125,8 @@ HEADERS += \
     helpers/sensorwidget.h \
     helpers/realtimeevokedmodel.h \
     realtimeevokedwidget.h \
-    helpers/realtimebutterflyplot.h
+    helpers/realtimebutterflyplot.h \
+    noiseestimationwidget.h
 
 FORMS += \
     realtimesamplearraywidget.ui
