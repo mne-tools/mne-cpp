@@ -42,6 +42,7 @@ VERSION = $${MNE_CPP_VERSION}
 QT += gui
 QT += widgets
 QT += network core widgets concurrent
+QT += xml
 
 CONFIG   += console
 CONFIG   -= app_bundle
