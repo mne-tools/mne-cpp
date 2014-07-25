@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
-* @file     noiseestimatesetupwidget.h
-* @author   Limin Sun <liminsun@nmr.mgh.harvard.edu>
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     noiseestimationwidget.cpp
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     July, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Limin Sun, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,20 +29,21 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the NoiseEstimateSetupWidget class.
+* @brief    Implementation of the NoiseEstimationWidget Class.
 *
 */
 
-#ifndef NOISEESTIMATESETUPWIDGET_H
-#define NOISEESTIMATESETUPWIDGET_H
-
+//ToDo Paint to render area
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_noiseestimatesetup.h"
+#include "noiseestimationwidget.h"
+//#include "annotationwindow.h"
+
+#include <xMeas/noiseestimation.h>
 
 
 //*************************************************************************************************************
@@ -53,82 +53,104 @@
 
 #include <Eigen/Core>
 
+
+//*************************************************************************************************************
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+#include <math.h>
+
+
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
+#include <QVBoxLayout>
+#include <QLabel>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
-using namespace Eigen;
 
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE RtHpiPlugin
-//=============================================================================================================
-
-namespace NoiseEstimatePlugin
-{
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-class NoiseEstimate;
+using namespace XDISPLIB;
+using namespace XMEASLIB;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS NoiseEstimateSetupWidget
-*
-* @brief The NoiseEstimateSetupWidget class provides the NoiseEstimate configuration window.
+* Tool enumeration.
 */
-class NoiseEstimateSetupWidget : public QWidget
+enum Tool
 {
-    Q_OBJECT
-
-public:
-
-    //=========================================================================================================
-    /**
-    * Constructs a NoiseEstimateSetupWidget which is a child of parent.
-    *
-    * @param [in] toolbox a pointer to the corresponding NoiseEstimate.
-    * @param [in] parent pointer to parent widget; If parent is 0, the new NoiseEstimateSetupWidget becomes a window. If parent is another widget, RtHpiSetupWidget becomes a child window inside parent. RtHpiSetupWidget is deleted when its parent is deleted.
-    */
-    NoiseEstimateSetupWidget(NoiseEstimate* toolbox, QWidget *parent = 0);
-
-    //=========================================================================================================
-    /**
-    * Destroys the NoiseEstimateSetupWidget.
-    * All NoiseEstimateSetupWidget's children are deleted first. The application exits if NoiseEstimateSetupWidget is the main widget.
-    */
-    ~NoiseEstimateSetupWidget();
-
-    void init(qint32 nFFTidx, double fs);
-    void chgnFFT(QString tx);
-    void Update(MatrixXf data);
-    void Replot(/*MatrixXd tmp*/);
-//    float mmin(MatrixXd tmp,int chan);
-//    float mmax(MatrixXd tmp,int chan);
-
-
-private slots:
-
-private:
-
-    NoiseEstimate* m_pNoiseEstimate;	/**< Holds a pointer to corresponding RtHpi.*/
-
-    Ui::NoiseEstimateSetupWidgetClass ui;	/**< Holds the user interface for the RtHpiSetupWidget.*/
+    Freeze     = 0,     /**< Freezing tool. */
+    Annotation = 1      /**< Annotation tool. */
 };
 
-} // NAMESPACE
 
-#endif // NoiseEstimateSETUPWIDGET_H
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+NoiseEstimationWidget::NoiseEstimationWidget(QSharedPointer<NoiseEstimation> pNE, QSharedPointer<QTime> &pTime, QWidget* parent)
+: NewMeasurementWidget(parent)
+, m_pNE(pNE)
+, m_bInitialized(false)
+{
+    Q_UNUSED(pTime)
+
+    //set vertical layout
+    QVBoxLayout *neLayout = new QVBoxLayout(this);
+
+    QLabel *t_pLabelNoiseEstimation = new QLabel;
+
+    t_pLabelNoiseEstimation->setText("Noise Estimation Widget");
+
+    neLayout->addWidget(t_pLabelNoiseEstimation);
+
+    //set layouts
+    this->setLayout(neLayout);
+
+    getData();
+}
+
+
+//*************************************************************************************************************
+
+NoiseEstimationWidget::~NoiseEstimationWidget()
+{
+
+}
+
+
+//*************************************************************************************************************
+
+void NoiseEstimationWidget::update(XMEASLIB::NewMeasurement::SPtr)
+{
+    getData();
+}
+
+
+//*************************************************************************************************************
+
+void NoiseEstimationWidget::getData()
+{
+    if(!m_bInitialized)
+    {
+
+    }
+}
+
+//*************************************************************************************************************
+
+void NoiseEstimationWidget::init()
+{
+//    if(m_qListChInfo.size() > 0)
+//    {
+//        m_bInitialized = true;
+//    }
+}
