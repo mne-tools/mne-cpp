@@ -125,7 +125,7 @@ public:
     *
     * @return whether RealTimeCov contains values.
     */
-    inline bool containsValues() const;
+    inline bool isInitialized() const;
 
 private:
     FiffCov::SPtr               m_pFiffCov;     /**< Covariance data set */
@@ -139,7 +139,7 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline bool RealTimeCov::containsValues() const
+inline bool RealTimeCov::isInitialized() const
 {
     return m_bInitialized;
 }

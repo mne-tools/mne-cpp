@@ -106,16 +106,9 @@ void Covariance::init()
     connect(m_pCovarianceInput.data(), &PluginInputConnector::notify, this, &Covariance::update, Qt::DirectConnection);
     m_inputConnectors.append(m_pCovarianceInput);
 
-//    // Output
-//    m_pCovarianceOutput = PluginOutputData<NewRealTimeSampleArray>::create(this, "CovarianceOut", "Covariance output data");
-//    m_outputConnectors.append(m_pCovarianceOutput);
-
-//    m_pCovarianceOutput->data()->setName("Covariance Output");
-//    m_pCovarianceOutput->data()->setUnit("mV");
-//    m_pCovarianceOutput->data()->setMinValue(-200);
-//    m_pCovarianceOutput->data()->setMaxValue(360);
-//    m_pCovarianceOutput->data()->setSamplingRate(256.0/1.0);
-
+    // Output
+    m_pCovarianceOutput = PluginOutputData<RealTimeCov>::create(this, "CovarianceOut", "Covariance output data");
+    m_outputConnectors.append(m_pCovarianceOutput);
 
     //init channels when fiff info is available
     connect(this, &Covariance::fiffInfoAvailable, this, &Covariance::initConnector);
@@ -160,16 +153,11 @@ bool Covariance::stop()
     //Wait until this thread is stopped
     m_bIsRunning = false;
 
-    if(m_bProcessData)
-    {
-        //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the pop function (acquire statement)
-        m_pCovarianceBuffer->releaseFromPop();
-        m_pCovarianceBuffer->releaseFromPush();
+    //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the pop function (acquire statement)
+    m_pCovarianceBuffer->releaseFromPop();
 
-        m_pCovarianceBuffer->clear();
+    m_pCovarianceBuffer->clear();
 
-//        m_pRTMSAOutput->data()->clear();
-    }
     return true;
 }
 
@@ -232,6 +220,15 @@ void Covariance::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 }
 
 
+//*************************************************************************************************************
+
+void Covariance::appendCovariance(FiffCov::SPtr p_pCovariance)
+{
+    mutex.lock();
+    m_qVecCovData.push_back(p_pCovariance);
+    mutex.unlock();
+}
+
 
 //*************************************************************************************************************
 
@@ -243,6 +240,20 @@ void Covariance::run()
     while(!m_pFiffInfo)
         msleep(10);// Wait for fiff Info
 
+    //
+    // Init Real-Time Covariance estimator
+    //
+    m_pRtCov = RtCov::SPtr(new RtCov(5000, m_pFiffInfo));
+    connect(m_pRtCov.data(), &RtCov::covCalculated, this, &Covariance::appendCovariance);
+
+    //
+    // Start the rt helpers
+    //
+    m_pRtCov->start();
+
+    //
+    // start processing data
+    //
     m_bProcessData = true;
 
     while (m_bIsRunning)
@@ -252,10 +263,17 @@ void Covariance::run()
             /* Dispatch the inputs */
             MatrixXd t_mat = m_pCovarianceBuffer->pop();
 
-            //ToDo: Implement your algorithm here
+            //Add to covariance estimation
+            m_pRtCov->append(t_mat);
 
-//            for(qint32 i = 0; i < t_mat.cols(); ++i)
-//                m_pCovarianceOutput->data()->setValue(t_mat.col(i));
+            if(m_qVecCovData.size() > 0)
+            {
+                mutex.lock();
+                m_pCovarianceOutput->data()->setValue(*m_qVecCovData[0]);
+
+                m_qVecCovData.pop_front();
+                mutex.unlock();
+            }
         }
     }
 }
