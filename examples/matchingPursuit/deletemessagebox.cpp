@@ -48,6 +48,7 @@
 
 QString parentName;
 
+// CONSTRUCTOR
 DeleteMessageBox::DeleteMessageBox(QWidget *parent) :    QDialog(parent),    ui(new Ui::DeleteMessageBox)
 {
     parentName =  parent->accessibleName();
