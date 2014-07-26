@@ -103,6 +103,7 @@ qreal _signal_negative_scale = 0;
 qreal _max_pos = 0;
 qreal _max_neg = 0;
 qreal _draw_factor = 0;
+QString _file_name = "";
 QMap<qint32, bool> select_channel_map;
 
 QList<QColor> _colors;
@@ -132,7 +133,6 @@ enum TruncationCriterion
 
 //*************************************************************************************************************************************
 
-// constructor
 MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
@@ -170,6 +170,13 @@ MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::
 
     ui->splitter->setStretchFactor(1,4);
     ui->dsb_energy->setValue(3.0);
+
+    ui->lb_from->setHidden(true);
+    ui->dsb_from->setHidden(true);
+    ui->lb_to->setHidden(true);
+    ui->dsb_to->setHidden(true);
+    ui->lb_samples->setHidden(true);
+    ui->lb_sample_count->setHidden(true);
 
     // set result tableview
     ui->tbv_Results->setColumnCount(5);
@@ -265,14 +272,15 @@ MainWindow::~MainWindow()
 void MainWindow::open_file()
 {
     QFileDialog* fileDia;
-    QString fileName = fileDia->getOpenFileName(this, "Please select signal file.",QDir::currentPath(),"(*.fif *.txt)");
-    if(fileName.isNull()) return;
+    QString temp_file_name = fileDia->getOpenFileName(this, "Please select signal file.",QDir::currentPath(),"(*.fif *.txt)");
+    if(temp_file_name.isNull()) return;
 
+    _file_name = temp_file_name;
     this->cb_items.clear();
 
     ui->sb_sample_rate->setEnabled(true);
 
-    QFile file(fileName);
+    QFile file(_file_name);
     if (!file.open(QIODevice::ReadOnly))
     {
         QMessageBox::warning(this, tr("Error"),
@@ -283,25 +291,33 @@ void MainWindow::open_file()
     _colors.clear();
     _colors.append(QColor(0, 0, 0));
 
-    if(fileName.endsWith(".fif", Qt::CaseInsensitive))        
+    if(_file_name.endsWith(".fif", Qt::CaseInsensitive))
     {
-        _from = 47.151f;
-        read_fiff_file(fileName);
-        _signal_matrix.resize(_datas.cols(),5);
-        _original_signal_matrix.resize(_datas.cols(),5);
-        // ToDo: find good fiff signal part
-        for(qint32 channels = 0; channels < 5; channels++)
-            for(qint32 i = 0; i < _datas.cols(); i++)
-                _signal_matrix(i, channels) = _datas(channels, i);// * 10000000000;
+        ui->dsb_from->setValue(47.151f);
+        ui->dsb_to->setValue(48.000f);
+        read_fiff_file(_file_name);
+        ui->lb_sample_count->setText(QString::number((ui->dsb_to->value() - ui->dsb_from->value()) * ui->sb_sample_rate->value()));
+        ui->lb_from->setHidden(false);
+        ui->dsb_from->setHidden(false);
+        ui->lb_to->setHidden(false);
+        ui->dsb_to->setHidden(false);
+        ui->lb_samples->setHidden(false);
+        ui->lb_sample_count->setHidden(false);
     }
     else
     {
         _from = 0;
         _signal_matrix.resize(0,0);
-        read_matlab_file(fileName);
-        _original_signal_matrix.resize(_signal_matrix.rows(), _signal_matrix.cols());
+        read_matlab_file(_file_name);
+        ui->lb_from->setHidden(true);
+        ui->dsb_from->setHidden(true);
+        ui->lb_to->setHidden(true);
+        ui->dsb_to->setHidden(true);
+        ui->lb_samples->setHidden(true);
+        ui->lb_sample_count->setHidden(true);
     }
 
+    _original_signal_matrix.resize(_signal_matrix.rows(), _signal_matrix.cols());
     _original_signal_matrix = _signal_matrix;
     ui->tbv_Results->setRowCount(0);
 
@@ -350,7 +366,6 @@ void MainWindow::cb_selection_changed(const QModelIndex& topLeft, const QModelIn
     _atom_sum_matrix.resize(_original_signal_matrix.rows(), size);
     _residuum_matrix.resize(_original_signal_matrix.rows(), size);
 
-
     _colors.clear();
     qint32 selected_chn = 0;
 
@@ -372,7 +387,7 @@ qint32 MainWindow::read_fiff_file(QString fileName)
 
     bool in_samples = false;
 
-    bool keep_comp = true;
+    //bool keep_comp = true;
 
     //
     //   Setup for reading the raw data
@@ -391,6 +406,7 @@ qint32 MainWindow::read_fiff_file(QString fileName)
 
     RowVectorXi picks = raw.info.pick_types(want_meg, want_eeg, want_stim, include, raw.info.bads);
 
+    /*
     //
     //   Set up projection
     //
@@ -443,6 +459,9 @@ qint32 MainWindow::read_fiff_file(QString fileName)
           return -1;
        }
     }
+
+    */
+
     //
     //   Read a data segment
     //   times output argument is optional
@@ -461,11 +480,21 @@ qint32 MainWindow::read_fiff_file(QString fileName)
     }
 
     printf("Read %d samples.\n",(qint32)_datas.cols());
+
     ui->sb_sample_rate->setValue(raw.info.sfreq);    
     ui->sb_sample_rate->setEnabled(false);
     _sample_rate = ui->sb_sample_rate->value();
 
-    std::cout << _datas.block(0,0,10,10) << std::endl;
+    qint32 cols = 5;
+    if(_datas.cols() <= 5)   cols = _datas.cols();
+    _signal_matrix.resize(_datas.cols(),cols);
+
+
+    for(qint32 channels = 0; channels < cols; channels++)
+        for(qint32 i = 0; i < _datas.cols(); i++)
+            _signal_matrix(i, channels) = _datas(channels, i);
+
+    //std::cout << _datas.block(0,0,10,10) << std::endl;
 
     return 0;
 }
@@ -616,7 +645,7 @@ void GraphWindow::paint_signal(MatrixXd signalMatrix, QSize windowSize)
         qreal scaleY = (qreal)(windowSize.height() - borderMarginHeigth) / (qreal)maxmax;
 
         //scale axis
-        //qreal scaleXAchse = (qreal)(windowSize.width() - maxStrLenght - borderMarginWidth) / (qreal)20;
+        qreal scaleXAchse = (qreal)(windowSize.width() - maxStrLenght - borderMarginWidth) / (qreal)20;
         qreal scaleYAchse = (qreal)(windowSize.height() - borderMarginHeigth) / (qreal)10;
 
         // position of title of x-axis
@@ -645,16 +674,14 @@ void GraphWindow::paint_signal(MatrixXd signalMatrix, QSize windowSize)
                 }
 
                 // paint x-axis
-                /*
                 qint32 j = 1;
                 while(j <= 21)
                 {
-                    QString str;
-                    painter.drawText(j * scaleXAchse + maxStrLenght - 7, -(((i - 1) * scaleYAchse)-(windowSize.height())) + xAxisTextPos, str.append(QString::number(j * scaleXText + _from, 'f', 2)));      // scalevalue
+                    //QString str;
+                    //painter.drawText(j * scaleXAchse + maxStrLenght - 7, -(((i - 1) * scaleYAchse)-(windowSize.height())) + xAxisTextPos, str.append(QString::number(j * scaleXText + _from, 'f', 2)));      // scalevalue
                     painter.drawLine(j * scaleXAchse + maxStrLenght, -(((i - 1) * scaleYAchse)-(windowSize.height() - borderMarginHeigth / 2 - 2)), j * scaleXAchse + maxStrLenght , -(((i - 1) * scaleYAchse)-(windowSize.height() - borderMarginHeigth / 2 + 2)));   // scalelines
                     j++;
                 }
-                */
                 painter.drawLine(maxStrLenght, -(((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2), windowSize.width()-5, -(((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2));
             }
 
@@ -736,7 +763,7 @@ void AtomSumWindow::paint_atom_sum(MatrixXd atom_matrix, QSize windowSize, qreal
         qreal scaleY = (qreal)(windowSize.height() - borderMarginHeigth) / (qreal)signalMaximum;
 
         //scale axis
-        //qreal scaleXAchse = (qreal)(windowSize.width() - maxStrLenght - borderMarginWidth) / (qreal)20;
+        qreal scaleXAchse = (qreal)(windowSize.width() - maxStrLenght - borderMarginWidth) / (qreal)20;
         qreal scaleYAchse = (qreal)(windowSize.height() - borderMarginHeigth) / (qreal)10;
 
         // position of title of x-axis
@@ -765,19 +792,16 @@ void AtomSumWindow::paint_atom_sum(MatrixXd atom_matrix, QSize windowSize, qreal
                         h++;
                     }
                     polygons.append(poly);
-                }
-                /*
+                }                
                 // paint x-axis
                 qint32 j = 1;
                 while(j <= 21)
                 {
-                    QString str;
-
-                    painter.drawText(j * scaleXAchse + maxStrLenght - 7, -(((i - 1) * scaleYAchse)-(windowSize.height())) + xAxisTextPos, str.append(QString::number(j * scaleXText + _from, 'f', 2)));      // scalevalue
+                    //QString str;
+                    //painter.drawText(j * scaleXAchse + maxStrLenght - 7, -(((i - 1) * scaleYAchse)-(windowSize.height())) + xAxisTextPos, str.append(QString::number(j * scaleXText + _from, 'f', 2)));      // scalevalue
                     painter.drawLine(j * scaleXAchse + maxStrLenght, -(((i - 1) * scaleYAchse)-(windowSize.height() - borderMarginHeigth / 2 - 2)), j * scaleXAchse + maxStrLenght , -(((i - 1) * scaleYAchse)-(windowSize.height() - borderMarginHeigth / 2 + 2)));   // scalelines
                     j++;
                 }
-                */
                 painter.drawLine(maxStrLenght, -(((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2), windowSize.width()-5, -(((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2));
             }
 
@@ -879,8 +903,15 @@ void ResiduumWindow::PaintResiduum(MatrixXd residuum_matrix, QSize windowSize, q
                         h++;
                     }
                     polygons.append(poly);
+                }                
+                qint32 j = 1;
+                while(j <= 21)
+                {
+                    //QString str;
+                    //painter.drawText(j * scaleXAchse + maxStrLenght - 7, -(((i - 1) * scaleYAchse)-(windowSize.height())) + xAxisTextPos, str.append(QString::number(j * scaleXText + _from, 'f', 2)));      // scalevalue
+                    painter.drawLine(j * scaleXAchse + maxStrLenght, -(((i - 1) * scaleYAchse)-(windowSize.height() - borderMarginHeigth / 2 - 2)), j * scaleXAchse + maxStrLenght , -(((i - 1) * scaleYAchse)-(windowSize.height() - borderMarginHeigth / 2 + 2)));   // scalelines
+                    j++;
                 }
-
                 // paint x-axis               
                 painter.drawLine(maxStrLenght, -(((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2), windowSize.width()-5, -(((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2));
             }
@@ -1118,6 +1149,8 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
     update();
     _tbv_is_loading = false;
 }
+
+//*************************************************************************************************************
 
 void MainWindow::tbv_selection_changed(const QModelIndex& topLeft, const QModelIndex& bottomRight)
 {
@@ -1611,22 +1644,7 @@ void MainWindow::on_btt_OpenSignal_clicked()
     open_file();
 }
 
-//-----------------------------------------------------------------------------------------------------------------
 //*****************************************************************************************************************
-
-/*
-QMap<int, bool> matrix_select;
-
-void MatrixXdS::set_selected(int index)
-{
-    this->row(index);
-}
-
-bool MatrixXdS::is_selected(int index)
-{
-
-}
-*/
 
 void MainWindow::on_actionCreate_treebased_dictionary_triggered()
 {
@@ -1634,7 +1652,55 @@ void MainWindow::on_actionCreate_treebased_dictionary_triggered()
     x->show();
 }
 
+//*****************************************************************************************************************
+
 void MainWindow::on_sb_sample_rate_editingFinished()
 {
     _sample_rate = ui->sb_sample_rate->value();
+}
+
+//*****************************************************************************************************************
+
+void MainWindow::on_dsb_from_editingFinished()
+{
+    if(ui->dsb_from->value() >= _to)
+    {
+        QMessageBox::warning(this, tr("Error"), tr("Start time must be less than the end time."));
+        ui->dsb_from->setValue(_from);
+        return;
+    }
+    _from = ui->dsb_from->value();
+    read_fiff_file(_file_name);
+    update();
+}
+
+//*****************************************************************************************************************
+
+void MainWindow::on_dsb_to_editingFinished()
+{
+    if(ui->dsb_to->value() <= _from)
+    {
+        QMessageBox::warning(this, tr("Error"), tr("Start time must be less than the end time."));
+        ui->dsb_from->setValue(_to);
+        return;
+    }
+    _to = ui->dsb_to->value();
+    read_fiff_file(_file_name);
+    update();
+}
+
+//*****************************************************************************************************************
+
+void MainWindow::on_dsb_from_valueChanged(double arg1)
+{
+    qint32 sample_count = (_to - arg1) * ui->sb_sample_rate->value();
+    ui->lb_sample_count->setText(QString::number(sample_count));
+}
+
+//*****************************************************************************************************************
+
+void MainWindow::on_dsb_to_valueChanged(double arg1)
+{
+    qint32 sample_count = (arg1 - _from) * ui->sb_sample_rate->value();
+    ui->lb_sample_count->setText(QString::number(sample_count));
 }

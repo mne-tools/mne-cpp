@@ -23,5 +23,6 @@
         <file>icons/sinus.png</file>
         <file>icons/spanner.png</file>
         <file>icons/warning.png</file>
+        <file>icons/tree.png</file>
     </qresource>
 </RCC>

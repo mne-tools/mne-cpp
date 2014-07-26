@@ -68,9 +68,7 @@ public:
     
 private slots:
     void on_btt_yes_clicked();
-
     void on_btt_No_clicked();
-
     void on_chb_NoMessageBox_toggled(bool checked);
 
 private:
