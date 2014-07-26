@@ -106,6 +106,8 @@ EditorWindow::AtomType atomType;
 //=============================================================================================================
 // MAIN
 //=============================================================================================================
+
+//contructor
 EditorWindow::EditorWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::EditorWindow)
 {
     this->setAccessibleName("simple");
