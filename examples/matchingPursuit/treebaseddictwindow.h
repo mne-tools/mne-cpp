@@ -22,6 +22,8 @@ private slots:
 
     void on_tb_treebased_dict_name_editingFinished();
 
+    void on_btt_call_tree_creator_clicked();
+
 private:
     Ui::TreebasedDictWindow *ui;
 };
