@@ -82,6 +82,7 @@ class GraphWindow;
 class ResiduumWindow;
 class AtomSumWindow;
 class Atom;
+class YAxisWindow;
 
 class MainWindow : public QMainWindow
 {
@@ -109,6 +110,8 @@ private slots:
 
     void on_actionCreate_treebased_dictionary_triggered();
 
+    void on_sb_sample_rate_editingFinished();
+
 signals:
 
     void send_input(MatrixXd send_signal, qint32 send_max_iterations, qreal send_epsilon);
@@ -119,6 +122,7 @@ private:
     GraphWindow *callGraphWindow;
     AtomSumWindow *callAtomSumWindow;
     ResiduumWindow *callResidumWindow;
+    YAxisWindow *callYAxisWindow;
     QStandardItemModel* cb_model;
     QStandardItem* cb_item;
     std::vector<QStandardItem*> cb_items;
@@ -145,9 +149,23 @@ class GraphWindow : public QWidget
 
 protected:
    void paintEvent(QPaintEvent *event);
-public:
-   void paint_signal(MatrixXd signalMatrix, QSize windowSize);
 
+public:
+   //==========================================================================================================
+   /**
+   * GraphWindow_paint_signal
+   *
+   * ### MP toolbox GUI function ###
+   *
+   * painting input signal of chosen channels in butterfly plot
+   *
+   * @param[in] signalMatrix    matrix of input signal
+   * @param[in] windowSize      size (height,width) of window
+   *
+   * @return void
+   */
+   void paint_signal(MatrixXd signalMatrix, QSize windowSize);
+   //==========================================================================================================
 };
 
 //*************************************************************************************************************
@@ -158,26 +176,25 @@ class AtomSumWindow : public QWidget
 
 protected:
    void paintEvent(QPaintEvent *event);
-public:
 
+public:
    //=========================================================================================================
    /**
-   * AtomSumWIndow_paint_atom_sum
+   * AtomSumWindow_paint_atom_sum
    *
    * ### MP toolbox GUI function ###
    *
    * painting sum of found atoms in butterfly plot
    *
-   * @param[in] atom_matrix    matrix of found atoms for each channel
-   * @param[in] windowSize
-   * @param[in] signalMaximum
-   * @param[in] signalNegativeMaximum
-   *
+   * @param[in] atom_matrix             matrix of found atoms for each channel
+   * @param[in] windowSize              size (height,width) of window
+   * @param[in] signalMaximum           maximum value of atom signal
+   * @param[in] signalNegativeMaximum   minimum value of atom signal
    *
    * @return void
    */
    void paint_atom_sum(MatrixXd atom_matrix, QSize windowSize, qreal signalMaximum, qreal signalNegativeMaximum);
-
+   //==========================================================================================================
 };
 
 //*************************************************************************************************************
@@ -188,28 +205,53 @@ class ResiduumWindow : public QWidget
 
   protected:
     void paintEvent(QPaintEvent *event);
+
 public:
-   void PaintResiduum(MatrixXd residuum_matrix, QSize windowSize, qreal maxPos, qreal maxNeg);
-
-
+    //=========================================================================================================
+    /**
+    * AtomSumWindow_paint_atom_sum
+    *
+    * ### MP toolbox GUI function ###
+    *
+    * painting sum of found atoms in butterfly plot
+    *
+    * @param[in] atom_matrix             matrix of found atoms for each channel
+    * @param[in] windowSize              size (height,width) of window
+    * @param[in] signalMaximum           maximum value of atom signal
+    * @param[in] signalNegativeMaximum   minimum value of atom signal
+    *
+    * @return void
+    */
+    void PaintResiduum(MatrixXd residuum_matrix, QSize windowSize, qreal maxPos, qreal maxNeg);
+    //=========================================================================================================
 };
 
-//*************************************************************************************************************
-/*
-class MatrixXdS : public MatrixXd
+// Widget to paint y-axis
+class YAxisWindow : public QWidget
 {
     Q_OBJECT
 
+protected:
+   void paintEvent(QPaintEvent *event);
 
 public:
-   void set_selected(int index);
-   bool is_selected(int index);
-
-
+   //==========================================================================================================
+   /**
+   * YAxisWindow_paint_signal
+   *
+   * ### MP toolbox GUI function ###
+   *
+   * painting y-axis of chosen channels in butterfly plot
+   *
+   * @param[in] signalMatrix    matrix of input signal
+   * @param[in] windowSize      size (height,width) of window
+   *
+   * @return void
+   */
+   void paint_axis(MatrixXd signalMatrix, QSize windowSize);
+   //==========================================================================================================
 };
-*/
-//=============================================================================================================
 
-
+//*************************************************************************************************************
 
 #endif // MAINWINDOW_H
