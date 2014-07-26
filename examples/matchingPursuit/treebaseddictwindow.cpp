@@ -94,26 +94,28 @@ void TreebasedDictWindow::on_btt_calc_treebased_clicked()
 
     QXmlStreamWriter xmlWriter(&file);
     xmlWriter.setAutoFormatting(true);
-    xmlWriter.writeStartDocument();
 
-    xmlWriter.writeStartElement("All built Atoms for Treebased MP");
-    xmlWriter.writeAttribute("sample_count: ", QString::number(sample_count));
+    xmlWriter.writeStartDocument();
+    xmlWriter.writeStartElement("builtAtomsTreebasedMP");
+    xmlWriter.writeAttribute("sample_count", QString::number(sample_count));
+
 
     for(qint32 scale = 1; scale <= sample_count; scale+= sample_count / 16)
     {
-        for(qint32 translation = 0; translation < sample_count; translation+= sample_count / 16)
+        for(qint32 translation = 0; translation < 1/*sample_count*/; translation+= sample_count / 16)
         {
             modulation = 0;
-            while(modulation < floor(sample_count/2))
+            //while(modulation < floor(sample_count/2))
             {
                 phase = 0;
-                while(phase < 2 * PI)
+                //while(phase < 2 * PI)
                 {                    
-                    xmlWriter.writeStartElement(QString("Atom %1").arg(count));
-                    xmlWriter.writeAttribute("scale: ", QString::number(scale));
-                    xmlWriter.writeAttribute("translation: ", QString::number(translation));
-                    xmlWriter.writeAttribute("modulation: ", QString::number(modulation));
-                    xmlWriter.writeAttribute("phase: ", QString::number(phase));
+                    xmlWriter.writeStartElement(QString("Atom_%1").arg(count));
+                    //xmlWriter.writeAttribute("sample_count", QString::number(sample_count));
+                    xmlWriter.writeAttribute("scale", QString::number(scale));
+                    xmlWriter.writeAttribute("translation", QString::number(translation));
+                    xmlWriter.writeAttribute("modulation", QString::number(modulation));
+                    xmlWriter.writeAttribute("phase", QString::number(phase));
                     xmlWriter.writeEndElement();
 
                     count++;
