@@ -46,7 +46,6 @@
 #include "newmeasurement.h"
 #include "realtimesamplearraychinfo.h"
 
-#include <fiff/fiff_info.h>
 #include <fiff/fiff_evoked.h>
 
 
@@ -105,22 +104,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Init channel infos using fiff info
-    *
-    * @param[in] p_pFiffInfo     Info to init from
-    */
-    void init(FiffInfo::SPtr &p_pFiffInfo);
-
-    //=========================================================================================================
-    /**
-    * Returns whether channel info is initialized
-    *
-    * @return true whether the channel info is available.
-    */
-    inline bool isChInit() const;
-
-    //=========================================================================================================
-    /**
     * Returns the file name of the xml layout file.
     *
     * @return the file name of the layout file.
@@ -153,14 +136,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Sets averaging information
-    *
-    * @param[in] numPreStimSamples      number of pre stimulus samples to set
-    */
-    void setAveInfo(qint32 numPreStimSamples, qint32 numOfAverages);
-
-    //=========================================================================================================
-    /**
     * Returns the number of channels.
     *
     * @return the number of values which are gathered before a notify() is called.
@@ -177,11 +152,11 @@ public:
 
     //=========================================================================================================
     /**
-    * New data block to distribute
+    * New devoked to distribute
     *
-    * @param [in] v the value which is should be distributed.
+    * @param [in] v     the evoked which should be distributed.
     */
-    virtual void setValue(MatrixXd& v);
+    virtual void setValue(FiffEvoked& v);
 
     //=========================================================================================================
     /**
@@ -198,9 +173,17 @@ public:
     *
     * @return whether RealTimeEvoked contains values.
     */
-    inline bool containsValues() const;
+    inline bool isInitialized() const;
 
 private:
+    //=========================================================================================================
+    /**
+    * Init channel infos using fiff info
+    *
+    * @param[in] p_fiffInfo     Info to init from
+    */
+    void init(FiffInfo &p_fiffInfo);
+
     FiffEvoked::SPtr            m_pFiffEvoked;      /**< Evoked data set */
 
     QString                     m_sXMLLayoutFile;   /**< Layout file name. */
@@ -209,7 +192,6 @@ private:
 
     QList<QColor>               m_qListChColors;    /**< Channel color for butterfly plot.*/
     QList<RealTimeSampleArrayChInfo> m_qListChInfo; /**< Channel info list.*/
-    bool                        m_bInfoIsInit;      /**< If channel info is initialized.*/
     bool                        m_bInitialized;     /**< If values are stored.*/
 };
 
@@ -218,15 +200,6 @@ private:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-
-
-inline bool RealTimeEvoked::isChInit() const
-{
-    return m_bInfoIsInit;
-}
-
-
-//*************************************************************************************************************
 
 inline const QString& RealTimeEvoked::getXMLLayoutFile() const
 {
@@ -276,7 +249,7 @@ inline QList<RealTimeSampleArrayChInfo>& RealTimeEvoked::chInfo()
 
 //*************************************************************************************************************
 
-inline bool RealTimeEvoked::containsValues() const
+inline bool RealTimeEvoked::isInitialized() const
 {
     return m_bInitialized;
 }

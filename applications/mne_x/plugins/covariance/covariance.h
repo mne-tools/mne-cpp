@@ -47,6 +47,8 @@
 #include <mne_x/Interfaces/IAlgorithm.h>
 #include <generics/circularmatrixbuffer.h>
 #include <xMeas/newrealtimemultisamplearray.h>
+#include <xMeas/realtimecov.h>
+#include <rtInv/rtcov.h>
 
 
 //*************************************************************************************************************
@@ -55,6 +57,7 @@
 //=============================================================================================================
 
 #include <fiff/fiff_info.h>
+#include <fiff/fiff_cov.h>
 
 
 //*************************************************************************************************************
@@ -63,6 +66,7 @@
 //=============================================================================================================
 
 #include <QtWidgets>
+#include <QVector>
 
 
 //*************************************************************************************************************
@@ -82,6 +86,8 @@ namespace CovariancePlugin
 using namespace MNEX;
 using namespace XMEASLIB;
 using namespace IOBuffer;
+using namespace RTINVLIB;
+using namespace FIFFLIB;
 
 
 //*************************************************************************************************************
@@ -138,6 +144,8 @@ public:
 
     void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
 
+    void appendCovariance(FiffCov::SPtr p_pCovariance);
+
 signals:
     //=========================================================================================================
     /**
@@ -155,12 +163,18 @@ private:
     */
     void initConnector();
 
-    PluginInputData<NewRealTimeMultiSampleArray>::SPtr   m_pCovarianceInput;        /**< The NewRealTimeMultiSampleArray of the Covariance input.*/
-//    PluginOutputData<NewRealTimeMultiSampleArray>::SPtr  m_pCovarianceOutput;       /**< The NewRealTimeMultiSampleArray of the Covariance output.*/
+    QMutex mutex;
+
+    PluginInputData<NewRealTimeMultiSampleArray>::SPtr  m_pCovarianceInput;     /**< The NewRealTimeMultiSampleArray of the Covariance input.*/
+    PluginOutputData<RealTimeCov>::SPtr                 m_pCovarianceOutput;    /**< The RealTimeCov of the Covariance output.*/
 
     FiffInfo::SPtr  m_pFiffInfo;                                /**< Fiff measurement info.*/
 
     CircularMatrixBuffer<double>::SPtr   m_pCovarianceBuffer;   /**< Holds incoming data.*/
+
+    RtCov::SPtr m_pRtCov;   /**< Real-time covariance. */
+
+    QVector<FiffCov::SPtr>   m_qVecCovData;  /**< Evoked data set */
 
     bool m_bIsRunning;      /**< If source lab is running */
     bool m_bProcessData;    /**< If data should be received for processing */

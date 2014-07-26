@@ -169,7 +169,7 @@ void RealTimeEvokedWidget::getData()
 {
     if(!m_bInitialized)
     {
-        if(m_pRTE->isChInit())
+        if(m_pRTE->isInitialized())
         {
             m_qListChInfo = m_pRTE->chInfo();
 
@@ -188,9 +188,9 @@ void RealTimeEvokedWidget::getData()
 //            }
 
             init();
-        }
-        if(m_pRTE->containsValues())
+
             m_pRTEModel->updateData();
+        }
     }
     else
         m_pRTEModel->updateData();

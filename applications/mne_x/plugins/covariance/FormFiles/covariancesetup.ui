@@ -15,19 +15,6 @@
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QLabel" name="m_qLabel_Headline">
-     <property name="font">
-      <font>
-       <weight>75</weight>
-       <bold>true</bold>
-      </font>
-     </property>
-     <property name="text">
-      <string>Covariance Configuration</string>
-     </property>
-    </widget>
-   </item>
-   <item>
     <spacer name="m_qVerticalSpacer_Headline">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
@@ -45,49 +32,6 @@
    </item>
    <item>
     <layout class="QGridLayout" name="m_qGridLayout_main">
-     <item row="0" column="0">
-      <widget class="QGroupBox" name="m_qGroupBox_Properties">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>100</height>
-        </size>
-       </property>
-       <property name="title">
-        <string>Properties</string>
-       </property>
-       <property name="flat">
-        <bool>false</bool>
-       </property>
-       <layout class="QGridLayout" name="m_qGridLayout_Properties"/>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QGroupBox" name="m_qGroupBox_Channels">
-       <property name="sizePolicy">
-        <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-         <horstretch>0</horstretch>
-         <verstretch>0</verstretch>
-        </sizepolicy>
-       </property>
-       <property name="minimumSize">
-        <size>
-         <width>0</width>
-         <height>200</height>
-        </size>
-       </property>
-       <property name="title">
-        <string>Channels</string>
-       </property>
-       <layout class="QGridLayout" name="m_qGridLayout_Channels"/>
-      </widget>
-     </item>
      <item row="3" column="1">
       <spacer name="m_qHorizontalSpacer_About">
        <property name="orientation">
@@ -101,18 +45,6 @@
        </property>
       </spacer>
      </item>
-     <item row="0" column="1" rowspan="3" colspan="2">
-      <widget class="QGroupBox" name="m_qGroupBox_Information">
-       <property name="title">
-        <string>Information</string>
-       </property>
-       <layout class="QGridLayout" name="m_qGridLayout_Information">
-        <item row="0" column="0">
-         <widget class="QTextBrowser" name="m_qTextBrowser_Information"/>
-        </item>
-       </layout>
-      </widget>
-     </item>
      <item row="3" column="2">
       <widget class="QPushButton" name="m_qPushButton_About">
        <property name="text">
@@ -120,7 +52,57 @@
        </property>
       </widget>
      </item>
-     <item row="2" column="0">
+     <item row="1" column="1" rowspan="2" colspan="2">
+      <widget class="QGroupBox" name="m_qGroupBox_Information">
+       <property name="title">
+        <string>Information</string>
+       </property>
+       <layout class="QGridLayout" name="m_qGridLayout_Information">
+        <item row="0" column="1">
+         <widget class="QTextBrowser" name="m_qTextBrowser_Information"/>
+        </item>
+       </layout>
+      </widget>
+     </item>
+     <item row="0" column="1" colspan="2">
+      <widget class="QLabel" name="m_qLabelCovarianceImage">
+       <property name="minimumSize">
+        <size>
+         <width>0</width>
+         <height>103</height>
+        </size>
+       </property>
+       <property name="maximumSize">
+        <size>
+         <width>16777215</width>
+         <height>103</height>
+        </size>
+       </property>
+       <property name="text">
+        <string/>
+       </property>
+       <property name="pixmap">
+        <pixmap resource="../covariance.qrc">:/images/covariance_logo.png</pixmap>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+      </widget>
+     </item>
+     <item row="0" column="0">
+      <spacer name="m_qHorizontalSpacer_Header">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item row="1" column="0" rowspan="2">
       <spacer name="m_qVerticalSpacer_LeftRow">
        <property name="orientation">
         <enum>Qt::Vertical</enum>
@@ -138,6 +120,8 @@
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <resources>
+  <include location="../covariance.qrc"/>
+ </resources>
  <connections/>
 </ui>
