@@ -121,7 +121,7 @@ QList<GaborAtom> AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterat
                 VectorXd corr_coeffs = VectorXd::Zero(sample_count);
 
                 //iteration for multichannel
-                for(qint32 chn = 0; chn < channel_count; ++chn)
+                for(qint32 chn = 0; chn < channel_count; chn++)
                 {
                     quint32 max_index = 0;
                     qreal maximum = 0;
@@ -173,8 +173,9 @@ QList<GaborAtom> AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterat
             j++;
             s = pow(2.0,j);
         }
-        std::cout << "found parameters " << it << ":\n   "<< "scale: " << gabor_Atom->scale << " transl.: " << gabor_Atom->translation <<
-                     " modu: " << gabor_Atom->modulation << " phase: " << gabor_Atom->phase << " max Scalar product: " << gabor_Atom->max_scalar_product << "\n";
+        std::cout << "\n" << "===============" << " found parameters " << it + 1 << "===============" << ":\n\n"<<
+                     "scale: " << gabor_Atom->scale << " trans: " << gabor_Atom->translation <<
+                     " modu: " << gabor_Atom->modulation << " phase: " << gabor_Atom->phase << " sclr_prdct: " << gabor_Atom->max_scalar_product << "\n";
 
         //replace atoms with s==N and p = floor(N/2) by such atoms that do not have an envelope
         k = 0;
@@ -204,13 +205,13 @@ QList<GaborAtom> AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterat
             }
 
         }
-        std::cout << "found params after reset with NoEnvelope " << it << ":\n   "<< "scale: " << gabor_Atom->scale << " transl.: " << gabor_Atom->translation <<
-                     " modu: " << gabor_Atom->modulation << " phase: " << gabor_Atom->phase << " max Scalar product: " << gabor_Atom->max_scalar_product << "\n";
+        std::cout << "      after comparison to NoEnvelope " << ":\n"<< "scale: " << gabor_Atom->scale << " trans: " << gabor_Atom->translation <<
+                     " modu: " << gabor_Atom->modulation << " phase: " << gabor_Atom->phase << " sclr_prdct: " << gabor_Atom->max_scalar_product << "\n\n";
 
         //Maximisation Simplex Algorithm implemented by Bozoa Jia, adapted to the MP Algorithm by Martin Henfling. Copyright (C) 2010 Botao Jia
         //todo change to clean use of EIGEN, @present its mixed with Namespace std and <vector>
         //iteration for multichannel
-        for(qint32 chn = 0; chn < channel_count; ++chn)
+        for(qint32 chn = 0; chn < channel_count; chn++)
         {
             //simplexfunction to find minimum of target among parameters s, p, k
             std::vector<double> init;
@@ -415,15 +416,15 @@ QList<GaborAtom> AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterat
             }
 
             if(cnt==iterations)//max number of iteration achieves before tol is satisfied
-                std::cout<<"Simplex Iteration limit of "<<iterations<<" achieved, result may not be optimal"  <<std::endl;
+                std::cout<<"Simplex Iteration limit of "<<iterations<<" achieved in channel " << chn << ", result may not be optimal";
 
         }//end Maximisation for channels Copyright (C) 2010 Botao Jia
 
-        std::cout <<  "parameters after optimization " << it << ":\n   "<< "scale: " << gabor_Atom->scale << " transl.: " << gabor_Atom->translation <<
-                      " modu: " << gabor_Atom->modulation << " phase: " << gabor_Atom->phase << " max Scalar product: " << gabor_Atom->max_scalar_product << "\n\n";
+        std::cout <<  "      after simplex optimization " << ":\n"<< "scale: " << gabor_Atom->scale << " trans: " << gabor_Atom->translation <<
+                      " modu: " << gabor_Atom->modulation << " phase: " << gabor_Atom->phase << " sclr_prdct: " << gabor_Atom->max_scalar_product << "\n\n";
 
         //calc multichannel parameters phase and max_scalar_product
-        for(qint32 chn = 0; chn < channel_count; ++chn)
+        for(qint32 chn = 0; chn < channel_count; chn++)
         {
             VectorXd channel_params = calculate_atom(sample_count, gabor_Atom->scale, gabor_Atom->translation, gabor_Atom->modulation, chn, residuum, RETURNPARAMETERS);
             gabor_Atom->phase_list.append(channel_params[3]);

@@ -166,9 +166,10 @@ MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::
 
     ui->sb_Iterations->setMaximum(1999);        // max iterations
     ui->sb_Iterations->setMinimum(1);           // min iterations
+    ui->sb_Iterations->setValue(80);
 
     ui->splitter->setStretchFactor(1,4);
-    ui->dsb_energy->setValue(0.1);
+    ui->dsb_energy->setValue(3.0);
 
     // set result tableview
     ui->tbv_Results->setColumnCount(5);
@@ -1064,7 +1065,7 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
 
     QTableWidgetItem* atomEnergieItem = new QTableWidgetItem(QString::number(percent_atom_energy, 'f', 2));
     QTableWidgetItem* atomScaleItem = new QTableWidgetItem(QString::number(atom_res_list.last().scale / ui->sb_sample_rate->value(), 'g', 3));
-    QTableWidgetItem* atomTranslationItem = new QTableWidgetItem(QString::number((atom_res_list.last().translation / ui->sb_sample_rate->value()) + _from, 'g', 3));
+    QTableWidgetItem* atomTranslationItem = new QTableWidgetItem(QString::number(atom_res_list.last().translation / qreal(ui->sb_sample_rate->value()) + _from, 'g', 4));
     QTableWidgetItem* atomModulationItem = new QTableWidgetItem(QString::number(atom_res_list.last().modulation * _sample_rate / atom_res_list.last().sample_count, 'g', 3));
     QTableWidgetItem* atomPhaseItem = new QTableWidgetItem(QString::number(phase, 'g', 3));
 
