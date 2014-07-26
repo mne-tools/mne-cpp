@@ -46,7 +46,7 @@
 #include "newmeasurement.h"
 #include "realtimesamplearraychinfo.h"
 
-#include <fiff/fiff_info.h>
+#include <fiff/fiff_evoked.h>
 
 
 //*************************************************************************************************************
@@ -104,30 +104,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Inits RealTimeMultiSampleArrayNew and adds uiNumChannels empty channel information
-    *
-    * @param [in] uiNumChannels     the number of channels to init.
-    */
-    void init(QList<RealTimeSampleArrayChInfo> &chInfo);
-
-    //=========================================================================================================
-    /**
-    * Init channel infos using fiff info
-    *
-    * @param[in] p_pFiffInfo     Info to init from
-    */
-    void initFromFiffInfo(FiffInfo::SPtr &p_pFiffInfo);
-
-    //=========================================================================================================
-    /**
-    * Returns whether channel info is initialized
-    *
-    * @return true whether the channel info is available.
-    */
-    inline bool isChInit() const;
-
-    //=========================================================================================================
-    /**
     * Returns the file name of the xml layout file.
     *
     * @return the file name of the layout file.
@@ -150,7 +126,6 @@ public:
     */
     inline unsigned int getNumChannels() const;
 
-
     //=========================================================================================================
     /**
     * Returns the number of pre-stimulus samples
@@ -158,14 +133,6 @@ public:
     * @return the number of pre-stimulus samples
     */
     inline qint32 getNumPreStimSamples() const;
-
-    //=========================================================================================================
-    /**
-    * Selects the given list of channel indeces and unselect all other channels
-    *
-    * @param[in] numSamples     number of pre stimulus samples to set
-    */
-    void setPreStimSamples(qint32 numSamples);
 
     //=========================================================================================================
     /**
@@ -183,22 +150,13 @@ public:
     */
     inline QList<RealTimeSampleArrayChInfo>& chInfo();
 
-
     //=========================================================================================================
     /**
-    * Returns the reference to the orig FiffInfo.
+    * New devoked to distribute
     *
-    * @return the reference to the orig FiffInfo.
+    * @param [in] v     the evoked which should be distributed.
     */
-    inline FiffInfo::SPtr& getFiffInfo();
-
-    //=========================================================================================================
-    /**
-    * New data block to distribute
-    *
-    * @param [in] v the value which is should be distributed.
-    */
-    virtual void setValue(MatrixXd& v);
+    virtual void setValue(FiffEvoked& v);
 
     //=========================================================================================================
     /**
@@ -207,7 +165,7 @@ public:
     *
     * @return the last attached value.
     */
-    virtual MatrixXd getValue() const;
+    virtual FiffEvoked::SPtr& getValue();
 
     //=========================================================================================================
     /**
@@ -215,20 +173,26 @@ public:
     *
     * @return whether RealTimeEvoked contains values.
     */
-    inline bool containsValues() const;
+    inline bool isInitialized() const;
 
 private:
-    FiffInfo::SPtr              m_pFiffInfo_orig;   /**< Original Fiff Info if initialized by fiff info. */
+    //=========================================================================================================
+    /**
+    * Init channel infos using fiff info
+    *
+    * @param[in] p_fiffInfo     Info to init from
+    */
+    void init(FiffInfo &p_fiffInfo);
+
+    FiffEvoked::SPtr            m_pFiffEvoked;      /**< Evoked data set */
 
     QString                     m_sXMLLayoutFile;   /**< Layout file name. */
-    MatrixXd                    m_matValue;         /**< The current attached sample vector.*/
 
-    qint32                  m_iNumPreStimSamples;   /**< Number of pre-stimulus samples */
+    qint32                      m_iPreStimSamples;  /**< Number of pre-stimulus samples */
 
     QList<QColor>               m_qListChColors;    /**< Channel color for butterfly plot.*/
     QList<RealTimeSampleArrayChInfo> m_qListChInfo; /**< Channel info list.*/
-    bool                        m_bChInfoIsInit;    /**< If channel info is initialized.*/
-    bool                        m_bContainsValues;  /**< If values are stored.*/
+    bool                        m_bInitialized;     /**< If values are stored.*/
 };
 
 
@@ -236,15 +200,6 @@ private:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-
-
-inline bool RealTimeEvoked::isChInit() const
-{
-    return m_bChInfoIsInit;
-}
-
-
-//*************************************************************************************************************
 
 inline const QString& RealTimeEvoked::getXMLLayoutFile() const
 {
@@ -272,7 +227,7 @@ inline unsigned int RealTimeEvoked::getNumChannels() const
 
 inline qint32 RealTimeEvoked::getNumPreStimSamples() const
 {
-    return m_iNumPreStimSamples;
+    return m_iPreStimSamples;
 }
 
 
@@ -294,17 +249,9 @@ inline QList<RealTimeSampleArrayChInfo>& RealTimeEvoked::chInfo()
 
 //*************************************************************************************************************
 
-inline FiffInfo::SPtr& RealTimeEvoked::getFiffInfo()
+inline bool RealTimeEvoked::isInitialized() const
 {
-    return m_pFiffInfo_orig;
-}
-
-
-//*************************************************************************************************************
-
-inline bool RealTimeEvoked::containsValues() const
-{
-    return m_bContainsValues;
+    return m_bInitialized;
 }
 
 } // NAMESPACE

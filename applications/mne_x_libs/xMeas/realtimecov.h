@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     fiffsimulatorsetupwidget.h
+* @file     realtimecov.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the FiffSimulatorSetupWidget class.
+* @brief    Contains the declaration of the RealTimeCov class.
 *
 */
 
-#ifndef FIFFSIMULATORSETUPWIDGET_H
-#define FIFFSIMULATORSETUPWIDGET_H
+#ifndef REALTIMECOV_H
+#define REALTIMECOV_H
 
 
 //*************************************************************************************************************
@@ -42,102 +42,110 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_fiffsimulatorsetup.h"
+#include "xmeas_global.h"
+#include "newmeasurement.h"
+#include "realtimesamplearraychinfo.h"
+
+#include <fiff/fiff_cov.h>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
 
-#include <QWidget>
+#include <QSharedPointer>
+#include <QVector>
+#include <QList>
+#include <QColor>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE FiffSimulatorPlugin
+// DEFINE NAMESPACE XMEASLIB
 //=============================================================================================================
 
-namespace FiffSimulatorPlugin
+namespace XMEASLIB
 {
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// USED NAMESPACES
 //=============================================================================================================
 
-class FiffSimulator;
+using namespace FIFFLIB;
 
 
-//=============================================================================================================
+//=========================================================================================================
 /**
-* DECLARE CLASS FiffSimulatorSetupWidget
+* DECLARE CLASS RealTimeCov -> ToDo check feasibilty of QAbstractTableModel
 *
-* @brief The FiffSimulatorSetupWidget class provides the Fiff configuration window.
+* @brief The RealTimeMultiSampleArrayNew class is the base class of every RealTimeMultiSampleArrayNew Measurement.
 */
-class FiffSimulatorSetupWidget : public QWidget
+class XMEASSHARED_EXPORT RealTimeCov : public NewMeasurement
 {
     Q_OBJECT
-
 public:
+    typedef QSharedPointer<RealTimeCov> SPtr;               /**< Shared pointer type for RealTimeCov. */
+    typedef QSharedPointer<const RealTimeCov> ConstSPtr;    /**< Const shared pointer type for RealTimeCov. */
 
     //=========================================================================================================
     /**
-    * Constructs a FiffSimulatorSetupWidget which is a child of parent.
+    * Constructs a RealTimeMultiSampleArrayNew.
+    */
+    explicit RealTimeCov(QObject *parent = 0);
+
+    //=========================================================================================================
+    /**
+    * Destroys the RealTimeMultiSampleArrayNew.
+    */
+    virtual ~RealTimeCov();
+
+    //=========================================================================================================
+    /**
+    * New covariance to distribute
     *
-    * @param [in] p_pFiffSimulator   a pointer to the corresponding FiffSimulator.
-    * @param [in] parent        pointer to parent widget; If parent is 0, the new FiffSimulatorSetupWidget becomes a window. If parent is another widget, FiffSimulatorSetupWidget becomes a child window inside parent. FiffSimulatorSetupWidget is deleted when its parent is deleted.
+    * @param [in] v     the covariance which should be distributed.
     */
-    FiffSimulatorSetupWidget(FiffSimulator* p_pFiffSimulator, QWidget *parent = 0);
+    virtual void setValue(FiffCov& v);
 
     //=========================================================================================================
     /**
-    * Destroys the FiffSimulatorSetupWidget.
-    * All FiffSimulatorSetupWidget's children are deleted first. The application exits if FiffSimulatorSetupWidget is the main widget.
+    * Returns the current value set.
+    * This method is inherited by Measurement.
+    *
+    * @return the last attached value.
     */
-    ~FiffSimulatorSetupWidget();
+    virtual FiffCov::SPtr& getValue();
 
     //=========================================================================================================
     /**
-    * Inits the setup widget
+    * Returns whether RealTimeCov contains values
+    *
+    * @return whether RealTimeCov contains values.
     */
-    void init();
-
-//slots
-    void bufferSizeEdited();        /**< Buffer size edited and set new buffer size.*/
-
-    void printToLog(QString message);   /**< Implements printing messages to rtproc log.*/
-
-    void pressedConnect();          /**< Triggers a connection trial to rt_server.*/
-
-    void pressedSendCLI();          /**< Triggers a send request of a cli command.*/
-
-    void fiffInfoReceived();        /**< Triggered when new fiff info is recieved by producer and stored intor rt_server */
+    inline bool isInitialized() const;
 
 private:
-    //=========================================================================================================
-    /**
-    * Set command connection status
-    *
-    * @param[in] p_bConnectionStatus    the connection status
-    */
-    void cmdConnectionChanged(bool p_bConnectionStatus);
+    FiffCov::SPtr               m_pFiffCov;     /**< Covariance data set */
 
-    //=========================================================================================================
-    /**
-    * Shows the About Dialog
-    */
-    void showAboutDialog();
-
-    FiffSimulator*   m_pFiffSimulator;      /**< a pointer to corresponding mne rt client.*/
-
-    Ui::FiffSimulatorSetupWidgetClass ui; /**< the user interface for the MneRtClientSetupWidget.*/
-
-    bool m_bIsInit;                     /**< false when gui is not initialized jet. Prevents gui from already interacting when not initialized */
-
+    bool                        m_bInitialized;     /**< If values are stored.*/
 };
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline bool RealTimeCov::isInitialized() const
+{
+    return m_bInitialized;
+}
 
 } // NAMESPACE
 
-#endif // FIFFSIMULATORSETUPWIDGET_H
+Q_DECLARE_METATYPE(XMEASLIB::RealTimeCov::SPtr)
+
+#endif // REALTIMECOV_H

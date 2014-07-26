@@ -169,7 +169,7 @@ void RealTimeEvokedWidget::getData()
 {
     if(!m_bInitialized)
     {
-        if(m_pRTE->isChInit())
+        if(m_pRTE->isInitialized())
         {
             m_qListChInfo = m_pRTE->chInfo();
 
@@ -188,12 +188,12 @@ void RealTimeEvokedWidget::getData()
 //            }
 
             init();
+
+            m_pRTEModel->updateData();
         }
-        if(m_pRTE->containsValues())
-            m_pRTEModel->addData(m_pRTE->getValue());
     }
     else
-        m_pRTEModel->addData(m_pRTE->getValue());
+        m_pRTEModel->updateData();
 }
 
 //*************************************************************************************************************
@@ -210,144 +210,8 @@ void RealTimeEvokedWidget::init()
 
         m_pButterflyPlot->setModel(m_pRTEModel);
 
-
-
-
-//        if(m_pRTMSADelegate)
-//            delete m_pRTMSADelegate;
-//        m_pRTMSADelegate = new RealTimeMultiSampleArrayDelegate(this);
-
-//        connect(m_pTableView, &QTableView::doubleClicked, m_pRTMSAModel, &RealTimeMultiSampleArrayModel::toggleFreeze);
-
-//        //set some size settings for m_pTableView
-//        m_pTableView->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
-
-//        m_pTableView->setShowGrid(false);
-
-//        m_pTableView->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch); //Stretch 2 column to maximal width
-//        m_pTableView->horizontalHeader()->hide();
-//        m_pTableView->verticalHeader()->setDefaultSectionSize(m_fZoomFactor*m_fDefaultSectionSize);//Row Height
-
-//        m_pTableView->setAutoScroll(false);
-//        m_pTableView->setColumnHidden(0,true); //because content is plotted jointly with column=1
-
-//        m_pTableView->resizeColumnsToContents();
-
-//        m_pTableView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
-
-//        //set context menu
-//        m_pTableView->setContextMenuPolicy(Qt::CustomContextMenu);
-//        connect(m_pTableView,SIGNAL(customContextMenuRequested(QPoint)),this,SLOT(channelContextMenu(QPoint)));
-
-//        //activate kinetic scrolling
-//        QScroller::grabGesture(m_pTableView,QScroller::MiddleMouseButtonGesture);
-
         m_bInitialized = true;
     }
-}
-
-
-//*************************************************************************************************************
-
-void RealTimeEvokedWidget::channelContextMenu(QPoint pos)
-{
-//    //obtain index where index was clicked
-//    QModelIndex index = m_pTableView->indexAt(pos);
-
-//    //get selected items
-//    QModelIndexList selected = m_pTableView->selectionModel()->selectedIndexes();
-
-////    // Lambda C++11 version
-////    QVector<qint32> vecSelection;
-////    for(qint32 i = 0; i < selected.size(); ++i)
-////        if(selected[i].column() == 1)
-////            vecSelection.append(m_pRTMSAModel->getIdxSelMap()[selected[i].row()]);
-
-////    //create custom context menu and actions
-////    QMenu *menu = new QMenu(this);
-
-////    //select channels
-////    QAction* doSelection = menu->addAction(tr("Apply selection"));
-////    connect(doSelection,&QAction::triggered, [=](){
-////        m_pRTMSAModel->selectRows(vecSelection);
-////    });
-
-//    // non C++11 alternative
-//    m_qListCurrentSelection.clear();
-//    for(qint32 i = 0; i < selected.size(); ++i)
-//        if(selected[i].column() == 1)
-//            m_qListCurrentSelection.append(m_pRTMSAModel->getIdxSelMap()[selected[i].row()]);
-
-//    //create custom context menu and actions
-//    QMenu *menu = new QMenu(this);
-
-//    //select channels
-//    QAction* doSelection = menu->addAction(tr("Apply selection"));
-//    connect(doSelection, &QAction::triggered, this, &RealTimeEvokedWidget::applySelection);
-
-//    //undo selection
-//    QAction* resetAppliedSelection = menu->addAction(tr("Reset selection"));
-//    connect(resetAppliedSelection,&QAction::triggered, m_pRTMSAModel, &RealTimeMultiSampleArrayModel::resetSelection);
-//    connect(resetAppliedSelection,&QAction::triggered, this, &RealTimeEvokedWidget::resetSelection);
-
-//    //show context menu
-//    menu->popup(m_pTableView->viewport()->mapToGlobal(pos));
-}
-
-
-//*************************************************************************************************************
-
-void RealTimeEvokedWidget::resizeEvent(QResizeEvent* resizeEvent)
-{
-    Q_UNUSED(resizeEvent)
-}
-
-
-//*************************************************************************************************************
-
-void RealTimeEvokedWidget::keyPressEvent(QKeyEvent* keyEvent)
-{
-    Q_UNUSED(keyEvent)
-}
-
-
-//*************************************************************************************************************
-
-void RealTimeEvokedWidget::mousePressEvent(QMouseEvent* mouseEvent)
-{
-    Q_UNUSED(mouseEvent)
-}
-
-
-//*************************************************************************************************************
-
-void RealTimeEvokedWidget::mouseMoveEvent(QMouseEvent* mouseEvent)
-{
-    Q_UNUSED(mouseEvent)
-}
-
-
-//*************************************************************************************************************
-
-void RealTimeEvokedWidget::mouseReleaseEvent(QMouseEvent* mouseEvent)
-{
-    Q_UNUSED(mouseEvent)
-}
-
-
-//*************************************************************************************************************
-
-void RealTimeEvokedWidget::mouseDoubleClickEvent(QMouseEvent* mouseEvent)
-{
-    Q_UNUSED(mouseEvent)
-}
-
-
-//*************************************************************************************************************
-
-void RealTimeEvokedWidget::wheelEvent(QWheelEvent* wheelEvent)
-{
-    Q_UNUSED(wheelEvent)
 }
 
 
@@ -356,8 +220,6 @@ void RealTimeEvokedWidget::wheelEvent(QWheelEvent* wheelEvent)
 void RealTimeEvokedWidget::zoomChanged(double zoomFac)
 {
     m_fZoomFactor = zoomFac;
-
-//    m_pTableView->verticalHeader()->setDefaultSectionSize(m_fZoomFactor*m_fDefaultSectionSize);//Row Height
 }
 
 

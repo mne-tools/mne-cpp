@@ -192,9 +192,9 @@ void RealTimeEvokedModel::setRTE(QSharedPointer<RealTimeEvoked> &pRTE)
 
 //*************************************************************************************************************
 
-void RealTimeEvokedModel::addData(const MatrixXd &data)
+void RealTimeEvokedModel::updateData()
 {
-    m_matData = data;
+    m_matData = m_pRTE->getValue()->data;
     m_bIsInit = true;
 
     //Update data content
