@@ -426,6 +426,7 @@ void FixDictMp::create_tree_dict(QString save_path)
          << std::endl;
     }
 
+    qint32 cnt = 0;
     while(!xml_reader.atEnd() && !xml_reader.hasError())
     {
         // Read next element
@@ -435,39 +436,31 @@ void FixDictMp::create_tree_dict(QString save_path)
         {
                 continue;
         }
-        if(token == QXmlStreamReader::Invalid)
-        {
-                continue;
-        }
+
         //If token is StartElement - read it
         if(token == QXmlStreamReader::StartElement)
         {
-
-            if(xml_reader.name() == "sample_count")
+            if(xml_reader.name() == "builtAtomsTreebasedMP")
             {
-                sample_count = xml_reader.readElementText().toInt();
-                    continue;
+                sample_count = xml_reader.attributes().data()->value().toInt();
+                cout << sample_count << "\n";
+                xml_reader.readNextStartElement();
             }
 
-            if(xml_reader.name() == "scale")
+            if(xml_reader.name() == QString("Atom_%1").arg(cnt))
             {
-                scale = xml_reader.readElementText().toDouble();
-                continue;
-            }
-            if(xml_reader.name() == "translation")
-            {
-                translation = xml_reader.readElementText().toInt();
-                continue;
-            }
-            if(xml_reader.name() == "modulation")
-            {
-                modulation = xml_reader.readElementText().toDouble();
-                continue;
-            }
-            if(xml_reader.name() == "phase")
-            {
-                phase = xml_reader.readElementText().toDouble();
-                continue;
+                scale = xml_reader.attributes().at(0).value().toDouble();
+                translation = xml_reader.attributes().at(1).value().toInt();
+                modulation = xml_reader.attributes().at(2).value().toDouble();
+                phase = xml_reader.attributes().at(3).value().toDouble();
+
+                cout << scale << "\n";
+                cout << translation << "\n";
+                cout << modulation << "\n";
+                cout << phase << "\n\n";
+
+                cnt++;
+                xml_reader.readNextStartElement();
             }
         }
     }
