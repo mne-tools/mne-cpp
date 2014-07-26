@@ -95,7 +95,6 @@ public:
     typedef QList<GaborAtom> gabor_atom_list;
 
 private slots:
-
     void on_btt_Calc_clicked();
     void on_actionW_rterbucheditor_triggered();
     void on_actionAtomformeleditor_triggered();
@@ -107,17 +106,17 @@ private slots:
     void tbv_selection_changed(const QModelIndex& topLeft, const QModelIndex& bottomRight);
     void recieve_result(qint32 current_iteration, qint32 max_iterations, qreal current_energy, qreal max_energy, gabor_atom_list atom_res_list);
     void calc_thread_finished();
-
     void on_actionCreate_treebased_dictionary_triggered();
-
     void on_sb_sample_rate_editingFinished();
+    void on_dsb_from_editingFinished();
+    void on_dsb_to_editingFinished();
+    void on_dsb_to_valueChanged(double arg1);
+    void on_dsb_from_valueChanged(double arg1);
 
 signals:
-
     void send_input(MatrixXd send_signal, qint32 send_max_iterations, qreal send_epsilon);
 
 private:
-
     Ui::MainWindow *ui;    
     GraphWindow *callGraphWindow;
     AtomSumWindow *callAtomSumWindow;

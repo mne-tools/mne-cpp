@@ -11,7 +11,11 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Form</string>
+   <string>Treebase Dictionary Factory</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="Ressourcen.qrc">
+    <normaloff>:/images/icons/tree.png</normaloff>:/images/icons/tree.png</iconset>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -107,6 +111,8 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="Ressourcen.qrc"/>
+ </resources>
  <connections/>
 </ui>

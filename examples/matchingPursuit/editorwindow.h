@@ -74,14 +74,11 @@ public:
     };
 
 private:
-
     void read_dicts();
-
     void calc_scale_value();
     void calc_modu_value();
     void calc_phase_value();
     void calc_chirp_value();
-
     void calc_atom_count_all_combined();
 
     QList<qreal> calc_lin_pos_parameters(qreal startValue, qreal linStepValue);
@@ -99,111 +96,60 @@ private:
     QList<qreal> calc_parameter_values_phase(qreal startValue, qreal linStepValue, qreal expStepValue);
     QList<qreal> calc_parameter_values_chirp(qreal startValue, qreal linStepValue, qreal expStepValue);
 
-
-private slots:
+private slots:    
     void on_btt_CalcAtoms_clicked();
-
     void on_spb_AtomCount_valueChanged(int arg1);
-
     void on_dspb_StartValueScale_editingFinished();
-
     void on_rb_PosCountScale_toggled();
-
     void on_rb_NoStepScale_toggled(bool checked);
-
     void on_rb_LinStepScale_toggled(bool checked);
-
     void on_rb_ExpStepScale_toggled(bool checked);
-
     void on_dspb_ExpStepScale_editingFinished();
-
     void on_rb_NegCountScale_toggled();
-
     void on_dspb_LinStepScale_editingFinished();
-
     void on_rb_NoStepModu_toggled(bool checked);
-
     void on_rb_NoStepPhase_toggled(bool checked);
-
     void on_rb_NoStepChirp_toggled(bool checked);
-
     void on_dspb_LinStepPhase_editingFinished();
-
     void on_dspb_LinStepModu_editingFinished();
-
     void on_dspb_ExpStepModu_editingFinished();
-
     void on_dspb_StartValueModu_editingFinished();
-
     void on_rb_PosCountModu_toggled();
-
     void on_rb_NegCountModu_toggled();
-
     void on_dspb_ExpStepPhase_editingFinished();
-
     void on_dspb_StartValuePhase_editingFinished();
-
     void on_rb_PosCountPhase_toggled();
-
     void on_rb_NegCountPhase_toggled();
-
     void on_dspb_LinStepChirp_editingFinished();
-
     void on_dspb_ExpStepChirp_editingFinished();
-
     void on_dspb_StartValueChirp_editingFinished();
-
     void on_rb_PosCountChirp_toggled();
-
     void on_rb_NegCountChirp_toggled();
-
     void on_rb_LinStepModu_toggled(bool checked);
-
     void on_rb_ExpStepModu_toggled(bool checked);
-
     void on_rb_LinStepPhase_toggled(bool checked);
-
     void on_rb_ExpStepPhase_toggled(bool checked);
-
     void on_rb_LinStepChirp_toggled(bool checked);
-
     void on_rb_ExpStepChirp_toggled(bool checked);
-
     void on_rb_GaussAtomType_toggled(bool checked);
-
     void on_rb_ChirpAtomType_toggled(bool checked);
-
     void on_spb_AtomLength_editingFinished();
-
     void on_tb_PartDictName_editingFinished();
-
     void on_chb_CombAllPara_toggled(bool checked);
-
     void on_dspb_EndValueScale_editingFinished();
-
     void on_dspb_EndValueModu_editingFinished();
-
     void on_dspb_EndValuePhase_editingFinished();
-
     void on_dspb_EndValueChirp_editingFinished();
-
     void on_btt_ToNewDict_clicked();
-
     void on_list_AllDict_doubleClicked();
-
     void on_btt_ToAlldict_clicked();
-
     void on_list_NewDict_doubleClicked();
-
     void on_btt_DeleteDict_clicked();
-
     void on_list_AllDict_itemSelectionChanged();
-
     void on_list_NewDict_itemSelectionChanged();
-
     void on_btt_SaveDicts_clicked();
 
-private:
+private:    
     Ui::EditorWindow *ui;
 };
 
