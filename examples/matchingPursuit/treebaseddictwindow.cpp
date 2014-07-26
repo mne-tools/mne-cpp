@@ -97,7 +97,7 @@ void TreebasedDictWindow::on_btt_calc_treebased_clicked()
     xmlWriter.writeStartDocument();
 
     xmlWriter.writeStartElement("All built Atoms for Treebased MP");
-    xmlWriter.writeTextElement("sample_count: ", QString::number(sample_count));
+    xmlWriter.writeAttribute("sample_count: ", QString::number(sample_count));
 
     for(qint32 scale = 1; scale <= sample_count; scale+= sample_count / 16)
     {
@@ -110,10 +110,10 @@ void TreebasedDictWindow::on_btt_calc_treebased_clicked()
                 while(phase < 2 * PI)
                 {                    
                     xmlWriter.writeStartElement(QString("Atom %1").arg(count));
-                    xmlWriter.writeTextElement("scale: ", QString::number(scale));
-                    xmlWriter.writeTextElement("translation: ", QString::number(translation));
-                    xmlWriter.writeTextElement("modulation: ", QString::number(modulation));
-                    xmlWriter.writeTextElement("phase: ", QString::number(phase));
+                    xmlWriter.writeAttribute("scale: ", QString::number(scale));
+                    xmlWriter.writeAttribute("translation: ", QString::number(translation));
+                    xmlWriter.writeAttribute("modulation: ", QString::number(modulation));
+                    xmlWriter.writeAttribute("phase: ", QString::number(phase));
                     xmlWriter.writeEndElement();
 
                     count++;
@@ -126,6 +126,7 @@ void TreebasedDictWindow::on_btt_calc_treebased_clicked()
 
     xmlWriter.writeEndElement();
     xmlWriter.writeEndDocument();
+
     file.close();
     std::cout << count << "\n";
     FixDictMp::create_tree_dict(save_path);
@@ -134,5 +135,12 @@ void TreebasedDictWindow::on_btt_calc_treebased_clicked()
 
 void TreebasedDictWindow::on_tb_treebased_dict_name_editingFinished()
 {
-    //_treebased_dict_name = ui->tb_PartDictName->text();
+    _treebased_dict_name = ui->tb_treebased_dict_name->text();
+}
+
+void TreebasedDictWindow::on_btt_call_tree_creator_clicked()
+{
+    QString save_path = QString("Matching-Pursuit-Toolbox/%1.tbd").arg(_treebased_dict_name);
+
+    FixDictMp::create_tree_dict(save_path);
 }

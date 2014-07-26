@@ -409,9 +409,15 @@ QStringList FixDictMp::correlation(VectorXd signalSamples, QList<qreal> atomSamp
 
 void FixDictMp::create_tree_dict(QString save_path)
 {
-    QDomDocument xml_file;
     QFile file(save_path);
-    //qint32 count = 0;
+    //file.open(QIODevice::ReadOnly);
+    QXmlStreamReader xml_reader(&file);
+
+    qint32 sample_count = 0;
+    qreal scale = 0;
+    quint32 translation = 0;
+    qreal modulation = 0;
+    qreal phase = 0;
 
     if (!file.open(QFile::ReadOnly | QFile::Text))
     {
@@ -420,7 +426,55 @@ void FixDictMp::create_tree_dict(QString save_path)
          << std::endl;
     }
 
-    xml_file.setContent(&file);
+    while(!xml_reader.atEnd() && !xml_reader.hasError())
+    {
+        // Read next element
+        QXmlStreamReader::TokenType token = xml_reader.readNext();
+        //If token is just StartDocument - go to next
+        if(token == QXmlStreamReader::StartDocument)
+        {
+                continue;
+        }
+        if(token == QXmlStreamReader::Invalid)
+        {
+                continue;
+        }
+        //If token is StartElement - read it
+        if(token == QXmlStreamReader::StartElement)
+        {
+
+            if(xml_reader.name() == "sample_count")
+            {
+                sample_count = xml_reader.readElementText().toInt();
+                    continue;
+            }
+
+            if(xml_reader.name() == "scale")
+            {
+                scale = xml_reader.readElementText().toDouble();
+                continue;
+            }
+            if(xml_reader.name() == "translation")
+            {
+                translation = xml_reader.readElementText().toInt();
+                continue;
+            }
+            if(xml_reader.name() == "modulation")
+            {
+                modulation = xml_reader.readElementText().toDouble();
+                continue;
+            }
+            if(xml_reader.name() == "phase")
+            {
+                phase = xml_reader.readElementText().toDouble();
+                continue;
+            }
+        }
+    }
+
+    //close reader and flush file
+    xml_reader.clear();
+    file.close();
 
     /* // Extract the root markup
     QDomElement Component = xml_file.firstChild().toElement();
@@ -463,5 +517,4 @@ void FixDictMp::create_tree_dict(QString save_path)
         Component = Component.nextSibling().toElement();
     }*/
 
-    file.close();
 }

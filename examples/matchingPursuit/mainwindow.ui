@@ -206,7 +206,7 @@
              <item row="10" column="0" colspan="2">
               <widget class="QLabel" name="label">
                <property name="text">
-                <string>sample rate:</string>
+                <string>sample rate [1/sec]:</string>
                </property>
               </widget>
              </item>
