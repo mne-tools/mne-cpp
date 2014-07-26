@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     realtimeevoked.cpp
+* @file     realtimecov.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the RealTimeEvoked class.
+* @brief    Contains the implementation of the RealTimeCov class.
 *
 */
 
@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "realtimeevoked.h"
+#include "realtimecov.h"
 
 #include <time.h>
 
@@ -64,9 +64,9 @@ using namespace XMEASLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RealTimeEvoked::RealTimeEvoked(QObject *parent)
-: NewMeasurement(QMetaType::type("RealTimeEvoked::SPtr"), parent)
-, m_pFiffEvoked(new FiffEvoked)
+RealTimeCov::RealTimeCov(QObject *parent)
+: NewMeasurement(QMetaType::type("RealTimeCov::SPtr"), parent)
+, m_pFiffCov(new FiffCov)
 , m_bInitialized(false)
 {
 
@@ -75,7 +75,7 @@ RealTimeEvoked::RealTimeEvoked(QObject *parent)
 
 //*************************************************************************************************************
 
-RealTimeEvoked::~RealTimeEvoked()
+RealTimeCov::~RealTimeCov()
 {
 
 }
@@ -83,77 +83,19 @@ RealTimeEvoked::~RealTimeEvoked()
 
 //*************************************************************************************************************
 
-void RealTimeEvoked::init(FiffInfo &p_fiffInfo)
+FiffCov::SPtr& RealTimeCov::getValue()
 {
-    m_qListChInfo.clear();
-    m_qListChColors.clear();
-
-    qsrand(time(NULL));
-    for(qint32 i = 0; i < p_fiffInfo.nchan; ++i)
-    {
-         m_qListChColors.append(QColor(qrand() % 256, qrand() % 256, qrand() % 256));
-
-        RealTimeSampleArrayChInfo initChInfo;
-        initChInfo.setChannelName(p_fiffInfo.chs[i].ch_name);
-
-        // set channel Unit
-        initChInfo.setUnit(p_fiffInfo.chs[i].unit);
-
-        //Treat stimulus channels different
-        if(p_fiffInfo.chs[i].kind == FIFFV_STIM_CH)
-        {
-//            initChInfo.setUnit("");
-            initChInfo.setMinValue(0);
-            initChInfo.setMaxValue(1.0e6);
-        }
-
-        // set channel Kind
-        initChInfo.setKind(p_fiffInfo.chs[i].kind);
-
-        // set channel coil
-        initChInfo.setCoil(p_fiffInfo.chs[i].coil_type);
-
-        m_qListChInfo.append(initChInfo);
-    }
+    return m_pFiffCov;
 }
 
 
 //*************************************************************************************************************
 
-FiffEvoked::SPtr& RealTimeEvoked::getValue()
+void RealTimeCov::setValue(FiffCov& v)
 {
-    return m_pFiffEvoked;
-}
-
-
-//*************************************************************************************************************
-
-void RealTimeEvoked::setValue(FiffEvoked& v)
-{
-
-    if(m_pFiffEvoked->data.cols() != v.data.cols())
-        m_bInitialized = false;
-
     //Store
-    *m_pFiffEvoked = v;
-
-    if(!m_bInitialized)
-    {
-        init(m_pFiffEvoked->info);
-        m_iPreStimSamples = 0;
-        for(qint32 i = 0; i < m_pFiffEvoked->times.size(); ++i)
-        {
-            if(m_pFiffEvoked->times[i] >= 0)
-                break;
-            else
-                ++m_iPreStimSamples;
-        }
-
-
-
-
-        m_bInitialized = true;
-    }
+    *m_pFiffCov = v;
+    m_bInitialized = true;
 
     emit notify();
 }
