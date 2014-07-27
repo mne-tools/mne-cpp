@@ -61,7 +61,7 @@
        <bool>false</bool>
       </property>
       <widget class="QWidget" name="layoutWidget">
-       <layout class="QVBoxLayout" name="verticalLayout">
+       <layout class="QVBoxLayout" name="l_left_side">
         <item>
          <widget class="QFrame" name="frame">
           <property name="frameShape">
@@ -84,31 +84,18 @@
             <number>6</number>
            </property>
            <item>
-            <layout class="QGridLayout" name="l_Options" columnstretch="0,0,0,1">
+            <layout class="QGridLayout" name="l_options" columnstretch="0,0,0,0,1">
              <property name="spacing">
               <number>5</number>
              </property>
-             <item row="4" column="2">
+             <item row="5" column="2">
               <widget class="QSpinBox" name="sb_Iterations">
                <property name="alignment">
                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                </property>
               </widget>
              </item>
-             <item row="6" column="3">
-              <widget class="QLabel" name="lb_Prozent">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="text">
-                <string>%</string>
-               </property>
-              </widget>
-             </item>
-             <item row="6" column="0" colspan="2">
+             <item row="7" column="0" colspan="2">
               <widget class="QCheckBox" name="chb_ResEnergy">
                <property name="text">
                 <string>residuum energy:</string>
@@ -118,7 +105,7 @@
                </property>
               </widget>
              </item>
-             <item row="4" column="0" colspan="2">
+             <item row="5" column="0" colspan="2">
               <widget class="QCheckBox" name="chb_Iterations">
                <property name="text">
                 <string>max. iterations:</string>
@@ -128,7 +115,7 @@
                </property>
               </widget>
              </item>
-             <item row="9" column="1" colspan="3">
+             <item row="10" column="1" colspan="4">
               <widget class="QComboBox" name="cb_Dicts">
                <property name="enabled">
                 <bool>false</bool>
@@ -141,7 +128,7 @@
                </property>
               </widget>
              </item>
-             <item row="8" column="0" colspan="2">
+             <item row="9" column="0" colspan="2">
               <widget class="QRadioButton" name="rb_adativMp">
                <property name="text">
                 <string>adaptive MP</string>
@@ -151,7 +138,7 @@
                </property>
               </widget>
              </item>
-             <item row="2" column="0" colspan="2">
+             <item row="3" column="0" colspan="2">
               <widget class="QLabel" name="lb_Criterion">
                <property name="sizePolicy">
                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -164,14 +151,14 @@
                </property>
               </widget>
              </item>
-             <item row="9" column="0">
+             <item row="10" column="0">
               <widget class="QRadioButton" name="rb_OwnDictionary">
                <property name="text">
                 <string>own dictionary:</string>
                </property>
               </widget>
              </item>
-             <item row="6" column="2">
+             <item row="7" column="2">
               <widget class="QDoubleSpinBox" name="dsb_energy">
                <property name="alignment">
                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -184,7 +171,7 @@
                </property>
               </widget>
              </item>
-             <item row="10" column="2">
+             <item row="11" column="2">
               <widget class="QSpinBox" name="sb_sample_rate">
                <property name="maximumSize">
                 <size>
@@ -203,10 +190,23 @@
                </property>
               </widget>
              </item>
-             <item row="10" column="0" colspan="2">
+             <item row="11" column="0" colspan="2">
               <widget class="QLabel" name="label">
                <property name="text">
                 <string>sample rate [1/sec]:</string>
+               </property>
+              </widget>
+             </item>
+             <item row="7" column="3">
+              <widget class="QLabel" name="lb_Prozent">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string>%</string>
                </property>
               </widget>
              </item>
@@ -216,7 +216,7 @@
          </widget>
         </item>
         <item>
-         <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0,0">
+         <layout class="QHBoxLayout" name="lo_buttons" stretch="0,0,0">
           <property name="leftMargin">
            <number>5</number>
           </property>
@@ -261,10 +261,67 @@
          </layout>
         </item>
         <item>
+         <layout class="QHBoxLayout" name="l_readtime">
+          <property name="leftMargin">
+           <number>5</number>
+          </property>
+          <property name="rightMargin">
+           <number>5</number>
+          </property>
+          <item>
+           <widget class="QLabel" name="lb_from">
+            <property name="text">
+             <string>from:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QDoubleSpinBox" name="dsb_from"/>
+          </item>
+          <item>
+           <widget class="QLabel" name="lb_to">
+            <property name="text">
+             <string>to</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QDoubleSpinBox" name="dsb_to"/>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_3">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>0</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QLabel" name="lb_samples">
+            <property name="text">
+             <string>samples:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="lb_sample_count">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
          <widget class="QTableWidget" name="tbv_Results"/>
         </item>
         <item>
-         <layout class="QVBoxLayout" name="verticalLayout_4">
+         <layout class="QVBoxLayout" name="l_progress">
           <property name="spacing">
            <number>0</number>
           </property>
@@ -288,7 +345,7 @@
            </widget>
           </item>
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_3">
+           <layout class="QHBoxLayout" name="l_res_energy">
             <property name="spacing">
              <number>0</number>
             </property>
@@ -340,7 +397,7 @@
            </layout>
           </item>
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_5">
+           <layout class="QHBoxLayout" name="l_iterations">
             <property name="spacing">
              <number>0</number>
             </property>
@@ -602,6 +659,10 @@
    </property>
   </action>
   <action name="actionCreate_treebased_dictionary">
+   <property name="icon">
+    <iconset resource="Ressourcen.qrc">
+     <normaloff>:/images/icons/tree.png</normaloff>:/images/icons/tree.png</iconset>
+   </property>
    <property name="text">
     <string>create treebased dictionary</string>
    </property>
