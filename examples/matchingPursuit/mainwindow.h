@@ -64,6 +64,18 @@
 #include <QModelIndex>
 #include <QSize>
 
+
+#ifndef MAXUINT32
+#define MAXUINT32   ((UINT32)~((UINT32)0))
+#endif
+#ifndef MAXINT32
+#define MAXINT32    ((INT32)(MAXUINT32 >> 1))
+#endif
+#ifndef MININT32
+#define MININT32    ((INT32)~MAXINT32)
+#endif
+
+
 //=============================================================================================================
 // USED NAMESPACES
 
