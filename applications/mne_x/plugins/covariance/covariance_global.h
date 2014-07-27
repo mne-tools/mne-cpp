@@ -34,7 +34,7 @@
 */
 
 #ifndef COVARIANCE_GLOBAL_H
-#define AVERAGING_GLOBAL_H
+#define COVARIANCE_GLOBAL_H
 
 
 //*************************************************************************************************************
