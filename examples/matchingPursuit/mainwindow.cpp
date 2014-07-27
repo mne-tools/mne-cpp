@@ -955,11 +955,11 @@ void MainWindow::on_btt_Calc_clicked()
     ui->progressBarCalc->setHidden(false);
 
     if(ui->chb_Iterations->isChecked() && !ui->chb_ResEnergy->isChecked())
-        criterion = TruncationCriterion::Iterations;
+        criterion = Iterations;
     if(ui->chb_Iterations->isChecked() && ui->chb_ResEnergy->isChecked())
-        criterion = TruncationCriterion::Both;
+        criterion = Both;
     if(ui->chb_ResEnergy->isChecked() && !ui->chb_Iterations->isChecked())
-        criterion = TruncationCriterion::SignalEnergy;
+        criterion = SignalEnergy;
 
     if(_signal_matrix.rows() == 0)
     {
