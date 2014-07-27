@@ -64,7 +64,12 @@
 #include <QModelIndex>
 #include <QSize>
 
-
+#ifndef UINT32
+typedef unsigned int        UINT32, *PUINT32;
+#endif
+#ifndef INT32
+typedef signed int          INT32, *PINT32;
+#endif
 #ifndef MAXUINT32
 #define MAXUINT32   ((UINT32)~((UINT32)0))
 #endif
