@@ -407,11 +407,14 @@ QStringList FixDictMp::correlation(VectorXd signalSamples, QList<qreal> atomSamp
 
 }
 
+//******************************************************************************************************************
+
 void FixDictMp::create_tree_dict(QString save_path)
 {
     QFile file(save_path);
-    //file.open(QIODevice::ReadOnly);
-    QXmlStreamReader xml_reader(&file);
+    QDomDocument atom_xml_file;
+    atom_xml_file.setContent(&file);
+    GaborAtom* gabor_Atom = new GaborAtom;
 
     qint32 sample_count = 0;
     qreal scale = 0;
@@ -419,95 +422,169 @@ void FixDictMp::create_tree_dict(QString save_path)
     qreal modulation = 0;
     qreal phase = 0;
 
-    if (!file.open(QFile::ReadOnly | QFile::Text))
+
+    QDomElement xml_element = atom_xml_file.documentElement();
+
+    QString root_tag = xml_element.tagName();
+
+    if(root_tag == "builtAtomsTreebasedMP")
     {
-        std::cout << "Error: Cannot read file " << qPrintable(save_path)
-         << ": " << qPrintable(file.errorString())
-         << std::endl;
+        sample_count = xml_element.attribute("sample_count").toInt();
+        //cout << sample_count << "\n";
     }
 
-    qint32 cnt = 0;
-    while(!xml_reader.atEnd() && !xml_reader.hasError())
+    VectorXd compare_atom = VectorXd::Zero(sample_count);
+
+    QString write_save_path = save_path;
+    write_save_path.replace(".tbd", ".dict");
+    QFile write_file(write_save_path);
+    write_file.open(QIODevice::WriteOnly);
+
+    QXmlStreamWriter write_molecules_to_xml(&write_file);
+    write_molecules_to_xml.setAutoFormatting(true);
+
+    write_molecules_to_xml.writeStartDocument();
+    write_molecules_to_xml.writeStartElement("TreebasedStructurFor_TBMP");
+    write_molecules_to_xml.writeAttribute("sample_count", QString::number(sample_count));
+
+    QDomNodeList node_list = xml_element.elementsByTagName("Atom");
+
+    //set atoms out of xml to compare with compare_atom
+    qint32 i = 1;
+    while(node_list.count() > 1, i++)
     {
-        // Read next element
-        QXmlStreamReader::TokenType token = xml_reader.readNext();
-        //If token is just StartDocument - go to next
-        if(token == QXmlStreamReader::StartDocument)
+        QDomElement current_element = node_list.at(0).toElement();
+
+        if(!current_element.isNull())
         {
-                continue;
+            scale = (current_element.attribute("scale", current_element.text())).toDouble();
+            translation = (current_element.attribute("translation", current_element.text())).toInt();
+            modulation = (current_element.attribute("modulation", current_element.text())).toDouble();
+            phase = (current_element.attribute("phase", current_element.text())).toDouble();
+            //cout << "node: " << i << " scale: " << scale << " trans: " << translation
+            //     << " modu: " << modulation << " phase: " << phase_list.first() << "\n";
         }
 
-        //If token is StartElement - read it
-        if(token == QXmlStreamReader::StartElement)
+        compare_atom = gabor_Atom->create_real(sample_count,scale,translation,modulation,phase);
+        qreal threshold = 0.5 * compare_atom.dot(compare_atom);
+
+        current_element = node_list.at(i).toElement();
+
+        if(!current_element.isNull())
         {
-            if(xml_reader.name() == "builtAtomsTreebasedMP")
+            scale = (current_element.attribute("scale", current_element.text())).toDouble();
+            translation = (current_element.attribute("translation", current_element.text())).toInt();
+            modulation = (current_element.attribute("modulation", current_element.text())).toDouble();
+            phase = (current_element.attribute("phase", current_element.text())).toDouble();
+
+        }
+
+        QList<qint32> similar_atoms;
+        similar_atoms.append(0);
+        VectorXd temp_atom = VectorXd::Zero(sample_count);
+        temp_atom = gabor_Atom->create_real(sample_count,scale,translation,modulation,phase);
+
+        qint32 molecule_size = 1;
+        qint32 count_next = 2;
+
+        //finding 32 atoms with low differences
+        while (molecule_size < 32)
+        {
+            //fill list of similar atoms until 32 are found to save as molecule
+            if( compare_atom.dot(temp_atom) > threshold)
             {
-                sample_count = xml_reader.attributes().data()->value().toInt();
-                cout << sample_count << "\n";
-                xml_reader.readNextStartElement();
+                similar_atoms.append(i);
+                molecule_size++;
+            }
+            else
+            {
+                //try the next atom
+                current_element = node_list.at(count_next).toElement();
+
+                if(!current_element.isNull())
+                {
+                    scale = (current_element.attribute("scale", current_element.text())).toDouble();
+                    translation = (current_element.attribute("translation", current_element.text())).toInt();
+                    modulation = (current_element.attribute("modulation", current_element.text())).toDouble();
+                    phase = (current_element.attribute("phase", current_element.text())).toDouble();
+
+                }
+                count_next++;
+            }
+            if (count_next == node_list.count());
+                break;
+        }
+
+        qreal molec_scale = 0;
+        quint32 molec_translation = 0;
+        qreal molec_modulation = 0;
+        qreal molec_phase = 0;
+
+        for(qint32 j = 0; j < molecule_size; j++)
+        {
+            current_element = node_list.at(similar_atoms.at(j)).toElement();
+            if(!current_element.isNull())
+            {
+                molec_scale += (current_element.attribute("scale", current_element.text())).toDouble();
+                molec_translation += (current_element.attribute("translation", current_element.text())).toInt();
+                molec_modulation += (current_element.attribute("modulation", current_element.text())).toDouble();
+                molec_phase += (current_element.attribute("phase", current_element.text())).toDouble();
             }
 
-            if(xml_reader.name() == QString("Atom_%1").arg(cnt))
+        }
+        molec_scale /= molecule_size;
+        molec_translation /= molecule_size;
+        molec_modulation /= molecule_size;
+        molec_phase /= molecule_size;
+
+        write_molecules_to_xml.writeStartElement("Molecule");
+        write_molecules_to_xml.writeAttribute("scale", QString::number(molec_scale));
+        write_molecules_to_xml.writeAttribute("translation", QString::number(molec_translation));
+        write_molecules_to_xml.writeAttribute("modulation", QString::number(molec_modulation));
+        write_molecules_to_xml.writeAttribute("phase", QString::number(molec_phase));
+
+        if(similar_atoms.length() > 1)
+        {
+            for(qint32 k = 0; k < molecule_size; k++)
             {
-                scale = xml_reader.attributes().at(0).value().toDouble();
-                translation = xml_reader.attributes().at(1).value().toInt();
-                modulation = xml_reader.attributes().at(2).value().toDouble();
-                phase = xml_reader.attributes().at(3).value().toDouble();
+                write_molecules_to_xml.writeStartElement("Atom");
 
-                cout << scale << "\n";
-                cout << translation << "\n";
-                cout << modulation << "\n";
-                cout << phase << "\n\n";
+                current_element = node_list.at(similar_atoms.at(k)).toElement();
+                QDomNode to_remove = node_list.at(similar_atoms.at(k)).toElement().parentNode();
 
-                cnt++;
-                xml_reader.readNextStartElement();
+                if(!current_element.isNull())
+                {
+                    write_molecules_to_xml.writeAttribute("scale", current_element.attribute("scale", current_element.text()));
+                    write_molecules_to_xml.writeAttribute("translation", current_element.attribute("translation", current_element.text()));
+                    write_molecules_to_xml.writeAttribute("modulation", current_element.attribute("modulation", current_element.text()));
+                    write_molecules_to_xml.writeAttribute("phase", current_element.attribute("phase", current_element.text()));
+                }
+                to_remove.removeChild(current_element);
+                write_molecules_to_xml.writeEndElement();//atom
             }
         }
-    }
+        else
+        {
+            //just remove the single atom
+            current_element = node_list.at(0).toElement();
+            QDomNode to_remove = node_list.at(0).toElement().parentNode();
+            to_remove.removeChild(current_element);
+        }
+
+        write_molecules_to_xml.writeEndElement();//molecule
+
+        node_list = xml_element.elementsByTagName("Atom");
+        cout << node_list.count() <<"\n";
+
+        if(node_list.count() == 0)
+            break;
+    }//while nodelist
+    write_molecules_to_xml.writeEndElement();//header
+    write_molecules_to_xml.writeEndDocument();
+
+    cout << "finished.... number of built molecules:  " << i << "\n";
 
     //close reader and flush file
-    xml_reader.clear();
     file.close();
-
-    /* // Extract the root markup
-    QDomElement Component = xml_file.firstChild().toElement();
-
-    // Loop while there is a child
-    while(!Component.isNull())
-    {
-        // Check if the child tag name is COMPONENT
-        if (Component.tagName()=="scale")
-        {
-
-            // Read and display the component ID
-            QString ID=Component.attribute("ID","No ID");
-
-            // Get the first child of the component
-            QDomElement Child=Component.firstChild().toElement();
-
-            QString Name;
-            double Value;
-
-            // Read each child of the component node
-            while (!Child.isNull())
-            {
-                // Read Name and value
-                if (Child.tagName()=="NAME") Name=Child.firstChild().toText().data();
-                if (Child.tagName()=="VALUE") Value=Child.firstChild().toText().data().toDouble();
-
-                // Next child
-                Child = Child.nextSibling().toElement();
-            }
-
-            // Display component data
-            std::cout << "Component " << ID.toStdString().c_str() << std::endl;
-            std::cout << "   Name  = " << Name.toStdString().c_str() << std::endl;
-            std::cout << "   Value = " << Value << std::endl;
-            std::cout << std::endl;
-        }
-
-        // Next component
-        Component = Component.nextSibling().toElement();
-    }*/
-
+    write_file.close();
 }

@@ -126,6 +126,7 @@ public:
     static void create_tree_dict(QString save_path);
     //=========================================================================================================
 
+    qreal create_molecules(VectorXd compare_atom, qreal phase, qreal modulation, quint32 translation, qint32 sample_count, GaborAtom* gabor_Atom, qreal scale);
 public slots:
     //void send_result();
     //void matching_pursuit (MatrixXd signal, qint32 max_iterations, qreal epsilon);

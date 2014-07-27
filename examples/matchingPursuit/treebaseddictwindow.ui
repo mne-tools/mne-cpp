@@ -86,7 +86,7 @@
         </size>
        </property>
        <property name="minimum">
-        <number>512</number>
+        <number>8</number>
        </property>
        <property name="maximum">
         <number>1024</number>
