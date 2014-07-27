@@ -383,5 +383,7 @@ void Averaging::run()
 
         }
     }
+
+    m_pRtAve->stop();
 }
 

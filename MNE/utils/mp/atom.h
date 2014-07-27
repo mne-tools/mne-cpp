@@ -205,7 +205,7 @@ public:
     *
     * @return GaborAtom as String
     */
-    QStringList GaborAtom::CreateStringValues(qint32 sample_count, qreal scale, qint32 translation, qreal modulation, qreal phase);
+    QStringList CreateStringValues(qint32 sample_count, qreal scale, qint32 translation, qreal modulation, qreal phase);
 
 };
 
