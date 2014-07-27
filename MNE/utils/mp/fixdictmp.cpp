@@ -444,14 +444,14 @@ void FixDictMp::create_tree_dict(QString save_path)
     write_molecules_to_xml.setAutoFormatting(true);
 
     write_molecules_to_xml.writeStartDocument();
-    write_molecules_to_xml.writeStartElement("TreebasedStructurFor_TBMP");
+    write_molecules_to_xml.writeStartElement("TreebasedStructureFor_TBMP");
     write_molecules_to_xml.writeAttribute("sample_count", QString::number(sample_count));
 
     QDomNodeList node_list = xml_element.elementsByTagName("Atom");
 
     //set atoms out of xml to compare with compare_atom
     qint32 i = 1;
-    while(node_list.count() > 1, i++)
+    while(node_list.count() > 1)
     {
         QDomElement current_element = node_list.at(0).toElement();
 
@@ -466,8 +466,9 @@ void FixDictMp::create_tree_dict(QString save_path)
         }
 
         compare_atom = gabor_Atom->create_real(sample_count,scale,translation,modulation,phase);
-        qreal threshold = 0.5 * compare_atom.dot(compare_atom);
+        qreal threshold = 0.7 * compare_atom.dot(compare_atom);
 
+        /*
         current_element = node_list.at(i).toElement();
 
         if(!current_element.isNull())
@@ -477,50 +478,49 @@ void FixDictMp::create_tree_dict(QString save_path)
             modulation = (current_element.attribute("modulation", current_element.text())).toDouble();
             phase = (current_element.attribute("phase", current_element.text())).toDouble();
 
-        }
+        }*/
 
         QList<qint32> similar_atoms;
         similar_atoms.append(0);
+
+        //qint32 molecule_size = 1;
         VectorXd temp_atom = VectorXd::Zero(sample_count);
-        temp_atom = gabor_Atom->create_real(sample_count,scale,translation,modulation,phase);
 
-        qint32 molecule_size = 1;
-        qint32 count_next = 2;
 
-        //finding 32 atoms with low differences
-        while (molecule_size < 32)
+        //finding atoms with low differences
+        for (qint32 next = 0; next < node_list.count(); ++next)//;32)
         {
-            //fill list of similar atoms until 32 are found to save as molecule
+            //try the next atom
+            current_element = node_list.at(next).toElement();
+
+            if(!current_element.isNull())
+            {
+                scale = (current_element.attribute("scale", current_element.text())).toDouble();
+                translation = (current_element.attribute("translation", current_element.text())).toInt();
+                modulation = (current_element.attribute("modulation", current_element.text())).toDouble();
+                phase = (current_element.attribute("phase", current_element.text())).toDouble();
+            }
+
+            temp_atom = gabor_Atom->create_real(sample_count,scale,translation,modulation,phase);
+
+            //fill list of similar atoms to save as molecule
             if( compare_atom.dot(temp_atom) > threshold)
             {
-                similar_atoms.append(i);
-                molecule_size++;
+                similar_atoms.append(next);
+                //molecule_size++;
             }
-            else
-            {
-                //try the next atom
-                current_element = node_list.at(count_next).toElement();
 
-                if(!current_element.isNull())
-                {
-                    scale = (current_element.attribute("scale", current_element.text())).toDouble();
-                    translation = (current_element.attribute("translation", current_element.text())).toInt();
-                    modulation = (current_element.attribute("modulation", current_element.text())).toDouble();
-                    phase = (current_element.attribute("phase", current_element.text())).toDouble();
-
-                }
-                count_next++;
-            }
-            if (count_next == node_list.count());
+            if (similar_atoms.length() == 32)//vary this for testing
                 break;
         }
+
 
         qreal molec_scale = 0;
         quint32 molec_translation = 0;
         qreal molec_modulation = 0;
         qreal molec_phase = 0;
 
-        for(qint32 j = 0; j < molecule_size; j++)
+        for(qint32 j = 0; j < similar_atoms.length(); j++)
         {
             current_element = node_list.at(similar_atoms.at(j)).toElement();
             if(!current_element.isNull())
@@ -532,10 +532,10 @@ void FixDictMp::create_tree_dict(QString save_path)
             }
 
         }
-        molec_scale /= molecule_size;
-        molec_translation /= molecule_size;
-        molec_modulation /= molecule_size;
-        molec_phase /= molecule_size;
+        molec_scale /= similar_atoms.length();
+        molec_translation /= similar_atoms.length();
+        molec_modulation /= similar_atoms.length();
+        molec_phase /= similar_atoms.length();
 
         write_molecules_to_xml.writeStartElement("Molecule");
         write_molecules_to_xml.writeAttribute("scale", QString::number(molec_scale));
@@ -543,13 +543,16 @@ void FixDictMp::create_tree_dict(QString save_path)
         write_molecules_to_xml.writeAttribute("modulation", QString::number(molec_modulation));
         write_molecules_to_xml.writeAttribute("phase", QString::number(molec_phase));
 
-        if(similar_atoms.length() > 1)
+        if(similar_atoms.length() > 0)//more than one 0 atom found almost similar
         {
-            for(qint32 k = 0; k < molecule_size; k++)
+            for(qint32 k = 0; k < similar_atoms.length(); k++)
             {
-                write_molecules_to_xml.writeStartElement("Atom");
-
                 current_element = node_list.at(similar_atoms.at(k)).toElement();
+
+                write_molecules_to_xml.writeStartElement("Atom");
+                write_molecules_to_xml.writeAttribute("ID", current_element.attribute("ID", current_element.text()));
+
+
                 QDomNode to_remove = node_list.at(similar_atoms.at(k)).toElement().parentNode();
 
                 if(!current_element.isNull())
@@ -578,7 +581,10 @@ void FixDictMp::create_tree_dict(QString save_path)
 
         if(node_list.count() == 0)
             break;
+
+        i++;
     }//while nodelist
+
     write_molecules_to_xml.writeEndElement();//header
     write_molecules_to_xml.writeEndDocument();
 
