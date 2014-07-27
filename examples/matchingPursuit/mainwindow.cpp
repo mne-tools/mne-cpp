@@ -170,7 +170,7 @@ MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::
     ui->lb_to->setHidden(true);
     ui->dsb_to->setHidden(true);
     ui->lb_samples->setHidden(true);
-    ui->lb_sample_count->setHidden(true);
+    ui->sb_sample_count->setHidden(true);
 
     // set result tableview
     ui->tbv_Results->setColumnCount(5);
@@ -290,13 +290,14 @@ void MainWindow::open_file()
         ui->dsb_from->setValue(47.151f);
         ui->dsb_to->setValue(48.000f);
         read_fiff_file(_file_name);
-        ui->lb_sample_count->setText(QString::number((ui->dsb_to->value() - ui->dsb_from->value()) * ui->sb_sample_rate->value()));
         ui->lb_from->setHidden(false);
         ui->dsb_from->setHidden(false);
         ui->lb_to->setHidden(false);
         ui->dsb_to->setHidden(false);
         ui->lb_samples->setHidden(false);
-        ui->lb_sample_count->setHidden(false);
+        ui->sb_sample_count->setHidden(false);
+        ui->sb_sample_count->setValue((ui->dsb_to->value() - ui->dsb_from->value()) * ui->sb_sample_rate->value());
+
     }
     else
     {
@@ -308,7 +309,7 @@ void MainWindow::open_file()
         ui->lb_to->setHidden(true);
         ui->dsb_to->setHidden(true);
         ui->lb_samples->setHidden(true);
-        ui->lb_sample_count->setHidden(true);
+        ui->sb_sample_count->setHidden(true);
     }
 
     _original_signal_matrix.resize(_signal_matrix.rows(), _signal_matrix.cols());
@@ -972,15 +973,6 @@ void MainWindow::on_btt_Calc_clicked()
     if(ui->btt_Calc->text() == "break")
         return;
 
-    ui->frame->setEnabled(false);
-    ui->btt_OpenSignal->setEnabled(false);
-    ui->btt_Calc->setText("break");
-    ui->tbv_Results->setEnabled(false);
-    ui->cb_channels->setEnabled(false);
-
-    _my_atom_list.clear();
-
-
     TruncationCriterion criterion;    
     ui->progressBarCalc->setValue(0);
     ui->progressBarCalc->setHidden(false);
@@ -1035,6 +1027,15 @@ void MainWindow::on_btt_Calc_clicked()
             msgBox->close();
         }
     }
+
+    ui->frame->setEnabled(false);
+    ui->btt_OpenSignal->setEnabled(false);
+    ui->btt_Calc->setText("break");
+    ui->tbv_Results->setEnabled(false);
+    ui->cb_channels->setEnabled(false);
+
+    _my_atom_list.clear();
+
 
     if(ui->chb_ResEnergy->isChecked())
     {
@@ -1148,6 +1149,19 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
 
 void MainWindow::tbv_selection_changed(const QModelIndex& topLeft, const QModelIndex& bottomRight)
 {
+    bool all_selected = true;
+    bool all_deselected = true;
+    for(qint32 i = 0; i < ui->tbv_Results->rowCount(); i++)
+        if(ui->tbv_Results->item(i, 0)->checkState())
+            all_deselected = false;
+        else
+            all_selected = false;
+
+    if(all_selected || all_deselected)
+        ui->cb_all_select->setChecked(true);
+    else
+        ui->cb_all_select->setChecked(false);
+
     if(_tbv_is_loading)
         return;
 
@@ -1236,34 +1250,6 @@ void MainWindow::calc_adaptiv_mp(MatrixXd signal, TruncationCriterion criterion)
 }
 
 //************************************************************************************************************************************
-
-void MainWindow::on_tbv_Results_cellClicked(int row, int column)
-{
-    /*
-    QTableWidgetItem* firstItem = ui->tbv_Results->item(row, 0);
-    GaborAtom atom = _my_atom_list.at(row);
-
-    if(firstItem->checkState())
-    {
-        firstItem->setCheckState(Qt::Unchecked);
-        for(qint32 channels = 0; channels < atom.phase_list.length(); channels++)
-        {
-            _atom_sum_matrix.col(channels) -= atom.max_scalar_list.at(channels) * atom.create_real(atom.sample_count, atom.scale, atom.translation, atom.modulation, atom.phase_list.at(channels));
-            _residuum_matrix.col(channels) += atom.max_scalar_list.at(channels) * atom.create_real(atom.sample_count, atom.scale, atom.translation, atom.modulation, atom.phase_list.at(channels));
-        }
-    }
-    else
-    {
-        firstItem->setCheckState(Qt::Checked);
-        for(qint32 channels = 0; channels < atom.phase_list.length(); channels++)
-        {
-            _atom_sum_matrix.col(channels) += atom.max_scalar_list.at(channels) * atom.create_real(atom.sample_count, atom.scale, atom.translation, atom.modulation, atom.phase_list.at(channels));
-            _residuum_matrix.col(channels) -= atom.max_scalar_list.at(channels) * atom.create_real(atom.sample_count, atom.scale, atom.translation, atom.modulation, atom.phase_list.at(channels));
-        }
-    }
-    update();
-    */
-}
 
 /*
  * TODO: Calc MP (new)
@@ -1687,14 +1673,50 @@ void MainWindow::on_dsb_to_editingFinished()
 
 void MainWindow::on_dsb_from_valueChanged(double arg1)
 {
-    qint32 sample_count = (_to - arg1) * ui->sb_sample_rate->value();
-    ui->lb_sample_count->setText(QString::number(sample_count));
+        ui->sb_sample_count->setValue(lround((_to - arg1) * ui->sb_sample_rate->value()));
 }
 
 //*****************************************************************************************************************
 
 void MainWindow::on_dsb_to_valueChanged(double arg1)
 {
-    qint32 sample_count = (arg1 - _from) * ui->sb_sample_rate->value();
-    ui->lb_sample_count->setText(QString::number(sample_count));
+
+    qreal var  = (arg1 - _from) * ui->sb_sample_rate->value();
+    if(var < 64)
+        ui->dsb_to->setValue(_to);
+    else
+        ui->sb_sample_count->setValue(var);
+}
+
+//*****************************************************************************************************************
+
+void MainWindow::on_sb_sample_count_editingFinished()
+{
+    _to = ui->dsb_to->value();
+    read_fiff_file(_file_name);
+    update();
+}
+
+//*****************************************************************************************************************
+
+void MainWindow::on_sb_sample_count_valueChanged(int arg1)
+{
+   qreal var = _from  + ((qreal)arg1 / (qreal)ui->sb_sample_rate->value());
+   ui->dsb_to->setValue( var);
+}
+
+//*****************************************************************************************************************
+
+void MainWindow::on_cb_all_select_clicked()
+{
+    bool all_selected = true;
+    for(qint32 i = 0; i < ui->tbv_Results->rowCount(); i++)
+        if(!ui->tbv_Results->item(i, 0)->checkState())
+            all_selected = false;
+
+    for(qint32 i = 0; i < ui->tbv_Results->rowCount(); i++)
+        if(all_selected)
+            ui->tbv_Results->item(i, 0)->setCheckState(Qt::Unchecked);
+        else
+            ui->tbv_Results->item(i, 0)->setCheckState(Qt::Checked);
 }
