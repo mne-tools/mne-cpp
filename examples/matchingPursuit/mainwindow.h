@@ -124,8 +124,7 @@ private slots:
     void on_actionAtomformeleditor_triggered();
     void on_actionErweiterter_W_rterbucheditor_triggered();
     void on_actionNeu_triggered();
-    void on_btt_OpenSignal_clicked();
-    void on_tbv_Results_cellClicked(int row, int column);
+    void on_btt_OpenSignal_clicked();    
     void cb_selection_changed(const QModelIndex&, const QModelIndex&);
     void tbv_selection_changed(const QModelIndex& topLeft, const QModelIndex& bottomRight);
     void recieve_result(qint32 current_iteration, qint32 max_iterations, qreal current_energy, qreal max_energy, gabor_atom_list atom_res_list);
@@ -136,6 +135,9 @@ private slots:
     void on_dsb_to_editingFinished();
     void on_dsb_to_valueChanged(double arg1);
     void on_dsb_from_valueChanged(double arg1);
+    void on_sb_sample_count_editingFinished();
+    void on_sb_sample_count_valueChanged(int arg1);
+    void on_cb_all_select_clicked();
 
 signals:
     void send_input(MatrixXd send_signal, qint32 send_max_iterations, qreal send_epsilon);
