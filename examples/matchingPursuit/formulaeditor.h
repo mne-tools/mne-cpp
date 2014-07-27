@@ -78,7 +78,6 @@ class Formulaeditor : public QWidget
     Q_OBJECT
     
 public:
-
     explicit Formulaeditor(QWidget *parent = 0);
     ~Formulaeditor();
     QString GetFormula();
@@ -88,7 +87,6 @@ public:
     double calculation(QString strFormula, qreal xValue, bool strip  =true);
     
 private slots:
-
     void on_tb_A_textChanged(const QString &arg1);
     void on_tb_B_textChanged(const QString &arg1);
     void on_tb_C_textChanged(const QString &arg1);
@@ -103,18 +101,17 @@ private slots:
     void on_dsb_StartValue_editingFinished();
     void on_dsb_StepWidth_editingFinished();
 
-private:
+private:    
     Ui::Formulaeditor *ui;
     AtomPaintWindow *callAtomPaintWindow;
 
     QString m_strFormula;
     QString m_strFunction;
     QString m_strErrortext;
-
+    QStringList m_strStandardFunction;
     static QString g_strF;
     double m_dFktValue;
-    double m_dFunctionConstant[ANZFUNKTKONST];
-    QStringList m_strStandardFunction;
+    double m_dFunctionConstant[ANZFUNKTKONST];    
 
     qreal sign_factor(qint32 &nPosition, QString& strCharacter);
     double expression(int& nPosition, QString& strCharacter);
@@ -143,9 +140,10 @@ class AtomPaintWindow : public QWidget
 {
     Q_OBJECT
 
-protected:
+protected:    
    void paint_event(QPaintEvent *event);
-public:
+
+public:   
    void paint_signal(QList<qreal> valueList, QSize windowSize);
 
 };
