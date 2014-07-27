@@ -309,9 +309,12 @@
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="lb_sample_count">
-            <property name="text">
-             <string/>
+           <widget class="QSpinBox" name="sb_sample_count">
+            <property name="minimum">
+             <number>64</number>
+            </property>
+            <property name="maximum">
+             <number>4096</number>
             </property>
            </widget>
           </item>
@@ -341,6 +344,13 @@
             </property>
             <property name="value">
              <number>24</number>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="cb_all_select">
+            <property name="text">
+             <string>select / deselect all atoms</string>
             </property>
            </widget>
           </item>
