@@ -1,16 +1,16 @@
-//MATCHING PURSUIT
 //=============================================================================================================
 /**
-* @file     main.cpp
-* @author   Martin Henfling <martin.henfling@tu-ilmenau.de>;
-*           Daniel Knobl <daniel.knobl@tu-ilmenau.de>;
-*           Sebastian Krause <sebastian.krause@tu-ilmenau.de>
+* @file     fixdict.h
+* @author   Martin Henfling <martin.henfling@tu-ilmenau.de>
+*           Daniel Knobl <daniel.knobl@tu-ilmenau.de>
+*           Sebastian Krause <sebastian.krause@tu.ilmenau.de
+*
 * @version  1.0
 * @date     July, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Martin Henfling, Daniel Knobl and Sebastian Krause. All rights reserved.
+* Copyright (C) 2014, Sebastian Krause,Daniel Knobl and Martin Henfling All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -31,72 +31,115 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Main.cpp starts program.
+* @brief    FIXDICTMP class declaration, providing the implemetation of the Matching Pursuit Algorithm
+*           using precalculated atom dictionaries.
+*
 */
+
+#ifndef FIXDICTMP_H
+#define FIXDICTMP_H
 
 //*************************************************************************************************************
 //=============================================================================================================
-// INCLUDES
+// STL INCLUDES
 //=============================================================================================================
 
 #include <iostream>
 #include <vector>
 #include <math.h>
-#include <fiff/fiff.h>
-#include <mne/mne.h>
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Utils INCLUDES
+//=============================================================================================================
+
 #include <utils/mp/atom.h>
-#include <utils/mp/adaptivemp.h>
-#include "mainwindow.h"
-#include <disp/plot.h>
+#include <utils/utils_global.h>
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+#include <Eigen/SparseCore>
+#include <unsupported/Eigen/FFT>
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtGui>
-#include <QApplication>
-#include <QDateTime>
+#include <QThread>
+#include <QFile>
+#include <QStringList>
+#include <QtXml/QtXml>
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE UTILSLIB
+//=============================================================================================================
+
+namespace UTILSLIB
+{
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
-using namespace UTILSLIB;
-using namespace DISPLIB;
+using namespace Eigen;
+using namespace std;
 
 //*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-MainWindow* mainWindow = NULL;
-
-//*************************************************************************************************************
-//=============================================================================================================
-// MAIN
-//=============================================================================================================
-
 /**
-* The function main marks the entry point of the program.
-* By default, main has the storage class extern.
+* DECLARE CLASS FixDictMp
 *
-* @param [in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
-* @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
-* @return the value that was set to exit() (which is 0 if exit() is called via quit()).
+* @brief The fixdictMP class provides functions several calculating functions to run the Matching Pursuit Algorithm
 */
-int main(int argc, char *argv[])
+class UTILSSHARED_EXPORT FixDictMp : public QThread
 {
-    QApplication a(argc, argv);
+    Q_OBJECT
 
-    //set application settings
-    QCoreApplication::setOrganizationName("DKnobl MHenfling");
-    QApplication::setApplicationName("MatchingPursuit Viewer");
+public:
 
-    mainWindow = new MainWindow();
-    mainWindow->show();
+    //typedef QList<GaborAtom> gabor_atom_list;
 
-    return a.exec();
-}
+    /**
+    * fixdictMp_fixdictMP
+    *
+    * ### MP toolbox function ###
+    *
+    * Constructor
+    *
+    * constructs FixDictMp class
+    *
+    */
+    FixDictMp();
+
+    qint32 test();
+
+    QList<GaborAtom> matching_pursuit(QFile &currentDict, VectorXd signalSamples, qint32 iterationsCount);
+
+    QStringList correlation(VectorXd signalSamples, QList<qreal> atomSamples, QString atomName);
+
+    static void create_tree_dict(QString save_path);
+    //=========================================================================================================
+
+    qreal create_molecules(VectorXd compare_atom, qreal phase, qreal modulation, quint32 translation, qint32 sample_count, GaborAtom* gabor_Atom, qreal scale);
+public slots:
+    //void send_result();
+    //void matching_pursuit (MatrixXd signal, qint32 max_iterations, qreal epsilon);
+    //void process();
+    //void recieve_input(MatrixXd signal, qint32 max_iterations, qreal epsilon);
+
+    //=========================================================================================================
+
+signals:
+    //void current_result(qint32 current_iteration, qint32 max_iteration, qreal current_energy, qreal max_energy, gabor_atom_list atom_list);
+    //void finished();
+};//class
+
+}//NAMESPACE
+
+#endif // FIXDICTMP_H
