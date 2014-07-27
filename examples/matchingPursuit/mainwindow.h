@@ -77,7 +77,14 @@ namespace Ui
     class MainWindow;  
 }
 
-enum TruncationCriterion;
+
+enum TruncationCriterion
+{
+    Iterations,
+    SignalEnergy,
+    Both
+};
+
 class GraphWindow;
 class ResiduumWindow;
 class AtomSumWindow;
