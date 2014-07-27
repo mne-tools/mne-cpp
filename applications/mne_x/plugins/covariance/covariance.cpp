@@ -289,5 +289,7 @@ void Covariance::run()
             }
         }
     }
+
+    m_pRtCov->stop();
 }
 
