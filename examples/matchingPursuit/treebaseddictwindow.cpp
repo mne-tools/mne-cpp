@@ -100,9 +100,9 @@ void TreebasedDictWindow::on_btt_calc_treebased_clicked()
     xmlWriter.writeAttribute("sample_count", QString::number(sample_count));
 
 
-    for(qint32 scale = 1; scale <= sample_count; scale+= sample_count / 16)
+    for(qint32 scale = 1; scale <= sample_count; scale++)
     {
-        for(qint32 translation = 0; translation <sample_count; translation+= sample_count / 16)
+        for(qint32 translation = 0; translation <sample_count; translation++)
         {
             modulation = 0;
             while(modulation < floor(sample_count/2))
@@ -111,7 +111,7 @@ void TreebasedDictWindow::on_btt_calc_treebased_clicked()
                 while(phase < 2 * PI)
                 {                    
                     xmlWriter.writeStartElement("Atom");
-                    //xmlWriter.writeAttribute("sample_count", QString::number(sample_count));
+                    xmlWriter.writeAttribute("ID", QString::number(count));
                     xmlWriter.writeAttribute("scale", QString::number(scale));
                     xmlWriter.writeAttribute("translation", QString::number(translation));
                     xmlWriter.writeAttribute("modulation", QString::number(modulation));
@@ -119,9 +119,9 @@ void TreebasedDictWindow::on_btt_calc_treebased_clicked()
                     xmlWriter.writeEndElement();
 
                     count++;
-                    phase += 16 * 2*PI / sample_count;//(4*PI)/360;
+                    phase += 2*PI / sample_count;//(4*PI)/360;
                 }
-                modulation += sample_count / 32;//floor(5/100*sample_count);
+                modulation += 0.5;//(sample_count/2) / 32;//floor(5/100*sample_count);
             }
         }
     }
@@ -130,7 +130,7 @@ void TreebasedDictWindow::on_btt_calc_treebased_clicked()
     xmlWriter.writeEndDocument();
 
     file.close();
-    std::cout << "number of atom built: " << count << "\n";
+    std::cout << "number of atoms built: " << count << "\n";
     FixDictMp::create_tree_dict(save_path);
 
 }
