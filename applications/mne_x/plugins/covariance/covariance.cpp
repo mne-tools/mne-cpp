@@ -73,6 +73,11 @@ Covariance::Covariance()
 //, m_pCovarianceOutput(NULL)
 , m_pCovarianceBuffer(CircularMatrixBuffer<double>::SPtr())
 {
+    m_pActionShowAdjustment = new QAction(QIcon(":/images/covariance.png"), tr("Covariance Adjustments"),this);
+//    m_pActionSetupProject->setShortcut(tr("F12"));
+    m_pActionShowAdjustment->setStatusTip(tr("Covariance Adjustments"));
+    connect(m_pActionShowAdjustment, &QAction::triggered, this, &Covariance::showCovarianceWidget);
+    addPluginAction(m_pActionShowAdjustment);
 }
 
 
@@ -180,6 +185,14 @@ QString Covariance::getName() const
 
 //*************************************************************************************************************
 
+void Covariance::showCovarianceWidget()
+{
+
+}
+
+
+//*************************************************************************************************************
+
 QWidget* Covariance::setupWidget()
 {
     CovarianceSetupWidget* setupWidget = new CovarianceSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
@@ -276,5 +289,7 @@ void Covariance::run()
             }
         }
     }
+
+    m_pRtCov->stop();
 }
 
