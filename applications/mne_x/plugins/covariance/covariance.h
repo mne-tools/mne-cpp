@@ -146,6 +146,8 @@ public:
 
     void appendCovariance(FiffCov::SPtr p_pCovariance);
 
+    void  showCovarianceWidget();
+
 signals:
     //=========================================================================================================
     /**
@@ -179,7 +181,7 @@ private:
     bool m_bIsRunning;      /**< If source lab is running */
     bool m_bProcessData;    /**< If data should be received for processing */
 
-
+    QAction* m_pActionShowAdjustment;
 };
 
 } // NAMESPACE
