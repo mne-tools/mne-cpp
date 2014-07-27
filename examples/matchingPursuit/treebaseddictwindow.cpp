@@ -102,15 +102,15 @@ void TreebasedDictWindow::on_btt_calc_treebased_clicked()
 
     for(qint32 scale = 1; scale <= sample_count; scale+= sample_count / 16)
     {
-        for(qint32 translation = 0; translation < 1/*sample_count*/; translation+= sample_count / 16)
+        for(qint32 translation = 0; translation <sample_count; translation+= sample_count / 16)
         {
             modulation = 0;
-            //while(modulation < floor(sample_count/2))
+            while(modulation < floor(sample_count/2))
             {
                 phase = 0;
-                //while(phase < 2 * PI)
+                while(phase < 2 * PI)
                 {                    
-                    xmlWriter.writeStartElement(QString("Atom_%1").arg(count));
+                    xmlWriter.writeStartElement("Atom");
                     //xmlWriter.writeAttribute("sample_count", QString::number(sample_count));
                     xmlWriter.writeAttribute("scale", QString::number(scale));
                     xmlWriter.writeAttribute("translation", QString::number(translation));
@@ -130,7 +130,7 @@ void TreebasedDictWindow::on_btt_calc_treebased_clicked()
     xmlWriter.writeEndDocument();
 
     file.close();
-    std::cout << count << "\n";
+    std::cout << "number of atom built: " << count << "\n";
     FixDictMp::create_tree_dict(save_path);
 
 }
