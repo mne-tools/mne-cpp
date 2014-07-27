@@ -149,6 +149,22 @@ public:
 
     //=========================================================================================================
     /**
+    * Sets the number of pre stimulus samples
+    *
+    * @param[in] samples    new number of pre stimulus samples
+    */
+    void setPreStim(qint32 samples);
+
+    //=========================================================================================================
+    /**
+    * Sets the number of post stimulus samples
+    *
+    * @param[in] samples    new number of post stimulus samples
+    */
+    void setPostStim(qint32 samples);
+
+    //=========================================================================================================
+    /**
     * Starts the RtAve by starting the producer's thread.
     */
     virtual bool start();
@@ -234,6 +250,10 @@ private:
 
     qint32     m_iPreStimSamples;       /**< Amount of samples averaged before the stimulus. */
     qint32     m_iPostStimSamples;      /**< Amount of samples averaged after the stimulus, including the stimulus sample.*/
+
+    qint32     m_iNewPreStimSamples;    /**< New amount of samples averaged before the stimulus. */
+    qint32     m_iNewPostStimSamples;   /**< New amount of samples averaged after the stimulus, including the stimulus sample.*/
+
 
     FiffInfo::SPtr  m_pFiffInfo;        /**< Holds the fiff measurement information. */
 
