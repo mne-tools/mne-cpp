@@ -64,6 +64,23 @@
 #include <QModelIndex>
 #include <QSize>
 
+#ifndef UINT32
+typedef unsigned int        UINT32, *PUINT32;
+#endif
+#ifndef INT32
+typedef signed int          INT32, *PINT32;
+#endif
+#ifndef MAXUINT32
+#define MAXUINT32   ((UINT32)~((UINT32)0))
+#endif
+#ifndef MAXINT32
+#define MAXINT32    ((INT32)(MAXUINT32 >> 1))
+#endif
+#ifndef MININT32
+#define MININT32    ((INT32)~MAXINT32)
+#endif
+
+
 //=============================================================================================================
 // USED NAMESPACES
 
@@ -77,7 +94,14 @@ namespace Ui
     class MainWindow;  
 }
 
-enum TruncationCriterion;
+
+enum TruncationCriterion
+{
+    Iterations,
+    SignalEnergy,
+    Both
+};
+
 class GraphWindow;
 class ResiduumWindow;
 class AtomSumWindow;
