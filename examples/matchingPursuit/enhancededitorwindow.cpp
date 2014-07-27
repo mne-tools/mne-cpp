@@ -1,3 +1,38 @@
+//=============================================================================================================
+/**
+* @file     enhancededitorwindow.cpp
+* @author   Martin Henfling <martin.henfling@tu-ilmenau.de>;
+*           Daniel Knobl <daniel.knobl@tu-ilmenau.de>;
+*           Sebastian Krause <sebastian.krause@tu-ilmenau.de>
+* @version  1.0
+* @date     July, 2014
+*
+* @section  LICENSE
+*
+* Copyright (C) 2014, Martin Henfling, Daniel Knobl and Sebastian Krause. All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+* the following conditions are met:
+*     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+*       following disclaimer.
+*     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+*       the following disclaimer in the documentation and/or other materials provided with the distribution.
+*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*       to endorse or promote products derived from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+*
+* @brief    Implementation of EnhancedEditorWindow class.
+*/
+
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
@@ -27,24 +62,26 @@
 //=============================================================================================================
 // MAIN
 //=============================================================================================================
-Enhancededitorwindow::Enhancededitorwindow(QWidget *parent) :    QWidget(parent),    ui(new Ui::Enhancededitorwindow)
+
+//constructor
+Enhancededitorwindow::Enhancededitorwindow(QWidget *parent): QWidget(parent), ui(new Ui::Enhancededitorwindow)
 {
     this->setAccessibleName("formel");
     ui->setupUi(this);
     //this->setFixedWidth(627);
     //this->setFixedHeight(160);
     QString contents;
-    QFile formulaFile("Matching-Pursuit-Toolbox/user.fml");
-    //if (formulaFile == ) return; //Aufpassen
-    if (formulaFile.open(QIODevice::ReadOnly | QIODevice::Text))
+    QFile formula_file("Matching-Pursuit-Toolbox/user.fml");
+
+    if (formula_file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
-        while(!formulaFile.atEnd())
+        while(!formula_file.atEnd())
         {
-            contents = formulaFile.readLine(0).constData();
+            contents = formula_file.readLine(0).constData();
             ui->cb_AtomFormula->addItem(QIcon(":/images/icons/formel.png"), contents.trimmed());
         }
     }
-    formulaFile.close();
+    formula_file.close();
     if(ui->cb_AtomFormula->count() != 0)
         ui->cb_AtomFormula->setCurrentIndex(0);
 }
@@ -215,34 +252,34 @@ void Enhancededitorwindow::on_btt_DeleteFormula_clicked()
         msgBox->close();
     }
 
-    QFile formelFile("Matching-Pursuit-Toolbox/user.fml");
-    QFile formelTempFile("Matching-Pursuit-Toolbox/user.temp");
+    QFile formel_file("Matching-Pursuit-Toolbox/user.fml");
+    QFile formel_temp_file("Matching-Pursuit-Toolbox/user.temp");
 
-    if(!formelTempFile.exists())
+    if(!formel_temp_file.exists())
     {
-        if (formelTempFile.open(QIODevice::ReadWrite | QIODevice::Text))
-        formelTempFile.close();
+        if (formel_temp_file.open(QIODevice::ReadWrite | QIODevice::Text))
+        formel_temp_file.close();
     }
 
-    QTextStream stream( &formelTempFile );
-    if (formelFile.open(QIODevice::ReadWrite | QIODevice::Text))
+    QTextStream stream( &formel_temp_file );
+    if (formel_file.open(QIODevice::ReadWrite | QIODevice::Text))
     {
-        if (formelTempFile.open (QIODevice::WriteOnly| QIODevice::Append))
+        if (formel_temp_file.open (QIODevice::WriteOnly| QIODevice::Append))
         {
-            while(!formelFile.atEnd())
+            while(!formel_file.atEnd())
             {
-                contents = formelFile.readLine(0).constData();
+                contents = formel_file.readLine(0).constData();
                 if(!QString::compare(ui->cb_AtomFormula->currentText() + "\n", contents) == 0)
                     stream << contents;
             }
         }
     }
 
-    formelFile.close();
-    formelTempFile.close();
+    formel_file.close();
+    formel_temp_file.close();
 
-    formelFile.remove();
-    formelTempFile.rename("Matching-Pursuit-Toolbox/user.fml");
+    formel_file.remove();
+    formel_temp_file.rename("Matching-Pursuit-Toolbox/user.fml");
 
     ui->cb_AtomFormula->removeItem(ui->cb_AtomFormula->currentIndex());
 }
