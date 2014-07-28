@@ -40,6 +40,7 @@
 
 #include "covariance.h"
 #include "FormFiles/covariancesetupwidget.h"
+#include "FormFiles/covariancesettingswidget.h"
 
 
 //*************************************************************************************************************
@@ -70,14 +71,16 @@ Covariance::Covariance()
 : m_bIsRunning(false)
 , m_bProcessData(false)
 , m_pCovarianceInput(NULL)
-//, m_pCovarianceOutput(NULL)
+, m_pCovarianceOutput(NULL)
 , m_pCovarianceBuffer(CircularMatrixBuffer<double>::SPtr())
+, m_iEstimationSamples(5000)
 {
     m_pActionShowAdjustment = new QAction(QIcon(":/images/covariance.png"), tr("Covariance Adjustments"),this);
 //    m_pActionSetupProject->setShortcut(tr("F12"));
     m_pActionShowAdjustment->setStatusTip(tr("Covariance Adjustments"));
     connect(m_pActionShowAdjustment, &QAction::triggered, this, &Covariance::showCovarianceWidget);
     addPluginAction(m_pActionShowAdjustment);
+    m_pActionShowAdjustment->setVisible(false);
 }
 
 
@@ -115,22 +118,9 @@ void Covariance::init()
     m_pCovarianceOutput = PluginOutputData<RealTimeCov>::create(this, "CovarianceOut", "Covariance output data");
     m_outputConnectors.append(m_pCovarianceOutput);
 
-    //init channels when fiff info is available
-    connect(this, &Covariance::fiffInfoAvailable, this, &Covariance::initConnector);
-
     //Delete Buffer - will be initailzed with first incoming data
     if(!m_pCovarianceBuffer.isNull())
         m_pCovarianceBuffer = CircularMatrixBuffer<double>::SPtr();
-}
-
-
-//*************************************************************************************************************
-
-void Covariance::initConnector()
-{
-    qDebug() << "void Covariance::initConnector()";
-//    if(m_pFiffInfo)
-//        m_pRTMSAOutput->data()->initFromFiffInfo(m_pFiffInfo);
 }
 
 
@@ -187,7 +177,8 @@ QString Covariance::getName() const
 
 void Covariance::showCovarianceWidget()
 {
-
+    m_pCovarianceWidget = CovarianceSettingsWidget::SPtr(new CovarianceSettingsWidget(this));
+    m_pCovarianceWidget->show();
 }
 
 
@@ -245,6 +236,16 @@ void Covariance::appendCovariance(FiffCov::SPtr p_pCovariance)
 
 //*************************************************************************************************************
 
+void Covariance::changeSamples(qint32 samples)
+{
+    m_iEstimationSamples = samples;
+    if(m_pRtCov)
+        m_pRtCov->setSamples(m_iEstimationSamples);
+}
+
+
+//*************************************************************************************************************
+
 void Covariance::run()
 {
     //
@@ -253,10 +254,12 @@ void Covariance::run()
     while(!m_pFiffInfo)
         msleep(10);// Wait for fiff Info
 
+    m_pActionShowAdjustment->setVisible(true);
+
     //
     // Init Real-Time Covariance estimator
     //
-    m_pRtCov = RtCov::SPtr(new RtCov(5000, m_pFiffInfo));
+    m_pRtCov = RtCov::SPtr(new RtCov(m_iEstimationSamples, m_pFiffInfo));
     connect(m_pRtCov.data(), &RtCov::covCalculated, this, &Covariance::appendCovariance);
 
     //
@@ -289,6 +292,8 @@ void Covariance::run()
             }
         }
     }
+
+    m_pActionShowAdjustment->setVisible(false);
 
     m_pRtCov->stop();
 }
