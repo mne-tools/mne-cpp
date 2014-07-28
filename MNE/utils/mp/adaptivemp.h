@@ -143,6 +143,7 @@ public:
     MatrixXd signal;
     qint32 max_iterations;
     qreal epsilon;
+    bool fix_phase;
 
     //=========================================================================================================
     /*
@@ -202,7 +203,7 @@ public slots:
     void send_result();
     QList<GaborAtom> matching_pursuit (MatrixXd signal, qint32 max_iterations, qreal epsilon, bool fix_phase);
     void process();
-    void recieve_input(MatrixXd signal, qint32 max_iterations, qreal epsilon);
+    void recieve_input(MatrixXd signal, qint32 max_iterations, qreal epsilon, bool fix_phase);
 
     //=========================================================================================================
 

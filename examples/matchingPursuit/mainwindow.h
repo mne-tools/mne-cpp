@@ -140,7 +140,7 @@ private slots:
     void on_cb_all_select_clicked();
 
 signals:
-    void send_input(MatrixXd send_signal, qint32 send_max_iterations, qreal send_epsilon);
+    void send_input(MatrixXd send_signal, qint32 send_max_iterations, qreal send_epsilon, bool fix_phase);
 
 private:
     Ui::MainWindow *ui;    

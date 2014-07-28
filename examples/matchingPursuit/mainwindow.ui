@@ -217,6 +217,13 @@
                </property>
               </widget>
              </item>
+             <item row="9" column="2">
+              <widget class="QCheckBox" name="chb_fix_phase">
+               <property name="text">
+                <string>fix phase</string>
+               </property>
+              </widget>
+             </item>
             </layout>
            </item>
           </layout>
