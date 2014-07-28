@@ -552,9 +552,9 @@ void AdaptiveMp::process()
 
 //*************************************************************************************************************
 
-void AdaptiveMp::recieve_input(Eigen::MatrixXd signal, qint32 max_iterations, qreal epsilon)
+void AdaptiveMp::recieve_input(Eigen::MatrixXd signal, qint32 max_iterations, qreal epsilon, bool fix_phase)
 {
-  matching_pursuit(signal, max_iterations, epsilon);
+  matching_pursuit(signal, max_iterations, epsilon, fix_phase);
 }
 
 //*************************************************************************************************************

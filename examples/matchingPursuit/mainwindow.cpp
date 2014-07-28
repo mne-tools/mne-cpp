@@ -1303,7 +1303,7 @@ void MainWindow::calc_adaptiv_mp(MatrixXd signal, TruncationCriterion criterion)
     qRegisterMetaType<Eigen::MatrixXd>("MatrixXd");
     qRegisterMetaType<gabor_atom_list>("gabor_atom_list");
 
-    connect(this, SIGNAL(send_input(MatrixXd, qint32, qreal)), adaptive_Mp, SLOT(recieve_input(MatrixXd, qint32, qreal)));
+    connect(this, SIGNAL(send_input(MatrixXd, qint32, qreal, bool)), adaptive_Mp, SLOT(recieve_input(MatrixXd, qint32, qreal, bool)));
     connect(adaptive_Mp, SIGNAL(current_result(qint32, qint32, qreal, qreal, gabor_atom_list)),
                  this, SLOT(recieve_result(qint32, qint32, qreal, qreal, gabor_atom_list)));
     connect(adaptive_Mp_Thread, SIGNAL(started()), adaptive_Mp, SLOT(process()));
@@ -1316,7 +1316,7 @@ void MainWindow::calc_adaptiv_mp(MatrixXd signal, TruncationCriterion criterion)
     {
         case Iterations:
         {
-            emit send_input(signal, ui->sb_Iterations->value(), qreal(MININT32));
+            emit send_input(signal, ui->sb_Iterations->value(), qreal(MININT32), ui->chb_fix_phase->isChecked());
             adaptive_Mp_Thread->start();
         }
         break;
@@ -1324,7 +1324,7 @@ void MainWindow::calc_adaptiv_mp(MatrixXd signal, TruncationCriterion criterion)
         case SignalEnergy:
         {
             //must be debugged, thread is not ending like i want it to
-            emit send_input(signal, MAXINT32, res_energy);
+            emit send_input(signal, MAXINT32, res_energy, ui->chb_fix_phase->isChecked());
             adaptive_Mp_Thread->start();        
         }
         break;
@@ -1332,7 +1332,7 @@ void MainWindow::calc_adaptiv_mp(MatrixXd signal, TruncationCriterion criterion)
         case Both:
         {
             //must be debugged, thread is not ending like i want it to
-            emit send_input(signal, ui->sb_Iterations->value(), res_energy);
+            emit send_input(signal, ui->sb_Iterations->value(), res_energy, ui->chb_fix_phase->isChecked());
             adaptive_Mp_Thread->start();
         }
         break;
