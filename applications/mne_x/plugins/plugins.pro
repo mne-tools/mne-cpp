@@ -84,6 +84,7 @@ SUBDIRS += \
     dummytoolbox \
     triggercontrol \
     sourcelab \
+    mne \
     raplab \
     averaging \
     covariance \
