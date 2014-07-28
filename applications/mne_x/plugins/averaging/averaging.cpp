@@ -75,8 +75,8 @@ Averaging::Averaging()
 , m_pAveragingBuffer(CircularMatrixBuffer<double>::SPtr())
 , m_bIsRunning(false)
 , m_bProcessData(false)
-, m_iPreStimSamples(750)
-, m_iPostStimSamples(400)//750)
+, m_iPreStimSamples(400)
+, m_iPostStimSamples(750)
 , m_iNumAverages(10)
 , m_iStimChan(0)
 , m_pAveragingWidget(AveragingSettingsWidget::SPtr())
@@ -249,7 +249,9 @@ void Averaging::changeStimChannel(qint32 index)
 void Averaging::changePreStim(qint32 samples)
 {
     m_iPreStimSamples = samples;
-    emit sampleNumChanged();
+    if(m_pRtAve)
+        m_pRtAve->setPreStim(m_iPreStimSamples);
+
 }
 
 
@@ -258,7 +260,8 @@ void Averaging::changePreStim(qint32 samples)
 void Averaging::changePostStim(qint32 samples)
 {
     m_iPostStimSamples = samples;
-    emit sampleNumChanged();
+    if(m_pRtAve)
+        m_pRtAve->setPostStim(m_iPostStimSamples);
 }
 
 
