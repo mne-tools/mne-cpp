@@ -127,6 +127,11 @@ public:
     //=========================================================================================================
 
     qreal create_molecules(VectorXd compare_atom, qreal phase, qreal modulation, quint32 translation, qint32 sample_count, GaborAtom* gabor_Atom, qreal scale);
+
+    //=========================================================================================================
+
+    static void build_molecule_xml_file(qint32 level_counter);
+    static void recursive_node_built(QDomElement current_element, QFile &temp_file);
 public slots:
     //void send_result();
     //void matching_pursuit (MatrixXd signal, qint32 max_iterations, qreal epsilon);

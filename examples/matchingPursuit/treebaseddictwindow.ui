@@ -86,7 +86,7 @@
         </size>
        </property>
        <property name="minimum">
-        <number>8</number>
+        <number>2</number>
        </property>
        <property name="maximum">
         <number>1024</number>
@@ -96,14 +96,14 @@
      <item row="1" column="2">
       <widget class="QPushButton" name="btt_calc_treebased">
        <property name="text">
-        <string>calc  gabor dict</string>
+        <string>don´t touch if u don´t like bugs...</string>
        </property>
       </widget>
      </item>
      <item row="2" column="2">
       <widget class="QPushButton" name="btt_call_tree_creator">
        <property name="text">
-        <string>create XML tree</string>
+        <string>no way</string>
        </property>
       </widget>
      </item>
