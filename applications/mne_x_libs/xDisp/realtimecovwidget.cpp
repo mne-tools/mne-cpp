@@ -1,16 +1,14 @@
-//MATCHING PURSUIT
 //=============================================================================================================
 /**
-* @file     main.cpp
-* @author   Martin Henfling <martin.henfling@tu-ilmenau.de>;
-*           Daniel Knobl <daniel.knobl@tu-ilmenau.de>;
-*           Sebastian Krause <sebastian.krause@tu-ilmenau.de>
+* @file     realtimecovwidget.cpp
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     July, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Martin Henfling, Daniel Knobl and Sebastian Krause. All rights reserved.
+* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -31,7 +29,8 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Main.cpp starts program.
+* @brief    Implementation of the RealTimeCovWidget Class.
+*
 */
 
 //*************************************************************************************************************
@@ -39,64 +38,111 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <iostream>
-#include <vector>
-#include <math.h>
-#include <fiff/fiff.h>
-#include <mne/mne.h>
-#include <utils/mp/atom.h>
-#include <utils/mp/adaptivemp.h>
-#include "mainwindow.h"
-#include <disp/plot.h>
+#include "realtimecovwidget.h"
+
+#include <xMeas/realtimecov.h>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// STL INCLUDES
+//=============================================================================================================
+
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtGui>
-#include <QApplication>
-#include <QDateTime>
+#include <QVBoxLayout>
+#include <QLabel>
+#include <QDebug>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
-using namespace UTILSLIB;
-using namespace DISPLIB;
+using namespace XDISPLIB;
+using namespace XMEASLIB;
 
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
 
-MainWindow* mainWindow = NULL;
-
-//*************************************************************************************************************
 //=============================================================================================================
-// MAIN
-//=============================================================================================================
-
 /**
-* The function main marks the entry point of the program.
-* By default, main has the storage class extern.
-*
-* @param [in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
-* @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
-* @return the value that was set to exit() (which is 0 if exit() is called via quit()).
+* Tool enumeration.
 */
-int main(int argc, char *argv[])
+enum Tool
 {
-    QApplication a(argc, argv);
+    Freeze     = 0,     /**< Freezing tool. */
+    Annotation = 1      /**< Annotation tool. */
+};
 
-    //set application settings
-    QCoreApplication::setOrganizationName("DKnobl MHenfling");
-    QApplication::setApplicationName("MatchingPursuit Viewer");
 
-    mainWindow = new MainWindow();
-    mainWindow->show();
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
 
-    return a.exec();
+RealTimeCovWidget::RealTimeCovWidget(QSharedPointer<RealTimeCov> pRTC, QSharedPointer<QTime> &pTime, QWidget* parent)
+: NewMeasurementWidget(parent)
+, m_pRTC(pRTC)
+, m_bInitialized(false)
+{
+    Q_UNUSED(pTime)
+
+    //set vertical layout
+    QVBoxLayout *rtcLayout = new QVBoxLayout(this);
+
+    QLabel *testLabel = new QLabel;
+    testLabel->setText("Real Time Cov");
+
+    rtcLayout->addWidget(testLabel);
+
+    //set layouts
+    this->setLayout(rtcLayout);
+
+    getData();
+}
+
+
+//*************************************************************************************************************
+
+RealTimeCovWidget::~RealTimeCovWidget()
+{
+
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeCovWidget::update(XMEASLIB::NewMeasurement::SPtr)
+{
+    getData();
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeCovWidget::getData()
+{
+    if(!m_bInitialized)
+        if(m_pRTC->isInitialized())
+            init();
+}
+
+//*************************************************************************************************************
+
+void RealTimeCovWidget::init()
+{
+    m_bInitialized = true;
 }

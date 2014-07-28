@@ -168,12 +168,6 @@ signals:
     */
     void fiffInfoAvailable();
 
-    //=========================================================================================================
-    /**
-    * Emitted when either pre or post stimulus number changed
-    */
-    void sampleNumChanged();
-
 protected:
     virtual void run();
 
@@ -186,7 +180,6 @@ private:
 
 
     QMutex mutex;
-
 
     PluginInputData<NewRealTimeMultiSampleArray>::SPtr   m_pAveragingInput;     /**< The RealTimeSampleArray of the Averaging input.*/
     PluginOutputData<RealTimeEvoked>::SPtr  m_pAveragingOutput;                 /**< The RealTimeEvoked of the Averaging output.*/

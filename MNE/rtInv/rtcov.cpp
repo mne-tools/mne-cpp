@@ -102,6 +102,14 @@ void RtCov::append(const MatrixXd &p_DataSegment)
 
 //*************************************************************************************************************
 
+void RtCov::setSamples(qint32 samples)
+{
+    m_iNewMaxSamples = samples;
+}
+
+
+//*************************************************************************************************************
+
 bool RtCov::start()
 {
     //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
@@ -169,8 +177,8 @@ void RtCov::run()
                 //ToDo do picks
                 cov->names = m_pFiffInfo->ch_names;
                 cov->projs = m_pFiffInfo->projs;
-                cov->bads  = m_pFiffInfo->bads;
-                cov->nfree  = n_samples;
+                cov->bads = m_pFiffInfo->bads;
+                cov->nfree = n_samples;
 
                 // regularize noise covariance
                 *cov.data() = cov->regularize(*m_pFiffInfo, 0.05, 0.05, 0.1, true);
