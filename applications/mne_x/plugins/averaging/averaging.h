@@ -168,12 +168,6 @@ signals:
     */
     void fiffInfoAvailable();
 
-    //=========================================================================================================
-    /**
-    * Emitted when either pre or post stimulus number changed
-    */
-    void sampleNumChanged();
-
 protected:
     virtual void run();
 
