@@ -408,6 +408,12 @@ QStringList FixDictMp::correlation(VectorXd signalSamples, QList<qreal> atomSamp
 }
 
 //******************************************************************************************************************
+//******************************************************************************************************************
+//******************************************************************************************************************
+//******************************************************************************************************************
+//******************************************************************************************************************
+//******************************************************************************************************************
+//******************************************************************************************************************
 
 void FixDictMp::create_tree_dict(QString save_path)
 {
@@ -499,7 +505,7 @@ void FixDictMp::create_tree_dict(QString save_path)
         //calc molecule params
         for(qint32 j = 0; j < similar_atoms.length(); j++)
         {
-            current_element = node_list.at(similar_atoms.at(j)).toElement();
+            current_element.nextSibling() = node_list.at(similar_atoms.at(j)).toElement();
             if(!current_element.isNull())
             {
                 molec_scale += (current_element.attribute("scale", current_element.text())).toDouble();
@@ -542,6 +548,7 @@ void FixDictMp::create_tree_dict(QString save_path)
             //    current_element = node_list.at(similar_atoms.at(k)).toElement();
             //    QDomNode to_remove = current_element.parentNode();//node_list.at(similar_atoms.at(k)).toElement().parentNode();
             //    to_remove.removeChild(current_element);
+
             //}
         }
         write_molecules_to_xml.writeEndElement();//molecule

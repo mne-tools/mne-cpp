@@ -105,7 +105,7 @@ class UTILSSHARED_EXPORT AdaptiveMp : public QThread
 {
     Q_OBJECT
 
-public:    
+public:
 
     /**
     * adaptiveMP_adaptiveMP
@@ -200,7 +200,7 @@ public:
 public slots:
 
     void send_result();
-    QList<GaborAtom> matching_pursuit (MatrixXd signal, qint32 max_iterations, qreal epsilon);
+    QList<GaborAtom> matching_pursuit (MatrixXd signal, qint32 max_iterations, qreal epsilon, bool fix_phase);
     void process();
     void recieve_input(MatrixXd signal, qint32 max_iterations, qreal epsilon);
 

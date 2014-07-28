@@ -66,7 +66,7 @@ AdaptiveMp::AdaptiveMp()
 //*************************************************************************************************************
 
 //MP Algorithm of M. Gratkowski
-QList<GaborAtom> AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal epsilon)
+QList<GaborAtom> AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal epsilon, bool fix_phase = false)
 {
     max_it = max_iterations;
     Eigen::FFT<double> fft;
@@ -426,6 +426,7 @@ QList<GaborAtom> AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterat
         //calc multichannel parameters phase and max_scalar_product
         for(qint32 chn = 0; chn < channel_count; chn++)
         {
+
             VectorXd channel_params = calculate_atom(sample_count, gabor_Atom->scale, gabor_Atom->translation, gabor_Atom->modulation, chn, residuum, RETURNPARAMETERS);
             gabor_Atom->phase_list.append(channel_params[3]);
             gabor_Atom->max_scalar_list.append(channel_params[4]);
@@ -441,6 +442,24 @@ QList<GaborAtom> AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterat
 
             gabor_Atom->residuum = residuum;
         }
+
+        //fix_phase = true;
+        if(fix_phase == true)
+        {
+            gabor_Atom->phase = 0;
+
+            for(qint32 chn = 0; chn < channel_count; chn++)
+            {
+                gabor_Atom->phase +=gabor_Atom->phase_list.at(chn);
+            }
+            gabor_Atom->phase /= channel_count;
+
+            for(qint32 chn = 0; chn < channel_count; chn++)
+            {
+                gabor_Atom->phase_list.replace(chn, gabor_Atom->phase);
+            }
+        }
+
 
         residuum_energy -= gabor_Atom->energy;
         current_energy += gabor_Atom->energy;
