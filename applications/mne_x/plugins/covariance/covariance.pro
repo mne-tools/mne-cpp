@@ -77,13 +77,15 @@ DESTDIR = $${MNE_BINARY_DIR}/mne_x_plugins
 SOURCES += \
     covariance.cpp \
     FormFiles/covariancesetupwidget.cpp \
-    FormFiles/covarianceaboutwidget.cpp
+    FormFiles/covarianceaboutwidget.cpp \
+    FormFiles/covariancesettingswidget.cpp
 
 HEADERS += \
     covariance_global.h \
     covariance.h \
     FormFiles/covariancesetupwidget.h \
-    FormFiles/covarianceaboutwidget.h
+    FormFiles/covarianceaboutwidget.h \
+    FormFiles/covariancesettingswidget.h
 
 FORMS += \
     FormFiles/covariancesetup.ui \

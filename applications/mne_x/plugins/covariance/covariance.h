@@ -95,6 +95,8 @@ using namespace FIFFLIB;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+class CovarianceSettingsWidget;
+
 
 //=============================================================================================================
 /**
@@ -108,6 +110,8 @@ class COVARIANCESHARED_EXPORT Covariance : public IAlgorithm
     Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "covariance.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(MNEX::IAlgorithm)
+
+    friend class CovarianceSettingsWidget;
 
 public:
     //=========================================================================================================
@@ -146,7 +150,9 @@ public:
 
     void appendCovariance(FiffCov::SPtr p_pCovariance);
 
-    void  showCovarianceWidget();
+    void showCovarianceWidget();
+
+    void changeSamples(qint32 samples);
 
 signals:
     //=========================================================================================================
@@ -159,12 +165,6 @@ protected:
     virtual void run();
 
 private:
-    //=========================================================================================================
-    /**
-    * Initialises the output connector.
-    */
-    void initConnector();
-
     QMutex mutex;
 
     PluginInputData<NewRealTimeMultiSampleArray>::SPtr  m_pCovarianceInput;     /**< The NewRealTimeMultiSampleArray of the Covariance input.*/
@@ -174,12 +174,16 @@ private:
 
     CircularMatrixBuffer<double>::SPtr   m_pCovarianceBuffer;   /**< Holds incoming data.*/
 
-    RtCov::SPtr m_pRtCov;   /**< Real-time covariance. */
+    RtCov::SPtr m_pRtCov;                       /**< Real-time covariance. */
 
-    QVector<FiffCov::SPtr>   m_qVecCovData;  /**< Evoked data set */
+    QVector<FiffCov::SPtr>   m_qVecCovData;     /**< Evoked data set */
 
-    bool m_bIsRunning;      /**< If source lab is running */
-    bool m_bProcessData;    /**< If data should be received for processing */
+    bool m_bIsRunning;                          /**< If source lab is running */
+    bool m_bProcessData;                        /**< If data should be received for processing */
+
+    qint32 m_iEstimationSamples;
+
+    QSharedPointer<CovarianceSettingsWidget> m_pCovarianceWidget;
 
     QAction* m_pActionShowAdjustment;
 };

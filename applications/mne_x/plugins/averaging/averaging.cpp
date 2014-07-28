@@ -87,6 +87,8 @@ Averaging::Averaging()
     m_pActionShowAdjustment->setStatusTip(tr("Averaging Adjustments"));
     connect(m_pActionShowAdjustment, &QAction::triggered, this, &Averaging::showAveragingWidget);
     addPluginAction(m_pActionShowAdjustment);
+
+    m_pActionShowAdjustment->setVisible(false);
 }
 
 
@@ -344,6 +346,8 @@ void Averaging::run()
     while(!m_pFiffInfo)
         msleep(10);// Wait for fiff Info
 
+    m_pActionShowAdjustment->setVisible(true);
+
     for(qint32 i = 0; i < m_pFiffInfo->chs.size(); ++i)
     {
         if(m_pFiffInfo->chs[i].kind == FIFFV_STIM_CH)
@@ -386,6 +390,9 @@ void Averaging::run()
 
         }
     }
+
+
+    m_pActionShowAdjustment->setVisible(false);
 
     m_pRtAve->stop();
 }
