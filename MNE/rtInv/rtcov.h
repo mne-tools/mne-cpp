@@ -137,6 +137,22 @@ public:
 
     //=========================================================================================================
     /**
+    * Returns true if is running, otherwise false.
+    *
+    * @return true if is running, false otherwise
+    */
+    inline bool isRunning();
+
+    //=========================================================================================================
+    /**
+    * Set number of estimation samples
+    *
+    * @param[in] samples    estimation samples to set
+    */
+    void setSamples(qint32 samples);
+
+    //=========================================================================================================
+    /**
     * Starts the RtCov by starting the producer's thread.
     *
     * @return true if succeeded, false otherwise
@@ -150,14 +166,6 @@ public:
     * @return true if succeeded, false otherwise
     */
     virtual bool stop();
-
-    //=========================================================================================================
-    /**
-    * Returns true if is running, otherwise false.
-    *
-    * @return true if is running, false otherwise
-    */
-    inline bool isRunning();
 
 signals:
     //=========================================================================================================
@@ -181,6 +189,8 @@ private:
     QMutex      mutex;                  /**< Provides access serialization between threads*/
 
     quint32      m_iMaxSamples;         /**< Maximal amount of samples received, before covariance is estimated.*/
+
+    quint32      m_iNewMaxSamples;      /**< New maximal amount of samples received, before covariance is estimated.*/
 
     FiffInfo::SPtr  m_pFiffInfo;        /**< Holds the fiff measurement information. */
 
