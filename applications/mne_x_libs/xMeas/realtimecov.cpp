@@ -1,16 +1,14 @@
-//MATCHING PURSUIT
 //=============================================================================================================
 /**
-* @file     main.cpp
-* @author   Martin Henfling <martin.henfling@tu-ilmenau.de>;
-*           Daniel Knobl <daniel.knobl@tu-ilmenau.de>;
-*           Sebastian Krause <sebastian.krause@tu-ilmenau.de>
+* @file     realtimecov.cpp
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     July, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Martin Henfling, Daniel Knobl and Sebastian Krause. All rights reserved.
+* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -31,7 +29,8 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Main.cpp starts program.
+* @brief    Contains the implementation of the RealTimeCov class.
+*
 */
 
 //*************************************************************************************************************
@@ -39,64 +38,65 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <iostream>
-#include <vector>
-#include <math.h>
-#include <fiff/fiff.h>
-#include <mne/mne.h>
-#include <utils/mp/atom.h>
-#include <utils/mp/adaptivemp.h>
-#include "mainwindow.h"
-#include <disp/plot.h>
+#include "realtimecov.h"
+
+#include <time.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtGui>
-#include <QApplication>
-#include <QDateTime>
+#include <QDebug>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
-using namespace UTILSLIB;
-using namespace DISPLIB;
+using namespace XMEASLIB;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MainWindow* mainWindow = NULL;
-
-//*************************************************************************************************************
-//=============================================================================================================
-// MAIN
-//=============================================================================================================
-
-/**
-* The function main marks the entry point of the program.
-* By default, main has the storage class extern.
-*
-* @param [in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
-* @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
-* @return the value that was set to exit() (which is 0 if exit() is called via quit()).
-*/
-int main(int argc, char *argv[])
+RealTimeCov::RealTimeCov(QObject *parent)
+: NewMeasurement(QMetaType::type("RealTimeCov::SPtr"), parent)
+, m_pFiffCov(new FiffCov)
+, m_bInitialized(false)
 {
-    QApplication a(argc, argv);
 
-    //set application settings
-    QCoreApplication::setOrganizationName("DKnobl MHenfling");
-    QApplication::setApplicationName("MatchingPursuit Viewer");
-
-    mainWindow = new MainWindow();
-    mainWindow->show();
-
-    return a.exec();
 }
+
+
+//*************************************************************************************************************
+
+RealTimeCov::~RealTimeCov()
+{
+
+}
+
+
+//*************************************************************************************************************
+
+FiffCov::SPtr& RealTimeCov::getValue()
+{
+    return m_pFiffCov;
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeCov::setValue(FiffCov& v)
+{
+    //Store
+    *m_pFiffCov = v;
+    m_bInitialized = true;
+
+    emit notify();
+}
+

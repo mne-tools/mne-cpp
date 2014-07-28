@@ -75,8 +75,8 @@ Averaging::Averaging()
 , m_pAveragingBuffer(CircularMatrixBuffer<double>::SPtr())
 , m_bIsRunning(false)
 , m_bProcessData(false)
-, m_iPreStimSamples(750)
-, m_iPostStimSamples(400)//750)
+, m_iPreStimSamples(400)
+, m_iPostStimSamples(750)
 , m_iNumAverages(10)
 , m_iStimChan(0)
 , m_pAveragingWidget(AveragingSettingsWidget::SPtr())
@@ -87,6 +87,8 @@ Averaging::Averaging()
     m_pActionShowAdjustment->setStatusTip(tr("Averaging Adjustments"));
     connect(m_pActionShowAdjustment, &QAction::triggered, this, &Averaging::showAveragingWidget);
     addPluginAction(m_pActionShowAdjustment);
+
+    m_pActionShowAdjustment->setVisible(false);
 }
 
 
@@ -122,7 +124,6 @@ void Averaging::init()
 
     // Output
     m_pAveragingOutput = PluginOutputData<RealTimeEvoked>::create(this, "AveragingOut", "Averaging Output Data");
-    m_pAveragingOutput->data()->setPreStimSamples(m_iPreStimSamples);
     m_outputConnectors.append(m_pAveragingOutput);
 
     //init channels when fiff info is available
@@ -150,8 +151,6 @@ void Averaging::initConnector()
 {
     if(m_pFiffInfo)
     {
-        m_pAveragingOutput->data()->initFromFiffInfo(m_pFiffInfo);
-
         m_qListModalities.clear();
         bool hasMag = false;
         bool hasGrad = false;
@@ -252,8 +251,9 @@ void Averaging::changeStimChannel(qint32 index)
 void Averaging::changePreStim(qint32 samples)
 {
     m_iPreStimSamples = samples;
-    m_pAveragingOutput->data()->setPreStimSamples(m_iPreStimSamples);
-    emit sampleNumChanged();
+    if(m_pRtAve)
+        m_pRtAve->setPreStim(m_iPreStimSamples);
+
 }
 
 
@@ -262,7 +262,8 @@ void Averaging::changePreStim(qint32 samples)
 void Averaging::changePostStim(qint32 samples)
 {
     m_iPostStimSamples = samples;
-    emit sampleNumChanged();
+    if(m_pRtAve)
+        m_pRtAve->setPostStim(m_iPostStimSamples);
 }
 
 
@@ -345,6 +346,8 @@ void Averaging::run()
     while(!m_pFiffInfo)
         msleep(10);// Wait for fiff Info
 
+    m_pActionShowAdjustment->setVisible(true);
+
     for(qint32 i = 0; i < m_pFiffInfo->chs.size(); ++i)
     {
         if(m_pFiffInfo->chs[i].kind == FIFFV_STIM_CH)
@@ -378,7 +381,7 @@ void Averaging::run()
             {
                 FiffEvoked t_fiffEvoked = *m_qVecEvokedData[0].data();
 
-                m_pAveragingOutput->data()->setValue(t_fiffEvoked.data);
+                m_pAveragingOutput->data()->setValue(t_fiffEvoked);
 
                 m_qVecEvokedData.pop_front();
 
@@ -387,5 +390,10 @@ void Averaging::run()
 
         }
     }
+
+
+    m_pActionShowAdjustment->setVisible(false);
+
+    m_pRtAve->stop();
 }
 

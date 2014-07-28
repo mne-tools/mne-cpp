@@ -1,7 +1,6 @@
-//MATCHING PURSUIT
 //=============================================================================================================
 /**
-* @file     main.cpp
+* @file     editorwindow.cpp
 * @author   Martin Henfling <martin.henfling@tu-ilmenau.de>;
 *           Daniel Knobl <daniel.knobl@tu-ilmenau.de>;
 *           Sebastian Krause <sebastian.krause@tu-ilmenau.de>
@@ -31,7 +30,8 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Main.cpp starts program.
+* @brief    Implementation of the EditorWindow class.
+*
 */
 
 //*************************************************************************************************************
@@ -39,15 +39,14 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <iostream>
-#include <vector>
-#include <math.h>
-#include <fiff/fiff.h>
-#include <mne/mne.h>
 #include <utils/mp/atom.h>
-#include <utils/mp/adaptivemp.h>
+#include <utils/mp/fixdictmp.h>
+#include "treebaseddictwindow.h"
+#include "ui_treebaseddictwindow.h"
+
 #include "mainwindow.h"
-#include <disp/plot.h>
+#include "editorwindow.h"
+#include "stdio.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -56,47 +55,94 @@
 
 #include <QtGui>
 #include <QApplication>
-#include <QDateTime>
+#include <QModelIndex>
+#include <QMessageBox>
+#include <QtXml/QtXml>
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNELIB;
 using namespace UTILSLIB;
-using namespace DISPLIB;
 
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-MainWindow* mainWindow = NULL;
-
-//*************************************************************************************************************
-//=============================================================================================================
-// MAIN
-//=============================================================================================================
-
-/**
-* The function main marks the entry point of the program.
-* By default, main has the storage class extern.
-*
-* @param [in] argc (argument count) is an integer that indicates how many arguments were entered on the command line when the program was started.
-* @param [in] argv (argument vector) is an array of pointers to arrays of character objects. The array objects are null-terminated strings, representing the arguments that were entered on the command line when the program was started.
-* @return the value that was set to exit() (which is 0 if exit() is called via quit()).
-*/
-int main(int argc, char *argv[])
+TreebasedDictWindow::TreebasedDictWindow(QWidget *parent) :
+    QWidget(parent),
+    ui(new Ui::TreebasedDictWindow)
 {
-    QApplication a(argc, argv);
+    ui->setupUi(this);
+}
 
-    //set application settings
-    QCoreApplication::setOrganizationName("DKnobl MHenfling");
-    QApplication::setApplicationName("MatchingPursuit Viewer");
+TreebasedDictWindow::~TreebasedDictWindow()
+{
+    delete ui;
+}
 
-    mainWindow = new MainWindow();
-    mainWindow->show();
+void TreebasedDictWindow::on_btt_calc_treebased_clicked()
+{
+    qint32 sample_count = ui->spb_AtomLength->value();
 
-    return a.exec();
+    qint32 count = 0;
+    qreal phase = 0;
+    qreal modulation = 0;
+
+    _treebased_dict_name = ui->tb_treebased_dict_name->text();
+    QString save_path = QString("Matching-Pursuit-Toolbox/%1.tbd").arg(_treebased_dict_name);
+
+    QFile file(save_path);
+    file.open(QIODevice::WriteOnly);
+
+    QXmlStreamWriter xmlWriter(&file);
+    xmlWriter.setAutoFormatting(true);
+
+    xmlWriter.writeStartDocument();
+    xmlWriter.writeStartElement("builtAtomsTreebasedMP");
+    xmlWriter.writeAttribute("sample_count", QString::number(sample_count));
+
+
+    for(qint32 scale = 1; scale <= sample_count; scale+= sample_count / 16)
+    {
+        for(qint32 translation = 0; translation <sample_count; translation+= sample_count / 16)
+        {
+            modulation = 0;
+            while(modulation < floor(sample_count/2))
+            {
+                phase = 0;
+                while(phase < 2 * PI)
+                {                    
+                    xmlWriter.writeStartElement("Atom");
+                    //xmlWriter.writeAttribute("sample_count", QString::number(sample_count));
+                    xmlWriter.writeAttribute("scale", QString::number(scale));
+                    xmlWriter.writeAttribute("translation", QString::number(translation));
+                    xmlWriter.writeAttribute("modulation", QString::number(modulation));
+                    xmlWriter.writeAttribute("phase", QString::number(phase));
+                    xmlWriter.writeEndElement();
+
+                    count++;
+                    phase += 16 * 2*PI / sample_count;//(4*PI)/360;
+                }
+                modulation += sample_count / 32;//floor(5/100*sample_count);
+            }
+        }
+    }
+
+    xmlWriter.writeEndElement();
+    xmlWriter.writeEndDocument();
+
+    file.close();
+    std::cout << "number of atom built: " << count << "\n";
+    FixDictMp::create_tree_dict(save_path);
+
+}
+
+void TreebasedDictWindow::on_tb_treebased_dict_name_editingFinished()
+{
+    _treebased_dict_name = ui->tb_treebased_dict_name->text();
+}
+
+void TreebasedDictWindow::on_btt_call_tree_creator_clicked()
+{
+    QString save_path = QString("Matching-Pursuit-Toolbox/%1.tbd").arg(_treebased_dict_name);
+
+    FixDictMp::create_tree_dict(save_path);
 }

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     realtimeevokedwidget.h
+* @file     realtimecovwidget.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of the RealTimeEvokedWidget Class.
+* @brief    Declaration of the RealTimeCovWidget Class.
 *
 */
 
-#ifndef REALTIMEEVOKEDWIDGET_H
-#define REALTIMEEVOKEDWIDGET_H
+#ifndef REALTIMECOVWIDGET_H
+#define REALTIMECOVWIDGET_H
 
 
 //*************************************************************************************************************
@@ -44,10 +44,6 @@
 
 #include "xdisp_global.h"
 #include "newmeasurementwidget.h"
-#include "helpers/realtimeevokedmodel.h"
-#include "helpers/realtimebutterflyplot.h"
-
-#include "helpers/sensorwidget.h"
 
 
 //*************************************************************************************************************
@@ -56,10 +52,6 @@
 //=============================================================================================================
 
 #include <QSharedPointer>
-#include <QList>
-#include <QAction>
-#include <QSpinBox>
-#include <QDoubleSpinBox>
 
 
 //*************************************************************************************************************
@@ -71,7 +63,7 @@ class QTime;
 
 namespace XMEASLIB
 {
-class RealTimeEvoked;
+class RealTimeCov;
 }
 
 
@@ -119,26 +111,26 @@ using namespace XMEASLIB;
 *
 * @brief The RealTimeMultiSampleArrayNewWidget class provides a real-time curve display.
 */
-class XDISPSHARED_EXPORT RealTimeEvokedWidget : public NewMeasurementWidget
+class XDISPSHARED_EXPORT RealTimeCovWidget : public NewMeasurementWidget
 {
     Q_OBJECT
 
 public:
     //=========================================================================================================
     /**
-    * Constructs a RealTimeEvokedWidget which is a child of parent.
+    * Constructs a RealTimeCovWidget which is a child of parent.
     *
-    * @param [in] pRTE          pointer to real-time evoked measurement.
+    * @param [in] pRTC          pointer to real-time evoked measurement.
     * @param [in] pTime         pointer to application time.
     * @param [in] parent        pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
     */
-    RealTimeEvokedWidget(QSharedPointer<RealTimeEvoked> pRTE, QSharedPointer<QTime> &pTime, QWidget* parent = 0);
+    RealTimeCovWidget(QSharedPointer<RealTimeCov> pRTC, QSharedPointer<QTime> &pTime, QWidget* parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the RealTimeEvokedWidget.
+    * Destroys the RealTimeCovWidget.
     */
-    ~RealTimeEvokedWidget();
+    ~RealTimeCovWidget();
 
     //=========================================================================================================
     /**
@@ -156,47 +148,16 @@ public:
 
     //=========================================================================================================
     /**
-    * Initialise the RealTimeEvokedWidget.
+    * Initialise the RealTimeCovWidget.
     */
     virtual void init();
 
 private:
-    //=========================================================================================================
-    /**
-    * Sets new zoom factor
-    *
-    * @param [in] zoomFac  time window size;
-    */
-    void zoomChanged(double zoomFac);
+    QSharedPointer<RealTimeCov> m_pRTC;         /**< The real-time covariance measurement. */
 
-    //=========================================================================================================
-    /**
-    * Shows sensor selection widget
-    */
-    void showSensorSelectionWidget();
-
-    RealTimeEvokedModel*        m_pRTEModel;            /**< RTE data model */
-    RealTimeButterflyPlot*      m_pButterflyPlot;       /**< Butterfly plot */
-
-    float m_fZoomFactor;                                    /**< Zoom factor */
-    QDoubleSpinBox* m_pDoubleSpinBoxZoom;                   /**< Adjust Zoom Factor */
-
-    QSharedPointer<RealTimeEvoked> m_pRTE;                  /**< The real-time evoked measurement. */
-
-    bool m_bInitialized;                                    /**< Is Initialized */
-
-    QList<RealTimeSampleArrayChInfo>    m_qListChInfo;      /**< Channel info list. ToDo: check if this is obsolete later on*/
-
-    QAction*    m_pActionSelectSensors;                     /**< show roi select widget */
-
-    SensorModel* m_pSensorModel;                            /**< Sensor model for channel selection */
-    QSharedPointer<SensorWidget> m_pSensorSelectionWidget;  /**< Sensor selection widget. */
-
-    QList<qint32> m_qListCurrentSelection;  /**< Current selection list -> hack around C++11 lambda  */
-    void applySelection();                  /**< apply the in m_qListCurrentSelection stored selection -> hack around C++11 lambda */
-    void resetSelection();                  /**< reset the in m_qListCurrentSelection stored selection -> hack around C++11 lambda */
+    bool m_bInitialized;                        /**< Is Initialized */
 };
 
 } // NAMESPACE
 
-#endif // REALTIMEEVOKEDWIDGET_H
+#endif // REALTIMECOVWIDGET_H
