@@ -160,6 +160,7 @@ private:
     void read_matlab_file(QString fileName);
     void calc_adaptiv_mp(MatrixXd signal, TruncationCriterion criterion);
     qint32 read_fiff_file(QString fileName);
+    void read_fiff_file_new(QString file_name);
     QList<qreal> norm_signal(QList<qreal> signalSamples);
      //QStringList correlation(VectorXd signalSamples, QList<qreal> atomSamples, QString atomName);
     //VectorXd mpCalc(QFile& dictionary, VectorXd signalSamples, qint32 iterationsCount);
