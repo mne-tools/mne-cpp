@@ -75,8 +75,8 @@ Averaging::Averaging()
 , m_pAveragingBuffer(CircularMatrixBuffer<double>::SPtr())
 , m_bIsRunning(false)
 , m_bProcessData(false)
-, m_iPreStimSamples(750)
-, m_iPostStimSamples(400)//750)
+, m_iPreStimSamples(400)
+, m_iPostStimSamples(750)
 , m_iNumAverages(10)
 , m_iStimChan(0)
 , m_pAveragingWidget(AveragingSettingsWidget::SPtr())
@@ -87,6 +87,8 @@ Averaging::Averaging()
     m_pActionShowAdjustment->setStatusTip(tr("Averaging Adjustments"));
     connect(m_pActionShowAdjustment, &QAction::triggered, this, &Averaging::showAveragingWidget);
     addPluginAction(m_pActionShowAdjustment);
+
+    m_pActionShowAdjustment->setVisible(false);
 }
 
 
@@ -249,7 +251,9 @@ void Averaging::changeStimChannel(qint32 index)
 void Averaging::changePreStim(qint32 samples)
 {
     m_iPreStimSamples = samples;
-    emit sampleNumChanged();
+    if(m_pRtAve)
+        m_pRtAve->setPreStim(m_iPreStimSamples);
+
 }
 
 
@@ -258,7 +262,8 @@ void Averaging::changePreStim(qint32 samples)
 void Averaging::changePostStim(qint32 samples)
 {
     m_iPostStimSamples = samples;
-    emit sampleNumChanged();
+    if(m_pRtAve)
+        m_pRtAve->setPostStim(m_iPostStimSamples);
 }
 
 
@@ -341,6 +346,8 @@ void Averaging::run()
     while(!m_pFiffInfo)
         msleep(10);// Wait for fiff Info
 
+    m_pActionShowAdjustment->setVisible(true);
+
     for(qint32 i = 0; i < m_pFiffInfo->chs.size(); ++i)
     {
         if(m_pFiffInfo->chs[i].kind == FIFFV_STIM_CH)
@@ -383,6 +390,9 @@ void Averaging::run()
 
         }
     }
+
+
+    m_pActionShowAdjustment->setVisible(false);
 
     m_pRtAve->stop();
 }
