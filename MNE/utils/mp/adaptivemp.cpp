@@ -1,4 +1,43 @@
-//MATCHING PURSUIT
+//=============================================================================================================
+/**
+* @file     adaptivemp.cpp
+* @author   Martin Henfling <martin.henfling@tu-ilmenau.de>
+*           Daniel Knobl <daniel.knobl@tu-ilmenau.de>
+*
+* @version  1.0
+* @date     July, 2014
+*
+* @section  LICENSE
+*
+* Copyright (C) 2014, Daniel Knobl and Martin Henfling All rights reserved.
+*
+* ported to mne-cpp by Martin Henfling and Daniel Knobl in May 2014
+* original code was implemented in Matlab Code by Maciej Gratkowski
+*
+* Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+* the following conditions are met:
+*     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+*       following disclaimer.
+*     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+*       the following disclaimer in the documentation and/or other materials provided with the distribution.
+*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*       to endorse or promote products derived from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+*
+* @brief    Implemetation of the Matching Pursuit Algorithm introduced by Stephane Mallat and Zhifeng Zhang.
+*           Matlabimplemetation of Maciej Gratkowski is used as Source and reference.
+*
+*/
+
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
@@ -19,7 +58,11 @@ using namespace UTILSLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-adaptiveMP::adaptiveMP()
+AdaptiveMp::AdaptiveMp()
+: it(0)
+, max_it(0)
+, signal_energy(0)
+, current_energy(0)
 {
 
 }
@@ -27,174 +70,175 @@ adaptiveMP::adaptiveMP()
 //*************************************************************************************************************
 
 //MP Algorithm of M. Gratkowski
-QList<GaborAtom> adaptiveMP::MatchingPursuit (MatrixXd signal,qint32 max_it,qreal epsilon)
+QList<GaborAtom> AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal epsilon)
 {
-    QList<GaborAtom> atomList;
+    max_it = max_iterations;
     Eigen::FFT<double> fft;
     MatrixXd residuum = signal; //residuum initialised with signal
-    qint32 it = 0;              //iterationscounter
-    qint32 sampleCount = signal.rows();
-    qint32 channelCount = signal.cols();
-    qint32 signalChannel = 0;
-    VectorXd signalEnergy = VectorXd::Zero(channelCount);
-    VectorXd residuumEnergy = VectorXd::Zero(channelCount);
-    VectorXd energyThreshold = VectorXd::Zero(channelCount);
+    qint32 sample_count = signal.rows();
+    qint32 channel_count = signal.cols();
+    signal_energy = 0;//VectorXd::Zero(channel_count);
+    qreal residuum_energy = 0;//VectorXd residuum_energy = VectorXd::Zero(channel_count);
+    qreal energy_threshold = 0;//VectorXd energy_threshold = VectorXd::Zero(channel_count);
 
-    //calculate signalenergy
-    for(qint32 channel = 0; channel < channelCount; channel++)
+    //calculate signal_energy
+    for(qint32 channel = 0; channel < channel_count; channel++)
     {
-        for(qint32 sample = 0; sample < sampleCount; sample++)
-            signalEnergy[channel] += (signal(sample, channel) * signal(sample, channel));
+        for(qint32 sample = 0; sample < sample_count; sample++)
+            signal_energy/*[channel]*/ += (signal(sample, channel) * signal(sample, channel));
 
-        energyThreshold[channel] = epsilon * signalEnergy[channel];
-        residuumEnergy[channel] = signalEnergy[channel];
+        energy_threshold/*[channel]*/ = 0.01 * epsilon * signal_energy;//[channel];
+        residuum_energy/*[channel]*/ = signal_energy;//[channel];
     }
 
-
-    //TODO multichannel!! Not working yet: problem is energyThreshold-->when should i increase signalChannel? may change order of loops for that
+    //TODO multichannel!! Not working yet: problem is energy_threshold-->when should i increase signal_channel? may change order of loops for that
     //connecting atoms to the channel, thing to think about....
 
-    while(it < max_it && energyThreshold[signalChannel] <= residuumEnergy[signalChannel] )
+    while(it < max_iterations && (energy_threshold/*[signal_channel]*/ < residuum_energy/*[signal_channel]*/ ))
     {
         //variables for dyadic sampling
         qreal s = 1;                            //scale
         qint32 j = 1;
-        qreal maxScalarProduct = 0;             //inner product for choosing the best matching atom
+        qreal max_scalar_product = 0;             //inner product for choosing the best matching atom
         qreal k = 0;                            //for modulation 2*pi*k/N
-        qint32 p = floor(sampleCount / 2);      //translation
-        GaborAtom *gaborAtom = new GaborAtom();
-        gaborAtom->SampleCount = sampleCount;
+        quint32 p = floor(sample_count / 2);      //translation
+        GaborAtom *gabor_Atom = new GaborAtom();
+        gabor_Atom->sample_count = sample_count;
+        gabor_Atom->energy = 0;
         qreal phase = 0;
 
-        while(s < sampleCount)
+        while(s < sample_count)
         {
             k = 0;                              //for modulation 2*pi*k/N
-            p = floor(sampleCount / 2);         //translation
-            VectorXd envelope = GaborAtom::GaussFunction(sampleCount, s, p);
-            VectorXcd fftEnvelope = RowVectorXcd::Zero(sampleCount);
-            fft.fwd(fftEnvelope, envelope);
+            p = floor(sample_count / 2);         //translation
+            VectorXd envelope = GaborAtom::gauss_function(sample_count, s, p);
+            VectorXcd fft_envelope = RowVectorXcd::Zero(sample_count);
+            fft.fwd(fft_envelope, envelope);
 
-            while(k < sampleCount/2)
+            while(k < sample_count/2)
             {
-                p = floor(sampleCount/2);
-                VectorXcd modulation = ModulationFunction(sampleCount, k);
-                VectorXcd modulatedResid = VectorXcd::Zero(sampleCount);
-                VectorXcd fftModulatedResid = VectorXcd::Zero(sampleCount);
-                VectorXcd fftMEResid = VectorXcd::Zero(sampleCount);
-                VectorXd corrCoeffs = VectorXd::Zero(sampleCount);
+                p = floor(sample_count/2);
+                VectorXcd modulation = modulation_function(sample_count, k);
+                VectorXcd modulated_resid = VectorXcd::Zero(sample_count);
+                VectorXcd fft_modulated_resid = VectorXcd::Zero(sample_count);
+                VectorXcd fft_m_e_resid = VectorXcd::Zero(sample_count);
+                VectorXd corr_coeffs = VectorXd::Zero(sample_count);
 
                 //iteration for multichannel
-                for(qint32 chn = 0; chn < channelCount; ++chn)
+                for(qint32 chn = 0; chn < channel_count; chn++)
                 {
-                    qint32 maxIndex = 0;
+                    quint32 max_index = 0;
                     qreal maximum = 0;
                     phase = 0;
 
                     //complex correlation of signal and sinus-modulated gaussfunction
-                    for(qint32 l = 0; l< sampleCount; l++)
-                        modulatedResid[l] = residuum(l, chn) * modulation[l];
+                    for(qint32 l = 0; l< sample_count; l++)
+                        modulated_resid[l] = residuum(l, chn) * modulation[l];
+                    //modulated_resid = residuum.row(chn) * modulation;
 
-                    fft.fwd(fftModulatedResid, modulatedResid);
+                    fft.fwd(fft_modulated_resid, modulated_resid);
 
-                    for( qint32 m = 0; m < sampleCount; m++)
-                        fftMEResid[m] = fftModulatedResid[m] * conj(fftEnvelope[m]);
+                    for( qint32 m = 0; m < sample_count; m++)
+                    fft_m_e_resid[m] = fft_modulated_resid[m] * conj(fft_envelope[m]);
+                    //fft_m_e_resid = fft_modulated_resid * conj(fft_envelope);
 
-                    fft.inv(corrCoeffs, fftMEResid);
-                    maximum = corrCoeffs[0];
+                    fft.inv(corr_coeffs, fft_m_e_resid);
+                    maximum = corr_coeffs[0];
 
                     //find index of maximum correlation-coefficient to use in translation
-                    for(qint32 i = 1; i < corrCoeffs.rows(); i++)
-                        if(maximum < corrCoeffs[i])
+                    for(qint32 i = 1; i < corr_coeffs.rows(); i++)
+                        if(maximum < corr_coeffs[i])
                         {
-                            maximum = corrCoeffs[i];
-                            maxIndex = i;
+                            maximum = corr_coeffs[i];
+                            max_index = i;
                         }
 
-                    //adapting translation p to create atomtranslation correctly
-                    if(maxIndex >= p) p = maxIndex - p + 1;
-                    else p = maxIndex + p;
+                    //adapting translation p to create atomtranslation correctly ToDo: is this correct, think about it again
+                    if(max_index >= p) p = max_index - p + 1;
+                    else p = max_index + p;
 
-                    VectorXd atomParameters = adaptiveMP::CalculateAtom(sampleCount, s, p, k, chn, residuum, RETURNPARAMETERS);
+                    VectorXd atom_parameters = calculate_atom(sample_count, s, p, k, chn, residuum, RETURNPARAMETERS);
 
-                    if(abs(atomParameters[4]) > abs(maxScalarProduct))
+                    if(abs(atom_parameters[4]) > abs(max_scalar_product)&& p < sample_count && p > 0)
                     {
                         //set highest scalarproduct, in comparison to best matching atom
-                        maxScalarProduct            = atomParameters[4];
-                        gaborAtom->Scale            = atomParameters[0];
-                        gaborAtom->Translation      = atomParameters[1];
-                        gaborAtom->Modulation       = atomParameters[2];
-                        gaborAtom->Phase            = atomParameters[3];
-                        gaborAtom->MaxScalarProduct = maxScalarProduct;
+                        max_scalar_product             = atom_parameters[4];
+                        gabor_Atom->scale              = atom_parameters[0];
+                        gabor_Atom->translation        = atom_parameters[1];
+                        gabor_Atom->modulation         = atom_parameters[2];
+                        gabor_Atom->phase              = atom_parameters[3];
+                        gabor_Atom->max_scalar_product = max_scalar_product;
                     }
 
                 }
-                k += pow(2.0,(-j))*sampleCount/2;
+                k += pow(2.0,(-j))*sample_count/2;
 
             }
             j++;
             s = pow(2.0,j);
         }
-        std::cout << "gefundene Parameter " << it << ":\n   " << gaborAtom->Scale << "     " << gaborAtom->Translation <<
-                     "      " << gaborAtom->Modulation << "      " << gaborAtom->Phase << "\n";
+        std::cout << "\n" << "===============" << " found parameters " << it + 1 << "===============" << ":\n\n"<<
+                     "scale: " << gabor_Atom->scale << " trans: " << gabor_Atom->translation <<
+                     " modu: " << gabor_Atom->modulation << " phase: " << gabor_Atom->phase << " sclr_prdct: " << gabor_Atom->max_scalar_product << "\n";
 
         //replace atoms with s==N and p = floor(N/2) by such atoms that do not have an envelope
         k = 0;
-        s = sampleCount;
-        p = floor(sampleCount / 2);
-        j = floor(log(sampleCount) / log(2));
+        s = sample_count;
+        p = floor(sample_count / 2);
+        j = floor(log(sample_count) / log(2));
         phase = 0;
 
-        for(qint32 chn = 0; chn < channelCount; ++chn)
+        for(qint32 chn = 0; chn < channel_count; ++chn)
         {
-            while(k < sampleCount / 2)
+            while(k < sample_count / 2)
             {
-                VectorXd parametersNoEnvelope = adaptiveMP::CalculateAtom(sampleCount, s, p, k, chn, residuum, RETURNPARAMETERS);
+                VectorXd parameters_no_envelope = calculate_atom(sample_count, s, p, k, chn, residuum, RETURNPARAMETERS);
 
-                if(abs(parametersNoEnvelope[4]) > abs(maxScalarProduct))// && gaborAtom->Scale == s && gaborAtom->Translation == p)
+                if(abs(parameters_no_envelope[4]) > abs(max_scalar_product) && p < sample_count && p > 0)// && gaborAtom->scale == s && gaborAtom->translation == p)
                 {
                     //set highest scalarproduct, in comparison to best matching atom
-                    maxScalarProduct            = parametersNoEnvelope[4];
-                    gaborAtom->Scale            = parametersNoEnvelope[0];
-                    gaborAtom->Translation      = parametersNoEnvelope[1];
-                    gaborAtom->Modulation       = parametersNoEnvelope[2];
-                    gaborAtom->Phase            = parametersNoEnvelope[3];
-                    gaborAtom->MaxScalarProduct = maxScalarProduct;
+                    max_scalar_product             = parameters_no_envelope[4];
+                    gabor_Atom->scale              = parameters_no_envelope[0];
+                    gabor_Atom->translation        = parameters_no_envelope[1];
+                    gabor_Atom->modulation         = parameters_no_envelope[2];
+                    gabor_Atom->phase              = parameters_no_envelope[3];
+                    gabor_Atom->max_scalar_product = max_scalar_product;
                 }
-                k += pow(2.0,(-j))*sampleCount/2;
+                k += pow(2.0,(-j))*sample_count/2;
 
             }
 
         }
-        std::cout << "gefundene Parameter nach ersetung NoEnvelope " << it << ":\n   " << gaborAtom->Scale << "     " << gaborAtom->Translation <<
-                     "      " << gaborAtom->Modulation << "      " << gaborAtom->Phase << "\n";
+        std::cout << "      after comparison to NoEnvelope " << ":\n"<< "scale: " << gabor_Atom->scale << " trans: " << gabor_Atom->translation <<
+                     " modu: " << gabor_Atom->modulation << " phase: " << gabor_Atom->phase << " sclr_prdct: " << gabor_Atom->max_scalar_product << "\n\n";
 
         //Maximisation Simplex Algorithm implemented by Bozoa Jia, adapted to the MP Algorithm by Martin Henfling. Copyright (C) 2010 Botao Jia
         //todo change to clean use of EIGEN, @present its mixed with Namespace std and <vector>
         //iteration for multichannel
-        for(qint32 chn = 0; chn < channelCount; ++chn)
+        for(qint32 chn = 0; chn < channel_count; chn++)
         {
             //simplexfunction to find minimum of target among parameters s, p, k
             std::vector<double> init;
 
-            init.push_back(gaborAtom->Scale);
-            init.push_back(gaborAtom->Translation);
-            init.push_back(gaborAtom->Modulation);
+            init.push_back(gabor_Atom->scale);
+            init.push_back(gabor_Atom->translation);
+            init.push_back(gabor_Atom->modulation);
 
             double tol = 1E8 * std::numeric_limits<double>::epsilon();
             std::vector<std::vector<double> > x = std::vector<std::vector<double> >();
             qint32 iterations = 1E3;
             qint32 N = init.size();                     //space dimension
 
-            VectorXd atomFxcParams = VectorXd::Zero(5); //initialisation for contraction coefficients
+            VectorXd atom_fxc_params = VectorXd::Zero(5); //initialisation for contraction coefficients
 
-            const qreal a=1.0, b=0.2, g=0.5, h=0.5;  //coefficients
+            const qreal a=1.0, b=0.2, g=0.5, h=0.5;  //coefficients a = 1, b = 0.2, g = 0.5, h = 0.5
                                                      //a: reflection  -> xr step away from worst siplex found
                                                      //b: expansion   -> xe if better with a so go in this direction with b
                                                      //g: contraction -> xc calc new worst point an bring closer to middle of simplex
                                                      //h: full contraction to x1
             std::vector<double> xcentroid_old(N,0);  //simplex center * (N+1)
             std::vector<double> xcentroid_new(N,0);  //simplex center * (N+1)
-            std::vector<double> vf(N+1,0);           //f evaluated at simplex vertexes
+            std::vector<double> vf(N+1,0);           //f evaluated at simplex vertices
             qint32 x1 = 0, xn = 0, xnp1 = 0;         //x1:   f(x1) = min { f(x1), f(x2)...f(x_{n+1} }
                                                      //xnp1: f(xnp1) = max { f(x1), f(x2)...f(x_{n+1} }
                                                      //xn:   f(xn)<f(xnp1) && f(xn)> all other f(x_i)
@@ -227,19 +271,19 @@ QList<GaborAtom> adaptiveMP::MatchingPursuit (MatrixXd signal,qint32 max_it,qrea
             {
                 for(qint32 i=0; i < N+1; ++i)
                 {
-                    VectorXd atomFx = VectorXd::Zero(sampleCount);
+                    VectorXd atom_fx = VectorXd::Zero(sample_count);
 
-                    if(gaborAtom->Scale == sampleCount && gaborAtom->Translation == floor(sampleCount / 2))
-                        atomFx = adaptiveMP::CalculateAtom(sampleCount, sampleCount, floor(sampleCount / 2), x[i][2], chn, residuum, RETURNATOM);
+                    if(gabor_Atom->scale == sample_count && gabor_Atom->translation == floor(sample_count / 2))
+                        atom_fx = calculate_atom(sample_count, sample_count, floor(sample_count / 2), x[i][2], chn, residuum, RETURNATOM);
 
                     else
-                        atomFx = adaptiveMP::CalculateAtom(sampleCount, x[i][0], x[i][1], x[i][2], chn, residuum, RETURNATOM);
+                        atom_fx = calculate_atom(sample_count, x[i][0], x[i][1], x[i][2], chn, residuum, RETURNATOM);
 
                     //create targetfunction of realGaborAtom and Residuum
                     double target = 0;
-                    for(qint32 k = 0; k < atomFx.rows(); k++)
+                    for(qint32 k = 0; k < atom_fx.rows(); k++)
                     {
-                        target -=atomFx[k]*residuum(k,0);
+                        target -=atom_fx[k]*residuum(k,0);
                     }
 
                     vf[i] = target;
@@ -251,7 +295,6 @@ QList<GaborAtom> adaptiveMP::MatchingPursuit (MatrixXd signal,qint32 max_it,qrea
                 {
                     if(vf[i]<vf[x1])      x1 = i;
                     if(vf[i]>vf[xnp1])    xnp1 = i;
-
                 }
 
                 xn = x1;
@@ -283,17 +326,17 @@ QList<GaborAtom> adaptiveMP::MatchingPursuit (MatrixXd signal,qint32 max_it,qrea
                 for( qint32 i=0; i<N; ++i) xr[i]=xg[i]+a*(xg[i]-x[xnp1][i]);
                 //reflection, xr found
 
-                VectorXd atomFxr = VectorXd::Zero(sampleCount);
+                VectorXd atom_fxr = VectorXd::Zero(sample_count);
 
-                if(gaborAtom->Scale == sampleCount && gaborAtom->Translation == floor(sampleCount / 2))
-                    atomFxr = adaptiveMP::CalculateAtom(sampleCount, sampleCount, floor(sampleCount / 2), xr[2], chn, residuum, RETURNATOM);
+                if(gabor_Atom->scale == sample_count && gabor_Atom->translation == floor(sample_count / 2))
+                    atom_fxr = calculate_atom(sample_count, sample_count, floor(sample_count / 2), xr[2], chn, residuum, RETURNATOM);
 
                 else
-                    atomFxr = adaptiveMP::CalculateAtom(sampleCount, xr[0], xr[1], xr[2], chn, residuum, RETURNATOM);
+                    atom_fxr = calculate_atom(sample_count, xr[0], xr[1], xr[2], chn, residuum, RETURNATOM);
 
                 //create targetfunction of realGaborAtom and Residuum
                 double fxr = 0;
-                for(qint32 k = 0; k < atomFxr.rows(); k++) fxr -=atomFxr[k]*residuum(k,0);
+                for(qint32 k = 0; k < atom_fxr.rows(); k++) fxr -=atom_fxr[k]*residuum(k,chn);//ToDo: old residuum(k,0)
 
                 //double fxr = target;//record function at xr
 
@@ -306,17 +349,17 @@ QList<GaborAtom> adaptiveMP::MatchingPursuit (MatrixXd signal,qint32 max_it,qrea
 
                     for( qint32 i=0; i<N; ++i) xe[i]=xr[i]+b*(xr[i]-xg[i]);
 
-                    VectorXd atomFxe = VectorXd::Zero(sampleCount);
+                    VectorXd atom_fxe = VectorXd::Zero(sample_count);
 
-                    if(gaborAtom->Scale == sampleCount && gaborAtom->Translation == floor(sampleCount / 2))
-                        atomFxe = adaptiveMP::CalculateAtom(sampleCount, sampleCount, floor(sampleCount / 2), xe[2], chn, residuum, RETURNATOM);
+                    if(gabor_Atom->scale == sample_count && gabor_Atom->translation == floor(sample_count / 2))
+                        atom_fxe = calculate_atom(sample_count, sample_count, floor(sample_count / 2), xe[2], chn, residuum, RETURNATOM);
 
                     else
-                        atomFxe = adaptiveMP::CalculateAtom(sampleCount, xe[0], xe[1], xe[2], chn, residuum, RETURNATOM);
+                        atom_fxe = calculate_atom(sample_count, xe[0], xe[1], xe[2], chn, residuum, RETURNATOM);
 
                     //create targetfunction of realGaborAtom and Residuum
                     double fxe = 0;
-                    for(qint32 k = 0; k < atomFxe.rows(); k++) fxe -=atomFxe[k]*residuum(k,0);
+                    for(qint32 k = 0; k < atom_fxe.rows(); k++) fxe -=atom_fxe[k]*residuum(k,chn);//ToDo: old residuum(k,0)
 
                     if( fxe < fxr ) std::copy(xe.begin(), xe.end(), x[xnp1].begin() );
                     else std::copy(xr.begin(), xr.end(), x[xnp1].begin() );
@@ -330,24 +373,24 @@ QList<GaborAtom> adaptiveMP::MatchingPursuit (MatrixXd signal,qint32 max_it,qrea
                     for( qint32 i=0; i<N; ++i)
                         xc[i]=xg[i]+g*(x[xnp1][i]-xg[i]);
 
-                    if(gaborAtom->Scale == sampleCount && gaborAtom->Translation == floor(sampleCount / 2))
-                        atomFxcParams = adaptiveMP::CalculateAtom(sampleCount, sampleCount, floor(sampleCount / 2), xc[2], chn, residuum, RETURNPARAMETERS);
+                    if(gabor_Atom->scale == sample_count && gabor_Atom->translation == floor(sample_count / 2))
+                        atom_fxc_params = AdaptiveMp::calculate_atom(sample_count, sample_count, floor(sample_count / 2), xc[2], chn, residuum, RETURNPARAMETERS);
 
                     else
-                        atomFxcParams = adaptiveMP::CalculateAtom(sampleCount, xc[0], xc[1], xc[2], chn, residuum, RETURNPARAMETERS);
+                        atom_fxc_params = AdaptiveMp::calculate_atom(sample_count, xc[0], xc[1], xc[2], chn, residuum, RETURNPARAMETERS);
 
-                    VectorXd atomFxc = gaborAtom->CreateReal(gaborAtom->SampleCount, atomFxcParams[0], atomFxcParams[1], atomFxcParams[2], atomFxcParams[3]);
+                    VectorXd atom_fxc = gabor_Atom->create_real(gabor_Atom->sample_count, atom_fxc_params[0], atom_fxc_params[1], atom_fxc_params[2], atom_fxc_params[3]);
 
-                    atomFxcParams[4] = 0;
+                    atom_fxc_params[4] = 0;
 
-                    for(qint32 i = 0; i < sampleCount; i++)
-                        atomFxcParams[4] += atomFxc[i] * residuum(i, chn);
+                    for(qint32 i = 0; i < sample_count; i++)
+                        atom_fxc_params[4] += atom_fxc[i] * residuum(i, chn);
 
                     //create targetfunction of realGaborAtom and Residuum
                     double fxc = 0;
 
-                    for(qint32 k = 0; k < atomFxc.rows(); k++)
-                        fxc -=atomFxc[k]*residuum(k,0);
+                    for(qint32 k = 0; k < atom_fxc.rows(); k++)
+                        fxc -=atom_fxc[k]*residuum(k,chn);//ToDo: old residuum(k,0)
 
                     if( fxc < vf[xnp1] )
                         std::copy(xc.begin(), xc.end(), x[xnp1].begin() );
@@ -360,49 +403,68 @@ QList<GaborAtom> adaptiveMP::MatchingPursuit (MatrixXd signal,qint32 max_it,qrea
                 }//contraction finished, xc is not used outside the scope
             }//optimization is finished
 
-            if(gaborAtom->Scale == sampleCount && gaborAtom->Translation == floor(sampleCount / 2))
-                atomFxcParams = adaptiveMP::CalculateAtom(sampleCount, sampleCount, floor(sampleCount / 2), x[x1][2], chn, residuum, RETURNPARAMETERS);
+            if(gabor_Atom->scale == sample_count && gabor_Atom->translation == floor(sample_count / 2))
+                atom_fxc_params = AdaptiveMp::calculate_atom(sample_count, sample_count, floor(sample_count / 2), x[x1][2], chn, residuum, RETURNPARAMETERS);
 
             else
-                atomFxcParams = adaptiveMP::CalculateAtom(sampleCount, x[x1][0], x[x1][1], x[x1][2], chn, residuum, RETURNPARAMETERS);
+                atom_fxc_params = AdaptiveMp::calculate_atom(sample_count, x[x1][0], x[x1][1], x[x1][2], chn, residuum, RETURNPARAMETERS);
 
-            if(abs(atomFxcParams[4]) > abs(maxScalarProduct))
+            if(abs(atom_fxc_params[4]) > abs(max_scalar_product) /*&& atom_fxc_params[0] < sample_count && atom_fxc_params[0] > 0*/ && atom_fxc_params[1] < sample_count && atom_fxc_params[1] > 0)//ToDo: find a way to make the simplex not running out of bounds
             {
-                maxScalarProduct = atomFxcParams[4];             //scalarProduct
-                gaborAtom->Scale              = atomFxcParams[0];//Scale
-                gaborAtom->Translation        = atomFxcParams[1];//Translation
-                gaborAtom->Modulation         = atomFxcParams[2];//Phase
-                gaborAtom->Phase              = atomFxcParams[3];
-                gaborAtom->MaxScalarProduct   = maxScalarProduct;
+                max_scalar_product = atom_fxc_params[4];             //scalarProduct
+                gabor_Atom->scale              = atom_fxc_params[0];//scale
+                gabor_Atom->translation        = atom_fxc_params[1];//translation
+                gabor_Atom->modulation         = atom_fxc_params[2];//phase
+                gabor_Atom->phase              = atom_fxc_params[3];
+                gabor_Atom->max_scalar_product   = max_scalar_product;
             }
 
-            std::cout <<  "Parameter nach Optimierung " << it << ":\n   " << gaborAtom->Scale << "     " << gaborAtom->Translation <<
-                                "      " << gaborAtom->Modulation << "      " << gaborAtom->Phase << "\n\n";
             if(cnt==iterations)//max number of iteration achieves before tol is satisfied
-                std::cout<<"Simplex Iteration limit of "<<iterations<<" achieved, result may not be optimal"  <<std::endl;
+                std::cout<<"Simplex Iteration limit of "<<iterations<<" achieved in channel " << chn << ", result may not be optimal";
+
+        }//end Maximisation for channels Copyright (C) 2010 Botao Jia
+
+        std::cout <<  "      after simplex optimization " << ":\n"<< "scale: " << gabor_Atom->scale << " trans: " << gabor_Atom->translation <<
+                      " modu: " << gabor_Atom->modulation << " phase: " << gabor_Atom->phase << " sclr_prdct: " << gabor_Atom->max_scalar_product << "\n\n";
+
+        //calc multichannel parameters phase and max_scalar_product
+        for(qint32 chn = 0; chn < channel_count; chn++)
+        {
+            VectorXd channel_params = calculate_atom(sample_count, gabor_Atom->scale, gabor_Atom->translation, gabor_Atom->modulation, chn, residuum, RETURNPARAMETERS);
+            gabor_Atom->phase_list.append(channel_params[3]);
+            gabor_Atom->max_scalar_list.append(channel_params[4]);
 
             //substract best matching Atom from Residuum in each channel
-            VectorXd bestMatch = gaborAtom->CreateReal(gaborAtom->SampleCount, gaborAtom->Scale, gaborAtom->Translation, gaborAtom->Modulation, gaborAtom->Phase);
+            VectorXd bestMatch = gabor_Atom->create_real(gabor_Atom->sample_count, gabor_Atom->scale, gabor_Atom->translation, gabor_Atom->modulation, gabor_Atom->phase_list.at(chn));
 
-            for(qint32 j = 0; j < gaborAtom->SampleCount; j++)
+            for(qint32 j = 0; j < gabor_Atom->sample_count; j++)
             {
-                residuum(j,chn) -= gaborAtom->MaxScalarProduct * bestMatch[j];
-                residuumEnergy[chn] -= (gaborAtom->MaxScalarProduct * bestMatch[j]) * (gaborAtom->MaxScalarProduct * bestMatch[j]);
+                residuum(j,chn) -= gabor_Atom->max_scalar_list.at(chn) * bestMatch[j];
+                gabor_Atom->energy += (gabor_Atom->max_scalar_list.at(chn) * bestMatch[j]) * (gabor_Atom->max_scalar_list.at(chn) * bestMatch[j]);
             }
 
-            gaborAtom->Residuum = residuum;
-            atomList.append(*gaborAtom);
-        }//end Maximisation Copyright (C) 2010 Botao Jia
+            gabor_Atom->residuum = residuum;
+        }
 
-        delete gaborAtom;
+        residuum_energy -= gabor_Atom->energy;
+        current_energy += gabor_Atom->energy;
+
+        std::cout << "energy of residuum: " << residuum_energy << "\n";
+
+        atom_list.append(*gabor_Atom);
+
+        delete gabor_Atom;
         it++;
-    }//end iterations
-    return atomList;
+        send_result();
+
+    }//end iterations    
+    emit finished();
+    return atom_list;
 }
 
 //*************************************************************************************************************
 
-VectorXcd adaptiveMP::ModulationFunction(qint32 N, qreal k)
+VectorXcd AdaptiveMp::modulation_function(qint32 N, qreal k)
 {
     VectorXcd modulation = VectorXcd::Zero(N);
 
@@ -415,47 +477,73 @@ VectorXcd adaptiveMP::ModulationFunction(qint32 N, qreal k)
 
 //*************************************************************************************************************
 
-VectorXd adaptiveMP::CalculateAtom(qint32 sampleCount, qreal scale, qint32 translation, qreal modulation, qint32 channel, MatrixXd residuum, ReturnValue returnValue)
+VectorXd AdaptiveMp::calculate_atom(qint32 sample_count, qreal scale, quint32 translation, qreal modulation, qint32 channel, MatrixXd residuum, ReturnValue return_value)
 {
-    GaborAtom *gaborAtom = new GaborAtom();
+    GaborAtom *gabor_Atom = new GaborAtom();
     qreal phase = 0;
     //create complex Gaboratom
-    VectorXcd complexGaborAtom = gaborAtom->CreateComplex(sampleCount, scale, translation, modulation);
+    VectorXcd complex_gabor_atom = gabor_Atom->create_complex(sample_count, scale, translation, modulation);
 
     //calculate Inner Product: preparation to find the parameter phase
-    std::complex<double> innerProduct(0, 0);
+    std::complex<double> inner_product(0, 0);
 
-    for(qint32 i = 0; i < sampleCount; i++)
-        innerProduct += residuum(i, channel) * conj(complexGaborAtom[i]);
+    for(qint32 i = 0; i < sample_count; i++)
+        inner_product += residuum(i, channel) * conj(complex_gabor_atom[i]);
 
-    //calculate Phase to create realGaborAtoms
-    phase = std::arg(innerProduct);
+    //calculate phase to create realGaborAtoms
+    phase = std::arg(inner_product);
     if (phase < 0) phase = 2 * PI - phase;
-    VectorXd realGaborAtom = gaborAtom->CreateReal(sampleCount, scale, translation, modulation, phase);
+    VectorXd real_gabor_atom = gabor_Atom->create_real(sample_count, scale, translation, modulation, phase);
 
-    delete gaborAtom;
+    delete gabor_Atom;
 
-    switch(returnValue)
+    switch(return_value)
     {
         case RETURNPARAMETERS:
         {
-            qreal scalarProduct = 0;
+            qreal scalar_product = 0;
 
-            for(qint32 i = 0; i < sampleCount; i++)
-                scalarProduct += realGaborAtom[i] * residuum(i, channel);
+            for(qint32 i = 0; i < sample_count; i++)
+                scalar_product += real_gabor_atom[i] * residuum(i, channel);
 
-            VectorXd atomParameters = VectorXd::Zero(5);
+            VectorXd atom_parameters = VectorXd::Zero(5);
 
-            atomParameters[0] = scale;
-            atomParameters[1] = translation;
-            atomParameters[2] = modulation;
-            atomParameters[3] = phase;
-            atomParameters[4] = scalarProduct;
+            atom_parameters[0] = scale;
+            atom_parameters[1] = translation;
+            atom_parameters[2] = modulation;
+            atom_parameters[3] = phase;
+            atom_parameters[4] = scalar_product;
 
-            return atomParameters;
+            return atom_parameters;
         }
-        case RETURNATOM: {return realGaborAtom;} //returns normalized realGaborAtom
+        case RETURNATOM: {return real_gabor_atom;} //returns normalized realGaborAtom
     }
 }
 
+//*************************************************************************************************************
 
+void AdaptiveMp::send_result()
+{
+    emit current_result(it, max_it, current_energy, signal_energy, atom_list);
+}
+
+//*************************************************************************************************************
+
+void AdaptiveMp::process()
+{
+    //recieve_input(signal, max_iterations, epsilon);
+    matching_pursuit(signal, max_iterations, epsilon);
+}
+
+//*************************************************************************************************************
+
+void AdaptiveMp::recieve_input(Eigen::MatrixXd signal, qint32 max_iterations, qreal epsilon)
+{
+  matching_pursuit(signal, max_iterations, epsilon);
+}
+
+//*************************************************************************************************************
+
+AdaptiveMp::~AdaptiveMp()
+{
+}

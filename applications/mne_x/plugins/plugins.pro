@@ -45,6 +45,7 @@ SUBDIRS += \
     fiffsimulator \
     neuromag \
     babymeg \
+    noise \
     dummytoolbox \
     triggercontrol \
     sourcelab \
@@ -110,6 +111,7 @@ SUBDIRS += \
     dummytoolbox \
     triggercontrol \
     sourcelab \
+    mne \
     raplab \
     averaging \
     covariance \

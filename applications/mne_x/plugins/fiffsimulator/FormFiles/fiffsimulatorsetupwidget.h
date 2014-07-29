@@ -115,7 +115,6 @@ public:
 
     void fiffInfoReceived();        /**< Triggered when new fiff info is recieved by producer and stored intor rt_server */
 
-
 private:
     //=========================================================================================================
     /**

@@ -407,13 +407,11 @@ void MainWindow::createToolBars()
         delete m_pDynamicPluginToolBar;
         m_pDynamicPluginToolBar = NULL;
     }
-    if(m_qListDynamicPluginActions.size() > 0 || m_qListDynamicPluginWidgets.size() > 0)
+    if(m_qListDynamicPluginActions.size() > 0)
     {
         m_pDynamicPluginToolBar = addToolBar(m_sCurPluginName + tr("Control"));
         for(qint32 i = 0; i < m_qListDynamicPluginActions.size(); ++i)
             m_pDynamicPluginToolBar->addAction(m_qListDynamicPluginActions[i]);
-        for(qint32 i = 0; i < m_qListDynamicPluginWidgets.size(); ++i)
-            m_pDynamicPluginToolBar->addWidget(m_qListDynamicPluginWidgets[i]);
     }
 
     //Display
@@ -490,7 +488,6 @@ void MainWindow::createLogDockWindow()
 void MainWindow::updatePluginWidget(IPlugin::SPtr pPlugin)
 {
     m_qListDynamicPluginActions.clear();
-    m_qListDynamicPluginWidgets.clear();
     m_qListDynamicDisplayActions.clear();
     m_qListDynamicDisplayWidgets.clear();
 
@@ -498,7 +495,6 @@ void MainWindow::updatePluginWidget(IPlugin::SPtr pPlugin)
     {
         // Add Dynamic Plugin Actions
         m_qListDynamicPluginActions.append(pPlugin->getPluginActions());
-        m_qListDynamicPluginWidgets.append(pPlugin->getPluginWidgets());
 
         m_sCurPluginName = pPlugin->getName();
 
@@ -528,6 +524,7 @@ void MainWindow::updatePluginWidget(IPlugin::SPtr pPlugin)
                 {
                     m_pRunWidget->showFullScreen();
                     connect(m_pRunWidget, &RunWidget::displayClosed, this, &MainWindow::toggleDisplayMax);
+                    m_pRunWidgetClose = new QShortcut(QKeySequence(Qt::Key_Escape), m_pRunWidget, SLOT(close()));
                 }
                 else
                     setCentralWidget(m_pRunWidget);

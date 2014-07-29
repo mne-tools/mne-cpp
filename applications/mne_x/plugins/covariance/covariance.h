@@ -47,6 +47,8 @@
 #include <mne_x/Interfaces/IAlgorithm.h>
 #include <generics/circularmatrixbuffer.h>
 #include <xMeas/newrealtimemultisamplearray.h>
+#include <xMeas/realtimecov.h>
+#include <rtInv/rtcov.h>
 
 
 //*************************************************************************************************************
@@ -55,6 +57,7 @@
 //=============================================================================================================
 
 #include <fiff/fiff_info.h>
+#include <fiff/fiff_cov.h>
 
 
 //*************************************************************************************************************
@@ -63,6 +66,7 @@
 //=============================================================================================================
 
 #include <QtWidgets>
+#include <QVector>
 
 
 //*************************************************************************************************************
@@ -82,12 +86,16 @@ namespace CovariancePlugin
 using namespace MNEX;
 using namespace XMEASLIB;
 using namespace IOBuffer;
+using namespace RTINVLIB;
+using namespace FIFFLIB;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
+
+class CovarianceSettingsWidget;
 
 
 //=============================================================================================================
@@ -102,6 +110,8 @@ class COVARIANCESHARED_EXPORT Covariance : public IAlgorithm
     Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "covariance.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(MNEX::IAlgorithm)
+
+    friend class CovarianceSettingsWidget;
 
 public:
     //=========================================================================================================
@@ -138,6 +148,12 @@ public:
 
     void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
 
+    void appendCovariance(FiffCov::SPtr p_pCovariance);
+
+    void showCovarianceWidget();
+
+    void changeSamples(qint32 samples);
+
 signals:
     //=========================================================================================================
     /**
@@ -149,23 +165,27 @@ protected:
     virtual void run();
 
 private:
-    //=========================================================================================================
-    /**
-    * Initialises the output connector.
-    */
-    void initConnector();
+    QMutex mutex;
 
-    PluginInputData<NewRealTimeMultiSampleArray>::SPtr   m_pCovarianceInput;        /**< The NewRealTimeMultiSampleArray of the Covariance input.*/
-//    PluginOutputData<NewRealTimeMultiSampleArray>::SPtr  m_pCovarianceOutput;       /**< The NewRealTimeMultiSampleArray of the Covariance output.*/
+    PluginInputData<NewRealTimeMultiSampleArray>::SPtr  m_pCovarianceInput;     /**< The NewRealTimeMultiSampleArray of the Covariance input.*/
+    PluginOutputData<RealTimeCov>::SPtr                 m_pCovarianceOutput;    /**< The RealTimeCov of the Covariance output.*/
 
     FiffInfo::SPtr  m_pFiffInfo;                                /**< Fiff measurement info.*/
 
     CircularMatrixBuffer<double>::SPtr   m_pCovarianceBuffer;   /**< Holds incoming data.*/
 
-    bool m_bIsRunning;      /**< If source lab is running */
-    bool m_bProcessData;    /**< If data should be received for processing */
+    RtCov::SPtr m_pRtCov;                       /**< Real-time covariance. */
 
+    QVector<FiffCov::SPtr>   m_qVecCovData;     /**< Evoked data set */
 
+    bool m_bIsRunning;                          /**< If source lab is running */
+    bool m_bProcessData;                        /**< If data should be received for processing */
+
+    qint32 m_iEstimationSamples;
+
+    QSharedPointer<CovarianceSettingsWidget> m_pCovarianceWidget;
+
+    QAction* m_pActionShowAdjustment;
 };
 
 } // NAMESPACE
