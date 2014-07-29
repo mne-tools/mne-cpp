@@ -35,9 +35,9 @@ CovarianceSettingsWidget::CovarianceSettingsWidget(Covariance *toolbox, QWidget 
 
         m_pSpinBoxNumSamples = new QSpinBox;
         m_pSpinBoxNumSamples->setMinimum(minSamples);
-        m_pSpinBoxNumSamples->setMaximum(minSamples*10);
-        m_pSpinBoxNumSamples->setSingleStep(minSamples/2);
-        m_pSpinBoxNumSamples->setValue(minSamples*5);
+        m_pSpinBoxNumSamples->setMaximum(minSamples*60);
+        m_pSpinBoxNumSamples->setSingleStep(minSamples);
+        m_pSpinBoxNumSamples->setValue(minSamples*10);
         connect(m_pSpinBoxNumSamples, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), m_pCovarianceToolbox, &Covariance::changeSamples);
         t_pGridLayout->addWidget(m_pSpinBoxNumSamples,0,1,1,1);
     }
