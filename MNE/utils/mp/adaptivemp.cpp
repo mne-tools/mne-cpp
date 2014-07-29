@@ -59,6 +59,10 @@ using namespace UTILSLIB;
 //=============================================================================================================
 
 AdaptiveMp::AdaptiveMp()
+: it(0)
+, max_it(0)
+, signal_energy(0)
+, current_energy(0)
 {
 
 }

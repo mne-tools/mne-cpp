@@ -135,10 +135,10 @@ public:
     //=========================================================================================================
 
     typedef QList<GaborAtom> gabor_atom_list;
-    qint32 it = 0;
-    qint32 max_it = 0;
-    qreal signal_energy = 0;
-    qreal current_energy = 0;
+    qint32 it;
+    qint32 max_it;
+    qreal signal_energy;
+    qreal current_energy;
     QList<GaborAtom> atom_list;
     MatrixXd signal;
     qint32 max_iterations;
