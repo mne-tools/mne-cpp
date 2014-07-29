@@ -87,7 +87,6 @@ using namespace MNELIB;
 
 //=============================================================================================================
 
-
 namespace Ui
 {
     class MainWindow;  
@@ -233,6 +232,8 @@ private slots:
 
 signals:
 
+    void send_input(MatrixXd send_signal, qint32 send_max_iterations, qreal send_epsilon, bool fix_phase);
+
 private:
     Ui::MainWindow *ui;    
     GraphWindow *callGraphWindow;
@@ -294,25 +295,25 @@ private:
     *
     * @param[in] fileName   name of fiff file
     *
-    * @return   sample rate
+    * @return gibt 0 zurück wenn erflogreich sonst ungleich 0
     */
     qint32 read_fiff_file(QString fileName);
     //==========================================================================================================
+
     /**
-    * MainWindow_norm_signal
+    * MainWindow_read_fiff_file
     *
     * ### MP toolbox main function ###
     *
-    * painting input signal of chosen channels in butterfly plot
+    * reads data from fiff files
     *
-    * @param[in] signalSamples  list of signal samples
-    *
-    * @return
+    * @param[in] file_name   name of fiff file
     */
     void read_fiff_file_new(QString file_name);
-    QList<qreal> norm_signal(QList<qreal> signalSamples);
+
     //==========================================================================================================
 
+    //QList<qreal> norm_signal(QList<qreal> signalSamples);
     //QStringList correlation(VectorXd signalSamples, QList<qreal> atomSamples, QString atomName);
     //VectorXd mpCalc(QFile& dictionary, VectorXd signalSamples, qint32 iterationsCount);
 
@@ -385,9 +386,8 @@ class ResiduumWindow : public QWidget
 
 public:
     //=========================================================================================================
-    /**
-    * AtomSumWindow_paint_atom_sum
-    * AtomSumWindow_paint_residuum
+    /**    
+    * ResiduumWindow_paint_residuum
     *
     * ### MP toolbox GUI function ###
     *
