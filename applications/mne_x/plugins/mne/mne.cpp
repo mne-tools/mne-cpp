@@ -138,6 +138,14 @@ void MNE::init()
 
 //*************************************************************************************************************
 
+void MNE::calcFiffInfo()
+{
+
+}
+
+
+//*************************************************************************************************************
+
 void MNE::doClustering()
 {
     emit clusteringStarted();
@@ -247,9 +255,16 @@ void MNE::updateRTC(XMEASLIB::NewMeasurement::SPtr pMeasurement)
     //MEG
     if(pRTC && m_bReceiveData)
     {
-        mutex.lock();
-        m_qVecFiffCov.push_back(*pRTC->getValue());
-        mutex.unlock();
+        //Fiff Information of the covariance
+        if(m_pCovChNames.size() != pRTC->getValue()->names.size())
+            m_pCovChNames = pRTC->getValue()->names;
+
+        if(m_bProcessData)
+        {
+            mutex.lock();
+            m_qVecFiffCov.push_back(*pRTC->getValue());
+            mutex.unlock();
+        }
     }
 }
 
@@ -264,13 +279,16 @@ void MNE::updateRTE(XMEASLIB::NewMeasurement::SPtr pMeasurement)
     //MEG
     if(pRTE && m_bReceiveData)
     {
-        //Fiff information
-        if(!m_pFiffInfo)
-            m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo(pRTE->getValue()->info));
+        //Fiff Information of the evoked
+        if(!m_pFiffInfoEvoked)
+            m_pFiffInfoEvoked = QSharedPointer<FiffInfo>(new FiffInfo(pRTE->getValue()->info));
 
-        mutex.lock();
-        m_qVecFiffEvoked.push_back(*pRTE->getValue());
-        mutex.unlock();
+        if(m_bProcessData)
+        {
+            mutex.lock();
+            m_qVecFiffEvoked.push_back(*pRTE->getValue());
+            mutex.unlock();
+        }
     }
 }
 
@@ -324,7 +342,10 @@ void MNE::run()
     // Read Fiff Info
     //
     while(!m_pFiffInfo)
+    {
+        calcFiffInfo();
         msleep(10);// Wait for fiff Info
+    }
 
     //
     // Init Real-Time inverse estimator
