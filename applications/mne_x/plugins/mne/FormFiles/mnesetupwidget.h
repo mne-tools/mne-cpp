@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     pluginconnectorconnection.h
+* @file     mnesetupwidget.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     August, 2013
+* @date     February, 2013
 *
 * @section  LICENSE
 *
@@ -29,161 +29,132 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the PluginConnectorConnection class.
+* @brief    Contains the declaration of the MNESetupWidget class.
 *
 */
-#ifndef PLUGINCONNECTORCONNECTION_H
-#define PLUGINCONNECTORCONNECTION_H
+
+#ifndef MNESETUPWIDGET_H
+#define MNESETUPWIDGET_H
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../mne_x_global.h"
-
-#include "../Interfaces/IPlugin.h"
-
-#include "plugininputconnector.h"
-#include "pluginoutputconnector.h"
+#include "../ui_mnesetup.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
-#include <QObject>
-#include <QMetaObject>
-#include <QSharedPointer>
+#include <QtWidgets>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNEX
+// USED NAMESPACES
 //=============================================================================================================
 
-namespace MNEX
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE MNEPlugin
+//=============================================================================================================
+
+namespace MNEPlugin
 {
 
+
 //*************************************************************************************************************
-/**
-* Connector Data Type
-*/
-enum ConnectorDataType
-{
-    _N,         /**< Numeric */
-    _RTMSA,     /**< Real-Time Multi Sample Array */
-    _RTSA,      /**< Real-Time Sample Array */
-    _RTE,       /**< Real-Time Evoked */
-    _RTC,       /**< Real-Time Covariance */
-    _RTSE,      /**< Real-Time Source Estimate */
-    _None,      /**< None */
-};
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+class MNE;
 
 
 //=============================================================================================================
 /**
-* Class implements plug-in connector connections.
+* DECLARE CLASS DummySetupWidget
 *
-* @brief The PluginConnectorConnection class holds connector connections
+* @brief The DummySetupWidget class provides the DummyToolbox configuration window.
 */
-class MNE_X_SHARED_EXPORT PluginConnectorConnection : public QObject
+class MNESetupWidget : public QWidget
 {
     Q_OBJECT
 
-    friend class PluginConnectorConnectionWidget;
-
 public:
-    typedef QSharedPointer<PluginConnectorConnection> SPtr;             /**< Shared pointer type for PluginConnectorConnection. */
-    typedef QSharedPointer<const PluginConnectorConnection> ConstSPtr;  /**< Const shared pointer type for PluginConnectorConnection. */
-
-    explicit PluginConnectorConnection(IPlugin::SPtr sender, IPlugin::SPtr receiver, QObject *parent = 0);
-    
-    //=========================================================================================================
-    /**
-    * Destructor
-    */
-    virtual ~PluginConnectorConnection();
 
     //=========================================================================================================
     /**
-    * Disconnect connection
-    */
-    void clearConnection();
-
-    //=========================================================================================================
-    /**
-    * Create connection
-    */
-    static inline QSharedPointer<PluginConnectorConnection> create(IPlugin::SPtr sender, IPlugin::SPtr receiver, QObject *parent = 0);
-
-    static ConnectorDataType getDataType(QSharedPointer<PluginConnector> pPluginConnector);
-
-    inline IPlugin::SPtr& getSender();
-
-    inline IPlugin::SPtr& getReceiver();
-
-    inline bool isConnected();
-
-    //=========================================================================================================
-    /**
-    * The connector connection setup widget
+    * Constructs a MNESetupWidget which is a child of parent.
     *
-    * @return the setup widget
+    * @param [in] toolbox a pointer to the corresponding MNEToolbox.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new MNESetupWidget becomes a window. If parent is another widget, DummySetupWidget becomes a child window inside parent. DummySetupWidget is deleted when its parent is deleted.
     */
-    QWidget* setupWidget();
+    MNESetupWidget(MNE* toolbox, QWidget *parent = 0);
 
-signals:
-    
-private:
     //=========================================================================================================
     /**
-    * Create connection
+    * Destroys the MNESetupWidget.
+    * All MNESetupWidget's children are deleted first. The application exits if MNESetupWidget is the main widget.
     */
-    bool createConnection();
+    ~MNESetupWidget();
 
-    IPlugin::SPtr m_pSender;
-    IPlugin::SPtr m_pReceiver;
+    //=========================================================================================================
+    /**
+    * Adapts the UI to clustering state
+    */
+    void setClusteringState();
 
-    QHash<QPair<QString, QString>, QMetaObject::Connection> m_qHashConnections; /**< QHash which holds the connections between sender and receiver QHash<QPair<Sender,Receiver>, Connection>. */
+    //=========================================================================================================
+    /**
+    * Adapts the UI to setup state
+    */
+    void setSetupState();
+
+private:
+
+    //=========================================================================================================
+    /**
+    * Triggers th cluster process
+    */
+    void clusteringTriggered();
+
+    //=========================================================================================================
+    /**
+    * Shows the About Dialogs
+    */
+    void showAboutDialog();
+
+    //=========================================================================================================
+    /**
+    * Shows forward solution selection dialog
+    */
+    void showFwdFileDialog();
+
+    //=========================================================================================================
+    /**
+    * Shows atlas selection dialog
+    */
+    void showAtlasDirDialog();
+
+    //=========================================================================================================
+    /**
+    * Shows atlas selection dialog
+    */
+    void showSurfaceDirDialog();
+
+
+    MNE* m_pMNE;            /**< Holds a pointer to corresponding DummyToolbox.*/
+
+    Ui::MNESetupWidgetClass ui;   /**< Holds the user interface for the DummySetupWidget.*/
 };
-
-//*************************************************************************************************************
-//=============================================================================================================
-// INLINE DEFINITIONS
-//=============================================================================================================
-
-inline QSharedPointer<PluginConnectorConnection> PluginConnectorConnection::create(IPlugin::SPtr sender, IPlugin::SPtr receiver, QObject *parent)
-{
-    QSharedPointer<PluginConnectorConnection> pPluginConnectorConnection(new PluginConnectorConnection(sender, receiver, parent));
-    return pPluginConnectorConnection;
-}
-
-
-//*************************************************************************************************************
-
-inline IPlugin::SPtr& PluginConnectorConnection::getSender()
-{
-    return m_pSender;
-}
-
-
-//*************************************************************************************************************
-
-inline IPlugin::SPtr& PluginConnectorConnection::getReceiver()
-{
-    return m_pReceiver;
-}
-
-
-//*************************************************************************************************************
-
-inline bool PluginConnectorConnection::isConnected()
-{
-    return m_qHashConnections.size() > 0 ? true : false;
-}
 
 } // NAMESPACE
 
-#endif // PLUGINCONNECTORCONNECTION_H
+#endif // MNESETUPWIDGET_H
