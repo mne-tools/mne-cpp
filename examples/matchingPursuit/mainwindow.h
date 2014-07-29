@@ -119,15 +119,108 @@ public:
     typedef QList<GaborAtom> gabor_atom_list;
 
 private slots:
+    //==========================================================================================================
+    /**
+    * MainWindow_on_btt_Calc_clicked
+    *
+    * ### MP toolbox main window slots ###
+    *
+    * starts calculation
+    *
+    * @return void
+    */
     void on_btt_Calc_clicked();
+    //==========================================================================================================
+    /**
+    * MainWindow_on_actionW_rterbucheditor_triggered
+    *
+    * ### MP toolbox main window slots ###
+    *
+    * opens dictionary editor
+    *
+    * @return void
+    */
     void on_actionW_rterbucheditor_triggered();
+    //==========================================================================================================
+    /**
+    * MainWindow_on_actionAtomformeleditor_triggered
+    *
+    * ### MP toolbox main window slots ###
+    *
+    * opens atom formular editor
+    *
+    * @return void
+    */
     void on_actionAtomformeleditor_triggered();
+    //==========================================================================================================
+    /**
+    * MainWindow_on_actionErweiterter_W_rterbucheditor_triggered
+    *
+    * ### MP toolbox main window slots ###
+    *
+    * opens advanced dictionary editor
+    *
+    * @return void
+    */
     void on_actionErweiterter_W_rterbucheditor_triggered();
+    //==========================================================================================================
+    /**
+    * MainWindow_on_actionNeu_triggered
+    *
+    * ### MP toolbox main window slots ###
+    *
+    * opens interface to select signal file
+    *
+    * @return void
+    */
     void on_actionNeu_triggered();
-    void on_btt_OpenSignal_clicked();    
+    //==========================================================================================================
+
+    void on_btt_OpenSignal_clicked();
+
+    /**
+    * MainWindow_cb_selection_changed
+    *
+    * ### MP toolbox main window slots ###
+    *
+    * changes channel selection
+    *
+    * @param[in] QModelIndex    channel number
+    *
+    * @return void
+    */
     void cb_selection_changed(const QModelIndex&, const QModelIndex&);
+    //==========================================================================================================
+    /**
+    * MainWindow_tbv_selection_changed
+    *
+    * ### MP toolbox main window slots ###
+    *
+    * selects/deselects all calculated atoms
+    *
+    * @return void
+    */
     void tbv_selection_changed(const QModelIndex& topLeft, const QModelIndex& bottomRight);
+    //==========================================================================================================
+    /**
+    * MainWindow_recieve_result
+    *
+    * ### MP toolbox main window slots ###
+    *
+    * receives calculated atoms and updates remaining energy, iterations and progressbar
+    *
+    * @param[in]    current_iteration   number of current iteration
+    * @param[in]    max_iterations      number of all iterations for current calculation
+    * @param[in]    current_energy      energy of decomposition
+    * @param[in]    max_energy          whole energy of given signal
+    * @param[in]    atom_res_list       list of calculated atoms
+    *
+    * @return void
+    */
     void recieve_result(qint32 current_iteration, qint32 max_iterations, qreal current_energy, qreal max_energy, gabor_atom_list atom_res_list);
+    //==========================================================================================================
+
+
     void calc_thread_finished();
     void on_actionCreate_treebased_dictionary_triggered();
     void on_sb_sample_rate_editingFinished();
@@ -155,13 +248,73 @@ private:
     QStandardItemModel* tbv_model;
     QStandardItem* tbv_item;
     std::vector<QStandardItem*> tbv_items;
-
+    //==========================================================================================================
+    /**
+    * MainWindow_open_file
+    *
+    * ### MP toolbox main function ###
+    *
+    * opens files for read signals
+    *
+    * @return void
+    */
     void open_file();
+    //==========================================================================================================
+    /**
+    * MainWindow_read_matlab_file
+    *
+    * ### MP toolbox main function ###
+    *
+    * reads matlab files
+    *
+    * @param[in] fileName   name of matlab file
+    *
+    * @return void
+    */
     void read_matlab_file(QString fileName);
+    //==========================================================================================================
+    /**
+    * MainWindow_calc_adaptive_mp
+    *
+    * ### MP toolbox main function ###
+    *
+    * calculates atoms with adaptive matching pursuit algorithm
+    *
+    * @param[in] signal         input signal
+    * @param[in] criterion      truncation criterion to end approximation
+    *
+    * @return void
+    */
     void calc_adaptiv_mp(MatrixXd signal, TruncationCriterion criterion);
+    //==========================================================================================================
+    /**
+    * MainWindow_read_fiff_file
+    *
+    * ### MP toolbox main function ###
+    *
+    * reads data from fiff files
+    *
+    * @param[in] fileName   name of fiff file
+    *
+    * @return   sample rate
+    */
     qint32 read_fiff_file(QString fileName);
+    //==========================================================================================================
+    /**
+    * MainWindow_norm_signal
+    *
+    * ### MP toolbox main function ###
+    *
+    * painting input signal of chosen channels in butterfly plot
+    *
+    * @param[in] signalSamples  list of signal samples
+    *
+    * @return
+    */
     QList<qreal> norm_signal(QList<qreal> signalSamples);
-     //QStringList correlation(VectorXd signalSamples, QList<qreal> atomSamples, QString atomName);
+    //==========================================================================================================
+
+    //QStringList correlation(VectorXd signalSamples, QList<qreal> atomSamples, QString atomName);
     //VectorXd mpCalc(QFile& dictionary, VectorXd signalSamples, qint32 iterationsCount);
 
 };
@@ -234,20 +387,20 @@ class ResiduumWindow : public QWidget
 public:
     //=========================================================================================================
     /**
-    * AtomSumWindow_paint_atom_sum
+    * AtomSumWindow_paint_residuum
     *
     * ### MP toolbox GUI function ###
     *
-    * painting sum of found atoms in butterfly plot
+    * painting residuum after each iteration in butterfly plot
     *
-    * @param[in] atom_matrix             matrix of found atoms for each channel
-    * @param[in] windowSize              size (height,width) of window
-    * @param[in] signalMaximum           maximum value of atom signal
-    * @param[in] signalNegativeMaximum   minimum value of atom signal
+    * @param[in] residuum_matrix    matrix of found residuums for each channel
+    * @param[in] windowSize         size (height,width) of window
+    * @param[in] maxPos             maximum value of residuum signal
+    * @param[in] maxNeg             minimum value of residuum signal
     *
     * @return void
     */
-    void PaintResiduum(MatrixXd residuum_matrix, QSize windowSize, qreal maxPos, qreal maxNeg);
+    void paint_residuum(MatrixXd residuum_matrix, QSize windowSize, qreal maxPos, qreal maxNeg);
     //=========================================================================================================
 };
 
