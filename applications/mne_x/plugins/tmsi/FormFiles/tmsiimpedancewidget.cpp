@@ -71,7 +71,7 @@ TMSIImpedanceWidget::TMSIImpedanceWidget(TMSI* pTMSI, QWidget *parent)
 : m_pTMSI(pTMSI)
 , QWidget(parent)
 , ui(new Ui::TMSIImpedanceWidget)
-, m_dMaxImpedance(100000)
+, m_dMaxImpedance(200000)
 {
     ui->setupUi(this);
 
@@ -92,6 +92,7 @@ TMSIImpedanceWidget::TMSIImpedanceWidget(TMSI* pTMSI, QWidget *parent)
     connect(ui->m_pushButton_loadLayout, &QPushButton::released, this, &TMSIImpedanceWidget::loadLayout);
     connect(ui->m_pushButton_saveValues, &QPushButton::released, this, &TMSIImpedanceWidget::saveToFile);
     connect(ui->m_pushButton_Help, &QPushButton::released, this, &TMSIImpedanceWidget::helpDialog);
+    //connect(ui->m_verticalSlider_manualImpedanceValue, &QSlider::valueChanged, this, &TMSIImpedanceWidget::setIm);
 
 }
 
@@ -130,10 +131,18 @@ void TMSIImpedanceWidget::updateGraphicScene(VectorXd matValue)
         impedanceValue = matValue[matIndex];
 
         // set new color and impedance value. Clip received impedance value if > predefined max impedance value
-        if(impedanceValue>m_dMaxImpedance || impedanceValue<0)
-            impedanceValue = m_dMaxImpedance;
+//        if(impedanceValue>m_dMaxImpedance || impedanceValue<0)
+//            impedanceValue = m_dMaxImpedance;
 
-        item->setColor(m_cbColorMap->valueToJet(impedanceValue/m_dMaxImpedance));
+        // For testing purposes only!
+        //impedanceValue = ui->m_verticalSlider_manualImpedanceValue->value();
+
+        double scale = ui->m_doubleSpinBox_manualImpedanceValueScale->value();
+        //double scale = 0.000053;
+        //cout << scale <<endl;
+        double valueScaledNormalized = (scale*impedanceValue)/(scale*impedanceValue+1);
+
+        item->setColor(m_cbColorMap->valueToJet(valueScaledNormalized));
         item->setImpedanceValue(impedanceValue);
     }
 

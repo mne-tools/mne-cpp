@@ -1,11 +1,11 @@
 //=============================================================================================================
 /**
-* @file     tmsisetupprojectwidget.h
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+* @file     eegosportsproducer.h
+* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     July 2014
+* @date     July, 2014
 *
 * @section  LICENSE
 *
@@ -30,17 +30,21 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the TMSISetupProjectWidget class.
+* @brief    Contains the declaration of the EEGoSportsProducer class.
 *
 */
 
-#ifndef TMSISETUPPROJECTWIDGET_H
-#define TMSISETUPPROJECTWIDGET_H
+#ifndef EEGOSPORTSPRODUCER_H
+#define EEGOSPORTSPRODUCER_H
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
+
+#include <generics/circularbuffer.h>
+#include <Eigen/Eigen>
 
 
 //*************************************************************************************************************
@@ -48,19 +52,25 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QWidget>
+#include <QThread>
 
-namespace Ui {
-class TMSISetupProjectWidget;
-}
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE TMSIPlugin
+// DEFINE NAMESPACE EEGoSportsPlugin
 //=============================================================================================================
 
-namespace TMSIPlugin
+namespace EEGoSportsPlugin
 {
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace IOBuffer;
+using namespace Eigen;
 
 
 //*************************************************************************************************************
@@ -68,91 +78,73 @@ namespace TMSIPlugin
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class TMSI;
+class EEGoSports;
+class EEGoSportsDriver;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS TMSISetupProjectWidget
+* DECLARE CLASS EEGProducer
 *
-* @brief The TMSISetupProjectWidget class provides the TMSISetupProjectWidget configuration window.
+* @brief The EEGProducer class provides a EEG data producer for a given sampling rate.
 */
-class TMSISetupProjectWidget : public QWidget
+class EEGoSportsProducer : public QThread
 {
-    Q_OBJECT
-
 public:
     //=========================================================================================================
     /**
-    * Constructs a TMSISetupProjectWidget which is a child of parent.
+    * Constructs a EEGoSportsProducer.
     *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new TMSISetupProjectWidget becomes a window. If parent is another widget, TMSISetupWidget becomes a child window inside parent. TMSISetupWidget is deleted when its parent is deleted.
-    * @param [in] pTMSI a pointer to the corresponding ECGSimulator.
+    * @param [in] pEEGoSports a pointer to the corresponding EEGoSports class.
     */
-    explicit TMSISetupProjectWidget(TMSI* pTMSI, QWidget *parent = 0);
+    EEGoSportsProducer(EEGoSports* pEEGoSports);
 
     //=========================================================================================================
     /**
-    * Destructs a TMSISetupProjectWidget which is a child of parent.
-    *
+    * Destroys the EEGoSportsProducer.
     */
-    ~TMSISetupProjectWidget();
+    ~EEGoSportsProducer();
 
     //=========================================================================================================
     /**
-    * Inits the GUI
-    *
+    * Starts the EEGoSportsProducer by starting the producer's thread and initialising the device.
+    * @param [in] iNumberOfChannels The number of channels defined by the user via the GUI.
+    * @param [in] iSamplingFrequency The sampling frequency defined by the user via the GUI (in Hertz).
+    * @param [in] bUseChExponent Flag for using the channels exponent. Defined by the user via the GUI.
+    * @param [in] sOutpuFilePath Holds the path for the output file. Defined by the user via the GUI.
+    * @param [in] bWriteDriverDebugToFile Flag for writing the received samples to a file. Defined by the user via the GUI.
+    * @param [in] bUseUnitOffset Flag for using the channels unit offset. Defined by the user via the GUI.
+    * @param [in] bMeasureImpedance Flag for measuring impedances.
     */
-    void initGui();
+    virtual void start(int iNumberOfChannels,
+                       int iSamplingFrequency,
+                       bool bUseChExponent,
+                       bool bWriteDriverDebugToFile,
+                       QString sOutputFilePath,
+                       bool bMeasureImpedance);
+
+    //=========================================================================================================
+    /**
+    * Stops the EEGoSportsProducer by stopping the producer's thread.
+    */
+    void stop();
+
+protected:
+    //=========================================================================================================
+    /**
+    * The starting point for the thread. After calling start(), the newly created thread calls this function.
+    * Returning from this method will end the execution of the thread.
+    * Pure virtual method inherited by QThread.
+    */
+    virtual void run();
 
 private:
-    TMSI*                           m_pTMSI;        /**< a pointer to corresponding TMSI.*/
+    EEGoSports*                         m_pEEGoSports;              /**< A pointer to the corresponding EEGoSports class.*/
+    QSharedPointer<EEGoSportsDriver>    m_pEEGoSportsDriver;        /**< A pointer to the corresponding EEGoSports driver class.*/
 
-    Ui::TMSISetupProjectWidget*     ui;             /**< the user interface for the TMSISetupWidget.*/
-
-    //=========================================================================================================
-    /**
-    * Sets the project dir
-    *
-    */
-    void addProject();
-
-    //=========================================================================================================
-    /**
-    * Sets the subject dir
-    *
-    */
-    void addSubject();
-
-    //=========================================================================================================
-    /**
-    * Sets the dir where the output file is saved
-    *
-    */
-    void changeOutputFile();
-
-    //=========================================================================================================
-    /**
-    * Sets the dir where the eeg cap file is located
-    *
-    */
-    void changeCap();
-
-    //=========================================================================================================
-    /**
-    * Generates new file path based onthe project and subject parameters
-    *
-    */
-    void generateFilePath(int index = 0);
-
-    //=========================================================================================================
-    /**
-    * Changes the EEG cap and file path variables in the EEGoSports class
-    *
-    */
-    void changeQLineEdits();
+    bool                                m_bIsRunning;               /**< Whether EEGoSportsProducer is running.*/
 };
 
 } // NAMESPACE
 
-#endif // TMSISETUPPROJECTWIDGET_H
+#endif // EEGOSPORTSPRODUCER_H

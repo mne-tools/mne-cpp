@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     tmsisetupprojectwidget.h
+* @file     eegosportssetupprojectwidget.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
@@ -30,12 +30,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the TMSISetupProjectWidget class.
+* @brief    Contains the declaration of the EEGoSportsSetupProjectWidget class.
 *
 */
 
-#ifndef TMSISETUPPROJECTWIDGET_H
-#define TMSISETUPPROJECTWIDGET_H
+#ifndef EEGOSPORTSSETUPPROJECTWIDGET_H
+#define EEGOSPORTSSETUPPROJECTWIDGET_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -51,15 +51,15 @@
 #include <QWidget>
 
 namespace Ui {
-class TMSISetupProjectWidget;
+class EEGoSportsSetupProjectWidget;
 }
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE TMSIPlugin
+// DEFINE NAMESPACE EEGoSportsPlugin
 //=============================================================================================================
 
-namespace TMSIPlugin
+namespace EEGoSportsPlugin
 {
 
 
@@ -68,35 +68,35 @@ namespace TMSIPlugin
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class TMSI;
+class EEGoSports;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS TMSISetupProjectWidget
+* DECLARE CLASS EEGoSportsSetupProjectWidget
 *
-* @brief The TMSISetupProjectWidget class provides the TMSISetupProjectWidget configuration window.
+* @brief The EEGoSportsSetupProjectWidget class provides the EEGoSportsSetupProjectWidget configuration window.
 */
-class TMSISetupProjectWidget : public QWidget
+class EEGoSportsSetupProjectWidget : public QWidget
 {
     Q_OBJECT
 
 public:
     //=========================================================================================================
     /**
-    * Constructs a TMSISetupProjectWidget which is a child of parent.
+    * Constructs a EEGoSportsSetupProjectWidget which is a child of parent.
     *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new TMSISetupProjectWidget becomes a window. If parent is another widget, TMSISetupWidget becomes a child window inside parent. TMSISetupWidget is deleted when its parent is deleted.
-    * @param [in] pTMSI a pointer to the corresponding ECGSimulator.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new EEGoSportsSetupProjectWidget becomes a window. If parent is another widget, EEGoSportsSetupWidget becomes a child window inside parent. EEGoSportsSetupWidget is deleted when its parent is deleted.
+    * @param [in] pEEGoSports a pointer to the corresponding ECGSimulator.
     */
-    explicit TMSISetupProjectWidget(TMSI* pTMSI, QWidget *parent = 0);
+    explicit EEGoSportsSetupProjectWidget(EEGoSports* pEEGoSports, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destructs a TMSISetupProjectWidget which is a child of parent.
+    * Destructs a EEGoSportsSetupProjectWidget which is a child of parent.
     *
     */
-    ~TMSISetupProjectWidget();
+    ~EEGoSportsSetupProjectWidget();
 
     //=========================================================================================================
     /**
@@ -106,9 +106,9 @@ public:
     void initGui();
 
 private:
-    TMSI*                           m_pTMSI;        /**< a pointer to corresponding TMSI.*/
+    EEGoSports*                           m_pEEGoSports;        /**< a pointer to corresponding EEGoSports.*/
 
-    Ui::TMSISetupProjectWidget*     ui;             /**< the user interface for the TMSISetupWidget.*/
+    Ui::EEGoSportsSetupProjectWidget*     ui;             /**< the user interface for the EEGoSportsSetupWidget.*/
 
     //=========================================================================================================
     /**
@@ -155,4 +155,4 @@ private:
 
 } // NAMESPACE
 
-#endif // TMSISETUPPROJECTWIDGET_H
+#endif // EEGOSPORTSSETUPPROJECTWIDGET_H
