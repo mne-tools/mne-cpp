@@ -14,7 +14,7 @@ class TreebasedDictWindow : public QWidget
 public:
     explicit TreebasedDictWindow(QWidget *parent = 0);
     ~TreebasedDictWindow();
-    QString _treebased_dict_name = "";
+    QString _treebased_dict_name;
 
 private slots:
     void on_btt_calc_treebased_clicked();

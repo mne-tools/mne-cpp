@@ -17,12 +17,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -158,6 +158,7 @@ void TMSI::init()
 
 void TMSI::setUpFiffInfo()
 {
+    // Only works for ANT Neuro Waveguard Duke caps
     //
     //Clear old fiff info data
     //
@@ -249,10 +250,15 @@ void TMSI::setUpFiffInfo()
     digPoint.ident = FIFFV_POINT_LPA;//digitizerInfo.size();
 
     //Set EEG electrode location - Convert from mm to m
-    digPoint.r[0] = elcLocation3D[indexLE2][0]*0.001;
-    digPoint.r[1] = elcLocation3D[indexLE2][1]*0.001;
-    digPoint.r[2] = (elcLocation3D[indexLE2][2]-10)*0.001;
-    digitizerInfo.push_back(digPoint);
+    if(indexLE2!=-1)
+    {
+        digPoint.r[0] = elcLocation3D[indexLE2][0]*0.001;
+        digPoint.r[1] = elcLocation3D[indexLE2][1]*0.001;
+        digPoint.r[2] = (elcLocation3D[indexLE2][2]-10)*0.001;
+        digitizerInfo.push_back(digPoint);
+    }
+    else
+        cout<<"Plugin TMSI - ERROR - LE2 not found. Check loaded layout."<<endl;
 
     //Append nasion value to digitizer data. Take location of Z1 electrode minus 6 cm as approximation.
     int indexZ1 = elcChannelNames.indexOf("Z1");
@@ -260,10 +266,15 @@ void TMSI::setUpFiffInfo()
     digPoint.ident = FIFFV_POINT_NASION;//digitizerInfo.size();
 
     //Set EEG electrode location - Convert from mm to m
-    digPoint.r[0] = elcLocation3D[indexZ1][0]*0.001;
-    digPoint.r[1] = elcLocation3D[indexZ1][1]*0.001;
-    digPoint.r[2] = (elcLocation3D[indexZ1][2]-60)*0.001;
-    digitizerInfo.push_back(digPoint);
+    if(indexZ1!=-1)
+    {
+        digPoint.r[0] = elcLocation3D[indexZ1][0]*0.001;
+        digPoint.r[1] = elcLocation3D[indexZ1][1]*0.001;
+        digPoint.r[2] = (elcLocation3D[indexZ1][2]-60)*0.001;
+        digitizerInfo.push_back(digPoint);
+    }
+    else
+        cout<<"Plugin TMSI - ERROR - Z1 not found. Check loaded layout."<<endl;
 
     //Append RAP value to digitizer data. Take location of RE2 electrode minus 1 cm as approximation.
     int indexRE2 = elcChannelNames.indexOf("RE2");
@@ -271,10 +282,15 @@ void TMSI::setUpFiffInfo()
     digPoint.ident = FIFFV_POINT_RPA;//digitizerInfo.size();
 
     //Set EEG electrode location - Convert from mm to m
-    digPoint.r[0] = elcLocation3D[indexRE2][0]*0.001;
-    digPoint.r[1] = elcLocation3D[indexRE2][1]*0.001;
-    digPoint.r[2] = (elcLocation3D[indexRE2][2]-10)*0.001;
-    digitizerInfo.push_back(digPoint);
+    if(indexRE2!=-1)
+    {
+        digPoint.r[0] = elcLocation3D[indexRE2][0]*0.001;
+        digPoint.r[1] = elcLocation3D[indexRE2][1]*0.001;
+        digPoint.r[2] = (elcLocation3D[indexRE2][2]-10)*0.001;
+        digitizerInfo.push_back(digPoint);
+    }
+    else
+        cout<<"Plugin TMSI - ERROR - RE2 not found. Check loaded layout."<<endl;
 
     //Add EEG electrode positions as digitizers
     for(int i=0; i<numberEEGCh; i++)
