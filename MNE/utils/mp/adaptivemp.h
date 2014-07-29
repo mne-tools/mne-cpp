@@ -105,7 +105,7 @@ class UTILSSHARED_EXPORT AdaptiveMp : public QThread
 {
     Q_OBJECT
 
-public:    
+public:
 
     /**
     * adaptiveMP_adaptiveMP
@@ -143,6 +143,7 @@ public:
     MatrixXd signal;
     qint32 max_iterations;
     qreal epsilon;
+    bool fix_phase;
 
     //=========================================================================================================
     /*
@@ -193,16 +194,16 @@ public:
     *
     * @return depending on returnValue returning the real atom calculated or the manipulated parameters: scale, translation, modulation, phase, scalarproduct
     */
-    VectorXd calculate_atom(qint32 sampleCount, qreal scale, quint32 translation, qreal modulation, qint32 channel, MatrixXd residuum, ReturnValue return_value);
+    VectorXd calculate_atom(qint32 sampleCount, qreal scale, qint32 translation, qreal modulation, qint32 channel, MatrixXd residuum, ReturnValue return_value);
 
     //=========================================================================================================
 
 public slots:
 
     void send_result();
-    QList<GaborAtom> matching_pursuit (MatrixXd signal, qint32 max_iterations, qreal epsilon);
+    QList<GaborAtom> matching_pursuit (MatrixXd signal, qint32 max_iterations, qreal epsilon, bool fix_phase);
     void process();
-    void recieve_input(MatrixXd signal, qint32 max_iterations, qreal epsilon);
+    void recieve_input(MatrixXd signal, qint32 max_iterations, qreal epsilon, bool fix_phase);
 
     //=========================================================================================================
 
