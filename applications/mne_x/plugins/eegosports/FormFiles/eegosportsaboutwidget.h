@@ -1,11 +1,11 @@
 //=============================================================================================================
 /**
-* @file     tmsisetupprojectwidget.h
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+* @file     eegosportsaboutwidget.h
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July 2014
+* @date     July, 2014
 *
 * @section  LICENSE
 *
@@ -30,17 +30,20 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the TMSISetupProjectWidget class.
+* @brief    Contains the declaration of the EEGoSportsAboutWidget class.
 *
 */
 
-#ifndef TMSISETUPPROJECTWIDGET_H
-#define TMSISETUPPROJECTWIDGET_H
+#ifndef EEGOSPORTSABOUTWIDGET_H
+#define EEGOSPORTSABOUTWIDGET_H
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
+
+#include "../ui_eegosportsabout.h"
 
 
 //*************************************************************************************************************
@@ -48,19 +51,22 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QWidget>
+#include <QtWidgets>
 
-namespace Ui {
-class TMSISetupProjectWidget;
-}
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE TMSIPlugin
+// DEFINE NAMESPACE EEGoSportsPlugin
 //=============================================================================================================
 
-namespace TMSIPlugin
+namespace EEGoSportsPlugin
 {
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
 
 
 //*************************************************************************************************************
@@ -68,91 +74,38 @@ namespace TMSIPlugin
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class TMSI;
-
 
 //=============================================================================================================
 /**
-* DECLARE CLASS TMSISetupProjectWidget
+* DECLARE CLASS EEGoSportsAboutWidget
 *
-* @brief The TMSISetupProjectWidget class provides the TMSISetupProjectWidget configuration window.
+* @brief The EEGoSportsAboutWidget class provides the about dialog for the EEGoSports.
 */
-class TMSISetupProjectWidget : public QWidget
+class EEGoSportsAboutWidget : public QDialog
 {
     Q_OBJECT
 
 public:
-    //=========================================================================================================
-    /**
-    * Constructs a TMSISetupProjectWidget which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new TMSISetupProjectWidget becomes a window. If parent is another widget, TMSISetupWidget becomes a child window inside parent. TMSISetupWidget is deleted when its parent is deleted.
-    * @param [in] pTMSI a pointer to the corresponding ECGSimulator.
-    */
-    explicit TMSISetupProjectWidget(TMSI* pTMSI, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destructs a TMSISetupProjectWidget which is a child of parent.
+    * Constructs a ECGAboutWidget dialog which is a child of parent.
     *
+    * @param [in] parent pointer to parent widget; If parent is 0, the new EEGoSportsAboutWidget becomes a window. If parent is another widget, EEGoSportsAboutWidget becomes a child window inside parent. EEGoSportsAboutWidget is deleted when its parent is deleted.
     */
-    ~TMSISetupProjectWidget();
+    EEGoSportsAboutWidget(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Inits the GUI
-    *
+    * Destroys the EEGoSportsAboutWidget.
+    * All EEGoSportsAboutWidget's children are deleted first. The application exits if EEGoSportsAboutWidget is the main widget.
     */
-    void initGui();
+    ~EEGoSportsAboutWidget();
 
 private:
-    TMSI*                           m_pTMSI;        /**< a pointer to corresponding TMSI.*/
-
-    Ui::TMSISetupProjectWidget*     ui;             /**< the user interface for the TMSISetupWidget.*/
-
-    //=========================================================================================================
-    /**
-    * Sets the project dir
-    *
-    */
-    void addProject();
-
-    //=========================================================================================================
-    /**
-    * Sets the subject dir
-    *
-    */
-    void addSubject();
-
-    //=========================================================================================================
-    /**
-    * Sets the dir where the output file is saved
-    *
-    */
-    void changeOutputFile();
-
-    //=========================================================================================================
-    /**
-    * Sets the dir where the eeg cap file is located
-    *
-    */
-    void changeCap();
-
-    //=========================================================================================================
-    /**
-    * Generates new file path based onthe project and subject parameters
-    *
-    */
-    void generateFilePath(int index = 0);
-
-    //=========================================================================================================
-    /**
-    * Changes the EEG cap and file path variables in the EEGoSports class
-    *
-    */
-    void changeQLineEdits();
+    Ui::EEGoSportsAboutWidgetClass ui;    /**< Holds the user interface for the EEGoSportsAboutWidgetClass.*/
 };
 
 } // NAMESPACE
 
-#endif // TMSISETUPPROJECTWIDGET_H
+#endif // EEGOSPORTSABOUTWIDGET_H
