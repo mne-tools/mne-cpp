@@ -66,9 +66,10 @@
 
 using namespace UTILSLIB;
 
-TreebasedDictWindow::TreebasedDictWindow(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::TreebasedDictWindow)
+TreebasedDictWindow::TreebasedDictWindow(QWidget *parent)
+: QWidget(parent)
+, ui(new Ui::TreebasedDictWindow)
+, _treebased_dict_name("")
 {
     ui->setupUi(this);
 }
