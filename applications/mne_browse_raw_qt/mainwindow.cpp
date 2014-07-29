@@ -90,6 +90,7 @@ void MainWindow::setupModel()
 {
 //    m_pRawModel = new RawModel(this);
     m_pRawModel = new RawModel(m_qFileRaw,this);
+    m_pEventModel = new EventModel(this);
 }
 
 
@@ -106,9 +107,14 @@ void MainWindow::setupDelegate()
 void MainWindow::setupView()
 {
     m_pTableView = new QTableView;
+    m_pEventTableView = new QTableView;
 
-    m_pTableView->setModel(m_pRawModel); //set custom model
-    m_pTableView->setItemDelegate(m_pRawDelegate); //set custom delegate
+    //set custom models
+    m_pEventTableView->setModel(m_pEventModel);
+    m_pTableView->setModel(m_pRawModel);
+
+    //set custom delegate
+    m_pTableView->setItemDelegate(m_pRawDelegate);
 
     //TableView settings
     setupViewSettings();
@@ -177,6 +183,9 @@ void MainWindow::createMenus() {
     QAction *writeAction = fileMenu->addAction(tr("&Save As..."));
     openAction->setShortcuts(QKeySequence::SaveAs);
     connect(writeAction, SIGNAL(triggered()), this, SLOT(writeFile()));
+
+    QAction *loadEvents = fileMenu->addAction(tr("&Load Events..."));
+    connect(loadEvents, SIGNAL(triggered()), this, SLOT(loadEvents()));
 
     QAction *quitAction = fileMenu->addAction(tr("E&xit"));
     quitAction->setShortcuts(QKeySequence::Quit);
@@ -318,6 +327,28 @@ void MainWindow::writeFile()
 
     if(!m_pRawModel->writeFiffData(t_fileRaw))
         qDebug() << "MainWindow: ERROR writing fiff data file" << t_fileRaw.fileName() << "!";
+}
+
+
+//*************************************************************************************************************
+
+void MainWindow::loadEvents()
+{
+    QString filename = QFileDialog::getOpenFileName(this,QString("Open fiff event data file"),QString("./MNE-sample-data/MEG/sample/"),tr("fif event data files (*-eve.fif);;fif data files (*.fif)"));
+    if(m_qFileRaw.isOpen())
+        m_qFileRaw.close();
+    m_qFileRaw.setFileName(filename);
+
+    if(m_pEventModel->loadEventData(m_qFileRaw)) {
+        qDebug() << "Fiff event data file" << filename << "loaded.";
+    }
+    else
+        qDebug("ERROR loading fiff event data file %s",filename.toLatin1().data());
+
+    setWindowStatus();
+
+    //set position of QScrollArea
+    setScrollBarPosition(0);
 }
 
 

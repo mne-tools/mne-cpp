@@ -142,7 +142,10 @@ public:
     */
     void init();
 
+    void calcFiffInfo();
+
     void doClustering();
+
     void finishedClustering();
 
     virtual bool start();
@@ -222,6 +225,11 @@ private:
 
 
     FiffInfo::SPtr              m_pFiffInfo;        /**< Fiff information. */
+    FiffInfo::SPtr              m_pFiffInfoEvoked;  /**< Fiff information of the evoked. */
+    QStringList                 m_pCovChNames;      /**< Covariance channel names. */
+    FiffInfo::SPtr              m_pFiffInfoForward; /**< Fiff information of the forward solution. */
+
+    QStringList                 pickChNames;        /**< Channels to pick */
 
     RtInvOp::SPtr               m_pRtInvOp;         /**< Real-time inverse operator. */
     MNEInverseOperator::SPtr    m_pInvOp;           /**< The inverse operator. */
