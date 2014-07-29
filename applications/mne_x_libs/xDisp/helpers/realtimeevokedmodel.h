@@ -43,6 +43,7 @@
 //=============================================================================================================
 
 #include <xMeas/realtimesamplearraychinfo.h>
+#include <xMeas/realtimeevoked.h>
 #include <fiff/fiff_types.h>
 
 
@@ -100,6 +101,10 @@ public:
     */
     RealTimeEvokedModel(QObject *parent = 0);
 
+    inline bool isInit() const;
+
+    inline qint32 getNumSamples() const;
+
     //=========================================================================================================
     /**
     * Returns the number of rows under the given parent. When the parent is valid it means that rowCount is returning the number of children of parent.
@@ -119,6 +124,18 @@ public:
     * @return number of columns
     */
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
+
+    //=========================================================================================================
+    /**
+    * Data for the row and column and given display role
+    *
+    * @param [in] row       index row
+    * @param [in] column    index column
+    * @param [in] role      display role to access
+    *
+    * @return the accessed data
+    */
+    inline QVariant data(int row, int column, int role = Qt::DisplayRole) const;
 
     //=========================================================================================================
     /**
@@ -145,27 +162,27 @@ public:
 
     //=========================================================================================================
     /**
-    * Sets corresponding channel information
+    * Sets corresponding real-time evoked
     *
-    * @param [in] chInfo        The corresponding channel information list
+    * @param [in] pRTE      The real-time evoked
     */
-    void setChannelInfo(QList<RealTimeSampleArrayChInfo> &chInfo);
+    void setRTE(QSharedPointer<RealTimeEvoked> &pRTE);
 
     //=========================================================================================================
     /**
-    * Sets the sampling information and calculates the resulting downsampling factor between actual sps and desired sps
-    *
-    * @param[in] sps        Samples per second of incomming data
+    * Update stored data
     */
-    void setSamplingInfo(float sps);
+    void updateData();
 
     //=========================================================================================================
     /**
-    * Adds multiple time points (QVector) for a channel set (VectorXd)
+    * Returns the color of a given channel number
     *
-    * @param[in] data       data to add (Time points of channel samples)
+    * @param[in] row    row number which correspodns to a given channel
+    *
+    * @return color of given channel number
     */
-    void addData(const MatrixXd &data);
+    QColor getColor(qint32 row) const;
 
     //=========================================================================================================
     /**
@@ -199,19 +216,19 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns the maximal number of samples of the downsampled data to display
-    *
-    * @return the maximal number of samples
-    */
-    inline qint32 getMaxSamples() const;
-
-    //=========================================================================================================
-    /**
     * Returns a map which conatins the channel idx and its corresponding selection status
     *
     * @return the channel idx to selection status
     */
     inline const QMap<qint32,qint32>& getIdxSelMap() const;
+
+    //=========================================================================================================
+    /**
+    * Returns the number of pre-stimulus samples
+    *
+    * @return the number of pre-stimulus samples
+    */
+    inline qint32 getNumPreStimSamples() const;
 
     //=========================================================================================================
     /**
@@ -261,13 +278,15 @@ signals:
     void newSelection(QList<qint32> selection);
 
 private:
-    QList<RealTimeSampleArrayChInfo> m_qListChInfo; /**< Channel info list.*/
+    QSharedPointer<RealTimeEvoked> m_pRTE;          /**< The real-time evoked measurement. */
 
     QMap<qint32,qint32> m_qMapIdxRowSelection;      /**< Selection mapping.*/
 
     //Fiff data structure
     MatrixXd m_matData;        /**< List that holds the data*/
     MatrixXd m_matDataFreeze;  /**< List that holds the data when freezed*/
+
+    bool m_bIsInit;
 
     float m_fSps;               /**< Sampling rate */
 
@@ -280,6 +299,31 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
+
+inline bool RealTimeEvokedModel::isInit() const
+{
+    return m_bIsInit;
+}
+
+
+//*************************************************************************************************************
+
+inline qint32 RealTimeEvokedModel::getNumSamples() const
+{
+    return m_bIsInit ? m_matData.cols() : 0;
+}
+
+
+//*************************************************************************************************************
+
+inline QVariant RealTimeEvokedModel::data(int row, int column, int role) const
+{
+    return data(index(row, column), role);
+}
+
+
+//*************************************************************************************************************
+
 inline const QMap<qint32,qint32>& RealTimeEvokedModel::getIdxSelMap() const
 {
     return m_qMapIdxRowSelection;
@@ -291,6 +335,14 @@ inline const QMap<qint32,qint32>& RealTimeEvokedModel::getIdxSelMap() const
 inline qint32 RealTimeEvokedModel::numVLines() const
 {
     return (qint32)(m_matData.cols()/m_fSps) - 1;
+}
+
+
+//*************************************************************************************************************
+
+inline qint32 RealTimeEvokedModel::getNumPreStimSamples() const
+{
+    return m_pRTE->getNumPreStimSamples();
 }
 
 

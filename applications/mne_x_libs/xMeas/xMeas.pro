@@ -84,7 +84,9 @@ SOURCES += \
     newnumeric.cpp \
     newmeasurement.cpp \
     measurementtypes.cpp \
-    realtimeevoked.cpp
+    realtimeevoked.cpp \
+    noiseestimation.cpp \
+    realtimecov.cpp
 
 
 HEADERS += \
@@ -96,7 +98,9 @@ HEADERS += \
     newnumeric.h \
     newmeasurement.h \
     measurementtypes.h \
-    realtimeevoked.h
+    realtimeevoked.h \
+    noiseestimation.h \
+    realtimecov.h
 
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}

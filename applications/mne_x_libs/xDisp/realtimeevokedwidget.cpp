@@ -45,6 +45,12 @@
 
 #include <xMeas/realtimeevoked.h>
 
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
 #include <Eigen/Core>
 
 
@@ -63,8 +69,6 @@
 
 #include <QPaintEvent>
 #include <QPainter>
-#include <QTimer>
-#include <QTime>
 #include <QVBoxLayout>
 #include <QHeaderView>
 #include <QMenu>
@@ -73,6 +77,7 @@
 #include <QScroller>
 
 #include <QDebug>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -103,11 +108,9 @@ RealTimeEvokedWidget::RealTimeEvokedWidget(QSharedPointer<RealTimeEvoked> pRTE, 
 : NewMeasurementWidget(parent)
 , m_pRTEModel(NULL)
 , m_pButterflyPlot(NULL)
-, m_fDefaultSectionSize(80.0f)
 , m_fZoomFactor(1.0f)
 , m_pRTE(pRTE)
 , m_bInitialized(false)
-, m_fSamplingRate(1024)
 , m_pSensorModel(NULL)
 {
     Q_UNUSED(pTime)
@@ -121,12 +124,12 @@ RealTimeEvokedWidget::RealTimeEvokedWidget(QSharedPointer<RealTimeEvoked> pRTE, 
     connect(m_pDoubleSpinBoxZoom, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &RealTimeEvokedWidget::zoomChanged);
     addDisplayWidget(m_pDoubleSpinBoxZoom);
 
-    m_pActionSelectSensors = new QAction(QIcon(":/images/selectSensors.png"), tr("Shows the region selection widget (F12)"),this);
-    m_pActionSelectSensors->setShortcut(tr("F12"));
-    m_pActionSelectSensors->setStatusTip(tr("Shows the region selection widget (F12)"));
-    m_pActionSelectSensors->setVisible(false);
-    connect(m_pActionSelectSensors, &QAction::triggered, this, &RealTimeEvokedWidget::showSensorSelectionWidget);
-    addDisplayAction(m_pActionSelectSensors);
+//    m_pActionSelectSensors = new QAction(QIcon(":/images/selectSensors.png"), tr("Shows the region selection widget (F12)"),this);
+//    m_pActionSelectSensors->setShortcut(tr("F12"));
+//    m_pActionSelectSensors->setStatusTip(tr("Shows the region selection widget (F12)"));
+//    m_pActionSelectSensors->setVisible(false);
+//    connect(m_pActionSelectSensors, &QAction::triggered, this, &RealTimeEvokedWidget::showSensorSelectionWidget);
+//    addDisplayAction(m_pActionSelectSensors);
 
     if(m_pButterflyPlot)
         delete m_pButterflyPlot;
@@ -140,7 +143,7 @@ RealTimeEvokedWidget::RealTimeEvokedWidget(QSharedPointer<RealTimeEvoked> pRTE, 
     //set layouts
     this->setLayout(rteLayout);
 
-    init();
+    getData();
 }
 
 
@@ -156,34 +159,42 @@ RealTimeEvokedWidget::~RealTimeEvokedWidget()
 
 void RealTimeEvokedWidget::update(XMEASLIB::NewMeasurement::SPtr)
 {
+    getData();
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeEvokedWidget::getData()
+{
     if(!m_bInitialized)
     {
-        if(m_pRTE->isChInit())
+        if(m_pRTE->isInitialized())
         {
             m_qListChInfo = m_pRTE->chInfo();
-            m_fSamplingRate = 0;//m_pRTE->getSamplingRate();
 
-            QFile file(m_pRTE->getXMLLayoutFile());
-            if (!file.open(QFile::ReadOnly | QFile::Text))
-            {
-                qDebug() << QString("Cannot read file %1:\n%2.").arg(m_pRTE->getXMLLayoutFile()).arg(file.errorString());
-                m_pSensorModel = new SensorModel(this);
-                m_pSensorModel->mapChannelInfo(m_qListChInfo);
-            }
-            else
-            {
-                m_pSensorModel = new SensorModel(&file, this);
-                m_pSensorModel->mapChannelInfo(m_qListChInfo);
-                m_pActionSelectSensors->setVisible(true);
-            }
+//            QFile file(m_pRTE->getXMLLayoutFile());
+//            if (!file.open(QFile::ReadOnly | QFile::Text))
+//            {
+//                qDebug() << QString("Cannot read file %1:\n%2.").arg(m_pRTE->getXMLLayoutFile()).arg(file.errorString());
+//                m_pSensorModel = new SensorModel(this);
+//                m_pSensorModel->mapChannelInfo(m_qListChInfo);
+//            }
+//            else
+//            {
+//                m_pSensorModel = new SensorModel(&file, this);
+//                m_pSensorModel->mapChannelInfo(m_qListChInfo);
+//                m_pActionSelectSensors->setVisible(true);
+//            }
 
             init();
+
+            m_pRTEModel->updateData();
         }
     }
     else
-        m_pRTEModel->addData(m_pRTE->getValue());
+        m_pRTEModel->updateData();
 }
-
 
 //*************************************************************************************************************
 
@@ -195,42 +206,9 @@ void RealTimeEvokedWidget::init()
             delete m_pRTEModel;
         m_pRTEModel = new RealTimeEvokedModel(this);
 
-        m_pRTEModel->setChannelInfo(m_qListChInfo);
-        m_pRTEModel->setSamplingInfo(m_fSamplingRate);
+        m_pRTEModel->setRTE(m_pRTE);
 
         m_pButterflyPlot->setModel(m_pRTEModel);
-
-
-
-
-//        if(m_pRTMSADelegate)
-//            delete m_pRTMSADelegate;
-//        m_pRTMSADelegate = new RealTimeMultiSampleArrayDelegate(this);
-
-//        connect(m_pTableView, &QTableView::doubleClicked, m_pRTMSAModel, &RealTimeMultiSampleArrayModel::toggleFreeze);
-
-//        //set some size settings for m_pTableView
-//        m_pTableView->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
-
-//        m_pTableView->setShowGrid(false);
-
-//        m_pTableView->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch); //Stretch 2 column to maximal width
-//        m_pTableView->horizontalHeader()->hide();
-//        m_pTableView->verticalHeader()->setDefaultSectionSize(m_fZoomFactor*m_fDefaultSectionSize);//Row Height
-
-//        m_pTableView->setAutoScroll(false);
-//        m_pTableView->setColumnHidden(0,true); //because content is plotted jointly with column=1
-
-//        m_pTableView->resizeColumnsToContents();
-
-//        m_pTableView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
-
-//        //set context menu
-//        m_pTableView->setContextMenuPolicy(Qt::CustomContextMenu);
-//        connect(m_pTableView,SIGNAL(customContextMenuRequested(QPoint)),this,SLOT(channelContextMenu(QPoint)));
-
-//        //activate kinetic scrolling
-//        QScroller::grabGesture(m_pTableView,QScroller::MiddleMouseButtonGesture);
 
         m_bInitialized = true;
     }
@@ -239,115 +217,9 @@ void RealTimeEvokedWidget::init()
 
 //*************************************************************************************************************
 
-void RealTimeEvokedWidget::channelContextMenu(QPoint pos)
-{
-//    //obtain index where index was clicked
-//    QModelIndex index = m_pTableView->indexAt(pos);
-
-//    //get selected items
-//    QModelIndexList selected = m_pTableView->selectionModel()->selectedIndexes();
-
-////    // Lambda C++11 version
-////    QVector<qint32> vecSelection;
-////    for(qint32 i = 0; i < selected.size(); ++i)
-////        if(selected[i].column() == 1)
-////            vecSelection.append(m_pRTMSAModel->getIdxSelMap()[selected[i].row()]);
-
-////    //create custom context menu and actions
-////    QMenu *menu = new QMenu(this);
-
-////    //select channels
-////    QAction* doSelection = menu->addAction(tr("Apply selection"));
-////    connect(doSelection,&QAction::triggered, [=](){
-////        m_pRTMSAModel->selectRows(vecSelection);
-////    });
-
-//    // non C++11 alternative
-//    m_qListCurrentSelection.clear();
-//    for(qint32 i = 0; i < selected.size(); ++i)
-//        if(selected[i].column() == 1)
-//            m_qListCurrentSelection.append(m_pRTMSAModel->getIdxSelMap()[selected[i].row()]);
-
-//    //create custom context menu and actions
-//    QMenu *menu = new QMenu(this);
-
-//    //select channels
-//    QAction* doSelection = menu->addAction(tr("Apply selection"));
-//    connect(doSelection, &QAction::triggered, this, &RealTimeEvokedWidget::applySelection);
-
-//    //undo selection
-//    QAction* resetAppliedSelection = menu->addAction(tr("Reset selection"));
-//    connect(resetAppliedSelection,&QAction::triggered, m_pRTMSAModel, &RealTimeMultiSampleArrayModel::resetSelection);
-//    connect(resetAppliedSelection,&QAction::triggered, this, &RealTimeEvokedWidget::resetSelection);
-
-//    //show context menu
-//    menu->popup(m_pTableView->viewport()->mapToGlobal(pos));
-}
-
-
-//*************************************************************************************************************
-
-void RealTimeEvokedWidget::resizeEvent(QResizeEvent* resizeEvent)
-{
-    Q_UNUSED(resizeEvent)
-}
-
-
-//*************************************************************************************************************
-
-void RealTimeEvokedWidget::keyPressEvent(QKeyEvent* keyEvent)
-{
-    Q_UNUSED(keyEvent)
-}
-
-
-//*************************************************************************************************************
-
-void RealTimeEvokedWidget::mousePressEvent(QMouseEvent* mouseEvent)
-{
-    Q_UNUSED(mouseEvent)
-}
-
-
-//*************************************************************************************************************
-
-void RealTimeEvokedWidget::mouseMoveEvent(QMouseEvent* mouseEvent)
-{
-    Q_UNUSED(mouseEvent)
-}
-
-
-//*************************************************************************************************************
-
-void RealTimeEvokedWidget::mouseReleaseEvent(QMouseEvent* mouseEvent)
-{
-    Q_UNUSED(mouseEvent)
-}
-
-
-//*************************************************************************************************************
-
-void RealTimeEvokedWidget::mouseDoubleClickEvent(QMouseEvent* mouseEvent)
-{
-    Q_UNUSED(mouseEvent)
-}
-
-
-//*************************************************************************************************************
-
-void RealTimeEvokedWidget::wheelEvent(QWheelEvent* wheelEvent)
-{
-    Q_UNUSED(wheelEvent)
-}
-
-
-//*************************************************************************************************************
-
 void RealTimeEvokedWidget::zoomChanged(double zoomFac)
 {
     m_fZoomFactor = zoomFac;
-
-//    m_pTableView->verticalHeader()->setDefaultSectionSize(m_fZoomFactor*m_fDefaultSectionSize);//Row Height
 }
 
 

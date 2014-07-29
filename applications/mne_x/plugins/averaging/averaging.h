@@ -48,6 +48,7 @@
 #include <generics/circularmatrixbuffer.h>
 #include <xMeas/newrealtimemultisamplearray.h>
 #include <xMeas/realtimeevoked.h>
+#include <rtInv/rtave.h>
 
 
 //*************************************************************************************************************
@@ -56,6 +57,7 @@
 //=============================================================================================================
 
 #include <fiff/fiff_info.h>
+#include <fiff/fiff_evoked.h>
 
 
 //*************************************************************************************************************
@@ -64,6 +66,7 @@
 //=============================================================================================================
 
 #include <QtWidgets>
+#include <QSpinBox>
 
 
 //*************************************************************************************************************
@@ -83,12 +86,16 @@ namespace AveragingPlugin
 using namespace MNEX;
 using namespace XMEASLIB;
 using namespace IOBuffer;
+using namespace FIFFLIB;
+using namespace RTINVLIB;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
+
+class AveragingSettingsWidget;
 
 
 //=============================================================================================================
@@ -103,6 +110,8 @@ class AVERAGINGSHARED_EXPORT Averaging : public IAlgorithm
     Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "averaging.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(MNEX::IAlgorithm)
+
+    friend class AveragingSettingsWidget;
 
 public:
     //=========================================================================================================
@@ -123,6 +132,8 @@ public:
     */
     void init();
 
+    void changeNumAverages(qint32 numAve);
+
     //=========================================================================================================
     /**
     * Clone the plugin
@@ -135,9 +146,20 @@ public:
     virtual IPlugin::PluginType getType() const;
     virtual QString getName() const;
 
+
+    void changeStimChannel(qint32 index);
+
+    void changePreStim(qint32 samples);
+
+    void changePostStim(qint32 samples);
+
+    void appendEvoked(FiffEvoked::SPtr p_pEvoked);
+
     virtual QWidget* setupWidget();
 
     void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
+
+    void showAveragingWidget();
 
 signals:
     //=========================================================================================================
@@ -156,17 +178,36 @@ private:
     */
     void initConnector();
 
+
+    QMutex mutex;
+
     PluginInputData<NewRealTimeMultiSampleArray>::SPtr   m_pAveragingInput;     /**< The RealTimeSampleArray of the Averaging input.*/
     PluginOutputData<RealTimeEvoked>::SPtr  m_pAveragingOutput;                 /**< The RealTimeEvoked of the Averaging output.*/
 
-    FiffInfo::SPtr  m_pFiffInfo;                            /**< Fiff measurement info.*/
+    FiffInfo::SPtr  m_pFiffInfo;        /**< Fiff measurement info.*/
+    QList<qint32> m_qListStimChs;       /**< Stimulus channels.*/
+
+    QList< QPair<QString, bool> > m_qListModalities; /**< List Modalities.*/
 
     CircularMatrixBuffer<double>::SPtr   m_pAveragingBuffer;      /**< Holds incoming data.*/
 
     bool m_bIsRunning;      /**< If source lab is running */
     bool m_bProcessData;    /**< If data should be received for processing */
 
-    int m_iDebugNumChannels;
+    RtAve::SPtr m_pRtAve;   /**< Real-time average. */
+
+    qint32 m_iPreStimSamples;
+    qint32 m_iPostStimSamples;
+
+    qint32 m_iNumAverages;
+
+    qint32 m_iStimChan;
+
+    QVector<FiffEvoked::SPtr>   m_qVecEvokedData;   /**< Evoked data set */
+
+    QSharedPointer<AveragingSettingsWidget> m_pAveragingWidget;
+
+    QAction* m_pActionShowAdjustment;
 
 };
 
