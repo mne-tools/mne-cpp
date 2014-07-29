@@ -160,7 +160,7 @@ public:
     *
     * @return Info modified according to sel
     */
-    FiffInfoBase pick_info(const MatrixXi* sel = NULL) const;
+    FiffInfoBase pick_info(const RowVectorXi* sel = NULL) const;
 
     //=========================================================================================================
     /**
