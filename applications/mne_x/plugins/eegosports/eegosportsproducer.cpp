@@ -1,11 +1,11 @@
 //=============================================================================================================
 /**
-* @file     tmsielectrodeitem.cpp
+* @file     eegosportsproducer.cpp
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     June, 2014
+* @date     July, 2014
 *
 * @section  LICENSE
 *
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the TmsiElectrodeItem class.
+* @brief    Contains the implementation of the EEGoSportsProducer class.
 *
 */
 
@@ -39,7 +39,11 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "tmsielectrodeitem.h"
+#include "eegosportsproducer.h"
+#include "eegosports.h"
+#include "eegosportsdriver.h"
+
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -47,8 +51,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace TMSIPlugin;
-using namespace std;
+using namespace EEGoSportsPlugin;
 
 
 //*************************************************************************************************************
@@ -56,108 +59,80 @@ using namespace std;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-TMSIElectrodeItem::TMSIElectrodeItem(QString electrodeName, QPointF electrodePosition, QColor electrodeColor, int channelIndex)
-: m_sElectrodeName(electrodeName)
-, m_qpElectrodePosition(electrodePosition)
-, m_cElectrodeColor(electrodeColor)
-, m_dImpedanceValue(0.0)
-, m_iChannelIndex(channelIndex)
+EEGoSportsProducer::EEGoSportsProducer(EEGoSports* pEEGoSports)
+: m_pEEGoSports(pEEGoSports)
+, m_pEEGoSportsDriver(new EEGoSportsDriver(this))
+, m_bIsRunning(true)
 {
 }
+
 
 //*************************************************************************************************************
 
-QRectF TMSIElectrodeItem::boundingRect() const
+EEGoSportsProducer::~EEGoSportsProducer()
 {
-    return QRectF(-25, -35, 50, 70);
+    //cout << "EEGoSportsProducer::~EEGoSportsProducer()" << endl;
 }
+
 
 //*************************************************************************************************************
 
-void TMSIElectrodeItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void EEGoSportsProducer::start(int iNumberOfChannels,
+                     int iSamplingFrequency,
+                     bool bUseChExponent,
+                     bool bWriteDriverDebugToFile,
+                     QString sOutputFilePath,
+                     bool bMeasureImpedance)
 {
-    Q_UNUSED(option);
-    Q_UNUSED(widget);
-
-    // Plot shadow
-    painter->setPen(Qt::NoPen);
-    painter->setBrush(Qt::darkGray);
-    painter->drawEllipse(-12, -12, 30, 30);
-
-    // Plot colored circle
-    painter->setPen(QPen(Qt::black, 1));
-    painter->setBrush(QBrush(m_cElectrodeColor));
-    painter->drawEllipse(-15, -15, 30, 30);
-
-    // Plot electrode name
-    QStaticText staticElectrodeName = QStaticText(m_sElectrodeName);
-    QSizeF sizeText = staticElectrodeName.size();
-    painter->drawStaticText(-15+((30-sizeText.width())/2), -32, staticElectrodeName);
-
-    // Plot electrodes impedance value
-    QString impedanceValueToString;
-    QStaticText staticElectrodeValue = QStaticText(QString("%1 %2").arg(impedanceValueToString.setNum(m_dImpedanceValue/1000)).arg(/*"kOhm"*/"k")); // transform to kilo ohm (divide by 1000)
-    QSizeF sizeValue = staticElectrodeValue.size();
-    painter->drawStaticText(-15+((30-sizeValue.width())/2), 19, staticElectrodeValue);
-
-    this->setPos(m_qpElectrodePosition);
+    //Initialise device
+    if(m_pEEGoSportsDriver->initDevice(iNumberOfChannels,
+                              iSamplingFrequency,
+                              bUseChExponent,
+                              bWriteDriverDebugToFile,
+                              sOutputFilePath,
+                              bMeasureImpedance))
+    {
+        m_bIsRunning = true;
+        QThread::start();
+    }
+    else
+        m_bIsRunning = false;
 }
+
 
 //*************************************************************************************************************
 
-void TMSIElectrodeItem::setColor(QColor electrodeColor)
+void EEGoSportsProducer::stop()
 {
-    m_cElectrodeColor = electrodeColor;
+    //Wait until this thread (EEGoSportsProducer) is stopped
+    m_bIsRunning = false;
+
+    //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the push function (acquire statement)
+    m_pEEGoSports->m_pRawMatrixBuffer_In->releaseFromPush();
+
+    while(this->isRunning())
+        m_bIsRunning = false;
+
+    //Unitialise device only after the thread stopped
+    m_pEEGoSportsDriver->uninitDevice();
 }
+
 
 //*************************************************************************************************************
 
-QString TMSIElectrodeItem::getElectrodeName()
+void EEGoSportsProducer::run()
 {
-    return m_sElectrodeName;
+    while(m_bIsRunning)
+    {
+        //std::cout<<"EEGoSportsProducer::run()"<<std::endl;
+        //Get the TMSi EEG data out of the device buffer and write received data to a QList
+        MatrixXf matRawBuffer;
+
+        if(m_pEEGoSportsDriver->getSampleMatrixValue(matRawBuffer))
+            m_pEEGoSports->setSampleData(matRawBuffer);
+    }
+
+    //std::cout<<"EXITING - EEGoSportsProducer::run()"<<std::endl;
 }
-
-//*************************************************************************************************************
-
-void TMSIElectrodeItem::setImpedanceValue(double impedanceValue)
-{
-    m_dImpedanceValue = impedanceValue;
-}
-
-//*************************************************************************************************************
-
-double TMSIElectrodeItem::getImpedanceValue()
-{
-    return m_dImpedanceValue;
-}
-
-//*************************************************************************************************************
-
-void TMSIElectrodeItem::setPosition(QPointF newPosition)
-{
-    m_qpElectrodePosition = newPosition;
-}
-
-//*************************************************************************************************************
-
-QPointF TMSIElectrodeItem::getPosition()
-{
-    return m_qpElectrodePosition;
-}
-
-//*************************************************************************************************************
-
-int TMSIElectrodeItem::getChannelIndex()
-{
-    return m_iChannelIndex;
-}
-
-
-
-
-
-
-
-
 
 
