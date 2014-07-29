@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
-* @file     tmsisetupwidget.cpp
+* @file     eegosportssetupwidget.cpp
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     September 2013
+* @date     July 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the TMSISetupWidget class.
+* @brief    Contains the implementation of the EEGoSportsSetupWidget class.
 *
 */
 
@@ -39,9 +39,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "tmsisetupwidget.h"
-#include "tmsiaboutwidget.h"
-#include "../tmsi.h"
+#include "eegosportssetupwidget.h"
+#include "eegosportsaboutwidget.h"
+#include "../eegosports.h"
 
 
 //*************************************************************************************************************
@@ -57,7 +57,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace TMSIPlugin;
+using namespace EEGoSportsPlugin;
 
 
 //*************************************************************************************************************
@@ -65,55 +65,43 @@ using namespace TMSIPlugin;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-TMSISetupWidget::TMSISetupWidget(TMSI* pTMSI, QWidget* parent)
+EEGoSportsSetupWidget::EEGoSportsSetupWidget(EEGoSports* pEEGoSports, QWidget* parent)
 : QWidget(parent)
-, m_pTMSI(pTMSI)
+, m_pEEGoSports(pEEGoSports)
 {
     ui.setupUi(this);
 
     //Connect device sampling properties
     connect(ui.m_spinBox_SamplingFreq, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-            this, &TMSISetupWidget::setDeviceSamplingProperties);
+            this, &EEGoSportsSetupWidget::setDeviceSamplingProperties);
     connect(ui.m_spinBox_NumberOfChannels, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-            this, &TMSISetupWidget::setDeviceSamplingProperties);
-    connect(ui.m_spinBox_SamplesPerBlock, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-            this, &TMSISetupWidget::setDeviceSamplingProperties);
-    connect(ui.m_checkBox_UseCommonAverage, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
-            this, &TMSISetupWidget::setDeviceSamplingProperties);
+            this, &EEGoSportsSetupWidget::setDeviceSamplingProperties);
 
     //Connect channel corrections
     connect(ui.m_checkBox_UseChExponent, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
-            this, &TMSISetupWidget::setDeviceSamplingProperties);
-    connect(ui.m_checkBox_UseUnitGain, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
-            this, &TMSISetupWidget::setDeviceSamplingProperties);
-    connect(ui.m_checkBox_UseUnitOffset, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
-            this, &TMSISetupWidget::setDeviceSamplingProperties);
+            this, &EEGoSportsSetupWidget::setDeviceSamplingProperties);
 
     //Connect preprocessing
     connect(ui.m_checkBox_UseFiltering, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
-            this, &TMSISetupWidget::setPreprocessing);
-
-    //Connect postprocessing
-    connect(ui.m_checkBox_UseFFT, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
-            this, &TMSISetupWidget::setPostprocessing);
+            this, &EEGoSportsSetupWidget::setPreprocessing);
 
     //Connect debug file
     connect(ui.m_checkBox_WriteDriverDebugToFile, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
-            this, &TMSISetupWidget::setWriteToFile);
+            this, &EEGoSportsSetupWidget::setWriteToFile);
 
     //Connect trigger properties
     connect(ui.m_spinBox_BeepLength, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
-            this, &TMSISetupWidget::setTriggerProperties);
+            this, &EEGoSportsSetupWidget::setTriggerProperties);
     connect(ui.m_checkBox_EnableBeep, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
-            this, &TMSISetupWidget::setTriggerProperties);
+            this, &EEGoSportsSetupWidget::setTriggerProperties);
     connect(ui.m_checkBox_EnableKeyboardTrigger, static_cast<void (QCheckBox::*)(bool)>(&QCheckBox::clicked),
-            this, &TMSISetupWidget::setTriggerProperties);
+            this, &EEGoSportsSetupWidget::setTriggerProperties);
 
     //Connect about button
-    connect(ui.m_qPushButton_About, &QPushButton::released, this, &TMSISetupWidget::showAboutDialog);
+    connect(ui.m_qPushButton_About, &QPushButton::released, this, &EEGoSportsSetupWidget::showAboutDialog);
 
     //Fill info box
-    QFile file(m_pTMSI->m_qStringResourcePath+"readme.txt");
+    QFile file(m_pEEGoSports->m_qStringResourcePath+"readme.txt");
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
         return;
 
@@ -129,7 +117,7 @@ TMSISetupWidget::TMSISetupWidget(TMSI* pTMSI, QWidget* parent)
 
 //*************************************************************************************************************
 
-TMSISetupWidget::~TMSISetupWidget()
+EEGoSportsSetupWidget::~EEGoSportsSetupWidget()
 {
 
 }
@@ -137,87 +125,73 @@ TMSISetupWidget::~TMSISetupWidget()
 
 //*************************************************************************************************************
 
-void TMSISetupWidget::initGui()
+void EEGoSportsSetupWidget::initGui()
 {
     //Init device sampling properties
-    ui.m_spinBox_SamplingFreq->setValue(m_pTMSI->m_iSamplingFreq);
-    ui.m_spinBox_NumberOfChannels->setValue(m_pTMSI->m_iNumberOfChannels);
-    ui.m_spinBox_SamplesPerBlock->setValue(m_pTMSI->m_iSamplesPerBlock);
-    ui.m_checkBox_UseCommonAverage->setChecked(m_pTMSI->m_bUseCommonAverage);
+    ui.m_spinBox_SamplingFreq->setValue(m_pEEGoSports->m_iSamplingFreq);
+    ui.m_spinBox_NumberOfChannels->setValue(m_pEEGoSports->m_iNumberOfChannels);
 
     //Init channel corrections
-    ui.m_checkBox_UseChExponent->setChecked(m_pTMSI->m_bUseChExponent);
-    ui.m_checkBox_UseUnitGain->setChecked(m_pTMSI->m_bUseUnitGain);
-    ui.m_checkBox_UseUnitOffset->setChecked(m_pTMSI->m_bUseUnitOffset);
+    ui.m_checkBox_UseChExponent->setChecked(m_pEEGoSports->m_bUseChExponent);
 
     //Init preprocessing
-    ui.m_checkBox_UseFiltering->setChecked(m_pTMSI->m_bUseFiltering);
+    ui.m_checkBox_UseFiltering->setChecked(m_pEEGoSports->m_bUseFiltering);
 
     //Init write to file
-    ui.m_checkBox_WriteDriverDebugToFile->setChecked(m_pTMSI->m_bWriteDriverDebugToFile);
+    ui.m_checkBox_WriteDriverDebugToFile->setChecked(m_pEEGoSports->m_bWriteDriverDebugToFile);
 
     //Init trigger properties
-    ui.m_spinBox_BeepLength->setValue(m_pTMSI->m_iTriggerInterval);
-    ui.m_checkBox_EnableBeep->setChecked(m_pTMSI->m_bBeepTrigger);
-
-    ui.m_checkBox_EnableKeyboardTrigger->setChecked(m_pTMSI->m_bUseKeyboardTrigger);
+    ui.m_spinBox_BeepLength->setValue(m_pEEGoSports->m_iTriggerInterval);
+    ui.m_checkBox_EnableBeep->setChecked(m_pEEGoSports->m_bBeepTrigger);
 }
 
 
 //*************************************************************************************************************
 
-void TMSISetupWidget::setDeviceSamplingProperties()
+void EEGoSportsSetupWidget::setDeviceSamplingProperties()
 {
-    cout<<"changing "<<endl;
-    m_pTMSI->m_iSamplingFreq = ui.m_spinBox_SamplingFreq->value();
-    m_pTMSI->m_iNumberOfChannels = ui.m_spinBox_NumberOfChannels->value();
-    m_pTMSI->m_iSamplesPerBlock = ui.m_spinBox_SamplesPerBlock->value();
+    m_pEEGoSports->m_iSamplingFreq = ui.m_spinBox_SamplingFreq->value();
+    m_pEEGoSports->m_iNumberOfChannels = ui.m_spinBox_NumberOfChannels->value();
 
-    m_pTMSI->m_bUseChExponent = ui.m_checkBox_UseChExponent->isChecked();
-    m_pTMSI->m_bUseUnitGain = ui.m_checkBox_UseUnitGain->isChecked();
-    m_pTMSI->m_bUseUnitOffset = ui.m_checkBox_UseUnitOffset->isChecked();
-
-    m_pTMSI->m_bUseCommonAverage = ui.m_checkBox_UseCommonAverage->isChecked();
+    m_pEEGoSports->m_bUseChExponent = ui.m_checkBox_UseChExponent->isChecked();
 }
 
 
 //*************************************************************************************************************
 
-void TMSISetupWidget::setPreprocessing()
+void EEGoSportsSetupWidget::setPreprocessing()
 {
-    m_pTMSI->m_bUseFiltering = ui.m_checkBox_UseFiltering->isChecked();
+    m_pEEGoSports->m_bUseFiltering = ui.m_checkBox_UseFiltering->isChecked();
 }
 
 
 //*************************************************************************************************************
 
-void TMSISetupWidget::setPostprocessing()
+void EEGoSportsSetupWidget::setPostprocessing()
 {
-    m_pTMSI->m_bUseFFT = ui.m_checkBox_UseFFT->isChecked();
 }
 
 
 //*************************************************************************************************************
 
-void TMSISetupWidget::setWriteToFile()
+void EEGoSportsSetupWidget::setWriteToFile()
 {
-    m_pTMSI->m_bWriteDriverDebugToFile = ui.m_checkBox_WriteDriverDebugToFile->isChecked();
+    m_pEEGoSports->m_bWriteDriverDebugToFile = ui.m_checkBox_WriteDriverDebugToFile->isChecked();
 }
 
 //*************************************************************************************************************
 
-void TMSISetupWidget::setTriggerProperties()
+void EEGoSportsSetupWidget::setTriggerProperties()
 {
-    m_pTMSI->m_iTriggerInterval = ui.m_spinBox_BeepLength->value();
-    m_pTMSI->m_bBeepTrigger = ui.m_checkBox_EnableBeep->isChecked();
-    m_pTMSI->m_bUseKeyboardTrigger = ui.m_checkBox_EnableKeyboardTrigger->isChecked();
+    m_pEEGoSports->m_iTriggerInterval = ui.m_spinBox_BeepLength->value();
+    m_pEEGoSports->m_bBeepTrigger = ui.m_checkBox_EnableBeep->isChecked();
 }
 
 
 //*************************************************************************************************************
 
-void TMSISetupWidget::showAboutDialog()
+void EEGoSportsSetupWidget::showAboutDialog()
 {
-    TMSIAboutWidget aboutDialog(this);
+    EEGoSportsAboutWidget aboutDialog(this);
     aboutDialog.exec();
 }

@@ -158,6 +158,7 @@ typedef struct _FRONTENDINFO
 // Method Typedefs - method defines as used in the RTINST.DLL
 //=============================================================================================================
 
+// define a pointer POPEN to a function which is taking a void pointe and a char and returns a bool value
 typedef BOOLEAN         ( __stdcall * POPEN)            (void *Handle, const char *DeviceLocator);
 typedef BOOL            ( __stdcall * PCLOSE)           (HANDLE hHandle);
 typedef BOOLEAN         ( __stdcall * PSTART)           (IN HANDLE Handle);
