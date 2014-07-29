@@ -101,7 +101,7 @@ QList<GaborAtom> AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterat
         qint32 j = 1;
         qreal max_scalar_product = 0;             //inner product for choosing the best matching atom
         qreal k = 0;                            //for modulation 2*pi*k/N
-        quint32 p = floor(sample_count / 2);      //translation
+        qint32 p = floor(sample_count / 2);      //translation
         GaborAtom *gabor_Atom = new GaborAtom();
         gabor_Atom->sample_count = sample_count;
         gabor_Atom->energy = 0;
@@ -127,7 +127,7 @@ QList<GaborAtom> AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterat
                 //iteration for multichannel
                 for(qint32 chn = 0; chn < channel_count; chn++)
                 {
-                    quint32 max_index = 0;
+                    qint32 max_index = 0;
                     qreal maximum = 0;
                     phase = 0;
 
@@ -433,21 +433,22 @@ QList<GaborAtom> AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterat
 
             VectorXd channel_params = calculate_atom(sample_count, gabor_Atom->scale, gabor_Atom->translation, gabor_Atom->modulation, chn, residuum, RETURNPARAMETERS);
             gabor_Atom->phase_list.append(channel_params[3]);
-            gabor_Atom->max_scalar_list.append(channel_params[4]);
 
             //substract best matching Atom from Residuum in each channel
-            VectorXd bestMatch = gabor_Atom->create_real(gabor_Atom->sample_count, gabor_Atom->scale, gabor_Atom->translation, gabor_Atom->modulation, gabor_Atom->phase_list.at(chn));
-
-            for(qint32 j = 0; j < gabor_Atom->sample_count; j++)
+            if(fix_phase == false)
             {
-                residuum(j,chn) -= gabor_Atom->max_scalar_list.at(chn) * bestMatch[j];
-                gabor_Atom->energy += (gabor_Atom->max_scalar_list.at(chn) * bestMatch[j]) * (gabor_Atom->max_scalar_list.at(chn) * bestMatch[j]);
-            }
+                gabor_Atom->max_scalar_list.append(channel_params[4]);
+                VectorXd bestMatch = gabor_Atom->create_real(gabor_Atom->sample_count, gabor_Atom->scale, gabor_Atom->translation, gabor_Atom->modulation, gabor_Atom->phase_list.at(chn));
 
-            gabor_Atom->residuum = residuum;
+                for(qint32 j = 0; j < gabor_Atom->sample_count; j++)
+                {
+                    residuum(j,chn) -= gabor_Atom->max_scalar_list.at(chn) * bestMatch[j];
+                    gabor_Atom->energy += (gabor_Atom->max_scalar_list.at(chn) * bestMatch[j]) * (gabor_Atom->max_scalar_list.at(chn) * bestMatch[j]);
+                }
+            }
         }
 
-        //fix_phase = true;
+        //option fix_phase, chg: phase and max_scalar_product in resulting atoms
         if(fix_phase == true)
         {
             gabor_Atom->phase = 0;
@@ -455,15 +456,34 @@ QList<GaborAtom> AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterat
             for(qint32 chn = 0; chn < channel_count; chn++)
             {
                 gabor_Atom->phase +=gabor_Atom->phase_list.at(chn);
+
             }
+
             gabor_Atom->phase /= channel_count;
 
             for(qint32 chn = 0; chn < channel_count; chn++)
             {
                 gabor_Atom->phase_list.replace(chn, gabor_Atom->phase);
             }
-        }
 
+            for(qint32 chn = 0; chn < channel_count; chn++)
+            {
+                VectorXd fix_phase_atom = gabor_Atom->create_real(gabor_Atom->sample_count, gabor_Atom->scale, gabor_Atom->translation, gabor_Atom->modulation, gabor_Atom->phase);
+
+                qreal fix_phase_scalar_product = 0;
+
+                for(qint32 i = 0; i < sample_count; i++)
+                    fix_phase_scalar_product += fix_phase_atom[i] * residuum(i, chn);
+
+                gabor_Atom->max_scalar_list.append(fix_phase_scalar_product);
+
+                for(qint32 j = 0; j < gabor_Atom->sample_count; j++)
+                {
+                    residuum(j,chn) -= gabor_Atom->max_scalar_list.at(chn) * fix_phase_atom[j];
+                    gabor_Atom->energy += (gabor_Atom->max_scalar_list.at(chn) * fix_phase_atom[j]) * (gabor_Atom->max_scalar_list.at(chn) * fix_phase_atom[j]);
+                }
+            }
+        }
 
         residuum_energy -= gabor_Atom->energy;
         current_energy += gabor_Atom->energy;
@@ -496,7 +516,7 @@ VectorXcd AdaptiveMp::modulation_function(qint32 N, qreal k)
 
 //*************************************************************************************************************
 
-VectorXd AdaptiveMp::calculate_atom(qint32 sample_count, qreal scale, quint32 translation, qreal modulation, qint32 channel, MatrixXd residuum, ReturnValue return_value)
+VectorXd AdaptiveMp::calculate_atom(qint32 sample_count, qreal scale, qint32 translation, qreal modulation, qint32 channel, MatrixXd residuum, ReturnValue return_value = RETURNATOM)
 {
     GaborAtom *gabor_Atom = new GaborAtom();
     qreal phase = 0;
