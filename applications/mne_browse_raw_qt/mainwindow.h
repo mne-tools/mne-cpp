@@ -280,23 +280,24 @@ private:
     */
     void setWindowStatus();
 
-    QFile m_qFileRaw; /**< Fiff data file to read (set for convenience) */
-    QSignalMapper* m_qSignalMapper; /**< signal mapper used for signal-slot mapping */
+    QFile               m_qFileRaw;                 /**< Fiff data file to read (set for convenience) */
+    QSignalMapper*      m_qSignalMapper;            /**< signal mapper used for signal-slot mapping */
 
     //modelview framework
-    RawModel *m_pRawModel; /**< the QAbstractTable model being part of the model/view framework of Qt */
-    EventModel *m_pEventModel; /**< the QAbstractTable event model being part of the model/view framework of Qt */
-    QTableView *m_pTableView; /**< the QTableView being part of the model/view framework of Qt */
-    RawDelegate *m_pRawDelegate; /**< the QAbstractDelegate being part of the model/view framework of Qt */
+    RawModel*           m_pRawModel;                /**< the QAbstractTable model being part of the model/view framework of Qt */
+    EventModel*         m_pEventModel;              /**< the QAbstractTable event model being part of the model/view framework of Qt */
+    QTableView*         m_pTableView;               /**< the QTableView being part of the model/view framework of Qt for the fiff data handling*/
+    QTableView*         m_pEventTableView;          /**< the QTableView being part of the model/view framework of Qt for the fiff event handling */
+    RawDelegate*        m_pRawDelegate;             /**< the QAbstractDelegate being part of the model/view framework of Qt */
 
     //application settings
-    QSettings m_qSettings;
-    RawSettings m_rawSettings;
+    QSettings           m_qSettings;
+    RawSettings         m_rawSettings;
 
     //Log
-    QDockWidget* m_pDockWidget_Log; /**< a dock widget being part of the log feature */
-    QTextBrowser* m_pTextBrowser_Log; /** a textbox being part of the log feature */
-    LogLevel m_eLogLevelCurrent; /**< Holds the current log level.*/
+    QDockWidget*        m_pDockWidget_Log;          /**< a dock widget being part of the log feature */
+    QTextBrowser*       m_pTextBrowser_Log;         /** a textbox being part of the log feature */
+    LogLevel            m_eLogLevelCurrent;         /**< Holds the current log level.*/
 
 };
 

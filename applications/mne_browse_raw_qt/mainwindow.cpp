@@ -90,6 +90,7 @@ void MainWindow::setupModel()
 {
 //    m_pRawModel = new RawModel(this);
     m_pRawModel = new RawModel(m_qFileRaw,this);
+    m_pEventModel = new EventModel(this);
 }
 
 
@@ -106,9 +107,14 @@ void MainWindow::setupDelegate()
 void MainWindow::setupView()
 {
     m_pTableView = new QTableView;
+    m_pEventTableView = new QTableView;
 
-    m_pTableView->setModel(m_pRawModel); //set custom model
-    m_pTableView->setItemDelegate(m_pRawDelegate); //set custom delegate
+    //set custom models
+    m_pEventTableView->setModel(m_pEventModel);
+    m_pTableView->setModel(m_pRawModel);
+
+    //set custom delegate
+    m_pTableView->setItemDelegate(m_pRawDelegate);
 
     //TableView settings
     setupViewSettings();

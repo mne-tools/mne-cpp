@@ -80,12 +80,6 @@ EventModel::EventModel(QFile &qFile, QObject *parent)
 //    m_maxWindows = m_qSettings.value("RawModel/max_windows").toInt();
 //    m_iFilterTaps = m_qSettings.value("RawModel/num_filter_taps").toInt();
 
-//    //read fiff data
-//    loadFiffData(qFile);
-
-//    //generator FilterOperator objects
-//    genStdFilterOps();
-
 //    //connect signal and slots
 //    connect(&m_reloadFutureWatcher,&QFutureWatcher<QPair<MatrixXd,MatrixXd> >::finished,[this](){
 //        insertReloadedData(m_reloadFutureWatcher.future().result());
@@ -112,9 +106,9 @@ EventModel::EventModel(QFile &qFile, QObject *parent)
 //virtual functions
 int EventModel::rowCount(const QModelIndex & /*parent*/) const
 {
-    /*if(!m_chInfolist.empty())
-        return m_chInfolist.size();
-    else */return 0;
+    if(!m_data.rows()==0)
+        return m_data.rows();
+    else return 0;
 }
 
 
@@ -122,7 +116,7 @@ int EventModel::rowCount(const QModelIndex & /*parent*/) const
 
 int EventModel::columnCount(const QModelIndex & /*parent*/) const
 {
-    return 2;
+    return 3;
 }
 
 
@@ -133,11 +127,10 @@ QVariant EventModel::data(const QModelIndex &index, int role) const
 //    if(role != Qt::DisplayRole && role != Qt::BackgroundRole)
 //        return QVariant();
 
-
 //    if (index.isValid()) {
-//        //******** first column (chname) ********
+//        //******** first column (sample value) ********
 //        if(index.column()==0 && role == Qt::DisplayRole)
-//            return QVariant(m_chInfolist[index.row()].ch_name);
+//            return QVariant(m_data[index.row()].ch_name);
 
 //        //******** second column (data plot) ********
 //        if(index.column()==1) {
@@ -193,39 +186,6 @@ QVariant EventModel::data(const QModelIndex &index, int role) const
 
 //*************************************************************************************************************
 
-QVariant EventModel::headerData(int section, Qt::Orientation orientation, int role) const
-{
-//    if(role != Qt::DisplayRole && role != Qt::TextAlignmentRole)
-//        return QVariant();
-
-//    if(orientation == Qt::Horizontal) {
-//        switch(section) {
-//        case 0: //chname column
-//            return QVariant();
-//        case 1: //data plot column
-//            return QVariant("data plot");
-//            switch(role) {
-//            case Qt::DisplayRole:
-//                return QVariant("data plot");
-//            case Qt::TextAlignmentRole:
-//                return QVariant(Qt::AlignLeft);
-//            }
-//        }
-//    }
-//    else if(orientation == Qt::Vertical) {
-//        QModelIndex chname = createIndex(section,0);
-//        switch(role) {
-//        case Qt::DisplayRole:
-//            return QVariant(data(chname).toString());
-//        }
-//    }
-
-    return QVariant();
-}
-
-
-//*************************************************************************************************************
-
 bool EventModel::loadEventData(QFile& qFile)
 {
     beginResetModel();
@@ -240,15 +200,12 @@ bool EventModel::loadEventData(QFile& qFile)
         return false;
     }
 
+    std::cout << events << endl;
+
     qDebug() << QString("Events read from %1").arg(qFile.fileName());
 
     //set loaded fiff event data
-//    m_data.append(t_data);
-//    m_procData.append(MatrixXdR::Zero(t_data.rows(),t_data.cols()));
-//    m_times.append(t_times);
-
-//    loadFiffInfos();
-//    genStdFilterOps();
+    m_data = events;
 
     endResetModel();
     return true;
@@ -259,18 +216,8 @@ bool EventModel::loadEventData(QFile& qFile)
 
 void EventModel::clearModel()
 {
-//    //FiffIO object
-//    m_pfiffIO.clear();
-//    m_fiffInfo.clear();
-//    m_chInfolist.clear();
-
-//    //data model structure
-//    m_data.clear();
-//    m_procData.clear();
-//    m_times.clear();
-
-//    //MNEOperators
-//    m_assignedOperators.clear();
+    //data model structure
+//    m_dataclear();
 
 //    //View parameters
 //    m_iAbsFiffCursor = 0;
@@ -278,5 +225,5 @@ void EventModel::clearModel()
 //    m_bStartReached = false;
 //    m_bEndReached = false;
 
-//    qDebug("RawModel cleared.");
+    qDebug("EventModel cleared.");
 }
