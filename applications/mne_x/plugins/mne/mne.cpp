@@ -140,6 +140,29 @@ void MNE::init()
 
 void MNE::calcFiffInfo()
 {
+    if(m_qListCovChNames.size() > 0 && m_pFiffInfoEvoked && m_pFiffInfoForward)
+    {
+        qDebug() << "Fiff Infos available";
+
+        QStringList tmp_pick_ch_names;
+        foreach (const QString &ch, m_pFiffInfoForward->ch_names)
+        {
+            if(m_pFiffInfoEvoked->ch_names.contains(ch))
+                tmp_pick_ch_names << ch;
+        }
+
+        m_qListPickChannels.clear();
+
+        foreach (const QString &ch, tmp_pick_ch_names)
+        {
+            if(m_qListCovChNames.contains(ch))
+                m_qListPickChannels << ch;
+        }
+
+        RowVectorXi sel = m_pFiffInfoEvoked->pick_channels(m_qListPickChannels);
+
+        m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo(m_pFiffInfoEvoked->pick_info(sel)));
+    }
 
 }
 
@@ -163,6 +186,9 @@ void MNE::finishedClustering()
     m_pRTSEOutput->data()->setSrc(m_pClusteredFwd->src);
 
     m_bFinishedClustering = true;
+
+    m_pFiffInfoForward = QSharedPointer<FiffInfoBase>(new FiffInfoBase(m_pClusteredFwd->info));
+
     emit clusteringFinished();
 }
 
@@ -201,6 +227,8 @@ bool MNE::stop()
         m_qVecFiffEvoked.clear();
         m_qVecFiffCov.clear();
     }
+
+    m_qListCovChNames.clear();
 
     // Stop filling buffers with data from the inputs
     m_bProcessData = false;
@@ -256,13 +284,13 @@ void MNE::updateRTC(XMEASLIB::NewMeasurement::SPtr pMeasurement)
     if(pRTC && m_bReceiveData)
     {
         //Fiff Information of the covariance
-        if(m_pCovChNames.size() != pRTC->getValue()->names.size())
-            m_pCovChNames = pRTC->getValue()->names;
+        if(m_qListCovChNames.size() != pRTC->getValue()->names.size())
+            m_qListCovChNames = pRTC->getValue()->names;
 
         if(m_bProcessData)
         {
             mutex.lock();
-            m_qVecFiffCov.push_back(*pRTC->getValue());
+            m_qVecFiffCov.push_back(pRTC->getValue()->pick_channels(m_qListPickChannels));
             mutex.unlock();
         }
     }
@@ -286,7 +314,7 @@ void MNE::updateRTE(XMEASLIB::NewMeasurement::SPtr pMeasurement)
         if(m_bProcessData)
         {
             mutex.lock();
-            m_qVecFiffEvoked.push_back(*pRTE->getValue());
+            m_qVecFiffEvoked.push_back(pRTE->getValue()->pick_channels(m_qListPickChannels));
             mutex.unlock();
         }
     }
@@ -353,6 +381,7 @@ void MNE::run()
     m_pRtInvOp = RtInvOp::SPtr(new RtInvOp(m_pFiffInfo, m_pClusteredFwd));
     connect(m_pRtInvOp.data(), &RtInvOp::invOperatorCalculated, this, &MNE::updateInvOp);
 
+    m_pMinimumNorm.reset();
 
     //
     // Start the rt helpers
@@ -368,65 +397,36 @@ void MNE::run()
 
     while(m_bIsRunning)
     {
-
-
-//            if(m_bSingleTrial)
-//            {
-//                //Continous Data
-//                mutex.lock();
-//                if(m_pMinimumNorm && t_mat.cols() > 0)
-//                {
-//                    //
-//                    // calculate the inverse
-//                    //
-//                    MNESourceEstimate sourceEstimate = m_pMinimumNorm->calculateInverse(t_mat, 0, 1/m_pFiffInfo->sfreq);
-
-//                    std::cout << "Source Estimated" << std::endl;
-//                }
-//                mutex.unlock();
-//            }
-//            else
-//            {
-
-
-
         if(m_qVecFiffCov.size() > 0)
         {
-            qDebug() << "Pop Cov";
+            mutex.lock();
+            m_pRtInvOp->appendNoiseCov(m_qVecFiffCov[0]);//DEBUG THIS
             m_qVecFiffCov.pop_front();
+            mutex.unlock();
         }
 
         if(m_qVecFiffEvoked.size() > 0)
         {
-            qDebug() << "Pop Evoked";
-            m_qVecFiffEvoked.pop_front();
+            //DEBUG THIS
+//            if(m_pMinimumNorm)
+//            {
+//                mutex.lock();
+//                FiffEvoked t_fiffEvoked = m_qVecFiffEvoked[0];
+//                m_qVecFiffEvoked.pop_front();
+//                mutex.unlock();
+
+//                qDebug() << "source estimate replacement";
+////                float tmin = ((float)t_fiffEvoked.first) / t_fiffEvoked.info.sfreq;
+////                float tstep = 1/t_fiffEvoked.info.sfreq;
+
+////                MNESourceEstimate sourceEstimate = m_pMinimumNorm->calculateInverse(t_fiffEvoked.data, tmin, tstep);
+//            }
+//            else
+//            {
+                mutex.lock();
+                m_qVecFiffEvoked.pop_front();
+                mutex.unlock();
+//            }
         }
-
-
-//        if(m_pMinimumNorm && m_qVecFiffEvoked.size() > 0 && skip_count > 2)
-//        {
-
-//            mutex.lock();
-//            FiffEvoked t_fiffEvoked = m_qVecFiffEvoked[0];
-//            m_qVecFiffEvoked.pop_front();
-//            mutex.unlock();
-
-//            float tmin = ((float)t_fiffEvoked.first) / t_fiffEvoked.info.sfreq;
-//            float tstep = 1/t_fiffEvoked.info.sfreq;
-
-//            MNESourceEstimate sourceEstimate = m_pMinimumNorm->calculateInverse(t_fiffEvoked.data, tmin, tstep);
-
-//            std::cout << "SourceEstimated:\n" << std::endl;
-////                std::cout << "SourceEstimated:\n" << sourceEstimate.data.block(0,0,10,10) << std::endl;
-
-//            //emit source estimates sample wise
-//            for(qint32 i = 0; i < sourceEstimate.data.cols(); i += m_iDownSample)
-//                m_pRTSEOutput->data()->setValue(sourceEstimate.data.col(i));
-
-
-//            skip_count = 0;
-//        }
-
-//        ++skip_count;
     }
 }
