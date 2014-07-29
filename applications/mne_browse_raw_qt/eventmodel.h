@@ -123,16 +123,15 @@ class EventModel : public QAbstractTableModel
 public:
     EventModel(QObject *parent);
     EventModel(QFile& qFile, QObject *parent);
-    virtual int rowCount(const QModelIndex &parent = QModelIndex()) const ;
+    virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
     virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
-    virtual QVariant headerData(int section, Qt::Orientation orientation, int role = Qt::DisplayRole) const;
 
     //=========================================================================================================
     /**
     * loadEventData loads fiff event data file.
     *
-    * @param p_IODevice fiff data event file to write
+    * @param p_IODevice fiff data event file to read from
     */
     bool loadEventData(QFile& qFile);
 
@@ -142,6 +141,9 @@ private:
     * clearModel clears all model's members
     */
     void clearModel();
+
+    MatrixXi        m_data;        /**< Matrix that holds the loaded events from the event file. */
+
 };
 
 } // NAMESPACE
