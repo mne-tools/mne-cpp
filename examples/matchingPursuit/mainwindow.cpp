@@ -124,7 +124,7 @@ MatrixXd _original_signal_matrix(0, 0);
 MatrixXd _atom_sum_matrix(0, 0);
 MatrixXd _residuum_matrix(0, 0);
 MatrixXd _real_residuum_matrix(0, 0);
-MatrixXd _real_original_residuum_matrix(0, 0);
+//MatrixXd _real_original_residuum_matrix(0, 0);
 
 //QList<QStringList> _result_atom_list;
 
@@ -139,8 +139,6 @@ MatrixXd _real_original_residuum_matrix(0, 0);
 MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-
-
 
     callGraphWindow = new GraphWindow();    
     callGraphWindow->setMinimumHeight(220);
@@ -281,6 +279,7 @@ void MainWindow::open_file()
     if(temp_file_name.isNull()) return;
 
     _file_name = temp_file_name;
+     this->cb_model->clear();
     this->cb_items.clear();
 
     ui->sb_sample_rate->setEnabled(true);
@@ -297,9 +296,10 @@ void MainWindow::open_file()
     _colors.append(QColor(0, 0, 0));
 
     if(_file_name.endsWith(".fif", Qt::CaseInsensitive))
-    {
+    {        
         ui->dsb_from->setValue(47.151f);
         ui->dsb_to->setValue(48.000f);
+        _from = 47.151f;
         read_fiff_file(_file_name);
         ui->lb_from->setHidden(false);
         ui->dsb_from->setHidden(false);
@@ -308,7 +308,6 @@ void MainWindow::open_file()
         ui->lb_samples->setHidden(false);
         ui->sb_sample_count->setHidden(false);
         ui->sb_sample_count->setValue((ui->dsb_to->value() - ui->dsb_from->value()) * ui->sb_sample_rate->value());
-
     }
     else
     {
@@ -348,6 +347,40 @@ void MainWindow::open_file()
     update();   
 }
 
+void MainWindow::read_fiff_file_new(QString file_name)
+{
+    this->cb_model->clear();
+    this->cb_items.clear();
+    _colors.clear();
+    _colors.append(QColor(0, 0, 0));
+
+    read_fiff_file(file_name);
+
+    _original_signal_matrix.resize(_signal_matrix.rows(), _signal_matrix.cols());
+    _original_signal_matrix = _signal_matrix;
+    ui->tbv_Results->setRowCount(0);
+
+    for(qint32 channels = 0; channels < _signal_matrix.cols(); channels++)
+    {
+        _colors.append(QColor::fromHsv(qrand() % 256, 255, 190));
+
+        this->cb_item = new QStandardItem;
+
+        this->cb_item->setText(QString("Channel %1").arg(channels));
+        this->cb_item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
+        this->cb_item->setData(Qt::Checked, Qt::CheckStateRole);
+        this->cb_model->insertRow(channels, this->cb_item);
+        this->cb_items.push_back(this->cb_item);
+        _select_channel_map.insert(channels, true);
+    }
+    ui->cb_channels->setModel(this->cb_model);
+    _original_colors = _colors;
+    _atom_sum_matrix.resize(_signal_matrix.rows(), _signal_matrix.cols()); //resize
+    _residuum_matrix.resize(_signal_matrix.rows(), _signal_matrix.cols()); //resize
+
+    update();
+}
+
 //*************************************************************************************************************************************
 
 void MainWindow::cb_selection_changed(const QModelIndex& topLeft, const QModelIndex& bottomRight)
@@ -371,7 +404,7 @@ void MainWindow::cb_selection_changed(const QModelIndex& topLeft, const QModelIn
     _signal_matrix.resize(_original_signal_matrix.rows(), size);
     _atom_sum_matrix.resize(_original_signal_matrix.rows(), size);
     _residuum_matrix.resize(_original_signal_matrix.rows(), size);
-    _real_residuum_matrix.resize(_original_signal_matrix.rows(), size);
+    //_real_residuum_matrix.resize(_original_signal_matrix.rows(), size);
 
     _colors.clear();
     qint32 selected_chn = 0;
@@ -381,7 +414,7 @@ void MainWindow::cb_selection_changed(const QModelIndex& topLeft, const QModelIn
         {
             _colors.append(_original_colors.at(channels));
             _signal_matrix.col(selected_chn) = _original_signal_matrix.col(channels);
-            _real_residuum_matrix.col(selected_chn) = _real_original_residuum_matrix.col(channels);
+            //_real_residuum_matrix.col(selected_chn) = _real_original_residuum_matrix.col(channels);
             selected_chn++;
         }
     update();
@@ -497,10 +530,8 @@ qint32 MainWindow::read_fiff_file(QString fileName)
     if(_datas.cols() <= 5)   cols = _datas.cols();
     _signal_matrix.resize(_datas.cols(),cols);
 
-
     for(qint32 channels = 0; channels < cols; channels++)
-        for(qint32 i = 0; i < _datas.cols(); i++)
-            _signal_matrix(i, channels) = _datas(channels, i);
+        _signal_matrix.col(channels) = _datas.row(channels);
 
     //std::cout << _datas.block(0,0,10,10) << std::endl;
 
@@ -1238,7 +1269,7 @@ void MainWindow::calc_thread_finished()
     ui->cb_all_select->setEnabled(true);
 
     _real_residuum_matrix = _residuum_matrix;
-    _real_original_residuum_matrix = _real_residuum_matrix;
+    //_real_original_residuum_matrix = _real_residuum_matrix;
 
     for(qint32 i = 0; i < _my_atom_list.count(); i++)
         _select_atoms_map.insert(i, true);
@@ -1272,7 +1303,7 @@ void MainWindow::calc_adaptiv_mp(MatrixXd signal, TruncationCriterion criterion)
     qRegisterMetaType<Eigen::MatrixXd>("MatrixXd");
     qRegisterMetaType<gabor_atom_list>("gabor_atom_list");
 
-    connect(this, SIGNAL(send_input(MatrixXd, qint32, qreal)), adaptive_Mp, SLOT(recieve_input(MatrixXd, qint32, qreal)));
+    connect(this, SIGNAL(send_input(MatrixXd, qint32, qreal, bool)), adaptive_Mp, SLOT(recieve_input(MatrixXd, qint32, qreal, bool)));
     connect(adaptive_Mp, SIGNAL(current_result(qint32, qint32, qreal, qreal, gabor_atom_list)),
                  this, SLOT(recieve_result(qint32, qint32, qreal, qreal, gabor_atom_list)));
     connect(adaptive_Mp_Thread, SIGNAL(started()), adaptive_Mp, SLOT(process()));
@@ -1285,7 +1316,7 @@ void MainWindow::calc_adaptiv_mp(MatrixXd signal, TruncationCriterion criterion)
     {
         case Iterations:
         {
-            emit send_input(signal, ui->sb_Iterations->value(), qreal(MININT32));
+            emit send_input(signal, ui->sb_Iterations->value(), qreal(MININT32), ui->chb_fix_phase->isChecked());
             adaptive_Mp_Thread->start();
         }
         break;
@@ -1293,7 +1324,7 @@ void MainWindow::calc_adaptiv_mp(MatrixXd signal, TruncationCriterion criterion)
         case SignalEnergy:
         {
             //must be debugged, thread is not ending like i want it to
-            emit send_input(signal, MAXINT32, res_energy);
+            emit send_input(signal, MAXINT32, res_energy, ui->chb_fix_phase->isChecked());
             adaptive_Mp_Thread->start();        
         }
         break;
@@ -1301,7 +1332,7 @@ void MainWindow::calc_adaptiv_mp(MatrixXd signal, TruncationCriterion criterion)
         case Both:
         {
             //must be debugged, thread is not ending like i want it to
-            emit send_input(signal, ui->sb_Iterations->value(), res_energy);
+            emit send_input(signal, ui->sb_Iterations->value(), res_energy, ui->chb_fix_phase->isChecked());
             adaptive_Mp_Thread->start();
         }
         break;
@@ -1703,8 +1734,7 @@ void MainWindow::on_sb_sample_rate_editingFinished()
 void MainWindow::on_dsb_from_editingFinished()
 {   
     _from = ui->dsb_from->value();
-    read_fiff_file(_file_name);
-    update();
+    read_fiff_file_new(_file_name);
 }
 
 //*****************************************************************************************************************
@@ -1712,8 +1742,7 @@ void MainWindow::on_dsb_from_editingFinished()
 void MainWindow::on_dsb_to_editingFinished()
 {   
     _to = ui->dsb_to->value();
-    read_fiff_file(_file_name);
-    update();
+    read_fiff_file_new(_file_name);
 }
 
 //*****************************************************************************************************************
@@ -1758,8 +1787,7 @@ void MainWindow::on_sb_sample_count_editingFinished()
     if(!_come_from_from)
     {
         _to = ui->dsb_to->value();
-        read_fiff_file(_file_name);
-        update();
+        read_fiff_file_new(_file_name);
     }
 }
 
