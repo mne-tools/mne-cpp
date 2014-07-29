@@ -1,16 +1,15 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     applications.pro
-# @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
+# @file     eegosports.pro
+# @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 #           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-#           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
-#           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
+#           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
-# @date     January, 2014
+# @date     July, 2014
 #
 # @section  LICENSE
 #
-# Copyright (C) 2014, Florian Schlembach, Christoph Dinh, Matti Hamalainen and Jens Haueisen. All rights reserved.
+# Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -31,77 +30,101 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file builds the mne_browse_raw_qt project
+# @brief    This project file generates the makefile for the eegosports plug-in.
 #
 #--------------------------------------------------------------------------------------------------------------
 
-include(../../mne-cpp.pri)
+include(../../../../mne-cpp.pri)
 
-TEMPLATE = app
+TEMPLATE = lib
 
-QT += network core widgets concurrent
+CONFIG += plugin
 
-TARGET = mne_browse_raw_qt
+DEFINES += EEGOSPORTS_LIBRARY
 
+contains(QMAKE_HOST.arch, x86_64) { #Compiling MNE-X FOR a 64bit system
+    exists(C:/Windows/System32/eego.dll) {
+        DEFINES += TAKE_EEGOSPORTSSDK_DLL
+    }
+}
+else {
+    exists(C:/Windows/SysWOW64/eego.dll) { #Compiling MNE-X FOR a 32bit system ON a 64bit system
+        DEFINES += TAKE_EEGOSPORTSSDK_32_DLL
+    }
+    else {
+        exists(C:/Windows/System32/eego.dll) { #Compiling MNE-X FOR a 32bit system ON a 32bit system
+            DEFINES += TAKE_EEGOSPORTSSDK_DLL
+        }
+        else {
+            message(EEGOSPORTS.pro warning: EEGoSports Driver DLL not found!)
+        }
+    }
+}
+
+QT += core widgets svg
+
+TARGET = EEGoSports
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
-
-CONFIG += console #DEBUG
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
             -lMNE$${MNE_LIB_VERSION}Utilsd \
-            -lMNE$${MNE_LIB_VERSION}Fsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
-            -lMNE$${MNE_LIB_VERSION}Mned
+            -lMNE$${MNE_LIB_VERSION}Dispd \
+            -lxMeasd \
+            -lxDispd \
+            -lmne_xd
 }
 else {
     LIBS += -lMNE$${MNE_LIB_VERSION}Generics \
             -lMNE$${MNE_LIB_VERSION}Utils \
-            -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \
-            -lMNE$${MNE_LIB_VERSION}Mne
+            -lMNE$${MNE_LIB_VERSION}Disp \
+            -lxMeas \
+            -lxDisp \
+            -lmne_x
 }
 
-DESTDIR = $${MNE_BINARY_DIR}
+DESTDIR = $${MNE_BINARY_DIR}/mne_x_plugins
 
-SOURCES += rawsettings.cpp\
-    main.cpp\
-    rawmodel.cpp \
-    mainwindow.cpp \
-    rawdelegate.cpp \
-    mneoperator.cpp \
-    filteroperator.cpp \
-    eventmodel.cpp
+SOURCES += \
+        eegosports.cpp \
+        eegosportsproducer.cpp \
+        FormFiles/eegosportssetupwidget.cpp \
+        FormFiles/eegosportsaboutwidget.cpp \
+        eegosportsdriver.cpp \
+        FormFiles/eegosportssetupprojectwidget.cpp
 
-HEADERS += types.h\
-    info.h\
-    rawsettings.h\
-    rawmodel.h\
-    mainwindow.h \
-    rawdelegate.h \
-    mneoperator.h \
-    filteroperator.h \
-    eventmodel.h
+HEADERS += \
+        eegosports.h\
+        eegosports_global.h \
+        eegosportsproducer.h \
+        FormFiles/eegosportssetupwidget.h \
+        FormFiles/eegosportsaboutwidget.h \
+        eegosportsdriver.h \
+        FormFiles/eegosportssetupprojectwidget.h
 
-
-FORMS +=
+FORMS += \
+        FormFiles/eegosportssetup.ui \
+        FormFiles/eegosportssetupprojectwidget.ui \
+        FormFiles/eegosportsabout.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_X_INCLUDE_DIR}
 
-unix:!macx {
-    QMAKE_CXXFLAGS += -std=c++0x
-    QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
+OTHER_FILES += eegosports.json
 
-    # suppress visibility warnings
-    QMAKE_CXXFLAGS += -Wno-attributes
-}
-macx {
-    QMAKE_CXXFLAGS = -mmacosx-version-min=10.7 -std=gnu0x -stdlib=libc+
-    CONFIG +=c++11
-}
+# Put generated form headers into the origin --> cause other src is pointing at them
+UI_DIR = $${PWD}
 
+unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
+
+# suppress visibility warnings
+unix: QMAKE_CXXFLAGS += -Wno-attributes
+
+RESOURCES += \
+    eegosports.qrc

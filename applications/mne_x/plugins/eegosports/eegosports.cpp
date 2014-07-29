@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
-* @file     tmsi.cpp
+* @file     eegosports.cpp
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     September, 2013
+* @date     July, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the TMSI class.
+* @brief    Contains the implementation of the EEGoSports class.
 *
 */
 
@@ -39,8 +39,8 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "tmsi.h"
-#include "tmsiproducer.h"
+#include "eegosports.h"
+#include "eegosportsproducer.h"
 
 
 //*************************************************************************************************************
@@ -58,7 +58,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace TMSIPlugin;
+using namespace EEGoSportsPlugin;
 
 
 //*************************************************************************************************************
@@ -66,37 +66,31 @@ using namespace TMSIPlugin;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-TMSI::TMSI()
-: m_pRMTSA_TMSI(0)
-, m_qStringResourcePath(qApp->applicationDirPath()+"/mne_x_plugins/resources/tmsi/")
+EEGoSports::EEGoSports()
+: m_pRMTSA_EEGoSports(0)
+, m_qStringResourcePath(qApp->applicationDirPath()+"/mne_x_plugins/resources/eegosports/")
 , m_pRawMatrixBuffer_In(0)
-, m_pTMSIProducer(new TMSIProducer(this))
+, m_pEEGoSportsProducer(new EEGoSportsProducer(this))
 {
     // Create record file option action bar item/button
     m_pActionSetupProject = new QAction(QIcon(":/images/database.png"), tr("Setup project"), this);
     m_pActionSetupProject->setStatusTip(tr("Setup project"));
-    connect(m_pActionSetupProject, &QAction::triggered, this, &TMSI::showSetupProjectDialog);
+    connect(m_pActionSetupProject, &QAction::triggered, this, &EEGoSports::showSetupProjectDialog);
     addPluginAction(m_pActionSetupProject);
 
     // Create start recordin action bar item/button
     m_pActionStartRecording = new QAction(QIcon(":/images/record.png"), tr("Start recording data to fif file"), this);
     m_pActionStartRecording->setStatusTip(tr("Start recording data to fif file"));
-    connect(m_pActionStartRecording, &QAction::triggered, this, &TMSI::showStartRecording);
+    connect(m_pActionStartRecording, &QAction::triggered, this, &EEGoSports::showStartRecording);
     addPluginAction(m_pActionStartRecording);
-
-    // Create impedance action bar item/button
-    m_pActionImpedance = new QAction(QIcon(":/images/impedances.png"), tr("Check impedance values"), this);
-    m_pActionImpedance->setStatusTip(tr("Check impedance values"));
-    connect(m_pActionImpedance, &QAction::triggered, this, &TMSI::showImpedanceDialog);
-    addPluginAction(m_pActionImpedance);
 }
 
 
 //*************************************************************************************************************
 
-TMSI::~TMSI()
+EEGoSports::~EEGoSports()
 {
-    //std::cout << "TMSI::~TMSI() " << std::endl;
+    //std::cout << "EEGoSports::~EEGoSports() " << std::endl;
 
     //If the program is closed while the sampling is in process
     if(this->isRunning())
@@ -106,59 +100,50 @@ TMSI::~TMSI()
 
 //*************************************************************************************************************
 
-QSharedPointer<IPlugin> TMSI::clone() const
+QSharedPointer<IPlugin> EEGoSports::clone() const
 {
-    QSharedPointer<TMSI> pTMSIClone(new TMSI());
-    return pTMSIClone;
+    QSharedPointer<EEGoSports> pEEGoSportsClone(new EEGoSports());
+    return pEEGoSportsClone;
 }
 
 
 //*************************************************************************************************************
 
-void TMSI::init()
+void EEGoSports::init()
 {
-    m_pRMTSA_TMSI = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "TMSI", "EEG output data");
+    m_pRMTSA_EEGoSports = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "EEGoSports", "EEG output data");
 
-    m_outputConnectors.append(m_pRMTSA_TMSI);
+    m_outputConnectors.append(m_pRMTSA_EEGoSports);
 
     //default values used by the setupGUI class must be set here
     m_iSamplingFreq = 1024;
-    m_iNumberOfChannels = 138;
+    m_iNumberOfChannels = 64;
     m_iSamplesPerBlock = 16;
     m_iTriggerInterval = 5000;
-
     m_bUseChExponent = true;
-    m_bUseUnitGain = true;
-    m_bUseUnitOffset = true;
     m_bWriteToFile = false;
     m_bWriteDriverDebugToFile = false;
     m_bUseFiltering = false;
-    m_bUseFFT = false;
     m_bIsRunning = false;
     m_bBeepTrigger = false;
-    m_bUseCommonAverage = true;
-    m_bUseKeyboardTrigger = false;
     m_bCheckImpedances = false;
-
-    m_iTriggerType = 0;
 
     QDate date;
     m_sOutputFilePath = QString ("%1Sequence_01/Subject_01/%2_%3_%4_EEG_001_raw.fif").arg(m_qStringResourcePath).arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day());
 
-    m_sElcFilePath = QString("./mne_x_plugins/resources/tmsi/loc_files/Lorenz-Duke128-28-11-2013.elc");
+    m_sElcFilePath = QString("./mne_x_plugins/resources/eegosports/loc_files/standard_waveguard64.elc");
 
     m_pFiffInfo = QSharedPointer<FiffInfo>(new FiffInfo());
 
     //Initialise matrix used to perform a very simple high pass filter operation
-    m_matOldMatrix = MatrixXf::Zero(m_iNumberOfChannels, m_iSamplesPerBlock);
+    //m_matOldMatrix = MatrixXf::Zero(m_iNumberOfChannels, m_iSamplesPerBlock);
 }
 
 
 //*************************************************************************************************************
 
-void TMSI::setUpFiffInfo()
+void EEGoSports::setUpFiffInfo()
 {
-    // Only works for ANT Neuro Waveguard Duke caps
     //
     //Clear old fiff info data
     //
@@ -381,46 +366,6 @@ void TMSI::setUpFiffInfo()
             //cout<<i<<endl<<fChInfo.eeg_loc<<endl;
         }
 
-        //Bipolar channels
-        if(i>=128 && i<=131)
-        {
-            //Set channel type
-            fChInfo.kind = FIFFV_MISC_CH;
-
-            sChType = QString("BIPO ");
-            fChInfo.ch_name = sChType.append(sChType.number(i-128));
-        }
-
-        //Auxilary input channels
-        if(i>=132 && i<=135)
-        {
-            //Set channel type
-            fChInfo.kind = FIFFV_MISC_CH;
-
-            sChType = QString("AUX ");
-            fChInfo.ch_name = sChType.append(sChType.number(i-132));
-        }
-
-        //Digital input channel
-        if(i==136)
-        {
-            //Set channel type
-            fChInfo.kind = FIFFV_STIM_CH;
-
-            sChType = QString("STI 014");
-            fChInfo.ch_name = sChType;
-        }
-
-        //Internally generated test signal - ramp signal
-        if(i==137)
-        {
-            //Set channel type
-            fChInfo.kind = FIFFV_MISC_CH;
-
-            sChType = QString("TEST RAMP");
-            fChInfo.ch_name = sChType;
-        }
-
         QSLChNames << sChType;
 
         m_pFiffInfo->chs.append(fChInfo);
@@ -480,7 +425,7 @@ void TMSI::setUpFiffInfo()
 
 //*************************************************************************************************************
 
-bool TMSI::start()
+bool EEGoSports::start()
 {
     //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
     if(this->isRunning())
@@ -493,42 +438,30 @@ bool TMSI::start()
     setUpFiffInfo();
 
     //Set the channel size of the RMTSA - this needs to be done here and NOT in the init() function because the user can change the number of channels during runtime
-    m_pRMTSA_TMSI->data()->initFromFiffInfo(m_pFiffInfo);
-    m_pRMTSA_TMSI->data()->setMultiArraySize(m_iSamplesPerBlock);
-    m_pRMTSA_TMSI->data()->setSamplingRate(m_iSamplingFreq);
+    m_pRMTSA_EEGoSports->data()->initFromFiffInfo(m_pFiffInfo);
+    m_pRMTSA_EEGoSports->data()->setMultiArraySize(m_iSamplesPerBlock);
+    m_pRMTSA_EEGoSports->data()->setSamplingRate(m_iSamplingFreq);
 
     //Buffer
     m_pRawMatrixBuffer_In = QSharedPointer<RawMatrixBuffer>(new RawMatrixBuffer(8, m_iNumberOfChannels, m_iSamplesPerBlock));
+    m_qListReceivedSamples.clear();
 
-    m_pTMSIProducer->start(m_iNumberOfChannels,
+    m_pEEGoSportsProducer->start(m_iNumberOfChannels,
                        m_iSamplingFreq,
-                       m_iSamplesPerBlock,
                        m_bUseChExponent,
-                       m_bUseUnitGain,
-                       m_bUseUnitOffset,
                        m_bWriteDriverDebugToFile,
                        m_sOutputFilePath,
-                       m_bUseCommonAverage,
                        m_bCheckImpedances);
 
-    if(m_pTMSIProducer->isRunning())
+    if(m_pEEGoSportsProducer->isRunning())
     {
-        // Init BCIFeatureWindow for visualization
-        m_tmsiManualAnnotationWidget = QSharedPointer<TMSIManualAnnotationWidget>(new TMSIManualAnnotationWidget(this));
-
-        if(m_bUseKeyboardTrigger && !m_bCheckImpedances)
-        {
-            m_tmsiManualAnnotationWidget->initGui();
-            m_tmsiManualAnnotationWidget->show();
-        }
-
         m_bIsRunning = true;
         QThread::start();
         return true;
     }
     else
     {
-        qWarning() << "Plugin TMSI - ERROR - TMSIProducer thread could not be started - Either the device is turned off (check your OS device manager) or the driver DLL (TMSiSDK.dll / TMSiSDK32bit.dll) is not installed in the system32 / SysWOW64 directory" << endl;
+        qWarning() << "Plugin EEGoSports - ERROR - EEGoSportsProducer thread could not be started - Either the device is turned off (check your OS device manager) or the driver DLL (TMSiSDK.dll / TMSiSDK32bit.dll) is not installed in the system32 / SysWOW64 directory" << endl;
         return false;
     }
 }
@@ -536,12 +469,12 @@ bool TMSI::start()
 
 //*************************************************************************************************************
 
-bool TMSI::stop()
+bool EEGoSports::stop()
 {
     //Stop the producer thread first
-    m_pTMSIProducer->stop();
+    m_pEEGoSportsProducer->stop();
 
-    //Wait until this thread (TMSI) is stopped
+    //Wait until this thread (EEGoSports) is stopped
     m_bIsRunning = false;
 
     //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the pop function (acquire statement)
@@ -549,9 +482,9 @@ bool TMSI::stop()
 
     m_pRawMatrixBuffer_In->clear();
 
-    m_pRMTSA_TMSI->data()->clear();
+    m_pRMTSA_EEGoSports->data()->clear();
 
-    m_tmsiManualAnnotationWidget->hide();
+    m_qListReceivedSamples.clear();
 
     return true;
 }
@@ -559,7 +492,17 @@ bool TMSI::stop()
 
 //*************************************************************************************************************
 
-IPlugin::PluginType TMSI::getType() const
+void EEGoSports::setSampleData(MatrixXf &matRawBuffer)
+{
+    m_mutex.lock();
+        m_qListReceivedSamples.append(matRawBuffer);
+    m_mutex.unlock();
+}
+
+
+//*************************************************************************************************************
+
+IPlugin::PluginType EEGoSports::getType() const
 {
     return _ISensor;
 }
@@ -567,17 +510,17 @@ IPlugin::PluginType TMSI::getType() const
 
 //*************************************************************************************************************
 
-QString TMSI::getName() const
+QString EEGoSports::getName() const
 {
-    return "TMSI EEG";
+    return "EEGoSports EEG";
 }
 
 
 //*************************************************************************************************************
 
-QWidget* TMSI::setupWidget()
+QWidget* EEGoSports::setupWidget()
 {
-    TMSISetupWidget* widget = new TMSISetupWidget(this);//widget is later destroyed by CentralWidget - so it has to be created everytime new
+    EEGoSportsSetupWidget* widget = new EEGoSportsSetupWidget(this);//widget is later destroyed by CentralWidget - so it has to be created everytime new
 
     //init properties dialog
     widget->initGui();
@@ -588,132 +531,52 @@ QWidget* TMSI::setupWidget()
 
 //*************************************************************************************************************
 
-void TMSI::setKeyboardTriggerType(int type)
-{
-    m_qMutex.lock();
-        m_iTriggerType =type;
-    m_qMutex.unlock();
-}
-
-
-//*************************************************************************************************************
-
-void TMSI::run()
+void EEGoSports::run()
 {
     while(m_bIsRunning)
     {
-        //std::cout<<"TMSI::run(s)"<<std::endl;
-
-        // Check impedances - send new impedance values to graphic scene
-        if(m_pTMSIProducer->isRunning() && m_bCheckImpedances)
-        {
-            MatrixXf matValue = m_pRawMatrixBuffer_In->pop();
-
-            for(qint32 i = 0; i < matValue.cols(); ++i)
-                m_pTmsiImpedanceWidget->updateGraphicScene(matValue.col(i).cast<double>());
-        }
+        //std::cout<<"EEGoSports::run(s)"<<std::endl;
 
         //pop matrix only if the producer thread is running
-        if(m_pTMSIProducer->isRunning() && !m_bCheckImpedances)
+        if(m_pEEGoSportsProducer->isRunning())
         {
-            MatrixXf matValue = m_pRawMatrixBuffer_In->pop();
+            //MatrixXf matValue = m_pRawMatrixBuffer_In->pop();
+            MatrixXf matValue;
+
+            m_mutex.lock();
+            if(m_qListReceivedSamples.isEmpty() == false)
+            {
+                //cout<<m_qListReceivedSamples.size()<<endl;
+                matValue = m_qListReceivedSamples.first();
+                m_qListReceivedSamples.removeFirst();
+            }
+            m_mutex.unlock();
 
             // Set Beep trigger (if activated)
             if(m_bBeepTrigger && m_qTimerTrigger.elapsed() >= m_iTriggerInterval)
             {
                 QtConcurrent::run(Beep, 450, 700);
                 //Set trigger in received data samples - just for one sample, so that this event is easy to detect
-                matValue(136, m_iSamplesPerBlock-1) = 252;
+                //matValue(136, m_iSamplesPerBlock-1) = 252;
                 m_qTimerTrigger.restart();
             }
-
-            // Set keyboard trigger (if activated and !=0)
-            if(m_bUseKeyboardTrigger && m_iTriggerType!=0)
-                matValue(136, m_iSamplesPerBlock-1) = m_iTriggerType;
 
             //Write raw data to fif file
             if(m_bWriteToFile)
                 m_pOutfid->write_raw_buffer(matValue.cast<double>(), m_cals);
 
-            // TODO: Use preprocessing if wanted by the user
+            // Use preprocessing if wanted by the user
             if(m_bUseFiltering)
             {
                 MatrixXf temp = matValue;
 
                 matValue = matValue - m_matOldMatrix;
                 m_matOldMatrix = temp;
-
-                //    //Check filter class - will be removed in the future - testing purpose only!
-                //    FilterTools* filterObject = new FilterTools();
-
-                //    //kaiser window testing
-                //    qint32 numberCoeff = 51;
-                //    QVector<float> impulseResponse(numberCoeff);
-                //    filterObject->createDynamicFilter(QString('LP'), numberCoeff, (float)0.3, impulseResponse);
-
-                //    ofstream outputFileStream("mne_x_plugins/resources/tmsi/filterToolsTest.txt", ios::out);
-
-                //    outputFileStream << "impulseResponse:\n";
-                //    for(int i=0; i<impulseResponse.size(); i++)
-                //        outputFileStream << impulseResponse[i] << " ";
-                //    outputFileStream << endl;
-
-                //    //convolution testing
-                //    QVector<float> in (12, 2);
-                //    QVector<float> kernel (4, 2);
-
-                //    QVector<float> out = filterObject->convolve(in, kernel);
-
-                //    outputFileStream << "convolution result:\n";
-                //    for(int i=0; i<out.size(); i++)
-                //        outputFileStream << out[i] << " ";
-                //    outputFileStream << endl;
-            }
-
-            // TODO: Perform a fft if wanted by the user
-            if(m_bUseFFT)
-            {
-                QElapsedTimer timer;
-                timer.start();
-
-                FFT<float> fft;
-                Matrix<complex<float>, 138, 16> freq;
-
-                for(qint32 i = 0; i < matValue.rows(); ++i)
-                    fft.fwd(freq.row(i), matValue.row(i));
-
-//                cout<<"FFT postprocessing done in "<<timer.nsecsElapsed()<<" nanosec"<<endl;
-//                cout<<"matValue before FFT:"<<endl<<matValue<<endl;
-//                cout<<"freq after FFT:"<<endl<<freq<<endl;
-//                matValue = freq.cwiseAbs();
-//                cout<<"matValue after FFT:"<<endl<<matValue<<endl;
-            }
-
-            //Change values of the trigger channel for better plotting - this change is not saved in the produced fif file
-            if(m_iNumberOfChannels>137)
-            {
-                for(int i = 0; i<matValue.row(137).cols(); i++)
-                {
-                    // Left keyboard or capacitive
-                    if(matValue.row(136)[i] == 254)
-                        matValue.row(136)[i] = 4000;
-
-                    // Right keyboard
-                    if(matValue.row(136)[i] == 253)
-                        matValue.row(136)[i] = 8000;
-
-                    // Beep
-                    if(matValue.row(136)[i] == 252)
-                        matValue.row(136)[i] = 2000;
-                }
             }
 
             //emit values to real time multi sample array
             for(qint32 i = 0; i < matValue.cols(); ++i)
-                m_pRMTSA_TMSI->data()->setValue(matValue.col(i).cast<double>());
-
-            // Reset keyboard trigger
-            m_iTriggerType = 0;
+                m_pRMTSA_EEGoSports->data()->setValue(matValue.col(i).cast<double>());
         }
     }
 
@@ -726,51 +589,30 @@ void TMSI::run()
         m_pActionStartRecording->setIcon(QIcon(":/images/record.png"));
     }
 
-    //std::cout<<"EXITING - TMSI::run()"<<std::endl;
+    //std::cout<<"EXITING - EEGoSports::run()"<<std::endl;
 }
 
 
 //*************************************************************************************************************
 
-void TMSI::showImpedanceDialog()
-{
-    // Open Impedance dialog only if no sampling process is active
-    if(!m_bIsRunning)
-    {
-        if(m_pTmsiImpedanceWidget == NULL)
-            m_pTmsiImpedanceWidget = QSharedPointer<TMSIImpedanceWidget>(new TMSIImpedanceWidget(this));
-
-        if(!m_pTmsiImpedanceWidget->isVisible())
-        {
-            m_pTmsiImpedanceWidget->setWindowTitle("MNE-X - Measure impedances");
-            m_pTmsiImpedanceWidget->show();
-            m_pTmsiImpedanceWidget->raise();
-        }
-
-        m_pTmsiImpedanceWidget->initGraphicScene();
-    }
-}
-
-//*************************************************************************************************************
-
-void TMSI::showSetupProjectDialog()
+void EEGoSports::showSetupProjectDialog()
 {
     // Open setup project widget
-    if(m_pTmsiSetupProjectWidget == NULL)
-        m_pTmsiSetupProjectWidget = QSharedPointer<TMSISetupProjectWidget>(new TMSISetupProjectWidget(this));
+    if(m_pEEGoSportsSetupProjectWidget == NULL)
+        m_pEEGoSportsSetupProjectWidget = QSharedPointer<EEGoSportsSetupProjectWidget>(new EEGoSportsSetupProjectWidget(this));
 
-    if(!m_pTmsiSetupProjectWidget->isVisible())
+    if(!m_pEEGoSportsSetupProjectWidget->isVisible())
     {
-        m_pTmsiSetupProjectWidget->setWindowTitle("TMSI EEG Connector - Setup project");
-        m_pTmsiSetupProjectWidget->initGui();
-        m_pTmsiSetupProjectWidget->show();
-        m_pTmsiSetupProjectWidget->raise();
+        m_pEEGoSportsSetupProjectWidget->setWindowTitle("EEGoSports EEG Connector - Setup project");
+        m_pEEGoSportsSetupProjectWidget->initGui();
+        m_pEEGoSportsSetupProjectWidget->show();
+        m_pEEGoSportsSetupProjectWidget->raise();
     }
 }
 
 //*************************************************************************************************************
 
-void TMSI::showStartRecording()
+void EEGoSports::showStartRecording()
 {
     //Setup writing to file
     if(m_bWriteToFile)
@@ -829,7 +671,7 @@ void TMSI::showStartRecording()
         m_bWriteToFile = true;
 
         m_pTimerRecordingChange = QSharedPointer<QTimer>(new QTimer);
-        connect(m_pTimerRecordingChange.data(), &QTimer::timeout, this, &TMSI::changeRecordingButton);
+        connect(m_pTimerRecordingChange.data(), &QTimer::timeout, this, &EEGoSports::changeRecordingButton);
         m_pTimerRecordingChange->start(500);
     }
 }
@@ -837,7 +679,7 @@ void TMSI::showStartRecording()
 
 //*************************************************************************************************************
 
-void TMSI::changeRecordingButton()
+void EEGoSports::changeRecordingButton()
 {
     if(m_iBlinkStatus == 0)
     {
@@ -854,7 +696,7 @@ void TMSI::changeRecordingButton()
 
 //*************************************************************************************************************
 
-bool TMSI::dirExists(const std::string& dirName_in)
+bool EEGoSports::dirExists(const std::string& dirName_in)
 {
     DWORD ftyp = GetFileAttributesA(dirName_in.c_str());
     if (ftyp == INVALID_FILE_ATTRIBUTES)
