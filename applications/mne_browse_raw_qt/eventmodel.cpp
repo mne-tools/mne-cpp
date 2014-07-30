@@ -124,61 +124,26 @@ int EventModel::columnCount(const QModelIndex & /*parent*/) const
 
 QVariant EventModel::data(const QModelIndex &index, int role) const
 {
-//    if(role != Qt::DisplayRole && role != Qt::BackgroundRole)
-//        return QVariant();
+    if(role != Qt::DisplayRole && role != Qt::BackgroundRole)
+        return QVariant();
 
-//    if (index.isValid()) {
-//        //******** first column (sample value) ********
-//        if(index.column()==0 && role == Qt::DisplayRole)
-//            return QVariant(m_data[index.row()].ch_name);
+    if(index.column()>m_data.cols() || index.row()>m_data.rows())
+        return QVariant();
 
-//        //******** second column (data plot) ********
-//        if(index.column()==1) {
-//            QVariant v;
+    if (index.isValid()) {
+        //******** first column (sample index) ********
+        if(index.column()==0 && role == Qt::DisplayRole)
+            return QVariant(m_data(index.row(), 0));
 
-//            switch(role) {
-//            case Qt::DisplayRole: {
-//                //form RowVectorPair of pointer and length of RowVector
-//                QPair<const double*,qint32> rowVectorPair;
+        //******** second column (?) ********
+        if(index.column()==1 && role == Qt::DisplayRole)
+            return QVariant(m_data(index.row(), 1));
 
-//                //pack all adjacent (after reload) RowVectorPairs into a QList
-//                QList<RowVectorPair> listRowVectorPair;
+        //******** third column (event type plot) ********
+        if(index.column()==2 && role == Qt::DisplayRole)
+            return QVariant(m_data(index.row(), 2));
 
-//                for(qint16 i=0; i < m_data.size(); ++i) {
-//                    //if channel is not filtered or background Processing pending...
-//                    if(!m_assignedOperators.contains(index.row()) || (m_bProcessing && m_bReloadBefore && i==0) || (m_bProcessing && !m_bReloadBefore && i==m_data.size()-1)) {
-//                        rowVectorPair.first = m_data[i].data() + index.row()*m_data[i].cols();
-//                        rowVectorPair.second  = m_data[i].cols();
-//                    }
-//                    else { //if channel IS filtered
-//                        rowVectorPair.first = m_procData[i].data() + index.row()*m_procData[i].cols();
-//                        rowVectorPair.second  = m_procData[i].cols();
-//                    }
-
-//                    listRowVectorPair.append(rowVectorPair);
-//                }
-
-//                v.setValue(listRowVectorPair);
-//                return v;
-//                break;
-//            }
-//            case Qt::BackgroundRole: {
-//                if(m_fiffInfo.bads.contains(m_chInfolist[index.row()].ch_name)) {
-//                    QBrush brush;
-//                    brush.setStyle(Qt::SolidPattern);
-////                    qDebug() << m_chInfolist[index.row()].ch_name << "is marked as bad, index:" << index.row();
-//                    brush.setColor(Qt::red);
-//                    return QVariant(brush);
-//                }
-//                else
-//                    return QVariant();
-
-//                break;
-//            }
-//        } // end role switch
-//    } // end column check
-
-//    } // end index.valid() check
+    } // end index.valid() check
 
     return QVariant();
 }
@@ -196,7 +161,7 @@ bool EventModel::loadEventData(QFile& qFile)
 
     if(!MNE::read_events(qFile, events))
     {
-        qDebug() << "Error while read events.";
+        qDebug() << "Error while reading events.";
         return false;
     }
 

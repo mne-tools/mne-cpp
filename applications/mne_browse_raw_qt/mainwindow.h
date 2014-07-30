@@ -290,6 +290,8 @@ private:
     QTableView*         m_pEventTableView;          /**< the QTableView being part of the model/view framework of Qt for the fiff event handling */
     RawDelegate*        m_pRawDelegate;             /**< the QAbstractDelegate being part of the model/view framework of Qt */
 
+    QWidget*            m_wEventWidget;             /**< Event widget which display the event view */
+
     //application settings
     QSettings           m_qSettings;
     RawSettings         m_rawSettings;

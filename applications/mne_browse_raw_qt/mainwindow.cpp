@@ -141,6 +141,7 @@ void MainWindow::setupLayout() {
 //*************************************************************************************************************
 
 void MainWindow::setupViewSettings() {
+    //VIEW: m_pTableView SETTINGS
     //set some size settings for m_pTableView
     m_pTableView->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
 
@@ -167,6 +168,16 @@ void MainWindow::setupViewSettings() {
 
     //connect other signals
     connect(m_pRawModel,SIGNAL(scrollBarValueChange(int)),this,SLOT(setScrollBarPosition(int)));
+
+    //VIEW: m_pEventModel SETTINGS
+    if(m_wEventWidget == NULL)
+        m_wEventWidget = new QWidget();
+
+    QVBoxLayout *eventWidgetLayout = new QVBoxLayout;
+
+    eventWidgetLayout->addWidget(m_pEventTableView);
+    m_wEventWidget->setLayout(eventWidgetLayout);
+    m_wEventWidget->hide();
 }
 
 
@@ -349,6 +360,14 @@ void MainWindow::loadEvents()
 
     //set position of QScrollArea
     setScrollBarPosition(0);
+
+    //Show event widget
+    if(!m_wEventWidget->isVisible())
+    {
+        m_wEventWidget->setWindowTitle("MNE_BROWSE_RAW_QT - Loaded events");
+        m_wEventWidget->show();
+        m_wEventWidget->raise();
+    }
 }
 
 
