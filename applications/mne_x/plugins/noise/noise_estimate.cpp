@@ -254,9 +254,12 @@ void NoiseEstimate::run()
 
     m_bProcessData = true;
 
-    long ncount = 1; // for spectrum average
+    m_iFFTlength = 4096;
+    m_Fs = 1000;
 
-    MatrixXd sum_psdx;
+    //QVector<double> sum_psdx(QVector<double>(m_iFFTlength/2+1));
+
+    ulong ncount = 1; // for spectrum average
 
     while (m_bIsRunning)
     {
@@ -265,16 +268,16 @@ void NoiseEstimate::run()
             /* Dispatch the inputs */
             MatrixXd t_mat = m_pBuffer->pop();
 
+            //qDebug()<<"len_mat"<<t_mat.rows();
             //ToDo: Implement your algorithm here
-            MatrixXd psdx(t_mat.rows(),m_iFFTlength/2+1);
             MatrixXd t_psdx(t_mat.rows(),m_iFFTlength/2+1);
 
             if (ncount == 1)
             {
-                sum_psdx = t_psdx;
+                sum_psdx = MatrixXd::Zero(t_mat.rows(),m_iFFTlength/2+1);
             }
 
-            for(qint32 i = 0; i < t_mat.rows(); ++i){//FFT calculation by row
+            for(qint32 i = 0; i < t_mat.rows(); i++){//FFT calculation by row
                 RowVectorXd data;
 
                 data = t_mat.row(i);
@@ -288,46 +291,25 @@ void NoiseEstimate::run()
                 fft.SetFlag(fft.HalfSpectrum);
 
                 //fft-transform data sequence
-                RowVectorXcd t_freqData;
+                RowVectorXcd t_freqData(m_iFFTlength/2+1);
                 fft.fwd(t_freqData,t_dataZeroPad);
 
                 // calculate spectrum from FFT
-                RowVectorXcd xdft(m_iFFTlength/2+1);
-
                 for(qint32 j=0; j<m_iFFTlength/2+1;j++)
                 {                    
-                    xdft(j) = t_freqData(j);
-                    double mag_abs = t_freqData(i,j).real()* t_freqData(i,j).real() +  t_freqData(i,j).imag()*t_freqData(i,j).imag();
+                    double mag_abs = t_freqData(j).real()* t_freqData(j).real() +  t_freqData(j).imag()*t_freqData(j).imag();
+                    double spower = (1.0/(m_Fs*m_iFFTlength))* mag_abs;
+                    if (j>0&&j<m_iFFTlength/2) spower = 2.0*spower;
+                    sum_psdx(i,j) = sum_psdx(i,j) + spower;
 
-                    psdx(i,j) = (1.0/(m_Fs*m_iFFTlength))* mag_abs;
-                }
-
-                for(qint32 j=1; j<m_iFFTlength/2;j++)
-                {
-                    psdx(i,j) = 2.0*psdx(j);
-                }
-
-                for(qint32 j=0; j<m_iFFTlength/2+1;j++)
-                {
-                    sum_psdx(i,j) += psdx(i,j);
-                }
-
-
-                for(qint32 j=0; j<m_iFFTlength/2+1;j++)
-                {
                     t_psdx(i,j) = 10.0*log10(sum_psdx(i,j)/ncount);
+
                 }
-
-
-                //emit RePlot(psdx);
 
             }//row computing is done
             ncount ++;
-            if (ncount == 0)
-            {
-                ncount = 1;
-            }
-//            std::cout << t_psdx(0,1) << std::endl;
+
+//           qDebug()<<"Spec"<< sum_psdx(0,1)<<t_psdx(0,1)<<ncount;
 
 //            for(qint32 i = 0; i < t_mat.cols(); ++i)
 //                m_pRTMSAOutput->data()->setValue(t_mat.col(i));

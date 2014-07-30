@@ -56,6 +56,7 @@
 //=============================================================================================================
 
 #include <Eigen/Core>
+#include <Eigen/Dense>
 #include <Eigen/SparseCore>
 #include <unsupported/Eigen/FFT>
 
@@ -74,7 +75,7 @@
 
 #include <QtWidgets>
 
-
+#include <QVector>
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE NAMESPACE RtHpiPlugin
@@ -190,6 +191,8 @@ private:
 public:
     double m_Fs;
     qint32 m_iFFTlength;
+
+    MatrixXd sum_psdx;
 
 };
 
