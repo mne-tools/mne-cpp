@@ -257,7 +257,7 @@ void NoiseEstimate::run()
     m_iFFTlength = 4096;
     m_Fs = 1000;
 
-    QVector<double> sum_psdx(QVector<double>(m_iFFTlength/2+1));
+    //QVector<double> sum_psdx(QVector<double>(m_iFFTlength/2+1));
 
     ulong ncount = 1; // for spectrum average
 
@@ -274,7 +274,7 @@ void NoiseEstimate::run()
 
             if (ncount == 1)
             {
-                sum_psdx.fill(0.0);
+                sum_psdx = MatrixXd::Zero(t_mat.rows(),m_iFFTlength/2+1);
             }
 
             for(qint32 i = 0; i < t_mat.rows(); i++){//FFT calculation by row
@@ -300,16 +300,16 @@ void NoiseEstimate::run()
                     double mag_abs = t_freqData(j).real()* t_freqData(j).real() +  t_freqData(j).imag()*t_freqData(j).imag();
                     double spower = (1.0/(m_Fs*m_iFFTlength))* mag_abs;
                     if (j>0&&j<m_iFFTlength/2) spower = 2.0*spower;
-                    sum_psdx[j] = sum_psdx[j] + spower;
+                    sum_psdx(i,j) = sum_psdx(i,j) + spower;
 
-                    t_psdx(i,j) = 10.0*log10(sum_psdx[j]/ncount);
+                    t_psdx(i,j) = 10.0*log10(sum_psdx(i,j)/ncount);
 
                 }
 
             }//row computing is done
             ncount ++;
 
-            qDebug()<<"Spec"<< t_psdx(0,1)<<t_psdx(0,2);
+//           qDebug()<<"Spec"<< sum_psdx(0,1)<<t_psdx(0,1)<<ncount;
 
 //            for(qint32 i = 0; i < t_mat.cols(); ++i)
 //                m_pRTMSAOutput->data()->setValue(t_mat.col(i));
