@@ -72,6 +72,8 @@ NoiseEstimate::NoiseEstimate()
 , m_pRTMSAInput(NULL)
 , m_pNEOutput(NULL)
 , m_pBuffer(CircularMatrixBuffer<double>::SPtr())
+, m_Fs(600)
+, m_iFFTlength(4096)
 {
 }
 
@@ -127,16 +129,8 @@ void NoiseEstimate::init()
 void NoiseEstimate::initConnector()
 {
     qDebug() << "void NoiseEstimate::initConnector()";
-//    if(m_pFiffInfo){
-//        m_pNEOutput->data()->initFromFiffInfo(m_pFiffInfo);
-//    }
-//    else
-//    {
-//        m_iFFTlength = 0;
-//        m_Fs = 0;
-//    }
-
-
+    if(m_pFiffInfo)
+        m_pNEOutput->data()->initFromFiffInfo(m_pFiffInfo);
 }
 
 
@@ -254,8 +248,8 @@ void NoiseEstimate::run()
 
     m_bProcessData = true;
 
-    m_iFFTlength = 4096;
-    m_Fs = 1000;
+    qDebug() << "RUN m_iFFTlength" << m_iFFTlength;
+    m_Fs = m_pFiffInfo->sfreq;
 
     //QVector<double> sum_psdx(QVector<double>(m_iFFTlength/2+1));
 
@@ -309,10 +303,9 @@ void NoiseEstimate::run()
             }//row computing is done
             ncount ++;
 
-//           qDebug()<<"Spec"<< sum_psdx(0,1)<<t_psdx(0,1)<<ncount;
+//            qDebug()<< "Spec" << sum_psdx(0,1) << t_psdx(0,1) << ncount;
 
-//            for(qint32 i = 0; i < t_mat.cols(); ++i)
-//                m_pRTMSAOutput->data()->setValue(t_mat.col(i));
+            m_pNEOutput->data()->setValue(t_psdx);
         }
     }
 }

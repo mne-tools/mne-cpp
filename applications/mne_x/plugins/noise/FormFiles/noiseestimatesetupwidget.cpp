@@ -69,12 +69,9 @@ NoiseEstimateSetupWidget::NoiseEstimateSetupWidget(NoiseEstimate* toolbox, QWidg
 {
     ui.setupUi(this);
 
-//    connect(ui.m_qPushButton_About, SIGNAL(released()), this, SLOT(showAboutDialog()));
-//    connect(ui.m_qcbChannel,SIGNAL(currentIndexChanged(int)), this, SLOT(chgChannelInx));
-//    connect(ui.m_cb_nFFT,SIGNAL(currentTextChanged(QString)), this, SLOT(chgnFFT));
+    init();
 
-//    d_timeplot = new plotter();
-//    ui.m_layNoise->addWidget(d_timeplot);
+    connect(ui.m_qComboBoxnFFT, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &NoiseEstimateSetupWidget::chgnFFT);
 
 }
 
@@ -85,33 +82,38 @@ NoiseEstimateSetupWidget::~NoiseEstimateSetupWidget()
 {
 
 }
-void NoiseEstimateSetupWidget::init(qint32 nFFT, double fs)
+
+
+//*************************************************************************************************************
+
+void NoiseEstimateSetupWidget::init()
 {
+    ui.m_qComboBoxnFFT->insertItem(0, "512");
+    ui.m_qComboBoxnFFT->insertItem(1, "1024");
+    ui.m_qComboBoxnFFT->insertItem(2, "2048");
+    ui.m_qComboBoxnFFT->insertItem(3, "4096");
+    ui.m_qComboBoxnFFT->insertItem(4, "8192");
+    ui.m_qComboBoxnFFT->insertItem(5, "16384");
 
-    qDebug() << "Setup Noise Parameters:"<<nFFT<<","<<fs;
+    qint32 i = 0;
+    for(i = 0; i < ui.m_qComboBoxnFFT->count(); ++i)
+        if(ui.m_qComboBoxnFFT->itemText(i).toInt() == m_pNoiseEstimate->m_iFFTlength)
+            break;
 
-    int idx = 0;
-    if(nFFT==512) idx = 1;
-    else if(nFFT==1024) idx = 2;
-    else if(nFFT==2048) idx = 3;
-    else if(nFFT==4096) idx = 4;
-    else if(nFFT==8192) idx = 5;
-    else if(nFFT==16384) idx = 6;
-
-    ui.m_cb_nFFT->setCurrentIndex(idx);
-
-    ui.m_qlabel_fs->setText(QString("%1").arg(fs));
+    ui.m_qComboBoxnFFT->setCurrentIndex(i);
 }
 
-void NoiseEstimateSetupWidget::Update(MatrixXf data)
-{
 
+//*************************************************************************************************************
+
+void NoiseEstimateSetupWidget::chgnFFT(int idx)
+{
+//    qDebug() << "ui.m_qComboBoxnFFT->itemData(idx).toInt();" << ui.m_qComboBoxnFFT->itemText(idx).toInt();
+    m_pNoiseEstimate->m_iFFTlength = ui.m_qComboBoxnFFT->itemText(idx).toInt();
 }
 
-void NoiseEstimateSetupWidget::chgnFFT(QString tx)
-{
 
-}
+//*************************************************************************************************************
 
 void NoiseEstimateSetupWidget::Replot(/*MatrixXd tmp*/)
 {

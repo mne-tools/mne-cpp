@@ -48,54 +48,6 @@
    </item>
    <item>
     <layout class="QGridLayout" name="m_qGridLayout_main">
-     <item row="4" column="0">
-      <widget class="QLabel" name="m_qlabel_fs">
-       <property name="text">
-        <string/>
-       </property>
-      </widget>
-     </item>
-     <item row="2" column="0">
-      <widget class="QComboBox" name="m_cb_nFFT">
-       <item>
-        <property name="text">
-         <string>512</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>1024</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>2048</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>4096</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>8192</string>
-        </property>
-       </item>
-       <item>
-        <property name="text">
-         <string>16384</string>
-        </property>
-       </item>
-      </widget>
-     </item>
-     <item row="3" column="0">
-      <widget class="QLabel" name="label_2">
-       <property name="text">
-        <string>sample rate:</string>
-       </property>
-      </widget>
-     </item>
      <item row="1" column="0">
       <widget class="QLabel" name="label">
        <property name="text">
@@ -106,7 +58,7 @@
        </property>
       </widget>
      </item>
-     <item row="6" column="1">
+     <item row="4" column="1">
       <spacer name="m_qHorizontalSpacer_About">
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
@@ -119,7 +71,10 @@
        </property>
       </spacer>
      </item>
-     <item row="0" column="1" rowspan="6" colspan="2">
+     <item row="2" column="0">
+      <widget class="QComboBox" name="m_qComboBoxnFFT"/>
+     </item>
+     <item row="0" column="1" rowspan="4" colspan="2">
       <widget class="QGroupBox" name="m_qGroupBox_Information">
        <property name="title">
         <string/>
@@ -131,7 +86,7 @@
        </layout>
       </widget>
      </item>
-     <item row="5" column="0">
+     <item row="3" column="0">
       <spacer name="m_qVerticalSpacer_LeftRow">
        <property name="orientation">
         <enum>Qt::Vertical</enum>
