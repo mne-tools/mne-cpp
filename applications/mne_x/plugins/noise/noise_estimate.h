@@ -192,6 +192,8 @@ public:
     double m_Fs;
     qint32 m_iFFTlength;
 
+    MatrixXd sum_psdx;
+
 };
 
 } // NAMESPACE
