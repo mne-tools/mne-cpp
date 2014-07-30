@@ -88,6 +88,8 @@ void RtInvOp::appendNoiseCov(FiffCov &p_noiseCov)
     //Use here a circular buffer
     m_vecNoiseCov.push_back(p_noiseCov);
 
+    qDebug() << "RtInvOp m_vecNoiseCov" << m_vecNoiseCov.size();
+
     mutex.unlock();
 }
 
@@ -116,9 +118,8 @@ void RtInvOp::run()
             // Restrict forward solution as necessary for MEG
             MNEForwardSolution t_forwardMeg = m_pFwd->pick_types(true, false);
 
-            MNEInverseOperator::SPtr t_invOpMeg(new MNEInverseOperator(*m_pFiffInfo.data(), t_forwardMeg, m_vecNoiseCov[0], 0.2f, 0.8f));
-
             mutex.lock();
+            MNEInverseOperator::SPtr t_invOpMeg(new MNEInverseOperator(*m_pFiffInfo.data(), t_forwardMeg, m_vecNoiseCov[0], 0.2f, 0.8f));
             m_vecNoiseCov.pop_front();
             mutex.unlock();
 

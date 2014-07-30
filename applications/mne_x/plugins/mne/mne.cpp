@@ -400,6 +400,7 @@ void MNE::run()
         if(m_qVecFiffCov.size() > 0)
         {
             mutex.lock();
+            qDebug() << "m_qVecFiffCov" << m_qVecFiffCov.size();
             m_pRtInvOp->appendNoiseCov(m_qVecFiffCov[0]);//DEBUG THIS
             m_qVecFiffCov.pop_front();
             mutex.unlock();

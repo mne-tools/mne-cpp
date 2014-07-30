@@ -332,6 +332,7 @@ void Averaging::appendEvoked(FiffEvoked::SPtr p_pEvoked)
         mutex.lock();
         m_qVecEvokedData.push_back(p_pEvoked);
         mutex.unlock();
+        qDebug() << "append after" << m_qVecEvokedData.size();
     }
 }
 
