@@ -112,9 +112,8 @@ public:
     */
     ~NoiseEstimateSetupWidget();
 
-    void init(qint32 nFFTidx, double fs);
-    void chgnFFT(QString tx);
-    void Update(MatrixXf data);
+    void init();
+    void chgnFFT(int idx);
     void Replot(/*MatrixXd tmp*/);
 //    float mmin(MatrixXd tmp,int chan);
 //    float mmax(MatrixXd tmp,int chan);

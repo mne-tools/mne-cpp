@@ -139,6 +139,8 @@ void NoiseEstimationWidget::update(XMEASLIB::NewMeasurement::SPtr)
 
 void NoiseEstimationWidget::getData()
 {
+    qDebug() << "get Data" << m_pNE->getValue()(0,1) << "Cols" << m_pNE->getValue().cols();
+
     if(!m_bInitialized)
     {
 

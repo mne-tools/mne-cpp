@@ -230,17 +230,6 @@ MatrixXd NoiseEstimation::getValue() const
 
 void NoiseEstimation::setValue(MatrixXd& v)
 {
-    //check vector size
-    if(v.rows() != m_qListChInfo.size())
-        qCritical() << "Error Occured in RealTimeMultiSampleArrayNew::setVector: Vector size does not matche the number of channels! ";
-
-//    //Check if maximum exceeded //ToDo speed this up
-//    for(qint32 i = 0; i < v.size(); ++i)
-//    {
-//        if(v[i] < m_qListChInfo[i].getMinValue()) v[i] = m_qListChInfo[i].getMinValue();
-//        else if(v[i] > m_qListChInfo[i].getMaxValue()) v[i] = m_qListChInfo[i].getMaxValue();
-//    }
-
     //Store
     m_matValue = v;
     emit notify();
