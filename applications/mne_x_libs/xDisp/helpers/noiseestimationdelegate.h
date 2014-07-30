@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     noiseestimationwidget.h
+* @file     noiseestimationdelegate.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     May, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,48 +29,28 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of the NoiseEstimationWidget Class.
+* @brief    Declaration of the NoiseEstimationDelegate Class.
 *
 */
 
-#ifndef NOISEESTIMATIONWIDGET_H
-#define NOISEESTIMATIONWIDGET_H
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// INCLUDES
-//=============================================================================================================
-
-#include "xdisp_global.h"
-#include "newmeasurementwidget.h"
-#include "helpers/noiseestimationmodel.h"
-#include "helpers/noiseestimationdelegate.h"
-
+#ifndef NOISEESTIMATIONDELEGATE_H
+#define NOISEESTIMATIONDELEGATE_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QSharedPointer>
-#include <QList>
-#include <QAction>
-#include <QSpinBox>
-#include <QDoubleSpinBox>
+#include <QAbstractItemDelegate>
+#include <QTableView>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// Eigen INCLUDES
 //=============================================================================================================
 
-class QTime;
-
-namespace XMEASLIB
-{
-class NoiseEstimation;
-}
+#include <Eigen/Core>
 
 
 //*************************************************************************************************************
@@ -81,95 +61,81 @@ class NoiseEstimation;
 namespace XDISPLIB
 {
 
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace XMEASLIB;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// ENUMERATIONS
-//=============================================================================================================
-
-////=============================================================================================================
-///**
-//* Tool enumeration.
-//*/
-//enum Tool
-//{
-//    Freeze     = 0,       /**< Freezing tool. */
-//    Annotation = 1        /**< Annotation tool. */
-//};
+using namespace Eigen;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS NoiseEstimationWidget
+* DECLARE CLASS NoiseEstimationDelegate
 *
-* @brief The NoiseEstimationWidget class provides a equalizer display
+* @brief The NoiseEstimationDelegate class represents a RTMSA delegate which creates the plot paths
 */
-class XDISPSHARED_EXPORT NoiseEstimationWidget : public NewMeasurementWidget
+class NoiseEstimationDelegate : public QAbstractItemDelegate
 {
     Q_OBJECT
-
 public:
     //=========================================================================================================
     /**
-    * Constructs a NoiseEstimationWidget which is a child of parent.
+    * Creates a new abstract item delegate with the given parent.
     *
-    * @param [in] pNE           pointer to noise estimation measurement.
-    * @param [in] pTime         pointer to application time.
-    * @param [in] parent        pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
+    * @param[in] parent     Parent of the delegate
     */
-    NoiseEstimationWidget(QSharedPointer<NoiseEstimation> pNE, QSharedPointer<QTime> &pTime, QWidget* parent = 0);
+    NoiseEstimationDelegate(QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the NoiseEstimationWidget.
-    */
-    ~NoiseEstimationWidget();
-
-    //=========================================================================================================
-    /**
-    * Is called when new data are available.
+    * Use the painter and style option to render the item specified by the item index.
     *
-    * @param [in] pMeasurement  pointer to measurement -> not used because its direct attached to the measurement.
+    * (sizeHint() must be implemented also)
+    *
+    * @param[in] painter    Low-level painting on widgets and other paint devices
+    * @param[in] option     Describes the parameters used to draw an item in a view widget
+    * @param[in] index      Used to locate data in a data model.
     */
-    virtual void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
+    virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
     //=========================================================================================================
     /**
-    * Is called when new data are available.
+    * Item size
+    *
+    * @param[in] option     Describes the parameters used to draw an item in a view widget
+    * @param[in] index      Used to locate data in a data model.
     */
-    virtual void getData();
-
-    //=========================================================================================================
-    /**
-    * Initialise the NoiseEstimationWidget.
-    */
-    virtual void init();
+    virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
 private:
+    //=========================================================================================================
+    /**
+    * createPlotPath creates the QPointer path for the data plot.
+    *
+    * @param[in]        index   QModelIndex for accessing associated data and model object.
+    * @param[in,out]    path    The QPointerPath to create for the data plot.
+    */
+    void createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorXd& data) const;
 
-    NoiseEstimationModel*      m_pNEModel;      /**< NE model */
-    NoiseEstimationDelegate*   m_pNEDelegate;   /**< NE delegate */
-    QTableView* m_pTableView;                   /**< the QTableView being part of the model/view framework of Qt */
+    //=========================================================================================================
+    /**
+    * createGridPath Creates the QPointer path for the grid plot.
+    *
+    * @param[in,out] path The row vector of the data matrix <1 x nsamples>.
+    * @param[in] data The row vector of the data matrix <1 x nsamples>.
+    */
+    void createGridPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorXd& data) const;
 
+    //Settings
+//    QSettings m_qSettings;
 
-    QSharedPointer<NoiseEstimation> m_pNE;                  /**< The noise estimation measurement. */
-
-    bool m_bInitialized;                                    /**< Is Initialized */
+    // Scaling
+    float m_fMaxValue;     /**< Maximum value of the data to plot  */
+    float m_fScaleY;       /**< Maximum amplitude of plot (max is m_dPlotHeight/2) */
 };
 
 } // NAMESPACE
 
-#endif // NOISEESTIMATIONWIDGET_H
+#endif // NOISEESTIMATIONDELEGATE_H
