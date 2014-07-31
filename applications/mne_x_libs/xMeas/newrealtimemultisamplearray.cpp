@@ -65,7 +65,7 @@ using namespace XMEASLIB;
 NewRealTimeMultiSampleArray::NewRealTimeMultiSampleArray(QObject *parent)
 : NewMeasurement(QMetaType::type("NewRealTimeMultiSampleArray::SPtr"), parent)
 , m_dSamplingRate(0)
-, m_ucMultiArraySize(10)
+, m_iMultiArraySize(10)
 , m_bChInfoIsInit(false)
 {
 }
@@ -259,7 +259,7 @@ void NewRealTimeMultiSampleArray::setValue(VectorXd v)
     //Store
     m_vecValue = v;
     m_matSamples.push_back(m_vecValue);
-    if(m_matSamples.size() >= m_ucMultiArraySize)
+    if(m_matSamples.size() >= m_iMultiArraySize)
     {
         emit notify();
         m_matSamples.clear();

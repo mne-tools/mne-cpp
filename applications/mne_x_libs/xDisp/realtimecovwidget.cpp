@@ -103,15 +103,16 @@ RealTimeCovWidget::RealTimeCovWidget(QSharedPointer<RealTimeCov> pRTC, QSharedPo
     //set vertical layout
     QVBoxLayout *rtcLayout = new QVBoxLayout(this);
 
-    QLabel *testLabel = new QLabel;
-    testLabel->setText("Real Time Cov");
-
-    rtcLayout->addWidget(testLabel);
+    m_pImageSc = new ImageSc;
+    rtcLayout->addWidget(m_pImageSc);
 
     //set layouts
     this->setLayout(rtcLayout);
 
+    m_sPickTypes << "EEG";// << "MEG";
+
     getData();
+
 }
 
 
@@ -135,14 +136,43 @@ void RealTimeCovWidget::update(XMEASLIB::NewMeasurement::SPtr)
 
 void RealTimeCovWidget::getData()
 {
-    if(!m_bInitialized)
+    if(!m_bInitialized || m_pRTC->getValue()->names.size() != m_sChNames.size())
         if(m_pRTC->isInitialized())
             init();
+
+    if(m_bInitialized)
+    {
+        MatrixXd data = (m_matSelectorT * m_pRTC->getValue()->data) * m_matSelector;
+        m_pImageSc->updateData(data);
+    }
 }
 
 //*************************************************************************************************************
 
 void RealTimeCovWidget::init()
 {
-    m_bInitialized = true;
+    if(m_pRTC->getValue()->names.size() > 0)
+    {
+        m_pImageSc->setTitle(m_pRTC->getName());
+
+        m_sChNames = m_pRTC->getValue()->names;
+
+        QList<qint32> qListSelChannel;
+        for(qint32 i = 0; i < m_sChNames.size(); ++i)
+        {
+            foreach (const QString &type, m_sPickTypes) {
+                if (m_sChNames[i].contains(type))
+                    qListSelChannel.append(i);
+            }
+        }
+
+        m_matSelector = MatrixXd::Zero(m_pRTC->getValue()->data.cols(), qListSelChannel.size());
+
+        for(qint32 i = 0; i  < qListSelChannel.size(); ++i)
+            m_matSelector(qListSelChannel[i],i) = 1;
+
+        m_matSelectorT = m_matSelector.transpose();
+
+        m_bInitialized = true;
+    }
 }
