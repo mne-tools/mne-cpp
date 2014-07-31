@@ -193,7 +193,15 @@ private:
     double m_Fs;
     qint32 m_iFFTlength;
 
-    MatrixXd sum_psdx;
+    //MatrixXd sum_psdx;
+
+protected:
+    int NumOfBlocks;
+    int BlockSize  ;
+    int Sensors    ;
+    int BlockIndex ;
+
+    MatrixXd CircBuf;
 
 };
 
