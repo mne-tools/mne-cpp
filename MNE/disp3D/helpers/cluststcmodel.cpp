@@ -1,16 +1,71 @@
-#include "cluststcmodel.h"
+//=============================================================================================================
+/**
+* @file     cluststcmodel.cpp
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Daniel Strohmeier <daniel.strohmeier@tu-ilmenau.de>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+* @version  1.0
+* @date     June, 2014
+*
+* @section  LICENSE
+*
+* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+* the following conditions are met:
+*     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+*       following disclaimer.
+*     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+*       the following disclaimer in the documentation and/or other materials provided with the distribution.
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
+*       to endorse or promote products derived from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+* INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+*
+* @brief    Implementation of the ClustStcModel class.
+*
+*/
 
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "cluststcmodel.h"
 #include <mne/mne_sourceestimate.h>
+#include <iostream>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
 
 #include <QDebug>
 #include <QColor>
 
-#include <iostream>
 
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
 
-
+using namespace DISP3DLIB;
 using namespace MNELIB;
 
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
 
 ClustStcModel::ClustStcModel(QObject *parent)
 : QAbstractTableModel(parent)
@@ -75,17 +130,32 @@ QVariant ClustStcModel::data(const QModelIndex &index, int role) const
             }
             case 1: { // vertex
                 if(m_bDataInit && role == Qt::DisplayRole)
-                    return QVariant(m_vertices(row));
+                    return QVariant(m_qListLabels[row].label_id);//m_vertLabelIds(row));
                 break;
             }
-            case 2: { // stc data
+            case 2: // stc data
+            case 3: // relative stc data
+            {
                 if(m_bDataInit && role == Qt::DisplayRole)
-                    return QVariant(m_vecCurStc(row));
-                break;
-            }
-            case 3: { // relative stc data
-                if(m_bDataInit && role == Qt::DisplayRole)
-                    return QVariant(m_vecCurRelStc(row));
+                {
+                    QList<qint32> selVec;
+                    QVariant v;
+                    if(row < m_iLHSize)
+                        selVec = m_qMapLabelIdChannelLH.values(m_qListLabels[row].label_id);
+                    else
+                        selVec = m_qMapLabelIdChannelRH.values(m_qListLabels[row].label_id);
+
+                    VectorXd valVec(selVec.size());
+
+                    if(index.column() == 2) //stc data
+                        for(qint32 i = 0; i < selVec.size(); ++i)
+                            valVec(i) = m_vecCurStc(selVec[i]);
+                    else // relative stc data
+                        for(qint32 i = 0; i < selVec.size(); ++i)
+                            valVec(i) = m_vecCurRelStc(selVec[i]);
+                    v.setValue(valVec);
+                    return v;//m_vecCurStc(row));
+                }
                 break;
             }
             case 4: { // Label
@@ -130,7 +200,7 @@ QVariant ClustStcModel::headerData(int section, Qt::Orientation orientation, int
             case 0: //index column
                 return QVariant("Index");
             case 1: //vertex column
-                return QVariant("Vertex");
+                return QVariant("Vertex/Label ID");
             case 2: //stc data column
                 return QVariant("STC");
             case 3: //realtive stc data column
@@ -162,11 +232,11 @@ void ClustStcModel::addData(const MNESourceEstimate &stc)
     if(!m_bModelInit)
         return;
 
-    if(m_vertices.size() != stc.data.rows())
+    if(m_vertLabelIds.size() != stc.data.rows())
     {
         //TODO MAP data 416 to labels 150!!!!!!!!
         //ToDo Map the indices to the regions
-        setVertices(stc.vertices);
+        setVertLabelIDs(stc.vertices);
         m_bDataInit = true;
     }
 
@@ -277,6 +347,11 @@ void ClustStcModel::init(const AnnotationSet &annotationSet, const SurfaceSet &s
         }
     }
 
+    m_iLHSize = 0;
+    for(qint32 k = 0; k < m_qListLabels.size(); ++k)
+        if(m_qListLabels[k].hemi == 0)
+            ++m_iLHSize;
+
     m_vecCurStc = VectorXd::Zero(416);//m_qListLabels.size(),1);
     m_vecCurRelStc = VectorXd::Zero(416);//m_qListLabels.size(),1);;
     endResetModel();
@@ -339,8 +414,47 @@ void ClustStcModel::setStcSample(const VectorXd &sample)
 
 //*************************************************************************************************************
 
-void ClustStcModel::setVertices(const VectorXi &vertnos)
+void ClustStcModel::setVertLabelIDs(const VectorXi &vertLabelIDs)
 {
-    m_vertices = vertnos;
+    QMap<qint32, qint32> t_qMapLabelIdChannel;
+    for(qint32 i = 0; i < vertLabelIDs.size(); ++i)
+        t_qMapLabelIdChannel.insertMulti(vertLabelIDs(i),i);
+
+
+    QList<qint32> qListLastIdcs = t_qMapLabelIdChannel.values(vertLabelIDs(vertLabelIDs.size() - 1));
+
+    qint32 lhIdx = 0;
+    qint32 maxIdx = qListLastIdcs[0];
+    qint32 minIdx = qListLastIdcs[0];
+
+    for(qint32 i = 0; i < qListLastIdcs.size(); ++i)
+    {
+        if(maxIdx < qListLastIdcs[i])
+            maxIdx = qListLastIdcs[i];
+        if(minIdx > qListLastIdcs[i])
+            minIdx = qListLastIdcs[i];
+    }
+
+    qint32 upperBound = maxIdx - (maxIdx*0.25);
+    for(qint32 i = 0; i < qListLastIdcs.size(); ++i)
+    {
+        if(lhIdx < qListLastIdcs[i] && qListLastIdcs[i] < upperBound)
+            lhIdx = qListLastIdcs[i];
+    }
+
+    m_qMapLabelIdChannelLH.clear();
+    m_qMapLabelIdChannelRH.clear();
+
+
+    QMap<qint32, qint32>::iterator it;
+    for (it = t_qMapLabelIdChannel.begin(); it != t_qMapLabelIdChannel.end(); ++it)
+    {
+        if(it.value() <= lhIdx)
+            m_qMapLabelIdChannelLH.insertMulti(it.key(),it.value());
+        else
+            m_qMapLabelIdChannelRH.insertMulti(it.key(),it.value());
+    }
+
+    m_vertLabelIds = vertLabelIDs;
 }
 

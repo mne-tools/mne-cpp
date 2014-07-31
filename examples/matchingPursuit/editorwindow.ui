@@ -70,7 +70,7 @@
          <enum>QFrame::Plain</enum>
         </property>
         <property name="text">
-         <string>Atomeditor</string>
+         <string>atom editor</string>
         </property>
         <property name="textFormat">
          <enum>Qt::AutoText</enum>
@@ -153,7 +153,7 @@
               </sizepolicy>
              </property>
              <property name="text">
-              <string>Typ:</string>
+              <string>type</string>
              </property>
             </widget>
            </item>
@@ -166,7 +166,7 @@
               </sizepolicy>
              </property>
              <property name="text">
-              <string>Name:</string>
+              <string>name:</string>
              </property>
             </widget>
            </item>
@@ -179,7 +179,7 @@
               </sizepolicy>
              </property>
              <property name="text">
-              <string>Atomanzahl:</string>
+              <string>number of atoms</string>
              </property>
             </widget>
            </item>
@@ -249,7 +249,7 @@
               </sizepolicy>
              </property>
              <property name="text">
-              <string>Anzahl der Samples:</string>
+              <string>number of samples</string>
              </property>
             </widget>
            </item>
@@ -331,7 +331,7 @@
            <item row="2" column="4" colspan="2">
             <widget class="QCheckBox" name="chb_CombAllPara">
              <property name="text">
-              <string>Alle Parameter kombinieren</string>
+              <string>combine all parameters</string>
              </property>
             </widget>
            </item>
@@ -398,7 +398,7 @@
               <item>
                <widget class="QRadioButton" name="rb_PosCountScale">
                 <property name="text">
-                 <string>Positiv</string>
+                 <string>incrementing</string>
                 </property>
                 <property name="checked">
                  <bool>true</bool>
@@ -408,7 +408,7 @@
               <item>
                <widget class="QRadioButton" name="rb_NegCountScale">
                 <property name="text">
-                 <string>Negativ</string>
+                 <string>decrementing</string>
                 </property>
                </widget>
               </item>
@@ -427,7 +427,7 @@
               </sizepolicy>
              </property>
              <property name="text">
-              <string>Zählrichtung:</string>
+              <string>iterator</string>
              </property>
              <property name="margin">
               <number>0</number>
@@ -440,7 +440,7 @@
               <bool>false</bool>
              </property>
              <property name="text">
-              <string>Endwert:</string>
+              <string>final value:</string>
              </property>
             </widget>
            </item>
@@ -477,7 +477,7 @@
                  <bool>false</bool>
                 </property>
                 <property name="text">
-                 <string>null</string>
+                 <string>zero</string>
                 </property>
                 <property name="checked">
                  <bool>true</bool>
@@ -512,7 +512,7 @@
                  </sizepolicy>
                 </property>
                 <property name="text">
-                 <string>Schrittweite:</string>
+                 <string>stepwidth:</string>
                 </property>
                </widget>
               </item>
@@ -522,7 +522,7 @@
                  <bool>false</bool>
                 </property>
                 <property name="text">
-                 <string>x • n  </string>
+                 <string>x • n </string>
                 </property>
                 <property name="autoExclusive">
                  <bool>true</bool>
@@ -653,7 +653,7 @@
            <item row="1" column="1">
             <widget class="QLabel" name="lb_StartValueScale">
              <property name="text">
-              <string>Wert:</string>
+              <string>value:</string>
              </property>
             </widget>
            </item>
@@ -671,7 +671,7 @@
               </font>
              </property>
              <property name="text">
-              <string>Skalierung der Einhüllenden:</string>
+              <string>scale:</string>
              </property>
             </widget>
            </item>
@@ -702,7 +702,7 @@
            <item row="1" column="1">
             <widget class="QLabel" name="lb_StartValueModu">
              <property name="text">
-              <string>Wert:</string>
+              <string>value:</string>
              </property>
             </widget>
            </item>
@@ -712,7 +712,7 @@
               <bool>false</bool>
              </property>
              <property name="text">
-              <string>Endwert:</string>
+              <string>final value:</string>
              </property>
             </widget>
            </item>
@@ -752,7 +752,7 @@
               <item>
                <widget class="QRadioButton" name="rb_PosCountModu">
                 <property name="text">
-                 <string>Positiv</string>
+                 <string>incrementing</string>
                 </property>
                 <property name="checked">
                  <bool>true</bool>
@@ -762,7 +762,7 @@
               <item>
                <widget class="QRadioButton" name="rb_NegCountModu">
                 <property name="text">
-                 <string>Negativ</string>
+                 <string>decrementing</string>
                 </property>
                </widget>
               </item>
@@ -781,7 +781,7 @@
               </sizepolicy>
              </property>
              <property name="text">
-              <string>Zählrichtung:</string>
+              <string>iterator</string>
              </property>
              <property name="margin">
               <number>0</number>
@@ -821,7 +821,7 @@
                  <bool>false</bool>
                 </property>
                 <property name="text">
-                 <string>x • n  </string>
+                 <string>x • n </string>
                 </property>
                </widget>
               </item>
@@ -831,7 +831,7 @@
                  <bool>false</bool>
                 </property>
                 <property name="text">
-                 <string>null</string>
+                 <string>zero</string>
                 </property>
                 <property name="checked">
                  <bool>true</bool>
@@ -850,7 +850,7 @@
                  </sizepolicy>
                 </property>
                 <property name="text">
-                 <string>Schrittweite:</string>
+                 <string>stepwidth:</string>
                 </property>
                </widget>
               </item>
@@ -984,7 +984,7 @@
               </font>
              </property>
              <property name="text">
-              <string>Modulation:</string>
+              <string>modulation:</string>
              </property>
             </widget>
            </item>
@@ -1018,7 +1018,7 @@
               <bool>false</bool>
              </property>
              <property name="text">
-              <string>Endwert:</string>
+              <string>final value:</string>
              </property>
             </widget>
            </item>
@@ -1058,7 +1058,7 @@
               <item>
                <widget class="QRadioButton" name="rb_PosCountPhase">
                 <property name="text">
-                 <string>Positiv</string>
+                 <string>incrementing</string>
                 </property>
                 <property name="checked">
                  <bool>true</bool>
@@ -1068,7 +1068,7 @@
               <item>
                <widget class="QRadioButton" name="rb_NegCountPhase">
                 <property name="text">
-                 <string>Negativ</string>
+                 <string>decrementing</string>
                 </property>
                </widget>
               </item>
@@ -1087,7 +1087,7 @@
               </sizepolicy>
              </property>
              <property name="text">
-              <string>Zählrichtung:</string>
+              <string>iterator</string>
              </property>
              <property name="margin">
               <number>0</number>
@@ -1108,14 +1108,14 @@
               </font>
              </property>
              <property name="text">
-              <string>Phase:</string>
+              <string>phase:</string>
              </property>
             </widget>
            </item>
            <item row="1" column="1">
             <widget class="QLabel" name="lb_StartValuePhase">
              <property name="text">
-              <string>Wert:</string>
+              <string>value:</string>
              </property>
             </widget>
            </item>
@@ -1200,7 +1200,7 @@ p, li { white-space: pre-wrap; }
                  </sizepolicy>
                 </property>
                 <property name="text">
-                 <string>Schrittweite:</string>
+                 <string>stepwidth:</string>
                 </property>
                </widget>
               </item>
@@ -1210,7 +1210,7 @@ p, li { white-space: pre-wrap; }
                  <bool>false</bool>
                 </property>
                 <property name="text">
-                 <string>null</string>
+                 <string>zero</string>
                 </property>
                 <property name="checked">
                  <bool>true</bool>
@@ -1223,7 +1223,7 @@ p, li { white-space: pre-wrap; }
                  <bool>false</bool>
                 </property>
                 <property name="text">
-                 <string>x • n  </string>
+                 <string>x • n </string>
                 </property>
                </widget>
               </item>
@@ -1371,7 +1371,7 @@ p, li { white-space: pre-wrap; }
                  </sizepolicy>
                 </property>
                 <property name="text">
-                 <string>Zählrichtung:</string>
+                 <string>iterator</string>
                 </property>
                 <property name="margin">
                  <number>0</number>
@@ -1411,7 +1411,7 @@ p, li { white-space: pre-wrap; }
                  <item>
                   <widget class="QRadioButton" name="rb_PosCountChirp">
                    <property name="text">
-                    <string>Positiv</string>
+                    <string>incrementing</string>
                    </property>
                    <property name="checked">
                     <bool>true</bool>
@@ -1421,7 +1421,7 @@ p, li { white-space: pre-wrap; }
                  <item>
                   <widget class="QRadioButton" name="rb_NegCountChirp">
                    <property name="text">
-                    <string>Negativ</string>
+                    <string>decrementing</string>
                    </property>
                   </widget>
                  </item>
@@ -1437,7 +1437,7 @@ p, li { white-space: pre-wrap; }
                  </sizepolicy>
                 </property>
                 <property name="text">
-                 <string>Endwert:</string>
+                 <string>final value:</string>
                 </property>
                </widget>
               </item>
@@ -1477,7 +1477,7 @@ p, li { white-space: pre-wrap; }
                  <item row="1" column="1">
                   <widget class="QRadioButton" name="rb_LinStepChirp">
                    <property name="text">
-                    <string>x • n  </string>
+                    <string>x • n </string>
                    </property>
                   </widget>
                  </item>
@@ -1491,7 +1491,7 @@ p, li { white-space: pre-wrap; }
                  <item row="0" column="1">
                   <widget class="QRadioButton" name="rb_NoStepChirp">
                    <property name="text">
-                    <string>null</string>
+                    <string>zero</string>
                    </property>
                    <property name="checked">
                     <bool>true</bool>
@@ -1507,7 +1507,7 @@ p, li { white-space: pre-wrap; }
                     </sizepolicy>
                    </property>
                    <property name="text">
-                    <string>Schrittweite:</string>
+                    <string>stepwidth:</string>
                    </property>
                   </widget>
                  </item>
@@ -1602,7 +1602,7 @@ p, li { white-space: pre-wrap; }
                  </font>
                 </property>
                 <property name="text">
-                 <string>Chirp:</string>
+                 <string>chirp:</string>
                 </property>
                </widget>
               </item>
@@ -1659,7 +1659,7 @@ p, li { white-space: pre-wrap; }
                  </sizepolicy>
                 </property>
                 <property name="text">
-                 <string>Wert:</string>
+                 <string>value:</string>
                 </property>
                </widget>
               </item>
@@ -1701,7 +1701,7 @@ p, li { white-space: pre-wrap; }
               </size>
              </property>
              <property name="text">
-              <string>Wörterbuch erstellen</string>
+              <string>calculate dictionary</string>
              </property>
              <property name="icon">
               <iconset resource="Ressourcen.qrc">
@@ -1765,7 +1765,7 @@ p, li { white-space: pre-wrap; }
          </font>
         </property>
         <property name="text">
-         <string>Wörterbucheditor</string>
+         <string>dictionary editor</string>
         </property>
         <property name="alignment">
          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -1944,7 +1944,7 @@ p, li { white-space: pre-wrap; }
             </size>
            </property>
            <property name="text">
-            <string>Ausgewählte Wörterbücher löschen</string>
+            <string>delete choosen dictionary</string>
            </property>
            <property name="icon">
             <iconset resource="Ressourcen.qrc">
@@ -1987,7 +1987,7 @@ p, li { white-space: pre-wrap; }
          <item row="0" column="0">
           <widget class="QLabel" name="lb_AllDict">
            <property name="text">
-            <string>Bisher erstellte (Teil-)Wörterbücher:</string>
+            <string>existing (part-) dictionaries:</string>
            </property>
           </widget>
          </item>
@@ -2013,7 +2013,7 @@ p, li { white-space: pre-wrap; }
             </sizepolicy>
            </property>
            <property name="text">
-            <string>Neues Wörterbuch:</string>
+            <string>new dictionary</string>
            </property>
           </widget>
          </item>
@@ -2058,7 +2058,7 @@ p, li { white-space: pre-wrap; }
             <enum>Qt::LeftToRight</enum>
            </property>
            <property name="text">
-            <string>Neues Wörterbuch speichern...</string>
+            <string>save new dictionary as...</string>
            </property>
            <property name="icon">
             <iconset resource="Ressourcen.qrc">

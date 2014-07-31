@@ -116,11 +116,6 @@ background-color:rgb(216, 216, 216);</string>
              <widget class="QComboBox" name="m_Qcb_slew">
               <item>
                <property name="text">
-                <string>Null</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
                 <string>Slow</string>
                </property>
               </item>
@@ -138,11 +133,6 @@ background-color:rgb(216, 216, 216);</string>
             </item>
             <item row="2" column="1">
              <widget class="QComboBox" name="m_Qcb_pregain">
-              <item>
-               <property name="text">
-                <string>null</string>
-               </property>
-              </item>
               <item>
                <property name="text">
                 <string>x1</string>
@@ -343,11 +333,6 @@ background-color:rgb(216, 216, 216);</string>
              <widget class="QComboBox" name="m_Qcb_postgain">
               <item>
                <property name="text">
-                <string>null</string>
-               </property>
-              </item>
-              <item>
-               <property name="text">
                 <string>x1</string>
                </property>
               </item>
@@ -540,7 +525,7 @@ background-color:rgb(216, 216, 216);</string>
           <widget class="QComboBox" name="m_Qcb_opermode">
            <item>
             <property name="text">
-             <string>Off</string>
+             <string>Choose</string>
             </property>
            </item>
            <item>
@@ -551,11 +536,6 @@ background-color:rgb(216, 216, 216);</string>
            <item>
             <property name="text">
              <string>Tune</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>Sleep</string>
             </property>
            </item>
           </widget>

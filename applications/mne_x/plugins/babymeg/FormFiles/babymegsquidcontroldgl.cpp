@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -636,11 +636,11 @@ void BabyMEGSQUIDControlDgl::UpdateGUI()
     // low pass
     ui->m_Qcb_lp->setCurrentIndex( m_GUISM.LowPass );
     //pregain
-    ui->m_Qcb_pregain->setCurrentIndex( m_GUISM.PreGain );
+    ui->m_Qcb_pregain->setCurrentIndex( m_GUISM.PreGain-1 );
     //postgain
-    ui->m_Qcb_postgain->setCurrentIndex( m_GUISM.PostGain );
+    ui->m_Qcb_postgain->setCurrentIndex( m_GUISM.PostGain-1 );
     //slew
-    ui->m_Qcb_slew->setCurrentIndex( m_GUISM.Slew);
+    ui->m_Qcb_slew->setCurrentIndex( m_GUISM.Slew-1);
 
     //heattime
     ui->m_Qsb_heattime->setValue(m_GUISM.HeatTime);
