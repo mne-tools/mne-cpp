@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/images">
+        <file alias="covarianceSelection.png">images/covarianceSelection.png</file>
         <file alias="selectSensors.png">images/selectSensors.png</file>
     </qresource>
 </RCC>

@@ -111,7 +111,8 @@ SOURCES += \
     noiseestimationwidget.cpp \
     realtimecovwidget.cpp \
     helpers/noiseestimationdelegate.cpp \
-    helpers/noiseestimationmodel.cpp
+    helpers/noiseestimationmodel.cpp \
+    helpers/covmodalitywidget.cpp
 
 HEADERS += \
     xdisp_global.h \
@@ -132,7 +133,8 @@ HEADERS += \
     noiseestimationwidget.h \
     realtimecovwidget.h \
     helpers/noiseestimationdelegate.h \
-    helpers/noiseestimationmodel.h
+    helpers/noiseestimationmodel.h \
+    helpers/covmodalitywidget.h
 
 FORMS += \
     realtimesamplearraywidget.ui
