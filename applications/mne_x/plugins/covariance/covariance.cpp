@@ -80,7 +80,7 @@ Covariance::Covariance()
     m_pActionShowAdjustment->setStatusTip(tr("Covariance Adjustments"));
     connect(m_pActionShowAdjustment, &QAction::triggered, this, &Covariance::showCovarianceWidget);
     addPluginAction(m_pActionShowAdjustment);
-    m_pActionShowAdjustment->setVisible(false);
+//    m_pActionShowAdjustment->setVisible(false);
 }
 
 
@@ -254,7 +254,7 @@ void Covariance::run()
     while(!m_pFiffInfo)
         msleep(10);// Wait for fiff Info
 
-    m_pActionShowAdjustment->setVisible(true);
+//    m_pActionShowAdjustment->setVisible(true);
 
     //
     // Init Real-Time Covariance estimator
