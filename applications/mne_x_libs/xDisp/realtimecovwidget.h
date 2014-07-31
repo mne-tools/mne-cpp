@@ -44,6 +44,7 @@
 
 #include "xdisp_global.h"
 #include "newmeasurementwidget.h"
+#include <disp/imagesc.h>
 
 
 //*************************************************************************************************************
@@ -87,6 +88,7 @@ namespace XDISPLIB
 //=============================================================================================================
 
 using namespace XMEASLIB;
+using namespace DISPLIB;
 
 
 //*************************************************************************************************************
@@ -156,6 +158,14 @@ private:
     QSharedPointer<RealTimeCov> m_pRTC;         /**< The real-time covariance measurement. */
 
     bool m_bInitialized;                        /**< Is Initialized */
+
+    QStringList m_sChNames;                /**< Channel names */
+
+    QStringList m_sPickTypes;                   /**< Channel Types to pick */
+    MatrixXd m_matSelector;                     /**< Selction matrix */
+    MatrixXd m_matSelectorT;                    /**< Transposed selction matrix */
+
+    ImageSc* m_pImageSc;                        /**< The covariance colormap */
 };
 
 } // NAMESPACE
