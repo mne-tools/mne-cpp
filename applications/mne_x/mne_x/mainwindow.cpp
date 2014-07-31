@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -205,11 +205,11 @@ void MainWindow::about()
             " following disclaimer.\n"
             "\t* Redistributions in binary form must reproduce the above copyright notice, this list of conditions and"
             " the following disclaimer in the documentation and/or other materials provided with the distribution.\n"
-            "\t* Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used"
+            "\t* Neither the name of MNE-CPP authors nor the names of its contributors may be used"
             " to endorse or promote products derived from this software without specific prior written permission.\n\n"
             "THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\" AND ANY EXPRESS OR IMPLIED"
             " WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A"
-            " PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,"
+            " PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,"
             " INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,"
             " PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)"
             " HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING"
@@ -407,13 +407,11 @@ void MainWindow::createToolBars()
         delete m_pDynamicPluginToolBar;
         m_pDynamicPluginToolBar = NULL;
     }
-    if(m_qListDynamicPluginActions.size() > 0 || m_qListDynamicPluginWidgets.size() > 0)
+    if(m_qListDynamicPluginActions.size() > 0)
     {
         m_pDynamicPluginToolBar = addToolBar(m_sCurPluginName + tr("Control"));
         for(qint32 i = 0; i < m_qListDynamicPluginActions.size(); ++i)
             m_pDynamicPluginToolBar->addAction(m_qListDynamicPluginActions[i]);
-        for(qint32 i = 0; i < m_qListDynamicPluginWidgets.size(); ++i)
-            m_pDynamicPluginToolBar->addWidget(m_qListDynamicPluginWidgets[i]);
     }
 
     //Display
@@ -490,7 +488,6 @@ void MainWindow::createLogDockWindow()
 void MainWindow::updatePluginWidget(IPlugin::SPtr pPlugin)
 {
     m_qListDynamicPluginActions.clear();
-    m_qListDynamicPluginWidgets.clear();
     m_qListDynamicDisplayActions.clear();
     m_qListDynamicDisplayWidgets.clear();
 
@@ -498,7 +495,6 @@ void MainWindow::updatePluginWidget(IPlugin::SPtr pPlugin)
     {
         // Add Dynamic Plugin Actions
         m_qListDynamicPluginActions.append(pPlugin->getPluginActions());
-        m_qListDynamicPluginWidgets.append(pPlugin->getPluginWidgets());
 
         m_sCurPluginName = pPlugin->getName();
 
@@ -528,6 +524,7 @@ void MainWindow::updatePluginWidget(IPlugin::SPtr pPlugin)
                 {
                     m_pRunWidget->showFullScreen();
                     connect(m_pRunWidget, &RunWidget::displayClosed, this, &MainWindow::toggleDisplayMax);
+                    m_pRunWidgetClose = new QShortcut(QKeySequence(Qt::Key_Escape), m_pRunWidget, SLOT(close()));
                 }
                 else
                     setCentralWidget(m_pRunWidget);

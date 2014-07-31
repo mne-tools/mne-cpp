@@ -247,6 +247,20 @@ protected:
     */
     virtual void run();
 
+    //=========================================================================================================
+    /**
+    * Do BCI stuff with data received from sensor level
+    *
+    */
+    void BCIOnSensorLevel();
+
+    //=========================================================================================================
+    /**
+    * Do BCI stuff with data received from source level
+    *
+    */
+    void BCIOnSourceLevel();
+
 signals:
     void paintFeatures(MyQList features, bool bTrigerActivated);
 
@@ -309,9 +323,13 @@ private:
     double                  m_dFilterUpperBound;                /**< GUI input: Filter upper bound in Hz. */
     double                  m_dParcksWidth;                     /**< GUI input: Parck filter algorithm width in Hz. */
     double                  m_dThresholdValue;                  /**< GUI input: Threshold in micro volts. */
+    double                  m_dDisplayRangeBoundary;            /**< GUI input: Display range for the boundary values. */
+    double                  m_dDisplayRangeVariances;           /**< GUI input: Display range for the variance values. */
+    double                  m_dDisplayRangeElectrodes;          /**< GUI input: Display range for the electrode time values. */
     int                     m_iFilterOrder;                     /**< GUI input: Filter order. */
     int                     m_iNumberFeatures;                  /**< GUI input: Number of classifactions to store until they get averaged. */
     int                     m_iNumberFeaturesToDisplay;         /**< GUI input: Number of features to display. */
+    int                     m_iFeatureCalculationType;          /**< GUI input: Type of feature calculation (variance/log of variance/...). */
 };
 
 } // NAMESPACE

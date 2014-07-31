@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -78,7 +78,7 @@ SourceLab::SourceLab()
 , m_sSurfaceDir("./MNE-sample-data/subjects/sample/surf")
 , m_iNumAverages(10)
 , m_bSingleTrial(false)
-, m_iStimChan(0)
+, m_sStimChan("STI 001")
 , m_iDownSample(4)
 {
 
@@ -280,10 +280,9 @@ void SourceLab::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
 void SourceLab::appendEvoked(FiffEvoked::SPtr p_pEvoked)
 {
-    if(p_pEvoked->comment == QString("Stim %1").arg(m_iStimChan))
+    if(p_pEvoked->comment == m_sStimChan)
     {
-        std::cout << p_pEvoked->comment.toLatin1().constData() << " append" << std::endl;
-
+//        std::cout << p_pEvoked->comment.toLatin1().constData() << " append" << std::endl;
         mutex.lock();
         m_qVecEvokedData.push_back(p_pEvoked);
         mutex.unlock();
@@ -298,7 +297,7 @@ void SourceLab::updateFiffCov(FiffCov::SPtr p_pFiffCov)
     m_pFiffCov = p_pFiffCov;
 
     if(m_pRtInvOp)
-        m_pRtInvOp->appendNoiseCov(m_pFiffCov);
+        m_pRtInvOp->appendNoiseCov(*m_pFiffCov);
 }
 
 
