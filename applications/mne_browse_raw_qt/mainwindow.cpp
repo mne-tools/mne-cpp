@@ -346,6 +346,39 @@ void MainWindow::writeFile()
 void MainWindow::loadEvents()
 {
     QString filename = QFileDialog::getOpenFileName(this,QString("Open fiff event data file"),QString("./MNE-sample-data/MEG/sample/"),tr("fif event data files (*-eve.fif);;fif data files (*.fif)"));
+    if(m_qFileEvent.isOpen())
+        m_qFileEvent.close();
+    m_qFileEvent.setFileName(filename);
+
+    if(m_pEventModel->loadEventData(m_qFileRaw)) {
+        qDebug() << "Fiff event data file" << filename << "loaded.";
+    }
+    else
+        qDebug("ERROR loading fiff event data file %s",filename.toLatin1().data());
+
+    setWindowStatus();
+
+    //set position of QScrollArea
+    setScrollBarPosition(0);
+
+    //Show event widget
+    if(!m_wEventWidget->isVisible())
+    {
+        m_wEventWidget->setWindowTitle("MNE_BROWSE_RAW_QT - Loaded events");
+        m_wEventWidget->show();
+        m_wEventWidget->raise();
+    }
+}
+
+
+//*************************************************************************************************************
+
+void MainWindow::saveEvents()
+{
+    QString filename = QFileDialog::getSaveFileName(this,
+                                                    QString("Save fiff event data file"),
+                                                    QString("./MNE-sample-data/MEG/sample/"),
+                                                    tr("fif event data files (*-eve.fif);;fif data files (*.fif)"));
     if(m_qFileRaw.isOpen())
         m_qFileRaw.close();
     m_qFileRaw.setFileName(filename);
