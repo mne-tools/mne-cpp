@@ -264,7 +264,7 @@ void NoiseEstimate::run()
 
             if(FirstStart){
                 //init the circ buffer and parameters
-                NumOfBlocks = 30;
+                NumOfBlocks = 60;
                 BlockSize =  block.cols();
                 Sensors =  block.rows();
 
@@ -328,7 +328,7 @@ void NoiseEstimate::run()
                         // calculate spectrum from FFT
                         for(qint32 j=0; j<m_iFFTlength/2+1;j++)
                         {
-                            double mag_abs = t_freqData(j).real()* t_freqData(j).real() +  t_freqData(j).imag()*t_freqData(j).imag();
+                            double mag_abs = sqrt(t_freqData(j).real()* t_freqData(j).real() +  t_freqData(j).imag()*t_freqData(j).imag());
                             double spower = (1.0/(m_Fs*m_iFFTlength))* mag_abs;
                             if (j>0&&j<m_iFFTlength/2) spower = 2.0*spower;
                             sum_psdx(i,j) = sum_psdx(i,j) + spower;
