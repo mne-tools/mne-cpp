@@ -237,7 +237,7 @@ void NoiseEstimationDelegate::createGridPath(const QModelIndex &index, const QSt
     {
         double fs = t_pModel->getInfo()->sfreq/2;
 
-        qint32 numLines = (qint32)floor(log10(fs));
+        qint32 numLines = (qint32)ceil(log10(fs));
 
         QList<qint32> qListLineSamples;
 
