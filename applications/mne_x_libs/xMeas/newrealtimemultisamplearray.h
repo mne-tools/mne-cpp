@@ -191,9 +191,9 @@ public:
     /**
     * Sets the number of sample vectors which should be gathered before attached observers are notified by calling the Subject notify() method.
     *
-    * @param [in] ucMultiArraySize the number of values.
+    * @param [in] iMultiArraySize the number of values.
     */
-    inline void setMultiArraySize(unsigned char ucMultiArraySize);
+    inline void setMultiArraySize(qint32 iMultiArraySize);
 
     //=========================================================================================================
     /**
@@ -201,7 +201,7 @@ public:
     *
     * @return the number of values which are gathered before a notify() is called.
     */
-    inline unsigned char getMultiArraySize() const;
+    inline qint32 getMultiArraySize() const;
 
     //=========================================================================================================
     /**
@@ -234,7 +234,7 @@ private:
     QString                     m_sXMLLayoutFile;   /**< Layout file name. */
     double                      m_dSamplingRate;    /**< Sampling rate of the RealTimeSampleArray.*/
     VectorXd                    m_vecValue;         /**< The current attached sample vector.*/
-    unsigned char               m_ucMultiArraySize; /**< Sample size of the multi sample array.*/
+    qint32                      m_iMultiArraySize; /**< Sample size of the multi sample array.*/
     QVector< VectorXd >         m_matSamples;       /**< The multi sample array.*/
     QList<RealTimeSampleArrayChInfo> m_qListChInfo; /**< Channel info list.*/
     bool                        m_bChInfoIsInit;    /**< If channel info is initialized.*/
@@ -318,21 +318,21 @@ inline FiffInfo::SPtr& NewRealTimeMultiSampleArray::getFiffInfo()
 
 //*************************************************************************************************************
 
-inline void NewRealTimeMultiSampleArray::setMultiArraySize(unsigned char ucMultiArraySize)
+inline void NewRealTimeMultiSampleArray::setMultiArraySize(qint32 iMultiArraySize)
 {
     //Obsolete unsigned char can't be bigger
 //    if(ucArraySize > 255)
 //        m_ucArraySize = 255;
 //    else
-        m_ucMultiArraySize = ucMultiArraySize;
+        m_iMultiArraySize = iMultiArraySize;
 }
 
 
 //*************************************************************************************************************
 
-unsigned char NewRealTimeMultiSampleArray::getMultiArraySize() const
+qint32 NewRealTimeMultiSampleArray::getMultiArraySize() const
 {
-    return m_ucMultiArraySize;
+    return m_iMultiArraySize;
 }
 
 
