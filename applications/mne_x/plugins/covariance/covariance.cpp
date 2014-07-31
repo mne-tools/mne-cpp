@@ -75,7 +75,7 @@ Covariance::Covariance()
 , m_pCovarianceBuffer(CircularMatrixBuffer<double>::SPtr())
 , m_iEstimationSamples(5000)
 {
-    m_pActionShowAdjustment = new QAction(QIcon(":/images/covariance.png"), tr("Covariance Adjustments"),this);
+    m_pActionShowAdjustment = new QAction(QIcon(":/images/covadjustments.png"), tr("Covariance Adjustments"),this);
 //    m_pActionSetupProject->setShortcut(tr("F12"));
     m_pActionShowAdjustment->setStatusTip(tr("Covariance Adjustments"));
     connect(m_pActionShowAdjustment, &QAction::triggered, this, &Covariance::showCovarianceWidget);
