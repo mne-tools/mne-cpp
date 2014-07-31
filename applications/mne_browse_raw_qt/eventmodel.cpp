@@ -116,7 +116,30 @@ int EventModel::rowCount(const QModelIndex & /*parent*/) const
 
 int EventModel::columnCount(const QModelIndex & /*parent*/) const
 {
-    return 3;
+    return 2;
+}
+
+
+//*************************************************************************************************************
+
+QVariant EventModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+    if(role != Qt::DisplayRole && role != Qt::TextAlignmentRole)
+        return QVariant();
+
+    if(orientation == Qt::Horizontal) {
+        switch(section) {
+        case 0: //chname column
+            return QVariant("Sample");
+        case 1: //data plot column
+            return QVariant("Type");
+        }
+    }
+    else if(orientation == Qt::Vertical) {
+        return QString("Event %1").arg(section);
+    }
+
+    return QVariant();
 }
 
 
@@ -135,12 +158,8 @@ QVariant EventModel::data(const QModelIndex &index, int role) const
         if(index.column()==0 && role == Qt::DisplayRole)
             return QVariant(m_data(index.row(), 0));
 
-        //******** second column (?) ********
+        //******** second column (event type plot) ********
         if(index.column()==1 && role == Qt::DisplayRole)
-            return QVariant(m_data(index.row(), 1));
-
-        //******** third column (event type plot) ********
-        if(index.column()==2 && role == Qt::DisplayRole)
             return QVariant(m_data(index.row(), 2));
 
     } // end index.valid() check
@@ -165,7 +184,7 @@ bool EventModel::loadEventData(QFile& qFile)
         return false;
     }
 
-    std::cout << events << endl;
+    //std::cout << events << endl;
 
     qDebug() << QString("Events read from %1").arg(qFile.fileName());
 
