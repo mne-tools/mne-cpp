@@ -163,7 +163,7 @@ void BabyMEG::initConnector()
 {
     if(m_pFiffInfo)
     {
-        m_pRTMSABabyMEG = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "RtClient", "MNE Rt Client");
+        m_pRTMSABabyMEG = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "BabyMEG Output", "BabyMEG");
 
         m_pRTMSABabyMEG->data()->initFromFiffInfo(m_pFiffInfo);
         m_pRTMSABabyMEG->data()->setMultiArraySize(500);
@@ -306,6 +306,8 @@ void BabyMEG::setFiffInfo(FiffInfo p_FiffInfo)
 
     m_iBufferSize = pInfo->dataLength;
     sfreq = pInfo->sfreq;
+
+    emit fiffInfoAvailable();
 }
 
 //*************************************************************************************************************
