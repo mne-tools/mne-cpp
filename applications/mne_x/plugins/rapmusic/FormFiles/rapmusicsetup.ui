@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>RapLabSetupWidgetClass</class>
- <widget class="QWidget" name="RapLabSetupWidgetClass">
+ <class>RapMusicSetupWidgetClass</class>
+ <widget class="QWidget" name="RapMusicSetupWidgetClass">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>600</width>
-    <height>562</height>
+    <height>591</height>
    </rect>
   </property>
   <property name="windowTitle">

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     raplab.h
+* @file     rapmusic.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the RapLab class.
+* @brief    Contains the declaration of the RapMusic class.
 *
 */
 
-#ifndef RAPLAB_H
-#define RAPLAB_H
+#ifndef RAPMUSIC_H
+#define RAPMUSIC_H
 
 
 //*************************************************************************************************************
@@ -42,7 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "raplab_global.h"
+#include "rapmusic_global.h"
 #include <mne_x/Interfaces/IAlgorithm.h>
 
 #include <generics/circularmatrixbuffer.h>
@@ -73,10 +73,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE RapLabPlugin
+// DEFINE NAMESPACE RapMusicPlugin
 //=============================================================================================================
 
-namespace RapLabPlugin
+namespace RapMusicPlugin
 {
 
 
@@ -103,31 +103,31 @@ using namespace IOBuffer;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS RapLab
+* DECLARE CLASS RapMusic
 *
-* @brief The RapLab class provides a dummy algorithm structure.
+* @brief The RapMusic class provides a dummy algorithm structure.
 */
-class RAPLABSHARED_EXPORT RapLab : public IAlgorithm
+class RAPMUSICSHARED_EXPORT RapMusic : public IAlgorithm
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "raplab.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "rapmusic.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(MNEX::IAlgorithm)
 
-    friend class RapLabSetupWidget;
+    friend class RapMusicSetupWidget;
 
 public:
 
     //=========================================================================================================
     /**
-    * Constructs a RapLab.
+    * Constructs a RapMusic.
     */
-    RapLab();
+    RapMusic();
     //=========================================================================================================
     /**
-    * Destroys the RapLab.
+    * Destroys the RapMusic.
     */
-    ~RapLab();
+    ~RapMusic();
 
     //=========================================================================================================
     /**
@@ -137,7 +137,7 @@ public:
 
     //=========================================================================================================
     /**
-    * Initialise the RapLab.
+    * Initialise the RapMusic.
     */
     void init();
 
@@ -186,7 +186,7 @@ private:
 
     QMutex mutex;
 
-    CircularMatrixBuffer<double>::SPtr m_pRapLabBuffer;   /**< Holds incoming rt server data.*/
+    CircularMatrixBuffer<double>::SPtr m_pRapMusicBuffer;   /**< Holds incoming rt server data.*/
 
     bool m_bIsRunning;      /**< If source lab is running */
     bool m_bReceiveData;    /**< If thread is ready to receive data */
@@ -220,9 +220,9 @@ private:
     MinimumNorm::SPtr           m_pMinimumNorm;     /**< Minimum Norm Estimation. */
     qint32                      m_iDownSample;      /**< Sampling rate */
 
-//    RealTimeSourceEstimate::SPtr m_pRTSE_RapLab; /**< Source Estimate output channel. */
+//    RealTimeSourceEstimate::SPtr m_pRTSE_RapMusic; /**< Source Estimate output channel. */
 };
 
 } // NAMESPACE
 
-#endif // RAPLAB_H
+#endif // RAPMUSIC_H

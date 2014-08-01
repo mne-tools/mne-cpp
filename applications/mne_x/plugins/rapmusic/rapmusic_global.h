@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     raplab_global.h
+* @file     rapmusic_global.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the RapLab library export/import macros.
+* @brief    Contains the RapMusic library export/import macros.
 *
 */
 
-#ifndef RAPLAB_GLOBAL_H
-#define RAPLAB_GLOBAL_H
+#ifndef RAPMUSIC_GLOBAL_H
+#define RAPMUSIC_GLOBAL_H
 
 
 //*************************************************************************************************************
@@ -50,10 +50,10 @@
 // PREPROCESSOR DEFINES
 //=============================================================================================================
 
-#if defined(RAPLAB_LIBRARY)
-#  define RAPLABSHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#if defined(RAPMUSIC_LIBRARY)
+#  define RAPMUSICSHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
-#  define RAPLABSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#  define RAPMUSICSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
-#endif // RAPLAB_GLOBAL_H
+#endif // RAPMUSIC_GLOBAL_H

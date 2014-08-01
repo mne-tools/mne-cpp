@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     dummyaboutwidget.cpp
+* @file     rapmusicaboutwidget.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     February, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the DummyAboutWidget class.
+* @brief    Contains the implementation of the RapMusicAboutWidget class.
 *
 */
 
@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "raplababoutwidget.h"
+#include "rapmusicaboutwidget.h"
 
 
 //*************************************************************************************************************
@@ -46,7 +46,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace RapLabPlugin;
+using namespace RapMusicPlugin;
 
 
 //*************************************************************************************************************
@@ -54,7 +54,7 @@ using namespace RapLabPlugin;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RapLabAboutWidget::RapLabAboutWidget(QWidget *parent)
+RapMusicAboutWidget::RapMusicAboutWidget(QWidget *parent)
 : QDialog(parent)
 {
     ui.setupUi(this);
@@ -63,7 +63,7 @@ RapLabAboutWidget::RapLabAboutWidget(QWidget *parent)
 
 //*************************************************************************************************************
 
-RapLabAboutWidget::~RapLabAboutWidget()
+RapMusicAboutWidget::~RapMusicAboutWidget()
 {
 
 }
