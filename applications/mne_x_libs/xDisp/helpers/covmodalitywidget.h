@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
-* @file     noiseestimatesetupwidget.h
-* @author   Limin Sun <liminsun@nmr.mgh.harvard.edu>
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     covmodalitywidget.h
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2014
+* @date     May, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Limin Sun, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,49 +29,36 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the NoiseEstimateSetupWidget class.
+* @brief    Declaration of the CovModalityWidget Class.
 *
 */
 
-#ifndef NOISEESTIMATESETUPWIDGET_H
-#define NOISEESTIMATESETUPWIDGET_H
-
+#ifndef COVMODALITYWIDGET_H
+#define COVMODALITYWIDGET_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_noiseestimatesetup.h"
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Eigen INCLUDES
-//=============================================================================================================
-
-#include <Eigen/Core>
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
+#include <QWidget>
+#include <QCheckBox>
+#include <QStringList>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-using namespace Eigen;
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE RtHpiPlugin
+// DEFINE NAMESPACE XDISPLIB
 //=============================================================================================================
 
-namespace NoiseEstimatePlugin
+namespace XDISPLIB
 {
 
 
@@ -81,53 +67,39 @@ namespace NoiseEstimatePlugin
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class NoiseEstimate;
+class RealTimeCovWidget;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS NoiseEstimateSetupWidget
+* DECLARE CLASS CovModalityWidget
 *
-* @brief The NoiseEstimateSetupWidget class provides the NoiseEstimate configuration window.
+* @brief The CovModalityWidget class provides the sensor selection widget
 */
-class NoiseEstimateSetupWidget : public QWidget
+class CovModalityWidget : public QWidget
 {
     Q_OBJECT
-
 public:
 
     //=========================================================================================================
     /**
-    * Constructs a NoiseEstimateSetupWidget which is a child of parent.
+    * Constructs a CovModalityWidget which is a child of parent.
     *
-    * @param [in] toolbox a pointer to the corresponding NoiseEstimate.
-    * @param [in] parent pointer to parent widget; If parent is 0, the new NoiseEstimateSetupWidget becomes a window. If parent is another widget, RtHpiSetupWidget becomes a child window inside parent. RtHpiSetupWidget is deleted when its parent is deleted.
+    * @param [in] parent    parent of widget
+    * @param [in] f         widget flags
     */
-    NoiseEstimateSetupWidget(NoiseEstimate* toolbox, QWidget *parent = 0);
+    CovModalityWidget(RealTimeCovWidget *toolbox);
 
-    //=========================================================================================================
-    /**
-    * Destroys the NoiseEstimateSetupWidget.
-    * All NoiseEstimateSetupWidget's children are deleted first. The application exits if NoiseEstimateSetupWidget is the main widget.
-    */
-    ~NoiseEstimateSetupWidget();
-
-    void init();
-    void chgnFFT(int idx);
-    void Replot(/*MatrixXd tmp*/);
-//    float mmin(MatrixXd tmp,int chan);
-//    float mmax(MatrixXd tmp,int chan);
-
-
-private slots:
+    void updateSelection(qint32 state);
 
 private:
+    RealTimeCovWidget * m_pRealTimeCovWidget;       /**< Connected real-time covariance widget */
 
-    NoiseEstimate* m_pNoiseEstimate;	/**< Holds a pointer to corresponding RtHpi.*/
+    QList<QCheckBox*>   m_qListModalityCheckBox;    /**< List of modality checkboxes */
 
-    Ui::NoiseEstimateSetupWidgetClass ui;	/**< Holds the user interface for the RtHpiSetupWidget.*/
+    QStringList m_qListModalities;                  /**< List of modalities */
 };
 
 } // NAMESPACE
 
-#endif // NoiseEstimateSETUPWIDGET_H
+#endif // COVMODALITYWIDGET_H

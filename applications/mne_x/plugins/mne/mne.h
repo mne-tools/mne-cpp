@@ -202,7 +202,7 @@ private:
 
     QMutex mutex;
 
-    QVector<FiffEvoked>     m_qVecFiffEvoked;
+    QVector<FiffEvoked> m_qVecFiffEvoked;
     qint32 m_iNumAverages;
 
     QVector<FiffCov>        m_qVecFiffCov;
@@ -226,10 +226,10 @@ private:
 
     FiffInfo::SPtr              m_pFiffInfo;        /**< Fiff information. */
     FiffInfo::SPtr              m_pFiffInfoEvoked;  /**< Fiff information of the evoked. */
-    QStringList                 m_pCovChNames;      /**< Covariance channel names. */
-    FiffInfo::SPtr              m_pFiffInfoForward; /**< Fiff information of the forward solution. */
+    QStringList                 m_qListCovChNames;      /**< Covariance channel names. */
+    FiffInfoBase::SPtr          m_pFiffInfoForward; /**< Fiff information of the forward solution. */
 
-    QStringList                 pickChNames;        /**< Channels to pick */
+    QStringList                 m_qListPickChannels;        /**< Channels to pick */
 
     RtInvOp::SPtr               m_pRtInvOp;         /**< Real-time inverse operator. */
     MNEInverseOperator::SPtr    m_pInvOp;           /**< The inverse operator. */

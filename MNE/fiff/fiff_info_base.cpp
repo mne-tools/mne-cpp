@@ -234,7 +234,7 @@ RowVectorXi FiffInfoBase::pick_channels(const QStringList& ch_names, const QStri
 
 //*************************************************************************************************************
 
-FiffInfoBase FiffInfoBase::pick_info(const MatrixXi* sel) const
+FiffInfoBase FiffInfoBase::pick_info(const RowVectorXi* sel) const
 {
     FiffInfoBase res = *this;//new FiffInfo(this);
     if (sel == NULL)
@@ -245,13 +245,13 @@ FiffInfoBase FiffInfoBase::pick_info(const MatrixXi* sel) const
     res.ch_names.clear();
 
     qint32 idx;
-    for(qint32 i = 0; i < sel->cols(); ++i)
+    for(qint32 i = 0; i < sel->size(); ++i)
     {
         idx = (*sel)(0,i);
         res.chs.append(this->chs[idx]);
         res.ch_names.append(this->ch_names[idx]);
     }
-    res.nchan  = sel->cols();
+    res.nchan  = sel->size();
 
     return res;
 }

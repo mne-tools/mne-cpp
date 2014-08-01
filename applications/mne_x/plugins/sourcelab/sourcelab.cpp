@@ -297,7 +297,7 @@ void SourceLab::updateFiffCov(FiffCov::SPtr p_pFiffCov)
     m_pFiffCov = p_pFiffCov;
 
     if(m_pRtInvOp)
-        m_pRtInvOp->appendNoiseCov(m_pFiffCov);
+        m_pRtInvOp->appendNoiseCov(*m_pFiffCov);
 }
 
 

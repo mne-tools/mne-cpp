@@ -64,7 +64,7 @@ using namespace XMEASLIB;
 
 NoiseEstimation::NoiseEstimation(QObject *parent)
 : NewMeasurement(QMetaType::type("NoiseEstimation::SPtr"), parent)
-, m_bChInfoIsInit(false)
+, m_bIsInit(false)
 , m_bContainsValues(false)
 {
 }
@@ -80,141 +80,11 @@ NoiseEstimation::~NoiseEstimation()
 
 //*************************************************************************************************************
 
-void NoiseEstimation::init(QList<RealTimeSampleArrayChInfo> &chInfo)
-{
-    m_qListChInfo = chInfo;
-
-    m_bChInfoIsInit = true;
-}
-
-
-//*************************************************************************************************************
-
 void NoiseEstimation::initFromFiffInfo(FiffInfo::SPtr &p_pFiffInfo)
 {
-    m_qListChInfo.clear();
-    m_bChInfoIsInit = false;
+    m_pFiffInfo = p_pFiffInfo;
 
-    bool t_bIsBabyMEG = false;
-
-    if(p_pFiffInfo->acq_pars == "BabyMEG")
-        t_bIsBabyMEG = true;
-
-    for(qint32 i = 0; i < p_pFiffInfo->nchan; ++i)
-    {
-        RealTimeSampleArrayChInfo initChInfo;
-        initChInfo.setChannelName(p_pFiffInfo->chs[i].ch_name);
-
-        // set channel Unit
-        initChInfo.setUnit(p_pFiffInfo->chs[i].unit);
-
-        //Treat stimulus channels different
-        if(p_pFiffInfo->chs[i].kind == FIFFV_STIM_CH)
-        {
-//            initChInfo.setUnit("");
-            initChInfo.setMinValue(0);
-            initChInfo.setMaxValue(1.0e6);
-        }
-//        else
-//        {
-////            qDebug() << "kind" << p_pFiffInfo->chs[i].kind << "unit" << p_pFiffInfo->chs[i].unit;
-
-//            //Unit
-//            switch(p_pFiffInfo->chs[i].unit)
-//            {
-//                case 101:
-//                    initChInfo.setUnit("Hz");
-//                    break;
-//                case 102:
-//                    initChInfo.setUnit("N");
-//                    break;
-//                case 103:
-//                    initChInfo.setUnit("Pa");
-//                    break;
-//                case 104:
-//                    initChInfo.setUnit("J");
-//                    break;
-//                case 105:
-//                    initChInfo.setUnit("W");
-//                    break;
-//                case 106:
-//                    initChInfo.setUnit("C");
-//                    break;
-//                case 107:
-//                    initChInfo.setUnit("V");
-////                    initChInfo.setMinValue(0);
-////                    initChInfo.setMaxValue(1.0e-3);
-//                    break;
-//                case 108:
-//                    initChInfo.setUnit("F");
-//                    break;
-//                case 109:
-//                    initChInfo.setUnit("Ohm");
-//                    break;
-//                case 110:
-//                    initChInfo.setUnit("MHO");
-//                    break;
-//                case 111:
-//                    initChInfo.setUnit("Wb");
-//                    break;
-//                case 112:
-//                    initChInfo.setUnit("T");
-//                    if(t_bIsBabyMEG)
-//                    {
-//                        initChInfo.setMinValue(-1.0e-4);
-//                        initChInfo.setMaxValue(1.0e-4);
-//                    }
-//                    else
-//                    {
-//                        initChInfo.setMinValue(-1.0e-10);
-//                        initChInfo.setMaxValue(1.0e-10);
-//                    }
-//                    break;
-//                case 113:
-//                    initChInfo.setUnit("H");
-//                    break;
-//                case 114:
-//                    initChInfo.setUnit("Cel");
-//                    break;
-//                case 115:
-//                    initChInfo.setUnit("Lm");
-//                    break;
-//                case 116:
-//                    initChInfo.setUnit("Lx");
-//                    break;
-//                case 201:
-//                    initChInfo.setUnit("T/m");
-//                    if(t_bIsBabyMEG)
-//                    {
-//                        initChInfo.setMinValue(-1.0e-4);
-//                        initChInfo.setMaxValue(1.0e-4);
-//                    }
-//                    else
-//                    {
-//                        initChInfo.setMinValue(-1.0e-10);
-//                        initChInfo.setMaxValue(1.0e-10);
-//                    }
-//                    break;
-//                case 202:
-//                    initChInfo.setUnit("Am");
-//                    break;
-//                default:
-//                    initChInfo.setUnit("");
-//            }
-//        }
-
-        // set channel Kind
-        initChInfo.setKind(p_pFiffInfo->chs[i].kind);
-
-        // set channel coil
-        initChInfo.setCoil(p_pFiffInfo->chs[i].coil_type);
-
-        m_qListChInfo.append(initChInfo);
-    }
-
-    m_pFiffInfo_orig = p_pFiffInfo;
-
-    m_bChInfoIsInit = true;
+    m_bIsInit = true;
 }
 
 
@@ -230,17 +100,6 @@ MatrixXd NoiseEstimation::getValue() const
 
 void NoiseEstimation::setValue(MatrixXd& v)
 {
-    //check vector size
-    if(v.rows() != m_qListChInfo.size())
-        qCritical() << "Error Occured in RealTimeMultiSampleArrayNew::setVector: Vector size does not matche the number of channels! ";
-
-//    //Check if maximum exceeded //ToDo speed this up
-//    for(qint32 i = 0; i < v.size(); ++i)
-//    {
-//        if(v[i] < m_qListChInfo[i].getMinValue()) v[i] = m_qListChInfo[i].getMinValue();
-//        else if(v[i] > m_qListChInfo[i].getMaxValue()) v[i] = m_qListChInfo[i].getMaxValue();
-//    }
-
     //Store
     m_matValue = v;
     emit notify();
