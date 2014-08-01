@@ -196,27 +196,34 @@ void MainWindow::createMenus()
     openAction->setShortcuts(QKeySequence::Open);
     connect(openAction, SIGNAL(triggered()), this, SLOT(openFile()));
 
-    QAction *writeAction = fileMenu->addAction(tr("&Save As..."));
+    QAction *writeAction = fileMenu->addAction(tr("&Save..."));
     openAction->setShortcuts(QKeySequence::SaveAs);
     connect(writeAction, SIGNAL(triggered()), this, SLOT(writeFile()));
 
-    QAction *loadEvents = fileMenu->addAction(tr("&Load Events..."));
+    fileMenu->addSeparator();
+
+    QAction *loadEvents = fileMenu->addAction(tr("&Load Events (fif)..."));
     connect(loadEvents, SIGNAL(triggered()), this, SLOT(loadEvents()));
 
-    QAction *quitAction = fileMenu->addAction(tr("E&xit"));
+    QAction *saveEvents = fileMenu->addAction(tr("&Save Events (fif)..."));
+    connect(saveEvents, SIGNAL(triggered()), this, SLOT(saveEvents()));
+
+    fileMenu->addSeparator();
+
+    QAction *quitAction = fileMenu->addAction(tr("&Quit"));
     quitAction->setShortcuts(QKeySequence::Quit);
     connect(quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
 
     //Windows
     QMenu *windowsMenu = new QMenu(tr("&Windows"), this);
 
-    QAction *eventAction = windowsMenu->addAction(tr("&Show events"));
+    QAction *eventAction = windowsMenu->addAction(tr("&Show event list..."));
     connect(eventAction, SIGNAL(triggered()), this, SLOT(showEventWindow()));
 
     //Help
     QMenu *helpMenu = new QMenu(tr("&Help"), this);
 
-    QAction *aboutAction = helpMenu->addAction(tr("&About"));
+    QAction *aboutAction = helpMenu->addAction(tr("&About..."));
     connect(aboutAction, SIGNAL(triggered()), this, SLOT(about()));
 
     //add to menub
@@ -351,7 +358,7 @@ void MainWindow::writeFile()
 
     if(filename.isEmpty())
     {
-        qDebug("User aborted saving fiff data file");
+        qDebug("User aborted saving to fiff data file");
         return;
     }
 
@@ -394,7 +401,7 @@ void MainWindow::saveEvents()
                                                     tr("fif event data files (*-eve.fif);;fif data files (*.fif)"));
     if(filename.isEmpty())
     {
-        qDebug("ABORTED saving fiff event data file");
+        qDebug("USer aborted saving to fiff event data file");
         return;
     }
 
@@ -552,7 +559,7 @@ void MainWindow::showEventWindow()
         m_wEventWidget->raise();
 
     //Scale view to exact vertical length of the table entries
-    m_wEventWidget->resize(245, 350);
+    m_wEventWidget->resize(242, 350);
 }
 
 
