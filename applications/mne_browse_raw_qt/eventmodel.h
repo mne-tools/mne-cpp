@@ -153,6 +153,7 @@ private:
 
     MatrixXi        m_data;        /**< Matrix that holds the loaded events from the event file. */
 
+    int             m_fSample;     /**< Sampling frequency. */
 };
 
 } // NAMESPACE
