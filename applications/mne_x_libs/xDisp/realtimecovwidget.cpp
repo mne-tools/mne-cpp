@@ -63,8 +63,8 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QVBoxLayout>
 #include <QLabel>
+#include <QFont>
 #include <QDebug>
 
 
@@ -100,18 +100,32 @@ RealTimeCovWidget::RealTimeCovWidget(QSharedPointer<RealTimeCov> pRTC, QSharedPo
 {
     Q_UNUSED(pTime)
 
+    m_pActionSelectModality = new QAction(QIcon(":/images/covarianceSelection.png"), tr("Shows the covariance modality selection widget (F12)"),this);
+    m_pActionSelectModality->setShortcut(tr("F12"));
+    m_pActionSelectModality->setStatusTip(tr("Shows the covariance modality selection widget (F12)"));
+    connect(m_pActionSelectModality, &QAction::triggered, this, &RealTimeCovWidget::showModalitySelectionWidget);
+    addDisplayAction(m_pActionSelectModality);
+
     //set vertical layout
-    QVBoxLayout *rtcLayout = new QVBoxLayout(this);
+    m_pRtcLayout = new QVBoxLayout(this);
 
-    QLabel *testLabel = new QLabel;
-    testLabel->setText("Real Time Cov");
+    m_pLabelInit= new QLabel;
+    m_pLabelInit->setText("Acquiring Data");
+    m_pLabelInit->setAlignment(Qt::AlignCenter);
+    QFont font;font.setBold(true);font.setPointSize(20);
+    m_pLabelInit->setFont(font);
+    m_pRtcLayout->addWidget(m_pLabelInit);
 
-    rtcLayout->addWidget(testLabel);
+    m_pImageSc = new ImageSc;
+    m_pRtcLayout->addWidget(m_pImageSc);
 
     //set layouts
-    this->setLayout(rtcLayout);
+    this->setLayout(m_pRtcLayout);
+
+    m_qListPickTypes << "EEG";// << "MEG";
 
     getData();
+
 }
 
 
@@ -135,14 +149,61 @@ void RealTimeCovWidget::update(XMEASLIB::NewMeasurement::SPtr)
 
 void RealTimeCovWidget::getData()
 {
-    if(!m_bInitialized)
+    if(!m_bInitialized || m_pRTC->getValue()->names.size() != m_qListChNames.size())
         if(m_pRTC->isInitialized())
             init();
+
+    if(m_bInitialized)
+    {
+        MatrixXd data = (m_matSelectorT * m_pRTC->getValue()->data) * m_matSelector;
+        m_pImageSc->updateData(data);
+    }
 }
+
 
 //*************************************************************************************************************
 
 void RealTimeCovWidget::init()
 {
-    m_bInitialized = true;
+    if(m_pRTC->getValue()->names.size() > 0)
+    {
+        m_pRtcLayout->removeWidget(m_pLabelInit);
+        m_pLabelInit->hide();
+
+        m_pImageSc->setTitle(m_pRTC->getName());
+
+        m_qListChNames = m_pRTC->getValue()->names;
+
+        QList<qint32> qListSelChannel;
+        for(qint32 i = 0; i < m_qListChNames.size(); ++i)
+        {
+            foreach (const QString &type, m_qListPickTypes) {
+                if (m_qListChNames[i].contains(type))
+                    qListSelChannel.append(i);
+            }
+        }
+
+        m_matSelector = MatrixXd::Zero(m_pRTC->getValue()->data.cols(), qListSelChannel.size());
+
+        for(qint32 i = 0; i  < qListSelChannel.size(); ++i)
+            m_matSelector(qListSelChannel[i],i) = 1;
+
+        m_matSelectorT = m_matSelector.transpose();
+
+        m_bInitialized = true;
+    }
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeCovWidget::showModalitySelectionWidget()
+{
+    if(!m_pModalitySelectionWidget)
+    {
+        m_pModalitySelectionWidget = QSharedPointer<CovModalityWidget>(new CovModalityWidget(this));
+
+        m_pModalitySelectionWidget->setWindowTitle("Modality Selection");
+    }
+    m_pModalitySelectionWidget->show();
 }

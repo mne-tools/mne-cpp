@@ -636,11 +636,11 @@ void BabyMEGSQUIDControlDgl::UpdateGUI()
     // low pass
     ui->m_Qcb_lp->setCurrentIndex( m_GUISM.LowPass );
     //pregain
-    ui->m_Qcb_pregain->setCurrentIndex( m_GUISM.PreGain );
+    ui->m_Qcb_pregain->setCurrentIndex( m_GUISM.PreGain-1 );
     //postgain
-    ui->m_Qcb_postgain->setCurrentIndex( m_GUISM.PostGain );
+    ui->m_Qcb_postgain->setCurrentIndex( m_GUISM.PostGain-1 );
     //slew
-    ui->m_Qcb_slew->setCurrentIndex( m_GUISM.Slew);
+    ui->m_Qcb_slew->setCurrentIndex( m_GUISM.Slew-1);
 
     //heattime
     ui->m_Qsb_heattime->setValue(m_GUISM.HeatTime);

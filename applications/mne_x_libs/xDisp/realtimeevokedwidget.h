@@ -60,6 +60,8 @@
 #include <QAction>
 #include <QSpinBox>
 #include <QDoubleSpinBox>
+#include <QLabel>
+#include <QVBoxLayout>
 
 
 //*************************************************************************************************************
@@ -174,6 +176,10 @@ private:
     * Shows sensor selection widget
     */
     void showSensorSelectionWidget();
+
+
+    QVBoxLayout *m_pRteLayout;  /**< RTE Widget layout */
+    QLabel *m_pLabelInit;       /**< Initialization LAbel */
 
     RealTimeEvokedModel*        m_pRTEModel;            /**< RTE data model */
     RealTimeButterflyPlot*      m_pButterflyPlot;       /**< Butterfly plot */

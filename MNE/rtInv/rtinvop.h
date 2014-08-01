@@ -130,9 +130,9 @@ public:
     /**
     * Slot to receive incoming noise covariance estimations.
     *
-    * @param[in] p_pNoiseCov     Noise covariance estimation
+    * @param[in] p_NoiseCov     Noise covariance estimation
     */
-    void appendNoiseCov(FiffCov::SPtr p_pNoiseCov);
+    void appendNoiseCov(FiffCov &p_NoiseCov);
 
     //=========================================================================================================
     /**
@@ -172,7 +172,7 @@ private:
     QMutex      mutex;                  /**< Provides access serialization between threads. */
     bool        m_bIsRunning;           /**< Whether RtInv is running. */
 
-    QVector<FiffCov::SPtr> m_vecNoiseCov;/**< Noise covariance matrices. */
+    QVector<FiffCov> m_vecNoiseCov;     /**< Noise covariance matrices. */
 
     FiffInfo::SPtr m_pFiffInfo;         /**< The fiff measurement information. */
     MNEForwardSolution::SPtr m_pFwd;    /**< The forward solution. */
