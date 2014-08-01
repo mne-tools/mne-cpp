@@ -143,7 +143,7 @@ void MainWindow::setupLayout()
 
 void MainWindow::setupViewSettings()
 {
-    //VIEW: m_pTableView SETTINGS
+    //SETUP VIEW: m_pTableView SETTINGS
     //set some size settings for m_pTableView
     m_pTableView->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
 
@@ -171,7 +171,9 @@ void MainWindow::setupViewSettings()
     //connect other signals
     connect(m_pRawModel,SIGNAL(scrollBarValueChange(int)),this,SLOT(setScrollBarPosition(int)));
 
-    //VIEW: m_pEventModel SETTINGS
+    //SETUP VIEW: m_pEventModel SETTINGS
+    m_pEventTableView->resizeColumnsToContents();
+
     if(m_wEventWidget == NULL)
         m_wEventWidget = new QWidget();
 
@@ -346,6 +348,13 @@ void MainWindow::openFile()
 void MainWindow::writeFile()
 {
     QString filename = QFileDialog::getSaveFileName(this,QString("Write fiff data file"),QString("./MNE-sample-data/MEG/sample/"),tr("fif data files (*.fif)"));
+
+    if(filename.isEmpty())
+    {
+        qDebug("User aborted saving fiff data file");
+        return;
+    }
+
     QFile t_fileRaw(filename);
 
     if(!m_pRawModel->writeFiffData(t_fileRaw))
@@ -383,6 +392,12 @@ void MainWindow::saveEvents()
                                                     QString("Save fiff event data file"),
                                                     QString("./MNE-sample-data/MEG/sample/"),
                                                     tr("fif event data files (*-eve.fif);;fif data files (*.fif)"));
+    if(filename.isEmpty())
+    {
+        qDebug("ABORTED saving fiff event data file");
+        return;
+    }
+
     if(m_qFileEvent.isOpen())
         m_qFileEvent.close();
     m_qFileEvent.setFileName(filename);
@@ -526,12 +541,18 @@ void MainWindow::about()
 
 void MainWindow::showEventWindow()
 {
+    //Note: A widget that happens to be obscured by other windows on the screen is considered to be visible.
     if(!m_wEventWidget->isVisible())
     {
-        m_wEventWidget->setWindowTitle("MNE_BROWSE_RAW_QT - Loaded events");
+        m_wEventWidget->setWindowTitle("Events");
         m_wEventWidget->show();
         m_wEventWidget->raise();
     }
+    else // if visible raise the widget to be sure that it is not abscured by other windows
+        m_wEventWidget->raise();
+
+    //Scale view to exact vertical length of the table entries
+    m_wEventWidget->resize(245, 350);
 }
 
 

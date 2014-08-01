@@ -58,6 +58,7 @@ using namespace MNEBrowseRawQt;
 
 EventModel::EventModel(QObject *parent)
 : QAbstractTableModel(parent)
+, m_fSample(1024)
 {
 //    m_iWindowSize = m_qSettings.value("RawModel/window_size").toInt();
 //    m_reloadPos = m_qSettings.value("RawModel/reload_pos").toInt();
@@ -68,6 +69,7 @@ EventModel::EventModel(QObject *parent)
 
 EventModel::EventModel(QFile &qFile, QObject *parent)
 : QAbstractTableModel(parent)
+, m_fSample(1024)
 //, m_bFileloaded(false)
 //, m_qSettings()
 //, m_bStartReached(false)
@@ -75,6 +77,7 @@ EventModel::EventModel(QFile &qFile, QObject *parent)
 //, m_bReloading(false)
 //, m_bProcessing(false)
 {
+    Q_UNUSED(qFile);
 //    m_iWindowSize = m_qSettings.value("RawModel/window_size").toInt();
 //    m_reloadPos = m_qSettings.value("RawModel/reload_pos").toInt();
 //    m_maxWindows = m_qSettings.value("RawModel/max_windows").toInt();
@@ -116,7 +119,7 @@ int EventModel::rowCount(const QModelIndex & /*parent*/) const
 
 int EventModel::columnCount(const QModelIndex & /*parent*/) const
 {
-    return 2;
+    return 3;
 }
 
 
@@ -129,9 +132,11 @@ QVariant EventModel::headerData(int section, Qt::Orientation orientation, int ro
 
     if(orientation == Qt::Horizontal) {
         switch(section) {
-        case 0: //chname column
+        case 0: //sample column
             return QVariant("Sample");
-        case 1: //data plot column
+        case 1: //time value column
+            return QVariant("Time (s)");
+        case 2: //event type column
             return QVariant("Type");
         }
     }
@@ -158,8 +163,12 @@ QVariant EventModel::data(const QModelIndex &index, int role) const
         if(index.column()==0 && role == Qt::DisplayRole)
             return QVariant(m_data(index.row(), 0));
 
-        //******** second column (event type plot) ********
+        //******** second column (event time plot) ********
         if(index.column()==1 && role == Qt::DisplayRole)
+            return QVariant((double)m_data(index.row(), 0)/m_fSample);
+
+        //******** third column (event type plot) ********
+        if(index.column()==2 && role == Qt::DisplayRole)
             return QVariant(m_data(index.row(), 2));
 
     } // end index.valid() check
@@ -200,6 +209,8 @@ bool EventModel::loadEventData(QFile& qFile)
 
 bool EventModel::saveEventData(QFile& qFile)
 {
+    Q_UNUSED(qFile);
+
     beginResetModel();
     clearModel();
 
