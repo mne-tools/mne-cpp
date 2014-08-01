@@ -38,12 +38,12 @@ TEMPLATE = lib
 
 CONFIG += plugin
 
-DEFINES += RAPLAB_LIBRARY
+DEFINES += RAPMUSIC_LIBRARY
 
 QT += core widgets
 #QT += concurrent
 
-TARGET = raplab
+TARGET = rapmusic
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
@@ -77,19 +77,19 @@ else {
 DESTDIR = $${MNE_BINARY_DIR}/mne_x_plugins
 
 SOURCES += \
-        raplab.cpp \
-        FormFiles/raplabsetupwidget.cpp \
-        FormFiles/raplababoutwidget.cpp
+        rapmusic.cpp \
+        FormFiles/rapmusicsetupwidget.cpp \
+        FormFiles/rapmusicaboutwidget.cpp
 
 HEADERS += \
-        raplab.h\
-        raplab_global.h \
-        FormFiles/raplabsetupwidget.h \
-        FormFiles/raplababoutwidget.h
+        rapmusic.h\
+        rapmusic_global.h \
+        FormFiles/rapmusicsetupwidget.h \
+        FormFiles/rapmusicaboutwidget.h
 
 FORMS += \
-        FormFiles/raplabsetup.ui \
-        FormFiles/raplababout.ui
+        FormFiles/rapmusicsetup.ui \
+        FormFiles/rapmusicabout.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

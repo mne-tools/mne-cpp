@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     raplab.cpp
+* @file     rapmusic.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the RapLab class.
+* @brief    Contains the implementation of the RapMusic class.
 *
 */
 
@@ -38,9 +38,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "raplab.h"
+#include "rapmusic.h"
 
-#include "FormFiles/raplabsetupwidget.h"
+#include "FormFiles/rapmusicsetupwidget.h"
 
 
 //*************************************************************************************************************
@@ -58,7 +58,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace RapLabPlugin;
+using namespace RapMusicPlugin;
 using namespace FIFFLIB;
 using namespace XMEASLIB;
 
@@ -68,7 +68,7 @@ using namespace XMEASLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RapLab::RapLab()
+RapMusic::RapMusic()
 : m_bIsRunning(false)
 , m_bReceiveData(false)
 , m_bProcessData(false)
@@ -86,7 +86,7 @@ RapLab::RapLab()
 
 //*************************************************************************************************************
 
-RapLab::~RapLab()
+RapMusic::~RapMusic()
 {
     if(this->isRunning())
         stop();
@@ -95,10 +95,10 @@ RapLab::~RapLab()
 
 //*************************************************************************************************************
 
-QSharedPointer<IPlugin> RapLab::clone() const
+QSharedPointer<IPlugin> RapMusic::clone() const
 {
-    QSharedPointer<RapLab> pRapLabClone(new RapLab());
-    return pRapLabClone;
+    QSharedPointer<RapMusic> pRapMusicClone(new RapMusic());
+    return pRapMusicClone;
 }
 
 
@@ -107,7 +107,7 @@ QSharedPointer<IPlugin> RapLab::clone() const
 // Creating required display instances and set configurations
 //=============================================================================================================
 
-void RapLab::init()
+void RapMusic::init()
 {
     // Inits
     m_pFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(m_qFileFwdSolution));
@@ -119,16 +119,16 @@ void RapLab::init()
     m_pClusteredFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(m_pFwd->cluster_forward_solution(*m_pAnnotationSet.data(), 40)));
 
     //Delete Buffer - will be initailzed with first incoming data
-    if(!m_pRapLabBuffer.isNull())
-        m_pRapLabBuffer = CircularMatrixBuffer<double>::SPtr();
+    if(!m_pRapMusicBuffer.isNull())
+        m_pRapMusicBuffer = CircularMatrixBuffer<double>::SPtr();
 
     // Input
-    m_pRTMSAInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "RapLabIn", "RapLab input data");
-    connect(m_pRTMSAInput.data(), &PluginInputConnector::notify, this, &RapLab::update, Qt::DirectConnection);
+    m_pRTMSAInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "RapMusicIn", "RapMusic input data");
+    connect(m_pRTMSAInput.data(), &PluginInputConnector::notify, this, &RapMusic::update, Qt::DirectConnection);
     m_inputConnectors.append(m_pRTMSAInput);
 
     // Output
-    m_pRTSEOutput = PluginOutputData<RealTimeSourceEstimate>::create(this, "RapLabOut", "RapLab output data");
+    m_pRTSEOutput = PluginOutputData<RealTimeSourceEstimate>::create(this, "RapMusicOut", "RapMusic output data");
     m_outputConnectors.append(m_pRTSEOutput);
 
     m_pRTSEOutput->data()->setName("Real-Time Source Estimate");
@@ -167,16 +167,16 @@ void RapLab::init()
 
 
 //    this->addPlugin(PLG_ID::MNERTCLIENT);
-//    Buffer::SPtr t_buf = m_pRapLabBuffer.staticCast<Buffer>(); //unix fix
+//    Buffer::SPtr t_buf = m_pRapMusicBuffer.staticCast<Buffer>(); //unix fix
 //    this->addAcceptorMeasurementBuffer(MSR_ID::MEGMNERTCLIENT_OUTPUT, t_buf);
 
 
 
-//    m_pRTSE_RapLab = addProviderRealTimeSourceEstimate(MSR_ID::RapLab_OUTPUT);
-//    m_pRTSE_RapLab->setName("Real-Time Source Estimate");
-////    m_pRTSE_RapLab->initFromFiffInfo(m_pFiffInfo);
-//    m_pRTSE_RapLab->setArraySize(10);
-//    m_pRTSE_RapLab->setVisibility(true);
+//    m_pRTSE_RapMusic = addProviderRealTimeSourceEstimate(MSR_ID::RapMusic_OUTPUT);
+//    m_pRTSE_RapMusic->setName("Real-Time Source Estimate");
+////    m_pRTSE_RapMusic->initFromFiffInfo(m_pFiffInfo);
+//    m_pRTSE_RapMusic->setArraySize(10);
+//    m_pRTSE_RapMusic->setVisibility(true);
 
 
 
@@ -185,7 +185,7 @@ void RapLab::init()
 
 //*************************************************************************************************************
 
-bool RapLab::start()
+bool RapMusic::start()
 {
     QThread::start();
     return true;
@@ -194,7 +194,7 @@ bool RapLab::start()
 
 //*************************************************************************************************************
 
-bool RapLab::stop()
+bool RapMusic::stop()
 {
     m_bIsRunning = false;
 
@@ -208,8 +208,8 @@ bool RapLab::stop()
     if(m_pRtInvOp->isRunning())
         m_pRtInvOp->stop();
 
-    if(m_pRapLabBuffer)
-        m_pRapLabBuffer->clear();
+    if(m_pRapMusicBuffer)
+        m_pRapMusicBuffer->clear();
 
     m_bReceiveData = false;
 
@@ -219,7 +219,7 @@ bool RapLab::stop()
 
 //*************************************************************************************************************
 
-IPlugin::PluginType RapLab::getType() const
+IPlugin::PluginType RapMusic::getType() const
 {
     return _IAlgorithm;
 }
@@ -227,24 +227,24 @@ IPlugin::PluginType RapLab::getType() const
 
 //*************************************************************************************************************
 
-QString RapLab::getName() const
+QString RapMusic::getName() const
 {
-    return "RapLab";
+    return "RapMusic";
 }
 
 
 //*************************************************************************************************************
 
-QWidget* RapLab::setupWidget()
+QWidget* RapMusic::setupWidget()
 {
-    RapLabSetupWidget* setupWidget = new RapLabSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
+    RapMusicSetupWidget* setupWidget = new RapMusicSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
     return setupWidget;
 }
 
 
 //*************************************************************************************************************
 
-void RapLab::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
+void RapMusic::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 {
     QSharedPointer<NewRealTimeMultiSampleArray> pRTMSA = pMeasurement.dynamicCast<NewRealTimeMultiSampleArray>();
 
@@ -252,8 +252,8 @@ void RapLab::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
     if(pRTMSA && m_bReceiveData)
     {
         //Check if buffer initialized
-        if(!m_pRapLabBuffer)
-            m_pRapLabBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSA->getNumChannels(), pRTMSA->getMultiArraySize()));
+        if(!m_pRapMusicBuffer)
+            m_pRapMusicBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSA->getNumChannels(), pRTMSA->getMultiArraySize()));
 
         //Fiff information
         if(!m_pFiffInfo)
@@ -266,7 +266,7 @@ void RapLab::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
             for(unsigned char i = 0; i < pRTMSA->getMultiArraySize(); ++i)
                 t_mat.col(i) = pRTMSA->getMultiSampleArray()[i];
 
-            m_pRapLabBuffer->push(&t_mat);
+            m_pRapMusicBuffer->push(&t_mat);
         }
     }
 }
@@ -274,7 +274,7 @@ void RapLab::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
 //*************************************************************************************************************
 
-void RapLab::appendEvoked(FiffEvoked::SPtr p_pEvoked)
+void RapMusic::appendEvoked(FiffEvoked::SPtr p_pEvoked)
 {
     if(p_pEvoked->comment == QString("Stim %1").arg(m_iStimChan))
     {
@@ -289,7 +289,7 @@ void RapLab::appendEvoked(FiffEvoked::SPtr p_pEvoked)
 
 //*************************************************************************************************************
 
-void RapLab::updateFiffCov(FiffCov::SPtr p_pFiffCov)
+void RapMusic::updateFiffCov(FiffCov::SPtr p_pFiffCov)
 {
     m_pFiffCov = p_pFiffCov;
 
@@ -300,7 +300,7 @@ void RapLab::updateFiffCov(FiffCov::SPtr p_pFiffCov)
 
 //*************************************************************************************************************
 
-void RapLab::updateInvOp(MNEInverseOperator::SPtr p_pInvOp)
+void RapMusic::updateInvOp(MNEInverseOperator::SPtr p_pInvOp)
 {
     m_pInvOp = p_pInvOp;
 
@@ -321,7 +321,7 @@ void RapLab::updateInvOp(MNEInverseOperator::SPtr p_pInvOp)
 
 //*************************************************************************************************************
 
-void RapLab::run()
+void RapMusic::run()
 {
     m_bIsRunning = true;
 
@@ -355,13 +355,13 @@ void RapLab::run()
     // Init Real-Time Covariance estimator
     //
     m_pRtCov = RtCov::SPtr(new RtCov(5000, m_pFiffInfo));
-    connect(m_pRtCov.data(), &RtCov::covCalculated, this, &RapLab::updateFiffCov);
+    connect(m_pRtCov.data(), &RtCov::covCalculated, this, &RapMusic::updateFiffCov);
 
     //
     // Init Real-Time inverse estimator
     //
     m_pRtInvOp = RtInvOp::SPtr(new RtInvOp(m_pFiffInfo, m_pClusteredFwd));
-    connect(m_pRtInvOp.data(), &RtInvOp::invOperatorCalculated, this, &RapLab::updateInvOp);
+    connect(m_pRtInvOp.data(), &RtInvOp::invOperatorCalculated, this, &RapMusic::updateInvOp);
 
     if(!m_bSingleTrial)
     {
@@ -369,7 +369,7 @@ void RapLab::run()
         // Init Real-Time average
         //
         m_pRtAve = RtAve::SPtr(new RtAve(m_iNumAverages, 750, 750, m_pFiffInfo));
-        connect(m_pRtAve.data(), &RtAve::evokedStim, this, &RapLab::appendEvoked);
+        connect(m_pRtAve.data(), &RtAve::evokedStim, this, &RapMusic::appendEvoked);
     }
 
     //
@@ -389,12 +389,12 @@ void RapLab::run()
 
     while(m_bIsRunning)
     {
-        qint32 nrows = m_pRapLabBuffer->rows();
+        qint32 nrows = m_pRapMusicBuffer->rows();
 
         if(nrows > 0) // check if init
         {
             /* Dispatch the inputs */
-            MatrixXd t_mat = m_pRapLabBuffer->pop();
+            MatrixXd t_mat = m_pRapMusicBuffer->pop();
 
             //Add to covariance estimation
             m_pRtCov->append(t_mat);

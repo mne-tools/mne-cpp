@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     raplababoutwidget.h
+* @file     rapmusicaboutwidget.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     March, 2014
@@ -28,12 +28,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the RapLabAboutWidget class.
+* @brief    Contains the declaration of the RapMusicAboutWidget class.
 *
 */
 
-#ifndef RAPLABABOUTWIDGET_H
-#define RAPLABABOUTWIDGET_H
+#ifndef RAPMUSICABOUTWIDGET_H
+#define RAPMUSICABOUTWIDGET_H
 
 
 //*************************************************************************************************************
@@ -41,7 +41,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_raplababout.h"
+#include "../ui_rapmusicabout.h"
 
 
 //*************************************************************************************************************
@@ -54,20 +54,20 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE RapLabPlugin
+// DEFINE NAMESPACE RapMusicPlugin
 //=============================================================================================================
 
-namespace RapLabPlugin
+namespace RapMusicPlugin
 {
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS RapLabAboutWidget
+* DECLARE CLASS RapMusicAboutWidget
 *
-* @brief The RapLabAboutWidget class provides the about dialog for the RapLab.
+* @brief The RapMusicAboutWidget class provides the about dialog for the RapMusic.
 */
-class RapLabAboutWidget : public QDialog
+class RapMusicAboutWidget : public QDialog
 {
     Q_OBJECT
 
@@ -75,25 +75,25 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a RapLabAboutWidget dialog which is a child of parent.
+    * Constructs a RapMusicAboutWidget dialog which is a child of parent.
     *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new RapLabAboutWidget becomes a window. If parent is another widget, DummyAboutWidget becomes a child window inside parent. DummyAboutWidget is deleted when its parent is deleted.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new RapMusicAboutWidget becomes a window. If parent is another widget, DummyAboutWidget becomes a child window inside parent. DummyAboutWidget is deleted when its parent is deleted.
     */
-    RapLabAboutWidget(QWidget *parent = 0);
+    RapMusicAboutWidget(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the RapLabAboutWidget.
-    * All DummyAboutWidget's children are deleted first. The application exits if RapLabAboutWidget is the main widget.
+    * Destroys the RapMusicAboutWidget.
+    * All DummyAboutWidget's children are deleted first. The application exits if RapMusicAboutWidget is the main widget.
     */
-    ~RapLabAboutWidget();
+    ~RapMusicAboutWidget();
 
 private:
 
-    Ui::RapLabAboutWidgetClass ui;		/**< Holds the user interface for the RapLabAboutWidget.*/
+    Ui::RapMusicAboutWidgetClass ui;		/**< Holds the user interface for the RapMusicAboutWidget.*/
 
 };
 
 } // NAMESPACE
 
-#endif // RAPLABABOUTWIDGET_H
+#endif // RAPMUSICABOUTWIDGET_H

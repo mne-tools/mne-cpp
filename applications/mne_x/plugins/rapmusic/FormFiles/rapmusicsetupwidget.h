@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     raplabsetupwidget.h
+* @file     rapmusicsetupwidget.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the RapLabSetupWidget class.
+* @brief    Contains the declaration of the RapMusicSetupWidget class.
 *
 */
 
-#ifndef RAPLABSETUPWIDGET_H
-#define RAPLABSETUPWIDGET_H
+#ifndef RAPMUSICSETUPWIDGET_H
+#define RAPMUSICSETUPWIDGET_H
 
 
 //*************************************************************************************************************
@@ -42,7 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_raplabsetup.h"
+#include "../ui_rapmusicsetup.h"
 
 
 //*************************************************************************************************************
@@ -62,10 +62,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE RapLabPlugin
+// DEFINE NAMESPACE RapMusicPlugin
 //=============================================================================================================
 
-namespace RapLabPlugin
+namespace RapMusicPlugin
 {
 
 
@@ -74,7 +74,7 @@ namespace RapLabPlugin
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class RapLab;
+class RapMusic;
 
 
 //=============================================================================================================
@@ -83,7 +83,7 @@ class RapLab;
 *
 * @brief The DummySetupWidget class provides the DummyToolbox configuration window.
 */
-class RapLabSetupWidget : public QWidget
+class RapMusicSetupWidget : public QWidget
 {
     Q_OBJECT
 
@@ -91,19 +91,19 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a RapLabSetupWidget which is a child of parent.
+    * Constructs a RapMusicSetupWidget which is a child of parent.
     *
-    * @param [in] toolbox a pointer to the corresponding RapLabToolbox.
-    * @param [in] parent pointer to parent widget; If parent is 0, the new RapLabSetupWidget becomes a window. If parent is another widget, DummySetupWidget becomes a child window inside parent. DummySetupWidget is deleted when its parent is deleted.
+    * @param [in] toolbox a pointer to the corresponding RapMusicToolbox.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new RapMusicSetupWidget becomes a window. If parent is another widget, DummySetupWidget becomes a child window inside parent. DummySetupWidget is deleted when its parent is deleted.
     */
-    RapLabSetupWidget(RapLab* toolbox, QWidget *parent = 0);
+    RapMusicSetupWidget(RapMusic* toolbox, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the RapLabSetupWidget.
-    * All RapLabSetupWidget's children are deleted first. The application exits if RapLabSetupWidget is the main widget.
+    * Destroys the RapMusicSetupWidget.
+    * All RapMusicSetupWidget's children are deleted first. The application exits if RapMusicSetupWidget is the main widget.
     */
-    ~RapLabSetupWidget();
+    ~RapMusicSetupWidget();
 
 private:
     //=========================================================================================================
@@ -131,11 +131,11 @@ private:
     void showSurfaceDirDialog();
 
 
-    RapLab* m_pRapLab;            /**< Holds a pointer to corresponding DummyToolbox.*/
+    RapMusic* m_pRapMusic;            /**< Holds a pointer to corresponding RapMusic.*/
 
-    Ui::RapLabSetupWidgetClass ui;   /**< Holds the user interface for the DummySetupWidget.*/
+    Ui::RapMusicSetupWidgetClass ui;   /**< Holds the user interface for the RapMusicSetupWidget.*/
 };
 
 } // NAMESPACE
 
-#endif // RAPLABSETUPWIDGET_H
+#endif // RAPMUSICSETUPWIDGET_H
