@@ -206,6 +206,7 @@ void RealTimeEvokedWidget::getData()
         m_pRTEModel->updateData();
 }
 
+
 //*************************************************************************************************************
 
 void RealTimeEvokedWidget::init()

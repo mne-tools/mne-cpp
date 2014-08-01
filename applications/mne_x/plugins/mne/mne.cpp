@@ -128,7 +128,6 @@ void MNE::init()
     m_pRTSEOutput->data()->setName("Real-Time Source Estimate");
     m_pRTSEOutput->data()->setAnnotSet(m_pAnnotationSet);
     m_pRTSEOutput->data()->setSurfSet(m_pSurfaceSet);
-    m_pRTSEOutput->data()->setSamplingRate(600/m_iDownSample);
 
     // start clustering
     QFuture<void> future = QtConcurrent::run(this, &MNE::doClustering);
@@ -183,8 +182,6 @@ void MNE::doClustering()
 
 void MNE::finishedClustering()
 {
-    m_pRTSEOutput->data()->setSrc(m_pClusteredFwd->src);
-
     m_bFinishedClustering = true;
 
     m_pFiffInfoForward = QSharedPointer<FiffInfoBase>(new FiffInfoBase(m_pClusteredFwd->info));
@@ -409,25 +406,27 @@ void MNE::run()
         if(m_qVecFiffEvoked.size() > 0)
         {
             //DEBUG THIS
-//            if(m_pMinimumNorm)
-//            {
-//                mutex.lock();
-//                FiffEvoked t_fiffEvoked = m_qVecFiffEvoked[0];
-//                m_qVecFiffEvoked.pop_front();
-//                mutex.unlock();
+            if(m_pMinimumNorm)
+            {
+                mutex.lock();
+                FiffEvoked t_fiffEvoked = m_qVecFiffEvoked[0];
+                m_qVecFiffEvoked.pop_front();
+                mutex.unlock();
 
-//                qDebug() << "source estimate replacement";
-////                float tmin = ((float)t_fiffEvoked.first) / t_fiffEvoked.info.sfreq;
-////                float tstep = 1/t_fiffEvoked.info.sfreq;
+                qDebug() << "source estimate replacement";
+                float tmin = ((float)t_fiffEvoked.first) / t_fiffEvoked.info.sfreq;
+                float tstep = 1/t_fiffEvoked.info.sfreq;
 
-////                MNESourceEstimate sourceEstimate = m_pMinimumNorm->calculateInverse(t_fiffEvoked.data, tmin, tstep);
-//            }
-//            else
-//            {
+                MNESourceEstimate sourceEstimate = m_pMinimumNorm->calculateInverse(t_fiffEvoked.data, tmin, tstep);
+
+                m_pRTSEOutput->data()->setValue(sourceEstimate);
+            }
+            else
+            {
                 mutex.lock();
                 m_qVecFiffEvoked.pop_front();
                 mutex.unlock();
-//            }
+            }
         }
     }
 }

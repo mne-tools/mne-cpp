@@ -70,18 +70,12 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QPaintEvent>
-#include <QPainter>
-#include <QTimer>
-#include <QTime>
+#include <QLabel>
+#include <QGridLayout>
+#include <QSlider>
+
 
 #include <QDebug>
-
-
-#include <QWindow>
-#include <QWidget>
-#include <QHBoxLayout>
-#include <QLineEdit>
 
 
 //*************************************************************************************************************
@@ -110,7 +104,47 @@ RealTimeSourceEstimateWidget::RealTimeSourceEstimateWidget(QSharedPointer<RealTi
 , m_bInitializationStarted(false)
 , count(0)
 {
-    connect(this,&RealTimeSourceEstimateWidget::startInit, this, &RealTimeSourceEstimateWidget::init);
+
+    m_pClustStcModel = new ClustStcModel(this);
+//    m_pClustStcModel->init(t_annotationSet, t_surfSet);
+    m_pClustStcModel->setLoop(false);
+
+    //
+    // STC view
+    //
+    QGridLayout *mainLayoutView = new QGridLayout;
+
+    QLabel * pLabelNormView = new QLabel("Norm");
+    QSlider* pSliderNormView = new QSlider(Qt::Vertical);
+    QObject::connect(pSliderNormView, &QSlider::valueChanged, m_pClustStcModel, &ClustStcModel::setNormalization);
+    pSliderNormView->setMinimum(1);
+    pSliderNormView->setMaximum(100);
+    pSliderNormView->setValue(60);
+
+    QLabel * pLabelAverageView = new QLabel("Average");
+    QSlider* pSliderAverageView = new QSlider(Qt::Horizontal);
+    QObject::connect(pSliderAverageView, &QSlider::valueChanged, m_pClustStcModel, &ClustStcModel::setAverage);
+    pSliderAverageView->setMinimum(1);
+    pSliderAverageView->setMaximum(500);
+    pSliderAverageView->setValue(100);
+
+    m_pClustView = new ClustStcView(false, true, QGLView::RedCyanAnaglyph);//(false); (true, QGLView::StretchedLeftRight); (true, QGLView::RedCyanAnaglyph);
+    m_pClustView->setModel(m_pClustStcModel);
+
+    if (m_pClustView->stereoType() != QGLView::RedCyanAnaglyph)
+        m_pClustView->camera()->setEyeSeparation(0.3f);
+
+    QWidget *pWidgetContainer = QWidget::createWindowContainer(m_pClustView);
+
+    mainLayoutView->addWidget(pWidgetContainer,0,0,2,2);
+    mainLayoutView->addWidget(pLabelNormView,0,3);
+    mainLayoutView->addWidget(pSliderNormView,1,3);
+    mainLayoutView->addWidget(pLabelAverageView,3,0);
+    mainLayoutView->addWidget(pSliderAverageView,3,1);
+
+    this->setLayout(mainLayoutView);
+
+    getData();
 }
 
 
@@ -127,22 +161,35 @@ RealTimeSourceEstimateWidget::~RealTimeSourceEstimateWidget()
 
 void RealTimeSourceEstimateWidget::update(XMEASLIB::NewMeasurement::SPtr)
 {
+    getData();
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeSourceEstimateWidget::getData()
+{
     if(m_bInitialized)
     {
         if(count % 4 == 0)
         {
-            MNESourceEstimate stc = m_pRTMSE->getStc();
-            m_pView->pushSourceEstimate(stc);
+            //
+            // Add Data
+            //
+            m_pClustStcModel->addData(*m_pRTMSE->getValue());
         }
         ++count;
     }
     else
     {
-        if(!m_bInitializationStarted && !m_pRTMSE->getSrc().isEmpty())
+        if(m_pRTMSE->getAnnotSet() && m_pRTMSE->getSurfSet())
         {
             m_pRTMSE->m_bStcSend = false;
-            m_bInitializationStarted = true;
-            emit startInit();
+            init();
+            //
+            // Add Data
+            //
+            m_pClustStcModel->addData(*m_pRTMSE->getValue());
         }
     }
 }
@@ -152,52 +199,11 @@ void RealTimeSourceEstimateWidget::update(XMEASLIB::NewMeasurement::SPtr)
 
 void RealTimeSourceEstimateWidget::init()
 {
-    if(this->initOpenGLWidget())
-    {
-        m_bInitialized = true;
-        m_pRTMSE->m_bStcSend = true;
-    }
-    else
-    {
-        m_bInitialized = false;
-        m_bInitializationStarted = false;
-    }
+    m_pClustStcModel->init(*m_pRTMSE->getAnnotSet(), *m_pRTMSE->getSurfSet());
+    m_bInitialized = true;
+    m_pRTMSE->m_bStcSend = true;
 }
 
-
-//*************************************************************************************************************
-
-bool RealTimeSourceEstimateWidget::initOpenGLWidget()
-{
-    if(     !m_pRTMSE->getSrc().isEmpty() &&
-            !m_pRTMSE->getAnnotSet()->isEmpty() &&
-            !m_pRTMSE->getSurfSet()->isEmpty())
-    {
-        QList<Label> t_qListLabels;
-        QList<RowVector4i> t_qListRGBAs;
-
-        m_pRTMSE->getAnnotSet()->toLabels(*m_pRTMSE->getSurfSet().data(), t_qListLabels, t_qListRGBAs);
-
-        QHBoxLayout *layout = new QHBoxLayout(this);
-
-        m_pView = new InverseView(m_pRTMSE->getSrc(), t_qListLabels, t_qListRGBAs, 12, false);
-
-        if (m_pView->stereoType() != QGLView::RedCyanAnaglyph)
-            m_pView->camera()->setEyeSeparation(0.3f);
-
-        m_pWidgetView = QWidget::createWindowContainer(m_pView); //widget take owner ship of m_pView
-//        m_pContainer->setFocusPolicy(Qt::StrongFocus);
-        m_pWidgetView->setFocusPolicy(Qt::TabFocus);
-
-//        layout->addWidget(new QLineEdit(QLatin1String("A QLineEdit")));
-        layout->addWidget(m_pWidgetView);
-//        layout->addWidget(new QLineEdit(QLatin1String("A QLabel")));
-
-        return true;
-    }
-    else
-        return false;
-}
 
 //*************************************************************************************************************
 //=============================================================================================================

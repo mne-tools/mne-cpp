@@ -135,9 +135,7 @@ void RapMusic::init()
     m_pRTSEOutput->data()->setAnnotSet(m_pAnnotationSet);
     m_pRTSEOutput->data()->setSurfSet(m_pSurfaceSet);
 //    m_pRTSEOutput->data()->setSrc(m_pFwd->src); // Is done after clustering -> m_pClusteredFwd
-    m_pRTSEOutput->data()->setSrc(m_pClusteredFwd->src);
-
-    m_pRTSEOutput->data()->setSamplingRate(600/m_iDownSample);
+//    m_pRTSEOutput->data()->setSrc(m_pClusteredFwd->src);
 
 
 
@@ -435,8 +433,7 @@ void RapMusic::run()
     //                std::cout << "SourceEstimated:\n" << sourceEstimate.data.block(0,0,10,10) << std::endl;
 
                     //emit source estimates sample wise
-                    for(qint32 i = 0; i < sourceEstimate.data.cols(); i += m_iDownSample)
-                        m_pRTSEOutput->data()->setValue(sourceEstimate.data.col(i));
+                    m_pRTSEOutput->data()->setValue(sourceEstimate);
 
                     m_qVecEvokedData.pop_front();
 

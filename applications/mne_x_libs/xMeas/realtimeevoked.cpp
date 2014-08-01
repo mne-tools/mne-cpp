@@ -149,9 +149,6 @@ void RealTimeEvoked::setValue(FiffEvoked& v)
                 ++m_iPreStimSamples;
         }
 
-
-
-
         m_bInitialized = true;
     }
 
