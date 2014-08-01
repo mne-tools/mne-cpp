@@ -198,6 +198,20 @@ bool EventModel::loadEventData(QFile& qFile)
 
 //*************************************************************************************************************
 
+bool EventModel::saveEventData(QFile& qFile)
+{
+    beginResetModel();
+    clearModel();
+
+    //TODO: Save events to file
+
+    endResetModel();
+    return true;
+}
+
+
+//*************************************************************************************************************
+
 void EventModel::clearModel()
 {
     //data model structure

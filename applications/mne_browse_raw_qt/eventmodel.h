@@ -136,6 +136,14 @@ public:
     */
     bool loadEventData(QFile& qFile);
 
+    //=========================================================================================================
+    /**
+    * saveEventData saves events to a fiff event data file.
+    *
+    * @param p_IODevice fiff data event file to save to
+    */
+    bool saveEventData(QFile& qFile);
+
 private:
     //=========================================================================================================
     /**

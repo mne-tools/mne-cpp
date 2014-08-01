@@ -59,6 +59,7 @@ using namespace MNEBrowseRawQt;
 MainWindow::MainWindow(QWidget *parent)
 : QMainWindow(parent)
 , m_qFileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
+, m_qFileEvent("./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif")
 , m_qSettings()
 , m_rawSettings()
 {
@@ -118,13 +119,13 @@ void MainWindow::setupView()
 
     //TableView settings
     setupViewSettings();
-
 }
 
 
 //*************************************************************************************************************
 
-void MainWindow::setupLayout() {
+void MainWindow::setupLayout()
+{
     //set vertical layout
     QVBoxLayout *mainlayout = new QVBoxLayout;
 
@@ -140,7 +141,8 @@ void MainWindow::setupLayout() {
 
 //*************************************************************************************************************
 
-void MainWindow::setupViewSettings() {
+void MainWindow::setupViewSettings()
+{
     //VIEW: m_pTableView SETTINGS
     //set some size settings for m_pTableView
     m_pTableView->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
@@ -183,7 +185,8 @@ void MainWindow::setupViewSettings() {
 
 //*************************************************************************************************************
 
-void MainWindow::createMenus() {
+void MainWindow::createMenus()
+{
     //File
     QMenu *fileMenu = new QMenu(tr("&File"), this);
 
@@ -202,6 +205,12 @@ void MainWindow::createMenus() {
     quitAction->setShortcuts(QKeySequence::Quit);
     connect(quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
 
+    //Windows
+    QMenu *windowsMenu = new QMenu(tr("&Windows"), this);
+
+    QAction *eventAction = windowsMenu->addAction(tr("&Show events"));
+    connect(eventAction, SIGNAL(triggered()), this, SLOT(showEventWindow()));
+
     //Help
     QMenu *helpMenu = new QMenu(tr("&Help"), this);
 
@@ -210,13 +219,15 @@ void MainWindow::createMenus() {
 
     //add to menub
     menuBar()->addMenu(fileMenu);
+    menuBar()->addMenu(windowsMenu);
     menuBar()->addMenu(helpMenu);
 }
 
 
 //*************************************************************************************************************
 
-void MainWindow::setWindow() {
+void MainWindow::setWindow()
+{
     //set Window functions
     resize(m_qSettings.value("MainWindow/size").toSize());
     this->move(50,50);
@@ -225,7 +236,8 @@ void MainWindow::setWindow() {
 
 //*************************************************************************************************************
 
-void MainWindow::setWindowStatus() {
+void MainWindow::setWindowStatus()
+{
     QString title;
 
     //request status
@@ -350,7 +362,7 @@ void MainWindow::loadEvents()
         m_qFileEvent.close();
     m_qFileEvent.setFileName(filename);
 
-    if(m_pEventModel->loadEventData(m_qFileRaw)) {
+    if(m_pEventModel->loadEventData(m_qFileEvent)) {
         qDebug() << "Fiff event data file" << filename << "loaded.";
     }
     else
@@ -358,16 +370,8 @@ void MainWindow::loadEvents()
 
     setWindowStatus();
 
-    //set position of QScrollArea
-    setScrollBarPosition(0);
-
     //Show event widget
-    if(!m_wEventWidget->isVisible())
-    {
-        m_wEventWidget->setWindowTitle("MNE_BROWSE_RAW_QT - Loaded events");
-        m_wEventWidget->show();
-        m_wEventWidget->raise();
-    }
+    showEventWindow();
 }
 
 
@@ -379,28 +383,17 @@ void MainWindow::saveEvents()
                                                     QString("Save fiff event data file"),
                                                     QString("./MNE-sample-data/MEG/sample/"),
                                                     tr("fif event data files (*-eve.fif);;fif data files (*.fif)"));
-    if(m_qFileRaw.isOpen())
-        m_qFileRaw.close();
-    m_qFileRaw.setFileName(filename);
+    if(m_qFileEvent.isOpen())
+        m_qFileEvent.close();
+    m_qFileEvent.setFileName(filename);
 
-    if(m_pEventModel->loadEventData(m_qFileRaw)) {
-        qDebug() << "Fiff event data file" << filename << "loaded.";
+    if(m_pEventModel->saveEventData(m_qFileEvent)) {
+        qDebug() << "Fiff event data file" << filename << "saved.";
     }
     else
-        qDebug("ERROR loading fiff event data file %s",filename.toLatin1().data());
+        qDebug("ERROR saving fiff event data file %s",filename.toLatin1().data());
 
     setWindowStatus();
-
-    //set position of QScrollArea
-    setScrollBarPosition(0);
-
-    //Show event widget
-    if(!m_wEventWidget->isVisible())
-    {
-        m_wEventWidget->setWindowTitle("MNE_BROWSE_RAW_QT - Loaded events");
-        m_wEventWidget->show();
-        m_wEventWidget->raise();
-    }
 }
 
 
@@ -527,3 +520,18 @@ void MainWindow::about()
              " NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE"
              " POSSIBILITY OF SUCH DAMAGE."));
 }
+
+
+//*************************************************************************************************************
+
+void MainWindow::showEventWindow()
+{
+    if(!m_wEventWidget->isVisible())
+    {
+        m_wEventWidget->setWindowTitle("MNE_BROWSE_RAW_QT - Loaded events");
+        m_wEventWidget->show();
+        m_wEventWidget->raise();
+    }
+}
+
+

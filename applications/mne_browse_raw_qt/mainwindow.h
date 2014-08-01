@@ -207,12 +207,23 @@ private slots:
     */
     void loadEvents();
 
+    //=========================================================================================================
+    /**
+    * saveEvents saves the event data to file.
+    */
+    void saveEvents();
 
     //=========================================================================================================
     /**
      * about opens the about dialog
      */
     void about();
+
+    //=========================================================================================================
+    /**
+    * showEventWindow shows the event window
+    */
+    void showEventWindow();
 
 signals:
     void testSignal();
@@ -281,6 +292,7 @@ private:
     void setWindowStatus();
 
     QFile               m_qFileRaw;                 /**< Fiff data file to read (set for convenience) */
+    QFile               m_qFileEvent;               /**< Fiff event data file to read (set for convenience) */
     QSignalMapper*      m_qSignalMapper;            /**< signal mapper used for signal-slot mapping */
 
     //modelview framework
