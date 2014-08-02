@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     noiseestimation.cpp
+* @file     frequencyspectrum.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the NoiseEstimation class.
+* @brief    Contains the implementation of the FrequencySpectrum class.
 *
 */
 
@@ -38,7 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "noiseestimation.h"
+#include "frequencyspectrum.h"
 
 
 //*************************************************************************************************************
@@ -62,8 +62,8 @@ using namespace XMEASLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-NoiseEstimation::NoiseEstimation(QObject *parent)
-: NewMeasurement(QMetaType::type("NoiseEstimation::SPtr"), parent)
+FrequencySpectrum::FrequencySpectrum(QObject *parent)
+: NewMeasurement(QMetaType::type("FrequencySpectrum::SPtr"), parent)
 , m_bIsInit(false)
 , m_bContainsValues(false)
 {
@@ -72,7 +72,7 @@ NoiseEstimation::NoiseEstimation(QObject *parent)
 
 //*************************************************************************************************************
 
-NoiseEstimation::~NoiseEstimation()
+FrequencySpectrum::~FrequencySpectrum()
 {
 
 }
@@ -80,7 +80,7 @@ NoiseEstimation::~NoiseEstimation()
 
 //*************************************************************************************************************
 
-void NoiseEstimation::initFromFiffInfo(FiffInfo::SPtr &p_pFiffInfo)
+void FrequencySpectrum::initFromFiffInfo(FiffInfo::SPtr &p_pFiffInfo)
 {
     m_pFiffInfo = p_pFiffInfo;
 
@@ -90,7 +90,7 @@ void NoiseEstimation::initFromFiffInfo(FiffInfo::SPtr &p_pFiffInfo)
 
 //*************************************************************************************************************
 
-MatrixXd NoiseEstimation::getValue() const
+MatrixXd FrequencySpectrum::getValue() const
 {
     return m_matValue;
 }
@@ -98,7 +98,7 @@ MatrixXd NoiseEstimation::getValue() const
 
 //*************************************************************************************************************
 
-void NoiseEstimation::setValue(MatrixXd& v)
+void FrequencySpectrum::setValue(MatrixXd& v)
 {
     //Store
     m_matValue = v;

@@ -70,7 +70,7 @@ NoiseEstimate::NoiseEstimate()
 : m_bIsRunning(false)
 , m_bProcessData(false)
 , m_pRTMSAInput(NULL)
-, m_pNEOutput(NULL)
+, m_pFSOutput(NULL)
 , m_pBuffer(CircularMatrixBuffer<double>::SPtr())
 , m_Fs(600)
 , m_iFFTlength(4096)
@@ -109,8 +109,8 @@ void NoiseEstimate::init()
     m_inputConnectors.append(m_pRTMSAInput);
 
     // Output
-    m_pNEOutput = PluginOutputData<NoiseEstimation>::create(this, "Noise Estimate Out", "Noise Estimate output data");
-    m_outputConnectors.append(m_pNEOutput);
+    m_pFSOutput = PluginOutputData<FrequencySpectrum>::create(this, "Noise Estimate Out", "Noise Estimate output data");
+    m_outputConnectors.append(m_pFSOutput);
 
 //    m_pRTMSAOutput->data()->setMultiArraySize(100);
 //    m_pRTMSAOutput->data()->setVisibility(true);
@@ -130,7 +130,7 @@ void NoiseEstimate::initConnector()
 {
     qDebug() << "void NoiseEstimate::initConnector()";
     if(m_pFiffInfo)
-        m_pNEOutput->data()->initFromFiffInfo(m_pFiffInfo);
+        m_pFSOutput->data()->initFromFiffInfo(m_pFiffInfo);
 }
 
 
@@ -343,7 +343,7 @@ void NoiseEstimate::run()
 
                 qDebug()<< "Spec" << sum_psdx(0,1) << t_psdx(0,1) << nb;
                 //send spectrum to the output data
-                m_pNEOutput->data()->setValue(t_psdx);
+                m_pFSOutput->data()->setValue(t_psdx);
 
 
             }//next turn for n blocks data colloection
