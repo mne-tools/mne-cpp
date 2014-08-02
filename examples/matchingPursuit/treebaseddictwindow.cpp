@@ -100,29 +100,29 @@ void TreebasedDictWindow::on_btt_calc_treebased_clicked()
     xmlWriter.writeStartElement("builtAtomsTreebasedMP");
     xmlWriter.writeAttribute("sample_count", QString::number(sample_count));
 
-
-    for(qint32 scale = 1; scale <= sample_count; scale++)
+    //ToDo: find good stepwidths
+    for(qint32 scale = 1; scale <= sample_count; scale +=3)
     {
-        for(qint32 translation = 0; translation <sample_count; translation++)
+        for(qint32 translation = 0; translation <sample_count; translation +=2)
         {
             modulation = 0;
             while(modulation < floor(sample_count/2))
             {
                 phase = 0;
-                while(phase < 2 * PI)
+                //while(phase < 2 * PI)
                 {                    
                     xmlWriter.writeStartElement("Atom");
                     xmlWriter.writeAttribute("ID", QString::number(count));
                     xmlWriter.writeAttribute("scale", QString::number(scale));
                     xmlWriter.writeAttribute("translation", QString::number(translation));
                     xmlWriter.writeAttribute("modulation", QString::number(modulation));
-                    xmlWriter.writeAttribute("phase", QString::number(phase));
+                    //xmlWriter.writeAttribute("phase", QString::number(phase));
                     xmlWriter.writeEndElement();
 
                     count++;
-                    phase += 2*PI / sample_count;//(4*PI)/360;
+                //    phase += 2*PI / sample_count;//(4*PI)/360;
                 }
-                modulation += 0.5;//(sample_count/2) / 32;//floor(5/100*sample_count);
+                modulation += 2;//(sample_count/2) / 32;//floor(5/100*sample_count);
             }
         }
     }
@@ -132,7 +132,7 @@ void TreebasedDictWindow::on_btt_calc_treebased_clicked()
 
     file.close();
     std::cout << "number of atoms built: " << count << "\n";
-    FixDictMp::create_tree_dict(save_path);
+    //FixDictMp::create_tree_dict(save_path);
 
 }
 

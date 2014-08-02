@@ -86,24 +86,24 @@
         </size>
        </property>
        <property name="minimum">
-        <number>2</number>
+        <number>8</number>
        </property>
        <property name="maximum">
-        <number>1024</number>
+        <number>16</number>
        </property>
       </widget>
      </item>
      <item row="1" column="2">
       <widget class="QPushButton" name="btt_calc_treebased">
        <property name="text">
-        <string>don´t touch if u don´t like bugs...</string>
+        <string>create atom params</string>
        </property>
       </widget>
      </item>
      <item row="2" column="2">
       <widget class="QPushButton" name="btt_call_tree_creator">
        <property name="text">
-        <string>no way</string>
+        <string>build treebased xml</string>
        </property>
       </widget>
      </item>
