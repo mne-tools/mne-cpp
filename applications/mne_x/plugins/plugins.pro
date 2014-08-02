@@ -50,7 +50,7 @@ SUBDIRS += \
 SUBDIRS += \
     dummytoolbox \
     mne \
-    rapmusic \
+    rapmusictoolbox \
     averaging \
     covariance \
     noise \

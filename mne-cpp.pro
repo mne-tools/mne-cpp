@@ -49,3 +49,6 @@ SUBDIRS += \
     applications
 
 CONFIG += ordered
+
+RESOURCES += \
+    applications/mne_x/plugins/rapmusictoolbox/mne.qrc

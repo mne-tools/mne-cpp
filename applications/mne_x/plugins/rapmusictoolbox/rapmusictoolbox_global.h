@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     rapmusic_global.h
+* @file     rapmusictoolbox_global.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the RapMusic library export/import macros.
+* @brief    Contains the RapMusicToolbox library export/import macros.
 *
 */
 
-#ifndef RAPMUSIC_GLOBAL_H
-#define RAPMUSIC_GLOBAL_H
+#ifndef RAPMUSICTOOLBOX_GLOBAL_H
+#define RAPMUSICTOOLBOX_GLOBAL_H
 
 
 //*************************************************************************************************************
@@ -50,10 +50,10 @@
 // PREPROCESSOR DEFINES
 //=============================================================================================================
 
-#if defined(RAPMUSIC_LIBRARY)
-#  define RAPMUSICSHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#if defined(RAPMUSICTOOLBOX_LIBRARY)
+#  define RAPMUSICTOOLBOXSHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
-#  define RAPMUSICSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#  define RAPMUSICTOOLBOXSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
-#endif // RAPMUSIC_GLOBAL_H
+#endif // RAPMUSICTOOLBOX_GLOBAL_H

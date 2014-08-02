@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     rapmusic.h
+* @file     rapmusictoolbox.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     February, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the RapMusic class.
+* @brief    Contains the declaration of the RapMusicToolbox class.
 *
 */
 
-#ifndef RAPMUSIC_H
-#define RAPMUSIC_H
+#ifndef RAPMUSICTOOLBOX_H
+#define RAPMUSICTOOLBOX_H
 
 
 //*************************************************************************************************************
@@ -42,7 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "rapmusic_global.h"
+#include "rapmusictoolbox_global.h"
 #include <mne_x/Interfaces/IAlgorithm.h>
 
 #include <generics/circularmatrixbuffer.h>
@@ -53,13 +53,10 @@
 #include <fiff/fiff_evoked.h>
 #include <mne/mne_forwardsolution.h>
 #include <mne/mne_sourceestimate.h>
-#include <inverse/minimumNorm/minimumnorm.h>
-#include <rtInv/rtcov.h>
-#include <rtInv/rtinvop.h>
-#include <rtInv/rtave.h>
+#include <inverse/rapMusic/rapmusic.h>
 
 #include <xMeas/realtimesourceestimate.h>
-#include <xMeas/newrealtimemultisamplearray.h>
+#include <xMeas/realtimeevoked.h>
 
 
 //*************************************************************************************************************
@@ -73,10 +70,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE RapMusicPlugin
+// DEFINE NAMESPACE RapMusicToolboxPlugin
 //=============================================================================================================
 
-namespace RapMusicPlugin
+namespace RapMusicToolboxPlugin
 {
 
 
@@ -88,11 +85,10 @@ namespace RapMusicPlugin
 using namespace FSLIB;
 using namespace FIFFLIB;
 using namespace MNELIB;
-using namespace INVERSELIB;
-using namespace RTINVLIB;
 using namespace MNEX;
 using namespace XMEASLIB;
 using namespace IOBuffer;
+using namespace INVERSELIB;
 
 
 //*************************************************************************************************************
@@ -103,31 +99,31 @@ using namespace IOBuffer;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS RapMusic
+* DECLARE CLASS RapMusicToolbox
 *
-* @brief The RapMusic class provides a dummy algorithm structure.
+* @brief The RapMusicToolbox class provides a dummy algorithm structure.
 */
-class RAPMUSICSHARED_EXPORT RapMusic : public IAlgorithm
+class RAPMUSICTOOLBOXSHARED_EXPORT RapMusicToolbox : public IAlgorithm
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "rapmusic.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "rapmusictoolbox.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(MNEX::IAlgorithm)
 
-    friend class RapMusicSetupWidget;
+    friend class RapMusicToolboxSetupWidget;
 
 public:
 
     //=========================================================================================================
     /**
-    * Constructs a RapMusic.
+    * Constructs a RapMusicToolbox.
     */
-    RapMusic();
+    RapMusicToolbox();
     //=========================================================================================================
     /**
-    * Destroys the RapMusic.
+    * Destroys the RapMusicToolbox.
     */
-    ~RapMusic();
+    ~RapMusicToolbox();
 
     //=========================================================================================================
     /**
@@ -137,9 +133,15 @@ public:
 
     //=========================================================================================================
     /**
-    * Initialise the RapMusic.
+    * Initialise the RapMusicToolbox.
     */
     void init();
+
+    void calcFiffInfo();
+
+    void doClustering();
+
+    void finishedClustering();
 
     virtual bool start();
     virtual bool stop();
@@ -151,78 +153,66 @@ public:
 
     //=========================================================================================================
     /**
-    * Append evoked
+    * Slot to update the fiff evoked
     *
-    * @param[in] p_pEvoked  The evoked to be appended
+    * @param[in] pMeasurement   The evoked to be appended
     */
-    void appendEvoked(FiffEvoked::SPtr p_pEvoked);
+    void updateRTE(XMEASLIB::NewMeasurement::SPtr pMeasurement);
 
-    void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
+signals:
+    //=========================================================================================================
+    /**
+    * Signal when clsutering is started
+    */
+    void clusteringStarted();
 
     //=========================================================================================================
     /**
-    * Slot to update the fiff covariance
-    *
-    * @param[in] p_pFiffCov    The covariance to update
+    * Signal when clsutering has finished
     */
-    void updateFiffCov(FiffCov::SPtr p_pFiffCov);
-
-    //=========================================================================================================
-    /**
-    * Slot to update the inverse operator
-    *
-    * @param[in] p_pInvOp    The inverse operator to update
-    */
-    void updateInvOp(MNEInverseOperator::SPtr p_pInvOp);
+    void clusteringFinished();
 
 protected:
     virtual void run();
 
 private:
-    PluginInputData<NewRealTimeMultiSampleArray>::SPtr  m_pRTMSAInput;  /**< The RealTimeMultiSampleArray input.*/
+    PluginInputData<RealTimeEvoked>::SPtr   m_pRTEInput;    /**< The RealTimeEvoked input.*/
 
     PluginOutputData<RealTimeSourceEstimate>::SPtr      m_pRTSEOutput;  /**< The RealTimeSourceEstimate output.*/
 
-
     QMutex mutex;
 
-    CircularMatrixBuffer<double>::SPtr m_pRapMusicBuffer;   /**< Holds incoming rt server data.*/
+    QVector<FiffEvoked> m_qVecFiffEvoked;
+    qint32 m_iNumAverages;
 
     bool m_bIsRunning;      /**< If source lab is running */
     bool m_bReceiveData;    /**< If thread is ready to receive data */
     bool m_bProcessData;    /**< If data should be received for processing */
 
-    //MNE stuff
+    //RapMusicToolbox stuff
     QFile                       m_qFileFwdSolution; /**< File to forward solution. */
     MNEForwardSolution::SPtr    m_pFwd;             /**< Forward solution. */
     MNEForwardSolution::SPtr    m_pClusteredFwd;    /**< Clustered forward solution. */
+
+    bool m_bFinishedClustering;                     /**< If clustered forward solution is available. */
 
     QString                     m_sAtlasDir;        /**< File to Atlas. */
     AnnotationSet::SPtr         m_pAnnotationSet;   /**< Annotation set. */
     QString                     m_sSurfaceDir;      /**< File to Surface. */
     SurfaceSet::SPtr            m_pSurfaceSet;      /**< Surface set. */
 
-
     FiffInfo::SPtr              m_pFiffInfo;        /**< Fiff information. */
+    FiffInfo::SPtr              m_pFiffInfoEvoked;  /**< Fiff information of the evoked. */
+    FiffInfoBase::SPtr          m_pFiffInfoForward; /**< Fiff information of the forward solution. */
 
-    RtCov::SPtr                 m_pRtCov;           /**< Real-time covariance. */
-    FiffCov::SPtr               m_pFiffCov;         /**< The estimated covariance. */
+    QStringList                 m_qListPickChannels;        /**< Channels to pick */
 
-    RtInvOp::SPtr               m_pRtInvOp;         /**< Real-time inverse operator. */
-    MNEInverseOperator::SPtr    m_pInvOp;           /**< The inverse operator. */
-
-    RtAve::SPtr                 m_pRtAve;           /**< Real-time average. */
-    qint32                      m_iNumAverages;     /**< Number of averages. */
-    bool                        m_bSingleTrial;     /**< Single trial mode, or averages */
-    QVector<FiffEvoked::SPtr>   m_qVecEvokedData;   /**< Evoked data set */
-    qint32                      m_iStimChan;        /**< Stimulus Channel to use for source estimation */
-
-    MinimumNorm::SPtr           m_pMinimumNorm;     /**< Minimum Norm Estimation. */
+    RapMusic::SPtr              m_pRapMusic;        /**< RAP MUSIC. */
     qint32                      m_iDownSample;      /**< Sampling rate */
 
-//    RealTimeSourceEstimate::SPtr m_pRTSE_RapMusic; /**< Source Estimate output channel. */
+//    RealTimeSourceEstimate::SPtr m_pRTSE_MNE; /**< Source Estimate output channel. */
 };
 
 } // NAMESPACE
 
-#endif // RAPMUSIC_H
+#endif // RAPMUSICTOOLBOX_H
