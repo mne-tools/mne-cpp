@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     noiseestimation.h
+* @file     frequencyspectrumwidget.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the NoiseEstimation class.
+* @brief    Declaration of the FrequencySpectrumWidget Class.
 *
 */
 
-#ifndef NOISEESTIMATION_H
-#define NOISEESTIMATION_H
+#ifndef FREQUENCYSPECTRUMWIDGET_H
+#define FREQUENCYSPECTRUMWIDGET_H
 
 
 //*************************************************************************************************************
@@ -42,31 +42,49 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "xmeas_global.h"
-#include "newmeasurement.h"
-#include "realtimesamplearraychinfo.h"
-
-#include <fiff/fiff_info.h>
+#include "xdisp_global.h"
+#include "newmeasurementwidget.h"
+#include "helpers/frequencyspectrummodel.h"
+#include "helpers/frequencyspectrumdelegate.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
 #include <QSharedPointer>
-#include <QVector>
 #include <QList>
-#include <QColor>
+#include <QAction>
+#include <QSpinBox>
+#include <QDoubleSpinBox>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE XMEASLIB
+// FORWARD DECLARATIONS
 //=============================================================================================================
+
+class QTime;
 
 namespace XMEASLIB
 {
+class FrequencySpectrum;
+}
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE XDISPLIB
+//=============================================================================================================
+
+namespace XDISPLIB
+{
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
 
 
 //*************************************************************************************************************
@@ -74,122 +92,83 @@ namespace XMEASLIB
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
+using namespace XMEASLIB;
 
 
-//=========================================================================================================
+//*************************************************************************************************************
+//=============================================================================================================
+// ENUMERATIONS
+//=============================================================================================================
+
+////=============================================================================================================
+///**
+//* Tool enumeration.
+//*/
+//enum Tool
+//{
+//    Freeze     = 0,       /**< Freezing tool. */
+//    Annotation = 1        /**< Annotation tool. */
+//};
+
+
+//=============================================================================================================
 /**
-* DECLARE CLASS NoiseEstimation
+* DECLARE CLASS FrequencySpectrumWidget
 *
-* @brief The RealTimeMultiSampleArrayNew class is the base class of every RealTimeMultiSampleArrayNew Measurement.
+* @brief The FrequencySpectrumWidget class provides a equalizer display
 */
-class XMEASSHARED_EXPORT NoiseEstimation : public NewMeasurement
+class XDISPSHARED_EXPORT FrequencySpectrumWidget : public NewMeasurementWidget
 {
     Q_OBJECT
+
 public:
-    typedef QSharedPointer<NoiseEstimation> SPtr;               /**< Shared pointer type for NoiseEstimation. */
-    typedef QSharedPointer<const NoiseEstimation> ConstSPtr;    /**< Const shared pointer type for NoiseEstimation. */
-
     //=========================================================================================================
     /**
-    * Constructs a RealTimeMultiSampleArrayNew.
-    */
-    explicit NoiseEstimation(QObject *parent = 0);
-
-    //=========================================================================================================
-    /**
-    * Destroys the RealTimeMultiSampleArrayNew.
-    */
-    virtual ~NoiseEstimation();
-
-    //=========================================================================================================
-    /**
-    * Init channel infos using fiff info
+    * Constructs a FrequencySpectrumWidget which is a child of parent.
     *
-    * @param[in] p_pFiffInfo     Info to init from
+    * @param [in] pNE           pointer to noise estimation measurement.
+    * @param [in] pTime         pointer to application time.
+    * @param [in] parent        pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
     */
-    void initFromFiffInfo(FiffInfo::SPtr &p_pFiffInfo);
+    FrequencySpectrumWidget(QSharedPointer<FrequencySpectrum> pNE, QSharedPointer<QTime> &pTime, QWidget* parent = 0);
 
     //=========================================================================================================
     /**
-    * Returns whether channel info is initialized
-    *
-    * @return true whether the channel info is available.
+    * Destroys the FrequencySpectrumWidget.
     */
-    inline bool isInit() const;
+    ~FrequencySpectrumWidget();
 
     //=========================================================================================================
     /**
-    * Returns the reference to the orig FiffInfo.
+    * Is called when new data are available.
     *
-    * @return the reference to the orig FiffInfo.
+    * @param [in] pMeasurement  pointer to measurement -> not used because its direct attached to the measurement.
     */
-    inline FiffInfo::SPtr& getFiffInfo();
+    virtual void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
-    * New data block to distribute
-    *
-    * @param [in] v the value which is should be distributed.
+    * Is called when new data are available.
     */
-    virtual void setValue(MatrixXd& v);
+    virtual void getData();
 
     //=========================================================================================================
     /**
-    * Returns the current value set.
-    * This method is inherited by Measurement.
-    *
-    * @return the last attached value.
+    * Initialise the FrequencySpectrumWidget.
     */
-    virtual MatrixXd getValue() const;
-
-    //=========================================================================================================
-    /**
-    * Returns whether NoiseEstimation contains values
-    *
-    * @return whether NoiseEstimation contains values.
-    */
-    inline bool containsValues() const;
+    virtual void init();
 
 private:
-    FiffInfo::SPtr              m_pFiffInfo;   /**< Original Fiff Info if initialized by fiff info. */
+    FrequencySpectrumModel*      m_pFSModel;      /**< FS model */
+    FrequencySpectrumDelegate*   m_pFSDelegate;   /**< FS delegate */
+    QTableView* m_pTableView;                   /**< the QTableView being part of the model/view framework of Qt */
 
-    MatrixXd                    m_matValue;         /**< The current attached sample vector.*/
 
-    bool m_bIsInit;             /**< If channel info is initialized.*/
-    bool m_bContainsValues;     /**< If values are stored.*/
+    QSharedPointer<FrequencySpectrum> m_pFS;    /**< The frequency spectrum measurement. */
+
+    bool m_bInitialized;                        /**< Is Initialized */
 };
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// INLINE DEFINITIONS
-//=============================================================================================================
-
-
-inline bool NoiseEstimation::isInit() const
-{
-    return m_bIsInit;
-}
-
-
-//*************************************************************************************************************
-
-inline FiffInfo::SPtr& NoiseEstimation::getFiffInfo()
-{
-    return m_pFiffInfo;
-}
-
-
-//*************************************************************************************************************
-
-inline bool NoiseEstimation::containsValues() const
-{
-    return m_bContainsValues;
-}
 
 } // NAMESPACE
 
-Q_DECLARE_METATYPE(XMEASLIB::NoiseEstimation::SPtr)
-
-#endif // NOISEESTIMATION_H
+#endif // FREQUENCYSPECTRUMWIDGET_H

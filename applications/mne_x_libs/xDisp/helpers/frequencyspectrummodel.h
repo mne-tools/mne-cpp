@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     noiseestimationmodel.h
+* @file     frequencyspectrummodel.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of the NoiseEstimationModel Class.
+* @brief    Declaration of the FrequencySpectrumModel Class.
 *
 */
 
-#ifndef NOISEESTIMATIONMODEL_H
-#define NOISEESTIMATIONMODEL_H
+#ifndef FREQUENCYSPECTRUMMODEL_H
+#define FREQUENCYSPECTRUMMODEL_H
 
 
 //*************************************************************************************************************
@@ -82,11 +82,11 @@ using namespace Eigen;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS NoiseEstimationModel
+* DECLARE CLASS FrequencySpectrumModel
 *
-* @brief The NoiseEstimationModel class implements the data access model for a real-time multi sample array data stream
+* @brief The FrequencySpectrumModel class implements the data access model for a real-time multi sample array data stream
 */
-class NoiseEstimationModel : public QAbstractTableModel
+class FrequencySpectrumModel : public QAbstractTableModel
 {
     Q_OBJECT
 public:
@@ -97,7 +97,7 @@ public:
     *
     * @param[in] parent     parent of the table model
     */
-    NoiseEstimationModel(QObject *parent = 0);
+    FrequencySpectrumModel(QObject *parent = 0);
 
     //=========================================================================================================
     /**
@@ -253,7 +253,7 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-FiffInfo::SPtr NoiseEstimationModel::getInfo() const
+FiffInfo::SPtr FrequencySpectrumModel::getInfo() const
 {
     return m_pFiffInfo;
 }
@@ -261,7 +261,7 @@ FiffInfo::SPtr NoiseEstimationModel::getInfo() const
 
 //*************************************************************************************************************
 
-RowVectorXd NoiseEstimationModel::getFreqScale() const
+RowVectorXd FrequencySpectrumModel::getFreqScale() const
 {
     return m_vecFreqScale;
 }
@@ -269,7 +269,7 @@ RowVectorXd NoiseEstimationModel::getFreqScale() const
 
 //*************************************************************************************************************
 
-inline qint32 NoiseEstimationModel::getNumStems() const
+inline qint32 FrequencySpectrumModel::getNumStems() const
 {
     return m_dataCurrent.cols();
 }
@@ -277,7 +277,7 @@ inline qint32 NoiseEstimationModel::getNumStems() const
 
 //*************************************************************************************************************
 
-inline const QMap<qint32,qint32>& NoiseEstimationModel::getIdxSelMap() const
+inline const QMap<qint32,qint32>& FrequencySpectrumModel::getIdxSelMap() const
 {
     return m_qMapIdxRowSelection;
 }
@@ -285,7 +285,7 @@ inline const QMap<qint32,qint32>& NoiseEstimationModel::getIdxSelMap() const
 
 //*************************************************************************************************************
 
-inline bool NoiseEstimationModel::isFreezed() const
+inline bool FrequencySpectrumModel::isFreezed() const
 {
     return m_bIsFreezed;
 }
@@ -297,4 +297,4 @@ inline bool NoiseEstimationModel::isFreezed() const
 Q_DECLARE_METATYPE(Eigen::RowVectorXd);    /**< Provides QT META type declaration of the Eigen::RowVectorXd type. For signal/slot usage.*/
 #endif
 
-#endif // NOISEESTIMATIONMODEL_H
+#endif // FREQUENCYSPECTRUMMODEL_H
