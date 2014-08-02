@@ -135,7 +135,7 @@ MatrixXd _real_residuum_matrix(0, 0);
 
 
 //*************************************************************************************************************************************
-
+// constructor
 MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
@@ -865,12 +865,12 @@ void AtomSumWindow::paint_atom_sum(MatrixXd atom_matrix, QSize windowSize, qreal
 
 void ResiduumWindow::paintEvent(QPaintEvent* event)
 {
-   PaintResiduum(_residuum_matrix, this->size(), _signal_maximum, _signal_negative_scale);
+   paint_residuum(_residuum_matrix, this->size(), _signal_maximum, _signal_negative_scale);
 }
 
 //*************************************************************************************************************************************
 
-void ResiduumWindow::PaintResiduum(MatrixXd residuum_matrix, QSize windowSize, qreal signalMaximum, qreal signalNegativeMaximum)
+void ResiduumWindow::paint_residuum(MatrixXd residuum_matrix, QSize windowSize, qreal signalMaximum, qreal signalNegativeMaximum)
 {
     // paint window white
     QPainter painter(this);
