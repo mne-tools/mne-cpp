@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/images">
+        <file alias="rapmusic.png">images/rapmusic.png</file>
+    </qresource>
+</RCC>

@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -44,6 +44,8 @@
 
 #include "xdisp_global.h"
 #include "newmeasurementwidget.h"
+#include "helpers/covmodalitywidget.h"
+#include <disp/imagesc.h>
 
 
 //*************************************************************************************************************
@@ -51,7 +53,10 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QVBoxLayout>
 #include <QSharedPointer>
+#include <QAction>
+#include <QLabel>
 
 
 //*************************************************************************************************************
@@ -87,6 +92,7 @@ namespace XDISPLIB
 //=============================================================================================================
 
 using namespace XMEASLIB;
+using namespace DISPLIB;
 
 
 //*************************************************************************************************************
@@ -115,6 +121,7 @@ class XDISPSHARED_EXPORT RealTimeCovWidget : public NewMeasurementWidget
 {
     Q_OBJECT
 
+    friend class CovModalityWidget;
 public:
     //=========================================================================================================
     /**
@@ -152,10 +159,31 @@ public:
     */
     virtual void init();
 
+    //=========================================================================================================
+    /**
+    * Show modal the RealTimeCovWidget.
+    */
+    void showModalitySelectionWidget();
+
 private:
-    QSharedPointer<RealTimeCov> m_pRTC;         /**< The real-time covariance measurement. */
+    QSharedPointer<RealTimeCov> m_pRTC;                     /**< The real-time covariance measurement. */
+
+    QSharedPointer<CovModalityWidget>   m_pModalitySelectionWidget;     /**< Modality selection widget */
+
+    QAction* m_pActionSelectModality;           /**< Modality selection action */
 
     bool m_bInitialized;                        /**< Is Initialized */
+
+    QStringList m_qListChNames;                 /**< Channel names */
+
+    QStringList m_qListPickTypes;               /**< Channel Types to pick */
+    MatrixXd m_matSelector;                     /**< Selction matrix */
+    MatrixXd m_matSelectorT;                    /**< Transposed selction matrix */
+
+    ImageSc* m_pImageSc;                        /**< The covariance colormap */
+
+    QVBoxLayout*    m_pRtcLayout;               /**< Widget layout */
+    QLabel*         m_pLabelInit;               /**< Initialization label */
 };
 
 } // NAMESPACE

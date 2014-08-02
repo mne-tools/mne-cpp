@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -104,14 +104,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Inits RealTimeMultiSampleArrayNew and adds uiNumChannels empty channel information
-    *
-    * @param [in] uiNumChannels     the number of channels to init.
-    */
-    void init(QList<RealTimeSampleArrayChInfo> &chInfo);
-
-    //=========================================================================================================
-    /**
     * Init channel infos using fiff info
     *
     * @param[in] p_pFiffInfo     Info to init from
@@ -124,24 +116,7 @@ public:
     *
     * @return true whether the channel info is available.
     */
-    inline bool isChInit() const;
-
-    //=========================================================================================================
-    /**
-    * Returns the number of channels.
-    *
-    * @return the number of values which are gathered before a notify() is called.
-    */
-    inline unsigned int getNumChannels() const;
-
-    //=========================================================================================================
-    /**
-    * Returns the reference to the channel list.
-    *
-    * @return the reference to the channel list.
-    */
-    inline QList<RealTimeSampleArrayChInfo>& chInfo();
-
+    inline bool isInit() const;
 
     //=========================================================================================================
     /**
@@ -177,14 +152,12 @@ public:
     inline bool containsValues() const;
 
 private:
-    FiffInfo::SPtr              m_pFiffInfo_orig;   /**< Original Fiff Info if initialized by fiff info. */
+    FiffInfo::SPtr              m_pFiffInfo;   /**< Original Fiff Info if initialized by fiff info. */
 
     MatrixXd                    m_matValue;         /**< The current attached sample vector.*/
 
-    QList<RealTimeSampleArrayChInfo> m_qListChInfo; /**< Channel info list.*/
-
-    bool                        m_bChInfoIsInit;    /**< If channel info is initialized.*/
-    bool                        m_bContainsValues;  /**< If values are stored.*/
+    bool m_bIsInit;             /**< If channel info is initialized.*/
+    bool m_bContainsValues;     /**< If values are stored.*/
 };
 
 
@@ -194,25 +167,9 @@ private:
 //=============================================================================================================
 
 
-inline bool NoiseEstimation::isChInit() const
+inline bool NoiseEstimation::isInit() const
 {
-    return m_bChInfoIsInit;
-}
-
-
-//*************************************************************************************************************
-
-inline unsigned int NoiseEstimation::getNumChannels() const
-{
-    return m_qListChInfo.size();
-}
-
-
-//*************************************************************************************************************
-
-inline QList<RealTimeSampleArrayChInfo>& NoiseEstimation::chInfo()
-{
-    return m_qListChInfo;
+    return m_bIsInit;
 }
 
 
@@ -220,7 +177,7 @@ inline QList<RealTimeSampleArrayChInfo>& NoiseEstimation::chInfo()
 
 inline FiffInfo::SPtr& NoiseEstimation::getFiffInfo()
 {
-    return m_pFiffInfo_orig;
+    return m_pFiffInfo;
 }
 
 
