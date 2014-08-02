@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -110,22 +110,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns the list of labels.
-    *
-    * @return the list of labels
-    */
-    inline QList<Label> getLabels();
-
-    //=========================================================================================================
-    /**
-    * Returns the list of RGBAs.
-    *
-    * @return the list of RGBAs
-    */
-    inline QList<RowVector4i> getRGBAs();
-
-    //=========================================================================================================
-    /**
     * Sets the annotation set.
     *
     * @param[in] annotSet   the annotation set to set
@@ -158,44 +142,12 @@ public:
 
     //=========================================================================================================
     /**
-    * Sets the sampling rate of the NewRealTimeSampleArray Measurement.
-    *
-    * @param [in] dSamplingRate the sampling rate of the NewRealTimeSampleArray.
-    */
-    inline void setSamplingRate(double dSamplingRate);
-
-    //=========================================================================================================
-    /**
-    * Returns the sampling rate of the NewRealTimeSampleArray Measurement.
-    *
-    * @return the sampling rate of the NewRealTimeSampleArray.
-    */
-    inline double getSamplingRate() const;
-
-    //=========================================================================================================
-    /**
-    * Sets the number of sample vectors which should be gathered before attached observers are notified by calling the Subject notify() method.
-    *
-    * @param[in] iArraySize the number of values.
-    */
-    inline void setArraySize(qint32 iArraySize);
-
-    //=========================================================================================================
-    /**
-    * Returns the number of values which should be gathered before attached observers are notified by calling the Subject notify() method.
-    *
-    * @return the number of values which are gathered before a notify() is called.
-    */
-    inline qint32 getArraySize() const;
-
-    //=========================================================================================================
-    /**
     * Attaches a value to the sample array vector.
     * This method is inherited by Measurement.
     *
     * @param [in] v the value which is attached to the sample array vector.
     */
-    virtual void setValue(VectorXd v);
+    virtual void setValue(MNESourceEstimate &v);
 
     //=========================================================================================================
     /**
@@ -204,23 +156,7 @@ public:
     *
     * @return the last attached value.
     */
-    virtual VectorXd getValue() const;
-
-    //=========================================================================================================
-    /**
-    * Sets the source space
-    *
-    * @param[in] src    sets the source space
-    */
-    inline void setSrc(MNESourceSpace& src);
-
-    //=========================================================================================================
-    /**
-    * Returns the source space if source space is set.
-    *
-    * @return the connected source space
-    */
-    inline MNESourceSpace& getSrc();
+    virtual MNESourceEstimate::SPtr& getValue();
 
     //=========================================================================================================
     /**
@@ -230,24 +166,22 @@ public:
     */
     inline MNESourceEstimate& getStc();
 
+    //=========================================================================================================
+    /**
+    * Returns whether RealTimeEvoked contains values
+    *
+    * @return whether RealTimeEvoked contains values.
+    */
+    inline bool isInitialized() const;
 
-    bool m_bStcSend; //dirty hack
+    bool m_bStcSend; /**< dirty hack */
 
 private:
     AnnotationSet::SPtr     m_pAnnotSet;    /**< Annotation set. */
     SurfaceSet::SPtr        m_pSurfSet;     /**< Surface set. */
-    MNESourceSpace          m_pSrc;         /**< Source space. */
 
-    QList<Label> m_pListLabel;          /**< List of labels. */
-    QList<RowVector4i> m_pListRGBA;     /**< List of RGBAs corresponding to labels. */
-
-    double                      m_dSamplingRate;    /**< Sampling rate of the RealTimeSampleArray.*/
-    float                       m_fT;               /**< Time between two samples.*/
-    qint32                      m_iArraySize;      /**< Sample size of the source estimate.*/
-    qint32                      m_iCurIdx;         /**< Sample size of the multi sample array.*/
-    float                       m_fCurTimePoint;    /**< The current time point.*/
-    MNESourceEstimate           m_MNEStc;           /**< The source estimate. */
-    VectorXd                    m_vecValue;         /**< The current attached sample vector.*/
+    MNESourceEstimate::SPtr m_pMNEStc;      /**< The source estimate. */
+    bool m_bInitialized;                    /**< Is initialized */
 };
 
 
@@ -255,26 +189,6 @@ private:
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
-
-inline QList<Label> RealTimeSourceEstimate::getLabels()
-{
-    if(m_pListLabel.size() == 0 && m_pAnnotSet.isNull() && m_pSurfSet.isNull())
-        m_pAnnotSet->toLabels(*m_pSurfSet.data(), m_pListLabel, m_pListRGBA);
-    return m_pListLabel;
-}
-
-
-//*************************************************************************************************************
-
-inline QList<RowVector4i> RealTimeSourceEstimate::getRGBAs()
-{
-    if(m_pListRGBA.size() == 0 && m_pAnnotSet.isNull() && m_pSurfSet.isNull())
-        m_pAnnotSet->toLabels(*m_pSurfSet.data(), m_pListLabel, m_pListRGBA);
-    return m_pListRGBA;
-}
-
-
-//*************************************************************************************************************
 
 inline void RealTimeSourceEstimate::setAnnotSet(AnnotationSet::SPtr& annotSet)
 {
@@ -308,68 +222,9 @@ inline SurfaceSet::SPtr& RealTimeSourceEstimate::getSurfSet()
 
 //*************************************************************************************************************
 
-inline void RealTimeSourceEstimate::setSamplingRate(double dSamplingRate)
+inline bool RealTimeSourceEstimate::isInitialized() const
 {
-    m_dSamplingRate = dSamplingRate;
-    m_fT = 1.0f/(float)dSamplingRate;
-
-    m_MNEStc.tstep = m_fT;
-}
-
-
-//*************************************************************************************************************
-
-inline double RealTimeSourceEstimate::getSamplingRate() const
-{
-    return m_dSamplingRate;
-}
-
-
-//*************************************************************************************************************
-
-inline void RealTimeSourceEstimate::setArraySize(qint32 iArraySize)
-{
-    //Obsolete unsigned char can't be bigger
-    if(iArraySize > 255)
-        m_iArraySize = 255;
-    else
-        m_iArraySize = iArraySize;
-
-    //reset data
-    m_MNEStc.data = MatrixXd(0,0);
-    m_MNEStc.times = RowVectorXf::Zero(m_iArraySize);
-}
-
-
-//*************************************************************************************************************
-
-qint32 RealTimeSourceEstimate::getArraySize() const
-{
-    return m_iArraySize;
-}
-
-
-//*************************************************************************************************************
-
-inline void RealTimeSourceEstimate::setSrc(MNESourceSpace& src)
-{
-    m_pSrc = src;
-}
-
-
-//*************************************************************************************************************
-
-inline MNESourceSpace& RealTimeSourceEstimate::getSrc()
-{
-    return m_pSrc;
-}
-
-
-//*************************************************************************************************************
-
-inline MNESourceEstimate& RealTimeSourceEstimate::getStc()
-{
-    return m_MNEStc;
+    return m_bInitialized;
 }
 
 } // NAMESPACE

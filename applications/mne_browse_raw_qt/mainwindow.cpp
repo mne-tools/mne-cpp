@@ -18,12 +18,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -90,6 +90,7 @@ void MainWindow::setupModel()
 {
 //    m_pRawModel = new RawModel(this);
     m_pRawModel = new RawModel(m_qFileRaw,this);
+    m_pEventModel = new EventModel(this);
 }
 
 
@@ -106,9 +107,14 @@ void MainWindow::setupDelegate()
 void MainWindow::setupView()
 {
     m_pTableView = new QTableView;
+    m_pEventTableView = new QTableView;
 
-    m_pTableView->setModel(m_pRawModel); //set custom model
-    m_pTableView->setItemDelegate(m_pRawDelegate); //set custom delegate
+    //set custom models
+    m_pEventTableView->setModel(m_pEventModel);
+    m_pTableView->setModel(m_pRawModel);
+
+    //set custom delegate
+    m_pTableView->setItemDelegate(m_pRawDelegate);
 
     //TableView settings
     setupViewSettings();
@@ -177,6 +183,9 @@ void MainWindow::createMenus() {
     QAction *writeAction = fileMenu->addAction(tr("&Save As..."));
     openAction->setShortcuts(QKeySequence::SaveAs);
     connect(writeAction, SIGNAL(triggered()), this, SLOT(writeFile()));
+
+    QAction *loadEvents = fileMenu->addAction(tr("&Load Events..."));
+    connect(loadEvents, SIGNAL(triggered()), this, SLOT(loadEvents()));
 
     QAction *quitAction = fileMenu->addAction(tr("E&xit"));
     quitAction->setShortcuts(QKeySequence::Quit);
@@ -323,6 +332,28 @@ void MainWindow::writeFile()
 
 //*************************************************************************************************************
 
+void MainWindow::loadEvents()
+{
+    QString filename = QFileDialog::getOpenFileName(this,QString("Open fiff event data file"),QString("./MNE-sample-data/MEG/sample/"),tr("fif event data files (*-eve.fif);;fif data files (*.fif)"));
+    if(m_qFileRaw.isOpen())
+        m_qFileRaw.close();
+    m_qFileRaw.setFileName(filename);
+
+    if(m_pEventModel->loadEventData(m_qFileRaw)) {
+        qDebug() << "Fiff event data file" << filename << "loaded.";
+    }
+    else
+        qDebug("ERROR loading fiff event data file %s",filename.toLatin1().data());
+
+    setWindowStatus();
+
+    //set position of QScrollArea
+    setScrollBarPosition(0);
+}
+
+
+//*************************************************************************************************************
+
 void MainWindow::customContextMenuRequested(QPoint pos)
 {
     //obtain index where index was clicked
@@ -433,11 +464,11 @@ void MainWindow::about()
              " following disclaimer.\n"
              "\t* Redistributions in binary form must reproduce the above copyright notice, this list of conditions and"
              " the following disclaimer in the documentation and/or other materials provided with the distribution.\n"
-             "\t* Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used"
+             "\t* Neither the name of MNE-CPP authors nor the names of its contributors may be used"
              " to endorse or promote products derived from this software without specific prior written permission.\n\n"
              "THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\" AND ANY EXPRESS OR IMPLIED"
              " WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A"
-             " PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,"
+             " PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,"
              " INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,"
              " PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)"
              " HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING"

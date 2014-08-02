@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -54,9 +54,7 @@
 #include <mne/mne_forwardsolution.h>
 #include <mne/mne_sourceestimate.h>
 #include <inverse/minimumNorm/minimumnorm.h>
-#include <rtInv/rtcov.h>
 #include <rtInv/rtinvop.h>
-#include <rtInv/rtave.h>
 
 #include <xMeas/realtimesourceestimate.h>
 #include <xMeas/realtimecov.h>
@@ -142,7 +140,10 @@ public:
     */
     void init();
 
+    void calcFiffInfo();
+
     void doClustering();
+
     void finishedClustering();
 
     virtual bool start();
@@ -164,6 +165,7 @@ public:
     /**
     * Slot to update the fiff evoked
     *
+    * @param[in] pMeasurement   The evoked to be appended
     */
     void updateRTE(XMEASLIB::NewMeasurement::SPtr pMeasurement);
 
@@ -199,7 +201,7 @@ private:
 
     QMutex mutex;
 
-    QVector<FiffEvoked>     m_qVecFiffEvoked;
+    QVector<FiffEvoked> m_qVecFiffEvoked;
     qint32 m_iNumAverages;
 
     QVector<FiffCov>        m_qVecFiffCov;
@@ -222,6 +224,11 @@ private:
 
 
     FiffInfo::SPtr              m_pFiffInfo;        /**< Fiff information. */
+    FiffInfo::SPtr              m_pFiffInfoEvoked;  /**< Fiff information of the evoked. */
+    QStringList                 m_qListCovChNames;  /**< Covariance channel names. */
+    FiffInfoBase::SPtr          m_pFiffInfoForward; /**< Fiff information of the forward solution. */
+
+    QStringList                 m_qListPickChannels;        /**< Channels to pick */
 
     RtInvOp::SPtr               m_pRtInvOp;         /**< Real-time inverse operator. */
     MNEInverseOperator::SPtr    m_pInvOp;           /**< The inverse operator. */

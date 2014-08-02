@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -191,9 +191,9 @@ public:
     /**
     * Sets the number of sample vectors which should be gathered before attached observers are notified by calling the Subject notify() method.
     *
-    * @param [in] ucMultiArraySize the number of values.
+    * @param [in] iMultiArraySize the number of values.
     */
-    inline void setMultiArraySize(unsigned char ucMultiArraySize);
+    inline void setMultiArraySize(qint32 iMultiArraySize);
 
     //=========================================================================================================
     /**
@@ -201,7 +201,7 @@ public:
     *
     * @return the number of values which are gathered before a notify() is called.
     */
-    inline unsigned char getMultiArraySize() const;
+    inline qint32 getMultiArraySize() const;
 
     //=========================================================================================================
     /**
@@ -234,7 +234,7 @@ private:
     QString                     m_sXMLLayoutFile;   /**< Layout file name. */
     double                      m_dSamplingRate;    /**< Sampling rate of the RealTimeSampleArray.*/
     VectorXd                    m_vecValue;         /**< The current attached sample vector.*/
-    unsigned char               m_ucMultiArraySize; /**< Sample size of the multi sample array.*/
+    qint32                      m_iMultiArraySize; /**< Sample size of the multi sample array.*/
     QVector< VectorXd >         m_matSamples;       /**< The multi sample array.*/
     QList<RealTimeSampleArrayChInfo> m_qListChInfo; /**< Channel info list.*/
     bool                        m_bChInfoIsInit;    /**< If channel info is initialized.*/
@@ -318,21 +318,21 @@ inline FiffInfo::SPtr& NewRealTimeMultiSampleArray::getFiffInfo()
 
 //*************************************************************************************************************
 
-inline void NewRealTimeMultiSampleArray::setMultiArraySize(unsigned char ucMultiArraySize)
+inline void NewRealTimeMultiSampleArray::setMultiArraySize(qint32 iMultiArraySize)
 {
     //Obsolete unsigned char can't be bigger
 //    if(ucArraySize > 255)
 //        m_ucArraySize = 255;
 //    else
-        m_ucMultiArraySize = ucMultiArraySize;
+        m_iMultiArraySize = iMultiArraySize;
 }
 
 
 //*************************************************************************************************************
 
-unsigned char NewRealTimeMultiSampleArray::getMultiArraySize() const
+qint32 NewRealTimeMultiSampleArray::getMultiArraySize() const
 {
-    return m_ucMultiArraySize;
+    return m_iMultiArraySize;
 }
 
 

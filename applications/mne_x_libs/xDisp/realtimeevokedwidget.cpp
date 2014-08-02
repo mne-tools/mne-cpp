@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -69,7 +69,6 @@
 
 #include <QPaintEvent>
 #include <QPainter>
-#include <QVBoxLayout>
 #include <QHeaderView>
 #include <QMenu>
 #include <QMessageBox>
@@ -131,17 +130,28 @@ RealTimeEvokedWidget::RealTimeEvokedWidget(QSharedPointer<RealTimeEvoked> pRTE, 
 //    connect(m_pActionSelectSensors, &QAction::triggered, this, &RealTimeEvokedWidget::showSensorSelectionWidget);
 //    addDisplayAction(m_pActionSelectSensors);
 
+
+    //set vertical layout
+    m_pRteLayout = new QVBoxLayout(this);
+
+    m_pLabelInit= new QLabel;
+    m_pLabelInit->setText("Acquiring Data");
+    m_pLabelInit->setAlignment(Qt::AlignCenter);
+    QFont font;font.setBold(true);font.setPointSize(20);
+    m_pLabelInit->setFont(font);
+    m_pRteLayout->addWidget(m_pLabelInit);
+
     if(m_pButterflyPlot)
         delete m_pButterflyPlot;
     m_pButterflyPlot = new RealTimeButterflyPlot;
+    m_pButterflyPlot->hide();
 
-    //set vertical layout
-    QVBoxLayout *rteLayout = new QVBoxLayout(this);
+    m_pRteLayout->addWidget(m_pButterflyPlot);
 
-    rteLayout->addWidget(m_pButterflyPlot);
+
 
     //set layouts
-    this->setLayout(rteLayout);
+    this->setLayout(m_pRteLayout);
 
     getData();
 }
@@ -196,12 +206,18 @@ void RealTimeEvokedWidget::getData()
         m_pRTEModel->updateData();
 }
 
+
 //*************************************************************************************************************
 
 void RealTimeEvokedWidget::init()
 {
     if(m_qListChInfo.size() > 0)
     {
+        m_pRteLayout->removeWidget(m_pLabelInit);
+        m_pLabelInit->hide();
+
+        m_pButterflyPlot->show();
+
         if(m_pRTEModel)
             delete m_pRTEModel;
         m_pRTEModel = new RealTimeEvokedModel(this);
