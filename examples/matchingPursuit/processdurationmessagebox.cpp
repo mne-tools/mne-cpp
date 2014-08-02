@@ -49,7 +49,8 @@
 #include "QtGui"
 
 //=============================================================================================================
-processdurationmessagebox::processdurationmessagebox(QWidget *parent) :    QDialog(parent),    ui(new Ui::processdurationmessagebox)
+//constructor
+processdurationmessagebox::processdurationmessagebox(QWidget *parent):QDialog(parent),ui(new Ui::processdurationmessagebox)
 {
     ui->setupUi(this);
 }
