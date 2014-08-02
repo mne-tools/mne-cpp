@@ -184,6 +184,8 @@ private:
     RealTimeEvokedModel*        m_pRTEModel;            /**< RTE data model */
     RealTimeButterflyPlot*      m_pButterflyPlot;       /**< Butterfly plot */
 
+    QAction* m_pActionSelectModality;           /**< Modality selection action */
+
     float m_fZoomFactor;                                    /**< Zoom factor */
     QDoubleSpinBox* m_pDoubleSpinBoxZoom;                   /**< Adjust Zoom Factor */
 

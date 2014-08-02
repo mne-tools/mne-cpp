@@ -114,6 +114,12 @@ RealTimeEvokedWidget::RealTimeEvokedWidget(QSharedPointer<RealTimeEvoked> pRTE, 
 {
     Q_UNUSED(pTime)
 
+    m_pActionSelectModality = new QAction(QIcon(":/images/evokedSettings.png"), tr("Shows the covariance modality selection widget (F12)"),this);
+    m_pActionSelectModality->setShortcut(tr("F12"));
+    m_pActionSelectModality->setStatusTip(tr("Shows the covariance modality selection widget (F12)"));
+//    connect(m_pActionSelectModality, &QAction::triggered, this, &RealTimeCovWidget::showModalitySelectionWidget);
+    addDisplayAction(m_pActionSelectModality);
+
     m_pDoubleSpinBoxZoom = new QDoubleSpinBox(this);
     m_pDoubleSpinBoxZoom->setMinimum(0.3);
     m_pDoubleSpinBoxZoom->setMaximum(4.0);
