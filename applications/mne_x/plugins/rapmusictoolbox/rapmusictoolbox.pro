@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     raplab.pro
+# @file     rapmusictoolbox.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
 # @version  1.0
 # @date     March, 2014
@@ -28,7 +28,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file generates the makefile for the raplab plug-in.
+# @brief    This project file generates the makefile for the rapmusictoolbox plug-in.
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -38,12 +38,12 @@ TEMPLATE = lib
 
 CONFIG += plugin
 
-DEFINES += RAPMUSIC_LIBRARY
+DEFINES += RAPMUSICTOOLBOX_LIBRARY
 
-QT += core widgets
+QT += core widgets concurrent
 #QT += concurrent
 
-TARGET = rapmusic
+TARGET = rapmusictoolbox
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
@@ -77,19 +77,19 @@ else {
 DESTDIR = $${MNE_BINARY_DIR}/mne_x_plugins
 
 SOURCES += \
-        rapmusic.cpp \
-        FormFiles/rapmusicsetupwidget.cpp \
-        FormFiles/rapmusicaboutwidget.cpp
+        rapmusictoolbox.cpp \
+        FormFiles/rapmusictoolboxsetupwidget.cpp \
+        FormFiles/rapmusictoolboxaboutwidget.cpp
 
 HEADERS += \
-        rapmusic.h\
-        rapmusic_global.h \
-        FormFiles/rapmusicsetupwidget.h \
-        FormFiles/rapmusicaboutwidget.h
+        rapmusictoolbox.h\
+        rapmusictoolbox_global.h \
+        FormFiles/rapmusictoolboxsetupwidget.h \
+        FormFiles/rapmusictoolboxaboutwidget.h
 
 FORMS += \
-        FormFiles/rapmusicsetup.ui \
-        FormFiles/rapmusicabout.ui
+        FormFiles/rapmusictoolboxsetup.ui \
+        FormFiles/rapmusictoolboxabout.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
@@ -104,3 +104,6 @@ unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
 
 # suppress visibility warnings
 unix: QMAKE_CXXFLAGS += -Wno-attributes
+
+RESOURCES += \
+    rapmusictoolbox.qrc

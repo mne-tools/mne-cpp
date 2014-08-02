@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     rapmusicsetupwidget.h
+* @file     rapmusictoolboxsetupwidget.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the RapMusicSetupWidget class.
+* @brief    Contains the declaration of the RapMusicToolboxSetupWidget class.
 *
 */
 
-#ifndef RAPMUSICSETUPWIDGET_H
-#define RAPMUSICSETUPWIDGET_H
+#ifndef RAPMUSICTOOLBOXSETUPWIDGET_H
+#define RAPMUSICTOOLBOXSETUPWIDGET_H
 
 
 //*************************************************************************************************************
@@ -42,7 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_rapmusicsetup.h"
+#include "../ui_rapmusictoolboxsetup.h"
 
 
 //*************************************************************************************************************
@@ -62,10 +62,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE RapMusicPlugin
+// DEFINE NAMESPACE RapMusicToolboxPlugin
 //=============================================================================================================
 
-namespace RapMusicPlugin
+namespace RapMusicToolboxPlugin
 {
 
 
@@ -74,7 +74,7 @@ namespace RapMusicPlugin
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class RapMusic;
+class RapMusicToolbox;
 
 
 //=============================================================================================================
@@ -83,7 +83,7 @@ class RapMusic;
 *
 * @brief The DummySetupWidget class provides the DummyToolbox configuration window.
 */
-class RapMusicSetupWidget : public QWidget
+class RapMusicToolboxSetupWidget : public QWidget
 {
     Q_OBJECT
 
@@ -91,21 +91,40 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a RapMusicSetupWidget which is a child of parent.
+    * Constructs a RapMusicToolboxSetupWidget which is a child of parent.
     *
     * @param [in] toolbox a pointer to the corresponding RapMusicToolbox.
-    * @param [in] parent pointer to parent widget; If parent is 0, the new RapMusicSetupWidget becomes a window. If parent is another widget, DummySetupWidget becomes a child window inside parent. DummySetupWidget is deleted when its parent is deleted.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new RapMusicToolboxSetupWidget becomes a window. If parent is another widget, DummySetupWidget becomes a child window inside parent. DummySetupWidget is deleted when its parent is deleted.
     */
-    RapMusicSetupWidget(RapMusic* toolbox, QWidget *parent = 0);
+    RapMusicToolboxSetupWidget(RapMusicToolbox* toolbox, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the RapMusicSetupWidget.
-    * All RapMusicSetupWidget's children are deleted first. The application exits if RapMusicSetupWidget is the main widget.
+    * Destroys the RapMusicToolboxSetupWidget.
+    * All RapMusicToolboxSetupWidget's children are deleted first. The application exits if RapMusicToolboxSetupWidget is the main widget.
     */
-    ~RapMusicSetupWidget();
+    ~RapMusicToolboxSetupWidget();
+
+    //=========================================================================================================
+    /**
+    * Adapts the UI to clustering state
+    */
+    void setClusteringState();
+
+    //=========================================================================================================
+    /**
+    * Adapts the UI to setup state
+    */
+    void setSetupState();
 
 private:
+
+    //=========================================================================================================
+    /**
+    * Triggers th cluster process
+    */
+    void clusteringTriggered();
+
     //=========================================================================================================
     /**
     * Shows the About Dialogs
@@ -131,11 +150,11 @@ private:
     void showSurfaceDirDialog();
 
 
-    RapMusic* m_pRapMusic;            /**< Holds a pointer to corresponding RapMusic.*/
+    RapMusicToolbox* m_pRapMusicToolbox;            /**< Holds a pointer to corresponding DummyToolbox.*/
 
-    Ui::RapMusicSetupWidgetClass ui;   /**< Holds the user interface for the RapMusicSetupWidget.*/
+    Ui::RapMusicToolboxSetupWidgetClass ui;   /**< Holds the user interface for the DummySetupWidget.*/
 };
 
 } // NAMESPACE
 
-#endif // RAPMUSICSETUPWIDGET_H
+#endif // RAPMUSICTOOLBOXSETUPWIDGET_H

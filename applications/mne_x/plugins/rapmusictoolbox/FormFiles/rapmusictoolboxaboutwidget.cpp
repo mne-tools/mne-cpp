@@ -1,13 +1,14 @@
 //=============================================================================================================
 /**
-* @file     rapmusicaboutwidget.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
+* @file     rapmusictoolboxaboutwidget.cpp
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     March, 2014
+* @date     February, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Christoph Dinh. All rights reserved.
+* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -28,72 +29,41 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the RapMusicAboutWidget class.
+* @brief    Contains the implementation of the RapMusicToolboxAboutWidget class.
 *
 */
-
-#ifndef RAPMUSICABOUTWIDGET_H
-#define RAPMUSICABOUTWIDGET_H
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_rapmusicabout.h"
+#include "rapmusictoolboxaboutwidget.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// USED NAMESPACES
 //=============================================================================================================
 
-#include <QtWidgets>
+using namespace RapMusicToolboxPlugin;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE RapMusicPlugin
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-namespace RapMusicPlugin
+RapMusicToolboxAboutWidget::RapMusicToolboxAboutWidget(QWidget *parent)
+: QDialog(parent)
+{
+    ui.setupUi(this);
+}
+
+
+//*************************************************************************************************************
+
+RapMusicToolboxAboutWidget::~RapMusicToolboxAboutWidget()
 {
 
-
-//=============================================================================================================
-/**
-* DECLARE CLASS RapMusicAboutWidget
-*
-* @brief The RapMusicAboutWidget class provides the about dialog for the RapMusic.
-*/
-class RapMusicAboutWidget : public QDialog
-{
-    Q_OBJECT
-
-public:
-
-    //=========================================================================================================
-    /**
-    * Constructs a RapMusicAboutWidget dialog which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new RapMusicAboutWidget becomes a window. If parent is another widget, DummyAboutWidget becomes a child window inside parent. DummyAboutWidget is deleted when its parent is deleted.
-    */
-    RapMusicAboutWidget(QWidget *parent = 0);
-
-    //=========================================================================================================
-    /**
-    * Destroys the RapMusicAboutWidget.
-    * All DummyAboutWidget's children are deleted first. The application exits if RapMusicAboutWidget is the main widget.
-    */
-    ~RapMusicAboutWidget();
-
-private:
-
-    Ui::RapMusicAboutWidgetClass ui;		/**< Holds the user interface for the RapMusicAboutWidget.*/
-
-};
-
-} // NAMESPACE
-
-#endif // RAPMUSICABOUTWIDGET_H
+}
