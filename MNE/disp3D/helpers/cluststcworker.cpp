@@ -64,7 +64,7 @@ using namespace DISP3DLIB;
 
 ClustStcWorker::ClustStcWorker(QObject *parent)
 : QObject(parent)
-, m_bIsLooping(true)
+, m_bIsLooping(false)
 , m_iAverageSamples(10)
 , m_iCurrentSample(0)
 , m_iUSecIntervall(100)
@@ -77,10 +77,11 @@ ClustStcWorker::ClustStcWorker(QObject *parent)
 
 void ClustStcWorker::addData(QList<VectorXd> &data)
 {
+    if(data.size() == 0)
+        return;
+
     m_qMutex.lock();
     m_data.append(data);
-
-    qDebug() << "addData" << m_data.size();
     m_qMutex.unlock();
 }
 
@@ -103,7 +104,7 @@ void ClustStcWorker::process()
 
     while(true)
     {
-        if(!m_data.isEmpty())
+        if(!m_data.isEmpty() && m_data.size() > 0)
         {
             if(m_bIsLooping)
             {
@@ -133,7 +134,6 @@ void ClustStcWorker::process()
             {
                 m_vecAverage /= (double)m_iAverageSamples;
 
-                qDebug() << "emit sample";
                 emit stcSample(m_vecAverage);
                 m_vecAverage = VectorXd::Zero(m_vecAverage.rows());
             }

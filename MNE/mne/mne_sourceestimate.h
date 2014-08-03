@@ -176,7 +176,7 @@ public:
     *
     * @return true if is empty, false otherwise
     */
-    inline bool isEmpty();
+    inline bool isEmpty() const;
 
     //=========================================================================================================
     /**
@@ -210,7 +210,7 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline bool MNESourceEstimate::isEmpty()
+inline bool MNESourceEstimate::isEmpty() const
 {
     return tstep == -1;
 }

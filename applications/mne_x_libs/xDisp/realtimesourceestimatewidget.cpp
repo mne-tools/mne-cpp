@@ -118,8 +118,8 @@ RealTimeSourceEstimateWidget::RealTimeSourceEstimateWidget(QSharedPointer<RealTi
     QSlider* pSliderNormView = new QSlider(Qt::Vertical);
     QObject::connect(pSliderNormView, &QSlider::valueChanged, m_pClustStcModel, &ClustStcModel::setNormalization);
     pSliderNormView->setMinimum(1);
-    pSliderNormView->setMaximum(100);
-    pSliderNormView->setValue(60);
+    pSliderNormView->setMaximum(20000);
+    pSliderNormView->setValue(2000);
 
     QLabel * pLabelAverageView = new QLabel("Average");
     QSlider* pSliderAverageView = new QSlider(Qt::Horizontal);
