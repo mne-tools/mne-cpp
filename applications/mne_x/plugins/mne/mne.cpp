@@ -417,7 +417,9 @@ void MNE::run()
                 float tmin = ((float)t_fiffEvoked.first) / t_fiffEvoked.info.sfreq;
                 float tstep = 1/t_fiffEvoked.info.sfreq;
 
+                mutex.lock();
                 MNESourceEstimate sourceEstimate = m_pMinimumNorm->calculateInverse(t_fiffEvoked.data, tmin, tstep);
+                mutex.unlock();
 
                 m_pRTSEOutput->data()->setValue(sourceEstimate);
             }

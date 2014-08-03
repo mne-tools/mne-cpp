@@ -105,14 +105,17 @@ void ClustStcWorker::process()
         {
             if(m_bIsLooping)
             {
+                m_qMutex.lock();
                 //Down sampling in loop mode
                 if(m_vecAverage.rows() != m_data[0].rows())
                     m_vecAverage = m_data[m_iCurrentSample%m_data.size()];
                 else
                     m_vecAverage += m_data[m_iCurrentSample%m_data.size()];
+                m_qMutex.unlock();
             }
             else
             {
+                m_qMutex.lock();
                 //Down sampling in stream mode
                 if(m_vecAverage.rows() != m_data[0].rows())
                     m_vecAverage = m_data.front();
@@ -120,6 +123,7 @@ void ClustStcWorker::process()
                     m_vecAverage += m_data.front();
 
                 m_data.pop_front();
+                m_qMutex.unlock();
             }
             ++m_iCurrentSample;
 

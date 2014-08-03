@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     noiseestimationmodel.cpp
+* @file     frequencyspectrummodel.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,11 +29,11 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the NoiseEstimationModel Class.
+* @brief    Implementation of the FrequencySpectrumModel Class.
 *
 */
 
-#include "noiseestimationmodel.h"
+#include "frequencyspectrummodel.h"
 
 #include <QDebug>
 #include <QBrush>
@@ -53,7 +53,7 @@ using namespace XDISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-NoiseEstimationModel::NoiseEstimationModel(QObject *parent)
+FrequencySpectrumModel::FrequencySpectrumModel(QObject *parent)
 : QAbstractTableModel(parent)
 , m_fSps(1024.0f)
 , m_iT(10)
@@ -64,7 +64,7 @@ NoiseEstimationModel::NoiseEstimationModel(QObject *parent)
 
 //*************************************************************************************************************
 //virtual functions
-int NoiseEstimationModel::rowCount(const QModelIndex & /*parent*/) const
+int FrequencySpectrumModel::rowCount(const QModelIndex & /*parent*/) const
 {
     if(!m_qMapIdxRowSelection.empty())
         return m_qMapIdxRowSelection.size();
@@ -75,7 +75,7 @@ int NoiseEstimationModel::rowCount(const QModelIndex & /*parent*/) const
 
 //*************************************************************************************************************
 
-int NoiseEstimationModel::columnCount(const QModelIndex & /*parent*/) const
+int FrequencySpectrumModel::columnCount(const QModelIndex & /*parent*/) const
 {
     return 2;
 }
@@ -83,7 +83,7 @@ int NoiseEstimationModel::columnCount(const QModelIndex & /*parent*/) const
 
 //*************************************************************************************************************
 
-QVariant NoiseEstimationModel::data(const QModelIndex &index, int role) const
+QVariant FrequencySpectrumModel::data(const QModelIndex &index, int role) const
 {
     if(role != Qt::DisplayRole && role != Qt::BackgroundRole)
         return QVariant();
@@ -145,7 +145,7 @@ QVariant NoiseEstimationModel::data(const QModelIndex &index, int role) const
 
 //*************************************************************************************************************
 
-QVariant NoiseEstimationModel::headerData(int section, Qt::Orientation orientation, int role) const
+QVariant FrequencySpectrumModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
     if(role != Qt::DisplayRole && role != Qt::TextAlignmentRole)
         return QVariant();
@@ -178,7 +178,7 @@ QVariant NoiseEstimationModel::headerData(int section, Qt::Orientation orientati
 
 //*************************************************************************************************************
 
-void NoiseEstimationModel::setInfo(FiffInfo::SPtr &info)
+void FrequencySpectrumModel::setInfo(FiffInfo::SPtr &info)
 {
     beginResetModel();
     m_pFiffInfo = info;
@@ -191,7 +191,7 @@ void NoiseEstimationModel::setInfo(FiffInfo::SPtr &info)
 
 //*************************************************************************************************************
 
-void NoiseEstimationModel::addData(const MatrixXd &data)
+void FrequencySpectrumModel::addData(const MatrixXd &data)
 {
     m_dataCurrent = data;
 
@@ -222,7 +222,7 @@ void NoiseEstimationModel::addData(const MatrixXd &data)
 
 //*************************************************************************************************************
 
-void NoiseEstimationModel::selectRows(const QList<qint32> &selection)
+void FrequencySpectrumModel::selectRows(const QList<qint32> &selection)
 {
     beginResetModel();
 
@@ -246,7 +246,7 @@ void NoiseEstimationModel::selectRows(const QList<qint32> &selection)
 
 //*************************************************************************************************************
 
-void NoiseEstimationModel::resetSelection()
+void FrequencySpectrumModel::resetSelection()
 {
     beginResetModel();
 
@@ -261,7 +261,7 @@ void NoiseEstimationModel::resetSelection()
 
 //*************************************************************************************************************
 
-void NoiseEstimationModel::toggleFreeze(const QModelIndex &)
+void FrequencySpectrumModel::toggleFreeze(const QModelIndex &)
 {
     m_bIsFreezed = !m_bIsFreezed;
 

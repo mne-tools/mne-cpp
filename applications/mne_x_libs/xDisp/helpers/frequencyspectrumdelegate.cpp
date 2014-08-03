@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     noiseestimationdelegate.cpp
+* @file     frequencyspectrumdelegate.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the NoiseEstimationDelegate Class.
+* @brief    Implementation of the FrequencySpectrumDelegate Class.
 *
 */
 
@@ -38,9 +38,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "noiseestimationdelegate.h"
+#include "frequencyspectrumdelegate.h"
 
-#include "noiseestimationmodel.h"
+#include "frequencyspectrummodel.h"
 
 
 //*************************************************************************************************************
@@ -67,7 +67,7 @@ using namespace XDISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-NoiseEstimationDelegate::NoiseEstimationDelegate(QObject *parent)
+FrequencySpectrumDelegate::FrequencySpectrumDelegate(QObject *parent)
 : QAbstractItemDelegate(parent)
 {
 
@@ -76,7 +76,7 @@ NoiseEstimationDelegate::NoiseEstimationDelegate(QObject *parent)
 
 //*************************************************************************************************************
 
-void NoiseEstimationDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+void FrequencySpectrumDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     float t_fPlotHeight = option.rect.height();
     switch(index.column()) {
@@ -114,7 +114,7 @@ void NoiseEstimationDelegate::paint(QPainter *painter, const QStyleOptionViewIte
             RowVectorXd data = variant.value< RowVectorXd >();
 
 
-            const NoiseEstimationModel* t_pModel = static_cast<const NoiseEstimationModel*>(index.model());
+            const FrequencySpectrumModel* t_pModel = static_cast<const FrequencySpectrumModel*>(index.model());
 
             if(data.size() > 0)
             {
@@ -159,7 +159,7 @@ void NoiseEstimationDelegate::paint(QPainter *painter, const QStyleOptionViewIte
 
 //*************************************************************************************************************
 
-QSize NoiseEstimationDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
+QSize FrequencySpectrumDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     QSize size;
 
@@ -169,7 +169,7 @@ QSize NoiseEstimationDelegate::sizeHint(const QStyleOptionViewItem &option, cons
         break;
     case 1:
         RowVectorXd data = index.model()->data(index).value< RowVectorXd >();
-//        qint32 nsamples = (static_cast<const NoiseEstimationModel*>(index.model()))->lastSample()-(static_cast<const NoiseEstimationModel*>(index.model()))->firstSample();
+//        qint32 nsamples = (static_cast<const FrequencySpectrumModel*>(index.model()))->lastSample()-(static_cast<const FrequencySpectrumModel*>(index.model()))->firstSample();
 
 //        size = QSize(nsamples*m_dDx,m_dPlotHeight);
         Q_UNUSED(option);
@@ -183,9 +183,9 @@ QSize NoiseEstimationDelegate::sizeHint(const QStyleOptionViewItem &option, cons
 
 //*************************************************************************************************************
 
-void NoiseEstimationDelegate::createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorXd& data) const
+void FrequencySpectrumDelegate::createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorXd& data) const
 {
-    const NoiseEstimationModel* t_pModel = static_cast<const NoiseEstimationModel*>(index.model());
+    const FrequencySpectrumModel* t_pModel = static_cast<const FrequencySpectrumModel*>(index.model());
 
     float fMaxValue = data.maxCoeff();
 
@@ -227,11 +227,11 @@ void NoiseEstimationDelegate::createPlotPath(const QModelIndex &index, const QSt
 
 //*************************************************************************************************************
 
-void NoiseEstimationDelegate::createGridPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorXd& data) const
+void FrequencySpectrumDelegate::createGridPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorXd& data) const
 {
     Q_UNUSED(data)
 
-    const NoiseEstimationModel* t_pModel = static_cast<const NoiseEstimationModel*>(index.model());
+    const FrequencySpectrumModel* t_pModel = static_cast<const FrequencySpectrumModel*>(index.model());
 
     if(t_pModel->getInfo())
     {
