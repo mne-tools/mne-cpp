@@ -108,11 +108,11 @@ SOURCES += \
     helpers/realtimeevokedmodel.cpp \
     realtimeevokedwidget.cpp \
     helpers/realtimebutterflyplot.cpp \
-    noiseestimationwidget.cpp \
     realtimecovwidget.cpp \
-    helpers/noiseestimationdelegate.cpp \
-    helpers/noiseestimationmodel.cpp \
-    helpers/covmodalitywidget.cpp
+    helpers/covmodalitywidget.cpp \
+    frequencyspectrumwidget.cpp \
+    helpers/frequencyspectrummodel.cpp \
+    helpers/frequencyspectrumdelegate.cpp
 
 HEADERS += \
     xdisp_global.h \
@@ -130,11 +130,11 @@ HEADERS += \
     helpers/realtimeevokedmodel.h \
     realtimeevokedwidget.h \
     helpers/realtimebutterflyplot.h \
-    noiseestimationwidget.h \
     realtimecovwidget.h \
-    helpers/noiseestimationdelegate.h \
-    helpers/noiseestimationmodel.h \
-    helpers/covmodalitywidget.h
+    helpers/covmodalitywidget.h \
+    frequencyspectrumwidget.h \
+    helpers/frequencyspectrumdelegate.h \
+    helpers/frequencyspectrummodel.h
 
 FORMS += \
     realtimesamplearraywidget.ui

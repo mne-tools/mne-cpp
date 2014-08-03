@@ -48,14 +48,14 @@
 #endif
 #include <xDisp/realtimeevokedwidget.h>
 #include <xDisp/realtimecovwidget.h>
-#include <xDisp/noiseestimationwidget.h>
+#include <xDisp/frequencyspectrumwidget.h>
 
 #include <xMeas/newrealtimesamplearray.h>
 #include <xMeas/newrealtimemultisamplearray.h>
 #include <xMeas/realtimesourceestimate.h>
 #include <xMeas/realtimeevoked.h>
 #include <xMeas/realtimecov.h>
-#include <xMeas/noiseestimation.h>
+#include <xMeas/frequencyspectrum.h>
 
 
 //#include <xDisp/measurementwidget.h>
@@ -200,20 +200,20 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
             vboxLayout->addWidget(rtcWidget);
             rtcWidget->init();
         }
-        else if(pPluginOutputConnector.dynamicCast< PluginOutputData<NoiseEstimation> >())
+        else if(pPluginOutputConnector.dynamicCast< PluginOutputData<FrequencySpectrum> >())
         {
-            QSharedPointer<NoiseEstimation>* pNoiseEstimation = &pPluginOutputConnector.dynamicCast< PluginOutputData<NoiseEstimation> >()->data();
+            QSharedPointer<FrequencySpectrum>* pFrequencySpectrum = &pPluginOutputConnector.dynamicCast< PluginOutputData<FrequencySpectrum> >()->data();
 
-            NoiseEstimationWidget* neWidget = new NoiseEstimationWidget(*pNoiseEstimation, pT, newDisp);
+            FrequencySpectrumWidget* fsWidget = new FrequencySpectrumWidget(*pFrequencySpectrum, pT, newDisp);
 
-            qListActions.append(neWidget->getDisplayActions());
-            qListWidgets.append(neWidget->getDisplayWidgets());
+            qListActions.append(fsWidget->getDisplayActions());
+            qListWidgets.append(fsWidget->getDisplayWidgets());
 
             connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
-                    neWidget, &NoiseEstimationWidget::update, Qt::BlockingQueuedConnection);
+                    fsWidget, &FrequencySpectrumWidget::update, Qt::BlockingQueuedConnection);
 
-            vboxLayout->addWidget(neWidget);
-            neWidget->init();
+            vboxLayout->addWidget(fsWidget);
+            fsWidget->init();
         }
     }
 
