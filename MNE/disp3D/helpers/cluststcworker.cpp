@@ -79,6 +79,8 @@ void ClustStcWorker::addData(QList<VectorXd> &data)
 {
     m_qMutex.lock();
     m_data.append(data);
+
+    qDebug() << "addData" << m_data.size();
     m_qMutex.unlock();
 }
 
@@ -130,6 +132,8 @@ void ClustStcWorker::process()
             if(m_iCurrentSample%m_iAverageSamples == 0)
             {
                 m_vecAverage /= (double)m_iAverageSamples;
+
+                qDebug() << "emit sample";
                 emit stcSample(m_vecAverage);
                 m_vecAverage = VectorXd::Zero(m_vecAverage.rows());
             }

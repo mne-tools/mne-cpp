@@ -184,6 +184,8 @@ private:
     */
     void init(FiffInfo &p_fiffInfo);
 
+    mutable QMutex              m_qMutex;           /**< Mutex to ensure thread safety */
+
     FiffEvoked::SPtr            m_pFiffEvoked;      /**< Evoked data set */
 
     QString                     m_sXMLLayoutFile;   /**< Layout file name. */
@@ -203,6 +205,7 @@ private:
 
 inline const QString& RealTimeEvoked::getXMLLayoutFile() const
 {
+    QMutexLocker locker(&m_qMutex);
     return m_sXMLLayoutFile;
 }
 
@@ -211,6 +214,7 @@ inline const QString& RealTimeEvoked::getXMLLayoutFile() const
 
 inline void RealTimeEvoked::setXMLLayoutFile(const QString& layout)
 {
+    QMutexLocker locker(&m_qMutex);
     m_sXMLLayoutFile = layout;
 }
 
@@ -219,6 +223,7 @@ inline void RealTimeEvoked::setXMLLayoutFile(const QString& layout)
 
 inline unsigned int RealTimeEvoked::getNumChannels() const
 {
+    QMutexLocker locker(&m_qMutex);
     return m_qListChInfo.size();
 }
 
@@ -227,6 +232,7 @@ inline unsigned int RealTimeEvoked::getNumChannels() const
 
 inline qint32 RealTimeEvoked::getNumPreStimSamples() const
 {
+    QMutexLocker locker(&m_qMutex);
     return m_iPreStimSamples;
 }
 
@@ -235,6 +241,7 @@ inline qint32 RealTimeEvoked::getNumPreStimSamples() const
 
 inline QList<QColor>& RealTimeEvoked::chColor()
 {
+    QMutexLocker locker(&m_qMutex);
     return m_qListChColors;
 }
 
@@ -243,6 +250,7 @@ inline QList<QColor>& RealTimeEvoked::chColor()
 
 inline QList<RealTimeSampleArrayChInfo>& RealTimeEvoked::chInfo()
 {
+    QMutexLocker locker(&m_qMutex);
     return m_qListChInfo;
 }
 
@@ -251,6 +259,7 @@ inline QList<RealTimeSampleArrayChInfo>& RealTimeEvoked::chInfo()
 
 inline bool RealTimeEvoked::isInitialized() const
 {
+    QMutexLocker locker(&m_qMutex);
     return m_bInitialized;
 }
 

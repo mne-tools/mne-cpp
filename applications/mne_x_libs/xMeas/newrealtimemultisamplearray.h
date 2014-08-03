@@ -229,6 +229,8 @@ public:
     virtual VectorXd getValue() const;
 
 private:
+    mutable QMutex              m_qMutex;           /**< Mutex to ensure thread safety */
+
     FiffInfo::SPtr              m_pFiffInfo_orig;   /**< Original Fiff Info if initialized by fiff info. */
 
     QString                     m_sXMLLayoutFile;   /**< Layout file name. */
@@ -248,6 +250,7 @@ private:
 
 inline void NewRealTimeMultiSampleArray::clear()
 {
+    QMutexLocker locker(&m_qMutex);
     m_matSamples.clear();
 }
 
@@ -256,6 +259,7 @@ inline void NewRealTimeMultiSampleArray::clear()
 
 inline bool NewRealTimeMultiSampleArray::isChInit() const
 {
+    QMutexLocker locker(&m_qMutex);
     return m_bChInfoIsInit;
 }
 
@@ -264,6 +268,7 @@ inline bool NewRealTimeMultiSampleArray::isChInit() const
 
 inline const QString& NewRealTimeMultiSampleArray::getXMLLayoutFile() const
 {
+    QMutexLocker locker(&m_qMutex);
     return m_sXMLLayoutFile;
 }
 
@@ -272,6 +277,7 @@ inline const QString& NewRealTimeMultiSampleArray::getXMLLayoutFile() const
 
 inline void NewRealTimeMultiSampleArray::setXMLLayoutFile(const QString& layout)
 {
+    QMutexLocker locker(&m_qMutex);
     m_sXMLLayoutFile = layout;
 }
 
@@ -280,6 +286,7 @@ inline void NewRealTimeMultiSampleArray::setXMLLayoutFile(const QString& layout)
 
 inline void NewRealTimeMultiSampleArray::setSamplingRate(double dSamplingRate)
 {
+    QMutexLocker locker(&m_qMutex);
     m_dSamplingRate = dSamplingRate;
 }
 
@@ -288,6 +295,7 @@ inline void NewRealTimeMultiSampleArray::setSamplingRate(double dSamplingRate)
 
 inline double NewRealTimeMultiSampleArray::getSamplingRate() const
 {
+    QMutexLocker locker(&m_qMutex);
     return m_dSamplingRate;
 }
 
@@ -296,6 +304,7 @@ inline double NewRealTimeMultiSampleArray::getSamplingRate() const
 
 inline unsigned int NewRealTimeMultiSampleArray::getNumChannels() const
 {
+    QMutexLocker locker(&m_qMutex);
     return m_qListChInfo.size();
 }
 
@@ -304,6 +313,7 @@ inline unsigned int NewRealTimeMultiSampleArray::getNumChannels() const
 
 inline QList<RealTimeSampleArrayChInfo>& NewRealTimeMultiSampleArray::chInfo()
 {
+    QMutexLocker locker(&m_qMutex);
     return m_qListChInfo;
 }
 
@@ -312,6 +322,7 @@ inline QList<RealTimeSampleArrayChInfo>& NewRealTimeMultiSampleArray::chInfo()
 
 inline FiffInfo::SPtr& NewRealTimeMultiSampleArray::getFiffInfo()
 {
+    QMutexLocker locker(&m_qMutex);
     return m_pFiffInfo_orig;
 }
 
@@ -320,6 +331,7 @@ inline FiffInfo::SPtr& NewRealTimeMultiSampleArray::getFiffInfo()
 
 inline void NewRealTimeMultiSampleArray::setMultiArraySize(qint32 iMultiArraySize)
 {
+    QMutexLocker locker(&m_qMutex);
     //Obsolete unsigned char can't be bigger
 //    if(ucArraySize > 255)
 //        m_ucArraySize = 255;
@@ -332,6 +344,7 @@ inline void NewRealTimeMultiSampleArray::setMultiArraySize(qint32 iMultiArraySiz
 
 qint32 NewRealTimeMultiSampleArray::getMultiArraySize() const
 {
+    QMutexLocker locker(&m_qMutex);
     return m_iMultiArraySize;
 }
 

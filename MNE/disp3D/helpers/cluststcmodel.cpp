@@ -387,6 +387,8 @@ void ClustStcModel::setNormalization(qint32 fraction)
 
 void ClustStcModel::setStcSample(const VectorXd &sample)
 {
+    qDebug() << "setStcSample";
+
     m_vecCurStc = sample;
 
     m_vecCurRelStc = sample/m_dStcNorm;
