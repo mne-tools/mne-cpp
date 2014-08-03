@@ -86,7 +86,7 @@ ClustStcModel::ClustStcModel(QObject *parent)
     connect(m_pThread.data(), &QThread::started, m_pWorker.data(), &ClustStcWorker::process);
     connect(m_pWorker.data(), &ClustStcWorker::stcSample, this, &ClustStcModel::setStcSample);
 
-    m_pWorker->setLoop(true);
+//    m_pWorker->setLoop(true);
 
     m_pThread->start();
 
@@ -229,7 +229,7 @@ QVariant ClustStcModel::headerData(int section, Qt::Orientation orientation, int
 
 void ClustStcModel::addData(const MNESourceEstimate &stc)
 {
-    if(!m_bModelInit)
+    if(!m_bModelInit || stc.isEmpty())
         return;
 
     if(m_vertLabelIds.size() != stc.data.rows())
@@ -247,6 +247,8 @@ void ClustStcModel::addData(const MNESourceEstimate &stc)
     if(!m_bIntervallSet)
     {
         int usec = floor(stc.tstep*1000000);
+        if(usec <= 0)
+            return;
         m_pWorker->setInterval(usec);
         m_bIntervallSet = true;
     }
@@ -387,8 +389,6 @@ void ClustStcModel::setNormalization(qint32 fraction)
 
 void ClustStcModel::setStcSample(const VectorXd &sample)
 {
-    qDebug() << "setStcSample";
-
     m_vecCurStc = sample;
 
     m_vecCurRelStc = sample/m_dStcNorm;
