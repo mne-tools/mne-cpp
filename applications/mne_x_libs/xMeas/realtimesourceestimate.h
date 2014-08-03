@@ -177,6 +177,8 @@ public:
     bool m_bStcSend; /**< dirty hack */
 
 private:
+    mutable QMutex          m_qMutex;       /**< Mutex to ensure thread safety */
+
     AnnotationSet::SPtr     m_pAnnotSet;    /**< Annotation set. */
     SurfaceSet::SPtr        m_pSurfSet;     /**< Surface set. */
 
@@ -192,6 +194,7 @@ private:
 
 inline void RealTimeSourceEstimate::setAnnotSet(AnnotationSet::SPtr& annotSet)
 {
+    QMutexLocker locker(&m_qMutex);
     m_pAnnotSet = annotSet;
 }
 
@@ -200,6 +203,7 @@ inline void RealTimeSourceEstimate::setAnnotSet(AnnotationSet::SPtr& annotSet)
 
 inline AnnotationSet::SPtr& RealTimeSourceEstimate::getAnnotSet()
 {
+    QMutexLocker locker(&m_qMutex);
     return m_pAnnotSet;
 }
 
@@ -208,6 +212,7 @@ inline AnnotationSet::SPtr& RealTimeSourceEstimate::getAnnotSet()
 
 inline void RealTimeSourceEstimate::setSurfSet(SurfaceSet::SPtr& surfSet)
 {
+    QMutexLocker locker(&m_qMutex);
     m_pSurfSet = surfSet;
 }
 
@@ -216,6 +221,7 @@ inline void RealTimeSourceEstimate::setSurfSet(SurfaceSet::SPtr& surfSet)
 
 inline SurfaceSet::SPtr& RealTimeSourceEstimate::getSurfSet()
 {
+    QMutexLocker locker(&m_qMutex);
     return m_pSurfSet;
 }
 
@@ -224,6 +230,7 @@ inline SurfaceSet::SPtr& RealTimeSourceEstimate::getSurfSet()
 
 inline bool RealTimeSourceEstimate::isInitialized() const
 {
+    QMutexLocker locker(&m_qMutex);
     return m_bInitialized;
 }
 

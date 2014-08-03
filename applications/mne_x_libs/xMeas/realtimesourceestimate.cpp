@@ -85,6 +85,7 @@ RealTimeSourceEstimate::~RealTimeSourceEstimate()
 
 MNESourceEstimate::SPtr& RealTimeSourceEstimate::getValue()
 {
+    QMutexLocker locker(&m_qMutex);
     return m_pMNEStc;
 }
 
@@ -93,10 +94,14 @@ MNESourceEstimate::SPtr& RealTimeSourceEstimate::getValue()
 
 void RealTimeSourceEstimate::setValue(MNESourceEstimate& v)
 {
+    m_qMutex.lock();
+
     //Store
     *m_pMNEStc = v;
 
     m_bInitialized = true;
+
+    m_qMutex.unlock();
 
     emit notify();
 

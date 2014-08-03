@@ -128,9 +128,11 @@ public:
     inline bool isInitialized() const;
 
 private:
-    FiffCov::SPtr               m_pFiffCov;     /**< Covariance data set */
+    mutable QMutex  m_qMutex;       /**< Mutex to ensure thread safety */
 
-    bool                        m_bInitialized;     /**< If values are stored.*/
+    FiffCov::SPtr   m_pFiffCov;     /**< Covariance data set */
+
+    bool            m_bInitialized; /**< If values are stored.*/
 };
 
 
@@ -141,6 +143,7 @@ private:
 
 inline bool RealTimeCov::isInitialized() const
 {
+    QMutexLocker locker(&m_qMutex);
     return m_bInitialized;
 }
 
