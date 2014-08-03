@@ -169,6 +169,7 @@ void RealTimeSourceEstimateWidget::update(XMEASLIB::NewMeasurement::SPtr)
 
 void RealTimeSourceEstimateWidget::getData()
 {
+    qDebug() << "#### RealTimeSourceEstimateWidget::getData() ####";
     if(m_bInitialized)
     {
         if(count % 4 == 0)
