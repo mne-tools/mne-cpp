@@ -144,6 +144,14 @@ public:
     */
     bool saveEventData(QFile& qFile);
 
+    //=========================================================================================================
+    /**
+    * setFiffInfo sets the fiff info variabel.
+    *
+    * @param fiffInfo fiff infp variabel
+    */
+    void setFiffInfo(FiffInfo& fiffInfo);
+
 private:
     //=========================================================================================================
     /**
@@ -151,9 +159,9 @@ private:
     */
     void clearModel();
 
-    MatrixXi        m_data;        /**< Matrix that holds the loaded events from the event file. */
+    MatrixXi        m_data;         /**< Matrix that holds the loaded events from the event file. */
 
-    int             m_fSample;     /**< Sampling frequency. */
+    FiffInfo        m_fiffInfo;     /**< fiff info of whole fiff file */
 };
 
 } // NAMESPACE

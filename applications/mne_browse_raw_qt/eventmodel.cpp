@@ -58,7 +58,6 @@ using namespace MNEBrowseRawQt;
 
 EventModel::EventModel(QObject *parent)
 : QAbstractTableModel(parent)
-, m_fSample(1024)
 {
 //    m_iWindowSize = m_qSettings.value("RawModel/window_size").toInt();
 //    m_reloadPos = m_qSettings.value("RawModel/reload_pos").toInt();
@@ -69,7 +68,6 @@ EventModel::EventModel(QObject *parent)
 
 EventModel::EventModel(QFile &qFile, QObject *parent)
 : QAbstractTableModel(parent)
-, m_fSample(1024)
 //, m_bFileloaded(false)
 //, m_qSettings()
 //, m_bStartReached(false)
@@ -165,7 +163,7 @@ QVariant EventModel::data(const QModelIndex &index, int role) const
 
         //******** second column (event time plot) ********
         if(index.column()==1 && role == Qt::DisplayRole)
-            return QVariant((double)m_data(index.row(), 0)/m_fSample);
+            return QVariant((double)m_data(index.row(), 0)/m_fiffInfo.sfreq);
 
         //******** third column (event type plot) ********
         if(index.column()==2 && role == Qt::DisplayRole)
@@ -218,6 +216,14 @@ bool EventModel::saveEventData(QFile& qFile)
 
     endResetModel();
     return true;
+}
+
+
+//*************************************************************************************************************
+
+void EventModel::setFiffInfo(FiffInfo& fiffInfo)
+{
+    m_fiffInfo = fiffInfo;
 }
 
 

@@ -92,6 +92,9 @@ void MainWindow::setupModel()
 //    m_pRawModel = new RawModel(this);
     m_pRawModel = new RawModel(m_qFileRaw,this);
     m_pEventModel = new EventModel(this);
+
+    //Set fiffInfo in event model
+    m_pEventModel->setFiffInfo(m_pRawModel->m_fiffInfo);
 }
 
 
@@ -338,6 +341,13 @@ void MainWindow::setLogLevel(LogLevel lvl)
 void MainWindow::openFile()
 {
     QString filename = QFileDialog::getOpenFileName(this,QString("Open fiff data file"),QString("./MNE-sample-data/MEG/sample/"),tr("fif data files (*.fif)"));
+
+    if(filename.isEmpty())
+    {
+        qDebug("User aborted opening of fiff data file");
+        return;
+    }
+
     if(m_qFileRaw.isOpen())
         m_qFileRaw.close();
     m_qFileRaw.setFileName(filename);
@@ -556,11 +566,11 @@ void MainWindow::showEventWindow()
     //Note: A widget that happens to be obscured by other windows on the screen is considered to be visible.
     if(!m_wEventWidget->isVisible())
     {
-        m_wEventWidget->setWindowTitle("Events");
+        m_wEventWidget->setWindowTitle("Event list");
         m_wEventWidget->show();
         m_wEventWidget->raise();
     }
-    else // if visible raise the widget to be sure that it is not abscured by other windows
+    else // if visible raise the widget to be sure that it is not obscured by other windows
         m_wEventWidget->raise();
 
     //Scale view to exact vertical length of the table entries
@@ -572,7 +582,18 @@ void MainWindow::showEventWindow()
 
 void MainWindow::jumpToEvent(const QModelIndex & current, const QModelIndex & previous)
 {
-    qDebug()<<"Jumping to Event";
+    Q_UNUSED(previous);
+
+    //Always get the first column 0 (sample) of the model
+    QModelIndex index = m_pEventModel->index(current.row(), 0);
+
+    //Get the sample value
+    int sample = m_pEventModel->data(index, Qt::DisplayRole).toInt();
+
+    qDebug()<<"Jumping to Event at sample "<<sample;
+
+    //Jump to sample - subtract first sample value - put sample in the middle of the view (-m_pRawModel->m_iWindowSize/2)
+    m_pRawTableView->horizontalScrollBar()->setValue(sample-m_pRawModel->firstSample()-m_pRawModel->m_iWindowSize/2);
 }
 
 
