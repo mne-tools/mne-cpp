@@ -52,6 +52,8 @@
 
 #include <QSharedPointer>
 #include <QVector>
+#include <QMutex>
+#include <QMutexLocker>
 
 
 //*************************************************************************************************************
