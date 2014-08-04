@@ -54,7 +54,7 @@ SUBDIRS += \
     averaging \
     covariance \
     noise \
-#    bci \
+    bci \
     rtsss \
     rthpi
 

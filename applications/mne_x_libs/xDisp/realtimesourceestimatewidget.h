@@ -162,27 +162,16 @@ signals:
     void startInit();
 
 private:
+    QSharedPointer<RealTimeSourceEstimate> m_pRTMSE;    /**< The real-time source estimate measurement. */
+    bool m_bInitialized;                                /**< Whether init was processed successfully. */
 
     AnnotationSet m_annotationSet;
     SurfaceSet m_surfSet;
 
-    ClustStcModel* m_pClustStcModel;
-    ClustStcView* m_pClustView;
+    ClustStcModel*  m_pClustStcModel;
+    ClustStcView*   m_pClustView;
 
-
-
-
-
-
-//OLD
-    InverseView* m_pView;                               /**< The inverse view, owner ship is taken by container widget of m_pView -> no need to delete */
-    QWidget* m_pWidgetView;                             /**< The inverse view container, ownership is taken by QHBoxLayout -> no need to delete */
-
-    QSharedPointer<RealTimeSourceEstimate> m_pRTMSE;    /**< The real-time source estimate measurement. */
-    bool m_bInitialized;                                /**< Whether init was processed successfully. */
-    bool m_bInitializationStarted;
-
-    qint32 count;
+    qint32 count;   /**< Downsample skip count */
 };
 
 } // NAMESPACE
