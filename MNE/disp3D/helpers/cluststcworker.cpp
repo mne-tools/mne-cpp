@@ -63,13 +63,23 @@ using namespace DISP3DLIB;
 //=============================================================================================================
 
 ClustStcWorker::ClustStcWorker(QObject *parent)
-: QObject(parent)
+: QThread(parent)
+, m_bIsRunning(false)
 , m_bIsLooping(false)
 , m_iAverageSamples(10)
 , m_iCurrentSample(0)
 , m_iUSecIntervall(100)
 {
     m_data.clear();
+}
+
+
+//*************************************************************************************************************
+
+ClustStcWorker::~ClustStcWorker()
+{
+    if(this->isRunning())
+        stop();
 }
 
 
@@ -83,6 +93,8 @@ void ClustStcWorker::addData(QList<VectorXd> &data)
     m_qMutex.lock();
     m_data.append(data);
     m_qMutex.unlock();
+
+    qDebug() << "##### ClustStcWorker addData #####" << m_data.size();
 }
 
 
@@ -98,13 +110,28 @@ void ClustStcWorker::clear()
 
 //*************************************************************************************************************
 
-void ClustStcWorker::process()
+void ClustStcWorker::run()
 {
     VectorXd m_vecAverage(0,0);
 
+    m_bIsRunning = true;
+
     while(true)
     {
-        if(!m_data.isEmpty() && m_data.size() > 0)
+        {
+            QMutexLocker locker(&m_qMutex);
+            if(!m_bIsRunning)
+                break;
+        }
+
+        bool doProcessing = false;
+        {
+            QMutexLocker locker(&m_qMutex);
+            if(!m_data.isEmpty() && m_data.size() > 0)
+                doProcessing = true;
+        }
+
+        if(doProcessing)
         {
             if(m_bIsLooping)
             {
@@ -165,4 +192,16 @@ void ClustStcWorker::setInterval(int usec)
 void ClustStcWorker::setLoop(bool looping)
 {
     m_bIsLooping = looping;
+}
+
+
+//*************************************************************************************************************
+
+void ClustStcWorker::stop()
+{
+    m_qMutex.lock();
+    m_bIsRunning = false;
+    m_qMutex.unlock();
+
+    QThread::wait();
 }
