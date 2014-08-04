@@ -305,7 +305,8 @@ void ClustStcModel::init(const AnnotationSet &annotationSet, const SurfaceSet &s
     vecCenterRR.setY((m_vecMinRR.y()+m_vecMaxRR.y())/2.0f);
     vecCenterRR.setZ((m_vecMinRR.z()+m_vecMaxRR.z())/2.0f);
 
-    // Regions
+    // Regions -> ToDo QtConcurrent
+//    qDebug() << "Before ROI";
     for(qint32 h = 0; h < m_annotationSet.size(); ++h)
     {
         MatrixX3i tris;
@@ -335,8 +336,8 @@ void ClustStcModel::init(const AnnotationSet &annotationSet, const SurfaceSet &s
             if(m_qListLabels[k].hemi != h)
                 continue;
 
-            //Ggenerate label tri information
-            tris = m_qListLabels[k].selectTris(m_surfSet[h]);
+            //Generate label tri information
+            tris = m_qListLabels[k].selectTris(m_surfSet[h]); //ToDO very slow -> QtConcurrent
 
 
             Matrix3Xf triCoords(3,3*tris.rows());
@@ -351,6 +352,7 @@ void ClustStcModel::init(const AnnotationSet &annotationSet, const SurfaceSet &s
             m_qListTriRRs.append(triCoords);
         }
     }
+//    qDebug() << "After ROI";
 
     m_iLHSize = 0;
     for(qint32 k = 0; k < m_qListLabels.size(); ++k)
