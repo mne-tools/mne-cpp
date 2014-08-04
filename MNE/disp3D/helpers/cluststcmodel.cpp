@@ -69,7 +69,6 @@ using namespace MNELIB;
 
 ClustStcModel::ClustStcModel(QObject *parent)
 : QAbstractTableModel(parent)
-, m_pThread(new QThread)
 , m_pWorker(new ClustStcWorker)
 , m_bRTMode(true)
 , m_bModelInit(false)
@@ -82,14 +81,18 @@ ClustStcModel::ClustStcModel(QObject *parent)
     qRegisterMetaType<VectorXd>("VectorXd");
     qRegisterMetaType<Matrix3Xf>("Matrix3Xf");
 
-    m_pWorker->moveToThread(m_pThread.data());
-    connect(m_pThread.data(), &QThread::started, m_pWorker.data(), &ClustStcWorker::process);
     connect(m_pWorker.data(), &ClustStcWorker::stcSample, this, &ClustStcModel::setStcSample);
 
 //    m_pWorker->setLoop(true);
 
-    m_pThread->start();
+    m_pWorker->start();
+}
 
+
+//*************************************************************************************************************
+
+ClustStcModel::~ClustStcModel()
+{
 }
 
 
