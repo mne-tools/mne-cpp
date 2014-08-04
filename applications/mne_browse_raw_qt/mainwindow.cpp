@@ -107,15 +107,15 @@ void MainWindow::setupDelegate()
 
 void MainWindow::setupView()
 {
-    m_pTableView = new QTableView;
+    m_pRawTableView = new QTableView;
     m_pEventTableView = new QTableView;
 
     //set custom models
     m_pEventTableView->setModel(m_pEventModel);
-    m_pTableView->setModel(m_pRawModel);
+    m_pRawTableView->setModel(m_pRawModel);
 
     //set custom delegate
-    m_pTableView->setItemDelegate(m_pRawDelegate);
+    m_pRawTableView->setItemDelegate(m_pRawDelegate);
 
     //TableView settings
     setupViewSettings();
@@ -129,7 +129,7 @@ void MainWindow::setupLayout()
     //set vertical layout
     QVBoxLayout *mainlayout = new QVBoxLayout;
 
-    mainlayout->addWidget(m_pTableView);
+    mainlayout->addWidget(m_pRawTableView);
 
     //set layouts
     QWidget *window = new QWidget();
@@ -143,39 +143,44 @@ void MainWindow::setupLayout()
 
 void MainWindow::setupViewSettings()
 {
-    //SETUP VIEW: m_pTableView SETTINGS
-    //set some size settings for m_pTableView
-    m_pTableView->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+    //------------- SETUP VIEW: m_pRawTableView -------------
+    //set some size settings for m_pRawTableView
+    m_pRawTableView->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
 
-    m_pTableView->setShowGrid(false);
-    m_pTableView->horizontalHeader()->hide();
-    m_pTableView->verticalHeader()->setDefaultSectionSize(m_pRawDelegate->m_dDefaultPlotHeight);
+    m_pRawTableView->setShowGrid(false);
+    m_pRawTableView->horizontalHeader()->hide();
+    m_pRawTableView->verticalHeader()->setDefaultSectionSize(m_pRawDelegate->m_dDefaultPlotHeight);
 
-    m_pTableView->setAutoScroll(false);
-    m_pTableView->setColumnHidden(0,true); //because content is plotted jointly with column=1
+    m_pRawTableView->setAutoScroll(false);
+    m_pRawTableView->setColumnHidden(0,true); //because content is plotted jointly with column=1
 
-    m_pTableView->resizeColumnsToContents();
+    m_pRawTableView->resizeColumnsToContents();
 
-    m_pTableView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
+    m_pRawTableView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
 
     //set context menu
-    m_pTableView->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(m_pTableView,SIGNAL(customContextMenuRequested(QPoint)),this,SLOT(customContextMenuRequested(QPoint)));
+    m_pRawTableView->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(m_pRawTableView,SIGNAL(customContextMenuRequested(QPoint)),this,SLOT(customContextMenuRequested(QPoint)));
 
     //activate kinetic scrolling
-    QScroller::grabGesture(m_pTableView,QScroller::MiddleMouseButtonGesture);
+    QScroller::grabGesture(m_pRawTableView,QScroller::MiddleMouseButtonGesture);
 
     //connect QScrollBar with model in order to reload data samples
-    connect(m_pTableView->horizontalScrollBar(),SIGNAL(valueChanged(int)),m_pRawModel,SLOT(updateScrollPos(int)));
+    connect(m_pRawTableView->horizontalScrollBar(),SIGNAL(valueChanged(int)),m_pRawModel,SLOT(updateScrollPos(int)));
 
     //connect other signals
     connect(m_pRawModel,SIGNAL(scrollBarValueChange(int)),this,SLOT(setScrollBarPosition(int)));
 
-    //SETUP VIEW: m_pEventModel SETTINGS
+    //------------- SETUP VIEW: m_pEventModel -------------
     m_pEventTableView->resizeColumnsToContents();
 
+    //Connect selection in event window to specific slot
+    connect(m_pEventTableView->selectionModel(),SIGNAL(currentRowChanged(QModelIndex, QModelIndex)),
+                this,SLOT(jumpToEvent(QModelIndex, QModelIndex)));
+
+    //Create event window
     if(m_wEventWidget == NULL)
-        m_wEventWidget = new QWidget();
+        m_wEventWidget = new QWidget(this, Qt::Window);
 
     QVBoxLayout *eventWidgetLayout = new QVBoxLayout;
 
@@ -263,7 +268,7 @@ void MainWindow::setWindowStatus()
     setWindowTitle(title);
 
     //let the view update (ScrollBars etc.)
-    m_pTableView->resizeColumnsToContents();
+    m_pRawTableView->resizeColumnsToContents();
 }
 
 
@@ -424,10 +429,10 @@ void MainWindow::saveEvents()
 void MainWindow::customContextMenuRequested(QPoint pos)
 {
     //obtain index where index was clicked
-    QModelIndex index = m_pTableView->indexAt(pos);
+    QModelIndex index = m_pRawTableView->indexAt(pos);
 
     //get selected items
-    QModelIndexList selected = m_pTableView->selectionModel()->selectedIndexes();
+    QModelIndexList selected = m_pRawTableView->selectionModel()->selectedIndexes();
 
     //create custom context menu and actions
     QMenu *menu = new QMenu(this);
@@ -506,7 +511,7 @@ void MainWindow::customContextMenuRequested(QPoint pos)
     menu->addMenu(undoFiltOpSubMenu);
 
     //show context menu
-    menu->popup(m_pTableView->viewport()->mapToGlobal(pos));
+    menu->popup(m_pRawTableView->viewport()->mapToGlobal(pos));
 }
 
 
@@ -514,7 +519,7 @@ void MainWindow::customContextMenuRequested(QPoint pos)
 
 void MainWindow::setScrollBarPosition(int pos)
 {
-    m_pTableView->horizontalScrollBar()->setValue(pos);
+    m_pRawTableView->horizontalScrollBar()->setValue(pos);
     qDebug() << "MainWindow: m_iAbsFiffCursor position set to" << (m_pRawModel->firstSample()+pos);
 }
 
@@ -560,6 +565,14 @@ void MainWindow::showEventWindow()
 
     //Scale view to exact vertical length of the table entries
     m_wEventWidget->resize(242, 350);
+}
+
+
+//*************************************************************************************************************
+
+void MainWindow::jumpToEvent(const QModelIndex & current, const QModelIndex & previous)
+{
+    qDebug()<<"Jumping to Event";
 }
 
 

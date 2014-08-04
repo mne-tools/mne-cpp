@@ -225,6 +225,12 @@ private slots:
     */
     void showEventWindow();
 
+    //=========================================================================================================
+    /**
+    * jumpToEvent jumps to a event specified in the event table view
+    */
+    void jumpToEvent(const QModelIndex &current, const QModelIndex &previous);
+
 signals:
     void testSignal();
 
@@ -298,7 +304,7 @@ private:
     //modelview framework
     RawModel*           m_pRawModel;                /**< the QAbstractTable model being part of the model/view framework of Qt */
     EventModel*         m_pEventModel;              /**< the QAbstractTable event model being part of the model/view framework of Qt */
-    QTableView*         m_pTableView;               /**< the QTableView being part of the model/view framework of Qt for the fiff data handling*/
+    QTableView*         m_pRawTableView;            /**< the QTableView being part of the model/view framework of Qt for the fiff data handling*/
     QTableView*         m_pEventTableView;          /**< the QTableView being part of the model/view framework of Qt for the fiff event handling */
     RawDelegate*        m_pRawDelegate;             /**< the QAbstractDelegate being part of the model/view framework of Qt */
 
