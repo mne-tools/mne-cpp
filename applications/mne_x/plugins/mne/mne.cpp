@@ -213,11 +213,10 @@ bool MNE::start()
 
 bool MNE::stop()
 {
-    //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
-    if(this->isRunning())
-        QThread::wait();
-
     m_bIsRunning = false;
+
+    if(m_pRtInvOp->isRunning())
+        m_pRtInvOp->stop();
 
     if(m_bProcessData) // Only clear if buffers have been initialised
     {
@@ -229,9 +228,6 @@ bool MNE::stop()
 
     // Stop filling buffers with data from the inputs
     m_bProcessData = false;
-
-    if(m_pRtInvOp->isRunning())
-        m_pRtInvOp->stop();
 
     m_bReceiveData = false;
 
@@ -286,9 +282,9 @@ void MNE::updateRTC(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
         if(m_bProcessData)
         {
-            mutex.lock();
+            m_qMutex.lock();
             m_qVecFiffCov.push_back(pRTC->getValue()->pick_channels(m_qListPickChannels));
-            mutex.unlock();
+            m_qMutex.unlock();
         }
     }
 }
@@ -310,9 +306,9 @@ void MNE::updateRTE(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
         if(m_bProcessData)
         {
-            mutex.lock();
+            m_qMutex.lock();
             m_qVecFiffEvoked.push_back(pRTE->getValue()->pick_channels(m_qListPickChannels));
-            mutex.unlock();
+            m_qMutex.unlock();
         }
     }
 }
@@ -329,13 +325,13 @@ void MNE::updateInvOp(MNEInverseOperator::SPtr p_pInvOp)
 
     QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
 
-    mutex.lock();
+    m_qMutex.lock();
     m_pMinimumNorm = MinimumNorm::SPtr(new MinimumNorm(*m_pInvOp.data(), lambda2, method));
     //
     //   Set up the inverse according to the parameters
     //
     m_pMinimumNorm->doInverseSetup(m_iNumAverages,false);
-    mutex.unlock();
+    m_qMutex.unlock();
 }
 
 
@@ -343,21 +339,6 @@ void MNE::updateInvOp(MNEInverseOperator::SPtr p_pInvOp)
 
 void MNE::run()
 {
-    //
-    // Cluster forward solution;
-    //
-//    qDebug() << "Start Clustering";
-//    QFuture<MNEForwardSolution> future = QtConcurrent::run(this->m_pFwd.data(), &MNEForwardSolution::cluster_forward_solution, m_annotationSet, 40);
-//    qDebug() << "Run Clustering";
-//    future.waitForFinished();
-//    m_pClusteredFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(future.result()));
-
-
-    //Do this already in init
-//    m_pClusteredFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(m_pFwd->cluster_forward_solution(*m_pAnnotationSet.data(), 40)));
-
-//    m_pRTSEOutput->data()->setSrc(m_pClusteredFwd->src);
-
     //
     // start receiving data
     //
@@ -396,11 +377,11 @@ void MNE::run()
     {
         if(m_qVecFiffCov.size() > 0)
         {
-            mutex.lock();
+            m_qMutex.lock();
             qDebug() << "m_qVecFiffCov" << m_qVecFiffCov.size();
             m_pRtInvOp->appendNoiseCov(m_qVecFiffCov[0]);//DEBUG THIS
             m_qVecFiffCov.pop_front();
-            mutex.unlock();
+            m_qMutex.unlock();
         }
 
         if(m_qVecFiffEvoked.size() > 0)
@@ -408,26 +389,26 @@ void MNE::run()
             //DEBUG THIS
             if(m_pMinimumNorm)
             {
-                mutex.lock();
+                m_qMutex.lock();
                 FiffEvoked t_fiffEvoked = m_qVecFiffEvoked[0];
                 m_qVecFiffEvoked.pop_front();
-                mutex.unlock();
+                m_qMutex.unlock();
 
                 qDebug() << "source estimate replacement";
                 float tmin = ((float)t_fiffEvoked.first) / t_fiffEvoked.info.sfreq;
                 float tstep = 1/t_fiffEvoked.info.sfreq;
 
-                mutex.lock();
+                m_qMutex.lock();
                 MNESourceEstimate sourceEstimate = m_pMinimumNorm->calculateInverse(t_fiffEvoked.data, tmin, tstep);
-                mutex.unlock();
+                m_qMutex.unlock();
 
                 m_pRTSEOutput->data()->setValue(sourceEstimate);
             }
             else
             {
-                mutex.lock();
+                m_qMutex.lock();
                 m_qVecFiffEvoked.pop_front();
-                mutex.unlock();
+                m_qMutex.unlock();
             }
         }
     }
