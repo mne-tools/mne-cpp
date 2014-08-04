@@ -61,6 +61,7 @@
 #include <QSharedPointer>
 #include <QVector>
 #include <QList>
+#include <QMutex>
 
 
 //*************************************************************************************************************
