@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     raplabsetupwidget.h
+* @file     rapmusictoolbox.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     February, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the RapLabSetupWidget class.
+* @brief    Contains the declaration of the RapMusicToolbox class.
 *
 */
 
-#ifndef RAPLABSETUPWIDGET_H
-#define RAPLABSETUPWIDGET_H
+#ifndef RAPMUSICTOOLBOX_H
+#define RAPMUSICTOOLBOX_H
 
 
 //*************************************************************************************************************
@@ -42,7 +42,21 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_raplabsetup.h"
+#include "rapmusictoolbox_global.h"
+#include <mne_x/Interfaces/IAlgorithm.h>
+
+#include <generics/circularmatrixbuffer.h>
+
+#include <fs/annotationset.h>
+#include <fs/surfaceset.h>
+#include <fiff/fiff_info.h>
+#include <fiff/fiff_evoked.h>
+#include <mne/mne_forwardsolution.h>
+#include <mne/mne_sourceestimate.h>
+#include <inverse/rapMusic/rapmusic.h>
+
+#include <xMeas/realtimesourceestimate.h>
+#include <xMeas/realtimeevoked.h>
 
 
 //*************************************************************************************************************
@@ -51,6 +65,16 @@
 //=============================================================================================================
 
 #include <QtWidgets>
+#include <QFile>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE RapMusicToolboxPlugin
+//=============================================================================================================
+
+namespace RapMusicToolboxPlugin
+{
 
 
 //*************************************************************************************************************
@@ -58,15 +82,13 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE RapLabPlugin
-//=============================================================================================================
-
-namespace RapLabPlugin
-{
+using namespace FSLIB;
+using namespace FIFFLIB;
+using namespace MNELIB;
+using namespace MNEX;
+using namespace XMEASLIB;
+using namespace IOBuffer;
+using namespace INVERSELIB;
 
 
 //*************************************************************************************************************
@@ -74,68 +96,123 @@ namespace RapLabPlugin
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class RapLab;
-
 
 //=============================================================================================================
 /**
-* DECLARE CLASS DummySetupWidget
+* DECLARE CLASS RapMusicToolbox
 *
-* @brief The DummySetupWidget class provides the DummyToolbox configuration window.
+* @brief The RapMusicToolbox class provides a dummy algorithm structure.
 */
-class RapLabSetupWidget : public QWidget
+class RAPMUSICTOOLBOXSHARED_EXPORT RapMusicToolbox : public IAlgorithm
 {
     Q_OBJECT
+    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "rapmusictoolbox.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
+    Q_INTERFACES(MNEX::IAlgorithm)
+
+    friend class RapMusicToolboxSetupWidget;
 
 public:
 
     //=========================================================================================================
     /**
-    * Constructs a RapLabSetupWidget which is a child of parent.
-    *
-    * @param [in] toolbox a pointer to the corresponding RapLabToolbox.
-    * @param [in] parent pointer to parent widget; If parent is 0, the new RapLabSetupWidget becomes a window. If parent is another widget, DummySetupWidget becomes a child window inside parent. DummySetupWidget is deleted when its parent is deleted.
+    * Constructs a RapMusicToolbox.
     */
-    RapLabSetupWidget(RapLab* toolbox, QWidget *parent = 0);
+    RapMusicToolbox();
+    //=========================================================================================================
+    /**
+    * Destroys the RapMusicToolbox.
+    */
+    ~RapMusicToolbox();
 
     //=========================================================================================================
     /**
-    * Destroys the RapLabSetupWidget.
-    * All RapLabSetupWidget's children are deleted first. The application exits if RapLabSetupWidget is the main widget.
+    * Clone the plugin
     */
-    ~RapLabSetupWidget();
+    virtual QSharedPointer<IPlugin> clone() const;
+
+    //=========================================================================================================
+    /**
+    * Initialise the RapMusicToolbox.
+    */
+    void init();
+
+    void calcFiffInfo();
+
+    void doClustering();
+
+    void finishedClustering();
+
+    virtual bool start();
+    virtual bool stop();
+
+    virtual IPlugin::PluginType getType() const;
+    virtual QString getName() const;
+
+    virtual QWidget* setupWidget();
+
+    //=========================================================================================================
+    /**
+    * Slot to update the fiff evoked
+    *
+    * @param[in] pMeasurement   The evoked to be appended
+    */
+    void updateRTE(XMEASLIB::NewMeasurement::SPtr pMeasurement);
+
+signals:
+    //=========================================================================================================
+    /**
+    * Signal when clsutering is started
+    */
+    void clusteringStarted();
+
+    //=========================================================================================================
+    /**
+    * Signal when clsutering has finished
+    */
+    void clusteringFinished();
+
+protected:
+    virtual void run();
 
 private:
-    //=========================================================================================================
-    /**
-    * Shows the About Dialogs
-    */
-    void showAboutDialog();
+    PluginInputData<RealTimeEvoked>::SPtr   m_pRTEInput;    /**< The RealTimeEvoked input.*/
 
-    //=========================================================================================================
-    /**
-    * Shows forward solution selection dialog
-    */
-    void showFwdFileDialog();
+    PluginOutputData<RealTimeSourceEstimate>::SPtr      m_pRTSEOutput;  /**< The RealTimeSourceEstimate output.*/
 
-    //=========================================================================================================
-    /**
-    * Shows atlas selection dialog
-    */
-    void showAtlasDirDialog();
+    QMutex mutex;
 
-    //=========================================================================================================
-    /**
-    * Shows atlas selection dialog
-    */
-    void showSurfaceDirDialog();
+    QVector<FiffEvoked> m_qVecFiffEvoked;
+    qint32 m_iNumAverages;
 
+    bool m_bIsRunning;      /**< If source lab is running */
+    bool m_bReceiveData;    /**< If thread is ready to receive data */
+    bool m_bProcessData;    /**< If data should be received for processing */
 
-    RapLab* m_pRapLab;            /**< Holds a pointer to corresponding DummyToolbox.*/
+    //RapMusicToolbox stuff
+    QFile                       m_qFileFwdSolution; /**< File to forward solution. */
+    MNEForwardSolution::SPtr    m_pFwd;             /**< Forward solution. */
+    MNEForwardSolution::SPtr    m_pClusteredFwd;    /**< Clustered forward solution. */
 
-    Ui::RapLabSetupWidgetClass ui;   /**< Holds the user interface for the DummySetupWidget.*/
+    bool m_bFinishedClustering;                     /**< If clustered forward solution is available. */
+
+    QString                     m_sAtlasDir;        /**< File to Atlas. */
+    AnnotationSet::SPtr         m_pAnnotationSet;   /**< Annotation set. */
+    QString                     m_sSurfaceDir;      /**< File to Surface. */
+    SurfaceSet::SPtr            m_pSurfaceSet;      /**< Surface set. */
+
+    FiffInfo::SPtr              m_pFiffInfo;        /**< Fiff information. */
+    FiffInfo::SPtr              m_pFiffInfoEvoked;  /**< Fiff information of the evoked. */
+    FiffInfoBase::SPtr          m_pFiffInfoForward; /**< Fiff information of the forward solution. */
+
+    QStringList                 m_qListPickChannels;        /**< Channels to pick */
+
+    RapMusic::SPtr              m_pRapMusic;        /**< RAP MUSIC. */
+    qint32                      m_iDownSample;      /**< Sampling rate */
+
+//    RealTimeSourceEstimate::SPtr m_pRTSE_MNE; /**< Source Estimate output channel. */
 };
 
 } // NAMESPACE
 
-#endif // RAPLABSETUPWIDGET_H
+#endif // RAPMUSICTOOLBOX_H

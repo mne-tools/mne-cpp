@@ -69,7 +69,6 @@
 
 #include <QPaintEvent>
 #include <QPainter>
-#include <QVBoxLayout>
 #include <QHeaderView>
 #include <QMenu>
 #include <QMessageBox>
@@ -115,6 +114,12 @@ RealTimeEvokedWidget::RealTimeEvokedWidget(QSharedPointer<RealTimeEvoked> pRTE, 
 {
     Q_UNUSED(pTime)
 
+    m_pActionSelectModality = new QAction(QIcon(":/images/evokedSettings.png"), tr("Shows the covariance modality selection widget (F12)"),this);
+    m_pActionSelectModality->setShortcut(tr("F12"));
+    m_pActionSelectModality->setStatusTip(tr("Shows the covariance modality selection widget (F12)"));
+//    connect(m_pActionSelectModality, &QAction::triggered, this, &RealTimeCovWidget::showModalitySelectionWidget);
+    addDisplayAction(m_pActionSelectModality);
+
     m_pDoubleSpinBoxZoom = new QDoubleSpinBox(this);
     m_pDoubleSpinBoxZoom->setMinimum(0.3);
     m_pDoubleSpinBoxZoom->setMaximum(4.0);
@@ -131,17 +136,28 @@ RealTimeEvokedWidget::RealTimeEvokedWidget(QSharedPointer<RealTimeEvoked> pRTE, 
 //    connect(m_pActionSelectSensors, &QAction::triggered, this, &RealTimeEvokedWidget::showSensorSelectionWidget);
 //    addDisplayAction(m_pActionSelectSensors);
 
+
+    //set vertical layout
+    m_pRteLayout = new QVBoxLayout(this);
+
+    m_pLabelInit= new QLabel;
+    m_pLabelInit->setText("Acquiring Data");
+    m_pLabelInit->setAlignment(Qt::AlignCenter);
+    QFont font;font.setBold(true);font.setPointSize(20);
+    m_pLabelInit->setFont(font);
+    m_pRteLayout->addWidget(m_pLabelInit);
+
     if(m_pButterflyPlot)
         delete m_pButterflyPlot;
     m_pButterflyPlot = new RealTimeButterflyPlot;
+    m_pButterflyPlot->hide();
 
-    //set vertical layout
-    QVBoxLayout *rteLayout = new QVBoxLayout(this);
+    m_pRteLayout->addWidget(m_pButterflyPlot);
 
-    rteLayout->addWidget(m_pButterflyPlot);
+
 
     //set layouts
-    this->setLayout(rteLayout);
+    this->setLayout(m_pRteLayout);
 
     getData();
 }
@@ -196,12 +212,18 @@ void RealTimeEvokedWidget::getData()
         m_pRTEModel->updateData();
 }
 
+
 //*************************************************************************************************************
 
 void RealTimeEvokedWidget::init()
 {
     if(m_qListChInfo.size() > 0)
     {
+        m_pRteLayout->removeWidget(m_pLabelInit);
+        m_pLabelInit->hide();
+
+        m_pButterflyPlot->show();
+
         if(m_pRTEModel)
             delete m_pRTEModel;
         m_pRTEModel = new RealTimeEvokedModel(this);

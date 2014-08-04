@@ -65,7 +65,7 @@ using namespace XMEASLIB;
 NewRealTimeMultiSampleArray::NewRealTimeMultiSampleArray(QObject *parent)
 : NewMeasurement(QMetaType::type("NewRealTimeMultiSampleArray::SPtr"), parent)
 , m_dSamplingRate(0)
-, m_ucMultiArraySize(10)
+, m_iMultiArraySize(10)
 , m_bChInfoIsInit(false)
 {
 }
@@ -83,6 +83,7 @@ NewRealTimeMultiSampleArray::~NewRealTimeMultiSampleArray()
 
 void NewRealTimeMultiSampleArray::init(QList<RealTimeSampleArrayChInfo> &chInfo)
 {
+    QMutexLocker locker(&m_qMutex);
     m_qListChInfo = chInfo;
 
     m_bChInfoIsInit = true;
@@ -102,6 +103,7 @@ void NewRealTimeMultiSampleArray::init(QList<RealTimeSampleArrayChInfo> &chInfo)
 
 void NewRealTimeMultiSampleArray::initFromFiffInfo(FiffInfo::SPtr &p_pFiffInfo)
 {
+    QMutexLocker locker(&m_qMutex);
     m_qListChInfo.clear();
     m_bChInfoIsInit = false;
 
@@ -236,6 +238,7 @@ void NewRealTimeMultiSampleArray::initFromFiffInfo(FiffInfo::SPtr &p_pFiffInfo)
 
 VectorXd NewRealTimeMultiSampleArray::getValue() const
 {
+    QMutexLocker locker(&m_qMutex);
     return m_vecValue;
 }
 
@@ -244,6 +247,7 @@ VectorXd NewRealTimeMultiSampleArray::getValue() const
 
 void NewRealTimeMultiSampleArray::setValue(VectorXd v)
 {
+    m_qMutex.lock();
     //check vector size
     if(v.size() != m_qListChInfo.size())
         qCritical() << "Error Occured in RealTimeMultiSampleArrayNew::setVector: Vector size does not matche the number of channels! ";
@@ -259,10 +263,13 @@ void NewRealTimeMultiSampleArray::setValue(VectorXd v)
     //Store
     m_vecValue = v;
     m_matSamples.push_back(m_vecValue);
-    if(m_matSamples.size() >= m_ucMultiArraySize)
+    m_qMutex.unlock();
+    if(m_matSamples.size() >= m_iMultiArraySize)
     {
         emit notify();
+        m_qMutex.lock();
         m_matSamples.clear();
+        m_qMutex.unlock();
     }
 }
 

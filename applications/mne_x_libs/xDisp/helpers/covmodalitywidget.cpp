@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     realtimeevoked.cpp
+* @file     covmodalitywidget.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2014
+* @date     May, 2014
 *
 * @section  LICENSE
 *
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the RealTimeEvoked class.
+* @brief    Implementation of the CovModalityWidget Class.
 *
 */
 
@@ -38,15 +38,19 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "realtimeevoked.h"
-
-#include <time.h>
+#include "covmodalitywidget.h"
+#include "../realtimecovwidget.h"
+#include "sensoritem.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
+
+#include <QLabel>
+#include <QGridLayout>
+#include <QStringList>
 
 #include <QDebug>
 
@@ -56,7 +60,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace XMEASLIB;
+using namespace XDISPLIB;
 
 
 //*************************************************************************************************************
@@ -64,100 +68,56 @@ using namespace XMEASLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RealTimeEvoked::RealTimeEvoked(QObject *parent)
-: NewMeasurement(QMetaType::type("RealTimeEvoked::SPtr"), parent)
-, m_pFiffEvoked(new FiffEvoked)
-, m_bInitialized(false)
+CovModalityWidget::CovModalityWidget(RealTimeCovWidget *parent)
+: m_pRealTimeCovWidget(parent)
 {
+    this->setWindowTitle("Covariance Modality Settings");
+    this->setMinimumWidth(330);
+    this->setMaximumWidth(330);
 
-}
+    QGridLayout* t_pGridLayout = new QGridLayout;
 
-
-//*************************************************************************************************************
-
-RealTimeEvoked::~RealTimeEvoked()
-{
-
-}
+    QStringList t_qListModalities;
+    t_qListModalities << "MEG" << "EEG";
 
 
-//*************************************************************************************************************
+    qint32 count = 0;
+    foreach (const QString &mod, t_qListModalities) {
 
-void RealTimeEvoked::init(FiffInfo &p_fiffInfo)
-{
-    QMutexLocker locker(&m_qMutex);
-    m_qListChInfo.clear();
-    m_qListChColors.clear();
+        QLabel* t_pLabelModality = new QLabel;
+        t_pLabelModality->setText(mod);
+        t_pGridLayout->addWidget(t_pLabelModality, count,0,1,1);
+        m_qListModalities << mod;
 
-    qsrand(time(NULL));
-    for(qint32 i = 0; i < p_fiffInfo.nchan; ++i)
-    {
-         m_qListChColors.append(QColor(qrand() % 256, qrand() % 256, qrand() % 256));
+        QCheckBox* t_pCheckBoxModality = new QCheckBox;
+        if(m_pRealTimeCovWidget->m_qListPickTypes.contains(mod))
+            t_pCheckBoxModality->setChecked(true);
 
-        RealTimeSampleArrayChInfo initChInfo;
-        initChInfo.setChannelName(p_fiffInfo.chs[i].ch_name);
+        m_qListModalityCheckBox << t_pCheckBoxModality;
 
-        // set channel Unit
-        initChInfo.setUnit(p_fiffInfo.chs[i].unit);
+        connect(t_pCheckBoxModality,&QCheckBox::stateChanged,this,&CovModalityWidget::updateSelection);
 
-        //Treat stimulus channels different
-        if(p_fiffInfo.chs[i].kind == FIFFV_STIM_CH)
-        {
-//            initChInfo.setUnit("");
-            initChInfo.setMinValue(0);
-            initChInfo.setMaxValue(1.0e6);
-        }
+        t_pGridLayout->addWidget(t_pCheckBoxModality,count,1,1,1);
 
-        // set channel Kind
-        initChInfo.setKind(p_fiffInfo.chs[i].kind);
-
-        // set channel coil
-        initChInfo.setCoil(p_fiffInfo.chs[i].coil_type);
-
-        m_qListChInfo.append(initChInfo);
-    }
-}
-
-
-//*************************************************************************************************************
-
-FiffEvoked::SPtr& RealTimeEvoked::getValue()
-{
-    QMutexLocker locker(&m_qMutex);
-    return m_pFiffEvoked;
-}
-
-
-//*************************************************************************************************************
-
-void RealTimeEvoked::setValue(FiffEvoked& v)
-{
-    if(m_pFiffEvoked->data.cols() != v.data.cols())
-        m_bInitialized = false;
-
-    //Store
-    m_qMutex.lock();
-    *m_pFiffEvoked = v;
-    m_qMutex.unlock();
-
-    if(!m_bInitialized)
-    {
-        init(m_pFiffEvoked->info);
-
-        m_qMutex.lock();
-        m_iPreStimSamples = 0;
-        for(qint32 i = 0; i < m_pFiffEvoked->times.size(); ++i)
-        {
-            if(m_pFiffEvoked->times[i] >= 0)
-                break;
-            else
-                ++m_iPreStimSamples;
-        }
-
-        m_bInitialized = true;
-        m_qMutex.unlock();
+        ++count;
     }
 
-    emit notify();
+    this->setLayout(t_pGridLayout);
+
 }
 
+
+//*************************************************************************************************************
+
+void CovModalityWidget::updateSelection(qint32 state)
+{
+    Q_UNUSED(state)
+
+    m_pRealTimeCovWidget->m_qListPickTypes.clear();
+
+    for(qint32 i = 0; i < m_qListModalityCheckBox.size(); ++i)
+        if(m_qListModalityCheckBox[i]->isChecked())
+            m_pRealTimeCovWidget->m_qListPickTypes << m_qListModalities[i];
+
+    m_pRealTimeCovWidget->m_bInitialized = false;
+}

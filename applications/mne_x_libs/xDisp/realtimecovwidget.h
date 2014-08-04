@@ -44,6 +44,8 @@
 
 #include "xdisp_global.h"
 #include "newmeasurementwidget.h"
+#include "helpers/covmodalitywidget.h"
+#include <disp/imagesc.h>
 
 
 //*************************************************************************************************************
@@ -51,7 +53,10 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QVBoxLayout>
 #include <QSharedPointer>
+#include <QAction>
+#include <QLabel>
 
 
 //*************************************************************************************************************
@@ -87,6 +92,7 @@ namespace XDISPLIB
 //=============================================================================================================
 
 using namespace XMEASLIB;
+using namespace DISPLIB;
 
 
 //*************************************************************************************************************
@@ -115,6 +121,7 @@ class XDISPSHARED_EXPORT RealTimeCovWidget : public NewMeasurementWidget
 {
     Q_OBJECT
 
+    friend class CovModalityWidget;
 public:
     //=========================================================================================================
     /**
@@ -152,10 +159,31 @@ public:
     */
     virtual void init();
 
+    //=========================================================================================================
+    /**
+    * Show modal the RealTimeCovWidget.
+    */
+    void showModalitySelectionWidget();
+
 private:
-    QSharedPointer<RealTimeCov> m_pRTC;         /**< The real-time covariance measurement. */
+    QSharedPointer<RealTimeCov> m_pRTC;                     /**< The real-time covariance measurement. */
+
+    QSharedPointer<CovModalityWidget>   m_pModalitySelectionWidget;     /**< Modality selection widget */
+
+    QAction* m_pActionSelectModality;           /**< Modality selection action */
 
     bool m_bInitialized;                        /**< Is Initialized */
+
+    QStringList m_qListChNames;                 /**< Channel names */
+
+    QStringList m_qListPickTypes;               /**< Channel Types to pick */
+    MatrixXd m_matSelector;                     /**< Selction matrix */
+    MatrixXd m_matSelectorT;                    /**< Transposed selction matrix */
+
+    ImageSc* m_pImageSc;                        /**< The covariance colormap */
+
+    QVBoxLayout*    m_pRtcLayout;               /**< Widget layout */
+    QLabel*         m_pLabelInit;               /**< Initialization label */
 };
 
 } // NAMESPACE

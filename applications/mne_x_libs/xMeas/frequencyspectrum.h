@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     noiseestimation.h
+* @file     frequencyspectrum.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the NoiseEstimation class.
+* @brief    Contains the declaration of the FrequencySpectrum class.
 *
 */
 
-#ifndef NOISEESTIMATION_H
-#define NOISEESTIMATION_H
+#ifndef FREQUENCYSPECTRUM_H
+#define FREQUENCYSPECTRUM_H
 
 
 //*************************************************************************************************************
@@ -79,36 +79,28 @@ using namespace FIFFLIB;
 
 //=========================================================================================================
 /**
-* DECLARE CLASS NoiseEstimation
+* DECLARE CLASS FrequencySpectrum
 *
 * @brief The RealTimeMultiSampleArrayNew class is the base class of every RealTimeMultiSampleArrayNew Measurement.
 */
-class XMEASSHARED_EXPORT NoiseEstimation : public NewMeasurement
+class XMEASSHARED_EXPORT FrequencySpectrum : public NewMeasurement
 {
     Q_OBJECT
 public:
-    typedef QSharedPointer<NoiseEstimation> SPtr;               /**< Shared pointer type for NoiseEstimation. */
-    typedef QSharedPointer<const NoiseEstimation> ConstSPtr;    /**< Const shared pointer type for NoiseEstimation. */
+    typedef QSharedPointer<FrequencySpectrum> SPtr;               /**< Shared pointer type for FrequencySpectrum. */
+    typedef QSharedPointer<const FrequencySpectrum> ConstSPtr;    /**< Const shared pointer type for FrequencySpectrum. */
 
     //=========================================================================================================
     /**
     * Constructs a RealTimeMultiSampleArrayNew.
     */
-    explicit NoiseEstimation(QObject *parent = 0);
+    explicit FrequencySpectrum(QObject *parent = 0);
 
     //=========================================================================================================
     /**
     * Destroys the RealTimeMultiSampleArrayNew.
     */
-    virtual ~NoiseEstimation();
-
-    //=========================================================================================================
-    /**
-    * Inits RealTimeMultiSampleArrayNew and adds uiNumChannels empty channel information
-    *
-    * @param [in] uiNumChannels     the number of channels to init.
-    */
-    void init(QList<RealTimeSampleArrayChInfo> &chInfo);
+    virtual ~FrequencySpectrum();
 
     //=========================================================================================================
     /**
@@ -124,24 +116,7 @@ public:
     *
     * @return true whether the channel info is available.
     */
-    inline bool isChInit() const;
-
-    //=========================================================================================================
-    /**
-    * Returns the number of channels.
-    *
-    * @return the number of values which are gathered before a notify() is called.
-    */
-    inline unsigned int getNumChannels() const;
-
-    //=========================================================================================================
-    /**
-    * Returns the reference to the channel list.
-    *
-    * @return the reference to the channel list.
-    */
-    inline QList<RealTimeSampleArrayChInfo>& chInfo();
-
+    inline bool isInit() const;
 
     //=========================================================================================================
     /**
@@ -170,21 +145,19 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns whether NoiseEstimation contains values
+    * Returns whether FrequencySpectrum contains values
     *
-    * @return whether NoiseEstimation contains values.
+    * @return whether FrequencySpectrum contains values.
     */
     inline bool containsValues() const;
 
 private:
-    FiffInfo::SPtr              m_pFiffInfo_orig;   /**< Original Fiff Info if initialized by fiff info. */
+    FiffInfo::SPtr              m_pFiffInfo;   /**< Original Fiff Info if initialized by fiff info. */
 
     MatrixXd                    m_matValue;         /**< The current attached sample vector.*/
 
-    QList<RealTimeSampleArrayChInfo> m_qListChInfo; /**< Channel info list.*/
-
-    bool                        m_bChInfoIsInit;    /**< If channel info is initialized.*/
-    bool                        m_bContainsValues;  /**< If values are stored.*/
+    bool m_bIsInit;             /**< If channel info is initialized.*/
+    bool m_bContainsValues;     /**< If values are stored.*/
 };
 
 
@@ -194,45 +167,29 @@ private:
 //=============================================================================================================
 
 
-inline bool NoiseEstimation::isChInit() const
+inline bool FrequencySpectrum::isInit() const
 {
-    return m_bChInfoIsInit;
+    return m_bIsInit;
 }
 
 
 //*************************************************************************************************************
 
-inline unsigned int NoiseEstimation::getNumChannels() const
+inline FiffInfo::SPtr& FrequencySpectrum::getFiffInfo()
 {
-    return m_qListChInfo.size();
+    return m_pFiffInfo;
 }
 
 
 //*************************************************************************************************************
 
-inline QList<RealTimeSampleArrayChInfo>& NoiseEstimation::chInfo()
-{
-    return m_qListChInfo;
-}
-
-
-//*************************************************************************************************************
-
-inline FiffInfo::SPtr& NoiseEstimation::getFiffInfo()
-{
-    return m_pFiffInfo_orig;
-}
-
-
-//*************************************************************************************************************
-
-inline bool NoiseEstimation::containsValues() const
+inline bool FrequencySpectrum::containsValues() const
 {
     return m_bContainsValues;
 }
 
 } // NAMESPACE
 
-Q_DECLARE_METATYPE(XMEASLIB::NoiseEstimation::SPtr)
+Q_DECLARE_METATYPE(XMEASLIB::FrequencySpectrum::SPtr)
 
-#endif // NOISEESTIMATION_H
+#endif // FREQUENCYSPECTRUM_H

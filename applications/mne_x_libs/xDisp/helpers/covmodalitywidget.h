@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     raplab_global.h
+* @file     covmodalitywidget.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     May, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,12 +29,18 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the RapLab library export/import macros.
+* @brief    Declaration of the CovModalityWidget Class.
 *
 */
 
-#ifndef RAPLAB_GLOBAL_H
-#define RAPLAB_GLOBAL_H
+#ifndef COVMODALITYWIDGET_H
+#define COVMODALITYWIDGET_H
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
 
 
 //*************************************************************************************************************
@@ -42,18 +48,58 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtCore/qglobal.h>
+#include <QWidget>
+#include <QCheckBox>
+#include <QStringList>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// PREPROCESSOR DEFINES
+// DEFINE NAMESPACE XDISPLIB
 //=============================================================================================================
 
-#if defined(RAPLAB_LIBRARY)
-#  define RAPLABSHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
-#else
-#  define RAPLABSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
-#endif
+namespace XDISPLIB
+{
 
-#endif // RAPLAB_GLOBAL_H
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+class RealTimeCovWidget;
+
+
+//=============================================================================================================
+/**
+* DECLARE CLASS CovModalityWidget
+*
+* @brief The CovModalityWidget class provides the sensor selection widget
+*/
+class CovModalityWidget : public QWidget
+{
+    Q_OBJECT
+public:
+
+    //=========================================================================================================
+    /**
+    * Constructs a CovModalityWidget which is a child of parent.
+    *
+    * @param [in] parent    parent of widget
+    * @param [in] f         widget flags
+    */
+    CovModalityWidget(RealTimeCovWidget *toolbox);
+
+    void updateSelection(qint32 state);
+
+private:
+    RealTimeCovWidget * m_pRealTimeCovWidget;       /**< Connected real-time covariance widget */
+
+    QList<QCheckBox*>   m_qListModalityCheckBox;    /**< List of modality checkboxes */
+
+    QStringList m_qListModalities;                  /**< List of modalities */
+};
+
+} // NAMESPACE
+
+#endif // COVMODALITYWIDGET_H

@@ -82,7 +82,7 @@ Averaging::Averaging()
 , m_pAveragingWidget(AveragingSettingsWidget::SPtr())
 , m_pActionShowAdjustment(Q_NULLPTR)
 {
-    m_pActionShowAdjustment = new QAction(QIcon(":/images/averaging.png"), tr("Averaging Adjustments"),this);
+    m_pActionShowAdjustment = new QAction(QIcon(":/images/averagingadjustments.png"), tr("Averaging Adjustments"),this);
 //    m_pActionSetupProject->setShortcut(tr("F12"));
     m_pActionShowAdjustment->setStatusTip(tr("Averaging Adjustments"));
     connect(m_pActionShowAdjustment, &QAction::triggered, this, &Averaging::showAveragingWidget);
