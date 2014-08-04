@@ -769,26 +769,29 @@ void FixDictMp::build_molecule_xml_file(qint32 level_counter)
 
                 //treedepth building
 
+                current_element = node_list.at(0).toElement();
+
                 for(qint32 k = 0; k < similar_molecs.length(); k++)
                 {
-                    current_element = node_list.at(0).toElement();
+                    //current_element = node_list.at(current_element.attribute("ID", current_element.text()).toInt() == similar_molecs.at(k) && current_element.attribute("level").toInt() == level_counter).toElement();
 
-                    while(!current_element.isNull())
+                    //while(!current_element.isNull())
                     {
                         if(current_element.attribute("ID", current_element.text()).toInt() == similar_molecs.at(k) && current_element.attribute("level").toInt() == level_counter)
                         {
-                            write_molecules_to_xml.writeStartElement("Molecule");
-                            write_molecules_to_xml.writeAttribute("level", current_element.attribute("level", current_element.text()));
-                            write_molecules_to_xml.writeAttribute("ID", current_element.attribute("ID", current_element.text()));
-                            write_molecules_to_xml.writeAttribute("scale", current_element.attribute("scale", current_element.text()));
-                            write_molecules_to_xml.writeAttribute("translation", current_element.attribute("translation", current_element.text()));
-                            write_molecules_to_xml.writeAttribute("modulation", current_element.attribute("modulation", current_element.text()));
-                            write_molecules_to_xml.writeAttribute("phase", current_element.attribute("phase", current_element.text()));
+                            //write_molecules_to_xml.writeStartElement("Molecule");
+                            //write_molecules_to_xml.writeAttribute("level", current_element.attribute("level", current_element.text()));
+                            //write_molecules_to_xml.writeAttribute("ID", current_element.attribute("ID", current_element.text()));
+                            //write_molecules_to_xml.writeAttribute("scale", current_element.attribute("scale", current_element.text()));
+                            //write_molecules_to_xml.writeAttribute("translation", current_element.attribute("translation", current_element.text()));
+                            //write_molecules_to_xml.writeAttribute("modulation", current_element.attribute("modulation", current_element.text()));
+                            //write_molecules_to_xml.writeAttribute("phase", current_element.attribute("phase", current_element.text()));
 
 
                             //recursive_node_built(current_element, temp_file);
-                            qint32 end_element_counter = 0;
-                            if (current_element.hasChildNodes())
+                            //QDomNodeList child_list = current_element.childNodes();
+                            //qint32 end_element_counter = 0;
+                            //while(current_element.hasChildNodes())
                             {
                                 //recursive_node_built(current_element, temp_file);
                                 QDomNodeList child_list = current_element.childNodes();
@@ -811,44 +814,68 @@ void FixDictMp::build_molecule_xml_file(qint32 level_counter)
                                     if(current_element.nodeName() == "Atom")
                                         write_molecules_to_xml.writeEndElement();
 
-                                    if(current_element.nodeName() == "Molecule")
+                                    qint32 end_element_counter = 0;
+                                    while(current_element.hasChildNodes())
                                     {
-                                        current_element = current_element.firstChildElement();
+                                        current_element = current_element.nextSibling().toElement();
 
-                                        while(!current_element.isNull())
+                                        write_molecules_to_xml.writeStartElement(current_element.nodeName());
+
+                                        if(current_element.nodeName() == "Molecule")
+                                            write_molecules_to_xml.writeAttribute("level", current_element.attribute("level", current_element.text()));
+
+                                        write_molecules_to_xml.writeAttribute("ID", current_element.attribute("ID", current_element.text()));
+                                        write_molecules_to_xml.writeAttribute("scale", current_element.attribute("scale", current_element.text()));
+                                        write_molecules_to_xml.writeAttribute("translation", current_element.attribute("translation", current_element.text()));
+                                        write_molecules_to_xml.writeAttribute("modulation", current_element.attribute("modulation", current_element.text()));
+                                        write_molecules_to_xml.writeAttribute("phase", current_element.attribute("phase", current_element.text()));
+
+                                        if(current_element.nodeName() == "Atom")
+                                            write_molecules_to_xml.writeEndElement();
+
+                                        /*if(current_element.nodeName() == "Molecule")
                                         {
-                                            write_molecules_to_xml.writeStartElement(current_element.nodeName());
+                                            current_element = current_element.firstChildElement();
 
-                                            if(current_element.nodeName() == "Molecule")
-                                                write_molecules_to_xml.writeAttribute("level", current_element.attribute("level", current_element.text()));
+                                            while(!current_element.isNull())
+                                            {
+                                                write_molecules_to_xml.writeStartElement(current_element.nodeName());
 
-                                            write_molecules_to_xml.writeAttribute("ID", current_element.attribute("ID", current_element.text()));
-                                            write_molecules_to_xml.writeAttribute("scale", current_element.attribute("scale", current_element.text()));
-                                            write_molecules_to_xml.writeAttribute("translation", current_element.attribute("translation", current_element.text()));
-                                            write_molecules_to_xml.writeAttribute("modulation", current_element.attribute("modulation", current_element.text()));
-                                            write_molecules_to_xml.writeAttribute("phase", current_element.attribute("phase", current_element.text()));
+                                                if(current_element.nodeName() == "Molecule")
+                                                    write_molecules_to_xml.writeAttribute("level", current_element.attribute("level", current_element.text()));
 
-                                            if(current_element.nodeName() == "Atom")
-                                                write_molecules_to_xml.writeEndElement();
+                                                write_molecules_to_xml.writeAttribute("ID", current_element.attribute("ID", current_element.text()));
+                                                write_molecules_to_xml.writeAttribute("scale", current_element.attribute("scale", current_element.text()));
+                                                write_molecules_to_xml.writeAttribute("translation", current_element.attribute("translation", current_element.text()));
+                                                write_molecules_to_xml.writeAttribute("modulation", current_element.attribute("modulation", current_element.text()));
+                                                write_molecules_to_xml.writeAttribute("phase", current_element.attribute("phase", current_element.text()));
 
-                                            current_element = current_element.nextSibling().toElement();
-                                        }
-                                        write_molecules_to_xml.writeEndElement();
+                                                if(current_element.nodeName() == "Atom")
+                                                    write_molecules_to_xml.writeEndElement();
+
+                                                current_element = current_element.nextSibling().toElement();
+                                            }
+                                            write_molecules_to_xml.writeEndElement();
+                                        }*/
+                                        //current_element = child_list.at(z).toElement();
+                                        end_element_counter++;
                                     }
-                                    current_element = child_list.at(z).toElement();
+                                    for(qint32 close = end_element_counter; close > 0; close--)
+                                        write_molecules_to_xml.writeEndElement();
                                 }
-                                end_element_counter++;
+                                //end_element_counter++;
 
                             }
 
-                            for(qint32 close = end_element_counter; close > 1; close--)
-                                write_molecules_to_xml.writeEndElement();
+                            //for(qint32 close = end_element_counter; close > 1; close--)
+                            //    write_molecules_to_xml.writeEndElement();
 
-                            write_molecules_to_xml.writeEndElement();//molecules
+                            //write_molecules_to_xml.writeEndElement();//molecules
                         }
-                        current_element = current_element.nextSiblingElement("Molecule").toElement();
+                        current_element = current_element.nextSibling().toElement();
+                        //current_element = current_element.parentNode().toElement();//"Molecule").toElement();
                     }
-                }
+                }//for all similar molecules
                 write_molecules_to_xml.writeEndElement(); // next level molecule
 
                 //remove found molecules from node list
@@ -876,10 +903,13 @@ void FixDictMp::build_molecule_xml_file(qint32 level_counter)
         write_molecules_to_xml.writeEndElement();//header
         write_molecules_to_xml.writeEndDocument();
 
+        file.flush();
+        temp_file.flush();
         file.close();
         temp_file.close();
 
-        file.remove();
+        file.remove();        
+
         temp_file.copy(save_path);
         temp_file.remove();
 
