@@ -199,7 +199,7 @@ private:
 
     PluginOutputData<RealTimeSourceEstimate>::SPtr      m_pRTSEOutput;  /**< The RealTimeSourceEstimate output.*/
 
-    QMutex mutex;
+    QMutex m_qMutex;
 
     QVector<FiffEvoked> m_qVecFiffEvoked;
     qint32 m_iNumAverages;

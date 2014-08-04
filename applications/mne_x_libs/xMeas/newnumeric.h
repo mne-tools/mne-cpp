@@ -123,6 +123,8 @@ public:
     virtual double getValue() const;
 
 private:
+    mutable QMutex  m_qMutex;   /**< Mutex to ensure thread safety */
+
     QString m_qString_Unit;     /**< Holds unit of the data of the measurement.*/
     double  m_dValue;           /**< Holds current set value.*/
 };
@@ -135,6 +137,7 @@ private:
 
 inline void NewNumeric::setUnit(const QString& unit)
 {
+    QMutexLocker locker(&m_qMutex);
     m_qString_Unit = unit;
 }
 
@@ -143,6 +146,7 @@ inline void NewNumeric::setUnit(const QString& unit)
 
 inline const QString& NewNumeric::getUnit() const
 {
+    QMutexLocker locker(&m_qMutex);
     return m_qString_Unit;
 }
 

@@ -101,10 +101,8 @@ RealTimeSourceEstimateWidget::RealTimeSourceEstimateWidget(QSharedPointer<RealTi
 : NewMeasurementWidget(parent)
 , m_pRTMSE(pRTSE)
 , m_bInitialized(false)
-, m_bInitializationStarted(false)
 , count(0)
 {
-
     m_pClustStcModel = new ClustStcModel(this);
 //    m_pClustStcModel->init(t_annotationSet, t_surfSet);
     m_pClustStcModel->setLoop(false);
@@ -118,10 +116,10 @@ RealTimeSourceEstimateWidget::RealTimeSourceEstimateWidget(QSharedPointer<RealTi
     QSlider* pSliderNormView = new QSlider(Qt::Vertical);
     QObject::connect(pSliderNormView, &QSlider::valueChanged, m_pClustStcModel, &ClustStcModel::setNormalization);
     pSliderNormView->setMinimum(1);
-    pSliderNormView->setMaximum(100);
-    pSliderNormView->setValue(60);
+    pSliderNormView->setMaximum(20000);
+    pSliderNormView->setValue(2000);
 
-    QLabel * pLabelAverageView = new QLabel("Average");
+    QLabel* pLabelAverageView = new QLabel("Average");
     QSlider* pSliderAverageView = new QSlider(Qt::Horizontal);
     QObject::connect(pSliderAverageView, &QSlider::valueChanged, m_pClustStcModel, &ClustStcModel::setAverage);
     pSliderAverageView->setMinimum(1);
@@ -152,8 +150,7 @@ RealTimeSourceEstimateWidget::RealTimeSourceEstimateWidget(QSharedPointer<RealTi
 
 RealTimeSourceEstimateWidget::~RealTimeSourceEstimateWidget()
 {
-//    // Clear sampling rate vector
-//    RealTimeSourceEstimateWidget::s_listSamplingRates.clear();
+
 }
 
 
@@ -169,10 +166,9 @@ void RealTimeSourceEstimateWidget::update(XMEASLIB::NewMeasurement::SPtr)
 
 void RealTimeSourceEstimateWidget::getData()
 {
-    qDebug() << "#### RealTimeSourceEstimateWidget::getData() ####";
     if(m_bInitialized)
     {
-        if(count % 4 == 0)
+        if(count % 3 == 0)
         {
             //
             // Add Data

@@ -69,7 +69,6 @@ using namespace MNELIB;
 
 ClustStcModel::ClustStcModel(QObject *parent)
 : QAbstractTableModel(parent)
-, m_pThread(new QThread)
 , m_pWorker(new ClustStcWorker)
 , m_bRTMode(true)
 , m_bModelInit(false)
@@ -82,14 +81,18 @@ ClustStcModel::ClustStcModel(QObject *parent)
     qRegisterMetaType<VectorXd>("VectorXd");
     qRegisterMetaType<Matrix3Xf>("Matrix3Xf");
 
-    m_pWorker->moveToThread(m_pThread.data());
-    connect(m_pThread.data(), &QThread::started, m_pWorker.data(), &ClustStcWorker::process);
     connect(m_pWorker.data(), &ClustStcWorker::stcSample, this, &ClustStcModel::setStcSample);
 
-    m_pWorker->setLoop(true);
+//    m_pWorker->setLoop(true);
 
-    m_pThread->start();
+    m_pWorker->start();
+}
 
+
+//*************************************************************************************************************
+
+ClustStcModel::~ClustStcModel()
+{
 }
 
 
@@ -229,7 +232,7 @@ QVariant ClustStcModel::headerData(int section, Qt::Orientation orientation, int
 
 void ClustStcModel::addData(const MNESourceEstimate &stc)
 {
-    if(!m_bModelInit)
+    if(!m_bModelInit || stc.isEmpty())
         return;
 
     if(m_vertLabelIds.size() != stc.data.rows())
@@ -247,6 +250,8 @@ void ClustStcModel::addData(const MNESourceEstimate &stc)
     if(!m_bIntervallSet)
     {
         int usec = floor(stc.tstep*1000000);
+        if(usec <= 0)
+            return;
         m_pWorker->setInterval(usec);
         m_bIntervallSet = true;
     }
@@ -300,7 +305,8 @@ void ClustStcModel::init(const AnnotationSet &annotationSet, const SurfaceSet &s
     vecCenterRR.setY((m_vecMinRR.y()+m_vecMaxRR.y())/2.0f);
     vecCenterRR.setZ((m_vecMinRR.z()+m_vecMaxRR.z())/2.0f);
 
-    // Regions
+    // Regions -> ToDo QtConcurrent
+//    qDebug() << "Before ROI";
     for(qint32 h = 0; h < m_annotationSet.size(); ++h)
     {
         MatrixX3i tris;
@@ -330,8 +336,8 @@ void ClustStcModel::init(const AnnotationSet &annotationSet, const SurfaceSet &s
             if(m_qListLabels[k].hemi != h)
                 continue;
 
-            //Ggenerate label tri information
-            tris = m_qListLabels[k].selectTris(m_surfSet[h]);
+            //Generate label tri information
+            tris = m_qListLabels[k].selectTris(m_surfSet[h]); //ToDO very slow -> QtConcurrent
 
 
             Matrix3Xf triCoords(3,3*tris.rows());
@@ -346,6 +352,7 @@ void ClustStcModel::init(const AnnotationSet &annotationSet, const SurfaceSet &s
             m_qListTriRRs.append(triCoords);
         }
     }
+//    qDebug() << "After ROI";
 
     m_iLHSize = 0;
     for(qint32 k = 0; k < m_qListLabels.size(); ++k)
