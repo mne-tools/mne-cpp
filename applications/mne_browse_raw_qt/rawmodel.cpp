@@ -348,7 +348,8 @@ void RawModel::loadFiffInfos()
 
 //*************************************************************************************************************
 
-void RawModel::clearModel() {
+void RawModel::clearModel()
+{
     //FiffIO object
     m_pfiffIO.clear();
     m_fiffInfo.clear();
@@ -374,7 +375,8 @@ void RawModel::clearModel() {
 
 //*************************************************************************************************************
 
-void RawModel::resetPosition(qint32 position) {
+void RawModel::resetPosition(qint32 position)
+{
     beginResetModel();
 
     //reset members
@@ -421,7 +423,8 @@ void RawModel::resetPosition(qint32 position) {
 
 //*************************************************************************************************************
 
-void RawModel::reloadFiffData(bool before) {
+void RawModel::reloadFiffData(bool before)
+{
     m_bReloadBefore = before;
 
     //update scroll position
@@ -467,7 +470,8 @@ void RawModel::reloadFiffData(bool before) {
 
 //*************************************************************************************************************
 
-QPair<MatrixXd,MatrixXd> RawModel::readSegment(fiff_int_t from, fiff_int_t to) {
+QPair<MatrixXd,MatrixXd> RawModel::readSegment(fiff_int_t from, fiff_int_t to)
+{
     QPair<MatrixXd,MatrixXd> datatime;
 
     m_Mutex.lock();
@@ -483,12 +487,14 @@ QPair<MatrixXd,MatrixXd> RawModel::readSegment(fiff_int_t from, fiff_int_t to) {
 
 //*************************************************************************************************************
 //public SLOTS
-void RawModel::updateScrollPos(int value) {
+void RawModel::updateScrollPos(int value)
+{
     m_iCurAbsScrollPos = firstSample()+value;
-    qDebug() << "RawModel: absolute Fiff Scroll Cursor" << m_iCurAbsScrollPos << "(m_iAbsFiffCursor" << m_iAbsFiffCursor << ", sizeOfPreloadedData" << sizeOfPreloadedData() << ")";
+    qDebug() << "RawModel: absolute Fiff Scroll Cursor" << m_iCurAbsScrollPos << "(m_iAbsFiffCursor" << m_iAbsFiffCursor << ", sizeOfPreloadedData" << sizeOfPreloadedData() << ", firstSample()" << firstSample() << ")";
 
     //if a scroll position is selected, which is not within the loaded data range -> reset position of model
     if(m_iCurAbsScrollPos > (m_iAbsFiffCursor+sizeOfPreloadedData()+m_iWindowSize) || m_iCurAbsScrollPos < m_iAbsFiffCursor) {
+        qDebug() << "RawModel: Reset position requested, m_iAbsFiffCursor:" << m_iAbsFiffCursor << "m_iCurAbsScrollPos:" << m_iCurAbsScrollPos;
         resetPosition(m_iCurAbsScrollPos);
         return;
     }
@@ -608,7 +614,8 @@ void RawModel::applyOperatorsConcurrently(QPair<int,RowVectorXd>& chdata)
 
 //*************************************************************************************************************
 
-void RawModel::updateOperators(QModelIndex chan) {
+void RawModel::updateOperators(QModelIndex chan)
+{
     for(qint32 i=0; i < m_assignedOperators.values(chan.row()).size(); ++i)
         applyOperator(chan,m_assignedOperators.values(chan.row())[i],true);
 }
@@ -616,7 +623,8 @@ void RawModel::updateOperators(QModelIndex chan) {
 
 //*************************************************************************************************************
 
-void RawModel::updateOperators(QModelIndexList chlist) {
+void RawModel::updateOperators(QModelIndexList chlist)
+{
     if(chlist.empty())
         for(qint32 i=0; i < m_chInfolist.size(); ++i)
             chlist.append(createIndex(i,1));
@@ -631,7 +639,8 @@ void RawModel::updateOperators(QModelIndexList chlist) {
 
 //*************************************************************************************************************
 
-void RawModel::updateOperators() {
+void RawModel::updateOperators()
+{
     updateOperators(QModelIndexList());
 }
 
@@ -683,7 +692,8 @@ void RawModel::undoFilter()
 
 //*************************************************************************************************************
 //private SLOTS
-void RawModel::insertReloadedData(QPair<MatrixXd,MatrixXd> dataTimesPair) {
+void RawModel::insertReloadedData(QPair<MatrixXd,MatrixXd> dataTimesPair)
+{
     //extend m_data with reloaded data
     if(m_bReloadBefore) {
         m_data.prepend(dataTimesPair.first);
