@@ -135,6 +135,7 @@ void RapMusicToolbox::init()
 
 void RapMusicToolbox::calcFiffInfo()
 {
+    QMutexLocker locker(&m_qMutex);
     if(m_pFiffInfoEvoked && m_pFiffInfoForward)
     {
         qDebug() << "Fiff Infos available";
@@ -159,8 +160,11 @@ void RapMusicToolbox::calcFiffInfo()
 void RapMusicToolbox::doClustering()
 {
     emit clusteringStarted();
+
+    m_qMutex.lock();
     m_bFinishedClustering = false;
     m_pClusteredFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(m_pFwd->cluster_forward_solution(*m_pAnnotationSet.data(), 40)));
+    m_qMutex.unlock();
 
     finishedClustering();
 }
@@ -170,9 +174,10 @@ void RapMusicToolbox::doClustering()
 
 void RapMusicToolbox::finishedClustering()
 {
+    m_qMutex.lock();
     m_bFinishedClustering = true;
-
     m_pFiffInfoForward = QSharedPointer<FiffInfoBase>(new FiffInfoBase(m_pClusteredFwd->info));
+    m_qMutex.unlock();
 
     emit clusteringFinished();
 }
@@ -205,6 +210,7 @@ bool RapMusicToolbox::stop()
     if(this->isRunning())
         QThread::wait();
 
+    m_qMutex.lock();
     m_bIsRunning = false;
 
     if(m_bProcessData) // Only clear if buffers have been initialised
@@ -214,6 +220,8 @@ bool RapMusicToolbox::stop()
     m_bProcessData = false;
 
     m_bReceiveData = false;
+
+    m_qMutex.unlock();
 
     return true;
 }
@@ -257,6 +265,7 @@ void RapMusicToolbox::updateRTE(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 {
     QSharedPointer<RealTimeEvoked> pRTE = pMeasurement.dynamicCast<RealTimeEvoked>();
 
+    QMutexLocker locker(&m_qMutex);
     //MEG
     if(pRTE && m_bReceiveData)
     {
@@ -265,11 +274,7 @@ void RapMusicToolbox::updateRTE(XMEASLIB::NewMeasurement::SPtr pMeasurement)
             m_pFiffInfoEvoked = QSharedPointer<FiffInfo>(new FiffInfo(pRTE->getValue()->info));
 
         if(m_bProcessData)
-        {
-            mutex.lock();
             m_qVecFiffEvoked.push_back(pRTE->getValue()->pick_channels(m_qListPickChannels));
-            mutex.unlock();
-        }
     }
 }
 
@@ -278,75 +283,75 @@ void RapMusicToolbox::updateRTE(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
 void RapMusicToolbox::run()
 {
-    //
-    // Cluster forward solution;
-    //
-//    qDebug() << "Start Clustering";
-//    QFuture<MNEForwardSolution> future = QtConcurrent::run(this->m_pFwd.data(), &MNEForwardSolution::cluster_forward_solution, m_annotationSet, 40);
-//    qDebug() << "Run Clustering";
-//    future.waitForFinished();
-//    m_pClusteredFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(future.result()));
-
-
-    //Do this already in init
-//    m_pClusteredFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(m_pFwd->cluster_forward_solution(*m_pAnnotationSet.data(), 40)));
-
-//    m_pRTSEOutput->data()->setSrc(m_pClusteredFwd->src);
+    qint32 numDipolePairs = 1;
 
     //
     // start receiving data
     //
+    m_qMutex.lock();
     m_bReceiveData = true;
+    m_qMutex.unlock();
 
     //
     // Read Fiff Info
     //
-    while(!m_pFiffInfo)
+    while(true)
     {
+        {
+            QMutexLocker locker(&m_qMutex);
+            if(m_pFiffInfo)
+                break;
+        }
         calcFiffInfo();
         msleep(10);// Wait for fiff Info
     }
 
-    m_pRapMusic.reset();
+    m_pPwlRapMusic.reset();
 
-    m_pRapMusic = RapMusic::SPtr(new RapMusic(*m_pClusteredFwd, false));
-
-
+    m_pPwlRapMusic = RapMusic::SPtr(new RapMusic(*m_pClusteredFwd, false, numDipolePairs));
 
     //
     // start processing data
     //
+    m_qMutex.lock();
     m_bProcessData = true;
+    m_qMutex.unlock();
 
     qint32 skip_count = 0;
-
-    while(m_bIsRunning)
+    while(true)
     {
-        if(m_qVecFiffEvoked.size() > 0)
         {
-            //DEBUG THIS
-            if(m_pRapMusic)
+            QMutexLocker locker(&m_qMutex);
+            if(!m_bIsRunning)
+                break;
+        }
+
+        m_qMutex.lock();
+        qint32 t_evokedSize = m_qVecFiffEvoked.size();
+        m_qMutex.unlock();
+
+        if(t_evokedSize > 0)
+        {
+            if(m_pPwlRapMusic && ((skip_count % 10) == 0))
             {
-                mutex.lock();
+                m_qMutex.lock();
                 FiffEvoked t_fiffEvoked = m_qVecFiffEvoked[0];
+                m_pPwlRapMusic->setStcAttr(t_fiffEvoked.data.cols()/4.0,0.0);
                 m_qVecFiffEvoked.pop_front();
-                mutex.unlock();
+                m_qMutex.unlock();
 
-                qDebug() << "source estimate replacement";
-                float tmin = ((float)t_fiffEvoked.first) / t_fiffEvoked.info.sfreq;
-                float tstep = 1/t_fiffEvoked.info.sfreq;
+                qDebug() << "m_pRapMusic->calculateInverse";
 
-                MNESourceEstimate sourceEstimate;
-//                MNESourceEstimate sourceEstimate = m_pRapMusic->calculateInverse(t_fiffEvoked.data, tmin, tstep);
-
+                MNESourceEstimate sourceEstimate = m_pPwlRapMusic->calculateInverse(t_fiffEvoked);
                 m_pRTSEOutput->data()->setValue(sourceEstimate);
             }
             else
             {
-                mutex.lock();
+                m_qMutex.lock();
                 m_qVecFiffEvoked.pop_front();
-                mutex.unlock();
+                m_qMutex.unlock();
             }
+            ++skip_count;
         }
     }
 }
