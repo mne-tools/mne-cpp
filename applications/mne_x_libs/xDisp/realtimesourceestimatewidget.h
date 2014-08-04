@@ -170,8 +170,6 @@ private:
 
     ClustStcModel*  m_pClustStcModel;
     ClustStcView*   m_pClustView;
-
-    qint32 count;   /**< Downsample skip count */
 };
 
 } // NAMESPACE
