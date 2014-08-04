@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     realtimeevokedwidget.h
+* @file     frequencyspectrumwidget.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of the RealTimeEvokedWidget Class.
+* @brief    Declaration of the FrequencySpectrumWidget Class.
 *
 */
 
-#ifndef REALTIMEEVOKEDWIDGET_H
-#define REALTIMEEVOKEDWIDGET_H
+#ifndef FREQUENCYSPECTRUMWIDGET_H
+#define FREQUENCYSPECTRUMWIDGET_H
 
 
 //*************************************************************************************************************
@@ -44,10 +44,8 @@
 
 #include "xdisp_global.h"
 #include "newmeasurementwidget.h"
-#include "helpers/realtimeevokedmodel.h"
-#include "helpers/realtimebutterflyplot.h"
-
-#include "helpers/sensorwidget.h"
+#include "helpers/frequencyspectrummodel.h"
+#include "helpers/frequencyspectrumdelegate.h"
 
 
 //*************************************************************************************************************
@@ -60,8 +58,6 @@
 #include <QAction>
 #include <QSpinBox>
 #include <QDoubleSpinBox>
-#include <QLabel>
-#include <QVBoxLayout>
 
 
 //*************************************************************************************************************
@@ -73,7 +69,7 @@ class QTime;
 
 namespace XMEASLIB
 {
-class RealTimeEvoked;
+class FrequencySpectrum;
 }
 
 
@@ -117,30 +113,30 @@ using namespace XMEASLIB;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS RealTimeMultiSampleArrayNewWidget
+* DECLARE CLASS FrequencySpectrumWidget
 *
-* @brief The RealTimeMultiSampleArrayNewWidget class provides a real-time curve display.
+* @brief The FrequencySpectrumWidget class provides a equalizer display
 */
-class XDISPSHARED_EXPORT RealTimeEvokedWidget : public NewMeasurementWidget
+class XDISPSHARED_EXPORT FrequencySpectrumWidget : public NewMeasurementWidget
 {
     Q_OBJECT
 
 public:
     //=========================================================================================================
     /**
-    * Constructs a RealTimeEvokedWidget which is a child of parent.
+    * Constructs a FrequencySpectrumWidget which is a child of parent.
     *
-    * @param [in] pRTE          pointer to real-time evoked measurement.
+    * @param [in] pNE           pointer to noise estimation measurement.
     * @param [in] pTime         pointer to application time.
     * @param [in] parent        pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
     */
-    RealTimeEvokedWidget(QSharedPointer<RealTimeEvoked> pRTE, QSharedPointer<QTime> &pTime, QWidget* parent = 0);
+    FrequencySpectrumWidget(QSharedPointer<FrequencySpectrum> pNE, QSharedPointer<QTime> &pTime, QWidget* parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the RealTimeEvokedWidget.
+    * Destroys the FrequencySpectrumWidget.
     */
-    ~RealTimeEvokedWidget();
+    ~FrequencySpectrumWidget();
 
     //=========================================================================================================
     /**
@@ -158,53 +154,21 @@ public:
 
     //=========================================================================================================
     /**
-    * Initialise the RealTimeEvokedWidget.
+    * Initialise the FrequencySpectrumWidget.
     */
     virtual void init();
 
 private:
-    //=========================================================================================================
-    /**
-    * Sets new zoom factor
-    *
-    * @param [in] zoomFac  time window size;
-    */
-    void zoomChanged(double zoomFac);
-
-    //=========================================================================================================
-    /**
-    * Shows sensor selection widget
-    */
-    void showSensorSelectionWidget();
+    FrequencySpectrumModel*      m_pFSModel;      /**< FS model */
+    FrequencySpectrumDelegate*   m_pFSDelegate;   /**< FS delegate */
+    QTableView* m_pTableView;                   /**< the QTableView being part of the model/view framework of Qt */
 
 
-    QVBoxLayout *m_pRteLayout;  /**< RTE Widget layout */
-    QLabel *m_pLabelInit;       /**< Initialization LAbel */
+    QSharedPointer<FrequencySpectrum> m_pFS;    /**< The frequency spectrum measurement. */
 
-    RealTimeEvokedModel*        m_pRTEModel;            /**< RTE data model */
-    RealTimeButterflyPlot*      m_pButterflyPlot;       /**< Butterfly plot */
-
-    QAction* m_pActionSelectModality;           /**< Modality selection action */
-
-    float m_fZoomFactor;                                    /**< Zoom factor */
-    QDoubleSpinBox* m_pDoubleSpinBoxZoom;                   /**< Adjust Zoom Factor */
-
-    QSharedPointer<RealTimeEvoked> m_pRTE;                  /**< The real-time evoked measurement. */
-
-    bool m_bInitialized;                                    /**< Is Initialized */
-
-    QList<RealTimeSampleArrayChInfo>    m_qListChInfo;      /**< Channel info list. ToDo: check if this is obsolete later on*/
-
-    QAction*    m_pActionSelectSensors;                     /**< show roi select widget */
-
-    SensorModel* m_pSensorModel;                            /**< Sensor model for channel selection */
-    QSharedPointer<SensorWidget> m_pSensorSelectionWidget;  /**< Sensor selection widget. */
-
-    QList<qint32> m_qListCurrentSelection;  /**< Current selection list -> hack around C++11 lambda  */
-    void applySelection();                  /**< apply the in m_qListCurrentSelection stored selection -> hack around C++11 lambda */
-    void resetSelection();                  /**< reset the in m_qListCurrentSelection stored selection -> hack around C++11 lambda */
+    bool m_bInitialized;                        /**< Is Initialized */
 };
 
 } // NAMESPACE
 
-#endif // REALTIMEEVOKEDWIDGET_H
+#endif // FREQUENCYSPECTRUMWIDGET_H

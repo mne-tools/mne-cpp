@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     mne.cpp
+* @file     rapmusictoolbox.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     February, 2014
 *
 * @section  LICENSE
 *
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the MNE class.
+* @brief    Contains the implementation of the RapMusicToolbox class.
 *
 */
 
@@ -38,9 +38,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "mne.h"
+#include "rapmusictoolbox.h"
 
-#include "FormFiles/mnesetupwidget.h"
+#include "FormFiles/rapmusictoolboxsetupwidget.h"
 
 
 //*************************************************************************************************************
@@ -58,7 +58,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNEPlugin;
+using namespace RapMusicToolboxPlugin;
 using namespace FIFFLIB;
 using namespace XMEASLIB;
 
@@ -68,7 +68,7 @@ using namespace XMEASLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MNE::MNE()
+RapMusicToolbox::RapMusicToolbox()
 : m_bIsRunning(false)
 , m_bReceiveData(false)
 , m_bProcessData(false)
@@ -85,7 +85,7 @@ MNE::MNE()
 
 //*************************************************************************************************************
 
-MNE::~MNE()
+RapMusicToolbox::~RapMusicToolbox()
 {
     if(this->isRunning())
         stop();
@@ -94,10 +94,10 @@ MNE::~MNE()
 
 //*************************************************************************************************************
 
-QSharedPointer<IPlugin> MNE::clone() const
+QSharedPointer<IPlugin> RapMusicToolbox::clone() const
 {
-    QSharedPointer<MNE> pMNEClone(new MNE());
-    return pMNEClone;
+    QSharedPointer<RapMusicToolbox> pRapMusicToolboxClone(new RapMusicToolbox());
+    return pRapMusicToolboxClone;
 }
 
 
@@ -106,7 +106,7 @@ QSharedPointer<IPlugin> MNE::clone() const
 // Creating required display instances and set configurations
 //=============================================================================================================
 
-void MNE::init()
+void RapMusicToolbox::init()
 {
     // Inits
     m_pFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(m_qFileFwdSolution));
@@ -114,47 +114,35 @@ void MNE::init()
     m_pSurfaceSet = SurfaceSet::SPtr(new SurfaceSet(m_sSurfaceDir+"/lh.white", m_sSurfaceDir+"/rh.white"));
 
     // Input
-    m_pRTEInput = PluginInputData<RealTimeEvoked>::create(this, "MNE RTE In", "MNE real-time evoked input data");
-    connect(m_pRTEInput.data(), &PluginInputConnector::notify, this, &MNE::updateRTE, Qt::DirectConnection);
+    m_pRTEInput = PluginInputData<RealTimeEvoked>::create(this, "RapMusic Toolbox RTE In", "RapMusic Toolbox real-time evoked input data");
+    connect(m_pRTEInput.data(), &PluginInputConnector::notify, this, &RapMusicToolbox::updateRTE, Qt::DirectConnection);
     m_inputConnectors.append(m_pRTEInput);
 
-    m_pRTCInput = PluginInputData<RealTimeCov>::create(this, "MNE RTC In", "MNE real-time covariance input data");
-    connect(m_pRTCInput.data(), &PluginInputConnector::notify, this, &MNE::updateRTC, Qt::DirectConnection);
-    m_inputConnectors.append(m_pRTCInput);
-
     // Output
-    m_pRTSEOutput = PluginOutputData<RealTimeSourceEstimate>::create(this, "MNE Out", "MNE output data");
+    m_pRTSEOutput = PluginOutputData<RealTimeSourceEstimate>::create(this, "MNEOut", "RapMusic Toolbox output data");
     m_outputConnectors.append(m_pRTSEOutput);
     m_pRTSEOutput->data()->setName("Real-Time Source Estimate");
     m_pRTSEOutput->data()->setAnnotSet(m_pAnnotationSet);
     m_pRTSEOutput->data()->setSurfSet(m_pSurfaceSet);
 
     // start clustering
-    QFuture<void> future = QtConcurrent::run(this, &MNE::doClustering);
+    QFuture<void> future = QtConcurrent::run(this, &RapMusicToolbox::doClustering);
 
 }
 
 
 //*************************************************************************************************************
 
-void MNE::calcFiffInfo()
+void RapMusicToolbox::calcFiffInfo()
 {
-    if(m_qListCovChNames.size() > 0 && m_pFiffInfoEvoked && m_pFiffInfoForward)
+    if(m_pFiffInfoEvoked && m_pFiffInfoForward)
     {
         qDebug() << "Fiff Infos available";
 
-        QStringList tmp_pick_ch_names;
+        m_qListPickChannels.clear();
         foreach (const QString &ch, m_pFiffInfoForward->ch_names)
         {
             if(m_pFiffInfoEvoked->ch_names.contains(ch))
-                tmp_pick_ch_names << ch;
-        }
-
-        m_qListPickChannels.clear();
-
-        foreach (const QString &ch, tmp_pick_ch_names)
-        {
-            if(m_qListCovChNames.contains(ch))
                 m_qListPickChannels << ch;
         }
 
@@ -168,7 +156,7 @@ void MNE::calcFiffInfo()
 
 //*************************************************************************************************************
 
-void MNE::doClustering()
+void RapMusicToolbox::doClustering()
 {
     emit clusteringStarted();
     m_bFinishedClustering = false;
@@ -180,7 +168,7 @@ void MNE::doClustering()
 
 //*************************************************************************************************************
 
-void MNE::finishedClustering()
+void RapMusicToolbox::finishedClustering()
 {
     m_bFinishedClustering = true;
 
@@ -192,7 +180,7 @@ void MNE::finishedClustering()
 
 //*************************************************************************************************************
 
-bool MNE::start()
+bool RapMusicToolbox::start()
 {
     //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
     if(this->isRunning())
@@ -211,20 +199,16 @@ bool MNE::start()
 
 //*************************************************************************************************************
 
-bool MNE::stop()
+bool RapMusicToolbox::stop()
 {
+    //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
+    if(this->isRunning())
+        QThread::wait();
+
     m_bIsRunning = false;
 
-    if(m_pRtInvOp->isRunning())
-        m_pRtInvOp->stop();
-
     if(m_bProcessData) // Only clear if buffers have been initialised
-    {
         m_qVecFiffEvoked.clear();
-        m_qVecFiffCov.clear();
-    }
-
-    m_qListCovChNames.clear();
 
     // Stop filling buffers with data from the inputs
     m_bProcessData = false;
@@ -237,7 +221,7 @@ bool MNE::stop()
 
 //*************************************************************************************************************
 
-IPlugin::PluginType MNE::getType() const
+IPlugin::PluginType RapMusicToolbox::getType() const
 {
     return _IAlgorithm;
 }
@@ -245,23 +229,23 @@ IPlugin::PluginType MNE::getType() const
 
 //*************************************************************************************************************
 
-QString MNE::getName() const
+QString RapMusicToolbox::getName() const
 {
-    return "MNE";
+    return "RAP MUSIC Toolbox";
 }
 
 
 //*************************************************************************************************************
 
-QWidget* MNE::setupWidget()
+QWidget* RapMusicToolbox::setupWidget()
 {
-    MNESetupWidget* setupWidget = new MNESetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
+    RapMusicToolboxSetupWidget* setupWidget = new RapMusicToolboxSetupWidget(this);//widget is later distroyed by CentralWidget - so it has to be created everytime new
 
     if(!m_bFinishedClustering)
         setupWidget->setClusteringState();
 
-    connect(this, &MNE::clusteringStarted, setupWidget, &MNESetupWidget::setClusteringState);
-    connect(this, &MNE::clusteringFinished, setupWidget, &MNESetupWidget::setSetupState);
+    connect(this, &RapMusicToolbox::clusteringStarted, setupWidget, &RapMusicToolboxSetupWidget::setClusteringState);
+    connect(this, &RapMusicToolbox::clusteringFinished, setupWidget, &RapMusicToolboxSetupWidget::setSetupState);
 
     return setupWidget;
 }
@@ -269,31 +253,7 @@ QWidget* MNE::setupWidget()
 
 //*************************************************************************************************************
 
-void MNE::updateRTC(XMEASLIB::NewMeasurement::SPtr pMeasurement)
-{
-    QSharedPointer<RealTimeCov> pRTC = pMeasurement.dynamicCast<RealTimeCov>();
-
-    //MEG
-    if(pRTC && m_bReceiveData)
-    {
-        //Fiff Information of the covariance
-        if(m_qListCovChNames.size() != pRTC->getValue()->names.size())
-            m_qListCovChNames = pRTC->getValue()->names;
-
-        if(m_bProcessData)
-        {
-            m_qMutex.lock();
-            m_qVecFiffCov.push_back(pRTC->getValue()->pick_channels(m_qListPickChannels));
-            m_qMutex.unlock();
-        }
-    }
-}
-
-
-
-//*************************************************************************************************************
-
-void MNE::updateRTE(XMEASLIB::NewMeasurement::SPtr pMeasurement)
+void RapMusicToolbox::updateRTE(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 {
     QSharedPointer<RealTimeEvoked> pRTE = pMeasurement.dynamicCast<RealTimeEvoked>();
 
@@ -306,9 +266,9 @@ void MNE::updateRTE(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
         if(m_bProcessData)
         {
-            m_qMutex.lock();
+            mutex.lock();
             m_qVecFiffEvoked.push_back(pRTE->getValue()->pick_channels(m_qListPickChannels));
-            m_qMutex.unlock();
+            mutex.unlock();
         }
     }
 }
@@ -316,29 +276,23 @@ void MNE::updateRTE(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
 //*************************************************************************************************************
 
-void MNE::updateInvOp(MNEInverseOperator::SPtr p_pInvOp)
+void RapMusicToolbox::run()
 {
-    m_pInvOp = p_pInvOp;
-
-    double snr = 3.0;
-    double lambda2 = 1.0 / pow(snr, 2); //ToDO estimate lambda using covariance
-
-    QString method("dSPM"); //"MNE" | "dSPM" | "sLORETA"
-
-    m_qMutex.lock();
-    m_pMinimumNorm = MinimumNorm::SPtr(new MinimumNorm(*m_pInvOp.data(), lambda2, method));
     //
-    //   Set up the inverse according to the parameters
+    // Cluster forward solution;
     //
-    m_pMinimumNorm->doInverseSetup(m_iNumAverages,false);
-    m_qMutex.unlock();
-}
+//    qDebug() << "Start Clustering";
+//    QFuture<MNEForwardSolution> future = QtConcurrent::run(this->m_pFwd.data(), &MNEForwardSolution::cluster_forward_solution, m_annotationSet, 40);
+//    qDebug() << "Run Clustering";
+//    future.waitForFinished();
+//    m_pClusteredFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(future.result()));
 
 
-//*************************************************************************************************************
+    //Do this already in init
+//    m_pClusteredFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(m_pFwd->cluster_forward_solution(*m_pAnnotationSet.data(), 40)));
 
-void MNE::run()
-{
+//    m_pRTSEOutput->data()->setSrc(m_pClusteredFwd->src);
+
     //
     // start receiving data
     //
@@ -353,18 +307,11 @@ void MNE::run()
         msleep(10);// Wait for fiff Info
     }
 
-    //
-    // Init Real-Time inverse estimator
-    //
-    m_pRtInvOp = RtInvOp::SPtr(new RtInvOp(m_pFiffInfo, m_pClusteredFwd));
-    connect(m_pRtInvOp.data(), &RtInvOp::invOperatorCalculated, this, &MNE::updateInvOp);
+    m_pRapMusic.reset();
 
-    m_pMinimumNorm.reset();
+    m_pRapMusic = RapMusic::SPtr(new RapMusic(*m_pClusteredFwd, false));
 
-    //
-    // Start the rt helpers
-    //
-    m_pRtInvOp->start();
+
 
     //
     // start processing data
@@ -375,40 +322,30 @@ void MNE::run()
 
     while(m_bIsRunning)
     {
-        if(m_qVecFiffCov.size() > 0)
-        {
-            m_qMutex.lock();
-            qDebug() << "m_qVecFiffCov" << m_qVecFiffCov.size();
-            m_pRtInvOp->appendNoiseCov(m_qVecFiffCov[0]);//DEBUG THIS
-            m_qVecFiffCov.pop_front();
-            m_qMutex.unlock();
-        }
-
         if(m_qVecFiffEvoked.size() > 0)
         {
             //DEBUG THIS
-            if(m_pMinimumNorm)
+            if(m_pRapMusic)
             {
-                m_qMutex.lock();
+                mutex.lock();
                 FiffEvoked t_fiffEvoked = m_qVecFiffEvoked[0];
                 m_qVecFiffEvoked.pop_front();
-                m_qMutex.unlock();
+                mutex.unlock();
 
                 qDebug() << "source estimate replacement";
                 float tmin = ((float)t_fiffEvoked.first) / t_fiffEvoked.info.sfreq;
                 float tstep = 1/t_fiffEvoked.info.sfreq;
 
-                m_qMutex.lock();
-                MNESourceEstimate sourceEstimate = m_pMinimumNorm->calculateInverse(t_fiffEvoked.data, tmin, tstep);
-                m_qMutex.unlock();
+                MNESourceEstimate sourceEstimate;
+//                MNESourceEstimate sourceEstimate = m_pRapMusic->calculateInverse(t_fiffEvoked.data, tmin, tstep);
 
                 m_pRTSEOutput->data()->setValue(sourceEstimate);
             }
             else
             {
-                m_qMutex.lock();
+                mutex.lock();
                 m_qVecFiffEvoked.pop_front();
-                m_qMutex.unlock();
+                mutex.unlock();
             }
         }
     }

@@ -238,9 +238,6 @@ void RealTimeMultiSampleArrayWidget::init()
         m_pTableView->setContextMenuPolicy(Qt::CustomContextMenu);
         connect(m_pTableView,SIGNAL(customContextMenuRequested(QPoint)),this,SLOT(channelContextMenu(QPoint)));
 
-        //activate kinetic scrolling
-        QScroller::grabGesture(m_pTableView,QScroller::MiddleMouseButtonGesture);
-
         m_bInitialized = true;
     }
 }

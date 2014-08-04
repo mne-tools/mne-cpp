@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     realtimeevoked.cpp
+* @file     frequencyspectrum.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the RealTimeEvoked class.
+* @brief    Contains the implementation of the FrequencySpectrum class.
 *
 */
 
@@ -38,9 +38,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "realtimeevoked.h"
-
-#include <time.h>
+#include "frequencyspectrum.h"
 
 
 //*************************************************************************************************************
@@ -64,10 +62,17 @@ using namespace XMEASLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RealTimeEvoked::RealTimeEvoked(QObject *parent)
-: NewMeasurement(QMetaType::type("RealTimeEvoked::SPtr"), parent)
-, m_pFiffEvoked(new FiffEvoked)
-, m_bInitialized(false)
+FrequencySpectrum::FrequencySpectrum(QObject *parent)
+: NewMeasurement(QMetaType::type("FrequencySpectrum::SPtr"), parent)
+, m_bIsInit(false)
+, m_bContainsValues(false)
+{
+}
+
+
+//*************************************************************************************************************
+
+FrequencySpectrum::~FrequencySpectrum()
 {
 
 }
@@ -75,89 +80,31 @@ RealTimeEvoked::RealTimeEvoked(QObject *parent)
 
 //*************************************************************************************************************
 
-RealTimeEvoked::~RealTimeEvoked()
+void FrequencySpectrum::initFromFiffInfo(FiffInfo::SPtr &p_pFiffInfo)
 {
+    m_pFiffInfo = p_pFiffInfo;
 
+    m_bIsInit = true;
 }
 
 
 //*************************************************************************************************************
 
-void RealTimeEvoked::init(FiffInfo &p_fiffInfo)
+MatrixXd FrequencySpectrum::getValue() const
 {
-    QMutexLocker locker(&m_qMutex);
-    m_qListChInfo.clear();
-    m_qListChColors.clear();
-
-    qsrand(time(NULL));
-    for(qint32 i = 0; i < p_fiffInfo.nchan; ++i)
-    {
-         m_qListChColors.append(QColor(qrand() % 256, qrand() % 256, qrand() % 256));
-
-        RealTimeSampleArrayChInfo initChInfo;
-        initChInfo.setChannelName(p_fiffInfo.chs[i].ch_name);
-
-        // set channel Unit
-        initChInfo.setUnit(p_fiffInfo.chs[i].unit);
-
-        //Treat stimulus channels different
-        if(p_fiffInfo.chs[i].kind == FIFFV_STIM_CH)
-        {
-//            initChInfo.setUnit("");
-            initChInfo.setMinValue(0);
-            initChInfo.setMaxValue(1.0e6);
-        }
-
-        // set channel Kind
-        initChInfo.setKind(p_fiffInfo.chs[i].kind);
-
-        // set channel coil
-        initChInfo.setCoil(p_fiffInfo.chs[i].coil_type);
-
-        m_qListChInfo.append(initChInfo);
-    }
+    return m_matValue;
 }
 
 
 //*************************************************************************************************************
 
-FiffEvoked::SPtr& RealTimeEvoked::getValue()
+void FrequencySpectrum::setValue(MatrixXd& v)
 {
-    QMutexLocker locker(&m_qMutex);
-    return m_pFiffEvoked;
-}
-
-
-//*************************************************************************************************************
-
-void RealTimeEvoked::setValue(FiffEvoked& v)
-{
-    if(m_pFiffEvoked->data.cols() != v.data.cols())
-        m_bInitialized = false;
-
     //Store
-    m_qMutex.lock();
-    *m_pFiffEvoked = v;
-    m_qMutex.unlock();
-
-    if(!m_bInitialized)
-    {
-        init(m_pFiffEvoked->info);
-
-        m_qMutex.lock();
-        m_iPreStimSamples = 0;
-        for(qint32 i = 0; i < m_pFiffEvoked->times.size(); ++i)
-        {
-            if(m_pFiffEvoked->times[i] >= 0)
-                break;
-            else
-                ++m_iPreStimSamples;
-        }
-
-        m_bInitialized = true;
-        m_qMutex.unlock();
-    }
-
+    m_matValue = v;
     emit notify();
+
+    if(!m_bContainsValues)
+        m_bContainsValues = true;
 }
 

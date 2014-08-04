@@ -41,15 +41,23 @@ TEMPLATE = subdirs
 #Sensors
 SUBDIRS += \
     ecgsimulator \
-    mnertclient \
     fiffsimulator \
     neuromag \
     babymeg \
-    noise \
+    triggercontrol
+
+#Algorithms
+SUBDIRS += \
     dummytoolbox \
-    triggercontrol \
-    sourcelab \
-    raplab
+    mne \
+    rapmusictoolbox \
+    averaging \
+    covariance \
+    noise \
+    bci \
+    rtsss \
+    rthpi
+
 
 win32 { #Only compile the TMSI plugin if a windows system is used - TMSi driver is not available for linux yet
     contains(QMAKE_HOST.arch, x86_64) { #Compiling MNE-X FOR a 64bit system
@@ -106,18 +114,6 @@ else {
 }
 
 
-#Algorithms
-SUBDIRS += \
-    dummytoolbox \
-    triggercontrol \
-    sourcelab \
-    mne \
-    raplab \
-    averaging \
-    covariance \
-#    bci \
-    rtsss \
-    rthpi
 
 
 

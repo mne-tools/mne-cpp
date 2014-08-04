@@ -48,7 +48,7 @@
 #include <mne_x/Interfaces/IAlgorithm.h>
 #include <generics/circularmatrixbuffer.h>
 #include <xMeas/newrealtimemultisamplearray.h>
-#include <xMeas/noiseestimation.h>
+#include <xMeas/frequencyspectrum.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -56,6 +56,7 @@
 //=============================================================================================================
 
 #include <Eigen/Core>
+#include <Eigen/Dense>
 #include <Eigen/SparseCore>
 #include <unsupported/Eigen/FFT>
 
@@ -74,7 +75,7 @@
 
 #include <QtWidgets>
 
-
+#include <QVector>
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE NAMESPACE RtHpiPlugin
@@ -113,6 +114,8 @@ class NOISE_ESTIMATESHARED_EXPORT NoiseEstimate : public IAlgorithm
     Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "noise.json") //NEW Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(MNEX::IAlgorithm)
+
+    friend class NoiseEstimateSetupWidget;
 
 public:
     //=========================================================================================================
@@ -177,7 +180,7 @@ private:
     void initConnector();
 
     PluginInputData<NewRealTimeMultiSampleArray>::SPtr   m_pRTMSAInput;     /**< The NewRealTimeMultiSampleArray of the noise plugin input.*/
-    PluginOutputData<NoiseEstimation>::SPtr  m_pNEOutput;                   /**< The NE of the noise plugin output.*/
+    PluginOutputData<FrequencySpectrum>::SPtr  m_pFSOutput;                   /**< The NE of the noise plugin output.*/
 
 
     FiffInfo::SPtr  m_pFiffInfo;                        /**< Fiff measurement info.*/
@@ -187,9 +190,18 @@ private:
     bool m_bIsRunning;      /**< If source lab is running */
     bool m_bProcessData;    /**< If data should be received for processing */
 
-public:
     double m_Fs;
     qint32 m_iFFTlength;
+
+    //MatrixXd sum_psdx;
+
+protected:
+    int NumOfBlocks;
+    int BlockSize  ;
+    int Sensors    ;
+    int BlockIndex ;
+
+    MatrixXd CircBuf;
 
 };
 

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     noiseestimationwidget.cpp
+* @file     frequencyspectrumwidget.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the NoiseEstimationWidget Class.
+* @brief    Implementation of the FrequencySpectrumWidget Class.
 *
 */
 
@@ -40,10 +40,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "noiseestimationwidget.h"
+#include "frequencyspectrumwidget.h"
 //#include "annotationwindow.h"
 
-#include <xMeas/noiseestimation.h>
+#include <xMeas/frequencyspectrum.h>
 
 
 //*************************************************************************************************************
@@ -69,6 +69,7 @@
 
 #include <QVBoxLayout>
 #include <QLabel>
+#include <QHeaderView>
 
 
 //*************************************************************************************************************
@@ -96,21 +97,28 @@ enum Tool
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-NoiseEstimationWidget::NoiseEstimationWidget(QSharedPointer<NoiseEstimation> pNE, QSharedPointer<QTime> &pTime, QWidget* parent)
+FrequencySpectrumWidget::FrequencySpectrumWidget(QSharedPointer<FrequencySpectrum> pFS, QSharedPointer<QTime> &pTime, QWidget* parent)
 : NewMeasurementWidget(parent)
-, m_pNE(pNE)
+, m_pFSModel(Q_NULLPTR)
+, m_pFSDelegate(Q_NULLPTR)
+, m_pTableView(Q_NULLPTR)
+, m_pFS(pFS)
 , m_bInitialized(false)
 {
     Q_UNUSED(pTime)
 
+    if(m_pTableView)
+        delete m_pTableView;
+    m_pTableView = new QTableView;
+
     //set vertical layout
     QVBoxLayout *neLayout = new QVBoxLayout(this);
 
-    QLabel *t_pLabelNoiseEstimation = new QLabel;
+//    QLabel *t_pLabelFrequencySpectrum = new QLabel;
+//    t_pLabelFrequencySpectrum->setText("Noise Estimation Widget");
+//    neLayout->addWidget(t_pLabelFrequencySpectrum);
 
-    t_pLabelNoiseEstimation->setText("Noise Estimation Widget");
-
-    neLayout->addWidget(t_pLabelNoiseEstimation);
+    neLayout->addWidget(m_pTableView);
 
     //set layouts
     this->setLayout(neLayout);
@@ -121,7 +129,7 @@ NoiseEstimationWidget::NoiseEstimationWidget(QSharedPointer<NoiseEstimation> pNE
 
 //*************************************************************************************************************
 
-NoiseEstimationWidget::~NoiseEstimationWidget()
+FrequencySpectrumWidget::~FrequencySpectrumWidget()
 {
 
 }
@@ -129,7 +137,7 @@ NoiseEstimationWidget::~NoiseEstimationWidget()
 
 //*************************************************************************************************************
 
-void NoiseEstimationWidget::update(XMEASLIB::NewMeasurement::SPtr)
+void FrequencySpectrumWidget::update(XMEASLIB::NewMeasurement::SPtr)
 {
     getData();
 }
@@ -137,20 +145,62 @@ void NoiseEstimationWidget::update(XMEASLIB::NewMeasurement::SPtr)
 
 //*************************************************************************************************************
 
-void NoiseEstimationWidget::getData()
+void FrequencySpectrumWidget::getData()
 {
+//    qDebug() << "get Data" << m_pNE->getValue()(0,1) << "Cols" << m_pNE->getValue().cols();
+
     if(!m_bInitialized)
     {
-
+        if(m_pFS->isInit())
+        {
+            init();
+        }
     }
+    else
+        m_pFSModel->addData(m_pFS->getValue());
 }
 
 //*************************************************************************************************************
 
-void NoiseEstimationWidget::init()
+void FrequencySpectrumWidget::init()
 {
-//    if(m_qListChInfo.size() > 0)
-//    {
-//        m_bInitialized = true;
-//    }
+    if(m_pFS->getFiffInfo())
+    {
+        if(m_pFSModel)
+            delete m_pFSModel;
+        m_pFSModel = new FrequencySpectrumModel(this);
+
+        m_pFSModel->setInfo(m_pFS->getFiffInfo());
+
+        if(m_pFSDelegate)
+            delete m_pFSDelegate;
+        m_pFSDelegate = new FrequencySpectrumDelegate(this);
+
+        connect(m_pTableView, &QTableView::doubleClicked, m_pFSModel, &FrequencySpectrumModel::toggleFreeze);
+
+        m_pTableView->setModel(m_pFSModel);
+        m_pTableView->setItemDelegate(m_pFSDelegate);
+
+        //set some size settings for m_pTableView
+        m_pTableView->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+
+        m_pTableView->setShowGrid(false);
+
+        m_pTableView->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch); //Stretch 2 column to maximal width
+        m_pTableView->horizontalHeader()->hide();
+        m_pTableView->verticalHeader()->setDefaultSectionSize(140);//m_fZoomFactor*m_fDefaultSectionSize);//Row Height
+
+        m_pTableView->setAutoScroll(false);
+        m_pTableView->setColumnHidden(0,true); //because content is plotted jointly with column=1
+
+        m_pTableView->resizeColumnsToContents();
+
+        m_pTableView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
+
+        //set context menu
+        m_pTableView->setContextMenuPolicy(Qt::CustomContextMenu);
+        connect(m_pTableView,SIGNAL(customContextMenuRequested(QPoint)),this,SLOT(channelContextMenu(QPoint)));
+
+        m_bInitialized = true;
+    }
 }

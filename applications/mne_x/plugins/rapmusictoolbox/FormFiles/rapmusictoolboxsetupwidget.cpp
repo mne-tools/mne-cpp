@@ -1,13 +1,14 @@
 //=============================================================================================================
 /**
-* @file     raplabsetupwidget.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>
+* @file     rapmusictoolboxsetupwidget.cpp
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     March, 2014
+* @date     February, 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Christoph Dinh. All rights reserved.
+* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -28,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the RapLabSetupWidget class.
+* @brief    Contains the implementation of the RapMusicToolboxSetupWidget class.
 *
 */
 
@@ -37,10 +38,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "raplabsetupwidget.h"
-#include "raplababoutwidget.h"
+#include "rapmusictoolboxsetupwidget.h"
+#include "rapmusictoolboxaboutwidget.h"
 
-#include "../raplab.h"
+#include "../rapmusictoolbox.h"
 
 #include <fs/annotationset.h>
 #include <fs/surfaceset.h>
@@ -54,6 +55,7 @@
 
 #include <QDebug>
 #include <QFileDialog>
+#include <QtConcurrent>
 
 
 //*************************************************************************************************************
@@ -61,7 +63,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace RapLabPlugin;
+using namespace RapMusicToolboxPlugin;
 
 
 //*************************************************************************************************************
@@ -69,36 +71,37 @@ using namespace RapLabPlugin;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RapLabSetupWidget::RapLabSetupWidget(RapLab* toolbox, QWidget *parent)
+RapMusicToolboxSetupWidget::RapMusicToolboxSetupWidget(RapMusicToolbox* toolbox, QWidget *parent)
 : QWidget(parent)
-, m_pRapLab(toolbox)
+, m_pRapMusicToolbox(toolbox)
 {
     ui.setupUi(this);
 
-    ui.m_qLineEdit_FwdFileName->setText(m_pRapLab->m_qFileFwdSolution.fileName());
+    ui.m_qLineEdit_FwdFileName->setText(m_pRapMusicToolbox->m_qFileFwdSolution.fileName());
 
-    ui.m_qLineEdit_AtlasDirName->setText(m_pRapLab->m_sAtlasDir);
-    if(m_pRapLab->m_pAnnotationSet->isEmpty())
+    ui.m_qLineEdit_AtlasDirName->setText(m_pRapMusicToolbox->m_sAtlasDir);
+    if(m_pRapMusicToolbox->m_pAnnotationSet->isEmpty())
         ui.m_qLabel_atlasStat->setText("not loaded");
     else
         ui.m_qLabel_atlasStat->setText("loaded");
 
-    ui.m_qLineEdit_SurfaceDirName->setText(m_pRapLab->m_sSurfaceDir);
-    if(m_pRapLab->m_pSurfaceSet->isEmpty())
+    ui.m_qLineEdit_SurfaceDirName->setText(m_pRapMusicToolbox->m_sSurfaceDir);
+    if(m_pRapMusicToolbox->m_pSurfaceSet->isEmpty())
         ui.m_qLabel_surfaceStat->setText("not loaded");
     else
         ui.m_qLabel_surfaceStat->setText("loaded");
 
-    connect(ui.m_qPushButton_About, &QPushButton::released, this, &RapLabSetupWidget::showAboutDialog);
-    connect(ui.m_qPushButton_FwdFileDialog, &QPushButton::released, this, &RapLabSetupWidget::showFwdFileDialog);
-    connect(ui.m_qPushButton_AtlasDirDialog, &QPushButton::released, this, &RapLabSetupWidget::showAtlasDirDialog);
-    connect(ui.m_qPushButton_SurfaceDirDialog, &QPushButton::released, this, &RapLabSetupWidget::showSurfaceDirDialog);
+    connect(ui.m_qPushButton_About, &QPushButton::released, this, &RapMusicToolboxSetupWidget::showAboutDialog);
+    connect(ui.m_qPushButton_FwdFileDialog, &QPushButton::released, this, &RapMusicToolboxSetupWidget::showFwdFileDialog);
+    connect(ui.m_qPushButton_AtlasDirDialog, &QPushButton::released, this, &RapMusicToolboxSetupWidget::showAtlasDirDialog);
+    connect(ui.m_qPushButton_SurfaceDirDialog, &QPushButton::released, this, &RapMusicToolboxSetupWidget::showSurfaceDirDialog);
+    connect(ui.m_qPushButonStartClustering, &QPushButton::released, this, &RapMusicToolboxSetupWidget::clusteringTriggered);
 }
 
 
 //*************************************************************************************************************
 
-RapLabSetupWidget::~RapLabSetupWidget()
+RapMusicToolboxSetupWidget::~RapMusicToolboxSetupWidget()
 {
 
 }
@@ -106,16 +109,43 @@ RapLabSetupWidget::~RapLabSetupWidget()
 
 //*************************************************************************************************************
 
-void RapLabSetupWidget::showAboutDialog()
+void RapMusicToolboxSetupWidget::setClusteringState()
 {
-    RapLabAboutWidget aboutDialog(this);
+    ui.m_qPushButonStartClustering->setEnabled(false);
+    ui.m_qPushButonStartClustering->setText("Clustering...");
+}
+
+
+//*************************************************************************************************************
+
+void RapMusicToolboxSetupWidget::setSetupState()
+{
+    ui.m_qPushButonStartClustering->setEnabled(true);
+    ui.m_qPushButonStartClustering->setText("Start Clustering");
+}
+
+
+//*************************************************************************************************************
+
+void RapMusicToolboxSetupWidget::clusteringTriggered()
+{
+    // start clustering
+    QFuture<void> future = QtConcurrent::run(m_pRapMusicToolbox, &RapMusicToolbox::doClustering);
+}
+
+
+//*************************************************************************************************************
+
+void RapMusicToolboxSetupWidget::showAboutDialog()
+{
+    RapMusicToolboxAboutWidget aboutDialog(this);
     aboutDialog.exec();
 }
 
 
 //*************************************************************************************************************
 
-void RapLabSetupWidget::showFwdFileDialog()
+void RapMusicToolboxSetupWidget::showFwdFileDialog()
 {
     QString t_sFileName = QFileDialog::getOpenFileName(this,
                                                     tr("Open Forward Solution"),
@@ -128,38 +158,38 @@ void RapLabSetupWidget::showFwdFileDialog()
     if(!t_pFwd->isEmpty())
     {
         ui.m_qLineEdit_FwdFileName->setText(t_sFileName);
-        m_pRapLab->m_qFileFwdSolution.setFileName(t_sFileName);
-        m_pRapLab->m_pFwd = t_pFwd;
+        m_pRapMusicToolbox->m_qFileFwdSolution.setFileName(t_sFileName);
+        m_pRapMusicToolbox->m_pFwd = t_pFwd;
     }
 }
 
 
 //*************************************************************************************************************
 
-void RapLabSetupWidget::showAtlasDirDialog()
+void RapMusicToolboxSetupWidget::showAtlasDirDialog()
 {
     QString t_sAtlasDir = QFileDialog::getExistingDirectory(this, tr("Open Atlas Directory"),
                                                             QString(),
                                                             QFileDialog::ShowDirsOnly
                                                             | QFileDialog::DontResolveSymlinks);
 
-    m_pRapLab->m_sAtlasDir = t_sAtlasDir;
+    m_pRapMusicToolbox->m_sAtlasDir = t_sAtlasDir;
 
-    ui.m_qLineEdit_AtlasDirName->setText(m_pRapLab->m_sAtlasDir);
+    ui.m_qLineEdit_AtlasDirName->setText(m_pRapMusicToolbox->m_sAtlasDir);
 
     AnnotationSet::SPtr t_pAnnotationSet = AnnotationSet::SPtr(new AnnotationSet(t_sAtlasDir+"/lh.aparc.a2009s.annot", t_sAtlasDir+"/rh.aparc.a2009s.annot"));
 
     if(!t_pAnnotationSet->isEmpty() && t_pAnnotationSet->size() == 2)
     {
-        m_pRapLab->m_pAnnotationSet = t_pAnnotationSet;
+        m_pRapMusicToolbox->m_pAnnotationSet = t_pAnnotationSet;
 
-        m_pRapLab->m_sAtlasDir = t_sAtlasDir;
+        m_pRapMusicToolbox->m_sAtlasDir = t_sAtlasDir;
 
         ui.m_qLabel_atlasStat->setText("loaded");
     }
     else
     {
-        m_pRapLab->m_pAnnotationSet = AnnotationSet::SPtr(new AnnotationSet());
+        m_pRapMusicToolbox->m_pAnnotationSet = AnnotationSet::SPtr(new AnnotationSet());
         ui.m_qLabel_atlasStat->setText("not loaded");
     }
 }
@@ -167,7 +197,7 @@ void RapLabSetupWidget::showAtlasDirDialog()
 
 //*************************************************************************************************************
 
-void RapLabSetupWidget::showSurfaceDirDialog()
+void RapMusicToolboxSetupWidget::showSurfaceDirDialog()
 {
     QString t_sSurfaceDir = QFileDialog::getExistingDirectory(  this, tr("Open Surface Directory"),
                                                                 QString(),
@@ -178,15 +208,15 @@ void RapLabSetupWidget::showSurfaceDirDialog()
 
     if(!t_pSurfaceSet->isEmpty() && t_pSurfaceSet->size() == 2)
     {
-        m_pRapLab->m_pSurfaceSet = t_pSurfaceSet;
+        m_pRapMusicToolbox->m_pSurfaceSet = t_pSurfaceSet;
 
-        m_pRapLab->m_sSurfaceDir = t_sSurfaceDir;
+        m_pRapMusicToolbox->m_sSurfaceDir = t_sSurfaceDir;
 
         ui.m_qLabel_surfaceStat->setText("loaded");
     }
     else
     {
-        m_pRapLab->m_pSurfaceSet = SurfaceSet::SPtr(new SurfaceSet());
+        m_pRapMusicToolbox->m_pSurfaceSet = SurfaceSet::SPtr(new SurfaceSet());
         ui.m_qLabel_surfaceStat->setText("not loaded");
     }
 }

@@ -191,9 +191,9 @@ public:
     /**
     * Sets the number of sample vectors which should be gathered before attached observers are notified by calling the Subject notify() method.
     *
-    * @param [in] ucMultiArraySize the number of values.
+    * @param [in] iMultiArraySize the number of values.
     */
-    inline void setMultiArraySize(unsigned char ucMultiArraySize);
+    inline void setMultiArraySize(qint32 iMultiArraySize);
 
     //=========================================================================================================
     /**
@@ -201,7 +201,7 @@ public:
     *
     * @return the number of values which are gathered before a notify() is called.
     */
-    inline unsigned char getMultiArraySize() const;
+    inline qint32 getMultiArraySize() const;
 
     //=========================================================================================================
     /**
@@ -229,12 +229,14 @@ public:
     virtual VectorXd getValue() const;
 
 private:
+    mutable QMutex              m_qMutex;           /**< Mutex to ensure thread safety */
+
     FiffInfo::SPtr              m_pFiffInfo_orig;   /**< Original Fiff Info if initialized by fiff info. */
 
     QString                     m_sXMLLayoutFile;   /**< Layout file name. */
     double                      m_dSamplingRate;    /**< Sampling rate of the RealTimeSampleArray.*/
     VectorXd                    m_vecValue;         /**< The current attached sample vector.*/
-    unsigned char               m_ucMultiArraySize; /**< Sample size of the multi sample array.*/
+    qint32                      m_iMultiArraySize; /**< Sample size of the multi sample array.*/
     QVector< VectorXd >         m_matSamples;       /**< The multi sample array.*/
     QList<RealTimeSampleArrayChInfo> m_qListChInfo; /**< Channel info list.*/
     bool                        m_bChInfoIsInit;    /**< If channel info is initialized.*/
@@ -248,6 +250,7 @@ private:
 
 inline void NewRealTimeMultiSampleArray::clear()
 {
+    QMutexLocker locker(&m_qMutex);
     m_matSamples.clear();
 }
 
@@ -256,6 +259,7 @@ inline void NewRealTimeMultiSampleArray::clear()
 
 inline bool NewRealTimeMultiSampleArray::isChInit() const
 {
+    QMutexLocker locker(&m_qMutex);
     return m_bChInfoIsInit;
 }
 
@@ -264,6 +268,7 @@ inline bool NewRealTimeMultiSampleArray::isChInit() const
 
 inline const QString& NewRealTimeMultiSampleArray::getXMLLayoutFile() const
 {
+    QMutexLocker locker(&m_qMutex);
     return m_sXMLLayoutFile;
 }
 
@@ -272,6 +277,7 @@ inline const QString& NewRealTimeMultiSampleArray::getXMLLayoutFile() const
 
 inline void NewRealTimeMultiSampleArray::setXMLLayoutFile(const QString& layout)
 {
+    QMutexLocker locker(&m_qMutex);
     m_sXMLLayoutFile = layout;
 }
 
@@ -280,6 +286,7 @@ inline void NewRealTimeMultiSampleArray::setXMLLayoutFile(const QString& layout)
 
 inline void NewRealTimeMultiSampleArray::setSamplingRate(double dSamplingRate)
 {
+    QMutexLocker locker(&m_qMutex);
     m_dSamplingRate = dSamplingRate;
 }
 
@@ -288,6 +295,7 @@ inline void NewRealTimeMultiSampleArray::setSamplingRate(double dSamplingRate)
 
 inline double NewRealTimeMultiSampleArray::getSamplingRate() const
 {
+    QMutexLocker locker(&m_qMutex);
     return m_dSamplingRate;
 }
 
@@ -296,6 +304,7 @@ inline double NewRealTimeMultiSampleArray::getSamplingRate() const
 
 inline unsigned int NewRealTimeMultiSampleArray::getNumChannels() const
 {
+    QMutexLocker locker(&m_qMutex);
     return m_qListChInfo.size();
 }
 
@@ -304,6 +313,7 @@ inline unsigned int NewRealTimeMultiSampleArray::getNumChannels() const
 
 inline QList<RealTimeSampleArrayChInfo>& NewRealTimeMultiSampleArray::chInfo()
 {
+    QMutexLocker locker(&m_qMutex);
     return m_qListChInfo;
 }
 
@@ -312,27 +322,30 @@ inline QList<RealTimeSampleArrayChInfo>& NewRealTimeMultiSampleArray::chInfo()
 
 inline FiffInfo::SPtr& NewRealTimeMultiSampleArray::getFiffInfo()
 {
+    QMutexLocker locker(&m_qMutex);
     return m_pFiffInfo_orig;
 }
 
 
 //*************************************************************************************************************
 
-inline void NewRealTimeMultiSampleArray::setMultiArraySize(unsigned char ucMultiArraySize)
+inline void NewRealTimeMultiSampleArray::setMultiArraySize(qint32 iMultiArraySize)
 {
+    QMutexLocker locker(&m_qMutex);
     //Obsolete unsigned char can't be bigger
 //    if(ucArraySize > 255)
 //        m_ucArraySize = 255;
 //    else
-        m_ucMultiArraySize = ucMultiArraySize;
+        m_iMultiArraySize = iMultiArraySize;
 }
 
 
 //*************************************************************************************************************
 
-unsigned char NewRealTimeMultiSampleArray::getMultiArraySize() const
+qint32 NewRealTimeMultiSampleArray::getMultiArraySize() const
 {
-    return m_ucMultiArraySize;
+    QMutexLocker locker(&m_qMutex);
+    return m_iMultiArraySize;
 }
 
 
