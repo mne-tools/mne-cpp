@@ -101,7 +101,9 @@ const QString FiffSimulator::Commands::SIMFILE      = "simfile";
 
 FiffSimulator::FiffSimulator()
 : m_pFiffProducer(new FiffProducer(this))
-, m_sResourceDataPath(QString("%1/MNE-sample-data/MEG/sample/sample_audvis_raw.fif").arg(QCoreApplication::applicationDirPath()))
+, m_sResourceDataPath(QString("D:/Data/MEG/mind006/mind006_051209_auditory01_raw.fif"))
+//, m_sResourceDataPath(QString("%1/MNE-sample-data/MEG/sample/sample_audvis_raw.fif").arg(QCoreApplication::applicationDirPath()))
+
 //, m_sResourceDataPath(QString("D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2014_02_24_Lorenz_Esch_008/Original/EEG_data_001_involuntary_left_tapping_raw.fif"))
 //, m_sResourceDataPath(QString("D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2014_02_24_Lorenz_Esch_008/Original/EEG_data_001_base_raw.fif"))
 //, m_sResourceDataPath(QString("D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2014_02_24_Lorenz_Esch_008/Original/EEG_data_001_involuntary_right_tapping_raw.fif"))
