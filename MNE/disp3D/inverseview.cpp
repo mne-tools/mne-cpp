@@ -17,12 +17,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -43,11 +43,12 @@
 #include "inverseviewproducer.h"
 
 #include <fs/label.h>
+#include <disp/colormap.h>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
 
 #include "qglbuilder.h"
@@ -73,6 +74,7 @@
 //=============================================================================================================
 
 using namespace DISP3DLIB;
+using namespace DISPLIB;
 
 
 //*************************************************************************************************************
@@ -80,14 +82,14 @@ using namespace DISP3DLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-InverseView::InverseView(const MNESourceSpace &p_sourceSpace, QList<Label> &p_qListLabels, QList<RowVector4i> &p_qListRGBAs, QWindow *parent)
+InverseView::InverseView(const MNESourceSpace &p_sourceSpace, QList<Label> &p_qListLabels, QList<RowVector4i> &p_qListRGBAs, qint32 p_iFps, bool p_bLoop, bool p_bStereo, bool p_bSlowMotion, QWindow *parent)
 : QGLView(parent)
-, m_pInverseViewProducer(new InverseViewProducer)
-, m_iColorMode(0)
+, m_pInverseViewProducer(new InverseViewProducer(p_iFps, p_bLoop, p_bSlowMotion))
 , m_sourceSpace(p_sourceSpace)
 , m_qListLabels(p_qListLabels)
 , m_qListRGBAs(p_qListRGBAs)
-, m_bStereo(true)
+, m_iColorMode(0)
+, m_bStereo(p_bStereo)
 , m_fOffsetZ(-100.0f)
 , m_fOffsetZEye(60.0f)
 , m_pSceneNodeBrain(0)
@@ -99,7 +101,7 @@ InverseView::InverseView(const MNESourceSpace &p_sourceSpace, QList<Label> &p_qL
 //    m_pCameraFrontal = new QGLCamera(this);
 //    m_pCameraFrontal->setAdjustForAspectRatio(false);
 
-    qDebug() << "p_qListLabels" << p_qListLabels.size();
+//    qDebug() << "p_qListLabels" << p_qListLabels.size();
 
     QObject::connect(m_pInverseViewProducer.data(), &InverseViewProducer::sourceEstimateSample, this, &InverseView::updateActivation);
 }
@@ -117,9 +119,8 @@ InverseView::~InverseView()
 
 //*************************************************************************************************************
 
-void InverseView::pushSourceEstimate(SourceEstimate &p_sourceEstimate)
+void InverseView::pushSourceEstimate(MNESourceEstimate &p_sourceEstimate)
 {
-    qDebug() << "Push Source Estimate 1";
     m_pInverseViewProducer->pushSourceEstimate(p_sourceEstimate);
 }
 
@@ -281,7 +282,7 @@ void InverseView::initializeGL(QGLPainter *painter)
     // Set stereo type
     //
     if (m_bStereo) {
-//            this->setStereoType(QGLView::RedCyanAnaglyph);
+//        this->setStereoType(QGLView::RedCyanAnaglyph);
         this->setStereoType(QGLView::StretchedLeftRight);
 //        camera()->setEyeSeparation(0.4f);
 //        m_pCameraFrontal->setEyeSeparation(0.1f);
@@ -295,8 +296,11 @@ void InverseView::initializeGL(QGLPainter *painter)
 
     }
 
-    //set background to light grey-blue
-    glClearColor(0.8f, 0.8f, 1.0f, 0.0f);
+//    //set background to light grey-blue
+//    glClearColor(0.8f, 0.8f, 1.0f, 0.0f);
+
+//    //set background to light white
+    glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
 
     //start the producer
     m_pInverseViewProducer->start();
@@ -409,41 +413,54 @@ void InverseView::updateActivation(QSharedPointer<Eigen::VectorXd> p_pVecActivat
 {
     VectorXd t_curLabelActivation = VectorXd::Zero(m_pSceneNode->palette()->size());
 
+    qint32 actCount = 0;
     for(qint32 h = 0; h < 2; ++h)
     {
         for(qint32 i = 0; i < m_sourceSpace[h].cluster_info.numClust(); ++i)
         {
             qint32 labelId = m_sourceSpace[h].cluster_info.clusterLabelIds[i];
             qint32 colorIdx = m_qListMapLabelIdIndex[h][labelId];
+
             //search for max activation within one label - by checking if there is already an assigned value
-            if(abs(t_curLabelActivation[colorIdx]) < abs((*p_pVecActivation.data())[i]))//m_curSourceEstimate.data(i, currentSample)))
-                t_curLabelActivation[colorIdx] = (*p_pVecActivation.data())[i];//m_curSourceEstimate.data(i, currentSample);
+            if(abs(t_curLabelActivation[colorIdx]) < abs((*p_pVecActivation.data())[actCount]))//m_curSourceEstimate.data(i, currentSample)))
+                t_curLabelActivation[colorIdx] = (*p_pVecActivation.data())[actCount];//m_curSourceEstimate.data(i, currentSample);
+
+            ++actCount;
         }
     }
 
     for(qint32 i = 0; i < m_pSceneNode->palette()->size(); ++i)
     {
-        if(m_pInverseViewProducer->getMaxActivation()[i] != 0)
-        {
-            qint32 iVal = (t_curLabelActivation[i]/m_pInverseViewProducer->getGlobalMax()) * 255;
-            iVal = iVal > 255 ? 255 : iVal < 0 ? 0 : iVal;
+        qint32 iVal = (t_curLabelActivation[i]/m_pInverseViewProducer->getGlobalMax()) * 255;//300;
 
-            int r, g, b;
-            if(m_iColorMode == 0)
-            {
-                r = iVal;
-                g = iVal;
-                b = iVal;
-            }
-            else if(m_iColorMode == 1)
-            {
-                r = iVal;
-                g = iVal;
-                b = iVal;
-            }
+        iVal = iVal > 255 ? 255 : iVal < 0 ? 0 : iVal;
 
-            m_pSceneNode->palette()->material(i)->setSpecularColor(QColor(r,g,b,200));
-        }
+//            int r, g, b;
+        QRgb qRgb;
+
+        qRgb = ColorMap::valueToHotNegative1((double)iVal/255.0);
+//        qRgb = ColorMap::valueToHotNegative2((double)iVal/255.0);
+
+
+//            if(m_iColorMode == 0)
+//            {
+//                r = iVal;
+//                g = iVal;
+//                b = iVal;
+////                qRgb = ColorMap::valueToHotNegative1((double)iVal/255.0);
+//                qRgb = ColorMap::valueToHotNegative2((double)iVal/255.0);
+//            }
+//            else if(m_iColorMode == 1)
+//            {
+//                r = iVal;
+//                g = iVal;
+//                b = iVal;
+////                qRgb = ColorMap::valueToHot((double)iVal/255.0);
+//                qRgb = ColorMap::valueToHotNegative2((double)iVal/255.0);
+//            }
+
+        m_pSceneNode->palette()->material(i)->setSpecularColor(QColor(qRgb));
+                    //QColor(r,g,b,200));
     }
 
     this->update();

@@ -18,12 +18,12 @@
  *       following disclaimer.
  *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
  *       the following disclaimer in the documentation and/or other materials provided with the distribution.
- *     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+ *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
  *       to endorse or promote products derived from this software without specific prior written permission.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
  * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
- * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+ * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
  * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
  * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
  * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -39,6 +39,7 @@
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
+
 #include "rtcmdclient.h"
 
 //*************************************************************************************************************
@@ -48,6 +49,11 @@
 
 #include <QDateTime>
 #include <QThread>
+
+#include <iostream>
+
+
+#define USENEW 1
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -111,9 +117,44 @@ void RtCmdClient::sendCommandJSON(const Command &p_command)
 
     if (this->state() == QAbstractSocket::ConnectedState)
     {
-        qDebug() << "Request: " << t_sCommand;
-
         // Send request
+#ifdef USENEW
+        QByteArray block;
+        QDataStream out(&block, QIODevice::WriteOnly);
+        out.setVersion(QDataStream::Qt_5_1);
+
+        out << (quint16)0;
+        out << t_sCommand;
+        out.device()->seek(0);
+        out << (quint16)(block.size() - sizeof(quint16));
+
+        this->write(block);
+        this->waitForBytesWritten();
+
+        // Receive response
+        QDataStream in(this);
+        in.setVersion(QDataStream::Qt_5_1);
+
+        quint16 blockSize = 0;
+
+        bool respComplete = false;
+
+        do
+        {
+            this->waitForReadyRead(100);
+
+            if (blockSize == 0)
+            {
+                if (this->bytesAvailable() >= (int)sizeof(quint16))
+                    in >> blockSize;
+            }
+            else if(this->bytesAvailable() >= blockSize)
+            {
+                in >> t_sReply;
+                respComplete = true;
+            }
+        } while (!respComplete && blockSize < 65000);//Sanity Check -> allowed maximal blocksize is 65.000
+#else
         this->write(t_sCommand.toUtf8().constData(), t_sCommand.size());
         this->waitForBytesWritten();
 
@@ -133,6 +174,7 @@ void RtCmdClient::sendCommandJSON(const Command &p_command)
             qDebug() << "Response: " << t_qByteArrayRaw.size() << " bytes";
         } while (!respComplete);
         t_sReply = QString(t_qByteArrayRaw);
+#endif
     }
     else
     {
@@ -166,7 +208,7 @@ qint32 RtCmdClient::requestBufsize()
 
     if (error.error == QJsonParseError::NoError)
     {
-        qDebug() << t_jsonDocumentOrigin;//"Received Commands" << m_commandManager.commandMap().keys();
+//        qDebug() << t_jsonDocumentOrigin;//"Received Commands" << m_commandManager.commandMap().keys();
 
         //Switch to command object
         if(t_jsonDocumentOrigin.isObject() && t_jsonDocumentOrigin.object().value(QString("bufsize")) != QJsonValue::Undefined)
@@ -203,21 +245,16 @@ void RtCmdClient::requestCommands()
     QJsonParseError error;
     QJsonDocument t_jsonDocumentOrigin = QJsonDocument::fromJson(
             t_sJsonCommands, &error);
+
     if (error.error == QJsonParseError::NoError)
-    {
         m_commandManager.insert(t_jsonDocumentOrigin);
-//        qDebug() << "Received Commands" << m_commandManager.commandMap().keys();
-    }
     else
-    {
         qCritical() << "Unable to parse JSON response: " << error.errorString();
-    }
 }
 
 
 //*************************************************************************************************************
 
-//QMap<qint32, QString>
 qint32 RtCmdClient::requestConnectors(QMap<qint32, QString> &p_qMapConnectors)
 {
     //Send

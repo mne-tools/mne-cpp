@@ -16,12 +16,12 @@
 #       following disclaimer.
 #     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 #       the following disclaimer in the documentation and/or other materials provided with the distribution.
-#     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+#     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 #       to endorse or promote products derived from this software without specific prior written permission.
 #
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 # WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-# PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+# PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 # INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 # PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 # HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -45,6 +45,8 @@ CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
+CONFIG += console #DEBUG
+
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
     LIBS += -lMNE$${MNE_LIB_VERSION}Genericsd \
@@ -52,9 +54,9 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Fsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Mned \
+            -lMNE$${MNE_LIB_VERSION}Dispd \
             -lxMeasd \
             -lxDispd \
-            -lxDtMngd \
             -lmne_xd
 }
 else {
@@ -63,35 +65,52 @@ else {
             -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lMNE$${MNE_LIB_VERSION}Mne \
+            -lMNE$${MNE_LIB_VERSION}Disp \
             -lxMeas \
             -lxDisp \
-            -lxDtMng \
             -lmne_x
+}
+
+qtHaveModule(3d) {
+    CONFIG(debug, debug|release) {
+        LIBS += -lMNE$${MNE_LIB_VERSION}Disp3Dd
+    }
+    else {
+        LIBS += -lMNE$${MNE_LIB_VERSION}Disp3D
+    }
 }
 
 DESTDIR = $${MNE_BINARY_DIR}
 
 SOURCES += \
-    src/main.cpp \
-    src/FormFiles/startupwidget.cpp \
-    src/FormFiles/runwidget.cpp \
-    src/FormFiles/mainwindow.cpp \
-    src/FormFiles/mainsplashscreen.cpp \
-    src/FormFiles/plugindockwidget.cpp
+    main.cpp \
+    startupwidget.cpp \
+    runwidget.cpp \
+    mainwindow.cpp \
+    mainsplashscreen.cpp \
+    pluginscene.cpp \
+    pluginitem.cpp \
+    plugingui.cpp \
+    arrow.cpp
 
 HEADERS += \
-    src/FormFiles/startupwidget.h \
-    src/FormFiles/runwidget.h \
-    src/FormFiles/mainwindow.h \
-    src/FormFiles/mainsplashscreen.h \
-    src/preferences/info.h \
-    src/FormFiles/plugindockwidget.h
+    info.h \
+    startupwidget.h \
+    runwidget.h \
+    mainwindow.h \
+    mainsplashscreen.h \
+    pluginscene.h \
+    pluginitem.h \
+    plugingui.h \
+    arrow.h
 
-FORMS   +=
+FORMS +=
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_X_INCLUDE_DIR}
 
 RESOURCES += \
-    res/mainApp.qrc
+    mainApp.qrc
+
+unix: QMAKE_CXXFLAGS += -Wno-attributes

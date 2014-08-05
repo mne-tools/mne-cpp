@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -57,6 +57,9 @@
 using namespace RTSERVER;
 
 
+#define USENEWSERVER 1
+
+
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE MEMBER METHODS
@@ -83,12 +86,13 @@ CommandThread::~CommandThread()
 
 //*************************************************************************************************************
 
-void CommandThread::attachCommandReply(QByteArray p_blockReply, qint32 p_iID)
+void CommandThread::attachCommandReply(QString p_blockReply, qint32 p_iID)
 {
+    qDebug() << "CommandThread::attachCommandReply";
     if(p_iID == m_iThreadID)
     {
         m_qMutex.lock();
-        m_qSendBlock.append(p_blockReply);
+        m_qSendData = p_blockReply;
         m_qMutex.unlock();
     }
 }
@@ -114,11 +118,70 @@ void CommandThread::run()
     }
 
     QDataStream t_FiffStreamIn(&t_qTcpSocket);
+    t_FiffStreamIn.setVersion(QDataStream::Qt_5_1);
 
+#ifndef USENEWSERVER
     qint64 t_iMaxBufSize = 1024;
+#endif
 
     while(t_qTcpSocket.state() != QAbstractSocket::UnconnectedState && m_bIsRunning)
     {
+#ifdef USENEWSERVER
+        //
+        // Write available data
+        //
+        if(m_qSendData.size() > 0)
+        {
+            QByteArray block;
+            QDataStream out(&block, QIODevice::WriteOnly);
+            out.setVersion(QDataStream::Qt_5_1);
+            out << (quint16)0;
+            m_qMutex.lock();
+            out << m_qSendData;
+            m_qSendData.clear();
+            m_qMutex.unlock();
+            out.device()->seek(0);
+            out << (quint16)(block.size() - sizeof(quint16));
+
+            t_qTcpSocket.write(block);
+            t_qTcpSocket.waitForBytesWritten();
+        }
+
+        //
+        // Read: Wait 100ms for incomming tag header, read and continue
+        //
+
+        t_qTcpSocket.waitForReadyRead(100);
+
+        if (t_qTcpSocket.bytesAvailable() >= (int)sizeof(quint16))
+        {
+            quint16 blockSize = 0;
+
+            bool respComplete = false;
+            t_FiffStreamIn >> blockSize;
+
+            while(!respComplete && blockSize < 65000)//Sanity Check -> allowed maximal blocksize is 65.000
+            {
+                if (t_qTcpSocket.bytesAvailable() >= blockSize)
+                {
+                    QString t_sCommand;
+
+                    t_FiffStreamIn >> t_sCommand;
+
+                    t_sCommand = t_sCommand.simplified();
+
+                    //
+                    // Parse command
+                    //
+                    if(!t_sCommand.isEmpty())
+                        emit newCommand(t_sCommand, m_iThreadID);
+
+                    respComplete = true;
+                }
+            }
+        }
+
+#else
         //
         // Write available data
         //
@@ -156,6 +219,7 @@ void CommandThread::run()
         {
             t_qTcpSocket.readAll();//readAll that QTcpSocket is empty again -> prevent overflow
         }
+#endif
     }
 
     t_qTcpSocket.disconnectFromHost();

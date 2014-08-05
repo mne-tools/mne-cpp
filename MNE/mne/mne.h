@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 * 
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -48,6 +48,7 @@
 #include "mne_forwardsolution.h"
 #include "mne_hemisphere.h"
 #include "mne_sourcespace.h"
+#include "mne_surface.h"
 
 
 //*************************************************************************************************************
@@ -414,6 +415,29 @@ public:
     static bool read_source_spaces(FiffStream::SPtr& p_pStream, bool add_geom, FiffDirTree& p_Tree, MNESourceSpace& p_SourceSpace)
     {
         return MNESourceSpace::readFromStream(p_pStream, add_geom, p_Tree, p_SourceSpace);
+    }
+
+    //=========================================================================================================
+    /**
+    * mne_read_bem_surface
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Wrapper for the MNESurface::read static function
+    *
+    * Reads a BEM surface from a fif stream
+    *
+    * @param [in] p_pStream         The open fiff file
+    * @param [in] add_geom          Add geometry information to the source spaces
+    * @param [in] p_Tree            Search for the source spaces here
+    *
+    * @param [out] p_Surfaces       The read bem surfaces
+    *
+    * @return true if succeeded, false otherwise
+    */
+    static bool read_bem_surface(FiffStream::SPtr& p_pStream, bool add_geom, FiffDirTree& p_Tree, QList<MNESurface::SPtr>& p_Surfaces)
+    {
+        return MNESurface::read(p_pStream, add_geom, p_Tree, p_Surfaces);
     }
 
     //ToDo FiffChInfoList Class

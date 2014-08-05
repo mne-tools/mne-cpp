@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/images">
+        <file alias="neuromag.png">images/neuromag.png</file>
+    </qresource>
+</RCC>

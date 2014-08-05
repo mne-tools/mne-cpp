@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -117,10 +117,22 @@ public:
     */
     inline qint32 numClust() const;
 
+    //=========================================================================================================
+    /**
+    * Writes the cluster info to a file
+    *
+    * @param[in] p_sFileName    FileName to write to
+    */
+    void write(QString p_sFileName) const;
+
 public:
-    QList<VectorXi> clusterVertnos;    /**< Vertnos which belong to corresponding cluster. */
-    QList<VectorXd> clusterDistances;  /**< Distances to clusters centroid. */
-    QList<int> clusterLabelIds;        /**< Id (Label/ROI id) of the cluster. Entries can be non unique, since some Label/ROI consist of more than one cluster.*/
+    QList<QString>      clusterLabelNames;  /**< Label name of the cluster. Entries can be non unique, since some Label consist of more than one cluster.*/
+    QList<qint32>       clusterLabelIds;    /**< Id (Label/ROI id) of the cluster. Entries can be non unique, since some Label/ROI consist of more than one cluster.*/
+    QList<qint32>       centroidVertno;     /**< Id (Label/ROI id) of the centroid */
+    QList<Vector3f>     centroidSource_rr;  /**< Centroid location */
+    QList<VectorXi>     clusterVertnos;     /**< Vertnos which belong to corresponding cluster. */
+    QList<MatrixX3f>    clusterSource_rr;   /**< Cluster source locations */
+    QList<VectorXd>     clusterDistances;   /**< Distances to clusters centroid. */
 };
 
 //*************************************************************************************************************

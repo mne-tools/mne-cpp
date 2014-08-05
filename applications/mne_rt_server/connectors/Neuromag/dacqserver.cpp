@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -72,7 +72,6 @@ using namespace NeuromagPlugin;
 
 DacqServer::DacqServer(Neuromag* p_pNeuromag, QObject * parent)
 : QThread(parent)
-, m_pNeuromag(p_pNeuromag)
 , m_pCollectorSock(NULL)
 , m_pShmemSock(NULL)
 , m_bIsRunning(false)
@@ -80,6 +79,7 @@ DacqServer::DacqServer(Neuromag* p_pNeuromag, QObject * parent)
 , m_bMeasRequest(true)
 , m_bMeasStopRequest(false)
 , m_bSetBuffersizeRequest(false)
+, m_pNeuromag(p_pNeuromag)
 {
 }
 
@@ -249,7 +249,7 @@ bool DacqServer::getMeasInfo(FiffInfo& p_fiffInfo)
     for(qint32 i = 0; i < p_fiffInfo.chs.size(); ++i)
         p_fiffInfo.ch_names.append(p_fiffInfo.chs[i].ch_name);
 
-    printf("[done]\r\n", p_fiffInfo.chs.size());
+    printf("[done]\r\n %d", p_fiffInfo.chs.size());
     
     printf("measurement info read.\r\n");   
 
@@ -299,8 +299,10 @@ void DacqServer::run()
     //            collector_close();
     //            return;
     //        }
+    Q_UNUSED(t_iOriginalMaxBuflen);
+
     if (m_pNeuromag->m_uiBufferSampleSize < MIN_BUFLEN) {
-        fprintf(stderr, "%s: Too small Neuromag buffer length requested, should be at least %d\n", m_pNeuromag->m_uiBufferSampleSize, MIN_BUFLEN);
+        fprintf(stderr, "%ui: Too small Neuromag buffer length requested, should be at least %d\n", m_pNeuromag->m_uiBufferSampleSize, MIN_BUFLEN);
         return;
     }
     else {
@@ -419,13 +421,42 @@ void DacqServer::run()
                     t_nSamplesNew = t_nSamples + m_pNeuromag->m_uiBufferSampleSize - 1;
                     printf("Reading %d ... %d  =  %9.3f ... %9.3f secs...", t_nSamples, t_nSamplesNew, ((float)t_nSamples) / sfreq, ((float)t_nSamplesNew) / sfreq );
                     t_nSamples += m_pNeuromag->m_uiBufferSampleSize;
-                    
-                    MatrixXf* t_pMatrix = new MatrixXf( (Map<MatrixXi>( (int*) t_pTag->data(), nchan, m_pNeuromag->m_uiBufferSampleSize)).cast<float>());
 
-//                    std::cout << "Matrix Xf " << t_pMatrix->block(0,0,1,4);
+                    float a;
+                    float meg_mag_multiplier = 1.0;
+                    float meg_grad_multiplier = 1.0;
+                    float eeg_multiplier = 1.0;
+
+                    MatrixXf* t_pMatrix = new MatrixXf(nchan, m_pNeuromag->m_uiBufferSampleSize);
+
+                    fiff_int_t *data32 = (fiff_int_t *)t_pTag->data();
+                    for (qint32 ch = 0; ch < nchan; ch++) {
+                        switch(m_pNeuromag->m_info.chs[ch].kind) {
+                            case FIFFV_MAGN_CH:
+                                if (m_pNeuromag->m_info.chs[ch].unit == FIFF_UNIT_T_M)
+                                    a = meg_grad_multiplier;
+                                else
+                                    a = meg_mag_multiplier;
+                                break;
+                            case FIFFV_EL_CH:
+                                a = eeg_multiplier;
+                                break;
+                            default:
+                                a = 1.0;
+                        }
+                        for (qint32 ns = 0; ns < m_pNeuromag->m_uiBufferSampleSize; ns++)
+                            (*t_pMatrix)(ch,ns) = a * m_pNeuromag->m_info.chs[ch].cal * m_pNeuromag->m_info.chs[ch].range * data32[nchan*ns+ch];
+                    }
+
                     m_pNeuromag->m_pRawMatrixBuffer->push(t_pMatrix);
 
                     delete t_pMatrix;
+/*                    
+                    MatrixXf* t_pMatrix = new MatrixXf( (Map<MatrixXi>( (int*) t_pTag->data(), nchan, m_pNeuromag->m_uiBufferSampleSize)).cast<float>());
+//                    std::cout << "Matrix Xf " << t_pMatrix->block(0,0,1,4);
+                    m_pNeuromag->m_pRawMatrixBuffer->push(t_pMatrix);
+                    delete t_pMatrix;
+*/
                     printf(" [done]\r\n");
                 }
                 break;

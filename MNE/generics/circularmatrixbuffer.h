@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -153,6 +153,26 @@ public:
     */
     inline quint32 cols() const;
 
+    //=========================================================================================================
+    /**
+    * Pauses the buffer. Skpis any incoming matrices and only pops zero matrices.
+    */
+    inline void pause(bool);
+
+    //=========================================================================================================
+    /**
+    * Releases the circular buffer from the acquire statement in the pop() function.
+    * @param [out] bool returns true if resources were freed so that the aquire statement in the pop function can release, otherwise false.
+    */
+    inline bool releaseFromPop();
+
+    //=========================================================================================================
+    /**
+    * Releases the circular buffer from the acquire statement in the push() function.
+    * @param [out] bool returns true if resources were freed so that the aquire statement in the push function can release, otherwise false.
+    */
+    inline bool releaseFromPush();
+
 private:
     //=========================================================================================================
     /**
@@ -172,6 +192,7 @@ private:
     int             m_iCurrentWriteIndex;       /**< Holds the current write index.*/
     QSemaphore*     m_pFreeElements;            /**< Holds a semaphore which acquires free elements for thread safe writing. A semaphore is a generalization of a mutex.*/
     QSemaphore*     m_pUsedElements;            /**< Holds a semaphore which acquires written semaphore for thread safe reading.*/
+    bool            m_bPause;
 };
 
 
@@ -192,6 +213,7 @@ CircularMatrixBuffer<_Tp>::CircularMatrixBuffer(unsigned int uiMaxNumMatrices, u
 , m_iCurrentWriteIndex(-1)
 , m_pFreeElements(new QSemaphore(m_uiMaxNumElements))
 , m_pUsedElements(new QSemaphore(0))
+, m_bPause(false)
 {
 
 }
@@ -213,16 +235,19 @@ CircularMatrixBuffer<_Tp>::~CircularMatrixBuffer()
 template<typename _Tp>
 inline void CircularMatrixBuffer<_Tp>::push(const Matrix<_Tp, Dynamic, Dynamic>* pMatrix)
 {
-    unsigned int t_size = pMatrix->size();
-    if(t_size == m_uiRows*m_uiCols)
+    if(!m_bPause)
     {
-        m_pFreeElements->acquire(t_size);
-        for(unsigned int i = 0; i < t_size; ++i)
-            m_pBuffer[mapIndex(m_iCurrentWriteIndex)] = pMatrix->data()[i];
-        m_pUsedElements->release(t_size);
+        unsigned int t_size = pMatrix->size();
+        if(t_size == m_uiRows*m_uiCols)
+        {
+            m_pFreeElements->acquire(t_size);
+            for(unsigned int i = 0; i < t_size; ++i)
+                m_pBuffer[mapIndex(m_iCurrentWriteIndex)] = pMatrix->data()[i];
+            m_pUsedElements->release(t_size);
+        }
+    //    else
+    //        printf("Error: Matrix not appended to CircularMatrixBuffer - wrong dimensions\n");
     }
-//    else
-//        printf("Error: Matrix not appended to CircularMatrixBuffer - wrong dimensions\n");
 }
 
 
@@ -231,11 +256,17 @@ inline void CircularMatrixBuffer<_Tp>::push(const Matrix<_Tp, Dynamic, Dynamic>*
 template<typename _Tp>
 inline Matrix<_Tp, Dynamic, Dynamic> CircularMatrixBuffer<_Tp>::pop()
 {
-    m_pUsedElements->acquire(m_uiRows*m_uiCols);
     Matrix<_Tp, Dynamic, Dynamic> matrix(m_uiRows, m_uiCols);
-    for(quint32 i = 0; i < m_uiRows*m_uiCols; ++i)
-        matrix.data()[i] = m_pBuffer[mapIndex(m_iCurrentReadIndex)];
-    m_pFreeElements->release(m_uiRows*m_uiCols);
+
+    if(!m_bPause)
+    {
+        m_pUsedElements->acquire(m_uiRows*m_uiCols);
+        for(quint32 i = 0; i < m_uiRows*m_uiCols; ++i)
+            matrix.data()[i] = m_pBuffer[mapIndex(m_iCurrentReadIndex)];
+        m_pFreeElements->release(m_uiRows*m_uiCols);
+    }
+    else
+        matrix.setZero();
 
     return matrix;
 }
@@ -246,7 +277,10 @@ inline Matrix<_Tp, Dynamic, Dynamic> CircularMatrixBuffer<_Tp>::pop()
 template<typename _Tp>
 inline unsigned int CircularMatrixBuffer<_Tp>::mapIndex(int& index)
 {
-    return index = ++index % m_uiMaxNumElements;
+    int AuxIndex;
+    AuxIndex = ++index;
+    return index = AuxIndex % m_uiMaxNumElements;
+
 }
 
 
@@ -289,6 +323,59 @@ template<typename _Tp>
 inline quint32 CircularMatrixBuffer<_Tp>::cols() const
 {
     return m_uiCols;
+}
+
+
+//*************************************************************************************************************
+
+template<typename _Tp>
+inline void CircularMatrixBuffer<_Tp>::pause(bool bPause)
+{
+    m_bPause = bPause;
+}
+
+
+//*************************************************************************************************************
+
+template<typename _Tp>
+inline bool CircularMatrixBuffer<_Tp>::releaseFromPop()
+{
+   if((uint)m_pUsedElements->available() < m_uiRows*m_uiCols)
+    {
+        //The last matrix which is to be popped from the buffer is supposed to be a zero matrix
+        unsigned int t_size = m_uiRows*m_uiCols;
+        for(unsigned int i = 0; i < t_size; ++i)
+            m_pBuffer[mapIndex(m_iCurrentWriteIndex)] = 0;
+
+        //Release (create) values from m_pUsedElements so that the pop function can leave the acquire statement in the pop function
+        m_pUsedElements->release(m_uiRows*m_uiCols);
+
+        return true;
+    }
+
+    return false;
+}
+
+
+//*************************************************************************************************************
+
+template<typename _Tp>
+inline bool CircularMatrixBuffer<_Tp>::releaseFromPush()
+{
+    if((uint)m_pFreeElements->available() < m_uiRows*m_uiCols)
+    {
+        //The last matrix which is to be pushed to the buffer is supposed to be a zero matrix
+        unsigned int t_size = m_uiRows*m_uiCols;
+        for(unsigned int i = 0; i < t_size; ++i)
+            m_pBuffer[mapIndex(m_iCurrentWriteIndex)] = 0;
+
+        //Release (create) values from m_pFreeElements so that the push function can leave the acquire statement in the push function
+        m_pFreeElements->release(m_uiRows*m_uiCols);
+
+        return true;
+    }
+
+    return false;
 }
 
 

@@ -2,6 +2,7 @@
 /**
 * @file     fiff_evoked_set.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     July, 2012
@@ -16,12 +17,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -158,6 +159,51 @@ FiffEvokedSet FiffEvokedSet::pick_channels(const QStringList& include, const QSt
 //    }
 
 //    return res;
+}
+
+//*************************************************************************************************************
+
+bool FiffEvokedSet::compensate_to(FiffEvokedSet& p_FiffEvokedSet, fiff_int_t to) const
+{
+    qint32 now = p_FiffEvokedSet.info.get_current_comp();
+    FiffCtfComp ctf_comp;
+
+    if(now == to)
+    {
+        printf("Data is already compensated as desired.\n");
+        return false;
+    }
+
+    //Make the compensator and apply it to all data sets
+    p_FiffEvokedSet.info.make_compensator(now,to,ctf_comp);
+
+    for(qint16 i=0; i < p_FiffEvokedSet.evoked.size(); ++i)
+    {
+        p_FiffEvokedSet.evoked[i].data = ctf_comp.data->data*p_FiffEvokedSet.evoked.at(i).data;
+    }
+
+    //Update the compensation info in the channel descriptors
+    p_FiffEvokedSet.info.set_current_comp(to);
+
+    return true;
+}
+
+//*************************************************************************************************************
+
+bool FiffEvokedSet::find_evoked(const FiffEvokedSet& p_FiffEvokedSet) const
+{
+    if(!p_FiffEvokedSet.evoked.size()) {
+        printf("No evoked response data sets in %s\n",p_FiffEvokedSet.info.filename.toLatin1().constData());
+        return false;
+    }
+    else
+        printf("\nFound %d evoked response data sets in %s :\n",p_FiffEvokedSet.evoked.size(),p_FiffEvokedSet.info.filename.toLatin1().constData());
+
+    for(qint32 i = 0; i < p_FiffEvokedSet.evoked.size(); ++i) {
+        printf("%s (%s)\n",p_FiffEvokedSet.evoked.at(i).comment.toLatin1().constData(),p_FiffEvokedSet.evoked.at(i).aspectKindToString().toLatin1().constBegin());
+    }
+
+    return true;
 }
 
 

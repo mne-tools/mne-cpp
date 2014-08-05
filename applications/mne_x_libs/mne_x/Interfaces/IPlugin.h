@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -36,6 +36,16 @@
 #ifndef IPLUGIN_H
 #define IPLUGIN_H
 
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+//#include "../Management/plugininputconnector.h"
+//#include "../Management/pluginoutputconnector.h"
+#include "../Management/pluginoutputdata.h"
+#include "../Management/plugininputdata.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -45,8 +55,7 @@
 #include <QThread>
 #include <QCoreApplication>
 #include <QSharedPointer>
-
-#include <xMeas/Nomenclature/nomenclature.h>
+#include <QAction>
 
 
 //*************************************************************************************************************
@@ -63,20 +72,15 @@ namespace MNEX
 // ENUMERATIONS
 //=============================================================================================================
 
-//=============================================================================================================
-/**
-* Plugin Type enumeration.
-*/
-enum Type
-{
-    _ISensor,               /**< Type for a sensor plugin. */
-    _IRTAlgorithm,          /**< Type for a real-time algorithm plugin. */
-    _IRTRecord,             /**< Type for a real-time record plugin. */
-    _IAlert,                /**< Type for a alert plugin. */
-    _IRTVisualization       /**< Type for a real-time visualization plugin. */
-};
 
-using namespace XMEASLIB;
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+//class PluginInputConnector;
+//class PluginOutputConnector;
 
 
 //=========================================================================================================
@@ -87,15 +91,43 @@ using namespace XMEASLIB;
 */
 class IPlugin : public QThread
 {
+//    Q_OBJECT
 public:
+    //=============================================================================================================
+    /**
+    * Plugin Type enumeration.
+    */
+    enum PluginType
+    {
+        _ISensor,       /**< Type for a sensor plugin. */
+        _IAlgorithm,    /**< Type for a real-time algorithm plugin. */
+        _IIO,           /**< Type for a real-time I/O plugin. */
+        _PluginSet      /**< Type for a plugin set which holds different types of plugins. */
+    };
+
     typedef QSharedPointer<IPlugin> SPtr;               /**< Shared pointer type for IPlugin. */
     typedef QSharedPointer<const IPlugin> ConstSPtr;    /**< Const shared pointer type for IPlugin. */
+
+    typedef QVector< QSharedPointer< PluginInputConnector > > InputConnectorList;  /**< List of input connectors. */
+    typedef QVector< QSharedPointer< PluginOutputConnector > > OutputConnectorList; /**< List of output connectors. */
 
     //=========================================================================================================
     /**
     * Destroys the IPlugin.
     */
     virtual ~IPlugin() {};
+
+    //=========================================================================================================
+    /**
+    * Clone the plugin
+    */
+    virtual QSharedPointer<IPlugin> clone() const = 0;
+
+    //=========================================================================================================
+    /**
+    * Initializes the plugin.
+    */
+    virtual void init() = 0;
 
     //=========================================================================================================
     /**
@@ -117,11 +149,11 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns the provider id
+    * A list of actions for the current plugin.
     *
-    * @return the provider id (Plugin ID).
+    * @return a list of plugin actions
     */
-    inline PLG_ID::Plugin_ID getPlugin_ID() const;
+    inline QList< QAction* > getPluginActions();
 
     //=========================================================================================================
     /**
@@ -130,7 +162,7 @@ public:
     *
     * @return type of the IPlugin
     */
-    virtual Type getType() const = 0;
+    virtual PluginType getType() const = 0;
 
     //=========================================================================================================
     /**
@@ -139,7 +171,15 @@ public:
     *
     * @return the name of plugin.
     */
-    virtual const char* getName() const = 0;
+    virtual QString getName() const = 0;
+
+    //=========================================================================================================
+    /**
+    * True if multi instantiation of plugin is allowed.
+    *
+    * @return true if multi instantiation of plugin is allowed.
+    */
+    virtual inline bool multiInstanceAllowed() const = 0;
 
     //=========================================================================================================
     /**
@@ -150,33 +190,12 @@ public:
     */
     virtual QWidget* setupWidget() = 0; //setup()
 
-    //=========================================================================================================
-    /**
-    * Returns the widget which is shown under configuration tab while running mode.
-    * Pure virtual method.
-    *
-    * @return the run widget.
-    */
-    virtual QWidget* runWidget() = 0;
 
-    //=========================================================================================================
-    /**
-    * Sets the activation status of the plugin.
-    *
-    * @param [in] status the new activation status of the plugin.
-    */
-    inline void setStatus(bool status);
+    inline InputConnectorList& getInputConnectors(){return m_inputConnectors;}
+    inline OutputConnectorList& getOutputConnectors(){return m_outputConnectors;}
 
-    //=========================================================================================================
-    /**
-    * Returns the activation status of the plugin.
-    *
-    * @return true if plugin is activated.
-    */
-    inline bool isActive() const;
 
 protected:
-
     //=========================================================================================================
     /**
     * The starting point for the thread. After calling start(), the newly created thread calls this function.
@@ -185,11 +204,19 @@ protected:
     */
     virtual void run() = 0;
 
-    PLG_ID::Plugin_ID m_PLG_ID;     /**< Holds the plugin id.*/
+    //=========================================================================================================
+    /**
+    * Adds a plugin action to the current plugin.
+    *
+    * @param [in] pAction  pointer to the action to be added to the plugin
+    */
+    inline void addPluginAction(QAction* pAction);
+
+    InputConnectorList m_inputConnectors;    /**< Set of input connectors associated with this plug-in. */
+    OutputConnectorList m_outputConnectors;  /**< Set of output connectors associated with this plug-in. */
 
 private:
-
-    bool m_bStatus;                 /**< Holds the activation status. */
+    QList< QAction* >   m_qListPluginActions;  /**< List of plugin actions */
 };
 
 //*************************************************************************************************************
@@ -197,26 +224,34 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
-inline PLG_ID::Plugin_ID IPlugin::getPlugin_ID() const
+inline bool IPlugin::multiInstanceAllowed() const
 {
-    return m_PLG_ID;
+    return true;
 }
 
 
 //*************************************************************************************************************
 
-inline void IPlugin::setStatus(bool status)
+inline QList< QAction* > IPlugin::getPluginActions()
 {
-    m_bStatus = status;
+    return m_qListPluginActions;
 }
 
 
 //*************************************************************************************************************
 
-inline bool IPlugin::isActive() const
+inline void IPlugin::addPluginAction(QAction* pAction)
 {
-    return m_bStatus;
+    m_qListPluginActions.append(pAction);
 }
+
+
+//*************************************************************************************************************
+
+//inline void IPlugin::addPluginWidget(QWidget* pWidget)
+//{
+//    m_qListPluginWidgets.append(pWidget);
+//}
 
 } //Namespace
 

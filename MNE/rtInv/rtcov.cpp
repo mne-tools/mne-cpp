@@ -17,12 +17,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -82,7 +82,8 @@ RtCov::RtCov(qint32 p_iMaxSamples, FiffInfo::SPtr p_pFiffInfo, QObject *parent)
 
 RtCov::~RtCov()
 {
-    stop();
+    if(this->isRunning())
+        stop();
 }
 
 
@@ -101,10 +102,36 @@ void RtCov::append(const MatrixXd &p_DataSegment)
 
 //*************************************************************************************************************
 
+void RtCov::setSamples(qint32 samples)
+{
+    m_iNewMaxSamples = samples;
+}
+
+
+//*************************************************************************************************************
+
+bool RtCov::start()
+{
+    //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
+    if(this->isRunning())
+        QThread::wait();
+
+    m_bIsRunning = true;
+    QThread::start();
+
+    return true;
+}
+
+
+//*************************************************************************************************************
+
 bool RtCov::stop()
 {
     m_bIsRunning = false;
-    QThread::wait();
+
+    m_pRawMatrixBuffer->releaseFromPop();
+
+    m_pRawMatrixBuffer->clear();
 
     return true;
 }
@@ -114,9 +141,6 @@ bool RtCov::stop()
 
 void RtCov::run()
 {
-    m_bIsRunning = true;
-
-
     quint32 n_samples = 0;
 
     FiffCov::SPtr cov(new FiffCov());
@@ -153,8 +177,8 @@ void RtCov::run()
                 //ToDo do picks
                 cov->names = m_pFiffInfo->ch_names;
                 cov->projs = m_pFiffInfo->projs;
-                cov->bads  = m_pFiffInfo->bads;
-                cov->nfree  = n_samples;
+                cov->bads = m_pFiffInfo->bads;
+                cov->nfree = n_samples;
 
                 // regularize noise covariance
                 *cov.data() = cov->regularize(*m_pFiffInfo, 0.05, 0.05, 0.1, true);

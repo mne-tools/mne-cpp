@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -278,7 +278,7 @@ bool FiffEvoked::read(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant 
     fiff_int_t nchan = 0;
     float sfreq = -1.0f;
     QList<FiffChInfo> chs;
-    fiff_int_t kind, pos, first, last;
+    fiff_int_t kind, pos, first=0, last=0;
     FiffTag::SPtr t_pTag;
     QString comment("");
     qint32 k;
@@ -413,13 +413,16 @@ bool FiffEvoked::read(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant 
     }
     if (all_data.cols() != nsamp)
     {
-        qWarning("Incorrect number of samples (%d instead of %d)", all_data.cols(), nsamp);
+        qWarning("Incorrect number of samples (%d instead of %d)", (int) all_data.cols(), nsamp);
         return false;
     }
 
     //
     //   Calibrate
     //
+    printf("\n\tPreprocessing...\n");
+    printf("\t%d channels remain after picking\n",info.nchan);
+
     typedef Eigen::Triplet<double> T;
     std::vector<T> tripletList;
     tripletList.reserve(info.nchan);
@@ -464,12 +467,13 @@ bool FiffEvoked::read(QIODevice& p_IODevice, FiffEvoked& p_FiffEvoked, QVariant 
 
     if(p_FiffEvoked.proj.rows() > 0)
     {
-        printf("\tSSP projectors applied...\n");
         all_data = p_FiffEvoked.proj * all_data;
+        printf("\tSSP projectors applied to the evoked data\n");
     }
 
     // Run baseline correction
     all_data = MNEMath::rescale(all_data, times, baseline, QString("mean"));
+    printf("Applying baseline correction ... (mode: mean)");
 
     // Put it all together
     p_FiffEvoked.info = info;

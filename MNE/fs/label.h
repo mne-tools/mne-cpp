@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -176,13 +176,12 @@ public:
 
 public:
     QString comment;    /**< Comment from the first line of the label file. */
-    qint32 hemi;        /**< Hemisphere (lh = 0; rh = 1) */
-//    qint32 hemi;                        /**< Hemisphere (lh = 0; rh = 1; both = 2) */ Don't mix both hemis - KISS principle
-    QString name;       /**< Name of the label */
     VectorXi vertices;  /**< Vertex indices (0 based) */
     MatrixX3f pos;      /**< Locations in meters */
     VectorXd values;    /**< Values at the vertices */
-
+    qint32 hemi;        /**< Hemisphere (lh = 0; rh = 1) */
+//    qint32 hemi;                        /**< Hemisphere (lh = 0; rh = 1; both = 2) */ Don't mix both hemis - KISS principle
+    QString name;       /**< Name of the label */
     qint32 label_id;    /**< Label id (optional) */
 //    MatrixX3i tris;     /**< Tris for plotting (optional) */
 

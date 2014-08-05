@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -119,6 +119,26 @@ public:
 
     //=========================================================================================================
     /**
+    * Returns a negative skewed hot RGB to a given double value [0,1]
+    *
+    * @param[in] v      the double which has to be part of the intervall [0,1]
+    *
+    * @return the corresponding negative skewed Hot RGB
+    */
+    static inline QRgb valueToHotNegative1(double v);
+
+    //=========================================================================================================
+    /**
+    * Returns a negative skewed hot RGB to a given double value [0,1]
+    *
+    * @param[in] v      the double which has to be part of the intervall [0,1]
+    *
+    * @return the corresponding negative skewed Hot RGB
+    */
+    static inline QRgb valueToHotNegative2(double v);
+
+    //=========================================================================================================
+    /**
     * Returns a Bone RGB to a given double value [0,1]
     *
     * @param[in] v      the double which has to be part of the intervall [0,1]
@@ -208,6 +228,62 @@ protected:
 
     //=========================================================================================================
     /**
+    * Describes the red Hot negative skewed fuzzy set. Calculates to an input value v [0,1] the corresponding output color value [0,255]
+    *
+    * @param[in] v  input value [0,1]
+    *
+    * @return the output color value [0.255]
+    */
+    static int hotRNeg1(double v);
+    //=========================================================================================================
+    /**
+    * Describes the green Hot negative skewed fuzzy set. Calculates to an input value v [0,1] the corresponding output color value [0,255]
+    *
+    * @param[in] v  input value [0,1]
+    *
+    * @return the output color value [0.255]
+    */
+    static int hotGNeg1(double v);
+    //=========================================================================================================
+    /**
+    * Describes the blue Hot negative skewed fuzzy set. Calculates to an input value v [0,1] the corresponding output color value [0,255]
+    *
+    * @param[in] v  input value [0,1]
+    *
+    * @return the output color value [0.255]
+    */
+    static int hotBNeg1(double v);
+
+    //=========================================================================================================
+    /**
+    * Describes the red Hot negative skewed fuzzy set. Calculates to an input value v [0,1] the corresponding output color value [0,255]
+    *
+    * @param[in] v  input value [0,1]
+    *
+    * @return the output color value [0.255]
+    */
+    static int hotRNeg2(double v);
+    //=========================================================================================================
+    /**
+    * Describes the green Hot negative skewed fuzzy set. Calculates to an input value v [0,1] the corresponding output color value [0,255]
+    *
+    * @param[in] v  input value [0,1]
+    *
+    * @return the output color value [0.255]
+    */
+    static int hotGNeg2(double v);
+    //=========================================================================================================
+    /**
+    * Describes the blue Hot negative skewed fuzzy set. Calculates to an input value v [0,1] the corresponding output color value [0,255]
+    *
+    * @param[in] v  input value [0,1]
+    *
+    * @return the output color value [0.255]
+    */
+    static int hotBNeg2(double v);
+
+    //=========================================================================================================
+    /**
     * Describes the red Bone fuzzy set. Calculates to an input value v [0,1] the corresponding output color value [0,255]
     *
     * @param[in] v  input value [0,1]
@@ -283,6 +359,24 @@ inline QRgb ColorMap::valueToJet(double v)
 inline QRgb ColorMap::valueToHot(double v)
 {
     QRgb p_qRgb = qRgb(hotR(v), hotG(v), hotB(v));
+    return p_qRgb;
+}
+
+
+//*************************************************************************************************************
+
+inline QRgb ColorMap::valueToHotNegative1(double v)
+{
+    QRgb p_qRgb = qRgb(hotRNeg1(v), hotGNeg1(v), hotBNeg1(v));
+    return p_qRgb;
+}
+
+
+//*************************************************************************************************************
+
+inline QRgb ColorMap::valueToHotNegative2(double v)
+{
+    QRgb p_qRgb = qRgb(hotRNeg2(v), hotGNeg2(v), hotBNeg2(v));
     return p_qRgb;
 }
 

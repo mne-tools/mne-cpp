@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -71,10 +71,10 @@ using namespace NeuromagPlugin;
 
 ShmemSocket::ShmemSocket(QObject *parent)
 : QObject(parent)
-, m_iShmemSock(-1)
-, m_iShmemId(CLIENT_ID)
 , shmid(-1)
 , shmptr(NULL)
+, m_iShmemSock(-1)
+, m_iShmemId(CLIENT_ID)
 , fd(NULL)
 , shmem_fd(NULL)
 , filename(NULL)
@@ -139,7 +139,7 @@ int ShmemSocket::receive_tag (FiffTag::SPtr& p_pTag)
 
     /* A sanity check to survive at least some crazy messages */
 
-    if (mess.kind > 20000 || mess.size > (size_t) 100000000)
+    if (mess.kind > 20000 || (unsigned long) mess.size > (size_t) 100000000)
     {
         printf("ALERT: Unreasonable data received, skipping! (size=%d)(kind=%d)", mess.kind, mess.size);
         //dacq_log("ALERT: Unreasonable data received, skipping! (size=%d)(kind=%d)", mess.kind, mess.size);
@@ -151,14 +151,14 @@ int ShmemSocket::receive_tag (FiffTag::SPtr& p_pTag)
     p_pTag->type = mess.type;
     p_pTag->next = 0;
 
-    if (mess.size > (size_t) 0)
+    if ((unsigned long) mess.size > (size_t) 0)
     {
         p_pTag->resize(mess.size);
     }
 
 //    qDebug() << mess.loc << " " << mess.size << " " << mess.shmem_buf << " " << mess.shmem_loc;
 
-    if (mess.loc < 0 && mess.size > (size_t) 0 && mess.shmem_buf < 0 && mess.shmem_loc < 0)
+    if (mess.loc < 0 && (unsigned long) mess.size > (size_t) 0 && mess.shmem_buf < 0 && mess.shmem_loc < 0)
     {
         fromlen = sizeof(from);
         rlen = recvfrom(m_iShmemSock, (void *)p_pTag->data(), mess.size, 0, (sockaddr *)(&from), &fromlen);
@@ -172,7 +172,7 @@ int ShmemSocket::receive_tag (FiffTag::SPtr& p_pTag)
 //        if (mess.type == FIFFT_STRING)
 //            data[mess.size] = '\0';
     }
-    else if (mess.size > (size_t) 0) {
+    else if ((unsigned long) mess.size > (size_t) 0) {
         /*
          * Copy data from shared memory
          */
@@ -213,7 +213,7 @@ int ShmemSocket::receive_tag (FiffTag::SPtr& p_pTag)
             }
             if (interesting_data(mess.kind)) {
                 if (read_fif (read_fd,read_loc,mess.size,(char *)p_pTag->data()) == -1) {
-                    printf("Could not read data (tag = %d, size = %d, pos = %d)!\n", mess.kind,mess.size,read_loc);//dacq_log("Could not read data (tag = %d, size = %d, pos = %d)!\n", mess.kind,mess.size,read_loc);
+                    printf("Could not read data (tag = %d, size = %d, pos = %li)!\n", mess.kind,mess.size,read_loc);//dacq_log("Could not read data (tag = %d, size = %d, pos = %d)!\n", mess.kind,mess.size,read_loc);
                     //dacq_log("%s\n",err_get_error());
                 }
                 else {

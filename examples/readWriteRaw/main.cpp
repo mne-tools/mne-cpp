@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implements the main() application function.
+* @brief    Example of processing raw data (read and write)
 *
 */
 
@@ -81,9 +81,12 @@ int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    QFile t_fileIn("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+//    QFile t_fileIn("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+//    QFile t_fileIn("./MNE-sample-data/MEG/test_output.fif");
+    QFile t_fileIn("./MNE-sample-data/MEG/sample/sample_write/test_output.fif");
 
-    QFile t_fileOut("./MNE-sample-data/MEG/test_output.fif");
+    QFile t_fileOut("./MNE-sample-data/MEG/sample/sample_write/test_output2.fif");
+//    QFile t_fileOut("./MNE-sample-data/MEG/test_output2.fif");
 
     //
     //   Setup for reading the raw data
@@ -117,7 +120,7 @@ int main(int argc, char *argv[])
     //
     MatrixXd cals;
 
-    FiffStream::SPtr outfid = Fiff::start_writing_raw(t_fileOut,raw.info, cals, picks);
+    FiffStream::SPtr outfid = Fiff::start_writing_raw(t_fileOut,raw.info, cals/*, picks*/);
     //
     //   Set up the reading parameters
     //
@@ -147,7 +150,7 @@ int main(int argc, char *argv[])
             last = to;
         }
 
-        if (!raw.read_raw_segment(data,times,first,last,picks))
+        if (!raw.read_raw_segment(data,times,first,last/*,picks*/))
         {
                 printf("error during read_raw_segment\n");
                 return -1;
@@ -170,7 +173,7 @@ int main(int argc, char *argv[])
 
     printf("Finished\n");
 
-    return a.exec();
+    return 0;//a.exec();
 }
 
 //*************************************************************************************************************

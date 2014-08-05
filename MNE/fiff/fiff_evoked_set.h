@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -143,6 +143,36 @@ public:
     * @return the desired fiff evoked data set
     */
     FiffEvokedSet pick_channels(const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList) const;
+
+    //=========================================================================================================
+    /**
+    * mne_compensate_to
+    *
+    * ### MNE toolbox root function ### Implementation of the mne_compensate_to function
+    *
+    * Apply compensation to the data as desired
+    *
+    * @param[in] to                 desired compensation in the output
+    * @param[in,out] p_FiffEvoked   Evoked set to compensate
+    *
+    * @return true if succeeded, false otherwise
+    */
+    bool compensate_to(FiffEvokedSet &p_FiffEvokedSet, fiff_int_t to) const;
+
+
+    //=========================================================================================================
+    /**
+    * fiff_find_evoked
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Find evoked data sets
+    *
+    * @param[out] p_FiffEvokedSet   The read evoked data set
+    *
+    * @return true when any set was found, false otherwise
+    */
+    bool find_evoked(const FiffEvokedSet& p_FiffEvokedSet) const;
 
     //=========================================================================================================
     /**
