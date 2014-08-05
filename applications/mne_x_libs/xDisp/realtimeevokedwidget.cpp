@@ -117,8 +117,10 @@ RealTimeEvokedWidget::RealTimeEvokedWidget(QSharedPointer<RealTimeEvoked> pRTE, 
     m_pActionSelectModality = new QAction(QIcon(":/images/evokedSettings.png"), tr("Shows the covariance modality selection widget (F12)"),this);
     m_pActionSelectModality->setShortcut(tr("F12"));
     m_pActionSelectModality->setStatusTip(tr("Shows the covariance modality selection widget (F12)"));
-//    connect(m_pActionSelectModality, &QAction::triggered, this, &RealTimeCovWidget::showModalitySelectionWidget);
+    connect(m_pActionSelectModality, &QAction::triggered, this, &RealTimeEvokedWidget::showModalitySelectionWidget);
     addDisplayAction(m_pActionSelectModality);
+
+    m_qListPickTypes << "MAG";
 
     m_pDoubleSpinBoxZoom = new QDoubleSpinBox(this);
     m_pDoubleSpinBoxZoom->setMinimum(0.3);
@@ -187,8 +189,6 @@ void RealTimeEvokedWidget::getData()
     {
         if(m_pRTE->isInitialized())
         {
-            m_qListChInfo = m_pRTE->chInfo();
-
 //            QFile file(m_pRTE->getXMLLayoutFile());
 //            if (!file.open(QFile::ReadOnly | QFile::Text))
 //            {
@@ -202,6 +202,8 @@ void RealTimeEvokedWidget::getData()
 //                m_pSensorModel->mapChannelInfo(m_qListChInfo);
 //                m_pActionSelectSensors->setVisible(true);
 //            }
+
+            m_qListChInfo = m_pRTE->chInfo();
 
             init();
 
@@ -217,7 +219,7 @@ void RealTimeEvokedWidget::getData()
 
 void RealTimeEvokedWidget::init()
 {
-    if(m_qListChInfo.size() > 0)
+    if(m_pRTE->isInitialized())
     {
         m_pRteLayout->removeWidget(m_pLabelInit);
         m_pLabelInit->hide();
@@ -232,6 +234,35 @@ void RealTimeEvokedWidget::init()
 
         m_pButterflyPlot->setModel(m_pRTEModel);
 
+        m_qListModalities.clear();
+        bool hasMag = false;
+        bool hasGrad = false;
+        bool hasEEG = false;
+        bool hasEOG = false;
+        for(qint32 i = 0; i < m_pRTE->info().nchan; ++i)
+        {
+            if(m_pRTE->info().chs[i].kind == FIFFV_MEG_CH)
+            {
+                if(!hasMag && m_pRTE->info().chs[i].unit == FIFF_UNIT_T)
+                    hasMag = true;
+                else if(!hasGrad &&  m_pRTE->info().chs[i].unit == FIFF_UNIT_T_M)
+                    hasGrad = true;
+            }
+            else if(!hasEEG && m_pRTE->info().chs[i].kind == FIFFV_EEG_CH)
+                hasEEG = true;
+            else if(!hasEOG && m_pRTE->info().chs[i].kind == FIFFV_EOG_CH)
+                hasEOG = true;
+        }
+        if(hasMag)
+            m_qListModalities.append(QPair<QString,bool>("MAG",true));
+        if(hasGrad)
+            m_qListModalities.append(QPair<QString,bool>("GRAD",true));
+        if(hasEEG)
+            m_qListModalities.append(QPair<QString,bool>("EEG",true));
+        if(hasEOG)
+            m_qListModalities.append(QPair<QString,bool>("EOG",true));
+
+        // Initialized
         m_bInitialized = true;
     }
 }
@@ -242,6 +273,22 @@ void RealTimeEvokedWidget::init()
 void RealTimeEvokedWidget::zoomChanged(double zoomFac)
 {
     m_fZoomFactor = zoomFac;
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeEvokedWidget::showModalitySelectionWidget()
+{
+    if(!m_pEvokedModalityWidget)
+    {
+        m_pEvokedModalityWidget = QSharedPointer<EvokedModalityWidget>(new EvokedModalityWidget(this));
+
+        m_pEvokedModalityWidget->setWindowTitle("Modality Selection");
+
+        connect(m_pEvokedModalityWidget.data(), &EvokedModalityWidget::selectionChanged, m_pButterflyPlot, &RealTimeButterflyPlot::setSelection);
+    }
+    m_pEvokedModalityWidget->show();
 }
 
 
@@ -281,11 +328,11 @@ void RealTimeEvokedWidget::applySelection()
 
 void RealTimeEvokedWidget::resetSelection()
 {
-    // non C++11 alternative
-    m_qListCurrentSelection.clear();
-    for(qint32 i = 0; i < m_qListChInfo.size(); ++i)
-        m_qListCurrentSelection.append(i);
+//    // non C++11 alternative
+//    m_qListCurrentSelection.clear();
+//    for(qint32 i = 0; i < m_qListChInfo.size(); ++i)
+//        m_qListCurrentSelection.append(i);
 
-    applySelection();
+//    applySelection();
 }
 

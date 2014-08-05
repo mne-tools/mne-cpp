@@ -35,6 +35,11 @@ RealTimeButterflyPlot::RealTimeButterflyPlot(QWidget *parent)
 , m_pRealTimeEvokedModel(NULL)
 , m_bIsInit(false)
 , m_iNumChannels(-1)
+, showMAG(true)
+, showGRAD(false)
+, showEEG(false)
+, showEOG(false)
+, showMISC(false)
 {
 }
 
@@ -87,33 +92,46 @@ void RealTimeButterflyPlot::paintEvent(QPaintEvent*)
         {
             qint32 kind = m_pRealTimeEvokedModel->getKind(r);
 
-            //ToDo display only selected kinds
+            //Display only selected kinds
             switch(kind) {
-//                case FIFFV_MEG_CH: {
-//                    qint32 unit = m_pRealTimeEvokedModel->getUnit(row);
-//                    if(unit == FIFF_UNIT_T_M) {
-//                        fMaxValue = 1e-10f;// m_qSettings.value("RawDelegate/max_meg_grad").toDouble();
-//                    }
-//                    else if(unit == FIFF_UNIT_T)
-//                    {
-//                        if(m_pRealTimeEvokedModel->getCoil(row) == FIFFV_COIL_BABY_MAG)
-//                            fMaxValue = 1e-4f;
-//                        else
-//                            fMaxValue = 1e-11f;// m_qSettings.value("RawDelegate/max_meg_mag").toDouble();
-//                    }
-//                    break;
-//                }
-                case FIFFV_EEG_CH: {
-                    break;
+                case FIFFV_MEG_CH: {
+                    qint32 unit = m_pRealTimeEvokedModel->getUnit(r);
+                    if(unit == FIFF_UNIT_T_M) {
+                        if(showGRAD)
+                            break;
+                        else
+                            continue;
+                    }
+                    else if(unit == FIFF_UNIT_T)
+                    {
+                        if(showMAG)
+                            break;
+                        else
+                            continue;
+                    }
+                    continue;
                 }
-//                case FIFFV_EOG_CH: {
-//                    fMaxValue = 1e-3f; //m_qSettings.value("RawDelegate/max_eog").toDouble();
-//                    break;
-//                }
+                case FIFFV_EEG_CH: {
+                    if(showEEG)
+                        break;
+                    else
+                        continue;
+                }
+                case FIFFV_EOG_CH: {
+                    if(showEOG)
+                        break;
+                    else
+                        continue;
+                }
+                case FIFFV_MISC_CH: {
+                    if(showMISC)
+                        break;
+                    else
+                        continue;
+                }
                 default:
                     continue;
             }
-
 
             painter.save();
             painter.setPen(QPen(m_pRealTimeEvokedModel->getColor(r), 1));
@@ -234,4 +252,38 @@ void RealTimeButterflyPlot::createPlotPath(qint32 row, QPainterPath& path) const
 
 //        lastPath.lineTo(qSamplePosition);
 //    }
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeButterflyPlot::setSelection(QStringList p_qList)
+{
+    qDebug() << "RealTimeButterflyPlot::setSelection";
+
+    if(p_qList.contains("GRAD"))
+        showGRAD = true;
+    else
+        showGRAD = false;
+
+    if(p_qList.contains("MAG"))
+        showMAG = true;
+    else
+        showMAG = false;
+
+    if(p_qList.contains("EEG"))
+        showEEG = true;
+    else
+        showEEG = false;
+
+    if(p_qList.contains("EOG"))
+        showEOG = true;
+    else
+        showEOG = false;
+
+    if(p_qList.contains("MSIC"))
+        showMISC = true;
+    else
+        showMISC = false;
+    update();
 }
