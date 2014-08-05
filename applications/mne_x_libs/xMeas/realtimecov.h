@@ -58,6 +58,8 @@
 #include <QVector>
 #include <QList>
 #include <QColor>
+#include <QMutex>
+#include <QMutexLocker>
 
 
 //*************************************************************************************************************
