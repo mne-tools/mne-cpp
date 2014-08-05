@@ -139,6 +139,7 @@ void MNE::init()
 
 void MNE::calcFiffInfo()
 {
+    QMutexLocker locker(&m_qMutex);
     if(m_qListCovChNames.size() > 0 && m_pFiffInfoEvoked && m_pFiffInfoForward)
     {
         qDebug() << "Fiff Infos available";
@@ -171,8 +172,11 @@ void MNE::calcFiffInfo()
 void MNE::doClustering()
 {
     emit clusteringStarted();
+
+    m_qMutex.lock();
     m_bFinishedClustering = false;
     m_pClusteredFwd = MNEForwardSolution::SPtr(new MNEForwardSolution(m_pFwd->cluster_forward_solution(*m_pAnnotationSet.data(), 40)));
+    m_qMutex.unlock();
 
     finishedClustering();
 }
@@ -182,9 +186,10 @@ void MNE::doClustering()
 
 void MNE::finishedClustering()
 {
+    m_qMutex.lock();
     m_bFinishedClustering = true;
-
     m_pFiffInfoForward = QSharedPointer<FiffInfoBase>(new FiffInfoBase(m_pClusteredFwd->info));
+    m_qMutex.unlock();
 
     emit clusteringFinished();
 }
@@ -297,6 +302,7 @@ void MNE::updateRTE(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 {
     QSharedPointer<RealTimeEvoked> pRTE = pMeasurement.dynamicCast<RealTimeEvoked>();
 
+    QMutexLocker locker(&m_qMutex);
     //MEG
     if(pRTE && m_bReceiveData)
     {
@@ -305,11 +311,7 @@ void MNE::updateRTE(XMEASLIB::NewMeasurement::SPtr pMeasurement)
             m_pFiffInfoEvoked = QSharedPointer<FiffInfo>(new FiffInfo(pRTE->getValue()->info));
 
         if(m_bProcessData)
-        {
-            m_qMutex.lock();
             m_qVecFiffEvoked.push_back(pRTE->getValue()->pick_channels(m_qListPickChannels));
-            m_qMutex.unlock();
-        }
     }
 }
 
@@ -342,13 +344,20 @@ void MNE::run()
     //
     // start receiving data
     //
+    m_qMutex.lock();
     m_bReceiveData = true;
+    m_qMutex.unlock();
 
     //
     // Read Fiff Info
     //
-    while(!m_pFiffInfo)
+    while(true)
     {
+        {
+            QMutexLocker locker(&m_qMutex);
+            if(m_pFiffInfo)
+                break;
+        }
         calcFiffInfo();
         msleep(10);// Wait for fiff Info
     }
@@ -375,26 +384,29 @@ void MNE::run()
 
     while(m_bIsRunning)
     {
-        if(m_qVecFiffCov.size() > 0)
+        m_qMutex.lock();
+        qint32 t_covSize = m_qVecFiffCov.size();
+        m_qMutex.unlock();
+        if(t_covSize > 0)
         {
             m_qMutex.lock();
-            qDebug() << "m_qVecFiffCov" << m_qVecFiffCov.size();
-            m_pRtInvOp->appendNoiseCov(m_qVecFiffCov[0]);//DEBUG THIS
+            m_pRtInvOp->appendNoiseCov(m_qVecFiffCov[0]);
             m_qVecFiffCov.pop_front();
             m_qMutex.unlock();
         }
 
-        if(m_qVecFiffEvoked.size() > 0)
+        m_qMutex.lock();
+        qint32 t_evokedSize = m_qVecFiffEvoked.size();
+        m_qMutex.unlock();
+        if(t_evokedSize > 0)
         {
-            //DEBUG THIS
-            if(m_pMinimumNorm)
+            if(m_pMinimumNorm && ((skip_count % 4) == 0))
             {
                 m_qMutex.lock();
                 FiffEvoked t_fiffEvoked = m_qVecFiffEvoked[0];
                 m_qVecFiffEvoked.pop_front();
                 m_qMutex.unlock();
 
-                qDebug() << "source estimate replacement";
                 float tmin = ((float)t_fiffEvoked.first) / t_fiffEvoked.info.sfreq;
                 float tstep = 1/t_fiffEvoked.info.sfreq;
 
@@ -410,6 +422,7 @@ void MNE::run()
                 m_qVecFiffEvoked.pop_front();
                 m_qMutex.unlock();
             }
+            ++skip_count;
         }
     }
 }
