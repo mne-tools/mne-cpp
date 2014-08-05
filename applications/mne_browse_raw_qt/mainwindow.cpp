@@ -93,8 +93,9 @@ void MainWindow::setupModel()
     m_pRawModel = new RawModel(m_qFileRaw,this);
     m_pEventModel = new EventModel(this);
 
-    //Set fiffInfo in event model
+    //Set fiffInfo in event model TODO: This is dirty - what happens if no file was loaded (due to missing file)
     m_pEventModel->setFiffInfo(m_pRawModel->m_fiffInfo);
+    m_pEventModel->setFirstSample(m_pRawModel->firstSample());
 }
 
 
@@ -182,8 +183,7 @@ void MainWindow::setupViewSettings()
                 this,SLOT(jumpToEvent(QModelIndex, QModelIndex)));
 
     //Create event window
-    if(m_wEventWidget == NULL)
-        m_wEventWidget = new QWidget(this, Qt::Window);
+    m_wEventWidget = new QWidget(this, Qt::Window);
 
     QVBoxLayout *eventWidgetLayout = new QVBoxLayout;
 
@@ -362,6 +362,10 @@ void MainWindow::openFile()
 
     //set position of QScrollArea
     setScrollBarPosition(0);
+
+    //Set fiffInfo in event model
+    m_pEventModel->setFiffInfo(m_pRawModel->m_fiffInfo);
+    m_pEventModel->setFirstSample(m_pRawModel->firstSample());
 }
 
 
@@ -592,8 +596,8 @@ void MainWindow::jumpToEvent(const QModelIndex & current, const QModelIndex & pr
 
     qDebug()<<"Jumping to Event at sample "<<sample;
 
-    //Jump to sample - subtract first sample value - put sample in the middle of the view (-m_pRawModel->m_iWindowSize/2)
-    m_pRawTableView->horizontalScrollBar()->setValue(sample-m_pRawModel->firstSample()-m_pRawModel->m_iWindowSize/2);
+    //Jump to sample - put sample in the middle of the view (-m_pRawModel->m_iWindowSize/2)
+    m_pRawTableView->horizontalScrollBar()->setValue(sample-m_pRawModel->m_iWindowSize/2);
 }
 
 

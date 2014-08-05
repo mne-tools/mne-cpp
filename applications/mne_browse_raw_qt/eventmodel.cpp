@@ -58,48 +58,17 @@ using namespace MNEBrowseRawQt;
 
 EventModel::EventModel(QObject *parent)
 : QAbstractTableModel(parent)
+, m_iFirstSample(0)
 {
-//    m_iWindowSize = m_qSettings.value("RawModel/window_size").toInt();
-//    m_reloadPos = m_qSettings.value("RawModel/reload_pos").toInt();
-//    m_maxWindows = m_qSettings.value("RawModel/max_windows").toInt();
 }
 
 //*************************************************************************************************************
 
 EventModel::EventModel(QFile &qFile, QObject *parent)
 : QAbstractTableModel(parent)
-//, m_bFileloaded(false)
-//, m_qSettings()
-//, m_bStartReached(false)
-//, m_bEndReached(false)
-//, m_bReloading(false)
-//, m_bProcessing(false)
+, m_iFirstSample(0)
 {
-    Q_UNUSED(qFile);
-//    m_iWindowSize = m_qSettings.value("RawModel/window_size").toInt();
-//    m_reloadPos = m_qSettings.value("RawModel/reload_pos").toInt();
-//    m_maxWindows = m_qSettings.value("RawModel/max_windows").toInt();
-//    m_iFilterTaps = m_qSettings.value("RawModel/num_filter_taps").toInt();
-
-//    //connect signal and slots
-//    connect(&m_reloadFutureWatcher,&QFutureWatcher<QPair<MatrixXd,MatrixXd> >::finished,[this](){
-//        insertReloadedData(m_reloadFutureWatcher.future().result());
-//    });
-
-//    connect(this,&RawModel::dataReloaded,[this](){
-//        if(!m_assignedOperators.empty()) updateOperatorsConcurrently();
-//    });
-
-////    connect(&m_operatorFutureWatcher,&QFutureWatcher<QPair<int,RowVectorXd> >::resultReadyAt,[this](int index){
-////        insertProcessedData(index);
-////    });
-//    connect(&m_operatorFutureWatcher,&QFutureWatcher<void>::finished,[this](){
-//        insertProcessedData();
-//    });
-
-//    connect(&m_operatorFutureWatcher,&QFutureWatcher<QPair<int,RowVectorXd> >::progressValueChanged,[this](int progressValue){
-//        qDebug() << "RawModel: ProgressValue m_operatorFutureWatcher, " << progressValue << " items processed out of" << m_listTmpChData.size();
-//    });
+    loadEventData(qFile);
 }
 
 
@@ -159,11 +128,11 @@ QVariant EventModel::data(const QModelIndex &index, int role) const
     if (index.isValid()) {
         //******** first column (sample index) ********
         if(index.column()==0 && role == Qt::DisplayRole)
-            return QVariant(m_data(index.row(), 0));
+            return QVariant(m_data(index.row(), 0)-m_iFirstSample);
 
         //******** second column (event time plot) ********
         if(index.column()==1 && role == Qt::DisplayRole)
-            return QVariant((double)m_data(index.row(), 0)/m_fiffInfo.sfreq);
+            return QVariant((double)(m_data(index.row(), 0)-m_iFirstSample)/m_fiffInfo.sfreq);
 
         //******** third column (event type plot) ********
         if(index.column()==2 && role == Qt::DisplayRole)
@@ -224,6 +193,19 @@ bool EventModel::saveEventData(QFile& qFile)
 void EventModel::setFiffInfo(FiffInfo& fiffInfo)
 {
     m_fiffInfo = fiffInfo;
+}
+
+
+//*************************************************************************************************************
+
+void EventModel::setFirstSample(int firstSample)
+{
+    m_iFirstSample = firstSample;
+
+//    //Subtract first sample from event samples
+//    if(m_data.rows() != 0)
+//        for(int i = 0; i<m_data.rows(); i++)
+//            m_data(i,0) = m_data(i,0) - m_iFirstSample;
 }
 
 
