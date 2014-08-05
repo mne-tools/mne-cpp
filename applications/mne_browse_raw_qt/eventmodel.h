@@ -152,6 +152,14 @@ public:
     */
     void setFiffInfo(FiffInfo& fiffInfo);
 
+    //=========================================================================================================
+    /**
+    * setFirstSample sets the first/starting sample of the loaded fiff data file.
+    *
+    * @param firstSample first sample value
+    */
+    void setFirstSample(int firstSample);
+
 private:
     //=========================================================================================================
     /**
@@ -162,6 +170,8 @@ private:
     MatrixXi        m_data;         /**< Matrix that holds the loaded events from the event file. */
 
     FiffInfo        m_fiffInfo;     /**< fiff info of whole fiff file */
+
+    int             m_iFirstSample; /**< holds the first/starting sample of the fiff data file */
 };
 
 } // NAMESPACE
