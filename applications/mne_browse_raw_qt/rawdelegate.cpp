@@ -210,10 +210,20 @@ void RawDelegate::createPlotPath(const QModelIndex &index, const QStyleOptionVie
     QPointF qSamplePosition;
 
     //plot all rows from list of pairs
+    int counter = 0;
+
     for(qint8 i=0; i < listPairs.size(); ++i) {
         //create lines from one to the next sample
         for(qint32 j=0; j < listPairs[i].second; ++j)
         {
+            //If event add line
+            if(counter == 40)
+            {
+                path.addRect(path.currentPosition().x(),option.rect.y(),1,option.rect.height());
+                counter = 0;
+            }
+            counter++;
+
             double val = *(listPairs[i].first+j);
             dValue = val*dScaleY;
 
