@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -57,7 +57,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace ECGSimulatorModule;
+using namespace ECGSimulatorPlugin;
 
 
 //*************************************************************************************************************
@@ -71,8 +71,10 @@ ECGSetupWidget::ECGSetupWidget(ECGSimulator* simulator, QWidget* parent)
 {
     ui.setupUi(this);
 
-    connect(ui.m_qDoubleSpinBox_SamplingRate, SIGNAL(valueChanged(double)), this, SLOT(setSamplingRate(double)));
-    connect(ui.m_qSpinBox_Downsampling, SIGNAL(valueChanged(int)), this, SLOT(setDownsamplingRate(int)));
+    connect(ui.m_qDoubleSpinBox_SamplingRate, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
+            this, &ECGSetupWidget::setSamplingRate);
+    connect(ui.m_qSpinBox_Downsampling, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged),
+            this, &ECGSetupWidget::setDownsamplingRate);
 
 
     QString path(m_pECGSimulator->m_qStringResourcePath+"data/");
@@ -87,19 +89,22 @@ ECGSetupWidget::ECGSetupWidget(ECGSimulator* simulator, QWidget* parent)
     ui.m_qComboBox_Channel_2->addItems(files);
     ui.m_qComboBox_Channel_3->addItems(files);
 
-    connect(ui.m_qComboBox_Channel_1, SIGNAL(currentIndexChanged(int)), this, SLOT(setFileOfChannel_I()));
-    connect(ui.m_qComboBox_Channel_2, SIGNAL(currentIndexChanged(int)), this, SLOT(setFileOfChannel_II()));
-    connect(ui.m_qComboBox_Channel_3, SIGNAL(currentIndexChanged(int)), this, SLOT(setFileOfChannel_III()));
+    connect(ui.m_qComboBox_Channel_1, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+            this, &ECGSetupWidget::setFileOfChannel_I);
+    connect(ui.m_qComboBox_Channel_2, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+            this, &ECGSetupWidget::setFileOfChannel_II);
+    connect(ui.m_qComboBox_Channel_3, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+            this, &ECGSetupWidget::setFileOfChannel_III);
 
-    connect(ui.m_qCheckBox_Channel_Enable_1, SIGNAL(toggled(bool)), this, SLOT(setEnabledChannel_I(bool)));
-    connect(ui.m_qCheckBox_Channel_Enable_2, SIGNAL(toggled(bool)), this, SLOT(setEnabledChannel_II(bool)));
-    connect(ui.m_qCheckBox_Channel_Enable_3, SIGNAL(toggled(bool)), this, SLOT(setEnabledChannel_III(bool)));
+    connect(ui.m_qCheckBox_Channel_Enable_1, &QCheckBox::toggled, this, &ECGSetupWidget::setEnabledChannel_I);
+    connect(ui.m_qCheckBox_Channel_Enable_2, &QCheckBox::toggled, this, &ECGSetupWidget::setEnabledChannel_II);
+    connect(ui.m_qCheckBox_Channel_Enable_3, &QCheckBox::toggled, this, &ECGSetupWidget::setEnabledChannel_III);
 
-    connect(ui.m_qCheckBox_Channel_Visible_1, SIGNAL(toggled(bool)), this, SLOT(setVisibleChannel_I(bool)));
-    connect(ui.m_qCheckBox_Channel_Visible_2, SIGNAL(toggled(bool)), this, SLOT(setVisibleChannel_II(bool)));
-    connect(ui.m_qCheckBox_Channel_Visible_3, SIGNAL(toggled(bool)), this, SLOT(setVisibleChannel_III(bool)));
+    connect(ui.m_qCheckBox_Channel_Visible_1, &QCheckBox::toggled, this, &ECGSetupWidget::setVisibleChannel_I);
+    connect(ui.m_qCheckBox_Channel_Visible_2, &QCheckBox::toggled, this, &ECGSetupWidget::setVisibleChannel_II);
+    connect(ui.m_qCheckBox_Channel_Visible_3, &QCheckBox::toggled, this, &ECGSetupWidget::setVisibleChannel_III);
 
-    connect(ui.m_qPushButton_About, SIGNAL(released()), this, SLOT(showAboutDialog()));
+    connect(ui.m_qPushButton_About, &QPushButton::released, this, &ECGSetupWidget::showAboutDialog);
 
 
     QFile file(m_pECGSimulator->m_qStringResourcePath+"readme.txt");
@@ -248,7 +253,7 @@ void ECGSetupWidget::setVisibleChannel_III(bool state)
 
 //*************************************************************************************************************
 
-void ECGSetupWidget::setFileOfChannel_I()
+void ECGSetupWidget::setFileOfChannel_I(qint32)
 {
     m_pECGSimulator->m_pECGChannel_ECG_I->setChannelFile(ui.m_qComboBox_Channel_1->currentText());
 }
@@ -256,7 +261,7 @@ void ECGSetupWidget::setFileOfChannel_I()
 
 //*************************************************************************************************************
 
-void ECGSetupWidget::setFileOfChannel_II()
+void ECGSetupWidget::setFileOfChannel_II(qint32)
 {
     m_pECGSimulator->m_pECGChannel_ECG_II->setChannelFile(ui.m_qComboBox_Channel_2->currentText());
 }
@@ -264,7 +269,7 @@ void ECGSetupWidget::setFileOfChannel_II()
 
 //*************************************************************************************************************
 
-void ECGSetupWidget::setFileOfChannel_III()
+void ECGSetupWidget::setFileOfChannel_III(qint32)
 {
     m_pECGSimulator->m_pECGChannel_ECG_III->setChannelFile(ui.m_qComboBox_Channel_3->currentText());
 }

@@ -104,11 +104,14 @@ Command::Command(   const QString &p_sCommand, const QString &p_sDescription,
 , m_sDescription(p_sDescription)
 , m_bIsJson(p_bIsJson)
 {
-    if(p_qListParamNames.size() == p_qListParamValues.size() == p_vecParameterDescriptions.size())
+    if(p_qListParamNames.size() == p_qListParamValues.size())
     {
-        m_qListParamNames = p_qListParamNames;
-        m_qListParamValues = p_qListParamValues;
-        m_qListParamDescriptions = p_vecParameterDescriptions;
+        if(p_qListParamValues.size() == p_vecParameterDescriptions.size())
+        {
+            m_qListParamNames = p_qListParamNames;
+            m_qListParamValues = p_qListParamValues;
+            m_qListParamDescriptions = p_vecParameterDescriptions;
+        }
     }
     else
     {
@@ -222,8 +225,7 @@ QString Command::toStringReadySend() const
     QString t_sParameters;
     for(qint32 i = 0; i < m_qListParamNames.size(); ++i)
     {
-        qDebug() << m_qListParamValues[i];
-
+//        qDebug() << m_qListParamValues[i];
         t_sParameters.append(QString("\"%1\":\"%2\"").arg(m_qListParamNames[i]).arg(m_qListParamValues[i].toString()));
 
         if(i < m_qListParamNames.size()-1)

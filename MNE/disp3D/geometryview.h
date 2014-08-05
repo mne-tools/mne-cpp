@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 * 
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -153,10 +153,6 @@ protected:
 
 private:
 //    MNEForwardSolution m_forwardSolution;   /**< Holds the forward soultion -> ToDo change this to shraed data pointer */
-    MNESourceSpace m_sourceSpace;           /**< The used source space. */
-
-
-    bool m_bStereo;
 
     QGLLightModel *m_pLightModel;    /**< The selected light model. */
     QGLLightParameters *m_pLightParametersScene;    /**< The selected light parameters. */
@@ -165,14 +161,18 @@ private:
 
     QVector<Annotation::SPtr> m_vecAnnotation;
 
-    QGLSceneNode *m_pSceneNodeBrain;               /**< Scene node of the hemisphere models. */
     QVector3D m_vecBoundingBoxMin;                  /**< X, Y, Z minima. */
     QVector3D m_vecBoundingBoxMax;                  /**< X, Y, Z maxima. */
     QVector3D m_vecBoundingBoxCenter;               /**< X, Y, Z center. */
 
+    MNESourceSpace m_sourceSpace;           /**< The used source space. */
+
+    bool m_bStereo;
+
     float m_fOffsetZ;                               /**< Z offset for pop-out effect. */
     float m_fOffsetZEye;                            /**< Z offset eye. */
 
+    QGLSceneNode *m_pSceneNodeBrain;               /**< Scene node of the hemisphere models. */
     QGLSceneNode *m_pSceneNode;                    /**< Node of the scene. */
 
 //    QGLCamera *m_pCameraFrontal;     /**< frontal camera. */

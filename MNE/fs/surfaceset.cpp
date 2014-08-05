@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -64,18 +64,63 @@ SurfaceSet::SurfaceSet()
 
 //*************************************************************************************************************
 
-SurfaceSet::SurfaceSet(const Surface& p_sLHSurface, const Surface& p_sRHSurface)
+SurfaceSet::SurfaceSet(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir)
 {
-    if(p_sLHSurface.getHemi() == 0)
-        m_qMapSurfs.insert(0, p_sLHSurface);
+    Surface t_Surface;
+    if(hemi == 0 || hemi == 1)
+    {
+        if(Surface::read(subject_id, hemi, surf, subjects_dir, t_Surface))
+            insert(t_Surface);
+    }
+    else if(hemi == 2)
+    {
+        if(Surface::read(subject_id, 0, surf, subjects_dir, t_Surface))
+            insert(t_Surface);
+        if(Surface::read(subject_id, 1, surf, subjects_dir, t_Surface))
+            insert(t_Surface);
+    }
+
+    calcOffset();
+}
+
+
+//*************************************************************************************************************
+
+SurfaceSet::SurfaceSet(const QString &path, qint32 hemi, const QString &surf)
+{
+    Surface t_Surface;
+    if(hemi == 0 || hemi == 1)
+    {
+        if(Surface::read(path, hemi, surf, t_Surface))
+            insert(t_Surface);
+    }
+    else if(hemi == 2)
+    {
+        if(Surface::read(path, 0, surf, t_Surface))
+            insert(t_Surface);
+        if(Surface::read(path, 1, surf, t_Surface))
+            insert(t_Surface);
+    }
+
+    calcOffset();
+}
+
+
+//*************************************************************************************************************
+
+SurfaceSet::SurfaceSet(const Surface& p_LHSurface, const Surface& p_RHSurface)
+{
+    if(p_LHSurface.hemi() == 0)
+        m_qMapSurfs.insert(0, p_LHSurface);
     else
         qWarning("Left hemisphere id is not 0. LH surface not assigned!");
 
-    if(p_sRHSurface.getHemi() == 1)
-        m_qMapSurfs.insert(1, p_sRHSurface);
+    if(p_RHSurface.hemi() == 1)
+        m_qMapSurfs.insert(1, p_RHSurface);
     else
         qWarning("Right hemisphere id is not 1. RH surface not assigned!");
 
+    calcOffset();
 }
 
 
@@ -106,6 +151,20 @@ void SurfaceSet::clear()
 
 //*************************************************************************************************************
 
+void SurfaceSet::insert(const Surface& p_Surface)
+{
+    if(p_Surface.isEmpty())
+        return;
+
+    qint32 hemi = p_Surface.hemi();
+    m_qMapSurfs.remove(hemi);
+
+    m_qMapSurfs.insert(hemi, p_Surface);
+}
+
+
+//*************************************************************************************************************
+
 bool SurfaceSet::read(const QString& p_sLHFileName, const QString& p_sRHFileName, SurfaceSet &p_SurfaceSet)
 {
     p_SurfaceSet.clear();
@@ -126,6 +185,8 @@ bool SurfaceSet::read(const QString& p_sLHFileName, const QString& p_sRHFileName
                 return false;
         }
     }
+
+    p_SurfaceSet.calcOffset();
 
     return true;
 }
@@ -194,3 +255,21 @@ Surface& SurfaceSet::operator[] (QString idt)
     }
 }
 
+
+//*************************************************************************************************************
+
+void SurfaceSet::calcOffset()
+{
+    //
+    // Correct inflated offset
+    //
+    if(m_qMapSurfs.size() == 2 && QString::compare(m_qMapSurfs.begin().value().surf(),"inflated") == 0)
+    {
+        float xOffset = m_qMapSurfs.find(0).value().rr().col(0).maxCoeff() - m_qMapSurfs.find(1).value().rr().col(0).minCoeff();
+        Vector3f vecLhOffset, vecRhOffset;
+        vecLhOffset << (xOffset/2.0f), 0, 0;
+        vecRhOffset << (-xOffset/2.0f), 0, 0;
+        m_qMapSurfs.find(0).value().offset() = vecLhOffset;
+        m_qMapSurfs.find(1).value().offset() = vecRhOffset;
+    }
+}

@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 * 
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -292,6 +292,8 @@ namespace FIFFLIB
 #define FIFFB_REF                118
 #define FIFFB_SMSH_RAW_DATA      119
 #define FIFFB_SMSH_ASPECT        120
+#define FIFFB_BEM                310  /**< A BEM description. */
+#define FIFFB_BEM_SURF           311  /**< Describes one BEM surface. */
 #define FIFFB_PROJ               313
 #define FIFFB_PROJ_ITEM          314
 #define FIFFB_MRI                200
@@ -403,6 +405,20 @@ namespace FIFFLIB
 #define FIFFV_ASPECT_SAMPLE        105    /**< A sample cut out by graph*/
 #define FIFFV_ASPECT_POWER_DENSITY 106    /**< Power density spectrum*/
 #define FIFFV_ASPECT_DIPOLE_WAVE   200    /**< Dipole amplitude curve*/
+
+    //
+    // Conductor models
+    //
+#define FIFF_BEM_SURF_ID        3101  /**< int    - surface number */
+#define FIFF_BEM_SURF_NAME      3102  /**< string - surface name */
+#define FIFF_BEM_SURF_NNODE     3103  /**< int    - # of nodes on a surface */
+#define FIFF_BEM_SURF_NTRI      3104  /**< int    - # number of triangles on a surface */
+#define FIFF_BEM_SURF_NODES     3105  /**< float* - surface nodes */
+#define FIFF_BEM_SURF_TRIANGLES 3106  /**< int*   - surface triangles */
+#define FIFF_BEM_SURF_NORMALS   3107  /**< float* - surface node normal unit vectors */
+#define FIFF_BEM_COORD_FRAME    3112  /**< enum   - the coordinate frame of the mode */
+#define FIFF_BEM_SIGMA          3113  /**< float  - conductivity of a compartment */
+
     //
     // BEM surface IDs
     //
@@ -410,6 +426,7 @@ namespace FIFFLIB
 #define FIFFV_BEM_SURF_ID_BRAIN      1
 #define FIFFV_BEM_SURF_ID_SKULL      3
 #define FIFFV_BEM_SURF_ID_HEAD       4
+
     //
     // More of those defined in MNE
     //
@@ -517,11 +534,6 @@ namespace FIFFLIB
 
 #define FIFF_MNE_SOURCE_SPACE_DIST          3599    /**< Distances between vertices in use (along the surface)*/
 #define FIFF_MNE_SOURCE_SPACE_DIST_LIMIT    3600    /**< If distance is above this limit (in the volume) it has not been calculated*/
-
-
-#define FIFF_BEM_SURF_NTRI                  3104
-#define FIFF_BEM_SURF_TRIANGLES             3106
-
     //
     // 3520... Forward solution
     //
@@ -794,7 +806,7 @@ namespace FIFFLIB
                      * disks in the data acquisition front end */
 #define FIFF_CONTINUE_FILE      17  /* Used to inform that data is saved into a continuation file. */
 #define FIFF_JITTER_MAX         18  /* Used to tell the jitter in the timing of data packets */
-#define  FIFF_STREAM_SEGMENT    19  /* A segment of data stream */
+#define FIFF_STREAM_SEGMENT    19  /* A segment of data stream */
 
 
 

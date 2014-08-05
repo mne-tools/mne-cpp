@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -43,12 +43,10 @@
 //=============================================================================================================
 
 #include "dummytoolbox_global.h"
-#include <mne_x/Interfaces/IRTAlgorithm.h>
-#include <generics/circularbuffer_old.h>
-#include <generics/circularmultichannelbuffer_old.h>
 
-#include <xMeas/Measurement/realtimesamplearray.h>
-#include <xMeas/Measurement/realtimemultisamplearray.h>
+#include <mne_x/Interfaces/IAlgorithm.h>
+#include <generics/circularbuffer.h>
+#include <xMeas/newrealtimesamplearray.h>
 
 
 //*************************************************************************************************************
@@ -74,6 +72,7 @@ namespace DummyToolboxPlugin
 //=============================================================================================================
 
 using namespace MNEX;
+using namespace XMEASLIB;
 using namespace IOBuffer;
 
 
@@ -89,55 +88,58 @@ using namespace IOBuffer;
 *
 * @brief The DummyToolbox class provides a dummy algorithm structure.
 */
-class DUMMYTOOLBOXSHARED_EXPORT DummyToolbox : public IRTAlgorithm
+class DUMMYTOOLBOXSHARED_EXPORT DummyToolbox : public IAlgorithm
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "dummytoolbox.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(MNEX::IRTAlgorithm)
+    Q_INTERFACES(MNEX::IAlgorithm)
 
 public:
-
     //=========================================================================================================
     /**
     * Constructs a DummyToolbox.
     */
     DummyToolbox();
+
     //=========================================================================================================
     /**
     * Destroys the DummyToolbox.
     */
     ~DummyToolbox();
 
+    //=========================================================================================================
+    /**
+    * Initialise input and output connectors.
+    */
+    void init();
+
+    //=========================================================================================================
+    /**
+    * Clone the plugin
+    */
+    virtual QSharedPointer<IPlugin> clone() const;
+
     virtual bool start();
     virtual bool stop();
 
-    virtual Type getType() const;
-    virtual const char* getName() const;
+    virtual IPlugin::PluginType getType() const;
+    virtual QString getName() const;
 
     virtual QWidget* setupWidget();
-    virtual QWidget* runWidget();
 
-    virtual void update(Subject* pSubject);
+    void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
 
 protected:
     virtual void run();
 
 private:
-    //=========================================================================================================
-    /**
-    * Initialise the DummyToolbox.
-    */
-    void init();
+    bool m_bIsRunning;
 
-    RealTimeSampleArray::SPtr       m_pDummy_Output;        /**< Holds the RealTimeSampleArray of the DummyToolbox output.*/
+    PluginInputData<NewRealTimeSampleArray>::SPtr   m_pDummyInput;      /**< The RealTimeSampleArray of the DummyToolbox input.*/
+    PluginOutputData<NewRealTimeSampleArray>::SPtr  m_pDummyOutput;    /**< The RealTimeSampleArray of the DummyToolbox output.*/
 
-    RealTimeMultiSampleArray::SPtr  m_pDummy_MSA_Output;    /**< Holds the RealTimeMultiSampleArray of the DummyToolbox output.*/
-
-    CircularBuffer_old<double>::SPtr   m_pDummyBuffer;      /**< Holds incoming data.*/
-
-    CircularMultiChannelBuffer_old<double>::SPtr m_pDummyMultiChannelBuffer;    /**< Holds incoming multi sample data.*/
-
+    dBuffer::SPtr   m_pDummyBuffer;      /**< Holds incoming data.*/
 };
 
 } // NAMESPACE

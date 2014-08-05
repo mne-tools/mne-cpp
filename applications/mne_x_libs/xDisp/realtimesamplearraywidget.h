@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -43,7 +43,7 @@
 //=============================================================================================================
 
 #include "xdisp_global.h"
-#include "measurementwidget.h"
+#include "newmeasurementwidget.h"
 #include "ui_realtimesamplearraywidget.h"
 
 
@@ -68,7 +68,7 @@ class QTime;
 
 namespace XMEASLIB
 {
-class RealTimeSampleArray;
+class NewRealTimeSampleArray;
 }
 
 
@@ -88,29 +88,13 @@ namespace XDISPLIB
 using namespace XMEASLIB;
 
 
-//*************************************************************************************************************
-//=============================================================================================================
-// ENUMERATIONS
-//=============================================================================================================
-
 //=============================================================================================================
 /**
-* Tool enumeration.
-*/
-enum Tool
-{
-    Freeze     = 0,     /**< Freezing tool. */
-    Annotation = 1      /**< Annotation tool. */
-};
-
-
-//=============================================================================================================
-/**
-* DECLARE CLASS RealTimeSampleArrayWidget
+* DECLARE CLASS NewRealTimeSampleArrayWidget
 *
-* @brief The RealTimeSampleArrayWidget class provides a real-time curve display.
+* @brief The NewRealTimeSampleArrayWidget class provides a real-time curve display.
 */
-class XDISPSHARED_EXPORT RealTimeSampleArrayWidget : public MeasurementWidget
+class XDISPSHARED_EXPORT RealTimeSampleArrayWidget : public NewMeasurementWidget
 {
     Q_OBJECT
 public:
@@ -122,26 +106,25 @@ public:
     * @param [in] pTime pointer to application time.
     * @param [in] parent pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
     */
-    RealTimeSampleArrayWidget(QSharedPointer<RealTimeSampleArray> pRTSA, QSharedPointer<QTime> pTime, QWidget* parent = 0);
+    RealTimeSampleArrayWidget(QSharedPointer<NewRealTimeSampleArray> &pRTSA, QSharedPointer<QTime> &pTime, QWidget* parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the RealTimeSampleArrayWidget.
+    * Destroys the NewRealTimeSampleArrayWidget.
     */
     ~RealTimeSampleArrayWidget();
 
     //=========================================================================================================
     /**
     * Is called when new data are available.
-    * Inherited by IObserver.
     *
-    * @param [in] pSubject pointer to Subject -> not used because its direct attached to the measurement.
+    * @param [in] pMeasurement  pointer to measurement -> not used because its direct attached to the measurement.
     */
-    virtual void update(Subject* pSubject);
+    virtual void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
-    * Initialise the RealTimeSampleArrayWidget.
+    * Initialise the NewRealTimeSampleArrayWidget.
     */
     virtual void init();
 
@@ -158,7 +141,7 @@ protected:
 
     //=========================================================================================================
     /**
-    * Is called when RealTimeSampleArrayWidget is resized.
+    * Is called when NewRealTimeSampleArrayWidget is resized.
     *
     * @param [in] event pointer to ResizeEvent -> not used.
     */
@@ -210,7 +193,6 @@ protected:
     virtual void wheelEvent(QWheelEvent* wheelEvent);
 
 private slots:
-
     //=========================================================================================================
     /**
     * Stops the Annotation
@@ -232,35 +214,35 @@ private slots:
     void minValueChanged(double);
 
 private:
-    void actualize();		/**< Actualize member variables. Like y position, scaling factor, middle value of the frame and the highest sampling rate to calculate the sample width.*/
-    Ui::RealTimeSampleArrayClass    ui;                             /**< Holds the user interface of the RealTimeSampleArray widget. */
-    QSharedPointer<RealTimeSampleArray> m_pRTSA;                    /**< Holds the real-time sample array measurement. */
-    QPainterPath                    m_qPainterPath;                 /**< Holds the current painter path which is the real-time curve. */
-    QPainterPath                    m_qPainterPath_Freeze;          /**< Holds the frozen painter path which is the frozen real-time curve. */
-    QMutex                          m_qMutex;                       /**< Holds a mutex to make the access to the painter path thread safe. */
-    bool                            m_bMeasurement;                 /**< Holds current status whether curve measurement is active (left mouse). */
-    bool                            m_bPosition;                    /**< Holds current status whether current coordinates should be shown. */
-    bool                            m_bFrozen;                      /**< Holds current status whether curve is frozen. */
-    bool                            m_bScaling;                     /**< Holds current status whether scaling of curve is active. */
-    bool                            m_bToolInUse;                   /**< Holds current status whether tool (annotation/freezing) is active. */
-    QPoint                          m_qPointMouseStartPosition;     /**< Holds mouse start position which is the position where mouse was first pressed. */
-    QPoint                          m_qPointMouseEndPosition;       /**< Holds mouse end position which is current mouse position. */
-    float                           m_fScaleFactor;                 /**< Holds current scaling factor -> renewed over actualize. */
-    double                          m_dMinValue_init;               /**< Holds the initial minimal value */
-    double                          m_dMaxValue_init;               /**< Holds the initial maximal value */
-    double                          m_dMiddle;                      /**< Holds the current middle value depending on the current scaling factor -> renewed over actualize. */
-    double                          m_dPosition;                    /**< Holds the start position which is the x position of the frame. */
+    void actualize();                                               /**< Actualize member variables. Like y position, scaling factor, middle value of the frame and the highest sampling rate to calculate the sample width.*/
+    Ui::RealTimeSampleArrayClass    ui;                             /**< the user interface of the RealTimeSampleArray widget. */
+    QSharedPointer<NewRealTimeSampleArray> m_pRTSA;                 /**< the real-time sample array measurement. */
+    QPainterPath                    m_qPainterPath;                 /**< the current painter path which is the real-time curve. */
+    QPainterPath                    m_qPainterPath_Freeze;          /**< the frozen painter path which is the frozen real-time curve. */
+    QMutex                          m_qMutex;                       /**< a mutex to make the access to the painter path thread safe. */
+    bool                            m_bMeasurement;                 /**< current status whether curve measurement is active (left mouse). */
+    bool                            m_bPosition;                    /**< current status whether current coordinates should be shown. */
+    bool                            m_bFrozen;                      /**< current status whether curve is frozen. */
+    bool                            m_bScaling;                     /**< current status whether scaling of curve is active. */
+    bool                            m_bToolInUse;                   /**< current status whether tool (annotation/freezing) is active. */
+    QPoint                          m_qPointMouseStartPosition;     /**< mouse start position which is the position where mouse was first pressed. */
+    QPoint                          m_qPointMouseEndPosition;       /**< mouse end position which is current mouse position. */
+    float                           m_fScaleFactor;                 /**< current scaling factor -> renewed over actualize. */
+    double                          m_dMinValue_init;               /**< the initial minimal value */
+    double                          m_dMaxValue_init;               /**< the initial maximal value */
+    double                          m_dMiddle;                      /**< the current middle value depending on the current scaling factor -> renewed over actualize. */
+    double                          m_dPosition;                    /**< the start position which is the x position of the frame. */
     double                          m_dSampleWidth;                 /**< Sample distance to synchronize all real-time sample array widgets independent from their sampling rate. */
-    double                          m_dPosX;                        /**< Holds the x position of the frame. */
-    double                          m_dPosY;                        /**< Holds the middle y position of the frame. */
-    bool                            m_bStartFlag;                   /**< Holds status whether the real-time curve should be restarted. */
-    std::vector<QString>            m_vecTool;                      /**< Holds the available tools. */
-    unsigned char                   m_ucToolIndex;                  /**< Holds the selected tool index. */
-    QTimer*                         m_pTimerToolDisplay;            /**< Timer for blending the tool label. */
-    QTimer*                         m_pTimerUpdate;                 /**< Timer which is caring about a continuous paint update of the widget. */
-    QSharedPointer<QTime>           m_pTime;                        /**< Holds the application time. */
+    double                          m_dPosX;                        /**< the x position of the frame. */
+    double                          m_dPosY;                        /**< the middle y position of the frame. */
+    bool                            m_bStartFlag;                   /**< status whether the real-time curve should be restarted. */
+    std::vector<QString>            m_vecTool;                      /**< the available tools. */
+    unsigned char                   m_ucToolIndex;                  /**< the selected tool index. */
+    QSharedPointer<QTimer>          m_pTimerToolDisplay;            /**< Timer for blending the tool label. */
+    QSharedPointer<QTimer>          m_pTimerUpdate;                 /**< Timer which is caring about a continuous paint update of the widget. */
+    QSharedPointer<QTime>           m_pTime;                        /**< the application time. */
     QSharedPointer<QTime>           m_pTimeCurrentDisplay;          /**< Time which corresponds to the x starting position of each segment. */
-    static QList<double>            s_listSamplingRates;            /**< Holds all real-time sample array sampling rates of the current display. */
+    static QList<double>            s_listSamplingRates;            /**< all real-time sample array sampling rates of the current display. */
 
 };
 

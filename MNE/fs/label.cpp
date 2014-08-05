@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -117,33 +117,33 @@ void Label::clear()
 
 MatrixX3i Label::selectTris(const Surface & p_Surface)
 {
-    //check whether there are data to create the tris
-    if(this->vertices.size() == 0)
-        return MatrixX3i(0,3);
+//    //check whether there are data to create the tris
+//    if(this->vertices.size() == 0)
+//        return MatrixX3i(0,3);
 
-    MatrixX3i tris(p_Surface.tris.rows(),3);
+//    MatrixX3i tris(p_Surface.tris().rows(),3);
 
-    QSet<int> verts;
-    verts.reserve(this->vertices.size());
-    for(qint32 i = 0; i < this->vertices.size(); ++i)
-        verts.insert(this->vertices[i]);
+//    QSet<int> verts;
+//    verts.reserve(this->vertices.size());
+//    for(qint32 i = 0; i < this->vertices.size(); ++i)
+//        verts.insert(this->vertices[i]);
 
-    //
-    // Search for all the tris where is at least one corner part of the label
-    //
-    qint32 t_size = 0;
-    for(qint32 i = 0; i < p_Surface.tris.rows(); ++i)
-    {
-        if(verts.contains(p_Surface.tris(i,0)) || verts.contains(p_Surface.tris(i,1)) || verts.contains(p_Surface.tris(i,2)))
-        {
-            tris.row(t_size) = p_Surface.tris.row(i);
-            ++t_size;
-        }
-    }
+//    //
+//    // Search for all the tris where is at least one corner part of the label
+//    //
+//    qint32 t_size = 0;
+//    for(qint32 i = 0; i < p_Surface.tris().rows(); ++i)
+//    {
+//        if(verts.contains(p_Surface.tris()(i,0)) || verts.contains(p_Surface.tris()(i,1)) || verts.contains(p_Surface.tris()(i,2)))
+//        {
+//            tris.row(t_size) = p_Surface.tris().row(i);
+//            ++t_size;
+//        }
+//    }
 
-    tris.conservativeResize(t_size, 3);
+//    tris.conservativeResize(t_size, 3);
 
-    return tris;
+    return this->selectTris(p_Surface.tris());//tris;
 }
 
 

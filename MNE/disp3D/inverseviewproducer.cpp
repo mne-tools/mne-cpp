@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -58,16 +58,18 @@ using namespace DISP3DLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-InverseViewProducer::InverseViewProducer(qint32 p_iT)
+InverseViewProducer::InverseViewProducer(qint32 p_iFps, bool p_bLoop, bool p_bSlowMotion)
 : m_bIsRunning(false)
-, m_iFps(60)
-, m_iT(p_iT)
-, m_nTimeSteps(0)
+, m_iFps(p_iFps)
+, m_bLoop(p_bLoop)
+, m_bSlowMotion(p_bSlowMotion)
+, m_iT(0)
+, m_iCurSampleStep(0)
 , m_dGlobalMaximum(0)
-, m_iDownSampling(20)
-, m_bBeep(true)
+, m_bBeep(false)
 {
-
+    float t_fT = 1.0 / (float)m_iFps;
+    m_iT = (qint32)(t_fT*1000000);
 }
 
 
@@ -80,21 +82,57 @@ InverseViewProducer::~InverseViewProducer()
 
 //*************************************************************************************************************
 
-void InverseViewProducer::pushSourceEstimate(SourceEstimate &p_sourceEstimate)
+void InverseViewProducer::pushSourceEstimate(MNESourceEstimate &p_sourceEstimate)
 {
     mutex.lock();
 
-    m_curSourceEstimate = p_sourceEstimate;
-    m_iT = (qint32)floor(p_sourceEstimate.tstep*1000000);
-    m_nTimeSteps = p_sourceEstimate.data.cols();
+    if(p_sourceEstimate.tstep > 0.0f)
+    {
+        m_vecMaxActivation = p_sourceEstimate.data.rowwise().maxCoeff(); //Per Label Source
 
-    m_vecMaxActivation = m_curSourceEstimate.data.rowwise().maxCoeff();
-    m_dGlobalMaximum = m_vecMaxActivation.maxCoeff();
+        m_dGlobalMaximum = m_vecMaxActivation.maxCoeff();
 
-    float t_fFpu = ((float)m_iFps)/(1000000.0f);
+        float t_fTstep = p_sourceEstimate.tstep*1000000;
 
-    m_iDownSampling = (qint32)floor(1/(m_iT*t_fFpu));
+        if(m_bSlowMotion)
+        {
+            m_iFps = 1/p_sourceEstimate.tstep;
+            float t_fT = 1.0 / (float)m_iFps;
+            m_iT = (qint32)(t_fT*1000000);
+        }
 
+        //
+        // Adapt skip to buffer size
+        //
+        qint32 t_iSampleStep = (qint32)ceil((float)m_iT)/t_fTstep;  //how many samples to skip
+
+        qint32 t_iBlockSize = p_sourceEstimate.data.cols();
+
+        if(m_vecStcs.size() > t_iBlockSize*8)
+            t_iSampleStep = t_iBlockSize; //skip block
+        else if(m_vecStcs.size() > t_iBlockSize*4)
+            t_iSampleStep *= 4;
+        else if(m_vecStcs.size() > t_iBlockSize*2)
+            t_iSampleStep *= 2;
+
+
+        //
+        // Take first or sample skip of previous push into account
+        //
+        qint32 t_iCurrentSample = m_iCurSampleStep;
+
+        while(p_sourceEstimate.data.cols() > t_iCurrentSample)
+        {
+            m_vecStcs.append(p_sourceEstimate.data.col(t_iCurrentSample));
+            m_vecTime.append(p_sourceEstimate.times(t_iCurrentSample));
+
+            t_iCurrentSample += t_iSampleStep;
+        }
+
+        m_iCurSampleStep = t_iCurrentSample - p_sourceEstimate.data.cols();
+    }
+    else
+        std::cout << "T step not set!" << std::endl;
     mutex.unlock();
 }
 
@@ -126,26 +164,45 @@ void InverseViewProducer::run()
     {
         //LNdT hack
         mutex.lock();
-        if(m_nTimeSteps > 0)
+        if(m_vecStcs.size() > 0)
         {
-            //downsample to 60Hz
-            if(simCount%m_iDownSampling == 0)
+            //Loop
+            if(m_bLoop)
             {
-                currentSample = simCount%m_nTimeSteps;
-                if (m_bBeep && ((t_fTimeOld < 0.0) && (m_curSourceEstimate.times(currentSample) >= 0.0)))
+                currentSample = simCount%m_vecStcs.size();
+                if (m_bBeep && ((t_fTimeOld < 0.0) && (m_vecTime[currentSample] >= 0.0)))
                 {
                     QApplication::beep();
                     qDebug("beep");
                 }
-                t_fTimeOld = m_curSourceEstimate.times(currentSample);
-                QSharedPointer<VectorXd> p_qVecCurrentActivation(new VectorXd(m_curSourceEstimate.data.col(currentSample)));
+                t_fTimeOld = m_vecTime[currentSample];
+                QSharedPointer<VectorXd> p_qVecCurrentActivation(new VectorXd(m_vecStcs[currentSample]));
                 emit sourceEstimateSample(p_qVecCurrentActivation);
-            }
 
-            ++simCount;
+                ++simCount;
+            }
+            //Single view
+            else
+            {
+                if (m_bBeep && ((t_fTimeOld < 0.0) && (m_vecTime[0] >= 0.0)))
+                {
+                    QApplication::beep();
+                    qDebug("beep");
+                }
+                t_fTimeOld = m_vecTime[0];
+
+                QSharedPointer<VectorXd> p_qVecCurrentActivation(new VectorXd(m_vecStcs[0]));
+                emit sourceEstimateSample(p_qVecCurrentActivation);
+                m_vecTime.pop_front();
+                m_vecStcs.pop_front();
+            }
         }
+
         mutex.unlock();
 
-        usleep(m_iT);
+        if(m_bSlowMotion)
+            msleep(40);
+        else
+            usleep(m_iT);
     }
 }

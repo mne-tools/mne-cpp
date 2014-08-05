@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -47,12 +47,12 @@
 
 #include <mne/mne_sourcespace.h>
 #include <fs/surfaceset.h>
-#include <inverse/sourceestimate.h>
+#include <mne/mne_sourceestimate.h>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
 
 #include "qglview.h"
@@ -99,7 +99,6 @@ namespace DISP3DLIB
 
 using namespace MNELIB;
 using namespace FSLIB;
-using namespace INVERSELIB;
 using namespace Eigen;
 
 
@@ -130,9 +129,13 @@ public:
     * @param[in] p_sourceSpace  Source space which contains the geometry information
     * @param[in] p_qListLabels  region of interest labels
     * @param[in] p_qListRGBAs   color information for given region of interest
+    * @param[in] p_iFps         Frames per second
+    * @param[in] p_bLoop        if current source estimate should be repeated
+    * @param[in] p_bStereo      if stereo view should be turned on
+    * @param[in] p_bSlowMotion  if slow motion should be turned on (fps is discarded)
     * @param[in] parent         Parent QObject (optional)
     */
-    InverseView(const MNESourceSpace &p_sourceSpace, QList<Label> &p_qListLabels, QList<RowVector4i> &p_qListRGBAs, QWindow *parent = 0);
+    InverseView(const MNESourceSpace &p_sourceSpace, QList<Label> &p_qListLabels, QList<RowVector4i> &p_qListRGBAs, qint32 p_iFps = 24, bool p_bLoop = true, bool p_bStereo = false, bool p_bSlowMotion = false, QWindow *parent = 0);
     
     //=========================================================================================================
     /**
@@ -146,7 +149,7 @@ public:
     *
     * @param[in] p_sourceEstimate   Source estimate to push
     */
-    void pushSourceEstimate(SourceEstimate &p_sourceEstimate);
+    void pushSourceEstimate(MNESourceEstimate &p_sourceEstimate);
 
 protected:
     //=========================================================================================================
@@ -193,33 +196,32 @@ private:
 
     InverseViewProducer::SPtr m_pInverseViewProducer;   /**< Inverse view producer. */
 
-    qint32 m_iColorMode;                            /**< used colorization mode. */
     //Data Stuff
     MNESourceSpace m_sourceSpace;                   /**< The used source space. */
     QList<Label> m_qListLabels;                     /**< The labels. */
     QList<RowVector4i> m_qListRGBAs;                /**< The label colors encoded in RGBA. */
 
+    qint32 m_iColorMode;                            /**< used colorization mode. */
+
     //GL Stuff
     bool m_bStereo;
+
+    float m_fOffsetZ;                               /**< Z offset for pop-out effect. */
+    float m_fOffsetZEye;                            /**< Z offset eye. */
+    QGLSceneNode *m_pSceneNodeBrain;                /**< Scene node of the hemisphere models. */
+    QGLSceneNode *m_pSceneNode;                     /**< Node of the scene. */
 
     QGLLightModel *m_pLightModel;                   /**< The selected light model. */
     QGLLightParameters *m_pLightParametersScene;    /**< The selected light parameters. */
 
     QGLColorMaterial material;
 
-    QGLSceneNode *m_pSceneNodeBrain;                /**< Scene node of the hemisphere models. */
+
     QVector3D m_vecBoundingBoxMin;                  /**< X, Y, Z minima. */
     QVector3D m_vecBoundingBoxMax;                  /**< X, Y, Z maxima. */
     QVector3D m_vecBoundingBoxCenter;               /**< X, Y, Z center. */
 
-    float m_fOffsetZ;                               /**< Z offset for pop-out effect. */
-    float m_fOffsetZEye;                            /**< Z offset eye. */
-
-
-    QGLSceneNode *m_pSceneNode;                     /**< Node of the scene. */
-
-//    QGLCamera *m_pCameraFrontal;     /**< frontal camera. */
-
+    //    QGLCamera *m_pCameraFrontal;     /**< frontal camera. */
 
     QList< QMap<qint32, qint32> > m_qListMapLabelIdIndex;
 

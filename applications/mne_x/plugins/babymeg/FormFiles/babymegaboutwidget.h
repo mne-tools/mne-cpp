@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the BabyMegAboutWidget class.
+* @brief    Contains the declaration of the BabyMEGAboutWidget class.
 *
 */
 
@@ -55,10 +55,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE BabyMegPlugin
+// DEFINE NAMESPACE BabyMEGPlugin
 //=============================================================================================================
 
-namespace BabyMegPlugin
+namespace BabyMEGPlugin
 {
 
 
@@ -76,11 +76,11 @@ namespace BabyMegPlugin
 
 //=============================================================================================================
 /**
-* DECLARE CLASS BabyMegAboutWidget
+* DECLARE CLASS BabyMEGAboutWidget
 *
-* @brief The BabyMegAboutWidget class provides the about dialog for the BabyMeg.
+* @brief The BabyMEGAboutWidget class provides the about dialog for the BabyMEG.
 */
-class BabyMegAboutWidget : public QDialog
+class BabyMEGAboutWidget : public QDialog
 {
     Q_OBJECT
 
@@ -88,21 +88,21 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a BabyMegAboutWidget dialog which is a child of parent.
+    * Constructs a BabyMEGAboutWidget dialog which is a child of parent.
     *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new BabyMegAboutWidget becomes a window. If parent is another widget, BabyMegAboutWidget becomes a child window inside parent. ECGAboutWidget is deleted when its parent is deleted.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new BabyMEGAboutWidget becomes a window. If parent is another widget, BabyMEGAboutWidget becomes a child window inside parent. BabyMEGAboutWidget is deleted when its parent is deleted.
     */
-    BabyMegAboutWidget(QWidget *parent = 0);
+    BabyMEGAboutWidget(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the BabyMegAboutWidget.
-    * All BabyMegAboutWidget's children are deleted first. The application exits if BabyMegAboutWidget is the main widget.
+    * Destroys the BabyMEGAboutWidget.
+    * All BabyMEGAboutWidget's children are deleted first. The application exits if BabyMEGAboutWidget is the main widget.
     */
-    ~BabyMegAboutWidget();
+    ~BabyMEGAboutWidget();
 
 private:
-    Ui::BabyMegAboutWidgetClass ui;    /**< Holds the user interface for the DummyAboutWidget.*/
+    Ui::BabyMEGAboutWidgetClass ui;    /**< Holds the user interface for the DummyAboutWidget.*/
 };
 
 } // NAMESPACE

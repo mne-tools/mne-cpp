@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -135,6 +135,7 @@ void FiffStream::finish_writing_raw()
     this->end_block(FIFFB_RAW_DATA);
     this->end_block(FIFFB_MEAS);
     this->end_file();
+    this->device()->close();
 }
 
 
@@ -1161,7 +1162,7 @@ QList<FiffProj> FiffStream::read_proj(const FiffDirTree& p_Node)
 
     FiffTag::SPtr t_pTag;
     t_qListNodes[0].find_tag(this, FIFF_NCHAN, t_pTag);
-    fiff_int_t global_nchan;
+    fiff_int_t global_nchan = 0;
     if (t_pTag)
         global_nchan = *t_pTag->toInt();
 
@@ -1295,7 +1296,6 @@ QList<FiffProj> FiffStream::read_proj(const FiffDirTree& p_Node)
 
     return projdata;
 }
-
 
 //*************************************************************************************************************
 
@@ -2068,7 +2068,7 @@ void FiffStream::write_float_sparse_ccs(fiff_int_t kind, const SparseMatrix<floa
     quint32 i;
     for(i = 0; i < s.size(); ++i)
     {
-        if(s[i].col() != v_old)
+        if((signed) s[i].col() != v_old)
         {
             v_old = s[i].col();
             cols.push_back(s[i].col());
@@ -2161,7 +2161,7 @@ void FiffStream::write_float_sparse_rcs(fiff_int_t kind, const SparseMatrix<floa
     quint32 i;
     for(i = 0; i < s.size(); ++i)
     {
-        if(s[i].row() != v_old)
+        if((signed) s[i].row() != v_old)
         {
             v_old = s[i].row();
             rows.push_back(s[i].row());

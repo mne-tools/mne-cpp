@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/images">
+        <file alias="evokedSettings.png">images/evokedSettings.png</file>
+        <file alias="covarianceSelection.png">images/covarianceSelection.png</file>
+        <file alias="selectSensors.png">images/selectSensors.png</file>
+    </qresource>
+</RCC>

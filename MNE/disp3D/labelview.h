@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -45,7 +45,7 @@
 
 #include <mne/mne.h>
 #include <fs/surfaceset.h>
-#include <inverse/sourceestimate.h>
+#include <mne/mne_sourceestimate.h>
 
 
 //*************************************************************************************************************
@@ -88,7 +88,6 @@ namespace DISP3DLIB
 
 using namespace MNELIB;
 using namespace FSLIB;
-using namespace INVERSELIB;
 
 
 //*************************************************************************************************************
@@ -114,11 +113,6 @@ public:
     /**
     * Default constructor
     *
-    *
-    *
-    *
-    *
-    *
     * @param[in] parent     Parent QObject (optional)
     */
     LabelView(SurfaceSet &p_surfSet, QList<Label> &p_qListLabels, QList<RowVector4i> &p_qListRGBAs, QWindow *parent = 0);
@@ -130,7 +124,7 @@ public:
     ~LabelView();
 
 
-    void pushSourceEstimate(SourceEstimate &p_sourceEstimate);
+    void pushSourceEstimate(MNESourceEstimate &p_sourceEstimate);
 
 
 protected:
@@ -173,7 +167,7 @@ private:
 
 
 
-    SourceEstimate m_curSourceEstimate;
+    MNESourceEstimate m_curSourceEstimate;
     RowVectorXd m_vecFirstLabelSourceEstimate;
     double m_dMaxSourceEstimate;
 

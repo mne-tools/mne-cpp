@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 * 
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -59,7 +59,7 @@
 #include "fiff_raw_dir.h"
 #include "fiff_stream.h"
 #include "fiff_evoked_set.h"
-
+#include "fiff_io.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -319,6 +319,25 @@ public:
     inline static FiffEvokedSet pick_channels(FiffEvokedSet& orig, const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList)
     {
         return orig.pick_channels(include, exclude);
+    }
+
+    //=========================================================================================================
+    /**
+    * fiff_find_evoked
+    *
+    * ### MNE toolbox root function ###
+    *
+    * Wrapper for the FiffEvokedDataSet find_evoked member function
+    *
+    * Find evoked data sets
+    *
+    * @param[out] orig   The read evoked data set
+    *
+    * @return true when any set was found, false otherwise
+    */
+    inline static bool find_evoked(FiffEvokedSet& orig)
+    {
+        return orig.find_evoked(orig);
     }
 
     //=========================================================================================================

@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 * 
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -47,6 +47,7 @@
 //=============================================================================================================
 
 #include <fs/colortable.h>
+#include <fs/label.h>
 #include <utils/mnemath.h>
 #include <utils/kmeans.h>
 
@@ -57,6 +58,8 @@
 //=============================================================================================================
 
 #include <iostream>
+#include <QtConcurrent>
+#include <QFuture>
 
 
 //*************************************************************************************************************
@@ -163,13 +166,21 @@ void MNEForwardSolution::clear()
 
 //*************************************************************************************************************
 
-MNEForwardSolution MNEForwardSolution::cluster_forward_solution(AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize)
+MNEForwardSolution MNEForwardSolution::cluster_forward_solution(const AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize, MatrixXd& p_D, const FiffCov &p_pNoise_cov, const FiffInfo &p_pInfo) const
 {
     MNEForwardSolution p_fwdOut = MNEForwardSolution(*this);
+
+//    qDebug() << "this->sol->data" << this->sol->data.rows() << "x" << this->sol->data.cols();
 
     //
     // Check consisty
     //
+    if(this->isFixedOrient())
+    {
+        printf("Error: Fixed orientation not implemented jet!\n");
+        return p_fwdOut;
+    }
+
 //    for(qint32 h = 0; h < this->src.hemispheres.size(); ++h )//obj.sizeForwardSolution)
 //    {
 //        if(this->src[h]->vertno.rows() !=  t_listAnnotation[h]->getLabel()->rows())
@@ -179,56 +190,37 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(AnnotationSet &p
 //        }
 //    }
 
+    MatrixXd t_G_Whitened(0,0);
+    bool t_bUseWhitened = false;
+    //
+    //Whiten gain matrix before clustering -> cause diffenerent units Magnetometer, Gradiometer and EEG
+    //
+    if(!p_pNoise_cov.isEmpty() && !p_pInfo.isEmpty())
+    {
+        FiffInfo p_outFwdInfo;
+        FiffCov p_outNoiseCov;
+        MatrixXd p_outWhitener;
+        qint32 p_outNumNonZero;
+        //do whitening with noise cov
+        this->prepare_forward(p_pInfo, p_pNoise_cov, false, p_outFwdInfo, t_G_Whitened, p_outNoiseCov, p_outWhitener, p_outNumNonZero);
+        printf("\tWhitening the forward solution.\n");
 
-//    //DEBUG
-//    MatrixXd test(20,3);
-//    test << 0.537667139546100, 1.83388501459509, -2.25884686100365,
-//            0.862173320368121, 0.318765239858981, -1.30768829630527,
-//            -0.433592022305684, 0.342624466538650, 3.57839693972576,
-//            2.76943702988488, -1.34988694015652, 3.03492346633185,
-//            0.725404224946106, -0.0630548731896562, 0.714742903826096,
-//            -0.204966058299775, -0.124144348216312, 1.48969760778547,
-//            1.40903448980048, 1.41719241342961, 0.671497133608081,
-//            -1.20748692268504, 0.717238651328839, 1.63023528916473,
-//            0.488893770311789, 1.03469300991786, 0.726885133383238,
-//            -0.303440924786016, 0.293871467096658, -0.787282803758638,
-//            0.888395631757642, -1.14707010696915, -1.06887045816803,
-//            -0.809498694424876, -2.94428416199490, 1.43838029281510,
-//            0.325190539456198, -0.754928319169703, 1.37029854009523,
-//            -1.71151641885370, -0.102242446085491, -0.241447041607358,
-//            0.319206739165502, 0.312858596637428, -0.864879917324457,
-//            -0.0300512961962686, -0.164879019209038, 0.627707287528727,
-//            1.09326566903948, 1.10927329761440, -0.863652821988714,
-//            0.0773590911304249, -1.21411704361541, -1.11350074148676,
-//            -0.00684932810334806, 1.53263030828475, -0.769665913753682,
-//            0.371378812760058, -0.225584402271252, 1.11735613881447;
-
-//    std::cout << test << std::endl;
-
-//    VectorXi idx;
-//    MatrixXd ctrs;
-//    VectorXd sumd;
-//    MatrixXd D;
-
-//    KMeans testK(QString("cityblock"), QString("sample"), 5);//QString("sqeuclidean")//QString("sample")
-
-//    testK.calculate(test, 2, idx, ctrs, sumd, D);
-
-//    std::cout << "idx" << std::endl << idx << std::endl;
-//    std::cout << "ctrs" << std::endl << ctrs << std::endl;
-//    std::cout << "sumd" << std::endl << sumd << std::endl;
-//    std::cout << "D" << std::endl << D << std::endl;
-//    //DEBUG END
+        t_G_Whitened = p_outWhitener*t_G_Whitened;
+        t_bUseWhitened = true;
+    }
 
 
-    KMeans t_kMeans(QString("cityblock"), QString("sample"), 5);//QString("sqeuclidean")//QString("sample")//cityblock
-    MatrixXd t_LF_new;
-
+    //
+    // Assemble input data
+    //
     qint32 count;
     qint32 offset;
 
-    for(qint32 h = 0; h < this->src.size(); ++h )//obj.sizeForwardSolution)
+    MatrixXd t_G_new;
+
+    for(qint32 h = 0; h < this->src.size(); ++h )
     {
+
         count = 0;
         offset = 0;
 
@@ -252,15 +244,18 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(AnnotationSet &p
         for(qint32 i = 0; i < vertno_labeled.rows(); ++i)
             vertno_labeled[i] = p_AnnotationSet[h].getLabelIds()[this->src[h].vertno[i]];
 
-        //iterate over labels
-        MatrixXd t_LF_partial;
+        //Qt Concurrent List
+        QList<RegionData> m_qListRegionDataIn;
+
+        //
+        // Generate cluster input data
+        //
         for (qint32 i = 0; i < label_ids.rows(); ++i)
         {
-
             if (label_ids[i] != 0)
             {
                 QString curr_name = t_CurrentColorTable.struct_names[i];//obj.label2AtlasName(label(i));
-                printf("\tCluster %d / %d %s...", i+1, label_ids.rows(), curr_name.toUtf8().constData());
+                printf("\tCluster %d / %li %s...", i+1, label_ids.rows(), curr_name.toUtf8().constData());
 
                 //
                 // Get source space indeces
@@ -279,107 +274,53 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(AnnotationSet &p
                 }
                 idcs.conservativeResize(c);
 
-                //get selected LF
-                MatrixXd t_LF(this->sol->data.rows(), idcs.rows()*3);
+                //get selected G
+                MatrixXd t_G(this->sol->data.rows(), idcs.rows()*3);
+                MatrixXd t_G_Whitened_Roi(t_G_Whitened.rows(), idcs.rows()*3);
 
                 for(qint32 j = 0; j < idcs.rows(); ++j)
-                    t_LF.block(0, j*3, t_LF.rows(), 3) = this->sol->data.block(0, (idcs[j]+offset)*3, t_LF.rows(), 3);
+                {
+                    t_G.block(0, j*3, t_G.rows(), 3) = this->sol->data.block(0, (idcs[j]+offset)*3, t_G.rows(), 3);
+                    if(t_bUseWhitened)
+                        t_G_Whitened_Roi.block(0, j*3, t_G_Whitened_Roi.rows(), 3) = t_G_Whitened.block(0, (idcs[j]+offset)*3, t_G_Whitened_Roi.rows(), 3);
+                }
 
-                qint32 nSens = t_LF.rows();
-                qint32 nSources = t_LF.cols()/3;
-                qint32 nClusters = 0;
+                qint32 nSens = t_G.rows();
+                qint32 nSources = t_G.cols()/3;
 
                 if (nSources > 0)
                 {
-                    nClusters = ceil((double)nSources/(double)p_iClusterSize);
+                    RegionData t_sensG;
 
-                    printf("%d Cluster(s)... ", nClusters);
+                    t_sensG.idcs = idcs;
+                    t_sensG.iLabelIdxIn = i;
+                    t_sensG.nClusters = ceil((double)nSources/(double)p_iClusterSize);
 
-                    t_LF_partial = MatrixXd::Zero(nSens,nClusters*3);
+                    t_sensG.matRoiGOrig = t_G;
+//                    if(t_bUseWhitened)
+//                        t_sensG.matRoiGOrigWhitened = t_G_Whitened_Roi;
+
+                    printf("%d Cluster(s)... ", t_sensG.nClusters);
 
                     // Reshape Input data -> sources rows; sensors columns
-                    MatrixXd t_sensLF(t_LF.cols()/3, 3*nSens);
+                    t_sensG.matRoiG = MatrixXd(t_G.cols()/3, 3*nSens);
+                    if(t_bUseWhitened)
+                        t_sensG.matRoiGWhitened = MatrixXd(t_G_Whitened_Roi.cols()/3, 3*nSens);
+
                     for(qint32 j = 0; j < nSens; ++j)
                     {
-                        for(qint32 k = 0; k < t_sensLF.rows(); ++k)
-                            t_sensLF.block(k,j*3,1,3) = t_LF.block(j,k*3,1,3);
+                        for(qint32 k = 0; k < t_sensG.matRoiG.rows(); ++k)
+                            t_sensG.matRoiG.block(k,j*3,1,3) = t_G.block(j,k*3,1,3);
+                        if(t_bUseWhitened)
+                            for(qint32 k = 0; k < t_sensG.matRoiGWhitened.rows(); ++k)
+                                t_sensG.matRoiGWhitened.block(k,j*3,1,3) = t_G_Whitened_Roi.block(j,k*3,1,3);
                     }
 
-                    // Kmeans Reduction
-                    VectorXi roiIdx;
-                    MatrixXd ctrs;
-                    VectorXd sumd;
-                    MatrixXd D;
+                    t_sensG.bUseWhitened = t_bUseWhitened;
 
-                    t_kMeans.calculate(t_sensLF, nClusters, roiIdx, ctrs, sumd, D);
+                    m_qListRegionDataIn.append(t_sensG);
 
-                    //
-                    // Assign the centroid for each cluster to the partial LF
-                    //
-                    for(qint32 j = 0; j < nSens; ++j)
-                        for(qint32 k = 0; k < nClusters; ++k)
-                            t_LF_partial.block(j, k*3, 1, 3) = ctrs.block(k,j*3,1,3);
-
-                    //
-                    // Get cluster indizes and its distances to the centroid
-                    //
-                    for(qint32 j = 0; j < nClusters; ++j)
-                    {
-                        VectorXi clusterIdcs = VectorXi::Zero(roiIdx.rows());
-                        VectorXd clusterDistance = VectorXd::Zero(roiIdx.rows());
-                        qint32 nClusterIdcs = 0;
-                        for(qint32 k = 0; k < roiIdx.rows(); ++k)
-                        {
-                            if(roiIdx[k] == j)
-                            {
-                                clusterIdcs[nClusterIdcs] = idcs[k];
-                                clusterDistance[nClusterIdcs] = D(k,j);
-                                ++nClusterIdcs;
-                            }
-                        }
-                        clusterIdcs.conservativeResize(nClusterIdcs);
-                        p_fwdOut.src[h].cluster_info.clusterVertnos.append(clusterIdcs);
-                        p_fwdOut.src[h].cluster_info.clusterDistances.append(clusterDistance);
-                        p_fwdOut.src[h].cluster_info.clusterLabelIds.append(label_ids[i]);
-                    }
-
-                    //
-                    // Assign partial LF to new LeadField
-                    //
-                    if(t_LF_partial.rows() > 0 && t_LF_partial.cols() > 0)
-                    {
-                        t_LF_new.conservativeResize(t_LF_partial.rows(), t_LF_new.cols() + t_LF_partial.cols());
-                        t_LF_new.block(0, t_LF_new.cols() - t_LF_partial.cols(), t_LF_new.rows(), t_LF_partial.cols()) = t_LF_partial;
-
-                        // Map the centroids to the closest rr
-                        for(qint32 k = 0; k < nClusters; ++k)
-                        {
-                            qint32 j = 0;
-
-                            double sqec = sqrt((t_LF.block(0, j*3, t_LF.rows(), 3) - t_LF_partial.block(0, k*3, t_LF_partial.rows(), 3)).array().pow(2).sum());
-                            double sqec_min = sqec;
-                            double j_min = j;
-                            for(qint32 j = 1; j < idcs.rows(); ++j)
-                            {
-                                sqec = sqrt((t_LF.block(0, j*3, t_LF.rows(), 3) - t_LF_partial.block(0, k*3, t_LF_partial.rows(), 3)).array().pow(2).sum());
-                                if(sqec < sqec_min)
-                                {
-                                    sqec_min = sqec;
-                                    j_min = j;
-                                }
-                            }
-
-                            // Take the closest coordinates
-                            qint32 sel_idx = idcs[j_min];
-                            //ToDo store this in cluster info
-//                            p_fwdOut.src[h].rr.row(count) = this->src[h].rr.row(sel_idx);
-//                            p_fwdOut.src[h].nn.row(count) = MatrixXd::Zero(1,3);
-
-                            p_fwdOut.src[h].vertno[count] = this->src[h].vertno[sel_idx];
-                            ++count;
-                        }
-                    }
-                    printf("[done]\n");
+                    printf("[added]\n");
                 }
                 else
                 {
@@ -388,43 +329,474 @@ MNEForwardSolution MNEForwardSolution::cluster_forward_solution(AnnotationSet &p
             }
         }
 
+
+        //
+        // Calculate clusters
+        //
+        printf("Clustering... ");
+        QFuture< RegionDataOut > res;
+        res = QtConcurrent::mapped(m_qListRegionDataIn, &RegionData::cluster);
+        res.waitForFinished();
+
+        //
+        // Assign results
+        //
+        MatrixXd t_G_partial;
+
+        qint32 nClusters;
+        qint32 nSens;
+        QList<RegionData>::const_iterator itIn;
+        itIn = m_qListRegionDataIn.begin();
+        QFuture<RegionDataOut>::const_iterator itOut;
+        for (itOut = res.constBegin(); itOut != res.constEnd(); ++itOut)
+        {
+            nClusters = itOut->ctrs.rows();
+            nSens = itOut->ctrs.cols()/3;
+            t_G_partial = MatrixXd::Zero(nSens, nClusters*3);
+
+//            std::cout << "Number of Clusters: " << nClusters << " x " << nSens << std::endl;//itOut->iLabelIdcsOut << std::endl;
+
+            //
+            // Assign the centroid for each cluster to the partial G
+            //
+            //ToDo change this use indeces found with whitened data
+            for(qint32 j = 0; j < nSens; ++j)
+                for(qint32 k = 0; k < nClusters; ++k)
+                    t_G_partial.block(j, k*3, 1, 3) = itOut->ctrs.block(k,j*3,1,3);
+
+            //
+            // Get cluster indizes and its distances to the centroid
+            //
+            for(qint32 j = 0; j < nClusters; ++j)
+            {
+                VectorXi clusterIdcs = VectorXi::Zero(itOut->roiIdx.rows());
+                VectorXd clusterDistance = VectorXd::Zero(itOut->roiIdx.rows());
+                MatrixX3f clusterSource_rr = MatrixX3f::Zero(itOut->roiIdx.rows(), 3);
+                qint32 nClusterIdcs = 0;
+                for(qint32 k = 0; k < itOut->roiIdx.rows(); ++k)
+                {
+                    if(itOut->roiIdx[k] == j)
+                    {
+                        clusterIdcs[nClusterIdcs] = itIn->idcs[k];
+
+                        qint32 offset = h == 0 ? 0 : this->src[0].nuse;
+                        clusterSource_rr.row(nClusterIdcs) = this->source_rr.row(offset + itIn->idcs[k]);
+                        clusterDistance[nClusterIdcs] = itOut->D(k,j);
+                        ++nClusterIdcs;
+                    }
+                }
+                clusterIdcs.conservativeResize(nClusterIdcs);
+                clusterSource_rr.conservativeResize(nClusterIdcs,3);
+                clusterDistance.conservativeResize(nClusterIdcs);
+
+                VectorXi clusterVertnos = VectorXi::Zero(clusterIdcs.size());
+                for(qint32 k = 0; k < clusterVertnos.size(); ++k)
+                    clusterVertnos(k) = this->src[h].vertno[clusterIdcs(k)];
+
+
+                p_fwdOut.src[h].cluster_info.clusterVertnos.append(clusterVertnos);
+                p_fwdOut.src[h].cluster_info.clusterSource_rr.append(clusterSource_rr);
+                p_fwdOut.src[h].cluster_info.clusterDistances.append(clusterDistance);
+                p_fwdOut.src[h].cluster_info.clusterLabelIds.append(label_ids[itOut->iLabelIdxOut]);
+                p_fwdOut.src[h].cluster_info.clusterLabelNames.append(t_CurrentColorTable.getNames()[itOut->iLabelIdxOut]);
+            }
+
+
+            //
+            // Assign partial G to new LeadField
+            //
+            if(t_G_partial.rows() > 0 && t_G_partial.cols() > 0)
+            {
+                t_G_new.conservativeResize(t_G_partial.rows(), t_G_new.cols() + t_G_partial.cols());
+                t_G_new.block(0, t_G_new.cols() - t_G_partial.cols(), t_G_new.rows(), t_G_partial.cols()) = t_G_partial;
+
+                // Map the centroids to the closest rr
+                for(qint32 k = 0; k < nClusters; ++k)
+                {
+                    qint32 j = 0;
+
+                    double sqec = sqrt((itIn->matRoiGOrig.block(0, j*3, itIn->matRoiGOrig.rows(), 3) - t_G_partial.block(0, k*3, t_G_partial.rows(), 3)).array().pow(2).sum());
+                    double sqec_min = sqec;
+                    qint32 j_min = 0;
+//                    MatrixXd matGainDiff;
+                    for(qint32 j = 1; j < itIn->idcs.rows(); ++j)
+                    {
+                        sqec = sqrt((itIn->matRoiGOrig.block(0, j*3, itIn->matRoiGOrig.rows(), 3) - t_G_partial.block(0, k*3, t_G_partial.rows(), 3)).array().pow(2).sum());
+
+                        if(sqec < sqec_min)
+                        {
+                            sqec_min = sqec;
+                            j_min = j;
+//                            matGainDiff = itIn->matRoiGOrig.block(0, j*3, itIn->matRoiGOrig.rows(), 3) - t_G_partial.block(0, k*3, t_G_partial.rows(), 3);
+                        }
+                    }
+
+//                    qListGainDist.append(matGainDiff);
+
+                    // Take the closest coordinates
+                    qint32 sel_idx = itIn->idcs[j_min];
+
+                    p_fwdOut.src[h].cluster_info.centroidVertno.append(this->src[h].vertno[sel_idx]);
+                    p_fwdOut.src[h].cluster_info.centroidSource_rr.append(this->src[h].rr.row(sel_idx));
+//                    p_fwdOut.src[h].nn.row(count) = MatrixXd::Zero(1,3);
+
+//                    // Option 1 closest vertno
+//                    p_fwdOut.src[h].vertno[count] = this->src[h].vertno[sel_idx]; //ToDo resizing necessary?
+                    // Option 2 label ID
+                    p_fwdOut.src[h].vertno[count] = p_fwdOut.src[h].cluster_info.clusterLabelIds[count];
+
+
+
+//                    //vertices
+//                    std::cout << this->src[h].vertno[sel_idx] << ", ";
+
+                    ++count;
+                }
+            }
+
+            ++itIn;
+        }
+
         //
         // Assemble new hemisphere information
         //
-//ToDo store this in cluster info
 //        p_fwdOut.src[h].rr.conservativeResize(count, 3);
 //        p_fwdOut.src[h].nn.conservativeResize(count, 3);
         p_fwdOut.src[h].vertno.conservativeResize(count);
 
-//        p_fwdOut.src[h].nuse_tri = 0;
-//        p_fwdOut.src[h].use_tris = MatrixX3i(0,3);
-
-
-//        if(p_fwdOut.src[h].rr.rows() > 0 && p_fwdOut.src[h].rr.cols() > 0)
-//        {
-//            if(h == 0)
-//            {
-//                p_fwdOut.source_rr = MatrixX3d(0,3);
-//                p_fwdOut.source_nn = MatrixX3d(0,3);
-//            }
-
-//            p_fwdOut.source_rr.conservativeResize(p_fwdOut.source_rr.rows() + p_fwdOut.src[h].rr.rows(),3);
-//            p_fwdOut.source_rr.block(p_fwdOut.source_rr.rows() -  p_fwdOut.src[h].rr.rows(), 0,  p_fwdOut.src[h].rr.rows(), 3) = p_fwdOut.src[h].rr;
-
-//            p_fwdOut.source_nn.conservativeResize(p_fwdOut.source_nn.rows() + p_fwdOut.src[h].nn.rows(),3);
-//            p_fwdOut.source_nn.block(p_fwdOut.source_nn.rows() -  p_fwdOut.src[h].nn.rows(), 0,  p_fwdOut.src[h].nn.rows(), 3) = p_fwdOut.src[h].nn;
-//        }
-
         printf("[done]\n");
     }
+
+
+    //
+    // Cluster operator D (sources x clusters)
+    //
+    qint32 totalNumOfClust = 0;
+    for (qint32 h = 0; h < 2; ++h)
+        totalNumOfClust += p_fwdOut.src[h].cluster_info.clusterVertnos.size();
+
+    if(this->isFixedOrient())
+        p_D = MatrixXd::Zero(this->sol->data.cols(), totalNumOfClust);
+    else
+        p_D = MatrixXd::Zero(this->sol->data.cols(), totalNumOfClust*3);
+
+    QList<VectorXi> t_vertnos = this->src.get_vertno();
+
+//    qDebug() << "Size: " << t_vertnos[0].size()  << t_vertnos[1].size();
+//    qDebug() << "this->sol->data.cols(): " << this->sol->data.cols();
+
+    qint32 currentCluster = 0;
+    for (qint32 h = 0; h < 2; ++h)
+    {
+        int hemiOffset = h == 0 ? 0 : t_vertnos[0].size();
+        for(qint32 i = 0; i < p_fwdOut.src[h].cluster_info.clusterVertnos.size(); ++i)
+        {
+            VectorXi idx_sel;
+            MNEMath::intersect(t_vertnos[h], p_fwdOut.src[h].cluster_info.clusterVertnos[i], idx_sel);
+
+//            std::cout << "\nVertnos:\n" << t_vertnos[h] << std::endl;
+
+//            std::cout << "clusterVertnos[i]:\n" << p_fwdOut.src[h].cluster_info.clusterVertnos[i] << std::endl;
+
+            idx_sel.array() += hemiOffset;
+
+//            std::cout << "idx_sel]:\n" << idx_sel << std::endl;
+
+
+
+            double selectWeight = 1.0/idx_sel.size();
+            if(this->isFixedOrient())
+            {
+                for(qint32 j = 0; j < idx_sel.size(); ++j)
+                    p_D.col(currentCluster)[idx_sel(j)] = selectWeight;
+            }
+            else
+            {
+                qint32 clustOffset = currentCluster*3;
+                for(qint32 j = 0; j < idx_sel.size(); ++j)
+                {
+                    qint32 idx_sel_Offset = idx_sel(j)*3;
+                    //x
+                    p_D(idx_sel_Offset,clustOffset) = selectWeight;
+                    //y
+                    p_D(idx_sel_Offset+1, clustOffset+1) = selectWeight;
+                    //z
+                    p_D(idx_sel_Offset+2, clustOffset+2) = selectWeight;
+                }
+            }
+            ++currentCluster;
+        }
+    }
+
+//    std::cout << "D:\n" << D.row(0) << std::endl << D.row(1) << std::endl << D.row(2) << std::endl << D.row(3) << std::endl << D.row(4) << std::endl << D.row(5) << std::endl;
+
+
+//    //
+//    // get mean and std of original gain matrix
+//    //
+//    double mean = 0;
+//    qint32 c = 0;
+//    for(qint32 i = 0; i < this->sol->data.rows(); ++i)
+//    {
+//        if(i % 3 == 1 || i%3 == 2)
+//        {
+//            for(qint32 j = 0; j < this->sol->data.cols(); ++j)
+//            {
+//                mean += this->sol->data(i,j);
+//                ++c;
+//            }
+//        }
+//    }
+
+//    mean /= c;
+//    double var = 0;
+//    c = 0;
+//    for(qint32 i = 0; i < this->sol->data.rows(); ++i)
+//    {
+//        if(i % 3 == 1 || i%3 == 2)
+//        {
+//            for(qint32 j = 0; j < this->sol->data.cols(); ++j)
+//            {
+//                var += pow(this->sol->data(i,j) - mean,2);
+//                ++c;
+//            }
+//        }
+//    }
+//    var /= c - 1;
+//    var = sqrt(var);
+//    std::cout << "Original gain matrix (gradiometer):\n    mean: " << mean << "\n    var: " << var << std::endl;
+
+//    mean = 0;
+//    c = 0;
+//    for(qint32 i = 0; i < this->sol->data.rows(); ++i)
+//    {
+//        if(i % 3 == 0)
+//        {
+//            for(qint32 j = 0; j < this->sol->data.cols(); ++j)
+//            {
+//                mean += this->sol->data(i,j);
+//                ++c;
+//            }
+//        }
+//    }
+//    mean /= c;
+
+//    var = 0;
+//    c = 0;
+//    for(qint32 i = 0; i < this->sol->data.rows(); ++i)
+//    {
+//        if(i % 3 == 0)
+//        {
+//            for(qint32 j = 0; j < this->sol->data.cols(); ++j)
+//            {
+//                var += pow(this->sol->data(i,j) - mean,2);
+//                ++c;
+//            }
+//        }
+//    }
+//    var /= c - 1;
+//    var = sqrt(var);
+//    std::cout << "Original gain matrix (magnetometer):\n    mean: " << mean << "\n    var: " << var << std::endl;
+
+//    //
+//    // get mean and std of original gain matrix mapping
+//    //
+//    mean = 0;
+//    c = 0;
+//    for(qint32 h = 0; h < qListGainDist.size(); ++h)
+//    {
+//        for(qint32 i = 0; i < qListGainDist[h].rows(); ++i)
+//        {
+//            if(i % 3 == 1 || i%3 == 2)
+//            {
+//                for(qint32 j = 0; j < qListGainDist[h].cols(); ++j)
+//                {
+//                    mean += qListGainDist[h](i,j);
+//                    ++c;
+//                }
+//            }
+//        }
+//    }
+//    mean /= c;
+
+//    var = 0;
+//    c = 0;
+//    for(qint32 h = 0; h < qListGainDist.size(); ++h)
+//    {
+//        for(qint32 i = 0; i < qListGainDist[h].rows(); ++i)
+//        {
+//            if(i % 3 == 1 || i%3 == 2)
+//            {
+//                for(qint32 j = 0; j < qListGainDist[h].cols(); ++j)
+//                {
+//                    var += pow(qListGainDist[i](i,j) - mean,2);
+//                    ++c;
+//                }
+//            }
+//        }
+//    }
+
+//    var /= c - 1;
+//    var = sqrt(var);
+
+//    std::cout << "Gain matrix offset mapping (gradiometer):\n    mean: " << mean << "\n    var: " << var << std::endl;
+
+//    mean = 0;
+//    c = 0;
+//    for(qint32 h = 0; h < qListGainDist.size(); ++h)
+//    {
+//        for(qint32 i = 0; i < qListGainDist[h].rows(); ++i)
+//        {
+//            if(i % 3 == 0)
+//            {
+//                for(qint32 j = 0; j < qListGainDist[h].cols(); ++j)
+//                {
+//                    mean += qListGainDist[h](i,j);
+//                    ++c;
+//                }
+//            }
+//        }
+//    }
+//    mean /= c;
+
+//    var = 0;
+//    c = 0;
+//    for(qint32 h = 0; h < qListGainDist.size(); ++h)
+//    {
+//        for(qint32 i = 0; i < qListGainDist[h].rows(); ++i)
+//        {
+//            if(i % 3 == 0)
+//            {
+//                for(qint32 j = 0; j < qListGainDist[h].cols(); ++j)
+//                {
+//                    var += pow(qListGainDist[i](i,j) - mean,2);
+//                    ++c;
+//                }
+//            }
+//        }
+//    }
+
+//    var /= c - 1;
+//    var = sqrt(var);
+
+//    std::cout << "Gain matrix offset mapping (magnetometer):\n    mean: " << mean << "\n    var: " << var << std::endl;
+
 
     //
     // Put it all together
     //
-    p_fwdOut.sol->data = t_LF_new;
-    p_fwdOut.sol->ncol = t_LF_new.cols();
+    p_fwdOut.sol->data = t_G_new;
+    p_fwdOut.sol->ncol = t_G_new.cols();
 
     p_fwdOut.nsource = p_fwdOut.sol->ncol/3;
+
+    return p_fwdOut;
+}
+
+
+//*************************************************************************************************************
+
+MNEForwardSolution MNEForwardSolution::reduce_forward_solution(qint32 p_iNumDipoles, MatrixXd& p_D) const
+{
+    MNEForwardSolution p_fwdOut = MNEForwardSolution(*this);
+
+    bool isFixed = p_fwdOut.isFixedOrient();
+    qint32 np = isFixed ? p_fwdOut.sol->data.cols() : p_fwdOut.sol->data.cols()/3;
+
+    if(p_iNumDipoles > np)
+        return p_fwdOut;
+
+    VectorXi sel(p_iNumDipoles);
+
+    float t_fStep = (float)np/(float)p_iNumDipoles;
+
+    for(qint32 i = 0; i < p_iNumDipoles; ++i)
+    {
+        float t_fCurrent = ((float)i)*t_fStep;
+        sel[i] = (quint32)floor(t_fCurrent);
+    }
+
+    if(isFixed)
+    {
+        p_D = MatrixXd::Zero(p_fwdOut.sol->data.cols(), p_iNumDipoles);
+        for(qint32 i = 0; i < p_iNumDipoles; ++i)
+            p_D(sel[i], i) = 1;
+    }
+    else
+    {
+        p_D = MatrixXd::Zero(p_fwdOut.sol->data.cols(), p_iNumDipoles*3);
+        for(qint32 i = 0; i < p_iNumDipoles; ++i)
+            for(qint32 j = 0; j < 3; ++j)
+                p_D((sel[i]*3)+j, (i*3)+j) = 1;
+    }
+
+
+//    //find idx of hemi switch
+//    qint32 vertno_size = this->src[0].nuse;
+//    qint32 hIdx = 0;
+
+//    //LH
+//    VectorXi vertnosLH(this->src[0].nuse);
+//    for(qint32 i = 0; i < sel.size(); ++i)
+//    {
+//        if(sel[i] >= vertno_size)
+//        {
+//            hIdx = i;
+//            break;
+//        }
+//        vertnosLH[i] = this->src[0].vertno(sel[i]);
+//    }
+//    vertnosLH.conservativeResize(hIdx);
+
+//    QFile file_centroids_LH("./centroids_LH_sel.txt");
+//    file_centroids_LH.open(QIODevice::WriteOnly | QIODevice::Text);
+//    QTextStream out_centroids_LH(&file_centroids_LH);
+//    for(qint32 i = 0; i < vertnosLH.size(); ++i)
+//        out_centroids_LH << vertnosLH[i] << ", ";
+//    file_centroids_LH.close();
+
+//    QFile file_centroids_LH_full("./centroids_LH_full.txt");
+//    file_centroids_LH_full.open(QIODevice::WriteOnly | QIODevice::Text);
+//    QTextStream out_centroids_LH_full(&file_centroids_LH_full);
+//    for(qint32 i = 0; i < this->src[0].vertno.size(); ++i)
+//        out_centroids_LH_full << this->src[0].vertno[i] << ", ";
+//    file_centroids_LH_full.close();
+
+//    //RH
+//    VectorXi vertnosRH(sel.size() - hIdx);
+//    for(qint32 i = hIdx; i < sel.size(); ++i)
+//    {
+//        vertnosRH[i - hIdx] = this->src[1].vertno(sel[i] - hIdx);
+//    }
+
+//    QFile file_centroids_RH("./centroids_RH_sel.txt");
+//    file_centroids_RH.open(QIODevice::WriteOnly | QIODevice::Text);
+//    QTextStream out_centroids_RH(&file_centroids_RH);
+//    for(qint32 i = 0; i < vertnosRH.size(); ++i)
+//        out_centroids_RH << vertnosRH[i] << ", ";
+//    file_centroids_RH.close();
+//    //vertno end
+
+    // New gain matrix
+    p_fwdOut.sol->data = this->sol->data * p_D;
+
+    MatrixX3f rr(p_iNumDipoles,3);
+
+    MatrixX3f nn(p_iNumDipoles,3);
+
+
+    for(qint32 i = 0; i < p_iNumDipoles; ++i)
+    {
+        rr.row(i) = this->source_rr.row(sel(i));
+        nn.row(i) = this->source_nn.row(sel(i));
+    }
+
+    p_fwdOut.source_rr = rr;
+    p_fwdOut.source_nn = nn;
+
+    p_fwdOut.sol->ncol =  p_fwdOut.sol->data.cols();
+
+    p_fwdOut.nsource = p_iNumDipoles;
 
     return p_fwdOut;
 }
@@ -504,7 +876,7 @@ FiffCov MNEForwardSolution::compute_depth_prior(const MatrixXd &Gain, const Fiff
         }
     }
 
-    printf("\tlimit = %d/%d = %f", n_limit + 1, d.size(), sqrt(limit / ws[0]));
+    printf("\tlimit = %d/%li = %f", n_limit + 1, d.size(), sqrt(limit / ws[0]));
     double scale = 1.0 / limit;
     printf("\tscale = %g exp = %g", scale, exp);
 
@@ -650,6 +1022,58 @@ MNEForwardSolution MNEForwardSolution::pick_channels(const QStringList& include,
     }
 
     return fwd;
+}
+
+
+//*************************************************************************************************************
+
+MNEForwardSolution MNEForwardSolution::pick_regions(const QList<Label> &p_qListLabels) const
+{
+    VectorXi selVertices;
+
+    qint32 iSize = 0;
+    for(qint32 i = 0; i < p_qListLabels.size(); ++i)
+    {
+        VectorXi currentSelection;
+        this->src.label_src_vertno_sel(p_qListLabels[i], currentSelection);
+
+        selVertices.conservativeResize(iSize+currentSelection.size());
+        selVertices.block(iSize,0,currentSelection.size(),1) = currentSelection;
+        iSize = selVertices.size();
+    }
+
+    MNEMath::sort(selVertices, false);
+
+    MNEForwardSolution selectedFwd(*this);
+
+    MatrixX3f rr(selVertices.size(),3);
+    MatrixX3f nn(selVertices.size(),3);
+
+    for(qint32 i = 0; i < selVertices.size(); ++i)
+    {
+        rr.block(i, 0, 1, 3) = selectedFwd.source_rr.row(selVertices[i]);
+        nn.block(i, 0, 1, 3) = selectedFwd.source_nn.row(selVertices[i]);
+    }
+
+    selectedFwd.source_rr = rr;
+    selectedFwd.source_nn = nn;
+
+    VectorXi selSolIdcs = tripletSelection(selVertices);
+    MatrixXd G(selectedFwd.sol->data.rows(),selSolIdcs.size());
+//    selectedFwd.sol_grad; //ToDo
+    qint32 rows = G.rows();
+
+    for(qint32 i = 0; i < selSolIdcs.size(); ++i)
+        G.block(0, i, rows, 1) = selectedFwd.sol->data.col(selSolIdcs[i]);
+
+    selectedFwd.sol->data = G;
+    selectedFwd.sol->nrow = selectedFwd.sol->data.rows();
+    selectedFwd.sol->ncol = selectedFwd.sol->data.cols();
+    selectedFwd.nsource = selectedFwd.sol->ncol / 3;
+
+    selectedFwd.src = selectedFwd.src.pick_regions(p_qListLabels);
+
+    return selectedFwd;
 }
 
 
@@ -999,7 +1423,7 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice, MNEForwardSolution& fwd, bo
                 SparseMatrix<double> t_eye(3,3);
                 for (qint32 i = 0; i < 3; ++i)
                     t_eye.insert(i,i) = 1.0f;
-                kroneckerProduct(*fix_rot,t_eye,t_matKron);//kron(fix_rot,eye(3));
+                t_matKron = kroneckerProduct(*fix_rot,t_eye);//kron(fix_rot,eye(3));
                 fwd.sol_grad->data *= t_matKron;
                 fwd.sol_grad->ncol   = 3*fwd.nsource;
             }
@@ -1081,7 +1505,7 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice, MNEForwardSolution& fwd, bo
             SparseMatrix<double> t_eye(3,3);
             for (qint32 i = 0; i < 3; ++i)
                 t_eye.insert(i,i) = 1.0f;
-            kroneckerProduct(*surf_rot,t_eye,t_matKron);//kron(surf_rot,eye(3));
+            t_matKron = kroneckerProduct(*surf_rot,t_eye);//kron(surf_rot,eye(3));
             fwd.sol_grad->data *= t_matKron;
         }
         delete surf_rot;
@@ -1102,7 +1526,7 @@ bool MNEForwardSolution::read(QIODevice& p_IODevice, MNEForwardSolution& fwd, bo
 
         MatrixXf t_ones = MatrixXf::Ones(fwd.nsource,1);
         Matrix3f t_eye = Matrix3f::Identity();
-        kroneckerProduct(t_ones,t_eye,fwd.source_nn);
+        fwd.source_nn = kroneckerProduct(t_ones,t_eye);
 
         printf("[done]\n");
     }
@@ -1343,7 +1767,7 @@ void MNEForwardSolution::restrict_gain_matrix(MatrixXd &G, const FiffInfo &info)
     // Figure out which ones have been used
     if(info.chs.size() != G.rows())
     {
-        printf("Error G.rows() and length of info.chs do not match: %d != %d", G.rows(), info.chs.size()); //ToDo throw
+        printf("Error G.rows() and length of info.chs do not match: %li != %i", G.rows(), info.chs.size()); //ToDo throw
         return;
     }
 
@@ -1353,7 +1777,7 @@ void MNEForwardSolution::restrict_gain_matrix(MatrixXd &G, const FiffInfo &info)
         for(qint32 i = 0; i < sel.size(); ++i)
             G.row(i) = G.row(sel[i]);
         G.conservativeResize(sel.size(), G.cols());
-        printf("\t%d planar channels", sel.size());
+        printf("\t%li planar channels", sel.size());
     }
     else
     {
@@ -1363,7 +1787,7 @@ void MNEForwardSolution::restrict_gain_matrix(MatrixXd &G, const FiffInfo &info)
             for(qint32 i = 0; i < sel.size(); ++i)
                 G.row(i) = G.row(sel[i]);
             G.conservativeResize(sel.size(), G.cols());
-            printf("\t%d magnetometer or axial gradiometer channels", sel.size());
+            printf("\t%li magnetometer or axial gradiometer channels", sel.size());
         }
         else
         {
@@ -1373,7 +1797,7 @@ void MNEForwardSolution::restrict_gain_matrix(MatrixXd &G, const FiffInfo &info)
                 for(qint32 i = 0; i < sel.size(); ++i)
                     G.row(i) = G.row(sel[i]);
                 G.conservativeResize(sel.size(), G.cols());
-                printf("\t%d EEG channels\n", sel.size());
+                printf("\t%li EEG channels\n", sel.size());
             }
             else
                 printf("Could not find MEG or EEG channels\n");

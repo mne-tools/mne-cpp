@@ -17,12 +17,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -89,10 +89,10 @@ using namespace UTILSLIB;
 //=============================================================================================================
 
 BabyMEG::BabyMEG()
-:m_bIsRunning(false)
+:pInfo(NULL)
+, m_bIsRunning(false)
 , m_uiBufferSampleSize(1000)
 , m_pRawMatrixBuffer(NULL)
-, pInfo(NULL)
 {
     //BabyMEG Inits
     pInfo = new BabyMEGInfo();
@@ -156,7 +156,56 @@ void BabyMEG::comFLL(Command p_command)
 
 void BabyMEG::setCMDData(QByteArray DATA)
 {
-    m_commandManager["FLL"].reply("FLL-OK"+DATA);
+    qDebug()<<"------"<<DATA;
+    m_commandManager["FLL"].reply(DATA);
+    qDebug()<<"Data has been received.";
+/*
+    int exec,a,b;
+    QByteArray chan;
+    int nChan;
+    //QList<QByteArray> mdat;
+    //qDebug()<<"setCMDData"<<DATA;
+    QByteArray rcmd = DATA.left(4);
+    QString sbuf;
+
+    exec =0;
+    if (rcmd == "INIT") exec = 2;
+    if (rcmd == "SYNC") exec = 3;
+
+    switch (exec)
+    {
+        case 1:
+            //find the repetition number for sending the channel information
+            a = DATA.indexOf("[",0);
+            b = DATA.indexOf("#",0);
+
+            chan = DATA.mid(a+1,b-a-1);
+            nChan = chan.toInt();
+//            //qDebug()<<"a, b, Chan"<<a<<b<<nChan;
+//            mdat = DATA.split('#');
+//            //qDebug()<<"size of list mdat"<<mdat.size();
+//            //qDebug()<<"mdat"<<mdat[0]<<mdat[1]<<mdat[2];
+//            for (int i=1; i<nChan+1; i++){
+//                //Send information per channel
+//                sbuf.clear();
+//                sbuf = "INIT|"+chan+"|"+tr("%1").arg(i)+"|"+mdat[i];
+//                //qDebug()<<sbuf;
+//                m_commandManager["FLL"].reply(sbuf);
+//            }
+            sbuf.clear();
+            sbuf = "INIT|"+chan;
+            m_commandManager["FLL"].reply(sbuf);
+
+            break;
+        case 2:
+            m_commandManager["FLL"].reply(DATA);
+            break;
+        default:
+            m_commandManager["FLL"].reply(DATA);
+            qDebug()<<"-----"<<DATA;
+            break;
+    }
+    */
 }
 
 

@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -41,7 +41,7 @@
 #include "fiff_raw_data.h"
 #include "fiff_tag.h"
 #include "fiff_stream.h"
-
+#include "cstdlib"
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -70,9 +70,11 @@ FiffRawData::FiffRawData(QIODevice &p_IODevice)
 : first_samp(-1)
 , last_samp(-1)
 {
+    //setup FiffRawData object
     if(!FiffStream::setup_read_raw(p_IODevice, *this))
     {
-        printf("\tError during fiff setup raw read.\n");//ToDo Throw here
+        printf("\tError during fiff setup raw read.\n");
+        //exit(EXIT_FAILURE); //ToDo Throw here, e.g.: throw std::runtime_error("IO Error! File not found");
         return;
     }
 }
@@ -254,7 +256,6 @@ bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t f
     }
 
     MatrixXd one;
-    bool doing_whole;
     fiff_int_t first_pick, last_pick, picksamp;
     for(k = 0; k < this->rawdir.size(); ++k)
     {
@@ -271,7 +272,6 @@ bool FiffRawData::read_raw_segment(MatrixXd& data, MatrixXd& times, fiff_int_t f
                 //
                 if(do_debug)
                     printf("S");
-                doing_whole = false;
                 if (sel.cols() <= 0)
                     one.resize(nchan,thisRawDir.nsamp);
                 else

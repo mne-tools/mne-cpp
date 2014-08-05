@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -94,12 +94,33 @@ public:
 
     //=========================================================================================================
     /**
+    * Construts the surface set by reading it of the given files.
+    *
+    * @param[in] subject_id         Name of subject
+    * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh, 2 -> both}
+    * @param[in] surf               Name of the surface to load (eg. inflated, orig ...)
+    * @param[in] subjects_dir       Subjects directory
+    */
+    explicit SurfaceSet(const QString &subject_id, qint32 hemi, const QString &surf, const QString &subjects_dir);
+
+    //=========================================================================================================
+    /**
+    * Construts the surface set by reading it of the given files.
+    *
+    * @param[in] path               path to surface directory
+    * @param[in] hemi               Which hemisphere to load {0 -> lh, 1 -> rh, 2 -> both}
+    * @param[in] surf               Name of the surface to load (eg. inflated, orig ...)
+    */
+    explicit SurfaceSet(const QString &path, qint32 hemi, const QString &surf);
+
+    //=========================================================================================================
+    /**
     * Constructs a surface set by assembling given surfaces
     *
-    * @param[in] p_sLHSurface    Left hemisphere surface
-    * @param[in] p_sRHSurface    Right hemisphere surface
+    * @param[in] p_LHSurface    Left hemisphere surface
+    * @param[in] p_RHSurface    Right hemisphere surface
     */
-    explicit SurfaceSet(const Surface& p_sLHSurface, const Surface& p_sRHSurface);
+    explicit SurfaceSet(const Surface& p_LHSurface, const Surface& p_RHSurface);
 
     //=========================================================================================================
     /**
@@ -124,6 +145,30 @@ public:
 
     //=========================================================================================================
     /**
+    * Returns The surface set map
+    *
+    * @return the surface set map
+    */
+    inline QMap<qint32, Surface>& data();
+
+    //=========================================================================================================
+    /**
+    * True if SurfaceSet is empty.
+    *
+    * @return true if SurfaceSet is empty
+    */
+    inline bool isEmpty() const;
+
+    //=========================================================================================================
+    /**
+    * Insert a surface
+    *
+    * @param[in] p_Surface  Surface to insert
+    */
+    void insert(const Surface& p_Surface);
+
+    //=========================================================================================================
+    /**
     * Reads different surface files and assembles them to a SurfaceSet
     *
     * @param[in] p_sLHFileName      Left hemisphere surface file
@@ -133,6 +178,14 @@ public:
     * @return true if succesfull, false otherwise
     */
     static bool read(const QString& p_sLHFileName, const QString& p_sRHFileName, SurfaceSet &p_SurfaceSet);
+
+    //=========================================================================================================
+    /**
+    * The kind of Surfaces which are held by the SurfaceSet (eg. inflated, orig ...)
+    *
+    * @return the loaded surfaces (eg. inflated, orig ...)
+    */
+    inline QString surf() const;
 
     //=========================================================================================================
     /**
@@ -174,8 +227,22 @@ public:
     */
     Surface& operator[] (QString idt);
 
+    //=========================================================================================================
+    /**
+    * Returns number of loaded hemispheres
+    *
+    * @return number of loaded hemispheres
+    */
+    inline qint32 size() const;
+
 private:
-    QMap<qint32, Surface> m_qMapSurfs;   /**< Hemisphere surfaces (lh = 0; rh = 1). */
+    //=========================================================================================================
+    /**
+    * Calculates the offset between two Surfaces and sets the offset to each surface accordingly
+    */
+    void calcOffset();
+
+    QMap<qint32, Surface> m_qMapSurfs;  /**< Hemisphere surfaces (lh = 0; rh = 1). */
 };
 
 //*************************************************************************************************************
@@ -183,6 +250,37 @@ private:
 // INLINE DEFINITIONS
 //=============================================================================================================
 
+inline QMap<qint32, Surface>& SurfaceSet::data()
+{
+    return m_qMapSurfs;
+}
+
+
+//*************************************************************************************************************
+
+inline bool SurfaceSet::isEmpty() const
+{
+    return m_qMapSurfs.isEmpty();
+}
+
+
+//*************************************************************************************************************
+
+inline QString SurfaceSet::surf() const
+{
+    if(m_qMapSurfs.size() > 0)
+        return m_qMapSurfs.begin().value().surf();
+    else
+        return QString("");
+}
+
+
+//*************************************************************************************************************
+
+inline qint32 SurfaceSet::size() const
+{
+    return m_qMapSurfs.size();
+}
 
 } // NAMESPACE
 

@@ -16,12 +16,12 @@
 #       following disclaimer.
 #     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 #       the following disclaimer in the documentation and/or other materials provided with the distribution.
-#     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+#     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 #       to endorse or promote products derived from this software without specific prior written permission.
 #
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 # WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-# PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+# PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 # INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 # PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 # HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -33,7 +33,7 @@
 #
 #--------------------------------------------------------------------------------------------------------------
 
-include(../../../mne-cpp.pri)
+include(../../../../mne-cpp.pri)
 
 TEMPLATE = lib
 
@@ -41,7 +41,7 @@ CONFIG += plugin
 
 DEFINES += BABYMEG_LIBRARY
 
-QT += widgets
+QT += widgets opengl
 QT += network
 
 TARGET = babymeg
@@ -60,7 +60,6 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}RtClientd \
             -lxMeasd \
             -lxDispd \
-            -lxDtMngd \
             -lmne_xd
 }
 else {
@@ -73,39 +72,54 @@ else {
             -lMNE$${MNE_LIB_VERSION}RtClient \
             -lxMeas \
             -lxDisp \
-            -lxDtMng \
             -lmne_x
 }
 
 DESTDIR = $${MNE_BINARY_DIR}/mne_x_plugins
 
 SOURCES += \
-        babymeg.cpp \
-        FormFiles/babymegsetupwidget.cpp \
-        FormFiles/babymegrunwidget.cpp \
-        FormFiles/babymegaboutwidget.cpp \
-    directrecord.cpp \
-    babymegproducer.cpp
+    babymeg.cpp \
+    babymegclient.cpp \
+    babymeginfo.cpp \
+    FormFiles/babymegsetupwidget.cpp \
+    FormFiles/babymegaboutwidget.cpp \
+    FormFiles/babymegsquidcontroldgl.cpp \
+    FormFiles/globalobj.cpp \
+    FormFiles/babymegprojectdialog.cpp \
+    FormFiles/plotter.cpp
 
 HEADERS += \
-        babymeg.h\
-        babymeg_global.h \
-        FormFiles/babymegsetupwidget.h \
-        FormFiles/babymegrunwidget.h \
-        FormFiles/babymegaboutwidget.h \
-    directrecord.h \
-    babymegproducer.h
+    babymeg.h \
+    babymegclient.h \
+    babymeginfo.h \
+    babymeg_global.h \
+    FormFiles/babymegsetupwidget.h \
+    FormFiles/babymegaboutwidget.h \
+    FormFiles/babymegsquidcontroldgl.h \
+    FormFiles/globalobj.h \
+    FormFiles/babymegprojectdialog.h \
+    FormFiles/plotter.h \
 
 FORMS += \
-        FormFiles/babymegsetup.ui \
-        FormFiles/babymegrun.ui \
-        FormFiles/babymegabout.ui
+    FormFiles/babymegsetup.ui \
+    FormFiles/babymegabout.ui \
+    FormFiles/babymegsquidcontroldgl.ui \
+    FormFiles/babymegprojectdialog.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_X_INCLUDE_DIR}
 
+RESOURCES += \
+    babymeg.qrc
+
 OTHER_FILES += babymeg.json
 
 # Put generated form headers into the origin --> cause other src is pointing at them
 UI_DIR = $${PWD}
+
+unix: QMAKE_CXXFLAGS += -isystem $$EIGEN_INCLUDE_DIR
+
+# suppress visibility warnings
+unix: QMAKE_CXXFLAGS += -Wno-attributes
+

@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -163,6 +163,87 @@ int ColorMap::hotB(double x)
     else
         return (int)floor(linearSlope(x,4,-3)*255);
 }
+
+
+//*************************************************************************************************************
+// Hot negative skewed
+int ColorMap::hotRNeg1(double x)
+{
+    //Describe the red fuzzy set
+    if(x < 0.2188)
+        return 0;
+    else if(x < 0.5781)
+        return (int)floor(linearSlope(x, 2.7832, -0.6090)*255);
+    else
+        return (int)floor(1.0*255);
+}
+
+
+//*************************************************************************************************************
+
+int ColorMap::hotGNeg1(double x)
+{
+    //Describe the green fuzzy set
+    if(x < 0.5781)
+        return 0;
+    else if(x >= 0.5781 && x < 0.8125)
+        return (int)floor(linearSlope(x, 4.2662, -2.4663)*255);
+    else
+        return (int)floor(1.0*255);
+}
+
+
+//*************************************************************************************************************
+
+int ColorMap::hotBNeg1(double x)
+{
+    //Describe the blue fuzzy set
+    if(x < 0.8125)
+        return 0;
+    else
+        return (int)floor(linearSlope(x,5.3333,-4.3333)*255);
+}
+
+
+//*************************************************************************************************************
+
+int ColorMap::hotRNeg2(double x)
+{
+    //Describe the red fuzzy set
+    if(x < 0.5625)
+        return 0;
+    else if(x < 0.8438)
+        return (int)floor(linearSlope(x, 3.5549, -1.9996)*255);
+    else
+        return (int)floor(1.0*255);
+}
+
+
+//*************************************************************************************************************
+
+int ColorMap::hotGNeg2(double x)
+{
+    //Describe the green fuzzy set
+    if(x < 0.8438)
+        return 0;
+    else if(x >= 0.8438 && x < 0.9531)
+        return (int)floor(linearSlope(x, 9.1491, -7.72)*255);
+    else
+        return (int)floor(1.0*255);
+}
+
+
+//*************************************************************************************************************
+
+int ColorMap::hotBNeg2(double x)
+{
+    //Describe the blue fuzzy set
+    if(x < 0.9531)
+        return 0;
+    else
+        return (int)floor(linearSlope(x,21.3220,-20.3220)*255);
+}
+
 
 
 //*************************************************************************************************************

@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 * 
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -160,7 +160,7 @@ public:
     *
     * @return Info modified according to sel
     */
-    FiffInfoBase pick_info(const MatrixXi* sel = NULL) const;
+    FiffInfoBase pick_info(const RowVectorXi* sel = NULL) const;
 
     //=========================================================================================================
     /**
@@ -201,13 +201,13 @@ public:
 
 public: //Public because it's a mne struct
     QString filename;           /**< Filename when the info is read of a fiff file. */
+    QStringList bads;           /**< List of bad channels. */
     FiffId      meas_id;        /**< Measurement ID. */
     fiff_int_t  nchan;          /**< Number of channels. */
     QList<FiffChInfo> chs;      /**< List of all channel info descriptors. */
     QStringList ch_names;       /**< List of all channel names. */
     FiffCoordTrans dev_head_t;  /**< Coordinate transformation ToDo... */
     FiffCoordTrans ctf_head_t;  /**< Coordinate transformation ToDo... */
-    QStringList bads;           /**< List of bad channels. */
 };
 
 //*************************************************************************************************************
