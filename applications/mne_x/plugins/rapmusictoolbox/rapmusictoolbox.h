@@ -53,7 +53,7 @@
 #include <fiff/fiff_evoked.h>
 #include <mne/mne_forwardsolution.h>
 #include <mne/mne_sourceestimate.h>
-#include <inverse/rapMusic/rapmusic.h>
+#include <inverse/rapMusic/pwlrapmusic.h>
 
 #include <xMeas/realtimesourceestimate.h>
 #include <xMeas/realtimeevoked.h>
@@ -180,7 +180,7 @@ private:
 
     PluginOutputData<RealTimeSourceEstimate>::SPtr      m_pRTSEOutput;  /**< The RealTimeSourceEstimate output.*/
 
-    QMutex mutex;
+    QMutex m_qMutex;
 
     QVector<FiffEvoked> m_qVecFiffEvoked;
     qint32 m_iNumAverages;
@@ -207,7 +207,7 @@ private:
 
     QStringList                 m_qListPickChannels;        /**< Channels to pick */
 
-    RapMusic::SPtr              m_pRapMusic;        /**< RAP MUSIC. */
+    PwlRapMusic::SPtr           m_pPwlRapMusic;     /**< Powell RAP MUSIC. */
     qint32                      m_iDownSample;      /**< Sampling rate */
 
 //    RealTimeSourceEstimate::SPtr m_pRTSE_MNE; /**< Source Estimate output channel. */

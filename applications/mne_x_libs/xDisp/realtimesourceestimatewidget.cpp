@@ -101,7 +101,6 @@ RealTimeSourceEstimateWidget::RealTimeSourceEstimateWidget(QSharedPointer<RealTi
 : NewMeasurementWidget(parent)
 , m_pRTMSE(pRTSE)
 , m_bInitialized(false)
-, count(0)
 {
     m_pClustStcModel = new ClustStcModel(this);
 //    m_pClustStcModel->init(t_annotationSet, t_surfSet);
@@ -168,14 +167,10 @@ void RealTimeSourceEstimateWidget::getData()
 {
     if(m_bInitialized)
     {
-        if(count % 3 == 0)
-        {
-            //
-            // Add Data
-            //
-            m_pClustStcModel->addData(*m_pRTMSE->getValue());
-        }
-        ++count;
+        //
+        // Add Data
+        //
+        m_pClustStcModel->addData(*m_pRTMSE->getValue());
     }
     else
     {
