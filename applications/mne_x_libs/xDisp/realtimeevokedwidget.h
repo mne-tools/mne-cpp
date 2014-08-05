@@ -47,6 +47,7 @@
 #include "helpers/realtimeevokedmodel.h"
 #include "helpers/realtimebutterflyplot.h"
 
+#include "helpers/evokedmodalitywidget.h"
 #include "helpers/sensorwidget.h"
 
 
@@ -125,6 +126,7 @@ class XDISPSHARED_EXPORT RealTimeEvokedWidget : public NewMeasurementWidget
 {
     Q_OBJECT
 
+    friend class EvokedModalityWidget;
 public:
     //=========================================================================================================
     /**
@@ -177,6 +179,12 @@ private:
     */
     void showSensorSelectionWidget();
 
+    //=========================================================================================================
+    /**
+    * Show the modality selection widget
+    */
+    void showModalitySelectionWidget();
+
 
     QVBoxLayout *m_pRteLayout;  /**< RTE Widget layout */
     QLabel *m_pLabelInit;       /**< Initialization LAbel */
@@ -199,6 +207,12 @@ private:
 
     SensorModel* m_pSensorModel;                            /**< Sensor model for channel selection */
     QSharedPointer<SensorWidget> m_pSensorSelectionWidget;  /**< Sensor selection widget. */
+
+    QSharedPointer<EvokedModalityWidget> m_pEvokedModalityWidget;   /**< Evoked modality widget. */
+    QStringList m_qListPickTypes;           /**< Channel Types to pick */
+
+    QList< QPair<QString,bool> > m_qListModalities;
+
 
     QList<qint32> m_qListCurrentSelection;  /**< Current selection list -> hack around C++11 lambda  */
     void applySelection();                  /**< apply the in m_qListCurrentSelection stored selection -> hack around C++11 lambda */

@@ -41,6 +41,8 @@ public:
 
     void dataUpdate(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles = QVector<int>());
 
+    void setSelection(QStringList p_qList);
+
 protected:
     //=========================================================================================================
     /**
@@ -60,6 +62,12 @@ private:
     * @param[in,out] path The QPointerPath to create for the data plot.
     */
     void createPlotPath(qint32 row, QPainterPath& path) const;
+
+    bool showMAG;       /**< Show Magnetometers channels */
+    bool showGRAD;      /**< Show Gradiometers channels */
+    bool showEEG;       /**< Show EEG channels */
+    bool showEOG;       /**< Show EEG channels */
+    bool showMISC;      /**< Show Miscellaneous channels */
 
     RealTimeEvokedModel* m_pRealTimeEvokedModel;
 

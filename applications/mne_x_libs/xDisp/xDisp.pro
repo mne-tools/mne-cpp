@@ -112,7 +112,8 @@ SOURCES += \
     helpers/covmodalitywidget.cpp \
     frequencyspectrumwidget.cpp \
     helpers/frequencyspectrummodel.cpp \
-    helpers/frequencyspectrumdelegate.cpp
+    helpers/frequencyspectrumdelegate.cpp \
+    helpers/evokedmodalitywidget.cpp
 
 HEADERS += \
     xdisp_global.h \
@@ -134,7 +135,8 @@ HEADERS += \
     helpers/covmodalitywidget.h \
     frequencyspectrumwidget.h \
     helpers/frequencyspectrumdelegate.h \
-    helpers/frequencyspectrummodel.h
+    helpers/frequencyspectrummodel.h \
+    helpers/evokedmodalitywidget.h
 
 FORMS += \
     realtimesamplearraywidget.ui
