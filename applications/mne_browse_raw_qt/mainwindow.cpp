@@ -407,6 +407,9 @@ void MainWindow::loadEvents()
 
     //Show event widget
     showEventWindow();
+
+    //Set event data in the delegate
+    m_pRawDelegate->setEventData(m_pEventModel->m_data);
 }
 
 
@@ -594,10 +597,17 @@ void MainWindow::jumpToEvent(const QModelIndex & current, const QModelIndex & pr
     //Get the sample value
     int sample = m_pEventModel->data(index, Qt::DisplayRole).toInt();
 
-    qDebug()<<"Jumping to Event at sample "<<sample;
-
     //Jump to sample - put sample in the middle of the view (-m_pRawModel->m_iWindowSize/2)
-    m_pRawTableView->horizontalScrollBar()->setValue(sample-m_pRawModel->m_iWindowSize/2);
+    int rawTableViewColumnWidth = m_pRawTableView->viewport()->width();
+
+    qDebug()<<"Jumping to Event at sample "<<sample<<"rawTableViewColumnWidth"<<rawTableViewColumnWidth;
+
+    if(sample-rawTableViewColumnWidth/2 < rawTableViewColumnWidth/2)
+        m_pRawTableView->horizontalScrollBar()->setValue(0);
+    else if(sample+rawTableViewColumnWidth/2 > m_pRawModel->lastSample()-rawTableViewColumnWidth/2)
+        m_pRawTableView->horizontalScrollBar()->setValue(m_pRawTableView->maximumWidth());
+    else
+        m_pRawTableView->horizontalScrollBar()->setValue(sample-rawTableViewColumnWidth/2);
 }
 
 
