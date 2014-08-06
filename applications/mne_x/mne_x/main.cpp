@@ -161,6 +161,11 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
 
+    //Store application info to use QSettings
+    QCoreApplication::setOrganizationName("MNE-CPP");
+    QCoreApplication::setOrganizationDomain("www.tu-ilmenau.de/mne-cpp");
+    QCoreApplication::setApplicationName("MNE-X");
+
     XMEASLIB::MeasurementTypes::registerTypes();
 
     QPixmap pixmap(":/images/splashscreen.png");
