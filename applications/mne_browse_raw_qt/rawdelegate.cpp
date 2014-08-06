@@ -277,8 +277,8 @@ void RawDelegate::plotEvents(const QModelIndex &index, const QStyleOptionViewIte
 
     for(int i = 0; i<m_eventData.rows(); i++)
     {
-//        if(m_eventData(i,0)-rawModel->firstSample()>=sampleRangeLow && m_eventData(i,0)-rawModel->firstSample()<=sampleRangeHigh)
-//        {
+        if(m_eventData(i,0)-rawModel->firstSample()>=sampleRangeLow && m_eventData(i,0)-rawModel->firstSample()<=sampleRangeHigh)
+        {
             //Set color for pen depending on current event type
             QPen pen;
             pen.setWidthF(1);
@@ -312,11 +312,7 @@ void RawDelegate::plotEvents(const QModelIndex &index, const QStyleOptionViewIte
 
             painter->setPen(pen);
             painter->drawLine(option.rect.x() + m_eventData(i,0)-rawModel->firstSample(), option.rect.y(), option.rect.x() + m_eventData(i,0)-rawModel->firstSample(), option.rect.y()-option.rect.height());
-
-
-            //std::cout<<"m_eventData(i,0)"<<m_eventData(i,0)<<endl;
-            //qDebug()<<"option.rect.x() + sampleRangeLow + m_eventData(i,0):"<<option.rect.x() + sampleRangeLow + m_eventData(i,0)<<" m_eventData(i,0):"<<m_eventData(i,0);
-        //}
+        }
     }
     //If there are events in the m_eventData matrix between sampleRangeLow and sampleRangeHigh plot these events
 
