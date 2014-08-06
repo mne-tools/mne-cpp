@@ -105,29 +105,21 @@ enum Tool
 
 RealTimeEvokedWidget::RealTimeEvokedWidget(QSharedPointer<RealTimeEvoked> pRTE, QSharedPointer<QTime> &pTime, QWidget* parent)
 : NewMeasurementWidget(parent)
-, m_pRTEModel(NULL)
-, m_pButterflyPlot(NULL)
-, m_fZoomFactor(1.0f)
+, m_pRTEModel(Q_NULLPTR)
+, m_pButterflyPlot(Q_NULLPTR)
 , m_pRTE(pRTE)
 , m_bInitialized(false)
-, m_pSensorModel(NULL)
+, m_pSensorModel(Q_NULLPTR)
 {
     Q_UNUSED(pTime)
 
     m_pActionSelectModality = new QAction(QIcon(":/images/evokedSettings.png"), tr("Shows the covariance modality selection widget (F12)"),this);
     m_pActionSelectModality->setShortcut(tr("F12"));
     m_pActionSelectModality->setStatusTip(tr("Shows the covariance modality selection widget (F12)"));
-//    connect(m_pActionSelectModality, &QAction::triggered, this, &RealTimeCovWidget::showModalitySelectionWidget);
+    connect(m_pActionSelectModality, &QAction::triggered, this, &RealTimeEvokedWidget::showModalitySelectionWidget);
     addDisplayAction(m_pActionSelectModality);
 
-    m_pDoubleSpinBoxZoom = new QDoubleSpinBox(this);
-    m_pDoubleSpinBoxZoom->setMinimum(0.3);
-    m_pDoubleSpinBoxZoom->setMaximum(4.0);
-    m_pDoubleSpinBoxZoom->setSingleStep(0.1);
-    m_pDoubleSpinBoxZoom->setValue(1.0);
-    m_pDoubleSpinBoxZoom->setSuffix(" x");
-    connect(m_pDoubleSpinBoxZoom, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &RealTimeEvokedWidget::zoomChanged);
-    addDisplayWidget(m_pDoubleSpinBoxZoom);
+    m_pActionSelectModality->setVisible(false);
 
 //    m_pActionSelectSensors = new QAction(QIcon(":/images/selectSensors.png"), tr("Shows the region selection widget (F12)"),this);
 //    m_pActionSelectSensors->setShortcut(tr("F12"));
@@ -173,6 +165,15 @@ RealTimeEvokedWidget::~RealTimeEvokedWidget()
 
 //*************************************************************************************************************
 
+void RealTimeEvokedWidget::broadcastSettings()
+{
+    m_pButterflyPlot->setSettings(m_qListModalities);
+
+}
+
+
+//*************************************************************************************************************
+
 void RealTimeEvokedWidget::update(XMEASLIB::NewMeasurement::SPtr)
 {
     getData();
@@ -187,8 +188,6 @@ void RealTimeEvokedWidget::getData()
     {
         if(m_pRTE->isInitialized())
         {
-            m_qListChInfo = m_pRTE->chInfo();
-
 //            QFile file(m_pRTE->getXMLLayoutFile());
 //            if (!file.open(QFile::ReadOnly | QFile::Text))
 //            {
@@ -202,6 +201,8 @@ void RealTimeEvokedWidget::getData()
 //                m_pSensorModel->mapChannelInfo(m_qListChInfo);
 //                m_pActionSelectSensors->setVisible(true);
 //            }
+
+            m_qListChInfo = m_pRTE->chInfo();
 
             init();
 
@@ -217,7 +218,7 @@ void RealTimeEvokedWidget::getData()
 
 void RealTimeEvokedWidget::init()
 {
-    if(m_qListChInfo.size() > 0)
+    if(m_pRTE->isInitialized())
     {
         m_pRteLayout->removeWidget(m_pLabelInit);
         m_pLabelInit->hide();
@@ -232,6 +233,58 @@ void RealTimeEvokedWidget::init()
 
         m_pButterflyPlot->setModel(m_pRTEModel);
 
+        m_qListModalities.clear();
+        bool hasMag = false;
+        bool hasGrad = false;
+        bool hasEEG = false;
+        bool hasEOG = false;
+        bool hasMISC = false;
+        for(qint32 i = 0; i < m_pRTE->info().nchan; ++i)
+        {
+            if(m_pRTE->info().chs[i].kind == FIFFV_MEG_CH)
+            {
+                if(!hasMag && m_pRTE->info().chs[i].unit == FIFF_UNIT_T)
+                    hasMag = true;
+                else if(!hasGrad &&  m_pRTE->info().chs[i].unit == FIFF_UNIT_T_M)
+                    hasGrad = true;
+            }
+            else if(!hasEEG && m_pRTE->info().chs[i].kind == FIFFV_EEG_CH)
+                hasEEG = true;
+            else if(!hasEOG && m_pRTE->info().chs[i].kind == FIFFV_EOG_CH)
+                hasEOG = true;
+            else if(!hasMISC && m_pRTE->info().chs[i].kind == FIFFV_MISC_CH)
+                hasMISC = true;
+        }
+        if(hasMag)
+        {
+            bool sel = true;
+            m_qListModalities.append(Modality("MAG",sel,1e-11));
+        }
+        if(hasGrad)
+        {
+            bool sel = true;
+            m_qListModalities.append(Modality("GRAD",true,1e-10));
+        }
+        if(hasEEG)
+        {
+            bool sel = true;
+            m_qListModalities.append(Modality("EEG",true,1e-4));
+        }
+        if(hasEOG)
+        {
+            bool sel = true;
+            m_qListModalities.append(Modality("EOG",true,1e-3));
+        }
+        if(hasMISC)
+        {
+            bool sel = true;
+            m_qListModalities.append(Modality("MISC",true,1e-3));
+        }
+
+        m_pButterflyPlot->setSettings(m_qListModalities);
+
+        m_pActionSelectModality->setVisible(true);
+        // Initialized
         m_bInitialized = true;
     }
 }
@@ -239,9 +292,17 @@ void RealTimeEvokedWidget::init()
 
 //*************************************************************************************************************
 
-void RealTimeEvokedWidget::zoomChanged(double zoomFac)
+void RealTimeEvokedWidget::showModalitySelectionWidget()
 {
-    m_fZoomFactor = zoomFac;
+    if(!m_pEvokedModalityWidget)
+    {
+        m_pEvokedModalityWidget = QSharedPointer<EvokedModalityWidget>(new EvokedModalityWidget(this));
+
+        m_pEvokedModalityWidget->setWindowTitle("Modality Selection");
+
+        connect(m_pEvokedModalityWidget.data(), &EvokedModalityWidget::settingsChanged, this, &RealTimeEvokedWidget::broadcastSettings);
+    }
+    m_pEvokedModalityWidget->show();
 }
 
 
@@ -281,11 +342,11 @@ void RealTimeEvokedWidget::applySelection()
 
 void RealTimeEvokedWidget::resetSelection()
 {
-    // non C++11 alternative
-    m_qListCurrentSelection.clear();
-    for(qint32 i = 0; i < m_qListChInfo.size(); ++i)
-        m_qListCurrentSelection.append(i);
+//    // non C++11 alternative
+//    m_qListCurrentSelection.clear();
+//    for(qint32 i = 0; i < m_qListChInfo.size(); ++i)
+//        m_qListCurrentSelection.append(i);
 
-    applySelection();
+//    applySelection();
 }
 

@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     realtimeevoked.cpp
+* @file     evokedmodalitywidget.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2014
+* @date     May, 2014
 *
 * @section  LICENSE
 *
@@ -29,18 +29,18 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the RealTimeEvoked class.
+* @brief    Declaration of the EvokedModalityWidget Class.
 *
 */
+
+#ifndef EVOKEDMODALITYWIDGET_H
+#define EVOKEDMODALITYWIDGET_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "realtimeevoked.h"
-
-#include <time.h>
 
 
 //*************************************************************************************************************
@@ -48,116 +48,64 @@
 // QT INCLUDES
 //=============================================================================================================
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace XMEASLIB;
+#include <QWidget>
+#include <QCheckBox>
+#include <QStringList>
+#include <QLineEdit>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// DEFINE NAMESPACE XDISPLIB
 //=============================================================================================================
 
-RealTimeEvoked::RealTimeEvoked(QObject *parent)
-: NewMeasurement(QMetaType::type("RealTimeEvoked::SPtr"), parent)
-, m_pFiffEvoked(new FiffEvoked)
-, m_bInitialized(false)
+namespace XDISPLIB
 {
-
-}
 
 
 //*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
 
-RealTimeEvoked::~RealTimeEvoked()
+class RealTimeEvokedWidget;
+struct Modality;
+
+
+//=============================================================================================================
+/**
+* DECLARE CLASS EvokedModalityWidget
+*
+* @brief The EvokedModalityWidget class provides the sensor selection widget
+*/
+class EvokedModalityWidget : public QWidget
 {
+    Q_OBJECT
+public:
 
-}
+    //=========================================================================================================
+    /**
+    * Constructs a EvokedModalityWidget which is a child of parent.
+    *
+    * @param [in] parent    parent of widget
+    * @param [in] f         widget flags
+    */
+    EvokedModalityWidget(RealTimeEvokedWidget *toolbox);
 
+    void updateCheckbox(qint32 state);
 
-//*************************************************************************************************************
+    void updateLineEdit(const QString & text);
 
-void RealTimeEvoked::init(FiffInfo &p_fiffInfo)
-{
-    QMutexLocker locker(&m_qMutex);
-    m_qListChInfo.clear();
-    m_qListChColors.clear();
+signals:
+    void settingsChanged();
 
-    m_fiffInfo = p_fiffInfo;
+private:
+    RealTimeEvokedWidget * m_pRealTimeEvokedWidget; /**< Connected real-time evoked widget */
 
-    qsrand(time(NULL));
-    for(qint32 i = 0; i < p_fiffInfo.nchan; ++i)
-    {
-         m_qListChColors.append(QColor(qrand() % 256, qrand() % 256, qrand() % 256));
+    QList<QCheckBox*>   m_qListModalityCheckBox;    /**< List of modality checkboxes */
+    QList<QLineEdit*>   m_qListModalityLineEdit;    /**< List of modality scalings */
+};
 
-        RealTimeSampleArrayChInfo initChInfo;
-        initChInfo.setChannelName(p_fiffInfo.chs[i].ch_name);
+} // NAMESPACE
 
-        // set channel Unit
-        initChInfo.setUnit(p_fiffInfo.chs[i].unit);
-
-        //Treat stimulus channels different
-        if(p_fiffInfo.chs[i].kind == FIFFV_STIM_CH)
-        {
-//            initChInfo.setUnit("");
-            initChInfo.setMinValue(0);
-            initChInfo.setMaxValue(1.0e6);
-        }
-
-        // set channel Kind
-        initChInfo.setKind(p_fiffInfo.chs[i].kind);
-
-        // set channel coil
-        initChInfo.setCoil(p_fiffInfo.chs[i].coil_type);
-
-        m_qListChInfo.append(initChInfo);
-    }
-}
-
-
-//*************************************************************************************************************
-
-FiffEvoked::SPtr& RealTimeEvoked::getValue()
-{
-    QMutexLocker locker(&m_qMutex);
-    return m_pFiffEvoked;
-}
-
-
-//*************************************************************************************************************
-
-void RealTimeEvoked::setValue(FiffEvoked& v)
-{
-    if(m_pFiffEvoked->data.cols() != v.data.cols())
-        m_bInitialized = false;
-
-    //Store
-    m_qMutex.lock();
-    *m_pFiffEvoked = v;
-    m_qMutex.unlock();
-
-    if(!m_bInitialized)
-    {
-        init(m_pFiffEvoked->info);
-
-        m_qMutex.lock();
-        m_iPreStimSamples = 0;
-        for(qint32 i = 0; i < m_pFiffEvoked->times.size(); ++i)
-        {
-            if(m_pFiffEvoked->times[i] >= 0)
-                break;
-            else
-                ++m_iPreStimSamples;
-        }
-
-        m_bInitialized = true;
-        m_qMutex.unlock();
-    }
-
-    emit notify();
-}
-
+#endif // EVOKEDMODALITYWIDGET_H

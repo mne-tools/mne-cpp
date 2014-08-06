@@ -113,8 +113,9 @@ int main(int argc, char *argv[])
     QFile t_fileCov("D:/Data/MEG/mind006/mind006_051209_auditory01_raw-cov.fif");
     QFile t_fileRaw("D:/Data/MEG/mind006/mind006_051209_auditory01_raw.fif");
     QString t_sEventName = "D:/Data/MEG/mind006/mind006_051209_auditory01_raw-eve.fif";
-    AnnotationSet t_annotationSet("D:/Data/subjects/mind006/label/lh.aparc.a2009s.annot", "D:/Data/subjects/mind006/label/rh.aparc.a2009s.annot");
-    SurfaceSet t_surfSet("D:/Data/subjects/mind006/surf/lh.white", "D:/Data/subjects/mind006/surf/rh.white");
+    AnnotationSet t_annotationSet("mind006", 2, "aparc.a2009s", "D:/Data/subjects");
+    SurfaceSet t_surfSet("mind006", 2, "white", "D:/Data/subjects");
+
 
     qint32 event = 1;
 
