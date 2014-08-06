@@ -317,6 +317,7 @@ private:
 
     //==========================================================================================================
 
+    void read_fiff_ave(QString file_name);
     QList<qreal> norm_signal(QList<qreal> signalSamples);
     QStringList correlation(VectorXd signalSamples, QList<qreal> atomSamples, QString atomName);
     VectorXd mpCalc(QFile& dictionary, VectorXd signalSamples, qint32 iterationsCount);
