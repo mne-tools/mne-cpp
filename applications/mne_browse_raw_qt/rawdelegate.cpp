@@ -135,11 +135,16 @@ void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, c
         createPlotPath(index, option, path, listPairs);
 
         painter->translate(0,t_fPlotHeight/2);
-
         painter->setRenderHint(QPainter::Antialiasing, true);
         painter->drawPath(path);
-
         painter->restore();
+
+        //Plot events
+        painter->save();
+        if(m_eventData.rows()!=0)
+            plotEvents(index, option, painter);
+        painter->restore();
+
         break;
     }
     }
@@ -168,6 +173,14 @@ QSize RawDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelInde
     Q_UNUSED(option);
 
     return size;
+}
+
+
+//*************************************************************************************************************
+
+void RawDelegate::setEventData(MatrixXi &eventData)
+{
+    m_eventData = eventData;
 }
 
 
@@ -248,3 +261,60 @@ void RawDelegate::createGridPath(QPainterPath& path, const QStyleOptionViewItem 
 
 //    qDebug("Grid-PainterPath created!");
 }
+
+
+//*************************************************************************************************************
+
+void RawDelegate::plotEvents(const QModelIndex &index, const QStyleOptionViewItem &option, QPainter* painter) const
+{
+    const RawModel* rawModel = static_cast<const RawModel*>(index.model());
+
+    qint32 sampleRangeLow = rawModel->relFiffCursor();
+    qint32 sampleRangeHigh = sampleRangeLow + rawModel->sizeOfPreloadedData();
+
+    //qDebug()<<"option.rect.x()"<<option.rect.x();
+    //qDebug()<<"sampleRangeLow"<<sampleRangeLow<<"sampleRangeHigh"<<sampleRangeHigh;
+
+    for(int i = 0; i<m_eventData.rows(); i++)
+    {
+        if(m_eventData(i,0)-rawModel->firstSample()>=sampleRangeLow && m_eventData(i,0)-rawModel->firstSample()<=sampleRangeHigh)
+        {
+            //Set color for pen depending on current event type
+            QPen pen;
+            pen.setWidthF(1);
+
+            switch(m_eventData(i,2))
+            {
+                case 1:
+                pen.setColor(Qt::black);
+                break;
+
+                case 2:
+                pen.setColor(Qt::blue);
+                break;
+
+                case 3:
+                pen.setColor(Qt::green);
+                break;
+
+                case 4:
+                pen.setColor(Qt::red);
+                break;
+
+                case 5:
+                pen.setColor(Qt::cyan);
+                break;
+
+                case 32:
+                pen.setColor(Qt::yellow);
+                break;
+            }
+
+            painter->setPen(pen);
+            painter->drawLine(option.rect.x() + m_eventData(i,0)-rawModel->firstSample(), option.rect.y(), option.rect.x() + m_eventData(i,0)-rawModel->firstSample(), option.rect.y()-option.rect.height());
+        }
+    }
+    //If there are events in the m_eventData matrix between sampleRangeLow and sampleRangeHigh plot these events
+
+}
+
