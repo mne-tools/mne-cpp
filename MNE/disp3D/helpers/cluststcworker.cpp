@@ -87,14 +87,11 @@ ClustStcWorker::~ClustStcWorker()
 
 void ClustStcWorker::addData(QList<VectorXd> &data)
 {
+    QMutexLocker locker(&m_qMutex);
     if(data.size() == 0)
         return;
 
-    m_qMutex.lock();
     m_data.append(data);
-    m_qMutex.unlock();
-
-    qDebug() << "##### ClustStcWorker addData #####" << m_data.size();
 }
 
 
@@ -102,9 +99,8 @@ void ClustStcWorker::addData(QList<VectorXd> &data)
 
 void ClustStcWorker::clear()
 {
-    m_qMutex.lock();
+    QMutexLocker locker(&m_qMutex);
     m_data.clear();
-    m_qMutex.unlock();
 }
 
 
@@ -155,6 +151,8 @@ void ClustStcWorker::run()
                 m_data.pop_front();
                 m_qMutex.unlock();
             }
+
+            m_qMutex.lock();
             ++m_iCurrentSample;
 
             if(m_iCurrentSample%m_iAverageSamples == 0)
@@ -164,6 +162,7 @@ void ClustStcWorker::run()
                 emit stcSample(m_vecAverage);
                 m_vecAverage = VectorXd::Zero(m_vecAverage.rows());
             }
+            m_qMutex.unlock();
         }
 
         QThread::usleep(m_iUSecIntervall);
@@ -175,6 +174,7 @@ void ClustStcWorker::run()
 
 void ClustStcWorker::setAverage(qint32 samples)
 {
+    QMutexLocker locker(&m_qMutex);
     m_iAverageSamples = samples;
 }
 
@@ -183,6 +183,7 @@ void ClustStcWorker::setAverage(qint32 samples)
 
 void ClustStcWorker::setInterval(int usec)
 {
+    QMutexLocker locker(&m_qMutex);
     m_iUSecIntervall = usec;
 }
 
@@ -191,6 +192,7 @@ void ClustStcWorker::setInterval(int usec)
 
 void ClustStcWorker::setLoop(bool looping)
 {
+    QMutexLocker locker(&m_qMutex);
     m_bIsLooping = looping;
 }
 

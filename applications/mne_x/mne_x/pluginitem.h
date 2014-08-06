@@ -71,8 +71,9 @@ class PluginItem : public QGraphicsPolygonItem
 {
 public:
     enum { Type = UserType + 15 };
-
     PluginItem(IPlugin::SPtr pPlugin, QMenu *contextMenu, QGraphicsItem *parent = 0);
+
+    ~PluginItem();
 
     void removeArrow(Arrow *arrow);
     void removeArrows();
