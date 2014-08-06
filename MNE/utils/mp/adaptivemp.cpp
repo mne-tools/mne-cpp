@@ -157,7 +157,7 @@ QList<GaborAtom> AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterat
                     if(max_index >= p) p = max_index - p + 1;
                     else p = max_index + p;
 
-                    VectorXd atom_parameters = calculate_atom(sample_count, s, p, k, chn, residuum, RETURNPARAMETERS);
+                    VectorXd atom_parameters = calculate_atom(sample_count, s, p, k, chn, residuum, RETURNPARAMETERS, fix_phase);
 
                     if(abs(atom_parameters[4]) > abs(max_scalar_product)&& p < sample_count && p > 0)
                     {
@@ -192,7 +192,7 @@ QList<GaborAtom> AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterat
         {
             while(k < sample_count / 2)
             {
-                VectorXd parameters_no_envelope = calculate_atom(sample_count, s, p, k, chn, residuum, RETURNPARAMETERS);
+                VectorXd parameters_no_envelope = calculate_atom(sample_count, s, p, k, chn, residuum, RETURNPARAMETERS, fix_phase);
 
                 if(abs(parameters_no_envelope[4]) > abs(max_scalar_product) && p < sample_count && p > 0)// && gaborAtom->scale == s && gaborAtom->translation == p)
                 {
@@ -274,10 +274,10 @@ QList<GaborAtom> AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterat
                     VectorXd atom_fx = VectorXd::Zero(sample_count);
 
                     if(gabor_Atom->scale == sample_count && gabor_Atom->translation == floor(sample_count / 2))
-                        atom_fx = calculate_atom(sample_count, sample_count, floor(sample_count / 2), x[i][2], chn, residuum, RETURNATOM);
+                        atom_fx = calculate_atom(sample_count, sample_count, floor(sample_count / 2), x[i][2], chn, residuum, RETURNATOM, fix_phase);
 
                     else
-                        atom_fx = calculate_atom(sample_count, x[i][0], x[i][1], x[i][2], chn, residuum, RETURNATOM);
+                        atom_fx = calculate_atom(sample_count, x[i][0], x[i][1], x[i][2], chn, residuum, RETURNATOM, fix_phase);
 
                     //create targetfunction of realGaborAtom and Residuum
                     double target = 0;
@@ -329,10 +329,10 @@ QList<GaborAtom> AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterat
                 VectorXd atom_fxr = VectorXd::Zero(sample_count);
 
                 if(gabor_Atom->scale == sample_count && gabor_Atom->translation == floor(sample_count / 2))
-                    atom_fxr = calculate_atom(sample_count, sample_count, floor(sample_count / 2), xr[2], chn, residuum, RETURNATOM);
+                    atom_fxr = calculate_atom(sample_count, sample_count, floor(sample_count / 2), xr[2], chn, residuum, RETURNATOM, fix_phase);
 
                 else
-                    atom_fxr = calculate_atom(sample_count, xr[0], xr[1], xr[2], chn, residuum, RETURNATOM);
+                    atom_fxr = calculate_atom(sample_count, xr[0], xr[1], xr[2], chn, residuum, RETURNATOM, fix_phase);
 
                 //create targetfunction of realGaborAtom and Residuum
                 double fxr = 0;
@@ -352,10 +352,10 @@ QList<GaborAtom> AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterat
                     VectorXd atom_fxe = VectorXd::Zero(sample_count);
 
                     if(gabor_Atom->scale == sample_count && gabor_Atom->translation == floor(sample_count / 2))
-                        atom_fxe = calculate_atom(sample_count, sample_count, floor(sample_count / 2), xe[2], chn, residuum, RETURNATOM);
+                        atom_fxe = calculate_atom(sample_count, sample_count, floor(sample_count / 2), xe[2], chn, residuum, RETURNATOM, fix_phase);
 
                     else
-                        atom_fxe = calculate_atom(sample_count, xe[0], xe[1], xe[2], chn, residuum, RETURNATOM);
+                        atom_fxe = calculate_atom(sample_count, xe[0], xe[1], xe[2], chn, residuum, RETURNATOM, fix_phase);
 
                     //create targetfunction of realGaborAtom and Residuum
                     double fxe = 0;
@@ -374,10 +374,10 @@ QList<GaborAtom> AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterat
                         xc[i]=xg[i]+g*(x[xnp1][i]-xg[i]);
 
                     if(gabor_Atom->scale == sample_count && gabor_Atom->translation == floor(sample_count / 2))
-                        atom_fxc_params = AdaptiveMp::calculate_atom(sample_count, sample_count, floor(sample_count / 2), xc[2], chn, residuum, RETURNPARAMETERS);
+                        atom_fxc_params = AdaptiveMp::calculate_atom(sample_count, sample_count, floor(sample_count / 2), xc[2], chn, residuum, RETURNPARAMETERS, fix_phase);
 
                     else
-                        atom_fxc_params = AdaptiveMp::calculate_atom(sample_count, xc[0], xc[1], xc[2], chn, residuum, RETURNPARAMETERS);
+                        atom_fxc_params = AdaptiveMp::calculate_atom(sample_count, xc[0], xc[1], xc[2], chn, residuum, RETURNPARAMETERS, fix_phase);
 
                     VectorXd atom_fxc = gabor_Atom->create_real(gabor_Atom->sample_count, atom_fxc_params[0], atom_fxc_params[1], atom_fxc_params[2], atom_fxc_params[3]);
 
@@ -404,10 +404,10 @@ QList<GaborAtom> AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterat
             }//optimization is finished
 
             if(gabor_Atom->scale == sample_count && gabor_Atom->translation == floor(sample_count / 2))
-                atom_fxc_params = AdaptiveMp::calculate_atom(sample_count, sample_count, floor(sample_count / 2), x[x1][2], chn, residuum, RETURNPARAMETERS);
+                atom_fxc_params = AdaptiveMp::calculate_atom(sample_count, sample_count, floor(sample_count / 2), x[x1][2], chn, residuum, RETURNPARAMETERS, fix_phase);
 
             else
-                atom_fxc_params = AdaptiveMp::calculate_atom(sample_count, x[x1][0], x[x1][1], x[x1][2], chn, residuum, RETURNPARAMETERS);
+                atom_fxc_params = AdaptiveMp::calculate_atom(sample_count, x[x1][0], x[x1][1], x[x1][2], chn, residuum, RETURNPARAMETERS, fix_phase);
 
             if(abs(atom_fxc_params[4]) > abs(max_scalar_product) /*&& atom_fxc_params[0] < sample_count && atom_fxc_params[0] > 0*/ && atom_fxc_params[1] < sample_count && atom_fxc_params[1] > 0)//ToDo: find a way to make the simplex not running out of bounds
             {
@@ -431,11 +431,11 @@ QList<GaborAtom> AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterat
         for(qint32 chn = 0; chn < channel_count; chn++)
         {
 
-            VectorXd channel_params = calculate_atom(sample_count, gabor_Atom->scale, gabor_Atom->translation, gabor_Atom->modulation, chn, residuum, RETURNPARAMETERS);
+            VectorXd channel_params = calculate_atom(sample_count, gabor_Atom->scale, gabor_Atom->translation, gabor_Atom->modulation, chn, residuum, RETURNPARAMETERS, fix_phase);
             gabor_Atom->phase_list.append(channel_params[3]);
 
             //substract best matching Atom from Residuum in each channel
-            if(fix_phase == false)
+            //if(fix_phase == false)
             {
                 gabor_Atom->max_scalar_list.append(channel_params[4]);
                 VectorXd bestMatch = gabor_Atom->create_real(gabor_Atom->sample_count, gabor_Atom->scale, gabor_Atom->translation, gabor_Atom->modulation, gabor_Atom->phase_list.at(chn));
@@ -447,7 +447,7 @@ QList<GaborAtom> AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterat
                 }
             }
         }
-
+    /*
         //option fix_phase, chg: phase and max_scalar_product in resulting atoms
         if(fix_phase == true)
         {
@@ -484,7 +484,7 @@ QList<GaborAtom> AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterat
                 }
             }
         }
-
+*/
         residuum_energy -= gabor_Atom->energy;
         current_energy += gabor_Atom->energy;
 
@@ -516,7 +516,7 @@ VectorXcd AdaptiveMp::modulation_function(qint32 N, qreal k)
 
 //*************************************************************************************************************
 
-VectorXd AdaptiveMp::calculate_atom(qint32 sample_count, qreal scale, qint32 translation, qreal modulation, qint32 channel, MatrixXd residuum, ReturnValue return_value = RETURNATOM)
+VectorXd AdaptiveMp::calculate_atom(qint32 sample_count, qreal scale, qint32 translation, qreal modulation, qint32 channel, MatrixXd residuum, ReturnValue return_value = RETURNATOM, bool fix_phase = false)
 {
     GaborAtom *gabor_Atom = new GaborAtom();
     qreal phase = 0;
@@ -526,8 +526,21 @@ VectorXd AdaptiveMp::calculate_atom(qint32 sample_count, qreal scale, qint32 tra
     //calculate Inner Product: preparation to find the parameter phase
     std::complex<double> inner_product(0, 0);
 
-    for(qint32 i = 0; i < sample_count; i++)
-        inner_product += residuum(i, channel) * conj(complex_gabor_atom[i]);
+    if(fix_phase == false)
+    {
+        for(qint32 i = 0; i < sample_count; i++)
+            inner_product += residuum(i, channel) * conj(complex_gabor_atom[i]);
+    }
+    else
+    {
+        for(qint32 chn = 0; chn < residuum.cols(); chn++)
+        {
+            for(qint32 i = 0; i < sample_count; i++)
+                inner_product += residuum(i, chn) * conj(complex_gabor_atom[i]);
+        }
+        if(residuum.cols() != 0)
+            inner_product /= residuum.cols();
+    }
 
     //calculate phase to create realGaborAtoms
     phase = std::arg(inner_product);

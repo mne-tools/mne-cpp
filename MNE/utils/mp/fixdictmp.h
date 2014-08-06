@@ -131,7 +131,6 @@ public:
     //=========================================================================================================
 
     static void build_molecule_xml_file(qint32 level_counter);
-    static void FixDictMp::recursive_node_built(QDomElement current_element, QFile &temp_file);
 
 public slots:
     //void send_result();

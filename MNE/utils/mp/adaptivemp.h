@@ -194,7 +194,8 @@ public:
     *
     * @return depending on returnValue returning the real atom calculated or the manipulated parameters: scale, translation, modulation, phase, scalarproduct
     */
-    VectorXd calculate_atom(qint32 sampleCount, qreal scale, qint32 translation, qreal modulation, qint32 channel, MatrixXd residuum, ReturnValue return_value);
+    VectorXd calculate_atom(qint32 sample_count, qreal scale, qint32 translation, qreal modulation, qint32 channel, MatrixXd residuum, ReturnValue return_value, bool fix_phase);
+
 
     //=========================================================================================================
 
