@@ -120,6 +120,9 @@ namespace MNEBrowseRawQt
 class EventModel : public QAbstractTableModel
 {
     Q_OBJECT
+
+    friend class MainWindow;
+
 public:
     EventModel(QObject *parent);
     EventModel(QFile& qFile, QObject *parent);
