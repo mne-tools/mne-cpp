@@ -220,7 +220,7 @@ private:
     void initConnector();
 
 
-    QMutex rtServerMutex;
+    QMutex m_qMutex;
 
 
     QString m_sFiffSimulatorClientAlias;     /**< The rt server client alias.*/

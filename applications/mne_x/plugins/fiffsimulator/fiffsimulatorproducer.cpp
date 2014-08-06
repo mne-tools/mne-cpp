@@ -44,6 +44,13 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QMutexLocker>
+
+//*************************************************************************************************************
+//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
@@ -52,7 +59,7 @@ using namespace FiffSimulatorPlugin;
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
 FiffSimulatorProducer::FiffSimulatorProducer(FiffSimulator* p_pFiffSimulator)
@@ -192,19 +199,25 @@ void FiffSimulatorProducer::run()
     qint32 from = 0;
     qint32 to = -1;
 
-    while(m_bIsRunning)
+    while(true)
     {
+        {
+            QMutexLocker locker(&producerMutex);
+            if(!m_bIsRunning)
+                break;
+        }
+
+        producerMutex.lock();
         if(m_bFlagInfoRequest)
         {
-            m_pFiffSimulator->rtServerMutex.lock();
+            m_pFiffSimulator->m_qMutex.lock();
             m_pFiffSimulator->m_pFiffInfo = m_pRtDataClient->readInfo();
             emit m_pFiffSimulator->fiffInfoAvailable();
-            m_pFiffSimulator->rtServerMutex.unlock();
+            m_pFiffSimulator->m_qMutex.unlock();
 
-            producerMutex.lock();
             m_bFlagInfoRequest = false;
-            producerMutex.unlock();
         }
+        producerMutex.unlock();
 
         if(m_bFlagMeasuring)
         {
