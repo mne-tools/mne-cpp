@@ -89,25 +89,5 @@ AveragingSettingsWidget::AveragingSettingsWidget(Averaging *toolbox, QWidget *pa
     connect(m_pSpinBoxPostStimSamples, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), m_pAveragingToolbox, &Averaging::changePostStim);
     t_pGridLayout->addWidget(m_pSpinBoxPostStimSamples,3,2,1,1);
 
-    if(toolbox->m_qListModalities.size() > 0)
-    {
-        QLabel* t_pLabelModalities = new QLabel;
-        t_pLabelModalities->setText("Modalities");
-        QFont font;font.setBold(true);
-        t_pLabelModalities->setFont(font);
-        t_pGridLayout->addWidget(t_pLabelModalities,4,0,1,3);
-
-        for(qint32 i = 0; i < toolbox->m_qListModalities.size(); ++i)
-        {
-            QLabel* t_pLabelModality = new QLabel;
-            t_pLabelModality->setText(toolbox->m_qListModalities[i].first);
-            t_pGridLayout->addWidget(t_pLabelModality,5+i,0,1,1);
-
-            QCheckBox* t_pCheckBoxModality = new QCheckBox;
-            t_pCheckBoxModality->setChecked(toolbox->m_qListModalities[i].second);
-            t_pGridLayout->addWidget(t_pCheckBoxModality,5+i,1,1,1);
-        }
-    }
-
     this->setLayout(t_pGridLayout);
 }

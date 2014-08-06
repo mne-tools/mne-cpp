@@ -17,12 +17,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -82,11 +82,13 @@ RtInvOp::~RtInvOp()
 
 //*************************************************************************************************************
 
-void RtInvOp::appendNoiseCov(FiffCov::SPtr p_pNoiseCov)
+void RtInvOp::appendNoiseCov(FiffCov &p_noiseCov)
 {
     mutex.lock();
     //Use here a circular buffer
-    m_vecNoiseCov.push_back(p_pNoiseCov);
+    m_vecNoiseCov.push_back(p_noiseCov);
+
+    qDebug() << "RtInvOp m_vecNoiseCov" << m_vecNoiseCov.size();
 
     mutex.unlock();
 }
@@ -116,9 +118,8 @@ void RtInvOp::run()
             // Restrict forward solution as necessary for MEG
             MNEForwardSolution t_forwardMeg = m_pFwd->pick_types(true, false);
 
-            MNEInverseOperator::SPtr t_invOpMeg(new MNEInverseOperator(*m_pFiffInfo.data(), t_forwardMeg, *m_vecNoiseCov[0].data(), 0.2f, 0.8f));
-
             mutex.lock();
+            MNEInverseOperator::SPtr t_invOpMeg(new MNEInverseOperator(*m_pFiffInfo.data(), t_forwardMeg, m_vecNoiseCov[0], 0.2f, 0.8f));
             m_vecNoiseCov.pop_front();
             mutex.unlock();
 

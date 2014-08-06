@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -45,6 +45,10 @@
 #include "xdisp_global.h"
 #include "newmeasurementwidget.h"
 
+#include <disp3D/helpers/cluststcview.h>
+#include <disp3D/helpers/cluststcmodel.h>
+
+//OLD
 #include <disp3D/inverseview.h>
 #include <mne/mne_forwardsolution.h>
 
@@ -54,12 +58,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QSet>
-#include <QList>
-#include <QVector>
-#include <QPainterPath>
-#include <QMutex>
-#include <QThread>
+
 
 
 //*************************************************************************************************************
@@ -142,6 +141,12 @@ public:
     //=========================================================================================================
     /**
     * Is called when new data are available.
+    */
+    virtual void getData();
+
+    //=========================================================================================================
+    /**
+    * Is called when new data are available.
     *
     * @param [in] pMeasurement  pointer to measurement -> not used because its direct attached to the measurement.
     */
@@ -153,27 +158,18 @@ public:
     */
     virtual void init();
 
-    //=========================================================================================================
-    /**
-    * Initialise the OpenGL widget.
-    *
-    * @return true when successful
-    */
-    bool initOpenGLWidget();
-
 signals:
     void startInit();
 
 private:
-
-    InverseView* m_pView;                               /**< The inverse view, owner ship is taken by container widget of m_pView -> no need to delete */
-    QWidget* m_pWidgetView;                             /**< The inverse view container, ownership is taken by QHBoxLayout -> no need to delete */
-
     QSharedPointer<RealTimeSourceEstimate> m_pRTMSE;    /**< The real-time source estimate measurement. */
     bool m_bInitialized;                                /**< Whether init was processed successfully. */
-    bool m_bInitializationStarted;
 
-    qint32 count;
+    AnnotationSet m_annotationSet;
+    SurfaceSet m_surfSet;
+
+    ClustStcModel*  m_pClustStcModel;
+    ClustStcView*   m_pClustView;
 };
 
 } // NAMESPACE

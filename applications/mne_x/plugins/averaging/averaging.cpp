@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -82,7 +82,7 @@ Averaging::Averaging()
 , m_pAveragingWidget(AveragingSettingsWidget::SPtr())
 , m_pActionShowAdjustment(Q_NULLPTR)
 {
-    m_pActionShowAdjustment = new QAction(QIcon(":/images/averaging.png"), tr("Averaging Adjustments"),this);
+    m_pActionShowAdjustment = new QAction(QIcon(":/images/averagingadjustments.png"), tr("Averaging Adjustments"),this);
 //    m_pActionSetupProject->setShortcut(tr("F12"));
     m_pActionShowAdjustment->setStatusTip(tr("Averaging Adjustments"));
     connect(m_pActionShowAdjustment, &QAction::triggered, this, &Averaging::showAveragingWidget);
@@ -124,6 +124,7 @@ void Averaging::init()
 
     // Output
     m_pAveragingOutput = PluginOutputData<RealTimeEvoked>::create(this, "AveragingOut", "Averaging Output Data");
+    m_pAveragingOutput->data()->setName("AveragingPlugin");//Provide name to auto store widget settings
     m_outputConnectors.append(m_pAveragingOutput);
 
     //init channels when fiff info is available
@@ -149,36 +150,10 @@ void Averaging::changeNumAverages(qint32 numAve)
 
 void Averaging::initConnector()
 {
-    if(m_pFiffInfo)
-    {
-        m_qListModalities.clear();
-        bool hasMag = false;
-        bool hasGrad = false;
-        bool hasEEG = false;
-        bool hasEOG = false;
-        for(qint32 i = 0; i < m_pFiffInfo->nchan; ++i)
-        {
-            if(m_pFiffInfo->chs[i].kind == FIFFV_MEG_CH)
-            {
-                if(!hasMag &&  m_pFiffInfo->chs[i].unit == FIFF_UNIT_T)
-                    hasMag = true;
-                else if(!hasGrad &&  m_pFiffInfo->chs[i].unit == FIFF_UNIT_T_M)
-                    hasGrad = true;
-            }
-            else if(!hasEEG && m_pFiffInfo->chs[i].kind == FIFFV_EEG_CH)
-                hasEEG = true;
-            else if(!hasEOG && m_pFiffInfo->chs[i].kind == FIFFV_EOG_CH)
-                hasEOG = true;
-        }
-        if(hasMag)
-            m_qListModalities.append(QPair<QString,bool>("MAG",true));
-        if(hasGrad)
-            m_qListModalities.append(QPair<QString,bool>("GRAD",true));
-        if(hasEEG)
-            m_qListModalities.append(QPair<QString,bool>("EEG",true));
-        if(hasEOG)
-            m_qListModalities.append(QPair<QString,bool>("EOG",true));
-    }
+//    if(m_pFiffInfo)
+//    {
+
+//    }
 }
 
 
@@ -332,6 +307,7 @@ void Averaging::appendEvoked(FiffEvoked::SPtr p_pEvoked)
         mutex.lock();
         m_qVecEvokedData.push_back(p_pEvoked);
         mutex.unlock();
+        qDebug() << "append after" << m_qVecEvokedData.size();
     }
 }
 
