@@ -1120,13 +1120,13 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
 
                             if(atomType == EditorWindow::Chirp)
                              {
-                                ChirpAtom *cAtom = new ChirpAtom(ui->spb_AtomLength->value(), tempScale, 0, tempModu, tempPhase, tempChirp);
+                                ChirpAtom *cAtom = new ChirpAtom(ui->spb_AtomLength->value(), tempScale, ui->spb_AtomLength->value() / 2, tempModu, tempPhase, tempChirp);
                                 resultList = cAtom->CreateStringValues();
                             }
                             else if(atomType == EditorWindow::Gauss)
                             {
                                 GaborAtom *gAtom = new GaborAtom();//ui->spb_AtomLength->value(), tempScale, 0, tempModu, tempPhase);
-                                resultList = gAtom->CreateStringValues(ui->spb_AtomLength->value(), tempScale, 0, tempModu, tempPhase);
+                                resultList = gAtom->CreateStringValues(ui->spb_AtomLength->value(), tempScale, ui->spb_AtomLength->value() / 2, tempModu, tempPhase);
                             }
                             stream << QString("%1_ATOM_%2 \n scale: %3 modu: %4 phase: %5 chrip: %6").arg(partDictName).arg(atomIndex).arg(tempScale).arg(tempModu).arg(tempPhase).arg(tempChirp) << "\n";
                             for (QStringList::Iterator it = resultList.begin(); it != resultList.end(); it++)
@@ -1182,13 +1182,13 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
 
                 if(atomType == EditorWindow::Chirp)
                  {
-                    ChirpAtom *cAtom = new ChirpAtom(ui->spb_AtomLength->value(), tempScale, 0, tempModu, tempPhase, tempChirp);
+                    ChirpAtom *cAtom = new ChirpAtom(ui->spb_AtomLength->value(), tempScale, ui->spb_AtomLength->value() / 2, tempModu, tempPhase, tempChirp);
                     resultList = cAtom->CreateStringValues();
                 }
                 else if(atomType == EditorWindow::Gauss)
                 {
                     GaborAtom *gAtom = new GaborAtom();//ui->spb_AtomLength->value(), tempScale,0 , tempModu, tempPhase);
-                    resultList = gAtom->CreateStringValues(ui->spb_AtomLength->value(), tempScale, 0, tempModu, tempPhase);
+                    resultList = gAtom->CreateStringValues(ui->spb_AtomLength->value(), tempScale, ui->spb_AtomLength->value() / 2, tempModu, tempPhase);
                 }
 
                 stream << QString("%1_ATOM_%2 \n scale: %3 modu: %4 phase: %5 chrip: %6").arg(partDictName).arg(i).arg(tempScale).arg(tempModu).arg(tempPhase).arg(tempChirp) << "\n";
