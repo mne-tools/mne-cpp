@@ -105,12 +105,11 @@ enum Tool
 
 RealTimeEvokedWidget::RealTimeEvokedWidget(QSharedPointer<RealTimeEvoked> pRTE, QSharedPointer<QTime> &pTime, QWidget* parent)
 : NewMeasurementWidget(parent)
-, m_pRTEModel(NULL)
-, m_pButterflyPlot(NULL)
-, m_fZoomFactor(1.0f)
+, m_pRTEModel(Q_NULLPTR)
+, m_pButterflyPlot(Q_NULLPTR)
 , m_pRTE(pRTE)
 , m_bInitialized(false)
-, m_pSensorModel(NULL)
+, m_pSensorModel(Q_NULLPTR)
 {
     Q_UNUSED(pTime)
 
@@ -120,16 +119,7 @@ RealTimeEvokedWidget::RealTimeEvokedWidget(QSharedPointer<RealTimeEvoked> pRTE, 
     connect(m_pActionSelectModality, &QAction::triggered, this, &RealTimeEvokedWidget::showModalitySelectionWidget);
     addDisplayAction(m_pActionSelectModality);
 
-    m_qListPickTypes << "MAG";
-
-    m_pDoubleSpinBoxZoom = new QDoubleSpinBox(this);
-    m_pDoubleSpinBoxZoom->setMinimum(0.3);
-    m_pDoubleSpinBoxZoom->setMaximum(4.0);
-    m_pDoubleSpinBoxZoom->setSingleStep(0.1);
-    m_pDoubleSpinBoxZoom->setValue(1.0);
-    m_pDoubleSpinBoxZoom->setSuffix(" x");
-    connect(m_pDoubleSpinBoxZoom, static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged), this, &RealTimeEvokedWidget::zoomChanged);
-    addDisplayWidget(m_pDoubleSpinBoxZoom);
+    m_pActionSelectModality->setVisible(false);
 
 //    m_pActionSelectSensors = new QAction(QIcon(":/images/selectSensors.png"), tr("Shows the region selection widget (F12)"),this);
 //    m_pActionSelectSensors->setShortcut(tr("F12"));
@@ -169,6 +159,15 @@ RealTimeEvokedWidget::RealTimeEvokedWidget(QSharedPointer<RealTimeEvoked> pRTE, 
 
 RealTimeEvokedWidget::~RealTimeEvokedWidget()
 {
+
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeEvokedWidget::broadcastSettings()
+{
+    m_pButterflyPlot->setSettings(m_qListModalities);
 
 }
 
@@ -239,6 +238,7 @@ void RealTimeEvokedWidget::init()
         bool hasGrad = false;
         bool hasEEG = false;
         bool hasEOG = false;
+        bool hasMISC = false;
         for(qint32 i = 0; i < m_pRTE->info().nchan; ++i)
         {
             if(m_pRTE->info().chs[i].kind == FIFFV_MEG_CH)
@@ -252,27 +252,41 @@ void RealTimeEvokedWidget::init()
                 hasEEG = true;
             else if(!hasEOG && m_pRTE->info().chs[i].kind == FIFFV_EOG_CH)
                 hasEOG = true;
+            else if(!hasMISC && m_pRTE->info().chs[i].kind == FIFFV_MISC_CH)
+                hasMISC = true;
         }
         if(hasMag)
-            m_qListModalities.append(QPair<QString,bool>("MAG",true));
+        {
+            bool sel = true;
+            m_qListModalities.append(Modality("MAG",sel,1e-11));
+        }
         if(hasGrad)
-            m_qListModalities.append(QPair<QString,bool>("GRAD",true));
+        {
+            bool sel = true;
+            m_qListModalities.append(Modality("GRAD",true,1e-10));
+        }
         if(hasEEG)
-            m_qListModalities.append(QPair<QString,bool>("EEG",true));
+        {
+            bool sel = true;
+            m_qListModalities.append(Modality("EEG",true,1e-4));
+        }
         if(hasEOG)
-            m_qListModalities.append(QPair<QString,bool>("EOG",true));
+        {
+            bool sel = true;
+            m_qListModalities.append(Modality("EOG",true,1e-3));
+        }
+        if(hasMISC)
+        {
+            bool sel = true;
+            m_qListModalities.append(Modality("MISC",true,1e-3));
+        }
 
+        m_pButterflyPlot->setSettings(m_qListModalities);
+
+        m_pActionSelectModality->setVisible(true);
         // Initialized
         m_bInitialized = true;
     }
-}
-
-
-//*************************************************************************************************************
-
-void RealTimeEvokedWidget::zoomChanged(double zoomFac)
-{
-    m_fZoomFactor = zoomFac;
 }
 
 
@@ -286,7 +300,7 @@ void RealTimeEvokedWidget::showModalitySelectionWidget()
 
         m_pEvokedModalityWidget->setWindowTitle("Modality Selection");
 
-        connect(m_pEvokedModalityWidget.data(), &EvokedModalityWidget::selectionChanged, m_pButterflyPlot, &RealTimeButterflyPlot::setSelection);
+        connect(m_pEvokedModalityWidget.data(), &EvokedModalityWidget::settingsChanged, this, &RealTimeEvokedWidget::broadcastSettings);
     }
     m_pEvokedModalityWidget->show();
 }

@@ -51,6 +51,7 @@
 #include <QWidget>
 #include <QCheckBox>
 #include <QStringList>
+#include <QLineEdit>
 
 
 //*************************************************************************************************************
@@ -68,6 +69,7 @@ namespace XDISPLIB
 //=============================================================================================================
 
 class RealTimeEvokedWidget;
+struct Modality;
 
 
 //=============================================================================================================
@@ -90,17 +92,18 @@ public:
     */
     EvokedModalityWidget(RealTimeEvokedWidget *toolbox);
 
-    void updateSelection(qint32 state);
+    void updateCheckbox(qint32 state);
+
+    void updateLineEdit(const QString & text);
 
 signals:
-    void selectionChanged(QStringList);
+    void settingsChanged();
 
 private:
     RealTimeEvokedWidget * m_pRealTimeEvokedWidget; /**< Connected real-time evoked widget */
 
     QList<QCheckBox*>   m_qListModalityCheckBox;    /**< List of modality checkboxes */
-
-    QStringList m_qListModalities;              /**< List of modalities */
+    QList<QLineEdit*>   m_qListModalityLineEdit;    /**< List of modality scalings */
 };
 
 } // NAMESPACE

@@ -5,6 +5,7 @@
 //=============================================================================================================
 
 #include "realtimebutterflyplot.h"
+#include "../realtimeevokedwidget.h"
 
 
 //*************************************************************************************************************
@@ -158,24 +159,22 @@ void RealTimeButterflyPlot::createPlotPath(qint32 row, QPainterPath& path) const
     switch(kind) {
         case FIFFV_MEG_CH: {
             qint32 unit = m_pRealTimeEvokedModel->getUnit(row);
-            if(unit == FIFF_UNIT_T_M) {
-                fMaxValue = 1e-10f;// m_qSettings.value("RawDelegate/max_meg_grad").toDouble();
-            }
+            if(unit == FIFF_UNIT_T_M)
+                fMaxValue = fMaxGRAD;
             else if(unit == FIFF_UNIT_T)
-            {
-                if(m_pRealTimeEvokedModel->getCoil(row) == FIFFV_COIL_BABY_MAG)
-                    fMaxValue = 1e-4f;
-                else
-                    fMaxValue = 1e-11f;// m_qSettings.value("RawDelegate/max_meg_mag").toDouble();
-            }
+                fMaxValue = fMaxMAG;
             break;
         }
         case FIFFV_EEG_CH: {
-            fMaxValue = 1e-4f;// m_qSettings.value("RawDelegate/max_eeg").toDouble();
+            fMaxValue = fMaxEEG;
             break;
         }
         case FIFFV_EOG_CH: {
-            fMaxValue = 1e-3f; //m_qSettings.value("RawDelegate/max_eog").toDouble();
+            fMaxValue = fMaxEOG;
+            break;
+        }
+        case FIFFV_MISC_CH: {
+            fMaxValue = fMaxMISC;
             break;
         }
         default:
@@ -257,33 +256,39 @@ void RealTimeButterflyPlot::createPlotPath(qint32 row, QPainterPath& path) const
 
 //*************************************************************************************************************
 
-void RealTimeButterflyPlot::setSelection(QStringList p_qList)
+void RealTimeButterflyPlot::setSettings(const QList< Modality >& p_qListModalities)
 {
-    qDebug() << "RealTimeButterflyPlot::setSelection";
+    for(qint32 i = 0; i < p_qListModalities.size(); ++i)
+    {
+        if(p_qListModalities[i].m_sName == ("GRAD"))
+        {
+            showGRAD = p_qListModalities[i].m_bActive;
+            fMaxGRAD = p_qListModalities[i].m_fNorm;
+        }
 
-    if(p_qList.contains("GRAD"))
-        showGRAD = true;
-    else
-        showGRAD = false;
+        if(p_qListModalities[i].m_sName == ("MAG"))
+        {
+            showMAG = p_qListModalities[i].m_bActive;
+            fMaxMAG = p_qListModalities[i].m_fNorm;
+        }
+        if(p_qListModalities[i].m_sName == ("EEG"))
+        {
+            showEEG = p_qListModalities[i].m_bActive;
+            fMaxEEG = p_qListModalities[i].m_fNorm;
 
-    if(p_qList.contains("MAG"))
-        showMAG = true;
-    else
-        showMAG = false;
+        }
+        if(p_qListModalities[i].m_sName == ("EOG"))
+        {
+            showEOG = p_qListModalities[i].m_bActive;
+            fMaxEOG = p_qListModalities[i].m_fNorm;
 
-    if(p_qList.contains("EEG"))
-        showEEG = true;
-    else
-        showEEG = false;
+        }
+        if(p_qListModalities[i].m_sName == ("MISC"))
+        {
+            showMISC = p_qListModalities[i].m_bActive;
+            fMaxMISC = p_qListModalities[i].m_fNorm;
 
-    if(p_qList.contains("EOG"))
-        showEOG = true;
-    else
-        showEOG = false;
-
-    if(p_qList.contains("MSIC"))
-        showMISC = true;
-    else
-        showMISC = false;
+        }
+    }
     update();
 }
