@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -47,8 +47,6 @@
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
-
-#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -85,8 +83,11 @@ RealTimeEvoked::~RealTimeEvoked()
 
 void RealTimeEvoked::init(FiffInfo &p_fiffInfo)
 {
+    QMutexLocker locker(&m_qMutex);
     m_qListChInfo.clear();
     m_qListChColors.clear();
+
+    m_fiffInfo = p_fiffInfo;
 
     qsrand(time(NULL));
     for(qint32 i = 0; i < p_fiffInfo.nchan; ++i)
@@ -122,6 +123,7 @@ void RealTimeEvoked::init(FiffInfo &p_fiffInfo)
 
 FiffEvoked::SPtr& RealTimeEvoked::getValue()
 {
+    QMutexLocker locker(&m_qMutex);
     return m_pFiffEvoked;
 }
 
@@ -130,16 +132,19 @@ FiffEvoked::SPtr& RealTimeEvoked::getValue()
 
 void RealTimeEvoked::setValue(FiffEvoked& v)
 {
-
     if(m_pFiffEvoked->data.cols() != v.data.cols())
         m_bInitialized = false;
 
     //Store
+    m_qMutex.lock();
     *m_pFiffEvoked = v;
+    m_qMutex.unlock();
 
     if(!m_bInitialized)
     {
         init(m_pFiffEvoked->info);
+
+        m_qMutex.lock();
         m_iPreStimSamples = 0;
         for(qint32 i = 0; i < m_pFiffEvoked->times.size(); ++i)
         {
@@ -149,10 +154,8 @@ void RealTimeEvoked::setValue(FiffEvoked& v)
                 ++m_iPreStimSamples;
         }
 
-
-
-
         m_bInitialized = true;
+        m_qMutex.unlock();
     }
 
     emit notify();

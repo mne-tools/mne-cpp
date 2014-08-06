@@ -1,6 +1,6 @@
 <RCC>
     <qresource prefix="/images">
-        <file alias="covariance.png">images/icons/covariance.png</file>
+        <file alias="covadjustments.png">images/icons/covadjustments.png</file>
         <file alias="covariance_logo.png">images/covariance_logo.png</file>
     </qresource>
 </RCC>

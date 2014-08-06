@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -101,7 +101,9 @@ const QString FiffSimulator::Commands::SIMFILE      = "simfile";
 
 FiffSimulator::FiffSimulator()
 : m_pFiffProducer(new FiffProducer(this))
+//, m_sResourceDataPath(QString("D:/Data/MEG/mind006/mind006_051209_auditory01_raw.fif"))
 , m_sResourceDataPath(QString("%1/MNE-sample-data/MEG/sample/sample_audvis_raw.fif").arg(QCoreApplication::applicationDirPath()))
+
 //, m_sResourceDataPath(QString("D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2014_02_24_Lorenz_Esch_008/Original/EEG_data_001_involuntary_left_tapping_raw.fif"))
 //, m_sResourceDataPath(QString("D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2014_02_24_Lorenz_Esch_008/Original/EEG_data_001_base_raw.fif"))
 //, m_sResourceDataPath(QString("D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2014_02_24_Lorenz_Esch_008/Original/EEG_data_001_involuntary_right_tapping_raw.fif"))

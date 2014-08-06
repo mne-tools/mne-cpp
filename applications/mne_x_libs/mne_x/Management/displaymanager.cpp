@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -48,14 +48,14 @@
 #endif
 #include <xDisp/realtimeevokedwidget.h>
 #include <xDisp/realtimecovwidget.h>
-#include <xDisp/noiseestimationwidget.h>
+#include <xDisp/frequencyspectrumwidget.h>
 
 #include <xMeas/newrealtimesamplearray.h>
 #include <xMeas/newrealtimemultisamplearray.h>
 #include <xMeas/realtimesourceestimate.h>
 #include <xMeas/realtimeevoked.h>
 #include <xMeas/realtimecov.h>
-#include <xMeas/noiseestimation.h>
+#include <xMeas/frequencyspectrum.h>
 
 
 //#include <xDisp/measurementwidget.h>
@@ -200,20 +200,20 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
             vboxLayout->addWidget(rtcWidget);
             rtcWidget->init();
         }
-        else if(pPluginOutputConnector.dynamicCast< PluginOutputData<NoiseEstimation> >())
+        else if(pPluginOutputConnector.dynamicCast< PluginOutputData<FrequencySpectrum> >())
         {
-            QSharedPointer<NoiseEstimation>* pNoiseEstimation = &pPluginOutputConnector.dynamicCast< PluginOutputData<NoiseEstimation> >()->data();
+            QSharedPointer<FrequencySpectrum>* pFrequencySpectrum = &pPluginOutputConnector.dynamicCast< PluginOutputData<FrequencySpectrum> >()->data();
 
-            NoiseEstimationWidget* neWidget = new NoiseEstimationWidget(*pNoiseEstimation, pT, newDisp);
+            FrequencySpectrumWidget* fsWidget = new FrequencySpectrumWidget(*pFrequencySpectrum, pT, newDisp);
 
-            qListActions.append(neWidget->getDisplayActions());
-            qListWidgets.append(neWidget->getDisplayWidgets());
+            qListActions.append(fsWidget->getDisplayActions());
+            qListWidgets.append(fsWidget->getDisplayWidgets());
 
             connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
-                    neWidget, &NoiseEstimationWidget::update, Qt::BlockingQueuedConnection);
+                    fsWidget, &FrequencySpectrumWidget::update, Qt::BlockingQueuedConnection);
 
-            vboxLayout->addWidget(neWidget);
-            neWidget->init();
+            vboxLayout->addWidget(fsWidget);
+            fsWidget->init();
         }
     }
 

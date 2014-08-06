@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -95,7 +95,7 @@ QVariant RealTimeEvokedModel::data(const QModelIndex &index, int role) const
 
         //******** first column (chname) ********
         if(index.column() == 0 && role == Qt::DisplayRole)
-            return QVariant(m_pRTE->chInfo()[row].getChannelName());
+            return QVariant(m_pRTE->info().ch_names[row]);
 
         //******** second column (data plot) ********
         if(index.column()==1) {
@@ -199,7 +199,7 @@ void RealTimeEvokedModel::updateData()
 
     //Update data content
     QModelIndex topLeft = this->index(0,1);
-    QModelIndex bottomRight = this->index(m_pRTE->chInfo().size()-1,1);
+    QModelIndex bottomRight = this->index(m_pRTE->info().nchan-1,1);
     QVector<int> roles; roles << Qt::DisplayRole;
     emit dataChanged(topLeft, bottomRight, roles);
 }
@@ -226,7 +226,7 @@ fiff_int_t RealTimeEvokedModel::getKind(qint32 row) const
     if(row < m_qMapIdxRowSelection.size())
     {
         qint32 chRow = m_qMapIdxRowSelection[row];
-        return m_pRTE->chInfo()[chRow].getKind();
+        return m_pRTE->info().chs[chRow].kind;
     }
     else
         return 0;
@@ -240,7 +240,7 @@ fiff_int_t RealTimeEvokedModel::getUnit(qint32 row) const
     if(row < m_qMapIdxRowSelection.size())
     {
         qint32 chRow = m_qMapIdxRowSelection[row];
-        return m_pRTE->chInfo()[chRow].getUnit();
+        return m_pRTE->info().chs[chRow].unit;
     }
     else
         return FIFF_UNIT_NONE;
@@ -254,7 +254,7 @@ fiff_int_t RealTimeEvokedModel::getCoil(qint32 row) const
     if(row < m_qMapIdxRowSelection.size())
     {
         qint32 chRow = m_qMapIdxRowSelection[row];
-        return m_pRTE->chInfo()[chRow].getCoil();
+        return m_pRTE->info().chs[chRow].coil_type;
     }
     else
         return FIFFV_COIL_NONE;
@@ -272,7 +272,7 @@ void RealTimeEvokedModel::selectRows(const QList<qint32> &selection)
     qint32 count = 0;
     for(qint32 i = 0; i < selection.size(); ++i)
     {
-        if(selection[i] < m_pRTE->chInfo().size())
+        if(selection[i] < m_pRTE->info().nchan)
         {
             m_qMapIdxRowSelection.insert(count,selection[i]);
             ++count;
@@ -293,7 +293,7 @@ void RealTimeEvokedModel::resetSelection()
 
     m_qMapIdxRowSelection.clear();
 
-    for(qint32 i = 0; i < m_pRTE->chInfo().size(); ++i)
+    for(qint32 i = 0; i < m_pRTE->info().nchan; ++i)
         m_qMapIdxRowSelection.insert(i,i);
 
     endResetModel();
@@ -311,7 +311,7 @@ void RealTimeEvokedModel::toggleFreeze(const QModelIndex &)
 
     //Update data content
     QModelIndex topLeft = this->index(0,1);
-    QModelIndex bottomRight = this->index(m_pRTE->chInfo().size()-1,1);
+    QModelIndex bottomRight = this->index(m_pRTE->info().nchan-1,1);
     QVector<int> roles; roles << Qt::DisplayRole;
     emit dataChanged(topLeft, bottomRight, roles);
 }

@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -47,6 +47,7 @@
 #include "helpers/realtimeevokedmodel.h"
 #include "helpers/realtimebutterflyplot.h"
 
+#include "helpers/evokedmodalitywidget.h"
 #include "helpers/sensorwidget.h"
 
 
@@ -60,6 +61,8 @@
 #include <QAction>
 #include <QSpinBox>
 #include <QDoubleSpinBox>
+#include <QLabel>
+#include <QVBoxLayout>
 
 
 //*************************************************************************************************************
@@ -112,6 +115,16 @@ using namespace XMEASLIB;
 //    Annotation = 1        /**< Annotation tool. */
 //};
 
+struct Modality {
+    QString m_sName;
+    bool m_bActive;
+    float m_fNorm;
+
+    Modality(QString name, bool active, double norm)
+    : m_sName(name), m_bActive(active), m_fNorm(norm)
+    {}
+};
+
 
 //=============================================================================================================
 /**
@@ -123,6 +136,7 @@ class XDISPSHARED_EXPORT RealTimeEvokedWidget : public NewMeasurementWidget
 {
     Q_OBJECT
 
+    friend class EvokedModalityWidget;
 public:
     //=========================================================================================================
     /**
@@ -139,6 +153,12 @@ public:
     * Destroys the RealTimeEvokedWidget.
     */
     ~RealTimeEvokedWidget();
+
+    //=========================================================================================================
+    /**
+    * Broadcast settings to attached widgets
+    */
+    void broadcastSettings();
 
     //=========================================================================================================
     /**
@@ -163,23 +183,24 @@ public:
 private:
     //=========================================================================================================
     /**
-    * Sets new zoom factor
-    *
-    * @param [in] zoomFac  time window size;
-    */
-    void zoomChanged(double zoomFac);
-
-    //=========================================================================================================
-    /**
     * Shows sensor selection widget
     */
     void showSensorSelectionWidget();
 
+    //=========================================================================================================
+    /**
+    * Show the modality selection widget
+    */
+    void showModalitySelectionWidget();
+
+
+    QVBoxLayout *m_pRteLayout;  /**< RTE Widget layout */
+    QLabel *m_pLabelInit;       /**< Initialization LAbel */
+
     RealTimeEvokedModel*        m_pRTEModel;            /**< RTE data model */
     RealTimeButterflyPlot*      m_pButterflyPlot;       /**< Butterfly plot */
 
-    float m_fZoomFactor;                                    /**< Zoom factor */
-    QDoubleSpinBox* m_pDoubleSpinBoxZoom;                   /**< Adjust Zoom Factor */
+    QAction* m_pActionSelectModality;           /**< Modality selection action */
 
     QSharedPointer<RealTimeEvoked> m_pRTE;                  /**< The real-time evoked measurement. */
 
@@ -191,6 +212,10 @@ private:
 
     SensorModel* m_pSensorModel;                            /**< Sensor model for channel selection */
     QSharedPointer<SensorWidget> m_pSensorSelectionWidget;  /**< Sensor selection widget. */
+
+    QSharedPointer<EvokedModalityWidget> m_pEvokedModalityWidget;   /**< Evoked modality widget. */
+    QList< Modality > m_qListModalities;
+
 
     QList<qint32> m_qListCurrentSelection;  /**< Current selection list -> hack around C++11 lambda  */
     void applySelection();                  /**< apply the in m_qListCurrentSelection stored selection -> hack around C++11 lambda */
