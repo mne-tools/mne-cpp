@@ -59,6 +59,7 @@ using namespace MNEBrowseRawQt;
 MainWindow::MainWindow(QWidget *parent)
 : QMainWindow(parent)
 , m_qFileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
+, m_qFileEvent("./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif")
 , m_qSettings()
 , m_rawSettings()
 {
@@ -91,6 +92,10 @@ void MainWindow::setupModel()
 //    m_pRawModel = new RawModel(this);
     m_pRawModel = new RawModel(m_qFileRaw,this);
     m_pEventModel = new EventModel(this);
+
+    //Set fiffInfo in event model TODO: This is dirty - what happens if no file was loaded (due to missing file)
+    m_pEventModel->setFiffInfo(m_pRawModel->m_fiffInfo);
+    m_pEventModel->setFirstSample(m_pRawModel->firstSample());
 }
 
 
@@ -106,29 +111,29 @@ void MainWindow::setupDelegate()
 
 void MainWindow::setupView()
 {
-    m_pTableView = new QTableView;
+    m_pRawTableView = new QTableView;
     m_pEventTableView = new QTableView;
 
     //set custom models
     m_pEventTableView->setModel(m_pEventModel);
-    m_pTableView->setModel(m_pRawModel);
+    m_pRawTableView->setModel(m_pRawModel);
 
     //set custom delegate
-    m_pTableView->setItemDelegate(m_pRawDelegate);
+    m_pRawTableView->setItemDelegate(m_pRawDelegate);
 
     //TableView settings
     setupViewSettings();
-
 }
 
 
 //*************************************************************************************************************
 
-void MainWindow::setupLayout() {
+void MainWindow::setupLayout()
+{
     //set vertical layout
     QVBoxLayout *mainlayout = new QVBoxLayout;
 
-    mainlayout->addWidget(m_pTableView);
+    mainlayout->addWidget(m_pRawTableView);
 
     //set layouts
     QWidget *window = new QWidget();
@@ -140,39 +145,58 @@ void MainWindow::setupLayout() {
 
 //*************************************************************************************************************
 
-void MainWindow::setupViewSettings() {
-    //set some size settings for m_pTableView
-    m_pTableView->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+void MainWindow::setupViewSettings()
+{
+    //------------- SETUP VIEW: m_pRawTableView -------------
+    //set some size settings for m_pRawTableView
+    m_pRawTableView->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
 
-    m_pTableView->setShowGrid(false);
-    m_pTableView->horizontalHeader()->hide();
-    m_pTableView->verticalHeader()->setDefaultSectionSize(m_pRawDelegate->m_dDefaultPlotHeight);
+    m_pRawTableView->setShowGrid(false);
+    m_pRawTableView->horizontalHeader()->hide();
+    m_pRawTableView->verticalHeader()->setDefaultSectionSize(m_pRawDelegate->m_dDefaultPlotHeight);
 
-    m_pTableView->setAutoScroll(false);
-    m_pTableView->setColumnHidden(0,true); //because content is plotted jointly with column=1
+    m_pRawTableView->setAutoScroll(false);
+    m_pRawTableView->setColumnHidden(0,true); //because content is plotted jointly with column=1
 
-    m_pTableView->resizeColumnsToContents();
+    m_pRawTableView->resizeColumnsToContents();
 
-    m_pTableView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
+    m_pRawTableView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
 
     //set context menu
-    m_pTableView->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(m_pTableView,SIGNAL(customContextMenuRequested(QPoint)),this,SLOT(customContextMenuRequested(QPoint)));
+    m_pRawTableView->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(m_pRawTableView,SIGNAL(customContextMenuRequested(QPoint)),this,SLOT(customContextMenuRequested(QPoint)));
 
     //activate kinetic scrolling
-    QScroller::grabGesture(m_pTableView,QScroller::MiddleMouseButtonGesture);
+    QScroller::grabGesture(m_pRawTableView,QScroller::MiddleMouseButtonGesture);
 
     //connect QScrollBar with model in order to reload data samples
-    connect(m_pTableView->horizontalScrollBar(),SIGNAL(valueChanged(int)),m_pRawModel,SLOT(updateScrollPos(int)));
+    connect(m_pRawTableView->horizontalScrollBar(),SIGNAL(valueChanged(int)),m_pRawModel,SLOT(updateScrollPos(int)));
 
     //connect other signals
     connect(m_pRawModel,SIGNAL(scrollBarValueChange(int)),this,SLOT(setScrollBarPosition(int)));
+
+    //------------- SETUP VIEW: m_pEventModel -------------
+    m_pEventTableView->resizeColumnsToContents();
+
+    //Connect selection in event window to specific slot
+    connect(m_pEventTableView->selectionModel(),SIGNAL(currentRowChanged(QModelIndex, QModelIndex)),
+                this,SLOT(jumpToEvent(QModelIndex, QModelIndex)));
+
+    //Create event window
+    m_wEventWidget = new QWidget(this, Qt::Window);
+
+    QVBoxLayout *eventWidgetLayout = new QVBoxLayout;
+
+    eventWidgetLayout->addWidget(m_pEventTableView);
+    m_wEventWidget->setLayout(eventWidgetLayout);
+    m_wEventWidget->hide();
 }
 
 
 //*************************************************************************************************************
 
-void MainWindow::createMenus() {
+void MainWindow::createMenus()
+{
     //File
     QMenu *fileMenu = new QMenu(tr("&File"), this);
 
@@ -180,32 +204,47 @@ void MainWindow::createMenus() {
     openAction->setShortcuts(QKeySequence::Open);
     connect(openAction, SIGNAL(triggered()), this, SLOT(openFile()));
 
-    QAction *writeAction = fileMenu->addAction(tr("&Save As..."));
+    QAction *writeAction = fileMenu->addAction(tr("&Save..."));
     openAction->setShortcuts(QKeySequence::SaveAs);
     connect(writeAction, SIGNAL(triggered()), this, SLOT(writeFile()));
 
-    QAction *loadEvents = fileMenu->addAction(tr("&Load Events..."));
+    fileMenu->addSeparator();
+
+    QAction *loadEvents = fileMenu->addAction(tr("&Load Events (fif)..."));
     connect(loadEvents, SIGNAL(triggered()), this, SLOT(loadEvents()));
 
-    QAction *quitAction = fileMenu->addAction(tr("E&xit"));
+    QAction *saveEvents = fileMenu->addAction(tr("&Save Events (fif)..."));
+    connect(saveEvents, SIGNAL(triggered()), this, SLOT(saveEvents()));
+
+    fileMenu->addSeparator();
+
+    QAction *quitAction = fileMenu->addAction(tr("&Quit"));
     quitAction->setShortcuts(QKeySequence::Quit);
     connect(quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
+
+    //Windows
+    QMenu *windowsMenu = new QMenu(tr("&Windows"), this);
+
+    QAction *eventAction = windowsMenu->addAction(tr("&Show event list..."));
+    connect(eventAction, SIGNAL(triggered()), this, SLOT(showEventWindow()));
 
     //Help
     QMenu *helpMenu = new QMenu(tr("&Help"), this);
 
-    QAction *aboutAction = helpMenu->addAction(tr("&About"));
+    QAction *aboutAction = helpMenu->addAction(tr("&About..."));
     connect(aboutAction, SIGNAL(triggered()), this, SLOT(about()));
 
     //add to menub
     menuBar()->addMenu(fileMenu);
+    menuBar()->addMenu(windowsMenu);
     menuBar()->addMenu(helpMenu);
 }
 
 
 //*************************************************************************************************************
 
-void MainWindow::setWindow() {
+void MainWindow::setWindow()
+{
     //set Window functions
     resize(m_qSettings.value("MainWindow/size").toSize());
     this->move(50,50);
@@ -214,7 +253,8 @@ void MainWindow::setWindow() {
 
 //*************************************************************************************************************
 
-void MainWindow::setWindowStatus() {
+void MainWindow::setWindowStatus()
+{
     QString title;
 
     //request status
@@ -231,7 +271,7 @@ void MainWindow::setWindowStatus() {
     setWindowTitle(title);
 
     //let the view update (ScrollBars etc.)
-    m_pTableView->resizeColumnsToContents();
+    m_pRawTableView->resizeColumnsToContents();
 }
 
 
@@ -301,6 +341,13 @@ void MainWindow::setLogLevel(LogLevel lvl)
 void MainWindow::openFile()
 {
     QString filename = QFileDialog::getOpenFileName(this,QString("Open fiff data file"),QString("./MNE-sample-data/MEG/sample/"),tr("fif data files (*.fif)"));
+
+    if(filename.isEmpty())
+    {
+        qDebug("User aborted opening of fiff data file");
+        return;
+    }
+
     if(m_qFileRaw.isOpen())
         m_qFileRaw.close();
     m_qFileRaw.setFileName(filename);
@@ -315,6 +362,10 @@ void MainWindow::openFile()
 
     //set position of QScrollArea
     setScrollBarPosition(0);
+
+    //Set fiffInfo in event model
+    m_pEventModel->setFiffInfo(m_pRawModel->m_fiffInfo);
+    m_pEventModel->setFirstSample(m_pRawModel->firstSample());
 }
 
 
@@ -323,6 +374,13 @@ void MainWindow::openFile()
 void MainWindow::writeFile()
 {
     QString filename = QFileDialog::getSaveFileName(this,QString("Write fiff data file"),QString("./MNE-sample-data/MEG/sample/"),tr("fif data files (*.fif)"));
+
+    if(filename.isEmpty())
+    {
+        qDebug("User aborted saving to fiff data file");
+        return;
+    }
+
     QFile t_fileRaw(filename);
 
     if(!m_pRawModel->writeFiffData(t_fileRaw))
@@ -335,11 +393,11 @@ void MainWindow::writeFile()
 void MainWindow::loadEvents()
 {
     QString filename = QFileDialog::getOpenFileName(this,QString("Open fiff event data file"),QString("./MNE-sample-data/MEG/sample/"),tr("fif event data files (*-eve.fif);;fif data files (*.fif)"));
-    if(m_qFileRaw.isOpen())
-        m_qFileRaw.close();
-    m_qFileRaw.setFileName(filename);
+    if(m_qFileEvent.isOpen())
+        m_qFileEvent.close();
+    m_qFileEvent.setFileName(filename);
 
-    if(m_pEventModel->loadEventData(m_qFileRaw)) {
+    if(m_pEventModel->loadEventData(m_qFileEvent)) {
         qDebug() << "Fiff event data file" << filename << "loaded.";
     }
     else
@@ -347,8 +405,39 @@ void MainWindow::loadEvents()
 
     setWindowStatus();
 
-    //set position of QScrollArea
-    setScrollBarPosition(0);
+    //Show event widget
+    showEventWindow();
+
+    //Set event data in the delegate
+    m_pRawDelegate->setEventData(m_pEventModel->m_data);
+}
+
+
+//*************************************************************************************************************
+
+void MainWindow::saveEvents()
+{
+    QString filename = QFileDialog::getSaveFileName(this,
+                                                    QString("Save fiff event data file"),
+                                                    QString("./MNE-sample-data/MEG/sample/"),
+                                                    tr("fif event data files (*-eve.fif);;fif data files (*.fif)"));
+    if(filename.isEmpty())
+    {
+        qDebug("USer aborted saving to fiff event data file");
+        return;
+    }
+
+    if(m_qFileEvent.isOpen())
+        m_qFileEvent.close();
+    m_qFileEvent.setFileName(filename);
+
+    if(m_pEventModel->saveEventData(m_qFileEvent)) {
+        qDebug() << "Fiff event data file" << filename << "saved.";
+    }
+    else
+        qDebug("ERROR saving fiff event data file %s",filename.toLatin1().data());
+
+    setWindowStatus();
 }
 
 
@@ -357,10 +446,10 @@ void MainWindow::loadEvents()
 void MainWindow::customContextMenuRequested(QPoint pos)
 {
     //obtain index where index was clicked
-    QModelIndex index = m_pTableView->indexAt(pos);
+    QModelIndex index = m_pRawTableView->indexAt(pos);
 
     //get selected items
-    QModelIndexList selected = m_pTableView->selectionModel()->selectedIndexes();
+    QModelIndexList selected = m_pRawTableView->selectionModel()->selectedIndexes();
 
     //create custom context menu and actions
     QMenu *menu = new QMenu(this);
@@ -439,7 +528,7 @@ void MainWindow::customContextMenuRequested(QPoint pos)
     menu->addMenu(undoFiltOpSubMenu);
 
     //show context menu
-    menu->popup(m_pTableView->viewport()->mapToGlobal(pos));
+    menu->popup(m_pRawTableView->viewport()->mapToGlobal(pos));
 }
 
 
@@ -447,7 +536,7 @@ void MainWindow::customContextMenuRequested(QPoint pos)
 
 void MainWindow::setScrollBarPosition(int pos)
 {
-    m_pTableView->horizontalScrollBar()->setValue(pos);
+    m_pRawTableView->horizontalScrollBar()->setValue(pos);
     qDebug() << "MainWindow: m_iAbsFiffCursor position set to" << (m_pRawModel->firstSample()+pos);
 }
 
@@ -475,3 +564,50 @@ void MainWindow::about()
              " NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE"
              " POSSIBILITY OF SUCH DAMAGE."));
 }
+
+
+//*************************************************************************************************************
+
+void MainWindow::showEventWindow()
+{
+    //Note: A widget that happens to be obscured by other windows on the screen is considered to be visible.
+    if(!m_wEventWidget->isVisible())
+    {
+        m_wEventWidget->setWindowTitle("Event list");
+        m_wEventWidget->show();
+        m_wEventWidget->raise();
+    }
+    else // if visible raise the widget to be sure that it is not obscured by other windows
+        m_wEventWidget->raise();
+
+    //Scale view to exact vertical length of the table entries
+    m_wEventWidget->resize(242, 350);
+}
+
+
+//*************************************************************************************************************
+
+void MainWindow::jumpToEvent(const QModelIndex & current, const QModelIndex & previous)
+{
+    Q_UNUSED(previous);
+
+    //Always get the first column 0 (sample) of the model
+    QModelIndex index = m_pEventModel->index(current.row(), 0);
+
+    //Get the sample value
+    int sample = m_pEventModel->data(index, Qt::DisplayRole).toInt();
+
+    //Jump to sample - put sample in the middle of the view (-m_pRawModel->m_iWindowSize/2)
+    int rawTableViewColumnWidth = m_pRawTableView->viewport()->width();
+
+    qDebug()<<"Jumping to Event at sample "<<sample<<"rawTableViewColumnWidth"<<rawTableViewColumnWidth;
+
+    if(sample-rawTableViewColumnWidth/2 < rawTableViewColumnWidth/2)
+        m_pRawTableView->horizontalScrollBar()->setValue(0);
+    else if(sample+rawTableViewColumnWidth/2 > m_pRawModel->lastSample()-rawTableViewColumnWidth/2)
+        m_pRawTableView->horizontalScrollBar()->setValue(m_pRawTableView->maximumWidth());
+    else
+        m_pRawTableView->horizontalScrollBar()->setValue(sample-rawTableViewColumnWidth/2);
+}
+
+

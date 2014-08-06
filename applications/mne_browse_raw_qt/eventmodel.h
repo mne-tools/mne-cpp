@@ -120,11 +120,15 @@ namespace MNEBrowseRawQt
 class EventModel : public QAbstractTableModel
 {
     Q_OBJECT
+
+    friend class MainWindow;
+
 public:
     EventModel(QObject *parent);
     EventModel(QFile& qFile, QObject *parent);
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
+    QVariant headerData(int section, Qt::Orientation orientation, int role) const;
     virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
 
     //=========================================================================================================
@@ -135,6 +139,30 @@ public:
     */
     bool loadEventData(QFile& qFile);
 
+    //=========================================================================================================
+    /**
+    * saveEventData saves events to a fiff event data file.
+    *
+    * @param p_IODevice fiff data event file to save to
+    */
+    bool saveEventData(QFile& qFile);
+
+    //=========================================================================================================
+    /**
+    * setFiffInfo sets the fiff info variabel.
+    *
+    * @param fiffInfo fiff infp variabel
+    */
+    void setFiffInfo(FiffInfo& fiffInfo);
+
+    //=========================================================================================================
+    /**
+    * setFirstSample sets the first/starting sample of the loaded fiff data file.
+    *
+    * @param firstSample first sample value
+    */
+    void setFirstSample(int firstSample);
+
 private:
     //=========================================================================================================
     /**
@@ -142,8 +170,11 @@ private:
     */
     void clearModel();
 
-    MatrixXi        m_data;        /**< Matrix that holds the loaded events from the event file. */
+    MatrixXi        m_data;         /**< Matrix that holds the loaded events from the event file. */
 
+    FiffInfo        m_fiffInfo;     /**< fiff info of whole fiff file */
+
+    int             m_iFirstSample; /**< holds the first/starting sample of the fiff data file */
 };
 
 } // NAMESPACE
