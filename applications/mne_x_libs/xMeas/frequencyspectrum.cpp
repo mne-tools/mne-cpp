@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     realtimesourceestimate.cpp
+* @file     frequencyspectrum.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     July, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the RealTimeSourceEstimate class.
+* @brief    Contains the implementation of the FrequencySpectrum class.
 *
 */
 
@@ -38,13 +38,15 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "realtimesourceestimate.h"
+#include "frequencyspectrum.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
+
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -53,7 +55,6 @@
 //=============================================================================================================
 
 using namespace XMEASLIB;
-//using namespace IOBuffer;
 
 
 //*************************************************************************************************************
@@ -61,11 +62,17 @@ using namespace XMEASLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RealTimeSourceEstimate::RealTimeSourceEstimate(QObject *parent)
-: NewMeasurement(QMetaType::type("RealTimeSourceEstimate::SPtr"), parent)
-, m_bStcSend(true)
-, m_pMNEStc(new MNESourceEstimate)
-, m_bInitialized(false)
+FrequencySpectrum::FrequencySpectrum(QObject *parent)
+: NewMeasurement(QMetaType::type("FrequencySpectrum::SPtr"), parent)
+, m_bIsInit(false)
+, m_bContainsValues(false)
+{
+}
+
+
+//*************************************************************************************************************
+
+FrequencySpectrum::~FrequencySpectrum()
 {
 
 }
@@ -73,35 +80,31 @@ RealTimeSourceEstimate::RealTimeSourceEstimate(QObject *parent)
 
 //*************************************************************************************************************
 
-RealTimeSourceEstimate::~RealTimeSourceEstimate()
+void FrequencySpectrum::initFromFiffInfo(FiffInfo::SPtr &p_pFiffInfo)
 {
+    m_pFiffInfo = p_pFiffInfo;
 
+    m_bIsInit = true;
 }
 
 
 //*************************************************************************************************************
 
-MNESourceEstimate::SPtr& RealTimeSourceEstimate::getValue()
+MatrixXd FrequencySpectrum::getValue() const
 {
-    QMutexLocker locker(&m_qMutex);
-    return m_pMNEStc;
+    return m_matValue;
 }
 
 
 //*************************************************************************************************************
 
-void RealTimeSourceEstimate::setValue(MNESourceEstimate& v)
+void FrequencySpectrum::setValue(MatrixXd& v)
 {
-    m_qMutex.lock();
-
     //Store
-    *m_pMNEStc = v;
-
-    m_bInitialized = true;
-
-    m_qMutex.unlock();
-
+    m_matValue = v;
     emit notify();
 
+    if(!m_bContainsValues)
+        m_bContainsValues = true;
 }
 

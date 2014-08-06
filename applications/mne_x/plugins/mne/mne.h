@@ -54,9 +54,7 @@
 #include <mne/mne_forwardsolution.h>
 #include <mne/mne_sourceestimate.h>
 #include <inverse/minimumNorm/minimumnorm.h>
-#include <rtInv/rtcov.h>
 #include <rtInv/rtinvop.h>
-#include <rtInv/rtave.h>
 
 #include <xMeas/realtimesourceestimate.h>
 #include <xMeas/realtimecov.h>
@@ -167,6 +165,7 @@ public:
     /**
     * Slot to update the fiff evoked
     *
+    * @param[in] pMeasurement   The evoked to be appended
     */
     void updateRTE(XMEASLIB::NewMeasurement::SPtr pMeasurement);
 
@@ -200,7 +199,7 @@ private:
 
     PluginOutputData<RealTimeSourceEstimate>::SPtr      m_pRTSEOutput;  /**< The RealTimeSourceEstimate output.*/
 
-    QMutex mutex;
+    QMutex m_qMutex;
 
     QVector<FiffEvoked> m_qVecFiffEvoked;
     qint32 m_iNumAverages;
@@ -226,7 +225,7 @@ private:
 
     FiffInfo::SPtr              m_pFiffInfo;        /**< Fiff information. */
     FiffInfo::SPtr              m_pFiffInfoEvoked;  /**< Fiff information of the evoked. */
-    QStringList                 m_qListCovChNames;      /**< Covariance channel names. */
+    QStringList                 m_qListCovChNames;  /**< Covariance channel names. */
     FiffInfoBase::SPtr          m_pFiffInfoForward; /**< Fiff information of the forward solution. */
 
     QStringList                 m_qListPickChannels;        /**< Channels to pick */

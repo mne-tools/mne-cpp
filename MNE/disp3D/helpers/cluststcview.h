@@ -89,6 +89,8 @@ public:
 
     ClustStcView(bool showRegions = true, bool isStereo = true, QGLView::StereoType stereo = QGLView::RedCyanAnaglyph, QWindow *parent = 0);
 
+    ~ClustStcView();
+
     void dataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight, const QVector<int> &roles = QVector<int> ());
 
     void setModel(ClustStcModel* model);

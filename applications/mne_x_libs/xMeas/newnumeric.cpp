@@ -75,7 +75,9 @@ NewNumeric::~NewNumeric()
 
 void NewNumeric::setValue(double v)
 {
+    m_qMutex.lock();
     m_dValue = v;
+    m_qMutex.unlock();
     emit notify();
 }
 
@@ -84,5 +86,6 @@ void NewNumeric::setValue(double v)
 
 double NewNumeric::getValue() const
 {
+    QMutexLocker locker(&m_qMutex);
     return m_dValue;
 }

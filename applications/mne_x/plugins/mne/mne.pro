@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------------------------------------------
 #
-# @file     sourcelab.pro
+# @file     mne.pro
 # @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 # @version  1.0
@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 #
 #
-# @brief    This project file generates the makefile for the sourcelab plug-in.
+# @brief    This project file generates the makefile for the mne plug-in.
 #
 #--------------------------------------------------------------------------------------------------------------
 
@@ -43,7 +43,7 @@ DEFINES += MNE_LIBRARY
 
 QT += core widgets concurrent
 
-TARGET = sourcelab
+TARGET = mne
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }

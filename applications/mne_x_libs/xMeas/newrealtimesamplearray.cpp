@@ -86,6 +86,7 @@ NewRealTimeSampleArray::~NewRealTimeSampleArray()
 
 double NewRealTimeSampleArray::getValue() const
 {
+    QMutexLocker locker(&m_qMutex);
     return m_dValue;
 }
 
@@ -94,13 +95,17 @@ double NewRealTimeSampleArray::getValue() const
 
 void NewRealTimeSampleArray::setValue(double v)
 {
+    m_qMutex.lock();
     if(v < m_dMinValue) v = m_dMinValue;
     else if(v > m_dMaxValue) v = m_dMaxValue;
     m_dValue = v;
     m_vecSamples.push_back(m_dValue);
+    m_qMutex.unlock();
     if(m_vecSamples.size() >= m_ucArraySize)
     {
         emit notify();
+        m_qMutex.lock();
         m_vecSamples.clear();
+        m_qMutex.unlock();
     }
 }
