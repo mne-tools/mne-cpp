@@ -191,7 +191,7 @@ private:
     void initConnector();
 
 
-    QMutex mutex;
+    QMutex m_qMutex;        /**< Provides access serialization between threads*/
 
     PluginInputData<NewRealTimeMultiSampleArray>::SPtr   m_pAveragingInput;     /**< The RealTimeSampleArray of the Averaging input.*/
     PluginOutputData<RealTimeEvoked>::SPtr  m_pAveragingOutput;                 /**< The RealTimeEvoked of the Averaging output.*/
