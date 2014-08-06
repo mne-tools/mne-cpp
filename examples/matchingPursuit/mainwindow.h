@@ -247,6 +247,7 @@ private:
     QStandardItemModel* tbv_model;
     QStandardItem* tbv_item;
     std::vector<QStandardItem*> tbv_items;
+
     //==========================================================================================================
     /**
     * MainWindow_open_file
@@ -258,6 +259,7 @@ private:
     * @return void
     */
     void open_file();
+
     //==========================================================================================================
     /**
     * MainWindow_read_matlab_file
@@ -271,6 +273,7 @@ private:
     * @return void
     */
     void read_matlab_file(QString fileName);
+
     //==========================================================================================================
     /**
     * MainWindow_calc_adaptive_mp
@@ -285,6 +288,7 @@ private:
     * @return void
     */
     void calc_adaptiv_mp(MatrixXd signal, TruncationCriterion criterion);
+
     //==========================================================================================================
     /**
     * MainWindow_read_fiff_file
@@ -298,8 +302,8 @@ private:
     * @return gibt 0 zurück wenn erflogreich sonst ungleich 0
     */
     qint32 read_fiff_file(QString fileName);
-    //==========================================================================================================
 
+    //==========================================================================================================
     /**
     * MainWindow_read_fiff_file
     *
@@ -313,9 +317,9 @@ private:
 
     //==========================================================================================================
 
-    //QList<qreal> norm_signal(QList<qreal> signalSamples);
-    //QStringList correlation(VectorXd signalSamples, QList<qreal> atomSamples, QString atomName);
-    //VectorXd mpCalc(QFile& dictionary, VectorXd signalSamples, qint32 iterationsCount);
+    QList<qreal> norm_signal(QList<qreal> signalSamples);
+    QStringList correlation(VectorXd signalSamples, QList<qreal> atomSamples, QString atomName);
+    VectorXd mpCalc(QFile& dictionary, VectorXd signalSamples, qint32 iterationsCount);
 
 };
 
