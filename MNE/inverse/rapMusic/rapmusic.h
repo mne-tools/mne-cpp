@@ -109,10 +109,14 @@ typedef struct Pair
 class INVERSESHARED_EXPORT RapMusic : public IInverseAlgorithm
 {
 public:
+    typedef QSharedPointer<RapMusic> SPtr;             /**< Shared pointer type for RapMusic. */
+    typedef QSharedPointer<const RapMusic> ConstSPtr;  /**< Const shared pointer type for RapMusic. */
+
     //*********************************************************************************************************
     //=========================================================================================================
     // TYPEDEFS
     //=========================================================================================================
+
     typedef Eigen::Matrix<double, Eigen::Dynamic, Eigen::Dynamic> MatrixXT;  /**< Defines Eigen::Matrix<T, Eigen::Dynamic,
                                                                              Eigen::Dynamic> as MatrixXT type. */
     typedef Eigen::Matrix<double, Eigen::Dynamic, 6> MatrixX6T;              /**< Defines Eigen::Matrix<T, Eigen::Dynamic,

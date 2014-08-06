@@ -56,7 +56,6 @@
 //=============================================================================================================
 
 #include <QAbstractTableModel>
-#include <QThread>
 #include <QVector3D>
 #include <QMap>
 
@@ -112,6 +111,8 @@ public:
 
     ClustStcModel(QObject *parent = 0);
 
+    ~ClustStcModel();
+
     virtual int rowCount(const QModelIndex &parent = QModelIndex()) const ;
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
 
@@ -151,14 +152,12 @@ public:
 
 
 private:
-    QSharedPointer<QThread> m_pThread;
-    ClustStcWorker::SPtr         m_pWorker;
+    ClustStcWorker::SPtr    m_pWorker;
 
     bool m_bRTMode;
     bool m_bModelInit;
     bool m_bDataInit;
     bool m_bIntervallSet;
-
 
     VectorXi m_vertLabelIds;
 

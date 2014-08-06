@@ -5,6 +5,7 @@
 //=============================================================================================================
 
 #include "realtimebutterflyplot.h"
+#include "../realtimeevokedwidget.h"
 
 
 //*************************************************************************************************************
@@ -35,6 +36,11 @@ RealTimeButterflyPlot::RealTimeButterflyPlot(QWidget *parent)
 , m_pRealTimeEvokedModel(NULL)
 , m_bIsInit(false)
 , m_iNumChannels(-1)
+, showMAG(true)
+, showGRAD(false)
+, showEEG(false)
+, showEOG(false)
+, showMISC(false)
 {
 }
 
@@ -87,33 +93,46 @@ void RealTimeButterflyPlot::paintEvent(QPaintEvent*)
         {
             qint32 kind = m_pRealTimeEvokedModel->getKind(r);
 
-            //ToDo display only selected kinds
+            //Display only selected kinds
             switch(kind) {
-//                case FIFFV_MEG_CH: {
-//                    qint32 unit = m_pRealTimeEvokedModel->getUnit(row);
-//                    if(unit == FIFF_UNIT_T_M) {
-//                        fMaxValue = 1e-10f;// m_qSettings.value("RawDelegate/max_meg_grad").toDouble();
-//                    }
-//                    else if(unit == FIFF_UNIT_T)
-//                    {
-//                        if(m_pRealTimeEvokedModel->getCoil(row) == FIFFV_COIL_BABY_MAG)
-//                            fMaxValue = 1e-4f;
-//                        else
-//                            fMaxValue = 1e-11f;// m_qSettings.value("RawDelegate/max_meg_mag").toDouble();
-//                    }
-//                    break;
-//                }
-                case FIFFV_EEG_CH: {
-                    break;
+                case FIFFV_MEG_CH: {
+                    qint32 unit = m_pRealTimeEvokedModel->getUnit(r);
+                    if(unit == FIFF_UNIT_T_M) {
+                        if(showGRAD)
+                            break;
+                        else
+                            continue;
+                    }
+                    else if(unit == FIFF_UNIT_T)
+                    {
+                        if(showMAG)
+                            break;
+                        else
+                            continue;
+                    }
+                    continue;
                 }
-//                case FIFFV_EOG_CH: {
-//                    fMaxValue = 1e-3f; //m_qSettings.value("RawDelegate/max_eog").toDouble();
-//                    break;
-//                }
+                case FIFFV_EEG_CH: {
+                    if(showEEG)
+                        break;
+                    else
+                        continue;
+                }
+                case FIFFV_EOG_CH: {
+                    if(showEOG)
+                        break;
+                    else
+                        continue;
+                }
+                case FIFFV_MISC_CH: {
+                    if(showMISC)
+                        break;
+                    else
+                        continue;
+                }
                 default:
                     continue;
             }
-
 
             painter.save();
             painter.setPen(QPen(m_pRealTimeEvokedModel->getColor(r), 1));
@@ -140,24 +159,22 @@ void RealTimeButterflyPlot::createPlotPath(qint32 row, QPainterPath& path) const
     switch(kind) {
         case FIFFV_MEG_CH: {
             qint32 unit = m_pRealTimeEvokedModel->getUnit(row);
-            if(unit == FIFF_UNIT_T_M) {
-                fMaxValue = 1e-10f;// m_qSettings.value("RawDelegate/max_meg_grad").toDouble();
-            }
+            if(unit == FIFF_UNIT_T_M)
+                fMaxValue = fMaxGRAD;
             else if(unit == FIFF_UNIT_T)
-            {
-                if(m_pRealTimeEvokedModel->getCoil(row) == FIFFV_COIL_BABY_MAG)
-                    fMaxValue = 1e-4f;
-                else
-                    fMaxValue = 1e-11f;// m_qSettings.value("RawDelegate/max_meg_mag").toDouble();
-            }
+                fMaxValue = fMaxMAG;
             break;
         }
         case FIFFV_EEG_CH: {
-            fMaxValue = 1e-4f;// m_qSettings.value("RawDelegate/max_eeg").toDouble();
+            fMaxValue = fMaxEEG;
             break;
         }
         case FIFFV_EOG_CH: {
-            fMaxValue = 1e-3f; //m_qSettings.value("RawDelegate/max_eog").toDouble();
+            fMaxValue = fMaxEOG;
+            break;
+        }
+        case FIFFV_MISC_CH: {
+            fMaxValue = fMaxMISC;
             break;
         }
         default:
@@ -234,4 +251,44 @@ void RealTimeButterflyPlot::createPlotPath(qint32 row, QPainterPath& path) const
 
 //        lastPath.lineTo(qSamplePosition);
 //    }
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeButterflyPlot::setSettings(const QList< Modality >& p_qListModalities)
+{
+    for(qint32 i = 0; i < p_qListModalities.size(); ++i)
+    {
+        if(p_qListModalities[i].m_sName == ("GRAD"))
+        {
+            showGRAD = p_qListModalities[i].m_bActive;
+            fMaxGRAD = p_qListModalities[i].m_fNorm;
+        }
+
+        if(p_qListModalities[i].m_sName == ("MAG"))
+        {
+            showMAG = p_qListModalities[i].m_bActive;
+            fMaxMAG = p_qListModalities[i].m_fNorm;
+        }
+        if(p_qListModalities[i].m_sName == ("EEG"))
+        {
+            showEEG = p_qListModalities[i].m_bActive;
+            fMaxEEG = p_qListModalities[i].m_fNorm;
+
+        }
+        if(p_qListModalities[i].m_sName == ("EOG"))
+        {
+            showEOG = p_qListModalities[i].m_bActive;
+            fMaxEOG = p_qListModalities[i].m_fNorm;
+
+        }
+        if(p_qListModalities[i].m_sName == ("MISC"))
+        {
+            showMISC = p_qListModalities[i].m_bActive;
+            fMaxMISC = p_qListModalities[i].m_fNorm;
+
+        }
+    }
+    update();
 }

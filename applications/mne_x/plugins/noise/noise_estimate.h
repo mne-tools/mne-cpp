@@ -48,7 +48,7 @@
 #include <mne_x/Interfaces/IAlgorithm.h>
 #include <generics/circularmatrixbuffer.h>
 #include <xMeas/newrealtimemultisamplearray.h>
-#include <xMeas/noiseestimation.h>
+#include <xMeas/frequencyspectrum.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -180,7 +180,7 @@ private:
     void initConnector();
 
     PluginInputData<NewRealTimeMultiSampleArray>::SPtr   m_pRTMSAInput;     /**< The NewRealTimeMultiSampleArray of the noise plugin input.*/
-    PluginOutputData<NoiseEstimation>::SPtr  m_pNEOutput;                   /**< The NE of the noise plugin output.*/
+    PluginOutputData<FrequencySpectrum>::SPtr  m_pFSOutput;                   /**< The NE of the noise plugin output.*/
 
 
     FiffInfo::SPtr  m_pFiffInfo;                        /**< Fiff measurement info.*/

@@ -52,6 +52,8 @@
 
 #include <QSharedPointer>
 #include <QVector>
+#include <QMutex>
+#include <QMutexLocker>
 
 
 //*************************************************************************************************************
@@ -211,6 +213,8 @@ public:
     virtual double getValue() const;
 
 private:
+    mutable QMutex      m_qMutex;           /**< Mutex to ensure thread safety */
+
     double              m_dMinValue;        /**< Holds the minimal value.*/
     double              m_dMaxValue;        /**< Holds the maximal value.*/
     double              m_dSamplingRate;    /**< Holds sampling rate of the NewRealTimeSampleArray.*/
@@ -228,11 +232,13 @@ private:
 
 inline void NewRealTimeSampleArray::clear()
 {
+    QMutexLocker locker(&m_qMutex);
     m_vecSamples.clear();
 }
 
 inline void NewRealTimeSampleArray::setMinValue(double minValue)
 {
+    QMutexLocker locker(&m_qMutex);
     m_dMinValue = minValue;
 }
 
@@ -241,6 +247,7 @@ inline void NewRealTimeSampleArray::setMinValue(double minValue)
 
 inline double NewRealTimeSampleArray::getMinValue() const
 {
+    QMutexLocker locker(&m_qMutex);
     return m_dMinValue;
 }
 
@@ -249,6 +256,7 @@ inline double NewRealTimeSampleArray::getMinValue() const
 
 inline void NewRealTimeSampleArray::setMaxValue(double maxValue)
 {
+    QMutexLocker locker(&m_qMutex);
     m_dMaxValue = maxValue;
 }
 
@@ -257,6 +265,7 @@ inline void NewRealTimeSampleArray::setMaxValue(double maxValue)
 
 inline double NewRealTimeSampleArray::getMaxValue() const
 {
+    QMutexLocker locker(&m_qMutex);
     return m_dMaxValue;
 }
 
@@ -265,6 +274,7 @@ inline double NewRealTimeSampleArray::getMaxValue() const
 
 inline void NewRealTimeSampleArray::setSamplingRate(double dSamplingRate)
 {
+    QMutexLocker locker(&m_qMutex);
     m_dSamplingRate = dSamplingRate;
 }
 
@@ -273,6 +283,7 @@ inline void NewRealTimeSampleArray::setSamplingRate(double dSamplingRate)
 
 inline double NewRealTimeSampleArray::getSamplingRate() const
 {
+    QMutexLocker locker(&m_qMutex);
     return m_dSamplingRate;
 }
 
@@ -281,6 +292,7 @@ inline double NewRealTimeSampleArray::getSamplingRate() const
 
 inline void NewRealTimeSampleArray::setArraySize(unsigned char ucArraySize)
 {
+    QMutexLocker locker(&m_qMutex);
     //Obsolete unsigned char can't be bigger
 //    if(ucArraySize > 255)
 //        m_ucArraySize = 255;
@@ -293,6 +305,7 @@ inline void NewRealTimeSampleArray::setArraySize(unsigned char ucArraySize)
 
 unsigned char NewRealTimeSampleArray::getArraySize() const
 {
+    QMutexLocker locker(&m_qMutex);
     return m_ucArraySize;
 }
 
@@ -301,6 +314,7 @@ unsigned char NewRealTimeSampleArray::getArraySize() const
 
 inline const QVector<double>& NewRealTimeSampleArray::getSampleArray()
 {
+    QMutexLocker locker(&m_qMutex);
     return m_vecSamples;
 }
 
@@ -309,6 +323,7 @@ inline const QVector<double>& NewRealTimeSampleArray::getSampleArray()
 
 inline void NewRealTimeSampleArray::setUnit(const QString& unit)
 {
+    QMutexLocker locker(&m_qMutex);
     m_qString_Unit = unit;
 }
 
@@ -317,6 +332,7 @@ inline void NewRealTimeSampleArray::setUnit(const QString& unit)
 
 inline const QString& NewRealTimeSampleArray::getUnit() const
 {
+    QMutexLocker locker(&m_qMutex);
     return m_qString_Unit;
 }
 

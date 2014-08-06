@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     realtimesourceestimate.cpp
+* @file     rapmusictoolbox_global.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,16 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the RealTimeSourceEstimate class.
+* @brief    Contains the RapMusicToolbox library export/import macros.
 *
 */
 
-//*************************************************************************************************************
-//=============================================================================================================
-// INCLUDES
-//=============================================================================================================
-
-#include "realtimesourceestimate.h"
+#ifndef RAPMUSICTOOLBOX_GLOBAL_H
+#define RAPMUSICTOOLBOX_GLOBAL_H
 
 
 //*************************************************************************************************************
@@ -46,62 +42,18 @@
 // QT INCLUDES
 //=============================================================================================================
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-using namespace XMEASLIB;
-//using namespace IOBuffer;
+#include <QtCore/qglobal.h>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// PREPROCESSOR DEFINES
 //=============================================================================================================
 
-RealTimeSourceEstimate::RealTimeSourceEstimate(QObject *parent)
-: NewMeasurement(QMetaType::type("RealTimeSourceEstimate::SPtr"), parent)
-, m_bStcSend(true)
-, m_pMNEStc(new MNESourceEstimate)
-, m_bInitialized(false)
-{
+#if defined(RAPMUSICTOOLBOX_LIBRARY)
+#  define RAPMUSICTOOLBOXSHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#else
+#  define RAPMUSICTOOLBOXSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#endif
 
-}
-
-
-//*************************************************************************************************************
-
-RealTimeSourceEstimate::~RealTimeSourceEstimate()
-{
-
-}
-
-
-//*************************************************************************************************************
-
-MNESourceEstimate::SPtr& RealTimeSourceEstimate::getValue()
-{
-    QMutexLocker locker(&m_qMutex);
-    return m_pMNEStc;
-}
-
-
-//*************************************************************************************************************
-
-void RealTimeSourceEstimate::setValue(MNESourceEstimate& v)
-{
-    m_qMutex.lock();
-
-    //Store
-    *m_pMNEStc = v;
-
-    m_bInitialized = true;
-
-    m_qMutex.unlock();
-
-    emit notify();
-
-}
-
+#endif // RAPMUSICTOOLBOX_GLOBAL_H

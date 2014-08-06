@@ -48,8 +48,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QDebug>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -85,6 +83,7 @@ RealTimeCov::~RealTimeCov()
 
 FiffCov::SPtr& RealTimeCov::getValue()
 {
+    QMutexLocker locker(&m_qMutex);
     return m_pFiffCov;
 }
 
@@ -93,9 +92,11 @@ FiffCov::SPtr& RealTimeCov::getValue()
 
 void RealTimeCov::setValue(FiffCov& v)
 {
+    m_qMutex.lock();
     //Store
     *m_pFiffCov = v;
     m_bInitialized = true;
+    m_qMutex.unlock();
 
     emit notify();
 }
