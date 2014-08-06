@@ -124,7 +124,6 @@ MatrixXd _original_signal_matrix(0, 0);
 MatrixXd _atom_sum_matrix(0, 0);
 MatrixXd _residuum_matrix(0, 0);
 MatrixXd _real_residuum_matrix(0, 0);
-//MatrixXd _real_original_residuum_matrix(0, 0);
 
 //QList<QStringList> _result_atom_list;
 
@@ -347,40 +346,6 @@ void MainWindow::open_file()
     update();   
 }
 
-void MainWindow::read_fiff_file_new(QString file_name)
-{
-    this->cb_model->clear();
-    this->cb_items.clear();
-    _colors.clear();
-    _colors.append(QColor(0, 0, 0));
-
-    read_fiff_file(file_name);
-
-    _original_signal_matrix.resize(_signal_matrix.rows(), _signal_matrix.cols());
-    _original_signal_matrix = _signal_matrix;
-    ui->tbv_Results->setRowCount(0);
-
-    for(qint32 channels = 0; channels < _signal_matrix.cols(); channels++)
-    {
-        _colors.append(QColor::fromHsv(qrand() % 256, 255, 190));
-
-        this->cb_item = new QStandardItem;
-
-        this->cb_item->setText(QString("Channel %1").arg(channels));
-        this->cb_item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
-        this->cb_item->setData(Qt::Checked, Qt::CheckStateRole);
-        this->cb_model->insertRow(channels, this->cb_item);
-        this->cb_items.push_back(this->cb_item);
-        _select_channel_map.insert(channels, true);
-    }
-    ui->cb_channels->setModel(this->cb_model);
-    _original_colors = _colors;
-    _atom_sum_matrix.resize(_signal_matrix.rows(), _signal_matrix.cols()); //resize
-    _residuum_matrix.resize(_signal_matrix.rows(), _signal_matrix.cols()); //resize
-
-    update();
-}
-
 //*************************************************************************************************************************************
 
 void MainWindow::cb_selection_changed(const QModelIndex& topLeft, const QModelIndex& bottomRight)
@@ -425,10 +390,8 @@ void MainWindow::cb_selection_changed(const QModelIndex& topLeft, const QModelIn
 qint32 MainWindow::read_fiff_file(QString fileName)
 {
     QFile t_fileRaw(fileName);
-
     bool in_samples = false;
-
-    //bool keep_comp = true;
+    bool keep_comp = true;
 
     //
     //   Setup for reading the raw data
@@ -447,7 +410,7 @@ qint32 MainWindow::read_fiff_file(QString fileName)
 
     RowVectorXi picks = raw.info.pick_types(want_meg, want_eeg, want_stim, include, raw.info.bads);
 
-    /*
+
     //
     //   Set up projection
     //
@@ -501,8 +464,6 @@ qint32 MainWindow::read_fiff_file(QString fileName)
        }
     }
 
-    */
-
     //
     //   Read a data segment
     //   times output argument is optional
@@ -536,6 +497,42 @@ qint32 MainWindow::read_fiff_file(QString fileName)
     //std::cout << _datas.block(0,0,10,10) << std::endl;
 
     return 0;
+}
+
+//*************************************************************************************************************************************
+
+void MainWindow::read_fiff_file_new(QString file_name)
+{
+    this->cb_model->clear();
+    this->cb_items.clear();
+    _colors.clear();
+    _colors.append(QColor(0, 0, 0));
+
+    read_fiff_file(file_name);
+
+    _original_signal_matrix.resize(_signal_matrix.rows(), _signal_matrix.cols());
+    _original_signal_matrix = _signal_matrix;
+    ui->tbv_Results->setRowCount(0);
+
+    for(qint32 channels = 0; channels < _signal_matrix.cols(); channels++)
+    {
+        _colors.append(QColor::fromHsv(qrand() % 256, 255, 190));
+
+        this->cb_item = new QStandardItem;
+
+        this->cb_item->setText(QString("Channel %1").arg(channels));
+        this->cb_item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
+        this->cb_item->setData(Qt::Checked, Qt::CheckStateRole);
+        this->cb_model->insertRow(channels, this->cb_item);
+        this->cb_items.push_back(this->cb_item);
+        _select_channel_map.insert(channels, true);
+    }
+    ui->cb_channels->setModel(this->cb_model);
+    _original_colors = _colors;
+    _atom_sum_matrix.resize(_signal_matrix.rows(), _signal_matrix.cols()); //resize
+    _residuum_matrix.resize(_signal_matrix.rows(), _signal_matrix.cols()); //resize
+
+    update();
 }
 
 //*************************************************************************************************************************************
@@ -1100,7 +1097,7 @@ void MainWindow::on_btt_Calc_clicked()
     if(ui->rb_OwnDictionary->isChecked())
     {
         QFile ownDict(QString("Matching-Pursuit-Toolbox/%1.dict").arg(ui->cb_Dicts->currentText()));
-        //residuumVector =  mpCalc(ownDict, signalVector, 0);
+        _residuum_matrix.col(0) =  mpCalc(ownDict, _signal_matrix.col(0), ui->sb_Iterations->value());
         update();
     }
     else if(ui->rb_adativMp->isChecked())
@@ -1154,11 +1151,11 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
     atomTranslationItem->setTextAlignment(0x0082);
     atomModulationItem->setTextAlignment(0x0082);
     atomPhaseItem->setTextAlignment(0x0082);
-    ui->tbv_Results->setItem(atom_res_list.length()-1, 0, atomEnergieItem);
-    ui->tbv_Results->setItem(atom_res_list.length()-1, 1, atomScaleItem);
-    ui->tbv_Results->setItem(atom_res_list.length()-1, 2, atomTranslationItem);
-    ui->tbv_Results->setItem(atom_res_list.length()-1, 3, atomModulationItem);
-    ui->tbv_Results->setItem(atom_res_list.length()-1, 4, atomPhaseItem);
+    ui->tbv_Results->setItem(atom_res_list.length() - 1, 0, atomEnergieItem);
+    ui->tbv_Results->setItem(atom_res_list.length() - 1, 1, atomScaleItem);
+    ui->tbv_Results->setItem(atom_res_list.length() - 1, 2, atomTranslationItem);
+    ui->tbv_Results->setItem(atom_res_list.length() - 1, 3, atomModulationItem);
+    ui->tbv_Results->setItem(atom_res_list.length() - 1, 4, atomPhaseItem);
 
     qint32 prgrsbar_adapt = 99;
 
@@ -1269,7 +1266,6 @@ void MainWindow::calc_thread_finished()
     ui->cb_all_select->setEnabled(true);
 
     _real_residuum_matrix = _residuum_matrix;
-    //_real_original_residuum_matrix = _real_residuum_matrix;
 
     for(qint32 i = 0; i < _my_atom_list.count(); i++)
         _select_atoms_map.insert(i, true);
@@ -1341,11 +1337,14 @@ void MainWindow::calc_adaptiv_mp(MatrixXd signal, TruncationCriterion criterion)
 
 //************************************************************************************************************************************
 
-/*
- * TODO: Calc MP (new)
+// TODO: Calc MP (new)
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 VectorXd MainWindow::mpCalc(QFile &currentDict, VectorXd signalSamples, qint32 iterationsCount)
 {
+    GaborAtom* gabor_Atom = new GaborAtom;
+    QList<GaborAtom> atom_res_list;
+    _atom_sum_matrix = MatrixXd::Zero(256,1);
+
     bool isDouble = false;
 
     qint32 atomCount = 0;
@@ -1362,13 +1361,10 @@ VectorXd MainWindow::mpCalc(QFile &currentDict, VectorXd signalSamples, qint32 i
     QList<qreal> atomSamples;
     QList<QStringList> correlationList;
     VectorXd originalSignalSamples;
-    VectorXd residuum;
+    VectorXd residuum = _signal_matrix.col(0);
     VectorXd bestCorrAtomSamples;
     VectorXd normBestCorrAtomSamples;
 
-    residuum(0);
-    bestCorrAtomSamples(0);
-    normBestCorrAtomSamples(0);
     originalSignalSamples = signalSamples;    
 
     // Liest das Woerterbuch aus und gibt die Samples und den Namen an die Skalarfunktion weiter
@@ -1423,7 +1419,8 @@ VectorXd MainWindow::mpCalc(QFile &currentDict, VectorXd signalSamples, qint32 i
             }
         }
 
-        // Sucht das passende Atom im Woerterbuch und traegt des Werte in eine Liste
+
+        // Sucht das passende Atom im Woerterbuch und traegt dessen Werte in eine Liste
         if (currentDict.open (QIODevice::ReadOnly))
         {
             bool hasFound = false;
@@ -1433,19 +1430,24 @@ VectorXd MainWindow::mpCalc(QFile &currentDict, VectorXd signalSamples, qint32 i
                 contents = currentDict.readLine();
                 if(QString::compare(contents, bestCorrName) == 0)
                 {
-                    contents = "";
-                    while(!contents.contains("_ATOM_"))
-                    {
-                        contents = currentDict.readLine();
-                        sample = contents.toDouble(&isDouble);
-                        if(isDouble)
-                        {
-                            bestCorrAtomSamples[j] = sample;
-                            j++;
-                        }
-                        if(currentDict.atEnd())
-                            break;
-                    }
+                    contents = currentDict.readLine();
+
+                    QStringList list = contents.split(':');
+                    QString t = list.at(1);
+                    gabor_Atom->sample_count = 256;
+                    gabor_Atom->scale = t.remove(QRegExp("[modu].")).toDouble();
+                    gabor_Atom->translation = bestCorrStartIndex + (256 / 2) ;
+                    t = list.at(2);
+                    gabor_Atom->modulation = t.remove(QRegExp("[phase].")).toDouble();
+                    t = list.at(3);
+                    gabor_Atom->phase = t.remove(QRegExp("[chirp].")).toDouble();
+                    gabor_Atom->max_scalar_product = bestCorrValue;
+
+                    std::cout << "\n" << "===============" << " found parameters " << 1 << "===============" << ":\n\n"<<
+                                 "scale: " << gabor_Atom->scale << " trans: " << gabor_Atom->translation <<
+                                 " modu: " << gabor_Atom->modulation << " phase: " << gabor_Atom->phase << " scalarproduct: " << gabor_Atom->max_scalar_product << "\n";
+
+                    atom_res_list.append(*gabor_Atom);
                     hasFound = true;
                 }
                 if(hasFound) break;
@@ -1453,6 +1455,68 @@ VectorXd MainWindow::mpCalc(QFile &currentDict, VectorXd signalSamples, qint32 i
         }        
         currentDict.close();
 
+        ui->lb_IterationsProgressValue->setText(QString::number(iterationsCount));
+
+        //current atoms list update
+
+
+        ui->tbv_Results->setRowCount(atom_res_list.length());
+        ui->tbv_Results->setRowCount(2);
+
+
+        for(qint32 i = 0; i < atom_res_list.length(); i++)
+        {
+            qreal phase = atom_res_list.at(i).phase;
+            if(phase > 2*PI)
+                 phase = phase - 2*PI;
+
+            QTableWidgetItem* atomEnergieItem = new QTableWidgetItem(QString::number(4.0000, 'f', 2));
+            QTableWidgetItem* atomScaleItem = new QTableWidgetItem(QString::number(atom_res_list.at(i).scale / ui->sb_sample_rate->value(), 'g', 3));
+            QTableWidgetItem* atomTranslationItem = new QTableWidgetItem(QString::number(atom_res_list.at(i).translation / qreal(ui->sb_sample_rate->value()) + _from, 'g', 4));
+            QTableWidgetItem* atomModulationItem = new QTableWidgetItem(QString::number(atom_res_list.at(i).modulation * _sample_rate / atom_res_list.last().sample_count, 'g', 3));
+            QTableWidgetItem* atomPhaseItem = new QTableWidgetItem(QString::number(phase, 'g', 3));
+
+
+            atomEnergieItem->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
+            atomScaleItem->setFlags(Qt::ItemIsEnabled);
+            atomTranslationItem->setFlags(Qt::ItemIsEnabled);
+            atomModulationItem->setFlags(Qt::ItemIsEnabled);
+            atomPhaseItem->setFlags(Qt::ItemIsEnabled);
+
+            atomEnergieItem->setCheckState(Qt::Checked);
+
+            atomEnergieItem->setTextAlignment(0x0082);
+            atomScaleItem->setTextAlignment(0x0082);
+            atomTranslationItem->setTextAlignment(0x0082);
+            atomModulationItem->setTextAlignment(0x0082);
+            atomPhaseItem->setTextAlignment(0x0082);
+            ui->tbv_Results->setItem(i, 0, atomEnergieItem);
+            ui->tbv_Results->setItem(i, 1, atomScaleItem);
+            ui->tbv_Results->setItem(i, 2, atomTranslationItem);
+            ui->tbv_Results->setItem(i, 3, atomModulationItem);
+            ui->tbv_Results->setItem(i, 4, atomPhaseItem);
+
+
+            //recieve the resulting atomparams
+            GaborAtom gaborAtom = atom_res_list.at(i);
+
+            //for(qint32 i = 0; i < _signal_matrix.cols(); i++)
+            //{
+                VectorXd discret_atom = gaborAtom.create_real(gaborAtom.sample_count, gaborAtom.scale, gaborAtom.translation, gaborAtom.modulation, gaborAtom.phase);
+
+                _atom_sum_matrix += gaborAtom.max_scalar_product * discret_atom;
+                _residuum_matrix -= gaborAtom.max_scalar_product  * discret_atom;
+            //}
+            update();
+            _tbv_is_loading = false;
+        }
+    }
+
+    calc_thread_finished();
+    return residuum;
+
+
+        /*
         // Quadratische Normierung des Atoms auf den Betrag 1 und Multiplikation mit dem Skalarproduktkoeffizenten
         //**************************** Im Moment weil Testwoerterbuecher nicht nomiert ***********************************
 
@@ -1465,6 +1529,7 @@ VectorXd MainWindow::mpCalc(QFile &currentDict, VectorXd signalSamples, qint32 i
             normBestCorrAtomSamples[i] = (bestCorrAtomSamples[i] / normFacktorAtom) * bestCorrValue;
 
         //**************************************************************************************************************
+
 
         // Subtraktion des Atoms vom Signal
         for(qint32 m = 0; m < normBestCorrAtomSamples.rows(); m++)
@@ -1502,7 +1567,7 @@ VectorXd MainWindow::mpCalc(QFile &currentDict, VectorXd signalSamples, qint32 i
             newSignalString.append(QString("%1/n").arg(normBestCorrAtomSamples[i]));
 
         bestAtom.append(newSignalString);
-        globalResultAtomList.append(bestAtom);
+        //globalResultAtomList.append(bestAtom);
 
 
         //***************** DEBUGGOUT **********************************************************************************
@@ -1532,7 +1597,7 @@ VectorXd MainWindow::mpCalc(QFile &currentDict, VectorXd signalSamples, qint32 i
         newSignal.close();
 
         //**************************************************************************************************************
-
+/*
 
         // Eintragen und Zeichnen der Ergebnisss in die Liste der UI
         ui->tw_Results->setRowCount(iterationsCount);
@@ -1592,8 +1657,10 @@ VectorXd MainWindow::mpCalc(QFile &currentDict, VectorXd signalSamples, qint32 i
             if(sollEnergie < residuumEnergie)
                 residuum = mpCalc(currentDict, residuum, iterationsCount);
         }
-    }
-    return residuum;
+        */
+    //}
+
+
 }
 
 
@@ -1613,6 +1680,7 @@ QStringList MainWindow::correlation(VectorXd signalSamples, QList<qreal> atomSam
     resultList.clear();
     tempList.clear();
 
+    /*
     // Quadratische Normierung des Atoms auf den Betrag 1
     //**************************** Im Moment weil Testwoerterbuecher nicht nomiert ***************************************
 
@@ -1626,13 +1694,19 @@ QStringList MainWindow::correlation(VectorXd signalSamples, QList<qreal> atomSam
         atomSamples.removeAt(i);
         atomSamples.insert(i, tempVarAtom);
     }
+    */
 
     // Fuellt das Signal vorne und hinten mit nullen auf damit Randwertproblem umgangen wird
-    for(qint32 l = 0; l < atomSamples.length() - 1; l++)
+    MatrixXd null_signal_samples(2,2);
+    null_signal_samples = MatrixXd::Zero(signalSamples.rows() + (2 * atomSamples.length()), 1);
+    qint32 j = 0;
+    for(qint32 i = atomSamples.length(); i < atomSamples.length() +  signalSamples.rows(); i++)
     {
-        //signalSamples.append(0);
-        //signalSamples.prepend(0);
+        null_signal_samples.row(i) = signalSamples.row(j);
+        j++;
     }
+
+
 
     //******************************************************************************************************************
 
@@ -1641,7 +1715,7 @@ QStringList MainWindow::correlation(VectorXd signalSamples, QList<qreal> atomSam
         // Inners Produkt des Signalteils mit dem Atom
         for(qint32 g = 0; g < atomSamples.length(); g++)
         {
-            tempList.append(signalSamples[g + j] * atomSamples.at(g));
+            tempList.append(null_signal_samples(g + j, 0) * atomSamples.at(g));
             sum += tempList.at(g);
         }
         scalarList.append(sum);
@@ -1669,7 +1743,7 @@ QStringList MainWindow::correlation(VectorXd signalSamples, QList<qreal> atomSam
     // dem Index des hoechsten Korrelationswertes minus die halbe Atomlaenge,
 
 }
-*/
+
 
 //*****************************************************************************************************************
 
