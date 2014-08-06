@@ -154,6 +154,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Returns the reference to the current info.
+    *
+    * @return the reference to the current info.
+    */
+    inline FiffInfo& info();
+
+    //=========================================================================================================
+    /**
     * New devoked to distribute
     *
     * @param [in] v     the evoked which should be distributed.
@@ -190,12 +198,16 @@ private:
 
     FiffEvoked::SPtr            m_pFiffEvoked;      /**< Evoked data set */
 
+    FiffInfo                    m_fiffInfo;        /**< Fiff info */
+
     QString                     m_sXMLLayoutFile;   /**< Layout file name. */
 
     qint32                      m_iPreStimSamples;  /**< Number of pre-stimulus samples */
 
     QList<QColor>               m_qListChColors;    /**< Channel color for butterfly plot.*/
+
     QList<RealTimeSampleArrayChInfo> m_qListChInfo; /**< Channel info list.*/
+
     bool                        m_bInitialized;     /**< If values are stored.*/
 };
 
@@ -226,7 +238,7 @@ inline void RealTimeEvoked::setXMLLayoutFile(const QString& layout)
 inline unsigned int RealTimeEvoked::getNumChannels() const
 {
     QMutexLocker locker(&m_qMutex);
-    return m_qListChInfo.size();
+    return m_pFiffEvoked->info.nchan;
 }
 
 
@@ -254,6 +266,15 @@ inline QList<RealTimeSampleArrayChInfo>& RealTimeEvoked::chInfo()
 {
     QMutexLocker locker(&m_qMutex);
     return m_qListChInfo;
+}
+
+
+//*************************************************************************************************************
+
+inline FiffInfo& RealTimeEvoked::info()
+{
+    QMutexLocker locker(&m_qMutex);
+    return m_fiffInfo;
 }
 
 
