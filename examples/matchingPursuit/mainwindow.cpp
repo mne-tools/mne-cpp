@@ -124,6 +124,7 @@ MatrixXd _original_signal_matrix(0, 0);
 MatrixXd _atom_sum_matrix(0, 0);
 MatrixXd _residuum_matrix(0, 0);
 MatrixXd _real_residuum_matrix(0, 0);
+QTimer *timer = new QTimer();
 
 //QList<QStringList> _result_atom_list;
 
@@ -140,27 +141,27 @@ MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::
     ui->setupUi(this);
 
     callGraphWindow = new GraphWindow();    
-    callGraphWindow->setMinimumHeight(220);
+    callGraphWindow->setMinimumHeight(140);
     callGraphWindow->setMinimumWidth(500);
     callGraphWindow->setMaximumHeight(400);
     ui->l_Graph->addWidget(callGraphWindow);
 
     callAtomSumWindow = new AtomSumWindow();
-    callAtomSumWindow->setMinimumHeight(220);
+    callAtomSumWindow->setMinimumHeight(140);
     callAtomSumWindow->setMinimumWidth(500);
     callAtomSumWindow->setMaximumHeight(400);
     ui->l_atoms->addWidget(callAtomSumWindow);
 
     callResidumWindow = new ResiduumWindow();
-    callResidumWindow->setMinimumHeight(220);
+    callResidumWindow->setMinimumHeight(140);
     callResidumWindow->setMinimumWidth(500);
     callResidumWindow->setMaximumHeight(400);
     ui->l_res->addWidget(callResidumWindow);
 
     callYAxisWindow = new YAxisWindow();
-    callYAxisWindow->setMinimumHeight(40);
+    callYAxisWindow->setMinimumHeight(22);
     callYAxisWindow->setMinimumWidth(500);
-    callYAxisWindow->setMaximumHeight(40);
+    callYAxisWindow->setMaximumHeight(22);
     ui->l_YAxis->addWidget(callYAxisWindow);
 
     ui->progressBarCalc->setMinimum(0);         // set progressbar
@@ -192,6 +193,8 @@ MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::
     this->cb_model = new QStandardItemModel;
     connect(this->cb_model, SIGNAL(dataChanged ( const QModelIndex&, const QModelIndex&)), this, SLOT(cb_selection_changed(const QModelIndex&, const QModelIndex&)));
     connect(ui->tbv_Results->model(), SIGNAL(dataChanged ( const QModelIndex&, const QModelIndex&)), this, SLOT(tbv_selection_changed(const QModelIndex&, const QModelIndex&)));
+
+    connect(timer, SIGNAL(timeout()), this, SLOT(on_time_out()));
 
     // build config file at init
     bool hasEntry1 = false;
@@ -513,8 +516,8 @@ qint32 MainWindow::read_fiff_file(QString fileName)
     ui->sb_sample_rate->setEnabled(false);
     _sample_rate = ui->sb_sample_rate->value();
 
-    qint32 cols = 5;
-    if(_datas.cols() <= 5)   cols = _datas.cols();
+    qint32 cols = 100;
+    if(_datas.cols() <= 100)   cols = _datas.cols();
     _signal_matrix.resize(_datas.cols(),cols);
 
     for(qint32 channels = 0; channels < cols; channels++)
@@ -1022,12 +1025,12 @@ void YAxisWindow::paint_axis(MatrixXd signalMatrix, QSize windowSize)
         while(j <= 21)
         {
             QString str;
-            painter.drawText(j * scaleXAchse + 45, 30, str.append(QString::number(j * scaleXText + _from, 'f', 2)));  // scalevalue as string
-            painter.drawLine(j * scaleXAchse + 55, 10 + 2, j * scaleXAchse + 55 , 10 - 2);                            // scalelines
+            painter.drawText(j * scaleXAchse + 45, 20, str.append(QString::number(j * scaleXText + _from, 'f', 2)));  // scalevalue as string
+            painter.drawLine(j * scaleXAchse + 55, 5 + 2, j * scaleXAchse + 55 , 5 - 2);                            // scalelines
             j++;
         }
-        painter.drawText(5 , 30, "[sec]");  // unit
-        painter.drawLine(5, 10, windowSize.width()-5, 10);  // paint y-line
+        painter.drawText(5 , 20, "[sec]");  // unit
+        painter.drawLine(5, 5, windowSize.width()-5, 5);  // paint y-line
     }
 }
 
@@ -1120,6 +1123,12 @@ void MainWindow::on_btt_Calc_clicked()
 
     _my_atom_list.clear();
     _residuum_matrix = _signal_matrix;
+    update();
+
+//    QTimer *timer = new QTimer();
+    timer->setInterval(100);
+
+    timer->start();
 
     if(ui->rb_OwnDictionary->isChecked())
     {
@@ -1133,6 +1142,15 @@ void MainWindow::on_btt_Calc_clicked()
     {
         calc_adaptiv_mp(_signal_matrix, criterion);
     }    
+}
+
+QTime test_time(0,0);
+QTime var;
+void MainWindow::on_time_out()
+{
+    test_time = test_time.addMSecs(100);
+    ui->lb_timer->setText(test_time.toString());
+    timer->start();
 }
 
 //*************************************************************************************************************
@@ -1287,6 +1305,7 @@ void MainWindow::tbv_selection_changed(const QModelIndex& topLeft, const QModelI
 
 void MainWindow::calc_thread_finished()
 {
+    timer->stop();
     ui->frame->setEnabled(true);
     ui->btt_OpenSignal->setEnabled(true);
     ui->btt_Calc->setText("calculate");

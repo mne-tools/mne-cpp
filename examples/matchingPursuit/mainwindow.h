@@ -229,6 +229,7 @@ private slots:
     void on_sb_sample_count_editingFinished();
     void on_sb_sample_count_valueChanged(int arg1);
     void on_cb_all_select_clicked();
+    void on_time_out();
 
 signals:
 
