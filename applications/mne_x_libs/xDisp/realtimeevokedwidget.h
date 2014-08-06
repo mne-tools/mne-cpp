@@ -115,6 +115,16 @@ using namespace XMEASLIB;
 //    Annotation = 1        /**< Annotation tool. */
 //};
 
+struct Modality {
+    QString m_sName;
+    bool m_bActive;
+    float m_fNorm;
+
+    Modality(QString name, bool active, double norm)
+    : m_sName(name), m_bActive(active), m_fNorm(norm)
+    {}
+};
+
 
 //=============================================================================================================
 /**
@@ -146,6 +156,12 @@ public:
 
     //=========================================================================================================
     /**
+    * Broadcast settings to attached widgets
+    */
+    void broadcastSettings();
+
+    //=========================================================================================================
+    /**
     * Is called when new data are available.
     *
     * @param [in] pMeasurement  pointer to measurement -> not used because its direct attached to the measurement.
@@ -167,14 +183,6 @@ public:
 private:
     //=========================================================================================================
     /**
-    * Sets new zoom factor
-    *
-    * @param [in] zoomFac  time window size;
-    */
-    void zoomChanged(double zoomFac);
-
-    //=========================================================================================================
-    /**
     * Shows sensor selection widget
     */
     void showSensorSelectionWidget();
@@ -194,9 +202,6 @@ private:
 
     QAction* m_pActionSelectModality;           /**< Modality selection action */
 
-    float m_fZoomFactor;                                    /**< Zoom factor */
-    QDoubleSpinBox* m_pDoubleSpinBoxZoom;                   /**< Adjust Zoom Factor */
-
     QSharedPointer<RealTimeEvoked> m_pRTE;                  /**< The real-time evoked measurement. */
 
     bool m_bInitialized;                                    /**< Is Initialized */
@@ -209,9 +214,7 @@ private:
     QSharedPointer<SensorWidget> m_pSensorSelectionWidget;  /**< Sensor selection widget. */
 
     QSharedPointer<EvokedModalityWidget> m_pEvokedModalityWidget;   /**< Evoked modality widget. */
-    QStringList m_qListPickTypes;           /**< Channel Types to pick */
-
-    QList< QPair<QString,bool> > m_qListModalities;
+    QList< Modality > m_qListModalities;
 
 
     QList<qint32> m_qListCurrentSelection;  /**< Current selection list -> hack around C++11 lambda  */

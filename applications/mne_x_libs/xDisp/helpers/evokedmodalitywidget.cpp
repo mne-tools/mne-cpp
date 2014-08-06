@@ -50,7 +50,7 @@
 
 #include <QLabel>
 #include <QGridLayout>
-#include <QStringList>
+#include <QDoubleValidator>
 
 #include <QDebug>
 
@@ -77,28 +77,30 @@ EvokedModalityWidget::EvokedModalityWidget(RealTimeEvokedWidget *parent)
 
     QGridLayout* t_pGridLayout = new QGridLayout;
 
-    QStringList t_qListModalities;
-    t_qListModalities << "GRAD" << "MAG" << "EEG" << "EOG" << "MISC";
-
-    qint32 count = 0;
-    foreach (const QString &mod, t_qListModalities) {
+    for(qint32 i = 0; i < m_pRealTimeEvokedWidget->m_qListModalities.size(); ++i)
+    {
+        QString mod = m_pRealTimeEvokedWidget->m_qListModalities[i].m_sName;
 
         QLabel* t_pLabelModality = new QLabel;
         t_pLabelModality->setText(mod);
-        t_pGridLayout->addWidget(t_pLabelModality, count,0,1,1);
-        m_qListModalities << mod;
+        t_pGridLayout->addWidget(t_pLabelModality,i,0,1,1);
 
         QCheckBox* t_pCheckBoxModality = new QCheckBox;
-        if(m_pRealTimeEvokedWidget->m_qListPickTypes.contains(mod))
-            t_pCheckBoxModality->setChecked(true);
-
+        t_pCheckBoxModality->setChecked(m_pRealTimeEvokedWidget->m_qListModalities[i].m_bActive);
         m_qListModalityCheckBox << t_pCheckBoxModality;
+        connect(t_pCheckBoxModality,&QCheckBox::stateChanged,this,&EvokedModalityWidget::updateCheckbox);
+        t_pGridLayout->addWidget(t_pCheckBoxModality,i,1,1,1);
 
-        connect(t_pCheckBoxModality,&QCheckBox::stateChanged,this,&EvokedModalityWidget::updateSelection);
 
-        t_pGridLayout->addWidget(t_pCheckBoxModality,count,1,1,1);
+        QDoubleValidator* t_pDoubleValidator = new QDoubleValidator(10e-11,1,16,this);
+        QLineEdit* t_pLineEditScale = new QLineEdit;
+        t_pLineEditScale->setMaximumWidth(100);
+        t_pLineEditScale->setValidator(t_pDoubleValidator);
+        t_pLineEditScale->setText(QString("%1").arg(m_pRealTimeEvokedWidget->m_qListModalities[i].m_fNorm));
+        m_qListModalityLineEdit << t_pLineEditScale;
+        connect(t_pLineEditScale,&QLineEdit::textEdited,this,&EvokedModalityWidget::updateLineEdit);
+        t_pGridLayout->addWidget(t_pLineEditScale,i,2,1,1);
 
-        ++count;
     }
 
     this->setLayout(t_pGridLayout);
@@ -108,15 +110,30 @@ EvokedModalityWidget::EvokedModalityWidget(RealTimeEvokedWidget *parent)
 
 //*************************************************************************************************************
 
-void EvokedModalityWidget::updateSelection(qint32 state)
+void EvokedModalityWidget::updateCheckbox(qint32 state)
 {
     Q_UNUSED(state)
 
-    m_pRealTimeEvokedWidget->m_qListPickTypes.clear();
+    for(qint32 i = 0; i < m_qListModalityCheckBox.size(); ++i)
+    {
+        if(m_qListModalityCheckBox[i]->isChecked())
+            m_pRealTimeEvokedWidget->m_qListModalities[i].m_bActive = true;
+        else
+            m_pRealTimeEvokedWidget->m_qListModalities[i].m_bActive = false;
+    }
+
+    emit settingsChanged();
+}
+
+
+//*************************************************************************************************************
+
+void EvokedModalityWidget::updateLineEdit(const QString & text)
+{
+    Q_UNUSED(text)
 
     for(qint32 i = 0; i < m_qListModalityCheckBox.size(); ++i)
-        if(m_qListModalityCheckBox[i]->isChecked())
-            m_pRealTimeEvokedWidget->m_qListPickTypes << m_qListModalities[i];
+        m_pRealTimeEvokedWidget->m_qListModalities[i].m_fNorm = (float)m_qListModalityLineEdit[i]->text().toDouble();
 
-    emit selectionChanged(m_pRealTimeEvokedWidget->m_qListPickTypes);
+    emit settingsChanged();
 }
