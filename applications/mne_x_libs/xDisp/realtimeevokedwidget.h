@@ -47,6 +47,7 @@
 #include "helpers/realtimeevokedmodel.h"
 #include "helpers/realtimebutterflyplot.h"
 
+#include "helpers/evokedmodalitywidget.h"
 #include "helpers/sensorwidget.h"
 
 
@@ -114,6 +115,16 @@ using namespace XMEASLIB;
 //    Annotation = 1        /**< Annotation tool. */
 //};
 
+struct Modality {
+    QString m_sName;
+    bool m_bActive;
+    float m_fNorm;
+
+    Modality(QString name, bool active, double norm)
+    : m_sName(name), m_bActive(active), m_fNorm(norm)
+    {}
+};
+
 
 //=============================================================================================================
 /**
@@ -125,6 +136,7 @@ class XDISPSHARED_EXPORT RealTimeEvokedWidget : public NewMeasurementWidget
 {
     Q_OBJECT
 
+    friend class EvokedModalityWidget;
 public:
     //=========================================================================================================
     /**
@@ -141,6 +153,12 @@ public:
     * Destroys the RealTimeEvokedWidget.
     */
     ~RealTimeEvokedWidget();
+
+    //=========================================================================================================
+    /**
+    * Broadcast settings to attached widgets
+    */
+    void broadcastSettings();
 
     //=========================================================================================================
     /**
@@ -165,17 +183,15 @@ public:
 private:
     //=========================================================================================================
     /**
-    * Sets new zoom factor
-    *
-    * @param [in] zoomFac  time window size;
-    */
-    void zoomChanged(double zoomFac);
-
-    //=========================================================================================================
-    /**
     * Shows sensor selection widget
     */
     void showSensorSelectionWidget();
+
+    //=========================================================================================================
+    /**
+    * Show the modality selection widget
+    */
+    void showModalitySelectionWidget();
 
 
     QVBoxLayout *m_pRteLayout;  /**< RTE Widget layout */
@@ -185,9 +201,6 @@ private:
     RealTimeButterflyPlot*      m_pButterflyPlot;       /**< Butterfly plot */
 
     QAction* m_pActionSelectModality;           /**< Modality selection action */
-
-    float m_fZoomFactor;                                    /**< Zoom factor */
-    QDoubleSpinBox* m_pDoubleSpinBoxZoom;                   /**< Adjust Zoom Factor */
 
     QSharedPointer<RealTimeEvoked> m_pRTE;                  /**< The real-time evoked measurement. */
 
@@ -199,6 +212,10 @@ private:
 
     SensorModel* m_pSensorModel;                            /**< Sensor model for channel selection */
     QSharedPointer<SensorWidget> m_pSensorSelectionWidget;  /**< Sensor selection widget. */
+
+    QSharedPointer<EvokedModalityWidget> m_pEvokedModalityWidget;   /**< Evoked modality widget. */
+    QList< Modality > m_qListModalities;
+
 
     QList<qint32> m_qListCurrentSelection;  /**< Current selection list -> hack around C++11 lambda  */
     void applySelection();                  /**< apply the in m_qListCurrentSelection stored selection -> hack around C++11 lambda */

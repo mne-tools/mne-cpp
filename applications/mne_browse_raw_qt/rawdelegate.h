@@ -115,6 +115,14 @@ public:
     virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
     virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
+    //=========================================================================================================
+    /**
+    * setEventData creates the QPointer path for the data plot.
+    *
+    * @param[in] eventData holds the loaded fiff event data i nform of a matrix.
+    */
+    void setEventData(MatrixXi &eventData);
+
     // Plots settings
     double m_dDefaultPlotHeight;   /**< The height of the plot */
 
@@ -142,9 +150,20 @@ private:
     */
     void createGridPath(QPainterPath& path, const QStyleOptionViewItem &option, QList<RowVectorPair>& listPairs) const;
 
+    //=========================================================================================================
+    /**
+    * plotEvents Plots the events.
+    *
+    * @param[in] index QModelIndex for accessing associated data and model object.
+    * @param[in] painter The painter of the current table item.
+    */
+    void plotEvents(const QModelIndex &index, const QStyleOptionViewItem &option, QPainter *painter) const;
+
     //Settings
-    qint8 m_nhlines;        /**< Number of horizontal lines for the grid plot */
-    QSettings m_qSettings;
+    qint8           m_nhlines;          /**< Number of horizontal lines for the grid plot */
+    QSettings       m_qSettings;
+
+    MatrixXi        m_eventData;             /**< Matrix that holds the loaded events from the event file. */
 };
 
 } // NAMESPACE

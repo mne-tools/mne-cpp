@@ -30,6 +30,8 @@
 namespace XDISPLIB
 {
 
+struct Modality;
+
 
 class XDISPSHARED_EXPORT RealTimeButterflyPlot : public QWidget
 {
@@ -40,6 +42,8 @@ public:
     inline void setModel(RealTimeEvokedModel* model);
 
     void dataUpdate(const QModelIndex& topLeft, const QModelIndex& bottomRight, const QVector<int>& roles = QVector<int>());
+
+    void setSettings(const QList< Modality >& p_qListModalities);
 
 protected:
     //=========================================================================================================
@@ -60,6 +64,18 @@ private:
     * @param[in,out] path The QPointerPath to create for the data plot.
     */
     void createPlotPath(qint32 row, QPainterPath& path) const;
+
+    bool showMAG;       /**< Show Magnetometers channels */
+    bool showGRAD;      /**< Show Gradiometers channels */
+    bool showEEG;       /**< Show EEG channels */
+    bool showEOG;       /**< Show EEG channels */
+    bool showMISC;      /**< Show Miscellaneous channels */
+
+    float fMaxMAG;       /**< Scale for Magnetometers channels */
+    float fMaxGRAD;      /**< Scale for Gradiometers channels */
+    float fMaxEEG;       /**< Scale for EEG channels */
+    float fMaxEOG;       /**< Scale for EEG channels */
+    float fMaxMISC;      /**< Scale for Miscellaneous channels */
 
     RealTimeEvokedModel* m_pRealTimeEvokedModel;
 

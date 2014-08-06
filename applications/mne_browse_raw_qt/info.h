@@ -116,7 +116,7 @@ public:
     */
     const static QString OrganizationName()
     {
-        return QObject::tr("mne-cpp");
+        return QObject::tr("MNE-CPP");
     }
 
     //=========================================================================================================

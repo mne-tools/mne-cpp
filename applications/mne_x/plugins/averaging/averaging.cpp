@@ -124,6 +124,7 @@ void Averaging::init()
 
     // Output
     m_pAveragingOutput = PluginOutputData<RealTimeEvoked>::create(this, "AveragingOut", "Averaging Output Data");
+    m_pAveragingOutput->data()->setName("AveragingPlugin");//Provide name to auto store widget settings
     m_outputConnectors.append(m_pAveragingOutput);
 
     //init channels when fiff info is available
@@ -149,36 +150,10 @@ void Averaging::changeNumAverages(qint32 numAve)
 
 void Averaging::initConnector()
 {
-    if(m_pFiffInfo)
-    {
-        m_qListModalities.clear();
-        bool hasMag = false;
-        bool hasGrad = false;
-        bool hasEEG = false;
-        bool hasEOG = false;
-        for(qint32 i = 0; i < m_pFiffInfo->nchan; ++i)
-        {
-            if(m_pFiffInfo->chs[i].kind == FIFFV_MEG_CH)
-            {
-                if(!hasMag &&  m_pFiffInfo->chs[i].unit == FIFF_UNIT_T)
-                    hasMag = true;
-                else if(!hasGrad &&  m_pFiffInfo->chs[i].unit == FIFF_UNIT_T_M)
-                    hasGrad = true;
-            }
-            else if(!hasEEG && m_pFiffInfo->chs[i].kind == FIFFV_EEG_CH)
-                hasEEG = true;
-            else if(!hasEOG && m_pFiffInfo->chs[i].kind == FIFFV_EOG_CH)
-                hasEOG = true;
-        }
-        if(hasMag)
-            m_qListModalities.append(QPair<QString,bool>("MAG",true));
-        if(hasGrad)
-            m_qListModalities.append(QPair<QString,bool>("GRAD",true));
-        if(hasEEG)
-            m_qListModalities.append(QPair<QString,bool>("EEG",true));
-        if(hasEOG)
-            m_qListModalities.append(QPair<QString,bool>("EOG",true));
-    }
+//    if(m_pFiffInfo)
+//    {
+
+//    }
 }
 
 
