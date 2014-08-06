@@ -130,8 +130,20 @@ public:
     /**
     * Initialise input and output connectors.
     */
-    void init();
+    virtual void init();
 
+    //=========================================================================================================
+    /**
+    * Is called when plugin is detached of the stage. Can be used to safe settings.
+    */
+    virtual void unload();
+
+    //=========================================================================================================
+    /**
+    * Change the number of averages
+    *
+    * @param[in] numAve     new number of averages
+    */
     void changeNumAverages(qint32 numAve);
 
     //=========================================================================================================

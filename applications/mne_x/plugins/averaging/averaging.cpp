@@ -51,6 +51,8 @@
 //=============================================================================================================
 
 #include <QtCore/QtPlugin>
+#include <QSettings>
+
 #include <QDebug>
 
 
@@ -117,6 +119,15 @@ QSharedPointer<IPlugin> Averaging::clone() const
 
 void Averaging::init()
 {
+    //
+    // Load Settings
+    //
+    QSettings settings;
+    m_iPreStimSamples = settings.value(QString("Plugin/%1/preStimSamples").arg(this->getName()), 400).toInt();
+    m_iPostStimSamples = settings.value(QString("Plugin/%1/postStimSamples").arg(this->getName()), 750).toInt();
+    m_iNumAverages = settings.value(QString("Plugin/%1/numAverages").arg(this->getName()), 10).toInt();
+    m_iStimChan = settings.value(QString("Plugin/%1/stimChannel").arg(this->getName()), 0).toInt();
+
     // Input
     m_pAveragingInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "AveragingIn", "Averaging input data");
     connect(m_pAveragingInput.data(), &PluginInputConnector::notify, this, &Averaging::update, Qt::DirectConnection);
@@ -124,7 +135,7 @@ void Averaging::init()
 
     // Output
     m_pAveragingOutput = PluginOutputData<RealTimeEvoked>::create(this, "AveragingOut", "Averaging Output Data");
-    m_pAveragingOutput->data()->setName("AveragingPlugin");//Provide name to auto store widget settings
+    m_pAveragingOutput->data()->setName(this->getName());//Provide name to auto store widget settings
     m_outputConnectors.append(m_pAveragingOutput);
 
     //init channels when fiff info is available
@@ -133,6 +144,21 @@ void Averaging::init()
     //Delete Buffer - will be initailzed with first incoming data
     if(!m_pAveragingBuffer.isNull())
         m_pAveragingBuffer = CircularMatrixBuffer<double>::SPtr();
+}
+
+
+//*************************************************************************************************************
+
+void Averaging::unload()
+{
+    //
+    // Store Settings
+    //
+    QSettings settings;
+    settings.setValue(QString("Plugin/%1/preStimSamples").arg(this->getName()), m_iPreStimSamples);
+    settings.setValue(QString("Plugin/%1/postStimSamples").arg(this->getName()), m_iPostStimSamples);
+    settings.setValue(QString("Plugin/%1/numAverages").arg(this->getName()), m_iNumAverages);
+    settings.setValue(QString("Plugin/%1/stimChannel").arg(this->getName()), m_iStimChan);
 }
 
 
@@ -303,11 +329,11 @@ void Averaging::appendEvoked(FiffEvoked::SPtr p_pEvoked)
 
     if(p_pEvoked->comment == t_sStimulusChannel)
     {
-        qDebug()<< "append" << p_pEvoked->comment << "=" << t_sStimulusChannel;
+//        qDebug()<< "append" << p_pEvoked->comment << "=" << t_sStimulusChannel;
         mutex.lock();
         m_qVecEvokedData.push_back(p_pEvoked);
         mutex.unlock();
-        qDebug() << "append after" << m_qVecEvokedData.size();
+//        qDebug() << "append after" << m_qVecEvokedData.size();
     }
 }
 
