@@ -382,6 +382,13 @@
            </widget>
           </item>
           <item>
+           <widget class="QLabel" name="lb_timer">
+            <property name="text">
+             <string>Timer: </string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QProgressBar" name="progressBarCalc">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
