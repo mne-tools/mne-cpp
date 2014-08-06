@@ -72,8 +72,8 @@
 #include <QHeaderView>
 #include <QMenu>
 #include <QMessageBox>
-
 #include <QScroller>
+#include <QSettings>
 
 #include <QDebug>
 
@@ -159,6 +159,22 @@ RealTimeEvokedWidget::RealTimeEvokedWidget(QSharedPointer<RealTimeEvoked> pRTE, 
 
 RealTimeEvokedWidget::~RealTimeEvokedWidget()
 {
+    //
+    // Store Settings
+    //
+    if(!m_pRTE->getName().isEmpty())
+    {
+        QString t_sRTEWName = m_pRTE->getName();
+
+        QSettings settings;
+
+        for(qint32 i = 0; i < m_qListModalities.size(); ++i)
+        {
+            settings.setValue(QString("RTEW/%1/%2/active").arg(t_sRTEWName).arg(m_qListModalities[i].m_sName), m_qListModalities[i].m_bActive);
+            settings.setValue(QString("RTEW/%1/%2/norm").arg(t_sRTEWName).arg(m_qListModalities[i].m_sName), m_qListModalities[i].m_fNorm);
+        }
+    }
+
 
 }
 
@@ -220,6 +236,8 @@ void RealTimeEvokedWidget::init()
 {
     if(m_pRTE->isInitialized())
     {
+        QString t_sRTEWName = m_pRTE->getName();
+        qDebug() << "##### NAME #####" << QString("RTEW/%1/MAG/active").arg(t_sRTEWName);
         m_pRteLayout->removeWidget(m_pLabelInit);
         m_pLabelInit->hide();
 
@@ -255,30 +273,38 @@ void RealTimeEvokedWidget::init()
             else if(!hasMISC && m_pRTE->info().chs[i].kind == FIFFV_MISC_CH)
                 hasMISC = true;
         }
+        QSettings settings;
+        bool sel = false;
+        float val = 1e-11f;
         if(hasMag)
         {
-            bool sel = true;
-            m_qListModalities.append(Modality("MAG",sel,1e-11));
+            sel = settings.value(QString("RTEW/%1/MAG/active").arg(t_sRTEWName), true).toBool();
+            val = settings.value(QString("RTEW/%1/MAG/norm").arg(t_sRTEWName), 1e-11f).toFloat();
+            m_qListModalities.append(Modality("MAG",sel,val));
         }
         if(hasGrad)
         {
-            bool sel = true;
-            m_qListModalities.append(Modality("GRAD",true,1e-10));
+            sel = settings.value(QString("RTEW/%1/GRAD/active").arg(t_sRTEWName), true).toBool();
+            val = settings.value(QString("RTEW/%1/GRAD/norm").arg(t_sRTEWName), 1e-10f).toFloat();
+            m_qListModalities.append(Modality("GRAD",sel,val));
         }
         if(hasEEG)
         {
-            bool sel = true;
-            m_qListModalities.append(Modality("EEG",true,1e-4));
+            sel = settings.value(QString("RTEW/%1/EEG/active").arg(t_sRTEWName), true).toBool();
+            val = settings.value(QString("RTEW/%1/EEG/norm").arg(t_sRTEWName), 1e-4f).toFloat();
+            m_qListModalities.append(Modality("EEG",sel,val));
         }
         if(hasEOG)
         {
-            bool sel = true;
-            m_qListModalities.append(Modality("EOG",true,1e-3));
+            sel = settings.value(QString("RTEW/%1/EOG/active").arg(t_sRTEWName), true).toBool();
+            val = settings.value(QString("RTEW/%1/EOG/norm").arg(t_sRTEWName), 1e-3f).toFloat();
+            m_qListModalities.append(Modality("EOG",sel,val));
         }
         if(hasMISC)
         {
-            bool sel = true;
-            m_qListModalities.append(Modality("MISC",true,1e-3));
+            sel = settings.value(QString("RTEW/%1/MISC/active").arg(t_sRTEWName), true).toBool();
+            val = settings.value(QString("RTEW/%1/MISC/norm").arg(t_sRTEWName), 1e-3f).toFloat();
+            m_qListModalities.append(Modality("MISC",sel,val));
         }
 
         m_pButterflyPlot->setSettings(m_qListModalities);

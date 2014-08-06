@@ -124,6 +124,7 @@ void Averaging::init()
 
     // Output
     m_pAveragingOutput = PluginOutputData<RealTimeEvoked>::create(this, "AveragingOut", "Averaging Output Data");
+    m_pAveragingOutput->data()->setName("AveragingPlugin");//Provide name to auto store widget settings
     m_outputConnectors.append(m_pAveragingOutput);
 
     //init channels when fiff info is available
