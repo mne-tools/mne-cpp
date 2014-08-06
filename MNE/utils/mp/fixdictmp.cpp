@@ -549,8 +549,6 @@ void FixDictMp::create_tree_dict(QString save_path)
                     write_molecules_to_xml.writeAttribute("modulation", current_element.attribute("modulation", current_element.text()));
                     write_molecules_to_xml.writeAttribute("phase", current_element.attribute("phase", current_element.text()));
 
-                    //recursive_node_built(current_element, write_file);
-
                     write_molecules_to_xml.writeEndElement();//atom
                 }
                 current_element = current_element.nextSibling().toElement();
@@ -599,48 +597,6 @@ void FixDictMp::create_tree_dict(QString save_path)
 
 //******************************************************************************************************************
 
-void FixDictMp::recursive_node_built(QDomElement current_element, QFile &temp_file)
-{
-    QXmlStreamWriter write_molecules_to_xml(&temp_file);
-    write_molecules_to_xml.setAutoFormatting(true);
-
-    qint32 end_element_counter = 0;
-    while (current_element.hasChildNodes())
-    {
-        QDomNodeList child_list = current_element.childNodes();
-
-        for(qint32 z = 0; z < child_list.length(); z++)
-        {
-            current_element = child_list.at(z).toElement();
-
-            write_molecules_to_xml.writeStartElement(current_element.nodeName());
-
-            if(current_element.nodeName() == "Molecule")
-                write_molecules_to_xml.writeAttribute("level", current_element.attribute("level", current_element.text()));
-
-            write_molecules_to_xml.writeAttribute("ID", current_element.attribute("ID", current_element.text()));
-            write_molecules_to_xml.writeAttribute("scale", current_element.attribute("scale", current_element.text()));
-            write_molecules_to_xml.writeAttribute("translation", current_element.attribute("translation", current_element.text()));
-            write_molecules_to_xml.writeAttribute("modulation", current_element.attribute("modulation", current_element.text()));
-            write_molecules_to_xml.writeAttribute("phase", current_element.attribute("phase", current_element.text()));
-
-            if(current_element.nodeName() == "Atom")
-                write_molecules_to_xml.writeEndElement();
-
-            //recursive_node_built(current_element, temp_file);
-
-        }
-        end_element_counter++;
-
-    }
-
-    for(qint32 close = end_element_counter; close > 1; --close)
-        write_molecules_to_xml.writeEndElement();
-
-}
-
-//******************************************************************************************************************
-
 void FixDictMp::build_molecule_xml_file(qint32 level_counter)
 {
     //qint32 i = 0;
@@ -674,6 +630,7 @@ void FixDictMp::build_molecule_xml_file(qint32 level_counter)
         VectorXd compare_molec = VectorXd::Zero(sample_count);
 
         QDomNodeList node_list = xml_element.elementsByTagName("Molecule");
+
         qint32 max_it = node_list.count();
         QDomElement current_element;
 
@@ -703,15 +660,13 @@ void FixDictMp::build_molecule_xml_file(qint32 level_counter)
                 compare_molec = gabor_Atom->create_real(sample_count,scale,translation,modulation,phase);
                 qreal threshold = 0.8 * compare_molec.dot(compare_molec); //vary this to find optimum of seperation
 
-
-
                 VectorXd temp_molec = VectorXd::Zero(sample_count);
 
                 //finding molecules with low differences
                 for (qint32 next = 0; next < node_list.count(); next++)//;32)
                 {
                     //try the next atom
-                    //if(current_element.attribute("level").toInt() == level_counter)
+                    if(current_element.attribute("level").toInt() == level_counter)
                         current_element = node_list.at(next).toElement();
 
                     if(!current_element.isNull())
@@ -773,22 +728,23 @@ void FixDictMp::build_molecule_xml_file(qint32 level_counter)
                 current_element = node_list.at(0).toElement();
 
                 for(qint32 k = 0; k < similar_molecs.length(); k++)
-                {
+                {                    
                     //current_element = node_list.at(current_element.attribute("ID", current_element.text()).toInt() == similar_molecs.at(k) && current_element.attribute("level").toInt() == level_counter).toElement();
                     current_element = node_list.at(0).toElement();
 
                     while(!current_element.isNull())
                     {
-                        if(current_element.attribute("ID", current_element.text()).toInt() == similar_molecs.at(k) && current_element.attribute("level").toInt() == level_counter)
+                        if(current_element.attribute("ID").toInt() == similar_molecs.at(k) && current_element.attribute("level").toInt() == level_counter)
                         {                           
                             QDomElement temp_element = current_element;
 
                             qint32 end_element_counter = 0;
+                            qint32 root_counter = 0;
+                            qint32 child_counter = 0;//ToDo: set right child for right position in tree to write all atoms and molecules
 
-
-                            while(!temp_element.isNull())
+                            while(temp_element.hasChildNodes())
                             {
-                                QDomElement last_child = temp_element.lastChild().toElement();
+                                end_element_counter = 0;
 
                                 while(!temp_element.isNull())
                                 {
@@ -805,25 +761,30 @@ void FixDictMp::build_molecule_xml_file(qint32 level_counter)
 
                                     if(temp_element.nodeName() == "Atom")
                                         write_molecules_to_xml.writeEndElement();
+
                                     else
                                         end_element_counter++;
 
                                     if(temp_element.hasChildNodes())
-                                        temp_element = temp_element.firstChild().toElement();
-                                    else //if(temp_element.nodeName() == "Atom")
                                     {
+                                        temp_element = temp_element.firstChild().toElement();
+                                        child_counter++;
+                                    }
+                                    else
                                         temp_element = temp_element.nextSibling().toElement();
 
-                                        if(temp_element.isNull())
-                                            temp_element = temp_element.nextSiblingElement("Molecule").toElement();
-                                    }
                                 }
-                                for(qint32 close = end_element_counter; close > 0; close--)
-                                    write_molecules_to_xml.writeEndElement();
+                                root_counter++;
+                                write_molecules_to_xml.writeEndElement();
 
-                                temp_element = temp_element.nextSiblingElement("Molecule").toElement();
+                                temp_element = current_element.childNodes().at(root_counter).toElement();
+
                             }
+                            for(qint32 close_root_molecs = end_element_counter; close_root_molecs > 1; close_root_molecs--)
+                                write_molecules_to_xml.writeEndElement();
 
+                            for(qint32 close_parent_molecs = root_counter; close_parent_molecs > 1; close_parent_molecs--)
+                                write_molecules_to_xml.writeEndElement();
 
                         }
                         current_element = current_element.nextSiblingElement("Molecule").toElement();
@@ -839,7 +800,7 @@ void FixDictMp::build_molecule_xml_file(qint32 level_counter)
 
                     while(!current_element.isNull())
                     {
-                        if(current_element.attribute("ID", current_element.text()).toInt() == similar_molecs.at(n) && current_element.attribute("level", current_element.text()).toInt() == level_counter)
+                        if(current_element.attribute("ID").toInt() == similar_molecs.at(n) && current_element.attribute("level").toInt() == level_counter)
                             to_remove.removeChild(current_element);
 
                         current_element = current_element.nextSiblingElement("Molecule").toElement();
