@@ -58,9 +58,6 @@
 #include <QDebug>
 
 
-#define DEBUG_AVERAGING 1
-
-
 //*************************************************************************************************************
 //=============================================================================================================
 // USED NAMESPACES
@@ -88,7 +85,10 @@ Averaging::Averaging()
 , m_iStimChan(0)
 , m_pAveragingWidget(AveragingSettingsWidget::SPtr())
 , m_pActionShowAdjustment(Q_NULLPTR)
+#ifdef DEBUG_AVERAGING
 , m_iTestCount(0)
+, m_iTestCount2(0)
+#endif
 {
     m_pActionShowAdjustment = new QAction(QIcon(":/images/averagingadjustments.png"), tr("Averaging Adjustments"),this);
 //    m_pActionSetupProject->setShortcut(tr("F12"));
@@ -345,15 +345,18 @@ void Averaging::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
             t_mat = MatrixXd::Zero(t_mat.rows(), t_mat.cols());
 
-            if(m_iTestCount%20 == 0)//GEN test stim
+            if(m_iTestCount%10 == 0)//GEN test stim
             {
-                qint32 samp = qrand() % (t_mat.cols()/2);
+                qint32 samp = (qrand() % (t_mat.cols()/8))+1; //exclude buggy 0
+                if(m_iTestCount2 % 5 == 0) // create zero every 5 generations
+                    samp = 0;
                 RowVectorXd stim = RowVectorXd::Ones(8)*5;
                 t_mat.block(m_iTestStimCh,samp,1,8) = stim;
 
-                t_mat.block(0,samp,m_iTestStimCh, t_mat.cols()-samp) = MatrixXd::Ones(m_iTestStimCh, t_mat.cols()-samp);
+                t_mat.block(0,samp+1,m_iTestStimCh, t_mat.cols()-(samp+1)) = MatrixXd::Ones(m_iTestStimCh, t_mat.cols()-(samp+1));
 
-                qDebug() << "synth stim" << samp;
+                qDebug() << "Pos:" << samp;
+                ++m_iTestCount2;
             }
             ++m_iTestCount;
 #endif
@@ -441,6 +444,10 @@ void Averaging::run()
             {
                 FiffEvoked t_fiffEvoked = *m_qVecEvokedData[0].data();
 
+
+#ifdef DEBUG_AVERAGING
+                std::cout << "EVK:" << t_fiffEvoked.data.row(0) << std::endl;
+#endif
                 m_pAveragingOutput->data()->setValue(t_fiffEvoked);
 
                 m_qVecEvokedData.pop_front();
