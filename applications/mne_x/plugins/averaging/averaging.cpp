@@ -51,6 +51,9 @@
 //=============================================================================================================
 
 #include <QtCore/QtPlugin>
+#include <QMutexLocker>
+#include <QSettings>
+
 #include <QDebug>
 
 
@@ -117,6 +120,15 @@ QSharedPointer<IPlugin> Averaging::clone() const
 
 void Averaging::init()
 {
+    //
+    // Load Settings
+    //
+    QSettings settings;
+    m_iPreStimSamples = settings.value(QString("Plugin/%1/preStimSamples").arg(this->getName()), 400).toInt();
+    m_iPostStimSamples = settings.value(QString("Plugin/%1/postStimSamples").arg(this->getName()), 750).toInt();
+    m_iNumAverages = settings.value(QString("Plugin/%1/numAverages").arg(this->getName()), 10).toInt();
+    m_iStimChan = settings.value(QString("Plugin/%1/stimChannel").arg(this->getName()), 0).toInt();
+
     // Input
     m_pAveragingInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "AveragingIn", "Averaging input data");
     connect(m_pAveragingInput.data(), &PluginInputConnector::notify, this, &Averaging::update, Qt::DirectConnection);
@@ -124,7 +136,7 @@ void Averaging::init()
 
     // Output
     m_pAveragingOutput = PluginOutputData<RealTimeEvoked>::create(this, "AveragingOut", "Averaging Output Data");
-    m_pAveragingOutput->data()->setName("AveragingPlugin");//Provide name to auto store widget settings
+    m_pAveragingOutput->data()->setName(this->getName());//Provide name to auto store widget settings
     m_outputConnectors.append(m_pAveragingOutput);
 
     //init channels when fiff info is available
@@ -138,8 +150,24 @@ void Averaging::init()
 
 //*************************************************************************************************************
 
+void Averaging::unload()
+{
+    //
+    // Store Settings
+    //
+    QSettings settings;
+    settings.setValue(QString("Plugin/%1/preStimSamples").arg(this->getName()), m_iPreStimSamples);
+    settings.setValue(QString("Plugin/%1/postStimSamples").arg(this->getName()), m_iPostStimSamples);
+    settings.setValue(QString("Plugin/%1/numAverages").arg(this->getName()), m_iNumAverages);
+    settings.setValue(QString("Plugin/%1/stimChannel").arg(this->getName()), m_iStimChan);
+}
+
+
+//*************************************************************************************************************
+
 void Averaging::changeNumAverages(qint32 numAve)
 {
+    QMutexLocker locker(&m_qMutex);
     m_iNumAverages = numAve;
     if(m_pRtAve)
         m_pRtAve->setAverages(numAve);
@@ -165,7 +193,9 @@ bool Averaging::start()
     if(this->isRunning())
         QThread::wait();
 
+    m_qMutex.lock();
     m_bIsRunning = true;
+    m_qMutex.unlock();
 
     // Start threads
     QThread::start();
@@ -179,6 +209,8 @@ bool Averaging::start()
 bool Averaging::stop()
 {
     //Wait until this thread is stopped
+
+    m_qMutex.lock();
     m_bIsRunning = false;
 
     if(m_bProcessData)
@@ -191,6 +223,7 @@ bool Averaging::stop()
 
 //        m_pRTMSAOutput->data()->clear();
     }
+    m_qMutex.unlock();
 
     return true;
 }
@@ -217,6 +250,7 @@ QString Averaging::getName() const
 void Averaging::changeStimChannel(qint32 index)
 {
     Q_UNUSED(index)
+    QMutexLocker locker(&m_qMutex);
     m_iStimChan = m_pAveragingWidget->m_pComboBoxChSelection->currentData().toInt();
 //    qDebug() << "Averaging::changeStimChannel(qint32 index)" << m_pAveragingWidget->m_pComboBoxChSelection->currentData().toInt();
 }
@@ -225,6 +259,7 @@ void Averaging::changeStimChannel(qint32 index)
 
 void Averaging::changePreStim(qint32 samples)
 {
+    QMutexLocker locker(&m_qMutex);
     m_iPreStimSamples = samples;
     if(m_pRtAve)
         m_pRtAve->setPreStim(m_iPreStimSamples);
@@ -236,6 +271,7 @@ void Averaging::changePreStim(qint32 samples)
 
 void Averaging::changePostStim(qint32 samples)
 {
+    QMutexLocker locker(&m_qMutex);
     m_iPostStimSamples = samples;
     if(m_pRtAve)
         m_pRtAve->setPostStim(m_iPostStimSamples);
@@ -255,6 +291,7 @@ QWidget* Averaging::setupWidget()
 
 void Averaging::showAveragingWidget()
 {
+    QMutexLocker locker(&m_qMutex);
     m_pAveragingWidget = AveragingSettingsWidget::SPtr(new AveragingSettingsWidget(this));
     m_pAveragingWidget->show();
 }
@@ -303,11 +340,11 @@ void Averaging::appendEvoked(FiffEvoked::SPtr p_pEvoked)
 
     if(p_pEvoked->comment == t_sStimulusChannel)
     {
-        qDebug()<< "append" << p_pEvoked->comment << "=" << t_sStimulusChannel;
-        mutex.lock();
+//        qDebug()<< "append" << p_pEvoked->comment << "=" << t_sStimulusChannel;
+        m_qMutex.lock();
         m_qVecEvokedData.push_back(p_pEvoked);
-        mutex.unlock();
-        qDebug() << "append after" << m_qVecEvokedData.size();
+        m_qMutex.unlock();
+//        qDebug() << "append after" << m_qVecEvokedData.size();
     }
 }
 
@@ -333,7 +370,9 @@ void Averaging::run()
         }
     }
 
+    m_qMutex.lock();
     m_bProcessData = true;
+    m_qMutex.unlock();
 
     //
     // Init Real-Time average
@@ -343,16 +382,28 @@ void Averaging::run()
 
     m_pRtAve->start();
 
-    while (m_bIsRunning)
+    while(true)
     {
-        if(m_bProcessData)
+        {
+            QMutexLocker locker(&m_qMutex);
+            if(!m_bIsRunning)
+                break;
+        }
+
+        bool doProcessing = false;
+        {
+            QMutexLocker locker(&m_qMutex);
+            doProcessing = m_bProcessData;
+        }
+
+        if(doProcessing)
         {
             /* Dispatch the inputs */
             MatrixXd rawSegment = m_pAveragingBuffer->pop();
 
             m_pRtAve->append(rawSegment);
 
-            mutex.lock();
+            m_qMutex.lock();
             if(m_qVecEvokedData.size() > 0)
             {
                 FiffEvoked t_fiffEvoked = *m_qVecEvokedData[0].data();
@@ -362,11 +413,10 @@ void Averaging::run()
                 m_qVecEvokedData.pop_front();
 
             }
-            mutex.unlock();
+            m_qMutex.unlock();
 
         }
     }
-
 
     m_pActionShowAdjustment->setVisible(false);
 

@@ -106,6 +106,14 @@ PluginItem::PluginItem(IPlugin::SPtr pPlugin, QMenu *contextMenu, QGraphicsItem 
 
 //*************************************************************************************************************
 
+PluginItem::~PluginItem()
+{
+    m_pPlugin->unload();
+}
+
+
+//*************************************************************************************************************
+
 void PluginItem::paint(QPainter * painter, const QStyleOptionGraphicsItem * option, QWidget * widget)
 {
     QGraphicsPolygonItem::paint(painter, option, widget);

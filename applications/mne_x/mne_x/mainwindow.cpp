@@ -145,7 +145,7 @@ void MainWindow::clear()
         this->stopMeasurement();
 
     //garbage collection
-    m_pPluginSceneManager.reset();
+    m_pPluginSceneManager->clear();
 }
 
 

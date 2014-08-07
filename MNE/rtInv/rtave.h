@@ -244,7 +244,7 @@ private:
     */
     void assemblePreStimulus(const QList<QPair<QList<qint32>, MatrixXd> > &p_qListRawMatBuf, qint32 p_iStimIdx);
 
-    QMutex      mutex;                  /**< Provides access serialization between threads*/
+    QMutex m_qMutex;                    /**< Provides access serialization between threads*/
 
     qint32 m_iNumAverages;              /**< Number of averages */
 
