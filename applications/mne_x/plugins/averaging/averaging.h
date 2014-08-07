@@ -68,10 +68,7 @@
 #include <QtWidgets>
 #include <QSpinBox>
 
-
-
-#define DEBUG_AVERAGING
-
+//#define DEBUG_AVERAGING
 
 
 //*************************************************************************************************************
