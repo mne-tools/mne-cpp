@@ -69,6 +69,11 @@
 #include <QSpinBox>
 
 
+
+#define DEBUG_AVERAGING
+
+
+
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE NAMESPACE AveragingPlugin
@@ -219,11 +224,14 @@ private:
     QAction* m_pActionShowAdjustment;
 
 
+#ifdef DEBUG_AVERAGING
     //
     // TEST
     //
     qint32 m_iTestStimCh;
     qint32 m_iTestCount;
+    qint32 m_iTestCount2;
+#endif
 };
 
 } // NAMESPACE

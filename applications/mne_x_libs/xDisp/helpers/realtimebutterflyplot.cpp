@@ -201,7 +201,7 @@ void RealTimeButterflyPlot::createPlotPath(qint32 row, QPainterPath& path) const
     if(rowVec.size() > 0)
     {
         float val = rowVec[0];
-        fValue = (val-rowVec[m_pRealTimeEvokedModel->getNumPreStimSamples()-1])*fScaleY;
+        fValue = (val-rowVec[m_pRealTimeEvokedModel->getNumPreStimSamples()-1])*fScaleY;//ToDo -> -2 PreStim is one too short
 
         float newY = y_base+fValue;
 
@@ -215,9 +215,9 @@ void RealTimeButterflyPlot::createPlotPath(qint32 row, QPainterPath& path) const
     qint32 i;
     for(i = 1; i < rowVec.size(); ++i) {
 
-        if(i != m_pRealTimeEvokedModel->getNumPreStimSamples())
+        if(i != m_pRealTimeEvokedModel->getNumPreStimSamples() - 2)
         {
-            float val = rowVec[i] - rowVec[m_pRealTimeEvokedModel->getNumPreStimSamples()-1]; //remove first sample data[0] as offset
+            float val = rowVec[m_pRealTimeEvokedModel->getNumPreStimSamples()-1] - rowVec[i]; //remove first sample data[0] as offset
             fValue = val*fScaleY;
 
             fValue = fValue > fWinMaxVal ? fWinMaxVal : fValue < -fWinMaxVal ? -fWinMaxVal : fValue;
