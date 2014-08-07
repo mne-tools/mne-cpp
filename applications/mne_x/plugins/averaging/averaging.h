@@ -190,7 +190,6 @@ private:
     */
     void initConnector();
 
-
     QMutex m_qMutex;        /**< Provides access serialization between threads*/
 
     PluginInputData<NewRealTimeMultiSampleArray>::SPtr   m_pAveragingInput;     /**< The RealTimeSampleArray of the Averaging input.*/
@@ -219,6 +218,12 @@ private:
 
     QAction* m_pActionShowAdjustment;
 
+
+    //
+    // TEST
+    //
+    qint32 m_iTestStimCh;
+    qint32 m_iTestCount;
 };
 
 } // NAMESPACE
