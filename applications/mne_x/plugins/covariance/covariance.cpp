@@ -109,6 +109,12 @@ QSharedPointer<IPlugin> Covariance::clone() const
 
 void Covariance::init()
 {
+    //
+    // Load Settings
+    //
+    QSettings settings;
+    m_iEstimationSamples = settings.value(QString("Plugin/%1/estimationSamples").arg(this->getName()), 5000).toInt();
+
     // Input
     m_pCovarianceInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "CovarianceIn", "Covariance input data");
     connect(m_pCovarianceInput.data(), &PluginInputConnector::notify, this, &Covariance::update, Qt::DirectConnection);
@@ -128,7 +134,11 @@ void Covariance::init()
 
 void Covariance::unload()
 {
-
+    //
+    // Store Settings
+    //
+    QSettings settings;
+    settings.setValue(QString("Plugin/%1/estimationSamples").arg(this->getName()), m_iEstimationSamples);
 }
 
 
@@ -301,7 +311,7 @@ void Covariance::run()
         }
     }
 
-    m_pActionShowAdjustment->setVisible(false);
+//    m_pActionShowAdjustment->setVisible(false);
 
     m_pRtCov->stop();
 }

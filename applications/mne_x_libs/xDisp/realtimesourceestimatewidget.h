@@ -58,7 +58,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
-
+#include <QSlider>
 
 
 //*************************************************************************************************************
@@ -162,7 +162,7 @@ signals:
     void startInit();
 
 private:
-    QSharedPointer<RealTimeSourceEstimate> m_pRTMSE;    /**< The real-time source estimate measurement. */
+    QSharedPointer<RealTimeSourceEstimate> m_pRTSE;     /**< The real-time source estimate measurement. */
     bool m_bInitialized;                                /**< Whether init was processed successfully. */
 
     AnnotationSet m_annotationSet;
@@ -170,6 +170,9 @@ private:
 
     ClustStcModel*  m_pClustStcModel;
     ClustStcView*   m_pClustView;
+
+    QSlider* m_pSliderNormView;
+    QSlider* m_pSliderAverageView;
 };
 
 } // NAMESPACE
