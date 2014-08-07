@@ -272,53 +272,51 @@ void RawDelegate::plotEvents(const QModelIndex &index, const QStyleOptionViewIte
     qint32 sampleRangeLow = rawModel->relFiffCursor();
     qint32 sampleRangeHigh = sampleRangeLow + rawModel->sizeOfPreloadedData();
 
-    //qDebug()<<"option.rect.x()"<<option.rect.x();
-    //qDebug()<<"sampleRangeLow"<<sampleRangeLow<<"sampleRangeHigh"<<sampleRangeHigh;
-
-    for(int i = 0; i<m_eventData.rows(); i++)
-    {
-        if(m_eventData(i,0)-rawModel->firstSample()>=sampleRangeLow && m_eventData(i,0)-rawModel->firstSample()<=sampleRangeHigh)
-        {
+    for(int i = 0; i<m_eventData.rows(); i++) {
+        if(m_eventData(i,0)-rawModel->firstSample()>=sampleRangeLow && m_eventData(i,0)-rawModel->firstSample()<=sampleRangeHigh) {
             //Set color for pen depending on current event type
             QPen pen;
-            pen.setWidthF(1);
+            pen.setWidthF(m_qSettings.value("EventDesignParameters/event_marker_width").toInt());
 
-            switch(m_eventData(i,2))
-            {
+            switch(m_eventData(i,2)) {
                 default:
-                pen.setColor(Qt::black);
+                    pen.setColor(m_qSettings.value("EventDesignParameters/event_color_default").value<QColor>());
                 break;
 
                 case 1:
-                pen.setColor(Qt::black);
+                    pen.setColor(m_qSettings.value("EventDesignParameters/event_color_1").value<QColor>());
                 break;
 
                 case 2:
-                pen.setColor(Qt::blue);
+                    pen.setColor(m_qSettings.value("EventDesignParameters/event_color_2").value<QColor>());
                 break;
 
                 case 3:
-                pen.setColor(Qt::green);
+                    pen.setColor(m_qSettings.value("EventDesignParameters/event_color_3").value<QColor>());
                 break;
 
                 case 4:
-                pen.setColor(Qt::red);
+                    pen.setColor(m_qSettings.value("EventDesignParameters/event_color_4").value<QColor>());
                 break;
 
                 case 5:
-                pen.setColor(Qt::cyan);
+                    pen.setColor(m_qSettings.value("EventDesignParameters/event_color_5").value<QColor>());
                 break;
 
                 case 32:
-                pen.setColor(Qt::yellow);
+                    pen.setColor(m_qSettings.value("EventDesignParameters/event_color_32").value<QColor>());
                 break;
             }
 
+            QColor colorTemp = pen.color();
+            colorTemp.setAlpha(m_qSettings.value("EventDesignParameters/event_marker_opacity").toInt());
+            pen.setColor(colorTemp);
             painter->setPen(pen);
-            painter->drawLine(option.rect.x() + m_eventData(i,0)-rawModel->firstSample(), option.rect.y(), option.rect.x() + m_eventData(i,0)-rawModel->firstSample(), option.rect.y()-option.rect.height());
+
+            //Draw line from sample position (x) and highest to lowest y position of the column widget - Add +m_qSettings.value("EventDesignParameters/event_marker_width").toInt() to avoid painting ovre the edge of the column widget
+            painter->drawLine(option.rect.x() + m_eventData(i,0) - rawModel->firstSample(), option.rect.y(), option.rect.x() + m_eventData(i,0) - rawModel->firstSample(), option.rect.y() - option.rect.height() + m_qSettings.value("EventDesignParameters/event_marker_width").toInt());
         }
     }
     //If there are events in the m_eventData matrix between sampleRangeLow and sampleRangeHigh plot these events
-
 }
 

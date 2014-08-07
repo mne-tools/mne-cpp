@@ -135,8 +135,56 @@ QVariant EventModel::data(const QModelIndex &index, int role) const
             return QVariant((double)(m_data(index.row(), 0)-m_iFirstSample)/m_fiffInfo.sfreq);
 
         //******** third column (event type plot) ********
-        if(index.column()==2 && role == Qt::DisplayRole)
-            return QVariant(m_data(index.row(), 2));
+        if(index.column()==2) {
+            switch(role){
+                case Qt::DisplayRole:
+                    return QVariant(m_data(index.row(), 2));
+
+                case Qt::BackgroundRole:{
+                    QBrush brush;
+                    brush.setStyle(Qt::SolidPattern);
+
+                    switch(m_data(index.row(), 2)) {
+                        default:
+                            brush.setColor(m_qSettings.value("EventDesignParameters/event_color_default").value<QColor>());
+                        break;
+
+                        case 1:
+                            brush.setColor(m_qSettings.value("EventDesignParameters/event_color_1").value<QColor>());
+                        break;
+
+                        case 2:
+                            brush.setColor(m_qSettings.value("EventDesignParameters/event_color_2").value<QColor>());
+                        break;
+
+                        case 3:
+                            brush.setColor(m_qSettings.value("EventDesignParameters/event_color_3").value<QColor>());
+                        break;
+
+                        case 4:
+                            brush.setColor(m_qSettings.value("EventDesignParameters/event_color_4").value<QColor>());
+                        break;
+
+                        case 5:
+                            brush.setColor(m_qSettings.value("EventDesignParameters/event_color_5").value<QColor>());
+                        break;
+
+                        case 32:
+                            brush.setColor(m_qSettings.value("EventDesignParameters/event_color_32").value<QColor>());
+                        break;
+                    }
+
+                    QColor colorTemp = brush.color();
+                    colorTemp.setAlpha(m_qSettings.value("EventDesignParameters/event_marker_opacity").toInt());
+                    brush.setColor(colorTemp);
+                    return QVariant(brush);
+                }
+
+                case Qt::TextAlignmentRole:
+                    qDebug()<<"alignment";
+                    return Qt::AlignCenter;
+            }
+        }
 
     } // end index.valid() check
 
@@ -154,8 +202,7 @@ bool EventModel::loadEventData(QFile& qFile)
     // Read events
     MatrixXi events;
 
-    if(!MNE::read_events(qFile, events))
-    {
+    if(!MNE::read_events(qFile, events)) {
         qDebug() << "Error while reading events.";
         return false;
     }

@@ -252,9 +252,9 @@ private:
 
     //=========================================================================================================
     /**
-    * setupView sets up the QTableView being part of the model/view framework and connects them with previously created RawModel and RawDelegate.
+    * setupViews sets up the QTableView being part of the model/view framework and connects them with previously created RawModel and RawDelegate.
     */
-    void setupView();
+    void setupViews();
 
     //=========================================================================================================
     /**
@@ -264,9 +264,15 @@ private:
 
     //=========================================================================================================
     /**
-    * setupViewSettings set the settings of the view such as size policies, scrolling behaviour etc.
+    * setupRawViewSettings set the settings of the raw fiff dataview such as size policies, scrolling behaviour etc.
     */
-    void setupViewSettings();
+    void setupRawViewSettings();
+
+    //=========================================================================================================
+    /**
+    * setupEventViewSettings set the settings of the event view such as size policies, scrolling behaviour etc.
+    */
+    void setupEventViewSettings();
 
     //=========================================================================================================
     /**
