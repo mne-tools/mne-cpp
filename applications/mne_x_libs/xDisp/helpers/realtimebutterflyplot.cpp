@@ -80,8 +80,8 @@ void RealTimeButterflyPlot::paintEvent(QPaintEvent*)
             painter.save();
             painter.setPen(QPen(Qt::black, 1, Qt::DashLine));
 
-            float fDx = (float)(this->width()-2) / (float)m_pRealTimeEvokedModel->getNumSamples();
-            float posX = fDx * ((float)m_pRealTimeEvokedModel->getNumPreStimSamples() + 1.0f);
+            float fDx = (float)(this->width()-2) / ((float)m_pRealTimeEvokedModel->getNumSamples()-1.0f);
+            float posX = fDx * ((float)m_pRealTimeEvokedModel->getNumPreStimSamples()-1.0f);
             painter.drawLine(posX, 1, posX, this->height()-2);
 
             painter.restore();
@@ -193,7 +193,7 @@ void RealTimeButterflyPlot::createPlotPath(qint32 row, QPainterPath& path) const
     float y_base = path.currentPosition().y();
     QPointF qSamplePosition;
 
-    float fDx = (float)(this->width()-2) / (float)m_pRealTimeEvokedModel->getNumSamples();//((float)option.rect.width()) / t_pModel->getMaxSamples();
+    float fDx = (float)(this->width()-2) / ((float)m_pRealTimeEvokedModel->getNumSamples()-1.0f);//((float)option.rect.width()) / t_pModel->getMaxSamples();
 //    fDx *= iDownSampling;
 
     RowVectorXd rowVec = m_pRealTimeEvokedModel->data(row,1).value<RowVectorXd>();
