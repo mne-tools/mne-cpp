@@ -100,7 +100,7 @@ void RawSettings::init()
         m_qSettings.setValue("dx",DELEGATE_DX);
         m_qSettings.setValue("nhlines",DELEGATE_NHLINES);
 
-//        //maximum values for different channels types according to FiffChInfo
+        //maximum values for different channels types according to FiffChInfo
         m_qSettings.setValue("max_meg_grad",DELEGATE_MAX_MEG_GRAD);
         m_qSettings.setValue("max_meg_mag",DELEGATE_MAX_MEG_MAG);
         m_qSettings.setValue("max_eeg",DELEGATE_MAX_EEG);

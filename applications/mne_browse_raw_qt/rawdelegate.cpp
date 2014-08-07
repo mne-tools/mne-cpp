@@ -285,6 +285,10 @@ void RawDelegate::plotEvents(const QModelIndex &index, const QStyleOptionViewIte
 
             switch(m_eventData(i,2))
             {
+                default:
+                pen.setColor(Qt::black);
+                break;
+
                 case 1:
                 pen.setColor(Qt::black);
                 break;
