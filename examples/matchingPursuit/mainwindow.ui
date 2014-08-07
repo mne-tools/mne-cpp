@@ -372,21 +372,28 @@
            <number>5</number>
           </property>
           <item>
-           <widget class="QCheckBox" name="cb_all_select">
-            <property name="text">
-             <string>select / deselect all atoms</string>
-            </property>
-            <property name="tristate">
-             <bool>true</bool>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="lb_timer">
-            <property name="text">
-             <string>Timer: </string>
-            </property>
-           </widget>
+           <layout class="QHBoxLayout" name="horizontalLayout_2">
+            <item>
+             <widget class="QCheckBox" name="cb_all_select">
+              <property name="text">
+               <string>select / deselect all atoms</string>
+              </property>
+              <property name="tristate">
+               <bool>true</bool>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="lb_timer">
+              <property name="text">
+               <string/>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
           <item>
            <widget class="QProgressBar" name="progressBarCalc">
@@ -775,6 +782,22 @@
     <hint type="destinationlabel">
      <x>236</x>
      <y>130</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>rb_adativMp</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>chb_fix_phase</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>67</x>
+     <y>111</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>159</x>
+     <y>111</y>
     </hint>
    </hints>
   </connection>
