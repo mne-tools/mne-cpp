@@ -215,7 +215,7 @@ QList<GaborAtom> AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterat
         //Maximisation Simplex Algorithm implemented by Bozoa Jia, adapted to the MP Algorithm by Martin Henfling. Copyright (C) 2010 Botao Jia
         //todo change to clean use of EIGEN, @present its mixed with Namespace std and <vector>
         //iteration for multichannel
-        for(qint32 chn = 0; chn < channel_count; chn++)
+        for(qint32 chn = 0; chn < 1; chn++)
         {
             //simplexfunction to find minimum of target among parameters s, p, k
             std::vector<double> init;
