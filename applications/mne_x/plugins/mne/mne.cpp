@@ -125,7 +125,8 @@ void MNE::init()
     // Output
     m_pRTSEOutput = PluginOutputData<RealTimeSourceEstimate>::create(this, "MNE Out", "MNE output data");
     m_outputConnectors.append(m_pRTSEOutput);
-    m_pRTSEOutput->data()->setName("Real-Time Source Estimate");
+    m_pRTSEOutput->data()->setName(this->getName());//Provide name to auto store widget settings
+
     m_pRTSEOutput->data()->setAnnotSet(m_pAnnotationSet);
     m_pRTSEOutput->data()->setSurfSet(m_pSurfaceSet);
 
