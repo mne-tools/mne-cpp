@@ -54,8 +54,9 @@
 #include <QtCore/QtPlugin>
 #include <QtCore/QTextStream>
 #include <QtCore/QFile>
-
+#include <QMutexLocker>
 #include <QList>
+
 #include <QDebug>
 
 
@@ -117,6 +118,14 @@ void FiffSimulator::init()
 
     //Try to connect the cmd client on start up using localhost connection
     this->connectCmdClient();
+}
+
+
+//*************************************************************************************************************
+
+void FiffSimulator::unload()
+{
+
 }
 
 
@@ -187,6 +196,7 @@ void FiffSimulator::changeConnector(qint32 p_iNewConnectorId)
 
 void FiffSimulator::clear()
 {
+    QMutexLocker locker(&m_qMutex);
     m_pFiffInfo.reset();
     m_iBufferSize = -1;
 }
@@ -206,7 +216,7 @@ void FiffSimulator::connectCmdClient()
 
     if(m_pRtCmdClient->state() == QTcpSocket::ConnectedState)
     {
-        rtServerMutex.lock();
+        m_qMutex.lock();
 
         if(!m_bCmdClientIsConnected)
         {
@@ -244,7 +254,7 @@ void FiffSimulator::connectCmdClient()
 
             emit cmdConnectionChanged(m_bCmdClientIsConnected);
         }
-        rtServerMutex.unlock();
+        m_qMutex.unlock();
     }
 }
 
@@ -253,14 +263,13 @@ void FiffSimulator::connectCmdClient()
 
 void FiffSimulator::disconnectCmdClient()
 {
+    QMutexLocker locker(&m_qMutex);
     if(m_bCmdClientIsConnected)
     {
         m_pRtCmdClient->disconnectFromHost();
         if(m_pRtCmdClient->ConnectedState != QTcpSocket::UnconnectedState)
             m_pRtCmdClient->waitForDisconnected();
-        rtServerMutex.lock();
         m_bCmdClientIsConnected = false;
-        rtServerMutex.unlock();
         emit cmdConnectionChanged(m_bCmdClientIsConnected);
     }
 }
@@ -306,9 +315,10 @@ bool FiffSimulator::start()
         (*m_pRtCmdClient)["bufsize"].send();
 
         // Buffer
+        m_qMutex.lock();
         m_pRawMatrixBuffer_In = QSharedPointer<RawMatrixBuffer>(new RawMatrixBuffer(8,m_pFiffInfo->nchan,m_iBufferSize));
-
         m_bIsRunning = true;
+        m_qMutex.unlock();
 
         // Start threads
         QThread::start();
@@ -338,7 +348,9 @@ bool FiffSimulator::stop()
         m_pFiffSimulatorProducer->stop();
 
     //Wait until this thread is stopped
+    m_qMutex.lock();
     m_bIsRunning = false;
+    m_qMutex.unlock();
 
     if(this->isRunning())
     {
@@ -385,8 +397,13 @@ QWidget* FiffSimulator::setupWidget()
 void FiffSimulator::run()
 {
     MatrixXf matValue;
-    while(m_bIsRunning)
+    while(true)
     {
+        {
+            QMutexLocker locker(&m_qMutex);
+            if(!m_bIsRunning)
+                break;
+        }
         //pop matrix
         matValue = m_pRawMatrixBuffer_In->pop();
 

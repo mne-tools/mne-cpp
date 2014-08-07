@@ -135,7 +135,13 @@ public:
     /**
     * Initialise the RapMusicToolbox.
     */
-    void init();
+    virtual void init();
+
+    //=========================================================================================================
+    /**
+    * Is called when plugin is detached of the stage. Can be used to safe settings.
+    */
+    virtual void unload();
 
     void calcFiffInfo();
 

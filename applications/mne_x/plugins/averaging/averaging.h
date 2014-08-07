@@ -130,8 +130,20 @@ public:
     /**
     * Initialise input and output connectors.
     */
-    void init();
+    virtual void init();
 
+    //=========================================================================================================
+    /**
+    * Is called when plugin is detached of the stage. Can be used to safe settings.
+    */
+    virtual void unload();
+
+    //=========================================================================================================
+    /**
+    * Change the number of averages
+    *
+    * @param[in] numAve     new number of averages
+    */
     void changeNumAverages(qint32 numAve);
 
     //=========================================================================================================
@@ -179,7 +191,7 @@ private:
     void initConnector();
 
 
-    QMutex mutex;
+    QMutex m_qMutex;        /**< Provides access serialization between threads*/
 
     PluginInputData<NewRealTimeMultiSampleArray>::SPtr   m_pAveragingInput;     /**< The RealTimeSampleArray of the Averaging input.*/
     PluginOutputData<RealTimeEvoked>::SPtr  m_pAveragingOutput;                 /**< The RealTimeEvoked of the Averaging output.*/
