@@ -66,7 +66,7 @@ MainWindow::MainWindow(QWidget *parent)
     //setup MVC
     setupModel();
     setupDelegate();
-    setupView();
+    setupViews();
     setupLayout();
 
     createMenus();
@@ -109,7 +109,7 @@ void MainWindow::setupDelegate()
 
 //*************************************************************************************************************
 
-void MainWindow::setupView()
+void MainWindow::setupViews()
 {
     m_pRawTableView = new QTableView;
     m_pEventTableView = new QTableView;
@@ -121,8 +121,9 @@ void MainWindow::setupView()
     //set custom delegate
     m_pRawTableView->setItemDelegate(m_pRawDelegate);
 
-    //TableView settings
-    setupViewSettings();
+    //setup view settings
+    setupRawViewSettings();
+    setupEventViewSettings();
 }
 
 
@@ -145,9 +146,8 @@ void MainWindow::setupLayout()
 
 //*************************************************************************************************************
 
-void MainWindow::setupViewSettings()
+void MainWindow::setupRawViewSettings()
 {
-    //------------- SETUP VIEW: m_pRawTableView -------------
     //set some size settings for m_pRawTableView
     m_pRawTableView->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
 
@@ -174,8 +174,13 @@ void MainWindow::setupViewSettings()
 
     //connect other signals
     connect(m_pRawModel,SIGNAL(scrollBarValueChange(int)),this,SLOT(setScrollBarPosition(int)));
+}
 
-    //------------- SETUP VIEW: m_pEventModel -------------
+
+//*************************************************************************************************************
+
+void MainWindow::setupEventViewSettings()
+{
     m_pEventTableView->resizeColumnsToContents();
 
     //Connect selection in event window to specific slot
@@ -600,14 +605,14 @@ void MainWindow::jumpToEvent(const QModelIndex & current, const QModelIndex & pr
     //Jump to sample - put sample in the middle of the view (-m_pRawModel->m_iWindowSize/2)
     int rawTableViewColumnWidth = m_pRawTableView->viewport()->width();
 
-    qDebug()<<"Jumping to Event at sample "<<sample<<"rawTableViewColumnWidth"<<rawTableViewColumnWidth;
-
-    if(sample-rawTableViewColumnWidth/2 < rawTableViewColumnWidth/2)
+    if(sample-rawTableViewColumnWidth/2 < rawTableViewColumnWidth/2) //events lie in the first half of the data window at the beginning of the loaded data -> cannot centralize view on event
         m_pRawTableView->horizontalScrollBar()->setValue(0);
-    else if(sample+rawTableViewColumnWidth/2 > m_pRawModel->lastSample()-rawTableViewColumnWidth/2)
+    else if(sample+rawTableViewColumnWidth/2 > m_pRawModel->lastSample()-rawTableViewColumnWidth/2) //events lie in the last half of the data window at the end of the loaded data -> cannot centralize view on event
         m_pRawTableView->horizontalScrollBar()->setValue(m_pRawTableView->maximumWidth());
-    else
+    else //centralize view on event
         m_pRawTableView->horizontalScrollBar()->setValue(sample-rawTableViewColumnWidth/2);
+
+    //qDebug()<<"Jumping to Event at sample "<<sample<<"rawTableViewColumnWidth"<<rawTableViewColumnWidth;
 }
 
 

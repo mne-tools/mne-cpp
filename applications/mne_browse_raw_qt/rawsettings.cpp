@@ -108,4 +108,31 @@ void RawSettings::init()
         m_qSettings.setValue("max_stim",DELEGATE_MAX_STIM);
 
     m_qSettings.endGroup();
+
+    //EventDesignParameters
+    m_qSettings.beginGroup("EventDesignParameters");
+        //Event colors
+        QVariant variant;
+        variant = QColor(Qt::black);
+        m_qSettings.setValue("event_color_default",variant);
+        variant = QColor(Qt::blue);
+        m_qSettings.setValue("event_color_1",variant);
+        variant = QColor(Qt::magenta);
+        m_qSettings.setValue("event_color_2",variant);
+        variant = QColor(Qt::green);
+        m_qSettings.setValue("event_color_3",variant);
+        variant = QColor(Qt::red);
+        m_qSettings.setValue("event_color_4",variant);
+        variant = QColor(Qt::cyan);
+        m_qSettings.setValue("event_color_5",variant);
+        variant = QColor(Qt::yellow);
+        m_qSettings.setValue("event_color_32",variant);
+
+        //Event marker width
+        m_qSettings.setValue("event_marker_width",EVENT_MARKER_WIDTH);
+
+        //Event marker opacity
+        m_qSettings.setValue("event_marker_opacity",EVENT_MARKER_OPACITY);
+    m_qSettings.endGroup();
+
 }
