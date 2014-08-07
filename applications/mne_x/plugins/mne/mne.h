@@ -140,6 +140,12 @@ public:
     */
     void init();
 
+    //=========================================================================================================
+    /**
+    * Is called when plugin is detached of the stage. Can be used to safe settings.
+    */
+    virtual void unload();
+
     void calcFiffInfo();
 
     void doClustering();

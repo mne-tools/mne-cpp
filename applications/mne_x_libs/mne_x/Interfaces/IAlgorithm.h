@@ -88,6 +88,18 @@ public:
 
     //=========================================================================================================
     /**
+    * Initializes the plugin.
+    */
+    virtual void init() = 0;
+
+    //=========================================================================================================
+    /**
+    * Is called when plugin is detached of the stage. Can be used to safe settings.
+    */
+    virtual void unload() = 0;
+
+    //=========================================================================================================
+    /**
     * Starts the IAlgorithm.
     * Pure virtual method inherited by IPlugin.
     *
