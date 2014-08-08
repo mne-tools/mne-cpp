@@ -43,6 +43,7 @@
 #include "FormFiles/averagingsettingswidget.h"
 
 #include <iostream>
+#include <time.h>
 
 
 //*************************************************************************************************************
@@ -84,6 +85,10 @@ Averaging::Averaging()
 , m_iStimChan(0)
 , m_pAveragingWidget(AveragingSettingsWidget::SPtr())
 , m_pActionShowAdjustment(Q_NULLPTR)
+#ifdef DEBUG_AVERAGING
+, m_iTestCount(0)
+, m_iTestCount2(0)
+#endif
 {
     m_pActionShowAdjustment = new QAction(QIcon(":/images/averagingadjustments.png"), tr("Averaging Adjustments"),this);
 //    m_pActionSetupProject->setShortcut(tr("F12"));
@@ -209,7 +214,6 @@ bool Averaging::start()
 bool Averaging::stop()
 {
     //Wait until this thread is stopped
-
     m_qMutex.lock();
     m_bIsRunning = false;
 
@@ -314,6 +318,17 @@ void Averaging::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
         {
             m_pFiffInfo = pRTMSA->getFiffInfo();
             emit fiffInfoAvailable();
+
+#ifdef DEBUG_AVERAGING
+            for(qint32 i = 0; i < m_pFiffInfo->nchan; ++i)
+            {
+                if(m_pFiffInfo->chs[i].kind == FIFFV_STIM_CH)
+                {
+                    m_iTestStimCh = i;
+                    break;
+                }
+            }
+#endif
         }
 
 
@@ -324,6 +339,27 @@ void Averaging::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
             for(qint32 i = 0; i < pRTMSA->getMultiArraySize(); ++i)
                 t_mat.col(i) = pRTMSA->getMultiSampleArray()[i];
 
+
+#ifdef DEBUG_AVERAGING
+            qsrand(time(NULL)+m_iTestCount);
+
+            t_mat = MatrixXd::Zero(t_mat.rows(), t_mat.cols());
+
+            if(m_iTestCount%10 == 0)//GEN test stim
+            {
+                qint32 samp = (qrand() % (t_mat.cols()/8))+1; //exclude buggy 0
+                if(m_iTestCount2 % 5 == 0) // create zero every 5 generations
+                    samp = 0;
+                RowVectorXd stim = RowVectorXd::Ones(8)*5;
+                t_mat.block(m_iTestStimCh,samp,1,8) = stim;
+
+                t_mat.block(0,samp+1,m_iTestStimCh, t_mat.cols()-(samp+1)) = MatrixXd::Ones(m_iTestStimCh, t_mat.cols()-(samp+1));
+
+                qDebug() << "Pos:" << samp;
+                ++m_iTestCount2;
+            }
+            ++m_iTestCount;
+#endif
             m_pAveragingBuffer->push(&t_mat);
         }
     }
@@ -408,6 +444,10 @@ void Averaging::run()
             {
                 FiffEvoked t_fiffEvoked = *m_qVecEvokedData[0].data();
 
+
+#ifdef DEBUG_AVERAGING
+                std::cout << "EVK:" << t_fiffEvoked.data.row(0) << std::endl;
+#endif
                 m_pAveragingOutput->data()->setValue(t_fiffEvoked);
 
                 m_qVecEvokedData.pop_front();
@@ -422,4 +462,3 @@ void Averaging::run()
 
     m_pRtAve->stop();
 }
-

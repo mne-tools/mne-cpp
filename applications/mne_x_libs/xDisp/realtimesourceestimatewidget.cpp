@@ -72,8 +72,7 @@
 
 #include <QLabel>
 #include <QGridLayout>
-#include <QSlider>
-
+#include <QSettings>
 
 #include <QDebug>
 
@@ -99,7 +98,7 @@ using namespace INVERSELIB;
 
 RealTimeSourceEstimateWidget::RealTimeSourceEstimateWidget(QSharedPointer<RealTimeSourceEstimate> &pRTSE, QWidget* parent)
 : NewMeasurementWidget(parent)
-, m_pRTMSE(pRTSE)
+, m_pRTSE(pRTSE)
 , m_bInitialized(false)
 {
     m_pClustStcModel = new ClustStcModel(this);
@@ -112,18 +111,18 @@ RealTimeSourceEstimateWidget::RealTimeSourceEstimateWidget(QSharedPointer<RealTi
     QGridLayout *mainLayoutView = new QGridLayout;
 
     QLabel * pLabelNormView = new QLabel("Norm");
-    QSlider* pSliderNormView = new QSlider(Qt::Vertical);
-    QObject::connect(pSliderNormView, &QSlider::valueChanged, m_pClustStcModel, &ClustStcModel::setNormalization);
-    pSliderNormView->setMinimum(1);
-    pSliderNormView->setMaximum(20000);
-    pSliderNormView->setValue(2000);
+    m_pSliderNormView = new QSlider(Qt::Vertical);
+    QObject::connect(m_pSliderNormView, &QSlider::valueChanged, m_pClustStcModel, &ClustStcModel::setNormalization);
+    m_pSliderNormView->setMinimum(1);
+    m_pSliderNormView->setMaximum(20000);
+    m_pSliderNormView->setValue(2000);
 
     QLabel* pLabelAverageView = new QLabel("Average");
-    QSlider* pSliderAverageView = new QSlider(Qt::Horizontal);
-    QObject::connect(pSliderAverageView, &QSlider::valueChanged, m_pClustStcModel, &ClustStcModel::setAverage);
-    pSliderAverageView->setMinimum(1);
-    pSliderAverageView->setMaximum(500);
-    pSliderAverageView->setValue(100);
+    m_pSliderAverageView = new QSlider(Qt::Horizontal);
+    QObject::connect(m_pSliderAverageView, &QSlider::valueChanged, m_pClustStcModel, &ClustStcModel::setAverage);
+    m_pSliderAverageView->setMinimum(1);
+    m_pSliderAverageView->setMaximum(500);
+    m_pSliderAverageView->setValue(100);
 
     m_pClustView = new ClustStcView(false, true, QGLView::RedCyanAnaglyph);//(false); (true, QGLView::StretchedLeftRight); (true, QGLView::RedCyanAnaglyph);
     m_pClustView->setModel(m_pClustStcModel);
@@ -135,9 +134,9 @@ RealTimeSourceEstimateWidget::RealTimeSourceEstimateWidget(QSharedPointer<RealTi
 
     mainLayoutView->addWidget(pWidgetContainer,0,0,2,2);
     mainLayoutView->addWidget(pLabelNormView,0,3);
-    mainLayoutView->addWidget(pSliderNormView,1,3);
+    mainLayoutView->addWidget(m_pSliderNormView,1,3);
     mainLayoutView->addWidget(pLabelAverageView,3,0);
-    mainLayoutView->addWidget(pSliderAverageView,3,1);
+    mainLayoutView->addWidget(m_pSliderAverageView,3,1);
 
     this->setLayout(mainLayoutView);
 
@@ -149,7 +148,17 @@ RealTimeSourceEstimateWidget::RealTimeSourceEstimateWidget(QSharedPointer<RealTi
 
 RealTimeSourceEstimateWidget::~RealTimeSourceEstimateWidget()
 {
+    //
+    // Store Settings
+    //
+    if(!m_pRTSE->getName().isEmpty())
+    {
+        QString t_sRTSEName = m_pRTSE->getName();
 
+        QSettings settings;
+        settings.setValue(QString("RTSEW/%1/norm").arg(t_sRTSEName), m_pSliderNormView->value());
+        settings.setValue(QString("RTSEW/%1/average").arg(t_sRTSEName), m_pSliderAverageView->value());
+    }
 }
 
 
@@ -170,18 +179,18 @@ void RealTimeSourceEstimateWidget::getData()
         //
         // Add Data
         //
-        m_pClustStcModel->addData(*m_pRTMSE->getValue());
+        m_pClustStcModel->addData(*m_pRTSE->getValue());
     }
     else
     {
-        if(m_pRTMSE->getAnnotSet() && m_pRTMSE->getSurfSet())
+        if(m_pRTSE->getAnnotSet() && m_pRTSE->getSurfSet())
         {
-            m_pRTMSE->m_bStcSend = false;
+            m_pRTSE->m_bStcSend = false;
             init();
             //
             // Add Data
             //
-            m_pClustStcModel->addData(*m_pRTMSE->getValue());
+            m_pClustStcModel->addData(*m_pRTSE->getValue());
         }
     }
 }
@@ -191,9 +200,14 @@ void RealTimeSourceEstimateWidget::getData()
 
 void RealTimeSourceEstimateWidget::init()
 {
-    m_pClustStcModel->init(*m_pRTMSE->getAnnotSet(), *m_pRTMSE->getSurfSet());
+    QString t_sRTSEName = m_pRTSE->getName();
+    QSettings settings;
+    m_pSliderNormView->setValue(settings.value(QString("RTSEW/%1/norm").arg(t_sRTSEName), 2000).toInt());
+    m_pSliderAverageView->setValue(settings.value(QString("RTSEW/%1/average").arg(t_sRTSEName), 100).toInt());
+
+    m_pClustStcModel->init(*m_pRTSE->getAnnotSet(), *m_pRTSE->getSurfSet());
     m_bInitialized = true;
-    m_pRTMSE->m_bStcSend = true;
+    m_pRTSE->m_bStcSend = true;
 }
 
 
