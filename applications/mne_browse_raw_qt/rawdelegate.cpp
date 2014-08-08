@@ -306,6 +306,14 @@ void RawDelegate::plotEvents(const QModelIndex &index, const QStyleOptionViewIte
                 case 32:
                     pen.setColor(m_qSettings.value("EventDesignParameters/event_color_32").value<QColor>());
                 break;
+
+                case 998:
+                    pen.setColor(m_qSettings.value("EventDesignParameters/event_color_998").value<QColor>());
+                break;
+
+                case 999:
+                    pen.setColor(m_qSettings.value("EventDesignParameters/event_color_999").value<QColor>());
+                break;
             }
 
             QColor colorTemp = pen.color();

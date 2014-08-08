@@ -172,6 +172,14 @@ QVariant EventModel::data(const QModelIndex &index, int role) const
                         case 32:
                             brush.setColor(m_qSettings.value("EventDesignParameters/event_color_32").value<QColor>());
                         break;
+
+                        case 998:
+                            brush.setColor(m_qSettings.value("EventDesignParameters/event_color_998").value<QColor>());
+                        break;
+
+                        case 999:
+                            brush.setColor(m_qSettings.value("EventDesignParameters/event_color_999").value<QColor>());
+                        break;
                     }
 
                     QColor colorTemp = brush.color();
