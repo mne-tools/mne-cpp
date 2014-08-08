@@ -125,7 +125,7 @@ void FiffSimulator::init()
 
 void FiffSimulator::unload()
 {
-
+    qDebug() << "void FiffSimulator::unload()";
 }
 
 

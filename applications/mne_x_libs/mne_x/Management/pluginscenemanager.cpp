@@ -218,8 +218,5 @@ void PluginSceneManager::stopPlugins()
 
 void PluginSceneManager::clear()
 {
-    for(qint32 i = 0; i < m_pluginList.size(); ++i)
-        m_pluginList[i]->unload();
-
-    m_pluginList.clear();
+//    m_pluginList.clear();
 }

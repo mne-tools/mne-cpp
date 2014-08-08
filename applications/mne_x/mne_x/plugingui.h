@@ -83,7 +83,7 @@ class PluginGui : public QMainWindow
     Q_OBJECT
     friend class PluginScene;
 public:
-    PluginGui(MNEX::PluginManager::SPtr &pPluginManager, MNEX::PluginSceneManager::SPtr &pPluginSceneManager);
+    PluginGui(MNEX::PluginManager *pPluginManager, MNEX::PluginSceneManager *pPluginSceneManager);
 
     ~PluginGui();
 
@@ -117,17 +117,23 @@ private:
 
     QAction* createItemAction(QString name, QMenu* menu);
 
-    PluginManager::SPtr       m_pPluginManager;       /**< Corresponding plugin manager. */
-    PluginSceneManager::SPtr  m_pPluginSceneManager;  /**< Corresponding plugin scene manager. */
+    PluginManager*          m_pPluginManager;       /**< Corresponding plugin manager. */
+    PluginSceneManager*     m_pPluginSceneManager;  /**< Corresponding plugin scene manager. */
 
     IPlugin::SPtr                   m_pCurrentPlugin;
     PluginConnectorConnection::SPtr m_pCurrentConnection;
 
     PluginScene*    m_pPluginScene;         /**< Plugin graph */
     QGraphicsView*  m_pGraphicsView;        /**< View to show graph */
+
+    QToolButton*    m_pSensorToolButton;
+    QToolButton*    m_pAlgorithmToolButton;
+    QToolButton*    m_pIOToolButton;
     QToolBar*       m_pToolBarPlugins;
     QActionGroup*   m_pActionGroupPlugins;
 
+    QToolButton*    m_pPointerButton;
+    QToolButton*    m_pLinePointerButton;
     QToolBar *      m_pToolBarPointer;
     QButtonGroup *  m_pButtonGroupPointers;
 
