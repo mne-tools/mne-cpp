@@ -127,6 +127,10 @@ void RawSettings::init()
         m_qSettings.setValue("event_color_5",variant);
         variant = QColor(Qt::yellow);
         m_qSettings.setValue("event_color_32",variant);
+        variant = QColor(Qt::darkBlue);
+        m_qSettings.setValue("event_color_998",variant);
+        variant = QColor(Qt::darkCyan);
+        m_qSettings.setValue("event_color_999",variant);
 
         //Event marker width
         m_qSettings.setValue("event_marker_width",EVENT_MARKER_WIDTH);
