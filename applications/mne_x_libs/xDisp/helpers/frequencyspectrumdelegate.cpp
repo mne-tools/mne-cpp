@@ -123,6 +123,7 @@ void FrequencySpectrumDelegate::paint(QPainter *painter, const QStyleOptionViewI
                 //Plot grid
                 painter->setRenderHint(QPainter::Antialiasing, false);
                 createGridPath(index, option, path, data);
+                createGridTick(index, option, painter);
 
                 painter->save();
                 QPen pen;
@@ -209,6 +210,7 @@ void FrequencySpectrumDelegate::createPlotPath(const QModelIndex &index, const Q
         path.moveTo(qSamplePosition);
     }
 
+
     //create lines from one to the next sample
     qint32 i;
     for(i = 1; i < data.size(); ++i) {
@@ -248,7 +250,7 @@ void FrequencySpectrumDelegate::createGridPath(const QModelIndex &index, const Q
             qListLineSamples.append(idx);
         }
 
-        //horizontal lines
+        //vertical lines
         float yStart = option.rect.topLeft().y();
 
         float yEnd = option.rect.bottomRight().y();
@@ -260,3 +262,35 @@ void FrequencySpectrumDelegate::createGridPath(const QModelIndex &index, const Q
         }
     }
 }
+
+//*************************************************************************************************************
+
+void FrequencySpectrumDelegate::createGridTick(const QModelIndex &index, const QStyleOptionViewItem &option,  QPainter *painter) const
+{
+    const FrequencySpectrumModel* t_pModel = static_cast<const FrequencySpectrumModel*>(index.model());
+
+    if(t_pModel->getInfo())
+    {
+        double fs = t_pModel->getInfo()->sfreq/2;
+
+        qint32 numLines = (qint32)ceil(log10(fs));
+
+        QList<qint32> qListLineSamples;
+
+
+        for(qint32 lineIdx = 0; lineIdx < numLines; ++lineIdx)
+        {
+            double val = pow(10,lineIdx);
+            qint32 idx = (qint32)floor((val/fs) * t_pModel->getNumStems());
+            qListLineSamples.append(idx);
+        }
+
+        float yStart = option.rect.topLeft().y();
+        for(qint32 i = 0; i < qListLineSamples.size(); ++i) {
+            double val = pow(10,i);
+            float x = (t_pModel->getFreqScale()[qListLineSamples[i]])*option.rect.width();
+            painter->drawText(x,yStart,QString("%1Hz").arg(val));
+        }
+    }
+}
+
