@@ -83,9 +83,25 @@ class PluginGui : public QMainWindow
     Q_OBJECT
     friend class PluginScene;
 public:
-    PluginGui(MNEX::PluginManager *pPluginManager, MNEX::PluginSceneManager *pPluginSceneManager);
+    PluginGui(const QString& sAppPath, MNEX::PluginManager *pPluginManager, MNEX::PluginSceneManager *pPluginSceneManager);
 
     ~PluginGui();
+
+    //=========================================================================================================
+    /**
+    * Loads a current plug in configuration from a given file
+    *
+    * @param [in] sFileName     The file name to load the configuration from.
+    */
+    void loadConfig(const QString& sFileName);
+
+    //=========================================================================================================
+    /**
+    * Saves the current plug in configuration to a given file
+    *
+    * @param [in] sFileName     The file name to stor the configuration to.
+    */
+    void saveConfig(const QString& sFileName);
 
 
     inline IPlugin::SPtr getCurrentPlugin();
@@ -114,6 +130,8 @@ private:
     void createActions();
     void createMenuItem();
     void createToolbars();
+
+    QString m_sAppPath;         /**< holds the application path.*/
 
     QAction* createItemAction(QString name, QMenu* menu);
 
