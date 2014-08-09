@@ -37,7 +37,7 @@ include(../../../mne-cpp.pri)
 
 TEMPLATE = app
 
-QT += network core widgets
+QT += network core widgets xml
 
 TARGET = mne_x
 

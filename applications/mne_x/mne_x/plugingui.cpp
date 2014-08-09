@@ -56,6 +56,9 @@
 //=============================================================================================================
 
 #include <QtWidgets>
+#include <QDomDocument>
+#include <QTextStream>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -70,8 +73,9 @@ using namespace MNEX;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-PluginGui::PluginGui(PluginManager *pPluginManager, PluginSceneManager *pPluginSceneManager)
-: m_pPluginManager(pPluginManager)
+PluginGui::PluginGui(const QString& sAppPath, PluginManager *pPluginManager, PluginSceneManager *pPluginSceneManager)
+: m_sAppPath(sAppPath)
+, m_pPluginManager(pPluginManager)
 , m_pPluginSceneManager(pPluginSceneManager)
 , m_pCurrentPlugin(0)
 , m_pGraphicsView(Q_NULLPTR)
@@ -95,7 +99,6 @@ PluginGui::PluginGui(PluginManager *pPluginManager, PluginSceneManager *pPluginS
     connect(m_pPluginScene, &PluginScene::selectionChanged,
             this, &PluginGui::newItemSelected);
 
-
     createToolbars();
 
     m_pGraphicsView = new QGraphicsView(m_pPluginScene);
@@ -103,6 +106,8 @@ PluginGui::PluginGui(PluginManager *pPluginManager, PluginSceneManager *pPluginS
     setCentralWidget(m_pGraphicsView);
     setWindowTitle(tr("PluginScene"));
     setUnifiedTitleAndToolBarOnMac(true);
+
+    loadConfig(QString("%1/%2").arg(m_sAppPath).arg("mne_x_default.xml"));
 }
 
 
@@ -110,6 +115,12 @@ PluginGui::PluginGui(PluginManager *pPluginManager, PluginSceneManager *pPluginS
 
 PluginGui::~PluginGui()
 {
+    //
+    // Save current configuration
+    //
+    qDebug() << m_sAppPath;
+    saveConfig(QString("%1/%2").arg(m_sAppPath).arg("mne_x_default.xml"));
+
     m_pCurrentPlugin.reset();
 
     //Plugin Toolbar
@@ -134,6 +145,43 @@ PluginGui::~PluginGui()
 
     if(m_pGraphicsView)
         delete m_pGraphicsView;
+}
+
+
+//*************************************************************************************************************
+
+void PluginGui::loadConfig(const QString& sFileName)
+{
+    QDomDocument domDocument;
+
+}
+
+
+//*************************************************************************************************************
+
+void PluginGui::saveConfig(const QString& sFileName)
+{
+    qDebug() << "Save Config";
+    QDomDocument doc("MyML");
+    QDomElement root = doc.createElement("MyML");
+    doc.appendChild(root);
+
+    QDomElement tag = doc.createElement("Greeting");
+    root.appendChild(tag);
+
+    QDomText t = doc.createTextNode("Hello World");
+    tag.appendChild(t);
+
+    QString xml = doc.toString();
+
+    QFile file(sFileName);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+        return;
+
+    qDebug() << "write data" << sFileName;
+
+    QTextStream out(&file);
+    out << xml;
 }
 
 

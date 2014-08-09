@@ -458,7 +458,7 @@ void MainWindow::createPluginDockWindow()
     m_pPluginGuiDockWidget = new QDockWidget(tr("Plugins"), this);
     m_pPluginGuiDockWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 
-    m_pPluginGui = new PluginGui(m_pPluginManager.data(), m_pPluginSceneManager.data());
+    m_pPluginGui = new PluginGui(qApp->applicationDirPath(), m_pPluginManager.data(), m_pPluginSceneManager.data());
     m_pPluginGui->setParent(m_pPluginGuiDockWidget);
     m_pPluginGuiDockWidget->setWidget(m_pPluginGui);
 
