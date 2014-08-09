@@ -162,15 +162,45 @@ void PluginGui::loadConfig(const QString& sFileName)
 void PluginGui::saveConfig(const QString& sFileName)
 {
     qDebug() << "Save Config";
-    QDomDocument doc("MyML");
-    QDomElement root = doc.createElement("MyML");
+    QDomDocument doc("PluginConfig");
+    QDomElement root = doc.createElement("PluginTree");
     doc.appendChild(root);
 
-    QDomElement tag = doc.createElement("Greeting");
-    root.appendChild(tag);
+    QDomElement plugins = doc.createElement("Plugins");
+    root.appendChild(plugins);
 
-    QDomText t = doc.createTextNode("Hello World");
-    tag.appendChild(t);
+    IPlugin::SPtr pPlugin;
+    foreach (QGraphicsItem *item, m_pPluginScene->items())
+    {
+        if(item->type() == PluginItem::Type)
+        {
+            pPlugin = qgraphicsitem_cast<PluginItem *>(item)->plugin();
+
+            QDomElement tag = doc.createElement("Plugin");
+            plugins.appendChild(tag);
+
+            QDomText t = doc.createTextNode(pPlugin->getName());
+            tag.appendChild(t);
+        }
+    }
+
+    QDomElement connections = doc.createElement("Connections");
+    root.appendChild(connections);
+    PluginConnectorConnection::SPtr pConnection;
+    foreach (QGraphicsItem *item, m_pPluginScene->items())
+    {
+        if(item->type() == Arrow::Type)
+        {
+            pConnection = qgraphicsitem_cast<Arrow *>(item)->connection();
+
+            QDomElement tag = doc.createElement("Connection");
+            connections.appendChild(tag);
+
+            QDomText t = doc.createTextNode(pConnection->getSender()->getName()+"#to#"+pConnection->getReceiver()->getName());
+            tag.appendChild(t);
+        }
+    }
+
 
     QString xml = doc.toString();
 
