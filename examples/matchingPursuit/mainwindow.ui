@@ -559,7 +559,7 @@
            </sizepolicy>
           </property>
           <property name="text">
-           <string>difference</string>
+           <string>difference:</string>
           </property>
          </widget>
         </item>
