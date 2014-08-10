@@ -128,6 +128,14 @@ private:
     */
     void createGridPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorXd& data) const;
 
+    //=========================================================================================================
+    /**
+    * createGridTick Creates x-axis tickes for the grid plot.
+    *
+    * Added by LImin Sun; 08.07/2014
+    */
+    void createGridTick(const QModelIndex &index, const QStyleOptionViewItem &option,  QPainter *painter) const;
+
     //Settings
 //    QSettings m_qSettings;
 

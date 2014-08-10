@@ -110,6 +110,9 @@ QSharedPointer<IPlugin> FiffSimulator::clone() const
 
 void FiffSimulator::init()
 {
+    m_pRTMSA_FiffSimulator = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "FiffSimulator", "Fiff Simulator Output");
+    m_outputConnectors.append(m_pRTMSA_FiffSimulator);
+
     // Start FiffSimulatorProducer
     m_pFiffSimulatorProducer->start();
 
@@ -125,7 +128,7 @@ void FiffSimulator::init()
 
 void FiffSimulator::unload()
 {
-
+    qDebug() << "void FiffSimulator::unload()";
 }
 
 
@@ -138,16 +141,10 @@ void FiffSimulator::initConnector()
 {
     if(m_pFiffInfo)
     {
-        m_pRTMSA_FiffSimulator = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "FiffSimulator", "Fiff Simulator Output");
-
         m_pRTMSA_FiffSimulator->data()->initFromFiffInfo(m_pFiffInfo);
         m_pRTMSA_FiffSimulator->data()->setMultiArraySize(100);
-
         m_pRTMSA_FiffSimulator->data()->setVisibility(true);
-
         m_pRTMSA_FiffSimulator->data()->setXMLLayoutFile("./mne_x_plugins/resources/FiffSimulator/VectorViewSimLayout.xml");
-
-        m_outputConnectors.append(m_pRTMSA_FiffSimulator);
     }
 }
 
@@ -307,9 +304,6 @@ bool FiffSimulator::start()
 
     if(m_bCmdClientIsConnected && m_pFiffInfo)
     {
-        // Initialize real time measurements
-        init();
-
         //Set buffer size
         (*m_pRtCmdClient)["bufsize"].pValues()[0].setValue(m_iBufferSize);
         (*m_pRtCmdClient)["bufsize"].send();

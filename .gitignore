@@ -344,3 +344,4 @@ bin/mne_browse_raw_qt.app/Contents/PkgInfo
 /bin/test_mne_rtd
 /bin/test_mne_stcd
 /bin/test_mne_surfaced
+/bin/mne_x_default.xml
