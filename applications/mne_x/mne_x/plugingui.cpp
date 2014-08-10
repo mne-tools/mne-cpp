@@ -58,6 +58,8 @@
 #include <QtWidgets>
 #include <QDomDocument>
 #include <QTextStream>
+#include <QStandardPaths>
+#include <QDir>
 
 
 //*************************************************************************************************************
@@ -73,9 +75,8 @@ using namespace MNEX;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-PluginGui::PluginGui(const QString& sAppPath, PluginManager *pPluginManager, PluginSceneManager *pPluginSceneManager)
-: m_sAppPath(sAppPath)
-, m_pPluginManager(pPluginManager)
+PluginGui::PluginGui(PluginManager *pPluginManager, PluginSceneManager *pPluginSceneManager)
+: m_pPluginManager(pPluginManager)
 , m_pPluginSceneManager(pPluginSceneManager)
 , m_pCurrentPlugin(0)
 , m_pGraphicsView(Q_NULLPTR)
@@ -90,6 +91,7 @@ PluginGui::PluginGui(const QString& sAppPath, PluginManager *pPluginManager, Plu
 {
     createActions();
     createMenuItem();
+    createToolbars();
 
     m_pPluginScene = new PluginScene(m_pMenuItem, this);
     m_pPluginScene->setSceneRect(QRectF(0, 0, 200, 500));
@@ -99,15 +101,13 @@ PluginGui::PluginGui(const QString& sAppPath, PluginManager *pPluginManager, Plu
     connect(m_pPluginScene, &PluginScene::selectionChanged,
             this, &PluginGui::newItemSelected);
 
-    createToolbars();
-
     m_pGraphicsView = new QGraphicsView(m_pPluginScene);
 
     setCentralWidget(m_pGraphicsView);
     setWindowTitle(tr("PluginScene"));
     setUnifiedTitleAndToolBarOnMac(true);
 
-    loadConfig(QString("%1/%2").arg(m_sAppPath).arg("mne_x_default.xml"));
+    loadConfig(QStandardPaths::writableLocation(QStandardPaths::DataLocation), "default.xml");
 }
 
 
@@ -118,8 +118,7 @@ PluginGui::~PluginGui()
     //
     // Save current configuration
     //
-    qDebug() << m_sAppPath;
-    saveConfig(QString("%1/%2").arg(m_sAppPath).arg("mne_x_default.xml"));
+    saveConfig(QStandardPaths::writableLocation(QStandardPaths::DataLocation),"default.xml");
 
     m_pCurrentPlugin.reset();
 
@@ -150,25 +149,132 @@ PluginGui::~PluginGui()
 
 //*************************************************************************************************************
 
-void PluginGui::loadConfig(const QString& sFileName)
+void PluginGui::loadConfig(const QString& sPath, const QString& sFileName)
 {
-    QDomDocument domDocument;
+    qDebug() << "load" << sPath+"/"+sFileName;
 
+    QDomDocument doc("PluginConfig");
+    QFile file(sPath+"/"+sFileName);
+    if (!file.open(QIODevice::ReadOnly))
+        return;
+    if (!doc.setContent(&file)) {
+        file.close();
+        return;
+    }
+    file.close();
+
+
+    QDomElement docElem = doc.documentElement();
+    if(docElem.tagName() != "PluginTree")
+    {
+        qWarning() << sFileName << "not found!";
+        return;
+    }
+
+    QDomNode nodePluginTree = docElem.firstChild();
+    while(!nodePluginTree.isNull()) {
+        QDomElement elementPluginTree = nodePluginTree.toElement();
+        //
+        // Create Plugins
+        //
+        if(elementPluginTree.tagName() == "Plugins") {
+            QDomNode nodePlugins = elementPluginTree.firstChild();
+            while(!nodePlugins.isNull())
+            {
+                QDomElement e = nodePlugins.toElement();
+                nodePlugins = nodePlugins.nextSibling();
+                if(!e.isNull()) {
+                    QPointF pos((qreal)e.attribute("pos_x").toInt(),(qreal)e.attribute("pos_y").toInt());
+                    QAction *pCurrentAction = Q_NULLPTR;
+
+                    for(qint32 i = 0; i < m_pActionGroupPlugins->actions().size(); ++i)
+                    {
+                        if(m_pActionGroupPlugins->actions()[i]->text() == e.attribute("name"))
+                        {
+                            pCurrentAction = m_pActionGroupPlugins->actions()[i];
+                            break;
+                        }
+                    }
+
+                    if(!pCurrentAction)
+                        continue;
+
+                    pCurrentAction->setChecked(true);
+                    m_pPluginScene->setActionPluginItem(pCurrentAction);
+                    m_pPluginScene->setMode(PluginScene::InsertPluginItem);
+                    m_pPluginScene->insertItem(pos);
+                }
+            }
+        }
+        //
+        // Create Connections
+        //
+        if(elementPluginTree.tagName() == "Connections") {
+            QDomNode nodeConections = elementPluginTree.firstChild();
+            while(!nodeConections.isNull())
+            {
+                QDomElement e = nodeConections.toElement();
+                nodeConections = nodeConections.nextSibling();
+                if(!e.isNull()) {
+                    qDebug() << qPrintable(e.tagName()) << e.attribute("receiver") << e.attribute("sender");
+
+                    QString sSender = e.attribute("sender");
+                    QString sReceiver = e.attribute("receiver");
+
+                    //
+                    // Start & End
+                    //
+                    PluginItem* startItem = Q_NULLPTR;
+                    PluginItem* endItem = Q_NULLPTR;
+                    for(qint32 i = 0; i < m_pPluginScene->items().size(); ++i)
+                    {
+                        PluginItem* item = qgraphicsitem_cast<PluginItem *>(m_pPluginScene->items()[i]);
+                        if(item->plugin()->getName() == sSender)
+                            startItem = item;
+
+                        if(item->plugin()->getName() == sReceiver)
+                            endItem = item;
+
+                    }
+
+                    if(!startItem || !endItem)
+                        continue;
+
+                    PluginConnectorConnection::SPtr pConnection = PluginConnectorConnection::create(startItem->plugin(), endItem->plugin());
+
+                    if(pConnection->isConnected())
+                    {
+                        Arrow *arrow = new Arrow(startItem, endItem, pConnection);
+                        arrow->setColor(QColor(65,113,156));
+                        startItem->addArrow(arrow);
+                        endItem->addArrow(arrow);
+                        arrow->setZValue(-1000.0);
+                        m_pPluginScene->addItem(arrow);
+                        arrow->updatePosition();
+                    }
+
+                }
+            }
+        }
+        nodePluginTree = nodePluginTree.nextSibling();
+    }
 }
 
 
 //*************************************************************************************************************
 
-void PluginGui::saveConfig(const QString& sFileName)
+void PluginGui::saveConfig(const QString& sPath, const QString& sFileName)
 {
-    qDebug() << "Save Config";
+    qDebug() << "Save Config" << sPath+"/"+sFileName;
     QDomDocument doc("PluginConfig");
     QDomElement root = doc.createElement("PluginTree");
     doc.appendChild(root);
 
+    //
+    // Plugins
+    //
     QDomElement plugins = doc.createElement("Plugins");
     root.appendChild(plugins);
-
     IPlugin::SPtr pPlugin;
     foreach (QGraphicsItem *item, m_pPluginScene->items())
     {
@@ -176,14 +282,17 @@ void PluginGui::saveConfig(const QString& sFileName)
         {
             pPlugin = qgraphicsitem_cast<PluginItem *>(item)->plugin();
 
-            QDomElement tag = doc.createElement("Plugin");
-            plugins.appendChild(tag);
-
-            QDomText t = doc.createTextNode(pPlugin->getName());
-            tag.appendChild(t);
+            QDomElement plugin = doc.createElement("Plugin");
+            plugin.setAttribute("name",pPlugin->getName());
+            plugin.setAttribute("pos_x",item->x());
+            plugin.setAttribute("pos_y",item->y());
+            plugins.appendChild(plugin);
         }
     }
 
+    //
+    // Connections
+    //
     QDomElement connections = doc.createElement("Connections");
     root.appendChild(connections);
     PluginConnectorConnection::SPtr pConnection;
@@ -193,22 +302,23 @@ void PluginGui::saveConfig(const QString& sFileName)
         {
             pConnection = qgraphicsitem_cast<Arrow *>(item)->connection();
 
-            QDomElement tag = doc.createElement("Connection");
-            connections.appendChild(tag);
-
-            QDomText t = doc.createTextNode(pConnection->getSender()->getName()+"#to#"+pConnection->getReceiver()->getName());
-            tag.appendChild(t);
+            QDomElement connection = doc.createElement("Connection");
+            connection.setAttribute("sender",pConnection->getSender()->getName());
+            connection.setAttribute("receiver",pConnection->getReceiver()->getName());
+            connections.appendChild(connection);
         }
     }
 
-
     QString xml = doc.toString();
 
-    QFile file(sFileName);
+    QDir dir;
+    if(!dir.exists(sPath))
+        if(!dir.mkpath(sPath))
+            return;
+
+    QFile file(sPath+"/"+sFileName);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
         return;
-
-    qDebug() << "write data" << sFileName;
 
     QTextStream out(&file);
     out << xml;
@@ -277,7 +387,6 @@ void PluginGui::actionGroupTriggered(QAction* action)
 {
     m_pPluginScene->setActionPluginItem(action);
     m_pPluginScene->setMode(PluginScene::InsertPluginItem);
-
 }
 
 
