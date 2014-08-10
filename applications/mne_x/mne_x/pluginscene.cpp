@@ -82,6 +82,39 @@ PluginScene::~PluginScene()
 
 //*************************************************************************************************************
 
+void PluginScene::insertItem(const QPointF& pos)
+{
+    PluginItem *item;
+    IPlugin::SPtr pPlugin;
+    QString name;
+    switch (m_mode) {
+        case InsertPluginItem:
+            if(insertPlugin(m_pActionPluginItem, pPlugin))
+            {
+                name = m_pActionPluginItem->text();
+                item = new PluginItem(pPlugin, m_pMenuPluginItem);
+                addItem(item);
+                item->setPos(pos);
+                emit itemInserted(item);
+            }
+            else
+            {
+                //If insertion failed, disable insert action
+                m_pActionPluginItem->setEnabled(false);
+            }
+            break;
+        case InsertLine:
+            line = new QGraphicsLineItem(QLineF(pos,pos));
+            line->setPen(QPen(m_qColorLine, 1));
+            addItem(line);
+            break;
+        default:
+        ;
+    }
+}
+
+//*************************************************************************************************************
+
 bool PluginScene::insertPlugin(QAction* pActionPluginItem, IPlugin::SPtr &pAddedPlugin)
 {
     if(pActionPluginItem->isEnabled())
@@ -111,34 +144,8 @@ void PluginScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
     if (mouseEvent->button() != Qt::LeftButton)
         return;
 
-    PluginItem *item;
-    IPlugin::SPtr pPlugin;
-    QString name;
-    switch (m_mode) {
-        case InsertPluginItem:
-            if(insertPlugin(m_pActionPluginItem, pPlugin))
-            {
-                name = m_pActionPluginItem->text();
-                item = new PluginItem(pPlugin, m_pMenuPluginItem);
-                addItem(item);
-                item->setPos(mouseEvent->scenePos());
-                emit itemInserted(item);
-            }
-            else
-            {
-                //If insertion failed, disable insert action
-                m_pActionPluginItem->setEnabled(false);
-            }
-            break;
-        case InsertLine:
-            line = new QGraphicsLineItem(QLineF(mouseEvent->scenePos(),
-                                        mouseEvent->scenePos()));
-            line->setPen(QPen(m_qColorLine, 1));
-            addItem(line);
-            break;
-        default:
-        ;
-    }
+    insertItem(mouseEvent->scenePos());
+
     QGraphicsScene::mousePressEvent(mouseEvent);
 }
 
@@ -184,8 +191,6 @@ void PluginScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
             if(pConnection->isConnected())
             {
-//                connect(startItem->plugin()->getOutputConnectors()[0].data(), &PluginOutputConnector::notify,
-//                        endItem->plugin()->getInputConnectors()[0].data(), &PluginInputConnector::update);
                 Arrow *arrow = new Arrow(startItem, endItem, pConnection);
                 arrow->setColor(m_qColorLine);
                 startItem->addArrow(arrow);

@@ -131,6 +131,12 @@ public:
 
     //=========================================================================================================
     /**
+    * Is called when plugin is detached of the stage. Can be used to safe settings.
+    */
+    virtual void unload();
+
+    //=========================================================================================================
+    /**
     * Initialise the ECGSimulator.
     */
     void initChannels();
