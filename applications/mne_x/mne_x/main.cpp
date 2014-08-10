@@ -62,6 +62,7 @@
 
 #include <QtGui>
 #include <QApplication>
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
@@ -80,7 +81,7 @@ using namespace Eigen;
 //=============================================================================================================
 
 
-MainWindow* mainWin = NULL;
+QSharedPointer<MainWindow> mainWin;
 
 //=============================================================================================================
 /**
@@ -164,7 +165,7 @@ int main(int argc, char *argv[])
     //Store application info to use QSettings
     QCoreApplication::setOrganizationName("MNE-CPP");
     QCoreApplication::setOrganizationDomain("www.tu-ilmenau.de/mne-cpp");
-    QCoreApplication::setApplicationName("MNE-X");
+    QCoreApplication::setApplicationName(CInfo::AppNameShort());
 
     XMEASLIB::MeasurementTypes::registerTypes();
 
@@ -180,10 +181,10 @@ int main(int argc, char *argv[])
         splashscreen->showMessage("Loading modules.."+ QString::number(p)+"%");
     }
 
-    mainWin = new MainWindow();
+    mainWin = QSharedPointer<MainWindow>(new MainWindow);
     mainWin->show();
 
-    splashscreen->finish(mainWin);
+    splashscreen->finish(mainWin.data());
 
     //ToDo Check the message handler and FiffSimulator
 

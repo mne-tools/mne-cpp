@@ -134,6 +134,21 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
     clear();
+
+    //clean
+    if(m_pToolBar)
+    {
+        if(m_pLabelTime)
+            delete m_pLabelTime;
+        m_pLabelTime = NULL;
+        delete m_pToolBar;
+    }
+
+    if(m_pDynamicPluginToolBar)
+        delete m_pDynamicPluginToolBar;
+
+    if(m_pDynamicDisplayToolBar)
+        delete m_pDynamicDisplayToolBar;
 }
 
 
@@ -143,9 +158,6 @@ void MainWindow::clear()
 {
     if(m_bIsRunning)
         this->stopMeasurement();
-
-    //garbage collection
-    m_pPluginSceneManager->clear();
 }
 
 
@@ -153,8 +165,6 @@ void MainWindow::clear()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    clear();
-
     QMainWindow::closeEvent(event);
 }
 
@@ -395,7 +405,7 @@ void MainWindow::createToolBars()
 
         m_pToolBar->addSeparator();
 
-        m_pLabelTime = new QLabel;
+        m_pLabelTime = new QLabel(this);
         m_pToolBar->addWidget(m_pLabelTime);
         m_pLabelTime->setText(QTime(0, 0).toString());
     }
@@ -448,7 +458,7 @@ void MainWindow::createPluginDockWindow()
     m_pPluginGuiDockWidget = new QDockWidget(tr("Plugins"), this);
     m_pPluginGuiDockWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 
-    m_pPluginGui = new PluginGui(m_pPluginManager, m_pPluginSceneManager);
+    m_pPluginGui = new PluginGui(m_pPluginManager.data(), m_pPluginSceneManager.data());
     m_pPluginGui->setParent(m_pPluginGuiDockWidget);
     m_pPluginGuiDockWidget->setWidget(m_pPluginGui);
 

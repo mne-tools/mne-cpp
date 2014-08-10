@@ -68,6 +68,8 @@
 #include <QtWidgets>
 #include <QSpinBox>
 
+//#define DEBUG_AVERAGING
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -190,7 +192,6 @@ private:
     */
     void initConnector();
 
-
     QMutex m_qMutex;        /**< Provides access serialization between threads*/
 
     PluginInputData<NewRealTimeMultiSampleArray>::SPtr   m_pAveragingInput;     /**< The RealTimeSampleArray of the Averaging input.*/
@@ -219,6 +220,15 @@ private:
 
     QAction* m_pActionShowAdjustment;
 
+
+#ifdef DEBUG_AVERAGING
+    //
+    // TEST
+    //
+    qint32 m_iTestStimCh;
+    qint32 m_iTestCount;
+    qint32 m_iTestCount2;
+#endif
 };
 
 } // NAMESPACE

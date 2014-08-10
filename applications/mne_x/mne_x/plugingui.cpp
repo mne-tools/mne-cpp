@@ -56,6 +56,11 @@
 //=============================================================================================================
 
 #include <QtWidgets>
+#include <QDomDocument>
+#include <QTextStream>
+#include <QStandardPaths>
+#include <QDir>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -70,13 +75,23 @@ using namespace MNEX;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-PluginGui::PluginGui(PluginManager::SPtr &pPluginManager, MNEX::PluginSceneManager::SPtr &pPluginSceneManager)
+PluginGui::PluginGui(PluginManager *pPluginManager, PluginSceneManager *pPluginSceneManager)
 : m_pPluginManager(pPluginManager)
 , m_pPluginSceneManager(pPluginSceneManager)
 , m_pCurrentPlugin(0)
+, m_pGraphicsView(Q_NULLPTR)
+, m_pSensorToolButton(Q_NULLPTR)
+, m_pAlgorithmToolButton(Q_NULLPTR)
+, m_pIOToolButton(Q_NULLPTR)
+, m_pToolBarPlugins(Q_NULLPTR)
+, m_pPointerButton(Q_NULLPTR)
+, m_pLinePointerButton(Q_NULLPTR)
+, m_pToolBarPointer(Q_NULLPTR)
+, m_pToolBarItem(Q_NULLPTR)
 {
     createActions();
     createMenuItem();
+    createToolbars();
 
     m_pPluginScene = new PluginScene(m_pMenuItem, this);
     m_pPluginScene->setSceneRect(QRectF(0, 0, 200, 500));
@@ -86,14 +101,13 @@ PluginGui::PluginGui(PluginManager::SPtr &pPluginManager, MNEX::PluginSceneManag
     connect(m_pPluginScene, &PluginScene::selectionChanged,
             this, &PluginGui::newItemSelected);
 
-
-    createToolbars();
-
     m_pGraphicsView = new QGraphicsView(m_pPluginScene);
 
     setCentralWidget(m_pGraphicsView);
     setWindowTitle(tr("PluginScene"));
     setUnifiedTitleAndToolBarOnMac(true);
+
+    loadConfig(QStandardPaths::writableLocation(QStandardPaths::DataLocation), "default.xml");
 }
 
 
@@ -101,7 +115,213 @@ PluginGui::PluginGui(PluginManager::SPtr &pPluginManager, MNEX::PluginSceneManag
 
 PluginGui::~PluginGui()
 {
+    //
+    // Save current configuration
+    //
+    saveConfig(QStandardPaths::writableLocation(QStandardPaths::DataLocation),"default.xml");
+
     m_pCurrentPlugin.reset();
+
+    //Plugin Toolbar
+    if(m_pSensorToolButton)
+        delete m_pSensorToolButton;
+    if(m_pAlgorithmToolButton)
+        delete m_pAlgorithmToolButton;
+    if(m_pIOToolButton)
+        delete m_pIOToolButton;
+    if(m_pToolBarPlugins)
+        delete m_pToolBarPlugins;
+    //Pointers Toolbar
+    if(m_pPointerButton)
+        delete m_pPointerButton;
+    if(m_pLinePointerButton)
+        delete m_pLinePointerButton;
+    if(m_pToolBarPointer)
+        delete m_pToolBarPointer;
+    //Item
+    if(m_pToolBarItem)
+        delete m_pToolBarItem;
+
+    if(m_pGraphicsView)
+        delete m_pGraphicsView;
+}
+
+
+//*************************************************************************************************************
+
+void PluginGui::loadConfig(const QString& sPath, const QString& sFileName)
+{
+    qDebug() << "load" << sPath+"/"+sFileName;
+
+    QDomDocument doc("PluginConfig");
+    QFile file(sPath+"/"+sFileName);
+    if (!file.open(QIODevice::ReadOnly))
+        return;
+    if (!doc.setContent(&file)) {
+        file.close();
+        return;
+    }
+    file.close();
+
+
+    QDomElement docElem = doc.documentElement();
+    if(docElem.tagName() != "PluginTree")
+    {
+        qWarning() << sFileName << "not found!";
+        return;
+    }
+
+    QDomNode nodePluginTree = docElem.firstChild();
+    while(!nodePluginTree.isNull()) {
+        QDomElement elementPluginTree = nodePluginTree.toElement();
+        //
+        // Create Plugins
+        //
+        if(elementPluginTree.tagName() == "Plugins") {
+            QDomNode nodePlugins = elementPluginTree.firstChild();
+            while(!nodePlugins.isNull())
+            {
+                QDomElement e = nodePlugins.toElement();
+                nodePlugins = nodePlugins.nextSibling();
+                if(!e.isNull()) {
+                    QPointF pos((qreal)e.attribute("pos_x").toInt(),(qreal)e.attribute("pos_y").toInt());
+                    QAction *pCurrentAction = Q_NULLPTR;
+
+                    for(qint32 i = 0; i < m_pActionGroupPlugins->actions().size(); ++i)
+                    {
+                        if(m_pActionGroupPlugins->actions()[i]->text() == e.attribute("name"))
+                        {
+                            pCurrentAction = m_pActionGroupPlugins->actions()[i];
+                            break;
+                        }
+                    }
+
+                    if(!pCurrentAction)
+                        continue;
+
+                    pCurrentAction->setChecked(true);
+                    m_pPluginScene->setActionPluginItem(pCurrentAction);
+                    m_pPluginScene->setMode(PluginScene::InsertPluginItem);
+                    m_pPluginScene->insertItem(pos);
+                }
+            }
+        }
+        //
+        // Create Connections
+        //
+        if(elementPluginTree.tagName() == "Connections") {
+            QDomNode nodeConections = elementPluginTree.firstChild();
+            while(!nodeConections.isNull())
+            {
+                QDomElement e = nodeConections.toElement();
+                nodeConections = nodeConections.nextSibling();
+                if(!e.isNull()) {
+                    qDebug() << qPrintable(e.tagName()) << e.attribute("receiver") << e.attribute("sender");
+
+                    QString sSender = e.attribute("sender");
+                    QString sReceiver = e.attribute("receiver");
+
+                    //
+                    // Start & End
+                    //
+                    PluginItem* startItem = Q_NULLPTR;
+                    PluginItem* endItem = Q_NULLPTR;
+                    for(qint32 i = 0; i < m_pPluginScene->items().size(); ++i)
+                    {
+                        PluginItem* item = qgraphicsitem_cast<PluginItem *>(m_pPluginScene->items()[i]);
+                        if(item->plugin()->getName() == sSender)
+                            startItem = item;
+
+                        if(item->plugin()->getName() == sReceiver)
+                            endItem = item;
+
+                    }
+
+                    if(!startItem || !endItem)
+                        continue;
+
+                    PluginConnectorConnection::SPtr pConnection = PluginConnectorConnection::create(startItem->plugin(), endItem->plugin());
+
+                    if(pConnection->isConnected())
+                    {
+                        Arrow *arrow = new Arrow(startItem, endItem, pConnection);
+                        arrow->setColor(QColor(65,113,156));
+                        startItem->addArrow(arrow);
+                        endItem->addArrow(arrow);
+                        arrow->setZValue(-1000.0);
+                        m_pPluginScene->addItem(arrow);
+                        arrow->updatePosition();
+                    }
+
+                }
+            }
+        }
+        nodePluginTree = nodePluginTree.nextSibling();
+    }
+}
+
+
+//*************************************************************************************************************
+
+void PluginGui::saveConfig(const QString& sPath, const QString& sFileName)
+{
+    qDebug() << "Save Config" << sPath+"/"+sFileName;
+    QDomDocument doc("PluginConfig");
+    QDomElement root = doc.createElement("PluginTree");
+    doc.appendChild(root);
+
+    //
+    // Plugins
+    //
+    QDomElement plugins = doc.createElement("Plugins");
+    root.appendChild(plugins);
+    IPlugin::SPtr pPlugin;
+    foreach (QGraphicsItem *item, m_pPluginScene->items())
+    {
+        if(item->type() == PluginItem::Type)
+        {
+            pPlugin = qgraphicsitem_cast<PluginItem *>(item)->plugin();
+
+            QDomElement plugin = doc.createElement("Plugin");
+            plugin.setAttribute("name",pPlugin->getName());
+            plugin.setAttribute("pos_x",item->x());
+            plugin.setAttribute("pos_y",item->y());
+            plugins.appendChild(plugin);
+        }
+    }
+
+    //
+    // Connections
+    //
+    QDomElement connections = doc.createElement("Connections");
+    root.appendChild(connections);
+    PluginConnectorConnection::SPtr pConnection;
+    foreach (QGraphicsItem *item, m_pPluginScene->items())
+    {
+        if(item->type() == Arrow::Type)
+        {
+            pConnection = qgraphicsitem_cast<Arrow *>(item)->connection();
+
+            QDomElement connection = doc.createElement("Connection");
+            connection.setAttribute("sender",pConnection->getSender()->getName());
+            connection.setAttribute("receiver",pConnection->getReceiver()->getName());
+            connections.appendChild(connection);
+        }
+    }
+
+    QString xml = doc.toString();
+
+    QDir dir;
+    if(!dir.exists(sPath))
+        if(!dir.mkpath(sPath))
+            return;
+
+    QFile file(sPath+"/"+sFileName);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+        return;
+
+    QTextStream out(&file);
+    out << xml;
 }
 
 
@@ -167,7 +387,6 @@ void PluginGui::actionGroupTriggered(QAction* action)
 {
     m_pPluginScene->setActionPluginItem(action);
     m_pPluginScene->setMode(PluginScene::InsertPluginItem);
-
 }
 
 
@@ -337,45 +556,45 @@ void PluginGui::createToolbars()
             this, &PluginGui::actionGroupTriggered);
 
     //Sensors
-    QToolButton *sensorToolButton = new QToolButton;
+    m_pSensorToolButton = new QToolButton;
     QMenu *menuSensors = new QMenu;
     for(qint32 i = 0; i < m_pPluginManager->getSensorPlugins().size(); ++i)
         createItemAction(m_pPluginManager->getSensorPlugins()[i]->getName(), menuSensors);
 
-    sensorToolButton->setMenu(menuSensors);
-    sensorToolButton->setPopupMode(QToolButton::InstantPopup);
-    sensorToolButton->setIcon(QIcon(":/images/sensor.png"));
-    sensorToolButton->setStatusTip(tr("Sensor Plugins"));
-    sensorToolButton->setToolTip(tr("Sensor Plugins"));
+    m_pSensorToolButton->setMenu(menuSensors);
+    m_pSensorToolButton->setPopupMode(QToolButton::InstantPopup);
+    m_pSensorToolButton->setIcon(QIcon(":/images/sensor.png"));
+    m_pSensorToolButton->setStatusTip(tr("Sensor Plugins"));
+    m_pSensorToolButton->setToolTip(tr("Sensor Plugins"));
 
     //Algorithms
-    QToolButton *algorithmToolButton = new QToolButton;
+    m_pAlgorithmToolButton = new QToolButton;
     QMenu *menuAlgorithms = new QMenu;
     for(qint32 i = 0; i < m_pPluginManager->getAlgorithmPlugins().size(); ++i)
         createItemAction(m_pPluginManager->getAlgorithmPlugins()[i]->getName(), menuAlgorithms);
 
-    algorithmToolButton->setMenu(menuAlgorithms);
-    algorithmToolButton->setPopupMode(QToolButton::InstantPopup);
-    algorithmToolButton->setIcon(QIcon(":/images/algorithm.png"));
-    algorithmToolButton->setStatusTip(tr("Algorithm Plugins"));
-    algorithmToolButton->setToolTip(tr("Algorithm Plugins"));
+    m_pAlgorithmToolButton->setMenu(menuAlgorithms);
+    m_pAlgorithmToolButton->setPopupMode(QToolButton::InstantPopup);
+    m_pAlgorithmToolButton->setIcon(QIcon(":/images/algorithm.png"));
+    m_pAlgorithmToolButton->setStatusTip(tr("Algorithm Plugins"));
+    m_pAlgorithmToolButton->setToolTip(tr("Algorithm Plugins"));
 
     //IOs
-    QToolButton *ioToolButton = new QToolButton;
+    m_pIOToolButton = new QToolButton;
     QMenu *menuIo = new QMenu;
     for(qint32 i = 0; i < m_pPluginManager->getIOPlugins().size(); ++i)
         createItemAction(m_pPluginManager->getIOPlugins()[i]->getName(), menuIo);
 
-    ioToolButton->setMenu(menuIo);
-    ioToolButton->setPopupMode(QToolButton::InstantPopup);
-    ioToolButton->setIcon(QIcon(":/images/io.png"));
-    ioToolButton->setStatusTip(tr("I/O Plugins"));
-    ioToolButton->setToolTip(tr("I/O Plugins"));
+    m_pIOToolButton->setMenu(menuIo);
+    m_pIOToolButton->setPopupMode(QToolButton::InstantPopup);
+    m_pIOToolButton->setIcon(QIcon(":/images/io.png"));
+    m_pIOToolButton->setStatusTip(tr("I/O Plugins"));
+    m_pIOToolButton->setToolTip(tr("I/O Plugins"));
 
     m_pToolBarPlugins = new QToolBar(tr("Plugins"), this);
-    m_pToolBarPlugins->addWidget(sensorToolButton);
-    m_pToolBarPlugins->addWidget(algorithmToolButton);
-    m_pToolBarPlugins->addWidget(ioToolButton);
+    m_pToolBarPlugins->addWidget(m_pSensorToolButton);
+    m_pToolBarPlugins->addWidget(m_pAlgorithmToolButton);
+    m_pToolBarPlugins->addWidget(m_pIOToolButton);
 
     m_pToolBarPlugins->setAllowedAreas(Qt::LeftToolBarArea);
     m_pToolBarPlugins->setFloatable(false);
@@ -384,32 +603,32 @@ void PluginGui::createToolbars()
     addToolBar(Qt::LeftToolBarArea, m_pToolBarPlugins);
 
     //Pointers Toolbar
-    QToolButton *pointerButton = new QToolButton;
-    pointerButton->setCheckable(true);
-    pointerButton->setChecked(true);
-    pointerButton->setIcon(QIcon(":/images/pointer.png"));
-    pointerButton->setShortcut(tr("Ctrl+P"));
-    pointerButton->setStatusTip(tr("Select/Place (Ctrl+P)"));
-    pointerButton->setToolTip(tr("Select/Place"));
+    m_pPointerButton = new QToolButton;
+    m_pPointerButton->setCheckable(true);
+    m_pPointerButton->setChecked(true);
+    m_pPointerButton->setIcon(QIcon(":/images/pointer.png"));
+    m_pPointerButton->setShortcut(tr("Ctrl+P"));
+    m_pPointerButton->setStatusTip(tr("Select/Place (Ctrl+P)"));
+    m_pPointerButton->setToolTip(tr("Select/Place"));
 
-    QToolButton *linePointerButton = new QToolButton;
-    linePointerButton->setCheckable(true);
-    linePointerButton->setIcon(QIcon(":/images/linepointer.png"));
-    linePointerButton->setShortcut(tr("Ctrl+L"));
-    linePointerButton->setStatusTip(tr("Connection (Ctrl+L)"));
-    linePointerButton->setToolTip(tr("Connection"));
+    m_pLinePointerButton = new QToolButton;
+    m_pLinePointerButton->setCheckable(true);
+    m_pLinePointerButton->setIcon(QIcon(":/images/linepointer.png"));
+    m_pLinePointerButton->setShortcut(tr("Ctrl+L"));
+    m_pLinePointerButton->setStatusTip(tr("Connection (Ctrl+L)"));
+    m_pLinePointerButton->setToolTip(tr("Connection"));
 
     m_pButtonGroupPointers = new QButtonGroup(this);
-    m_pButtonGroupPointers->addButton(pointerButton, int(PluginScene::MovePluginItem));
-    m_pButtonGroupPointers->addButton(linePointerButton, int(PluginScene::InsertLine));
+    m_pButtonGroupPointers->addButton(m_pPointerButton, int(PluginScene::MovePluginItem));
+    m_pButtonGroupPointers->addButton(m_pLinePointerButton, int(PluginScene::InsertLine));
 
     connect(m_pButtonGroupPointers, static_cast<void (QButtonGroup::*)(int)>(&QButtonGroup::buttonClicked),
             this, &PluginGui::pointerGroupClicked);
 
     m_pToolBarPointer = new QToolBar(tr("Pointer type"), this);
 
-    m_pToolBarPointer->addWidget(pointerButton);
-    m_pToolBarPointer->addWidget(linePointerButton);
+    m_pToolBarPointer->addWidget(m_pPointerButton);
+    m_pToolBarPointer->addWidget(m_pLinePointerButton);
 
     m_pToolBarPointer->setAllowedAreas(Qt::LeftToolBarArea);
     m_pToolBarPointer->setFloatable(false);
