@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     raplab_global.h
+* @file     evokedmodalitywidget.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     May, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,12 +29,18 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the RapLab library export/import macros.
+* @brief    Declaration of the EvokedModalityWidget Class.
 *
 */
 
-#ifndef RAPLAB_GLOBAL_H
-#define RAPLAB_GLOBAL_H
+#ifndef EVOKEDMODALITYWIDGET_H
+#define EVOKEDMODALITYWIDGET_H
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
 
 
 //*************************************************************************************************************
@@ -42,18 +48,64 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtCore/qglobal.h>
+#include <QWidget>
+#include <QCheckBox>
+#include <QStringList>
+#include <QLineEdit>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// PREPROCESSOR DEFINES
+// DEFINE NAMESPACE XDISPLIB
 //=============================================================================================================
 
-#if defined(RAPLAB_LIBRARY)
-#  define RAPLABSHARED_EXPORT Q_DECL_EXPORT   /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
-#else
-#  define RAPLABSHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
-#endif
+namespace XDISPLIB
+{
 
-#endif // RAPLAB_GLOBAL_H
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+class RealTimeEvokedWidget;
+struct Modality;
+
+
+//=============================================================================================================
+/**
+* DECLARE CLASS EvokedModalityWidget
+*
+* @brief The EvokedModalityWidget class provides the sensor selection widget
+*/
+class EvokedModalityWidget : public QWidget
+{
+    Q_OBJECT
+public:
+
+    //=========================================================================================================
+    /**
+    * Constructs a EvokedModalityWidget which is a child of parent.
+    *
+    * @param [in] parent    parent of widget
+    * @param [in] f         widget flags
+    */
+    EvokedModalityWidget(RealTimeEvokedWidget *toolbox);
+
+    void updateCheckbox(qint32 state);
+
+    void updateLineEdit(const QString & text);
+
+signals:
+    void settingsChanged();
+
+private:
+    RealTimeEvokedWidget * m_pRealTimeEvokedWidget; /**< Connected real-time evoked widget */
+
+    QList<QCheckBox*>   m_qListModalityCheckBox;    /**< List of modality checkboxes */
+    QList<QLineEdit*>   m_qListModalityLineEdit;    /**< List of modality scalings */
+};
+
+} // NAMESPACE
+
+#endif // EVOKEDMODALITYWIDGET_H

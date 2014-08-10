@@ -63,8 +63,9 @@ using namespace DISP3DLIB;
 //=============================================================================================================
 
 ClustStcWorker::ClustStcWorker(QObject *parent)
-: QObject(parent)
-, m_bIsLooping(true)
+: QThread(parent)
+, m_bIsRunning(false)
+, m_bIsLooping(false)
 , m_iAverageSamples(10)
 , m_iCurrentSample(0)
 , m_iUSecIntervall(100)
@@ -75,11 +76,22 @@ ClustStcWorker::ClustStcWorker(QObject *parent)
 
 //*************************************************************************************************************
 
+ClustStcWorker::~ClustStcWorker()
+{
+    if(this->isRunning())
+        stop();
+}
+
+
+//*************************************************************************************************************
+
 void ClustStcWorker::addData(QList<VectorXd> &data)
 {
-    m_qMutex.lock();
+    QMutexLocker locker(&m_qMutex);
+    if(data.size() == 0)
+        return;
+
     m_data.append(data);
-    m_qMutex.unlock();
 }
 
 
@@ -87,32 +99,49 @@ void ClustStcWorker::addData(QList<VectorXd> &data)
 
 void ClustStcWorker::clear()
 {
-    m_qMutex.lock();
+    QMutexLocker locker(&m_qMutex);
     m_data.clear();
-    m_qMutex.unlock();
 }
 
 
 //*************************************************************************************************************
 
-void ClustStcWorker::process()
+void ClustStcWorker::run()
 {
     VectorXd m_vecAverage(0,0);
 
+    m_bIsRunning = true;
+
     while(true)
     {
-        if(!m_data.isEmpty())
+        {
+            QMutexLocker locker(&m_qMutex);
+            if(!m_bIsRunning)
+                break;
+        }
+
+        bool doProcessing = false;
+        {
+            QMutexLocker locker(&m_qMutex);
+            if(!m_data.isEmpty() && m_data.size() > 0)
+                doProcessing = true;
+        }
+
+        if(doProcessing)
         {
             if(m_bIsLooping)
             {
+                m_qMutex.lock();
                 //Down sampling in loop mode
                 if(m_vecAverage.rows() != m_data[0].rows())
                     m_vecAverage = m_data[m_iCurrentSample%m_data.size()];
                 else
                     m_vecAverage += m_data[m_iCurrentSample%m_data.size()];
+                m_qMutex.unlock();
             }
             else
             {
+                m_qMutex.lock();
                 //Down sampling in stream mode
                 if(m_vecAverage.rows() != m_data[0].rows())
                     m_vecAverage = m_data.front();
@@ -120,15 +149,20 @@ void ClustStcWorker::process()
                     m_vecAverage += m_data.front();
 
                 m_data.pop_front();
+                m_qMutex.unlock();
             }
+
+            m_qMutex.lock();
             ++m_iCurrentSample;
 
             if(m_iCurrentSample%m_iAverageSamples == 0)
             {
                 m_vecAverage /= (double)m_iAverageSamples;
+
                 emit stcSample(m_vecAverage);
                 m_vecAverage = VectorXd::Zero(m_vecAverage.rows());
             }
+            m_qMutex.unlock();
         }
 
         QThread::usleep(m_iUSecIntervall);
@@ -140,6 +174,7 @@ void ClustStcWorker::process()
 
 void ClustStcWorker::setAverage(qint32 samples)
 {
+    QMutexLocker locker(&m_qMutex);
     m_iAverageSamples = samples;
 }
 
@@ -148,6 +183,7 @@ void ClustStcWorker::setAverage(qint32 samples)
 
 void ClustStcWorker::setInterval(int usec)
 {
+    QMutexLocker locker(&m_qMutex);
     m_iUSecIntervall = usec;
 }
 
@@ -156,5 +192,18 @@ void ClustStcWorker::setInterval(int usec)
 
 void ClustStcWorker::setLoop(bool looping)
 {
+    QMutexLocker locker(&m_qMutex);
     m_bIsLooping = looping;
+}
+
+
+//*************************************************************************************************************
+
+void ClustStcWorker::stop()
+{
+    m_qMutex.lock();
+    m_bIsRunning = false;
+    m_qMutex.unlock();
+
+    QThread::wait();
 }

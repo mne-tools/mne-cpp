@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     noiseestimationdelegate.h
+* @file     frequencyspectrumdelegate.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of the NoiseEstimationDelegate Class.
+* @brief    Declaration of the FrequencySpectrumDelegate Class.
 *
 */
 
-#ifndef NOISEESTIMATIONDELEGATE_H
-#define NOISEESTIMATIONDELEGATE_H
+#ifndef FREQUENCYSPECTRUMDELEGATE_H
+#define FREQUENCYSPECTRUMDELEGATE_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -72,11 +72,11 @@ using namespace Eigen;
 
 //=============================================================================================================
 /**
-* DECLARE CLASS NoiseEstimationDelegate
+* DECLARE CLASS FrequencySpectrumDelegate
 *
-* @brief The NoiseEstimationDelegate class represents a RTMSA delegate which creates the plot paths
+* @brief The FrequencySpectrumDelegate class represents a RTMSA delegate which creates the plot paths
 */
-class NoiseEstimationDelegate : public QAbstractItemDelegate
+class FrequencySpectrumDelegate : public QAbstractItemDelegate
 {
     Q_OBJECT
 public:
@@ -86,7 +86,7 @@ public:
     *
     * @param[in] parent     Parent of the delegate
     */
-    NoiseEstimationDelegate(QObject *parent = 0);
+    FrequencySpectrumDelegate(QObject *parent = 0);
 
     //=========================================================================================================
     /**
@@ -128,6 +128,14 @@ private:
     */
     void createGridPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorXd& data) const;
 
+    //=========================================================================================================
+    /**
+    * createGridTick Creates x-axis tickes for the grid plot.
+    *
+    * Added by LImin Sun; 08.07/2014
+    */
+    void createGridTick(const QModelIndex &index, const QStyleOptionViewItem &option,  QPainter *painter) const;
+
     //Settings
 //    QSettings m_qSettings;
 
@@ -138,4 +146,4 @@ private:
 
 } // NAMESPACE
 
-#endif // NOISEESTIMATIONDELEGATE_H
+#endif // FREQUENCYSPECTRUMDELEGATE_H

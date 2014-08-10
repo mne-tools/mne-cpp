@@ -131,12 +131,18 @@ public:
 
     //=========================================================================================================
     /**
+    * Is called when plugin is detached of the stage. Can be used to safe settings.
+    */
+    virtual void unload() = 0;// = 0 call is not longer possible - it has to be reimplemented in child;
+
+    //=========================================================================================================
+    /**
     * Starts the IPlugin.
     * Pure virtual method.
     *
     * @return true if success, false otherwise
     */
-    virtual bool start() = 0;// = 0 call is not longer possible - it has to be reimplemented in child;
+    virtual bool start() = 0;
 
     //=========================================================================================================
     /**

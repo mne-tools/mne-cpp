@@ -52,6 +52,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QMutexLocker>
 #include <QDebug>
 
 
@@ -96,6 +97,7 @@ RtAve::~RtAve()
 
 void RtAve::append(const MatrixXd &p_DataSegment)
 {
+    QMutexLocker locker(&m_qMutex);
     // ToDo handle change buffersize
     if(!m_pRawMatrixBuffer)
         m_pRawMatrixBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(128, p_DataSegment.rows(), p_DataSegment.cols()));
@@ -108,7 +110,9 @@ void RtAve::append(const MatrixXd &p_DataSegment)
 
 void RtAve::setAverages(qint32 numAve)
 {
+    m_qMutex.lock();
     m_iNumAverages = numAve;
+    m_qMutex.unlock();
     emit numAveragesChanged();
 }
 
@@ -117,7 +121,7 @@ void RtAve::setAverages(qint32 numAve)
 
 void RtAve::setPreStim(qint32 samples)
 {
-    qDebug() << "RtAve::setPreStim\n" << samples;
+    QMutexLocker locker(&m_qMutex);
     m_iNewPreStimSamples = samples;
 }
 
@@ -126,7 +130,7 @@ void RtAve::setPreStim(qint32 samples)
 
 void RtAve::setPostStim(qint32 samples)
 {
-    qDebug() << "RtAve::setPostStim\n" << samples;
+    QMutexLocker locker(&m_qMutex);
     m_iNewPostStimSamples = samples;
 }
 
@@ -135,11 +139,12 @@ void RtAve::setPostStim(qint32 samples)
 
 void RtAve::assemblePostStimulus(const QList<QPair<QList<qint32>, MatrixXd> > &p_qListRawMatBuf, qint32 p_iStimIdx)
 {
-    if(m_iPreStimSamples > 0)
+    QMutexLocker locker(&m_qMutex);
+    if(m_iPostStimSamples > 0)
     {
         // middle of the assembled buffers
         float ratio = (float)m_iPreStimSamples/((float)(m_iPreStimSamples+m_iPostStimSamples));
-        qint32 t_iBuffWithStim = p_qListRawMatBuf.size()*ratio;
+        qint32 t_iBuffWithStim = floor((p_qListRawMatBuf.size()-1)*ratio) + 1;
 
         qint32 nrows = p_qListRawMatBuf[t_iBuffWithStim].second.rows();
         qint32 ncols = p_qListRawMatBuf[t_iBuffWithStim].second.cols();
@@ -162,7 +167,7 @@ void RtAve::assemblePostStimulus(const QList<QPair<QList<qint32>, MatrixXd> > &p
         //
 
         // start from the stimulus itself
-        if(pos > 0)
+        if(pos >= 0)
         {
             t_iSize = ncols - pos;
             if(t_iSize <= m_iPostStimSamples)
@@ -175,9 +180,9 @@ void RtAve::assemblePostStimulus(const QList<QPair<QList<qint32>, MatrixXd> > &p
                 t_matPostStim.block(0, 0, nrows, m_iPostStimSamples) = p_qListRawMatBuf[t_iBuffWithStim].second.block(0, pos, nrows, m_iPostStimSamples);
                 nSampleCount = m_iPostStimSamples;
             }
-
-            ++t_curBufIdx;
         }
+
+        ++t_curBufIdx;
 
         // remaining samples
         while(nSampleCount < m_iPostStimSamples)
@@ -210,12 +215,12 @@ void RtAve::assemblePostStimulus(const QList<QPair<QList<qint32>, MatrixXd> > &p
 
 void RtAve::assemblePreStimulus(const QList<QPair<QList<qint32>, MatrixXd> > &p_qListRawMatBuf, qint32 p_iStimIdx)
 {
+    QMutexLocker locker(&m_qMutex);
     if(m_iPreStimSamples > 0)
     {
         // stimulus containing buffer of the assembled buffers
         float ratio = (float)m_iPreStimSamples/((float)(m_iPreStimSamples+m_iPostStimSamples));
-        qint32 t_iBuffWithStim = p_qListRawMatBuf.size()*ratio;
-
+        qint32 t_iBuffWithStim = floor((p_qListRawMatBuf.size()-1)*ratio) + 1;
         qint32 nrows = p_qListRawMatBuf[t_iBuffWithStim].second.rows();
         qint32 ncols = p_qListRawMatBuf[t_iBuffWithStim].second.cols();
 
@@ -250,9 +255,8 @@ void RtAve::assemblePreStimulus(const QList<QPair<QList<qint32>, MatrixXd> > &p_
                 t_matPreStim.block(0, 0, nrows, m_iPreStimSamples) = p_qListRawMatBuf[t_iBuffWithStim].second.block(0, -t_iStart, nrows, m_iPreStimSamples);
                 nSampleCount = 0;
             }
-
-            --t_curBufIdx;
         }
+        --t_curBufIdx;
 
         // remaining samples
         while(nSampleCount > 0)
@@ -289,7 +293,10 @@ bool RtAve::start()
     if(this->isRunning())
         QThread::wait();
 
+    m_qMutex.lock();
     m_bIsRunning = true;
+    m_qMutex.unlock();
+
     QThread::start();
 
     return true;
@@ -300,7 +307,9 @@ bool RtAve::start()
 
 bool RtAve::stop()
 {
+    m_qMutex.lock();
     m_bIsRunning = false;
+    m_qMutex.unlock();
 
     m_pRawMatrixBuffer->releaseFromPop();
 
@@ -317,6 +326,7 @@ void RtAve::run()
     //
     // Inits & Clears
     //
+    m_qMutex.lock();
     quint32 t_nSamplesPerBuf = 0;
     QList<QPair<QList<qint32>, MatrixXd> > t_qListRawMatBuf;
 
@@ -396,14 +406,30 @@ void RtAve::run()
     m_iNewPreStimSamples = m_iPreStimSamples;
     m_iNewPostStimSamples = m_iPostStimSamples;
 
+    m_qMutex.unlock();
+
     //Enter the main loop
-    while(m_bIsRunning)
+    while(true)
     {
-        if(m_pRawMatrixBuffer)
+        {
+            QMutexLocker locker(&m_qMutex);
+            if(!m_bIsRunning)
+                break;
+        }
+
+        bool doProcessing = false;
+        {
+            QMutexLocker locker(&m_qMutex);
+            if(m_pRawMatrixBuffer)
+                doProcessing = true;
+        }
+
+        if(doProcessing)
         {
             //
             // Reset when stim size changed
             //
+            m_qMutex.lock();
             if(m_iNewPreStimSamples != m_iPreStimSamples || m_iNewPostStimSamples != m_iPostStimSamples)
             {
                 m_iPreStimSamples = m_iNewPreStimSamples;
@@ -449,6 +475,7 @@ void RtAve::run()
                     m_qListStimAve.push_back(t_resetMat);
                 }
             }
+            m_qMutex.unlock();
 
             //
             // Acquire Data
@@ -478,19 +505,24 @@ void RtAve::run()
             //
             t_qListRawMatBuf.push_back(qMakePair(t_qListStimuli, rawSegment));
 
-            if(t_nSamplesPerBuf*t_qListRawMatBuf.size() > (m_iPreStimSamples+m_iPostStimSamples + (2 * t_nSamplesPerBuf)))
+            m_qMutex.lock();
+            qint32 minSize = (m_iPreStimSamples+m_iPostStimSamples) + (2 * t_nSamplesPerBuf);
+            m_qMutex.unlock();
+
+            if(t_nSamplesPerBuf*t_qListRawMatBuf.size() > minSize)
             {
                 //
                 // Average
                 //
                 float ratio = (float)m_iPreStimSamples/((float)(m_iPreStimSamples+m_iPostStimSamples));
-                qint32 t_iBuffWithStim = t_qListRawMatBuf.size()*ratio;
+                qint32 t_iBuffWithStim = floor((t_qListRawMatBuf.size()-1)*ratio) + 1;
 
                 if(t_iBuffWithStim > 0 && t_qListRawMatBuf[t_iBuffWithStim].first.size() != 0)
                 {
                     for(i = 0; i < t_qListRawMatBuf[t_iBuffWithStim].first.size(); ++i)
                     {
-                        if(!t_qListRawMatBuf[t_iBuffWithStim-1].first.contains(t_qListRawMatBuf[t_iBuffWithStim].first[i]))//make sure that previous buffer does not conatin this stim - prevent multiple detection
+                        //make sure that previous buffer does not conatin this stim - prevent multiple detection
+                        if(!t_qListRawMatBuf[t_iBuffWithStim-1].first.contains(t_qListRawMatBuf[t_iBuffWithStim].first[i]))
                         {
                             qint32 t_iStimIndex = t_qListRawMatBuf[t_iBuffWithStim].first[i];
 
@@ -508,6 +540,7 @@ void RtAve::run()
                             //
                             // Prestimulus average
                             //
+                            m_qMutex.lock();
                             if(m_qListQListPreStimBuf[t_iStimIndex].size() >= m_iNumAverages)
                             {
                                 while(m_qListQListPreStimBuf[t_iStimIndex].size() >= (m_iNumAverages+1))//if meanwhile number of averages was reduced
@@ -521,10 +554,12 @@ void RtAve::run()
 
                                 m_qListQListPreStimBuf[t_iStimIndex].pop_front();
                             }
+                            m_qMutex.unlock();
 
                             //
                             // Poststimulus average
                             //
+                            m_qMutex.lock();
                             if(m_qListQListPostStimBuf[t_iStimIndex].size() >= m_iNumAverages)
                             {
                                 while(m_qListQListPostStimBuf[t_iStimIndex].size() >= (m_iNumAverages+1))//if meanwhile number of averages was reduced
@@ -538,8 +573,10 @@ void RtAve::run()
 
                                 m_qListQListPostStimBuf[t_iStimIndex].pop_front();
                             }
+                            m_qMutex.unlock();
 
                             //if averages are available -> buffers are filled and first average is stored
+                            m_qMutex.lock();
                             if(m_qListPreStimAve[t_iStimIndex].size() > 0)
                             {
                                 //
@@ -573,6 +610,7 @@ void RtAve::run()
                                 t_pEvokedStim->data = m_qListStimAve[t_iStimIndex];
                                 emit evokedStim(t_pEvokedStim);
                             }
+                            m_qMutex.unlock();
                         }
                     }
                 }

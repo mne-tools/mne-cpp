@@ -1,14 +1,14 @@
 //=============================================================================================================
 /**
-* @file     raplabsetupwidget.h
+* @file     evokedmodalitywidget.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     May, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,28 +29,30 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the RapLabSetupWidget class.
+* @brief    Implementation of the EvokedModalityWidget Class.
 *
 */
-
-#ifndef RAPLABSETUPWIDGET_H
-#define RAPLABSETUPWIDGET_H
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_raplabsetup.h"
+#include "evokedmodalitywidget.h"
+#include "../realtimeevokedwidget.h"
+#include "sensoritem.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
+#include <QLabel>
+#include <QGridLayout>
+#include <QDoubleValidator>
+
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -58,84 +60,80 @@
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace XDISPLIB;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE RapLabPlugin
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-namespace RapLabPlugin
+EvokedModalityWidget::EvokedModalityWidget(RealTimeEvokedWidget *parent)
+: m_pRealTimeEvokedWidget(parent)
 {
+    this->setWindowTitle("Covariance Modality Settings");
+    this->setMinimumWidth(330);
+    this->setMaximumWidth(330);
+
+    QGridLayout* t_pGridLayout = new QGridLayout;
+
+    for(qint32 i = 0; i < m_pRealTimeEvokedWidget->m_qListModalities.size(); ++i)
+    {
+        QString mod = m_pRealTimeEvokedWidget->m_qListModalities[i].m_sName;
+
+        QLabel* t_pLabelModality = new QLabel;
+        t_pLabelModality->setText(mod);
+        t_pGridLayout->addWidget(t_pLabelModality,i,0,1,1);
+
+        QCheckBox* t_pCheckBoxModality = new QCheckBox;
+        t_pCheckBoxModality->setChecked(m_pRealTimeEvokedWidget->m_qListModalities[i].m_bActive);
+        m_qListModalityCheckBox << t_pCheckBoxModality;
+        connect(t_pCheckBoxModality,&QCheckBox::stateChanged,this,&EvokedModalityWidget::updateCheckbox);
+        t_pGridLayout->addWidget(t_pCheckBoxModality,i,1,1,1);
+
+
+        QDoubleValidator* t_pDoubleValidator = new QDoubleValidator(10e-11,1,16,this);
+        QLineEdit* t_pLineEditScale = new QLineEdit;
+        t_pLineEditScale->setMaximumWidth(100);
+        t_pLineEditScale->setValidator(t_pDoubleValidator);
+        t_pLineEditScale->setText(QString("%1").arg(m_pRealTimeEvokedWidget->m_qListModalities[i].m_fNorm));
+        m_qListModalityLineEdit << t_pLineEditScale;
+        connect(t_pLineEditScale,&QLineEdit::textEdited,this,&EvokedModalityWidget::updateLineEdit);
+        t_pGridLayout->addWidget(t_pLineEditScale,i,2,1,1);
+
+    }
+
+    this->setLayout(t_pGridLayout);
+
+}
 
 
 //*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
 
-class RapLab;
-
-
-//=============================================================================================================
-/**
-* DECLARE CLASS DummySetupWidget
-*
-* @brief The DummySetupWidget class provides the DummyToolbox configuration window.
-*/
-class RapLabSetupWidget : public QWidget
+void EvokedModalityWidget::updateCheckbox(qint32 state)
 {
-    Q_OBJECT
+    Q_UNUSED(state)
 
-public:
+    for(qint32 i = 0; i < m_qListModalityCheckBox.size(); ++i)
+    {
+        if(m_qListModalityCheckBox[i]->isChecked())
+            m_pRealTimeEvokedWidget->m_qListModalities[i].m_bActive = true;
+        else
+            m_pRealTimeEvokedWidget->m_qListModalities[i].m_bActive = false;
+    }
 
-    //=========================================================================================================
-    /**
-    * Constructs a RapLabSetupWidget which is a child of parent.
-    *
-    * @param [in] toolbox a pointer to the corresponding RapLabToolbox.
-    * @param [in] parent pointer to parent widget; If parent is 0, the new RapLabSetupWidget becomes a window. If parent is another widget, DummySetupWidget becomes a child window inside parent. DummySetupWidget is deleted when its parent is deleted.
-    */
-    RapLabSetupWidget(RapLab* toolbox, QWidget *parent = 0);
-
-    //=========================================================================================================
-    /**
-    * Destroys the RapLabSetupWidget.
-    * All RapLabSetupWidget's children are deleted first. The application exits if RapLabSetupWidget is the main widget.
-    */
-    ~RapLabSetupWidget();
-
-private:
-    //=========================================================================================================
-    /**
-    * Shows the About Dialogs
-    */
-    void showAboutDialog();
-
-    //=========================================================================================================
-    /**
-    * Shows forward solution selection dialog
-    */
-    void showFwdFileDialog();
-
-    //=========================================================================================================
-    /**
-    * Shows atlas selection dialog
-    */
-    void showAtlasDirDialog();
-
-    //=========================================================================================================
-    /**
-    * Shows atlas selection dialog
-    */
-    void showSurfaceDirDialog();
+    emit settingsChanged();
+}
 
 
-    RapLab* m_pRapLab;            /**< Holds a pointer to corresponding DummyToolbox.*/
+//*************************************************************************************************************
 
-    Ui::RapLabSetupWidgetClass ui;   /**< Holds the user interface for the DummySetupWidget.*/
-};
+void EvokedModalityWidget::updateLineEdit(const QString & text)
+{
+    Q_UNUSED(text)
 
-} // NAMESPACE
+    for(qint32 i = 0; i < m_qListModalityCheckBox.size(); ++i)
+        m_pRealTimeEvokedWidget->m_qListModalities[i].m_fNorm = (float)m_qListModalityLineEdit[i]->text().toDouble();
 
-#endif // RAPLABSETUPWIDGET_H
+    emit settingsChanged();
+}

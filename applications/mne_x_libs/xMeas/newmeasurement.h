@@ -52,7 +52,8 @@
 
 #include <QObject>
 #include <QSharedPointer>
-#include <QDebug>
+#include <QMutex>
+#include <QMutexLocker>
 
 
 //*************************************************************************************************************
@@ -138,6 +139,7 @@ protected:
     inline void setType(int type);
 
 private:
+    mutable QMutex  m_qMutex;   /**< Mutex to ensure thread safety */
     int     m_iMetaTypeId;      /**< QMetaType id of the Measurement */
     QString m_qString_Name;     /**< Name of the Measurement */
     bool    m_bVisibility;      /**< Visibility status */
@@ -151,6 +153,7 @@ private:
 
 inline const QString& NewMeasurement::getName() const
 {
+    QMutexLocker locker(&m_qMutex);
     return m_qString_Name;
 }
 
@@ -159,6 +162,7 @@ inline const QString& NewMeasurement::getName() const
 
 inline void NewMeasurement::setType(int type)
 {
+    QMutexLocker locker(&m_qMutex);
     m_iMetaTypeId = type;
 }
 
@@ -167,6 +171,7 @@ inline void NewMeasurement::setType(int type)
 
 inline void NewMeasurement::setName(const QString& name)
 {
+    QMutexLocker locker(&m_qMutex);
     m_qString_Name = name;
 }
 
@@ -175,6 +180,7 @@ inline void NewMeasurement::setName(const QString& name)
 
 inline bool NewMeasurement::isVisible() const
 {
+    QMutexLocker locker(&m_qMutex);
     return m_bVisibility;
 }
 
@@ -183,6 +189,7 @@ inline bool NewMeasurement::isVisible() const
 
 inline void NewMeasurement::setVisibility(bool visibility)
 {
+    QMutexLocker locker(&m_qMutex);
     m_bVisibility = visibility;
 }
 
@@ -191,6 +198,7 @@ inline void NewMeasurement::setVisibility(bool visibility)
 
 inline int NewMeasurement::type() const
 {
+    QMutexLocker locker(&m_qMutex);
     return m_iMetaTypeId;
 }
 

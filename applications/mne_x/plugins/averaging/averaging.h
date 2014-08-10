@@ -68,6 +68,8 @@
 #include <QtWidgets>
 #include <QSpinBox>
 
+//#define DEBUG_AVERAGING
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -130,8 +132,20 @@ public:
     /**
     * Initialise input and output connectors.
     */
-    void init();
+    virtual void init();
 
+    //=========================================================================================================
+    /**
+    * Is called when plugin is detached of the stage. Can be used to safe settings.
+    */
+    virtual void unload();
+
+    //=========================================================================================================
+    /**
+    * Change the number of averages
+    *
+    * @param[in] numAve     new number of averages
+    */
     void changeNumAverages(qint32 numAve);
 
     //=========================================================================================================
@@ -178,16 +192,13 @@ private:
     */
     void initConnector();
 
-
-    QMutex mutex;
+    QMutex m_qMutex;        /**< Provides access serialization between threads*/
 
     PluginInputData<NewRealTimeMultiSampleArray>::SPtr   m_pAveragingInput;     /**< The RealTimeSampleArray of the Averaging input.*/
     PluginOutputData<RealTimeEvoked>::SPtr  m_pAveragingOutput;                 /**< The RealTimeEvoked of the Averaging output.*/
 
     FiffInfo::SPtr  m_pFiffInfo;        /**< Fiff measurement info.*/
     QList<qint32> m_qListStimChs;       /**< Stimulus channels.*/
-
-    QList< QPair<QString, bool> > m_qListModalities; /**< List Modalities.*/
 
     CircularMatrixBuffer<double>::SPtr   m_pAveragingBuffer;      /**< Holds incoming data.*/
 
@@ -209,6 +220,15 @@ private:
 
     QAction* m_pActionShowAdjustment;
 
+
+#ifdef DEBUG_AVERAGING
+    //
+    // TEST
+    //
+    qint32 m_iTestStimCh;
+    qint32 m_iTestCount;
+    qint32 m_iTestCount2;
+#endif
 };
 
 } // NAMESPACE

@@ -1,10 +1,10 @@
 //=============================================================================================================
 /**
-* @file     noiseestimation.cpp
+* @file     covmodalitywidget.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2014
+* @date     May, 2014
 *
 * @section  LICENSE
 *
@@ -29,16 +29,18 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the NoiseEstimation class.
+* @brief    Declaration of the CovModalityWidget Class.
 *
 */
+
+#ifndef COVMODALITYWIDGET_H
+#define COVMODALITYWIDGET_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "noiseestimation.h"
 
 
 //*************************************************************************************************************
@@ -46,65 +48,58 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QDebug>
+#include <QWidget>
+#include <QCheckBox>
+#include <QStringList>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// DEFINE NAMESPACE XDISPLIB
 //=============================================================================================================
 
-using namespace XMEASLIB;
+namespace XDISPLIB
+{
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE MEMBER METHODS
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
-NoiseEstimation::NoiseEstimation(QObject *parent)
-: NewMeasurement(QMetaType::type("NoiseEstimation::SPtr"), parent)
-, m_bIsInit(false)
-, m_bContainsValues(false)
+class RealTimeCovWidget;
+
+
+//=============================================================================================================
+/**
+* DECLARE CLASS CovModalityWidget
+*
+* @brief The CovModalityWidget class provides the sensor selection widget
+*/
+class CovModalityWidget : public QWidget
 {
-}
+    Q_OBJECT
+public:
 
+    //=========================================================================================================
+    /**
+    * Constructs a CovModalityWidget which is a child of parent.
+    *
+    * @param [in] parent    parent of widget
+    * @param [in] f         widget flags
+    */
+    CovModalityWidget(RealTimeCovWidget *toolbox);
 
-//*************************************************************************************************************
+    void updateSelection(qint32 state);
 
-NoiseEstimation::~NoiseEstimation()
-{
+private:
+    RealTimeCovWidget * m_pRealTimeCovWidget;       /**< Connected real-time covariance widget */
 
-}
+    QList<QCheckBox*>   m_qListModalityCheckBox;    /**< List of modality checkboxes */
 
+    QStringList m_qListModalities;                  /**< List of modalities */
+};
 
-//*************************************************************************************************************
+} // NAMESPACE
 
-void NoiseEstimation::initFromFiffInfo(FiffInfo::SPtr &p_pFiffInfo)
-{
-    m_pFiffInfo = p_pFiffInfo;
-
-    m_bIsInit = true;
-}
-
-
-//*************************************************************************************************************
-
-MatrixXd NoiseEstimation::getValue() const
-{
-    return m_matValue;
-}
-
-
-//*************************************************************************************************************
-
-void NoiseEstimation::setValue(MatrixXd& v)
-{
-    //Store
-    m_matValue = v;
-    emit notify();
-
-    if(!m_bContainsValues)
-        m_bContainsValues = true;
-}
-
+#endif // COVMODALITYWIDGET_H

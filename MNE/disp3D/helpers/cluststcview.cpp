@@ -71,18 +71,26 @@ using namespace DISP3DLIB;
 
 ClustStcView::ClustStcView(bool showRegions, bool isStereo, QGLView::StereoType stereoType, QWindow *parent)
 : QGLView(parent)
-, m_pModel(NULL)
+, m_pModel(Q_NULLPTR)
 , m_bIsInitialized(false)
 , m_bShowRegions(showRegions)
 , m_bStereo(isStereo)
 , m_stereoType(stereoType)//QGLView::StretchedLeftRight)//QGLView::RedCyanAnaglyph
-, m_pSceneNodeBrain(NULL)
-, m_pSceneNode(NULL)
-, m_pLightModel(NULL)
-, m_pLightParametersScene(NULL)
+, m_pSceneNodeBrain(Q_NULLPTR)
+, m_pSceneNode(Q_NULLPTR)
+, m_pLightModel(Q_NULLPTR)
+, m_pLightParametersScene(Q_NULLPTR)
 {
     m_fOffsetZ = -100.0f;
     m_fOffsetZEye = 60.0f;
+}
+
+
+//*************************************************************************************************************
+
+ClustStcView::~ClustStcView()
+{
+
 }
 
 
