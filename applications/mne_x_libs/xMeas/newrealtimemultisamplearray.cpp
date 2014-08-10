@@ -245,6 +245,9 @@ VectorXd NewRealTimeMultiSampleArray::getValue() const
 
 void NewRealTimeMultiSampleArray::setValue(VectorXd v)
 {
+    if(!m_bChInfoIsInit)
+        return;
+
     m_qMutex.lock();
     //check vector size
     if(v.size() != m_qListChInfo.size())

@@ -237,7 +237,6 @@ void RealTimeEvokedWidget::init()
     if(m_pRTE->isInitialized())
     {
         QString t_sRTEWName = m_pRTE->getName();
-        qDebug() << "##### NAME #####" << QString("RTEW/%1/MAG/active").arg(t_sRTEWName);
         m_pRteLayout->removeWidget(m_pLabelInit);
         m_pLabelInit->hide();
 
