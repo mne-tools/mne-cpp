@@ -125,7 +125,13 @@ public:
     /**
     * Initialise input and output connectors.
     */
-    void init();
+    virtual void init();
+
+    //=========================================================================================================
+    /**
+    * Is called when plugin is detached of the stage. Can be used to safe settings.
+    */
+    virtual void unload();
 
     //=========================================================================================================
     /**

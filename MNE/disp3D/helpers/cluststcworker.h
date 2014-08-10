@@ -77,7 +77,7 @@ using namespace Eigen;
 *
 * @brief Data scheduler
 */
-class ClustStcWorker : public QObject
+class ClustStcWorker : public QThread
 {
     Q_OBJECT
 public:
@@ -86,13 +86,13 @@ public:
 
     ClustStcWorker(QObject *parent = 0);
 
+    ~ClustStcWorker();
+
 //    void setIntervall(int intervall);
 
     void addData(QList<VectorXd> &data);
 
     void clear();
-
-    void process();
 
     void setAverage(qint32 samples);
 
@@ -100,13 +100,19 @@ public:
 
     void setLoop(bool looping);
 
+    void stop();
+
 signals:
     void stcSample(Eigen::VectorXd sample);
 
-private:
+protected:
+    virtual void run();
 
+private:
     QMutex m_qMutex;
     QList<VectorXd> m_data;   /**< List that holds the fiff matrix data <n_channels x n_samples> */
+
+    bool m_bIsRunning;
     bool m_bIsLooping;
 
     qint32 m_iAverageSamples;

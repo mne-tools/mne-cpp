@@ -207,12 +207,32 @@ private slots:
     */
     void loadEvents();
 
+    //=========================================================================================================
+    /**
+    * saveEvents saves the event data to file.
+    */
+    void saveEvents();
 
     //=========================================================================================================
     /**
      * about opens the about dialog
      */
     void about();
+
+    //=========================================================================================================
+    /**
+    * showEventWindow shows the event window
+    */
+    void showEventWindow();
+
+    //=========================================================================================================
+    /**
+    * jumpToEvent jumps to a event specified in the event table view
+    *
+    * @param [in] current model item focused in the view
+    * @param [in] previous model item focused in the view
+    */
+    void jumpToEvent(const QModelIndex &current, const QModelIndex &previous);
 
 signals:
     void testSignal();
@@ -281,14 +301,17 @@ private:
     void setWindowStatus();
 
     QFile               m_qFileRaw;                 /**< Fiff data file to read (set for convenience) */
+    QFile               m_qFileEvent;               /**< Fiff event data file to read (set for convenience) */
     QSignalMapper*      m_qSignalMapper;            /**< signal mapper used for signal-slot mapping */
 
     //modelview framework
     RawModel*           m_pRawModel;                /**< the QAbstractTable model being part of the model/view framework of Qt */
     EventModel*         m_pEventModel;              /**< the QAbstractTable event model being part of the model/view framework of Qt */
-    QTableView*         m_pTableView;               /**< the QTableView being part of the model/view framework of Qt for the fiff data handling*/
+    QTableView*         m_pRawTableView;            /**< the QTableView being part of the model/view framework of Qt for the fiff data handling*/
     QTableView*         m_pEventTableView;          /**< the QTableView being part of the model/view framework of Qt for the fiff event handling */
     RawDelegate*        m_pRawDelegate;             /**< the QAbstractDelegate being part of the model/view framework of Qt */
+
+    QWidget*            m_wEventWidget;             /**< Event widget which display the event view */
 
     //application settings
     QSettings           m_qSettings;

@@ -80,7 +80,7 @@ Covariance::Covariance()
     m_pActionShowAdjustment->setStatusTip(tr("Covariance Adjustments"));
     connect(m_pActionShowAdjustment, &QAction::triggered, this, &Covariance::showCovarianceWidget);
     addPluginAction(m_pActionShowAdjustment);
-    m_pActionShowAdjustment->setVisible(false);
+//    m_pActionShowAdjustment->setVisible(false);
 }
 
 
@@ -109,6 +109,12 @@ QSharedPointer<IPlugin> Covariance::clone() const
 
 void Covariance::init()
 {
+    //
+    // Load Settings
+    //
+    QSettings settings;
+    m_iEstimationSamples = settings.value(QString("Plugin/%1/estimationSamples").arg(this->getName()), 5000).toInt();
+
     // Input
     m_pCovarianceInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "CovarianceIn", "Covariance input data");
     connect(m_pCovarianceInput.data(), &PluginInputConnector::notify, this, &Covariance::update, Qt::DirectConnection);
@@ -121,6 +127,18 @@ void Covariance::init()
     //Delete Buffer - will be initailzed with first incoming data
     if(!m_pCovarianceBuffer.isNull())
         m_pCovarianceBuffer = CircularMatrixBuffer<double>::SPtr();
+}
+
+
+//*************************************************************************************************************
+
+void Covariance::unload()
+{
+    //
+    // Store Settings
+    //
+    QSettings settings;
+    settings.setValue(QString("Plugin/%1/estimationSamples").arg(this->getName()), m_iEstimationSamples);
 }
 
 
@@ -254,7 +272,7 @@ void Covariance::run()
     while(!m_pFiffInfo)
         msleep(10);// Wait for fiff Info
 
-    m_pActionShowAdjustment->setVisible(true);
+//    m_pActionShowAdjustment->setVisible(true);
 
     //
     // Init Real-Time Covariance estimator
@@ -293,7 +311,7 @@ void Covariance::run()
         }
     }
 
-    m_pActionShowAdjustment->setVisible(false);
+//    m_pActionShowAdjustment->setVisible(false);
 
     m_pRtCov->stop();
 }

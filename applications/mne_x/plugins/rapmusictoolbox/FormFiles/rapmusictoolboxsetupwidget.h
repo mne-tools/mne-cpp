@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     noiseestimation.h
+* @file     rapmusictoolboxsetupwidget.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,12 +29,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the NoiseEstimation class.
+* @brief    Contains the declaration of the RapMusicToolboxSetupWidget class.
 *
 */
 
-#ifndef NOISEESTIMATION_H
-#define NOISEESTIMATION_H
+#ifndef RAPMUSICTOOLBOXSETUPWIDGET_H
+#define RAPMUSICTOOLBOXSETUPWIDGET_H
 
 
 //*************************************************************************************************************
@@ -42,31 +42,15 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "xmeas_global.h"
-#include "newmeasurement.h"
-#include "realtimesamplearraychinfo.h"
-
-#include <fiff/fiff_info.h>
+#include "../ui_rapmusictoolboxsetup.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
-#include <QSharedPointer>
-#include <QVector>
-#include <QList>
-#include <QColor>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE XMEASLIB
-//=============================================================================================================
-
-namespace XMEASLIB
-{
+#include <QtWidgets>
 
 
 //*************************************************************************************************************
@@ -74,122 +58,103 @@ namespace XMEASLIB
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace FIFFLIB;
 
 
-//=========================================================================================================
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE RapMusicToolboxPlugin
+//=============================================================================================================
+
+namespace RapMusicToolboxPlugin
+{
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+class RapMusicToolbox;
+
+
+//=============================================================================================================
 /**
-* DECLARE CLASS NoiseEstimation
+* DECLARE CLASS DummySetupWidget
 *
-* @brief The RealTimeMultiSampleArrayNew class is the base class of every RealTimeMultiSampleArrayNew Measurement.
+* @brief The DummySetupWidget class provides the DummyToolbox configuration window.
 */
-class XMEASSHARED_EXPORT NoiseEstimation : public NewMeasurement
+class RapMusicToolboxSetupWidget : public QWidget
 {
     Q_OBJECT
+
 public:
-    typedef QSharedPointer<NoiseEstimation> SPtr;               /**< Shared pointer type for NoiseEstimation. */
-    typedef QSharedPointer<const NoiseEstimation> ConstSPtr;    /**< Const shared pointer type for NoiseEstimation. */
 
     //=========================================================================================================
     /**
-    * Constructs a RealTimeMultiSampleArrayNew.
-    */
-    explicit NoiseEstimation(QObject *parent = 0);
-
-    //=========================================================================================================
-    /**
-    * Destroys the RealTimeMultiSampleArrayNew.
-    */
-    virtual ~NoiseEstimation();
-
-    //=========================================================================================================
-    /**
-    * Init channel infos using fiff info
+    * Constructs a RapMusicToolboxSetupWidget which is a child of parent.
     *
-    * @param[in] p_pFiffInfo     Info to init from
+    * @param [in] toolbox a pointer to the corresponding RapMusicToolbox.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new RapMusicToolboxSetupWidget becomes a window. If parent is another widget, DummySetupWidget becomes a child window inside parent. DummySetupWidget is deleted when its parent is deleted.
     */
-    void initFromFiffInfo(FiffInfo::SPtr &p_pFiffInfo);
+    RapMusicToolboxSetupWidget(RapMusicToolbox* toolbox, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Returns whether channel info is initialized
-    *
-    * @return true whether the channel info is available.
+    * Destroys the RapMusicToolboxSetupWidget.
+    * All RapMusicToolboxSetupWidget's children are deleted first. The application exits if RapMusicToolboxSetupWidget is the main widget.
     */
-    inline bool isInit() const;
+    ~RapMusicToolboxSetupWidget();
 
     //=========================================================================================================
     /**
-    * Returns the reference to the orig FiffInfo.
-    *
-    * @return the reference to the orig FiffInfo.
+    * Adapts the UI to clustering state
     */
-    inline FiffInfo::SPtr& getFiffInfo();
+    void setClusteringState();
 
     //=========================================================================================================
     /**
-    * New data block to distribute
-    *
-    * @param [in] v the value which is should be distributed.
+    * Adapts the UI to setup state
     */
-    virtual void setValue(MatrixXd& v);
-
-    //=========================================================================================================
-    /**
-    * Returns the current value set.
-    * This method is inherited by Measurement.
-    *
-    * @return the last attached value.
-    */
-    virtual MatrixXd getValue() const;
-
-    //=========================================================================================================
-    /**
-    * Returns whether NoiseEstimation contains values
-    *
-    * @return whether NoiseEstimation contains values.
-    */
-    inline bool containsValues() const;
+    void setSetupState();
 
 private:
-    FiffInfo::SPtr              m_pFiffInfo;   /**< Original Fiff Info if initialized by fiff info. */
 
-    MatrixXd                    m_matValue;         /**< The current attached sample vector.*/
+    //=========================================================================================================
+    /**
+    * Triggers th cluster process
+    */
+    void clusteringTriggered();
 
-    bool m_bIsInit;             /**< If channel info is initialized.*/
-    bool m_bContainsValues;     /**< If values are stored.*/
+    //=========================================================================================================
+    /**
+    * Shows the About Dialogs
+    */
+    void showAboutDialog();
+
+    //=========================================================================================================
+    /**
+    * Shows forward solution selection dialog
+    */
+    void showFwdFileDialog();
+
+    //=========================================================================================================
+    /**
+    * Shows atlas selection dialog
+    */
+    void showAtlasDirDialog();
+
+    //=========================================================================================================
+    /**
+    * Shows atlas selection dialog
+    */
+    void showSurfaceDirDialog();
+
+
+    RapMusicToolbox* m_pRapMusicToolbox;            /**< Holds a pointer to corresponding DummyToolbox.*/
+
+    Ui::RapMusicToolboxSetupWidgetClass ui;   /**< Holds the user interface for the DummySetupWidget.*/
 };
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// INLINE DEFINITIONS
-//=============================================================================================================
-
-
-inline bool NoiseEstimation::isInit() const
-{
-    return m_bIsInit;
-}
-
-
-//*************************************************************************************************************
-
-inline FiffInfo::SPtr& NoiseEstimation::getFiffInfo()
-{
-    return m_pFiffInfo;
-}
-
-
-//*************************************************************************************************************
-
-inline bool NoiseEstimation::containsValues() const
-{
-    return m_bContainsValues;
-}
 
 } // NAMESPACE
 
-Q_DECLARE_METATYPE(XMEASLIB::NoiseEstimation::SPtr)
-
-#endif // NOISEESTIMATION_H
+#endif // RAPMUSICTOOLBOXSETUPWIDGET_H

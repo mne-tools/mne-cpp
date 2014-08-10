@@ -137,6 +137,12 @@ public:
 
     //=========================================================================================================
     /**
+    * Is called when plugin is detached of the stage. Can be used to safe settings.
+    */
+    virtual void unload();
+
+    //=========================================================================================================
+    /**
     * Starts the BCI by starting the BCI's thread.
     */
     virtual bool start();

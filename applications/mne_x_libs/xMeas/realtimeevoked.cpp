@@ -48,8 +48,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QDebug>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -85,8 +83,11 @@ RealTimeEvoked::~RealTimeEvoked()
 
 void RealTimeEvoked::init(FiffInfo &p_fiffInfo)
 {
+    QMutexLocker locker(&m_qMutex);
     m_qListChInfo.clear();
     m_qListChColors.clear();
+
+    m_fiffInfo = p_fiffInfo;
 
     qsrand(time(NULL));
     for(qint32 i = 0; i < p_fiffInfo.nchan; ++i)
@@ -122,6 +123,7 @@ void RealTimeEvoked::init(FiffInfo &p_fiffInfo)
 
 FiffEvoked::SPtr& RealTimeEvoked::getValue()
 {
+    QMutexLocker locker(&m_qMutex);
     return m_pFiffEvoked;
 }
 
@@ -130,16 +132,19 @@ FiffEvoked::SPtr& RealTimeEvoked::getValue()
 
 void RealTimeEvoked::setValue(FiffEvoked& v)
 {
-
     if(m_pFiffEvoked->data.cols() != v.data.cols())
         m_bInitialized = false;
 
     //Store
+    m_qMutex.lock();
     *m_pFiffEvoked = v;
+    m_qMutex.unlock();
 
     if(!m_bInitialized)
     {
         init(m_pFiffEvoked->info);
+
+        m_qMutex.lock();
         m_iPreStimSamples = 0;
         for(qint32 i = 0; i < m_pFiffEvoked->times.size(); ++i)
         {
@@ -149,10 +154,8 @@ void RealTimeEvoked::setValue(FiffEvoked& v)
                 ++m_iPreStimSamples;
         }
 
-
-
-
         m_bInitialized = true;
+        m_qMutex.unlock();
     }
 
     emit notify();
