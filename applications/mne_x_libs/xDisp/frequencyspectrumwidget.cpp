@@ -199,7 +199,7 @@ void FrequencySpectrumWidget::init()
 
         //set context menu
         m_pTableView->setContextMenuPolicy(Qt::CustomContextMenu);
-        connect(m_pTableView,SIGNAL(customContextMenuRequested(QPoint)),this,SLOT(channelContextMenu(QPoint)));
+        //connect(m_pTableView,SIGNAL(customContextMenuRequested(QPoint)),this,SLOT(channelContextMenu(QPoint)));
 
         m_bInitialized = true;
     }

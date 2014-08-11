@@ -1,11 +1,11 @@
 //=============================================================================================================
 /**
-* @file     noise_estimate.h
-* @author   Limin Sun <liminsun@nmr.mgh.harvard.edu>
+* @file     rtnoise.h
+* @author   Limin Sun <liminsun@nmr.mgh.harvard.edu>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2014
+* @date     August, 2014
 *
 * @section  LICENSE
 *
@@ -30,42 +30,36 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the RTHPI class.
+* @brief     RtNoise class declaration.
 *
 */
 
-#ifndef NOISE_ESTIMATE_H
-#define NOISE_ESTIMATE_H
-
+#ifndef RTNOISE_H
+#define RTNOISE_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "noise_estimate_global.h"
+#include "rtinv_global.h"
 
-#include <mne_x/Interfaces/IAlgorithm.h>
-#include <generics/circularmatrixbuffer.h>
-#include <xMeas/newrealtimemultisamplearray.h>
-#include <xMeas/frequencyspectrum.h>
-#include <rtInv/rtnoise.h>
-//*************************************************************************************************************
-//=============================================================================================================
-// Eigen INCLUDES
-//=============================================================================================================
-
-#include <Eigen/Core>
-#include <Eigen/Dense>
-#include <Eigen/SparseCore>
-#include <unsupported/Eigen/FFT>
 
 //*************************************************************************************************************
 //=============================================================================================================
 // FIFF INCLUDES
 //=============================================================================================================
 
+#include <fiff/fiff_cov.h>
 #include <fiff/fiff_info.h>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Generics INCLUDES
+//=============================================================================================================
+
+#include <generics/circularmatrixbuffer.h>
 
 
 //*************************************************************************************************************
@@ -73,15 +67,25 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
+#include <QThread>
+#include <QMutex>
+#include <QSharedPointer>
 
-#include <QVector>
+
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE RtHpiPlugin
+// Eigen INCLUDES
 //=============================================================================================================
 
-namespace NoiseEstimatePlugin
+#include <Eigen/Core>
+#include <unsupported/Eigen/FFT>
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE INVRTLIB
+//=============================================================================================================
+
+namespace RTINVLIB
 {
 
 
@@ -90,125 +94,140 @@ namespace NoiseEstimatePlugin
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNEX;
-using namespace XMEASLIB;
+using namespace Eigen;
 using namespace IOBuffer;
-using namespace RTINVLIB;
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
+using namespace FIFFLIB;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS RTHPI
+* Real-time noise Spectrum estimation
 *
-* @brief The NoiseEstimate class provides a NoiseEstimate algorithm structure.
+* @brief Real-time Noise estimation
 */
-//class DUMMYTOOLBOXSHARED_EXPORT DummyToolbox : public IAlgorithm
-class NOISE_ESTIMATESHARED_EXPORT NoiseEstimate : public IAlgorithm
+class RTINVSHARED_EXPORT RtNoise : public QThread
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "noise.json") //NEW Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
-    // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(MNEX::IAlgorithm)
-
-    friend class NoiseEstimateSetupWidget;
-
 public:
-    //=========================================================================================================
-    /**
-    * Constructs a RtHpi.
-    */
-    NoiseEstimate();
+    typedef QSharedPointer<RtNoise> SPtr;             /**< Shared pointer type for RtNoise. */
+    typedef QSharedPointer<const RtNoise> ConstSPtr;  /**< Const shared pointer type for RtNoise. */
 
     //=========================================================================================================
     /**
-    * Destroys the RtHpi.
+    * Creates the real-time covariance estimation object.
+    *
+    * @param[in] p_iMaxSamples      Number of samples to use for each data chunk
+    * @param[in] p_pFiffInfo        Associated Fiff Information
+    * @param[in] parent     Parent QObject (optional)
     */
-    ~NoiseEstimate();
+    explicit RtNoise(qint32 p_iMaxSamples, FiffInfo::SPtr p_pFiffInfo, QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Initialise input and output connectors.
+    * Destroys the Real-time noise estimation object.
     */
-    virtual void init();
+    ~RtNoise();
 
     //=========================================================================================================
     /**
-    * Is called when plugin is detached of the stage. Can be used to safe settings.
+    * Slot to receive incoming data.
+    *
+    * @param[in] p_DataSegment  Data to estimate the spectrum from -> ToDo Replace this by shared data pointer
     */
-    virtual void unload();
+    void append(const MatrixXd &p_DataSegment);
 
     //=========================================================================================================
     /**
-    * Clone the plugin
+    * Returns true if is running, otherwise false.
+    *
+    * @return true if is running, false otherwise
     */
-    virtual QSharedPointer<IPlugin> clone() const;
+    inline bool isRunning();
 
+
+    //=========================================================================================================
+    /**
+    * Starts the RtNoise by starting the producer's thread.
+    *
+    * @return true if succeeded, false otherwise
+    */
     virtual bool start();
-    virtual bool stop();
-
-    virtual IPlugin::PluginType getType() const;
-    virtual QString getName() const;
-
-    virtual QWidget* setupWidget();
-
-    void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
 
     //=========================================================================================================
     /**
-    * Add the spectrum result into a list
+    * Stops the RtNoise by stopping the producer's thread.
+    *
+    * @return true if succeeded, false otherwise
     */
-    void appendNoiseSpectrum(Eigen::MatrixXd);
+    virtual bool stop();
 
 signals:
     //=========================================================================================================
     /**
-    * Emitted when fiffInfo is available
+    * Signal which is emitted when a new data Matrix is estimated.
+    *
+    * @param[out]
     */
-    void fiffInfoAvailable();
-    //=========================================================================================================
-    /**
-    * Emitted Noise parameters
-    */
-    void SetNoisePara(qint32 nFFT, int fs);
+    void SpecCalculated(Eigen::MatrixXd);
 
 protected:
+    //=========================================================================================================
+    /**
+    * The starting point for the thread. After calling start(), the newly created thread calls this function.
+    * Returning from this method will end the execution of the thread.
+    * Pure virtual method inherited by QThread.
+    */
     virtual void run();
 
 private:
-    //=========================================================================================================
-    /**
-    * Initialises the output connector.
-    */
-    void initConnector();
+    QMutex      mutex;                  /**< Provides access serialization between threads*/
 
-    PluginInputData<NewRealTimeMultiSampleArray>::SPtr   m_pRTMSAInput;     /**< The NewRealTimeMultiSampleArray of the noise plugin input.*/
-    PluginOutputData<FrequencySpectrum>::SPtr  m_pFSOutput;                   /**< The NE of the noise plugin output.*/
+    quint32      m_iMaxSamples;         /**< Maximal amount of samples received, before covariance is estimated.*/
 
+    quint32      m_iNewMaxSamples;      /**< New maximal amount of samples received, before covariance is estimated.*/
 
-    FiffInfo::SPtr  m_pFiffInfo;                        /**< Fiff measurement info.*/
+    FiffInfo::SPtr  m_pFiffInfo;        /**< Holds the fiff measurement information. */
 
-    CircularMatrixBuffer<double>::SPtr   m_pBuffer;     /**< Holds incoming data.*/
+    bool        m_bIsRunning;           /**< Holds if real-time Covariance estimation is running.*/
 
-    RtNoise::SPtr m_pRtNoise;                       /**< Real-time Noise Estimation. */
-    //RtNoise * m_pRtNoise;                       /**< Real-time Noise Estimation. */
-
-    QVector<MatrixXd>   m_qVecSpecData;     /**< Evoked data set */
-
-    bool m_bIsRunning;      /**< If source lab is running */
-    bool m_bProcessData;    /**< If data should be received for processing */
+    CircularMatrixBuffer<double>::SPtr m_pRawMatrixBuffer;   /**< The Circular Raw Matrix Buffer. */
 
     double m_Fs;
+
     qint32 m_iFFTlength;
 
-    QMutex mutex;
+protected:
+    int NumOfBlocks;
+    int BlockSize  ;
+    int Sensors    ;
+    int BlockIndex ;
+
+    MatrixXd CircBuf;
+
+public:
+    MatrixXd SpecData;
+    QMutex ReadMutex;
+
+    bool ReadDone;
+    bool CanRead;
 
 };
 
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline bool RtNoise::isRunning()
+{
+    return m_bIsRunning;
+}
+
 } // NAMESPACE
 
-#endif // NOISE_ESTIMATE_H
+#ifndef metatype_matrix
+#define metatype_matrix
+Q_DECLARE_METATYPE(Eigen::MatrixXd); /**< Provides QT META type declaration of the MatrixXd type. For signal/slot usage.*/
+#endif
+
+#endif // RtNoise_H
