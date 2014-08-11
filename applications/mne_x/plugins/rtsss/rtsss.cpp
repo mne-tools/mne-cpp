@@ -83,7 +83,8 @@ RtSss::RtSss()
 
 RtSss::~RtSss()
 {
-    stop();
+    if(this->isRunning())
+        stop();
 }
 
 
