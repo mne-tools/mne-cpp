@@ -51,6 +51,8 @@
 #include <QDebug>
 #include <QFuture>
 #include <QtConcurrent/QtConcurrentMap>
+#include <QSettings>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -115,6 +117,13 @@ void RtSss::init()
     // Output
     m_pRTMSAOutput = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "RtSssOut", "RtSss output data");
     m_outputConnectors.append(m_pRTMSAOutput);
+
+
+    //
+    // Load Settings
+    //
+//    QSettings settings;
+//    yourValue = settings.value(QString("Plugin/%1/yourValue").arg(this->getName()), 400).toInt();
 }
 
 
@@ -122,6 +131,11 @@ void RtSss::init()
 
 void RtSss::unload()
 {
+    //
+    // Store Settings
+    //
+//    QSettings settings;
+//    settings.setValue(QString("Plugin/%1/yourValue").arg(this->getName()), yourValue);
 
 }
 
