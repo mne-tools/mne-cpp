@@ -58,7 +58,9 @@
 #include <QDebug>
 #include <QTimer>
 #include <QTime>
+#include <QFile>
 #include <QFileDialog>
+#include <QFileInfo>
 #include <QStandardPaths>
 
 #include <iostream>
@@ -177,6 +179,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 void MainWindow::newConfiguration()
 {
     writeToLog(tr("Invoked <b>File|NewConfiguration</b>"), _LogKndMessage, _LogLvMin);
+    m_pPluginGui->clearScene();
 }
 
 
@@ -186,15 +189,13 @@ void MainWindow::openConfiguration()
 {
     writeToLog(tr("Invoked <b>File|OpenConfiguration</b>"), _LogKndMessage, _LogLvMin);
 
-
     QString path = QFileDialog::getOpenFileName(this,
                                                 "Open MNE-X Configuration File",
                                                 QStandardPaths::writableLocation(QStandardPaths::DataLocation),
                                                  tr("Configuration file (*.xml)"));
 
-    qDebug() << "Open Configuration" << path;
-
-
+    QFileInfo qFileInfo(path);
+    m_pPluginGui->loadConfig(qFileInfo.path(), qFileInfo.fileName());
 }
 
 
@@ -204,14 +205,14 @@ void MainWindow::saveConfiguration()
 {
     writeToLog(tr("Invoked <b>File|SaveConfiguration</b>"), _LogKndMessage, _LogLvMin);
 
-
     QString path = QFileDialog::getSaveFileName(
                 this,
                 "Save MNE-X Configuration File",
                 QStandardPaths::writableLocation(QStandardPaths::DataLocation),
                  tr("Configuration file (*.xml)"));
 
-    qDebug() << "Save Configuration" << path;
+    QFileInfo qFileInfo(path);
+    m_pPluginGui->saveConfig(qFileInfo.path(), qFileInfo.fileName());
 }
 
 
