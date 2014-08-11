@@ -79,7 +79,6 @@ PluginManager::PluginManager(QObject *parent)
 
 PluginManager::~PluginManager()
 {
-
 }
 
 
