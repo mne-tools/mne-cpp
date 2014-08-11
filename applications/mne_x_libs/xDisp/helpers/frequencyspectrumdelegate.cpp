@@ -260,6 +260,20 @@ void FrequencySpectrumDelegate::createGridPath(const QModelIndex &index, const Q
             path.moveTo(x,yStart);
             path.lineTo(x,yEnd);
         }
+
+        /*
+        //horizontal lines
+        float xStart = option.rect.topLeft().x();
+
+        float xEnd = option.rect.bottomRight().x();
+
+        for(qint32 i = 0; i < 6; ++i) {
+            float y =  option.rect.height()/5.0 * (float)i;
+            path.moveTo(xStart,y);
+            path.lineTo(xEnd,y);
+        }
+        */
+
     }
 }
 
@@ -285,12 +299,22 @@ void FrequencySpectrumDelegate::createGridTick(const QModelIndex &index, const Q
             qListLineSamples.append(idx);
         }
 
-        float yStart = option.rect.topLeft().y();
-        for(qint32 i = 0; i < qListLineSamples.size(); ++i) {
-            double val = pow(10,i);
+        // XTick
+        float yStart = 1.0*option.rect.topLeft().y();
+
+        double val = 0.0;
+        float x = (t_pModel->getFreqScale()[qListLineSamples[0]])*option.rect.width();
+        painter->drawText(x,yStart,QString("%1Hz").arg(val));
+
+        for(qint32 i = 1; i < qListLineSamples.size(); ++i) {
+            double val = pow(10,i-1);
             float x = (t_pModel->getFreqScale()[qListLineSamples[i]])*option.rect.width();
             painter->drawText(x,yStart,QString("%1Hz").arg(val));
         }
+
+        // YTick
+
+
     }
 }
 
