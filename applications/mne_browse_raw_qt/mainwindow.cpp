@@ -227,6 +227,12 @@ void MainWindow::createMenus()
     quitAction->setShortcuts(QKeySequence::Quit);
     connect(quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
 
+    //Adjust
+    QMenu *adjustMenu = new QMenu(tr("&Adjust"), this);
+
+    QAction *adjustAction = adjustMenu->addAction(tr("&Filter..."));
+    connect(adjustAction, SIGNAL(triggered()), this, SLOT(showFilterWindow()));
+
     //Windows
     QMenu *windowsMenu = new QMenu(tr("&Windows"), this);
 
@@ -241,6 +247,7 @@ void MainWindow::createMenus()
 
     //add to menub
     menuBar()->addMenu(fileMenu);
+    menuBar()->addMenu(adjustMenu);
     menuBar()->addMenu(windowsMenu);
     menuBar()->addMenu(helpMenu);
 }
@@ -568,6 +575,14 @@ void MainWindow::about()
              " HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING"
              " NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE"
              " POSSIBILITY OF SUCH DAMAGE."));
+}
+
+
+//*************************************************************************************************************
+
+void MainWindow::showFilterWindow()
+{
+
 }
 
 

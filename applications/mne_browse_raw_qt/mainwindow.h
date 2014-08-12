@@ -221,6 +221,12 @@ private slots:
 
     //=========================================================================================================
     /**
+    * showFilterWindow shows the filtering window
+    */
+    void showFilterWindow();
+
+    //=========================================================================================================
+    /**
     * showEventWindow shows the event window
     */
     void showEventWindow();
