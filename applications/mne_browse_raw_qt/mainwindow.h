@@ -105,6 +105,8 @@
 #include <QScrollArea>
 #include <QScrollBar>
 #include <QScroller>
+#include <QDoubleSpinBox>
+#include <QLabel>
 
 #include <QDockWidget>
 #include <QTextBrowser>
@@ -270,15 +272,21 @@ private:
 
     //=========================================================================================================
     /**
-    * setupRawViewSettings set the settings of the raw fiff dataview such as size policies, scrolling behaviour etc.
+    * setupRawViewSettings sets the settings of the raw fiff dataview such as size policies, scrolling behaviour etc.
     */
     void setupRawViewSettings();
 
     //=========================================================================================================
     /**
-    * setupEventViewSettings set the settings of the event view such as size policies, scrolling behaviour etc.
+    * setupEventViewSettings sets the settings of the event view such as size policies, scrolling behaviour etc.
     */
     void setupEventViewSettings();
+
+    //=========================================================================================================
+    /**
+    * setupWindowWidgets sets up the windows which can be shown during runtime (i.e. filter window, event list window, etc.).
+    */
+    void setupWindowWidgets();
 
     //=========================================================================================================
     /**
@@ -324,6 +332,7 @@ private:
     RawDelegate*        m_pRawDelegate;             /**< the QAbstractDelegate being part of the model/view framework of Qt */
 
     QWidget*            m_wEventWidget;             /**< Event widget which display the event view */
+    QWidget*            m_wFilterWidget;            /**< Filter widget which display the filter options for the user */
 
     //application settings
     QSettings           m_qSettings;
