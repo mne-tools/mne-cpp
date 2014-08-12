@@ -69,6 +69,8 @@ MainWindow::MainWindow(QWidget *parent)
     setupViews();
     setupLayout();
 
+    setupWindowWidgets();
+
     createMenus();
 
     createLogDockWindow();
@@ -186,6 +188,27 @@ void MainWindow::setupEventViewSettings()
     //Connect selection in event window to specific slot
     connect(m_pEventTableView->selectionModel(),SIGNAL(currentRowChanged(QModelIndex, QModelIndex)),
                 this,SLOT(jumpToEvent(QModelIndex, QModelIndex)));
+}
+
+
+//*************************************************************************************************************
+
+void MainWindow::setupWindowWidgets()
+{
+    //Create filter window
+    m_wFilterWidget = new QWidget(this, Qt::Window);
+
+    QGridLayout *filterWidgetLayout = new QVBoxLayout;
+
+    //QDoubleSpinBox spinBoxHP = new QDoubleSpinBox;
+    filterWidgetLayout->addWidget(new QDoubleSpinBox);
+    filterWidgetLayout->addWidget(new QDoubleSpinBox);
+    filterWidgetLayout->addWidget(new QDoubleSpinBox);
+    filterWidgetLayout->addWidget(new QDoubleSpinBox);
+
+    m_wFilterWidget->setWindowTitle("Adjust filter");
+    m_wFilterWidget->setLayout(filterWidgetLayout);
+    m_wFilterWidget->hide();
 
     //Create event window
     m_wEventWidget = new QWidget(this, Qt::Window);
@@ -193,6 +216,7 @@ void MainWindow::setupEventViewSettings()
     QVBoxLayout *eventWidgetLayout = new QVBoxLayout;
 
     eventWidgetLayout->addWidget(m_pEventTableView);
+    m_wEventWidget->setWindowTitle("Event list");
     m_wEventWidget->setLayout(eventWidgetLayout);
     m_wEventWidget->hide();
 }
@@ -435,7 +459,7 @@ void MainWindow::saveEvents()
                                                     tr("fif event data files (*-eve.fif);;fif data files (*.fif)"));
     if(filename.isEmpty())
     {
-        qDebug("USer aborted saving to fiff event data file");
+        qDebug("User aborted saving to fiff event data file");
         return;
     }
 
@@ -582,7 +606,14 @@ void MainWindow::about()
 
 void MainWindow::showFilterWindow()
 {
-
+    //Note: A widget that happens to be obscured by other windows on the screen is considered to be visible.
+    if(!m_wFilterWidget->isVisible())
+    {
+        m_wFilterWidget->show();
+        m_wFilterWidget->raise();
+    }
+    else // if visible raise the widget to be sure that it is not obscured by other windows
+        m_wFilterWidget->raise();
 }
 
 
@@ -593,7 +624,6 @@ void MainWindow::showEventWindow()
     //Note: A widget that happens to be obscured by other windows on the screen is considered to be visible.
     if(!m_wEventWidget->isVisible())
     {
-        m_wEventWidget->setWindowTitle("Event list");
         m_wEventWidget->show();
         m_wEventWidget->raise();
     }
