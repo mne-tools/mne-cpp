@@ -243,10 +243,12 @@ void FrequencySpectrumDelegate::createGridPath(const QModelIndex &index, const Q
 
         QList<qint32> qListLineSamples;
 
+        qListLineSamples << 0;
+
         for(qint32 lineIdx = 0; lineIdx < numLines; ++lineIdx)
         {
             double val = pow(10,lineIdx);
-            qint32 idx = (qint32)floor((val/fs) * t_pModel->getNumStems());
+            qint32 idx = (qint32)floor(val / ((float)fs/(float)t_pModel->getNumStems()));
             qListLineSamples.append(idx);
         }
 
@@ -291,11 +293,12 @@ void FrequencySpectrumDelegate::createGridTick(const QModelIndex &index, const Q
 
         QList<qint32> qListLineSamples;
 
+        qListLineSamples << 0;
 
         for(qint32 lineIdx = 0; lineIdx < numLines; ++lineIdx)
         {
             double val = pow(10,lineIdx);
-            qint32 idx = (qint32)floor((val/fs) * t_pModel->getNumStems());
+            qint32 idx = (qint32)floor(val / ((float)fs/(float)t_pModel->getNumStems()));
             qListLineSamples.append(idx);
         }
 
