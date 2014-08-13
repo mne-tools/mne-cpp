@@ -72,7 +72,7 @@ NoiseEstimate::NoiseEstimate()
 , m_pFSOutput(NULL)
 , m_pBuffer(CircularMatrixBuffer<double>::SPtr())
 , m_Fs(600)
-, m_iFFTlength(4096)
+, m_iFFTlength(16384)
 {
 }
 
@@ -102,6 +102,12 @@ QSharedPointer<IPlugin> NoiseEstimate::clone() const
 
 void NoiseEstimate::init()
 {    
+    //
+    // Load Settings
+    //
+    QSettings settings;
+    m_iFFTlength = settings.value(QString("Plugin/%1/FFTLength").arg(this->getName()), 16384).toInt();
+
     // Input
     m_pRTMSAInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "Noise Estimatge In", "Noise Estimate input data");
     connect(m_pRTMSAInput.data(), &PluginInputConnector::notify, this, &NoiseEstimate::update, Qt::DirectConnection);
@@ -127,7 +133,11 @@ void NoiseEstimate::init()
 
 void NoiseEstimate::unload()
 {
-
+    //
+    // Store Settings
+    //
+    QSettings settings;
+    settings.setValue(QString("Plugin/%1/FFTLength").arg(this->getName()), m_iFFTlength);
 }
 
 
