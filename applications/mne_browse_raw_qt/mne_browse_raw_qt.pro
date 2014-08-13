@@ -74,7 +74,8 @@ SOURCES += rawsettings.cpp\
     rawdelegate.cpp \
     mneoperator.cpp \
     filteroperator.cpp \
-    eventmodel.cpp
+    eventmodel.cpp \
+    FormFiles/filterwindow.cpp
 
 HEADERS += types.h\
     info.h\
@@ -84,10 +85,11 @@ HEADERS += types.h\
     rawdelegate.h \
     mneoperator.h \
     filteroperator.h \
-    eventmodel.h
+    eventmodel.h \
+    FormFiles/filterwindow.h
 
-
-FORMS +=
+FORMS += \
+    FormFiles/filterwindow.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

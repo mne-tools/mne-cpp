@@ -73,6 +73,8 @@ RawDelegate::RawDelegate(QObject *parent)
     m_dDefaultPlotHeight = m_qSettings.value("RawDelegate/plotheight").toDouble();
     m_dDx = m_qSettings.value("RawDelegate/dx").toDouble();
     m_nhlines = m_qSettings.value("RawDelegate/nhlines").toDouble();
+
+    m_eventModel = new EventModel(NULL);
 }
 
 
@@ -141,7 +143,7 @@ void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, c
 
         //Plot events
         painter->save();
-        if(m_eventData.rows()!=0)
+        if(m_eventModel->rowCount()!=0)
             plotEvents(index, option, painter);
         painter->restore();
 
@@ -178,9 +180,9 @@ QSize RawDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelInde
 
 //*************************************************************************************************************
 
-void RawDelegate::setEventData(MatrixXi &eventData)
+void RawDelegate::setEventModel(EventModel *model)
 {
-    m_eventData = eventData;
+    m_eventModel = model;
 }
 
 
@@ -272,13 +274,16 @@ void RawDelegate::plotEvents(const QModelIndex &index, const QStyleOptionViewIte
     qint32 sampleRangeLow = rawModel->relFiffCursor();
     qint32 sampleRangeHigh = sampleRangeLow + rawModel->sizeOfPreloadedData();
 
-    for(int i = 0; i<m_eventData.rows(); i++) {
-        if(m_eventData(i,0)-rawModel->firstSample()>=sampleRangeLow && m_eventData(i,0)-rawModel->firstSample()<=sampleRangeHigh) {
+    for(int i = 0; i<m_eventModel->rowCount(); i++) {
+        int sampleValue = m_eventModel->data(m_eventModel->index(i,0)).toInt();
+        int type = m_eventModel->data(m_eventModel->index(i,2)).toInt();
+
+        if(sampleValue>=sampleRangeLow && sampleValue<=sampleRangeHigh) {
             //Set color for pen depending on current event type
             QPen pen;
             pen.setWidthF(m_qSettings.value("EventDesignParameters/event_marker_width").toInt());
 
-            switch(m_eventData(i,2)) {
+            switch(type) {
                 default:
                     pen.setColor(m_qSettings.value("EventDesignParameters/event_color_default").value<QColor>());
                 break;
@@ -322,7 +327,7 @@ void RawDelegate::plotEvents(const QModelIndex &index, const QStyleOptionViewIte
             painter->setPen(pen);
 
             //Draw line from sample position (x) and highest to lowest y position of the column widget - Add +m_qSettings.value("EventDesignParameters/event_marker_width").toInt() to avoid painting ovre the edge of the column widget
-            painter->drawLine(option.rect.x() + m_eventData(i,0) - rawModel->firstSample(), option.rect.y(), option.rect.x() + m_eventData(i,0) - rawModel->firstSample(), option.rect.y() - option.rect.height() + m_qSettings.value("EventDesignParameters/event_marker_width").toInt());
+            painter->drawLine(option.rect.x() + sampleValue, option.rect.y(), option.rect.x() + sampleValue, option.rect.y() - option.rect.height() + m_qSettings.value("EventDesignParameters/event_marker_width").toInt());
         }
     }
     //If there are events in the m_eventData matrix between sampleRangeLow and sampleRangeHigh plot these events

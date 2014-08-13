@@ -106,6 +106,9 @@ void MainWindow::setupModel()
 void MainWindow::setupDelegate()
 {
     m_pRawDelegate = new RawDelegate(this);
+
+    //Set event data in the delegate
+    m_pRawDelegate->setEventModel(m_pEventModel);
 }
 
 
@@ -195,22 +198,11 @@ void MainWindow::setupEventViewSettings()
 
 void MainWindow::setupWindowWidgets()
 {
-    //Create filter window
-    m_wFilterWidget = new QWidget(this, Qt::Window);
-
-    QGridLayout *filterWidgetLayout = new QVBoxLayout;
-
-    //QDoubleSpinBox spinBoxHP = new QDoubleSpinBox;
-    filterWidgetLayout->addWidget(new QDoubleSpinBox);
-    filterWidgetLayout->addWidget(new QDoubleSpinBox);
-    filterWidgetLayout->addWidget(new QDoubleSpinBox);
-    filterWidgetLayout->addWidget(new QDoubleSpinBox);
-
-    m_wFilterWidget->setWindowTitle("Adjust filter");
-    m_wFilterWidget->setLayout(filterWidgetLayout);
+    //Create filter window - QTDesigner used
+    m_wFilterWidget = new FilterWindow();
     m_wFilterWidget->hide();
 
-    //Create event window
+    //Create event window - Manual setup because only the view needs to be added as widget
     m_wEventWidget = new QWidget(this, Qt::Window);
 
     QVBoxLayout *eventWidgetLayout = new QVBoxLayout;
@@ -443,9 +435,6 @@ void MainWindow::loadEvents()
 
     //Show event widget
     showEventWindow();
-
-    //Set event data in the delegate
-    m_pRawDelegate->setEventData(m_pEventModel->m_data);
 }
 
 
