@@ -178,8 +178,8 @@ public:
     FiffInfo                m_fiffInfo;         /**< fiff info of whole fiff file */
 
     //Filter operators
-    QMap<QString,QSharedPointer<MNEOperator> > m_Operators;     /**< generated MNEOperator types (FilterOperator,PCA etc.) */
-    QMap<int,QSharedPointer<MNEOperator> > m_assignedOperators; /**< Map of MNEOperator types to channels*/
+    QMap<QString,QSharedPointer<MNEOperator> >  m_Operators;            /**< generated MNEOperator types (FilterOperator,PCA etc.) */
+    QMap<int,QSharedPointer<MNEOperator> >      m_assignedOperators;    /**< Map of MNEOperator types to channels*/
 
     //Settings
     QSettings               m_qSettings;

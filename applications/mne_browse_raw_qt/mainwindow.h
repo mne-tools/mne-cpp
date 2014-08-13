@@ -116,6 +116,8 @@
 
 #include <QMessageBox>
 
+#include "FormFiles/filterwindow.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -332,7 +334,7 @@ private:
     RawDelegate*        m_pRawDelegate;             /**< the QAbstractDelegate being part of the model/view framework of Qt */
 
     QWidget*            m_wEventWidget;             /**< Event widget which display the event view */
-    QWidget*            m_wFilterWidget;            /**< Filter widget which display the filter options for the user */
+    FilterWindow*       m_wFilterWidget;            /**< Filter widget which display the filter options for the user */
 
     //application settings
     QSettings           m_qSettings;

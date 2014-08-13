@@ -51,6 +51,7 @@
 //=============================================================================================================
 
 #include "rawmodel.h"
+#include "eventmodel.h"
 #include "types.h"
 #include "rawsettings.h"
 
@@ -117,19 +118,19 @@ public:
 
     //=========================================================================================================
     /**
-    * setEventData creates the QPointer path for the data plot.
+    * setEventModel creates the QPointer path for the data plot.
     *
-    * @param[in] eventData holds the loaded fiff event data i nform of a matrix.
+    * @param[in] model holds a pointer to the event model. This model needs to be set in order to access the event data for plotting.
     */
-    void setEventData(MatrixXi &eventData);
+    void setEventModel(EventModel *model);
 
     // Plots settings
-    double m_dDefaultPlotHeight;   /**< The height of the plot */
+    double      m_dDefaultPlotHeight;       /**< The height of the plot */
 
     // Scaling
-    double m_dMaxValue;     /**< Maximum value of the data to plot  */
-    double m_dScaleY;       /**< Maximum amplitude of plot (max is m_dPlotHeight/2) */
-    double m_dDx;           /**< pixel difference to the next sample*/
+    double      m_dMaxValue;                /**< Maximum value of the data to plot  */
+    double      m_dScaleY;                  /**< Maximum amplitude of plot (max is m_dPlotHeight/2) */
+    double      m_dDx;                      /**< pixel difference to the next sample*/
 
 private:
     //=========================================================================================================
@@ -160,10 +161,10 @@ private:
     void plotEvents(const QModelIndex &index, const QStyleOptionViewItem &option, QPainter *painter) const;
 
     //Settings
-    qint8           m_nhlines;          /**< Number of horizontal lines for the grid plot */
+    qint8           m_nhlines;              /**< Number of horizontal lines for the grid plot */
     QSettings       m_qSettings;
 
-    MatrixXi        m_eventData;             /**< Matrix that holds the loaded events from the event file. */
+    EventModel*     m_eventModel;           /**< Pointer to the event model. */
 };
 
 } // NAMESPACE
