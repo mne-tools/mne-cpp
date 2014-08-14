@@ -210,6 +210,7 @@ public:
 
     bool ReadDone;
     bool CanRead;
+    bool SendDataToBuffer;
 
 };
 

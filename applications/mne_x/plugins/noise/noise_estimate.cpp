@@ -256,7 +256,9 @@ void NoiseEstimate::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 void NoiseEstimate::appendNoiseSpectrum(MatrixXd t_send)
 { 
     qDebug()<<"Spectrum"<<t_send(0,1)<<t_send(0,2)<<t_send(0,3);
+    mutex.lock();
     m_qVecSpecData.push_back(t_send);
+    mutex.unlock();
     //m_pFSOutput->data()->setValue(t_send);
     qDebug()<<"---------------------------------appendNoiseSpectrum--------------------------------";
 }
@@ -300,25 +302,15 @@ void NoiseEstimate::run()
             //ToDo: Implement your algorithm here
             m_pRtNoise->append(t_mat);
 
-//            if (m_pRtNoise->CanRead)
-//            {//send data to display
-//                //t_send = m_pRtNoise->SpecData;
-
-//                t_send = MatrixXd::Ones(t_mat.rows(),m_iFFTlength/2+1);
-//                m_pFSOutput->data()->setValue(t_send);
-//                m_pRtNoise->CanRead = false;
-//                m_pRtNoise->ReadDone = true;
-
-//                qDebug()<<"Spectrum"<<t_send(0,1)<<"MutexRead"<<MutexRead;
-//            }
-
            if(m_qVecSpecData.size() > 0)
            {
 
+               mutex.lock();
                qDebug()<<"%%%%%%%%%%%%%%%% send spectrum for display %%%%%%%%%%%%%%%%%%%";
                 //send spectrum to the output data
                m_pFSOutput->data()->setValue(m_qVecSpecData[0]);
                m_qVecSpecData.pop_front();
+               mutex.unlock();
 
             }
         }//m_bProcessData
