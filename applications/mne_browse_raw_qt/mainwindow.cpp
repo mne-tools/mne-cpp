@@ -199,7 +199,7 @@ void MainWindow::setupEventViewSettings()
 void MainWindow::setupWindowWidgets()
 {
     //Create filter window - QTDesigner used
-    m_wFilterWidget = new FilterWindow();
+    m_wFilterWidget = new FilterWindow(this);
     m_wFilterWidget->hide();
 
     //Create event window - Manual setup because only the view needs to be added as widget
