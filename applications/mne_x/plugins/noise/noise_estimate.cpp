@@ -300,18 +300,6 @@ void NoiseEstimate::run()
             //ToDo: Implement your algorithm here
             m_pRtNoise->append(t_mat);
 
-//            if (m_pRtNoise->CanRead)
-//            {//send data to display
-//                //t_send = m_pRtNoise->SpecData;
-
-//                t_send = MatrixXd::Ones(t_mat.rows(),m_iFFTlength/2+1);
-//                m_pFSOutput->data()->setValue(t_send);
-//                m_pRtNoise->CanRead = false;
-//                m_pRtNoise->ReadDone = true;
-
-//                qDebug()<<"Spectrum"<<t_send(0,1)<<"MutexRead"<<MutexRead;
-//            }
-
            if(m_qVecSpecData.size() > 0)
            {
 
