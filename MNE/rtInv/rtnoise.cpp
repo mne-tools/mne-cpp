@@ -237,6 +237,8 @@ void RtNoise::run()
 
                 qDebug()<<"Send spectrum to Noise Estimator";
                 emit SpecCalculated(t_psdx); //send back the spectrum result
+                if(m_pRawMatrixBuffer->size()>0)
+                    m_pRawMatrixBuffer->clear();
 
                 SendDataToBuffer = true;
             }
