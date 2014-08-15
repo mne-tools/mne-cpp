@@ -71,9 +71,9 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "rawmodel.h"
-#include "eventmodel.h"
-#include "rawdelegate.h"
+#include "Models/rawmodel.h"
+#include "Models/eventmodel.h"
+#include "Delegates/rawdelegate.h"
 
 #include "info.h"
 #include "types.h"
@@ -268,9 +268,9 @@ private:
 
     //=========================================================================================================
     /**
-    * setupLayout create and connects the individual elements of the layout.
+    * setupMainWindow create and connects the individual elements of the main window.
     */
-    void setupLayout();
+    void setupMainWindow();
 
     //=========================================================================================================
     /**
@@ -333,6 +333,7 @@ private:
     QTableView*         m_pEventTableView;          /**< the QTableView being part of the model/view framework of Qt for the fiff event handling */
     RawDelegate*        m_pRawDelegate;             /**< the QAbstractDelegate being part of the model/view framework of Qt */
 
+    //Window widgets
     QWidget*            m_wEventWidget;             /**< Event widget which display the event view */
     FilterWindow*       m_wFilterWidget;            /**< Filter widget which display the filter options for the user */
 

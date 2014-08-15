@@ -50,10 +50,10 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "rawmodel.h"
-#include "eventmodel.h"
-#include "types.h"
-#include "rawsettings.h"
+#include "../Models/rawmodel.h"
+#include "../Models/eventmodel.h"
+#include "../types.h"
+#include "../rawsettings.h"
 
 
 //*************************************************************************************************************
@@ -67,6 +67,7 @@
 #include <QPainterPath>
 #include <QPointF>
 #include <QRect>
+#include <QTableView>
 
 
 //*************************************************************************************************************
@@ -118,19 +119,21 @@ public:
 
     //=========================================================================================================
     /**
-    * setEventModel creates the QPointer path for the data plot.
+    * setEventModelView creates the QPointer path for the data plot.
     *
     * @param[in] model holds a pointer to the event model. This model needs to be set in order to access the event data for plotting.
+    * @param[in] view holds a pointer to the event view. This view needs to be set in order to access the selected event data for plotting.
     */
-    void setEventModel(EventModel *model);
+    void setEventModelView(EventModel *model, QTableView* view);
 
     // Plots settings
     double      m_dDefaultPlotHeight;       /**< The height of the plot */
+    bool        m_showAllEvents;            /**< When true all events are plotted otherwise only plot selected event */
 
     // Scaling
-    double      m_dMaxValue;                /**< Maximum value of the data to plot  */
+    double      m_dMaxValue;                /**< Maximum value of the data to plot */
     double      m_dScaleY;                  /**< Maximum amplitude of plot (max is m_dPlotHeight/2) */
-    double      m_dDx;                      /**< pixel difference to the next sample*/
+    double      m_dDx;                      /**< pixel difference to the next sample */
 
 private:
     //=========================================================================================================
@@ -164,7 +167,9 @@ private:
     qint8           m_nhlines;              /**< Number of horizontal lines for the grid plot */
     QSettings       m_qSettings;
 
+    //Event model view
     EventModel*     m_eventModel;           /**< Pointer to the event model. */
+    QTableView*     m_eventView;            /**< Pointer to the event view. */
 };
 
 } // NAMESPACE

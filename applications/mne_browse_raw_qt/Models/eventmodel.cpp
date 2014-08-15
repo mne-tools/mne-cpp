@@ -62,6 +62,7 @@ EventModel::EventModel(QObject *parent)
 {
 }
 
+
 //*************************************************************************************************************
 
 EventModel::EventModel(QFile &qFile, QObject *parent)
