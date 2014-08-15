@@ -81,6 +81,7 @@ RtNoise::RtNoise(qint32 p_iMaxSamples, FiffInfo::SPtr p_pFiffInfo, QObject *pare
     m_Fs = m_pFiffInfo->sfreq;
     ReadDone = true;
 
+    SendDataToBuffer = true;
 }
 
 
@@ -102,7 +103,8 @@ void RtNoise::append(const MatrixXd &p_DataSegment)
     if(!m_pRawMatrixBuffer)
         m_pRawMatrixBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(120, p_DataSegment.rows(), p_DataSegment.cols()));
 
-    m_pRawMatrixBuffer->push(&p_DataSegment);
+    if (SendDataToBuffer)
+        m_pRawMatrixBuffer->push(&p_DataSegment);
 }
 
 
@@ -169,6 +171,7 @@ void RtNoise::run()
 
                 //m_pRawMatrixBuffer.clear(); //empty the buffer
 
+                SendDataToBuffer = false;
                 //stop collect block and start to calculate the spectrum
                 BlockIndex = 0;
 
@@ -178,7 +181,6 @@ void RtNoise::run()
                 qDebug()<<"nb"<<nb<<"NumOfBlocks"<<NumOfBlocks<<"BlockSize"<<BlockSize;
                 MatrixXd t_mat(Sensors,m_iFFTlength);
                 MatrixXd t_psdx(Sensors,m_iFFTlength/2+1);
-                qDebug()<<"1.0";
                 for (int n = 0; n<nb; n++){
                     //collect a data block with data length of m_iFFTlength;
                     if(n==nb-1)
@@ -227,7 +229,6 @@ void RtNoise::run()
                         }
                      }//row computing is done
                 }//nb
-                qDebug()<<"2.2";
 
                 //DB-calculation
                 for(qint32 ii=0; ii<Sensors; ii++)
@@ -236,7 +237,10 @@ void RtNoise::run()
 
                 qDebug()<<"Send spectrum to Noise Estimator";
                 emit SpecCalculated(t_psdx); //send back the spectrum result
+                if(m_pRawMatrixBuffer->size()>0)
+                    m_pRawMatrixBuffer->clear();
 
+                SendDataToBuffer = true;
             }
 
         }

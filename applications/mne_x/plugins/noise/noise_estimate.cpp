@@ -72,7 +72,7 @@ NoiseEstimate::NoiseEstimate()
 , m_pFSOutput(NULL)
 , m_pBuffer(CircularMatrixBuffer<double>::SPtr())
 , m_Fs(600)
-, m_iFFTlength(4096)
+, m_iFFTlength(16384)
 {
 }
 
@@ -102,6 +102,12 @@ QSharedPointer<IPlugin> NoiseEstimate::clone() const
 
 void NoiseEstimate::init()
 {    
+    //
+    // Load Settings
+    //
+    QSettings settings;
+    m_iFFTlength = settings.value(QString("Plugin/%1/FFTLength").arg(this->getName()), 16384).toInt();
+
     // Input
     m_pRTMSAInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "Noise Estimatge In", "Noise Estimate input data");
     connect(m_pRTMSAInput.data(), &PluginInputConnector::notify, this, &NoiseEstimate::update, Qt::DirectConnection);
@@ -127,7 +133,11 @@ void NoiseEstimate::init()
 
 void NoiseEstimate::unload()
 {
-
+    //
+    // Store Settings
+    //
+    QSettings settings;
+    settings.setValue(QString("Plugin/%1/FFTLength").arg(this->getName()), m_iFFTlength);
 }
 
 
@@ -246,7 +256,9 @@ void NoiseEstimate::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 void NoiseEstimate::appendNoiseSpectrum(MatrixXd t_send)
 { 
     qDebug()<<"Spectrum"<<t_send(0,1)<<t_send(0,2)<<t_send(0,3);
+    mutex.lock();
     m_qVecSpecData.push_back(t_send);
+    mutex.unlock();
     //m_pFSOutput->data()->setValue(t_send);
     qDebug()<<"---------------------------------appendNoiseSpectrum--------------------------------";
 }
@@ -290,25 +302,15 @@ void NoiseEstimate::run()
             //ToDo: Implement your algorithm here
             m_pRtNoise->append(t_mat);
 
-//            if (m_pRtNoise->CanRead)
-//            {//send data to display
-//                //t_send = m_pRtNoise->SpecData;
-
-//                t_send = MatrixXd::Ones(t_mat.rows(),m_iFFTlength/2+1);
-//                m_pFSOutput->data()->setValue(t_send);
-//                m_pRtNoise->CanRead = false;
-//                m_pRtNoise->ReadDone = true;
-
-//                qDebug()<<"Spectrum"<<t_send(0,1)<<"MutexRead"<<MutexRead;
-//            }
-
            if(m_qVecSpecData.size() > 0)
            {
 
+               mutex.lock();
                qDebug()<<"%%%%%%%%%%%%%%%% send spectrum for display %%%%%%%%%%%%%%%%%%%";
                 //send spectrum to the output data
                m_pFSOutput->data()->setValue(m_qVecSpecData[0]);
                m_qVecSpecData.pop_front();
+               mutex.unlock();
 
             }
         }//m_bProcessData

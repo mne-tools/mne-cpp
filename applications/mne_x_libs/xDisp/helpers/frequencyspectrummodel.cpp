@@ -201,7 +201,7 @@ void FrequencySpectrumModel::addData(const MatrixXd &data)
         double k = 1.0;
         m_vecFreqScale.resize(1,m_dataCurrent.cols());
 
-        double currFreq = freqRes;
+        double currFreq = 0;
         for(qint32 i = 0; i < m_dataCurrent.cols(); ++i)
         {
             m_vecFreqScale[i] = log10(currFreq+k);
