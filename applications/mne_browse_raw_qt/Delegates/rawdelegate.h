@@ -130,7 +130,8 @@ public:
 
     // Plots settings
     double      m_dDefaultPlotHeight;       /**< The height of the plot */
-    bool        m_showAllEvents;            /**< When true all events are plotted otherwise only plot selected event */
+    bool        m_bShowAllEvents;           /**< When true all events are plotted otherwise only plot selected event */
+    bool        m_bPlotEvents;              /**< Flag for plotting events */
 
     // Scaling
     double      m_dMaxValue;                /**< Maximum value of the data to plot */
