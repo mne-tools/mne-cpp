@@ -207,14 +207,22 @@ void MainWindow::setupWindowWidgets()
     m_wEventWidget = new QWidget(this, Qt::Window);
 
     QVBoxLayout *eventWidgetLayout = new QVBoxLayout;
+
+    QCheckBox *showEvents = new QCheckBox("Show events");
+    showEvents->setChecked(true);
+    eventWidgetLayout->addWidget(showEvents);
+    connect(showEvents,&QCheckBox::stateChanged, [=](int state){
+        m_pRawDelegate->m_bPlotEvents = state;
+        jumpToEvent(m_pEventTableView->selectionModel()->currentIndex(), QModelIndex());
+    });
+
     eventWidgetLayout->addWidget(m_pEventTableView);
 
     QCheckBox *showAllEvents = new QCheckBox("Show all events");
-    showAllEvents->setObjectName("QCheckBox_ShowAllEvents");
     showAllEvents->setChecked(true);
     eventWidgetLayout->addWidget(showAllEvents);
     connect(showAllEvents,&QCheckBox::stateChanged, [=](int state){
-        m_pRawDelegate->m_showAllEvents = state;
+        m_pRawDelegate->m_bShowAllEvents = state;
         jumpToEvent(m_pEventTableView->selectionModel()->currentIndex(), QModelIndex());
     });
 

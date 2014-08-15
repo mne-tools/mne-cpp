@@ -69,7 +69,8 @@ using namespace MNELIB;
 RawDelegate::RawDelegate(QObject *parent)
 : QAbstractItemDelegate(parent)
 , m_qSettings()
-, m_showAllEvents(true)
+, m_bShowAllEvents(true)
+, m_bPlotEvents(true)
 {
     m_dDefaultPlotHeight = m_qSettings.value("RawDelegate/plotheight").toDouble();
     m_dDx = m_qSettings.value("RawDelegate/dx").toDouble();
@@ -146,7 +147,7 @@ void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, c
 
         //Plot events
         painter->save();
-        if(m_pEventModel->rowCount()!=0)
+        if(m_pEventModel->rowCount()!=0 && m_bPlotEvents)
             plotEvents(index, option, painter);
         painter->restore();
 
@@ -282,7 +283,7 @@ void RawDelegate::plotEvents(const QModelIndex &index, const QStyleOptionViewIte
     qint32 sampleRangeLow = rawModel->relFiffCursor();
     qint32 sampleRangeHigh = sampleRangeLow + rawModel->sizeOfPreloadedData();
 
-    if(m_showAllEvents) { //Plot all events
+    if(m_bShowAllEvents) { //Plot all events
         for(int i = 0; i<m_pEventModel->rowCount(); i++) {
             int sampleValue = m_pEventModel->data(m_pEventModel->index(i,0)).toInt();
             int type = m_pEventModel->data(m_pEventModel->index(i,2)).toInt();
