@@ -67,7 +67,11 @@ MainWindow::MainWindow(QWidget *parent)
     setupModel();
     setupDelegate();
     setupViews();
-    setupLayout();
+
+    //Set event data and view in the delegate. This needs to be done here after all the above called setup routines
+    m_pRawDelegate->setEventModelView(m_pEventModel, m_pEventTableView);
+
+    setupMainWindow();
 
     setupWindowWidgets();
 
@@ -106,9 +110,6 @@ void MainWindow::setupModel()
 void MainWindow::setupDelegate()
 {
     m_pRawDelegate = new RawDelegate(this);
-
-    //Set event data in the delegate
-    m_pRawDelegate->setEventModel(m_pEventModel);
 }
 
 
@@ -134,7 +135,7 @@ void MainWindow::setupViews()
 
 //*************************************************************************************************************
 
-void MainWindow::setupLayout()
+void MainWindow::setupMainWindow()
 {
     //set vertical layout
     QVBoxLayout *mainlayout = new QVBoxLayout;
@@ -206,8 +207,16 @@ void MainWindow::setupWindowWidgets()
     m_wEventWidget = new QWidget(this, Qt::Window);
 
     QVBoxLayout *eventWidgetLayout = new QVBoxLayout;
-
     eventWidgetLayout->addWidget(m_pEventTableView);
+
+    QCheckBox *showAllEvents = new QCheckBox("Show all events");
+    showAllEvents->setObjectName("QCheckBox_ShowAllEvents");
+    showAllEvents->setChecked(true);
+    eventWidgetLayout->addWidget(showAllEvents);
+    connect(showAllEvents,&QCheckBox::stateChanged, [=](int state){
+        m_pRawDelegate->m_showAllEvents = state;
+    });
+
     m_wEventWidget->setWindowTitle("Event list");
     m_wEventWidget->setLayout(eventWidgetLayout);
     m_wEventWidget->hide();
@@ -471,7 +480,7 @@ void MainWindow::saveEvents()
 void MainWindow::customContextMenuRequested(QPoint pos)
 {
     //obtain index where index was clicked
-    QModelIndex index = m_pRawTableView->indexAt(pos);
+    //QModelIndex index = m_pRawTableView->indexAt(pos);
 
     //get selected items
     QModelIndexList selected = m_pRawTableView->selectionModel()->selectedIndexes();
@@ -636,7 +645,7 @@ void MainWindow::jumpToEvent(const QModelIndex & current, const QModelIndex & pr
     //Get the sample value
     int sample = m_pEventModel->data(index, Qt::DisplayRole).toInt();
 
-    //Jump to sample - put sample in the middle of the view (-m_pRawModel->m_iWindowSize/2)
+    //Jump to sample - put sample in the middle of the view
     int rawTableViewColumnWidth = m_pRawTableView->viewport()->width();
 
     if(sample-rawTableViewColumnWidth/2 < rawTableViewColumnWidth/2) //events lie in the first half of the data window at the beginning of the loaded data -> cannot centralize view on event
@@ -646,7 +655,11 @@ void MainWindow::jumpToEvent(const QModelIndex & current, const QModelIndex & pr
     else //centralize view on event
         m_pRawTableView->horizontalScrollBar()->setValue(sample-rawTableViewColumnWidth/2);
 
-    //qDebug()<<"Jumping to Event at sample "<<sample<<"rawTableViewColumnWidth"<<rawTableViewColumnWidth;
+    qDebug()<<"Jumping to Event at sample "<<sample<<"rawTableViewColumnWidth"<<rawTableViewColumnWidth;
+
+    //m_pRawModel->;
+    emit m_pRawModel->dataChanged(m_pRawModel->index(0,0), m_pRawModel->index(0,0));
+    //m_pRawTableView->repaint();
 }
 
 

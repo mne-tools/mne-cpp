@@ -67,25 +67,25 @@ else {
 
 DESTDIR = $${MNE_BINARY_DIR}
 
-SOURCES += rawsettings.cpp\
-    main.cpp\
-    rawmodel.cpp \
+SOURCES += rawsettings.cpp \
+    main.cpp \
     mainwindow.cpp \
-    rawdelegate.cpp \
     mneoperator.cpp \
     filteroperator.cpp \
-    eventmodel.cpp \
+    Models/rawmodel.cpp \
+    Models/eventmodel.cpp \
+    Delegates/rawdelegate.cpp \
     FormFiles/filterwindow.cpp
 
-HEADERS += types.h\
-    info.h\
-    rawsettings.h\
-    rawmodel.h\
+HEADERS += rawsettings.h \
     mainwindow.h \
-    rawdelegate.h \
     mneoperator.h \
     filteroperator.h \
-    eventmodel.h \
+    types.h \
+    info.h \
+    Models/rawmodel.h \
+    Models/eventmodel.h \
+    Delegates/rawdelegate.h \
     FormFiles/filterwindow.h
 
 FORMS += \
