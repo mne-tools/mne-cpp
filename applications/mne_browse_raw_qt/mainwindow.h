@@ -79,6 +79,8 @@
 #include "types.h"
 #include "rawsettings.h"
 
+#include "FormFiles/filterwindow.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -115,8 +117,6 @@
 #include <QPainter>
 
 #include <QMessageBox>
-
-#include "FormFiles/filterwindow.h"
 
 
 //*************************************************************************************************************
@@ -331,7 +331,7 @@ private:
     EventModel*         m_pEventModel;              /**< the QAbstractTable event model being part of the model/view framework of Qt */
     QTableView*         m_pRawTableView;            /**< the QTableView being part of the model/view framework of Qt for the fiff data handling*/
     QTableView*         m_pEventTableView;          /**< the QTableView being part of the model/view framework of Qt for the fiff event handling */
-    RawDelegate*        m_pRawDelegate;             /**< the QAbstractDelegate being part of the model/view framework of Qt */
+    RawDelegate*        m_pRawDelegate;             /**< the QAbstractDelegate being part of the raw model/view framework of Qt */
 
     //Window widgets
     QWidget*            m_wEventWidget;             /**< Event widget which display the event view */
