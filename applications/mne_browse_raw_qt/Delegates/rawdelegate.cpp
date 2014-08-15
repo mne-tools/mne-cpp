@@ -75,8 +75,9 @@ RawDelegate::RawDelegate(QObject *parent)
     m_dDx = m_qSettings.value("RawDelegate/dx").toDouble();
     m_nhlines = m_qSettings.value("RawDelegate/nhlines").toDouble();
 
-    m_eventModel = new EventModel(NULL);
-    m_eventView = new QTableView(NULL);
+    m_pEventModel = new EventModel(NULL);
+    m_pEventView = new QTableView(NULL);
+    m_pRawView = new QTableView(NULL);
 }
 
 
@@ -145,14 +146,17 @@ void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, c
 
         //Plot events
         painter->save();
-        if(m_eventModel->rowCount()!=0)
+        if(m_pEventModel->rowCount()!=0)
             plotEvents(index, option, painter);
         painter->restore();
 
         break;
-    }
+        }
     }
 
+    //Update raw table view widget's viewport manually. This needs to be done because the user is working with the event view widget and thus the delegate of the raw view widget is not getting called
+    //Note: If you inherit QAbstractItemView and intend to update the contents of the viewport, you should use viewport->update() instead of update() as all painting operations take place on the viewport.
+    m_pRawView->viewport()->update();
 }
 
 
@@ -182,10 +186,11 @@ QSize RawDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelInde
 
 //*************************************************************************************************************
 
-void RawDelegate::setEventModelView(EventModel *model, QTableView* view)
+void RawDelegate::setEventModelView(EventModel *model, QTableView* eventView, QTableView* rawView)
 {
-    m_eventModel = model;
-    m_eventView = view;
+    m_pEventModel = model;
+    m_pEventView = eventView;
+    m_pRawView = rawView;
 }
 
 
@@ -278,9 +283,9 @@ void RawDelegate::plotEvents(const QModelIndex &index, const QStyleOptionViewIte
     qint32 sampleRangeHigh = sampleRangeLow + rawModel->sizeOfPreloadedData();
 
     if(m_showAllEvents) { //Plot all events
-        for(int i = 0; i<m_eventModel->rowCount(); i++) {
-            int sampleValue = m_eventModel->data(m_eventModel->index(i,0)).toInt();
-            int type = m_eventModel->data(m_eventModel->index(i,2)).toInt();
+        for(int i = 0; i<m_pEventModel->rowCount(); i++) {
+            int sampleValue = m_pEventModel->data(m_pEventModel->index(i,0)).toInt();
+            int type = m_pEventModel->data(m_pEventModel->index(i,2)).toInt();
 
             if(sampleValue>=sampleRangeLow && sampleValue<=sampleRangeHigh) {
                 //Set color for pen depending on current event type
@@ -336,9 +341,9 @@ void RawDelegate::plotEvents(const QModelIndex &index, const QStyleOptionViewIte
         } // END if statement
     } // END if statement plot all
     else { //Only plot selected event
-        int currentRow = m_eventView->selectionModel()->currentIndex().row();
-        int sampleValue = m_eventModel->data(m_eventModel->index(currentRow,0)).toInt();
-        int type = m_eventModel->data(m_eventModel->index(currentRow,2)).toInt();
+        int currentRow = m_pEventView->selectionModel()->currentIndex().row();
+        int sampleValue = m_pEventModel->data(m_pEventModel->index(currentRow,0)).toInt();
+        int type = m_pEventModel->data(m_pEventModel->index(currentRow,2)).toInt();
 
         if(sampleValue>=sampleRangeLow && sampleValue<=sampleRangeHigh) {
             //qDebug()<<"currentRow"<<currentRow<<"sampleValue"<<sampleValue<<"sampleRangeLow"<<sampleRangeLow<<"sampleRangeHigh"<<sampleRangeHigh;

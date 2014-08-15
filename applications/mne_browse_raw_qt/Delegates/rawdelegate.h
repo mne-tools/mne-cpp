@@ -52,6 +52,7 @@
 
 #include "../Models/rawmodel.h"
 #include "../Models/eventmodel.h"
+
 #include "../types.h"
 #include "../rawsettings.h"
 
@@ -122,9 +123,10 @@ public:
     * setEventModelView creates the QPointer path for the data plot.
     *
     * @param[in] model holds a pointer to the event model. This model needs to be set in order to access the event data for plotting.
-    * @param[in] view holds a pointer to the event view. This view needs to be set in order to access the selected event data for plotting.
+    * @param[in] eventView holds a pointer to the event view. This view needs to be set in order to access the selected event data for plotting.
+    * @param[in] rawView holds a pointer to the raw view. This view needs to be set in order to access the raw view for manual viewport updating.
     */
-    void setEventModelView(EventModel *model, QTableView* view);
+    void setEventModelView(EventModel *model, QTableView* eventView, QTableView *rawView);
 
     // Plots settings
     double      m_dDefaultPlotHeight;       /**< The height of the plot */
@@ -168,8 +170,9 @@ private:
     QSettings       m_qSettings;
 
     //Event model view
-    EventModel*     m_eventModel;           /**< Pointer to the event model. */
-    QTableView*     m_eventView;            /**< Pointer to the event view. */
+    EventModel*     m_pEventModel;           /**< Pointer to the event model. */
+    QTableView*     m_pEventView;            /**< Pointer to the event view. */
+    QTableView*     m_pRawView;              /**< Pointer to the raw view. */
 };
 
 } // NAMESPACE

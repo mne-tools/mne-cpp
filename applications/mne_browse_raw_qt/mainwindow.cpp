@@ -69,7 +69,7 @@ MainWindow::MainWindow(QWidget *parent)
     setupViews();
 
     //Set event data and view in the delegate. This needs to be done here after all the above called setup routines
-    m_pRawDelegate->setEventModelView(m_pEventModel, m_pEventTableView);
+    m_pRawDelegate->setEventModelView(m_pEventModel, m_pEventTableView, m_pRawTableView);
 
     setupMainWindow();
 
@@ -121,8 +121,8 @@ void MainWindow::setupViews()
     m_pEventTableView = new QTableView;
 
     //set custom models
-    m_pEventTableView->setModel(m_pEventModel);
     m_pRawTableView->setModel(m_pRawModel);
+    m_pEventTableView->setModel(m_pEventModel);
 
     //set custom delegate
     m_pRawTableView->setItemDelegate(m_pRawDelegate);
@@ -215,6 +215,7 @@ void MainWindow::setupWindowWidgets()
     eventWidgetLayout->addWidget(showAllEvents);
     connect(showAllEvents,&QCheckBox::stateChanged, [=](int state){
         m_pRawDelegate->m_showAllEvents = state;
+        jumpToEvent(m_pEventTableView->selectionModel()->currentIndex(), QModelIndex());
     });
 
     m_wEventWidget->setWindowTitle("Event list");
@@ -656,10 +657,6 @@ void MainWindow::jumpToEvent(const QModelIndex & current, const QModelIndex & pr
         m_pRawTableView->horizontalScrollBar()->setValue(sample-rawTableViewColumnWidth/2);
 
     qDebug()<<"Jumping to Event at sample "<<sample<<"rawTableViewColumnWidth"<<rawTableViewColumnWidth;
-
-    //m_pRawModel->;
-    emit m_pRawModel->dataChanged(m_pRawModel->index(0,0), m_pRawModel->index(0,0));
-    //m_pRawTableView->repaint();
 }
 
 
