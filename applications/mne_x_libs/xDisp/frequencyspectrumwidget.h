@@ -159,12 +159,25 @@ public:
     virtual void init();
 
 private:
-    FrequencySpectrumModel*      m_pFSModel;      /**< FS model */
-    FrequencySpectrumDelegate*   m_pFSDelegate;   /**< FS delegate */
+
+    //=========================================================================================================
+    /**
+    * Show the frequency spectrum settings widget
+    */
+    void showFrequencySpectrumSettingsWidget();
+
+
+    QAction* m_pActionFrequencySettings;        /**< Frequency spectrum settings action */
+
+    FrequencySpectrumModel*      m_pFSModel;    /**< FS model */
+    FrequencySpectrumDelegate*   m_pFSDelegate; /**< FS delegate */
     QTableView* m_pTableView;                   /**< the QTableView being part of the model/view framework of Qt */
 
 
     QSharedPointer<FrequencySpectrum> m_pFS;    /**< The frequency spectrum measurement. */
+
+    float m_fLowerFrqBound;                    /**< Lower frequency bound */
+    float m_fUpperFrqBound;                    /**< Upper frequency bound */
 
     bool m_bInitialized;                        /**< Is Initialized */
 };
