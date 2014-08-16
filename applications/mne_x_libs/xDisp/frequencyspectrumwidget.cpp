@@ -247,5 +247,13 @@ void FrequencySpectrumWidget::init()
 
 void FrequencySpectrumWidget::showFrequencySpectrumSettingsWidget()
 {
+    if(!m_pFrequencySpectrumSettingsWidget)
+    {
+        m_pFrequencySpectrumSettingsWidget = QSharedPointer<FrequencySpectrumSettingsWidget>(new FrequencySpectrumSettingsWidget(this));
 
+        m_pFrequencySpectrumSettingsWidget->setWindowTitle("Frequency Spectrum Settings");
+
+//        connect(m_pEvokedModalityWidget.data(), &EvokedModalityWidget::settingsChanged, this, &RealTimeEvokedWidget::broadcastSettings);
+    }
+    m_pFrequencySpectrumSettingsWidget->show();
 }

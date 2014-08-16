@@ -46,6 +46,7 @@
 #include "newmeasurementwidget.h"
 #include "helpers/frequencyspectrummodel.h"
 #include "helpers/frequencyspectrumdelegate.h"
+#include "helpers/frequencyspectrumsettingswidget.h"
 
 
 //*************************************************************************************************************
@@ -172,6 +173,9 @@ private:
     FrequencySpectrumModel*      m_pFSModel;    /**< FS model */
     FrequencySpectrumDelegate*   m_pFSDelegate; /**< FS delegate */
     QTableView* m_pTableView;                   /**< the QTableView being part of the model/view framework of Qt */
+
+
+    QSharedPointer<FrequencySpectrumSettingsWidget> m_pFrequencySpectrumSettingsWidget;   /**< Frequency spectrum settings modality widget. */
 
 
     QSharedPointer<FrequencySpectrum> m_pFS;    /**< The frequency spectrum measurement. */
