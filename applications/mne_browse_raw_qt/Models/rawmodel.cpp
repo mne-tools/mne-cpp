@@ -410,7 +410,8 @@ void RawModel::resetPosition(qint32 position)
     updateOperators();
 
     endResetModel();
-    updateScrollPos(m_iCurAbsScrollPos-firstSample()); //little hack: if the m_iCurAbsScrollPos is now close to the edge -> force reloading w/o scrolling
+    if(!m_iCurAbsScrollPos-firstSample() == 0)
+        updateScrollPos(m_iCurAbsScrollPos-firstSample()); //little hack: if the m_iCurAbsScrollPos is now close to the edge -> force reloading w/o scrolling
 
     qDebug() << "RawModel: Model Position RESET, samples from " << m_iAbsFiffCursor << "to" << m_iAbsFiffCursor+m_iWindowSize-1 << "reloaded.";
 
@@ -431,12 +432,11 @@ void RawModel::reloadFiffData(bool before)
     //update scroll position
     fiff_int_t start,end;
     if(before) {
-        m_iAbsFiffCursor -= m_iWindowSize;
-        start = m_iAbsFiffCursor;
+        start = m_iAbsFiffCursor-m_iWindowSize;
         end = m_iAbsFiffCursor+m_iWindowSize-1;
 
         //check if start of fiff file is reached
-        if(start == firstSample()) {
+        if(start <= firstSample()) {
             m_bStartReached = true;
             qDebug() << "RawModel: Start of fiff file reached.";
 
