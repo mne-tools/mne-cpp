@@ -203,7 +203,7 @@ void MainWindow::setupWindowWidgets()
     m_wFilterWidget = new FilterWindow(this);
     m_wFilterWidget->hide();
 
-    //Create event window - Manual setup because only the view needs to be added as widget
+    //Create event window - Manual setup because only few widgets need to be added
     m_wEventWidget = new QWidget(this, Qt::Window);
 
     QVBoxLayout *eventWidgetLayout = new QVBoxLayout;
@@ -253,6 +253,7 @@ void MainWindow::createMenus()
     connect(loadEvents, SIGNAL(triggered()), this, SLOT(loadEvents()));
 
     QAction *saveEvents = fileMenu->addAction(tr("&Save Events (fif)..."));
+    saveEvents->setDisabled(true);
     connect(saveEvents, SIGNAL(triggered()), this, SLOT(saveEvents()));
 
     fileMenu->addSeparator();
