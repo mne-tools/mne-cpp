@@ -115,6 +115,7 @@ void NoiseEstimate::init()
 
     // Output
     m_pFSOutput = PluginOutputData<FrequencySpectrum>::create(this, "Noise Estimate Out", "Noise Estimate output data");
+    m_pFSOutput->data()->setName(this->getName());//Provide name to auto store widget settings
     m_outputConnectors.append(m_pFSOutput);
 
 //    m_pRTMSAOutput->data()->setMultiArraySize(100);
@@ -202,7 +203,7 @@ IPlugin::PluginType NoiseEstimate::getType() const
 
 QString NoiseEstimate::getName() const
 {
-    return "NoiseEstimate Toolbox";
+    return "Noise Estimation";
 }
 
 

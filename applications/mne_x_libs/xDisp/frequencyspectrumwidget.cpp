@@ -70,6 +70,7 @@
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QHeaderView>
+#include <QSettings>
 
 
 //*************************************************************************************************************
@@ -103,9 +104,23 @@ FrequencySpectrumWidget::FrequencySpectrumWidget(QSharedPointer<FrequencySpectru
 , m_pFSDelegate(Q_NULLPTR)
 , m_pTableView(Q_NULLPTR)
 , m_pFS(pFS)
+, m_fLowerFrqBound(0)
+, m_fUpperFrqBound(300)
 , m_bInitialized(false)
 {
     Q_UNUSED(pTime)
+
+
+    m_pActionFrequencySettings = new QAction(QIcon(":/images/evokedSettings.png"), tr("Shows the frequency spectrum settings widget (F12)"),this);
+    m_pActionFrequencySettings->setShortcut(tr("F12"));
+    m_pActionFrequencySettings->setStatusTip(tr("Shows the frequency spectrum settings widget (F12)"));
+    connect(m_pActionFrequencySettings, &QAction::triggered, this, &FrequencySpectrumWidget::showFrequencySpectrumSettingsWidget);
+    addDisplayAction(m_pActionFrequencySettings);
+
+    m_pActionFrequencySettings->setVisible(false);
+
+
+
 
     if(m_pTableView)
         delete m_pTableView;
@@ -131,7 +146,18 @@ FrequencySpectrumWidget::FrequencySpectrumWidget(QSharedPointer<FrequencySpectru
 
 FrequencySpectrumWidget::~FrequencySpectrumWidget()
 {
+    //
+    // Store Settings
+    //
+    if(!m_pFS->getName().isEmpty())
+    {
+        QString t_sFSName = m_pFS->getName();
 
+        QSettings settings;
+
+        settings.setValue(QString("FSW/%1/lowerFrqBound").arg(t_sFSName), m_fLowerFrqBound);
+        settings.setValue(QString("FSW/%1/upperFrqBound").arg(t_sFSName), m_fUpperFrqBound);
+    }
 }
 
 
@@ -160,12 +186,23 @@ void FrequencySpectrumWidget::getData()
         m_pFSModel->addData(m_pFS->getValue());
 }
 
+
 //*************************************************************************************************************
 
 void FrequencySpectrumWidget::init()
 {
     if(m_pFS->getFiffInfo())
     {
+        QSettings settings;
+        if(!m_pFS->getName().isEmpty())
+        {
+            QString t_sFSName = m_pFS->getName();
+            m_fLowerFrqBound = settings.value(QString("FSW/%1/lowerFrqBound").arg(t_sFSName), 0).toFloat();
+            m_fUpperFrqBound = settings.value(QString("FSW/%1/upperFrqBound").arg(t_sFSName), 300).toFloat();
+        }
+
+        m_pActionFrequencySettings->setVisible(true);
+
         if(m_pFSModel)
             delete m_pFSModel;
         m_pFSModel = new FrequencySpectrumModel(this);
@@ -203,4 +240,12 @@ void FrequencySpectrumWidget::init()
 
         m_bInitialized = true;
     }
+}
+
+
+//*************************************************************************************************************
+
+void FrequencySpectrumWidget::showFrequencySpectrumSettingsWidget()
+{
+
 }
