@@ -187,7 +187,7 @@ public:
     *
     * @return the reference to the orig FiffInfo.
     */
-    inline FiffInfo::SPtr& getFiffInfo();
+    inline FiffInfo::SPtr& info();
 
     //=========================================================================================================
     /**
@@ -322,7 +322,7 @@ inline QList<RealTimeSampleArrayChInfo>& NewRealTimeMultiSampleArray::chInfo()
 
 //*************************************************************************************************************
 
-inline FiffInfo::SPtr& NewRealTimeMultiSampleArray::getFiffInfo()
+inline FiffInfo::SPtr& NewRealTimeMultiSampleArray::info()
 {
     QMutexLocker locker(&m_qMutex);
     return m_pFiffInfo_orig;
