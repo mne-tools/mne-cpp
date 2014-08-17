@@ -69,6 +69,7 @@
 #include <QHeaderView>
 #include <QMenu>
 #include <QMessageBox>
+#include <QSettings>
 
 #include <QScroller>
 
@@ -139,6 +140,13 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
     connect(m_pActionSelectSensors, &QAction::triggered, this, &RealTimeMultiSampleArrayWidget::showSensorSelectionWidget);
     addDisplayAction(m_pActionSelectSensors);
 
+    m_pActionChScaling = new QAction(QIcon(":/images/evokedSettings.png"), tr("Shows the channel scaling widget (F11)"),this);
+    m_pActionChScaling->setShortcut(tr("F11"));
+    m_pActionChScaling->setStatusTip(tr("Shows the covariance modality selection widget (F11)"));
+    connect(m_pActionChScaling, &QAction::triggered, this, &RealTimeMultiSampleArrayWidget::showChScalingWidget);
+    addDisplayAction(m_pActionChScaling);
+    m_pActionChScaling->setVisible(false);
+
     if(m_pTableView)
         delete m_pTableView;
     m_pTableView = new QTableView;
@@ -159,7 +167,33 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
 
 RealTimeMultiSampleArrayWidget::~RealTimeMultiSampleArrayWidget()
 {
+    //
+    // Store Settings
+    //
+    if(!m_pRTMSA->getName().isEmpty())
+    {
+        QString t_sRTMSAWName = m_pRTMSA->getName();
 
+        QSettings settings;
+
+        if(m_qMapChScaling.contains(FIFF_UNIT_T))
+            settings.setValue(QString("RTMSAW/%1/scaleMAG").arg(t_sRTMSAWName), m_qMapChScaling[FIFF_UNIT_T]);
+
+        if(m_qMapChScaling.contains(FIFF_UNIT_T_M))
+            settings.setValue(QString("RTMSAW/%1/scaleGRAD").arg(t_sRTMSAWName), m_qMapChScaling[FIFF_UNIT_T_M]);
+
+        if(m_qMapChScaling.contains(FIFFV_EEG_CH))
+            settings.setValue(QString("RTMSAW/%1/scaleEEG").arg(t_sRTMSAWName), m_qMapChScaling[FIFFV_EEG_CH]);
+
+        if(m_qMapChScaling.contains(FIFFV_EOG_CH))
+            settings.setValue(QString("RTMSAW/%1/scaleEOG").arg(t_sRTMSAWName), m_qMapChScaling[FIFFV_EOG_CH]);
+
+        if(m_qMapChScaling.contains(FIFFV_STIM_CH))
+            settings.setValue(QString("RTMSAW/%1/scaleSTIM").arg(t_sRTMSAWName), m_qMapChScaling[FIFFV_STIM_CH]);
+
+        if(m_qMapChScaling.contains(FIFFV_MISC_CH))
+            settings.setValue(QString("RTMSAW/%1/scaleMISC").arg(t_sRTMSAWName), m_qMapChScaling[FIFFV_MISC_CH]);
+    }
 }
 
 
@@ -237,6 +271,57 @@ void RealTimeMultiSampleArrayWidget::init()
         //set context menu
         m_pTableView->setContextMenuPolicy(Qt::CustomContextMenu);
         connect(m_pTableView,SIGNAL(customContextMenuRequested(QPoint)),this,SLOT(channelContextMenu(QPoint)));
+
+        //Scaling
+        QString t_sRTMSAWName = m_pRTMSA->getName();
+
+        if(!t_sRTMSAWName.isEmpty())
+        {
+            m_qMapChScaling.clear();
+
+            QSettings settings;
+            float val = 0.0f;
+            val = settings.value(QString("RTMSAW/%1/scaleMAG").arg(t_sRTMSAWName), 1e-11f).toFloat();
+            m_qMapChScaling.insert(FIFF_UNIT_T, val);
+
+            val = settings.value(QString("RTMSAW/%1/scaleGRAD").arg(t_sRTMSAWName), 1e-10f).toFloat();
+            m_qMapChScaling.insert(FIFF_UNIT_T_M, val);
+
+            val = settings.value(QString("RTMSAW/%1/scaleEEG").arg(t_sRTMSAWName), 1e-4f).toFloat();
+            m_qMapChScaling.insert(FIFFV_EEG_CH, val);
+
+            val = settings.value(QString("RTMSAW/%1/scaleEOG").arg(t_sRTMSAWName), 1e-3f).toFloat();
+            m_qMapChScaling.insert(FIFFV_EOG_CH, val);
+
+            val = settings.value(QString("RTMSAW/%1/scaleSTIM").arg(t_sRTMSAWName), 1e-3f).toFloat();
+            m_qMapChScaling.insert(FIFFV_STIM_CH, val);
+
+            val = settings.value(QString("RTMSAW/%1/scaleMISC").arg(t_sRTMSAWName), 1e-3f).toFloat();
+            m_qMapChScaling.insert(FIFFV_MISC_CH, val);
+
+            m_pRTMSAModel->setScaling(m_qMapChScaling);
+
+            m_pActionChScaling->setVisible(true);
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         m_bInitialized = true;
     }
@@ -336,6 +421,14 @@ void RealTimeMultiSampleArrayWidget::mouseReleaseEvent(QMouseEvent* mouseEvent)
 void RealTimeMultiSampleArrayWidget::mouseDoubleClickEvent(QMouseEvent* mouseEvent)
 {
     Q_UNUSED(mouseEvent)
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayWidget::showChScalingWidget()
+{
+
 }
 
 
