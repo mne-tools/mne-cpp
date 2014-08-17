@@ -180,6 +180,10 @@ void FrequencySpectrumWidget::getData()
         if(m_pFS->isInit())
         {
             init();
+
+            m_pFSModel->addData(m_pFS->getValue());
+
+            initSettingsWidget();
         }
     }
     else
@@ -245,7 +249,7 @@ void FrequencySpectrumWidget::init()
 
 //*************************************************************************************************************
 
-void FrequencySpectrumWidget::showFrequencySpectrumSettingsWidget()
+void FrequencySpectrumWidget::initSettingsWidget()
 {
     if(!m_pFrequencySpectrumSettingsWidget)
     {
@@ -253,7 +257,41 @@ void FrequencySpectrumWidget::showFrequencySpectrumSettingsWidget()
 
         m_pFrequencySpectrumSettingsWidget->setWindowTitle("Frequency Spectrum Settings");
 
-//        connect(m_pEvokedModalityWidget.data(), &EvokedModalityWidget::settingsChanged, this, &RealTimeEvokedWidget::broadcastSettings);
+        connect(m_pFrequencySpectrumSettingsWidget.data(), &FrequencySpectrumSettingsWidget::settingsChanged, this, &FrequencySpectrumWidget::broadcastSettings);
     }
+
+    if(m_pFS->isInit() && m_pFS->getFiffInfo())
+    {
+        m_fUpperFrqBound = m_fLowerFrqBound < m_fUpperFrqBound ? m_fUpperFrqBound : m_fLowerFrqBound;
+        m_pFrequencySpectrumSettingsWidget->m_pSliderLowerBound->setMinimum(0);
+        m_pFrequencySpectrumSettingsWidget->m_pSliderLowerBound->setMaximum((qint32)(m_pFS->getFiffInfo()->sfreq/2)*1000);
+        m_pFrequencySpectrumSettingsWidget->m_pSliderLowerBound->setValue((qint32)(m_fLowerFrqBound*1000));
+
+        m_pFrequencySpectrumSettingsWidget->m_pSliderUpperBound->setMinimum(0);
+        m_pFrequencySpectrumSettingsWidget->m_pSliderUpperBound->setMaximum((qint32)(m_pFS->getFiffInfo()->sfreq/2)*1000);
+        m_pFrequencySpectrumSettingsWidget->m_pSliderUpperBound->setValue((qint32)(m_fUpperFrqBound*1000));
+    }
+
+}
+
+
+//*************************************************************************************************************
+
+void FrequencySpectrumWidget::broadcastSettings()
+{
+    if(m_pFrequencySpectrumSettingsWidget)
+    {
+        m_fLowerFrqBound = m_pFrequencySpectrumSettingsWidget->m_pSliderLowerBound->value()/1000.0f;
+        m_fUpperFrqBound = m_pFrequencySpectrumSettingsWidget->m_pSliderUpperBound->value()/1000.0f;
+        m_pFSModel->setBoundaries(m_fLowerFrqBound,m_fUpperFrqBound);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void FrequencySpectrumWidget::showFrequencySpectrumSettingsWidget()
+{
+    initSettingsWidget();
     m_pFrequencySpectrumSettingsWidget->show();
 }

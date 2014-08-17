@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     noise_estimate.cpp
+* @file     noiseestimate.cpp
 * @author   Limin Sun <liminsun@nmr.mgh.harvard.edu>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "noise_estimate.h"
+#include "noiseestimate.h"
 #include "FormFiles/noiseestimatesetupwidget.h"
 
 //*************************************************************************************************************
@@ -176,8 +176,11 @@ bool NoiseEstimate::stop()
     //Wait until this thread is stopped
     m_bIsRunning = false;
 
+    m_pRtNoise->stop();
+
     if(m_bProcessData)
     {
+
         //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the pop function (acquire statement)
         m_pBuffer->releaseFromPop();
         m_pBuffer->releaseFromPush();
