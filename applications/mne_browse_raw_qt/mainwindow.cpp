@@ -639,6 +639,7 @@ void MainWindow::showEventWindow()
         m_wEventWidget->raise();
 
     //Scale view to exact vertical length of the table entries
+    m_wEventWidget->setFixedWidth(242);
     m_wEventWidget->resize(242, 350);
 }
 

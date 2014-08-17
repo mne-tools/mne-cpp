@@ -154,10 +154,6 @@ void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, c
         break;
         }
     }
-
-    //Update raw table view widget's viewport manually. This needs to be done because the user is working with the event view widget and thus the delegate of the raw view widget is not getting called
-    //Note: If you inherit QAbstractItemView and intend to update the contents of the viewport, you should use viewport->update() instead of update() as all painting operations take place on the viewport.
-    m_pRawView->viewport()->update();
 }
 
 
@@ -400,5 +396,9 @@ void RawDelegate::plotEvents(const QModelIndex &index, const QStyleOptionViewIte
             painter->drawLine(option.rect.x() + sampleValue, option.rect.y(), option.rect.x() + sampleValue, option.rect.y() - option.rect.height() + m_qSettings.value("EventDesignParameters/event_marker_width").toInt());
         } // END if statement
     } // END else statement
+
+    //Update raw table view widget's viewport manually. This needs to be done because the user is working with the event view widget and thus the delegate of the raw view widget is not getting called
+    //Note: If you inherit QAbstractItemView and intend to update the contents of the viewport, you should use viewport->update() instead of update() as all painting operations take place on the viewport.
+    m_pRawView->viewport()->update();
 }
 

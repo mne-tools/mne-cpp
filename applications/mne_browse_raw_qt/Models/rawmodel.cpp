@@ -432,8 +432,8 @@ void RawModel::reloadFiffData(bool before)
     //update scroll position
     fiff_int_t start,end;
     if(before) {
-        start = m_iAbsFiffCursor-m_iWindowSize;
-        end = m_iAbsFiffCursor+m_iWindowSize-1;
+        start = m_iAbsFiffCursor - m_iWindowSize;
+        end = m_iAbsFiffCursor + m_iWindowSize - 1;
 
         //check if start of fiff file is reached
         if(start <= firstSample()) {
@@ -706,6 +706,8 @@ void RawModel::insertReloadedData(QPair<MatrixXd,MatrixXd> dataTimesPair)
             m_data.removeLast();
             m_procData.removeLast();
         }
+
+        m_iAbsFiffCursor -= m_iWindowSize;
     }
     else {
         m_data.append(dataTimesPair.first);
@@ -723,7 +725,7 @@ void RawModel::insertReloadedData(QPair<MatrixXd,MatrixXd> dataTimesPair)
 
     m_bReloading = false;
 
-    emit dataChanged(createIndex(0,1),createIndex(m_chInfolist.size(),1));
+    emit dataChanged(createIndex(0,1),createIndex(m_chInfolist.size()-1,1));
     emit dataReloaded();
 
     qDebug() << "RawModel: Fiff data REloaded from " << dataTimesPair.second.coeff(0) << "secs to" << dataTimesPair.second.coeff(dataTimesPair.second.cols()-1) << "secs";
