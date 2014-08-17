@@ -76,7 +76,41 @@ FrequencySpectrumSettingsWidget::FrequencySpectrumSettingsWidget(FrequencySpectr
 
     QGridLayout* t_pGridLayout = new QGridLayout;
 
+    QLabel *t_pLabelLower = new QLabel;
+    t_pLabelLower->setText("Lower Frequency");
+    m_pSliderLowerBound = new QSlider(Qt::Horizontal);
+    QLabel *t_pLabelUpper = new QLabel;
+    t_pLabelUpper->setText("Upper Frequency");
+    m_pSliderUpperBound = new QSlider(Qt::Horizontal);
+
+    m_pSliderUpperBound->setMinimum(0);
+    m_pSliderUpperBound->setMaximum(100);
+
+    connect(m_pSliderLowerBound, &QSlider::valueChanged, this, &FrequencySpectrumSettingsWidget::updateValue);
+    connect(m_pSliderUpperBound, &QSlider::valueChanged, this, &FrequencySpectrumSettingsWidget::updateValue);
+
+    t_pGridLayout->addWidget(t_pLabelLower,0,0);
+    t_pGridLayout->addWidget(m_pSliderLowerBound,0,1);
+    t_pGridLayout->addWidget(t_pLabelUpper,1,0);
+    t_pGridLayout->addWidget(m_pSliderUpperBound,1,1);
+
+
 
     this->setLayout(t_pGridLayout);
 
+}
+
+
+//*************************************************************************************************************
+
+void FrequencySpectrumSettingsWidget::updateValue(qint32 value)
+{
+    Q_UNUSED(value)
+
+    if(m_pSliderLowerBound->value() > m_pSliderUpperBound->value())
+        m_pSliderLowerBound->setValue(m_pSliderUpperBound->value());
+    else if(m_pSliderUpperBound->value() < m_pSliderLowerBound->value())
+        m_pSliderUpperBound->setValue(m_pSliderLowerBound->value());
+
+    emit settingsChanged();
 }

@@ -176,6 +176,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Returns the frequency scale scaled to boundaries of the x axis
+    *
+    * @return the frequency scale of the x axis
+    */
+    inline RowVectorXd getFreqScaleBound() const;
+
+    //=========================================================================================================
+    /**
     * Returns the number of stems
     *
     * @return the number of stems
@@ -220,6 +228,31 @@ public:
     */
     inline bool isFreezed() const;
 
+    //=========================================================================================================
+    /**
+    * Set plotting boundaries
+    *
+    * @param[in] fLowerFrqBound     Lower frequency boudnary
+    * @param[in] fUpperFrqBound     Upper frequency boudnary
+    */
+    void setBoundaries(float fLowerFrqBound, float fUpperFrqBound);
+
+    //=========================================================================================================
+    /**
+    * Returns the lower frequency boundary
+    *
+    * @return the lower frequency boundary
+    */
+    inline qint32 getLowerFrqBound() const;
+
+    //=========================================================================================================
+    /**
+    * Returns the upper frequency boundary
+    *
+    * @return the upper frequency boundary
+    */
+    inline qint32 getUpperFrqBound() const;
+
 signals:
     //=========================================================================================================
     /**
@@ -236,6 +269,8 @@ private:
 
     RowVectorXd m_vecFreqScale;                 /**< Frequency scale */
 
+    RowVectorXd m_vecFreqScaleBound;            /**< Frequency scaled to boundaries */
+
     //Fiff data structure
     MatrixXd m_dataCurrent;         /**< List that holds the current data*/
 
@@ -245,6 +280,12 @@ private:
     qint32 m_iT;                /**< Time window */
 
     bool m_bIsFreezed;          /**< Display is freezed */
+
+    bool m_bInitialized;        /**< If it's initailized */
+
+    qint32 m_iLowerFrqIdx;  /**< Upper frequency plotting boundary */
+    qint32 m_iUpperFrqIdx;  /**< Lower frequency plotting boundary */
+
 };
 
 
@@ -269,6 +310,14 @@ RowVectorXd FrequencySpectrumModel::getFreqScale() const
 
 //*************************************************************************************************************
 
+RowVectorXd FrequencySpectrumModel::getFreqScaleBound() const
+{
+    return m_vecFreqScaleBound;
+}
+
+
+//*************************************************************************************************************
+
 inline qint32 FrequencySpectrumModel::getNumStems() const
 {
     return m_dataCurrent.cols();
@@ -288,6 +337,22 @@ inline const QMap<qint32,qint32>& FrequencySpectrumModel::getIdxSelMap() const
 inline bool FrequencySpectrumModel::isFreezed() const
 {
     return m_bIsFreezed;
+}
+
+
+//*************************************************************************************************************
+
+inline qint32 FrequencySpectrumModel::getLowerFrqBound() const
+{
+    return m_iLowerFrqIdx;
+}
+
+
+//*************************************************************************************************************
+
+inline qint32 FrequencySpectrumModel::getUpperFrqBound() const
+{
+    return m_iUpperFrqIdx;
 }
 
 } // NAMESPACE

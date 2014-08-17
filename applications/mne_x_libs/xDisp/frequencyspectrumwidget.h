@@ -122,6 +122,7 @@ class XDISPSHARED_EXPORT FrequencySpectrumWidget : public NewMeasurementWidget
 {
     Q_OBJECT
 
+    friend class FrequencySpectrumSettingsWidget;
 public:
     //=========================================================================================================
     /**
@@ -159,7 +160,20 @@ public:
     */
     virtual void init();
 
+
+    //=========================================================================================================
+    /**
+    * Initialise the SettingsWidget.
+    */
+    void initSettingsWidget();
+
 private:
+
+    //=========================================================================================================
+    /**
+    * Broadcast settings of frequency spectrum settings widget
+    */
+    void broadcastSettings();
 
     //=========================================================================================================
     /**

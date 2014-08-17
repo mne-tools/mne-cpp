@@ -78,8 +78,10 @@ class FrequencySpectrumWidget;
 class FrequencySpectrumSettingsWidget : public QWidget
 {
     Q_OBJECT
-public:
 
+    friend class FrequencySpectrumWidget;
+
+public:
     //=========================================================================================================
     /**
     * Constructs a FrequencySpectrumWidget which is a child of parent.
@@ -88,11 +90,22 @@ public:
     */
     FrequencySpectrumSettingsWidget(FrequencySpectrumWidget *toolbox);
 
+    //=========================================================================================================
+    /**
+    * Update slider value
+    *
+    * @param [in] value    slider value
+    */
+    void updateValue(qint32 value);
+
 signals:
     void settingsChanged();
 
 private:
     FrequencySpectrumWidget * m_pFrequencySpectrumWidget; /**< Connected frequency spectrum widget */
+
+    QSlider* m_pSliderLowerBound;   /**< Lower bound frequency */
+    QSlider* m_pSliderUpperBound;   /**< Upper bound frequency */
 };
 
 } // NAMESPACE
