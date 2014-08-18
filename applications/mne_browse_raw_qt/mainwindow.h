@@ -80,6 +80,7 @@
 #include "rawsettings.h"
 
 #include "FormFiles/filterwindow.h"
+#include "FormFiles/eventwindow.h"
 
 
 //*************************************************************************************************************
@@ -159,7 +160,10 @@ namespace MNEBrowseRawQt
 * DECLARE CLASS MainWindow
 */
 class MainWindow : public QMainWindow
-{
+{    
+    friend class FilterWindow;
+    friend class EventWindow;
+
     Q_OBJECT
 
 public:
@@ -268,12 +272,6 @@ private:
 
     //=========================================================================================================
     /**
-    * setupMainWindow create and connects the individual elements of the main window.
-    */
-    void setupMainWindow();
-
-    //=========================================================================================================
-    /**
     * setupRawViewSettings sets the settings of the raw fiff dataview such as size policies, scrolling behaviour etc.
     */
     void setupRawViewSettings();
@@ -283,6 +281,12 @@ private:
     * setupEventViewSettings sets the settings of the event view such as size policies, scrolling behaviour etc.
     */
     void setupEventViewSettings();
+
+    //=========================================================================================================
+    /**
+    * setupMainWindow create and connects the individual elements of the main window.
+    */
+    void setupMainWindow();
 
     //=========================================================================================================
     /**
@@ -334,8 +338,8 @@ private:
     RawDelegate*        m_pRawDelegate;             /**< the QAbstractDelegate being part of the raw model/view framework of Qt */
 
     //Window widgets
-    QWidget*            m_wEventWidget;             /**< Event widget which display the event view */
-    FilterWindow*       m_wFilterWidget;            /**< Filter widget which display the filter options for the user */
+    EventWindow*        m_pEventWindow;             /**< Event widget which display the event view */
+    FilterWindow*       m_pFilterWindow;            /**< Filter widget which display the filter options for the user */
 
     //application settings
     QSettings           m_qSettings;

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     filterwindow.h
+* @file     eventwindow.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
@@ -30,19 +30,20 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the FilterWindow class.
+* @brief    Contains the declaration of the EventWindow class.
 *
 */
 
-#ifndef FILTERWINDOW_H
-#define FILTERWINDOW_H
+#ifndef EVENTWINDOW_H
+#define EVENTWINDOW_H
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// INCLUDES
 //=============================================================================================================
 
-#include "ui_filterwindow.h"
+#include "../mainwindow.h"
+#include "ui_eventwindow.h"
 
 
 //*************************************************************************************************************
@@ -62,34 +63,49 @@ namespace MNEBrowseRawQt
 {
 
 /**
-* DECLARE CLASS FilterWindow
+* DECLARE CLASS EventWindow
 *
-* @brief The FilterWindow class provides the filter window.
+* @brief The EventWindow class provides the event window.
 */
-class FilterWindow : public QWidget
+class EventWindow : public QWidget
 {
+    friend class MainWindow;
     Q_OBJECT
 
 public:
     //=========================================================================================================
     /**
-    * Constructs a FilterWindow dialog which is a child of parent.
+    * Constructs a EventWindow dialog which is a child of parent.
     *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new FilterWindow becomes a window. If parent is another widget, FilterWindow becomes a child window inside parent. FilterWindow is deleted when its parent is deleted.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new EventWindow becomes a window. If parent is another widget, EventWindow becomes a child window inside parent. EventWindow is deleted when its parent is deleted.
     */
-    FilterWindow(QWidget *parent = 0);
+    explicit EventWindow(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the FilterWindow.
-    * All FilterWindow's children are deleted first. The application exits if FilterWindow is the main widget.
+    * Destroys the EventWindow.
+    * All EventWindow's children are deleted first. The application exits if EventWindow is the main widget.
     */
-    ~FilterWindow();
+    ~EventWindow();
 
 private:
-    Ui::FilterWindowWidget *ui;
+    Ui::EventWindowWidget *ui;
+
+    MainWindow* m_pMainWindow;
+
+    //=========================================================================================================
+    /**
+    * Inits the table view of the event window.
+    */
+    void initTableView();
+
+    //=========================================================================================================
+    /**
+    * Inits alle the QCheckBoxes of the event window.
+    */
+    void initCheckBoxes();
 };
 
 } // NAMESPACE MNEBrowseRawQt
 
-#endif // FILTERWINDOW_H
+#endif // EVENTWINDOW_H

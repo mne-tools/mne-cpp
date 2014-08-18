@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     filterwindow.h
+* @file     eventwindow.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
@@ -30,66 +30,71 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the FilterWindow class.
+* @brief    Contains the implementation of the EventWindow class.
 *
 */
 
-#ifndef FILTERWINDOW_H
-#define FILTERWINDOW_H
-
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// INCLUDES
 //=============================================================================================================
 
-#include "ui_filterwindow.h"
+#include "eventwindow.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// USED NAMESPACES
 //=============================================================================================================
 
-#include <QWidget>
+using namespace MNEBrowseRawQt;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNEBrowseRawQt
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-namespace MNEBrowseRawQt
+EventWindow::EventWindow(QWidget *parent) :
+    QWidget(parent, Qt::Window),
+    ui(new Ui::EventWindowWidget),
+    m_pMainWindow((MainWindow*)parent)
 {
+    ui->setupUi(this);
 
-/**
-* DECLARE CLASS FilterWindow
-*
-* @brief The FilterWindow class provides the filter window.
-*/
-class FilterWindow : public QWidget
+    initCheckBoxes();
+    initTableView();
+}
+
+
+//*************************************************************************************************************
+
+EventWindow::~EventWindow()
 {
-    Q_OBJECT
+    delete ui;
+}
 
-public:
-    //=========================================================================================================
-    /**
-    * Constructs a FilterWindow dialog which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new FilterWindow becomes a window. If parent is another widget, FilterWindow becomes a child window inside parent. FilterWindow is deleted when its parent is deleted.
-    */
-    FilterWindow(QWidget *parent = 0);
 
-    //=========================================================================================================
-    /**
-    * Destroys the FilterWindow.
-    * All FilterWindow's children are deleted first. The application exits if FilterWindow is the main widget.
-    */
-    ~FilterWindow();
+//*************************************************************************************************************
 
-private:
-    Ui::FilterWindowWidget *ui;
-};
+void EventWindow::initTableView()
+{
+    ui->m_tableView_eventTableView->resizeColumnsToContents();
+    ui->m_tableView_eventTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
+}
 
-} // NAMESPACE MNEBrowseRawQt
 
-#endif // FILTERWINDOW_H
+//*************************************************************************************************************
+
+void EventWindow::initCheckBoxes()
+{
+    connect(ui->m_checkBox_activateEvents,&QCheckBox::stateChanged, [=](int state){
+        m_pMainWindow->m_pRawDelegate->m_bActivateEvents = state;
+        m_pMainWindow->jumpToEvent(m_pMainWindow->m_pEventTableView->selectionModel()->currentIndex(), QModelIndex());
+    });
+
+    connect(ui->m_checkBox_showSelectedEventsOnly,&QCheckBox::stateChanged, [=](int state){
+        m_pMainWindow->m_pRawDelegate->m_bShowSelectedEventsOnly = state;
+        m_pMainWindow->jumpToEvent(m_pMainWindow->m_pEventTableView->selectionModel()->currentIndex(), QModelIndex());
+    });
+}

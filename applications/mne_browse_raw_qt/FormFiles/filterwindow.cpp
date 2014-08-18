@@ -57,7 +57,7 @@ using namespace MNEBrowseRawQt;
 
 FilterWindow::FilterWindow(QWidget *parent) :
     QWidget(parent, Qt::Window),
-    ui(new Ui::FilterWindowClass)
+    ui(new Ui::FilterWindowWidget)
 {
     ui->setupUi(this);
 }
