@@ -76,7 +76,8 @@ SOURCES += rawsettings.cpp \
     Models/eventmodel.cpp \
     Delegates/rawdelegate.cpp \
     FormFiles/filterwindow.cpp \
-    FormFiles/eventwindow.cpp
+    FormFiles/eventwindow.cpp \
+    FormFiles/datawindow.cpp \
 
 HEADERS += rawsettings.h \
     mainwindow.h \
@@ -88,11 +89,13 @@ HEADERS += rawsettings.h \
     Models/eventmodel.h \
     Delegates/rawdelegate.h \
     FormFiles/filterwindow.h \
-    FormFiles/eventwindow.h
+    FormFiles/eventwindow.h \
+    FormFiles/datawindow.h \
 
 FORMS += \
     FormFiles/filterwindow.ui \
-    FormFiles/eventwindow.ui
+    FormFiles/eventwindowdock.ui \
+    FormFiles/datawindowdock.ui \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

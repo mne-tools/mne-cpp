@@ -293,7 +293,6 @@ void RawDelegate::plotEvents(const QModelIndex &index, const QStyleOptionViewIte
             int sampleValue = m_pEventModel->data(m_pEventModel->index(i,0)).toInt();
             int type = m_pEventModel->data(m_pEventModel->index(i,2)).toInt();
 
-
             if(sampleValue>=sampleRangeLow && sampleValue<=sampleRangeHigh) {
                 //Set color for pen depending on current event type
                 switch(type) {
@@ -342,7 +341,7 @@ void RawDelegate::plotEvents(const QModelIndex &index, const QStyleOptionViewIte
                 //Draw line from sample position (x) and highest to lowest y position of the column widget - Add +m_qSettings.value("EventDesignParameters/event_marker_width").toInt() to avoid painting ovre the edge of the column widget
                 painter->drawLine(option.rect.x() + sampleValue, option.rect.y(), option.rect.x() + sampleValue, option.rect.y() - option.rect.height() + m_qSettings.value("EventDesignParameters/event_marker_width").toInt());
             } // END for statement
-        } // END if statement
+        } // END if statement event in data range
     } // END if statement plot all
     else { //Only plot selected event
         QModelIndexList indexes = m_pEventView->selectionModel()->selectedIndexes();

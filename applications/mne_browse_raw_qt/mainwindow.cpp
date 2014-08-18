@@ -80,6 +80,7 @@ MainWindow::MainWindow(QWidget *parent)
     createLogDockWindow();
     setWindow();
     setWindowStatus();
+    m_pDataWindow->setWindowStatus();
 }
 
 
@@ -116,8 +117,8 @@ void MainWindow::setupDelegate()
 
 void MainWindow::setupViews()
 {
-    m_pRawTableView = new QTableView;
-    m_pEventTableView = m_pEventWindow->ui->m_tableView_eventTableView;
+    m_pRawTableView = m_pDataWindow->getTableView();
+    m_pEventTableView = m_pEventWindow->getTableView();
 
     //set custom models
     m_pRawTableView->setModel(m_pRawModel);
@@ -127,55 +128,8 @@ void MainWindow::setupViews()
     m_pRawTableView->setItemDelegate(m_pRawDelegate);
 
     //setup view settings
-    setupRawViewSettings();
-    setupEventViewSettings();
-}
-
-
-//*************************************************************************************************************
-
-void MainWindow::setupRawViewSettings()
-{
-    //set some size settings for m_pRawTableView
-    m_pRawTableView->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
-
-    m_pRawTableView->setShowGrid(false);
-    m_pRawTableView->horizontalHeader()->hide();
-    m_pRawTableView->verticalHeader()->setDefaultSectionSize(m_pRawDelegate->m_dDefaultPlotHeight);
-
-    m_pRawTableView->setAutoScroll(false);
-    m_pRawTableView->setColumnHidden(0,true); //because content is plotted jointly with column=1
-
-    m_pRawTableView->resizeColumnsToContents();
-
-    m_pRawTableView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
-
-    //set context menu
-    m_pRawTableView->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(m_pRawTableView,SIGNAL(customContextMenuRequested(QPoint)),this,SLOT(customContextMenuRequested(QPoint)));
-
-    //activate kinetic scrolling
-    QScroller::grabGesture(m_pRawTableView,QScroller::MiddleMouseButtonGesture);
-
-    //connect QScrollBar with model in order to reload data samples
-    connect(m_pRawTableView->horizontalScrollBar(),SIGNAL(valueChanged(int)),m_pRawModel,SLOT(updateScrollPos(int)));
-
-    //connect other signals
-    connect(m_pRawModel,SIGNAL(scrollBarValueChange(int)),this,SLOT(setScrollBarPosition(int)));
-}
-
-
-//*************************************************************************************************************
-
-void MainWindow::setupEventViewSettings()
-{
-    m_pEventTableView->resizeColumnsToContents();
-
-    m_pEventTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
-
-    //Connect selection in event window to specific slot
-    connect(m_pEventTableView->selectionModel(),SIGNAL(currentRowChanged(QModelIndex, QModelIndex)),
-                this,SLOT(jumpToEvent(QModelIndex, QModelIndex)));
+    m_pDataWindow->setupRawViewSettings();
+    m_pEventWindow->setupEventViewSettings();
 }
 
 
@@ -183,16 +137,22 @@ void MainWindow::setupEventViewSettings()
 
 void MainWindow::setupMainWindow()
 {
-    //set vertical layout
-    QVBoxLayout *mainlayout = new QVBoxLayout;
+    //Create non dockable data window
+//    //set vertical layout
+//    QVBoxLayout *mainlayout = new QVBoxLayout;
 
-    mainlayout->addWidget(m_pRawTableView);
+//    mainlayout->addWidget(m_pRawTableView);
 
-    //set layouts
+//    //set layouts
+//    QWidget *window = new QWidget();
+//    window->setLayout(mainlayout);
+
+//    setCentralWidget(window);
+
+    // Set central widget
     QWidget *window = new QWidget();
-    window->setLayout(mainlayout);
-
     setCentralWidget(window);
+    window->hide();
 }
 
 
@@ -200,12 +160,17 @@ void MainWindow::setupMainWindow()
 
 void MainWindow::setupWindowWidgets()
 {
+    //Create dockable data window - QTDesigner used - see /FormFiles
+    m_pDataWindow = new DataWindow(this);
+    addDockWidget(Qt::LeftDockWidgetArea, m_pDataWindow);
+
     //Create filter window - QTDesigner used - see /FormFiles
     m_pFilterWindow = new FilterWindow(this);
     m_pFilterWindow->hide();
 
-    //Create event window - Manual setup because only few widgets need to be added
+    //Create dockble event window - QTDesigner used - see /FormFiles
     m_pEventWindow = new EventWindow(this);
+    addDockWidget(Qt::RightDockWidgetArea, m_pEventWindow);
     m_pEventWindow->hide();
 }
 
@@ -252,6 +217,9 @@ void MainWindow::createMenus()
     QAction *eventAction = windowsMenu->addAction(tr("&Show event list..."));
     connect(eventAction, SIGNAL(triggered()), this, SLOT(showEventWindow()));
 
+    QAction *logAction = windowsMenu->addAction(tr("&Show log..."));
+    connect(logAction, SIGNAL(triggered()), this, SLOT(showLogWindow()));
+
     //Help
     QMenu *helpMenu = new QMenu(tr("&Help"), this);
 
@@ -283,14 +251,7 @@ void MainWindow::setWindowStatus()
     QString title;
 
     //request status
-    if(m_pRawModel->m_bFileloaded) {
-        int idx = m_qFileRaw.fileName().lastIndexOf("/");
-        QString filename = m_qFileRaw.fileName().remove(0,idx+1);
-        title = QString("%1, (File loaded: %2)").arg(CInfo::AppNameShort()).arg(filename);
-    }
-    else {
-        title = QString("%1, (No File Loaded)").arg(CInfo::AppNameShort());
-    }
+    title = QString("%1").arg(CInfo::AppNameShort());
 
     //set title
     setWindowTitle(title);
@@ -383,7 +344,7 @@ void MainWindow::openFile()
     else
         qDebug("ERROR loading fiff data file %s",filename.toLatin1().data());
 
-    setWindowStatus();
+    m_pDataWindow->setWindowStatus();
 
     //set position of QScrollArea
     setScrollBarPosition(0);
@@ -428,7 +389,7 @@ void MainWindow::loadEvents()
     else
         qDebug("ERROR loading fiff event data file %s",filename.toLatin1().data());
 
-    setWindowStatus();
+    m_pDataWindow->setWindowStatus();
 
     //Show event widget
     showEventWindow();
@@ -459,7 +420,7 @@ void MainWindow::saveEvents()
     else
         qDebug("ERROR saving fiff event data file %s",filename.toLatin1().data());
 
-    setWindowStatus();
+    m_pDataWindow->setWindowStatus();
 }
 
 
@@ -568,7 +529,7 @@ void MainWindow::setScrollBarPosition(int pos)
 void MainWindow::about()
 {
     QMessageBox::about(this, CInfo::AppNameShort()+ ", "+tr("Version ")+CInfo::AppVersion(),
-          tr("Copyright (C) 2014 Florian Schlembach, Christoph Dinh, Matti Hamalainen, Jens Haueisen. All rights reserved.\n\n"
+          tr("Copyright (C) 2014 Florian Schlembach, Lorenz Esch, Christoph Dinh, Matti Hamalainen, Jens Haueisen. All rights reserved.\n\n"
              "Redistribution and use in source and binary forms, with or without modification, are permitted provided that"
              " the following conditions are met:\n"
              "\t* Redistributions of source code must retain the above copyright notice, this list of conditions and the"
@@ -615,10 +576,21 @@ void MainWindow::showEventWindow()
     }
     else // if visible raise the widget to be sure that it is not obscured by other windows
         m_pEventWindow->raise();
+}
 
-    //Scale view to exact vertical length of the table entries
-    m_pEventWindow->setFixedWidth(242);
-    m_pEventWindow->resize(242, 350);
+
+//*************************************************************************************************************
+
+void MainWindow::showLogWindow()
+{
+    //Note: A widget that happens to be obscured by other windows on the screen is considered to be visible.
+    if(!m_pDockWidget_Log->isVisible())
+    {
+        m_pDockWidget_Log->show();
+        m_pDockWidget_Log->raise();
+    }
+    else // if visible raise the widget to be sure that it is not obscured by other windows
+        m_pDockWidget_Log->raise();
 }
 
 

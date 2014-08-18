@@ -96,7 +96,7 @@
 #define EVENT_MARKER_WIDTH 3 // in pixels
 
 //Event marker opacity
-#define EVENT_MARKER_OPACITY 95 // opacity of the markers and backgorunds in the table columns
+#define EVENT_MARKER_OPACITY 85 // opacity of the markers and backgorunds in the table columns
 
 //*************************************************************************************************************
 //=============================================================================================================

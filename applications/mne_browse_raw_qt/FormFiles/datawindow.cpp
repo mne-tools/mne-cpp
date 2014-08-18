@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     eventwindow.h
+* @file     datawindow.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
@@ -30,87 +30,98 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the EventWindow class.
+* @brief    Contains the implementation of the DataWindow class.
 *
 */
-
-#ifndef EVENTWINDOW_H
-#define EVENTWINDOW_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../mainwindow.h"
-#include "ui_eventwindowdock.h"
+#include "datawindow.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// USED NAMESPACES
 //=============================================================================================================
 
-#include <QDockWidget>
+using namespace MNEBrowseRawQt;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNEBrowseRawQt
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-namespace MNEBrowseRawQt
+DataWindow::DataWindow(QWidget *parent) :
+    QDockWidget(parent),
+    ui(new Ui::DataWindowDockWidget),
+    m_pMainWindow((MainWindow*)parent)
 {
+    ui->setupUi(this);
+}
 
-/**
-* DECLARE CLASS EventWindow
-*
-* @brief The EventWindow class provides the event dock window.
-*/
-class EventWindow : public QDockWidget
+
+//*************************************************************************************************************
+
+DataWindow::~DataWindow()
 {
-    Q_OBJECT
+    delete ui;
+}
 
-public:
-    //=========================================================================================================
-    /**
-    * Constructs a EventWindow dialog which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new EventWindow becomes a window. If parent is another widget, EventWindow becomes a child window inside parent. EventWindow is deleted when its parent is deleted.
-    */
-    EventWindow(QWidget *parent = 0);
 
-    //=========================================================================================================
-    /**
-    * Destroys the EventWindow.
-    * All EventWindow's children are deleted first. The application exits if EventWindow is the main widget.
-    */
-    ~EventWindow();
+//*************************************************************************************************************
 
-    //=========================================================================================================
-    /**
-    * Setup the QtableView of the event window.
-    */
-    void setupEventViewSettings();
+void DataWindow::setupRawViewSettings()
+{
+    //set some settings for m_pRawTableView
+    ui->m_tableView_rawTableView->verticalHeader()->setDefaultSectionSize(m_pMainWindow->m_pRawDelegate->m_dDefaultPlotHeight);
+    ui->m_tableView_rawTableView->setColumnHidden(0,true); //because content is plotted jointly with column=1
+    ui->m_tableView_rawTableView->resizeColumnsToContents();
 
-    //=========================================================================================================
-    /**
-    * Returns the QTableView of this window.
-    */
-    QTableView* getTableView();
+    //set context menu
+    ui->m_tableView_rawTableView->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(ui->m_tableView_rawTableView,&QWidget::customContextMenuRequested,
+            m_pMainWindow,&MainWindow::customContextMenuRequested);
 
-private:
-    Ui::EventWindowDockWidget *ui;
+    //activate kinetic scrolling
+    QScroller::grabGesture(ui->m_tableView_rawTableView,QScroller::MiddleMouseButtonGesture);
 
-    MainWindow* m_pMainWindow;
+    //connect QScrollBar with model in order to reload data samples
+    connect(ui->m_tableView_rawTableView->horizontalScrollBar(),SIGNAL(valueChanged(int)),
+            m_pMainWindow->m_pRawModel,SLOT(updateScrollPos(int)));
 
-    //=========================================================================================================
-    /**
-    * Inits all the QCheckBoxes of the event window.
-    */
-    void initCheckBoxes();
-};
+    //connect other signals
+    connect(m_pMainWindow->m_pRawModel,&RawModel::scrollBarValueChange,
+            m_pMainWindow,&MainWindow::setScrollBarPosition);
+}
 
-} // NAMESPACE MNEBrowseRawQt
+//*************************************************************************************************************
 
-#endif // EVENTWINDOW_H
+QTableView* DataWindow::getTableView()
+{
+    return ui->m_tableView_rawTableView;
+}
+
+
+//*************************************************************************************************************
+
+void DataWindow::setWindowStatus()
+{
+    QString title;
+
+    //request status
+    if(m_pMainWindow->m_pRawModel->m_bFileloaded) {
+        int idx = m_pMainWindow->m_qFileRaw.fileName().lastIndexOf("/");
+        QString filename = m_pMainWindow->m_qFileRaw.fileName().remove(0,idx+1);
+        title = QString("%1 - File loaded: %2").arg("Data plot").arg(filename);
+    }
+    else {
+        title = QString("%1 - No File loaded").arg("Data plot");
+    }
+
+    //set title
+    setWindowTitle(title);
+}
