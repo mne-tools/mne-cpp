@@ -154,6 +154,10 @@ void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, c
         break;
         }
     }
+
+    //Update raw table view widget's viewport manually. This needs to be done because the user is working with the event view widget and thus the delegate of the raw view widget is not getting called
+    //Note: If you inherit QAbstractItemView and intend to update the contents of the viewport, you should use viewport->update() instead of update() as all painting operations take place on the viewport.
+    m_pRawView->viewport()->update();
 }
 
 
@@ -279,16 +283,19 @@ void RawDelegate::plotEvents(const QModelIndex &index, const QStyleOptionViewIte
     qint32 sampleRangeLow = rawModel->relFiffCursor();
     qint32 sampleRangeHigh = sampleRangeLow + rawModel->sizeOfPreloadedData();
 
+    QPen pen;
+    pen.setWidth(m_qSettings.value("EventDesignParameters/event_marker_width").toInt());
+
+    QColor colorTemp;
+
     if(m_bShowAllEvents) { //Plot all events
         for(int i = 0; i<m_pEventModel->rowCount(); i++) {
             int sampleValue = m_pEventModel->data(m_pEventModel->index(i,0)).toInt();
             int type = m_pEventModel->data(m_pEventModel->index(i,2)).toInt();
 
+
             if(sampleValue>=sampleRangeLow && sampleValue<=sampleRangeHigh) {
                 //Set color for pen depending on current event type
-                QPen pen;
-                pen.setWidthF(m_qSettings.value("EventDesignParameters/event_marker_width").toInt());
-
                 switch(type) {
                     default:
                         pen.setColor(m_qSettings.value("EventDesignParameters/event_color_default").value<QColor>());
@@ -327,7 +334,7 @@ void RawDelegate::plotEvents(const QModelIndex &index, const QStyleOptionViewIte
                     break;
                 }
 
-                QColor colorTemp = pen.color();
+                colorTemp = pen.color();
                 colorTemp.setAlpha(m_qSettings.value("EventDesignParameters/event_marker_opacity").toInt());
                 pen.setColor(colorTemp);
                 painter->setPen(pen);
@@ -346,9 +353,6 @@ void RawDelegate::plotEvents(const QModelIndex &index, const QStyleOptionViewIte
             //qDebug()<<"currentRow"<<currentRow<<"sampleValue"<<sampleValue<<"sampleRangeLow"<<sampleRangeLow<<"sampleRangeHigh"<<sampleRangeHigh;
 
             //Set color for pen depending on current event type
-            QPen pen;
-            pen.setWidthF(m_qSettings.value("EventDesignParameters/event_marker_width").toInt());
-
             switch(type) {
                 default:
                     pen.setColor(m_qSettings.value("EventDesignParameters/event_color_default").value<QColor>());
@@ -387,7 +391,7 @@ void RawDelegate::plotEvents(const QModelIndex &index, const QStyleOptionViewIte
                 break;
             }
 
-            QColor colorTemp = pen.color();
+            colorTemp = pen.color();
             colorTemp.setAlpha(m_qSettings.value("EventDesignParameters/event_marker_opacity").toInt());
             pen.setColor(colorTemp);
             painter->setPen(pen);
@@ -396,9 +400,5 @@ void RawDelegate::plotEvents(const QModelIndex &index, const QStyleOptionViewIte
             painter->drawLine(option.rect.x() + sampleValue, option.rect.y(), option.rect.x() + sampleValue, option.rect.y() - option.rect.height() + m_qSettings.value("EventDesignParameters/event_marker_width").toInt());
         } // END if statement
     } // END else statement
-
-    //Update raw table view widget's viewport manually. This needs to be done because the user is working with the event view widget and thus the delegate of the raw view widget is not getting called
-    //Note: If you inherit QAbstractItemView and intend to update the contents of the viewport, you should use viewport->update() instead of update() as all painting operations take place on the viewport.
-    m_pRawView->viewport()->update();
 }
 
