@@ -410,8 +410,9 @@ void RawModel::resetPosition(qint32 position)
     updateOperators();
 
     endResetModel();
-    if(!m_iCurAbsScrollPos-firstSample() == 0)
-        updateScrollPos(m_iCurAbsScrollPos-firstSample()); //little hack: if the m_iCurAbsScrollPos is now close to the edge -> force reloading w/o scrolling
+
+//    if(!m_iCurAbsScrollPos<firstSample())
+//        updateScrollPos(m_iCurAbsScrollPos-firstSample()); //little hack: if the m_iCurAbsScrollPos is now close to the edge -> force reloading w/o scrolling
 
     qDebug() << "RawModel: Model Position RESET, samples from " << m_iAbsFiffCursor << "to" << m_iAbsFiffCursor+m_iWindowSize-1 << "reloaded.";
 
@@ -432,15 +433,18 @@ void RawModel::reloadFiffData(bool before)
     //update scroll position
     fiff_int_t start,end;
     if(before) {
-        start = m_iAbsFiffCursor - m_iWindowSize;
-        end = m_iAbsFiffCursor + m_iWindowSize - 1;
+        m_iAbsFiffCursor -= m_iWindowSize;
+        start = m_iAbsFiffCursor;
+        end = start + m_iWindowSize - 1;
 
         //check if start of fiff file is reached
-        if(start <= firstSample()) {
+        if(start < firstSample()) {
             m_bStartReached = true;
             qDebug() << "RawModel: Start of fiff file reached.";
 
             m_iAbsFiffCursor = firstSample();
+            resetPosition(m_iAbsFiffCursor);
+            return;
         }
     }
     else {
@@ -465,7 +469,6 @@ void RawModel::reloadFiffData(bool before)
     QFuture<QPair<MatrixXd,MatrixXd> > future = QtConcurrent::run(this,&RawModel::readSegment,start,end);
 
     m_reloadFutureWatcher.setFuture(future);
-
 }
 
 
@@ -490,7 +493,7 @@ QPair<MatrixXd,MatrixXd> RawModel::readSegment(fiff_int_t from, fiff_int_t to)
 //public SLOTS
 void RawModel::updateScrollPos(int value)
 {
-    m_iCurAbsScrollPos = firstSample()+value;
+    m_iCurAbsScrollPos = firstSample() + value;
     qDebug() << "RawModel: absolute Fiff Scroll Cursor" << m_iCurAbsScrollPos << "(m_iAbsFiffCursor" << m_iAbsFiffCursor << ", sizeOfPreloadedData" << sizeOfPreloadedData() << ", firstSample()" << firstSample() << ")";
 
     //if a scroll position is selected, which is not within the loaded data range -> reset position of model
@@ -706,8 +709,6 @@ void RawModel::insertReloadedData(QPair<MatrixXd,MatrixXd> dataTimesPair)
             m_data.removeLast();
             m_procData.removeLast();
         }
-
-        m_iAbsFiffCursor -= m_iWindowSize;
     }
     else {
         m_data.append(dataTimesPair.first);
