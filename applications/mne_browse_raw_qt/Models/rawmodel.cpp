@@ -411,8 +411,8 @@ void RawModel::resetPosition(qint32 position)
 
     endResetModel();
 
-//    if(!m_iCurAbsScrollPos<firstSample())
-//        updateScrollPos(m_iCurAbsScrollPos-firstSample()); //little hack: if the m_iCurAbsScrollPos is now close to the edge -> force reloading w/o scrolling
+    if(!(m_iAbsFiffCursor<=firstSample()))
+        updateScrollPos(m_iCurAbsScrollPos-firstSample()); //little hack: if the m_iCurAbsScrollPos is now close to the edge -> force reloading w/o scrolling
 
     qDebug() << "RawModel: Model Position RESET, samples from " << m_iAbsFiffCursor << "to" << m_iAbsFiffCursor+m_iWindowSize-1 << "reloaded.";
 

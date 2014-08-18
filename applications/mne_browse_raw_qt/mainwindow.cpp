@@ -63,6 +63,9 @@ MainWindow::MainWindow(QWidget *parent)
 , m_qSettings()
 , m_rawSettings()
 {
+    //Setup the windows first - this NEEDS to be done here because important pointers (window pointers) which are needed for further processing are generated in this function
+    setupWindowWidgets();
+
     //setup MVC
     setupModel();
     setupDelegate();
@@ -71,14 +74,10 @@ MainWindow::MainWindow(QWidget *parent)
     //Set event data and view in the delegate. This needs to be done here after all the above called setup routines
     m_pRawDelegate->setEventModelView(m_pEventModel, m_pEventTableView, m_pRawTableView);
 
+    // Setup rest of the GUI
     setupMainWindow();
-
-    setupWindowWidgets();
-
     createMenus();
-
     createLogDockWindow();
-
     setWindow();
     setWindowStatus();
 }
@@ -118,7 +117,7 @@ void MainWindow::setupDelegate()
 void MainWindow::setupViews()
 {
     m_pRawTableView = new QTableView;
-    m_pEventTableView = new QTableView;
+    m_pEventTableView = m_pEventWindow->ui->m_tableView_eventTableView;
 
     //set custom models
     m_pRawTableView->setModel(m_pRawModel);
@@ -130,23 +129,6 @@ void MainWindow::setupViews()
     //setup view settings
     setupRawViewSettings();
     setupEventViewSettings();
-}
-
-
-//*************************************************************************************************************
-
-void MainWindow::setupMainWindow()
-{
-    //set vertical layout
-    QVBoxLayout *mainlayout = new QVBoxLayout;
-
-    mainlayout->addWidget(m_pRawTableView);
-
-    //set layouts
-    QWidget *window = new QWidget();
-    window->setLayout(mainlayout);
-
-    setCentralWidget(window);
 }
 
 
@@ -189,6 +171,8 @@ void MainWindow::setupEventViewSettings()
 {
     m_pEventTableView->resizeColumnsToContents();
 
+    m_pEventTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
+
     //Connect selection in event window to specific slot
     connect(m_pEventTableView->selectionModel(),SIGNAL(currentRowChanged(QModelIndex, QModelIndex)),
                 this,SLOT(jumpToEvent(QModelIndex, QModelIndex)));
@@ -197,38 +181,32 @@ void MainWindow::setupEventViewSettings()
 
 //*************************************************************************************************************
 
+void MainWindow::setupMainWindow()
+{
+    //set vertical layout
+    QVBoxLayout *mainlayout = new QVBoxLayout;
+
+    mainlayout->addWidget(m_pRawTableView);
+
+    //set layouts
+    QWidget *window = new QWidget();
+    window->setLayout(mainlayout);
+
+    setCentralWidget(window);
+}
+
+
+//*************************************************************************************************************
+
 void MainWindow::setupWindowWidgets()
 {
-    //Create filter window - QTDesigner used
-    m_wFilterWidget = new FilterWindow(this);
-    m_wFilterWidget->hide();
+    //Create filter window - QTDesigner used - see /FormFiles
+    m_pFilterWindow = new FilterWindow(this);
+    m_pFilterWindow->hide();
 
     //Create event window - Manual setup because only few widgets need to be added
-    m_wEventWidget = new QWidget(this, Qt::Window);
-
-    QVBoxLayout *eventWidgetLayout = new QVBoxLayout;
-
-    QCheckBox *showEvents = new QCheckBox("Show events");
-    showEvents->setChecked(true);
-    eventWidgetLayout->addWidget(showEvents);
-    connect(showEvents,&QCheckBox::stateChanged, [=](int state){
-        m_pRawDelegate->m_bPlotEvents = state;
-        jumpToEvent(m_pEventTableView->selectionModel()->currentIndex(), QModelIndex());
-    });
-
-    eventWidgetLayout->addWidget(m_pEventTableView);
-
-    QCheckBox *showAllEvents = new QCheckBox("Show all events");
-    showAllEvents->setChecked(true);
-    eventWidgetLayout->addWidget(showAllEvents);
-    connect(showAllEvents,&QCheckBox::stateChanged, [=](int state){
-        m_pRawDelegate->m_bShowAllEvents = state;
-        jumpToEvent(m_pEventTableView->selectionModel()->currentIndex(), QModelIndex());
-    });
-
-    m_wEventWidget->setWindowTitle("Event list");
-    m_wEventWidget->setLayout(eventWidgetLayout);
-    m_wEventWidget->hide();
+    m_pEventWindow = new EventWindow(this);
+    m_pEventWindow->hide();
 }
 
 
@@ -615,13 +593,13 @@ void MainWindow::about()
 void MainWindow::showFilterWindow()
 {
     //Note: A widget that happens to be obscured by other windows on the screen is considered to be visible.
-    if(!m_wFilterWidget->isVisible())
+    if(!m_pFilterWindow->isVisible())
     {
-        m_wFilterWidget->show();
-        m_wFilterWidget->raise();
+        m_pFilterWindow->show();
+        m_pFilterWindow->raise();
     }
     else // if visible raise the widget to be sure that it is not obscured by other windows
-        m_wFilterWidget->raise();
+        m_pFilterWindow->raise();
 }
 
 
@@ -630,17 +608,17 @@ void MainWindow::showFilterWindow()
 void MainWindow::showEventWindow()
 {
     //Note: A widget that happens to be obscured by other windows on the screen is considered to be visible.
-    if(!m_wEventWidget->isVisible())
+    if(!m_pEventWindow->isVisible())
     {
-        m_wEventWidget->show();
-        m_wEventWidget->raise();
+        m_pEventWindow->show();
+        m_pEventWindow->raise();
     }
     else // if visible raise the widget to be sure that it is not obscured by other windows
-        m_wEventWidget->raise();
+        m_pEventWindow->raise();
 
     //Scale view to exact vertical length of the table entries
-    m_wEventWidget->setFixedWidth(242);
-    m_wEventWidget->resize(242, 350);
+    m_pEventWindow->setFixedWidth(242);
+    m_pEventWindow->resize(242, 350);
 }
 
 

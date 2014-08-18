@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>FilterWindowClass</class>
- <widget class="QWidget" name="FilterWindowClass">
+ <class>FilterWindowWidget</class>
+ <widget class="QWidget" name="FilterWindowWidget">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>197</width>
+    <width>203</width>
     <height>175</height>
    </rect>
   </property>

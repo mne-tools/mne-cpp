@@ -69,8 +69,8 @@ using namespace MNELIB;
 RawDelegate::RawDelegate(QObject *parent)
 : QAbstractItemDelegate(parent)
 , m_qSettings()
-, m_bShowAllEvents(true)
-, m_bPlotEvents(true)
+, m_bShowSelectedEventsOnly(false)
+, m_bActivateEvents(true)
 {
     m_dDefaultPlotHeight = m_qSettings.value("RawDelegate/plotheight").toDouble();
     m_dDx = m_qSettings.value("RawDelegate/dx").toDouble();
@@ -147,7 +147,7 @@ void RawDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, c
 
         //Plot events
         painter->save();
-        if(m_pEventModel->rowCount()!=0 && m_bPlotEvents)
+        if(m_pEventModel->rowCount()!=0 && m_bActivateEvents)
             plotEvents(index, option, painter);
         painter->restore();
 
@@ -288,7 +288,7 @@ void RawDelegate::plotEvents(const QModelIndex &index, const QStyleOptionViewIte
 
     QColor colorTemp;
 
-    if(m_bShowAllEvents) { //Plot all events
+    if(!m_bShowSelectedEventsOnly) { //Plot all events
         for(int i = 0; i<m_pEventModel->rowCount(); i++) {
             int sampleValue = m_pEventModel->data(m_pEventModel->index(i,0)).toInt();
             int type = m_pEventModel->data(m_pEventModel->index(i,2)).toInt();
@@ -345,59 +345,63 @@ void RawDelegate::plotEvents(const QModelIndex &index, const QStyleOptionViewIte
         } // END if statement
     } // END if statement plot all
     else { //Only plot selected event
-        int currentRow = m_pEventView->selectionModel()->currentIndex().row();
-        int sampleValue = m_pEventModel->data(m_pEventModel->index(currentRow,0)).toInt();
-        int type = m_pEventModel->data(m_pEventModel->index(currentRow,2)).toInt();
+        QModelIndexList indexes = m_pEventView->selectionModel()->selectedIndexes();
 
-        if(sampleValue>=sampleRangeLow && sampleValue<=sampleRangeHigh) {
-            //qDebug()<<"currentRow"<<currentRow<<"sampleValue"<<sampleValue<<"sampleRangeLow"<<sampleRangeLow<<"sampleRangeHigh"<<sampleRangeHigh;
+        for(int i = 0; i<indexes.size(); i++) {
+            int currentRow = indexes.at(i).row();
+            int sampleValue = m_pEventModel->data(m_pEventModel->index(currentRow,0)).toInt();
+            int type = m_pEventModel->data(m_pEventModel->index(currentRow,2)).toInt();
 
-            //Set color for pen depending on current event type
-            switch(type) {
-                default:
-                    pen.setColor(m_qSettings.value("EventDesignParameters/event_color_default").value<QColor>());
-                break;
+            if(sampleValue>=sampleRangeLow && sampleValue<=sampleRangeHigh) {
+                //qDebug()<<"currentRow"<<currentRow<<"sampleValue"<<sampleValue<<"sampleRangeLow"<<sampleRangeLow<<"sampleRangeHigh"<<sampleRangeHigh;
 
-                case 1:
-                    pen.setColor(m_qSettings.value("EventDesignParameters/event_color_1").value<QColor>());
-                break;
+                //Set color for pen depending on current event type
+                switch(type) {
+                    default:
+                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_default").value<QColor>());
+                    break;
 
-                case 2:
-                    pen.setColor(m_qSettings.value("EventDesignParameters/event_color_2").value<QColor>());
-                break;
+                    case 1:
+                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_1").value<QColor>());
+                    break;
 
-                case 3:
-                    pen.setColor(m_qSettings.value("EventDesignParameters/event_color_3").value<QColor>());
-                break;
+                    case 2:
+                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_2").value<QColor>());
+                    break;
 
-                case 4:
-                    pen.setColor(m_qSettings.value("EventDesignParameters/event_color_4").value<QColor>());
-                break;
+                    case 3:
+                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_3").value<QColor>());
+                    break;
 
-                case 5:
-                    pen.setColor(m_qSettings.value("EventDesignParameters/event_color_5").value<QColor>());
-                break;
+                    case 4:
+                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_4").value<QColor>());
+                    break;
 
-                case 32:
-                    pen.setColor(m_qSettings.value("EventDesignParameters/event_color_32").value<QColor>());
-                break;
+                    case 5:
+                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_5").value<QColor>());
+                    break;
 
-                case 998:
-                    pen.setColor(m_qSettings.value("EventDesignParameters/event_color_998").value<QColor>());
-                break;
+                    case 32:
+                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_32").value<QColor>());
+                    break;
 
-                case 999:
-                    pen.setColor(m_qSettings.value("EventDesignParameters/event_color_999").value<QColor>());
-                break;
-            }
+                    case 998:
+                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_998").value<QColor>());
+                    break;
 
-            colorTemp = pen.color();
-            colorTemp.setAlpha(m_qSettings.value("EventDesignParameters/event_marker_opacity").toInt());
-            pen.setColor(colorTemp);
-            painter->setPen(pen);
+                    case 999:
+                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_999").value<QColor>());
+                    break;
+                }
 
-            //Draw line from sample position (x) and highest to lowest y position of the column widget - Add +m_qSettings.value("EventDesignParameters/event_marker_width").toInt() to avoid painting ovre the edge of the column widget
-            painter->drawLine(option.rect.x() + sampleValue, option.rect.y(), option.rect.x() + sampleValue, option.rect.y() - option.rect.height() + m_qSettings.value("EventDesignParameters/event_marker_width").toInt());
+                colorTemp = pen.color();
+                colorTemp.setAlpha(m_qSettings.value("EventDesignParameters/event_marker_opacity").toInt());
+                pen.setColor(colorTemp);
+                painter->setPen(pen);
+
+                //Draw line from sample position (x) and highest to lowest y position of the column widget - Add +m_qSettings.value("EventDesignParameters/event_marker_width").toInt() to avoid painting ovre the edge of the column widget
+                painter->drawLine(option.rect.x() + sampleValue, option.rect.y(), option.rect.x() + sampleValue, option.rect.y() - option.rect.height() + m_qSettings.value("EventDesignParameters/event_marker_width").toInt());
+            } // END for statement
         } // END if statement
     } // END else statement
 }
