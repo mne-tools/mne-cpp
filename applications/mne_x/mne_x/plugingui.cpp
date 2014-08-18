@@ -149,6 +149,25 @@ PluginGui::~PluginGui()
 
 //*************************************************************************************************************
 
+void PluginGui::clearScene()
+{
+    foreach (QGraphicsItem *item, m_pPluginScene->items())
+    {
+        if(item->type() == PluginItem::Type)
+        {
+            if(removePlugin(qgraphicsitem_cast<PluginItem *>(item)->plugin()))
+            {
+                qgraphicsitem_cast<PluginItem *>(item)->removeArrows();
+                m_pPluginScene->removeItem(item);
+                delete item;
+            }
+        }
+    }
+}
+
+
+//*************************************************************************************************************
+
 void PluginGui::loadConfig(const QString& sPath, const QString& sFileName)
 {
     qDebug() << "load" << sPath+"/"+sFileName;
@@ -163,6 +182,7 @@ void PluginGui::loadConfig(const QString& sPath, const QString& sFileName)
     }
     file.close();
 
+    clearScene();
 
     QDomElement docElem = doc.documentElement();
     if(docElem.tagName() != "PluginTree")

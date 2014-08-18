@@ -208,30 +208,48 @@ void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, 
         case FIFFV_MEG_CH: {
             qint32 unit =t_pModel->getUnit(index.row());
             if(unit == FIFF_UNIT_T_M) {
-                fMaxValue = 1e-10f;// m_qSettings.value("RawDelegate/max_meg_grad").toDouble();
+                fMaxValue = 1e-10f;
+                if(t_pModel->getScaling().contains(FIFF_UNIT_T_M))
+                    fMaxValue = t_pModel->getScaling()[FIFF_UNIT_T_M];
             }
             else if(unit == FIFF_UNIT_T)
             {
                 if(t_pModel->getCoil(index.row()) == FIFFV_COIL_BABY_MAG)
                     fMaxValue = 1e-4f;
                 else
-                    fMaxValue = 1e-11f;// m_qSettings.value("RawDelegate/max_meg_mag").toDouble();
+                    fMaxValue = 1e-11f;
+
+                if(t_pModel->getScaling().contains(FIFF_UNIT_T))
+                    fMaxValue = t_pModel->getScaling()[FIFF_UNIT_T];
             }
             break;
         }
         case FIFFV_EEG_CH: {
-            fMaxValue = 1e-4f;// m_qSettings.value("RawDelegate/max_eeg").toDouble();
+            fMaxValue = 1e-4f;
+            if(t_pModel->getScaling().contains(FIFFV_EEG_CH))
+                fMaxValue = t_pModel->getScaling()[FIFFV_EEG_CH];
             break;
         }
         case FIFFV_EOG_CH: {
-            fMaxValue = 1e-3f; //m_qSettings.value("RawDelegate/max_eog").toDouble();
+            fMaxValue = 1e-3f;
+            if(t_pModel->getScaling().contains(FIFFV_EOG_CH))
+                fMaxValue = t_pModel->getScaling()[FIFFV_EOG_CH];
             break;
         }
         case FIFFV_STIM_CH: {
-            fMaxValue = 5; //m_qSettings.value("RawDelegate/max_stim").toDouble();
+            fMaxValue = 5;
+            if(t_pModel->getScaling().contains(FIFFV_STIM_CH))
+                fMaxValue = t_pModel->getScaling()[FIFFV_STIM_CH];
+            break;
+        }
+        case FIFFV_MISC_CH: {
+            fMaxValue = 1e-3f;
+            if(t_pModel->getScaling().contains(FIFFV_MISC_CH))
+                fMaxValue = t_pModel->getScaling()[FIFFV_MISC_CH];
             break;
         }
     }
+
 
     float fValue;
     float fScaleY = option.rect.height()/(2*fMaxValue);

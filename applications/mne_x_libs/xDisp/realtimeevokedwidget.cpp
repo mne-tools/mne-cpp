@@ -174,8 +174,6 @@ RealTimeEvokedWidget::~RealTimeEvokedWidget()
             settings.setValue(QString("RTEW/%1/%2/norm").arg(t_sRTEWName).arg(m_qListModalities[i].m_sName), m_qListModalities[i].m_fNorm);
         }
     }
-
-
 }
 
 

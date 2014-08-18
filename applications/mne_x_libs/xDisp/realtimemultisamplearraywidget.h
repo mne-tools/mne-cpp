@@ -57,6 +57,7 @@
 
 #include <QSharedPointer>
 #include <QList>
+#include <QMap>
 #include <QTableView>
 #include <QAction>
 #include <QSpinBox>
@@ -220,6 +221,12 @@ protected:
 
     //=========================================================================================================
     /**
+    * Show channel scaling widget
+    */
+    void showChScalingWidget();
+
+    //=========================================================================================================
+    /**
     * Is called when mouse wheel is used.
     * Function is selecting the tool (freezing/annotation);
     *
@@ -258,7 +265,6 @@ private:
     float m_fZoomFactor;                                    /**< Zoom factor */
     QDoubleSpinBox* m_pDoubleSpinBoxZoom;                   /**< Adjust Zoom Factor */
 
-
     QSharedPointer<NewRealTimeMultiSampleArray> m_pRTMSA;   /**< The real-time sample array measurement. */
 
     bool m_bInitialized;                                    /**< Is Initialized */
@@ -273,10 +279,11 @@ private:
 
     QAction*    m_pActionSelectSensors;                     /**< show roi select widget */
 
-
     SensorModel* m_pSensorModel;                            /**< Sensor model for channel selection */
     QSharedPointer<SensorWidget> m_pSensorSelectionWidget;  /**< Sensor selection widget. */
 
+    QMap< qint32,float > m_qMapChScaling;                   /**< Sensor selection widget. */
+    QAction* m_pActionChScaling;                            /**< Show channel scaling Action. */
 
     QList<qint32> m_qListCurrentSelection;  /**< Current selection list -> hack around C++11 lambda  */
     void applySelection();                  /**< apply the in m_qListCurrentSelection stored selection -> hack around C++11 lambda */
