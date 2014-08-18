@@ -81,6 +81,7 @@
 
 #include "FormFiles/filterwindow.h"
 #include "FormFiles/eventwindow.h"
+#include "FormFiles/datawindow.h"
 
 
 //*************************************************************************************************************
@@ -163,6 +164,7 @@ class MainWindow : public QMainWindow
 {    
     friend class FilterWindow;
     friend class EventWindow;
+    friend class DataWindow;
 
     Q_OBJECT
 
@@ -241,6 +243,12 @@ private slots:
 
     //=========================================================================================================
     /**
+    * showLogWindow shows the log window
+    */
+    void showLogWindow();
+
+    //=========================================================================================================
+    /**
     * jumpToEvent jumps to a event specified in the event table view
     *
     * @param [in] current model item focused in the view
@@ -269,18 +277,6 @@ private:
     * setupViews sets up the QTableView being part of the model/view framework and connects them with previously created RawModel and RawDelegate.
     */
     void setupViews();
-
-    //=========================================================================================================
-    /**
-    * setupRawViewSettings sets the settings of the raw fiff dataview such as size policies, scrolling behaviour etc.
-    */
-    void setupRawViewSettings();
-
-    //=========================================================================================================
-    /**
-    * setupEventViewSettings sets the settings of the event view such as size policies, scrolling behaviour etc.
-    */
-    void setupEventViewSettings();
 
     //=========================================================================================================
     /**
@@ -340,6 +336,7 @@ private:
     //Window widgets
     EventWindow*        m_pEventWindow;             /**< Event widget which display the event view */
     FilterWindow*       m_pFilterWindow;            /**< Filter widget which display the filter options for the user */
+    DataWindow*         m_pDataWindow;              /**< Data widget which display the data for the user */
 
     //application settings
     QSettings           m_qSettings;

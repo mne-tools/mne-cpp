@@ -56,14 +56,12 @@ using namespace MNEBrowseRawQt;
 //=============================================================================================================
 
 EventWindow::EventWindow(QWidget *parent) :
-    QWidget(parent, Qt::Window),
-    ui(new Ui::EventWindowWidget),
+    QDockWidget(parent),
+    ui(new Ui::EventWindowDockWidget),
     m_pMainWindow((MainWindow*)parent)
 {
     ui->setupUi(this);
-
     initCheckBoxes();
-    initTableView();
 }
 
 
@@ -77,10 +75,14 @@ EventWindow::~EventWindow()
 
 //*************************************************************************************************************
 
-void EventWindow::initTableView()
+void EventWindow::setupEventViewSettings()
 {
     ui->m_tableView_eventTableView->resizeColumnsToContents();
     ui->m_tableView_eventTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
+
+    //Connect selection in event window to specific slot
+    connect(ui->m_tableView_eventTableView->selectionModel(),&QItemSelectionModel::currentRowChanged,
+                m_pMainWindow,&MainWindow::jumpToEvent);
 }
 
 
@@ -98,3 +100,11 @@ void EventWindow::initCheckBoxes()
         m_pMainWindow->jumpToEvent(m_pMainWindow->m_pEventTableView->selectionModel()->currentIndex(), QModelIndex());
     });
 }
+
+//*************************************************************************************************************
+
+QTableView* EventWindow::getTableView()
+{
+    return ui->m_tableView_eventTableView;
+}
+

@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     eventwindow.h
+* @file     datawindow.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
@@ -30,20 +30,19 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the EventWindow class.
+* @brief    Contains the declaration of the DataWindow class.
 *
 */
 
-#ifndef EVENTWINDOW_H
-#define EVENTWINDOW_H
+#ifndef DATAWINDOW_H
+#define DATAWINDOW_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
-
 #include "../mainwindow.h"
-#include "ui_eventwindowdock.h"
+#include "ui_datawindowdock.h"
 
 
 //*************************************************************************************************************
@@ -63,35 +62,35 @@ namespace MNEBrowseRawQt
 {
 
 /**
-* DECLARE CLASS EventWindow
+* DECLARE CLASS DataWindow
 *
-* @brief The EventWindow class provides the event dock window.
+* @brief The DataWindow class provides the data dock window.
 */
-class EventWindow : public QDockWidget
+class DataWindow : public QDockWidget
 {
     Q_OBJECT
 
 public:
     //=========================================================================================================
     /**
-    * Constructs a EventWindow dialog which is a child of parent.
+    * Constructs a DataWindow dialog which is a child of parent.
     *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new EventWindow becomes a window. If parent is another widget, EventWindow becomes a child window inside parent. EventWindow is deleted when its parent is deleted.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new DataWindow becomes a window. If parent is another widget, DataWindow becomes a child window inside parent. DataWindow is deleted when its parent is deleted.
     */
-    EventWindow(QWidget *parent = 0);
+    DataWindow(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the EventWindow.
-    * All EventWindow's children are deleted first. The application exits if EventWindow is the main widget.
+    * Destroys the DataWindow.
+    * All DataWindow's children are deleted first. The application exits if DataWindow is the main widget.
     */
-    ~EventWindow();
+    ~DataWindow();
 
     //=========================================================================================================
     /**
-    * Setup the QtableView of the event window.
+    * Setup the table view of the data window.
     */
-    void setupEventViewSettings();
+    void setupRawViewSettings();
 
     //=========================================================================================================
     /**
@@ -99,18 +98,19 @@ public:
     */
     QTableView* getTableView();
 
+    //=========================================================================================================
+    /**
+    * setWindowStatus sets the window status depending on m_pRawModel->m_bFileloaded
+    */
+    void setWindowStatus();
+
 private:
-    Ui::EventWindowDockWidget *ui;
+    Ui::DataWindowDockWidget *ui;
 
     MainWindow* m_pMainWindow;
 
-    //=========================================================================================================
-    /**
-    * Inits all the QCheckBoxes of the event window.
-    */
-    void initCheckBoxes();
 };
 
 } // NAMESPACE MNEBrowseRawQt
 
-#endif // EVENTWINDOW_H
+#endif // DATAWINDOW_H
