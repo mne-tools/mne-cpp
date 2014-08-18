@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     frequencyspectrumdelegate.h
+* @file     frequencyspectrumsettingswidget.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,28 +29,27 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of the FrequencySpectrumDelegate Class.
+* @brief    Declaration of the FrequencySpectrumSettingsWidget Class.
 *
 */
 
-#ifndef FREQUENCYSPECTRUMDELEGATE_H
-#define FREQUENCYSPECTRUMDELEGATE_H
+#ifndef FREQUENCYSPECTRUMSETTINGSWIDGET_H
+#define FREQUENCYSPECTRUMSETTINGSWIDGET_H
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QAbstractItemDelegate>
-#include <QTableView>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Eigen INCLUDES
-//=============================================================================================================
-
-#include <Eigen/Core>
+#include <QWidget>
+#include <QSlider>
 
 
 //*************************************************************************************************************
@@ -64,87 +63,51 @@ namespace XDISPLIB
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// FORWARD DECLARATIONS
 //=============================================================================================================
 
-using namespace Eigen;
+class FrequencySpectrumWidget;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS FrequencySpectrumDelegate
+* DECLARE CLASS FrequencySpectrumWidget
 *
-* @brief The FrequencySpectrumDelegate class represents a RTMSA delegate which creates the plot paths
+* @brief The FrequencySpectrumWidget class provides the settings widget
 */
-class FrequencySpectrumDelegate : public QAbstractItemDelegate
+class FrequencySpectrumSettingsWidget : public QWidget
 {
     Q_OBJECT
+
+    friend class FrequencySpectrumWidget;
+
 public:
     //=========================================================================================================
     /**
-    * Creates a new abstract item delegate with the given parent.
+    * Constructs a FrequencySpectrumWidget which is a child of parent.
     *
-    * @param[in] parent     Parent of the delegate
+    * @param [in] parent    parent of widget
     */
-    FrequencySpectrumDelegate(QObject *parent = 0);
+    FrequencySpectrumSettingsWidget(FrequencySpectrumWidget *toolbox);
 
     //=========================================================================================================
     /**
-    * Use the painter and style option to render the item specified by the item index.
+    * Update slider value
     *
-    * (sizeHint() must be implemented also)
-    *
-    * @param[in] painter    Low-level painting on widgets and other paint devices
-    * @param[in] option     Describes the parameters used to draw an item in a view widget
-    * @param[in] index      Used to locate data in a data model.
+    * @param [in] value    slider value
     */
-    virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    void updateValue(qint32 value);
 
-    //=========================================================================================================
-    /**
-    * Item size
-    *
-    * @param[in] option     Describes the parameters used to draw an item in a view widget
-    * @param[in] index      Used to locate data in a data model.
-    */
-    virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
+signals:
+    void settingsChanged();
 
 private:
-    //=========================================================================================================
-    /**
-    * createPlotPath creates the QPointer path for the data plot.
-    *
-    * @param[in]        index   QModelIndex for accessing associated data and model object.
-    * @param[in,out]    path    The QPointerPath to create for the data plot.
-    */
-    void createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorXd& data) const;
+    FrequencySpectrumWidget * m_pFrequencySpectrumWidget; /**< Connected frequency spectrum widget */
 
-    //=========================================================================================================
-    /**
-    * createGridPath Creates the QPointer path for the grid plot.
-    *
-    * @param[in,out] path The row vector of the data matrix <1 x nsamples>.
-    * @param[in] data The row vector of the data matrix <1 x nsamples>.
-    */
-    void createGridPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorXd& data) const;
-
-    //=========================================================================================================
-    /**
-    * createGridTick Creates x-axis tickes for the grid plot.
-    *
-    * Added by LImin Sun; 08.07/2014
-    */
-    void createGridTick(const QModelIndex &index, const QStyleOptionViewItem &option,  QPainter *painter) const;
-
-    //Settings
-//    QSettings m_qSettings;
-
-    // Scaling
-    float m_fMaxValue;     /**< Maximum value of the data to plot  */
-    float m_fScaleY;       /**< Maximum amplitude of plot (max is m_dPlotHeight/2) */
-
+    QSlider* m_pSliderLowerBound;   /**< Lower bound frequency */
+    QSlider* m_pSliderUpperBound;   /**< Upper bound frequency */
 };
 
 } // NAMESPACE
 
-#endif // FREQUENCYSPECTRUMDELEGATE_H
+#endif // FREQUENCYSPECTRUMSETTINGSWIDGET_H

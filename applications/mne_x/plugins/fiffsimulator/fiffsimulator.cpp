@@ -111,6 +111,7 @@ QSharedPointer<IPlugin> FiffSimulator::clone() const
 void FiffSimulator::init()
 {
     m_pRTMSA_FiffSimulator = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "FiffSimulator", "Fiff Simulator Output");
+    m_pRTMSA_FiffSimulator->data()->setName(this->getName());//Provide name to auto store widget settings
     m_outputConnectors.append(m_pRTMSA_FiffSimulator);
 
     // Start FiffSimulatorProducer

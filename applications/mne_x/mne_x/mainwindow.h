@@ -268,7 +268,7 @@ private:
     void updateConnectionWidget(QSharedPointer<PluginConnectorConnection> pConnection);   /**< Sets the connection widget to central widget of MainWindow class depending on the current arrow selected in m_pDockWidgetPlugins.*/
 
 
-private slots:
+private:
     void newConfiguration();            /**< Implements new configuration tasks.*/
     void openConfiguration();           /**< Implements open configuration tasks.*/
     void saveConfiguration();           /**< Implements save configuration tasks.*/

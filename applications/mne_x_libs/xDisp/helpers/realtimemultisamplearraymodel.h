@@ -253,6 +253,22 @@ public:
     */
     inline bool isFreezed() const;
 
+    //=========================================================================================================
+    /**
+    * Returns current scaling
+    *
+    * @return the current scaling
+    */
+    inline const QMap< qint32,float >& getScaling() const;
+
+    //=========================================================================================================
+    /**
+    * Set scaling channel scaling
+    *
+    * @param[in] p_qMapChScaling    Map of scaling factors
+    */
+    void setScaling(const QMap< qint32,float >& p_qMapChScaling);
+
 signals:
     //=========================================================================================================
     /**
@@ -281,6 +297,8 @@ private:
     qint32 m_iCurrentSample;    /**< Accurate Downsampling */
 
     bool m_bIsFreezed;          /**< Display is freezed */
+
+    QMap< qint32,float > m_qMapChScaling;   /**< Sensor selection widget. */
 };
 
 
@@ -316,6 +334,14 @@ inline qint32 RealTimeMultiSampleArrayModel::numVLines() const
 inline bool RealTimeMultiSampleArrayModel::isFreezed() const
 {
     return m_bIsFreezed;
+}
+
+
+//*************************************************************************************************************
+
+inline const QMap< qint32,float >& RealTimeMultiSampleArrayModel::getScaling() const
+{
+    return m_qMapChScaling;
 }
 
 } // NAMESPACE
