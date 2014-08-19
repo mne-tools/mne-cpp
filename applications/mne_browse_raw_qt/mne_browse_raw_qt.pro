@@ -95,7 +95,7 @@ HEADERS += rawsettings.h \
 FORMS += \
     FormFiles/filterwindow.ui \
     FormFiles/eventwindowdock.ui \
-    FormFiles/datawindowdock.ui \
+    FormFiles/datawindowdock.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

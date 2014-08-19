@@ -51,6 +51,8 @@
 //=============================================================================================================
 
 #include <QDockWidget>
+#include <QResizeEvent>
+#include <QToolBar>
 
 
 //*************************************************************************************************************
@@ -105,10 +107,23 @@ public:
     void setWindowStatus();
 
 private:
+    //=========================================================================================================
+    /**
+    * event reimplemented virtual function to handle the resizing of the data dock window
+    */
+    bool event(QEvent * event);
+
     Ui::DataWindowDockWidget *ui;
 
     MainWindow* m_pMainWindow;
 
+protected slots:
+    //=========================================================================================================
+    /**
+    * @brief customContextMenuRequested
+    * @param pos is the position, where the right-click occurred
+    */
+    void customContextMenuRequested(QPoint pos);
 };
 
 } // NAMESPACE MNEBrowseRawQt
