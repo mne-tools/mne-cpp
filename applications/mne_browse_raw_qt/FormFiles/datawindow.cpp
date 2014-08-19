@@ -102,10 +102,6 @@ void DataWindow::setupRawViewSettings()
     //connect QScrollBar with model in order to reload data samples
     connect(ui->m_tableView_rawTableView->horizontalScrollBar(),SIGNAL(valueChanged(int)),
             m_pMainWindow->m_pRawModel,SLOT(updateScrollPos(int)));
-
-    //connect other signals
-    connect(m_pMainWindow->m_pRawModel,&RawModel::scrollBarValueChange,
-            m_pMainWindow,&MainWindow::setScrollBarPosition);
 }
 
 //*************************************************************************************************************

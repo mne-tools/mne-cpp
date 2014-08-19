@@ -417,10 +417,6 @@ void RawModel::resetPosition(qint32 position)
     qDebug() << "RawModel: Model Position RESET, samples from " << m_iAbsFiffCursor << "to" << m_iAbsFiffCursor+m_iWindowSize-1 << "reloaded.";
 
     emit dataChanged(createIndex(0,1),createIndex(m_chInfolist.size(),1));
-
-    //set scrollBarPosition so that the m_iCurAbsScrollPos is not position closer that m_reloadPos to the loaded window's edge so that data is not reloaded right after this method
-    //Lorenz: Commented this out due to error when selecting/jumping to an event which is not in the preloaded data
-    //emit scrollBarValueChange(m_iAbsFiffCursor-firstSample()+m_iWindowSize/2);
 }
 
 

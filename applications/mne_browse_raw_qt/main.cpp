@@ -40,7 +40,7 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include "mainwindow.h"
+#include "FormFiles/mainwindow.h"
 #include "info.h"
 
 

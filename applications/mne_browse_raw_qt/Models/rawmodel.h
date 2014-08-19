@@ -264,13 +264,6 @@ signals:
     */
     void dataReloaded();
 
-    //=========================================================================================================
-    /**
-    * scrollBarValueChange is emitted if a change of the horizontal ScrollBar value is requested by the RawModel
-    * @param pos is the requested relative scroll position (0 equals beginning of ScrollBar)
-    */
-    void scrollBarValueChange(int pos);
-
 public slots:
     //=========================================================================================================
     /**

@@ -71,17 +71,17 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "Models/rawmodel.h"
-#include "Models/eventmodel.h"
-#include "Delegates/rawdelegate.h"
+#include "../Models/rawmodel.h"
+#include "../Models/eventmodel.h"
+#include "../Delegates/rawdelegate.h"
 
-#include "info.h"
-#include "types.h"
-#include "rawsettings.h"
+#include "../info.h"
+#include "../types.h"
+#include "../rawsettings.h"
 
-#include "FormFiles/filterwindow.h"
-#include "FormFiles/eventwindow.h"
-#include "FormFiles/datawindow.h"
+#include "filterwindow.h"
+#include "eventwindow.h"
+#include "datawindow.h"
 
 
 //*************************************************************************************************************
@@ -89,36 +89,12 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QApplication>
-#include <QDebug>
-#include <QSettings>
-#include <QMainWindow>
-#include <QWidget>
+#include "ui_mainwindow.h"
 
 #include <QFileDialog>
-#include <QFile>
-#include <QMenu>
-#include <QMenuBar>
-#include <QAction>
-#include <QSignalMapper>
-
-#include <QTableView>
-#include <QHeaderView>
-#include <QVBoxLayout>
-#include <QGroupBox>
-#include <QScrollArea>
 #include <QScrollBar>
 #include <QScroller>
-#include <QDoubleSpinBox>
-#include <QLabel>
-#include <QToolBar>
-
-#include <QDockWidget>
 #include <QTextBrowser>
-
-#include <QDebug>
-#include <QPainter>
-
 #include <QMessageBox>
 
 
@@ -183,14 +159,6 @@ public:
     */
     void writeToLog(const QString& logMsg, LogKind lgknd, LogLevel lglvl);
 
-public slots:
-    //=========================================================================================================
-    /**
-    * setScrollBarPosition sets the position of the horizontal scrollbar
-    * @param pos the absolute position of the scrollbar
-    */
-    void setScrollBarPosition(int pos);
-
 private slots:
     //=========================================================================================================
     /**
@@ -246,9 +214,6 @@ private slots:
     */
     void showDataWindow();
 
-signals:
-    void testSignal();
-
 private:
     //=========================================================================================================
     /**
@@ -276,9 +241,9 @@ private:
 
     //=========================================================================================================
     /**
-    * createMenus sets up the filemenu
+    * connectMenus sets up the filemenu
     */
-    void createMenus();
+    void connectMenus();
 
     //=========================================================================================================
     /**
@@ -331,6 +296,7 @@ private:
     QTextBrowser*       m_pTextBrowser_Log;         /** a textbox being part of the log feature */
     LogLevel            m_eLogLevelCurrent;         /**< Holds the current log level.*/
 
+    Ui::MainWindowWidget* ui;
 };
 
 } //NAMESPACE
