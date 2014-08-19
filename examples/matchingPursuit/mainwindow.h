@@ -231,9 +231,12 @@ private slots:
     void on_cb_all_select_clicked();
     void on_time_out();
 
+    void on_actionSettings_triggered();
+
 signals:
 
-    void send_input(MatrixXd send_signal, qint32 send_max_iterations, qreal send_epsilon, bool fix_phase);
+    void send_input(MatrixXd send_signal, qint32 send_max_iterations, qreal send_epsilon, bool fix_phase, bool boost, qint32 simplex_it,
+                    qreal simplex_reflection, qreal simplex_expansion, qreal simplex_contraction, qreal simplex_full_contraction);
 
 private:
     Ui::MainWindow *ui;    

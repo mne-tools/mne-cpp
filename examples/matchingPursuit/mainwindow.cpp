@@ -63,6 +63,8 @@
 #include "ui_processdurationmessagebox.h"
 #include "treebaseddictwindow.h"
 #include "ui_treebaseddictwindow.h"
+#include "settingwindow.h"
+#include "ui_settingwindow.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -74,6 +76,7 @@
 #include <QHeaderView>
 #include <QMessageBox>
 #include <QMap>
+#include <QtConcurrent>
 
 #include "QtGui"
 
@@ -515,7 +518,8 @@ qint32 MainWindow::read_fiff_file(QString fileName)
     ui->sb_sample_rate->setEnabled(false);
     _sample_rate = ui->sb_sample_rate->value();
 
-    qint32 cols = 10;
+    //ToDo: read all channels, or only a few?!
+    qint32 cols = 305;
     if(_datas.cols() <= cols)   cols = _datas.cols();
     _signal_matrix.resize(_datas.cols(),cols);
 
@@ -1163,6 +1167,8 @@ void MainWindow::on_btt_Calc_clicked()
         QFile ownDict(QString("Matching-Pursuit-Toolbox/%1.dict").arg(ui->cb_Dicts->currentText()));
         // ToDo: size from dict
         _atom_sum_matrix = MatrixXd::Zero(256,1);
+//        QFuture<void> f1 = QtConcurrent::run(&mpCalc, ownDict, _signal_matrix.col(0), ui->sb_Iterations->value());
+//        f1.waitForFinished();
         mpCalc(ownDict, _signal_matrix.col(0), ui->sb_Iterations->value());
         //update();
     }
@@ -1378,28 +1384,27 @@ void MainWindow::calc_adaptiv_mp(MatrixXd signal, TruncationCriterion criterion)
     qRegisterMetaType<Eigen::MatrixXd>("MatrixXd");
     qRegisterMetaType<gabor_atom_list>("gabor_atom_list");
 
-    connect(this, SIGNAL(send_input(MatrixXd, qint32, qreal, bool)), adaptive_Mp, SLOT(recieve_input(MatrixXd, qint32, qreal, bool)));
+    connect(this, SIGNAL(send_input(MatrixXd, qint32, qreal, bool, bool, qint32, qreal, qreal, qreal, qreal)),
+            adaptive_Mp, SLOT(recieve_input(MatrixXd, qint32, qreal, bool, bool, qint32, qreal, qreal, qreal, qreal)));
     connect(adaptive_Mp, SIGNAL(current_result(qint32, qint32, qreal, qreal, gabor_atom_list)),
                  this, SLOT(recieve_result(qint32, qint32, qreal, qreal, gabor_atom_list)));
-    connect(adaptive_Mp_Thread, SIGNAL(started()), adaptive_Mp, SLOT(process()));
     connect(adaptive_Mp, SIGNAL(finished()), adaptive_Mp_Thread, SLOT(quit()));
-    connect(adaptive_Mp, SIGNAL(finished()), adaptive_Mp, SLOT(deleteLater()));
-    connect(adaptive_Mp_Thread, SIGNAL(finished()), adaptive_Mp_Thread, SLOT(deleteLater()));
+    //connect(adaptive_Mp, SIGNAL(finished()), adaptive_Mp, SLOT(deleteLater()));
     connect(adaptive_Mp_Thread, SIGNAL(finished()), this, SLOT(calc_thread_finished()));
+    //connect(adaptive_Mp_Thread, SIGNAL(finished()), adaptive_Mp_Thread, SLOT(deleteLater()));
 
     switch(criterion)
     {
         case Iterations:
         {
-            emit send_input(signal, ui->sb_Iterations->value(), qreal(MININT32), ui->chb_fix_phase->isChecked());
+            emit send_input(signal, ui->sb_Iterations->value(), qreal(MININT32), ui->chb_fix_phase->isChecked(), 1, 1E3, 1.0, 0.2, 0.5, 0.5);
             adaptive_Mp_Thread->start();
         }
         break;
 
         case SignalEnergy:
         {
-            //must be debugged, thread is not ending like i want it to
-            emit send_input(signal, MAXINT32, res_energy, ui->chb_fix_phase->isChecked());
+            emit send_input(signal, MAXINT32, res_energy, ui->chb_fix_phase->isChecked(), 1, 1E3, 1.0, 0.2, 0.5, 0.5);
             adaptive_Mp_Thread->start();        
         }
         break;
@@ -1407,7 +1412,7 @@ void MainWindow::calc_adaptiv_mp(MatrixXd signal, TruncationCriterion criterion)
         case Both:
         {
             //must be debugged, thread is not ending like i want it to
-            emit send_input(signal, ui->sb_Iterations->value(), res_energy, ui->chb_fix_phase->isChecked());
+            emit send_input(signal, ui->sb_Iterations->value(), res_energy, ui->chb_fix_phase->isChecked(), 1, 1E3, 1.0, 0.2, 0.5, 0.5);
             adaptive_Mp_Thread->start();
         }
         break;
@@ -2188,4 +2193,13 @@ void MainWindow::on_cb_all_select_clicked()
     else ui->cb_all_select->setCheckState(Qt::PartiallyChecked);
 
     _auto_change = false;
+}
+
+//*****************************************************************************************************************
+
+void MainWindow::on_actionSettings_triggered()
+{
+    settingwindow *set = new settingwindow();
+    set->show();
+
 }
