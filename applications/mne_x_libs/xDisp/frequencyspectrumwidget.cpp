@@ -111,7 +111,7 @@ FrequencySpectrumWidget::FrequencySpectrumWidget(QSharedPointer<FrequencySpectru
     Q_UNUSED(pTime)
 
 
-    m_pActionFrequencySettings = new QAction(QIcon(":/images/evokedSettings.png"), tr("Shows the frequency spectrum settings widget (F12)"),this);
+    m_pActionFrequencySettings = new QAction(QIcon(":/images/frqResolution.png"), tr("Shows the frequency spectrum settings widget (F12)"),this);
     m_pActionFrequencySettings->setShortcut(tr("F12"));
     m_pActionFrequencySettings->setStatusTip(tr("Shows the frequency spectrum settings widget (F12)"));
     connect(m_pActionFrequencySettings, &QAction::triggered, this, &FrequencySpectrumWidget::showFrequencySpectrumSettingsWidget);
