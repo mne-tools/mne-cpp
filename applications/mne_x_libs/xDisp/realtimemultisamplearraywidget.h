@@ -125,6 +125,8 @@ class XDISPSHARED_EXPORT RealTimeMultiSampleArrayWidget : public NewMeasurementW
 {
     Q_OBJECT
 
+    friend class RealTimeMultiSampleArrayScalingWidget;
+
 public:
     //=========================================================================================================
     /**
