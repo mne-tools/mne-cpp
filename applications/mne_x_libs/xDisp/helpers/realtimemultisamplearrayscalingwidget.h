@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     evokedmodalitywidget.cpp
+* @file     realtimemultisamplearrayscalingwidget.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -29,111 +29,78 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the EvokedModalityWidget Class.
+* @brief    Declaration of the RealTimeMultiSampleArrayScalingWidget Class.
 *
 */
+
+#ifndef REALTIMEMULTISAMPLEARRAYSCALINGWIDGET_H
+#define REALTIMEMULTISAMPLEARRAYSCALINGWIDGET_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "evokedmodalitywidget.h"
-#include "../realtimeevokedwidget.h"
-#include "sensoritem.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
-#include <QLabel>
-#include <QGridLayout>
-#include <QDoubleValidator>
-
-#include <QDebug>
+#include <QWidget>
+#include <QStringList>
+#include <QLineEdit>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// DEFINE NAMESPACE XDISPLIB
 //=============================================================================================================
 
-using namespace XDISPLIB;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE MEMBER METHODS
-//=============================================================================================================
-
-EvokedModalityWidget::EvokedModalityWidget(RealTimeEvokedWidget *toolbox)
-: m_pRealTimeEvokedWidget(toolbox)
+namespace XDISPLIB
 {
-    this->setWindowTitle("Covariance Modality Settings");
-    this->setMinimumWidth(330);
-    this->setMaximumWidth(330);
-
-    QGridLayout* t_pGridLayout = new QGridLayout;
-
-    for(qint32 i = 0; i < m_pRealTimeEvokedWidget->m_qListModalities.size(); ++i)
-    {
-        QString mod = m_pRealTimeEvokedWidget->m_qListModalities[i].m_sName;
-
-        QLabel* t_pLabelModality = new QLabel;
-        t_pLabelModality->setText(mod);
-        t_pGridLayout->addWidget(t_pLabelModality,i,0,1,1);
-
-        QCheckBox* t_pCheckBoxModality = new QCheckBox;
-        t_pCheckBoxModality->setChecked(m_pRealTimeEvokedWidget->m_qListModalities[i].m_bActive);
-        m_qListModalityCheckBox << t_pCheckBoxModality;
-        connect(t_pCheckBoxModality,&QCheckBox::stateChanged,this,&EvokedModalityWidget::updateCheckbox);
-        t_pGridLayout->addWidget(t_pCheckBoxModality,i,1,1,1);
-
-
-        QDoubleValidator* t_pDoubleValidator = new QDoubleValidator(10e-11,1,16,this);
-        QLineEdit* t_pLineEditScale = new QLineEdit;
-        t_pLineEditScale->setMaximumWidth(100);
-        t_pLineEditScale->setValidator(t_pDoubleValidator);
-        t_pLineEditScale->setText(QString("%1").arg(m_pRealTimeEvokedWidget->m_qListModalities[i].m_fNorm));
-        m_qListModalityLineEdit << t_pLineEditScale;
-        connect(t_pLineEditScale,&QLineEdit::textEdited,this,&EvokedModalityWidget::updateLineEdit);
-        t_pGridLayout->addWidget(t_pLineEditScale,i,2,1,1);
-
-    }
-
-    this->setLayout(t_pGridLayout);
-
-}
 
 
 //*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
 
-void EvokedModalityWidget::updateCheckbox(qint32 state)
+class RealTimeMultiSampleArrayWidget;
+struct Modality;
+
+
+//=============================================================================================================
+/**
+* DECLARE CLASS EvokedModalityWidget
+*
+* @brief The EvokedModalityWidget class provides the sensor selection widget
+*/
+class RealTimeMultiSampleArrayScalingWidget : public QWidget
 {
-    Q_UNUSED(state)
+    Q_OBJECT
+public:
 
-    for(qint32 i = 0; i < m_qListModalityCheckBox.size(); ++i)
-    {
-        if(m_qListModalityCheckBox[i]->isChecked())
-            m_pRealTimeEvokedWidget->m_qListModalities[i].m_bActive = true;
-        else
-            m_pRealTimeEvokedWidget->m_qListModalities[i].m_bActive = false;
-    }
+    //=========================================================================================================
+    /**
+    * Constructs a EvokedModalityWidget which is a child of connected RTMSAW.
+    *
+    * @param [in] toolbox   connected RealTimeMultiSampleArrayWidget
+    */
+    RealTimeMultiSampleArrayScalingWidget(RealTimeMultiSampleArrayWidget *toolbox);
 
-    emit settingsChanged();
-}
+    void updateLineEdit(const QString & text);
 
+signals:
+    void settingsChanged();
 
-//*************************************************************************************************************
+private:
+    RealTimeMultiSampleArrayWidget * m_pRTMSAW;     /**< Connected real-time evoked widget */
 
-void EvokedModalityWidget::updateLineEdit(const QString & text)
-{
-    Q_UNUSED(text)
+    QList<QLineEdit*>   m_qListModalityLineEdit;    /**< List of modality scalings */
+};
 
-    for(qint32 i = 0; i < m_qListModalityCheckBox.size(); ++i)
-        m_pRealTimeEvokedWidget->m_qListModalities[i].m_fNorm = (float)m_qListModalityLineEdit[i]->text().toDouble();
+} // NAMESPACE
 
-    emit settingsChanged();
-}
+#endif // REALTIMEMULTISAMPLEARRAYSCALINGWIDGET_H
