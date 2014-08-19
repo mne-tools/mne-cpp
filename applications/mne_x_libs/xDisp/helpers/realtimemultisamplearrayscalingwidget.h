@@ -93,7 +93,7 @@ public:
     void updateLineEdit(const QString & text);
 
 signals:
-    void settingsChanged();
+    void scalingChanged();
 
 private:
     RealTimeMultiSampleArrayWidget * m_pRTMSAW;     /**< Connected real-time evoked widget */

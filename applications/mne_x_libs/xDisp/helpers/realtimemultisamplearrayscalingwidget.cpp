@@ -200,5 +200,5 @@ void RealTimeMultiSampleArrayScalingWidget::updateLineEdit(const QString & text)
 //    for(qint32 i = 0; i < m_qListModalityCheckBox.size(); ++i)
 //        m_pRealTimeEvokedWidget->m_qListModalities[i].m_fNorm = (float)m_qListModalityLineEdit[i]->text().toDouble();
 
-    emit settingsChanged();
+    emit scalingChanged();
 }
