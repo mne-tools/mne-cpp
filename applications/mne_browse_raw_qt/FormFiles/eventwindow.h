@@ -109,6 +109,16 @@ private:
     * Inits all the QCheckBoxes of the event window.
     */
     void initCheckBoxes();
+
+protected slots:
+    //=========================================================================================================
+    /**
+    * jumpToEvent jumps to a event specified in the event table view
+    *
+    * @param [in] current model item focused in the view
+    * @param [in] previous model item focused in the view
+    */
+    void jumpToEvent(const QModelIndex &current, const QModelIndex &previous);
 };
 
 } // NAMESPACE MNEBrowseRawQt

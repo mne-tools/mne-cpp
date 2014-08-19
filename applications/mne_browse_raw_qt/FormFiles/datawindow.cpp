@@ -61,6 +61,16 @@ DataWindow::DataWindow(QWidget *parent) :
     m_pMainWindow((MainWindow*)parent)
 {
     ui->setupUi(this);
+
+
+    QToolBar *toolBar = new QToolBar();
+    toolBar->setOrientation(Qt::Vertical);
+    toolBar->setFixedWidth(30);
+    toolBar->setMovable(false);
+    toolBar->addAction(new QAction("Test", this));
+
+    ui->horizontalLayout->addWidget(toolBar);
+
 }
 
 
@@ -84,7 +94,7 @@ void DataWindow::setupRawViewSettings()
     //set context menu
     ui->m_tableView_rawTableView->setContextMenuPolicy(Qt::CustomContextMenu);
     connect(ui->m_tableView_rawTableView,&QWidget::customContextMenuRequested,
-            m_pMainWindow,&MainWindow::customContextMenuRequested);
+            this,&DataWindow::customContextMenuRequested);
 
     //activate kinetic scrolling
     QScroller::grabGesture(ui->m_tableView_rawTableView,QScroller::MiddleMouseButtonGesture);
@@ -124,4 +134,121 @@ void DataWindow::setWindowStatus()
 
     //set title
     setWindowTitle(title);
+}
+
+
+//*************************************************************************************************************
+
+bool DataWindow::event(QEvent * event)
+{
+    if(event->type() == QEvent::Paint) {
+        //Manually resize QDockWidget - This needs to be done because there is no typical central widget in QMainWindow - QT does not do a good job when resizing dock widgets (known issue)
+        int newWidth;
+
+        if(m_pMainWindow->m_pEventWindow->isHidden() || m_pMainWindow->m_pEventWindow->isFloating())
+        {
+            newWidth = m_pMainWindow->size().width() - m_pMainWindow->centralWidget()->size().width() - 1;
+            //qDebug()<<"resize data plot event window is hidden";
+        }
+        else
+        {
+            newWidth = m_pMainWindow->size().width() - m_pMainWindow->m_pEventWindow->size().width() - 5;
+            //qDebug()<<"resize data plot event window is visible";
+        }
+
+        resize(newWidth, this->size().height());
+    }
+
+    return QDockWidget::event(event);
+}
+
+
+//*************************************************************************************************************
+
+void DataWindow::customContextMenuRequested(QPoint pos)
+{
+    //obtain index where index was clicked
+    //QModelIndex index = m_pRawTableView->indexAt(pos);
+
+    //get selected items
+    QModelIndexList selected = m_pMainWindow->m_pRawTableView->selectionModel()->selectedIndexes();
+
+    //create custom context menu and actions
+    QMenu *menu = new QMenu(this);
+
+    //**************** Marking ****************
+    QMenu *markingSubMenu = new QMenu("Mark channels",menu);
+
+    QAction* doMarkChBad = markingSubMenu->addAction(tr("Mark as bad"));
+    connect(doMarkChBad,&QAction::triggered, [=](){
+        m_pMainWindow->m_pRawModel->markChBad(selected,1);
+    });
+
+    QAction* doMarkChGood = markingSubMenu->addAction(tr("Mark as good"));
+    connect(doMarkChGood,&QAction::triggered, [=](){
+        m_pMainWindow->m_pRawModel->markChBad(selected,0);
+    });
+
+    //**************** FilterOperators ****************
+    //selected channels
+    QMenu *filtOpSubMenu = new QMenu("Apply FilterOperator to selected channel",menu);
+    QMutableMapIterator<QString,QSharedPointer<MNEOperator> > it(m_pMainWindow->m_pRawModel->m_Operators);
+    while(it.hasNext()) {
+        it.next();
+        QAction* doApplyFilter = filtOpSubMenu->addAction(tr("%1").arg(it.key()));
+
+        connect(doApplyFilter,&QAction::triggered, [=](){
+            m_pMainWindow->m_pRawModel->applyOperator(selected,it.value());
+        });
+    }
+
+    //all channels
+    QMenu *filtOpAllSubMenu = new QMenu("Apply FilterOperator to all channels",menu);
+    it.toFront();
+    while(it.hasNext()) {
+        it.next();
+        QAction* doApplyFilter = filtOpAllSubMenu->addAction(tr("%1").arg(it.key()));
+
+        connect(doApplyFilter,&QAction::triggered, [=](){
+            m_pMainWindow->m_pRawModel->applyOperator(QModelIndexList(),it.value());
+        });
+    }
+
+    //undoing filtering
+    QMenu *undoFiltOpSubMenu = new QMenu("Undo filtering",menu);
+    QMenu *undoFiltOpSelSubMenu = new QMenu("to selected channels",undoFiltOpSubMenu);
+
+    //undo certain FilterOperators to selected channels
+    it.toFront();
+    while(it.hasNext()) {
+        it.next();
+        QAction* undoApplyFilter = undoFiltOpSelSubMenu->addAction(tr("%1").arg(it.key()));
+
+        connect(undoApplyFilter,&QAction::triggered, [=](){
+            m_pMainWindow->m_pRawModel->undoFilter(selected,it.value());
+        });
+    }
+
+    undoFiltOpSubMenu->addMenu(undoFiltOpSelSubMenu);
+
+    //undo all filterting to selected channels
+    QAction* undoApplyFilterSel = undoFiltOpSubMenu->addAction(tr("Undo FilterOperators to selected channels"));
+    connect(undoApplyFilterSel,&QAction::triggered, [=](){
+        m_pMainWindow->m_pRawModel->undoFilter(selected);
+    });
+
+    //undo all filtering to all channels
+    QAction* undoApplyFilterAll = undoFiltOpSubMenu->addAction(tr("Undo FilterOperators to all channels"));
+    connect(undoApplyFilterAll,&QAction::triggered, [=](){
+        m_pMainWindow->m_pRawModel->undoFilter();
+    });
+
+    //add everything to main contextmenu
+    menu->addMenu(markingSubMenu);
+    menu->addMenu(filtOpSubMenu);
+    menu->addMenu(filtOpAllSubMenu);
+    menu->addMenu(undoFiltOpSubMenu);
+
+    //show context menu
+    menu->popup(m_pMainWindow->m_pRawTableView->viewport()->mapToGlobal(pos));
 }

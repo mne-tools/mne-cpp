@@ -6,20 +6,23 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>203</width>
-    <height>175</height>
+    <width>469</width>
+    <height>208</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Adjust filter</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
-   <item>
+  <layout class="QFormLayout" name="formLayout_2">
+   <item row="0" column="0">
     <widget class="QGroupBox" name="m_groupBox_filterSettings">
      <property name="title">
       <string>Filter settings</string>
      </property>
      <layout class="QFormLayout" name="formLayout">
+      <property name="fieldGrowthPolicy">
+       <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+      </property>
       <item row="0" column="0">
        <widget class="QLabel" name="label">
         <property name="text">
@@ -69,14 +72,26 @@
         </property>
        </widget>
       </item>
+      <item row="4" column="0">
+       <widget class="QPushButton" name="m_pushButton_applyFilter">
+        <property name="text">
+         <string>Apply filter to all</string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
-   <item>
-    <widget class="QPushButton" name="m_pushButton_applyFilter">
-     <property name="text">
-      <string>Apply filter to all channels</string>
+   <item row="0" column="1">
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>Filter plot</string>
      </property>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <item>
+       <widget class="QGraphicsView" name="m_graphicsView_filterPlot"/>
+      </item>
+     </layout>
     </widget>
    </item>
   </layout>

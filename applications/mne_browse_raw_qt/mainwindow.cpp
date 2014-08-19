@@ -64,6 +64,7 @@ MainWindow::MainWindow(QWidget *parent)
 , m_rawSettings()
 {
     //Setup the windows first - this NEEDS to be done here because important pointers (window pointers) which are needed for further processing are generated in this function
+    setupMainWindow();
     setupWindowWidgets();
 
     //setup MVC
@@ -75,10 +76,8 @@ MainWindow::MainWindow(QWidget *parent)
     m_pRawDelegate->setEventModelView(m_pEventModel, m_pEventTableView, m_pRawTableView);
 
     // Setup rest of the GUI
-    setupMainWindow();
     createMenus();
     createLogDockWindow();
-    setWindow();
     setWindowStatus();
     m_pDataWindow->setWindowStatus();
 }
@@ -130,29 +129,6 @@ void MainWindow::setupViews()
     //setup view settings
     m_pDataWindow->setupRawViewSettings();
     m_pEventWindow->setupEventViewSettings();
-}
-
-
-//*************************************************************************************************************
-
-void MainWindow::setupMainWindow()
-{
-    //Create non dockable data window
-//    //set vertical layout
-//    QVBoxLayout *mainlayout = new QVBoxLayout;
-
-//    mainlayout->addWidget(m_pRawTableView);
-
-//    //set layouts
-//    QWidget *window = new QWidget();
-//    window->setLayout(mainlayout);
-
-//    setCentralWidget(window);
-
-    // Set central widget
-    QWidget *window = new QWidget();
-    setCentralWidget(window);
-    window->hide();
 }
 
 
@@ -214,6 +190,9 @@ void MainWindow::createMenus()
     //Windows
     QMenu *windowsMenu = new QMenu(tr("&Windows"), this);
 
+    QAction *dataAction = windowsMenu->addAction(tr("&Show data plot..."));
+    connect(dataAction, SIGNAL(triggered()), this, SLOT(showDataWindow()));
+
     QAction *eventAction = windowsMenu->addAction(tr("&Show event list..."));
     connect(eventAction, SIGNAL(triggered()), this, SLOT(showEventWindow()));
 
@@ -236,11 +215,16 @@ void MainWindow::createMenus()
 
 //*************************************************************************************************************
 
-void MainWindow::setWindow()
+void MainWindow::setupMainWindow()
 {
     //set Window functions
-    resize(m_qSettings.value("MainWindow/size").toSize());
-    this->move(50,50);
+    resize(m_qSettings.value("MainWindow/size").toSize()); //Resize to predefined default size
+    move(50,50); // Move this main window to position 50/50 on the screen
+
+    //Set central widget - This is needed because we are using QDockWidgets
+    QWidget *window = new QWidget();
+    setCentralWidget(window);
+    centralWidget()->setFixedWidth(1);
 }
 
 
@@ -426,97 +410,6 @@ void MainWindow::saveEvents()
 
 //*************************************************************************************************************
 
-void MainWindow::customContextMenuRequested(QPoint pos)
-{
-    //obtain index where index was clicked
-    //QModelIndex index = m_pRawTableView->indexAt(pos);
-
-    //get selected items
-    QModelIndexList selected = m_pRawTableView->selectionModel()->selectedIndexes();
-
-    //create custom context menu and actions
-    QMenu *menu = new QMenu(this);
-
-    //**************** Marking ****************
-    QMenu *markingSubMenu = new QMenu("Mark channels",menu);
-
-    QAction* doMarkChBad = markingSubMenu->addAction(tr("Mark as bad"));
-    connect(doMarkChBad,&QAction::triggered, [=](){
-        m_pRawModel->markChBad(selected,1);
-    });
-
-    QAction* doMarkChGood = markingSubMenu->addAction(tr("Mark as good"));
-    connect(doMarkChGood,&QAction::triggered, [=](){
-        m_pRawModel->markChBad(selected,0);
-    });
-
-    //**************** FilterOperators ****************
-    //selected channels
-    QMenu *filtOpSubMenu = new QMenu("Apply FilterOperator to selected channel",menu);
-    QMutableMapIterator<QString,QSharedPointer<MNEOperator> > it(m_pRawModel->m_Operators);
-    while(it.hasNext()) {
-        it.next();
-        QAction* doApplyFilter = filtOpSubMenu->addAction(tr("%1").arg(it.key()));
-
-        connect(doApplyFilter,&QAction::triggered, [=](){
-            m_pRawModel->applyOperator(selected,it.value());
-        });
-    }
-
-    //all channels
-    QMenu *filtOpAllSubMenu = new QMenu("Apply FilterOperator to all channels",menu);
-    it.toFront();
-    while(it.hasNext()) {
-        it.next();
-        QAction* doApplyFilter = filtOpAllSubMenu->addAction(tr("%1").arg(it.key()));
-
-        connect(doApplyFilter,&QAction::triggered, [=](){
-            m_pRawModel->applyOperator(QModelIndexList(),it.value());
-        });
-    }
-
-    //undoing filtering
-    QMenu *undoFiltOpSubMenu = new QMenu("Undo filtering",menu);
-    QMenu *undoFiltOpSelSubMenu = new QMenu("to selected channels",undoFiltOpSubMenu);
-
-    //undo certain FilterOperators to selected channels
-    it.toFront();
-    while(it.hasNext()) {
-        it.next();
-        QAction* undoApplyFilter = undoFiltOpSelSubMenu->addAction(tr("%1").arg(it.key()));
-
-        connect(undoApplyFilter,&QAction::triggered, [=](){
-            m_pRawModel->undoFilter(selected,it.value());
-        });
-    }
-
-    undoFiltOpSubMenu->addMenu(undoFiltOpSelSubMenu);
-
-    //undo all filterting to selected channels
-    QAction* undoApplyFilterSel = undoFiltOpSubMenu->addAction(tr("Undo FilterOperators to selected channels"));
-    connect(undoApplyFilterSel,&QAction::triggered, [=](){
-        m_pRawModel->undoFilter(selected);
-    });
-
-    //undo all filtering to all channels
-    QAction* undoApplyFilterAll = undoFiltOpSubMenu->addAction(tr("Undo FilterOperators to all channels"));
-    connect(undoApplyFilterAll,&QAction::triggered, [=](){
-        m_pRawModel->undoFilter();
-    });
-
-    //add everything to main contextmenu
-    menu->addMenu(markingSubMenu);
-    menu->addMenu(filtOpSubMenu);
-    menu->addMenu(filtOpAllSubMenu);
-    menu->addMenu(undoFiltOpSubMenu);
-
-    //show context menu
-    menu->popup(m_pRawTableView->viewport()->mapToGlobal(pos));
-}
-
-
-//*************************************************************************************************************
-
 void MainWindow::setScrollBarPosition(int pos)
 {
     m_pRawTableView->horizontalScrollBar()->setValue(pos);
@@ -596,27 +489,17 @@ void MainWindow::showLogWindow()
 
 //*************************************************************************************************************
 
-void MainWindow::jumpToEvent(const QModelIndex & current, const QModelIndex & previous)
+void MainWindow::showDataWindow()
 {
-    Q_UNUSED(previous);
-
-    //Always get the first column 0 (sample) of the model
-    QModelIndex index = m_pEventModel->index(current.row(), 0);
-
-    //Get the sample value
-    int sample = m_pEventModel->data(index, Qt::DisplayRole).toInt();
-
-    //Jump to sample - put sample in the middle of the view
-    int rawTableViewColumnWidth = m_pRawTableView->viewport()->width();
-
-    if(sample-rawTableViewColumnWidth/2 < rawTableViewColumnWidth/2) //events lie in the first half of the data window at the beginning of the loaded data -> cannot centralize view on event
-        m_pRawTableView->horizontalScrollBar()->setValue(0);
-    else if(sample+rawTableViewColumnWidth/2 > m_pRawModel->lastSample()-rawTableViewColumnWidth/2) //events lie in the last half of the data window at the end of the loaded data -> cannot centralize view on event
-        m_pRawTableView->horizontalScrollBar()->setValue(m_pRawTableView->maximumWidth());
-    else //centralize view on event
-        m_pRawTableView->horizontalScrollBar()->setValue(sample-rawTableViewColumnWidth/2);
-
-    qDebug()<<"Jumping to Event at sample "<<sample<<"rawTableViewColumnWidth"<<rawTableViewColumnWidth;
+    //Note: A widget that happens to be obscured by other windows on the screen is considered to be visible.
+    if(!m_pDataWindow->isVisible())
+    {
+        m_pDataWindow->show();
+        m_pDataWindow->raise();
+    }
+    else // if visible raise the widget to be sure that it is not obscured by other windows
+        m_pDataWindow->raise();
 }
+
 
 

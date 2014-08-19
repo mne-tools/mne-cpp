@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>700</height>
+    <width>907</width>
+    <height>740</height>
    </rect>
   </property>
   <property name="sizePolicy">
-   <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+   <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
@@ -19,21 +19,33 @@
   <property name="minimumSize">
    <size>
     <width>200</width>
-    <height>700</height>
+    <height>200</height>
    </size>
   </property>
   <property name="allowedAreas">
-   <set>Qt::LeftDockWidgetArea|Qt::RightDockWidgetArea</set>
+   <set>Qt::LeftDockWidgetArea</set>
   </property>
   <property name="windowTitle">
    <string>Data Plot</string>
   </property>
   <widget class="QWidget" name="dockWidgetContents">
-   <layout class="QVBoxLayout" name="verticalLayout">
+   <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
      <widget class="QTableView" name="m_tableView_rawTableView">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>0</height>
+       </size>
+      </property>
       <property name="autoScroll">
-       <bool>false</bool>
+       <bool>true</bool>
       </property>
       <property name="horizontalScrollMode">
        <enum>QAbstractItemView::ScrollPerPixel</enum>

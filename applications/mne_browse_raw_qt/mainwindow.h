@@ -111,6 +111,7 @@
 #include <QScroller>
 #include <QDoubleSpinBox>
 #include <QLabel>
+#include <QToolBar>
 
 #include <QDockWidget>
 #include <QTextBrowser>
@@ -183,14 +184,6 @@ public:
     void writeToLog(const QString& logMsg, LogKind lgknd, LogLevel lglvl);
 
 public slots:
-
-    //=========================================================================================================
-    /**
-    * @brief customContextMenuRequested
-    * @param pos is the position, where the right-click occurred
-    */
-    void customContextMenuRequested(QPoint pos);
-
     //=========================================================================================================
     /**
     * setScrollBarPosition sets the position of the horizontal scrollbar
@@ -249,12 +242,9 @@ private slots:
 
     //=========================================================================================================
     /**
-    * jumpToEvent jumps to a event specified in the event table view
-    *
-    * @param [in] current model item focused in the view
-    * @param [in] previous model item focused in the view
+    * showDataWindow shows the data window
     */
-    void jumpToEvent(const QModelIndex &current, const QModelIndex &previous);
+    void showDataWindow();
 
 signals:
     void testSignal();
@@ -277,12 +267,6 @@ private:
     * setupViews sets up the QTableView being part of the model/view framework and connects them with previously created RawModel and RawDelegate.
     */
     void setupViews();
-
-    //=========================================================================================================
-    /**
-    * setupMainWindow create and connects the individual elements of the main window.
-    */
-    void setupMainWindow();
 
     //=========================================================================================================
     /**
@@ -312,9 +296,9 @@ private:
 
     //=========================================================================================================
     /**
-    * setWindow makes settings that are related to the MainWindow
+    * setupMainWindow makes settings that are related to the MainWindow
     */
-    void setWindow();
+    void setupMainWindow();
 
     //=========================================================================================================
     /**
