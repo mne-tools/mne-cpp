@@ -89,7 +89,7 @@ RealTimeMultiSampleArrayScalingWidget::RealTimeMultiSampleArrayScalingWidget(Rea
         t_pLineEditScale->setMaximumWidth(100);
         t_pLineEditScale->setValidator(t_pDoubleValidator);
         t_pLineEditScale->setText(QString("%1").arg(m_pRTMSAW->m_qMapChScaling[FIFF_UNIT_T]));
-        m_qListModalityLineEdit << t_pLineEditScale;
+        m_qMapScalingLineEdit.insert(FIFF_UNIT_T,t_pLineEditScale);
         connect(t_pLineEditScale,&QLineEdit::textEdited,this,&RealTimeMultiSampleArrayScalingWidget::updateLineEdit);
         t_pGridLayout->addWidget(t_pLineEditScale,i,2,1,1);
         ++i;
@@ -107,7 +107,7 @@ RealTimeMultiSampleArrayScalingWidget::RealTimeMultiSampleArrayScalingWidget(Rea
         t_pLineEditScale->setMaximumWidth(100);
         t_pLineEditScale->setValidator(t_pDoubleValidator);
         t_pLineEditScale->setText(QString("%1").arg(m_pRTMSAW->m_qMapChScaling[FIFF_UNIT_T_M]));
-        m_qListModalityLineEdit << t_pLineEditScale;
+        m_qMapScalingLineEdit.insert(FIFF_UNIT_T_M,t_pLineEditScale);
         connect(t_pLineEditScale,&QLineEdit::textEdited,this,&RealTimeMultiSampleArrayScalingWidget::updateLineEdit);
         t_pGridLayout->addWidget(t_pLineEditScale,i,2,1,1);
         ++i;
@@ -125,7 +125,7 @@ RealTimeMultiSampleArrayScalingWidget::RealTimeMultiSampleArrayScalingWidget(Rea
         t_pLineEditScale->setMaximumWidth(100);
         t_pLineEditScale->setValidator(t_pDoubleValidator);
         t_pLineEditScale->setText(QString("%1").arg(m_pRTMSAW->m_qMapChScaling[FIFFV_EEG_CH]));
-        m_qListModalityLineEdit << t_pLineEditScale;
+        m_qMapScalingLineEdit.insert(FIFFV_EEG_CH,t_pLineEditScale);
         connect(t_pLineEditScale,&QLineEdit::textEdited,this,&RealTimeMultiSampleArrayScalingWidget::updateLineEdit);
         t_pGridLayout->addWidget(t_pLineEditScale,i,2,1,1);
         ++i;
@@ -143,7 +143,7 @@ RealTimeMultiSampleArrayScalingWidget::RealTimeMultiSampleArrayScalingWidget(Rea
         t_pLineEditScale->setMaximumWidth(100);
         t_pLineEditScale->setValidator(t_pDoubleValidator);
         t_pLineEditScale->setText(QString("%1").arg(m_pRTMSAW->m_qMapChScaling[FIFFV_EOG_CH]));
-        m_qListModalityLineEdit << t_pLineEditScale;
+        m_qMapScalingLineEdit.insert(FIFFV_EOG_CH,t_pLineEditScale);
         connect(t_pLineEditScale,&QLineEdit::textEdited,this,&RealTimeMultiSampleArrayScalingWidget::updateLineEdit);
         t_pGridLayout->addWidget(t_pLineEditScale,i,2,1,1);
         ++i;
@@ -161,7 +161,7 @@ RealTimeMultiSampleArrayScalingWidget::RealTimeMultiSampleArrayScalingWidget(Rea
         t_pLineEditScale->setMaximumWidth(100);
         t_pLineEditScale->setValidator(t_pDoubleValidator);
         t_pLineEditScale->setText(QString("%1").arg(m_pRTMSAW->m_qMapChScaling[FIFFV_STIM_CH]));
-        m_qListModalityLineEdit << t_pLineEditScale;
+        m_qMapScalingLineEdit.insert(FIFFV_STIM_CH,t_pLineEditScale);
         connect(t_pLineEditScale,&QLineEdit::textEdited,this,&RealTimeMultiSampleArrayScalingWidget::updateLineEdit);
         t_pGridLayout->addWidget(t_pLineEditScale,i,2,1,1);
         ++i;
@@ -179,7 +179,7 @@ RealTimeMultiSampleArrayScalingWidget::RealTimeMultiSampleArrayScalingWidget(Rea
         t_pLineEditScale->setMaximumWidth(100);
         t_pLineEditScale->setValidator(t_pDoubleValidator);
         t_pLineEditScale->setText(QString("%1").arg(m_pRTMSAW->m_qMapChScaling[FIFFV_MISC_CH]));
-        m_qListModalityLineEdit << t_pLineEditScale;
+        m_qMapScalingLineEdit.insert(FIFFV_MISC_CH,t_pLineEditScale);
         connect(t_pLineEditScale,&QLineEdit::textEdited,this,&RealTimeMultiSampleArrayScalingWidget::updateLineEdit);
         t_pGridLayout->addWidget(t_pLineEditScale,i,2,1,1);
         ++i;
@@ -197,8 +197,9 @@ void RealTimeMultiSampleArrayScalingWidget::updateLineEdit(const QString & text)
 {
     Q_UNUSED(text)
 
-//    for(qint32 i = 0; i < m_qListModalityCheckBox.size(); ++i)
-//        m_pRealTimeEvokedWidget->m_qListModalities[i].m_fNorm = (float)m_qListModalityLineEdit[i]->text().toDouble();
+    QMap<qint32, QLineEdit*>::iterator it;
+    for (it = m_qMapScalingLineEdit.begin(); it != m_qMapScalingLineEdit.end(); ++it)
+        m_pRTMSAW->m_qMapChScaling[it.key()] = it.value()->text().toDouble();
 
     emit scalingChanged();
 }
