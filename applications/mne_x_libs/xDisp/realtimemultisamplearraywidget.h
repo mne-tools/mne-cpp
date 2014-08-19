@@ -47,6 +47,7 @@
 #include "helpers/realtimemultisamplearraymodel.h"
 #include "helpers/realtimemultisamplearraydelegate.h"
 
+#include "helpers/realtimemultisamplearrayscalingwidget.h"
 #include "helpers/sensorwidget.h"
 
 
@@ -124,6 +125,8 @@ using namespace XMEASLIB;
 class XDISPSHARED_EXPORT RealTimeMultiSampleArrayWidget : public NewMeasurementWidget
 {
     Q_OBJECT
+
+    friend class RealTimeMultiSampleArrayScalingWidget;
 
 public:
     //=========================================================================================================
@@ -284,6 +287,8 @@ private:
 
     QMap< qint32,float > m_qMapChScaling;                   /**< Sensor selection widget. */
     QAction* m_pActionChScaling;                            /**< Show channel scaling Action. */
+
+    QSharedPointer<RealTimeMultiSampleArrayScalingWidget> m_pRTMSAScalingWidget;   /**< Channel scaling widget. */
 
     QList<qint32> m_qListCurrentSelection;  /**< Current selection list -> hack around C++11 lambda  */
     void applySelection();                  /**< apply the in m_qListCurrentSelection stored selection -> hack around C++11 lambda */

@@ -140,7 +140,7 @@ RealTimeMultiSampleArrayWidget::RealTimeMultiSampleArrayWidget(QSharedPointer<Ne
     connect(m_pActionSelectSensors, &QAction::triggered, this, &RealTimeMultiSampleArrayWidget::showSensorSelectionWidget);
     addDisplayAction(m_pActionSelectSensors);
 
-    m_pActionChScaling = new QAction(QIcon(":/images/evokedSettings.png"), tr("Shows the channel scaling widget (F11)"),this);
+    m_pActionChScaling = new QAction(QIcon(":/images/channelScaling.png"), tr("Shows the channel scaling widget (F11)"),this);
     m_pActionChScaling->setShortcut(tr("F11"));
     m_pActionChScaling->setStatusTip(tr("Shows the covariance modality selection widget (F11)"));
     connect(m_pActionChScaling, &QAction::triggered, this, &RealTimeMultiSampleArrayWidget::showChScalingWidget);
@@ -428,7 +428,15 @@ void RealTimeMultiSampleArrayWidget::mouseDoubleClickEvent(QMouseEvent* mouseEve
 
 void RealTimeMultiSampleArrayWidget::showChScalingWidget()
 {
+    if(!m_pRTMSAScalingWidget)
+    {
+        m_pRTMSAScalingWidget = QSharedPointer<RealTimeMultiSampleArrayScalingWidget>(new RealTimeMultiSampleArrayScalingWidget(this));
 
+        m_pRTMSAScalingWidget->setWindowTitle("Scaling");
+
+//        connect(m_pRTMSAScalingWidget.data(), &RealTimeMultiSampleArrayScalingWidget::scalingChanged, this, &RealTimeMultiSampleArrayWidget::broadcastScaling);
+    }
+    m_pRTMSAScalingWidget->show();
 }
 
 

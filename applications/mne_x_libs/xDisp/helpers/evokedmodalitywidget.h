@@ -85,10 +85,9 @@ public:
 
     //=========================================================================================================
     /**
-    * Constructs a EvokedModalityWidget which is a child of parent.
+    * Constructs a EvokedModalityWidget which is a child of parent evoked widget.
     *
-    * @param [in] parent    parent of widget
-    * @param [in] f         widget flags
+    * @param [in] toolbox   connected real-time evoked widget
     */
     EvokedModalityWidget(RealTimeEvokedWidget *toolbox);
 
