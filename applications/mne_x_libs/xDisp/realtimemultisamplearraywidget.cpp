@@ -199,6 +199,14 @@ RealTimeMultiSampleArrayWidget::~RealTimeMultiSampleArrayWidget()
 
 //*************************************************************************************************************
 
+void RealTimeMultiSampleArrayWidget::broadcastScaling()
+{
+    m_pRTMSAModel->setScaling(m_qMapChScaling);
+}
+
+
+//*************************************************************************************************************
+
 void RealTimeMultiSampleArrayWidget::update(XMEASLIB::NewMeasurement::SPtr)
 {
     if(!m_bInitialized)
@@ -303,25 +311,6 @@ void RealTimeMultiSampleArrayWidget::init()
 
             m_pActionChScaling->setVisible(true);
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         m_bInitialized = true;
     }
@@ -432,9 +421,9 @@ void RealTimeMultiSampleArrayWidget::showChScalingWidget()
     {
         m_pRTMSAScalingWidget = QSharedPointer<RealTimeMultiSampleArrayScalingWidget>(new RealTimeMultiSampleArrayScalingWidget(this));
 
-        m_pRTMSAScalingWidget->setWindowTitle("Scaling");
+        m_pRTMSAScalingWidget->setWindowTitle("Channel Scaling");
 
-//        connect(m_pRTMSAScalingWidget.data(), &RealTimeMultiSampleArrayScalingWidget::scalingChanged, this, &RealTimeMultiSampleArrayWidget::broadcastScaling);
+        connect(m_pRTMSAScalingWidget.data(), &RealTimeMultiSampleArrayScalingWidget::scalingChanged, this, &RealTimeMultiSampleArrayWidget::broadcastScaling);
     }
     m_pRTMSAScalingWidget->show();
 }
