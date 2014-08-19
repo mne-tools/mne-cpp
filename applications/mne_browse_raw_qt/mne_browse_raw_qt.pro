@@ -69,18 +69,17 @@ DESTDIR = $${MNE_BINARY_DIR}
 
 SOURCES += rawsettings.cpp \
     main.cpp \
-    mainwindow.cpp \
     mneoperator.cpp \
     filteroperator.cpp \
     Models/rawmodel.cpp \
     Models/eventmodel.cpp \
     Delegates/rawdelegate.cpp \
+    FormFiles/mainwindow.cpp \
     FormFiles/filterwindow.cpp \
     FormFiles/eventwindow.cpp \
     FormFiles/datawindow.cpp \
 
 HEADERS += rawsettings.h \
-    mainwindow.h \
     mneoperator.h \
     filteroperator.h \
     types.h \
@@ -88,6 +87,7 @@ HEADERS += rawsettings.h \
     Models/rawmodel.h \
     Models/eventmodel.h \
     Delegates/rawdelegate.h \
+    FormFiles/mainwindow.h \
     FormFiles/filterwindow.h \
     FormFiles/eventwindow.h \
     FormFiles/datawindow.h \
@@ -95,7 +95,8 @@ HEADERS += rawsettings.h \
 FORMS += \
     FormFiles/filterwindow.ui \
     FormFiles/eventwindowdock.ui \
-    FormFiles/datawindowdock.ui
+    FormFiles/datawindowdock.ui \
+    FormFiles/mainwindow.ui \
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

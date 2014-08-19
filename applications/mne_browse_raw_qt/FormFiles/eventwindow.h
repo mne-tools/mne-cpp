@@ -42,7 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../mainwindow.h"
+#include "mainwindow.h"
 #include "ui_eventwindowdock.h"
 
 

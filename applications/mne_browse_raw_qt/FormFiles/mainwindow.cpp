@@ -62,7 +62,10 @@ MainWindow::MainWindow(QWidget *parent)
 , m_qFileEvent("./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif")
 , m_qSettings()
 , m_rawSettings()
+, ui(new Ui::MainWindowWidget)
 {
+    ui->setupUi(this);
+
     //Setup the windows first - this NEEDS to be done here because important pointers (window pointers) which are needed for further processing are generated in this function
     setupMainWindow();
     setupWindowWidgets();
@@ -76,7 +79,7 @@ MainWindow::MainWindow(QWidget *parent)
     m_pRawDelegate->setEventModelView(m_pEventModel, m_pEventTableView, m_pRawTableView);
 
     // Setup rest of the GUI
-    createMenus();
+    connectMenus();
     createLogDockWindow();
     setWindowStatus();
     m_pDataWindow->setWindowStatus();
@@ -153,63 +156,25 @@ void MainWindow::setupWindowWidgets()
 
 //*************************************************************************************************************
 
-void MainWindow::createMenus()
+void MainWindow::connectMenus()
 {
     //File
-    QMenu *fileMenu = new QMenu(tr("&File"), this);
-
-    QAction *openAction = fileMenu->addAction(tr("&Open..."));
-    openAction->setShortcuts(QKeySequence::Open);
-    connect(openAction, SIGNAL(triggered()), this, SLOT(openFile()));
-
-    QAction *writeAction = fileMenu->addAction(tr("&Save..."));
-    openAction->setShortcuts(QKeySequence::SaveAs);
-    connect(writeAction, SIGNAL(triggered()), this, SLOT(writeFile()));
-
-    fileMenu->addSeparator();
-
-    QAction *loadEvents = fileMenu->addAction(tr("&Load Events (fif)..."));
-    connect(loadEvents, SIGNAL(triggered()), this, SLOT(loadEvents()));
-
-    QAction *saveEvents = fileMenu->addAction(tr("&Save Events (fif)..."));
-    saveEvents->setDisabled(true);
-    connect(saveEvents, SIGNAL(triggered()), this, SLOT(saveEvents()));
-
-    fileMenu->addSeparator();
-
-    QAction *quitAction = fileMenu->addAction(tr("&Quit"));
-    quitAction->setShortcuts(QKeySequence::Quit);
-    connect(quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
+    connect(ui->m_openAction, SIGNAL(triggered()), this, SLOT(openFile()));
+    connect(ui->m_writeAction, SIGNAL(triggered()), this, SLOT(writeFile()));
+    connect(ui->m_loadEvents, SIGNAL(triggered()), this, SLOT(loadEvents()));
+    connect(ui->m_saveEvents, SIGNAL(triggered()), this, SLOT(saveEvents()));
+    connect(ui->m_quitAction, SIGNAL(triggered()), qApp, SLOT(quit()));
 
     //Adjust
-    QMenu *adjustMenu = new QMenu(tr("&Adjust"), this);
-
-    QAction *adjustAction = adjustMenu->addAction(tr("&Filter..."));
-    connect(adjustAction, SIGNAL(triggered()), this, SLOT(showFilterWindow()));
+    connect(ui->m_filterAction, SIGNAL(triggered()), this, SLOT(showFilterWindow()));
 
     //Windows
-    QMenu *windowsMenu = new QMenu(tr("&Windows"), this);
-
-    QAction *dataAction = windowsMenu->addAction(tr("&Show data plot..."));
-    connect(dataAction, SIGNAL(triggered()), this, SLOT(showDataWindow()));
-
-    QAction *eventAction = windowsMenu->addAction(tr("&Show event list..."));
-    connect(eventAction, SIGNAL(triggered()), this, SLOT(showEventWindow()));
-
-    QAction *logAction = windowsMenu->addAction(tr("&Show log..."));
-    connect(logAction, SIGNAL(triggered()), this, SLOT(showLogWindow()));
+    connect(ui->m_dataAction, SIGNAL(triggered()), this, SLOT(showDataWindow()));
+    connect(ui->m_eventAction, SIGNAL(triggered()), this, SLOT(showEventWindow()));
+    connect(ui->m_logAction, SIGNAL(triggered()), this, SLOT(showLogWindow()));
 
     //Help
-    QMenu *helpMenu = new QMenu(tr("&Help"), this);
-
-    QAction *aboutAction = helpMenu->addAction(tr("&About..."));
-    connect(aboutAction, SIGNAL(triggered()), this, SLOT(about()));
-
-    //add to menub
-    menuBar()->addMenu(fileMenu);
-    menuBar()->addMenu(adjustMenu);
-    menuBar()->addMenu(windowsMenu);
-    menuBar()->addMenu(helpMenu);
+    connect(ui->m_aboutAction, SIGNAL(triggered()), this, SLOT(about()));
 }
 
 
@@ -239,9 +204,6 @@ void MainWindow::setWindowStatus()
 
     //set title
     setWindowTitle(title);
-
-    //let the view update (ScrollBars etc.)
-    m_pRawTableView->resizeColumnsToContents();
 }
 
 
@@ -331,7 +293,7 @@ void MainWindow::openFile()
     m_pDataWindow->setWindowStatus();
 
     //set position of QScrollArea
-    setScrollBarPosition(0);
+    m_pDataWindow->getTableView()->horizontalScrollBar()->setValue(0);
 
     //Set fiffInfo in event model
     m_pEventModel->setFiffInfo(m_pRawModel->m_fiffInfo);
@@ -405,15 +367,6 @@ void MainWindow::saveEvents()
         qDebug("ERROR saving fiff event data file %s",filename.toLatin1().data());
 
     m_pDataWindow->setWindowStatus();
-}
-
-
-//*************************************************************************************************************
-
-void MainWindow::setScrollBarPosition(int pos)
-{
-    m_pRawTableView->horizontalScrollBar()->setValue(pos);
-    qDebug() << "MainWindow: m_iAbsFiffCursor position set to" << (m_pRawModel->firstSample()+pos);
 }
 
 
