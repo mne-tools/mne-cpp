@@ -51,6 +51,7 @@
 #include <QWidget>
 #include <QStringList>
 #include <QLineEdit>
+#include <QMap>
 
 
 //*************************************************************************************************************
@@ -98,7 +99,7 @@ signals:
 private:
     RealTimeMultiSampleArrayWidget * m_pRTMSAW;     /**< Connected real-time evoked widget */
 
-    QList<QLineEdit*>   m_qListModalityLineEdit;    /**< List of modality scalings */
+    QMap<qint32, QLineEdit*>   m_qMapScalingLineEdit;    /**< Map of types and channel scaling line edits */
 };
 
 } // NAMESPACE
