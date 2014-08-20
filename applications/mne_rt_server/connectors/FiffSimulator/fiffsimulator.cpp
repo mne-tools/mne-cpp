@@ -101,13 +101,7 @@ const QString FiffSimulator::Commands::SIMFILE      = "simfile";
 
 FiffSimulator::FiffSimulator()
 : m_pFiffProducer(new FiffProducer(this))
-//, m_sResourceDataPath(QString("D:/Data/MEG/mind006/mind006_051209_auditory01_raw.fif"))
 , m_sResourceDataPath(QString("%1/MNE-sample-data/MEG/sample/sample_audvis_raw.fif").arg(QCoreApplication::applicationDirPath()))
-
-//, m_sResourceDataPath(QString("D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2014_02_24_Lorenz_Esch_008/Original/EEG_data_001_involuntary_left_tapping_raw.fif"))
-//, m_sResourceDataPath(QString("D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2014_02_24_Lorenz_Esch_008/Original/EEG_data_001_base_raw.fif"))
-//, m_sResourceDataPath(QString("D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2014_02_24_Lorenz_Esch_008/Original/EEG_data_001_involuntary_right_tapping_raw.fif"))
-//, m_sResourceDataPath(QString("D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2014_02_24_Lorenz_Esch_008/Processed/filtered/EEG_data_001_involuntary_right_tapping_filtered_07_40_raw.fif"))
 , m_uiBufferSampleSize(100)//(4)
 , m_AccelerationFactor(1.0)
 , m_TrueSamplingRate(0.0)
@@ -317,6 +311,36 @@ const char* FiffSimulator::getName() const
 
 void FiffSimulator::init()
 {
+    //
+    // Read cfg file
+    //
+    QFile t_qFile(QString("%1/mne_rt_server_plugins/FiffSimulation.cfg").arg(QCoreApplication::applicationDirPath()));
+    if (t_qFile.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        QTextStream in(&t_qFile);
+        QString key = "simFile = ";
+        while (!in.atEnd()) {
+            QString line = in.readLine();
+            if(line.contains(key, Qt::CaseInsensitive))
+            {
+                qint32 idx = line.indexOf(key);
+                idx += key.size();
+
+                QString sFileName = line.mid(idx, line.size()-idx);
+
+                QFile t_qFileMeas(sFileName);
+
+                if (t_qFileMeas.open(QIODevice::ReadOnly))
+                {
+                    m_sResourceDataPath = sFileName;
+                    std::cout << "\tLoad simulation file: " << sFileName.toLatin1().constData() << std::endl;
+                    t_qFileMeas.close();
+                }
+            }
+        }
+        t_qFile.close();
+    }
+
     if(m_pRawMatrixBuffer)
         delete m_pRawMatrixBuffer;
     m_pRawMatrixBuffer = NULL;

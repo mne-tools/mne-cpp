@@ -142,6 +142,7 @@ private:
     // Scaling
     float m_fMaxValue;     /**< Maximum value of the data to plot  */
     float m_fScaleY;       /**< Maximum amplitude of plot (max is m_dPlotHeight/2) */
+
 };
 
 } // NAMESPACE

@@ -111,6 +111,7 @@ QSharedPointer<IPlugin> FiffSimulator::clone() const
 void FiffSimulator::init()
 {
     m_pRTMSA_FiffSimulator = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "FiffSimulator", "Fiff Simulator Output");
+    m_pRTMSA_FiffSimulator->data()->setName(this->getName());//Provide name to auto store widget settings
     m_outputConnectors.append(m_pRTMSA_FiffSimulator);
 
     // Start FiffSimulatorProducer
@@ -400,6 +401,8 @@ void FiffSimulator::run()
         }
         //pop matrix
         matValue = m_pRawMatrixBuffer_In->pop();
+
+//        std::cout << "Mat Value\n" << matValue.row(306) << std::endl;
 
         //emit values
         for(qint32 i = 0; i < matValue.cols(); ++i)

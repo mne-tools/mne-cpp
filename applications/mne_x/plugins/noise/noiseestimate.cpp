@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     noise_estimate.cpp
+* @file     noiseestimate.cpp
 * @author   Limin Sun <liminsun@nmr.mgh.harvard.edu>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "noise_estimate.h"
+#include "noiseestimate.h"
 #include "FormFiles/noiseestimatesetupwidget.h"
 
 //*************************************************************************************************************
@@ -115,6 +115,7 @@ void NoiseEstimate::init()
 
     // Output
     m_pFSOutput = PluginOutputData<FrequencySpectrum>::create(this, "Noise Estimate Out", "Noise Estimate output data");
+    m_pFSOutput->data()->setName(this->getName());//Provide name to auto store widget settings
     m_outputConnectors.append(m_pFSOutput);
 
 //    m_pRTMSAOutput->data()->setMultiArraySize(100);
@@ -175,8 +176,11 @@ bool NoiseEstimate::stop()
     //Wait until this thread is stopped
     m_bIsRunning = false;
 
+    m_pRtNoise->stop();
+
     if(m_bProcessData)
     {
+
         //In case the semaphore blocks the thread -> Release the QSemaphore and let it exit from the pop function (acquire statement)
         m_pBuffer->releaseFromPop();
         m_pBuffer->releaseFromPush();
@@ -202,7 +206,7 @@ IPlugin::PluginType NoiseEstimate::getType() const
 
 QString NoiseEstimate::getName() const
 {
-    return "NoiseEstimate Toolbox";
+    return "Noise Estimation";
 }
 
 
@@ -235,7 +239,7 @@ void NoiseEstimate::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
         //Fiff information
         if(!m_pFiffInfo)
         {
-            m_pFiffInfo = pRTMSA->getFiffInfo();
+            m_pFiffInfo = pRTMSA->info();
             emit fiffInfoAvailable();
         }
 
