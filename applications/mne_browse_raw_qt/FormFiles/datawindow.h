@@ -90,13 +90,13 @@ public:
 
     //=========================================================================================================
     /**
-    * Setup the table view of the data window.
+    * Setup the table view of the data window
     */
     void setupRawViewSettings();
 
     //=========================================================================================================
     /**
-    * Returns the QTableView of this window.
+    * Returns the QTableView of this window
     */
     QTableView* getTableView();
 
@@ -107,6 +107,12 @@ public:
     void setWindowStatus();
 
 private:
+    //=========================================================================================================
+    /**
+    * Setup the tool bar of the data window.
+    */
+    void setupToolBar();
+
     //=========================================================================================================
     /**
     * event reimplemented virtual function to handle the resizing of the data dock window

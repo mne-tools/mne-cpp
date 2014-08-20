@@ -62,15 +62,7 @@ DataWindow::DataWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-
-    QToolBar *toolBar = new QToolBar();
-    toolBar->setOrientation(Qt::Vertical);
-    toolBar->setFixedWidth(30);
-    toolBar->setMovable(false);
-    toolBar->addAction(new QAction("Test", this));
-
-    ui->horizontalLayout->addWidget(toolBar);
-
+    setupToolBar();
 }
 
 
@@ -130,6 +122,26 @@ void DataWindow::setWindowStatus()
 
     //set title
     setWindowTitle(title);
+}
+
+
+//*************************************************************************************************************
+
+void DataWindow::setupToolBar()
+{
+    //Create toolbar
+    QToolBar *toolBar = new QToolBar();
+    toolBar->setOrientation(Qt::Vertical);
+    //toolBar->setFixedWidth(30);
+    toolBar->setMovable(false);
+
+    //Add actions to tool bar
+    QAction* addEventAction = new QAction(QIcon(":/Resources/Images/addEvent.png"),tr("Add event"), this);
+    addEventAction->setStatusTip(tr("Add an event to the event list"));
+    //connect(addEventAction, SIGNAL(triggered()), this, SLOT(newFile()));
+    toolBar->addAction(addEventAction);
+
+    ui->horizontalLayout->addWidget(toolBar);
 }
 
 
