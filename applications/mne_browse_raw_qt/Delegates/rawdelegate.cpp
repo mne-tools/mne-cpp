@@ -72,7 +72,7 @@ RawDelegate::RawDelegate(QObject *parent)
 , m_bShowSelectedEventsOnly(false)
 , m_bActivateEvents(true)
 {
-    m_dDefaultPlotHeight = m_qSettings.value("RawDelegate/plotheight").toDouble();
+    m_iDefaultPlotHeight = m_qSettings.value("RawDelegate/plotheight").toDouble();
     m_dDx = m_qSettings.value("RawDelegate/dx").toDouble();
     m_nhlines = m_qSettings.value("RawDelegate/nhlines").toDouble();
 
@@ -338,12 +338,12 @@ void RawDelegate::plotEvents(const QModelIndex &index, const QStyleOptionViewIte
                 pen.setColor(colorTemp);
                 painter->setPen(pen);
 
-                //Draw line from sample position (x) and highest to lowest y position of the column widget - Add +m_qSettings.value("EventDesignParameters/event_marker_width").toInt() to avoid painting ovre the edge of the column widget
-                painter->drawLine(option.rect.x() + sampleValue, option.rect.y(), option.rect.x() + sampleValue, option.rect.y() - option.rect.height() + m_qSettings.value("EventDesignParameters/event_marker_width").toInt());
+                //Draw line from sample position (x) and highest to lowest y position of the column widget - Add -m_qSettings.value("EventDesignParameters/event_marker_width").toInt() to avoid painting ovre the edge of the column widget
+                painter->drawLine(option.rect.x() + sampleValue, option.rect.y(), option.rect.x() + sampleValue, option.rect.y() + option.rect.height() - m_qSettings.value("EventDesignParameters/event_marker_width").toInt());
             } // END for statement
         } // END if statement event in data range
     } // END if statement plot all
-    else { //Only plot selected event
+    else { //Only plot selected events
         QModelIndexList indexes = m_pEventView->selectionModel()->selectedIndexes();
 
         for(int i = 0; i<indexes.size(); i++) {

@@ -129,7 +129,7 @@ public:
     void setEventModelView(EventModel *model, QTableView* eventView, QTableView *rawView);
 
     // Plots settings
-    double      m_dDefaultPlotHeight;       /**< The height of the plot */
+    int         m_iDefaultPlotHeight;       /**< The height of the plot */
     bool        m_bShowSelectedEventsOnly;  /**< When true all events are plotted otherwise only plot selected event */
     bool        m_bActivateEvents;          /**< Flag for plotting events */
 
