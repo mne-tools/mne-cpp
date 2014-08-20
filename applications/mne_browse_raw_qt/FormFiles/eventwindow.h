@@ -100,15 +100,17 @@ public:
     QTableView* getTableView();
 
 private:
-    Ui::EventWindowDockWidget *ui;
-
-    MainWindow* m_pMainWindow;
-
     //=========================================================================================================
     /**
     * Inits all the QCheckBoxes of the event window.
     */
     void initCheckBoxes();
+
+    Ui::EventWindowDockWidget *ui;
+
+    MainWindow* m_pMainWindow;
+
+    QSettings       m_qSettings;
 
 protected slots:
     //=========================================================================================================

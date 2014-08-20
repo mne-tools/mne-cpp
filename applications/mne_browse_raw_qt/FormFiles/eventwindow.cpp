@@ -121,7 +121,7 @@ void EventWindow::jumpToEvent(const QModelIndex & current, const QModelIndex & p
     //Get the sample value
     int sample = m_pMainWindow->m_pEventModel->data(index, Qt::DisplayRole).toInt();
 
-    //Jump to sample - put sample in the middle of the view
+    //Jump to sample - put sample in the middle of the view - the viewport holds the width of the are which is changed through scrolling
     int rawTableViewColumnWidth = m_pMainWindow->m_pRawTableView->viewport()->width();
 
     if(sample-rawTableViewColumnWidth/2 < rawTableViewColumnWidth/2) //events lie in the first half of the data window at the beginning of the loaded data -> cannot centralize view on event

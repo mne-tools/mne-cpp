@@ -63,6 +63,7 @@ DataWindow::DataWindow(QWidget *parent) :
     ui->setupUi(this);
 
     setupToolBar();
+    setupSampleLabels();
 }
 
 
@@ -92,8 +93,8 @@ void DataWindow::setupRawViewSettings()
     QScroller::grabGesture(ui->m_tableView_rawTableView,QScroller::MiddleMouseButtonGesture);
 
     //connect QScrollBar with model in order to reload data samples
-    connect(ui->m_tableView_rawTableView->horizontalScrollBar(),SIGNAL(valueChanged(int)),
-            m_pMainWindow->m_pRawModel,SLOT(updateScrollPos(int)));
+    connect(ui->m_tableView_rawTableView->horizontalScrollBar(),&QScrollBar::valueChanged,
+            m_pMainWindow->m_pRawModel,&RawModel::updateScrollPos);
 }
 
 //*************************************************************************************************************
@@ -140,7 +141,19 @@ void DataWindow::setupToolBar()
     //connect(addEventAction, SIGNAL(triggered()), this, SLOT(newFile()));
     toolBar->addAction(addEventAction);
 
-    ui->horizontalLayout->addWidget(toolBar);
+    int layoutRows = ui->m_gridLayout->rowCount();
+    int layoutColumns = ui->m_gridLayout->columnCount();
+
+    ui->m_gridLayout->addWidget(toolBar, 0, layoutColumns, layoutRows, 1);
+}
+
+
+//*************************************************************************************************************
+
+void DataWindow::setupSampleLabels()
+{
+    connect(ui->m_tableView_rawTableView->horizontalScrollBar(),&QScrollBar::valueChanged,
+            this,&DataWindow::setSampleLabels);
 }
 
 
@@ -148,7 +161,7 @@ void DataWindow::setupToolBar()
 
 bool DataWindow::event(QEvent * event)
 {
-    if(event->type() == QEvent::Paint) {
+    if(event->type() == QEvent::Resize) {
         //Manually resize QDockWidget - This needs to be done because there is no typical central widget in QMainWindow - QT does not do a good job when resizing dock widgets (known issue)
         int newWidth;
 
@@ -162,6 +175,9 @@ bool DataWindow::event(QEvent * event)
         }
 
         resize(newWidth, this->size().height());
+
+        //Set sample labels to new viewport adjustments
+        setSampleLabels();
     }
 
     return QDockWidget::event(event);
@@ -257,3 +273,24 @@ void DataWindow::customContextMenuRequested(QPoint pos)
     //show context menu
     menu->popup(m_pMainWindow->m_pRawTableView->viewport()->mapToGlobal(pos));
 }
+
+
+//*************************************************************************************************************
+
+void DataWindow::setSampleLabels()
+{
+    //Set sapce width so that min sample and max sample are in line with the data plot
+    ui->m_horizontalSpacer_Min->setFixedWidth(ui->m_tableView_rawTableView->verticalHeader()->width());
+    ui->m_horizontalSpacer_Max->setFixedWidth(ui->m_tableView_rawTableView->verticalScrollBar()->width());
+
+    //calculate sample range which is currently displayed in the view
+    //Note: the viewport holds the width of the area which is changed through scrolling
+    int minSampleRange = ui->m_tableView_rawTableView->horizontalScrollBar()->value() + m_pMainWindow->m_pRawModel->firstSample();
+    int maxSampleRange = minSampleRange + ui->m_tableView_rawTableView->viewport()->width();
+
+    //Set values as string
+    QString stringTemp;
+    ui->m_label_sampleMin->setText(QString("%1 / %2 sec").arg(stringTemp.number(minSampleRange)).arg(stringTemp.number(minSampleRange/m_pMainWindow->m_pRawModel->m_fiffInfo.sfreq)));
+    ui->m_label_sampleMax->setText(QString("%1 / %2 sec").arg(stringTemp.number(maxSampleRange)).arg(stringTemp.number(maxSampleRange/m_pMainWindow->m_pRawModel->m_fiffInfo.sfreq)));
+}
+
