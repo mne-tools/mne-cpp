@@ -100,7 +100,7 @@ void RawSettings::init()
         m_qSettings.setValue("dx",DELEGATE_DX);
         m_qSettings.setValue("nhlines",DELEGATE_NHLINES);
 
-//        //maximum values for different channels types according to FiffChInfo
+        //maximum values for different channels types according to FiffChInfo
         m_qSettings.setValue("max_meg_grad",DELEGATE_MAX_MEG_GRAD);
         m_qSettings.setValue("max_meg_mag",DELEGATE_MAX_MEG_MAG);
         m_qSettings.setValue("max_eeg",DELEGATE_MAX_EEG);
@@ -108,4 +108,35 @@ void RawSettings::init()
         m_qSettings.setValue("max_stim",DELEGATE_MAX_STIM);
 
     m_qSettings.endGroup();
+
+    //EventDesignParameters
+    m_qSettings.beginGroup("EventDesignParameters");
+        //Event colors
+        QVariant variant;
+        variant = QColor(Qt::black);
+        m_qSettings.setValue("event_color_default",variant);
+        variant = QColor(Qt::blue);
+        m_qSettings.setValue("event_color_1",variant);
+        variant = QColor(Qt::magenta);
+        m_qSettings.setValue("event_color_2",variant);
+        variant = QColor(Qt::green);
+        m_qSettings.setValue("event_color_3",variant);
+        variant = QColor(Qt::red);
+        m_qSettings.setValue("event_color_4",variant);
+        variant = QColor(Qt::cyan);
+        m_qSettings.setValue("event_color_5",variant);
+        variant = QColor(Qt::yellow);
+        m_qSettings.setValue("event_color_32",variant);
+        variant = QColor(Qt::darkBlue);
+        m_qSettings.setValue("event_color_998",variant);
+        variant = QColor(Qt::darkCyan);
+        m_qSettings.setValue("event_color_999",variant);
+
+        //Event marker width
+        m_qSettings.setValue("event_marker_width",EVENT_MARKER_WIDTH);
+
+        //Event marker opacity
+        m_qSettings.setValue("event_marker_opacity",EVENT_MARKER_OPACITY);
+    m_qSettings.endGroup();
+
 }

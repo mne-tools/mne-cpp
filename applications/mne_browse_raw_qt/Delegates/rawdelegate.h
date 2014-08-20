@@ -1,7 +1,7 @@
 //=============================================================================================================
 /**
-* @file     eventmodel.h
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+* @file     rawdelegate.h
+* @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 *           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
@@ -10,7 +10,7 @@
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Lorenz Esch, Christoph Dinh, Matti Hamalainen and Jens Haueisen. All rights reserved.
+* Copyright (C) 2014, Florian Schlembach, Christoph Dinh, Matti Hamalainen and Jens Haueisen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -31,44 +31,30 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    This class represents the model of the model/view framework of mne_browse_raw_qt application.
-*           It is derived from QAbstractTableModel so the virtual functions rowCount(),columnCount() and data()
-*           needed to be reimplemented. The delegate requests the data for any individual table cell by
-*           invoking data(QModelIndex index, int role) and a certain role. DisplayRole is the standard role
-*           for requesting the plain data. Other roles such as BackgroundRole are requested to fill a cell
-*           with a certain background color with respect to the individual index.
-*           For further information see [1].
+* @brief    This class represents the delegate of the model/view framework of mne_browse_raw_qt application.
+*           Since it is derived from the QAbstractItemDelegate class [1], the virtual functions paint() und sizeHint()
+*           need to be reimplemented.
+*           The paint() function is invoked from the connected QTableView for each table cell for any individual
+*           item with a certain QModelIndex. The task of this function is to paint this cell with the data
+*           that is requested by index.model()->data(index,Qt::DisplayRole); with the corresponding QModelIndex.
 *
-*           The way how the data is organized is totally up to the model. In our case, the raw and processed
-*           data is stored in stored in the two matrices m_data[i] and m_procData[i] (both are QList that contains MatrixXdR), respectively. (nchans x m_iWindowSize)
-*           The data is loaded and displayed blockwise. If the user scrolls close (meaning distanced smaller than
-*           m_iReloadPos) to the loaded edge, the subsequent block is loaded from the fiff file. The maximum number
-*           of loaded window blocks is determined by the parameter m_maxWindows. If m_maxWindows is reached and another
-*           block is to be loaded, the first or last block (depending on whether the user scrolls to the right or left edge)
-*           is removed from m_data, pretty much like a circular buffer. The logic of the reloading is managed by the
-*           slot updateScrollPos, which obtains the value from the horizontal QScrollBar being part of the connected TableView.
-*
-*           In order to not freeze the GUI when reloading new data or filtering data, the RawModel class makes heavy use
-*           of the QtConcurrent features. [2]
-*           Therefore, the methods updateOperatorsConcurrently() and readSegment() is run in a background-thread. Once the results
-*           are ready the m_operatorFutureWatcher and m_reloadFutureWatcher emits a signal that is connect to the slots
-*           insertProcessedData() and insertReloadedData(), respectively.
-*
-*           MNEOperators such as FilterOperators are stored in m_Operators. The MNEOperators that are applied to any
-*           individual channel are stored in the QMap m_assignedOperators.
-*
-*           [1] http://qt-project.org/doc/qt-5/QAbstractTableModel.html
-*           [2] http://qt-project.org/doc/qt-5.0/qtconcurrent/qtconcurrent-index.html
+*           [1] http://qt-project.org/doc/qt-5/QAbstractItemDelegate.html
 *
 */
 
-#ifndef EVEMODEL_H
-#define EVEMODEL_H
+#ifndef RAWDELEGATE_H
+#define RAWDELEGATE_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
+
+#include "../Models/rawmodel.h"
+#include "../Models/eventmodel.h"
+
+#include "../types.h"
+#include "../rawsettings.h"
 
 
 //*************************************************************************************************************
@@ -76,15 +62,13 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QAbstractTableModel>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Eigen INCLUDES
-//=============================================================================================================
-
-#include <Eigen/Core>
+#include <QDebug>
+#include <QAbstractItemDelegate>
+#include <QPainter>
+#include <QPainterPath>
+#include <QPointF>
+#include <QRect>
+#include <QTableView>
 
 
 //*************************************************************************************************************
@@ -94,6 +78,15 @@
 
 #include <fiff/fiff.h>
 #include <mne/mne.h>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Eigen INCLUDES
+//=============================================================================================================
+
+#include <Eigen/Core>
+#include <Eigen/SparseCore>
 
 
 //*************************************************************************************************************
@@ -115,70 +108,74 @@ namespace MNEBrowseRawQt
 
 //=============================================================================================================
 /**
-* DECLARE CLASS EventModel
+* DECLARE CLASS RawDelegate
 */
-class EventModel : public QAbstractTableModel
+class RawDelegate : public QAbstractItemDelegate
 {
     Q_OBJECT
-
-    friend class MainWindow;
-
 public:
-    EventModel(QObject *parent);
-    EventModel(QFile& qFile, QObject *parent);
-    virtual int rowCount(const QModelIndex &parent = QModelIndex()) const;
-    virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
-    QVariant headerData(int section, Qt::Orientation orientation, int role) const;
-    virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+    RawDelegate(QObject *parent = 0);
+    virtual void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
     //=========================================================================================================
     /**
-    * loadEventData loads fiff event data file.
+    * setEventModelView creates the QPointer path for the data plot.
     *
-    * @param p_IODevice fiff data event file to read from
+    * @param[in] model holds a pointer to the event model. This model needs to be set in order to access the event data for plotting.
+    * @param[in] eventView holds a pointer to the event view. This view needs to be set in order to access the selected event data for plotting.
+    * @param[in] rawView holds a pointer to the raw view. This view needs to be set in order to access the raw view for manual viewport updating.
     */
-    bool loadEventData(QFile& qFile);
+    void setEventModelView(EventModel *model, QTableView* eventView, QTableView *rawView);
 
-    //=========================================================================================================
-    /**
-    * saveEventData saves events to a fiff event data file.
-    *
-    * @param p_IODevice fiff data event file to save to
-    */
-    bool saveEventData(QFile& qFile);
+    // Plots settings
+    int         m_iDefaultPlotHeight;       /**< The height of the plot */
+    bool        m_bShowSelectedEventsOnly;  /**< When true all events are plotted otherwise only plot selected event */
+    bool        m_bActivateEvents;          /**< Flag for plotting events */
 
-    //=========================================================================================================
-    /**
-    * setFiffInfo sets the fiff info variabel.
-    *
-    * @param fiffInfo fiff infp variabel
-    */
-    void setFiffInfo(FiffInfo& fiffInfo);
-
-    //=========================================================================================================
-    /**
-    * setFirstSample sets the first/starting sample of the loaded fiff data file.
-    *
-    * @param firstSample first sample value
-    */
-    void setFirstSample(int firstSample);
+    // Scaling
+    double      m_dMaxValue;                /**< Maximum value of the data to plot */
+    double      m_dScaleY;                  /**< Maximum amplitude of plot (max is m_dPlotHeight/2) */
+    double      m_dDx;                      /**< pixel difference to the next sample */
 
 private:
     //=========================================================================================================
     /**
-    * clearModel clears all model's members
+    * createPlotPath creates the QPointer path for the data plot.
+    *
+    * @param[in] index QModelIndex for accessing associated data and model object.
+    * @param[in,out] path The QPointerPath to create for the data plot.
     */
-    void clearModel();
+    void createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QList<RowVectorPair>& listPairs) const;
 
-    MatrixXi        m_data;         /**< Matrix that holds the loaded events from the event file. */
+    //=========================================================================================================
+    /**
+    * createGridPath Creates the QPointer path for the grid plot.
+    *
+    * @param[in,out] path The row vector of the data matrix <1 x nsamples>.
+    * @param[in] data The row vector of the data matrix <1 x nsamples>.
+    */
+    void createGridPath(QPainterPath& path, const QStyleOptionViewItem &option, QList<RowVectorPair>& listPairs) const;
 
-    FiffInfo        m_fiffInfo;     /**< fiff info of whole fiff file */
+    //=========================================================================================================
+    /**
+    * plotEvents Plots the events.
+    *
+    * @param[in] index QModelIndex for accessing associated data and model object.
+    * @param[in] painter The painter of the current table item.
+    */
+    void plotEvents(const QModelIndex &index, const QStyleOptionViewItem &option, QPainter *painter) const;
 
-    int             m_iFirstSample; /**< holds the first/starting sample of the fiff data file */
+    //Settings
+    qint8           m_nhlines;              /**< Number of horizontal lines for the grid plot */
+    QSettings       m_qSettings;
+
+    //Event model view
+    EventModel*     m_pEventModel;           /**< Pointer to the event model. */
+    QTableView*     m_pEventView;            /**< Pointer to the event view. */
+    QTableView*     m_pRawView;              /**< Pointer to the raw view. */
 };
 
 } // NAMESPACE
 
-#endif // EVEMODEL_H
-
-
+#endif // RAWDELEGATE_H

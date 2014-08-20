@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
-* @file     tmsiaboutwidget.h
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
+* @file     filterwindow.cpp
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     September, 2013
+* @date     August, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,37 +30,16 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the TMSIAboutWidget class.
+* @brief    Contains the implementation of the FilterWindow class.
 *
 */
-
-#ifndef TMSIABOUTWIDGET_H
-#define TMSIABOUTWIDGET_H
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_tmsiabout.h"
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QtWidgets>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE TMSIPlugin
-//=============================================================================================================
-
-namespace TMSIPlugin
-{
+#include "filterwindow.h"
 
 
 //*************************************************************************************************************
@@ -68,44 +47,25 @@ namespace TMSIPlugin
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace MNEBrowseRawQt;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-
-//=============================================================================================================
-/**
-* DECLARE CLASS TMSIAboutWidget
-*
-* @brief The TMSIAboutWidget class provides the about dialog for the TMSI.
-*/
-class TMSIAboutWidget : public QDialog
+FilterWindow::FilterWindow(QWidget *parent) :
+    QWidget(parent, Qt::Window),
+    ui(new Ui::FilterWindowWidget)
 {
-    Q_OBJECT
+    ui->setupUi(this);
+}
 
-public:
 
-    //=========================================================================================================
-    /**
-    * Constructs a TMSIAboutWidget dialog which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new TMSIAboutWidget becomes a window. If parent is another widget, TMSIAboutWidget becomes a child window inside parent. TMSIAboutWidget is deleted when its parent is deleted.
-    */
-    TMSIAboutWidget(QWidget *parent = 0);
+//*************************************************************************************************************
 
-    //=========================================================================================================
-    /**
-    * Destroys the TMSIAboutWidget.
-    * All TMSIAboutWidget's children are deleted first. The application exits if TMSIAboutWidget is the main widget.
-    */
-    ~TMSIAboutWidget();
-
-private:
-    Ui::TMSIAboutWidgetClass ui;    /**< Holds the user interface for the TMSIAboutWidgetClass.*/
-};
-
-} // NAMESPACE
-
-#endif // TMSIABOUTWIDGET_H
+FilterWindow::~FilterWindow()
+{
+    delete ui;
+}

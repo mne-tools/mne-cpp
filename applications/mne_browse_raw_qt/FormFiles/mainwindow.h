@@ -71,13 +71,18 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "rawmodel.h"
-#include "eventmodel.h"
-#include "rawdelegate.h"
+#include "../Models/rawmodel.h"
+#include "../Models/eventmodel.h"
+#include "../Delegates/rawdelegate.h"
 
-#include "info.h"
-#include "types.h"
-#include "rawsettings.h"
+#include "../info.h"
+#include "../types.h"
+#include "../rawsettings.h"
+
+#include "filterwindow.h"
+#include "eventwindow.h"
+#include "datawindow.h"
+#include "aboutwindow.h"
 
 
 //*************************************************************************************************************
@@ -85,34 +90,14 @@
 // Qt INCLUDES
 //=============================================================================================================
 
-#include <QApplication>
-#include <QDebug>
-#include <QSettings>
-#include <QMainWindow>
-#include <QWidget>
+#include "ui_mainwindow.h"
 
 #include <QFileDialog>
-#include <QFile>
-#include <QMenu>
-#include <QMenuBar>
-#include <QAction>
-#include <QSignalMapper>
-
-#include <QTableView>
-#include <QHeaderView>
-#include <QVBoxLayout>
-#include <QGroupBox>
-#include <QScrollArea>
 #include <QScrollBar>
 #include <QScroller>
-
-#include <QDockWidget>
 #include <QTextBrowser>
-
-#include <QDebug>
-#include <QPainter>
-
 #include <QMessageBox>
+#include <QPixMap>
 
 
 //*************************************************************************************************************
@@ -155,7 +140,11 @@ namespace MNEBrowseRawQt
 * DECLARE CLASS MainWindow
 */
 class MainWindow : public QMainWindow
-{
+{    
+    friend class FilterWindow;
+    friend class EventWindow;
+    friend class DataWindow;
+
     Q_OBJECT
 
 public:
@@ -171,22 +160,6 @@ public:
     * @param [in] lglvl message level; Message is displayed depending on its level.
     */
     void writeToLog(const QString& logMsg, LogKind lgknd, LogLevel lglvl);
-
-public slots:
-
-    //=========================================================================================================
-    /**
-    * @brief customContextMenuRequested
-    * @param pos is the position, where the right-click occurred
-    */
-    void customContextMenuRequested(QPoint pos);
-
-    //=========================================================================================================
-    /**
-    * setScrollBarPosition sets the position of the horizontal scrollbar
-    * @param pos the absolute position of the scrollbar
-    */
-    void setScrollBarPosition(int pos);
 
 private slots:
     //=========================================================================================================
@@ -215,9 +188,15 @@ private slots:
 
     //=========================================================================================================
     /**
-     * about opens the about dialog
+     * showAboutWindow opens the about dialog
      */
-    void about();
+    void showAboutWindow();
+
+    //=========================================================================================================
+    /**
+    * showFilterWindow shows the filtering window
+    */
+    void showFilterWindow();
 
     //=========================================================================================================
     /**
@@ -227,15 +206,15 @@ private slots:
 
     //=========================================================================================================
     /**
-    * jumpToEvent jumps to a event specified in the event table view
-    *
-    * @param [in] current model item focused in the view
-    * @param [in] previous model item focused in the view
+    * showLogWindow shows the log window
     */
-    void jumpToEvent(const QModelIndex &current, const QModelIndex &previous);
+    void showLogWindow();
 
-signals:
-    void testSignal();
+    //=========================================================================================================
+    /**
+    * showDataWindow shows the data window
+    */
+    void showDataWindow();
 
 private:
     //=========================================================================================================
@@ -252,27 +231,21 @@ private:
 
     //=========================================================================================================
     /**
-    * setupView sets up the QTableView being part of the model/view framework and connects them with previously created RawModel and RawDelegate.
+    * setupViews sets up the QTableView being part of the model/view framework and connects them with previously created RawModel and RawDelegate.
     */
-    void setupView();
+    void setupViews();
 
     //=========================================================================================================
     /**
-    * setupLayout create and connects the individual elements of the layout.
+    * setupWindowWidgets sets up the windows which can be shown during runtime (i.e. filter window, event list window, etc.).
     */
-    void setupLayout();
+    void setupWindowWidgets();
 
     //=========================================================================================================
     /**
-    * setupViewSettings set the settings of the view such as size policies, scrolling behaviour etc.
+    * connectMenus sets up the filemenu
     */
-    void setupViewSettings();
-
-    //=========================================================================================================
-    /**
-    * createMenus sets up the filemenu
-    */
-    void createMenus();
+    void connectMenus();
 
     //=========================================================================================================
     /**
@@ -290,9 +263,9 @@ private:
 
     //=========================================================================================================
     /**
-    * setWindow makes settings that are related to the MainWindow
+    * setupMainWindow makes settings that are related to the MainWindow
     */
-    void setWindow();
+    void setupMainWindow();
 
     //=========================================================================================================
     /**
@@ -309,9 +282,13 @@ private:
     EventModel*         m_pEventModel;              /**< the QAbstractTable event model being part of the model/view framework of Qt */
     QTableView*         m_pRawTableView;            /**< the QTableView being part of the model/view framework of Qt for the fiff data handling*/
     QTableView*         m_pEventTableView;          /**< the QTableView being part of the model/view framework of Qt for the fiff event handling */
-    RawDelegate*        m_pRawDelegate;             /**< the QAbstractDelegate being part of the model/view framework of Qt */
+    RawDelegate*        m_pRawDelegate;             /**< the QAbstractDelegate being part of the raw model/view framework of Qt */
 
-    QWidget*            m_wEventWidget;             /**< Event widget which display the event view */
+    //Window widgets
+    EventWindow*        m_pEventWindow;             /**< Event widget which display the event view */
+    FilterWindow*       m_pFilterWindow;            /**< Filter widget which display the filter options for the user */
+    DataWindow*         m_pDataWindow;              /**< Data widget which display the data for the user */
+    AboutWindow*        m_pAboutWindow;             /**< About widget which displays information about this application*/
 
     //application settings
     QSettings           m_qSettings;
@@ -322,6 +299,7 @@ private:
     QTextBrowser*       m_pTextBrowser_Log;         /** a textbox being part of the log feature */
     LogLevel            m_eLogLevelCurrent;         /**< Holds the current log level.*/
 
+    Ui::MainWindowWidget* ui;
 };
 
 } //NAMESPACE

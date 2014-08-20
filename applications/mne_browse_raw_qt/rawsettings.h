@@ -60,6 +60,7 @@
 #include <QObject>
 #include <QSettings>
 #include <QSize>
+#include <QColor>
 
 
 //*************************************************************************************************************
@@ -90,6 +91,12 @@
 #define DELEGATE_MAX_EOG 1e-3 // kind=FIFFV_EOG_CH
 #define DELEGATE_MAX_STIM 5 // kind=FIFFV_STIM_CH
 
+//Define Event design parameters
+//Event marker width
+#define EVENT_MARKER_WIDTH 3 // in pixels
+
+//Event marker opacity
+#define EVENT_MARKER_OPACITY 85 // opacity of the markers and backgorunds in the table columns
 
 //*************************************************************************************************************
 //=============================================================================================================

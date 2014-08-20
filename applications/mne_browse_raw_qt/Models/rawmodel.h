@@ -65,13 +65,14 @@
 #ifndef RAWMODEL_H
 #define RAWMODEL_H
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "types.h"
-#include "filteroperator.h"
+#include "../types.h"
+#include "../filteroperator.h"
 
 
 //*************************************************************************************************************
@@ -156,7 +157,6 @@ public:
     */
     bool loadFiffData(QFile& qFile);
 
-
     //=========================================================================================================
     /**
     * writeFiffData writes a new fiff data file
@@ -178,8 +178,8 @@ public:
     FiffInfo                m_fiffInfo;         /**< fiff info of whole fiff file */
 
     //Filter operators
-    QMap<QString,QSharedPointer<MNEOperator> > m_Operators;     /**< generated MNEOperator types (FilterOperator,PCA etc.) */
-    QMap<int,QSharedPointer<MNEOperator> > m_assignedOperators; /**< Map of MNEOperator types to channels*/
+    QMap<QString,QSharedPointer<MNEOperator> >  m_Operators;            /**< generated MNEOperator types (FilterOperator,PCA etc.) */
+    QMap<int,QSharedPointer<MNEOperator> >      m_assignedOperators;    /**< Map of MNEOperator types to channels*/
 
     //Settings
     QSettings               m_qSettings;
@@ -263,13 +263,6 @@ signals:
     * dataReloaded is emitted when data reloading has finished in the background-thread
     */
     void dataReloaded();
-
-    //=========================================================================================================
-    /**
-    * scrollBarValueChange is emitted if a change of the horizontal ScrollBar value is requested by the RawModel
-    * @param pos is the requested relative scroll position (0 equals beginning of ScrollBar)
-    */
-    void scrollBarValueChange(int pos);
 
 public slots:
     //=========================================================================================================
