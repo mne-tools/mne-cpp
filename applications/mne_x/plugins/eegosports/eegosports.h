@@ -156,6 +156,12 @@ public:
 
     //=========================================================================================================
     /**
+    * Is called when plugin is detached of the stage. Can be used to safe settings.
+    */
+    virtual void unload();
+
+    //=========================================================================================================
+    /**
     * Sets up the fiff info with the current data chosen by the user.
     */
     void setUpFiffInfo();

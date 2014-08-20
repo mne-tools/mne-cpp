@@ -123,6 +123,14 @@ void RtHpi::init()
 
 //*************************************************************************************************************
 
+void RtHpi::unload()
+{
+
+}
+
+
+//*************************************************************************************************************
+
 void RtHpi::initConnector()
 {
     qDebug() << "void RtHpi::initConnector()";
@@ -210,7 +218,7 @@ void RtHpi::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
         //Fiff information
         if(!m_pFiffInfo)
         {
-            m_pFiffInfo = pRTMSA->getFiffInfo();
+            m_pFiffInfo = pRTMSA->info();
             emit fiffInfoAvailable();
         }
 

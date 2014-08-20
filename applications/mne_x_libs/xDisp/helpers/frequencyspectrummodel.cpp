@@ -58,6 +58,9 @@ FrequencySpectrumModel::FrequencySpectrumModel(QObject *parent)
 , m_fSps(1024.0f)
 , m_iT(10)
 , m_bIsFreezed(false)
+, m_bInitialized(false)
+, m_iLowerFrqIdx(0)
+, m_iUpperFrqIdx(0)
 {
 }
 
@@ -201,7 +204,7 @@ void FrequencySpectrumModel::addData(const MatrixXd &data)
         double k = 1.0;
         m_vecFreqScale.resize(1,m_dataCurrent.cols());
 
-        double currFreq = freqRes;
+        double currFreq = 0;
         for(qint32 i = 0; i < m_dataCurrent.cols(); ++i)
         {
             m_vecFreqScale[i] = log10(currFreq+k);
@@ -210,6 +213,13 @@ void FrequencySpectrumModel::addData(const MatrixXd &data)
 
         double max = m_vecFreqScale.maxCoeff();
         m_vecFreqScale /= max;
+
+        m_vecFreqScaleBound = m_vecFreqScale;
+        m_iLowerFrqIdx = 0;
+        m_iUpperFrqIdx = m_vecFreqScale.size()-1;
+
+
+        m_bInitialized = true;
     }
 
     //Update data content
@@ -273,4 +283,41 @@ void FrequencySpectrumModel::toggleFreeze(const QModelIndex &)
     QModelIndex bottomRight = this->index(m_dataCurrent.rows()-1,1);
     QVector<int> roles; roles << Qt::DisplayRole;
     emit dataChanged(topLeft, bottomRight, roles);
+}
+
+
+//*************************************************************************************************************
+
+void FrequencySpectrumModel::setBoundaries(float fLowerFrqBound, float fUpperFrqBound)
+{
+    if(!m_bInitialized)
+        return;
+
+    beginResetModel();
+
+    double nf = m_pFiffInfo->sfreq/2;
+
+    m_iLowerFrqIdx = 0;
+    m_iUpperFrqIdx = m_vecFreqScale.size()-1;
+
+    //find boundaries
+    for(qint32 i = 0; i < m_vecFreqScale.size(); ++i)
+    {
+        float val = m_vecFreqScale[i]*nf;
+        if( val < fLowerFrqBound)
+            m_iLowerFrqIdx = i;
+
+        if( val > fUpperFrqBound)
+        {
+            m_iUpperFrqIdx = i;
+            break;
+        }
+    }
+
+    // scale it new
+    m_vecFreqScaleBound = m_vecFreqScale;
+    for(qint32 i = 0; i < m_vecFreqScaleBound.size(); ++i)
+        m_vecFreqScaleBound[i] = (m_vecFreqScaleBound[i] - m_vecFreqScale[m_iLowerFrqIdx]) / (m_vecFreqScale[m_iUpperFrqIdx] - m_vecFreqScale[m_iLowerFrqIdx]);
+
+    endResetModel();
 }

@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
-* @file     covariance.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     rtnoise.h
+* @author   Limin Sun <liminsun@nmr.mgh.harvard.edu>;
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     August, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Limin Sun, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,26 +30,19 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the Covariance class.
+* @brief     RtNoise class declaration.
 *
 */
 
-#ifndef COVARIANCE_H
-#define COVARIANCE_H
-
+#ifndef RTNOISE_H
+#define RTNOISE_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "covariance_global.h"
-
-#include <mne_x/Interfaces/IAlgorithm.h>
-#include <generics/circularmatrixbuffer.h>
-#include <xMeas/newrealtimemultisamplearray.h>
-#include <xMeas/realtimecov.h>
-#include <rtInv/rtcov.h>
+#include "rtinv_global.h"
 
 
 //*************************************************************************************************************
@@ -56,8 +50,16 @@
 // FIFF INCLUDES
 //=============================================================================================================
 
-#include <fiff/fiff_info.h>
 #include <fiff/fiff_cov.h>
+#include <fiff/fiff_info.h>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Generics INCLUDES
+//=============================================================================================================
+
+#include <generics/circularmatrixbuffer.h>
 
 
 //*************************************************************************************************************
@@ -65,16 +67,25 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
-#include <QVector>
+#include <QThread>
+#include <QMutex>
+#include <QSharedPointer>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE CovariancePlugin
+// Eigen INCLUDES
 //=============================================================================================================
 
-namespace CovariancePlugin
+#include <Eigen/Core>
+#include <unsupported/Eigen/FFT>
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE INVRTLIB
+//=============================================================================================================
+
+namespace RTINVLIB
 {
 
 
@@ -83,117 +94,141 @@ namespace CovariancePlugin
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNEX;
-using namespace XMEASLIB;
+using namespace Eigen;
 using namespace IOBuffer;
-using namespace RTINVLIB;
 using namespace FIFFLIB;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-class CovarianceSettingsWidget;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS Covariance
+* Real-time noise Spectrum estimation
 *
-* @brief The Covariance class provides a Covariance algorithm structure.
+* @brief Real-time Noise estimation
 */
-class COVARIANCESHARED_EXPORT Covariance : public IAlgorithm
+class RTINVSHARED_EXPORT RtNoise : public QThread
 {
     Q_OBJECT
-    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "covariance.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
-    // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
-    Q_INTERFACES(MNEX::IAlgorithm)
-
-    friend class CovarianceSettingsWidget;
-
 public:
-    //=========================================================================================================
-    /**
-    * Constructs a Covariance.
-    */
-    Covariance();
+    typedef QSharedPointer<RtNoise> SPtr;             /**< Shared pointer type for RtNoise. */
+    typedef QSharedPointer<const RtNoise> ConstSPtr;  /**< Const shared pointer type for RtNoise. */
 
     //=========================================================================================================
     /**
-    * Destroys the Covariance.
+    * Creates the real-time covariance estimation object.
+    *
+    * @param[in] p_iMaxSamples      Number of samples to use for each data chunk
+    * @param[in] p_pFiffInfo        Associated Fiff Information
+    * @param[in] parent     Parent QObject (optional)
     */
-    ~Covariance();
+    explicit RtNoise(qint32 p_iMaxSamples, FiffInfo::SPtr p_pFiffInfo, QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Initialise input and output connectors.
+    * Destroys the Real-time noise estimation object.
     */
-    virtual void init();
+    ~RtNoise();
 
     //=========================================================================================================
     /**
-    * Is called when plugin is detached of the stage. Can be used to safe settings.
+    * Slot to receive incoming data.
+    *
+    * @param[in] p_DataSegment  Data to estimate the spectrum from -> ToDo Replace this by shared data pointer
     */
-    virtual void unload();
+    void append(const MatrixXd &p_DataSegment);
 
     //=========================================================================================================
     /**
-    * Clone the plugin
+    * Returns true if is running, otherwise false.
+    *
+    * @return true if is running, false otherwise
     */
-    virtual QSharedPointer<IPlugin> clone() const;
+    inline bool isRunning();
 
+
+    //=========================================================================================================
+    /**
+    * Starts the RtNoise by starting the producer's thread.
+    *
+    * @return true if succeeded, false otherwise
+    */
     virtual bool start();
+
+    //=========================================================================================================
+    /**
+    * Stops the RtNoise by stopping the producer's thread.
+    *
+    * @return true if succeeded, false otherwise
+    */
     virtual bool stop();
-
-    virtual IPlugin::PluginType getType() const;
-    virtual QString getName() const;
-
-    virtual QWidget* setupWidget();
-
-    void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
-
-    void appendCovariance(FiffCov::SPtr p_pCovariance);
-
-    void showCovarianceWidget();
-
-    void changeSamples(qint32 samples);
 
 signals:
     //=========================================================================================================
     /**
-    * Emitted when fiffInfo is available
+    * Signal which is emitted when a new data Matrix is estimated.
+    *
+    * @param[out]
     */
-    void fiffInfoAvailable();
+    void SpecCalculated(Eigen::MatrixXd);
 
 protected:
+    //=========================================================================================================
+    /**
+    * The starting point for the thread. After calling start(), the newly created thread calls this function.
+    * Returning from this method will end the execution of the thread.
+    * Pure virtual method inherited by QThread.
+    */
     virtual void run();
 
 private:
-    QMutex mutex;
+    QMutex      mutex;                  /**< Provides access serialization between threads*/
 
-    PluginInputData<NewRealTimeMultiSampleArray>::SPtr  m_pCovarianceInput;     /**< The NewRealTimeMultiSampleArray of the Covariance input.*/
-    PluginOutputData<RealTimeCov>::SPtr                 m_pCovarianceOutput;    /**< The RealTimeCov of the Covariance output.*/
+    quint32      m_iMaxSamples;         /**< Maximal amount of samples received, before covariance is estimated.*/
 
-    FiffInfo::SPtr  m_pFiffInfo;                                /**< Fiff measurement info.*/
+    quint32      m_iNewMaxSamples;      /**< New maximal amount of samples received, before covariance is estimated.*/
 
-    CircularMatrixBuffer<double>::SPtr   m_pCovarianceBuffer;   /**< Holds incoming data.*/
+    FiffInfo::SPtr  m_pFiffInfo;        /**< Holds the fiff measurement information. */
 
-    RtCov::SPtr m_pRtCov;                       /**< Real-time covariance. */
+    bool        m_bIsRunning;           /**< Holds if real-time Covariance estimation is running.*/
 
-    QVector<FiffCov::SPtr>   m_qVecCovData;     /**< Evoked data set */
+    CircularMatrixBuffer<double>::SPtr m_pRawMatrixBuffer;   /**< The Circular Raw Matrix Buffer. */
 
-    bool m_bIsRunning;                          /**< If source lab is running */
-    bool m_bProcessData;                        /**< If data should be received for processing */
+    double m_Fs;
 
-    qint32 m_iEstimationSamples;
+    qint32 m_iFFTlength;
 
-    QSharedPointer<CovarianceSettingsWidget> m_pCovarianceWidget;
+protected:
+    int NumOfBlocks;
+    int BlockSize  ;
+    int Sensors    ;
+    int BlockIndex ;
 
-    QAction* m_pActionShowAdjustment;
+    MatrixXd CircBuf;
+
+public:
+    MatrixXd SpecData;
+    QMutex ReadMutex;
+
+    bool ReadDone;
+    bool CanRead;
+    bool SendDataToBuffer;
+
 };
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline bool RtNoise::isRunning()
+{
+    return m_bIsRunning;
+}
 
 } // NAMESPACE
 
-#endif // COVARIANCE_H
+#ifndef metatype_matrix
+#define metatype_matrix
+Q_DECLARE_METATYPE(Eigen::MatrixXd); /**< Provides QT META type declaration of the MatrixXd type. For signal/slot usage.*/
+#endif
+
+#endif // RtNoise_H
