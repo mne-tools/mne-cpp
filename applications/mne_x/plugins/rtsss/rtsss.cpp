@@ -251,7 +251,7 @@ void RtSss::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
         //Fiff information
         if(!m_pFiffInfo)
-            m_pFiffInfo = pRTMSA->getFiffInfo();
+            m_pFiffInfo = pRTMSA->info();
 
         if(m_bProcessData)
         {

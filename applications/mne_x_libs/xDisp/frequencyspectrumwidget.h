@@ -46,6 +46,7 @@
 #include "newmeasurementwidget.h"
 #include "helpers/frequencyspectrummodel.h"
 #include "helpers/frequencyspectrumdelegate.h"
+#include "helpers/frequencyspectrumsettingswidget.h"
 
 
 //*************************************************************************************************************
@@ -121,6 +122,7 @@ class XDISPSHARED_EXPORT FrequencySpectrumWidget : public NewMeasurementWidget
 {
     Q_OBJECT
 
+    friend class FrequencySpectrumSettingsWidget;
 public:
     //=========================================================================================================
     /**
@@ -158,13 +160,42 @@ public:
     */
     virtual void init();
 
+
+    //=========================================================================================================
+    /**
+    * Initialise the SettingsWidget.
+    */
+    void initSettingsWidget();
+
 private:
-    FrequencySpectrumModel*      m_pFSModel;      /**< FS model */
-    FrequencySpectrumDelegate*   m_pFSDelegate;   /**< FS delegate */
+
+    //=========================================================================================================
+    /**
+    * Broadcast settings of frequency spectrum settings widget
+    */
+    void broadcastSettings();
+
+    //=========================================================================================================
+    /**
+    * Show the frequency spectrum settings widget
+    */
+    void showFrequencySpectrumSettingsWidget();
+
+
+    QAction* m_pActionFrequencySettings;        /**< Frequency spectrum settings action */
+
+    FrequencySpectrumModel*      m_pFSModel;    /**< FS model */
+    FrequencySpectrumDelegate*   m_pFSDelegate; /**< FS delegate */
     QTableView* m_pTableView;                   /**< the QTableView being part of the model/view framework of Qt */
 
 
+    QSharedPointer<FrequencySpectrumSettingsWidget> m_pFrequencySpectrumSettingsWidget;   /**< Frequency spectrum settings modality widget. */
+
+
     QSharedPointer<FrequencySpectrum> m_pFS;    /**< The frequency spectrum measurement. */
+
+    float m_fLowerFrqBound;                    /**< Lower frequency bound */
+    float m_fUpperFrqBound;                    /**< Upper frequency bound */
 
     bool m_bInitialized;                        /**< Is Initialized */
 };

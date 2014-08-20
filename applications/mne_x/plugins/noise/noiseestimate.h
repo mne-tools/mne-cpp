@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     noise_estimate.h
+* @file     noiseestimate.h
 * @author   Limin Sun <liminsun@nmr.mgh.harvard.edu>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
@@ -30,12 +30,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the RTHPI class.
+* @brief    Contains the declaration of the NoiseEstimate class.
 *
 */
 
-#ifndef NOISE_ESTIMATE_H
-#define NOISE_ESTIMATE_H
+#ifndef NOISEESTIMATE_H
+#define NOISEESTIMATE_H
 
 
 //*************************************************************************************************************
@@ -43,7 +43,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "noise_estimate_global.h"
+#include "noiseestimate_global.h"
 
 #include <mne_x/Interfaces/IAlgorithm.h>
 #include <generics/circularmatrixbuffer.h>
@@ -211,4 +211,4 @@ private:
 
 } // NAMESPACE
 
-#endif // NOISE_ESTIMATE_H
+#endif // NOISEESTIMATE_H
