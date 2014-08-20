@@ -218,5 +218,5 @@ void PluginSceneManager::stopPlugins()
 
 void PluginSceneManager::clear()
 {
-    m_pluginList.clear();
+//    m_pluginList.clear();
 }

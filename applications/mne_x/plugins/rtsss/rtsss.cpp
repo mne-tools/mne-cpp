@@ -81,7 +81,8 @@ RtSss::RtSss()
 
 RtSss::~RtSss()
 {
-    stop();
+    if(this->isRunning())
+        stop();
 }
 
 
@@ -115,6 +116,14 @@ void RtSss::init()
     // Output
     m_pRTMSAOutput = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "RtSssOut", "RtSss output data");
     m_outputConnectors.append(m_pRTMSAOutput);
+}
+
+
+//*************************************************************************************************************
+
+void RtSss::unload()
+{
+
 }
 
 
@@ -228,7 +237,7 @@ void RtSss::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
         //Fiff information
         if(!m_pFiffInfo)
-            m_pFiffInfo = pRTMSA->getFiffInfo();
+            m_pFiffInfo = pRTMSA->info();
 
         if(m_bProcessData)
         {

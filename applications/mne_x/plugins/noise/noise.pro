@@ -55,6 +55,7 @@ CONFIG(debug, debug|release) {
             -lMNE$${MNE_LIB_VERSION}Fsd \
             -lMNE$${MNE_LIB_VERSION}Fiffd \
             -lMNE$${MNE_LIB_VERSION}Mned \
+            -lMNE$${MNE_LIB_VERSION}RtInvd \
             -lxMeasd \
             -lxDispd \
             -lmne_xd
@@ -65,6 +66,7 @@ else {
             -lMNE$${MNE_LIB_VERSION}Fs \
             -lMNE$${MNE_LIB_VERSION}Fiff \
             -lMNE$${MNE_LIB_VERSION}Mne \
+            -lMNE$${MNE_LIB_VERSION}RtInv \
             -lxMeas \
             -lxDisp \
             -lmne_x
@@ -73,13 +75,13 @@ else {
 DESTDIR = $${MNE_BINARY_DIR}/mne_x_plugins
 
 SOURCES += \
-    noise_estimate.cpp \
-    FormFiles/noiseestimatesetupwidget.cpp
+    FormFiles/noiseestimatesetupwidget.cpp \
+    noiseestimate.cpp
 
 HEADERS += \
-    noise_estimate.h \
-    noise_estimate_global.h \
-    FormFiles/noiseestimatesetupwidget.h
+    FormFiles/noiseestimatesetupwidget.h \
+    noiseestimate.h \
+    noiseestimate_global.h
 
 FORMS += \
     FormFiles/noiseestimatesetup.ui

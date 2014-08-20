@@ -174,8 +174,6 @@ RealTimeEvokedWidget::~RealTimeEvokedWidget()
             settings.setValue(QString("RTEW/%1/%2/norm").arg(t_sRTEWName).arg(m_qListModalities[i].m_sName), m_qListModalities[i].m_fNorm);
         }
     }
-
-
 }
 
 
@@ -237,7 +235,6 @@ void RealTimeEvokedWidget::init()
     if(m_pRTE->isInitialized())
     {
         QString t_sRTEWName = m_pRTE->getName();
-        qDebug() << "##### NAME #####" << QString("RTEW/%1/MAG/active").arg(t_sRTEWName);
         m_pRteLayout->removeWidget(m_pLabelInit);
         m_pLabelInit->hide();
 

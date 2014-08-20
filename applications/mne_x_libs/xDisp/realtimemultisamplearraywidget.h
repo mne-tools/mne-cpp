@@ -47,6 +47,7 @@
 #include "helpers/realtimemultisamplearraymodel.h"
 #include "helpers/realtimemultisamplearraydelegate.h"
 
+#include "helpers/realtimemultisamplearrayscalingwidget.h"
 #include "helpers/sensorwidget.h"
 
 
@@ -57,6 +58,7 @@
 
 #include <QSharedPointer>
 #include <QList>
+#include <QMap>
 #include <QTableView>
 #include <QAction>
 #include <QSpinBox>
@@ -123,6 +125,8 @@ using namespace XMEASLIB;
 class XDISPSHARED_EXPORT RealTimeMultiSampleArrayWidget : public NewMeasurementWidget
 {
     Q_OBJECT
+
+    friend class RealTimeMultiSampleArrayScalingWidget;
 
 public:
     //=========================================================================================================
@@ -220,6 +224,12 @@ protected:
 
     //=========================================================================================================
     /**
+    * Show channel scaling widget
+    */
+    void showChScalingWidget();
+
+    //=========================================================================================================
+    /**
     * Is called when mouse wheel is used.
     * Function is selecting the tool (freezing/annotation);
     *
@@ -228,6 +238,12 @@ protected:
     virtual void wheelEvent(QWheelEvent* wheelEvent);
 
 private:
+    //=========================================================================================================
+    /**
+    * Broadcast channel scaling
+    */
+    void broadcastScaling();
+
     //=========================================================================================================
     /**
     * Sets new zoom factor
@@ -258,7 +274,6 @@ private:
     float m_fZoomFactor;                                    /**< Zoom factor */
     QDoubleSpinBox* m_pDoubleSpinBoxZoom;                   /**< Adjust Zoom Factor */
 
-
     QSharedPointer<NewRealTimeMultiSampleArray> m_pRTMSA;   /**< The real-time sample array measurement. */
 
     bool m_bInitialized;                                    /**< Is Initialized */
@@ -273,10 +288,13 @@ private:
 
     QAction*    m_pActionSelectSensors;                     /**< show roi select widget */
 
-
     SensorModel* m_pSensorModel;                            /**< Sensor model for channel selection */
     QSharedPointer<SensorWidget> m_pSensorSelectionWidget;  /**< Sensor selection widget. */
 
+    QMap< qint32,float > m_qMapChScaling;                   /**< Sensor selection widget. */
+    QAction* m_pActionChScaling;                            /**< Show channel scaling Action. */
+
+    QSharedPointer<RealTimeMultiSampleArrayScalingWidget> m_pRTMSAScalingWidget;   /**< Channel scaling widget. */
 
     QList<qint32> m_qListCurrentSelection;  /**< Current selection list -> hack around C++11 lambda  */
     void applySelection();                  /**< apply the in m_qListCurrentSelection stored selection -> hack around C++11 lambda */

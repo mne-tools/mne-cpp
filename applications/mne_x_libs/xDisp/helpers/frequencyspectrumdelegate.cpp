@@ -123,6 +123,7 @@ void FrequencySpectrumDelegate::paint(QPainter *painter, const QStyleOptionViewI
                 //Plot grid
                 painter->setRenderHint(QPainter::Antialiasing, false);
                 createGridPath(index, option, path, data);
+                createGridTick(index, option, painter);
 
                 painter->save();
                 QPen pen;
@@ -195,6 +196,9 @@ void FrequencySpectrumDelegate::createPlotPath(const QModelIndex &index, const Q
     float y_base = path.currentPosition().y();
     QPointF qSamplePosition;
 
+    qint32 lowerIdx = t_pModel->getLowerFrqBound();
+    qint32 upperIdx = t_pModel->getUpperFrqBound();
+
     //Move to initial starting point
     if(data.size() > 0)
     {
@@ -204,21 +208,22 @@ void FrequencySpectrumDelegate::createPlotPath(const QModelIndex &index, const Q
         float newY = y_base+fValue;
 
         qSamplePosition.setY(newY);
-        qSamplePosition.setX((double)option.rect.width()*t_pModel->getFreqScale()[0]);
+        qSamplePosition.setX((double)option.rect.width()*t_pModel->getFreqScaleBound()[lowerIdx]);
 
         path.moveTo(qSamplePosition);
     }
 
+
     //create lines from one to the next sample
     qint32 i;
-    for(i = 1; i < data.size(); ++i) {
+    for(i = lowerIdx+1; i <= upperIdx; ++i) {
         float val = data[i]-data[0]; //remove first sample data[0] as offset
         fValue = val*fScaleY;
 
         float newY = y_base+fValue;
 
         qSamplePosition.setY(newY);
-        qSamplePosition.setX((double)option.rect.width()*t_pModel->getFreqScale()[i]);
+        qSamplePosition.setX((double)option.rect.width()*t_pModel->getFreqScaleBound()[i]);
 
         path.lineTo(qSamplePosition);
     }
@@ -235,28 +240,96 @@ void FrequencySpectrumDelegate::createGridPath(const QModelIndex &index, const Q
 
     if(t_pModel->getInfo())
     {
-        double fs = t_pModel->getInfo()->sfreq/2;
+        double nf = t_pModel->getInfo()->sfreq/2;
 
-        qint32 numLines = (qint32)ceil(log10(fs));
+        qint32 numLines = (qint32)ceil(log10(nf));
 
         QList<qint32> qListLineSamples;
+
+        qListLineSamples << 0;
 
         for(qint32 lineIdx = 0; lineIdx < numLines; ++lineIdx)
         {
             double val = pow(10,lineIdx);
-            qint32 idx = (qint32)floor((val/fs) * t_pModel->getNumStems());
+            qint32 idx = (qint32)floor(val / ((float)nf/(float)t_pModel->getNumStems()));
             qListLineSamples.append(idx);
         }
 
-        //horizontal lines
+        //vertical lines
         float yStart = option.rect.topLeft().y();
 
         float yEnd = option.rect.bottomRight().y();
 
         for(qint32 i = 0; i < qListLineSamples.size(); ++i) {
-            float x = (t_pModel->getFreqScale()[qListLineSamples[i]])*option.rect.width();
-            path.moveTo(x,yStart);
-            path.lineTo(x,yEnd);
+            if(qListLineSamples[i] > t_pModel->getLowerFrqBound() && qListLineSamples[i] < t_pModel->getUpperFrqBound())
+            {
+                float x = (t_pModel->getFreqScaleBound()[qListLineSamples[i]])*option.rect.width();
+                path.moveTo(x,yStart);
+                path.lineTo(x,yEnd);
+            }
         }
+
+        /*
+        //horizontal lines
+        float xStart = option.rect.topLeft().x();
+
+        float xEnd = option.rect.bottomRight().x();
+
+        for(qint32 i = 0; i < 6; ++i) {
+            float y =  option.rect.height()/5.0 * (float)i;
+            path.moveTo(xStart,y);
+            path.lineTo(xEnd,y);
+        }
+        */
+
     }
 }
+
+//*************************************************************************************************************
+
+void FrequencySpectrumDelegate::createGridTick(const QModelIndex &index, const QStyleOptionViewItem &option,  QPainter *painter) const
+{
+    const FrequencySpectrumModel* t_pModel = static_cast<const FrequencySpectrumModel*>(index.model());
+
+    if(t_pModel->getInfo())
+    {
+        double nf = t_pModel->getInfo()->sfreq/2;
+
+        qint32 numLines = (qint32)ceil(log10(nf));
+
+        QList<qint32> qListLineSamples;
+
+        qListLineSamples << 0;
+
+        for(qint32 lineIdx = 0; lineIdx < numLines; ++lineIdx)
+        {
+            double val = pow(10,lineIdx);
+            qint32 idx = (qint32)floor(val / ((float)nf/(float)t_pModel->getNumStems()));
+            qListLineSamples.append(idx);
+        }
+
+        // XTick
+        float yStart = 1.0*option.rect.topLeft().y();
+
+        if(qListLineSamples[0] > t_pModel->getLowerFrqBound() && qListLineSamples[0] < t_pModel->getUpperFrqBound())
+        {
+            double val = 0.0;
+            float x = (t_pModel->getFreqScaleBound()[qListLineSamples[0]])*option.rect.width();
+            painter->drawText(x,yStart,QString("%1Hz").arg(val));
+        }
+
+        for(qint32 i = 1; i < qListLineSamples.size(); ++i) {
+            if(qListLineSamples[i] > t_pModel->getLowerFrqBound() && qListLineSamples[i] < t_pModel->getUpperFrqBound())
+            {
+                double val = pow(10,i-1);
+                float x = (t_pModel->getFreqScaleBound()[qListLineSamples[i]])*option.rect.width();
+                painter->drawText(x,yStart,QString("%1Hz").arg(val));
+            }
+        }
+
+        // YTick
+
+
+    }
+}
+

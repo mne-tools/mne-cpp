@@ -58,6 +58,10 @@
 #include <QDebug>
 #include <QTimer>
 #include <QTime>
+#include <QFile>
+#include <QFileDialog>
+#include <QFileInfo>
+#include <QStandardPaths>
 
 #include <iostream>
 
@@ -134,6 +138,21 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
     clear();
+
+    //clean
+    if(m_pToolBar)
+    {
+        if(m_pLabelTime)
+            delete m_pLabelTime;
+        m_pLabelTime = NULL;
+        delete m_pToolBar;
+    }
+
+    if(m_pDynamicPluginToolBar)
+        delete m_pDynamicPluginToolBar;
+
+    if(m_pDynamicDisplayToolBar)
+        delete m_pDynamicDisplayToolBar;
 }
 
 
@@ -143,9 +162,6 @@ void MainWindow::clear()
 {
     if(m_bIsRunning)
         this->stopMeasurement();
-
-    //garbage collection
-    m_pPluginSceneManager.reset();
 }
 
 
@@ -153,8 +169,6 @@ void MainWindow::clear()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    clear();
-
     QMainWindow::closeEvent(event);
 }
 
@@ -164,7 +178,8 @@ void MainWindow::closeEvent(QCloseEvent *event)
 //File QMenu
 void MainWindow::newConfiguration()
 {
-    writeToLog(tr("Invoked <b>File|NewPreferences</b>"), _LogKndMessage, _LogLvMin);
+    writeToLog(tr("Invoked <b>File|NewConfiguration</b>"), _LogKndMessage, _LogLvMin);
+    m_pPluginGui->clearScene();
 }
 
 
@@ -172,7 +187,15 @@ void MainWindow::newConfiguration()
 
 void MainWindow::openConfiguration()
 {
-    writeToLog(tr("Invoked <b>File|OpenPreferences</b>"), _LogKndMessage, _LogLvMin);
+    writeToLog(tr("Invoked <b>File|OpenConfiguration</b>"), _LogKndMessage, _LogLvMin);
+
+    QString path = QFileDialog::getOpenFileName(this,
+                                                "Open MNE-X Configuration File",
+                                                QStandardPaths::writableLocation(QStandardPaths::DataLocation),
+                                                 tr("Configuration file (*.xml)"));
+
+    QFileInfo qFileInfo(path);
+    m_pPluginGui->loadConfig(qFileInfo.path(), qFileInfo.fileName());
 }
 
 
@@ -180,7 +203,16 @@ void MainWindow::openConfiguration()
 
 void MainWindow::saveConfiguration()
 {
-    writeToLog(tr("Invoked <b>File|SavePreferences</b>"), _LogKndMessage, _LogLvMin);
+    writeToLog(tr("Invoked <b>File|SaveConfiguration</b>"), _LogKndMessage, _LogLvMin);
+
+    QString path = QFileDialog::getSaveFileName(
+                this,
+                "Save MNE-X Configuration File",
+                QStandardPaths::writableLocation(QStandardPaths::DataLocation),
+                 tr("Configuration file (*.xml)"));
+
+    QFileInfo qFileInfo(path);
+    m_pPluginGui->saveConfig(qFileInfo.path(), qFileInfo.fileName());
 }
 
 
@@ -252,41 +284,41 @@ void MainWindow::createActions()
     m_pActionNewConfig = new QAction(QIcon(":/images/new.png"), tr("&New configuration"), this);
     m_pActionNewConfig->setShortcuts(QKeySequence::New);
     m_pActionNewConfig->setStatusTip(tr("Create a new configuration"));
-//    connect(m_pActionNewConfig, SIGNAL(triggered()), this, SLOT(newPreferences()));
+    connect(m_pActionNewConfig, &QAction::triggered, this, &MainWindow::newConfiguration);
 
     m_pActionOpenConfig = new QAction(tr("&Open configuration..."), this);
     m_pActionOpenConfig->setShortcuts(QKeySequence::Open);
     m_pActionOpenConfig->setStatusTip(tr("Open an existing configuration"));
-//    connect(m_pActionOpenConfig, SIGNAL(triggered()), this, SLOT(openPreferences()));
+    connect(m_pActionOpenConfig, &QAction::triggered, this, &MainWindow::openConfiguration);
 
     m_pActionSaveConfig = new QAction(QIcon(":/images/save.png"), tr("&Save configuration..."), this);
     m_pActionSaveConfig->setShortcuts(QKeySequence::Save);
     m_pActionSaveConfig->setStatusTip(tr("Save the current configuration"));
-//    connect(m_pActionSaveConfig, SIGNAL(triggered()), this, SLOT(savePreferences()));
+    connect(m_pActionSaveConfig, &QAction::triggered, this, &MainWindow::saveConfiguration);
 
     m_pActionExit = new QAction(tr("E&xit"), this);
     m_pActionExit->setShortcuts(QKeySequence::Quit);
     m_pActionExit->setStatusTip(tr("Exit the application"));
-    connect(m_pActionExit, SIGNAL(triggered()), this, SLOT(close()));
+    connect(m_pActionExit, &QAction::triggered, this, &MainWindow::close);
 
     //View QMenu
     m_pActionMinLgLv = new QAction(tr("&Minimal"), this);
     m_pActionMinLgLv->setCheckable(true);
     m_pActionMinLgLv->setShortcut(tr("Ctrl+1"));
     m_pActionMinLgLv->setStatusTip(tr("Open an existing file"));
-    connect(m_pActionMinLgLv, SIGNAL(triggered()), this, SLOT(setMinLogLevel()));
+    connect(m_pActionMinLgLv, &QAction::triggered, this, &MainWindow::setMinLogLevel);
 
     m_pActionNormLgLv = new QAction(tr("&Normal"), this);
     m_pActionNormLgLv->setCheckable(true);
     m_pActionNormLgLv->setShortcut(tr("Ctrl+2"));
     m_pActionNormLgLv->setStatusTip(tr("Save the document to disk"));
-    connect(m_pActionNormLgLv, SIGNAL(triggered()), this, SLOT(setNormalLogLevel()));
+    connect(m_pActionNormLgLv, &QAction::triggered, this, &MainWindow::setNormalLogLevel);
 
     m_pActionMaxLgLv = new QAction(tr("Maximal"), this);
     m_pActionMaxLgLv->setCheckable(true);
     m_pActionMaxLgLv->setShortcut(tr("Ctrl+3"));
     m_pActionMaxLgLv->setStatusTip(tr("Exit the application"));
-    connect(m_pActionMaxLgLv, SIGNAL(triggered()), this, SLOT(setMaxLogLevel()));
+    connect(m_pActionMaxLgLv, &QAction::triggered, this, &MainWindow::setMaxLogLevel);
 
     m_pActionGroupLgLv = new QActionGroup(this);
     m_pActionGroupLgLv->addAction(m_pActionMinLgLv);
@@ -303,42 +335,42 @@ void MainWindow::createActions()
     m_pActionHelpContents = new QAction(tr("Help &Contents"), this);
     m_pActionHelpContents->setShortcuts(QKeySequence::HelpContents);
     m_pActionHelpContents->setStatusTip(tr("Show the help contents"));
-    connect(m_pActionHelpContents, SIGNAL(triggered()), this, SLOT(helpContents()));
+    connect(m_pActionHelpContents, &QAction::triggered, this, &MainWindow::helpContents);
 
     m_pActionAbout = new QAction(tr("&About"), this);
     m_pActionAbout->setStatusTip(tr("Show the application's About box"));
-    connect(m_pActionAbout, SIGNAL(triggered()), this, SLOT(about()));
+    connect(m_pActionAbout, &QAction::triggered, this, &MainWindow::about);
 
     //QToolbar
     m_pActionRun = new QAction(QIcon(":/images/run.png"), tr("Run (F5)"), this);
     m_pActionRun->setShortcut(tr("F5"));
     m_pActionRun->setStatusTip(tr("Runs (F5) ")+CInfo::AppNameShort());
-    connect(m_pActionRun, SIGNAL(triggered()), this, SLOT(startMeasurement()));
+    connect(m_pActionRun, &QAction::triggered, this, &MainWindow::startMeasurement);
 
     m_pActionStop = new QAction(QIcon(":/images/stop.png"), tr("Stop (F6)"), this);
     m_pActionStop->setShortcut(tr("F6"));
     m_pActionStop->setStatusTip(tr("Stops (F6) ")+CInfo::AppNameShort());
-    connect(m_pActionStop, SIGNAL(triggered()), this, SLOT(stopMeasurement()));
+    connect(m_pActionStop, &QAction::triggered, this, &MainWindow::stopMeasurement);
 
     m_pActionZoomStd = new QAction(QIcon(":/images/zoomStd.png"), tr("Standard Zoom (Ctrl+0)"), this);
     m_pActionZoomStd->setShortcut(tr("Ctrl+0"));
     m_pActionZoomStd->setStatusTip(tr("Sets the standard Zoom (Ctrl+0)"));
-    connect(m_pActionZoomStd, SIGNAL(triggered()), this, SLOT(zoomStd()));
+    connect(m_pActionZoomStd, &QAction::triggered, this, &MainWindow::zoomStd);
 
     m_pActionZoomIn = new QAction(QIcon(":/images/zoomIn.png"), tr("Zoom In ")+QKeySequence(QKeySequence::ZoomIn).toString(), this);
     m_pActionZoomIn->setShortcuts(QKeySequence::ZoomIn);
     m_pActionZoomIn->setStatusTip(tr("Zooms in the magnitude ")+QKeySequence(QKeySequence::ZoomIn).toString());
-    connect(m_pActionZoomIn, SIGNAL(triggered()), this, SLOT(zoomIn()));
+    connect(m_pActionZoomIn, &QAction::triggered, this, &MainWindow::zoomIn);
 
     m_pActionZoomOut = new QAction(QIcon(":/images/zoomOut.png"), tr("Zoom Out ")+QKeySequence(QKeySequence::ZoomOut).toString(), this);
     m_pActionZoomOut->setShortcuts(QKeySequence::ZoomOut);
     m_pActionZoomOut->setStatusTip(tr("Zooms out the magnitude ")+QKeySequence(QKeySequence::ZoomOut).toString());
-    connect(m_pActionZoomOut, SIGNAL(triggered()), this, SLOT(zoomOut()));
+    connect(m_pActionZoomOut, &QAction::triggered, this, &MainWindow::zoomOut);
 
     m_pActionDisplayMax = new QAction(QIcon(":/images/displayMax.png"), tr("Maximize current Display (F11)"), this);
     m_pActionDisplayMax->setShortcut(tr("F11"));
     m_pActionDisplayMax->setStatusTip(tr("Maximizes the current display (F11)"));
-    connect(m_pActionDisplayMax, SIGNAL(triggered()), this, SLOT(toggleDisplayMax()));
+    connect(m_pActionDisplayMax, &QAction::triggered, this, &MainWindow::toggleDisplayMax);
 }
 
 
@@ -395,7 +427,7 @@ void MainWindow::createToolBars()
 
         m_pToolBar->addSeparator();
 
-        m_pLabelTime = new QLabel;
+        m_pLabelTime = new QLabel(this);
         m_pToolBar->addWidget(m_pLabelTime);
         m_pLabelTime->setText(QTime(0, 0).toString());
     }
@@ -448,7 +480,7 @@ void MainWindow::createPluginDockWindow()
     m_pPluginGuiDockWidget = new QDockWidget(tr("Plugins"), this);
     m_pPluginGuiDockWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 
-    m_pPluginGui = new PluginGui(m_pPluginManager, m_pPluginSceneManager);
+    m_pPluginGui = new PluginGui(m_pPluginManager.data(), m_pPluginSceneManager.data());
     m_pPluginGui->setParent(m_pPluginGuiDockWidget);
     m_pPluginGuiDockWidget->setWidget(m_pPluginGui);
 
@@ -729,7 +761,7 @@ void MainWindow::uiSetupRunningState(bool state)
 void MainWindow::startTimer(int msec)
 {
     m_pTimer = QSharedPointer<QTimer>(new QTimer(this));
-    connect(m_pTimer.data(), SIGNAL(timeout()), this, SLOT(updateTime()));
+    connect(m_pTimer.data(), &QTimer::timeout, this, &MainWindow::updateTime);
     m_pTimer->start(msec);
     m_pTime->setHMS(0,0,0);
     QString strTime = m_pTime->toString();
@@ -741,7 +773,7 @@ void MainWindow::startTimer(int msec)
 
 void MainWindow::stopTimer()
 {
-    disconnect(m_pTimer.data(), SIGNAL(timeout()), this, SLOT(updateTime()));
+    disconnect(m_pTimer.data(), &QTimer::timeout, this, &MainWindow::updateTime);
 }
 
 
