@@ -17,12 +17,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -74,35 +74,35 @@ TriggerControlSetupWidget::TriggerControlSetupWidget(TriggerControl* toolbox, QW
 , m_pTriggerControl(toolbox)
 {
     ui.setupUi(this);
-
-//    connect(ui.m_qPushButton_About, &QPushButton::released, this, &TriggerControlSetupWidget::showAboutDialog);
-
-
-
     connect(ui.m_qPushButton_Settings, &QPushButton::released, this, &TriggerControlSetupWidget::showSettings);
 
-
-
+    connect(ui.m_qPushButton_About, &QPushButton::released, this, &TriggerControlSetupWidget::showAboutDialog);
     // initialize Buttons
     ui.m_qPushButton_Connect->setEnabled(true);
     ui.m_qPushButton_Disconnect->setEnabled(false);
     ui.m_qPushButton_Send->setEnabled(false);
     ui.m_qPushButton_Sendanalog->setEnabled(false);
 
-    ui.m_qComboBox_RetrieveType->addItem(QLatin1String("Digital"));
-    ui.m_qComboBox_RetrieveType->addItem(QLatin1String("Analog"));
+    ui.m_qComboBox_AnalogSelect->addItem(QLatin1String("Kanal 1"));
+    ui.m_qComboBox_AnalogSelect->addItem(QLatin1String("Kanal 2"));
 
+    ui.m_qComboBox_ChannelList->addItem(QLatin1String("Kanal 1"));
+    ui.m_qComboBox_ChannelList->addItem(QLatin1String("Kanal 2"));
+    ui.m_qComboBox_ChannelList->addItem(QLatin1String("Kanal 3"));
+    ui.m_qComboBox_ChannelList->addItem(QLatin1String("Kanal 4"));
+    ui.m_qComboBox_ChannelList->addItem(QLatin1String("Kanal 5"));
+    ui.m_qComboBox_ChannelList->addItem(QLatin1String("Kanal 6"));
+    ui.m_qComboBox_ChannelList->addItem(QLatin1String("Kanal 7"));
+    ui.m_qComboBox_ChannelList->addItem(QLatin1String("Kanal 8"));
+    ui.m_qComboBox_ChannelList->addItem(QLatin1String("Kanal 9"));
+    ui.m_qComboBox_ChannelList->addItem(QLatin1String("Kanal 10"));
+    ui.m_qComboBox_ChannelList->addItem(QLatin1String("Kanal 11"));
+    ui.m_qComboBox_ChannelList->addItem(QLatin1String("Kanal 12"));
+    ui.m_qComboBox_ChannelList->addItem(QLatin1String("Kanal 13"));
+    ui.m_qComboBox_ChannelList->addItem(QLatin1String("Kanal 14"));
+    ui.m_qComboBox_ChannelList->addItem(QLatin1String("Kanal 15"));
+    ui.m_qComboBox_ChannelList->addItem(QLatin1String("Kanal 16"));
 
-//    connect(ui.m_qPushButton_Connect, SIGNAL(released()), this, SLOT( m_port_tsw->openSerialPort(TriggerControl::Settings m_pTriggerControl->m_currentSettings)));
-//    connect(ui.m_qPushButton_Disconnect, SIGNAL(released()), this, SLOT(closeSerialPort()));
-//    connect(ui->pushButton_send,SIGNAL(released()),this, SLOT(sendData()));
-
-
-
-
-    //Bsp Parameter
-
-//    m_pTriggerControl->m_bBspBool = true;
 }
 
 //*************************************************************************************************************
@@ -117,8 +117,8 @@ TriggerControlSetupWidget::~TriggerControlSetupWidget()
 
 void TriggerControlSetupWidget::showAboutDialog()
 {
-//    TriggerControlAboutWidget aboutDialog(this);
-//    aboutDialog.exec();
+    TriggerControlAboutWidget aboutDialog(this);
+    aboutDialog.exec();
 }
 
 
@@ -137,7 +137,7 @@ void TriggerControlSetupWidget::on_m_qPushButton_Connect_released()
 {
     if (m_pTriggerControl->m_pSerialPort->open())
     {
-        std::cout << "Port geöffnet" << std::endl;
+        std::cout << "Port opened" << std::endl;
         ui.m_qPushButton_Connect->setEnabled(false);
         ui.m_qPushButton_Disconnect->setEnabled(true);
         ui.m_qPushButton_Send->setEnabled(true);
@@ -146,7 +146,7 @@ void TriggerControlSetupWidget::on_m_qPushButton_Connect_released()
     }
     else
     {
-        std::cout << "Port konnte nicht geöffnet werden" << std::endl;
+        std::cout << "Port cannot be opened" << std::endl;
     }
 }
 
@@ -157,7 +157,7 @@ void TriggerControlSetupWidget::on_m_qPushButton_Disconnect_released()
 {
 
     m_pTriggerControl->m_pSerialPort->close();
-    std::cout << "Port geschlossen" << std::endl;
+    std::cout << "Port closed" << std::endl;
     ui.m_qPushButton_Connect->setEnabled(true);
     ui.m_qPushButton_Disconnect->setEnabled(false);
     ui.m_qPushButton_Send->setEnabled(false);
@@ -210,30 +210,14 @@ void TriggerControlPlugin::TriggerControlSetupWidget::on_m_qPushButton_Send_rele
         else m_pTriggerControl->m_pSerialPort->m_digchannel.replace(14,0);
     if (ui.m_qRadioButton_16->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(15,1);     // 0010 0000
         else m_pTriggerControl->m_pSerialPort->m_digchannel.replace(15,0);
-    if (ui.m_qRadioButton_17->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(16,1);     // 0100 0000
-        else m_pTriggerControl->m_pSerialPort->m_digchannel.replace(16,0);
-    if (ui.m_qRadioButton_18->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(17,1);     // 1000 0000
-        else m_pTriggerControl->m_pSerialPort->m_digchannel.replace(17,0);
-
-    // 19 - 22
-    if (ui.m_qRadioButton_19->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(18,1);     // 0000 0100
-    else m_pTriggerControl->m_pSerialPort->m_digchannel.replace(18,0);
-    if (ui.m_qRadioButton_20->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(19,1);     // 0000 1000
-    else m_pTriggerControl->m_pSerialPort->m_digchannel.replace(19,0);
-    if (ui.m_qRadioButton_21->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(20,1);     // 0001 0000
-    else m_pTriggerControl->m_pSerialPort->m_digchannel.replace(20,0);
-    if (ui.m_qRadioButton_22->isChecked()) m_pTriggerControl->m_pSerialPort->m_digchannel.replace(21,1);     // 0010 0000
-    else m_pTriggerControl->m_pSerialPort->m_digchannel.replace(21,0);
-
 
    // encode information according to data transfer protocol
     m_pTriggerControl->m_pSerialPort->encodedig();
 
-
     // send data
     m_pTriggerControl->m_pSerialPort->sendData(m_pTriggerControl->m_pSerialPort->m_data);
 
-    std::cout << "Digitale Daten gesendet" << std::endl;
+    std::cout << "Digital data sent" << std::endl;
 }
 
 
@@ -252,38 +236,49 @@ void TriggerControlPlugin::TriggerControlSetupWidget::on_m_qPushButton_Sendanalo
     // retrieve analog value
     m_pTriggerControl->m_pSerialPort->m_analval = ui.m_qAnalogDisp->intValue();
 
-
     // encode information according to data transfer protocol
     m_pTriggerControl->m_pSerialPort->encodeana();
-
 
     // send data
     m_pTriggerControl->m_pSerialPort->sendData(m_pTriggerControl->m_pSerialPort->m_data);
 
-    std::cout << "Analoge Daten gesendet" << std::endl;
-
-  //  m_pTriggerControl->m_pSerialPort->readData();
+    std::cout << "Analog data sent" << std::endl;
 
 }
 
+void TriggerControlPlugin::TriggerControlSetupWidget::on_m_qPushButton_RetrieveDigitalInfo_released()
+{
+    m_pTriggerControl->m_pSerialPort->m_retrievetyp = 0;    // digital channel desired
+    m_pTriggerControl->m_pSerialPort->encoderetr();
+    m_pTriggerControl->m_pSerialPort->sendData(m_pTriggerControl->m_pSerialPort->m_data);
+}
+
+
 //*************************************************************************************************************
 
-void TriggerControlPlugin::TriggerControlSetupWidget::on_m_qPushButton_RetrieveInfo_released()
+void TriggerControlPlugin::TriggerControlSetupWidget::on_m_qPushButton_RetrieveAnalogInfo_released()
 {
-    if ( ui.m_qComboBox_RetrieveType->currentIndex() == 0)      // digital selected
-        m_pTriggerControl->m_pSerialPort->m_retrievetyp = 0;
+    m_pTriggerControl->m_pSerialPort->m_retrievetyp = 1;    // analog channel desired
 
-    else if (ui.m_qComboBox_RetrieveType->currentIndex() == 1)
-    {
-        m_pTriggerControl->m_pSerialPort->m_retrievetyp = 1;
-        int t_channel = ui.m_qLineEdit_RetrieveChannel->text().toInt();
-        if ((t_channel <= 2) && (t_channel > 0))
-                m_pTriggerControl->m_pSerialPort->m_retrievechan = t_channel;
-        else
-            std::cout << "check desired channel" << std::endl;
-    }
+    if (ui.m_qComboBox_AnalogSelect->currentIndex() == 0)
+        m_pTriggerControl->m_pSerialPort->m_retrievechan = 1;
+    else
+        std::cout << "check desired channel" << std::endl;
+
+    if (ui.m_qComboBox_AnalogSelect->currentIndex() == 1)
+        m_pTriggerControl->m_pSerialPort->m_retrievechan = 2;
+    else
+        std::cout << "check desired channel" << std::endl;
+
     m_pTriggerControl->m_pSerialPort->encoderetr();
 
     m_pTriggerControl->m_pSerialPort->sendData(m_pTriggerControl->m_pSerialPort->m_data);
+}
 
+
+//*************************************************************************************************************
+
+void TriggerControlPlugin::TriggerControlSetupWidget::on_m_qPushButton_ConnectChannel_released()
+{
+    m_pTriggerControl->m_pSerialPort->m_wiredChannel = ui.m_qComboBox_ChannelList->currentIndex();
 }

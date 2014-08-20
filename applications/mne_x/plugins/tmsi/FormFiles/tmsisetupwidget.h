@@ -17,12 +17,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -51,6 +51,7 @@
 
 #include <QtWidgets>
 #include "../ui_tmsisetup.h"
+#include "tmsiimpedanceview.h"
 
 
 //*************************************************************************************************************
@@ -85,15 +86,15 @@ public:
     /**
     * Constructs a TMSISetupWidget which is a child of parent.
     *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new ECGSetupWidget becomes a window. If parent is another widget, ECGSetupWidget becomes a child window inside parent. ECGSetupWidget is deleted when its parent is deleted.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new TMSISetupWidget becomes a window. If parent is another widget, TMSISetupWidget becomes a child window inside parent. TMSISetupWidget is deleted when its parent is deleted.
     * @param [in] pTMSI a pointer to the corresponding ECGSimulator.
     */
     TMSISetupWidget(TMSI* pTMSI, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the ECGSetupWidget.
-    * All ECGSetupWidget's children are deleted first. The application exits if ECGSetupWidget is the main widget.
+    * Destroys the TMSISetupWidget.
+    * All TMSISetupWidget's children are deleted first. The application exits if TMSISetupWidget is the main widget.
     */
     ~TMSISetupWidget();
 
@@ -129,31 +130,10 @@ private:
 
     //=========================================================================================================
     /**
-    * Sets flag for writing the received samples to a file.
+    * Sets flag for writing to a file.
     *
     */
     void setWriteToFile();
-
-    //=========================================================================================================
-    /**
-    * Sets the dir where the output file is saved
-    *
-    */
-    void changeOutputFileDir();
-
-    //=========================================================================================================
-    /**
-    * Sets the dir where the output file is saved
-    *
-    */
-    void setOutputTextField();
-
-    //=========================================================================================================
-    /**
-    * Sets the dir where the eeg hat file is located
-    *
-    */
-    void changeHatDir();
 
     //=========================================================================================================
     /**
@@ -169,9 +149,9 @@ private:
     */
     void showAboutDialog();
 
-    TMSI*           m_pTMSI;                    /**< a pointer to corresponding TMSI.*/
+    TMSI*               m_pTMSI;                 /**< a pointer to corresponding TMSI.*/
 
-    Ui::TMSISetupClass ui;                      /**< the user interface for the TMSISetupWidget.*/
+    Ui::TMSISetupClass  ui;                      /**< the user interface for the TMSISetupWidget.*/
 };
 
 } // NAMESPACE

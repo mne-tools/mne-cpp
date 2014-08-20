@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -39,6 +39,15 @@
 //=============================================================================================================
 
 #include "mne_cluster_info.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Qt INCLUDES
+//=============================================================================================================
+
+#include <QFile>
+#include <QTextStream>
 
 
 //*************************************************************************************************************
@@ -63,7 +72,55 @@ MNEClusterInfo::MNEClusterInfo()
 
 void MNEClusterInfo::clear()
 {
-    clusterVertnos.clear();
-    clusterDistances.clear();
+    clusterLabelNames.clear();
     clusterLabelIds.clear();
+    centroidVertno.clear();
+    centroidSource_rr.clear();
+    clusterVertnos.clear();
+    clusterSource_rr.clear();
+    clusterDistances.clear();
+}
+
+
+//*************************************************************************************************************
+
+void MNEClusterInfo::write(QString p_sFileName) const
+{
+    QFile file("./"+p_sFileName);
+    file.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream out(&file);
+    out << "MNE Cluster Info\n";
+
+    for(qint32 i = 0; i < clusterLabelIds.size(); ++i)
+    {
+        out << "\nLabel : " << clusterLabelNames[i] << "\n";
+        out << "Label ID : " << clusterLabelIds[i] << "\n";
+        out << "Centroid Vertno : " << centroidVertno[i] << "\n";
+        out << "Centroid rr : " << centroidSource_rr[i](0) << ", " << clusterSource_rr[i](1) << ", " << clusterSource_rr[i](2) << "\n";
+        out << "Vertnos :\n";
+        for(qint32 j = 0; j < clusterVertnos[i].size(); ++j)
+            out << clusterVertnos[i][j] << ", ";
+        out << "\nDistances :\n";
+        for(qint32 j = 0; j < clusterDistances[i].size(); ++j)
+            out << clusterDistances[i][j] << ", ";
+        out << "\nrr :\n";
+        for(qint32 j = 0; j < clusterSource_rr[i].rows(); ++j)
+            out << clusterSource_rr[i](j,0) << ", " << clusterSource_rr[i](j,1) << ", " << clusterSource_rr[i](j,2) << "\n";
+
+        out << "\n";
+    }
+
+    // optional, as QFile destructor will already do it:
+    file.close();
+
+
+    QFile file_centroids("./centroids_"+p_sFileName);
+    file_centroids.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream out_centroids(&file_centroids);
+
+    for(qint32 i = 0; i < clusterLabelIds.size(); ++i)
+        out_centroids << centroidVertno[i] << ", ";
+
+    // optional, as QFile destructor will already do it:
+    file_centroids.close();
 }

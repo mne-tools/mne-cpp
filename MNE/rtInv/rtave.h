@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -71,7 +71,6 @@
 #include <QSharedPointer>
 #include <QSet>
 #include <QList>
-#include <QVector>
 
 
 //*************************************************************************************************************
@@ -142,7 +141,37 @@ public:
 
     //=========================================================================================================
     /**
-    * Stops the RtCov by stopping the producer's thread.
+    * Sets the number of averages
+    *
+    * @param[in] numAve     new number of averages
+    */
+    void setAverages(qint32 numAve);
+
+    //=========================================================================================================
+    /**
+    * Sets the number of pre stimulus samples
+    *
+    * @param[in] samples    new number of pre stimulus samples
+    */
+    void setPreStim(qint32 samples);
+
+    //=========================================================================================================
+    /**
+    * Sets the number of post stimulus samples
+    *
+    * @param[in] samples    new number of post stimulus samples
+    */
+    void setPostStim(qint32 samples);
+
+    //=========================================================================================================
+    /**
+    * Starts the RtAve by starting the producer's thread.
+    */
+    virtual bool start();
+
+    //=========================================================================================================
+    /**
+    * Stops the RtAve by stopping the producer's thread.
     *
     * @return true if succeeded, false otherwise
     */
@@ -181,6 +210,12 @@ signals:
     */
     void evokedStim(FIFFLIB::FiffEvoked::SPtr p_pEvokedStim);
 
+    //=========================================================================================================
+    /**
+    * Emitted when number of averages changed
+    */
+    void numAveragesChanged();
+
 protected:
     //=========================================================================================================
     /**
@@ -209,15 +244,20 @@ private:
     */
     void assemblePreStimulus(const QList<QPair<QList<qint32>, MatrixXd> > &p_qListRawMatBuf, qint32 p_iStimIdx);
 
-    FiffInfo::SPtr  m_pFiffInfo;        /**< Holds the fiff measurement information. */
-
-    QMutex      mutex;                  /**< Provides access serialization between threads*/
-    bool        m_bIsRunning;           /**< Holds if real-time Covariance estimation is running.*/
+    QMutex m_qMutex;                    /**< Provides access serialization between threads*/
 
     qint32 m_iNumAverages;              /**< Number of averages */
 
     qint32     m_iPreStimSamples;       /**< Amount of samples averaged before the stimulus. */
     qint32     m_iPostStimSamples;      /**< Amount of samples averaged after the stimulus, including the stimulus sample.*/
+
+    qint32     m_iNewPreStimSamples;    /**< New amount of samples averaged before the stimulus. */
+    qint32     m_iNewPostStimSamples;   /**< New amount of samples averaged after the stimulus, including the stimulus sample.*/
+
+
+    FiffInfo::SPtr  m_pFiffInfo;        /**< Holds the fiff measurement information. */
+
+    bool        m_bIsRunning;           /**< Holds if real-time Covariance estimation is running.*/
 
     CircularMatrixBuffer<double>::SPtr m_pRawMatrixBuffer;   /**< The Circular Raw Matrix Buffer. */
 
@@ -228,8 +268,8 @@ private:
 
 //    QList<fiff_int_t>  m_qSetAspectKinds;   /**< List of aspects to average. Each aspect is averaged separetely and released stored in evoked data.*/
 
-    QList<QVector<MatrixXd> > m_qListQVectorPreStimBuf;     /**< assembles the pre stimulus data */
-    QList<QVector<MatrixXd> > m_qListQVectorPostStimBuf;    /**< assembles the post stimulus data */
+    QList<QList<MatrixXd> > m_qListQListPreStimBuf;     /**< assembles the pre stimulus data */
+    QList<QList<MatrixXd> > m_qListQListPostStimBuf;    /**< assembles the post stimulus data */
 
     QList<MatrixXd> m_qListPreStimAve;     /**< the current pre stimulus average */
     QList<MatrixXd> m_qListPostStimAve;    /**< the current post stimulus average */

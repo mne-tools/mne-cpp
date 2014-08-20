@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 * 
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -52,6 +52,7 @@
 //=============================================================================================================
 
 #include <utils/mnemath.h>
+#include <utils/kmeans.h>
 
 #include <fs/annotationset.h>
 
@@ -69,7 +70,7 @@
 #include <Eigen/Core>
 #include <Eigen/SVD>
 #include <Eigen/Sparse>
-#include <Eigen/unsupported/KroneckerProduct>
+#include <unsupported/Eigen/KroneckerProduct>
 
 
 //*************************************************************************************************************
@@ -90,6 +91,7 @@
 #include <QDataStream>
 
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE NAMESPACE MNELIB
@@ -108,6 +110,84 @@ using namespace Eigen;
 using namespace FSLIB;
 using namespace UTILSLIB;
 using namespace FIFFLIB;
+
+//=========================================================================================================
+/**
+* Gain matrix output data for one region, used for clustering
+*/
+struct RegionDataOut
+{
+    VectorXi    roiIdx;     /**< Region cluster indices */
+    MatrixXd    ctrs;       /**< Cluster centers */
+    VectorXd    sumd;       /**< Sums of the distances to the centroid */
+    MatrixXd    D;          /**< Distances to the centroid */
+
+    qint32      iLabelIdxOut;   /**< Label ID */
+};
+
+
+//=========================================================================================================
+/**
+* Gain matrix input data for one region, used for clustering
+*/
+struct RegionData
+{
+    MatrixXd    matRoiG;            /**< Reshaped region gain matrix sources x sensors(x,y,z)*/
+    MatrixXd    matRoiGWhitened;    /**< Reshaped whitened region gain matrix sources x sensors(x,y,z)*/
+    bool        bUseWhitened;       /**< Wheather indeces of whitened gain matrix should be used to calculate centroids */
+
+    MatrixXd    matRoiGOrig;            /**< Region gain matrix sensors x sources(x,y,z)*/
+//    MatrixXd    matRoiGOrigWhitened;    /**< Whitened region gain matrix sensors x sources(x,y,z)*/
+
+    qint32      nClusters;      /**< Number of clusters within this region */
+
+    VectorXi    idcs;           /**< Get source space indeces */
+    qint32      iLabelIdxIn;    /**< Label ID */
+
+    RegionDataOut cluster() const
+    {
+        // Kmeans Reduction
+        RegionDataOut p_RegionDataOut;
+
+        KMeans t_kMeans(QString("cityblock"), QString("sample"), 5);//QString("cityblock")sqeuclidean
+
+        if(bUseWhitened)
+        {
+            t_kMeans.calculate(this->matRoiGWhitened, this->nClusters, p_RegionDataOut.roiIdx, p_RegionDataOut.ctrs, p_RegionDataOut.sumd, p_RegionDataOut.D);
+
+            MatrixXd newCtrs = MatrixXd::Zero(p_RegionDataOut.ctrs.rows(), p_RegionDataOut.ctrs.cols());
+            for(qint32 c = 0; c < p_RegionDataOut.ctrs.rows(); ++c)
+            {
+                qint32 num = 0;
+
+                for(qint32 idx = 0; idx < p_RegionDataOut.roiIdx.size(); ++idx)
+                {
+                    if(c == p_RegionDataOut.roiIdx[idx])
+                    {
+                        newCtrs.row(c) += this->matRoiG.row(idx); //just take whitened to get indeces calculate centroids using the original matrix
+                        ++num;
+                    }
+                }
+
+                if(num > 0)
+                    newCtrs.row(c) /= num;
+            }
+            p_RegionDataOut.ctrs = newCtrs; //Replace whitened with original
+        }
+        else
+            t_kMeans.calculate(this->matRoiG, this->nClusters, p_RegionDataOut.roiIdx, p_RegionDataOut.ctrs, p_RegionDataOut.sumd, p_RegionDataOut.D);
+
+        p_RegionDataOut.iLabelIdxOut = this->iLabelIdxIn;
+
+        return p_RegionDataOut;
+    }
+
+};
+
+
+const static FiffCov defaultCov;
+const static FiffInfo defaultInfo;
+static MatrixXd defaultD;
 
 
 //=============================================================================================================
@@ -167,12 +247,15 @@ public:
     * Cluster the forward solution and stores the result to p_fwdOut.
     * The clustering is done by using the provided annotations
     *
-    * @param[in] p_AnnotationSet    Annotation set containing the annotation of left & right hemisphere
-    * @param[in] p_iClusterSize     Maximal cluster size per roi
+    * @param[in]    p_AnnotationSet     Annotation set containing the annotation of left & right hemisphere
+    * @param[in]    p_iClusterSize      Maximal cluster size per roi
+    * @param[out]   p_D                 The cluster operator
+    * @param[in]    p_pNoise_cov
+    * @param[in]    p_pInfo
     *
     * @return clustered MNE forward solution
     */
-    MNEForwardSolution cluster_forward_solution(AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize);
+    MNEForwardSolution cluster_forward_solution(const AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize, MatrixXd& p_D = defaultD, const FiffCov &p_pNoise_cov = defaultCov, const FiffInfo &p_pInfo = defaultInfo) const;
 
     //=========================================================================================================
     /**
@@ -236,6 +319,16 @@ public:
     * @return Forward solution restricted to selected channel types.
     */
     MNEForwardSolution pick_channels(const QStringList& include = defaultQStringList, const QStringList& exclude = defaultQStringList) const;
+
+    //=========================================================================================================
+    /**
+    * Reduces a forward solution to selected regions
+    *
+    * @param[in] p_qListLabels  ROIs
+    *
+    * @return the reduced forward solution
+    */
+    MNEForwardSolution pick_regions(const QList<Label> &p_qListLabels) const;
 
     //=========================================================================================================
     /**
@@ -346,22 +439,23 @@ public:
 
     //=========================================================================================================
     /**
+    * reduces the forward solution and stores the result to p_fwdOut.
+    *
+    * @param[in]    p_iNumDipoles   Desired number of dipoles
+    * @param[out]   p_D             The reduction operator
+    *
+    * @return reduced MNE forward solution
+    */
+    MNEForwardSolution reduce_forward_solution(qint32 p_iNumDipoles, MatrixXd& p_D) const;
+
+    //=========================================================================================================
+    /**
     * Restrict gain matrix entries for optimal depth weighting
     *
     * @param[in, out] G     Gain matrix to be restricted; result is stored in place.
     * @param[in] info       Fiff information
     */
     static void restrict_gain_matrix(MatrixXd &G, const FiffInfo &info);
-
-    //=========================================================================================================
-    /**
-    * Reduces a forward solution to selected regions
-    *
-    * @param[in] p_qListLabels  ROIs
-    *
-    * @return the reduced forward solution
-    */
-    MNEForwardSolution selectRegions(const QList<Label> &p_qListLabels) const;
 
     //=========================================================================================================
     /**
@@ -380,7 +474,10 @@ public:
     */
     friend std::ostream& operator<<(std::ostream& out, const MNELIB::MNEForwardSolution &p_MNEForwardSolution);
 
+
+
 private:
+
     //=========================================================================================================
     /**
     * Implementation of the read_one function in mne_read_forward_solution.m
@@ -405,7 +502,7 @@ public:
     FiffNamedMatrix::SDPtr sol;         /**< Forward solution */
     FiffNamedMatrix::SDPtr sol_grad;    /**< ToDo... */
     FiffCoordTrans mri_head_t;          /**< MRI head coordinate transformation */
-    MNESourceSpace src;                 /**< Geomertic description of the source spaces (hemispheres) */
+    MNESourceSpace src;                 /**< Geometric description of the source spaces (hemispheres) */
     MatrixX3f source_rr;                /**< Source locations */
     MatrixX3f source_nn;                /**< Source normals (number depends on fixed or free orientation) */
 };

@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -82,6 +82,39 @@ PluginScene::~PluginScene()
 
 //*************************************************************************************************************
 
+void PluginScene::insertItem(const QPointF& pos)
+{
+    PluginItem *item;
+    IPlugin::SPtr pPlugin;
+    QString name;
+    switch (m_mode) {
+        case InsertPluginItem:
+            if(insertPlugin(m_pActionPluginItem, pPlugin))
+            {
+                name = m_pActionPluginItem->text();
+                item = new PluginItem(pPlugin, m_pMenuPluginItem);
+                addItem(item);
+                item->setPos(pos);
+                emit itemInserted(item);
+            }
+            else
+            {
+                //If insertion failed, disable insert action
+                m_pActionPluginItem->setEnabled(false);
+            }
+            break;
+        case InsertLine:
+            line = new QGraphicsLineItem(QLineF(pos,pos));
+            line->setPen(QPen(m_qColorLine, 1));
+            addItem(line);
+            break;
+        default:
+        ;
+    }
+}
+
+//*************************************************************************************************************
+
 bool PluginScene::insertPlugin(QAction* pActionPluginItem, IPlugin::SPtr &pAddedPlugin)
 {
     if(pActionPluginItem->isEnabled())
@@ -111,34 +144,8 @@ void PluginScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
     if (mouseEvent->button() != Qt::LeftButton)
         return;
 
-    PluginItem *item;
-    IPlugin::SPtr pPlugin;
-    QString name;
-    switch (m_mode) {
-        case InsertPluginItem:
-            if(insertPlugin(m_pActionPluginItem, pPlugin))
-            {
-                name = m_pActionPluginItem->text();
-                item = new PluginItem(pPlugin, m_pMenuPluginItem);
-                addItem(item);
-                item->setPos(mouseEvent->scenePos());
-                emit itemInserted(item);
-            }
-            else
-            {
-                //If insertion failed, disable insert action
-                m_pActionPluginItem->setEnabled(false);
-            }
-            break;
-        case InsertLine:
-            line = new QGraphicsLineItem(QLineF(mouseEvent->scenePos(),
-                                        mouseEvent->scenePos()));
-            line->setPen(QPen(m_qColorLine, 1));
-            addItem(line);
-            break;
-        default:
-        ;
-    }
+    insertItem(mouseEvent->scenePos());
+
     QGraphicsScene::mousePressEvent(mouseEvent);
 }
 
@@ -184,8 +191,6 @@ void PluginScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
             if(pConnection->isConnected())
             {
-//                connect(startItem->plugin()->getOutputConnectors()[0].data(), &PluginOutputConnector::notify,
-//                        endItem->plugin()->getInputConnectors()[0].data(), &PluginInputConnector::update);
                 Arrow *arrow = new Arrow(startItem, endItem, pConnection);
                 arrow->setColor(m_qColorLine);
                 startItem->addArrow(arrow);

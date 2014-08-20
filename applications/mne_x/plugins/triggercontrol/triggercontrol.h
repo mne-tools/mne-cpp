@@ -17,12 +17,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -47,8 +47,10 @@
 
 #include <mne_x/Interfaces/IAlgorithm.h>
 #include <generics/circularbuffer.h>
+#include <generics/circularmatrixbuffer.h>
 #include <xMeas/newrealtimesamplearray.h>
 #include <xMeas/newrealtimemultisamplearray.h>
+
 
 
 //*************************************************************************************************************
@@ -91,7 +93,10 @@ class SerialPort;
 /**
 * DECLARE CLASS TriggerControl
 *
-* @brief The TriggerControl ....
+
+* @brief The TriggerControl is a MNE-X plugin which contains an intuitive terminal for manual
+* configurations of output channels and an automated processing of connected signal channels.
+*
 */
 class TRIGGERCONTROLSHARED_EXPORT TriggerControl : public IAlgorithm
 {
@@ -120,7 +125,13 @@ public:
     /**
     * Initialise input and output connectors.
     */
-    void init();
+    virtual void init();
+
+    //=========================================================================================================
+    /**
+    * Is called when plugin is detached of the stage. Can be used to safe settings.
+    */
+    virtual void unload();
 
     //=========================================================================================================
     /**
@@ -128,24 +139,78 @@ public:
     */
     virtual QSharedPointer<IPlugin> clone() const;
 
+    //=========================================================================================================
+    /**
+    * Starts the TriggerControl by starting the triggercontrol's thread.
+    */
     virtual bool start();
+
+    //=========================================================================================================
+    /**
+    * Stops the TriggerControl by starting the triggercontrol's thread.
+    */
     virtual bool stop();
 
+    //=========================================================================================================
+    /**
+    * [...]
+    */
     virtual IPlugin::PluginType getType() const;
+
+    //=========================================================================================================
+    /**
+    * [...]
+    */
     virtual QString getName() const;
 
+
+    //=========================================================================================================
+    /**
+    * [...]
+    */    
     virtual QWidget* setupWidget();
 
+    //=========================================================================================================
+    /**
+    * [...]
+    */
     void updateSingleChannel(XMEASLIB::NewMeasurement::SPtr pMeasurement);
 
+    //=========================================================================================================
+    /**
+    * [...]
+    */
     void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
-//
+
+    //=========================================================================================================
+    /**
+    * Initialise input and output connectors.
+    */
+    void byteReceived();
+
+
+
 signals:
-    void sendByte(int value);
+//    void sendByte(int value);
+    void sendByte(int value, int channel);
+
 
 protected:
+
+    //=========================================================================================================
+    /**
+    * Runs the run method
+    */
     virtual void run();
-    void sendByteTo(int);
+
+    //=========================================================================================================
+    /**
+    * Sets or Unsets the HardWired channel from the terminal function (see manual)
+    */
+
+    void sendByteTo(int value, int channel);
+
+
 
 private:
     PluginOutputData<NewRealTimeSampleArray>::SPtr  m_pTriggerOutput;   /**< The RealTimeSampleArray of the trigger output.*/
@@ -160,8 +225,9 @@ private:
 
     qint32 m_iBaud;
 
-
     QMutex m_qMutex;
+
+    CircularMatrixBuffer<double>::SPtr m_pDataMatrixBuffer;   /**< Holds incoming rt server data.*/
 
     QVector<VectorXd> m_pData;
     dBuffer::SPtr m_pDataSingleChannel;
@@ -171,6 +237,21 @@ private:
     QTime m_qTime;
 
     bool m_bIsRunning;
+    bool m_isReceived;
+
+
+
+    //alpha locked stuff
+
+    double m_fs;
+    double m_dt;
+    double m_refFreq;
+    double m_alphaFreq;
+
+    VectorXd m_refSin;
+    VectorXd m_vecCorr;
+
+    double corr(VectorXd a, VectorXd b);
 
 
 };

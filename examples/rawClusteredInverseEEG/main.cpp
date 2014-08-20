@@ -17,12 +17,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -67,6 +67,7 @@
 
 #include <QGuiApplication>
 #include <QSet>
+#include <QDir>
 
 
 //*************************************************************************************************************
@@ -105,18 +106,22 @@ int main(int argc, char *argv[])
     //source localization type
     QString method("MNE"); //"MNE" | "dSPM" | "sLORETA"
 
-    //time read around events - note: trigger point is the pressing of the button, not the atual
-    float tmin = -1.0f;
-    float tmax = 1.0f;
-
     //Choose which epoch to take - i.e. for every 4th epoch set to 4
     int averageIterator = 1;
+
+    bool doRawTrialLocalization = false;
 
     //measurement data location (data location must always has same directory structure - see dropbox folder for more information)
     //QString data_location("D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2013_12_05_Lorenz_Esch_001");
     //QString data_location("D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2014_01_10_Lorenz_Esch_002");
     //QString data_location("D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2014_01_14_Lorenz_Esch_003");
-    QString data_location("D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2014_01_28_Lorenz_Esch_004");
+    //QString data_location("D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2014_01_28_Lorenz_Esch_004");
+    //QString data_location("D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2014_02_04_Lorenz_Esch_005");
+    //QString data_location("D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2014_02_05_Uwe_Graichen_006");
+    QString data_location("D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2014_02_07_Lorenz_Esch_007");
+    //QString data_location("D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2014_02_24_Lorenz_Esch_008");
+    //QString data_location("D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2014_02_25_Christoph_Dinh_009");
+    //QString data_location("D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2014_03_17_Lorenz_Esch_010");
 
     //Forward solution
     //QFile t_fileFwd("D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/Lorenz-131212-Duke128-fwd.fif");
@@ -132,118 +137,274 @@ int main(int argc, char *argv[])
     //AnnotationSet (See Destrieux paper)
     AnnotationSet t_annotationSet("D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/atlas/lh.aparc.a2009s.annot", "D:/Dropbox/Masterarbeit DB/Messdaten/Forward solutions/atlas/rh.aparc.a2009s.annot");
 
-    //********************************** Original **********************************//
+    //////////////////////////////////////////// Interesting start ////////////////////////////////////////////////////////////////////
+    //********************************** Involuntary Tapping ***********************************//
+    //time read around events - note: trigger point is the pressing of the button, not the atual
+//    float tmin = -2.0f;
+//    float tmax = 2.0f;
 
-//    //Original left tapping
+//    //Filtered 7-14Hz left tapping
+//    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_001_involuntary_left_tapping_filtered_7_14_raw.fif");
+//    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_001_base_filtered_7_14_raw-cov.fif");
+//    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_involuntary_left_tapping_131_raw-eve.fif");
+//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_involuntary_left_tapping_filtered_7_14_Averaged_");
+//    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_involuntary_left_tapping_filtered_7_14_Averaged_");
+
+//    //Filtered 7-14Hz right tapping
+//    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_001_involuntary_right_tapping_filtered_7_14_raw.fif");
+//    QString t_sCovFileNameRel  ("/Processed/covariance/EEEG_data_001_base_filtered_7_14_raw-cov.fif");
+//    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_involuntary_right_tapping_136_raw-eve.fif");
+//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_involuntary_right_tapping_filtered_7_14_Averaged_");
+//    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_involuntary_right_tapping_filtered_7_14_Averaged_");
+
+//    //Filtered 0.7-40Hz left tapping
+//    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_001_involuntary_left_tapping_filtered_07_40_raw.fif");
+//    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_001_base_filtered_07_40_raw-cov.fif");
+//    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_involuntary_left_tapping_131_raw-eve.fif");
+//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_involuntary_left_tapping_filtered_07_40_Averaged_");
+//    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_involuntary_left_tapping_filtered_07_40_Averaged_");
+
+//    //Filtered 0.7-40Hz right tapping
+//    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_001_involuntary_right_tapping_filtered_07_40_raw.fif");
+//    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_001_base_filtered_07_40_raw-cov.fif");
+//    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_involuntary_right_tapping_136_raw-eve.fif");
+//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_involuntary_right_tapping_filtered_07_40_Averaged_");
+//    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_involuntary_right_tapping_filtered_07_40_Averaged_");
+
+    //////////////////////////////////////////// Interesting end ////////////////////////////////////////////////////////////////////
+
+    //********************************** Voluntary Tapping ***********************************//
+
+//    //time read around events - note: trigger point is the pressing of the button, not the atual
+//    float tmin = -1.0f;
+//    float tmax = 1.0f;
+
+//    //Original left tapping - no filtering DC still present
 //    QString t_sRawFileNameRel  ("/Original/EEG_data_001_right_tapping_raw.fif");
 //    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_001_base_raw-cov.fif");
 //    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_right_tapping_raw-eve.fif");
-//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_right_tapping_Avr_");
+//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_right_tapping_Averaged_");
 //    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_right_tapping_Averaged_");
-
-    //********************************** Tapping ***********************************//
-
-//    //Filtered 7-14Hz left tapping
-//    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_001_left_tapping_filtered_7_14_raw.fif");
-//    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_001_left_tapping_filtered_7_14_raw-cov.fif");
-//    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_left_tapping_raw-eve.fif");
-//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_left_tapping_filtered_7_14_Avr_");
-//    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_left_tapping_filtered_7_14_Averaged_");
-
-//    //Filtered 7-14Hz right tapping
-//    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_001_right_tapping_filtered_7_14_raw.fif");
-//    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_001_right_tapping_filtered_7_14_raw-cov.fif");                   //("/Processed/covariance/EEG_data_001_base_filtered_7_14_raw-cov.fif"); ("/Processed/covariance/EEG_data_001_right_tapping_filtered_7_14_raw-cov.fif")
-//    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_right_tapping_artefact_reduction_-1_1_0.001_raw-eve.fif");  //("EEG_data_001_right_tapping_raw-eve.fif")
-//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_right_tapping_filtered_7_14_Avr_");
-//    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_right_tapping_filtered_7_14_Averaged_");
 
 //    //Filtered 0.6-40Hz left tapping
 //    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_001_left_tapping_filtered_06_40_raw.fif");
 //    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_001_left_tapping_filtered_06_40_raw-cov.fif");
 //    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_left_tapping_raw-eve.fif");
-//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_left_tapping_filtered_06_40_Avr_");
+//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_left_tapping_filtered_06_40_Averaged_");
 //    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_left_tapping_filtered_06_40_Averaged_");
 
 //    //Filtered 0.6-40Hz right tapping
 //    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_001_right_tapping_filtered_06_40_raw.fif");
 //    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_001_right_tapping_filtered_06_40_raw-cov.fif");
 //    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_right_tapping_raw-eve.fif");
-//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_right_tapping_filtered_06_40_Avr_");
+//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_right_tapping_filtered_06_40_Averaged_");
 //    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_right_tapping_filtered_06_40_Averaged_");
 
+//    //Filtered 7-14Hz left tapping
+//    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_002_voluntary_left_tapping_filtered_7_14_raw.fif");
+//    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_voluntary_tapping_base_filtered_7_14_raw-cov.fif");
+//    QString t_sEventFileNameRel("/Processed/events/EEG_data_002_voluntary_left_tapping_artefact_reduction_-1_1_0.002_71_raw-eve.fif");
+//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_voluntary_left_tapping_filtered_7_14_Averaged_");
+//    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_002_voluntary_left_tapping_filtered_7_14_Averaged_");
+
+//    //Filtered 7-14Hz right tapping
+//    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_002_voluntary_right_tapping_filtered_7_14_raw.fif");
+//    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_voluntary_tapping_base_filtered_7_14_raw-cov.fif");
+//    QString t_sEventFileNameRel("/Processed/events/EEG_data_002_voluntary_right_tapping_artefact_reduction_-1_1_0.003_69_raw-eve.fif");
+//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_voluntary_right_tapping_filtered_7_14_Averaged_");
+//    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_002_voluntary_right_tapping_filtered_7_14_Averaged_");
+
+//    //Filtered 0.7-40Hz left tapping
+//    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_002_voluntary_left_tapping_filtered_07_40_raw.fif");
+//    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_voluntary_tapping_base_filtered_07_40_raw-cov.fif");
+//    QString t_sEventFileNameRel("/Processed/events/EEG_data_002_voluntary_left_tapping_222_raw-eve.fif");
+//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_voluntary_left_tapping_filtered_07_40_Averaged_");
+//    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_002_voluntary_left_tapping_filtered_07_40_Averaged_");
+
 //    //Filtered 0.7-40Hz right tapping
-//    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_001_right_tapping_filtered_07_40_raw.fif");
-//    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_001_base_filtered_07_40_raw-cov.fif"); //("/Processed/covariance/EEG_data_001_right_tapping_filtered_07_40_raw-cov.fif"); ("/Processed/covariance/EEG_data_001_base_filtered_07_40_raw-cov.fif");
-//    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_right_tapping_raw-eve.fif");
-//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_right_tapping_filtered_07_40_Avr_");
-//    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_right_tapping_filtered_07_40_Averaged_");
+//    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_002_voluntary_right_tapping_filtered_07_40_raw.fif");
+//    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_voluntary_tapping_base_filtered_07_40_raw-cov.fif");
+//    QString t_sEventFileNameRel("/Processed/events/EEG_data_002_voluntary_right_tapping_184_raw-eve.fif");
+//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_voluntary_right_tapping_filtered_07_40_Averaged_");
+//    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_002_voluntary_right_tapping_filtered_07_40_Averaged_");
 
-//    //Filtered 0.7-100Hz right tapping
-//    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_001_right_tapping_filtered_07_100_raw.fif");
-//    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_001_base_filtered_07_100_raw-cov.fif");
-//    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_right_tapping_raw-eve.fif");
-//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_right_tapping_filtered_07_100_Avr_");
-//    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_right_tapping_filtered_07_100_Averaged_");
+    //********************************** Medianus stimulation **********************************//
 
-    //********************************** Medianus **********************************//
+//    //time read around events - note: trigger point is the pressing of the button, not the atual
+//    float tmin = -1.0f;
+//    float tmax = 1.0f;
+
+//    //Original left medianus stimulation - no filtering DC still present
+//    QString t_sRawFileNameRel  ("/Original/EEG_data_002_medianus_left_raw.fif");
+//    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_medianus_base_raw-cov.fif");
+//    QString t_sEventFileNameRel("/Processed/events/EEG_data_002_medianus_left_240_raw-eve.fif");
+//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_medianus_left_Averaged_");
+//    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_002_medianus_left_Averaged_");
+
+//    //Original right medianus stimulation - no filtering DC still present
+//    QString t_sRawFileNameRel  ("/Original/EEG_data_002_medianus_right_raw.fif");
+//    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_medianus_base_raw-cov.fif");
+//    QString t_sEventFileNameRel("/Processed/events/EEG_data_002_medianus_right_295_raw-eve.fif");
+//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_medianus_right_Averaged_");
+//    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_002_medianus_right_Averaged_");
 
 //    //Filtered 0.7-40Hz left medianus stimulation
 //    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_002_medianus_left_filtered_07_40_raw.fif");
 //    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_medianus_base_filtered_07_40_raw-cov.fif");
-//    QString t_sEventFileNameRel("/Processed/events/EEG_data_002_medianus_left_artefact_reduction_-1_1_0.003_raw-eve.fif"); // ("EEG_data_002_medianus_left_raw-eve")
-//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_medianus_left_filtered_07_40_Avr_");
+//    QString t_sEventFileNameRel("/Processed/events/EEG_data_002_medianus_left_artefact_reduction_-1_1_0.002_80_raw-eve.fif"); // ("EEG_data_002_medianus_left_raw-eve")
+//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_medianus_left_filtered_07_40_Averaged_");
 //    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_002_medianus_left_filtered_07_40_Averaged_");
 
 //    //Filtered 0.7-40Hz right medianus stimulation
 //    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_002_medianus_right_filtered_07_40_raw.fif");
 //    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_medianus_base_filtered_07_40_raw-cov.fif");
-//    QString t_sEventFileNameRel("/Processed/events/EEG_data_002_medianus_right_artefact_reduction_-1_1_0.003_raw-eve.fif");    // ("EEG_data_002_medianus_right_raw-eve")
-//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_medianus_right_filtered_07_40_Avr_");
+//    QString t_sEventFileNameRel("/Processed/events/EEG_data_002_medianus_right_artefact_reduction_-1_1_0.0025_93_raw-eve.fif");    // ("EEG_data_002_medianus_right_raw-eve")
+//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_medianus_right_filtered_07_40_Averaged_");
 //    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_002_medianus_right_filtered_07_40_Averaged_");
 
 //    //Filtered 7-14Hz left medianus stimulation
 //    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_002_medianus_left_filtered_7_14_raw.fif");
 //    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_medianus_base_filtered_7_14_raw-cov.fif");
-//    QString t_sEventFileNameRel("/Processed/events/EEG_data_002_medianus_left_artefact_reduction_-1_1_0.002_80_raw-eve.fif"); // ("EEG_data_002_medianus_left_raw-eve")
-//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_medianus_left_filtered_7_14_Avr_");
+//    QString t_sEventFileNameRel("/Processed/events/EEG_data_002_medianus_left_artefact_reduction_-1_1_0.002_80_raw-eve.fif");
+//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_medianus_left_filtered_7_14_Averaged_");
 //    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_002_medianus_left_filtered_7_14_Averaged_");
 
 //    //Filtered 7-14Hz right medianus stimulation
 //    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_002_medianus_right_filtered_7_14_raw.fif");
 //    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_medianus_base_filtered_7_14_raw-cov.fif");
-//    QString t_sEventFileNameRel("/Processed/events/EEG_data_002_medianus_right_artefact_reduction_-1_1_0.002_15_raw-eve.fif");    // ("EEG_data_002_medianus_right_raw-eve")
-//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_medianus_right_filtered_7_14_Avr_");
+//    QString t_sEventFileNameRel("/Processed/events/EEG_data_002_medianus_right_artefact_reduction_-1_1_0.0025_93_raw-eve.fif");
+//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_medianus_right_filtered_7_14_Averaged_");
 //    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_002_medianus_right_filtered_7_14_Averaged_");
 
-    //*************************** Opposing finger movement **************************//
+    //*************************** Voluntary opposing finger movement **************************//
 
-//    //Filtered 0.7-40Hz left voluntary finger opposing
-//    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_001_voluntary_left_opposing_filtered_07_40_raw.fif");
-//    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_voluntary_base_filtered_07_40_raw-cov.fif");
-//    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_voluntary_left_opposing_artefact_reduction_-1_1_0.003_raw-eve.fif"); // ("EEG_data_001_voluntary_left_opposing_raw-eve")
-//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_voluntary_left_filtered_07_40_Avr_");
-//    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_voluntary_left_filtered_07_40_Averaged_");
+//    //time read around events - note: trigger point is the pressing of the button, not the atual
+//    float tmin = -0.3f;
+//    float tmax = 0.1f;
 
-//    //Filtered 0.7-40Hz right voluntary finger opposing
-//    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_001_voluntary_right_opposing_filtered_07_40_raw.fif");
-//    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_voluntary_base_filtered_07_40_raw-cov.fif");
-//    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_voluntary_right_opposing_artefact_reduction_-1_1_0.003_raw-eve.fif");    // ("EEG_data_001_voluntary_right_opposing_raw-eve")
-//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_voluntary_right_filtered_07_40_Avr_");
-//    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_voluntary_right_filtered_07_40_Averaged_");
+//    //Original left opposing finger movement - no filtering DC still present
+//    QString t_sRawFileNameRel  ("/Original/EEG_data_001_voluntary_left_opposing_raw.fif");
+//    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_voluntary_base_raw-cov.fif");
+//    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_voluntary_left_opposing_89_raw-eve.fif");
+//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_voluntary_left_Averaged_");
+//    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_voluntary_left_Averaged_");
 
-    //Filtered 7-14Hz left voluntary finger opposing
-    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_001_voluntary_left_opposing_filtered_7_14_raw.fif");
-    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_voluntary_base_filtered_7_14_raw-cov.fif");
-    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_voluntary_left_opposing_artefact_reduction_-1_1_0.003_45_raw-eve.fif"); // ("EEG_data_001_voluntary_left_opposing_raw-eve")
-    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_voluntary_left_filtered_7_14_Avr_");
-    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_voluntary_left_filtered_7_14_Averaged_");
+//    //Original right opposing finger movement - no filtering DC still present
+//    QString t_sRawFileNameRel  ("/Original/EEG_data_001_voluntary_right_opposing_raw.fif");
+//    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_voluntary_base_raw-cov.fif");
+//    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_voluntary_right_opposing_90_raw-eve.fif");
+//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_voluntary_right_Averaged_");
+//    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_voluntary_right_Averaged_");
+
+//    //Filtered 7-14Hz left voluntary finger opposing
+//    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_001_voluntary_left_opposing_filtered_7_14_raw.fif");
+//    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_voluntary_opposing_base_filtered_7_14_raw-cov.fif");
+//    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_voluntary_left_opposing_154_raw-eve.fif");
+//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_voluntary_left_opposing_filtered_7_14_Averaged_");
+//    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_voluntary_left_opposing_filtered_7_14_Averaged_");
 
 //    //Filtered 7-14Hz right voluntary finger opposing
 //    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_001_voluntary_right_opposing_filtered_7_14_raw.fif");
-//    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_voluntary_base_filtered_7_14_raw-cov.fif");
-//    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_voluntary_right_opposing_artefact_reduction_-1_1_0.0008_raw-eve.fif");    // ("EEG_data_001_voluntary_right_opposing_raw-eve")
-//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_voluntary_right_filtered_7_14_Avr_");
-//    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_voluntary_right_filtered_7_14_Averaged_");
+//    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_voluntary_opposing_base_filtered_7_14_raw-cov.fif");
+//    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_voluntary_right_opposing_135_raw-eve.fif");
+//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_voluntary_right_opposing_filtered_7_14_Averaged_");
+//    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_voluntary_right_opposing_filtered_7_14_Averaged_");
+
+//    //Filtered 0.7-40Hz left voluntary finger opposing
+//    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_001_voluntary_left_opposing_filtered_07_40_raw.fif");
+//    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_voluntary_opposing_base_filtered_07_40_raw-cov.fif");
+//    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_voluntary_left_opposing_137_raw-eve.fif");
+//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_voluntary_left_opposing_filtered_07_40_Averaged_");
+//    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_voluntary_left_opposing_filtered_07_40_Averaged_");
+
+//    //Filtered 0.7-40Hz right voluntary finger opposing
+//    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_001_voluntary_right_opposing_filtered_07_40_raw.fif");
+//    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_voluntary_opposing_base_filtered_07_40_raw-cov.fif");
+//    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_voluntary_right_opposing_135_raw-eve.fif");
+//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_voluntary_right_opposing_filtered_07_40_Averaged_");
+//    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_voluntary_right_opposing_filtered_07_40_Averaged_");
+
+
+    //*************************** Involuntary opposing finger movement **************************//
+
+    //time read around events - note: trigger point is the pressing of the button
+    float tmin = -1.0f;
+    float tmax = 1.0f;
+
+//    //Filtered 7-14Hz left involuntary finger opposing
+//    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_001_involuntary_left_opposing_filtered_7_14_raw.fif");
+//    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_001_base_filtered_7_14_raw-cov.fif");
+//    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_involuntary_left_opposing_137_raw-eve.fif");
+//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_involuntary_left_opposing_filtered_7_14_Averaged_");
+//    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_involuntary_left_opposing_filtered_7_14_Averaged_");
+
+//    //Filtered 7-14Hz right involuntary finger opposing
+//    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_001_involuntary_right_opposing_filtered_7_14_raw.fif");
+//    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_001_base_filtered_7_14_raw-cov.fif");
+//    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_involuntary_right_opposing_150_raw-eve.fif");
+//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_involuntary_right_opposing_filtered_7_14_Averaged_");
+//    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_involuntary_right_opposing_filtered_7_14_Averaged_");
+
+//    //Filtered 0.7-40Hz left involuntary finger opposing
+//    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_001_involuntary_left_opposing_filtered_07_40_raw.fif");
+//    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_001_base_filtered_07_40_raw-cov.fif");
+//    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_involuntary_left_opposing_137_raw-eve.fif");
+//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_involuntary_left_opposing_filtered_07_40_Averaged_");
+//    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_involuntary_left_opposing_filtered_07_40_Averaged_");
+
+    //Filtered 0.7-40Hz right involuntary finger opposing
+    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_001_involuntary_right_opposing_filtered_07_40_raw.fif");
+    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_001_base_filtered_07_40_raw-cov.fif");
+    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_involuntary_right_opposing_150_raw-eve.fif");
+    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_involuntary_right_opposing_filtered_07_40_Averaged_");
+    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_involuntary_right_opposing_filtered_07_40_Averaged_");
+
+    //*************************** Motor imagery **************************//
+
+//    //time read around events - note: trigger point is the pressing of the button, not the atual
+//    float tmin = -1.0f;
+//    float tmax = 6.0f;
+
+//    //Filtered 7-14Hz left MI
+//    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_002_left_MI_filtered_7_14_raw.fif");
+//    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_002_base_filtered_7_14_raw-cov.fif");
+//    QString t_sEventFileNameRel("/Processed/events/EEG_data_002_left_MI_filtered_100_raw-eve.fif");
+//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_left_MI_filtered_7_14_Averaged_");
+//    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_002_left_MI_filtered_7_14_Averaged_");
+
+//    //Filtered 7-14Hz right MI
+//    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_002_right_MI_filtered_7_14_raw.fif");
+//    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_002_base_filtered_7_14_raw-cov.fif");
+//    QString t_sEventFileNameRel("/Processed/events/EEG_data_002_right_MI_filtered_105_raw-eve.fif");
+//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_right_MI_filtered_7_14_Averaged_");
+//    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_002_right_MI_filtered_7_14_Averaged_");
+
+//    //Filtered 0.7-40Hz left MI
+//    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_002_left_MI_filtered_07_40_raw.fif");
+//    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_002_base_filtered_07_40_raw-cov.fif");
+//    QString t_sEventFileNameRel("/Processed/events/EEG_data_002_left_MI_filtered_100_raw-eve.fif");
+//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_left_MI_filtered_07_40_Averaged_");
+//    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_002_left_MI_filtered_07_40_Averaged_");
+
+//    //Filtered 0.7-40Hz right MI
+//    QString t_sRawFileNameRel  ("/Processed/filtered/EEG_data_002_right_MI_filtered_07_40_raw.fif");
+//    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_002_base_filtered_07_40_raw-cov.fif");
+//    QString t_sEventFileNameRel("/Processed/events/EEG_data_002_right_MI_filtered_105_raw-eve.fif");
+//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_right_MI_filtered_07_40_Averaged_");
+//    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_002_right_MI_filtered_07_40_Averaged_");
+
+    //*************************** BCI lefti right in one file finger tapping **************************//
+
+//    //time read around events - note: trigger point is the pressing of the button, not the atual
+//    float tmin = -1.0f;
+//    float tmax = 1.0f;
+
+//    //Filtered 7-14Hz left MI
+//    QString t_sRawFileNameRel  ("/Original/EEG_data_001_voluntary_left_right_tapping_raw.fif");
+//    QString t_sCovFileNameRel  ("/Processed/covariance/EEG_data_002_base_filtered_7_14_raw-cov.fif");
+//    QString t_sEventFileNameRel("/Processed/events/EEG_data_001_voluntary_left_right_tapping_234_raw-eve.fif");
+//    QString t_sStcFileNameRel  ("/Processed/stc/SourceLoc_left_MI_filtered_7_14_Averaged_");
+//    QString t_sAvrFileNameRel  ("/Processed/averaged/EEG_data_001_voluntary_right_tapping_raw_Averaged_");
 
     //##########################################################################################################################
 
@@ -252,20 +413,8 @@ int main(int argc, char *argv[])
     QFile t_fileCov(t_sCovFileNameRel.prepend(data_location));
     QString t_sEventName = t_sEventFileNameRel.prepend(data_location);
 
-    t_sStcFileNameRel.append(t_sStcFileNameRel.number(tmin));
-    t_sStcFileNameRel.append("_");
-    t_sStcFileNameRel.append(t_sStcFileNameRel.number(tmax));
-    t_sStcFileNameRel.append("_");
-    t_sStcFileNameRel.append(method.append(".stc"));
-    QString t_sFileNameStc = t_sStcFileNameRel.prepend(data_location);
+    qint32 event = 1; //254-right trigger | 253-left trigger | 252-beep | 1-old eventfile value for trigger
 
-    t_sAvrFileNameRel.append(t_sAvrFileNameRel.number(tmin));
-    t_sAvrFileNameRel.append("_");
-    t_sAvrFileNameRel.append(t_sAvrFileNameRel.number(tmax));
-    t_sAvrFileNameRel.append(".fif");
-    QString t_sAvrFileName = t_sAvrFileNameRel.prepend(data_location);
-
-    qint32 event = 1;
     qint32 k, p;
     fiff_int_t dest_comp = 0;
     bool keep_comp = false;
@@ -489,10 +638,32 @@ int main(int argc, char *argv[])
 //    VectorXi vecSel(1);
 //    vecSel << 60;
 
+    if(count<averageIterator)
+        averageIterator = count;
+
     VectorXi vecSel(count/averageIterator);
 
-    for(int i=0; i<count/averageIterator; i++)
+    int i;
+    for(i=0; i<count/averageIterator; i++)
         vecSel[i] = i*averageIterator;
+
+    // Add number of averages read from the eventfile to the file name
+    t_sAvrFileNameRel.append(t_sAvrFileNameRel.number(tmin));
+    t_sAvrFileNameRel.append("_");
+    t_sAvrFileNameRel.append(t_sAvrFileNameRel.number(tmax));
+    t_sAvrFileNameRel.append("_");
+    t_sAvrFileNameRel.append(t_sAvrFileNameRel.number(i));
+    t_sAvrFileNameRel.append(".fif");
+    QString t_sAvrFileName = t_sAvrFileNameRel.prepend(data_location);
+
+    t_sStcFileNameRel.append(t_sStcFileNameRel.number(tmin));
+    t_sStcFileNameRel.append("_");
+    t_sStcFileNameRel.append(t_sStcFileNameRel.number(tmax));
+    t_sStcFileNameRel.append("_");
+    t_sStcFileNameRel.append(t_sStcFileNameRel.number(i));
+    t_sStcFileNameRel.append("_");
+    t_sStcFileNameRel.append(method.append(".stc"));
+    QString t_sFileNameStc = t_sStcFileNameRel.prepend(data_location);
 
     std::cout << "Select following epochs to average:\n" << vecSel << std::endl;
     raw.info.filename = QString(""); //this need to be done in order to write a new file. otherwise some of the info contents are not getting copied correctly from raw.info (i.e. digitizer data)
@@ -548,6 +719,8 @@ int main(int argc, char *argv[])
     }
 
     double lambda2 = 1.0 / pow(snr, 2);
+
+
     qDebug() << "Start calculation with: SNR" << snr << "; Lambda" << lambda2 << "; Method" << method << "; stc:" << t_sFileNameStc;
 
     MNEForwardSolution t_Fwd(t_fileFwd);
@@ -562,7 +735,10 @@ int main(int argc, char *argv[])
     //
     // Cluster forward solution;
     //
-    MNEForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution(t_annotationSet, 20);//40);
+    MNEForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution(t_annotationSet, 20);//40); % Use multithreading
+    //MNEForwardSolution t_clusteredFwd = t_Fwd.cluster_forward_solution(t_annotationSet, 10);//40);
+
+    //MNEForwardSolution t_clusteredFwd = t_Fwd;
 
     //
     // Find rows of interest in stc files
@@ -596,6 +772,19 @@ int main(int argc, char *argv[])
         out<<labelIds_right[i]<<endl;
 
     //Find interesting rows in stc files
+    // Left hemisphere
+    QFile wrtFWD_28_left ("./mne_x_plugins/resources/tmsi/fwd_clustered_postcentral_28_Left.txt");
+    wrtFWD_28_left.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream out_28_left(&wrtFWD_28_left);
+
+    QFile wrtFWD_29_left ("./mne_x_plugins/resources/tmsi/fwd_clustered_precentral_29_Left.txt");
+    wrtFWD_29_left.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream out_29_left(&wrtFWD_29_left);
+
+    QFile wrtFWD_45_left ("./mne_x_plugins/resources/tmsi/fwd_clustered_central_45_Left.txt");
+    wrtFWD_45_left.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream out_45_left(&wrtFWD_45_left);
+
     QVector<int> interestingRows_Left;
     out<<endl<<endl<<"interestingRows_Left (matlab syntax):"<<endl<<endl;
     for(int i=0; i<vertno_left.rows() ; i++)
@@ -605,6 +794,7 @@ int main(int argc, char *argv[])
         {
             interestingRows_Left.push_back(i);
             out<<"Region 28 - G_postcentral: "<<i+1<<endl;
+            out_28_left<<i+1<<endl;
         }
 
         //G_precentral
@@ -612,6 +802,7 @@ int main(int argc, char *argv[])
         {
             interestingRows_Left.push_back(i);
             out<<"Region 29 - G_precentral: "<<i+1<<endl;
+            out_29_left<<i+1<<endl;
         }
 
         //S_central
@@ -619,8 +810,22 @@ int main(int argc, char *argv[])
         {
             interestingRows_Left.push_back(i);
             out<<"Region 45 - S_central: "<<i+1<<endl;
+            out_45_left<<i+1<<endl;
         }
     }
+
+    // Right hemisphere
+    QFile wrtFWD_28_right ("./mne_x_plugins/resources/tmsi/fwd_clustered_postcentral_28_Right.txt");
+    wrtFWD_28_right.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream out_28_right(&wrtFWD_28_right);
+
+    QFile wrtFWD_29_right ("./mne_x_plugins/resources/tmsi/fwd_clustered_precentral_29_Right.txt");
+    wrtFWD_29_right.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream out_29_right(&wrtFWD_29_right);
+
+    QFile wrtFWD_45_right ("./mne_x_plugins/resources/tmsi/fwd_clustered_central_45_Right.txt");
+    wrtFWD_45_right.open(QIODevice::WriteOnly | QIODevice::Text);
+    QTextStream out_45_right(&wrtFWD_45_right);
 
     QVector<int> interestingRows_Right;
     out<<endl<<endl<<"interestingRows_Right (matlab syntax):"<<endl<<endl;
@@ -631,6 +836,7 @@ int main(int argc, char *argv[])
         {
             interestingRows_Right.push_back(i);
             out<<"Region 28 - G_postcentral: "<<i+1+vertno_left.rows()<<endl;
+            out_28_right<<i+1<<endl;
         }
 
         //G_precentral
@@ -638,6 +844,7 @@ int main(int argc, char *argv[])
         {
             interestingRows_Right.push_back(i);
             out<<"Region 29 - G_precentral: "<<i+1+vertno_left.rows()<<endl;
+            out_29_right<<i+1<<endl;
         }
 
         //S_central
@@ -645,9 +852,16 @@ int main(int argc, char *argv[])
         {
             interestingRows_Right.push_back(i);
             out<<"Region 45 - S_central: "<<i+1+vertno_left.rows()<<endl;
+            out_45_right<<i+1<<endl;
         }
     }
 
+    wrtFWD_28_left.close();
+    wrtFWD_29_left.close();
+    wrtFWD_45_left.close();
+    wrtFWD_28_right.close();
+    wrtFWD_29_right.close();
+    wrtFWD_45_right.close();
     wrtFWD.close();
 
     //
@@ -656,6 +870,9 @@ int main(int argc, char *argv[])
     FiffInfo info = evoked.info;
 
     MNEInverseOperator inverse_operator(info, t_clusteredFwd, noise_cov, 0.2f, 0.8f);
+
+//    QFile t_fileInv("D:/Dropbox/Masterarbeit DB/Messdaten/EEG/2014_02_07_Lorenz_Esch_007/Processed/inverse operators/Lorenz-140128-Duke128-eeg-inv.fif");
+//    MNEInverseOperator inverse_operator(t_fileInv);
 
     //
     // save clustered inverse
@@ -669,11 +886,59 @@ int main(int argc, char *argv[])
     //
     // Compute inverse solution
     //
+    // Calculate stc for averaged data
     MinimumNorm minimumNorm(inverse_operator, lambda2, method);
+
     MNESourceEstimate sourceEstimate = minimumNorm.calculateInverse(evoked);
 
     if(sourceEstimate.isEmpty())
         return 1;
+
+    // Calculate stc for all trials and write to file - dirty
+    if(doRawTrialLocalization)
+    {
+        MNESourceEstimate sourceEstimate_trial;
+
+        for(int i = 0; i<data.size(); i++)
+        {
+            QString file_trial_stc_orig = t_sFileNameStc;
+
+            QString file_trial_stc_tmp = t_sFileNameStc;
+            QString stc_trial_sub_folder = file_trial_stc_tmp.remove(0,t_sFileNameStc.indexOf("/So")+1);
+
+            stc_trial_sub_folder.remove(".stc");
+            stc_trial_sub_folder.append("-raw-trials/");
+
+            QString dirCheck = data_location;
+            dirCheck.append("/Processed/stc/");
+            dirCheck.append(stc_trial_sub_folder);
+
+            if(QDir(dirCheck).exists() == false)
+                QDir().mkdir(dirCheck);
+
+            stc_trial_sub_folder.prepend("stc/");
+
+            file_trial_stc_orig.replace("stc/", stc_trial_sub_folder);
+
+            QString temp;
+            temp.append("_");
+            temp.append(temp.number(i));
+            temp.append(".stc");
+
+            file_trial_stc_orig.replace(".stc",temp);
+
+            sourceEstimate_trial = minimumNorm.calculateInverse(data[i]->epoch,0,1/info.sfreq);
+
+            if(sourceEstimate_trial.isEmpty())
+                return 1;
+
+            if(!t_sFileNameStc.isEmpty())
+            {
+                QFile t_fileTrialStc(file_trial_stc_orig);
+                sourceEstimate_trial.write(t_fileTrialStc);
+            }
+        }
+    }
 
     // View activation time-series
     std::cout << "\nsourceEstimate:\n" << sourceEstimate.data.block(0,0,10,10) << std::endl;
@@ -684,13 +949,13 @@ int main(int argc, char *argv[])
 
     VectorXd s;
 
-    double t_dConditionNumber = MNEMath::getConditionNumber(t_Fwd.sol->data, s);
-    double t_dConditionNumberClustered = MNEMath::getConditionNumber(t_clusteredFwd.sol->data, s);
+    //double t_dConditionNumber = MNEMath::getConditionNumber(t_Fwd.sol->data, s);
+    //double t_dConditionNumberClustered = MNEMath::getConditionNumber(t_clusteredFwd.sol->data, s);
 
-    std::cout << "Condition Number:\n" << t_dConditionNumber << std::endl;
-    std::cout << "Clustered Condition Number:\n" << t_dConditionNumberClustered << std::endl;
+//    std::cout << "Condition Number:\n" << t_dConditionNumber << std::endl;
+//    std::cout << "Clustered Condition Number:\n" << t_dConditionNumberClustered << std::endl;
 
-    std::cout << "ForwardSolution" << t_Fwd.sol->data.block(0,0,10,10) << std::endl;
+//    std::cout << "ForwardSolution" << t_Fwd.sol->data.block(0,0,10,10) << std::endl;
 
     std::cout << "Clustered ForwardSolution" << t_clusteredFwd.sol->data.block(0,0,10,10) << std::endl;
 
@@ -756,12 +1021,6 @@ int main(int argc, char *argv[])
 
     //Push Estimate
     view.pushSourceEstimate(sourceEstimate);
-
-    if(!t_sFileNameStc.isEmpty())
-    {
-        QFile t_fileClusteredStc(t_sFileNameStc);
-        sourceEstimate.write(t_fileClusteredStc);
-    }
 
     return a.exec();//1;//a.exec();
 }

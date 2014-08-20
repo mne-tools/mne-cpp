@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -105,6 +105,50 @@ using namespace FIFFLIB;
 using namespace Eigen;
 
 
+//=========================================================================================================
+/**
+* Gain matrix output data for one region, used for clustering
+*/
+struct RegionMTOut
+{
+    VectorXi    roiIdx;     /**< Region cluster indices */
+    MatrixXd    ctrs;       /**< Cluster centers */
+    VectorXd    sumd;       /**< Sums of the distances to the centroid */
+    MatrixXd    D;          /**< Distances to the centroid */
+
+    qint32      iLabelIdxOut;   /**< Label ID */
+};
+
+
+//=========================================================================================================
+/**
+* Gain matrix input data for one region, used for clustering
+*/
+struct RegionMT
+{
+    MatrixXd    matRoiMT;           /**< Reshaped region gain matrix sources x sensors(x,y,z)*/
+    MatrixXd    matRoiMTOrig;       /**< Region gain matrix sensors x sources(x,y,z)*/
+
+    qint32      nClusters;      /**< Number of clusters within this region */
+    VectorXi    idcs;           /**< Get source space indeces */
+    qint32      iLabelIdxIn;    /**< Label ID */
+
+    RegionMTOut cluster() const
+    {
+        // Kmeans Reduction
+        RegionMTOut p_RegionMTOut;
+
+        KMeans t_kMeans(QString("sqeuclidean"), QString("sample"), 5);//QString("cityblock")
+
+        t_kMeans.calculate(this->matRoiMT, this->nClusters, p_RegionMTOut.roiIdx, p_RegionMTOut.ctrs, p_RegionMTOut.sumd, p_RegionMTOut.D);
+
+        p_RegionMTOut.iLabelIdxOut = this->iLabelIdxIn;
+
+        return p_RegionMTOut;
+    }
+};
+
+
 //=============================================================================================================
 /**
 * Inverse operator
@@ -176,7 +220,7 @@ public:
     *
     * @return the assembled kernel
     */
-    bool assemble_kernel(const Label &label, QString method, bool pick_normal, MatrixXd &K, SparseMatrix<double> &noise_norm, QList<VectorXi> &vertno) const;
+    bool assemble_kernel(const Label &label, QString method, bool pick_normal, MatrixXd &K, SparseMatrix<double> &noise_norm, QList<VectorXi> &vertno);
 
     //=========================================================================================================
     /**
@@ -187,6 +231,42 @@ public:
     * @return true when successful, false otherwise
     */
     bool check_ch_names(const FiffInfo &info) const;
+
+    //=========================================================================================================
+    /**
+    * Clusters the current kernel
+    *
+    * @param[in]    p_AnnotationSet     Annotation set containing the annotation of left & right hemisphere
+    * @param[in]    p_iClusterSize      Maximal cluster size per roi
+    * @param[out]   p_D                 The cluster operator
+    *
+    * @return the clustered kernel
+    */
+    MatrixXd cluster_kernel(const AnnotationSet &p_AnnotationSet, qint32 p_iClusterSize, MatrixXd& p_D) const;
+
+    //=========================================================================================================
+    /**
+    * Returns the current kernel
+    *
+    * @return the current kernel
+    */
+    inline MatrixXd& getKernel();
+
+    //=========================================================================================================
+    /**
+    * Returns the current kernel
+    *
+    * @return the current kernel
+    */
+    inline MatrixXd getKernel() const;
+
+    //=========================================================================================================
+    /**
+    * Has inverse operator fixed orientation?
+    *
+    * @return true if inverse operator has fixed orientation, false otherwise
+    */
+    inline bool isFixedOrient() const;
 
     //=========================================================================================================
     /**
@@ -290,12 +370,39 @@ public:
     MatrixXd whitener;                      /**< Whitens the data */
     VectorXd reginv;                        /**< The diagonal matrix implementing. regularization and the inverse */
     SparseMatrix<double> noisenorm;         /**< These are the noise-normalization factors */
+
+private:
+    MatrixXd m_K;                           /**< Everytime a new kernel is assamebled a copy is stored here */
 };
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INLINE DEFINITIONS
 //=============================================================================================================
+
+inline MatrixXd& MNEInverseOperator::getKernel()
+{
+    return m_K;
+}
+
+
+//*************************************************************************************************************
+
+inline MatrixXd MNEInverseOperator::getKernel() const
+{
+    return m_K;
+}
+
+
+//*************************************************************************************************************
+
+inline bool MNEInverseOperator::isFixedOrient() const
+{
+    return this->source_ori == FIFFV_MNE_FIXED_ORI;
+}
+
+
+//*************************************************************************************************************
 
 inline std::ostream& operator<<(std::ostream& out, const MNELIB::MNEInverseOperator &p_MNEInverseOperator)
 {

@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -57,6 +57,7 @@
 #include <QVBoxLayout>
 #include <QContextMenuEvent>
 #include <QSharedPointer>
+#include <QShortcut>
 
 
 //*************************************************************************************************************
@@ -73,11 +74,6 @@ class QTimer;
 class QTime;
 class QDockWidget;
 class QTextBrowser;
-
-namespace DISPLIB
-{
-class DisplayManager;
-}
 
 
 //*************************************************************************************************************
@@ -104,9 +100,11 @@ class StartUpWidget;
 class PluginGui;
 class PluginManager;
 class PluginSceneManager;
-class NewDisplayManager;
+class DisplayManager;
 
 class IPlugin;
+
+class PluginConnectorConnection;
 
 class RunWidget;
 class PluginDockWidget;
@@ -183,8 +181,9 @@ private:
     StartUpWidget* m_pStartUpWidget;    /**< holds the StartUpWidget.*/
 
     //Run
-    RunWidget* m_pRunWidget;                                /**< The run widget */
-    QSharedPointer<NewDisplayManager> m_pDisplayManager;    /**< The run widget */
+    RunWidget* m_pRunWidget;                            /**< The run widget */
+    QShortcut* m_pRunWidgetClose;                       /**< Run widget close shortcut */
+    QSharedPointer<DisplayManager> m_pDisplayManager;   /**< display manager */
 
     bool m_bDisplayMax;                 /**< whether full screen mode is activated.*/
     bool m_bIsRunning;                  /**< whether program/plugins is/are started.*/
@@ -207,35 +206,41 @@ private:
 
     void initStatusBar();       /**< Creates QToolBar for user interface of MainWindow class. */
 
-    QAction*                             m_pActionNewConfig;        /**< new configuration */
-    QAction*                             m_pActionOpenConfig;       /**< open configuration */
-    QAction*                             m_pActionSaveConfig;       /**< save configuration */
-    QAction*                             m_pActionExit;             /**< exit application */
+    QAction*                            m_pActionNewConfig;         /**< new configuration */
+    QAction*                            m_pActionOpenConfig;        /**< open configuration */
+    QAction*                            m_pActionSaveConfig;        /**< save configuration */
+    QAction*                            m_pActionExit;              /**< exit application */
 
-    QActionGroup*                        m_pActionGroupLgLv;        /**< group log level */
-    QAction*                             m_pActionMinLgLv;          /**< set minimal log level */
-    QAction*                             m_pActionNormLgLv;         /**< set normal log level */
-    QAction*                             m_pActionMaxLgLv;          /**< set maximal log level */
+    QActionGroup*                       m_pActionGroupLgLv;         /**< group log level */
+    QAction*                            m_pActionMinLgLv;           /**< set minimal log level */
+    QAction*                            m_pActionNormLgLv;          /**< set normal log level */
+    QAction*                            m_pActionMaxLgLv;           /**< set maximal log level */
 
-    QAction*                             m_pActionHelpContents;     /**< open help contents */
-    QAction*                             m_pActionAbout;            /**< show about dialog */
+    QAction*                            m_pActionHelpContents;      /**< open help contents */
+    QAction*                            m_pActionAbout;             /**< show about dialog */
 
-    QAction*                             m_pActionRun;              /**< run application */
-    QAction*                             m_pActionStop;             /**< stop application */
-    QAction*                             m_pActionZoomStd;          /**< standard zoom */
-    QAction*                             m_pActionZoomIn;           /**< zoom in */
-    QAction*                             m_pActionZoomOut;          /**< zoom out */
-    QAction*                             m_pActionDisplayMax;       /**< show full screen mode */
+    QAction*                            m_pActionRun;               /**< run application */
+    QAction*                            m_pActionStop;              /**< stop application */
+    QAction*                            m_pActionZoomStd;           /**< standard zoom */
+    QAction*                            m_pActionZoomIn;            /**< zoom in */
+    QAction*                            m_pActionZoomOut;           /**< zoom out */
+    QAction*                            m_pActionDisplayMax;        /**< show full screen mode */
+
+    QList< QAction* >                   m_qListDynamicPluginActions;    /**< dynamic plugin actions */
+    QList< QAction* >                   m_qListDynamicDisplayActions;   /**< dynamic display actions */
+    QList< QWidget* >                   m_qListDynamicDisplayWidgets;   /**< dynamic display widgets */
 
     //Main Window Menu
-    QMenu*                                 m_pMenuFile;     /**< Holds the file menu.*/
-    QMenu*                                 m_pMenuView;     /**< Holds the view menu.*/
-    QMenu*                                 m_pMenuLgLv;     /**< Holds the log level sub menu.*/
-    QMenu*                                 m_pMenuHelp;     /**< Holds the help menu.*/
+    QMenu*                              m_pMenuFile;    /**< Holds the file menu.*/
+    QMenu*                              m_pMenuView;    /**< Holds the view menu.*/
+    QMenu*                              m_pMenuLgLv;    /**< Holds the log level sub menu.*/
+    QMenu*                              m_pMenuHelp;    /**< Holds the help menu.*/
 
     // Tool bar
-    QToolBar*                             m_pToolBar;       /**< Holds the tool bar.*/
-
+    QToolBar*                           m_pToolBar;                 /**< Holds the tool bar.*/
+    QToolBar*                           m_pDynamicPluginToolBar;    /**< Holds the plugin tool bar.*/
+    QToolBar*                           m_pDynamicDisplayToolBar;   /**< Holds the display tool bar.*/
+    QString                             m_sCurPluginName;           /**< The name which corresponds to the current selected plugin */
 
     QLabel*                             m_pLabelTime;      /**< Holds the display label for the running time.*/
     QSharedPointer<QTimer>              m_pTimer;           /**< timer of the main application*/
@@ -255,12 +260,15 @@ private:
     QDockWidget*                        m_pDockWidget_Log;              /**< Holds the dock widget containing the log.*/
     QTextBrowser*                       m_pTextBrowser_Log;             /**< Holds the text browser for the log.*/
 
-    LogLevel                             m_eLogLevelCurrent;            /**< Holds the current log level.*/
+    LogLevel                            m_eLogLevelCurrent;            /**< Holds the current log level.*/
 
 
-    void updatePluginWidget(QSharedPointer<IPlugin> pPlugin);     /**< Sets a widget to central widget of MainWindow class depending on the current plugin selected in m_pDockWidgetPlugins.*/
+    void updatePluginWidget(QSharedPointer<IPlugin> pPlugin);           /**< Sets the plugin widget to central widget of MainWindow class depending on the current plugin selected in m_pDockWidgetPlugins.*/
 
-private slots:
+    void updateConnectionWidget(QSharedPointer<PluginConnectorConnection> pConnection);   /**< Sets the connection widget to central widget of MainWindow class depending on the current arrow selected in m_pDockWidgetPlugins.*/
+
+
+private:
     void newConfiguration();            /**< Implements new configuration tasks.*/
     void openConfiguration();           /**< Implements open configuration tasks.*/
     void saveConfiguration();           /**< Implements save configuration tasks.*/

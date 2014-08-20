@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -136,6 +136,14 @@ public:
 
     //=========================================================================================================
     /**
+    * Get the prepared inverse operator.
+    *
+    * @return the prepared inverse operator
+    */
+    inline MNEInverseOperator& getPreparedInverseOperator();
+
+    //=========================================================================================================
+    /**
     * Set minimum norm algorithm method ("MNE" | "dSPM" | "sLORETA")
     *
     * @param[in] method   Use mininum norm, dSPM or sLORETA.
@@ -159,6 +167,8 @@ public:
     */
     void setRegularization(float lambda);
 
+    inline MatrixXd& getKernel();
+
 private:
     MNEInverseOperator m_inverseOperator;   /**< The inverse operator */
     float m_fLambda;                        /**< Regularization parameter */
@@ -174,6 +184,24 @@ private:
     MatrixXd K;                             /**< Imaging kernel */
 
 };
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline MatrixXd& MinimumNorm::getKernel()
+{
+    return K;
+}
+
+
+//*************************************************************************************************************
+
+inline MNEInverseOperator& MinimumNorm::getPreparedInverseOperator()
+{
+    return inv;
+}
 
 } //NAMESPACE
 

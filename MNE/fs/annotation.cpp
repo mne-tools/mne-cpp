@@ -17,12 +17,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -102,6 +102,32 @@ void Annotation::clear()
     m_Vertices = VectorXi::Zero(0);
     m_LabelIds = VectorXi::Zero(0);
     m_Colortable.clear();
+}
+
+
+//*************************************************************************************************************
+
+bool Annotation::read(const QString &subject_id, qint32 hemi, const QString &atlas, const QString &subjects_dir, Annotation &p_Annotation)
+{
+    if(hemi != 0 && hemi != 1)
+        return false;
+
+    QString p_sFile = QString("%1/%2/label/%3.%4.annot").arg(subjects_dir).arg(subject_id).arg(hemi == 0 ? "lh" : "rh").arg(atlas);
+
+    return read(p_sFile, p_Annotation);
+}
+
+
+//*************************************************************************************************************
+
+bool Annotation::read(const QString &path, qint32 hemi, const QString &atlas, Annotation &p_Annotation)
+{
+    if(hemi != 0 && hemi != 1)
+        return false;
+
+    QString p_sFile = QString("%1/%2.%3.annot").arg(path).arg(hemi == 0 ? "lh" : "rh").arg(atlas);
+
+    return read(p_sFile, p_Annotation);
 }
 
 
@@ -238,9 +264,9 @@ bool Annotation::read(const QString& p_sFileName, Annotation &p_Annotation)
 
     // hemi info
     if(t_File.fileName().contains("lh."))
-        p_Annotation.hemi = 0;
+        p_Annotation.m_iHemi = 0;
     else
-        p_Annotation.hemi = 1;
+        p_Annotation.m_iHemi = 1;
 
     printf("[done]\n");
 
@@ -254,9 +280,9 @@ bool Annotation::read(const QString& p_sFileName, Annotation &p_Annotation)
 
 bool Annotation::toLabels(const Surface &p_surf, QList<Label> &p_qListLabels, QList<RowVector4i> &p_qListLabelRGBAs) const
 {
-    if(this->hemi != p_surf.hemi)
+    if(this->m_iHemi != p_surf.hemi())
     {
-        qWarning("Annotation and surface hemisphere (annot = %d; surf = %d) do not match!\n", this->hemi, p_surf.hemi);
+        qWarning("Annotation and surface hemisphere (annot = %d; surf = %d) do not match!\n", this->m_iHemi, p_surf.hemi());
         return false;
     }
 
@@ -277,7 +303,7 @@ bool Annotation::toLabels(const Surface &p_surf, QList<Label> &p_qListLabels, QL
     MatrixX4i label_rgbas = m_Colortable.getRGBAs();
 
     // load the vertex positions from surface
-    MatrixX3f vert_pos = p_surf.rr;
+    MatrixX3f vert_pos = p_surf.rr();
 
 //    qDebug() << label_rgbas.rows() << label_ids.size() << label_names.size();
 
@@ -314,11 +340,11 @@ bool Annotation::toLabels(const Surface &p_surf, QList<Label> &p_qListLabels, QL
             pos.row(j) = vert_pos.row(vertices[j]);
 
         values = VectorXd::Zero(count);
-        name = QString("%1-%2").arg(label_names[i]).arg(this->hemi == 0 ? "lh" : "rh");
+        name = QString("%1-%2").arg(label_names[i]).arg(this->m_iHemi == 0 ? "lh" : "rh");
 
         // put it all together
         //t_tris
-        p_qListLabels.append(Label(vertices, pos, values, this->hemi, name, label_id));
+        p_qListLabels.append(Label(vertices, pos, values, this->m_iHemi, name, label_id));
 
         // store the color
         p_qListLabelRGBAs.append(label_rgba);

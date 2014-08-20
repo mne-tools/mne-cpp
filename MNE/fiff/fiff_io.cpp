@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     fiff_obj.cpp
+* @file     fiff_io.cpp
 * @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
@@ -17,12 +17,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -40,8 +40,10 @@
 //=============================================================================================================
 
 #include "fiff_io.h"
+#include "fiff.h"
+#include "fiff_evoked_set.h"
 #include "fiff_stream.h"
-#include <mne/mne.h>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -112,7 +114,7 @@ bool FiffIO::read(QIODevice& p_IODevice)
     FiffInfo t_fiffInfo;
     FiffDirTree t_Tree;
     FiffDirTree t_dirTree;
-    bool hasRaw=false,hasEvoked=false,hasFwds=false;
+    bool hasRaw=false,hasEvoked=false; // hasFwds=false;
 
     FiffIO::setup_read(p_IODevice,t_fiffInfo,t_Tree,t_dirTree);
     p_IODevice.close(); //file can be closed, since IODevice is already read
@@ -120,10 +122,10 @@ bool FiffIO::read(QIODevice& p_IODevice)
     //Search dirTree for specific data types
     if(t_dirTree.has_kind(FIFFB_EVOKED))
         hasEvoked = true;
-    if(t_dirTree.has_kind(FIFFB_RAW_DATA)) //this type might not yet be sufficient, (another is e.g. FIFFB_RAW_DATA)
+    if(t_dirTree.has_kind(FIFFB_RAW_DATA) || t_dirTree.has_kind(FIFFB_PROCESSED_DATA))
         hasRaw = true;
-    if(t_Tree.has_kind(FIFFB_MNE_FORWARD_SOLUTION))
-        hasFwds = true;
+   // if(t_Tree.has_kind(FIFFB_MNE_FORWARD_SOLUTION))
+   //     hasFwds = true;
 
     //Read all sort of types
     //raw data
@@ -168,7 +170,7 @@ bool FiffIO::write(QIODevice& p_IODevice, const fiff_int_t type, const fiff_int_
     switch(type) {
         case FIFFB_RAW_DATA: {
             FiffIO::write_raw(p_IODevice,idx);
-        printf("Finished writing single raw data with index %i!\n",idx);
+            qDebug() << "Finished writing single raw data with index" << idx << ".";
         }
         case FIFFB_EVOKED:
         //ToDo: write evoked set to file
@@ -182,7 +184,7 @@ bool FiffIO::write(QIODevice& p_IODevice, const fiff_int_t type, const fiff_int_
 //*************************************************************************************************************
 
 bool FiffIO::write(QFile& p_QFile, const fiff_int_t type, const fiff_int_t idx) const {
-    printf("------------------------ Writing fiff data ------------------------\n");
+    qDebug("------------------------ Writing fiff data ------------------------");
 
     switch(type) {
         case FIFFB_RAW_DATA: {
@@ -196,7 +198,7 @@ bool FiffIO::write(QFile& p_QFile, const fiff_int_t type, const fiff_int_t idx) 
                 t_fname = p_QFile.fileName().insert(p,QString("_"+t_nameoftype+"-"+QString::number(i)));
 
                 //assign new file name
-                printf("\nWriting set with index %i to file %s ...",i,t_fname.toUtf8().constData());
+                qDebug("\nWriting set with index %i to file %s ...",i,t_fname.toUtf8().constData());
                 QFile t_file(t_fname);
 
                 FiffIO::write_raw(t_file,i);
@@ -205,7 +207,7 @@ bool FiffIO::write(QFile& p_QFile, const fiff_int_t type, const fiff_int_t idx) 
         else {
             FiffIO::write_raw(p_QFile,idx);
         }
-        printf("\nFinished Writing %i raw data sets!\n",m_qlistRaw.size());
+        qDebug("\nFinished Writing %i raw data sets!\n",m_qlistRaw.size());
         }
         case FIFFB_EVOKED:
 
@@ -223,7 +225,7 @@ bool FiffIO::write_raw(QIODevice& p_IODevice, const fiff_int_t idx) const {
 
     MatrixXd cals;
 
-//    std::cout << "Writing file " << QFile(&p_IODevice).fileName() << std::endl;
+//    std::cout << "Writing file " << QFile(&p_IODevice).fileName().toLatin1() << std::endl;
     FiffStream::SPtr outfid = Fiff::start_writing_raw(p_IODevice,this->m_qlistRaw[idx]->info,cals);
 
     //Setup reading parameters
@@ -248,18 +250,18 @@ bool FiffIO::write_raw(QIODevice& p_IODevice, const fiff_int_t idx) const {
             last = to;
 
         if (!m_qlistRaw[idx]->read_raw_segment(data,times,first,last)) {
-                printf("error during read_raw_segment\n");
-                return -1;
+                qDebug("error during read_raw_segment\n");
+                return false;
         }
 
-        printf("Writing...");
+        qDebug("Writing...");
         if (first_buffer) {
            if (first > 0)
                outfid->write_int(FIFF_FIRST_SAMPLE,&first);
            first_buffer = false;
         }
         outfid->write_raw_buffer(data,cals);
-        printf("[done]\n");
+        qDebug("[done]\n");
     }
 
     outfid->finish_writing_raw();

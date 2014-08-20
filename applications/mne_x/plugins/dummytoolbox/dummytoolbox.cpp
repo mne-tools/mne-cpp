@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -67,7 +67,8 @@ using namespace XMEASLIB;
 //=============================================================================================================
 
 DummyToolbox::DummyToolbox()
-: m_pDummyInput(NULL)
+: m_bIsRunning(false)
+, m_pDummyInput(NULL)
 , m_pDummyOutput(NULL)
 , m_pDummyBuffer(new dBuffer(1024))
 {
@@ -78,7 +79,8 @@ DummyToolbox::DummyToolbox()
 
 DummyToolbox::~DummyToolbox()
 {
-    stop();
+    if(this->isRunning())
+        stop();
 }
 
 
@@ -117,8 +119,21 @@ void DummyToolbox::init()
 
 //*************************************************************************************************************
 
+void DummyToolbox::unload()
+{
+
+}
+
+
+//*************************************************************************************************************
+
 bool DummyToolbox::start()
 {
+    //Check if the thread is already or still running. This can happen if the start button is pressed immediately after the stop button was pressed. In this case the stopping process is not finished yet but the start process is initiated.
+    if(this->isRunning())
+        QThread::wait();
+
+    m_bIsRunning = true;
     QThread::start();
     return true;
 }
@@ -128,9 +143,10 @@ bool DummyToolbox::start()
 
 bool DummyToolbox::stop()
 {
-    // Stop threads
-    QThread::terminate();
-    QThread::wait();
+    m_bIsRunning = false;
+
+    m_pDummyBuffer->releaseFromPop();
+    m_pDummyBuffer->releaseFromPush();
 
     m_pDummyBuffer->clear();
 
@@ -185,7 +201,7 @@ void DummyToolbox::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
 void DummyToolbox::run()
 {
-    while (true)
+    while(m_bIsRunning)
     {
         /* Dispatch the inputs */
         double v = m_pDummyBuffer->pop();

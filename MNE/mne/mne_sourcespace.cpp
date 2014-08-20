@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 * 
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -161,6 +161,98 @@ QList<VectorXi> MNESourceSpace::label_src_vertno_sel(const Label &p_label, Vecto
 
 //*************************************************************************************************************
 
+MNESourceSpace MNESourceSpace::pick_regions(const QList<Label> &p_qListLabels) const
+{
+    Q_UNUSED(p_qListLabels);
+
+    MNESourceSpace selectedSrc(*this);
+
+    for(qint32 h = 0; h < 2; ++h)
+    {
+        VectorXi selVertices;
+
+        //get vertices indeces for new selection
+        qint32 iSize = 0;
+        for(qint32 i = 0; i < p_qListLabels.size(); ++i)
+        {
+            if(p_qListLabels[i].hemi == h)
+            {
+                VectorXi currentSelection;
+
+                MNEMath::intersect(m_qListHemispheres[h].vertno, p_qListLabels[i].vertices, currentSelection);
+
+                selVertices.conservativeResize(iSize+currentSelection.size());
+                selVertices.block(iSize,0,currentSelection.size(),1) = currentSelection;
+                iSize = selVertices.size();
+            }
+        }
+
+        MNEMath::sort(selVertices, false);
+
+        VectorXi newVertno(selVertices.size());
+
+        selectedSrc.m_qListHemispheres[h].inuse = VectorXi::Zero(selectedSrc.m_qListHemispheres[h].np);
+
+        for(qint32 i = 0; i < selVertices.size(); ++i)
+        {
+            selectedSrc.m_qListHemispheres[h].inuse[selVertices[i]] = 1;
+            newVertno[i] = this->m_qListHemispheres[h].vertno[selVertices[i]];
+        }
+
+        selectedSrc.m_qListHemispheres[h].nuse = selVertices.size();
+        selectedSrc.m_qListHemispheres[h].vertno = newVertno;
+
+        //
+        // Tris
+        //
+        VectorXi idx_select = VectorXi::Zero(this->m_qListHemispheres[h].use_tris.rows());
+        for(qint32 i = 0; i < 3; ++i)
+        {
+            VectorXi tri_dim = this->m_qListHemispheres[h].use_tris.col(i);
+            VectorXi idx_dim;
+            MNEMath::intersect(tri_dim, newVertno, idx_dim);
+
+            for(qint32 j = 0; j < idx_dim.size(); ++j)
+                idx_select[idx_dim[j]] = 1;
+        }
+
+        qint32 countSel = 0;
+        for(qint32 i = 0; i < idx_select.size(); ++i)
+            if(idx_select[i] == 1)
+                ++countSel;
+
+        selectedSrc.m_qListHemispheres[h].nuse_tri = countSel;
+
+        MatrixX3i use_tris_new(countSel,3);
+        MatrixX3d use_tri_cent_new(countSel,3);
+        MatrixX3d use_tri_nn_new(countSel,3);
+        VectorXd use_tri_area_new(countSel);
+
+        countSel = 0;
+        for(qint32 i = 0; i < idx_select.size(); ++i)
+        {
+            if(idx_select[i] == 1)
+            {
+                use_tris_new.row(countSel) = this->m_qListHemispheres[h].use_tris.row(i);
+                use_tri_cent_new.row(countSel) = this->m_qListHemispheres[h].use_tri_cent.row(i);
+                use_tri_nn_new.row(countSel) = this->m_qListHemispheres[h].use_tri_nn.row(i);
+                use_tri_area_new[countSel] = this->m_qListHemispheres[h].use_tri_area[i];
+                ++countSel;
+            }
+        }
+
+        selectedSrc.m_qListHemispheres[h].use_tris = use_tris_new;
+        selectedSrc.m_qListHemispheres[h].use_tri_cent = use_tri_cent_new;
+        selectedSrc.m_qListHemispheres[h].use_tri_nn = use_tri_nn_new;
+        selectedSrc.m_qListHemispheres[h].use_tri_area = use_tri_area_new;
+    }
+
+    return selectedSrc;
+}
+
+
+//*************************************************************************************************************
+
 bool MNESourceSpace::readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, FiffDirTree& p_Tree, MNESourceSpace& p_SourceSpace)
 {
 //    if (p_pSourceSpace != NULL)
@@ -217,34 +309,6 @@ bool MNESourceSpace::readFromStream(FiffStream::SPtr& p_pStream, bool add_geom, 
         p_pStream->device()->close();
 
     return true;
-}
-
-
-//*************************************************************************************************************
-
-MNESourceSpace MNESourceSpace::selectRegions(const QList<Label> &p_qListLabels) const
-{
-//    QList<VectorXi> vertno;
-//    vertno << this->m_qListHemispheres[0].vertno << this->m_qListHemispheres[1].vertno;
-
-//    if (p_label.hemi == 0) //lh
-//    {
-//        VectorXi vertno_sel = MNEMath::intersect(vertno[0], p_label.vertices, src_sel);
-//        vertno[0] = vertno_sel;
-//        vertno[1] = VectorXi();
-//    }
-//    else if (p_label.hemi == 1) //rh
-//    {
-//        VectorXi vertno_sel = MNEMath::intersect(vertno[1], p_label.vertices, src_sel);
-//        src_sel.array() += p_label.vertices.size();
-//        vertno[0] = VectorXi();
-//        vertno[1] = vertno_sel;
-//    }
-
-
-
-    MNESourceSpace test;
-    return test;
 }
 
 

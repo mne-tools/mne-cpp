@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     sourcelabsetupwidget.cpp
+* @file     rtssssetupwidget.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the SourceLabSetupWidget class.
+* @brief    Contains the implementation of the ECGSetupWidget class.
 *
 */
 
@@ -40,9 +40,8 @@
 
 #include "rtssssetupwidget.h"
 #include "rtsssaboutwidget.h"
-
 #include "../rtsss.h"
-
+#include "../rtsssalgo.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -72,6 +71,13 @@ RtSssSetupWidget::RtSssSetupWidget(RtSss* toolbox, QWidget *parent)
     ui.setupUi(this);
 
     connect(ui.m_qPushButton_About, SIGNAL(released()), this, SLOT(showAboutDialog()));
+
+    connect(ui.m_qSpinBox_LinRR, SIGNAL(valueChanged (int)), this, SLOT(setNewLinRR(int)));
+
+    connect(ui.m_qSpinBox_LinRR, SIGNAL(valueChanged (int)), this, SLOT(setNewLinRR(int)));
+    connect(ui.m_qSpinBox_LoutRR, SIGNAL(valueChanged (int)), this, SLOT(setNewLoutRR(int)));
+    connect(ui.m_qSpinBox_Lin, SIGNAL(valueChanged (int)), this, SLOT(setNewLin(int)));
+    connect(ui.m_qSpinBox_Lout, SIGNAL(valueChanged (int)), this, SLOT(setNewLout(int)));
 }
 
 
@@ -80,6 +86,56 @@ RtSssSetupWidget::RtSssSetupWidget(RtSss* toolbox, QWidget *parent)
 RtSssSetupWidget::~RtSssSetupWidget()
 {
 
+}
+
+
+//*************************************************************************************************************
+
+void RtSssSetupWidget::setNewLinRR(int val)
+{
+    std::cout << "###### Emitted LinRR(set): " << val << std::endl;
+    emit signalNewLinRR(val);
+}
+
+void RtSssSetupWidget::setNewLoutRR(int val)
+{
+    std::cout << "###### Emitted LoutRR(set): " << val << std::endl;
+    emit signalNewLoutRR(val);
+}
+
+void RtSssSetupWidget::setNewLin(int val)
+{
+    std::cout << "###### Emitted Lin(set): " << val << std::endl;
+    emit signalNewLin(val);
+}
+
+void RtSssSetupWidget::setNewLout(int val)
+{
+    std::cout << "###### Emitted Lout(set): " << val << std::endl;
+    emit signalNewLout(val);
+}
+
+
+//*************************************************************************************************************
+
+int RtSssSetupWidget::getLinRR()
+{
+    return ui.m_qSpinBox_LinRR->value();
+}
+
+int RtSssSetupWidget::getLoutRR()
+{
+    return ui.m_qSpinBox_LoutRR->value();
+}
+
+int RtSssSetupWidget::getLin()
+{
+    return ui.m_qSpinBox_Lin->value();
+}
+
+int RtSssSetupWidget::getLout()
+{
+    return ui.m_qSpinBox_Lout->value();
 }
 
 

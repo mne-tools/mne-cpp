@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -42,9 +42,8 @@
 // INCLUDES
 //=============================================================================================================
 
+//#include "../ui_dummysetup.h"
 #include "../ui_rtssssetup.h"
-
-#include <xMeas/Nomenclature/nomenclature.h>
 
 
 //*************************************************************************************************************
@@ -59,8 +58,6 @@
 //=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
-
-using namespace XMEASLIB;
 
 
 //*************************************************************************************************************
@@ -84,7 +81,7 @@ class RtSss;
 /**
 * DECLARE CLASS RtSssSetupWidget
 *
-* @brief The RtSssSetupWidget class provides the DummyToolbox configuration window.
+* @brief The RtSssSetupWidget class provides the RtSss configuration window.
 */
 class RtSssSetupWidget : public QWidget
 {
@@ -96,18 +93,28 @@ public:
     /**
     * Constructs a RtSssSetupWidget which is a child of parent.
     *
-    * @param [in] toolbox a pointer to the corresponding SourceLabToolbox.
-    * @param [in] parent pointer to parent widget; If parent is 0, the new SourceLabSetupWidget becomes a window. If parent is another widget, DummySetupWidget becomes a child window inside parent. DummySetupWidget is deleted when its parent is deleted.
+    * @param [in] toolbox a pointer to the corresponding RtSss.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new RtSssSetupWidget becomes a window. If parent is another widget, RtSssSetupWidget becomes a child window inside parent. RtSssSetupWidget is deleted when its parent is deleted.
     */
     RtSssSetupWidget(RtSss* toolbox, QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the SourceLabSetupWidget.
-    * All SourceLabSetupWidget's children are deleted first. The application exits if SourceLabSetupWidget is the main widget.
+    * Destroys the RtSssSetupWidget.
+    * All RtSssSetupWidget's children are deleted first. The application exits if RtSssSetupWidget is the main widget.
     */
     ~RtSssSetupWidget();
 
+    int getLinRR();
+    int getLoutRR();
+    int getLin();
+    int getLout();
+
+signals:
+    void signalNewLinRR(int val);
+    void signalNewLoutRR(int val);
+    void signalNewLin(int val);
+    void signalNewLout(int val);
 
 private slots:
     //=========================================================================================================
@@ -116,12 +123,16 @@ private slots:
     *
     */
     void showAboutDialog();
+    void setNewLinRR(int);
+    void setNewLoutRR(int);
+    void setNewLin(int);
+    void setNewLout(int);
 
 private:
 
-    RtSss* m_pRtSss;                /**< Holds a pointer to corresponding RtSss.*/
+    RtSss* m_pRtSss;	/**< Holds a pointer to corresponding RtSss.*/
 
-    Ui::RtSssSetupWidgetClass ui;   /**< Holds the user interface for the RtSssSetupWidget.*/
+    Ui::RtSssSetupWidgetClass ui;	/**< Holds the user interface for the RtSssSetupWidget.*/
 };
 
 } // NAMESPACE

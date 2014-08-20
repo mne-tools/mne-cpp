@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -102,11 +102,11 @@ const QString FiffSimulator::Commands::SIMFILE      = "simfile";
 FiffSimulator::FiffSimulator()
 : m_pFiffProducer(new FiffProducer(this))
 , m_sResourceDataPath(QString("%1/MNE-sample-data/MEG/sample/sample_audvis_raw.fif").arg(QCoreApplication::applicationDirPath()))
-, m_bIsRunning(false)
 , m_uiBufferSampleSize(100)//(4)
-, m_pRawMatrixBuffer(NULL)
 , m_AccelerationFactor(1.0)
 , m_TrueSamplingRate(0.0)
+, m_pRawMatrixBuffer(NULL)
+, m_bIsRunning(false)
 {
     this->init();
 }
@@ -311,6 +311,36 @@ const char* FiffSimulator::getName() const
 
 void FiffSimulator::init()
 {
+    //
+    // Read cfg file
+    //
+    QFile t_qFile(QString("%1/mne_rt_server_plugins/FiffSimulation.cfg").arg(QCoreApplication::applicationDirPath()));
+    if (t_qFile.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        QTextStream in(&t_qFile);
+        QString key = "simFile = ";
+        while (!in.atEnd()) {
+            QString line = in.readLine();
+            if(line.contains(key, Qt::CaseInsensitive))
+            {
+                qint32 idx = line.indexOf(key);
+                idx += key.size();
+
+                QString sFileName = line.mid(idx, line.size()-idx);
+
+                QFile t_qFileMeas(sFileName);
+
+                if (t_qFileMeas.open(QIODevice::ReadOnly))
+                {
+                    m_sResourceDataPath = sFileName;
+                    std::cout << "\tLoad simulation file: " << sFileName.toLatin1().constData() << std::endl;
+                    t_qFileMeas.close();
+                }
+            }
+        }
+        t_qFile.close();
+    }
+
     if(m_pRawMatrixBuffer)
         delete m_pRawMatrixBuffer;
     m_pRawMatrixBuffer = NULL;
