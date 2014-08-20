@@ -115,13 +115,21 @@ private:
 
     //=========================================================================================================
     /**
+    * Setup the sample labels of the data window.
+    */
+    void setupSampleLabels();
+
+    //=========================================================================================================
+    /**
     * event reimplemented virtual function to handle the resizing of the data dock window
     */
     bool event(QEvent * event);
 
     Ui::DataWindowDockWidget *ui;
 
-    MainWindow* m_pMainWindow;
+    MainWindow*     m_pMainWindow;
+
+    QSettings       m_qSettings;
 
 protected slots:
     //=========================================================================================================
@@ -130,6 +138,12 @@ protected slots:
     * @param pos is the position, where the right-click occurred
     */
     void customContextMenuRequested(QPoint pos);
+
+    //=========================================================================================================
+    /**
+    * Set the sample labels of the data window.
+    */
+    void setSampleLabels();
 };
 
 } // NAMESPACE MNEBrowseRawQt
