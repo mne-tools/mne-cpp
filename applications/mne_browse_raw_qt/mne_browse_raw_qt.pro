@@ -79,6 +79,7 @@ SOURCES += \
     FormFiles/filterwindow.cpp \
     FormFiles/eventwindow.cpp \
     FormFiles/datawindow.cpp \
+    FormFiles/aboutwindow.cpp
 
 HEADERS += \
     rawsettings.h \
@@ -93,12 +94,14 @@ HEADERS += \
     FormFiles/filterwindow.h \
     FormFiles/eventwindow.h \
     FormFiles/datawindow.h \
+    FormFiles/aboutwindow.h
 
 FORMS += \
     FormFiles/filterwindow.ui \
     FormFiles/eventwindowdock.ui \
     FormFiles/datawindowdock.ui \
     FormFiles/mainwindow.ui \
+    FormFiles/aboutwindow.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

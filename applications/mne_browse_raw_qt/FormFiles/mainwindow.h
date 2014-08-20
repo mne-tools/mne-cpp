@@ -82,6 +82,7 @@
 #include "filterwindow.h"
 #include "eventwindow.h"
 #include "datawindow.h"
+#include "aboutwindow.h"
 
 
 //*************************************************************************************************************
@@ -96,6 +97,7 @@
 #include <QScroller>
 #include <QTextBrowser>
 #include <QMessageBox>
+#include <QPixMap>
 
 
 //*************************************************************************************************************
@@ -186,9 +188,9 @@ private slots:
 
     //=========================================================================================================
     /**
-     * about opens the about dialog
+     * showAboutWindow opens the about dialog
      */
-    void about();
+    void showAboutWindow();
 
     //=========================================================================================================
     /**
@@ -286,6 +288,7 @@ private:
     EventWindow*        m_pEventWindow;             /**< Event widget which display the event view */
     FilterWindow*       m_pFilterWindow;            /**< Filter widget which display the filter options for the user */
     DataWindow*         m_pDataWindow;              /**< Data widget which display the data for the user */
+    AboutWindow*        m_pAboutWindow;             /**< About widget which displays information about this application*/
 
     //application settings
     QSettings           m_qSettings;

@@ -151,6 +151,10 @@ void MainWindow::setupWindowWidgets()
     m_pEventWindow = new EventWindow(this);
     addDockWidget(Qt::RightDockWidgetArea, m_pEventWindow);
     m_pEventWindow->hide();
+
+    //Create about window - QTDesigner used - see /FormFiles
+    m_pAboutWindow = new AboutWindow(this);
+    m_pAboutWindow->hide();
 }
 
 
@@ -174,7 +178,7 @@ void MainWindow::connectMenus()
     connect(ui->m_logAction, SIGNAL(triggered()), this, SLOT(showLogWindow()));
 
     //Help
-    connect(ui->m_aboutAction, SIGNAL(triggered()), this, SLOT(about()));
+    connect(ui->m_aboutAction, SIGNAL(triggered()), this, SLOT(showAboutWindow()));
 }
 
 
@@ -325,8 +329,16 @@ void MainWindow::writeFile()
 void MainWindow::loadEvents()
 {
     QString filename = QFileDialog::getOpenFileName(this,QString("Open fiff event data file"),QString("./MNE-sample-data/MEG/sample/"),tr("fif event data files (*-eve.fif);;fif data files (*.fif)"));
+
+    if(filename.isEmpty())
+    {
+        qDebug("User aborted loading fiff event file");
+        return;
+    }
+
     if(m_qFileEvent.isOpen())
         m_qFileEvent.close();
+
     m_qFileEvent.setFileName(filename);
 
     if(m_pEventModel->loadEventData(m_qFileEvent)) {
@@ -372,26 +384,39 @@ void MainWindow::saveEvents()
 
 //*************************************************************************************************************
 
-void MainWindow::about()
+void MainWindow::showAboutWindow()
 {
-    QMessageBox::about(this, CInfo::AppNameShort()+ ", "+tr("Version ")+CInfo::AppVersion(),
-          tr("Copyright (C) 2014 Florian Schlembach, Lorenz Esch, Christoph Dinh, Matti Hamalainen, Jens Haueisen. All rights reserved.\n\n"
-             "Redistribution and use in source and binary forms, with or without modification, are permitted provided that"
-             " the following conditions are met:\n"
-             "\t* Redistributions of source code must retain the above copyright notice, this list of conditions and the"
-             " following disclaimer.\n"
-             "\t* Redistributions in binary form must reproduce the above copyright notice, this list of conditions and"
-             " the following disclaimer in the documentation and/or other materials provided with the distribution.\n"
-             "\t* Neither the name of MNE-CPP authors nor the names of its contributors may be used"
-             " to endorse or promote products derived from this software without specific prior written permission.\n\n"
-             "THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\" AND ANY EXPRESS OR IMPLIED"
-             " WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A"
-             " PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,"
-             " INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,"
-             " PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)"
-             " HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING"
-             " NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE"
-             " POSSIBILITY OF SUCH DAMAGE."));
+    //Note: A widget that happens to be obscured by other windows on the screen is considered to be visible.
+    if(!m_pAboutWindow->isVisible())
+    {
+        m_pAboutWindow->show();
+        m_pAboutWindow->raise();
+    }
+    else // if visible raise the widget to be sure that it is not obscured by other windows
+        m_pAboutWindow->raise();
+
+//    QMessageBox* messageBox = new QMessageBox(this);
+//    messageBox->setWindowTitle(CInfo::AppNameShort()+ ", "+tr("Version ")+CInfo::AppVersion());
+
+//    messageBox->setIconPixmap(pixmap.scaled(150,125));
+//    messageBox->setText(tr("Copyright (C) 2014 Florian Schlembach, Lorenz Esch, Christoph Dinh, Matti Hamalainen, Jens Haueisen. All rights reserved.\n\n"
+//                           "Redistribution and use in source and binary forms, with or without modification, are permitted provided that"
+//                           " the following conditions are met:\n"
+//                           "\t* Redistributions of source code must retain the above copyright notice, this list of conditions and the"
+//                           " following disclaimer.\n"
+//                           "\t* Redistributions in binary form must reproduce the above copyright notice, this list of conditions and"
+//                           " the following disclaimer in the documentation and/or other materials provided with the distribution.\n"
+//                           "\t* Neither the name of MNE-CPP authors nor the names of its contributors may be used"
+//                           " to endorse or promote products derived from this software without specific prior written permission.\n\n"
+//                           "THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\" AND ANY EXPRESS OR IMPLIED"
+//                           " WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A"
+//                           " PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,"
+//                           " INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,"
+//                           " PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)"
+//                           " HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING"
+//                           " NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE"
+//                           " POSSIBILITY OF SUCH DAMAGE."));
+//    messageBox->exec();
 }
 
 
