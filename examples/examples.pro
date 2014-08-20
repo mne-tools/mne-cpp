@@ -61,6 +61,7 @@ contains(MNECPP_CONFIG, withGui) {
         SUBDIRS += \
             clusteredInverse \
             rawClusteredInverse \
+            rawClusteredInverseEEG \
             readFwdDisp3D \
             plotSurfaces \
             lnt \
