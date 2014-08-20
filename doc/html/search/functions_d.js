@@ -1,0 +1,25 @@
+var searchData=
+[
+  ['nchoose2',['nchoose2',['../class_u_t_i_l_s_l_i_b_1_1_m_n_e_math.html#a78a6acb8de351255626065bb69e7c69f',1,'UTILSLIB::MNEMath']]],
+  ['neuromag',['Neuromag',['../class_neuromag_plugin_1_1_neuromag.html#a43e8a68cb028823fbbff3eccf373f7e8',1,'NeuromagPlugin::Neuromag::Neuromag()'],['../class_mne_rt_client_plugin_1_1_neuromag.html#a43e8a68cb028823fbbff3eccf373f7e8',1,'MneRtClientPlugin::Neuromag::Neuromag()']]],
+  ['neuromagaboutwidget',['NeuromagAboutWidget',['../class_mne_rt_client_plugin_1_1_neuromag_about_widget.html#ac40dc06af28e07651aae947705d29798',1,'MneRtClientPlugin::NeuromagAboutWidget']]],
+  ['neuromagproducer',['NeuromagProducer',['../class_mne_rt_client_plugin_1_1_neuromag_producer.html#a0834e1abe0d4376338ef850eabe4c67c',1,'MneRtClientPlugin::NeuromagProducer']]],
+  ['neuromagsetupwidget',['NeuromagSetupWidget',['../class_mne_rt_client_plugin_1_1_neuromag_setup_widget.html#a02e9bfe7e5ea460b006aa634aa78a502',1,'MneRtClientPlugin::NeuromagSetupWidget']]],
+  ['newlayout',['newLayout',['../class_sensor_model.html#ad823fb3cf5474ffd4e5cbe576d7c745d',1,'SensorModel']]],
+  ['newmeasurement',['NewMeasurement',['../class_x_m_e_a_s_l_i_b_1_1_new_measurement.html#aec987f6b679897f395ff2107f9b6fffd',1,'XMEASLIB::NewMeasurement']]],
+  ['newmeasurementwidget',['NewMeasurementWidget',['../class_x_d_i_s_p_l_i_b_1_1_new_measurement_widget.html#ada30e4cc59cde89019ac2232d1aa50b9',1,'XDISPLIB::NewMeasurementWidget']]],
+  ['newnumeric',['NewNumeric',['../class_x_m_e_a_s_l_i_b_1_1_new_numeric.html#a056ecfb58387f40d8127390c7d219eb8',1,'XMEASLIB::NewNumeric']]],
+  ['newrealtimemultisamplearray',['NewRealTimeMultiSampleArray',['../class_x_m_e_a_s_l_i_b_1_1_new_real_time_multi_sample_array.html#ad2de269331a80873f09a4f0899115426',1,'XMEASLIB::NewRealTimeMultiSampleArray']]],
+  ['newrealtimemultisamplearraywidget',['NewRealTimeMultiSampleArrayWidget',['../class_x_d_i_s_p_l_i_b_1_1_new_real_time_multi_sample_array_widget.html#a99b4d4cdb7ed5fb34dec52a4021f47ad',1,'XDISPLIB::NewRealTimeMultiSampleArrayWidget']]],
+  ['newrealtimesamplearray',['NewRealTimeSampleArray',['../class_x_m_e_a_s_l_i_b_1_1_new_real_time_sample_array.html#a9ab4325515934d963f3af42fadc05a0f',1,'XMEASLIB::NewRealTimeSampleArray']]],
+  ['newrealtimesamplearraywidget',['NewRealTimeSampleArrayWidget',['../class_x_d_i_s_p_l_i_b_1_1_new_real_time_sample_array_widget.html#ad7e6362b64a36c943e08ef94f2983899',1,'XDISPLIB::NewRealTimeSampleArrayWidget']]],
+  ['newselection',['newSelection',['../class_real_time_multi_sample_array_model.html#a284204b4f57b46790ed152e21c9b36fa',1,'RealTimeMultiSampleArrayModel::newSelection()'],['../class_sensor_model.html#a387673806f2c12e6b936fddf2b935f9c',1,'SensorModel::newSelection()']]],
+  ['nn',['nn',['../class_f_s_l_i_b_1_1_surface.html#a2c17d75ce29e106f1de0f0736952a4b6',1,'FSLIB::Surface']]],
+  ['notify',['notify',['../class_subject.html#af104c2baf37c7aa63b2ef6d32c2b3a9c',1,'Subject']]],
+  ['notifycallbackfunction',['notifyCallbackFunction',['../class_m_n_e_x_1_1_plugin_input_data.html#a6b44454d524cee815135819b558919b6',1,'MNEX::PluginInputData']]],
+  ['numchannels',['numChannels',['../class_i_o_buffer_1_1_circular_multi_channel_buffer__old.html#abcab3a44ecb55ab604b43694bc3a32b5',1,'IOBuffer::CircularMultiChannelBuffer_old::numChannels()'],['../class_sensor_layout.html#a82d4c4c2234a7ac0baf4872def477332',1,'SensorLayout::numChannels()']]],
+  ['numclust',['numClust',['../class_m_n_e_l_i_b_1_1_m_n_e_cluster_info.html#ae1ca13a5b919dced78925af0c5d83a80',1,'MNELIB::MNEClusterInfo']]],
+  ['numeric',['Numeric',['../class_x_m_e_a_s_l_i_b_1_1_numeric.html#a7e001a674c1d430db61532cc25350be6',1,'XMEASLIB::Numeric']]],
+  ['numericwidget',['NumericWidget',['../class_x_d_i_s_p_l_i_b_1_1_numeric_widget.html#a43c597cb32f2d4b6a77d6f7fa45a5ad1',1,'XDISPLIB::NumericWidget']]],
+  ['numvlines',['numVLines',['../class_real_time_multi_sample_array_model.html#a6f088f58a282f3e3daf1612397420c8b',1,'RealTimeMultiSampleArrayModel']]]
+];

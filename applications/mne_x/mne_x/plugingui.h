@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -83,9 +83,33 @@ class PluginGui : public QMainWindow
     Q_OBJECT
     friend class PluginScene;
 public:
-    PluginGui(MNEX::PluginManager::SPtr &pPluginManager, MNEX::PluginSceneManager::SPtr &pPluginSceneManager);
+    PluginGui(MNEX::PluginManager *pPluginManager, MNEX::PluginSceneManager *pPluginSceneManager);
 
     ~PluginGui();
+
+    //=========================================================================================================
+    /**
+    * Clear scene
+    */
+    void clearScene();
+
+    //=========================================================================================================
+    /**
+    * Loads a current plug in configuration from a given file
+    *
+    * @param [in] sPath         The path to the file.
+    * @param [in] sFileName     The file name to load the configuration from.
+    */
+    void loadConfig(const QString& sPath, const QString& sFileName);
+
+    //=========================================================================================================
+    /**
+    * Saves the current plug in configuration to a given file
+    *
+    * @param [in] sPath         The path to the file.
+    * @param [in] sFileName     The file name to store the configuration to.
+    */
+    void saveConfig(const QString& sPath, const QString& sFileName);
 
 
     inline IPlugin::SPtr getCurrentPlugin();
@@ -94,6 +118,8 @@ public:
 
 signals:
    void selectedPluginChanged(IPlugin::SPtr pPlugin);
+
+   void selectedConnectionChanged(PluginConnectorConnection::SPtr pConnection);
 
 private:
 
@@ -115,16 +141,23 @@ private:
 
     QAction* createItemAction(QString name, QMenu* menu);
 
-    PluginManager::SPtr       m_pPluginManager;       /**< Corresponding plugin manager. */
-    PluginSceneManager::SPtr  m_pPluginSceneManager;  /**< Corresponding plugin scene manager. */
+    PluginManager*          m_pPluginManager;       /**< Corresponding plugin manager. */
+    PluginSceneManager*     m_pPluginSceneManager;  /**< Corresponding plugin scene manager. */
 
-    IPlugin::SPtr             m_pCurrentPlugin;
+    IPlugin::SPtr                   m_pCurrentPlugin;
+    PluginConnectorConnection::SPtr m_pCurrentConnection;
 
     PluginScene*    m_pPluginScene;         /**< Plugin graph */
     QGraphicsView*  m_pGraphicsView;        /**< View to show graph */
+
+    QToolButton*    m_pSensorToolButton;
+    QToolButton*    m_pAlgorithmToolButton;
+    QToolButton*    m_pIOToolButton;
     QToolBar*       m_pToolBarPlugins;
     QActionGroup*   m_pActionGroupPlugins;
 
+    QToolButton*    m_pPointerButton;
+    QToolButton*    m_pLinePointerButton;
     QToolBar *      m_pToolBarPointer;
     QButtonGroup *  m_pButtonGroupPointers;
 

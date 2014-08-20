@@ -17,12 +17,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -79,26 +79,23 @@ SerialPort::SerialPort()
         m_digchannel.replace(i,0);
     }
 
-    //for (int i = 0; i < digchannel.size(); i++)
-    //std::cout << digchannel[i] << std::endl;
     m_motor = 1;
     m_analval = 0;
 
-
-    m_InAnChannelVal.resize(16);
+    m_InAnChannelVal.resize(2);
     for (int i = 0; i < m_InAnChannelVal.size(); i++)
     {
         m_InAnChannelVal.replace(i,0);
     }
 
-    m_InActiveDig.resize(22);
+    m_InActiveDig.resize(4);
     for (int i = 0; i < m_InActiveDig.size(); i++)
     {
         m_InActiveDig.replace(i,0);
     }
 
+    m_wiredChannel = 0;
 
-    //connect(this->m_qSerialPort, SIGNAL(readyRead()), this, SLOT(SerialPort::readData()));   // if data available, read
     connect(&m_qSerialPort, &QSerialPort::readyRead, this, &SerialPort::readData);
 
 }
@@ -118,7 +115,7 @@ SerialPort::~SerialPort()
 void SerialPort::close()
 {
     m_qSerialPort.close();
-    std::cout << "port geschlossen" << std::endl;
+    std::cout << "Port closed" << std::endl;
 }
 
 //*************************************************************************************************************
@@ -131,24 +128,50 @@ void SerialPort::decodeana(QByteArray &t_incomingArray)
 
     t_incomingArray[0]=t_incomingArray[0] << 2;     // left shift to pop the type info (11)
 
+    char cVal = t_incomingArray[0];
+    void* voidVal = (void*)&cVal;
+    unsigned char* ucVal = (unsigned char*)voidVal;
+
+
 // decode channel
-         if (t_incomingArray.at(0) == 0x00) {AnChannel=1;}
-    else if (t_incomingArray.at(0)==0x10) {AnChannel=2;}
-    else if (t_incomingArray.at(0)==0x20) {AnChannel=3;}
-    else if (t_incomingArray.at(0)==0x40) {AnChannel=4;}
-    else if (t_incomingArray.at(0)==0x80) {AnChannel=5;}
-    else if (t_incomingArray.at(0)==0x30) {AnChannel=6;}
-    else if (t_incomingArray.at(0)==0x50) {AnChannel=7;}
-    else if (t_incomingArray.at(0)==0x90) {AnChannel=8;}
-    else if (t_incomingArray.at(0)==0x60) {AnChannel=9;}
-    else if (t_incomingArray.at(0)==0xA0) {AnChannel=10;}
-    else if (t_incomingArray.at(0)==0xC0) {AnChannel=11;}
-    else if (t_incomingArray.at(0)==0x70) {AnChannel=12;}
-    else if (t_incomingArray.at(0)==0xB0) {AnChannel=13;}
-    else if (t_incomingArray.at(0)==0xD0) {AnChannel=14;}
-    else if (t_incomingArray.at(0)==0xE0) {AnChannel=15;}
-    else if (t_incomingArray.at(0)==0xF0) {AnChannel=16;}
+         if (*ucVal== 0x00) {AnChannel=1;}
+    else if (*ucVal==0x10) {AnChannel=2;}
+    else if (*ucVal==0x20) {AnChannel=3;}
+    else if (*ucVal==0x40) {AnChannel=4;}
+    else if (*ucVal==0x80) {AnChannel=5;}
+    else if (*ucVal==0x30) {AnChannel=6;}
+    else if (*ucVal==0x50) {AnChannel=7;}
+    else if (*ucVal==0x90) {AnChannel=8;}
+    else if (*ucVal==0x60) {AnChannel=9;}
+    else if (*ucVal==0xA0) {AnChannel=10;}
+    else if (*ucVal==0xC0) {AnChannel=11;}
+    else if (*ucVal==0x70) {AnChannel=12;}
+    else if (*ucVal==0xB0) {AnChannel=13;}
+    else if (*ucVal==0xD0) {AnChannel=14;}
+    else if (*ucVal==0xE0) {AnChannel=15;}
+    else if (*ucVal==0xF0) {AnChannel=16;}
     else {std::cout << "Error during analog channel selection" << std::endl;}
+
+
+
+//// decode channel - old
+//         if (t_incomingArray.at(0) == 0x00) {AnChannel=1;}
+//    else if (t_incomingArray.at(0)==0x10) {AnChannel=2;}
+//    else if (t_incomingArray.at(0)==0x20) {AnChannel=3;}
+//    else if (t_incomingArray.at(0)==0x40) {AnChannel=4;}
+//    else if (t_incomingArray.at(0)==0x80) {AnChannel=5;}
+//    else if (t_incomingArray.at(0)==0x30) {AnChannel=6;}
+//    else if (t_incomingArray.at(0)==0x50) {AnChannel=7;}
+//    else if (t_incomingArray.at(0)==0x90) {AnChannel=8;}
+//    else if (t_incomingArray.at(0)==0x60) {AnChannel=9;}
+//    else if (t_incomingArray.at(0)==0xA0) {AnChannel=10;}
+//    else if (t_incomingArray.at(0)==0xC0) {AnChannel=11;}
+//    else if (t_incomingArray.at(0)==0x70) {AnChannel=12;}
+//    else if (t_incomingArray.at(0)==0xB0) {AnChannel=13;}
+//    else if (t_incomingArray.at(0)==0xD0) {AnChannel=14;}
+//    else if (t_incomingArray.at(0)==0xE0) {AnChannel=15;}
+//    else if (t_incomingArray.at(0)==0xF0) {AnChannel=16;}
+//    else {std::cout << "Error during analog channel selection" << std::endl;}
 
 
 
@@ -174,7 +197,7 @@ void SerialPort::decodeana(QByteArray &t_incomingArray)
     if ((t_incomingArray[3]&0x02) == 0x02) {AnValue=AnValue+2;}
     if ((t_incomingArray[3]&0x01) == 0x01) {AnValue=AnValue+1;}
 
-    std::cout << "Analoger Channel: " << AnChannel <<  " | Analogerwert:" << AnValue << std::endl;
+    std::cout << "Analog channel: " << AnChannel <<  " | Value:" << AnValue << std::endl;
 
     m_InAnChannelVal[AnChannel-1] = AnValue;
 
@@ -182,89 +205,26 @@ void SerialPort::decodeana(QByteArray &t_incomingArray)
 
 //*************************************************************************************************************
 
-void SerialPort::decodedig(QByteArray &t_incomingArray)
+void SerialPort::decodedig(QByteArray &p_incomingArray)
 {
-
+    std::cout << "Decode Digital" << std::endl;
 
 // decode channel 1-6
 
-    if ((t_incomingArray.at(3)&0x04) == 0x04) m_InActiveDig[0] = 1;              // 0000 0100
+    if ((p_incomingArray.at(3)&0x04) == 0x04) m_InActiveDig[0] = 1;              // 0000 0100
     else m_InActiveDig[0] = 0;
 
-    if ((t_incomingArray.at(3)&0x08) == 0x08) m_InActiveDig[1] = 1;            // 0000 1000
+    if ((p_incomingArray.at(3)&0x08) == 0x08) m_InActiveDig[1] = 1;            // 0000 1000
     else m_InActiveDig[1] = 0;
 
-    if ((t_incomingArray.at(3)&0x10) == 0x10) m_InActiveDig[2] = 1;            // 0001 0000
+    if ((p_incomingArray.at(3)&0x10) == 0x10) m_InActiveDig[2] = 1;            // 0001 0000
     else m_InActiveDig[2] = 0;
 
-    if ((t_incomingArray.at(3)&0x20) == 0x20) m_InActiveDig[3] = 1;            // 0010 0000
+    if ((p_incomingArray.at(3)&0x20) == 0x20) m_InActiveDig[3] = 1;            // 0010 0000
     else m_InActiveDig[3] = 0;
 
-    if ((t_incomingArray.at(3)&0x40) == 0x40) m_InActiveDig[4] = 1;             // 0100 0000
-    else m_InActiveDig[4] = 0;
-
-    if ((t_incomingArray.at(3)&0x80) == 0x80) m_InActiveDig[5] = 1;             // 1000 0000
-    else m_InActiveDig[5] = 0;
-
-
-// decode channel 7 - 12
-
-    if ((t_incomingArray.at(2)&0x04) == 0x4) m_InActiveDig[6] = 1;            // 0000 0100
-    else m_InActiveDig[6] = 0;
-
-    if ((t_incomingArray.at(2)&0x08) == 0x8) m_InActiveDig[7] = 1;            // 0000 1000
-    else m_InActiveDig[7] = 0;
-
-    if ((t_incomingArray.at(2)&0x10) == 0x10) m_InActiveDig[8] = 1;            // 0001 0000
-    else m_InActiveDig[8] = 0;
-
-    if ((t_incomingArray.at(2)&0x20) == 0x20) m_InActiveDig[9] = 1;            // 0010 0000
-    else m_InActiveDig[9] = 0;
-
-    if ((t_incomingArray.at(2)&0x40) == 0x40) m_InActiveDig[10] = 1;            // 0100 0000
-    else m_InActiveDig[10] = 0;
-
-    if ((t_incomingArray.at(2)&0x80) == 0x80) m_InActiveDig[11] = 1;            // 1000 0000
-    else m_InActiveDig[11] = 0;
-
-// decode channel 13 - 18
-
-    if ((t_incomingArray.at(1)&0x04) == 0x4) m_InActiveDig[12] = 1;            // 0000 0100
-    else m_InActiveDig[12] = 0;
-
-    if ((t_incomingArray.at(1)&0x08) == 0x8) m_InActiveDig[13] = 1;            // 0000 1000
-    else m_InActiveDig[13] = 0;
-
-    if ((t_incomingArray.at(1)&0x10) == 0x10) m_InActiveDig[14] = 1;            // 0001 0000
-    else m_InActiveDig[14] = 0;
-
-    if ((t_incomingArray.at(1)&0x20) == 0x20) m_InActiveDig[15] = 1;            // 0010 0000
-    else m_InActiveDig[15] = 0;
-
-
-    if ((t_incomingArray.at(1)&0x40) == 0x40) m_InActiveDig[16] = 1;            // 0100 0000
-    else m_InActiveDig[16] = 0;
-
-    if ((t_incomingArray.at(1)&0x80) == 0x80) m_InActiveDig[17] = 1;            // 1000 0000
-    else m_InActiveDig[17] = 0;
-
-// decode channel 19 - 22
-
-    if ((t_incomingArray.at(0)&0x04) == 0x4) m_InActiveDig[18] = 1;            // 0000 0100
-    else m_InActiveDig[18] = 0;
-
-    if ((t_incomingArray.at(0)&0x08) == 0x8) m_InActiveDig[19] = 1;            // 0000 1000
-    else m_InActiveDig[19] = 0;
-
-    if ((t_incomingArray.at(0)&0x10) == 0x10) m_InActiveDig[20] = 1;            // 0001 0000
-    else m_InActiveDig[20] = 0;
-
-    if ((t_incomingArray.at(0)&0x20) == 0x20) m_InActiveDig[21] = 1;            // 0010 0000
-    else m_InActiveDig[21] = 0;
-
-
-    for ( int i = 0; i<22;i++)
-        std::cout << "Kanal: " << m_InActiveDig[i] << std::endl;
+    for ( int i = 1; i<5;i++)
+        std::cout << "Channel " << i <<": " << m_InActiveDig[i-1] << std::endl;
 }
 
 //*************************************************************************************************************
@@ -276,7 +236,7 @@ void SerialPort::encodeana()
     m_data.clear();
 
 
-//denote control bytes
+//denote control bites
     m_data[0] = m_data[0]|0x40;
     m_data[1] = m_data[1]|0x01;
     m_data[2] = m_data[2]|0x02;
@@ -346,7 +306,6 @@ void SerialPort::encodeana()
         }
         }
 
-    std::cout << "Analog ausgelesen" << std::endl;
 
 
 }
@@ -398,7 +357,6 @@ void SerialPort::encodedig()
     if (m_digchannel.at(21) == 1) m_data[0] = m_data[0]|0x20;     // 0010 0000
 
 
-    std::cout << "Digital ausgelesen" << std::endl;
 
 
 }
@@ -415,6 +373,8 @@ void SerialPort::encodedig()
         m_data[1] = m_data[1]|0x01;
         m_data[2] = m_data[2]|0x02;
         m_data[3] = m_data[3]|0x03;
+
+
     }
     else if(m_retrievetyp == 1)     // retrieve analog information
     {
@@ -424,11 +384,9 @@ void SerialPort::encodedig()
         m_data[1] = m_data[1]|0x01;
         m_data[2] = m_data[2]|0x02;
         m_data[3] = m_data[3]|0x03;
-        qDebug() << m_retrievechan << endl;
-        if (m_retrievechan == 1){m_data[1] = m_data[1]|0x00;}     // 0000 0000   1. analoger In-Channel
-        else if (m_retrievechan == 2){m_data[1] = m_data[1]|0x04;}     // 0000 0100   2. Motor
-        //else if (m_motor == 3){m_data[0] = m_data[0]|0x08;}     // 0000 1000   3. Motor
-        //else if (m_motor == 4){m_data[0] = m_data[0]|0x10;}     // 0001 0000   4. Motor
+
+        if (m_retrievechan == 1){m_data[1] = m_data[1]|0x00;}           // 0000 0000   first analoge In-Channel
+        else if (m_retrievechan == 2){m_data[1] = m_data[1]|0x04;}      // 0000 0100   second first analoge In-Channel
 
         else {std::cout << "Error while retrieving analog channel information" << std::endl;}
     }
@@ -462,13 +420,6 @@ void SerialPort::initPort()
 
     bool t_correctPort = false;
 
-//    if(t_qListPortInfo.size() > 1)
-//    {
-//        m_currentSettings.name = t_qListPortInfo[1].portName();
-//        qDebug() << t_qListPortInfo[1].description().toLatin1() << endl;
-//        m_qSerialPort.setPortName( t_qListPortInfo[1].portName());
-//    }
-
     for (int t_count = 0; t_count < t_qListPortInfo.size();t_count++)
     {
         if (t_qListPortInfo[t_count].description() == "Silicon Labs CP210x USB to UART Bridge")
@@ -482,7 +433,7 @@ void SerialPort::initPort()
     }
 
     if(t_correctPort)
-        std::cout << "correct port was found" << std::endl;
+        std::cout << "Correct port was found" << std::endl;
     else
         std::cout << "correct port was not found" << std::endl;
 
@@ -494,7 +445,6 @@ void SerialPort::readData()
 {
     QByteArray t_incomingArray = m_qSerialPort.readAll();
 
-
     if(((t_incomingArray[0]&0x03) == 0x00) && ((t_incomingArray[1]&0x03) == 0x01) && ((t_incomingArray[2]&0x03) == 0x02) && ((t_incomingArray[3]&0x03) == 0x03))
     {
         if ((t_incomingArray[0]&0xC0) == 0x00)
@@ -504,13 +454,11 @@ void SerialPort::readData()
             decodeana(t_incomingArray);
 
         else
-            std::cout << "Error while reading" << std::endl;
+            std::cout << "Error while reading the data. Correct transfer protocol?" << std::endl;
     }
 
 
 }
-
-
 
 //*************************************************************************************************************
 
@@ -521,25 +469,21 @@ bool SerialPort::open()
     // get current settings
     m_qSerialPort.setPortName(m_currentSettings.name);
 
-
-
-
- //   qDebug() << "noch nicht geöffnet" << endl;
     if (m_qSerialPort.open(QIODevice::ReadWrite))
     {
-        //std::cout << "geöffnet, ohne Konfigs" << std::endl;
         if (m_qSerialPort.setBaudRate(m_currentSettings.baudRate)
                 && m_qSerialPort.setDataBits(m_currentSettings.dataBits)
                 && m_qSerialPort.setParity(m_currentSettings.parity)
                 && m_qSerialPort.setStopBits(m_currentSettings.stopBits)
                 && m_qSerialPort.setFlowControl(m_currentSettings.flowControl))
         {
-            std::cout << "geöffnet, mit:"
+            std::cout << "Port opened, with:"
                       << "Name" << m_currentSettings.name.toLatin1().data()
                       << "BaudRat" << m_currentSettings.stringBaudRate.toLatin1().data()
                       << "Databits" << m_currentSettings.stringDataBits.toLatin1().data()
                       << "Parity" << m_currentSettings.stringParity.toLatin1().data()
                       << "FlowControl" << m_currentSettings.stringFlowControl.toLatin1().data()  << std::endl;
+// WARUM 3 MAL??
             std::cout << "geöffnet, mit:"
                       << "Name" << m_currentSettings.name.toLatin1().data()
                       << "BaudRat" << m_currentSettings.stringBaudRate.toLatin1().data()
@@ -552,17 +496,11 @@ bool SerialPort::open()
                       << ", Databits: " << m_currentSettings.stringDataBits.toLatin1().data()
                       << ", Parity: " << m_currentSettings.stringParity.toLatin1().data()
                       << ", FlowControl: " << m_currentSettings.stringFlowControl.toLatin1().data()  << std::endl;
-//            std::cout << "geöffnet, mit:"
-//                      << "Name" << m_currentSettings.name.toLatin1().data()
-//                      << "BaudRat" << m_currentSettings.stringBaudRate.toLatin1().data()
-//                      << "Databits" << m_currentSettings.stringDataBits.toLatin1().data()
-//                      << "Parity" << m_currentSettings.stringParity.toLatin1().data()
-//                      << "FlowControl" << m_currentSettings.stringFlowControl.toLatin1().data()  << std::endl;
 
             success = true;
         }
         else
-        {    std::cout << "nicht geöffnet, Fehler mit KOnfigurationszuweisung" << std::endl;
+        {    std::cout << "Port was not opened, configuration failed" << std::endl;
              m_qSerialPort.close();
 
             success = false;
@@ -571,7 +509,7 @@ bool SerialPort::open()
     }
     else
     {
-        std::cout << "nicht geöffnet, Fehler schon beim readwriteöffnen" << std::endl;
+        std::cout << "Port could not be opened" << std::endl;
 
         success = false;
     }
@@ -579,9 +517,7 @@ bool SerialPort::open()
     return success;
 }
 
-
 //*************************************************************************************************************
-
 
 void SerialPort::sendData(const QByteArray &data)
 {

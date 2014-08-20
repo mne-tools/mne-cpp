@@ -42,7 +42,7 @@
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
-
+#include <utils/filterdata.h>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -104,6 +104,14 @@ public:
     */
     void initGui();
 
+protected:
+    //=========================================================================================================
+    /**
+    * Filters specified objects for wanted events -> intercepts events
+    *
+    */
+    bool eventFilter(QObject *object, QEvent *event);
+
 private:
 
     //=========================================================================================================
@@ -113,9 +121,76 @@ private:
     */
     void showAboutDialog();
 
-    BCI*           m_pBCI;                    /**< a pointer to corresponding BCI.*/
+    //=========================================================================================================
+    /**
+    * Sets general options made by the user
+    *
+    */
+    void setGeneralOptions();
 
-    Ui::BCISetupClass ui;                      /**< the user interface for the BCISetupWidget.*/
+    //=========================================================================================================
+    /**
+    * Sets processing options made by the user
+    *
+    */
+    void setProcessingOptions();
+
+    //=========================================================================================================
+    /**
+    * Loads classification boundary for source level
+    *
+    */
+    void changeLoadSourceBoundary();
+
+    //=========================================================================================================
+    /**
+    * Loads classification boundary for sensor level
+    *
+    */
+    void changeLoadSensorBoundary();
+
+    //=========================================================================================================
+    /**
+    * Loads classification boundary for sensor level
+    * [in] path location of the boundary file
+    * [out] QVector<VectorXd> boundary coeff
+    */
+    QVector<VectorXd> readBoundaryInformation(QString path);
+
+    //=========================================================================================================
+    /**
+    * Init selected feature list on sensor level
+    *
+    */
+    void initSelectedFeaturesSensor();
+
+    //=========================================================================================================
+    /**
+    * Sets feature selections made by the user on source and sensor level
+    *
+    */
+    void setFeatureSelection();
+
+    //=========================================================================================================
+    /**
+    * Sets filter options
+    *
+    */
+    void setFilterOptions();
+
+    //=========================================================================================================
+    /**
+    * Sets classification options
+    *
+    */
+    void setClassificationOptions();
+
+
+    BCI* m_pBCI;                                    /**< a pointer to corresponding BCI.*/
+
+    QStringList m_vAvailableFeaturesSensor;         /**< QStringList holding available features to select on sensor level (electrodes).*/
+
+    Ui::BCISetupClass ui;                           /**< the user interface for the BCISetupWidget.*/
 };
 
 } // NAMESPACE

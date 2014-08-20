@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -29,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the BabyMeg class.
+* @brief    Contains the declaration of the BabyMEG class.
 *
 */
 
@@ -43,11 +43,15 @@
 //=============================================================================================================
 
 #include "babymeg_global.h"
+#include "babymegclient.h"
+
+#include "FormFiles/babymegsquidcontroldgl.h"
+
 
 #include <mne_x/Interfaces/ISensor.h>
 #include <generics/circularbuffer_old.h>
 #include <generics/circularmatrixbuffer.h>
-#include <xMeas/Measurement/realtimemultisamplearray_new.h>
+#include <xMeas/newrealtimemultisamplearray.h>
 
 
 //*************************************************************************************************************
@@ -56,6 +60,7 @@
 //=============================================================================================================
 
 #include <fiff/fiff_info.h>
+#include <fiff/fiff.h>
 
 
 //*************************************************************************************************************
@@ -78,10 +83,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE BabyMegPlugin
+// DEFINE NAMESPACE BabyMEGPlugin
 //=============================================================================================================
 
-namespace BabyMegPlugin
+namespace BabyMEGPlugin
 {
 
 
@@ -94,6 +99,7 @@ using namespace MNEX;
 using namespace IOBuffer;
 using namespace RTCLIENTLIB;
 using namespace FIFFLIB;
+using namespace XMEASLIB;
 
 
 //*************************************************************************************************************
@@ -101,40 +107,39 @@ using namespace FIFFLIB;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-class BabyMegProducer;
-//class ECGChannel;
+class BabyMEGProjectDialog;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS BabyMeg
+* DECLARE CLASS BabyMEG
 *
-* @brief The BabyMeg class provides a RT server connection.
+* @brief The BabyMEG class provides a RT server connection.
 */
-class BABYMEGSHARED_EXPORT BabyMeg : public ISensor
+class BABYMEGSHARED_EXPORT BabyMEG : public ISensor
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "babymeg.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
     // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
     Q_INTERFACES(MNEX::ISensor)
 
-    friend class BabyMegProducer;
-    friend class BabyMegSetupWidget;
-    friend class BabyMegRunWidget;
+    friend class BabyMEGSetupWidget;
+    friend class BabyMEGProjectDialog;
+    friend class BabyMEGSQUIDControlDgl;
 
 public:
 
     //=========================================================================================================
     /**
-    * Constructs a BabyMeg.
+    * Constructs a BabyMEG.
     */
-    BabyMeg();
+    BabyMEG();
 
     //=========================================================================================================
     /**
-    * Destroys the BabyMeg.
+    * Destroys the BabyMEG.
     */
-    virtual ~BabyMeg();
+    virtual ~BabyMEG();
 
     //=========================================================================================================
     /**
@@ -142,41 +147,49 @@ public:
     */
     void clear();
 
+    //=========================================================================================================
+    /**
+    * Clone the plugin
+    */
+    virtual QSharedPointer<IPlugin> clone() const;
+
+    //=========================================================================================================
+    /**
+    * Initialise the BabyMEG.
+    */
+    virtual void init();
+
+    //=========================================================================================================
+    /**
+    * Is called when plugin is detached of the stage. Can be used to safe settings.
+    */
+    virtual void unload();
+
+    void showProjectDialog();
+
+    void showSqdCtrlDialog();
+
+    void toggleRecordingFile();
+
     virtual bool start();
     virtual bool stop();
 
-    virtual Type getType() const;
-    virtual const char* getName() const;
+    virtual IPlugin::PluginType getType() const;
+    virtual QString getName() const;
 
     virtual QWidget* setupWidget();
-    virtual QWidget* runWidget();
 
-//slots:
+    void setFiffInfo(FIFFLIB::FiffInfo);
+    void setFiffData(QByteArray DATA);
+    void setCMDData(QByteArray DATA);
+
     //=========================================================================================================
     /**
-    * Change connector
+    * Returns information from FLL hardware
     *
-    * @param[in] p_iNewConnectorId      new connector ID
+    * @param[in] t_sFLLControlCommand  FLL command.
     */
-    void changeConnector(qint32 p_iNewConnectorId);
-
-    //=========================================================================================================
-    /**
-    * Connects the cmd client.
-    */
-    void connectCmdClient();
-
-    //=========================================================================================================
-    /**
-    * Disconnects the cmd client.
-    */
-    void disconnectCmdClient();
-
-    //=========================================================================================================
-    /**
-    * Request FiffInfo using cmd client and producer (data client)
-    */
-    void requestInfo();
+    void comFLL(QString t_sFLLControlCommand);
 
 signals:
     //=========================================================================================================
@@ -193,47 +206,58 @@ signals:
     */
     void fiffInfoAvailable();
 
+    void DataToSquidCtrlGUI(MatrixXf tmp);
+    void SendCMDDataToSQUIDControl(QByteArray DATA);
+
+
 protected:
     virtual void run();
 
 private:
+    void changeRecordingButton();
+
+    QSharedPointer<QTimer> m_pTimerRecordingChange;
+    qint16 m_iBlinkStatus;
+
     //=========================================================================================================
     /**
-    * Initialise the BabyMeg.
+    * Initialises the output connector.
     */
-    void init();
+    void initConnector();
+
+    PluginOutputData<NewRealTimeMultiSampleArray>::SPtr m_pRTMSABabyMEG;   /**< The NewRealTimeMultiSampleArray to provide the rt_server Channels.*/
+
+    QMutex mutex;
+
+    QSharedPointer<BabyMEGClient> myClient;
+    QSharedPointer<BabyMEGClient> myClientComm;
+    QSharedPointer<BabyMEGInfo>   pInfo;
+    bool DataStartFlag;
+
+    QSharedPointer<BabyMEGSQUIDControlDgl> SQUIDCtrlDlg; // added by Dr. Limin Sun for nonmodal dialog
+
+    FiffInfo::SPtr m_pFiffInfo;                             /**< Fiff measurement info.*/
+    qint32 m_iBufferSize;                                   /**< The raw data buffer size.*/
+
+    bool                                m_bWriteToFile;     /**< Flag for for writing the received samples to a file. Defined by the user via the GUI.*/
+    QString                             m_sRecordFile;      /**< Holds the path for the sample output file. Defined by the user via the GUI.*/
+    QFile                               m_qFileOut;         /**< QFile for writing to fif file.*/
+    FiffStream::SPtr                    m_pOutfid;          /**< FiffStream to write to.*/
+
+    MatrixXd                            m_cals;
 
 
-    QMutex rtServerMutex;
+    bool    m_bIsRunning;
+
+    QSharedPointer<RawMatrixBuffer> m_pRawMatrixBuffer;  /**< Holds incoming raw data. */
+
+    QAction*                        m_pActionSetupProject;      /**< shows setup project dialog */
+    QAction*                        m_pActionRecordFile;        /**< start recording action */
+    QAction*                        m_pActionSqdCtrl;           /**< show squid control */
 
 
-    QString m_sBabyMegClientAlias;     /**< The rt server client alias.*/
-
-//    float           m_fSamplingRate;                /**< Holds the sampling rate.*/
-//    int             m_iDownsamplingFactor;          /**< Holds the down sampling factor.*/
-
-    RealTimeMultiSampleArrayNew*    m_pRTMSA_BabyMeg;      /**< Holds the RealTimeMultiSampleArray to provide the rt_server Channels.*/
-
-    RtCmdClient*       m_pRtCmdClient;      /**< The command client.*/
-    bool m_bCmdClientIsConnected;           /**< If the command client is connected.*/
-
-    QString     m_sBabyMegIP;              /**< The IP Adress of mne_rt_server.*/
-
-    BabyMegProducer*   m_pBabyMegProducer;/**< Holds the BabyMegProducer.*/
-
-
-    QMap<qint32, QString> m_qMapConnectors; /**< Connector map.*/
-    qint32 m_iActiveConnectorId;            /**< The active connector.*/
-
-    FiffInfo::SPtr m_pFiffInfo;             /**< Fiff measurement info.*/
-    qint32 m_iBufferSize;                   /**< The raw data buffer size.*/
-
-    QTimer m_cmdConnectionTimer;            /**< Timer for convinient command client connection. When timer times out a connection is tried to be established. */
-
-
-    RawMatrixBuffer*      m_pRawMatrixBuffer_In;         /**< Holds incoming raw data. */
-
-
+public:
+    double sfreq;
 };
 
 } // NAMESPACE

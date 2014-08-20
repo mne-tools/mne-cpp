@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -42,6 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
+//#include "../ui_dummyabout.h"
 #include "../ui_rtsssabout.h"
 
 
@@ -58,6 +59,7 @@
 // DEFINE NAMESPACE RtSssPlugin
 //=============================================================================================================
 
+//namespace DummyToolboxPlugin
 namespace RtSssPlugin
 {
 
@@ -78,20 +80,21 @@ public:
     /**
     * Constructs a RtSssAboutWidget dialog which is a child of parent.
     *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new RtSssAboutWidget becomes a window. If parent is another widget, DummyAboutWidget becomes a child window inside parent. DummyAboutWidget is deleted when its parent is deleted.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new RtSssAboutWidget becomes a window. If parent is another widget, RtSssAboutWidget becomes a child window inside parent. RtSssAboutWidget is deleted when its parent is deleted.
     */
+//    DummyAboutWidget(QWidget *parent = 0);
     RtSssAboutWidget(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
     * Destroys the RtSssAboutWidget.
-    * All DummyAboutWidget's children are deleted first. The application exits if RtSssAboutWidget is the main widget.
+    * All RtSssAboutWidget's children are deleted first. The application exits if RtSssAboutWidget is the main widget.
     */
     ~RtSssAboutWidget();
 
 private:
 
-    Ui::RtSssAboutWidgetClass ui;   /**< Holds the user interface for the RtSssAboutWidget.*/
+    Ui::RtSssAboutWidgetClass ui;		/**< Holds the user interface for the RtSssAboutWidget.*/
 
 };
 

@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -123,8 +123,80 @@ public:
     * Pure virtual method.
     */
     virtual void init() = 0;
+
+    //=========================================================================================================
+    /**
+    * A list of display actions for the current measurement widget.
+    *
+    * @return a list of display actions
+    */
+    inline QList< QAction* > getDisplayActions();
+
+    //=========================================================================================================
+    /**
+    * A list of display widgets for the current measurement widget.
+    *
+    * @return a list of display widgets
+    */
+    inline QList< QWidget* > getDisplayWidgets();
+
+protected:
+    //=========================================================================================================
+    /**
+    * Adds a display action to the current measurement widget.
+    *
+    * @param [in] pAction  pointer to the action to be added to the measurement widget
+    */
+    inline void addDisplayAction(QAction* pAction);
+
+    //=========================================================================================================
+    /**
+    * Adds a display widgetto the current measurement widget, which is attached to the toolbar
+    *
+    * @param [in] pWidget  pointer to the widget to be added to the measurement widget
+    */
+    inline void addDisplayWidget(QWidget* pWidget);
+
+private:
+    QList< QAction* >   m_qListDisplayActions;      /**< List of display actions */
+    QList< QWidget* >   m_qListDisplayWidgets;       /**< List of display widgets to attach to the toolbar */
+
 };
 
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+QList< QAction* > NewMeasurementWidget::getDisplayActions()
+{
+    return m_qListDisplayActions;
 }
+
+
+//*************************************************************************************************************
+
+QList< QWidget* > NewMeasurementWidget::getDisplayWidgets()
+{
+    return m_qListDisplayWidgets;
+}
+
+
+//*************************************************************************************************************
+
+inline void NewMeasurementWidget::addDisplayAction(QAction* pAction)
+{
+    m_qListDisplayActions.append(pAction);
+}
+
+
+//*************************************************************************************************************
+
+inline void NewMeasurementWidget::addDisplayWidget(QWidget* pWidget)
+{
+    m_qListDisplayWidgets.append(pWidget);
+}
+
+} //NAMESPACE
 
 #endif // NEWMEASUREMENTWIDGET_H

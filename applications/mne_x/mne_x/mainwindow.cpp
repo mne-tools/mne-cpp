@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -40,7 +40,7 @@
 
 #include <mne_x/Management/pluginmanager.h>
 #include <mne_x/Management/pluginscenemanager.h>
-#include <mne_x/Management/newdisplaymanager.h>
+#include <mne_x/Management/displaymanager.h>
 
 //GUI
 #include "mainwindow.h"
@@ -58,6 +58,10 @@
 #include <QDebug>
 #include <QTimer>
 #include <QTime>
+#include <QFile>
+#include <QFileDialog>
+#include <QFileInfo>
+#include <QStandardPaths>
 
 #include <iostream>
 
@@ -87,8 +91,12 @@ MainWindow::MainWindow(QWidget *parent)
 : QMainWindow(parent)
 , m_pStartUpWidget(new StartUpWidget(this))
 , m_pRunWidget(NULL)
+, m_pDisplayManager(new DisplayManager(this))
 , m_bDisplayMax(false)
 , m_bIsRunning(false)
+, m_pToolBar(NULL)
+, m_pDynamicPluginToolBar(NULL)
+, m_pDynamicDisplayToolBar(NULL)
 , m_pLabelTime(NULL)
 , m_pTimer(NULL)
 , m_pTime(new QTime(0, 0))
@@ -96,7 +104,6 @@ MainWindow::MainWindow(QWidget *parent)
 , m_pPluginGui(NULL)
 , m_pPluginManager(new PluginManager(this))
 , m_pPluginSceneManager(new PluginSceneManager(this))
-, m_pDisplayManager(new NewDisplayManager(this))
 , m_eLogLevelCurrent(_LogLvMax)
 {
     qDebug() << "Clinical Sensing and Analysis - Version" << CInfo::AppVersion();
@@ -131,6 +138,21 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
     clear();
+
+    //clean
+    if(m_pToolBar)
+    {
+        if(m_pLabelTime)
+            delete m_pLabelTime;
+        m_pLabelTime = NULL;
+        delete m_pToolBar;
+    }
+
+    if(m_pDynamicPluginToolBar)
+        delete m_pDynamicPluginToolBar;
+
+    if(m_pDynamicDisplayToolBar)
+        delete m_pDynamicDisplayToolBar;
 }
 
 
@@ -138,12 +160,8 @@ MainWindow::~MainWindow()
 
 void MainWindow::clear()
 {
-    //garbage collection
-    m_pPluginSceneManager.reset();
-
-    if(m_pPluginGui)
-        delete m_pPluginGui;
-
+    if(m_bIsRunning)
+        this->stopMeasurement();
 }
 
 
@@ -151,8 +169,6 @@ void MainWindow::clear()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    clear();
-
     QMainWindow::closeEvent(event);
 }
 
@@ -162,7 +178,8 @@ void MainWindow::closeEvent(QCloseEvent *event)
 //File QMenu
 void MainWindow::newConfiguration()
 {
-    writeToLog(tr("Invoked <b>File|NewPreferences</b>"), _LogKndMessage, _LogLvMin);
+    writeToLog(tr("Invoked <b>File|NewConfiguration</b>"), _LogKndMessage, _LogLvMin);
+    m_pPluginGui->clearScene();
 }
 
 
@@ -170,7 +187,15 @@ void MainWindow::newConfiguration()
 
 void MainWindow::openConfiguration()
 {
-    writeToLog(tr("Invoked <b>File|OpenPreferences</b>"), _LogKndMessage, _LogLvMin);
+    writeToLog(tr("Invoked <b>File|OpenConfiguration</b>"), _LogKndMessage, _LogLvMin);
+
+    QString path = QFileDialog::getOpenFileName(this,
+                                                "Open MNE-X Configuration File",
+                                                QStandardPaths::writableLocation(QStandardPaths::DataLocation),
+                                                 tr("Configuration file (*.xml)"));
+
+    QFileInfo qFileInfo(path);
+    m_pPluginGui->loadConfig(qFileInfo.path(), qFileInfo.fileName());
 }
 
 
@@ -178,7 +203,16 @@ void MainWindow::openConfiguration()
 
 void MainWindow::saveConfiguration()
 {
-    writeToLog(tr("Invoked <b>File|SavePreferences</b>"), _LogKndMessage, _LogLvMin);
+    writeToLog(tr("Invoked <b>File|SaveConfiguration</b>"), _LogKndMessage, _LogLvMin);
+
+    QString path = QFileDialog::getSaveFileName(
+                this,
+                "Save MNE-X Configuration File",
+                QStandardPaths::writableLocation(QStandardPaths::DataLocation),
+                 tr("Configuration file (*.xml)"));
+
+    QFileInfo qFileInfo(path);
+    m_pPluginGui->saveConfig(qFileInfo.path(), qFileInfo.fileName());
 }
 
 
@@ -203,11 +237,11 @@ void MainWindow::about()
             " following disclaimer.\n"
             "\t* Redistributions in binary form must reproduce the above copyright notice, this list of conditions and"
             " the following disclaimer in the documentation and/or other materials provided with the distribution.\n"
-            "\t* Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used"
+            "\t* Neither the name of MNE-CPP authors nor the names of its contributors may be used"
             " to endorse or promote products derived from this software without specific prior written permission.\n\n"
             "THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\" AND ANY EXPRESS OR IMPLIED"
             " WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A"
-            " PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,"
+            " PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,"
             " INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,"
             " PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)"
             " HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING"
@@ -250,41 +284,41 @@ void MainWindow::createActions()
     m_pActionNewConfig = new QAction(QIcon(":/images/new.png"), tr("&New configuration"), this);
     m_pActionNewConfig->setShortcuts(QKeySequence::New);
     m_pActionNewConfig->setStatusTip(tr("Create a new configuration"));
-//    connect(m_pActionNewConfig, SIGNAL(triggered()), this, SLOT(newPreferences()));
+    connect(m_pActionNewConfig, &QAction::triggered, this, &MainWindow::newConfiguration);
 
     m_pActionOpenConfig = new QAction(tr("&Open configuration..."), this);
     m_pActionOpenConfig->setShortcuts(QKeySequence::Open);
     m_pActionOpenConfig->setStatusTip(tr("Open an existing configuration"));
-//    connect(m_pActionOpenConfig, SIGNAL(triggered()), this, SLOT(openPreferences()));
+    connect(m_pActionOpenConfig, &QAction::triggered, this, &MainWindow::openConfiguration);
 
     m_pActionSaveConfig = new QAction(QIcon(":/images/save.png"), tr("&Save configuration..."), this);
     m_pActionSaveConfig->setShortcuts(QKeySequence::Save);
     m_pActionSaveConfig->setStatusTip(tr("Save the current configuration"));
-//    connect(m_pActionSaveConfig, SIGNAL(triggered()), this, SLOT(savePreferences()));
+    connect(m_pActionSaveConfig, &QAction::triggered, this, &MainWindow::saveConfiguration);
 
     m_pActionExit = new QAction(tr("E&xit"), this);
     m_pActionExit->setShortcuts(QKeySequence::Quit);
     m_pActionExit->setStatusTip(tr("Exit the application"));
-    connect(m_pActionExit, SIGNAL(triggered()), this, SLOT(close()));
+    connect(m_pActionExit, &QAction::triggered, this, &MainWindow::close);
 
     //View QMenu
     m_pActionMinLgLv = new QAction(tr("&Minimal"), this);
     m_pActionMinLgLv->setCheckable(true);
     m_pActionMinLgLv->setShortcut(tr("Ctrl+1"));
     m_pActionMinLgLv->setStatusTip(tr("Open an existing file"));
-    connect(m_pActionMinLgLv, SIGNAL(triggered()), this, SLOT(setMinLogLevel()));
+    connect(m_pActionMinLgLv, &QAction::triggered, this, &MainWindow::setMinLogLevel);
 
     m_pActionNormLgLv = new QAction(tr("&Normal"), this);
     m_pActionNormLgLv->setCheckable(true);
     m_pActionNormLgLv->setShortcut(tr("Ctrl+2"));
     m_pActionNormLgLv->setStatusTip(tr("Save the document to disk"));
-    connect(m_pActionNormLgLv, SIGNAL(triggered()), this, SLOT(setNormalLogLevel()));
+    connect(m_pActionNormLgLv, &QAction::triggered, this, &MainWindow::setNormalLogLevel);
 
     m_pActionMaxLgLv = new QAction(tr("Maximal"), this);
     m_pActionMaxLgLv->setCheckable(true);
     m_pActionMaxLgLv->setShortcut(tr("Ctrl+3"));
     m_pActionMaxLgLv->setStatusTip(tr("Exit the application"));
-    connect(m_pActionMaxLgLv, SIGNAL(triggered()), this, SLOT(setMaxLogLevel()));
+    connect(m_pActionMaxLgLv, &QAction::triggered, this, &MainWindow::setMaxLogLevel);
 
     m_pActionGroupLgLv = new QActionGroup(this);
     m_pActionGroupLgLv->addAction(m_pActionMinLgLv);
@@ -301,42 +335,42 @@ void MainWindow::createActions()
     m_pActionHelpContents = new QAction(tr("Help &Contents"), this);
     m_pActionHelpContents->setShortcuts(QKeySequence::HelpContents);
     m_pActionHelpContents->setStatusTip(tr("Show the help contents"));
-    connect(m_pActionHelpContents, SIGNAL(triggered()), this, SLOT(helpContents()));
+    connect(m_pActionHelpContents, &QAction::triggered, this, &MainWindow::helpContents);
 
     m_pActionAbout = new QAction(tr("&About"), this);
     m_pActionAbout->setStatusTip(tr("Show the application's About box"));
-    connect(m_pActionAbout, SIGNAL(triggered()), this, SLOT(about()));
+    connect(m_pActionAbout, &QAction::triggered, this, &MainWindow::about);
 
     //QToolbar
     m_pActionRun = new QAction(QIcon(":/images/run.png"), tr("Run (F5)"), this);
     m_pActionRun->setShortcut(tr("F5"));
     m_pActionRun->setStatusTip(tr("Runs (F5) ")+CInfo::AppNameShort());
-    connect(m_pActionRun, SIGNAL(triggered()), this, SLOT(startMeasurement()));
+    connect(m_pActionRun, &QAction::triggered, this, &MainWindow::startMeasurement);
 
     m_pActionStop = new QAction(QIcon(":/images/stop.png"), tr("Stop (F6)"), this);
     m_pActionStop->setShortcut(tr("F6"));
     m_pActionStop->setStatusTip(tr("Stops (F6) ")+CInfo::AppNameShort());
-    connect(m_pActionStop, SIGNAL(triggered()), this, SLOT(stopMeasurement()));
+    connect(m_pActionStop, &QAction::triggered, this, &MainWindow::stopMeasurement);
 
     m_pActionZoomStd = new QAction(QIcon(":/images/zoomStd.png"), tr("Standard Zoom (Ctrl+0)"), this);
     m_pActionZoomStd->setShortcut(tr("Ctrl+0"));
     m_pActionZoomStd->setStatusTip(tr("Sets the standard Zoom (Ctrl+0)"));
-    connect(m_pActionZoomStd, SIGNAL(triggered()), this, SLOT(zoomStd()));
+    connect(m_pActionZoomStd, &QAction::triggered, this, &MainWindow::zoomStd);
 
     m_pActionZoomIn = new QAction(QIcon(":/images/zoomIn.png"), tr("Zoom In ")+QKeySequence(QKeySequence::ZoomIn).toString(), this);
     m_pActionZoomIn->setShortcuts(QKeySequence::ZoomIn);
     m_pActionZoomIn->setStatusTip(tr("Zooms in the magnitude ")+QKeySequence(QKeySequence::ZoomIn).toString());
-    connect(m_pActionZoomIn, SIGNAL(triggered()), this, SLOT(zoomIn()));
+    connect(m_pActionZoomIn, &QAction::triggered, this, &MainWindow::zoomIn);
 
     m_pActionZoomOut = new QAction(QIcon(":/images/zoomOut.png"), tr("Zoom Out ")+QKeySequence(QKeySequence::ZoomOut).toString(), this);
     m_pActionZoomOut->setShortcuts(QKeySequence::ZoomOut);
     m_pActionZoomOut->setStatusTip(tr("Zooms out the magnitude ")+QKeySequence(QKeySequence::ZoomOut).toString());
-    connect(m_pActionZoomOut, SIGNAL(triggered()), this, SLOT(zoomOut()));
+    connect(m_pActionZoomOut, &QAction::triggered, this, &MainWindow::zoomOut);
 
     m_pActionDisplayMax = new QAction(QIcon(":/images/displayMax.png"), tr("Maximize current Display (F11)"), this);
     m_pActionDisplayMax->setShortcut(tr("F11"));
-    m_pActionDisplayMax->setStatusTip(tr("Maximizes the current Display (F11)"));
-    connect(m_pActionDisplayMax, SIGNAL(triggered()), this, SLOT(toggleDisplayMax()));
+    m_pActionDisplayMax->setStatusTip(tr("Maximizes the current display (F11)"));
+    connect(m_pActionDisplayMax, &QAction::triggered, this, &MainWindow::toggleDisplayMax);
 }
 
 
@@ -372,27 +406,62 @@ void MainWindow::createMenus()
 
 void MainWindow::createToolBars()
 {
-    m_pToolBar = addToolBar(tr("File"));
-    m_pToolBar->addAction(m_pActionRun);
-    m_pToolBar->addAction(m_pActionStop);
-    m_pActionStop->setEnabled(false);
+    //Control
+    if(!m_pToolBar)
+    {
+        m_pToolBar = addToolBar(tr("Control"));
+        m_pToolBar->addAction(m_pActionRun);
+        m_pToolBar->addAction(m_pActionStop);
+        m_pActionStop->setEnabled(false);
 
-    m_pToolBar->addSeparator();
+        m_pToolBar->addSeparator();
 
-    m_pToolBar->addAction(m_pActionZoomStd);
-    m_pToolBar->addAction(m_pActionZoomIn);
-    m_pToolBar->addAction(m_pActionZoomOut);
-    m_pToolBar->addAction(m_pActionDisplayMax);
-    m_pActionZoomStd->setEnabled(false);
-    m_pActionZoomIn->setEnabled(false);
-    m_pActionZoomOut->setEnabled(false);
-    m_pActionDisplayMax->setEnabled(false);
+        m_pToolBar->addAction(m_pActionZoomStd);
+        m_pToolBar->addAction(m_pActionZoomIn);
+        m_pToolBar->addAction(m_pActionZoomOut);
+        m_pToolBar->addAction(m_pActionDisplayMax);
+        m_pActionZoomStd->setEnabled(false);
+        m_pActionZoomIn->setEnabled(false);
+        m_pActionZoomOut->setEnabled(false);
+        m_pActionDisplayMax->setEnabled(false);
 
-    m_pToolBar->addSeparator();
+        m_pToolBar->addSeparator();
 
-    m_pLabelTime = new QLabel;
-    m_pToolBar->addWidget(m_pLabelTime);
-    m_pLabelTime->setText(QTime(0, 0).toString());
+        m_pLabelTime = new QLabel(this);
+        m_pToolBar->addWidget(m_pLabelTime);
+        m_pLabelTime->setText(QTime(0, 0).toString());
+    }
+
+    //Plugin
+    if(m_pDynamicPluginToolBar)
+    {
+        removeToolBar(m_pDynamicPluginToolBar);
+        delete m_pDynamicPluginToolBar;
+        m_pDynamicPluginToolBar = NULL;
+    }
+    if(m_qListDynamicPluginActions.size() > 0)
+    {
+        m_pDynamicPluginToolBar = addToolBar(m_sCurPluginName + tr("Control"));
+        for(qint32 i = 0; i < m_qListDynamicPluginActions.size(); ++i)
+            m_pDynamicPluginToolBar->addAction(m_qListDynamicPluginActions[i]);
+    }
+
+    //Display
+    if(m_pDynamicDisplayToolBar)
+    {
+        removeToolBar(m_pDynamicDisplayToolBar);
+        delete m_pDynamicDisplayToolBar;
+        m_pDynamicDisplayToolBar = NULL;
+    }
+    if(m_qListDynamicDisplayActions.size() > 0 || m_qListDynamicDisplayWidgets.size() > 0)
+    {
+        m_pDynamicDisplayToolBar = addToolBar(tr("Display"));
+        for(qint32 i = 0; i < m_qListDynamicDisplayActions.size(); ++i)
+            m_pDynamicDisplayToolBar->addAction(m_qListDynamicDisplayActions[i]);
+        for(qint32 i = 0; i < m_qListDynamicDisplayWidgets.size(); ++i)
+            m_pDynamicDisplayToolBar->addWidget(m_qListDynamicDisplayWidgets[i]);
+    }
+
 }
 
 
@@ -411,7 +480,7 @@ void MainWindow::createPluginDockWindow()
     m_pPluginGuiDockWidget = new QDockWidget(tr("Plugins"), this);
     m_pPluginGuiDockWidget->setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
 
-    m_pPluginGui = new PluginGui(m_pPluginManager, m_pPluginSceneManager);
+    m_pPluginGui = new PluginGui(m_pPluginManager.data(), m_pPluginSceneManager.data());
     m_pPluginGui->setParent(m_pPluginGuiDockWidget);
     m_pPluginGuiDockWidget->setWidget(m_pPluginGui);
 
@@ -419,6 +488,9 @@ void MainWindow::createPluginDockWindow()
 
     connect(m_pPluginGui, &PluginGui::selectedPluginChanged,
             this, &MainWindow::updatePluginWidget);
+
+    connect(m_pPluginGui, &PluginGui::selectedConnectionChanged,
+            this, &MainWindow::updateConnectionWidget);
 }
 
 
@@ -426,7 +498,6 @@ void MainWindow::createPluginDockWindow()
 
 void MainWindow::createLogDockWindow()
 {
-
     //Log TextBrowser
     m_pDockWidget_Log = new QDockWidget(tr("Log"), this);
 
@@ -448,39 +519,66 @@ void MainWindow::createLogDockWindow()
 //Plugin stuff
 void MainWindow::updatePluginWidget(IPlugin::SPtr pPlugin)
 {
-    //Garbage collecting
-    if(m_pRunWidget)
-    {
-        delete m_pRunWidget;
-        m_pRunWidget = NULL;
-    }
+    m_qListDynamicPluginActions.clear();
+    m_qListDynamicDisplayActions.clear();
+    m_qListDynamicDisplayWidgets.clear();
 
-    if(pPlugin.isNull())
+    if(!pPlugin.isNull())
     {
-        QWidget* pWidget = new QWidget;
-        setCentralWidget(pWidget);
+        // Add Dynamic Plugin Actions
+        m_qListDynamicPluginActions.append(pPlugin->getPluginActions());
+
+        m_sCurPluginName = pPlugin->getName();
+
+        //Garbage collecting
+        if(m_pRunWidget)
+        {
+            delete m_pRunWidget;
+            m_pRunWidget = NULL;
+        }
+
+        if(pPlugin.isNull())
+        {
+            QWidget* pWidget = new QWidget;
+            setCentralWidget(pWidget);
+        }
+        else
+        {
+            if(!m_bIsRunning)
+                setCentralWidget(pPlugin->setupWidget());
+            else
+            {
+                m_pRunWidget = new RunWidget( m_pDisplayManager->show(pPlugin->getOutputConnectors(), m_pTime, m_qListDynamicDisplayActions, m_qListDynamicDisplayWidgets));
+
+                m_pRunWidget->show();
+
+                if(m_bDisplayMax)//ToDo send events to main window
+                {
+                    m_pRunWidget->showFullScreen();
+                    connect(m_pRunWidget, &RunWidget::displayClosed, this, &MainWindow::toggleDisplayMax);
+                    m_pRunWidgetClose = new QShortcut(QKeySequence(Qt::Key_Escape), m_pRunWidget, SLOT(close()));
+                }
+                else
+                    setCentralWidget(m_pRunWidget);
+            }
+        }
     }
     else
     {
-
-
-        if(!m_bIsRunning)
-            setCentralWidget(pPlugin->setupWidget());
-        else
-        {
-            m_pRunWidget = new RunWidget( m_pDisplayManager->show(pPlugin->getOutputConnectors(), m_pTime));
-
-            m_pRunWidget->show();
-
-            if(m_bDisplayMax)//ToDo send events to main window
-            {
-                m_pRunWidget->showFullScreen();
-                connect(m_pRunWidget, &RunWidget::displayClosed, this, &MainWindow::toggleDisplayMax);
-            }
-            else
-                setCentralWidget(m_pRunWidget);
-        }
+        QWidget* t_pWidgetEmpty = new QWidget;
+        setCentralWidget(t_pWidgetEmpty);
     }
+
+    this->createToolBars();
+}
+
+
+//*************************************************************************************************************
+
+void MainWindow::updateConnectionWidget(PluginConnectorConnection::SPtr pConnection)
+{
+    QWidget* pWidget = pConnection->setupWidget();
+    setCentralWidget(pWidget);
 }
 
 
@@ -663,7 +761,7 @@ void MainWindow::uiSetupRunningState(bool state)
 void MainWindow::startTimer(int msec)
 {
     m_pTimer = QSharedPointer<QTimer>(new QTimer(this));
-    connect(m_pTimer.data(), SIGNAL(timeout()), this, SLOT(updateTime()));
+    connect(m_pTimer.data(), &QTimer::timeout, this, &MainWindow::updateTime);
     m_pTimer->start(msec);
     m_pTime->setHMS(0,0,0);
     QString strTime = m_pTime->toString();
@@ -675,7 +773,7 @@ void MainWindow::startTimer(int msec)
 
 void MainWindow::stopTimer()
 {
-    disconnect(m_pTimer.data(), SIGNAL(timeout()), this, SLOT(updateTime()));
+    disconnect(m_pTimer.data(), &QTimer::timeout, this, &MainWindow::updateTime);
 }
 
 

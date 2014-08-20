@@ -16,12 +16,12 @@
 #       following disclaimer.
 #     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 #       the following disclaimer in the documentation and/or other materials provided with the distribution.
-#     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+#     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 #       to endorse or promote products derived from this software without specific prior written permission.
 #
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 # WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-# PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+# PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 # INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 # PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 # HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -101,8 +101,9 @@ SOURCES += \
     Management/plugininputdata.cpp \
     Management/pluginoutputdata.cpp \
     Management/pluginconnectorconnection.cpp \
+    Management/pluginconnectorconnectionwidget.cpp \
     Management/pluginscenemanager.cpp \
-    Management/newdisplaymanager.cpp
+    Management/displaymanager.cpp
 
 HEADERS += \
     mne_x_global.h \
@@ -117,8 +118,9 @@ HEADERS += \
     Management/plugininputdata.h \
     Management/pluginoutputdata.h \
     Management/pluginconnectorconnection.h \
+    Management/pluginconnectorconnectionwidget.h \
     Management/pluginscenemanager.h \
-    Management/newdisplaymanager.h
+    Management/displaymanager.h
 
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
@@ -138,3 +140,13 @@ header_files_management.path = $${MNE_X_INCLUDE_DIR}/mne_x/Management
 INSTALLS += header_files
 INSTALLS += header_files_interfaces
 INSTALLS += header_files_management
+
+
+unix:!macx {
+    QMAKE_CXXFLAGS += -std=c++0x
+    QMAKE_CXXFLAGS += -Wno-attributes
+}
+macx {
+    QMAKE_CXXFLAGS = -mmacosx-version-min=10.7 -std=gnu0x -stdlib=libc+
+    CONFIG +=c++11
+}
