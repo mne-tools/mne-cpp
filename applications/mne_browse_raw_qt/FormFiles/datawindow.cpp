@@ -79,7 +79,7 @@ DataWindow::~DataWindow()
 void DataWindow::setupRawViewSettings()
 {
     //set some settings for m_pRawTableView
-    ui->m_tableView_rawTableView->verticalHeader()->setDefaultSectionSize(m_pMainWindow->m_pRawDelegate->m_dDefaultPlotHeight);
+    ui->m_tableView_rawTableView->verticalHeader()->setDefaultSectionSize(m_pMainWindow->m_pRawDelegate->m_iDefaultPlotHeight);
     ui->m_tableView_rawTableView->setColumnHidden(0,true); //because content is plotted jointly with column=1
     ui->m_tableView_rawTableView->resizeColumnsToContents();
 
@@ -89,7 +89,7 @@ void DataWindow::setupRawViewSettings()
             this,&DataWindow::customContextMenuRequested);
 
     //activate kinetic scrolling
-    QScroller::grabGesture(ui->m_tableView_rawTableView,QScroller::MiddleMouseButtonGesture);
+    QScroller::grabGesture(ui->m_tableView_rawTableView,QScroller::LeftMouseButtonGesture);
 
     //connect QScrollBar with model in order to reload data samples
     connect(ui->m_tableView_rawTableView->horizontalScrollBar(),SIGNAL(valueChanged(int)),
@@ -132,7 +132,6 @@ void DataWindow::setupToolBar()
     //Create toolbar
     QToolBar *toolBar = new QToolBar();
     toolBar->setOrientation(Qt::Vertical);
-    //toolBar->setFixedWidth(30);
     toolBar->setMovable(false);
 
     //Add actions to tool bar
@@ -153,13 +152,11 @@ bool DataWindow::event(QEvent * event)
         //Manually resize QDockWidget - This needs to be done because there is no typical central widget in QMainWindow - QT does not do a good job when resizing dock widgets (known issue)
         int newWidth;
 
-        if(m_pMainWindow->m_pEventWindow->isHidden() || m_pMainWindow->m_pEventWindow->isFloating())
-        {
+        if(m_pMainWindow->m_pEventWindow->isHidden() || m_pMainWindow->m_pEventWindow->isFloating()) {
             newWidth = m_pMainWindow->size().width() - m_pMainWindow->centralWidget()->size().width() - 1;
             //qDebug()<<"resize data plot event window is hidden";
         }
-        else
-        {
+        else {
             newWidth = m_pMainWindow->size().width() - m_pMainWindow->m_pEventWindow->size().width() - 5;
             //qDebug()<<"resize data plot event window is visible";
         }
@@ -179,7 +176,7 @@ void DataWindow::customContextMenuRequested(QPoint pos)
     //QModelIndex index = m_pRawTableView->indexAt(pos);
 
     //get selected items
-    QModelIndexList selected = m_pMainWindow->m_pRawTableView->selectionModel()->selectedIndexes();
+    QModelIndexList selected = ui->m_tableView_rawTableView->selectionModel()->selectedIndexes();
 
     //create custom context menu and actions
     QMenu *menu = new QMenu(this);

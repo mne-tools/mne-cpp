@@ -37,9 +37,10 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// INCLUDES
 //=============================================================================================================
 
+#include <stdio.h>
 #include "FormFiles/mainwindow.h"
 #include "info.h"
 
@@ -53,6 +54,7 @@
 #include <QApplication>
 #include <QDateTime>
 #include <QSplashScreen>
+#include <QThread>
 
 
 //*************************************************************************************************************
@@ -119,6 +121,7 @@ int main(int argc, char *argv[])
     QPixmap pixmap(":/Resources/Images/splashscreen_mne_browse_raw_qt.png");
     QSplashScreen splash(pixmap);
     splash.show();
+    QThread::sleep(1);
 
     mainWindow = new MainWindow();
     mainWindow->show();

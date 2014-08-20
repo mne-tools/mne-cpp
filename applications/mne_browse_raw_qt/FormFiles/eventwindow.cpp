@@ -78,7 +78,6 @@ EventWindow::~EventWindow()
 void EventWindow::setupEventViewSettings()
 {
     ui->m_tableView_eventTableView->resizeColumnsToContents();
-    ui->m_tableView_eventTableView->setSelectionBehavior(QAbstractItemView::SelectRows);
 
     //Connect selection in event window to specific slot
     connect(ui->m_tableView_eventTableView->selectionModel(),&QItemSelectionModel::currentRowChanged,
