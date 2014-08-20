@@ -67,7 +67,8 @@ else {
 
 DESTDIR = $${MNE_BINARY_DIR}
 
-SOURCES += rawsettings.cpp \
+SOURCES += \
+    rawsettings.cpp \
     main.cpp \
     mneoperator.cpp \
     filteroperator.cpp \
@@ -79,7 +80,8 @@ SOURCES += rawsettings.cpp \
     FormFiles/eventwindow.cpp \
     FormFiles/datawindow.cpp \
 
-HEADERS += rawsettings.h \
+HEADERS += \
+    rawsettings.h \
     mneoperator.h \
     filteroperator.h \
     types.h \
@@ -114,3 +116,5 @@ macx {
     CONFIG +=c++11
 }
 
+RESOURCES += \
+    mnebrowserawqt.qrc

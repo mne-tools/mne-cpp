@@ -52,6 +52,7 @@
 #include <QtGui>
 #include <QApplication>
 #include <QDateTime>
+#include <QSplashScreen>
 
 
 //*************************************************************************************************************
@@ -114,8 +115,15 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationName(CInfo::OrganizationName());
     QCoreApplication::setApplicationName(CInfo::AppNameShort());
 
+    //show splash screen
+    QPixmap pixmap(":/Resources/Images/splashscreen_mne_browse_raw_qt.png");
+    QSplashScreen splash(pixmap);
+    splash.show();
+
     mainWindow = new MainWindow();
     mainWindow->show();
+
+    splash.finish(mainWindow);
 
     return a.exec();
 }
