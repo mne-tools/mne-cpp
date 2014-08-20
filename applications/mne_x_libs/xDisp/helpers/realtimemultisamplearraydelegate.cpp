@@ -265,7 +265,7 @@ void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, 
 //        float val = data[0];
         fValue = 0;//(val-data[0])*fScaleY;
 
-        float newY = y_base+fValue;
+        float newY = y_base-fValue;//Reverse direction -> plot the right way
 
         qSamplePosition.setY(newY);
         qSamplePosition.setX(path.currentPosition().x());
@@ -279,7 +279,7 @@ void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, 
         float val = data[i] - data[0]; //remove first sample data[0] as offset
         fValue = val*fScaleY;
 
-        float newY = y_base+fValue;
+        float newY = y_base-fValue;//Reverse direction -> plot the right way
 
         qSamplePosition.setY(newY);
         qSamplePosition.setX(path.currentPosition().x()+fDx);
@@ -296,7 +296,7 @@ void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, 
         float val = lastData[i] - lastData[0]; //remove first sample lastData[0] as offset
         fValue = val*fScaleY;
 
-        float newY = y_base+fValue;
+        float newY = y_base-fValue;
 
         qSamplePosition.setY(newY);
         qSamplePosition.setX(lastPath.currentPosition().x()+fDx);

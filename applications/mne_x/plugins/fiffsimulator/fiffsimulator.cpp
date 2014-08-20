@@ -402,6 +402,8 @@ void FiffSimulator::run()
         //pop matrix
         matValue = m_pRawMatrixBuffer_In->pop();
 
+//        std::cout << "Mat Value\n" << matValue.row(306) << std::endl;
+
         //emit values
         for(qint32 i = 0; i < matValue.cols(); ++i)
             m_pRTMSA_FiffSimulator->data()->setValue(matValue.col(i).cast<double>());
