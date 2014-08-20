@@ -305,6 +305,23 @@ void RtSss::run()
     expOrder << LinRR << LoutRR << Lin << Lout;
     rsss.setSSSParameter(expOrder);
 
+//    // Find out if coils are all gradiometers, all magnetometers, or both.
+//    // When both gradiometers and magnetometers are used,
+//    //      MagScale facor of 100 must be appiled to magnetomters.
+//    float MagScale;
+//    if ((0 < CoilGrad.sum()) && (CoilGrad.sum() < NumCoil))  MagScale = 100;
+//    else MagScale = 1;
+
+//    VectorXd CoilScale;
+//    CoilScale.setOnes(NumCoil);
+//    for(int i=0; i<NumCoil; i++)
+//    {
+//        if (CoilGrad(i) == 0) CoilScale(i) = MagScale;
+////        std::cout <<  "i=" << i << "CoilGrad: " << CoilGrad(i) << ",  CoilScale: " << CoilScale(i) << std::endl;
+//    }
+
+
+
     // Find a starting MEG channel index fiff
     // When the MEG recording of the first channel is saved starting from the first row in the signal matrix, the startID_MEGch will be 0.
     // When the MEG recording of the first channel is saved starting not from the first row and being followed by others like EEG,
@@ -327,19 +344,20 @@ void RtSss::run()
 
     // start processing data
     m_bProcessData = true;
-    qint32 HEADMOV_COR_cnt = 2 ;
-
+    qint32 HEADMOV_COR_cnt = 15 ;
+qint32 cnt=0;
     qDebug() << "rtSSS started.....";
+
     while(m_bIsRunning)
     {
         // When new head movement correction presented, lineqn must be rebuilt for rtSSS
-        if (HEADMOV_COR_cnt == 2)
-        {
-            lineqn = rsss.buildLinearEqn();
-            qDebug() << "rebuilt SSS linear equation .....";
-            HEADMOV_COR_cnt = 0;
-        }
-        else HEADMOV_COR_cnt++;
+//        if (HEADMOV_COR_cnt == 15)
+//        {
+//            lineqn = rsss.buildLinearEqn();
+//            qDebug() << "rebuilt SSS linear equation .....";
+//            HEADMOV_COR_cnt = 0;
+//        }
+//        else HEADMOV_COR_cnt++;
 
         qint32 nrows = m_pRtSssBuffer->rows();
         qDebug() << "rtsss";
@@ -347,35 +365,45 @@ void RtSss::run()
         {
             // * Dispatch the inputs * //
             MatrixXd in_mat = m_pRtSssBuffer->pop();
-//            qDebug() << "size of in_mat (run): " << in_mat.rows() << " x " << in_mat.cols();
+            qDebug() << "size of in_mat (run): " << in_mat.rows() << " x " << in_mat.cols();
 
             //  Remove bad channel signals
+//            nmegchanused = 275;
             MatrixXd in_mat_used(nmegchanused, in_mat.cols());
-//            qDebug() << "size of in_mat_used (run): " << in_mat_used.rows() << " x " << in_mat_used.cols();
-            for(qint32 i = 0, k = 0; i < nmegchan; ++i)
-                if (badch(i) == 0)
-                {
-                    in_mat_used.row(k) = in_mat.row(i);
-                    k++;
-                }
+            qDebug() << "size of in_mat_used (run): " << in_mat_used.rows() << " x " << in_mat_used.cols();
+//            for(qint32 i = 0, k = 0; i < nmegchan; ++i)
+//                if (badch(i) == 0)
+//                {
+//                    in_mat_used.row(k) = in_mat.row(i);
+//                    k++;
+//                }
+            in_mat_used = in_mat.block(0,0,nmegchanused,in_mat.cols());
+
+            cnt++;
+            qDebug() << cnt;
+
+
+            // Implement Concurrent mapreduced tfor parallel processing
+            // divide the in_mat_used into 2 or 4 matrices, which renders 50ms or 25ms data
 
             sssOut = rsss.getSSSRR(lineqn[0], lineqn[1], lineqn[2], lineqn[3], lineqn[4]*in_mat_used);
 //            sssOut = rsss.getSSSOLS(lineqn[0], lineqn[1], lineqn[3], lineqn[4]*in_mat_used);
 //            sssRR = rsss.getSSSRR(lineqn[0], lineqn[1], lineqn[2], lineqn[3], lineqn[4]*in_mat_used.block(startID_MEGch,0,nmegchanused,in_mat_used.cols()));
 //            sssRR = rsss.getSSSRR(lineqn[0], lineqn[1], lineqn[2], lineqn[3], lineqn[4]*in_mat.block(startID_MEGch,0,nmegchan,in_mat.cols()));
-//            qDebug() <<  "size of sssRR[0] (run): " << sssRR[0].rows() << " x " << sssRR[0].cols();
+            qDebug() <<  "size of sssRR[0] (run): " << sssOut[0].rows() << " x " << sssOut[0].cols();
 
             // Replace raw signal by SSS signal
-            for(qint32 i = 0, k = 0; i < nmegchan; ++i)
-                if (badch(i) == 0)
-                {
-                    in_mat.row(i) = sssOut[0].row(k);
-                    k++;
-                }
+//            for(qint32 i = 0, k = 0; i < nmegchan; ++i)
+//                if (badch(i) == 0)
+//                {
+//                    in_mat.row(i) = sssOut[0].row(k);
+//                    k++;
+//                }
 
+            in_mat.block(0,0,nmegchanused,in_mat.cols()) = sssOut[0];
             // Display signal after SSS
             for(qint32 i = 0; i <in_mat.cols(); ++i)
-                m_pRTMSAOutput->data()->setValue(in_mat.col(i));
+                m_pRTMSAOutput->data()->setValue(1e7 * in_mat.col(i));
         }
     }
 
