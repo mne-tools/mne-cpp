@@ -201,20 +201,20 @@ void RtSssAlgo::setMEGInfo(FiffInfo::SPtr fiffInfo)
     CoilNk.resize(NumCoil);
 
     // Coordinate of coil integrating points:  This is assigned to CoilRk.
-    //      7001 (babyMEG inlayer magnetometer): 7 pts
-    //      7002 (babyMEG outlayer magnetometer): 7 pts
+    //      7002 (babyMEG inlayer magnetometer): 7 pts
+    //      7003 (babyMEG outlayer magnetometer): 7 pts
     //      3012 (VectorView planar grdiometer, Type 1): 8 pts
     //      3024 (VectorView magnetometer,Type 3): 9 pts
-    MatrixXd C7001intpts7(3,7), C7002intpts7(3,7), C3012intpts8(3,8), C3024intpts9(3,9);
-    C7001intpts7 << 0.000000, 0.000000, 0.000000, 0.0040825, 0.000000, 0.000000, -0.0040825, 0.000000, 0.000000,  0.0020412, 0.0035356, 0.000000, 0.0020412, -0.0035356, 0.000000, -0.0020412, 0.0035356, 0.000000, -0.0020412, -0.0035356, 0.000000;
+    MatrixXd C7002intpts7(3,7), C7003intpts7(3,7), C3012intpts8(3,8), C3024intpts9(3,9);
     C7002intpts7 << 0.000000, 0.000000, 0.000000, 0.0081650, 0.000000, 0.000000, -0.0081650, 0.000000, 0.000000,  0.0040824, 0.0070712, 0.000000, 0.0040824, -0.0070712, 0.000000, -0.0040824, 0.0070712, 0.000000, -0.0040824, -0.0070712, 0.000000;
+    C7003intpts7 << 0.000000, 0.000000, 0.000000, 0.0081650, 0.000000, 0.000000, -0.0081650, 0.000000, 0.000000,  0.0040824, 0.0070712, 0.000000, 0.0040824, -0.0070712, 0.000000, -0.0040824, 0.0070712, 0.000000, -0.0040824, -0.0070712, 0.000000;
     C3012intpts8 << 0.0059, -0.0059, 0.0059, -0.0059, 0.0108, -0.0108, 0.0108, -0.0108, 0.0067, 0.0067, -0.0067, -0.0067, 0.0067, 0.0067, -0.0067, -0.0067, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003;
     C3024intpts9 << 0.0000, 0.0100, -0.0100, 0.0100, -0.0100, 0.0000, 0.0000, 0.0100, -0.0100, 0.0000, 0.0100, 0.0100, -0.0100, -0.0100, 0.0100, -0.0100, 0.0000, 0.0000, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003;
 
     // Coil point weight:  This is assinged to CoilWk
-    MatrixXd C7001Wintpts7(1,7), C7002Wintpts7(1,7), C3012Wintpts8(1,8), C3024Wintpts9(1,9);
-    C7001Wintpts7 << 0.25, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125;
+    MatrixXd C7002Wintpts7(1,7), C7003Wintpts7(1,7), C3012Wintpts8(1,8), C3024Wintpts9(1,9);
     C7002Wintpts7 << 0.25, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125;
+    C7003Wintpts7 << 0.25, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125;
     C3012Wintpts8 << 14.9790,  -14.9790,   14.9790,  -14.9790,   14.9790,  -14.9790,   14.9790,  -14.9790;
     C3024Wintpts9 << 0.1975,    0.0772,    0.0772,    0.0772,    0.0772,    0.1235,    0.1235,    0.1235,    0.1235;
 
@@ -228,6 +228,8 @@ void RtSssAlgo::setMEGInfo(FiffInfo::SPtr fiffInfo)
 
             CoilT.append(fiffInfo->chs[i].coil_trans);
             CoilName.append(fiffInfo->chs[i].ch_name);
+
+//            qDebug() << "coil type= " << fiffInfo->chs[i].coil_type;
 
             switch (fiffInfo->chs[i].coil_type)
             {
@@ -245,13 +247,6 @@ void RtSssAlgo::setMEGInfo(FiffInfo::SPtr fiffInfo)
                     CoilWk.append(C3024Wintpts9);
                     break;
 
-                case 7001:
-                    CoilGrad(cid) = 0;
-                    CoilNk(cid) = 7;
-                    CoilRk.append(C7001intpts7);
-                    CoilWk.append(C7001Wintpts7);
-                    break;
-
                 case 7002:
                     CoilGrad(cid) = 0;
                     CoilNk(cid) = 7;
@@ -259,6 +254,16 @@ void RtSssAlgo::setMEGInfo(FiffInfo::SPtr fiffInfo)
                     CoilWk.append(C7002Wintpts7);
                     break;
 
+                case 7003:
+                    CoilGrad(cid) = 0;
+                    CoilNk(cid) = 7;
+                    CoilRk.append(C7003intpts7);
+                    CoilWk.append(C7003Wintpts7);
+                    break;
+
+                default:
+                    qDebug() << " This coil type is NOT supported";
+                    break;
             }
 //        qDebug() << fiffInfo->chs[i].coil_type << ", CoilNk(" << cid << "): " << CoilNk(cid);
             cid++;
@@ -272,7 +277,7 @@ void RtSssAlgo::setMEGInfo(FiffInfo::SPtr fiffInfo)
 //    for(int k=0; k<NumCoil; k++)    inMEGData >> tmpvec(k);
 //    MEGData.col(0) = tmpvec;
 //    inMEGData.close();
-
+//NumCoil = 275;
 }
 
 
