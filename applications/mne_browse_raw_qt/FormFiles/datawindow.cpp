@@ -138,13 +138,12 @@ void DataWindow::setupToolBar()
     //Add actions to tool bar
     QAction* addEventAction = new QAction(QIcon(":/Resources/Images/addEvent.png"),tr("Add event"), this);
     addEventAction->setStatusTip(tr("Add an event to the event list"));
-    //connect(addEventAction, SIGNAL(triggered()), this, SLOT(newFile()));
-    toolBar->addAction(addEventAction);
+    connect(addEventAction, SIGNAL(triggered()), this, SLOT(newFile()));
 
     int layoutRows = ui->m_gridLayout->rowCount();
     int layoutColumns = ui->m_gridLayout->columnCount();
 
-    ui->m_gridLayout->addWidget(toolBar, 0, layoutColumns, layoutRows, 1);
+    ui->m_gridLayout->addWidget(toolBar, 1, layoutColumns, layoutRows-1, 1);
 }
 
 
@@ -285,12 +284,12 @@ void DataWindow::setSampleLabels()
 
     //calculate sample range which is currently displayed in the view
     //Note: the viewport holds the width of the area which is changed through scrolling
-    int minSampleRange = ui->m_tableView_rawTableView->horizontalScrollBar()->value() + m_pMainWindow->m_pRawModel->firstSample();
+    int minSampleRange = ui->m_tableView_rawTableView->horizontalScrollBar()->value()/* + m_pMainWindow->m_pRawModel->firstSample()*/;
     int maxSampleRange = minSampleRange + ui->m_tableView_rawTableView->viewport()->width();
 
     //Set values as string
     QString stringTemp;
-    ui->m_label_sampleMin->setText(QString("%1 / %2 sec").arg(stringTemp.number(minSampleRange)).arg(stringTemp.number(minSampleRange/m_pMainWindow->m_pRawModel->m_fiffInfo.sfreq)));
-    ui->m_label_sampleMax->setText(QString("%1 / %2 sec").arg(stringTemp.number(maxSampleRange)).arg(stringTemp.number(maxSampleRange/m_pMainWindow->m_pRawModel->m_fiffInfo.sfreq)));
+    ui->m_label_sampleMin->setText(QString("%1 / %2 sec").arg(stringTemp.number(minSampleRange)).arg(stringTemp.number(minSampleRange/m_pMainWindow->m_pRawModel->m_fiffInfo.sfreq,'g',3)));
+    ui->m_label_sampleMax->setText(QString("%1 / %2 sec").arg(stringTemp.number(maxSampleRange)).arg(stringTemp.number(maxSampleRange/m_pMainWindow->m_pRawModel->m_fiffInfo.sfreq,'g',3)));
 }
 
