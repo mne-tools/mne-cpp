@@ -64,10 +64,33 @@ RawModel::RawModel(QObject *parent)
 , m_bEndReached(false)
 , m_bReloading(false)
 , m_bProcessing(false)
+, m_fiffInfo(FiffInfo())
+, m_pfiffIO(QSharedPointer<FiffIO>(new FiffIO()))
 {
     m_iWindowSize = m_qSettings.value("RawModel/window_size").toInt();
     m_reloadPos = m_qSettings.value("RawModel/reload_pos").toInt();
     m_maxWindows = m_qSettings.value("RawModel/max_windows").toInt();
+    m_iFilterTaps = m_qSettings.value("RawModel/num_filter_taps").toInt();
+
+    //connect signal and slots
+    connect(&m_reloadFutureWatcher,&QFutureWatcher<QPair<MatrixXd,MatrixXd> >::finished,[this](){
+        insertReloadedData(m_reloadFutureWatcher.future().result());
+    });
+
+    connect(this,&RawModel::dataReloaded,[this](){
+        if(!m_assignedOperators.empty()) updateOperatorsConcurrently();
+    });
+
+//    connect(&m_operatorFutureWatcher,&QFutureWatcher<QPair<int,RowVectorXd> >::resultReadyAt,[this](int index){
+//        insertProcessedData(index);
+//    });
+    connect(&m_operatorFutureWatcher,&QFutureWatcher<void>::finished,[this](){
+        insertProcessedData();
+    });
+
+    connect(&m_operatorFutureWatcher,&QFutureWatcher<QPair<int,RowVectorXd> >::progressValueChanged,[this](int progressValue){
+        qDebug() << "RawModel: ProgressValue m_operatorFutureWatcher, " << progressValue << " items processed out of" << m_listTmpChData.size();
+    });
 }
 
 
@@ -81,6 +104,8 @@ RawModel::RawModel(QFile &qFile, QObject *parent)
 , m_bEndReached(false)
 , m_bReloading(false)
 , m_bProcessing(false)
+, m_fiffInfo(FiffInfo())
+, m_pfiffIO(QSharedPointer<FiffIO>(new FiffIO()))
 {
     m_iWindowSize = m_qSettings.value("RawModel/window_size").toInt();
     m_reloadPos = m_qSettings.value("RawModel/reload_pos").toInt();

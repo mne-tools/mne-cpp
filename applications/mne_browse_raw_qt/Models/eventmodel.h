@@ -123,8 +123,6 @@ class EventModel : public QAbstractTableModel
 {
     Q_OBJECT
 
-    friend class MainWindow;
-
 public:
     EventModel(QObject *parent);
     EventModel(QFile& qFile, QObject *parent);
@@ -164,6 +162,8 @@ public:
     * @param firstSample first sample value
     */
     void setFirstSample(int firstSample);
+
+    bool            m_bFileloaded;  /**< true when a Fiff event file is loaded */
 
 private:
     //=========================================================================================================

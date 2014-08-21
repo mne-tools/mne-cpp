@@ -63,6 +63,13 @@
 namespace MNEBrowseRawQt
 {
 
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE FORWARD DECLARATIONS
+//=============================================================================================================
+
+class MainWindow;
+
 /**
 * DECLARE CLASS DataWindow
 *
@@ -92,7 +99,7 @@ public:
     /**
     * Setup the table view of the data window
     */
-    void setupRawViewSettings();
+    void initRawViewSettings();
 
     //=========================================================================================================
     /**
@@ -100,28 +107,22 @@ public:
     */
     QTableView* getTableView();
 
-    //=========================================================================================================
-    /**
-    * setWindowStatus sets the window status depending on m_pRawModel->m_bFileloaded
-    */
-    void setWindowStatus();
-
 private:
     //=========================================================================================================
     /**
     * Setup the tool bar of the data window.
     */
-    void setupToolBar();
+    void initToolBar();
 
     //=========================================================================================================
     /**
     * Setup the sample labels of the data window.
     */
-    void setupSampleLabels();
+    void initSampleLabels();
 
     //=========================================================================================================
     /**
-    * event reimplemented virtual function to handle the resizing of the data dock window
+    * event reimplemented virtual function to handle events of the data dock window
     */
     bool event(QEvent * event);
 
@@ -132,6 +133,12 @@ private:
     QSettings       m_qSettings;
 
 protected slots:
+    //=========================================================================================================
+    /**
+    * @brief manualResize performs a manual resize of this dock widget
+    */
+    void manualResize();
+
     //=========================================================================================================
     /**
     * @brief customContextMenuRequested

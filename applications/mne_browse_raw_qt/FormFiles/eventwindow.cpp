@@ -75,11 +75,11 @@ EventWindow::~EventWindow()
 
 //*************************************************************************************************************
 
-void EventWindow::setupEventViewSettings()
+void EventWindow::initEventViewSettings()
 {
     ui->m_tableView_eventTableView->resizeColumnsToContents();
 
-    //Connect selection in event window to specific slot
+    //Connect selection in event window to jumpEvent slot
     connect(ui->m_tableView_eventTableView->selectionModel(),&QItemSelectionModel::currentRowChanged,
                 this,&EventWindow::jumpToEvent);
 }
@@ -111,25 +111,40 @@ void EventWindow::initCheckBoxes()
 
 //*************************************************************************************************************
 
+bool EventWindow::event(QEvent * event)
+{
+    //On resize event center marker again
+    if(event->type() == QEvent::Resize) {
+        jumpToEvent(ui->m_tableView_eventTableView->selectionModel()->currentIndex(), QModelIndex());
+    }
+
+    return QDockWidget::event(event);
+}
+
+
+//*************************************************************************************************************
+
 void EventWindow::jumpToEvent(const QModelIndex & current, const QModelIndex & previous)
 {
     Q_UNUSED(previous);
 
-    //Always get the first column 0 (sample) of the model
-    QModelIndex index = m_pMainWindow->m_pEventModel->index(current.row(), 0);
+    if(ui->m_checkBox_activateEvents->isChecked()) {
+        //Always get the first column 0 (sample) of the model
+        QModelIndex index = m_pMainWindow->m_pEventModel->index(current.row(), 0);
 
-    //Get the sample value
-    int sample = m_pMainWindow->m_pEventModel->data(index, Qt::DisplayRole).toInt();
+        //Get the sample value
+        int sample = m_pMainWindow->m_pEventModel->data(index, Qt::DisplayRole).toInt();
 
-    //Jump to sample - put sample in the middle of the view - the viewport holds the width of the are which is changed through scrolling
-    int rawTableViewColumnWidth = m_pMainWindow->m_pRawTableView->viewport()->width();
+        //Jump to sample - put sample in the middle of the view - the viewport holds the width of the are which is changed through scrolling
+        int rawTableViewColumnWidth = m_pMainWindow->m_pRawTableView->viewport()->width();
 
-    if(sample-rawTableViewColumnWidth/2 < rawTableViewColumnWidth/2) //events lie in the first half of the data window at the beginning of the loaded data -> cannot centralize view on event
-         m_pMainWindow->m_pRawTableView->horizontalScrollBar()->setValue(0);
-    else if(sample+rawTableViewColumnWidth/2 > m_pMainWindow->m_pRawModel->lastSample()-rawTableViewColumnWidth/2) //events lie in the last half of the data window at the end of the loaded data -> cannot centralize view on event
-        m_pMainWindow->m_pRawTableView->horizontalScrollBar()->setValue(m_pMainWindow->m_pRawTableView->maximumWidth());
-    else //centralize view on event
-        m_pMainWindow->m_pRawTableView->horizontalScrollBar()->setValue(sample-rawTableViewColumnWidth/2);
+        if(sample-rawTableViewColumnWidth/2 < rawTableViewColumnWidth/2) //events lie in the first half of the data window at the beginning of the loaded data -> cannot centralize view on event
+            m_pMainWindow->m_pRawTableView->horizontalScrollBar()->setValue(0);
+        else if(sample+rawTableViewColumnWidth/2 > m_pMainWindow->m_pRawModel->lastSample()-rawTableViewColumnWidth/2) //events lie in the last half of the data window at the end of the loaded data -> cannot centralize view on event
+            m_pMainWindow->m_pRawTableView->horizontalScrollBar()->setValue(m_pMainWindow->m_pRawTableView->maximumWidth());
+        else //centralize view on event
+            m_pMainWindow->m_pRawTableView->horizontalScrollBar()->setValue(sample-rawTableViewColumnWidth/2);
 
-    qDebug()<<"Jumping to Event at sample "<<sample<<"rawTableViewColumnWidth"<<rawTableViewColumnWidth;
+        qDebug()<<"Jumping to Event at sample "<<sample<<"rawTableViewColumnWidth"<<rawTableViewColumnWidth;
+    }
 }
