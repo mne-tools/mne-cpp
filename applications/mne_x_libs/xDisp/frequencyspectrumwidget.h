@@ -172,12 +172,8 @@ private:
 
     bool m_bInitialized;                        /**< Is Initialized */
 
-    QPoint   m_qPointMouseEndPosition;       /**< Mouse end position which is current mouse position. */
-
-
-
 signals:
-    void SendMouseLoc(int row, int x, int y, QRect visRect);
+    void sendMouseLoc(int row, int x, int y, QRect visRect);
 };
 
 } // NAMESPACE

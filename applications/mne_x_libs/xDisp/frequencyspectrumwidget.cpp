@@ -184,8 +184,8 @@ void FrequencySpectrumWidget::init()
         connect(m_pTableView, &QTableView::doubleClicked, m_pFSModel, &FrequencySpectrumModel::toggleFreeze);
 
         // add a connection for sending mouse location to the delegate; Dr. -Ing. Limin Sun 8/21/14
-        connect(this,&FrequencySpectrumWidget::SendMouseLoc,
-                m_pFSDelegate, &FrequencySpectrumDelegate::RcvMouseLoc);
+        connect(this,&FrequencySpectrumWidget::sendMouseLoc,
+                m_pFSDelegate, &FrequencySpectrumDelegate::rcvMouseLoc);
 
 
         m_pTableView->setModel(m_pFSModel);
@@ -229,7 +229,7 @@ bool FrequencySpectrumWidget::eventFilter(QObject * watched, QEvent * event)
 
       QModelIndex item = m_pTableView->currentIndex();
 
-      emit SendMouseLoc(item.row(), mouseEvent->x(), mouseEvent->y(),m_pTableView->visualRect(item) );
+      emit sendMouseLoc(item.row(), mouseEvent->x(), mouseEvent->y(),m_pTableView->visualRect(item) );
 
       return true;
   }
