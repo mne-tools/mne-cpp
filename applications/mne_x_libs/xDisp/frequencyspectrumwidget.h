@@ -158,6 +158,10 @@ public:
     */
     virtual void init();
 
+
+    virtual bool eventFilter(QObject * watched, QEvent * event);
+
+
 private:
     FrequencySpectrumModel*      m_pFSModel;      /**< FS model */
     FrequencySpectrumDelegate*   m_pFSDelegate;   /**< FS delegate */
@@ -167,6 +171,13 @@ private:
     QSharedPointer<FrequencySpectrum> m_pFS;    /**< The frequency spectrum measurement. */
 
     bool m_bInitialized;                        /**< Is Initialized */
+
+    QPoint   m_qPointMouseEndPosition;       /**< Mouse end position which is current mouse position. */
+
+
+
+signals:
+    void SendMouseLoc(int row, int x, int y, QRect visRect);
 };
 
 } // NAMESPACE

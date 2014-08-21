@@ -2,6 +2,7 @@
 /**
 * @file     frequencyspectrumwidget.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Limin Sun <liminsun@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     July, 2014
@@ -70,7 +71,7 @@
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QHeaderView>
-
+#include <QTableView>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -110,6 +111,10 @@ FrequencySpectrumWidget::FrequencySpectrumWidget(QSharedPointer<FrequencySpectru
     if(m_pTableView)
         delete m_pTableView;
     m_pTableView = new QTableView;
+
+    m_pTableView->setSelectionMode( QAbstractItemView::ExtendedSelection );
+    m_pTableView->setMouseTracking( true );
+    m_pTableView->viewport()->installEventFilter( this );
 
     //set vertical layout
     QVBoxLayout *neLayout = new QVBoxLayout(this);
@@ -174,9 +179,14 @@ void FrequencySpectrumWidget::init()
 
         if(m_pFSDelegate)
             delete m_pFSDelegate;
-        m_pFSDelegate = new FrequencySpectrumDelegate(this);
+        m_pFSDelegate = new FrequencySpectrumDelegate(m_pTableView,this);
 
         connect(m_pTableView, &QTableView::doubleClicked, m_pFSModel, &FrequencySpectrumModel::toggleFreeze);
+
+        // add a connection for sending mouse location to the delegate; Dr. -Ing. Limin Sun 8/21/14
+        connect(this,&FrequencySpectrumWidget::SendMouseLoc,
+                m_pFSDelegate, &FrequencySpectrumDelegate::RcvMouseLoc);
+
 
         m_pTableView->setModel(m_pFSModel);
         m_pTableView->setItemDelegate(m_pFSDelegate);
@@ -202,5 +212,30 @@ void FrequencySpectrumWidget::init()
         //connect(m_pTableView,SIGNAL(customContextMenuRequested(QPoint)),this,SLOT(channelContextMenu(QPoint)));
 
         m_bInitialized = true;
+
+
+
     }
+}
+
+bool FrequencySpectrumWidget::eventFilter(QObject * watched, QEvent * event)
+{
+  if(event->type() == QEvent::MouseMove){
+      QMouseEvent *mouseEvent = static_cast <QMouseEvent*>( event );
+      //qDebug()<<"MouseMove event!@"<<mouseEvent->x()<<":"<<mouseEvent->y();
+
+      int currentRow = m_pTableView->rowAt(mouseEvent->y());
+      m_pTableView->selectRow(currentRow);
+
+      QModelIndex item = m_pTableView->currentIndex();
+
+      emit SendMouseLoc(item.row(), mouseEvent->x(), mouseEvent->y(),m_pTableView->visualRect(item) );
+
+      return true;
+  }
+  else
+  {
+      return QWidget::eventFilter(watched, event);
+  }
+
 }
