@@ -492,8 +492,8 @@ void FixDictMp::create_tree_dict(QString save_path)
             if( compare_atom.dot(temp_atom) > threshold)
                 similar_atoms.append(current_element.attribute("ID", current_element.text()).toInt());
 
-            if (similar_atoms.length() == 32)//vary this for testing
-                break;
+            //if (similar_atoms.length() == 32)//vary this for testing
+            //    break;
         }
 
         qreal molec_scale = 0;
@@ -629,7 +629,7 @@ void FixDictMp::build_molecule_xml_file(qint32 level_counter)
 
         VectorXd compare_molec = VectorXd::Zero(sample_count);
 
-        QDomNodeList node_list = xml_element.elementsByTagName("Molecule");
+        QDomNodeList node_list = xml_element.attributeNode(element("Molecule");
 
         qint32 max_it = node_list.count();
         QDomElement current_element;
@@ -648,7 +648,7 @@ void FixDictMp::build_molecule_xml_file(qint32 level_counter)
             current_element = node_list.at(0).toElement();
             QList<qint32> similar_molecs;
 
-            if(current_element.attribute("level").toInt() == level_counter)
+            if(current_element.attribute("level").toInt() == level_counter && current_element.nodeName() == "Molecule")
             {
                 if(!current_element.isNull())
                 {
@@ -658,33 +658,35 @@ void FixDictMp::build_molecule_xml_file(qint32 level_counter)
                     phase = (current_element.attribute("phase", current_element.text())).toDouble();
                 }
                 compare_molec = gabor_Atom->create_real(sample_count,scale,translation,modulation,phase);
-                qreal threshold = 0.01 * compare_molec.dot(compare_molec); //vary this to find optimum of seperation
+                qreal threshold = 0.6 * compare_molec.dot(compare_molec); //vary this to find optimum of seperation
 
                 VectorXd temp_molec = VectorXd::Zero(sample_count);
 
                 //finding molecules with low differences
                 for (qint32 next = 0; next < node_list.count(); next++)//;32)
                 {
-                    //try the next atom
-                    if(current_element.attribute("level").toInt() == level_counter)
-                        current_element = node_list.at(next).toElement();
+                    current_element = node_list.at(next).toElement();
+                    //try the next molecule
+                    if(current_element.attribute("level").toInt() == level_counter && current_element.nodeName() == "Molecule")
+                    {    //current_element = node_list.at(next).toElement();
 
-                    if(!current_element.isNull())
-                    {
-                        scale = (current_element.attribute("scale", current_element.text())).toDouble();
-                        translation = (current_element.attribute("translation", current_element.text())).toInt();
-                        modulation = (current_element.attribute("modulation", current_element.text())).toDouble();
-                        phase = (current_element.attribute("phase", current_element.text())).toDouble();
+                        if(!current_element.isNull())
+                        {
+                            scale = (current_element.attribute("scale", current_element.text())).toDouble();
+                            translation = (current_element.attribute("translation", current_element.text())).toInt();
+                            modulation = (current_element.attribute("modulation", current_element.text())).toDouble();
+                            phase = (current_element.attribute("phase", current_element.text())).toDouble();
+                        }
+                        //set molecules out of xml to compare with molecule
+                        temp_molec = gabor_Atom->create_real(sample_count,scale,translation,modulation,phase);
+
+                        //fill list of similar molecules to save as new molecule
+                        if( compare_molec.dot(temp_molec) > threshold)
+                            similar_molecs.append(current_element.attribute("ID", current_element.text()).toInt());
+
+                        //if (similar_molecs.length() == 32)//vary this for testing
+                        //    break;
                     }
-                    //set molecules out of xml to compare with molecule
-                    temp_molec = gabor_Atom->create_real(sample_count,scale,translation,modulation,phase);
-
-                    //fill list of similar molecules to save as new molecule
-                    if( compare_molec.dot(temp_molec) > threshold && current_element.attribute("level").toInt() == level_counter)
-                        similar_molecs.append(current_element.attribute("ID", current_element.text()).toInt());
-
-                    if (similar_molecs.length() == 32)//vary this for testing
-                        break;
                 }
 
                 qreal molec_scale = 0;
@@ -742,6 +744,7 @@ void FixDictMp::build_molecule_xml_file(qint32 level_counter)
                             QDomElement temp_element = current_element;
                             qint32 end_element_counter = 0;
                             qint32 child_counter = 0;//ToDo: set right child for right position in tree to write all atoms and molecules
+                            root_counter = 0;
 
                             while(temp_element.hasChildNodes())
                             {
@@ -780,8 +783,8 @@ void FixDictMp::build_molecule_xml_file(qint32 level_counter)
 
                                 temp_element = current_element;
 
-                                for(qint32 node_depth = 2; node_depth < child_counter; node_depth++)
-                                    temp_element = temp_element.firstChildElement();
+                                //for(qint32 node_depth = end_element_counter+2 /*2*/; node_depth < child_counter; node_depth++)
+                                //    temp_element = temp_element.firstChildElement();
 
                                 temp_element = temp_element.childNodes().at(root_counter).toElement();
 
