@@ -40,10 +40,9 @@
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
-
 #include <QAbstractItemDelegate>
 #include <QTableView>
-
+#include <QMouseEvent>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -86,7 +85,7 @@ public:
     *
     * @param[in] parent     Parent of the delegate
     */
-    FrequencySpectrumDelegate(QObject *parent = 0);
+    FrequencySpectrumDelegate(QTableView* m_pTableView,QObject *parent = 0);
 
     //=========================================================================================================
     /**
@@ -110,6 +109,15 @@ public:
     virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
 private:
+    //=========================================================================================================
+    /**
+    * CapturePoint capture one QPointer .
+    *
+    * @param[in]        index   QModelIndex for accessing associated data and model object.
+    * @param[in,out]    path    The QPointerPath to create for the data plot.
+    */
+    void FrequencySpectrumDelegate::CapturePoint(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorXd& data, QPainter *painter) const;
+
     //=========================================================================================================
     /**
     * createPlotPath creates the QPointer path for the data plot.
@@ -136,12 +144,40 @@ private:
     */
     void createGridTick(const QModelIndex &index, const QStyleOptionViewItem &option,  QPainter *painter) const;
 
-    //Settings
-//    QSettings m_qSettings;
+    //=========================================================================================================
+    /**
+    * Is called when mouse is moved.
+    * Function is getting the current mouse position for measurement of the real-time curve and to zoom in or out.
+    *
+    * @param [in] mouseEvent pointer to MouseEvent.
+    */
+//    virtual void mouseMoveEvent(QMouseEvent* mouseEvent);
+
+//    virtual void mousePressEvent(QMouseEvent* mouseEvent);
+
+//    virtual void mouseReleaseEvent(QMouseEvent* mouseEvent);
+
+    QPoint   m_qPointMouseStartPosition;     /**< Mouse start position which is the position where mouse was first pressed. */
+    QPoint   m_qPointMouseEndPosition;       /**< Mouse end position which is current mouse position. */
 
     // Scaling
     float m_fMaxValue;     /**< Maximum value of the data to plot  */
     float m_fScaleY;       /**< Maximum amplitude of plot (max is m_dPlotHeight/2) */
+
+    QTableView * m_tableview;
+
+    bool mousepressflag;
+
+    int m_tableview_row;
+    int m_mousex;
+    int m_mousey;
+    QRect m_visRect;
+    float m_x_rate;
+
+
+
+public slots:
+    void RcvMouseLoc( int row, int x, int y, QRect visRect);
 };
 
 } // NAMESPACE
