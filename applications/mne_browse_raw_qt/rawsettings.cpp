@@ -82,6 +82,7 @@ void RawSettings::init()
     //Window settings
     m_qSettings.beginGroup("MainWindow");
         m_qSettings.setValue("size",QSize(MAINWINDOW_WINDOW_SIZE_W,MAINWINDOW_WINDOW_SIZE_H));
+        m_qSettings.setValue("position",QPoint(MAINWINDOW_WINDOW_POSITION_X,MAINWINDOW_WINDOW_POSITION_Y));
     m_qSettings.endGroup();
 
     //RawModel

@@ -61,6 +61,7 @@
 #include <QSettings>
 #include <QSize>
 #include <QColor>
+#include <QPoint>
 
 
 //*************************************************************************************************************
@@ -71,6 +72,8 @@
 //MainWindow
 #define MAINWINDOW_WINDOW_SIZE_W 1200 //width of MainWindow
 #define MAINWINDOW_WINDOW_SIZE_H 800 //width of MainWindow
+#define MAINWINDOW_WINDOW_POSITION_X 50 //initial window position x
+#define MAINWINDOW_WINDOW_POSITION_Y 50 //initial window position y
 
 //RawModel
 #define MODEL_WINDOW_SIZE 4016 //this value+MODEL_NUM_FILTER_TAPS must be a multiple integer of 2^x (e.g. 4016 or 8112 for 80 filter taps), length of data window to preload [in samples]

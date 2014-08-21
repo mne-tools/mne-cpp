@@ -105,7 +105,7 @@ void MainWindow::setupModel()
 
     m_pEventModel = new EventModel(this);
 
-    //Set fiffInfo in event model TODO: This is dirty - what happens if no file was loaded (due to missing file)
+    //Set fiffInfo in event model
     m_pEventModel->setFiffInfo(m_pRawModel->m_fiffInfo);
     m_pEventModel->setFirstSample(m_pRawModel->firstSample());
 }
@@ -196,7 +196,7 @@ void MainWindow::setupMainWindow()
 {
     //set Window functions
     resize(m_qSettings.value("MainWindow/size").toSize()); //Resize to predefined default size
-    move(50,50); // Move this main window to position 50/50 on the screen
+    move(m_qSettings.value("MainWindow/position").toPoint()); // Move this main window to position 50/50 on the screen
 
     //Set central widget - This is needed because we are using QDockWidgets
     QWidget *window = new QWidget();
