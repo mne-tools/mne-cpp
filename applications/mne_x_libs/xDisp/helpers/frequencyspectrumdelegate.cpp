@@ -2,13 +2,14 @@
 /**
 * @file     frequencyspectrumdelegate.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Limin Sun <liminsun@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     May, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Christoph Dinh, Limin Sun and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -52,7 +53,7 @@
 #include <QPainterPath>
 #include <QDebug>
 #include <QThread>
-
+#include <QTableView>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -61,15 +62,18 @@
 
 using namespace XDISPLIB;
 
-
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-FrequencySpectrumDelegate::FrequencySpectrumDelegate(QObject *parent)
+FrequencySpectrumDelegate::FrequencySpectrumDelegate(QTableView* m_pTableView,QObject *parent)
 : QAbstractItemDelegate(parent)
 {
+
+    m_tableview = m_pTableView;
+
+    m_tableview->setMouseTracking(true);
 
 }
 
@@ -125,6 +129,9 @@ void FrequencySpectrumDelegate::paint(QPainter *painter, const QStyleOptionViewI
                 createGridPath(index, option, path, data);
                 createGridTick(index, option, painter);
 
+                //capture the mouse
+                capturePoint(index, option, path, data, painter);
+
                 painter->save();
                 QPen pen;
                 pen.setStyle(Qt::DotLine);
@@ -132,6 +139,7 @@ void FrequencySpectrumDelegate::paint(QPainter *painter, const QStyleOptionViewI
                 painter->setPen(pen);
                 painter->drawPath(path);
                 painter->restore();
+
 
                 //Plot data path
                 path = QPainterPath(QPointF(option.rect.x(),option.rect.y()));//QPointF(option.rect.x()+t_rtmsaModel->relFiffCursor(),option.rect.y()));
@@ -154,6 +162,9 @@ void FrequencySpectrumDelegate::paint(QPainter *painter, const QStyleOptionViewI
             break;
         }
     }
+
+
+
 
 }
 
@@ -181,6 +192,90 @@ QSize FrequencySpectrumDelegate::sizeHint(const QStyleOptionViewItem &option, co
     return size;
 }
 
+//*************************************************************************************************************
+void FrequencySpectrumDelegate::rcvMouseLoc(int tableview_row, int mousex, int mousey, QRect visRect)
+{
+
+    m_tableview_row = tableview_row;
+    m_mousex = mousex;
+    m_mousey = mousey;
+    m_visRect = visRect;
+
+    m_x_rate = (float)m_mousex/(float)m_visRect.width();
+
+
+    m_tableview->viewport()->repaint();
+
+}
+
+void FrequencySpectrumDelegate::capturePoint(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorXd& data, QPainter *painter) const
+{
+    Q_UNUSED(option);
+    Q_UNUSED(path);
+
+    if (m_tableview_row == index.row()){
+    const FrequencySpectrumModel* t_pModel = static_cast<const FrequencySpectrumModel*>(index.model());
+
+    qint32 i;
+    qint32 numbins = data.size();
+
+    for(i = 1; i < numbins; ++i) {
+
+        float tmp_rate = t_pModel->getFreqScale()[i]/t_pModel->getFreqScale()[numbins-1];
+
+        if (tmp_rate > m_x_rate) { break;}
+    }
+
+    /***************************************************
+     * Mouse moving showing the frequency and value
+     *
+     * *************************************************/
+
+    unsigned short usPosY = m_visRect.bottom();
+    unsigned short usPosX = m_visRect.left();
+    unsigned short usHeight = m_visRect.height();
+    unsigned short usWidth = m_visRect.width();
+
+    int iPosX = m_mousex;
+    int iPosY = m_mousey;
+
+
+    if(iPosX>usPosX && iPosX < usPosX+usWidth && iPosY > (usPosY - usHeight) && iPosY < usPosY )
+    {
+    //    qDebug()<<" index row" << index.row()<< "i"<< i << "iPosX,iposY" << iPosX << iPosY << "usPosY"<<usPosY<<"usHeight"<<usHeight;
+    //Horizontal line
+    painter->setPen(QPen(Qt::gray, 1, Qt::DashLine));
+
+    QPoint start(iPosX - 25, iPosY);//iStartY-5);//paint measure line vertical direction
+    QPoint end(iPosX + 25, iPosY);//iStartY+5);
+
+//    painter->drawLine(start, end);
+
+    //vertical line
+    start.setX(iPosX); start.setY(usPosY -usHeight); // iPosY - 25);//iStartY - 5);
+    end.setX(iPosX); end.setY(usPosY); //iPosY + 25);//iStartY + 5);
+    painter->drawLine(start, end);
+    // Draw text
+    painter->setPen(QPen(Qt::black, 1, Qt::SolidLine));
+
+    // cal the frequency according to the iPosX
+    double fs = t_pModel->getInfo()->sfreq/2;
+
+    RowVectorXd vecFreqScale = t_pModel->getFreqScale();
+    double max = log10(fs+1);
+    vecFreqScale *= max;
+
+    double freq = pow(10,vecFreqScale[i]) - 1;
+
+    QString tx = QString("%1 [DB], %2 [Hz]").arg(data[i]).arg(freq);
+
+    if (iPosX > usPosX + usWidth - tx.size()*8 )
+        painter->drawText(iPosX-tx.size()*8, iPosY-8, tx);// ToDo Precision should be part of preferences
+    else
+        painter->drawText(iPosX+8, iPosY-8, tx);// ToDo Precision should be part of preferences
+    }
+    }//correct row to plot
+}
 
 //*************************************************************************************************************
 
