@@ -59,7 +59,7 @@ using namespace MNEBrowseRawQt;
 MainWindow::MainWindow(QWidget *parent)
 : QMainWindow(parent)
 , m_qFileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
-, m_qFileEvent("./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif")
+, m_qEventFile("./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif")
 , m_qSettings()
 , m_rawSettings()
 , ui(new Ui::MainWindowWidget)
@@ -82,7 +82,6 @@ MainWindow::MainWindow(QWidget *parent)
     connectMenus();
     createLogDockWindow();
     setWindowStatus();
-    m_pDataWindow->setWindowStatus();
 }
 
 
@@ -97,8 +96,11 @@ MainWindow::~MainWindow()
 
 void MainWindow::setupModel()
 {
-//    m_pRawModel = new RawModel(this);
-    m_pRawModel = new RawModel(m_qFileRaw,this);
+    if(m_qFileRaw.exists())
+        m_pRawModel = new RawModel(m_qFileRaw,this);
+    else
+        m_pRawModel = new RawModel(this);
+
     m_pEventModel = new EventModel(this);
 
     //Set fiffInfo in event model TODO: This is dirty - what happens if no file was loaded (due to missing file)
@@ -130,8 +132,8 @@ void MainWindow::setupViews()
     m_pRawTableView->setItemDelegate(m_pRawDelegate);
 
     //setup view settings
-    m_pDataWindow->setupRawViewSettings();
-    m_pEventWindow->setupEventViewSettings();
+    m_pDataWindow->initRawViewSettings();
+    m_pEventWindow->initEventViewSettings();
 }
 
 
@@ -201,13 +203,37 @@ void MainWindow::setupMainWindow()
 
 void MainWindow::setWindowStatus()
 {
+    //Set window title
     QString title;
-
-    //request status
     title = QString("%1").arg(CInfo::AppNameShort());
-
-    //set title
     setWindowTitle(title);
+
+    //Set status bar
+    if(m_pRawModel->m_bFileloaded) {
+        int idx = m_qFileRaw.fileName().lastIndexOf("/");
+        QString filename = m_qFileRaw.fileName().remove(0,idx+1);
+        title = QString("Data file: %1  /  First sample: %2  /  Sample frequency: %3Hz").arg(filename).arg(m_pRawModel->firstSample()).arg(m_pRawModel->m_fiffInfo.sfreq);
+    }
+    else
+        title = QString("No data file");
+
+    if(m_pEventModel->m_bFileloaded) {
+        int idx = m_qEventFile.fileName().lastIndexOf("/");
+        QString filename = m_qEventFile.fileName().remove(0,idx+1);
+
+        title.append(QString("  -  Event file: %1").arg(filename));
+    }
+    else
+        title.append("  -  No event file");
+
+    //Add permanent widget to status bar after deleting old one
+    QObjectList cildrenList = statusBar()->children();
+
+    for(int i = 0; i< cildrenList.size(); i++)
+        statusBar()->removeWidget((QWidget*)cildrenList.at(i));
+
+    QLabel* label = new QLabel(title);
+    statusBar()->addWidget(label);
 }
 
 
@@ -294,14 +320,19 @@ void MainWindow::openFile()
     else
         qDebug("ERROR loading fiff data file %s",filename.toLatin1().data());
 
-    m_pDataWindow->setWindowStatus();
-
     //set position of QScrollArea
     m_pDataWindow->getTableView()->horizontalScrollBar()->setValue(0);
 
     //Set fiffInfo in event model
     m_pEventModel->setFiffInfo(m_pRawModel->m_fiffInfo);
     m_pEventModel->setFirstSample(m_pRawModel->firstSample());
+
+    //setup view settings
+    m_pDataWindow->initRawViewSettings();
+    m_pEventWindow->initEventViewSettings();
+
+    //Update status bar
+    setWindowStatus();
 }
 
 
@@ -336,18 +367,19 @@ void MainWindow::loadEvents()
         return;
     }
 
-    if(m_qFileEvent.isOpen())
-        m_qFileEvent.close();
+    if(m_qEventFile.isOpen())
+        m_qEventFile.close();
 
-    m_qFileEvent.setFileName(filename);
+    m_qEventFile.setFileName(filename);
 
-    if(m_pEventModel->loadEventData(m_qFileEvent)) {
+    if(m_pEventModel->loadEventData(m_qEventFile)) {
         qDebug() << "Fiff event data file" << filename << "loaded.";
     }
     else
         qDebug("ERROR loading fiff event data file %s",filename.toLatin1().data());
 
-    m_pDataWindow->setWindowStatus();
+    //Update status bar
+    setWindowStatus();
 
     //Show event widget
     showEventWindow();
@@ -368,17 +400,15 @@ void MainWindow::saveEvents()
         return;
     }
 
-    if(m_qFileEvent.isOpen())
-        m_qFileEvent.close();
-    m_qFileEvent.setFileName(filename);
+    if(m_qEventFile.isOpen())
+        m_qEventFile.close();
+    m_qEventFile.setFileName(filename);
 
-    if(m_pEventModel->saveEventData(m_qFileEvent)) {
+    if(m_pEventModel->saveEventData(m_qEventFile)) {
         qDebug() << "Fiff event data file" << filename << "saved.";
     }
     else
         qDebug("ERROR saving fiff event data file %s",filename.toLatin1().data());
-
-    m_pDataWindow->setWindowStatus();
 }
 
 
@@ -394,29 +424,6 @@ void MainWindow::showAboutWindow()
     }
     else // if visible raise the widget to be sure that it is not obscured by other windows
         m_pAboutWindow->raise();
-
-//    QMessageBox* messageBox = new QMessageBox(this);
-//    messageBox->setWindowTitle(CInfo::AppNameShort()+ ", "+tr("Version ")+CInfo::AppVersion());
-
-//    messageBox->setIconPixmap(pixmap.scaled(150,125));
-//    messageBox->setText(tr("Copyright (C) 2014 Florian Schlembach, Lorenz Esch, Christoph Dinh, Matti Hamalainen, Jens Haueisen. All rights reserved.\n\n"
-//                           "Redistribution and use in source and binary forms, with or without modification, are permitted provided that"
-//                           " the following conditions are met:\n"
-//                           "\t* Redistributions of source code must retain the above copyright notice, this list of conditions and the"
-//                           " following disclaimer.\n"
-//                           "\t* Redistributions in binary form must reproduce the above copyright notice, this list of conditions and"
-//                           " the following disclaimer in the documentation and/or other materials provided with the distribution.\n"
-//                           "\t* Neither the name of MNE-CPP authors nor the names of its contributors may be used"
-//                           " to endorse or promote products derived from this software without specific prior written permission.\n\n"
-//                           "THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS \"AS IS\" AND ANY EXPRESS OR IMPLIED"
-//                           " WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A"
-//                           " PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,"
-//                           " INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,"
-//                           " PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)"
-//                           " HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING"
-//                           " NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE"
-//                           " POSSIBILITY OF SUCH DAMAGE."));
-//    messageBox->exec();
 }
 
 

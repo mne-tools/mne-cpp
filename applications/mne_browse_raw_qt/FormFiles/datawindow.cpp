@@ -62,8 +62,14 @@ DataWindow::DataWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    setupToolBar();
-    setupSampleLabels();
+    initToolBar();
+    initSampleLabels();
+
+    //Setup when the dock widget is to be manually resized
+    connect(this,&QDockWidget::topLevelChanged,
+                this,&DataWindow::manualResize);
+    connect(this,&QDockWidget::visibilityChanged,
+                this,&DataWindow::manualResize);
 }
 
 
@@ -77,7 +83,7 @@ DataWindow::~DataWindow()
 
 //*************************************************************************************************************
 
-void DataWindow::setupRawViewSettings()
+void DataWindow::initRawViewSettings()
 {
     //set some settings for m_pRawTableView
     ui->m_tableView_rawTableView->verticalHeader()->setDefaultSectionSize(m_pMainWindow->m_pRawDelegate->m_iDefaultPlotHeight);
@@ -97,6 +103,7 @@ void DataWindow::setupRawViewSettings()
             m_pMainWindow->m_pRawModel,&RawModel::updateScrollPos);
 }
 
+
 //*************************************************************************************************************
 
 QTableView* DataWindow::getTableView()
@@ -107,28 +114,7 @@ QTableView* DataWindow::getTableView()
 
 //*************************************************************************************************************
 
-void DataWindow::setWindowStatus()
-{
-    QString title;
-
-    //request status
-    if(m_pMainWindow->m_pRawModel->m_bFileloaded) {
-        int idx = m_pMainWindow->m_qFileRaw.fileName().lastIndexOf("/");
-        QString filename = m_pMainWindow->m_qFileRaw.fileName().remove(0,idx+1);
-        title = QString("%1 - File loaded: %2").arg("Data plot").arg(filename);
-    }
-    else {
-        title = QString("%1 - No File loaded").arg("Data plot");
-    }
-
-    //set title
-    setWindowTitle(title);
-}
-
-
-//*************************************************************************************************************
-
-void DataWindow::setupToolBar()
+void DataWindow::initToolBar()
 {
     //Create toolbar
     QToolBar *toolBar = new QToolBar();
@@ -139,6 +125,7 @@ void DataWindow::setupToolBar()
     QAction* addEventAction = new QAction(QIcon(":/Resources/Images/addEvent.png"),tr("Add event"), this);
     addEventAction->setStatusTip(tr("Add an event to the event list"));
     connect(addEventAction, SIGNAL(triggered()), this, SLOT(newFile()));
+    toolBar->addAction(addEventAction);
 
     int layoutRows = ui->m_gridLayout->rowCount();
     int layoutColumns = ui->m_gridLayout->columnCount();
@@ -149,8 +136,9 @@ void DataWindow::setupToolBar()
 
 //*************************************************************************************************************
 
-void DataWindow::setupSampleLabels()
+void DataWindow::initSampleLabels()
 {
+    //Connect sample labels to horizontal sroll bar changes
     connect(ui->m_tableView_rawTableView->horizontalScrollBar(),&QScrollBar::valueChanged,
             this,&DataWindow::setSampleLabels);
 }
@@ -160,26 +148,34 @@ void DataWindow::setupSampleLabels()
 
 bool DataWindow::event(QEvent * event)
 {
-    if(event->type() == QEvent::Resize) {
-        //Manually resize QDockWidget - This needs to be done because there is no typical central widget in QMainWindow - QT does not do a good job when resizing dock widgets (known issue)
-        int newWidth;
-
-        if(m_pMainWindow->m_pEventWindow->isHidden() || m_pMainWindow->m_pEventWindow->isFloating()) {
-            newWidth = m_pMainWindow->size().width() - m_pMainWindow->centralWidget()->size().width() - 1;
-            //qDebug()<<"resize data plot event window is hidden";
-        }
-        else {
-            newWidth = m_pMainWindow->size().width() - m_pMainWindow->m_pEventWindow->size().width() - 5;
-            //qDebug()<<"resize data plot event window is visible";
-        }
-
-        resize(newWidth, this->size().height());
-
-        //Set sample labels to new viewport adjustments
-        setSampleLabels();
+    //Manually resize QDockWidget - This needs to be done because there is no typical central widget in QMainWindow - QT does not do a good job when resizing dock widgets (known issue)
+    if(event->type() == QEvent::Resize && !this->isFloating()) {
+        manualResize();
     }
 
     return QDockWidget::event(event);
+}
+
+
+//*************************************************************************************************************
+
+void DataWindow::manualResize()
+{
+    int newWidth;
+
+     if(m_pMainWindow->m_pEventWindow->isHidden() || m_pMainWindow->m_pEventWindow->isFloating()) {
+         newWidth = m_pMainWindow->size().width() - m_pMainWindow->centralWidget()->size().width() - 1;
+         //qDebug()<<"resize data plot event window is hidden";
+     }
+     else {
+         newWidth = m_pMainWindow->size().width() - m_pMainWindow->m_pEventWindow->size().width() - 5;
+         //qDebug()<<"resize data plot event window is visible";
+     }
+
+     resize(newWidth, this->size().height());
+
+     //Set sample labels to new viewport adjustments
+     setSampleLabels();
 }
 
 

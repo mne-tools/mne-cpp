@@ -59,6 +59,7 @@ using namespace MNEBrowseRawQt;
 EventModel::EventModel(QObject *parent)
 : QAbstractTableModel(parent)
 , m_iFirstSample(0)
+, m_bFileloaded(false)
 {
 }
 
@@ -68,6 +69,7 @@ EventModel::EventModel(QObject *parent)
 EventModel::EventModel(QFile &qFile, QObject *parent)
 : QAbstractTableModel(parent)
 , m_iFirstSample(0)
+, m_bFileloaded(false)
 {
     loadEventData(qFile);
 }
@@ -224,6 +226,9 @@ bool EventModel::loadEventData(QFile& qFile)
     m_data = events;
 
     endResetModel();
+
+    m_bFileloaded = true;
+
     return true;
 }
 

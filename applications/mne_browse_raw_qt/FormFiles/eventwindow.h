@@ -62,6 +62,13 @@
 namespace MNEBrowseRawQt
 {
 
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE FORWARD DECLARATIONS
+//=============================================================================================================
+
+class MainWindow;
+
 /**
 * DECLARE CLASS EventWindow
 *
@@ -70,7 +77,6 @@ namespace MNEBrowseRawQt
 class EventWindow : public QDockWidget
 {
     Q_OBJECT
-
 public:
     //=========================================================================================================
     /**
@@ -91,7 +97,7 @@ public:
     /**
     * Setup the QtableView of the event window.
     */
-    void setupEventViewSettings();
+    void initEventViewSettings();
 
     //=========================================================================================================
     /**
@@ -106,9 +112,15 @@ private:
     */
     void initCheckBoxes();
 
+    //=========================================================================================================
+    /**
+    * event reimplemented virtual function to handle events of the event dock window
+    */
+    bool event(QEvent * event);
+
     Ui::EventWindowDockWidget *ui;
 
-    MainWindow* m_pMainWindow;
+    MainWindow*     m_pMainWindow;
 
     QSettings       m_qSettings;
 

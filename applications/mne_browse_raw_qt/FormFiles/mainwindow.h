@@ -146,7 +146,6 @@ class MainWindow : public QMainWindow
     friend class DataWindow;
 
     Q_OBJECT
-
 public:
     MainWindow(QWidget *parent = 0);
     ~MainWindow();
@@ -274,7 +273,7 @@ private:
     void setWindowStatus();
 
     QFile               m_qFileRaw;                 /**< Fiff data file to read (set for convenience) */
-    QFile               m_qFileEvent;               /**< Fiff event data file to read (set for convenience) */
+    QFile               m_qEventFile;               /**< Fiff event data file to read (set for convenience) */
     QSignalMapper*      m_qSignalMapper;            /**< signal mapper used for signal-slot mapping */
 
     //modelview framework

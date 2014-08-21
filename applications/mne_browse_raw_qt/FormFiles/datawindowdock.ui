@@ -22,6 +22,12 @@
     <height>200</height>
    </size>
   </property>
+  <property name="contextMenuPolicy">
+   <enum>Qt::DefaultContextMenu</enum>
+  </property>
+  <property name="features">
+   <set>QDockWidget::AllDockWidgetFeatures</set>
+  </property>
   <property name="allowedAreas">
    <set>Qt::LeftDockWidgetArea</set>
   </property>

@@ -78,6 +78,12 @@
         <height>0</height>
        </size>
       </property>
+      <property name="showDropIndicator" stdset="0">
+       <bool>false</bool>
+      </property>
+      <property name="dragDropOverwriteMode">
+       <bool>false</bool>
+      </property>
       <property name="textElideMode">
        <enum>Qt::ElideMiddle</enum>
       </property>
