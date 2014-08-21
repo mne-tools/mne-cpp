@@ -83,6 +83,7 @@
 #include "eventwindow.h"
 #include "datawindow.h"
 #include "aboutwindow.h"
+#include "informationwindow.h"
 
 
 //*************************************************************************************************************
@@ -144,6 +145,7 @@ class MainWindow : public QMainWindow
     friend class FilterWindow;
     friend class EventWindow;
     friend class DataWindow;
+    friend class InformationWindow;
 
     Q_OBJECT
 public:
@@ -205,9 +207,9 @@ private slots:
 
     //=========================================================================================================
     /**
-    * showLogWindow shows the log window
+    * showInformationWindow shows the information window
     */
-    void showLogWindow();
+    void showInformationWindow();
 
     //=========================================================================================================
     /**
@@ -248,12 +250,6 @@ private:
 
     //=========================================================================================================
     /**
-    * createLogDockWindow creates the log window as a dock widget
-    */
-    void createLogDockWindow();
-
-    //=========================================================================================================
-    /**
     * Sets the log level
     *
     * @param [in] lvl message level; Message is displayed depending on its level.
@@ -288,13 +284,13 @@ private:
     FilterWindow*       m_pFilterWindow;            /**< Filter widget which display the filter options for the user */
     DataWindow*         m_pDataWindow;              /**< Data widget which display the data for the user */
     AboutWindow*        m_pAboutWindow;             /**< About widget which displays information about this application*/
+    InformationWindow*  m_pInformationWindow;       /**< Information widget which displays information about this application (log, etc.)*/
 
     //application settings
     QSettings           m_qSettings;
     RawSettings         m_rawSettings;
 
     //Log
-    QDockWidget*        m_pDockWidget_Log;          /**< a dock widget being part of the log feature */
     QTextBrowser*       m_pTextBrowser_Log;         /** a textbox being part of the log feature */
     LogLevel            m_eLogLevelCurrent;         /**< Holds the current log level.*/
 
