@@ -47,7 +47,7 @@
     </property>
     <addaction name="m_dataAction"/>
     <addaction name="m_eventAction"/>
-    <addaction name="m_logAction"/>
+    <addaction name="m_informationAction"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -104,9 +104,9 @@
     <string>Show event list...</string>
    </property>
   </action>
-  <action name="m_logAction">
+  <action name="m_informationAction">
    <property name="text">
-    <string>Show log...</string>
+    <string>Show information...</string>
    </property>
   </action>
   <action name="m_aboutAction">

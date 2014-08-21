@@ -80,8 +80,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     // Setup rest of the GUI
     connectMenus();
-    createLogDockWindow();
     setWindowStatus();
+
+    //Set standard LogLevel
+    setLogLevel(_LogLvMax);
 }
 
 
@@ -154,6 +156,10 @@ void MainWindow::setupWindowWidgets()
     addDockWidget(Qt::RightDockWidgetArea, m_pEventWindow);
     m_pEventWindow->hide();
 
+    //Create dockble event window - QTDesigner used - see /FormFiles
+    m_pInformationWindow = new InformationWindow(this);
+    addDockWidget(Qt::BottomDockWidgetArea, m_pInformationWindow);
+
     //Create about window - QTDesigner used - see /FormFiles
     m_pAboutWindow = new AboutWindow(this);
     m_pAboutWindow->hide();
@@ -177,7 +183,7 @@ void MainWindow::connectMenus()
     //Windows
     connect(ui->m_dataAction, SIGNAL(triggered()), this, SLOT(showDataWindow()));
     connect(ui->m_eventAction, SIGNAL(triggered()), this, SLOT(showEventWindow()));
-    connect(ui->m_logAction, SIGNAL(triggered()), this, SLOT(showLogWindow()));
+    connect(ui->m_informationAction, SIGNAL(triggered()), this, SLOT(showInformationWindow()));
 
     //Help
     connect(ui->m_aboutAction, SIGNAL(triggered()), this, SLOT(showAboutWindow()));
@@ -239,25 +245,6 @@ void MainWindow::setWindowStatus()
 
 //*************************************************************************************************************
 //Log
-void MainWindow::createLogDockWindow()
-{
-    //Log TextBrowser
-    m_pDockWidget_Log = new QDockWidget(tr("Log"), this);
-
-    m_pTextBrowser_Log = new QTextBrowser(m_pDockWidget_Log);
-
-    m_pDockWidget_Log->setWidget(m_pTextBrowser_Log);
-
-    m_pDockWidget_Log->setAllowedAreas(Qt::BottomDockWidgetArea);
-    addDockWidget(Qt::BottomDockWidgetArea, m_pDockWidget_Log);
-
-    //Set standard LogLevel
-    setLogLevel(_LogLvMax);
-}
-
-
-//*************************************************************************************************************
-
 void MainWindow::writeToLog(const QString& logMsg, LogKind lgknd, LogLevel lglvl)
 {
     if(lglvl<=m_eLogLevelCurrent) {
@@ -459,16 +446,16 @@ void MainWindow::showEventWindow()
 
 //*************************************************************************************************************
 
-void MainWindow::showLogWindow()
+void MainWindow::showInformationWindow()
 {
     //Note: A widget that happens to be obscured by other windows on the screen is considered to be visible.
-    if(!m_pDockWidget_Log->isVisible())
+    if(!m_pInformationWindow->isVisible())
     {
-        m_pDockWidget_Log->show();
-        m_pDockWidget_Log->raise();
+        m_pInformationWindow->show();
+        m_pInformationWindow->raise();
     }
     else // if visible raise the widget to be sure that it is not obscured by other windows
-        m_pDockWidget_Log->raise();
+        m_pInformationWindow->raise();
 }
 
 
