@@ -193,8 +193,11 @@ QSize FrequencySpectrumDelegate::sizeHint(const QStyleOptionViewItem &option, co
 }
 
 //*************************************************************************************************************
+
 void FrequencySpectrumDelegate::rcvMouseLoc(int tableview_row, int mousex, int mousey, QRect visRect)
 {
+
+    if(mousex != m_mousex){
 
     m_tableview_row = tableview_row;
     m_mousex = mousex;
@@ -205,8 +208,10 @@ void FrequencySpectrumDelegate::rcvMouseLoc(int tableview_row, int mousex, int m
 
 
     m_tableview->viewport()->repaint();
-
+    }
 }
+
+//*************************************************************************************************************
 
 void FrequencySpectrumDelegate::capturePoint(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorXd& data, QPainter *painter) const
 {
@@ -217,13 +222,28 @@ void FrequencySpectrumDelegate::capturePoint(const QModelIndex &index, const QSt
     const FrequencySpectrumModel* t_pModel = static_cast<const FrequencySpectrumModel*>(index.model());
 
     qint32 i;
-    qint32 numbins = data.size();
 
-    for(i = 1; i < numbins; ++i) {
+    RowVectorXd org_vecFreqScale = t_pModel->getFreqScale();
+    RowVectorXd vecFreqScale = t_pModel->getFreqScaleBound();
 
-        float tmp_rate = t_pModel->getFreqScale()[i]/t_pModel->getFreqScale()[numbins-1];
+    qint32 lowerIdx = t_pModel->getLowerFrqBound();
+    qint32 upperIdx = t_pModel->getUpperFrqBound();
+
+
+    qint32 numbins = vecFreqScale.size();//  data.size();
+
+    //qDebug() << "numbins" << numbins;
+    //qDebug() << "lowerIdx" << lowerIdx << "upperIdx" << upperIdx;
+
+    // find the index for the current mouse cursor location
+    for(i = lowerIdx+1; i <= upperIdx; ++i) {
+
+        //float tmp_rate = t_pModel->getFreqScale()[i]/t_pModel->getFreqScale()[numbins-1];
+
+        float tmp_rate = (vecFreqScale[i] - vecFreqScale[lowerIdx])/(vecFreqScale[upperIdx]-vecFreqScale[lowerIdx]);
 
         if (tmp_rate > m_x_rate) { break;}
+        //qDebug()<<"tmp_rate"<<tmp_rate<<"m_x_rate"<<m_x_rate<<"i"<<i;
     }
 
     /***************************************************
@@ -242,7 +262,7 @@ void FrequencySpectrumDelegate::capturePoint(const QModelIndex &index, const QSt
 
     if(iPosX>usPosX && iPosX < usPosX+usWidth && iPosY > (usPosY - usHeight) && iPosY < usPosY )
     {
-    //    qDebug()<<" index row" << index.row()<< "i"<< i << "iPosX,iposY" << iPosX << iPosY << "usPosY"<<usPosY<<"usHeight"<<usHeight;
+    //qDebug()<<" index row" << index.row()<< "i"<< i << "iPosX,iposY" << iPosX << iPosY << "usPosY"<<usPosY<<"usHeight"<<usHeight;
     //Horizontal line
     painter->setPen(QPen(Qt::gray, 1, Qt::DashLine));
 
@@ -261,11 +281,12 @@ void FrequencySpectrumDelegate::capturePoint(const QModelIndex &index, const QSt
     // cal the frequency according to the iPosX
     double fs = t_pModel->getInfo()->sfreq/2;
 
-    RowVectorXd vecFreqScale = t_pModel->getFreqScale();
+    //RowVectorXd vecFreqScale = t_pModel->getFreqScale();
+    //RowVectorXd vecFreqScale = t_pModel->getFreqScaleBound();
     double max = log10(fs+1);
-    vecFreqScale *= max;
+    org_vecFreqScale *= max;
 
-    double freq = pow(10,vecFreqScale[i]) - 1;
+    double freq = pow(10,org_vecFreqScale[i]) - 1;
 
     QString tx = QString("%1 [DB], %2 [Hz]").arg(data[i]).arg(freq);
 
@@ -363,19 +384,6 @@ void FrequencySpectrumDelegate::createGridPath(const QModelIndex &index, const Q
                 path.lineTo(x,yEnd);
             }
         }
-
-        /*
-        //horizontal lines
-        float xStart = option.rect.topLeft().x();
-
-        float xEnd = option.rect.bottomRight().x();
-
-        for(qint32 i = 0; i < 6; ++i) {
-            float y =  option.rect.height()/5.0 * (float)i;
-            path.moveTo(xStart,y);
-            path.lineTo(xEnd,y);
-        }
-        */
 
     }
 }
