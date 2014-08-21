@@ -94,8 +94,6 @@ FrequencySpectrumSettingsWidget::FrequencySpectrumSettingsWidget(FrequencySpectr
     t_pGridLayout->addWidget(t_pLabelUpper,1,0);
     t_pGridLayout->addWidget(m_pSliderUpperBound,1,1);
 
-
-
     this->setLayout(t_pGridLayout);
 
 }
