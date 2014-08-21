@@ -130,7 +130,7 @@ void FrequencySpectrumDelegate::paint(QPainter *painter, const QStyleOptionViewI
                 createGridTick(index, option, painter);
 
                 //capture the mouse
-                CapturePoint(index, option, path, data, painter);
+                capturePoint(index, option, path, data, painter);
 
                 painter->save();
                 QPen pen;
@@ -193,7 +193,7 @@ QSize FrequencySpectrumDelegate::sizeHint(const QStyleOptionViewItem &option, co
 }
 
 //*************************************************************************************************************
-void FrequencySpectrumDelegate::RcvMouseLoc(int tableview_row, int mousex, int mousey, QRect visRect)
+void FrequencySpectrumDelegate::rcvMouseLoc(int tableview_row, int mousex, int mousey, QRect visRect)
 {
 
     m_tableview_row = tableview_row;
@@ -208,7 +208,7 @@ void FrequencySpectrumDelegate::RcvMouseLoc(int tableview_row, int mousex, int m
 
 }
 
-void FrequencySpectrumDelegate::CapturePoint(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorXd& data, QPainter *painter) const
+void FrequencySpectrumDelegate::capturePoint(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorXd& data, QPainter *painter) const
 {
     Q_UNUSED(option);
     Q_UNUSED(path);

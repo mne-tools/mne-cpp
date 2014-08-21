@@ -116,7 +116,7 @@ private:
     * @param[in]        index   QModelIndex for accessing associated data and model object.
     * @param[in,out]    path    The QPointerPath to create for the data plot.
     */
-    void FrequencySpectrumDelegate::CapturePoint(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorXd& data, QPainter *painter) const;
+    void capturePoint(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, RowVectorXd& data, QPainter *painter) const;
 
     //=========================================================================================================
     /**
@@ -151,14 +151,6 @@ private:
     *
     * @param [in] mouseEvent pointer to MouseEvent.
     */
-//    virtual void mouseMoveEvent(QMouseEvent* mouseEvent);
-
-//    virtual void mousePressEvent(QMouseEvent* mouseEvent);
-
-//    virtual void mouseReleaseEvent(QMouseEvent* mouseEvent);
-
-    QPoint   m_qPointMouseStartPosition;     /**< Mouse start position which is the position where mouse was first pressed. */
-    QPoint   m_qPointMouseEndPosition;       /**< Mouse end position which is current mouse position. */
 
     // Scaling
     float m_fMaxValue;     /**< Maximum value of the data to plot  */
@@ -177,7 +169,7 @@ private:
 
 
 public slots:
-    void RcvMouseLoc( int row, int x, int y, QRect visRect);
+    void rcvMouseLoc( int row, int x, int y, QRect visRect);
 };
 
 } // NAMESPACE
