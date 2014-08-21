@@ -14,7 +14,7 @@
    <set>Qt::BottomDockWidgetArea</set>
   </property>
   <property name="windowTitle">
-   <string>Information Window</string>
+   <string>Information</string>
   </property>
   <widget class="QWidget" name="dockWidgetContents">
    <layout class="QVBoxLayout" name="verticalLayout">
