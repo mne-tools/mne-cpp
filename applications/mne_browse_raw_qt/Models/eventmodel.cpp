@@ -79,8 +79,8 @@ EventModel::EventModel(QFile &qFile, QObject *parent)
 //virtual functions
 int EventModel::rowCount(const QModelIndex & /*parent*/) const
 {
-    if(!m_data.rows()==0)
-        return m_data.rows();
+    if(!m_dataSamples.size()==0)
+        return m_dataSamples.size();
     else return 0;
 }
 
@@ -102,13 +102,13 @@ QVariant EventModel::headerData(int section, Qt::Orientation orientation, int ro
 
     if(orientation == Qt::Horizontal) {
         switch(section) {
-        case 0: //sample column
-            return QVariant("Sample");
-        case 1: //time value column
-            return QVariant("Time (s)");
-        case 2: //event type column
-            return QVariant("Type");
-        }
+            case 0: //sample column
+                return QVariant("Sample");
+            case 1: //time value column
+                return QVariant("Time (s)");
+            case 2: //event type column
+                return QVariant("Type");
+            }
     }
     else if(orientation == Qt::Vertical) {
         return QString("Event %1").arg(section);
@@ -125,29 +125,59 @@ QVariant EventModel::data(const QModelIndex &index, int role) const
     if(role != Qt::DisplayRole && role != Qt::BackgroundRole)
         return QVariant();
 
-    if(index.column()>m_data.cols() || index.row()>m_data.rows())
+    if(index.row()>=m_dataSamples.size())
         return QVariant();
 
     if (index.isValid()) {
         //******** first column (sample index) ********
-        if(index.column()==0 && role == Qt::DisplayRole)
-            return QVariant(m_data(index.row(), 0)-m_iFirstSample);
+        if(index.column()==0) {
+            switch(role) {
+                case Qt::DisplayRole:
+                    return QVariant(m_dataSamples.at(index.row())-m_iFirstSample);
+
+                case Qt::BackgroundRole:
+                    //Paint different background if event was set by user
+                    if(m_dataIsUserEvent.at(index.row()) == 1) {
+                        QBrush brush;
+                        brush.setStyle(Qt::SolidPattern);
+                        QColor colorTemp(Qt::red);
+                        colorTemp.setAlpha(15);
+                        brush.setColor(colorTemp);
+                        return QVariant(brush);
+                    }
+            }
+        }
 
         //******** second column (event time plot) ********
-        if(index.column()==1 && role == Qt::DisplayRole)
-            return QVariant((double)(m_data(index.row(), 0)-m_iFirstSample)/m_fiffInfo.sfreq);
+        if(index.column()==1){
+            switch(role) {
+                case Qt::DisplayRole:
+                    return QVariant((double)(m_dataSamples.at(index.row())-m_iFirstSample)/m_fiffInfo.sfreq);
+
+                case Qt::BackgroundRole:
+                    //Paint different background if event was set by user
+                    if(m_dataIsUserEvent.at(index.row()) == 1) {
+                        QBrush brush;
+                        brush.setStyle(Qt::SolidPattern);
+                        QColor colorTemp(Qt::red);
+                        colorTemp.setAlpha(15);
+                        brush.setColor(colorTemp);
+                        return QVariant(brush);
+                    }
+            }
+        }
 
         //******** third column (event type plot) ********
         if(index.column()==2) {
-            switch(role){
+            switch(role) {
                 case Qt::DisplayRole:
-                    return QVariant(m_data(index.row(), 2));
+                    return QVariant(m_dataTypes.at(index.row()));
 
                 case Qt::BackgroundRole:{
                     QBrush brush;
                     brush.setStyle(Qt::SolidPattern);
 
-                    switch(m_data(index.row(), 2)) {
+                    switch(m_dataTypes.at(index.row())) {
                         default:
                             brush.setColor(m_qSettings.value("EventDesignParameters/event_color_default").value<QColor>());
                         break;
@@ -205,6 +235,46 @@ QVariant EventModel::data(const QModelIndex &index, int role) const
 
 //*************************************************************************************************************
 
+bool EventModel::insertRows(int position, int span, const QModelIndex & parent)
+{
+    qDebug()<<"inserting row";
+    Q_UNUSED(parent);
+    beginInsertRows(QModelIndex(), position, position+span-1);
+
+    for (int i = 0; i < span; ++i) {
+        m_dataSamples.insert(position, 0);
+        m_dataTypes.insert(position, 1);
+        m_dataIsUserEvent.insert(position, 1);
+    }
+
+    endInsertRows();
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+bool EventModel::removeRows(int position, int span, const QModelIndex & parent)
+{
+    Q_UNUSED(parent);
+    beginRemoveRows(QModelIndex(), position, position+span-1);
+
+    for (int i = 0; i < span; ++i) {
+        //Only user events can be deleted
+        if(m_dataIsUserEvent.at(i) == 1) {
+            m_dataSamples.removeAt(position);
+            m_dataTypes.removeAt(position);
+            m_dataIsUserEvent.removeAt(position);
+        }
+    }
+
+    endRemoveRows();
+    return true;
+}
+
+
+//*************************************************************************************************************
+
 bool EventModel::loadEventData(QFile& qFile)
 {
     beginResetModel();
@@ -223,7 +293,11 @@ bool EventModel::loadEventData(QFile& qFile)
     qDebug() << QString("Events read from %1").arg(qFile.fileName());
 
     //set loaded fiff event data
-    m_data = events;
+    for(int i = 0; i < events.rows(); i++) {
+        m_dataSamples.append(events(i,0));
+        m_dataTypes.append(events(i,2));
+        m_dataIsUserEvent.append(0);
+    }
 
     endResetModel();
 
@@ -262,11 +336,14 @@ void EventModel::setFiffInfo(FiffInfo& fiffInfo)
 void EventModel::setFirstSample(int firstSample)
 {
     m_iFirstSample = firstSample;
+}
 
-//    //Subtract first sample from event samples
-//    if(m_data.rows() != 0)
-//        for(int i = 0; i<m_data.rows(); i++)
-//            m_data(i,0) = m_data(i,0) - m_iFirstSample;
+
+//*************************************************************************************************************
+
+void EventModel::setCurrentMarkerPos(int markerPos)
+{
+    m_iCurrentMarkerPo = markerPos;
 }
 
 
@@ -274,14 +351,10 @@ void EventModel::setFirstSample(int firstSample)
 
 void EventModel::clearModel()
 {
-    //data model structure
-//    m_dataclear();
-
-//    //View parameters
-//    m_iAbsFiffCursor = 0;
-//    m_iCurAbsScrollPos = 0;
-//    m_bStartReached = false;
-//    m_bEndReached = false;
+    //clear event data model structure
+    m_dataSamples.clear();
+    m_dataTypes.clear();
+    m_dataIsUserEvent.clear();
 
     qDebug("EventModel cleared.");
 }

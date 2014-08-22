@@ -79,6 +79,7 @@
 #include <QAbstractTableModel>
 #include <QBrush>
 #include <QSettings>
+#include <QVector>
 
 
 //*************************************************************************************************************
@@ -130,10 +131,12 @@ public:
     virtual int columnCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant headerData(int section, Qt::Orientation orientation, int role) const;
     virtual QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+    bool insertRows(int position, int span, const QModelIndex & parent = QModelIndex());
+    bool removeRows(int position, int span, const QModelIndex & parent = QModelIndex());
 
     //=========================================================================================================
     /**
-    * loadEventData loads fiff event data file.
+    * loadEventData loads fiff event data file
     *
     * @param p_IODevice fiff data event file to read from
     */
@@ -141,7 +144,7 @@ public:
 
     //=========================================================================================================
     /**
-    * saveEventData saves events to a fiff event data file.
+    * saveEventData saves events to a fiff event data file
     *
     * @param p_IODevice fiff data event file to save to
     */
@@ -149,7 +152,7 @@ public:
 
     //=========================================================================================================
     /**
-    * setFiffInfo sets the fiff info variabel.
+    * setFiffInfo sets the fiff info variabel
     *
     * @param fiffInfo fiff infp variabel
     */
@@ -157,11 +160,19 @@ public:
 
     //=========================================================================================================
     /**
-    * setFirstSample sets the first/starting sample of the loaded fiff data file.
+    * setFirstSample sets the first/starting sample of the loaded fiff data file
     *
     * @param firstSample first sample value
     */
     void setFirstSample(int firstSample);
+
+    //=========================================================================================================
+    /**
+    * setCurrentMarkerPos sets the current marker position
+    *
+    * @param markerPos marker position in samples
+    */
+    void setCurrentMarkerPos(int markerPos);
 
     bool            m_bFileloaded;  /**< true when a Fiff event file is loaded */
 
@@ -172,13 +183,15 @@ private:
     */
     void clearModel();
 
-    MatrixXi        m_data;         /**< Matrix that holds the loaded events from the event file. */
+    QVector<int>    m_dataSamples;      /**< Vector that holds the sample alues for each loaded event */
+    QVector<int>    m_dataTypes;        /**< Vector that holds the type alues for each loaded event */
+    QVector<int>    m_dataIsUserEvent;  /**< Vector that holds the flag whether the event is user defined or loaded from file */
 
-    FiffInfo        m_fiffInfo;     /**< fiff info of whole fiff file */
+    FiffInfo        m_fiffInfo;         /**< fiff info of whole fiff file */
 
-    int             m_iFirstSample; /**< holds the first/starting sample of the fiff data file */
-
-    QSettings       m_qSettings;    /**< setting paramter to access globally defined values. see rawsettings.cpp and rawsettings.h */
+    int             m_iFirstSample;     /**< holds the first/starting sample of the fiff data file */
+    int             m_iCurrentMarkerPo; /**< holds the current marker position */
+    QSettings       m_qSettings;        /**< setting paramter to access globally defined values. see rawsettings.cpp and rawsettings.h */
 };
 
 } // NAMESPACE

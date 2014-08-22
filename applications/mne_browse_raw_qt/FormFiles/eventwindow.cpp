@@ -58,7 +58,7 @@ using namespace MNEBrowseRawQt;
 EventWindow::EventWindow(QWidget *parent) :
     QDockWidget(parent),
     ui(new Ui::EventWindowDockWidget),
-    m_pMainWindow((MainWindow*)parent)
+    m_pMainWindow(static_cast<MainWindow*>(parent))
 {
     ui->setupUi(this);
     initCheckBoxes();
@@ -116,6 +116,19 @@ bool EventWindow::event(QEvent * event)
     //On resize event center marker again
     if(event->type() == QEvent::Resize) {
         jumpToEvent(ui->m_tableView_eventTableView->selectionModel()->currentIndex(), QModelIndex());
+    }
+
+    //Delete selected row on delete key press event
+    if(event->type() == QEvent::KeyPress && ui->m_tableView_eventTableView->hasFocus()) {
+        QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+        if(keyEvent->key() == Qt::Key_Delete) {
+            QModelIndexList indexList = ui->m_tableView_eventTableView->selectionModel()->selectedIndexes();
+
+            for(int i = 0; i<indexList.size(); i++)
+                m_pMainWindow->m_pEventModel->removeRow(indexList.at(i).row());
+
+            m_pMainWindow->m_pEventModel->removeRow(ui->m_tableView_eventTableView->selectionModel()->currentIndex().row());
+        }
     }
 
     return QDockWidget::event(event);

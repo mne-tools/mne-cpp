@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     informationwindow.h
+* @file     datamarker.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
@@ -30,45 +30,88 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the InformationWindow class.
+* @brief    Contains the declaration of the DataMarker class.
 *
 */
+#ifndef DATAMARKER_H
+#define DATAMARKER_H
 
 //*************************************************************************************************************
 //=============================================================================================================
-// INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
-#include "informationwindow.h"
+#include <QWidget>
+#include <QPalette>
+#include <QMouseEvent>
+#include <QRect>
+#include <QRegion>
+#include <QDebug>
+#include <QEvent>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// DEFINE NAMESPACE MNEBrowseRawQt
 //=============================================================================================================
 
-using namespace MNEBrowseRawQt;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE MEMBER METHODS
-//=============================================================================================================
-
-InformationWindow::InformationWindow(QWidget *parent) :
-    QDockWidget(parent),
-    ui(new Ui::InformationWindowWidget),
-    m_pMainWindow(static_cast<MainWindow*>(parent))
+namespace MNEBrowseRawQt
 {
-    ui->setupUi(this);
 
-    m_pMainWindow->m_pTextBrowser_Log = (QTextBrowser*)ui->tab_log->childAt(50,50);
-}
-
-
-//*************************************************************************************************************
-
-InformationWindow::~InformationWindow()
+/**
+* DECLARE CLASS DataMarker
+*
+* @brief The DataWindow class provides the data dock window
+*/
+class DataMarker : public QWidget
 {
-    delete ui;
-}
+    Q_OBJECT
+public:
+    //=========================================================================================================
+    /**
+    * Constructs a DataMarker dialog which is a child of parent
+    *
+    * @param [in] parent pointer to parent widget; If parent is 0, the new DataMarker becomes a window. If parent is another widget, DataMarker becomes a child window inside parent. DataWindow is deleted when its parent is deleted.
+    */
+    DataMarker(QWidget *parent = 0);
+
+    //=========================================================================================================
+    /**
+    * set the m_movementBoundary
+    *
+    * @param [in] QRect Hols the bounding rect
+    */
+    void setMovementBoundary(QRegion rect);
+
+private:
+    //=========================================================================================================
+    /**
+    * Reimplemnted mouse press event handler
+    *
+    * @param event QMouseEvent
+    */
+    void mousePressEvent(QMouseEvent *event);
+
+    //=========================================================================================================
+    /**
+    * Reimplemnted mouse move event handler
+    *
+    * @param event QMouseEvent
+    */
+    void mouseMoveEvent(QMouseEvent *event);
+
+    void enterEvent(QEvent *event);
+
+    QPoint      m_oldPos;               /**< The old mouse position */
+
+    QRegion     m_movableRegion;        /**< The movement boundary */
+
+signals:
+
+public slots:
+
+};
+
+} // NAMESPACE MNEBrowseRawQt
+
+#endif // DATAMARKER_H

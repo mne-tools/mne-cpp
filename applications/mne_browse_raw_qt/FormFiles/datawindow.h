@@ -42,6 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 #include "mainwindow.h"
+#include "datamarker.h"
 #include "ui_datawindowdock.h"
 
 
@@ -53,7 +54,7 @@
 #include <QDockWidget>
 #include <QResizeEvent>
 #include <QToolBar>
-
+#include <QPainter>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -116,21 +117,31 @@ private:
 
     //=========================================================================================================
     /**
-    * Setup the sample labels of the data window.
+    * Setup the sample labels of the data window
     */
     void initSampleLabels();
 
     //=========================================================================================================
     /**
-    * event reimplemented virtual function to handle events of the data dock window
+    * Setup the marker of the data window
     */
-    bool event(QEvent * event);
+    void initMarker();
+
+    //=========================================================================================================
+    /**
+    * resizeEvent reimplemented virtual function to handle events of the data dock window
+    */
+    void resizeEvent(QResizeEvent * event);
 
     Ui::DataWindowDockWidget *ui;
 
     MainWindow*     m_pMainWindow;
 
     QSettings       m_qSettings;
+
+    QWidget*        m_pPainterMarker;
+
+    DataMarker*     m_pDataMarker;
 
 protected slots:
     //=========================================================================================================
@@ -148,9 +159,21 @@ protected slots:
 
     //=========================================================================================================
     /**
-    * Set the sample labels of the data window.
+    * Set the sample labels of the data window
     */
     void setSampleLabels();
+
+    //=========================================================================================================
+    /**
+    * Adds an event to the event model and its QTableView
+    */
+    void addEventToEventModel();
+
+    //=========================================================================================================
+    /**
+    * Updates the marker position
+    */
+    void updateMarkerPosition();
 };
 
 } // NAMESPACE MNEBrowseRawQt
