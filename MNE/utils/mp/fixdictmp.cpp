@@ -629,7 +629,7 @@ void FixDictMp::build_molecule_xml_file(qint32 level_counter)
 
         VectorXd compare_molec = VectorXd::Zero(sample_count);
 
-        QDomNodeList node_list = xml_element.attributeNode(element("Molecule");
+        QDomNodeList node_list = xml_element.elementsByTagName("Molecule");
 
         qint32 max_it = node_list.count();
         QDomElement current_element;
@@ -783,10 +783,11 @@ void FixDictMp::build_molecule_xml_file(qint32 level_counter)
 
                                 temp_element = current_element;
 
-                                //for(qint32 node_depth = end_element_counter+2 /*2*/; node_depth < child_counter; node_depth++)
+                                //for(qint32 node_depth = 2; node_depth < child_counter; node_depth++)
                                 //    temp_element = temp_element.firstChildElement();
 
-                                temp_element = temp_element.childNodes().at(root_counter).toElement();
+                                for(qint32 node_depth = 2; node_depth < child_counter; node_depth++)
+                                    temp_element = temp_element.childNodes().at(root_counter).toElement();
 
                             }
                             //for(qint32 close_root_molecs = end_element_counter; close_root_molecs > 1; close_root_molecs--)
