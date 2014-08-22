@@ -58,12 +58,14 @@ using namespace MNEBrowseRawQt;
 DataWindow::DataWindow(QWidget *parent) :
     QDockWidget(parent),
     ui(new Ui::DataWindowDockWidget),
-    m_pMainWindow((MainWindow*)parent)
+    m_pMainWindow(static_cast<MainWindow*>(parent)),
+    m_pDataMarker(new DataMarker(this))
 {
     ui->setupUi(this);
 
     initToolBar();
     initSampleLabels();
+    initMarker();
 
     //Setup when the dock widget is to be manually resized
     connect(this,&QDockWidget::topLevelChanged,
@@ -124,7 +126,7 @@ void DataWindow::initToolBar()
     //Add actions to tool bar
     QAction* addEventAction = new QAction(QIcon(":/Resources/Images/addEvent.png"),tr("Add event"), this);
     addEventAction->setStatusTip(tr("Add an event to the event list"));
-    connect(addEventAction, SIGNAL(triggered()), this, SLOT(newFile()));
+    connect(addEventAction, SIGNAL(triggered()), this, SLOT(addEventToEventModel()));
     toolBar->addAction(addEventAction);
 
     int layoutRows = ui->m_gridLayout->rowCount();
@@ -146,14 +148,28 @@ void DataWindow::initSampleLabels()
 
 //*************************************************************************************************************
 
-bool DataWindow::event(QEvent * event)
+void DataWindow::initMarker()
 {
-    //Manually resize QDockWidget - This needs to be done because there is no typical central widget in QMainWindow - QT does not do a good job when resizing dock widgets (known issue)
-    if(event->type() == QEvent::Resize && !this->isFloating()) {
-        manualResize();
-    }
+    m_pDataMarker->raise();
+    QRect boundingRect = ui->m_tableView_rawTableView->geometry();
+    QRegion region(boundingRect);
+    m_pDataMarker->move(boundingRect.x(),boundingRect.y()+2);
+    m_pDataMarker->setMovementBoundary(region);
+    m_pDataMarker->resize(4,boundingRect.height()-2);
+}
 
-    return QDockWidget::event(event);
+
+//*************************************************************************************************************
+
+void DataWindow::resizeEvent(QResizeEvent * event)
+{
+    //Manually resize QDockWidget when not floating
+    //This needs to be done because there is no typical central widget in QMainWindow
+    //QT does not do a good job when resizing dock widgets (known issue)
+    if(isFloating() == false && (event->size() != event->oldSize()))
+        manualResize();
+
+    return QDockWidget::resizeEvent(event);
 }
 
 
@@ -163,19 +179,17 @@ void DataWindow::manualResize()
 {
     int newWidth;
 
-     if(m_pMainWindow->m_pEventWindow->isHidden() || m_pMainWindow->m_pEventWindow->isFloating()) {
-         newWidth = m_pMainWindow->size().width() - m_pMainWindow->centralWidget()->size().width() - 1;
-         //qDebug()<<"resize data plot event window is hidden";
-     }
-     else {
-         newWidth = m_pMainWindow->size().width() - m_pMainWindow->m_pEventWindow->size().width() - 5;
-         //qDebug()<<"resize data plot event window is visible";
-     }
+    if(m_pMainWindow->m_pEventWindow->isHidden() || m_pMainWindow->m_pEventWindow->isFloating())
+        newWidth = m_pMainWindow->size().width() - m_pMainWindow->centralWidget()->size().width() - 1;
+    else
+        newWidth = m_pMainWindow->size().width() - m_pMainWindow->m_pEventWindow->size().width() - 5;
 
-     resize(newWidth, this->size().height());
+    resize(newWidth, this->size().height());
 
-     //Set sample labels to new viewport adjustments
-     setSampleLabels();
+    //Set sample informaiton for every resize
+    setSampleLabels();
+
+    updateMarkerPosition();
 }
 
 
@@ -287,5 +301,25 @@ void DataWindow::setSampleLabels()
     QString stringTemp;
     ui->m_label_sampleMin->setText(QString("%1 / %2 sec").arg(stringTemp.number(minSampleRange)).arg(stringTemp.number(minSampleRange/m_pMainWindow->m_pRawModel->m_fiffInfo.sfreq,'g',3)));
     ui->m_label_sampleMax->setText(QString("%1 / %2 sec").arg(stringTemp.number(maxSampleRange)).arg(stringTemp.number(maxSampleRange/m_pMainWindow->m_pRawModel->m_fiffInfo.sfreq,'g',3)));
+}
+
+
+//*************************************************************************************************************
+
+void DataWindow::addEventToEventModel()
+{
+    m_pMainWindow->m_pEventModel->insertRow(0, QModelIndex());
+}
+
+
+//*************************************************************************************************************
+
+void DataWindow::updateMarkerPosition()
+{
+    m_pDataMarker->raise();
+    QRect boundingRect = ui->m_tableView_rawTableView->geometry();
+    QRegion region(boundingRect);
+    m_pDataMarker->setMovementBoundary(region);
+    m_pDataMarker->resize(4,boundingRect.height()-2);
 }
 

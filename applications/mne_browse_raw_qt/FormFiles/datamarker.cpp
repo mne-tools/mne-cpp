@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     informationwindow.h
+* @file     datawindow.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the InformationWindow class.
+* @brief    Contains the implementation of the DataWindow class.
 *
 */
 
@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "informationwindow.h"
+#include "datamarker.h"
 
 
 //*************************************************************************************************************
@@ -55,20 +55,60 @@ using namespace MNEBrowseRawQt;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-InformationWindow::InformationWindow(QWidget *parent) :
-    QDockWidget(parent),
-    ui(new Ui::InformationWindowWidget),
-    m_pMainWindow(static_cast<MainWindow*>(parent))
+DataMarker::DataMarker(QWidget *parent) :
+    QWidget(parent),
+    m_oldPos(QPoint(0,0)),
+    m_movableRegion(QRegion())
 {
-    ui->setupUi(this);
-
-    m_pMainWindow->m_pTextBrowser_Log = (QTextBrowser*)ui->tab_log->childAt(50,50);
+    //Set color
+    QPalette Pal(palette());
+    // set black background
+    Pal.setColor(QPalette::Background, QColor(Qt::green));
+    setAutoFillBackground(true);
+    setPalette(Pal);
 }
 
 
 //*************************************************************************************************************
 
-InformationWindow::~InformationWindow()
+void DataMarker::setMovementBoundary(QRegion rect)
 {
-    delete ui;
+    m_movableRegion = rect;
+}
+
+
+//*************************************************************************************************************
+
+void DataMarker::mousePressEvent(QMouseEvent *event)
+{
+    m_oldPos = event->globalPos();
+}
+
+
+//*************************************************************************************************************
+
+void DataMarker::mouseMoveEvent(QMouseEvent *event)
+{
+    const QPoint delta = event->globalPos() - m_oldPos;
+
+    QRect newPosition(x()+delta.x(), y()+delta.y(),
+                      this->geometry().width(), this->geometry().height());
+
+    //Check if new position is inside the boundary
+    if(m_movableRegion.contains(newPosition.bottomLeft()) && m_movableRegion.contains(newPosition.bottomRight()))
+        move(x()+delta.x(), y());
+
+    m_oldPos = event->globalPos();
+
+    qDebug()<<"globalPos"<<event->globalPos().x()<<event->globalPos().y();
+    qDebug()<<"newPosition"<<newPosition.x()<<newPosition.y()<<newPosition.width()<<newPosition.height();
+    qDebug()<<"m_movableRegion"<<m_movableRegion.boundingRect().x()<<m_movableRegion.boundingRect().y()<<m_movableRegion.boundingRect().width()<<m_movableRegion.boundingRect().height();
+}
+
+
+//*************************************************************************************************************
+
+void DataMarker::enterEvent(QEvent *event)
+{
+    setCursor(QCursor(Qt::SizeHorCursor));
 }
