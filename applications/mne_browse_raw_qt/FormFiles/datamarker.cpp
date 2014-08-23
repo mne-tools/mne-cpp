@@ -60,10 +60,12 @@ DataMarker::DataMarker(QWidget *parent) :
     m_oldPos(QPoint(0,0)),
     m_movableRegion(QRegion())
 {
-    //Set color
+    //Set background color
     QPalette Pal(palette());
-    // set black background
-    Pal.setColor(QPalette::Background, QColor(Qt::green));
+
+    QColor colorTemp(227,6,19);
+    Pal.setColor(QPalette::Background, colorTemp);
+
     setAutoFillBackground(true);
     setPalette(Pal);
 }
@@ -81,7 +83,8 @@ void DataMarker::setMovementBoundary(QRegion rect)
 
 void DataMarker::mousePressEvent(QMouseEvent *event)
 {
-    m_oldPos = event->globalPos();
+    if(event->buttons() == Qt::LeftButton)
+        m_oldPos = event->globalPos();
 }
 
 
@@ -89,20 +92,24 @@ void DataMarker::mousePressEvent(QMouseEvent *event)
 
 void DataMarker::mouseMoveEvent(QMouseEvent *event)
 {
-    const QPoint delta = event->globalPos() - m_oldPos;
+    if(event->buttons() == Qt::LeftButton) {
+        const QPoint delta = event->globalPos() - m_oldPos;
 
-    QRect newPosition(x()+delta.x(), y()+delta.y(),
-                      this->geometry().width(), this->geometry().height());
+        QRect newPosition(x()+delta.x(), y(),
+                          this->geometry().width(), this->geometry().height());
 
-    //Check if new position is inside the boundary
-    if(m_movableRegion.contains(newPosition.bottomLeft()) && m_movableRegion.contains(newPosition.bottomRight()))
-        move(x()+delta.x(), y());
+        //Check if new position is inside the boundary
+        if(m_movableRegion.contains(newPosition.bottomLeft()) && m_movableRegion.contains(newPosition.bottomRight())) {
+            move(x()+delta.x(), y());
+            m_oldPos = event->globalPos();
 
-    m_oldPos = event->globalPos();
+            emit markerMoved();
+        }
 
-    qDebug()<<"globalPos"<<event->globalPos().x()<<event->globalPos().y();
-    qDebug()<<"newPosition"<<newPosition.x()<<newPosition.y()<<newPosition.width()<<newPosition.height();
-    qDebug()<<"m_movableRegion"<<m_movableRegion.boundingRect().x()<<m_movableRegion.boundingRect().y()<<m_movableRegion.boundingRect().width()<<m_movableRegion.boundingRect().height();
+//        qDebug()<<"globalPos"<<event->globalPos().x()<<event->globalPos().y();
+//        qDebug()<<"newPosition"<<newPosition.x()<<newPosition.y()<<newPosition.width()<<newPosition.height();
+//        qDebug()<<"m_movableRegion"<<m_movableRegion.boundingRect().x()<<m_movableRegion.boundingRect().y()<<m_movableRegion.boundingRect().width()<<m_movableRegion.boundingRect().height();
+    }
 }
 
 
@@ -110,5 +117,6 @@ void DataMarker::mouseMoveEvent(QMouseEvent *event)
 
 void DataMarker::enterEvent(QEvent *event)
 {
+    Q_UNUSED(event);
     setCursor(QCursor(Qt::SizeHorCursor));
 }
