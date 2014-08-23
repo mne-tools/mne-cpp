@@ -154,10 +154,14 @@ void DataWindow::initLabels()
     m_pCurrentDataMarkerLabel->setText(QString().number(m_iCurrentMarkerSample));
 
     //Set color
-    QPalette colorText;
-    colorText.setColor(QPalette::WindowText, QColor (227,6,19));
+    QPalette palette;
+    palette.setColor(QPalette::WindowText, QColor (227,6,19));
+    QColor color;
+    color.setAlpha(0);
+    palette.setColor(QPalette::Window, color);
+
     m_pCurrentDataMarkerLabel->setAutoFillBackground(true);
-    m_pCurrentDataMarkerLabel->setPalette(colorText);
+    m_pCurrentDataMarkerLabel->setPalette(palette);
 
     //Connect current marker sample label to marker move signal
     connect(m_pDataMarker,&DataMarker::markerMoved,
