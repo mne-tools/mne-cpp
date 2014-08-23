@@ -107,6 +107,7 @@ private:
     QRegion     m_movableRegion;        /**< The movement boundary */
 
 signals:
+    void markerMoved();
 
 public slots:
 

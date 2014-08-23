@@ -59,13 +59,15 @@ DataWindow::DataWindow(QWidget *parent) :
     QDockWidget(parent),
     ui(new Ui::DataWindowDockWidget),
     m_pMainWindow(static_cast<MainWindow*>(parent)),
-    m_pDataMarker(new DataMarker(this))
+    m_pDataMarker(new DataMarker(this)),
+    m_pCurrentDataMarkerLabel(new QLabel(this)),
+    m_iCurrentMarkerSample(0)
 {
     ui->setupUi(this);
 
     initToolBar();
-    initSampleLabels();
     initMarker();
+    initLabels();
 
     //Setup when the dock widget is to be manually resized
     connect(this,&QDockWidget::topLevelChanged,
@@ -138,11 +140,32 @@ void DataWindow::initToolBar()
 
 //*************************************************************************************************************
 
-void DataWindow::initSampleLabels()
+void DataWindow::initLabels()
 {
-    //Connect sample labels to horizontal sroll bar changes
+    //Setup range samples
+    //Connect range sample labels to horizontal sroll bar changes
     connect(ui->m_tableView_rawTableView->horizontalScrollBar(),&QScrollBar::valueChanged,
-            this,&DataWindow::setSampleLabels);
+            this,&DataWindow::setRangeSampleLabels);
+
+    //Setup marker label
+    //Set current marker sample label to vertical spacer position and initalize text with
+    m_pCurrentDataMarkerLabel->setAlignment(Qt::AlignHCenter);
+    m_pCurrentDataMarkerLabel->move(m_pDataMarker->geometry().left(), m_pDataMarker->geometry().top() + 5);
+    m_pCurrentDataMarkerLabel->setText(QString().number(m_iCurrentMarkerSample));
+
+    //Set color
+    QPalette colorText;
+    colorText.setColor(QPalette::WindowText, QColor (227,6,19));
+    m_pCurrentDataMarkerLabel->setAutoFillBackground(true);
+    m_pCurrentDataMarkerLabel->setPalette(colorText);
+
+    //Connect current marker sample label to marker move signal
+    connect(m_pDataMarker,&DataMarker::markerMoved,
+            this,&DataWindow::setMarkerSampleLabel);
+
+    //Connect current marker sample label to horizontal scroll bar changes
+    connect(ui->m_tableView_rawTableView->horizontalScrollBar(),&QScrollBar::valueChanged,
+            this,&DataWindow::setMarkerSampleLabel);
 }
 
 
@@ -150,12 +173,23 @@ void DataWindow::initSampleLabels()
 
 void DataWindow::initMarker()
 {
+    //Set marker as front top-most widget
     m_pDataMarker->raise();
+
+    //Get boundary rect coordinates for table view
     QRect boundingRect = ui->m_tableView_rawTableView->geometry();
+    boundingRect.setLeft(boundingRect.x() + ui->m_tableView_rawTableView->verticalHeader()->width());
+    boundingRect.setRight(boundingRect.right() - ui->m_tableView_rawTableView->verticalScrollBar()->width() + 1);
+
+    //Inital position of the marker
+    m_pDataMarker->move(boundingRect.x() + 66, boundingRect.y() + 1);
+
+    //Create Region from bounding rect - this region is used to restrain the marker inside the data view
     QRegion region(boundingRect);
-    m_pDataMarker->move(boundingRect.x(),boundingRect.y()+2);
     m_pDataMarker->setMovementBoundary(region);
-    m_pDataMarker->resize(4,boundingRect.height()-2);
+
+    //Set marker size to table view size minus horizontal scroll bar height
+    m_pDataMarker->resize(3,boundingRect.height() - ui->m_tableView_rawTableView->horizontalScrollBar()->height()-1);
 }
 
 
@@ -168,6 +202,12 @@ void DataWindow::resizeEvent(QResizeEvent * event)
     //QT does not do a good job when resizing dock widgets (known issue)
     if(isFloating() == false && (event->size() != event->oldSize()))
         manualResize();
+
+    //On every resize update marker position
+    updateMarkerPosition();
+
+    //On every resize set sample informaiton
+    setRangeSampleLabels();
 
     return QDockWidget::resizeEvent(event);
 }
@@ -185,11 +225,6 @@ void DataWindow::manualResize()
         newWidth = m_pMainWindow->size().width() - m_pMainWindow->m_pEventWindow->size().width() - 5;
 
     resize(newWidth, this->size().height());
-
-    //Set sample informaiton for every resize
-    setSampleLabels();
-
-    updateMarkerPosition();
 }
 
 
@@ -286,7 +321,7 @@ void DataWindow::customContextMenuRequested(QPoint pos)
 
 //*************************************************************************************************************
 
-void DataWindow::setSampleLabels()
+void DataWindow::setRangeSampleLabels()
 {
     //Set sapce width so that min sample and max sample are in line with the data plot
     ui->m_horizontalSpacer_Min->setFixedWidth(ui->m_tableView_rawTableView->verticalHeader()->width());
@@ -306,6 +341,22 @@ void DataWindow::setSampleLabels()
 
 //*************************************************************************************************************
 
+void DataWindow::setMarkerSampleLabel()
+{
+    m_pCurrentDataMarkerLabel->raise();
+
+    //Update the text and position in the current sample marker label
+    m_iCurrentMarkerSample = ui->m_tableView_rawTableView->horizontalScrollBar()->value() +
+            (m_pDataMarker->geometry().x() - ui->m_tableView_rawTableView->geometry().x() - ui->m_tableView_rawTableView->verticalHeader()->width());
+
+    m_pCurrentDataMarkerLabel->setText(QString().number(m_iCurrentMarkerSample));
+
+    m_pCurrentDataMarkerLabel->move(m_pDataMarker->geometry().left() - (m_pCurrentDataMarkerLabel->width()/2) + 1, m_pDataMarker->geometry().top() - 20);
+}
+
+
+//*************************************************************************************************************
+
 void DataWindow::addEventToEventModel()
 {
     m_pMainWindow->m_pEventModel->insertRow(0, QModelIndex());
@@ -316,10 +367,29 @@ void DataWindow::addEventToEventModel()
 
 void DataWindow::updateMarkerPosition()
 {
-    m_pDataMarker->raise();
+    qDebug()<<"updateMarkerPosition";
+    //Get boundary rect coordinates for table view
     QRect boundingRect = ui->m_tableView_rawTableView->geometry();
+
+    //When window is docked the geometry is somehow corrupted - manual fix necessary :-(
+    if(!this->isFloating()) {
+        boundingRect.setTop(boundingRect.top() + 22);
+        boundingRect.setBottom(boundingRect.bottom() + 22);
+    }
+
+    m_pDataMarker->move(m_pDataMarker->x(), boundingRect.y()+1);
+
+    boundingRect.setLeft(boundingRect.x() + ui->m_tableView_rawTableView->verticalHeader()->width());
+    boundingRect.setRight(boundingRect.right() - ui->m_tableView_rawTableView->verticalScrollBar()->width() + 1);
+
+    //Create Region from bounding rect - this region is used to restrain the marker inside the data view
     QRegion region(boundingRect);
     m_pDataMarker->setMovementBoundary(region);
-    m_pDataMarker->resize(4,boundingRect.height()-2);
+
+    //Set marker size to table view size minus horizontal scroll bar height
+    m_pDataMarker->resize(3, boundingRect.height() - ui->m_tableView_rawTableView->horizontalScrollBar()->height()-1);
+
+    //Update current marker sample lable
+    m_pCurrentDataMarkerLabel->move(m_pDataMarker->geometry().left() - (m_pCurrentDataMarkerLabel->width()/2) + 1, m_pDataMarker->geometry().top() - 20);
 }
 

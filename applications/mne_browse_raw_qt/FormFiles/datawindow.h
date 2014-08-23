@@ -119,7 +119,7 @@ private:
     /**
     * Setup the sample labels of the data window
     */
-    void initSampleLabels();
+    void initLabels();
 
     //=========================================================================================================
     /**
@@ -143,6 +143,10 @@ private:
 
     DataMarker*     m_pDataMarker;
 
+    QLabel*         m_pCurrentDataMarkerLabel;
+
+    int             m_iCurrentMarkerSample;
+
 protected slots:
     //=========================================================================================================
     /**
@@ -159,9 +163,15 @@ protected slots:
 
     //=========================================================================================================
     /**
+    * Set the range sample labels of the data window
+    */
+    void setRangeSampleLabels();
+
+    //=========================================================================================================
+    /**
     * Set the sample labels of the data window
     */
-    void setSampleLabels();
+    void setMarkerSampleLabel();
 
     //=========================================================================================================
     /**
