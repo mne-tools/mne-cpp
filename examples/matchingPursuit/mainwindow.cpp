@@ -1169,7 +1169,7 @@ void MainWindow::on_btt_Calc_clicked()
         _atom_sum_matrix = MatrixXd::Zero(256,1);
 //        QFuture<void> f1 = QtConcurrent::run(&mpCalc, ownDict, _signal_matrix.col(0), ui->sb_Iterations->value());
 //        f1.waitForFinished();
-        mpCalc(ownDict, _signal_matrix.col(0), ui->sb_Iterations->value());
+        calc_fix_mp(ownDict, _signal_matrix.col(0), ui->sb_Iterations->value());
         //update();
     }
     else if(ui->rb_adativMp->isChecked())
@@ -1410,8 +1410,7 @@ void MainWindow::calc_adaptiv_mp(MatrixXd signal, TruncationCriterion criterion)
         break;
 
         case Both:
-        {
-            //must be debugged, thread is not ending like i want it to
+        {           
             emit send_input(signal, ui->sb_Iterations->value(), res_energy, ui->chb_fix_phase->isChecked(), 1, 1E3, 1.0, 0.2, 0.5, 0.5);
             adaptive_Mp_Thread->start();
         }
@@ -1423,7 +1422,7 @@ void MainWindow::calc_adaptiv_mp(MatrixXd signal, TruncationCriterion criterion)
 
 // TODO: Calc MP (new)
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-VectorXd MainWindow::mpCalc(QFile &currentDict, VectorXd signalSamples, qint32 iterationsCount)
+VectorXd MainWindow::calc_fix_mp(QFile &currentDict, VectorXd signalSamples, qint32 iterationsCount)
 {
     _tbv_is_loading = true;
     GaborAtom* gabor_Atom = new GaborAtom;
@@ -1811,7 +1810,7 @@ VectorXd MainWindow::mpCalc(QFile &currentDict, VectorXd signalSamples, qint32 i
     if(iterationsCount > 0)
     {
         QFile ownDict(QString("Matching-Pursuit-Toolbox/%1.dict").arg(ui->cb_Dicts->currentText()));
-        mpCalc(ownDict, residuum.col(0), iterationsCount);
+        calc_fix_mp(ownDict, residuum.col(0), iterationsCount);
 
     }
 
