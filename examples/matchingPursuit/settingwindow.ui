@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>settingwindow</class>
+ <widget class="QWidget" name="settingwindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>114</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>settings</string>
+  </property>
+  <property name="toolTip">
+   <string extracomment="this option accelerates the adaptive MP algorithm for multichannel use. Only one channel is choosen to select bestmatching atom. performance: about triple speed in calculation but also 2 - 3 times more atoms will be found"/>
+  </property>
+  <widget class="QCheckBox" name="cb_boost">
+   <property name="geometry">
+    <rect>
+     <x>30</x>
+     <y>40</y>
+     <width>111</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="toolTip">
+    <string comment="z" extracomment="v"/>
+   </property>
+   <property name="text">
+    <string>adaptiveMP boost</string>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btt_close">
+   <property name="geometry">
+    <rect>
+     <x>310</x>
+     <y>80</y>
+     <width>75</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>close</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
