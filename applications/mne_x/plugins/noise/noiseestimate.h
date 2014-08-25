@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     noise_estimate.h
+* @file     noiseestimate.h
 * @author   Limin Sun <liminsun@nmr.mgh.harvard.edu>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
@@ -30,12 +30,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the RTHPI class.
+* @brief    Contains the declaration of the NoiseEstimate class.
 *
 */
 
-#ifndef NOISE_ESTIMATE_H
-#define NOISE_ESTIMATE_H
+#ifndef NOISEESTIMATE_H
+#define NOISEESTIMATE_H
 
 
 //*************************************************************************************************************
@@ -43,13 +43,13 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "noise_estimate_global.h"
+#include "noiseestimate_global.h"
 
 #include <mne_x/Interfaces/IAlgorithm.h>
 #include <generics/circularmatrixbuffer.h>
 #include <xMeas/newrealtimemultisamplearray.h>
 #include <xMeas/frequencyspectrum.h>
-
+#include <rtInv/rtnoise.h>
 //*************************************************************************************************************
 //=============================================================================================================
 // Eigen INCLUDES
@@ -93,7 +93,7 @@ namespace NoiseEstimatePlugin
 using namespace MNEX;
 using namespace XMEASLIB;
 using namespace IOBuffer;
-
+using namespace RTINVLIB;
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -158,6 +158,12 @@ public:
 
     void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
 
+    //=========================================================================================================
+    /**
+    * Add the spectrum result into a list
+    */
+    void appendNoiseSpectrum(Eigen::MatrixXd);
+
 signals:
     //=========================================================================================================
     /**
@@ -169,11 +175,6 @@ signals:
     * Emitted Noise parameters
     */
     void SetNoisePara(qint32 nFFT, int fs);
-    //=========================================================================================================
-    /**
-    * Emitted data to plot
-    */
-    //void RePlot(MatrixXf psdx);
 
 protected:
     virtual void run();
@@ -193,24 +194,21 @@ private:
 
     CircularMatrixBuffer<double>::SPtr   m_pBuffer;     /**< Holds incoming data.*/
 
+    RtNoise::SPtr m_pRtNoise;                       /**< Real-time Noise Estimation. */
+    //RtNoise * m_pRtNoise;                       /**< Real-time Noise Estimation. */
+
+    QVector<MatrixXd>   m_qVecSpecData;     /**< Evoked data set */
+
     bool m_bIsRunning;      /**< If source lab is running */
     bool m_bProcessData;    /**< If data should be received for processing */
 
     double m_Fs;
     qint32 m_iFFTlength;
 
-    //MatrixXd sum_psdx;
-
-protected:
-    int NumOfBlocks;
-    int BlockSize  ;
-    int Sensors    ;
-    int BlockIndex ;
-
-    MatrixXd CircBuf;
+    QMutex mutex;
 
 };
 
 } // NAMESPACE
 
-#endif // NOISE_ESTIMATE_H
+#endif // NOISEESTIMATE_H

@@ -113,7 +113,9 @@ SOURCES += \
     frequencyspectrumwidget.cpp \
     helpers/frequencyspectrummodel.cpp \
     helpers/frequencyspectrumdelegate.cpp \
-    helpers/evokedmodalitywidget.cpp
+    helpers/evokedmodalitywidget.cpp \
+    helpers/frequencyspectrumsettingswidget.cpp \
+    helpers/realtimemultisamplearrayscalingwidget.cpp
 
 HEADERS += \
     xdisp_global.h \
@@ -136,7 +138,9 @@ HEADERS += \
     frequencyspectrumwidget.h \
     helpers/frequencyspectrumdelegate.h \
     helpers/frequencyspectrummodel.h \
-    helpers/evokedmodalitywidget.h
+    helpers/evokedmodalitywidget.h \
+    helpers/frequencyspectrumsettingswidget.h \
+    helpers/realtimemultisamplearrayscalingwidget.h
 
 FORMS += \
     realtimesamplearraywidget.ui

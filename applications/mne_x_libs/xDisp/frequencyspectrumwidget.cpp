@@ -2,6 +2,7 @@
 /**
 * @file     frequencyspectrumwidget.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Limin Sun <liminsun@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     July, 2014
@@ -70,7 +71,8 @@
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QHeaderView>
-
+#include <QSettings>
+#include <QTableView>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -103,13 +105,28 @@ FrequencySpectrumWidget::FrequencySpectrumWidget(QSharedPointer<FrequencySpectru
 , m_pFSDelegate(Q_NULLPTR)
 , m_pTableView(Q_NULLPTR)
 , m_pFS(pFS)
+, m_fLowerFrqBound(0)
+, m_fUpperFrqBound(300)
 , m_bInitialized(false)
 {
     Q_UNUSED(pTime)
 
+
+    m_pActionFrequencySettings = new QAction(QIcon(":/images/frqResolution.png"), tr("Shows the frequency spectrum settings widget (F12)"),this);
+    m_pActionFrequencySettings->setShortcut(tr("F12"));
+    m_pActionFrequencySettings->setStatusTip(tr("Shows the frequency spectrum settings widget (F12)"));
+    connect(m_pActionFrequencySettings, &QAction::triggered, this, &FrequencySpectrumWidget::showFrequencySpectrumSettingsWidget);
+    addDisplayAction(m_pActionFrequencySettings);
+
+    m_pActionFrequencySettings->setVisible(false);
+
     if(m_pTableView)
         delete m_pTableView;
     m_pTableView = new QTableView;
+
+    m_pTableView->setSelectionMode( QAbstractItemView::ExtendedSelection );
+    m_pTableView->setMouseTracking( true );
+    m_pTableView->viewport()->installEventFilter( this );
 
     //set vertical layout
     QVBoxLayout *neLayout = new QVBoxLayout(this);
@@ -131,7 +148,18 @@ FrequencySpectrumWidget::FrequencySpectrumWidget(QSharedPointer<FrequencySpectru
 
 FrequencySpectrumWidget::~FrequencySpectrumWidget()
 {
+    //
+    // Store Settings
+    //
+    if(!m_pFS->getName().isEmpty())
+    {
+        QString t_sFSName = m_pFS->getName();
 
+        QSettings settings;
+
+        settings.setValue(QString("FSW/%1/lowerFrqBound").arg(t_sFSName), m_fLowerFrqBound);
+        settings.setValue(QString("FSW/%1/upperFrqBound").arg(t_sFSName), m_fUpperFrqBound);
+    }
 }
 
 
@@ -154,11 +182,16 @@ void FrequencySpectrumWidget::getData()
         if(m_pFS->isInit())
         {
             init();
+
+            m_pFSModel->addData(m_pFS->getValue());
+
+            initSettingsWidget();
         }
     }
     else
         m_pFSModel->addData(m_pFS->getValue());
 }
+
 
 //*************************************************************************************************************
 
@@ -166,6 +199,16 @@ void FrequencySpectrumWidget::init()
 {
     if(m_pFS->getFiffInfo())
     {
+        QSettings settings;
+        if(!m_pFS->getName().isEmpty())
+        {
+            QString t_sFSName = m_pFS->getName();
+            m_fLowerFrqBound = settings.value(QString("FSW/%1/lowerFrqBound").arg(t_sFSName), 0).toFloat();
+            m_fUpperFrqBound = settings.value(QString("FSW/%1/upperFrqBound").arg(t_sFSName), 300).toFloat();
+        }
+
+        m_pActionFrequencySettings->setVisible(true);
+
         if(m_pFSModel)
             delete m_pFSModel;
         m_pFSModel = new FrequencySpectrumModel(this);
@@ -174,9 +217,15 @@ void FrequencySpectrumWidget::init()
 
         if(m_pFSDelegate)
             delete m_pFSDelegate;
-        m_pFSDelegate = new FrequencySpectrumDelegate(this);
+//        m_pFSDelegate = new FrequencySpectrumDelegate(this);
+        m_pFSDelegate = new FrequencySpectrumDelegate(m_pTableView,this);
 
         connect(m_pTableView, &QTableView::doubleClicked, m_pFSModel, &FrequencySpectrumModel::toggleFreeze);
+
+        // add a connection for sending mouse location to the delegate; Dr. -Ing. Limin Sun 8/21/14
+        connect(this,&FrequencySpectrumWidget::sendMouseLoc,
+                m_pFSDelegate, &FrequencySpectrumDelegate::rcvMouseLoc);
+
 
         m_pTableView->setModel(m_pFSModel);
         m_pTableView->setItemDelegate(m_pFSDelegate);
@@ -199,8 +248,86 @@ void FrequencySpectrumWidget::init()
 
         //set context menu
         m_pTableView->setContextMenuPolicy(Qt::CustomContextMenu);
-        connect(m_pTableView,SIGNAL(customContextMenuRequested(QPoint)),this,SLOT(channelContextMenu(QPoint)));
+        //connect(m_pTableView,SIGNAL(customContextMenuRequested(QPoint)),this,SLOT(channelContextMenu(QPoint)));
 
         m_bInitialized = true;
+
+
+
     }
+}
+
+
+//*************************************************************************************************************
+
+void FrequencySpectrumWidget::initSettingsWidget()
+{
+    if(!m_pFrequencySpectrumSettingsWidget)
+    {
+        m_pFrequencySpectrumSettingsWidget = QSharedPointer<FrequencySpectrumSettingsWidget>(new FrequencySpectrumSettingsWidget(this));
+
+        m_pFrequencySpectrumSettingsWidget->setWindowTitle("Frequency Spectrum Settings");
+
+        connect(m_pFrequencySpectrumSettingsWidget.data(), &FrequencySpectrumSettingsWidget::settingsChanged, this, &FrequencySpectrumWidget::broadcastSettings);
+    }
+
+    if(m_pFS->isInit() && m_pFS->getFiffInfo())
+    {
+        m_fUpperFrqBound = m_fLowerFrqBound < m_fUpperFrqBound ? m_fUpperFrqBound : m_fLowerFrqBound;
+        m_pFrequencySpectrumSettingsWidget->m_pSliderLowerBound->setMinimum(0);
+        m_pFrequencySpectrumSettingsWidget->m_pSliderLowerBound->setMaximum((qint32)(m_pFS->getFiffInfo()->sfreq/2)*1000);
+        m_pFrequencySpectrumSettingsWidget->m_pSliderLowerBound->setValue((qint32)(m_fLowerFrqBound*1000));
+
+        m_pFrequencySpectrumSettingsWidget->m_pSliderUpperBound->setMinimum(0);
+        m_pFrequencySpectrumSettingsWidget->m_pSliderUpperBound->setMaximum((qint32)(m_pFS->getFiffInfo()->sfreq/2)*1000);
+        m_pFrequencySpectrumSettingsWidget->m_pSliderUpperBound->setValue((qint32)(m_fUpperFrqBound*1000));
+    }
+
+}
+
+
+//*************************************************************************************************************
+
+void FrequencySpectrumWidget::broadcastSettings()
+{
+    if(m_pFrequencySpectrumSettingsWidget)
+    {
+        m_fLowerFrqBound = m_pFrequencySpectrumSettingsWidget->m_pSliderLowerBound->value()/1000.0f;
+        m_fUpperFrqBound = m_pFrequencySpectrumSettingsWidget->m_pSliderUpperBound->value()/1000.0f;
+        m_pFSModel->setBoundaries(m_fLowerFrqBound,m_fUpperFrqBound);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void FrequencySpectrumWidget::showFrequencySpectrumSettingsWidget()
+{
+    initSettingsWidget();
+    m_pFrequencySpectrumSettingsWidget->show();
+}
+
+
+//*************************************************************************************************************
+
+bool FrequencySpectrumWidget::eventFilter(QObject * watched, QEvent * event)
+{
+  if(event->type() == QEvent::MouseMove){
+      QMouseEvent *mouseEvent = static_cast <QMouseEvent*>( event );
+      //qDebug()<<"MouseMove event!@"<<mouseEvent->x()<<":"<<mouseEvent->y();
+
+      int currentRow = m_pTableView->rowAt(mouseEvent->y());
+      m_pTableView->selectRow(currentRow);
+
+      QModelIndex item = m_pTableView->currentIndex();
+
+      emit sendMouseLoc(item.row(), mouseEvent->x(), mouseEvent->y(),m_pTableView->visualRect(item) );
+
+      return true;
+  }
+  else
+  {
+      return QWidget::eventFilter(watched, event);
+  }
+
 }
