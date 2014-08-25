@@ -54,6 +54,7 @@
 //=============================================================================================================
 
 #include <utils/mp/atom.h>
+#include <utils/mp/adaptivemp.h>
 #include <utils/utils_global.h>
 
 //*************************************************************************************************************
@@ -104,7 +105,7 @@ class UTILSSHARED_EXPORT FixDictMp : public QThread
 public:
 
     //typedef QList<GaborAtom> gabor_atom_list;
-
+    //=========================================================================================================
     /**
     * fixdictMp_fixdictMP
     *
@@ -117,13 +118,23 @@ public:
     */
     FixDictMp();
 
+    //=========================================================================================================
+
     qint32 test();
+    QList<GaborAtom> atom_list;
+
+    //=========================================================================================================
 
     QList<GaborAtom> matching_pursuit(QFile &currentDict, VectorXd signalSamples, qint32 iterationsCount);
 
+    //=========================================================================================================
+
     QStringList correlation(VectorXd signalSamples, QList<qreal> atomSamples, QString atomName);
 
+    //=========================================================================================================
+
     static void create_tree_dict(QString save_path);
+
     //=========================================================================================================
 
     qreal create_molecules(VectorXd compare_atom, qreal phase, qreal modulation, quint32 translation, qint32 sample_count, GaborAtom* gabor_Atom, qreal scale);
