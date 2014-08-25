@@ -147,7 +147,9 @@ public slots:
     //void send_result();
     //void matching_pursuit (MatrixXd signal, qint32 max_iterations, qreal epsilon);
     //void process();
-    //void recieve_input(MatrixXd signal, qint32 max_iterations, qreal epsilon);
+
+    //void recieve_input(MatrixXd signal, qint32 max_iterations, qreal epsilon, QFile &current_dict, qint32 simplex_it,
+    //                   qreal simplex_reflection, qreal simplex_expansion, qreal simplex_contraction, qreal simplex_full_contraction);
 
     //=========================================================================================================
 

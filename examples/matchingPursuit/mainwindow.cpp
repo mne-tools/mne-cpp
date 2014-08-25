@@ -1441,7 +1441,7 @@ void MainWindow::calc_fix_mp(QFile &currentDict, MatrixXd signal, TruncationCrit
     qRegisterMetaType<Eigen::MatrixXd>("MatrixXd");
     qRegisterMetaType<gabor_atom_list>("gabor_atom_list");
 
-    connect(this, SIGNAL(send_input(MatrixXd, qint32, qreal, bool, bool, qint32, qreal, qreal, qreal, qreal)),
+    connect(this, SIGNAL(send_input_fix_dict(MatrixXd, qint32, qreal, QFile, qint32, qreal, qreal, qreal, qreal)),
             fixDict_Mp, SLOT(recieve_input(MatrixXd, qint32, qreal, bool, bool, qint32, qreal, qreal, qreal, qreal)));
     connect(fixDict_Mp, SIGNAL(current_result(qint32, qint32, qreal, qreal, gabor_atom_list)),
                   this, SLOT(recieve_result(qint32, qint32, qreal, qreal, gabor_atom_list)));
@@ -1454,21 +1454,21 @@ void MainWindow::calc_fix_mp(QFile &currentDict, MatrixXd signal, TruncationCrit
     {
         case Iterations:
         {
-            emit send_input(signal, ui->sb_Iterations->value(), qreal(MININT32), ui->chb_fix_phase->isChecked(), 1, 1E3, 1.0, 0.2, 0.5, 0.5);
+            emit send_input_fix_dict(signal, ui->sb_Iterations->value(), qreal(MININT32), currentDict, 1E3, 1.0, 0.2, 0.5, 0.5);
             fixDict_Mp_Thread->start();
         }
         break;
 
         case SignalEnergy:
         {
-            emit send_input(signal, MAXINT32, res_energy, ui->chb_fix_phase->isChecked(), 1, 1E3, 1.0, 0.2, 0.5, 0.5);
+            emit send_input_fix_dict(signal, MAXINT32, res_energy, currentDict, 1E3, 1.0, 0.2, 0.5, 0.5);
             fixDict_Mp_Thread->start();
         }
         break;
 
         case Both:
         {
-            emit send_input(signal, ui->sb_Iterations->value(), res_energy, ui->chb_fix_phase->isChecked(), 1, 1E3, 1.0, 0.2, 0.5, 0.5);
+            emit send_input_fix_dict(signal, ui->sb_Iterations->value(), res_energy, currentDict, 1E3, 1.0, 0.2, 0.5, 0.5);
             fixDict_Mp_Thread->start();
         }
         break;
