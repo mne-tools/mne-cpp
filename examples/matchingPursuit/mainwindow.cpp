@@ -1169,7 +1169,7 @@ void MainWindow::on_btt_Calc_clicked()
         _atom_sum_matrix = MatrixXd::Zero(256,1);
 //        QFuture<void> f1 = QtConcurrent::run(&mpCalc, ownDict, _signal_matrix.col(0), ui->sb_Iterations->value());
 //        f1.waitForFinished();
-        calc_fix_mp(ownDict, _signal_matrix.col(0), ui->sb_Iterations->value());
+        calc_fix_mp(ownDict, _signal_matrix.col(0), criterion);
         //update();
     }
     else if(ui->rb_adativMp->isChecked())
@@ -1389,9 +1389,9 @@ void MainWindow::calc_adaptiv_mp(MatrixXd signal, TruncationCriterion criterion)
     connect(adaptive_Mp, SIGNAL(current_result(qint32, qint32, qreal, qreal, gabor_atom_list)),
                  this, SLOT(recieve_result(qint32, qint32, qreal, qreal, gabor_atom_list)));
     connect(adaptive_Mp, SIGNAL(finished()), adaptive_Mp_Thread, SLOT(quit()));
-    //connect(adaptive_Mp, SIGNAL(finished()), adaptive_Mp, SLOT(deleteLater()));
+    connect(adaptive_Mp, SIGNAL(finished()), adaptive_Mp, SLOT(deleteLater()));
     connect(adaptive_Mp_Thread, SIGNAL(finished()), this, SLOT(calc_thread_finished()));
-    //connect(adaptive_Mp_Thread, SIGNAL(finished()), adaptive_Mp_Thread, SLOT(deleteLater()));
+    connect(adaptive_Mp_Thread, SIGNAL(finished()), adaptive_Mp_Thread, SLOT(deleteLater()));
 
     switch(criterion)
     {
@@ -1422,339 +1422,54 @@ void MainWindow::calc_adaptiv_mp(MatrixXd signal, TruncationCriterion criterion)
 
 // TODO: Calc MP (new)
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-VectorXd MainWindow::calc_fix_mp(QFile &currentDict, VectorXd signalSamples, qint32 iterationsCount)
+void MainWindow::calc_fix_mp(QFile &currentDict, MatrixXd signal, TruncationCriterion criterion)
 {
-    _tbv_is_loading = true;
-    GaborAtom* gabor_Atom = new GaborAtom;
+    FixDictMp *fixDict_Mp = new FixDictMp();
+    _atom_sum_matrix = MatrixXd::Zero(signal.rows(), signal.cols());
+    _residuum_matrix = signal;
+    qreal res_energy = ui->dsb_energy->value();
 
+    //threading
+    QThread* fixDict_Mp_Thread = new QThread;
+    fixDict_Mp->moveToThread(fixDict_Mp_Thread);
+    qRegisterMetaType<Eigen::MatrixXd>("MatrixXd");
+    qRegisterMetaType<gabor_atom_list>("gabor_atom_list");
 
-    bool isDouble = false;
+    connect(this, SIGNAL(send_input(MatrixXd, qint32, qreal, bool, bool, qint32, qreal, qreal, qreal, qreal)),
+            fixDict_Mp, SLOT(recieve_input(MatrixXd, qint32, qreal, bool, bool, qint32, qreal, qreal, qreal, qreal)));
+    connect(fixDict_Mp, SIGNAL(current_result(qint32, qint32, qreal, qreal, gabor_atom_list)),
+                  this, SLOT(recieve_result(qint32, qint32, qreal, qreal, gabor_atom_list)));
+    connect(fixDict_Mp, SIGNAL(finished()), fixDict_Mp_Thread, SLOT(quit()));
+    connect(fixDict_Mp, SIGNAL(finished()), fixDict_Mp, SLOT(deleteLater()));
+    connect(fixDict_Mp_Thread, SIGNAL(finished()), this, SLOT(calc_thread_finished()));
+    connect(fixDict_Mp_Thread, SIGNAL(finished()), fixDict_Mp_Thread, SLOT(deleteLater()));
 
-    qint32 atomCount = 0;
-    qint32 bestCorrStartIndex;
-    qreal sample;
-    qreal bestCorrValue = 0;
-    qreal residuumEnergie = 0;    
-
-    QString contents;
-    QString atomName;
-    QString bestCorrName;
-
-    QList<qreal> atomSamples;
-    QList<QStringList> correlationList;    
-    VectorXd residuum = signalSamples;
-
-
-    //originalSignalSamples = signalSamples;
-
-    // Liest das Woerterbuch aus und gibt die Samples und den Namen an die Skalarfunktion weiter
-    if (currentDict.open (QIODevice::ReadOnly))
+    switch(criterion)
     {
-        while(!currentDict.atEnd())
+        case Iterations:
         {
-            contents = currentDict.readLine();
-            if(contents.startsWith("atomcount"))
-            {
-                atomCount = contents.mid(12).toInt();
-                break;
-            }
-        }        
-        while(!currentDict.atEnd())
-        {
-            while(!currentDict.atEnd())
-            {
-                if(contents.contains("_ATOM_"))
-                {
-                    atomName = contents;
-                    break;
-                }
-                contents = currentDict.readLine();
-            }
-
-            contents = "";
-            while(!contents.contains("_ATOM_"))
-            {
-                contents = currentDict.readLine();
-                sample = contents.toDouble(&isDouble);
-                if(isDouble)
-                    atomSamples.append(sample);
-                if(currentDict.atEnd())
-                    break;
-            }
-            correlationList.append(correlation(signalSamples, atomSamples, atomName));
-
-            atomSamples.clear();
+            emit send_input(signal, ui->sb_Iterations->value(), qreal(MININT32), ui->chb_fix_phase->isChecked(), 1, 1E3, 1.0, 0.2, 0.5, 0.5);
+            fixDict_Mp_Thread->start();
         }
-        currentDict.close();
+        break;
 
-        // Sucht aus allen verglichenen Atomen das beste passende herraus
-        for(qint32 i = 0; i < correlationList.length(); i++)
+        case SignalEnergy:
         {
-            if(fabs(correlationList.at(i).at(2).toDouble()) > fabs(bestCorrValue))
-            {
-                bestCorrName =  correlationList.at(i).at(0);
-                bestCorrStartIndex = correlationList.at(i).at(1).toInt();
-                bestCorrValue = correlationList.at(i).at(2).toDouble();              
-            }
+            emit send_input(signal, MAXINT32, res_energy, ui->chb_fix_phase->isChecked(), 1, 1E3, 1.0, 0.2, 0.5, 0.5);
+            fixDict_Mp_Thread->start();
         }
+        break;
 
-        // Sucht das passende Atom im Woerterbuch und traegt dessen Werte in eine Liste
-        if (currentDict.open (QIODevice::ReadOnly))
+        case Both:
         {
-            bool hasFound = false;
-            qint32 j = 0;
-            while(!currentDict.atEnd() )
-            {
-                contents = currentDict.readLine();
-                if(QString::compare(contents, bestCorrName) == 0)
-                {
-                    contents = currentDict.readLine();
+            emit send_input(signal, ui->sb_Iterations->value(), res_energy, ui->chb_fix_phase->isChecked(), 1, 1E3, 1.0, 0.2, 0.5, 0.5);
+            fixDict_Mp_Thread->start();
+        }
+        break;
+    }
+    /*
+    _tbv_is_loading = true;
 
-                    QStringList list = contents.split(':');
-                    gabor_Atom->sample_count = 256;
-                    QString t = list.at(1);
-                    qreal scale = t.remove(t.length() - 5, 5).toDouble(&isDouble);
-                    if(isDouble)
-                        gabor_Atom->scale = scale;
-                    gabor_Atom->translation = bestCorrStartIndex - 128;
-                    t = list.at(2);
-                    qreal modu = t.remove(t.length() - 6, 6).toDouble(&isDouble);
-                    if(isDouble)
-                        gabor_Atom->modulation = modu;
-                    t = list.at(3);
-                    qreal phase = t.remove(t.length() - 6, 6).toDouble(&isDouble);
-                    if(isDouble)
-                        gabor_Atom->phase = phase;
-                    gabor_Atom->max_scalar_product = bestCorrValue;
-
-                    //---------------------------------
-
-                    for(qint32 chn = 0; chn < 1; chn++)
-                    {
-                        //simplexfunction to find minimum of target among parameters s, p, k
-                        std::vector<double> init;
-
-                        init.push_back(gabor_Atom->scale);
-                        init.push_back(gabor_Atom->translation);
-                        init.push_back(gabor_Atom->modulation);
-
-                        double tol = 1E8 * std::numeric_limits<double>::epsilon();
-                        std::vector<std::vector<double> > x = std::vector<std::vector<double> >();
-                        qint32 iterations = 1E3;
-                        qint32 N = init.size();                     //space dimension
-
-                        VectorXd atom_fxc_params = VectorXd::Zero(5); //initialisation for contraction coefficients
-
-                        const qreal a=1.0, b=0.2, g=0.5, h=0.5;  //coefficients a = 1, b = 0.2, g = 0.5, h = 0.5
-                                                                 //a: reflection  -> xr step away from worst siplex found
-                                                                 //b: expansion   -> xe if better with a so go in this direction with b
-                                                                 //g: contraction -> xc calc new worst point an bring closer to middle of simplex
-                                                                 //h: full contraction to x1
-                        std::vector<double> xcentroid_old(N,0);  //simplex center * (N+1)
-                        std::vector<double> xcentroid_new(N,0);  //simplex center * (N+1)
-                        std::vector<double> vf(N+1,0);           //f evaluated at simplex vertices
-                        qint32 x1 = 0, xn = 0, xnp1 = 0;         //x1:   f(x1) = min { f(x1), f(x2)...f(x_{n+1} }
-                                                                 //xnp1: f(xnp1) = max { f(x1), f(x2)...f(x_{n+1} }
-                                                                 //xn:   f(xn)<f(xnp1) && f(xn)> all other f(x_i)
-                        qint32 cnt = 0; //iteration step number
-
-                        if(x.size()== 0) //if no initial simplex is specified
-                        {
-                            //construct the trial simplex
-                            //based upon the initial guess parameters
-                            std::vector<double> del( init );
-                            std::transform(del.begin(), del.end(), del.begin(),
-                            std::bind2nd( std::divides<double>() , 20) );//'20' is picked
-                                                                 //assuming initial trail close to true
-
-                            for(qint32 i = 0; i < N; ++i)
-                            {
-                                std::vector<double> tmp( init );
-                                tmp[i] +=  del[i];
-                                x.push_back( tmp );
-                            }
-
-                            x.push_back(init);//x.size()=N+1, x[i].size()=N
-
-                            //xcentriod
-                            std::transform(init.begin(), init.end(), xcentroid_old.begin(), std::bind2nd(std::multiplies<double>(), N+1) );
-                        }//constructing the simplex finished
-
-                        qint32 sample_count = 256;
-
-                        //optimization begins
-                        for(cnt=0; cnt<iterations; ++cnt)
-                        {
-                            for(qint32 i=0; i < N+1; ++i)
-                            {
-                                VectorXd atom_fx = VectorXd::Zero(sample_count);
-
-                                if(gabor_Atom->scale == sample_count && gabor_Atom->translation == floor(sample_count / 2))
-                                    atom_fx = AdaptiveMp::calculate_atom(sample_count, sample_count, floor(sample_count / 2), x[i][2], chn, residuum, RETURNATOM, false);
-
-                                else
-                                    atom_fx = AdaptiveMp::calculate_atom(sample_count, x[i][0], x[i][1], x[i][2], chn, residuum, RETURNATOM, false);
-
-                                //create targetfunction of realGaborAtom and Residuum
-                                double target = 0;
-                                for(qint32 k = 0; k < atom_fx.rows(); k++)
-                                {
-                                    target -=atom_fx[k]*residuum(k,0);
-                                }
-
-                                vf[i] = target;
-                            }
-
-                            x1=0; xn=0; xnp1=0;//find index of max, second max, min of vf.
-
-                            for(quint32 i=0; i < vf.size(); ++i)
-                            {
-                                if(vf[i]<vf[x1])      x1 = i;
-                                if(vf[i]>vf[xnp1])    xnp1 = i;
-                            }
-
-                            xn = x1;
-
-                            for(quint32 i=0; i<vf.size();++i) if(vf[i]<vf[xnp1] && vf[i]>vf[xn])  xn=i;
-
-                            //x1, xn, xnp1 are found
-
-                            std::vector<double> xg(N, 0);//xg: centroid of the N best vertexes
-
-                            for(quint32 i=0; i<x.size(); ++i) if(i!=xnp1) std::transform(xg.begin(), xg.end(), x[i].begin(), xg.begin(), std::plus<double>() );
-
-                            std::transform(xg.begin(), xg.end(), x[xnp1].begin(), xcentroid_new.begin(), std::plus<double>());
-                            std::transform(xg.begin(), xg.end(), xg.begin(), std::bind2nd(std::divides<double>(), N) );
-                            //xg found, xcentroid_new updated
-
-                            //termination condition
-                            double diff=0;          //calculate the difference of the simplex centers
-
-                            //see if the difference is less than the termination criteria
-                            for(qint32 i=0; i<N; ++i) diff += fabs(xcentroid_old[i]-xcentroid_new[i]);
-
-                            if (diff/N < tol) break;              //terminate the optimizer
-                            else xcentroid_old.swap(xcentroid_new); //update simplex center
-
-                            //reflection:
-                            std::vector<double> xr(N,0);
-
-                            for( qint32 i=0; i<N; ++i) xr[i]=xg[i]+a*(xg[i]-x[xnp1][i]);
-                            //reflection, xr found
-
-                            VectorXd atom_fxr = VectorXd::Zero(sample_count);
-
-                            if(gabor_Atom->scale == sample_count && gabor_Atom->translation == floor(sample_count / 2))
-                                atom_fxr = AdaptiveMp::calculate_atom(sample_count, sample_count, floor(sample_count / 2), xr[2], chn, residuum, RETURNATOM, false);
-
-                            else
-                                atom_fxr = AdaptiveMp::calculate_atom(sample_count, xr[0], xr[1], xr[2], chn, residuum, RETURNATOM, false);
-
-                            //create targetfunction of realGaborAtom and Residuum
-                            double fxr = 0;
-                            for(qint32 k = 0; k < atom_fxr.rows(); k++) fxr -=atom_fxr[k]*residuum(k,chn);//ToDo: old residuum(k,0)
-
-                            //double fxr = target;//record function at xr
-
-                            if(vf[x1]<=fxr && fxr<=vf[xn]) std::copy(xr.begin(), xr.end(), x[xnp1].begin());
-
-                            //expansion:
-                            else if(fxr<vf[x1])
-                            {
-                                std::vector<double> xe(N,0);
-
-                                for( qint32 i=0; i<N; ++i) xe[i]=xr[i]+b*(xr[i]-xg[i]);
-
-                                VectorXd atom_fxe = VectorXd::Zero(sample_count);
-
-                                if(gabor_Atom->scale == sample_count && gabor_Atom->translation == floor(sample_count / 2))
-                                    atom_fxe = AdaptiveMp::calculate_atom(sample_count, sample_count, floor(sample_count / 2), xe[2], chn, residuum, RETURNATOM, false);
-
-                                else
-                                    atom_fxe = AdaptiveMp::calculate_atom(sample_count, xe[0], xe[1], xe[2], chn, residuum, RETURNATOM, false);
-
-                                //create targetfunction of realGaborAtom and Residuum
-                                double fxe = 0;
-                                for(qint32 k = 0; k < atom_fxe.rows(); k++) fxe -=atom_fxe[k]*residuum(k,chn);//ToDo: old residuum(k,0)
-
-                                if( fxe < fxr ) std::copy(xe.begin(), xe.end(), x[xnp1].begin() );
-                                else std::copy(xr.begin(), xr.end(), x[xnp1].begin() );
-                            }//expansion finished,  xe is not used outside the scope
-
-                            //contraction:
-                            else if( fxr > vf[xn] )
-                            {
-                                std::vector<double> xc(N,0);
-
-                                for( qint32 i=0; i<N; ++i)
-                                    xc[i]=xg[i]+g*(x[xnp1][i]-xg[i]);
-
-                                if(gabor_Atom->scale == sample_count && gabor_Atom->translation == floor(sample_count / 2))
-                                    atom_fxc_params = AdaptiveMp::calculate_atom(sample_count, sample_count, floor(sample_count / 2), xc[2], chn, residuum, RETURNPARAMETERS, false);
-
-                                else
-                                    atom_fxc_params = AdaptiveMp::calculate_atom(sample_count, xc[0], xc[1], xc[2], chn, residuum, RETURNPARAMETERS, false);
-
-                                VectorXd atom_fxc = gabor_Atom->create_real(gabor_Atom->sample_count, atom_fxc_params[0], atom_fxc_params[1], atom_fxc_params[2], atom_fxc_params[3]);
-
-                                atom_fxc_params[4] = 0;
-
-                                for(qint32 i = 0; i < sample_count; i++)
-                                    atom_fxc_params[4] += atom_fxc[i] * residuum(i, chn);
-
-                                //create targetfunction of realGaborAtom and Residuum
-                                double fxc = 0;
-
-                                for(qint32 k = 0; k < atom_fxc.rows(); k++)
-                                    fxc -=atom_fxc[k]*residuum(k,chn);//ToDo: old residuum(k,0)
-
-                                if( fxc < vf[xnp1] )
-                                    std::copy(xc.begin(), xc.end(), x[xnp1].begin() );
-
-                                else
-                                    for( quint32 i=0; i<x.size(); ++i )
-                                        if( i!=x1 )
-                                            for(qint32 j=0; j<N; ++j)
-                                                x[i][j] = x[x1][j] + h * ( x[i][j]-x[x1][j] );
-                            }//contraction finished, xc is not used outside the scope
-                        }//optimization is finished
-
-                        if(gabor_Atom->scale == sample_count && gabor_Atom->translation == floor(sample_count / 2))
-                            atom_fxc_params = AdaptiveMp::calculate_atom(sample_count, sample_count, floor(sample_count / 2), x[x1][2], chn, residuum, RETURNPARAMETERS, false);
-
-                        else
-                            atom_fxc_params = AdaptiveMp::calculate_atom(sample_count, x[x1][0], x[x1][1], x[x1][2], chn, residuum, RETURNPARAMETERS, false);
-
-                        if(abs(atom_fxc_params[4]) > abs(bestCorrValue) /*&& atom_fxc_params[0] < sample_count && atom_fxc_params[0] > 0*/ && atom_fxc_params[1] < sample_count && atom_fxc_params[1] > 0)//ToDo: find a way to make the simplex not running out of bounds
-                        {
-                            bestCorrValue = atom_fxc_params[4];             //scalarProduct
-                            gabor_Atom->scale              = atom_fxc_params[0];//scale
-                            gabor_Atom->translation        = atom_fxc_params[1];//translation
-                            gabor_Atom->modulation         = atom_fxc_params[2];//phase
-                            gabor_Atom->phase              = atom_fxc_params[3];
-                            gabor_Atom->max_scalar_product   = bestCorrValue;
-                        }
-
-                        if(cnt==iterations)//max number of iteration achieves before tol is satisfied
-                            std::cout<<"Simplex Iteration limit of "<<iterations<<" achieved in channel " << chn << ", result may not be optimal";
-
-                    }//end Maximisation for channels Copyright (C) 2010 Botao Jia
-
-
-                    //-----------------------------------
-
-                    std::cout << "\n" << "===============" << " found parameters " << 1 << "===============" << ":\n\n"<<
-                                 "scale: " << gabor_Atom->scale << " trans: " << gabor_Atom->translation <<
-                                 " modu: " << gabor_Atom->modulation << " phase: " << gabor_Atom->phase << " scalarproduct: " << gabor_Atom->max_scalar_product << "\n";
-
-                    _my_atom_list.append(*gabor_Atom);
-                    //atom_res_list.append(*gabor_Atom);
-                    hasFound = true;
-                }
-                if(hasFound) break;
-            }
-        }        
-        currentDict.close();
 
         ui->lb_IterationsProgressValue->setText(QString::number(iterationsCount));
 
@@ -1793,20 +1508,8 @@ VectorXd MainWindow::calc_fix_mp(QFile &currentDict, VectorXd signalSamples, qin
        ui->tbv_Results->setItem(_my_atom_list.length() - 1, 4, atomPhaseItem);
 
 
-        //recieve the resulting atomparams
-        GaborAtom gaborAtom = _my_atom_list.last();
-
-        VectorXd discret_atom = gaborAtom.create_real(gaborAtom.sample_count, gaborAtom.scale, gaborAtom.translation, gaborAtom.modulation, gaborAtom.phase);
-
-        _atom_sum_matrix.col(0) += gaborAtom.max_scalar_product * discret_atom;
-        _residuum_matrix.col(0) -= gaborAtom.max_scalar_product  * discret_atom;
-        residuum.col(0) -= gaborAtom.max_scalar_product  * discret_atom;
-        update();
-        _tbv_is_loading = false;
-
-    }
     update();
-    iterationsCount--;
+
     if(iterationsCount > 0)
     {
         QFile ownDict(QString("Matching-Pursuit-Toolbox/%1.dict").arg(ui->cb_Dicts->currentText()));
