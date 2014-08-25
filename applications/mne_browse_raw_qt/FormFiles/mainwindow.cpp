@@ -98,11 +98,13 @@ MainWindow::~MainWindow()
 
 void MainWindow::setupModel()
 {
+    //Setup data model
     if(m_qFileRaw.exists())
         m_pRawModel = new RawModel(m_qFileRaw,this);
     else
         m_pRawModel = new RawModel(this);
 
+    //Setup event model and sorting
     m_pEventModel = new EventModel(this);
 
     //Set fiffInfo in event model
@@ -154,7 +156,6 @@ void MainWindow::setupWindowWidgets()
     //Create dockble event window - QTDesigner used - see /FormFiles
     m_pEventWindow = new EventWindow(this);
     addDockWidget(Qt::RightDockWidgetArea, m_pEventWindow);
-    m_pEventWindow->hide();
 
     //Create dockble event window - QTDesigner used - see /FormFiles
     m_pInformationWindow = new InformationWindow(this);

@@ -190,7 +190,7 @@ private:
     FiffInfo        m_fiffInfo;         /**< fiff info of whole fiff file */
 
     int             m_iFirstSample;     /**< holds the first/starting sample of the fiff data file */
-    int             m_iCurrentMarkerPo; /**< holds the current marker position */
+    int             m_iCurrentMarkerPos;/**< holds the current marker position */
     QSettings       m_qSettings;        /**< setting paramter to access globally defined values. see rawsettings.cpp and rawsettings.h */
 };
 
