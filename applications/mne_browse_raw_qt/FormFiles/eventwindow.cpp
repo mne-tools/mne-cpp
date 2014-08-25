@@ -77,6 +77,7 @@ EventWindow::~EventWindow()
 
 void EventWindow::initEventViewSettings()
 {
+    //Resize columns to contents
     ui->m_tableView_eventTableView->resizeColumnsToContents();
 
     //Connect selection in event window to jumpEvent slot
@@ -127,7 +128,7 @@ bool EventWindow::event(QEvent * event)
             for(int i = 0; i<indexList.size(); i++)
                 m_pMainWindow->m_pEventModel->removeRow(indexList.at(i).row());
 
-            m_pMainWindow->m_pEventModel->removeRow(ui->m_tableView_eventTableView->selectionModel()->currentIndex().row());
+//            m_pMainWindow->m_pEventModel->removeRow(ui->m_tableView_eventTableView->selectionModel()->currentIndex().row());
         }
     }
 
@@ -142,7 +143,7 @@ void EventWindow::jumpToEvent(const QModelIndex & current, const QModelIndex & p
     Q_UNUSED(previous);
 
     if(ui->m_checkBox_activateEvents->isChecked()) {
-        //Always get the first column 0 (sample) of the model
+        //Always get the first column 0 (sample) of the model - Note: Need to map index from sorting model back to source model
         QModelIndex index = m_pMainWindow->m_pEventModel->index(current.row(), 0);
 
         //Get the sample value

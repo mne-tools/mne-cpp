@@ -363,6 +363,7 @@ void DataWindow::setMarkerSampleLabel()
 
 void DataWindow::addEventToEventModel()
 {
+    m_pMainWindow->m_pEventModel->setCurrentMarkerPos(m_iCurrentMarkerSample);
     m_pMainWindow->m_pEventModel->insertRow(0, QModelIndex());
 }
 
@@ -371,7 +372,6 @@ void DataWindow::addEventToEventModel()
 
 void DataWindow::updateMarkerPosition()
 {
-    qDebug()<<"updateMarkerPosition";
     //Get boundary rect coordinates for table view
     QRect boundingRect = ui->m_tableView_rawTableView->geometry();
 
@@ -383,12 +383,23 @@ void DataWindow::updateMarkerPosition()
 
     m_pDataMarker->move(m_pDataMarker->x(), boundingRect.y()+1);
 
-    boundingRect.setLeft(boundingRect.x() + ui->m_tableView_rawTableView->verticalHeader()->width());
+    boundingRect.setLeft(boundingRect.left() + ui->m_tableView_rawTableView->verticalHeader()->width());
     boundingRect.setRight(boundingRect.right() - ui->m_tableView_rawTableView->verticalScrollBar()->width() + 1);
 
     //Create Region from bounding rect - this region is used to restrain the marker inside the data view
     QRegion region(boundingRect);
     m_pDataMarker->setMovementBoundary(region);
+
+    //If marker is outside of the bounding rect move to edges of bounding rect
+    if(m_pDataMarker->pos().x() < boundingRect.left()) {
+        m_pDataMarker->move(boundingRect.left(), boundingRect.y()+1);
+        setMarkerSampleLabel();
+    }
+
+    if(m_pDataMarker->pos().x() > boundingRect.right()) {
+        m_pDataMarker->move(boundingRect.right()-2, boundingRect.y()+1);
+        setMarkerSampleLabel();
+    }
 
     //Set marker size to table view size minus horizontal scroll bar height
     m_pDataMarker->resize(3, boundingRect.height() - ui->m_tableView_rawTableView->horizontalScrollBar()->height()-1);

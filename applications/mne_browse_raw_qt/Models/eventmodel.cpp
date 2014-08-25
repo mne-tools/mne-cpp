@@ -237,14 +237,31 @@ QVariant EventModel::data(const QModelIndex &index, int role) const
 
 bool EventModel::insertRows(int position, int span, const QModelIndex & parent)
 {
-    qDebug()<<"inserting row";
     Q_UNUSED(parent);
     beginInsertRows(QModelIndex(), position, position+span-1);
 
-    for (int i = 0; i < span; ++i) {
-        m_dataSamples.insert(position, 0);
-        m_dataTypes.insert(position, 1);
-        m_dataIsUserEvent.insert(position, 1);
+    if(m_dataSamples.isEmpty()) {
+        m_dataSamples.insert(0, m_iCurrentMarkerPos);
+        m_dataTypes.insert(0, 1);
+        m_dataIsUserEvent.insert(0, 1);
+    }
+    else {
+        for (int i = 0; i < span; ++i) {
+            for(int t = 0; t<m_dataSamples.size(); t++) {
+                if(m_dataSamples[t] >= m_iCurrentMarkerPos) {
+                    m_dataSamples.insert(t, m_iCurrentMarkerPos);
+                    m_dataTypes.insert(t, 1);
+                    m_dataIsUserEvent.insert(t, 1);
+                    break;
+                }
+
+                if(t == m_dataSamples.size()-1) {
+                    m_dataSamples.append(m_iCurrentMarkerPos);
+                    m_dataTypes.append(1);
+                    m_dataIsUserEvent.append(1);
+                }
+            }
+        }
     }
 
     endInsertRows();
@@ -261,7 +278,7 @@ bool EventModel::removeRows(int position, int span, const QModelIndex & parent)
 
     for (int i = 0; i < span; ++i) {
         //Only user events can be deleted
-        if(m_dataIsUserEvent.at(i) == 1) {
+        if(m_dataIsUserEvent[position] == 1) {
             m_dataSamples.removeAt(position);
             m_dataTypes.removeAt(position);
             m_dataIsUserEvent.removeAt(position);
@@ -343,7 +360,8 @@ void EventModel::setFirstSample(int firstSample)
 
 void EventModel::setCurrentMarkerPos(int markerPos)
 {
-    m_iCurrentMarkerPo = markerPos;
+    //add m_iFirstSample because m_iFirstSample gets subtracted when data is asked from this model
+    m_iCurrentMarkerPos = markerPos + m_iFirstSample;
 }
 
 
