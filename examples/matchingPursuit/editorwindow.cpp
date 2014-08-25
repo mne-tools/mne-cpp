@@ -101,6 +101,7 @@ QList<qreal> chirpList;
 qint32 atomCount = 1;
 
 EditorWindow::AtomType atomType;
+MainWindow main_window;
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -110,6 +111,8 @@ EditorWindow::AtomType atomType;
 //contructor
 EditorWindow::EditorWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::EditorWindow)
 {
+    //ToDo: Parent übergeben
+    //main_window = (MainWindow)parent;
     this->setAccessibleName("simple");
     ui->setupUi(this);
     read_dicts();

@@ -89,7 +89,7 @@ using namespace MNELIB;
 
 namespace Ui
 {
-    class MainWindow;  
+    class MainWindow;
 }
 
 
@@ -112,8 +112,9 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();
+    ~MainWindow();    
 
+    void fill_dict_combobox();
     typedef QList<GaborAtom> gabor_atom_list;
 
 private slots:
@@ -217,7 +218,6 @@ private slots:
     */
     void recieve_result(qint32 current_iteration, qint32 max_iterations, qreal current_energy, qreal max_energy, gabor_atom_list atom_res_list);
     //==========================================================================================================
-
 
     void calc_thread_finished();
     void on_actionCreate_treebased_dictionary_triggered();

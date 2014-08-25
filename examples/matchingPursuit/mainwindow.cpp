@@ -188,7 +188,7 @@ MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::
     ui->tbv_Results->setColumnWidth(1,45);
     ui->tbv_Results->setColumnWidth(2,40);
     ui->tbv_Results->setColumnWidth(3,40);
-    ui->tbv_Results->setColumnWidth(4,40);
+    ui->tbv_Results->setColumnWidth(4,40);    
 
     this->cb_model = new QStandardItemModel;
     connect(this->cb_model, SIGNAL(dataChanged ( const QModelIndex&, const QModelIndex&)), this, SLOT(cb_selection_changed(const QModelIndex&, const QModelIndex&)));
@@ -256,12 +256,7 @@ MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::
         configFile.close();
     }
 
-    QStringList filterList;
-    filterList.append("*.dict");
-    QFileInfoList fileList =  dir.entryInfoList(filterList);
-
-    for(int i = 0; i < fileList.length(); i++)
-        ui->cb_Dicts->addItem(QIcon(":/images/icons/DictIcon.png"), fileList.at(i).baseName());
+    fill_dict_combobox();
 }
 
 //*************************************************************************************************************************************
@@ -272,6 +267,17 @@ MainWindow::~MainWindow()
 }
 
 //*************************************************************************************************************************************
+
+void MainWindow::fill_dict_combobox()
+{
+    QDir dir("Matching-Pursuit-Toolbox");
+    QStringList filterList;
+    filterList.append("*.dict");
+    QFileInfoList fileList =  dir.entryInfoList(filterList);
+
+    for(int i = 0; i < fileList.length(); i++)
+        ui->cb_Dicts->addItem(QIcon(":/images/icons/DictIcon.png"), fileList.at(i).baseName());
+}
 
 void MainWindow::open_file()
 {
@@ -2019,9 +2025,9 @@ QStringList MainWindow::correlation(VectorXd signalSamples, QList<qreal> atomSam
 
 // Opens Dictionaryeditor
 void MainWindow::on_actionW_rterbucheditor_triggered()
-{
-    EditorWindow *x = new EditorWindow();
-    x->show();
+{        
+    EditorWindow *editor_window = new EditorWindow(this);
+    editor_window->show();
 }
 
 //*****************************************************************************************************************
