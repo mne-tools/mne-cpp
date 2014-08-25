@@ -1,15 +1,14 @@
 //=============================================================================================================
 /**
-* @file     NoiseEstimatesetupwidget.cpp
-* @author   Limin Sun <liminsun@nmr.mgh.haravrd.edu>
-*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     frequencyspectrumsettingswidget.cpp
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     July, 2014
+* @date     May, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Limin Sun, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,7 +29,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the NoiseEstimateSetupWidget class.
+* @brief    Implementation of the FrequencySpectrumSettingsWidget Class.
 *
 */
 
@@ -39,13 +38,18 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "noiseestimatesetupwidget.h"
-#include "../noiseestimate.h"
+#include "frequencyspectrumsettingswidget.h"
+#include "../frequencyspectrumwidget.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// Qt INCLUDES
 //=============================================================================================================
+
+#include <QLabel>
+#include <QGridLayout>
+#include <QDoubleValidator>
 
 #include <QDebug>
 
@@ -55,7 +59,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace NoiseEstimatePlugin;
+using namespace XDISPLIB;
 
 
 //*************************************************************************************************************
@@ -63,108 +67,48 @@ using namespace NoiseEstimatePlugin;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-NoiseEstimateSetupWidget::NoiseEstimateSetupWidget(NoiseEstimate* toolbox, QWidget *parent)
-: QWidget(parent)
-, m_pNoiseEstimate(toolbox)
+FrequencySpectrumSettingsWidget::FrequencySpectrumSettingsWidget(FrequencySpectrumWidget *parent)
+: m_pFrequencySpectrumWidget(parent)
 {
-    ui.setupUi(this);
+    this->setWindowTitle("Frequency Spectrum Settings");
+    this->setMinimumWidth(330);
+    this->setMaximumWidth(330);
 
-    init();
+    QGridLayout* t_pGridLayout = new QGridLayout;
 
-    connect(ui.m_qComboBoxnFFT, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &NoiseEstimateSetupWidget::chgnFFT);
+    QLabel *t_pLabelLower = new QLabel;
+    t_pLabelLower->setText("Lower Frequency");
+    m_pSliderLowerBound = new QSlider(Qt::Horizontal);
+    QLabel *t_pLabelUpper = new QLabel;
+    t_pLabelUpper->setText("Upper Frequency");
+    m_pSliderUpperBound = new QSlider(Qt::Horizontal);
+
+    m_pSliderUpperBound->setMinimum(0);
+    m_pSliderUpperBound->setMaximum(100);
+
+    connect(m_pSliderLowerBound, &QSlider::valueChanged, this, &FrequencySpectrumSettingsWidget::updateValue);
+    connect(m_pSliderUpperBound, &QSlider::valueChanged, this, &FrequencySpectrumSettingsWidget::updateValue);
+
+    t_pGridLayout->addWidget(t_pLabelLower,0,0);
+    t_pGridLayout->addWidget(m_pSliderLowerBound,0,1);
+    t_pGridLayout->addWidget(t_pLabelUpper,1,0);
+    t_pGridLayout->addWidget(m_pSliderUpperBound,1,1);
+
+    this->setLayout(t_pGridLayout);
 
 }
 
 
 //*************************************************************************************************************
 
-NoiseEstimateSetupWidget::~NoiseEstimateSetupWidget()
+void FrequencySpectrumSettingsWidget::updateValue(qint32 value)
 {
+    Q_UNUSED(value)
 
+    if(m_pSliderLowerBound->value() > m_pSliderUpperBound->value())
+        m_pSliderLowerBound->setValue(m_pSliderUpperBound->value());
+    else if(m_pSliderUpperBound->value() < m_pSliderLowerBound->value())
+        m_pSliderUpperBound->setValue(m_pSliderLowerBound->value());
+
+    emit settingsChanged();
 }
-
-
-//*************************************************************************************************************
-
-void NoiseEstimateSetupWidget::init()
-{
-    ui.m_qComboBoxnFFT->insertItem(0, "512");
-    ui.m_qComboBoxnFFT->insertItem(1, "1024");
-    ui.m_qComboBoxnFFT->insertItem(2, "2048");
-    ui.m_qComboBoxnFFT->insertItem(3, "4096");
-    ui.m_qComboBoxnFFT->insertItem(4, "8192");
-    ui.m_qComboBoxnFFT->insertItem(5, "16384");
-
-    qint32 i = 0;
-    for(i = 0; i < ui.m_qComboBoxnFFT->count(); ++i)
-        if(ui.m_qComboBoxnFFT->itemText(i).toInt() == m_pNoiseEstimate->m_iFFTlength)
-            break;
-
-    ui.m_qComboBoxnFFT->setCurrentIndex(i);
-}
-
-
-//*************************************************************************************************************
-
-void NoiseEstimateSetupWidget::chgnFFT(int idx)
-{
-//    qDebug() << "ui.m_qComboBoxnFFT->itemData(idx).toInt();" << ui.m_qComboBoxnFFT->itemText(idx).toInt();
-    m_pNoiseEstimate->m_iFFTlength = ui.m_qComboBoxnFFT->itemText(idx).toInt();
-}
-
-
-//*************************************************************************************************************
-
-void NoiseEstimateSetupWidget::Replot(/*MatrixXd tmp*/)
-{
-    /*
-    int cols = tmp.cols();
-    int chanIndx = 1;// ui->m_Qcb_channel->currentIndex();//
-    // plot the real time data here
-    settings.minX = 0.0;
-    settings.maxX = cols;
-    settings.minY = mmin(tmp,chanIndx);
-    settings.maxY = mmax(tmp,chanIndx);
-    settings.xlabel = QString("%1 samples/second").arg(1000) ;
-    settings.ylabel = QString("Power Spectrum [DB/Hz]");
-
-    d_timeplot->setPlotSettings(settings);
-//    qDebug()<<"minY"<<settings.minY<<"maxY"<<settings.maxY;
-
-    QVector <QPointF> F;
-
-    for(int i=0; i<cols;i++)
-        F.append(QPointF(i,tmp(chanIndx,i)));
-
-    d_timeplot->setCurveData(0,F);
-    d_timeplot->show();
-*/
-}
-
-//float NoiseEstimateSetupWidget::mmin(MatrixXd tmp,int chan)
-//{
-//    int cols = tmp.cols();
-
-//    float ret = tmp(chan,0);
-//    for (int i=0; i<cols; i++)
-//    {
-//        if (tmp(chan,i) < ret)
-//            ret = tmp(chan,i);
-//    }
-
-//    return ret;
-//}
-
-//float NoiseEstimateSetupWidget::mmax(MatrixXd tmp,int chan)
-//{
-//    int cols = tmp.cols();
-
-//    float ret = tmp(chan,0);
-//    for (int i=0; i<cols; i++)
-//    {
-//        if (tmp(chan,i) > ret)
-//            ret = tmp(chan,i);
-//    }
-
-//    return ret;
-//}

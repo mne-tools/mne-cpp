@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     noise_estimate_global.h
+* @file     noiseestimate_global.h
 * @author   Limin Sun <liminsun@nmr.mgh.harvard.edu>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
@@ -34,8 +34,8 @@
 *
 */
 
-#ifndef NOISE_ESTIMATE_GLOBAL_H
-#define NOISE_ESTIMATE_GLOBAL_H
+#ifndef NOISEESTIMATE_GLOBAL_H
+#define NOISEESTIMATE_GLOBAL_H
 
 
 //*************************************************************************************************************
@@ -57,4 +57,4 @@
 #  define NOISE_ESTIMATESHARED_EXPORT Q_DECL_IMPORT   /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
 
-#endif // NOISE_ESTIMATE_GLOBAL_H
+#endif // NOISEESTIMATE_GLOBAL_H

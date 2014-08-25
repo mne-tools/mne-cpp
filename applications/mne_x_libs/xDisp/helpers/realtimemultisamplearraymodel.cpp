@@ -356,3 +356,13 @@ void RealTimeMultiSampleArrayModel::toggleFreeze(const QModelIndex &)
     QVector<int> roles; roles << Qt::DisplayRole;
     emit dataChanged(topLeft, bottomRight, roles);
 }
+
+
+//*************************************************************************************************************
+
+void RealTimeMultiSampleArrayModel::setScaling(const QMap< qint32,float >& p_qMapChScaling)
+{
+    beginResetModel();
+    m_qMapChScaling = p_qMapChScaling;
+    endResetModel();
+}

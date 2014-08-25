@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
-* @file     frequencyspectrumwidget.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     rtnoise.h
+* @author   Limin Sun <liminsun@nmr.mgh.harvard.edu>;
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     February, 2013
+* @date     August, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Limin Sun, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,24 +30,36 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Declaration of the FrequencySpectrumWidget Class.
+* @brief     RtNoise class declaration.
 *
 */
 
-#ifndef FREQUENCYSPECTRUMWIDGET_H
-#define FREQUENCYSPECTRUMWIDGET_H
-
+#ifndef RTNOISE_H
+#define RTNOISE_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "xdisp_global.h"
-#include "newmeasurementwidget.h"
-#include "helpers/frequencyspectrummodel.h"
-#include "helpers/frequencyspectrumdelegate.h"
-#include "helpers/frequencyspectrumsettingswidget.h"
+#include "rtinv_global.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FIFF INCLUDES
+//=============================================================================================================
+
+#include <fiff/fiff_cov.h>
+#include <fiff/fiff_info.h>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// Generics INCLUDES
+//=============================================================================================================
+
+#include <generics/circularmatrixbuffer.h>
 
 
 //*************************************************************************************************************
@@ -54,38 +67,26 @@
 // QT INCLUDES
 //=============================================================================================================
 
+#include <QThread>
+#include <QMutex>
 #include <QSharedPointer>
-#include <QList>
-#include <QAction>
-#include <QSpinBox>
-#include <QDoubleSpinBox>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// Eigen INCLUDES
 //=============================================================================================================
 
-class QTime;
+#include <Eigen/Core>
+#include <unsupported/Eigen/FFT>
 
-namespace XMEASLIB
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE INVRTLIB
+//=============================================================================================================
+
+namespace RTINVLIB
 {
-class FrequencySpectrum;
-}
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE XDISPLIB
-//=============================================================================================================
-
-namespace XDISPLIB
-{
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
 
 
 //*************************************************************************************************************
@@ -93,123 +94,141 @@ namespace XDISPLIB
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace XMEASLIB;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// ENUMERATIONS
-//=============================================================================================================
-
-////=============================================================================================================
-///**
-//* Tool enumeration.
-//*/
-//enum Tool
-//{
-//    Freeze     = 0,       /**< Freezing tool. */
-//    Annotation = 1        /**< Annotation tool. */
-//};
+using namespace Eigen;
+using namespace IOBuffer;
+using namespace FIFFLIB;
 
 
 //=============================================================================================================
 /**
-* DECLARE CLASS FrequencySpectrumWidget
+* Real-time noise Spectrum estimation
 *
-* @brief The FrequencySpectrumWidget class provides a equalizer display
+* @brief Real-time Noise estimation
 */
-class XDISPSHARED_EXPORT FrequencySpectrumWidget : public NewMeasurementWidget
+class RTINVSHARED_EXPORT RtNoise : public QThread
 {
     Q_OBJECT
-
-    friend class FrequencySpectrumSettingsWidget;
 public:
+    typedef QSharedPointer<RtNoise> SPtr;             /**< Shared pointer type for RtNoise. */
+    typedef QSharedPointer<const RtNoise> ConstSPtr;  /**< Const shared pointer type for RtNoise. */
+
     //=========================================================================================================
     /**
-    * Constructs a FrequencySpectrumWidget which is a child of parent.
+    * Creates the real-time covariance estimation object.
     *
-    * @param [in] pNE           pointer to noise estimation measurement.
-    * @param [in] pTime         pointer to application time.
-    * @param [in] parent        pointer to parent widget; If parent is 0, the new NumericWidget becomes a window. If parent is another widget, NumericWidget becomes a child window inside parent. NumericWidget is deleted when its parent is deleted.
+    * @param[in] p_iMaxSamples      Number of samples to use for each data chunk
+    * @param[in] p_pFiffInfo        Associated Fiff Information
+    * @param[in] parent     Parent QObject (optional)
     */
-    FrequencySpectrumWidget(QSharedPointer<FrequencySpectrum> pNE, QSharedPointer<QTime> &pTime, QWidget* parent = 0);
+    explicit RtNoise(qint32 p_iMaxSamples, FiffInfo::SPtr p_pFiffInfo, QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the FrequencySpectrumWidget.
+    * Destroys the Real-time noise estimation object.
     */
-    ~FrequencySpectrumWidget();
+    ~RtNoise();
 
     //=========================================================================================================
     /**
-    * Is called when new data are available.
+    * Slot to receive incoming data.
     *
-    * @param [in] pMeasurement  pointer to measurement -> not used because its direct attached to the measurement.
+    * @param[in] p_DataSegment  Data to estimate the spectrum from -> ToDo Replace this by shared data pointer
     */
-    virtual void update(XMEASLIB::NewMeasurement::SPtr pMeasurement);
+    void append(const MatrixXd &p_DataSegment);
 
     //=========================================================================================================
     /**
-    * Is called when new data are available.
+    * Returns true if is running, otherwise false.
+    *
+    * @return true if is running, false otherwise
     */
-    virtual void getData();
-
-    //=========================================================================================================
-    /**
-    * Initialise the FrequencySpectrumWidget.
-    */
-    virtual void init();
+    inline bool isRunning();
 
 
     //=========================================================================================================
     /**
-    * Initialise the SettingsWidget.
+    * Starts the RtNoise by starting the producer's thread.
+    *
+    * @return true if succeeded, false otherwise
     */
-    void initSettingsWidget();
-
-
-    virtual bool eventFilter(QObject * watched, QEvent * event);
-
-private:
+    virtual bool start();
 
     //=========================================================================================================
     /**
-    * Broadcast settings of frequency spectrum settings widget
+    * Stops the RtNoise by stopping the producer's thread.
+    *
+    * @return true if succeeded, false otherwise
     */
-    void broadcastSettings();
-
-    //=========================================================================================================
-    /**
-    * Show the frequency spectrum settings widget
-    */
-    void showFrequencySpectrumSettingsWidget();
-
-
-    QAction* m_pActionFrequencySettings;        /**< Frequency spectrum settings action */
-
-    FrequencySpectrumModel*      m_pFSModel;    /**< FS model */
-    FrequencySpectrumDelegate*   m_pFSDelegate; /**< FS delegate */
-    QTableView* m_pTableView;                   /**< the QTableView being part of the model/view framework of Qt */
-
-
-    QSharedPointer<FrequencySpectrumSettingsWidget> m_pFrequencySpectrumSettingsWidget;   /**< Frequency spectrum settings modality widget. */
-
-
-    QSharedPointer<FrequencySpectrum> m_pFS;    /**< The frequency spectrum measurement. */
-
-    float m_fLowerFrqBound;                    /**< Lower frequency bound */
-    float m_fUpperFrqBound;                    /**< Upper frequency bound */
-
-    bool m_bInitialized;                        /**< Is Initialized */
+    virtual bool stop();
 
 signals:
     //=========================================================================================================
     /**
-    * Signals for sending the mouse location to the delegate
+    * Signal which is emitted when a new data Matrix is estimated.
+    *
+    * @param[out]
     */
-    void sendMouseLoc(int row, int x, int y, QRect visRect);
+    void SpecCalculated(Eigen::MatrixXd);
+
+protected:
+    //=========================================================================================================
+    /**
+    * The starting point for the thread. After calling start(), the newly created thread calls this function.
+    * Returning from this method will end the execution of the thread.
+    * Pure virtual method inherited by QThread.
+    */
+    virtual void run();
+
+private:
+    QMutex      mutex;                  /**< Provides access serialization between threads*/
+
+    quint32      m_iMaxSamples;         /**< Maximal amount of samples received, before covariance is estimated.*/
+
+    quint32      m_iNewMaxSamples;      /**< New maximal amount of samples received, before covariance is estimated.*/
+
+    FiffInfo::SPtr  m_pFiffInfo;        /**< Holds the fiff measurement information. */
+
+    bool        m_bIsRunning;           /**< Holds if real-time Covariance estimation is running.*/
+
+    CircularMatrixBuffer<double>::SPtr m_pRawMatrixBuffer;   /**< The Circular Raw Matrix Buffer. */
+
+    double m_Fs;
+
+    qint32 m_iFFTlength;
+
+protected:
+    int NumOfBlocks;
+    int BlockSize  ;
+    int Sensors    ;
+    int BlockIndex ;
+
+    MatrixXd CircBuf;
+
+public:
+    MatrixXd SpecData;
+    QMutex ReadMutex;
+
+    bool ReadDone;
+    bool CanRead;
+    bool SendDataToBuffer;
+
 };
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INLINE DEFINITIONS
+//=============================================================================================================
+
+inline bool RtNoise::isRunning()
+{
+    return m_bIsRunning;
+}
 
 } // NAMESPACE
 
-#endif // FREQUENCYSPECTRUMWIDGET_H
+#ifndef metatype_matrix
+#define metatype_matrix
+Q_DECLARE_METATYPE(Eigen::MatrixXd); /**< Provides QT META type declaration of the MatrixXd type. For signal/slot usage.*/
+#endif
+
+#endif // RtNoise_H
