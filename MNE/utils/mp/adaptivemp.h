@@ -74,6 +74,7 @@
 //=============================================================================================================
 
 #include <QThread>
+#include <QtConcurrent/QtConcurrent>
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -202,9 +203,10 @@ public:
 public slots:
 
     void send_result();
-    QList<GaborAtom> matching_pursuit (MatrixXd signal, qint32 max_iterations, qreal epsilon, bool fix_phase);
-    void process();
-    void recieve_input(MatrixXd signal, qint32 max_iterations, qreal epsilon, bool fix_phase);
+    QList<GaborAtom> matching_pursuit (MatrixXd signal, qint32 max_iterations, qreal epsilon, bool fix_phase, bool boost, qint32 simplex_it,
+                                       qreal simplex_reflection, qreal simplex_expansion, qreal simplex_contraction, qreal simplex_full_contraction);
+    void recieve_input(MatrixXd signal, qint32 max_iterations, qreal epsilon, bool fix_phase, bool boost, qint32 simplex_it,
+                       qreal simplex_reflection, qreal simplex_expansion, qreal simplex_contraction, qreal simplex_full_contraction);
 
     //=========================================================================================================
 

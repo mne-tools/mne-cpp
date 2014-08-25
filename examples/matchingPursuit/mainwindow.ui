@@ -603,6 +603,8 @@
     <addaction name="actionErweiterter_W_rterbucheditor"/>
     <addaction name="actionAtomformeleditor"/>
     <addaction name="actionCreate_treebased_dictionary"/>
+    <addaction name="separator"/>
+    <addaction name="actionSettings"/>
    </widget>
    <widget class="QMenu" name="menuInfo">
     <property name="title">
@@ -729,6 +731,11 @@
    </property>
    <property name="text">
     <string>create treebased dictionary</string>
+   </property>
+  </action>
+  <action name="actionSettings">
+   <property name="text">
+    <string>settings</string>
    </property>
   </action>
  </widget>
