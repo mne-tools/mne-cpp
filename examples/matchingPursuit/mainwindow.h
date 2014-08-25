@@ -230,7 +230,6 @@ private slots:
     void on_sb_sample_count_valueChanged(int arg1);
     void on_cb_all_select_clicked();
     void on_time_out();
-
     void on_actionSettings_triggered();
 
 signals:
@@ -327,7 +326,7 @@ private:
     QList<qreal> norm_signal(QList<qreal> signalSamples);
     QStringList correlation(VectorXd signalSamples, QList<qreal> atomSamples, QString atomName);
     void calc_fix_mp(QFile& dictionary, MatrixXd signal, TruncationCriterion criterion);
-
+    void closeEvent(QCloseEvent * event);
 };
 
 //*************************************************************************************************************

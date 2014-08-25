@@ -131,6 +131,9 @@ MatrixXd _real_residuum_matrix(0, 0);
 QTime _counter_time(0,0);
 QTimer *_counter_timer = new QTimer();
 
+
+//QSettings _settings;
+
 //*************************************************************************************************************
 //=============================================================================================================
 // MAIN
@@ -260,16 +263,31 @@ MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::
     }
 
     fill_dict_combobox();
+
+    QSettings settings;
+    QSize size = settings.value("size", QSize(1050, 700)).toSize();
+    resize(size);
+
 }
 
 //*************************************************************************************************************************************
 
 MainWindow::~MainWindow()
-{
+{    
     delete ui;
 }
 
 //*************************************************************************************************************************************
+
+void MainWindow::closeEvent(QCloseEvent * event)
+{
+    QSettings settings;
+    settings.setValue("size", size());
+    event->accept();
+}
+
+//*************************************************************************************************************************************
+
 
 void MainWindow::fill_dict_combobox()
 {
@@ -426,8 +444,7 @@ void MainWindow::read_fiff_ave(QString file_name)
 
 qint32 MainWindow::read_fiff_file(QString fileName)
 {
-    QFile t_fileRaw(fileName);
-    bool in_samples = false;
+    QFile t_fileRaw(fileName);    
     bool keep_comp = true;
 
     //
@@ -506,11 +523,7 @@ qint32 MainWindow::read_fiff_file(QString fileName)
     //   times output argument is optional
     //
     bool readSuccessful = false;
-
-    if (in_samples)
-        readSuccessful = raw.read_raw_segment(_datas, _times, (qint32)_from, (qint32)_to, picks);
-    else
-        readSuccessful = raw.read_raw_segment_times(_datas, _times, _from, _to, picks);
+    readSuccessful = raw.read_raw_segment_times(_datas, _times, _from, _to, picks);
 
     if (!readSuccessful)
     {
@@ -525,11 +538,11 @@ qint32 MainWindow::read_fiff_file(QString fileName)
     _sample_rate = ui->sb_sample_rate->value();
 
     //ToDo: read all channels, or only a few?!
-    qint32 cols = 305;
-    if(_datas.cols() <= cols)   cols = _datas.cols();
-    _signal_matrix.resize(_datas.cols(),cols);
+    qint32 rows = 305;
+    if(_datas.rows() <= rows)   rows = _datas.rows();
+    _signal_matrix.resize(_datas.cols(),rows);
 
-    for(qint32 channels = 0; channels < cols; channels++)
+    for(qint32 channels = 0; channels < rows; channels++)
         _signal_matrix.col(channels) = _datas.row(channels);
 
     //std::cout << _datas.block(0,0,10,10) << std::endl;
@@ -1242,7 +1255,7 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
     ui->tbv_Results->setItem(atom_res_list.length() - 1, 1, atomScaleItem);
     ui->tbv_Results->setItem(atom_res_list.length() - 1, 2, atomTranslationItem);
     ui->tbv_Results->setItem(atom_res_list.length() - 1, 3, atomModulationItem);
-    ui->tbv_Results->setItem(atom_res_list.length() - 1, 4, atomPhaseItem);
+    ui->tbv_Results->setItem(atom_res_list.length() - 1, 4, atomPhaseItem);    
 
     qint32 prgrsbar_adapt = 99;
 
@@ -1373,6 +1386,10 @@ void MainWindow::calc_thread_finished()
 
     _tbv_is_loading = false;
 
+    // ToDo: Sort
+    //ui->tbv_Results->sortItems(0, Qt::AscendingOrder);
+    update();
+
 }
 
 //*************************************************************************************************************
@@ -1399,25 +1416,33 @@ void MainWindow::calc_adaptiv_mp(MatrixXd signal, TruncationCriterion criterion)
     connect(adaptive_Mp_Thread, SIGNAL(finished()), this, SLOT(calc_thread_finished()));
     connect(adaptive_Mp_Thread, SIGNAL(finished()), adaptive_Mp_Thread, SLOT(deleteLater()));
 
+    QSettings settings;
+    bool fixphase = settings.value("fixPhase", false).toBool();
+    bool isBoost = settings.value("isBoost", true).toBool();
+    qint32 iterations = settings.value("adaptive_iterations", 1E3).toInt();
+    qreal reflection = settings.value("adaptive_reflection", 1.00).toDouble();
+    qreal expansion = settings.value("adaptive_expansion", 0.20).toDouble();
+    qreal contraction = settings.value("adaptive_contraction", 0.5).toDouble();
+    qreal fullcontraction = settings.value("adaptive_fullcontraction", 0.50).toDouble();
     switch(criterion)
     {
         case Iterations:
         {
-            emit send_input(signal, ui->sb_Iterations->value(), qreal(MININT32), ui->chb_fix_phase->isChecked(), 1, 1E3, 1.0, 0.2, 0.5, 0.5);
+            emit send_input(signal, ui->sb_Iterations->value(), qreal(MININT32), fixphase, isBoost, iterations, reflection, expansion, contraction, fullcontraction);
             adaptive_Mp_Thread->start();
         }
         break;
 
         case SignalEnergy:
         {
-            emit send_input(signal, MAXINT32, res_energy, ui->chb_fix_phase->isChecked(), 1, 1E3, 1.0, 0.2, 0.5, 0.5);
+            emit send_input(signal, MAXINT32, res_energy, fixphase, isBoost, iterations, reflection, expansion, contraction, fullcontraction);
             adaptive_Mp_Thread->start();        
         }
         break;
 
         case Both:
         {           
-            emit send_input(signal, ui->sb_Iterations->value(), res_energy, ui->chb_fix_phase->isChecked(), 1, 1E3, 1.0, 0.2, 0.5, 0.5);
+            emit send_input(signal, ui->sb_Iterations->value(), res_energy,fixphase, isBoost, iterations, reflection, expansion, contraction, fullcontraction);
             adaptive_Mp_Thread->start();
         }
         break;
@@ -1670,7 +1695,7 @@ QStringList MainWindow::correlation(VectorXd signalSamples, QList<qreal> atomSam
     qreal sum = 0;
     qint32 index = 0;
     qreal maximum = 0;
-    qreal sumAtom = 0;
+    //qreal sumAtom = 0;
 
     VectorXd originalSignalList = signalSamples;
     QList<qreal> tempList;
@@ -1909,5 +1934,4 @@ void MainWindow::on_actionSettings_triggered()
 {
     settingwindow *set = new settingwindow();
     set->show();
-
 }
