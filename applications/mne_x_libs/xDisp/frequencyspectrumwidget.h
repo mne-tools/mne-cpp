@@ -167,6 +167,9 @@ public:
     */
     void initSettingsWidget();
 
+
+    virtual bool eventFilter(QObject * watched, QEvent * event);
+
 private:
 
     //=========================================================================================================
@@ -198,6 +201,13 @@ private:
     float m_fUpperFrqBound;                    /**< Upper frequency bound */
 
     bool m_bInitialized;                        /**< Is Initialized */
+
+signals:
+    //=========================================================================================================
+    /**
+    * Signals for sending the mouse location to the delegate
+    */
+    void sendMouseLoc(int row, int x, int y, QRect visRect);
 };
 
 } // NAMESPACE
