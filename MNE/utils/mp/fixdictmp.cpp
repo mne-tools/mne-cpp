@@ -492,8 +492,8 @@ void FixDictMp::create_tree_dict(QString save_path)
             if( compare_atom.dot(temp_atom) > threshold)
                 similar_atoms.append(current_element.attribute("ID", current_element.text()).toInt());
 
-            if (similar_atoms.length() == 32)//vary this for testing
-                break;
+            //if (similar_atoms.length() == 32)//vary this for testing
+            //    break;
         }
 
         qreal molec_scale = 0;
@@ -648,7 +648,7 @@ void FixDictMp::build_molecule_xml_file(qint32 level_counter)
             current_element = node_list.at(0).toElement();
             QList<qint32> similar_molecs;
 
-            if(current_element.attribute("level").toInt() == level_counter)
+            if(current_element.attribute("level").toInt() == level_counter && current_element.nodeName() == "Molecule")
             {
                 if(!current_element.isNull())
                 {
@@ -658,33 +658,35 @@ void FixDictMp::build_molecule_xml_file(qint32 level_counter)
                     phase = (current_element.attribute("phase", current_element.text())).toDouble();
                 }
                 compare_molec = gabor_Atom->create_real(sample_count,scale,translation,modulation,phase);
-                qreal threshold = 0.8 * compare_molec.dot(compare_molec); //vary this to find optimum of seperation
+                qreal threshold = 0.6 * compare_molec.dot(compare_molec); //vary this to find optimum of seperation
 
                 VectorXd temp_molec = VectorXd::Zero(sample_count);
 
                 //finding molecules with low differences
                 for (qint32 next = 0; next < node_list.count(); next++)//;32)
                 {
-                    //try the next atom
-                    if(current_element.attribute("level").toInt() == level_counter)
-                        current_element = node_list.at(next).toElement();
+                    current_element = node_list.at(next).toElement();
+                    //try the next molecule
+                    if(current_element.attribute("level").toInt() == level_counter && current_element.nodeName() == "Molecule")
+                    {    //current_element = node_list.at(next).toElement();
 
-                    if(!current_element.isNull())
-                    {
-                        scale = (current_element.attribute("scale", current_element.text())).toDouble();
-                        translation = (current_element.attribute("translation", current_element.text())).toInt();
-                        modulation = (current_element.attribute("modulation", current_element.text())).toDouble();
-                        phase = (current_element.attribute("phase", current_element.text())).toDouble();
+                        if(!current_element.isNull())
+                        {
+                            scale = (current_element.attribute("scale", current_element.text())).toDouble();
+                            translation = (current_element.attribute("translation", current_element.text())).toInt();
+                            modulation = (current_element.attribute("modulation", current_element.text())).toDouble();
+                            phase = (current_element.attribute("phase", current_element.text())).toDouble();
+                        }
+                        //set molecules out of xml to compare with molecule
+                        temp_molec = gabor_Atom->create_real(sample_count,scale,translation,modulation,phase);
+
+                        //fill list of similar molecules to save as new molecule
+                        if( compare_molec.dot(temp_molec) > threshold)
+                            similar_molecs.append(current_element.attribute("ID", current_element.text()).toInt());
+
+                        //if (similar_molecs.length() == 32)//vary this for testing
+                        //    break;
                     }
-                    //set molecules out of xml to compare with molecule
-                    temp_molec = gabor_Atom->create_real(sample_count,scale,translation,modulation,phase);
-
-                    //fill list of similar molecules to save as new molecule
-                    if( compare_molec.dot(temp_molec) > threshold && current_element.attribute("level").toInt() == level_counter)
-                        similar_molecs.append(current_element.attribute("ID", current_element.text()).toInt());
-
-                    if (similar_molecs.length() == 32)//vary this for testing
-                        break;
                 }
 
                 qreal molec_scale = 0;
@@ -726,6 +728,7 @@ void FixDictMp::build_molecule_xml_file(qint32 level_counter)
                 //treedepth building
 
                 current_element = node_list.at(0).toElement();
+                qint32 root_counter = 0;
 
                 for(qint32 k = 0; k < similar_molecs.length(); k++)
                 {                    
@@ -734,19 +737,18 @@ void FixDictMp::build_molecule_xml_file(qint32 level_counter)
 
                     while(!current_element.isNull())
                     {
-                        qint32 root_counter = 0;
+                        root_counter = 0;
 
                         if(current_element.attribute("ID").toInt() == similar_molecs.at(k) && current_element.attribute("level").toInt() == level_counter)
                         {                           
                             QDomElement temp_element = current_element;
-
                             qint32 end_element_counter = 0;
-                            //qint32 root_counter = 0;
                             qint32 child_counter = 0;//ToDo: set right child for right position in tree to write all atoms and molecules
+                            root_counter = 0;
 
                             while(temp_element.hasChildNodes())
                             {
-                                //end_element_counter = 0;
+                                end_element_counter = 0;
                                 child_counter = 0;
 
                                 while(!temp_element.isNull())
@@ -763,47 +765,47 @@ void FixDictMp::build_molecule_xml_file(qint32 level_counter)
                                     write_molecules_to_xml.writeAttribute("phase", temp_element.attribute("phase", temp_element.text()));
 
                                     if(temp_element.nodeName() == "Atom")
-                                        write_molecules_to_xml.writeEndElement();
-
+                                        write_molecules_to_xml.writeEndElement();//close atoms immediately
                                     else
-                                        end_element_counter++;
+                                        end_element_counter++;//keep in mind how many molecules are opened
 
-                                    if(temp_element.hasChildNodes())
+                                    if(temp_element.hasChildNodes())//if there are children, that means the current element is not an atom: go to next child
                                     {
                                         temp_element = temp_element.firstChild().toElement();
-                                        child_counter++;
+                                        child_counter++;//keep in mind how many children exist
                                     }
                                     else
-                                        temp_element = temp_element.nextSibling().toElement();
+                                        temp_element = temp_element.nextSibling().toElement();//else there are no children, there must be an atom , so take the next atom
 
                                 }
                                 root_counter++;
                                 write_molecules_to_xml.writeEndElement();
 
-                                //temp_element = current_element.childNodes().at(root_counter).toElement();
                                 temp_element = current_element;
+
+                                //for(qint32 node_depth = 2; node_depth < child_counter; node_depth++)
+                                //    temp_element = temp_element.firstChildElement();
+
                                 for(qint32 node_depth = 2; node_depth < child_counter; node_depth++)
-                                    temp_element = temp_element.firstChildElement();
-
-                                temp_element = temp_element.childNodes().at(root_counter).toElement();
-
-                                //for(qint32 close_root_molecs = end_element_counter; close_root_molecs > 0; close_root_molecs--)
-                                //    write_molecules_to_xml.writeEndElement();
+                                    temp_element = temp_element.childNodes().at(root_counter).toElement();
 
                             }
-                            for(qint32 close_root_molecs = end_element_counter; close_root_molecs > 1; close_root_molecs--)
-                                write_molecules_to_xml.writeEndElement();
+                            //for(qint32 close_root_molecs = end_element_counter; close_root_molecs > 1; close_root_molecs--)
+                            for(qint32 close_root_molecs = level_counter; close_root_molecs > 0; close_root_molecs--)
+                                write_molecules_to_xml.writeEndElement();//end elements for one submolecule in a "parentmolecule"
 
                         }
 
-                        for(qint32 close_parent_molecs = root_counter; close_parent_molecs > 1; close_parent_molecs--)
-                            write_molecules_to_xml.writeEndElement();
+                        //for(qint32 close_parent_molecs = root_counter; close_parent_molecs > 1; close_parent_molecs--)
+                        //    write_molecules_to_xml.writeEndElement();//close all submolecules inside a new parentmolecule
 
                         current_element = current_element.nextSiblingElement("Molecule").toElement();
                     }
+
                 }//for all similar molecules
 
-                write_molecules_to_xml.writeEndElement(); // new level molecule
+                //for(qint32 close_parent_molecs = root_counter; close_parent_molecs > 1; close_parent_molecs--)
+                write_molecules_to_xml.writeEndElement();
 
                 //remove found molecules from node list
                 for(qint32 n = 0; n < similar_molecs.length(); n++)

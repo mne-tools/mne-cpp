@@ -122,7 +122,7 @@ void TreebasedDictWindow::on_btt_calc_treebased_clicked()
                     count++;
                 //    phase += 2*PI / sample_count;//(4*PI)/360;
                 }
-                modulation += 2;//(sample_count/2) / 32;//floor(5/100*sample_count);
+                modulation +=2;//(sample_count/2) / 32;//floor(5/100*sample_count);
             }
         }
     }
