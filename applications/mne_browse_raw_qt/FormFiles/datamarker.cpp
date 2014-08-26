@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
-* @file     tmsiaboutwidget.h
+* @file     datawindow.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     September, 2013
+* @date     August, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,37 +30,16 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the TMSIAboutWidget class.
+* @brief    Contains the implementation of the DataWindow class.
 *
 */
-
-#ifndef TMSIABOUTWIDGET_H
-#define TMSIABOUTWIDGET_H
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_tmsiabout.h"
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QtWidgets>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE TMSIPlugin
-//=============================================================================================================
-
-namespace TMSIPlugin
-{
+#include "datamarker.h"
 
 
 //*************************************************************************************************************
@@ -68,44 +47,88 @@ namespace TMSIPlugin
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace MNEBrowseRawQt;
+
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-
-//=============================================================================================================
-/**
-* DECLARE CLASS TMSIAboutWidget
-*
-* @brief The TMSIAboutWidget class provides the about dialog for the TMSI.
-*/
-class TMSIAboutWidget : public QDialog
+DataMarker::DataMarker(QWidget *parent) :
+    QWidget(parent),
+    m_oldPos(QPoint(0,0)),
+    m_movableRegion(QRegion())
 {
-    Q_OBJECT
+    //Set background color
+    QPalette Pal(palette());
 
-public:
+    QColor colorTemp(227,6,19);
+    Pal.setColor(QPalette::Background, colorTemp);
 
-    //=========================================================================================================
-    /**
-    * Constructs a TMSIAboutWidget dialog which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new TMSIAboutWidget becomes a window. If parent is another widget, TMSIAboutWidget becomes a child window inside parent. TMSIAboutWidget is deleted when its parent is deleted.
-    */
-    TMSIAboutWidget(QWidget *parent = 0);
+    setAutoFillBackground(true);
+    setPalette(Pal);
+}
 
-    //=========================================================================================================
-    /**
-    * Destroys the TMSIAboutWidget.
-    * All TMSIAboutWidget's children are deleted first. The application exits if TMSIAboutWidget is the main widget.
-    */
-    ~TMSIAboutWidget();
 
-private:
-    Ui::TMSIAboutWidgetClass ui;    /**< Holds the user interface for the TMSIAboutWidgetClass.*/
-};
+//*************************************************************************************************************
 
-} // NAMESPACE
+void DataMarker::setMovementBoundary(QRegion rect)
+{
+    m_movableRegion = rect;
+}
 
-#endif // TMSIABOUTWIDGET_H
+
+//*************************************************************************************************************
+
+void DataMarker::mousePressEvent(QMouseEvent *event)
+{
+    if(event->buttons() == Qt::LeftButton)
+        m_oldPos = event->globalPos();
+}
+
+
+//*************************************************************************************************************
+
+void DataMarker::mouseMoveEvent(QMouseEvent *event)
+{
+    if(event->buttons() == Qt::LeftButton) {
+        const QPoint delta = event->globalPos() - m_oldPos;
+
+        QRect newPosition(x()+delta.x(), y(),
+                          this->geometry().width(), this->geometry().height());
+
+        //Check if new position is inside the boundary
+        if(m_movableRegion.contains(newPosition.bottomLeft()) && m_movableRegion.contains(newPosition.bottomRight())) {
+            move(x()+delta.x(), y());
+            m_oldPos = event->globalPos();
+
+            emit markerMoved();
+        }
+
+        if(event->windowPos().x() < m_movableRegion.boundingRect().left()) {
+            move(m_movableRegion.boundingRect().left(), y());
+
+            emit markerMoved();
+        }
+
+        if(event->windowPos().x() > m_movableRegion.boundingRect().right()) {
+            move(m_movableRegion.boundingRect().right()-2, y());
+
+            emit markerMoved();
+        }
+
+//        qDebug()<<"globalPos"<<event->globalPos().x()<<event->globalPos().y();
+//        qDebug()<<"newPosition"<<newPosition.x()<<newPosition.y()<<newPosition.width()<<newPosition.height();
+//        qDebug()<<"m_movableRegion"<<m_movableRegion.boundingRect().x()<<m_movableRegion.boundingRect().y()<<m_movableRegion.boundingRect().width()<<m_movableRegion.boundingRect().height();
+    }
+}
+
+
+//*************************************************************************************************************
+
+void DataMarker::enterEvent(QEvent *event)
+{
+    Q_UNUSED(event);
+    setCursor(QCursor(Qt::SizeHorCursor));
+}
