@@ -149,6 +149,11 @@ private slots:
     void on_list_NewDict_itemSelectionChanged();
     void on_btt_SaveDicts_clicked();
 
+signals:
+
+    void dict_saved();
+
+
 private:    
     Ui::EditorWindow *ui;
 };
