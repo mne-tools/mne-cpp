@@ -131,9 +131,6 @@ MatrixXd _real_residuum_matrix(0, 0);
 QTime _counter_time(0,0);
 QTimer *_counter_timer = new QTimer();
 
-
-//QSettings _settings;
-
 //*************************************************************************************************************
 //=============================================================================================================
 // MAIN
@@ -265,8 +262,9 @@ MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::
     fill_dict_combobox();
 
     QSettings settings;
-    QSize size = settings.value("size", QSize(1050, 700)).toSize();
-    resize(size);
+    move(settings.value("pos", QPoint(200, 200)).toPoint());
+    resize(settings.value("size", QSize(1050, 700)).toSize());
+
 
 }
 
@@ -282,6 +280,7 @@ MainWindow::~MainWindow()
 void MainWindow::closeEvent(QCloseEvent * event)
 {
     QSettings settings;
+    settings.setValue("pos", pos());
     settings.setValue("size", size());
     event->accept();
 }
@@ -290,19 +289,20 @@ void MainWindow::closeEvent(QCloseEvent * event)
 
 
 void MainWindow::fill_dict_combobox()
-{
+{    
     QDir dir("Matching-Pursuit-Toolbox");
     QStringList filterList;
     filterList.append("*.dict");
     QFileInfoList fileList =  dir.entryInfoList(filterList);
 
+    ui->cb_Dicts->clear();
     for(int i = 0; i < fileList.length(); i++)
         ui->cb_Dicts->addItem(QIcon(":/images/icons/DictIcon.png"), fileList.at(i).baseName());
 }
 
 void MainWindow::open_file()
 {
-    QFileDialog* fileDia;
+    QFileDialog* fileDia;    
     QString temp_file_name = fileDia->getOpenFileName(this, "Please select signal file.",QDir::currentPath(),"(*.fif *.txt)");
     if(temp_file_name.isNull()) return;
 
@@ -769,13 +769,11 @@ void GraphWindow::paint_signal(MatrixXd signalMatrix, QSize windowSize)
                         QPen pen(Qt::darkGray, 0.5, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
                         painter.setPen(pen);
                         painter.drawLine(j * scaleXAchse + maxStrLenght, -(((i - 1) * scaleYAchse)-(windowSize.height() - borderMarginHeigth / 2 - windowSize.height())), j * scaleXAchse + maxStrLenght , -(((i - 1) * scaleYAchse)-(windowSize.height() - borderMarginHeigth / 2 + windowSize.height())));   // scalelines
-                    }
-                    else
-                    {
-                        QPen pen(Qt::black, 1, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
-                        painter.setPen(pen);
-                        painter.drawLine(j * scaleXAchse + maxStrLenght, -(((i - 1) * scaleYAchse)-(windowSize.height() - borderMarginHeigth / 2 - 2)), j * scaleXAchse + maxStrLenght , -(((i - 1) * scaleYAchse)-(windowSize.height() - borderMarginHeigth / 2 + 2)));   // scalelines
-                    }
+                    }                   
+                    QPen pen(Qt::black, 1, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+                    painter.setPen(pen);
+                    painter.drawLine(j * scaleXAchse + maxStrLenght, -(((i - 1) * scaleYAchse)-(windowSize.height() - borderMarginHeigth / 2 - 2)), j * scaleXAchse + maxStrLenght , -(((i - 1) * scaleYAchse)-(windowSize.height() - borderMarginHeigth / 2 + 2)));   // scalelines
+
                     j++;
                 }
                 painter.drawLine(maxStrLenght, -(((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2), windowSize.width()-5, -(((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2));
@@ -898,12 +896,11 @@ void AtomSumWindow::paint_atom_sum(MatrixXd atom_matrix, QSize windowSize, qreal
                         QPen pen(Qt::darkGray, 0.5, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
                         painter.setPen(pen);
                         painter.drawLine(j * scaleXAchse + maxStrLenght, -(((i - 1) * scaleYAchse)-(windowSize.height() - borderMarginHeigth / 2 - windowSize.height())), j * scaleXAchse + maxStrLenght , -(((i - 1) * scaleYAchse)-(windowSize.height() - borderMarginHeigth / 2 + windowSize.height())));   // scalelines
-                    }else
-                    {
-                        QPen pen(Qt::black, 1, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
-                        painter.setPen(pen);
-                        painter.drawLine(j * scaleXAchse + maxStrLenght, -(((i - 1) * scaleYAchse)-(windowSize.height() - borderMarginHeigth / 2 - 2)), j * scaleXAchse + maxStrLenght , -(((i - 1) * scaleYAchse)-(windowSize.height() - borderMarginHeigth / 2 + 2)));   // scalelines
                     }
+                    QPen pen(Qt::black, 1, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+                    painter.setPen(pen);
+                    painter.drawLine(j * scaleXAchse + maxStrLenght, -(((i - 1) * scaleYAchse)-(windowSize.height() - borderMarginHeigth / 2 - 2)), j * scaleXAchse + maxStrLenght , -(((i - 1) * scaleYAchse)-(windowSize.height() - borderMarginHeigth / 2 + 2)));   // scalelines
+
                     j++;
                 }
                 painter.drawLine(maxStrLenght, -(((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2), windowSize.width()-5, -(((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2));
@@ -1016,13 +1013,11 @@ void ResiduumWindow::paint_residuum(MatrixXd residuum_matrix, QSize windowSize, 
                         QPen pen(Qt::darkGray, 0.5, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
                         painter.setPen(pen);
                         painter.drawLine(j * scaleXAchse + maxStrLenght, -(((i - 1) * scaleYAchse)-(windowSize.height() - borderMarginHeigth / 2 - windowSize.height())), j * scaleXAchse + maxStrLenght , -(((i - 1) * scaleYAchse)-(windowSize.height() - borderMarginHeigth / 2 + windowSize.height())));   // scalelines
-                    }
-                    else
-                    {
-                        QPen pen(Qt::black, 1, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
-                        painter.setPen(pen);
-                        painter.drawLine(j * scaleXAchse + maxStrLenght, -(((i - 1) * scaleYAchse)-(windowSize.height() - borderMarginHeigth / 2 - 2)), j * scaleXAchse + maxStrLenght , -(((i - 1) * scaleYAchse)-(windowSize.height() - borderMarginHeigth / 2 + 2)));   // scalelines
-                    }
+                    }                   
+                    QPen pen(Qt::black, 1, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+                    painter.setPen(pen);
+                    painter.drawLine(j * scaleXAchse + maxStrLenght, -(((i - 1) * scaleYAchse)-(windowSize.height() - borderMarginHeigth / 2 - 2)), j * scaleXAchse + maxStrLenght , -(((i - 1) * scaleYAchse)-(windowSize.height() - borderMarginHeigth / 2 + 2)));   // scalelines
+
                     j++;
                 }
                 // paint x-axis               
@@ -1759,6 +1754,8 @@ QStringList MainWindow::correlation(VectorXd signalSamples, QList<qreal> atomSam
 void MainWindow::on_actionW_rterbucheditor_triggered()
 {        
     EditorWindow *editor_window = new EditorWindow(this);
+    connect(editor_window, SIGNAL(dict_saved()), this, SLOT(on_dicts_saved()));
+
     editor_window->show();
 }
 
@@ -1934,4 +1931,193 @@ void MainWindow::on_actionSettings_triggered()
 {
     settingwindow *set = new settingwindow();
     set->show();
+}
+
+//*****************************************************************************************************************
+
+void MainWindow::on_dicts_saved()
+{
+    fill_dict_combobox();
+}
+
+//*****************************************************************************************************************
+
+void MainWindow::on_actionSpeicher_unter_triggered()
+{
+    if(_file_name.isNull())
+    {
+        QMessageBox::warning(this, tr("Error"),
+        tr("error: No file for save."));
+        return;
+    }
+
+    QFileDialog* fileDia;
+    QString save_name = "";
+    QStringList saveList = _file_name.split('/').last().split('.').first().split('_');
+    for(int i = 0; i < saveList.length(); i++)
+    {
+        if(i == saveList.length() - 1)
+            save_name += "mp_" + saveList.at(i);
+        else
+            save_name += saveList.at(i) + "_";
+    }
+
+    QString save_path = fileDia->getSaveFileName(this, "Save file as...", QDir::currentPath() + "/" + save_name,"(*.fif)");
+    if(save_path.isNull()) return;
+
+    QFile t_fileIn(_file_name);
+    QFile t_fileOut(save_path);
+
+    //
+    //   Setup for reading the raw data
+    //
+    FiffRawData raw(t_fileIn);
+
+    //
+    //   Set up pick list: MEG + STI 014 - bad channels
+    //
+    //
+
+    bool want_meg   = true;
+    bool want_eeg   = false;
+    bool want_stim  = false;
+    QStringList include;
+    include << "STI 014";
+
+    MatrixXi picks = raw.info.pick_types(want_meg, want_eeg, want_stim, include, raw.info.bads); // prefer member function
+    if(picks.cols() == 0)
+    {
+        include.clear();
+        include << "STI101" << "STI201" << "STI301";
+//        picks = Fiff::pick_types(raw.info, want_meg, want_eeg, want_stim, include, raw.info.bads);
+        picks = raw.info.pick_types(want_meg, want_eeg, want_stim, include, raw.info.bads);// prefer member function
+        if(picks.cols() == 0)
+        {
+            printf("channel list may need modification\n");
+            //return -1;
+        }
+    }
+    //
+    MatrixXd cals;
+
+    FiffStream::SPtr outfid = Fiff::start_writing_raw(t_fileOut,raw.info, cals/*, picks*/);
+    //
+    //   Set up the reading parameters
+    //
+    fiff_int_t from = raw.first_samp;
+    fiff_int_t to = raw.last_samp;
+    float quantum_sec = 10.0f;//read and write in 10 sec junks
+    fiff_int_t quantum = ceil(quantum_sec*raw.info.sfreq);
+    //
+    //   To read the whole file at once set
+    //
+    //quantum     = to - from + 1;
+    //
+    //
+    //   Read and write all the data
+    //
+    bool first_buffer = true;
+
+    fiff_int_t first, last;
+    MatrixXd data;
+    MatrixXd times;
+
+    // start of change
+    qreal start_change = _from * raw.info.sfreq;
+    // end of change
+    qreal end_change = _to * raw.info.sfreq + 1;
+
+    // from 0 to start of change
+    for(first = from; first < start_change; first+=quantum)
+    {
+        last = first+quantum-1;
+        if (last > start_change)
+        {
+            last = start_change;
+        }
+        if (!raw.read_raw_segment(data,times,first,last/*,picks*/))
+        {
+                printf("error during read_raw_segment\n");
+                QMessageBox::warning(this, tr("Error"),
+                tr("error: Save unsucessful."));
+                return;
+        }    
+        printf("Writing...");
+        if (first_buffer)
+        {
+           if (first > 0)
+               outfid->write_int(FIFF_FIRST_SAMPLE,&first);
+           first_buffer = false;
+        }
+        outfid->write_raw_buffer(data,cals);
+        printf("[done]\n");
+    }
+
+    //************************************************************************************
+
+    // from start of change to end of change
+    if (!raw.read_raw_segment(data, times, start_change ,end_change/*,picks*/))
+    {
+            printf("error during read_raw_segment\n");
+            QMessageBox::warning(this, tr("Error"),
+            tr("error: Save unsucessful."));
+            return;
+    }
+
+    qint32 index = 0;
+    for(qint32 channels = 0; channels < data.rows(); channels++)
+    {
+        if(_select_channel_map[channels])
+        {
+            data.row(channels) =  _atom_sum_matrix.col(index)  ;
+            index++;
+        }
+    }
+
+    //************************************************************************************
+
+    // from end of change to end
+    for(first = end_change; first < to; first+=quantum)
+    {
+        last = first+quantum-1;
+        if (last > to)
+        {
+            last = to;
+        }
+        if (!raw.read_raw_segment(data,times,first,last/*,picks*/))
+        {
+                printf("error during read_raw_segment\n");
+                QMessageBox::warning(this, tr("Error"),
+                tr("error: Save unsucessful."));
+                return;
+        }
+        printf("Writing...");
+        if (first_buffer)
+        {
+           if (first > 0)
+               outfid->write_int(FIFF_FIRST_SAMPLE,&first);
+           first_buffer = false;
+        }
+        outfid->write_raw_buffer(data,cals);
+        printf("[done]\n");
+    }
+
+
+
+
+
+
+    printf("Writing...");
+    outfid->write_raw_buffer(data,cals);
+    printf("[done]\n");
+
+
+
+
+
+    outfid->finish_writing_raw();
+
+    printf("Finished\n");
+
+    //return 0;//a.exec();
 }

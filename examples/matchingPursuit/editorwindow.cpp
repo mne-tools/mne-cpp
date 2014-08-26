@@ -118,10 +118,14 @@ EditorWindow::EditorWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::Ed
     read_dicts();
 }
 
+//*************************************************************************************************************
+
 EditorWindow::~EditorWindow()
 {
     delete ui;
 }
+
+//*************************************************************************************************************
 
 void EditorWindow::read_dicts()
 {
@@ -159,6 +163,8 @@ void EditorWindow::read_dicts()
     if(ui->list_AllDict->count() > 1) ui->list_AllDict->itemAt(0, 0)->setSelected(true);
 }
 
+//*************************************************************************************************************
+
 // calculates number of atoms if "combine all"
 void EditorWindow::calc_atom_count_all_combined()
 {
@@ -186,6 +192,8 @@ void EditorWindow::calc_atom_count_all_combined()
     }
     ui->spb_AtomCount->setValue(count);
 }
+
+//*************************************************************************************************************
 
 // calculates parameters for linear stepwidth
 QList<qreal> EditorWindow::calc_lin_pos_parameters(qreal startValue, qreal linStepValue)
@@ -221,6 +229,8 @@ QList<qreal> EditorWindow::calc_lin_neg_parameters(qreal startValue, qreal linSt
     return resultList;
 }
 
+//*************************************************************************************************************
+
 // calculates parameters for exponential stepwidth (positiv)
 QList<qreal> EditorWindow::calc_exp_pos_parameters(qreal startValue, qreal expStepValue)
 {
@@ -238,6 +248,8 @@ QList<qreal> EditorWindow::calc_exp_pos_parameters(qreal startValue, qreal expSt
     return resultList;
 }
 
+//*************************************************************************************************************
+
 // calculates parameters for exponential stepwidth (negativ)
 QList<qreal> EditorWindow::calc_exp_neg_parameters(qreal startValue, qreal expStepValue)
 {
@@ -254,6 +266,8 @@ QList<qreal> EditorWindow::calc_exp_neg_parameters(qreal startValue, qreal expSt
     }
     return resultList;
 }
+
+//*************************************************************************************************************
 
 // calculates scale and save to list
 QList<qreal> EditorWindow::calc_parameter_values_scale(qreal startValue, qreal linStepValue, qreal expStepValue)
@@ -277,6 +291,8 @@ QList<qreal> EditorWindow::calc_parameter_values_scale(qreal startValue, qreal l
     return resultList;
 }
 
+//*************************************************************************************************************
+
 // calculates scale and save to list (AllCombined)
 QList<qreal> EditorWindow::calc_all_comb_parameter_values_scale(qreal startValue, qreal endvalue, qreal linStepValue, qreal expStepValue)
 {
@@ -297,6 +313,8 @@ QList<qreal> EditorWindow::calc_all_comb_parameter_values_scale(qreal startValue
     }
     return resultList;
 }
+
+//*************************************************************************************************************
 
 // calculates modulation and save to list
 QList<qreal> EditorWindow::calc_parameter_values_modu(qreal startValue, qreal linStepValue, qreal expStepValue)
@@ -320,6 +338,8 @@ QList<qreal> EditorWindow::calc_parameter_values_modu(qreal startValue, qreal li
     return resultList;
 }
 
+//*************************************************************************************************************
+
 // calculates modulation and save to list (AllCombined)
 QList<qreal> EditorWindow::calc_all_comb_parameter_values_modu(qreal startValue, qreal endvalue, qreal linStepValue, qreal expStepValue)
 {
@@ -340,6 +360,8 @@ QList<qreal> EditorWindow::calc_all_comb_parameter_values_modu(qreal startValue,
     }
     return resultList;
 }
+
+//*************************************************************************************************************
 
 // calculates phase and save to list
 QList<qreal> EditorWindow::calc_parameter_values_phase(qreal startValue, qreal linStepValue, qreal expStepValue)
@@ -363,6 +385,8 @@ QList<qreal> EditorWindow::calc_parameter_values_phase(qreal startValue, qreal l
     return resultList;
 }
 
+//*************************************************************************************************************
+
 // calculates phase and save to list (AllCombined)
 QList<qreal> EditorWindow::calc_all_comb_parameter_values_phase(qreal startValue, qreal endvalue, qreal linStepValue, qreal expStepValue)
 {
@@ -383,6 +407,8 @@ QList<qreal> EditorWindow::calc_all_comb_parameter_values_phase(qreal startValue
     }
     return resultList;
 }
+
+//*************************************************************************************************************
 
 // calculates chirp and save to list
 QList<qreal> EditorWindow::calc_parameter_values_chirp(qreal startValue, qreal linStepValue, qreal expStepValue)
@@ -406,6 +432,8 @@ QList<qreal> EditorWindow::calc_parameter_values_chirp(qreal startValue, qreal l
     return resultList;
 }
 
+//*************************************************************************************************************
+
 // calculates chirp and save to list (AllCombined)
 QList<qreal> EditorWindow::calc_all_comb_parameter_values_chirp(qreal startValue, qreal endvalue, qreal linStepValue, qreal expStepValue)
 {
@@ -426,6 +454,8 @@ QList<qreal> EditorWindow::calc_all_comb_parameter_values_chirp(qreal startValue
     }
     return resultList;
 }
+
+//*************************************************************************************************************
 
 // handle scale
 void EditorWindow::calc_scale_value()
@@ -450,6 +480,8 @@ void EditorWindow::calc_scale_value()
     }
 }
 
+//*************************************************************************************************************
+
 // handle modulation
 void EditorWindow::calc_modu_value()
 {
@@ -469,6 +501,8 @@ void EditorWindow::calc_modu_value()
     else
         moduList = calc_parameter_values_modu(startValueModu, linStepWidthModu, expStepWidthModu);
 }
+
+//*************************************************************************************************************
 
 // handle phase
 void EditorWindow::calc_phase_value()
@@ -490,6 +524,8 @@ void EditorWindow::calc_phase_value()
         phaseList = calc_parameter_values_phase(startValuePhase, linStepWidthPhase, expStepWidthPhase);
 }
 
+//*************************************************************************************************************
+
 // handle chirp
 void EditorWindow::calc_chirp_value()
 {
@@ -510,6 +546,8 @@ void EditorWindow::calc_chirp_value()
         chirpList = calc_parameter_values_chirp(startValueChirp, linStepWidthChirp, expStepWidthChirp);
 }
 
+//*************************************************************************************************************
+
 // access if namechange of PartDictName
 void EditorWindow::on_tb_PartDictName_editingFinished()
 {
@@ -520,6 +558,8 @@ void EditorWindow::on_tb_PartDictName_editingFinished()
     calc_phase_value();
     calc_chirp_value();
 }
+
+//*************************************************************************************************************
 
 // access if "All combined"
 void EditorWindow::on_chb_CombAllPara_toggled(bool checked)
@@ -630,6 +670,8 @@ void EditorWindow::on_chb_CombAllPara_toggled(bool checked)
     calc_chirp_value();
 }
 
+//*************************************************************************************************************
+
 void EditorWindow::on_spb_AtomLength_editingFinished()
 {
     // set max startvalue of scale
@@ -641,6 +683,8 @@ void EditorWindow::on_spb_AtomLength_editingFinished()
     calc_phase_value();
     calc_chirp_value();
 }
+
+//*************************************************************************************************************
 
 // set number of atoms (recalculate stopvalues)
 void EditorWindow::on_spb_AtomCount_valueChanged(int arg1)
@@ -741,6 +785,8 @@ void EditorWindow::on_spb_AtomCount_valueChanged(int arg1)
     calc_chirp_value();
 }
 
+//*************************************************************************************************************
+
 // for scale
 void EditorWindow::on_dspb_StartValueScale_editingFinished()
 {
@@ -748,11 +794,15 @@ void EditorWindow::on_dspb_StartValueScale_editingFinished()
     calc_scale_value();
 }
 
+//*************************************************************************************************************
+
 void EditorWindow::on_dspb_EndValueScale_editingFinished()
 {
     endValueScale = ui->dspb_EndValueScale->value();
     calc_scale_value();
 }
+
+//*************************************************************************************************************
 
 void EditorWindow::on_rb_NoStepScale_toggled(bool checked)
 {
@@ -772,11 +822,15 @@ void EditorWindow::on_rb_NoStepScale_toggled(bool checked)
     calc_scale_value();
 }
 
+//*************************************************************************************************************
+
 void EditorWindow::on_rb_LinStepScale_toggled(bool checked)
 {
     if(checked) linStepWidthScale = ui->dspb_LinStepScale->value();
     calc_scale_value();
 }
+
+//*************************************************************************************************************
 
 void EditorWindow::on_rb_ExpStepScale_toggled(bool checked)
 {
@@ -784,11 +838,15 @@ void EditorWindow::on_rb_ExpStepScale_toggled(bool checked)
     calc_scale_value();
 }
 
+//*************************************************************************************************************
+
 void EditorWindow::on_dspb_LinStepScale_editingFinished()
 {
     linStepWidthScale = ui->dspb_LinStepScale->value();
     calc_scale_value();
 }
+
+//*************************************************************************************************************
 
 void EditorWindow::on_dspb_ExpStepScale_editingFinished()
 {
@@ -796,17 +854,23 @@ void EditorWindow::on_dspb_ExpStepScale_editingFinished()
     calc_scale_value();
 }
 
+//*************************************************************************************************************
+
 void EditorWindow::on_rb_PosCountScale_toggled()
 {
     if(!allCombined)
         scaleList = calc_parameter_values_scale(startValueScale, linStepWidthScale, expStepWidthScale);
 }
 
+//*************************************************************************************************************
+
 void EditorWindow::on_rb_NegCountScale_toggled()
 {
     if(!allCombined)
         scaleList = calc_parameter_values_scale(startValueScale, linStepWidthScale, expStepWidthScale);
 }
+
+//*************************************************************************************************************
 
 // for modulation
 void EditorWindow::on_dspb_StartValueModu_editingFinished()
@@ -815,11 +879,15 @@ void EditorWindow::on_dspb_StartValueModu_editingFinished()
     calc_modu_value();
 }
 
+//*************************************************************************************************************
+
 void EditorWindow::on_dspb_EndValueModu_editingFinished()
 {
     endValueModu = ui->dspb_EndValueModu->value();
     calc_modu_value();
 }
+
+//*************************************************************************************************************
 
 void EditorWindow::on_rb_NoStepModu_toggled(bool checked)
 {
@@ -839,11 +907,15 @@ void EditorWindow::on_rb_NoStepModu_toggled(bool checked)
     calc_modu_value();
 }
 
+//*************************************************************************************************************
+
 void EditorWindow::on_rb_LinStepModu_toggled(bool checked)
 {
     if(checked) linStepWidthModu = ui->dspb_LinStepModu->value();
     calc_modu_value();
 }
+
+//*************************************************************************************************************
 
 void EditorWindow::on_rb_ExpStepModu_toggled(bool checked)
 {
@@ -851,11 +923,15 @@ void EditorWindow::on_rb_ExpStepModu_toggled(bool checked)
     calc_modu_value();
 }
 
+//*************************************************************************************************************
+
 void EditorWindow::on_dspb_LinStepModu_editingFinished()
 {
     linStepWidthModu = ui->dspb_LinStepModu->value();
     calc_modu_value();
 }
+
+//*************************************************************************************************************
 
 void EditorWindow::on_dspb_ExpStepModu_editingFinished()
 {
@@ -863,17 +939,23 @@ void EditorWindow::on_dspb_ExpStepModu_editingFinished()
     calc_modu_value();
 }
 
+//*************************************************************************************************************
+
 void EditorWindow::on_rb_PosCountModu_toggled()
 {
     if(allCombined)
         moduList = calc_parameter_values_modu(startValueModu, linStepWidthModu, expStepWidthModu);
 }
 
+//*************************************************************************************************************
+
 void EditorWindow::on_rb_NegCountModu_toggled()
 {
     if(allCombined)
         moduList = calc_parameter_values_modu(startValueModu, linStepWidthModu, expStepWidthModu);
 }
+
+//*************************************************************************************************************
 
 // for phase
 void EditorWindow::on_dspb_StartValuePhase_editingFinished()
@@ -882,11 +964,15 @@ void EditorWindow::on_dspb_StartValuePhase_editingFinished()
     calc_phase_value();
 }
 
+//*************************************************************************************************************
+
 void EditorWindow::on_dspb_EndValuePhase_editingFinished()
 {
     endValuePhase = ui->dspb_EndValuePhase->value();
     calc_phase_value();
 }
+
+//*************************************************************************************************************
 
 void EditorWindow::on_rb_NoStepPhase_toggled(bool checked)
 {
@@ -906,11 +992,15 @@ void EditorWindow::on_rb_NoStepPhase_toggled(bool checked)
     calc_phase_value();
 }
 
+//*************************************************************************************************************
+
 void EditorWindow::on_rb_LinStepPhase_toggled(bool checked)
 {
     if(checked) linStepWidthPhase = ui->dspb_LinStepPhase->value();
     calc_phase_value();
 }
+
+//*************************************************************************************************************
 
 void EditorWindow::on_rb_ExpStepPhase_toggled(bool checked)
 {
@@ -918,11 +1008,15 @@ void EditorWindow::on_rb_ExpStepPhase_toggled(bool checked)
     calc_phase_value();
 }
 
+//*************************************************************************************************************
+
 void EditorWindow::on_dspb_LinStepPhase_editingFinished()
 {
     linStepWidthPhase = ui->dspb_LinStepPhase->value();
     calc_phase_value();
 }
+
+//*************************************************************************************************************
 
 void EditorWindow::on_dspb_ExpStepPhase_editingFinished()
 {
@@ -930,17 +1024,23 @@ void EditorWindow::on_dspb_ExpStepPhase_editingFinished()
     calc_phase_value();
 }
 
+//*************************************************************************************************************
+
 void EditorWindow::on_rb_PosCountPhase_toggled()
 {
     if(allCombined)
         phaseList = calc_parameter_values_phase(startValuePhase, linStepWidthPhase, expStepWidthPhase);
 }
 
+//*************************************************************************************************************
+
 void EditorWindow::on_rb_NegCountPhase_toggled()
 {
     if(allCombined)
         phaseList = calc_parameter_values_phase(startValuePhase, linStepWidthPhase, expStepWidthPhase);
 }
+
+//*************************************************************************************************************
 
 // for chirp
 void EditorWindow::on_dspb_StartValueChirp_editingFinished()
@@ -949,11 +1049,15 @@ void EditorWindow::on_dspb_StartValueChirp_editingFinished()
     calc_chirp_value();
 }
 
+//*************************************************************************************************************
+
 void EditorWindow::on_dspb_EndValueChirp_editingFinished()
 {
     endValueChirp = ui->dspb_EndValueChirp->value();
     calc_chirp_value();
 }
+
+//*************************************************************************************************************
 
 void EditorWindow::on_rb_NoStepChirp_toggled(bool checked)
 {
@@ -977,11 +1081,15 @@ void EditorWindow::on_rb_NoStepChirp_toggled(bool checked)
     calc_chirp_value();
 }
 
+//*************************************************************************************************************
+
 void EditorWindow::on_rb_LinStepChirp_toggled(bool checked)
 {
      if(checked) linStepWidthChirp = ui->dspb_LinStepChirp->value();
      calc_chirp_value();
 }
+
+//*************************************************************************************************************
 
 void EditorWindow::on_rb_ExpStepChirp_toggled(bool checked)
 {
@@ -989,11 +1097,15 @@ void EditorWindow::on_rb_ExpStepChirp_toggled(bool checked)
     calc_chirp_value();
 }
 
+//*************************************************************************************************************
+
 void EditorWindow::on_dspb_LinStepChirp_editingFinished()
 {
     linStepWidthChirp = ui->dspb_LinStepChirp->value();
     calc_chirp_value();
 }
+
+//*************************************************************************************************************
 
 void EditorWindow::on_dspb_ExpStepChirp_editingFinished()
 {
@@ -1001,11 +1113,15 @@ void EditorWindow::on_dspb_ExpStepChirp_editingFinished()
     calc_chirp_value();
 }
 
+//*************************************************************************************************************
+
 void EditorWindow::on_rb_PosCountChirp_toggled()
 {
     if(allCombined)
         chirpList = calc_parameter_values_chirp(startValueChirp, linStepWidthChirp, expStepWidthChirp);
 }
+
+//*************************************************************************************************************
 
 void EditorWindow::on_rb_NegCountChirp_toggled()
 {
@@ -1013,11 +1129,15 @@ void EditorWindow::on_rb_NegCountChirp_toggled()
         chirpList = calc_parameter_values_chirp(startValueChirp, linStepWidthChirp, expStepWidthChirp);
 }
 
+//*************************************************************************************************************
+
 // check whether gauss or chirp
 void EditorWindow::on_rb_GaussAtomType_toggled(bool checked)
 {
     if(checked) atomType = EditorWindow::Gauss;
 }
+
+//*************************************************************************************************************
 
 void EditorWindow::on_rb_ChirpAtomType_toggled(bool checked)
 {
@@ -1049,6 +1169,7 @@ void EditorWindow::on_rb_ChirpAtomType_toggled(bool checked)
     }
 }
 
+//*************************************************************************************************************
 
 // calc all atoms with choosen parameters and save to list and to drive
 void EditorWindow::on_btt_CalcAtoms_clicked()
@@ -1213,6 +1334,8 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
     if(ui->list_AllDict->count() > 1) ui->list_AllDict->itemAt(0, 0)->setSelected(true);
 }
 
+//*************************************************************************************************************
+
 void EditorWindow::on_btt_ToNewDict_clicked()
 {
     QList<QListWidgetItem*> selcItems = ui->list_AllDict->selectedItems();
@@ -1228,6 +1351,8 @@ void EditorWindow::on_btt_ToNewDict_clicked()
     if(ui->list_NewDict->count() > 0) ui->btt_SaveDicts->setEnabled(true);
 }
 
+//*************************************************************************************************************
+
 void EditorWindow::on_list_AllDict_doubleClicked()
 {
     QListWidgetItem* item = ui->list_AllDict->selectedItems().at(0);
@@ -1239,6 +1364,8 @@ void EditorWindow::on_list_AllDict_doubleClicked()
     if(ui->list_NewDict->count() > 0) ui->btt_SaveDicts->setEnabled(true);
 
 }
+
+//*************************************************************************************************************
 
 void EditorWindow::on_btt_ToAlldict_clicked()
 {
@@ -1255,6 +1382,8 @@ void EditorWindow::on_btt_ToAlldict_clicked()
     if(ui->list_NewDict->count() == 0) ui->btt_SaveDicts->setEnabled(false);
 }
 
+//*************************************************************************************************************
+
 void EditorWindow::on_list_NewDict_doubleClicked()
 {
     QListWidgetItem* item = ui->list_NewDict->selectedItems().at(0);
@@ -1265,6 +1394,8 @@ void EditorWindow::on_list_NewDict_doubleClicked()
     if(ui->list_NewDict->count() > 1) ui->list_NewDict->itemAt(0,0)->setSelected(true);
     if(ui->list_NewDict->count() == 0) ui->btt_SaveDicts->setEnabled(false);
 }
+
+//*************************************************************************************************************
 
 void EditorWindow::on_btt_DeleteDict_clicked()
 {
@@ -1310,6 +1441,8 @@ void EditorWindow::on_btt_DeleteDict_clicked()
     }
 }
 
+//*************************************************************************************************************
+
 void EditorWindow::on_list_AllDict_itemSelectionChanged()
 {
     if(ui->list_AllDict->selectedItems().length() == 0)
@@ -1324,6 +1457,8 @@ void EditorWindow::on_list_AllDict_itemSelectionChanged()
     }
 }
 
+//*************************************************************************************************************
+
 void EditorWindow::on_list_NewDict_itemSelectionChanged()
 {
     if(ui->list_NewDict->selectedItems().length() == 0)
@@ -1335,6 +1470,8 @@ void EditorWindow::on_list_NewDict_itemSelectionChanged()
          ui->btt_ToAlldict->setEnabled(true);
     }
 }
+
+//*************************************************************************************************************
 
 void EditorWindow::on_btt_SaveDicts_clicked()
 {
@@ -1413,5 +1550,5 @@ void EditorWindow::on_btt_SaveDicts_clicked()
     ui->list_NewDict->clear();
     ui->tb_DictName->clear();
 
-
+    emit dict_saved();
 }

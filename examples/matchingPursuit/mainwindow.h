@@ -231,6 +231,9 @@ private slots:
     void on_cb_all_select_clicked();
     void on_time_out();
     void on_actionSettings_triggered();
+    void on_dicts_saved();
+
+    void on_actionSpeicher_unter_triggered();
 
 signals:
 
