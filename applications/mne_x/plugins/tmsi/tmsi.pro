@@ -122,7 +122,7 @@ FORMS += \
         FormFiles/tmsiabout.ui \
         FormFiles/tmsimanualannotation.ui \
         FormFiles/tmsiimpedancewidget.ui \
-    FormFiles/tmsisetupprojectwidget.ui
+        FormFiles/tmsisetupprojectwidget.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

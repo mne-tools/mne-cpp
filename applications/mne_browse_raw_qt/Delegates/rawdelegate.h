@@ -50,9 +50,11 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "rawmodel.h"
-#include "types.h"
-#include "rawsettings.h"
+#include "../Models/rawmodel.h"
+#include "../Models/eventmodel.h"
+
+#include "../types.h"
+#include "../rawsettings.h"
 
 
 //*************************************************************************************************************
@@ -66,6 +68,7 @@
 #include <QPainterPath>
 #include <QPointF>
 #include <QRect>
+#include <QTableView>
 
 
 //*************************************************************************************************************
@@ -117,19 +120,23 @@ public:
 
     //=========================================================================================================
     /**
-    * setEventData creates the QPointer path for the data plot.
+    * setEventModelView creates the QPointer path for the data plot.
     *
-    * @param[in] eventData holds the loaded fiff event data i nform of a matrix.
+    * @param[in] model holds a pointer to the event model. This model needs to be set in order to access the event data for plotting.
+    * @param[in] eventView holds a pointer to the event view. This view needs to be set in order to access the selected event data for plotting.
+    * @param[in] rawView holds a pointer to the raw view. This view needs to be set in order to access the raw view for manual viewport updating.
     */
-    void setEventData(MatrixXi &eventData);
+    void setEventModelView(EventModel *model, QTableView* eventView, QTableView *rawView);
 
     // Plots settings
-    double m_dDefaultPlotHeight;   /**< The height of the plot */
+    int         m_iDefaultPlotHeight;       /**< The height of the plot */
+    bool        m_bShowSelectedEventsOnly;  /**< When true all events are plotted otherwise only plot selected event */
+    bool        m_bActivateEvents;          /**< Flag for plotting events */
 
     // Scaling
-    double m_dMaxValue;     /**< Maximum value of the data to plot  */
-    double m_dScaleY;       /**< Maximum amplitude of plot (max is m_dPlotHeight/2) */
-    double m_dDx;           /**< pixel difference to the next sample*/
+    double      m_dMaxValue;                /**< Maximum value of the data to plot */
+    double      m_dScaleY;                  /**< Maximum amplitude of plot (max is m_dPlotHeight/2) */
+    double      m_dDx;                      /**< pixel difference to the next sample */
 
 private:
     //=========================================================================================================
@@ -160,10 +167,13 @@ private:
     void plotEvents(const QModelIndex &index, const QStyleOptionViewItem &option, QPainter *painter) const;
 
     //Settings
-    qint8           m_nhlines;          /**< Number of horizontal lines for the grid plot */
+    qint8           m_nhlines;              /**< Number of horizontal lines for the grid plot */
     QSettings       m_qSettings;
 
-    MatrixXi        m_eventData;             /**< Matrix that holds the loaded events from the event file. */
+    //Event model view
+    EventModel*     m_pEventModel;           /**< Pointer to the event model. */
+    QTableView*     m_pEventView;            /**< Pointer to the event view. */
+    QTableView*     m_pRawView;              /**< Pointer to the raw view. */
 };
 
 } // NAMESPACE

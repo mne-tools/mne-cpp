@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
-* @file     tmsiaboutwidget.h
+* @file     aboutwindow.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     September, 2013
+* @date     August, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,20 +30,19 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the TMSIAboutWidget class.
+* @brief    Contains the declaration of the AboutWindow class.
 *
 */
 
-#ifndef TMSIABOUTWIDGET_H
-#define TMSIABOUTWIDGET_H
-
+#ifndef ABOUTWINDOW_H
+#define ABOUTWINDOW_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "../ui_tmsiabout.h"
+#include "ui_aboutwindow.h"
 
 
 //*************************************************************************************************************
@@ -51,61 +50,47 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
+#include <QWidget>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE TMSIPlugin
+// DEFINE NAMESPACE MNEBrowseRawQt
 //=============================================================================================================
 
-namespace TMSIPlugin
+namespace MNEBrowseRawQt
 {
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-
-//=============================================================================================================
 /**
-* DECLARE CLASS TMSIAboutWidget
+* DECLARE CLASS AboutWindow
 *
-* @brief The TMSIAboutWidget class provides the about dialog for the TMSI.
+* @brief The AboutWindow class provides the about window.
 */
-class TMSIAboutWidget : public QDialog
+class AboutWindow : public QWidget
 {
     Q_OBJECT
 
 public:
-
     //=========================================================================================================
     /**
-    * Constructs a TMSIAboutWidget dialog which is a child of parent.
+    * Constructs a AboutWindow dialog which is a child of parent.
     *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new TMSIAboutWidget becomes a window. If parent is another widget, TMSIAboutWidget becomes a child window inside parent. TMSIAboutWidget is deleted when its parent is deleted.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new AboutWindow becomes a window. If parent is another widget, AboutWindow becomes a child window inside parent. AboutWindow is deleted when its parent is deleted.
     */
-    TMSIAboutWidget(QWidget *parent = 0);
+    AboutWindow(QWidget *parent = 0);
+
 
     //=========================================================================================================
     /**
-    * Destroys the TMSIAboutWidget.
-    * All TMSIAboutWidget's children are deleted first. The application exits if TMSIAboutWidget is the main widget.
+    * Destroys the AboutWindow.
+    * All AboutWindow's children are deleted first. The application exits if AboutWindow is the main widget.
     */
-    ~TMSIAboutWidget();
+    ~AboutWindow();
 
 private:
-    Ui::TMSIAboutWidgetClass ui;    /**< Holds the user interface for the TMSIAboutWidgetClass.*/
+    Ui::AboutWindow *ui;
 };
 
-} // NAMESPACE
+} // NAMESPACE MNEBrowseRawQt
 
-#endif // TMSIABOUTWIDGET_H
+#endif // ABOUTWINDOW_H
