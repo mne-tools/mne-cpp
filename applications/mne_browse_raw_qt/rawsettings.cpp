@@ -112,6 +112,7 @@ void RawSettings::init()
 
     //EventDesignParameters
     m_qSettings.beginGroup("EventDesignParameters");
+
         //Event colors
         QVariant variant;
         variant = QColor(Qt::black);
@@ -138,6 +139,17 @@ void RawSettings::init()
 
         //Event marker opacity
         m_qSettings.setValue("event_marker_opacity",EVENT_MARKER_OPACITY);
+
     m_qSettings.endGroup();
 
+    //Data window marker
+    m_qSettings.beginGroup("DataMarker");
+
+        //Event colors
+        variant = QColor (227,6,19);
+        m_qSettings.setValue("data_marker_color",variant);
+        m_qSettings.setValue("data_marker_opacity",DATA_MARKER_OPACITY);
+        m_qSettings.setValue("data_marker_width",DATA_MARKER_WIDTH);
+
+    m_qSettings.endGroup();
 }

@@ -100,7 +100,7 @@ void DataWindow::initRawViewSettings()
             this,&DataWindow::customContextMenuRequested);
 
     //activate kinetic scrolling
-    QScroller::grabGesture(ui->m_tableView_rawTableView,QScroller::MiddleMouseButtonGesture);
+    QScroller::grabGesture(ui->m_tableView_rawTableView, QScroller::MiddleMouseButtonGesture);
 
     //connect QScrollBar with model in order to reload data samples
     connect(ui->m_tableView_rawTableView->horizontalScrollBar(),&QScrollBar::valueChanged,
@@ -148,17 +148,20 @@ void DataWindow::initLabels()
             this,&DataWindow::setRangeSampleLabels);
 
     //Setup marker label
-    //Set current marker sample label to vertical spacer position and initalize text with
+    //Set current marker sample label to vertical spacer position and initalize text
     m_pCurrentDataMarkerLabel->setAlignment(Qt::AlignHCenter);
     m_pCurrentDataMarkerLabel->move(m_pDataMarker->geometry().left(), m_pDataMarker->geometry().top() + 5);
     m_pCurrentDataMarkerLabel->setText(QString().number(m_iCurrentMarkerSample));
 
     //Set color
     QPalette palette;
-    palette.setColor(QPalette::WindowText, QColor (227,6,19));
-    QColor color;
-    color.setAlpha(0);
-    palette.setColor(QPalette::Window, color);
+    QColor textColor = m_qSettings.value("DataMarker/data_marker_color").value<QColor>();
+    textColor.setAlpha(m_qSettings.value("DataMarker/data_marker_opacity").toInt());
+    palette.setColor(QPalette::WindowText, textColor);
+
+    QColor windowColor;
+    windowColor.setAlpha(0); //make qlabel bounding rect fully transparent
+    palette.setColor(QPalette::Window, windowColor);
 
     m_pCurrentDataMarkerLabel->setAutoFillBackground(true);
     m_pCurrentDataMarkerLabel->setPalette(palette);
@@ -193,7 +196,8 @@ void DataWindow::initMarker()
     m_pDataMarker->setMovementBoundary(region);
 
     //Set marker size to table view size minus horizontal scroll bar height
-    m_pDataMarker->resize(3,boundingRect.height() - ui->m_tableView_rawTableView->horizontalScrollBar()->height()-1);
+    m_pDataMarker->resize(m_qSettings.value("DataMarker/data_marker_width").toInt(),
+                          boundingRect.height() - ui->m_tableView_rawTableView->horizontalScrollBar()->height()-1);
 }
 
 
@@ -355,7 +359,9 @@ void DataWindow::setMarkerSampleLabel()
 
     m_pCurrentDataMarkerLabel->setText(QString().number(m_iCurrentMarkerSample));
 
-    m_pCurrentDataMarkerLabel->move(m_pDataMarker->geometry().left() - (m_pCurrentDataMarkerLabel->width()/2) + 1, m_pDataMarker->geometry().top() - 20);
+    m_pCurrentDataMarkerLabel->move(m_pDataMarker->geometry().left() + (m_qSettings.value("DataMarker/data_marker_width").toInt()/2) - (m_pCurrentDataMarkerLabel->width()/2) + 1, m_pDataMarker->geometry().top() - 20);
+
+    qDebug()<<"marker moved"<<m_iCurrentMarkerSample;
 }
 
 
@@ -402,7 +408,8 @@ void DataWindow::updateMarkerPosition()
     }
 
     //Set marker size to table view size minus horizontal scroll bar height
-    m_pDataMarker->resize(3, boundingRect.height() - ui->m_tableView_rawTableView->horizontalScrollBar()->height()-1);
+    m_pDataMarker->resize(m_qSettings.value("DataMarker/data_marker_width").toInt(),
+                          boundingRect.height() - ui->m_tableView_rawTableView->horizontalScrollBar()->height()-1);
 
     //Update current marker sample lable
     m_pCurrentDataMarkerLabel->move(m_pDataMarker->geometry().left() - (m_pCurrentDataMarkerLabel->width()/2) + 1, m_pDataMarker->geometry().top() - 20);

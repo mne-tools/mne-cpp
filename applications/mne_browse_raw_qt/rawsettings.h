@@ -101,6 +101,10 @@
 //Event marker opacity
 #define EVENT_MARKER_OPACITY 85 // opacity of the markers and backgorunds in the table columns
 
+//Data marker
+#define DATA_MARKER_WIDTH 3 // in pixels
+#define DATA_MARKER_OPACITY 100 // opacity of the data marker and backgorunds in the table columns
+
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE NAMESPACE MNEBrowseRawQt
