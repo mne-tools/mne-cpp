@@ -65,13 +65,14 @@
 #ifndef RAWMODEL_H
 #define RAWMODEL_H
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "types.h"
-#include "filteroperator.h"
+#include "../types.h"
+#include "../filteroperator.h"
 
 
 //*************************************************************************************************************
@@ -156,7 +157,6 @@ public:
     */
     bool loadFiffData(QFile& qFile);
 
-
     //=========================================================================================================
     /**
     * writeFiffData writes a new fiff data file
@@ -167,32 +167,11 @@ public:
     bool writeFiffData(QFile &qFile);
 
     //VARIABLES
-    bool                    m_bFileloaded;      /**< true when a Fiff file is loaded */
-
-    //Fiff data structure
-    QList<MatrixXdR>        m_data;             /**< List that holds the fiff matrix data <n_channels x n_samples> */
-    QList<MatrixXdR>        m_procData;         /**< List that holds the processed fiff matrix data <n_channels x n_samples> */
-    QList<MatrixXdR>        m_times;            /**< List that holds the time axis [in secs] */
-
-    QList<FiffChInfo>       m_chInfolist;       /**< List of FiffChInfo objects that holds the corresponding channels information */
-    FiffInfo                m_fiffInfo;         /**< fiff info of whole fiff file */
-
-    //Filter operators
-    QMap<QString,QSharedPointer<MNEOperator> > m_Operators;     /**< generated MNEOperator types (FilterOperator,PCA etc.) */
-    QMap<int,QSharedPointer<MNEOperator> > m_assignedOperators; /**< Map of MNEOperator types to channels*/
-
-    //Settings
-    QSettings               m_qSettings;
-
-    qint32                  m_iAbsFiffCursor;   /**< Cursor that points to the current position in the fiff data file [in samples] */
-    qint32                  m_iCurAbsScrollPos; /**< the current (absolute) ScrollPosition in the fiff data file */
-
-    qint32                  m_iWindowSize;      /**< Length of window to load [in samples] */
-    qint32                  m_reloadPos;        /**< Distance that the current window needs to be off the ends of m_data[i] [in samples] */
-    qint8                   m_maxWindows;       /**< number of windows that are at maximum remained in m_data */
-    qint16                  m_iFilterTaps;      /**< Number of Filter taps */
-
-    QSharedPointer<FiffIO>  m_pfiffIO;          /**< FiffIO objects, which holds all the information of the fiff data (excluding the samples!) */
+    bool                                        m_bFileloaded;  /**< true when a Fiff file is loaded */
+    QList<FiffChInfo>                           m_chInfolist;   /**< List of FiffChInfo objects that holds the corresponding channels information */
+    FiffInfo                                    m_fiffInfo;     /**< fiff info of whole fiff file */
+    QSharedPointer<FiffIO>                      m_pfiffIO;      /**< FiffIO objects, which holds all the information of the fiff data (excluding the samples!) */
+    QMap<QString,QSharedPointer<MNEOperator> >  m_Operators;    /**< generated MNEOperator types (FilterOperator,PCA etc.) */
 
 private:
     //=========================================================================================================
@@ -257,19 +236,31 @@ private:
 
     QMutex                                  m_Mutex;                    /**< mutex for locking against simultaenous access to shared objects > */
 
+    //Fiff data structure
+    QList<MatrixXdR>                        m_data;                     /**< List that holds the fiff matrix data <n_channels x n_samples> */
+    QList<MatrixXdR>                        m_procData;                 /**< List that holds the processed fiff matrix data <n_channels x n_samples> */
+    QList<MatrixXdR>                        m_times;                    /**< List that holds the time axis [in secs] */
+
+    //Filter operators
+    QMap<int,QSharedPointer<MNEOperator> >      m_assignedOperators;    /**< Map of MNEOperator types to channels*/
+
+    //Settings
+    QSettings                               m_qSettings;
+
+    qint32                                  m_iAbsFiffCursor;           /**< Cursor that points to the current position in the fiff data file [in samples] */
+    qint32                                  m_iCurAbsScrollPos;         /**< the current (absolute) ScrollPosition in the fiff data file */
+
+    qint32                                  m_iWindowSize;              /**< Length of window to load [in samples] */
+    qint32                                  m_reloadPos;                /**< Distance that the current window needs to be off the ends of m_data[i] [in samples] */
+    qint8                                   m_maxWindows;               /**< number of windows that are at maximum remained in m_data */
+    qint16                                  m_iFilterTaps;              /**< Number of Filter taps */
+
 signals:
     //=========================================================================================================
     /**
     * dataReloaded is emitted when data reloading has finished in the background-thread
     */
     void dataReloaded();
-
-    //=========================================================================================================
-    /**
-    * scrollBarValueChange is emitted if a change of the horizontal ScrollBar value is requested by the RawModel
-    * @param pos is the requested relative scroll position (0 equals beginning of ScrollBar)
-    */
-    void scrollBarValueChange(int pos);
 
 public slots:
     //=========================================================================================================
