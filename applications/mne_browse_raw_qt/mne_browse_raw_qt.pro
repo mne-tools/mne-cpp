@@ -67,27 +67,46 @@ else {
 
 DESTDIR = $${MNE_BINARY_DIR}
 
-SOURCES += rawsettings.cpp\
-    main.cpp\
-    rawmodel.cpp \
-    mainwindow.cpp \
-    rawdelegate.cpp \
+SOURCES += \
+    rawsettings.cpp \
+    main.cpp \
     mneoperator.cpp \
     filteroperator.cpp \
-    eventmodel.cpp
+    Models/rawmodel.cpp \
+    Models/eventmodel.cpp \
+    Delegates/rawdelegate.cpp \
+    FormFiles/mainwindow.cpp \
+    FormFiles/filterwindow.cpp \
+    FormFiles/eventwindow.cpp \
+    FormFiles/datawindow.cpp \
+    FormFiles/aboutwindow.cpp \
+    FormFiles/informationwindow.cpp \
+    FormFiles/datamarker.cpp
 
-HEADERS += types.h\
-    info.h\
-    rawsettings.h\
-    rawmodel.h\
-    mainwindow.h \
-    rawdelegate.h \
+HEADERS += \
+    rawsettings.h \
     mneoperator.h \
     filteroperator.h \
-    eventmodel.h
+    types.h \
+    info.h \
+    Models/rawmodel.h \
+    Models/eventmodel.h \
+    Delegates/rawdelegate.h \
+    FormFiles/mainwindow.h \
+    FormFiles/filterwindow.h \
+    FormFiles/eventwindow.h \
+    FormFiles/datawindow.h \
+    FormFiles/aboutwindow.h \
+    FormFiles/informationwindow.h \
+    FormFiles/datamarker.h
 
-
-FORMS +=
+FORMS += \
+    FormFiles/filterwindow.ui \
+    FormFiles/eventwindowdock.ui \
+    FormFiles/datawindowdock.ui \
+    FormFiles/mainwindow.ui \
+    FormFiles/aboutwindow.ui \
+    FormFiles/informationwindow.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
@@ -105,3 +124,5 @@ macx {
     CONFIG +=c++11
 }
 
+RESOURCES += \
+    mnebrowserawqt.qrc
