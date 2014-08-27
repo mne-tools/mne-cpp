@@ -81,7 +81,8 @@ SOURCES += \
     FormFiles/datawindow.cpp \
     FormFiles/aboutwindow.cpp \
     FormFiles/informationwindow.cpp \
-    FormFiles/datamarker.cpp
+    FormFiles/datamarker.cpp \
+    Delegates/eventdelegate.cpp
 
 HEADERS += \
     rawsettings.h \
@@ -98,7 +99,8 @@ HEADERS += \
     FormFiles/datawindow.h \
     FormFiles/aboutwindow.h \
     FormFiles/informationwindow.h \
-    FormFiles/datamarker.h
+    FormFiles/datamarker.h \
+    Delegates/eventdelegate.h
 
 FORMS += \
     FormFiles/filterwindow.ui \

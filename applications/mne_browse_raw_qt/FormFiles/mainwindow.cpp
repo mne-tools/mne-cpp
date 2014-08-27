@@ -118,6 +118,7 @@ void MainWindow::setupModel()
 void MainWindow::setupDelegate()
 {
     m_pRawDelegate = new RawDelegate(this);
+    m_pEventDelegate = new EventDelegate(this);
 }
 
 
@@ -134,6 +135,7 @@ void MainWindow::setupViews()
 
     //set custom delegate
     m_pRawTableView->setItemDelegate(m_pRawDelegate);
+    m_pEventTableView->setItemDelegate(m_pEventDelegate);
 
     //setup view settings
     m_pDataWindow->initRawViewSettings();

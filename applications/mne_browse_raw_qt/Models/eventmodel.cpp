@@ -292,6 +292,35 @@ bool EventModel::removeRows(int position, int span, const QModelIndex & parent)
 
 //*************************************************************************************************************
 
+Qt::ItemFlags EventModel::flags(const QModelIndex & index) const
+{
+    //Return editable only for user events
+    if(m_dataIsUserEvent[index.row()] == 1 && (index.column() == 0 || index.column() == 2))
+        return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
+    else
+        return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
+}
+
+
+//*************************************************************************************************************
+
+bool EventModel::setData(const QModelIndex & index, const QVariant & value, int role)
+{
+    if(index.row() >= rowCount() || index.column() >= columnCount())
+        return false;
+
+    if(role == Qt::EditRole) {
+        m_dataSamples[index.row()] = value.toInt();
+        m_dataTypes[index.row()] = value.toInt();
+        m_dataIsUserEvent[index.row()] = value.toInt();
+    }
+
+    return true;
+}
+
+
+//*************************************************************************************************************
+
 bool EventModel::loadEventData(QFile& qFile)
 {
     beginResetModel();

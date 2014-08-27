@@ -100,12 +100,12 @@ void EventWindow::initCheckBoxes()
 {
     connect(ui->m_checkBox_activateEvents,&QCheckBox::stateChanged, [=](int state){
         m_pMainWindow->m_pRawDelegate->m_bActivateEvents = state;
-        jumpToEvent(m_pMainWindow->m_pEventTableView->selectionModel()->currentIndex(), QModelIndex());
+        jumpToEvent(ui->m_tableView_eventTableView->selectionModel()->currentIndex(), QModelIndex());
     });
 
     connect(ui->m_checkBox_showSelectedEventsOnly,&QCheckBox::stateChanged, [=](int state){
         m_pMainWindow->m_pRawDelegate->m_bShowSelectedEventsOnly = state;
-        jumpToEvent(m_pMainWindow->m_pEventTableView->selectionModel()->currentIndex(), QModelIndex());
+        jumpToEvent(ui->m_tableView_eventTableView->selectionModel()->currentIndex(), QModelIndex());
     });
 }
 
@@ -126,10 +126,8 @@ bool EventWindow::event(QEvent * event)
             QModelIndexList indexList = ui->m_tableView_eventTableView->selectionModel()->selectedIndexes();
 
             for(int i = 0; i<indexList.size(); i++)
-                m_pMainWindow->m_pEventModel->removeRow(indexList.at(i).row());
-
-//            m_pMainWindow->m_pEventModel->removeRow(ui->m_tableView_eventTableView->selectionModel()->currentIndex().row());
-        }
+                m_pMainWindow->m_pEventModel->removeRow(indexList.at(i).row() - i); // - i because the internal data structure gets smaller by one with each succession in this for statement
+       }
     }
 
     return QDockWidget::event(event);
