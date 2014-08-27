@@ -89,7 +89,6 @@ using namespace MNELIB;
 
 namespace Ui
 {
-    class MainWindow;  
 }
 
 
@@ -112,8 +111,8 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();
 
+    void fill_dict_combobox();
     typedef QList<GaborAtom> gabor_atom_list;
 
 private slots:
@@ -218,7 +217,6 @@ private slots:
     void recieve_result(qint32 current_iteration, qint32 max_iterations, qreal current_energy, qreal max_energy, gabor_atom_list atom_res_list);
     //==========================================================================================================
 
-
     void calc_thread_finished();
     void on_actionCreate_treebased_dictionary_triggered();
     void on_sb_sample_rate_editingFinished();
@@ -230,8 +228,10 @@ private slots:
     void on_sb_sample_count_valueChanged(int arg1);
     void on_cb_all_select_clicked();
     void on_time_out();
-
     void on_actionSettings_triggered();
+    void on_dicts_saved();
+
+    void on_actionSpeicher_unter_triggered();
 
 signals:
 
@@ -328,7 +328,7 @@ private:
     QList<qreal> norm_signal(QList<qreal> signalSamples);
     QStringList correlation(VectorXd signalSamples, QList<qreal> atomSamples, QString atomName);
     void calc_fix_mp(QString path, MatrixXd signal, TruncationCriterion criterion);
-
+    void closeEvent(QCloseEvent * event);
 };
 
 //*************************************************************************************************************

@@ -17,6 +17,7 @@ public:
 
 private slots:
     void on_btt_close_clicked();
+    void on_btt_cancel_clicked();
 
 private:
     Ui::settingwindow *ui;
