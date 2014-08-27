@@ -361,7 +361,7 @@ void DataWindow::setMarkerSampleLabel()
 
     m_pCurrentDataMarkerLabel->move(m_pDataMarker->geometry().left() + (m_qSettings.value("DataMarker/data_marker_width").toInt()/2) - (m_pCurrentDataMarkerLabel->width()/2) + 1, m_pDataMarker->geometry().top() - 20);
 
-    qDebug()<<"marker moved"<<m_iCurrentMarkerSample;
+    //qDebug()<<"marker moved"<<m_iCurrentMarkerSample;
 }
 
 

@@ -79,7 +79,7 @@
        </size>
       </property>
       <property name="editTriggers">
-       <set>QAbstractItemView::AnyKeyPressed|QAbstractItemView::DoubleClicked|QAbstractItemView::EditKeyPressed</set>
+       <set>QAbstractItemView::AllEditTriggers</set>
       </property>
       <property name="showDropIndicator" stdset="0">
        <bool>false</bool>

@@ -134,6 +134,9 @@ public:
     bool insertRows(int position, int span, const QModelIndex & parent = QModelIndex());
     bool removeRows(int position, int span, const QModelIndex & parent = QModelIndex());
 
+    Qt::ItemFlags flags(const QModelIndex & index) const;
+    bool setData(const QModelIndex & index, const QVariant & value, int role = Qt::EditRole);
+
     //=========================================================================================================
     /**
     * loadEventData loads fiff event data file
