@@ -217,13 +217,6 @@
                </property>
               </widget>
              </item>
-             <item row="9" column="2">
-              <widget class="QCheckBox" name="chb_fix_phase">
-               <property name="text">
-                <string>fix phase</string>
-               </property>
-              </widget>
-             </item>
             </layout>
            </item>
           </layout>
@@ -789,22 +782,6 @@
     <hint type="destinationlabel">
      <x>236</x>
      <y>130</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>rb_adativMp</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>chb_fix_phase</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>67</x>
-     <y>111</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>159</x>
-     <y>111</y>
     </hint>
    </hints>
   </connection>
