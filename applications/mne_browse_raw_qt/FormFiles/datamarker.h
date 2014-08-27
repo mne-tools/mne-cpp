@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
-* @file     tmsiaboutwidget.h
+* @file     datamarker.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     September, 2013
+* @date     August, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,82 +30,89 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the TMSIAboutWidget class.
+* @brief    Contains the declaration of the DataMarker class.
 *
 */
-
-#ifndef TMSIABOUTWIDGET_H
-#define TMSIABOUTWIDGET_H
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// INCLUDES
-//=============================================================================================================
-
-#include "../ui_tmsiabout.h"
-
+#ifndef DATAMARKER_H
+#define DATAMARKER_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QtWidgets>
+#include <QWidget>
+#include <QPalette>
+#include <QMouseEvent>
+#include <QRect>
+#include <QRegion>
+#include <QDebug>
+#include <QEvent>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE TMSIPlugin
+// DEFINE NAMESPACE MNEBrowseRawQt
 //=============================================================================================================
 
-namespace TMSIPlugin
+namespace MNEBrowseRawQt
 {
 
-
-//*************************************************************************************************************
-//=============================================================================================================
-// USED NAMESPACES
-//=============================================================================================================
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// FORWARD DECLARATIONS
-//=============================================================================================================
-
-
-//=============================================================================================================
 /**
-* DECLARE CLASS TMSIAboutWidget
+* DECLARE CLASS DataMarker
 *
-* @brief The TMSIAboutWidget class provides the about dialog for the TMSI.
+* @brief The DataWindow class provides the data dock window
 */
-class TMSIAboutWidget : public QDialog
+class DataMarker : public QWidget
 {
     Q_OBJECT
-
 public:
-
     //=========================================================================================================
     /**
-    * Constructs a TMSIAboutWidget dialog which is a child of parent.
+    * Constructs a DataMarker dialog which is a child of parent
     *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new TMSIAboutWidget becomes a window. If parent is another widget, TMSIAboutWidget becomes a child window inside parent. TMSIAboutWidget is deleted when its parent is deleted.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new DataMarker becomes a window. If parent is another widget, DataMarker becomes a child window inside parent. DataWindow is deleted when its parent is deleted.
     */
-    TMSIAboutWidget(QWidget *parent = 0);
+    DataMarker(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the TMSIAboutWidget.
-    * All TMSIAboutWidget's children are deleted first. The application exits if TMSIAboutWidget is the main widget.
+    * set the m_movementBoundary
+    *
+    * @param [in] QRect Hols the bounding rect
     */
-    ~TMSIAboutWidget();
+    void setMovementBoundary(QRegion rect);
 
 private:
-    Ui::TMSIAboutWidgetClass ui;    /**< Holds the user interface for the TMSIAboutWidgetClass.*/
+    //=========================================================================================================
+    /**
+    * Reimplemnted mouse press event handler
+    *
+    * @param event QMouseEvent
+    */
+    void mousePressEvent(QMouseEvent *event);
+
+    //=========================================================================================================
+    /**
+    * Reimplemnted mouse move event handler
+    *
+    * @param event QMouseEvent
+    */
+    void mouseMoveEvent(QMouseEvent *event);
+
+    void enterEvent(QEvent *event);
+
+    QPoint      m_oldPos;               /**< The old mouse position */
+
+    QRegion     m_movableRegion;        /**< The movement boundary */
+
+signals:
+    void markerMoved();
+
+public slots:
+
 };
 
-} // NAMESPACE
+} // NAMESPACE MNEBrowseRawQt
 
-#endif // TMSIABOUTWIDGET_H
+#endif // DATAMARKER_H
