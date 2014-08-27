@@ -202,7 +202,6 @@ public:
 
 public slots:
 
-    void send_result();
     QList<GaborAtom> matching_pursuit (MatrixXd signal, qint32 max_iterations, qreal epsilon, bool fix_phase, bool boost, qint32 simplex_it,
                                        qreal simplex_reflection, qreal simplex_expansion, qreal simplex_contraction, qreal simplex_full_contraction);
     void recieve_input(MatrixXd signal, qint32 max_iterations, qreal epsilon, bool fix_phase, bool boost, qint32 simplex_it,
@@ -213,7 +212,7 @@ public slots:
 signals:
 
     void current_result(qint32 current_iteration, qint32 max_iteration, qreal current_energy, qreal max_energy, gabor_atom_list atom_list);
-    void finished();
+    void finished_calc();
 
 };
 
