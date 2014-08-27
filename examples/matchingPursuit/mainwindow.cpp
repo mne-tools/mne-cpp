@@ -1169,7 +1169,7 @@ void MainWindow::on_btt_Calc_clicked()
         _atom_sum_matrix = MatrixXd::Zero(256,1);
 //        QFuture<void> f1 = QtConcurrent::run(&mpCalc, ownDict, _signal_matrix.col(0), ui->sb_Iterations->value());
 //        f1.waitForFinished();
-        calc_fix_mp(ownDict, _signal_matrix.col(0), criterion);
+        calc_fix_mp(QString("Matching-Pursuit-Toolbox/%1.dict").arg(ui->cb_Dicts->currentText()), _signal_matrix.col(0), criterion);
         //update();
     }
     else if(ui->rb_adativMp->isChecked())
@@ -1388,8 +1388,8 @@ void MainWindow::calc_adaptiv_mp(MatrixXd signal, TruncationCriterion criterion)
             adaptive_Mp, SLOT(recieve_input(MatrixXd, qint32, qreal, bool, bool, qint32, qreal, qreal, qreal, qreal)));
     connect(adaptive_Mp, SIGNAL(current_result(qint32, qint32, qreal, qreal, gabor_atom_list)),
                  this, SLOT(recieve_result(qint32, qint32, qreal, qreal, gabor_atom_list)));
-    connect(adaptive_Mp, SIGNAL(finished()), adaptive_Mp_Thread, SLOT(quit()));
-    connect(adaptive_Mp, SIGNAL(finished()), adaptive_Mp, SLOT(deleteLater()));
+    connect(adaptive_Mp, SIGNAL(finished_calc()), adaptive_Mp_Thread, SLOT(quit()));
+    connect(adaptive_Mp, SIGNAL(finished_calc()), adaptive_Mp, SLOT(deleteLater()));
     connect(adaptive_Mp_Thread, SIGNAL(finished()), this, SLOT(calc_thread_finished()));
     connect(adaptive_Mp_Thread, SIGNAL(finished()), adaptive_Mp_Thread, SLOT(deleteLater()));
 
@@ -1422,7 +1422,7 @@ void MainWindow::calc_adaptiv_mp(MatrixXd signal, TruncationCriterion criterion)
 
 // TODO: Calc MP (new)
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-void MainWindow::calc_fix_mp(QFile &currentDict, MatrixXd signal, TruncationCriterion criterion)
+void MainWindow::calc_fix_mp(QString path, MatrixXd signal, TruncationCriterion criterion)
 {
     FixDictMp *fixDict_Mp = new FixDictMp();
     _atom_sum_matrix = MatrixXd::Zero(signal.rows(), signal.cols());
@@ -1435,12 +1435,13 @@ void MainWindow::calc_fix_mp(QFile &currentDict, MatrixXd signal, TruncationCrit
     qRegisterMetaType<Eigen::MatrixXd>("MatrixXd");
     qRegisterMetaType<gabor_atom_list>("gabor_atom_list");
 
-    connect(this, SIGNAL(send_input_fix_dict(MatrixXd, qint32, qreal, QFile, qint32, qreal, qreal, qreal, qreal)),
-            fixDict_Mp, SLOT(recieve_input(MatrixXd, qint32, qreal, bool, bool, qint32, qreal, qreal, qreal, qreal)));
+    connect(this, SIGNAL(send_input_fix_dict(MatrixXd, qint32, qreal, QString, qint32, qreal, qreal, qreal, qreal)),
+            fixDict_Mp, SLOT(recieve_input(MatrixXd, qint32, qreal, QString, qint32, qreal, qreal, qreal, qreal)));
+
     connect(fixDict_Mp, SIGNAL(current_result(qint32, qint32, qreal, qreal, gabor_atom_list)),
                   this, SLOT(recieve_result(qint32, qint32, qreal, qreal, gabor_atom_list)));
-    connect(fixDict_Mp, SIGNAL(finished()), fixDict_Mp_Thread, SLOT(quit()));
-    connect(fixDict_Mp, SIGNAL(finished()), fixDict_Mp, SLOT(deleteLater()));
+    connect(fixDict_Mp, SIGNAL(finished_calc()), fixDict_Mp_Thread, SLOT(quit()));
+    connect(fixDict_Mp, SIGNAL(finished_calc()), fixDict_Mp, SLOT(deleteLater()));
     connect(fixDict_Mp_Thread, SIGNAL(finished()), this, SLOT(calc_thread_finished()));
     connect(fixDict_Mp_Thread, SIGNAL(finished()), fixDict_Mp_Thread, SLOT(deleteLater()));
 
@@ -1448,21 +1449,24 @@ void MainWindow::calc_fix_mp(QFile &currentDict, MatrixXd signal, TruncationCrit
     {
         case Iterations:
         {
-            emit send_input_fix_dict(signal, ui->sb_Iterations->value(), qreal(MININT32), currentDict, 1E3, 1.0, 0.2, 0.5, 0.5);
+            emit send_input_fix_dict(signal, ui->sb_Iterations->value(), qreal(MININT32), QString("Matching-Pursuit-Toolbox/%1.dict").arg(ui->cb_Dicts->currentText()),
+                                        1E3, 1.0, 0.2, 0.5, 0.5);
             fixDict_Mp_Thread->start();
         }
         break;
 
         case SignalEnergy:
         {
-            emit send_input_fix_dict(signal, MAXINT32, res_energy, currentDict, 1E3, 1.0, 0.2, 0.5, 0.5);
+            emit send_input_fix_dict(signal, MAXINT32, res_energy, QString("Matching-Pursuit-Toolbox/%1.dict").arg(ui->cb_Dicts->currentText()),
+                                        1E3, 1.0, 0.2, 0.5, 0.5);
             fixDict_Mp_Thread->start();
         }
         break;
 
         case Both:
         {
-            emit send_input_fix_dict(signal, ui->sb_Iterations->value(), res_energy, currentDict, 1E3, 1.0, 0.2, 0.5, 0.5);
+            emit send_input_fix_dict(signal, ui->sb_Iterations->value(), res_energy, QString("Matching-Pursuit-Toolbox/%1.dict").arg(ui->cb_Dicts->currentText()),
+                                        1E3, 1.0, 0.2, 0.5, 0.5);
             fixDict_Mp_Thread->start();
         }
         break;

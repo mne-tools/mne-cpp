@@ -155,7 +155,7 @@ QList<GaborAtom> AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterat
                             max_index = i;
                         }
 
-                    //adapting translation p to create atomtranslation correctly ToDo: is this correct, think about it again
+                    //adapting translation p to create atomtranslation correctly
                     if(max_index >= p) p = max_index - p + 1;
                     else p = max_index + p;
 
@@ -423,7 +423,7 @@ QList<GaborAtom> AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterat
         }
 
         if(cnt==iterations)//max number of iteration achieves before tol is satisfied
-            std::cout<<"Simplex Iteration limit of "<<iterations<<" achieved, result may not be optimal";
+            std::cout<<"Simplex Iteration limit of "<<iterations<<" achieved, result may not be optimal\n";
 
         //end Maximisation Copyright (C) 2010 Botao Jia
 
@@ -459,11 +459,12 @@ QList<GaborAtom> AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterat
 
         delete gabor_Atom;
         it++;
-        send_result();
+
+        emit current_result(it, max_it, current_energy, signal_energy, atom_list);
 
     }//end iterations    
     std::cout << "\nAdaptive Matching Pursuit Algorithm finished.\n";
-    emit finished();
+    emit finished_calc();
     return atom_list;
 }
 
@@ -536,13 +537,6 @@ VectorXd AdaptiveMp::calculate_atom(qint32 sample_count, qreal scale, qint32 tra
         }
         case RETURNATOM: {return real_gabor_atom;} //returns normalized realGaborAtom
     }
-}
-
-//*************************************************************************************************************
-
-void AdaptiveMp::send_result()
-{
-    emit current_result(it, max_it, current_energy, signal_energy, atom_list);
 }
 
 //*************************************************************************************************************
