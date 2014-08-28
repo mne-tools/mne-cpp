@@ -56,8 +56,8 @@ using namespace MNEBrowseRawQt;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-EventDelegate::EventDelegate(QWidget *parent)
-: QStyledItemDelegate(parent)
+EventDelegate::EventDelegate(QObject *parent)
+: QItemDelegate(parent)
 {
 }
 
@@ -66,27 +66,60 @@ EventDelegate::EventDelegate(QWidget *parent)
 
 QWidget *EventDelegate::createEditor(QWidget *parent,
      const QStyleOptionViewItem &/* option */,
-     const QModelIndex &/* index */) const
+     const QModelIndex & index) const
 {
-    qDebug()<<"EventDelegate::createEditor";
-    QSpinBox *editor = new QSpinBox(parent);
-    editor->setMinimum(0);
-    editor->setMaximum(100);
+    switch(index.column()) {
+        case 0: {
+            QSpinBox *editor = new QSpinBox(parent);
+            editor->setMinimum(0);
+            editor->setMaximum(m_pEventModel->getFirstLastSample().second);
+            return editor;
+        }
 
-    return editor;
+        case 1: {
+            QDoubleSpinBox *editor = new QDoubleSpinBox(parent);
+            editor->setMinimum(0.0);
+            editor->setMaximum(m_pEventModel->getFirstLastSample().second / m_pEventModel->getFiffInfo().sfreq);
+            return editor;
+        }
+
+        case 2: {
+            QComboBox *editor = new QComboBox(parent);
+            editor->addItems(m_qSettings.value("EventDesignParameters/event_types").value<QStringList>());
+            return editor;
+        }
+    }
+
+    return &QWidget();
 }
 
 
 //*************************************************************************************************************
 
-void EventDelegate::setEditorData(QWidget *editor,
-                                     const QModelIndex &index) const
+void EventDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
 {
-    qDebug()<<"EventDelegate::setEditorData";
-    int value = index.model()->data(index, Qt::EditRole).toInt();
+    switch(index.column()) {
+        case 0: {
+            int value = index.model()->data(index, Qt::DisplayRole).toInt();
+            QSpinBox *spinBox = static_cast<QSpinBox*>(editor);
+            spinBox->setValue(value);
+            break;
+        }
 
-    QSpinBox *spinBox = static_cast<QSpinBox*>(editor);
-    spinBox->setValue(value);
+        case 1: {
+            double value = index.model()->data(index, Qt::DisplayRole).toDouble();
+            QDoubleSpinBox *spinBox = static_cast<QDoubleSpinBox*>(editor);
+            spinBox->setValue(value);
+            break;
+        }
+
+        case 2: {
+            int value = index.model()->data(index, Qt::DisplayRole).toInt();
+            QComboBox *spinBox = static_cast<QComboBox*>(editor);
+            spinBox->setCurrentText(QString().number(value));
+            break;
+        }
+    }
 }
 
 
@@ -95,12 +128,34 @@ void EventDelegate::setEditorData(QWidget *editor,
 void EventDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
                                     const QModelIndex &index) const
 {
-    qDebug()<<"EventDelegate::setModelData";
-    QSpinBox *spinBox = static_cast<QSpinBox*>(editor);
-    spinBox->interpretText();
-    int value = spinBox->value();
+    switch(index.column()) {
+        case 0: {
+            QSpinBox *spinBox = static_cast<QSpinBox*>(editor);
+            spinBox->interpretText();
+            int value = spinBox->value();
 
-    model->setData(index, value, Qt::EditRole);
+            model->setData(index, value, Qt::EditRole);
+            break;
+        }
+
+        case 1: {
+            QDoubleSpinBox *spinBox = static_cast<QDoubleSpinBox*>(editor);
+            spinBox->interpretText();
+            double value = spinBox->value();
+
+            model->setData(index, value, Qt::EditRole);
+            break;
+        }
+
+        case 2: {
+            QComboBox *spinBox = static_cast<QComboBox*>(editor);
+            QString value = spinBox->currentText();
+
+            model->setData(index, value.toInt(), Qt::EditRole);
+            break;
+        }
+    }
+
 }
 
 
@@ -112,3 +167,12 @@ void EventDelegate::updateEditorGeometry(QWidget *editor,
     qDebug()<<"EventDelegate::updateEditorGeometry";
     editor->setGeometry(option.rect);
 }
+
+
+//*************************************************************************************************************
+
+void EventDelegate::setModelView(EventModel *eventModel)
+{
+    m_pEventModel = eventModel;
+}
+

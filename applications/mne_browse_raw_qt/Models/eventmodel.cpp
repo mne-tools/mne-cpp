@@ -151,8 +151,11 @@ QVariant EventModel::data(const QModelIndex &index, int role) const
         //******** second column (event time plot) ********
         if(index.column()==1){
             switch(role) {
-                case Qt::DisplayRole:
-                    return QVariant((double)(m_dataSamples.at(index.row())-m_iFirstSample)/m_fiffInfo.sfreq);
+                case Qt::DisplayRole: {
+                    int time = ((m_dataSamples.at(index.row()) - m_iFirstSample) / m_fiffInfo.sfreq) * 100;
+
+                    return QVariant((double)time / 100);
+                }
 
                 case Qt::BackgroundRole:
                     //Paint different background if event was set by user
@@ -173,7 +176,7 @@ QVariant EventModel::data(const QModelIndex &index, int role) const
                 case Qt::DisplayRole:
                     return QVariant(m_dataTypes.at(index.row()));
 
-                case Qt::BackgroundRole:{
+                case Qt::BackgroundRole: {
                     QBrush brush;
                     brush.setStyle(Qt::SolidPattern);
 
@@ -294,8 +297,8 @@ bool EventModel::removeRows(int position, int span, const QModelIndex & parent)
 
 Qt::ItemFlags EventModel::flags(const QModelIndex & index) const
 {
-    //Return editable only for user events
-    if(m_dataIsUserEvent[index.row()] == 1 && (index.column() == 0 || index.column() == 2))
+    //Return editable mode only for user events
+    if(m_dataIsUserEvent[index.row()] == 1)
         return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
     else
         return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
@@ -310,9 +313,24 @@ bool EventModel::setData(const QModelIndex & index, const QVariant & value, int 
         return false;
 
     if(role == Qt::EditRole) {
-        m_dataSamples[index.row()] = value.toInt();
-        m_dataTypes[index.row()] = value.toInt();
-        m_dataIsUserEvent[index.row()] = value.toInt();
+        int column = index.column();
+        switch(column) {
+            case 0:
+                m_dataSamples[index.row()] = value.toInt() + m_iFirstSample;
+                break;
+
+            case 1:
+                m_dataSamples[index.row()] = (int)value.toInt() * m_fiffInfo.sfreq + m_iFirstSample;
+
+                qDebug()<<"(int)value.toInt() * m_fiffInfo.sfreq"<<(int)value.toInt() * m_fiffInfo.sfreq;
+
+                break;
+
+            case 2:
+                QString string = value.toString();
+                m_dataTypes[index.row()] = string.toInt();
+                break;
+        }
     }
 
     return true;
@@ -379,9 +397,10 @@ void EventModel::setFiffInfo(FiffInfo& fiffInfo)
 
 //*************************************************************************************************************
 
-void EventModel::setFirstSample(int firstSample)
+void EventModel::setFirstLastSample(int firstSample, int lastSample)
 {
     m_iFirstSample = firstSample;
+    m_iLastSample = lastSample;
 }
 
 
@@ -391,6 +410,23 @@ void EventModel::setCurrentMarkerPos(int markerPos)
 {
     //add m_iFirstSample because m_iFirstSample gets subtracted when data is asked from this model
     m_iCurrentMarkerPos = markerPos + m_iFirstSample;
+}
+
+
+//*************************************************************************************************************
+
+FiffInfo EventModel::getFiffInfo()
+{
+    return m_fiffInfo;
+}
+
+
+//*************************************************************************************************************
+
+QPair<int, int> EventModel::getFirstLastSample()
+{
+    QPair<int, int> pair(m_iFirstSample, m_iLastSample);
+    return pair;
 }
 
 
