@@ -43,9 +43,20 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QStyledItemDelegate>
+#include "../Models/eventmodel.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QItemDelegate>
 #include <QSpinBox>
+#include <QDoubleSpinBox>
+#include <QComboBox>
 #include <QDebug>
+#include <QSettings>
 
 
 //*************************************************************************************************************
@@ -61,18 +72,29 @@ namespace MNEBrowseRawQt
 /**
 * DECLARE CLASS EventDelegate
 */
-class EventDelegate : public QStyledItemDelegate
+class EventDelegate : public QItemDelegate
 {
     Q_OBJECT
 
 public:
-    EventDelegate(QWidget *parent = 0);
+    EventDelegate(QObject *parent = 0);
 
     QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
     void setEditorData(QWidget *editor, const QModelIndex &index) const;
     void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const;
     void updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
+    //=========================================================================================================
+    /**
+    * setModelView creates the QPointer path for the data plot.
+    *
+    * @param[in] model holds a pointer to the event model. This model needs to be set in order to access the event data for plotting.
+    */
+    void setModelView(EventModel *eventModel);
+
+private:
+    QSettings       m_qSettings;
+    EventModel*     m_pEventModel;
 };
 
 } //NAMESPACE
