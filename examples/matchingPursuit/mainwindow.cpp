@@ -198,66 +198,10 @@ MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::
     connect(ui->tbv_Results->model(), SIGNAL(dataChanged ( const QModelIndex&, const QModelIndex&)), this, SLOT(tbv_selection_changed(const QModelIndex&, const QModelIndex&)));
     connect(_counter_timer, SIGNAL(timeout()), this, SLOT(on_time_out()));
 
-    // build config file at init
-    bool hasEntry1 = false;
-    bool hasEntry2 = false;
-    bool hasEntry3 = false;
-    QString contents;
 
     QDir dir("Matching-Pursuit-Toolbox");
     if(!dir.exists())
-        dir.mkdir(dir.absolutePath());
-    QFile configFile("Matching-Pursuit-Toolbox/Matching-Pursuit-Toolbox.config");
-    if(!configFile.exists())
-    {
-        if (configFile.open(QIODevice::ReadWrite | QIODevice::Text))
-        configFile.close();
-    }
-
-    if (configFile.open(QIODevice::ReadWrite | QIODevice::Text))
-    {
-        while(!configFile.atEnd())
-        {
-            contents = configFile.readLine(0).constData();
-            if(contents.startsWith("ShowDeleteMessageBox=") == 0)
-                hasEntry1 = true;
-            if(contents.startsWith("ShowProcessDurationMessageBox=") == 0)
-                hasEntry2 = true;
-            if(contents.startsWith("ShowDeleteFormelMessageBox=") == 0)
-                hasEntry3 = true;
-        }
-    }
-    configFile.close();
-
-    if(!hasEntry1)
-    {
-        if (configFile.open (QIODevice::WriteOnly| QIODevice::Append))
-        {
-            QTextStream stream( &configFile );
-            stream << QString("ShowDeleteMessageBox=true;") << "\n";
-        }
-        configFile.close();
-    }
-
-    if(!hasEntry2)
-    {
-        if (configFile.open (QIODevice::WriteOnly| QIODevice::Append))
-        {
-            QTextStream stream( &configFile );
-            stream << QString("ShowProcessDurationMessageBox=true;") << "\n";
-        }
-        configFile.close();
-    }
-
-    if(!hasEntry3)
-    {
-        if (configFile.open (QIODevice::WriteOnly| QIODevice::Append))
-        {
-            QTextStream stream( &configFile );
-            stream << QString("ShowDeleteFormelMessageBox=true;") << "\n";
-        }
-        configFile.close();
-    }
+        dir.mkdir(dir.absolutePath());    
 
     fill_dict_combobox();
 
@@ -1118,21 +1062,9 @@ void MainWindow::on_btt_Calc_clicked()
 
     if(((ui->dsb_energy->value() <= 1 && ui->dsb_energy->isEnabled()) && (ui->sb_Iterations->value() >= 500 && ui->sb_Iterations->isEnabled())) || (ui->dsb_energy->value() <= 1 && ui->dsb_energy->isEnabled() && !ui->sb_Iterations->isEnabled()) || (ui->sb_Iterations->value() >= 500 && ui->sb_Iterations->isEnabled() && !ui->dsb_energy->isEnabled()) )
     {
-        QFile configFile("Matching-Pursuit-Toolbox/Matching-Pursuit-Toolbox.config");
-        bool showMsgBox = false;
-        QString contents;
-        if (configFile.open(QIODevice::ReadWrite | QIODevice::Text))
-        {
-            while(!configFile.atEnd())
-            {
-                contents = configFile.readLine(0).constData();
-                if(QString::compare("ShowProcessDurationMessageBox=true;\n", contents) == 0)
-                    showMsgBox = true;
-            }
-        }
-        configFile.close();
+        QSettings settings;
 
-        if(showMsgBox)
+        if(settings.value("show_warnings", true).toBool())
         {
             processdurationmessagebox* msgBox = new processdurationmessagebox(this);
             msgBox->setModal(true);
