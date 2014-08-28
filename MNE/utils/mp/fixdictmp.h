@@ -104,7 +104,16 @@ class UTILSSHARED_EXPORT FixDictMp : public QThread
 
 public:
 
-    //typedef QList<GaborAtom> gabor_atom_list;
+    typedef QList<GaborAtom> gabor_atom_list;
+    qint32 it;
+    qint32 max_it;
+    qreal signal_energy;
+    qreal current_energy;
+    QList<GaborAtom> atom_list;
+    MatrixXd signal;
+    qint32 max_iterations;
+    qreal epsilon;
+
     //=========================================================================================================
     /**
     * fixdictMp_fixdictMP
@@ -120,12 +129,7 @@ public:
 
     //=========================================================================================================
 
-    qint32 test();
-    QList<GaborAtom> atom_list;
 
-    //=========================================================================================================
-
-    QList<GaborAtom> matching_pursuit(QFile &currentDict, VectorXd signalSamples, qint32 iterationsCount);
 
     //=========================================================================================================
 
@@ -144,18 +148,21 @@ public:
     static void build_molecule_xml_file(qint32 level_counter);
 
 public slots:
-    //void send_result();
-    //void matching_pursuit (MatrixXd signal, qint32 max_iterations, qreal epsilon);
-    //void process();
 
-    //void recieve_input(MatrixXd signal, qint32 max_iterations, qreal epsilon, QFile &current_dict, qint32 simplex_it,
-    //                   qreal simplex_reflection, qreal simplex_expansion, qreal simplex_contraction, qreal simplex_full_contraction);
+    QList<GaborAtom> matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal epsilon, QString path,
+                                                  qint32 simplex_it, qreal simplex_reflection, qreal simplex_expansion,
+                                                  qreal simplex_contraction, qreal simplex_full_contraction);
+
+    void recieve_input(MatrixXd signal, qint32 max_iterations, qreal epsilon, QString path, qint32 simplex_it,
+                       qreal simplex_reflection, qreal simplex_expansion, qreal simplex_contraction, qreal simplex_full_contraction);
 
     //=========================================================================================================
 
 signals:
-    //void current_result(qint32 current_iteration, qint32 max_iteration, qreal current_energy, qreal max_energy, gabor_atom_list atom_list);
-    //void finished();
+
+    void current_result(qint32 current_iteration, qint32 max_iteration, qreal current_energy, qreal max_energy, gabor_atom_list atom_list);
+    void finished_calc();
+
 };//class
 
 }//NAMESPACE
