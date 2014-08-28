@@ -24,5 +24,6 @@
         <file>icons/spanner.png</file>
         <file>icons/warning.png</file>
         <file>icons/tree.png</file>
+        <file>icons/settings.png</file>
     </qresource>
 </RCC>

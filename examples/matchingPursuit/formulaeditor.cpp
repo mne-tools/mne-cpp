@@ -67,8 +67,6 @@
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
-//#define PI 3.14159265358979323846
-
 QString oldStringX = "";
 QString oldStringA = "";
 QString oldStringB = "";
@@ -538,7 +536,7 @@ void Formulaeditor::on_btt_Test_clicked()
             ui->btt_Save->setEnabled(true);
         if(retValue < 0.0000000000001 && retValue > -0.0000000000001)
             retValue = 0;
-        ui->lb_Result->setText(QString("Ergebnis vom Startwert = %1").arg(retValue));
+        ui->lb_Result->setText(QString("result start value = %1").arg(retValue));
     }
     else
     {
@@ -554,7 +552,7 @@ void Formulaeditor::on_btt_Test_clicked()
     stepWidth = ui->dsb_StepWidth->value();
     if(stepWidth == 0)
     {
-        QMessageBox::warning(this, tr("Fehler"), tr("Die Schrittweite darf nicht null sein."));
+        QMessageBox::warning(this, tr("error"), tr("Increment can not be null."));
         return;
     }
 
@@ -569,7 +567,7 @@ void Formulaeditor::on_btt_Test_clicked()
     else
     {
         qreal result = FormulaParser.calculation(ui->tb_Formula->text(), internStartValue );
-        ui->lb_Result->setText(QString("Ergebnis = %1").arg(result));
+        ui->lb_Result->setText(QString("result = %1").arg(result));
     }
 
     atomList = resultsList;
@@ -579,7 +577,7 @@ void Formulaeditor::on_btt_Test_clicked()
     update();
 }
 
-// access when "Speichern" clicked
+// access when "sforumla save" clicked
 void Formulaeditor::on_btt_Save_clicked()
 {    
     QFile saveFile("Matching-Pursuit-Toolbox/user.fml");
@@ -782,7 +780,7 @@ double Formulaeditor::simple_expression(int& nPosition, QString& strCharacter)
         {
             dum = term(nPosition, strCharacter);
             if (dum != 0)   s = s / dum;
-            else    errorText = QString("Dividieren durch 0 ist nicht möglich.");
+            else    errorText = QString("Divide by 0 is not possible.");
         }
     }
     return s;
@@ -797,7 +795,7 @@ double Formulaeditor::term(int& nPosition, QString& strCharacter)
       char_n(nPosition, strCharacter);
       vz = sign_factor(nPosition, strCharacter);
 
-      if ((t <= 0 && fabs(vz) <= 1) || (t <= 0 && vz != qint32(vz))) errorText = QString("Radizieren negativer Zahlen ist im Reelen nicht möglich.");
+      if ((t <= 0 && fabs(vz) <= 1) || (t <= 0 && vz != qint32(vz))) errorText = QString("Extraction of square root of negative numbers is not possible using dense matrix algebra.");
       else    t = pow(t,vz);
   }
   return t;

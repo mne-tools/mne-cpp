@@ -89,6 +89,7 @@ using namespace MNELIB;
 
 namespace Ui
 {
+    class MainWindow;
 }
 
 
@@ -111,6 +112,7 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(QWidget *parent = 0);
+    ~MainWindow();
 
     void fill_dict_combobox();
     typedef QList<GaborAtom> gabor_atom_list;

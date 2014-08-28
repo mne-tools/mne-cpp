@@ -73,7 +73,8 @@ public:
              Chirp
     };
 
-private:
+private:    
+
     void read_dicts();
     void calc_scale_value();
     void calc_modu_value();

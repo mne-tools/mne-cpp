@@ -41,7 +41,7 @@
 // INCLUDES
 //=============================================================================================================
 
-
+#include "formulaeditor.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -70,14 +70,50 @@ public:
     ~Enhancededitorwindow();
     
 private slots:    
-    void on_chb_allCombined_toggled(bool checked);
-    void on_sb_Atomcount_editingFinished();
+    void on_chb_allCombined_toggled(bool checked);    
     void on_cb_AtomFormula_currentIndexChanged(const QString &arg1);
     void on_sb_Atomcount_valueChanged(int arg1);
     void on_btt_DeleteFormula_clicked();
+    void on_dsb_StepVauleA_editingFinished();
+    void on_dsb_StepVauleB_editingFinished();
+    void on_dsb_StepVauleC_editingFinished();
+    void on_dsb_StepVauleD_editingFinished();
+    void on_dsb_StepVauleE_editingFinished();
+    void on_dsb_StepVauleF_editingFinished();
+    void on_dsb_StepVauleG_editingFinished();
+    void on_dsb_StepVauleH_editingFinished();
+    void on_dsb_StartValueA_editingFinished();
+    void on_dsb_StartValueB_editingFinished();
+    void on_dsb_StartValueC_editingFinished();
+    void on_dsb_StartValueD_editingFinished();
+    void on_dsb_StartValueE_editingFinished();
+    void on_dsb_StartValueF_editingFinished();
+    void on_dsb_StartValueG_editingFinished();
+    void on_dsb_StartValueH_editingFinished();
+    void on_sb_SampleCount_editingFinished();
+    void on_dsb_StepVauleA_valueChanged(double arg1);
+    void on_dsb_StepVauleB_valueChanged(double arg1);
+    void on_dsb_StepVauleC_valueChanged(double arg1);
+    void on_dsb_StepVauleD_valueChanged(double arg1);
+    void on_dsb_StepVauleE_valueChanged(double arg1);
+    void on_dsb_StepVauleF_valueChanged(double arg1);
+    void on_dsb_StepVauleG_valueChanged(double arg1);
+    void on_dsb_StepVauleH_valueChanged(double arg1);
+    void on_dsb_StartValueA_valueChanged(double arg1);
+    void on_dsb_StartValueB_valueChanged(double arg1);
+    void on_dsb_StartValueC_valueChanged(double arg1);
+    void on_dsb_StartValueD_valueChanged(double arg1);
+    void on_dsb_StartValueE_valueChanged(double arg1);
+    void on_dsb_StartValueF_valueChanged(double arg1);
+    void on_dsb_StartValueG_valueChanged(double arg1);
+    void on_dsb_StartValueH_valueChanged(double arg1);
+    void on_pushButton_clicked();
 
-private:    
+private:
     Ui::Enhancededitorwindow *ui;
+    QStringList m_strStandardFunction;
+    QList<qreal> calc_value_list(qreal startValue, qreal linStepValue);
+    qreal calc_end_value(qreal startValue, qreal linStepValue);
 };
 
 #endif // ENHANCEDEDITORWINDOW_H

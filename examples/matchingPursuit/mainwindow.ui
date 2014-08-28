@@ -727,6 +727,10 @@
    </property>
   </action>
   <action name="actionSettings">
+   <property name="icon">
+    <iconset resource="Ressourcen.qrc">
+     <normaloff>:/images/icons/settings.png</normaloff>:/images/icons/settings.png</iconset>
+   </property>
    <property name="text">
     <string>settings</string>
    </property>
