@@ -89,7 +89,6 @@ using namespace MNELIB;
 
 namespace Ui
 {
-    class MainWindow;
 }
 
 
@@ -112,7 +111,6 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(QWidget *parent = 0);
-    ~MainWindow();    
 
     void fill_dict_combobox();
     typedef QList<GaborAtom> gabor_atom_list;
@@ -239,7 +237,8 @@ signals:
 
     void send_input(MatrixXd send_signal, qint32 send_max_iterations, qreal send_epsilon, bool fix_phase, bool boost, qint32 simplex_it,
                     qreal simplex_reflection, qreal simplex_expansion, qreal simplex_contraction, qreal simplex_full_contraction);
-    void send_input_fix_dict(MatrixXd send_signal, qint32 send_max_iterations, qreal send_epsilon, QFile &current_dict, qint32 simplex_it,
+
+    void send_input_fix_dict(MatrixXd send_signal, qint32 send_max_iterations, qreal send_epsilon, QString path, qint32 simplex_it,
                     qreal simplex_reflection, qreal simplex_expansion, qreal simplex_contraction, qreal simplex_full_contraction);
 
 private:
@@ -328,7 +327,7 @@ private:
     void read_fiff_ave(QString file_name);
     QList<qreal> norm_signal(QList<qreal> signalSamples);
     QStringList correlation(VectorXd signalSamples, QList<qreal> atomSamples, QString atomName);
-    void calc_fix_mp(QFile& dictionary, MatrixXd signal, TruncationCriterion criterion);
+    void calc_fix_mp(QString path, MatrixXd signal, TruncationCriterion criterion);
     void closeEvent(QCloseEvent * event);
 };
 
