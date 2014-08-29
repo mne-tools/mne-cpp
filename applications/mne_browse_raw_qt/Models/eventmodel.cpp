@@ -241,7 +241,6 @@ QVariant EventModel::data(const QModelIndex &index, int role) const
 bool EventModel::insertRows(int position, int span, const QModelIndex & parent)
 {
     Q_UNUSED(parent);
-    beginInsertRows(QModelIndex(), position, position+span-1);
 
     if(m_dataSamples.isEmpty()) {
         m_dataSamples.insert(0, m_iCurrentMarkerPos);
@@ -266,6 +265,8 @@ bool EventModel::insertRows(int position, int span, const QModelIndex & parent)
             }
         }
     }
+
+    beginInsertRows(QModelIndex(), position, position+span-1);
 
     endInsertRows();
     return true;
