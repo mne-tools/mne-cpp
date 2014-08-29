@@ -116,6 +116,7 @@ public:
     void fill_dict_combobox();
     typedef QList<GaborAtom> gabor_atom_list;
     typedef Eigen::VectorXd VectorXd;
+    typedef QList<VectorXd> vector_list;
 
 private slots:
     //==========================================================================================================
@@ -217,7 +218,7 @@ private slots:
     * @return void
     */
     void recieve_result(qint32 current_iteration, qint32 max_iterations, qreal current_energy, qreal max_energy,
-                        gabor_atom_list atom_res_list, VectorXd discrete_atom, QString atom_formula);
+                        gabor_atom_list atom_res_list, vector_list discrete_atoms, QString atom_formula);
 
     //==========================================================================================================
 

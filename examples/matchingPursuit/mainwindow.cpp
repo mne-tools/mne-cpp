@@ -131,8 +131,9 @@ MatrixXd _real_residuum_matrix(0, 0);
 QTime _counter_time(0,0);
 QTimer *_counter_timer = new QTimer();
 
-QThread* adaptive_Mp_Thread;// = new QThread;
+QThread* mp_Thread;// = new QThread;
 AdaptiveMp *adaptive_Mp;// = new AdaptiveMp();
+FixDictMp *fixDict_Mp ;
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -1215,7 +1216,11 @@ void MainWindow::on_btt_Calc_clicked()
     //paused Thread
     else if(ui->btt_Calc->text() == "cancel")
     {
-        adaptive_Mp_Thread->requestInterruption();
+        //if(mp_Thread)
+            mp_Thread->requestInterruption();
+
+        //else if(fixDict_Mp_Thread)
+        //    fixDict_Mp_Thread->requestInterruption();
 
         ui->btt_Calc->setText("wait...");
         //return;
@@ -1235,7 +1240,7 @@ void MainWindow::on_time_out()
 //*************************************************************************************************************
 
 void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations, qreal current_energy, qreal max_energy,
-                                gabor_atom_list atom_res_list, Eigen::VectorXd discrete_atom, QString atom_formula)
+                                gabor_atom_list atom_res_list, vector_list discrete_atoms, QString atom_formula)
 {
     _tbv_is_loading = true;
     //update();
@@ -1305,10 +1310,10 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
 
     for(qint32 i = 0; i < _signal_matrix.cols(); i++)
     {
-        VectorXd discret_atom = gaborAtom.create_real(gaborAtom.sample_count, gaborAtom.scale, gaborAtom.translation, gaborAtom.modulation, gaborAtom.phase_list.at(i));
+        //VectorXd discret_atom = gaborAtom.create_real(gaborAtom.sample_count, gaborAtom.scale, gaborAtom.translation, gaborAtom.modulation, gaborAtom.phase_list.at(i));
 
-        _atom_sum_matrix.col(i) += gaborAtom.max_scalar_list.at(i) * discret_atom;
-        _residuum_matrix.col(i) -= gaborAtom.max_scalar_list.at(i)  * discret_atom;
+        _atom_sum_matrix.col(i) += gaborAtom.max_scalar_list.at(i) * discrete_atoms.at(i);
+        _residuum_matrix.col(i) -= gaborAtom.max_scalar_list.at(i)  * discrete_atoms.at(i);
     }
     update();
     _tbv_is_loading = false;
@@ -1430,20 +1435,21 @@ void MainWindow::calc_adaptiv_mp(MatrixXd signal, TruncationCriterion criterion)
     qreal res_energy = ui->dsb_energy->value();
 
     //threading
-    adaptive_Mp_Thread = new QThread;
-    adaptive_Mp->moveToThread(adaptive_Mp_Thread);
+    mp_Thread = new QThread;
+    adaptive_Mp->moveToThread(mp_Thread);
     qRegisterMetaType<Eigen::MatrixXd>("MatrixXd");
     qRegisterMetaType<Eigen::VectorXd>("VectorXd");
     qRegisterMetaType<gabor_atom_list>("gabor_atom_list");
+    qRegisterMetaType<vector_list>("vector_list");
 
     connect(this, SIGNAL(send_input(MatrixXd, qint32, qreal, bool, bool, qint32, qreal, qreal, qreal, qreal)),
             adaptive_Mp, SLOT(recieve_input(MatrixXd, qint32, qreal, bool, bool, qint32, qreal, qreal, qreal, qreal)));
-    connect(adaptive_Mp, SIGNAL(current_result(qint32, qint32, qreal, qreal, gabor_atom_list, VectorXd, QString)),
-                 this, SLOT(recieve_result(qint32, qint32, qreal, qreal, gabor_atom_list, VectorXd, QString)));
-    connect(adaptive_Mp, SIGNAL(finished_calc()), adaptive_Mp_Thread, SLOT(quit()));
+    connect(adaptive_Mp, SIGNAL(current_result(qint32, qint32, qreal, qreal, gabor_atom_list, vector_list, QString)),
+                 this, SLOT(recieve_result(qint32, qint32, qreal, qreal, gabor_atom_list, vector_list, QString)));
+    connect(adaptive_Mp, SIGNAL(finished_calc()), mp_Thread, SLOT(quit()));
     connect(adaptive_Mp, SIGNAL(finished_calc()), adaptive_Mp, SLOT(deleteLater()));
-    connect(adaptive_Mp_Thread, SIGNAL(finished()), this, SLOT(calc_thread_finished()));
-    connect(adaptive_Mp_Thread, SIGNAL(finished()), adaptive_Mp_Thread, SLOT(deleteLater()));
+    connect(mp_Thread, SIGNAL(finished()), this, SLOT(calc_thread_finished()));
+    connect(mp_Thread, SIGNAL(finished()), mp_Thread, SLOT(deleteLater()));
 
     QSettings settings;
     bool fixphase = settings.value("fixPhase", false).toBool();
@@ -1458,21 +1464,21 @@ void MainWindow::calc_adaptiv_mp(MatrixXd signal, TruncationCriterion criterion)
         case Iterations:
         {
             emit send_input(signal, ui->sb_Iterations->value(), qreal(MININT32), fixphase, isBoost, iterations, reflection, expansion, contraction, fullcontraction);
-            adaptive_Mp_Thread->start();
+            mp_Thread->start();
         }
         break;
 
         case SignalEnergy:
         {
             emit send_input(signal, MAXINT32, res_energy, fixphase, isBoost, iterations, reflection, expansion, contraction, fullcontraction);
-            adaptive_Mp_Thread->start();        
+            mp_Thread->start();
         }
         break;
 
         case Both:
         {           
             emit send_input(signal, ui->sb_Iterations->value(), res_energy,fixphase, isBoost, iterations, reflection, expansion, contraction, fullcontraction);
-            adaptive_Mp_Thread->start();
+            mp_Thread->start();
         }
         break;
     }       
@@ -1484,26 +1490,27 @@ void MainWindow::calc_adaptiv_mp(MatrixXd signal, TruncationCriterion criterion)
 // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 void MainWindow::calc_fix_mp(QString path, MatrixXd signal, TruncationCriterion criterion)
 {
-    FixDictMp *fixDict_Mp = new FixDictMp();
+    fixDict_Mp = new FixDictMp();
     _atom_sum_matrix = MatrixXd::Zero(signal.rows(), signal.cols());
     _residuum_matrix = signal;
     qreal res_energy = ui->dsb_energy->value();
 
     //threading
-    QThread* fixDict_Mp_Thread = new QThread;
-    fixDict_Mp->moveToThread(fixDict_Mp_Thread);
+    mp_Thread = new QThread;
+    fixDict_Mp->moveToThread(mp_Thread);
     qRegisterMetaType<Eigen::MatrixXd>("MatrixXd");
+    qRegisterMetaType<Eigen::VectorXd>("VectorXd");
     qRegisterMetaType<gabor_atom_list>("gabor_atom_list");
+    qRegisterMetaType<vector_list>("vector_list");
 
-    connect(this, SIGNAL(send_input_fix_dict(MatrixXd, qint32, qreal, QString, qint32, qreal, qreal, qreal, qreal, VectorXd, QString)),
-            fixDict_Mp, SLOT(recieve_input(MatrixXd, qint32, qreal, QString, qint32, qreal, qreal, qreal, qreal, VectorXd, QString)));
-
-    connect(fixDict_Mp, SIGNAL(current_result(qint32, qint32, qreal, qreal, gabor_atom_list)),
-                  this, SLOT(recieve_result(qint32, qint32, qreal, qreal, gabor_atom_list)));
-    connect(fixDict_Mp, SIGNAL(finished_calc()), fixDict_Mp_Thread, SLOT(quit()));
+    connect(this, SIGNAL(send_input_fix_dict(MatrixXd, qint32, qreal, QString, qint32, qreal, qreal, qreal, qreal)),
+            fixDict_Mp, SLOT(recieve_input(MatrixXd, qint32, qreal, QString, qint32, qreal, qreal, qreal, qreal)));
+    connect(fixDict_Mp, SIGNAL(current_result(qint32, qint32, qreal, qreal, gabor_atom_list, vector_list, QString)),
+                  this, SLOT(recieve_result(qint32, qint32, qreal, qreal, gabor_atom_list, vector_list, QString)));
+    connect(fixDict_Mp, SIGNAL(finished_calc()), mp_Thread, SLOT(quit()));
     connect(fixDict_Mp, SIGNAL(finished_calc()), fixDict_Mp, SLOT(deleteLater()));
-    connect(fixDict_Mp_Thread, SIGNAL(finished()), this, SLOT(calc_thread_finished()));
-    connect(fixDict_Mp_Thread, SIGNAL(finished()), fixDict_Mp_Thread, SLOT(deleteLater()));
+    connect(mp_Thread, SIGNAL(finished()), this, SLOT(calc_thread_finished()));
+    connect(mp_Thread, SIGNAL(finished()), mp_Thread, SLOT(deleteLater()));
 
     switch(criterion)
     {
@@ -1511,7 +1518,7 @@ void MainWindow::calc_fix_mp(QString path, MatrixXd signal, TruncationCriterion 
         {
             emit send_input_fix_dict(signal, ui->sb_Iterations->value(), qreal(MININT32), QString("Matching-Pursuit-Toolbox/%1.dict").arg(ui->cb_Dicts->currentText()),
                                         1E3, 1.0, 0.2, 0.5, 0.5);
-            fixDict_Mp_Thread->start();
+            mp_Thread->start();
         }
         break;
 
@@ -1519,7 +1526,7 @@ void MainWindow::calc_fix_mp(QString path, MatrixXd signal, TruncationCriterion 
         {
             emit send_input_fix_dict(signal, MAXINT32, res_energy, QString("Matching-Pursuit-Toolbox/%1.dict").arg(ui->cb_Dicts->currentText()),
                                         1E3, 1.0, 0.2, 0.5, 0.5);
-            fixDict_Mp_Thread->start();
+            mp_Thread->start();
         }
         break;
 
@@ -1527,7 +1534,7 @@ void MainWindow::calc_fix_mp(QString path, MatrixXd signal, TruncationCriterion 
         {
             emit send_input_fix_dict(signal, ui->sb_Iterations->value(), res_energy, QString("Matching-Pursuit-Toolbox/%1.dict").arg(ui->cb_Dicts->currentText()),
                                         1E3, 1.0, 0.2, 0.5, 0.5);
-            fixDict_Mp_Thread->start();
+            mp_Thread->start();
         }
         break;
     }

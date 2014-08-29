@@ -105,6 +105,9 @@ class UTILSSHARED_EXPORT FixDictMp : public QThread
 public:
 
     typedef QList<GaborAtom> gabor_atom_list;
+    typedef Eigen::VectorXd VectorXd;
+    typedef QList<VectorXd> vector_list;
+
     qint32 it;
     qint32 max_it;
     qreal signal_energy;
@@ -160,7 +163,9 @@ public slots:
 
 signals:
 
-    void current_result(qint32 current_iteration, qint32 max_iteration, qreal current_energy, qreal max_energy, gabor_atom_list atom_list, Eigen::VectorXd atom, QString atom_formula);
+    void current_result(qint32 current_iteration, qint32 max_iteration, qreal current_energy, qreal max_energy,
+                        gabor_atom_list atom_list, vector_list discrete_atoms, QString atom_formula);
+
     void finished_calc();
 
 };//class

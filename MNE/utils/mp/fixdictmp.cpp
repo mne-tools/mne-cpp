@@ -441,6 +441,7 @@ QList<GaborAtom> FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterati
         //calc multichannel parameters phase and max_scalar_product
         channel_count = signal.cols();
         VectorXd bestMatch = VectorXd::Zero(sample_count);
+        vector_list discrete_atoms;
         for(qint32 chn = 0; chn < channel_count; chn++)
         {
             VectorXd channel_params = AdaptiveMp::calculate_atom(sample_count, gabor_Atom->scale, gabor_Atom->translation, gabor_Atom->modulation, chn, residuum, RETURNPARAMETERS, 0);
@@ -449,6 +450,7 @@ QList<GaborAtom> FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterati
             //substract best matching Atom from Residuum in each channel
             gabor_Atom->max_scalar_list.append(channel_params[4]);
             bestMatch = gabor_Atom->create_real(gabor_Atom->sample_count, gabor_Atom->scale, gabor_Atom->translation, gabor_Atom->modulation, gabor_Atom->phase_list.at(chn));
+            discrete_atoms.append(bestMatch);
 
             for(qint32 j = 0; j < gabor_Atom->sample_count; j++)
             {
@@ -465,7 +467,10 @@ QList<GaborAtom> FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterati
         atom_list.append(*gabor_Atom);
         delete gabor_Atom;
         it++;
-        emit current_result(it, max_it, current_energy, signal_energy, atom_list, bestMatch, "Fix");
+        emit current_result(it, max_it, current_energy, signal_energy, atom_list, discrete_atoms, "Fix");
+
+        if( QThread::currentThread()->isInterruptionRequested())
+            break;
 
     }//end while iterations
 

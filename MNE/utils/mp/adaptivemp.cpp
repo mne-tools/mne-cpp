@@ -436,6 +436,7 @@ QList<GaborAtom> AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterat
 
         channel_count = signal.cols();
         VectorXd best_match;// = VectorXd::Zero(sample_count);
+        vector_list discrete_atoms;
 
         for(qint32 chn = 0; chn < channel_count; chn++)
         {
@@ -446,6 +447,7 @@ QList<GaborAtom> AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterat
             //substract best matching Atom from Residuum in each channel        
             gabor_Atom->max_scalar_list.append(channel_params[4]);
             best_match = gabor_Atom->create_real(gabor_Atom->sample_count, gabor_Atom->scale, gabor_Atom->translation, gabor_Atom->modulation, gabor_Atom->phase_list.at(chn));
+            discrete_atoms.append(best_match);
 
             for(qint32 j = 0; j < gabor_Atom->sample_count; j++)
             {
@@ -465,7 +467,7 @@ QList<GaborAtom> AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterat
         delete gabor_Atom;
         it++;
 
-        emit current_result(it, max_it, current_energy, signal_energy, atom_list, best_match, QString("ADAPTIVE_MP"));
+        emit current_result(it, max_it, current_energy, signal_energy, atom_list, discrete_atoms, QString("ADAPTIVE_MP"));
 
         if( QThread::currentThread()->isInterruptionRequested())
             break;
