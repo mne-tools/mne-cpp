@@ -95,8 +95,13 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationName("DKnobl MHenfling");
     QApplication::setApplicationName("MatchingPursuit Viewer");
 
+    QSettings settings;
+    bool was_maximized = settings.value("maximized", false).toBool();
     mainWindow = new MainWindow();
-    mainWindow->show();
+    if(was_maximized)
+        mainWindow->showMaximized();
+    else
+        mainWindow->show();
 
     return a.exec();
 }

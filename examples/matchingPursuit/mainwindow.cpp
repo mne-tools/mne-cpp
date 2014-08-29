@@ -131,6 +131,9 @@ MatrixXd _real_residuum_matrix(0, 0);
 QTime _counter_time(0,0);
 QTimer *_counter_timer = new QTimer();
 
+QThread* adaptive_Mp_Thread;// = new QThread;
+AdaptiveMp *adaptive_Mp;// = new AdaptiveMp();
+
 //*************************************************************************************************************
 //=============================================================================================================
 // MAIN
@@ -264,8 +267,8 @@ MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::
     QSettings settings;
     move(settings.value("pos", QPoint(200, 200)).toPoint());
     resize(settings.value("size", QSize(1050, 700)).toSize());
-
-
+    this->restoreState(settings.value("window_state").toByteArray());
+    ui->splitter->restoreState(settings.value("splitter_sizes").toByteArray());
 }
 
 //*************************************************************************************************************************************
@@ -280,8 +283,14 @@ MainWindow::~MainWindow()
 void MainWindow::closeEvent(QCloseEvent * event)
 {
     QSettings settings;
-    settings.setValue("pos", pos());
-    settings.setValue("size", size());
+    if(!this->isMaximized())
+    {
+        settings.setValue("pos", pos());
+        settings.setValue("size", size());
+    }
+    settings.setValue("splitter_sizes", ui->splitter->saveState());
+    settings.setValue("window_state", this->saveState());
+    settings.setValue("maximized", this->isMaximized());
     event->accept();
 }
 
@@ -1081,14 +1090,8 @@ void YAxisWindow::paint_axis(MatrixXd signalMatrix, QSize windowSize)
 
 // starts MP-algorithm
 void MainWindow::on_btt_Calc_clicked()
-{    
-    // ToDo: paused Thread
-    if(ui->btt_Calc->text() == "break")
-        return;
-
-    TruncationCriterion criterion;    
-    ui->progressBarCalc->setValue(0);
-    ui->progressBarCalc->setHidden(false);
+{
+    TruncationCriterion criterion;
 
     if(ui->chb_Iterations->isChecked() && !ui->chb_ResEnergy->isChecked())
         criterion = Iterations;
@@ -1097,99 +1100,120 @@ void MainWindow::on_btt_Calc_clicked()
     if(ui->chb_ResEnergy->isChecked() && !ui->chb_Iterations->isChecked())
         criterion = SignalEnergy;
 
-    if(_signal_matrix.rows() == 0)
+    if(ui->btt_Calc->text()== "calculate")
     {
-        QString title = "Warning";
-        QString text = "No signalfile found.";
-        QMessageBox msgBox(QMessageBox::Warning, title, text, QMessageBox::Ok, this);
-        msgBox.exec();
+        ui->progressBarCalc->setValue(0);
+        ui->progressBarCalc->setHidden(false);
 
-        return;
-    }
-
-    if(ui->chb_Iterations->checkState()  == Qt::Unchecked && ui->chb_ResEnergy->checkState() == Qt::Unchecked)
-    {
-        QString title = "Error";
-        QString text = "No truncation criterion choose.";
-        QMessageBox msgBox(QMessageBox::Warning, title, text, QMessageBox::Ok, this);
-        msgBox.exec();
-        return;
-    }
-
-    if(((ui->dsb_energy->value() <= 1 && ui->dsb_energy->isEnabled()) && (ui->sb_Iterations->value() >= 500 && ui->sb_Iterations->isEnabled())) || (ui->dsb_energy->value() <= 1 && ui->dsb_energy->isEnabled() && !ui->sb_Iterations->isEnabled()) || (ui->sb_Iterations->value() >= 500 && ui->sb_Iterations->isEnabled() && !ui->dsb_energy->isEnabled()) )
-    {
-        QFile configFile("Matching-Pursuit-Toolbox/Matching-Pursuit-Toolbox.config");
-        bool showMsgBox = false;
-        QString contents;
-        if (configFile.open(QIODevice::ReadWrite | QIODevice::Text))
+        if(_signal_matrix.rows() == 0)
         {
-            while(!configFile.atEnd())
-            {
-                contents = configFile.readLine(0).constData();
-                if(QString::compare("ShowProcessDurationMessageBox=true;\n", contents) == 0)
-                    showMsgBox = true;
-            }
-        }
-        configFile.close();
-
-        if(showMsgBox)
-        {
-            processdurationmessagebox* msgBox = new processdurationmessagebox(this);
-            msgBox->setModal(true);
-            msgBox->exec();
-            msgBox->close();
-        }
-    }
-
-    if(ui->chb_ResEnergy->isChecked())
-    {
-        if(ui->dsb_energy->value() >= 100)
-        {
-            QString title = "Error";
-            QString text = "Please enter a number less than 100.";
+            QString title = "Warning";
+            QString text = "No signalfile found.";
             QMessageBox msgBox(QMessageBox::Warning, title, text, QMessageBox::Ok, this);
             msgBox.exec();
-            ui->dsb_energy->setFocus();
-            ui->dsb_energy->selectAll();
+
             return;
         }
-        _soll_energy =  _signal_energy / 100 * ui->dsb_energy->value();
-    } 
+
+        if(ui->chb_Iterations->checkState()  == Qt::Unchecked && ui->chb_ResEnergy->checkState() == Qt::Unchecked)
+        {
+            QString title = "Error";
+            QString text = "No truncation criterion choose.";
+            QMessageBox msgBox(QMessageBox::Warning, title, text, QMessageBox::Ok, this);
+            msgBox.exec();
+            return;
+        }
+
+        if(((ui->dsb_energy->value() <= 1 && ui->dsb_energy->isEnabled()) && (ui->sb_Iterations->value() >= 500 && ui->sb_Iterations->isEnabled())) || (ui->dsb_energy->value() <= 1 && ui->dsb_energy->isEnabled() && !ui->sb_Iterations->isEnabled()) || (ui->sb_Iterations->value() >= 500 && ui->sb_Iterations->isEnabled() && !ui->dsb_energy->isEnabled()) )
+        {
+            QFile configFile("Matching-Pursuit-Toolbox/Matching-Pursuit-Toolbox.config");
+            bool showMsgBox = false;
+            QString contents;
+            if (configFile.open(QIODevice::ReadWrite | QIODevice::Text))
+            {
+                while(!configFile.atEnd())
+                {
+                    contents = configFile.readLine(0).constData();
+                    if(QString::compare("ShowProcessDurationMessageBox=true;\n", contents) == 0)
+                        showMsgBox = true;
+                }
+            }
+            configFile.close();
+
+            if(showMsgBox)
+            {
+                processdurationmessagebox* msgBox = new processdurationmessagebox(this);
+                msgBox->setModal(true);
+                msgBox->exec();
+                msgBox->close();
+            }
+        }
+
+        if(ui->chb_ResEnergy->isChecked())
+        {
+            if(ui->dsb_energy->value() >= 100)
+            {
+                QString title = "Error";
+                QString text = "Please enter a number less than 100.";
+                QMessageBox msgBox(QMessageBox::Warning, title, text, QMessageBox::Ok, this);
+                msgBox.exec();
+                ui->dsb_energy->setFocus();
+                ui->dsb_energy->selectAll();
+                return;
+            }
+            _soll_energy =  _signal_energy / 100 * ui->dsb_energy->value();
+        }
 
 
-    ui->frame->setEnabled(false);
-    ui->btt_OpenSignal->setEnabled(false);
-    ui->btt_Calc->setText("break");
-    ui->tbv_Results->setEnabled(false);
-    ui->cb_channels->setEnabled(false);
-    ui->cb_all_select->setEnabled(false);
-    ui->dsb_from->setEnabled(false);
-    ui->dsb_to->setEnabled(false);
-    ui->sb_sample_count ->setEnabled(false);
+        ui->frame->setEnabled(false);
+        ui->btt_OpenSignal->setEnabled(false);
+        ui->btt_Calc->setText("cancel");
+        ui->tbv_Results->setEnabled(false);
+        ui->cb_channels->setEnabled(false);
+        ui->cb_all_select->setEnabled(false);
+        ui->dsb_from->setEnabled(false);
+        ui->dsb_to->setEnabled(false);
+        ui->sb_sample_count ->setEnabled(false);
 
 
-    _my_atom_list.clear();
-    _residuum_matrix = _signal_matrix;
-    update();
+        ui->tbv_Results->setRowCount(0);
+        ui->lb_IterationsProgressValue->setText("0");
+        ui->lb_RestEnergieResiduumValue->setText("0");
+        _my_atom_list.clear();
+        _residuum_matrix = _signal_matrix;
+        _atom_sum_matrix = MatrixXd::Zero(_signal_matrix.rows(), _signal_matrix.cols());
 
-    _counter_time = QTime(0,0);
-    _counter_timer->setInterval(100);
-    _counter_timer->start();
+        update();
 
-    if(ui->rb_OwnDictionary->isChecked())
-    {
-        QFile ownDict(QString("Matching-Pursuit-Toolbox/%1.dict").arg(ui->cb_Dicts->currentText()));
-        // ToDo: size from dict
-        _atom_sum_matrix = MatrixXd::Zero(256,1);
-//        QFuture<void> f1 = QtConcurrent::run(&mpCalc, ownDict, _signal_matrix.col(0), ui->sb_Iterations->value());
-//        f1.waitForFinished();
-        calc_fix_mp(QString("Matching-Pursuit-Toolbox/%1.dict").arg(ui->cb_Dicts->currentText()), _signal_matrix.col(0), criterion);
-        //update();
+        _counter_time = QTime(0,0);
+        _counter_timer->setInterval(100);
+        _counter_timer->start();
+
+        if(ui->rb_OwnDictionary->isChecked())
+        {
+            QFile ownDict(QString("Matching-Pursuit-Toolbox/%1.dict").arg(ui->cb_Dicts->currentText()));
+            // ToDo: size from dict
+            _atom_sum_matrix = MatrixXd::Zero(256,1);
+    //        QFuture<void> f1 = QtConcurrent::run(&mpCalc, ownDict, _signal_matrix.col(0), ui->sb_Iterations->value());
+    //        f1.waitForFinished();
+            calc_fix_mp(QString("Matching-Pursuit-Toolbox/%1.dict").arg(ui->cb_Dicts->currentText()), _signal_matrix.col(0), criterion);
+            //update();
+        }
+        else if(ui->rb_adativMp->isChecked())
+        {
+            calc_adaptiv_mp(_signal_matrix, criterion);
+        }
     }
-    else if(ui->rb_adativMp->isChecked())
+
+    //paused Thread
+    else if(ui->btt_Calc->text() == "cancel")
     {
-        calc_adaptiv_mp(_signal_matrix, criterion);
-    }    
+        adaptive_Mp_Thread->requestInterruption();
+
+        ui->btt_Calc->setText("wait...");
+        //return;
+    }
+
 }
 
 //*************************************************************************************************************
@@ -1203,7 +1227,8 @@ void MainWindow::on_time_out()
 
 //*************************************************************************************************************
 
-void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations, qreal current_energy, qreal max_energy, gabor_atom_list atom_res_list)
+void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations, qreal current_energy, qreal max_energy,
+                                gabor_atom_list atom_res_list, Eigen::VectorXd discrete_atom, QString atom_formula)
 {
     _tbv_is_loading = true;
     //update();
@@ -1356,6 +1381,7 @@ void MainWindow::calc_thread_finished()
     _counter_timer->stop();
     ui->frame->setEnabled(true);
     ui->btt_OpenSignal->setEnabled(true);
+
     ui->btt_Calc->setText("calculate");
     ui->tbv_Results->setEnabled(true);
     ui->cb_channels->setEnabled(true);
@@ -1391,21 +1417,22 @@ void MainWindow::calc_thread_finished()
 
 void MainWindow::calc_adaptiv_mp(MatrixXd signal, TruncationCriterion criterion)
 {
-    AdaptiveMp *adaptive_Mp = new AdaptiveMp();
-    _atom_sum_matrix = MatrixXd::Zero(signal.rows(), signal.cols());
-    _residuum_matrix = signal;
+    adaptive_Mp = new AdaptiveMp();
+    //_atom_sum_matrix = MatrixXd::Zero(signal.rows(), signal.cols());
+    //_residuum_matrix = signal;
     qreal res_energy = ui->dsb_energy->value();
 
     //threading
-    QThread* adaptive_Mp_Thread = new QThread;
+    adaptive_Mp_Thread = new QThread;
     adaptive_Mp->moveToThread(adaptive_Mp_Thread);
     qRegisterMetaType<Eigen::MatrixXd>("MatrixXd");
+    qRegisterMetaType<Eigen::VectorXd>("VectorXd");
     qRegisterMetaType<gabor_atom_list>("gabor_atom_list");
 
     connect(this, SIGNAL(send_input(MatrixXd, qint32, qreal, bool, bool, qint32, qreal, qreal, qreal, qreal)),
             adaptive_Mp, SLOT(recieve_input(MatrixXd, qint32, qreal, bool, bool, qint32, qreal, qreal, qreal, qreal)));
-    connect(adaptive_Mp, SIGNAL(current_result(qint32, qint32, qreal, qreal, gabor_atom_list)),
-                 this, SLOT(recieve_result(qint32, qint32, qreal, qreal, gabor_atom_list)));
+    connect(adaptive_Mp, SIGNAL(current_result(qint32, qint32, qreal, qreal, gabor_atom_list, VectorXd, QString)),
+                 this, SLOT(recieve_result(qint32, qint32, qreal, qreal, gabor_atom_list, VectorXd, QString)));
     connect(adaptive_Mp, SIGNAL(finished_calc()), adaptive_Mp_Thread, SLOT(quit()));
     connect(adaptive_Mp, SIGNAL(finished_calc()), adaptive_Mp, SLOT(deleteLater()));
     connect(adaptive_Mp_Thread, SIGNAL(finished()), this, SLOT(calc_thread_finished()));
@@ -1461,8 +1488,8 @@ void MainWindow::calc_fix_mp(QString path, MatrixXd signal, TruncationCriterion 
     qRegisterMetaType<Eigen::MatrixXd>("MatrixXd");
     qRegisterMetaType<gabor_atom_list>("gabor_atom_list");
 
-    connect(this, SIGNAL(send_input_fix_dict(MatrixXd, qint32, qreal, QString, qint32, qreal, qreal, qreal, qreal)),
-            fixDict_Mp, SLOT(recieve_input(MatrixXd, qint32, qreal, QString, qint32, qreal, qreal, qreal, qreal)));
+    connect(this, SIGNAL(send_input_fix_dict(MatrixXd, qint32, qreal, QString, qint32, qreal, qreal, qreal, qreal, VectorXd, QString)),
+            fixDict_Mp, SLOT(recieve_input(MatrixXd, qint32, qreal, QString, qint32, qreal, qreal, qreal, qreal, VectorXd, QString)));
 
     connect(fixDict_Mp, SIGNAL(current_result(qint32, qint32, qreal, qreal, gabor_atom_list)),
                   this, SLOT(recieve_result(qint32, qint32, qreal, qreal, gabor_atom_list)));
@@ -1687,7 +1714,7 @@ void MainWindow::calc_fix_mp(QString path, MatrixXd signal, TruncationCriterion 
 
 }
 
-
+/*
 // Berechnung das Skalarprodukt zwischen Atom und Signal
 QStringList MainWindow::correlation(VectorXd signalSamples, QList<qreal> atomSamples, QString atomName)
 {    
@@ -1750,7 +1777,7 @@ QStringList MainWindow::correlation(VectorXd signalSamples, QList<qreal> atomSam
     // dem Index des hoechsten Korrelationswertes minus die halbe Atomlaenge,
 
 }
-
+*/
 
 //*****************************************************************************************************************
 

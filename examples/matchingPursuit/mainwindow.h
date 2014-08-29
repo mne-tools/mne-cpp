@@ -89,6 +89,7 @@ using namespace MNELIB;
 
 namespace Ui
 {
+    class MainWindow;
 }
 
 
@@ -111,9 +112,10 @@ class MainWindow : public QMainWindow
 
 public:
     explicit MainWindow(QWidget *parent = 0);
-
+    ~MainWindow();
     void fill_dict_combobox();
     typedef QList<GaborAtom> gabor_atom_list;
+    typedef Eigen::VectorXd VectorXd;
 
 private slots:
     //==========================================================================================================
@@ -214,7 +216,9 @@ private slots:
     *
     * @return void
     */
-    void recieve_result(qint32 current_iteration, qint32 max_iterations, qreal current_energy, qreal max_energy, gabor_atom_list atom_res_list);
+    void recieve_result(qint32 current_iteration, qint32 max_iterations, qreal current_energy, qreal max_energy,
+                        gabor_atom_list atom_res_list, VectorXd discrete_atom, QString atom_formula);
+
     //==========================================================================================================
 
     void calc_thread_finished();
@@ -326,7 +330,7 @@ private:
 
     void read_fiff_ave(QString file_name);
     QList<qreal> norm_signal(QList<qreal> signalSamples);
-    QStringList correlation(VectorXd signalSamples, QList<qreal> atomSamples, QString atomName);
+    //QStringList correlation(VectorXd signalSamples, QList<qreal> atomSamples, QString atomName);
     void calc_fix_mp(QString path, MatrixXd signal, TruncationCriterion criterion);
     void closeEvent(QCloseEvent * event);
 };
