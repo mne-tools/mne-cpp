@@ -130,6 +130,7 @@ Formulaeditor::Formulaeditor(QWidget *parent) :    QWidget(parent),    ui(new Ui
     m_strStandardFunction.append("GGT");
 
     callAtomPaintWindow->update();
+    update();
 }
 
 Formulaeditor::~Formulaeditor()
@@ -137,7 +138,7 @@ Formulaeditor::~Formulaeditor()
     delete ui;
 }
 
-void AtomPaintWindow::paint_event(QPaintEvent *event)
+void AtomPaintWindow::paintEvent(QPaintEvent *event)
 {    
     paint_signal(atomList, QSize(510,200));
 }

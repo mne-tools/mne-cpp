@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>567</width>
+    <width>581</width>
     <height>948</height>
    </rect>
   </property>
@@ -1361,7 +1361,7 @@ p, li { white-space: pre-wrap; }
              <number>0</number>
             </property>
             <item>
-             <layout class="QGridLayout" name="gl_Phase_2" columnstretch="1,0,0,0">
+             <layout class="QGridLayout" name="gl_chirp" columnstretch="1,0,0,0">
               <item row="2" column="1" rowspan="2">
                <widget class="QLabel" name="lb_CountDirectionChirp">
                 <property name="sizePolicy">

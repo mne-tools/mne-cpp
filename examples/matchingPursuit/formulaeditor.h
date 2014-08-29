@@ -141,7 +141,7 @@ class AtomPaintWindow : public QWidget
     Q_OBJECT
 
 protected:    
-   void paint_event(QPaintEvent *event);
+   void paintEvent(QPaintEvent *event);
 
 public:   
    void paint_signal(QList<qreal> valueList, QSize windowSize);
