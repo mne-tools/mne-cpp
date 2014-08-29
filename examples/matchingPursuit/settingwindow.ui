@@ -38,6 +38,13 @@
     </widget>
    </item>
    <item>
+    <widget class="QCheckBox" name="cb_show_warnings">
+     <property name="text">
+      <string>show warnings</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QLabel" name="l_simplex_settings">
      <property name="text">
       <string>simplex settings:</string>

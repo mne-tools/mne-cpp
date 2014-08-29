@@ -186,8 +186,8 @@ void EditorWindow::calc_atom_count_all_combined()
 
     if(count > 1000000)
     {
-        QMessageBox::warning(this, tr("Fehler"), //todo localisation (language??)
-        tr("Die Anzahl der zu berechnenden Atome ist zu gro�."));
+        QMessageBox::warning(this, tr("Error"),
+        tr("The number of atoms is too large."));
         return;
     }
     ui->spb_AtomCount->setValue(count);
@@ -806,8 +806,8 @@ void EditorWindow::on_dspb_EndValueScale_editingFinished()
 
 void EditorWindow::on_rb_NoStepScale_toggled(bool checked)
 {
-    if(checked) ui->lb_StartValueScale->setText("Wert:");
-    else ui->lb_StartValueScale->setText("Startwert:");
+    if(checked) ui->lb_StartValueScale->setText("value:");
+    else ui->lb_StartValueScale->setText("start value:");
     ui->lb_EndValueScale->setDisabled(checked);
     if(!checked)
     {
@@ -891,8 +891,8 @@ void EditorWindow::on_dspb_EndValueModu_editingFinished()
 
 void EditorWindow::on_rb_NoStepModu_toggled(bool checked)
 {
-    if(checked) ui->lb_StartValueModu->setText("Wert:");
-    else ui->lb_StartValueModu->setText("Startwert:");
+    if(checked) ui->lb_StartValueModu->setText("value:");
+    else ui->lb_StartValueModu->setText("start value:");
     ui->lb_EndValueModu->setDisabled(checked);
     if(!checked)
     {
@@ -976,8 +976,8 @@ void EditorWindow::on_dspb_EndValuePhase_editingFinished()
 
 void EditorWindow::on_rb_NoStepPhase_toggled(bool checked)
 {
-    if(checked) ui->lb_StartValuePhase->setText("Wert:");
-    else ui->lb_StartValuePhase->setText("Startwert:");
+    if(checked) ui->lb_StartValuePhase->setText("value:");
+    else ui->lb_StartValuePhase->setText("start value:");
     ui->lb_EndValuePhase->setDisabled(checked);
     if(!checked)
     {
@@ -1061,8 +1061,8 @@ void EditorWindow::on_dspb_EndValueChirp_editingFinished()
 
 void EditorWindow::on_rb_NoStepChirp_toggled(bool checked)
 {
-    if(checked) ui->lb_StartValueChirp->setText("Wert:");
-    else ui->lb_StartValueChirp->setText("Startwert:");
+    if(checked) ui->lb_StartValueChirp->setText("value:");
+    else ui->lb_StartValueChirp->setText("start value:");
     ui->lb_EndValueChirp->setDisabled(checked);
     if(!checked)
     {
@@ -1182,8 +1182,8 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
 
     if(partDictName.isEmpty())
     {
-        QMessageBox::warning(this, tr("Fehler"),
-        tr("Es wurde kein Name vergeben."));
+        QMessageBox::warning(this, tr("Error"),
+        tr("It was not assigned a name."));
         ui->tb_PartDictName->setFocus();
         return;
     }
@@ -1192,8 +1192,8 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
     while(k < ui->list_AllDict->count())
     {
         if(QString::compare(partDictName, ui->list_AllDict->item(k)->text()) == 0)
-        { QMessageBox::warning(this, tr("Fehler"),
-                tr("Der Name ist schon vergeben."));
+        { QMessageBox::warning(this, tr("Error"),
+                tr("The name is already taken."));
 
                 ui->tb_PartDictName->setFocus();
                 ui->tb_PartDictName->selectAll();
@@ -1246,14 +1246,18 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
                              {
                                 ChirpAtom *cAtom = new ChirpAtom(ui->spb_AtomLength->value(), tempScale, ui->spb_AtomLength->value() / 2, tempModu, tempPhase, tempChirp);
                                 resultList = cAtom->CreateStringValues();
+                                stream << QString("%1_ATOM_%2 \n Chirpatom: scale: %3 modu: %4 phase: %5 chrip: %6").arg(partDictName).arg(atomIndex).arg(tempScale).arg(tempModu).arg(tempPhase).arg(tempChirp) << "\n";
+
                             }
                             else if(atomType == EditorWindow::Gauss)
                             {
                                 GaborAtom *gAtom = new GaborAtom();//ui->spb_AtomLength->value(), tempScale, 0, tempModu, tempPhase);
                                 resultList = gAtom->CreateStringValues(ui->spb_AtomLength->value(), tempScale, ui->spb_AtomLength->value() / 2, tempModu, tempPhase);
+                                stream << QString("%1_ATOM_%2 \n Gaboratom: scale: %3 modu: %4 phase: %5").arg(partDictName).arg(atomIndex).arg(tempScale).arg(tempModu).arg(tempPhase) << "\n";
                             }
                             stream << QString("%1_ATOM_%2 \n scale: %3 modu: %4 phase: %5 chrip: %6").arg(partDictName).arg(atomIndex).arg(tempScale).arg(tempModu).arg(tempPhase).arg(tempChirp) << "\n";
                             for (QStringList::Iterator it = resultList.begin(); it != resultList.end(); it++)
+                           for (QStringList::Iterator it = resultList.begin(); it != resultList.end(); it++)
                                 stream << *it << "\n";
 
                             atomIndex++;
@@ -1274,13 +1278,13 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
                 {
                     if(ui->rb_NoStepScale->isChecked() && ui->rb_NoStepModu->isChecked() && ui->rb_NoStepPhase->isChecked() && ui->rb_NoStepChirp)
                     {
-                        QMessageBox::warning(this, tr("Warnung"),QString("Es werden %1 identische Atome erstellt. Bitte �ndern Sie die Atomanzahl auf 1 oder lassen Sie einen Parameter variieren.").arg(ui->spb_AtomCount->value()));
+                        QMessageBox::warning(this, tr("Warning"),QString("It created %1 identical atoms. Please change the number of atoms on one or let you vary a parameter.").arg(ui->spb_AtomCount->value()));
                         return;
                     }
                 }
                 else if(ui->rb_NoStepScale->isChecked() && ui->rb_NoStepModu->isChecked() && ui->rb_NoStepPhase->isChecked())
                 {
-                    QMessageBox::warning(this, tr("Warnung"),QString("Es werden %1 identische Atome erstellt. Bitte �ndern Sie die Atomanzahl auf 1 oder lassen Sie einen Parameter variieren.").arg(ui->spb_AtomCount->value()));
+                    QMessageBox::warning(this, tr("Warning"),QString("It created %1 identical atoms. Please change the number of atoms on one or let you vary a parameter.").arg(ui->spb_AtomCount->value()));
                     return;
                 }
             }
@@ -1308,11 +1312,13 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
                  {
                     ChirpAtom *cAtom = new ChirpAtom(ui->spb_AtomLength->value(), tempScale, ui->spb_AtomLength->value() / 2, tempModu, tempPhase, tempChirp);
                     resultList = cAtom->CreateStringValues();
+                    stream << QString("%1_ATOM_%2 \n Chirpatom: scale: %3 modu: %4 phase: %5 chrip: %6").arg(partDictName).arg(i).arg(tempScale).arg(tempModu).arg(tempPhase).arg(tempChirp) << "\n";
                 }
                 else if(atomType == EditorWindow::Gauss)
                 {
                     GaborAtom *gAtom = new GaborAtom();//ui->spb_AtomLength->value(), tempScale,0 , tempModu, tempPhase);
                     resultList = gAtom->CreateStringValues(ui->spb_AtomLength->value(), tempScale, ui->spb_AtomLength->value() / 2, tempModu, tempPhase);
+                    stream << QString("%1_ATOM_%2 \n Gaboratom: scale: %3 modu: %4 phase: %5").arg(partDictName).arg(i).arg(tempScale).arg(tempModu).arg(tempPhase) << "\n";
                 }
 
                 stream << QString("%1_ATOM_%2 \n scale: %3 modu: %4 phase: %5 chrip: %6").arg(partDictName).arg(i).arg(tempScale).arg(tempModu).arg(tempPhase).arg(tempChirp) << "\n";
@@ -1398,23 +1404,10 @@ void EditorWindow::on_list_NewDict_doubleClicked()
 //*************************************************************************************************************
 
 void EditorWindow::on_btt_DeleteDict_clicked()
-{
-    QFile configFile("Matching-Pursuit-Toolbox/Matching-Pursuit-Toolbox.config");
-    bool showMsgBox = true;
-    QString contents;
-    if (configFile.open(QIODevice::ReadWrite | QIODevice::Text))
-    {
-        while(!configFile.atEnd())
-        {
-            contents = configFile.readLine(0).constData();
-            if(QString::compare("ShowDeleteMessageBox=true;\n", contents) == 0)
-                showMsgBox = true;
-        }
-    }
-    configFile.close();
-
-    if(showMsgBox)
-    {
+{    
+    QSettings settings;
+    if(settings.value("show_warnings", true).toBool())
+    {    
         DeleteMessageBox* msgBox = new DeleteMessageBox(this);
         msgBox->setModal(true);
         qint32 result = msgBox->exec();
@@ -1479,8 +1472,8 @@ void EditorWindow::on_btt_SaveDicts_clicked()
 
     if(ui->tb_DictName->text().isEmpty())
     {
-        QMessageBox::warning(this, tr("Fehler"),
-        tr("Es wurde kein Name f�r das W�rterbuch vergeben."));
+        QMessageBox::warning(this, tr("Error"),
+        tr("There was no name for the dictionary awarded."));
         ui->tb_DictName->setFocus();
         return;
     }
@@ -1497,8 +1490,8 @@ void EditorWindow::on_btt_SaveDicts_clicked()
         QFileInfo fileInfo = fileList.at(i);
         if(QString::compare(fileInfo.baseName(), ui->tb_DictName->text()) == 0)
         {
-                QMessageBox::warning(this, tr("Fehler"),
-                tr("Der Name f�r das W�rterbuch ist schon vergeben."));
+                QMessageBox::warning(this, tr("Error"),
+                tr("The name for The dictionary is already taken."));
                 ui->tb_DictName->setFocus();
                 ui->tb_DictName->selectAll();
                 return;
