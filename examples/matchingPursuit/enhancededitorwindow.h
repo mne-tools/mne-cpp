@@ -73,23 +73,7 @@ private slots:
     void on_chb_allCombined_toggled(bool checked);    
     void on_cb_AtomFormula_currentIndexChanged(const QString &arg1);
     void on_sb_Atomcount_valueChanged(int arg1);
-    void on_btt_DeleteFormula_clicked();
-    void on_dsb_StepVauleA_editingFinished();
-    void on_dsb_StepVauleB_editingFinished();
-    void on_dsb_StepVauleC_editingFinished();
-    void on_dsb_StepVauleD_editingFinished();
-    void on_dsb_StepVauleE_editingFinished();
-    void on_dsb_StepVauleF_editingFinished();
-    void on_dsb_StepVauleG_editingFinished();
-    void on_dsb_StepVauleH_editingFinished();
-    void on_dsb_StartValueA_editingFinished();
-    void on_dsb_StartValueB_editingFinished();
-    void on_dsb_StartValueC_editingFinished();
-    void on_dsb_StartValueD_editingFinished();
-    void on_dsb_StartValueE_editingFinished();
-    void on_dsb_StartValueF_editingFinished();
-    void on_dsb_StartValueG_editingFinished();
-    void on_dsb_StartValueH_editingFinished();
+    void on_btt_DeleteFormula_clicked(); 
     void on_sb_SampleCount_editingFinished();
     void on_dsb_StepVauleA_valueChanged(double arg1);
     void on_dsb_StepVauleB_valueChanged(double arg1);
@@ -107,12 +91,21 @@ private slots:
     void on_dsb_StartValueF_valueChanged(double arg1);
     void on_dsb_StartValueG_valueChanged(double arg1);
     void on_dsb_StartValueH_valueChanged(double arg1);
+    void on_dsb_EndValueA_valueChanged(double arg1);
+    void on_dsb_EndValueB_valueChanged(double arg1);
+    void on_dsb_EndValueC_valueChanged(double arg1);
+    void on_dsb_EndValueD_valueChanged(double arg1);
+    void on_dsb_EndValueE_valueChanged(double arg1);
+    void on_dsb_EndValueF_valueChanged(double arg1);
+    void on_dsb_EndValueG_valueChanged(double arg1);
+    void on_dsb_EndValueH_valueChanged(double arg1);
     void on_pushButton_clicked();
 
 private:
     Ui::Enhancededitorwindow *ui;
     QStringList m_strStandardFunction;
-    QList<qreal> calc_value_list(qreal startValue, qreal linStepValue);
+    void calc_atom_count_all_combined();
+    QList<qreal> calc_value_list(qreal start_value, qreal line_step_value, qreal end_value);
     qreal calc_end_value(qreal startValue, qreal linStepValue);
 };
 

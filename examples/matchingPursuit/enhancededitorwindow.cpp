@@ -67,8 +67,8 @@
 // MAIN
 //=============================================================================================================
 
-qint32 _atom_count = 0;
-qint32 _sample_count = 0;
+qint32 _atom_count = 1;
+qint32 _sample_count = 64;
 QList<qreal> value_a_list;
 QList<qreal> value_b_list;
 QList<qreal> value_c_list;
@@ -156,6 +156,16 @@ void Enhancededitorwindow::on_chb_allCombined_toggled(bool checked)
     if(checked)
     {
         ui->sb_Atomcount->setEnabled(false);
+
+        ui->dsb_StepVauleA->setEnabled(true);
+        ui->dsb_StepVauleB->setEnabled(true);
+        ui->dsb_StepVauleC->setEnabled(true);
+        ui->dsb_StepVauleD->setEnabled(true);
+        ui->dsb_StepVauleE->setEnabled(true);
+        ui->dsb_StepVauleF->setEnabled(true);
+        ui->dsb_StepVauleG->setEnabled(true);
+        ui->dsb_StepVauleH->setEnabled(true);
+
         ui->dsb_EndValueA->setEnabled(true);
         ui->dsb_EndValueB->setEnabled(true);
         ui->dsb_EndValueC->setEnabled(true);
@@ -164,6 +174,8 @@ void Enhancededitorwindow::on_chb_allCombined_toggled(bool checked)
         ui->dsb_EndValueF->setEnabled(true);
         ui->dsb_EndValueG->setEnabled(true);
         ui->dsb_EndValueH->setEnabled(true);
+
+        calc_atom_count_all_combined();
     }
     else
     {
@@ -206,16 +218,19 @@ void Enhancededitorwindow::on_sb_Atomcount_valueChanged(int arg1)
         ui->dsb_StepVauleG->setEnabled(true);
         ui->dsb_StepVauleH->setEnabled(true);
     }
-    ui->dsb_EndValueA->setValue(calc_end_value(ui->dsb_StartValueA->value(), ui->dsb_StartValueA->value()));
-    ui->dsb_EndValueB->setValue(calc_end_value(ui->dsb_StartValueB->value(), ui->dsb_StartValueB->value()));
-    ui->dsb_EndValueC->setValue(calc_end_value(ui->dsb_StartValueC->value(), ui->dsb_StartValueC->value()));
-    ui->dsb_EndValueD->setValue(calc_end_value(ui->dsb_StartValueD->value(), ui->dsb_StartValueD->value()));
-    ui->dsb_EndValueE->setValue(calc_end_value(ui->dsb_StartValueE->value(), ui->dsb_StartValueE->value()));
-    ui->dsb_EndValueF->setValue(calc_end_value(ui->dsb_StartValueF->value(), ui->dsb_StartValueF->value()));
-    ui->dsb_EndValueG->setValue(calc_end_value(ui->dsb_StartValueG->value(), ui->dsb_StartValueG->value()));
-    ui->dsb_EndValueH->setValue(calc_end_value(ui->dsb_StartValueH->value(), ui->dsb_StartValueH->value()));
 
-    _atom_count = ui->sb_Atomcount->value();
+    if(!ui->chb_allCombined->isChecked())
+    {
+        if(ui->lb_A->isVisible()) ui->dsb_EndValueA->setValue(calc_end_value(ui->dsb_StartValueA->value(), ui->dsb_StepVauleA->value()));
+        if(ui->lb_B->isVisible()) ui->dsb_EndValueB->setValue(calc_end_value(ui->dsb_StartValueB->value(), ui->dsb_StepVauleB->value()));
+        if(ui->lb_C->isVisible()) ui->dsb_EndValueC->setValue(calc_end_value(ui->dsb_StartValueC->value(), ui->dsb_StepVauleC->value()));
+        if(ui->lb_D->isVisible()) ui->dsb_EndValueD->setValue(calc_end_value(ui->dsb_StartValueD->value(), ui->dsb_StepVauleD->value()));
+        if(ui->lb_E->isVisible()) ui->dsb_EndValueE->setValue(calc_end_value(ui->dsb_StartValueE->value(), ui->dsb_StepVauleE->value()));
+        if(ui->lb_F->isVisible()) ui->dsb_EndValueF->setValue(calc_end_value(ui->dsb_StartValueF->value(), ui->dsb_StepVauleF->value()));
+        if(ui->lb_G->isVisible()) ui->dsb_EndValueG->setValue(calc_end_value(ui->dsb_StartValueG->value(), ui->dsb_StepVauleG->value()));
+        if(ui->lb_H->isVisible()) ui->dsb_EndValueH->setValue(calc_end_value(ui->dsb_StartValueH->value(), ui->dsb_StepVauleH->value()));
+    }
+    _atom_count = arg1;
 }
 
 //***********************************************************************************************************************
@@ -348,11 +363,50 @@ void Enhancededitorwindow::on_btt_DeleteFormula_clicked()
 
 //***********************************************************************************************************************
 
-QList<qreal> Enhancededitorwindow::calc_value_list(qreal startValue, qreal linStepValue)
+// calculates number of atoms if "combine all"
+void Enhancededitorwindow::calc_atom_count_all_combined()
 {
+    qint32 count = 0;
+    qint32 count_a = 1;
+    qint32 count_b = 1;
+    qint32 count_c = 1;
+    qint32 count_d = 1;
+    qint32 count_e = 1;
+    qint32 count_f = 1;
+    qint32 count_g = 1;
+    qint32 count_h = 1;
+
+    if(value_a_list.length() != 0) count_a = value_a_list.length();
+    if(value_b_list.length() != 0) count_b = value_b_list.length();
+    if(value_c_list.length() != 0) count_c = value_c_list.length();
+    if(value_d_list.length() != 0) count_d = value_d_list.length();
+    if(value_e_list.length() != 0) count_e = value_e_list.length();
+    if(value_f_list.length() != 0) count_f = value_f_list.length();
+    if(value_g_list.length() != 0) count_g = value_g_list.length();
+    if(value_h_list.length() != 0) count_h = value_h_list.length();
+
+    count = count_a * count_b * count_c * count_d * count_e * count_f * count_g * count_h;
+
+    if(count > 10000000)
+    {
+        QMessageBox::warning(this, tr("Error"),
+        tr("The number of atoms is too large."));
+        //return;
+    }
+    ui->sb_Atomcount->setValue(count);
+}
+
+//***********************************************************************************************************************
+
+QList<qreal> Enhancededitorwindow::calc_value_list(qreal start_value, qreal line_step_value, qreal end_value)
+{
+    qreal atom_count = _atom_count;
     QList<qreal> resultList;
-    for(qint32 i = 0; i < _atom_count; i++)
-        resultList.append(startValue + (i * linStepValue));
+    if(ui->chb_allCombined->isChecked())
+        atom_count = (end_value - start_value) / line_step_value + 1;
+
+    for(qint32 i = 0; i < atom_count; i++)
+        resultList.append(start_value + (i * line_step_value));
 
     return resultList;
 }
@@ -364,131 +418,94 @@ qreal Enhancededitorwindow::calc_end_value(qreal startValue, qreal linStepValue)
     return startValue + (_atom_count * linStepValue);
 }
 
-
-//***********************************************************************************************************************
-
-void Enhancededitorwindow::on_dsb_StepVauleA_editingFinished()
-{
-    value_a_list = calc_value_list(ui->dsb_StartValueA->value(), ui->dsb_StepVauleA->value());
-}
-
-void Enhancededitorwindow::on_dsb_StepVauleB_editingFinished()
-{
-    value_b_list = calc_value_list(ui->dsb_StartValueB->value(), ui->dsb_StepVauleB->value());
-}
-
-void Enhancededitorwindow::on_dsb_StepVauleC_editingFinished()
-{
-    value_c_list = calc_value_list(ui->dsb_StartValueC->value(), ui->dsb_StepVauleC->value());
-}
-
-void Enhancededitorwindow::on_dsb_StepVauleD_editingFinished()
-{
-    value_d_list = calc_value_list(ui->dsb_StartValueD->value(), ui->dsb_StepVauleD->value());
-}
-
-void Enhancededitorwindow::on_dsb_StepVauleE_editingFinished()
-{
-    value_e_list = calc_value_list(ui->dsb_StartValueE->value(), ui->dsb_StepVauleE->value());
-}
-
-void Enhancededitorwindow::on_dsb_StepVauleF_editingFinished()
-{
-    value_f_list = calc_value_list(ui->dsb_StartValueF->value(), ui->dsb_StepVauleF->value());
-}
-
-void Enhancededitorwindow::on_dsb_StepVauleG_editingFinished()
-{
-    value_g_list = calc_value_list(ui->dsb_StartValueH->value(), ui->dsb_StepVauleG->value());
-}
-
-void Enhancededitorwindow::on_dsb_StepVauleH_editingFinished()
-{
-    value_h_list = calc_value_list(ui->dsb_StartValueG->value(), ui->dsb_StepVauleH->value());
-}
-
-//***********************************************************************************************************************
-
-void Enhancededitorwindow::on_dsb_StartValueA_editingFinished()
-{
-   value_a_list = calc_value_list(ui->dsb_StartValueA->value(), ui->dsb_StepVauleA->value());
-}
-
-void Enhancededitorwindow::on_dsb_StartValueB_editingFinished()
-{
-    value_b_list = calc_value_list(ui->dsb_StartValueB->value(), ui->dsb_StepVauleB->value());
-}
-
-void Enhancededitorwindow::on_dsb_StartValueC_editingFinished()
-{
-    value_c_list = calc_value_list(ui->dsb_StartValueC->value(), ui->dsb_StepVauleC->value());
-}
-
-void Enhancededitorwindow::on_dsb_StartValueD_editingFinished()
-{
-    value_d_list = calc_value_list(ui->dsb_StartValueD->value(), ui->dsb_StepVauleD->value());
-}
-
-void Enhancededitorwindow::on_dsb_StartValueE_editingFinished()
-{
-    value_e_list = calc_value_list(ui->dsb_StartValueE->value(), ui->dsb_StepVauleE->value());
-}
-
-void Enhancededitorwindow::on_dsb_StartValueF_editingFinished()
-{
-    value_f_list = calc_value_list(ui->dsb_StartValueF->value(), ui->dsb_StepVauleF->value());
-}
-
-void Enhancededitorwindow::on_dsb_StartValueG_editingFinished()
-{
-    value_g_list = calc_value_list(ui->dsb_StartValueH->value(), ui->dsb_StepVauleG->value());
-}
-
-void Enhancededitorwindow::on_dsb_StartValueH_editingFinished()
-{
-    value_h_list = calc_value_list(ui->dsb_StartValueG->value(), ui->dsb_StepVauleH->value());
-}
-
 //***********************************************************************************************************************
 
 void Enhancededitorwindow::on_dsb_StepVauleA_valueChanged(double arg1)
 {
-    ui->dsb_EndValueA->setValue(calc_end_value(ui->dsb_StartValueA->value(), arg1));
+    value_a_list = calc_value_list(ui->dsb_StartValueA->value(), arg1, ui->dsb_EndValueA->value());
+    if(!ui->chb_allCombined->isChecked()) ui->dsb_EndValueA->setValue(calc_end_value(ui->dsb_StartValueA->value(), arg1));
+    if(ui->chb_allCombined->isChecked())
+    {
+        ui->dsb_EndValueA->setMinimum(ui->dsb_StartValueA->value() + arg1);
+        calc_atom_count_all_combined();
+    }
 }
 
 void Enhancededitorwindow::on_dsb_StepVauleB_valueChanged(double arg1)
 {
-    ui->dsb_EndValueB->setValue(calc_end_value(ui->dsb_StartValueB->value(), arg1));
+    value_b_list = calc_value_list(ui->dsb_StartValueB->value(), arg1, ui->dsb_EndValueB->value());
+    if(!ui->chb_allCombined->isChecked()) ui->dsb_EndValueB->setValue(calc_end_value(ui->dsb_StartValueB->value(), arg1));
+    if(ui->chb_allCombined->isChecked())
+    {
+        ui->dsb_EndValueB->setMinimum(ui->dsb_StartValueB->value() + arg1);
+        calc_atom_count_all_combined();
+    }
 }
 
 void Enhancededitorwindow::on_dsb_StepVauleC_valueChanged(double arg1)
 {
-    ui->dsb_EndValueC->setValue(calc_end_value(ui->dsb_StartValueC->value(), arg1));
+    value_c_list = calc_value_list(ui->dsb_StartValueC->value(), arg1, ui->dsb_EndValueC->value());
+    if(!ui->chb_allCombined->isChecked()) ui->dsb_EndValueC->setValue(calc_end_value(ui->dsb_StartValueC->value(), arg1));
+    if(ui->chb_allCombined->isChecked())
+    {
+        ui->dsb_EndValueC->setMinimum(ui->dsb_StartValueC->value() + arg1);
+        calc_atom_count_all_combined();
+    }
 }
 
 void Enhancededitorwindow::on_dsb_StepVauleD_valueChanged(double arg1)
 {
-    ui->dsb_EndValueD->setValue(calc_end_value(ui->dsb_StartValueD->value(), arg1));
+    value_d_list = calc_value_list(ui->dsb_StartValueD->value(), arg1, ui->dsb_EndValueD->value());
+    if(!ui->chb_allCombined->isChecked()) ui->dsb_EndValueD->setValue(calc_end_value(ui->dsb_StartValueD->value(), arg1));
+    if(ui->chb_allCombined->isChecked())
+    {
+        ui->dsb_EndValueD->setMinimum(ui->dsb_StartValueD->value() + arg1);
+        calc_atom_count_all_combined();
+    }
 }
 
 void Enhancededitorwindow::on_dsb_StepVauleE_valueChanged(double arg1)
 {
-    ui->dsb_EndValueE->setValue(calc_end_value(ui->dsb_StartValueE->value(), arg1));
+    value_e_list = calc_value_list(ui->dsb_StartValueE->value(), arg1, ui->dsb_EndValueE->value());
+    if(!ui->chb_allCombined->isChecked()) ui->dsb_EndValueE->setValue(calc_end_value(ui->dsb_StartValueE->value(), arg1));
+    if(ui->chb_allCombined->isChecked())
+    {
+        ui->dsb_EndValueE->setMinimum(ui->dsb_StartValueE->value() + arg1);
+        calc_atom_count_all_combined();
+    }
 }
 
 void Enhancededitorwindow::on_dsb_StepVauleF_valueChanged(double arg1)
 {
-    ui->dsb_EndValueF->setValue(calc_end_value(ui->dsb_StartValueF->value(), arg1));
+    value_f_list = calc_value_list(ui->dsb_StartValueF->value(), arg1, ui->dsb_EndValueF->value());
+    if(!ui->chb_allCombined->isChecked()) ui->dsb_EndValueF->setValue(calc_end_value(ui->dsb_StartValueF->value(), arg1));
+    if(ui->chb_allCombined->isChecked())
+    {
+        ui->dsb_EndValueF->setMinimum(ui->dsb_StartValueF->value() + arg1);
+        calc_atom_count_all_combined();
+    }
 }
 
 void Enhancededitorwindow::on_dsb_StepVauleG_valueChanged(double arg1)
 {
-    ui->dsb_EndValueG->setValue(calc_end_value(ui->dsb_StartValueG->value(), arg1));
+    value_g_list = calc_value_list(ui->dsb_StartValueG->value(), arg1, ui->dsb_EndValueG->value());
+    if(!ui->chb_allCombined->isChecked()) ui->dsb_EndValueG->setValue(calc_end_value(ui->dsb_StartValueG->value(), arg1));
+    if(ui->chb_allCombined->isChecked())
+    {
+        ui->dsb_EndValueG->setMinimum(ui->dsb_StartValueG->value() + arg1);
+        calc_atom_count_all_combined();
+    }
 }
 
 void Enhancededitorwindow::on_dsb_StepVauleH_valueChanged(double arg1)
 {
-    ui->dsb_EndValueH->setValue(calc_end_value(ui->dsb_StartValueH->value(), arg1));
+    value_h_list = calc_value_list(ui->dsb_StartValueH->value(), arg1, ui->dsb_EndValueH->value());
+    if(!ui->chb_allCombined->isChecked()) ui->dsb_EndValueH->setValue(calc_end_value(ui->dsb_StartValueH->value(), arg1));
+    if(ui->chb_allCombined->isChecked())
+    {
+        ui->dsb_EndValueH->setMinimum(ui->dsb_StartValueH->value() + arg1);
+        calc_atom_count_all_combined();
+    }
 }
 
 //***********************************************************************************************************************
@@ -496,42 +513,140 @@ void Enhancededitorwindow::on_dsb_StepVauleH_valueChanged(double arg1)
 
 void Enhancededitorwindow::on_dsb_StartValueA_valueChanged(double arg1)
 {
-    ui->dsb_EndValueA->setValue(calc_end_value(arg1, ui->dsb_StepVauleA->value()));
+    value_a_list = calc_value_list(arg1, ui->dsb_StepVauleA->value(), ui->dsb_EndValueA->value());
+    if(!ui->chb_allCombined->isChecked()) ui->dsb_EndValueA->setValue(calc_end_value(arg1, ui->dsb_StepVauleA->value()));
+    if(ui->chb_allCombined->isChecked())
+    {
+        ui->dsb_EndValueA->setMinimum(arg1 + ui->dsb_StepVauleA->value());
+        calc_atom_count_all_combined();
+    }
 }
 
 void Enhancededitorwindow::on_dsb_StartValueB_valueChanged(double arg1)
 {
-    ui->dsb_EndValueB->setValue(calc_end_value(arg1, ui->dsb_StepVauleB->value()));
+    value_b_list = calc_value_list(arg1, ui->dsb_StepVauleB->value(), ui->dsb_EndValueB->value());
+    if(!ui->chb_allCombined->isChecked()) ui->dsb_EndValueB->setValue(calc_end_value(arg1, ui->dsb_StepVauleB->value()));
+    if(ui->chb_allCombined->isChecked())
+    {
+        ui->dsb_EndValueA->setMinimum(arg1 + ui->dsb_StepVauleB->value());
+        calc_atom_count_all_combined();
+    }
 }
 
 void Enhancededitorwindow::on_dsb_StartValueC_valueChanged(double arg1)
 {
-    ui->dsb_EndValueC->setValue(calc_end_value(arg1, ui->dsb_StepVauleC->value()));
+    value_c_list = calc_value_list(arg1, ui->dsb_StepVauleC->value(), ui->dsb_EndValueC->value());
+    if(!ui->chb_allCombined->isChecked()) ui->dsb_EndValueC->setValue(calc_end_value(arg1, ui->dsb_StepVauleC->value()));
+    if(ui->chb_allCombined->isChecked())
+    {
+        ui->dsb_EndValueA->setMinimum(arg1 + ui->dsb_StepVauleC->value());
+        calc_atom_count_all_combined();
+    }
 }
 
 void Enhancededitorwindow::on_dsb_StartValueD_valueChanged(double arg1)
 {
-    ui->dsb_EndValueD->setValue(calc_end_value(arg1, ui->dsb_StepVauleD->value()));
+    value_d_list = calc_value_list(arg1, ui->dsb_StepVauleD->value(), ui->dsb_EndValueD->value());
+    if(!ui->chb_allCombined->isChecked()) ui->dsb_EndValueD->setValue(calc_end_value(arg1, ui->dsb_StepVauleD->value()));
+    if(ui->chb_allCombined->isChecked())
+    {
+        ui->dsb_EndValueA->setMinimum(arg1 + ui->dsb_StepVauleD->value());
+        calc_atom_count_all_combined();
+    }
 }
 
 void Enhancededitorwindow::on_dsb_StartValueE_valueChanged(double arg1)
 {
-    ui->dsb_EndValueE->setValue(calc_end_value(arg1, ui->dsb_StepVauleE->value()));
+    value_e_list = calc_value_list(arg1, ui->dsb_StepVauleE->value(), ui->dsb_EndValueE->value());
+    if(!ui->chb_allCombined->isChecked()) ui->dsb_EndValueE->setValue(calc_end_value(arg1, ui->dsb_StepVauleE->value()));
+    if(ui->chb_allCombined->isChecked())
+    {
+        ui->dsb_EndValueA->setMinimum(arg1 + ui->dsb_StepVauleE->value());
+        calc_atom_count_all_combined();
+    }
 }
 
 void Enhancededitorwindow::on_dsb_StartValueF_valueChanged(double arg1)
 {
-    ui->dsb_EndValueF->setValue(calc_end_value(arg1, ui->dsb_StepVauleF->value()));
+    value_f_list = calc_value_list(arg1, ui->dsb_StepVauleF->value(), ui->dsb_EndValueF->value());
+    if(!ui->chb_allCombined->isChecked()) ui->dsb_EndValueF->setValue(calc_end_value(arg1, ui->dsb_StepVauleF->value()));
+    if(ui->chb_allCombined->isChecked())
+    {
+        ui->dsb_EndValueA->setMinimum(arg1 + ui->dsb_StepVauleF->value());
+        calc_atom_count_all_combined();
+    }
 }
 
 void Enhancededitorwindow::on_dsb_StartValueG_valueChanged(double arg1)
 {
-    ui->dsb_EndValueG->setValue(calc_end_value(arg1, ui->dsb_StepVauleG->value()));
+    value_g_list = calc_value_list(arg1, ui->dsb_StepVauleG->value(), ui->dsb_EndValueG->value());
+    if(!ui->chb_allCombined->isChecked()) ui->dsb_EndValueG->setValue(calc_end_value(arg1, ui->dsb_StepVauleG->value()));
+    if(ui->chb_allCombined->isChecked())
+    {
+        ui->dsb_EndValueA->setMinimum(arg1 + ui->dsb_StepVauleG->value());
+        calc_atom_count_all_combined();
+    }
 }
 
 void Enhancededitorwindow::on_dsb_StartValueH_valueChanged(double arg1)
 {
-    ui->dsb_EndValueH->setValue(calc_end_value(arg1, ui->dsb_StepVauleH->value()));
+    value_h_list = calc_value_list(arg1, ui->dsb_StepVauleH->value(), ui->dsb_EndValueH->value());
+    if(!ui->chb_allCombined->isChecked()) ui->dsb_EndValueH->setValue(calc_end_value(arg1, ui->dsb_StepVauleH->value()));
+    if(ui->chb_allCombined->isChecked())
+    {
+        ui->dsb_EndValueA->setMinimum(arg1 + ui->dsb_StepVauleH->value());
+        calc_atom_count_all_combined();
+    }
+}
+
+//***********************************************************************************************************************
+
+void Enhancededitorwindow::on_dsb_EndValueA_valueChanged(double arg1)
+{
+    value_a_list = calc_value_list(ui->dsb_StartValueA->value(), ui->dsb_StepVauleA->value(), arg1);
+    if(ui->chb_allCombined->isChecked()) calc_atom_count_all_combined();
+}
+
+void Enhancededitorwindow::on_dsb_EndValueB_valueChanged(double arg1)
+{
+    value_b_list = calc_value_list(ui->dsb_StartValueB->value(), ui->dsb_StepVauleB->value(), arg1);
+    if(ui->chb_allCombined->isChecked()) calc_atom_count_all_combined();
+}
+
+void Enhancededitorwindow::on_dsb_EndValueC_valueChanged(double arg1)
+{
+    value_c_list = calc_value_list(ui->dsb_StartValueC->value(), ui->dsb_StepVauleC->value(), arg1);
+    if(ui->chb_allCombined->isChecked()) calc_atom_count_all_combined();
+}
+
+void Enhancededitorwindow::on_dsb_EndValueD_valueChanged(double arg1)
+{
+    value_d_list = calc_value_list(ui->dsb_StartValueD->value(), ui->dsb_StepVauleD->value(), arg1);
+    if(ui->chb_allCombined->isChecked()) calc_atom_count_all_combined();
+}
+
+void Enhancededitorwindow::on_dsb_EndValueE_valueChanged(double arg1)
+{
+    value_e_list = calc_value_list(ui->dsb_StartValueE->value(), ui->dsb_StepVauleE->value(), arg1);
+    if(ui->chb_allCombined->isChecked()) calc_atom_count_all_combined();
+}
+
+void Enhancededitorwindow::on_dsb_EndValueF_valueChanged(double arg1)
+{
+    value_f_list = calc_value_list(ui->dsb_StartValueF->value(), ui->dsb_StepVauleF->value(), arg1);
+    if(ui->chb_allCombined->isChecked()) calc_atom_count_all_combined();
+}
+
+void Enhancededitorwindow::on_dsb_EndValueG_valueChanged(double arg1)
+{
+    value_g_list = calc_value_list(ui->dsb_StartValueG->value(), ui->dsb_StepVauleG->value(), arg1);
+    if(ui->chb_allCombined->isChecked()) calc_atom_count_all_combined();
+}
+
+void Enhancededitorwindow::on_dsb_EndValueH_valueChanged(double arg1)
+{
+    value_h_list = calc_value_list(ui->dsb_StartValueH->value(), ui->dsb_StepVauleH->value(), arg1);
+    if(ui->chb_allCombined->isChecked()) calc_atom_count_all_combined();
 }
 
 //***********************************************************************************************************************
@@ -570,116 +685,174 @@ void Enhancededitorwindow::on_pushButton_clicked()
     {
         QTextStream stream( &dict );
         stream << QString("atomcount = %1 ").arg(_atom_count) << "\n";
-
-        qint32 atomIndex = 0;
-        qint32 count_h = 0;
-
-        qint32 max_a = 1;
-        qint32 max_b = 1;
-        qint32 max_c = 1;
-        qint32 max_d = 1;
-        qint32 max_e = 1;
-        qint32 max_f = 1;
-        qint32 max_g = 1;
-        qint32 max_h = 1;
-
-        if(value_a_list.length() != 0) max_a = value_a_list.length();
-        if(value_b_list.length() != 0) max_b = value_b_list.length();
-        if(value_c_list.length() != 0) max_c = value_c_list.length();
-        if(value_d_list.length() != 0) max_d = value_d_list.length();
-        if(value_e_list.length() != 0) max_e = value_e_list.length();
-        if(value_f_list.length() != 0) max_f = value_f_list.length();
-        if(value_g_list.length() != 0) max_g = value_g_list.length();
-        if(value_h_list.length() != 0) max_h = value_h_list.length();
-
-
-        while(count_h < max_h)
+        if(ui->chb_allCombined->isChecked())
         {
-            qint32 count_g = 0;
-            while(count_g < max_g)
+            qint32 atomIndex = 0;
+            qint32 max_a = 1;
+            qint32 max_b = 1;
+            qint32 max_c = 1;
+            qint32 max_d = 1;
+            qint32 max_e = 1;
+            qint32 max_f = 1;
+            qint32 max_g = 1;
+            qint32 max_h = 1;
+
+            if(value_a_list.length() != 0) max_a = value_a_list.length();
+            if(value_b_list.length() != 0) max_b = value_b_list.length();
+            if(value_c_list.length() != 0) max_c = value_c_list.length();
+            if(value_d_list.length() != 0) max_d = value_d_list.length();
+            if(value_e_list.length() != 0) max_e = value_e_list.length();
+            if(value_f_list.length() != 0) max_f = value_f_list.length();
+            if(value_g_list.length() != 0) max_g = value_g_list.length();
+            if(value_h_list.length() != 0) max_h = value_h_list.length();
+
+            qint32 count_h = 0;
+            while(count_h < max_h)
             {
-                qint32 count_f = 0;
-                while(count_f < max_f)
+                qint32 count_g = 0;
+                while(count_g < max_g)
                 {
-                    qint32 count_e = 0;
-                    while(count_e < max_e)
+                    qint32 count_f = 0;
+                    while(count_f < max_f)
                     {
-                        qint32 count_d = 0;
-                        while(count_d < max_d)
+                        qint32 count_e = 0;
+                        while(count_e < max_e)
                         {
-                            qint32 count_c = 0;
-                            while(count_c < max_c)
+                            qint32 count_d = 0;
+                            while(count_d < max_d)
                             {
-                                qint32 count_b = 0;
-                                while(count_b < max_b)
+                                qint32 count_c = 0;
+                                while(count_c < max_c)
                                 {
-                                    qint32 count_a = 0;
-                                    while(count_a < max_a)
+                                    qint32 count_b = 0;
+                                    while(count_b < max_b)
                                     {
-                                        qreal temp_a = 0;
-                                        qreal temp_b = 0;
-                                        qreal temp_c = 0;
-                                        qreal temp_d = 0;
-                                        qreal temp_e = 0;
-                                        qreal temp_f = 0;
-                                        qreal temp_g = 0;
-                                        qreal temp_h = 0;
-                                        if(value_a_list.length() > 0) temp_a = value_a_list.at(count_a);
-                                        if(value_b_list.length() > 0) temp_b = value_b_list.at(count_b);
-                                        if(value_c_list.length() > 0) temp_c = value_c_list.at(count_c);
-                                        if(value_d_list.length() > 0) temp_d = value_d_list.at(count_d);
-                                        if(value_e_list.length() > 0) temp_e = value_e_list.at(count_e);
-                                        if(value_f_list.length() > 0) temp_f = value_f_list.at(count_f);
-                                        if(value_g_list.length() > 0) temp_g = value_g_list.at(count_g);
-                                        if(value_h_list.length() > 0) temp_h = value_h_list.at(count_h);
+                                        qint32 count_a = 0;
+                                        while(count_a < max_a)
+                                        {
+                                            qreal temp_a = ui->dsb_StartValueA->value();
+                                            qreal temp_b = ui->dsb_StartValueB->value();
+                                            qreal temp_c = ui->dsb_StartValueC->value();
+                                            qreal temp_d = ui->dsb_StartValueD->value();
+                                            qreal temp_e = ui->dsb_StartValueE->value();
+                                            qreal temp_f = ui->dsb_StartValueF->value();
+                                            qreal temp_g = ui->dsb_StartValueG->value();
+                                            qreal temp_h = ui->dsb_StartValueH->value();
+                                            if(value_a_list.length() > 0) temp_a = value_a_list.at(count_a);
+                                            if(value_b_list.length() > 0) temp_b = value_b_list.at(count_b);
+                                            if(value_c_list.length() > 0) temp_c = value_c_list.at(count_c);
+                                            if(value_d_list.length() > 0) temp_d = value_d_list.at(count_d);
+                                            if(value_e_list.length() > 0) temp_e = value_e_list.at(count_e);
+                                            if(value_f_list.length() > 0) temp_f = value_f_list.at(count_f);
+                                            if(value_g_list.length() > 0) temp_g = value_g_list.at(count_g);
+                                            if(value_h_list.length() > 0) temp_h = value_h_list.at(count_h);
 
 
-                                        Formulaeditor formula_parser;
+                                            Formulaeditor formula_parser;
 
-                                        formula_parser.set_funct_const(0, temp_a);
-                                        formula_parser.set_funct_const(1, temp_b);
-                                        formula_parser.set_funct_const(2, temp_c);
-                                        formula_parser.set_funct_const(3, temp_d);
-                                        formula_parser.set_funct_const(4, temp_e);
-                                        formula_parser.set_funct_const(5, temp_f);
-                                        formula_parser.set_funct_const(6, temp_g);
-                                        formula_parser.set_funct_const(7, temp_h);
+                                            formula_parser.set_funct_const(0, temp_a);
+                                            formula_parser.set_funct_const(1, temp_b);
+                                            formula_parser.set_funct_const(2, temp_c);
+                                            formula_parser.set_funct_const(3, temp_d);
+                                            formula_parser.set_funct_const(4, temp_e);
+                                            formula_parser.set_funct_const(5, temp_f);
+                                            formula_parser.set_funct_const(6, temp_g);
+                                            formula_parser.set_funct_const(7, temp_h);
 
-                                        for(qint32 i = 0; i < _sample_count; i++)
-                                            results_list.append( QString::number(formula_parser.calculation(ui->cb_AtomFormula->currentText(), i)));
+                                            results_list.clear();
+                                            for(qint32 i = 0; i < _sample_count; i++)
+                                                results_list.append( QString::number(formula_parser.calculation(ui->cb_AtomFormula->currentText(), i)));
 
-                                        stream << QString("%1_ATOM_%2 \n %3: a: %4 b: %5 c: %6 d: %7 e: %8 f: %9 g: %10 h: %11")
-                                                  .arg(ui->tb_atom_name->text())
-                                                  .arg(atomIndex)
-                                                  .arg(ui->cb_AtomFormula->currentText())
-                                                  .arg(temp_a)
-                                                  .arg(temp_b)
-                                                  .arg(temp_c)
-                                                  .arg(temp_d)
-                                                  .arg(temp_e)
-                                                  .arg(temp_f)
-                                                  .arg(temp_g)
-                                                  .arg(temp_h) << "\n";
+                                            stream << QString("%1_ATOM_%2 \n %3: a: %4 b: %5 c: %6 d: %7 e: %8 f: %9 g: %10 h: %11")
+                                                      .arg(ui->tb_atom_name->text())
+                                                      .arg(atomIndex)
+                                                      .arg(ui->cb_AtomFormula->currentText())
+                                                      .arg(temp_a)
+                                                      .arg(temp_b)
+                                                      .arg(temp_c)
+                                                      .arg(temp_d)
+                                                      .arg(temp_e)
+                                                      .arg(temp_f)
+                                                      .arg(temp_g)
+                                                      .arg(temp_h) << "\n";
 
-                                       for (QStringList::Iterator it = results_list.begin(); it != results_list.end(); it++)
-                                            stream << *it << "\n";
+                                           for (QStringList::Iterator it = results_list.begin(); it != results_list.end(); it++)
+                                                stream << *it << "\n";
 
-                                       atomIndex++;
-                                       count_a++;
+                                           atomIndex++;
+                                           count_a++;
+                                        }
+                                        count_b++;
                                     }
-                                    count_b++;
+                                    count_c++;
                                 }
-                                count_c++;
+                                count_d++;
                             }
-                            count_d++;
+                            count_e++;
                         }
-                        count_e++;
+                        count_f++;
                     }
-                    count_f++;
+                    count_g++;
                 }
-                count_g++;
+                count_h++;
             }
-            count_h++;
+        }
+        else // not all params combined
+        {
+            qint32 atom_index = 0;
+            while (atom_index < _atom_count)
+            {
+                qreal temp_a = ui->dsb_StartValueA->value();
+                qreal temp_b = ui->dsb_StartValueB->value();
+                qreal temp_c = ui->dsb_StartValueC->value();
+                qreal temp_d = ui->dsb_StartValueD->value();
+                qreal temp_e = ui->dsb_StartValueE->value();
+                qreal temp_f = ui->dsb_StartValueF->value();
+                qreal temp_g = ui->dsb_StartValueG->value();
+                qreal temp_h = ui->dsb_StartValueH->value();
+                if(value_a_list.length() > 0) temp_a = value_a_list.at(atom_index);
+                if(value_b_list.length() > 0) temp_b = value_b_list.at(atom_index);
+                if(value_c_list.length() > 0) temp_c = value_c_list.at(atom_index);
+                if(value_d_list.length() > 0) temp_d = value_d_list.at(atom_index);
+                if(value_e_list.length() > 0) temp_e = value_e_list.at(atom_index);
+                if(value_f_list.length() > 0) temp_f = value_f_list.at(atom_index);
+                if(value_g_list.length() > 0) temp_g = value_g_list.at(atom_index);
+                if(value_h_list.length() > 0) temp_h = value_h_list.at(atom_index);
+
+
+                Formulaeditor formula_parser;
+
+                formula_parser.set_funct_const(0, temp_a);
+                formula_parser.set_funct_const(1, temp_b);
+                formula_parser.set_funct_const(2, temp_c);
+                formula_parser.set_funct_const(3, temp_d);
+                formula_parser.set_funct_const(4, temp_e);
+                formula_parser.set_funct_const(5, temp_f);
+                formula_parser.set_funct_const(6, temp_g);
+                formula_parser.set_funct_const(7, temp_h);
+
+                results_list.clear();
+                for(qint32 i = 0; i < _sample_count; i++)
+                    results_list.append(QString::number(formula_parser.calculation(ui->cb_AtomFormula->currentText(), i)));
+
+                stream << QString("%1_ATOM_%2 \n %3: a: %4 b: %5 c: %6 d: %7 e: %8 f: %9 g: %10 h: %11")
+                          .arg(ui->tb_atom_name->text())
+                          .arg(atom_index)
+                          .arg(ui->cb_AtomFormula->currentText())
+                          .arg(temp_a)
+                          .arg(temp_b)
+                          .arg(temp_c)
+                          .arg(temp_d)
+                          .arg(temp_e)
+                          .arg(temp_f)
+                          .arg(temp_g)
+                          .arg(temp_h) << "\n";
+
+               for (QStringList::Iterator it = results_list.begin(); it != results_list.end(); it++)
+                    stream << *it << "\n";
+
+               atom_index++;
+            }
         }
         dict.close();
     }
