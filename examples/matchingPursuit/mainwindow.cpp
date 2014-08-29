@@ -1111,8 +1111,15 @@ void MainWindow::on_btt_Calc_clicked()
             QString text = "No signalfile found.";
             QMessageBox msgBox(QMessageBox::Warning, title, text, QMessageBox::Ok, this);
             msgBox.exec();
+        }
 
-            return;
+        QSettings settings;
+        if(settings.value("show_warnings", true).toBool())
+        {
+            processdurationmessagebox* msgBox = new processdurationmessagebox(this);
+            msgBox->setModal(true);
+            msgBox->exec();
+            msgBox->close();
         }
 
         if(ui->chb_Iterations->checkState()  == Qt::Unchecked && ui->chb_ResEnergy->checkState() == Qt::Unchecked)

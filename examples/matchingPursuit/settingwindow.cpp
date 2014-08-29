@@ -8,6 +8,7 @@ settingwindow::settingwindow(QWidget *parent) :    QWidget(parent),    ui(new Ui
     ui->setupUi(this);
     ui->cb_boost->setChecked(settings.value("isBoost", true).toBool());
     ui->cb_fixphase->setChecked(settings.value("fixPhase", false).toBool());
+    ui->cb_show_warnings->setChecked(settings.value("show_warnings", true).toBool());
 
     ui->sb_adaptive_iteration->setValue(settings.value("adaptive_iterations", 1E3).toInt());
     ui->sb_fix_iteration->setValue(settings.value("fix_iterations", 1E3).toInt());
@@ -39,6 +40,7 @@ void settingwindow::on_btt_close_clicked()
     QSettings settings;
     settings.setValue("isBoost", ui->cb_boost->isChecked());
     settings.setValue("fixPhase", ui->cb_fixphase->isChecked());
+    settings.setValue("show_warnings", ui->cb_show_warnings->isChecked());
 
     settings.setValue("adaptive_iterations", ui->sb_adaptive_iteration->value());
     settings.setValue("fix_iterations", ui->sb_fix_iteration->value());

@@ -47,12 +47,12 @@
         </sizepolicy>
        </property>
        <property name="text">
-        <string>Name: </string>
+        <string>name:</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QLineEdit" name="lineEdit">
+      <widget class="QLineEdit" name="tb_atom_name">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
          <horstretch>0</horstretch>
@@ -102,7 +102,7 @@
         </sizepolicy>
        </property>
        <property name="text">
-        <string>Atomformel:    y = </string>
+        <string>atom formula:    y = </string>
        </property>
       </widget>
      </item>
@@ -174,7 +174,7 @@
      <item>
       <widget class="QLabel" name="lb_AtomCount">
        <property name="text">
-        <string>Atomanzahl: </string>
+        <string>number of atoms</string>
        </property>
       </widget>
      </item>
@@ -198,6 +198,9 @@
          <height>16777215</height>
         </size>
        </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
        <property name="minimum">
         <number>1</number>
        </property>
@@ -209,7 +212,7 @@
      <item>
       <widget class="QCheckBox" name="chb_allCombined">
        <property name="text">
-        <string>Alle Parameter kombinieren</string>
+        <string>combine all parameters</string>
        </property>
       </widget>
      </item>
@@ -235,7 +238,7 @@
         </sizepolicy>
        </property>
        <property name="text">
-        <string>Sampleanzahl: </string>
+        <string>number of samples</string>
        </property>
       </widget>
      </item>
@@ -258,6 +261,15 @@
          <width>70</width>
          <height>16777215</height>
         </size>
+       </property>
+       <property name="alignment">
+        <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       </property>
+       <property name="minimum">
+        <number>64</number>
+       </property>
+       <property name="maximum">
+        <number>4096</number>
        </property>
       </widget>
      </item>
@@ -311,7 +323,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Schrittweite:    x • n    n =  </string>
+         <string>step width:    x • n    n =  </string>
         </property>
        </widget>
       </item>
@@ -338,6 +350,9 @@
           <height>16777215</height>
          </size>
         </property>
+        <property name="value">
+         <double>1.000000000000000</double>
+        </property>
        </widget>
       </item>
       <item>
@@ -362,7 +377,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Startwert:</string>
+         <string>start value:</string>
         </property>
        </widget>
       </item>
@@ -413,7 +428,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Endwert: </string>
+         <string>final value:</string>
         </property>
        </widget>
       </item>
@@ -487,7 +502,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Schrittweite:    x • n    n =  </string>
+         <string>step width:    x • n    n =  </string>
         </property>
        </widget>
       </item>
@@ -514,6 +529,9 @@
           <height>16777215</height>
          </size>
         </property>
+        <property name="value">
+         <double>1.000000000000000</double>
+        </property>
        </widget>
       </item>
       <item>
@@ -538,7 +556,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Startwert:</string>
+         <string>start value:</string>
         </property>
        </widget>
       </item>
@@ -589,7 +607,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Endwert: </string>
+         <string>final value:</string>
         </property>
        </widget>
       </item>
@@ -663,7 +681,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Schrittweite:    x • n    n =  </string>
+         <string>step width:    x • n    n =  </string>
         </property>
        </widget>
       </item>
@@ -690,6 +708,9 @@
           <height>16777215</height>
          </size>
         </property>
+        <property name="value">
+         <double>1.000000000000000</double>
+        </property>
        </widget>
       </item>
       <item>
@@ -714,7 +735,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Startwert:</string>
+         <string>start value:</string>
         </property>
        </widget>
       </item>
@@ -765,7 +786,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Endwert: </string>
+         <string>final value:</string>
         </property>
        </widget>
       </item>
@@ -839,7 +860,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Schrittweite:    x • n    n =  </string>
+         <string>step width:    x • n    n =  </string>
         </property>
        </widget>
       </item>
@@ -866,6 +887,9 @@
           <height>16777215</height>
          </size>
         </property>
+        <property name="value">
+         <double>1.000000000000000</double>
+        </property>
        </widget>
       </item>
       <item>
@@ -890,7 +914,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Startwert:</string>
+         <string>start value:</string>
         </property>
        </widget>
       </item>
@@ -941,7 +965,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Endwert: </string>
+         <string>final value:</string>
         </property>
        </widget>
       </item>
@@ -1015,7 +1039,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Schrittweite:    x • n    n =  </string>
+         <string>step width:    x • n    n =  </string>
         </property>
        </widget>
       </item>
@@ -1042,6 +1066,9 @@
           <height>16777215</height>
          </size>
         </property>
+        <property name="value">
+         <double>1.000000000000000</double>
+        </property>
        </widget>
       </item>
       <item>
@@ -1066,7 +1093,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Startwert:</string>
+         <string>start value:</string>
         </property>
        </widget>
       </item>
@@ -1117,7 +1144,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Endwert: </string>
+         <string>final value:</string>
         </property>
        </widget>
       </item>
@@ -1191,7 +1218,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Schrittweite:    x • n    n =  </string>
+         <string>step width:    x • n    n =  </string>
         </property>
        </widget>
       </item>
@@ -1218,6 +1245,9 @@
           <height>16777215</height>
          </size>
         </property>
+        <property name="value">
+         <double>1.000000000000000</double>
+        </property>
        </widget>
       </item>
       <item>
@@ -1242,7 +1272,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Startwert:</string>
+         <string>start value:</string>
         </property>
        </widget>
       </item>
@@ -1293,7 +1323,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Endwert: </string>
+         <string>final value:</string>
         </property>
        </widget>
       </item>
@@ -1367,7 +1397,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Schrittweite:    x • n    n =  </string>
+         <string>step width:    x • n    n =  </string>
         </property>
        </widget>
       </item>
@@ -1394,6 +1424,9 @@
           <height>16777215</height>
          </size>
         </property>
+        <property name="value">
+         <double>1.000000000000000</double>
+        </property>
        </widget>
       </item>
       <item>
@@ -1418,7 +1451,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Startwert:</string>
+         <string>start value:</string>
         </property>
        </widget>
       </item>
@@ -1469,7 +1502,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Endwert: </string>
+         <string>final value:</string>
         </property>
        </widget>
       </item>
@@ -1543,7 +1576,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Schrittweite:    x • n    n =  </string>
+         <string>step width:    x • n    n =  </string>
         </property>
        </widget>
       </item>
@@ -1570,6 +1603,9 @@
           <height>16777215</height>
          </size>
         </property>
+        <property name="value">
+         <double>1.000000000000000</double>
+        </property>
        </widget>
       </item>
       <item>
@@ -1594,7 +1630,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Startwert:</string>
+         <string>start value:</string>
         </property>
        </widget>
       </item>
@@ -1645,7 +1681,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Endwert: </string>
+         <string>final value:</string>
         </property>
        </widget>
       </item>
@@ -1695,7 +1731,7 @@
      <item>
       <widget class="QPushButton" name="pushButton">
        <property name="text">
-        <string>(Teil-) Wörterbuch speichern</string>
+        <string>Save Dictionary</string>
        </property>
        <property name="icon">
         <iconset resource="Ressourcen.qrc">
