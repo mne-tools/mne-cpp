@@ -86,6 +86,7 @@ QList<GaborAtom> FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterati
     QString contents;
     QString atomName;
     QString bestCorrName;
+    QString atom_formula;
 
     QList<qreal> atomSamples;
     QList<QStringList> correlationList;
@@ -98,6 +99,10 @@ QList<GaborAtom> FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterati
     signal_energy = 0;
     qreal residuum_energy = 0;
     qreal energy_threshold = 0;
+    qreal temp_energy = 0;
+
+    VectorXd best_match_discrete_values;
+    vector_list discrete_atoms;
 
     //calculate signal_energy
     for(qint32 channel = 0; channel < channel_count; channel++)
@@ -110,20 +115,17 @@ QList<GaborAtom> FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterati
     }
     std::cout << "absolute energy of signal: " << residuum_energy << "\n";
 
-    VectorXd signalSamples = VectorXd::Zero(sample_count);
-
-    for(qint32 i = 0; i < sample_count; i++)
-        signalSamples[i] = residuum(i,0);
+    VectorXd signalSamples = VectorXd::Zero(sample_count);    
 
     QFile current_dict(path);
 
     while(it < max_iterations && (energy_threshold < residuum_energy))
     {
 
-        //gabor_Atom->sample_count = sample_count;
-        //originalSignalSamples = signalSamples;
+        for(qint32 i = 0; i < sample_count; i++)
+            signalSamples[i] = residuum(i,0);
 
-        // Liest das Woerterbuch aus und gibt die Samples und den Namen an die Skalarfunktion weiter
+        // read dictionary and give samples and name of atom to correlation function
         if (current_dict.open (QIODevice::ReadOnly))
         {
             while(!current_dict.atEnd())
@@ -148,6 +150,8 @@ QList<GaborAtom> FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterati
                 }
 
                 contents = "";
+                atom_formula = current_dict.readLine();
+
                 while(!contents.contains("_ATOM_"))
                 {
                     contents = current_dict.readLine();
@@ -163,18 +167,19 @@ QList<GaborAtom> FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterati
             }
             current_dict.close();
 
-            // Sucht aus allen verglichenen Atomen das beste passende herraus
+            // find best matching atom
             for(qint32 i = 0; i < correlationList.length(); i++)
             {
-                if(fabs(correlationList.at(i).at(2).toDouble()) > fabs(bestCorrValue))
+                if(abs(correlationList.at(i).at(2).toDouble()) > abs(bestCorrValue))
                 {
                     bestCorrName =  correlationList.at(i).at(0);
                     bestCorrStartIndex = correlationList.at(i).at(1).toInt();
                     bestCorrValue = correlationList.at(i).at(2).toDouble();
                 }
             }
+            correlationList.clear();
 
-            // Sucht das passende Atom im Woerterbuch und traegt dessen Werte in eine Liste
+            // find best matching atom in dictionary and write values into list
             if (current_dict.open (QIODevice::ReadOnly))
             {
                 bool hasFound = false;
@@ -184,69 +189,101 @@ QList<GaborAtom> FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterati
                     contents = current_dict.readLine();
                     if(QString::compare(contents, bestCorrName) == 0)
                     {
+                        atom_formula = current_dict.readLine();
                         contents = current_dict.readLine();
 
-                        QStringList list = contents.split(':');
-                        //gabor_Atom->sample_count = 256;
-                        QString t = list.at(1);
-                        qreal scale = t.remove(t.length() - 5, 5).toDouble(&isDouble);
-                        //if(isDouble)
-                        //    gabor_Atom->scale = scale;
-                        //gabor_Atom->translation = bestCorrStartIndex;// - 128;
-                        t = list.at(2);
-                        qreal modu = t.remove(t.length() - 6, 6).toDouble(&isDouble);
-                        //if(isDouble)
-                        //    gabor_Atom->modulation = modu;
-                        t = list.at(3);
-                        qreal phase = t.remove(t.length() - 6, 6).toDouble(&isDouble);
-                        //if(isDouble)
-                        //    gabor_Atom->phase = phase;
-                        //gabor_Atom->max_scalar_product = bestCorrValue;
+                        while (!contents.contains("_ATOM_"))
+                        {
+                            qint32 read_offset = 0;
+
+                            if(bestCorrStartIndex - floor(sample_count/2) >= 0)
+                            {
+                                for(qint32 translation = 0; translation < sample_count; translation++)
+                                {
+                                    if(translation <= bestCorrStartIndex - floor(sample_count/2))
+                                    {
+                                        read_offset++;
+                                        atomSamples.append(0);
+                                        //if(bestCorrStartIndex - floor(sample_count/2) == 0)
+                                        //    read_offset--;
+                                    }
+
+                                    else if(translation > bestCorrStartIndex - floor(sample_count/2))
+                                    {
+                                        contents = current_dict.readLine();
+                                        sample = contents.toDouble(&isDouble);
+                                        if(isDouble)
+                                            atomSamples.append(sample);
+                                    }
+
+                                    if(current_dict.atEnd())
+                                        break;
+                                }
+                                for(qint32 i = 0; i < read_offset; i++)
+                                    contents = current_dict.readLine();
+
+                                if(current_dict.atEnd())
+                                    break;
+                            }
+                            else
+                            {
+                                for(qint32 translation = bestCorrStartIndex - floor(sample_count/2); translation < sample_count; translation++)
+                                {
+                                    if(translation < 0)
+                                    {
+                                        contents = current_dict.readLine();
+                                    }
+
+                                    else if(translation >= 0 && translation < sample_count - bestCorrStartIndex - floor(sample_count/2))
+                                    {
+                                        contents = current_dict.readLine();
+                                        sample = contents.toDouble(&isDouble);
+                                        if(isDouble)
+                                            atomSamples.append(sample);
+                                    }
+                                    else
+                                        atomSamples.append(0);
+
+                                    if(current_dict.atEnd())
+                                        break;
+                                }
+
+                                if(current_dict.atEnd())
+                                    break;
+                            }
+
+                            if(current_dict.atEnd())
+                                break;
+
+                        }
+
+                        for(qint32 k = 0; k < sample_count; k++)
+                        {
+                                residuum(k, 0) -= bestCorrValue * atomSamples.at(k);
+                                temp_energy += bestCorrValue * atomSamples.at(k) * bestCorrValue * atomSamples.at(k);
+                        }
 
                         std::cout << "\n" << "===============" << " found atom " << it << "===============" << ":\n\n";
-                        //             "scale: " << gabor_Atom->scale << " trans: " << gabor_Atom->translation <<
-                        //             " modu: " << gabor_Atom->modulation << " phase: " << gabor_Atom->phase << " scalarproduct: " << gabor_Atom->max_scalar_product << "\n";
 
-                        //atom_res_list.append(*gabor_Atom);
                         hasFound = true;
                     }
                     if(hasFound) break;
                 }
-            }
-
+            }            
             current_dict.close();
-        }
+        }   
 
-        //calc multichannel parameters phase and max_scalar_product
-        channel_count = signal.cols();
-        VectorXd bestMatch = VectorXd::Zero(sample_count);
-        vector_list discrete_atoms;
-        for(qint32 chn = 0; chn < channel_count; chn++)
-        {
-            //VectorXd channel_params = AdaptiveMp::calculate_atom(sample_count, gabor_Atom->scale, gabor_Atom->translation, gabor_Atom->modulation, chn, residuum, RETURNPARAMETERS, 0);
-            //gabor_Atom->phase_list.append(channel_params[3]);
-
-            //substract best matching Atom from Residuum in each channel
-            //gabor_Atom->max_scalar_list.append(channel_params[4]);
-            //bestMatch = gabor_Atom->create_real(gabor_Atom->sample_count, gabor_Atom->scale, gabor_Atom->translation, gabor_Atom->modulation, gabor_Atom->phase_list.at(chn));
-            //discrete_atoms.append(bestMatch);
-
-            //for(qint32 j = 0; j < gabor_Atom->sample_count; j++)
-            {
-                //residuum(j,chn) -= gabor_Atom->max_scalar_list.at(chn) * bestMatch[j];
-                //gabor_Atom->energy += (gabor_Atom->max_scalar_list.at(chn) * bestMatch[j]) * (gabor_Atom->max_scalar_list.at(chn) * bestMatch[j]);
-            }
-        }
-
-        //residuum_energy -= gabor_Atom->energy;
-        //current_energy += gabor_Atom->energy;
+        residuum_energy -= temp_energy;
+        current_energy += temp_energy;
 
         std::cout << "absolute energy of residuum: " << residuum_energy << "\n";
 
-        //atom_list.append(*gabor_Atom);
-        //delete gabor_Atom;
+        atomSamples.clear();
+        signalSamples = VectorXd::Zero(sample_count);
+        bestCorrValue = 0;
+        temp_energy = 0;
         it++;
-        emit current_result(it, max_it, current_energy, signal_energy, residuum, atom_list, discrete_atoms, "Fix");
+        emit current_result(it, max_it, current_energy, signal_energy, residuum, atom_list, discrete_atoms, QString(atom_formula));
 
         if( QThread::currentThread()->isInterruptionRequested())
             break;

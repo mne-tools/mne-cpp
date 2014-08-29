@@ -1303,7 +1303,8 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
     }
     else
     {
-
+        _residuum_matrix = residuum;
+        _atom_sum_matrix = _signal_matrix - _residuum_matrix;
     }
 
     //progressbar update
