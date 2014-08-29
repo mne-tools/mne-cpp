@@ -66,6 +66,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
+    //The following functions and their point of calling should NOT be changed
     //Setup the windows first - this NEEDS to be done here because important pointers (window pointers) which are needed for further processing are generated in this function
     setupMainWindow();
     setupWindowWidgets();
@@ -111,8 +112,7 @@ void MainWindow::setupModel()
     else
         m_pEventModel = new EventModel(this);
 
-
-    //Set fiffInfo in event model
+    //Set fiffInfo and first/last sample in the event model
     m_pEventModel->setFiffInfo(m_pRawModel->m_fiffInfo);
     m_pEventModel->setFirstLastSample(m_pRawModel->firstSample(), m_pRawModel->lastSample());
 }

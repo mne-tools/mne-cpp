@@ -114,6 +114,12 @@ private:
 
     //=========================================================================================================
     /**
+    * Inits all the QCheckBoxes of the event window.
+    */
+    void initComboBoxes();
+
+    //=========================================================================================================
+    /**
     * event reimplemented virtual function to handle events of the event dock window
     */
     bool event(QEvent * event);

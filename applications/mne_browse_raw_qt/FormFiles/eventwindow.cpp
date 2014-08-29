@@ -61,7 +61,9 @@ EventWindow::EventWindow(QWidget *parent) :
     m_pMainWindow(static_cast<MainWindow*>(parent))
 {
     ui->setupUi(this);
+
     initCheckBoxes();
+    initComboBoxes();
 }
 
 
@@ -109,6 +111,15 @@ void EventWindow::initCheckBoxes()
     });
 }
 
+
+//*************************************************************************************************************
+
+void EventWindow::initComboBoxes()
+{
+    ui->m_comboBox_filterTypes->addItem("All");
+    ui->m_comboBox_filterTypes->addItems(m_qSettings.value("EventDesignParameters/event_types").value<QStringList>());
+    ui->m_comboBox_filterTypes->setCurrentText("All");
+}
 
 //*************************************************************************************************************
 
