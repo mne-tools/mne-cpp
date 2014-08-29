@@ -217,7 +217,7 @@ private slots:
     *
     * @return void
     */
-    void recieve_result(qint32 current_iteration, qint32 max_iterations, qreal current_energy, qreal max_energy,
+    void recieve_result(qint32 current_iteration, qint32 max_iterations, qreal current_energy, qreal max_energy, MatrixXd residuum,
                         gabor_atom_list atom_res_list, vector_list discrete_atoms, QString atom_formula);
 
     //==========================================================================================================

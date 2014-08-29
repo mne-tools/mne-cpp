@@ -137,6 +137,7 @@ public:
 
     typedef QList<GaborAtom> gabor_atom_list;
     typedef Eigen::VectorXd VectorXd;
+    typedef Eigen::MatrixXd MatrixXd;
     typedef QList<VectorXd> vector_list;
 
     qint32 it;
@@ -215,7 +216,7 @@ public slots:
 
 signals:
 
-    void current_result(qint32 current_iteration, qint32 max_iteration, qreal current_energy, qreal max_energy,
+    void current_result(qint32 current_iteration, qint32 max_iteration, qreal current_energy, qreal max_energy, MatrixXd residuum,
                         gabor_atom_list atom_list, vector_list discrete_atoms, QString atom_formula);
     void finished_calc();
 

@@ -467,7 +467,7 @@ QList<GaborAtom> AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterat
         delete gabor_Atom;
         it++;
 
-        emit current_result(it, max_it, current_energy, signal_energy, atom_list, discrete_atoms, QString("ADAPTIVE_MP"));
+        emit current_result(it, max_it, current_energy, signal_energy, residuum, atom_list, discrete_atoms, QString("ADAPTIVE_MP"));
 
         if( QThread::currentThread()->isInterruptionRequested())
             break;
