@@ -26,7 +26,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Erweiterter Editor</string>
+   <string>advanced dictionary editor</string>
   </property>
   <property name="windowIcon">
    <iconset resource="Ressourcen.qrc">
@@ -401,6 +401,15 @@
           <height>16777215</height>
          </size>
         </property>
+        <property name="minimum">
+         <double>-999999.989999999990687</double>
+        </property>
+        <property name="maximum">
+         <double>999999.989999999990687</double>
+        </property>
+        <property name="value">
+         <double>0.000000000000000</double>
+        </property>
        </widget>
       </item>
       <item>
@@ -448,6 +457,15 @@
           <width>70</width>
           <height>16777215</height>
          </size>
+        </property>
+        <property name="minimum">
+         <double>-999999.989999999990687</double>
+        </property>
+        <property name="maximum">
+         <double>999999.989999999990687</double>
+        </property>
+        <property name="value">
+         <double>1.000000000000000</double>
         </property>
        </widget>
       </item>
@@ -580,6 +598,15 @@
           <height>16777215</height>
          </size>
         </property>
+        <property name="minimum">
+         <double>-999999.989999999990687</double>
+        </property>
+        <property name="maximum">
+         <double>999999.989999999990687</double>
+        </property>
+        <property name="value">
+         <double>0.000000000000000</double>
+        </property>
        </widget>
       </item>
       <item>
@@ -627,6 +654,15 @@
           <width>70</width>
           <height>16777215</height>
          </size>
+        </property>
+        <property name="minimum">
+         <double>-999999.989999999990687</double>
+        </property>
+        <property name="maximum">
+         <double>999999.989999999990687</double>
+        </property>
+        <property name="value">
+         <double>1.000000000000000</double>
         </property>
        </widget>
       </item>
@@ -759,6 +795,15 @@
           <height>16777215</height>
          </size>
         </property>
+        <property name="minimum">
+         <double>-999999.989999999990687</double>
+        </property>
+        <property name="maximum">
+         <double>999999.989999999990687</double>
+        </property>
+        <property name="value">
+         <double>0.000000000000000</double>
+        </property>
        </widget>
       </item>
       <item>
@@ -806,6 +851,15 @@
           <width>70</width>
           <height>16777215</height>
          </size>
+        </property>
+        <property name="minimum">
+         <double>-999999.989999999990687</double>
+        </property>
+        <property name="maximum">
+         <double>999999.989999999990687</double>
+        </property>
+        <property name="value">
+         <double>1.000000000000000</double>
         </property>
        </widget>
       </item>
@@ -938,6 +992,15 @@
           <height>16777215</height>
          </size>
         </property>
+        <property name="minimum">
+         <double>-999999.989999999990687</double>
+        </property>
+        <property name="maximum">
+         <double>999999.989999999990687</double>
+        </property>
+        <property name="value">
+         <double>0.000000000000000</double>
+        </property>
        </widget>
       </item>
       <item>
@@ -985,6 +1048,15 @@
           <width>70</width>
           <height>16777215</height>
          </size>
+        </property>
+        <property name="minimum">
+         <double>-999999.989999999990687</double>
+        </property>
+        <property name="maximum">
+         <double>999999.989999999990687</double>
+        </property>
+        <property name="value">
+         <double>1.000000000000000</double>
         </property>
        </widget>
       </item>
@@ -1117,6 +1189,15 @@
           <height>16777215</height>
          </size>
         </property>
+        <property name="minimum">
+         <double>-999999.989999999990687</double>
+        </property>
+        <property name="maximum">
+         <double>999999.989999999990687</double>
+        </property>
+        <property name="value">
+         <double>0.000000000000000</double>
+        </property>
        </widget>
       </item>
       <item>
@@ -1164,6 +1245,15 @@
           <width>70</width>
           <height>16777215</height>
          </size>
+        </property>
+        <property name="minimum">
+         <double>-999999.989999999990687</double>
+        </property>
+        <property name="maximum">
+         <double>999999.989999999990687</double>
+        </property>
+        <property name="value">
+         <double>1.000000000000000</double>
         </property>
        </widget>
       </item>
@@ -1296,6 +1386,15 @@
           <height>16777215</height>
          </size>
         </property>
+        <property name="minimum">
+         <double>-999999.989999999990687</double>
+        </property>
+        <property name="maximum">
+         <double>999999.989999999990687</double>
+        </property>
+        <property name="value">
+         <double>0.000000000000000</double>
+        </property>
        </widget>
       </item>
       <item>
@@ -1343,6 +1442,15 @@
           <width>70</width>
           <height>16777215</height>
          </size>
+        </property>
+        <property name="minimum">
+         <double>-999999.989999999990687</double>
+        </property>
+        <property name="maximum">
+         <double>999999.989999999990687</double>
+        </property>
+        <property name="value">
+         <double>1.000000000000000</double>
         </property>
        </widget>
       </item>
@@ -1475,6 +1583,15 @@
           <height>16777215</height>
          </size>
         </property>
+        <property name="minimum">
+         <double>-999999.989999999990687</double>
+        </property>
+        <property name="maximum">
+         <double>999999.989999999990687</double>
+        </property>
+        <property name="value">
+         <double>0.000000000000000</double>
+        </property>
        </widget>
       </item>
       <item>
@@ -1522,6 +1639,15 @@
           <width>70</width>
           <height>16777215</height>
          </size>
+        </property>
+        <property name="minimum">
+         <double>-999999.989999999990687</double>
+        </property>
+        <property name="maximum">
+         <double>999999.989999999990687</double>
+        </property>
+        <property name="value">
+         <double>1.000000000000000</double>
         </property>
        </widget>
       </item>
@@ -1654,6 +1780,15 @@
           <height>16777215</height>
          </size>
         </property>
+        <property name="minimum">
+         <double>-999999.989999999990687</double>
+        </property>
+        <property name="maximum">
+         <double>999999.989999999990687</double>
+        </property>
+        <property name="value">
+         <double>0.000000000000000</double>
+        </property>
        </widget>
       </item>
       <item>
@@ -1702,6 +1837,15 @@
           <height>16777215</height>
          </size>
         </property>
+        <property name="minimum">
+         <double>-999999.989999999990687</double>
+        </property>
+        <property name="maximum">
+         <double>999999.989999999990687</double>
+        </property>
+        <property name="value">
+         <double>1.000000000000000</double>
+        </property>
        </widget>
       </item>
      </layout>
@@ -1731,7 +1875,7 @@
      <item>
       <widget class="QPushButton" name="pushButton">
        <property name="text">
-        <string>Save Dictionary</string>
+        <string>save dictionary</string>
        </property>
        <property name="icon">
         <iconset resource="Ressourcen.qrc">
