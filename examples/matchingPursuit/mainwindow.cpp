@@ -93,7 +93,9 @@ using namespace DISPLIB;
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
+QStringList _fix_dict_atoms;
 
+qint32 _row_count = 0;
 
 bool _tbv_is_loading = false;
 bool _auto_change = false;
@@ -1183,7 +1185,7 @@ void MainWindow::on_btt_Calc_clicked()
         ui->dsb_to->setEnabled(false);
         ui->sb_sample_count ->setEnabled(false);
 
-
+        _row_count = 0;
         ui->tbv_Results->setRowCount(0);
         ui->lb_IterationsProgressValue->setText("0");
         ui->lb_RestEnergieResiduumValue->setText("0");
@@ -1199,16 +1201,27 @@ void MainWindow::on_btt_Calc_clicked()
 
         if(ui->rb_OwnDictionary->isChecked())
         {
+            ui->tbv_Results->setColumnCount(2);
+            ui->tbv_Results->setHorizontalHeaderLabels(QString("energy\n[%];atom").split(";"));
+            ui->tbv_Results->setColumnWidth(0,55);
+            ui->tbv_Results->setColumnWidth(1,280);
+
             QFile ownDict(QString("Matching-Pursuit-Toolbox/%1.dict").arg(ui->cb_Dicts->currentText()));
             // ToDo: size from dict
             _atom_sum_matrix = MatrixXd::Zero(256,1);
-    //        QFuture<void> f1 = QtConcurrent::run(&mpCalc, ownDict, _signal_matrix.col(0), ui->sb_Iterations->value());
-    //        f1.waitForFinished();
+            //QFuture<void> f1 = QtConcurrent::run(&mpCalc, ownDict, _signal_matrix.col(0), ui->sb_Iterations->value());
+            //f1.waitForFinished();
             calc_fix_mp(QString("Matching-Pursuit-Toolbox/%1.dict").arg(ui->cb_Dicts->currentText()), _signal_matrix.col(0), criterion);
-            //update();
         }
         else if(ui->rb_adativMp->isChecked())
         {
+            ui->tbv_Results->setColumnCount(5);
+            ui->tbv_Results->setHorizontalHeaderLabels(QString("energy\n[%];scale\n[sec];trans\n[sec];modu\n[Hz];phase\n[rad]").split(";"));
+            ui->tbv_Results->setColumnWidth(0,55);
+            ui->tbv_Results->setColumnWidth(1,45);
+            ui->tbv_Results->setColumnWidth(2,40);
+            ui->tbv_Results->setColumnWidth(3,40);
+            ui->tbv_Results->setColumnWidth(4,40);
             calc_adaptiv_mp(_signal_matrix, criterion);
         }
     }
@@ -1239,24 +1252,26 @@ void MainWindow::on_time_out()
 
 //*************************************************************************************************************
 
+
+
 void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations, qreal current_energy, qreal max_energy, MatrixXd residuum,
                                 gabor_atom_list atom_res_list, vector_list discrete_atoms, QString atom_formula = "ADAPTIVE_MP")
 {
     _tbv_is_loading = true;
+    _row_count++;
 
     qreal percent = ui->dsb_energy->value();
 
     qreal residuum_energy = 100 * (max_energy - current_energy) / max_energy;
 
     //remaining energy and iterations update
-
     ui->lb_IterationsProgressValue->setText(QString::number(current_iteration));
     ui->lb_RestEnergieResiduumValue->setText(QString::number(residuum_energy, 'f', 2) + "%");
 
     //current atoms list update
     if(atom_formula == "ADAPTIVE_MP")
     {
-        ui->tbv_Results->setRowCount(atom_res_list.length());
+        ui->tbv_Results->setRowCount(_row_count);
         _my_atom_list.append(atom_res_list.last());
 
         qreal percent_atom_energy = 100 * atom_res_list.last().energy / max_energy;
@@ -1285,11 +1300,11 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
         atomTranslationItem->setTextAlignment(0x0082);
         atomModulationItem->setTextAlignment(0x0082);
         atomPhaseItem->setTextAlignment(0x0082);
-        ui->tbv_Results->setItem(atom_res_list.length() - 1, 0, atomEnergieItem);
-        ui->tbv_Results->setItem(atom_res_list.length() - 1, 1, atomScaleItem);
-        ui->tbv_Results->setItem(atom_res_list.length() - 1, 2, atomTranslationItem);
-        ui->tbv_Results->setItem(atom_res_list.length() - 1, 3, atomModulationItem);
-        ui->tbv_Results->setItem(atom_res_list.length() - 1, 4, atomPhaseItem);
+        ui->tbv_Results->setItem(ui->tbv_Results->rowCount()- 1, 0, atomEnergieItem);
+        ui->tbv_Results->setItem(ui->tbv_Results->rowCount()- 1, 1, atomScaleItem);
+        ui->tbv_Results->setItem(ui->tbv_Results->rowCount()- 1, 2, atomTranslationItem);
+        ui->tbv_Results->setItem(ui->tbv_Results->rowCount()- 1, 3, atomModulationItem);
+        ui->tbv_Results->setItem(ui->tbv_Results->rowCount()- 1, 4, atomPhaseItem);
 
         //update residuum and atom sum for painting and later save to hdd
         _residuum_matrix = residuum;
@@ -1302,7 +1317,29 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
 
     }
     else
-    {
+    {        
+        ui->tbv_Results->setRowCount(_row_count);
+
+        _fix_dict_atoms.append(atom_formula);
+
+        qreal percent_atom_energy = 100 * /*TODO add atomenergie*/ 4 / max_energy;
+
+
+        QTableWidgetItem* atom_energie_item = new QTableWidgetItem(QString::number(percent_atom_energy, 'f', 2));
+        QTableWidgetItem* atom_name_item = new QTableWidgetItem(atom_formula);
+
+
+        atom_energie_item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
+        atom_name_item->setFlags(Qt::ItemIsEnabled);
+        atom_energie_item->setCheckState(Qt::Checked);
+
+        atom_energie_item->setTextAlignment(0x0082);
+        atom_name_item->setTextAlignment(0x0082);
+
+        ui->tbv_Results->setItem(ui->tbv_Results->rowCount()- 1, 0, atom_energie_item);
+        ui->tbv_Results->setItem(ui->tbv_Results->rowCount() - 1, 1, atom_name_item);
+
+
         _residuum_matrix = residuum;
         _atom_sum_matrix = _signal_matrix - _residuum_matrix;
     }
@@ -1351,7 +1388,7 @@ void MainWindow::tbv_selection_changed(const QModelIndex& topLeft, const QModelI
         return;
 
     QTableWidgetItem* item = ui->tbv_Results->item(topLeft.row(), 0);
-    if(topLeft.row() == _my_atom_list.count())
+    if(topLeft.row() == _row_count)
     {
         if(item->checkState())
         {
@@ -1417,13 +1454,13 @@ void MainWindow::calc_thread_finished()
 
     _tbv_is_loading = true;
 
-    ui->tbv_Results->setRowCount(_my_atom_list.count() + 1);
+    ui->tbv_Results->setRowCount(_row_count + 1);
     QTableWidgetItem* residuumItem = new QTableWidgetItem("residuum");
     residuumItem->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
     residuumItem->setCheckState(Qt::Unchecked);
     residuumItem->setTextAlignment(Qt::AlignCenter);
-    ui->tbv_Results->setItem(_my_atom_list.count(), 0, residuumItem);
-    ui->tbv_Results->setSpan(_my_atom_list.count(), 0, 1, 5);
+    ui->tbv_Results->setItem(_row_count, 0, residuumItem);
+    ui->tbv_Results->setSpan(_row_count, 0, 1, 5);
 
     _tbv_is_loading = false;
 
