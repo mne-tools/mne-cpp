@@ -1255,10 +1255,8 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
                                 resultList = gAtom->CreateStringValues(ui->spb_AtomLength->value(), tempScale, ui->spb_AtomLength->value() / 2, tempModu, tempPhase);
                                 stream << QString("%1_ATOM_%2 \n Gaboratom: scale: %3 modu: %4 phase: %5").arg(partDictName).arg(atomIndex).arg(tempScale).arg(tempModu).arg(tempPhase) << "\n";
                             }
-                            //stream << QString("%1_ATOM_%2 \n scale: %3 modu: %4 phase: %5 chrip: %6").arg(partDictName).arg(atomIndex).arg(tempScale).arg(tempModu).arg(tempPhase).arg(tempChirp) << "\n";
                             for (QStringList::Iterator it = resultList.begin(); it != resultList.end(); it++)
-                            //for (QStringList::Iterator it = resultList.begin(); it != resultList.end(); it++)
-                                stream << *it << "\n";
+                                 stream << *it << "\n";
 
                             atomIndex++;
                             scaleCount++;
@@ -1270,7 +1268,7 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
                 chirpCount++;
             }
         }
-        else //all params combined
+        else //not all params combined
         {
             if(ui->spb_AtomCount->value() != 1)
             {
@@ -1321,7 +1319,6 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
                     stream << QString("%1_ATOM_%2 \n Gaboratom: scale: %3 modu: %4 phase: %5").arg(partDictName).arg(i).arg(tempScale).arg(tempModu).arg(tempPhase) << "\n";
                 }
 
-                //stream << QString("%1_ATOM_%2 \n scale: %3 modu: %4 phase: %5 chrip: %6").arg(partDictName).arg(i).arg(tempScale).arg(tempModu).arg(tempPhase).arg(tempChirp) << "\n";
                 for (QStringList::Iterator it = resultList.begin(); it != resultList.end(); it++)
                     stream << *it << "\n";
 
