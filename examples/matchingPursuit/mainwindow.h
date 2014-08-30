@@ -243,8 +243,7 @@ signals:
     void send_input(MatrixXd send_signal, qint32 send_max_iterations, qreal send_epsilon, bool fix_phase, bool boost, qint32 simplex_it,
                     qreal simplex_reflection, qreal simplex_expansion, qreal simplex_contraction, qreal simplex_full_contraction);
 
-    void send_input_fix_dict(MatrixXd send_signal, qint32 send_max_iterations, qreal send_epsilon, QString path, qint32 simplex_it,
-                    qreal simplex_reflection, qreal simplex_expansion, qreal simplex_contraction, qreal simplex_full_contraction);
+    void send_input_fix_dict(MatrixXd send_signal, qint32 send_max_iterations, qreal send_epsilon, QString path);
 
 private:
     Ui::MainWindow *ui;    
