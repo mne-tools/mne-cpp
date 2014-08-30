@@ -1511,8 +1511,8 @@ void MainWindow::calc_fix_mp(QString path, MatrixXd signal, TruncationCriterion 
     qRegisterMetaType<gabor_atom_list>("gabor_atom_list");
     qRegisterMetaType<vector_list>("vector_list");
 
-    connect(this, SIGNAL(send_input_fix_dict(MatrixXd, qint32, qreal, QString, qint32, qreal, qreal, qreal, qreal)),
-            fixDict_Mp, SLOT(recieve_input(MatrixXd, qint32, qreal, QString, qint32, qreal, qreal, qreal, qreal)));
+    connect(this, SIGNAL(send_input_fix_dict(MatrixXd, qint32, qreal, QString)),
+            fixDict_Mp, SLOT(recieve_input(MatrixXd, qint32, qreal, QString)));
     connect(fixDict_Mp, SIGNAL(current_result(qint32, qint32, qreal, qreal, MatrixXd, gabor_atom_list, vector_list, QString)),
                   this, SLOT(recieve_result(qint32, qint32, qreal, qreal, MatrixXd, gabor_atom_list, vector_list, QString)));
     connect(fixDict_Mp, SIGNAL(finished_calc()), mp_Thread, SLOT(quit()));
@@ -1524,24 +1524,24 @@ void MainWindow::calc_fix_mp(QString path, MatrixXd signal, TruncationCriterion 
     {
         case Iterations:
         {
-            emit send_input_fix_dict(signal, ui->sb_Iterations->value(), qreal(MININT32), QString("Matching-Pursuit-Toolbox/%1.dict").arg(ui->cb_Dicts->currentText()),
-                                        1E3, 1.0, 0.2, 0.5, 0.5);
+            emit send_input_fix_dict(signal, ui->sb_Iterations->value(), qreal(MININT32),
+                                     QString("Matching-Pursuit-Toolbox/%1.dict").arg(ui->cb_Dicts->currentText()));
             mp_Thread->start();
         }
         break;
 
         case SignalEnergy:
         {
-            emit send_input_fix_dict(signal, MAXINT32, res_energy, QString("Matching-Pursuit-Toolbox/%1.dict").arg(ui->cb_Dicts->currentText()),
-                                        1E3, 1.0, 0.2, 0.5, 0.5);
+            emit send_input_fix_dict(signal, MAXINT32, res_energy,
+                                     QString("Matching-Pursuit-Toolbox/%1.dict").arg(ui->cb_Dicts->currentText()));
             mp_Thread->start();
         }
         break;
 
         case Both:
         {
-            emit send_input_fix_dict(signal, ui->sb_Iterations->value(), res_energy, QString("Matching-Pursuit-Toolbox/%1.dict").arg(ui->cb_Dicts->currentText()),
-                                        1E3, 1.0, 0.2, 0.5, 0.5);
+            emit send_input_fix_dict(signal, ui->sb_Iterations->value(), res_energy,
+                                     QString("Matching-Pursuit-Toolbox/%1.dict").arg(ui->cb_Dicts->currentText()));
             mp_Thread->start();
         }
         break;

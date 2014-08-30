@@ -68,12 +68,9 @@ FixDictMp::FixDictMp()
 
 //*************************************************************************************************************
 
-//QList<GaborAtom> FixDictMp::matching_pursuit(QFile &currentDict, MatrixXd signalSamples, qint32 iterationsCount)
-QList<GaborAtom> FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal epsilon, QString path,
-                                              qint32 simplex_it = 1E3, qreal simplex_reflection = 1.0, qreal simplex_expansion = 0.2 ,
-                                              qreal simplex_contraction = 0.5, qreal simplex_full_contraction = 0.5)
+void FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal epsilon, QString path)
 {
-    //GaborAtom* gabor_Atom = new GaborAtom;
+    std::cout << "\nFixDict Matching Pursuit Algorithm started...\n";
 
     bool isDouble = false;
 
@@ -81,27 +78,26 @@ QList<GaborAtom> FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterati
     qint32 bestCorrStartIndex;
     qreal sample;
     qreal bestCorrValue = 0;
-    //qreal residuumEnergie = 0;
 
     QString contents;
     QString atomName;
     QString bestCorrName;
     QString atom_formula;
 
-    QList<qreal> atomSamples;
-    QList<QStringList> correlationList;
-    //VectorXd residuum = signalSamples;
+    QList<qreal> atom_samples;
+    QList<QStringList> correlationList;    
 
     MatrixXd residuum = signal; //residuum initialised with signal
     qint32 sample_count = signal.rows();
     qint32 channel_count = signal.cols();
+    qint32 atom_sample_count = 0;
 
     signal_energy = 0;
     qreal residuum_energy = 0;
     qreal energy_threshold = 0;
     qreal temp_energy = 0;
+    bool sample_count_mismatch = false;
 
-    VectorXd best_match_discrete_values;
     vector_list discrete_atoms;
 
     //calculate signal_energy
@@ -157,13 +153,24 @@ QList<GaborAtom> FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterati
                     contents = current_dict.readLine();
                     sample = contents.toDouble(&isDouble);
                     if(isDouble)
-                        atomSamples.append(sample);
+                        atom_samples.append(sample);
                     if(current_dict.atEnd())
                         break;
                 }
-                correlationList.append(correlation(signalSamples, atomSamples, atomName));
+                correlationList.append(correlation(signalSamples, atom_samples, atomName));
 
-                atomSamples.clear();
+                if(atom_samples.length() != sample_count && !sample_count_mismatch)
+                {
+                    std::cout <<  "\n=============================================\n"
+                              << "this dictionary does not fit the signal,\nplease choose or create another dictionary containing\nonly atoms of the same length as the signal vector\n"
+                              << "signal samples: " << sample_count << "\n"
+                              << "atom samples: " << atom_samples.length() << "\n"
+                              <<  "=============================================\n";
+                    sample_count_mismatch = true;
+                }
+
+                atom_sample_count = atom_samples.length();
+                atom_samples.clear();
             }
             current_dict.close();
 
@@ -192,28 +199,26 @@ QList<GaborAtom> FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterati
                         atom_formula = current_dict.readLine();
                         contents = current_dict.readLine();
 
-                        while (!contents.contains("_ATOM_"))
+
+                        while (!contents.contains("_ATOM_") && atom_sample_count > 0)
                         {
                             qint32 read_offset = 0;
 
-                            if(bestCorrStartIndex - floor(sample_count/2) >= 0)
+                            if(bestCorrStartIndex - floor(sample_count/2) >= 0)//atom translated in direction to signalvector end
                             {
                                 for(qint32 translation = 0; translation < sample_count; translation++)
                                 {
                                     if(translation <= bestCorrStartIndex - floor(sample_count/2))
                                     {
                                         read_offset++;
-                                        atomSamples.append(0);
-                                        //if(bestCorrStartIndex - floor(sample_count/2) == 0)
-                                        //    read_offset--;
+                                        atom_samples.append(0);
                                     }
-
                                     else if(translation > bestCorrStartIndex - floor(sample_count/2))
                                     {
                                         contents = current_dict.readLine();
                                         sample = contents.toDouble(&isDouble);
                                         if(isDouble)
-                                            atomSamples.append(sample);
+                                            atom_samples.append(sample);
                                     }
 
                                     if(current_dict.atEnd())
@@ -224,25 +229,23 @@ QList<GaborAtom> FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterati
 
                                 if(current_dict.atEnd())
                                     break;
-                            }
-                            else
+                            }                            
+                            else // atom translated more in direction to signalvector start
                             {
                                 for(qint32 translation = bestCorrStartIndex - floor(sample_count/2); translation < sample_count; translation++)
                                 {
                                     if(translation < 0)
-                                    {
                                         contents = current_dict.readLine();
-                                    }
 
                                     else if(translation >= 0 && translation < sample_count - bestCorrStartIndex - floor(sample_count/2))
                                     {
                                         contents = current_dict.readLine();
                                         sample = contents.toDouble(&isDouble);
                                         if(isDouble)
-                                            atomSamples.append(sample);
+                                            atom_samples.append(sample);
                                     }
                                     else
-                                        atomSamples.append(0);
+                                        atom_samples.append(0);
 
                                     if(current_dict.atEnd())
                                         break;
@@ -251,16 +254,16 @@ QList<GaborAtom> FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterati
                                 if(current_dict.atEnd())
                                     break;
                             }
-
                             if(current_dict.atEnd())
                                 break;
 
+                            atom_sample_count--;
                         }
 
                         for(qint32 k = 0; k < sample_count; k++)
                         {
-                                residuum(k, 0) -= bestCorrValue * atomSamples.at(k);
-                                temp_energy += bestCorrValue * atomSamples.at(k) * bestCorrValue * atomSamples.at(k);
+                                residuum(k, 0) -= bestCorrValue * atom_samples.at(k);
+                                temp_energy += bestCorrValue * atom_samples.at(k) * bestCorrValue * atom_samples.at(k);
                         }
 
                         std::cout << "\n" << "===============" << " found atom " << it << "===============" << ":\n\n";
@@ -278,7 +281,7 @@ QList<GaborAtom> FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterati
 
         std::cout << "absolute energy of residuum: " << residuum_energy << "\n";
 
-        atomSamples.clear();
+        atom_samples.clear();
         signalSamples = VectorXd::Zero(sample_count);
         bestCorrValue = 0;
         temp_energy = 0;
@@ -290,8 +293,9 @@ QList<GaborAtom> FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterati
 
     }//end while iterations
 
+    std::cout << "\nFixDict Matching Pursuit Algorithm finished.\n";
     emit finished_calc();
-    return atom_list;
+    //return atom_list;
 }
 
 //*************************************************************************************************************
@@ -347,18 +351,13 @@ QStringList FixDictMp::correlation(VectorXd signalSamples, QList<qreal> atomSamp
     resultList.append(QString("%1").arg(maximum)); //for scaling
 
     return resultList;
-
-    // die Stelle, an der die Korrelation am groessten ist ergibt sich aus:
-    // dem Index des hoechsten Korrelationswertes minus die halbe Atomlaenge,
-
 }
 
 //*************************************************************************************************************
 
-void FixDictMp::recieve_input(MatrixXd signal, qint32 max_iterations, qreal epsilon, QString path,  qint32 simplex_it = 1E3,
-                               qreal simplex_reflection = 1.0, qreal simplex_expansion = 0.2, qreal simplex_contraction = 0.5, qreal simplex_full_contraction = 0.5)
+void FixDictMp::recieve_input(MatrixXd signal, qint32 max_iterations, qreal epsilon, QString path)
 {
-    matching_pursuit(signal, max_iterations, epsilon, path, simplex_it, simplex_reflection, simplex_expansion, simplex_contraction, simplex_full_contraction);
+    matching_pursuit(signal, max_iterations, epsilon, path);
 }
 
 //*************************************************************************************************************
