@@ -810,18 +810,16 @@ void Enhancededitorwindow::on_pushButton_clicked()
                 qreal temp_f = ui->dsb_StartValueF->value();
                 qreal temp_g = ui->dsb_StartValueG->value();
                 qreal temp_h = ui->dsb_StartValueH->value();
-                if(value_a_list.length() > 0) temp_a = value_a_list.at(atom_index);
-                if(value_b_list.length() > 0) temp_b = value_b_list.at(atom_index);
-                if(value_c_list.length() > 0) temp_c = value_c_list.at(atom_index);
-                if(value_d_list.length() > 0) temp_d = value_d_list.at(atom_index);
-                if(value_e_list.length() > 0) temp_e = value_e_list.at(atom_index);
-                if(value_f_list.length() > 0) temp_f = value_f_list.at(atom_index);
-                if(value_g_list.length() > 0) temp_g = value_g_list.at(atom_index);
-                if(value_h_list.length() > 0) temp_h = value_h_list.at(atom_index);
-
+                if(value_a_list.length() > 0 && atom_index < value_a_list.length()) temp_a = value_a_list.at(atom_index);
+                if(value_b_list.length() > 0 && atom_index < value_b_list.length()) temp_b = value_b_list.at(atom_index);
+                if(value_c_list.length() > 0 && atom_index < value_c_list.length()) temp_c = value_c_list.at(atom_index);
+                if(value_d_list.length() > 0 && atom_index < value_d_list.length()) temp_d = value_d_list.at(atom_index);
+                if(value_e_list.length() > 0 && atom_index < value_e_list.length()) temp_e = value_e_list.at(atom_index);
+                if(value_f_list.length() > 0 && atom_index < value_f_list.length()) temp_f = value_f_list.at(atom_index);
+                if(value_g_list.length() > 0 && atom_index < value_g_list.length()) temp_g = value_g_list.at(atom_index);
+                if(value_h_list.length() > 0 && atom_index < value_h_list.length()) temp_h = value_h_list.at(atom_index);
 
                 Formulaeditor formula_parser;
-
                 formula_parser.set_funct_const(0, temp_a);
                 formula_parser.set_funct_const(1, temp_b);
                 formula_parser.set_funct_const(2, temp_c);
