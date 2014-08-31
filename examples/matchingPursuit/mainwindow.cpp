@@ -93,9 +93,6 @@ using namespace DISPLIB;
 //=============================================================================================================
 // FORWARD DECLARATIONS
 //=============================================================================================================
-QStringList _fix_dict_atoms;
-
-qint32 _row_count = 0;
 
 bool _tbv_is_loading = false;
 bool _auto_change = false;
@@ -103,7 +100,6 @@ bool _was_partialchecked = false;
 bool _come_from_sample_count = false;
 bool _come_from_from =false;
 
-qint32 _sample_rate = 1;
 qreal _from = 47.151f;
 qreal _to = 48.000f;
 qreal _soll_energy = 0;
@@ -113,6 +109,8 @@ qreal _signal_negative_scale = 0;
 qreal _max_pos = 0;
 qreal _max_neg = 0;
 qreal _draw_factor = 0;
+qint32 _row_count = 0;
+qint32 _sample_rate = 1;
 
 QString _file_name = "";
 QMap<qint32, bool> _select_channel_map;
@@ -120,7 +118,8 @@ QMap<qint32, bool> _select_atoms_map;
 
 QList<QColor> _colors;
 QList<QColor> _original_colors;
-QList<GaborAtom> _my_atom_list;
+QList<GaborAtom> _adaptive_atom_list;
+QList<FixDictAtom> _fix_dict_atom_list;
 
 MatrixXd _datas;
 MatrixXd _times;
@@ -380,6 +379,15 @@ void MainWindow::open_file()
         this->cb_items.push_back(this->cb_item);
         _select_channel_map.insert(channels, true);
     }
+
+    this->cb_item = new QStandardItem;
+
+    this->cb_item->setText("alle Channels an/ab wählen");
+    this->cb_item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
+    this->cb_item->setData(Qt::Checked, Qt::CheckStateRole);
+    this->cb_model->appendRow(this->cb_item);
+    this->cb_items.push_back(this->cb_item);
+
     ui->cb_channels->setModel(this->cb_model);
     _original_colors = _colors;
     _atom_sum_matrix.resize(_signal_matrix.rows(), _signal_matrix.cols()); //resize
@@ -392,9 +400,26 @@ void MainWindow::open_file()
 
 void MainWindow::cb_selection_changed(const QModelIndex& topLeft, const QModelIndex& bottomRight)
 {
+    QStandardItem* cb_item = this->cb_items[topLeft.row()];
+    if(topLeft.row() == ui->cb_channels->count() - 1)
+    {
+        if(cb_item->checkState() == Qt::Checked)
+        {
+            for(qint32 i = 0; i < ui->cb_channels->count() - 1; i++)
+                if(this->cb_items[i]->checkState() == Qt::Unchecked)
+                    this->cb_items[i]->setData(Qt::Checked, Qt::CheckStateRole);
+        }
+        else
+        {
+            for(qint32 i = 0; i < ui->cb_channels->count() - 1; i++)
+                if(this->cb_items[i]->checkState() == Qt::Checked)
+                    this->cb_items[i]->setData(Qt::Unchecked, Qt::CheckStateRole);
+        }
+        return;
+    }
+
     ui->tbv_Results->setRowCount(0);
 
-    QStandardItem* cb_item = this->cb_items[topLeft.row()];
     if(cb_item->checkState() == Qt::Unchecked)
         _select_channel_map[topLeft.row()] = false;
     else if(cb_item->checkState() == Qt::Checked)
@@ -404,14 +429,12 @@ void MainWindow::cb_selection_changed(const QModelIndex& topLeft, const QModelIn
 
     for(qint32 i = 0; i < _original_signal_matrix.cols(); i++)    
         if(_select_channel_map[i] == true)
-        {
             size++;
-        }
+
 
     _signal_matrix.resize(_original_signal_matrix.rows(), size);
     _atom_sum_matrix.resize(_original_signal_matrix.rows(), size);
-    _residuum_matrix.resize(_original_signal_matrix.rows(), size);
-    //_real_residuum_matrix.resize(_original_signal_matrix.rows(), size);
+    _residuum_matrix.resize(_original_signal_matrix.rows(), size);    
 
     _colors.clear();
     qint32 selected_chn = 0;
@@ -420,8 +443,7 @@ void MainWindow::cb_selection_changed(const QModelIndex& topLeft, const QModelIn
         if(_select_channel_map[channels] == true)
         {
             _colors.append(_original_colors.at(channels));
-            _signal_matrix.col(selected_chn) = _original_signal_matrix.col(channels);
-            //_real_residuum_matrix.col(selected_chn) = _real_original_residuum_matrix.col(channels);
+            _signal_matrix.col(selected_chn) = _original_signal_matrix.col(channels);            
             selected_chn++;
         }
     update();
@@ -1178,7 +1200,7 @@ void MainWindow::on_btt_Calc_clicked()
         ui->frame->setEnabled(false);
         ui->btt_OpenSignal->setEnabled(false);
         ui->btt_Calc->setText("cancel");
-        ui->tbv_Results->setEnabled(false);
+        //ui->tbv_Results->setEnabled(false);
         ui->cb_channels->setEnabled(false);
         ui->cb_all_select->setEnabled(false);
         ui->dsb_from->setEnabled(false);
@@ -1189,7 +1211,8 @@ void MainWindow::on_btt_Calc_clicked()
         ui->tbv_Results->setRowCount(0);
         ui->lb_IterationsProgressValue->setText("0");
         ui->lb_RestEnergieResiduumValue->setText("0");
-        _my_atom_list.clear();
+        _adaptive_atom_list.clear();
+        _fix_dict_atom_list.clear();
         _residuum_matrix = _signal_matrix;
         _atom_sum_matrix = MatrixXd::Zero(_signal_matrix.rows(), _signal_matrix.cols());
 
@@ -1205,6 +1228,8 @@ void MainWindow::on_btt_Calc_clicked()
             ui->tbv_Results->setHorizontalHeaderLabels(QString("energy\n[%];atom").split(";"));
             ui->tbv_Results->setColumnWidth(0,55);
             ui->tbv_Results->setColumnWidth(1,280);
+
+
 
             QFile ownDict(QString("Matching-Pursuit-Toolbox/%1.dict").arg(ui->cb_Dicts->currentText()));
             // ToDo: size from dict
@@ -1224,6 +1249,12 @@ void MainWindow::on_btt_Calc_clicked()
             ui->tbv_Results->setColumnWidth(4,40);
             calc_adaptiv_mp(_signal_matrix, criterion);
         }
+        /* //ToDo: splitter
+        QList<qint32> sizes = ui->splitter->sizes();
+
+        sizes.insert(0, ui->tbv_Results->size().width() + 10);
+        ui->splitter->setSizes(sizes);
+        */
     }
 
     //paused Thread
@@ -1252,47 +1283,38 @@ void MainWindow::on_time_out()
 
 //*************************************************************************************************************
 
-
-
 void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations, qreal current_energy, qreal max_energy, MatrixXd residuum,
-                                gabor_atom_list atom_res_list, vector_list discrete_atoms, QString atom_formula = "ADAPTIVE_MP")
+                                adaptive_atom_list adaptive_atom_res_list, fix_dict_atom_list fix_dict_atom_res_list)
 {
     _tbv_is_loading = true;
     _row_count++;
 
     qreal percent = ui->dsb_energy->value();
-
     qreal residuum_energy = 100 * (max_energy - current_energy) / max_energy;
 
     //remaining energy and iterations update
     ui->lb_IterationsProgressValue->setText(QString::number(current_iteration));
     ui->lb_RestEnergieResiduumValue->setText(QString::number(residuum_energy, 'f', 2) + "%");
-
     //current atoms list update
-    if(atom_formula == "ADAPTIVE_MP")
+    if(fix_dict_atom_res_list.isEmpty())
     {
-        ui->tbv_Results->setRowCount(_row_count);
-        _my_atom_list.append(atom_res_list.last());
-
-        qreal percent_atom_energy = 100 * atom_res_list.last().energy / max_energy;
-        qreal phase = atom_res_list.last().phase_list.first();
-
-        if(atom_res_list.last().phase_list.first() > 2*PI)
-            phase = atom_res_list.last().phase_list.first() - 2*PI;
+        GaborAtom temp_atom = adaptive_atom_res_list.last();
+        qreal percent_atom_energy = 100 * temp_atom.energy / max_energy;
+        qreal phase = temp_atom.phase_list.first();
+        if(temp_atom.phase_list.first() > 2*PI)
+            phase = temp_atom.phase_list.first() - 2*PI;
 
         QTableWidgetItem* atomEnergieItem = new QTableWidgetItem(QString::number(percent_atom_energy, 'f', 2));
-        QTableWidgetItem* atomScaleItem = new QTableWidgetItem(QString::number(atom_res_list.last().scale / ui->sb_sample_rate->value(), 'g', 3));
-        QTableWidgetItem* atomTranslationItem = new QTableWidgetItem(QString::number(atom_res_list.last().translation / qreal(ui->sb_sample_rate->value()) + _from, 'g', 4));
-        QTableWidgetItem* atomModulationItem = new QTableWidgetItem(QString::number(atom_res_list.last().modulation * _sample_rate / atom_res_list.last().sample_count, 'g', 3));
+        QTableWidgetItem* atomScaleItem = new QTableWidgetItem(QString::number(temp_atom.scale / ui->sb_sample_rate->value(), 'g', 3));
+        QTableWidgetItem* atomTranslationItem = new QTableWidgetItem(QString::number(temp_atom.translation / qreal(ui->sb_sample_rate->value()) + _from, 'g', 4));
+        QTableWidgetItem* atomModulationItem = new QTableWidgetItem(QString::number(temp_atom.modulation * _sample_rate / temp_atom.sample_count, 'g', 3));
         QTableWidgetItem* atomPhaseItem = new QTableWidgetItem(QString::number(phase, 'g', 3));
 
-
-        atomEnergieItem->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
-        atomScaleItem->setFlags(Qt::ItemIsEnabled);
-        atomTranslationItem->setFlags(Qt::ItemIsEnabled);
-        atomModulationItem->setFlags(Qt::ItemIsEnabled);
-        atomPhaseItem->setFlags(Qt::ItemIsEnabled);
-
+        atomEnergieItem->setFlags(Qt::ItemIsUserCheckable);
+        atomScaleItem->setFlags(Qt::NoItemFlags);
+        atomTranslationItem->setFlags(Qt::NoItemFlags);
+        atomModulationItem->setFlags(Qt::NoItemFlags);
+        atomPhaseItem->setFlags(Qt::NoItemFlags);
         atomEnergieItem->setCheckState(Qt::Checked);
 
         atomEnergieItem->setTextAlignment(0x0082);
@@ -1300,11 +1322,29 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
         atomTranslationItem->setTextAlignment(0x0082);
         atomModulationItem->setTextAlignment(0x0082);
         atomPhaseItem->setTextAlignment(0x0082);
-        ui->tbv_Results->setItem(ui->tbv_Results->rowCount()- 1, 0, atomEnergieItem);
-        ui->tbv_Results->setItem(ui->tbv_Results->rowCount()- 1, 1, atomScaleItem);
-        ui->tbv_Results->setItem(ui->tbv_Results->rowCount()- 1, 2, atomTranslationItem);
-        ui->tbv_Results->setItem(ui->tbv_Results->rowCount()- 1, 3, atomModulationItem);
-        ui->tbv_Results->setItem(ui->tbv_Results->rowCount()- 1, 4, atomPhaseItem);
+
+        _adaptive_atom_list.append(temp_atom);
+        qSort(_adaptive_atom_list.begin(),_adaptive_atom_list.end(), sort_Energie);
+        qSort(adaptive_atom_res_list.begin(),adaptive_atom_res_list.end(), sort_Energie);
+
+        qint32 index = 0;
+        while(index < adaptive_atom_res_list.length())
+        {
+            if(temp_atom.scale == adaptive_atom_res_list.at(index).scale
+                    && temp_atom.modulation == adaptive_atom_res_list.at(index).modulation
+                    && temp_atom.translation == adaptive_atom_res_list.at(index).translation
+                    && temp_atom.energy == adaptive_atom_res_list.at(index).energy)
+                break;
+            index++;
+        }
+
+        ui->tbv_Results->insertRow(index);
+
+        ui->tbv_Results->setItem(index, 0, atomEnergieItem);
+        ui->tbv_Results->setItem(index, 1, atomScaleItem);
+        ui->tbv_Results->setItem(index, 2, atomTranslationItem);
+        ui->tbv_Results->setItem(index, 3, atomModulationItem);
+        ui->tbv_Results->setItem(index, 4, atomPhaseItem);
 
         //update residuum and atom sum for painting and later save to hdd
         _residuum_matrix = residuum;
@@ -1314,19 +1354,17 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
         //GaborAtom gaborAtom = atom_res_list.last();
         //for(qint32 i = 0; i < _signal_matrix.cols(); i++)
         //    _atom_sum_matrix.col(i) += gaborAtom.max_scalar_list.at(i) * discrete_atoms.at(i);
-
     }
-    else
+    else if(adaptive_atom_res_list.isEmpty())
     {        
         ui->tbv_Results->setRowCount(_row_count);
-
-        _fix_dict_atoms.append(atom_formula);
+        _fix_dict_atom_list.append(fix_dict_atom_res_list);
 
         qreal percent_atom_energy = 100 * /*TODO add atomenergie*/ 4 / max_energy;
 
 
         QTableWidgetItem* atom_energie_item = new QTableWidgetItem(QString::number(percent_atom_energy, 'f', 2));
-        QTableWidgetItem* atom_name_item = new QTableWidgetItem(atom_formula);
+        QTableWidgetItem* atom_name_item = new QTableWidgetItem(fix_dict_atom_res_list.last().atom_formula);
 
 
         atom_energie_item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
@@ -1368,6 +1406,9 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
 
 void MainWindow::tbv_selection_changed(const QModelIndex& topLeft, const QModelIndex& bottomRight)
 {
+    if(_tbv_is_loading)
+        return;
+
     bool all_selected = true;
     bool all_deselected = true;
     for(qint32 i = 0; i < ui->tbv_Results->rowCount() - 1; i++)     // last item is residuum
@@ -1382,10 +1423,6 @@ void MainWindow::tbv_selection_changed(const QModelIndex& topLeft, const QModelI
         ui->cb_all_select->setCheckState(Qt::Unchecked);
     else
         ui->cb_all_select->setCheckState(Qt::PartiallyChecked);
-
-
-    if(_tbv_is_loading)
-        return;
 
     QTableWidgetItem* item = ui->tbv_Results->item(topLeft.row(), 0);
     if(topLeft.row() == _row_count)
@@ -1407,24 +1444,50 @@ void MainWindow::tbv_selection_changed(const QModelIndex& topLeft, const QModelI
     }
     else
     {
-        GaborAtom  atom = _my_atom_list.at(topLeft.row());
-        if(!_auto_change)
-            _select_atoms_map[topLeft.row()] = item->checkState();
-
-        if(item->checkState())
+        if(ui->tbv_Results->columnCount() > 2)
         {
-            for(qint32 channels = 0; channels < _signal_matrix.cols(); channels++)
+            GaborAtom  atom = _adaptive_atom_list.at(topLeft.row());
+            if(!_auto_change)
+                _select_atoms_map[topLeft.row()] = item->checkState();
+
+            if(item->checkState())
             {
-                _atom_sum_matrix.col(channels) += atom.max_scalar_list.at(channels) * atom.create_real(atom.sample_count, atom.scale, atom.translation, atom.modulation, atom.phase_list.at(channels));
-                _residuum_matrix.col(channels) -= atom.max_scalar_list.at(channels) * atom.create_real(atom.sample_count, atom.scale, atom.translation, atom.modulation, atom.phase_list.at(channels));
+                for(qint32 channels = 0; channels < _signal_matrix.cols(); channels++)
+                {
+                    _atom_sum_matrix.col(channels) += atom.max_scalar_list.at(channels) * atom.create_real(atom.sample_count, atom.scale, atom.translation, atom.modulation, atom.phase_list.at(channels));
+                    _residuum_matrix.col(channels) -= atom.max_scalar_list.at(channels) * atom.create_real(atom.sample_count, atom.scale, atom.translation, atom.modulation, atom.phase_list.at(channels));
+                }
+            }
+            else
+            {
+                for(qint32 channels = 0; channels < _signal_matrix.cols(); channels++)
+                {
+                    _atom_sum_matrix.col(channels) -= atom.max_scalar_list.at(channels) * atom.create_real(atom.sample_count, atom.scale, atom.translation, atom.modulation, atom.phase_list.at(channels));
+                    _residuum_matrix.col(channels) += atom.max_scalar_list.at(channels) * atom.create_real(atom.sample_count, atom.scale, atom.translation, atom.modulation, atom.phase_list.at(channels));
+                }
             }
         }
         else
         {
-            for(qint32 channels = 0; channels < _signal_matrix.cols(); channels++)//atom.phase_list.length()
+            // ToDo: Multichannel
+            VectorXd  discret_atom = _fix_dict_atom_list.at(topLeft.row()).vector_list.first();
+            if(!_auto_change)
+                _select_atoms_map[topLeft.row()] = item->checkState();
+            if(item->checkState())
             {
-                _atom_sum_matrix.col(channels) -= atom.max_scalar_list.at(channels) * atom.create_real(atom.sample_count, atom.scale, atom.translation, atom.modulation, atom.phase_list.at(channels));
-                _residuum_matrix.col(channels) += atom.max_scalar_list.at(channels) * atom.create_real(atom.sample_count, atom.scale, atom.translation, atom.modulation, atom.phase_list.at(channels));
+                for(qint32 channels = 0; channels < _signal_matrix.cols(); channels++)
+                {
+                    _atom_sum_matrix.col(channels) += discret_atom;
+                    _residuum_matrix.col(channels) -= discret_atom;
+                }
+            }
+            else
+            {
+                for(qint32 channels = 0; channels < _signal_matrix.cols(); channels++)
+                {
+                    _atom_sum_matrix.col(channels) -= discret_atom;
+                    _residuum_matrix.col(channels) += discret_atom;
+                }
             }
         }
     }
@@ -1435,24 +1498,33 @@ void MainWindow::tbv_selection_changed(const QModelIndex& topLeft, const QModelI
 
 void MainWindow::calc_thread_finished()
 {
+    _tbv_is_loading = true;
+
     _counter_timer->stop();
     ui->frame->setEnabled(true);
     ui->btt_OpenSignal->setEnabled(true);
 
     ui->btt_Calc->setText("calculate");
-    ui->tbv_Results->setEnabled(true);
+    //ui->tbv_Results->setEnabled(true);
     ui->cb_channels->setEnabled(true);
     ui->cb_all_select->setEnabled(true);
     ui->dsb_from->setEnabled(true);
     ui->dsb_to->setEnabled(true);
     ui->sb_sample_count ->setEnabled(true);
 
+    for(qint32 col = 0; col < ui->tbv_Results->columnCount(); col++)
+        for(qint32 row = 0; row < ui->tbv_Results->rowCount(); row++)
+        {
+            if(col == 0)
+                ui->tbv_Results->item(row, col)->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
+            else
+                ui->tbv_Results->item(row, col)->setFlags(Qt::ItemIsEnabled);
+        }
+
     _real_residuum_matrix = _residuum_matrix;
 
-    for(qint32 i = 0; i < _my_atom_list.count(); i++)
+    for(qint32 i = 0; i < _row_count; i++)
         _select_atoms_map.insert(i, true);
-
-    _tbv_is_loading = true;
 
     ui->tbv_Results->setRowCount(_row_count + 1);
     QTableWidgetItem* residuumItem = new QTableWidgetItem("residuum");
@@ -1464,8 +1536,7 @@ void MainWindow::calc_thread_finished()
 
     _tbv_is_loading = false;
 
-    // ToDo: Sort
-    //ui->tbv_Results->sortItems(0, Qt::AscendingOrder);
+
     update();
 
 }
@@ -1484,13 +1555,13 @@ void MainWindow::calc_adaptiv_mp(MatrixXd signal, TruncationCriterion criterion)
     adaptive_Mp->moveToThread(mp_Thread);
     qRegisterMetaType<Eigen::MatrixXd>("MatrixXd");
     qRegisterMetaType<Eigen::VectorXd>("VectorXd");
-    qRegisterMetaType<gabor_atom_list>("gabor_atom_list");
-    qRegisterMetaType<vector_list>("vector_list");
+    qRegisterMetaType<adaptive_atom_list>("adaptive_atom_list");
+    qRegisterMetaType<fix_dict_atom_list>("fix_dict_atom_list");
 
     connect(this, SIGNAL(send_input(MatrixXd, qint32, qreal, bool, bool, qint32, qreal, qreal, qreal, qreal)),
             adaptive_Mp, SLOT(recieve_input(MatrixXd, qint32, qreal, bool, bool, qint32, qreal, qreal, qreal, qreal)));
-    connect(adaptive_Mp, SIGNAL(current_result(qint32, qint32, qreal, qreal, MatrixXd, gabor_atom_list, vector_list, QString)),
-                 this, SLOT(recieve_result(qint32, qint32, qreal, qreal, MatrixXd, gabor_atom_list, vector_list, QString)));
+    connect(adaptive_Mp, SIGNAL(current_result(qint32, qint32, qreal, qreal, MatrixXd, adaptive_atom_list, fix_dict_atom_list)),
+                 this, SLOT(recieve_result(qint32, qint32, qreal, qreal, MatrixXd, adaptive_atom_list, fix_dict_atom_list)));
     connect(adaptive_Mp, SIGNAL(finished_calc()), mp_Thread, SLOT(quit()));
     connect(adaptive_Mp, SIGNAL(finished_calc()), adaptive_Mp, SLOT(deleteLater()));
     connect(mp_Thread, SIGNAL(finished()), this, SLOT(calc_thread_finished()));
@@ -1545,13 +1616,13 @@ void MainWindow::calc_fix_mp(QString path, MatrixXd signal, TruncationCriterion 
     fixDict_Mp->moveToThread(mp_Thread);
     qRegisterMetaType<Eigen::MatrixXd>("MatrixXd");
     qRegisterMetaType<Eigen::VectorXd>("VectorXd");
-    qRegisterMetaType<gabor_atom_list>("gabor_atom_list");
-    qRegisterMetaType<vector_list>("vector_list");
+    qRegisterMetaType<adaptive_atom_list>("adaptive_atom_list");
+    qRegisterMetaType<fix_dict_atom_list>("fix_dict_atom_list");
 
     connect(this, SIGNAL(send_input_fix_dict(MatrixXd, qint32, qreal, QString)),
             fixDict_Mp, SLOT(recieve_input(MatrixXd, qint32, qreal, QString)));
-    connect(fixDict_Mp, SIGNAL(current_result(qint32, qint32, qreal, qreal, MatrixXd, gabor_atom_list, vector_list, QString)),
-                  this, SLOT(recieve_result(qint32, qint32, qreal, qreal, MatrixXd, gabor_atom_list, vector_list, QString)));
+    connect(fixDict_Mp, SIGNAL(current_result(qint32, qint32, qreal, qreal, MatrixXd, adaptive_atom_list, fix_dict_atom_list)),
+                  this, SLOT(recieve_result(qint32, qint32, qreal, qreal, MatrixXd, adaptive_atom_list, fix_dict_atom_list)));
     connect(fixDict_Mp, SIGNAL(finished_calc()), mp_Thread, SLOT(quit()));
     connect(fixDict_Mp, SIGNAL(finished_calc()), fixDict_Mp, SLOT(deleteLater()));
     connect(mp_Thread, SIGNAL(finished()), this, SLOT(calc_thread_finished()));
@@ -2210,4 +2281,11 @@ void MainWindow::on_actionSpeicher_unter_triggered()
     printf("Finished\n");
 
     //return 0;//a.exec();
+}
+
+//*****************************************************************************************************************
+
+bool MainWindow::sort_Energie(const GaborAtom atom_1, const GaborAtom atom_2)
+{
+    return (atom_1.energy > atom_2.energy);
 }

@@ -114,9 +114,9 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
     void fill_dict_combobox();
-    typedef QList<GaborAtom> gabor_atom_list;
-    typedef Eigen::VectorXd VectorXd;
-    typedef QList<VectorXd> vector_list;
+    typedef QList<GaborAtom> adaptive_atom_list;
+    typedef QList<FixDictAtom> fix_dict_atom_list;
+    typedef Eigen::VectorXd VectorXd;    
 
 private slots:
     //==========================================================================================================
@@ -218,7 +218,7 @@ private slots:
     * @return void
     */
     void recieve_result(qint32 current_iteration, qint32 max_iterations, qreal current_energy, qreal max_energy, MatrixXd residuum,
-                        gabor_atom_list atom_res_list, vector_list discrete_atoms, QString atom_formula);
+                        adaptive_atom_list adaptive_atom_res_list, fix_dict_atom_list fix_dict_atom_res_list);
 
     //==========================================================================================================
 
@@ -250,13 +250,12 @@ private:
     GraphWindow *callGraphWindow;
     AtomSumWindow *callAtomSumWindow;
     ResiduumWindow *callResidumWindow;
-    YAxisWindow *callYAxisWindow;
-    QStandardItemModel* cb_model;
+    YAxisWindow *callYAxisWindow;    
     QStandardItem* cb_item;
-    std::vector<QStandardItem*> cb_items;
-
-    QStandardItemModel* tbv_model;
     QStandardItem* tbv_item;
+    QStandardItemModel* cb_model;
+    QStandardItemModel* tbv_model;
+    std::vector<QStandardItem*> cb_items;
     std::vector<QStandardItem*> tbv_items;
 
     //==========================================================================================================
@@ -329,10 +328,10 @@ private:
     //==========================================================================================================
 
     void read_fiff_ave(QString file_name);
-    QList<qreal> norm_signal(QList<qreal> signalSamples);
-    //QStringList correlation(VectorXd signalSamples, QList<qreal> atomSamples, QString atomName);
+    QList<qreal> norm_signal(QList<qreal> signalSamples);    
     void calc_fix_mp(QString path, MatrixXd signal, TruncationCriterion criterion);
     void closeEvent(QCloseEvent * event);
+    static bool sort_Energie(const GaborAtom atom_1, const GaborAtom atom_2);
 };
 
 //*************************************************************************************************************

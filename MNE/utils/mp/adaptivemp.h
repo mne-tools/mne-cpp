@@ -135,22 +135,22 @@ public:
 
     //=========================================================================================================
 
-    typedef QList<GaborAtom> gabor_atom_list;
+    typedef QList<GaborAtom> adaptive_atom_list;
+    typedef QList<FixDictAtom> fix_dict_atom_list;
     typedef Eigen::VectorXd VectorXd;
     typedef Eigen::MatrixXd MatrixXd;
-    typedef QList<VectorXd> vector_list;
 
-    qint32 it;
-    qint32 max_it;
+    bool fix_phase;
     qreal signal_energy;
     qreal current_energy;
-    QList<GaborAtom> atom_list;
-    MatrixXd signal;
-    qint32 max_iterations;
     qreal epsilon;
-    bool fix_phase;
+    qint32 it;
+    qint32 max_it;
+    qint32 max_iterations;
     VectorXd best_match;
-    bool stop_running;
+    MatrixXd signal;
+    QList<GaborAtom> atom_list;
+    QList<FixDictAtom> fix_dict_list;
 
     //=========================================================================================================
     /*
@@ -217,7 +217,7 @@ public slots:
 signals:
 
     void current_result(qint32 current_iteration, qint32 max_iteration, qreal current_energy, qreal max_energy, MatrixXd residuum,
-                        gabor_atom_list atom_list, vector_list discrete_atoms, QString atom_formula);
+                        adaptive_atom_list atom_list, fix_dict_atom_list fix_dict_list);
     void finished_calc();
 
 };

@@ -103,17 +103,43 @@ class UTILSSHARED_EXPORT Atom// : public QObject // Atom class to build and call
     // Q_OBJECT
 public:
 
-    bool SaveToRam;
     qint32 sample_count;
-    qreal scale;
-    qint32 translation;
-    qreal modulation;
-    qreal max_scalar_product;
-    MatrixXd residuum;
     qreal energy;
-    QList<qreal> phase_list;
+    qreal max_scalar_product;
+    MatrixXd residuum;     
     QList<qreal> max_scalar_list;
 
+};
+
+//=============================================================================================================
+
+/**
+* FixDictAtom class inherited from Atom with additional functions
+*
+* @brief FixDictAtom used in fix dict MP Algorithm
+*/
+class UTILSSHARED_EXPORT FixDictAtom : public Atom
+{
+
+public:
+
+
+    //=========================================================================================================
+    /**
+    * Copy constructor.
+    *
+    * FixDictAtom class inherited from Atom with additional functions
+    */
+    FixDictAtom();
+    //=========================================================================================================
+    /**
+    * Copy deconstructor.
+    *
+    */
+    ~FixDictAtom();
+
+    QString atom_formula;
+    QList<VectorXd> vector_list;
 };
 
 //=============================================================================================================
@@ -127,7 +153,12 @@ class UTILSSHARED_EXPORT GaborAtom : public Atom
 {
 
 public:
+
+    qreal scale;
+    qint32 translation;
+    qreal modulation;
     qreal phase;
+    QList<qreal> phase_list;
 
     //=========================================================================================================
     /**
@@ -209,21 +240,24 @@ public:
 
 };
 
-    class UTILSSHARED_EXPORT ChirpAtom : public Atom
-    {
+class UTILSSHARED_EXPORT ChirpAtom : public Atom
+{
 
-    public:
+public:
 
-        qreal phase;
-        qreal chirp;
+    qreal scale;
+    qint32 translation;
+    qreal modulation;
+    qreal phase;
+    qreal chirp;
 
-        ChirpAtom(qint32 sampleCount, qreal scale, quint32 translation, qreal modulation, qreal phase, qreal chirp, bool saveToRam = false);
+    ChirpAtom(qint32 sampleCount, qreal scale, quint32 translation, qreal modulation, qreal phase, qreal chirp);
 
-        VectorXcd CreateComplex();
-        VectorXd CreateReal();
-        QStringList CreateStringValues();
+    VectorXcd CreateComplex();
+    VectorXd CreateReal();
+    QStringList CreateStringValues();
 
-    };
+};
 
 
 }

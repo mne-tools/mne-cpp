@@ -1246,14 +1246,14 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
                              {
                                 ChirpAtom *cAtom = new ChirpAtom(ui->spb_AtomLength->value(), tempScale, ui->spb_AtomLength->value() / 2, tempModu, tempPhase, tempChirp);
                                 resultList = cAtom->CreateStringValues();
-                                stream << QString("%1_ATOM_%2 \n Chirpatom: scale: %3 modu: %4 phase: %5 chrip: %6").arg(partDictName).arg(atomIndex).arg(tempScale).arg(tempModu).arg(tempPhase).arg(tempChirp) << "\n";
+                                stream << QString("%1_ATOM_%2\nChirpatom: scale: %3 modu: %4 phase: %5 chrip: %6").arg(partDictName).arg(atomIndex).arg(tempScale).arg(tempModu).arg(tempPhase).arg(tempChirp) << "\n";
 
                             }
                             else if(atomType == EditorWindow::Gauss)
                             {
-                                GaborAtom *gAtom = new GaborAtom();//ui->spb_AtomLength->value(), tempScale, 0, tempModu, tempPhase);
+                                GaborAtom *gAtom = new GaborAtom();
                                 resultList = gAtom->CreateStringValues(ui->spb_AtomLength->value(), tempScale, ui->spb_AtomLength->value() / 2, tempModu, tempPhase);
-                                stream << QString("%1_ATOM_%2 \n Gaboratom: scale: %3 modu: %4 phase: %5").arg(partDictName).arg(atomIndex).arg(tempScale).arg(tempModu).arg(tempPhase) << "\n";
+                                stream << QString("%1_ATOM_%2\nGaboratom: scale: %3 modu: %4 phase: %5").arg(partDictName).arg(atomIndex).arg(tempScale).arg(tempModu).arg(tempPhase) << "\n";
                             }
                             for (QStringList::Iterator it = resultList.begin(); it != resultList.end(); it++)
                                  stream << *it << "\n";
@@ -1310,13 +1310,13 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
                  {
                     ChirpAtom *cAtom = new ChirpAtom(ui->spb_AtomLength->value(), tempScale, ui->spb_AtomLength->value() / 2, tempModu, tempPhase, tempChirp);
                     resultList = cAtom->CreateStringValues();
-                    stream << QString("%1_ATOM_%2 \n Chirpatom: scale: %3 modu: %4 phase: %5 chrip: %6").arg(partDictName).arg(i).arg(tempScale).arg(tempModu).arg(tempPhase).arg(tempChirp) << "\n";
+                    stream << QString("%1_ATOM_%2\nChirpatom: scale: %3 modu: %4 phase: %5 chrip: %6").arg(partDictName).arg(i).arg(tempScale).arg(tempModu).arg(tempPhase).arg(tempChirp) << "\n";
                 }
                 else if(atomType == EditorWindow::Gauss)
                 {
                     GaborAtom *gAtom = new GaborAtom();//ui->spb_AtomLength->value(), tempScale,0 , tempModu, tempPhase);
                     resultList = gAtom->CreateStringValues(ui->spb_AtomLength->value(), tempScale, ui->spb_AtomLength->value() / 2, tempModu, tempPhase);
-                    stream << QString("%1_ATOM_%2 \n Gaboratom: scale: %3 modu: %4 phase: %5").arg(partDictName).arg(i).arg(tempScale).arg(tempModu).arg(tempPhase) << "\n";
+                    stream << QString("%1_ATOM_%2\nGaboratom: scale: %3 modu: %4 phase: %5").arg(partDictName).arg(i).arg(tempScale).arg(tempModu).arg(tempPhase) << "\n";
                 }
 
                 for (QStringList::Iterator it = resultList.begin(); it != resultList.end(); it++)
@@ -1506,7 +1506,8 @@ void EditorWindow::on_btt_SaveDicts_clicked()
     if (newFile.open (QIODevice::WriteOnly| QIODevice::Append))
     {
         QTextStream stream(&newFile);
-        stream << "/n";
+        stream << "atomcount = 1" << qSetFieldWidth(1);
+        stream << "\n\n";
         for(qint32 i = 0; i < ui->list_NewDict->count(); i++)
         {
             QString contents;
@@ -1516,7 +1517,7 @@ void EditorWindow::on_btt_SaveDicts_clicked()
                 while(!file.atEnd())
                 {
                     contents = file.readLine(0).constData();
-                    if(contents.startsWith("atomcount"))
+                    if(contents.startsWith("atomcount ="))
                         atomCountList.append(contents.mid(12).toInt());
                     else
                         stream << contents;
@@ -1530,7 +1531,7 @@ void EditorWindow::on_btt_SaveDicts_clicked()
             sum += atomCountList.at(i);
 
         stream.seek(0);
-        stream << QString("atomcount = %1").arg(sum) << "\n";
+        stream << QString("atomcount = %1").arg(sum);
     }
 
     newFile.close();

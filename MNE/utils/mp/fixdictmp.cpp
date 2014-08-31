@@ -82,7 +82,6 @@ void FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal e
     QString contents;
     QString atomName;
     QString bestCorrName;
-    QString atom_formula;
 
     QList<qreal> atom_samples;
     QList<QStringList> correlationList;    
@@ -98,7 +97,6 @@ void FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal e
     qreal temp_energy = 0;
     bool sample_count_mismatch = false;
 
-    vector_list discrete_atoms;
 
     //calculate signal_energy
     for(qint32 channel = 0; channel < channel_count; channel++)
@@ -117,6 +115,7 @@ void FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal e
 
     while(it < max_iterations && (energy_threshold < residuum_energy))
     {
+        FixDictAtom *fix_dict_atom = new FixDictAtom();
 
         for(qint32 i = 0; i < sample_count; i++)
             signalSamples[i] = residuum(i,0);
@@ -146,7 +145,7 @@ void FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal e
                 }
 
                 contents = "";
-                atom_formula = current_dict.readLine();
+                fix_dict_atom->atom_formula = current_dict.readLine();
 
                 while(!contents.contains("_ATOM_"))
                 {
@@ -196,7 +195,7 @@ void FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal e
                     contents = current_dict.readLine();
                     if(QString::compare(contents, bestCorrName) == 0)
                     {
-                        atom_formula = current_dict.readLine();
+                        fix_dict_atom->atom_formula = current_dict.readLine();
                         contents = current_dict.readLine();
 
 
@@ -278,6 +277,15 @@ void FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal e
 
         residuum_energy -= temp_energy;
         current_energy += temp_energy;
+        VectorXd atom_sample_vector = VectorXd::Zero(atom_samples.length());
+        for(qint32 i = 0; i < atom_samples.length(); i++)
+            atom_sample_vector[i] = atom_samples.at(i);
+
+
+        fix_dict_atom->vector_list.append(atom_sample_vector);
+        fix_dict_atom->energy = temp_energy;
+        fix_dict_atom->max_scalar_list.append(bestCorrValue);
+        fix_dict_list.append(*fix_dict_atom);
 
         std::cout << "absolute energy of residuum: " << residuum_energy << "\n";
 
@@ -286,15 +294,18 @@ void FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal e
         bestCorrValue = 0;
         temp_energy = 0;
         it++;
-        emit current_result(it, max_it, current_energy, signal_energy, residuum, atom_list, discrete_atoms, QString(atom_formula));
+        emit current_result(it, max_it, current_energy, signal_energy, residuum, adaptive_list, fix_dict_list);
 
         if( QThread::currentThread()->isInterruptionRequested())
             break;
+
+        delete fix_dict_atom;
 
     }//end while iterations
 
     std::cout << "\nFixDict Matching Pursuit Algorithm finished.\n";
     emit finished_calc();
+
     //return atom_list;
 }
 

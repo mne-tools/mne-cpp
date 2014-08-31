@@ -365,6 +365,9 @@
               <property name="text">
                <string>select / deselect all atoms</string>
               </property>
+              <property name="checked">
+               <bool>true</bool>
+              </property>
               <property name="tristate">
                <bool>true</bool>
               </property>
