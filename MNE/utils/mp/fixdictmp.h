@@ -113,7 +113,6 @@ public:
     qreal current_energy;
     qreal epsilon;
     qint32 it;
-    qint32 max_it;
     qint32 max_iterations;
     MatrixXd signal;
     QList<FixDictAtom> fix_dict_list;

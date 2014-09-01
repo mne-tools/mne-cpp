@@ -1202,6 +1202,21 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
         k++;
     }
 
+    QString save_path_xml = QString("Matching-Pursuit-Toolbox/%1_xml.pdict").arg(partDictName);
+    QFile xml_file(save_path_xml);
+
+    xml_file.open(QIODevice::WriteOnly);
+
+    QXmlStreamWriter xmlWriter(&xml_file);
+
+    xmlWriter.setAutoFormatting(true);
+
+    xmlWriter.writeStartDocument();
+    xmlWriter.writeStartElement("built_Atoms");
+    xmlWriter.writeAttribute("sample_count", QString::number(ui->spb_AtomLength->value()));
+    xmlWriter.writeAttribute("atom_count", QString::number(atomCount));
+
+
     if (dict.open (QIODevice::WriteOnly| QIODevice::Append))
     {
         QTextStream stream( &dict );
@@ -1248,15 +1263,43 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
                                 resultList = cAtom->CreateStringValues();
                                 stream << QString("%1_ATOM_%2\nChirpatom: scale: %3 modu: %4 phase: %5 chrip: %6").arg(partDictName).arg(atomIndex).arg(tempScale).arg(tempModu).arg(tempPhase).arg(tempChirp) << "\n";
 
+                                xmlWriter.writeStartElement("ATOM");
+                                xmlWriter.writeAttribute("source_dict", partDictName);
+                                xmlWriter.writeAttribute("ID", QString::number(atomIndex));
+                                xmlWriter.writeAttribute("formula", "Chirpatom");
+                                xmlWriter.writeAttribute("scale", QString::number(tempScale));
+                                xmlWriter.writeAttribute("modu", QString::number(tempModu));
+                                xmlWriter.writeAttribute("phase", QString::number(tempPhase));
+                                xmlWriter.writeAttribute("chirp", QString::number(tempChirp));
+
                             }
                             else if(atomType == EditorWindow::Gauss)
                             {
                                 GaborAtom *gAtom = new GaborAtom();
                                 resultList = gAtom->CreateStringValues(ui->spb_AtomLength->value(), tempScale, ui->spb_AtomLength->value() / 2, tempModu, tempPhase);
                                 stream << QString("%1_ATOM_%2\nGaboratom: scale: %3 modu: %4 phase: %5").arg(partDictName).arg(atomIndex).arg(tempScale).arg(tempModu).arg(tempPhase) << "\n";
+
+                                xmlWriter.writeStartElement("ATOM");
+                                xmlWriter.writeAttribute("source_dict", partDictName);
+                                xmlWriter.writeAttribute("ID", QString::number(atomIndex));
+                                xmlWriter.writeAttribute("formula", "Gaboratom");
+                                xmlWriter.writeAttribute("scale", QString::number(tempScale));
+                                xmlWriter.writeAttribute("modu", QString::number(tempModu));
+                                xmlWriter.writeAttribute("phase", QString::number(tempPhase));
+
                             }
                             for (QStringList::Iterator it = resultList.begin(); it != resultList.end(); it++)
-                                 stream << *it << "\n";
+                                stream << *it << "\n";
+
+                            for (qint32 it = 0; it < resultList.length(); it++)
+                            {
+                                xmlWriter.writeStartElement("sample", QString(resultList.at(it)));
+                                //xmlWriter.writeAttribute("", resultList.at(it));
+                                //xmlWriter.writeAttribute(QString("%1").arg(it), resultList.at(it));
+                                xmlWriter.writeEndElement();
+                            }
+
+                            xmlWriter.writeEndElement();
 
                             atomIndex++;
                             scaleCount++;
@@ -1311,22 +1354,55 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
                     ChirpAtom *cAtom = new ChirpAtom(ui->spb_AtomLength->value(), tempScale, ui->spb_AtomLength->value() / 2, tempModu, tempPhase, tempChirp);
                     resultList = cAtom->CreateStringValues();
                     stream << QString("%1_ATOM_%2\nChirpatom: scale: %3 modu: %4 phase: %5 chrip: %6").arg(partDictName).arg(i).arg(tempScale).arg(tempModu).arg(tempPhase).arg(tempChirp) << "\n";
+
+                    xmlWriter.writeStartElement("ATOM");
+                    xmlWriter.writeAttribute("source_dict", partDictName);
+                    xmlWriter.writeAttribute("ID", QString::number(i));
+                    xmlWriter.writeAttribute("formula", "Chirpatom");
+                    xmlWriter.writeAttribute("scale", QString::number(tempScale));
+                    xmlWriter.writeAttribute("modu", QString::number(tempModu));
+                    xmlWriter.writeAttribute("phase", QString::number(tempPhase));
+                    xmlWriter.writeAttribute("chirp", QString::number(tempChirp));
+
                 }
                 else if(atomType == EditorWindow::Gauss)
                 {
                     GaborAtom *gAtom = new GaborAtom();//ui->spb_AtomLength->value(), tempScale,0 , tempModu, tempPhase);
                     resultList = gAtom->CreateStringValues(ui->spb_AtomLength->value(), tempScale, ui->spb_AtomLength->value() / 2, tempModu, tempPhase);
                     stream << QString("%1_ATOM_%2\nGaboratom: scale: %3 modu: %4 phase: %5").arg(partDictName).arg(i).arg(tempScale).arg(tempModu).arg(tempPhase) << "\n";
+
+                    xmlWriter.writeStartElement("ATOM");
+                    xmlWriter.writeAttribute("source_dict", partDictName);
+                    xmlWriter.writeAttribute("ID", QString::number(i));
+                    xmlWriter.writeAttribute("formula", "Gaboratom");
+                    xmlWriter.writeAttribute("scale", QString::number(tempScale));
+                    xmlWriter.writeAttribute("modu", QString::number(tempModu));
+                    xmlWriter.writeAttribute("phase", QString::number(tempPhase));
                 }
 
                 for (QStringList::Iterator it = resultList.begin(); it != resultList.end(); it++)
                     stream << *it << "\n";
+
+                for (qint32 it = 0; it < resultList.length(); it++)
+                {
+                    xmlWriter.writeStartElement("sample");
+                    //xmlWriter.writeAttribute(QString("%1").arg(it), resultList.at(it));
+                    xmlWriter.writeAttribute("", resultList.at(it));
+                    xmlWriter.writeEndElement();
+                }
+
+                xmlWriter.writeEndElement();
 
                 i++;
             }
         }
         dict.close();
     }
+
+    xmlWriter.writeEndElement();
+    xmlWriter.writeEndDocument();
+
+    xml_file.close();
 
     QListWidgetItem *item = new QListWidgetItem;
     item->setToolTip(QString("%1.pdict").arg(partDictName));
@@ -1495,6 +1571,13 @@ void EditorWindow::on_btt_SaveDicts_clicked()
         }
     }
 
+    QString xml_new_path = QString("Matching-Pursuit-Toolbox/%1_xml.dict").arg(ui->tb_DictName->text());
+    QFile xml_new_file(xml_new_path);
+    xml_new_file.open(QIODevice::WriteOnly);
+    QDomDocument xml_dict;
+    xml_dict.setContent(&xml_new_file);
+
+
     QString newpath = QString("Matching-Pursuit-Toolbox/%1.dict").arg(ui->tb_DictName->text());
     QFile newFile(newpath);
     if(!newFile.exists())
@@ -1524,6 +1607,16 @@ void EditorWindow::on_btt_SaveDicts_clicked()
                 }
                 file.close();
             }
+
+            QFile xml_file(QString("Matching-Pursuit-Toolbox/%1").arg(ui->list_NewDict->item(i)->toolTip()));
+
+            QDomDocument xml_pdict;
+            xml_pdict.setContent(&xml_file);
+            QDomElement xml_element = xml_pdict.documentElement();
+            QString root_tag = xml_element.tagName();
+            QDomNodeList xml_atom_list = xml_element.elementsByTagName("ATOM");
+            for(qint32 i = 0; i < xml_atom_list.size(); i++)
+                xml_dict.appendChild(xml_atom_list.at(i).toElement());
         }
 
         qint32 sum = 0;
@@ -1533,6 +1626,18 @@ void EditorWindow::on_btt_SaveDicts_clicked()
         stream.seek(0);
         stream << QString("atomcount = %1").arg(sum);
     }
+
+    QTextStream xml_stream(&xml_new_file);
+
+    QXmlStreamWriter writer(&xml_new_file);
+    writer.setAutoFormatting(true);
+
+    writer.writeStartDocument();
+    xml_stream << xml_dict.toString();
+    //std::cout << xml_dict.toString();
+    writer.writeEndDocument();
+    //xml_dict.save(xml_stream, 4);
+    xml_new_file.close();
 
     newFile.close();
 

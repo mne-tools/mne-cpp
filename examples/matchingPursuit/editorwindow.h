@@ -47,6 +47,8 @@
 
 #include <QMainWindow>
 #include <QModelIndex>
+#include <QtXml/QtXml>
+#include <QDomDocument>
 
 //=============================================================================================================
 // USED NAMESPACES

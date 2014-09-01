@@ -14,7 +14,7 @@
    <enum>Qt::CustomContextMenu</enum>
   </property>
   <property name="windowTitle">
-   <string>Editor</string>
+   <string>dictionary manager</string>
   </property>
   <property name="windowIcon">
    <iconset resource="Ressourcen.qrc">
