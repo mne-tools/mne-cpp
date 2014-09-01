@@ -109,7 +109,6 @@ qreal _signal_negative_scale = 0;
 qreal _max_pos = 0;
 qreal _max_neg = 0;
 qreal _draw_factor = 0;
-qint32 _row_count = 0;
 qint32 _sample_rate = 1;
 
 QString _file_name = "";
@@ -188,6 +187,7 @@ MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::
     ui->dsb_to->setHidden(true);
     ui->lb_samples->setHidden(true);
     ui->sb_sample_count->setHidden(true);
+    ui->cb_all_select->setEnabled(false);
 
     // set result tableview
     ui->tbv_Results->setColumnCount(5);
@@ -203,66 +203,14 @@ MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::
     connect(ui->tbv_Results->model(), SIGNAL(dataChanged ( const QModelIndex&, const QModelIndex&)), this, SLOT(tbv_selection_changed(const QModelIndex&, const QModelIndex&)));
     connect(_counter_timer, SIGNAL(timeout()), this, SLOT(on_time_out()));
 
-    // build config file at init
-    bool hasEntry1 = false;
-    bool hasEntry2 = false;
-    bool hasEntry3 = false;
-    QString contents;
+    qRegisterMetaType<Eigen::MatrixXd>("MatrixXd");
+    qRegisterMetaType<Eigen::VectorXd>("VectorXd");
+    qRegisterMetaType<adaptive_atom_list>("adaptive_atom_list");
+    qRegisterMetaType<fix_dict_atom_list>("fix_dict_atom_list");
 
     QDir dir("Matching-Pursuit-Toolbox");
     if(!dir.exists())
         dir.mkdir(dir.absolutePath());
-    QFile configFile("Matching-Pursuit-Toolbox/Matching-Pursuit-Toolbox.config");
-    if(!configFile.exists())
-    {
-        if (configFile.open(QIODevice::ReadWrite | QIODevice::Text))
-        configFile.close();
-    }
-
-    if (configFile.open(QIODevice::ReadWrite | QIODevice::Text))
-    {
-        while(!configFile.atEnd())
-        {
-            contents = configFile.readLine(0).constData();
-            if(contents.startsWith("ShowDeleteMessageBox=") == 0)
-                hasEntry1 = true;
-            if(contents.startsWith("ShowProcessDurationMessageBox=") == 0)
-                hasEntry2 = true;
-            if(contents.startsWith("ShowDeleteFormelMessageBox=") == 0)
-                hasEntry3 = true;
-        }
-    }
-    configFile.close();
-
-    if(!hasEntry1)
-    {
-        if (configFile.open (QIODevice::WriteOnly| QIODevice::Append))
-        {
-            QTextStream stream( &configFile );
-            stream << QString("ShowDeleteMessageBox=true;") << "\n";
-        }
-        configFile.close();
-    }
-
-    if(!hasEntry2)
-    {
-        if (configFile.open (QIODevice::WriteOnly| QIODevice::Append))
-        {
-            QTextStream stream( &configFile );
-            stream << QString("ShowProcessDurationMessageBox=true;") << "\n";
-        }
-        configFile.close();
-    }
-
-    if(!hasEntry3)
-    {
-        if (configFile.open (QIODevice::WriteOnly| QIODevice::Append))
-        {
-            QTextStream stream( &configFile );
-            stream << QString("ShowDeleteFormelMessageBox=true;") << "\n";
-        }
-        configFile.close();
-    }
 
     fill_dict_combobox();
 
@@ -1200,14 +1148,12 @@ void MainWindow::on_btt_Calc_clicked()
         ui->frame->setEnabled(false);
         ui->btt_OpenSignal->setEnabled(false);
         ui->btt_Calc->setText("cancel");
-        //ui->tbv_Results->setEnabled(false);
         ui->cb_channels->setEnabled(false);
         ui->cb_all_select->setEnabled(false);
         ui->dsb_from->setEnabled(false);
         ui->dsb_to->setEnabled(false);
         ui->sb_sample_count ->setEnabled(false);
 
-        _row_count = 0;
         ui->tbv_Results->setRowCount(0);
         ui->lb_IterationsProgressValue->setText("0");
         ui->lb_RestEnergieResiduumValue->setText("0");
@@ -1229,11 +1175,9 @@ void MainWindow::on_btt_Calc_clicked()
             ui->tbv_Results->setColumnWidth(0,55);
             ui->tbv_Results->setColumnWidth(1,280);
 
-
-
-            QFile ownDict(QString("Matching-Pursuit-Toolbox/%1.dict").arg(ui->cb_Dicts->currentText()));
             // ToDo: size from dict
-            _atom_sum_matrix = MatrixXd::Zero(256,1);
+            //QFile ownDict(QString("Matching-Pursuit-Toolbox/%1.dict").arg(ui->cb_Dicts->currentText()));
+            //_atom_sum_matrix = MatrixXd::Zero(256,1);
             //QFuture<void> f1 = QtConcurrent::run(&mpCalc, ownDict, _signal_matrix.col(0), ui->sb_Iterations->value());
             //f1.waitForFinished();
             calc_fix_mp(QString("Matching-Pursuit-Toolbox/%1.dict").arg(ui->cb_Dicts->currentText()), _signal_matrix.col(0), criterion);
@@ -1287,7 +1231,7 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
                                 adaptive_atom_list adaptive_atom_res_list, fix_dict_atom_list fix_dict_atom_res_list)
 {
     _tbv_is_loading = true;
-    _row_count++;
+    //_row_count++;
 
     qreal percent = ui->dsb_energy->value();
     qreal residuum_energy = 100 * (max_energy - current_energy) / max_energy;
@@ -1327,6 +1271,8 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
         qSort(_adaptive_atom_list.begin(),_adaptive_atom_list.end(), sort_Energie);
         qSort(adaptive_atom_res_list.begin(),adaptive_atom_res_list.end(), sort_Energie);
 
+        //index = _adaptive_atom_list.indexOf(temp_atom);
+
         qint32 index = 0;
         while(index < adaptive_atom_res_list.length())
         {
@@ -1345,42 +1291,36 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
         ui->tbv_Results->setItem(index, 2, atomTranslationItem);
         ui->tbv_Results->setItem(index, 3, atomModulationItem);
         ui->tbv_Results->setItem(index, 4, atomPhaseItem);
-
-        //update residuum and atom sum for painting and later save to hdd
-        _residuum_matrix = residuum;
-        _atom_sum_matrix = _signal_matrix - _residuum_matrix;
-
-        //ToDo: consider if the atom sum can be calculated as above or should be done like below, as this is more accurate but maybe unimportant?
-        //GaborAtom gaborAtom = atom_res_list.last();
-        //for(qint32 i = 0; i < _signal_matrix.cols(); i++)
-        //    _atom_sum_matrix.col(i) += gaborAtom.max_scalar_list.at(i) * discrete_atoms.at(i);
     }
     else if(adaptive_atom_res_list.isEmpty())
-    {        
-        ui->tbv_Results->setRowCount(_row_count);
-        _fix_dict_atom_list.append(fix_dict_atom_res_list);
+    {
+        FixDictAtom temp_atom = fix_dict_atom_res_list.last();
+        ui->tbv_Results->setRowCount(fix_dict_atom_res_list.length());
 
-        qreal percent_atom_energy = 100 * /*TODO add atomenergie*/ 4 / max_energy;
-
+        qreal percent_atom_energy = 100 * temp_atom.energy / max_energy;
 
         QTableWidgetItem* atom_energie_item = new QTableWidgetItem(QString::number(percent_atom_energy, 'f', 2));
         QTableWidgetItem* atom_name_item = new QTableWidgetItem(fix_dict_atom_res_list.last().atom_formula);
 
 
-        atom_energie_item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
-        atom_name_item->setFlags(Qt::ItemIsEnabled);
+        atom_energie_item->setFlags(Qt::ItemIsUserCheckable);
+        atom_name_item->setFlags(Qt::NoItemFlags);
+
         atom_energie_item->setCheckState(Qt::Checked);
 
         atom_energie_item->setTextAlignment(0x0082);
         atom_name_item->setTextAlignment(0x0082);
 
+         _fix_dict_atom_list.append(temp_atom);
+
         ui->tbv_Results->setItem(ui->tbv_Results->rowCount()- 1, 0, atom_energie_item);
         ui->tbv_Results->setItem(ui->tbv_Results->rowCount() - 1, 1, atom_name_item);
-
-
-        _residuum_matrix = residuum;
-        _atom_sum_matrix = _signal_matrix - _residuum_matrix;
     }
+
+
+    //update residuum and atom sum for painting and later save to hdd
+    _residuum_matrix = residuum;
+    _atom_sum_matrix = _signal_matrix - _residuum_matrix;
 
     //progressbar update
     qint32 prgrsbar_adapt = 99;
@@ -1425,7 +1365,7 @@ void MainWindow::tbv_selection_changed(const QModelIndex& topLeft, const QModelI
         ui->cb_all_select->setCheckState(Qt::PartiallyChecked);
 
     QTableWidgetItem* item = ui->tbv_Results->item(topLeft.row(), 0);
-    if(topLeft.row() == _row_count)
+    if(topLeft.row() == ui->tbv_Results->rowCount() - 1)
     {
         if(item->checkState())
         {
@@ -1469,24 +1409,24 @@ void MainWindow::tbv_selection_changed(const QModelIndex& topLeft, const QModelI
         }
         else
         {
-            // ToDo: Multichannel
-            VectorXd  discret_atom = _fix_dict_atom_list.at(topLeft.row()).vector_list.first();
+            FixDictAtom  atom = _fix_dict_atom_list.at(topLeft.row());
             if(!_auto_change)
                 _select_atoms_map[topLeft.row()] = item->checkState();
+
             if(item->checkState())
             {
                 for(qint32 channels = 0; channels < _signal_matrix.cols(); channels++)
                 {
-                    _atom_sum_matrix.col(channels) += discret_atom;
-                    _residuum_matrix.col(channels) -= discret_atom;
+                    _atom_sum_matrix.col(channels) += atom.max_scalar_list.at(channels) * atom.vector_list.at(channels);
+                    _residuum_matrix.col(channels) -= atom.max_scalar_list.at(channels) * atom.vector_list.at(channels);
                 }
             }
             else
             {
                 for(qint32 channels = 0; channels < _signal_matrix.cols(); channels++)
                 {
-                    _atom_sum_matrix.col(channels) -= discret_atom;
-                    _residuum_matrix.col(channels) += discret_atom;
+                    _atom_sum_matrix.col(channels) -= atom.max_scalar_list.at(channels) * atom.vector_list.at(channels);
+                    _residuum_matrix.col(channels) += atom.max_scalar_list.at(channels) * atom.vector_list.at(channels);
                 }
             }
         }
@@ -1523,16 +1463,16 @@ void MainWindow::calc_thread_finished()
 
     _real_residuum_matrix = _residuum_matrix;
 
-    for(qint32 i = 0; i < _row_count; i++)
+    for(qint32 i = 0; i < ui->tbv_Results->rowCount(); i++)
         _select_atoms_map.insert(i, true);
 
-    ui->tbv_Results->setRowCount(_row_count + 1);
+    ui->tbv_Results->setRowCount(ui->tbv_Results->rowCount() + 1);
     QTableWidgetItem* residuumItem = new QTableWidgetItem("residuum");
     residuumItem->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
     residuumItem->setCheckState(Qt::Unchecked);
     residuumItem->setTextAlignment(Qt::AlignCenter);
-    ui->tbv_Results->setItem(_row_count, 0, residuumItem);
-    ui->tbv_Results->setSpan(_row_count, 0, 1, 5);
+    ui->tbv_Results->setItem(ui->tbv_Results->rowCount() - 1, 0, residuumItem);
+    ui->tbv_Results->setSpan(ui->tbv_Results->rowCount() - 1, 0, 1, 5);
 
     _tbv_is_loading = false;
 
@@ -1553,10 +1493,6 @@ void MainWindow::calc_adaptiv_mp(MatrixXd signal, TruncationCriterion criterion)
     //threading
     mp_Thread = new QThread;
     adaptive_Mp->moveToThread(mp_Thread);
-    qRegisterMetaType<Eigen::MatrixXd>("MatrixXd");
-    qRegisterMetaType<Eigen::VectorXd>("VectorXd");
-    qRegisterMetaType<adaptive_atom_list>("adaptive_atom_list");
-    qRegisterMetaType<fix_dict_atom_list>("fix_dict_atom_list");
 
     connect(this, SIGNAL(send_input(MatrixXd, qint32, qreal, bool, bool, qint32, qreal, qreal, qreal, qreal)),
             adaptive_Mp, SLOT(recieve_input(MatrixXd, qint32, qreal, bool, bool, qint32, qreal, qreal, qreal, qreal)));
@@ -1602,8 +1538,6 @@ void MainWindow::calc_adaptiv_mp(MatrixXd signal, TruncationCriterion criterion)
 
 //************************************************************************************************************************************
 
-// TODO: Calc MP (new)
-// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 void MainWindow::calc_fix_mp(QString path, MatrixXd signal, TruncationCriterion criterion)
 {
     fixDict_Mp = new FixDictMp();
@@ -1654,260 +1588,7 @@ void MainWindow::calc_fix_mp(QString path, MatrixXd signal, TruncationCriterion 
         }
         break;
     }
-    /*
-    _tbv_is_loading = true;
-
-
-        ui->lb_IterationsProgressValue->setText(QString::number(iterationsCount));
-
-        //current atoms list update
-        ui->tbv_Results->setRowCount(_my_atom_list.length());
-
-        qreal phase = _my_atom_list.last().phase;
-        if(phase > 2*PI)
-            phase = phase - 2*PI;
-
-       QTableWidgetItem* atomEnergieItem = new QTableWidgetItem(QString::number(4.0000, 'f', 2));
-       QTableWidgetItem* atomScaleItem = new QTableWidgetItem(QString::number(_my_atom_list.last().scale / ui->sb_sample_rate->value(), 'g', 3));
-       QTableWidgetItem* atomTranslationItem = new QTableWidgetItem(QString::number(_my_atom_list.last().translation / qreal(ui->sb_sample_rate->value()) + _from, 'g', 4));
-       QTableWidgetItem* atomModulationItem = new QTableWidgetItem(QString::number(_my_atom_list.last().modulation * _sample_rate / _my_atom_list.last().sample_count, 'g', 3));
-       QTableWidgetItem* atomPhaseItem = new QTableWidgetItem(QString::number(phase, 'g', 3));
-
-
-       atomEnergieItem->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
-       atomScaleItem->setFlags(Qt::ItemIsEnabled);
-       atomTranslationItem->setFlags(Qt::ItemIsEnabled);
-       atomModulationItem->setFlags(Qt::ItemIsEnabled);
-       atomPhaseItem->setFlags(Qt::ItemIsEnabled);
-
-       atomEnergieItem->setCheckState(Qt::Checked);
-
-       atomEnergieItem->setTextAlignment(0x0082);
-       atomScaleItem->setTextAlignment(0x0082);
-       atomTranslationItem->setTextAlignment(0x0082);
-       atomModulationItem->setTextAlignment(0x0082);
-       atomPhaseItem->setTextAlignment(0x0082);
-
-       ui->tbv_Results->setItem(_my_atom_list.length() - 1, 0, atomEnergieItem);
-       ui->tbv_Results->setItem(_my_atom_list.length() - 1, 1, atomScaleItem);
-       ui->tbv_Results->setItem(_my_atom_list.length() - 1, 2, atomTranslationItem);
-       ui->tbv_Results->setItem(_my_atom_list.length() - 1, 3, atomModulationItem);
-       ui->tbv_Results->setItem(_my_atom_list.length() - 1, 4, atomPhaseItem);
-
-
-    update();
-
-    if(iterationsCount > 0)
-    {
-        QFile ownDict(QString("Matching-Pursuit-Toolbox/%1.dict").arg(ui->cb_Dicts->currentText()));
-        calc_fix_mp(ownDict, residuum.col(0), iterationsCount);
-
-    }
-
-    calc_thread_finished();
-    _counter_timer->stop();
-    ui->lb_timer->setText(_counter_time.toString("hh:mm:ss.zzz"));
-    return residuum;
-
-
-/*
-
-        // Subtraktion des Atoms vom Signal
-        for(qint32 m = 0; m < normBestCorrAtomSamples.rows(); m++)
-        {
-            // TODO:
-            //signalSamples.append(0);
-            //signalSamples.prepend(0);
-        }
-
-        residuum = signalSamples;
-        for(qint32 i = 0; i < normBestCorrAtomSamples.rows(); i++)
-        {
-            residuum[normBestCorrAtomSamples.rows() + i + bestCorrStartIndex] = signalSamples[normBestCorrAtomSamples.rows() + i + bestCorrStartIndex] - normBestCorrAtomSamples[i];
-            //residuum.removeAt(normBestCorrAtomSamples.rows() + i + bestCorrStartIndex + 1);
-        }
-
-        // Loescht die Nullen wieder
-        for(qint32 j = 0; j < normBestCorrAtomSamples.rows(); j++)
-        {
-            // TODO:
-            //residuum.removeAt(0);
-            //residuum.removeAt(residuum.rows() - 1);
-            //signalSamples.removeAt(0);
-            //signalSamples.removeAt(signalSamples.rows() - 1);
-        }
-
-        iterationsCount++;
-
-        // Traegt das gefunden Atom in eine Liste ein
-        bestAtom.append(bestCorrName);
-        bestAtom.append(QString("%1").arg(bestCorrStartIndex));
-        bestAtom.append(QString("%1").arg(bestCorrValue));
-        QString newSignalString = "";
-        for(qint32 i = 0; i < normBestCorrAtomSamples.rows(); i++)
-            newSignalString.append(QString("%1/n").arg(normBestCorrAtomSamples[i]));
-
-        bestAtom.append(newSignalString);
-        //globalResultAtomList.append(bestAtom);
-
-
-        //***************** DEBUGGOUT **********************************************************************************
-        QFile newSignal("Matching-Pursuit-Toolbox/newSignal.txt");
-        if(!newSignal.exists())
-        {
-            if (newSignal.open(QIODevice::ReadWrite | QIODevice::Text))
-            newSignal.close();
-        }
-        else    newSignal.remove();
-
-        if(!newSignal.exists())
-        {
-            if (newSignal.open(QIODevice::ReadWrite | QIODevice::Text))
-            newSignal.close();
-        }
-
-        if (newSignal.open (QIODevice::WriteOnly| QIODevice::Append))
-        {
-            QTextStream stream( &newSignal );
-            for(qint32 i = 0; i < residuum.rows(); i++)
-            {
-                QString temp = QString("%1").arg(residuum[i]);
-                stream << temp << "\n";
-            }
-        }
-        newSignal.close();
-
-        //**************************************************************************************************************
-/*
-
-        // Eintragen und Zeichnen der Ergebnisss in die Liste der UI
-        ui->tw_Results->setRowCount(iterationsCount);
-        QTableWidgetItem* atomNameItem = new QTableWidgetItem(bestCorrName);
-
-        // Berechnet die Energie des Atoms mit dem NormFaktor des Signals
-        qreal normAtomEnergie = 0;
-        for(qint32 i = 0; i < normBestCorrAtomSamples.rows(); i++)
-            normAtomEnergie += normBestCorrAtomSamples[i] * normBestCorrAtomSamples[i];
-
-        QTableWidgetItem* atomEnergieItem = new QTableWidgetItem(QString("%1").arg(normAtomEnergie / signalEnergie * 100));
-
-        //AtomWindow *atomWidget = new AtomWindow();
-        //atomWidget->update();
-        //ui->tw_Results->setItem(iterationsCount - 1, 1, atomWidget);
-        //atomWidget->update();
-        //QTableWidgetItem* atomItem = new QTableWidgetItem();
-        //atomItem->
-
-        ui->tw_Results->setItem(iterationsCount - 1, 0, atomNameItem);
-        ui->tw_Results->setItem(iterationsCount - 1, 2, atomEnergieItem);
-
-
-        ui->lb_IterationsProgressValue->setText(QString("%1").arg(iterationsCount));
-        for(qint32 i = 0; i < residuum.rows(); i++)
-            residuumEnergie += residuum[i] * residuum[i];
-        if(residuumEnergie == 0)    ui->lb_RestEnergieResiduumValue->setText("0%");
-        else    ui->lb_RestEnergieResiduumValue->setText(QString("%1%").arg(residuumEnergie / signalEnergie * 100));
-
-        // Ueberprueft die Abbruchkriterien
-        if(ui->chb_Iterations->isChecked() && ui->chb_ResEnergy->isChecked())
-        {
-            ui->progressBarCalc->setMaximum((1-sollEnergie)*100);
-            processValue = (1 - residuumEnergie / signalEnergie + sollEnergie)*100;
-            ui->progressBarCalc->setValue(processValue);
-            if(ui->sb_Iterations->value() <= iterationsCount)
-                ui->progressBarCalc->setValue(ui->progressBarCalc->maximum());
-
-            if(ui->sb_Iterations->value() > iterationsCount && sollEnergie < residuumEnergie)
-                residuum = mpCalc(currentDict, residuum, iterationsCount);
-        }
-        else if(ui->chb_Iterations->isChecked())
-        {
-            ui->progressBarCalc->setMaximum(ui->sb_Iterations->value());
-            processValue++;
-            ui->progressBarCalc->setValue(processValue);
-
-            if(ui->sb_Iterations->value() > iterationsCount)
-                residuum = mpCalc(currentDict, residuum, iterationsCount);
-        }
-        else if(ui->chb_ResEnergy->isChecked())
-        {
-            ui->progressBarCalc->setMaximum((1-sollEnergie)*100);
-            processValue = (1 - residuumEnergie / signalEnergie + sollEnergie)*100;
-            ui->progressBarCalc->setValue(processValue);
-
-            if(sollEnergie < residuumEnergie)
-                residuum = mpCalc(currentDict, residuum, iterationsCount);
-        }
-        */
-    //}
-
-
 }
-
-/*
-// Berechnung das Skalarprodukt zwischen Atom und Signal
-QStringList MainWindow::correlation(VectorXd signalSamples, QList<qreal> atomSamples, QString atomName)
-{    
-    qreal sum = 0;
-    qint32 index = 0;
-    qreal maximum = 0;
-    //qreal sumAtom = 0;
-
-    VectorXd originalSignalList = signalSamples;
-    QList<qreal> tempList;
-    QList<qreal> scalarList;    
-    QStringList resultList;
-
-    resultList.clear();
-    tempList.clear();
-
-
-    // Fuellt das Signal vorne und hinten mit nullen auf damit Randwertproblem umgangen wird
-    MatrixXd null_signal_samples(2,2);
-    null_signal_samples = MatrixXd::Zero(signalSamples.rows() + (2 * atomSamples.length()), 1);
-    qint32 j = 0;
-    for(qint32 i = atomSamples.length(); i < atomSamples.length() +  signalSamples.rows(); i++)
-    {
-        null_signal_samples.row(i) = signalSamples.row(j);
-        j++;
-    }
-
-    //******************************************************************************************************************
-
-    for(qint32 j = 0; j < originalSignalList.rows() + atomSamples.length() -1; j++)
-    {
-        // Inners Produkt des Signalteils mit dem Atom
-        for(qint32 g = 0; g < atomSamples.length(); g++)
-        {
-            tempList.append(null_signal_samples(g + j, 0) * atomSamples.at(g));
-            sum += tempList.at(g);
-        }
-        scalarList.append(sum);
-        tempList.clear();
-        sum = 0;
-    }
-
-    //Maximum und Index des Skalarproduktes finden unabhaengig ob positiv oder negativ
-    for(qint32 k = 0; k < scalarList.length(); k++)
-    {
-        if(fabs(maximum) < fabs(scalarList.at(k)))
-        {
-            maximum = scalarList.at(k);
-            index = k;
-        }
-    }
-
-    // Liste mit dem Name des Atoms, Index und hoechster Korrelationskoeffizent
-    resultList.append(atomName);
-    resultList.append(QString("%1").arg(index));     // Gibt den Signalindex fuer den Startpunkt des Atoms wieder
-    resultList.append(QString("%1").arg(maximum));
-
-    return resultList;
-    // die Stelle, an der die Korrelation am groessten ist ergibt sich aus:
-    // dem Index des hoechsten Korrelationswertes minus die halbe Atomlaenge,
-
-}
-*/
 
 //*****************************************************************************************************************
 

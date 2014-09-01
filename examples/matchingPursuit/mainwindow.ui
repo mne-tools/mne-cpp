@@ -588,8 +588,8 @@
      <string>Edit</string>
     </property>
     <addaction name="actionW_rterbucheditor"/>
-    <addaction name="actionErweiterter_W_rterbucheditor"/>
     <addaction name="actionAtomformeleditor"/>
+    <addaction name="actionErweiterter_W_rterbucheditor"/>
     <addaction name="actionCreate_treebased_dictionary"/>
     <addaction name="separator"/>
     <addaction name="actionSettings"/>
@@ -691,7 +691,7 @@
      <normaloff>:/images/icons/pen.png</normaloff>:/images/icons/pen.png</iconset>
    </property>
    <property name="text">
-    <string>dictionary editor</string>
+    <string>manage dictionaries...</string>
    </property>
   </action>
   <action name="actionErweiterter_W_rterbucheditor">
@@ -700,7 +700,7 @@
      <normaloff>:/images/icons/design.png</normaloff>:/images/icons/design.png</iconset>
    </property>
    <property name="text">
-    <string>advanced dictionary editor</string>
+    <string>build dictionary from formula...</string>
    </property>
   </action>
   <action name="actionAtomformeleditor">
@@ -709,7 +709,7 @@
      <normaloff>:/images/icons/ruler.png</normaloff>:/images/icons/ruler.png</iconset>
    </property>
    <property name="text">
-    <string>atom formula editor</string>
+    <string>create formula...</string>
    </property>
   </action>
   <action name="actionCreate_treebased_dictionary">

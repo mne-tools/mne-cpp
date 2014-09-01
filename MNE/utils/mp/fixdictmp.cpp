@@ -33,7 +33,7 @@
 *
 *
 * @brief    Implemetation of the Matching Pursuit Algorithm using static atom dictionaries to find best matching
-*           aproximation of signals.
+*           approximation of signals.
 *
 */
 
@@ -59,7 +59,6 @@ using namespace UTILSLIB;
 
 FixDictMp::FixDictMp()
 : it(0)
-, max_it(0)
 , signal_energy(0)
 , current_energy(0)
 {
@@ -293,19 +292,19 @@ void FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal e
         signalSamples = VectorXd::Zero(sample_count);
         bestCorrValue = 0;
         temp_energy = 0;
+
+        delete fix_dict_atom;
         it++;
-        emit current_result(it, max_it, current_energy, signal_energy, residuum, adaptive_list, fix_dict_list);
+
+        emit current_result(it, max_iterations, current_energy, signal_energy, residuum, adaptive_list, fix_dict_list);
 
         if( QThread::currentThread()->isInterruptionRequested())
             break;
-
-        delete fix_dict_atom;
 
     }//end while iterations
 
     std::cout << "\nFixDict Matching Pursuit Algorithm finished.\n";
     emit finished_calc();
-
     //return atom_list;
 }
 
