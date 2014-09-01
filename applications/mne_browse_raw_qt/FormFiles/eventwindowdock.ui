@@ -39,16 +39,6 @@
   </property>
   <widget class="QWidget" name="dockWidgetContents">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="0" column="0">
-     <widget class="QCheckBox" name="m_checkBox_activateEvents">
-      <property name="text">
-       <string>Activate events</string>
-      </property>
-      <property name="checked">
-       <bool>true</bool>
-      </property>
-     </widget>
-    </item>
     <item row="2" column="0">
      <widget class="QLabel" name="m_label_filterTypes">
       <property name="minimumSize">
@@ -59,6 +49,16 @@
       </property>
       <property name="text">
        <string>Filter event types:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="0">
+     <widget class="QCheckBox" name="m_checkBox_activateEvents">
+      <property name="text">
+       <string>Activate events</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
       </property>
      </widget>
     </item>
@@ -100,6 +100,9 @@
       <property name="dragDropOverwriteMode">
        <bool>false</bool>
       </property>
+      <property name="selectionMode">
+       <enum>QAbstractItemView::SingleSelection</enum>
+      </property>
       <property name="textElideMode">
        <enum>Qt::ElideMiddle</enum>
       </property>
@@ -111,7 +114,7 @@
     <item row="1" column="0" colspan="2">
      <widget class="QCheckBox" name="m_checkBox_showSelectedEventsOnly">
       <property name="text">
-       <string>Show selected events only</string>
+       <string>Show selected event only</string>
       </property>
      </widget>
     </item>

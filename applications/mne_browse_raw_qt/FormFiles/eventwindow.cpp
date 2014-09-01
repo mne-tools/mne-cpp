@@ -119,7 +119,14 @@ void EventWindow::initComboBoxes()
     ui->m_comboBox_filterTypes->addItem("All");
     ui->m_comboBox_filterTypes->addItems(m_qSettings.value("EventDesignParameters/event_types").value<QStringList>());
     ui->m_comboBox_filterTypes->setCurrentText("All");
+
+    //Connect filter types to event model
+    connect(ui->m_comboBox_filterTypes,&QComboBox::currentTextChanged,
+                this,[=](QString string){
+        m_pMainWindow->m_pEventModel->setEventFilterType(string);
+    });
 }
+
 
 //*************************************************************************************************************
 
