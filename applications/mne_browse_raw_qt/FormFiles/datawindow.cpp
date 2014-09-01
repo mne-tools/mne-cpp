@@ -151,7 +151,8 @@ void DataWindow::initLabels()
     //Set current marker sample label to vertical spacer position and initalize text
     m_pCurrentDataMarkerLabel->setAlignment(Qt::AlignHCenter);
     m_pCurrentDataMarkerLabel->move(m_pDataMarker->geometry().left(), m_pDataMarker->geometry().top() + 5);
-    m_pCurrentDataMarkerLabel->setText(QString().number(m_iCurrentMarkerSample));
+    QString numberString = QString().number(m_iCurrentMarkerSample);
+    m_pCurrentDataMarkerLabel->setText(numberString.append(QString(" / %1").arg("0 sec")));
 
     //Set color
     QPalette palette;
@@ -357,7 +358,8 @@ void DataWindow::setMarkerSampleLabel()
     m_iCurrentMarkerSample = ui->m_tableView_rawTableView->horizontalScrollBar()->value() +
             (m_pDataMarker->geometry().x() - ui->m_tableView_rawTableView->geometry().x() - ui->m_tableView_rawTableView->verticalHeader()->width());
 
-    m_pCurrentDataMarkerLabel->setText(QString().number(m_iCurrentMarkerSample));
+    QString numberString = QString("%1 / %2 sec").arg(QString().number(m_iCurrentMarkerSample)).arg(QString().number(m_iCurrentMarkerSample/m_pMainWindow->m_pRawModel->m_fiffInfo.sfreq,'g',3));
+    m_pCurrentDataMarkerLabel->setText(numberString);
 
     m_pCurrentDataMarkerLabel->move(m_pDataMarker->geometry().left() + (m_qSettings.value("DataMarker/data_marker_width").toInt()/2) - (m_pCurrentDataMarkerLabel->width()/2) + 1, m_pDataMarker->geometry().top() - 20);
 

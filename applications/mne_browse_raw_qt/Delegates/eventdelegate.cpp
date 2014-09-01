@@ -80,6 +80,7 @@ QWidget *EventDelegate::createEditor(QWidget *parent,
             QDoubleSpinBox *editor = new QDoubleSpinBox(parent);
             editor->setMinimum(0.0);
             editor->setMaximum(m_pEventModel->getFirstLastSample().second / m_pEventModel->getFiffInfo().sfreq);
+            editor->setSingleStep(0.01);
             return editor;
         }
 
@@ -155,7 +156,6 @@ void EventDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
             break;
         }
     }
-
 }
 
 
@@ -164,7 +164,6 @@ void EventDelegate::setModelData(QWidget *editor, QAbstractItemModel *model,
 void EventDelegate::updateEditorGeometry(QWidget *editor,
     const QStyleOptionViewItem &option, const QModelIndex &/* index */) const
 {
-    qDebug()<<"EventDelegate::updateEditorGeometry";
     editor->setGeometry(option.rect);
 }
 

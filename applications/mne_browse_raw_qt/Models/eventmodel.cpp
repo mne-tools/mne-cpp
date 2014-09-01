@@ -60,6 +60,7 @@ EventModel::EventModel(QObject *parent)
 : QAbstractTableModel(parent)
 , m_iFirstSample(0)
 , m_bFileloaded(false)
+, m_sFilterEventType("All")
 {
 }
 
@@ -70,6 +71,7 @@ EventModel::EventModel(QFile &qFile, QObject *parent)
 : QAbstractTableModel(parent)
 , m_iFirstSample(0)
 , m_bFileloaded(false)
+, m_sFilterEventType("All")
 {
     loadEventData(qFile);
 }
@@ -79,9 +81,11 @@ EventModel::EventModel(QFile &qFile, QObject *parent)
 //virtual functions
 int EventModel::rowCount(const QModelIndex & /*parent*/) const
 {
-    if(!m_dataSamples.size()==0)
-        return m_dataSamples.size();
-    else return 0;
+    //Always return filtered events so that the qTableView gets the correct number of rows which are to be displayed
+    if(!m_dataSamples_Filtered.size()==0)
+        return m_dataSamples_Filtered.size();
+    else
+        return 0;
 }
 
 
@@ -122,10 +126,13 @@ QVariant EventModel::headerData(int section, Qt::Orientation orientation, int ro
 
 QVariant EventModel::data(const QModelIndex &index, int role) const
 {
+    if (role == Qt::TextAlignmentRole )
+        return Qt::AlignCenter | Qt::AlignVCenter;
+
     if(role != Qt::DisplayRole && role != Qt::BackgroundRole)
         return QVariant();
 
-    if(index.row()>=m_dataSamples.size())
+    if(index.row()>=m_dataSamples_Filtered.size())
         return QVariant();
 
     if (index.isValid()) {
@@ -133,11 +140,11 @@ QVariant EventModel::data(const QModelIndex &index, int role) const
         if(index.column()==0) {
             switch(role) {
                 case Qt::DisplayRole:
-                    return QVariant(m_dataSamples.at(index.row())-m_iFirstSample);
+                    return QVariant(m_dataSamples_Filtered.at(index.row())-m_iFirstSample);
 
                 case Qt::BackgroundRole:
                     //Paint different background if event was set by user
-                    if(m_dataIsUserEvent.at(index.row()) == 1) {
+                    if(m_dataIsUserEvent_Filtered.at(index.row()) == 1) {
                         QBrush brush;
                         brush.setStyle(Qt::SolidPattern);
                         QColor colorTemp(Qt::red);
@@ -152,14 +159,14 @@ QVariant EventModel::data(const QModelIndex &index, int role) const
         if(index.column()==1){
             switch(role) {
                 case Qt::DisplayRole: {
-                    int time = ((m_dataSamples.at(index.row()) - m_iFirstSample) / m_fiffInfo.sfreq) * 100;
+                    int time = ((m_dataSamples_Filtered.at(index.row()) - m_iFirstSample) / m_fiffInfo.sfreq) * 100;
 
                     return QVariant((double)time / 100);
                 }
 
                 case Qt::BackgroundRole:
                     //Paint different background if event was set by user
-                    if(m_dataIsUserEvent.at(index.row()) == 1) {
+                    if(m_dataIsUserEvent_Filtered.at(index.row()) == 1) {
                         QBrush brush;
                         brush.setStyle(Qt::SolidPattern);
                         QColor colorTemp(Qt::red);
@@ -174,13 +181,13 @@ QVariant EventModel::data(const QModelIndex &index, int role) const
         if(index.column()==2) {
             switch(role) {
                 case Qt::DisplayRole:
-                    return QVariant(m_dataTypes.at(index.row()));
+                    return QVariant(m_dataTypes_Filtered.at(index.row()));
 
                 case Qt::BackgroundRole: {
                     QBrush brush;
                     brush.setStyle(Qt::SolidPattern);
 
-                    switch(m_dataTypes.at(index.row())) {
+                    switch(m_dataTypes_Filtered.at(index.row())) {
                         default:
                             brush.setColor(m_qSettings.value("EventDesignParameters/event_color_default").value<QColor>());
                         break;
@@ -252,14 +259,24 @@ bool EventModel::insertRows(int position, int span, const QModelIndex & parent)
             for(int t = 0; t<m_dataSamples.size(); t++) {
                 if(m_dataSamples[t] >= m_iCurrentMarkerPos) {
                     m_dataSamples.insert(t, m_iCurrentMarkerPos);
-                    m_dataTypes.insert(t, 1);
+
+                    if(m_sFilterEventType == "All")
+                        m_dataTypes.insert(t, 1);
+                    else
+                        m_dataTypes.insert(t, m_sFilterEventType.toInt());
+
                     m_dataIsUserEvent.insert(t, 1);
                     break;
                 }
 
                 if(t == m_dataSamples.size()-1) {
                     m_dataSamples.append(m_iCurrentMarkerPos);
-                    m_dataTypes.append(1);
+
+                    if(m_sFilterEventType == "All")
+                        m_dataTypes.append(1);
+                    else
+                        m_dataTypes.append(m_sFilterEventType.toInt());
+
                     m_dataIsUserEvent.append(1);
                 }
             }
@@ -269,6 +286,10 @@ bool EventModel::insertRows(int position, int span, const QModelIndex & parent)
     beginInsertRows(QModelIndex(), position, position+span-1);
 
     endInsertRows();
+
+    //Update filtered event data
+    setEventFilterType(m_sFilterEventType);
+
     return true;
 }
 
@@ -278,7 +299,6 @@ bool EventModel::insertRows(int position, int span, const QModelIndex & parent)
 bool EventModel::removeRows(int position, int span, const QModelIndex & parent)
 {
     Q_UNUSED(parent);
-    beginRemoveRows(QModelIndex(), position, position+span-1);
 
     for (int i = 0; i < span; ++i) {
         //Only user events can be deleted
@@ -289,7 +309,13 @@ bool EventModel::removeRows(int position, int span, const QModelIndex & parent)
         }
     }
 
+    beginRemoveRows(QModelIndex(), position, position+span-1);
+
     endRemoveRows();
+
+    //Update filtered event data
+    setEventFilterType(m_sFilterEventType);
+
     return true;
 }
 
@@ -298,8 +324,8 @@ bool EventModel::removeRows(int position, int span, const QModelIndex & parent)
 
 Qt::ItemFlags EventModel::flags(const QModelIndex & index) const
 {
-    //Return editable mode only for user events
-    if(m_dataIsUserEvent[index.row()] == 1)
+    //Return editable mode only for user events an when event type filtering is deactivated
+    if(m_dataIsUserEvent_Filtered[index.row()] == 1 && m_sFilterEventType == "All")
         return Qt::ItemIsEnabled | Qt::ItemIsSelectable | Qt::ItemIsEditable;
     else
         return Qt::ItemIsEnabled | Qt::ItemIsSelectable;
@@ -310,7 +336,7 @@ Qt::ItemFlags EventModel::flags(const QModelIndex & index) const
 
 bool EventModel::setData(const QModelIndex & index, const QVariant & value, int role)
 {
-    if(index.row() >= rowCount() || index.column() >= columnCount())
+    if(index.row() >= m_dataSamples.size() || index.column() >= columnCount())
         return false;
 
     if(role == Qt::EditRole) {
@@ -322,9 +348,6 @@ bool EventModel::setData(const QModelIndex & index, const QVariant & value, int 
 
             case 1:
                 m_dataSamples[index.row()] = (int)value.toInt() * m_fiffInfo.sfreq + m_iFirstSample;
-
-                qDebug()<<"(int)value.toInt() * m_fiffInfo.sfreq"<<(int)value.toInt() * m_fiffInfo.sfreq;
-
                 break;
 
             case 2:
@@ -333,6 +356,9 @@ bool EventModel::setData(const QModelIndex & index, const QVariant & value, int 
                 break;
         }
     }
+
+    //Update filtered event data
+    setEventFilterType(m_sFilterEventType);
 
     return true;
 }
@@ -363,6 +389,11 @@ bool EventModel::loadEventData(QFile& qFile)
         m_dataTypes.append(events(i,2));
         m_dataIsUserEvent.append(0);
     }
+
+    //Set filtered events to original
+    m_dataSamples_Filtered = m_dataSamples;
+    m_dataTypes_Filtered = m_dataTypes;
+    m_dataIsUserEvent_Filtered = m_dataIsUserEvent;
 
     endResetModel();
 
@@ -433,12 +464,48 @@ QPair<int, int> EventModel::getFirstLastSample()
 
 //*************************************************************************************************************
 
+void EventModel::setEventFilterType(const QString eventType)
+{
+    m_sFilterEventType = eventType;
+
+    //Clear filtered event data
+    m_dataSamples_Filtered.clear();
+    m_dataTypes_Filtered.clear();
+    m_dataIsUserEvent_Filtered.clear();
+
+    //Fill filtered event data depending on the user defined event filter type
+    if(eventType == "All") {
+        m_dataSamples_Filtered = m_dataSamples;
+        m_dataTypes_Filtered = m_dataTypes;
+        m_dataIsUserEvent_Filtered = m_dataIsUserEvent;
+    }
+    else {
+        for(int i = 0; i<m_dataSamples.size(); i++) {
+            if(m_dataTypes[i] == eventType.toInt()) {
+                m_dataSamples_Filtered.append(m_dataSamples[i]);
+                m_dataTypes_Filtered.append(m_dataTypes[i]);
+                m_dataIsUserEvent_Filtered.append(m_dataIsUserEvent[i]);
+            }
+        }
+    }
+
+    emit dataChanged(createIndex(0,0),createIndex(m_dataSamples_Filtered.size(),0));
+    emit headerDataChanged(Qt::Vertical, 0, m_dataSamples_Filtered.size());
+}
+
+
+//*************************************************************************************************************
+
 void EventModel::clearModel()
 {
     //clear event data model structure
     m_dataSamples.clear();
     m_dataTypes.clear();
     m_dataIsUserEvent.clear();
+
+    m_dataSamples_Filtered.clear();
+    m_dataTypes_Filtered.clear();
+    m_dataIsUserEvent_Filtered.clear();
 
     qDebug("EventModel cleared.");
 }
