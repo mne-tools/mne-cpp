@@ -347,7 +347,7 @@ bool EventModel::setData(const QModelIndex & index, const QVariant & value, int 
                 break;
 
             case 1:
-                m_dataSamples[index.row()] = (int)value.toInt() * m_fiffInfo.sfreq + m_iFirstSample;
+                m_dataSamples[index.row()] = value.toDouble() * m_fiffInfo.sfreq + m_iFirstSample;
                 break;
 
             case 2:
