@@ -112,6 +112,7 @@ EditorWindow::EditorWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::Ed
 {   
     this->setAccessibleName("simple");
     ui->setupUi(this);
+
     // set chirp visibility
     ui->rb_ChirpAtomType->setVisible(false);
     ui->fr_Chirp->setVisible(false);
@@ -129,6 +130,7 @@ EditorWindow::~EditorWindow()
 
 void EditorWindow::read_dicts()
 {
+    ui->list_AllDict->clear();
     QDir dictDir = QDir("Matching-Pursuit-Toolbox");
 
     QStringList filterList;
@@ -184,12 +186,13 @@ void EditorWindow::calc_atom_count_all_combined()
     else if( atomType == EditorWindow::Chirp)
         count = scaleCount * moduCount * phaseCount * chirpCount;
 
-    if(count > 1000000)
+    if(count > 100000000)
     {
         QMessageBox::warning(this, tr("Error"),
         tr("The number of atoms is too large."));
         return;
-    }
+    }    
+    atomCount = count;
     ui->spb_AtomCount->setValue(count);
 }
 
@@ -552,11 +555,6 @@ void EditorWindow::calc_chirp_value()
 void EditorWindow::on_tb_PartDictName_editingFinished()
 {
     partDictName = ui->tb_PartDictName->text();
-
-    calc_scale_value();
-    calc_modu_value();
-    calc_phase_value();
-    calc_chirp_value();
 }
 
 //*************************************************************************************************************
@@ -565,13 +563,6 @@ void EditorWindow::on_tb_PartDictName_editingFinished()
 void EditorWindow::on_chb_CombAllPara_toggled(bool checked)
 {
     allCombined = checked;
-    if(checked)
-    {
-        ui->spb_AtomCount->setMaximum(1000000);
-        ui->spb_AtomCount->setMinimum(0);
-        ui->spb_AtomCount->setValue(0);
-    }
-    else ui->spb_AtomCount->setMinimum(1);
 
     ui->spb_AtomCount->setDisabled(checked);
     ui->dspb_EndValueScale->setEnabled(true);
@@ -579,15 +570,15 @@ void EditorWindow::on_chb_CombAllPara_toggled(bool checked)
     ui->dspb_EndValuePhase->setEnabled(true);
     ui->dspb_EndValueChirp->setEnabled(true);
 
-    ui->dspb_LinStepScale->setEnabled(ui->rb_LinStepScale->isChecked());
-    ui->dspb_LinStepModu->setEnabled(ui->rb_LinStepModu->isChecked());
-    ui->dspb_LinStepPhase->setEnabled(ui->rb_LinStepPhase->isChecked());
-    ui->dspb_LinStepChirp->setEnabled(ui->rb_LinStepChirp->isChecked());
+    ui->dspb_LinStepScale->setEnabled(ui->rb_LinStepScale->isChecked() && ui->spb_AtomCount->value() > 1);
+    ui->dspb_LinStepModu->setEnabled(ui->rb_LinStepModu->isChecked() && ui->spb_AtomCount->value() > 1);
+    ui->dspb_LinStepPhase->setEnabled(ui->rb_LinStepPhase->isChecked() && ui->spb_AtomCount->value() > 1);
+    ui->dspb_LinStepChirp->setEnabled(ui->rb_LinStepChirp->isChecked() && ui->spb_AtomCount->value() > 1);
 
-    ui->dspb_ExpStepScale->setEnabled(ui->rb_ExpStepScale->isChecked());
-    ui->dspb_ExpStepModu->setEnabled(ui->rb_ExpStepModu->isChecked());
-    ui->dspb_ExpStepPhase->setEnabled(ui->rb_ExpStepPhase->isChecked());
-    ui->dspb_ExpStepChirp->setEnabled(ui->rb_ExpStepChirp->isChecked());
+    ui->dspb_ExpStepScale->setEnabled(ui->rb_ExpStepScale->isChecked() && ui->spb_AtomCount->value() > 1);
+    ui->dspb_ExpStepModu->setEnabled(ui->rb_ExpStepModu->isChecked() && ui->spb_AtomCount->value() > 1);
+    ui->dspb_ExpStepPhase->setEnabled(ui->rb_ExpStepPhase->isChecked() && ui->spb_AtomCount->value() > 1);
+    ui->dspb_ExpStepChirp->setEnabled(ui->rb_ExpStepChirp->isChecked() && ui->spb_AtomCount->value() > 1);
 
     ui->lb_LinNScale->setEnabled(ui->rb_LinStepScale->isChecked());
     ui->lb_LinNModu->setEnabled(ui->rb_LinStepModu->isChecked());
@@ -656,13 +647,41 @@ void EditorWindow::on_chb_CombAllPara_toggled(bool checked)
         ui->fr_CountDirectionModu->setEnabled(!ui->rb_NoStepModu->isChecked());
         ui->fr_CountDirectionPhase->setEnabled(!ui->rb_NoStepPhase->isChecked());
         ui->fr_CountDirectionChirp->setEnabled(!ui->rb_NoStepChirp->isChecked());
-
-        if(ui->spb_AtomCount->value() == 1)
-        {
-            ui->spb_AtomCount->setValue(2);
-            ui->spb_AtomCount->setValue(1);
-        }
     }
+
+    ui->rb_NoStepScale->setEnabled(checked);
+    ui->rb_NoStepModu->setEnabled(checked);
+    ui->rb_NoStepPhase->setEnabled(checked);
+    ui->rb_NoStepChirp->setEnabled(checked);
+
+    ui->lb_StepDefScale ->setEnabled(checked);
+    ui->lb_StepDefModu ->setEnabled(checked);
+    ui->lb_StepDefPhase ->setEnabled(checked);
+    ui->lb_StepDefChirp ->setEnabled(checked);
+
+    ui->rb_LinStepScale->setEnabled(checked);
+    ui->rb_LinStepModu->setEnabled(checked);
+    ui->rb_LinStepPhase->setEnabled(checked);
+    ui->rb_LinStepChirp->setEnabled(checked);
+
+    ui->rb_ExpStepScale->setEnabled(checked);
+    ui->rb_ExpStepModu->setEnabled(checked);
+    ui->rb_ExpStepPhase->setEnabled(checked);
+    ui->rb_ExpStepChirp->setEnabled(checked);
+
+    ui->lb_LinNScale->setEnabled(checked);
+    ui->lb_LinNModu->setEnabled(checked);
+    ui->lb_LinNPhase->setEnabled(checked);
+    ui->lb_LinNChirp->setEnabled(checked);
+
+    ui->lb_ExpNScale->setEnabled(checked);
+    ui->lb_ExpNModu->setEnabled(checked);
+    ui->lb_ExpNPhase->setEnabled(checked);
+    ui->lb_ExpNChirp->setEnabled(checked);
+
+    // update ui
+    ui->spb_AtomCount->setValue(ui->spb_AtomCount->value() + 1);
+    ui->spb_AtomCount->setValue(ui->spb_AtomCount->value() - 1);
 
     calc_scale_value();
     calc_modu_value();
@@ -675,13 +694,7 @@ void EditorWindow::on_chb_CombAllPara_toggled(bool checked)
 void EditorWindow::on_spb_AtomLength_editingFinished()
 {
     // set max startvalue of scale
-    ui->dspb_StartValueScale->setMaximum(10 * ui->spb_AtomLength->value());
-    startValueScale = ui->dspb_StartValueScale->value();
-
-    calc_scale_value();
-    calc_modu_value();
-    calc_phase_value();
-    calc_chirp_value();
+    ui->dspb_StartValueScale->setMaximum(ui->spb_AtomLength->value());
 }
 
 //*************************************************************************************************************
@@ -689,10 +702,9 @@ void EditorWindow::on_spb_AtomLength_editingFinished()
 // set number of atoms (recalculate stopvalues)
 void EditorWindow::on_spb_AtomCount_valueChanged(int arg1)
 {
-    atomCount = ui->spb_AtomCount->value();
-
+    atomCount = arg1;
     bool oneAtom = true;
-    if(atomCount != 1 || (atomCount == 1 && allCombined)) oneAtom = false;
+    if(atomCount != 1  || atomCount == 1 && allCombined)oneAtom = false;
 
     ui->rb_NoStepScale->setChecked(oneAtom);
     ui->rb_NoStepModu->setChecked(oneAtom);
@@ -1208,13 +1220,11 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
     xml_file.open(QIODevice::WriteOnly);
 
     QXmlStreamWriter xmlWriter(&xml_file);
-
     xmlWriter.setAutoFormatting(true);
-
     xmlWriter.writeStartDocument();
 
     xmlWriter.writeStartElement("COUNT");
-    xmlWriter.writeAttribute("of_atoms", QString::number(ui->spb_AtomLength->value()));
+    xmlWriter.writeAttribute("of_atoms", QString::number(ui->spb_AtomCount->value()));
     xmlWriter.writeStartElement("built_Atoms");
 
     if(atomType == EditorWindow::Chirp)
@@ -1249,21 +1259,14 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
                         qint32 scaleCount = 0;
                         while(scaleCount < scaleList.length())
                         {
-                            qreal tempScale = 0;
-                            if(scaleList.length() == 1) tempScale = scaleList.at(0);
-                            else tempScale = scaleList.at(scaleCount);
-
-                            qreal tempModu = 0;
-                            if(moduList.length() ==1) tempModu = moduList.at(0);
-                            else tempModu = moduList.at(moduCount);
-
-                            qreal tempPhase = 0;
-                            if(phaseList.length() == 1) tempPhase = phaseList.at(0);
-                            else tempPhase = phaseList.at(phaseCount);
-
-                            qreal tempChirp = 0;
-                            if(chirpList.length() == 1) tempChirp = chirpList.at(0);
-                            else tempChirp = chirpList.at(chirpCount);
+                            qreal tempScale = ui->dspb_StartValueScale->value();
+                            if(scaleList.length() > 0 && atomIndex < scaleList.length()) tempScale = scaleList.at(atomIndex);
+                            qreal tempModu = ui->dspb_StartValueModu->value();
+                            if(moduList.length() > 0 && atomIndex < moduList.length()) tempModu = moduList.at(atomIndex);
+                            qreal tempPhase = ui->dspb_StartValuePhase->value();
+                            if(phaseList.length() > 0 && atomIndex < phaseList.length()) tempPhase = phaseList.at(atomIndex);
+                            qreal tempChirp = ui->dspb_StartValueChirp->value();
+                            if(chirpList.length() > 0 && atomIndex < chirpList.length()) tempChirp = chirpList.at(atomIndex);
 
                             if(atomType == EditorWindow::Chirp)
                              {
@@ -1290,8 +1293,8 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
                                 xmlWriter.writeAttribute("scale", QString::number(tempScale));
                                 xmlWriter.writeAttribute("modu", QString::number(tempModu));
                                 xmlWriter.writeAttribute("phase", QString::number(tempPhase));
-
                             }
+
                             for (QStringList::Iterator it = resultList.begin(); it != resultList.end(); it++)
                                 stream << *it << "\n";
 
@@ -1339,21 +1342,14 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
             qint32 i = 0;
             while (i < atomCount)
             {
-                qreal tempScale = 0;
-                if(scaleList.length() == 1) tempScale = scaleList.at(0);
-                else tempScale = scaleList.at(i);
-
-                qreal tempModu = 0;
-                if(moduList.length() ==1) tempModu = moduList.at(0);
-                else tempModu = moduList.at(i);
-
-                qreal tempPhase = 0;
-                if(phaseList.length() == 1) tempPhase = phaseList.at(0);
-                else tempPhase = phaseList.at(i);
-
-                qreal tempChirp = 0;
-                if(chirpList.length() == 1) tempChirp = chirpList.at(0);
-                else tempChirp = chirpList.at(i);
+                qreal tempScale = ui->dspb_StartValueScale->value();
+                if(scaleList.length() > 0 && i < scaleList.length()) tempScale = scaleList.at(i);
+                qreal tempModu = ui->dspb_StartValueModu->value();
+                if(moduList.length() > 0 && i < moduList.length()) tempModu = moduList.at(i);
+                qreal tempPhase = ui->dspb_StartValuePhase->value();
+                if(phaseList.length() > 0 && i < phaseList.length()) tempPhase = phaseList.at(i);
+                qreal tempChirp = ui->dspb_StartValueChirp->value();
+                if(chirpList.length() > 0 && i < chirpList.length()) tempChirp = chirpList.at(i);
 
                 if(atomType == EditorWindow::Chirp)
                  {
@@ -1409,18 +1405,8 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
 
     xml_file.close();
 
-    QListWidgetItem *item = new QListWidgetItem;
-    item->setToolTip(QString("%1.pdict").arg(partDictName));
-    item->setIcon(QIcon(":/images/icons/PartDictIcon.png"));
-    item->setText(partDictName);
+    read_dicts();
 
-    ui->list_AllDict->addItem(item);
-
-    item->setToolTip(QString("%1_xml.pdict").arg(partDictName));
-    item->setIcon(QIcon(":/images/icons/PartDictIcon.png"));
-    item->setText(partDictName + "_xml");
-
-    ui->list_AllDict->addItem(item);
     if(ui->list_AllDict->count() > 1) ui->list_AllDict->itemAt(0, 0)->setSelected(true);
 }
 
@@ -1489,9 +1475,16 @@ void EditorWindow::on_list_NewDict_doubleClicked()
 
 void EditorWindow::on_btt_DeleteDict_clicked()
 {    
+    deleteDicts();
+}
+
+//*************************************************************************************************************
+
+void EditorWindow::deleteDicts()
+{
     QSettings settings;
     if(settings.value("show_warnings", true).toBool())
-    {    
+    {
         DeleteMessageBox* msgBox = new DeleteMessageBox(this);
         msgBox->setModal(true);
         qint32 result = msgBox->exec();
@@ -1621,18 +1614,16 @@ void EditorWindow::on_btt_SaveDicts_clicked()
         stream << QString("atomcount = %1").arg(sum);
     }     
 
+    qint32 summarize_atoms = 0;
     QDomDocument xml_dict;
     QDomElement header = xml_dict.createElement("COUNT");
-    QDomElement built;// = xml_dict.documentElement();
-    QDomElement atom;
-    qint32 summarize_atoms = 0;
     for(qint32 i = 0; i < ui->list_NewDict->count(); i++)
     {
         QFile xml_file(QString("Matching-Pursuit-Toolbox/%1").arg(ui->list_NewDict->item(i)->toolTip()));
 
         QDomDocument xml_pdict;
         xml_pdict.setContent(&xml_file);
-        QDomElement xml_root = xml_pdict.documentElement();
+        QDomElement xml_root= xml_pdict.documentElement();
         summarize_atoms += (xml_root.attribute("of_atoms", xml_root.text())).toInt();
 
         QDomNodeList node_list = xml_root.childNodes();
@@ -1640,26 +1631,24 @@ void EditorWindow::on_btt_SaveDicts_clicked()
         for(qint32 ii = 0; ii < count; ii++)
         {
             bool hasElement = false;
-            built = node_list.at(0).toElement();
+            QDomElement built = node_list.at(0).toElement();
             if(built.hasChildNodes())
             {
                 QDomNodeList write_list = header.elementsByTagName("built_Atoms");
                 qint32 count_2 = write_list.count();
                 for(qint32 k = 0; k < count_2; k++)
                 {
-                    QDomElement write_element = write_list.at(0).toElement();
-                    QMessageBox::warning(this, tr("Error"),
-                    built.attribute("source_dict", built.text()) + "==" + write_element.attribute("source_dict", write_element.text()));
+                    QDomElement write_element = write_list.at(k).toElement();
                     if((built.attribute("source_dict", built.text())) == (write_element.attribute("source_dict", write_element.text())))
                     {
                         hasElement = true;
-                        //break;
+                        break;
                     }
                 }
                 if(!hasElement)
                 {
                     header.appendChild(built);
-                    atom = built.firstChild().toElement();
+                    QDomElement atom = built.firstChild().toElement();
                     while(!atom.isNull())
                     {
                         built.appendChild(atom);
@@ -1668,54 +1657,38 @@ void EditorWindow::on_btt_SaveDicts_clicked()
                 }
             }
         }
-
-        /*
-        for(qint32 i = 0; i < built_atoms_list.length(); i++)
-        {
-            QDomElement built = built_atoms_list.at(i).toElement();
-            QDomNodeList atom_list = built.elementsByTagName("ATOM");
-            for(qint32 i = 0; i < atom_list.length(); i++)
-            {
-                built.appendChild(atom_list.at(i).toElement());
-            }
-            header.appendChild(built);
-        }
-        */
-
     }
-     const QString string = xml_dict.toString();
-     QByteArray array = string.toLocal8Bit();
-     char* buffer = array.data();
-    std::cout << "DOC " << buffer;//QChar::(string);
 
     QString xml_new_path = QString("Matching-Pursuit-Toolbox/%1_xml.dict").arg(ui->tb_DictName->text());
     QFile xml_new_file(xml_new_path);
     if(xml_new_file.open(QIODevice::WriteOnly))
     {
         QTextStream xml_stream(&xml_new_file);
-
         QXmlStreamWriter writer(&xml_new_file);
         writer.setAutoFormatting(true);
-
-
         writer.writeStartDocument();
         xml_stream << "\n";
-
         header.setAttribute("of_atoms", QString::number(summarize_atoms));
-        //header.appendChild(built);
         xml_dict.appendChild(header);
-
         xml_dict.save(xml_stream, 4);
-
         writer.writeEndDocument();
     }
     xml_new_file.close();
     newFile.close();
 
-    ui->list_AllDict->clear();
     read_dicts();
     ui->list_NewDict->clear();
     ui->tb_DictName->clear();
 
     emit dict_saved();
+}
+
+//*************************************************************************************************************
+
+void EditorWindow::keyReleaseEvent(QKeyEvent *event)
+{
+    if(event->key() == Qt::Key_Delete && ui->list_AllDict->hasFocus() && ui->list_AllDict->selectedItems().count() > 0)
+    {
+        deleteDicts();
+    }
 }

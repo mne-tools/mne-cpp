@@ -1086,15 +1086,6 @@ void MainWindow::on_btt_Calc_clicked()
             msgBox.exec();
         }
 
-        QSettings settings;
-        if(settings.value("show_warnings", true).toBool())
-        {
-            processdurationmessagebox* msgBox = new processdurationmessagebox(this);
-            msgBox->setModal(true);
-            msgBox->exec();
-            msgBox->close();
-        }
-
         if(ui->chb_Iterations->checkState()  == Qt::Unchecked && ui->chb_ResEnergy->checkState() == Qt::Unchecked)
         {
             QString title = "Error";
@@ -1106,21 +1097,8 @@ void MainWindow::on_btt_Calc_clicked()
 
         if(((ui->dsb_energy->value() <= 1 && ui->dsb_energy->isEnabled()) && (ui->sb_Iterations->value() >= 500 && ui->sb_Iterations->isEnabled())) || (ui->dsb_energy->value() <= 1 && ui->dsb_energy->isEnabled() && !ui->sb_Iterations->isEnabled()) || (ui->sb_Iterations->value() >= 500 && ui->sb_Iterations->isEnabled() && !ui->dsb_energy->isEnabled()) )
         {
-            QFile configFile("Matching-Pursuit-Toolbox/Matching-Pursuit-Toolbox.config");
-            bool showMsgBox = false;
-            QString contents;
-            if (configFile.open(QIODevice::ReadWrite | QIODevice::Text))
-            {
-                while(!configFile.atEnd())
-                {
-                    contents = configFile.readLine(0).constData();
-                    if(QString::compare("ShowProcessDurationMessageBox=true;\n", contents) == 0)
-                        showMsgBox = true;
-                }
-            }
-            configFile.close();
-
-            if(showMsgBox)
+            QSettings settings;
+            if(settings.value("show_warnings", true).toBool())
             {
                 processdurationmessagebox* msgBox = new processdurationmessagebox(this);
                 msgBox->setModal(true);

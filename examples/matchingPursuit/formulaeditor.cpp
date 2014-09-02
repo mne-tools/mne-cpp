@@ -322,7 +322,6 @@ void AtomPaintWindow::paint_signal(QList<qreal> valueList, QSize windowSize)
 
 void Formulaeditor::on_tb_Formula_textChanged(const QString &arg1)
 {
-
     ui->btt_Save->setEnabled(false);
     QList<QChar> foundChar;
     foundChar.clear();
@@ -595,6 +594,18 @@ void Formulaeditor::on_btt_Save_clicked()
     }
     saveFile.close();
 
+    ui->tb_Formula->clear();
+    ui->tb_A->setText("0");
+    ui->tb_B->setText("0");
+    ui->tb_C->setText("0");
+    ui->tb_D->setText("0");
+    ui->tb_E->setText("0");
+    ui->tb_F->setText("0");
+    ui->tb_G->setText("0");
+    ui->tb_H->setText("0");
+    ui->lb_Result->setText("result start value = ---");
+    atomList.clear();
+    update();
 }
 
 //**********************************************************************************************************************

@@ -78,6 +78,7 @@ public:
 private:    
 
     void read_dicts();
+    void deleteDicts();
     void calc_scale_value();
     void calc_modu_value();
     void calc_phase_value();
@@ -159,6 +160,10 @@ signals:
 
 private:    
     Ui::EditorWindow *ui;
+
+protected:
+    //void keyPressEvent(QKeyEvent *event);
+    void keyReleaseEvent(QKeyEvent *event);
 };
 
 #endif // EDITORWINDOW_H
