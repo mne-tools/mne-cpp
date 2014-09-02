@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
-* @file     frequencyspectrumsettingswidget.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     informationwindow.h
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     May, 2014
+* @date     August, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,86 +30,76 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the FrequencySpectrumSettingsWidget Class.
+* @brief    Contains the declaration of the InformationWindow class.
 *
 */
+
+#ifndef INFORMATIONWINDOW_H
+#define INFORMATIONWINDOW_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "frequencyspectrumsettingswidget.h"
-#include "../frequencyspectrumwidget.h"
+#include "mainwindow.h"
+#include "ui_informationwindow.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
-#include <QLabel>
-#include <QGridLayout>
-#include <QDoubleValidator>
-
-#include <QDebug>
+#include <QDockWidget>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// DEFINE NAMESPACE MNEBrowseRawQt
 //=============================================================================================================
 
-using namespace XDISPLIB;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE MEMBER METHODS
-//=============================================================================================================
-
-FrequencySpectrumSettingsWidget::FrequencySpectrumSettingsWidget(FrequencySpectrumWidget *parent)
-: m_pFrequencySpectrumWidget(parent)
+namespace MNEBrowseRawQt
 {
-    this->setWindowTitle("Frequency Spectrum Settings");
-    this->setMinimumWidth(330);
-    this->setMaximumWidth(330);
-
-    QGridLayout* t_pGridLayout = new QGridLayout;
-
-    QLabel *t_pLabelLower = new QLabel;
-    t_pLabelLower->setText("Lower Frequency");
-    m_pSliderLowerBound = new QSlider(Qt::Horizontal);
-    QLabel *t_pLabelUpper = new QLabel;
-    t_pLabelUpper->setText("Upper Frequency");
-    m_pSliderUpperBound = new QSlider(Qt::Horizontal);
-
-    m_pSliderUpperBound->setMinimum(0);
-    m_pSliderUpperBound->setMaximum(100);
-
-    connect(m_pSliderLowerBound, &QSlider::valueChanged, this, &FrequencySpectrumSettingsWidget::updateValue);
-    connect(m_pSliderUpperBound, &QSlider::valueChanged, this, &FrequencySpectrumSettingsWidget::updateValue);
-
-    t_pGridLayout->addWidget(t_pLabelLower,0,0);
-    t_pGridLayout->addWidget(m_pSliderLowerBound,0,1);
-    t_pGridLayout->addWidget(t_pLabelUpper,1,0);
-    t_pGridLayout->addWidget(m_pSliderUpperBound,1,1);
-
-    this->setLayout(t_pGridLayout);
-
-}
-
 
 //*************************************************************************************************************
+//=============================================================================================================
+// DEFINE FORWARD DECLARATIONS
+//=============================================================================================================
 
-void FrequencySpectrumSettingsWidget::updateValue(qint32 value)
+class MainWindow;
+
+/**
+* DECLARE CLASS InformationWindow
+*
+* @brief The AboutWindow class provides the about window.
+*/
+class InformationWindow : public QDockWidget
 {
-    Q_UNUSED(value)
+    Q_OBJECT
 
-    if(m_pSliderLowerBound->value() > m_pSliderUpperBound->value())
-        m_pSliderLowerBound->setValue(m_pSliderUpperBound->value());
-    else if(m_pSliderUpperBound->value() < m_pSliderLowerBound->value())
-        m_pSliderUpperBound->setValue(m_pSliderLowerBound->value());
+public:
+    //=========================================================================================================
+    /**
+    * Constructs a InformationWindow dialog which is a child of parent.
+    *
+    * @param [in] parent pointer to parent widget; If parent is 0, the new InformationWindow becomes a window. If parent is another widget, InformationWindow becomes a child window inside parent. InformationWindow is deleted when its parent is deleted.
+    */
+    InformationWindow(QWidget *parent = 0);
 
-    emit settingsChanged();
-}
+    //=========================================================================================================
+    /**
+    * Destroys the InformationWindow.
+    * All InformationWindow's children are deleted first. The application exits if InformationWindow is the main widget.
+    */
+    ~InformationWindow();
+
+private:
+    Ui::InformationWindowWidget *ui;
+
+    MainWindow*     m_pMainWindow;
+};
+
+} // NAMESPACE MNEBrowseRawQt
+
+#endif // INFORMATIONWINDOW_H

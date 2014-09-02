@@ -108,6 +108,18 @@ public:
     */
     virtual QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
+    //=========================================================================================================
+    /**
+    * Receive Mouse location
+    *
+    * @param[in] row    The select row of tableview
+    * @param[in] x      mouse x pos.
+    * @param[in] y      mouse y pos.
+    * @param[in] visRect      visual rect of row_tableview.
+    *
+    */
+    void rcvMouseLoc( int row, int x, int y, QRect visRect);
+
 private:
     //=========================================================================================================
     /**
@@ -156,20 +168,17 @@ private:
     float m_fMaxValue;     /**< Maximum value of the data to plot  */
     float m_fScaleY;       /**< Maximum amplitude of plot (max is m_dPlotHeight/2) */
 
-    QTableView * m_tableview;
-
-    bool mousepressflag;
-
-    int m_tableview_row;
-    int m_mousex;
-    int m_mousey;
-    QRect m_visRect;
-    float m_x_rate;
+    QTableView * m_tableview; /**< Pointer to the TableView */
 
 
+    int m_tableview_row;     /**< the selected row of the tableview*/
+    int m_mousex;            /**< the mouse x pos */
+    int m_mousey;            /**< the mouse y pos */
+    QRect m_visRect;         /**< visual rect of row of tableview */
+    float m_x_rate;          /**< the rate of the cursor position in the raw visual rect */
 
-public slots:
-    void rcvMouseLoc( int row, int x, int y, QRect visRect);
+
+
 };
 
 } // NAMESPACE

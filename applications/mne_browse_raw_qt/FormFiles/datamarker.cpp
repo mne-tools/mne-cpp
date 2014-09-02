@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
-* @file     frequencyspectrumsettingswidget.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     datawindow.h
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     May, 2014
+* @date     August, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the FrequencySpectrumSettingsWidget Class.
+* @brief    Contains the implementation of the DataWindow class.
 *
 */
 
@@ -38,20 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "frequencyspectrumsettingswidget.h"
-#include "../frequencyspectrumwidget.h"
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Qt INCLUDES
-//=============================================================================================================
-
-#include <QLabel>
-#include <QGridLayout>
-#include <QDoubleValidator>
-
-#include <QDebug>
+#include "datamarker.h"
 
 
 //*************************************************************************************************************
@@ -59,7 +47,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace XDISPLIB;
+using namespace MNEBrowseRawQt;
 
 
 //*************************************************************************************************************
@@ -67,48 +55,80 @@ using namespace XDISPLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-FrequencySpectrumSettingsWidget::FrequencySpectrumSettingsWidget(FrequencySpectrumWidget *parent)
-: m_pFrequencySpectrumWidget(parent)
+DataMarker::DataMarker(QWidget *parent) :
+    QWidget(parent),
+    m_oldPos(QPoint(0,0)),
+    m_movableRegion(QRegion())
 {
-    this->setWindowTitle("Frequency Spectrum Settings");
-    this->setMinimumWidth(330);
-    this->setMaximumWidth(330);
+    //Set background color
+    QPalette Pal(palette());
 
-    QGridLayout* t_pGridLayout = new QGridLayout;
+    QColor colorTemp(227,6,19);
+    Pal.setColor(QPalette::Background, colorTemp);
 
-    QLabel *t_pLabelLower = new QLabel;
-    t_pLabelLower->setText("Lower Frequency");
-    m_pSliderLowerBound = new QSlider(Qt::Horizontal);
-    QLabel *t_pLabelUpper = new QLabel;
-    t_pLabelUpper->setText("Upper Frequency");
-    m_pSliderUpperBound = new QSlider(Qt::Horizontal);
-
-    m_pSliderUpperBound->setMinimum(0);
-    m_pSliderUpperBound->setMaximum(100);
-
-    connect(m_pSliderLowerBound, &QSlider::valueChanged, this, &FrequencySpectrumSettingsWidget::updateValue);
-    connect(m_pSliderUpperBound, &QSlider::valueChanged, this, &FrequencySpectrumSettingsWidget::updateValue);
-
-    t_pGridLayout->addWidget(t_pLabelLower,0,0);
-    t_pGridLayout->addWidget(m_pSliderLowerBound,0,1);
-    t_pGridLayout->addWidget(t_pLabelUpper,1,0);
-    t_pGridLayout->addWidget(m_pSliderUpperBound,1,1);
-
-    this->setLayout(t_pGridLayout);
-
+    setAutoFillBackground(true);
+    setPalette(Pal);
 }
 
 
 //*************************************************************************************************************
 
-void FrequencySpectrumSettingsWidget::updateValue(qint32 value)
+void DataMarker::setMovementBoundary(QRegion rect)
 {
-    Q_UNUSED(value)
+    m_movableRegion = rect;
+}
 
-    if(m_pSliderLowerBound->value() > m_pSliderUpperBound->value())
-        m_pSliderLowerBound->setValue(m_pSliderUpperBound->value());
-    else if(m_pSliderUpperBound->value() < m_pSliderLowerBound->value())
-        m_pSliderUpperBound->setValue(m_pSliderLowerBound->value());
 
-    emit settingsChanged();
+//*************************************************************************************************************
+
+void DataMarker::mousePressEvent(QMouseEvent *event)
+{
+    if(event->buttons() == Qt::LeftButton)
+        m_oldPos = event->globalPos();
+}
+
+
+//*************************************************************************************************************
+
+void DataMarker::mouseMoveEvent(QMouseEvent *event)
+{
+    if(event->buttons() == Qt::LeftButton) {
+        const QPoint delta = event->globalPos() - m_oldPos;
+
+        QRect newPosition(x()+delta.x(), y(),
+                          this->geometry().width(), this->geometry().height());
+
+        //Check if new position is inside the boundary
+        if(m_movableRegion.contains(newPosition.bottomLeft()) && m_movableRegion.contains(newPosition.bottomRight())) {
+            move(x()+delta.x(), y());
+            m_oldPos = event->globalPos();
+
+            emit markerMoved();
+        }
+
+        if(event->windowPos().x() < m_movableRegion.boundingRect().left()) {
+            move(m_movableRegion.boundingRect().left(), y());
+
+            emit markerMoved();
+        }
+
+        if(event->windowPos().x() > m_movableRegion.boundingRect().right()) {
+            move(m_movableRegion.boundingRect().right()-2, y());
+
+            emit markerMoved();
+        }
+
+//        qDebug()<<"globalPos"<<event->globalPos().x()<<event->globalPos().y();
+//        qDebug()<<"newPosition"<<newPosition.x()<<newPosition.y()<<newPosition.width()<<newPosition.height();
+//        qDebug()<<"m_movableRegion"<<m_movableRegion.boundingRect().x()<<m_movableRegion.boundingRect().y()<<m_movableRegion.boundingRect().width()<<m_movableRegion.boundingRect().height();
+    }
+}
+
+
+//*************************************************************************************************************
+
+void DataMarker::enterEvent(QEvent *event)
+{
+    Q_UNUSED(event);
+    setCursor(QCursor(Qt::SizeHorCursor));
 }

@@ -37,10 +37,11 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// INCLUDES
 //=============================================================================================================
 
-#include "mainwindow.h"
+#include <stdio.h>
+#include "FormFiles/mainwindow.h"
 #include "info.h"
 
 
@@ -52,6 +53,8 @@
 #include <QtGui>
 #include <QApplication>
 #include <QDateTime>
+#include <QSplashScreen>
+#include <QThread>
 
 
 //*************************************************************************************************************
@@ -114,8 +117,22 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationName(CInfo::OrganizationName());
     QCoreApplication::setApplicationName(CInfo::AppNameShort());
 
+    //show splash screen
+    QPixmap pixmap(":/Resources/Images/splashscreen_mne_browse_raw_qt.png");
+    QSplashScreen splash(pixmap);
+
+    QSettings settings;
+    QSize sizeMainWindow = settings.value("MainWindow/size").toSize();
+    QPoint positionMainWindow = settings.value("MainWindow/position").toPoint();
+    splash.move(positionMainWindow.x()+sizeMainWindow.width()/2-pixmap.width()/2,
+                positionMainWindow.y()+sizeMainWindow.height()/2-pixmap.height()/2);
+    splash.show();
+    QThread::sleep(1);
+
     mainWindow = new MainWindow();
     mainWindow->show();
+
+    splash.finish(mainWindow);
 
     return a.exec();
 }
