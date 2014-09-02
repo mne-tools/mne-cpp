@@ -73,6 +73,7 @@ SOURCES += \
     Utils/rawsettings.cpp \
     Utils/mneoperator.cpp \
     Utils/filteroperator.cpp \
+    Utils/filterplotscene.cpp \
     Models/rawmodel.cpp \
     Models/eventmodel.cpp \
     Delegates/rawdelegate.cpp \
@@ -82,7 +83,7 @@ SOURCES += \
     Windows/datawindow.cpp \
     Windows/aboutwindow.cpp \
     Windows/informationwindow.cpp \
-    Delegates/eventdelegate.cpp
+    Delegates/eventdelegate.cpp \ 
 
 HEADERS += \
     Utils/datamarker.h \
@@ -91,6 +92,7 @@ HEADERS += \
     Utils/filteroperator.h \
     Utils/types.h \
     Utils/info.h \
+    Utils/filterplotscene.h \
     Models/rawmodel.h \
     Models/eventmodel.h \
     Delegates/rawdelegate.h \
@@ -100,7 +102,7 @@ HEADERS += \
     Windows/datawindow.h \
     Windows/aboutwindow.h \
     Windows/informationwindow.h \
-    Delegates/eventdelegate.h
+    Delegates/eventdelegate.h \
 
 FORMS += \
     Windows/filterwindow.ui \

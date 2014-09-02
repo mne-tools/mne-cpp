@@ -58,6 +58,7 @@ using namespace MNEBrowseRawQt;
 FilterWindow::FilterWindow(QWidget *parent) :
     QWidget(parent, Qt::Window),
     ui(new Ui::FilterWindowWidget),
+    m_pFilterPlotScene(new FilterPlotScene),
     m_pMainWindow(static_cast<MainWindow*>(parent))
 {
     ui->setupUi(this);
@@ -119,10 +120,35 @@ void FilterWindow::initComboBoxes()
 
 void FilterWindow::initFilterPlot()
 {
-    ui->m_graphicsView_filterPlot->setScene(&m_graphicsScene);
-    m_graphicsScene.addText("TEST");
+    ui->m_graphicsView_filterPlot->setScene(m_pFilterPlotScene);
 }
 
+
+//*************************************************************************************************************
+
+void FilterWindow::updateFilterPlot()
+{
+    //Update the filter of the scene
+    QMutableMapIterator<QString,QSharedPointer<MNEOperator> > it(m_pMainWindow->m_pRawModel->m_Operators);
+    while(it.hasNext()) {
+        it.next();
+        if(it.key() == "User defined (See 'Adjust/Filter')") {
+            m_pFilterPlotScene->updateFilter(it.value());
+        }
+    }
+
+    ui->m_graphicsView_filterPlot->fitInView(m_pFilterPlotScene->itemsBoundingRect(), Qt::KeepAspectRatio);
+    //ui->m_graphicsView_filterPlot->update();
+}
+
+
+//*************************************************************************************************************
+
+void FilterWindow::resizeEvent(QResizeEvent* event)
+{
+    Q_UNUSED(event);
+    ui->m_graphicsView_filterPlot->fitInView(m_pFilterPlotScene->itemsBoundingRect(), Qt::KeepAspectRatio);
+}
 
 //*************************************************************************************************************
 
@@ -205,6 +231,7 @@ void FilterWindow::changeFilterParamters()
     }
 
     //update filter plot
+    updateFilterPlot();
 }
 
 
