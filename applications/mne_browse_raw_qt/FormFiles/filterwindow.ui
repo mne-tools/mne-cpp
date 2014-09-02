@@ -20,67 +20,97 @@
       <string>Filter settings</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="0" column="0">
-       <widget class="QLabel" name="label">
+      <item row="1" column="0">
+       <widget class="QLabel" name="m_label_lowpass">
         <property name="text">
-         <string>Lowpass (Hz):</string>
+         <string>Cut-Off Low (Hz):</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
-       <widget class="QDoubleSpinBox" name="m_doubleSpinBox_lowpass">
+      <item row="3" column="1">
+       <widget class="QDoubleSpinBox" name="m_doubleSpinBox_transitionband">
         <property name="maximum">
          <double>999.000000000000000</double>
         </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_2">
-        <property name="text">
-         <string>Highpass (Hz):</string>
+        <property name="singleStep">
+         <double>0.100000000000000</double>
+        </property>
+        <property name="value">
+         <double>5.000000000000000</double>
         </property>
        </widget>
       </item>
       <item row="1" column="1">
+       <widget class="QDoubleSpinBox" name="m_doubleSpinBox_lowpass">
+        <property name="maximum">
+         <double>999.000000000000000</double>
+        </property>
+        <property name="singleStep">
+         <double>0.100000000000000</double>
+        </property>
+        <property name="value">
+         <double>5.000000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
        <widget class="QDoubleSpinBox" name="m_doubleSpinBox_highpass">
         <property name="maximum">
          <double>999.000000000000000</double>
         </property>
+        <property name="singleStep">
+         <double>0.100000000000000</double>
+        </property>
+        <property name="value">
+         <double>40.000000000000000</double>
+        </property>
        </widget>
       </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="label_3">
+      <item row="3" column="0">
+       <widget class="QLabel" name="m_label_transitionBand">
         <property name="text">
          <string>Transition band (Hz):</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
-       <widget class="QDoubleSpinBox" name="m_doubleSpinBox_transitionband">
-        <property name="maximum">
-         <double>999.000000000000000</double>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0">
-       <widget class="QCheckBox" name="m_checkBox_filterActive">
-        <property name="text">
-         <string>Filter active</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="0">
+      <item row="4" column="0" colspan="2">
        <widget class="QPushButton" name="m_pushButton_applyFilter">
         <property name="text">
-         <string>Apply filter to all</string>
+         <string>Apply filter to all channels</string>
         </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="m_label_highpass">
+        <property name="text">
+         <string>Cut-Off High (Hz):</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0" colspan="2">
+       <widget class="QComboBox" name="m_comboBox_filterType">
+        <item>
+         <property name="text">
+          <string>Lowpass</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Highpass</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>Bandpass</string>
+         </property>
+        </item>
        </widget>
       </item>
      </layout>
     </widget>
    </item>
    <item row="0" column="1">
-    <widget class="QGroupBox" name="groupBox">
+    <widget class="QGroupBox" name="m_groupBox_filterPlot">
      <property name="title">
       <string>Filter plot</string>
      </property>
