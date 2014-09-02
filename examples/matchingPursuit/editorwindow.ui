@@ -219,11 +219,14 @@
                <height>16777215</height>
               </size>
              </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
              <property name="minimum">
               <number>1</number>
              </property>
              <property name="maximum">
-              <number>5000</number>
+              <number>100000</number>
              </property>
             </widget>
            </item>
@@ -266,6 +269,9 @@
                <width>60</width>
                <height>0</height>
               </size>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
              </property>
              <property name="minimum">
               <number>20</number>
@@ -546,6 +552,9 @@
                   <height>0</height>
                  </size>
                 </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
                 <property name="minimum">
                  <double>0.010000000000000</double>
                 </property>
@@ -571,6 +580,9 @@
                <widget class="QDoubleSpinBox" name="dspb_LinStepScale">
                 <property name="enabled">
                  <bool>false</bool>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                 </property>
                 <property name="minimum">
                  <double>0.010000000000000</double>
@@ -620,6 +632,9 @@
                <height>0</height>
               </size>
              </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
              <property name="suffix">
               <string/>
              </property>
@@ -638,6 +653,9 @@
             <widget class="QDoubleSpinBox" name="dspb_EndValueScale">
              <property name="enabled">
               <bool>false</bool>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
              </property>
              <property name="minimum">
               <double>-999999.000000000000000</double>
@@ -881,6 +899,9 @@
                   <height>0</height>
                  </size>
                 </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
                 <property name="minimum">
                  <double>0.010000000000000</double>
                 </property>
@@ -906,6 +927,9 @@
                <widget class="QDoubleSpinBox" name="dspb_LinStepModu">
                 <property name="enabled">
                  <bool>false</bool>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                 </property>
                 <property name="minimum">
                  <double>0.010000000000000</double>
@@ -955,6 +979,9 @@
                <height>0</height>
               </size>
              </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
              <property name="maximum">
               <double>99999.990000000005239</double>
              </property>
@@ -964,6 +991,9 @@
             <widget class="QDoubleSpinBox" name="dspb_EndValueModu">
              <property name="enabled">
               <bool>false</bool>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
              </property>
              <property name="minimum">
               <double>-999999.000000000000000</double>
@@ -1134,6 +1164,9 @@ p, li { white-space: pre-wrap; }
 &lt;/style&gt;&lt;/head&gt;&lt;body style=&quot; font-family:'MS Shell Dlg 2'; font-size:8.25pt; font-weight:400; font-style:normal;&quot;&gt;
 &lt;p style=&quot; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;&quot;&gt;Von 0 bis 2&lt;span style=&quot; font-family:'Calibri,sans-serif'; font-size:11pt;&quot;&gt;π&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
              </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
              <property name="decimals">
               <number>4</number>
              </property>
@@ -1149,6 +1182,9 @@ p, li { white-space: pre-wrap; }
             <widget class="QDoubleSpinBox" name="dspb_EndValuePhase">
              <property name="enabled">
               <bool>false</bool>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
              </property>
              <property name="minimum">
               <double>0.000000000000000</double>
@@ -1242,6 +1278,9 @@ p, li { white-space: pre-wrap; }
                 <property name="enabled">
                  <bool>false</bool>
                 </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
                 <property name="minimum">
                  <double>0.010000000000000</double>
                 </property>
@@ -1269,6 +1308,9 @@ p, li { white-space: pre-wrap; }
                   <width>80</width>
                   <height>0</height>
                  </size>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                 </property>
                 <property name="minimum">
                  <double>0.010000000000000</double>
@@ -1528,6 +1570,9 @@ p, li { white-space: pre-wrap; }
                      <height>0</height>
                     </size>
                    </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                   </property>
                    <property name="minimum">
                     <double>0.010000000000000</double>
                    </property>
@@ -1540,6 +1585,9 @@ p, li { white-space: pre-wrap; }
                   <widget class="QDoubleSpinBox" name="dspb_LinStepChirp">
                    <property name="enabled">
                     <bool>false</bool>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                    </property>
                    <property name="minimum">
                     <double>0.010000000000000</double>
@@ -1626,6 +1674,9 @@ p, li { white-space: pre-wrap; }
                   <height>16777215</height>
                  </size>
                 </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                </property>
                 <property name="decimals">
                  <number>6</number>
                 </property>
@@ -1644,6 +1695,9 @@ p, li { white-space: pre-wrap; }
                   <width>80</width>
                   <height>16777215</height>
                  </size>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                 </property>
                 <property name="minimum">
                  <double>-999999.000000000000000</double>
@@ -1813,6 +1867,9 @@ p, li { white-space: pre-wrap; }
            </property>
            <property name="selectionMode">
             <enum>QAbstractItemView::ExtendedSelection</enum>
+           </property>
+           <property name="sortingEnabled">
+            <bool>false</bool>
            </property>
           </widget>
          </item>
@@ -2058,7 +2115,7 @@ p, li { white-space: pre-wrap; }
             <enum>Qt::LeftToRight</enum>
            </property>
            <property name="text">
-            <string>save new dictionary as...</string>
+            <string>save new dictionary</string>
            </property>
            <property name="icon">
             <iconset resource="Ressourcen.qrc">
