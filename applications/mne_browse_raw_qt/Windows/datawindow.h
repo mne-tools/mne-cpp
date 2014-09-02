@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     filterwindow.h
+* @file     datawindow.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
@@ -30,20 +30,20 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the FilterWindow class.
+* @brief    Contains the declaration of the DataWindow class.
 *
 */
 
-#ifndef FILTERWINDOW_H
-#define FILTERWINDOW_H
+#ifndef DATAWINDOW_H
+#define DATAWINDOW_H
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// INCLUDES
 //=============================================================================================================
-
-#include "ui_filterwindow.h"
 #include "mainwindow.h"
+#include "../Utils/datamarker.h"
+#include "ui_datawindowdock.h"
 
 
 //*************************************************************************************************************
@@ -51,8 +51,11 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QWidget>
-#include <QSettings>
+#include <QDockWidget>
+#include <QResizeEvent>
+#include <QToolBar>
+#include <QPainter>
+#include <QColor>
 
 
 //*************************************************************************************************************
@@ -71,85 +74,120 @@ namespace MNEBrowseRawQt
 class MainWindow;
 
 /**
-* DECLARE CLASS FilterWindow
+* DECLARE CLASS DataWindow
 *
-* @brief The FilterWindow class provides the filter window.
+* @brief The DataWindow class provides the data dock window.
 */
-class FilterWindow : public QWidget
+class DataWindow : public QDockWidget
 {
     Q_OBJECT
 
 public:
     //=========================================================================================================
     /**
-    * Constructs a FilterWindow dialog which is a child of parent.
+    * Constructs a DataWindow dialog which is a child of parent.
     *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new FilterWindow becomes a window. If parent is another widget, FilterWindow becomes a child window inside parent. FilterWindow is deleted when its parent is deleted.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new DataWindow becomes a window. If parent is another widget, DataWindow becomes a child window inside parent. DataWindow is deleted when its parent is deleted.
     */
-    FilterWindow(QWidget *parent = 0);
+    DataWindow(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the FilterWindow.
-    * All FilterWindow's children are deleted first. The application exits if FilterWindow is the main widget.
+    * Destroys the DataWindow.
+    * All DataWindow's children are deleted first. The application exits if DataWindow is the main widget.
     */
-    ~FilterWindow();
+    ~DataWindow();
+
+    //=========================================================================================================
+    /**
+    * Setup the table view of the data window
+    */
+    void initRawViewSettings();
+
+    //=========================================================================================================
+    /**
+    * Returns the QTableView of this window
+    */
+    QTableView* getTableView();
 
 private:
     //=========================================================================================================
     /**
-    * inits all spin boxes.
+    * Setup the tool bar of the data window.
     */
-    void initSpinBoxes();
+    void initToolBar();
 
     //=========================================================================================================
     /**
-    * inits all buttons.
+    * Setup the sample labels of the data window
     */
-    void initButtons();
+    void initLabels();
 
     //=========================================================================================================
     /**
-    * inits the QComboBoxes.
+    * Setup the marker of the data window
     */
-    void initComboBoxes();
+    void initMarker();
 
     //=========================================================================================================
     /**
-    * inits the filter plot.
+    * resizeEvent reimplemented virtual function to handle events of the data dock window
     */
-    void initFilterPlot();
+    void resizeEvent(QResizeEvent * event);
 
-    Ui::FilterWindowWidget *ui;
+    Ui::DataWindowDockWidget *ui;
 
     MainWindow*     m_pMainWindow;
 
-    int             m_iWindowSize;
-    int             m_iFilterTaps;
-
     QSettings       m_qSettings;
+
+    QWidget*        m_pPainterMarker;
+
+    DataMarker*     m_pDataMarker;
+
+    QLabel*         m_pCurrentDataMarkerLabel;
+
+    int             m_iCurrentMarkerSample;
 
 protected slots:
     //=========================================================================================================
     /**
-    * This function gets called whenever the combo box is altered by the user via the gui.
-    * @param currentIndex holds the current index of the combo box
+    * @brief manualResize performs a manual resize of this dock widget
     */
-    void changeStateSpinBoxes(int currentIndex);
+    void manualResize();
 
     //=========================================================================================================
     /**
-    * This function gets called whenever the filter parameters are altered by the user via the gui.
+    * @brief customContextMenuRequested
+    * @param pos is the position, where the right-click occurred
     */
-    void changeFilterParamters();
+    void customContextMenuRequested(QPoint pos);
 
     //=========================================================================================================
     /**
-    * This function applies the user defined filter to all channels.
+    * Set the range sample labels of the data window
     */
-    void applyFilterToAll();
+    void setRangeSampleLabels();
+
+    //=========================================================================================================
+    /**
+    * Set the sample labels of the data window
+    */
+    void setMarkerSampleLabel();
+
+    //=========================================================================================================
+    /**
+    * Adds an event to the event model and its QTableView
+    */
+    void addEventToEventModel();
+
+    //=========================================================================================================
+    /**
+    * Updates the marker position
+    */
+    void updateMarkerPosition();
 };
 
 } // NAMESPACE MNEBrowseRawQt
 
-#endif // FILTERWINDOW_H
+#endif // DATAWINDOW_H

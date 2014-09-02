@@ -68,47 +68,47 @@ else {
 DESTDIR = $${MNE_BINARY_DIR}
 
 SOURCES += \
-    rawsettings.cpp \
     main.cpp \
-    mneoperator.cpp \
-    filteroperator.cpp \
+    Utils/datamarker.cpp \
+    Utils/rawsettings.cpp \
+    Utils/mneoperator.cpp \
+    Utils/filteroperator.cpp \
     Models/rawmodel.cpp \
     Models/eventmodel.cpp \
     Delegates/rawdelegate.cpp \
-    FormFiles/mainwindow.cpp \
-    FormFiles/filterwindow.cpp \
-    FormFiles/eventwindow.cpp \
-    FormFiles/datawindow.cpp \
-    FormFiles/aboutwindow.cpp \
-    FormFiles/informationwindow.cpp \
-    FormFiles/datamarker.cpp \
+    Windows/mainwindow.cpp \
+    Windows/filterwindow.cpp \
+    Windows/eventwindow.cpp \
+    Windows/datawindow.cpp \
+    Windows/aboutwindow.cpp \
+    Windows/informationwindow.cpp \
     Delegates/eventdelegate.cpp
 
 HEADERS += \
-    rawsettings.h \
-    mneoperator.h \
-    filteroperator.h \
-    types.h \
-    info.h \
+    Utils/datamarker.h \
+    Utils/rawsettings.h \
+    Utils/mneoperator.h \
+    Utils/filteroperator.h \
+    Utils/types.h \
+    Utils/info.h \
     Models/rawmodel.h \
     Models/eventmodel.h \
     Delegates/rawdelegate.h \
-    FormFiles/mainwindow.h \
-    FormFiles/filterwindow.h \
-    FormFiles/eventwindow.h \
-    FormFiles/datawindow.h \
-    FormFiles/aboutwindow.h \
-    FormFiles/informationwindow.h \
-    FormFiles/datamarker.h \
+    Windows/mainwindow.h \
+    Windows/filterwindow.h \
+    Windows/eventwindow.h \
+    Windows/datawindow.h \
+    Windows/aboutwindow.h \
+    Windows/informationwindow.h \
     Delegates/eventdelegate.h
 
 FORMS += \
-    FormFiles/filterwindow.ui \
-    FormFiles/eventwindowdock.ui \
-    FormFiles/datawindowdock.ui \
-    FormFiles/mainwindow.ui \
-    FormFiles/aboutwindow.ui \
-    FormFiles/informationwindow.ui
+    Windows/filterwindow.ui \
+    Windows/eventwindowdock.ui \
+    Windows/datawindowdock.ui \
+    Windows/mainwindow.ui \
+    Windows/aboutwindow.ui \
+    Windows/informationwindow.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

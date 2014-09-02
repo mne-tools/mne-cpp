@@ -76,9 +76,9 @@
 #include "../Delegates/rawdelegate.h"
 #include "../Delegates/eventdelegate.h"
 
-#include "../info.h"
-#include "../types.h"
-#include "../rawsettings.h"
+#include "../Utils/info.h"
+#include "../Utils/types.h"
+#include "../Utils/rawsettings.h"
 
 #include "filterwindow.h"
 #include "eventwindow.h"
