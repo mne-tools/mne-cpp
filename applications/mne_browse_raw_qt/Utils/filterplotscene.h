@@ -1,11 +1,11 @@
 //=============================================================================================================
 /**
-* @file     filterwindow.h
+* @file     filterplotscene.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     August, 2014
+* @date     September, 2014
 *
 * @section  LICENSE
 *
@@ -30,30 +30,29 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the FilterWindow class.
+* @brief    Contains the declaration of the FilterPlotScene class.
 *
 */
 
-#ifndef FILTERWINDOW_H
-#define FILTERWINDOW_H
-
-//*************************************************************************************************************
-//=============================================================================================================
-// INCLUDES
-//=============================================================================================================
-
-#include "ui_filterwindow.h"
-#include "mainwindow.h"
-#include "../Utils/filterplotscene.h"
+#ifndef FILTERPLOTSCENE_H
+#define FILTERPLOTSCENE_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QWidget>
-#include <QSettings>
+#include "../Utils/filterplotscene.h"
+#include "../Utils/filteroperator.h"
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
 #include <QGraphicsScene>
+#include <QPainterPath>
 
 
 //*************************************************************************************************************
@@ -64,107 +63,45 @@
 namespace MNEBrowseRawQt
 {
 
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE FORWARD DECLARATIONS
-//=============================================================================================================
-
-class MainWindow;
-
 /**
-* DECLARE CLASS FilterWindow
+* DECLARE CLASS FilterPlotScene
 *
-* @brief The FilterWindow class provides the filter window.
+* @brief The FilterPlotScene class provides the scene where a filter respone can be plotted.
 */
-class FilterWindow : public QWidget
+class FilterPlotScene : public QGraphicsScene
 {
     Q_OBJECT
-
 public:
     //=========================================================================================================
     /**
-    * Constructs a FilterWindow dialog which is a child of parent.
+    * Constructs a FilterPlotScene dialog which is a child of parent.
     *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new FilterWindow becomes a window. If parent is another widget, FilterWindow becomes a child window inside parent. FilterWindow is deleted when its parent is deleted.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new FilterPlotScene becomes a window. If parent is another widget, FilterPlotScene becomes a child window inside parent. FilterPlotScene is deleted when its parent is deleted.
     */
-    FilterWindow(QWidget *parent = 0);
+    FilterPlotScene(QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the FilterWindow.
-    * All FilterWindow's children are deleted first. The application exits if FilterWindow is the main widget.
+    * Updates the current filter.
+    *
+    * @param [in] operatorFilter pointer to the current filter operator which is to be plotted
     */
-    ~FilterWindow();
+    void updateFilter(QSharedPointer<FilterOperator> operatorFilter);
 
-private:
+protected:
     //=========================================================================================================
     /**
-    * inits all spin boxes.
+    * Draws the filter's frequency response.
+    *
     */
-    void initSpinBoxes();
+    void plotFilterFrequencyResponse();
 
-    //=========================================================================================================
-    /**
-    * inits all buttons.
-    */
-    void initButtons();
+    FilterOperator*         m_pCurrentFilter;
 
-    //=========================================================================================================
-    /**
-    * inits the QComboBoxes.
-    */
-    void initComboBoxes();
+public slots:
 
-    //=========================================================================================================
-    /**
-    * inits the filter plot.
-    */
-    void initFilterPlot();
-
-    //=========================================================================================================
-    /**
-    * resizeEvent reimplemented virtual function to handle resize events of the filter window
-    */
-    void resizeEvent(QResizeEvent * event);
-
-    //=========================================================================================================
-    /**
-    * updates the filter plot scene with the newly generated filter
-    */
-    void updateFilterPlot();
-
-    Ui::FilterWindowWidget *ui;
-
-    MainWindow*         m_pMainWindow;
-
-    int                 m_iWindowSize;
-    int                 m_iFilterTaps;
-
-    QSettings           m_qSettings;
-
-    FilterPlotScene*    m_pFilterPlotScene;
-
-protected slots:
-    //=========================================================================================================
-    /**
-    * This function gets called whenever the combo box is altered by the user via the gui.
-    * @param currentIndex holds the current index of the combo box
-    */
-    void changeStateSpinBoxes(int currentIndex);
-
-    //=========================================================================================================
-    /**
-    * This function gets called whenever the filter parameters are altered by the user via the gui.
-    */
-    void changeFilterParamters();
-
-    //=========================================================================================================
-    /**
-    * This function applies the user defined filter to all channels.
-    */
-    void applyFilterToAll();
 };
 
 } // NAMESPACE MNEBrowseRawQt
 
-#endif // FILTERWINDOW_H
+#endif // FILTERPLOTSCENE_H
