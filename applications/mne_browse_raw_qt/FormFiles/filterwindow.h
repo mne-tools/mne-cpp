@@ -52,6 +52,7 @@
 //=============================================================================================================
 
 #include <QWidget>
+#include <QSettings>
 
 
 //*************************************************************************************************************
@@ -61,6 +62,13 @@
 
 namespace MNEBrowseRawQt
 {
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE FORWARD DECLARATIONS
+//=============================================================================================================
+
+class MainWindow;
 
 /**
 * DECLARE CLASS FilterWindow
@@ -88,7 +96,58 @@ public:
     ~FilterWindow();
 
 private:
+    //=========================================================================================================
+    /**
+    * inits all spin boxes.
+    */
+    void initSpinBoxes();
+
+    //=========================================================================================================
+    /**
+    * inits all buttons.
+    */
+    void initButtons();
+
+    //=========================================================================================================
+    /**
+    * inits the QComboBoxes.
+    */
+    void initComboBoxes();
+
+    //=========================================================================================================
+    /**
+    * inits the filter plot.
+    */
+    void initFilterPlot();
+
     Ui::FilterWindowWidget *ui;
+
+    MainWindow*     m_pMainWindow;
+
+    int             m_iWindowSize;
+    int             m_iFilterTaps;
+
+    QSettings       m_qSettings;
+
+protected slots:
+    //=========================================================================================================
+    /**
+    * This function gets called whenever the combo box is altered by the user via the gui.
+    * @param currentIndex holds the current index of the combo box
+    */
+    void changeStateSpinBoxes(int currentIndex);
+
+    //=========================================================================================================
+    /**
+    * This function gets called whenever the filter parameters are altered by the user via the gui.
+    */
+    void changeFilterParamters();
+
+    //=========================================================================================================
+    /**
+    * This function applies the user defined filter to all channels.
+    */
+    void applyFilterToAll();
 };
 
 } // NAMESPACE MNEBrowseRawQt

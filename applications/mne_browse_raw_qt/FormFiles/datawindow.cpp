@@ -343,8 +343,10 @@ void DataWindow::setRangeSampleLabels()
 
     //Set values as string
     QString stringTemp;
-    ui->m_label_sampleMin->setText(QString("%1 / %2 sec").arg(stringTemp.number(minSampleRange)).arg(stringTemp.number(minSampleRange/m_pMainWindow->m_pRawModel->m_fiffInfo.sfreq,'g',3)));
-    ui->m_label_sampleMax->setText(QString("%1 / %2 sec").arg(stringTemp.number(maxSampleRange)).arg(stringTemp.number(maxSampleRange/m_pMainWindow->m_pRawModel->m_fiffInfo.sfreq,'g',3)));
+    int minSampleRangeSec = (minSampleRange/m_pMainWindow->m_pRawModel->m_fiffInfo.sfreq)*1000;
+    ui->m_label_sampleMin->setText(QString("%1 / %2 sec").arg(stringTemp.number(minSampleRange)).arg(stringTemp.number((double)minSampleRangeSec/1000,'g')));
+    int maxSampleRangeSec = (maxSampleRange/m_pMainWindow->m_pRawModel->m_fiffInfo.sfreq)*1000;
+    ui->m_label_sampleMax->setText(QString("%1 / %2 sec").arg(stringTemp.number(maxSampleRange)).arg(stringTemp.number((double)maxSampleRangeSec/1000,'g')));
 }
 
 
@@ -358,7 +360,9 @@ void DataWindow::setMarkerSampleLabel()
     m_iCurrentMarkerSample = ui->m_tableView_rawTableView->horizontalScrollBar()->value() +
             (m_pDataMarker->geometry().x() - ui->m_tableView_rawTableView->geometry().x() - ui->m_tableView_rawTableView->verticalHeader()->width());
 
-    QString numberString = QString("%1 / %2 sec").arg(QString().number(m_iCurrentMarkerSample)).arg(QString().number(m_iCurrentMarkerSample/m_pMainWindow->m_pRawModel->m_fiffInfo.sfreq,'g',4));
+    int currentSeconds = (m_iCurrentMarkerSample/m_pMainWindow->m_pRawModel->m_fiffInfo.sfreq)*1000;
+
+    QString numberString = QString("%1 / %2 sec").arg(QString().number(m_iCurrentMarkerSample)).arg(QString().number((double)currentSeconds/1000,'g'));
     m_pCurrentDataMarkerLabel->setText(numberString);
 
     m_pCurrentDataMarkerLabel->move(m_pDataMarker->geometry().left() + (m_qSettings.value("DataMarker/data_marker_width").toInt()/2) - (m_pCurrentDataMarkerLabel->width()/2) + 1, m_pDataMarker->geometry().top() - 20);
