@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
-* @file     frequencyspectrumsettingswidget.cpp
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+* @file     eventwindow.h
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     May, 2014
+* @date     August, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -29,86 +30,111 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the FrequencySpectrumSettingsWidget Class.
+* @brief    Contains the declaration of the EventWindow class.
 *
 */
+
+#ifndef EVENTWINDOW_H
+#define EVENTWINDOW_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "frequencyspectrumsettingswidget.h"
-#include "../frequencyspectrumwidget.h"
+#include "mainwindow.h"
+#include "ui_eventwindowdock.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
-#include <QLabel>
-#include <QGridLayout>
-#include <QDoubleValidator>
-
-#include <QDebug>
+#include <QDockWidget>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// DEFINE NAMESPACE MNEBrowseRawQt
 //=============================================================================================================
 
-using namespace XDISPLIB;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE MEMBER METHODS
-//=============================================================================================================
-
-FrequencySpectrumSettingsWidget::FrequencySpectrumSettingsWidget(FrequencySpectrumWidget *parent)
-: m_pFrequencySpectrumWidget(parent)
+namespace MNEBrowseRawQt
 {
-    this->setWindowTitle("Frequency Spectrum Settings");
-    this->setMinimumWidth(330);
-    this->setMaximumWidth(330);
-
-    QGridLayout* t_pGridLayout = new QGridLayout;
-
-    QLabel *t_pLabelLower = new QLabel;
-    t_pLabelLower->setText("Lower Frequency");
-    m_pSliderLowerBound = new QSlider(Qt::Horizontal);
-    QLabel *t_pLabelUpper = new QLabel;
-    t_pLabelUpper->setText("Upper Frequency");
-    m_pSliderUpperBound = new QSlider(Qt::Horizontal);
-
-    m_pSliderUpperBound->setMinimum(0);
-    m_pSliderUpperBound->setMaximum(100);
-
-    connect(m_pSliderLowerBound, &QSlider::valueChanged, this, &FrequencySpectrumSettingsWidget::updateValue);
-    connect(m_pSliderUpperBound, &QSlider::valueChanged, this, &FrequencySpectrumSettingsWidget::updateValue);
-
-    t_pGridLayout->addWidget(t_pLabelLower,0,0);
-    t_pGridLayout->addWidget(m_pSliderLowerBound,0,1);
-    t_pGridLayout->addWidget(t_pLabelUpper,1,0);
-    t_pGridLayout->addWidget(m_pSliderUpperBound,1,1);
-
-    this->setLayout(t_pGridLayout);
-
-}
-
 
 //*************************************************************************************************************
+//=============================================================================================================
+// DEFINE FORWARD DECLARATIONS
+//=============================================================================================================
 
-void FrequencySpectrumSettingsWidget::updateValue(qint32 value)
+class MainWindow;
+
+/**
+* DECLARE CLASS EventWindow
+*
+* @brief The EventWindow class provides the event dock window.
+*/
+class EventWindow : public QDockWidget
 {
-    Q_UNUSED(value)
+    Q_OBJECT
+public:
+    //=========================================================================================================
+    /**
+    * Constructs a EventWindow dialog which is a child of parent.
+    *
+    * @param [in] parent pointer to parent widget; If parent is 0, the new EventWindow becomes a window. If parent is another widget, EventWindow becomes a child window inside parent. EventWindow is deleted when its parent is deleted.
+    */
+    EventWindow(QWidget *parent = 0);
 
-    if(m_pSliderLowerBound->value() > m_pSliderUpperBound->value())
-        m_pSliderLowerBound->setValue(m_pSliderUpperBound->value());
-    else if(m_pSliderUpperBound->value() < m_pSliderLowerBound->value())
-        m_pSliderUpperBound->setValue(m_pSliderLowerBound->value());
+    //=========================================================================================================
+    /**
+    * Destroys the EventWindow.
+    * All EventWindow's children are deleted first. The application exits if EventWindow is the main widget.
+    */
+    ~EventWindow();
 
-    emit settingsChanged();
-}
+    //=========================================================================================================
+    /**
+    * Setup the QtableView of the event window.
+    */
+    void initEventViewSettings();
+
+    //=========================================================================================================
+    /**
+    * Returns the QTableView of this window.
+    */
+    QTableView* getTableView();
+
+private:
+    //=========================================================================================================
+    /**
+    * Inits all the QCheckBoxes of the event window.
+    */
+    void initCheckBoxes();
+
+    //=========================================================================================================
+    /**
+    * event reimplemented virtual function to handle events of the event dock window
+    */
+    bool event(QEvent * event);
+
+    Ui::EventWindowDockWidget *ui;
+
+    MainWindow*     m_pMainWindow;
+
+    QSettings       m_qSettings;
+
+protected slots:
+    //=========================================================================================================
+    /**
+    * jumpToEvent jumps to a event specified in the event table view
+    *
+    * @param [in] current model item focused in the view
+    * @param [in] previous model item focused in the view
+    */
+    void jumpToEvent(const QModelIndex &current, const QModelIndex &previous);
+};
+
+} // NAMESPACE MNEBrowseRawQt
+
+#endif // EVENTWINDOW_H

@@ -98,7 +98,9 @@ bool MNE::read_events(QIODevice &p_IODevice, MatrixXi& eventlist)
     qint32 k, nelem;
     fiff_int_t kind, pos;
     FiffTag::SPtr t_pTag;
-    quint32* serial_eventlist = NULL;
+    quint32* serial_eventlist_uint = NULL;
+    qint32* serial_eventlist_int = NULL;
+
     for(k = 0; k < events[0].nent; ++k)
     {
         kind = events[0].dir[k].kind;
@@ -108,14 +110,21 @@ bool MNE::read_events(QIODevice &p_IODevice, MatrixXi& eventlist)
             FiffTag::read_tag(t_pFile.data(),t_pTag,pos);
             if(t_pTag->type == FIFFT_UINT)
             {
-                serial_eventlist = t_pTag->toUnsignedInt();
+                serial_eventlist_uint = t_pTag->toUnsignedInt();
                 nelem = t_pTag->size()/4;
             }
+
+            if(t_pTag->type == FIFFT_INT)
+            {
+                serial_eventlist_int = t_pTag->toInt();
+                nelem = t_pTag->size()/4;
+            }
+
             break;
         }
     }
 
-    if(serial_eventlist == NULL)
+    if(serial_eventlist_uint == NULL && serial_eventlist_int == NULL)
     {
         printf("Could not find any events\n");
         return false;
@@ -123,11 +132,24 @@ bool MNE::read_events(QIODevice &p_IODevice, MatrixXi& eventlist)
     else
     {
         eventlist.resize(nelem/3,3);
-        for(k = 0; k < nelem/3; ++k)
+        if(serial_eventlist_uint != NULL)
         {
-            eventlist(k,0) = serial_eventlist[k*3];
-            eventlist(k,1) = serial_eventlist[k*3+1];
-            eventlist(k,2) = serial_eventlist[k*3+2];
+            for(k = 0; k < nelem/3; ++k)
+            {
+                eventlist(k,0) = serial_eventlist_uint[k*3];
+                eventlist(k,1) = serial_eventlist_uint[k*3+1];
+                eventlist(k,2) = serial_eventlist_uint[k*3+2];
+            }
+        }
+
+        if(serial_eventlist_int != NULL)
+        {
+            for(k = 0; k < nelem/3; ++k)
+            {
+                eventlist(k,0) = serial_eventlist_int[k*3];
+                eventlist(k,1) = serial_eventlist_int[k*3+1];
+                eventlist(k,2) = serial_eventlist_int[k*3+2];
+            }
         }
     }
 
