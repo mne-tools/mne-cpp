@@ -53,8 +53,8 @@
 #include "../Models/rawmodel.h"
 #include "../Models/eventmodel.h"
 
-#include "../types.h"
-#include "../rawsettings.h"
+#include "../Utils/types.h"
+#include "../Utils/rawsettings.h"
 
 
 //*************************************************************************************************************

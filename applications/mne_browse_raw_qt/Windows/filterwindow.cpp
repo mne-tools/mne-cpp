@@ -65,6 +65,7 @@ FilterWindow::FilterWindow(QWidget *parent) :
     initSpinBoxes();
     initButtons();
     initComboBoxes();
+    initFilterPlot();
 
     m_iWindowSize = m_qSettings.value("RawModel/window_size").toInt();
     m_iFilterTaps = m_qSettings.value("RawModel/num_filter_taps").toInt();
@@ -118,6 +119,8 @@ void FilterWindow::initComboBoxes()
 
 void FilterWindow::initFilterPlot()
 {
+    ui->m_graphicsView_filterPlot->setScene(&m_graphicsScene);
+    m_graphicsScene.addText("TEST");
 }
 
 
@@ -189,7 +192,7 @@ void FilterWindow::changeFilterParamters()
 
     if(ui->m_comboBox_filterType->currentText() == "Bandpass") {
         userDefinedFilterOperator = QSharedPointer<MNEOperator>(
-                   new FilterOperator("User defined (See 'Adjust Filter')",FilterOperator::BPF,m_iFilterTaps,(double)center/nyquist_freq,(double)bw/nyquist_freq,(double)trans_width/nyquist_freq,(m_iWindowSize+m_iFilterTaps)));
+                   new FilterOperator("User defined (See 'Adjust/Filter')",FilterOperator::BPF,m_iFilterTaps,(double)center/nyquist_freq,(double)bw/nyquist_freq,(double)trans_width/nyquist_freq,(m_iWindowSize+m_iFilterTaps)));
     }
 
     //Replace old with new filter operator
@@ -213,7 +216,7 @@ void FilterWindow::applyFilterToAll()
 
     while(it.hasNext()) {
         it.next();
-        if(it.key() == "User defined (See 'Adjust/Filter'')") {
+        if(it.key() == "User defined (See 'Adjust/Filter')") {
             m_pMainWindow->m_pRawModel->applyOperator(QModelIndexList(),it.value());
         }
     }
