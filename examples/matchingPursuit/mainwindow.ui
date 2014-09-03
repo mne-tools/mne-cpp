@@ -374,7 +374,7 @@
            <number>5</number>
           </property>
           <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_2">
+           <layout class="QHBoxLayout" name="l_selectall_and_timer">
             <item>
              <widget class="QCheckBox" name="cb_all_select">
               <property name="text">
@@ -395,6 +395,17 @@
               </property>
               <property name="alignment">
                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="l_save">
+            <item>
+             <widget class="QLabel" name="lb_save_file">
+              <property name="text">
+               <string>Save fif file...</string>
               </property>
              </widget>
             </item>
