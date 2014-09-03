@@ -150,6 +150,7 @@ void FilterWindow::resizeEvent(QResizeEvent* event)
     ui->m_graphicsView_filterPlot->fitInView(m_pFilterPlotScene->itemsBoundingRect(), Qt::KeepAspectRatio);
 }
 
+
 //*************************************************************************************************************
 
 void FilterWindow::changeStateSpinBoxes(int currentIndex)
@@ -180,7 +181,7 @@ void FilterWindow::changeStateSpinBoxes(int currentIndex)
             ui->m_doubleSpinBox_highpass->setVisible(true);
             ui->m_label_highpass->setVisible(true);
             ui->m_doubleSpinBox_lowpass->setVisible(true);
-            ui->m_label_lowpass->setText("Cut-Off Low (Hz)");
+            ui->m_label_lowpass->setText("Cut-Off Low (Hz):");
 
             ui->m_label_lowpass->setVisible(true);
             ui->m_doubleSpinBox_lowpass->setEnabled(true);
@@ -194,8 +195,6 @@ void FilterWindow::changeStateSpinBoxes(int currentIndex)
 
 void FilterWindow::changeFilterParamters()
 {
-    qDebug()<<"changeFilterParamters()";
-
     //User defined filter parameters
     double lowpassHz = ui->m_doubleSpinBox_lowpass->value();
     double highpassHz = ui->m_doubleSpinBox_highpass->value();

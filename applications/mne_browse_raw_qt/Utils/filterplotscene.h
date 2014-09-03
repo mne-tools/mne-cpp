@@ -86,7 +86,7 @@ public:
     *
     * @param [in] operatorFilter pointer to the current filter operator which is to be plotted
     */
-    void updateFilter(QSharedPointer<FilterOperator> operatorFilter);
+    void updateFilter(QSharedPointer<MNEOperator> operatorFilter);
 
 protected:
     //=========================================================================================================
@@ -96,7 +96,7 @@ protected:
     */
     void plotFilterFrequencyResponse();
 
-    FilterOperator*         m_pCurrentFilter;
+    QSharedPointer<FilterOperator>          m_pCurrentFilter;
 
 public slots:
 

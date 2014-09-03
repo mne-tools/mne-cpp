@@ -60,8 +60,8 @@ FilterPlotScene::FilterPlotScene(QObject *parent) :
     QGraphicsScene(parent),
     m_pCurrentFilter(new FilterOperator())
 {
-    addLine(0,0,50,50);
-    addRect(this->sceneRect());
+//    addLine(0,0,50,50);
+//    addRect(this->sceneRect());
 }
 
 
@@ -69,7 +69,8 @@ FilterPlotScene::FilterPlotScene(QObject *parent) :
 
 void FilterPlotScene::updateFilter(QSharedPointer<MNEOperator> operatorFilter)
 {
-    m_pCurrentFilter = (FilterOperator*)operatorFilter;
+    if(operatorFilter->m_OperatorType == MNEOperator::FILTER)
+        m_pCurrentFilter = operatorFilter.staticCast<FilterOperator>();
 
     //Plot newly set filter
     plotFilterFrequencyResponse();
@@ -82,16 +83,26 @@ void FilterPlotScene::plotFilterFrequencyResponse()
 {
     RowVectorXcd coefficientsAFreq = m_pCurrentFilter->m_dFFTCoeffA;
 
+    coefficientsAFreq.normalize();
+
     //Create painter path
     QPainterPath path;
-    path.moveTo(0,0);
+    path.moveTo(0,-abs(coefficientsAFreq(0))*8000);
 
-    for(int i = 0; i<coefficientsAFreq.rows(); i++){
-        path.lineTo(path.currentPosition().x()+1,abs(coefficientsAFreq(i)));
+    for(int i = 0; i<coefficientsAFreq.cols(); i++) {
+        //qDebug()<<abs(coefficientsAFreq(i));
+        path.lineTo(path.currentPosition().x()+1,-abs(coefficientsAFreq(i))*8000);
     }
 
-    this->addPath(path);
+    QPen pen;
+    pen.setColor(Qt::black);
+    pen.setWidth(4);
+
+    //Clear scene and plot new filter path
+    clear();
+    addPath(path, pen);
 }
+
 
 //*************************************************************************************************************
 
