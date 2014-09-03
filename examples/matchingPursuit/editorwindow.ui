@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>581</width>
+    <width>588</width>
     <height>948</height>
    </rect>
   </property>
@@ -226,7 +226,7 @@
               <number>1</number>
              </property>
              <property name="maximum">
-              <number>100000</number>
+              <number>999999999</number>
              </property>
             </widget>
            </item>
@@ -274,10 +274,10 @@
               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
              </property>
              <property name="minimum">
-              <number>20</number>
+              <number>64</number>
              </property>
              <property name="maximum">
-              <number>1000</number>
+              <number>4096</number>
              </property>
             </widget>
            </item>
@@ -555,11 +555,14 @@
                 <property name="alignment">
                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                 </property>
+                <property name="decimals">
+                 <number>0</number>
+                </property>
                 <property name="minimum">
-                 <double>0.010000000000000</double>
+                 <double>0.000000000000000</double>
                 </property>
                 <property name="maximum">
-                 <double>99.989999999999995</double>
+                 <double>100.000000000000000</double>
                 </property>
                 <property name="value">
                  <double>2.000000000000000</double>
@@ -584,11 +587,14 @@
                 <property name="alignment">
                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                 </property>
+                <property name="decimals">
+                 <number>0</number>
+                </property>
                 <property name="minimum">
-                 <double>0.010000000000000</double>
+                 <double>0.000000000000000</double>
                 </property>
                 <property name="maximum">
-                 <double>9999.989999999999782</double>
+                 <double>10000.000000000000000</double>
                 </property>
                 <property name="value">
                  <double>1.000000000000000</double>
@@ -639,13 +645,16 @@
               <string/>
              </property>
              <property name="minimum">
-              <double>0.050000000000000</double>
+              <double>1.000000000000000</double>
              </property>
              <property name="maximum">
-              <double>99999.990000000005239</double>
+              <double>64.000000000000000</double>
              </property>
              <property name="singleStep">
-              <double>0.050000000000000</double>
+              <double>1.000000000000000</double>
+             </property>
+             <property name="value">
+              <double>1.000000000000000</double>
              </property>
             </widget>
            </item>
@@ -658,13 +667,16 @@
               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
              </property>
              <property name="minimum">
-              <double>-999999.000000000000000</double>
+              <double>1.000000000000000</double>
              </property>
              <property name="maximum">
-              <double>99999.000000000000000</double>
+              <double>64.000000000000000</double>
              </property>
              <property name="singleStep">
-              <double>0.050000000000000</double>
+              <double>1.000000000000000</double>
+             </property>
+             <property name="value">
+              <double>1.000000000000000</double>
              </property>
             </widget>
            </item>
@@ -902,11 +914,14 @@
                 <property name="alignment">
                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                 </property>
+                <property name="decimals">
+                 <number>0</number>
+                </property>
                 <property name="minimum">
-                 <double>0.010000000000000</double>
+                 <double>0.000000000000000</double>
                 </property>
                 <property name="maximum">
-                 <double>99.989999999999995</double>
+                 <double>100.000000000000000</double>
                 </property>
                 <property name="value">
                  <double>2.000000000000000</double>
@@ -931,11 +946,14 @@
                 <property name="alignment">
                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                 </property>
+                <property name="decimals">
+                 <number>0</number>
+                </property>
                 <property name="minimum">
-                 <double>0.010000000000000</double>
+                 <double>0.000000000000000</double>
                 </property>
                 <property name="maximum">
-                 <double>9999.989999999999782</double>
+                 <double>10000.000000000000000</double>
                 </property>
                 <property name="value">
                  <double>1.000000000000000</double>
@@ -983,7 +1001,7 @@
               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
              </property>
              <property name="maximum">
-              <double>99999.990000000005239</double>
+              <double>32.000000000000000</double>
              </property>
             </widget>
            </item>
@@ -996,7 +1014,10 @@
               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
              </property>
              <property name="minimum">
-              <double>-999999.000000000000000</double>
+              <double>0.000000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>32.000000000000000</double>
              </property>
             </widget>
            </item>
@@ -1049,6 +1070,25 @@
              </property>
              <property name="text">
               <string>final value:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="2" column="1" rowspan="2">
+            <widget class="QLabel" name="lb_CountDirectionPhase">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text">
+              <string>iterator</string>
+             </property>
+             <property name="margin">
+              <number>0</number>
              </property>
             </widget>
            </item>
@@ -1105,25 +1145,6 @@
              </layout>
             </widget>
            </item>
-           <item row="2" column="1" rowspan="2">
-            <widget class="QLabel" name="lb_CountDirectionPhase">
-             <property name="enabled">
-              <bool>false</bool>
-             </property>
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>iterator</string>
-             </property>
-             <property name="margin">
-              <number>0</number>
-             </property>
-            </widget>
-           </item>
            <item row="0" column="0">
             <widget class="QLabel" name="lb_Phase">
              <property name="sizePolicy">
@@ -1139,6 +1160,22 @@
              </property>
              <property name="text">
               <string>phase:</string>
+             </property>
+            </widget>
+           </item>
+           <item row="4" column="2">
+            <widget class="QDoubleSpinBox" name="dspb_EndValuePhase">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             </property>
+             <property name="minimum">
+              <double>0.000000000000000</double>
+             </property>
+             <property name="maximum">
+              <double>64.000000000000000</double>
              </property>
             </widget>
            </item>
@@ -1171,25 +1208,25 @@ p, li { white-space: pre-wrap; }
               <number>4</number>
              </property>
              <property name="maximum">
-              <double>6.283200000000000</double>
+              <double>64.000000000000000</double>
              </property>
              <property name="singleStep">
               <double>0.100000000000000</double>
              </property>
             </widget>
            </item>
-           <item row="4" column="2">
-            <widget class="QDoubleSpinBox" name="dspb_EndValuePhase">
-             <property name="enabled">
-              <bool>false</bool>
+           <item row="1" column="3">
+            <spacer name="horizontalSpacer_8">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
              </property>
-             <property name="alignment">
-              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
              </property>
-             <property name="minimum">
-              <double>0.000000000000000</double>
-             </property>
-            </widget>
+            </spacer>
            </item>
            <item row="1" column="0" rowspan="4">
             <widget class="QFrame" name="fr_DefCountPhase">
@@ -1281,11 +1318,14 @@ p, li { white-space: pre-wrap; }
                 <property name="alignment">
                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                 </property>
+                <property name="decimals">
+                 <number>0</number>
+                </property>
                 <property name="minimum">
-                 <double>0.010000000000000</double>
+                 <double>0.000000000000000</double>
                 </property>
                 <property name="maximum">
-                 <double>9999.989999999999782</double>
+                 <double>10000.000000000000000</double>
                 </property>
                 <property name="value">
                  <double>1.000000000000000</double>
@@ -1312,8 +1352,11 @@ p, li { white-space: pre-wrap; }
                 <property name="alignment">
                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                 </property>
+                <property name="decimals">
+                 <number>0</number>
+                </property>
                 <property name="minimum">
-                 <double>0.010000000000000</double>
+                 <double>0.000000000000000</double>
                 </property>
                 <property name="value">
                  <double>2.000000000000000</double>
@@ -1355,19 +1398,6 @@ p, li { white-space: pre-wrap; }
               </item>
              </layout>
             </widget>
-           </item>
-           <item row="1" column="3">
-            <spacer name="horizontalSpacer_8">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>40</width>
-               <height>20</height>
-              </size>
-             </property>
-            </spacer>
            </item>
           </layout>
          </item>
@@ -1573,8 +1603,11 @@ p, li { white-space: pre-wrap; }
                    <property name="alignment">
                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                    </property>
+                   <property name="decimals">
+                    <number>0</number>
+                   </property>
                    <property name="minimum">
-                    <double>0.010000000000000</double>
+                    <double>0.000000000000000</double>
                    </property>
                    <property name="value">
                     <double>2.000000000000000</double>
@@ -1589,11 +1622,14 @@ p, li { white-space: pre-wrap; }
                    <property name="alignment">
                     <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                    </property>
+                   <property name="decimals">
+                    <number>0</number>
+                   </property>
                    <property name="minimum">
-                    <double>0.010000000000000</double>
+                    <double>0.000000000000000</double>
                    </property>
                    <property name="maximum">
-                    <double>9999.989999999999782</double>
+                    <double>10000.000000000000000</double>
                    </property>
                    <property name="value">
                     <double>1.000000000000000</double>
@@ -1681,7 +1717,7 @@ p, li { white-space: pre-wrap; }
                  <number>6</number>
                 </property>
                 <property name="maximum">
-                 <double>999999.989999999990687</double>
+                 <double>9999.000000000000000</double>
                 </property>
                 <property name="singleStep">
                  <double>0.000001000000000</double>
@@ -1700,7 +1736,10 @@ p, li { white-space: pre-wrap; }
                  <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
                 </property>
                 <property name="minimum">
-                 <double>-999999.000000000000000</double>
+                 <double>0.000000000000000</double>
+                </property>
+                <property name="maximum">
+                 <double>9999.000000000000000</double>
                 </property>
                </widget>
               </item>

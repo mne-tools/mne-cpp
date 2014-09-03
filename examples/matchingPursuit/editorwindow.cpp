@@ -79,14 +79,14 @@ qreal linStepWidthChirp = 1;
 qreal expStepWidthScale = 2;
 qreal expStepWidthModu = 2;
 qreal expStepWidthPhase = 2;
-qreal expStepWidthChirp = 02;
+qreal expStepWidthChirp = 2;
 
-qreal startValueScale = 0.05;
+qreal startValueScale = 1;
 qreal startValueModu = 0;
 qreal startValuePhase = 0;
 qreal startValueChirp = 0;
 
-qreal endValueScale = 0.05;
+qreal endValueScale = 1;
 qreal endValueModu = 0;
 qreal endValuePhase = 0;
 qreal endValueChirp = 0;
@@ -112,6 +112,7 @@ EditorWindow::EditorWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::Ed
 {   
     this->setAccessibleName("simple");
     ui->setupUi(this);
+    ui->dspb_StartValueScale->setMaximum(ui->spb_AtomLength->value());
 
     // set chirp visibility
     ui->rb_ChirpAtomType->setVisible(false);
@@ -695,6 +696,19 @@ void EditorWindow::on_spb_AtomLength_editingFinished()
 {
     // set max startvalue of scale
     ui->dspb_StartValueScale->setMaximum(ui->spb_AtomLength->value());
+    ui->dspb_StartValueModu->setMaximum(ui->spb_AtomLength->value() / 2);
+    ui->dspb_StartValuePhase->setMaximum(ui->spb_AtomLength->value());
+    ui->dspb_StartValueChirp->setMaximum(ui->spb_AtomLength->value() / 2);
+
+    ui->dspb_EndValueScale->setMaximum(ui->spb_AtomLength->value());
+    ui->dspb_EndValueModu->setMaximum(ui->spb_AtomLength->value() / 2);
+    ui->dspb_EndValuePhase->setMaximum(ui->spb_AtomLength->value());
+    ui->dspb_EndValueChirp->setMaximum(ui->spb_AtomLength->value() / 2);
+
+    ui->dspb_LinStepScale->setMaximum(ui->spb_AtomLength->value());
+    ui->dspb_LinStepModu->setMaximum(ui->spb_AtomLength->value() / 2);
+    ui->dspb_LinStepPhase->setMaximum(ui->spb_AtomLength->value());
+    ui->dspb_LinStepChirp->setMaximum(ui->spb_AtomLength->value() / 2);
 }
 
 //*************************************************************************************************************
@@ -1260,13 +1274,13 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
                         while(scaleCount < scaleList.length())
                         {
                             qreal tempScale = ui->dspb_StartValueScale->value();
-                            if(scaleList.length() > 0 && atomIndex < scaleList.length()) tempScale = scaleList.at(atomIndex);
+                            if(scaleList.length() > 0 && scaleCount < scaleList.length()) tempScale = scaleList.at(scaleCount);
                             qreal tempModu = ui->dspb_StartValueModu->value();
-                            if(moduList.length() > 0 && atomIndex < moduList.length()) tempModu = moduList.at(atomIndex);
-                            qreal tempPhase = ui->dspb_StartValuePhase->value();
-                            if(phaseList.length() > 0 && atomIndex < phaseList.length()) tempPhase = phaseList.at(atomIndex);
+                            if(moduList.length() > 0 && moduCount < moduList.length()) tempModu = moduList.at(moduCount);
+                            qreal tempPhase = 2 * PI * ui->dspb_StartValuePhase->value() / tempScale;
+                            if(phaseList.length() > 0 && phaseCount < phaseList.length()) tempPhase = 2 * PI * phaseList.at(phaseCount) / tempScale;
                             qreal tempChirp = ui->dspb_StartValueChirp->value();
-                            if(chirpList.length() > 0 && atomIndex < chirpList.length()) tempChirp = chirpList.at(atomIndex);
+                            if(chirpList.length() > 0 && chirpCount < chirpList.length()) tempChirp = chirpList.at(chirpCount);
 
                             if(atomType == EditorWindow::Chirp)
                              {
@@ -1298,7 +1312,7 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
                             for (QStringList::Iterator it = resultList.begin(); it != resultList.end(); it++)
                                 stream << *it << "\n";
 
-                            //xmlWriter.writeStartElement("samples");
+                            xmlWriter.writeStartElement("samples");
                             QString samples_to_xml;
                             for (qint32 it = 0; it < resultList.length(); it++)
                             {
@@ -1306,7 +1320,7 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
                                 samples_to_xml.append(":");
                             }
                             xmlWriter.writeAttribute("samples", samples_to_xml);
-                            //xmlWriter.writeEndElement();
+                            xmlWriter.writeEndElement();
 
                             xmlWriter.writeEndElement();
 
@@ -1346,8 +1360,8 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
                 if(scaleList.length() > 0 && i < scaleList.length()) tempScale = scaleList.at(i);
                 qreal tempModu = ui->dspb_StartValueModu->value();
                 if(moduList.length() > 0 && i < moduList.length()) tempModu = moduList.at(i);
-                qreal tempPhase = ui->dspb_StartValuePhase->value();
-                if(phaseList.length() > 0 && i < phaseList.length()) tempPhase = phaseList.at(i);
+                qreal tempPhase = 2 * PI * ui->dspb_StartValuePhase->value() / tempScale;
+                if(phaseList.length() > 0 && i < phaseList.length()) tempPhase = 2 * PI * phaseList.at(i) / tempScale;
                 qreal tempChirp = ui->dspb_StartValueChirp->value();
                 if(chirpList.length() > 0 && i < chirpList.length()) tempChirp = chirpList.at(i);
 
@@ -1381,7 +1395,7 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
                 for (QStringList::Iterator it = resultList.begin(); it != resultList.end(); it++)
                     stream << *it << "\n";
 
-                //xmlWriter.writeStartElement("samples");
+                xmlWriter.writeStartElement("samples");
                 QString samples_to_xml;
                 for (qint32 it = 0; it < resultList.length(); it++)
                 {
@@ -1389,8 +1403,7 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
                     samples_to_xml.append(":");
                 }
                 xmlWriter.writeAttribute("samples", samples_to_xml);
-                //xmlWriter.writeEndElement();
-
+                xmlWriter.writeEndElement();
                 xmlWriter.writeEndElement();
 
                 i++;
@@ -1624,7 +1637,7 @@ void EditorWindow::on_btt_SaveDicts_clicked()
         QDomDocument xml_pdict;
         xml_pdict.setContent(&xml_file);
         QDomElement xml_root= xml_pdict.documentElement();
-        summarize_atoms += (xml_root.attribute("of_atoms", xml_root.text())).toInt();
+        //summarize_atoms += (xml_root.attribute("of_atoms", xml_root.text())).toInt();
 
         QDomNodeList node_list = xml_root.childNodes();
         qint32 count = node_list.count();
@@ -1647,6 +1660,7 @@ void EditorWindow::on_btt_SaveDicts_clicked()
                 }
                 if(!hasElement)
                 {
+                    summarize_atoms += (built.attribute("atom_count", built.text())).toInt();
                     header.appendChild(built);
                     QDomElement atom = built.firstChild().toElement();
                     while(!atom.isNull())

@@ -528,6 +528,7 @@ VectorXd AdaptiveMp::calculate_atom(qint32 sample_count, qreal scale, qint32 tra
     {
         case RETURNPARAMETERS:
         {
+
             qreal scalar_product = 0;
 
             for(qint32 i = 0; i < sample_count; i++)
@@ -543,7 +544,8 @@ VectorXd AdaptiveMp::calculate_atom(qint32 sample_count, qreal scale, qint32 tra
 
             return atom_parameters;
         }
-        case RETURNATOM: {return real_gabor_atom;} //returns normalized realGaborAtom
+
+    case RETURNATOM: {return real_gabor_atom;} //returns normalized realGaborAtom
     }
 }
 

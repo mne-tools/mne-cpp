@@ -78,6 +78,15 @@ using namespace UTILSLIB;
 
 //*************************************************************************************************************
 
+FixDictAtom::FixDictAtom(qint32 _id, qint32 _sample_count, QString _dict_source)
+{
+    id = _id;
+    sample_count = _sample_count;
+    dict_source = _dict_source;
+    energy = 0;
+    max_scalar_product = 0;
+}
+
 FixDictAtom::FixDictAtom()
 {
     energy = 0;
@@ -179,11 +188,7 @@ VectorXd GaborAtom::create_real(qint32 sample_count, qreal scale, quint32 transl
     {
         VectorXd envelope = GaborAtom::gauss_function(sample_count, scale, translation);
         for(qint32 i = 0; i < sample_count; i++)
-        {
-            qreal t = (qreal(i) - translation) / scale;
             real_atom[i] = envelope[i] * cos(2 * PI * modulation / sample_count * qreal(i) + phase);
-            Q_UNUSED(t);
-        }
     }
 
     //normalization
