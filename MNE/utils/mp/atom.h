@@ -131,15 +131,56 @@ public:
     * FixDictAtom class inherited from Atom with additional functions
     */
     FixDictAtom();
+    FixDictAtom(qint32 _id, qint32 _sample_count, QString _dict_source);
     //=========================================================================================================
     /**
     * Copy deconstructor.
     *
     */
     ~FixDictAtom();
-
+    //=========================================================================================================
     QString atom_formula;
+    QString display_text;
     QList<VectorXd> vector_list;
+
+    enum AtomType{GABORATOM, CHIRPATOM, FORMULAATOM};
+
+    qint32 id;
+    QString dict_source;
+    AtomType type;
+    qreal translation;
+
+    struct GaborATOM
+    {
+        qreal scale;
+        qreal modulation;
+        qreal phase;
+    };
+
+    struct ChirpATOM
+    {
+        qreal scale;
+        qreal modulation;
+        qreal phase;
+        qreal chirp;
+    };
+
+
+    struct formulaATOM
+    {
+        qreal a;
+        qreal b;
+        qreal c;
+        qreal d;
+        qreal e;
+        qreal f;
+        qreal g;
+        qreal h;
+    };
+
+    GaborATOM gabor_atom;
+    ChirpATOM chirp_atom;
+    formulaATOM formula_atom;
 };
 
 //=============================================================================================================

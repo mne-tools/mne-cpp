@@ -415,6 +415,8 @@ QList<qreal> Enhancededitorwindow::calc_value_list(qreal start_value, qreal line
 
 qreal Enhancededitorwindow::calc_end_value(qreal startValue, qreal linStepValue)
 {
+    if(ui->sb_Atomcount->value() == 1)
+        return startValue;
     return startValue + (_atom_count * linStepValue);
 }
 
@@ -681,6 +683,25 @@ void Enhancededitorwindow::on_pushButton_clicked()
         }
     }
 
+
+    QString save_path_xml = QString("Matching-Pursuit-Toolbox/%1_xml.pdict").arg(ui->tb_atom_name->text());
+    QFile xml_file(save_path_xml);
+
+    xml_file.open(QIODevice::WriteOnly);
+
+    QXmlStreamWriter xmlWriter(&xml_file);
+    xmlWriter.setAutoFormatting(true);
+    xmlWriter.writeStartDocument();
+
+    xmlWriter.writeStartElement("COUNT");
+    xmlWriter.writeAttribute("of_atoms", QString::number(ui->sb_Atomcount->value()));
+    xmlWriter.writeStartElement("built_Atoms");
+
+    xmlWriter.writeAttribute("formula", ui->cb_AtomFormula->currentText());
+    xmlWriter.writeAttribute("sample_count", QString::number(ui->sb_SampleCount->value()));
+    xmlWriter.writeAttribute("atom_count", QString::number(ui->sb_Atomcount->value()));
+    xmlWriter.writeAttribute("source_dict", ui->tb_atom_name->text());
+
     if (dict.open (QIODevice::WriteOnly| QIODevice::Append))
     {
         QTextStream stream( &dict );
@@ -776,8 +797,32 @@ void Enhancededitorwindow::on_pushButton_clicked()
                                                       .arg(temp_g)
                                                       .arg(temp_h) << "\n";
 
-                                           for (QStringList::Iterator it = results_list.begin(); it != results_list.end(); it++)
-                                                stream << *it << "\n";
+                                            for (QStringList::Iterator it = results_list.begin(); it != results_list.end(); it++)
+                                                 stream << *it << "\n";
+
+                                            xmlWriter.writeStartElement("ATOM");
+                                            xmlWriter.writeAttribute("ID", QString::number(atomIndex));
+                                            xmlWriter.writeAttribute("a", QString::number(temp_a));
+                                            xmlWriter.writeAttribute("b", QString::number(temp_b));
+                                            xmlWriter.writeAttribute("c", QString::number(temp_c));
+                                            xmlWriter.writeAttribute("d", QString::number(temp_d));
+                                            xmlWriter.writeAttribute("e", QString::number(temp_e));
+                                            xmlWriter.writeAttribute("f", QString::number(temp_f));
+                                            xmlWriter.writeAttribute("g", QString::number(temp_g));
+                                            xmlWriter.writeAttribute("h", QString::number(temp_h));
+
+                                            xmlWriter.writeStartElement("samples");
+                                            QString samples_to_xml;
+                                            for (qint32 it = 0; it < results_list.length(); it++)
+                                            {
+                                                samples_to_xml.append(results_list.at(it));
+                                                samples_to_xml.append(":");
+                                            }
+                                            xmlWriter.writeAttribute("samples", samples_to_xml);
+                                            xmlWriter.writeEndElement();
+
+                                            xmlWriter.writeEndElement();
+
 
                                            atomIndex++;
                                            count_a++;
@@ -849,9 +894,38 @@ void Enhancededitorwindow::on_pushButton_clicked()
                for (QStringList::Iterator it = results_list.begin(); it != results_list.end(); it++)
                     stream << *it << "\n";
 
+               xmlWriter.writeStartElement("ATOM");
+               xmlWriter.writeAttribute("ID", QString::number(atom_index));
+               xmlWriter.writeAttribute("a", QString::number(temp_a));
+               xmlWriter.writeAttribute("b", QString::number(temp_b));
+               xmlWriter.writeAttribute("c", QString::number(temp_c));
+               xmlWriter.writeAttribute("d", QString::number(temp_d));
+               xmlWriter.writeAttribute("e", QString::number(temp_e));
+               xmlWriter.writeAttribute("f", QString::number(temp_f));
+               xmlWriter.writeAttribute("g", QString::number(temp_g));
+               xmlWriter.writeAttribute("h", QString::number(temp_h));
+
+               xmlWriter.writeStartElement("samples");
+               QString samples_to_xml;
+               for (qint32 it = 0; it < results_list.length(); it++)
+               {
+                   samples_to_xml.append(results_list.at(it));
+                   samples_to_xml.append(":");
+               }
+               xmlWriter.writeAttribute("samples", samples_to_xml);
+               xmlWriter.writeEndElement();
+
+               xmlWriter.writeEndElement();
+
+
                atom_index++;
             }
         }
         dict.close();
     }
+    xmlWriter.writeEndElement();
+    xmlWriter.writeEndElement();
+    xmlWriter.writeEndDocument();
+
+    xml_file.close();
 }

@@ -32,7 +32,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Hinweis</string>
+   <string>Warning</string>
   </property>
   <property name="modal">
    <bool>true</bool>
@@ -100,7 +100,7 @@
     </size>
    </property>
    <property name="text">
-    <string>Diese Meldung nicht wieder anzeigen</string>
+    <string>Don´t show this message again.</string>
    </property>
   </widget>
   <widget class="QLabel" name="lb_MessageText">
@@ -119,7 +119,7 @@
     </sizepolicy>
    </property>
    <property name="text">
-    <string>Die Berechnung kann einige Minuten in Anspruch nehmen.</string>
+    <string>The calculation may take several minutes to complete.</string>
    </property>
   </widget>
  </widget>

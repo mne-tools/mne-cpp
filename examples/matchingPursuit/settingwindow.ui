@@ -6,9 +6,27 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>312</width>
+    <width>195</width>
     <height>282</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>195</width>
+    <height>282</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>195</width>
+    <height>282</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>settings</string>
@@ -18,13 +36,13 @@
     <normaloff>:/images/icons/settings.png</normaloff>:/images/icons/settings.png</iconset>
   </property>
   <property name="toolTip">
-   <string extracomment="this option accelerates the adaptive MP algorithm for multichannel use. Only one channel is choosen to select bestmatching atom. performance: about triple speed in calculation but also 2 - 3 times more atoms will be found"/>
+   <string/>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QCheckBox" name="cb_boost">
      <property name="toolTip">
-      <string comment="z" extracomment="v"/>
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;justify&quot;&gt;This option accelerates the adaptive MP algorithm for multichannel use by&lt;br/&gt;only choosing one channel to select best matching atom.&lt;/p&gt;&lt;p align=&quot;justify&quot;&gt;Performance changes:	About triple speed in calculation but&lt;br/&gt;		also 2 - 3 times more atoms will be found.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="text">
       <string>adaptiveMP boost</string>
@@ -42,9 +60,9 @@
     </widget>
    </item>
    <item>
-    <widget class="QCheckBox" name="cb_show_warnings">
-     <property name="text">
-      <string>show warnings</string>
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
      </property>
     </widget>
    </item>
@@ -61,7 +79,7 @@
       <widget class="QSpinBox" name="sb_adaptive_iteration">
        <property name="maximumSize">
         <size>
-         <width>100</width>
+         <width>80</width>
          <height>16777215</height>
         </size>
        </property>
@@ -130,7 +148,7 @@
       <widget class="QDoubleSpinBox" name="dsb_adaptive_reflection">
        <property name="maximumSize">
         <size>
-         <width>100</width>
+         <width>80</width>
          <height>16777215</height>
         </size>
        </property>
@@ -149,7 +167,7 @@
       <widget class="QDoubleSpinBox" name="dsb_adaptive_contraction">
        <property name="maximumSize">
         <size>
-         <width>100</width>
+         <width>80</width>
          <height>16777215</height>
         </size>
        </property>
@@ -168,7 +186,7 @@
       <widget class="QDoubleSpinBox" name="dsb_adaptive_fullcontraction">
        <property name="maximumSize">
         <size>
-         <width>100</width>
+         <width>80</width>
          <height>16777215</height>
         </size>
        </property>
@@ -187,7 +205,7 @@
       <widget class="QDoubleSpinBox" name="dsb_adaptive_expansion">
        <property name="maximumSize">
         <size>
-         <width>100</width>
+         <width>80</width>
          <height>16777215</height>
         </size>
        </property>
@@ -205,11 +223,25 @@
     </layout>
    </item>
    <item>
+    <widget class="Line" name="line_2">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QCheckBox" name="cb_show_warnings">
+     <property name="text">
+      <string>show warnings</string>
+     </property>
+    </widget>
+   </item>
+   <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QPushButton" name="btt_close">
        <property name="text">
-        <string>save and close</string>
+        <string>save and exit</string>
        </property>
       </widget>
      </item>
