@@ -238,6 +238,8 @@ private slots:
 
     void on_actionSpeicher_unter_triggered();
 
+    void on_actionSpeicher_triggered();
+
 signals:
 
     void send_input(MatrixXd send_signal, qint32 send_max_iterations, qreal send_epsilon, bool fix_phase, bool boost, qint32 simplex_it,
@@ -332,6 +334,7 @@ private:
     void calc_fix_mp(QString path, MatrixXd signal, TruncationCriterion criterion);
     void closeEvent(QCloseEvent * event);
     static bool sort_Energie(const GaborAtom atom_1, const GaborAtom atom_2);
+    void save_fif_file();
 };
 
 //*************************************************************************************************************

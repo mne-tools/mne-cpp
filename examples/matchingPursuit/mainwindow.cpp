@@ -100,7 +100,7 @@ bool _was_partialchecked = false;
 bool _come_from_sample_count = false;
 bool _come_from_from =false;
 
-qreal _from = 47.151f;
+qreal _from = 47.005f;
 qreal _to = 48.000f;
 qreal _signal_energy = 0;
 qreal _signal_maximum = 0;
@@ -110,6 +110,7 @@ qreal _max_neg = 0;
 qreal _draw_factor = 0;
 qint32 _sample_rate = 1;
 
+QString _save_path = "";
 QString _file_name = "";
 QMap<qint32, bool> _select_channel_map;
 QMap<qint32, bool> _select_atoms_map;
@@ -174,6 +175,7 @@ MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::
     ui->progressBarCalc->setHidden(true);
     ui->splitter->setStretchFactor(1,4);    
 
+    ui->lb_save_file->setHidden(true);
     ui->lb_from->setHidden(true);
     ui->dsb_from->setHidden(true);
     ui->lb_to->setHidden(true);
@@ -277,9 +279,9 @@ void MainWindow::open_file()
 
     if(_file_name.endsWith(".fif", Qt::CaseInsensitive))
     {        
-        ui->dsb_from->setValue(47.151f);
+        ui->dsb_from->setValue(47.005f);
         ui->dsb_to->setValue(48.000f);
-        _from = 47.151f;
+        _from = 47.005f;
         //read_fiff_ave(_file_name);
         read_fiff_file(_file_name);
         ui->lb_from->setHidden(false);
@@ -422,90 +424,26 @@ qint32 MainWindow::read_fiff_file(QString fileName)
     QFile t_fileRaw(fileName);    
     bool keep_comp = true;
 
-    //
-    //   Setup for reading the raw data
-    //
+
+    //   Setup for reading the raw data    
     FiffRawData raw(t_fileRaw);
 
-    //
+
     //   Set up pick list: MEG + STI 014 - bad channels
-    //
-    //
     QStringList include;
     include << "STI 014";
     bool want_meg   = true;
     bool want_eeg   = false;
     bool want_stim  = false;
-
     RowVectorXi picks = raw.info.pick_types(want_meg, want_eeg, want_stim, include, raw.info.bads);
 
-
-    //
-    //   Set up projection
-    //
-    qint32 k = 0;
-    if (raw.info.projs.size() == 0)
-       printf("No projector specified for these data\n");
-    else
-    {
-        //
-        //   Activate the projection items
-        //
-        for (k = 0; k < raw.info.projs.size(); ++k)
-           raw.info.projs[k].active = true;
-
-       printf("%d projection items activated\n",raw.info.projs.size());
-       //
-       //   Create the projector
-       //
-       fiff_int_t nproj = raw.info.make_projector(raw.proj);
-
-       if (nproj == 0)
-           printf("The projection vectors do not apply to these channels\n");
-       else
-           printf("Created an SSP operator (subspace dimension = %d)\n",nproj);
-    }
-
-    //
-    //   Set up the CTF compensator
-    //
-    qint32 current_comp = raw.info.get_current_comp();
-    qint32 dest_comp = -1;
-
-    if (current_comp > 0)
-       printf("Current compensation grade : %d\n",current_comp);
-
-    if (keep_comp)
-        dest_comp = current_comp;
-
-    if (current_comp != dest_comp)
-    {
-       qDebug() << "This part needs to be debugged";
-       if(MNE::make_compensator(raw.info, current_comp, dest_comp, raw.comp))
-       {
-          raw.info.set_current_comp(dest_comp);
-          printf("Appropriate compensator added to change to grade %d.\n",dest_comp);
-       }
-       else
-       {
-          printf("Could not make the compensator\n");
-          return -1;
-       }
-    }
-
-    //
     //   Read a data segment
     //   times output argument is optional
-    //
-    bool readSuccessful = false;
-    readSuccessful = raw.read_raw_segment_times(_datas, _times, _from, _to, picks);
-
-    if (!readSuccessful)
+    if (!raw.read_raw_segment_times(_datas, _times, _from, _to, picks))
     {
        printf("Could not read raw segment.\n");
        return -1;
     }
-
     printf("Read %d samples.\n",(qint32)_datas.cols());
 
     ui->sb_sample_rate->setValue(raw.info.sfreq);    
@@ -519,8 +457,6 @@ qint32 MainWindow::read_fiff_file(QString fileName)
 
     for(qint32 channels = 0; channels < rows; channels++)
         _signal_matrix.col(channels) = _datas.row(channels);
-
-    //std::cout << _datas.block(0,0,10,10) << std::endl;
 
     return 0;
 }
@@ -1716,12 +1652,55 @@ void MainWindow::on_dicts_saved()
 
 //*****************************************************************************************************************
 
-void MainWindow::on_actionSpeicher_unter_triggered()
+void MainWindow::on_actionSpeicher_triggered()
 {
-    if(_file_name.isNull())
+    if(_file_name.isEmpty())
     {
         QMessageBox::warning(this, tr("Error"),
         tr("error: No file for save."));
+        return;
+    }
+
+    if(ui->tbv_Results->rowCount() == 0)
+    {
+        QMessageBox::warning(this, tr("Error"),
+        tr("error: No results for save."));
+        return;
+    }
+
+    if(_save_path.isEmpty())
+    {
+        QFileDialog* fileDia;
+        QString save_name = "";
+        QStringList saveList = _file_name.split('/').last().split('.').first().split('_');
+        for(int i = 0; i < saveList.length(); i++)
+        {
+            if(i == saveList.length() - 1)
+                save_name += "mp_" + saveList.at(i);
+            else
+                save_name += saveList.at(i) + "_";
+        }
+        _save_path = fileDia->getSaveFileName(this, "Save file as...", QDir::currentPath() + "/" + save_name,"(*.fif)");
+        if(_save_path.isEmpty()) return;
+    }
+    save_fif_file();
+}
+
+//*****************************************************************************************************************
+
+void MainWindow::on_actionSpeicher_unter_triggered()
+{
+    if(_file_name.isEmpty())
+    {
+        QMessageBox::warning(this, tr("Error"),
+        tr("error: No file for save."));
+        return;
+    }
+
+    if(ui->tbv_Results->rowCount() == 0)
+    {
+        QMessageBox::warning(this, tr("Error"),
+        tr("error: No results for save."));
         return;
     }
 
@@ -1736,11 +1715,23 @@ void MainWindow::on_actionSpeicher_unter_triggered()
             save_name += saveList.at(i) + "_";
     }
 
-    QString save_path = fileDia->getSaveFileName(this, "Save file as...", QDir::currentPath() + "/" + save_name,"(*.fif)");
-    if(save_path.isNull()) return;
+    _save_path = fileDia->getSaveFileName(this, "Save file as...", QDir::currentPath() + "/" + save_name,"(*.fif)");
+    if(_save_path.isEmpty()) return;
+    else save_fif_file();
+}
+
+//*****************************************************************************************************************
+
+void MainWindow::save_fif_file()
+{
+    //change ui
+    ui->lb_timer->setHidden(true);
+    ui->cb_all_select->setHidden(true);
+    ui->lb_save_file->setHidden(false);
+
 
     QFile t_fileIn(_file_name);
-    QFile t_fileOut(save_path);
+    QFile t_fileOut(_save_path);
 
     //
     //   Setup for reading the raw data
@@ -1751,55 +1742,39 @@ void MainWindow::on_actionSpeicher_unter_triggered()
     //   Set up pick list: MEG + STI 014 - bad channels
     //
     //
-
+    QStringList include;
+    include << "STI 014";
     bool want_meg   = true;
     bool want_eeg   = false;
     bool want_stim  = false;
-    QStringList include;
-    include << "STI 014";
+    RowVectorXi picks = raw.info.pick_types(want_meg, want_eeg, want_stim, include, raw.info.bads);
 
-    MatrixXi picks = raw.info.pick_types(want_meg, want_eeg, want_stim, include, raw.info.bads); // prefer member function
-    if(picks.cols() == 0)
-    {
-        include.clear();
-        include << "STI101" << "STI201" << "STI301";
-//        picks = Fiff::pick_types(raw.info, want_meg, want_eeg, want_stim, include, raw.info.bads);
-        picks = raw.info.pick_types(want_meg, want_eeg, want_stim, include, raw.info.bads);// prefer member function
-        if(picks.cols() == 0)
-        {
-            printf("channel list may need modification\n");
-            //return -1;
-        }
-    }
-    //
     MatrixXd cals;
+    FiffStream::SPtr outfid = Fiff::start_writing_raw(t_fileOut,raw.info, cals, picks);
 
-    FiffStream::SPtr outfid = Fiff::start_writing_raw(t_fileOut,raw.info, cals/*, picks*/);
     //
     //   Set up the reading parameters
     //
     fiff_int_t from = raw.first_samp;
     fiff_int_t to = raw.last_samp;
     float quantum_sec = 10.0f;//read and write in 10 sec junks
-    fiff_int_t quantum = ceil(quantum_sec*raw.info.sfreq);
-    //
-    //   To read the whole file at once set
-    //
-    //quantum     = to - from + 1;
-    //
+    fiff_int_t quantum = ceil(quantum_sec*raw.info.sfreq);  //   To read the whole file at once set quantum     = to - from + 1;
+
+    //************************************************************************************
+
     //
     //   Read and write all the data
     //
     bool first_buffer = true;
-
     fiff_int_t first, last;
     MatrixXd data;
     MatrixXd times;
+    qreal start_change = _from * raw.info.sfreq;    // start of change
+    qreal end_change = _to * raw.info.sfreq + 1;    // end of change
 
-    // start of change
-    qreal start_change = _from * raw.info.sfreq;
-    // end of change
-    qreal end_change = _to * raw.info.sfreq + 1;
+    ui->progressBarCalc->setValue(0);
+    ui->progressBarCalc->setMinimum(0);
+    ui->progressBarCalc->setMaximum(to);
 
     // from 0 to start of change
     for(first = from; first < start_change; first+=quantum)
@@ -1809,13 +1784,13 @@ void MainWindow::on_actionSpeicher_unter_triggered()
         {
             last = start_change;
         }
-        if (!raw.read_raw_segment(data,times,first,last/*,picks*/))
+        if (!raw.read_raw_segment(data ,times, first, last, picks))
         {
                 printf("error during read_raw_segment\n");
                 QMessageBox::warning(this, tr("Error"),
                 tr("error: Save unsucessful."));
                 return;
-        }    
+        }
         printf("Writing...");
         if (first_buffer)
         {
@@ -1825,12 +1800,14 @@ void MainWindow::on_actionSpeicher_unter_triggered()
         }
         outfid->write_raw_buffer(data,cals);
         printf("[done]\n");
+
+        ui->progressBarCalc->setValue(first);
     }
 
     //************************************************************************************
 
     // from start of change to end of change
-    if (!raw.read_raw_segment(data, times, start_change ,end_change/*,picks*/))
+    if (!raw.read_raw_segment(data, times, start_change ,end_change,picks))
     {
             printf("error during read_raw_segment\n");
             QMessageBox::warning(this, tr("Error"),
@@ -1848,6 +1825,10 @@ void MainWindow::on_actionSpeicher_unter_triggered()
         }
     }
 
+    printf("Writing new data...");
+    outfid->write_raw_buffer(data,cals);
+    printf("[done]\n");
+
     //************************************************************************************
 
     // from end of change to end
@@ -1858,7 +1839,7 @@ void MainWindow::on_actionSpeicher_unter_triggered()
         {
             last = to;
         }
-        if (!raw.read_raw_segment(data,times,first,last/*,picks*/))
+        if (!raw.read_raw_segment(data,times,first,last, picks))
         {
                 printf("error during read_raw_segment\n");
                 QMessageBox::warning(this, tr("Error"),
@@ -1866,34 +1847,22 @@ void MainWindow::on_actionSpeicher_unter_triggered()
                 return;
         }
         printf("Writing...");
-        if (first_buffer)
-        {
-           if (first > 0)
-               outfid->write_int(FIFF_FIRST_SAMPLE,&first);
-           first_buffer = false;
-        }
         outfid->write_raw_buffer(data,cals);
         printf("[done]\n");
+        ui->progressBarCalc->setValue(first);
     }
-
-
-
-
-
+    ui->progressBarCalc->setValue(to);
 
     printf("Writing...");
     outfid->write_raw_buffer(data,cals);
     printf("[done]\n");
 
-
-
-
-
     outfid->finish_writing_raw();
-
     printf("Finished\n");
 
-    //return 0;//a.exec();
+    ui->lb_timer->setHidden(false);
+    ui->cb_all_select->setHidden(false);
+    ui->lb_save_file->setHidden(true);
 }
 
 //*****************************************************************************************************************
@@ -1902,3 +1871,5 @@ bool MainWindow::sort_Energie(const GaborAtom atom_1, const GaborAtom atom_2)
 {
     return (atom_1.energy > atom_2.energy);
 }
+
+
