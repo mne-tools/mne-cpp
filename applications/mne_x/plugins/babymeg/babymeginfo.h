@@ -95,6 +95,8 @@ public:
     QStringList lm_ch_pos10;
     QStringList lm_ch_pos11;
     QStringList lm_ch_pos12;
+    QStringList lm_ch_coiltype;
+    QStringList lm_ch_calicoef;
 
     //BB_QUEUE
     QQueue<QByteArray> g_queue;
