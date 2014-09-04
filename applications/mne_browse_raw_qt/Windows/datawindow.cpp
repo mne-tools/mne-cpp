@@ -224,6 +224,25 @@ void DataWindow::resizeEvent(QResizeEvent * event)
 
 //*************************************************************************************************************
 
+void DataWindow::keyPressEvent(QKeyEvent* event)
+{
+    QScrollBar* horizontalScrollBar = ui->m_tableView_rawTableView->horizontalScrollBar();
+
+    switch(event->key()) {
+    case Qt::Key_Left:
+        horizontalScrollBar->setValue(horizontalScrollBar->value() - 25);
+        break;
+    case Qt::Key_Right:
+        horizontalScrollBar->setValue(horizontalScrollBar->value() + 25);
+        break;
+    }
+
+    return QDockWidget::keyPressEvent(event);
+}
+
+
+//*************************************************************************************************************
+
 void DataWindow::manualResize()
 {
     int newWidth;

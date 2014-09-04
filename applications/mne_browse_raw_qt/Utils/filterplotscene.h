@@ -53,6 +53,7 @@
 
 #include <QGraphicsScene>
 #include <QPainterPath>
+#include <QGraphicsPathItem>
 
 
 //*************************************************************************************************************
@@ -91,12 +92,29 @@ public:
 protected:
     //=========================================================================================================
     /**
+    * Draws the diagram to plot the magnitude.
+    *
+    */
+    void plotMagnitudeDiagram();
+
+    //=========================================================================================================
+    /**
     * Draws the filter's frequency response.
     *
     */
     void plotFilterFrequencyResponse();
 
-    QSharedPointer<FilterOperator>          m_pCurrentFilter;
+    QSharedPointer<FilterOperator>      m_pCurrentFilter;
+
+    QGraphicsPathItem*                  m_pGraphicsItemPath;
+
+    int             m_iScalingFactor;           /**< Scales the db filter magnitudes by the specified factor in order to provide better plotting */
+    double          m_dMaxMagnitude;            /**< the maximum magnirutde shown in the diagram */
+    int             m_iNumberHorizontalLines;   /**< number of plotted horizontal ()lines */
+    int             m_iNumberVerticalLines;     /**< number of plotted vertical lines */
+    int             m_iAxisTextSize;            /**< point size of the plotted text */
+    int             m_iDiagramMarginsHoriz;     /**< horizontal space between the filter and diagram plot  */
+    int             m_iDiagramMarginsVert;      /**< vertical space between the filter and diagram plot */
 
 public slots:
 

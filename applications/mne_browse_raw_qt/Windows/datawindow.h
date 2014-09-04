@@ -131,9 +131,15 @@ private:
 
     //=========================================================================================================
     /**
-    * resizeEvent reimplemented virtual function to handle events of the data dock window
+    * resizeEvent reimplemented virtual function to handle resize events of the data dock window
     */
-    void resizeEvent(QResizeEvent * event);
+    void resizeEvent(QResizeEvent* event);
+
+    //=========================================================================================================
+    /**
+    * keyPressEvent reimplemented virtual function to handle key press events of the data dock window
+    */
+    void keyPressEvent(QKeyEvent* event);
 
     Ui::DataWindowDockWidget *ui;
 

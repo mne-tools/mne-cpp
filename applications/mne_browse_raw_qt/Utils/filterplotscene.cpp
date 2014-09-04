@@ -58,10 +58,16 @@ using namespace Eigen;
 
 FilterPlotScene::FilterPlotScene(QObject *parent) :
     QGraphicsScene(parent),
-    m_pCurrentFilter(new FilterOperator())
+    m_pCurrentFilter(new FilterOperator()),
+    m_pGraphicsItemPath(new QGraphicsPathItem()),
+    m_iScalingFactor(5),
+    m_dMaxMagnitude(100*m_iScalingFactor),
+    m_iNumberHorizontalLines(4),
+    m_iNumberVerticalLines(3),
+    m_iAxisTextSize(24),
+    m_iDiagramMarginsHoriz(5),
+    m_iDiagramMarginsVert(5)
 {
-//    addLine(0,0,50,50);
-//    addRect(this->sceneRect());
 }
 
 
@@ -74,6 +80,58 @@ void FilterPlotScene::updateFilter(QSharedPointer<MNEOperator> operatorFilter)
 
     //Plot newly set filter
     plotFilterFrequencyResponse();
+
+    //Plot the magnitude diagram
+    plotMagnitudeDiagram();
+}
+
+
+//*************************************************************************************************************
+
+void FilterPlotScene::plotMagnitudeDiagram()
+{
+    //Get row vector with filter coefficients
+    RowVectorXcd coefficientsAFreq = m_pCurrentFilter->m_dFFTCoeffA;
+
+    addRect(-m_iDiagramMarginsHoriz,
+            -m_iDiagramMarginsVert,
+            coefficientsAFreq.cols()+(m_iDiagramMarginsHoriz*2),
+            m_dMaxMagnitude+(m_iDiagramMarginsVert*2));
+
+    //HORIZONTAL
+    //Draw horizontal lines
+    for(int i = 1; i <= m_iNumberHorizontalLines; i++)
+        addLine(-m_iDiagramMarginsHoriz,
+                (i * (m_dMaxMagnitude/(m_iNumberHorizontalLines+1))) - m_iDiagramMarginsVert,
+                coefficientsAFreq.cols() + m_iDiagramMarginsHoriz,
+                (i * (m_dMaxMagnitude/(m_iNumberHorizontalLines+1))) - m_iDiagramMarginsVert,
+                QPen(Qt::DotLine));
+
+    //Draw vertical axis texts - db magnitude
+    for(int i = 0; i <= m_iNumberHorizontalLines+1; i++) {
+        QGraphicsTextItem * text = addText(QString("-%1 db").arg(QString().number(i * m_dMaxMagnitude/(m_iScalingFactor*(m_iNumberHorizontalLines+1)),'g',3)),
+                                           QFont("Times", m_iAxisTextSize));
+        text->setPos(-text->boundingRect().width() - m_iAxisTextSize/2,
+                     (i * (m_dMaxMagnitude/(m_iNumberHorizontalLines+1))) - (text->boundingRect().height()/2));
+    }
+
+    //VERTICAL
+    //Draw vertical lines
+    double length = coefficientsAFreq.cols() / (m_iNumberVerticalLines+1);
+    for(int i = 1; i<=m_iNumberVerticalLines; i++)
+        addLine(i*length - m_iDiagramMarginsHoriz,
+                -m_iDiagramMarginsVert,
+                i*length - m_iDiagramMarginsHoriz,
+                m_dMaxMagnitude + m_iDiagramMarginsVert,
+                QPen(Qt::DotLine));
+
+    //Draw horizontal axis texts - Hz frequency
+    for(int i = 0; i <= m_iNumberVerticalLines+1; i++) {
+        QGraphicsTextItem * text = addText(QString("%1 Hz").arg(i*(600/(m_iNumberVerticalLines+1))),
+                                           QFont("Times", m_iAxisTextSize));
+        text->setPos(i * length - m_iDiagramMarginsHoriz - (text->boundingRect().width()/2),
+                     m_dMaxMagnitude + (text->boundingRect().height()/2));
+    }
 }
 
 
@@ -81,26 +139,37 @@ void FilterPlotScene::updateFilter(QSharedPointer<MNEOperator> operatorFilter)
 
 void FilterPlotScene::plotFilterFrequencyResponse()
 {
+    //Get row vector with filter coefficients and norm to 1
     RowVectorXcd coefficientsAFreq = m_pCurrentFilter->m_dFFTCoeffA;
 
-    coefficientsAFreq.normalize();
+    double max = 0;
+    for(int i = 0; i<coefficientsAFreq.cols(); i++)
+        if(abs(coefficientsAFreq(i)) > max)
+            max = abs(coefficientsAFreq(i));
+
+    coefficientsAFreq = coefficientsAFreq / max;
 
     //Create painter path
     QPainterPath path;
-    path.moveTo(0,-abs(coefficientsAFreq(0))*8000);
+    path.moveTo(0, -20 * log10(abs(coefficientsAFreq(0))) * m_iScalingFactor);
 
     for(int i = 0; i<coefficientsAFreq.cols(); i++) {
-        //qDebug()<<abs(coefficientsAFreq(i));
-        path.lineTo(path.currentPosition().x()+1,-abs(coefficientsAFreq(i))*8000);
+        double y = -20 * log10(abs(coefficientsAFreq(i))) * m_iScalingFactor; //-1 because we want to plot upwards
+        if(y > m_dMaxMagnitude)
+            y = m_dMaxMagnitude;
+
+        path.lineTo(path.currentPosition().x()+1,y);
     }
 
     QPen pen;
     pen.setColor(Qt::black);
     pen.setWidth(4);
 
-    //Clear scene and plot new filter path
-    clear();
-    addPath(path, pen);
+    //Clear old and plot new filter path
+    if(m_pGraphicsItemPath->scene() != NULL)
+        removeItem(m_pGraphicsItemPath);
+
+    m_pGraphicsItemPath = addPath(path, pen);
 }
 
 
