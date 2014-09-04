@@ -101,6 +101,9 @@ private slots:
     void on_dsb_StartValue_editingFinished();
     void on_dsb_StepWidth_editingFinished();
 
+signals:
+    void formula_saved();
+
 private:    
     Ui::Formulaeditor *ui;
     AtomPaintWindow *callAtomPaintWindow;
@@ -133,6 +136,7 @@ private:
     double ArTanh(double x);
     double ArCoth(double x);
     double sqr(double x);
+    void closeEvent(QCloseEvent * event);
 
 };
 

@@ -235,16 +235,14 @@ private slots:
     void on_time_out();
     void on_actionSettings_triggered();
     void on_dicts_saved();
-
     void on_actionSpeicher_unter_triggered();
-
     void on_actionSpeicher_triggered();
+    void on_actionExport_triggered();
 
 signals:
 
     void send_input(MatrixXd send_signal, qint32 send_max_iterations, qreal send_epsilon, bool fix_phase, bool boost, qint32 simplex_it,
                     qreal simplex_reflection, qreal simplex_expansion, qreal simplex_contraction, qreal simplex_full_contraction);
-
     void send_input_fix_dict(MatrixXd send_signal, qint32 send_max_iterations, qreal send_epsilon, QString path);
 
 private:
@@ -330,11 +328,12 @@ private:
     //==========================================================================================================
 
     void read_fiff_ave(QString file_name);
-    QList<qreal> norm_signal(QList<qreal> signalSamples);    
+    void fill_channel_combobox();
+    void save_fif_file();
+    void save_parameters();
     void calc_fix_mp(QString path, MatrixXd signal, TruncationCriterion criterion);
     void closeEvent(QCloseEvent * event);
     static bool sort_Energie(const GaborAtom atom_1, const GaborAtom atom_2);
-    void save_fif_file();
 };
 
 //*************************************************************************************************************

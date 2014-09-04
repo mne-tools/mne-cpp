@@ -112,6 +112,12 @@ EditorWindow::EditorWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::Ed
 {   
     this->setAccessibleName("simple");
     ui->setupUi(this);
+    QSettings settings;
+    move(settings.value("pos_editor", QPoint(200, 200)).toPoint());
+    resize(settings.value("size_editor", QSize(606, 948)).toSize());
+    this->restoreState(settings.value("editor_state").toByteArray());
+
+
     ui->dspb_StartValueScale->setMaximum(ui->spb_AtomLength->value());
 
     // set chirp visibility
@@ -127,12 +133,25 @@ EditorWindow::~EditorWindow()
     delete ui;
 }
 
+//*************************************************************************************************************************************
+
+void EditorWindow::closeEvent(QCloseEvent * event)
+{
+    QSettings settings;
+    if(!this->isMaximized())
+    {
+        settings.setValue("pos_editor", pos());
+        settings.setValue("size_editor", size());
+    }
+    settings.setValue("editor_state", this->saveState());
+}
+
 //*************************************************************************************************************
 
 void EditorWindow::read_dicts()
 {
     ui->list_AllDict->clear();
-    QDir dictDir = QDir("Matching-Pursuit-Toolbox");
+    QDir dictDir = QDir(QDir::homePath() + "/" + "Matching-Pursuit-Toolbox");
 
     QStringList filterList;
     filterList.append("*.dict");
@@ -164,6 +183,7 @@ void EditorWindow::read_dicts()
         ui->list_AllDict->addItem(item);
     }
     if(ui->list_AllDict->count() > 1) ui->list_AllDict->itemAt(0, 0)->setSelected(true);
+    update();
 }
 
 //*************************************************************************************************************
@@ -1203,7 +1223,7 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
     QStringList resultList;
     resultList.clear();
 
-    QString savePath = QString("Matching-Pursuit-Toolbox/%1.pdict").arg(partDictName);
+    QString savePath = QString(QDir::homePath() + "/" + "Matching-Pursuit-Toolbox/%1.pdict").arg(partDictName);
     QFile dict(savePath);
 
     if(partDictName.isEmpty())
@@ -1228,7 +1248,7 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
         k++;
     }
 
-    QString save_path_xml = QString("Matching-Pursuit-Toolbox/%1_xml.pdict").arg(partDictName);
+    QString save_path_xml = QString(QDir::homePath() + "/" + "Matching-Pursuit-Toolbox/%1_xml.pdict").arg(partDictName);
     QFile xml_file(save_path_xml);
 
     xml_file.open(QIODevice::WriteOnly);
@@ -1403,8 +1423,8 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
                     samples_to_xml.append(":");
                 }
                 xmlWriter.writeAttribute("samples", samples_to_xml);
-                xmlWriter.writeEndElement();
-                xmlWriter.writeEndElement();
+                xmlWriter.writeEndElement();    //samples
+                xmlWriter.writeEndElement();    //ATOM
 
                 i++;
             }
@@ -1412,10 +1432,9 @@ void EditorWindow::on_btt_CalcAtoms_clicked()
         dict.close();
     }
 
-    xmlWriter.writeEndElement();
-    xmlWriter.writeEndElement();
+    xmlWriter.writeEndElement();    //build_Atoms
+    xmlWriter.writeEndElement();    //COUNT
     xmlWriter.writeEndDocument();
-
     xml_file.close();
 
     read_dicts();
@@ -1514,7 +1533,7 @@ void EditorWindow::deleteDicts()
     QList<QListWidgetItem*> delItemsList = ui->list_AllDict->selectedItems();
     while( i < delItemsList.length())
     {
-        QFile file(QString("Matching-Pursuit-Toolbox/%1").arg(delItemsList.at(i)->toolTip()));
+        QFile file(QString(QDir::homePath() + "/" + "Matching-Pursuit-Toolbox/%1").arg(delItemsList.at(i)->toolTip()));
         file.remove();
 
         QListWidgetItem* delItem = delItemsList.at(i);
@@ -1522,6 +1541,7 @@ void EditorWindow::deleteDicts()
         delete delItem;
         i++;
     }
+    emit dict_saved();
 }
 
 //*************************************************************************************************************
@@ -1568,7 +1588,7 @@ void EditorWindow::on_btt_SaveDicts_clicked()
         return;
     }
 
-    QDir dictDir = QDir("Matching-Pursuit-Toolbox");
+    QDir dictDir = QDir(QDir::homePath() + "/" + "Matching-Pursuit-Toolbox");
 
     QStringList filterList;
     filterList.append("*.dict");
@@ -1588,7 +1608,7 @@ void EditorWindow::on_btt_SaveDicts_clicked()
         }
     }
 
-    QString newpath = QString("Matching-Pursuit-Toolbox/%1.dict").arg(ui->tb_DictName->text());
+    QString newpath = QString(QDir::homePath() + "/" + "Matching-Pursuit-Toolbox/%1.dict").arg(ui->tb_DictName->text());
     QFile newFile(newpath);
     if(!newFile.exists())
     {
@@ -1604,7 +1624,7 @@ void EditorWindow::on_btt_SaveDicts_clicked()
         for(qint32 i = 0; i < ui->list_NewDict->count(); i++)
         {
             QString contents;
-            QFile file(QString("Matching-Pursuit-Toolbox/%1").arg(ui->list_NewDict->item(i)->toolTip()));
+            QFile file(QString(QDir::homePath() + "/" + "Matching-Pursuit-Toolbox/%1").arg(ui->list_NewDict->item(i)->toolTip()));
             if (file.open(QIODevice::ReadOnly))
             {
                 while(!file.atEnd())
@@ -1632,7 +1652,7 @@ void EditorWindow::on_btt_SaveDicts_clicked()
     QDomElement header = xml_dict.createElement("COUNT");
     for(qint32 i = 0; i < ui->list_NewDict->count(); i++)
     {
-        QFile xml_file(QString("Matching-Pursuit-Toolbox/%1").arg(ui->list_NewDict->item(i)->toolTip()));
+        QFile xml_file(QString(QDir::homePath() + "/" + "Matching-Pursuit-Toolbox/%1").arg(ui->list_NewDict->item(i)->toolTip()));
 
         QDomDocument xml_pdict;
         xml_pdict.setContent(&xml_file);
@@ -1673,7 +1693,7 @@ void EditorWindow::on_btt_SaveDicts_clicked()
         }
     }
 
-    QString xml_new_path = QString("Matching-Pursuit-Toolbox/%1_xml.dict").arg(ui->tb_DictName->text());
+    QString xml_new_path = QString(QDir::homePath() + "/" + "Matching-Pursuit-Toolbox/%1_xml.dict").arg(ui->tb_DictName->text());
     QFile xml_new_file(xml_new_path);
     if(xml_new_file.open(QIODevice::WriteOnly))
     {
@@ -1705,4 +1725,9 @@ void EditorWindow::keyReleaseEvent(QKeyEvent *event)
     {
         deleteDicts();
     }
+}
+
+void EditorWindow::on_save_dicts()
+{
+    read_dicts();
 }
