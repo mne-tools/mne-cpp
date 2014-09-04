@@ -266,6 +266,9 @@
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;This button starts the choosen MP Algorithm. When Algorithm is started, the button´s text is changed to &amp;quot;cancel&amp;quot;. Now you can interrupt the calculation-thread and it will stop after finding the next atom. During the interrupt-request the button´s text is set to &amp;quot;wait...&amp;quot;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
             <property name="layoutDirection">
              <enum>Qt::RightToLeft</enum>
             </property>
