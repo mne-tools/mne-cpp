@@ -62,7 +62,8 @@ FixDictMp::FixDictMp()
 , signal_energy(0)
 , current_energy(0)
 {
-
+    //future = new QFuture<FixDictAtom>;
+    //watcher = new QFutureWatcher<FixDictAtom>;
 }
 
 //*************************************************************************************************************
@@ -83,7 +84,8 @@ void FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal e
     QString bestCorrName;
 
     QList<qreal> atom_samples;
-    QList<QStringList> correlationList;    
+    QList<QStringList> correlationList;
+    QList<FixDictAtom> parsed_atoms;
 
     MatrixXd residuum = signal; //residuum initialised with signal
     qint32 sample_count = signal.rows();
@@ -95,6 +97,10 @@ void FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal e
     qreal energy_threshold = 0;
     qreal temp_energy = 0;
     bool sample_count_mismatch = false;
+
+    QFile current_dict(path);
+
+    parsed_atoms = parse_xml_dict(path);
 
 
     //calculate signal_energy
@@ -109,8 +115,6 @@ void FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal e
     std::cout << "absolute energy of signal: " << residuum_energy << "\n";
 
     VectorXd signalSamples = VectorXd::Zero(sample_count);    
-
-    QFile current_dict(path);
 
     while(it < max_iterations && (energy_threshold < residuum_energy))
     {
@@ -361,6 +365,126 @@ QStringList FixDictMp::correlation(VectorXd signalSamples, QList<qreal> atomSamp
     resultList.append(QString("%1").arg(maximum)); //for scaling
 
     return resultList;
+}
+//*************************************************************************************************************
+
+QList<FixDictAtom> FixDictMp::parse_xml_dict(QString path)
+{
+    QFile current_dict(path);
+    std::cout << "\nparsing dictionary, please be patient...";
+
+    QDomDocument dictionary;
+    dictionary.setContent(&current_dict);
+    QList<FixDictAtom> parsed_dict;
+    QDomElement current_element = dictionary.documentElement();
+    QDomNodeList node_list = current_element.childNodes();
+    //QList<QDomNode> pdict_nodes;
+
+    for(qint32 i = 0; i < node_list.length(); i++)
+        this->pdict_nodes.append(node_list.at(i));
+
+    //ToDo multithreading
+    //QFuture<FixDictAtom> var;
+
+    //var = QtConcurrent::mapped(pdict_nodes, &FixDictMp::fill_dict_in_map);// parse_threads;
+    //var.waitForFinished();
+
+    for(qint32 i = 0; i < node_list.length(); i++)
+        parsed_dict.append(fill_dict(pdict_nodes.at(i).cloneNode(true)));
+
+    std::cout << "   done.\n";
+    return parsed_dict;
+}
+//*************************************************************************************************************
+
+FixDictAtom FixDictMp::fill_dict(QDomNode pdict)
+{
+    FixDictAtom current_atom;
+    QDomElement atom = pdict.firstChildElement("ATOM");
+
+    current_atom.dict_source = pdict.toElement().attribute("source_dict");
+    current_atom.sample_count = pdict.toElement().attribute("sample_count").toInt();
+
+    if(pdict.toElement().attribute("formula") == QString("Gaboratom"))
+    {
+        current_atom.type = current_atom.AtomType::GABORATOM;
+        current_atom.atom_formula = pdict.toElement().attribute("formula");
+
+        while(!atom.isNull())
+        {
+            current_atom.gabor_atom.id = atom.attribute("id").toInt();
+            current_atom.gabor_atom.scale = atom.attribute("scale").toDouble();
+            current_atom.gabor_atom.modulation = atom.attribute("modu").toDouble();
+            current_atom.gabor_atom.phase = atom.attribute("phase").toDouble();
+
+            if(atom.hasChildNodes())
+            {
+                QString sample_string = atom.firstChild().toElement().attribute("samples");
+                QStringList sample_list = sample_string.split(":");
+                current_atom.gabor_atom.atom_samples = VectorXd::Zero(sample_list.length() - 1);
+                for(qint32 i = 0; i < sample_list.length() - 1; i++)
+                    current_atom.gabor_atom.atom_samples[i] = sample_list.at(i).toDouble();
+            }
+            current_atom.gabor_atoms.append(current_atom.gabor_atom);
+            atom = atom.nextSiblingElement("ATOM");
+        }
+    }
+    else if(pdict.toElement().attribute("formula") == QString("Chirpatom"))
+    {
+        current_atom.type = current_atom.AtomType::CHIRPATOM;
+        current_atom.atom_formula = pdict.toElement().attribute("formula");
+
+        while(!atom.isNull())
+        {
+            current_atom.chirp_atom.id = atom.attribute("id").toInt();
+            current_atom.chirp_atom.scale = atom.attribute("scale").toDouble();
+            current_atom.chirp_atom.modulation = atom.attribute("modu").toDouble();
+            current_atom.chirp_atom.phase = atom.attribute("phase").toDouble();
+            current_atom.chirp_atom.chirp = atom.attribute("chirp").toDouble();
+
+            if(atom.hasChildNodes())
+            {
+                QString sample_string = atom.firstChild().toElement().attribute("samples");
+                QStringList sample_list = sample_string.split(":");
+                current_atom.chirp_atom.atom_samples = VectorXd::Zero(sample_list.length() - 1);
+                for(qint32 i = 0; i < sample_list.length() - 1; i++)
+                    current_atom.chirp_atom.atom_samples[i] = sample_list.at(i).toDouble();
+            }
+            current_atom.chirp_atoms.append(current_atom.chirp_atom);
+            atom = atom.nextSiblingElement("ATOM");
+        }
+    }
+    else
+    {
+        current_atom.type = current_atom.AtomType::FORMULAATOM;
+        current_atom.atom_formula = pdict.toElement().attribute("formula");
+
+        while(!atom.isNull())
+        {
+            current_atom.formula_atom.id = atom.attribute("id").toInt();
+            current_atom.formula_atom.a = atom.attribute("a").toDouble();
+            current_atom.formula_atom.b = atom.attribute("b").toDouble();
+            current_atom.formula_atom.c = atom.attribute("c").toDouble();
+            current_atom.formula_atom.d = atom.attribute("d").toDouble();
+            current_atom.formula_atom.d = atom.attribute("e").toDouble();
+            current_atom.formula_atom.d = atom.attribute("f").toDouble();
+            current_atom.formula_atom.d = atom.attribute("g").toDouble();
+            current_atom.formula_atom.d = atom.attribute("h").toDouble();
+
+            if(atom.hasChildNodes())
+            {
+                QString sample_string = atom.firstChild().toElement().attribute("samples");
+                QStringList sample_list = sample_string.split(":");
+                current_atom.formula_atom.atom_samples = VectorXd::Zero(sample_list.length() - 1);
+                for(qint32 i = 0; i < sample_list.length() - 1; i++)
+                    current_atom.formula_atom.atom_samples[i] = sample_list.at(i).toDouble();
+            }
+            current_atom.formula_atoms.append(current_atom.formula_atom);
+            atom = atom.nextSiblingElement("ATOM");
+        }
+    }
+
+    return current_atom;
 }
 
 //*************************************************************************************************************
