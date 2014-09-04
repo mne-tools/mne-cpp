@@ -93,6 +93,10 @@ Formulaeditor::Formulaeditor(QWidget *parent) :    QWidget(parent),    ui(new Ui
 {
     ui->setupUi(this);
 
+    QSettings settings;
+    move(settings.value("pos_formula_editor", QPoint(200, 200)).toPoint());
+    resize(settings.value("size_formula_editor", QSize(555, 418)).toSize());
+
     callAtomPaintWindow = new AtomPaintWindow();
 
     callAtomPaintWindow->setFixedSize(510,200);
@@ -131,15 +135,33 @@ Formulaeditor::Formulaeditor(QWidget *parent) :    QWidget(parent),    ui(new Ui
     update();
 }
 
+//*************************************************************************************************************************************
+
 Formulaeditor::~Formulaeditor()
 {
     delete ui;
 }
 
+//*************************************************************************************************************************************
+
+void Formulaeditor::closeEvent(QCloseEvent * event)
+{
+    QSettings settings;
+    if(!this->isMaximized())
+    {
+        settings.setValue("pos_formula_editor", pos());
+        settings.setValue("size_formula_editor", size());
+    }
+}
+
+//*************************************************************************************************************************************
+
 void AtomPaintWindow::paintEvent(QPaintEvent *event)
 {    
     paint_signal(atomList, QSize(510,200));
 }
+
+//*************************************************************************************************************************************
 
 void AtomPaintWindow::paint_signal(QList<qreal> valueList, QSize windowSize)
 {
@@ -320,6 +342,8 @@ void AtomPaintWindow::paint_signal(QList<qreal> valueList, QSize windowSize)
     painter.end();
 }
 
+//*************************************************************************************************************************************
+
 void Formulaeditor::on_tb_Formula_textChanged(const QString &arg1)
 {
     ui->btt_Save->setEnabled(false);
@@ -439,6 +463,8 @@ void Formulaeditor::on_tb_Formula_textChanged(const QString &arg1)
     }
 }
 
+//*************************************************************************************************************************************
+
 void Formulaeditor::on_tb_A_textChanged(const QString &arg1)
 {
     bool ok = false;
@@ -513,8 +539,8 @@ void Formulaeditor::on_dsb_StepWidth_editingFinished()
     ui->dsb_EndValue->setMinimum(ui->dsb_StartValue->value() + ui->dsb_StepWidth->value());
 }
 
+//*************************************************************************************************************************************
 
-//***************************************************************************************************************
 void Formulaeditor::on_btt_Test_clicked()
 {
     Formulaeditor FormulaParser;
@@ -577,10 +603,12 @@ void Formulaeditor::on_btt_Test_clicked()
     update();
 }
 
+//*************************************************************************************************************************************
+
 // access when "sforumla save" clicked
 void Formulaeditor::on_btt_Save_clicked()
 {    
-    QFile saveFile("Matching-Pursuit-Toolbox/user.fml");
+    QFile saveFile(QDir::homePath() + "/" + "Matching-Pursuit-Toolbox/user.fml");
     if(!saveFile.exists())
     {
         if (saveFile.open(QIODevice::ReadWrite | QIODevice::Text))
@@ -606,12 +634,14 @@ void Formulaeditor::on_btt_Save_clicked()
     ui->lb_Result->setText("result start value = ---");
     atomList.clear();
     update();
+
+    emit formula_saved();
 }
 
-//**********************************************************************************************************************
-// formula methods    Copyright: 2004, Ralf Wirtz   adapted to qt for formula editor by Daniel Knobl *******************
-// this Code is licensed under The Code Project Open License (CPOL) 1.02 ***********************************************
-//**********************************************************************************************************************
+//*************************************************************************************************************************************
+// formula methods    Copyright: 2004, Ralf Wirtz   adapted to qt for formula editor by Daniel Knobl **********************************
+// this Code is licensed under The Code Project Open License (CPOL) 1.02 **************************************************************
+//*************************************************************************************************************************************
 
 qreal Formulaeditor::sign_factor(qint32& nPosition, QString& strCharacter)
 {
@@ -622,6 +652,8 @@ qreal Formulaeditor::sign_factor(qint32& nPosition, QString& strCharacter)
     }
   else return factor(nPosition, strCharacter);
 }
+
+//*************************************************************************************************************************************
 
 void Formulaeditor::strip_formula(QString &strFormula)
 {
@@ -737,6 +769,8 @@ void Formulaeditor::strip_formula(QString &strFormula)
     strFormula.replace("|", "");
 }
 
+//*************************************************************************************************************************************
+
 double Formulaeditor::calculation(QString strFormula, qreal xValue, bool strip)
 {
     qint32  nPosition;
@@ -761,6 +795,8 @@ double Formulaeditor::calculation(QString strFormula, qreal xValue, bool strip)
     return ergebnis;
 }
 
+//*************************************************************************************************************************************
+
 double Formulaeditor::expression(int& nPosition, QString& strCharacter)
 {
   QString strOperator;
@@ -777,6 +813,8 @@ double Formulaeditor::expression(int& nPosition, QString& strCharacter)
 
   return erg;
 }
+
+//*************************************************************************************************************************************
 
 double Formulaeditor::simple_expression(int& nPosition, QString& strCharacter)
 {
@@ -799,6 +837,8 @@ double Formulaeditor::simple_expression(int& nPosition, QString& strCharacter)
     return s;
 }
 
+//*************************************************************************************************************************************
+
 double Formulaeditor::term(int& nPosition, QString& strCharacter)
 {
   qreal t,vz;
@@ -813,6 +853,8 @@ double Formulaeditor::term(int& nPosition, QString& strCharacter)
   }
   return t;
 }
+
+//*************************************************************************************************************************************
 
 double Formulaeditor::char_n(int& nPosition, QString& strCharacter)
 {
@@ -829,15 +871,21 @@ double Formulaeditor::char_n(int& nPosition, QString& strCharacter)
     return nPosition;
 }
 
+//*************************************************************************************************************************************
+
 void Formulaeditor::set_formula(QString Formula)
 {
     m_strFormula = Formula;
 }
 
+//*************************************************************************************************************************************
+
 QString Formulaeditor::GetFormula()
 {
     return m_strFormula;
 }
+
+//*************************************************************************************************************************************
 
 double Formulaeditor::factor(qint32& nPosition, QString& strCharacter)
 {
@@ -1018,6 +1066,8 @@ double Formulaeditor::factor(qint32& nPosition, QString& strCharacter)
     return f;
 }
 
+//*************************************************************************************************************************************
+
 void Formulaeditor::set_funct_const(int index, double val)
 {
     //between 0 and 9
@@ -1112,12 +1162,7 @@ double Formulaeditor::sqr(double x)
     return x*x;
 }
 
-//**********************************************************************************************************************
-// end formula methods    Copyright: 2004, Ralf Wirtz   adapted to qt for formula editor by Daniel Knobl ***************
-//**********************************************************************************************************************
-
-
-//**********************************************************************************************************************
-//**********************************************************************************************************************
-//**********************************************************************************************************************
+//*************************************************************************************************************************************
+// end formula methods    Copyright: 2004, Ralf Wirtz   adapted to qt for formula editor by Daniel Knobl ******************************
+//*************************************************************************************************************************************
 

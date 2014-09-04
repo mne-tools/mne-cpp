@@ -152,17 +152,17 @@ private slots:
     void on_list_AllDict_itemSelectionChanged();
     void on_list_NewDict_itemSelectionChanged();
     void on_btt_SaveDicts_clicked();
+    void on_save_dicts();
 
 signals:
-
     void dict_saved();
 
 
 private:    
     Ui::EditorWindow *ui;
+    void closeEvent(QCloseEvent * event);
 
 protected:
-    //void keyPressEvent(QKeyEvent *event);
     void keyReleaseEvent(QKeyEvent *event);
 };
 
