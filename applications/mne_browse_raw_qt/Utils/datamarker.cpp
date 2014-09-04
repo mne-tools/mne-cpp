@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     eventwindow.h
+* @file     datawindow.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
@@ -30,111 +30,106 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the EventWindow class.
+* @brief    Contains the implementation of the DataWindow class.
 *
 */
-
-#ifndef EVENTWINDOW_H
-#define EVENTWINDOW_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "mainwindow.h"
-#include "ui_eventwindowdock.h"
+#include "datamarker.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// USED NAMESPACES
 //=============================================================================================================
 
-#include <QDockWidget>
+using namespace MNEBrowseRawQt;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNEBrowseRawQt
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-namespace MNEBrowseRawQt
+DataMarker::DataMarker(QWidget *parent) :
+    QWidget(parent),
+    m_oldPos(QPoint(0,0)),
+    m_movableRegion(QRegion())
 {
+    //Set background color
+    QPalette Pal(palette());
+
+    QColor color = m_qSettings.value("DataMarker/data_marker_color").value<QColor>();
+    color.setAlpha(m_qSettings.value("DataMarker/data_marker_opacity").toInt());
+    Pal.setColor(QPalette::Background, color);
+
+    setAutoFillBackground(true);
+    setPalette(Pal);
+}
+
 
 //*************************************************************************************************************
-//=============================================================================================================
-// DEFINE FORWARD DECLARATIONS
-//=============================================================================================================
 
-class MainWindow;
-
-/**
-* DECLARE CLASS EventWindow
-*
-* @brief The EventWindow class provides the event dock window.
-*/
-class EventWindow : public QDockWidget
+void DataMarker::setMovementBoundary(QRegion rect)
 {
-    Q_OBJECT
-public:
-    //=========================================================================================================
-    /**
-    * Constructs a EventWindow dialog which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new EventWindow becomes a window. If parent is another widget, EventWindow becomes a child window inside parent. EventWindow is deleted when its parent is deleted.
-    */
-    EventWindow(QWidget *parent = 0);
+    m_movableRegion = rect;
+}
 
-    //=========================================================================================================
-    /**
-    * Destroys the EventWindow.
-    * All EventWindow's children are deleted first. The application exits if EventWindow is the main widget.
-    */
-    ~EventWindow();
 
-    //=========================================================================================================
-    /**
-    * Setup the QtableView of the event window.
-    */
-    void initEventViewSettings();
+//*************************************************************************************************************
 
-    //=========================================================================================================
-    /**
-    * Returns the QTableView of this window.
-    */
-    QTableView* getTableView();
+void DataMarker::mousePressEvent(QMouseEvent *event)
+{
+    if(event->buttons() == Qt::LeftButton)
+        m_oldPos = event->globalPos();
+}
 
-private:
-    //=========================================================================================================
-    /**
-    * Inits all the QCheckBoxes of the event window.
-    */
-    void initCheckBoxes();
 
-    //=========================================================================================================
-    /**
-    * event reimplemented virtual function to handle events of the event dock window
-    */
-    bool event(QEvent * event);
+//*************************************************************************************************************
 
-    Ui::EventWindowDockWidget *ui;
+void DataMarker::mouseMoveEvent(QMouseEvent *event)
+{
+    if(event->buttons() == Qt::LeftButton) {
+        const QPoint delta = event->globalPos() - m_oldPos;
 
-    MainWindow*     m_pMainWindow;
+        QRect newPosition(x()+delta.x(), y(),
+                          this->geometry().width(), this->geometry().height());
 
-    QSettings       m_qSettings;
+        //Check if new position is inside the boundary
+        if(m_movableRegion.contains(newPosition.bottomLeft()) && m_movableRegion.contains(newPosition.bottomRight())) {
+            move(x()+delta.x(), y());
+            m_oldPos = event->globalPos();
 
-protected slots:
-    //=========================================================================================================
-    /**
-    * jumpToEvent jumps to a event specified in the event table view
-    *
-    * @param [in] current model item focused in the view
-    * @param [in] previous model item focused in the view
-    */
-    void jumpToEvent(const QModelIndex &current, const QModelIndex &previous);
-};
+            emit markerMoved();
+        }
 
-} // NAMESPACE MNEBrowseRawQt
+        if(event->windowPos().x() < m_movableRegion.boundingRect().left()) {
+            move(m_movableRegion.boundingRect().left(), y());
 
-#endif // EVENTWINDOW_H
+            emit markerMoved();
+        }
+
+        if(event->windowPos().x() > m_movableRegion.boundingRect().right()) {
+            move(m_movableRegion.boundingRect().right()-2, y());
+
+            emit markerMoved();
+        }
+
+//        qDebug()<<"globalPos"<<event->globalPos().x()<<event->globalPos().y();
+//        qDebug()<<"newPosition"<<newPosition.x()<<newPosition.y()<<newPosition.width()<<newPosition.height();
+//        qDebug()<<"m_movableRegion"<<m_movableRegion.boundingRect().x()<<m_movableRegion.boundingRect().y()<<m_movableRegion.boundingRect().width()<<m_movableRegion.boundingRect().height();
+    }
+}
+
+
+//*************************************************************************************************************
+
+void DataMarker::enterEvent(QEvent *event)
+{
+    Q_UNUSED(event);
+    setCursor(QCursor(Qt::SizeHorCursor));
+}

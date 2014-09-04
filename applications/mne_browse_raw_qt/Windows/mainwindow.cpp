@@ -66,6 +66,7 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
+    //The following functions and their point of calling should NOT be changed
     //Setup the windows first - this NEEDS to be done here because important pointers (window pointers) which are needed for further processing are generated in this function
     setupMainWindow();
     setupWindowWidgets();
@@ -76,7 +77,8 @@ MainWindow::MainWindow(QWidget *parent)
     setupViews();
 
     //Set event data and view in the delegate. This needs to be done here after all the above called setup routines
-    m_pRawDelegate->setEventModelView(m_pEventModel, m_pEventTableView, m_pRawTableView);
+    m_pRawDelegate->setModelView(m_pEventModel, m_pEventTableView, m_pRawTableView);
+    m_pEventDelegate->setModelView(m_pEventModel);
 
     // Setup rest of the GUI
     connectMenus();
@@ -100,16 +102,19 @@ void MainWindow::setupModel()
 {
     //Setup data model
     if(m_qFileRaw.exists())
-        m_pRawModel = new RawModel(m_qFileRaw,this);
+        m_pRawModel = new RawModel(m_qFileRaw, this);
     else
         m_pRawModel = new RawModel(this);
 
     //Setup event model and sorting
-    m_pEventModel = new EventModel(this);
+    if(m_qFileRaw.exists())
+        m_pEventModel = new EventModel(m_qEventFile, this);
+    else
+        m_pEventModel = new EventModel(this);
 
-    //Set fiffInfo in event model
+    //Set fiffInfo and first/last sample in the event model
     m_pEventModel->setFiffInfo(m_pRawModel->m_fiffInfo);
-    m_pEventModel->setFirstSample(m_pRawModel->firstSample());
+    m_pEventModel->setFirstLastSample(m_pRawModel->firstSample(), m_pRawModel->lastSample());
 }
 
 
@@ -118,6 +123,7 @@ void MainWindow::setupModel()
 void MainWindow::setupDelegate()
 {
     m_pRawDelegate = new RawDelegate(this);
+    m_pEventDelegate = new EventDelegate(this);
 }
 
 
@@ -134,6 +140,7 @@ void MainWindow::setupViews()
 
     //set custom delegate
     m_pRawTableView->setItemDelegate(m_pRawDelegate);
+    m_pEventTableView->setItemDelegate(m_pEventDelegate);
 
     //setup view settings
     m_pDataWindow->initRawViewSettings();
@@ -313,7 +320,7 @@ void MainWindow::openFile()
 
     //Set fiffInfo in event model
     m_pEventModel->setFiffInfo(m_pRawModel->m_fiffInfo);
-    m_pEventModel->setFirstSample(m_pRawModel->firstSample());
+    m_pEventModel->setFirstLastSample(m_pRawModel->firstSample(), m_pRawModel->lastSample());
 
     //setup view settings
     m_pDataWindow->initRawViewSettings();
