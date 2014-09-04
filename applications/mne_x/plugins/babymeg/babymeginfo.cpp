@@ -141,6 +141,8 @@ void BabyMEGInfo::MGH_LM_Get_Channel_Info(QByteArray cmdstr)
     lm_ch_pos10.clear();
     lm_ch_pos11.clear();
     lm_ch_pos12.clear();
+    lm_ch_coiltype.clear();
+    lm_ch_calicoef.clear();
 
 
     // parse the information for each channel
@@ -158,7 +160,7 @@ void BabyMEGInfo::MGH_LM_Get_Channel_Info(QByteArray cmdstr)
                 //qDebug()<<tt;
                 //extract value array from tt by separated char ","
                 QStringList schp = tt.split(",");
-
+                //qDebug()<<schp;
                 // scale
                 lm_ch_scales.append(schp.at(0));
                 // positions : x,y,z and units of x,y,z
@@ -174,9 +176,14 @@ void BabyMEGInfo::MGH_LM_Get_Channel_Info(QByteArray cmdstr)
                 lm_ch_pos10.append(schp.at(10));
                 lm_ch_pos11.append(schp.at(11));
                 lm_ch_pos12.append(schp.at(12));
+                //coil type
+                lm_ch_coiltype.append(schp.at(13));
+                //calibration coefficient
+                lm_ch_calicoef.append(schp.at(14));
 
 //                qDebug()<<lm_ch_scales;
 //                qDebug()<<lm_ch_pos2;
+//                qDebug()<<lm_ch_coiltype;
 
 
             }
@@ -246,7 +253,7 @@ void BabyMEGInfo::MGH_LM_Parse_Para(QByteArray cmdstr)
         //qDebug()<<t_ch.ch_name;
         t_ch.scanno = i;
         t_ch.logno = i+1;
-        t_ch.cal = 1;
+        t_ch.cal = lm_ch_calicoef.at(i).toDouble();
         t_ch.unit_mul = lm_ch_scales.at(i).toFloat(); // set scale
         //qDebug()<<t_ch.cal;
         t_ch.range = 1;
@@ -268,26 +275,43 @@ void BabyMEGInfo::MGH_LM_Parse_Para(QByteArray cmdstr)
 
         //qDebug()<<t_ch.loc(0,0)<<t_ch.loc(1,0)<<t_ch.loc(2,0);
 
-        QString type = t_ch.ch_name.left(3);
+        int type = lm_ch_coiltype.at(i).toInt(); //t_ch.ch_name.left(3);
         int ntype = 0;
-        if (type == "MEG")
+//        if (type == "MEG")
+//            ntype = 1;
+//        else if (type == "EEG")
+//            ntype = 2;
+        if (type == FIFFV_COIL_BABY_MAG)
             ntype = 1;
-        else if (type == "EEG")
+        else if (type == FIFFV_COIL_EEG)
             ntype = 2;
+        else if (type == FIFFV_COIL_BABY_REF_MAG)
+            ntype = 3;
+
         switch (ntype)
         {
         case 1:
-                t_ch.kind = FIFFV_MEG_CH;
-                t_ch.unit = FIFF_UNIT_T;
-                t_ch.unit_mul = FIFF_UNITM_NONE;
-                t_ch.coil_type = FIFFV_COIL_BABY_MAG;// ToDo FIFFV_COIL_BABY_REF_MAG
+            t_ch.kind = FIFFV_MEG_CH;
+            t_ch.unit = FIFF_UNIT_T;
+            t_ch.unit_mul = FIFF_UNITM_NONE;
+            t_ch.coil_type = FIFFV_COIL_BABY_MAG;// ToDo FIFFV_COIL_BABY_MAG
+
             break;
         case 2:
-                t_ch.kind = FIFFV_EEG_CH;
-                t_ch.unit = FIFF_UNIT_V;
-                t_ch.unit_mul = FIFF_UNITM_NONE;
-                t_ch.coil_type = FIFFV_COIL_EEG;
+            t_ch.kind = FIFFV_EEG_CH;
+            t_ch.unit = FIFF_UNIT_V;
+            t_ch.unit_mul = FIFF_UNITM_NONE;
+            t_ch.coil_type = FIFFV_COIL_EEG;
+
             break;
+        case 3:
+            t_ch.kind = FIFFV_MEG_CH;
+            t_ch.unit = FIFF_UNIT_T;
+            t_ch.unit_mul = FIFF_UNITM_NONE;
+            t_ch.coil_type = FIFFV_COIL_BABY_REF_MAG;// ToDo FIFFV_COIL_BABY_REF_MAG
+
+            break;
+
         default:
             t_ch.kind = FIFFV_MEG_CH;
             t_ch.unit = FIFF_UNIT_T;
