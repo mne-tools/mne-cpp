@@ -610,6 +610,7 @@
     <addaction name="actionNeu"/>
     <addaction name="actionSpeicher"/>
     <addaction name="actionSpeicher_unter"/>
+    <addaction name="actionExport"/>
     <addaction name="actionBeenden"/>
    </widget>
    <widget class="QMenu" name="menuBearbeiten">
@@ -757,6 +758,15 @@
    </property>
    <property name="text">
     <string>settings</string>
+   </property>
+  </action>
+  <action name="actionExport">
+   <property name="icon">
+    <iconset resource="Ressourcen.qrc">
+     <normaloff>:/images/icons/boxUpload.png</normaloff>:/images/icons/boxUpload.png</iconset>
+   </property>
+   <property name="text">
+    <string>export results to dict...</string>
    </property>
   </action>
  </widget>

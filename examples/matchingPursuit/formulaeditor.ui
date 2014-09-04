@@ -356,6 +356,9 @@ p, li { white-space: pre-wrap; }
             <property name="text">
              <string>0</string>
             </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
            </widget>
           </item>
           <item row="1" column="7">
@@ -383,6 +386,9 @@ p, li { white-space: pre-wrap; }
             </property>
             <property name="text">
              <string>0</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
            </widget>
           </item>
@@ -412,6 +418,9 @@ p, li { white-space: pre-wrap; }
             <property name="text">
              <string>0</string>
             </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
            </widget>
           </item>
           <item row="2" column="1">
@@ -439,6 +448,9 @@ p, li { white-space: pre-wrap; }
             </property>
             <property name="text">
              <string>0</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
            </widget>
           </item>
@@ -468,6 +480,9 @@ p, li { white-space: pre-wrap; }
             <property name="text">
              <string>0</string>
             </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
            </widget>
           </item>
           <item row="2" column="7">
@@ -496,6 +511,9 @@ p, li { white-space: pre-wrap; }
             <property name="text">
              <string>0</string>
             </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
            </widget>
           </item>
           <item row="2" column="10">
@@ -523,6 +541,9 @@ p, li { white-space: pre-wrap; }
             </property>
             <property name="text">
              <string>0</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
            </widget>
           </item>
@@ -628,6 +649,9 @@ p, li { white-space: pre-wrap; }
             </property>
             <property name="text">
              <string>0</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
            </widget>
           </item>

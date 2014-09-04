@@ -100,11 +100,17 @@ private slots:
     void on_dsb_EndValueG_valueChanged(double arg1);
     void on_dsb_EndValueH_valueChanged(double arg1);
     void on_pushButton_clicked();
+    void on_formula_saved();
+
+signals:
+    void dict_saved();
 
 private:
+    void closeEvent(QCloseEvent * event);
+    void read_formula();
+    void calc_atom_count_all_combined();
     Ui::Enhancededitorwindow *ui;
     QStringList m_strStandardFunction;
-    void calc_atom_count_all_combined();
     QList<qreal> calc_value_list(qreal start_value, qreal line_step_value, qreal end_value);
     qreal calc_end_value(qreal startValue, qreal linStepValue);
 };
