@@ -156,13 +156,19 @@ protected slots:
     /**
     * This function gets called whenever the filter parameters are altered by the user via the gui.
     */
-    void changeFilterParamters();
+    void changeFilterParameters();
 
     //=========================================================================================================
     /**
     * This function applies the user defined filter to all channels.
     */
     void applyFilterToAll();
+
+    //=========================================================================================================
+    /**
+    * This function undoes the user defined filter to all channels.
+    */
+    void undoFilterToAll();
 };
 
 } // NAMESPACE MNEBrowseRawQt
