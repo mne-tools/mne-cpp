@@ -4,8 +4,13 @@
 
 settingwindow::settingwindow(QWidget *parent) :    QWidget(parent),    ui(new Ui::settingwindow)
 {    
-    QSettings settings;
     ui->setupUi(this);
+
+
+    QSettings settings;
+    move(settings.value("pos_settings", QPoint(200, 200)).toPoint());
+
+
     ui->cb_boost->setChecked(settings.value("isBoost", true).toBool());
     ui->cb_fixphase->setChecked(settings.value("fixPhase", false).toBool());
     ui->cb_show_warnings->setChecked(settings.value("show_warnings", true).toBool());
@@ -31,6 +36,14 @@ settingwindow::settingwindow(QWidget *parent) :    QWidget(parent),    ui(new Ui
 settingwindow::~settingwindow()
 {
     delete ui;
+}
+
+//*************************************************************************************************************************************
+
+void settingwindow::closeEvent(QCloseEvent * event)
+{
+    QSettings settings;
+    settings.setValue("pos_settings", pos());
 }
 
 //*****************************************************************************************************************

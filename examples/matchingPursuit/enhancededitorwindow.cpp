@@ -77,7 +77,7 @@ QList<qreal> value_e_list;
 QList<qreal> value_f_list;
 QList<qreal> value_g_list;
 QList<qreal> value_h_list;
-QStringList names_list;
+QStringList _names_list;
 
 //***********************************************************************************************************************
 
@@ -86,6 +86,9 @@ Enhancededitorwindow::Enhancededitorwindow(QWidget *parent): QWidget(parent), ui
 {
     this->setAccessibleName("formel");
     ui->setupUi(this);
+
+    QSettings settings;
+    move(settings.value("pos_enhanced_editor", QPoint(200, 200)).toPoint());
 
     m_strStandardFunction.append("");
     m_strStandardFunction.append("PI");
@@ -114,8 +117,45 @@ Enhancededitorwindow::Enhancededitorwindow(QWidget *parent): QWidget(parent), ui
     m_strStandardFunction.append("KGV");
     m_strStandardFunction.append("GGT");
 
+    read_formula();
+}
+
+//***********************************************************************************************************************
+
+Enhancededitorwindow::~Enhancededitorwindow()
+{
+    delete ui;
+}
+
+//*************************************************************************************************************************************
+
+void Enhancededitorwindow::closeEvent(QCloseEvent * event)
+{
+    QSettings settings;
+    if(!this->isMaximized())
+    {
+        settings.setValue("pos_enhanced_editor", pos());
+    }
+}
+
+//*************************************************************************************************************************************
+
+
+void Enhancededitorwindow::on_formula_saved()
+{
+    read_formula();
+}
+
+//*************************************************************************************************************************************
+
+
+void Enhancededitorwindow::read_formula()
+{
+    _names_list.clear();
+    ui->cb_AtomFormula->clear();
+
     QString contents;
-    QFile formula_file("Matching-Pursuit-Toolbox/user.fml");
+    QFile formula_file(QDir::homePath() + "/" + "Matching-Pursuit-Toolbox/user.fml");
 
     if (formula_file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
@@ -127,7 +167,7 @@ Enhancededitorwindow::Enhancededitorwindow(QWidget *parent): QWidget(parent), ui
     }
     formula_file.close();
 
-    QDir dictDir = QDir("Matching-Pursuit-Toolbox");
+    QDir dictDir = QDir(QDir::homePath() + "/" + "Matching-Pursuit-Toolbox");
 
     QStringList filterList;
     filterList.append("*.dict");
@@ -135,17 +175,10 @@ Enhancededitorwindow::Enhancededitorwindow(QWidget *parent): QWidget(parent), ui
 
     QFileInfoList fileList = dictDir.entryInfoList(filterList);
     for(int i = 0; i < fileList.length(); i++)
-        names_list.append(fileList.at(i).baseName());
+        _names_list.append(fileList.at(i).baseName());
 
     if(ui->cb_AtomFormula->count() != 0)
         ui->cb_AtomFormula->setCurrentIndex(0);
-}
-
-//***********************************************************************************************************************
-
-Enhancededitorwindow::~Enhancededitorwindow()
-{
-    delete ui;
 }
 
 //***********************************************************************************************************************
@@ -329,8 +362,8 @@ void Enhancededitorwindow::on_btt_DeleteFormula_clicked()
         msgBox->close();
     }
 
-    QFile formel_file("Matching-Pursuit-Toolbox/user.fml");
-    QFile formel_temp_file("Matching-Pursuit-Toolbox/user.temp");
+    QFile formel_file(QDir::homePath() + "/" + "Matching-Pursuit-Toolbox/user.fml");
+    QFile formel_temp_file(QDir::homePath() + "/" + "Matching-Pursuit-Toolbox/user.temp");
 
     if(!formel_temp_file.exists())
     {
@@ -356,7 +389,7 @@ void Enhancededitorwindow::on_btt_DeleteFormula_clicked()
     formel_temp_file.close();
 
     formel_file.remove();
-    formel_temp_file.rename("Matching-Pursuit-Toolbox/user.fml");
+    formel_temp_file.rename(QDir::homePath() + "/" + "Matching-Pursuit-Toolbox/user.fml");
 
     ui->cb_AtomFormula->removeItem(ui->cb_AtomFormula->currentIndex());
 }
@@ -659,7 +692,7 @@ void Enhancededitorwindow::on_pushButton_clicked()
     QStringList results_list;
     results_list.clear();
 
-    QString savePath = QString("Matching-Pursuit-Toolbox/%1.pdict").arg(ui->tb_atom_name->text());
+    QString savePath = QString(QDir::homePath() + "/" + "Matching-Pursuit-Toolbox/%1.pdict").arg(ui->tb_atom_name->text());
     QFile dict(savePath);
 
     if(ui->tb_atom_name->text().isEmpty())
@@ -670,9 +703,9 @@ void Enhancededitorwindow::on_pushButton_clicked()
         return;
     }
 
-    for(qint32 k = 0; k < names_list.length(); k++)
+    for(qint32 k = 0; k < _names_list.length(); k++)
     {
-        if(QString::compare(ui->tb_atom_name->text(), names_list.at(k)) == 0)
+        if(QString::compare(ui->tb_atom_name->text(), _names_list.at(k)) == 0)
         {
             QMessageBox::warning(this, tr("Error"),
                 tr("The name is already taken."));
@@ -684,7 +717,7 @@ void Enhancededitorwindow::on_pushButton_clicked()
     }
 
 
-    QString save_path_xml = QString("Matching-Pursuit-Toolbox/%1_xml.pdict").arg(ui->tb_atom_name->text());
+    QString save_path_xml = QString(QDir::homePath() + "/" + "Matching-Pursuit-Toolbox/%1_xml.pdict").arg(ui->tb_atom_name->text());
     QFile xml_file(save_path_xml);
 
     xml_file.open(QIODevice::WriteOnly);
@@ -927,5 +960,7 @@ void Enhancededitorwindow::on_pushButton_clicked()
     xmlWriter.writeEndElement();
     xmlWriter.writeEndDocument();
 
-    xml_file.close();
+    xml_file.close();    
+
+    emit dict_saved();
 }

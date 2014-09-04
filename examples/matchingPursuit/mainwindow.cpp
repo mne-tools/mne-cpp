@@ -112,6 +112,9 @@ qint32 _sample_rate = 1;
 
 QString _save_path = "";
 QString _file_name = "";
+QString _last_open_path = QDir::homePath();
+QString _last_save_path = QDir::homePath();
+
 QMap<qint32, bool> _select_channel_map;
 QMap<qint32, bool> _select_atoms_map;
 
@@ -135,6 +138,11 @@ QThread* mp_Thread;
 AdaptiveMp *adaptive_Mp;
 FixDictMp *fixDict_Mp ;
 
+Formulaeditor *_formula_editor;
+EditorWindow *_editor_window;
+Enhancededitorwindow *_enhanced_editor_window;
+settingwindow *_setting_window;
+
 //*************************************************************************************************************
 //=============================================================================================================
 // MAIN
@@ -146,7 +154,6 @@ FixDictMp *fixDict_Mp ;
 MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-
     callGraphWindow = new GraphWindow();    
     callGraphWindow->setMinimumHeight(140);
     callGraphWindow->setMinimumWidth(500);
@@ -171,7 +178,8 @@ MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::
     callYAxisWindow->setMaximumHeight(22);
     ui->l_YAxis->addWidget(callYAxisWindow);
 
-    ui->progressBarCalc->setMinimum(0);         // set progressbar
+    // set progressbar
+    ui->progressBarCalc->setMinimum(0);
     ui->progressBarCalc->setHidden(true);
     ui->splitter->setStretchFactor(1,4);    
 
@@ -203,9 +211,8 @@ MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::
     qRegisterMetaType<adaptive_atom_list>("adaptive_atom_list");
     qRegisterMetaType<fix_dict_atom_list>("fix_dict_atom_list");
 
-    QDir dir("Matching-Pursuit-Toolbox");
-    if(!dir.exists()) dir.mkdir(dir.absolutePath());
-
+    QDir dir(QDir::homePath() + "/" + "Matching-Pursuit-Toolbox");
+    if(!dir.exists())dir.mkdir(".");
     fill_dict_combobox();
 
     QSettings settings;
@@ -213,6 +220,8 @@ MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::
     resize(settings.value("size", QSize(1050, 700)).toSize());
     this->restoreState(settings.value("window_state").toByteArray());
     ui->splitter->restoreState(settings.value("splitter_sizes").toByteArray());
+    _last_open_path = settings.value("last_open_path", QDir::homePath()).toString();
+    _last_save_path= settings.value("last_save_path", QDir::homePath()).toString();
 }
 
 //*************************************************************************************************************************************
@@ -235,6 +244,8 @@ void MainWindow::closeEvent(QCloseEvent * event)
     settings.setValue("splitter_sizes", ui->splitter->saveState());
     settings.setValue("window_state", this->saveState());
     settings.setValue("maximized", this->isMaximized());
+    settings.setValue("last_open_path", _last_open_path);
+    settings.setValue("last_save_path", _last_save_path);
     event->accept();
 }
 
@@ -242,7 +253,7 @@ void MainWindow::closeEvent(QCloseEvent * event)
 
 void MainWindow::fill_dict_combobox()
 {    
-    QDir dir("Matching-Pursuit-Toolbox");
+    QDir dir(QDir::homePath() + "/" + "Matching-Pursuit-Toolbox");
     QStringList filterList;
     filterList.append("*.dict");
     QFileInfoList fileList =  dir.entryInfoList(filterList);
@@ -257,9 +268,13 @@ void MainWindow::fill_dict_combobox()
 void MainWindow::open_file()
 {
     QFileDialog* fileDia;    
-    QString temp_file_name = fileDia->getOpenFileName(this, "Please select signal file.",QDir::currentPath(),"(*.fif *.txt)");
+    QString temp_file_name = fileDia->getOpenFileName(this, "Please select signal file.", _last_open_path,"(*.fif *.txt)");
     if(temp_file_name.isNull()) return;
 
+    QStringList string_list = temp_file_name.split('/');
+    _last_open_path = "";
+    for(qint32 i = 0; i < string_list.length() - 1; i++)
+        _last_open_path += string_list.at(i) + '/';
     _file_name = temp_file_name;
      this->cb_model->clear();
     this->cb_items.clear();
@@ -309,29 +324,8 @@ void MainWindow::open_file()
     _original_signal_matrix = _signal_matrix;
     ui->tbv_Results->setRowCount(0);
 
-    for(qint32 channels = 0; channels < _signal_matrix.cols(); channels++)
-    {
-        _colors.append(QColor::fromHsv(qrand() % 256, 255, 190));
+    fill_channel_combobox();
 
-        this->cb_item = new QStandardItem;
-
-        this->cb_item->setText(QString("Channel %1").arg(channels));
-        this->cb_item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
-        this->cb_item->setData(Qt::Checked, Qt::CheckStateRole);
-        this->cb_model->insertRow(channels, this->cb_item);
-        this->cb_items.push_back(this->cb_item);
-        _select_channel_map.insert(channels, true);
-    }
-
-    this->cb_item = new QStandardItem;
-
-    this->cb_item->setText("alle Channels an/ab wählen");
-    this->cb_item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
-    this->cb_item->setData(Qt::Checked, Qt::CheckStateRole);
-    this->cb_model->appendRow(this->cb_item);
-    this->cb_items.push_back(this->cb_item);
-
-    ui->cb_channels->setModel(this->cb_model);
     _original_colors = _colors;
     _atom_sum_matrix.resize(_signal_matrix.rows(), _signal_matrix.cols()); //resize
     _residuum_matrix.resize(_signal_matrix.rows(), _signal_matrix.cols()); //resize
@@ -476,25 +470,40 @@ void MainWindow::read_fiff_file_new(QString file_name)
     _original_signal_matrix = _signal_matrix;
     ui->tbv_Results->setRowCount(0);
 
+    fill_channel_combobox();
+
+    _original_colors = _colors;
+    _atom_sum_matrix.resize(_signal_matrix.rows(), _signal_matrix.cols()); //resize
+    _residuum_matrix.resize(_signal_matrix.rows(), _signal_matrix.cols()); //resize
+
+    update();
+}
+
+void MainWindow::fill_channel_combobox()
+{
     for(qint32 channels = 0; channels < _signal_matrix.cols(); channels++)
     {
         _colors.append(QColor::fromHsv(qrand() % 256, 255, 190));
 
+        //channel item
         this->cb_item = new QStandardItem;
-
-        this->cb_item->setText(QString("Channel %1").arg(channels));
+        this->cb_item->setText(QString("channel %1").arg(channels));
         this->cb_item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
         this->cb_item->setData(Qt::Checked, Qt::CheckStateRole);
         this->cb_model->insertRow(channels, this->cb_item);
         this->cb_items.push_back(this->cb_item);
         _select_channel_map.insert(channels, true);
     }
-    ui->cb_channels->setModel(this->cb_model);
-    _original_colors = _colors;
-    _atom_sum_matrix.resize(_signal_matrix.rows(), _signal_matrix.cols()); //resize
-    _residuum_matrix.resize(_signal_matrix.rows(), _signal_matrix.cols()); //resize
 
-    update();
+    //select all channels item
+    this->cb_item = new QStandardItem;
+    this->cb_item->setText("de/select all channels");
+    this->cb_item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
+    this->cb_item->setData(Qt::Checked, Qt::CheckStateRole);
+    this->cb_model->appendRow(this->cb_item);
+    this->cb_items.push_back(this->cb_item);
+
+    ui->cb_channels->setModel(this->cb_model);
 }
 
 //*************************************************************************************************************************************
@@ -1463,10 +1472,18 @@ void MainWindow::calc_fix_mp(QString path, MatrixXd signal, TruncationCriterion 
 // Opens Dictionaryeditor
 void MainWindow::on_actionW_rterbucheditor_triggered()
 {        
-    EditorWindow *editor_window = new EditorWindow(this);
-    connect(editor_window, SIGNAL(dict_saved()), this, SLOT(on_dicts_saved()));
+    if(_editor_window == NULL)
+    {
+        _editor_window = new EditorWindow();
+        connect(_editor_window, SIGNAL(dict_saved()), this, SLOT(on_dicts_saved()));
+    }
+    if(!_editor_window->isVisible()) _editor_window->show();
+    else
+    {
+        _editor_window->setWindowState(Qt::WindowActive);
+        _editor_window->raise();
+    }
 
-    editor_window->show();
 }
 
 //*****************************************************************************************************************
@@ -1474,17 +1491,61 @@ void MainWindow::on_actionW_rterbucheditor_triggered()
 // opens advanced Dictionaryeditor
 void MainWindow::on_actionErweiterter_W_rterbucheditor_triggered()
 {
-    Enhancededitorwindow *x = new Enhancededitorwindow();
+     if(_enhanced_editor_window == NULL)
+     {
+         _enhanced_editor_window = new Enhancededitorwindow();
+         if(_editor_window == NULL) _editor_window = new EditorWindow();
+         connect(_enhanced_editor_window, SIGNAL(dict_saved()), _editor_window, SLOT(on_save_dicts()));
+     }
+     if(!_enhanced_editor_window->isVisible()) _enhanced_editor_window->show();
+     else
+     {
+         _enhanced_editor_window->setWindowState(Qt::WindowActive);
+         _enhanced_editor_window->raise();
+     }
+}
+
+//*****************************************************************************************************************
+
+
+// opens formula editor
+void MainWindow::on_actionAtomformeleditor_triggered()
+{
+    if(_formula_editor == NULL)
+    {
+        _formula_editor = new Formulaeditor();
+        if(_enhanced_editor_window == NULL) _enhanced_editor_window = new Enhancededitorwindow();
+        connect(_formula_editor, SIGNAL(formula_saved()), _enhanced_editor_window, SLOT(on_formula_saved()));
+    }
+    if(!_formula_editor->isVisible()) _formula_editor->show();
+    else
+    {
+        _formula_editor->setWindowState(Qt::WindowActive);
+        _formula_editor->raise();
+    }
+}
+
+//*****************************************************************************************************************
+
+// open treebase window
+void MainWindow::on_actionCreate_treebased_dictionary_triggered()
+{
+    TreebasedDictWindow *x = new TreebasedDictWindow();
     x->show();
 }
 
 //*****************************************************************************************************************
 
-// opens formula editor
-void MainWindow::on_actionAtomformeleditor_triggered()
+// open settings
+void MainWindow::on_actionSettings_triggered()
 {
-    Formulaeditor *x = new Formulaeditor();
-    x->show();
+    if(_setting_window == NULL) _setting_window = new settingwindow();
+    if(!_setting_window->isVisible()) _setting_window->show();
+    else
+    {
+        _setting_window->setWindowState(Qt::WindowActive);
+        _setting_window->raise();
+    }
 }
 
 //*****************************************************************************************************************
@@ -1503,13 +1564,6 @@ void MainWindow::on_btt_OpenSignal_clicked()
     open_file();
 }
 
-//*****************************************************************************************************************
-
-void MainWindow::on_actionCreate_treebased_dictionary_triggered()
-{
-    TreebasedDictWindow *x = new TreebasedDictWindow();
-    x->show();
-}
 
 //*****************************************************************************************************************
 
@@ -1637,14 +1691,6 @@ void MainWindow::on_cb_all_select_clicked()
 
 //*****************************************************************************************************************
 
-void MainWindow::on_actionSettings_triggered()
-{
-    settingwindow *set = new settingwindow();
-    set->show();
-}
-
-//*****************************************************************************************************************
-
 void MainWindow::on_dicts_saved()
 {
     fill_dict_combobox();
@@ -1680,9 +1726,15 @@ void MainWindow::on_actionSpeicher_triggered()
             else
                 save_name += saveList.at(i) + "_";
         }
-        _save_path = fileDia->getSaveFileName(this, "Save file as...", QDir::currentPath() + "/" + save_name,"(*.fif)");
+        _save_path = fileDia->getSaveFileName(this, "Save file as...", _last_save_path + "/" + save_name,"(*.fif)");
         if(_save_path.isEmpty()) return;
     }
+    QStringList string_list = _save_path.split('/');
+    _last_save_path = "";
+    for(qint32 i = 0; i < string_list.length() - 1; i++)
+        _last_save_path += string_list.at(i) + '/';
+    save_fif_file();
+
     save_fif_file();
 }
 
@@ -1715,9 +1767,16 @@ void MainWindow::on_actionSpeicher_unter_triggered()
             save_name += saveList.at(i) + "_";
     }
 
-    _save_path = fileDia->getSaveFileName(this, "Save file as...", QDir::currentPath() + "/" + save_name,"(*.fif)");
+    _save_path = fileDia->getSaveFileName(this, "Save file as...", _last_save_path + "/" + save_name,"(*.fif)");
     if(_save_path.isEmpty()) return;
-    else save_fif_file();
+    else
+    {
+        QStringList string_list = _save_path.split('/');
+        _last_save_path = "";
+        for(qint32 i = 0; i < string_list.length() - 1; i++)
+            _last_save_path += string_list.at(i) + '/';
+        save_fif_file();
+    }
 }
 
 //*****************************************************************************************************************
@@ -1851,6 +1910,8 @@ void MainWindow::save_fif_file()
         printf("[done]\n");
         ui->progressBarCalc->setValue(first);
     }
+
+    save_parameters();
     ui->progressBarCalc->setValue(to);
 
     printf("Writing...");
@@ -1867,9 +1928,159 @@ void MainWindow::save_fif_file()
 
 //*****************************************************************************************************************
 
+void MainWindow::save_parameters()
+{
+    QString save_parameter_path = _save_path.split(".").first() + ".txt";
+    QFile xml_file(save_parameter_path);
+    if(xml_file.open(QIODevice::WriteOnly))
+    {
+        QXmlStreamWriter xmlWriter(&xml_file);
+        xmlWriter.setAutoFormatting(true);
+        xmlWriter.writeStartDocument();
+
+        for(qint32 i = 0; i < _adaptive_atom_list.length(); i++)
+        {
+            if(ui->tbv_Results->columnCount() == 2 && ui->tbv_Results->item(i, 1)->text() != "residuum")
+            {
+                FixDictAtom fix_atom = _fix_dict_atom_list.at(i);
+
+                xmlWriter.writeStartElement("ATOM");
+                xmlWriter.writeAttribute("formula", fix_atom.atom_formula);
+                xmlWriter.writeAttribute("sample_count", QString::number(fix_atom.sample_count));
+                xmlWriter.writeAttribute("energy", ui->tbv_Results->item(i, 0)->text());
+                xmlWriter.writeAttribute("parameters", ui->tbv_Results->item(i, 1)->text());
+                xmlWriter.writeAttribute("dict_source", fix_atom.dict_source);
+
+                xmlWriter.writeStartElement("PARAMETER");
+                if(fix_atom.type == FixDictAtom::AtomType::GABORATOM)
+                {
+                    xmlWriter.writeAttribute("formula", "GABORATOM");
+                    xmlWriter.writeStartElement("PARAMETER");
+                    xmlWriter.writeAttribute("scale", QString::number(fix_atom.gabor_atom.scale));
+                    xmlWriter.writeAttribute("translation", QString::number(fix_atom.translation));
+                    xmlWriter.writeAttribute("modulation", QString::number(fix_atom.gabor_atom.modulation));
+                    xmlWriter.writeAttribute("phase", QString::number(fix_atom.gabor_atom.phase));
+                }
+                else if(fix_atom.type == FixDictAtom::AtomType::CHIRPATOM)
+                {
+                    xmlWriter.writeAttribute("formula", "CHIRPATOM");
+                    xmlWriter.writeStartElement("PARAMETER");
+                    xmlWriter.writeAttribute("scale", QString::number(fix_atom.chirp_atom.scale));
+                    xmlWriter.writeAttribute("translation", QString::number(fix_atom.translation));
+                    xmlWriter.writeAttribute("modulation", QString::number(fix_atom.chirp_atom.modulation));
+                    xmlWriter.writeAttribute("phase", QString::number(fix_atom.chirp_atom.phase));
+                    xmlWriter.writeAttribute("chirp", QString::number(fix_atom.chirp_atom.chirp));
+                }
+                else if(fix_atom.type == FixDictAtom::AtomType::FORMULAATOM)
+                {
+                    xmlWriter.writeAttribute("translation", QString::number(fix_atom.translation));
+                    xmlWriter.writeAttribute("a", QString::number(fix_atom.formula_atom.a));
+                    xmlWriter.writeAttribute("b", QString::number(fix_atom.formula_atom.b));
+                    xmlWriter.writeAttribute("c", QString::number(fix_atom.formula_atom.c));
+                    xmlWriter.writeAttribute("d", QString::number(fix_atom.formula_atom.d));
+                    xmlWriter.writeAttribute("e", QString::number(fix_atom.formula_atom.e));
+                    xmlWriter.writeAttribute("f", QString::number(fix_atom.formula_atom.f));
+                    xmlWriter.writeAttribute("g", QString::number(fix_atom.formula_atom.g));
+                    xmlWriter.writeAttribute("h", QString::number(fix_atom.formula_atom.h));
+                }
+                xmlWriter.writeEndElement();    //PARAMETER
+                xmlWriter.writeEndElement();    //ATOM
+            }
+            else
+            {
+                GaborAtom gabor_atom = _adaptive_atom_list.at(i);
+                xmlWriter.writeStartElement("ATOM");
+                xmlWriter.writeAttribute("formula", "GABORATOM");
+                xmlWriter.writeAttribute("sample_count", QString::number(gabor_atom.sample_count));
+                xmlWriter.writeAttribute("energy", ui->tbv_Results->item(i, 0)->text());
+
+                xmlWriter.writeStartElement("PARAMETER");
+                xmlWriter.writeAttribute("scale", QString::number(gabor_atom.scale));
+                xmlWriter.writeAttribute("translation", QString::number(gabor_atom.translation));
+                xmlWriter.writeAttribute("modulation", QString::number(gabor_atom.modulation));
+                xmlWriter.writeAttribute("phase", QString::number(gabor_atom.phase));
+
+                xmlWriter.writeEndElement();    //PARAMETER
+                xmlWriter.writeEndElement();    //ATOM
+            }
+        }
+        xmlWriter.writeEndDocument();
+    }
+    xml_file.close();
+}
+
+//*****************************************************************************************************************
+
+void MainWindow::on_actionExport_triggered()
+{
+    if(_adaptive_atom_list.length() == 0)
+    {
+        QMessageBox::warning(this, tr("Error"),
+        tr("error: No adaptive MP results for save."));
+        return;
+    }
+
+    QFileDialog* fileDia;
+    QString save_path = fileDia->getSaveFileName(this, "Export results as dict file...", _last_save_path + "/" + "Matching-Pursuit-Toolbox" + "/" + "resultdict","(*.dict)");
+    if(save_path.isEmpty()) return;
+
+    QStringList string_list = save_path.split('/');
+    _last_save_path = "";
+    for(qint32 i = 0; i < string_list.length() - 1; i++)
+        _last_save_path += string_list.at(i) + '/';
+
+    QFile xml_file(save_path);
+    if(xml_file.open(QIODevice::WriteOnly))
+    {
+        QXmlStreamWriter xmlWriter(&xml_file);
+        xmlWriter.setAutoFormatting(true);
+        xmlWriter.writeStartDocument();
+
+        xmlWriter.writeStartElement("COUNT");
+        xmlWriter.writeAttribute("of_atoms", QString::number(_adaptive_atom_list.length()));
+        xmlWriter.writeStartElement("built_Atoms");
+        xmlWriter.writeAttribute("formula", "Gaboratom");
+        xmlWriter.writeAttribute("sample_count", QString::number(_adaptive_atom_list.first().sample_count));
+        xmlWriter.writeAttribute("atom_count", QString::number(_adaptive_atom_list.length()));
+        xmlWriter.writeAttribute("source_dict", save_path.split('/').last().split('.').first());
+
+        for(qint32 i = 0; i < _adaptive_atom_list.length(); i++)
+        {
+            GaborAtom gabor_atom = _adaptive_atom_list.at(i);
+            QStringList result_list = gabor_atom.CreateStringValues(gabor_atom.sample_count, gabor_atom.scale, gabor_atom.sample_count / 2, gabor_atom.modulation, gabor_atom.phase);
+
+            xmlWriter.writeStartElement("ATOM");
+            xmlWriter.writeAttribute("ID", QString::number(i));
+            xmlWriter.writeAttribute("scale", QString::number(gabor_atom.scale));
+            xmlWriter.writeAttribute("modu", QString::number(gabor_atom.modulation));
+            xmlWriter.writeAttribute("phase", QString::number(gabor_atom.phase));
+
+            xmlWriter.writeStartElement("samples");
+            QString samples_to_xml;
+            for (qint32 it = 0; it < result_list.length(); it++)
+            {
+                samples_to_xml.append(result_list.at(it));
+                samples_to_xml.append(":");
+            }
+            xmlWriter.writeAttribute("samples", samples_to_xml);
+            xmlWriter.writeEndElement();    //samples
+
+            xmlWriter.writeEndElement();    //ATOM
+
+        }
+        xmlWriter.writeEndElement();    //bulit_atoms
+        xmlWriter.writeEndElement();    //COUNT
+        xmlWriter.writeEndDocument();
+    }
+    xml_file.close();
+}
+
+//*****************************************************************************************************************
+
 bool MainWindow::sort_Energie(const GaborAtom atom_1, const GaborAtom atom_2)
 {
     return (atom_1.energy > atom_2.energy);
 }
 
+//*****************************************************************************************************************
 

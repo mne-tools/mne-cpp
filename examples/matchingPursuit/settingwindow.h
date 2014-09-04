@@ -21,6 +21,7 @@ private slots:
 
 private:
     Ui::settingwindow *ui;
+    void closeEvent(QCloseEvent * event);
 };
 
 #endif // SETTINGWINDOW_H
