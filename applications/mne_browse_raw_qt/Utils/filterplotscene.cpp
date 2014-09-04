@@ -73,8 +73,10 @@ FilterPlotScene::FilterPlotScene(QObject *parent) :
 
 //*************************************************************************************************************
 
-void FilterPlotScene::updateFilter(QSharedPointer<MNEOperator> operatorFilter)
+void FilterPlotScene::updateFilter(QSharedPointer<MNEOperator> operatorFilter, int samplingFreq)
 {
+    clear();
+
     if(operatorFilter->m_OperatorType == MNEOperator::FILTER)
         m_pCurrentFilter = operatorFilter.staticCast<FilterOperator>();
 
@@ -82,13 +84,13 @@ void FilterPlotScene::updateFilter(QSharedPointer<MNEOperator> operatorFilter)
     plotFilterFrequencyResponse();
 
     //Plot the magnitude diagram
-    plotMagnitudeDiagram();
+    plotMagnitudeDiagram(samplingFreq);
 }
 
 
 //*************************************************************************************************************
 
-void FilterPlotScene::plotMagnitudeDiagram()
+void FilterPlotScene::plotMagnitudeDiagram(int samplingFreq)
 {
     //Get row vector with filter coefficients
     RowVectorXcd coefficientsAFreq = m_pCurrentFilter->m_dFFTCoeffA;
@@ -112,7 +114,7 @@ void FilterPlotScene::plotMagnitudeDiagram()
         QGraphicsTextItem * text = addText(QString("-%1 db").arg(QString().number(i * m_dMaxMagnitude/(m_iScalingFactor*(m_iNumberHorizontalLines+1)),'g',3)),
                                            QFont("Times", m_iAxisTextSize));
         text->setPos(-text->boundingRect().width() - m_iAxisTextSize/2,
-                     (i * (m_dMaxMagnitude/(m_iNumberHorizontalLines+1))) - (text->boundingRect().height()/2));
+                     (i * (m_dMaxMagnitude/(m_iNumberHorizontalLines+1))) - (text->boundingRect().height()/2) - m_iDiagramMarginsVert);
     }
 
     //VERTICAL
@@ -127,7 +129,7 @@ void FilterPlotScene::plotMagnitudeDiagram()
 
     //Draw horizontal axis texts - Hz frequency
     for(int i = 0; i <= m_iNumberVerticalLines+1; i++) {
-        QGraphicsTextItem * text = addText(QString("%1 Hz").arg(i*(600/(m_iNumberVerticalLines+1))),
+        QGraphicsTextItem * text = addText(QString("%1 Hz").arg(i*(samplingFreq/(m_iNumberVerticalLines+1))),
                                            QFont("Times", m_iAxisTextSize));
         text->setPos(i * length - m_iDiagramMarginsHoriz - (text->boundingRect().width()/2),
                      m_dMaxMagnitude + (text->boundingRect().height()/2));
@@ -166,9 +168,6 @@ void FilterPlotScene::plotFilterFrequencyResponse()
     pen.setWidth(4);
 
     //Clear old and plot new filter path
-    if(m_pGraphicsItemPath->scene() != NULL)
-        removeItem(m_pGraphicsItemPath);
-
     m_pGraphicsItemPath = addPath(path, pen);
 }
 

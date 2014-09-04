@@ -105,6 +105,12 @@ void FilterWindow::initButtons()
 
     connect(ui->m_pushButton_undoFiltering,&QPushButton::clicked,
                 this,&FilterWindow::undoFilterToAll);
+
+    connect(ui->m_pushButton_exportPlot,&QPushButton::clicked,
+                this,&FilterWindow::exportFilterPlot);
+
+    connect(ui->m_pushButton_exportFilter,&QPushButton::clicked,
+                this,&FilterWindow::exportFilterCoefficients);
 }
 
 
@@ -143,12 +149,11 @@ void FilterWindow::updateFilterPlot()
     while(it.hasNext()) {
         it.next();
         if(it.key() == "User defined (See 'Adjust/Filter')") {
-            m_pFilterPlotScene->updateFilter(it.value());
+            m_pFilterPlotScene->updateFilter(it.value(), m_pMainWindow->m_pRawModel->m_fiffInfo.sfreq);
         }
     }
 
     ui->m_graphicsView_filterPlot->fitInView(m_pFilterPlotScene->itemsBoundingRect(), Qt::KeepAspectRatio);
-    ui->m_graphicsView_filterPlot->update();
 }
 
 
@@ -268,5 +273,87 @@ void FilterWindow::undoFilterToAll()
 {
     m_pMainWindow->m_pRawModel->undoFilter();
 }
+
+
+//*************************************************************************************************************
+
+void FilterWindow::exportFilterPlot()
+{
+    // Open file dialog
+    QDate date;
+    QString fileName = QFileDialog::getSaveFileName(this,
+                                                    "Save filter plot",
+                                                    QString("%1/%2_%3_%4_FilterPlot").arg(QStandardPaths::writableLocation(QStandardPaths::DesktopLocation)).arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day()),
+                                                    tr("Vector graphic(*.svg);;Images (*.png)"));
+
+    if(!fileName.isEmpty())
+    {
+        // Generate screenshot
+        if(fileName.contains(".svg"))
+        {
+            QSvgGenerator svgGen;
+
+            svgGen.setFileName(fileName);
+            QRectF rect = m_pFilterPlotScene->itemsBoundingRect();
+            svgGen.setSize(QSize(rect.width(), rect.height()));
+            //svgGen.setViewBox(QRect(0, 0, rect.width(), rect.height()));
+
+            QPainter painter(&svgGen);
+            m_pFilterPlotScene->render(&painter);
+        }
+
+        if(fileName.contains(".png"))
+        {
+            m_pFilterPlotScene->setSceneRect(m_pFilterPlotScene->itemsBoundingRect());                           // Re-shrink the scene to it's bounding contents
+            QImage image(m_pFilterPlotScene->sceneRect().size().toSize(), QImage::Format_ARGB32);       // Create the image with the exact size of the shrunk scene
+            image.fill(Qt::transparent);                                                                // Start all pixels transparent
+
+            QPainter painter(&image);
+            m_pFilterPlotScene->render(&painter);
+            image.save(fileName);
+        }
+    }
+}
+
+
+//*************************************************************************************************************
+
+void FilterWindow::exportFilterCoefficients()
+{
+    // Open file dialog
+    QDate date;
+    QString fileName = QFileDialog::getSaveFileName(this,
+                                                    "Save filter coefficients",
+                                                    QString("%1/%2_%3_%4_FilterCoeffs").arg(QStandardPaths::writableLocation(QStandardPaths::DesktopLocation)).arg(date.currentDate().year()).arg(date.currentDate().month()).arg(date.currentDate().day()),
+                                                    tr("Text file(*.txt)"));
+
+    if(!fileName.isEmpty())
+    {
+        QFile file(fileName);
+        if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+            return;
+
+        //get user defined filter oeprator
+        QSharedPointer<FilterOperator> currentFilter;
+
+        QMutableMapIterator<QString,QSharedPointer<MNEOperator> > it(m_pMainWindow->m_pRawModel->m_Operators);
+        while(it.hasNext()) {
+            it.next();
+            if(it.key() == "User defined (See 'Adjust/Filter')") {
+                if(it.value()->m_OperatorType == MNEOperator::FILTER) {
+                    currentFilter = it.value().staticCast<FilterOperator>();
+
+                    //Write coefficients to file
+                    QTextStream out(&file);
+                    for(int i = 0 ; i<currentFilter->m_dCoeffA.cols() ;i++)
+                        out << currentFilter->m_dCoeffA(i) << "\n";
+                }
+            }
+        }
+
+        file.close();
+    }
+}
+
 
 

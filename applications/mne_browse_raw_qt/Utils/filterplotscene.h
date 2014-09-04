@@ -86,16 +86,17 @@ public:
     * Updates the current filter.
     *
     * @param [in] operatorFilter pointer to the current filter operator which is to be plotted
+    * @param [in] holds the current sampling frequency
     */
-    void updateFilter(QSharedPointer<MNEOperator> operatorFilter);
+    void updateFilter(QSharedPointer<MNEOperator> operatorFilter, int samplingFreq);
 
 protected:
     //=========================================================================================================
     /**
     * Draws the diagram to plot the magnitude.
-    *
+    * @param [in] holds the current sampling frequency
     */
-    void plotMagnitudeDiagram();
+    void plotMagnitudeDiagram(int samplingFreq);
 
     //=========================================================================================================
     /**

@@ -46,6 +46,7 @@
 #include "mainwindow.h"
 #include "../Utils/filterplotscene.h"
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
@@ -54,6 +55,7 @@
 #include <QWidget>
 #include <QSettings>
 #include <QGraphicsScene>
+#include <QSvgGenerator>
 
 
 //*************************************************************************************************************
@@ -169,6 +171,18 @@ protected slots:
     * This function undoes the user defined filter to all channels.
     */
     void undoFilterToAll();
+
+    //=========================================================================================================
+    /**
+    * Saves an svg graphic of the scene if wanted by the user.
+    */
+    void exportFilterPlot();
+
+    //=========================================================================================================
+    /**
+    * This function exports the filter coefficients to a txt file.
+    */
+    void exportFilterCoefficients();
 };
 
 } // NAMESPACE MNEBrowseRawQt
