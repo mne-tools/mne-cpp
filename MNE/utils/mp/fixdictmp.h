@@ -72,6 +72,8 @@
 //=============================================================================================================
 
 #include <QThread>
+#include <QtConcurrent/QtConcurrent>
+#include <QFuture>
 #include <QFile>
 #include <QStringList>
 #include <QtXml/QtXml>
@@ -117,6 +119,7 @@ public:
     MatrixXd signal;
     QList<FixDictAtom> fix_dict_list;
     QList<GaborAtom> adaptive_list;
+    QList<QDomNode> pdict_nodes;
 
     //=========================================================================================================
     /**
@@ -145,6 +148,25 @@ public:
 
     //=========================================================================================================
 
+    QList<FixDictAtom> parse_xml_dict(QString path);
+
+    //=========================================================================================================
+
+    FixDictAtom fill_dict(QDomNode pdict);
+
+    //=========================================================================================================
+
+    FixDictAtom fill_dict_in_map() const
+    {
+        FixDictAtom add_to_map;
+        FixDictMp fix_dict_mp;
+        add_to_map = fix_dict_mp.fill_dict(this->pdict_nodes.last());
+        //this->pdict_nodes.removeLast();//erase(pdict_nodes.Iteratorlast());
+        return add_to_map;
+    }
+
+    //=========================================================================================================
+
     static void build_molecule_xml_file(qint32 level_counter);
 
 public slots:
@@ -161,6 +183,8 @@ signals:
                         adaptive_atom_list adaptive_atom_list, fix_dict_atom_list fix_dict_atom_list);
 
     void finished_calc();
+
+    void parse_in_thread();
 
 };//class
 

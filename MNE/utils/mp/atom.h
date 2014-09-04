@@ -141,7 +141,7 @@ public:
     //=========================================================================================================
     QString atom_formula;
     QString display_text;
-    QList<VectorXd> vector_list;
+    QList<VectorXd> vector_list;//use for communication with gui to paint results...
 
     enum AtomType{GABORATOM, CHIRPATOM, FORMULAATOM};
 
@@ -155,6 +155,9 @@ public:
         qreal scale;
         qreal modulation;
         qreal phase;
+
+        VectorXd atom_samples;
+        qint32 id;
     };
 
     struct ChirpATOM
@@ -163,6 +166,9 @@ public:
         qreal modulation;
         qreal phase;
         qreal chirp;
+
+        VectorXd atom_samples;
+        qint32 id;
     };
 
 
@@ -176,11 +182,18 @@ public:
         qreal f;
         qreal g;
         qreal h;
+
+        VectorXd atom_samples;
+        qint32 id;
     };
 
     GaborATOM gabor_atom;
     ChirpATOM chirp_atom;
     formulaATOM formula_atom;
+
+    QList<GaborATOM> gabor_atoms;
+    QList<ChirpATOM> chirp_atoms;
+    QList<formulaATOM> formula_atoms;
 };
 
 //=============================================================================================================
