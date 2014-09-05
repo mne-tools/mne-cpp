@@ -137,14 +137,14 @@ public:
 
     RowVectorXd applyFFTFilter(RowVectorXd& data);
 
-    int m_iFilterOrder;     /**< represents the order of the filter instance */
-    int m_iFFTlength;       /**< represents the filter length */
+    int             m_iFilterOrder;     /**< represents the order of the filter instance */
+    int             m_iFFTlength;       /**< represents the filter length */
 
-    RowVectorXd m_dCoeffA;  /**< contains the forward filter coefficient set */
-    RowVectorXd m_dCoeffB;  /**< contains the backward filter coefficient set (empty if FIR filter) */
+    RowVectorXd     m_dCoeffA;          /**< contains the forward filter coefficient set */
+    RowVectorXd     m_dCoeffB;          /**< contains the backward filter coefficient set (empty if FIR filter) */
 
-    RowVectorXcd m_dFFTCoeffA;  /**< the FFT-transformed forward filter coefficient set, required for frequency-domain filtering, zero-padded to m_iFFTlength */
-    RowVectorXcd m_dFFTCoeffB;  /**< the FFT-transformed backward filter coefficient set, required for frequency-domain filtering, zero-padded to m_iFFTlength */
+    RowVectorXcd    m_dFFTCoeffA;       /**< the FFT-transformed forward filter coefficient set, required for frequency-domain filtering, zero-padded to m_iFFTlength */
+    RowVectorXcd    m_dFFTCoeffB;       /**< the FFT-transformed backward filter coefficient set, required for frequency-domain filtering, zero-padded to m_iFFTlength */
 };
 
 } // NAMESPACE

@@ -187,9 +187,9 @@ QSize RawDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelInde
 
 //*************************************************************************************************************
 
-void RawDelegate::setEventModelView(EventModel *model, QTableView* eventView, QTableView* rawView)
+void RawDelegate::setModelView(EventModel *eventModel, QTableView* eventView, QTableView* rawView)
 {
-    m_pEventModel = model;
+    m_pEventModel = eventModel;
     m_pEventView = eventView;
     m_pRawView = rawView;
 }
