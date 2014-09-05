@@ -315,6 +315,9 @@ void MainWindow::openFile()
     else
         qDebug("ERROR loading fiff data file %s",filename.toLatin1().data());
 
+    //Clear event model
+    m_pEventModel->clearModel();
+
     //set position of QScrollArea
     m_pDataWindow->getTableView()->horizontalScrollBar()->setValue(0);
 

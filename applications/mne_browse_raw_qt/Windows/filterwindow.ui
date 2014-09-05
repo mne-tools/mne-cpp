@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>913</width>
+    <width>736</width>
     <height>287</height>
    </rect>
   </property>
@@ -175,7 +175,7 @@
       <item row="9" column="0" colspan="2">
        <widget class="QPushButton" name="m_pushButton_exportFilter">
         <property name="text">
-         <string>Export filter</string>
+         <string>Export filter coefficients</string>
         </property>
        </widget>
       </item>

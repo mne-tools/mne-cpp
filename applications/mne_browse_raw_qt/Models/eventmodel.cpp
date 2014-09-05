@@ -498,6 +498,7 @@ void EventModel::setEventFilterType(const QString eventType)
 
 void EventModel::clearModel()
 {
+    beginResetModel();
     //clear event data model structure
     m_dataSamples.clear();
     m_dataTypes.clear();
@@ -506,6 +507,10 @@ void EventModel::clearModel()
     m_dataSamples_Filtered.clear();
     m_dataTypes_Filtered.clear();
     m_dataIsUserEvent_Filtered.clear();
+
+    m_bFileloaded = false;
+
+    endResetModel();
 
     qDebug("EventModel cleared.");
 }
