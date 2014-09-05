@@ -66,15 +66,23 @@ FilterPlotScene::FilterPlotScene(QObject *parent) :
     m_iNumberVerticalLines(3),
     m_iAxisTextSize(24),
     m_iDiagramMarginsHoriz(5),
-    m_iDiagramMarginsVert(5)
+    m_iDiagramMarginsVert(5),
+    m_iCutOffLow(5),
+    m_iCutOffHigh(40),
+    m_iCutOffMarkerWidth(3)
 {
 }
 
 
 //*************************************************************************************************************
 
-void FilterPlotScene::updateFilter(QSharedPointer<MNEOperator> operatorFilter, int samplingFreq)
+void FilterPlotScene::updateFilter(QSharedPointer<MNEOperator> operatorFilter, int samplingFreq, int cutOffLow, int cutOffHigh)
 {
+    //set member variables
+    m_iCutOffLow = cutOffLow;
+    m_iCutOffHigh = cutOffHigh;
+
+    //Clear the scene
     clear();
 
     if(operatorFilter->m_OperatorType == MNEOperator::FILTER)
@@ -137,6 +145,44 @@ void FilterPlotScene::plotMagnitudeDiagram(int samplingFreq)
         text->setPos(i * length - m_iDiagramMarginsHoriz - (text->boundingRect().width()/2),
                      m_dMaxMagnitude + (text->boundingRect().height()/2));
     }
+
+    //Plot lower higher cut off frequency
+    double pos = 0;
+    switch(m_pCurrentFilter->m_Type) {
+        case 0://LPF
+            pos = ((double)m_iCutOffLow / (double)fMax) * numberCoeff;
+            addLine(pos - m_iDiagramMarginsHoriz,
+                    -m_iDiagramMarginsVert + m_iCutOffMarkerWidth,
+                    pos - m_iDiagramMarginsHoriz,
+                    m_dMaxMagnitude + m_iDiagramMarginsVert,
+                    QPen(Qt::red,m_iCutOffMarkerWidth));
+        break;
+
+        case 1://HPF
+            pos = ((double)m_iCutOffHigh / (double)fMax) * numberCoeff;
+            addLine(pos - m_iDiagramMarginsHoriz,
+                    -m_iDiagramMarginsVert + m_iCutOffMarkerWidth,
+                    pos - m_iDiagramMarginsHoriz,
+                    m_dMaxMagnitude + m_iDiagramMarginsVert + m_iCutOffMarkerWidth,
+                    QPen(Qt::red,m_iCutOffMarkerWidth));
+        break;
+
+        case 2://BPF
+            pos = ((double)m_iCutOffLow / (double)fMax) * numberCoeff;
+            addLine(pos - m_iDiagramMarginsHoriz,
+                    -m_iDiagramMarginsVert + m_iCutOffMarkerWidth,
+                    pos - m_iDiagramMarginsHoriz,
+                    m_dMaxMagnitude + m_iDiagramMarginsVert + m_iCutOffMarkerWidth,
+                    QPen(Qt::red,m_iCutOffMarkerWidth));
+
+            pos = ((double)m_iCutOffHigh / (double)fMax) * numberCoeff;
+            addLine(pos - m_iDiagramMarginsHoriz,
+                    -m_iDiagramMarginsVert + m_iCutOffMarkerWidth,
+                    pos - m_iDiagramMarginsHoriz,
+                    m_dMaxMagnitude + m_iDiagramMarginsVert + m_iCutOffMarkerWidth,
+                    QPen(Qt::red,m_iCutOffMarkerWidth));
+        break;
+    }
 }
 
 
@@ -170,7 +216,7 @@ void FilterPlotScene::plotFilterFrequencyResponse()
 
     QPen pen;
     pen.setColor(Qt::black);
-    pen.setWidth(4);
+    pen.setWidth(2);
 
     //Clear old and plot new filter path
     m_pGraphicsItemPath = addPath(path, pen);

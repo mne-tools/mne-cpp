@@ -149,6 +149,7 @@ void DataWindow::initLabels()
 
     //Setup marker label
     //Set current marker sample label to vertical spacer position and initalize text
+    m_pCurrentDataMarkerLabel->resize(m_pCurrentDataMarkerLabel->width()+15, m_pCurrentDataMarkerLabel->height());
     m_pCurrentDataMarkerLabel->setAlignment(Qt::AlignHCenter);
     m_pCurrentDataMarkerLabel->move(m_pDataMarker->geometry().left(), m_pDataMarker->geometry().top() + 5);
     QString numberString = QString().number(m_iCurrentMarkerSample);
