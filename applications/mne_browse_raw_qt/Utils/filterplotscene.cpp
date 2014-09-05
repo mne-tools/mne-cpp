@@ -95,9 +95,12 @@ void FilterPlotScene::plotMagnitudeDiagram(int samplingFreq)
     //Get row vector with filter coefficients
     RowVectorXcd coefficientsAFreq = m_pCurrentFilter->m_dFFTCoeffA;
 
+    int numberCoeff = coefficientsAFreq.cols()/2; //Divide by 2 because we do not want the conjugate complex part
+    int fMax = samplingFreq/2; //nyquist frequency
+
     addRect(-m_iDiagramMarginsHoriz,
             -m_iDiagramMarginsVert,
-            coefficientsAFreq.cols()+(m_iDiagramMarginsHoriz*2),
+            numberCoeff+(m_iDiagramMarginsHoriz*2),
             m_dMaxMagnitude+(m_iDiagramMarginsVert*2));
 
     //HORIZONTAL
@@ -105,7 +108,7 @@ void FilterPlotScene::plotMagnitudeDiagram(int samplingFreq)
     for(int i = 1; i <= m_iNumberHorizontalLines; i++)
         addLine(-m_iDiagramMarginsHoriz,
                 (i * (m_dMaxMagnitude/(m_iNumberHorizontalLines+1))) - m_iDiagramMarginsVert,
-                coefficientsAFreq.cols() + m_iDiagramMarginsHoriz,
+                numberCoeff + m_iDiagramMarginsHoriz,
                 (i * (m_dMaxMagnitude/(m_iNumberHorizontalLines+1))) - m_iDiagramMarginsVert,
                 QPen(Qt::DotLine));
 
@@ -119,7 +122,7 @@ void FilterPlotScene::plotMagnitudeDiagram(int samplingFreq)
 
     //VERTICAL
     //Draw vertical lines
-    double length = coefficientsAFreq.cols() / (m_iNumberVerticalLines+1);
+    double length = numberCoeff / (m_iNumberVerticalLines+1);
     for(int i = 1; i<=m_iNumberVerticalLines; i++)
         addLine(i*length - m_iDiagramMarginsHoriz,
                 -m_iDiagramMarginsVert,
@@ -129,7 +132,7 @@ void FilterPlotScene::plotMagnitudeDiagram(int samplingFreq)
 
     //Draw horizontal axis texts - Hz frequency
     for(int i = 0; i <= m_iNumberVerticalLines+1; i++) {
-        QGraphicsTextItem * text = addText(QString("%1 Hz").arg(i*(samplingFreq/(m_iNumberVerticalLines+1))),
+        QGraphicsTextItem * text = addText(QString("%1 Hz").arg(i*(fMax/(m_iNumberVerticalLines+1))),
                                            QFont("Times", m_iAxisTextSize));
         text->setPos(i * length - m_iDiagramMarginsHoriz - (text->boundingRect().width()/2),
                      m_dMaxMagnitude + (text->boundingRect().height()/2));
@@ -144,8 +147,10 @@ void FilterPlotScene::plotFilterFrequencyResponse()
     //Get row vector with filter coefficients and norm to 1
     RowVectorXcd coefficientsAFreq = m_pCurrentFilter->m_dFFTCoeffA;
 
+    int numberCoeff = coefficientsAFreq.cols()/2; //Divide by 2 because we do not want the conjugate complex part
+
     double max = 0;
-    for(int i = 0; i<coefficientsAFreq.cols(); i++)
+    for(int i = 0; i<numberCoeff; i++)
         if(abs(coefficientsAFreq(i)) > max)
             max = abs(coefficientsAFreq(i));
 
@@ -155,7 +160,7 @@ void FilterPlotScene::plotFilterFrequencyResponse()
     QPainterPath path;
     path.moveTo(0, -20 * log10(abs(coefficientsAFreq(0))) * m_iScalingFactor);
 
-    for(int i = 0; i<coefficientsAFreq.cols(); i++) {
+    for(int i = 0; i<numberCoeff; i++) {
         double y = -20 * log10(abs(coefficientsAFreq(i))) * m_iScalingFactor; //-1 because we want to plot upwards
         if(y > m_dMaxMagnitude)
             y = m_dMaxMagnitude;
