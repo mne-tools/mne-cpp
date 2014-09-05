@@ -415,13 +415,9 @@ void MainWindow::read_fiff_ave(QString file_name)
 
 qint32 MainWindow::read_fiff_file(QString fileName)
 {
-    QFile t_fileRaw(fileName);    
-    bool keep_comp = true;
-
-
-    //   Setup for reading the raw data    
+    //   Setup for reading the raw data
+    QFile t_fileRaw(fileName);
     FiffRawData raw(t_fileRaw);
-
 
     //   Set up pick list: MEG + STI 014 - bad channels
     QStringList include;
@@ -1715,8 +1711,7 @@ void MainWindow::on_actionSpeicher_triggered()
     }
 
     if(_save_path.isEmpty())
-    {
-        QFileDialog* fileDia;
+    {        
         QString save_name = "";
         QStringList saveList = _file_name.split('/').last().split('.').first().split('_');
         for(int i = 0; i < saveList.length(); i++)
@@ -1726,7 +1721,7 @@ void MainWindow::on_actionSpeicher_triggered()
             else
                 save_name += saveList.at(i) + "_";
         }
-        _save_path = fileDia->getSaveFileName(this, "Save file as...", _last_save_path + "/" + save_name,"(*.fif)");
+        _save_path = QFileDialog::getSaveFileName(this, "Save file as...", _last_save_path + "/" + save_name,"(*.fif)");
         if(_save_path.isEmpty()) return;
     }
     QStringList string_list = _save_path.split('/');
@@ -1756,7 +1751,6 @@ void MainWindow::on_actionSpeicher_unter_triggered()
         return;
     }
 
-    QFileDialog* fileDia;
     QString save_name = "";
     QStringList saveList = _file_name.split('/').last().split('.').first().split('_');
     for(int i = 0; i < saveList.length(); i++)
@@ -1767,7 +1761,7 @@ void MainWindow::on_actionSpeicher_unter_triggered()
             save_name += saveList.at(i) + "_";
     }
 
-    _save_path = fileDia->getSaveFileName(this, "Save file as...", _last_save_path + "/" + save_name,"(*.fif)");
+    _save_path = QFileDialog::getSaveFileName(this, "Save file as...", _last_save_path + "/" + save_name,"(*.fif)");
     if(_save_path.isEmpty()) return;
     else
     {
@@ -2020,8 +2014,8 @@ void MainWindow::on_actionExport_triggered()
         return;
     }
 
-    QFileDialog* fileDia;
-    QString save_path = fileDia->getSaveFileName(this, "Export results as dict file...", _last_save_path + "/" + "Matching-Pursuit-Toolbox" + "/" + "resultdict","(*.dict)");
+
+    QString save_path = QFileDialog::getSaveFileName(this, "Export results as dict file...", _last_save_path + "/" + "Matching-Pursuit-Toolbox" + "/" + "resultdict","(*.dict)");
     if(save_path.isEmpty()) return;
 
     QStringList string_list = save_path.split('/');
