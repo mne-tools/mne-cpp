@@ -149,7 +149,10 @@ void FilterWindow::updateFilterPlot()
     while(it.hasNext()) {
         it.next();
         if(it.key() == "User defined (See 'Adjust/Filter')") {
-            m_pFilterPlotScene->updateFilter(it.value(), m_pMainWindow->m_pRawModel->m_fiffInfo.sfreq);
+            m_pFilterPlotScene->updateFilter(it.value(),
+                                             m_pMainWindow->m_pRawModel->m_fiffInfo.sfreq,
+                                             ui->m_doubleSpinBox_lowpass->value(),
+                                             ui->m_doubleSpinBox_highpass->value());
         }
     }
 
@@ -216,7 +219,7 @@ void FilterWindow::changeFilterParameters()
     //User defined filter parameters
     double lowpassHz = ui->m_doubleSpinBox_lowpass->value();
     double highpassHz = ui->m_doubleSpinBox_highpass->value();
-    double center = lowpassHz+highpassHz/2;
+    double center = (lowpassHz+highpassHz)/2;
     double trans_width = ui->m_doubleSpinBox_transitionband->value();
     double bw = highpassHz-lowpassHz;
     double nyquist_freq = m_pMainWindow->m_pRawModel->m_fiffInfo.sfreq;
