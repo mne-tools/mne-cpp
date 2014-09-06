@@ -51,7 +51,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QDockWidget>
+#include <QWidget>
 #include <QResizeEvent>
 #include <QToolBar>
 #include <QPainter>
@@ -78,7 +78,7 @@ class MainWindow;
 *
 * @brief The DataWindow class provides the data dock window.
 */
-class DataWindow : public QDockWidget
+class DataWindow : public QWidget
 {
     Q_OBJECT
 
@@ -156,12 +156,6 @@ private:
     int             m_iCurrentMarkerSample;
 
 protected slots:
-    //=========================================================================================================
-    /**
-    * @brief manualResize performs a manual resize of this dock widget
-    */
-    void manualResize();
-
     //=========================================================================================================
     /**
     * @brief customContextMenuRequested

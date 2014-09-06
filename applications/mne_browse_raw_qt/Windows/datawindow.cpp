@@ -56,7 +56,7 @@ using namespace MNEBrowseRawQt;
 //=============================================================================================================
 
 DataWindow::DataWindow(QWidget *parent) :
-    QDockWidget(parent),
+    QWidget(parent),
     ui(new Ui::DataWindowDockWidget),
     m_pMainWindow(static_cast<MainWindow*>(parent)),
     m_pDataMarker(new DataMarker(this)),
@@ -70,10 +70,10 @@ DataWindow::DataWindow(QWidget *parent) :
     initLabels();
 
     //Setup when the dock widget is to be manually resized
-    connect(this,&QDockWidget::topLevelChanged,
-                this,&DataWindow::manualResize);
-    connect(this,&QDockWidget::visibilityChanged,
-                this,&DataWindow::manualResize);
+//    connect(this,&QWidget::topLevelChanged,
+//                this,&DataWindow::manualResize);
+//    connect(this,&QWidget::visibilityChanged,
+//                this,&DataWindow::manualResize);
 }
 
 
@@ -207,19 +207,13 @@ void DataWindow::initMarker()
 
 void DataWindow::resizeEvent(QResizeEvent * event)
 {
-    //Manually resize QDockWidget when not floating
-    //This needs to be done because there is no typical central widget in QMainWindow
-    //QT does not do a good job when resizing dock widgets (known issue)
-    if(isFloating() == false && (event->size() != event->oldSize()))
-        manualResize();
-
     //On every resize update marker position
     updateMarkerPosition();
 
     //On every resize set sample informaiton
     setRangeSampleLabels();
 
-    return QDockWidget::resizeEvent(event);
+    return QWidget::resizeEvent(event);
 }
 
 
@@ -238,22 +232,7 @@ void DataWindow::keyPressEvent(QKeyEvent* event)
         break;
     }
 
-    return QDockWidget::keyPressEvent(event);
-}
-
-
-//*************************************************************************************************************
-
-void DataWindow::manualResize()
-{
-    int newWidth;
-
-    if(m_pMainWindow->m_pEventWindow->isHidden() || m_pMainWindow->m_pEventWindow->isFloating())
-        newWidth = m_pMainWindow->size().width() - m_pMainWindow->centralWidget()->size().width() - 1;
-    else
-        newWidth = m_pMainWindow->size().width() - m_pMainWindow->m_pEventWindow->size().width() - 5;
-
-    resize(newWidth, this->size().height());
+    return QWidget::keyPressEvent(event);
 }
 
 
@@ -386,8 +365,6 @@ void DataWindow::setMarkerSampleLabel()
     m_pCurrentDataMarkerLabel->setText(numberString);
 
     m_pCurrentDataMarkerLabel->move(m_pDataMarker->geometry().left() + (m_qSettings.value("DataMarker/data_marker_width").toInt()/2) - (m_pCurrentDataMarkerLabel->width()/2) + 1, m_pDataMarker->geometry().top() - 20);
-
-    //qDebug()<<"marker moved"<<m_iCurrentMarkerSample;
 }
 
 
@@ -406,12 +383,6 @@ void DataWindow::updateMarkerPosition()
 {
     //Get boundary rect coordinates for table view
     QRect boundingRect = ui->m_tableView_rawTableView->geometry();
-
-    //When window is docked the geometry is somehow corrupted - manual fix necessary :-(
-    if(!this->isFloating()) {
-        boundingRect.setTop(boundingRect.top() + 22);
-        boundingRect.setBottom(boundingRect.bottom() + 22);
-    }
 
     m_pDataMarker->move(m_pDataMarker->x(), boundingRect.y()+1);
 

@@ -152,10 +152,6 @@ void MainWindow::setupViews()
 
 void MainWindow::setupWindowWidgets()
 {
-    //Create dockable data window - QTDesigner used - see /FormFiles
-    m_pDataWindow = new DataWindow(this);
-    addDockWidget(Qt::LeftDockWidgetArea, m_pDataWindow);
-
     //Create filter window - QTDesigner used - see /FormFiles
     m_pFilterWindow = new FilterWindow(this);
     m_pFilterWindow->hide();
@@ -189,7 +185,6 @@ void MainWindow::connectMenus()
     connect(ui->m_filterAction, SIGNAL(triggered()), this, SLOT(showFilterWindow()));
 
     //Windows
-    connect(ui->m_dataAction, SIGNAL(triggered()), this, SLOT(showDataWindow()));
     connect(ui->m_eventAction, SIGNAL(triggered()), this, SLOT(showEventWindow()));
     connect(ui->m_informationAction, SIGNAL(triggered()), this, SLOT(showInformationWindow()));
 
@@ -206,10 +201,9 @@ void MainWindow::setupMainWindow()
     resize(m_qSettings.value("MainWindow/size").toSize()); //Resize to predefined default size
     move(m_qSettings.value("MainWindow/position").toPoint()); // Move this main window to position 50/50 on the screen
 
-    //Set central widget - This is needed because we are using QDockWidgets
-    QWidget *window = new QWidget();
-    setCentralWidget(window);
-    centralWidget()->setFixedWidth(1);
+    //Set data window as central widget - This is needed because we are using QDockWidgets
+    m_pDataWindow = new DataWindow(this);
+    setCentralWidget(m_pDataWindow);
 }
 
 
@@ -468,21 +462,3 @@ void MainWindow::showInformationWindow()
     else // if visible raise the widget to be sure that it is not obscured by other windows
         m_pInformationWindow->raise();
 }
-
-
-//*************************************************************************************************************
-
-void MainWindow::showDataWindow()
-{
-    //Note: A widget that happens to be obscured by other windows on the screen is considered to be visible.
-    if(!m_pDataWindow->isVisible())
-    {
-        m_pDataWindow->show();
-        m_pDataWindow->raise();
-    }
-    else // if visible raise the widget to be sure that it is not obscured by other windows
-        m_pDataWindow->raise();
-}
-
-
-
