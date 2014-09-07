@@ -146,6 +146,7 @@ Formulaeditor::~Formulaeditor()
 
 void Formulaeditor::closeEvent(QCloseEvent * event)
 {
+    Q_UNUSED(event);
     QSettings settings;
     if(!this->isMaximized())
     {
@@ -157,7 +158,8 @@ void Formulaeditor::closeEvent(QCloseEvent * event)
 //*************************************************************************************************************************************
 
 void AtomPaintWindow::paintEvent(QPaintEvent *event)
-{    
+{
+    Q_UNUSED(event);
     paint_signal(atomList, QSize(510,200));
 }
 

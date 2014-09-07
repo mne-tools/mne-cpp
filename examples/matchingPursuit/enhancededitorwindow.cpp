@@ -131,6 +131,7 @@ Enhancededitorwindow::~Enhancededitorwindow()
 
 void Enhancededitorwindow::closeEvent(QCloseEvent * event)
 {
+    Q_UNUSED(event);
     QSettings settings;
     if(!this->isMaximized())
     {
