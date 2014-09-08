@@ -83,6 +83,17 @@ FilterWindow::~FilterWindow()
 
 //*************************************************************************************************************
 
+void FilterWindow::init()
+{
+    initSpinBoxes();
+    initButtons();
+    initComboBoxes();
+    initFilterPlot();
+}
+
+
+//*************************************************************************************************************
+
 void FilterWindow::initSpinBoxes()
 {
     connect(ui->m_doubleSpinBox_lowpass,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
@@ -145,12 +156,12 @@ void FilterWindow::initFilterPlot()
 void FilterWindow::updateFilterPlot()
 {
     //Update the filter of the scene
-    QMutableMapIterator<QString,QSharedPointer<MNEOperator> > it(m_pMainWindow->m_pRawModel->m_Operators);
+    QMutableMapIterator<QString,QSharedPointer<MNEOperator> > it(m_pMainWindow->m_pDataWindow->getDataModel()->m_Operators);
     while(it.hasNext()) {
         it.next();
         if(it.key() == "User defined (See 'Adjust/Filter')") {
             m_pFilterPlotScene->updateFilter(it.value(),
-                                             m_pMainWindow->m_pRawModel->m_fiffInfo.sfreq,
+                                             m_pMainWindow->m_pDataWindow->getDataModel()->m_fiffInfo.sfreq,
                                              ui->m_doubleSpinBox_lowpass->value(),
                                              ui->m_doubleSpinBox_highpass->value());
         }
@@ -222,7 +233,7 @@ void FilterWindow::filterParametersChanged()
     double center = (lowpassHz+highpassHz)/2;
     double trans_width = ui->m_doubleSpinBox_transitionband->value();
     double bw = highpassHz-lowpassHz;
-    double samplingFrequency = m_pMainWindow->m_pRawModel->m_fiffInfo.sfreq;
+    double samplingFrequency = m_pMainWindow->m_pDataWindow->getDataModel()->m_fiffInfo.sfreq;
 
     //Update min max of spin boxes to nyquist
     ui->m_doubleSpinBox_highpass->setMaximum(samplingFrequency/2);
@@ -246,7 +257,7 @@ void FilterWindow::filterParametersChanged()
     }
 
     //Replace old with new filter operator
-    QMutableMapIterator<QString,QSharedPointer<MNEOperator> > it(m_pMainWindow->m_pRawModel->m_Operators);
+    QMutableMapIterator<QString,QSharedPointer<MNEOperator> > it(m_pMainWindow->m_pDataWindow->getDataModel()->m_Operators);
     while(it.hasNext()) {
         it.next();
         if(it.key() == "User defined (See 'Adjust/Filter')") {
@@ -263,12 +274,12 @@ void FilterWindow::filterParametersChanged()
 
 void FilterWindow::applyFilterToAll()
 {
-    QMutableMapIterator<QString,QSharedPointer<MNEOperator> > it(m_pMainWindow->m_pRawModel->m_Operators);
+    QMutableMapIterator<QString,QSharedPointer<MNEOperator> > it(m_pMainWindow->m_pDataWindow->getDataModel()->m_Operators);
 
     while(it.hasNext()) {
         it.next();
         if(it.key() == "User defined (See 'Adjust/Filter')") {
-            m_pMainWindow->m_pRawModel->applyOperator(QModelIndexList(),it.value());
+            m_pMainWindow->m_pDataWindow->getDataModel()->applyOperator(QModelIndexList(),it.value());
         }
     }
 }
@@ -278,7 +289,7 @@ void FilterWindow::applyFilterToAll()
 
 void FilterWindow::undoFilterToAll()
 {
-    m_pMainWindow->m_pRawModel->undoFilter();
+    m_pMainWindow->m_pDataWindow->getDataModel()->undoFilter();
 }
 
 
@@ -343,7 +354,7 @@ void FilterWindow::exportFilterCoefficients()
         //get user defined filter oeprator
         QSharedPointer<FilterOperator> currentFilter;
 
-        QMutableMapIterator<QString,QSharedPointer<MNEOperator> > it(m_pMainWindow->m_pRawModel->m_Operators);
+        QMutableMapIterator<QString,QSharedPointer<MNEOperator> > it(m_pMainWindow->m_pDataWindow->getDataModel()->m_Operators);
         while(it.hasNext()) {
             it.next();
             if(it.key() == "User defined (See 'Adjust/Filter')") {

@@ -66,10 +66,13 @@ DataWindow::DataWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    initUndockedWindow();
-    initToolBar();
-    initMarker();
-    initLabels();
+    //------------------------
+    //--- Setup data model ---
+    //------------------------
+    if(m_pMainWindow->m_qFileRaw.exists())
+        m_pRawModel = new RawModel(m_pMainWindow->m_qFileRaw, this);
+    else
+        m_pRawModel = new RawModel(this);
 }
 
 
@@ -83,11 +86,56 @@ DataWindow::~DataWindow()
 
 //*************************************************************************************************************
 
-void DataWindow::initRawDataViewSettings()
+void DataWindow::init()
 {
+    initMVCSettings();
+    initUndockedWindow();
+    initToolBar();
+    initMarker();
+    initLabels();
+}
+
+
+//*************************************************************************************************************
+
+QTableView* DataWindow::getDataTableView()
+{
+    return ui->m_tableView_rawTableView;
+}
+
+
+//*************************************************************************************************************
+
+RawModel* DataWindow::getDataModel()
+{
+    return m_pRawModel;
+}
+
+
+//*************************************************************************************************************
+
+RawDelegate* DataWindow::getDataDelegate()
+{
+    return m_pRawDelegate;
+}
+
+
+//*************************************************************************************************************
+
+void DataWindow::initMVCSettings()
+{
+    //-----------------------------------
     //------ Init data window view ------
+    //-----------------------------------
+    //Set MVC model
+    ui->m_tableView_rawTableView->setModel(m_pRawModel);
+
+    //Set MVC delegate
+    m_pRawDelegate = new RawDelegate(this);
+    ui->m_tableView_rawTableView->setItemDelegate(m_pRawDelegate);
+
     //set some settings for m_pRawTableView
-    ui->m_tableView_rawTableView->verticalHeader()->setDefaultSectionSize(m_pMainWindow->m_pRawDelegate->m_iDefaultPlotHeight);
+    ui->m_tableView_rawTableView->verticalHeader()->setDefaultSectionSize(m_pRawDelegate->m_iDefaultPlotHeight);
     ui->m_tableView_rawTableView->setColumnHidden(0,true); //because content is plotted jointly with column=1
     ui->m_tableView_rawTableView->resizeColumnsToContents();
 
@@ -101,13 +149,21 @@ void DataWindow::initRawDataViewSettings()
 
     //connect QScrollBar with model in order to reload data samples
     connect(ui->m_tableView_rawTableView->horizontalScrollBar(),&QScrollBar::valueChanged,
-            m_pMainWindow->m_pRawModel,&RawModel::updateScrollPos);
+            m_pRawModel,&RawModel::updateScrollPos);
 
-    //------ Init undocked view ------
-    m_pUndockedDataView->setModel(m_pMainWindow->m_pRawModel);
-    m_pUndockedDataView->setItemDelegate(m_pMainWindow->m_pRawDelegate);
+    //Set MVC in delegate
+    m_pRawDelegate->setModelView(m_pMainWindow->m_pEventWindow->getEventModel(),
+                                 m_pMainWindow->m_pEventWindow->getEventTableView(),
+                                 ui->m_tableView_rawTableView);
 
-    m_pUndockedDataView->verticalHeader()->setDefaultSectionSize(m_pMainWindow->m_pRawDelegate->m_iDefaultPlotHeight);
+    //-----------------------------------
+    //------ Init "dockable" view -------
+    //-----------------------------------
+    m_pUndockedDataView = new QTableView(m_pUndockedViewWidget);
+    m_pUndockedDataView->setModel(m_pRawModel);
+    m_pUndockedDataView->setItemDelegate(m_pRawDelegate);
+
+    m_pUndockedDataView->verticalHeader()->setDefaultSectionSize(m_pRawDelegate->m_iDefaultPlotHeight);
     m_pUndockedDataView->setColumnHidden(0,true); //because content is plotted jointly with column=1
     m_pUndockedDataView->resizeColumnsToContents();
 
@@ -117,19 +173,16 @@ void DataWindow::initRawDataViewSettings()
     m_pUndockedDataView->setShowGrid(false);
     m_pUndockedDataView->horizontalHeader()->setVisible(false);
 
-    //set context menu
-    m_pUndockedDataView->setContextMenuPolicy(Qt::CustomContextMenu);
-    connect(m_pUndockedDataView,&QWidget::customContextMenuRequested,
-            this,&DataWindow::customContextMenuRequested);
-
     //activate kinetic scrolling
     QScroller::grabGesture(m_pUndockedDataView, QScroller::MiddleMouseButtonGesture);
 
     //connect QScrollBar with model in order to reload data samples
     connect(m_pUndockedDataView->horizontalScrollBar(),&QScrollBar::valueChanged,
-            m_pMainWindow->m_pRawModel,&RawModel::updateScrollPos);
+            m_pRawModel,&RawModel::updateScrollPos);
 
-    //Interconnect scrollbars of docked and undocked view
+    //-------------------------------------------------------
+    //- Interconnect scrollbars of docked and undocked view -
+    //-------------------------------------------------------
     //m_pUndockedDataView ---> ui->m_tableView_rawTableView
     connect(m_pUndockedDataView->horizontalScrollBar(),&QScrollBar::valueChanged,
             ui->m_tableView_rawTableView->horizontalScrollBar(),&QScrollBar::setValue);
@@ -146,19 +199,10 @@ void DataWindow::initRawDataViewSettings()
 
 //*************************************************************************************************************
 
-QTableView* DataWindow::getTableView()
-{
-    return ui->m_tableView_rawTableView;
-}
-
-
-//*************************************************************************************************************
-
 void DataWindow::initUndockedWindow()
 {
     //Add second data view to undocked window
     m_pUndockedDataViewLayout = new QVBoxLayout(m_pUndockedViewWidget);
-    m_pUndockedDataView = new QTableView(m_pUndockedViewWidget);
     m_pUndockedDataViewLayout->addWidget(m_pUndockedDataView);
     m_pUndockedViewWidget->setLayout(m_pUndockedDataViewLayout);
     m_pUndockedViewWidget->hide();
@@ -314,24 +358,24 @@ void DataWindow::customContextMenuRequested(QPoint pos)
 
     QAction* doMarkChBad = markingSubMenu->addAction(tr("Mark as bad"));
     connect(doMarkChBad,&QAction::triggered, [=](){
-        m_pMainWindow->m_pRawModel->markChBad(selected,1);
+        m_pRawModel->markChBad(selected,1);
     });
 
     QAction* doMarkChGood = markingSubMenu->addAction(tr("Mark as good"));
     connect(doMarkChGood,&QAction::triggered, [=](){
-        m_pMainWindow->m_pRawModel->markChBad(selected,0);
+        m_pRawModel->markChBad(selected,0);
     });
 
     //**************** FilterOperators ****************
     //selected channels
     QMenu *filtOpSubMenu = new QMenu("Apply FilterOperator to selected channel",menu);
-    QMutableMapIterator<QString,QSharedPointer<MNEOperator> > it(m_pMainWindow->m_pRawModel->m_Operators);
+    QMutableMapIterator<QString,QSharedPointer<MNEOperator> > it(m_pRawModel->m_Operators);
     while(it.hasNext()) {
         it.next();
         QAction* doApplyFilter = filtOpSubMenu->addAction(tr("%1").arg(it.key()));
 
         connect(doApplyFilter,&QAction::triggered, [=](){
-            m_pMainWindow->m_pRawModel->applyOperator(selected,it.value());
+            m_pRawModel->applyOperator(selected,it.value());
         });
     }
 
@@ -343,7 +387,7 @@ void DataWindow::customContextMenuRequested(QPoint pos)
         QAction* doApplyFilter = filtOpAllSubMenu->addAction(tr("%1").arg(it.key()));
 
         connect(doApplyFilter,&QAction::triggered, [=](){
-            m_pMainWindow->m_pRawModel->applyOperator(QModelIndexList(),it.value());
+            m_pRawModel->applyOperator(QModelIndexList(),it.value());
         });
     }
 
@@ -358,7 +402,7 @@ void DataWindow::customContextMenuRequested(QPoint pos)
         QAction* undoApplyFilter = undoFiltOpSelSubMenu->addAction(tr("%1").arg(it.key()));
 
         connect(undoApplyFilter,&QAction::triggered, [=](){
-            m_pMainWindow->m_pRawModel->undoFilter(selected,it.value());
+            m_pRawModel->undoFilter(selected,it.value());
         });
     }
 
@@ -367,13 +411,13 @@ void DataWindow::customContextMenuRequested(QPoint pos)
     //undo all filterting to selected channels
     QAction* undoApplyFilterSel = undoFiltOpSubMenu->addAction(tr("Undo FilterOperators to selected channels"));
     connect(undoApplyFilterSel,&QAction::triggered, [=](){
-        m_pMainWindow->m_pRawModel->undoFilter(selected);
+        m_pRawModel->undoFilter(selected);
     });
 
     //undo all filtering to all channels
     QAction* undoApplyFilterAll = undoFiltOpSubMenu->addAction(tr("Undo FilterOperators to all channels"));
     connect(undoApplyFilterAll,&QAction::triggered, [=](){
-        m_pMainWindow->m_pRawModel->undoFilter();
+        m_pRawModel->undoFilter();
     });
 
     //add everything to main contextmenu
@@ -383,7 +427,7 @@ void DataWindow::customContextMenuRequested(QPoint pos)
     menu->addMenu(undoFiltOpSubMenu);
 
     //show context menu
-    menu->popup(m_pMainWindow->m_pRawTableView->viewport()->mapToGlobal(pos));
+    menu->popup(ui->m_tableView_rawTableView->viewport()->mapToGlobal(pos));
 }
 
 
@@ -402,9 +446,9 @@ void DataWindow::setRangeSampleLabels()
 
     //Set values as string
     QString stringTemp;
-    int minSampleRangeSec = (minSampleRange/m_pMainWindow->m_pRawModel->m_fiffInfo.sfreq)*1000;
+    int minSampleRangeSec = (minSampleRange/m_pRawModel->m_fiffInfo.sfreq)*1000;
     ui->m_label_sampleMin->setText(QString("%1 / %2 sec").arg(stringTemp.number(minSampleRange)).arg(stringTemp.number((double)minSampleRangeSec/1000,'g')));
-    int maxSampleRangeSec = (maxSampleRange/m_pMainWindow->m_pRawModel->m_fiffInfo.sfreq)*1000;
+    int maxSampleRangeSec = (maxSampleRange/m_pRawModel->m_fiffInfo.sfreq)*1000;
     ui->m_label_sampleMax->setText(QString("%1 / %2 sec").arg(stringTemp.number(maxSampleRange)).arg(stringTemp.number((double)maxSampleRangeSec/1000,'g')));
 }
 
@@ -419,7 +463,7 @@ void DataWindow::setMarkerSampleLabel()
     m_iCurrentMarkerSample = ui->m_tableView_rawTableView->horizontalScrollBar()->value() +
             (m_pDataMarker->geometry().x() - ui->m_tableView_rawTableView->geometry().x() - ui->m_tableView_rawTableView->verticalHeader()->width());
 
-    int currentSeconds = (m_iCurrentMarkerSample/m_pMainWindow->m_pRawModel->m_fiffInfo.sfreq)*1000;
+    int currentSeconds = (m_iCurrentMarkerSample/m_pRawModel->m_fiffInfo.sfreq)*1000;
 
     QString numberString = QString("%1 / %2 sec").arg(QString().number(m_iCurrentMarkerSample)).arg(QString().number((double)currentSeconds/1000,'g'));
     m_pCurrentDataMarkerLabel->setText(numberString);
@@ -432,8 +476,8 @@ void DataWindow::setMarkerSampleLabel()
 
 void DataWindow::addEventToEventModel()
 {
-    m_pMainWindow->m_pEventModel->setCurrentMarkerPos(m_iCurrentMarkerSample);
-    m_pMainWindow->m_pEventModel->insertRow(0, QModelIndex());
+    m_pMainWindow->m_pEventWindow->getEventModel()->setCurrentMarkerPos(m_iCurrentMarkerSample);
+    m_pMainWindow->m_pEventWindow->getEventModel()->insertRow(0, QModelIndex());
 }
 
 

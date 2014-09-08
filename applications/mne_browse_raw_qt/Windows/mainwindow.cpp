@@ -68,17 +68,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     //The following functions and their point of calling should NOT be changed
     //Setup the windows first - this NEEDS to be done here because important pointers (window pointers) which are needed for further processing are generated in this function
-    setupMainWindow();
     setupWindowWidgets();
-
-    //setup MVC
-    setupModel();
-    setupDelegate();
-    setupViews();
-
-    //Set event data and view in the delegate. This needs to be done here after all the above called setup routines
-    m_pRawDelegate->setModelView(m_pEventModel, m_pEventTableView, m_pRawTableView);
-    m_pEventDelegate->setModelView(m_pEventModel);
+    setupMainWindow();
 
     // Setup rest of the GUI
     connectMenus();
@@ -98,75 +89,32 @@ MainWindow::~MainWindow()
 
 //*************************************************************************************************************
 
-void MainWindow::setupModel()
-{
-    //Setup data model
-    if(m_qFileRaw.exists())
-        m_pRawModel = new RawModel(m_qFileRaw, this);
-    else
-        m_pRawModel = new RawModel(this);
-
-    //Setup event model and sorting
-    if(m_qFileRaw.exists())
-        m_pEventModel = new EventModel(m_qEventFile, this);
-    else
-        m_pEventModel = new EventModel(this);
-
-    //Set fiffInfo and first/last sample in the event model
-    m_pEventModel->setFiffInfo(m_pRawModel->m_fiffInfo);
-    m_pEventModel->setFirstLastSample(m_pRawModel->firstSample(), m_pRawModel->lastSample());
-}
-
-
-//*************************************************************************************************************
-
-void MainWindow::setupDelegate()
-{
-    m_pRawDelegate = new RawDelegate(this);
-    m_pEventDelegate = new EventDelegate(this);
-}
-
-
-//*************************************************************************************************************
-
-void MainWindow::setupViews()
-{
-    m_pRawTableView = m_pDataWindow->getTableView();
-    m_pEventTableView = m_pEventWindow->getTableView();
-
-    //set custom models
-    m_pRawTableView->setModel(m_pRawModel);
-    m_pEventTableView->setModel(m_pEventModel);
-
-    //set custom delegates
-    m_pRawTableView->setItemDelegate(m_pRawDelegate);
-    m_pEventTableView->setItemDelegate(m_pEventDelegate);
-
-    //setup view settings
-    m_pDataWindow->initRawDataViewSettings();
-    m_pEventWindow->initEventViewSettings();
-}
-
-
-//*************************************************************************************************************
-
 void MainWindow::setupWindowWidgets()
 {
-    //Create filter window - QTDesigner used - see /FormFiles
-    m_pFilterWindow = new FilterWindow(this);
-    m_pFilterWindow->hide();
+    //Create data window
+    m_pDataWindow = new DataWindow(this);
 
     //Create dockble event window - QTDesigner used - see /FormFiles
     m_pEventWindow = new EventWindow(this);
     addDockWidget(Qt::RightDockWidgetArea, m_pEventWindow);
 
-    //Create dockble event window - QTDesigner used - see /FormFiles
+    //Create filter window - QTDesigner used - see /FormFiles
+    m_pFilterWindow = new FilterWindow(this);
+    m_pFilterWindow->hide();
+
+    //Create dockble information window - QTDesigner used - see /FormFiles
     m_pInformationWindow = new InformationWindow(this);
     addDockWidget(Qt::BottomDockWidgetArea, m_pInformationWindow);
+    m_pInformationWindow->hide();
 
     //Create about window - QTDesigner used - see /FormFiles
     m_pAboutWindow = new AboutWindow(this);
     m_pAboutWindow->hide();
+
+    //Init windows
+    m_pDataWindow->init();
+    m_pEventWindow->init();
+    m_pFilterWindow->init();
 }
 
 
@@ -202,7 +150,6 @@ void MainWindow::setupMainWindow()
     move(m_qSettings.value("MainWindow/position").toPoint()); // Move this main window to position 50/50 on the screen
 
     //Set data window as central widget - This is needed because we are using QDockWidgets
-    m_pDataWindow = new DataWindow(this);
     setCentralWidget(m_pDataWindow);
 
     //Set window icon for MNE browse Raw Qt
@@ -220,15 +167,15 @@ void MainWindow::setWindowStatus()
     setWindowTitle(title);
 
     //Set status bar
-    if(m_pRawModel->m_bFileloaded) {
+    if(m_pDataWindow->getDataModel()->m_bFileloaded) {
         int idx = m_qFileRaw.fileName().lastIndexOf("/");
         QString filename = m_qFileRaw.fileName().remove(0,idx+1);
-        title = QString("Data file: %1  /  First sample: %2  /  Sample frequency: %3Hz").arg(filename).arg(m_pRawModel->firstSample()).arg(m_pRawModel->m_fiffInfo.sfreq);
+        title = QString("Data file: %1  /  First sample: %2  /  Sample frequency: %3Hz").arg(filename).arg(m_pDataWindow->getDataModel()->firstSample()).arg(m_pDataWindow->getDataModel()->m_fiffInfo.sfreq);
     }
     else
         title = QString("No data file");
 
-    if(m_pEventModel->m_bFileloaded) {
+    if(m_pEventWindow->getEventModel()->m_bFileloaded) {
         int idx = m_qEventFile.fileName().lastIndexOf("/");
         QString filename = m_qEventFile.fileName().remove(0,idx+1);
 
@@ -306,25 +253,24 @@ void MainWindow::openFile()
         m_qFileRaw.close();
     m_qFileRaw.setFileName(filename);
 
-    if(m_pRawModel->loadFiffData(m_qFileRaw)) {
+    if(m_pDataWindow->getDataModel()->loadFiffData(m_qFileRaw))
         qDebug() << "Fiff data file" << filename << "loaded.";
-    }
     else
         qDebug("ERROR loading fiff data file %s",filename.toLatin1().data());
 
     //Clear event model
-    m_pEventModel->clearModel();
+    m_pEventWindow->getEventModel()->clearModel();
 
     //set position of QScrollArea
-    m_pDataWindow->getTableView()->horizontalScrollBar()->setValue(0);
+    m_pDataWindow->getDataTableView()->horizontalScrollBar()->setValue(0);
 
     //Set fiffInfo in event model
-    m_pEventModel->setFiffInfo(m_pRawModel->m_fiffInfo);
-    m_pEventModel->setFirstLastSample(m_pRawModel->firstSample(), m_pRawModel->lastSample());
+    m_pEventWindow->getEventModel()->setFiffInfo(m_pDataWindow->getDataModel()->m_fiffInfo);
+    m_pEventWindow->getEventModel()->setFirstLastSample(m_pDataWindow->getDataModel()->firstSample(),
+                                                        m_pDataWindow->getDataModel()->lastSample());
 
-    //setup view settings
-    m_pDataWindow->initRawDataViewSettings();
-    m_pEventWindow->initEventViewSettings();
+    //resize columns to contents - needs to be done because the new data file can be shorter than the old one
+    m_pDataWindow->getDataTableView()->resizeColumnsToContents();
 
     //Update status bar
     setWindowStatus();
@@ -345,7 +291,7 @@ void MainWindow::writeFile()
 
     QFile t_fileRaw(filename);
 
-    if(!m_pRawModel->writeFiffData(t_fileRaw))
+    if(!m_pDataWindow->getDataModel()->writeFiffData(t_fileRaw))
         qDebug() << "MainWindow: ERROR writing fiff data file" << t_fileRaw.fileName() << "!";
 }
 
@@ -367,16 +313,15 @@ void MainWindow::loadEvents()
 
     m_qEventFile.setFileName(filename);
 
-    if(m_pEventModel->loadEventData(m_qEventFile)) {
+    if(m_pEventWindow->getEventModel()->loadEventData(m_qEventFile))
         qDebug() << "Fiff event data file" << filename << "loaded.";
-    }
     else
         qDebug("ERROR loading fiff event data file %s",filename.toLatin1().data());
 
     //Update status bar
     setWindowStatus();
 
-    //Show event widget
+    //Show event window
     showEventWindow();
 }
 
@@ -399,7 +344,7 @@ void MainWindow::saveEvents()
         m_qEventFile.close();
     m_qEventFile.setFileName(filename);
 
-    if(m_pEventModel->saveEventData(m_qEventFile)) {
+    if(m_pEventWindow->getEventModel()->saveEventData(m_qEventFile)) {
         qDebug() << "Fiff event data file" << filename << "saved.";
     }
     else

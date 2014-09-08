@@ -71,11 +71,6 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../Models/rawmodel.h"
-#include "../Models/eventmodel.h"
-#include "../Delegates/rawdelegate.h"
-#include "../Delegates/eventdelegate.h"
-
 #include "../Utils/info.h"
 #include "../Utils/types.h"
 #include "../Utils/rawsettings.h"
@@ -100,6 +95,7 @@
 #include <QTextBrowser>
 #include <QMessageBox>
 #include <QPixMap>
+#include <QSignalMapper>
 
 
 //*************************************************************************************************************
@@ -215,24 +211,6 @@ private slots:
 private:
     //=========================================================================================================
     /**
-    * setupModel creates the RawModel object being part of the model/view framework of QT (derived from QAbstractTableModel)
-    */
-    void setupModel();
-
-    //=========================================================================================================
-    /**
-    * setupDelegate creates the RawDelegate object being part of the model/view framework of QT (derived from QAbstractItemDelegate)
-    */
-    void setupDelegate();
-
-    //=========================================================================================================
-    /**
-    * setupViews sets up the QTableView being part of the model/view framework and connects them with previously created RawModel and RawDelegate.
-    */
-    void setupViews();
-
-    //=========================================================================================================
-    /**
     * setupWindowWidgets sets up the windows which can be shown during runtime (i.e. filter window, event list window, etc.).
     */
     void setupWindowWidgets();
@@ -266,14 +244,6 @@ private:
     QFile               m_qFileRaw;                 /**< Fiff data file to read (set for convenience) */
     QFile               m_qEventFile;               /**< Fiff event data file to read (set for convenience) */
     QSignalMapper*      m_qSignalMapper;            /**< signal mapper used for signal-slot mapping */
-
-    //modelview framework
-    RawModel*           m_pRawModel;                /**< the QAbstractTable model being part of the model/view framework of Qt */
-    EventModel*         m_pEventModel;              /**< the QAbstractTable event model being part of the model/view framework of Qt */
-    QTableView*         m_pRawTableView;            /**< the QTableView being part of the model/view framework of Qt for the fiff data handling*/
-    QTableView*         m_pEventTableView;          /**< the QTableView being part of the model/view framework of Qt for the fiff event handling */
-    RawDelegate*        m_pRawDelegate;             /**< the QAbstractDelegate being part of the raw model/view framework of Qt */
-    EventDelegate*      m_pEventDelegate;           /**< the QAbstractDelegate being part of the event model/view framework of Qt */
 
     //Window widgets
     EventWindow*        m_pEventWindow;             /**< Event widget which display the event view */
