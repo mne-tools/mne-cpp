@@ -65,6 +65,16 @@ FixDictMp::FixDictMp()
     //future = new QFuture<FixDictAtom>;
     //watcher = new QFutureWatcher<FixDictAtom>;
 }
+FixDictMp::~FixDictMp()
+{
+}
+
+Dictionary::Dictionary()
+{
+}
+Dictionary::~Dictionary()
+{
+}
 
 //*************************************************************************************************************
 
@@ -72,25 +82,14 @@ void FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal e
 {
     std::cout << "\nFixDict Matching Pursuit Algorithm started...\n";
 
-    bool isDouble = false;
+    //QList<qreal> atom_samples;
+    QList<Dictionary> parsed_dicts;
+    FixDictAtom global_best_matching;
 
-    qint32 atomCount = 0;
-    qint32 bestCorrStartIndex;
-    qreal sample;
-    qreal bestCorrValue = 0;
-
-    QString contents;
-    QString atomName;
-    QString bestCorrName;
-
-    QList<qreal> atom_samples;
-    QList<QStringList> correlationList;
-    QList<FixDictAtom> parsed_atoms;
-
+    this->signal = signal;
     MatrixXd residuum = signal; //residuum initialised with signal
     qint32 sample_count = signal.rows();
     qint32 channel_count = signal.cols();
-    qint32 atom_sample_count = 0;
 
     signal_energy = 0;
     qreal residuum_energy = 0;
@@ -98,10 +97,7 @@ void FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal e
     qreal temp_energy = 0;
     bool sample_count_mismatch = false;
 
-    QFile current_dict(path);
-
-    parsed_atoms = parse_xml_dict(path);
-
+    parsed_dicts = parse_xml_dict(path);
 
     //calculate signal_energy
     for(qint32 channel = 0; channel < channel_count; channel++)
@@ -118,186 +114,49 @@ void FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal e
 
     while(it < max_iterations && (energy_threshold < residuum_energy))
     {
+
         FixDictAtom *fix_dict_atom = new FixDictAtom();
 
         for(qint32 i = 0; i < sample_count; i++)
             signalSamples[i] = residuum(i,0);
 
-        // read dictionary and give samples and name of atom to correlation function
-        if (current_dict.open (QIODevice::ReadOnly))
+        for (qint32 i = 0; i < parsed_dicts.length(); i++)
         {
-            while(!current_dict.atEnd())
-            {
-                contents = current_dict.readLine();
-                if(contents.startsWith("atomcount"))
-                {
-                    atomCount = contents.mid(12).toInt();
-                    break;
-                }
-            }
-            while(!current_dict.atEnd())
-            {
-                while(!current_dict.atEnd())
-                {
-                    if(contents.contains("_ATOM_"))
-                    {
-                        atomName = contents;
-                        break;
-                    }
-                    contents = current_dict.readLine();
-                }
+            FixDictAtom current_best_matching = correlation(parsed_dicts.at(i));
+            if(i == 0)
+                global_best_matching = parsed_dicts.at(i).atoms.first();
 
-                contents = "";
-                fix_dict_atom->atom_formula = current_dict.readLine();
+            if(current_best_matching.max_scalar_product > global_best_matching.max_scalar_product)
+                global_best_matching = current_best_matching;
 
-                while(!contents.contains("_ATOM_"))
-                {
-                    contents = current_dict.readLine();
-                    sample = contents.toDouble(&isDouble);
-                    if(isDouble)
-                        atom_samples.append(sample);
-                    if(current_dict.atEnd())
-                        break;
-                }
-                correlationList.append(correlation(signalSamples, atom_samples, atomName));
-
-                if(atom_samples.length() != sample_count && !sample_count_mismatch)
-                {
-                    std::cout <<  "\n=============================================\n"
-                              << "this dictionary does not fit the signal,\nplease choose or create another dictionary containing\nonly atoms of the same length as the signal vector\n"
-                              << "signal samples: " << sample_count << "\n"
-                              << "atom samples: " << atom_samples.length() << "\n"
-                              <<  "=============================================\n";
-                    sample_count_mismatch = true;
-                }
-
-                atom_sample_count = atom_samples.length();
-                atom_samples.clear();
-            }
-            current_dict.close();
-
-            // find best matching atom
-            for(qint32 i = 0; i < correlationList.length(); i++)
-            {
-                if(abs(correlationList.at(i).at(2).toDouble()) > abs(bestCorrValue))
-                {
-                    bestCorrName =  correlationList.at(i).at(0);
-                    bestCorrStartIndex = correlationList.at(i).at(1).toInt();
-                    bestCorrValue = correlationList.at(i).at(2).toDouble();
-                }
-            }
-            correlationList.clear();
-
-            // find best matching atom in dictionary and write values into list
-            if (current_dict.open (QIODevice::ReadOnly))
-            {
-                bool hasFound = false;
-                //qint32 j = 0;
-                while(!current_dict.atEnd() )
-                {
-                    contents = current_dict.readLine();
-                    if(QString::compare(contents, bestCorrName) == 0)
-                    {
-                        fix_dict_atom->atom_formula = current_dict.readLine();
-                        contents = current_dict.readLine();
-
-
-                        while (!contents.contains("_ATOM_") && atom_sample_count > 0)
-                        {
-                            qint32 read_offset = 0;
-
-                            if(bestCorrStartIndex - floor(sample_count/2) >= 0)//atom translated in direction to signalvector end
-                            {
-                                for(qint32 translation = 0; translation < sample_count; translation++)
-                                {
-                                    if(translation <= bestCorrStartIndex - floor(sample_count/2))
-                                    {
-                                        read_offset++;
-                                        atom_samples.append(0);
-                                    }
-                                    else if(translation > bestCorrStartIndex - floor(sample_count/2))
-                                    {
-                                        contents = current_dict.readLine();
-                                        sample = contents.toDouble(&isDouble);
-                                        if(isDouble)
-                                            atom_samples.append(sample);
-                                    }
-
-                                    if(current_dict.atEnd())
-                                        break;
-                                }
-                                for(qint32 i = 0; i < read_offset; i++)
-                                    contents = current_dict.readLine();
-
-                                if(current_dict.atEnd())
-                                    break;
-                            }                            
-                            else // atom translated more in direction to signalvector start
-                            {
-                                for(qint32 translation = bestCorrStartIndex - floor(sample_count/2); translation < sample_count; translation++)
-                                {
-                                    if(translation < 0)
-                                        contents = current_dict.readLine();
-
-                                    else if(translation >= 0 && translation < sample_count - bestCorrStartIndex - floor(sample_count/2))
-                                    {
-                                        contents = current_dict.readLine();
-                                        sample = contents.toDouble(&isDouble);
-                                        if(isDouble)
-                                            atom_samples.append(sample);
-                                    }
-                                    else
-                                        atom_samples.append(0);
-
-                                    if(current_dict.atEnd())
-                                        break;
-                                }
-
-                                if(current_dict.atEnd())
-                                    break;
-                            }
-                            if(current_dict.atEnd())
-                                break;
-
-                            atom_sample_count--;
-                        }
-
-                        for(qint32 k = 0; k < sample_count; k++)
-                        {
-                                residuum(k, 0) -= bestCorrValue * atom_samples.at(k);
-                                temp_energy += bestCorrValue * atom_samples.at(k) * bestCorrValue * atom_samples.at(k);
-                        }
-
-                        std::cout << "\n" << "===============" << " found atom " << it << "===============" << ":\n\n";
-
-                        hasFound = true;
-                    }
-                    if(hasFound) break;
-                }
-            }            
-            current_dict.close();
         }   
+
+        VectorXd fitted_atom = VectorXd::Zero(this->signal.rows());
+
+        for(qint32 k = 0; k < global_best_matching.vector_list.first().rows(); k++)
+            fitted_atom[k + global_best_matching.translation - floor(global_best_matching.vector_list.first().rows() / 2)] += global_best_matching.vector_list.first()[k];
+
+        /*if(atom_samples.length() != sample_count && !sample_count_mismatch)
+        {
+            std::cout <<  "\n=============================================\n"
+                      << "this dictionary does not fit the signal,\nplease choose or create another dictionary containing\nonly atoms of the same length as the signal vector\n"
+                      << "signal samples: " << sample_count << "\n"
+                      << "atom samples: " << atom_samples.length() << "\n"
+                      <<  "=============================================\n";
+            sample_count_mismatch = true;
+        }*/
 
         residuum_energy -= temp_energy;
         current_energy += temp_energy;
-        VectorXd atom_sample_vector = VectorXd::Zero(atom_samples.length());
-        for(qint32 i = 0; i < atom_samples.length(); i++)
-            atom_sample_vector[i] = atom_samples.at(i);
 
-
-        fix_dict_atom->vector_list.append(atom_sample_vector);
-        fix_dict_atom->energy = temp_energy;
-        fix_dict_atom->max_scalar_list.append(bestCorrValue);
-        fix_dict_list.append(*fix_dict_atom);
+        fix_dict_list.append(global_best_matching);
 
         std::cout << "absolute energy of residuum: " << residuum_energy << "\n";
 
-        atom_samples.clear();
-        signalSamples = VectorXd::Zero(sample_count);
-        bestCorrValue = 0;
         temp_energy = 0;
 
         delete fix_dict_atom;
+
         it++;
 
         emit current_result(it, max_iterations, current_energy, signal_energy, residuum, adaptive_list, fix_dict_list);
@@ -315,104 +174,116 @@ void FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal e
 //*************************************************************************************************************
 
 // calc scalarproduct of Atom and Signal
-QStringList FixDictMp::correlation(VectorXd signalSamples, QList<qreal> atomSamples, QString atomName)
+FixDictAtom FixDictMp::correlation(Dictionary current_pdict)
 {
-    qreal maximum = 0;
-    qint32 max_index = 0;
-    qint32 p = floor(signalSamples.rows() / 2);//translation
     Eigen::FFT<double> fft;
+    std::ptrdiff_t max_index;
+    VectorXcd fft_atom = VectorXcd::Zero(this->signal.rows());
+    VectorXcd fft_signal = VectorXcd::Zero(this->signal.rows());
+    VectorXcd fft_sig_atom = VectorXcd::Zero(this->signal.rows());
+    VectorXd corr_coeffs = VectorXd::Zero(this->signal.rows());
+    FixDictAtom best_matching;
+    qreal max_scalar_product = 0;
 
-    QStringList resultList;
+    for(qint32 i = 0; i < current_pdict.atoms.length(); i++)
+    {
+        qint32 p = floor(this->signal.rows() / 2);//translation
 
-    resultList.clear();
+        fft.fwd(fft_atom, current_pdict.atoms.at(i).vector_list.first());
 
-    VectorXd atom = VectorXd::Zero(signalSamples.rows());
+        fft.fwd(fft_signal, this->signal.col(0));
 
-    for(qint32 i = 0; i < atomSamples.length(); i++)
-        atom[i] = atomSamples.at(i);
+        for( qint32 m = 0; m < this->signal.rows(); m++)
+            fft_sig_atom[m] = fft_signal[m] * conj(fft_atom[m]);
 
-    VectorXcd fft_atom = VectorXcd::Zero(signalSamples.rows());
+        fft.inv(corr_coeffs, fft_sig_atom);
 
-    fft.fwd(fft_atom, atom);
+        //find index of maximum correlation-coefficient to use in translation
+        max_scalar_product = corr_coeffs.maxCoeff(&max_index);
 
-    VectorXcd fft_signal = VectorXcd::Zero(signalSamples.rows());
-    VectorXcd fft_sig_atom = VectorXcd::Zero(signalSamples.rows());
-    VectorXd corr_coeffs = VectorXd::Zero(signalSamples.rows());
-
-    fft.fwd(fft_signal, signalSamples);
-
-    for( qint32 m = 0; m < signalSamples.rows(); m++)
-        fft_sig_atom[m] = fft_signal[m] * conj(fft_atom[m]);
-
-    fft.inv(corr_coeffs, fft_sig_atom);
-    maximum = corr_coeffs[0];
-
-    //find index of maximum correlation-coefficient to use in translation
-    for(qint32 i = 1; i < corr_coeffs.rows(); i++)
-        if(maximum < corr_coeffs[i])
+        if(i == 0)
         {
-            maximum = corr_coeffs[i];
-            max_index = i;
+            best_matching.max_scalar_product = max_scalar_product;
+            best_matching = current_pdict.atoms.at(i);
+
+            //adapting translation p to create atomtranslation correctly
+            if(max_index >= p) p = max_index - p + 1;
+            else p = max_index + p;
+
+            best_matching.translation = p;
         }
 
-    //adapting translation p to create atomtranslation correctly
-    if(max_index >= p) p = max_index - p + 1;
-    else p = max_index + p;
+        if(max_scalar_product > best_matching.max_scalar_product)
+        {
+            best_matching = current_pdict.atoms.at(i);
+            best_matching.max_scalar_product = max_scalar_product;
 
-    // List of Atomname, Index and max correlation coefficient
-    resultList.append(atomName);
-    resultList.append(QString("%1").arg(p));     // for translation
-    resultList.append(QString("%1").arg(maximum)); //for scaling
+            //adapting translation p to create atomtranslation correctly
+            if(max_index >= p) p = max_index - p + 1;
+            else p = max_index + p;
 
-    return resultList;
+            best_matching.translation = p;
+        }
+    }
+    return best_matching;
 }
 //*************************************************************************************************************
 
-QList<FixDictAtom> FixDictMp::parse_xml_dict(QString path)
+QList<Dictionary> FixDictMp::parse_xml_dict(QString path)
 {
     QFile current_dict(path);
     std::cout << "\nparsing dictionary, please be patient...";
 
     QDomDocument dictionary;
     dictionary.setContent(&current_dict);
-    QList<FixDictAtom> parsed_dict;
+    QList<Dictionary> parsed_dict;
     QDomElement current_element = dictionary.documentElement();
     QDomNodeList node_list = current_element.childNodes();
-    //QList<QDomNode> pdict_nodes;
+    QList<parse_node> pdict_nodes;
+    QList<QDomNode> nodes_listed;
 
     for(qint32 i = 0; i < node_list.length(); i++)
-        this->pdict_nodes.append(node_list.at(i));
+    {
+        parse_node temp_parse;
+        temp_parse.node = node_list.at(i);
+        pdict_nodes.append(temp_parse);
+        nodes_listed.append(node_list.at(i));
+    }
 
     //ToDo multithreading
-    //QFuture<FixDictAtom> var;
+    //QFuture<Dictionary> var;
 
-    //var = QtConcurrent::mapped(pdict_nodes, &FixDictMp::fill_dict_in_map);// parse_threads;
-    //var.waitForFinished();
+    QFuture<Dictionary> mapped_dicts = QtConcurrent::mapped(pdict_nodes, &parse_node::fill_dict_in_map);// parse_threads;
+    mapped_dicts.waitForFinished();
 
-    for(qint32 i = 0; i < node_list.length(); i++)
-        parsed_dict.append(fill_dict(pdict_nodes.at(i).cloneNode(true)));
+    QFuture<Dictionary>::const_iterator i;
+
+    for (i = mapped_dicts.constBegin(); i != mapped_dicts.constEnd(); i++)
+        parsed_dict.append(*i);
 
     std::cout << "   done.\n";
     return parsed_dict;
 }
 //*************************************************************************************************************
 
-FixDictAtom FixDictMp::fill_dict(QDomNode pdict)
+Dictionary FixDictMp::fill_dict(const QDomNode &pdict)
 {
-    FixDictAtom current_atom;
+    Dictionary current_dict;
     QDomElement atom = pdict.firstChildElement("ATOM");
 
-    current_atom.dict_source = pdict.toElement().attribute("source_dict");
-    current_atom.sample_count = pdict.toElement().attribute("sample_count").toInt();
+    current_dict.source = pdict.toElement().attribute("source_dict");
+    current_dict.atom_count();// = pdict.toElement().attribute("atom_count").toInt();
+    current_dict.atom_formula = pdict.toElement().attribute("formula");
 
-    if(pdict.toElement().attribute("formula") == QString("Gaboratom"))
+    if(current_dict.atom_formula == QString("Gaboratom"))
     {
-        current_atom.type = current_atom.AtomType::GABORATOM;
-        current_atom.atom_formula = pdict.toElement().attribute("formula");
+        current_dict.type = AtomType::GABORATOM;
 
         while(!atom.isNull())
         {
-            current_atom.gabor_atom.id = atom.attribute("id").toInt();
+            FixDictAtom current_atom;// = new FixDictAtom();
+
+            current_atom.id = atom.attribute("ID").toInt();
             current_atom.gabor_atom.scale = atom.attribute("scale").toDouble();
             current_atom.gabor_atom.modulation = atom.attribute("modu").toDouble();
             current_atom.gabor_atom.phase = atom.attribute("phase").toDouble();
@@ -420,23 +291,26 @@ FixDictAtom FixDictMp::fill_dict(QDomNode pdict)
             if(atom.hasChildNodes())
             {
                 QString sample_string = atom.firstChild().toElement().attribute("samples");
-                QStringList sample_list = sample_string.split(":");
-                current_atom.gabor_atom.atom_samples = VectorXd::Zero(sample_list.length() - 1);
-                for(qint32 i = 0; i < sample_list.length() - 1; i++)
-                    current_atom.gabor_atom.atom_samples[i] = sample_list.at(i).toDouble();
+                QStringList sample_list = sample_string.split(":",  QString::SkipEmptyParts);
+                current_atom.vector_list.append(VectorXd::Zero(sample_list.length()));
+                for(qint32 i = 0; i < sample_list.length(); i++)
+                    current_atom.vector_list.first()[i] = sample_list.at(i).toDouble();
             }
-            current_atom.gabor_atoms.append(current_atom.gabor_atom);
+            current_dict.atoms.append(current_atom);
             atom = atom.nextSiblingElement("ATOM");
-        }
+
+            //delete current_atom;
+        }        
     }
-    else if(pdict.toElement().attribute("formula") == QString("Chirpatom"))
+    else if(current_dict.atom_formula == QString("Chirpatom"))
     {
-        current_atom.type = current_atom.AtomType::CHIRPATOM;
-        current_atom.atom_formula = pdict.toElement().attribute("formula");
+        current_dict.type = AtomType::CHIRPATOM;
 
         while(!atom.isNull())
         {
-            current_atom.chirp_atom.id = atom.attribute("id").toInt();
+            FixDictAtom current_atom;
+
+            current_atom.id = atom.attribute("id").toInt();
             current_atom.chirp_atom.scale = atom.attribute("scale").toDouble();
             current_atom.chirp_atom.modulation = atom.attribute("modu").toDouble();
             current_atom.chirp_atom.phase = atom.attribute("phase").toDouble();
@@ -445,23 +319,24 @@ FixDictAtom FixDictMp::fill_dict(QDomNode pdict)
             if(atom.hasChildNodes())
             {
                 QString sample_string = atom.firstChild().toElement().attribute("samples");
-                QStringList sample_list = sample_string.split(":");
-                current_atom.chirp_atom.atom_samples = VectorXd::Zero(sample_list.length() - 1);
-                for(qint32 i = 0; i < sample_list.length() - 1; i++)
-                    current_atom.chirp_atom.atom_samples[i] = sample_list.at(i).toDouble();
+                QStringList sample_list = sample_string.split(":", QString::SkipEmptyParts);
+                current_atom.vector_list.append(VectorXd::Zero(sample_list.length()));
+                for(qint32 i = 0; i < sample_list.length(); i++)
+                    current_atom.vector_list.first()[i] = sample_list.at(i).toDouble();
             }
-            current_atom.chirp_atoms.append(current_atom.chirp_atom);
+            current_dict.atoms.append(current_atom);
             atom = atom.nextSiblingElement("ATOM");
         }
     }
     else
     {
-        current_atom.type = current_atom.AtomType::FORMULAATOM;
-        current_atom.atom_formula = pdict.toElement().attribute("formula");
+        current_dict.type = AtomType::FORMULAATOM;
 
         while(!atom.isNull())
         {
-            current_atom.formula_atom.id = atom.attribute("id").toInt();
+            FixDictAtom current_atom;
+
+            current_atom.id = atom.attribute("id").toInt();
             current_atom.formula_atom.a = atom.attribute("a").toDouble();
             current_atom.formula_atom.b = atom.attribute("b").toDouble();
             current_atom.formula_atom.c = atom.attribute("c").toDouble();
@@ -474,17 +349,24 @@ FixDictAtom FixDictMp::fill_dict(QDomNode pdict)
             if(atom.hasChildNodes())
             {
                 QString sample_string = atom.firstChild().toElement().attribute("samples");
-                QStringList sample_list = sample_string.split(":");
-                current_atom.formula_atom.atom_samples = VectorXd::Zero(sample_list.length() - 1);
-                for(qint32 i = 0; i < sample_list.length() - 1; i++)
-                    current_atom.formula_atom.atom_samples[i] = sample_list.at(i).toDouble();
+                QStringList sample_list = sample_string.split(":", QString::SkipEmptyParts);
+                current_atom.vector_list.append(VectorXd::Zero(sample_list.length()));
+                for(qint32 i = 0; i < sample_list.length(); i++)
+                    current_atom.vector_list.first()[i] = sample_list.at(i).toDouble();
             }
-            current_atom.formula_atoms.append(current_atom.formula_atom);
+            current_dict.atoms.append(current_atom);
             atom = atom.nextSiblingElement("ATOM");
         }
     }
 
-    return current_atom;
+    return current_dict;
+}
+
+//*************************************************************************************************************
+
+qint32 Dictionary::atom_count()
+{
+    return atoms.length();
 }
 
 //*************************************************************************************************************

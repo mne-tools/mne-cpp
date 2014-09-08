@@ -90,6 +90,7 @@ using namespace Eigen;
 //=============================================================================================================
 
 #define PI 3.1415926535897932384626433832795
+enum AtomType{GABORATOM, CHIRPATOM, FORMULAATOM};
 
 //=============================================================================================================
 
@@ -143,8 +144,6 @@ public:
     QString display_text;
     QList<VectorXd> vector_list;//use for communication with gui to paint results...
 
-    enum AtomType{GABORATOM, CHIRPATOM, FORMULAATOM};
-
     qint32 id;
     QString dict_source;
     AtomType type;
@@ -155,9 +154,6 @@ public:
         qreal scale;
         qreal modulation;
         qreal phase;
-
-        VectorXd atom_samples;
-        qint32 id;
     };
 
     struct ChirpATOM
@@ -166,11 +162,7 @@ public:
         qreal modulation;
         qreal phase;
         qreal chirp;
-
-        VectorXd atom_samples;
-        qint32 id;
     };
-
 
     struct formulaATOM
     {
@@ -182,18 +174,11 @@ public:
         qreal f;
         qreal g;
         qreal h;
-
-        VectorXd atom_samples;
-        qint32 id;
     };
 
     GaborATOM gabor_atom;
     ChirpATOM chirp_atom;
     formulaATOM formula_atom;
-
-    QList<GaborATOM> gabor_atoms;
-    QList<ChirpATOM> chirp_atoms;
-    QList<formulaATOM> formula_atoms;
 };
 
 //=============================================================================================================

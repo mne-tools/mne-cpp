@@ -71,7 +71,7 @@ AdaptiveMp::AdaptiveMp()
 
 //*************************************************************************************************************
 
-QList<GaborAtom> AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal epsilon, bool fix_phase = false, bool boost = true,
+QList<GaborAtom> AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal epsilon, bool fix_phase = false, qint32 boost = 0,
                                               qint32 simplex_it = 1E3, qreal simplex_reflection = 1.0, qreal simplex_expansion = 0.2 ,
                                               qreal simplex_contraction = 0.5, qreal simplex_full_contraction = 0.5)
 {
@@ -101,7 +101,9 @@ QList<GaborAtom> AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterat
 
     while(it < max_iterations && (energy_threshold/*[signal_channel]*/ < residuum_energy/*[signal_channel]*/ ))
     {
-        if(boost == true) channel_count = 1;
+        channel_count = channel_count * (boost / 100.0); //reducing the number of observed channels in the algorithm to increase speed performance
+        if(boost == 0 || channel_count == 0)
+            channel_count = 1;
 
         //variables for dyadic sampling
         qreal s = 1;                             //scale
@@ -553,7 +555,7 @@ VectorXd AdaptiveMp::calculate_atom(qint32 sample_count, qreal scale, qint32 tra
 
 //*************************************************************************************************************
 
-void AdaptiveMp::recieve_input(Eigen::MatrixXd signal, qint32 max_iterations, qreal epsilon, bool fix_phase = false, bool boost = true, qint32 simplex_it = 1E3,
+void AdaptiveMp::recieve_input(Eigen::MatrixXd signal, qint32 max_iterations, qreal epsilon, bool fix_phase = false, qint32 boost = 0, qint32 simplex_it = 1E3,
                                qreal simplex_reflection = 1.0, qreal simplex_expansion = 0.2, qreal simplex_contraction = 0.5, qreal simplex_full_contraction = 0.5)
 {
     matching_pursuit(signal, max_iterations, epsilon, fix_phase, boost, simplex_it, simplex_reflection, simplex_expansion, simplex_contraction, simplex_full_contraction);
