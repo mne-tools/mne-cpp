@@ -224,7 +224,6 @@ private slots:
 
     void calc_thread_finished();
     void on_actionCreate_treebased_dictionary_triggered();
-    void on_sb_sample_rate_editingFinished();
     void on_dsb_from_editingFinished();
     void on_dsb_to_editingFinished();
     void on_dsb_to_valueChanged(double arg1);
@@ -238,10 +237,11 @@ private slots:
     void on_actionSpeicher_unter_triggered();
     void on_actionSpeicher_triggered();
     void on_actionExport_triggered();
+    void on_dsb_sample_rate_editingFinished();
 
 signals:
 
-    void send_input(MatrixXd send_signal, qint32 send_max_iterations, qreal send_epsilon, bool fix_phase, bool boost, qint32 simplex_it,
+    void send_input(MatrixXd send_signal, qint32 send_max_iterations, qreal send_epsilon, bool fix_phase, qint32 boost, qint32 simplex_it,
                     qreal simplex_reflection, qreal simplex_expansion, qreal simplex_contraction, qreal simplex_full_contraction);
     void send_input_fix_dict(MatrixXd send_signal, qint32 send_max_iterations, qreal send_epsilon, QString path);
 
