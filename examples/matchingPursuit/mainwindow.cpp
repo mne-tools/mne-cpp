@@ -1076,7 +1076,7 @@ void MainWindow::on_btt_Calc_clicked()
             //_atom_sum_matrix = MatrixXd::Zero(256,1);
             //QFuture<void> f1 = QtConcurrent::run(&mpCalc, ownDict, _signal_matrix.col(0), ui->sb_Iterations->value());
             //f1.waitForFinished();
-            calc_fix_mp(QString("Matching-Pursuit-Toolbox/%1.dict").arg(ui->cb_Dicts->currentText()), _signal_matrix.col(0), criterion);
+            calc_fix_mp(QString(QDir::homePath() + "/" + "Matching-Pursuit-Toolbox/%1.dict").arg(ui->cb_Dicts->currentText()), _signal_matrix.col(0), criterion);
         }
         else if(ui->rb_adativMp->isChecked())
         {
@@ -1444,20 +1444,17 @@ void MainWindow::calc_fix_mp(QString path, MatrixXd signal, TruncationCriterion 
     switch(criterion)
     {
         case Iterations:
-            emit send_input_fix_dict(signal, ui->sb_Iterations->value(), qreal(MININT32),
-                                     QString("Matching-Pursuit-Toolbox/%1.dict").arg(ui->cb_Dicts->currentText()));
+            emit send_input_fix_dict(signal, ui->sb_Iterations->value(), qreal(MININT32), path);
             mp_Thread->start();
             break;
 
         case SignalEnergy:
-            emit send_input_fix_dict(signal, MAXINT32, res_energy,
-                                     QString("Matching-Pursuit-Toolbox/%1.dict").arg(ui->cb_Dicts->currentText()));
+            emit send_input_fix_dict(signal, MAXINT32, res_energy, path);
             mp_Thread->start();
             break;
 
         case Both:
-            emit send_input_fix_dict(signal, ui->sb_Iterations->value(), res_energy,
-                                     QString("Matching-Pursuit-Toolbox/%1.dict").arg(ui->cb_Dicts->currentText()));
+            emit send_input_fix_dict(signal, ui->sb_Iterations->value(), res_energy, path);
             mp_Thread->start();
             break;
     }
@@ -1946,7 +1943,7 @@ void MainWindow::save_parameters()
                 xmlWriter.writeAttribute("dict_source", fix_atom.dict_source);
 
                 xmlWriter.writeStartElement("PARAMETER");
-                if(fix_atom.type == FixDictAtom::AtomType::GABORATOM)
+                if(fix_atom.type == AtomType::GABORATOM)
                 {
                     xmlWriter.writeAttribute("formula", "GABORATOM");
                     xmlWriter.writeStartElement("PARAMETER");
@@ -1955,7 +1952,7 @@ void MainWindow::save_parameters()
                     xmlWriter.writeAttribute("modulation", QString::number(fix_atom.gabor_atom.modulation));
                     xmlWriter.writeAttribute("phase", QString::number(fix_atom.gabor_atom.phase));
                 }
-                else if(fix_atom.type == FixDictAtom::AtomType::CHIRPATOM)
+                else if(fix_atom.type == AtomType::CHIRPATOM)
                 {
                     xmlWriter.writeAttribute("formula", "CHIRPATOM");
                     xmlWriter.writeStartElement("PARAMETER");
@@ -1965,7 +1962,7 @@ void MainWindow::save_parameters()
                     xmlWriter.writeAttribute("phase", QString::number(fix_atom.chirp_atom.phase));
                     xmlWriter.writeAttribute("chirp", QString::number(fix_atom.chirp_atom.chirp));
                 }
-                else if(fix_atom.type == FixDictAtom::AtomType::FORMULAATOM)
+                else if(fix_atom.type == AtomType::FORMULAATOM)
                 {
                     xmlWriter.writeAttribute("translation", QString::number(fix_atom.translation));
                     xmlWriter.writeAttribute("a", QString::number(fix_atom.formula_atom.a));
