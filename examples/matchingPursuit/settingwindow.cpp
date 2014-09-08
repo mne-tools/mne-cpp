@@ -42,6 +42,7 @@ settingwindow::~settingwindow()
 
 void settingwindow::closeEvent(QCloseEvent * event)
 {
+    Q_UNUSED(event);
     QSettings settings;
     settings.setValue("pos_settings", pos());
 }
