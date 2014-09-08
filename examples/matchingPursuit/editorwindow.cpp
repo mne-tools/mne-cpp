@@ -1589,11 +1589,9 @@ void EditorWindow::on_btt_SaveDicts_clicked()
         return;
     }
 
-    QDir dictDir = QDir(QDir::homePath() + "/" + "Matching-Pursuit-Toolbox");
-
     QStringList filterList;
     filterList.append("*.dict");
-
+    QDir dictDir = QDir(QDir::homePath() + "/" + "Matching-Pursuit-Toolbox");
     QFileInfoList fileList = dictDir.entryInfoList(filterList);
 
     for(qint32 i = 0; i < fileList.length(); i++)
@@ -1602,7 +1600,7 @@ void EditorWindow::on_btt_SaveDicts_clicked()
         if(QString::compare(fileInfo.baseName(), ui->tb_DictName->text()) == 0)
         {
                 QMessageBox::warning(this, tr("Error"),
-                tr("The name for The dictionary is already taken."));
+                tr("The name for the dictionary is already taken."));
                 ui->tb_DictName->setFocus();
                 ui->tb_DictName->selectAll();
                 return;

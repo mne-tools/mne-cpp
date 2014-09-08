@@ -55,6 +55,15 @@ DeleteMessageBox::DeleteMessageBox(QWidget *parent) :    QDialog(parent),    ui(
     ui->setupUi(this);
 }
 
+DeleteMessageBox::DeleteMessageBox(QString msg_text, QString caption, QString btt_left_text, QString btt_right_text, QWidget *parent)  :    QDialog(parent),    ui(new Ui::DeleteMessageBox)
+{
+    ui->setupUi(this);
+    ui->lb_MessageText->setText(msg_text);
+    ui->btt_yes->setText(btt_left_text);
+    ui->btt_No->setText(btt_right_text);
+    this->setWindowTitle(caption);
+}
+
 DeleteMessageBox::~DeleteMessageBox()
 {
     delete ui;
