@@ -57,6 +57,8 @@
 #include "ui_formulaeditor.h"
 #include "enhancededitorwindow.h"
 #include "ui_enhancededitorwindow.h"
+#include "deletemessagebox.h"
+#include "ui_deletemessagebox.h"
 #include "processdurationmessagebox.h"
 #include "ui_processdurationmessagebox.h"
 #include "treebaseddictwindow.h"
@@ -92,6 +94,7 @@ using namespace DISPLIB;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+bool _is_saved = true;
 bool _new_paint = true;
 bool _tbv_is_loading = false;
 bool _auto_change = false;
@@ -110,8 +113,8 @@ qreal _sample_rate = 1;
 
 QString _save_path = "";
 QString _file_name = "";
-QString _last_open_path = QDir::homePath();
-QString _last_save_path = QDir::homePath();
+QString _last_open_path = QDir::homePath() + "/" + "Matching-Pursuit-Toolbox";
+QString _last_save_path = QDir::homePath() + "/" + "Matching-Pursuit-Toolbox";
 
 QMap<qint32, bool> _select_channel_map;
 QMap<qint32, bool> _select_atoms_map;
@@ -218,8 +221,8 @@ MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::
     resize(settings.value("size", QSize(1050, 700)).toSize());
     this->restoreState(settings.value("window_state").toByteArray());
     ui->splitter->restoreState(settings.value("splitter_sizes").toByteArray());
-    _last_open_path = settings.value("last_open_path", QDir::homePath()).toString();
-    _last_save_path= settings.value("last_save_path", QDir::homePath()).toString();
+    _last_open_path = settings.value("last_open_path", QDir::homePath()+ "/" + "Matching-Pursuit-Toolbox").toString();
+    _last_save_path = settings.value("last_save_path", QDir::homePath()+ "/" + "Matching-Pursuit-Toolbox").toString();
 }
 
 //*************************************************************************************************************************************
@@ -234,6 +237,22 @@ MainWindow::~MainWindow()
 void MainWindow::closeEvent(QCloseEvent * event)
 {
     QSettings settings;
+    if(settings.value("show_warnings",true).toBool() && !_is_saved)
+    {
+        QString text = "Warning, your changes have not been saved.\nTo close this window and discard your changes\nclick OK otherwise click Cancel and save the current changes.";
+        DeleteMessageBox *msg_box = new DeleteMessageBox(text, "Warning...", "OK", "Cancel");
+        msg_box->setModal(true);
+        qint32 result = msg_box->exec();
+
+        if(result == 0)
+        {
+            msg_box->close();
+            event->ignore();
+            return;
+        }
+        msg_box->close();
+    }
+
     if(!this->isMaximized())
     {
         settings.setValue("pos", pos());
@@ -945,6 +964,7 @@ void MainWindow::on_btt_Calc_clicked()
         ui->lb_RestEnergieResiduumValue->setText("0");
         _adaptive_atom_list.clear();
         _fix_dict_atom_list.clear();
+        _is_saved = false;
         _residuum_matrix = _signal_matrix;
         _atom_sum_matrix = MatrixXd::Zero(_signal_matrix.rows(), _signal_matrix.cols());
         callAtomSumWindow->update();
@@ -1625,6 +1645,13 @@ void MainWindow::on_actionSpeicher_unter_triggered()
         return;
     }
 
+    if(_file_name.split('.').last() != "fif")
+    {
+        QMessageBox::warning(this, tr("Error"),
+        tr("error: No fif file for save."));
+        return;
+    }
+
     if(ui->tbv_Results->rowCount() == 0)
     {
         QMessageBox::warning(this, tr("Error"),
@@ -1796,6 +1823,7 @@ void MainWindow::save_fif_file()
     outfid->finish_writing_raw();
     printf("Finished\n");
 
+    _is_saved = true;
     ui->lb_timer->setHidden(false);
     ui->cb_all_select->setHidden(false);
     ui->lb_save_file->setHidden(true);
@@ -1896,7 +1924,7 @@ void MainWindow::on_actionExport_triggered()
     }
 
 
-    QString save_path = QFileDialog::getSaveFileName(this, "Export results as dict file...", _last_save_path + "/" + "Matching-Pursuit-Toolbox" + "/" + "resultdict","(*.dict)");
+    QString save_path = QFileDialog::getSaveFileName(this, "Export results as dict file...", QDir::homePath() + "/" + "Matching-Pursuit-Toolbox" + "/" + "resultdict","(*.dict)");
     if(save_path.isEmpty()) return;
 
     QStringList string_list = save_path.split('/');

@@ -704,19 +704,23 @@ void Enhancededitorwindow::on_pushButton_clicked()
         return;
     }
 
-    for(qint32 k = 0; k < _names_list.length(); k++)
-    {
-        if(QString::compare(ui->tb_atom_name->text(), _names_list.at(k)) == 0)
-        {
-            QMessageBox::warning(this, tr("Error"),
-                tr("The name is already taken."));
+    QStringList filterList;
+    filterList.append("*.pdict");
+    QDir dictDir = QDir(QDir::homePath() + "/" + "Matching-Pursuit-Toolbox");
+    QFileInfoList fileList = dictDir.entryInfoList(filterList);
 
+    for(qint32 i = 0; i < fileList.length(); i++)
+    {
+        QFileInfo fileInfo = fileList.at(i);
+        if(QString::compare(fileInfo.baseName(), ui->tb_atom_name->text()) == 0)
+        {
+                QMessageBox::warning(this, tr("Error"),
+                tr("The name for the dictionary is already taken."));
                 ui->tb_atom_name->setFocus();
                 ui->tb_atom_name->selectAll();
                 return;
         }
     }
-
 
     QString save_path_xml = QString(QDir::homePath() + "/" + "Matching-Pursuit-Toolbox/%1_xml.pdict").arg(ui->tb_atom_name->text());
     QFile xml_file(save_path_xml);
