@@ -95,6 +95,49 @@ using namespace Eigen;
 using namespace std;
 
 //*************************************************************************************************************
+
+
+class UTILSSHARED_EXPORT Dictionary
+{
+
+public:
+
+    //=========================================================================================================
+    /**
+    * dicitionary_Dicitionary
+    *
+    * ### MP toolbox function ###
+    *
+    * Constructor
+    *
+    * constructs Dicitionary class
+    *
+    */
+    Dictionary();
+    //=========================================================================================================
+    /**
+    *  dicitionary_Dicitionary
+    *
+    * ### MP toolbox function ###
+    *
+    * Deconstructor
+    *
+    * deconstructs Dicitionary class
+    *
+    */
+    ~Dictionary();
+    //=========================================================================================================
+
+    QList<FixDictAtom> atoms;
+    AtomType type;
+    QString source;
+    QString atom_formula;
+
+    qint32 atom_count();
+
+};//class
+
+
 /**
 * DECLARE CLASS FixDictMp
 *
@@ -119,7 +162,6 @@ public:
     MatrixXd signal;
     QList<FixDictAtom> fix_dict_list;
     QList<GaborAtom> adaptive_list;
-    QList<QDomNode> pdict_nodes;
 
     //=========================================================================================================
     /**
@@ -133,6 +175,18 @@ public:
     *
     */
     FixDictMp();
+    //=========================================================================================================
+    /**
+    * fixdictMp_fixdictMP
+    *
+    * ### MP toolbox function ###
+    *
+    * Deconstructor
+    *
+    * deconstructs FixDictMp class
+    *
+    */
+    ~FixDictMp();
 
     //=========================================================================================================
 
@@ -148,22 +202,15 @@ public:
 
     //=========================================================================================================
 
-    QList<FixDictAtom> parse_xml_dict(QString path);
+    QList<Dictionary> parse_xml_dict(QString path);
 
     //=========================================================================================================
 
-    FixDictAtom fill_dict(QDomNode pdict);
+    Dictionary fill_dict(const QDomNode &pdict);
 
     //=========================================================================================================
 
-    FixDictAtom fill_dict_in_map() const
-    {
-        FixDictAtom add_to_map;
-        FixDictMp fix_dict_mp;
-        add_to_map = fix_dict_mp.fill_dict(this->pdict_nodes.last());
-        //this->pdict_nodes.removeLast();//erase(pdict_nodes.Iteratorlast());
-        return add_to_map;
-    }
+
 
     //=========================================================================================================
 
@@ -187,6 +234,21 @@ signals:
     void parse_in_thread();
 
 };//class
+
+//=========================================================================================================
+
+struct parse_node
+{
+    QDomNode node;
+
+    Dictionary fill_dict_in_map() const
+    {
+        Dictionary add_to_map;
+        FixDictMp fix_dict_mp;
+        add_to_map = fix_dict_mp.fill_dict(this->node);
+        return add_to_map;
+    }
+};
 
 }//NAMESPACE
 

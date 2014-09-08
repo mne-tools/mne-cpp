@@ -39,6 +39,7 @@ TEMPLATE = lib
 
 QT       -= gui
 QT       += xml
+QT       += network concurrent
 
 DEFINES += UTILS_LIBRARY
 
