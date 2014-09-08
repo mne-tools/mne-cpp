@@ -158,7 +158,7 @@ protected slots:
     /**
     * This function gets called whenever the filter parameters are altered by the user via the gui.
     */
-    void changeFilterParameters();
+    void filterParametersChanged();
 
     //=========================================================================================================
     /**

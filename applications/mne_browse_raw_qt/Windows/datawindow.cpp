@@ -66,6 +66,7 @@ DataWindow::DataWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    initUndockedWindow();
     initToolBar();
     initMarker();
     initLabels();
@@ -84,7 +85,7 @@ DataWindow::~DataWindow()
 
 void DataWindow::initRawDataViewSettings()
 {
-    //Init data window view
+    //------ Init data window view ------
     //set some settings for m_pRawTableView
     ui->m_tableView_rawTableView->verticalHeader()->setDefaultSectionSize(m_pMainWindow->m_pRawDelegate->m_iDefaultPlotHeight);
     ui->m_tableView_rawTableView->setColumnHidden(0,true); //because content is plotted jointly with column=1
@@ -102,9 +103,7 @@ void DataWindow::initRawDataViewSettings()
     connect(ui->m_tableView_rawTableView->horizontalScrollBar(),&QScrollBar::valueChanged,
             m_pMainWindow->m_pRawModel,&RawModel::updateScrollPos);
 
-    //Init undocked view
-    m_pUndockedDataViewLayout = new QVBoxLayout(m_pUndockedViewWidget);
-    m_pUndockedDataView = new QTableView(m_pUndockedViewWidget);
+    //------ Init undocked view ------
     m_pUndockedDataView->setModel(m_pMainWindow->m_pRawModel);
     m_pUndockedDataView->setItemDelegate(m_pMainWindow->m_pRawDelegate);
 
@@ -130,11 +129,6 @@ void DataWindow::initRawDataViewSettings()
     connect(m_pUndockedDataView->horizontalScrollBar(),&QScrollBar::valueChanged,
             m_pMainWindow->m_pRawModel,&RawModel::updateScrollPos);
 
-    m_pUndockedDataViewLayout->addWidget(m_pUndockedDataView);
-
-    m_pUndockedViewWidget->setLayout(m_pUndockedDataViewLayout);
-    m_pUndockedViewWidget->hide();
-
     //Interconnect scrollbars of docked and undocked view
     //m_pUndockedDataView ---> ui->m_tableView_rawTableView
     connect(m_pUndockedDataView->horizontalScrollBar(),&QScrollBar::valueChanged,
@@ -155,6 +149,21 @@ void DataWindow::initRawDataViewSettings()
 QTableView* DataWindow::getTableView()
 {
     return ui->m_tableView_rawTableView;
+}
+
+
+//*************************************************************************************************************
+
+void DataWindow::initUndockedWindow()
+{
+    //Add second data view to undocked window
+    m_pUndockedDataViewLayout = new QVBoxLayout(m_pUndockedViewWidget);
+    m_pUndockedDataView = new QTableView(m_pUndockedViewWidget);
+    m_pUndockedDataViewLayout->addWidget(m_pUndockedDataView);
+    m_pUndockedViewWidget->setLayout(m_pUndockedDataViewLayout);
+    m_pUndockedViewWidget->hide();
+
+    m_pUndockedViewWidget->setWindowTitle("Data plot");
 }
 
 
