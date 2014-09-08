@@ -5,18 +5,18 @@
 settingwindow::settingwindow(QWidget *parent) :    QWidget(parent),    ui(new Ui::settingwindow)
 {    
     ui->setupUi(this);
-
+    //ui->sl_boost->setStyleSheet("QSlider::handle {image:  url(:/images/icons/greenArrowLeft.png);}");
+    //QSlider::
 
     QSettings settings;
     move(settings.value("pos_settings", QPoint(200, 200)).toPoint());
 
 
-    ui->cb_boost->setChecked(settings.value("isBoost", true).toBool());
+    ui->sl_boost->setValue(-1 * (settings.value("boost", 0).toInt()));
     ui->cb_fixphase->setChecked(settings.value("fixPhase", false).toBool());
     ui->cb_show_warnings->setChecked(settings.value("show_warnings", true).toBool());
 
     ui->sb_adaptive_iteration->setValue(settings.value("adaptive_iterations", 1E3).toInt());
-    //ui->sb_fix_iteration->setValue(settings.value("fix_iterations", 1E3).toInt());
 
     ui->dsb_adaptive_reflection->setValue(settings.value("adaptive_reflection", 1.00).toDouble());
     //ui->dsb_fix_reflection->setValue(settings.value("fix_reflection", 1.00).toDouble());
@@ -52,7 +52,7 @@ void settingwindow::closeEvent(QCloseEvent * event)
 void settingwindow::on_btt_close_clicked()
 {
     QSettings settings;
-    settings.setValue("isBoost", ui->cb_boost->isChecked());
+    settings.setValue("boost", abs(ui->sl_boost->value()));
     settings.setValue("fixPhase", ui->cb_fixphase->isChecked());
     settings.setValue("show_warnings", ui->cb_show_warnings->isChecked());
 
@@ -79,4 +79,39 @@ void settingwindow::on_btt_close_clicked()
 void settingwindow::on_btt_cancel_clicked()
 {
     close();
+}
+
+//*****************************************************************************************************************
+
+void settingwindow::on_btt_max_it_default_clicked()
+{
+    ui->sb_adaptive_iteration->setValue(1000);
+}
+
+//*****************************************************************************************************************
+
+void settingwindow::on_btt_reflection_default_clicked()
+{
+    ui->dsb_adaptive_reflection->setValue(1);
+}
+
+//*****************************************************************************************************************
+
+void settingwindow::on_btt_expansion_default_clicked()
+{
+    ui->dsb_adaptive_expansion->setValue(0.2);
+}
+
+//*****************************************************************************************************************
+
+void settingwindow::on_btt_contraction_default_clicked()
+{
+    ui->dsb_adaptive_contraction->setValue(0.5);
+}
+
+//*****************************************************************************************************************
+
+void settingwindow::on_btt_full_contraction_default_clicked()
+{
+    ui->dsb_adaptive_fullcontraction->setValue(0.5);
 }

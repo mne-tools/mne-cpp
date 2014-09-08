@@ -160,25 +160,6 @@
                </property>
               </widget>
              </item>
-             <item row="11" column="2">
-              <widget class="QSpinBox" name="sb_sample_rate">
-               <property name="maximumSize">
-                <size>
-                 <width>60</width>
-                 <height>16777215</height>
-                </size>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-               </property>
-               <property name="minimum">
-                <number>1</number>
-               </property>
-               <property name="maximum">
-                <number>999999</number>
-               </property>
-              </widget>
-             </item>
              <item row="11" column="0" colspan="2">
               <widget class="QLabel" name="label">
                <property name="text">
@@ -223,6 +204,25 @@
               <widget class="QLabel" name="l_unit">
                <property name="text">
                 <string>1 / sec</string>
+               </property>
+              </widget>
+             </item>
+             <item row="11" column="2">
+              <widget class="QDoubleSpinBox" name="dsb_sample_rate">
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+               <property name="decimals">
+                <number>3</number>
+               </property>
+               <property name="minimum">
+                <double>0.010000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>999999.000000000000000</double>
+               </property>
+               <property name="value">
+                <double>1.000000000000000</double>
                </property>
               </widget>
              </item>
@@ -299,6 +299,9 @@
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
+            <property name="decimals">
+             <number>4</number>
+            </property>
             <property name="maximum">
              <double>9999.989999999999782</double>
             </property>
@@ -318,6 +321,9 @@
            <widget class="QDoubleSpinBox" name="dsb_to">
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="decimals">
+             <number>4</number>
             </property>
             <property name="maximum">
              <double>9999.989999999999782</double>

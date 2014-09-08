@@ -25,5 +25,6 @@
         <file>icons/warning.png</file>
         <file>icons/tree.png</file>
         <file>icons/settings.png</file>
+        <file>icons/arrowReset.png</file>
     </qresource>
 </RCC>
