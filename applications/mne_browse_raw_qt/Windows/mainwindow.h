@@ -74,10 +74,11 @@
 #include "../Models/rawmodel.h"
 #include "../Models/eventmodel.h"
 #include "../Delegates/rawdelegate.h"
+#include "../Delegates/eventdelegate.h"
 
-#include "../info.h"
-#include "../types.h"
-#include "../rawsettings.h"
+#include "../Utils/info.h"
+#include "../Utils/types.h"
+#include "../Utils/rawsettings.h"
 
 #include "filterwindow.h"
 #include "eventwindow.h"
@@ -278,6 +279,7 @@ private:
     QTableView*         m_pRawTableView;            /**< the QTableView being part of the model/view framework of Qt for the fiff data handling*/
     QTableView*         m_pEventTableView;          /**< the QTableView being part of the model/view framework of Qt for the fiff event handling */
     RawDelegate*        m_pRawDelegate;             /**< the QAbstractDelegate being part of the raw model/view framework of Qt */
+    EventDelegate*      m_pEventDelegate;           /**< the QAbstractDelegate being part of the event model/view framework of Qt */
 
     //Window widgets
     EventWindow*        m_pEventWindow;             /**< Event widget which display the event view */
