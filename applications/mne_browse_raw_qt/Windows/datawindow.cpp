@@ -295,7 +295,7 @@ void DataWindow::initMarker()
     boundingRect.setRight(boundingRect.right() - ui->m_tableView_rawTableView->verticalScrollBar()->width() + 1);
 
     //Inital position of the marker
-    m_pDataMarker->move(boundingRect.x() + 66, boundingRect.y() + 1);
+    m_pDataMarker->move(boundingRect.x(), boundingRect.y() + 1);
 
     //Create Region from bounding rect - this region is used to restrain the marker inside the data view
     QRegion region(boundingRect);
