@@ -44,6 +44,8 @@
 #include "mainwindow.h"
 #include "../Utils/datamarker.h"
 #include "ui_datawindowdock.h"
+#include "../Delegates/rawdelegate.h"
+#include "../Models/rawmodel.h"
 
 
 //*************************************************************************************************************
@@ -100,17 +102,35 @@ public:
 
     //=========================================================================================================
     /**
-    * Setup the table view of the data window
+    * Initialises this window.
     */
-    void initRawDataViewSettings();
+    void init();
 
     //=========================================================================================================
     /**
-    * Returns the QTableView of this window
+    * Returns the event QTableView of this window
     */
-    QTableView* getTableView();
+    QTableView* getDataTableView();
+
+    //=========================================================================================================
+    /**
+    * Returns the RawModel of this window
+    */
+    RawModel* getDataModel();
+
+    //=========================================================================================================
+    /**
+    * Returns the RawModel of this window
+    */
+    RawDelegate* getDataDelegate();
 
 private:
+    //=========================================================================================================
+    /**
+    * Setup the model view controller of the data window
+    */
+    void initMVCSettings();
+
     //=========================================================================================================
     /**
     * Setup the undocked data view window.
@@ -160,6 +180,9 @@ private:
     QLabel*         m_pCurrentDataMarkerLabel;      /**< the current data marker label to display the marker's position */
 
     int             m_iCurrentMarkerSample;         /**< the current data marker sample value to display the marker's position */
+
+    RawDelegate*    m_pRawDelegate;                 /**< the QAbstractDelegate being part of the raw model/view framework of Qt */
+    RawModel*       m_pRawModel;                    /**< the QAbstractTable model being part of the model/view framework of Qt */
 
     QTableView*     m_pUndockedDataView;
     QVBoxLayout*    m_pUndockedDataViewLayout;

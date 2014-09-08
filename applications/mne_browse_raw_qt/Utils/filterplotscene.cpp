@@ -152,34 +152,34 @@ void FilterPlotScene::plotMagnitudeDiagram(int samplingFreq)
         case 0://LPF
             pos = ((double)m_iCutOffLow / (double)fMax) * numberCoeff;
             addLine(pos - m_iDiagramMarginsHoriz,
-                    -m_iDiagramMarginsVert + m_iCutOffMarkerWidth,
+                    -m_iDiagramMarginsVert + m_iCutOffMarkerWidth/2,
                     pos - m_iDiagramMarginsHoriz,
-                    m_dMaxMagnitude + m_iDiagramMarginsVert,
+                    m_dMaxMagnitude + m_iDiagramMarginsVert - m_iCutOffMarkerWidth/2,
                     QPen(Qt::red,m_iCutOffMarkerWidth));
         break;
 
         case 1://HPF
             pos = ((double)m_iCutOffHigh / (double)fMax) * numberCoeff;
             addLine(pos - m_iDiagramMarginsHoriz,
-                    -m_iDiagramMarginsVert + m_iCutOffMarkerWidth,
+                    -m_iDiagramMarginsVert + m_iCutOffMarkerWidth/2,
                     pos - m_iDiagramMarginsHoriz,
-                    m_dMaxMagnitude + m_iDiagramMarginsVert + m_iCutOffMarkerWidth,
+                    m_dMaxMagnitude + m_iDiagramMarginsVert - m_iCutOffMarkerWidth/2,
                     QPen(Qt::red,m_iCutOffMarkerWidth));
         break;
 
         case 2://BPF
             pos = ((double)m_iCutOffLow / (double)fMax) * numberCoeff;
             addLine(pos - m_iDiagramMarginsHoriz,
-                    -m_iDiagramMarginsVert + m_iCutOffMarkerWidth,
+                    -m_iDiagramMarginsVert + m_iCutOffMarkerWidth/2,
                     pos - m_iDiagramMarginsHoriz,
-                    m_dMaxMagnitude + m_iDiagramMarginsVert + m_iCutOffMarkerWidth,
+                    m_dMaxMagnitude + m_iDiagramMarginsVert - m_iCutOffMarkerWidth/2,
                     QPen(Qt::red,m_iCutOffMarkerWidth));
 
             pos = ((double)m_iCutOffHigh / (double)fMax) * numberCoeff;
             addLine(pos - m_iDiagramMarginsHoriz,
-                    -m_iDiagramMarginsVert + m_iCutOffMarkerWidth,
+                    -m_iDiagramMarginsVert + m_iCutOffMarkerWidth/2,
                     pos - m_iDiagramMarginsHoriz,
-                    m_dMaxMagnitude + m_iDiagramMarginsVert + m_iCutOffMarkerWidth,
+                    m_dMaxMagnitude + m_iDiagramMarginsVert - m_iCutOffMarkerWidth/2,
                     QPen(Qt::red,m_iCutOffMarkerWidth));
         break;
     }

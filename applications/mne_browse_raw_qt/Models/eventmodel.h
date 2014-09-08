@@ -203,6 +203,13 @@ public:
 
     //=========================================================================================================
     /**
+    * getEventTypeList returns the event type list
+    *
+    */
+    QStringList getEventTypeList();
+
+    //=========================================================================================================
+    /**
     * clearModel clears all model's members
     */
     void clearModel();
@@ -225,6 +232,12 @@ private:
     int             m_iCurrentMarkerPos;        /**< holds the current marker position */
     QSettings       m_qSettings;                /**< setting paramter to access globally defined values. see rawsettings.cpp and rawsettings.h */
     QString         m_sFilterEventType;         /**< holds the event txype which is to be filtered*/
+
+    QStringList     m_eventTypeList;            /**< holds all loaded event types */
+
+signals:
+    void updateEventTypes();
+
 };
 
 } // NAMESPACE

@@ -230,10 +230,6 @@ QVariant EventModel::data(const QModelIndex &index, int role) const
                     brush.setColor(colorTemp);
                     return QVariant(brush);
                 }
-
-                case Qt::TextAlignmentRole:
-                    qDebug()<<"alignment";
-                    return Qt::AlignCenter;
             }
         }
 
@@ -395,6 +391,14 @@ bool EventModel::loadEventData(QFile& qFile)
     m_dataTypes_Filtered = m_dataTypes;
     m_dataIsUserEvent_Filtered = m_dataIsUserEvent;
 
+    //Create type string list
+    m_eventTypeList.clear();
+    for(int i = 0; i<m_dataTypes.size(); i++)
+        if(!m_eventTypeList.contains(QString().number(m_dataTypes[i])))
+            m_eventTypeList<<QString().number(m_dataTypes[i]);
+
+    emit updateEventTypes();
+
     endResetModel();
 
     m_bFileloaded = true;
@@ -491,6 +495,14 @@ void EventModel::setEventFilterType(const QString eventType)
 
     emit dataChanged(createIndex(0,0),createIndex(m_dataSamples_Filtered.size(),0));
     emit headerDataChanged(Qt::Vertical, 0, m_dataSamples_Filtered.size());
+}
+
+
+//*************************************************************************************************************
+
+QStringList EventModel::getEventTypeList()
+{
+    return m_eventTypeList;
 }
 
 
