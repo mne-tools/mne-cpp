@@ -48,8 +48,6 @@
 #include <utils/mp/fixdictmp.h>
 #include <disp/plot.h>
 
-#include "mainwindow.h"
-#include "ui_mainwindow.h"
 #include "math.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
@@ -94,6 +92,7 @@ using namespace DISPLIB;
 // FORWARD DECLARATIONS
 //=============================================================================================================
 
+bool _new_paint = true;
 bool _tbv_is_loading = false;
 bool _auto_change = false;
 bool _was_partialchecked = false;
@@ -102,12 +101,11 @@ bool _come_from_from =false;
 
 qreal _from = 47.005f;
 qreal _to = 48.000f;
-qreal _signal_energy = 0;
-qreal _signal_maximum = 0;
-qreal _signal_negative_scale = 0;
-qreal _max_pos = 0;
-qreal _max_neg = 0;
-qreal _draw_factor = 0;
+qreal _signal_energy = 0.0;
+qreal _signal_maximum = 0.0;
+qreal _signal_negative_scale = 0.0;
+qreal _max_pos = 0.0;
+qreal _max_neg = 0.0;
 qint32 _sample_rate = 1;
 
 QString _save_path = "";
@@ -266,9 +264,8 @@ void MainWindow::fill_dict_combobox()
 //*************************************************************************************************************************************
 
 void MainWindow::open_file()
-{
-    QFileDialog* fileDia;    
-    QString temp_file_name = fileDia->getOpenFileName(this, "Please select signal file.", _last_open_path,"(*.fif *.txt)");
+{     
+    QString temp_file_name = QFileDialog::getOpenFileName(this, "Please select signal file.", _last_open_path,"(*.fif *.txt)");
     if(temp_file_name.isNull()) return;
 
     QStringList string_list = temp_file_name.split('/');
@@ -288,15 +285,14 @@ void MainWindow::open_file()
         tr("error: disable to open signal file."));
         return;
     }
-    file.close();    
-    _colors.clear();
-    _colors.append(QColor(0, 0, 0));
+    file.close();
 
     if(_file_name.endsWith(".fif", Qt::CaseInsensitive))
     {        
         ui->dsb_from->setValue(47.005f);
         ui->dsb_to->setValue(48.000f);
         _from = 47.005f;
+        _to = 48.000f;
         //read_fiff_ave(_file_name);
         read_fiff_file(_file_name);
         ui->lb_from->setHidden(false);
@@ -326,10 +322,10 @@ void MainWindow::open_file()
 
     fill_channel_combobox();
 
-    _original_colors = _colors;
     _atom_sum_matrix.resize(_signal_matrix.rows(), _signal_matrix.cols()); //resize
     _residuum_matrix.resize(_signal_matrix.rows(), _signal_matrix.cols()); //resize
 
+    _new_paint = true;
     update();   
 }
 
@@ -337,6 +333,7 @@ void MainWindow::open_file()
 
 void MainWindow::cb_selection_changed(const QModelIndex& topLeft, const QModelIndex& bottomRight)
 {
+    Q_UNUSED(bottomRight);
     QStandardItem* cb_item = this->cb_items[topLeft.row()];
     if(topLeft.row() == ui->cb_channels->count() - 1)
     {
@@ -383,6 +380,8 @@ void MainWindow::cb_selection_changed(const QModelIndex& topLeft, const QModelIn
             _signal_matrix.col(selected_chn) = _original_signal_matrix.col(channels);            
             selected_chn++;
         }
+
+    _new_paint = true;
     update();
 }
 
@@ -457,30 +456,29 @@ void MainWindow::read_fiff_file_new(QString file_name)
 {
     this->cb_model->clear();
     this->cb_items.clear();
-    _colors.clear();
-    _colors.append(QColor(0, 0, 0));
 
     read_fiff_file(file_name);
-
     _original_signal_matrix.resize(_signal_matrix.rows(), _signal_matrix.cols());
     _original_signal_matrix = _signal_matrix;
-    ui->tbv_Results->setRowCount(0);
 
     fill_channel_combobox();
-
-    _original_colors = _colors;
+    ui->tbv_Results->setRowCount(0);
     _atom_sum_matrix.resize(_signal_matrix.rows(), _signal_matrix.cols()); //resize
     _residuum_matrix.resize(_signal_matrix.rows(), _signal_matrix.cols()); //resize
 
+    _new_paint = true;
     update();
 }
 
+//*************************************************************************************************************************************
+
 void MainWindow::fill_channel_combobox()
 {
+    _colors.clear();
+    _colors.append(QColor(0, 0, 0));
     for(qint32 channels = 0; channels < _signal_matrix.cols(); channels++)
     {
         _colors.append(QColor::fromHsv(qrand() % 256, 255, 190));
-
         //channel item
         this->cb_item = new QStandardItem;
         this->cb_item->setText(QString("channel %1").arg(channels));
@@ -490,7 +488,7 @@ void MainWindow::fill_channel_combobox()
         this->cb_items.push_back(this->cb_item);
         _select_channel_map.insert(channels, true);
     }
-
+     _original_colors = _colors;
     //select all channels item
     this->cb_item = new QStandardItem;
     this->cb_item->setText("de/select all channels");
@@ -546,6 +544,7 @@ void MainWindow::read_matlab_file(QString fileName)
 
 void GraphWindow::paintEvent(QPaintEvent* event)
 {
+    Q_UNUSED(event);
     paint_signal(_signal_matrix, this->size());
 }
 
@@ -555,110 +554,66 @@ void GraphWindow::paint_signal(MatrixXd signalMatrix, QSize windowSize)
 {
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing, true);
-    painter.fillRect(0,0,windowSize.width(),windowSize.height(),QBrush(Qt::white));
-
+    painter.fillRect(0,0,windowSize.width(),windowSize.height(),QBrush(Qt::white));     // paint window white
 
     if(signalMatrix.rows() > 0 && signalMatrix.cols() > 0)
     {
-        qint32 borderMarginHeigth = 15;     // reduce paintspace in GraphWindow of borderMargin pixels
-        qint32 borderMarginWidth = 5;       // reduce paintspace in GraphWindow of borderMargin pixels
         qint32 i = 0;
-        qreal maxNeg = 0;                   // smalest signalvalue
-        qreal maxPos = 0;                   // highest signalvalue
-        qreal absMin = 0;                   // minimum of abs(maxNeg and maxPos)
-        qint32 drawFactor = 0;              // shift factor for decimal places (linear)
-        qint32 startDrawFactor = 1;         // shift factor for decimal places (exponential-base 10)
-        qint32 decimalPlace = 0;            // decimal places for axis title
+        qint32 maxStrLenght = 55;           // max lenght in pixel of x-axis string
+        qint32 borderMarginWidth = 5;       // reduce paintspace in GraphWindow of borderMargin pixels
+        qint32 borderMarginHeigth = 15;     // reduce paintspace in GraphWindow of borderMargin pixels
+        qreal maxPos = 0.0;                 // highest signalvalue
+        qreal maxNeg = 0.0;                 // smalest signalvalue
+        qreal maxmax = 0.0;                 // absolute difference maxpos - maxneg
         QList<QPolygonF> polygons;          // points for drawing the signal
         MatrixXd internSignalMatrix = signalMatrix; // intern representation of y-axis values of the signal (for painting only)
 
-        // paint window white
-        painter.fillRect(0,0,windowSize.width(),windowSize.height(),QBrush(Qt::white));
-
-        // find min and max of signal
-
-        for(qint32 channels = 0; channels < _signal_matrix.cols(); channels++)
+        qreal scaleYText = 0.0;
+        qint32 negScale  = 0;
+        if(_new_paint)
         {
-            i = 0;
-            while(i < signalMatrix.rows())
-            {
-                if(signalMatrix(i, channels) > maxPos)
-                    maxPos = signalMatrix(i, channels);
-
-                if(signalMatrix(i, channels) < maxNeg )
-                    maxNeg = signalMatrix(i, channels);
-                i++;
-            }
-        }
-
-        if(maxPos > fabs(maxNeg)) absMin = maxNeg;        // find absolute minimum of (maxPos, maxNeg)
-        else     absMin = maxPos;
-
-        if(absMin != 0)                                   // absMin must not be zero
-        {
-            while(true)                                   // shift factor for decimal places?
-            {
-                if(fabs(absMin) < 1)                      // if absMin > 1 , no shift of decimal places nescesary
+            // find min and max of signal
+            for(qint32 channels = 0; channels < _signal_matrix.cols(); channels++)
+            {                
+                for(qint32 samples = 0; samples < signalMatrix.rows(); samples++)
                 {
-                    absMin = absMin * 10;
-                    drawFactor++;                         // shiftfactor counter
+                    if(signalMatrix(samples, channels) > maxPos)
+                        maxPos = signalMatrix(samples, channels);
+
+                    if(signalMatrix(samples, channels) < maxNeg )
+                        maxNeg = signalMatrix(samples, channels);
                 }
-                if(fabs(absMin) >= 1) break;
             }
+
+            // absolute signalheight to globe
+            if(maxNeg <= 0) maxmax = maxPos - maxNeg;
+            else  maxmax = maxPos + maxNeg;
+
+            _max_pos = maxPos;          // to globe max_pos
+            _max_neg = maxNeg;          // to globe min_pos
+            _signal_maximum = maxmax;   // to globe abs_max
+            _new_paint = false;
         }
-        _draw_factor = drawFactor;  // to globe draw_factor
-
-        // shift of decimal places with drawFactor for all signalpoints and save to intern list
-        while(drawFactor > 0)
-        {
-
-            for(qint32 channel = 0; channel < signalMatrix.cols(); channel++)
-                for(qint32 sample = 0; sample < signalMatrix.rows(); sample++)
-                    internSignalMatrix(sample, channel) *= 10;
-
-            startDrawFactor = startDrawFactor * 10;
-            decimalPlace++;
-            maxPos = maxPos * 10;
-            maxNeg = maxNeg * 10;
-            drawFactor--;
-        }
-
-        _max_pos = maxPos;      // to globe max_pos
-        _max_neg = maxNeg;      // to globe min_pos
-
-        qreal maxmax;
-        // absolute signalheight
-        if(maxNeg <= 0)     maxmax = maxPos - maxNeg;
-        else  maxmax = maxPos + maxNeg;
-
-        _signal_maximum = maxmax;
 
         // scale axis title
-        //qreal scaleXText = (qreal)signalMatrix.rows() / _sample_rate / (qreal)20;     // divide signallength
-        qreal scaleYText = (qreal)maxmax / (qreal)10;
-        qint32 negScale =  floor((maxNeg * 10 / maxmax)+0.5);
+        scaleYText = _signal_maximum / 10.0;
+        negScale =  floor((_max_neg * 10 / _signal_maximum) + 0.5);
         _signal_negative_scale = negScale;
-        //find lenght of text of y-axis for shift of y-axis to the right (so the text will stay readable and is not painted into the y-axis
-        qint32 maxStrLenght = 55;
 
-        while((windowSize.width() - maxStrLenght -borderMarginWidth) % 20)borderMarginWidth++;
+        while((windowSize.width() - maxStrLenght -borderMarginWidth) % 20) borderMarginWidth++;
 
         // scale signal
         qreal scaleX = ((qreal)(windowSize.width() - maxStrLenght - borderMarginWidth))/ (qreal)signalMatrix.rows();
-        qreal scaleY = (qreal)(windowSize.height() - borderMarginHeigth) / (qreal)maxmax;
+        qreal scaleY = (qreal)(windowSize.height() - borderMarginHeigth) / _signal_maximum;
 
         //scale axis
         qreal scaleXAchse = (qreal)(windowSize.width() - maxStrLenght - borderMarginWidth) / (qreal)20;
         qreal scaleYAchse = (qreal)(windowSize.height() - borderMarginHeigth) / (qreal)10;
 
-        // position of title of x-axis
-        qint32 xAxisTextPos = 8;
-        if(maxNeg == 0) xAxisTextPos = -10; // if signal only positiv: titles above axis
-
         i = 1;
         while(i <= 11)
         {
-            qreal scaledYText = negScale * scaleYText / (qreal)startDrawFactor;           // scalevalue y-axis
+            qreal scaledYText = negScale * scaleYText ;                             // scalevalue y-axis
             QString string  = QString::number(scaledYText, 'g', 3);                 // scalevalue as string
 
             if(negScale == 0)                                                       // x-Axis reached (y-value = 0)
@@ -667,12 +622,8 @@ void GraphWindow::paint_signal(MatrixXd signalMatrix, QSize windowSize)
                 for(qint32 channel = 0; channel < signalMatrix.cols(); channel++)   // over all Channels
                 {
                     QPolygonF poly;
-                    qint32 h = 0;
-                    while(h < signalMatrix.rows())
-                    {
+                    for(qint32 h =0; h < signalMatrix.rows(); h++)
                         poly.append(QPointF((h * scaleX) + maxStrLenght,  -((internSignalMatrix(h, channel) * scaleY + ((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2))));
-                        h++;
-                    }
                     polygons.append(poly);
                 }
 
@@ -717,9 +668,10 @@ void GraphWindow::paint_signal(MatrixXd signalMatrix, QSize windowSize)
 
 //*************************************************************************************************************************************
 
- void AtomSumWindow::paintEvent(QPaintEvent* event)
+void AtomSumWindow::paintEvent(QPaintEvent* event)
 {
-   paint_atom_sum(_atom_sum_matrix, this->size(), _signal_maximum, _signal_negative_scale);
+     Q_UNUSED(event);
+    paint_atom_sum(_atom_sum_matrix, this->size(), _signal_maximum, _signal_negative_scale);
 }
 
 //*************************************************************************************************************************************
@@ -734,39 +686,17 @@ void AtomSumWindow::paint_atom_sum(MatrixXd atom_matrix, QSize windowSize, qreal
     // can also checked of zerovector, then you paint no empty axis
     if(atom_matrix.rows() > 0 && atom_matrix.cols() > 0  && _signal_matrix.rows() > 0 && _signal_matrix.cols() > 0)
     {
+        qint32 i = 0;
+        qint32 maxStrLenght = 55;
         qint32 borderMarginHeigth = 15;                     // reduce paintspace in GraphWindow of borderMargin pixels
         qint32 borderMarginWidth = 5;                       // reduce paintspace in GraphWindow of borderMargin pixels
-        qint32 i = 0;
-        qreal maxNeg = _max_neg;                            // smalest signalvalue
-        qint32 drawFactor = _draw_factor;                   // shift factor for decimal places (linear)
-        qint32 startDrawFactor = 1;                         // shift factor for decimal places (exponential-base 10)
-        qint32 decimalPlace = 0;                            // decimal places for axis title
         QList<QPolygonF> polygons;                          // points for drawing the signal
         MatrixXd internSignalMatrix = atom_matrix;          // intern representation of y-axis values of the signal (for painting only)
 
-
-        while(drawFactor > 0)
-        {
-            for(qint32 channels = 0; channels < atom_matrix.cols(); channels++)
-                for(qint32 sample = 0; sample < atom_matrix.rows(); sample++)
-                    internSignalMatrix(sample, channels) *= 10;
-
-            startDrawFactor = startDrawFactor * 10;
-            decimalPlace++;
-
-            drawFactor--;
-        }
-
-
         // scale axis title
-        //qreal scaleXText = (qreal)atom_matrix.rows() / (qreal)_sample_rate / (qreal)20;     // divide signallegnth
         qreal scaleYText = (qreal)signalMaximum / (qreal)10;
 
-        //find lenght of text of y-axis for shift of y-axis to the right (so the text will stay readable and is not painted into the y-axis
-        qint32 maxStrLenght = 55;
-
-
-        while((windowSize.width() - maxStrLenght -borderMarginWidth) % 20)borderMarginWidth++;
+         while((windowSize.width() - maxStrLenght -borderMarginWidth) % 20)borderMarginWidth++;
 
         // scale signal
         qreal scaleX = ((qreal)(windowSize.width() - maxStrLenght - borderMarginWidth))/ (qreal)atom_matrix.rows();
@@ -774,33 +704,24 @@ void AtomSumWindow::paint_atom_sum(MatrixXd atom_matrix, QSize windowSize, qreal
 
         //scale axis
         qreal scaleXAchse = (qreal)(windowSize.width() - maxStrLenght - borderMarginWidth) / (qreal)20;
-        qreal scaleYAchse = (qreal)(windowSize.height() - borderMarginHeigth) / (qreal)10;
-
-        // position of title of x-axis
-        qint32 xAxisTextPos = 8;
-        if(maxNeg == 0) xAxisTextPos = -10; // if signal only positiv: titles above axis
+        qreal scaleYAchse = (qreal)(windowSize.height() - borderMarginHeigth) / (qreal)10;     
 
         i = 1;
         while(i <= 11)
         {
             QString string;
 
-            qreal scaledYText = signalNegativeMaximum * scaleYText / (qreal)startDrawFactor;    // scala Y-axis
-            string  = QString::number(scaledYText, 'g', 3);                                     // scala as string
+            qreal scaledYText = signalNegativeMaximum * scaleYText;                 // scala Y-axis
+            string  = QString::number(scaledYText, 'g', 3);                         // scala as string
 
-            if(signalNegativeMaximum == 0)                                                      // x-Axis reached (y-value = 0)
+            if(signalNegativeMaximum == 0)                                          // x-Axis reached (y-value = 0)
             {
                 // append scaled signalpoints
-                for(qint32 channel = 0; channel < atom_matrix.cols(); channel++)                // over all Channels
+                for(qint32 channel = 0; channel < atom_matrix.cols(); channel++)    // over all Channels
                 {
-                    // append scaled signalpoints
-                    QPolygonF poly;
-                    qint32 h = 0;
-                    while(h < atom_matrix.rows())
-                    {
+                    QPolygonF poly;                   
+                    for(qint32 h = 0; h < atom_matrix.rows(); h++)
                         poly.append(QPointF((h * scaleX) + maxStrLenght,  -((internSignalMatrix(h, channel) * scaleY + ((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2))));
-                        h++;
-                    }
                     polygons.append(poly);
                 }                
                 // paint x-axis
@@ -843,7 +764,8 @@ void AtomSumWindow::paint_atom_sum(MatrixXd atom_matrix, QSize windowSize, qreal
 
 void ResiduumWindow::paintEvent(QPaintEvent* event)
 {
-   paint_residuum(_residuum_matrix, this->size(), _signal_maximum, _signal_negative_scale);
+    Q_UNUSED(event);
+    paint_residuum(_residuum_matrix, this->size(), _signal_maximum, _signal_negative_scale);
 }
 
 //*************************************************************************************************************************************
@@ -857,34 +779,15 @@ void ResiduumWindow::paint_residuum(MatrixXd residuum_matrix, QSize windowSize, 
 
     if(residuum_matrix.rows() > 0 && residuum_matrix.cols() > 0 && _signal_matrix.rows() > 0 && _signal_matrix.cols() > 0)
     {
+        qint32 i = 1;
+        qint32 maxStrLenght = 55;
         qint32 borderMarginHeigth = 15;                 // reduce paintspace in GraphWindow of borderMargin pixels
         qint32 borderMarginWidth = 5;                   // reduce paintspace in GraphWindow of borderMargin pixels
-        qint32 i = 0;
-        qreal maxNeg = _max_neg;                        // smalest signalvalue vom AusgangsSignal
-        qint32 drawFactor = _draw_factor;               // shift factor for decimal places (linear)
-        qint32 startDrawFactor = 1;                     // shift factor for decimal places (exponential-base 10)
-        qint32 decimalPlace = 0;                        // decimal places for axis title
         QList<QPolygonF> polygons;                      // points for drawing the signal
         MatrixXd internSignalVector = residuum_matrix;  // intern representation of y-axis values of the signal (for painting only)
 
-        while(drawFactor > 0)
-        {
-            for(qint32 channels = 0; channels < residuum_matrix.cols(); channels++)
-                for(qint32 sample = 0; sample < residuum_matrix.rows(); sample++)
-                    internSignalVector(sample,channels) *= 10;
-
-            startDrawFactor = startDrawFactor * 10;
-            decimalPlace++;
-
-            drawFactor--;
-        }
-
         // scale axis title
-        //qreal scaleXText = (qreal)residuum_matrix.rows() /  (qreal)_sample_rate / (qreal)20;     // divide signallegnth
         qreal scaleYText = (qreal)signalMaximum / (qreal)10;
-
-        //find lenght of text of y-axis for shift of y-axis to the right (so the text will stay readable and is not painted into the y-axis
-        qint32 maxStrLenght = 55;
 
         while((windowSize.width() - maxStrLenght -borderMarginWidth) % 20)borderMarginWidth++;
 
@@ -896,29 +799,19 @@ void ResiduumWindow::paint_residuum(MatrixXd residuum_matrix, QSize windowSize, 
         qreal scaleXAchse = (qreal)(windowSize.width() - maxStrLenght - borderMarginWidth) / (qreal)20;
         qreal scaleYAchse = (qreal)(windowSize.height() - borderMarginHeigth) / (qreal)10;
 
-        // position of title of x-axis
-        qint32 xAxisTextPos = 8;
-        if(maxNeg == 0) xAxisTextPos = -10; // if signal only positiv: titles above axis
-
-        i = 1;
         while(i <= 11)
         {            
-            qreal scaledYText = signalNegativeMaximum * scaleYText / (qreal)startDrawFactor;        // scalevalue y-axis
-            QString string  = QString::number(scaledYText, 'g', 3);                          // scalevalue as string
+            qreal scaledYText = signalNegativeMaximum * scaleYText;                     // scalevalue y-axis
+            QString string  = QString::number(scaledYText, 'g', 3);                     // scalevalue as string
 
-            if(signalNegativeMaximum == 0)                                                          // x-axis reached (y-value = 0)
+            if(signalNegativeMaximum == 0)                                              // x-axis reached (y-value = 0)
             {
                 // append scaled signalpoints
-                for(qint32 channel = 0; channel < residuum_matrix.cols(); channel++)       // over all Channels
+                for(qint32 channel = 0; channel < residuum_matrix.cols(); channel++)    // over all Channels
                 {
-                    // append scaled signalpoints
                     QPolygonF poly;                    
-                    qint32 h = 0;
-                    while(h < residuum_matrix.rows())
-                    {
+                    for(qint32 h = 0; h < residuum_matrix.rows(); h++)
                         poly.append(QPointF((h * scaleX) + maxStrLenght,  -((internSignalVector(h, channel) * scaleY + ((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2))));
-                        h++;
-                    }
                     polygons.append(poly);
                 }                
                 qint32 j = 1;
@@ -952,7 +845,7 @@ void ResiduumWindow::paint_residuum(MatrixXd residuum_matrix, QSize windowSize, 
         {
             QPen pen(_colors.at(channel), 0.5, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
             painter.setPen(pen);
-            painter.drawPolyline(polygons.at(channel));                               // paint signal
+            painter.drawPolyline(polygons.at(channel));                                 // paint signal
         }
     }
     painter.end();
@@ -962,7 +855,8 @@ void ResiduumWindow::paint_residuum(MatrixXd residuum_matrix, QSize windowSize, 
 
 void YAxisWindow::paintEvent(QPaintEvent* event)
 {
-   paint_axis(_signal_matrix, this->size());
+    Q_UNUSED(event);
+    paint_axis(_signal_matrix, this->size());
 }
 
 //*************************************************************************************************************************************
@@ -1233,7 +1127,8 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
     if(((current_iteration == max_iterations) || (max_energy - current_energy) < (0.01 * percent * max_energy))&&ui->chb_ResEnergy->isChecked())
         ui->progressBarCalc->setValue(ui->progressBarCalc->maximum());
 
-    update();
+    callAtomSumWindow->update();
+    callResidumWindow->update();
     _tbv_is_loading = false;
 }
 
@@ -1241,6 +1136,7 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
 
 void MainWindow::tbv_selection_changed(const QModelIndex& topLeft, const QModelIndex& bottomRight)
 {
+    Q_UNUSED(bottomRight);
     bool all_selected = true;
     bool all_deselected = true;
 
@@ -1317,7 +1213,8 @@ void MainWindow::tbv_selection_changed(const QModelIndex& topLeft, const QModelI
             }
         }
     }
-    update();
+    callAtomSumWindow->update();
+    callResidumWindow->update();
 }
 
 //*************************************************************************************************************
