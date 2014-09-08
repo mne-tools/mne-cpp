@@ -138,12 +138,12 @@ void MainWindow::setupViews()
     m_pRawTableView->setModel(m_pRawModel);
     m_pEventTableView->setModel(m_pEventModel);
 
-    //set custom delegate
+    //set custom delegates
     m_pRawTableView->setItemDelegate(m_pRawDelegate);
     m_pEventTableView->setItemDelegate(m_pEventDelegate);
 
     //setup view settings
-    m_pDataWindow->initRawViewSettings();
+    m_pDataWindow->initRawDataViewSettings();
     m_pEventWindow->initEventViewSettings();
 }
 
@@ -320,7 +320,7 @@ void MainWindow::openFile()
     m_pEventModel->setFirstLastSample(m_pRawModel->firstSample(), m_pRawModel->lastSample());
 
     //setup view settings
-    m_pDataWindow->initRawViewSettings();
+    m_pDataWindow->initRawDataViewSettings();
     m_pEventWindow->initEventViewSettings();
 
     //Update status bar

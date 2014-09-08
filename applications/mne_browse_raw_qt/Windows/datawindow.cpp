@@ -61,19 +61,14 @@ DataWindow::DataWindow(QWidget *parent) :
     m_pMainWindow(static_cast<MainWindow*>(parent)),
     m_pDataMarker(new DataMarker(this)),
     m_pCurrentDataMarkerLabel(new QLabel(this)),
-    m_iCurrentMarkerSample(0)
+    m_iCurrentMarkerSample(0),
+    m_pUndockedViewWidget(new QWidget(this,Qt::Window))
 {
     ui->setupUi(this);
 
     initToolBar();
     initMarker();
     initLabels();
-
-    //Setup when the dock widget is to be manually resized
-//    connect(this,&QWidget::topLevelChanged,
-//                this,&DataWindow::manualResize);
-//    connect(this,&QWidget::visibilityChanged,
-//                this,&DataWindow::manualResize);
 }
 
 
@@ -87,8 +82,9 @@ DataWindow::~DataWindow()
 
 //*************************************************************************************************************
 
-void DataWindow::initRawViewSettings()
+void DataWindow::initRawDataViewSettings()
 {
+    //Init data window view
     //set some settings for m_pRawTableView
     ui->m_tableView_rawTableView->verticalHeader()->setDefaultSectionSize(m_pMainWindow->m_pRawDelegate->m_iDefaultPlotHeight);
     ui->m_tableView_rawTableView->setColumnHidden(0,true); //because content is plotted jointly with column=1
@@ -105,6 +101,52 @@ void DataWindow::initRawViewSettings()
     //connect QScrollBar with model in order to reload data samples
     connect(ui->m_tableView_rawTableView->horizontalScrollBar(),&QScrollBar::valueChanged,
             m_pMainWindow->m_pRawModel,&RawModel::updateScrollPos);
+
+    //Init undocked view
+    m_pUndockedDataViewLayout = new QVBoxLayout(m_pUndockedViewWidget);
+    m_pUndockedDataView = new QTableView(m_pUndockedViewWidget);
+    m_pUndockedDataView->setModel(m_pMainWindow->m_pRawModel);
+    m_pUndockedDataView->setItemDelegate(m_pMainWindow->m_pRawDelegate);
+
+    m_pUndockedDataView->verticalHeader()->setDefaultSectionSize(m_pMainWindow->m_pRawDelegate->m_iDefaultPlotHeight);
+    m_pUndockedDataView->setColumnHidden(0,true); //because content is plotted jointly with column=1
+    m_pUndockedDataView->resizeColumnsToContents();
+
+    m_pUndockedDataView->setAutoScroll(false);
+    m_pUndockedDataView->setSelectionBehavior(QAbstractItemView::SelectItems);
+    m_pUndockedDataView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
+    m_pUndockedDataView->setShowGrid(false);
+    m_pUndockedDataView->horizontalHeader()->setVisible(false);
+
+    //set context menu
+    m_pUndockedDataView->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(m_pUndockedDataView,&QWidget::customContextMenuRequested,
+            this,&DataWindow::customContextMenuRequested);
+
+    //activate kinetic scrolling
+    QScroller::grabGesture(m_pUndockedDataView, QScroller::MiddleMouseButtonGesture);
+
+    //connect QScrollBar with model in order to reload data samples
+    connect(m_pUndockedDataView->horizontalScrollBar(),&QScrollBar::valueChanged,
+            m_pMainWindow->m_pRawModel,&RawModel::updateScrollPos);
+
+    m_pUndockedDataViewLayout->addWidget(m_pUndockedDataView);
+
+    m_pUndockedViewWidget->setLayout(m_pUndockedDataViewLayout);
+    m_pUndockedViewWidget->hide();
+
+    //Interconnect scrollbars of docked and undocked view
+    //m_pUndockedDataView ---> ui->m_tableView_rawTableView
+    connect(m_pUndockedDataView->horizontalScrollBar(),&QScrollBar::valueChanged,
+            ui->m_tableView_rawTableView->horizontalScrollBar(),&QScrollBar::setValue);
+    connect(m_pUndockedDataView->verticalScrollBar(),&QScrollBar::valueChanged,
+            ui->m_tableView_rawTableView->verticalScrollBar(),&QScrollBar::setValue);
+
+    //ui->m_tableView_rawTableView ---> m_pUndockedDataView
+    connect(ui->m_tableView_rawTableView->horizontalScrollBar(),&QScrollBar::valueChanged,
+            m_pUndockedDataView->horizontalScrollBar(),&QScrollBar::setValue);
+    connect(ui->m_tableView_rawTableView->verticalScrollBar(),&QScrollBar::valueChanged,
+            m_pUndockedDataView->verticalScrollBar(),&QScrollBar::setValue);
 }
 
 
@@ -126,10 +168,19 @@ void DataWindow::initToolBar()
     toolBar->setMovable(false);
 
     //Add actions to tool bar
+    //Add event
     QAction* addEventAction = new QAction(QIcon(":/Resources/Images/addEvent.png"),tr("Add event"), this);
     addEventAction->setStatusTip(tr("Add an event to the event list"));
     connect(addEventAction, SIGNAL(triggered()), this, SLOT(addEventToEventModel()));
     toolBar->addAction(addEventAction);
+
+    toolBar->addSeparator();
+
+    //undock view into new window (not dock widget)
+    QAction* undockToWindowAction = new QAction(QIcon(":/Resources/Images/undockView.png"),tr("Undock data view"), this);
+    undockToWindowAction->setStatusTip(tr("Undock data view to window"));
+    connect(undockToWindowAction, SIGNAL(triggered()), this, SLOT(undockDataViewToWindow()));
+    toolBar->addAction(undockToWindowAction);
 
     int layoutRows = ui->m_gridLayout->rowCount();
     int layoutColumns = ui->m_gridLayout->columnCount();
@@ -374,6 +425,14 @@ void DataWindow::addEventToEventModel()
 {
     m_pMainWindow->m_pEventModel->setCurrentMarkerPos(m_iCurrentMarkerSample);
     m_pMainWindow->m_pEventModel->insertRow(0, QModelIndex());
+}
+
+
+//*************************************************************************************************************
+
+void DataWindow::undockDataViewToWindow()
+{
+    m_pUndockedViewWidget->show();
 }
 
 

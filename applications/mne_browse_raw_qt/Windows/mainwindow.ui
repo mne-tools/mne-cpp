@@ -45,7 +45,6 @@
     <property name="title">
      <string>Windows</string>
     </property>
-    <addaction name="m_dataAction"/>
     <addaction name="m_eventAction"/>
     <addaction name="m_informationAction"/>
    </widget>
