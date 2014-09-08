@@ -271,6 +271,7 @@ void RawModel::genStdFilterOps()
     double cutoffFreqHz = 50; //in Hz
     QString name = QString("HPF_%1").arg(cutoffFreqHz);
     m_Operators.insert(name,QSharedPointer<MNEOperator>(new FilterOperator(name,FilterOperator::HPF,m_iFilterTaps,cutoffFreqHz/nyquist_freq,0.2,0.1,(m_iWindowSize+m_iFilterTaps))));
+
     //LPF
     cutoffFreqHz = 30; //in Hz
     name = QString("LPF_%1").arg(cutoffFreqHz);
@@ -287,6 +288,11 @@ void RawModel::genStdFilterOps()
     double center = from_freqHz+bw/2;
     name = QString("BPF_%1-%2").arg(from_freqHz).arg(to_freqHz);
     m_Operators.insert(name,QSharedPointer<MNEOperator>(new FilterOperator(name,FilterOperator::BPF,80,(double)center/nyquist_freq,(double)bw/nyquist_freq,(double)trans_width/nyquist_freq,(m_iWindowSize+m_iFilterTaps))));
+
+    //Own/manual set filter - only an entry i nthe operator list generated which is called when the filterwindow is used
+    cutoffFreqHz = 40;
+    name = QString("User defined (See 'Adjust/Filter')");
+    m_Operators.insert(name,QSharedPointer<MNEOperator>(new FilterOperator(name,FilterOperator::LPF,m_iFilterTaps,cutoffFreqHz/nyquist_freq,0.2,0.1,(m_iWindowSize+m_iFilterTaps))));
 
     //**********
     //filter debugging -> store filter coefficients to plain text file

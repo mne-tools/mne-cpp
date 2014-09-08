@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     datamarker.h
+* @file     eventwindow.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
@@ -30,24 +30,28 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the DataMarker class.
+* @brief    Contains the declaration of the EventWindow class.
 *
 */
-#ifndef DATAMARKER_H
-#define DATAMARKER_H
+
+#ifndef EVENTWINDOW_H
+#define EVENTWINDOW_H
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "mainwindow.h"
+#include "ui_eventwindowdock.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QWidget>
-#include <QPalette>
-#include <QMouseEvent>
-#include <QRect>
-#include <QRegion>
-#include <QDebug>
-#include <QEvent>
+#include <QDockWidget>
 
 
 //*************************************************************************************************************
@@ -58,61 +62,85 @@
 namespace MNEBrowseRawQt
 {
 
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE FORWARD DECLARATIONS
+//=============================================================================================================
+
+class MainWindow;
+
 /**
-* DECLARE CLASS DataMarker
+* DECLARE CLASS EventWindow
 *
-* @brief The DataWindow class provides the data dock window
+* @brief The EventWindow class provides the event dock window.
 */
-class DataMarker : public QWidget
+class EventWindow : public QDockWidget
 {
     Q_OBJECT
 public:
     //=========================================================================================================
     /**
-    * Constructs a DataMarker dialog which is a child of parent
+    * Constructs a EventWindow dialog which is a child of parent.
     *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new DataMarker becomes a window. If parent is another widget, DataMarker becomes a child window inside parent. DataWindow is deleted when its parent is deleted.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new EventWindow becomes a window. If parent is another widget, EventWindow becomes a child window inside parent. EventWindow is deleted when its parent is deleted.
     */
-    DataMarker(QWidget *parent = 0);
+    EventWindow(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * set the m_movementBoundary
-    *
-    * @param [in] QRect Hols the bounding rect
+    * Destroys the EventWindow.
+    * All EventWindow's children are deleted first. The application exits if EventWindow is the main widget.
     */
-    void setMovementBoundary(QRegion rect);
+    ~EventWindow();
+
+    //=========================================================================================================
+    /**
+    * Setup the QtableView of the event window.
+    */
+    void initEventViewSettings();
+
+    //=========================================================================================================
+    /**
+    * Returns the QTableView of this window.
+    */
+    QTableView* getTableView();
 
 private:
     //=========================================================================================================
     /**
-    * Reimplemnted mouse press event handler
-    *
-    * @param event QMouseEvent
+    * Inits all the QCheckBoxes of the event window.
     */
-    void mousePressEvent(QMouseEvent *event);
+    void initCheckBoxes();
 
     //=========================================================================================================
     /**
-    * Reimplemnted mouse move event handler
-    *
-    * @param event QMouseEvent
+    * Inits all the QCheckBoxes of the event window.
     */
-    void mouseMoveEvent(QMouseEvent *event);
+    void initComboBoxes();
 
-    void enterEvent(QEvent *event);
+    //=========================================================================================================
+    /**
+    * event reimplemented virtual function to handle events of the event dock window
+    */
+    bool event(QEvent * event);
 
-    QPoint      m_oldPos;               /**< The old mouse position */
+    Ui::EventWindowDockWidget *ui;
 
-    QRegion     m_movableRegion;        /**< The movement boundary */
+    MainWindow*     m_pMainWindow;
 
-signals:
-    void markerMoved();
+    QSettings       m_qSettings;
 
-public slots:
-
+protected slots:
+    //=========================================================================================================
+    /**
+    * jumpToEvent jumps to a event specified in the event table view
+    *
+    * @param [in] current model item focused in the view
+    * @param [in] previous model item focused in the view
+    */
+    void jumpToEvent(const QModelIndex &current, const QModelIndex &previous);
 };
 
 } // NAMESPACE MNEBrowseRawQt
 
-#endif // DATAMARKER_H
+#endif // EVENTWINDOW_H
