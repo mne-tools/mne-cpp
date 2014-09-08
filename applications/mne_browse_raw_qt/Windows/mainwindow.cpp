@@ -204,6 +204,9 @@ void MainWindow::setupMainWindow()
     //Set data window as central widget - This is needed because we are using QDockWidgets
     m_pDataWindow = new DataWindow(this);
     setCentralWidget(m_pDataWindow);
+
+    //Set window icon for MNE browse Raw Qt
+    setWindowIcon(QIcon(":/Resources/Images/application_icon_mne_browse_raw_qt.png"));
 }
 
 
