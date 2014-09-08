@@ -190,7 +190,7 @@ public:
 
     //=========================================================================================================
 
-    QStringList correlation(VectorXd signalSamples, QList<qreal> atomSamples, QString atomName);
+    FixDictAtom correlation(Dictionary current_pdict);
 
     //=========================================================================================================
 
