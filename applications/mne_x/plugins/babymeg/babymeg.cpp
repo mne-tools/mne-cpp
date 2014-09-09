@@ -91,11 +91,10 @@ BabyMEG::BabyMEG()
     connect(m_pActionSetupProject, &QAction::triggered, this, &BabyMEG::showProjectDialog);
     addPluginAction(m_pActionSetupProject);
 
-    m_pActionUpdateFiffInfo = new QAction(QIcon(":/images/down.png"), tr("Update Fiff Info"),this);
+    m_pActionUpdateFiffInfo = new QAction(QIcon(":/images/latestFiffInfo.png"), tr("Update Fiff Info"),this);
     m_pActionUpdateFiffInfo->setStatusTip(tr("Update Fiff Info"));
     connect(m_pActionUpdateFiffInfo, &QAction::triggered, this, &BabyMEG::UpdateFiffInfo);
     addPluginAction(m_pActionUpdateFiffInfo);
-
 
     m_pActionRecordFile = new QAction(QIcon(":/images/record.png"), tr("Start Recording"),this);
 //    m_pActionSetupProject->setShortcut(tr("F12"));
