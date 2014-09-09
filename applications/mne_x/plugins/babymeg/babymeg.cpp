@@ -237,7 +237,7 @@ void BabyMEG::UpdateFiffInfo()
     // read gain info and save them to the m_pFiffInfo.range
     myClientComm->SendCommandToBabyMEGShortConnection("INFO");
 
-    sleep(1);
+    sleep(0.5);
 
     m_pActionRecordFile->setEnabled(true);
 
