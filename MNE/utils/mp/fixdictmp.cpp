@@ -129,8 +129,40 @@ void FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal e
 
             else if(current_best_matching.max_scalar_product > global_best_matching.max_scalar_product)
                 global_best_matching = current_best_matching;
+        }
 
-        }   
+        QString display_text = "";
+        if(global_best_matching.type == AtomType::GABORATOM)
+        {
+            display_text = QString("Gaboratom: scale: %0, translation: %1, modulation: %2, phase: %3")
+                    .arg(QString::number(global_best_matching.gabor_atom.scale, 'f', 2))
+                    .arg(QString::number(global_best_matching.translation, 'f', 2))
+                    .arg(QString::number(global_best_matching.gabor_atom.modulation, 'f', 2))
+                    .arg(QString::number(global_best_matching.gabor_atom.phase, 'f', 2));
+        }
+        else if(global_best_matching.type == AtomType::CHIRPATOM)
+        {
+            display_text = QString("Chripatom: scale: %0, translation: %1, modulation: %2, phase: %3, chirp: %4")
+                    .arg(QString::number(global_best_matching.chirp_atom.scale, 'f', 2))
+                    .arg(QString::number(global_best_matching.translation, 'f', 2))
+                    .arg(QString::number(global_best_matching.chirp_atom.modulation, 'f', 2))
+                    .arg(QString::number(global_best_matching.chirp_atom.phase, 'f', 2))
+                    .arg(QString::number(global_best_matching.chirp_atom.chirp, 'f', 2));
+        }
+        else if(global_best_matching.type == AtomType::FORMULAATOM)
+        {
+            display_text = QString("%0: a: %1, b: %2, c: %3, d: %4, e: %5, f: %6, g: %7, h: %8")
+                    .arg(global_best_matching.atom_formula)
+                    .arg(QString::number(global_best_matching.formula_atom.a, 'f', 2))
+                    .arg(QString::number(global_best_matching.formula_atom.b, 'f', 2))
+                    .arg(QString::number(global_best_matching.formula_atom.c, 'f', 2))
+                    .arg(QString::number(global_best_matching.formula_atom.d, 'f', 2))
+                    .arg(QString::number(global_best_matching.formula_atom.e, 'f', 2))
+                    .arg(QString::number(global_best_matching.formula_atom.f, 'f', 2))
+                    .arg(QString::number(global_best_matching.formula_atom.g, 'f', 2))
+                    .arg(QString::number(global_best_matching.formula_atom.h, 'f', 2));
+        }
+        global_best_matching.display_text = display_text;
 
         VectorXd fitted_atom = VectorXd::Zero(this->residuum.rows());
 
@@ -139,8 +171,6 @@ void FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal e
             if((k + global_best_matching.translation - floor(global_best_matching.vector_list.first().rows() / 2)) >= 0
                 && (k + global_best_matching.translation - floor(global_best_matching.vector_list.first().rows() / 2)) < fitted_atom.rows())
                     fitted_atom[(k + global_best_matching.translation - floor(global_best_matching.vector_list.first().rows() / 2))] += global_best_matching.vector_list.first()[k];
-
-
         }
 
         for(qint32 k = 0; k < fitted_atom.rows(); k++)
@@ -241,6 +271,10 @@ FixDictAtom FixDictMp::correlation(Dictionary current_pdict)
             best_matching.translation = p;
         }
     }
+    best_matching.atom_formula = current_pdict.atom_formula;
+    best_matching.dict_source = current_pdict.source;
+    best_matching.type = current_pdict.type;
+
     return best_matching;
 }
 //*************************************************************************************************************

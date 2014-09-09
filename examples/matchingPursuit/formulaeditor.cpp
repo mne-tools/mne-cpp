@@ -98,8 +98,7 @@ Formulaeditor::Formulaeditor(QWidget *parent) :    QWidget(parent),    ui(new Ui
     resize(settings.value("size_formula_editor", QSize(555, 418)).toSize());
 
     callAtomPaintWindow = new AtomPaintWindow();
-
-    callAtomPaintWindow->setFixedSize(510,200);
+    //callAtomPaintWindow->setBaseSize(510,200);
     ui->l_PaintAtom->addWidget(callAtomPaintWindow);
 
     atomList.clear();
@@ -132,7 +131,7 @@ Formulaeditor::Formulaeditor(QWidget *parent) :    QWidget(parent),    ui(new Ui
     m_strStandardFunction.append("GGT");
 
     callAtomPaintWindow->update();
-    update();
+    //update();
 }
 
 //*************************************************************************************************************************************
@@ -160,7 +159,7 @@ void Formulaeditor::closeEvent(QCloseEvent * event)
 void AtomPaintWindow::paintEvent(QPaintEvent *event)
 {
     Q_UNUSED(event);
-    paint_signal(atomList, QSize(510,200));
+    paint_signal(atomList, this->size());
 }
 
 //*************************************************************************************************************************************

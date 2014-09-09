@@ -1097,7 +1097,7 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
         qreal percent_atom_energy = 100 * temp_atom.energy / max_energy;
 
         QTableWidgetItem* atom_energie_item = new QTableWidgetItem(QString::number(percent_atom_energy, 'f', 2));
-        QTableWidgetItem* atom_name_item = new QTableWidgetItem(fix_dict_atom_res_list.last().atom_formula);
+        QTableWidgetItem* atom_name_item = new QTableWidgetItem(fix_dict_atom_res_list.last().display_text);
 
 
         atom_energie_item->setFlags(Qt::ItemIsUserCheckable);
@@ -1106,7 +1106,7 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
         atom_energie_item->setCheckState(Qt::Checked);
 
         atom_energie_item->setTextAlignment(0x0082);
-        atom_name_item->setTextAlignment(0x0082);
+        atom_name_item->setTextAlignment(0x0081);
 
          _fix_dict_atom_list.append(temp_atom);
 
@@ -1950,7 +1950,7 @@ void MainWindow::on_actionExport_triggered()
         for(qint32 i = 0; i < _adaptive_atom_list.length(); i++)
         {
             GaborAtom gabor_atom = _adaptive_atom_list.at(i);
-            QStringList result_list = gabor_atom.CreateStringValues(gabor_atom.sample_count, gabor_atom.scale, gabor_atom.sample_count / 2, gabor_atom.modulation, gabor_atom.phase);
+            QStringList result_list = gabor_atom.create_string_values(gabor_atom.sample_count, gabor_atom.scale, gabor_atom.sample_count / 2, gabor_atom.modulation, gabor_atom.phase);
 
             xmlWriter.writeStartElement("ATOM");
             xmlWriter.writeAttribute("ID", QString::number(i));

@@ -34,6 +34,10 @@
   <property name="windowTitle">
    <string>Warning</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="Ressourcen.qrc">
+    <normaloff>:/images/icons/spanner.png</normaloff>:/images/icons/spanner.png</iconset>
+  </property>
   <property name="modal">
    <bool>true</bool>
   </property>
