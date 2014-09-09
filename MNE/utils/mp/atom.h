@@ -275,7 +275,7 @@ public:
     *
     * @return GaborAtom as String
     */
-    QStringList CreateStringValues(qint32 sample_count, qreal scale, qint32 translation, qreal modulation, qreal phase);
+    QStringList create_string_values(qint32 sample_count, qreal scale, qint32 translation, qreal modulation, qreal phase);
 
 };
 
@@ -290,11 +290,11 @@ public:
     qreal phase;
     qreal chirp;
 
-    ChirpAtom(qint32 sampleCount, qreal scale, quint32 translation, qreal modulation, qreal phase, qreal chirp);
-
-    VectorXcd CreateComplex();
-    VectorXd CreateReal();
-    QStringList CreateStringValues();
+    ChirpAtom();
+    ~ChirpAtom();
+    VectorXd gauss_function (qint32 sample_count, qreal scale, quint32 translation);
+    VectorXd create_real(qint32 sample_count, qreal scale, quint32 translation, qreal modulation, qreal phase, qreal chirp);
+    QStringList create_string_values(qint32 sample_count, qreal scale, quint32 translation, qreal modulation, qreal phase, qreal chirp);
 
 };
 
