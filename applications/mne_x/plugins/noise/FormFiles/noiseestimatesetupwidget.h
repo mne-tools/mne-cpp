@@ -114,10 +114,7 @@ public:
 
     void init();
     void chgnFFT(int idx);
-    void Replot(/*MatrixXd tmp*/);
-//    float mmin(MatrixXd tmp,int chan);
-//    float mmax(MatrixXd tmp,int chan);
-
+    void chgDataLen(int idx);
 
 private slots:
 

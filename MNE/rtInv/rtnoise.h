@@ -120,7 +120,7 @@ public:
     * @param[in] p_pFiffInfo        Associated Fiff Information
     * @param[in] parent     Parent QObject (optional)
     */
-    explicit RtNoise(qint32 p_iMaxSamples, FiffInfo::SPtr p_pFiffInfo, QObject *parent = 0);
+    explicit RtNoise(qint32 p_iMaxSamples, FiffInfo::SPtr p_pFiffInfo, qint32 p_dataLen, QObject *parent = 0);
 
     //=========================================================================================================
     /**
@@ -195,6 +195,7 @@ private:
     double m_Fs;
 
     qint32 m_iFFTlength;
+    qint32 m_dataLength;
 
 protected:
     int NumOfBlocks;
@@ -208,8 +209,6 @@ public:
     MatrixXd SpecData;
     QMutex ReadMutex;
 
-    bool ReadDone;
-    bool CanRead;
     bool SendDataToBuffer;
 
 };
