@@ -159,7 +159,7 @@ public:
     qreal epsilon;
     qint32 it;
     qint32 max_iterations;
-    MatrixXd signal;
+    MatrixXd residuum;
     QList<FixDictAtom> fix_dict_list;
     QList<GaborAtom> adaptive_list;
 
