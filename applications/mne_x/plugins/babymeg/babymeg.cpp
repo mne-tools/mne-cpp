@@ -243,6 +243,9 @@ void BabyMEG::toggleRecordingFile()
             return;
         }
 
+        // read gain info and save them to the m_pFiffInfo.range
+        myClientComm->SendCommandToBabyMEGShortConnection("INFO");
+
         //Initiate the stream for writing to the fif file
         m_qFileOut.setFileName(m_sRecordFile);
         if(m_qFileOut.exists())
