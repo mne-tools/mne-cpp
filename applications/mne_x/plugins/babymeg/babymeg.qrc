@@ -5,5 +5,7 @@
         <file alias="babymeg.png">images/babymeg.png</file>
         <file alias="record_active.png">images/icons/record_active.png</file>
         <file alias="sqdctrl.png">images/icons/sqdctrl.png</file>
+        <file>images/icons/download.png</file>
+        <file>images/icons/down.png</file>
     </qresource>
 </RCC>
