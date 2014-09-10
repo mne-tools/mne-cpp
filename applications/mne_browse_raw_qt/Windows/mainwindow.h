@@ -80,6 +80,7 @@
 #include "datawindow.h"
 #include "aboutwindow.h"
 #include "informationwindow.h"
+#include "selectionmanagerwindow.h"
 
 
 //*************************************************************************************************************
@@ -143,6 +144,7 @@ class MainWindow : public QMainWindow
     friend class EventWindow;
     friend class DataWindow;
     friend class InformationWindow;
+    friend class SelectionManagerWindow;
 
     Q_OBJECT
 public:
@@ -208,6 +210,12 @@ private slots:
     */
     void showInformationWindow();
 
+    //=========================================================================================================
+    /**
+    * showSelectionManagerWindow shows the channel selection window
+    */
+    void showSelectionManagerWindow();
+
 private:
     //=========================================================================================================
     /**
@@ -241,26 +249,27 @@ private:
     */
     void setWindowStatus();
 
-    QFile               m_qFileRaw;                 /**< Fiff data file to read (set for convenience) */
-    QFile               m_qEventFile;               /**< Fiff event data file to read (set for convenience) */
-    QSignalMapper*      m_qSignalMapper;            /**< signal mapper used for signal-slot mapping */
+    QFile                   m_qFileRaw;                 /**< Fiff data file to read (set for convenience) */
+    QFile                   m_qEventFile;               /**< Fiff event data file to read (set for convenience) */
+    QSignalMapper*          m_qSignalMapper;            /**< signal mapper used for signal-slot mapping */
 
     //Window widgets
-    EventWindow*        m_pEventWindow;             /**< Event widget which display the event view */
-    FilterWindow*       m_pFilterWindow;            /**< Filter widget which display the filter options for the user */
-    DataWindow*         m_pDataWindow;              /**< Data widget which display the data for the user */
-    AboutWindow*        m_pAboutWindow;             /**< About widget which displays information about this application*/
-    InformationWindow*  m_pInformationWindow;       /**< Information widget which displays information about this application (log, etc.)*/
+    EventWindow*            m_pEventWindow;             /**< Event widget which display the event view */
+    FilterWindow*           m_pFilterWindow;            /**< Filter widget which display the filter options for the user */
+    DataWindow*             m_pDataWindow;              /**< Data widget which display the data for the user */
+    AboutWindow*            m_pAboutWindow;             /**< About widget which displays information about this application*/
+    InformationWindow*      m_pInformationWindow;       /**< Information widget which displays information about this application (log, etc.)*/
+    SelectionManagerWindow* m_pSelectionManagerWindow;  /**< Selection manager window which can be used to select channels*/
 
     //application settings
-    QSettings           m_qSettings;
-    RawSettings         m_rawSettings;
+    QSettings               m_qSettings;
+    RawSettings             m_rawSettings;
 
     //Log
-    QTextBrowser*       m_pTextBrowser_Log;         /** a textbox being part of the log feature */
-    LogLevel            m_eLogLevelCurrent;         /**< Holds the current log level.*/
+    QTextBrowser*           m_pTextBrowser_Log;         /** a textbox being part of the log feature */
+    LogLevel                m_eLogLevelCurrent;         /**< Holds the current log level.*/
 
-    Ui::MainWindowWidget* ui;
+    Ui::MainWindowWidget*   ui;
 };
 
 } //NAMESPACE

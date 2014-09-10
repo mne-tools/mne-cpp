@@ -111,6 +111,10 @@ void MainWindow::setupWindowWidgets()
     m_pAboutWindow = new AboutWindow(this);
     m_pAboutWindow->hide();
 
+    //Create about window - QTDesigner used - see /FormFiles
+    m_pSelectionManagerWindow = new SelectionManagerWindow(this);
+    addDockWidget(Qt::BottomDockWidgetArea, m_pSelectionManagerWindow);
+
     //Init windows
     m_pDataWindow->init();
     m_pEventWindow->init();
@@ -135,6 +139,7 @@ void MainWindow::connectMenus()
     //Windows
     connect(ui->m_eventAction, SIGNAL(triggered()), this, SLOT(showEventWindow()));
     connect(ui->m_informationAction, SIGNAL(triggered()), this, SLOT(showInformationWindow()));
+    connect(ui->m_channelSelectionManagerAction, SIGNAL(triggered()), this, SLOT(showSelectionManagerWindow()));
 
     //Help
     connect(ui->m_aboutAction, SIGNAL(triggered()), this, SLOT(showAboutWindow()));
@@ -409,4 +414,19 @@ void MainWindow::showInformationWindow()
     }
     else // if visible raise the widget to be sure that it is not obscured by other windows
         m_pInformationWindow->raise();
+}
+
+
+//*************************************************************************************************************
+
+void MainWindow::showSelectionManagerWindow()
+{
+    //Note: A widget that happens to be obscured by other windows on the screen is considered to be visible.
+    if(!m_pSelectionManagerWindow->isVisible())
+    {
+        m_pSelectionManagerWindow->show();
+        m_pSelectionManagerWindow->raise();
+    }
+    else // if visible raise the widget to be sure that it is not obscured by other windows
+        m_pSelectionManagerWindow->raise();
 }

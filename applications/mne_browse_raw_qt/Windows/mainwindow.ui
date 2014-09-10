@@ -47,6 +47,7 @@
     </property>
     <addaction name="m_eventAction"/>
     <addaction name="m_informationAction"/>
+    <addaction name="m_channelSelectionManagerAction"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -111,6 +112,11 @@
   <action name="m_aboutAction">
    <property name="text">
     <string>About...</string>
+   </property>
+  </action>
+  <action name="m_channelSelectionManagerAction">
+   <property name="text">
+    <string>Show channelSelectionManager</string>
    </property>
   </action>
  </widget>

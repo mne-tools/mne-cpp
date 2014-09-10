@@ -66,7 +66,7 @@ SOURCES += \
     kmeans.cpp \
     mnemath.cpp \
     ioutils.cpp \
-    asaelc.cpp \
+    layoutloader.cpp \
     parksmcclellan.cpp \
     filterdata.cpp \
     mp/adaptivemp.cpp \
@@ -78,7 +78,7 @@ HEADERS += \
     utils_global.h \
     mnemath.h \
     ioutils.h \
-    asaelc.h \
+    layoutloader.h \
     parksmcclellan.h \
     filterdata.h \
     mp/adaptivemp.h \
