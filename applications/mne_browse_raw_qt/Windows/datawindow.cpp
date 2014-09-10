@@ -194,6 +194,9 @@ void DataWindow::initMVCSettings()
             m_pUndockedDataView->horizontalScrollBar(),&QScrollBar::setValue);
     connect(ui->m_tableView_rawTableView->verticalScrollBar(),&QScrollBar::valueChanged,
             m_pUndockedDataView->verticalScrollBar(),&QScrollBar::setValue);
+
+    //Selection test
+    //ui->m_tableView_rawTableView->hideRow(0);
 }
 
 

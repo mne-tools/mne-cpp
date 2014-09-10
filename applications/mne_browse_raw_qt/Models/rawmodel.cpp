@@ -214,9 +214,8 @@ QVariant RawModel::data(const QModelIndex &index, int role) const
 
                 break;
             }
-        } // end role switch
-    } // end column check
-
+            } // end role switch
+        } // end column check
     } // end index.valid() check
 
     return QVariant();

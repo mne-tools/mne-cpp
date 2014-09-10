@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
-* @file     asaelc.cpp
+* @file     layoutloader.cpp
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     November, 2013
+* @date     September, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the AsAElc class
+* @brief    Implementation of the LayoutLoader class
 *
 */
 
@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "asaelc.h"
+#include "layoutloader.h"
 
 
 //*************************************************************************************************************
@@ -55,21 +55,24 @@ using namespace UTILSLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-AsAElc::AsAElc()
+LayoutLoader::LayoutLoader()
 {
 }
 
 
 //*************************************************************************************************************
 
-bool AsAElc::readElcFile(QString path, QStringList &channelNames, QVector<QVector<double> > &location3D, QVector<QVector<double> > &location2D, QString &unit)
+bool LayoutLoader::readAsaElcFile(QString path, QStringList &channelNames, QVector<QVector<double> > &location3D, QVector<QVector<double> > &location2D, QString &unit)
 {
     //Open .elc file
     if(!path.contains(".elc"))
         return false;
 
     QFile file(path);
-    file.open(QIODevice::ReadOnly | QIODevice::Text);
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qDebug()<<"Error opening elc file";
+        return false;
+    }
 
     //Start reading from file
     double numberElectrodes;
@@ -136,6 +139,55 @@ bool AsAElc::readElcFile(QString path, QStringList &channelNames, QVector<QVecto
     }
 
     Q_UNUSED(numberElectrodes);
+
+    file.close();
+
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+bool LayoutLoader::readMNELoutFile(QString path, QMap<QString,QVector<double>> channelData)
+{
+    //Open .elc file
+    if(!path.contains(".lout"))
+        return false;
+
+    channelData.clear();
+
+    QFile file(path);
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qDebug()<<"Error opening mne lout file";
+        return false;
+    }
+
+    //Start reading from file
+    QTextStream in(&file);
+
+    //skip first line
+    in.readLine();
+
+    while(!in.atEnd())
+    {
+        QString line = in.readLine();
+
+        QStringList fields = line.split(QRegExp("\\s+"));
+
+        //Delete last element if it is a blank character
+        if(fields.at(fields.size()-1) == "")
+            fields.removeLast();
+
+        qDebug()<<fields;
+
+        QVector<double> posTemp;
+        posTemp.push_back(fields.at(1).toDouble());    //x
+        posTemp.push_back(fields.at(2).toDouble());    //y
+        posTemp.push_back(fields.at(0).toDouble());    //channel number
+
+        //Create channel data map entry
+        channelData.insert(fields.at(fields.size()-1), posTemp);
+    }
 
     file.close();
 
