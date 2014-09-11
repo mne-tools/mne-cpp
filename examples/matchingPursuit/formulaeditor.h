@@ -78,13 +78,17 @@ class Formulaeditor : public QWidget
     Q_OBJECT
     
 public:
+
+    // ToDo Seb ctor
     explicit Formulaeditor(QWidget *parent = 0);
     ~Formulaeditor();
+
     QString GetFormula();
     void strip_formula(QString& strFormula);
     void set_formula(QString Formula);
     void set_funct_const(int index, double val);
     double calculation(QString strFormula, qreal xValue, bool strip  =true);
+    // end seb
     
 private slots:
     void on_tb_A_textChanged(const QString &arg1);
@@ -108,6 +112,7 @@ private:
     Ui::Formulaeditor *ui;
     AtomPaintWindow *callAtomPaintWindow;
 
+    // formula methods    Copyright: 2004, Ralf Wirtz
     QString m_strFormula;
     QString m_strFunction;
     QString m_strErrortext;
@@ -137,6 +142,7 @@ private:
     double ArCoth(double x);
     double sqr(double x);
     void closeEvent(QCloseEvent * event);
+    // end formula methods    Copyright: 2004, Ralf Wirtz
 
 };
 

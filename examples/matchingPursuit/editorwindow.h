@@ -66,9 +66,10 @@ class EditorWindow : public QMainWindow
     Q_OBJECT
 
 public:
+    // ToDo Seb ctor
     explicit EditorWindow(QWidget *parent = 0);
     ~EditorWindow();
-
+    // end
     enum AtomType
     {
              Gauss,
@@ -77,6 +78,7 @@ public:
 
 private:    
 
+    // ToDo Seb
     void read_dicts();
     void deleteDicts();
     void calc_scale_value();
@@ -99,6 +101,7 @@ private:
     QList<qreal> calc_parameter_values_modu(qreal startValue, qreal linStepValue, qreal expStepValue);
     QList<qreal> calc_parameter_values_phase(qreal startValue, qreal linStepValue, qreal expStepValue);
     QList<qreal> calc_parameter_values_chirp(qreal startValue, qreal linStepValue, qreal expStepValue);
+    // end
 
 private slots:    
     void on_btt_CalcAtoms_clicked();

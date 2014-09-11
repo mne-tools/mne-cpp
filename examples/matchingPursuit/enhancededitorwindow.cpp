@@ -437,7 +437,7 @@ QList<qreal> Enhancededitorwindow::calc_value_list(qreal start_value, qreal line
     qreal atom_count = _atom_count;
     QList<qreal> resultList;
     if(ui->chb_allCombined->isChecked())
-        atom_count = (end_value - start_value) / line_step_value + 1;
+        atom_count = (end_value - start_value + 1) / line_step_value;
 
     for(qint32 i = 0; i < atom_count; i++)
         resultList.append(start_value + (i * line_step_value));

@@ -323,17 +323,17 @@ QList<qreal> EditorWindow::calc_all_comb_parameter_values_scale(qreal startValue
 {
     QList<qreal> resultList;
     resultList.clear();
-    qreal temp = endvalue - startValue;
+    qreal temp = endvalue - startValue + 1;
     if(ui->rb_NoStepScale->isChecked())
         resultList.append(startValue);
     else if(ui->rb_LinStepScale->isChecked())
     {
-        atomCount = temp / linStepValue + 1;
+        atomCount = temp / linStepValue;
         resultList = calc_lin_pos_parameters(startValue, linStepValue);
     }
     else if(ui->rb_ExpStepScale->isChecked())
     {
-        atomCount = pow(temp, (1/ expStepValue)) + 1;
+        atomCount = pow(temp, (1/ expStepValue));
         resultList = calc_exp_pos_parameters(startValue, expStepValue);
     }
     return resultList;
@@ -370,17 +370,17 @@ QList<qreal> EditorWindow::calc_all_comb_parameter_values_modu(qreal startValue,
 {
     QList<qreal> resultList;
     resultList.clear();
-    qreal temp = endvalue - startValue;
+    qreal temp = endvalue - startValue + 1;
     if(ui->rb_NoStepModu->isChecked())
         resultList.append(startValue);
     else if(ui->rb_LinStepModu->isChecked())
     {
-        atomCount = temp / linStepValue + 1;
+        atomCount = temp / linStepValue;
         resultList = calc_lin_pos_parameters(startValue, linStepValue);
     }
     if(ui->rb_ExpStepModu->isChecked())
     {
-        atomCount = pow(temp, (1.0/ expStepValue)) + 1;
+        atomCount = pow(temp, (1.0/ expStepValue));
         resultList = calc_exp_pos_parameters(startValue, expStepValue);
     }
     return resultList;
@@ -417,17 +417,17 @@ QList<qreal> EditorWindow::calc_all_comb_parameter_values_phase(qreal startValue
 {
     QList<qreal> resultList;
     resultList.clear();
-    qreal temp = endvalue - startValue;
+    qreal temp = endvalue - startValue + 1;
     if(ui->rb_NoStepPhase->isChecked())
         resultList.append(startValue);
     else if(ui->rb_LinStepPhase->isChecked())
     {
-        atomCount = temp / linStepValue + 1;
+        atomCount = temp / linStepValue;
         resultList = calc_lin_pos_parameters(startValue, linStepValue);
     }
     else if(ui->rb_ExpStepPhase->isChecked())
     {
-        atomCount = pow(temp, (1/ expStepValue)) + 1;
+        atomCount = pow(temp, (1/ expStepValue));
         resultList = calc_exp_pos_parameters(startValue, expStepValue);
     }
     return resultList;
@@ -464,17 +464,17 @@ QList<qreal> EditorWindow::calc_all_comb_parameter_values_chirp(qreal startValue
 {
     QList<qreal> resultList;
     resultList.clear();
-    qreal temp = endvalue - startValue;
+    qreal temp = endvalue - startValue + 1;
     if(ui->rb_NoStepChirp->isChecked())
         resultList.append(startValue);
     else if(ui->rb_LinStepChirp->isChecked())
     {
-        atomCount = temp / linStepValue + 1;
+        atomCount = temp / linStepValue;
         resultList = calc_lin_pos_parameters(startValue, linStepValue);
     }
     else if(ui->rb_ExpStepChirp->isChecked())
     {
-        atomCount = pow(temp, (1/ expStepValue)) + 1;
+        atomCount = pow(temp, (1/ expStepValue));
         resultList = calc_exp_pos_parameters(startValue, expStepValue);
     }
     return resultList;
@@ -701,14 +701,17 @@ void EditorWindow::on_chb_CombAllPara_toggled(bool checked)
     ui->lb_ExpNPhase->setEnabled(checked);
     ui->lb_ExpNChirp->setEnabled(checked);
 
-    // update ui
-    ui->spb_AtomCount->setValue(ui->spb_AtomCount->value() + 1);
-    ui->spb_AtomCount->setValue(ui->spb_AtomCount->value() - 1);
-
     calc_scale_value();
     calc_modu_value();
     calc_phase_value();
     calc_chirp_value();
+
+    // update ui
+    //ToDo:
+    //ui->spb_AtomCount->setValue(ui->spb_AtomCount->value() + 1);
+    //ui->spb_AtomCount->setValue(ui->spb_AtomCount->value() - 1);
+    calc_atom_count_all_combined();
+
 }
 
 //*************************************************************************************************************

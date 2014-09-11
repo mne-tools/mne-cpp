@@ -66,8 +66,10 @@ class Enhancededitorwindow : public QWidget
     Q_OBJECT
     
 public:    
+    // ToDo Seb ctor
     explicit Enhancededitorwindow(QWidget *parent = 0);
     ~Enhancededitorwindow();
+    // end
     
 private slots:    
     void on_chb_allCombined_toggled(bool checked);    
@@ -106,13 +108,15 @@ signals:
     void dict_saved();
 
 private:
+    Ui::Enhancededitorwindow *ui;
+    // ToDo Seb
     void closeEvent(QCloseEvent * event);
     void read_formula();
     void calc_atom_count_all_combined();
-    Ui::Enhancededitorwindow *ui;
     QStringList m_strStandardFunction;
     QList<qreal> calc_value_list(qreal start_value, qreal line_step_value, qreal end_value);
     qreal calc_end_value(qreal startValue, qreal linStepValue);
+    // End ToDo Seb
 };
 
 #endif // ENHANCEDEDITORWINDOW_H

@@ -111,9 +111,13 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
+    // ToDo seb ctor
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+
+    // ToDo seb
     void fill_dict_combobox();
+    // end
     typedef QList<GaborAtom> adaptive_atom_list;
     typedef QList<FixDictAtom> fix_dict_atom_list;
     typedef Eigen::VectorXd VectorXd;    
@@ -327,6 +331,7 @@ private:
 
     //==========================================================================================================
 
+    // ToDo seb
     void read_fiff_ave(QString file_name);
     void fill_channel_combobox();
     void save_fif_file();
@@ -334,6 +339,7 @@ private:
     void calc_fix_mp(QString path, MatrixXd signal, TruncationCriterion criterion);
     void closeEvent(QCloseEvent * event);
     static bool sort_Energie(const GaborAtom atom_1, const GaborAtom atom_2);
+    //end
 };
 
 //*************************************************************************************************************
