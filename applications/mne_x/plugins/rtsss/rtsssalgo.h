@@ -96,9 +96,17 @@ public:
     RtSssAlgo();
     ~RtSssAlgo();
 
-    QList<MatrixXd> buildLinearEqn();
-    QList<MatrixXd> getSSSRR(MatrixXd EqnIn, MatrixXd EqnOut, MatrixXd EqnARR, MatrixXd EqnA, MatrixXd EqnB);
-    QList<MatrixXd> getSSSOLS(MatrixXd EqnIn, MatrixXd EqnOut, MatrixXd EqnA, MatrixXd EqnB);
+//    QList<MatrixXd> buildLinearEqn();
+    MatrixXd buildLinearEqn();
+
+//    QList<MatrixXd> getSSSRR(MatrixXd EqnIn, MatrixXd EqnOut, MatrixXd EqnARR, MatrixXd EqnA, MatrixXd EqnB);
+//    QList<MatrixXd> getSSSRR(MatrixXd EqnB);
+    MatrixXd getSSSRR(MatrixXd EqnB);
+
+//    QList<MatrixXd> getSSSOLS(MatrixXd EqnIn, MatrixXd EqnOut, MatrixXd EqnA, MatrixXd EqnB);
+//    QList<MatrixXd> getSSSOLS(MatrixXd EqnB);
+    MatrixXd getSSSOLS(MatrixXd EqnB);
+
     QList<MatrixXd> getLinEqn();
 
     void setMEGInfo(FiffInfo::SPtr fiffinfo);
@@ -113,6 +121,7 @@ private:
     void getCoilInfoVectorView4Sim();
     void getCoilInfoBabyMEG4Sim();
     QList<MatrixXd> getSSSEqn(qint32, qint32);
+//    QList<MatrixXd> getSSSEqn(VectorXi Lexp);
     void getSSSBasis(VectorXd, VectorXd, VectorXd, qint32, qint32);
     void getCartesianToSpherCoordinate(VectorXd, VectorXd, VectorXd);
     void getSphereToCartesianVector();

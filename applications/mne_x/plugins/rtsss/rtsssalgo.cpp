@@ -37,6 +37,8 @@
 */
 
 #include "rtsssalgo.h"
+#include <QFuture>
+#include <QtConcurrent/QtConcurrentMap>
 //#include "FormFiles/rtssssetupwidget.h"
 
 RtSssAlgo::RtSssAlgo()
@@ -49,7 +51,8 @@ RtSssAlgo::~RtSssAlgo()
 
 }
 
-QList<MatrixXd> RtSssAlgo::buildLinearEqn()
+//QList<MatrixXd> RtSssAlgo::buildLinearEqn()
+MatrixXd RtSssAlgo::buildLinearEqn()
 {
     QList<MatrixXd> Eqn, EqnRR;
     QList<MatrixXd> LinEqn;
@@ -74,6 +77,7 @@ QList<MatrixXd> RtSssAlgo::buildLinearEqn()
 //        std::cout << "loading coil information (BabyMEG)..... ** finisehd **" << endl;
 //    }
 
+
 //  Compute SSS equation
     LIn = LInRR;
     LOut = LOutRR;
@@ -86,6 +90,22 @@ QList<MatrixXd> RtSssAlgo::buildLinearEqn()
     Eqn = getSSSEqn(LIn, LOut);
     EqnIn = Eqn[0];
     EqnOut = Eqn[1];
+
+//
+//    Vector2i  LexpRR, LexpOLS;
+//    LexpRR(0) =LInRR;
+//    LexpRR(1) = LOutRR;
+
+//    LexpOLS(0) =LInOLS;
+//    LexpOLS(1) = LOutOLS;
+
+//    QList<Vector2i> Lexp;
+//    Lexp.append(LexpRR);
+//    Lexp.append(LexpOLS);
+
+//    QFuture<QList> res = QtConcurrent::mapped(Lexp,getSSSEqn);
+//    res.waitForFinished();
+
 
 //  build linear equation
 //    MatrixXd EqnARR(NumCoil, EqnInRR.cols()+EqnOutRR.cols());
@@ -141,7 +161,8 @@ QList<MatrixXd> RtSssAlgo::buildLinearEqn()
 
 //    std::cout << "building SSS linear equation .....finished !" << endl;
 
-    return LinEqn;
+//    return LinEqn;
+    return CoilScale.asDiagonal();
 }
 
 void RtSssAlgo::setSSSParameter(QList<int> expansionOrder)
@@ -201,20 +222,25 @@ void RtSssAlgo::setMEGInfo(FiffInfo::SPtr fiffInfo)
     CoilNk.resize(NumCoil);
 
     // Coordinate of coil integrating points:  This is assigned to CoilRk.
-    //      7002 (babyMEG inlayer magnetometer): 7 pts
-    //      7003 (babyMEG outlayer magnetometer): 7 pts
+    //      7002 (babyMEG circular (10mm diameter) inlayer magnetometer): 7 pts
+    //      7003 (babyMEG square (20x20mm) outlayer magnetometer): 7 pts
     //      3012 (VectorView planar grdiometer, Type 1): 8 pts
     //      3024 (VectorView magnetometer,Type 3): 9 pts
-    MatrixXd C7002intpts7(3,7), C7003intpts7(3,7), C3012intpts8(3,8), C3024intpts9(3,9);
-    C7002intpts7 << 0.000000, 0.000000, 0.000000, 0.0081650, 0.000000, 0.000000, -0.0081650, 0.000000, 0.000000,  0.0040824, 0.0070712, 0.000000, 0.0040824, -0.0070712, 0.000000, -0.0040824, 0.0070712, 0.000000, -0.0040824, -0.0070712, 0.000000;
-    C7003intpts7 << 0.000000, 0.000000, 0.000000, 0.0081650, 0.000000, 0.000000, -0.0081650, 0.000000, 0.000000,  0.0040824, 0.0070712, 0.000000, 0.0040824, -0.0070712, 0.000000, -0.0040824, 0.0070712, 0.000000, -0.0040824, -0.0070712, 0.000000;
+    //      initialization order X1.....Xn Y1.....Yn Z1.....Zn
+    MatrixXd C7002intpts7(3,7), C7003intpts4(3,4), C7003intpts16(3,16), C3012intpts8(3,8), C3024intpts9(3,9);
+    C7002intpts7 << 0.0000000, 0.0020412, -0.0020412, -0.0040825, -0.0020412,  0.0020412, 0.0040825, 0.0000000, 0.0035356,  0.0035356,  0.0000000, -0.0035356, -0.0035356, 0.0000000, 0.0000000, 0.0000000,  0.0000000,  0.0000000,  0.0000000,  0.0000000, 0.0000000;
+    C7003intpts4 << 0.0050000, -0.0050000, -0.0050000, 0.0050000, 0.0050000, 0.0050000, 0.0050000,  0.0050000, 0.0000000, 0.0000000, 0.0000000, 0.0000000;
+    C7003intpts16 << 0.006, -0.006, -0.006, 0.006, 0.006, -0.006, -0.006, 0.006, 0.002, -0.002, -0.002, 0.002, 0.002, -0.002, -0.002, 0.002, 0.006, 0.006, -0.006, -0.006, 0.002, 0.002, -0.002, -0.002, 0.006, 0.006, -0.006, -0.006, 0.002, 0.002, -0.002, -0.002, 0.000, 0.000, 0.000, 0.000,0.000, 0.000, 0.000, 0.000,0.000, 0.000, 0.000, 0.000,0.000, 0.000, 0.000, 0.000;
+
     C3012intpts8 << 0.0059, -0.0059, 0.0059, -0.0059, 0.0108, -0.0108, 0.0108, -0.0108, 0.0067, 0.0067, -0.0067, -0.0067, 0.0067, 0.0067, -0.0067, -0.0067, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003;
     C3024intpts9 << 0.0000, 0.0100, -0.0100, 0.0100, -0.0100, 0.0000, 0.0000, 0.0100, -0.0100, 0.0000, 0.0100, 0.0100, -0.0100, -0.0100, 0.0100, -0.0100, 0.0000, 0.0000, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003;
 
     // Coil point weight:  This is assinged to CoilWk
-    MatrixXd C7002Wintpts7(1,7), C7003Wintpts7(1,7), C3012Wintpts8(1,8), C3024Wintpts9(1,9);
+    MatrixXd C7002Wintpts7(1,7), C7003Wintpts4(1,4), C7003Wintpts16(1,16), C3012Wintpts8(1,8), C3024Wintpts9(1,9);
     C7002Wintpts7 << 0.25, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125;
-    C7003Wintpts7 << 0.25, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125;
+    C7003Wintpts4 << 0.25, 0.25, 0.25, 0.25;
+    C7003Wintpts16 << 0.0625, 0.0625, 0.0625, 0.0625, 0.0625, 0.0625, 0.0625, 0.0625, 0.0625, 0.0625, 0.0625, 0.0625, 0.0625, 0.0625, 0.0625, 0.0625;
+
     C3012Wintpts8 << 14.9790,  -14.9790,   14.9790,  -14.9790,   14.9790,  -14.9790,   14.9790,  -14.9790;
     C3024Wintpts9 << 0.1975,    0.0772,    0.0772,    0.0772,    0.0772,    0.1235,    0.1235,    0.1235,    0.1235;
 
@@ -256,9 +282,11 @@ void RtSssAlgo::setMEGInfo(FiffInfo::SPtr fiffInfo)
 
                 case 7003:
                     CoilGrad(cid) = 0;
-                    CoilNk(cid) = 7;
-                    CoilRk.append(C7003intpts7);
-                    CoilWk.append(C7003Wintpts7);
+                    CoilNk(cid) = 4;
+                    CoilRk.append(C7003intpts4);
+                    CoilWk.append(C7003Wintpts4);
+//                    CoilRk.append(C7003intpts16);
+//                    CoilWk.append(C7003Wintpts16);
                     break;
 
                 default:
@@ -303,6 +331,7 @@ void RtSssAlgo::setMEGInfo(FiffInfo::SPtr fiffInfo)
 //      function [EqnIn,EqnOut] = get_SSS_Eqn(Origin,LIn,LOut,CoilTk,CoilNk,CoilWk,CoilRk,CoilName,CoilT)
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 QList<MatrixXd> RtSssAlgo::getSSSEqn(qint32 LIn, qint32 LOut)
+//QList<MatrixXd> RtSssAlgo::getSSSEqn(VectorXi Lexp)
 {
     int NumBIn, NumBOut;
 //    int coil_index=1;
@@ -312,7 +341,11 @@ QList<MatrixXd> RtSssAlgo::getSSSEqn(qint32 LIn, qint32 LOut)
     MatrixXd EqnIn, EqnOut;
     QList<MatrixXd> Eqn;
 
-//  % initialization
+//    qint32 LIn,LOut;
+//    LIn = Lexp(0);
+//    LOut = Lexp(1);
+
+    //  % initialization
     NumBIn = (LIn*LIn) + 2*LIn;
     NumBOut = (LOut*LOut) + 2*LOut;
 
@@ -350,11 +383,11 @@ QList<MatrixXd> RtSssAlgo::getSSSEqn(qint32 LIn, qint32 LOut)
 //        int NumCoilPts = CoilNk(coil_index);
         qint32 NumCoilPts = CoilNk(i);
         MatrixXd tmpmat; tmpmat.setOnes(4,NumCoilPts);
-
+//qDebug() << "pass 2";
 //        tmpmat.topRows(3) = CoilRk[coil_index];
 //        std::cout << "CoilRk: " << CoilRk[i].rows() << " x " << CoilRk[i].cols()  << std::endl;
         tmpmat.topRows(3) = CoilRk[i];
-
+//qDebug() << "pass 3";
         coil_location = CoilT[i] * tmpmat;
         tmpmat = coil_location.topRows(3);   coil_location.resize(3,NumCoilPts);   coil_location = tmpmat;
         coil_location = coil_location - Origin.replicate(1,NumCoilPts);
@@ -700,7 +733,9 @@ void RtSssAlgo::getSphereToCartesianVector()
 //  function [SSSIn,SSSOut,Weight,ErrRel] = get_SSS_RR(EqnIn,EqnOut,EqnARR,EqnA,EqnB)
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-QList<MatrixXd> RtSssAlgo::getSSSRR(MatrixXd EqnIn, MatrixXd EqnOut, MatrixXd EqnARR, MatrixXd EqnA, MatrixXd EqnB)
+//QList<MatrixXd> RtSssAlgo::getSSSRR(MatrixXd EqnIn, MatrixXd EqnOut, MatrixXd EqnARR, MatrixXd EqnA, MatrixXd EqnB)
+//QList<MatrixXd> RtSssAlgo::getSSSRR(MatrixXd EqnB)
+MatrixXd RtSssAlgo::getSSSRR(MatrixXd EqnB)
 {
     int NumBIn, NumBOut, NumCoil, NumExp;
     MatrixXd EqnRRInv, EqnInv, SSSIn, SSSOut, Weight; //, ErrRel;
@@ -837,7 +872,8 @@ QList<MatrixXd> RtSssAlgo::getSSSRR(MatrixXd EqnIn, MatrixXd EqnOut, MatrixXd Eq
     RRsss.append(Weight);
     RRsss.append(ErrRel);
 
-    return RRsss;
+//    return RRsss;
+    return SSSIn;
 }
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -862,7 +898,9 @@ QList<MatrixXd> RtSssAlgo::getSSSRR(MatrixXd EqnIn, MatrixXd EqnOut, MatrixXd Eq
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //function [SSSIn,SSSOut,ErrRel] = get_SSS_OLS(EqnIn,EqnOut,EqnA,EqnB)
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-QList<MatrixXd> RtSssAlgo::getSSSOLS(MatrixXd EqnIn, MatrixXd EqnOut, MatrixXd EqnA, MatrixXd EqnB)
+//QList<MatrixXd> RtSssAlgo::getSSSOLS(MatrixXd EqnIn, MatrixXd EqnOut, MatrixXd EqnA, MatrixXd EqnB)
+//QList<MatrixXd> RtSssAlgo::getSSSOLS(MatrixXd EqnB)
+MatrixXd RtSssAlgo::getSSSOLS(MatrixXd EqnB)
 {
     int NumBIn, NumBOut, NumCoil, NumExp;
     MatrixXd EqnRRInv, EqnInv, SSSIn, SSSOut;
@@ -901,7 +939,8 @@ QList<MatrixXd> RtSssAlgo::getSSSOLS(MatrixXd EqnIn, MatrixXd EqnOut, MatrixXd E
     OLSsss.append(SSSOut);
     OLSsss.append(ErrRel);
 
-    return OLSsss;
+//    return OLSsss;
+    return SSSIn;
 }
 
 // Return number of meg channels
