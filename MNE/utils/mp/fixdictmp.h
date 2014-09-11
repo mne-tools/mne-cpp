@@ -210,11 +210,12 @@ public:
 
     //=========================================================================================================
 
-
+    QString create_display_text(FixDictAtom global_best_matching);
 
     //=========================================================================================================
 
     static void build_molecule_xml_file(qint32 level_counter);
+
 
 public slots:
 

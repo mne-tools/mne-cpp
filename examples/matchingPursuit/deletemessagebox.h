@@ -63,9 +63,11 @@ class DeleteMessageBox : public QDialog
     Q_OBJECT
     
 public:
+    // ToDo Seb
     explicit DeleteMessageBox(QWidget *parent = 0);
     DeleteMessageBox(QString msg_text, QString caption, QString btt_left_text, QString btt_right_text, QWidget *parent = 0);
     ~DeleteMessageBox();
+    // end
 
 private slots:
     void on_btt_yes_clicked();

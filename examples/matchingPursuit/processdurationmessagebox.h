@@ -57,8 +57,10 @@ class processdurationmessagebox : public QDialog
     Q_OBJECT
     
 public:
+    // ToDo seb ctor
     explicit processdurationmessagebox(QWidget *parent = 0);
     ~processdurationmessagebox();
+    // end
     
 private slots:
     void on_pushButton_clicked();
