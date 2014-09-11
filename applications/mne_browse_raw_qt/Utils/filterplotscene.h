@@ -1,11 +1,11 @@
 //=============================================================================================================
 /**
-* @file     filterwindow.h
+* @file     filterplotscene.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     August, 2014
+* @date     September, 2014
 *
 * @section  LICENSE
 *
@@ -30,20 +30,20 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the FilterWindow class.
+* @brief    Contains the declaration of the FilterPlotScene class.
 *
 */
 
-#ifndef FILTERWINDOW_H
-#define FILTERWINDOW_H
+#ifndef FILTERPLOTSCENE_H
+#define FILTERPLOTSCENE_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // QT INCLUDES
 //=============================================================================================================
 
-#include "ui_filterwindow.h"
-#include "mainwindow.h"
+#include "../Utils/filterplotscene.h"
+#include "../Utils/filteroperator.h"
 
 
 //*************************************************************************************************************
@@ -51,7 +51,9 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QWidget>
+#include <QGraphicsScene>
+#include <QPainterPath>
+#include <QGraphicsPathItem>
 
 
 //*************************************************************************************************************
@@ -63,34 +65,62 @@ namespace MNEBrowseRawQt
 {
 
 /**
-* DECLARE CLASS FilterWindow
+* DECLARE CLASS FilterPlotScene
 *
-* @brief The FilterWindow class provides the filter window.
+* @brief The FilterPlotScene class provides the scene where a filter respone can be plotted.
 */
-class FilterWindow : public QWidget
+class FilterPlotScene : public QGraphicsScene
 {
     Q_OBJECT
-
 public:
     //=========================================================================================================
     /**
-    * Constructs a FilterWindow dialog which is a child of parent.
+    * Constructs a FilterPlotScene dialog which is a child of parent.
     *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new FilterWindow becomes a window. If parent is another widget, FilterWindow becomes a child window inside parent. FilterWindow is deleted when its parent is deleted.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new FilterPlotScene becomes a window. If parent is another widget, FilterPlotScene becomes a child window inside parent. FilterPlotScene is deleted when its parent is deleted.
     */
-    FilterWindow(QWidget *parent = 0);
+    FilterPlotScene(QObject *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the FilterWindow.
-    * All FilterWindow's children are deleted first. The application exits if FilterWindow is the main widget.
+    * Updates the current filter.
+    *
+    * @param [in] operatorFilter pointer to the current filter operator which is to be plotted
+    * @param [in] holds the current sampling frequency
     */
-    ~FilterWindow();
+    void updateFilter(QSharedPointer<MNEOperator> operatorFilter, int samplingFreq);
 
-private:
-    Ui::FilterWindowWidget *ui;
+protected:
+    //=========================================================================================================
+    /**
+    * Draws the diagram to plot the magnitude.
+    * @param [in] holds the current sampling frequency
+    */
+    void plotMagnitudeDiagram(int samplingFreq);
+
+    //=========================================================================================================
+    /**
+    * Draws the filter's frequency response.
+    *
+    */
+    void plotFilterFrequencyResponse();
+
+    QSharedPointer<FilterOperator>      m_pCurrentFilter;
+
+    QGraphicsPathItem*                  m_pGraphicsItemPath;
+
+    int             m_iScalingFactor;           /**< Scales the db filter magnitudes by the specified factor in order to provide better plotting */
+    double          m_dMaxMagnitude;            /**< the maximum magnirutde shown in the diagram */
+    int             m_iNumberHorizontalLines;   /**< number of plotted horizontal ()lines */
+    int             m_iNumberVerticalLines;     /**< number of plotted vertical lines */
+    int             m_iAxisTextSize;            /**< point size of the plotted text */
+    int             m_iDiagramMarginsHoriz;     /**< horizontal space between the filter and diagram plot  */
+    int             m_iDiagramMarginsVert;      /**< vertical space between the filter and diagram plot */
+
+public slots:
+
 };
 
 } // NAMESPACE MNEBrowseRawQt
 
-#endif // FILTERWINDOW_H
+#endif // FILTERPLOTSCENE_H
