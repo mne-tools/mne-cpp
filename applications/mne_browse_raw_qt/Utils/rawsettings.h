@@ -62,6 +62,7 @@
 #include <QSize>
 #include <QColor>
 #include <QPoint>
+#include <QStringList>
 
 
 //*************************************************************************************************************
@@ -99,7 +100,11 @@
 #define EVENT_MARKER_WIDTH 3 // in pixels
 
 //Event marker opacity
-#define EVENT_MARKER_OPACITY 85 // opacity of the markers and backgorunds in the table columns
+#define EVENT_MARKER_OPACITY 110 // opacity of the markers and backgorunds in the table columns. Range: 0...255
+
+//Data marker
+#define DATA_MARKER_WIDTH 3 // in pixels
+#define DATA_MARKER_OPACITY 200 // opacity of the data marker and backgorunds in the table columns. Range: 0...255
 
 //*************************************************************************************************************
 //=============================================================================================================
