@@ -776,7 +776,7 @@ double Formulaeditor::calculation(QString strFormula, qreal xValue, bool strip)
 {
     qint32  nPosition;
     QString strCharacter;
-    qreal	ergebnis;
+    qreal	result;
 
     if (strFormula.length() < 1) return 0.0;
 
@@ -791,9 +791,9 @@ double Formulaeditor::calculation(QString strFormula, qreal xValue, bool strip)
     nPosition = 0;
     char_n(nPosition, strCharacter);
 
-    ergebnis = expression(nPosition, strCharacter);
+    result = expression(nPosition, strCharacter);
 
-    return ergebnis;
+    return result;
 }
 
 //*************************************************************************************************************************************
@@ -1073,7 +1073,7 @@ void Formulaeditor::set_funct_const(int index, double val)
 {
     //between 0 and 9
     if (index >= 0 && index < 9)   m_dFunctionConstant[index] = val;
-    else errorText = QString("Programmfehler in SetFunctConst()");
+    else errorText = QString("Error in SetFunctConst()");
 }
 
 QString Formulaeditor::str_char(QString DecimalZahl)

@@ -88,9 +88,9 @@ private:
     void calc_atom_count_all_combined();
 
     QList<qreal> calc_lin_pos_parameters(qreal startValue, qreal linStepValue);
-    QList<qreal> calc_lin_neg_parameters(qreal startValue, qreal expStepValue);
-    QList<qreal> calc_exp_pos_parameters(qreal startValue, qreal linStepValue);
-    QList<qreal> calc_exp_neg_parameters(qreal startValue, qreal linStepValue);
+    QList<qreal> calc_lin_neg_parameters(qreal startValue, qreal linStepValue);
+    QList<qreal> calc_exp_pos_parameters(qreal startValue, qreal expStepValue);
+    QList<qreal> calc_exp_neg_parameters(qreal startValue, qreal expStepValue);
 
     QList<qreal> calc_all_comb_parameter_values_scale(qreal startValue, qreal endvalue, qreal linStepValue, qreal expStepValue);
     QList<qreal> calc_all_comb_parameter_values_modu(qreal startValue, qreal endvalue, qreal linStepValue, qreal expStepValue);
