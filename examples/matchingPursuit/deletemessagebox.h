@@ -63,8 +63,13 @@ class DeleteMessageBox : public QDialog
     Q_OBJECT
     
 public:
+
+    //*********************************************************************************************************
+    //constructor
     explicit DeleteMessageBox(QWidget *parent = 0);
     DeleteMessageBox(QString msg_text, QString caption, QString btt_left_text, QString btt_right_text, QWidget *parent = 0);
+    //*********************************************************************************************************
+
     ~DeleteMessageBox();
 
 private slots:

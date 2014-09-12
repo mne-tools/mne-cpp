@@ -66,7 +66,11 @@ class Enhancededitorwindow : public QWidget
     Q_OBJECT
     
 public:    
+    //*********************************************************************************************************
+    //constructor
     explicit Enhancededitorwindow(QWidget *parent = 0);
+    //*********************************************************************************************************
+
     ~Enhancededitorwindow();
     
 private slots:    
@@ -106,12 +110,73 @@ signals:
     void dict_saved();
 
 private:
-    void closeEvent(QCloseEvent * event);
-    void read_formula();
-    void calc_atom_count_all_combined();
+
     Ui::Enhancededitorwindow *ui;
     QStringList m_strStandardFunction;
+
+    //=======================================================================================================
+    /**
+    * EnhancedEditorWindow_close_event
+    *
+    * ### MP toolbox EnhancedEditorWindow function ###
+    *
+    * close event
+    *
+    * @param
+    *
+    * @return void
+    */
+    void closeEvent(QCloseEvent * event);
+
+    //=======================================================================================================
+    /**
+    * EnhancedEditorWindow_read_formula
+    *
+    * ### MP toolbox EnhancedEditorWindow function ###
+    *
+    * read in formula
+    *
+    * @return void
+    */
+    void read_formula();
+
+    //=======================================================================================================
+    /**
+    * EnhancedEditorWindow_calc_atom_count_all_combined
+    *
+    * ### MP toolbox EnhancedEditorWindow function ###
+    *
+    * calculates atom count when all combined is selected
+    *
+    * @return void
+    */
+    void calc_atom_count_all_combined();
+
+    //=======================================================================================================
+    /**
+    * EnhancedEditorWindow_calc_value_list
+    *
+    * ### MP toolbox EnhancedEditorWindow function ###
+    *
+    * calculates value list of parameter(s)
+    *
+    * @return   QList<real> value list of parameter(s)
+    */
     QList<qreal> calc_value_list(qreal start_value, qreal line_step_value, qreal end_value);
+
+    //=======================================================================================================
+    /**
+    * EnhancedEditorWindow_calc_end_value
+    *
+    * ### MP toolbox EnhancedEditorWindow function ###
+    *
+    * calculates end value of parameter
+    *
+    * @param    startValue      start value of paramter
+    * @param    linStepValue    step width
+    *
+    * @return   qreal   end value of parameter
+    */
     qreal calc_end_value(qreal startValue, qreal linStepValue);
 };
 

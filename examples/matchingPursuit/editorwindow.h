@@ -66,7 +66,12 @@ class EditorWindow : public QMainWindow
     Q_OBJECT
 
 public:
+
+    //*********************************************************************************************************
+    //constructor
     explicit EditorWindow(QWidget *parent = 0);
+    //*********************************************************************************************************
+
     ~EditorWindow();
 
     enum AtomType
@@ -77,12 +82,88 @@ public:
 
 private:    
 
+    //========================================================================================================
+    /**
+    * EditorWindow_read_dicts
+    *
+    * ### MP toolbox EditorWindow function ###
+    *
+    * reads dictionaries
+    *
+    * @return void
+    */
     void read_dicts();
+
+    //========================================================================================================
+    /**
+    * EditorWindow_delete_dicts
+    *
+    * ### MP toolbox EditorWindow function ###
+    *
+    * delete dictionaries
+    *
+    * @return void
+    */
     void deleteDicts();
+
+    //========================================================================================================
+    /**
+    * EditorWindow_calc_scale_value
+    *
+    * ### MP toolbox EditorWindow function ###
+    *
+    * calculates scale value
+    *
+    * @return void
+    */
     void calc_scale_value();
+
+    //========================================================================================================
+    /**
+    * EditorWindow_calc_modu_value
+    *
+    * ### MP toolbox EditorWindow function ###
+    *
+    * calculates modulation value
+    *
+    * @return void
+    */
     void calc_modu_value();
+
+    //========================================================================================================
+    /**
+    * EditorWindow_calc_phase_value
+    *
+    * ### MP toolbox EditorWindow function ###
+    *
+    * calculates phase value
+    *
+    * @return void
+    */
     void calc_phase_value();
+
+    //========================================================================================================
+    /**
+    * EditorWindow_calc_chirp_value
+    *
+    * ### MP toolbox EditorWindow function ###
+    *
+    * calculates chirp value
+    *
+    * @return void
+    */
     void calc_chirp_value();
+
+    //========================================================================================================
+    /**
+    * EditorWindow_calc_atom_count_all_combined
+    *
+    * ### MP toolbox EditorWindow function ###
+    *
+    * calculates
+    *
+    * @return void
+    */
     void calc_atom_count_all_combined();
 
     QList<qreal> calc_lin_pos_parameters(qreal startValue, qreal linStepValue);
