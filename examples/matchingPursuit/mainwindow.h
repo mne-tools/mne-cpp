@@ -226,6 +226,10 @@ private slots:
 
     //==========================================================================================================
 
+    void recieve_warnings(qint32 warning_number);
+
+    //==========================================================================================================
+
     void calc_thread_finished();
     void on_actionCreate_treebased_dictionary_triggered();
     void on_dsb_from_editingFinished();
@@ -247,7 +251,7 @@ signals:
 
     void send_input(MatrixXd send_signal, qint32 send_max_iterations, qreal send_epsilon, bool fix_phase, qint32 boost, qint32 simplex_it,
                     qreal simplex_reflection, qreal simplex_expansion, qreal simplex_contraction, qreal simplex_full_contraction);
-    void send_input_fix_dict(MatrixXd send_signal, qint32 send_max_iterations, qreal send_epsilon, QString path);
+    void send_input_fix_dict(MatrixXd send_signal, qint32 send_max_iterations, qreal send_epsilon, qint32 boost, QString path);
 
 private:
     Ui::MainWindow *ui;    

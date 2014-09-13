@@ -819,9 +819,18 @@ void Enhancededitorwindow::on_pushButton_clicked()
                                             formula_parser.set_funct_const(7, temp_h);
 
                                             results_list.clear();
+                                            VectorXd formel_vec = VectorXd::Zero(_sample_count);
+                                            qreal norm = 0;
                                             for(qint32 i = 0; i < _sample_count; i++)
-                                                results_list.append( QString::number(formula_parser.calculation(ui->cb_AtomFormula->currentText(), i)));
+                                            {
+                                                formel_vec[i] = formula_parser.calculation(ui->cb_AtomFormula->currentText(), i);
 
+                                                //normalization
+                                                norm = formel_vec.norm();
+                                                if(norm != 0) formel_vec /= norm;
+
+                                                results_list.append(QString::number(formel_vec[i]));
+                                            }
                                             stream << QString("%1_ATOM_%2 \n %3: a: %4 b: %5 c: %6 d: %7 e: %8 f: %9 g: %10 h: %11")
                                                       .arg(ui->tb_atom_name->text())
                                                       .arg(atomIndex)

@@ -454,9 +454,8 @@ QList<GaborAtom> AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterat
             for(qint32 j = 0; j < gabor_Atom->sample_count; j++)
             {
                 residuum(j,chn) -= gabor_Atom->max_scalar_list.at(chn) * best_match[j];
-                gabor_Atom->energy += (gabor_Atom->max_scalar_list.at(chn) * best_match[j]) * (gabor_Atom->max_scalar_list.at(chn) * best_match[j]);
+                gabor_Atom->energy += pow(gabor_Atom->max_scalar_list.at(chn) * best_match[j], 2); // * (gabor_Atom->max_scalar_list.at(chn) * best_match[j]);
             }
-
         }
 
         residuum_energy -= gabor_Atom->energy;

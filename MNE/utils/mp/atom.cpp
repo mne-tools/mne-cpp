@@ -185,7 +185,7 @@ VectorXcd GaborAtom::create_complex(qint32 sample_count, qreal scale, quint32 tr
 VectorXd GaborAtom::create_real(qint32 sample_count, qreal scale, quint32 translation, qreal modulation, qreal phase)
 {
     VectorXd real_atom(sample_count);
-    qreal norm_atom = 0;
+    qreal norm = 0;
 
     if(scale == sample_count)
         for(qint32 i = 0; i < sample_count; i++)
@@ -198,14 +198,8 @@ VectorXd GaborAtom::create_real(qint32 sample_count, qreal scale, quint32 transl
     }
 
     //normalization
-    for(qint32 i = 0; i < sample_count; i++)
-        norm_atom += pow(real_atom[i], 2);
-
-    norm_atom = sqrt(norm_atom);
-
-    if(norm_atom != 0)
-        for(qint32 i = 0; i < sample_count; i++)
-            real_atom[i] = real_atom[i] / norm_atom;
+    norm = real_atom.norm();
+    if(norm != 0) real_atom /= norm;
 
     return real_atom; //length of the vector realAtom is 1 after normalization
 }
@@ -230,7 +224,7 @@ VectorXd ChirpAtom::gauss_function (qint32 sample_count, qreal scale, quint32 tr
 VectorXd ChirpAtom::create_real(qint32 sample_count, qreal scale, quint32 translation, qreal modulation, qreal phase, qreal chirp)
 {
     VectorXd real_atom(sample_count);
-    qreal norm_atom = 0;
+    qreal norm = 0;
 
 
     if(scale == sample_count)
@@ -244,14 +238,8 @@ VectorXd ChirpAtom::create_real(qint32 sample_count, qreal scale, quint32 transl
     }
 
     //normalization
-    for(qint32 i = 0; i < sample_count; i++)
-        norm_atom += pow(real_atom[i], 2);
-
-    norm_atom = sqrt(norm_atom);
-
-    if(norm_atom != 0)
-        for(qint32 i = 0; i < sample_count; i++)
-            real_atom[i] = real_atom[i] / norm_atom;
+    norm = real_atom.norm();
+    if(norm != 0) real_atom /= norm;
 
     return real_atom; //length of the vector realAtom is 1 after normalization
 }
