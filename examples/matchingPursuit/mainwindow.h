@@ -48,6 +48,22 @@
 #include <mne/mne.h>
 #include <utils/mp/atom.h>
 #include <utils/mp/adaptivemp.h>
+#include <utils/mp/fixdictmp.h>
+
+#include "editorwindow.h"
+#include "ui_editorwindow.h"
+#include "formulaeditor.h"
+#include "ui_formulaeditor.h"
+#include "enhancededitorwindow.h"
+#include "ui_enhancededitorwindow.h"
+#include "deletemessagebox.h"
+#include "ui_deletemessagebox.h"
+#include "processdurationmessagebox.h"
+#include "ui_processdurationmessagebox.h"
+#include "treebaseddictwindow.h"
+#include "ui_treebaseddictwindow.h"
+#include "settingwindow.h"
+#include "ui_settingwindow.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -254,6 +270,50 @@ signals:
     void send_input_fix_dict(MatrixXd send_signal, qint32 send_max_iterations, qreal send_epsilon, qint32 boost, QString path);
 
 private:
+
+    bool is_saved;
+
+    bool tbv_is_loading;
+    bool auto_change;
+    bool was_partialchecked;
+    bool come_from_sample_count;
+    bool come_from_from;
+
+    qreal to;
+    qreal signal_energy;
+
+    qint32 recieved_result_counter;
+    qint32 max_tbv_header_width = 280;
+
+    QString save_path;
+    QString file_name;
+    QString last_open_path;
+    QString last_save_path;
+
+    QMap<qint32, bool> select_channel_map;
+    QMap<qint32, bool> select_atoms_map;
+
+    QList<QColor> original_colors;
+    QList<GaborAtom> _adaptive_atom_list;
+    QList<FixDictAtom> _fix_dict_atom_list;
+
+    MatrixXd datas;
+    MatrixXd times;
+    MatrixXd original_signal_matrix;
+    MatrixXd real_residuum_matrix;
+
+    QTime counter_time;
+    QTimer *counter_timer;
+
+    QThread* mp_Thread;
+    AdaptiveMp *adaptive_Mp;
+    FixDictMp *fixDict_Mp ;
+
+    Formulaeditor *formula_editor;
+    EditorWindow *editor_window;
+    Enhancededitorwindow *enhanced_editor_window;
+    settingwindow *setting_window;
+
     Ui::MainWindow *ui;    
     GraphWindow *callGraphWindow;
     AtomSumWindow *callAtomSumWindow;
@@ -342,7 +402,8 @@ private:
     void save_parameters();
     void calc_fix_mp(QString path, MatrixXd signal, TruncationCriterion criterion);
     void closeEvent(QCloseEvent * event);
-    static bool sort_Energie(const GaborAtom atom_1, const GaborAtom atom_2);
+    static bool sort_energie_adaptive(const GaborAtom atom_1, const GaborAtom atom_2);
+    static bool sort_energie_fix(const FixDictAtom atom_1, const FixDictAtom atom_2);
     //end
 };
 
