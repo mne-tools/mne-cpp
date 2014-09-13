@@ -272,48 +272,29 @@ signals:
 private:
 
     bool is_saved;
-
     bool tbv_is_loading;
     bool auto_change;
     bool was_partialchecked;
     bool come_from_sample_count;
     bool come_from_from;
-
     qreal to;
     qreal signal_energy;
-
     qint32 recieved_result_counter;
     qint32 max_tbv_header_width = 280;
-
     QString save_path;
     QString file_name;
     QString last_open_path;
     QString last_save_path;
-
     QMap<qint32, bool> select_channel_map;
     QMap<qint32, bool> select_atoms_map;
-
     QList<QColor> original_colors;
     QList<GaborAtom> _adaptive_atom_list;
     QList<FixDictAtom> _fix_dict_atom_list;
-
     MatrixXd datas;
     MatrixXd times;
     MatrixXd original_signal_matrix;
     MatrixXd real_residuum_matrix;
-
     QTime counter_time;
-    QTimer *counter_timer;
-
-    QThread* mp_Thread;
-    AdaptiveMp *adaptive_Mp;
-    FixDictMp *fixDict_Mp ;
-
-    Formulaeditor *formula_editor;
-    EditorWindow *editor_window;
-    Enhancededitorwindow *enhanced_editor_window;
-    settingwindow *setting_window;
-
     Ui::MainWindow *ui;    
     GraphWindow *callGraphWindow;
     AtomSumWindow *callAtomSumWindow;

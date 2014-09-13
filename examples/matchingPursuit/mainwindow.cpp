@@ -90,6 +90,15 @@ MatrixXd _signal_matrix;
 MatrixXd _atom_sum_matrix;
 MatrixXd _residuum_matrix;
 
+QTimer *_counter_timer;
+QThread* mp_Thread;
+AdaptiveMp *adaptive_Mp;
+FixDictMp *fixDict_Mp ;
+Formulaeditor *_formula_editor;
+EditorWindow *_editor_window;
+Enhancededitorwindow *_enhanced_editor_window;
+settingwindow *_setting_window;
+
 //*************************************************************************************************************
 //=============================================================================================================
 // MAIN
@@ -147,12 +156,12 @@ MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::
     is_saved = true;
     _new_paint = true;
     _sample_rate = 1;
-    counter_timer = new QTimer();
+    _counter_timer = new QTimer();
 
     this->cb_model = new QStandardItemModel;
     connect(this->cb_model, SIGNAL(dataChanged ( const QModelIndex&, const QModelIndex&)), this, SLOT(cb_selection_changed(const QModelIndex&, const QModelIndex&)));
     connect(ui->tbv_Results->model(), SIGNAL(dataChanged ( const QModelIndex&, const QModelIndex&)), this, SLOT(tbv_selection_changed(const QModelIndex&, const QModelIndex&)));
-    connect(counter_timer, SIGNAL(timeout()), this, SLOT(on_time_out()));
+    connect(_counter_timer, SIGNAL(timeout()), this, SLOT(on_time_out()));
 
     qRegisterMetaType<Eigen::MatrixXd>("MatrixXd");
     qRegisterMetaType<Eigen::VectorXd>("VectorXd");
@@ -859,8 +868,8 @@ void MainWindow::on_btt_Calc_clicked()
 
         recieved_result_counter = 0;
         counter_time.start();
-        counter_timer->setInterval(100);
-        counter_timer->start();
+        _counter_timer->setInterval(100);
+        _counter_timer->start();
 
         if(ui->rb_OwnDictionary->isChecked())
         {
@@ -899,7 +908,7 @@ void MainWindow::on_time_out()
     QTime diff_time(0,0);
     diff_time = diff_time.addMSecs(counter_time.elapsed());
     ui->lb_timer->setText(diff_time.toString("hh:mm:ss.zzz"));
-    counter_timer->start();
+    _counter_timer->start();
 }
 
 //*************************************************************************************************************
@@ -1173,7 +1182,7 @@ void MainWindow::calc_thread_finished()
 {
     tbv_is_loading = true;
 
-    counter_timer->stop();
+    _counter_timer->stop();
     ui->frame->setEnabled(true);
     ui->btt_OpenSignal->setEnabled(true);
 
@@ -1317,18 +1326,17 @@ void MainWindow::calc_fix_mp(QString path, MatrixXd signal, TruncationCriterion 
 // Opens Dictionaryeditor
 void MainWindow::on_actionW_rterbucheditor_triggered()
 {        
-    if(editor_window == NULL)
+    if(_editor_window == NULL)
     {
-        editor_window = new EditorWindow();
-        connect(editor_window, SIGNAL(dict_saved()), this, SLOT(on_dicts_saved()));
+        _editor_window = new EditorWindow();
+        connect(_editor_window, SIGNAL(dict_saved()), this, SLOT(on_dicts_saved()));
     }
-    if(!editor_window->isVisible()) editor_window->show();
+    if(!_editor_window->isVisible()) _editor_window->show();
     else
     {
-        editor_window->setWindowState(Qt::WindowActive);
-        editor_window->raise();
+        _editor_window->setWindowState(Qt::WindowActive);
+        _editor_window->raise();
     }
-
 }
 
 //*****************************************************************************************************************
@@ -1336,17 +1344,17 @@ void MainWindow::on_actionW_rterbucheditor_triggered()
 // opens advanced Dictionaryeditor
 void MainWindow::on_actionErweiterter_W_rterbucheditor_triggered()
 {
-     if(enhanced_editor_window == NULL)
+     if(_enhanced_editor_window == NULL)
      {
-         enhanced_editor_window = new Enhancededitorwindow();
-         if(editor_window == NULL) editor_window = new EditorWindow();
-         connect(enhanced_editor_window, SIGNAL(dict_saved()), editor_window, SLOT(on_save_dicts()));
+         _enhanced_editor_window = new Enhancededitorwindow();
+         if(_editor_window == NULL) _editor_window = new EditorWindow();
+         connect(_enhanced_editor_window, SIGNAL(dict_saved()), _editor_window, SLOT(on_save_dicts()));
      }
-     if(!enhanced_editor_window->isVisible()) enhanced_editor_window->show();
+     if(!_enhanced_editor_window->isVisible()) _enhanced_editor_window->show();
      else
      {
-         enhanced_editor_window->setWindowState(Qt::WindowActive);
-         enhanced_editor_window->raise();
+         _enhanced_editor_window->setWindowState(Qt::WindowActive);
+         _enhanced_editor_window->raise();
      }
 }
 
@@ -1356,17 +1364,17 @@ void MainWindow::on_actionErweiterter_W_rterbucheditor_triggered()
 // opens formula editor
 void MainWindow::on_actionAtomformeleditor_triggered()
 {
-    if(formula_editor == NULL)
+    if(_formula_editor == NULL)
     {
-        formula_editor = new Formulaeditor();
-        if(enhanced_editor_window == NULL) enhanced_editor_window = new Enhancededitorwindow();
-        connect(formula_editor, SIGNAL(formula_saved()), enhanced_editor_window, SLOT(on_formula_saved()));
+        _formula_editor = new Formulaeditor();
+        if(_enhanced_editor_window == NULL) _enhanced_editor_window = new Enhancededitorwindow();
+        connect(_formula_editor, SIGNAL(formula_saved()), _enhanced_editor_window, SLOT(on_formula_saved()));
     }
-    if(!formula_editor->isVisible()) formula_editor->show();
+    if(!_formula_editor->isVisible()) _formula_editor->show();
     else
     {
-        formula_editor->setWindowState(Qt::WindowActive);
-        formula_editor->raise();
+        _formula_editor->setWindowState(Qt::WindowActive);
+        _formula_editor->raise();
     }
 }
 
@@ -1384,13 +1392,13 @@ void MainWindow::on_actionCreate_treebased_dictionary_triggered()
 // open settings
 void MainWindow::on_actionSettings_triggered()
 {
-    if(setting_window == NULL) setting_window = new settingwindow();
-    setting_window->set_values();
-    if(!setting_window->isVisible()) setting_window->show();
+    if(_setting_window == NULL) _setting_window = new settingwindow();
+    if(_setting_window != NULL) _setting_window->set_values();
+    if(!_setting_window->isVisible()) _setting_window->show();
     else
     {
-        setting_window->setWindowState(Qt::WindowActive);
-        setting_window->raise();
+        _setting_window->setWindowState(Qt::WindowActive);
+        _setting_window->raise();
     }
 }
 
