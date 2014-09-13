@@ -190,7 +190,7 @@ public:
 
     //=========================================================================================================
 
-    FixDictAtom correlation(Dictionary current_pdict);
+    FixDictAtom correlation(Dictionary current_pdict, MatrixXd current_resid);
 
     //=========================================================================================================
 
@@ -202,6 +202,20 @@ public:
 
     //=========================================================================================================
 
+    struct find_best_matching
+    {
+        Dictionary pdict;
+        MatrixXd current_resid;
+
+        FixDictAtom parallel_correlation() const
+        {
+            FixDictAtom best_matching;
+            FixDictMp fix_dict_mp;
+            best_matching = fix_dict_mp.correlation(this->pdict, this->current_resid);
+            return best_matching;
+        }
+    };
+
     QList<Dictionary> parse_xml_dict(QString path);
 
     //=========================================================================================================
@@ -210,11 +224,12 @@ public:
 
     //=========================================================================================================
 
-
+    QString create_display_text(FixDictAtom global_best_matching);
 
     //=========================================================================================================
 
     static void build_molecule_xml_file(qint32 level_counter);
+
 
 public slots:
 
@@ -249,6 +264,10 @@ struct parse_node
         return add_to_map;
     }
 };
+
+//=========================================================================================================
+
+
 
 }//NAMESPACE
 

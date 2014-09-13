@@ -73,7 +73,6 @@ public:
     //*********************************************************************************************************
 
     ~EditorWindow();
-
     enum AtomType
     {
              Gauss,
@@ -160,26 +159,205 @@ private:
     *
     * ### MP toolbox EditorWindow function ###
     *
-    * calculates
+    * calculates number of atoms for all combined
     *
     * @return void
     */
     void calc_atom_count_all_combined();
 
+    //========================================================================================================
+    /**
+    * EditorWindow_calc_lin_pos_parameters
+    *
+    * ### MP toolbox EditorWindow function ###
+    *
+    * calculates parameters for linear step width in positiv direction
+    *
+    * @param    startValue      start value
+    * @param    linStepValue    linear step width
+    *
+    * @return   QList<real>     parameters for linear step width in positiv direction
+    */
     QList<qreal> calc_lin_pos_parameters(qreal startValue, qreal linStepValue);
-    QList<qreal> calc_lin_neg_parameters(qreal startValue, qreal expStepValue);
-    QList<qreal> calc_exp_pos_parameters(qreal startValue, qreal linStepValue);
-    QList<qreal> calc_exp_neg_parameters(qreal startValue, qreal linStepValue);
 
+    //========================================================================================================
+    /**
+    * EditorWindow_calc_lin_neg_parameters
+    *
+    * ### MP toolbox EditorWindow function ###
+    *
+    * calculates parameters for linear step width in negativ direction
+    *
+    * @param    startValue      start value
+    * @param    linStepValue    linear step width
+    *
+    * @return   QList<real>     parameters for linear step width in negativ direction
+    */
+    QList<qreal> calc_lin_neg_parameters(qreal startValue, qreal linStepValue);
+
+    //========================================================================================================
+    /**
+    * EditorWindow_calc_exp_pos_parameters
+    *
+    * ### MP toolbox EditorWindow function ###
+    *
+    * calculates parameters for exponential step width in positiv direction
+    *
+    * @param    startValue      start value
+    * @param    expStepValue    exponential step width
+    *
+    * @return   QList<real>     parameters for exponential step width in positiv direction
+    */
+    QList<qreal> calc_exp_pos_parameters(qreal startValue, qreal expStepValue);
+
+    //========================================================================================================
+    /**
+    * EditorWindow_calc_exp_neg_parameters
+    *
+    * ### MP toolbox EditorWindow function ###
+    *
+    * calculates parameters for exponential step width negativ direction
+    *
+    * @param    startValue      start value
+    * @param    expStepValue    exponential step width
+    *
+    * @return   QList<real>     parameters for exponential step width in negativ direction
+    */
+    QList<qreal> calc_exp_neg_parameters(qreal startValue, qreal expStepValue);
+
+    //========================================================================================================
+    /**
+    * EditorWindow_calc_all_comb_parameter_values_scale
+    *
+    * ### MP toolbox EditorWindow function ###
+    *
+    * calculates scale parameters for "all combined"
+    *
+    * @param    startValue      start value
+    * @param    endValue        end value
+    * @param    linStepValue    linear step width
+    * @param    expStepValue    exponential step width
+    *
+    * @return   QList<real>     scale parameters for "all combined"
+    */
     QList<qreal> calc_all_comb_parameter_values_scale(qreal startValue, qreal endvalue, qreal linStepValue, qreal expStepValue);
+
+    //========================================================================================================
+    /**
+    * EditorWindow_calc_all_comb_parameter_values_modu
+    *
+    * ### MP toolbox EditorWindow function ###
+    *
+    * calculates modulation parameters for "all combined"
+    *
+    * @param    startValue      start value
+    * @param    endValue        end value
+    * @param    linStepValue    linear step width
+    * @param    expStepValue    exponential step width
+    *
+    * @return   QList<real>     modulation parameters for "all combined"
+    */
     QList<qreal> calc_all_comb_parameter_values_modu(qreal startValue, qreal endvalue, qreal linStepValue, qreal expStepValue);
+
+    //========================================================================================================
+    /**
+    * EditorWindow_calc_all_comb_parameter_values_phase
+    *
+    * ### MP toolbox EditorWindow function ###
+    *
+    * calculates phase parameters for "all combined"
+    *
+    * @param    startValue      start value
+    * @param    endValue        end value
+    * @param    linStepValue    linear step width
+    * @param    expStepValue    exponential step width
+    *
+    * @return   QList<real>     phase parameters for "all combined"
+    */
     QList<qreal> calc_all_comb_parameter_values_phase(qreal startValue, qreal endvalue, qreal linStepValue, qreal expStepValue);
+
+    //========================================================================================================
+    /**
+    * EditorWindow_calc_all_comb_parameter_values_chirp
+    *
+    * ### MP toolbox EditorWindow function ###
+    *
+    * calculates chirp parameters for "all combined"
+    *
+    * @param    startValue      start value
+    * @param    endValue        end value
+    * @param    linStepValue    linear step width
+    * @param    expStepValue    exponential step width
+    *
+    * @return   QList<real>     chirp parameters for "all combined"
+    */
     QList<qreal> calc_all_comb_parameter_values_chirp(qreal startValue, qreal endvalue, qreal linStepValue, qreal expStepValue);
 
+    //========================================================================================================
+    /**
+    * EditorWindow_calc_parameter_values_scale
+    *
+    * ### MP toolbox EditorWindow function ###
+    *
+    * calculates scale parameters
+    *
+    * @param    startValue      start value
+    * @param    linStepValue    linear step width
+    * @param    expStepValue    exponential step width
+    *
+    * @return   QList<real>     scale parameters
+    */
     QList<qreal> calc_parameter_values_scale(qreal startValue, qreal linStepValue, qreal expStepValue);
+
+    //========================================================================================================
+    /**
+    * EditorWindow_calc_parameter_values_modu
+    *
+    * ### MP toolbox EditorWindow function ###
+    *
+    * calculates modulation parameters
+    *
+    * @param    startValue      start value
+    * @param    linStepValue    linear step width
+    * @param    expStepValue    exponential step width
+    *
+    * @return   QList<real>     modulation parameters
+    */
     QList<qreal> calc_parameter_values_modu(qreal startValue, qreal linStepValue, qreal expStepValue);
+
+    //========================================================================================================
+    /**
+    * EditorWindow_calc_parameter_values_phase
+    *
+    * ### MP toolbox EditorWindow function ###
+    *
+    * calculates phase parameters
+    *
+    * @param    startValue      start value
+    * @param    linStepValue    linear step width
+    * @param    expStepValue    exponential step width
+    *
+    * @return   QList<real>     phase parameters
+    */
     QList<qreal> calc_parameter_values_phase(qreal startValue, qreal linStepValue, qreal expStepValue);
+
+    //========================================================================================================
+    /**
+    * EditorWindow_calc_parameter_values_chirp
+    *
+    * ### MP toolbox EditorWindow function ###
+    *
+    * calculates chirp parameters
+    *
+    * @param    startValue      start value
+    * @param    linStepValue    linear step width
+    * @param    expStepValue    exponential step width
+    *
+    * @return   QList<real>     chirp parameters
+    */
     QList<qreal> calc_parameter_values_chirp(qreal startValue, qreal linStepValue, qreal expStepValue);
+
+    //========================================================================================================
 
 private slots:    
     void on_btt_CalcAtoms_clicked();

@@ -178,6 +178,7 @@ private:
     * @return   qreal   end value of parameter
     */
     qreal calc_end_value(qreal startValue, qreal linStepValue);
+    // End ToDo Seb
 };
 
 #endif // ENHANCEDEDITORWINDOW_H
