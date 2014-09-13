@@ -266,6 +266,9 @@ border-radius: 4px;
           <property name="maximum">
            <double>1.000000000000000</double>
           </property>
+          <property name="singleStep">
+           <double>0.100000000000000</double>
+          </property>
          </widget>
         </item>
         <item row="3" column="1">
@@ -284,6 +287,9 @@ border-radius: 4px;
           </property>
           <property name="maximum">
            <double>1.000000000000000</double>
+          </property>
+          <property name="singleStep">
+           <double>0.100000000000000</double>
           </property>
          </widget>
         </item>
@@ -304,6 +310,9 @@ border-radius: 4px;
           <property name="maximum">
            <double>1.000000000000000</double>
           </property>
+          <property name="singleStep">
+           <double>0.100000000000000</double>
+          </property>
          </widget>
         </item>
         <item row="2" column="1">
@@ -322,6 +331,9 @@ border-radius: 4px;
           </property>
           <property name="maximum">
            <double>1.000000000000000</double>
+          </property>
+          <property name="singleStep">
+           <double>0.100000000000000</double>
           </property>
          </widget>
         </item>

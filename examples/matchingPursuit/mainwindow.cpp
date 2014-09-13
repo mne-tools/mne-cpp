@@ -102,14 +102,16 @@ bool _was_partialchecked = false;
 bool _come_from_sample_count = false;
 bool _come_from_from =false;
 
-qreal _from = 47.005f;
-qreal _to = 48.000f;
+qreal _from;
+qreal _to;
 qreal _signal_energy = 0.0;
 qreal _signal_maximum = 0.0;
 qreal _signal_negative_scale = 0.0;
 qreal _max_pos = 0.0;
 qreal _max_neg = 0.0;
 qreal _sample_rate = 1;
+
+qint32 _max_tbv_header_width = 280;
 
 QString _save_path = "";
 QString _file_name = "";
@@ -309,9 +311,9 @@ void MainWindow::open_file()
     if(_file_name.endsWith(".fif", Qt::CaseInsensitive))
     {        
         ui->dsb_from->setValue(47.000f);
-        ui->dsb_to->setValue(48.000f);
-        _from = 47.0000f;
-        _to = 48.0000f;
+        ui->dsb_to->setValue(47.999f);
+        _from = 47.000f;
+        _to = 47.999f;
         //read_fiff_ave(_file_name);
         read_fiff_file(_file_name);
         ui->lb_from->setHidden(false);
@@ -980,8 +982,8 @@ void MainWindow::on_btt_Calc_clicked()
             ui->tbv_Results->setHorizontalHeaderLabels(QString("energy\n[%];atom").split(";"));
             ui->tbv_Results->setColumnWidth(0,55);
             ui->tbv_Results->setColumnWidth(1,280);
-
-            calc_fix_mp(QString(QDir::homePath() + "/" + "Matching-Pursuit-Toolbox/%1.dict").arg(ui->cb_Dicts->currentText()), _signal_matrix.col(0), criterion);
+            _max_tbv_header_width = 0;
+            calc_fix_mp(QString(QDir::homePath() + "/" + "Matching-Pursuit-Toolbox/%1.dict").arg(ui->cb_Dicts->currentText()), _signal_matrix, criterion);
         }
         else if(ui->rb_adativMp->isChecked())
         {
@@ -991,26 +993,17 @@ void MainWindow::on_btt_Calc_clicked()
             ui->tbv_Results->setColumnWidth(1,45);
             ui->tbv_Results->setColumnWidth(2,40);
             ui->tbv_Results->setColumnWidth(3,40);
-            ui->tbv_Results->setColumnWidth(4,40);
+            ui->tbv_Results->setColumnWidth(4,50);
 
             calc_adaptiv_mp(_signal_matrix, criterion);
-        }
-
-        /* //ToDo: splitter
-        QList<qint32> sizes = ui->splitter->sizes();
-
-        sizes.insert(0, ui->tbv_Results->size().width() + 10);
-        ui->splitter->setSizes(sizes);
-        */
+        }        
     }
-
     //cancel calculation thread
     else if(ui->btt_Calc->text() == "cancel")
     {
         mp_Thread->requestInterruption();
         ui->btt_Calc->setText("wait...");
     }
-
 }
 
 //*************************************************************************************************************
@@ -1088,9 +1081,27 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
         ui->tbv_Results->setItem(index, 2, atomTranslationItem);
         ui->tbv_Results->setItem(index, 3, atomModulationItem);
         ui->tbv_Results->setItem(index, 4, atomPhaseItem);
+
+
+        QList<qint32> sizes = ui->splitter->sizes();
+        sizes.insert(0, 240);
+        ui->splitter->setSizes(sizes);
     }
     else if(adaptive_atom_res_list.isEmpty())
     {
+        QFont font;
+        QFontMetrics fm(font);
+        qint32 header_width = fm.width(fix_dict_atom_res_list.last().display_text) + 35;
+        if(header_width > _max_tbv_header_width)
+        {
+            ui->tbv_Results->setColumnWidth(1, header_width);
+            _max_tbv_header_width = header_width;
+
+            QList<qint32> sizes = ui->splitter->sizes();
+            sizes.insert(0, header_width + 90);
+            ui->splitter->setSizes(sizes);
+        }
+
         FixDictAtom temp_atom = fix_dict_atom_res_list.last();
         ui->tbv_Results->setRowCount(fix_dict_atom_res_list.length());
 
@@ -1114,7 +1125,6 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
         ui->tbv_Results->setItem(ui->tbv_Results->rowCount() - 1, 1, atom_name_item);
     }
 
-
     //update residuum and atom sum for painting and later save to hdd
     _residuum_matrix = residuum;
     _atom_sum_matrix = _signal_matrix - _residuum_matrix;
@@ -1137,6 +1147,11 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
     callAtomSumWindow->update();
     callResidumWindow->update();
     _tbv_is_loading = false;
+
+
+
+    //ToDo: splitter
+
 }
 
 //*************************************************************************************************************
@@ -1206,16 +1221,16 @@ void MainWindow::tbv_selection_changed(const QModelIndex& topLeft, const QModelI
             {
                 for(qint32 channels = 0; channels < _signal_matrix.cols(); channels++)
                 {
-                    _atom_sum_matrix.col(channels) += atom.max_scalar_list.at(channels) * atom.vector_list.at(channels);
-                    _residuum_matrix.col(channels) -= atom.max_scalar_list.at(channels) * atom.vector_list.at(channels);
+                    _atom_sum_matrix.col(channels) += atom.max_scalar_list.at(channels) * atom.vector_list.first();
+                    _residuum_matrix.col(channels) -= atom.max_scalar_list.at(channels) * atom.vector_list.first();
                 }
             }
             else
             {
                 for(qint32 channels = 0; channels < _signal_matrix.cols(); channels++)
                 {
-                    _atom_sum_matrix.col(channels) -= atom.max_scalar_list.at(channels) * atom.vector_list.at(channels);
-                    _residuum_matrix.col(channels) += atom.max_scalar_list.at(channels) * atom.vector_list.at(channels);
+                    _atom_sum_matrix.col(channels) -= atom.max_scalar_list.at(channels) * atom.vector_list.first();
+                    _residuum_matrix.col(channels) += atom.max_scalar_list.at(channels) * atom.vector_list.first();
                 }
             }
         }
@@ -1437,6 +1452,7 @@ void MainWindow::on_actionCreate_treebased_dictionary_triggered()
 void MainWindow::on_actionSettings_triggered()
 {
     if(_setting_window == NULL) _setting_window = new settingwindow();
+    _setting_window->set_values();
     if(!_setting_window->isVisible()) _setting_window->show();
     else
     {

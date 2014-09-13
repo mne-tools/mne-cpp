@@ -60,26 +60,20 @@ using namespace UTILSLIB;
 FixDictMp::FixDictMp()
 : it(0)
 , signal_energy(0)
-, current_energy(0)
-{
-    //future = new QFuture<FixDictAtom>;
-    //watcher = new QFutureWatcher<FixDictAtom>;
-}
-FixDictMp::~FixDictMp()
-{
-}
+, current_energy(0){}
 
-Dictionary::Dictionary()
-{
-}
-Dictionary::~Dictionary()
-{
-}
+FixDictMp::~FixDictMp(){}
+
+Dictionary::Dictionary(){}
+
+Dictionary::~Dictionary(){}
 
 //*************************************************************************************************************
 
 void FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal epsilon, QString path)
 {
+    Eigen::initParallel();
+
     std::cout << "\nFixDict Matching Pursuit Algorithm started...\n";
 
     //QList<qreal> atom_samples;
@@ -94,8 +88,8 @@ void FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal e
     signal_energy = 0;
     qreal residuum_energy = 0;
     qreal energy_threshold = 0;
-    qreal temp_energy = 0;
-    bool sample_count_mismatch = false;
+    //qreal temp_energy = 0;
+    //bool sample_count_mismatch = false;
 
     parsed_dicts = parse_xml_dict(path);
 
@@ -110,75 +104,68 @@ void FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal e
     }
     std::cout << "absolute energy of signal: " << residuum_energy << "\n";
 
-    VectorXd signalSamples = VectorXd::Zero(sample_count);    
-
     while(it < max_iterations && (energy_threshold < residuum_energy))
     {
-
-        FixDictAtom *fix_dict_atom = new FixDictAtom();
-
-        for(qint32 i = 0; i < sample_count; i++)
-            signalSamples[i] = residuum(i,0);
-
-        for (qint32 i = 0; i < parsed_dicts.length(); i++)
+        QList<find_best_matching> list_of_best;
+        for(qint32 i = 0; i < parsed_dicts.length(); i++)
         {
-            FixDictAtom current_best_matching = correlation(parsed_dicts.at(i));
-            if(i == 0)
-                //global_best_matching = parsed_dicts.at(i).atoms.first();
-                global_best_matching = current_best_matching;
-
-            else if(current_best_matching.max_scalar_product > global_best_matching.max_scalar_product)
-                global_best_matching = current_best_matching;
+            find_best_matching current_best_matching;
+            current_best_matching.pdict = parsed_dicts.at(i);
+            current_best_matching.current_resid = this->residuum;
+            list_of_best.append(current_best_matching);
+            //parsed_dicts.at(i).current_resid = this->residuum;
         }
 
-        QString display_text = "";
-        if(global_best_matching.type == AtomType::GABORATOM)
+        QFuture<FixDictAtom> mapped_best_matchings = QtConcurrent::mapped(list_of_best, &find_best_matching::parallel_correlation);// parse_threads;
+        mapped_best_matchings.waitForFinished();
+
+        //for (qint32 i = 0; i < parsed_dicts.length(); i++)
+        QFuture<FixDictAtom>::const_iterator i;
+
+        for (i = mapped_best_matchings.constBegin(); i != mapped_best_matchings.constEnd(); i++)
         {
-            display_text = QString("Gaboratom: scale: %0, translation: %1, modulation: %2, phase: %3")
-                    .arg(QString::number(global_best_matching.gabor_atom.scale, 'f', 2))
-                    .arg(QString::number(global_best_matching.translation, 'f', 2))
-                    .arg(QString::number(global_best_matching.gabor_atom.modulation, 'f', 2))
-                    .arg(QString::number(global_best_matching.gabor_atom.phase, 'f', 2));
+            //FixDictAtom current_best_matching = correlation(parsed_dicts.at(i));
+            if(i == mapped_best_matchings.constBegin())
+                global_best_matching = *i;
+            else if(i->max_scalar_product > global_best_matching.max_scalar_product)
+                global_best_matching = *i;
         }
-        else if(global_best_matching.type == AtomType::CHIRPATOM)
-        {
-            display_text = QString("Chripatom: scale: %0, translation: %1, modulation: %2, phase: %3, chirp: %4")
-                    .arg(QString::number(global_best_matching.chirp_atom.scale, 'f', 2))
-                    .arg(QString::number(global_best_matching.translation, 'f', 2))
-                    .arg(QString::number(global_best_matching.chirp_atom.modulation, 'f', 2))
-                    .arg(QString::number(global_best_matching.chirp_atom.phase, 'f', 2))
-                    .arg(QString::number(global_best_matching.chirp_atom.chirp, 'f', 2));
-        }
-        else if(global_best_matching.type == AtomType::FORMULAATOM)
-        {
-            display_text = QString("%0: a: %1, b: %2, c: %3, d: %4, e: %5, f: %6, g: %7, h: %8")
-                    .arg(global_best_matching.atom_formula)
-                    .arg(QString::number(global_best_matching.formula_atom.a, 'f', 2))
-                    .arg(QString::number(global_best_matching.formula_atom.b, 'f', 2))
-                    .arg(QString::number(global_best_matching.formula_atom.c, 'f', 2))
-                    .arg(QString::number(global_best_matching.formula_atom.d, 'f', 2))
-                    .arg(QString::number(global_best_matching.formula_atom.e, 'f', 2))
-                    .arg(QString::number(global_best_matching.formula_atom.f, 'f', 2))
-                    .arg(QString::number(global_best_matching.formula_atom.g, 'f', 2))
-                    .arg(QString::number(global_best_matching.formula_atom.h, 'f', 2));
-        }
-        global_best_matching.display_text = display_text;
+
+        global_best_matching.display_text = create_display_text(global_best_matching);
 
         VectorXd fitted_atom = VectorXd::Zero(this->residuum.rows());
+        VectorXd resized_atom = VectorXd::Zero(this->residuum.rows());
 
-        for(qint32 k = 0; k < fitted_atom.rows(); k++)
+        if(global_best_matching.vector_list.first().rows() > this->residuum.rows())
+            for(qint32 k = 0; k < this->residuum.rows(); k++)    
+                resized_atom[k] = global_best_matching.vector_list.first()[k + floor(global_best_matching.vector_list.first().rows() / 2) - floor(this->residuum.rows() / 2)];
+        else    resized_atom = global_best_matching.vector_list.first();
+
+
+        for(qint32 k = 0; k < resized_atom.rows(); k++)
+            if((k + global_best_matching.translation - floor(resized_atom.rows() / 2)) >= 0
+                    && (k + global_best_matching.translation - floor(resized_atom.rows() / 2)) < fitted_atom.rows())
+                    fitted_atom[(k + global_best_matching.translation - floor(resized_atom.rows() / 2))] += resized_atom[k];
+
+
+        for(qint32 chn = 0; chn < this->residuum.cols(); chn++)
         {
-            if((k + global_best_matching.translation - floor(global_best_matching.vector_list.first().rows() / 2)) >= 0
-                && (k + global_best_matching.translation - floor(global_best_matching.vector_list.first().rows() / 2)) < fitted_atom.rows())
-                    fitted_atom[(k + global_best_matching.translation - floor(global_best_matching.vector_list.first().rows() / 2))] += global_best_matching.vector_list.first()[k];
+            qreal scalarproduct = 0;
+            for(qint32 sample = 0; sample < this->residuum.rows(); sample++)
+                scalarproduct += (this->residuum(sample, chn) * fitted_atom[sample]);
+
+            global_best_matching.max_scalar_list.append(scalarproduct);//residuum(global_best_matching.translation, chn) / fitted_atom[global_best_matching.translation]);
+
+            for(qint32 k = 0; k < fitted_atom.rows(); k++)
+            {
+                this->residuum(k,chn) -= global_best_matching.max_scalar_list.at(chn) * fitted_atom[k];
+                global_best_matching.energy += global_best_matching.max_scalar_list.at(chn) * fitted_atom[k] * global_best_matching.max_scalar_list.at(chn) * fitted_atom[k];
+            }
         }
 
-        for(qint32 k = 0; k < fitted_atom.rows(); k++)
-        {
-            residuum(k,0) -= global_best_matching.max_scalar_product * fitted_atom[k];
-            cout << "\n" << residuum(k,0);
-            temp_energy += global_best_matching.max_scalar_product * fitted_atom[k] * global_best_matching.max_scalar_product * fitted_atom[k];
-        }
+        global_best_matching.vector_list.first() = fitted_atom;
+        //global_best_matching.max_scalar_list.append(global_best_matching.max_scalar_product);
+
 
         /*if(atom_samples.length() != sample_count && !sample_count_mismatch)
         {
@@ -190,22 +177,27 @@ void FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal e
             sample_count_mismatch = true;
         }*/
 
-        residuum_energy -= temp_energy;
-        current_energy += temp_energy;
+        for(qint32 channel = 0; channel < channel_count; channel++)
+        {
+            for(qint32 sample = 0; sample < sample_count; sample++)
+                residuum_energy += (residuum(sample, channel) * residuum(sample, channel));
+        }
 
-        global_best_matching.energy = temp_energy;
+
+        //residuum_energy -= global_best_matching.energy;
+        current_energy += global_best_matching.energy;
+
+        //global_best_matching.energy = temp_energy;
 
         fix_dict_list.append(global_best_matching);
 
         std::cout << "absolute energy of residuum: " << residuum_energy << "\n";
 
-        temp_energy = 0;
-
-        delete fix_dict_atom;
+        //   temp_energy = 0;
 
         it++;
 
-        emit current_result(it, max_iterations, current_energy, signal_energy, residuum, adaptive_list, fix_dict_list);
+        emit current_result(it, max_iterations, current_energy, signal_energy, this->residuum, adaptive_list, fix_dict_list);
 
         if( QThread::currentThread()->isInterruptionRequested())
             break;
@@ -220,55 +212,76 @@ void FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal e
 //*************************************************************************************************************
 
 // calc scalarproduct of Atom and Signal
-FixDictAtom FixDictMp::correlation(Dictionary current_pdict)
+FixDictAtom FixDictMp::correlation(Dictionary current_pdict, MatrixXd current_resid)
 {
     Eigen::FFT<double> fft;
     std::ptrdiff_t max_index;
-    VectorXcd fft_atom = VectorXcd::Zero(this->residuum.rows());
-    VectorXcd fft_signal = VectorXcd::Zero(this->residuum.rows());
-    VectorXcd fft_sig_atom = VectorXcd::Zero(this->residuum.rows());
-    VectorXd corr_coeffs = VectorXd::Zero(this->residuum.rows());
+    VectorXcd fft_atom = VectorXcd::Zero(current_resid.rows());
+
     FixDictAtom best_matching;
     qreal max_scalar_product = 0;
 
     for(qint32 i = 0; i < current_pdict.atoms.length(); i++)
     {
-        qint32 p = floor(this->residuum.rows() / 2);//translation
+        VectorXd fitted_atom = VectorXd::Zero(current_resid.rows());
+        qint32 p = floor(current_resid.rows() / 2);//translation
 
-        fft.fwd(fft_atom, current_pdict.atoms.at(i).vector_list.first());
+        VectorXd resized_atom = VectorXd::Zero(current_resid.rows());
 
-        fft.fwd(fft_signal, this->residuum.col(0));
+        if(current_pdict.atoms.at(i).vector_list.first().rows() > current_resid.rows())
+            for(qint32 k = 0; k < current_resid.rows(); k++)
+                resized_atom[k] = current_pdict.atoms.at(i).vector_list.first()[k + floor(current_pdict.atoms.at(i).vector_list.first().rows() / 2) - floor(current_resid.rows() / 2)];
+        else resized_atom = current_pdict.atoms.at(i).vector_list.first();
 
-        for( qint32 m = 0; m < this->residuum.rows(); m++)
-            fft_sig_atom[m] = fft_signal[m] * conj(fft_atom[m]);
+        if(resized_atom.rows() < current_resid.rows())
+            for(qint32 k = 0; k < resized_atom.rows(); k++)
+                fitted_atom[(k + p - floor(resized_atom.rows() / 2))] = resized_atom[k];
+        else fitted_atom = resized_atom;
 
-        fft.inv(corr_coeffs, fft_sig_atom);
+        fft.fwd(fft_atom, fitted_atom);
 
-        //find index of maximum correlation-coefficient to use in translation
-        max_scalar_product = corr_coeffs.maxCoeff(&max_index);
-
-        if(i == 0)
+        for(qint32 chn = 0; chn < current_resid.cols(); chn++)
         {
-            best_matching = current_pdict.atoms.at(i);
-            best_matching.max_scalar_product = max_scalar_product;
+            p = floor(current_resid.rows() / 2);//translation
+            VectorXd corr_coeffs = VectorXd::Zero(current_resid.rows());
+            VectorXcd fft_signal = VectorXcd::Zero(current_resid.rows());
+            VectorXcd fft_sig_atom = VectorXcd::Zero(current_resid.rows());
 
-            //adapting translation p to create atomtranslation correctly
-            if(max_index >= p) p = max_index - p;
-            else p = max_index + p;
+            fft.fwd(fft_signal, current_resid.col(chn));
 
-            best_matching.translation = p;
-        }
+            for( qint32 m = 0; m < current_resid.rows(); m++)
+                fft_sig_atom[m] = fft_signal[m] * conj(fft_atom[m]);
 
-        else if(max_scalar_product > best_matching.max_scalar_product)
-        {
-            best_matching = current_pdict.atoms.at(i);
-            best_matching.max_scalar_product = max_scalar_product;
+            fft.inv(corr_coeffs, fft_sig_atom);
 
-            //adapting translation p to create atomtranslation correctly
-            if(max_index >= p) p = max_index - p;
-            else p = max_index + p;
+            //find index of maximum correlation-coefficient to use in translation
+            max_scalar_product = corr_coeffs.maxCoeff(&max_index);
 
-            best_matching.translation = p;
+            if(i == 0)
+            {
+                best_matching = current_pdict.atoms.at(i);
+                best_matching.max_scalar_product = max_scalar_product;
+
+                //adapting translation p to create atomtranslation correctly
+                if(max_index >= p && current_resid.rows() % (2) == 0) p = max_index - p;
+                else if(max_index >= p && current_resid.rows() % (2) != 0) p = max_index - p - 1;
+                else p = max_index + p;
+
+                best_matching.translation = p;
+            }
+
+            else if(max_scalar_product > best_matching.max_scalar_product)
+            {
+                best_matching = current_pdict.atoms.at(i);
+                best_matching.max_scalar_product = max_scalar_product;
+
+                //adapting translation p to create atomtranslation correctly
+                if(max_index >= p && current_resid.rows() % (2) == 0) p = max_index - p;
+                else if(max_index >= p && current_resid.rows() % (2) != 0) p = max_index - p - 1;
+                else p = max_index + p;
+
+                best_matching.translation = p;
+            }
         }
     }
     best_matching.atom_formula = current_pdict.atom_formula;
@@ -300,16 +313,19 @@ QList<Dictionary> FixDictMp::parse_xml_dict(QString path)
         nodes_listed.append(node_list.at(i));
     }
 
-    //ToDo multithreading
-    //QFuture<Dictionary> var;
-
+    //multithreading
     QFuture<Dictionary> mapped_dicts = QtConcurrent::mapped(pdict_nodes, &parse_node::fill_dict_in_map);// parse_threads;
     mapped_dicts.waitForFinished();
 
     QFuture<Dictionary>::const_iterator i;
 
     for (i = mapped_dicts.constBegin(); i != mapped_dicts.constEnd(); i++)
+    {
+        //find_best_matching current_best_matching;
+        //current_best_matching.pdict = *i;
+        //current_best_matching.current_resid = this->residuum;
         parsed_dict.append(*i);
+    }
 
     std::cout << "   done.\n";
     return parsed_dict;
@@ -417,6 +433,45 @@ Dictionary FixDictMp::fill_dict(const QDomNode &pdict)
 qint32 Dictionary::atom_count()
 {
     return atoms.length();
+}
+
+//*************************************************************************************************************
+
+QString FixDictMp::create_display_text(FixDictAtom global_best_matching)
+{
+    QString display_text = "";
+    if(global_best_matching.type == AtomType::GABORATOM)
+    {
+        display_text = QString("Gaboratom: scale: %0, translation: %1, modulation: %2, phase: %3")
+                .arg(QString::number(global_best_matching.gabor_atom.scale, 'f', 2))
+                .arg(QString::number(global_best_matching.translation, 'f', 2))
+                .arg(QString::number(global_best_matching.gabor_atom.modulation, 'f', 2))
+                .arg(QString::number(global_best_matching.gabor_atom.phase, 'f', 2));
+    }
+    else if(global_best_matching.type == AtomType::CHIRPATOM)
+    {
+        display_text = QString("Chripatom: scale: %0, translation: %1, modulation: %2, phase: %3, chirp: %4")
+                .arg(QString::number(global_best_matching.chirp_atom.scale, 'f', 2))
+                .arg(QString::number(global_best_matching.translation, 'f', 2))
+                .arg(QString::number(global_best_matching.chirp_atom.modulation, 'f', 2))
+                .arg(QString::number(global_best_matching.chirp_atom.phase, 'f', 2))
+                .arg(QString::number(global_best_matching.chirp_atom.chirp, 'f', 2));
+    }
+    else if(global_best_matching.type == AtomType::FORMULAATOM)
+    {
+        display_text = QString("%0: a: %1, b: %2, c: %3, d: %4, e: %5, f: %6, g: %7, h: %8")
+                .arg(global_best_matching.atom_formula)
+                .arg(QString::number(global_best_matching.formula_atom.a, 'f', 2))
+                .arg(QString::number(global_best_matching.formula_atom.b, 'f', 2))
+                .arg(QString::number(global_best_matching.formula_atom.c, 'f', 2))
+                .arg(QString::number(global_best_matching.formula_atom.d, 'f', 2))
+                .arg(QString::number(global_best_matching.formula_atom.e, 'f', 2))
+                .arg(QString::number(global_best_matching.formula_atom.f, 'f', 2))
+                .arg(QString::number(global_best_matching.formula_atom.g, 'f', 2))
+                .arg(QString::number(global_best_matching.formula_atom.h, 'f', 2));
+    }
+
+    return display_text;
 }
 
 //*************************************************************************************************************
