@@ -584,15 +584,12 @@ void GraphWindow::paint_signal(MatrixXd signalMatrix, QSize windowSize)
 
     if(signalMatrix.rows() > 0 && signalMatrix.cols() > 0)
     {
-        qint32 i = 0;
         qint32 maxStrLenght = 55;           // max lenght in pixel of x-axis string
         qint32 borderMarginWidth = 5;       // reduce paintspace in GraphWindow of borderMargin pixels
         qint32 borderMarginHeigth = 15;     // reduce paintspace in GraphWindow of borderMargin pixels
         qreal maxPos = 0.0;                 // highest signalvalue
         qreal maxNeg = 0.0;                 // smalest signalvalue
         qreal maxmax = 0.0;                 // absolute difference maxpos - maxneg
-        QList<QPolygonF> polygons;          // points for drawing the signal
-        MatrixXd internSignalMatrix = signalMatrix; // intern representation of y-axis values of the signal (for painting only)
 
         qreal scaleYText = 0.0;
         qint32 negScale  = 0;
@@ -610,12 +607,10 @@ void GraphWindow::paint_signal(MatrixXd signalMatrix, QSize windowSize)
             _signal_maximum = maxmax;   // to globe abs_max
             _new_paint = false;
         }
-
         // scale axis title
         scaleYText = _signal_maximum / 10.0;
         negScale =  floor((_max_neg * 10 / _signal_maximum) + 0.5);
-        _signal_negative_scale = negScale;
-
+        _signal_negative_scale = negScale;  // to globe _signal_negative_scale
         while((windowSize.width() - maxStrLenght -borderMarginWidth) % 20) borderMarginWidth++;
 
         // scale signal
@@ -626,12 +621,8 @@ void GraphWindow::paint_signal(MatrixXd signalMatrix, QSize windowSize)
         qreal scaleXAchse = (qreal)(windowSize.width() - maxStrLenght - borderMarginWidth) / (qreal)20;
         qreal scaleYAchse = (qreal)(windowSize.height() - borderMarginHeigth) / (qreal)10;
 
-        i = 1;
-        while(i <= 11)
+        for(qint32 i = 1; i <= 11; i++)
         {
-            qreal scaledYText = negScale * scaleYText ;                             // scalevalue y-axis
-            QString string  = QString::number(scaledYText, 'g', 3);                 // scalevalue as string
-
             if(negScale == 0)                                                       // x-Axis reached (y-value = 0)
             {
                 // append scaled signalpoints
@@ -639,45 +630,31 @@ void GraphWindow::paint_signal(MatrixXd signalMatrix, QSize windowSize)
                 {
                     QPolygonF poly;
                     for(qint32 h =0; h < signalMatrix.rows(); h++)
-                        poly.append(QPointF((h * scaleX) + maxStrLenght,  -((internSignalMatrix(h, channel) * scaleY + ((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2))));
-                    polygons.append(poly);
+                        poly.append(QPointF((h * scaleX) + maxStrLenght,  -((signalMatrix(h, channel) * scaleY + ((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2))));
+                    QPen pen(_colors.at(channel), 0.5, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+                    painter.setPen(pen);
+                    painter.drawPolyline(poly);
                 }
-
                 // paint x-axis
-                qint32 j = 1;
-                while(j <= 21)
+                for(qint32 j = 1; j < 22; j++)
                 {
                     if(fmod(j, 4.0) == 0)
                     {
                         QPen pen(Qt::darkGray, 0.5, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
                         painter.setPen(pen);
                         painter.drawLine(j * scaleXAchse + maxStrLenght, -(((i - 1) * scaleYAchse)-(windowSize.height() - borderMarginHeigth / 2 - windowSize.height())), j * scaleXAchse + maxStrLenght , -(((i - 1) * scaleYAchse)-(windowSize.height() - borderMarginHeigth / 2 + windowSize.height())));   // scalelines
-                    }                   
+                    }
                     QPen pen(Qt::black, 1, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
                     painter.setPen(pen);
                     painter.drawLine(j * scaleXAchse + maxStrLenght, -(((i - 1) * scaleYAchse)-(windowSize.height() - borderMarginHeigth / 2 - 2)), j * scaleXAchse + maxStrLenght , -(((i - 1) * scaleYAchse)-(windowSize.height() - borderMarginHeigth / 2 + 2)));   // scalelines
-
-                    j++;
                 }
                 painter.drawLine(maxStrLenght, -(((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2), windowSize.width()-5, -(((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2));
             }
-
-            painter.drawText(3, -((i - 1) * scaleYAchse - windowSize.height()) - borderMarginHeigth/2 + 4, string);     // paint scalevalue y-axis
+            painter.drawText(3, -((i - 1) * scaleYAchse - windowSize.height()) - borderMarginHeigth/2 + 4, QString::number(negScale * scaleYText, 'g', 3));     // paint scalevalue y-axis
             painter.drawLine(maxStrLenght - 2, -(((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2), maxStrLenght + 2, -(((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2));  // scalelines y-axis
-            i++;
             negScale++;
         }
-
-        painter.drawLine(maxStrLenght, 2, maxStrLenght, windowSize.height() - 2);     // paint y-axis
-
-
-
-        for(qint32 channel = 0; channel < signalMatrix.cols(); channel++)             // Butterfly
-        {
-            QPen pen(_colors.at(channel), 0.5, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
-            painter.setPen(pen);
-            painter.drawPolyline(polygons.at(channel));                               // paint signal
-        }
+        painter.drawLine(maxStrLenght, 2, maxStrLenght, windowSize.height() - 2);     // paint y-axis       
     }
     painter.end();    
 }
@@ -702,12 +679,9 @@ void AtomSumWindow::paint_atom_sum(MatrixXd atom_matrix, QSize windowSize, qreal
     // can also checked of zerovector, then you paint no empty axis
     if(atom_matrix.rows() > 0 && atom_matrix.cols() > 0  && _signal_matrix.rows() > 0 && _signal_matrix.cols() > 0)
     {
-        qint32 i = 0;
         qint32 maxStrLenght = 55;
         qint32 borderMarginHeigth = 15;                     // reduce paintspace in GraphWindow of borderMargin pixels
         qint32 borderMarginWidth = 5;                       // reduce paintspace in GraphWindow of borderMargin pixels
-        QList<QPolygonF> polygons;                          // points for drawing the signal
-        MatrixXd internSignalMatrix = atom_matrix;          // intern representation of y-axis values of the signal (for painting only)
 
         // scale axis title
         qreal scaleYText = (qreal)signalMaximum / (qreal)10;
@@ -715,21 +689,15 @@ void AtomSumWindow::paint_atom_sum(MatrixXd atom_matrix, QSize windowSize, qreal
          while((windowSize.width() - maxStrLenght -borderMarginWidth) % 20)borderMarginWidth++;
 
         // scale signal
-        qreal scaleX = ((qreal)(windowSize.width() - maxStrLenght - borderMarginWidth))/ (qreal)atom_matrix.rows();
+        qreal scaleX = ((qreal)(windowSize.width() - maxStrLenght - borderMarginWidth)) / (qreal)atom_matrix.rows();
         qreal scaleY = (qreal)(windowSize.height() - borderMarginHeigth) / (qreal)signalMaximum;
 
         //scale axis
         qreal scaleXAchse = (qreal)(windowSize.width() - maxStrLenght - borderMarginWidth) / (qreal)20;
         qreal scaleYAchse = (qreal)(windowSize.height() - borderMarginHeigth) / (qreal)10;     
 
-        i = 1;
-        while(i <= 11)
+        for(qint32 i = 1; i <= 11; i++)
         {
-            QString string;
-
-            qreal scaledYText = signalNegativeMaximum * scaleYText;                 // scala Y-axis
-            string  = QString::number(scaledYText, 'g', 3);                         // scala as string
-
             if(signalNegativeMaximum == 0)                                          // x-Axis reached (y-value = 0)
             {
                 // append scaled signalpoints
@@ -737,12 +705,13 @@ void AtomSumWindow::paint_atom_sum(MatrixXd atom_matrix, QSize windowSize, qreal
                 {
                     QPolygonF poly;                   
                     for(qint32 h = 0; h < atom_matrix.rows(); h++)
-                        poly.append(QPointF((h * scaleX) + maxStrLenght,  -((internSignalMatrix(h, channel) * scaleY + ((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2))));
-                    polygons.append(poly);
+                        poly.append(QPointF((h * scaleX) + maxStrLenght,  -((atom_matrix(h, channel) * scaleY + ((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2))));
+                    QPen pen(_colors.at(channel), 0.5, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+                    painter.setPen(pen);
+                    painter.drawPolyline(poly);
                 }                
-                // paint x-axis
-                qint32 j = 1;
-                while(j <= 21)
+                // paint x-axis                
+                for(qint32 j = 1; j < 22; j++)
                 {
                     if(fmod(j, 4.0) == 0)
                     {
@@ -753,25 +722,15 @@ void AtomSumWindow::paint_atom_sum(MatrixXd atom_matrix, QSize windowSize, qreal
                     QPen pen(Qt::black, 1, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
                     painter.setPen(pen);
                     painter.drawLine(j * scaleXAchse + maxStrLenght, -(((i - 1) * scaleYAchse)-(windowSize.height() - borderMarginHeigth / 2 - 2)), j * scaleXAchse + maxStrLenght , -(((i - 1) * scaleYAchse)-(windowSize.height() - borderMarginHeigth / 2 + 2)));   // scalelines
-
-                    j++;
                 }
                 painter.drawLine(maxStrLenght, -(((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2), windowSize.width()-5, -(((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2));
             }
 
-            painter.drawText(3, -((i - 1) * scaleYAchse - windowSize.height()) - borderMarginHeigth/2 + 4, string);     // paint scalvalue Y-axis
+            painter.drawText(3, -((i - 1) * scaleYAchse - windowSize.height()) - borderMarginHeigth/2 + 4, QString::number(signalNegativeMaximum * scaleYText, 'g', 3));     // paint scalvalue Y-axis
             painter.drawLine(maxStrLenght - 2, -(((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2), maxStrLenght + 2, -(((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2));  // scalelines y-axis
-            i++;
             signalNegativeMaximum++;
         }
-        painter.drawLine(maxStrLenght, 2, maxStrLenght, windowSize.height() - 2);     // paint y-axis
-
-        for(qint32 channel = 0; channel < atom_matrix.cols(); channel++)             // Butterfly
-        {
-            QPen pen(_colors.at(channel), 0.5, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
-            painter.setPen(pen);
-            painter.drawPolyline(polygons.at(channel));                               // paint signal
-        }
+        painter.drawLine(maxStrLenght, 2, maxStrLenght, windowSize.height() - 2);     // paint y-axis      
     }
     painter.end();
 }
@@ -795,12 +754,9 @@ void ResiduumWindow::paint_residuum(MatrixXd residuum_matrix, QSize windowSize, 
 
     if(residuum_matrix.rows() > 0 && residuum_matrix.cols() > 0 && _signal_matrix.rows() > 0 && _signal_matrix.cols() > 0)
     {
-        qint32 i = 1;
         qint32 maxStrLenght = 55;
         qint32 borderMarginHeigth = 15;                 // reduce paintspace in GraphWindow of borderMargin pixels
         qint32 borderMarginWidth = 5;                   // reduce paintspace in GraphWindow of borderMargin pixels
-        QList<QPolygonF> polygons;                      // points for drawing the signal
-        MatrixXd internSignalVector = residuum_matrix;  // intern representation of y-axis values of the signal (for painting only)
 
         // scale axis title
         qreal scaleYText = (qreal)signalMaximum / (qreal)10;
@@ -815,11 +771,8 @@ void ResiduumWindow::paint_residuum(MatrixXd residuum_matrix, QSize windowSize, 
         qreal scaleXAchse = (qreal)(windowSize.width() - maxStrLenght - borderMarginWidth) / (qreal)20;
         qreal scaleYAchse = (qreal)(windowSize.height() - borderMarginHeigth) / (qreal)10;
 
-        while(i <= 11)
-        {            
-            qreal scaledYText = signalNegativeMaximum * scaleYText;                     // scalevalue y-axis
-            QString string  = QString::number(scaledYText, 'g', 3);                     // scalevalue as string
-
+        for(qint32 i = 1; i <= 11; i++)
+        {
             if(signalNegativeMaximum == 0)                                              // x-axis reached (y-value = 0)
             {
                 // append scaled signalpoints
@@ -827,11 +780,13 @@ void ResiduumWindow::paint_residuum(MatrixXd residuum_matrix, QSize windowSize, 
                 {
                     QPolygonF poly;                    
                     for(qint32 h = 0; h < residuum_matrix.rows(); h++)
-                        poly.append(QPointF((h * scaleX) + maxStrLenght,  -((internSignalVector(h, channel) * scaleY + ((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2))));
-                    polygons.append(poly);
-                }                
-                qint32 j = 1;
-                while(j <= 21)
+                        poly.append(QPointF((h * scaleX) + maxStrLenght,  -((residuum_matrix(h, channel) * scaleY + ((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2))));
+                    QPen pen(_colors.at(channel), 0.5, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
+                    painter.setPen(pen);
+                    painter.drawPolyline(poly);
+                }
+                // paint x-axis
+                for(qint32 j = 1; j < 22; j++)
                 {
                     if(fmod(j, 4.0) == 0)
                     {
@@ -842,27 +797,16 @@ void ResiduumWindow::paint_residuum(MatrixXd residuum_matrix, QSize windowSize, 
                     QPen pen(Qt::black, 1, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
                     painter.setPen(pen);
                     painter.drawLine(j * scaleXAchse + maxStrLenght, -(((i - 1) * scaleYAchse)-(windowSize.height() - borderMarginHeigth / 2 - 2)), j * scaleXAchse + maxStrLenght , -(((i - 1) * scaleYAchse)-(windowSize.height() - borderMarginHeigth / 2 + 2)));   // scalelines
-
-                    j++;
                 }
-                // paint x-axis               
                 painter.drawLine(maxStrLenght, -(((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2), windowSize.width()-5, -(((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2));
             }
 
-            painter.drawText(3, -((i - 1) * scaleYAchse - windowSize.height()) - borderMarginHeigth/2 + 4, string);     // paint scalevalue y-axis
+            painter.drawText(3, -((i - 1) * scaleYAchse - windowSize.height()) - borderMarginHeigth/2 + 4, QString::number(signalNegativeMaximum * scaleYText, 'g', 3));     // paint scalevalue y-axis
             painter.drawLine(maxStrLenght - 2, -(((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2), maxStrLenght + 2, -(((i - 1) * scaleYAchse)-(windowSize.height()) + borderMarginHeigth / 2));  // scalelines y-axis
-            i++;
             signalNegativeMaximum++;
         }
 
         painter.drawLine(maxStrLenght, 2, maxStrLenght, windowSize.height() - 2);       // paint y-axis
-
-        for(qint32 channel = 0; channel < residuum_matrix.cols(); channel++)            // Butterfly
-        {
-            QPen pen(_colors.at(channel), 0.5, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
-            painter.setPen(pen);
-            painter.drawPolyline(polygons.at(channel));                                 // paint signal
-        }
     }
     painter.end();
 }
@@ -1018,6 +962,7 @@ void MainWindow::on_time_out()
 
 //*************************************************************************************************************
 
+qint32 counter = 0;
 void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations, qreal current_energy, qreal max_energy, MatrixXd residuum,
                                 adaptive_atom_list adaptive_atom_res_list, fix_dict_atom_list fix_dict_atom_res_list)
 {
@@ -1086,6 +1031,13 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
         QList<qint32> sizes = ui->splitter->sizes();
         sizes.insert(0, 240);
         ui->splitter->setSizes(sizes);
+
+        for(qint32 i = 0; i < _signal_matrix.cols(); i++)
+        {
+            VectorXd atom_vec = temp_atom.max_scalar_list.at(i) * temp_atom.create_real(temp_atom.sample_count, temp_atom.scale, temp_atom.translation, temp_atom.modulation, temp_atom.phase_list.at(i));
+            _residuum_matrix.col(i) -= atom_vec;
+            _atom_sum_matrix.col(i) += atom_vec;
+        }
     }
     else if(adaptive_atom_res_list.isEmpty())
     {
@@ -1123,11 +1075,18 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
 
         ui->tbv_Results->setItem(ui->tbv_Results->rowCount()- 1, 0, atom_energie_item);
         ui->tbv_Results->setItem(ui->tbv_Results->rowCount() - 1, 1, atom_name_item);
+
+
+        for(qint32 i = 0; i < _signal_matrix.cols(); i++)
+        {
+            _residuum_matrix.col(i) -= fix_dict_atom_res_list.last().max_scalar_list.at(i) * fix_dict_atom_res_list.last().vector_list.first();
+            _atom_sum_matrix.col(i) += fix_dict_atom_res_list.last().max_scalar_list.at(i) * fix_dict_atom_res_list.last().vector_list.first();
+        }
     }
 
     //update residuum and atom sum for painting and later save to hdd
-    _residuum_matrix = residuum;
-    _atom_sum_matrix = _signal_matrix - _residuum_matrix;
+    //_residuum_matrix = residuum;
+    //_atom_sum_matrix = _signal_matrix - _residuum_matrix;
 
     //progressbar update
     qint32 prgrsbar_adapt = 99;
@@ -1144,13 +1103,21 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
     if(((current_iteration == max_iterations) || (max_energy - current_energy) < (0.01 * percent * max_energy))&&ui->chb_ResEnergy->isChecked())
         ui->progressBarCalc->setValue(ui->progressBarCalc->maximum());
 
+    if(counter % 10 == 0)
+    {
     callAtomSumWindow->update();
     callResidumWindow->update();
+    }
     _tbv_is_loading = false;
+    counter++;
+
+}
 
 
+//*************************************************************************************************************
 
-    //ToDo: splitter
+void MainWindow::recieve_warnings(qint32 warning_number)
+{
 
 }
 
@@ -1351,8 +1318,8 @@ void MainWindow::calc_fix_mp(QString path, MatrixXd signal, TruncationCriterion 
     mp_Thread = new QThread;
     fixDict_Mp->moveToThread(mp_Thread);    
 
-    connect(this, SIGNAL(send_input_fix_dict(MatrixXd, qint32, qreal, QString)),
-            fixDict_Mp, SLOT(recieve_input(MatrixXd, qint32, qreal, QString)));
+    connect(this, SIGNAL(send_input_fix_dict(MatrixXd, qint32, qreal, qint32, QString)),
+            fixDict_Mp, SLOT(recieve_input(MatrixXd, qint32, qreal, qint32, QString)));
     connect(fixDict_Mp, SIGNAL(current_result(qint32, qint32, qreal, qreal, MatrixXd, adaptive_atom_list, fix_dict_atom_list)),
                   this, SLOT(recieve_result(qint32, qint32, qreal, qreal, MatrixXd, adaptive_atom_list, fix_dict_atom_list)));
     connect(fixDict_Mp, SIGNAL(finished_calc()), mp_Thread, SLOT(quit()));
@@ -1360,20 +1327,25 @@ void MainWindow::calc_fix_mp(QString path, MatrixXd signal, TruncationCriterion 
     connect(mp_Thread, SIGNAL(finished()), this, SLOT(calc_thread_finished()));
     connect(mp_Thread, SIGNAL(finished()), mp_Thread, SLOT(deleteLater()));
 
+    connect(fixDict_Mp, SIGNAL(send_warning(qint32)), this, SLOT(recieve_warnings(qint32)));
+
+    QSettings settings;
+    qint32 boost = settings.value("boost", 100).toInt();
+
     switch(criterion)
     {
         case Iterations:
-            emit send_input_fix_dict(signal, ui->sb_Iterations->value(), qreal(MININT32), path);
+            emit send_input_fix_dict(signal, ui->sb_Iterations->value(), qreal(MININT32), boost, path);
             mp_Thread->start();
             break;
 
         case SignalEnergy:
-            emit send_input_fix_dict(signal, MAXINT32, res_energy, path);
+            emit send_input_fix_dict(signal, MAXINT32, res_energy, boost, path);
             mp_Thread->start();
             break;
 
         case Both:
-            emit send_input_fix_dict(signal, ui->sb_Iterations->value(), res_energy, path);
+            emit send_input_fix_dict(signal, ui->sb_Iterations->value(), res_energy, boost, path);
             mp_Thread->start();
             break;
     }

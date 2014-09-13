@@ -132,6 +132,7 @@ public:
     AtomType type;
     QString source;
     QString atom_formula;
+    qint32 sample_count;
 
     qint32 atom_count();
 
@@ -190,7 +191,7 @@ public:
 
     //=========================================================================================================
 
-    FixDictAtom correlation(Dictionary current_pdict, MatrixXd current_resid);
+    FixDictAtom correlation(Dictionary current_pdict, MatrixXd current_resid, qint32 boost);
 
     //=========================================================================================================
 
@@ -206,12 +207,13 @@ public:
     {
         Dictionary pdict;
         MatrixXd current_resid;
+        qint32 boost;
 
         FixDictAtom parallel_correlation() const
         {
             FixDictAtom best_matching;
             FixDictMp fix_dict_mp;
-            best_matching = fix_dict_mp.correlation(this->pdict, this->current_resid);
+            best_matching = fix_dict_mp.correlation(this->pdict, this->current_resid, this->boost);
             return best_matching;
         }
     };
@@ -233,9 +235,9 @@ public:
 
 public slots:
 
-    void matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal epsilon, QString path);
+    void matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal epsilon, qint32 boost, QString path);
 
-    void recieve_input(MatrixXd signal, qint32 max_iterations, qreal epsilon, QString path);
+    void recieve_input(MatrixXd signal, qint32 max_iterations, qreal epsilon, qint32 boost, QString path);
 
     //=========================================================================================================
 
@@ -247,6 +249,7 @@ signals:
     void finished_calc();
 
     void parse_in_thread();
+    void send_warning(qint32 warning);
 
 };//class
 
