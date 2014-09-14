@@ -77,6 +77,7 @@ using namespace DISPLIB;
 //=============================================================================================================
 
 bool _new_paint;
+bool _has_warning;
 
 qreal _from;
 qreal _max_pos;
@@ -105,44 +106,41 @@ settingwindow *_setting_window;
 //=============================================================================================================
 MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::MainWindow)
 {
-    ui->setupUi(this);
+    ui->setupUi(this);    
+
+    this->setMinimumSize(832, 500);
     callGraphWindow = new GraphWindow();    
     callGraphWindow->setMinimumHeight(140);
     callGraphWindow->setMinimumWidth(500);
-    callGraphWindow->setMaximumHeight(400);
     ui->l_Graph->addWidget(callGraphWindow);
 
     callAtomSumWindow = new AtomSumWindow();
     callAtomSumWindow->setMinimumHeight(140);
     callAtomSumWindow->setMinimumWidth(500);
-    callAtomSumWindow->setMaximumHeight(400);
     ui->l_atoms->addWidget(callAtomSumWindow);
 
     callResidumWindow = new ResiduumWindow();
     callResidumWindow->setMinimumHeight(140);
     callResidumWindow->setMinimumWidth(500);
-    callResidumWindow->setMaximumHeight(400);
     ui->l_res->addWidget(callResidumWindow);
 
     callYAxisWindow = new YAxisWindow();
-    callYAxisWindow->setMinimumHeight(22);
-    callYAxisWindow->setMinimumWidth(500);
-    callYAxisWindow->setMaximumHeight(22);
+    callYAxisWindow->setMaximumHeight(0);
     ui->l_YAxis->addWidget(callYAxisWindow);
 
     // set progressbar
     ui->progressBarCalc->setMinimum(0);
     ui->progressBarCalc->setHidden(true);
-    ui->splitter->setStretchFactor(1,4);    
+    ui->splitter->setStretchFactor(1,4);
 
-    ui->lb_save_file->setHidden(true);
     ui->lb_from->setHidden(true);
     ui->dsb_from->setHidden(true);
     ui->lb_to->setHidden(true);
     ui->dsb_to->setHidden(true);
     ui->lb_samples->setHidden(true);
     ui->sb_sample_count->setHidden(true);
-    ui->cb_all_select->setEnabled(false);
+    ui->cb_all_select->setHidden(true);
+    ui->lb_timer->setHidden(true);
 
     // set result tableview
     ui->tbv_Results->setColumnCount(5);
@@ -262,6 +260,9 @@ void MainWindow::open_file()
     }
     file.close();
 
+    ui->cb_all_select->setHidden(true);   
+    ui->lb_timer->setHidden(true);
+
     if(file_name.endsWith(".fif", Qt::CaseInsensitive))
     {        
         ui->dsb_from->setValue(47.000f);
@@ -293,6 +294,8 @@ void MainWindow::open_file()
     original_signal_matrix.resize(_signal_matrix.rows(), _signal_matrix.cols());
     original_signal_matrix = _signal_matrix;
     ui->tbv_Results->setRowCount(0);
+    callYAxisWindow->setMinimumHeight(22);
+    callYAxisWindow->setMaximumHeight(22);
 
     fill_channel_combobox();
 
@@ -301,6 +304,8 @@ void MainWindow::open_file()
 
     ui->progressBarCalc->reset();
     ui->progressBarCalc->setVisible(false);
+    ui->lb_info_content->setText("");
+    _has_warning = false;
 
     _new_paint = true;
     update();   
@@ -445,6 +450,11 @@ void MainWindow::read_fiff_file_new(QString file_name)
     _atom_sum_matrix.resize(_signal_matrix.rows(), _signal_matrix.cols()); //resize
     _residuum_matrix.resize(_signal_matrix.rows(), _signal_matrix.cols()); //resize
 
+    ui->lb_info_content->setText("");
+    ui->cb_all_select->setHidden(true);    
+    ui->lb_timer->setHidden(true);
+
+    _has_warning = false;  
     _new_paint = true;
     update();
 }
@@ -530,9 +540,11 @@ void GraphWindow::paintEvent(QPaintEvent* event)
 
 void GraphWindow::paint_signal(MatrixXd signalMatrix, QSize windowSize)
 {
+
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing, true);
     painter.fillRect(0,0,windowSize.width(),windowSize.height(),QBrush(Qt::white));     // paint window white
+    painter.drawRect(0,0, windowSize.width(), windowSize.height());
 
     if(signalMatrix.rows() > 0 && signalMatrix.cols() > 0)
     {
@@ -627,6 +639,7 @@ void AtomSumWindow::paint_atom_sum(MatrixXd atom_matrix, QSize windowSize, qreal
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing, true);
     painter.fillRect(0,0,windowSize.width(),windowSize.height(),QBrush(Qt::white));
+    painter.drawRect(0,0, windowSize.width(), windowSize.height());
 
     // can also checked of zerovector, then you paint no empty axis
     if(atom_matrix.rows() > 0 && atom_matrix.cols() > 0  && _signal_matrix.rows() > 0 && _signal_matrix.cols() > 0)
@@ -701,6 +714,7 @@ void ResiduumWindow::paint_residuum(MatrixXd residuum_matrix, QSize windowSize, 
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing, true);
     painter.fillRect(0,0,windowSize.width(),windowSize.height(),QBrush(Qt::white));
+    painter.drawRect(0,0, windowSize.width(), windowSize.height());
 
     if(residuum_matrix.rows() > 0 && residuum_matrix.cols() > 0 && _signal_matrix.rows() > 0 && _signal_matrix.cols() > 0)
     {
@@ -773,7 +787,6 @@ void YAxisWindow::paint_axis(MatrixXd signalMatrix, QSize windowSize)
 {
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing, true);
-    painter.fillRect(0,0,windowSize.width(),windowSize.height(),QBrush(Qt::white));
 
     if(signalMatrix.rows() > 0 && signalMatrix.cols() > 0)
     {
@@ -854,15 +867,18 @@ void MainWindow::on_btt_Calc_clicked()
         ui->dsb_from->setEnabled(false);
         ui->dsb_to->setEnabled(false);
         ui->sb_sample_count ->setEnabled(false);
-
         ui->tbv_Results->setRowCount(0);
-        ui->lb_IterationsProgressValue->setText("0");
-        ui->lb_RestEnergieResiduumValue->setText("0");
+        ui->cb_all_select->setHidden(false);
+        ui->lb_timer->setHidden(false);
+
         _adaptive_atom_list.clear();
         _fix_dict_atom_list.clear();
+
         is_saved = false;
+        _has_warning = false;
+
         _residuum_matrix = _signal_matrix;
-        _atom_sum_matrix = MatrixXd::Zero(_signal_matrix.rows(), _signal_matrix.cols());
+        _atom_sum_matrix = MatrixXd::Zero(_signal_matrix.rows(), _signal_matrix.cols());      
         callAtomSumWindow->update();
         callResidumWindow->update();
 
@@ -882,6 +898,11 @@ void MainWindow::on_btt_Calc_clicked()
         }
         else if(ui->rb_adativMp->isChecked())
         {
+            QList<qint32> sizes = ui->splitter->sizes();
+            sizes.insert(0, 240);
+            ui->splitter->setSizes(sizes);
+            max_tbv_header_width = 150;
+
             ui->tbv_Results->setColumnCount(5);
             ui->tbv_Results->setHorizontalHeaderLabels(QString("energy\n[%];scale\n[sec];trans\n[sec];modu\n[Hz];phase\n[rad]").split(";"));
             ui->tbv_Results->setColumnWidth(0,55);
@@ -920,10 +941,6 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
 
     qreal percent = ui->dsb_energy->value();
     qreal residuum_energy = 100 * (max_energy - current_energy) / max_energy;
-
-    //remaining energy and iterations update
-    ui->lb_IterationsProgressValue->setText(QString::number(current_iteration));
-    ui->lb_RestEnergieResiduumValue->setText(QString::number(residuum_energy, 'f', 2) + "%");
 
     //current atoms list update
     if(fix_dict_atom_res_list.isEmpty())
@@ -976,11 +993,6 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
         ui->tbv_Results->setItem(index, 3, atomModulationItem);
         ui->tbv_Results->setItem(index, 4, atomPhaseItem);
 
-
-        QList<qint32> sizes = ui->splitter->sizes();
-        sizes.insert(0, 240);
-        ui->splitter->setSizes(sizes);
-
         //update residuum and atom sum for painting and later save to hdd
         for(qint32 i = 0; i < _signal_matrix.cols(); i++)
         {
@@ -997,11 +1009,7 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
         if(header_width > max_tbv_header_width)
         {
             ui->tbv_Results->setColumnWidth(1, header_width);
-            max_tbv_header_width = header_width;
-
-            QList<qint32> sizes = ui->splitter->sizes();
-            sizes.insert(0, header_width + 90);
-            ui->splitter->setSizes(sizes);
+            max_tbv_header_width = header_width;          
         }
 
         FixDictAtom temp_atom = fix_dict_atom_res_list.last();
@@ -1033,28 +1041,31 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
         ui->tbv_Results->setItem(index, 1, atom_name_item);
 
         //update residuum and atom sum for painting and later save to hdd
+
         for(qint32 i = 0; i < _signal_matrix.cols(); i++)
         {
-            _residuum_matrix.col(i) -= fix_dict_atom_res_list.last().max_scalar_list.at(i) * fix_dict_atom_res_list.last().vector_list.first();
-            _atom_sum_matrix.col(i) += fix_dict_atom_res_list.last().max_scalar_list.at(i) * fix_dict_atom_res_list.last().vector_list.first();
-        }
-    }
+            _residuum_matrix.col(i) -= temp_atom.max_scalar_list.at(i) * temp_atom.vector_list.first();
+            _atom_sum_matrix.col(i) += temp_atom.max_scalar_list.at(i) * temp_atom.vector_list.first();
+        }/*
+        _residuum_matrix = residuum;
+        _atom_sum_matrix = _signal_matrix - residuum;
+    */}
 
-    //progressbar update
+    //progressbar update remaining energy and iterations update
+    QString text = QString("residual energy: %0%            iterations: %1").arg(QString::number(residuum_energy, 'f', 2)).arg(current_iteration);
+    ui->progressBarCalc->setFormat(text);
     qint32 prgrsbar_adapt = 99;
     if(max_iterations > 1999 && current_iteration < 100)
         ui->progressBarCalc->setMaximum(100);
     if(ui->chb_ResEnergy->isChecked() && (current_iteration >= (prgrsbar_adapt)) && (max_energy - current_energy) > (0.01 * percent * max_energy))
         ui->progressBarCalc->setMaximum(current_iteration + 5);
-    if(max_iterations < 1999)
-        ui->progressBarCalc->setMaximum(max_iterations);
-
+    if(max_iterations < 1999) ui->progressBarCalc->setMaximum(max_iterations);
     ui->progressBarCalc->setValue(current_iteration);
 
     if(((current_iteration == max_iterations) || (max_energy - current_energy) < (0.01 * percent * max_energy))&&ui->chb_ResEnergy->isChecked())
         ui->progressBarCalc->setValue(ui->progressBarCalc->maximum());
 
-    // ToDo: stupid???
+    // update ui
     if(max_iterations > 10 && percent < 1 && _signal_matrix.cols() > 40 && recieved_result_counter % 10 == 0)
     {
         callAtomSumWindow->update();
@@ -1075,20 +1086,28 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
     recieved_result_counter++;
 }
 
-
 //*************************************************************************************************************
 
 void MainWindow::recieve_warnings(qint32 warning_number)
 {
-    QString title = "warning";
-    QString text = "No Warningtext.";
-    if(warning_number == 1)
-        text = "The dictionary does not have the appropriate atoms to the signal to approximate more closely.";
-    else if(warning_number == 2)
+    QString text;
+    if(warning_number == 1 && !_has_warning)
+    {
+        text = "The dictionary does not have the appropriate atoms to approximate the signal more closely.";
+        ui->lb_info_content->setText(text);
+        _has_warning = true;
+    }
+    else if(warning_number == 2 && !_has_warning)
+    {
         text = "No matching sample count between atoms and signal. This leads to discontinuities.";
-
-    QMessageBox msgBox(QMessageBox::Warning, title, text, QMessageBox::Ok, this);
-    msgBox.exec();
+        ui->lb_info_content->setText(text);
+        _has_warning = true;
+    }
+    else if(_has_warning)
+    {
+        text = "This dictionary does not fit the signals sample count (leads to discontinuities) and excludes atoms to reduce further residual energy.";
+        ui->lb_info_content->setText(text);
+    }
 }
 
 //*************************************************************************************************************
@@ -1185,13 +1204,18 @@ void MainWindow::calc_thread_finished()
     _counter_timer->stop();
     ui->frame->setEnabled(true);
     ui->btt_OpenSignal->setEnabled(true);
+    ui->progressBarCalc->setValue(ui->progressBarCalc->maximum());
 
     ui->btt_Calc->setText("calculate");
     ui->cb_channels->setEnabled(true);
     ui->cb_all_select->setEnabled(true);
     ui->dsb_from->setEnabled(true);
-    ui->dsb_to->setEnabled(true);
+    ui->dsb_to->setEnabled(true);    
     ui->sb_sample_count ->setEnabled(true);
+
+    QList<qint32> sizes = ui->splitter->sizes();
+    sizes.insert(0, max_tbv_header_width + 100);
+    ui->splitter->setSizes(sizes);
 
     for(qint32 col = 0; col < ui->tbv_Results->columnCount(); col++)
         for(qint32 row = 0; row < ui->tbv_Results->rowCount(); row++)
@@ -1209,12 +1233,12 @@ void MainWindow::calc_thread_finished()
 
     ui->tbv_Results->setRowCount(ui->tbv_Results->rowCount() + 1);
 
-    QTableWidgetItem* energy_item = new QTableWidgetItem(ui->lb_RestEnergieResiduumValue->text().remove('%'));
+    QTableWidgetItem* energy_item = new QTableWidgetItem("ToDo");//ui->lb_RestEnergieResiduumValue->text().remove('%'));
     energy_item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
     energy_item->setCheckState(Qt::Unchecked);
     energy_item->setTextAlignment(0x0082);
 
-    QTableWidgetItem* residuum_item = new QTableWidgetItem("residuum");
+    QTableWidgetItem* residuum_item = new QTableWidgetItem("residue");
     residuum_item->setFlags(Qt::ItemIsEnabled);
     residuum_item->setTextAlignment(Qt::AlignCenter);
 
@@ -1645,8 +1669,8 @@ void MainWindow::save_fif_file()
     //change ui
     ui->lb_timer->setHidden(true);
     ui->cb_all_select->setHidden(true);
-    ui->lb_save_file->setHidden(false);
-
+    ui->progressBarCalc->setHidden(false);
+    ui->progressBarCalc->setFormat("save fif file:  %p%");
 
     QFile t_fileIn(file_name);
     QFile t_fileOut(save_path);
@@ -1783,7 +1807,8 @@ void MainWindow::save_fif_file()
     is_saved = true;
     ui->lb_timer->setHidden(false);
     ui->cb_all_select->setHidden(false);
-    ui->lb_save_file->setHidden(true);
+    ui->progressBarCalc->setHidden(true);
+    //ui->lb_save_file->setHidden(true);
 }
 
 //*****************************************************************************************************************
@@ -1952,4 +1977,19 @@ bool MainWindow::sort_energie_fix(const FixDictAtom atom_1, const FixDictAtom at
 
 //*****************************************************************************************************************
 
+void MainWindow::on_cb_Dicts_currentIndexChanged(const QString &arg1)
+{
+    Q_UNUSED(arg1);
+    ui->lb_info_content->setText("");
+    _has_warning = false;
+}
 
+//*****************************************************************************************************************
+
+void MainWindow::on_rb_adativMp_clicked()
+{
+    ui->lb_info_content->setText("");
+    _has_warning = false;
+}
+
+//*****************************************************************************************************************
