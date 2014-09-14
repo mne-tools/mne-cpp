@@ -33,7 +33,7 @@
    <enum>Qt::LeftToRight</enum>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QHBoxLayout" name="horizontalLayout_4">
+   <layout class="QVBoxLayout" name="verticalLayout" stretch="1,0,0">
     <property name="spacing">
      <number>0</number>
     </property>
@@ -62,6 +62,9 @@
       </property>
       <widget class="QWidget" name="layoutWidget">
        <layout class="QVBoxLayout" name="l_left_side">
+        <property name="spacing">
+         <number>6</number>
+        </property>
         <item>
          <widget class="QFrame" name="frame">
           <property name="frameShape">
@@ -110,7 +113,7 @@
                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Residuum Energy&lt;/span&gt;&lt;/p&gt;&lt;p&gt;The Algorithm will expire if the selected percentage of the input signal is reached. &lt;br/&gt;Minimum: 0,1 % of the input signal &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="text">
-                <string>residuum energy:</string>
+                <string>residual energy:</string>
                </property>
                <property name="checked">
                 <bool>true</bool>
@@ -409,177 +412,83 @@
          <widget class="QTableWidget" name="tbv_Results"/>
         </item>
         <item>
-         <layout class="QVBoxLayout" name="l_progress">
+         <layout class="QHBoxLayout" name="l_selectall_and_timer">
           <property name="spacing">
            <number>0</number>
           </property>
-          <property name="leftMargin">
-           <number>5</number>
+          <property name="topMargin">
+           <number>0</number>
           </property>
-          <property name="rightMargin">
-           <number>5</number>
+          <property name="bottomMargin">
+           <number>0</number>
           </property>
           <item>
-           <layout class="QHBoxLayout" name="l_selectall_and_timer">
-            <item>
-             <widget class="QCheckBox" name="cb_all_select">
-              <property name="text">
-               <string>select / deselect all atoms</string>
-              </property>
-              <property name="checked">
-               <bool>true</bool>
-              </property>
-              <property name="tristate">
-               <bool>true</bool>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="lb_timer">
-              <property name="text">
-               <string/>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="l_save">
-            <item>
-             <widget class="QLabel" name="lb_save_file">
-              <property name="text">
-               <string>Save fif file...</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <widget class="QProgressBar" name="progressBarCalc">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
+           <widget class="QCheckBox" name="cb_all_select">
+            <property name="text">
+             <string>select / deselect all atoms</string>
             </property>
-            <property name="value">
-             <number>24</number>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
+            <property name="tristate">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
           <item>
-           <layout class="QHBoxLayout" name="l_res_energy">
-            <property name="spacing">
-             <number>0</number>
+           <widget class="QLabel" name="lb_timer">
+            <property name="text">
+             <string/>
             </property>
-            <item>
-             <widget class="QLabel" name="lb_RestEnergieResiduum">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="text">
-               <string>residuum energy:</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="lb_RestEnergieResiduumValue">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>0</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>100%</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <spacer name="horizontalSpacer">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QHBoxLayout" name="l_iterations">
-            <property name="spacing">
-             <number>0</number>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
-            <item>
-             <widget class="QLabel" name="lb_Iterationprogress">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="text">
-               <string>iterations:</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="lb_IterationsProgressValue">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>0</width>
-                <height>0</height>
-               </size>
-              </property>
-              <property name="text">
-               <string>0</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <spacer name="horizontalSpacer_2">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-           </layout>
+           </widget>
           </item>
          </layout>
+        </item>
+        <item>
+         <widget class="QProgressBar" name="progressBarCalc">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="font">
+           <font>
+            <kerning>true</kerning>
+           </font>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">QProgressBar {	
+	color: white;
+}
+QProgressBar::chunk { 
+	background-image: url(:/images/icons/progressbar_brush.png);
+}</string>
+          </property>
+          <property name="value">
+           <number>50</number>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+          <property name="textVisible">
+           <bool>true</bool>
+          </property>
+          <property name="format">
+           <string/>
+          </property>
+         </widget>
         </item>
        </layout>
       </widget>
       <widget class="QWidget" name="layoutWidget">
        <layout class="QVBoxLayout" name="l_Input">
+        <property name="spacing">
+         <number>0</number>
+        </property>
         <item>
          <widget class="QLabel" name="lb_InputSignal">
           <property name="sizePolicy">
@@ -587,6 +496,18 @@
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>18</height>
+           </size>
+          </property>
+          <property name="font">
+           <font>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
           </property>
           <property name="toolTip">
            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Signal&lt;/span&gt;&lt;/p&gt;&lt;p&gt;chosen input signal Only the displayed segment will be decomposed. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -607,6 +528,18 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>18</height>
+           </size>
+          </property>
+          <property name="font">
+           <font>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
           <property name="toolTip">
            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Approximation&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Addition of all founded atoms which are selected. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
@@ -626,6 +559,18 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>18</height>
+           </size>
+          </property>
+          <property name="font">
+           <font>
+            <weight>75</weight>
+            <bold>true</bold>
+           </font>
+          </property>
           <property name="toolTip">
            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Difference&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Residuum energy of the Decomposition &lt;br/&gt;The Difference between the input signal and all selected atoms is displayed. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
@@ -638,11 +583,75 @@
          <layout class="QVBoxLayout" name="l_res"/>
         </item>
         <item>
-         <layout class="QVBoxLayout" name="l_YAxis"/>
+         <layout class="QVBoxLayout" name="l_YAxis">
+          <property name="bottomMargin">
+           <number>0</number>
+          </property>
+         </layout>
         </item>
        </layout>
       </widget>
      </widget>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="l_line">
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>4</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="Line" name="line">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="l_info">
+      <item>
+       <widget class="QLabel" name="lb_info">
+        <property name="font">
+         <font>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="text">
+         <string>information:</string>
+        </property>
+        <property name="margin">
+         <number>3</number>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="lb_info_content">
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_4">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
     </item>
    </layout>
   </widget>
@@ -686,14 +695,6 @@
    <addaction name="menuDatei"/>
    <addaction name="menuBearbeiten"/>
    <addaction name="menuInfo"/>
-  </widget>
-  <widget class="QToolBar" name="mainToolBar">
-   <attribute name="toolBarArea">
-    <enum>BottomToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
   </widget>
   <action name="actionNeu">
    <property name="icon">

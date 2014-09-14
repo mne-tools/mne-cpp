@@ -263,6 +263,10 @@ private slots:
     void on_actionExport_triggered();
     void on_dsb_sample_rate_editingFinished();
 
+    void on_cb_Dicts_currentIndexChanged(const QString &arg1);
+
+    void on_rb_adativMp_clicked();
+
 signals:
 
     void send_input(MatrixXd send_signal, qint32 send_max_iterations, qreal send_epsilon, bool fix_phase, qint32 boost, qint32 simplex_it,

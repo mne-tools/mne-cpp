@@ -461,7 +461,7 @@ QList<GaborAtom> AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterat
         residuum_energy -= gabor_Atom->energy;
         current_energy += gabor_Atom->energy;
 
-        std::cout << "absolute energy of residuum: " << residuum_energy << "\n";
+        std::cout << "absolute energy of residue: " << residuum_energy << "\n";
 
         atom_list.append(*gabor_Atom);
 

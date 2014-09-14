@@ -182,7 +182,7 @@ void FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal e
         for(qint32 channel = 0; channel < residuum.cols(); channel++)
         {
             for(qint32 sample = 0; sample < residuum.rows(); sample++)
-                residuum_energy += (residuum(sample, channel) * residuum(sample, channel));
+                residuum_energy += pow(residuum(sample, channel), 2);
         }
 
         //residuum_energy -= global_best_matching.energy;
@@ -190,7 +190,7 @@ void FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal e
 
         fix_dict_list.append(global_best_matching);
 
-        std::cout << "absolute energy of residuum: " << residuum_energy << "\n";
+        std::cout << "absolute energy of residue: " << residuum_energy << "\n";
         it++;
 
         emit current_result(it, max_iterations, current_energy, signal_energy, residuum, adaptive_list, fix_dict_list);
@@ -198,7 +198,7 @@ void FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal e
 
         if(((last_energy * 100 / signal_energy) - (residuum_energy * 100 / signal_energy)) < 0.0005)
         {
-            std::cout << " \nALGORITHM ABORTED\ndictionary excludes atoms to reduce further residuum energy\n";
+            std::cout << " \nALGORITHM ABORTED\ndictionary excludes atoms to reduce further residual energy\n";
             emit send_warning(1);
             break;
         }
