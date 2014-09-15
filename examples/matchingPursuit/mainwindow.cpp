@@ -108,7 +108,7 @@ MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::
 {
     ui->setupUi(this);    
 
-    this->setMinimumSize(832, 500);
+    this->setMinimumSize(1280, 640);
     callGraphWindow = new GraphWindow();    
     callGraphWindow->setMinimumHeight(140);
     callGraphWindow->setMinimumWidth(500);
@@ -468,7 +468,8 @@ void MainWindow::fill_channel_combobox()
     _colors.append(QColor(0, 0, 0));
     for(qint32 channels = 0; channels < _signal_matrix.cols(); channels++)
     {
-        _colors.append(QColor::fromHsv(qrand() % 256, 255, 190));
+        //_colors.append(QColor::fromHsv(qrand() % 256, 255, 190)); first version
+        _colors.append(QColor::fromRgb(qrand() / ((qreal)RAND_MAX + 300) * 255, qrand() / ((qreal)RAND_MAX + 300) * 255, qrand() / ((qreal)RAND_MAX + 300) * 255));
         //channel item
         this->cb_item = new QStandardItem;
         this->cb_item->setText(QString("channel %1").arg(channels));
@@ -941,7 +942,7 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
     tbv_is_loading = true;
 
     qreal percent = ui->dsb_energy->value();
-    qreal residuum_energy = 100 * (max_energy - current_energy) / max_energy;
+    residuum_energy = 100 * (max_energy - current_energy) / max_energy;
 
     //current atoms list update
     if(fix_dict_atom_res_list.isEmpty())
@@ -1094,7 +1095,7 @@ void MainWindow::recieve_warnings(qint32 warning_number)
     QString text;
     if(warning_number == 1 && !_has_warning)
     {
-        text = "The dictionary does not have the appropriate atoms to approximate the signal more closely.";
+        text = "The dictionary does not have the appropriate atoms to approximate the signal more closely. Calculation terminated before reaching truncation criterion.";
         ui->lb_info_content->setText(text);
         _has_warning = true;
     }
@@ -1106,7 +1107,7 @@ void MainWindow::recieve_warnings(qint32 warning_number)
     }
     else if(_has_warning)
     {
-        text = "This dictionary does not fit the signals sample count (leads to discontinuities) and excludes atoms to reduce further residual energy.";
+        text = "This dictionary does not fit the signals sample count (leads to discontinuities) and excludes atoms to reduce further residual energy. Calculation terminated before reaching truncation criterion.";
         ui->lb_info_content->setText(text);
     }
 }
@@ -1234,7 +1235,7 @@ void MainWindow::calc_thread_finished()
 
     ui->tbv_Results->setRowCount(ui->tbv_Results->rowCount() + 1);
 
-    QTableWidgetItem* energy_item = new QTableWidgetItem("ToDo");//ui->lb_RestEnergieResiduumValue->text().remove('%'));
+    QTableWidgetItem* energy_item = new QTableWidgetItem(QString::number(residuum_energy, 'f', 2));//ui->lb_RestEnergieResiduumValue->text().remove('%'));
     energy_item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
     energy_item->setCheckState(Qt::Unchecked);
     energy_item->setTextAlignment(0x0082);
@@ -1449,6 +1450,7 @@ void MainWindow::on_btt_OpenSignal_clicked()
 void MainWindow::on_dsb_sample_rate_editingFinished()
 {
     _sample_rate = ui->dsb_sample_rate->value();
+    callYAxisWindow->update();
 }
 
 //*****************************************************************************************************************
