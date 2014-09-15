@@ -125,6 +125,7 @@ void FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal e
             //FixDictAtom current_best_matching = correlation(parsed_dicts.at(i));
             if(i == mapped_best_matchings.constBegin())
                 global_best_matching = *i;
+
             else if(abs(i->max_scalar_product) > abs(global_best_matching.max_scalar_product))
                 global_best_matching = *i;
         }
@@ -190,7 +191,12 @@ void FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal e
 
         fix_dict_list.append(global_best_matching);
 
-        std::cout << "absolute energy of residue: " << residuum_energy << "\n";
+        std::cout << "\n" << "===============" << it + 1 <<"th atom found" << "===============" << ":\n\n"<<
+                     qPrintable(global_best_matching.display_text) << "\n\n" <<  "sample_count: " << global_best_matching.sample_count <<
+                     " source_dict: " << qPrintable(global_best_matching.dict_source) << " Atom ID: " << global_best_matching.id <<
+                     "\nsclr_prdct: " << global_best_matching.max_scalar_product << "\n" <<
+                     "\nabsolute energy of residue: " << residuum_energy << "\n";
+
         it++;
 
         emit current_result(it, max_iterations, current_energy, signal_energy, residuum, adaptive_list, fix_dict_list);
@@ -299,6 +305,7 @@ FixDictAtom FixDictMp::correlation(Dictionary current_pdict, MatrixXd current_re
     best_matching.atom_formula = current_pdict.atom_formula;
     best_matching.dict_source = current_pdict.source;
     best_matching.type = current_pdict.type;
+    best_matching.sample_count = current_pdict.sample_count;
 
     return best_matching;
 }
@@ -478,8 +485,9 @@ QString FixDictMp::create_display_text(FixDictAtom global_best_matching)
     }
     else if(global_best_matching.type == AtomType::FORMULAATOM)
     {
-        display_text = QString("%0: a: %1, b: %2, c: %3, d: %4, e: %5, f: %6, g: %7, h: %8")
+        display_text = QString("%0:  transl: %1 a: %2, b: %3 c: %4, d: %5, e: %6, f: %7, g: %8, h: %9")
                 .arg(global_best_matching.atom_formula)
+                .arg(QString::number(global_best_matching.translation,    'f', 2))
                 .arg(QString::number(global_best_matching.formula_atom.a, 'f', 2))
                 .arg(QString::number(global_best_matching.formula_atom.b, 'f', 2))
                 .arg(QString::number(global_best_matching.formula_atom.c, 'f', 2))
