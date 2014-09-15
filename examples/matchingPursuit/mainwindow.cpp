@@ -453,6 +453,7 @@ void MainWindow::read_fiff_file_new(QString file_name)
     ui->lb_info_content->setText("");
     ui->cb_all_select->setHidden(true);    
     ui->lb_timer->setHidden(true);
+    ui->progressBarCalc->setHidden(true);
 
     _has_warning = false;  
     _new_paint = true;
