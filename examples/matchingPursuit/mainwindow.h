@@ -283,8 +283,9 @@ private:
     bool come_from_from;
     qreal to;
     qreal signal_energy;
+    qreal residuum_energy;
     qint32 recieved_result_counter;
-    qint32 max_tbv_header_width = 280;
+    qint32 max_tbv_header_width;
     QString save_path;
     QString file_name;
     QString last_open_path;
