@@ -127,13 +127,25 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    // ToDo seb ctor
+    //**********************************************************************************************************
+    //constructor
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+    //**********************************************************************************************************
 
-    // ToDo seb
+    //==========================================================================================================
+    /**
+    * MainWindow_fill_dict_combobox
+    *
+    * ### MP toolbox main window function ###
+    *
+    * fills combobox with available dictionaries
+    *
+    * @return void
+    */
     void fill_dict_combobox();
-    // end
+    //==========================================================================================================
+
     typedef QList<GaborAtom> adaptive_atom_list;
     typedef QList<FixDictAtom> fix_dict_atom_list;
     typedef Eigen::VectorXd VectorXd;    
@@ -380,16 +392,116 @@ private:
 
     //==========================================================================================================
 
-    // ToDo seb
+    //==========================================================================================================
+    /**
+    * MainWindow_read_fiff_ave
+    *
+    * ### MP toolbox main function ###
+    *
+    * reads data from ave files
+    *
+    * @param[in] QString file name  name of average-file
+    *
+    * @return   void
+    */
     void read_fiff_ave(QString file_name);
+
+    //==========================================================================================================
+    /**
+    * MainWindow_fill channel_combobox
+    *
+    * ### MP toolbox main function ###
+    *
+    * fills combobox with channel indicies
+    *
+    * @return   void
+    */
     void fill_channel_combobox();
+
+    //==========================================================================================================
+    /**
+    * MainWindow_save_fif_file
+    *
+    * ### MP toolbox main function ###
+    *
+    * saves fiff-files
+    *
+    * @return   void
+    */
     void save_fif_file();
+
+    //==========================================================================================================
+    /**
+    * MainWindow_save_paramters
+    *
+    * ### MP toolbox main function ###
+    *
+    * saves parameters
+    *
+    * @return   void
+    */
     void save_parameters();
+
+    //==========================================================================================================
+    /**
+    * MainWindow_calc_fix_mp
+    *
+    * ### MP toolbox main function ###
+    *
+    * calculates MP-Algorithm with fix dictionaries
+    *
+    * @param    path
+    * @param    signal      Matrix of input signal
+    * @param    criterion
+    *
+    * @return   void
+    */
     void calc_fix_mp(QString path, MatrixXd signal, TruncationCriterion criterion);
+
+    //==========================================================================================================
+    /**
+    * MainWindow_closeEvent
+    *
+    * ### MP toolbox main function ###
+    *
+    * Qt close event
+    *
+    * @param    QCloseEvent
+    *
+    * @return   void
+    */
     void closeEvent(QCloseEvent * event);
+
+    //==========================================================================================================
+    /**
+    * MainWindow_sort_energie_adaptive
+    *
+    * ### MP toolbox main function ###
+    *
+    * sorts atoms from adaptive MP regarding to their energy
+    *
+    * @param    atom_1  first atom
+    * @param    atom_2  second atom
+    *
+    * @return   static bool     sort_energie_adaptive
+    */
     static bool sort_energie_adaptive(const GaborAtom atom_1, const GaborAtom atom_2);
+
+    //==========================================================================================================
+    /**
+    * MainWindow_sort_energie_fix
+    *
+    * ### MP toolbox main function ###
+    *
+    * sorts atoms from fix dictionaries regarding to their energy
+    *
+    * @param    atom_1  first atom
+    * @param    atom_2  second atom
+    *
+    * @return   static bool     sort_energie_fix
+    */
     static bool sort_energie_fix(const FixDictAtom atom_1, const FixDictAtom atom_2);
-    //end
+    //==========================================================================================================
 };
 
 //*************************************************************************************************************

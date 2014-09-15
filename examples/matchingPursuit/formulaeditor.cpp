@@ -881,7 +881,7 @@ void Formulaeditor::set_formula(QString Formula)
 
 //*************************************************************************************************************************************
 
-QString Formulaeditor::GetFormula()
+QString Formulaeditor::get_formula()
 {
     return m_strFormula;
 }
