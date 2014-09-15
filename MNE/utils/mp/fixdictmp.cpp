@@ -85,7 +85,7 @@ void FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal e
     qreal residuum_energy = 0;
     qreal energy_threshold = 0;
     qreal last_energy = 0;
-    //bool sample_count_mismatch = false;
+    bool sample_count_mismatch = false;
 
     this->residuum = signal;
     parsed_dicts = parse_xml_dict(path);
@@ -168,28 +168,29 @@ void FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal e
 
         global_best_matching.vector_list.first() = fitted_atom;
 
-        /*if(atom_samples.length() != sample_count && !sample_count_mismatch)
-        {
-            std::cout <<  "\n=============================================\n"
-                      << "this dictionary does not fit the signal,\nplease choose or create another dictionary containing\nonly atoms of the same length as the signal vector\n"
-                      << "signal samples: " << sample_count << "\n"
-                      << "atom samples: " << atom_samples.length() << "\n"
-                      <<  "=============================================\n";
-            sample_count_mismatch = true;
-        }*/
 
         last_energy = residuum_energy;
-        residuum_energy = 0;
+        /*residuum_energy = 0;
         for(qint32 channel = 0; channel < residuum.cols(); channel++)
         {
             for(qint32 sample = 0; sample < residuum.rows(); sample++)
                 residuum_energy += pow(residuum(sample, channel), 2);
-        }
+        }*/
 
-        //residuum_energy -= global_best_matching.energy;
+        residuum_energy -= global_best_matching.energy;
         current_energy += global_best_matching.energy;
 
         fix_dict_list.append(global_best_matching);
+
+        if(global_best_matching.sample_count != signal.rows() && !sample_count_mismatch)
+        {
+            std::cout <<  "\n=============================================\n"
+                      << "  INFO\n\n(part-)dictionary does not fit the signal!\n\nResults might be better by creating dictionaries\ncontaining atoms of the same length as the signal\n"
+                      << "\nsignal samples: " << signal.rows() << "\n"
+                      << "atom samples: " << global_best_matching.sample_count << "\n"
+                      <<  "=============================================\n";
+            sample_count_mismatch = true;
+        }
 
         std::cout << "\n" << "===============" << it + 1 <<"th atom found" << "===============" << ":\n\n"<<
                      qPrintable(global_best_matching.display_text) << "\n\n" <<  "sample_count: " << global_best_matching.sample_count <<
@@ -204,7 +205,9 @@ void FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal e
 
         if(((last_energy * 100 / signal_energy) - (residuum_energy * 100 / signal_energy)) < 0.0005)
         {
-            std::cout << " \nALGORITHM ABORTED\ndictionary excludes atoms to reduce further residual energy\n";
+            std::cout <<  "\n=============================================\n"
+                      << "  ALGORITHM ABORTED\n\ndictionary excludes atoms to reduce further residual energy\n"
+                      <<  "=============================================\n";
             emit send_warning(1);
             break;
         }
@@ -433,10 +436,10 @@ Dictionary FixDictMp::fill_dict(const QDomNode &pdict)
             current_atom.formula_atom.b = atom.attribute("b").toDouble();
             current_atom.formula_atom.c = atom.attribute("c").toDouble();
             current_atom.formula_atom.d = atom.attribute("d").toDouble();
-            current_atom.formula_atom.d = atom.attribute("e").toDouble();
-            current_atom.formula_atom.d = atom.attribute("f").toDouble();
-            current_atom.formula_atom.d = atom.attribute("g").toDouble();
-            current_atom.formula_atom.d = atom.attribute("h").toDouble();
+            current_atom.formula_atom.e = atom.attribute("e").toDouble();
+            current_atom.formula_atom.f = atom.attribute("f").toDouble();
+            current_atom.formula_atom.g = atom.attribute("g").toDouble();
+            current_atom.formula_atom.h = atom.attribute("h").toDouble();
 
             if(atom.hasChildNodes())
             {
