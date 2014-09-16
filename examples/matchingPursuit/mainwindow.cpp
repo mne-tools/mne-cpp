@@ -177,6 +177,12 @@ MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::
     ui->splitter->restoreState(settings.value("splitter_sizes").toByteArray());
     last_open_path = settings.value("last_open_path", QDir::homePath()+ "/" + "Matching-Pursuit-Toolbox").toString();
     last_save_path = settings.value("last_save_path", QDir::homePath()+ "/" + "Matching-Pursuit-Toolbox").toString();
+
+    if(!settings.value("show_infos", true).toBool())
+    {
+        ui->lb_info_content->setHidden(true);
+        ui->lb_info->setHidden(true);
+    }
 }
 
 //*************************************************************************************************************************************
@@ -1092,23 +1098,31 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
 
 void MainWindow::recieve_warnings(qint32 warning_number)
 {
-    QString text;
-    if(warning_number == 1 && !_has_warning)
+    QSettings settings;
+
+    if(settings.value("show_infos", true).toBool())
     {
-        text = "The dictionary does not have the appropriate atoms to approximate the signal more closely. Calculation terminated before reaching truncation criterion.";
-        ui->lb_info_content->setText(text);
-        _has_warning = true;
-    }
-    else if(warning_number == 2 && !_has_warning)
-    {
-        text = "No matching sample count between atoms and signal. This leads to discontinuities.";
-        ui->lb_info_content->setText(text);
-        _has_warning = true;
-    }
-    else if(_has_warning)
-    {
-        text = "This dictionary does not fit the signals sample count (leads to discontinuities) and excludes atoms to reduce further residual energy. Calculation terminated before reaching truncation criterion.";
-        ui->lb_info_content->setText(text);
+        ui->lb_info_content->setHidden(false);
+        ui->lb_info->setHidden(false);
+
+        QString text;
+        if(warning_number == 1 && !_has_warning)
+        {
+            text = "The dictionary does not have the appropriate atoms to approximate the signal more closely. Calculation terminated before reaching truncation criterion.";
+            ui->lb_info_content->setText(text);
+            _has_warning = true;
+        }
+        else if(warning_number == 2 && !_has_warning)
+        {
+            text = "No matching sample count between atoms and signal. This leads to discontinuities.";
+            ui->lb_info_content->setText(text);
+            _has_warning = true;
+        }
+        else if(_has_warning)
+        {
+            text = "This dictionary does not fit the signals sample count (leads to discontinuities) and excludes atoms to reduce further residual energy. Calculation terminated before reaching truncation criterion.";
+            ui->lb_info_content->setText(text);
+        }
     }
 }
 
@@ -1314,8 +1328,8 @@ void MainWindow::calc_fix_mp(QString path, MatrixXd signal, TruncationCriterion 
     mp_Thread = new QThread;
     fixDict_Mp->moveToThread(mp_Thread);    
 
-    connect(this, SIGNAL(send_input_fix_dict(MatrixXd, qint32, qreal, qint32, QString)),
-            fixDict_Mp, SLOT(recieve_input(MatrixXd, qint32, qreal, qint32, QString)));
+    connect(this, SIGNAL(send_input_fix_dict(MatrixXd, qint32, qreal, qint32, QString, qreal)),
+            fixDict_Mp, SLOT(recieve_input(MatrixXd, qint32, qreal, qint32, QString, qreal)));
     connect(fixDict_Mp, SIGNAL(current_result(qint32, qint32, qreal, qreal, MatrixXd, adaptive_atom_list, fix_dict_atom_list)),
                   this, SLOT(recieve_result(qint32, qint32, qreal, qreal, MatrixXd, adaptive_atom_list, fix_dict_atom_list)));
     connect(fixDict_Mp, SIGNAL(finished_calc()), mp_Thread, SLOT(quit()));
@@ -1326,22 +1340,23 @@ void MainWindow::calc_fix_mp(QString path, MatrixXd signal, TruncationCriterion 
     connect(fixDict_Mp, SIGNAL(send_warning(qint32)), this, SLOT(recieve_warnings(qint32)));
 
     QSettings settings;
-    qint32 boost = settings.value("boost", 100).toInt();
+    qint32 boost = settings.value("boost_fixDict", 100).toInt();
+    qreal delta_energy = settings.value("delta_energy", 0.0005).toDouble();
 
     switch(criterion)
     {
         case Iterations:
-            emit send_input_fix_dict(signal, ui->sb_Iterations->value(), qreal(MININT32), boost, path);
+            emit send_input_fix_dict(signal, ui->sb_Iterations->value(), qreal(MININT32), boost, path, delta_energy);
             mp_Thread->start();
             break;
 
         case SignalEnergy:
-            emit send_input_fix_dict(signal, MAXINT32, res_energy, boost, path);
+            emit send_input_fix_dict(signal, MAXINT32, res_energy, boost, path, delta_energy);
             mp_Thread->start();
             break;
 
         case Both:
-            emit send_input_fix_dict(signal, ui->sb_Iterations->value(), res_energy, boost, path);
+            emit send_input_fix_dict(signal, ui->sb_Iterations->value(), res_energy, boost, path, delta_energy);
             mp_Thread->start();
             break;
     }
@@ -1426,6 +1441,8 @@ void MainWindow::on_actionSettings_triggered()
         _setting_window->setWindowState(Qt::WindowActive);
         _setting_window->raise();
     }
+
+    connect(_setting_window, SIGNAL(change_info_label()), this, SLOT(activate_info_label()));
 }
 
 //*****************************************************************************************************************
@@ -1984,6 +2001,7 @@ void MainWindow::on_cb_Dicts_currentIndexChanged(const QString &arg1)
 {
     Q_UNUSED(arg1);
     ui->lb_info_content->setText("");
+    ui->lb_info_content->repaint();
     _has_warning = false;
 }
 
@@ -1992,7 +2010,22 @@ void MainWindow::on_cb_Dicts_currentIndexChanged(const QString &arg1)
 void MainWindow::on_rb_adativMp_clicked()
 {
     ui->lb_info_content->setText("");
+    ui->lb_info_content->repaint();
     _has_warning = false;
 }
 
 //*****************************************************************************************************************
+void MainWindow::activate_info_label()
+{
+    QSettings settings;
+    if(!settings.value("show_infos", true).toBool())
+    {
+        ui->lb_info_content->setHidden(true);
+        ui->lb_info->setHidden(true);
+    }
+    else
+    {
+        ui->lb_info_content->setHidden(false);
+        ui->lb_info->setHidden(false);
+    }
+}

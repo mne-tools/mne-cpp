@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>202</width>
-    <height>421</height>
+    <width>230</width>
+    <height>480</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -18,14 +18,14 @@
   </property>
   <property name="minimumSize">
    <size>
-    <width>202</width>
-    <height>420</height>
+    <width>230</width>
+    <height>480</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
-    <width>209</width>
-    <height>421</height>
+    <width>230</width>
+    <height>480</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -43,9 +43,15 @@
     <layout class="QGridLayout" name="gridLayout_3">
      <item row="1" column="0">
       <widget class="QFrame" name="fr_adaptiveSet">
+       <property name="minimumSize">
+        <size>
+         <width>210</width>
+         <height>0</height>
+        </size>
+       </property>
        <property name="maximumSize">
         <size>
-         <width>189</width>
+         <width>210</width>
          <height>16777215</height>
         </size>
        </property>
@@ -60,11 +66,14 @@
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
-         <widget class="QLabel" name="lb_adaptiveMP_settings">
+         <widget class="QLabel" name="l_adaptiveMP_settings">
           <property name="font">
            <font>
             <underline>true</underline>
            </font>
+          </property>
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;adaptive MP&lt;/span&gt;&lt;/p&gt;&lt;p&gt;settings for the adaptive MP algorithm&lt;/p&gt;&lt;p&gt;including the simplex optimization parameters&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="text">
            <string>adaptive MP:</string>
@@ -75,6 +84,9 @@
          <layout class="QHBoxLayout" name="horizontalLayout_2">
           <item>
            <widget class="QLabel" name="l_boost">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;boost&lt;/span&gt;&lt;/p&gt;&lt;p&gt;set the number of channels (in percent of all choosen channels) used to find best machting atom in case of multichannel input signals&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
             <property name="text">
              <string>boost:</string>
             </property>
@@ -167,6 +179,9 @@ border-radius: 4px;
         </item>
         <item>
          <widget class="QCheckBox" name="cb_fixphase">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;fix phase&lt;/span&gt;&lt;/p&gt;&lt;p&gt;...set the parameter phase to its mean value of all selected channels&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>fix phase</string>
           </property>
@@ -181,6 +196,9 @@ border-radius: 4px;
         </item>
         <item>
          <widget class="QLabel" name="l_simplex_settings">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;simplex&lt;/span&gt;&lt;/p&gt;&lt;p&gt;...simplex optimizer setup&lt;/p&gt;&lt;p&gt; (be careful changing this values, you may affect the covergence of the algorithm)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>simplex:</string>
           </property>
@@ -196,11 +214,14 @@ border-radius: 4px;
               <height>16777215</height>
              </size>
             </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;0 ... 5000&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
             <property name="minimum">
-             <number>1</number>
+             <number>0</number>
             </property>
             <property name="maximum">
              <number>5000</number>
@@ -209,6 +230,9 @@ border-radius: 4px;
           </item>
           <item row="0" column="0">
            <widget class="QLabel" name="l_iterations">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;iterations&lt;/span&gt;&lt;/p&gt;&lt;p&gt;number of max. simplex iterations&lt;br/&gt;typical value: 1000&lt;br/&gt;range from 0 to 5000&lt;/p&gt;&lt;p&gt;default 1000&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
             <property name="frameShape">
              <enum>QFrame::NoFrame</enum>
             </property>
@@ -222,6 +246,9 @@ border-radius: 4px;
           </item>
           <item row="4" column="0">
            <widget class="QLabel" name="l_fullcontraction">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;full contraction&lt;/span&gt;&lt;/p&gt;&lt;p&gt;shrinkage parameter delta&lt;br/&gt;typical value: 0.5&lt;br/&gt;range: 0.0 ... 1.0&lt;/p&gt;&lt;p&gt;default: 0.5&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
             <property name="text">
              <string>full contraction:</string>
             </property>
@@ -232,6 +259,9 @@ border-radius: 4px;
           </item>
           <item row="2" column="0">
            <widget class="QLabel" name="l_expansion">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;expansion&lt;/span&gt;&lt;/p&gt;&lt;p&gt;parameter gamma&lt;br/&gt;typical value: 2.0&lt;br/&gt;range: gamma &amp;gt; 0.0&lt;/p&gt;&lt;p&gt;default: 0.2&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
             <property name="text">
              <string>expansion:</string>
             </property>
@@ -242,6 +272,9 @@ border-radius: 4px;
           </item>
           <item row="1" column="0">
            <widget class="QLabel" name="l_reflection">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;reflection&lt;/span&gt;&lt;/p&gt;&lt;p&gt;parameter alpha&lt;br/&gt;typical value: 1.0&lt;br/&gt;range: alpha &amp;gt; 0.0&lt;/p&gt;&lt;p&gt;default: 1.0&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
             <property name="frameShape">
              <enum>QFrame::NoFrame</enum>
             </property>
@@ -255,6 +288,9 @@ border-radius: 4px;
           </item>
           <item row="3" column="0">
            <widget class="QLabel" name="l_contraction">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;contraction&lt;/span&gt;&lt;/p&gt;&lt;p&gt;parameter beta&lt;br/&gt;typical value: 0.5&lt;br/&gt;range: from 0.0 to 1.0&lt;/p&gt;&lt;p&gt;default: 0.5&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
             <property name="text">
              <string>contraction:</string>
             </property>
@@ -271,11 +307,14 @@ border-radius: 4px;
               <height>16777215</height>
              </size>
             </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;0.0 ... 1.0&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
             <property name="minimum">
-             <double>0.010000000000000</double>
+             <double>0.000000000000000</double>
             </property>
             <property name="maximum">
              <double>1.000000000000000</double>
@@ -293,14 +332,17 @@ border-radius: 4px;
               <height>16777215</height>
              </size>
             </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;lower bound: 0.0&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
             <property name="minimum">
-             <double>0.010000000000000</double>
+             <double>0.000000000000000</double>
             </property>
             <property name="maximum">
-             <double>1.000000000000000</double>
+             <double>999999999.000000000000000</double>
             </property>
             <property name="singleStep">
              <double>0.100000000000000</double>
@@ -315,14 +357,17 @@ border-radius: 4px;
               <height>16777215</height>
              </size>
             </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;lower bound: 0.0&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
             <property name="minimum">
-             <double>0.010000000000000</double>
+             <double>0.000000000000000</double>
             </property>
             <property name="maximum">
-             <double>1.000000000000000</double>
+             <double>999999999.000000000000000</double>
             </property>
             <property name="singleStep">
              <double>0.100000000000000</double>
@@ -337,11 +382,14 @@ border-radius: 4px;
               <height>16777215</height>
              </size>
             </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt; 0.0 ... 1.0&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
             <property name="minimum">
-             <double>0.010000000000000</double>
+             <double>0.000000000000000</double>
             </property>
             <property name="maximum">
              <double>1.000000000000000</double>
@@ -358,6 +406,9 @@ border-radius: 4px;
               <width>20</width>
               <height>20</height>
              </size>
+            </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;reset&lt;/span&gt;&lt;/p&gt;&lt;p&gt;...set default value (1.0)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="text">
              <string/>
@@ -382,6 +433,9 @@ border-radius: 4px;
               <height>20</height>
              </size>
             </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;reset&lt;/span&gt;&lt;/p&gt;&lt;p&gt;...set default value (1000)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
             <property name="text">
              <string/>
             </property>
@@ -404,6 +458,9 @@ border-radius: 4px;
               <width>20</width>
               <height>20</height>
              </size>
+            </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;reset&lt;/span&gt;&lt;/p&gt;&lt;p&gt;...set default value (0.2)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="text">
              <string/>
@@ -428,6 +485,9 @@ border-radius: 4px;
               <height>20</height>
              </size>
             </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;reset&lt;/span&gt;&lt;/p&gt;&lt;p&gt;...set default value (0.5)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
             <property name="text">
              <string/>
             </property>
@@ -451,6 +511,9 @@ border-radius: 4px;
               <height>20</height>
              </size>
             </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;reset&lt;/span&gt;&lt;/p&gt;&lt;p&gt;...set default value (0.5)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
             <property name="text">
              <string/>
             </property>
@@ -473,9 +536,15 @@ border-radius: 4px;
      </item>
      <item row="0" column="0">
       <widget class="QFrame" name="fr_fixdictSet">
+       <property name="minimumSize">
+        <size>
+         <width>210</width>
+         <height>0</height>
+        </size>
+       </property>
        <property name="maximumSize">
         <size>
-         <width>189</width>
+         <width>210</width>
          <height>16777215</height>
         </size>
        </property>
@@ -487,7 +556,7 @@ border-radius: 4px;
        </property>
        <layout class="QVBoxLayout" name="verticalLayout_7">
         <item>
-         <widget class="QLabel" name="label">
+         <widget class="QLabel" name="l_fixDict_settings">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
             <horstretch>0</horstretch>
@@ -499,6 +568,9 @@ border-radius: 4px;
             <underline>true</underline>
            </font>
           </property>
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;fixdict MP&lt;/span&gt;&lt;/p&gt;&lt;p&gt;settings for the fixdict MP algorithm&lt;/p&gt;&lt;p&gt;including interrupt condition&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>fixdict MP:</string>
           </property>
@@ -508,6 +580,9 @@ border-radius: 4px;
          <layout class="QHBoxLayout" name="horizontalLayout_4">
           <item>
            <widget class="QLabel" name="l_boost_fixDict">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;boost&lt;/span&gt;&lt;/p&gt;&lt;p&gt;set the number of channels (in percent of all choosen channels) used to find best machting atom in case of multichannel input signals&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
             <property name="text">
              <string>boost:</string>
             </property>
@@ -517,13 +592,13 @@ border-radius: 4px;
            <widget class="QSlider" name="sl_boost_fixDict">
             <property name="minimumSize">
              <size>
-              <width>130</width>
+              <width>0</width>
               <height>0</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
-              <width>130</width>
+              <width>16777215</width>
               <height>16777215</height>
              </size>
             </property>
@@ -584,11 +659,105 @@ border-radius: 4px;
 
 }</string>
             </property>
+            <property name="minimum">
+             <number>-100</number>
+            </property>
+            <property name="maximum">
+             <number>0</number>
+            </property>
             <property name="value">
-             <number>50</number>
+             <number>0</number>
             </property>
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <widget class="Line" name="line_3">
+          <property name="toolTip">
+           <string>line</string>
+          </property>
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="l_interrupt">
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;interrupt condition&lt;/span&gt;&lt;/p&gt;&lt;p&gt;canceling the fixdict matching pursuit algorithm, if energy difference is lower than delta&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="text">
+           <string>interrupt condition:</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <layout class="QGridLayout" name="gridLayout_4">
+          <item row="1" column="1">
+           <widget class="QDoubleSpinBox" name="dsb_delta_energy">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;0,000010% ... 100%&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="suffix">
+             <string>%</string>
+            </property>
+            <property name="decimals">
+             <number>5</number>
+            </property>
+            <property name="minimum">
+             <double>0.000010000000000</double>
+            </property>
+            <property name="maximum">
+             <double>100.000000000000000</double>
+            </property>
+            <property name="singleStep">
+             <double>0.000050000000000</double>
+            </property>
+            <property name="value">
+             <double>0.000500000000000</double>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QLabel" name="lb_cancel_calc">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;delta energy&lt;/span&gt;&lt;/p&gt;&lt;p&gt;energydifference at which value the algorithm will be interrupted&lt;br/&gt;(despite chosen truncation criterion)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string>delta energy</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="QPushButton" name="btt_delta_energy_default">
+            <property name="maximumSize">
+             <size>
+              <width>20</width>
+              <height>20</height>
+             </size>
+            </property>
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;reset&lt;/span&gt;&lt;/p&gt;&lt;p&gt;...set default value (0.00050%)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="text">
+             <string/>
+            </property>
+            <property name="icon">
+             <iconset resource="Ressourcen.qrc">
+              <normaloff>:/images/icons/arrowReset.png</normaloff>:/images/icons/arrowReset.png</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>14</width>
+              <height>14</height>
+             </size>
             </property>
            </widget>
           </item>
@@ -601,6 +770,9 @@ border-radius: 4px;
    </item>
    <item>
     <widget class="QCheckBox" name="cb_show_infos">
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;show infos&lt;/span&gt;&lt;/p&gt;&lt;p&gt;...display status information to the bottom of the toolbox&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
      <property name="text">
       <string>show infos</string>
      </property>
@@ -611,6 +783,9 @@ border-radius: 4px;
    </item>
    <item>
     <widget class="QCheckBox" name="cb_show_warnings">
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;show warnings&lt;/span&gt;&lt;/p&gt;&lt;p&gt;...dis-/ enable popup warnings&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     </property>
      <property name="text">
       <string>show warnings</string>
      </property>
@@ -620,6 +795,9 @@ border-radius: 4px;
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QPushButton" name="btt_close">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;save and exit&lt;/span&gt;&lt;/p&gt;&lt;p&gt;...save current settings and close the window&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>save and exit</string>
        </property>
@@ -627,6 +805,9 @@ border-radius: 4px;
      </item>
      <item>
       <widget class="QPushButton" name="btt_cancel">
+       <property name="toolTip">
+        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;cancel&lt;/span&gt;&lt;/p&gt;&lt;p&gt;...abort changes and exit&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       </property>
        <property name="text">
         <string>cancel</string>
        </property>

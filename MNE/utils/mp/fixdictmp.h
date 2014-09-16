@@ -235,9 +235,9 @@ public:
 
 public slots:
 
-    void matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal epsilon, qint32 boost, QString path);
+    void matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal epsilon, qint32 boost, QString path, qreal delta);
 
-    void recieve_input(MatrixXd signal, qint32 max_iterations, qreal epsilon, qint32 boost, QString path);
+    void recieve_input(MatrixXd signal, qint32 max_iterations, qreal epsilon, qint32 boost, QString path, qreal delta);
 
     //=========================================================================================================
 
