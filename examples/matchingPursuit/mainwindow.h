@@ -119,7 +119,6 @@ enum TruncationCriterion
 class GraphWindow;
 class ResiduumWindow;
 class AtomSumWindow;
-class Atom;
 class YAxisWindow;
 
 class MainWindow : public QMainWindow
@@ -132,6 +131,10 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
     //**********************************************************************************************************
+
+    typedef QList<GaborAtom> adaptive_atom_list;
+    typedef QList<FixDictAtom> fix_dict_atom_list;
+    typedef Eigen::VectorXd VectorXd;
 
     //==========================================================================================================
     /**
@@ -147,9 +150,6 @@ public:
 
     //==========================================================================================================
 
-    typedef QList<GaborAtom> adaptive_atom_list;
-    typedef QList<FixDictAtom> fix_dict_atom_list;
-    typedef Eigen::VectorXd VectorXd;    
 
 private slots:
     //==========================================================================================================
