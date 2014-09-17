@@ -202,10 +202,11 @@ private:
     bool m_bIsRunning;      /**< If source lab is running */
     bool m_bProcessData;    /**< If data should be received for processing */
 
-    double m_Fs;
-    qint32 m_iFFTlength;
+    double m_Fs;         /** < sample rate */
+    qint32 m_iFFTlength; /**< number of bins for FFT */
+    float m_DataLen;   /**< the length of data used for spectrum calculation */
 
-    QMutex mutex;
+    QMutex mutex;       /**< mutex for spectrum */
 
 };
 
