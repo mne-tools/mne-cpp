@@ -295,6 +295,7 @@ private:
     bool was_partialchecked;
     bool come_from_sample_count;
     bool come_from_from;
+    bool is_white;
     qreal to;
     qreal signal_energy;
     qreal residuum_energy;

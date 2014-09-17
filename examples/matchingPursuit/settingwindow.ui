@@ -700,7 +700,7 @@ border-radius: 4px;
           <item row="1" column="1">
            <widget class="QDoubleSpinBox" name="dsb_delta_energy">
             <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;0,000010% ... 100%&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;0,0% ... 100%&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -712,7 +712,7 @@ border-radius: 4px;
              <number>5</number>
             </property>
             <property name="minimum">
-             <double>0.000010000000000</double>
+             <double>0.000000000000000</double>
             </property>
             <property name="maximum">
              <double>100.000000000000000</double>
