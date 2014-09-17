@@ -70,7 +70,7 @@ Dictionary::~Dictionary(){}
 
 //*************************************************************************************************************
 
-void FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal epsilon, qint32 boost, QString path)
+void FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal epsilon, qint32 boost, QString path, qreal delta)
 {
     Eigen::initParallel();
 
@@ -203,7 +203,7 @@ void FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal e
         emit current_result(it, max_iterations, current_energy, signal_energy, residuum, adaptive_list, fix_dict_list);
 
 
-        if(((last_energy * 100 / signal_energy) - (residuum_energy * 100 / signal_energy)) < 0.0005)
+        if(((last_energy * 100 / signal_energy) - (residuum_energy * 100 / signal_energy)) < delta)
         {
             std::cout <<  "\n=============================================\n"
                       << "  ALGORITHM ABORTED\n\ndictionary excludes atoms to reduce further residual energy\n"
@@ -506,9 +506,9 @@ QString FixDictMp::create_display_text(FixDictAtom global_best_matching)
 
 //*************************************************************************************************************
 
-void FixDictMp::recieve_input(MatrixXd signal, qint32 max_iterations, qreal epsilon, qint32 boost, QString path)
+void FixDictMp::recieve_input(MatrixXd signal, qint32 max_iterations, qreal epsilon, qint32 boost, QString path, qreal delta)
 {
-    matching_pursuit(signal, max_iterations, epsilon, boost, path);
+    matching_pursuit(signal, max_iterations, epsilon, boost, path, delta);
 }
 
 //*************************************************************************************************************
