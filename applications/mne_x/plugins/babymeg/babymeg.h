@@ -2,6 +2,7 @@
 /**
 * @file     babymeg.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Limin Sun <liminsun@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     February, 2013
@@ -191,6 +192,14 @@ public:
     */
     void comFLL(QString t_sFLLControlCommand);
 
+    //=========================================================================================================
+    /**
+    * Update fiff information
+    *
+    */
+    void UpdateFiffInfo();
+
+
 signals:
     //=========================================================================================================
     /**
@@ -206,7 +215,15 @@ signals:
     */
     void fiffInfoAvailable();
 
+    //=========================================================================================================
+    /**
+    * Emitted when data is ready
+    */
     void DataToSquidCtrlGUI(MatrixXf tmp);
+    //=========================================================================================================
+    /**
+    * Emitted when data received from tcp/ip socket
+    */
     void SendCMDDataToSQUIDControl(QByteArray DATA);
 
 
@@ -254,6 +271,7 @@ private:
     QAction*                        m_pActionSetupProject;      /**< shows setup project dialog */
     QAction*                        m_pActionRecordFile;        /**< start recording action */
     QAction*                        m_pActionSqdCtrl;           /**< show squid control */
+    QAction*                        m_pActionUpdateFiffInfo;        /**< Update Fiff Info action */
 
 
 public:
