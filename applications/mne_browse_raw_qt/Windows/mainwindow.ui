@@ -116,7 +116,7 @@
   </action>
   <action name="m_channelSelectionManagerAction">
    <property name="text">
-    <string>Show channelSelectionManager</string>
+    <string>Show channel selection manager</string>
    </property>
   </action>
  </widget>

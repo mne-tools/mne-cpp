@@ -75,6 +75,8 @@ SOURCES += \
     Utils/mneoperator.cpp \
     Utils/filteroperator.cpp \
     Utils/filterplotscene.cpp \
+    Utils/layoutscene.cpp \
+    Utils/channelitem.cpp \
     Models/rawmodel.cpp \
     Models/eventmodel.cpp \
     Delegates/rawdelegate.cpp \
@@ -95,6 +97,8 @@ HEADERS += \
     Utils/types.h \
     Utils/info.h \
     Utils/filterplotscene.h \
+    Utils/layoutscene.cpp \
+    Utils/channelitem.h \
     Models/rawmodel.h \
     Models/eventmodel.h \
     Delegates/rawdelegate.h \
