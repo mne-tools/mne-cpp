@@ -60,6 +60,7 @@
 #include <QMessageBox>
 #include <QMap>
 #include <QtConcurrent>
+#include <qtconcurrentrun.h>
 #include "QtGui"
 
 //*************************************************************************************************************
@@ -99,6 +100,7 @@ Formulaeditor *_formula_editor;
 EditorWindow *_editor_window;
 Enhancededitorwindow *_enhanced_editor_window;
 settingwindow *_setting_window;
+QPalette Pal;
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -177,6 +179,16 @@ MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::
     ui->splitter->restoreState(settings.value("splitter_sizes").toByteArray());
     last_open_path = settings.value("last_open_path", QDir::homePath()+ "/" + "Matching-Pursuit-Toolbox").toString();
     last_save_path = settings.value("last_save_path", QDir::homePath()+ "/" + "Matching-Pursuit-Toolbox").toString();
+
+
+    // set black background
+    Pal.setColor(QPalette::BrightText, Qt::black);
+    Pal.setColor(QPalette::Window, Qt::black);
+    Pal.setColor(QPalette::Text, Qt::black);
+    Pal.setColor(QPalette::HighlightedText, Qt::white);
+    ui->progressBarCalc->setAutoFillBackground(true);
+    ui->progressBarCalc->setPalette(Pal);
+    //ui->progressBarCalc->show();
 
     if(!settings.value("show_infos", true).toBool())
     {
@@ -270,11 +282,10 @@ void MainWindow::open_file()
     ui->lb_timer->setHidden(true);
 
     if(file_name.endsWith(".fif", Qt::CaseInsensitive))
-    {        
-        ui->dsb_from->setValue(47.000f);
-        ui->dsb_to->setValue(47.999f);
-        _from = 47.000f;
-        to = 47.999f;
+    {
+
+        _from = 0;
+        to = 511;
         //read_fiff_ave(_file_name);
         read_fiff_file(file_name);
         ui->lb_from->setHidden(false);
@@ -283,11 +294,14 @@ void MainWindow::open_file()
         ui->dsb_to->setHidden(false);
         ui->lb_samples->setHidden(false);
         ui->sb_sample_count->setHidden(false);
+
+        ui->dsb_from->setValue(47.000f);
+        ui->dsb_to->setValue(47.999f);
     }
     else
     {
         _from = 0;
-        _signal_matrix.resize(0,0);
+        //_signal_matrix.resize(0,0);
         read_matlab_file(file_name);
         ui->lb_from->setHidden(true);
         ui->dsb_from->setHidden(true);
@@ -297,7 +311,7 @@ void MainWindow::open_file()
         ui->sb_sample_count->setHidden(true);
     }
 
-    original_signal_matrix.resize(_signal_matrix.rows(), _signal_matrix.cols());
+    //original_signal_matrix.resize(_signal_matrix.rows(), _signal_matrix.cols());
     original_signal_matrix = _signal_matrix;
     ui->tbv_Results->setRowCount(0);
     callYAxisWindow->setMinimumHeight(22);
@@ -305,8 +319,8 @@ void MainWindow::open_file()
 
     fill_channel_combobox();
 
-    _atom_sum_matrix.resize(_signal_matrix.rows(), _signal_matrix.cols()); //resize
-    _residuum_matrix.resize(_signal_matrix.rows(), _signal_matrix.cols()); //resize
+    _atom_sum_matrix = MatrixXd::Zero(_signal_matrix.rows(), _signal_matrix.cols()); //resize
+    _residuum_matrix = MatrixXd::Zero(_signal_matrix.rows(), _signal_matrix.cols()); //resize
 
     ui->progressBarCalc->reset();
     ui->progressBarCalc->setVisible(false);
@@ -314,7 +328,7 @@ void MainWindow::open_file()
     _has_warning = false;
 
     _new_paint = true;
-    update();   
+    update();
 }
 
 //*************************************************************************************************************************************
@@ -354,9 +368,9 @@ void MainWindow::cb_selection_changed(const QModelIndex& topLeft, const QModelIn
             size++;
 
 
-    _signal_matrix.resize(original_signal_matrix.rows(), size);
-    _atom_sum_matrix.resize(original_signal_matrix.rows(), size);
-    _residuum_matrix.resize(original_signal_matrix.rows(), size);
+    _signal_matrix = MatrixXd::Zero(original_signal_matrix.rows(), size);
+    _atom_sum_matrix = MatrixXd::Zero(original_signal_matrix.rows(), size);
+    _residuum_matrix = MatrixXd::Zero(original_signal_matrix.rows(), size);
 
     _colors.clear();
     qint32 selected_chn = 0;
@@ -392,7 +406,7 @@ void MainWindow::read_fiff_ave(QString file_name)
 
     qint32 cols = 5;
     if(datas.cols() <= 5)   cols = datas.cols();
-    _signal_matrix.resize(datas.cols(),cols);
+    _signal_matrix = MatrixXd::Zero(datas.cols(),cols);
 
     for(qint32 channels = 0; channels < cols; channels++)
         _signal_matrix.col(channels) = datas.row(channels);
@@ -416,7 +430,7 @@ qint32 MainWindow::read_fiff_file(QString fileName)
 
     //   Read a data segment
     //   times output argument is optional
-    if (!raw.read_raw_segment_times(datas, times, _from + 0.002, to, picks))
+    if (!raw.read_raw_segment/*_times*/(datas, times, raw.first_samp + _from, raw.first_samp + to, picks))
     {
        printf("Could not read raw segment.\n");
        return -1;
@@ -428,11 +442,14 @@ qint32 MainWindow::read_fiff_file(QString fileName)
     _sample_rate = raw.info.sfreq;
 
     //ToDo: read all channels, or only a few?!
-    qint32 rows = 305;
-    if(datas.rows() <= rows)   rows = datas.rows();
-    _signal_matrix.resize(datas.cols(),rows);
+    //qint32 rows = 305;
+    //if(datas.rows() <= rows)
+    //rows = datas.rows();
 
-    for(qint32 channels = 0; channels < rows; channels++)
+    //signal must be filled with datas like this, because data.col == signal.row and vice versa
+    _signal_matrix = MatrixXd::Zero(datas.cols(),datas.rows());
+
+    for(qint32 channels = 0; channels < datas.rows(); channels++)
         _signal_matrix.col(channels) = datas.row(channels);
 
     ui->sb_sample_count->setValue((qint32)datas.cols());
@@ -448,13 +465,13 @@ void MainWindow::read_fiff_file_new(QString file_name)
     this->cb_items.clear();
 
     read_fiff_file(file_name);
-    original_signal_matrix.resize(_signal_matrix.rows(), _signal_matrix.cols());
+    //original_signal_matrix.resize(_signal_matrix.rows(), _signal_matrix.cols());
     original_signal_matrix = _signal_matrix;
 
     fill_channel_combobox();
     ui->tbv_Results->setRowCount(0);
-    _atom_sum_matrix.resize(_signal_matrix.rows(), _signal_matrix.cols()); //resize
-    _residuum_matrix.resize(_signal_matrix.rows(), _signal_matrix.cols()); //resize
+    _atom_sum_matrix = MatrixXd::Zero(_signal_matrix.rows(), _signal_matrix.cols()); //resize
+    _residuum_matrix = MatrixXd::Zero(_signal_matrix.rows(), _signal_matrix.cols()); //resize
 
     ui->lb_info_content->setText("");
     ui->cb_all_select->setHidden(true);    
@@ -510,7 +527,7 @@ void MainWindow::read_matlab_file(QString fileName)
         strList.append(file.readLine(0).constData());
     }
     int rowNumber = 0;
-    _signal_matrix.resize(strList.length(), 1);
+    _signal_matrix = MatrixXd::Zero(strList.length(), 1);
     file.close();
     file.open(QIODevice::ReadOnly);
     while(!file.atEnd())
@@ -806,12 +823,12 @@ void YAxisWindow::paint_axis(MatrixXd signalMatrix, QSize windowSize)
         {
             if(j == 20)
             {
-                painter.drawText(j * scaleXAchse + 37, 20, QString::number(j * scaleXText + _from, 'f', 2));    // scalevalue as string
+                painter.drawText(j * scaleXAchse + 37, 20, QString::number(j * scaleXText + _from / _sample_rate, 'f', 2));    // scalevalue as string
                 painter.drawLine(j * scaleXAchse + 55, 5 + 2, j * scaleXAchse + 55 , 5 - 2);                    // scalelines
             }
             else
             {
-                painter.drawText(j * scaleXAchse + 45, 20, QString::number(j * scaleXText + _from, 'f', 2));    // scalevalue as string
+                painter.drawText(j * scaleXAchse + 45, 20, QString::number(j * scaleXText + _from / _sample_rate, 'f', 2));    // scalevalue as string
                 painter.drawLine(j * scaleXAchse + 55, 5 + 2, j * scaleXAchse + 55 , 5 - 2);                    // scalelines
             }
         }
@@ -882,8 +899,14 @@ void MainWindow::on_btt_Calc_clicked()
         _adaptive_atom_list.clear();
         _fix_dict_atom_list.clear();
 
+        //reset progressbar text color to black
+        Pal.setColor(QPalette::Text, Qt::black);
+        ui->progressBarCalc->setPalette(Pal);
+        is_white = false;
+
         is_saved = false;
         _has_warning = false;
+        ui->lb_info_content->setText("");
 
         _residuum_matrix = _signal_matrix;
         _atom_sum_matrix = MatrixXd::Zero(_signal_matrix.rows(), _signal_matrix.cols());      
@@ -925,6 +948,7 @@ void MainWindow::on_btt_Calc_clicked()
     //cancel calculation thread
     else if(ui->btt_Calc->text() == "cancel")
     {
+        emit
         mp_Thread->requestInterruption();
         ui->btt_Calc->setText("wait...");
     }
@@ -941,7 +965,6 @@ void MainWindow::on_time_out()
 }
 
 //*************************************************************************************************************
-
 void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations, qreal current_energy, qreal max_energy, MatrixXd residuum,
                                 adaptive_atom_list adaptive_atom_res_list, fix_dict_atom_list fix_dict_atom_res_list)
 {
@@ -961,7 +984,7 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
 
         QTableWidgetItem* atomEnergieItem = new QTableWidgetItem(QString::number(100 * temp_atom.energy / max_energy, 'f', 2));
         QTableWidgetItem* atomScaleItem = new QTableWidgetItem(QString::number(temp_atom.scale / _sample_rate, 'g', 3));
-        QTableWidgetItem* atomTranslationItem = new QTableWidgetItem(QString::number(temp_atom.translation / qreal(_sample_rate) + _from, 'g', 4));
+        QTableWidgetItem* atomTranslationItem = new QTableWidgetItem(QString::number(temp_atom.translation / qreal(_sample_rate) + _from  / _sample_rate, 'g', 4));
         QTableWidgetItem* atomModulationItem = new QTableWidgetItem(QString::number(temp_atom.modulation * _sample_rate / temp_atom.sample_count, 'g', 3));
         QTableWidgetItem* atomPhaseItem = new QTableWidgetItem(QString::number(phase, 'g', 3));
 
@@ -1060,6 +1083,7 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
     */}
 
     //progressbar update remaining energy and iterations update
+
     QString text = QString("residual energy: %0%            iterations: %1").arg(QString::number(residuum_energy, 'f', 2)).arg(current_iteration);
     ui->progressBarCalc->setFormat(text);
     qint32 prgrsbar_adapt = 99;
@@ -1072,6 +1096,13 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
 
     if(((current_iteration == max_iterations) || (max_energy - current_energy) < (0.01 * percent * max_energy))&&ui->chb_ResEnergy->isChecked())
         ui->progressBarCalc->setValue(ui->progressBarCalc->maximum());
+
+    if(ui->progressBarCalc->value() > ui->progressBarCalc->maximum() / 2 && !is_white)
+    {
+        Pal.setColor(QPalette::Text, Qt::white);
+        ui->progressBarCalc->setPalette(Pal);
+        is_white = true;
+    }
 
     // update ui
     if(max_iterations > 10 && percent < 1 && _signal_matrix.cols() > 40 && recieved_result_counter % 10 == 0)
@@ -1108,21 +1139,33 @@ void MainWindow::recieve_warnings(qint32 warning_number)
         QString text;
         if(warning_number == 1 && !_has_warning)
         {
-            text = "The dictionary does not have the appropriate atoms to approximate the signal more closely. Calculation terminated before reaching truncation criterion.";
+            text = "The dictionary does not have the appropriate atoms to approximate the signal more closely. Calculation terminated before reaching truncation criterion. ";
             ui->lb_info_content->setText(text);
             _has_warning = true;
         }
         else if(warning_number == 2 && !_has_warning)
         {
-            text = "No matching sample count between atoms and signal. This leads to discontinuities.";
+            text = "No matching sample count between atoms and signal. This leads to discontinuities. ";
             ui->lb_info_content->setText(text);
             _has_warning = true;
         }
-        else if(_has_warning)
+        else if(_has_warning && warning_number != 10)
         {
-            text = "This dictionary does not fit the signals sample count (leads to discontinuities) and excludes atoms to reduce further residual energy. Calculation terminated before reaching truncation criterion.";
+            text = "This dictionary does not fit the signals sample count (leads to discontinuities) and excludes atoms to reduce further residual energy. Calculation terminated before reaching truncation criterion. ";
             ui->lb_info_content->setText(text);
         }
+        if(warning_number == 10)
+        {
+            text = ui->lb_info_content->text();
+            text.append("Algorithm canceled by user interaction.");
+            ui->lb_info_content->setText(text);
+        }
+        if(warning_number == 11)
+        {
+            text = QString("Simplex Iteration limit of %1 achieved, result may not be optimal. ").arg(settings.value("adaptive_iterations").toInt());
+            ui->lb_info_content->setText(text);
+        }
+
     }
 }
 
@@ -1222,6 +1265,10 @@ void MainWindow::calc_thread_finished()
     ui->btt_OpenSignal->setEnabled(true);
     ui->progressBarCalc->setValue(ui->progressBarCalc->maximum());
 
+    Pal.setColor(QPalette::Text, Qt::white);
+    ui->progressBarCalc->setPalette(Pal);
+    is_white = true;
+
     ui->btt_Calc->setText("calculate");
     ui->cb_channels->setEnabled(true);
     ui->cb_all_select->setEnabled(true);
@@ -1286,6 +1333,8 @@ void MainWindow::calc_adaptiv_mp(MatrixXd signal, TruncationCriterion criterion)
     connect(adaptive_Mp, SIGNAL(finished_calc()), adaptive_Mp, SLOT(deleteLater()));
     connect(mp_Thread, SIGNAL(finished()), this, SLOT(calc_thread_finished()));
     connect(mp_Thread, SIGNAL(finished()), mp_Thread, SLOT(deleteLater()));
+
+    connect(adaptive_Mp, SIGNAL(send_warning(qint32)), this, SLOT(recieve_warnings(qint32)));
 
     QSettings settings;
     bool fixphase = settings.value("fixPhase", false).toBool();
@@ -1378,6 +1427,7 @@ void MainWindow::on_actionW_rterbucheditor_triggered()
         _editor_window->setWindowState(Qt::WindowActive);
         _editor_window->raise();
     }
+
 }
 
 //*****************************************************************************************************************
@@ -1474,7 +1524,7 @@ void MainWindow::on_dsb_sample_rate_editingFinished()
 
 void MainWindow::on_dsb_from_editingFinished()
 {   
-    _from = ui->dsb_from->value();
+    _from = floor(ui->dsb_from->value() * _sample_rate);
     read_fiff_file_new(file_name);
 }
 
@@ -1482,7 +1532,7 @@ void MainWindow::on_dsb_from_editingFinished()
 
 void MainWindow::on_dsb_to_editingFinished()
 {   
-    to = ui->dsb_to->value();
+    to = ui->dsb_to->value() * _sample_rate;
     read_fiff_file_new(file_name);
 }
 
@@ -1491,9 +1541,9 @@ void MainWindow::on_dsb_to_editingFinished()
 void MainWindow::on_dsb_from_valueChanged(double arg1)
 {
     come_from_from = true;
-    qreal var = (to - arg1) * _sample_rate;
+    qreal var = to - floor(arg1  * _sample_rate);
     if(ui->dsb_to->value() <= arg1 || var < 64 || var > 4097)
-        ui->dsb_from->setValue(_from);
+        ui->dsb_from->setValue(_from  / _sample_rate);
     else
         ui->sb_sample_count->setValue(var);
     come_from_from = false;
@@ -1503,9 +1553,9 @@ void MainWindow::on_dsb_from_valueChanged(double arg1)
 
 void MainWindow::on_dsb_to_valueChanged(double arg1)
 {
-    qreal var  = (arg1 - _from) * _sample_rate;
+    qreal var  = floor(arg1  * _sample_rate) - _from;
     if(ui->dsb_from->value() >= arg1 || var < 64 || var > 4097)
-        ui->dsb_to->setValue(to);
+        ui->dsb_to->setValue(to  / _sample_rate);
 
     if(!come_from_sample_count)
         ui->sb_sample_count->setValue(var);
@@ -1517,7 +1567,7 @@ void MainWindow::on_sb_sample_count_valueChanged(int arg1)
 {
     come_from_sample_count = true;
     if(!come_from_from)
-        ui->dsb_to->setValue(_from  + ((qreal)arg1 / _sample_rate));
+        ui->dsb_to->setValue(_from  + arg1);
     come_from_sample_count = false;
 }
 
@@ -1527,7 +1577,7 @@ void MainWindow::on_sb_sample_count_editingFinished()
 {
     if(!come_from_from)
     {
-        to = ui->dsb_to->value();
+        to = ui->dsb_to->value() * _sample_rate;
         read_fiff_file_new(file_name);
     }
 }
@@ -1565,7 +1615,6 @@ void MainWindow::on_cb_all_select_clicked()
             else
                 ui->tbv_Results->item(i, 0)->setCheckState(Qt::Unchecked);
     }
-
 
     bool all_selected = true;
     bool all_deselected = true;
@@ -1678,6 +1727,7 @@ void MainWindow::on_actionSpeicher_unter_triggered()
         last_save_path = "";
         for(qint32 i = 0; i < string_list.length() - 1; i++)
             last_save_path += string_list.at(i) + '/';
+
         save_fif_file();
     }
 }
@@ -1723,7 +1773,6 @@ void MainWindow::save_fif_file()
     fiff_int_t quantum = ceil(quantum_sec*raw.info.sfreq);  //   To read the whole file at once set quantum     = to - from + 1;
 
     //************************************************************************************
-
     //
     //   Read and write all the data
     //
@@ -1731,8 +1780,8 @@ void MainWindow::save_fif_file()
     fiff_int_t first, last;
     MatrixXd data;
     MatrixXd times;
-    qreal start_change = _from * raw.info.sfreq;    // start of change
-    qreal end_change = to * raw.info.sfreq + 1;    // end of change
+    qint32 start_change = _from;// * raw.info.sfreq;    // start of change
+    qint32 end_change = to;// * raw.info.sfreq + 1;    // end of change
 
     ui->progressBarCalc->setValue(0);
     ui->progressBarCalc->setMinimum(0);

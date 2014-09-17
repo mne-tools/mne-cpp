@@ -220,6 +220,8 @@ signals:
                         adaptive_atom_list atom_list, fix_dict_atom_list fix_dict_list);
     void finished_calc();
 
+    void send_warning(qint32 warning);
+
 };
 
 }   // NAMESPACE
