@@ -212,7 +212,10 @@ void FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal e
             break;
         }
         if( QThread::currentThread()->isInterruptionRequested())
+        {
+            send_warning(10);
             break;
+        }
 
     }//end while iterations
 
