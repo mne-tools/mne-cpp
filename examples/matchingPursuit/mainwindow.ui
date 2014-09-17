@@ -463,9 +463,18 @@
           <property name="styleSheet">
            <string notr="true">QProgressBar {	
 	color: white;
+	
+	
+	
 }
 QProgressBar::chunk { 
 	background-image: url(:/images/icons/progressbar_brush.png);
+	
+}
+
+QProgressBar::background{
+
+ color: black;
 }</string>
           </property>
           <property name="value">
@@ -835,12 +844,12 @@ QProgressBar::chunk {
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>89</x>
-     <y>146</y>
+     <x>103</x>
+     <y>70</y>
     </hint>
     <hint type="destinationlabel">
-     <x>198</x>
-     <y>146</y>
+     <x>202</x>
+     <y>72</y>
     </hint>
    </hints>
   </connection>
@@ -851,12 +860,12 @@ QProgressBar::chunk {
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>346</x>
-     <y>178</y>
+     <x>114</x>
+     <y>142</y>
     </hint>
     <hint type="destinationlabel">
-     <x>561</x>
-     <y>190</y>
+     <x>681</x>
+     <y>144</y>
     </hint>
    </hints>
   </connection>
@@ -867,12 +876,12 @@ QProgressBar::chunk {
    <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>60</x>
-     <y>124</y>
+     <x>74</x>
+     <y>95</y>
     </hint>
     <hint type="destinationlabel">
-     <x>236</x>
-     <y>130</y>
+     <x>239</x>
+     <y>97</y>
     </hint>
    </hints>
   </connection>

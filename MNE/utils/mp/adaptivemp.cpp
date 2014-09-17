@@ -428,7 +428,10 @@ QList<GaborAtom> AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterat
         }
 
         if(cnt==iterations)//max number of iteration achieves before tol is satisfied
+        {
+            send_warning(11);
             std::cout<<"Simplex Iteration limit of "<<iterations<<" achieved, result may not be optimal\n";
+        }
 
         //end Maximisation Copyright (C) 2010 Botao Jia
 
@@ -471,7 +474,10 @@ QList<GaborAtom> AdaptiveMp::matching_pursuit(MatrixXd signal, qint32 max_iterat
         emit current_result(it, max_it, current_energy, signal_energy, residuum, atom_list, fix_dict_list);
 
         if( QThread::currentThread()->isInterruptionRequested())
+        {
+            send_warning(10);
             break;
+        }
 
     }//end iterations    
     std::cout << "\nAdaptive Matching Pursuit Algorithm finished.\n";
