@@ -432,6 +432,8 @@ qint32 MainWindow::read_fiff_file(QString fileName)
     //   times output argument is optional
     if (!raw.read_raw_segment/*_times*/(datas, times, raw.first_samp + _from, raw.first_samp + to, picks))
     {
+       QMessageBox::warning(this, tr("Error"),
+       tr("error: Read fif unsucessful."));
        printf("Could not read raw segment.\n");
        return -1;
     }
@@ -1741,19 +1743,21 @@ void MainWindow::save_fif_file()
     ui->cb_all_select->setHidden(true);
     ui->progressBarCalc->setHidden(false);
     ui->progressBarCalc->setFormat("save fif file:  %p%");
+    ui->progressBarCalc->setValue(0);
+    ui->progressBarCalc->setMinimum(0);
+    //reset progressbar text color to black
+    Pal.setColor(QPalette::Text, Qt::black);
+    ui->progressBarCalc->setPalette(Pal);
+    ui->progressBarCalc->repaint();
+    is_white = false;
 
     QFile t_fileIn(file_name);
     QFile t_fileOut(save_path);
 
-    //
-    //   Setup for reading the raw data
-    //
+    //   Setup for reading the raw data   
     FiffRawData raw(t_fileIn);
 
-    //
-    //   Set up pick list: MEG + STI 014 - bad channels
-    //
-    //
+    //   Set up pick list: MEG + STI 014 - bad channels   
     QStringList include;
     include << "STI 014";
     bool want_meg   = true;
@@ -1764,31 +1768,26 @@ void MainWindow::save_fif_file()
     MatrixXd cals;
     FiffStream::SPtr outfid = Fiff::start_writing_raw(t_fileOut,raw.info, cals, picks);
 
-    //
     //   Set up the reading parameters
-    //
     fiff_int_t from = raw.first_samp;
     fiff_int_t to = raw.last_samp;
+    ui->progressBarCalc->setMaximum(to);
     float quantum_sec = 10.0f;//read and write in 10 sec junks
     fiff_int_t quantum = ceil(quantum_sec*raw.info.sfreq);  //   To read the whole file at once set quantum     = to - from + 1;
 
-    //************************************************************************************
-    //
     //   Read and write all the data
-    //
+    //************************************************************************************
     bool first_buffer = true;
-    fiff_int_t first, last;
+    fiff_int_t first = from;
+    fiff_int_t last;
     MatrixXd data;
     MatrixXd times;
-    qint32 start_change = _from;// * raw.info.sfreq;    // start of change
-    qint32 end_change = to;// * raw.info.sfreq + 1;    // end of change
+    fiff_int_t start_change = _from + raw.first_samp;        // start of change
+    fiff_int_t end_change = this->to + raw.first_samp;       // end of change
 
-    ui->progressBarCalc->setValue(0);
-    ui->progressBarCalc->setMinimum(0);
-    ui->progressBarCalc->setMaximum(to);
 
     // from 0 to start of change
-    for(first = from; first < start_change; first+=quantum)
+    for(first; first < start_change; first+=quantum)
     {
         last = first+quantum-1;
         if (last > start_change)
@@ -1813,6 +1812,12 @@ void MainWindow::save_fif_file()
         printf("[done]\n");
 
         ui->progressBarCalc->setValue(first);
+        if(ui->progressBarCalc->value() > ui->progressBarCalc->maximum() / 2 && !is_white)
+        {
+            Pal.setColor(QPalette::Text, Qt::white);
+            ui->progressBarCalc->setPalette(Pal);
+            is_white = true;
+        }
     }
 
     //************************************************************************************
@@ -1835,7 +1840,12 @@ void MainWindow::save_fif_file()
             index++;
         }
     }
-
+    if (first_buffer)
+    {
+       if (start_change > 0)
+           outfid->write_int(FIFF_FIRST_SAMPLE,&start_change);
+       first_buffer = false;
+    }
     printf("Writing new data...");
     outfid->write_raw_buffer(data,cals);
     printf("[done]\n");
@@ -1861,6 +1871,12 @@ void MainWindow::save_fif_file()
         outfid->write_raw_buffer(data,cals);
         printf("[done]\n");
         ui->progressBarCalc->setValue(first);
+        if(ui->progressBarCalc->value() > ui->progressBarCalc->maximum() / 2 && !is_white)
+        {
+            Pal.setColor(QPalette::Text, Qt::white);
+            ui->progressBarCalc->setPalette(Pal);
+            is_white = true;
+        }
     }
 
     save_parameters();
@@ -1892,7 +1908,7 @@ void MainWindow::save_parameters()
         xmlWriter.setAutoFormatting(true);
         xmlWriter.writeStartDocument();
 
-        for(qint32 i = 0; i < _adaptive_atom_list.length(); i++)
+        for(qint32 i = 0; i < ui->tbv_Results->rowCount() - 1; i++)
         {
             if(ui->tbv_Results->columnCount() == 2 && ui->tbv_Results->item(i, 1)->text() != "residuum")
             {
@@ -1901,24 +1917,19 @@ void MainWindow::save_parameters()
                 xmlWriter.writeStartElement("ATOM");
                 xmlWriter.writeAttribute("formula", fix_atom.atom_formula);
                 xmlWriter.writeAttribute("sample_count", QString::number(fix_atom.sample_count));
-                xmlWriter.writeAttribute("energy", ui->tbv_Results->item(i, 0)->text());
-                xmlWriter.writeAttribute("parameters", ui->tbv_Results->item(i, 1)->text());
+                xmlWriter.writeAttribute("%energy_from_signal", ui->tbv_Results->item(i, 0)->text());
                 xmlWriter.writeAttribute("dict_source", fix_atom.dict_source);
-
                 xmlWriter.writeStartElement("PARAMETER");
+
                 if(fix_atom.type == AtomType::GABORATOM)
                 {
-                    xmlWriter.writeAttribute("formula", "GABORATOM");
-                    xmlWriter.writeStartElement("PARAMETER");
                     xmlWriter.writeAttribute("scale", QString::number(fix_atom.gabor_atom.scale));
                     xmlWriter.writeAttribute("translation", QString::number(fix_atom.translation));
                     xmlWriter.writeAttribute("modulation", QString::number(fix_atom.gabor_atom.modulation));
                     xmlWriter.writeAttribute("phase", QString::number(fix_atom.gabor_atom.phase));
                 }
                 else if(fix_atom.type == AtomType::CHIRPATOM)
-                {
-                    xmlWriter.writeAttribute("formula", "CHIRPATOM");
-                    xmlWriter.writeStartElement("PARAMETER");
+                {                   
                     xmlWriter.writeAttribute("scale", QString::number(fix_atom.chirp_atom.scale));
                     xmlWriter.writeAttribute("translation", QString::number(fix_atom.translation));
                     xmlWriter.writeAttribute("modulation", QString::number(fix_atom.chirp_atom.modulation));
@@ -1926,7 +1937,7 @@ void MainWindow::save_parameters()
                     xmlWriter.writeAttribute("chirp", QString::number(fix_atom.chirp_atom.chirp));
                 }
                 else if(fix_atom.type == AtomType::FORMULAATOM)
-                {
+                {                    
                     xmlWriter.writeAttribute("translation", QString::number(fix_atom.translation));
                     xmlWriter.writeAttribute("a", QString::number(fix_atom.formula_atom.a));
                     xmlWriter.writeAttribute("b", QString::number(fix_atom.formula_atom.b));
@@ -1946,15 +1957,15 @@ void MainWindow::save_parameters()
                 xmlWriter.writeStartElement("ATOM");
                 xmlWriter.writeAttribute("formula", "GABORATOM");
                 xmlWriter.writeAttribute("sample_count", QString::number(gabor_atom.sample_count));
-                xmlWriter.writeAttribute("energy", ui->tbv_Results->item(i, 0)->text());
+                xmlWriter.writeAttribute("%energy_from_signal", ui->tbv_Results->item(i, 0)->text());
 
                 xmlWriter.writeStartElement("PARAMETER");
                 xmlWriter.writeAttribute("scale", QString::number(gabor_atom.scale));
                 xmlWriter.writeAttribute("translation", QString::number(gabor_atom.translation));
                 xmlWriter.writeAttribute("modulation", QString::number(gabor_atom.modulation));
                 xmlWriter.writeAttribute("phase", QString::number(gabor_atom.phase));
-
                 xmlWriter.writeEndElement();    //PARAMETER
+
                 xmlWriter.writeEndElement();    //ATOM
             }
         }
