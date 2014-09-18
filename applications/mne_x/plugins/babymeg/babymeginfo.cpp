@@ -143,6 +143,7 @@ void BabyMEGInfo::MGH_LM_Get_Channel_Info(QByteArray cmdstr)
     lm_ch_pos12.clear();
     lm_ch_coiltype.clear();
     lm_ch_calicoef.clear();
+    lm_ch_gain.clear();
 
 
     // parse the information for each channel
@@ -180,6 +181,8 @@ void BabyMEGInfo::MGH_LM_Get_Channel_Info(QByteArray cmdstr)
                 lm_ch_coiltype.append(schp.at(13));
                 //calibration coefficient
                 lm_ch_calicoef.append(schp.at(14));
+                //gain
+                lm_ch_gain.append(schp.at(15));
 
 //                qDebug()<<lm_ch_scales;
 //                qDebug()<<lm_ch_pos2;
@@ -254,9 +257,9 @@ void BabyMEGInfo::MGH_LM_Parse_Para(QByteArray cmdstr)
         t_ch.scanno = i;
         t_ch.logno = i+1;
         t_ch.cal = lm_ch_calicoef.at(i).toDouble();
-        t_ch.unit_mul = lm_ch_scales.at(i).toFloat(); // set scale
+        t_ch.unit_mul = lm_ch_scales.at(i).toFloat();
         //qDebug()<<t_ch.cal;
-        t_ch.range = 1;
+        t_ch.range = lm_ch_gain.at(i).toFloat();//1; // set scale
         t_ch.loc.setZero(12,1);
 
         //set loc
@@ -328,7 +331,7 @@ void BabyMEGInfo::MGH_LM_Parse_Para(QByteArray cmdstr)
 
     return;
 }
-
+/*
 //*************************************************************************************************************
 
 void BabyMEGInfo::EnQueue(QByteArray DataIn)
@@ -357,3 +360,4 @@ QByteArray BabyMEGInfo::DeQueue()
     qDebug() << "Data Out...[size="<<g_queue.size()<<"]";
     return val;
 }
+*/

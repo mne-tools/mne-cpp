@@ -73,6 +73,7 @@ NoiseEstimate::NoiseEstimate()
 , m_pBuffer(CircularMatrixBuffer<double>::SPtr())
 , m_Fs(600)
 , m_iFFTlength(16384)
+, m_DataLen(6)
 {
 }
 
@@ -107,6 +108,7 @@ void NoiseEstimate::init()
     //
     QSettings settings;
     m_iFFTlength = settings.value(QString("Plugin/%1/FFTLength").arg(this->getName()), 16384).toInt();
+    m_DataLen = settings.value(QString("Plugin/%1/DataLen").arg(this->getName()), 6).toInt();
 
     // Input
     m_pRTMSAInput = PluginInputData<NewRealTimeMultiSampleArray>::create(this, "Noise Estimatge In", "Noise Estimate input data");
@@ -117,9 +119,6 @@ void NoiseEstimate::init()
     m_pFSOutput = PluginOutputData<FrequencySpectrum>::create(this, "Noise Estimate Out", "Noise Estimate output data");
     m_pFSOutput->data()->setName(this->getName());//Provide name to auto store widget settings
     m_outputConnectors.append(m_pFSOutput);
-
-//    m_pRTMSAOutput->data()->setMultiArraySize(100);
-//    m_pRTMSAOutput->data()->setVisibility(true);
 
     //init channels when fiff info is available
     connect(this, &NoiseEstimate::fiffInfoAvailable, this, &NoiseEstimate::initConnector);
@@ -139,6 +138,7 @@ void NoiseEstimate::unload()
     //
     QSettings settings;
     settings.setValue(QString("Plugin/%1/FFTLength").arg(this->getName()), m_iFFTlength);
+    settings.setValue(QString("Plugin/%1/DataLen").arg(this->getName()), m_DataLen);
 }
 
 
@@ -263,7 +263,6 @@ void NoiseEstimate::appendNoiseSpectrum(MatrixXd t_send)
     mutex.lock();
     m_qVecSpecData.push_back(t_send);
     mutex.unlock();
-    //m_pFSOutput->data()->setValue(t_send);
     qDebug()<<"---------------------------------appendNoiseSpectrum--------------------------------";
 }
 
@@ -278,18 +277,19 @@ void NoiseEstimate::run()
     while(!m_pFiffInfo)
         msleep(10);// Wait for fiff Info
 
-    //
     // Init Real-Time Noise Spectrum estimator
     //
-    m_pRtNoise = RtNoise::SPtr(new RtNoise(m_iFFTlength, m_pFiffInfo));
+    // calculate the segments according to the requested data length
+    // here 500 is the number of samples for a block specified in babyMEG plugin
+    m_Fs = m_pFiffInfo->sfreq;
+    int segments =  (qint32) ((m_DataLen * m_pFiffInfo->sfreq)/500.0);
+
+    qDebug()<<"+++++++++++segments :"<<segments<< "m_DataLen"<<m_DataLen<<"m_Fs"<<m_Fs<<"++++++++++++++++++++++++";
+
+    m_pRtNoise = RtNoise::SPtr(new RtNoise(m_iFFTlength, m_pFiffInfo, segments));
     connect(m_pRtNoise.data(), &RtNoise::SpecCalculated, this, &NoiseEstimate::appendNoiseSpectrum);
-    //connect(m_pRtNoise.data(), &RtNoise::SpecCalculated, this, &NoiseEstimate::appendNoiseSpectrum);
 
-//    m_pRtNoise = new RtNoise(m_iFFTlength, m_pFiffInfo);
-//    connect(m_pRtNoise, &RtNoise::SpecCalculated, this, &NoiseEstimate::appendNoiseSpectrum);
-
-
-    // Start the rt helpers
+    // Start Spectrum estimation
 
     m_pRtNoise->start();
 
@@ -308,7 +308,6 @@ void NoiseEstimate::run()
 
            if(m_qVecSpecData.size() > 0)
            {
-
                mutex.lock();
                qDebug()<<"%%%%%%%%%%%%%%%% send spectrum for display %%%%%%%%%%%%%%%%%%%";
                 //send spectrum to the output data
