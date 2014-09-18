@@ -179,6 +179,7 @@ private:
     Ui::Formulaeditor *ui;
     AtomPaintWindow *callAtomPaintWindow;
 
+    //========================================================================================================
     // formula methods    Copyright: 2004, Ralf Wirtz
     QString m_strFormula;
     QString m_strFunction;
@@ -210,6 +211,7 @@ private:
     double sqr(double x);
     void closeEvent(QCloseEvent * event);
     // end formula methods    Copyright: 2004, Ralf Wirtz
+    //========================================================================================================
 
 };
 
