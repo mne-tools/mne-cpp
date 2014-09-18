@@ -16,6 +16,7 @@ public:
     explicit settingwindow(QWidget *parent = 0);
     ~settingwindow();
     void set_values();
+    //end
 signals:
     void change_info_label();
 private slots:
@@ -26,16 +27,10 @@ private slots:
     void on_btt_expansion_default_clicked();
     void on_btt_contraction_default_clicked();
     void on_btt_full_contraction_default_clicked();
-    // end
-
     void on_sl_boost_valueChanged(int value);
-
     void on_sl_boost_sliderPressed();
-
     void on_sl_boost_fixDict_valueChanged(int value);
-
     void on_sl_boost_fixDict_sliderPressed();
-
     void on_btt_delta_energy_default_clicked();
 
 private:
