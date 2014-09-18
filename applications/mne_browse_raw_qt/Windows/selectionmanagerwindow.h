@@ -1,9 +1,9 @@
 //=============================================================================================================
 /**
-* @file     channelitem.h
-* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+* @file     selectionmanagerwindow.h
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     September, 2014
 *
@@ -30,19 +30,22 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the ChannelItem class.
+* @brief    Contains the declaration of the SelectionManagerWindow class.
 *
 */
 
-#ifndef CHANNELITEM_H
-#define CHANNELITEM_H
+#ifndef SELECTIONMANAGERWINDOW_H
+#define SELECTIONMANAGERWINDOW_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <iostream>
+#include "mainwindow.h"
+#include "ui_selectionmanagerwindow.h"
+#include "utils/layoutloader.h"         //MNE-CPP utils
+#include "../Utils/layoutscene.h"       //MNE Browse Raw QT utils
 
 
 //*************************************************************************************************************
@@ -50,11 +53,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QGraphicsItem>
-#include <QString>
-#include <QColor>
-#include <QPainter>
-#include <QStaticText>
+#include <QDockWidget>
 
 
 //*************************************************************************************************************
@@ -68,88 +67,93 @@ namespace MNEBrowseRawQt
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// DEFINE FORWARD DECLARATIONS
 //=============================================================================================================
 
+class LayoutScene;
+class MainWindow;
 
-//=============================================================================================================
+
 /**
-* ChannelItem...
+* DECLARE CLASS SelectionManagerWindow
 *
-* @brief The ChannelItem class provides a new data structure for impedance values.
+* @brief The SelectionManagerWindow class provides a channel selection window.
 */
-class ChannelItem : public QGraphicsItem
+class SelectionManagerWindow : public QDockWidget
 {
+    Q_OBJECT
 
 public:
     //=========================================================================================================
     /**
-    * Constructs a ChannelItem.
+    * Constructs a SelectionManagerWindow which is a child of parent.
+    *
+    * @param [in] parent pointer to parent widget; If parent is 0, the new SelectionManagerWindow becomes a window. If parent is another widget, SelectionManagerWindow becomes a child window inside parent. SelectionManagerWindow is deleted when its parent is deleted.
     */
-    ChannelItem(QString electrodeName, QPointF electrodePosition, QColor electrodeColor, int channelIndex);
+    SelectionManagerWindow(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Sets the color of the electrode item.
+    * Destroys the SelectionManagerWindow.
+    * All SelectionManagerWindow's children are deleted first. The application exits if SelectionManagerWindow is the main widget.
     */
-    void setColor(QColor electrodeColor);
-
-    //=========================================================================================================
-    /**
-    * Returns the bounding rect of the electrode item. This rect describes the area which the item uses to plot in.
-    */
-    QRectF boundingRect() const;
-
-    //=========================================================================================================
-    /**
-    * Reimplemented paint function.
-    */
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-
-    //=========================================================================================================
-    /**
-    * Returns the electrode name.
-    */
-    QString getElectrodeName();
-
-    //=========================================================================================================
-    /**
-    * Sets the impedance value.
-    */
-    void setImpedanceValue(double impedanceValue);
-
-    //=========================================================================================================
-    /**
-    * Returns the impedance value.
-    */
-    double getImpedanceValue();
-
-    //=========================================================================================================
-    /**
-    * Updates the electrodes position.
-    */
-    void setPosition(QPointF newPosition);
-
-    //=========================================================================================================
-    /**
-    * Updates the electrodes position.
-    */
-    QPointF getPosition();
-
-    //=========================================================================================================
-    /**
-    * Returns the device channel index of the electrode.
-    */
-    int getChannelIndex();
+    ~SelectionManagerWindow();
 
 private:
-    QString     m_sElectrodeName;           /**< Holds the electrode name.*/
-    QPointF     m_qpElectrodePosition;      /**< Holds the electrode 2D position in the scene.*/
-    QColor      m_cElectrodeColor;          /**< Holds the current electrode color.*/
-    double      m_dImpedanceValue;          /**< Holds the current electrode impedance value.*/
-    int         m_iChannelIndex;            /**< Holds the corresonding channel index.*/
+    //=========================================================================================================
+    /**
+    * Initialises all tabel widgets in the selection window.
+    *
+    */
+    void initListWidgets();
+
+    //=========================================================================================================
+    /**
+    * Initialises all graphic views in the selection window.
+    *
+    */
+    void initGraphicsView();
+
+    //=========================================================================================================
+    /**
+    * Loads a new layout from given file path.
+    *
+    * @param [in] path holds file path
+    */
+    bool loadLayout(QString path);
+
+    //=========================================================================================================
+    /**
+    * Loads a new selection from given file path.
+    *
+    * @param [in] path holds file path
+    */
+    bool loadSelectionGroups(QString path);
+
+    //=========================================================================================================
+    /**
+    * Updates selection files table widget in this window.
+    *
+    */
+    void updateSelectionFiles(QListWidgetItem *item);
+
+    //=========================================================================================================
+    /**
+    * Updates selection group widget in this window.
+    *
+    */
+    void updateSelectionGroups(QListWidgetItem *item);
+
+    Ui::SelectionManagerWindow*     ui;
+
+    QMap<QString,QVector<double>>   m_layoutMap;
+    QMap<QString,QStringList>       m_selectionGroups;
+
+    MainWindow*                     m_pMainWindow;
+
+    LayoutScene*                    m_pLayoutScene;
 };
 
 } // NAMESPACE MNEBrowseRawQt
 
-#endif // CHANNELITEM_H
+#endif // SELECTIONMANAGERWINDOW_H

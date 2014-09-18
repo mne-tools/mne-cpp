@@ -1,11 +1,11 @@
 //=============================================================================================================
 /**
-* @file     ChannelItem.cpp
-* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+* @file     selectionmanagerwindow.cpp
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     June, 2014
+* @date     September, 2014
 *
 * @section  LICENSE
 *
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the ChannelItem class.
+* @brief    Contains the implementation of the SelectionManagerWindow class.
 *
 */
 
@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "ChannelItem.h"
+#include "selectionmanagerwindow.h"
 
 
 //*************************************************************************************************************
@@ -48,7 +48,6 @@
 //=============================================================================================================
 
 using namespace MNEBrowseRawQt;
-using namespace std;
 
 
 //*************************************************************************************************************
@@ -56,108 +55,136 @@ using namespace std;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ChannelItem::ChannelItem(QString electrodeName, QPointF electrodePosition, QColor electrodeColor, int channelIndex)
-: m_sElectrodeName(electrodeName)
-, m_qpElectrodePosition(electrodePosition)
-, m_cElectrodeColor(electrodeColor)
-, m_dImpedanceValue(0.0)
-, m_iChannelIndex(channelIndex)
+SelectionManagerWindow::SelectionManagerWindow(QWidget *parent) :
+    QDockWidget(parent),
+    ui(new Ui::SelectionManagerWindow),
+    m_pMainWindow(static_cast<MainWindow*>(parent))
 {
+    ui->setupUi(this);
+
+    //Init gui elements
+    initListWidgets();
+    initGraphicsView();
 }
+
 
 //*************************************************************************************************************
 
-QRectF ChannelItem::boundingRect() const
+SelectionManagerWindow::~SelectionManagerWindow()
 {
-    return QRectF(-25, -35, 50, 70);
+    delete ui;
 }
+
 
 //*************************************************************************************************************
 
-void ChannelItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void SelectionManagerWindow::initListWidgets()
 {
-    Q_UNUSED(option);
-    Q_UNUSED(widget);
+    //Initialise layout as neuromag vectorview with all channels
+    loadLayout(":/Resources/Templates/Vectorview-grad.lout");
 
-    // Plot shadow
-    painter->setPen(Qt::NoPen);
-    painter->setBrush(Qt::darkGray);
-    painter->drawEllipse(-12, -12, 30, 30);
+    //Initialise selections
+    loadSelectionGroups(":/Resources/Templates/mne_browse_raw_vv.sel");
 
-    // Plot colored circle
-    painter->setPen(QPen(Qt::black, 1));
-    painter->setBrush(QBrush(m_cElectrodeColor));
-    painter->drawEllipse(-15, -15, 30, 30);
+    connect(ui->m_listWidget_selectionFiles, &QListWidget::itemClicked,
+                this, &SelectionManagerWindow::updateSelectionFiles);
 
-    // Plot electrode name
-    QStaticText staticElectrodeName = QStaticText(m_sElectrodeName);
-    QSizeF sizeText = staticElectrodeName.size();
-    painter->drawStaticText(-15+((30-sizeText.width())/2), -32, staticElectrodeName);
+    connect(ui->m_listWidget_selectionGroups, &QListWidget::itemClicked,
+                this, &SelectionManagerWindow::updateSelectionGroups);
 
-    // Plot electrodes impedance value
-    QString impedanceValueToString;
-    QStaticText staticElectrodeValue = QStaticText(QString("%1 %2").arg(impedanceValueToString.setNum(m_dImpedanceValue/1000)).arg(/*"kOhm"*/"k")); // transform to kilo ohm (divide by 1000)
-    QSizeF sizeValue = staticElectrodeValue.size();
-    painter->drawStaticText(-15+((30-sizeValue.width())/2), 19, staticElectrodeValue);
-
-    this->setPos(m_qpElectrodePosition);
+    ui->m_listWidget_selectedChannels->addItems(m_selectionGroups["Vertex"]);
 }
+
 
 //*************************************************************************************************************
 
-void ChannelItem::setColor(QColor electrodeColor)
+void SelectionManagerWindow::initGraphicsView()
 {
-    m_cElectrodeColor = electrodeColor;
+//    m_pLayoutScene = new LayoutScene(ui->m_graphicsView_layoutPlot);
+//    ui->m_graphicsView_layoutPlot->setScene(m_pLayoutScene);
 }
+
 
 //*************************************************************************************************************
 
-QString ChannelItem::getElectrodeName()
+bool SelectionManagerWindow::loadLayout(QString path)
 {
-    return m_sElectrodeName;
+    LayoutLoader* manager = new LayoutLoader();
+
+    return manager->readMNELoutFile(path, m_layoutMap);
 }
+
 
 //*************************************************************************************************************
 
-void ChannelItem::setImpedanceValue(double impedanceValue)
+bool SelectionManagerWindow::loadSelectionGroups(QString path)
 {
-    m_dImpedanceValue = impedanceValue;
+    //Open .elc file
+    if(!path.contains(".sel"))
+        return false;
+
+    m_selectionGroups.clear();
+
+    QFile file(path);
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qDebug()<<"Error opening selection file";
+        return false;
+    }
+
+    //Start reading from file
+    QTextStream in(&file);
+
+    while(!in.atEnd())
+    {
+        QString line = in.readLine();
+
+        if(line.contains("%") == false && line.contains(":") == true) //Skip commented areas in file
+        {
+            QStringList firstSplit = line.split(":");
+
+            //Create new key
+            QString key = firstSplit.at(0);
+
+            QStringList secondSplit = firstSplit.at(1).split("|");
+
+            //Delete last element if it is a blank character
+            if(secondSplit.at(secondSplit.size()-1) == "")
+                secondSplit.removeLast();
+
+            //Add to map
+            m_selectionGroups.insert(key, secondSplit);
+
+            //Add to list widget
+            int count = ui->m_listWidget_selectionGroups->count();
+            if(count<1)
+                ui->m_listWidget_selectionGroups->insertItem(0, key);
+            else
+                ui->m_listWidget_selectionGroups->insertItem(count, key);
+        }
+    }
+
+    file.close();
 }
+
 
 //*************************************************************************************************************
 
-double ChannelItem::getImpedanceValue()
+void SelectionManagerWindow::updateSelectionFiles(QListWidgetItem* item)
 {
-    return m_dImpedanceValue;
+    ui->m_listWidget_selectionGroups->clear();
+    ui->m_listWidget_selectedChannels->clear();
+
+    //update group list
+    loadSelectionGroups(QString(":/Resources/Templates/%1.sel").arg(item->text()));
 }
+
 
 //*************************************************************************************************************
 
-void ChannelItem::setPosition(QPointF newPosition)
+void SelectionManagerWindow::updateSelectionGroups(QListWidgetItem* item)
 {
-    m_qpElectrodePosition = newPosition;
+    ui->m_listWidget_selectedChannels->clear();
+
+    //update channel list
+    ui->m_listWidget_selectedChannels->addItems(m_selectionGroups[item->text()]);
 }
-
-//*************************************************************************************************************
-
-QPointF ChannelItem::getPosition()
-{
-    return m_qpElectrodePosition;
-}
-
-//*************************************************************************************************************
-
-int ChannelItem::getChannelIndex()
-{
-    return m_iChannelIndex;
-}
-
-
-
-
-
-
-
-
-
-
