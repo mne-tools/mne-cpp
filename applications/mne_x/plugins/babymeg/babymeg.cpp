@@ -2,6 +2,7 @@
 /**
 * @file     babymeg.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Limin Sun <liminsun@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     February, 2013
@@ -90,11 +91,18 @@ BabyMEG::BabyMEG()
     connect(m_pActionSetupProject, &QAction::triggered, this, &BabyMEG::showProjectDialog);
     addPluginAction(m_pActionSetupProject);
 
+    m_pActionUpdateFiffInfo = new QAction(QIcon(":/images/latestFiffInfo.png"), tr("Update Fiff Info"),this);
+    m_pActionUpdateFiffInfo->setStatusTip(tr("Update Fiff Info"));
+    connect(m_pActionUpdateFiffInfo, &QAction::triggered, this, &BabyMEG::UpdateFiffInfo);
+    addPluginAction(m_pActionUpdateFiffInfo);
+
     m_pActionRecordFile = new QAction(QIcon(":/images/record.png"), tr("Start Recording"),this);
 //    m_pActionSetupProject->setShortcut(tr("F12"));
     m_pActionRecordFile->setStatusTip(tr("Start Recording"));
     connect(m_pActionRecordFile, &QAction::triggered, this, &BabyMEG::toggleRecordingFile);
     addPluginAction(m_pActionRecordFile);
+
+    m_pActionRecordFile->setEnabled(false);
 
     m_pActionSqdCtrl = new QAction(QIcon(":/images/sqdctrl.png"), tr("Squid Control"),this);
 //    m_pActionSetupProject->setShortcut(tr("F12"));
@@ -223,6 +231,21 @@ void BabyMEG::showSqdCtrlDialog()
 
 //*************************************************************************************************************
 
+void BabyMEG::UpdateFiffInfo()
+{
+
+    // read gain info and save them to the m_pFiffInfo.range
+    myClientComm->SendCommandToBabyMEGShortConnection("INFO");
+
+    sleep(0.5);
+
+    m_pActionRecordFile->setEnabled(true);
+
+}
+
+
+//*************************************************************************************************************
+
 void BabyMEG::toggleRecordingFile()
 {
     //Setup writing to file
@@ -242,6 +265,7 @@ void BabyMEG::toggleRecordingFile()
             msgBox.exec();
             return;
         }
+
 
         //Initiate the stream for writing to the fif file
         m_qFileOut.setFileName(m_sRecordFile);
