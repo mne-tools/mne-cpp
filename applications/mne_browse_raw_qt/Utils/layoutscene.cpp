@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "../Windows/mainwindow.h"
+#include "layoutscene.h"
 
 
 //*************************************************************************************************************
@@ -111,19 +111,19 @@ void LayoutScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
 void LayoutScene::scaleElectrodePositions(double scaleFactor)
 {
     // Get scene items
-    QList< QGraphicsItem *> itemList = this->items();
+//    QList< QGraphicsItem *> itemList = this->items();
 
-    // Update position
-    for(int i = 0; i<itemList.size(); i++)
-    {
-        TMSIElectrodeItem* item = (TMSIElectrodeItem *) itemList.at(i);
+//    // Update position
+//    for(int i = 0; i<itemList.size(); i++)
+//    {
+//        TMSIElectrodeItem* item = (TMSIElectrodeItem *) itemList.at(i);
 
-        // Set both positions -> dunno why :-)
-        item->setPosition(item->getPosition()*scaleFactor);
-        item->setPos(item->pos()*scaleFactor);
-    }
+//        // Set both positions -> dunno why :-)
+//        item->setPosition(item->getPosition()*scaleFactor);
+//        item->setPos(item->pos()*scaleFactor);
+//    }
 
-    this->update(this->sceneRect());
+//    this->update(this->sceneRect());
 }
 
 
