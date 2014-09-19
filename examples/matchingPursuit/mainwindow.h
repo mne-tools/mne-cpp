@@ -119,7 +119,7 @@ enum TruncationCriterion
 class GraphWindow;
 class ResiduumWindow;
 class AtomSumWindow;
-class YAxisWindow;
+class XAxisWindow;
 
 class MainWindow : public QMainWindow
 {
@@ -134,8 +134,9 @@ public:
 
     typedef QList<GaborAtom> adaptive_atom_list;
     typedef QList<FixDictAtom> fix_dict_atom_list;
+    typedef QMap<qint32, bool> select_map;
     typedef Eigen::VectorXd VectorXd;
-
+    typedef Eigen::RowVectorXi RowVectorXi;
     //==========================================================================================================
     /**
     * MainWindow_fill_dict_combobox
@@ -151,6 +152,7 @@ public:
     //==========================================================================================================
 
 
+    void save_fif_file();
 private slots:
     //==========================================================================================================
     /**
@@ -275,11 +277,19 @@ private slots:
     *
     * ### MP toolbox main window slots ###
     *
-    * receives warnings from fix dict calculation errors
+    * receives warnings and infos from fixDict and adaptive MP Algorithm to show in GUI
     *
     * @param[in]    warning_number     number of corresponding warning
     *
     * @return void
+    *
+    * warning_number and meaning:
+    *
+    * "1"   fixDict MP: dict excludes atoms to approximate the signal more closely. Calculation terminated.
+    * "2"   fixDict MP: No matching sample count between atoms and signal. This may lead to discontinuities.
+    * "10"  fixDict, adaptive MP: Algorithm canceled by user interaction. (click on btt cancel)
+    * "11"  adaptive MP: Max. Simplex Iteration limit achieved, result may not be optimal.   *
+    *
     */
     void recieve_warnings(qint32 warning_number);
 
@@ -520,23 +530,44 @@ private slots:
     void activate_info_label();
 
     //==========================================================================================================
+    /**
+    * MainWindow_recieve_save_progress
+    *
+    * ### MP toolbox main window slots ###
+    *
+    *
+    *
+    * @return void
+    */
+    void recieve_save_progress(qint32 current_progress, qint32 finished);
+
+    //==========================================================================================================
+
+    void on_dsb_energy_valueChanged(double arg1);
+
+    void on_actionBeenden_triggered();
 
 signals:
 
     void send_input(MatrixXd send_signal, qint32 send_max_iterations, qreal send_epsilon, bool fix_phase, qint32 boost, qint32 simplex_it,
                     qreal simplex_reflection, qreal simplex_expansion, qreal simplex_contraction, qreal simplex_full_contraction);
     void send_input_fix_dict(MatrixXd send_signal, qint32 send_max_iterations, qreal send_epsilon, qint32 boost, QString path, qreal delta);
+    void to_save(QString source_path, QString save_path, fiff_int_t start_change, fiff_int_t end_change, MatrixXd changes, select_map select_channel_map, RowVectorXi picks);
 
 private:
 
     bool is_saved;
+    bool is_save_white;
     bool tbv_is_loading;
     bool auto_change;
     bool was_partialchecked;
-    bool come_from_sample_count;
-    bool come_from_from;
+    bool read_fiff_changed;
     bool is_white;
-    qreal to;
+    bool fiff_save_enable;
+    fiff_int_t to;
+    fiff_int_t last_to;
+    fiff_int_t last_from;
+    qint32 last_sample_count;
     qreal signal_energy;
     qreal residuum_energy;
     qint32 recieved_result_counter;
@@ -559,13 +590,16 @@ private:
     GraphWindow *callGraphWindow;
     AtomSumWindow *callAtomSumWindow;
     ResiduumWindow *callResidumWindow;
-    YAxisWindow *callYAxisWindow;    
+    XAxisWindow *callXAxisWindow;
     QStandardItem* cb_item;
     QStandardItem* tbv_item;
     QStandardItemModel* cb_model;
     QStandardItemModel* tbv_model;
     std::vector<QStandardItem*> cb_items;
     std::vector<QStandardItem*> tbv_items;
+    RowVectorXi picks;
+    FiffInfo pick_info;
+
 
     //==========================================================================================================
     /**
@@ -660,17 +694,6 @@ private:
     */
     void fill_channel_combobox();
 
-    //==========================================================================================================
-    /**
-    * MainWindow_save_fif_file
-    *
-    * ### MP toolbox main function ###
-    *
-    * saves fiff-files
-    *
-    * @return   void
-    */
-    void save_fif_file();
 
     //==========================================================================================================
     /**
@@ -835,8 +858,8 @@ public:
     //=========================================================================================================
 };
 
-// Widget to paint y-axis
-class YAxisWindow : public QWidget
+// Widget to paint x-axis
+class XAxisWindow : public QWidget
 {
     Q_OBJECT
 
@@ -846,11 +869,11 @@ protected:
 public:
    //==========================================================================================================
    /**
-   * YAxisWindow_paint_signal
+   * XAxisWindow_paint_signal
    *
    * ### MP toolbox GUI function ###
    *
-   * painting y-axis of chosen channels in butterfly plot
+   * painting x-axis of chosen channels in butterfly plot
    *
    * @param[in] signalMatrix    matrix of input signal
    * @param[in] windowSize      size (height,width) of window
@@ -860,6 +883,38 @@ public:
    void paint_axis(MatrixXd signalMatrix, QSize windowSize);
 
    //==========================================================================================================
+};
+
+//save fif file class
+class SaveFifFile : public QThread
+{
+    Q_OBJECT
+
+    typedef QMap<qint32, bool> select_map;
+    typedef Eigen::MatrixXd MatrixXd;
+    typedef FIFFLIB::fiff_int_t fiff_int_t;
+    typedef Eigen::RowVectorXi RowVectorXi;
+
+public:
+    SaveFifFile();
+
+    ~SaveFifFile();
+
+private slots:
+    //==========================================================================================================
+    /**
+    * MainWindow_save_fif_file
+    *
+    * ### MP toolbox main function ###
+    *
+    * saves fiff-files
+    *
+    * @return   void
+    */
+    void save_fif_file(QString source_path, QString save_path, fiff_int_t start_change, fiff_int_t end_change, MatrixXd changes, select_map select_channel_map, RowVectorXi picks);
+
+signals:
+    void save_progress(qint32 current_progress, qint32 finished);
 };
 
 //*************************************************************************************************************
