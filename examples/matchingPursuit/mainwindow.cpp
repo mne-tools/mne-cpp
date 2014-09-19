@@ -80,7 +80,9 @@ using namespace DISPLIB;
 bool _new_paint;
 bool _has_warning;
 
-qreal _from;
+fiff_int_t _from;
+fiff_int_t _first_sample;
+fiff_int_t _last_sample;
 qreal _max_pos;
 qreal _max_neg;
 qreal _sample_rate;
@@ -111,7 +113,7 @@ MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::
     ui->setupUi(this);    
 
     this->setMinimumSize(1280, 640);
-    callGraphWindow = new GraphWindow();    
+    callGraphWindow = new GraphWindow();
     callGraphWindow->setMinimumHeight(140);
     callGraphWindow->setMinimumWidth(500);
     ui->l_Graph->addWidget(callGraphWindow);
@@ -126,13 +128,14 @@ MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::
     callResidumWindow->setMinimumWidth(500);
     ui->l_res->addWidget(callResidumWindow);
 
-    callYAxisWindow = new YAxisWindow();
-    callYAxisWindow->setMaximumHeight(0);
-    ui->l_YAxis->addWidget(callYAxisWindow);
-
+    callXAxisWindow = new XAxisWindow();
+    callXAxisWindow->setMaximumHeight(0);
+    callXAxisWindow->setToolTip("timeline");
+    ui->l_XAxis->addWidget(callXAxisWindow);
     // set progressbar
-    ui->progressBarCalc->setMinimum(0);
     ui->progressBarCalc->setHidden(true);
+    ui->progress_bar_save->setHidden(true);
+
     ui->splitter->setStretchFactor(1,4);
 
     ui->lb_from->setHidden(true);
@@ -165,8 +168,11 @@ MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::
 
     qRegisterMetaType<Eigen::MatrixXd>("MatrixXd");
     qRegisterMetaType<Eigen::VectorXd>("VectorXd");
+    qRegisterMetaType<Eigen::RowVectorXi>("RowVectorXi");
     qRegisterMetaType<adaptive_atom_list>("adaptive_atom_list");
     qRegisterMetaType<fix_dict_atom_list>("fix_dict_atom_list");
+    qRegisterMetaType<FIFFLIB::fiff_int_t>("fiff_int_t");
+    qRegisterMetaType<select_map>("select_map");
 
     QDir dir(QDir::homePath() + "/" + "Matching-Pursuit-Toolbox");
     if(!dir.exists())dir.mkdir(".");
@@ -203,6 +209,14 @@ MainWindow::~MainWindow()
 {    
     delete ui;
 }
+
+//*************************************************************************************************************************************
+
+SaveFifFile::SaveFifFile(){}
+
+//*************************************************************************************************************************************
+
+SaveFifFile::~SaveFifFile(){}
 
 //*************************************************************************************************************************************
 
@@ -255,7 +269,7 @@ void MainWindow::fill_dict_combobox()
 //*************************************************************************************************************************************
 
 void MainWindow::open_file()
-{     
+{
     QString temp_file_name = QFileDialog::getOpenFileName(this, "Please select signal file.", last_open_path,"(*.fif *.txt)");
     if(temp_file_name.isNull()) return;
 
@@ -278,14 +292,12 @@ void MainWindow::open_file()
     }
     file.close();
 
-    ui->cb_all_select->setHidden(true);   
-    ui->lb_timer->setHidden(true);
 
     if(file_name.endsWith(".fif", Qt::CaseInsensitive))
     {
+        fiff_save_enable = true;
 
-        _from = 0;
-        to = 511;
+        _from = -1;
         //read_fiff_ave(_file_name);
         read_fiff_file(file_name);
         ui->lb_from->setHidden(false);
@@ -294,14 +306,11 @@ void MainWindow::open_file()
         ui->dsb_to->setHidden(false);
         ui->lb_samples->setHidden(false);
         ui->sb_sample_count->setHidden(false);
-
-        ui->dsb_from->setValue(47.000f);
-        ui->dsb_to->setValue(47.999f);
     }
     else
     {
-        _from = 0;
-        //_signal_matrix.resize(0,0);
+        fiff_save_enable = false;
+
         read_matlab_file(file_name);
         ui->lb_from->setHidden(true);
         ui->dsb_from->setHidden(true);
@@ -314,8 +323,8 @@ void MainWindow::open_file()
     //original_signal_matrix.resize(_signal_matrix.rows(), _signal_matrix.cols());
     original_signal_matrix = _signal_matrix;
     ui->tbv_Results->setRowCount(0);
-    callYAxisWindow->setMinimumHeight(22);
-    callYAxisWindow->setMaximumHeight(22);
+    callXAxisWindow->setMinimumHeight(22);
+    callXAxisWindow->setMaximumHeight(22);
 
     fill_channel_combobox();
 
@@ -325,6 +334,13 @@ void MainWindow::open_file()
     ui->progressBarCalc->reset();
     ui->progressBarCalc->setVisible(false);
     ui->lb_info_content->setText("");
+    ui->cb_all_select->setHidden(true);
+    ui->lb_timer->setHidden(true);
+    ui->actionSpeicher->setEnabled(false);
+    ui->actionSpeicher_unter->setEnabled(false);
+    ui->actionExport->setEnabled(false);
+    if(_signal_matrix.cols() == 0) ui->btt_Calc->setEnabled(false);
+    else ui->btt_Calc->setEnabled(true);
     _has_warning = false;
 
     _new_paint = true;
@@ -335,19 +351,20 @@ void MainWindow::open_file()
 
 void MainWindow::cb_selection_changed(const QModelIndex& topLeft, const QModelIndex& bottomRight)
 {
-    Q_UNUSED(bottomRight);
+    Q_UNUSED(bottomRight);    
+
     QStandardItem* cb_item = this->cb_items[topLeft.row()];
-    if(topLeft.row() == ui->cb_channels->count() - 1)
+    if(topLeft.row() == 0)
     {
         if(cb_item->checkState() == Qt::Checked)
         {
-            for(qint32 i = 0; i < ui->cb_channels->count() - 1; i++)
+            for(qint32 i = 1; i < ui->cb_channels->count(); i++)
                 if(this->cb_items[i]->checkState() == Qt::Unchecked)
                     this->cb_items[i]->setData(Qt::Checked, Qt::CheckStateRole);
         }
         else
         {
-            for(qint32 i = 0; i < ui->cb_channels->count() - 1; i++)
+            for(qint32 i = 1; i < ui->cb_channels->count(); i++)
                 if(this->cb_items[i]->checkState() == Qt::Checked)
                     this->cb_items[i]->setData(Qt::Unchecked, Qt::CheckStateRole);
         }
@@ -355,14 +372,16 @@ void MainWindow::cb_selection_changed(const QModelIndex& topLeft, const QModelIn
     }
 
     ui->tbv_Results->setRowCount(0);
+    ui->actionSpeicher->setEnabled(false);
+    ui->actionSpeicher_unter->setEnabled(false);
+    ui->actionExport->setEnabled(false);
 
     if(cb_item->checkState() == Qt::Unchecked)
-        select_channel_map[topLeft.row()] = false;
+        select_channel_map[topLeft.row() - 1] = false;
     else if(cb_item->checkState() == Qt::Checked)
-        select_channel_map[topLeft.row()] = true;
+        select_channel_map[topLeft.row() - 1] = true;
 
     qint32 size = 0;
-
     for(qint32 i = 0; i < original_signal_matrix.cols(); i++)
         if(select_channel_map[i] == true)
             size++;
@@ -374,7 +393,6 @@ void MainWindow::cb_selection_changed(const QModelIndex& topLeft, const QModelIn
 
     _colors.clear();
     qint32 selected_chn = 0;
-
     for(qint32 channels = 0; channels < original_signal_matrix.cols(); channels++)
         if(select_channel_map[channels] == true)
         {
@@ -382,6 +400,9 @@ void MainWindow::cb_selection_changed(const QModelIndex& topLeft, const QModelIn
             _signal_matrix.col(selected_chn) = original_signal_matrix.col(channels);
             selected_chn++;
         }
+
+    if(_signal_matrix.cols() == 0) ui->btt_Calc->setEnabled(false);
+    else ui->btt_Calc->setEnabled(true);
 
     _new_paint = true;
     update();
@@ -420,17 +441,78 @@ qint32 MainWindow::read_fiff_file(QString fileName)
     QFile t_fileRaw(fileName);
     FiffRawData raw(t_fileRaw);
 
+    //save channel names to settings
+    QSettings settings;
+    QMap<QString, QVariant> chn_name_map;
+    for(qint32 m = 0; m < 4; m++)
+        chn_name_map.insert(QString("MEG;EEG;STI;EOG").split(';').at(m), true);
+
+    chn_name_map = settings.value("channel_names", chn_name_map).toMap();//<QString, bool>();
+    QString next_name;
+
+    for(qint32 k = 0; k < raw.info.ch_names.length(); k++)
+    {
+        bool found_no_new_name = false;
+        next_name = raw.info.ch_names.at(k).split(" ").first();
+        if(chn_name_map.contains(next_name))
+        {
+            found_no_new_name = true;
+            break;
+        }
+        if(!found_no_new_name)
+            chn_name_map.insert(next_name, true);
+    }
+
+    settings.setValue("channel_names", chn_name_map);
+
     //   Set up pick list: MEG + STI 014 - bad channels
     QStringList include;
     include << "STI 014";
-    bool want_meg   = true;
-    bool want_eeg   = false;
-    bool want_stim  = false;
-    RowVectorXi picks = raw.info.pick_types(want_meg, want_eeg, want_stim, include, raw.info.bads);
+    bool want_meg   = chn_name_map["MEG"].toBool();
+    bool want_eeg   = chn_name_map["EEG"].toBool();
+    bool want_stim  = chn_name_map["STI"].toBool();
+    picks = raw.info.pick_types(want_meg, want_eeg, want_stim/*, include /*, raw.info.bads*/);
 
+    //save fiff data borders global
+    _first_sample = raw.first_samp;
+    _last_sample = raw.last_samp;
+
+    ui->dsb_sample_rate->setValue(raw.info.sfreq);
+    ui->dsb_sample_rate->setEnabled(false);
+    _sample_rate = raw.info.sfreq;
+
+    // initial
+    if(_from == -1)
+    {
+        read_fiff_changed = true;
+
+        _from = _first_sample;
+        this->to = _from + 511;
+
+        last_from = _from;
+        last_to = to;
+        last_sample_count = 512;
+
+        ui->dsb_from->setMaximum((_last_sample - 63) / _sample_rate);
+        ui->dsb_to->setMinimum((_first_sample + 63) / _sample_rate);
+        ui->lb_from->setToolTip(QString("minimum: %1 seconds").arg(_first_sample / _sample_rate));
+        ui->lb_to->setToolTip(QString("maximum: %1 seconds").arg(_last_sample / _sample_rate));
+        ui->dsb_from->setToolTip(QString("sample: %1").arg(_from));
+        ui->dsb_to->setToolTip(QString("sample: %1").arg(to));
+        ui->sb_sample_count->setToolTip(QString("epoch: %1 sec").arg((to - _from + 1) / _sample_rate));
+        ui->lb_samples->setToolTip(QString("min: 64 (%1 sec)\nmax: 4096 (%2 sec)").arg(64 / _sample_rate).arg(4096 / _sample_rate));
+
+        ui->dsb_from->setValue(_from / _sample_rate);
+        ui->dsb_to->setValue(to / _sample_rate);
+        ui->sb_sample_count->setValue(this->to - _from + 1);
+
+        read_fiff_changed = false;
+    }
+
+    pick_info = raw.info.pick_info(picks);
     //   Read a data segment
     //   times output argument is optional
-    if (!raw.read_raw_segment/*_times*/(datas, times, raw.first_samp + _from, raw.first_samp + to, picks))
+    if (!raw.read_raw_segment(datas, times, _from, to, picks))
     {
        QMessageBox::warning(this, tr("Error"),
        tr("error: Read fif unsucessful."));
@@ -439,22 +521,12 @@ qint32 MainWindow::read_fiff_file(QString fileName)
     }
     printf("Read %d samples.\n",(qint32)datas.cols());
 
-    ui->dsb_sample_rate->setValue(raw.info.sfreq);
-    ui->dsb_sample_rate->setEnabled(false);
-    _sample_rate = raw.info.sfreq;
-
-    //ToDo: read all channels, or only a few?!
-    //qint32 rows = 305;
-    //if(datas.rows() <= rows)
-    //rows = datas.rows();
-
     //signal must be filled with datas like this, because data.col == signal.row and vice versa
     _signal_matrix = MatrixXd::Zero(datas.cols(),datas.rows());
 
     for(qint32 channels = 0; channels < datas.rows(); channels++)
         _signal_matrix.col(channels) = datas.row(channels);
 
-    ui->sb_sample_count->setValue((qint32)datas.cols());
 
     return 0;
 }
@@ -463,22 +535,37 @@ qint32 MainWindow::read_fiff_file(QString fileName)
 
 void MainWindow::read_fiff_file_new(QString file_name)
 {
-    this->cb_model->clear();
-    this->cb_items.clear();
-
+    qint32 selected_chn = 0;
     read_fiff_file(file_name);
-    //original_signal_matrix.resize(_signal_matrix.rows(), _signal_matrix.cols());
     original_signal_matrix = _signal_matrix;
 
-    fill_channel_combobox();
-    ui->tbv_Results->setRowCount(0);
+    qint32 size = 0;
+    for(qint32 i = 0; i < original_signal_matrix.cols(); i++)
+        if(select_channel_map[i] == true)
+            size++;
+
+    _colors.clear();
+    _signal_matrix = MatrixXd::Zero(original_signal_matrix.rows(), size);
+
+    for(qint32 channels = 0; channels < original_signal_matrix.cols(); channels++)
+        if(select_channel_map[channels] == true)
+        {
+            _colors.append(original_colors.at(channels));
+            _signal_matrix.col(selected_chn) = original_signal_matrix.col(channels);
+            selected_chn++;
+        }
+
     _atom_sum_matrix = MatrixXd::Zero(_signal_matrix.rows(), _signal_matrix.cols()); //resize
     _residuum_matrix = MatrixXd::Zero(_signal_matrix.rows(), _signal_matrix.cols()); //resize
 
+    ui->tbv_Results->setRowCount(0);
+    ui->actionSpeicher->setEnabled(false);
+    ui->actionSpeicher_unter->setEnabled(false);
     ui->lb_info_content->setText("");
     ui->cb_all_select->setHidden(true);    
     ui->lb_timer->setHidden(true);
     ui->progressBarCalc->setHidden(true);
+    ui->actionExport->setEnabled(false);
 
     _has_warning = false;  
     _new_paint = true;
@@ -491,20 +578,7 @@ void MainWindow::fill_channel_combobox()
 {
     _colors.clear();
     _colors.append(QColor(0, 0, 0));
-    for(qint32 channels = 0; channels < _signal_matrix.cols(); channels++)
-    {
-        //_colors.append(QColor::fromHsv(qrand() % 256, 255, 190)); first version
-        _colors.append(QColor::fromRgb(qrand() / ((qreal)RAND_MAX + 300) * 255, qrand() / ((qreal)RAND_MAX + 300) * 255, qrand() / ((qreal)RAND_MAX + 300) * 255));
-        //channel item
-        this->cb_item = new QStandardItem;
-        this->cb_item->setText(QString("channel %1").arg(channels));
-        this->cb_item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
-        this->cb_item->setData(Qt::Checked, Qt::CheckStateRole);
-        this->cb_model->insertRow(channels, this->cb_item);
-        this->cb_items.push_back(this->cb_item);
-        select_channel_map.insert(channels, true);
-    }
-    original_colors = _colors;
+
     //select all channels item
     this->cb_item = new QStandardItem;
     this->cb_item->setText("de/select all channels");
@@ -512,6 +586,53 @@ void MainWindow::fill_channel_combobox()
     this->cb_item->setData(Qt::Checked, Qt::CheckStateRole);
     this->cb_model->appendRow(this->cb_item);
     this->cb_items.push_back(this->cb_item);
+
+    for(qint32 channels = 1; channels <= _signal_matrix.cols(); channels++)
+    {
+        //_colors.append(QColor::fromHsv(qrand() % 256, 255, 190)); first version
+        _colors.append(QColor::fromRgb(qrand() / ((qreal)RAND_MAX + 300) * 255, qrand() / ((qreal)RAND_MAX + 300) * 255, qrand() / ((qreal)RAND_MAX + 300) * 255));
+        //channel item
+        this->cb_item = new QStandardItem;
+        this->cb_item->setText(pick_info.ch_names.at(channels - 1));
+        this->cb_item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
+        this->cb_item->setData(Qt::Checked, Qt::CheckStateRole);
+        select_channel_map.insert(channels - 1, true);
+        for(qint32 k = 0; k < pick_info.bads.length(); k++)
+            if(pick_info.bads.at(k) == this->cb_item->text())
+            {
+               select_channel_map[channels - 1] = false;
+               this->cb_item->setData(Qt::Unchecked, Qt::CheckStateRole);
+               this->cb_item->setBackground(QColor::fromRgb(0x0F0, 0x080, 0x080, 0x00FF));
+               break;
+            }
+        this->cb_items.push_back(this->cb_item);
+        this->cb_model->insertRow(channels, this->cb_item);
+    }
+
+    original_colors = _colors;
+
+    qint32 size = 0;
+    for(qint32 i = 0; i < original_signal_matrix.cols(); i++)
+        if(select_channel_map[i] == true)
+            size++;
+
+
+    _signal_matrix = MatrixXd::Zero(original_signal_matrix.rows(), size);
+    _atom_sum_matrix = MatrixXd::Zero(original_signal_matrix.rows(), size);
+    _residuum_matrix = MatrixXd::Zero(original_signal_matrix.rows(), size);
+
+    _colors.clear();
+    qint32 selected_chn = 0;
+
+    for(qint32 channels = 0; channels < original_signal_matrix.cols(); channels++)
+        if(select_channel_map[channels] == true)
+        {
+            _colors.append(original_colors.at(channels));
+            _signal_matrix.col(selected_chn) = original_signal_matrix.col(channels);
+            selected_chn++;
+        }
+
+
 
     ui->cb_channels->setModel(this->cb_model);
 }
@@ -601,7 +722,8 @@ void GraphWindow::paint_signal(MatrixXd signalMatrix, QSize windowSize)
 
         // scale axis title
         scaleYText = _signal_maximum / 10.0;
-        negScale =  floor((_max_neg * 10 / _signal_maximum) + 0.5);
+        if(_max_neg < 0)
+            negScale = floor((_max_neg * 10 / _signal_maximum) + 0.5);
         _signal_negative_scale = negScale;  // to globe _signal_negative_scale
 
         // scale signal
@@ -802,7 +924,7 @@ void ResiduumWindow::paint_residuum(MatrixXd residuum_matrix, QSize windowSize, 
 
 //*************************************************************************************************************************************
 
-void YAxisWindow::paintEvent(QPaintEvent* event)
+void XAxisWindow::paintEvent(QPaintEvent* event)
 {
     Q_UNUSED(event);
     paint_axis(_signal_matrix, this->size());
@@ -810,7 +932,7 @@ void YAxisWindow::paintEvent(QPaintEvent* event)
 
 //*************************************************************************************************************************************
 
-void YAxisWindow::paint_axis(MatrixXd signalMatrix, QSize windowSize)
+void XAxisWindow::paint_axis(MatrixXd signalMatrix, QSize windowSize)
 {
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing, true);
@@ -858,13 +980,6 @@ void MainWindow::on_btt_Calc_clicked()
         ui->progressBarCalc->setValue(0);
         ui->progressBarCalc->setHidden(false);
 
-        if(_signal_matrix.rows() == 0)
-        {
-            QMessageBox msgBox(QMessageBox::Warning, "Warning", "No signalfile found.", QMessageBox::Ok, this);
-            msgBox.exec();
-            return;
-        }
-
         if(ui->chb_Iterations->checkState()  == Qt::Unchecked && ui->chb_ResEnergy->checkState() == Qt::Unchecked)
         {
             QMessageBox msgBox(QMessageBox::Warning, "Error", "No truncation criterion choosen.", QMessageBox::Ok, this);
@@ -897,6 +1012,7 @@ void MainWindow::on_btt_Calc_clicked()
         ui->tbv_Results->setRowCount(0);
         ui->cb_all_select->setHidden(false);
         ui->lb_timer->setHidden(false);
+        ui->actionExport->setEnabled(false);
 
         _adaptive_atom_list.clear();
         _fix_dict_atom_list.clear();
@@ -972,6 +1088,7 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
 {
     tbv_is_loading = true;
 
+    QSettings settings;
     qreal percent = ui->dsb_energy->value();
     residuum_energy = 100 * (max_energy - current_energy) / max_energy;
 
@@ -980,9 +1097,8 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
     {
         GaborAtom temp_atom = adaptive_atom_res_list.last();
 
-        qreal phase = temp_atom.phase_list.first();
-        if(temp_atom.phase_list.first() > 2*PI)
-            phase = temp_atom.phase_list.first() - 2*PI;
+        qreal phase = temp_atom.phase;
+        if(temp_atom.phase > 2*PI) phase -= 2*PI;
 
         QTableWidgetItem* atomEnergieItem = new QTableWidgetItem(QString::number(100 * temp_atom.energy / max_energy, 'f', 2));
         QTableWidgetItem* atomScaleItem = new QTableWidgetItem(QString::number(temp_atom.scale / _sample_rate, 'g', 3));
@@ -1004,9 +1120,11 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
         atomPhaseItem->setTextAlignment(0x0082);
 
         _adaptive_atom_list.append(temp_atom);
-        qSort(adaptive_atom_res_list.begin(), adaptive_atom_res_list.end(), sort_energie_adaptive);
-        qSort(_adaptive_atom_list.begin(), _adaptive_atom_list.end(), sort_energie_adaptive);
-
+        if(settings.value("sort_results", true).toBool())
+        {
+            qSort(adaptive_atom_res_list.begin(), adaptive_atom_res_list.end(), sort_energie_adaptive);
+            qSort(_adaptive_atom_list.begin(), _adaptive_atom_list.end(), sort_energie_adaptive);
+        }
         // ToDo: index = _adaptive_atom_list.indexOf(temp_atom);
         qint32 index = 0;
         while(index < adaptive_atom_res_list.length())
@@ -1058,9 +1176,11 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
         atom_name_item->setTextAlignment(0x0081);
 
         _fix_dict_atom_list.append(temp_atom);
-        qSort(fix_dict_atom_res_list.begin(),fix_dict_atom_res_list.end(), sort_energie_fix);
-        qSort(_fix_dict_atom_list.begin(),_fix_dict_atom_list.end(), sort_energie_fix);
-
+        if(settings.value("sort_results", true).toBool())
+        {
+            qSort(fix_dict_atom_res_list.begin(),fix_dict_atom_res_list.end(), sort_energie_fix);
+            qSort(_fix_dict_atom_list.begin(),_fix_dict_atom_list.end(), sort_energie_fix);
+        }
         // ToDo: index = _adaptive_atom_list.indexOf(temp_atom);
         qint32 index = 0;
         while(index < fix_dict_atom_res_list.length())
@@ -1147,7 +1267,7 @@ void MainWindow::recieve_warnings(qint32 warning_number)
         }
         else if(warning_number == 2 && !_has_warning)
         {
-            text = "No matching sample count between atoms and signal. This leads to discontinuities. ";
+            text = "No matching sample count between atoms and signal. This may lead to discontinuities. ";
             ui->lb_info_content->setText(text);
             _has_warning = true;
         }
@@ -1261,6 +1381,15 @@ void MainWindow::tbv_selection_changed(const QModelIndex& topLeft, const QModelI
 void MainWindow::calc_thread_finished()
 {
     tbv_is_loading = true;
+
+    if(_fix_dict_atom_list.isEmpty() && !_adaptive_atom_list.isEmpty())
+        ui->actionExport->setEnabled(true);
+
+    if(fiff_save_enable)
+    {
+        ui->actionSpeicher->setEnabled(true);
+        ui->actionSpeicher_unter->setEnabled(true);
+    }
 
     _counter_timer->stop();
     ui->frame->setEnabled(true);
@@ -1519,69 +1648,104 @@ void MainWindow::on_btt_OpenSignal_clicked()
 void MainWindow::on_dsb_sample_rate_editingFinished()
 {
     _sample_rate = ui->dsb_sample_rate->value();
-    callYAxisWindow->update();
+    callXAxisWindow->update();
 }
 
 //*****************************************************************************************************************
 
 void MainWindow::on_dsb_from_editingFinished()
 {   
-    _from = floor(ui->dsb_from->value() * _sample_rate);
+    if(read_fiff_changed || _from == last_from) return;
+    if(ui->dsb_from->value() * _sample_rate < _first_sample)
+        ui->dsb_from->setValue(_first_sample / _sample_rate);
     read_fiff_file_new(file_name);
+    last_from = _from;
 }
 
 //*****************************************************************************************************************
 
 void MainWindow::on_dsb_to_editingFinished()
-{   
-    to = ui->dsb_to->value() * _sample_rate;
+{
+    if(read_fiff_changed || to == last_to) return;
+    if(ui->dsb_to->value() * _sample_rate > _last_sample)
+        ui->dsb_to->setValue(_last_sample / _sample_rate);
     read_fiff_file_new(file_name);
-}
-
-//*****************************************************************************************************************
-
-void MainWindow::on_dsb_from_valueChanged(double arg1)
-{
-    come_from_from = true;
-    qreal var = to - floor(arg1  * _sample_rate);
-    if(ui->dsb_to->value() <= arg1 || var < 64 || var > 4097)
-        ui->dsb_from->setValue(_from  / _sample_rate);
-    else
-        ui->sb_sample_count->setValue(var);
-    come_from_from = false;
-}
-
-//*****************************************************************************************************************
-
-void MainWindow::on_dsb_to_valueChanged(double arg1)
-{
-    qreal var  = floor(arg1  * _sample_rate) - _from;
-    if(ui->dsb_from->value() >= arg1 || var < 64 || var > 4097)
-        ui->dsb_to->setValue(to  / _sample_rate);
-
-    if(!come_from_sample_count)
-        ui->sb_sample_count->setValue(var);
-}
-
-//*****************************************************************************************************************
-
-void MainWindow::on_sb_sample_count_valueChanged(int arg1)
-{
-    come_from_sample_count = true;
-    if(!come_from_from)
-        ui->dsb_to->setValue(_from  + arg1);
-    come_from_sample_count = false;
+    last_to = to;
 }
 
 //*****************************************************************************************************************
 
 void MainWindow::on_sb_sample_count_editingFinished()
 {
-    if(!come_from_from)
+    if(read_fiff_changed || ui->sb_sample_count->value() == last_sample_count) return;
+    read_fiff_file_new(file_name);
+    last_sample_count = ui->sb_sample_count->value();
+}
+
+//*****************************************************************************************************************
+
+void MainWindow::on_dsb_from_valueChanged(double arg1)
+{
+    if(read_fiff_changed) return;
+
+    read_fiff_changed = true;
+    _from = floor(arg1 * _sample_rate);
+    to = _from + ui->sb_sample_count->value() - 1;
+
+    if(to >= _last_sample)
     {
-        to = ui->dsb_to->value() * _sample_rate;
-        read_fiff_file_new(file_name);
+        to = _last_sample - 1;
+        ui->sb_sample_count->setValue(to - _from);
     }
+
+    ui->dsb_to->setValue(to / _sample_rate);
+    read_fiff_changed = false;
+
+    ui->dsb_from->setToolTip(QString("sample: %1").arg(_from));
+}
+
+//*****************************************************************************************************************
+
+
+void MainWindow::on_dsb_to_valueChanged(double arg1)
+{
+    if(read_fiff_changed) return;
+
+    read_fiff_changed = true;
+    to = floor(arg1 * _sample_rate);
+    _from = to - ui->sb_sample_count->value() + 1;
+
+    if(_from <= _first_sample)
+    {
+        _from = _first_sample + 1;
+        ui->sb_sample_count->setValue(to - _from);
+    }
+
+    ui->dsb_from->setValue(_from / _sample_rate);
+    read_fiff_changed = false;
+
+     ui->dsb_to->setToolTip(QString("sample: %1").arg(to));
+}
+
+//*****************************************************************************************************************
+
+void MainWindow::on_sb_sample_count_valueChanged(int arg1)
+{
+    if(read_fiff_changed) return;
+
+    read_fiff_changed = true;
+    to = _from + arg1 - 1;
+
+    if(to > _last_sample)
+    {
+        to = _last_sample;
+        ui->sb_sample_count->setValue(to - _from + 1);
+    }
+
+    ui->dsb_to->setValue(to / _sample_rate);
+    read_fiff_changed = false;
+
+    ui->sb_sample_count->setToolTip(QString("epoch: %1 sec").arg((to - _from + 1) / _sample_rate));
 }
 
 //*****************************************************************************************************************
@@ -1647,12 +1811,55 @@ void MainWindow::on_dicts_saved()
 
 //*****************************************************************************************************************
 
+void MainWindow::save_fif_file()
+{
+    SaveFifFile *save_Fif = new SaveFifFile();
+    QThread *save_thread = new QThread();
+
+    save_Fif->moveToThread(save_thread);
+
+    connect(this, SIGNAL(to_save(QString, QString, fiff_int_t, fiff_int_t, MatrixXd, select_map, RowVectorXi )),
+            save_Fif, SLOT(save_fif_file(QString, QString, fiff_int_t, fiff_int_t, MatrixXd, select_map, RowVectorXi )));
+    connect(save_Fif, SIGNAL(save_progress(qint32, qint32)),
+                  this, SLOT(recieve_save_progress(qint32, qint32)));
+    connect(save_thread, SIGNAL(finished()), save_thread, SLOT(deleteLater()));
+
+    ui->lb_timer->setHidden(true);
+    ui->cb_all_select->setHidden(true);
+    ui->progress_bar_save->setHidden(false);
+    ui->progress_bar_save->setFormat("save fif file:  %p%");
+    ui->progress_bar_save->setValue(0);
+    ui->progress_bar_save->setMinimum(0);
+    ui->progress_bar_save->setMaximum(_last_sample);
+    //reset progressbar text color to black
+    Pal.setColor(QPalette::Text, Qt::black);
+    ui->progress_bar_save->setPalette(Pal);
+    ui->progress_bar_save->repaint();
+    is_save_white = false;
+
+    ui->actionSpeicher->setEnabled(false);
+    ui->actionSpeicher_unter->setEnabled(false);
+
+    emit to_save(file_name, save_path, _from, to, _atom_sum_matrix, select_channel_map, picks);
+    save_thread->start();
+    save_parameters();
+}
+
+//*****************************************************************************************************************
+
 void MainWindow::on_actionSpeicher_triggered()
 {
     if(file_name.isEmpty())
     {
         QMessageBox::warning(this, tr("Error"),
         tr("error: No file for save."));
+        return;
+    }
+
+    if(file_name.split('.').last() != "fif")
+    {
+        QMessageBox::warning(this, tr("Error"),
+        tr("error: No fif file for save."));
         return;
     }
 
@@ -1681,9 +1888,9 @@ void MainWindow::on_actionSpeicher_triggered()
     last_save_path = "";
     for(qint32 i = 0; i < string_list.length() - 1; i++)
         last_save_path += string_list.at(i) + '/';
-    save_fif_file();
 
     save_fif_file();
+
 }
 
 //*****************************************************************************************************************
@@ -1723,47 +1930,52 @@ void MainWindow::on_actionSpeicher_unter_triggered()
 
     save_path = QFileDialog::getSaveFileName(this, "Save file as...", last_save_path + "/" + save_name,"(*.fif)");
     if(save_path.isEmpty()) return;
+
+    QStringList string_list = save_path.split('/');
+    last_save_path = "";
+    for(qint32 i = 0; i < string_list.length() - 1; i++)
+        last_save_path += string_list.at(i) + '/';
+
+    save_fif_file();
+}
+
+//*****************************************************************************************************************
+
+void MainWindow::recieve_save_progress(qint32 current_progress, qint32 finished)
+{
+    if(finished == 0)
+    {
+        ui->progress_bar_save->setValue(current_progress);
+        if(ui->progress_bar_save->value() > ui->progress_bar_save->maximum() / 2 && !is_save_white)
+        {
+            Pal.setColor(QPalette::Text, Qt::white);
+            ui->progress_bar_save->setPalette(Pal);
+            is_save_white = true;
+        }
+    }
+    else if(finished == 2)
+    {
+        QMessageBox::warning(this, "Error", "error: Save unsucessful.");
+        ui->progress_bar_save->setHidden(true);
+    }
     else
     {
-        QStringList string_list = save_path.split('/');
-        last_save_path = "";
-        for(qint32 i = 0; i < string_list.length() - 1; i++)
-            last_save_path += string_list.at(i) + '/';
-
-        save_fif_file();
+        ui->progress_bar_save->setHidden(true);
+        is_saved = true;
+        ui->actionSpeicher->setEnabled(true);
+        ui->actionSpeicher_unter->setEnabled(true);
     }
 }
 
 //*****************************************************************************************************************
 
-void MainWindow::save_fif_file()
-{
-    //change ui
-    ui->lb_timer->setHidden(true);
-    ui->cb_all_select->setHidden(true);
-    ui->progressBarCalc->setHidden(false);
-    ui->progressBarCalc->setFormat("save fif file:  %p%");
-    ui->progressBarCalc->setValue(0);
-    ui->progressBarCalc->setMinimum(0);
-    //reset progressbar text color to black
-    Pal.setColor(QPalette::Text, Qt::black);
-    ui->progressBarCalc->setPalette(Pal);
-    ui->progressBarCalc->repaint();
-    is_white = false;
-
-    QFile t_fileIn(file_name);
+void SaveFifFile::save_fif_file(QString source_path, QString save_path, fiff_int_t start_change, fiff_int_t end_change, MatrixXd changes, select_map select_channel_map, RowVectorXi picks)
+{    
+    QFile t_fileIn(source_path);
     QFile t_fileOut(save_path);
 
     //   Setup for reading the raw data   
     FiffRawData raw(t_fileIn);
-
-    //   Set up pick list: MEG + STI 014 - bad channels   
-    QStringList include;
-    include << "STI 014";
-    bool want_meg   = true;
-    bool want_eeg   = false;
-    bool want_stim  = false;
-    RowVectorXi picks = raw.info.pick_types(want_meg, want_eeg, want_stim, include, raw.info.bads);
 
     MatrixXd cals;
     FiffStream::SPtr outfid = Fiff::start_writing_raw(t_fileOut,raw.info, cals, picks);
@@ -1771,23 +1983,19 @@ void MainWindow::save_fif_file()
     //   Set up the reading parameters
     fiff_int_t from = raw.first_samp;
     fiff_int_t to = raw.last_samp;
-    ui->progressBarCalc->setMaximum(to);
     float quantum_sec = 10.0f;//read and write in 10 sec junks
     fiff_int_t quantum = ceil(quantum_sec*raw.info.sfreq);  //   To read the whole file at once set quantum     = to - from + 1;
 
     //   Read and write all the data
     //************************************************************************************
     bool first_buffer = true;
-    fiff_int_t first = from;
+    fiff_int_t first;
     fiff_int_t last;
     MatrixXd data;
     MatrixXd times;
-    fiff_int_t start_change = _from + raw.first_samp;        // start of change
-    fiff_int_t end_change = this->to + raw.first_samp;       // end of change
-
 
     // from 0 to start of change
-    for(first; first < start_change; first+=quantum)
+    for(first = from; first < start_change; first+=quantum)
     {
         last = first+quantum-1;
         if (last > start_change)
@@ -1797,8 +2005,7 @@ void MainWindow::save_fif_file()
         if (!raw.read_raw_segment(data ,times, first, last, picks))
         {
                 printf("error during read_raw_segment\n");
-                QMessageBox::warning(this, tr("Error"),
-                tr("error: Save unsucessful."));
+                emit save_progress(first, 2);
                 return;
         }
         printf("Writing...");
@@ -1811,13 +2018,7 @@ void MainWindow::save_fif_file()
         outfid->write_raw_buffer(data,cals);
         printf("[done]\n");
 
-        ui->progressBarCalc->setValue(first);
-        if(ui->progressBarCalc->value() > ui->progressBarCalc->maximum() / 2 && !is_white)
-        {
-            Pal.setColor(QPalette::Text, Qt::white);
-            ui->progressBarCalc->setPalette(Pal);
-            is_white = true;
-        }
+        emit save_progress(first, 0);
     }
 
     //************************************************************************************
@@ -1826,8 +2027,7 @@ void MainWindow::save_fif_file()
     if (!raw.read_raw_segment(data, times, start_change ,end_change,picks))
     {
             printf("error during read_raw_segment\n");
-            QMessageBox::warning(this, tr("Error"),
-            tr("error: Save unsucessful."));
+            emit save_progress(first, 2);
             return;
     }
 
@@ -1836,7 +2036,7 @@ void MainWindow::save_fif_file()
     {
         if(select_channel_map[channels])
         {
-            data.row(channels) =  _atom_sum_matrix.col(index)  ;
+            data.row(channels) =  changes.col(index)  ;
             index++;
         }
     }
@@ -1862,38 +2062,25 @@ void MainWindow::save_fif_file()
         }
         if (!raw.read_raw_segment(data,times,first,last, picks))
         {
-                printf("error during read_raw_segment\n");
-                QMessageBox::warning(this, tr("Error"),
-                tr("error: Save unsucessful."));
-                return;
+            printf("error during read_raw_segment\n");
+            emit save_progress(first, 2);
+            return;
         }
         printf("Writing...");
         outfid->write_raw_buffer(data,cals);
         printf("[done]\n");
-        ui->progressBarCalc->setValue(first);
-        if(ui->progressBarCalc->value() > ui->progressBarCalc->maximum() / 2 && !is_white)
-        {
-            Pal.setColor(QPalette::Text, Qt::white);
-            ui->progressBarCalc->setPalette(Pal);
-            is_white = true;
-        }
+
+        emit save_progress(first, false);
     }
 
-    save_parameters();
-    ui->progressBarCalc->setValue(to);
+    emit save_progress(to, true);
 
     printf("Writing...");
     outfid->write_raw_buffer(data,cals);
     printf("[done]\n");
 
     outfid->finish_writing_raw();
-    printf("Finished\n");
-
-    is_saved = true;
-    ui->lb_timer->setHidden(false);
-    ui->cb_all_select->setHidden(false);
-    ui->progressBarCalc->setHidden(true);
-    //ui->lb_save_file->setHidden(true);
+    printf("Finished\n");    
 }
 
 //*****************************************************************************************************************
@@ -1901,12 +2088,18 @@ void MainWindow::save_fif_file()
 void MainWindow::save_parameters()
 {
     QString save_parameter_path = save_path.split(".").first() + ".txt";
+    QString original_file_name = file_name.split("/").last().split(".").first();
     QFile xml_file(save_parameter_path);
     if(xml_file.open(QIODevice::WriteOnly))
     {
         QXmlStreamWriter xmlWriter(&xml_file);
         xmlWriter.setAutoFormatting(true);
         xmlWriter.writeStartDocument();
+        xmlWriter.writeStartElement("MP_DECOMPOSITION");
+        xmlWriter.writeAttribute("fiff_file_name", original_file_name);
+        xmlWriter.writeAttribute("epoch_from", QString::number(ui->dsb_from->value()));
+        xmlWriter.writeAttribute("epoch_to", QString::number(ui->dsb_to->value()));
+        xmlWriter.writeAttribute("samples", QString::number(ui->sb_sample_count->value()));
 
         for(qint32 i = 0; i < ui->tbv_Results->rowCount() - 1; i++)
         {
@@ -1959,16 +2152,26 @@ void MainWindow::save_parameters()
                 xmlWriter.writeAttribute("sample_count", QString::number(gabor_atom.sample_count));
                 xmlWriter.writeAttribute("%energy_from_signal", ui->tbv_Results->item(i, 0)->text());
 
-                xmlWriter.writeStartElement("PARAMETER");
+                xmlWriter.writeStartElement("MATHEMATICAL_PARAMETERS");
                 xmlWriter.writeAttribute("scale", QString::number(gabor_atom.scale));
                 xmlWriter.writeAttribute("translation", QString::number(gabor_atom.translation));
                 xmlWriter.writeAttribute("modulation", QString::number(gabor_atom.modulation));
                 xmlWriter.writeAttribute("phase", QString::number(gabor_atom.phase));
                 xmlWriter.writeEndElement();    //PARAMETER
 
+                xmlWriter.writeStartElement("PHYSICAL_PARAMETERS");
+                xmlWriter.writeAttribute("scale", QString::number(gabor_atom.scale / _sample_rate, 'g', 3));
+                xmlWriter.writeAttribute("translation", QString::number(gabor_atom.translation / qreal(_sample_rate) + _from  / _sample_rate, 'g', 4));
+                xmlWriter.writeAttribute("modulation", QString::number(gabor_atom.modulation * _sample_rate / gabor_atom.sample_count, 'g', 3));
+
+                qreal phase = gabor_atom.phase;
+                if(phase > 2*PI) phase -= 2*PI;
+                xmlWriter.writeAttribute("phase", QString::number(phase, 'g', 3));
+                xmlWriter.writeEndElement();    //PARAMETER
                 xmlWriter.writeEndElement();    //ATOM
             }
         }
+        xmlWriter.writeEndElement();    //MP_DECOMPOSITION
         xmlWriter.writeEndDocument();
     }
     xml_file.close();
@@ -1984,7 +2187,6 @@ void MainWindow::on_actionExport_triggered()
         tr("error: No adaptive MP results for save."));
         return;
     }
-
 
     QString save_path = QFileDialog::getSaveFileName(this, "Export results as dict file...", QDir::homePath() + "/" + "Matching-Pursuit-Toolbox" + "/" + "resultdict","(*.dict)");
     if(save_path.isEmpty()) return;
@@ -2003,37 +2205,80 @@ void MainWindow::on_actionExport_triggered()
 
         xmlWriter.writeStartElement("COUNT");
         xmlWriter.writeAttribute("of_atoms", QString::number(_adaptive_atom_list.length()));
-        xmlWriter.writeStartElement("built_Atoms");
-        xmlWriter.writeAttribute("formula", "Gaboratom");
-        xmlWriter.writeAttribute("sample_count", QString::number(_adaptive_atom_list.first().sample_count));
-        xmlWriter.writeAttribute("atom_count", QString::number(_adaptive_atom_list.length()));
-        xmlWriter.writeAttribute("source_dict", save_path.split('/').last().split('.').first());
 
-        for(qint32 i = 0; i < _adaptive_atom_list.length(); i++)
+        qint32 div = floor(_adaptive_atom_list.length() / 8.0);
+        qint32 mod = _adaptive_atom_list.length() % 8;
+        if(div != 0)
         {
-            GaborAtom gabor_atom = _adaptive_atom_list.at(i);
-            QStringList result_list = gabor_atom.create_string_values(gabor_atom.sample_count, gabor_atom.scale, gabor_atom.sample_count / 2, gabor_atom.modulation, gabor_atom.phase);
-
-            xmlWriter.writeStartElement("ATOM");
-            xmlWriter.writeAttribute("ID", QString::number(i));
-            xmlWriter.writeAttribute("scale", QString::number(gabor_atom.scale));
-            xmlWriter.writeAttribute("modu", QString::number(gabor_atom.modulation));
-            xmlWriter.writeAttribute("phase", QString::number(gabor_atom.phase));
-
-            xmlWriter.writeStartElement("samples");
-            QString samples_to_xml;
-            for (qint32 it = 0; it < result_list.length(); it++)
+            for(qint32 j = 0; j < 8; j++)
             {
-                samples_to_xml.append(result_list.at(it));
-                samples_to_xml.append(":");
-            }
-            xmlWriter.writeAttribute("samples", samples_to_xml);
-            xmlWriter.writeEndElement();    //samples
+                xmlWriter.writeStartElement("built_Atoms");
+                xmlWriter.writeAttribute("formula", "Gaboratom");
+                xmlWriter.writeAttribute("sample_count", QString::number(_adaptive_atom_list.first().sample_count));
+                xmlWriter.writeAttribute("atom_count", QString::number(div));
+                xmlWriter.writeAttribute("source_dict", save_path.split('/').last().split('.').first() + "_" + QString::number(j));
 
-            xmlWriter.writeEndElement();    //ATOM
+                for(qint32 i = 0; i < div; i++)
+                {
+                    GaborAtom gabor_atom = _adaptive_atom_list.at(i + j * div);
+                    QStringList result_list = gabor_atom.create_string_values(gabor_atom.sample_count, gabor_atom.scale, gabor_atom.sample_count / 2, gabor_atom.modulation, gabor_atom.phase);
 
+                    xmlWriter.writeStartElement("ATOM");
+                    xmlWriter.writeAttribute("ID", QString::number(i));
+                    xmlWriter.writeAttribute("scale", QString::number(gabor_atom.scale));
+                    xmlWriter.writeAttribute("modu", QString::number(gabor_atom.modulation));
+                    xmlWriter.writeAttribute("phase", QString::number(gabor_atom.phase));
+
+                    xmlWriter.writeStartElement("samples");
+                    QString samples_to_xml;
+                    for (qint32 it = 0; it < result_list.length(); it++)
+                    {
+                        samples_to_xml.append(result_list.at(it));
+                        samples_to_xml.append(":");
+                    }
+                    xmlWriter.writeAttribute("samples", samples_to_xml);
+                    xmlWriter.writeEndElement();    //samples
+
+                    xmlWriter.writeEndElement();    //ATOM
+
+                }
+                xmlWriter.writeEndElement();    //built_atoms
+            } //builds
         }
-        xmlWriter.writeEndElement();    //bulit_atoms
+
+        if(mod != 0)
+        {
+            xmlWriter.writeStartElement("built_Atoms");
+            xmlWriter.writeAttribute("formula", "Gaboratom");
+            xmlWriter.writeAttribute("sample_count", QString::number(_adaptive_atom_list.first().sample_count));
+            xmlWriter.writeAttribute("atom_count", QString::number(mod));
+            xmlWriter.writeAttribute("source_dict", save_path.split('/').last().split('.').first()  + "_" + QString::number(8));
+
+            for(qint32 i = 0; i < mod; i++)
+            {
+                GaborAtom gabor_atom = _adaptive_atom_list.at(i + 8 * div);
+                QStringList result_list = gabor_atom.create_string_values(gabor_atom.sample_count, gabor_atom.scale, gabor_atom.sample_count / 2, gabor_atom.modulation, gabor_atom.phase);
+
+                xmlWriter.writeStartElement("ATOM");
+                xmlWriter.writeAttribute("ID", QString::number(i));
+                xmlWriter.writeAttribute("scale", QString::number(gabor_atom.scale));
+                xmlWriter.writeAttribute("modu", QString::number(gabor_atom.modulation));
+                xmlWriter.writeAttribute("phase", QString::number(gabor_atom.phase));
+
+                xmlWriter.writeStartElement("samples");
+                QString samples_to_xml;
+                for (qint32 it = 0; it < result_list.length(); it++)
+                {
+                    samples_to_xml.append(result_list.at(it));
+                    samples_to_xml.append(":");
+                }
+                xmlWriter.writeAttribute("samples", samples_to_xml);
+                xmlWriter.writeEndElement();    //samples
+
+                xmlWriter.writeEndElement();    //ATOM
+            }
+            xmlWriter.writeEndElement();    //built_atoms
+        }
         xmlWriter.writeEndElement();    //COUNT
         xmlWriter.writeEndDocument();
     }
@@ -2075,6 +2320,7 @@ void MainWindow::on_rb_adativMp_clicked()
 }
 
 //*****************************************************************************************************************
+
 void MainWindow::activate_info_label()
 {
     QSettings settings;
@@ -2088,4 +2334,19 @@ void MainWindow::activate_info_label()
         ui->lb_info_content->setHidden(false);
         ui->lb_info->setHidden(false);
     }
+}
+
+//*****************************************************************************************************************
+
+void MainWindow::on_dsb_energy_valueChanged(double arg1)
+{
+    if(arg1 > 99.9)
+        ui->dsb_energy->setValue(99.9);
+}
+
+//*****************************************************************************************************************
+
+void MainWindow::on_actionBeenden_triggered()
+{
+    close();
 }

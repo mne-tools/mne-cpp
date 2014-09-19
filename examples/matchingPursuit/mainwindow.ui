@@ -87,43 +87,14 @@
             <number>6</number>
            </property>
            <item>
-            <layout class="QGridLayout" name="l_options" columnstretch="0,0,0,0,1">
+            <layout class="QGridLayout" name="l_options" columnstretch="0,0,0,0">
              <property name="spacing">
               <number>5</number>
              </property>
-             <item row="5" column="2">
-              <widget class="QSpinBox" name="sb_Iterations">
-               <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Maximum Iterations&lt;/span&gt;&lt;/p&gt;&lt;p&gt;The Algorithm will expire if the selected number of iterations (founded atoms) is reached. &lt;br/&gt;Maximum: 5000 iteration steps&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-               </property>
-               <property name="maximum">
-                <number>5000</number>
-               </property>
-               <property name="value">
-                <number>80</number>
-               </property>
-              </widget>
-             </item>
-             <item row="7" column="0" colspan="2">
-              <widget class="QCheckBox" name="chb_ResEnergy">
-               <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Residuum Energy&lt;/span&gt;&lt;/p&gt;&lt;p&gt;The Algorithm will expire if the selected percentage of the input signal is reached. &lt;br/&gt;Minimum: 0,1 % of the input signal &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-               </property>
-               <property name="text">
-                <string>residual energy:</string>
-               </property>
-               <property name="checked">
-                <bool>true</bool>
-               </property>
-              </widget>
-             </item>
              <item row="5" column="0" colspan="2">
               <widget class="QCheckBox" name="chb_Iterations">
                <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Maximum Iterations&lt;/span&gt;&lt;/p&gt;&lt;p&gt;The Algorithm will expire if the selected number of iterations (founded atoms) is reached. &lt;br/&gt;Maximum: 5000 iteration steps&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;maximum iterations&lt;/span&gt;&lt;/p&gt;&lt;p&gt;...algorithm will expire if the selected number of iterations (found atoms) is reached&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="text">
                 <string>max. iterations:</string>
@@ -133,16 +104,26 @@
                </property>
               </widget>
              </item>
-             <item row="9" column="0" colspan="2">
-              <widget class="QRadioButton" name="rb_adativMp">
+             <item row="7" column="0" colspan="2">
+              <widget class="QCheckBox" name="chb_ResEnergy">
                <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Adaptive MP&lt;/span&gt;&lt;br/&gt;&lt;br/&gt;Matching Pursuit Algorithm of Stephan Mallat and Zhifeng Zhang.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;residual energy&lt;/span&gt;&lt;/p&gt;&lt;p&gt;...algorithm will expire if residue reaches selected percentage of the input signal&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="text">
-                <string>adaptive MP</string>
+                <string>residual energy:</string>
                </property>
                <property name="checked">
                 <bool>true</bool>
+               </property>
+              </widget>
+             </item>
+             <item row="11" column="0" colspan="2">
+              <widget class="QLabel" name="label">
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;sample rate&lt;/span&gt;&lt;/p&gt;&lt;p&gt;The sample rate which was used for data aquisition has to be entered here. In case of fif-files it is set automatically.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="text">
+                <string>sample rate:</string>
                </property>
               </widget>
              </item>
@@ -155,59 +136,37 @@
                 </sizepolicy>
                </property>
                <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Truncation Criterion&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;Criterion which stops Matching Pursuit Algorithm One or both criterion(s) can be used. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;truncation criterion&lt;/span&gt;&lt;/p&gt;&lt;p&gt;criterion at which the matching pursuit algorithm stops&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="text">
                 <string>truncation criterion</string>
                </property>
               </widget>
              </item>
-             <item row="7" column="2">
-              <widget class="QDoubleSpinBox" name="dsb_energy">
+             <item row="9" column="0" colspan="2">
+              <widget class="QRadioButton" name="rb_adativMp">
                <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Residuum Energy&lt;/span&gt;&lt;/p&gt;&lt;p&gt;The Algorithm will expire if the selected percentage of the input signal is reached. &lt;br/&gt;Minimum: 0,1 % of the input signal &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-               </property>
-               <property name="alignment">
-                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-               </property>
-               <property name="decimals">
-                <number>1</number>
-               </property>
-               <property name="minimum">
-                <double>0.100000000000000</double>
-               </property>
-               <property name="maximum">
-                <double>99.000000000000000</double>
-               </property>
-               <property name="value">
-                <double>1.000000000000000</double>
-               </property>
-              </widget>
-             </item>
-             <item row="11" column="0" colspan="2">
-              <widget class="QLabel" name="label">
-               <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Sample Rate&lt;/span&gt;&lt;/p&gt;&lt;p&gt;The sample rate which was used for data aquisition has to be entered here.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;adaptive MP&lt;/span&gt;&lt;br/&gt;&lt;br/&gt;...use matching pursuit algorithm of Stephan Mallat and Zhifeng Zhang.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="text">
-                <string>sample rate:</string>
+                <string>adaptive MP</string>
+               </property>
+               <property name="checked">
+                <bool>true</bool>
                </property>
               </widget>
              </item>
-             <item row="7" column="3">
-              <widget class="QLabel" name="lb_Prozent">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
+             <item row="10" column="0" colspan="2">
+              <widget class="QRadioButton" name="rb_OwnDictionary">
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;own dictionary&lt;/span&gt;&lt;/p&gt;&lt;p&gt;…uses fix dictionaries which have been built by the user &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="text">
-                <string>%</string>
+                <string>own dictionary:</string>
                </property>
               </widget>
              </item>
-             <item row="10" column="2" colspan="3">
+             <item row="10" column="2" colspan="2">
               <widget class="QComboBox" name="cb_Dicts">
                <property name="enabled">
                 <bool>false</bool>
@@ -218,32 +177,65 @@
                  <height>0</height>
                 </size>
                </property>
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;...chose dictionary here&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
               </widget>
              </item>
-             <item row="10" column="0" colspan="2">
-              <widget class="QRadioButton" name="rb_OwnDictionary">
+             <item row="5" column="3">
+              <widget class="QSpinBox" name="sb_Iterations">
                <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Own Dictionary&lt;/span&gt;&lt;/p&gt;&lt;p&gt;…uses fix dictionaries which have been built by the user &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;0 ... 5000&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
-               <property name="text">
-                <string>own dictionary:</string>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+               <property name="minimum">
+                <number>1</number>
+               </property>
+               <property name="maximum">
+                <number>5000</number>
+               </property>
+               <property name="value">
+                <number>80</number>
+               </property>
+              </widget>
+             </item>
+             <item row="7" column="3">
+              <widget class="QDoubleSpinBox" name="dsb_energy">
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;0,1% ... 99,9%&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+               <property name="suffix">
+                <string> %</string>
+               </property>
+               <property name="decimals">
+                <number>1</number>
+               </property>
+               <property name="minimum">
+                <double>0.100000000000000</double>
+               </property>
+               <property name="maximum">
+                <double>1000.000000000000000</double>
+               </property>
+               <property name="value">
+                <double>1.000000000000000</double>
                </property>
               </widget>
              </item>
              <item row="11" column="3">
-              <widget class="QLabel" name="l_unit">
-               <property name="text">
-                <string>1 / sec</string>
-               </property>
-              </widget>
-             </item>
-             <item row="11" column="2">
               <widget class="QDoubleSpinBox" name="dsb_sample_rate">
                <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Sample Rate&lt;/span&gt;&lt;/p&gt;&lt;p&gt;The sample rate which was used for data aquisition has to be entered here.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;...enter sample rate here&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               </property>
+               <property name="suffix">
+                <string> Hz</string>
                </property>
                <property name="decimals">
                 <number>3</number>
@@ -260,6 +252,19 @@
               </widget>
              </item>
             </layout>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>40</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
            </item>
           </layout>
          </widget>
@@ -281,7 +286,7 @@
              </sizepolicy>
             </property>
             <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Read Signal&lt;/span&gt;&lt;/p&gt;&lt;p&gt;…opens file dialog for read in a new signal.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;read signal&lt;/span&gt;&lt;/p&gt;&lt;p&gt;…opens file dialog to read in a new signal.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="layoutDirection">
              <enum>Qt::RightToLeft</enum>
@@ -294,12 +299,18 @@
           <item>
            <widget class="QComboBox" name="cb_channels">
             <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Channel Select&lt;/span&gt;&lt;/p&gt;&lt;p&gt;…enables channel selection before decomposing. All select oder deselect is last entrie.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;channel select&lt;/span&gt;&lt;/p&gt;&lt;p&gt;drops down channel selection before decomposing. Bad channels are initially deselected and marked by red color.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
+            <property name="maxVisibleItems">
+             <number>51</number>
             </property>
            </widget>
           </item>
           <item>
            <widget class="QPushButton" name="btt_Calc">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
               <horstretch>0</horstretch>
@@ -307,7 +318,7 @@
              </sizepolicy>
             </property>
             <property name="toolTip">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Calculate&lt;/span&gt;&lt;/p&gt;&lt;p&gt;This button starts the choosen MP Algorithm. When Algorithm is started, the button´s text is changed to &amp;quot;cancel&amp;quot;. Now you can interrupt the calculation-thread and it will stop after finding the next atom. During the interrupt-request the button´s text is set to &amp;quot;wait...&amp;quot;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;calculate&lt;/span&gt;&lt;/p&gt;&lt;p&gt;...starts the chosen MP Algorithm. When Algorithm is started, the button´s text is changed to &amp;quot;cancel&amp;quot;. Now you can interrupt the calculation-thread and it will stop after finding the next atom. During the interrupt-request the button´s text is set to &amp;quot;wait...&amp;quot;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="layoutDirection">
              <enum>Qt::RightToLeft</enum>
@@ -339,6 +350,9 @@
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
             </property>
+            <property name="suffix">
+             <string> sec</string>
+            </property>
             <property name="decimals">
              <number>4</number>
             </property>
@@ -361,6 +375,9 @@
            <widget class="QDoubleSpinBox" name="dsb_to">
             <property name="alignment">
              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+            </property>
+            <property name="suffix">
+             <string> sec</string>
             </property>
             <property name="decimals">
              <number>4</number>
@@ -388,6 +405,9 @@
           </item>
           <item>
            <widget class="QLabel" name="lb_samples">
+            <property name="toolTip">
+             <string/>
+            </property>
             <property name="text">
              <string>samples:</string>
             </property>
@@ -403,6 +423,9 @@
             </property>
             <property name="maximum">
              <number>4096</number>
+            </property>
+            <property name="value">
+             <number>311</number>
             </property>
            </widget>
           </item>
@@ -424,6 +447,9 @@
           </property>
           <item>
            <widget class="QCheckBox" name="cb_all_select">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;select / deselect all atoms&lt;/span&gt;&lt;/p&gt;&lt;p&gt;...select all, none or user chosen atoms in result list&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
             <property name="text">
              <string>select / deselect all atoms</string>
             </property>
@@ -437,6 +463,9 @@
           </item>
           <item>
            <widget class="QLabel" name="lb_timer">
+            <property name="toolTip">
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;timer&lt;/span&gt;&lt;/p&gt;&lt;p&gt;expired time since algorithm started&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            </property>
             <property name="text">
              <string/>
             </property>
@@ -483,11 +512,44 @@ QProgressBar::background{
           <property name="alignment">
            <set>Qt::AlignCenter</set>
           </property>
-          <property name="textVisible">
-           <bool>true</bool>
-          </property>
           <property name="format">
            <string/>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QProgressBar" name="progress_bar_save">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">QProgressBar {	
+	color: white;
+	
+	
+	
+}
+QProgressBar::chunk { 
+	background-image: url(:/images/icons/progressbar_brush.png);
+	
+}
+
+QProgressBar::background{
+
+ color: black;
+}</string>
+          </property>
+          <property name="value">
+           <number>50</number>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+          <property name="format">
+           <string>save file: %p%</string>
           </property>
          </widget>
         </item>
@@ -519,7 +581,7 @@ QProgressBar::background{
            </font>
           </property>
           <property name="toolTip">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Signal&lt;/span&gt;&lt;/p&gt;&lt;p&gt;chosen input signal Only the displayed segment will be decomposed. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;signal&lt;/span&gt;&lt;/p&gt;&lt;p&gt;chosen input signal only the displayed epoch and channels will be decomposed&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="text">
            <string>signal:</string>
@@ -550,7 +612,7 @@ QProgressBar::background{
            </font>
           </property>
           <property name="toolTip">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Approximation&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Addition of all founded atoms which are selected. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;approximation&lt;/span&gt;&lt;/p&gt;&lt;p&gt;composition of all selected atoms &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="text">
            <string>approximation:</string>
@@ -581,7 +643,7 @@ QProgressBar::background{
            </font>
           </property>
           <property name="toolTip">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Difference&lt;/span&gt;&lt;/p&gt;&lt;p&gt;Residuum energy of the Decomposition &lt;br/&gt;The Difference between the input signal and all selected atoms is displayed. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;difference&lt;/span&gt;&lt;/p&gt;&lt;p&gt;difference between input signal and all selected atoms&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="text">
            <string>difference:</string>
@@ -592,7 +654,7 @@ QProgressBar::background{
          <layout class="QVBoxLayout" name="l_res"/>
         </item>
         <item>
-         <layout class="QVBoxLayout" name="l_YAxis">
+         <layout class="QVBoxLayout" name="l_XAxis">
           <property name="bottomMargin">
            <number>0</number>
           </property>
@@ -714,16 +776,10 @@ QProgressBar::background{
     <string>new...</string>
    </property>
   </action>
-  <action name="actionOeffnen">
-   <property name="icon">
-    <iconset resource="Ressourcen.qrc">
-     <normaloff>:/images/icons/folder.png</normaloff>:/images/icons/folder.png</iconset>
-   </property>
-   <property name="text">
-    <string>open...</string>
-   </property>
-  </action>
   <action name="actionSpeicher">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="Ressourcen.qrc">
      <normaloff>:/images/icons/floppyDisk.png</normaloff>:/images/icons/floppyDisk.png</iconset>
@@ -733,21 +789,15 @@ QProgressBar::background{
    </property>
   </action>
   <action name="actionSpeicher_unter">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="Ressourcen.qrc">
      <normaloff>:/images/icons/floppyDisk.png</normaloff>:/images/icons/floppyDisk.png</iconset>
    </property>
    <property name="text">
     <string>save as...</string>
-   </property>
-  </action>
-  <action name="actionExportieren">
-   <property name="icon">
-    <iconset resource="Ressourcen.qrc">
-     <normaloff>:/images/icons/boxUpload.png</normaloff>:/images/icons/boxUpload.png</iconset>
-   </property>
-   <property name="text">
-    <string>export...</string>
    </property>
   </action>
   <action name="actionBeenden">
@@ -823,6 +873,9 @@ QProgressBar::background{
    </property>
   </action>
   <action name="actionExport">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="icon">
     <iconset resource="Ressourcen.qrc">
      <normaloff>:/images/icons/boxUpload.png</normaloff>:/images/icons/boxUpload.png</iconset>
@@ -866,22 +919,6 @@ QProgressBar::background{
     <hint type="destinationlabel">
      <x>681</x>
      <y>144</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>chb_ResEnergy</sender>
-   <signal>toggled(bool)</signal>
-   <receiver>lb_Prozent</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>74</x>
-     <y>95</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>239</x>
-     <y>97</y>
     </hint>
    </hints>
   </connection>

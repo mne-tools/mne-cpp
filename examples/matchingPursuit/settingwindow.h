@@ -2,6 +2,7 @@
 #define SETTINGWINDOW_H
 
 #include <QWidget>
+#include <QStandardItem>
 
 namespace Ui {
 class settingwindow;
@@ -32,9 +33,17 @@ private slots:
     void on_sl_boost_fixDict_valueChanged(int value);
     void on_sl_boost_fixDict_sliderPressed();
     void on_btt_delta_energy_default_clicked();
+    void cb_selection_changed(const QModelIndex& topLeft, const QModelIndex& bottomRight);
+
+    void on_pushButton_clicked();
 
 private:
     Ui::settingwindow *ui;
+    QStandardItem* cb_item;
+    QStandardItemModel* cb_model;
+    std::vector<QStandardItem*> cb_items;
+    QMap<QString, QVariant> sel_signal_type_map;
+    void fill_signal_type_combobox();
     void closeEvent(QCloseEvent * event);
 };
 
