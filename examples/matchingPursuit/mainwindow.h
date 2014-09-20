@@ -778,6 +778,7 @@ class GraphWindow : public QWidget
 
 protected:
    void paintEvent(QPaintEvent *event);
+   void GraphWindow::mouseMoveEvent(QMouseEvent *event);
 
 public:
    //==========================================================================================================
@@ -806,6 +807,7 @@ class AtomSumWindow : public QWidget
 
 protected:
    void paintEvent(QPaintEvent *event);
+   void AtomSumWindow::mouseMoveEvent(QMouseEvent *event);
 
 public:
    //=========================================================================================================
@@ -836,6 +838,7 @@ class ResiduumWindow : public QWidget
 
   protected:
     void paintEvent(QPaintEvent *event);
+    void ResiduumWindow::mouseMoveEvent(QMouseEvent *event);
 
 public:
     //=========================================================================================================

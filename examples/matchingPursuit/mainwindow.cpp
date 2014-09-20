@@ -83,6 +83,7 @@ bool _has_warning;
 fiff_int_t _from;
 fiff_int_t _first_sample;
 fiff_int_t _last_sample;
+qint32 _to_for_tip;
 qreal _max_pos;
 qreal _max_neg;
 qreal _sample_rate;
@@ -114,16 +115,19 @@ MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::
 
     this->setMinimumSize(1280, 640);
     callGraphWindow = new GraphWindow();
+    callGraphWindow->setMouseTracking(true);
     callGraphWindow->setMinimumHeight(140);
     callGraphWindow->setMinimumWidth(500);
     ui->l_Graph->addWidget(callGraphWindow);
 
     callAtomSumWindow = new AtomSumWindow();
+    callAtomSumWindow->setMouseTracking(true);
     callAtomSumWindow->setMinimumHeight(140);
     callAtomSumWindow->setMinimumWidth(500);
     ui->l_atoms->addWidget(callAtomSumWindow);
 
     callResidumWindow = new ResiduumWindow();
+    callResidumWindow->setMouseTracking(true);
     callResidumWindow->setMinimumHeight(140);
     callResidumWindow->setMinimumWidth(500);
     ui->l_res->addWidget(callResidumWindow);
@@ -488,6 +492,7 @@ qint32 MainWindow::read_fiff_file(QString fileName)
 
         _from = _first_sample;
         this->to = _from + 511;
+        _to_for_tip = this->to;
 
         last_from = _from;
         last_to = to;
@@ -1691,6 +1696,7 @@ void MainWindow::on_dsb_from_valueChanged(double arg1)
     read_fiff_changed = true;
     _from = floor(arg1 * _sample_rate);
     to = _from + ui->sb_sample_count->value() - 1;
+    _to_for_tip = to;
 
     if(to >= _last_sample)
     {
@@ -1713,6 +1719,7 @@ void MainWindow::on_dsb_to_valueChanged(double arg1)
 
     read_fiff_changed = true;
     to = floor(arg1 * _sample_rate);
+    _to_for_tip = to;
     _from = to - ui->sb_sample_count->value() + 1;
 
     if(_from <= _first_sample)
@@ -1735,6 +1742,7 @@ void MainWindow::on_sb_sample_count_valueChanged(int arg1)
 
     read_fiff_changed = true;
     to = _from + arg1 - 1;
+    _to_for_tip = to;
 
     if(to > _last_sample)
     {
@@ -2350,3 +2358,49 @@ void MainWindow::on_actionBeenden_triggered()
 {
     close();
 }
+
+//*****************************************************************************************************************
+
+void GraphWindow::mouseMoveEvent(QMouseEvent *event)
+{
+    Q_UNUSED(event);
+   if(_to_for_tip - _from != 0)
+   {
+       qint32 temp_pos = qreal(mapFromGlobal(QCursor::pos()).x() - 55);
+       qreal stretch_factor = qreal(this->width() - 55/*left_border*/ - 15/*right_border*/) / (qreal(_to_for_tip) - qreal(_from));
+       qreal time = qreal(_from) / _sample_rate + temp_pos / stretch_factor / _sample_rate;
+       this->setToolTip(QString("time: %1 sec").arg(time));
+       setCursor(Qt::CrossCursor);
+   }
+}
+
+//*****************************************************************************************************************
+
+void AtomSumWindow::mouseMoveEvent(QMouseEvent *event)
+{
+    Q_UNUSED(event);
+   if(_to_for_tip - _from != 0)
+   {
+       qint32 temp_pos = qreal(mapFromGlobal(QCursor::pos()).x() - 55);
+       qreal stretch_factor = qreal(this->width() - 55/*left_border*/ - 15/*right_border*/) / (qreal(_to_for_tip) - qreal(_from));
+       qreal time = qreal(_from) / _sample_rate + temp_pos / stretch_factor / _sample_rate;
+       this->setToolTip(QString("time: %1 sec").arg(time));
+       setCursor(Qt::CrossCursor);
+   }
+}
+
+//*****************************************************************************************************************
+
+void ResiduumWindow::mouseMoveEvent(QMouseEvent *event)
+{
+     Q_UNUSED(event);
+    if(_to_for_tip - _from != 0)
+    {
+        qint32 temp_pos = qreal(mapFromGlobal(QCursor::pos()).x() - 55);
+        qreal stretch_factor = qreal(this->width() - 55/*left_border*/ - 15/*right_border*/) / (qreal(_to_for_tip) - qreal(_from));
+        qreal time = qreal(_from) / _sample_rate + temp_pos / stretch_factor / _sample_rate;
+        this->setToolTip(QString("time: %1 sec").arg(time));
+        setCursor(Qt::CrossCursor);
+    }
+}
+
