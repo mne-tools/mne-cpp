@@ -78,12 +78,11 @@ using namespace DISPLIB;
 //=============================================================================================================
 
 bool _new_paint;
-bool _has_warning;
 
 fiff_int_t _from;
+fiff_int_t _to;
 fiff_int_t _first_sample;
 fiff_int_t _last_sample;
-qint32 _to_for_tip;
 qreal _max_pos;
 qreal _max_neg;
 qreal _sample_rate;
@@ -103,7 +102,6 @@ Formulaeditor *_formula_editor;
 EditorWindow *_editor_window;
 Enhancededitorwindow *_enhanced_editor_window;
 settingwindow *_setting_window;
-QPalette Pal;
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -191,14 +189,16 @@ MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::
     last_save_path = settings.value("last_save_path", QDir::homePath()+ "/" + "Matching-Pursuit-Toolbox").toString();
 
 
+    /*
     // set black background
-    Pal.setColor(QPalette::BrightText, Qt::black);
-    Pal.setColor(QPalette::Window, Qt::black);
-    Pal.setColor(QPalette::Text, Qt::black);
-    Pal.setColor(QPalette::HighlightedText, Qt::white);
+    pal.setColor(QPalette::BrightText, Qt::black);
+    pal.setColor(QPalette::Window, Qt::black);
+    pal.setColor(QPalette::Text, Qt::black);
+    pal.setColor(QPalette::HighlightedText, Qt::white);
     ui->progressBarCalc->setAutoFillBackground(true);
-    ui->progressBarCalc->setPalette(Pal);
+    ui->progressBarCalc->setPalette(pal);
     //ui->progressBarCalc->show();
+    */
 
     if(!settings.value("show_infos", true).toBool())
     {
@@ -226,6 +226,18 @@ SaveFifFile::~SaveFifFile(){}
 
 void MainWindow::closeEvent(QCloseEvent * event)
 {
+
+    if(ui->progress_bar_save->isVisible())
+    {
+        if(QMessageBox::question(this, "warning", "Saving fif-file is still in progress. Are you sure you want to quit?") == QMessageBox::Yes)
+           event->accept();
+        else
+        {
+            event->ignore();
+            return;
+        }
+    }
+
     QSettings settings;
     if(settings.value("show_warnings",true).toBool() && !is_saved)
     {
@@ -296,41 +308,59 @@ void MainWindow::open_file()
     }
     file.close();
 
+    _colors.clear();
+    _colors.append(QColor(0, 0, 0));
 
+    _from = -1;
     if(file_name.endsWith(".fif", Qt::CaseInsensitive))
     {
-        fiff_save_enable = true;
-
-        _from = -1;
         //read_fiff_ave(_file_name);
-        read_fiff_file(file_name);
-        ui->lb_from->setHidden(false);
-        ui->dsb_from->setHidden(false);
-        ui->lb_to->setHidden(false);
-        ui->dsb_to->setHidden(false);
-        ui->lb_samples->setHidden(false);
-        ui->sb_sample_count->setHidden(false);
+        if(!read_fiff_file(file_name)) return;
+
+        ui->dsb_sample_rate->setEnabled(false);
+        original_signal_matrix = _signal_matrix;
+        fill_channel_combobox();
     }
     else
     {
-        fiff_save_enable = false;
 
-        read_matlab_file(file_name);
-        ui->lb_from->setHidden(true);
-        ui->dsb_from->setHidden(true);
-        ui->lb_to->setHidden(true);
-        ui->dsb_to->setHidden(true);
-        ui->lb_samples->setHidden(true);
-        ui->sb_sample_count->setHidden(true);
+        if(!read_matlab_file(file_name)) return;
+        // ToDo: change samplerate
+        ui->dsb_sample_rate->setEnabled(false);
+        //ui->dsb_sample_rate->setEnabled(true);
     }
+    //initial
+    read_fiff_changed = true;
 
-    //original_signal_matrix.resize(_signal_matrix.rows(), _signal_matrix.cols());
-    original_signal_matrix = _signal_matrix;
+    last_from = _from;
+    last_to = _to;
+    last_sample_count = _to - _from + 1;
+
+    ui->dsb_from->setMaximum((_last_sample - 63) / _sample_rate);
+    ui->dsb_to->setMinimum((_first_sample + 63) / _sample_rate);
+    ui->lb_from->setToolTip(QString("minimum: %1 seconds").arg(_first_sample / _sample_rate));
+    ui->lb_to->setToolTip(QString("maximum: %1 seconds").arg(_last_sample / _sample_rate));
+    ui->dsb_from->setToolTip(QString("sample: %1").arg(_from));
+    ui->dsb_to->setToolTip(QString("sample: %1").arg(_to));
+    ui->sb_sample_count->setToolTip(QString("epoch: %1 sec").arg((_to - _from + 1) / _sample_rate));
+    ui->lb_samples->setToolTip(QString("min: 64 (%1 sec)\nmax: 4096 (%2 sec)").arg(64 / _sample_rate).arg(4096 / _sample_rate));
+
+    ui->dsb_from->setValue(_from / _sample_rate);
+    ui->dsb_to->setValue(_to / _sample_rate);
+    ui->sb_sample_count->setValue(_to - _from + 1);
+
+    read_fiff_changed = false;
+
+    ui->lb_from->setHidden(false);
+    ui->dsb_from->setHidden(false);
+    ui->lb_to->setHidden(false);
+    ui->dsb_to->setHidden(false);
+    ui->lb_samples->setHidden(false);
+    ui->sb_sample_count->setHidden(false);
     ui->tbv_Results->setRowCount(0);
     callXAxisWindow->setMinimumHeight(22);
     callXAxisWindow->setMaximumHeight(22);
 
-    fill_channel_combobox();
 
     _atom_sum_matrix = MatrixXd::Zero(_signal_matrix.rows(), _signal_matrix.cols()); //resize
     _residuum_matrix = MatrixXd::Zero(_signal_matrix.rows(), _signal_matrix.cols()); //resize
@@ -345,7 +375,7 @@ void MainWindow::open_file()
     ui->actionExport->setEnabled(false);
     if(_signal_matrix.cols() == 0) ui->btt_Calc->setEnabled(false);
     else ui->btt_Calc->setEnabled(true);
-    _has_warning = false;
+    has_warning = false;
 
     _new_paint = true;
     update();
@@ -423,7 +453,7 @@ void MainWindow::read_fiff_ave(QString file_name)
     //std::cout << p_fiffIO << std::endl;
 
     //Read raw data samples
-    p_fiffIO.m_qlistRaw[0]->read_raw_segment_times(datas, times, _from, to);
+    p_fiffIO.m_qlistRaw[0]->read_raw_segment_times(datas, times, _from, _to);
 
     ui->dsb_sample_rate->setValue(600);//raw.info.sfreq);
     ui->dsb_sample_rate->setEnabled(false);
@@ -439,7 +469,7 @@ void MainWindow::read_fiff_ave(QString file_name)
 
 //*************************************************************************************************************************************
 
-qint32 MainWindow::read_fiff_file(QString fileName)
+bool MainWindow::read_fiff_file(QString fileName)
 {
     //   Setup for reading the raw data
     QFile t_fileRaw(fileName);
@@ -481,48 +511,24 @@ qint32 MainWindow::read_fiff_file(QString fileName)
     _first_sample = raw.first_samp;
     _last_sample = raw.last_samp;
 
-    ui->dsb_sample_rate->setValue(raw.info.sfreq);
-    ui->dsb_sample_rate->setEnabled(false);
-    _sample_rate = raw.info.sfreq;
-
-    // initial
     if(_from == -1)
     {
-        read_fiff_changed = true;
-
         _from = _first_sample;
-        this->to = _from + 511;
-        _to_for_tip = this->to;
-
-        last_from = _from;
-        last_to = to;
-        last_sample_count = 512;
-
-        ui->dsb_from->setMaximum((_last_sample - 63) / _sample_rate);
-        ui->dsb_to->setMinimum((_first_sample + 63) / _sample_rate);
-        ui->lb_from->setToolTip(QString("minimum: %1 seconds").arg(_first_sample / _sample_rate));
-        ui->lb_to->setToolTip(QString("maximum: %1 seconds").arg(_last_sample / _sample_rate));
-        ui->dsb_from->setToolTip(QString("sample: %1").arg(_from));
-        ui->dsb_to->setToolTip(QString("sample: %1").arg(to));
-        ui->sb_sample_count->setToolTip(QString("epoch: %1 sec").arg((to - _from + 1) / _sample_rate));
-        ui->lb_samples->setToolTip(QString("min: 64 (%1 sec)\nmax: 4096 (%2 sec)").arg(64 / _sample_rate).arg(4096 / _sample_rate));
-
-        ui->dsb_from->setValue(_from / _sample_rate);
-        ui->dsb_to->setValue(to / _sample_rate);
-        ui->sb_sample_count->setValue(this->to - _from + 1);
-
-        read_fiff_changed = false;
+        if(_from + 511 <= _last_sample) _to = _from + 511;
+        else _to = _last_sample;
     }
+
+    ui->dsb_sample_rate->setValue(raw.info.sfreq);    
+    _sample_rate = raw.info.sfreq;
 
     pick_info = raw.info.pick_info(picks);
     //   Read a data segment
     //   times output argument is optional
-    if (!raw.read_raw_segment(datas, times, _from, to, picks))
+    if (!raw.read_raw_segment(datas, times, _from, _to, picks))
     {
-       QMessageBox::warning(this, tr("Error"),
-       tr("error: Read fif unsucessful."));
+       QMessageBox::critical(this, "Error", "error reading fif-file. Could not read raw segment.");
        printf("Could not read raw segment.\n");
-       return -1;
+       return false;
     }
     printf("Read %d samples.\n",(qint32)datas.cols());
 
@@ -532,8 +538,7 @@ qint32 MainWindow::read_fiff_file(QString fileName)
     for(qint32 channels = 0; channels < datas.rows(); channels++)
         _signal_matrix.col(channels) = datas.row(channels);
 
-
-    return 0;
+    return true;
 }
 
 //*************************************************************************************************************************************
@@ -572,7 +577,7 @@ void MainWindow::read_fiff_file_new(QString file_name)
     ui->progressBarCalc->setHidden(true);
     ui->actionExport->setEnabled(false);
 
-    _has_warning = false;  
+    has_warning = false;
     _new_paint = true;
     update();
 }
@@ -581,8 +586,6 @@ void MainWindow::read_fiff_file_new(QString file_name)
 
 void MainWindow::fill_channel_combobox()
 {
-    _colors.clear();
-    _colors.append(QColor(0, 0, 0));
 
     //select all channels item
     this->cb_item = new QStandardItem;
@@ -644,42 +647,83 @@ void MainWindow::fill_channel_combobox()
 
 //*************************************************************************************************************************************
 
-void MainWindow::read_matlab_file(QString fileName)
+
+// ToDo: change samplerate --> update times (_from _to)
+bool MainWindow::read_matlab_file(QString fileName)
 {
     QFile file(fileName);
-    QString contents;
-    QList<QString> strList;
     file.open(QIODevice::ReadOnly);
-    while(!file.atEnd())
-    {
-        strList.append(file.readLine(0).constData());
-    }
-    int rowNumber = 0;
-    _signal_matrix = MatrixXd::Zero(strList.length(), 1);
-    file.close();
-    file.open(QIODevice::ReadOnly);
-    while(!file.atEnd())
-    {
-        contents = file.readLine(0).constData();
 
-        bool isFloat;
-        qreal value = contents.toFloat(&isFloat);
+    QTextStream stream(&file);
+    bool isFloat;
+    qint32 row_number = 0;
+
+    matlab_signal = stream.readAll().split('\n', QString::SkipEmptyParts);
+    _first_sample = 0;
+    _last_sample = matlab_signal.length();
+
+    _from = _first_sample;
+    if(_from + 511 <= _last_sample)
+        _to = _from + 511;
+    else
+        _to = _last_sample;
+
+    _signal_matrix = MatrixXd::Zero(_to - _from, 1);
+
+    for(qint32 i = _from; i < _to; i++)
+    {
+        qreal value = matlab_signal.at(i).toFloat(&isFloat);
         if(!isFloat)
         {
-            QString errorSignal = QString("The signal could not completly read. Line %1 from file %2 coud not be readed.").arg(rowNumber).arg(fileName);
-            QMessageBox::warning(this, tr("error"),
-            errorSignal);
-            return;
+             _signal_matrix = MatrixXd::Zero(0, 0);
+            QMessageBox::critical(this, "error", QString("error reading matlab file. Could not read line %1 from file %2.").arg(i).arg(fileName));
+            return false;
         }
-        _signal_matrix(rowNumber, 0) = value;
-        rowNumber++;
+        _signal_matrix(row_number, 0) = value;
+        row_number++;
+    }
+    file.close();
+
+    return true;
+}
+
+
+void MainWindow::read_matlab_file_new()
+{
+
+    bool isFloat;
+    qint32 row_number = 0;
+
+    _signal_matrix = MatrixXd::Zero(_to - _from, 1);
+
+    for(qint32 i = _from; i < _to; i++)
+    {
+        qreal value = matlab_signal.at(i).toFloat(&isFloat);
+        if(!isFloat)
+        {
+             _signal_matrix = MatrixXd::Zero(0, 0);
+        }
+        _signal_matrix(row_number, 0) = value;
+        row_number++;
     }
 
-    file.close();
-    signal_energy = 0;
-    for(qint32 i = 0; i < _signal_matrix.rows(); i++)
-        signal_energy += (_signal_matrix(i, 0) * _signal_matrix(i, 0));
+    _atom_sum_matrix = MatrixXd::Zero(_signal_matrix.rows(), _signal_matrix.cols()); //resize
+    _residuum_matrix = MatrixXd::Zero(_signal_matrix.rows(), _signal_matrix.cols()); //resize
+
+    ui->tbv_Results->setRowCount(0);
+    ui->actionSpeicher->setEnabled(false);
+    ui->actionSpeicher_unter->setEnabled(false);
+    ui->lb_info_content->setText("");
+    ui->cb_all_select->setHidden(true);
+    ui->lb_timer->setHidden(true);
+    ui->progressBarCalc->setHidden(true);
+    ui->actionExport->setEnabled(false);
+
+    has_warning = false;
+    _new_paint = true;
+    update();
 }
+
 
 //*************************************************************************************************************************************
 
@@ -1023,12 +1067,12 @@ void MainWindow::on_btt_Calc_clicked()
         _fix_dict_atom_list.clear();
 
         //reset progressbar text color to black
-        Pal.setColor(QPalette::Text, Qt::black);
-        ui->progressBarCalc->setPalette(Pal);
+        pal.setColor(QPalette::Text, Qt::black);
+        ui->progressBarCalc->setPalette(pal);
         is_white = false;
 
         is_saved = false;
-        _has_warning = false;
+        has_warning = false;
         ui->lb_info_content->setText("");
 
         _residuum_matrix = _signal_matrix;
@@ -1226,8 +1270,8 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
 
     if(ui->progressBarCalc->value() > ui->progressBarCalc->maximum() / 2 && !is_white)
     {
-        Pal.setColor(QPalette::Text, Qt::white);
-        ui->progressBarCalc->setPalette(Pal);
+        pal.setColor(QPalette::Text, Qt::white);
+        ui->progressBarCalc->setPalette(pal);
         is_white = true;
     }
 
@@ -1264,19 +1308,19 @@ void MainWindow::recieve_warnings(qint32 warning_number)
         ui->lb_info->setHidden(false);
 
         QString text;
-        if(warning_number == 1 && !_has_warning)
+        if(warning_number == 1 && !has_warning)
         {
             text = "The dictionary does not have the appropriate atoms to approximate the signal more closely. Calculation terminated before reaching truncation criterion. ";
             ui->lb_info_content->setText(text);
-            _has_warning = true;
+            has_warning = true;
         }
-        else if(warning_number == 2 && !_has_warning)
+        else if(warning_number == 2 && !has_warning)
         {
             text = "No matching sample count between atoms and signal. This may lead to discontinuities. ";
             ui->lb_info_content->setText(text);
-            _has_warning = true;
+            has_warning = true;
         }
-        else if(_has_warning && warning_number != 10)
+        else if(has_warning && warning_number != 10)
         {
             text = "This dictionary does not fit the signals sample count (leads to discontinuities) and excludes atoms to reduce further residual energy. Calculation terminated before reaching truncation criterion. ";
             ui->lb_info_content->setText(text);
@@ -1390,19 +1434,17 @@ void MainWindow::calc_thread_finished()
     if(_fix_dict_atom_list.isEmpty() && !_adaptive_atom_list.isEmpty())
         ui->actionExport->setEnabled(true);
 
-    if(fiff_save_enable)
-    {
-        ui->actionSpeicher->setEnabled(true);
-        ui->actionSpeicher_unter->setEnabled(true);
-    }
+     ui->actionSpeicher->setEnabled(true);
+     ui->actionSpeicher_unter->setEnabled(true);
+
 
     _counter_timer->stop();
     ui->frame->setEnabled(true);
     ui->btt_OpenSignal->setEnabled(true);
     ui->progressBarCalc->setValue(ui->progressBarCalc->maximum());
 
-    Pal.setColor(QPalette::Text, Qt::white);
-    ui->progressBarCalc->setPalette(Pal);
+    pal.setColor(QPalette::Text, Qt::white);
+    ui->progressBarCalc->setPalette(pal);
     is_white = true;
 
     ui->btt_Calc->setText("calculate");
@@ -1652,6 +1694,8 @@ void MainWindow::on_btt_OpenSignal_clicked()
 
 void MainWindow::on_dsb_sample_rate_editingFinished()
 {
+    if(!read_fiff_changed) _to = _signal_matrix.rows() / _sample_rate;
+
     _sample_rate = ui->dsb_sample_rate->value();
     callXAxisWindow->update();
 }
@@ -1663,7 +1707,10 @@ void MainWindow::on_dsb_from_editingFinished()
     if(read_fiff_changed || _from == last_from) return;
     if(ui->dsb_from->value() * _sample_rate < _first_sample)
         ui->dsb_from->setValue(_first_sample / _sample_rate);
-    read_fiff_file_new(file_name);
+
+    if(file_name.split('.').last() == "fif")
+        read_fiff_file_new(file_name);
+    else read_matlab_file_new();
     last_from = _from;
 }
 
@@ -1671,11 +1718,14 @@ void MainWindow::on_dsb_from_editingFinished()
 
 void MainWindow::on_dsb_to_editingFinished()
 {
-    if(read_fiff_changed || to == last_to) return;
+    if(read_fiff_changed || _to == last_to) return;
     if(ui->dsb_to->value() * _sample_rate > _last_sample)
         ui->dsb_to->setValue(_last_sample / _sample_rate);
-    read_fiff_file_new(file_name);
-    last_to = to;
+
+    if(file_name.split('.').last() == "fif")
+        read_fiff_file_new(file_name);
+    else read_matlab_file_new();
+    last_to = _to;
 }
 
 //*****************************************************************************************************************
@@ -1683,7 +1733,11 @@ void MainWindow::on_dsb_to_editingFinished()
 void MainWindow::on_sb_sample_count_editingFinished()
 {
     if(read_fiff_changed || ui->sb_sample_count->value() == last_sample_count) return;
-    read_fiff_file_new(file_name);
+
+    if(file_name.split('.').last() == "fif")
+        read_fiff_file_new(file_name);
+    else read_matlab_file_new();
+
     last_sample_count = ui->sb_sample_count->value();
 }
 
@@ -1695,16 +1749,15 @@ void MainWindow::on_dsb_from_valueChanged(double arg1)
 
     read_fiff_changed = true;
     _from = floor(arg1 * _sample_rate);
-    to = _from + ui->sb_sample_count->value() - 1;
-    _to_for_tip = to;
+    _to = _from + ui->sb_sample_count->value() - 1;
 
-    if(to >= _last_sample)
+    if(_to >= _last_sample)
     {
-        to = _last_sample - 1;
-        ui->sb_sample_count->setValue(to - _from);
+        _to = _last_sample - 1;
+        ui->sb_sample_count->setValue(_to - _from);
     }
 
-    ui->dsb_to->setValue(to / _sample_rate);
+    ui->dsb_to->setValue(_to / _sample_rate);
     read_fiff_changed = false;
 
     ui->dsb_from->setToolTip(QString("sample: %1").arg(_from));
@@ -1718,20 +1771,19 @@ void MainWindow::on_dsb_to_valueChanged(double arg1)
     if(read_fiff_changed) return;
 
     read_fiff_changed = true;
-    to = floor(arg1 * _sample_rate);
-    _to_for_tip = to;
-    _from = to - ui->sb_sample_count->value() + 1;
+    _to = floor(arg1 * _sample_rate);
+    _from = _to - ui->sb_sample_count->value() + 1;
 
     if(_from <= _first_sample)
     {
         _from = _first_sample + 1;
-        ui->sb_sample_count->setValue(to - _from);
+        ui->sb_sample_count->setValue(_to - _from);
     }
 
     ui->dsb_from->setValue(_from / _sample_rate);
     read_fiff_changed = false;
 
-     ui->dsb_to->setToolTip(QString("sample: %1").arg(to));
+     ui->dsb_to->setToolTip(QString("sample: %1").arg(_to));
 }
 
 //*****************************************************************************************************************
@@ -1741,19 +1793,18 @@ void MainWindow::on_sb_sample_count_valueChanged(int arg1)
     if(read_fiff_changed) return;
 
     read_fiff_changed = true;
-    to = _from + arg1 - 1;
-    _to_for_tip = to;
+    _to = _from + arg1 - 1;
 
-    if(to > _last_sample)
+    if(_to > _last_sample)
     {
-        to = _last_sample;
-        ui->sb_sample_count->setValue(to - _from + 1);
+        _to = _last_sample;
+        ui->sb_sample_count->setValue(_to - _from + 1);
     }
 
-    ui->dsb_to->setValue(to / _sample_rate);
+    ui->dsb_to->setValue(_to / _sample_rate);
     read_fiff_changed = false;
 
-    ui->sb_sample_count->setToolTip(QString("epoch: %1 sec").arg((to - _from + 1) / _sample_rate));
+    ui->sb_sample_count->setToolTip(QString("epoch: %1 sec").arg((_to - _from + 1) / _sample_rate));
 }
 
 //*****************************************************************************************************************
@@ -1819,79 +1870,42 @@ void MainWindow::on_dicts_saved()
 
 //*****************************************************************************************************************
 
-void MainWindow::save_fif_file()
-{
-    SaveFifFile *save_Fif = new SaveFifFile();
-    QThread *save_thread = new QThread();
-
-    save_Fif->moveToThread(save_thread);
-
-    connect(this, SIGNAL(to_save(QString, QString, fiff_int_t, fiff_int_t, MatrixXd, select_map, RowVectorXi )),
-            save_Fif, SLOT(save_fif_file(QString, QString, fiff_int_t, fiff_int_t, MatrixXd, select_map, RowVectorXi )));
-    connect(save_Fif, SIGNAL(save_progress(qint32, qint32)),
-                  this, SLOT(recieve_save_progress(qint32, qint32)));
-    connect(save_thread, SIGNAL(finished()), save_thread, SLOT(deleteLater()));
-
-    ui->lb_timer->setHidden(true);
-    ui->cb_all_select->setHidden(true);
-    ui->progress_bar_save->setHidden(false);
-    ui->progress_bar_save->setFormat("save fif file:  %p%");
-    ui->progress_bar_save->setValue(0);
-    ui->progress_bar_save->setMinimum(0);
-    ui->progress_bar_save->setMaximum(_last_sample);
-    //reset progressbar text color to black
-    Pal.setColor(QPalette::Text, Qt::black);
-    ui->progress_bar_save->setPalette(Pal);
-    ui->progress_bar_save->repaint();
-    is_save_white = false;
-
-    ui->actionSpeicher->setEnabled(false);
-    ui->actionSpeicher_unter->setEnabled(false);
-
-    emit to_save(file_name, save_path, _from, to, _atom_sum_matrix, select_channel_map, picks);
-    save_thread->start();
-    save_parameters();
-}
-
-//*****************************************************************************************************************
-
 void MainWindow::on_actionSpeicher_triggered()
 {
-    if(file_name.isEmpty())
+    QString save_name = "";
+    QStringList saveList = file_name.split('/').last().split('.').first().split('_');
+    for(int i = 0; i < saveList.length(); i++)
     {
-        QMessageBox::warning(this, tr("Error"),
-        tr("error: No file for save."));
-        return;
+        if(i == saveList.length() - 1)
+            save_name += "mp_" + saveList.at(i);
+        else
+            save_name += saveList.at(i) + "_";
     }
 
     if(file_name.split('.').last() != "fif")
     {
-        QMessageBox::warning(this, tr("Error"),
-        tr("error: No fif file for save."));
-        return;
-    }
-
-    if(ui->tbv_Results->rowCount() == 0)
-    {
-        QMessageBox::warning(this, tr("Error"),
-        tr("error: No results for save."));
+        if(save_path.isEmpty())
+        {
+            save_path = QFileDialog::getSaveFileName(this, "Save file as...", last_save_path + "/" + save_name,"(*.txt)");
+            if(save_path.isEmpty()) return;
+        }
+        save_parameters();
+        QMessageBox::information(this, tr("information"),
+        tr("No fif file for save. Only parameter.txt saved."));
         return;
     }
 
     if(save_path.isEmpty())
-    {        
-        QString save_name = "";
-        QStringList saveList = file_name.split('/').last().split('.').first().split('_');
-        for(int i = 0; i < saveList.length(); i++)
-        {
-            if(i == saveList.length() - 1)
-                save_name += "mp_" + saveList.at(i);
-            else
-                save_name += saveList.at(i) + "_";
-        }
+    {
+
+
         save_path = QFileDialog::getSaveFileName(this, "Save file as...", last_save_path + "/" + save_name,"(*.fif)");
         if(save_path.isEmpty()) return;
+
     }
+
+
+    save_parameters();
     QStringList string_list = save_path.split('/');
     last_save_path = "";
     for(qint32 i = 0; i < string_list.length() - 1; i++)
@@ -1904,36 +1918,22 @@ void MainWindow::on_actionSpeicher_triggered()
 //*****************************************************************************************************************
 
 void MainWindow::on_actionSpeicher_unter_triggered()
-{
-    if(file_name.isEmpty())
-    {
-        QMessageBox::warning(this, tr("Error"),
-        tr("error: No file for save."));
-        return;
-    }
-
-    if(file_name.split('.').last() != "fif")
-    {
-        QMessageBox::warning(this, tr("Error"),
-        tr("error: No fif file for save."));
-        return;
-    }
-
-    if(ui->tbv_Results->rowCount() == 0)
-    {
-        QMessageBox::warning(this, tr("Error"),
-        tr("error: No results for save."));
-        return;
-    }
-
+{  
     QString save_name = "";
     QStringList saveList = file_name.split('/').last().split('.').first().split('_');
     for(int i = 0; i < saveList.length(); i++)
     {
-        if(i == saveList.length() - 1)
-            save_name += "mp_" + saveList.at(i);
-        else
-            save_name += saveList.at(i) + "_";
+        if(i == saveList.length() - 1) save_name += "mp_" + saveList.at(i);
+        else save_name += saveList.at(i) + "_";
+    }
+
+    if(file_name.split('.').last() != "fif")
+    {
+        save_path = QFileDialog::getSaveFileName(this, "Save file as...", last_save_path + "/" + save_name,"(*.txt)");
+        save_parameters();
+        QMessageBox::information(this, tr("information"),
+        tr("No fif file for save. Only parameter.txt saved."));
+        return;
     }
 
     save_path = QFileDialog::getSaveFileName(this, "Save file as...", last_save_path + "/" + save_name,"(*.fif)");
@@ -1949,6 +1949,43 @@ void MainWindow::on_actionSpeicher_unter_triggered()
 
 //*****************************************************************************************************************
 
+void MainWindow::save_fif_file()
+{
+    SaveFifFile *save_Fif = new SaveFifFile();
+    QThread *save_thread = new QThread();
+
+    save_Fif->moveToThread(save_thread);
+
+    connect(this, SIGNAL(to_save(QString, QString, fiff_int_t, fiff_int_t, MatrixXd, select_map, RowVectorXi )),
+            save_Fif, SLOT(save_fif_file(QString, QString, fiff_int_t, fiff_int_t, MatrixXd, select_map, RowVectorXi )));
+    connect(save_Fif, SIGNAL(save_progress(qint32, qint32)), this, SLOT(recieve_save_progress(qint32, qint32)));
+    connect(save_thread, SIGNAL(finished()), save_thread, SLOT(deleteLater()));
+    connect(save_Fif, SIGNAL(finished()), save_Fif, SLOT(quit()));
+    connect(save_Fif, SIGNAL(finished()), save_Fif, SLOT(deleteLater()));
+
+    is_saved = true;
+    ui->lb_timer->setHidden(true);
+    ui->cb_all_select->setHidden(true);
+    ui->progress_bar_save->setHidden(false);
+    ui->progress_bar_save->setFormat("save fif file:  %p%");
+    ui->progress_bar_save->setValue(0);
+    ui->progress_bar_save->setMinimum(0);
+    ui->progress_bar_save->setMaximum(_last_sample);
+    //reset progressbar text color to black
+    pal.setColor(QPalette::Text, Qt::black);
+    ui->progress_bar_save->setPalette(pal);
+    //ui->progress_bar_save->repaint();
+    is_save_white = false;
+
+    ui->actionSpeicher->setEnabled(false);
+    ui->actionSpeicher_unter->setEnabled(false);
+
+    emit to_save(file_name, save_path, _from, _to, _atom_sum_matrix, select_channel_map, picks);
+    save_thread->start();
+}
+
+//*****************************************************************************************************************
+
 void MainWindow::recieve_save_progress(qint32 current_progress, qint32 finished)
 {
     if(finished == 0)
@@ -1956,8 +1993,8 @@ void MainWindow::recieve_save_progress(qint32 current_progress, qint32 finished)
         ui->progress_bar_save->setValue(current_progress);
         if(ui->progress_bar_save->value() > ui->progress_bar_save->maximum() / 2 && !is_save_white)
         {
-            Pal.setColor(QPalette::Text, Qt::white);
-            ui->progress_bar_save->setPalette(Pal);
+            pal.setColor(QPalette::Text, Qt::white);
+            ui->progress_bar_save->setPalette(pal);
             is_save_white = true;
         }
     }
@@ -1968,8 +2005,7 @@ void MainWindow::recieve_save_progress(qint32 current_progress, qint32 finished)
     }
     else
     {
-        ui->progress_bar_save->setHidden(true);
-        is_saved = true;
+        ui->progress_bar_save->setHidden(true);        
         ui->actionSpeicher->setEnabled(true);
         ui->actionSpeicher_unter->setEnabled(true);
     }
@@ -1986,7 +2022,7 @@ void SaveFifFile::save_fif_file(QString source_path, QString save_path, fiff_int
     FiffRawData raw(t_fileIn);
 
     MatrixXd cals;
-    FiffStream::SPtr outfid = Fiff::start_writing_raw(t_fileOut,raw.info, cals, picks);
+    FiffStream::SPtr outfid = Fiff::start_writing_raw(t_fileOut, raw.info, cals, picks);
 
     //   Set up the reading parameters
     fiff_int_t from = raw.first_samp;
@@ -2023,7 +2059,7 @@ void SaveFifFile::save_fif_file(QString source_path, QString save_path, fiff_int
                outfid->write_int(FIFF_FIRST_SAMPLE,&first);
            first_buffer = false;
         }
-        outfid->write_raw_buffer(data,cals);
+        outfid->write_raw_buffer(data, cals);
         printf("[done]\n");
 
         emit save_progress(first, 0);
@@ -2108,6 +2144,7 @@ void MainWindow::save_parameters()
         xmlWriter.writeAttribute("epoch_from", QString::number(ui->dsb_from->value()));
         xmlWriter.writeAttribute("epoch_to", QString::number(ui->dsb_to->value()));
         xmlWriter.writeAttribute("samples", QString::number(ui->sb_sample_count->value()));
+        xmlWriter.writeAttribute("sample_rate", QString::number(ui->dsb_sample_rate->value()));
 
         for(qint32 i = 0; i < ui->tbv_Results->rowCount() - 1; i++)
         {
@@ -2315,7 +2352,7 @@ void MainWindow::on_cb_Dicts_currentIndexChanged(const QString &arg1)
     Q_UNUSED(arg1);
     ui->lb_info_content->setText("");
     ui->lb_info_content->repaint();
-    _has_warning = false;
+    has_warning = false;
 }
 
 //*****************************************************************************************************************
@@ -2324,7 +2361,7 @@ void MainWindow::on_rb_adativMp_clicked()
 {
     ui->lb_info_content->setText("");
     ui->lb_info_content->repaint();
-    _has_warning = false;
+    has_warning = false;
 }
 
 //*****************************************************************************************************************
@@ -2364,10 +2401,10 @@ void MainWindow::on_actionBeenden_triggered()
 void GraphWindow::mouseMoveEvent(QMouseEvent *event)
 {
     Q_UNUSED(event);
-   if(_to_for_tip - _from != 0)
+   if(_to - _from != 0)
    {
        qint32 temp_pos = qreal(mapFromGlobal(QCursor::pos()).x() - 55);
-       qreal stretch_factor = qreal(this->width() - 55/*left_border*/ - 15/*right_border*/) / (qreal(_to_for_tip) - qreal(_from));
+       qreal stretch_factor = qreal(this->width() - 55/*left_border*/ - 15/*right_border*/) / (qreal(_to) - qreal(_from));
        qreal time = qreal(_from) / _sample_rate + temp_pos / stretch_factor / _sample_rate;
        this->setToolTip(QString("time: %1 sec").arg(time));
        setCursor(Qt::CrossCursor);
@@ -2379,10 +2416,10 @@ void GraphWindow::mouseMoveEvent(QMouseEvent *event)
 void AtomSumWindow::mouseMoveEvent(QMouseEvent *event)
 {
     Q_UNUSED(event);
-   if(_to_for_tip - _from != 0)
+   if(_to - _from != 0)
    {
        qint32 temp_pos = qreal(mapFromGlobal(QCursor::pos()).x() - 55);
-       qreal stretch_factor = qreal(this->width() - 55/*left_border*/ - 15/*right_border*/) / (qreal(_to_for_tip) - qreal(_from));
+       qreal stretch_factor = qreal(this->width() - 55/*left_border*/ - 15/*right_border*/) / (qreal(_to) - qreal(_from));
        qreal time = qreal(_from) / _sample_rate + temp_pos / stretch_factor / _sample_rate;
        this->setToolTip(QString("time: %1 sec").arg(time));
        setCursor(Qt::CrossCursor);
@@ -2394,10 +2431,10 @@ void AtomSumWindow::mouseMoveEvent(QMouseEvent *event)
 void ResiduumWindow::mouseMoveEvent(QMouseEvent *event)
 {
      Q_UNUSED(event);
-    if(_to_for_tip - _from != 0)
+    if(_to - _from != 0)
     {
         qint32 temp_pos = qreal(mapFromGlobal(QCursor::pos()).x() - 55);
-        qreal stretch_factor = qreal(this->width() - 55/*left_border*/ - 15/*right_border*/) / (qreal(_to_for_tip) - qreal(_from));
+        qreal stretch_factor = qreal(this->width() - 55/*left_border*/ - 15/*right_border*/) / (qreal(_to) - qreal(_from));
         qreal time = qreal(_from) / _sample_rate + temp_pos / stretch_factor / _sample_rate;
         this->setToolTip(QString("time: %1 sec").arg(time));
         setCursor(Qt::CrossCursor);
