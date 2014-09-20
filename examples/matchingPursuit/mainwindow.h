@@ -557,18 +557,16 @@ signals:
 private:
 
     bool is_saved;
+    bool has_warning;
     bool is_save_white;
     bool tbv_is_loading;
     bool auto_change;
     bool was_partialchecked;
     bool read_fiff_changed;
     bool is_white;
-    bool fiff_save_enable;
-    fiff_int_t to;
     fiff_int_t last_to;
     fiff_int_t last_from;
     qint32 last_sample_count;
-    qreal signal_energy;
     qreal residuum_energy;
     qint32 recieved_result_counter;
     qint32 max_tbv_header_width;
@@ -576,6 +574,7 @@ private:
     QString file_name;
     QString last_open_path;
     QString last_save_path;
+    QStringList matlab_signal;
     QMap<qint32, bool> select_channel_map;
     QMap<qint32, bool> select_atoms_map;
     QList<QColor> original_colors;
@@ -599,6 +598,7 @@ private:
     std::vector<QStandardItem*> tbv_items;
     RowVectorXi picks;
     FiffInfo pick_info;
+    QPalette pal;
 
 
     //==========================================================================================================
@@ -625,7 +625,21 @@ private:
     *
     * @return void
     */
-    void read_matlab_file(QString fileName);
+    bool read_matlab_file(QString fileName);
+
+    //==========================================================================================================
+    /**
+    * MainWindow_read_matlab_file_new
+    *
+    * ### MP toolbox main function ###
+    *
+    * reads matlab files new
+    *
+    * @param[in] fileName   name of matlab file
+    *
+    * @return void
+    */
+    void read_matlab_file_new();
 
     //==========================================================================================================
     /**
@@ -654,7 +668,7 @@ private:
     *
     * @return gibt 0 zurück wenn erflogreich sonst ungleich 0
     */
-    qint32 read_fiff_file(QString fileName);
+    bool read_fiff_file(QString fileName);
 
     //==========================================================================================================
     /**
