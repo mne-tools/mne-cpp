@@ -27,7 +27,5 @@
         <file>icons/settings.png</file>
         <file>icons/arrowReset.png</file>
         <file>icons/progressbar_brush.png</file>
-        <file>icons/chirp_fml.png</file>
-        <file>icons/gabor_fml.png</file>
     </qresource>
 </RCC>
