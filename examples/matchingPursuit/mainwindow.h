@@ -547,6 +547,8 @@ private slots:
 
     void on_actionBeenden_triggered();
 
+    void on_mouse_button_release();
+
 signals:
 
     void send_input(MatrixXd send_signal, qint32 send_max_iterations, qreal send_epsilon, bool fix_phase, qint32 boost, qint32 simplex_it,
@@ -792,7 +794,9 @@ class GraphWindow : public QWidget
 
 protected:
    void paintEvent(QPaintEvent *event);
-   void GraphWindow::mouseMoveEvent(QMouseEvent *event);
+   void mouseMoveEvent(QMouseEvent *event);
+   void mousePressEvent(QMouseEvent *event);
+   void mouseReleaseEvent(QMouseEvent *event);
 
 public:
    //==========================================================================================================
@@ -810,6 +814,9 @@ public:
    */
    void paint_signal(MatrixXd signalMatrix, QSize windowSize);
 
+signals:
+    void read_new();
+
    //==========================================================================================================
 };
 
@@ -821,7 +828,7 @@ class AtomSumWindow : public QWidget
 
 protected:
    void paintEvent(QPaintEvent *event);
-   void AtomSumWindow::mouseMoveEvent(QMouseEvent *event);
+   void mouseMoveEvent(QMouseEvent *event);
 
 public:
    //=========================================================================================================
@@ -852,7 +859,7 @@ class ResiduumWindow : public QWidget
 
   protected:
     void paintEvent(QPaintEvent *event);
-    void ResiduumWindow::mouseMoveEvent(QMouseEvent *event);
+    void mouseMoveEvent(QMouseEvent *event);
 
 public:
     //=========================================================================================================

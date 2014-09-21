@@ -120,7 +120,7 @@
              <item row="11" column="0" colspan="2">
               <widget class="QLabel" name="label">
                <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;sample rate&lt;/span&gt;&lt;/p&gt;&lt;p&gt;The sample rate which was used for data aquisition has to be entered here. In case of fif-files it is set automatically.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;sample rate&lt;/span&gt;&lt;/p&gt;&lt;p&gt;the sample rate which was used for data aquisition has to be entered here. In case of fif-files it is set automatically&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="text">
                 <string>sample rate:</string>
@@ -146,7 +146,7 @@
              <item row="9" column="0" colspan="2">
               <widget class="QRadioButton" name="rb_adativMp">
                <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;adaptive MP&lt;/span&gt;&lt;br/&gt;&lt;br/&gt;...use matching pursuit algorithm of Stephan Mallat and Zhifeng Zhang.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;adaptive MP&lt;/span&gt;&lt;br/&gt;&lt;br/&gt;...use matching pursuit algorithm of Stephan Mallat and Zhifeng Zhang&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="text">
                 <string>adaptive MP</string>
@@ -159,7 +159,7 @@
              <item row="10" column="0" colspan="2">
               <widget class="QRadioButton" name="rb_OwnDictionary">
                <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;own dictionary&lt;/span&gt;&lt;/p&gt;&lt;p&gt;…uses fix dictionaries which have been built by the user &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;own dictionary&lt;/span&gt;&lt;/p&gt;&lt;p&gt;…uses fix dictionaries which have been built by the user&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="text">
                 <string>own dictionary:</string>
@@ -229,7 +229,7 @@
              <item row="11" column="3">
               <widget class="QDoubleSpinBox" name="dsb_sample_rate">
                <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;...enter sample rate here&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;...enter sample rate here, in case of fif-files this value will be set automatically&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="alignment">
                 <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>

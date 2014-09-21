@@ -118,6 +118,8 @@ MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::
     callGraphWindow->setMinimumWidth(500);
     ui->l_Graph->addWidget(callGraphWindow);
 
+    connect(callGraphWindow, SIGNAL(read_new()), this, SLOT(on_mouse_button_release()));
+
     callAtomSumWindow = new AtomSumWindow();
     callAtomSumWindow->setMouseTracking(true);
     callAtomSumWindow->setMinimumHeight(140);
@@ -326,8 +328,8 @@ void MainWindow::open_file()
 
         if(!read_matlab_file(file_name)) return;
         // ToDo: change samplerate
-        ui->dsb_sample_rate->setEnabled(false);
-        //ui->dsb_sample_rate->setEnabled(true);
+        //ui->dsb_sample_rate->setEnabled(false);
+        ui->dsb_sample_rate->setEnabled(true);
     }
     //initial
     read_fiff_changed = true;
@@ -647,7 +649,6 @@ void MainWindow::fill_channel_combobox()
 
 //*************************************************************************************************************************************
 
-
 // ToDo: change samplerate --> update times (_from _to)
 bool MainWindow::read_matlab_file(QString fileName)
 {
@@ -660,7 +661,7 @@ bool MainWindow::read_matlab_file(QString fileName)
 
     matlab_signal = stream.readAll().split('\n', QString::SkipEmptyParts);
     _first_sample = 0;
-    _last_sample = matlab_signal.length();
+    _last_sample = matlab_signal.length() - 1;
 
     _from = _first_sample;
     if(_from + 511 <= _last_sample)
@@ -687,6 +688,7 @@ bool MainWindow::read_matlab_file(QString fileName)
     return true;
 }
 
+//*************************************************************************************************************************************
 
 void MainWindow::read_matlab_file_new()
 {
@@ -791,7 +793,7 @@ void GraphWindow::paint_signal(MatrixXd signalMatrix, QSize windowSize)
                 for(qint32 channel = 0; channel < signalMatrix.cols(); channel++)   // over all Channels
                 {
                     QPolygonF poly;
-                    for(qint32 h =0; h < signalMatrix.rows(); h++)
+                    for(qint32 h = 0; h < signalMatrix.rows(); h++)
                         poly.append(QPointF((h * scaleX) + maxStrLenght,  -((signalMatrix(h, channel) * scaleY + ((i - 1) * scaleYAchse) - (windowSize.height()) + borderMarginHeigth / 2))));
                     QPen pen(_colors.at(channel), 0.5, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin);
                     painter.setPen(pen);
@@ -1694,9 +1696,15 @@ void MainWindow::on_btt_OpenSignal_clicked()
 
 void MainWindow::on_dsb_sample_rate_editingFinished()
 {
-    if(!read_fiff_changed) _to = _signal_matrix.rows() / _sample_rate;
-
     _sample_rate = ui->dsb_sample_rate->value();
+    if(!read_fiff_changed)
+    {
+        read_fiff_changed = true;
+        if(_from != 0)
+            ui->dsb_from->setValue(_from / _sample_rate);
+        ui->dsb_to->setValue(_to / _sample_rate);
+        read_fiff_changed = false;
+    }
     callXAxisWindow->update();
 }
 
@@ -2400,13 +2408,15 @@ void MainWindow::on_actionBeenden_triggered()
 
 void GraphWindow::mouseMoveEvent(QMouseEvent *event)
 {
-    Q_UNUSED(event);
+   //Q_UNUSED(event);
    if(_to - _from != 0)
    {
        qint32 temp_pos = qreal(mapFromGlobal(QCursor::pos()).x() - 55);
        qreal stretch_factor = qreal(this->width() - 55/*left_border*/ - 15/*right_border*/) / (qreal(_to) - qreal(_from));
        qreal time = qreal(_from) / _sample_rate + temp_pos / stretch_factor / _sample_rate;
-       this->setToolTip(QString("time: %1 sec").arg(time));
+       if(mapFromGlobal(QCursor::pos()).x() > 55 && mapFromGlobal(QCursor::pos()).x() < (this->width() - 15))
+           this->setToolTip(QString("time: %1 sec").arg(time));
+//ToDo:       if(event->mouseState() == Qt::MouseButtons)
        setCursor(Qt::CrossCursor);
    }
 }
@@ -2421,7 +2431,8 @@ void AtomSumWindow::mouseMoveEvent(QMouseEvent *event)
        qint32 temp_pos = qreal(mapFromGlobal(QCursor::pos()).x() - 55);
        qreal stretch_factor = qreal(this->width() - 55/*left_border*/ - 15/*right_border*/) / (qreal(_to) - qreal(_from));
        qreal time = qreal(_from) / _sample_rate + temp_pos / stretch_factor / _sample_rate;
-       this->setToolTip(QString("time: %1 sec").arg(time));
+       if(mapFromGlobal(QCursor::pos()).x() > 55 && mapFromGlobal(QCursor::pos()).x() < (this->width() - 15))
+           this->setToolTip(QString("time: %1 sec").arg(time));
        setCursor(Qt::CrossCursor);
    }
 }
@@ -2430,14 +2441,52 @@ void AtomSumWindow::mouseMoveEvent(QMouseEvent *event)
 
 void ResiduumWindow::mouseMoveEvent(QMouseEvent *event)
 {
-     Q_UNUSED(event);
+    Q_UNUSED(event);
     if(_to - _from != 0)
     {
         qint32 temp_pos = qreal(mapFromGlobal(QCursor::pos()).x() - 55);
         qreal stretch_factor = qreal(this->width() - 55/*left_border*/ - 15/*right_border*/) / (qreal(_to) - qreal(_from));
         qreal time = qreal(_from) / _sample_rate + temp_pos / stretch_factor / _sample_rate;
-        this->setToolTip(QString("time: %1 sec").arg(time));
+        if(mapFromGlobal(QCursor::pos()).x() > 55 && mapFromGlobal(QCursor::pos()).x() < (this->width() - 15))
+            this->setToolTip(QString("time: %1 sec").arg(time));
         setCursor(Qt::CrossCursor);
     }
+}
+
+//*****************************************************************************************************************
+fiff_int_t _press_pos;
+void GraphWindow::mousePressEvent(QMouseEvent *event)
+{
+    _press_pos = mapFromGlobal(QCursor::pos()).x();
+    Q_UNUSED(event);
+
+    setCursor(Qt::ClosedHandCursor);
+
+}
+
+//*****************************************************************************************************************
+
+void GraphWindow::mouseReleaseEvent(QMouseEvent *event)
+{
+    fiff_int_t release_pos = mapFromGlobal(QCursor::pos()).x();
+    qreal stretch_factor = qreal(this->width() - 55/*left_border*/ - 15/*right_border*/) / (qreal(_to) - qreal(_from));
+    fiff_int_t samplecount = _to - _from + 1;
+
+    _from += (qreal)(_press_pos - release_pos) / stretch_factor;
+    _to = _from + samplecount;
+
+    setCursor(Qt::CrossCursor);
+
+    emit read_new();
+
+    Q_UNUSED(event);
+}
+
+void MainWindow::on_mouse_button_release()
+{
+    if(file_name.endsWith(".fif", Qt::CaseInsensitive))
+        read_fiff_file_new(file_name);
+    else
+        read_matlab_file_new();
 }
 
