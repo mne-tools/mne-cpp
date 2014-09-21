@@ -83,6 +83,7 @@ fiff_int_t _from;
 fiff_int_t _to;
 fiff_int_t _first_sample;
 fiff_int_t _last_sample;
+qint32 _samplecount;
 qreal _max_pos;
 qreal _max_neg;
 qreal _sample_rate;
@@ -349,6 +350,7 @@ void MainWindow::open_file()
 
     ui->dsb_from->setValue(_from / _sample_rate);
     ui->dsb_to->setValue(_to / _sample_rate);
+    _samplecount = _to - _from + 1;
     ui->sb_sample_count->setValue(_to - _from + 1);
 
     read_fiff_changed = false;
@@ -1762,6 +1764,7 @@ void MainWindow::on_dsb_from_valueChanged(double arg1)
     if(_to >= _last_sample)
     {
         _to = _last_sample - 1;
+        _samplecount = _to - _from;
         ui->sb_sample_count->setValue(_to - _from);
     }
 
@@ -1785,6 +1788,7 @@ void MainWindow::on_dsb_to_valueChanged(double arg1)
     if(_from <= _first_sample)
     {
         _from = _first_sample + 1;
+        _samplecount = _to - _from;
         ui->sb_sample_count->setValue(_to - _from);
     }
 
@@ -1806,6 +1810,7 @@ void MainWindow::on_sb_sample_count_valueChanged(int arg1)
     if(_to > _last_sample)
     {
         _to = _last_sample;
+        _samplecount = _to - _from + 1;
         ui->sb_sample_count->setValue(_to - _from + 1);
     }
 
@@ -2416,8 +2421,10 @@ void GraphWindow::mouseMoveEvent(QMouseEvent *event)
        qreal time = qreal(_from) / _sample_rate + temp_pos / stretch_factor / _sample_rate;
        if(mapFromGlobal(QCursor::pos()).x() > 55 && mapFromGlobal(QCursor::pos()).x() < (this->width() - 15))
            this->setToolTip(QString("time: %1 sec").arg(time));
-//ToDo:       if(event->mouseState() == Qt::MouseButtons)
-       setCursor(Qt::CrossCursor);
+       if(event->buttons() == Qt::LeftButton)
+               setCursor(Qt::ClosedHandCursor);
+       else
+        setCursor(Qt::CrossCursor);
    }
 }
 
@@ -2470,10 +2477,35 @@ void GraphWindow::mouseReleaseEvent(QMouseEvent *event)
 {
     fiff_int_t release_pos = mapFromGlobal(QCursor::pos()).x();
     qreal stretch_factor = qreal(this->width() - 55/*left_border*/ - 15/*right_border*/) / (qreal(_to) - qreal(_from));
-    fiff_int_t samplecount = _to - _from + 1;
+    fiff_int_t sample_count = _to - _from + 1;
 
-    _from += (qreal)(_press_pos - release_pos) / stretch_factor;
-    _to = _from + samplecount;
+    if(_press_pos > release_pos)
+    {
+        _from += floor((_press_pos - release_pos) / stretch_factor);
+        if(_from + sample_count < _last_sample)
+            _to = _from + sample_count;
+        else
+        {
+            _to = _last_sample;
+            if(_to - sample_count > _first_sample)
+                _from = _to - sample_count;
+            else
+                _from = _first_sample;
+        }
+    }
+    else
+    {
+        if((qreal)(_press_pos - release_pos) / stretch_factor > _first_sample)
+            _from += floor((_press_pos - release_pos) / stretch_factor);
+        else
+        {
+            _from = _first_sample;
+        }
+        if(_from + sample_count < _last_sample)
+            _to = _from + sample_count;
+        else
+            _to = _last_sample;
+    }
 
     setCursor(Qt::CrossCursor);
 
@@ -2482,8 +2514,41 @@ void GraphWindow::mouseReleaseEvent(QMouseEvent *event)
     Q_UNUSED(event);
 }
 
+//*****************************************************************************************************************
+
+void GraphWindow::wheelEvent(QWheelEvent *event)
+{
+    _samplecount += event->delta() / 10;
+
+    if(_samplecount  > 4096)
+        _samplecount = 4096;
+
+    if(_samplecount < 64)
+        _samplecount = 64;
+
+    _to = _from + _samplecount;
+
+    if(_to > _last_sample)
+    {
+        _to = _last_sample;
+        _samplecount = _to - _from + 1;
+    }
+    emit read_new();
+}
+
+//*****************************************************************************************************************
+
 void MainWindow::on_mouse_button_release()
 {
+
+    read_fiff_changed = true;
+
+    ui->dsb_from->setValue(_from / _sample_rate);
+    ui->dsb_to->setValue(_to / _sample_rate);
+    ui->sb_sample_count->setValue(_samplecount);
+
+    read_fiff_changed = false;
+
     if(file_name.endsWith(".fif", Qt::CaseInsensitive))
         read_fiff_file_new(file_name);
     else
