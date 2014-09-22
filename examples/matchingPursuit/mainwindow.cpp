@@ -83,6 +83,8 @@ fiff_int_t _from;
 fiff_int_t _to;
 fiff_int_t _first_sample;
 fiff_int_t _last_sample;
+fiff_int_t _press_pos;
+
 qint32 _samplecount;
 qreal _max_pos;
 qreal _max_neg;
@@ -1763,9 +1765,9 @@ void MainWindow::on_dsb_from_valueChanged(double arg1)
 
     if(_to >= _last_sample)
     {
-        _to = _last_sample - 1;
-        _samplecount = _to - _from;
-        ui->sb_sample_count->setValue(_to - _from);
+        _to = _last_sample;
+        _samplecount = _to - _from + 1;
+        ui->sb_sample_count->setValue(_samplecount);
     }
 
     ui->dsb_to->setValue(_to / _sample_rate);
@@ -1787,9 +1789,9 @@ void MainWindow::on_dsb_to_valueChanged(double arg1)
 
     if(_from <= _first_sample)
     {
-        _from = _first_sample + 1;
-        _samplecount = _to - _from;
-        ui->sb_sample_count->setValue(_to - _from);
+        _from = _first_sample;
+        _samplecount = _to - _from + 1;
+        ui->sb_sample_count->setValue(_samplecount);
     }
 
     ui->dsb_from->setValue(_from / _sample_rate);
@@ -1811,13 +1813,13 @@ void MainWindow::on_sb_sample_count_valueChanged(int arg1)
     {
         _to = _last_sample;
         _samplecount = _to - _from + 1;
-        ui->sb_sample_count->setValue(_to - _from + 1);
+        ui->sb_sample_count->setValue(_samplecount);
     }
-
+    _samplecount = arg1;
     ui->dsb_to->setValue(_to / _sample_rate);
     read_fiff_changed = false;
 
-    ui->sb_sample_count->setToolTip(QString("epoch: %1 sec").arg((_to - _from + 1) / _sample_rate));
+    ui->sb_sample_count->setToolTip(QString("epoch: %1 sec").arg((_samplecount) / _sample_rate));
 }
 
 //*****************************************************************************************************************
@@ -2413,13 +2415,12 @@ void MainWindow::on_actionBeenden_triggered()
 
 void GraphWindow::mouseMoveEvent(QMouseEvent *event)
 {
-   //Q_UNUSED(event);
    if(_to - _from != 0)
    {
-       qint32 temp_pos = qreal(mapFromGlobal(QCursor::pos()).x() - 55);
-       qreal stretch_factor = qreal(this->width() - 55/*left_border*/ - 15/*right_border*/) / (qreal(_to) - qreal(_from));
-       qreal time = qreal(_from) / _sample_rate + temp_pos / stretch_factor / _sample_rate;
-       if(mapFromGlobal(QCursor::pos()).x() > 55 && mapFromGlobal(QCursor::pos()).x() < (this->width() - 15))
+       qint32 temp_pos = mapFromGlobal(QCursor::pos()).x() - 55;
+       qreal stretch_factor = qreal(this->width() - 55/*left_margin*/ - 15/*right_margin*/) / (qreal)(_to -_from);
+       qreal time = (qreal)_from / _sample_rate + (qreal)temp_pos / stretch_factor / _sample_rate;
+       if(mapFromGlobal(QCursor::pos()).x() >= 55 && mapFromGlobal(QCursor::pos()).x() <= (this->width() - 15))
            this->setToolTip(QString("time: %1 sec").arg(time));
        if(event->buttons() == Qt::LeftButton)
                setCursor(Qt::ClosedHandCursor);
@@ -2433,13 +2434,13 @@ void GraphWindow::mouseMoveEvent(QMouseEvent *event)
 void AtomSumWindow::mouseMoveEvent(QMouseEvent *event)
 {
     Q_UNUSED(event);
-   if(_to - _from != 0)
-   {
-       qint32 temp_pos = qreal(mapFromGlobal(QCursor::pos()).x() - 55);
-       qreal stretch_factor = qreal(this->width() - 55/*left_border*/ - 15/*right_border*/) / (qreal(_to) - qreal(_from));
-       qreal time = qreal(_from) / _sample_rate + temp_pos / stretch_factor / _sample_rate;
-       if(mapFromGlobal(QCursor::pos()).x() > 55 && mapFromGlobal(QCursor::pos()).x() < (this->width() - 15))
-           this->setToolTip(QString("time: %1 sec").arg(time));
+    if(_to - _from != 0)
+    {
+        qint32 temp_pos = mapFromGlobal(QCursor::pos()).x() - 55;
+        qreal stretch_factor = qreal(this->width() - 55/*left_margin*/ - 15/*right_margin*/) / (qreal)(_samplecount);
+        qreal time = (qreal)_from / _sample_rate + (qreal)temp_pos / stretch_factor / _sample_rate;
+        if(mapFromGlobal(QCursor::pos()).x() >= 55 && mapFromGlobal(QCursor::pos()).x() <= (this->width() - 15))
+            this->setToolTip(QString("time: %1 sec").arg(time));
        setCursor(Qt::CrossCursor);
    }
 }
@@ -2451,22 +2452,21 @@ void ResiduumWindow::mouseMoveEvent(QMouseEvent *event)
     Q_UNUSED(event);
     if(_to - _from != 0)
     {
-        qint32 temp_pos = qreal(mapFromGlobal(QCursor::pos()).x() - 55);
-        qreal stretch_factor = qreal(this->width() - 55/*left_border*/ - 15/*right_border*/) / (qreal(_to) - qreal(_from));
-        qreal time = qreal(_from) / _sample_rate + temp_pos / stretch_factor / _sample_rate;
-        if(mapFromGlobal(QCursor::pos()).x() > 55 && mapFromGlobal(QCursor::pos()).x() < (this->width() - 15))
+        qint32 temp_pos = mapFromGlobal(QCursor::pos()).x() - 55;
+        qreal stretch_factor = qreal(this->width() - 55/*left_margin*/ - 15/*right_margin*/) / (qreal)(_samplecount);
+        qreal time = (qreal)_from / _sample_rate + (qreal)temp_pos / stretch_factor / _sample_rate;
+        if(mapFromGlobal(QCursor::pos()).x() >= 55 && mapFromGlobal(QCursor::pos()).x() <= (this->width() - 15))
             this->setToolTip(QString("time: %1 sec").arg(time));
         setCursor(Qt::CrossCursor);
     }
 }
 
 //*****************************************************************************************************************
-fiff_int_t _press_pos;
+
 void GraphWindow::mousePressEvent(QMouseEvent *event)
 {
-    _press_pos = mapFromGlobal(QCursor::pos()).x();
     Q_UNUSED(event);
-
+    _press_pos = mapFromGlobal(QCursor::pos()).x();
     setCursor(Qt::ClosedHandCursor);
 
 }
@@ -2475,20 +2475,22 @@ void GraphWindow::mousePressEvent(QMouseEvent *event)
 
 void GraphWindow::mouseReleaseEvent(QMouseEvent *event)
 {
+    Q_UNUSED(event);
+
     fiff_int_t release_pos = mapFromGlobal(QCursor::pos()).x();
-    qreal stretch_factor = qreal(this->width() - 55/*left_border*/ - 15/*right_border*/) / (qreal(_to) - qreal(_from));
-    fiff_int_t sample_count = _to - _from + 1;
+    qreal stretch_factor = qreal(this->width() - 55/*left_margin*/ - 15/*right_margin*/) / (qreal)(_samplecount);
+    //fiff_int_t sample_count = _to - _from + 1;
 
     if(_press_pos > release_pos)
     {
         _from += floor((_press_pos - release_pos) / stretch_factor);
-        if(_from + sample_count < _last_sample)
-            _to = _from + sample_count;
+        if(_from + _samplecount < _last_sample)
+            _to = _from + _samplecount;
         else
         {
             _to = _last_sample;
-            if(_to - sample_count > _first_sample)
-                _from = _to - sample_count;
+            if(_to - _samplecount > _first_sample)
+                _from = _to - _samplecount;
             else
                 _from = _first_sample;
         }
@@ -2501,24 +2503,23 @@ void GraphWindow::mouseReleaseEvent(QMouseEvent *event)
         {
             _from = _first_sample;
         }
-        if(_from + sample_count < _last_sample)
-            _to = _from + sample_count;
+        if(_from + _samplecount < _last_sample)
+            _to = _from + _samplecount;
         else
             _to = _last_sample;
     }
-
     setCursor(Qt::CrossCursor);
 
     emit read_new();
 
-    Q_UNUSED(event);
 }
 
 //*****************************************************************************************************************
 
 void GraphWindow::wheelEvent(QWheelEvent *event)
 {
-    _samplecount += event->delta() / 10;
+
+    _samplecount -= event->angleDelta().y();// / 10;
 
     if(_samplecount  > 4096)
         _samplecount = 4096;
@@ -2526,7 +2527,20 @@ void GraphWindow::wheelEvent(QWheelEvent *event)
     if(_samplecount < 64)
         _samplecount = 64;
 
+    qreal stretch_factor = qreal(this->width() - 55/*left_margin*/ - 15/*right_margin*/) / (qreal)(_to - _from);
+    qint32 temp_pos = mapFromGlobal(QCursor::pos()).x() - 55;
+    qint32 actual_sample = _from + floor((qreal)temp_pos / stretch_factor);
+    qint32 delta_from = (qreal)_samplecount * ((qreal)temp_pos / (qreal)(this->width() - 70));
+
+    _from = actual_sample - delta_from;
+
     _to = _from + _samplecount;
+
+    if(_from < _first_sample)
+    {
+        _from = _first_sample;
+        _samplecount = _to - _from + 1;
+    }
 
     if(_to > _last_sample)
     {
