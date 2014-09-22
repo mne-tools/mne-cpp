@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     channelitem.h
+* @file     channelsceneitem.h
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
@@ -30,12 +30,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the ChannelItem class.
+* @brief    Contains the declaration of the ChannelSceneItem class.
 *
 */
 
-#ifndef CHANNELITEM_H
-#define CHANNELITEM_H
+#ifndef ChannelSceneItem_H
+#define ChannelSceneItem_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -55,6 +55,7 @@
 #include <QColor>
 #include <QPainter>
 #include <QStaticText>
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -74,19 +75,19 @@ namespace MNEBrowseRawQt
 
 //=============================================================================================================
 /**
-* ChannelItem...
+* ChannelSceneItem...
 *
-* @brief The ChannelItem class provides a new data structure for impedance values.
+* @brief The ChannelSceneItem class provides a new data structure for impedance values.
 */
-class ChannelItem : public QGraphicsItem
+class ChannelSceneItem : public QGraphicsItem
 {
 
 public:
     //=========================================================================================================
     /**
-    * Constructs a ChannelItem.
+    * Constructs a ChannelSceneItem.
     */
-    ChannelItem(QString electrodeName, QPointF electrodePosition, QColor electrodeColor, int channelIndex);
+    ChannelSceneItem(QString electrodeName, QPointF electrodePosition, QColor electrodeColor = Qt::blue);
 
     //=========================================================================================================
     /**
@@ -114,18 +115,6 @@ public:
 
     //=========================================================================================================
     /**
-    * Sets the impedance value.
-    */
-    void setImpedanceValue(double impedanceValue);
-
-    //=========================================================================================================
-    /**
-    * Returns the impedance value.
-    */
-    double getImpedanceValue();
-
-    //=========================================================================================================
-    /**
     * Updates the electrodes position.
     */
     void setPosition(QPointF newPosition);
@@ -136,20 +125,16 @@ public:
     */
     QPointF getPosition();
 
-    //=========================================================================================================
-    /**
-    * Returns the device channel index of the electrode.
-    */
-    int getChannelIndex();
-
 private:
+    void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
+    void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
+
     QString     m_sElectrodeName;           /**< Holds the electrode name.*/
     QPointF     m_qpElectrodePosition;      /**< Holds the electrode 2D position in the scene.*/
     QColor      m_cElectrodeColor;          /**< Holds the current electrode color.*/
-    double      m_dImpedanceValue;          /**< Holds the current electrode impedance value.*/
-    int         m_iChannelIndex;            /**< Holds the corresonding channel index.*/
+    bool        m_bHighlight;               /**< Highlight item flag.*/
 };
 
 } // NAMESPACE MNEBrowseRawQt
 
-#endif // CHANNELITEM_H
+#endif // ChannelSceneItem_H

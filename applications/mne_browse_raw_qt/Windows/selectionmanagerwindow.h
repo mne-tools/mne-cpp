@@ -116,6 +116,13 @@ private:
 
     //=========================================================================================================
     /**
+    * Initialises all combo boxes in the selection window.
+    *
+    */
+    void initComboBoxes();
+
+    //=========================================================================================================
+    /**
     * Loads a new layout from given file path.
     *
     * @param [in] path holds file path
@@ -135,7 +142,7 @@ private:
     * Updates selection files table widget in this window.
     *
     */
-    void updateSelectionFiles(QListWidgetItem *item);
+    void updateSelectionFiles(QString text);
 
     //=========================================================================================================
     /**
@@ -144,10 +151,31 @@ private:
     */
     void updateSelectionGroups(QListWidgetItem *item);
 
+    //=========================================================================================================
+    /**
+    * Updates the scene regarding the selecting channel QList.
+    *
+    */
+    void updateSceneItems();
+
+    //=========================================================================================================
+    /**
+    * Updates user defined selections.
+    *
+    */
+    void updateUserDefinedChannels();
+
+    //=========================================================================================================
+    /**
+    * Updates data view.
+    *
+    */
+    void updateDataView();
+
     Ui::SelectionManagerWindow*     ui;
 
     QMap<QString,QVector<double>>   m_layoutMap;
-    QMap<QString,QStringList>       m_selectionGroups;
+    QMap<QString,QStringList>       m_selectionGroupsMap;
 
     MainWindow*                     m_pMainWindow;
 

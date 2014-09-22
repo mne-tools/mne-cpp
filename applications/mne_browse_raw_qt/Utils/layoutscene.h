@@ -42,7 +42,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "channelitem.h"
+#include "channelsceneitem.h"
 #include "../Windows/mainwindow.h"
 
 
@@ -79,36 +79,45 @@ public:
     /**
     * Constructs a LayoutScene.
     */
-    explicit LayoutScene(QGraphicsView* view, QObject *parent = 0);
+    explicit LayoutScene(QGraphicsView* view, QObject *parent = 0, int sceneType = 0);
+
+    //=========================================================================================================
+    /**
+    * Updates layout data.
+    * @param [in] layoutMap layout data map.
+    */
+    void setNewLayout(QMap<QString,QVector<double>> layoutMap);
+
+    //=========================================================================================================
+    /**
+    * Hides all items described in list.
+    * @param [in] list string list with items name which are to be hidden.
+    */
+    void hideItems(QStringList list);
+
+    int                             m_iSceneType;                   /**< Holds the current scene type (channel selection = 0, average = 1).*/
 
 private:
-    QPointF         m_mousePosition;                /**< Holds the mouse position.*/
-    bool            m_bRightMouseKeyPressed;        /**< Whether the right mouse button was pressed.*/
-    QGraphicsView*  m_qvView;                       /**< Holds the view which visualizes this scene.*/
+    QGraphicsView*                  m_qvView;                       /**< Holds the view which visualizes this scene.*/
+    QMap<QString,QVector<double>>   m_layoutMap;                    /**< Holds the layout data.*/
 
     //=========================================================================================================
     /**
-    * Reimplemented mouse press event handler.
+    * Repaints all items fro mthe layout data in the scene.
     */
-    void mousePressEvent(QGraphicsSceneMouseEvent * event);
+    void repaintItems();
 
     //=========================================================================================================
     /**
-    * Reimplemented mouse move event handler.
+    * Reimplemented wheel event.
     */
-    void mouseMoveEvent(QGraphicsSceneMouseEvent * event);
+    void wheelEvent(QGraphicsSceneWheelEvent* event);
 
     //=========================================================================================================
     /**
-    * Reimplemented mouse release event handler.
+    * Reimplemented double mouse press event.
     */
-    void mouseReleaseEvent(QGraphicsSceneMouseEvent * event);
-
-    //=========================================================================================================
-    /**
-    * Updates position of all electrodes in the scene.
-    */
-    void scaleElectrodePositions(double scaleFactor);
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* mouseEvent);
 
 };
 

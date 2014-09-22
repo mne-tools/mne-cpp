@@ -7,40 +7,18 @@
     <x>0</x>
     <y>0</y>
     <width>541</width>
-    <height>300</height>
+    <height>354</height>
    </rect>
   </property>
   <property name="allowedAreas">
-   <set>Qt::BottomDockWidgetArea|Qt::TopDockWidgetArea</set>
+   <set>Qt::AllDockWidgetAreas</set>
   </property>
   <property name="windowTitle">
    <string>Channel Selection Manager</string>
   </property>
   <widget class="QWidget" name="dockWidgetContents">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="1" column="2" rowspan="3" colspan="2">
-     <widget class="QListWidget" name="m_listWidget_selectedChannels">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="minimumSize">
-       <size>
-        <width>100</width>
-        <height>0</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>100</width>
-        <height>16777215</height>
-       </size>
-      </property>
-     </widget>
-    </item>
-    <item row="4" column="6">
+    <item row="13" column="6">
      <widget class="QPushButton" name="pushButton_changeSelection">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -53,80 +31,43 @@
       </property>
      </widget>
     </item>
-    <item row="3" column="5" colspan="2">
-     <widget class="QListWidget" name="m_listWidget_selectionFiles">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="minimumSize">
-       <size>
-        <width>220</width>
-        <height>0</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>220</width>
-        <height>16777215</height>
-       </size>
-      </property>
-      <property name="verticalScrollBarPolicy">
-       <enum>Qt::ScrollBarAsNeeded</enum>
-      </property>
-      <property name="horizontalScrollBarPolicy">
-       <enum>Qt::ScrollBarAsNeeded</enum>
-      </property>
-      <property name="sizeAdjustPolicy">
-       <enum>QAbstractScrollArea::AdjustToContents</enum>
-      </property>
+    <item row="12" column="5" colspan="2">
+     <widget class="QComboBox" name="m_comboBox_layoutFile">
       <item>
        <property name="text">
-        <string>mne_browse_raw_vv</string>
+        <string>Vectorview-all.lout</string>
        </property>
       </item>
       <item>
        <property name="text">
-        <string>mne_browse_raw_vv_new</string>
+        <string>Vectorview-grad.lout</string>
        </property>
       </item>
       <item>
        <property name="text">
-        <string>mne_browse_raw_CTF_275</string>
+        <string>Vectorview-mag.lout</string>
        </property>
       </item>
       <item>
        <property name="text">
-        <string>mne_browse_raw_Magnes_3600WH</string>
+        <string>CTF-275.lout</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>magnesWH3600.lout</string>
        </property>
       </item>
      </widget>
     </item>
-    <item row="1" column="5" colspan="2">
-     <widget class="QListWidget" name="m_listWidget_selectionGroups">
-      <property name="sizePolicy">
-       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-        <horstretch>0</horstretch>
-        <verstretch>0</verstretch>
-       </sizepolicy>
-      </property>
-      <property name="minimumSize">
-       <size>
-        <width>220</width>
-        <height>0</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>220</width>
-        <height>16777215</height>
-       </size>
+    <item row="11" column="5">
+     <widget class="QLabel" name="label_4">
+      <property name="text">
+       <string>Layout:</string>
       </property>
      </widget>
     </item>
-    <item row="4" column="5">
+    <item row="13" column="5">
      <widget class="QPushButton" name="m_pushButton_saveSelection">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -139,10 +80,54 @@
       </property>
      </widget>
     </item>
-    <item row="4" column="2" colspan="2">
-     <widget class="QPushButton" name="m_pushButton_selectLayout">
+    <item row="2" column="2">
+     <widget class="QLabel" name="label_5">
       <property name="text">
-       <string>Select layout</string>
+       <string>User defined:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="2" rowspan="11">
+     <widget class="QListWidget" name="m_listWidget_userDefined">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>100</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>100</width>
+        <height>16777215</height>
+       </size>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="2" colspan="2">
+     <widget class="QListWidget" name="m_listWidget_visibleChannels">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>100</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>100</width>
+        <height>16777215</height>
+       </size>
       </property>
      </widget>
     </item>
@@ -155,7 +140,27 @@
        </sizepolicy>
       </property>
       <property name="text">
-       <string>Selected channels:</string>
+       <string>Visible channels:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1" rowspan="14">
+     <widget class="Line" name="line">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="0" rowspan="14">
+     <widget class="QGraphicsView" name="m_graphicsView_layoutPlot">
+      <property name="dragMode">
+       <enum>QGraphicsView::RubberBandDrag</enum>
+      </property>
+      <property name="transformationAnchor">
+       <enum>QGraphicsView::AnchorUnderMouse</enum>
+      </property>
+      <property name="resizeAnchor">
+       <enum>QGraphicsView::AnchorViewCenter</enum>
       </property>
      </widget>
     </item>
@@ -172,7 +177,7 @@
       </property>
      </widget>
     </item>
-    <item row="2" column="5">
+    <item row="9" column="5">
      <widget class="QLabel" name="label_3">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
@@ -185,15 +190,51 @@
       </property>
      </widget>
     </item>
-    <item row="0" column="1" rowspan="5">
-     <widget class="Line" name="line">
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
+    <item row="1" column="5" rowspan="8" colspan="2">
+     <widget class="QListWidget" name="m_listWidget_selectionGroups">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>220</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>220</width>
+        <height>16777215</height>
+       </size>
       </property>
      </widget>
     </item>
-    <item row="0" column="0" rowspan="5">
-     <widget class="QGraphicsView" name="m_graphicsView_layoutPlot"/>
+    <item row="10" column="5" colspan="2">
+     <widget class="QComboBox" name="m_comboBox_selectionFiles">
+      <item>
+       <property name="text">
+        <string>mne_browse_raw_vv.sel</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>mne_browse_raw_vv_new.sel</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>mne_browse_raw_CTF_275.sel</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>mne_browse_raw_Magnes_3600WH.sel</string>
+       </property>
+      </item>
+     </widget>
     </item>
    </layout>
   </widget>

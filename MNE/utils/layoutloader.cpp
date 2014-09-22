@@ -148,7 +148,7 @@ bool LayoutLoader::readAsaElcFile(QString path, QStringList &channelNames, QVect
 
 //*************************************************************************************************************
 
-bool LayoutLoader::readMNELoutFile(QString path, QMap<QString,QVector<double>> channelData)
+bool LayoutLoader::readMNELoutFile(QString path, QMap<QString,QVector<double>> &channelData)
 {
     //Open .elc file
     if(!path.contains(".lout"))
@@ -168,8 +168,7 @@ bool LayoutLoader::readMNELoutFile(QString path, QMap<QString,QVector<double>> c
     //skip first line
     in.readLine();
 
-    while(!in.atEnd())
-    {
+    while(!in.atEnd()) {
         QString line = in.readLine();
 
         QStringList fields = line.split(QRegExp("\\s+"));
@@ -186,7 +185,8 @@ bool LayoutLoader::readMNELoutFile(QString path, QMap<QString,QVector<double>> c
         posTemp.push_back(fields.at(0).toDouble());    //channel number
 
         //Create channel data map entry
-        channelData.insert(fields.at(fields.size()-1), posTemp);
+        QString key = QString("%1 %2").arg(fields.at(fields.size()-2)).arg(fields.at(fields.size()-1));
+        channelData.insert(key, posTemp);
     }
 
     file.close();
