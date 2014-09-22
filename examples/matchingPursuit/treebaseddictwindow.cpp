@@ -81,6 +81,7 @@ TreebasedDictWindow::~TreebasedDictWindow()
 
 void TreebasedDictWindow::on_btt_calc_treebased_clicked()
 {
+    /*
     qint32 sample_count = ui->spb_AtomLength->value();
 
     qint32 count = 0;
@@ -133,17 +134,18 @@ void TreebasedDictWindow::on_btt_calc_treebased_clicked()
     file.close();
     std::cout << "number of atoms built: " << count << "\n";
     //FixDictMp::create_tree_dict(save_path);
+    */
 
 }
 
 void TreebasedDictWindow::on_tb_treebased_dict_name_editingFinished()
 {
-    _treebased_dict_name = ui->tb_treebased_dict_name->text();
+    //_treebased_dict_name = ui->tb_treebased_dict_name->text();
 }
 
 void TreebasedDictWindow::on_btt_call_tree_creator_clicked()
 {
-    QString save_path = QString("Matching-Pursuit-Toolbox/%1.tbd").arg(_treebased_dict_name);
+    //QString save_path = QString("Matching-Pursuit-Toolbox/%1.tbd").arg(_treebased_dict_name);
 
-    FixDictMp::create_tree_dict(save_path);
+    //FixDictMp::create_tree_dict(save_path);
 }
