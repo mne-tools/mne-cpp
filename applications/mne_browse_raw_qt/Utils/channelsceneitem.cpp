@@ -1,6 +1,6 @@
 //=============================================================================================================
 /**
-* @file     ChannelItem.cpp
+* @file     ChannelSceneItem.cpp
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the ChannelItem class.
+* @brief    Contains the implementation of the ChannelSceneItem class.
 *
 */
 
@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "ChannelItem.h"
+#include "channelsceneitem.h"
 
 
 //*************************************************************************************************************
@@ -56,25 +56,26 @@ using namespace std;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ChannelItem::ChannelItem(QString electrodeName, QPointF electrodePosition, QColor electrodeColor, int channelIndex)
+ChannelSceneItem::ChannelSceneItem(QString electrodeName, QPointF electrodePosition, QColor electrodeColor)
 : m_sElectrodeName(electrodeName)
 , m_qpElectrodePosition(electrodePosition)
 , m_cElectrodeColor(electrodeColor)
-, m_dImpedanceValue(0.0)
-, m_iChannelIndex(channelIndex)
+, m_bHighlight(false)
 {
+    this->setAcceptHoverEvents(true);
+    this->setFlag(QGraphicsItem::ItemIsSelectable, true);
 }
 
 //*************************************************************************************************************
 
-QRectF ChannelItem::boundingRect() const
+QRectF ChannelSceneItem::boundingRect() const
 {
     return QRectF(-25, -35, 50, 70);
 }
 
 //*************************************************************************************************************
 
-void ChannelItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void ChannelSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(option);
     Q_UNUSED(widget);
@@ -86,7 +87,10 @@ void ChannelItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
 
     // Plot colored circle
     painter->setPen(QPen(Qt::black, 1));
-    painter->setBrush(QBrush(m_cElectrodeColor));
+    if(this->isSelected())
+        painter->setBrush(QBrush(Qt::red));
+    else
+        painter->setBrush(QBrush(m_cElectrodeColor));
     painter->drawEllipse(-15, -15, 30, 30);
 
     // Plot electrode name
@@ -94,63 +98,55 @@ void ChannelItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *optio
     QSizeF sizeText = staticElectrodeName.size();
     painter->drawStaticText(-15+((30-sizeText.width())/2), -32, staticElectrodeName);
 
-    // Plot electrodes impedance value
-    QString impedanceValueToString;
-    QStaticText staticElectrodeValue = QStaticText(QString("%1 %2").arg(impedanceValueToString.setNum(m_dImpedanceValue/1000)).arg(/*"kOhm"*/"k")); // transform to kilo ohm (divide by 1000)
-    QSizeF sizeValue = staticElectrodeValue.size();
-    painter->drawStaticText(-15+((30-sizeValue.width())/2), 19, staticElectrodeValue);
-
-    this->setPos(m_qpElectrodePosition);
+    this->setPos(25*m_qpElectrodePosition.x(), -25*m_qpElectrodePosition.y());
 }
 
 //*************************************************************************************************************
 
-void ChannelItem::setColor(QColor electrodeColor)
+void ChannelSceneItem::setColor(QColor electrodeColor)
 {
     m_cElectrodeColor = electrodeColor;
 }
 
 //*************************************************************************************************************
 
-QString ChannelItem::getElectrodeName()
+QString ChannelSceneItem::getElectrodeName()
 {
     return m_sElectrodeName;
 }
 
 //*************************************************************************************************************
 
-void ChannelItem::setImpedanceValue(double impedanceValue)
-{
-    m_dImpedanceValue = impedanceValue;
-}
-
-//*************************************************************************************************************
-
-double ChannelItem::getImpedanceValue()
-{
-    return m_dImpedanceValue;
-}
-
-//*************************************************************************************************************
-
-void ChannelItem::setPosition(QPointF newPosition)
+void ChannelSceneItem::setPosition(QPointF newPosition)
 {
     m_qpElectrodePosition = newPosition;
 }
 
 //*************************************************************************************************************
 
-QPointF ChannelItem::getPosition()
+QPointF ChannelSceneItem::getPosition()
 {
     return m_qpElectrodePosition;
 }
 
+
 //*************************************************************************************************************
 
-int ChannelItem::getChannelIndex()
+void ChannelSceneItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
-    return m_iChannelIndex;
+    m_bHighlight = true;
+    this->update();
 }
+
+
+//*************************************************************************************************************
+
+void ChannelSceneItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
+{
+    m_bHighlight = false;
+    this->update();
+}
+
 
 
 

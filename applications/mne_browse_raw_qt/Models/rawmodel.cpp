@@ -165,7 +165,6 @@ QVariant RawModel::data(const QModelIndex &index, int role) const
     if(role != Qt::DisplayRole && role != Qt::BackgroundRole)
         return QVariant();
 
-
     if (index.isValid()) {
         //******** first column (chname) ********
         if(index.column()==0 && role == Qt::DisplayRole)

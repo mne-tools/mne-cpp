@@ -125,7 +125,7 @@ public:
     * @param [in] channel data holds the x,y and channel number for every channel. The map keys are the channel names (i.e. 'MEG 0113').
     * @param [out] bool returns true if reading was successful, false otherwise.
     */
-    bool readMNELoutFile(QString path, QMap<QString,QVector<double>> channelData);
+    bool readMNELoutFile(QString path, QMap<QString, QVector<double> > &channelData);
 
 private:
 

@@ -65,6 +65,13 @@ SelectionManagerWindow::SelectionManagerWindow(QWidget *parent) :
     //Init gui elements
     initListWidgets();
     initGraphicsView();
+    initComboBoxes();
+
+    //Initialise layout as neuromag vectorview with all channels
+    loadLayout("Vectorview-all.lout");
+
+    //Initialise selection list widgets
+    loadSelectionGroups("mne_browse_raw_vv.sel");
 }
 
 
@@ -80,19 +87,14 @@ SelectionManagerWindow::~SelectionManagerWindow()
 
 void SelectionManagerWindow::initListWidgets()
 {
-    //Initialise layout as neuromag vectorview with all channels
-    loadLayout(":/Resources/Templates/Vectorview-grad.lout");
-
-    //Initialise selections
-    loadSelectionGroups(":/Resources/Templates/mne_browse_raw_vv.sel");
-
-    connect(ui->m_listWidget_selectionFiles, &QListWidget::itemClicked,
-                this, &SelectionManagerWindow::updateSelectionFiles);
-
     connect(ui->m_listWidget_selectionGroups, &QListWidget::itemClicked,
                 this, &SelectionManagerWindow::updateSelectionGroups);
 
-    ui->m_listWidget_selectedChannels->addItems(m_selectionGroups["Vertex"]);
+    connect(ui->m_listWidget_selectionGroups, &QListWidget::itemClicked,
+                this, &SelectionManagerWindow::updateSceneItems);
+
+    connect(ui->m_listWidget_visibleChannels, &QListWidget::itemSelectionChanged,
+                this, &SelectionManagerWindow::updateSceneItems);
 }
 
 
@@ -100,8 +102,23 @@ void SelectionManagerWindow::initListWidgets()
 
 void SelectionManagerWindow::initGraphicsView()
 {
-//    m_pLayoutScene = new LayoutScene(ui->m_graphicsView_layoutPlot);
-//    ui->m_graphicsView_layoutPlot->setScene(m_pLayoutScene);
+    m_pLayoutScene = new LayoutScene(ui->m_graphicsView_layoutPlot);
+    ui->m_graphicsView_layoutPlot->setScene(m_pLayoutScene);
+
+    connect(m_pLayoutScene, &QGraphicsScene::selectionChanged,
+                this, &SelectionManagerWindow::updateUserDefinedChannels);
+}
+
+
+//*************************************************************************************************************
+
+void SelectionManagerWindow::initComboBoxes()
+{
+    connect(ui->m_comboBox_selectionFiles, &QComboBox::	currentTextChanged,
+                this, &SelectionManagerWindow::loadSelectionGroups);
+
+    connect(ui->m_comboBox_layoutFile, &QComboBox::	currentTextChanged,
+                this, &SelectionManagerWindow::loadLayout);
 }
 
 
@@ -111,7 +128,16 @@ bool SelectionManagerWindow::loadLayout(QString path)
 {
     LayoutLoader* manager = new LayoutLoader();
 
-    return manager->readMNELoutFile(path, m_layoutMap);
+    //Read layout
+    bool state = manager->readMNELoutFile(path.prepend(":/Resources/Templates/"), m_layoutMap);
+
+    //Update scene
+    m_pLayoutScene->setNewLayout(m_layoutMap);
+
+    //Fit to view
+    ui->m_graphicsView_layoutPlot->fitInView(m_pLayoutScene->itemsBoundingRect(), Qt::KeepAspectRatio);
+
+    return state;
 }
 
 
@@ -119,13 +145,15 @@ bool SelectionManagerWindow::loadLayout(QString path)
 
 bool SelectionManagerWindow::loadSelectionGroups(QString path)
 {
-    //Open .elc file
+    //Open .sel file
     if(!path.contains(".sel"))
         return false;
 
-    m_selectionGroups.clear();
+    ui->m_listWidget_selectionGroups->clear();
+    ui->m_listWidget_visibleChannels->clear();
+    m_selectionGroupsMap.clear();
 
-    QFile file(path);
+    QFile file(path.prepend(":/Resources/Templates/"));
     if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         qDebug()<<"Error opening selection file";
         return false;
@@ -134,8 +162,7 @@ bool SelectionManagerWindow::loadSelectionGroups(QString path)
     //Start reading from file
     QTextStream in(&file);
 
-    while(!in.atEnd())
-    {
+    while(!in.atEnd()) {
         QString line = in.readLine();
 
         if(line.contains("%") == false && line.contains(":") == true) //Skip commented areas in file
@@ -152,7 +179,7 @@ bool SelectionManagerWindow::loadSelectionGroups(QString path)
                 secondSplit.removeLast();
 
             //Add to map
-            m_selectionGroups.insert(key, secondSplit);
+            m_selectionGroupsMap.insert(key, secondSplit);
 
             //Add to list widget
             int count = ui->m_listWidget_selectionGroups->count();
@@ -164,18 +191,28 @@ bool SelectionManagerWindow::loadSelectionGroups(QString path)
     }
 
     file.close();
-}
 
+    //Create group 'All' manually
+    ui->m_listWidget_selectionGroups->insertItem(0, "All");
 
-//*************************************************************************************************************
+    RawModel* model = m_pMainWindow->m_pDataWindow->getDataModel();
 
-void SelectionManagerWindow::updateSelectionFiles(QListWidgetItem* item)
-{
-    ui->m_listWidget_selectionGroups->clear();
-    ui->m_listWidget_selectedChannels->clear();
+    QStringList allChannelsList;
 
-    //update group list
-    loadSelectionGroups(QString(":/Resources/Templates/%1.sel").arg(item->text()));
+    for(int i = 0; i<model->rowCount(); i++) {
+        QModelIndex index = model->index(i,0);
+        QString text = model->data(index, Qt::DisplayRole).toString();
+        allChannelsList << text;
+    }
+
+    m_selectionGroupsMap.insert("All", allChannelsList);
+
+    //Fit to view
+    ui->m_graphicsView_layoutPlot->fitInView(m_pLayoutScene->itemsBoundingRect(), Qt::KeepAspectRatio);
+
+    updateDataView();
+
+    return true;
 }
 
 
@@ -183,8 +220,92 @@ void SelectionManagerWindow::updateSelectionFiles(QListWidgetItem* item)
 
 void SelectionManagerWindow::updateSelectionGroups(QListWidgetItem* item)
 {
-    ui->m_listWidget_selectedChannels->clear();
+    ui->m_listWidget_visibleChannels->clear();
 
     //update channel list
-    ui->m_listWidget_selectedChannels->addItems(m_selectionGroups[item->text()]);
+    ui->m_listWidget_visibleChannels->addItems(m_selectionGroupsMap[item->text()]);
+
+    updateDataView();
+}
+
+
+//*************************************************************************************************************
+
+void SelectionManagerWindow::updateSceneItems()
+{
+    QStringList channelNamesToHide;
+
+    for(int i = 0; i<ui->m_listWidget_visibleChannels->count(); i++)
+        channelNamesToHide << ui->m_listWidget_visibleChannels->item(i)->text();
+
+    m_pLayoutScene->hideItems(channelNamesToHide);
+}
+
+
+//*************************************************************************************************************
+
+void SelectionManagerWindow::updateUserDefinedChannels()
+{
+    QList<QGraphicsItem*> itemList = m_pLayoutScene->selectedItems();
+    QStringList userDefinedChannels;
+
+    switch(m_pLayoutScene->m_iSceneType) {
+        case 0: //Channel selection plot scene
+            for(int i = 0; i<itemList.size(); i++) {
+                ChannelSceneItem* item = static_cast<ChannelSceneItem*>(itemList.at(i));
+                userDefinedChannels << item->getElectrodeName();
+            }
+        break;
+
+        case 1: //Average plot scene
+
+        break;
+    }
+
+    ui->m_listWidget_userDefined->clear();
+    ui->m_listWidget_userDefined->addItems(userDefinedChannels);
+
+    updateDataView();
+}
+
+
+//*************************************************************************************************************
+
+void SelectionManagerWindow::updateDataView()
+{
+    //Create list of channels which are to be hidden in the view
+    QListWidget* targetListWidget;
+    if(ui->m_listWidget_userDefined->count()>0)
+        targetListWidget = ui->m_listWidget_userDefined;
+    else
+        targetListWidget = ui->m_listWidget_visibleChannels;
+
+    QStringList visibleChannels;
+
+    switch(m_pLayoutScene->m_iSceneType) {
+        case 0: //Channel selection plot scene
+            for(int i = 0; i<targetListWidget->count(); i++) {
+                QListWidgetItem* item = targetListWidget->item(i);
+                visibleChannels << item->text();
+            }
+        break;
+
+        case 1: //Average plot scene
+
+        break;
+    }
+
+    //Hide selected channels/rows in the raw data view
+    QTableView* view = m_pMainWindow->m_pDataWindow->getDataTableView();
+    RawModel* model = m_pMainWindow->m_pDataWindow->getDataModel();
+
+    for(int i = 0; i<model->rowCount(); i++) {
+        QModelIndex index = model->index(i, 0);
+        QString channel = model->data(index, Qt::DisplayRole).toString();
+
+        if(!visibleChannels.contains(channel))
+            view->hideRow(i);
+        else
+            view->showRow(i);
+    }
 }

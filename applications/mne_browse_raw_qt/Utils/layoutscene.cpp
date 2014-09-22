@@ -56,10 +56,10 @@ using namespace std;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-LayoutScene::LayoutScene(QGraphicsView* view, QObject* parent)
+LayoutScene::LayoutScene(QGraphicsView* view, QObject* parent, int sceneType)
 : QGraphicsScene(parent)
-, m_bRightMouseKeyPressed(false)
 , m_qvView(view)
+, m_iSceneType(sceneType)
 {
 
 }
@@ -67,63 +67,101 @@ LayoutScene::LayoutScene(QGraphicsView* view, QObject* parent)
 
 //*************************************************************************************************************
 
-void LayoutScene::mousePressEvent(QGraphicsSceneMouseEvent* event)
+void LayoutScene::setNewLayout(QMap<QString,QVector<double>> layoutMap)
 {
-    if(event->button() == Qt::RightButton)
-        m_bRightMouseKeyPressed = true;
+    m_layoutMap = layoutMap;
 
-    QGraphicsScene::mousePressEvent(event);
+    //Redraw all items
+    repaintItems();
 }
 
 
 //*************************************************************************************************************
 
-void LayoutScene::mouseMoveEvent(QGraphicsSceneMouseEvent* event)
+void LayoutScene::hideItems(QStringList list)
 {
-    if(m_bRightMouseKeyPressed)
-    {
-        if(m_mousePosition.x()-event->scenePos().x() > 0) // user moved mouse to the left while pressing the right mouse key
-            scaleElectrodePositions(0.99);
+    QList<QGraphicsItem *> itemList = this->items();
 
-        if(m_mousePosition.x()-event->scenePos().x() < 0) // user moved mouse to the right while pressing the right mouse key
-            scaleElectrodePositions(1.01);
+    switch(m_iSceneType) {
+        case 0: //Channel selection plot scene
+            for(int i = 0; i<itemList.size(); i++) {
+                ChannelSceneItem* item = static_cast<ChannelSceneItem*>(itemList.at(i));
+
+                if(!list.contains(item->getElectrodeName()))
+                    item->hide();
+                else
+                    item->show();
+            }
+
+        break;
+
+        case 1: //Average plot scene
+
+
+        break;
     }
-
-    m_mousePosition = event->scenePos();
-
-    QGraphicsScene::mouseMoveEvent(event);
 }
 
 
 //*************************************************************************************************************
 
-void LayoutScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* event)
+void LayoutScene::repaintItems()
 {
-    if(event->button() == Qt::RightButton)
-        m_bRightMouseKeyPressed = false;
+    QMapIterator<QString,QVector<double>> i(m_layoutMap);
 
-    QGraphicsScene::mouseReleaseEvent(event);
+    switch(m_iSceneType) {
+        case 0: //Channel selection plot scene
+            this->clear();
+
+            while (i.hasNext()) {
+                i.next();
+                ChannelSceneItem* ChannelSceneItemTemp = new ChannelSceneItem(i.key(), QPointF(i.value().at(0), i.value().at(1)));
+
+                this->addItem(ChannelSceneItemTemp);
+            }
+
+        break;
+
+        case 1: //Average plot scene
+//            this->clear();
+
+//            QMapIterator<QString,QVector<double>> i(map);
+//            while (i.hasNext()) {
+//                i.next();
+//                AverageSceneItem* AverageSceneItemTemp = new AverageSceneItem(i.key(), QPointF(i.value().at(0), i.value().at(1)));
+
+//                this->addItem(AverageSceneItemTemp);
+//            }
+
+        break;
+    }
 }
 
 
 //*************************************************************************************************************
 
-void LayoutScene::scaleElectrodePositions(double scaleFactor)
-{
-    // Get scene items
-//    QList< QGraphicsItem *> itemList = this->items();
+void LayoutScene::wheelEvent(QGraphicsSceneWheelEvent* event) {
+    m_qvView->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
 
-//    // Update position
-//    for(int i = 0; i<itemList.size(); i++)
-//    {
-//        TMSIElectrodeItem* item = (TMSIElectrodeItem *) itemList.at(i);
-
-//        // Set both positions -> dunno why :-)
-//        item->setPosition(item->getPosition()*scaleFactor);
-//        item->setPos(item->pos()*scaleFactor);
-//    }
-
-//    this->update(this->sceneRect());
+    // Scale the view / do the zoom
+    double scaleFactor = 1.15;
+    if(event->delta() > 0) {
+        // Zoom in
+        m_qvView->scale(scaleFactor, scaleFactor);
+    } else {
+        // Zooming out
+        m_qvView->scale(1.0 / scaleFactor, 1.0 / scaleFactor);
+    }
 }
+
+
+//*************************************************************************************************************
+
+void LayoutScene::mouseDoubleClickEvent( QGraphicsSceneMouseEvent* mouseEvent)
+{
+    m_qvView->fitInView(this->itemsBoundingRect(), Qt::KeepAspectRatio);
+}
+
+
 
 
