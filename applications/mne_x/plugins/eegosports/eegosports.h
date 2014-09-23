@@ -52,7 +52,7 @@
 #include <generics/circularmatrixbuffer.h>
 #include <xMeas/newrealtimemultisamplearray.h>
 
-#include <utils/layoutloader.h>
+#include <utils/asaelc.h>
 
 #include <unsupported/Eigen/FFT>
 #include <Eigen/Geometry>

@@ -1,8 +1,7 @@
 #--------------------------------------------------------------------------------------------------------------
 #
 # @file     applications.pro
-# @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
-#           Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
+# @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
 #           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 #           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
@@ -11,7 +10,7 @@
 #
 # @section  LICENSE
 #
-# Copyright (C) 2014, Lorenz Esch, Florian Schlembach, Christoph Dinh, Matti Hamalainen and Jens Haueisen. All rights reserved.
+# Copyright (C) 2014, Florian Schlembach, Christoph Dinh, Matti Hamalainen and Jens Haueisen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -75,19 +74,16 @@ SOURCES += \
     Utils/mneoperator.cpp \
     Utils/filteroperator.cpp \
     Utils/filterplotscene.cpp \
-    Utils/layoutscene.cpp \
-    Utils/channelsceneitem.cpp \
     Models/rawmodel.cpp \
     Models/eventmodel.cpp \
     Delegates/rawdelegate.cpp \
-    Delegates/eventdelegate.cpp \
     Windows/mainwindow.cpp \
     Windows/filterwindow.cpp \
     Windows/eventwindow.cpp \
     Windows/datawindow.cpp \
     Windows/aboutwindow.cpp \
     Windows/informationwindow.cpp \
-    Windows/selectionmanagerwindow.cpp
+    Delegates/eventdelegate.cpp \ 
 
 HEADERS += \
     Utils/datamarker.h \
@@ -97,19 +93,16 @@ HEADERS += \
     Utils/types.h \
     Utils/info.h \
     Utils/filterplotscene.h \
-    Utils/layoutscene.h \
-    Utils/channelsceneitem.h \
     Models/rawmodel.h \
     Models/eventmodel.h \
     Delegates/rawdelegate.h \
-    Delegates/eventdelegate.h \
     Windows/mainwindow.h \
     Windows/filterwindow.h \
     Windows/eventwindow.h \
     Windows/datawindow.h \
     Windows/aboutwindow.h \
     Windows/informationwindow.h \
-    Windows/selectionmanagerwindow.h
+    Delegates/eventdelegate.h \
 
 FORMS += \
     Windows/filterwindow.ui \
@@ -117,8 +110,7 @@ FORMS += \
     Windows/datawindowdock.ui \
     Windows/mainwindow.ui \
     Windows/aboutwindow.ui \
-    Windows/informationwindow.ui \
-    Windows/selectionmanagerwindow.ui
+    Windows/informationwindow.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
@@ -138,5 +130,3 @@ macx {
 
 RESOURCES += \
     mnebrowserawqt.qrc
-
-RC_FILE = Resources/Images/ApplicationIcons/myapp.rc
