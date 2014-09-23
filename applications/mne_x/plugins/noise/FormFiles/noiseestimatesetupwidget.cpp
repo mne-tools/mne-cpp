@@ -72,7 +72,7 @@ NoiseEstimateSetupWidget::NoiseEstimateSetupWidget(NoiseEstimate* toolbox, QWidg
     init();
 
     connect(ui.m_qComboBoxnFFT, static_cast<void (QComboBox::*)(int)>(&QComboBox::currentIndexChanged), this, &NoiseEstimateSetupWidget::chgnFFT);
-
+    connect(ui.m_qSpinDataLen, static_cast<void (QSpinBox::*)(int)>(&QSpinBox::valueChanged), this, &NoiseEstimateSetupWidget::chgDataLen);
 }
 
 
@@ -101,6 +101,10 @@ void NoiseEstimateSetupWidget::init()
             break;
 
     ui.m_qComboBoxnFFT->setCurrentIndex(i);
+
+
+    //set up the data length for spectrum calculation
+    ui.m_qSpinDataLen->setValue(6);
 }
 
 
@@ -112,59 +116,9 @@ void NoiseEstimateSetupWidget::chgnFFT(int idx)
     m_pNoiseEstimate->m_iFFTlength = ui.m_qComboBoxnFFT->itemText(idx).toInt();
 }
 
-
-//*************************************************************************************************************
-
-void NoiseEstimateSetupWidget::Replot(/*MatrixXd tmp*/)
+void NoiseEstimateSetupWidget::chgDataLen(int idx)
 {
-    /*
-    int cols = tmp.cols();
-    int chanIndx = 1;// ui->m_Qcb_channel->currentIndex();//
-    // plot the real time data here
-    settings.minX = 0.0;
-    settings.maxX = cols;
-    settings.minY = mmin(tmp,chanIndx);
-    settings.maxY = mmax(tmp,chanIndx);
-    settings.xlabel = QString("%1 samples/second").arg(1000) ;
-    settings.ylabel = QString("Power Spectrum [DB/Hz]");
-
-    d_timeplot->setPlotSettings(settings);
-//    qDebug()<<"minY"<<settings.minY<<"maxY"<<settings.maxY;
-
-    QVector <QPointF> F;
-
-    for(int i=0; i<cols;i++)
-        F.append(QPointF(i,tmp(chanIndx,i)));
-
-    d_timeplot->setCurveData(0,F);
-    d_timeplot->show();
-*/
+//    qDebug() << "ui.m_qComboBoxnFFT->itemData(idx).toInt();" << ui.m_qComboBoxnFFT->itemText(idx).toInt();
+    m_pNoiseEstimate->m_DataLen = idx;
 }
 
-//float NoiseEstimateSetupWidget::mmin(MatrixXd tmp,int chan)
-//{
-//    int cols = tmp.cols();
-
-//    float ret = tmp(chan,0);
-//    for (int i=0; i<cols; i++)
-//    {
-//        if (tmp(chan,i) < ret)
-//            ret = tmp(chan,i);
-//    }
-
-//    return ret;
-//}
-
-//float NoiseEstimateSetupWidget::mmax(MatrixXd tmp,int chan)
-//{
-//    int cols = tmp.cols();
-
-//    float ret = tmp(chan,0);
-//    for (int i=0; i<cols; i++)
-//    {
-//        if (tmp(chan,i) > ret)
-//            ret = tmp(chan,i);
-//    }
-
-//    return ret;
-//}
