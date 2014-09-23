@@ -180,6 +180,7 @@ void BabyMEG::initConnector()
     if(m_pFiffInfo)
     {
         m_pRTMSABabyMEG = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "BabyMEG Output", "BabyMEG");
+        m_pRTMSABabyMEG->data()->setName(this->getName());//Provide name to auto store widget settings
 
         m_pRTMSABabyMEG->data()->initFromFiffInfo(m_pFiffInfo);
         m_pRTMSABabyMEG->data()->setMultiArraySize(500);

@@ -39,8 +39,8 @@
 //=============================================================================================================
 
 #include "rtsss.h"
-#include "FormFiles/rtssssetupwidget.h"
 #include "rtsssalgo.h"
+#include "FormFiles/rtssssetupwidget.h"
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -51,6 +51,9 @@
 #include <QDebug>
 #include <QFuture>
 #include <QtConcurrent/QtConcurrentMap>
+#include <QSettings>
+
+RtSssAlgo rsss;
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -61,7 +64,6 @@ using namespace RtSssPlugin;
 using namespace FIFFLIB;
 using namespace MNEX;
 using namespace XMEASLIB;
-
 
 
 //*************************************************************************************************************
@@ -116,6 +118,13 @@ void RtSss::init()
     // Output
     m_pRTMSAOutput = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "RtSssOut", "RtSss output data");
     m_outputConnectors.append(m_pRTMSAOutput);
+
+
+    //
+    // Load Settings
+    //
+//    QSettings settings;
+//    yourValue = settings.value(QString("Plugin/%1/yourValue").arg(this->getName()), 400).toInt();
 }
 
 
@@ -123,6 +132,11 @@ void RtSss::init()
 
 void RtSss::unload()
 {
+    //
+    // Store Settings
+    //
+//    QSettings settings;
+//    settings.setValue(QString("Plugin/%1/yourValue").arg(this->getName()), yourValue);
 
 }
 
@@ -253,11 +267,21 @@ void RtSss::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
 //*************************************************************************************************************
 
+
+MatrixXd rt_sss(const MatrixXd &p_mat)
+{
+    MatrixXd out;
+    out = rsss.getSSSRR(p_mat);
+    return out;
+}
+
+
+//*************************************************************************************************************
+
 void RtSss::run()
 {
-
-    RtSssAlgo rsss;
-    QList<MatrixXd> lineqn, sssOut;
+//    QList<MatrixXd> lineqn;
+    MatrixXd lineqn;
 
     m_bIsRunning = true;
 
@@ -291,6 +315,21 @@ void RtSss::run()
     expOrder << LinRR << LoutRR << Lin << Lout;
     rsss.setSSSParameter(expOrder);
 
+//    // Find out if coils are all gradiometers, all magnetometers, or both.
+//    // When both gradiometers and magnetometers are used,
+//    //      MagScale facor of 100 must be appiled to magnetomters.
+//    float MagScale;
+//    if ((0 < CoilGrad.sum()) && (CoilGrad.sum() < NumCoil))  MagScale = 100;
+//    else MagScale = 1;
+
+//    VectorXd CoilScale;
+//    CoilScale.setOnes(NumCoil);
+//    for(int i=0; i<NumCoil; i++)
+//    {
+//        if (CoilGrad(i) == 0) CoilScale(i) = MagScale;
+////        std::cout <<  "i=" << i << "CoilGrad: " << CoilGrad(i) << ",  CoilScale: " << CoilScale(i) << std::endl;
+//    }
+
     // Find a starting MEG channel index fiff
     // When the MEG recording of the first channel is saved starting from the first row in the signal matrix, the startID_MEGch will be 0.
     // When the MEG recording of the first channel is saved starting not from the first row and being followed by others like EEG,
@@ -313,22 +352,27 @@ void RtSss::run()
 
     // start processing data
     m_bProcessData = true;
-    qint32 HEADMOV_COR_cnt = 2 ;
-
+    qint32 HEADMOV_COR_cnt = 15 ;
+    qint32 cnt=0;
     qDebug() << "rtSSS started.....";
+
+    bool m_bIsHeadMov = true;
+
     while(m_bIsRunning)
     {
-        // When new head movement correction presented, lineqn must be rebuilt for rtSSS
-        if (HEADMOV_COR_cnt == 2)
-        {
+//        if (m_bIsHeadMov)
+//        {
             lineqn = rsss.buildLinearEqn();
             qDebug() << "rebuilt SSS linear equation .....";
-            HEADMOV_COR_cnt = 0;
-        }
-        else HEADMOV_COR_cnt++;
+//            m_bIsHeadMov = false;
+//        }
+//        else
+//        {
+//            m_bIsHeadMov = true;
+//        }
 
-        qint32 nrows = m_pRtSssBuffer->rows();
-        qDebug() << "rtsss";
+        qint16 nrows = m_pRtSssBuffer->rows();
+
         if(nrows > 0) // check if init
         {
             // * Dispatch the inputs * //
@@ -344,24 +388,38 @@ void RtSss::run()
                     in_mat_used.row(k) = in_mat.row(i);
                     k++;
                 }
+//            in_mat_used = in_mat.block(0,0,nmegchanused,in_mat.cols());
 
-            sssOut = rsss.getSSSRR(lineqn[0], lineqn[1], lineqn[2], lineqn[3], lineqn[4]*in_mat_used);
-//            sssOut = rsss.getSSSOLS(lineqn[0], lineqn[1], lineqn[3], lineqn[4]*in_mat_used);
-//            sssRR = rsss.getSSSRR(lineqn[0], lineqn[1], lineqn[2], lineqn[3], lineqn[4]*in_mat_used.block(startID_MEGch,0,nmegchanused,in_mat_used.cols()));
-//            sssRR = rsss.getSSSRR(lineqn[0], lineqn[1], lineqn[2], lineqn[3], lineqn[4]*in_mat.block(startID_MEGch,0,nmegchan,in_mat.cols()));
-//            qDebug() <<  "size of sssRR[0] (run): " << sssRR[0].rows() << " x " << sssRR[0].cols();
+            // Implement Concurrent mapreduced for parallel processing
+            // divide the in_mat_used into 2 or 4 matrices, which renders 50ms or 25ms data
+            QList<MatrixXd> list_in_mat;
+            qint32 nSubSample = 20;
+            qint32 nThread = in_mat.cols() / nSubSample;
+
+            for(qint32 ith = 0; ith < nThread; ++ ith)
+                list_in_mat.append(in_mat_used.block(0,ith*nSubSample,nmegchanused,nSubSample));
+
+            QFuture<MatrixXd> res = QtConcurrent::mapped(list_in_mat, rt_sss);
+            res.waitForFinished();
+
+            for(qint32 ith = 0; ith < nThread; ++ ith)
+                in_mat_used.block(0,ith*nSubSample,nmegchanused,nSubSample)= res.resultAt(ith);
 
             // Replace raw signal by SSS signal
             for(qint32 i = 0, k = 0; i < nmegchan; ++i)
                 if (badch(i) == 0)
                 {
-                    in_mat.row(i) = sssOut[0].row(k);
+                    in_mat.row(i) = in_mat_used.row(k);
                     k++;
                 }
 
-            // Display signal after SSS
+            // Output to display
             for(qint32 i = 0; i <in_mat.cols(); ++i)
-                m_pRTMSAOutput->data()->setValue(in_mat.col(i));
+                m_pRTMSAOutput->data()->setValue(1e7 * in_mat.col(i));
+//                m_pRTMSAOutput->data()->setValue(1e-16 * in_mat.col(i));
+
+            cnt++;
+            qDebug() << cnt;
         }
     }
 
@@ -369,3 +427,51 @@ void RtSss::run()
     m_bReceiveData = false;
     qDebug() << "rtSSS stopped.";
 }
+
+
+
+//
+// A possible way of passing parameters to QtConcurrent::mapped
+
+//QFuture<MatrixXd> thumbnails = QtConcurrent::mapped(list_in_mat, rsss.getSSSRR);
+
+
+//class obj
+//{
+//    MatrixXd data;
+//    int lineq1;
+//    int lineq2;
+//    int lineq3;
+//    int lineq4;
+
+//    MatrixXd getSSSRR()
+//    {
+
+//        lineq1;
+//        lineq2;
+//        lineq3;
+//        lineq4;
+//        MatrixXd res;
+//        return res;
+//    }
+//};
+
+
+//QList<obj> qListObj;
+
+////            {
+//obj obj0;
+//obj0.data = list_in_mat(0);
+//obj0.lineq1 = 0; obj0.lineq2 = 0; obj0.lineq3 = 0; obj0.lineq4 = 0;
+
+//obj obj1;
+//obj1.data = list_in_mat(1);
+//obj1.lineq1 = 0; obj1.lineq2 = 0; obj1.lineq3 = 1; obj1.lineq4 = 0;
+
+//qListObj << obj0;
+//qListObj << obj1;
+////            }
+
+//QFuture<MatrixXd> thumbnails = QtConcurrent::mapped(qListObj, &obj::getSSSRR);
+
+
