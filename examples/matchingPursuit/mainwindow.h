@@ -739,6 +739,20 @@ private:
 
     //==========================================================================================================
     /**
+    * MainWindow_create_display_text
+    *
+    * ### MP toolbox main function ###
+    *
+    * creates the display texts of found atoms to show in the result list
+    *
+    * @param[in]    global_best_matching    best matching atom, which text should be created
+    *
+    * @return       QString                 display text
+    */
+    QString create_display_text(FixDictAtom global_best_matching);
+
+    //==========================================================================================================
+    /**
     * MainWindow_closeEvent
     *
     * ### MP toolbox main function ###
