@@ -98,7 +98,7 @@ void ChannelSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     QSizeF sizeText = staticElectrodeName.size();
     painter->drawStaticText(-15+((30-sizeText.width())/2), -32, staticElectrodeName);
 
-    this->setPos(25*m_qpElectrodePosition.x(), -25*m_qpElectrodePosition.y());
+    this->setPos(10*m_qpElectrodePosition.x(), -10*m_qpElectrodePosition.y());
 }
 
 //*************************************************************************************************************

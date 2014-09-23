@@ -66,12 +66,6 @@ SelectionManagerWindow::SelectionManagerWindow(QWidget *parent) :
     initListWidgets();
     initGraphicsView();
     initComboBoxes();
-
-    //Initialise layout as neuromag vectorview with all channels
-    loadLayout("Vectorview-all.lout");
-
-    //Initialise selection list widgets
-    loadSelectionGroups("mne_browse_raw_vv.sel");
 }
 
 
@@ -87,13 +81,14 @@ SelectionManagerWindow::~SelectionManagerWindow()
 
 void SelectionManagerWindow::initListWidgets()
 {
+    //Install event filter to receive key press events
+    ui->m_listWidget_userDefined->installEventFilter(this);
+
+    //Connect list widgets to update themselves and other list widgets when changed
     connect(ui->m_listWidget_selectionGroups, &QListWidget::itemClicked,
                 this, &SelectionManagerWindow::updateSelectionGroups);
 
     connect(ui->m_listWidget_selectionGroups, &QListWidget::itemClicked,
-                this, &SelectionManagerWindow::updateSceneItems);
-
-    connect(ui->m_listWidget_visibleChannels, &QListWidget::itemSelectionChanged,
                 this, &SelectionManagerWindow::updateSceneItems);
 }
 
@@ -102,6 +97,7 @@ void SelectionManagerWindow::initListWidgets()
 
 void SelectionManagerWindow::initGraphicsView()
 {
+    //Create layout scene and set to view
     m_pLayoutScene = new LayoutScene(ui->m_graphicsView_layoutPlot);
     ui->m_graphicsView_layoutPlot->setScene(m_pLayoutScene);
 
@@ -114,11 +110,18 @@ void SelectionManagerWindow::initGraphicsView()
 
 void SelectionManagerWindow::initComboBoxes()
 {
+    //Connect the layout and selection group loader
     connect(ui->m_comboBox_selectionFiles, &QComboBox::	currentTextChanged,
                 this, &SelectionManagerWindow::loadSelectionGroups);
 
     connect(ui->m_comboBox_layoutFile, &QComboBox::	currentTextChanged,
                 this, &SelectionManagerWindow::loadLayout);
+
+    //Initialise layout as neuromag vectorview with all channels
+    loadLayout("Vectorview-all.lout");
+
+    //Initialise selection list widgets
+    loadSelectionGroups("mne_browse_raw_vv.sel");
 }
 
 
@@ -207,7 +210,7 @@ bool SelectionManagerWindow::loadSelectionGroups(QString path)
 
     m_selectionGroupsMap.insert("All", allChannelsList);
 
-    //Fit to view
+    //Fit scene in view
     ui->m_graphicsView_layoutPlot->fitInView(m_pLayoutScene->itemsBoundingRect(), Qt::KeepAspectRatio);
 
     updateDataView();
@@ -273,7 +276,7 @@ void SelectionManagerWindow::updateUserDefinedChannels()
 
 void SelectionManagerWindow::updateDataView()
 {
-    //Create list of channels which are to be hidden in the view
+    //Create list of channels which are to be visible in the view
     QListWidget* targetListWidget;
     if(ui->m_listWidget_userDefined->count()>0)
         targetListWidget = ui->m_listWidget_userDefined;
@@ -307,5 +310,38 @@ void SelectionManagerWindow::updateDataView()
             view->hideRow(i);
         else
             view->showRow(i);
+    }
+}
+
+
+//*************************************************************************************************************
+
+void SelectionManagerWindow::resizeEvent(QResizeEvent* event)
+{
+    Q_UNUSED(event);
+
+    //Fit scene in view
+    ui->m_graphicsView_layoutPlot->fitInView(m_pLayoutScene->itemsBoundingRect(), Qt::KeepAspectRatio);
+}
+
+
+//*************************************************************************************************************
+
+bool SelectionManagerWindow::eventFilter(QObject *obj, QEvent *event)
+{
+    if (obj == ui->m_listWidget_userDefined) {
+        if (event->type() == QEvent::KeyPress) {
+            QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
+
+            if(keyEvent->key() == Qt::Key_Delete)
+                qDeleteAll(ui->m_listWidget_userDefined->selectedItems());
+
+            return true;
+        } else {
+            return false;
+        }
+    } else {
+        // pass the event on to the parent class
+        return QDockWidget::eventFilter(obj, event);
     }
 }
