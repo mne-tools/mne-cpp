@@ -72,7 +72,7 @@ class MainWindow;
 /**
 * DECLARE CLASS InformationWindow
 *
-* @brief The InformationWindow class provides a dockable InformationWindow window.
+* @brief The AboutWindow class provides the about window.
 */
 class InformationWindow : public QDockWidget
 {
