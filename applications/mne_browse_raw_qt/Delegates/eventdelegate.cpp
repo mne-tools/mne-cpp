@@ -86,7 +86,7 @@ QWidget *EventDelegate::createEditor(QWidget *parent,
 
         case 2: {
             QComboBox *editor = new QComboBox(parent);
-            editor->addItems(m_pEventModel->getEventTypeList());
+            editor->addItems(m_qSettings.value("EventDesignParameters/event_types").value<QStringList>());
             return editor;
         }
     }
