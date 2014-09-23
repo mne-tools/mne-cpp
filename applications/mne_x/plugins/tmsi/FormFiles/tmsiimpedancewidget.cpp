@@ -157,14 +157,14 @@ void TMSIImpedanceWidget::initGraphicScene()
     m_qGScene->clear();
 
     // Load standard layout file
-    LayoutLoader *asaObject = new LayoutLoader();
+    AsAElc *asaObject = new AsAElc();
     QVector< QVector<double> > elcLocation3D;
     QVector< QVector<double> > elcLocation2D;
     QString unit;
     QStringList elcChannelNames;
     QString sElcFilePath = QString("./mne_x_plugins/resources/tmsi/loc_files/standard_waveguard128.elc");
 
-    if(!asaObject->readAsaElcFile(sElcFilePath, elcChannelNames, elcLocation3D, elcLocation2D, unit))
+    if(!asaObject->readElcFile(sElcFilePath, elcChannelNames, elcLocation3D, elcLocation2D, unit))
     {
         qDebug() << "Error: Reading elc file.";
         return;
@@ -273,13 +273,13 @@ void TMSIImpedanceWidget::loadLayout()
                                                         tr("ELC layout file (*.elc)"));
 
     // Load standard layout file
-    LayoutLoader *asaObject = new LayoutLoader();
+    AsAElc *asaObject = new AsAElc();
     QVector< QVector<double> > elcLocation3D;
     QVector< QVector<double> > elcLocation2D;
     QString unit;
     QStringList elcChannelNames;
 
-    if(!asaObject->readAsaElcFile(sElcFilePath, elcChannelNames, elcLocation3D, elcLocation2D, unit))
+    if(!asaObject->readElcFile(sElcFilePath, elcChannelNames, elcLocation3D, elcLocation2D, unit))
         qDebug() << "Error: Reading elc file.";
     else
         m_qGScene->clear();
