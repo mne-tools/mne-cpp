@@ -44,6 +44,8 @@
 #include "mainwindow.h"
 #include "../Utils/datamarker.h"
 #include "ui_datawindowdock.h"
+#include "../Delegates/rawdelegate.h"
+#include "../Models/rawmodel.h"
 
 
 //*************************************************************************************************************
@@ -51,7 +53,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QDockWidget>
+#include <QWidget>
 #include <QResizeEvent>
 #include <QToolBar>
 #include <QPainter>
@@ -78,7 +80,7 @@ class MainWindow;
 *
 * @brief The DataWindow class provides the data dock window.
 */
-class DataWindow : public QDockWidget
+class DataWindow : public QWidget
 {
     Q_OBJECT
 
@@ -100,17 +102,41 @@ public:
 
     //=========================================================================================================
     /**
-    * Setup the table view of the data window
+    * Initialises this window.
     */
-    void initRawViewSettings();
+    void init();
 
     //=========================================================================================================
     /**
-    * Returns the QTableView of this window
+    * Returns the event QTableView of this window
     */
-    QTableView* getTableView();
+    QTableView* getDataTableView();
+
+    //=========================================================================================================
+    /**
+    * Returns the RawModel of this window
+    */
+    RawModel* getDataModel();
+
+    //=========================================================================================================
+    /**
+    * Returns the RawModel of this window
+    */
+    RawDelegate* getDataDelegate();
 
 private:
+    //=========================================================================================================
+    /**
+    * Setup the model view controller of the data window
+    */
+    void initMVCSettings();
+
+    //=========================================================================================================
+    /**
+    * Setup the undocked data view window.
+    */
+    void initUndockedWindow();
+
     //=========================================================================================================
     /**
     * Setup the tool bar of the data window.
@@ -141,27 +167,27 @@ private:
     */
     void keyPressEvent(QKeyEvent* event);
 
-    Ui::DataWindowDockWidget *ui;
+    Ui::DataWindowDockWidget *ui;                   /**< the ui variabe to initalise and access the ui file with this class */
 
-    MainWindow*     m_pMainWindow;
+    MainWindow*     m_pMainWindow;                  /**< pointer to the main window (parent) */
 
-    QSettings       m_qSettings;
+    QSettings       m_qSettings;                    /**< global mne browse raw qt settings */
 
-    QWidget*        m_pPainterMarker;
+    QWidget*        m_pUndockedViewWidget;          /**< widget which is shown whenever the view undock action is triggered */
 
-    DataMarker*     m_pDataMarker;
+    DataMarker*     m_pDataMarker;                  /**< pointer to the data marker */
 
-    QLabel*         m_pCurrentDataMarkerLabel;
+    QLabel*         m_pCurrentDataMarkerLabel;      /**< the current data marker label to display the marker's position */
 
-    int             m_iCurrentMarkerSample;
+    int             m_iCurrentMarkerSample;         /**< the current data marker sample value to display the marker's position */
+
+    RawDelegate*    m_pRawDelegate;                 /**< the QAbstractDelegate being part of the raw model/view framework of Qt */
+    RawModel*       m_pRawModel;                    /**< the QAbstractTable model being part of the model/view framework of Qt */
+
+    QTableView*     m_pUndockedDataView;
+    QVBoxLayout*    m_pUndockedDataViewLayout;
 
 protected slots:
-    //=========================================================================================================
-    /**
-    * @brief manualResize performs a manual resize of this dock widget
-    */
-    void manualResize();
-
     //=========================================================================================================
     /**
     * @brief customContextMenuRequested
@@ -186,6 +212,12 @@ protected slots:
     * Adds an event to the event model and its QTableView
     */
     void addEventToEventModel();
+
+    //=========================================================================================================
+    /**
+    * Undock the table view to a normal window (not dock widget)
+    */
+    void undockDataViewToWindow();
 
     //=========================================================================================================
     /**

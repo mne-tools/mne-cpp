@@ -1,11 +1,11 @@
 //=============================================================================================================
 /**
-* @file     informationwindow.h
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
+* @file     layoutscene.h
+* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     August, 2014
+* @date     September, 2014
 *
 * @section  LICENSE
 *
@@ -30,20 +30,20 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the InformationWindow class.
+* @brief    Contains the declaration of the LayoutScene class.
 *
 */
 
-#ifndef INFORMATIONWINDOW_H
-#define INFORMATIONWINDOW_H
+#ifndef LAYOUTSCENE_H
+#define LAYOUTSCENE_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "mainwindow.h"
-#include "ui_informationwindow.h"
+#include "channelsceneitem.h"
+#include "../Windows/mainwindow.h"
 
 
 //*************************************************************************************************************
@@ -51,55 +51,76 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QDockWidget>
+#include <QGraphicsScene>
+#include <QGraphicsView>
+#include <QGraphicsSceneMouseEvent>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNEBrowseRawQt
+// DEFINE NAMESPACE TMSIPlugin
 //=============================================================================================================
 
 namespace MNEBrowseRawQt
 {
 
-//*************************************************************************************************************
 //=============================================================================================================
-// DEFINE FORWARD DECLARATIONS
-//=============================================================================================================
-
-class MainWindow;
-
 /**
-* DECLARE CLASS InformationWindow
+* LayoutScene...
 *
-* @brief The InformationWindow class provides a dockable InformationWindow window.
+* @brief The LayoutScene class provides a reimplemented QGraphicsScene for 2D layout plotting.
 */
-class InformationWindow : public QDockWidget
+class LayoutScene : public QGraphicsScene
 {
     Q_OBJECT
 
 public:
     //=========================================================================================================
     /**
-    * Constructs a InformationWindow dialog which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new InformationWindow becomes a window. If parent is another widget, InformationWindow becomes a child window inside parent. InformationWindow is deleted when its parent is deleted.
+    * Constructs a LayoutScene.
     */
-    InformationWindow(QWidget *parent = 0);
+    explicit LayoutScene(QGraphicsView* view, QObject *parent = 0, int sceneType = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the InformationWindow.
-    * All InformationWindow's children are deleted first. The application exits if InformationWindow is the main widget.
+    * Updates layout data.
+    * @param [in] layoutMap layout data map.
     */
-    ~InformationWindow();
+    void setNewLayout(QMap<QString,QVector<double>> layoutMap);
+
+    //=========================================================================================================
+    /**
+    * Hides all items described in list.
+    * @param [in] list string list with items name which are to be hidden.
+    */
+    void hideItems(QStringList list);
+
+    int                             m_iSceneType;                   /**< Holds the current scene type (channel selection = 0, average = 1).*/
 
 private:
-    Ui::InformationWindowWidget *ui;
+    QGraphicsView*                  m_qvView;                       /**< Holds the view which visualizes this scene.*/
+    QMap<QString,QVector<double>>   m_layoutMap;                    /**< Holds the layout data.*/
 
-    MainWindow*     m_pMainWindow;
+    //=========================================================================================================
+    /**
+    * Repaints all items fro mthe layout data in the scene.
+    */
+    void repaintItems();
+
+    //=========================================================================================================
+    /**
+    * Reimplemented wheel event.
+    */
+    void wheelEvent(QGraphicsSceneWheelEvent* event);
+
+    //=========================================================================================================
+    /**
+    * Reimplemented double mouse press event.
+    */
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* mouseEvent);
+
 };
 
-} // NAMESPACE MNEBrowseRawQt
+} // NAMESPACE
 
-#endif // INFORMATIONWINDOW_H
+#endif // LAYOUTSCENE_H

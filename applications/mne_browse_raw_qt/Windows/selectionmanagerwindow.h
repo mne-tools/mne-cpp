@@ -1,11 +1,11 @@
 //=============================================================================================================
 /**
-* @file     filterwindow.h
+* @file     selectionmanagerwindow.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     August, 2014
+* @date     September, 2014
 *
 * @section  LICENSE
 *
@@ -30,21 +30,22 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the FilterWindow class.
+* @brief    Contains the declaration of the SelectionManagerWindow class.
 *
 */
 
-#ifndef FILTERWINDOW_H
-#define FILTERWINDOW_H
+#ifndef SELECTIONMANAGERWINDOW_H
+#define SELECTIONMANAGERWINDOW_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "ui_filterwindow.h"
 #include "mainwindow.h"
-#include "../Utils/filterplotscene.h"
+#include "ui_selectionmanagerwindow.h"
+#include "utils/layoutloader.h"         //MNE-CPP utils
+#include "../Utils/layoutscene.h"       //MNE Browse Raw QT utils
 
 
 //*************************************************************************************************************
@@ -52,10 +53,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QWidget>
-#include <QSettings>
-#include <QGraphicsScene>
-#include <QSvgGenerator>
+#include <QDockWidget>
 
 
 //*************************************************************************************************************
@@ -66,131 +64,124 @@
 namespace MNEBrowseRawQt
 {
 
+
 //*************************************************************************************************************
 //=============================================================================================================
 // DEFINE FORWARD DECLARATIONS
 //=============================================================================================================
 
+class LayoutScene;
 class MainWindow;
 
+
 /**
-* DECLARE CLASS FilterWindow
+* DECLARE CLASS SelectionManagerWindow
 *
-* @brief The FilterWindow class provides the filter window.
+* @brief The SelectionManagerWindow class provides a channel selection window.
 */
-class FilterWindow : public QWidget
+class SelectionManagerWindow : public QDockWidget
 {
     Q_OBJECT
 
 public:
     //=========================================================================================================
     /**
-    * Constructs a FilterWindow dialog which is a child of parent.
+    * Constructs a SelectionManagerWindow which is a child of parent.
     *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new FilterWindow becomes a window. If parent is another widget, FilterWindow becomes a child window inside parent. FilterWindow is deleted when its parent is deleted.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new SelectionManagerWindow becomes a window. If parent is another widget, SelectionManagerWindow becomes a child window inside parent. SelectionManagerWindow is deleted when its parent is deleted.
     */
-    FilterWindow(QWidget *parent = 0);
+    SelectionManagerWindow(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the FilterWindow.
-    * All FilterWindow's children are deleted first. The application exits if FilterWindow is the main widget.
+    * Destroys the SelectionManagerWindow.
+    * All SelectionManagerWindow's children are deleted first. The application exits if SelectionManagerWindow is the main widget.
     */
-    ~FilterWindow();
-
-    //=========================================================================================================
-    /**
-    * Initialises this window.
-    */
-    void init();
+    ~SelectionManagerWindow();
 
 private:
     //=========================================================================================================
     /**
-    * inits all spin boxes.
+    * Initialises all tabel widgets in the selection window.
+    *
     */
-    void initSpinBoxes();
+    void initListWidgets();
 
     //=========================================================================================================
     /**
-    * inits all buttons.
+    * Initialises all graphic views in the selection window.
+    *
     */
-    void initButtons();
+    void initGraphicsView();
 
     //=========================================================================================================
     /**
-    * inits the QComboBoxes.
+    * Initialises all combo boxes in the selection window.
+    *
     */
     void initComboBoxes();
 
     //=========================================================================================================
     /**
-    * inits the filter plot.
+    * Loads a new layout from given file path.
+    *
+    * @param [in] path holds file path
     */
-    void initFilterPlot();
+    bool loadLayout(QString path);
 
     //=========================================================================================================
     /**
-    * resizeEvent reimplemented virtual function to handle resize events of the filter window
+    * Loads a new selection from given file path.
+    *
+    * @param [in] path holds file path
     */
-    void resizeEvent(QResizeEvent * event);
+    bool loadSelectionGroups(QString path);
 
     //=========================================================================================================
     /**
-    * updates the filter plot scene with the newly generated filter
+    * Updates selection files table widget in this window.
+    *
     */
-    void updateFilterPlot();
-
-    Ui::FilterWindowWidget *ui;
-
-    MainWindow*         m_pMainWindow;
-
-    int                 m_iWindowSize;
-    int                 m_iFilterTaps;
-
-    QSettings           m_qSettings;
-
-    FilterPlotScene*    m_pFilterPlotScene;
-
-protected slots:
-    //=========================================================================================================
-    /**
-    * This function gets called whenever the combo box is altered by the user via the gui.
-    * @param currentIndex holds the current index of the combo box
-    */
-    void changeStateSpinBoxes(int currentIndex);
+    void updateSelectionFiles(QString text);
 
     //=========================================================================================================
     /**
-    * This function gets called whenever the filter parameters are altered by the user via the gui.
+    * Updates selection group widget in this window.
+    *
     */
-    void filterParametersChanged();
+    void updateSelectionGroups(QListWidgetItem *item);
 
     //=========================================================================================================
     /**
-    * This function applies the user defined filter to all channels.
+    * Updates the scene regarding the selecting channel QList.
+    *
     */
-    void applyFilterToAll();
+    void updateSceneItems();
 
     //=========================================================================================================
     /**
-    * This function undoes the user defined filter to all channels.
+    * Updates user defined selections.
+    *
     */
-    void undoFilterToAll();
+    void updateUserDefinedChannels();
 
     //=========================================================================================================
     /**
-    * Saves an svg graphic of the scene if wanted by the user.
+    * Updates data view.
+    *
     */
-    void exportFilterPlot();
+    void updateDataView();
 
-    //=========================================================================================================
-    /**
-    * This function exports the filter coefficients to a txt file.
-    */
-    void exportFilterCoefficients();
+    Ui::SelectionManagerWindow*     ui;
+
+    QMap<QString,QVector<double>>   m_layoutMap;
+    QMap<QString,QStringList>       m_selectionGroupsMap;
+
+    MainWindow*                     m_pMainWindow;
+
+    LayoutScene*                    m_pLayoutScene;
 };
 
 } // NAMESPACE MNEBrowseRawQt
 
-#endif // FILTERWINDOW_H
+#endif // SELECTIONMANAGERWINDOW_H

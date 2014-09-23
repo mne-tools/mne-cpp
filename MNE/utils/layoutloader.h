@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
-* @file     asaelc.h
+* @file     layoutloader.h
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     November, 2013
+* @date     September, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,12 +30,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    AsAElc class declaration.
+* @brief    LayoutLoader class declaration.
 *
 */
 
-#ifndef ASAELC_H
-#define ASAELC_H
+#ifndef LAYOUTLOADER_H
+#define LAYOUTLOADER_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -91,32 +91,41 @@ using namespace Eigen;
 
 //=============================================================================================================
 /**
-* Processes AsA .elc files which contain the electrode positions of a EEG hat.
+* Processes layout files (AsA .elc, MNE .lout) files which contain the electrode positions of a EEG/MEG hat.
 *
 * @brief Processes AsA .elc files which contain the electrode positions of a EEG hat.
 */
-class UTILSSHARED_EXPORT AsAElc
+class UTILSSHARED_EXPORT LayoutLoader
 {
 public:
-    typedef QSharedPointer<AsAElc> SPtr;            /**< Shared pointer type for AsAElc. */
-    typedef QSharedPointer<const AsAElc> ConstSPtr; /**< Const shared pointer type for AsAElc. */
+    typedef QSharedPointer<LayoutLoader> SPtr;            /**< Shared pointer type for LayoutLoader. */
+    typedef QSharedPointer<const LayoutLoader> ConstSPtr; /**< Const shared pointer type for LayoutLoader. */
 
     //=========================================================================================================
     /**
     * Constructs a Filter object.
     */
-    AsAElc();
-
+    LayoutLoader();
 
     //=========================================================================================================
     /**
-    * Gets the impulse response of a static precalculated (matlab) filter.
+    * Reads the specified ANT elc-layout file.
     * @param [in] path holds the file path of the elc file which is to be read.
     * @param [in] location3D holds the vector to which the read 3D positions are stored.
     * @param [in] location2D holds the vector to which the read 2D positions are stored.
     * @param [out] bool returns true if reading was successful, false otherwise.
     */
-    bool readElcFile(QString path, QStringList &channelNames, QVector<QVector<double> > &location3D, QVector<QVector<double> > &location2D, QString &unit);
+    bool readAsaElcFile(QString path, QStringList &channelNames, QVector<QVector<double> > &location3D, QVector<QVector<double> > &location2D, QString &unit);
+
+
+    //=========================================================================================================
+    /**
+    * Reads the specified MNE .lout file.
+    * @param [in] path holds the file path of the lout file which is to be read.
+    * @param [in] channel data holds the x,y and channel number for every channel. The map keys are the channel names (i.e. 'MEG 0113').
+    * @param [out] bool returns true if reading was successful, false otherwise.
+    */
+    bool readMNELoutFile(QString path, QMap<QString, QVector<double> > &channelData);
 
 private:
 
@@ -124,4 +133,4 @@ private:
 
 } // NAMESPACE
 
-#endif // ASAELC_H
+#endif // LAYOUTLOADER_H

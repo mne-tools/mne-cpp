@@ -1,11 +1,11 @@
 //=============================================================================================================
 /**
-* @file     filterwindow.h
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
+* @file     channelsceneitem.h
+* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     August, 2014
+* @date     September, 2014
 *
 * @section  LICENSE
 *
@@ -30,21 +30,19 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the FilterWindow class.
+* @brief    Contains the declaration of the ChannelSceneItem class.
 *
 */
 
-#ifndef FILTERWINDOW_H
-#define FILTERWINDOW_H
+#ifndef ChannelSceneItem_H
+#define ChannelSceneItem_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "ui_filterwindow.h"
-#include "mainwindow.h"
-#include "../Utils/filterplotscene.h"
+#include <iostream>
 
 
 //*************************************************************************************************************
@@ -52,10 +50,12 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QWidget>
-#include <QSettings>
-#include <QGraphicsScene>
-#include <QSvgGenerator>
+#include <QGraphicsItem>
+#include <QString>
+#include <QColor>
+#include <QPainter>
+#include <QStaticText>
+#include <QDebug>
 
 
 //*************************************************************************************************************
@@ -66,131 +66,75 @@
 namespace MNEBrowseRawQt
 {
 
+
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE FORWARD DECLARATIONS
+// USED NAMESPACES
 //=============================================================================================================
 
-class MainWindow;
 
+//=============================================================================================================
 /**
-* DECLARE CLASS FilterWindow
+* ChannelSceneItem...
 *
-* @brief The FilterWindow class provides the filter window.
+* @brief The ChannelSceneItem class provides a new data structure for impedance values.
 */
-class FilterWindow : public QWidget
+class ChannelSceneItem : public QGraphicsItem
 {
-    Q_OBJECT
 
 public:
     //=========================================================================================================
     /**
-    * Constructs a FilterWindow dialog which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new FilterWindow becomes a window. If parent is another widget, FilterWindow becomes a child window inside parent. FilterWindow is deleted when its parent is deleted.
+    * Constructs a ChannelSceneItem.
     */
-    FilterWindow(QWidget *parent = 0);
+    ChannelSceneItem(QString electrodeName, QPointF electrodePosition, QColor electrodeColor = Qt::blue);
 
     //=========================================================================================================
     /**
-    * Destroys the FilterWindow.
-    * All FilterWindow's children are deleted first. The application exits if FilterWindow is the main widget.
+    * Sets the color of the electrode item.
     */
-    ~FilterWindow();
+    void setColor(QColor electrodeColor);
 
     //=========================================================================================================
     /**
-    * Initialises this window.
+    * Returns the bounding rect of the electrode item. This rect describes the area which the item uses to plot in.
     */
-    void init();
+    QRectF boundingRect() const;
+
+    //=========================================================================================================
+    /**
+    * Reimplemented paint function.
+    */
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+
+    //=========================================================================================================
+    /**
+    * Returns the electrode name.
+    */
+    QString getElectrodeName();
+
+    //=========================================================================================================
+    /**
+    * Updates the electrodes position.
+    */
+    void setPosition(QPointF newPosition);
+
+    //=========================================================================================================
+    /**
+    * Updates the electrodes position.
+    */
+    QPointF getPosition();
 
 private:
-    //=========================================================================================================
-    /**
-    * inits all spin boxes.
-    */
-    void initSpinBoxes();
+    void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
+    void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
 
-    //=========================================================================================================
-    /**
-    * inits all buttons.
-    */
-    void initButtons();
-
-    //=========================================================================================================
-    /**
-    * inits the QComboBoxes.
-    */
-    void initComboBoxes();
-
-    //=========================================================================================================
-    /**
-    * inits the filter plot.
-    */
-    void initFilterPlot();
-
-    //=========================================================================================================
-    /**
-    * resizeEvent reimplemented virtual function to handle resize events of the filter window
-    */
-    void resizeEvent(QResizeEvent * event);
-
-    //=========================================================================================================
-    /**
-    * updates the filter plot scene with the newly generated filter
-    */
-    void updateFilterPlot();
-
-    Ui::FilterWindowWidget *ui;
-
-    MainWindow*         m_pMainWindow;
-
-    int                 m_iWindowSize;
-    int                 m_iFilterTaps;
-
-    QSettings           m_qSettings;
-
-    FilterPlotScene*    m_pFilterPlotScene;
-
-protected slots:
-    //=========================================================================================================
-    /**
-    * This function gets called whenever the combo box is altered by the user via the gui.
-    * @param currentIndex holds the current index of the combo box
-    */
-    void changeStateSpinBoxes(int currentIndex);
-
-    //=========================================================================================================
-    /**
-    * This function gets called whenever the filter parameters are altered by the user via the gui.
-    */
-    void filterParametersChanged();
-
-    //=========================================================================================================
-    /**
-    * This function applies the user defined filter to all channels.
-    */
-    void applyFilterToAll();
-
-    //=========================================================================================================
-    /**
-    * This function undoes the user defined filter to all channels.
-    */
-    void undoFilterToAll();
-
-    //=========================================================================================================
-    /**
-    * Saves an svg graphic of the scene if wanted by the user.
-    */
-    void exportFilterPlot();
-
-    //=========================================================================================================
-    /**
-    * This function exports the filter coefficients to a txt file.
-    */
-    void exportFilterCoefficients();
+    QString     m_sElectrodeName;           /**< Holds the electrode name.*/
+    QPointF     m_qpElectrodePosition;      /**< Holds the electrode 2D position in the scene.*/
+    QColor      m_cElectrodeColor;          /**< Holds the current electrode color.*/
+    bool        m_bHighlight;               /**< Highlight item flag.*/
 };
 
 } // NAMESPACE MNEBrowseRawQt
 
-#endif // FILTERWINDOW_H
+#endif // ChannelSceneItem_H

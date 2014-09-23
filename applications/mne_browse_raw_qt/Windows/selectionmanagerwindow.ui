@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>SelectionManagerWindow</class>
+ <widget class="QDockWidget" name="SelectionManagerWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>541</width>
+    <height>354</height>
+   </rect>
+  </property>
+  <property name="allowedAreas">
+   <set>Qt::AllDockWidgetAreas</set>
+  </property>
+  <property name="windowTitle">
+   <string>Channel Selection Manager</string>
+  </property>
+  <widget class="QWidget" name="dockWidgetContents">
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="13" column="6">
+     <widget class="QPushButton" name="pushButton_changeSelection">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="text">
+       <string>Load selection</string>
+      </property>
+     </widget>
+    </item>
+    <item row="12" column="5" colspan="2">
+     <widget class="QComboBox" name="m_comboBox_layoutFile">
+      <item>
+       <property name="text">
+        <string>Vectorview-all.lout</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Vectorview-grad.lout</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Vectorview-mag.lout</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>CTF-275.lout</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>magnesWH3600.lout</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+    <item row="11" column="5">
+     <widget class="QLabel" name="label_4">
+      <property name="text">
+       <string>Layout:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="13" column="5">
+     <widget class="QPushButton" name="m_pushButton_saveSelection">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="text">
+       <string>Save selection</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="2">
+     <widget class="QLabel" name="label_5">
+      <property name="text">
+       <string>User defined:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="3" column="2" rowspan="11">
+     <widget class="QListWidget" name="m_listWidget_userDefined">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>100</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>100</width>
+        <height>16777215</height>
+       </size>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="2" colspan="2">
+     <widget class="QListWidget" name="m_listWidget_visibleChannels">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>100</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>100</width>
+        <height>16777215</height>
+       </size>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="2">
+     <widget class="QLabel" name="label">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="text">
+       <string>Visible channels:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="1" rowspan="14">
+     <widget class="Line" name="line">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="0" rowspan="14">
+     <widget class="QGraphicsView" name="m_graphicsView_layoutPlot">
+      <property name="dragMode">
+       <enum>QGraphicsView::RubberBandDrag</enum>
+      </property>
+      <property name="transformationAnchor">
+       <enum>QGraphicsView::AnchorUnderMouse</enum>
+      </property>
+      <property name="resizeAnchor">
+       <enum>QGraphicsView::AnchorViewCenter</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="5">
+     <widget class="QLabel" name="label_2">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="text">
+       <string>Selection groups:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="9" column="5">
+     <widget class="QLabel" name="label_3">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="text">
+       <string>Acquisition system:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="5" rowspan="8" colspan="2">
+     <widget class="QListWidget" name="m_listWidget_selectionGroups">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Fixed" vsizetype="Expanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="minimumSize">
+       <size>
+        <width>220</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>220</width>
+        <height>16777215</height>
+       </size>
+      </property>
+     </widget>
+    </item>
+    <item row="10" column="5" colspan="2">
+     <widget class="QComboBox" name="m_comboBox_selectionFiles">
+      <item>
+       <property name="text">
+        <string>mne_browse_raw_vv.sel</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>mne_browse_raw_vv_new.sel</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>mne_browse_raw_CTF_275.sel</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>mne_browse_raw_Magnes_3600WH.sel</string>
+       </property>
+      </item>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
