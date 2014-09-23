@@ -99,7 +99,7 @@ enum AtomType{GABORATOM, CHIRPATOM, FORMULAATOM};
 *
 * @brief basic core parameters of atoms
 */
-class UTILSSHARED_EXPORT Atom// : public QObject // Atom class to build and call atoms or their parameters
+class UTILSSHARED_EXPORT Atom// Atom class to build and call atoms or their parameters
 {
     // Q_OBJECT
 public:
@@ -142,7 +142,7 @@ public:
     //=========================================================================================================
     QString atom_formula;
     QString display_text;
-    QList<VectorXd> vector_list;//use for communication with gui to paint results...
+    VectorXd atom_samples;
 
     qint32 id;
     QString dict_source;

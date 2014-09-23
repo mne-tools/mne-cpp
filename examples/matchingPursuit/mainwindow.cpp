@@ -105,6 +105,7 @@ Formulaeditor *_formula_editor;
 EditorWindow *_editor_window;
 Enhancededitorwindow *_enhanced_editor_window;
 settingwindow *_setting_window;
+TreebasedDictWindow *_treebased_dict_window;
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -164,6 +165,7 @@ MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::
     ui->tbv_Results->setColumnWidth(4,40);
 
     is_saved = true;
+    is_calulating = false;
     _new_paint = true;
     _sample_rate = 1;
     _counter_timer = new QTimer();
@@ -193,18 +195,6 @@ MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::
     last_open_path = settings.value("last_open_path", QDir::homePath()+ "/" + "Matching-Pursuit-Toolbox").toString();
     last_save_path = settings.value("last_save_path", QDir::homePath()+ "/" + "Matching-Pursuit-Toolbox").toString();
 
-
-    /*
-    // set black background
-    pal.setColor(QPalette::BrightText, Qt::black);
-    pal.setColor(QPalette::Window, Qt::black);
-    pal.setColor(QPalette::Text, Qt::black);
-    pal.setColor(QPalette::HighlightedText, Qt::white);
-    ui->progressBarCalc->setAutoFillBackground(true);
-    ui->progressBarCalc->setPalette(pal);
-    //ui->progressBarCalc->show();
-    */
-
     if(!settings.value("show_infos", true).toBool())
     {
         ui->lb_info_content->setHidden(true);
@@ -216,7 +206,25 @@ MainWindow::MainWindow(QWidget *parent) :    QMainWindow(parent),    ui(new Ui::
 
 MainWindow::~MainWindow()
 {    
+    if(_editor_window != NULL)
+        delete _editor_window;
+    if(_enhanced_editor_window != NULL)
+        delete _enhanced_editor_window;
+    if(_setting_window != NULL)
+        delete _setting_window;
+    if(_formula_editor != NULL)
+        delete _formula_editor;
+    if(_treebased_dict_window != NULL)
+        delete _treebased_dict_window;
+
+    delete callAtomSumWindow;
+    delete callGraphWindow;
+    delete callResidumWindow;
+    delete callXAxisWindow;
+
+    delete this->cb_model;
     delete ui;
+
 }
 
 //*************************************************************************************************************************************
@@ -243,6 +251,17 @@ void MainWindow::closeEvent(QCloseEvent * event)
         }
     }
 
+    if(is_calulating)
+    {
+        if(QMessageBox::question(this, "warning", "Calculation is still in progress. Are you sure you want to quit?") == QMessageBox::Yes)
+           event->accept();
+        else
+        {
+            event->ignore();
+            return;
+        }
+    }
+
     QSettings settings;
     if(settings.value("show_warnings",true).toBool() && !is_saved)
     {
@@ -259,6 +278,12 @@ void MainWindow::closeEvent(QCloseEvent * event)
         }
         msg_box->close();
     }
+
+    /*
+    if(mp_Thread != NULL)
+        if(mp_Thread->isRunning())
+            emit mp_Thread->requestInterruption();
+    */
 
     if(!this->isMaximized())
     {
@@ -411,6 +436,7 @@ void MainWindow::cb_selection_changed(const QModelIndex& topLeft, const QModelIn
         return;
     }
 
+    ui->tbv_Results->clearContents();
     ui->tbv_Results->setRowCount(0);
     ui->actionSpeicher->setEnabled(false);
     ui->actionSpeicher_unter->setEnabled(false);
@@ -574,6 +600,7 @@ void MainWindow::read_fiff_file_new(QString file_name)
     _atom_sum_matrix = MatrixXd::Zero(_signal_matrix.rows(), _signal_matrix.cols()); //resize
     _residuum_matrix = MatrixXd::Zero(_signal_matrix.rows(), _signal_matrix.cols()); //resize
 
+    ui->tbv_Results->clearContents();
     ui->tbv_Results->setRowCount(0);
     ui->actionSpeicher->setEnabled(false);
     ui->actionSpeicher_unter->setEnabled(false);
@@ -673,7 +700,7 @@ bool MainWindow::read_matlab_file(QString fileName)
     else
         _to = _last_sample;
 
-    _signal_matrix = MatrixXd::Zero(_to - _from, 1);
+    _signal_matrix = MatrixXd::Zero(_to - _from + 1, 1);
 
     for(qint32 i = _from; i < _to; i++)
     {
@@ -716,6 +743,7 @@ void MainWindow::read_matlab_file_new()
     _atom_sum_matrix = MatrixXd::Zero(_signal_matrix.rows(), _signal_matrix.cols()); //resize
     _residuum_matrix = MatrixXd::Zero(_signal_matrix.rows(), _signal_matrix.cols()); //resize
 
+    ui->tbv_Results->clearContents();
     ui->tbv_Results->setRowCount(0);
     ui->actionSpeicher->setEnabled(false);
     ui->actionSpeicher_unter->setEnabled(false);
@@ -779,6 +807,7 @@ void GraphWindow::paint_signal(MatrixXd signalMatrix, QSize windowSize)
         scaleYText = _signal_maximum / 10.0;
         if(_max_neg < 0)
             negScale = floor((_max_neg * 10 / _signal_maximum) + 0.5);
+        if(_max_pos <= 0) negScale = -10;
         _signal_negative_scale = negScale;  // to globe _signal_negative_scale
 
         // scale signal
@@ -1064,6 +1093,7 @@ void MainWindow::on_btt_Calc_clicked()
         ui->dsb_from->setEnabled(false);
         ui->dsb_to->setEnabled(false);
         ui->sb_sample_count ->setEnabled(false);
+        ui->tbv_Results->clearContents();
         ui->tbv_Results->setRowCount(0);
         ui->cb_all_select->setHidden(false);
         ui->lb_timer->setHidden(false);
@@ -1117,12 +1147,12 @@ void MainWindow::on_btt_Calc_clicked()
 
             calc_adaptiv_mp(_signal_matrix, criterion);
         }        
+        is_calulating = true;
     }
     //cancel calculation thread
     else if(ui->btt_Calc->text() == "cancel")
     {
-        emit
-        mp_Thread->requestInterruption();
+        emit mp_Thread->requestInterruption();
         ui->btt_Calc->setText("wait...");
     }
 }
@@ -1252,8 +1282,8 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
 
         for(qint32 i = 0; i < _signal_matrix.cols(); i++)
         {
-            _residuum_matrix.col(i) -= temp_atom.max_scalar_list.at(i) * temp_atom.vector_list.first();
-            _atom_sum_matrix.col(i) += temp_atom.max_scalar_list.at(i) * temp_atom.vector_list.first();
+            _residuum_matrix.col(i) -= temp_atom.max_scalar_list.at(i) * temp_atom.atom_samples;
+            _atom_sum_matrix.col(i) += temp_atom.max_scalar_list.at(i) * temp_atom.atom_samples;
         }/*
         _residuum_matrix = residuum;
         _atom_sum_matrix = _signal_matrix - residuum;
@@ -1413,16 +1443,16 @@ void MainWindow::tbv_selection_changed(const QModelIndex& topLeft, const QModelI
             {
                 for(qint32 channels = 0; channels < _signal_matrix.cols(); channels++)
                 {
-                    _atom_sum_matrix.col(channels) += atom.max_scalar_list.at(channels) * atom.vector_list.first();
-                    _residuum_matrix.col(channels) -= atom.max_scalar_list.at(channels) * atom.vector_list.first();
+                    _atom_sum_matrix.col(channels) += atom.max_scalar_list.at(channels) * atom.atom_samples;
+                    _residuum_matrix.col(channels) -= atom.max_scalar_list.at(channels) * atom.atom_samples;
                 }
             }
             else
             {
                 for(qint32 channels = 0; channels < _signal_matrix.cols(); channels++)
                 {
-                    _atom_sum_matrix.col(channels) -= atom.max_scalar_list.at(channels) * atom.vector_list.first();
-                    _residuum_matrix.col(channels) += atom.max_scalar_list.at(channels) * atom.vector_list.first();
+                    _atom_sum_matrix.col(channels) -= atom.max_scalar_list.at(channels) * atom.atom_samples;
+                    _residuum_matrix.col(channels) += atom.max_scalar_list.at(channels) * atom.atom_samples;
                 }
             }
         }
@@ -1435,6 +1465,7 @@ void MainWindow::tbv_selection_changed(const QModelIndex& topLeft, const QModelI
 
 void MainWindow::calc_thread_finished()
 {
+    is_calulating = false;
     tbv_is_loading = true;
 
     if(_fix_dict_atom_list.isEmpty() && !_adaptive_atom_list.isEmpty())
@@ -1658,8 +1689,8 @@ void MainWindow::on_actionAtomformeleditor_triggered()
 // open treebase window
 void MainWindow::on_actionCreate_treebased_dictionary_triggered()
 {
-    TreebasedDictWindow *x = new TreebasedDictWindow();
-    x->show();
+    _treebased_dict_window = new TreebasedDictWindow();
+    _treebased_dict_window->show();
 }
 
 //*****************************************************************************************************************
@@ -2457,6 +2488,7 @@ void ResiduumWindow::mouseMoveEvent(QMouseEvent *event)
         qreal time = (qreal)_from / _sample_rate + (qreal)temp_pos / stretch_factor / _sample_rate;
         if(mapFromGlobal(QCursor::pos()).x() >= 55 && mapFromGlobal(QCursor::pos()).x() <= (this->width() - 15))
             this->setToolTip(QString("time: %1 sec").arg(time));
+
         setCursor(Qt::CrossCursor);
     }
 }
@@ -2466,9 +2498,11 @@ void ResiduumWindow::mouseMoveEvent(QMouseEvent *event)
 void GraphWindow::mousePressEvent(QMouseEvent *event)
 {
     Q_UNUSED(event);
-    _press_pos = mapFromGlobal(QCursor::pos()).x();
-    setCursor(Qt::ClosedHandCursor);
-
+    if(_to - _from != 0)
+    {
+        _press_pos = mapFromGlobal(QCursor::pos()).x();
+        setCursor(Qt::ClosedHandCursor);
+    }
 }
 
 //*****************************************************************************************************************
@@ -2477,40 +2511,36 @@ void GraphWindow::mouseReleaseEvent(QMouseEvent *event)
 {
     Q_UNUSED(event);
 
-    fiff_int_t release_pos = mapFromGlobal(QCursor::pos()).x();
-    qreal stretch_factor = qreal(this->width() - 55/*left_margin*/ - 15/*right_margin*/) / (qreal)(_samplecount);
-    //fiff_int_t sample_count = _to - _from + 1;
-
-    if(_press_pos > release_pos)
+    if(_to - _from != 0)
     {
+        fiff_int_t release_pos = mapFromGlobal(QCursor::pos()).x();
+        qreal stretch_factor = qreal(this->width() - 55/*left_margin*/ - 15/*right_margin*/) / (qreal)(_samplecount);
+        qint32 old_from = _from;
+        qint32 old_to = _to;
         _from += floor((_press_pos - release_pos) / stretch_factor);
-        if(_from + _samplecount < _last_sample)
-            _to = _from + _samplecount;
-        else
-        {
-            _to = _last_sample;
-            if(_to - _samplecount > _first_sample)
-                _from = _to - _samplecount;
-            else
-                _from = _first_sample;
-        }
-    }
-    else
-    {
-        if((qreal)(_press_pos - release_pos) / stretch_factor > _first_sample)
-            _from += floor((_press_pos - release_pos) / stretch_factor);
-        else
+        _to = _from + _samplecount - 1;
+        if(_from < _first_sample)
         {
             _from = _first_sample;
+             _to = _from + _samplecount - 1;
+            //_samplecount = _to - _from + 1;
         }
-        if(_from + _samplecount < _last_sample)
-            _to = _from + _samplecount;
-        else
-            _to = _last_sample;
-    }
-    setCursor(Qt::CrossCursor);
 
-    emit read_new();
+        if(_to > _last_sample)
+        {
+            _to = _last_sample;
+            _from = _to - _samplecount + 1;
+            //_samplecount = _to - _from + 1;
+        }
+
+        setCursor(Qt::CrossCursor);
+
+        // +/- 5 pixel dont read new if clicked by mistake
+        if(abs(_press_pos - release_pos) < 5 || old_from == _from || old_to == _to)
+            return;
+
+        emit read_new();
+    }
 
 }
 
@@ -2519,35 +2549,40 @@ void GraphWindow::mouseReleaseEvent(QMouseEvent *event)
 void GraphWindow::wheelEvent(QWheelEvent *event)
 {
 
-    _samplecount -= event->angleDelta().y();// / 10;
-
-    if(_samplecount  > 4096)
-        _samplecount = 4096;
-
-    if(_samplecount < 64)
-        _samplecount = 64;
-
-    qreal stretch_factor = qreal(this->width() - 55/*left_margin*/ - 15/*right_margin*/) / (qreal)(_to - _from);
-    qint32 temp_pos = mapFromGlobal(QCursor::pos()).x() - 55;
-    qint32 actual_sample = _from + floor((qreal)temp_pos / stretch_factor);
-    qint32 delta_from = (qreal)_samplecount * ((qreal)temp_pos / (qreal)(this->width() - 70));
-
-    _from = actual_sample - delta_from;
-
-    _to = _from + _samplecount;
-
-    if(_from < _first_sample)
+    if(_to - _from != 0)
     {
-        _from = _first_sample;
-        _samplecount = _to - _from + 1;
-    }
+        _samplecount -= event->angleDelta().y() / 1.875 *  _samplecount / 2048;
 
-    if(_to > _last_sample)
-    {
-        _to = _last_sample;
-        _samplecount = _to - _from + 1;
+        if(_samplecount  > 4096)
+            _samplecount = 4096;
+
+        if(_samplecount < 64)
+            _samplecount = 64;
+        if(_samplecount == _to - _from + 1)
+            return;
+
+        qreal stretch_factor = qreal(this->width() - 55/*left_margin*/ - 15/*right_margin*/) / (qreal)(_to - _from);
+        qint32 temp_pos = mapFromGlobal(QCursor::pos()).x() - 55;
+        qint32 actual_sample = _from + floor((qreal)temp_pos / stretch_factor);
+        qint32 delta_from = (qreal)_samplecount * ((qreal)temp_pos / (qreal)(this->width() - 70));
+
+        _from = actual_sample - delta_from;
+
+        _to = _from + _samplecount - 1;
+
+        if(_from < _first_sample)
+        {
+            _from = _first_sample;
+            _samplecount = _to - _from + 1;
+        }
+
+        if(_to > _last_sample)
+        {
+            _to = _last_sample;
+            _samplecount = _to - _from + 1;
+        }
+        emit read_new();
     }
-    emit read_new();
 }
 
 //*****************************************************************************************************************

@@ -566,6 +566,7 @@ private:
     bool was_partialchecked;
     bool read_fiff_changed;
     bool is_white;
+    bool is_calulating;
     fiff_int_t last_to;
     fiff_int_t last_from;
     qint32 last_sample_count;
@@ -593,11 +594,8 @@ private:
     ResiduumWindow *callResidumWindow;
     XAxisWindow *callXAxisWindow;
     QStandardItem* cb_item;
-    QStandardItem* tbv_item;
     QStandardItemModel* cb_model;
-    QStandardItemModel* tbv_model;
     std::vector<QStandardItem*> cb_items;
-    std::vector<QStandardItem*> tbv_items;
     RowVectorXi picks;
     FiffInfo pick_info;
     QPalette pal;

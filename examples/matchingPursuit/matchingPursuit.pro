@@ -40,7 +40,7 @@ TEMPLATE = app
 VERSION = $${MNE_CPP_VERSION}
 
 QT += gui
-QT += widgets
+QT += widgets  
 QT += network core widgets concurrent
 QT += xml
 
