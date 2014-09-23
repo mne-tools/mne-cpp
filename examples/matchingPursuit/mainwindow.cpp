@@ -2034,22 +2034,16 @@ void MainWindow::on_actionSpeicher_triggered()
 
     if(save_path.isEmpty())
     {
-
-
         save_path = QFileDialog::getSaveFileName(this, "Save file as...", last_save_path + "/" + save_name,"(*.fif)");
         if(save_path.isEmpty()) return;
-
     }
 
-
-    save_parameters();
     QStringList string_list = save_path.split('/');
     last_save_path = "";
     for(qint32 i = 0; i < string_list.length() - 1; i++)
         last_save_path += string_list.at(i) + '/';
 
     save_fif_file();
-
 }
 
 //*****************************************************************************************************************
@@ -2088,6 +2082,8 @@ void MainWindow::on_actionSpeicher_unter_triggered()
 
 void MainWindow::save_fif_file()
 {
+    save_parameters();
+
     SaveFifFile *save_Fif = new SaveFifFile();
     QThread *save_thread = new QThread();
 
