@@ -37,12 +37,12 @@ void settingwindow::set_values()
     ui->dsb_adaptive_expansion->setValue(settings.value("adaptive_expansion", 0.20).toDouble());
     ui->dsb_adaptive_contraction->setValue(settings.value("adaptive_contraction", 0.5).toDouble());
     ui->dsb_adaptive_fullcontraction->setValue(settings.value("adaptive_fullcontraction", 0.50).toDouble());
-
+    ui->sb_div_dict->setValue(settings.value("pdict_count", 8).toInt());
+    ui->cb_color_scheme->setChecked(settings.value("pastell_colors", false).toBool());
     ui->dsb_delta_energy->setValue(settings.value("delta_energy", 0.0005).toDouble());
-
-    ui->sl_boost->setValue(-1 * (settings.value("boost", 0).toInt()));
     ui->sl_boost_fixDict->setValue(-1 * (settings.value("boost_fixDict", 0).toInt()));
-
+    ui->sl_boost->setValue(-1 * (settings.value("boost", 0).toInt()));
+    ui->cb_phys_params->setChecked(settings.value("show_phys_params", false).toBool());
 
     if(settings.value("boost").toInt()== 0)
         ui->sl_boost->setToolTip("only 1 channel consulted");
@@ -82,6 +82,9 @@ void settingwindow::on_btt_close_clicked()
     settings.setValue("show_infos", ui->chb_show_infos->isChecked());
     settings.setValue("show_warnings", ui->chb_show_warnings->isChecked());
     settings.setValue("sort_results", ui->chb_sort_results->isChecked());
+    settings.setValue("pdict_count", ui->sb_div_dict->value());
+    settings.setValue("pastell_colors", ui->cb_color_scheme->isChecked());
+    settings.setValue("show_phys_params", ui->cb_phys_params->isChecked());
 
     emit change_info_label();
 

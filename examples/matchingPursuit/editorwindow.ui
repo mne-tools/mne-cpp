@@ -344,7 +344,7 @@
                  </sizepolicy>
                 </property>
                 <property name="toolTip">
-                 <string/>
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;img src=&quot;:/images/icons/gabor_fml.png&quot;/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                 </property>
                 <property name="text">
                  <string>Gabor</string>
@@ -363,7 +363,7 @@
                  </sizepolicy>
                 </property>
                 <property name="toolTip">
-                 <string/>
+                 <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;img src=&quot;:/images/icons/chirp_fml.png&quot;/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                 </property>
                 <property name="text">
                  <string>Chirp</string>
