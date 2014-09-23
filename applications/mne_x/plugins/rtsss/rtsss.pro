@@ -41,7 +41,7 @@ CONFIG += plugin
 
 DEFINES += RTSSS_LIBRARY
 
-QT += core widgets
+QT += core widgets concurrent
 
 TARGET = rtsss
 CONFIG(debug, debug|release) {

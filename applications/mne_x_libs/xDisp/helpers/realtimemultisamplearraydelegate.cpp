@@ -215,7 +215,7 @@ void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, 
             else if(unit == FIFF_UNIT_T)
             {
                 if(t_pModel->getCoil(index.row()) == FIFFV_COIL_BABY_MAG)
-                    fMaxValue = 1e-4f;
+                    fMaxValue = 1e-11f;
                 else
                     fMaxValue = 1e-11f;
 
