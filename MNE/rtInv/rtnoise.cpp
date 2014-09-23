@@ -69,17 +69,17 @@ using namespace FIFFLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RtNoise::RtNoise(qint32 p_iMaxSamples, FiffInfo::SPtr p_pFiffInfo, QObject *parent)
+RtNoise::RtNoise(qint32 p_iMaxSamples, FiffInfo::SPtr p_pFiffInfo, qint32 p_dataLen, QObject *parent)
 : QThread(parent)
 , m_iFFTlength(p_iMaxSamples)
 , m_pFiffInfo(p_pFiffInfo)
+, m_dataLength(p_dataLen)
 , m_bIsRunning(false)
 {
     qRegisterMetaType<Eigen::MatrixXd>("Eigen::MatrixXd");
     //qRegisterMetaType<QVector<double>>("QVector<double>");
 
     m_Fs = m_pFiffInfo->sfreq;
-    ReadDone = true;
 
     SendDataToBuffer = true;
 }
@@ -151,7 +151,8 @@ void RtNoise::run()
 
             if(FirstStart){
                 //init the circ buffer and parameters
-                NumOfBlocks = 60;
+                if(m_dataLength < 0) m_dataLength = 10;
+                NumOfBlocks = m_dataLength;//60;
                 BlockSize =  block.cols();
                 Sensors =  block.rows();
 

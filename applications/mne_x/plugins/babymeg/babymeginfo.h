@@ -97,6 +97,7 @@ public:
     QStringList lm_ch_pos12;
     QStringList lm_ch_coiltype;
     QStringList lm_ch_calicoef;
+    QStringList lm_ch_gain;
 
     //BB_QUEUE
     QQueue<QByteArray> g_queue;
@@ -160,21 +161,21 @@ public:
     * @param[in] DATA - QByteArray contains MEG data.
     */
     void MGH_LM_Send_CMDPackage(QByteArray DATA);
-    //=========================================================================================================
-    /**
-    * Put data block into a queue
-    *
-    * @param[in] DataIn - Input Data Block (QByteArray).
-    */
-    void EnQueue(QByteArray DataIn);
-    //=========================================================================================================
-    /**
-    * Get data block from a queue
-    *
-    * @param[in] void
-    * @param[out] Output Data Block (QByteArray)
-    */
-    QByteArray DeQueue();
+//    //=========================================================================================================
+//    /**
+//    * Put data block into a queue
+//    *
+//    * @param[in] DataIn - Input Data Block (QByteArray).
+//    */
+//    void EnQueue(QByteArray DataIn);
+//    //=========================================================================================================
+//    /**
+//    * Get data block from a queue
+//    *
+//    * @param[in] void
+//    * @param[out] Output Data Block (QByteArray)
+//    */
+//    QByteArray DeQueue();
 
 
 private:
