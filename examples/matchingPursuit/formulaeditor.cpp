@@ -98,7 +98,6 @@ Formulaeditor::Formulaeditor(QWidget *parent) :    QWidget(parent),    ui(new Ui
     resize(settings.value("size_formula_editor", QSize(555, 418)).toSize());
 
     callAtomPaintWindow = new AtomPaintWindow();
-    //callAtomPaintWindow->setBaseSize(510,200);
     ui->l_PaintAtom->addWidget(callAtomPaintWindow);
 
     atomList.clear();
