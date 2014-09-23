@@ -1,16 +1,15 @@
 //=============================================================================================================
 /**
-* @file     main.cpp
-* @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
+* @file     ChannelSceneItem.cpp
+* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
-*           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
 * @version  1.0
-* @date     January, 2014
+* @date     June, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Florian Schlembach, Christoph Dinh, Matti Hamalainen and Jens Haueisen. All rights reserved.
+* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -31,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implements the mne_browse_raw_qt GUI application.
+* @brief    Contains the implementation of the ChannelSceneItem class.
 *
 */
 
@@ -40,21 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include <stdio.h>
-#include "Windows/mainwindow.h"
-#include "Utils/info.h"
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// Qt INCLUDES
-//=============================================================================================================
-
-#include <QtGui>
-#include <QApplication>
-#include <QDateTime>
-#include <QSplashScreen>
-#include <QThread>
+#include "channelsceneitem.h"
 
 
 //*************************************************************************************************************
@@ -63,70 +48,112 @@
 //=============================================================================================================
 
 using namespace MNEBrowseRawQt;
+using namespace std;
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// FORWARD DECLARATIONS
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
-MainWindow* mainWindow = NULL;
+ChannelSceneItem::ChannelSceneItem(QString electrodeName, QPointF electrodePosition, QColor electrodeColor)
+: m_sElectrodeName(electrodeName)
+, m_qpElectrodePosition(electrodePosition)
+, m_cElectrodeColor(electrodeColor)
+, m_bHighlight(false)
+{
+    this->setAcceptHoverEvents(true);
+    this->setFlag(QGraphicsItem::ItemIsSelectable, true);
+}
+
+//*************************************************************************************************************
+
+QRectF ChannelSceneItem::boundingRect() const
+{
+    return QRectF(-25, -35, 50, 70);
+}
+
+//*************************************************************************************************************
+
+void ChannelSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+{
+    Q_UNUSED(option);
+    Q_UNUSED(widget);
+
+    // Plot shadow
+    painter->setPen(Qt::NoPen);
+    painter->setBrush(Qt::darkGray);
+    painter->drawEllipse(-12, -12, 30, 30);
+
+    // Plot colored circle
+    painter->setPen(QPen(Qt::black, 1));
+    if(this->isSelected())
+        painter->setBrush(QBrush(Qt::red));
+    else
+        painter->setBrush(QBrush(m_cElectrodeColor));
+    painter->drawEllipse(-15, -15, 30, 30);
+
+    // Plot electrode name
+    QStaticText staticElectrodeName = QStaticText(m_sElectrodeName);
+    QSizeF sizeText = staticElectrodeName.size();
+    painter->drawStaticText(-15+((30-sizeText.width())/2), -32, staticElectrodeName);
+
+    this->setPos(10*m_qpElectrodePosition.x(), -10*m_qpElectrodePosition.y());
+}
+
+//*************************************************************************************************************
+
+void ChannelSceneItem::setColor(QColor electrodeColor)
+{
+    m_cElectrodeColor = electrodeColor;
+}
+
+//*************************************************************************************************************
+
+QString ChannelSceneItem::getElectrodeName()
+{
+    return m_sElectrodeName;
+}
+
+//*************************************************************************************************************
+
+void ChannelSceneItem::setPosition(QPointF newPosition)
+{
+    m_qpElectrodePosition = newPosition;
+}
+
+//*************************************************************************************************************
+
+QPointF ChannelSceneItem::getPosition()
+{
+    return m_qpElectrodePosition;
+}
 
 
 //*************************************************************************************************************
 
-void customMessageHandler(QtMsgType type, const QMessageLogContext &context, const QString &msg)
+void ChannelSceneItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
-    Q_UNUSED(context);
-
-    QString dt = QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm:ss");
-    QString txt = QString("[%1] ").arg(dt);
-
-    if(mainWindow) {
-        switch (type) {
-        case QtDebugMsg:
-           txt += QString("{Debug} \t\t %1").arg(msg);
-           mainWindow->writeToLog(txt,_LogKndMessage, _LogLvMax);
-           break;
-        case QtWarningMsg:
-           txt += QString("{Warning} \t %1").arg(msg);
-           mainWindow->writeToLog(txt,_LogKndWarning, _LogLvNormal);
-           break;
-        case QtCriticalMsg:
-           txt += QString("{Critical} \t %1").arg(msg);
-           mainWindow->writeToLog(txt,_LogKndError, _LogLvMin);
-           break;
-        case QtFatalMsg:
-           txt += QString("{Fatal} \t\t %1").arg(msg);
-           mainWindow->writeToLog(txt,_LogKndError, _LogLvMin);
-           abort();
-           break;
-        }
-    }
+    m_bHighlight = true;
+    this->update();
 }
 
 
-//=============================================================================================================
-// MAIN
-int main(int argc, char *argv[])
+//*************************************************************************************************************
+
+void ChannelSceneItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 {
-    qInstallMessageHandler(customMessageHandler);
-    QApplication a(argc, argv);
-
-    //set application settings
-    QCoreApplication::setOrganizationName(CInfo::OrganizationName());
-    QCoreApplication::setApplicationName(CInfo::AppNameShort());
-
-    //show splash screen for 1 second
-    QPixmap pixmap(":/Resources/Images/splashscreen_mne_browse_raw_qt.png");
-    QSplashScreen splash(pixmap);
-    splash.show();
-    QThread::sleep(1);
-
-    mainWindow = new MainWindow();
-    mainWindow->show();
-
-    splash.finish(mainWindow);
-
-    return a.exec();
+    m_bHighlight = false;
+    this->update();
 }
+
+
+
+
+
+
+
+
+
+
+
