@@ -628,10 +628,14 @@ void MainWindow::fill_channel_combobox()
     this->cb_model->appendRow(this->cb_item);
     this->cb_items.push_back(this->cb_item);
 
+    QSettings settings;
+
     for(qint32 channels = 1; channels <= _signal_matrix.cols(); channels++)
     {
-        //_colors.append(QColor::fromHsv(qrand() % 256, 255, 190)); first version
-        _colors.append(QColor::fromRgb(qrand() / ((qreal)RAND_MAX + 300) * 255, qrand() / ((qreal)RAND_MAX + 300) * 255, qrand() / ((qreal)RAND_MAX + 300) * 255));
+        if(settings.value("pastell_colors", false).toBool())
+            _colors.append(QColor::fromHsv(qrand() % 256, 255, 190));
+        else
+            _colors.append(QColor::fromRgb(qrand() / ((qreal)RAND_MAX + 300) * 255, qrand() / ((qreal)RAND_MAX + 300) * 255, qrand() / ((qreal)RAND_MAX + 300) * 255));
         //channel item
         this->cb_item = new QStandardItem;
         this->cb_item->setText(pick_info.ch_names.at(channels - 1));
@@ -1239,19 +1243,21 @@ void MainWindow::recieve_result(qint32 current_iteration, qint32 max_iterations,
     }
     else if(adaptive_atom_res_list.isEmpty())
     {
+        FixDictAtom temp_atom = fix_dict_atom_res_list.last();
+        fix_dict_atom_res_list.last().display_text = create_display_text(fix_dict_atom_res_list.last());
+        temp_atom.display_text =  create_display_text(fix_dict_atom_res_list.last());
+
         QFont font;
         QFontMetrics fm(font);
         qint32 header_width = fm.width(fix_dict_atom_res_list.last().display_text) + 35;
         if(header_width > max_tbv_header_width)
         {
             ui->tbv_Results->setColumnWidth(1, header_width);
-            max_tbv_header_width = header_width;          
+            max_tbv_header_width = header_width;
         }
 
-        FixDictAtom temp_atom = fix_dict_atom_res_list.last();
-
         QTableWidgetItem* atom_energie_item = new QTableWidgetItem(QString::number(100 * temp_atom.energy / max_energy, 'f', 2));
-        QTableWidgetItem* atom_name_item = new QTableWidgetItem(fix_dict_atom_res_list.last().display_text);
+        QTableWidgetItem* atom_name_item = new QTableWidgetItem(temp_atom.display_text);
 
         atom_energie_item->setFlags(Qt::ItemIsUserCheckable);
         atom_name_item->setFlags(Qt::NoItemFlags);
@@ -1626,6 +1632,91 @@ void MainWindow::calc_fix_mp(QString path, MatrixXd signal, TruncationCriterion 
     }
 }
 
+//*************************************************************************************************************
+
+QString MainWindow::create_display_text(FixDictAtom global_best_matching)
+{
+    QSettings settings;
+    QString display_text;
+
+    if(!settings.value("show_phys_params", false).toBool())
+    {
+        if(global_best_matching.type == AtomType::GABORATOM)
+        {
+            display_text = QString("Gaboratom: scale: %0, translation: %1, modulation: %2, phase: %3")
+                    .arg(QString::number(global_best_matching.gabor_atom.scale, 'f', 2))
+                    .arg(QString::number(global_best_matching.translation, 'f', 2))
+                    .arg(QString::number(global_best_matching.gabor_atom.modulation, 'f', 2))
+                    .arg(QString::number(global_best_matching.gabor_atom.phase, 'f', 2));
+        }
+        else if(global_best_matching.type == AtomType::CHIRPATOM)
+        {
+            display_text = QString("Chripatom: scale: %0, translation: %1, modulation: %2, phase: %3, chirp: %4")
+                    .arg(QString::number(global_best_matching.chirp_atom.scale, 'f', 2))
+                    .arg(QString::number(global_best_matching.translation, 'f', 2))
+                    .arg(QString::number(global_best_matching.chirp_atom.modulation, 'f', 2))
+                    .arg(QString::number(global_best_matching.chirp_atom.phase, 'f', 2))
+                    .arg(QString::number(global_best_matching.chirp_atom.chirp, 'f', 2));
+        }
+        else if(global_best_matching.type == AtomType::FORMULAATOM)
+        {
+            display_text = QString("%0:  transl: %1 a: %2, b: %3 c: %4, d: %5, e: %6, f: %7, g: %8, h: %9")
+                    .arg(global_best_matching.atom_formula)
+                    .arg(QString::number(global_best_matching.translation,    'f', 2))
+                    .arg(QString::number(global_best_matching.formula_atom.a, 'f', 2))
+                    .arg(QString::number(global_best_matching.formula_atom.b, 'f', 2))
+                    .arg(QString::number(global_best_matching.formula_atom.c, 'f', 2))
+                    .arg(QString::number(global_best_matching.formula_atom.d, 'f', 2))
+                    .arg(QString::number(global_best_matching.formula_atom.e, 'f', 2))
+                    .arg(QString::number(global_best_matching.formula_atom.f, 'f', 2))
+                    .arg(QString::number(global_best_matching.formula_atom.g, 'f', 2))
+                    .arg(QString::number(global_best_matching.formula_atom.h, 'f', 2));
+        }
+    }
+    else
+    {
+        if(global_best_matching.type == AtomType::GABORATOM)
+        {
+            qreal phase = global_best_matching.gabor_atom.phase;
+            if(global_best_matching.gabor_atom.phase > 2*PI) phase -= 2*PI;
+
+            display_text = QString("Gaboratom: scale: %0 sec, translation: %1 sec, modulation: %2 Hz, phase: %3 rad")
+                    .arg(QString::number(global_best_matching.gabor_atom.scale / _sample_rate, 'f', 2))
+                    .arg(QString::number(global_best_matching.translation / qreal(_sample_rate) + _from  / _sample_rate, 'f', 2))
+                    .arg(QString::number(global_best_matching.gabor_atom.modulation * _sample_rate / global_best_matching.sample_count, 'f', 2))
+                    .arg(QString::number(phase, 'f', 2));
+        }
+        else if(global_best_matching.type == AtomType::CHIRPATOM)
+        {
+            qreal phase = global_best_matching.chirp_atom.phase;
+            if(global_best_matching.chirp_atom.phase > 2*PI) phase -= 2*PI;
+
+            display_text = QString("Chripatom: scale: %0 sec, translation: %1 sec, modulation: %2 Hz, phase: %3 rad, chirp: %4")
+                    .arg(QString::number(global_best_matching.chirp_atom.scale  / _sample_rate, 'f', 2))
+                    .arg(QString::number(global_best_matching.translation / qreal(_sample_rate) + _from  / _sample_rate, 'f', 2))
+                    .arg(QString::number(global_best_matching.chirp_atom.modulation * _sample_rate / global_best_matching.sample_count, 'f', 2))
+                    .arg(QString::number(phase, 'f', 2))
+                    .arg(QString::number(global_best_matching.chirp_atom.chirp, 'f', 2));
+        }
+        else if(global_best_matching.type == AtomType::FORMULAATOM)
+        {
+            display_text = QString("%0:  transl: %1 a: %2, b: %3 c: %4, d: %5, e: %6, f: %7, g: %8, h: %9")
+                    .arg(global_best_matching.atom_formula)
+                    .arg(QString::number(global_best_matching.translation,    'f', 2))
+                    .arg(QString::number(global_best_matching.formula_atom.a, 'f', 2))
+                    .arg(QString::number(global_best_matching.formula_atom.b, 'f', 2))
+                    .arg(QString::number(global_best_matching.formula_atom.c, 'f', 2))
+                    .arg(QString::number(global_best_matching.formula_atom.d, 'f', 2))
+                    .arg(QString::number(global_best_matching.formula_atom.e, 'f', 2))
+                    .arg(QString::number(global_best_matching.formula_atom.f, 'f', 2))
+                    .arg(QString::number(global_best_matching.formula_atom.g, 'f', 2))
+                    .arg(QString::number(global_best_matching.formula_atom.h, 'f', 2));
+        }
+    }
+
+    return display_text;
+}
+
 //*****************************************************************************************************************
 
 // Opens Dictionaryeditor
@@ -1943,22 +2034,16 @@ void MainWindow::on_actionSpeicher_triggered()
 
     if(save_path.isEmpty())
     {
-
-
         save_path = QFileDialog::getSaveFileName(this, "Save file as...", last_save_path + "/" + save_name,"(*.fif)");
         if(save_path.isEmpty()) return;
-
     }
 
-
-    save_parameters();
     QStringList string_list = save_path.split('/');
     last_save_path = "";
     for(qint32 i = 0; i < string_list.length() - 1; i++)
         last_save_path += string_list.at(i) + '/';
 
     save_fif_file();
-
 }
 
 //*****************************************************************************************************************
@@ -1997,6 +2082,8 @@ void MainWindow::on_actionSpeicher_unter_triggered()
 
 void MainWindow::save_fif_file()
 {
+    save_parameters();
+
     SaveFifFile *save_Fif = new SaveFifFile();
     QThread *save_thread = new QThread();
 
@@ -2287,6 +2374,9 @@ void MainWindow::on_actionExport_triggered()
     for(qint32 i = 0; i < string_list.length() - 1; i++)
         last_save_path += string_list.at(i) + '/';
 
+    QSettings settings;
+    qint32 pdict_count = settings.value("pdict_count", 8).toInt();
+
     QFile xml_file(save_path);
     if(xml_file.open(QIODevice::WriteOnly))
     {
@@ -2297,11 +2387,11 @@ void MainWindow::on_actionExport_triggered()
         xmlWriter.writeStartElement("COUNT");
         xmlWriter.writeAttribute("of_atoms", QString::number(_adaptive_atom_list.length()));
 
-        qint32 div = floor(_adaptive_atom_list.length() / 8.0);
-        qint32 mod = _adaptive_atom_list.length() % 8;
+        qint32 div = floor(_adaptive_atom_list.length() / (qreal)pdict_count);
+        qint32 mod = _adaptive_atom_list.length() % pdict_count;
         if(div != 0)
         {
-            for(qint32 j = 0; j < 8; j++)
+            for(qint32 j = 0; j < pdict_count; j++)
             {
                 xmlWriter.writeStartElement("built_Atoms");
                 xmlWriter.writeAttribute("formula", "Gaboratom");
@@ -2347,7 +2437,7 @@ void MainWindow::on_actionExport_triggered()
 
             for(qint32 i = 0; i < mod; i++)
             {
-                GaborAtom gabor_atom = _adaptive_atom_list.at(i + 8 * div);
+                GaborAtom gabor_atom = _adaptive_atom_list.at(i + pdict_count * div);
                 QStringList result_list = gabor_atom.create_string_values(gabor_atom.sample_count, gabor_atom.scale, gabor_atom.sample_count / 2, gabor_atom.modulation, gabor_atom.phase);
 
                 xmlWriter.writeStartElement("ATOM");
@@ -2603,4 +2693,3 @@ void MainWindow::on_mouse_button_release()
     else
         read_matlab_file_new();
 }
-
