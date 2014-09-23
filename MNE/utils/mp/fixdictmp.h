@@ -195,11 +195,11 @@ public:
 
     //=========================================================================================================
 
-    static void create_tree_dict(QString save_path);
+    //static void create_tree_dict(QString save_path);
 
     //=========================================================================================================
 
-    qreal create_molecules(VectorXd compare_atom, qreal phase, qreal modulation, quint32 translation, qint32 sample_count, GaborAtom* gabor_Atom, qreal scale);
+    //qreal create_molecules(VectorXd compare_atom, qreal phase, qreal modulation, quint32 translation, qint32 sample_count, GaborAtom* gabor_Atom, qreal scale);
 
     //=========================================================================================================
 
@@ -230,13 +230,12 @@ public:
 
     //=========================================================================================================
 
-    static void build_molecule_xml_file(qint32 level_counter);
+    //static void build_molecule_xml_file(qint32 level_counter);
 
 
 public slots:
 
     void matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal epsilon, qint32 boost, QString path, qreal delta);
-
     void recieve_input(MatrixXd signal, qint32 max_iterations, qreal epsilon, qint32 boost, QString path, qreal delta);
 
     //=========================================================================================================
@@ -247,7 +246,6 @@ signals:
                         adaptive_atom_list adaptive_atom_list, fix_dict_atom_list fix_dict_atom_list);
 
     void finished_calc();
-
     void parse_in_thread();
     void send_warning(qint32 warning);
 

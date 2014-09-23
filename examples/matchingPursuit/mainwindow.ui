@@ -862,6 +862,9 @@ QProgressBar::background{
    <property name="text">
     <string>create treebased dictionary</string>
    </property>
+   <property name="visible">
+    <bool>false</bool>
+   </property>
   </action>
   <action name="actionSettings">
    <property name="icon">

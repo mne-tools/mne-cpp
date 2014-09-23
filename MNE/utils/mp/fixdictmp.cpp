@@ -135,10 +135,10 @@ void FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal e
         VectorXd fitted_atom = VectorXd::Zero(this->residuum.rows());
         VectorXd resized_atom = VectorXd::Zero(this->residuum.rows());
 
-        if(global_best_matching.vector_list.first().rows() > this->residuum.rows())
+        if(global_best_matching.atom_samples.rows() > this->residuum.rows())
             for(qint32 k = 0; k < this->residuum.rows(); k++)    
-                resized_atom[k] = global_best_matching.vector_list.first()[k + floor(global_best_matching.vector_list.first().rows() / 2) - floor(this->residuum.rows() / 2)];
-        else    resized_atom = global_best_matching.vector_list.first();
+                resized_atom[k] = global_best_matching.atom_samples[k + floor(global_best_matching.atom_samples.rows() / 2) - floor(this->residuum.rows() / 2)];
+        else    resized_atom = global_best_matching.atom_samples;
 
 
         for(qint32 k = 0; k < resized_atom.rows(); k++)
@@ -166,7 +166,7 @@ void FixDictMp::matching_pursuit(MatrixXd signal, qint32 max_iterations, qreal e
             }
         }
 
-        global_best_matching.vector_list.first() = fitted_atom;
+        global_best_matching.atom_samples = fitted_atom;
 
 
         last_energy = residuum_energy;
@@ -247,10 +247,10 @@ FixDictAtom FixDictMp::correlation(Dictionary current_pdict, MatrixXd current_re
 
         VectorXd resized_atom = VectorXd::Zero(current_resid.rows());
 
-        if(current_pdict.atoms.at(i).vector_list.first().rows() > current_resid.rows())
+        if(current_pdict.atoms.at(i).atom_samples.rows() > current_resid.rows())
             for(qint32 k = 0; k < current_resid.rows(); k++)
-                resized_atom[k] = current_pdict.atoms.at(i).vector_list.first()[k + floor(current_pdict.atoms.at(i).vector_list.first().rows() / 2) - floor(current_resid.rows() / 2)];
-        else resized_atom = current_pdict.atoms.at(i).vector_list.first();
+                resized_atom[k] = current_pdict.atoms.at(i).atom_samples[k + floor(current_pdict.atoms.at(i).atom_samples.rows() / 2) - floor(current_resid.rows() / 2)];
+        else resized_atom = current_pdict.atoms.at(i).atom_samples;
 
         if(resized_atom.rows() < current_resid.rows())
             for(qint32 k = 0; k < resized_atom.rows(); k++)
@@ -392,9 +392,9 @@ Dictionary FixDictMp::fill_dict(const QDomNode &pdict)
             {
                 QString sample_string = atom.firstChild().toElement().attribute("samples");
                 QStringList sample_list = sample_string.split(":",  QString::SkipEmptyParts);
-                current_atom.vector_list.append(VectorXd::Zero(sample_list.length()));
+                current_atom.atom_samples = VectorXd::Zero(sample_list.length());
                 for(qint32 i = 0; i < sample_list.length(); i++)
-                    current_atom.vector_list.first()[i] = sample_list.at(i).toDouble();
+                    current_atom.atom_samples[i] = sample_list.at(i).toDouble();
             }
             current_dict.atoms.append(current_atom);
             atom = atom.nextSiblingElement("ATOM");
@@ -418,9 +418,9 @@ Dictionary FixDictMp::fill_dict(const QDomNode &pdict)
             {
                 QString sample_string = atom.firstChild().toElement().attribute("samples");
                 QStringList sample_list = sample_string.split(":", QString::SkipEmptyParts);
-                current_atom.vector_list.append(VectorXd::Zero(sample_list.length()));
+                current_atom.atom_samples = VectorXd::Zero(sample_list.length());
                 for(qint32 i = 0; i < sample_list.length(); i++)
-                    current_atom.vector_list.first()[i] = sample_list.at(i).toDouble();
+                    current_atom.atom_samples[i] = sample_list.at(i).toDouble();
             }
             current_dict.atoms.append(current_atom);
             atom = atom.nextSiblingElement("ATOM");
@@ -448,9 +448,9 @@ Dictionary FixDictMp::fill_dict(const QDomNode &pdict)
             {
                 QString sample_string = atom.firstChild().toElement().attribute("samples");
                 QStringList sample_list = sample_string.split(":", QString::SkipEmptyParts);
-                current_atom.vector_list.append(VectorXd::Zero(sample_list.length()));
+                current_atom.atom_samples = VectorXd::Zero(sample_list.length());
                 for(qint32 i = 0; i < sample_list.length(); i++)
-                    current_atom.vector_list.first()[i] = sample_list.at(i).toDouble();
+                    current_atom.atom_samples[i] = sample_list.at(i).toDouble();
             }
             current_dict.atoms.append(current_atom);
             atom = atom.nextSiblingElement("ATOM");
@@ -516,6 +516,8 @@ void FixDictMp::recieve_input(MatrixXd signal, qint32 max_iterations, qreal epsi
 
 //*************************************************************************************************************
 
+
+/*
 void FixDictMp::create_tree_dict(QString save_path)
 {
     QFile file(save_path);
@@ -947,5 +949,5 @@ void FixDictMp::build_molecule_xml_file(qint32 level_counter)
 
         build_molecule_xml_file(level_counter);
     }
-
 }
+*/
