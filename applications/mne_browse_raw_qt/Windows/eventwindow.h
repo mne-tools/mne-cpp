@@ -44,8 +44,6 @@
 
 #include "mainwindow.h"
 #include "ui_eventwindowdock.h"
-#include "../Delegates/eventdelegate.h"
-#include "../Models/eventmodel.h"
 
 
 //*************************************************************************************************************
@@ -97,35 +95,17 @@ public:
 
     //=========================================================================================================
     /**
-    * Initialises this window.
+    * Setup the QtableView of the event window.
     */
-    void init();
+    void initEventViewSettings();
 
     //=========================================================================================================
     /**
     * Returns the QTableView of this window.
     */
-    QTableView* getEventTableView();
-
-    //=========================================================================================================
-    /**
-    * Returns the EventModel of this window
-    */
-    EventModel* getEventModel();
-
-    //=========================================================================================================
-    /**
-    * Returns the EventModel of this window
-    */
-    EventDelegate* getEventDelegate();
+    QTableView* getTableView();
 
 private:
-    //=========================================================================================================
-    /**
-    * Setup the model view controller of the event window.
-    */
-    void initMVCSettings();
-
     //=========================================================================================================
     /**
     * Inits all the QCheckBoxes of the event window.
@@ -140,25 +120,15 @@ private:
 
     //=========================================================================================================
     /**
-    * Updates the event filter type combo box whenever a new event file was loaded
-    */
-    void updateComboBox();
-
-    //=========================================================================================================
-    /**
     * event reimplemented virtual function to handle events of the event dock window
     */
     bool event(QEvent * event);
 
     Ui::EventWindowDockWidget *ui;
 
-    MainWindow*         m_pMainWindow;
+    MainWindow*     m_pMainWindow;
 
-    QSettings           m_qSettings;
-
-    EventDelegate*      m_pEventDelegate;           /**< the QAbstractDelegate being part of the event model/view framework of Qt */
-    EventModel*         m_pEventModel;              /**< the QAbstractTable event model being part of the model/view framework of Qt */
-
+    QSettings       m_qSettings;
 
 protected slots:
     //=========================================================================================================

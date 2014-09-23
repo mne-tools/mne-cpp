@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
-* @file     layoutscene.cpp
+* @file     asaelc.cpp
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     September, 2014
+* @date     November, 2013
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2013, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the LayoutScene class.
+* @brief    Implementation of the AsAElc class
 *
 */
 
@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "layoutscene.h"
+#include "asaelc.h"
 
 
 //*************************************************************************************************************
@@ -47,8 +47,7 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace MNEBrowseRawQt;
-using namespace std;
+using namespace UTILSLIB;
 
 
 //*************************************************************************************************************
@@ -56,112 +55,89 @@ using namespace std;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-LayoutScene::LayoutScene(QGraphicsView* view, QObject* parent, int sceneType)
-: QGraphicsScene(parent)
-, m_qvView(view)
-, m_iSceneType(sceneType)
+AsAElc::AsAElc()
 {
-
 }
 
 
 //*************************************************************************************************************
 
-void LayoutScene::setNewLayout(QMap<QString,QVector<double>> layoutMap)
+bool AsAElc::readElcFile(QString path, QStringList &channelNames, QVector<QVector<double> > &location3D, QVector<QVector<double> > &location2D, QString &unit)
 {
-    m_layoutMap = layoutMap;
+    //Open .elc file
+    if(!path.contains(".elc"))
+        return false;
 
-    //Redraw all items
-    repaintItems();
-}
+    QFile file(path);
+    file.open(QIODevice::ReadOnly | QIODevice::Text);
 
+    //Start reading from file
+    double numberElectrodes;
+    QTextStream in(&file);
+    bool read2D = false;
 
-//*************************************************************************************************************
+    while(!in.atEnd())
+    {
+        QString line = in.readLine();
 
-void LayoutScene::hideItems(QStringList list)
-{
-    QList<QGraphicsItem *> itemList = this->items();
+        QStringList fields = line.split(QRegExp("\\s+"));
 
-    switch(m_iSceneType) {
-        case 0: //Channel selection plot scene
-            for(int i = 0; i<itemList.size(); i++) {
-                ChannelSceneItem* item = static_cast<ChannelSceneItem*>(itemList.at(i));
+        //Delete last element if it is a blank character
+        if(fields.at(fields.size()-1) == "")
+            fields.removeLast();
 
-                if(!list.contains(item->getElectrodeName()))
-                    item->hide();
-                else
-                    item->show();
+        if(!line.contains("#")) //Skip commented areas in file
+        {
+            //Read number of electrodes
+            if(line.contains("NumberPositions"))
+                numberElectrodes = fields.at(1).toDouble();
+
+            //Read the unit of the position values
+            if(line.contains("UnitPosition"))
+                unit = fields.at(1);
+
+            //Read actual electrode positions
+            if(line.contains("Positions2D"))
+                read2D = true;
+
+            if(line.contains(":") && !read2D) //Read 3D positions
+            {
+                channelNames.push_back(fields.at(0));
+                QVector<double> posTemp;
+
+                posTemp.push_back(fields.at(fields.size()-3).toDouble());    //x
+                posTemp.push_back(fields.at(fields.size()-2).toDouble());    //y
+                posTemp.push_back(fields.at(fields.size()-1).toDouble());    //z
+
+                location3D.push_back(posTemp);
             }
 
-        break;
-
-        case 1: //Average plot scene
-
-
-        break;
-    }
-}
-
-
-//*************************************************************************************************************
-
-void LayoutScene::repaintItems()
-{
-    QMapIterator<QString,QVector<double>> i(m_layoutMap);
-
-    switch(m_iSceneType) {
-        case 0: //Channel selection plot scene
-            this->clear();
-
-            while (i.hasNext()) {
-                i.next();
-                ChannelSceneItem* ChannelSceneItemTemp = new ChannelSceneItem(i.key(), QPointF(i.value().at(0), i.value().at(1)));
-
-                this->addItem(ChannelSceneItemTemp);
+            if(line.contains(":") && read2D) //Read 2D positions
+            {
+                QVector<double> posTemp;
+                posTemp.push_back(fields.at(fields.size()-2).toDouble());    //x
+                posTemp.push_back(fields.at(fields.size()-1).toDouble());    //y
+                location2D.push_back(posTemp);
             }
 
-        break;
+            //Read channel names
+            if(line.contains("Labels"))
+            {
+                line = in.readLine();
+                fields = line.split(QRegExp("\\s+"));
 
-        case 1: //Average plot scene
-//            this->clear();
+                //Delete last element if it is a blank character
+                if(fields.at(fields.size()-1) == "")
+                    fields.removeLast();
 
-//            QMapIterator<QString,QVector<double>> i(map);
-//            while (i.hasNext()) {
-//                i.next();
-//                AverageSceneItem* AverageSceneItemTemp = new AverageSceneItem(i.key(), QPointF(i.value().at(0), i.value().at(1)));
-
-//                this->addItem(AverageSceneItemTemp);
-//            }
-
-        break;
+                channelNames = fields;
+            }
+        }
     }
+
+    Q_UNUSED(numberElectrodes);
+
+    file.close();
+
+    return true;
 }
-
-
-//*************************************************************************************************************
-
-void LayoutScene::wheelEvent(QGraphicsSceneWheelEvent* event) {
-    m_qvView->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
-
-    // Scale the view / do the zoom
-    double scaleFactor = 1.15;
-    if(event->delta() > 0) {
-        // Zoom in
-        m_qvView->scale(scaleFactor, scaleFactor);
-    } else {
-        // Zooming out
-        m_qvView->scale(1.0 / scaleFactor, 1.0 / scaleFactor);
-    }
-}
-
-
-//*************************************************************************************************************
-
-void LayoutScene::mouseDoubleClickEvent( QGraphicsSceneMouseEvent* mouseEvent)
-{
-    m_qvView->fitInView(this->itemsBoundingRect(), Qt::KeepAspectRatio);
-}
-
-
-
-

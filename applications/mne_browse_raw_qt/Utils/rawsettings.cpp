@@ -140,6 +140,11 @@ void RawSettings::init()
         //Event marker opacity
         m_qSettings.setValue("event_marker_opacity",EVENT_MARKER_OPACITY);
 
+        //Event types
+        QStringList list;
+        list<<"1"<<"2"<<"3"<<"4"<<"5"<<"32";
+        m_qSettings.setValue("event_types",list);
+
     m_qSettings.endGroup();
 
     //Data window marker
