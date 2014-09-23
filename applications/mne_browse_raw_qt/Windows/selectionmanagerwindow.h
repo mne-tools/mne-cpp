@@ -172,6 +172,20 @@ private:
     */
     void updateDataView();
 
+    //=========================================================================================================
+    /**
+    * Reimplemented resize event.
+    *
+    */
+    void resizeEvent(QResizeEvent* event);
+
+    //=========================================================================================================
+    /**
+    * Installed event filter.
+    *
+    */
+    bool eventFilter(QObject *obj, QEvent *event);
+
     Ui::SelectionManagerWindow*     ui;
 
     QMap<QString,QVector<double>>   m_layoutMap;

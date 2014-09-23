@@ -145,7 +145,7 @@ void DataWindow::initMVCSettings()
             this,&DataWindow::customContextMenuRequested);
 
     //activate kinetic scrolling
-    QScroller::grabGesture(ui->m_tableView_rawTableView, QScroller::MiddleMouseButtonGesture);
+    QScroller::grabGesture(ui->m_tableView_rawTableView, QScroller::LeftMouseButtonGesture);
 
     //connect QScrollBar with model in order to reload data samples
     connect(ui->m_tableView_rawTableView->horizontalScrollBar(),&QScrollBar::valueChanged,
