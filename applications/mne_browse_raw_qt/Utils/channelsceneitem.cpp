@@ -130,23 +130,6 @@ QPointF ChannelSceneItem::getPosition()
 }
 
 
-//*************************************************************************************************************
-
-void ChannelSceneItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
-{
-    m_bHighlight = true;
-    this->update();
-}
-
-
-//*************************************************************************************************************
-
-void ChannelSceneItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
-{
-    m_bHighlight = false;
-    this->update();
-}
-
 
 
 

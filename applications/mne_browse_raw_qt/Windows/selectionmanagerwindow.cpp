@@ -306,10 +306,14 @@ void SelectionManagerWindow::updateDataView()
         QModelIndex index = model->index(i, 0);
         QString channel = model->data(index, Qt::DisplayRole).toString();
 
-        if(!visibleChannels.contains(channel))
+        if(!visibleChannels.contains(channel)) {
             view->hideRow(i);
-        else
+            m_pMainWindow->m_pDataWindow->getUndockedDataTableView()->hideRow(i);
+        }
+        else {
             view->showRow(i);
+            m_pMainWindow->m_pDataWindow->getUndockedDataTableView()->showRow(i);
+        }
     }
 }
 
