@@ -344,8 +344,8 @@ void MainWindow::open_file()
     _from = -1;
     if(file_name.endsWith(".fif", Qt::CaseInsensitive))
     {
-        //read_fiff_ave(_file_name);
-        if(!read_fiff_file(file_name)) return;
+        read_fiff_ave(file_name);
+        //if(!read_fiff_file(file_name)) return;
 
         ui->dsb_sample_rate->setEnabled(false);
         original_signal_matrix = _signal_matrix;
@@ -478,25 +478,57 @@ void MainWindow::cb_selection_changed(const QModelIndex& topLeft, const QModelIn
 
 void MainWindow::read_fiff_ave(QString file_name)
 {
-    QList<QIODevice*> t_listSampleFilesIn;
-    t_listSampleFilesIn.append(new QFile(file_name));
-    FiffIO p_fiffIO(t_listSampleFilesIn);
+    QFile t_fileEvoked(file_name);
 
-    //std::cout << p_fiffIO << std::endl;
+    fiff_int_t setno = 0;
+    QPair<QVariant, QVariant> baseline(QVariant(), 0);
+    FiffEvoked evoked(t_fileEvoked, setno, baseline);    
+    if(evoked.isEmpty())
+        return;
 
-    //Read raw data samples
-    p_fiffIO.m_qlistRaw[0]->read_raw_segment_times(datas, times, _from, _to);
+    QSettings settings;
+    QMap<QString, QVariant> chn_name_map;
+    for(qint32 m = 0; m < 4; m++)
+        chn_name_map.insert(QString("MEG;EEG;STI;EOG").split(';').at(m), true);
+    chn_name_map = settings.value("channel_names", chn_name_map).toMap();
 
-    ui->dsb_sample_rate->setValue(600);//raw.info.sfreq);
-    ui->dsb_sample_rate->setEnabled(false);
-    _sample_rate = 600; //ui->sb_sample_rate->value();
+    QStringList pick_list;
 
-    qint32 cols = 5;
-    if(datas.cols() <= 5)   cols = datas.cols();
-    _signal_matrix = MatrixXd::Zero(datas.cols(),cols);
+    QMap<QString, QVariant>::const_iterator i;
+    for (i = chn_name_map.constBegin(); i != chn_name_map.constEnd(); ++i)
+        if(i.value().toBool())
+            pick_list.append(i.key());
 
-    for(qint32 channels = 0; channels < cols; channels++)
-        _signal_matrix.col(channels) = datas.row(channels);
+    //   Set up pick list: MEG + STI 014 - bad channels
+    QStringList include;
+    include << "STI 014";
+    bool want_meg   = chn_name_map["MEG"].toBool();
+    bool want_eeg   = chn_name_map["EEG"].toBool();
+    bool want_stim  = chn_name_map["STI"].toBool();
+
+    picks = evoked.info.pick_types(want_meg, want_eeg, want_stim);
+    pick_info = evoked.info.pick_info(picks);
+
+    QStringList filter_list;
+    for(qint32 i = 0; i < evoked.info.ch_names.length(); i++)
+    {
+        for(qint32 k = 0; k < pick_list.length(); k++)
+            if(evoked.info.ch_names.at(i).contains(pick_list.at(k)))
+                filter_list.append(evoked.info.ch_names.at(i));
+    }
+
+    FiffEvoked pick_evoked = evoked.pick_channels(filter_list);
+
+    ui->dsb_sample_rate->setValue(pick_evoked.info.sfreq);
+    _sample_rate = pick_evoked.info.sfreq;
+
+    _signal_matrix = MatrixXd::Zero(pick_evoked.data.cols(), pick_evoked.data.rows());
+
+    for(qint32 channels = 0; channels <  pick_evoked.data.rows(); channels++)
+        _signal_matrix.col(channels) = pick_evoked.data.row(channels);
+
+    _from = _first_sample = 0;
+    _to = _last_sample = _signal_matrix.rows();
 }
 
 //*************************************************************************************************************************************
@@ -537,6 +569,9 @@ bool MainWindow::read_fiff_file(QString fileName)
     bool want_meg   = chn_name_map["MEG"].toBool();
     bool want_eeg   = chn_name_map["EEG"].toBool();
     bool want_stim  = chn_name_map["STI"].toBool();
+
+
+
     picks = raw.info.pick_types(want_meg, want_eeg, want_stim/*, include /*, raw.info.bads*/);
 
     //save fiff data borders global
@@ -576,7 +611,7 @@ bool MainWindow::read_fiff_file(QString fileName)
 //*************************************************************************************************************************************
 
 void MainWindow::read_fiff_file_new(QString file_name)
-{
+{  
     qint32 selected_chn = 0;
     read_fiff_file(file_name);
     original_signal_matrix = _signal_matrix;
@@ -630,6 +665,18 @@ void MainWindow::fill_channel_combobox()
 
     QSettings settings;
 
+    QStringList chn_names;
+    chn_names.clear();
+    if(!pick_info.isEmpty())
+        chn_names = pick_info.ch_names;
+    else
+        for(qint32 i = 0; i < _signal_matrix.cols(); i++)
+            chn_names.append(QString::number(i));
+
+
+
+    cout << "chn_name_lenght: " << chn_names.length() << "\n";
+    cout << "channelcount: " << _signal_matrix.cols() << "\n";
     for(qint32 channels = 1; channels <= _signal_matrix.cols(); channels++)
     {
         if(settings.value("pastell_colors", false).toBool())
@@ -638,18 +685,21 @@ void MainWindow::fill_channel_combobox()
             _colors.append(QColor::fromRgb(qrand() / ((qreal)RAND_MAX + 300) * 255, qrand() / ((qreal)RAND_MAX + 300) * 255, qrand() / ((qreal)RAND_MAX + 300) * 255));
         //channel item
         this->cb_item = new QStandardItem;
-        this->cb_item->setText(pick_info.ch_names.at(channels - 1));
+        this->cb_item->setText(chn_names.at(channels - 1));
         this->cb_item->setFlags(Qt::ItemIsUserCheckable | Qt::ItemIsEnabled);
         this->cb_item->setData(Qt::Checked, Qt::CheckStateRole);
         select_channel_map.insert(channels - 1, true);
-        for(qint32 k = 0; k < pick_info.bads.length(); k++)
-            if(pick_info.bads.at(k) == this->cb_item->text())
-            {
-               select_channel_map[channels - 1] = false;
-               this->cb_item->setData(Qt::Unchecked, Qt::CheckStateRole);
-               this->cb_item->setBackground(QColor::fromRgb(0x0F0, 0x080, 0x080, 0x00FF));
-               break;
-            }
+        if(!pick_info.isEmpty())
+        {
+            for(qint32 k = 0; k < pick_info.bads.length(); k++)
+                if(pick_info.bads.at(k) == this->cb_item->text())
+                {
+                   select_channel_map[channels - 1] = false;
+                   this->cb_item->setData(Qt::Unchecked, Qt::CheckStateRole);
+                   this->cb_item->setBackground(QColor::fromRgb(0x0F0, 0x080, 0x080, 0x00FF));
+                   break;
+                }
+        }
         this->cb_items.push_back(this->cb_item);
         this->cb_model->insertRow(channels, this->cb_item);
     }
@@ -676,9 +726,6 @@ void MainWindow::fill_channel_combobox()
             _signal_matrix.col(selected_chn) = original_signal_matrix.col(channels);
             selected_chn++;
         }
-
-
-
     ui->cb_channels->setModel(this->cb_model);
 }
 
