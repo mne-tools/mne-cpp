@@ -108,9 +108,15 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns the event QTableView of this window
+    * Returns the data QTableView of this window
     */
     QTableView* getDataTableView();
+
+    //=========================================================================================================
+    /**
+    * Returns the undocked data QTableView of this window
+    */
+    QTableView* getUndockedDataTableView();
 
     //=========================================================================================================
     /**

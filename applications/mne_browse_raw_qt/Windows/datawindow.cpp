@@ -66,6 +66,8 @@ DataWindow::DataWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    m_pUndockedDataView = new QTableView(m_pUndockedViewWidget);
+
     //------------------------
     //--- Setup data model ---
     //------------------------
@@ -101,6 +103,14 @@ void DataWindow::init()
 QTableView* DataWindow::getDataTableView()
 {
     return ui->m_tableView_rawTableView;
+}
+
+
+//*************************************************************************************************************
+
+QTableView* DataWindow::getUndockedDataTableView()
+{
+    return m_pUndockedDataView;
 }
 
 
@@ -159,7 +169,6 @@ void DataWindow::initMVCSettings()
     //-----------------------------------
     //------ Init "dockable" view -------
     //-----------------------------------
-    m_pUndockedDataView = new QTableView(m_pUndockedViewWidget);
     m_pUndockedDataView->setModel(m_pRawModel);
     m_pUndockedDataView->setItemDelegate(m_pRawDelegate);
 
@@ -174,15 +183,15 @@ void DataWindow::initMVCSettings()
     m_pUndockedDataView->horizontalHeader()->setVisible(false);
 
     //activate kinetic scrolling
-    QScroller::grabGesture(m_pUndockedDataView, QScroller::MiddleMouseButtonGesture);
+    QScroller::grabGesture(m_pUndockedDataView, QScroller::LeftMouseButtonGesture);
 
     //connect QScrollBar with model in order to reload data samples
     connect(m_pUndockedDataView->horizontalScrollBar(),&QScrollBar::valueChanged,
             m_pRawModel,&RawModel::updateScrollPos);
 
-    //-------------------------------------------------------
-    //- Interconnect scrollbars of docked and undocked view -
-    //-------------------------------------------------------
+    //---------------------------------------------------------
+    //-- Interconnect scrollbars of docked and undocked view --
+    //---------------------------------------------------------
     //m_pUndockedDataView ---> ui->m_tableView_rawTableView
     connect(m_pUndockedDataView->horizontalScrollBar(),&QScrollBar::valueChanged,
             ui->m_tableView_rawTableView->horizontalScrollBar(),&QScrollBar::setValue);
@@ -194,9 +203,6 @@ void DataWindow::initMVCSettings()
             m_pUndockedDataView->horizontalScrollBar(),&QScrollBar::setValue);
     connect(ui->m_tableView_rawTableView->verticalScrollBar(),&QScrollBar::valueChanged,
             m_pUndockedDataView->verticalScrollBar(),&QScrollBar::setValue);
-
-    //Selection test
-    //ui->m_tableView_rawTableView->hideRow(0);
 }
 
 
