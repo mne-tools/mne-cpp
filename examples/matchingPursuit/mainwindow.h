@@ -600,6 +600,10 @@ private:
     FiffInfo pick_info;
     QPalette pal;
 
+    QTimer *_counter_timer;
+    QThread* mp_Thread;
+    AdaptiveMp *adaptive_Mp;
+    FixDictMp *fixDict_Mp ;
 
     //==========================================================================================================
     /**
@@ -803,6 +807,8 @@ private:
 class GraphWindow : public QWidget
 {
     Q_OBJECT
+private:
+    fiff_int_t press_pos;
 
 protected:
    void paintEvent(QPaintEvent *event);

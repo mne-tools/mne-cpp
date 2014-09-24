@@ -83,7 +83,6 @@ fiff_int_t _from;
 fiff_int_t _to;
 fiff_int_t _first_sample;
 fiff_int_t _last_sample;
-fiff_int_t _press_pos;
 
 qint32 _samplecount;
 qreal _max_pos;
@@ -97,10 +96,10 @@ MatrixXd _signal_matrix;
 MatrixXd _atom_sum_matrix;
 MatrixXd _residuum_matrix;
 
-QTimer *_counter_timer;
-QThread* mp_Thread;
-AdaptiveMp *adaptive_Mp;
-FixDictMp *fixDict_Mp ;
+//QTimer *_counter_timer;
+//QThread* mp_Thread;
+//AdaptiveMp *adaptive_Mp;
+//FixDictMp *fixDict_Mp ;
 Formulaeditor *_formula_editor;
 EditorWindow *_editor_window;
 Enhancededitorwindow *_enhanced_editor_window;
@@ -499,7 +498,7 @@ void MainWindow::read_fiff_ave(QString file_name)
         if(i.value().toBool())
             pick_list.append(i.key());
 
-    //   Set up pick list: MEG + STI 014 - bad channels
+    //   Set up pick list: STI 014
     QStringList include;
     include << "STI 014";
     bool want_meg   = chn_name_map["MEG"].toBool();
@@ -563,16 +562,14 @@ bool MainWindow::read_fiff_file(QString fileName)
 
     settings.setValue("channel_names", chn_name_map);
 
-    //   Set up pick list: MEG + STI 014 - bad channels
+    //   Set up pick list: STI 014
     QStringList include;
     include << "STI 014";
     bool want_meg   = chn_name_map["MEG"].toBool();
     bool want_eeg   = chn_name_map["EEG"].toBool();
     bool want_stim  = chn_name_map["STI"].toBool();
 
-
-
-    picks = raw.info.pick_types(want_meg, want_eeg, want_stim/*, include /*, raw.info.bads*/);
+    picks = raw.info.pick_types(want_meg, want_eeg, want_stim);
 
     //save fiff data borders global
     _first_sample = raw.first_samp;
@@ -2637,7 +2634,7 @@ void GraphWindow::mousePressEvent(QMouseEvent *event)
     Q_UNUSED(event);
     if(_to - _from != 0)
     {
-        _press_pos = mapFromGlobal(QCursor::pos()).x();
+        press_pos = mapFromGlobal(QCursor::pos()).x();
         setCursor(Qt::ClosedHandCursor);
     }
 }
@@ -2654,7 +2651,7 @@ void GraphWindow::mouseReleaseEvent(QMouseEvent *event)
         qreal stretch_factor = qreal(this->width() - 55/*left_margin*/ - 15/*right_margin*/) / (qreal)(_samplecount);
         qint32 old_from = _from;
         qint32 old_to = _to;
-        _from += floor((_press_pos - release_pos) / stretch_factor);
+        _from += floor((press_pos - release_pos) / stretch_factor);
         _to = _from + _samplecount - 1;
         if(_from < _first_sample)
         {
@@ -2673,7 +2670,7 @@ void GraphWindow::mouseReleaseEvent(QMouseEvent *event)
         setCursor(Qt::CrossCursor);
 
         // +/- 5 pixel dont read new if clicked by mistake
-        if(abs(_press_pos - release_pos) < 5 || old_from == _from || old_to == _to)
+        if(abs(press_pos - release_pos) < 5 || old_from == _from || old_to == _to)
             return;
 
         emit read_new();
