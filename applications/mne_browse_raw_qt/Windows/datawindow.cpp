@@ -166,6 +166,10 @@ void DataWindow::initMVCSettings()
                                  m_pMainWindow->m_pEventWindow->getEventTableView(),
                                  ui->m_tableView_rawTableView);
 
+    //Install event filter to overcome QGrabGesture and QScrollBar problem
+    ui->m_tableView_rawTableView->horizontalScrollBar()->installEventFilter(this);
+    ui->m_tableView_rawTableView->verticalScrollBar()->installEventFilter(this);
+
     //-----------------------------------
     //------ Init "dockable" view -------
     //-----------------------------------
@@ -188,6 +192,10 @@ void DataWindow::initMVCSettings()
     //connect QScrollBar with model in order to reload data samples
     connect(m_pUndockedDataView->horizontalScrollBar(),&QScrollBar::valueChanged,
             m_pRawModel,&RawModel::updateScrollPos);
+
+    //Install event filter to overcome QGrabGesture and QScrollBar problem
+    m_pUndockedDataView->horizontalScrollBar()->installEventFilter(this);
+    m_pUndockedDataView->verticalScrollBar()->installEventFilter(this);
 
     //---------------------------------------------------------
     //-- Interconnect scrollbars of docked and undocked view --
@@ -262,7 +270,7 @@ void DataWindow::initLabels()
 
     //Setup marker label
     //Set current marker sample label to vertical spacer position and initalize text
-    m_pCurrentDataMarkerLabel->resize(m_pCurrentDataMarkerLabel->width()+15, m_pCurrentDataMarkerLabel->height());
+    m_pCurrentDataMarkerLabel->resize(150, m_pCurrentDataMarkerLabel->height());
     m_pCurrentDataMarkerLabel->setAlignment(Qt::AlignHCenter);
     m_pCurrentDataMarkerLabel->move(m_pDataMarker->geometry().left(), m_pDataMarker->geometry().top() + 5);
     QString numberString = QString().number(m_iCurrentMarkerSample);
@@ -348,6 +356,29 @@ void DataWindow::keyPressEvent(QKeyEvent* event)
     return QWidget::keyPressEvent(event);
 }
 
+
+//*************************************************************************************************************
+
+bool DataWindow::eventFilter(QObject *object, QEvent *event)
+{
+    if ((object == m_pUndockedDataView->horizontalScrollBar() || object == ui->m_tableView_rawTableView->horizontalScrollBar() ||
+         object == m_pUndockedDataView->verticalScrollBar() || object == ui->m_tableView_rawTableView->verticalScrollBar())
+        && event->type() == QEvent::Enter) {
+        QScroller::ungrabGesture(m_pUndockedDataView);
+        QScroller::ungrabGesture(ui->m_tableView_rawTableView);
+        return true;
+    }
+
+    if ((object == m_pUndockedDataView->horizontalScrollBar() || object == ui->m_tableView_rawTableView->horizontalScrollBar()||
+         object == m_pUndockedDataView->verticalScrollBar() || object == ui->m_tableView_rawTableView->verticalScrollBar())
+        && event->type() == QEvent::Leave) {
+        QScroller::grabGesture(m_pUndockedDataView, QScroller::LeftMouseButtonGesture);
+        QScroller::grabGesture(ui->m_tableView_rawTableView, QScroller::LeftMouseButtonGesture);
+        return true;
+    }
+
+    return false;
+}
 
 //*************************************************************************************************************
 
@@ -532,4 +563,5 @@ void DataWindow::updateMarkerPosition()
     //Update current marker sample lable
     m_pCurrentDataMarkerLabel->move(m_pDataMarker->geometry().left() - (m_pCurrentDataMarkerLabel->width()/2) + 1, m_pDataMarker->geometry().top() - 20);
 }
+
 
