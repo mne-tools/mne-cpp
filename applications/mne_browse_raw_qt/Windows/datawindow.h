@@ -173,6 +173,12 @@ private:
     */
     void keyPressEvent(QKeyEvent* event);
 
+    //=========================================================================================================
+    /**
+    * eventFilter filter events fro mthe table views
+    */
+    bool eventFilter(QObject *object, QEvent *event);
+
     Ui::DataWindowDockWidget *ui;                   /**< the ui variabe to initalise and access the ui file with this class */
 
     MainWindow*     m_pMainWindow;                  /**< pointer to the main window (parent) */
