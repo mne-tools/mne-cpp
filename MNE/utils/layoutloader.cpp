@@ -148,7 +148,7 @@ bool LayoutLoader::readAsaElcFile(QString path, QStringList &channelNames, QVect
 
 //*************************************************************************************************************
 
-bool LayoutLoader::readMNELoutFile(QString path, QMap<QString,QVector<double>> &channelData)
+bool LayoutLoader::readMNELoutFile(QString path, QMap<QString,QVector<double> > &channelData)
 {
     //Open .elc file
     if(!path.contains(".lout"))
