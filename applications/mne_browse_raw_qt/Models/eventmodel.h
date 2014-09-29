@@ -201,15 +201,22 @@ public:
     */
     void setEventFilterType(const QString eventType);
 
-    bool            m_bFileloaded;      /**< true when a Fiff event file is loaded */
+    //=========================================================================================================
+    /**
+    * getEventTypeList returns the event type list
+    *
+    */
+    QStringList getEventTypeList();
 
-private:
     //=========================================================================================================
     /**
     * clearModel clears all model's members
     */
     void clearModel();
 
+    bool            m_bFileloaded;      /**< true when a Fiff event file is loaded */
+
+private:
     QVector<int>    m_dataSamples;              /**< Vector that holds the sample alues for each loaded event */
     QVector<int>    m_dataTypes;                /**< Vector that holds the type alues for each loaded event */
     QVector<int>    m_dataIsUserEvent;          /**< Vector that holds the flag whether the event is user defined or loaded from file */
@@ -225,6 +232,12 @@ private:
     int             m_iCurrentMarkerPos;        /**< holds the current marker position */
     QSettings       m_qSettings;                /**< setting paramter to access globally defined values. see rawsettings.cpp and rawsettings.h */
     QString         m_sFilterEventType;         /**< holds the event txype which is to be filtered*/
+
+    QStringList     m_eventTypeList;            /**< holds all loaded event types */
+
+signals:
+    void updateEventTypes();
+
 };
 
 } // NAMESPACE

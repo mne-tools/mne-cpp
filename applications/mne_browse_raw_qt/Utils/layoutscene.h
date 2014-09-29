@@ -1,11 +1,11 @@
 //=============================================================================================================
 /**
-* @file     filterwindow.h
-* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
+* @file     layoutscene.h
+* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     August, 2014
+* @date     September, 2014
 *
 * @section  LICENSE
 *
@@ -30,21 +30,20 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the FilterWindow class.
+* @brief    Contains the declaration of the LayoutScene class.
 *
 */
 
-#ifndef FILTERWINDOW_H
-#define FILTERWINDOW_H
+#ifndef LAYOUTSCENE_H
+#define LAYOUTSCENE_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "ui_filterwindow.h"
-#include "mainwindow.h"
-#include "../Utils/filterplotscene.h"
+#include "channelsceneitem.h"
+#include "../Windows/mainwindow.h"
 
 
 //*************************************************************************************************************
@@ -52,145 +51,98 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QWidget>
-#include <QSettings>
 #include <QGraphicsScene>
-#include <QSvgGenerator>
+#include <QGraphicsView>
+#include <QGraphicsSceneMouseEvent>
+#include <QRubberBand>
+#include <QWidget>
+#include <QMouseEvent>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINE NAMESPACE MNEBrowseRawQt
+// DEFINE NAMESPACE TMSIPlugin
 //=============================================================================================================
 
 namespace MNEBrowseRawQt
 {
 
-//*************************************************************************************************************
 //=============================================================================================================
-// DEFINE FORWARD DECLARATIONS
-//=============================================================================================================
-
-class MainWindow;
-
 /**
-* DECLARE CLASS FilterWindow
+* LayoutScene...
 *
-* @brief The FilterWindow class provides the filter window.
+* @brief The LayoutScene class provides a reimplemented QGraphicsScene for 2D layout plotting.
 */
-class FilterWindow : public QWidget
+class LayoutScene : public QGraphicsScene
 {
     Q_OBJECT
 
 public:
     //=========================================================================================================
     /**
-    * Constructs a FilterWindow dialog which is a child of parent.
-    *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new FilterWindow becomes a window. If parent is another widget, FilterWindow becomes a child window inside parent. FilterWindow is deleted when its parent is deleted.
+    * Constructs a LayoutScene.
     */
-    FilterWindow(QWidget *parent = 0);
+    explicit LayoutScene(QGraphicsView* view, QObject *parent = 0, int sceneType = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the FilterWindow.
-    * All FilterWindow's children are deleted first. The application exits if FilterWindow is the main widget.
+    * Updates layout data.
+    * @param [in] layoutMap layout data map.
     */
-    ~FilterWindow();
+    void setNewLayout(QMap<QString,QVector<double>> layoutMap);
 
     //=========================================================================================================
     /**
-    * Initialises this window.
+    * Hides all items described in list.
+    * @param [in] list string list with items name which are to be hidden.
     */
-    void init();
+    void hideItems(QStringList list);
+
+    int                             m_iSceneType;                   /**< Holds the current scene type (channel selection = 0, average = 1).*/
 
 private:
-    //=========================================================================================================
-    /**
-    * inits all spin boxes.
-    */
-    void initSpinBoxes();
+    QGraphicsView*                  m_qvView;                       /**< Holds the view which visualizes this scene.*/
+    QMap<QString,QVector<double>>   m_layoutMap;                    /**< Holds the layout data.*/
+    bool                            m_dragSceneIsActive;
+    QPointF                         m_mousePressPosition;
 
     //=========================================================================================================
     /**
-    * inits all buttons.
+    * Repaints all items fro mthe layout data in the scene.
     */
-    void initButtons();
+    void repaintItems();
 
     //=========================================================================================================
     /**
-    * inits the QComboBoxes.
+    * Reimplemented wheel event.
     */
-    void initComboBoxes();
+    void wheelEvent(QGraphicsSceneWheelEvent* event);
 
     //=========================================================================================================
     /**
-    * inits the filter plot.
+    * Reimplemented double mouse press event.
     */
-    void initFilterPlot();
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent* mouseEvent);
 
     //=========================================================================================================
     /**
-    * resizeEvent reimplemented virtual function to handle resize events of the filter window
+    * Reimplemented mouse press event.
     */
-    void resizeEvent(QResizeEvent * event);
+    void mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent);
 
     //=========================================================================================================
     /**
-    * updates the filter plot scene with the newly generated filter
+    * Reimplemented double mouse move event.
     */
-    void updateFilterPlot();
-
-    Ui::FilterWindowWidget *ui;
-
-    MainWindow*         m_pMainWindow;
-
-    int                 m_iWindowSize;
-    int                 m_iFilterTaps;
-
-    QSettings           m_qSettings;
-
-    FilterPlotScene*    m_pFilterPlotScene;
-
-protected slots:
-    //=========================================================================================================
-    /**
-    * This function gets called whenever the combo box is altered by the user via the gui.
-    * @param currentIndex holds the current index of the combo box
-    */
-    void changeStateSpinBoxes(int currentIndex);
+    void mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent);
 
     //=========================================================================================================
     /**
-    * This function gets called whenever the filter parameters are altered by the user via the gui.
+    * Reimplemented double mouse release event.
     */
-    void filterParametersChanged();
-
-    //=========================================================================================================
-    /**
-    * This function applies the user defined filter to all channels.
-    */
-    void applyFilterToAll();
-
-    //=========================================================================================================
-    /**
-    * This function undoes the user defined filter to all channels.
-    */
-    void undoFilterToAll();
-
-    //=========================================================================================================
-    /**
-    * Saves an svg graphic of the scene if wanted by the user.
-    */
-    void exportFilterPlot();
-
-    //=========================================================================================================
-    /**
-    * This function exports the filter coefficients to a txt file.
-    */
-    void exportFilterCoefficients();
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent);
 };
 
-} // NAMESPACE MNEBrowseRawQt
+} // NAMESPACE
 
-#endif // FILTERWINDOW_H
+#endif // LAYOUTSCENE_H

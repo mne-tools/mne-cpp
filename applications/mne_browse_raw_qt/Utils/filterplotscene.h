@@ -86,9 +86,11 @@ public:
     * Updates the current filter.
     *
     * @param [in] operatorFilter pointer to the current filter operator which is to be plotted
-    * @param [in] holds the current sampling frequency
+    * @param [in] samplingFreq holds the current sampling frequency
+    * @param [in] cutOffLow cut off frequqency lowpass or lower cut off when filter is a bandpass
+    * @param [in] cutOffHigh cut off frequqency highpass or higher cut off when filter is a bandpass
     */
-    void updateFilter(QSharedPointer<MNEOperator> operatorFilter, int samplingFreq);
+    void updateFilter(QSharedPointer<MNEOperator> operatorFilter, int samplingFreq, int cutOffLow, int cutOffHigh);
 
 protected:
     //=========================================================================================================
@@ -116,8 +118,9 @@ protected:
     int             m_iAxisTextSize;            /**< point size of the plotted text */
     int             m_iDiagramMarginsHoriz;     /**< horizontal space between the filter and diagram plot  */
     int             m_iDiagramMarginsVert;      /**< vertical space between the filter and diagram plot */
-
-public slots:
+    int             m_iCutOffLow;               /**< cut off frequqency lowpass or lower cut off when filter is a bandpass */
+    int             m_iCutOffHigh;              /**< cut off frequqency highpass or higher cut off when filter is a bandpass */
+    int             m_iCutOffMarkerWidth;       /**< cut off marker width */
 
 };
 
