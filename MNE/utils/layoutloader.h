@@ -56,6 +56,8 @@
 #include <QTextStream>
 #include <QStringList>
 #include <QDebug>
+#include <QIODevice>
+#include <QString>
 
 
 //*************************************************************************************************************

@@ -49,10 +49,18 @@
 // DEFINES
 //=============================================================================================================
 
-#if defined(PYIO_LIBRARY)
+#if defined(BUILD_MNECPP_STATIC_LIB)
+#  define PYIOSHARED_EXPORT
+#elif defined(PYIO_LIBRARY)
 #  define PYIOSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
 #  define PYIOSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
+
+//#if defined(PYIO_LIBRARY)
+//#  define PYIOSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+//#else
+//#  define PYIOSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+//#endif
 
 #endif // PYIO_GLOBAL_H

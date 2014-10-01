@@ -50,10 +50,18 @@
 // DEFINES
 //=============================================================================================================
 
-#if defined(RTINV_LIBRARY)
-#  define RTINVSHARED_EXPORT Q_DECL_EXPORT  /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+#if defined(BUILD_MNECPP_STATIC_LIB)
+#  define RTINVSHARED_EXPORT
+#elif defined(RTINV_LIBRARY)
+#  define RTINVSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
-#  define RTINVSHARED_EXPORT Q_DECL_IMPORT  /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+#  define RTINVSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
+
+//#if defined(RTINV_LIBRARY)
+//#  define RTINVSHARED_EXPORT Q_DECL_EXPORT  /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+//#else
+//#  define RTINVSHARED_EXPORT Q_DECL_IMPORT  /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+//#endif
 
 #endif // RTINV_GLOBAL_H

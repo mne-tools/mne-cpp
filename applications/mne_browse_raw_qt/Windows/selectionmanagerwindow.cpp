@@ -132,7 +132,7 @@ bool SelectionManagerWindow::loadLayout(QString path)
     LayoutLoader* manager = new LayoutLoader();
 
     //Read layout
-    bool state = manager->readMNELoutFile(path.prepend(":/Resources/Templates/"), m_layoutMap);
+    bool state = manager->readMNELoutFile(path.prepend("./MNE_Browse_Raw_Resources/Templates/Layouts/"), m_layoutMap);
 
     //Update scene
     m_pLayoutScene->setNewLayout(m_layoutMap);
@@ -156,7 +156,7 @@ bool SelectionManagerWindow::loadSelectionGroups(QString path)
     ui->m_listWidget_visibleChannels->clear();
     m_selectionGroupsMap.clear();
 
-    QFile file(path.prepend(":/Resources/Templates/"));
+    QFile file(path.prepend("./MNE_Browse_Raw_Resources/Templates/ChannelSelection/"));
     if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         qDebug()<<"Error opening selection file";
         return false;
@@ -333,6 +333,7 @@ void SelectionManagerWindow::resizeEvent(QResizeEvent* event)
 
 bool SelectionManagerWindow::eventFilter(QObject *obj, QEvent *event)
 {
+    //Setup delte key on user defined channel list
     if (obj == ui->m_listWidget_userDefined) {
         if (event->type() == QEvent::KeyPress) {
             QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
@@ -341,10 +342,12 @@ bool SelectionManagerWindow::eventFilter(QObject *obj, QEvent *event)
                 qDeleteAll(ui->m_listWidget_userDefined->selectedItems());
 
             return true;
-        } else {
+        }
+        else {
             return false;
         }
-    } else {
+    }
+    else {
         // pass the event on to the parent class
         return QDockWidget::eventFilter(obj, event);
     }
