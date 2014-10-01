@@ -209,7 +209,14 @@ namespace FIFFLIB
  */
 #define FIFFV_COIL_BABY_GRAD          7001  /**< BabySQUID gradiometers */
 #define FIFFV_COIL_BABY_MAG           7002  /**< BabyMEG magnetometers */
-#define FIFFV_COIL_BABY_REF_MAG       7003  /**< BabyMEG reference magnetometers */
+//#define FIFFV_COIL_BABY_REF_MAG       7003  /**< BabyMEG reference magnetometers */
+
+/*
+ * BabyMEG sensors --- added by Limin ---
+ */
+#define FIFFV_COIL_BABY_INLAYER_MAG   7002  /**< babyMEG inlayer magnetometer */
+#define FIFFV_COIL_BABY_OUTLAYER_MAG  7003  /**< babyMEG outlayer magnetometer */
+#define FIFFV_COIL_BABY_REF_MAG       7004  /**< babyMEG reference magnetometer */
 
 
 #define FIFFM_IS_VV_COIL(c) ((c)/1000 == 3)
