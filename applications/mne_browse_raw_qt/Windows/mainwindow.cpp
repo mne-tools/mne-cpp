@@ -58,8 +58,8 @@ using namespace MNEBrowseRawQt;
 
 MainWindow::MainWindow(QWidget *parent)
 : QMainWindow(parent)
-//, m_qFileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
-//, m_qEventFile("./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif")
+, m_qFileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
+, m_qEventFile("./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif")
 , m_qSettings()
 , m_rawSettings()
 , ui(new Ui::MainWindowWidget)
@@ -111,7 +111,7 @@ void MainWindow::setupWindowWidgets()
     m_pAboutWindow = new AboutWindow(this);
     m_pAboutWindow->hide();
 
-    //Create about window - QTDesigner used - see /FormFiles
+    //Create selection manager window - QTDesigner used - see /FormFiles
     m_pSelectionManagerWindow = new SelectionManagerWindow(this);
     addDockWidget(Qt::BottomDockWidgetArea, m_pSelectionManagerWindow);
 

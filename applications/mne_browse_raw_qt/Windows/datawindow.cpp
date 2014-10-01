@@ -186,26 +186,16 @@ void DataWindow::initMVCSettings()
     m_pUndockedDataView->setShowGrid(false);
     m_pUndockedDataView->horizontalHeader()->setVisible(false);
 
-    //activate kinetic scrolling
-    QScroller::grabGesture(m_pUndockedDataView, QScroller::LeftMouseButtonGesture);
+    m_pUndockedDataView->verticalScrollBar()->setVisible(false);
+    m_pUndockedDataView->horizontalScrollBar()->setVisible(false);
 
     //connect QScrollBar with model in order to reload data samples
     connect(m_pUndockedDataView->horizontalScrollBar(),&QScrollBar::valueChanged,
             m_pRawModel,&RawModel::updateScrollPos);
 
-    //Install event filter to overcome QGrabGesture and QScrollBar problem
-    m_pUndockedDataView->horizontalScrollBar()->installEventFilter(this);
-    m_pUndockedDataView->verticalScrollBar()->installEventFilter(this);
-
     //---------------------------------------------------------
     //-- Interconnect scrollbars of docked and undocked view --
     //---------------------------------------------------------
-    //m_pUndockedDataView ---> ui->m_tableView_rawTableView
-    connect(m_pUndockedDataView->horizontalScrollBar(),&QScrollBar::valueChanged,
-            ui->m_tableView_rawTableView->horizontalScrollBar(),&QScrollBar::setValue);
-    connect(m_pUndockedDataView->verticalScrollBar(),&QScrollBar::valueChanged,
-            ui->m_tableView_rawTableView->verticalScrollBar(),&QScrollBar::setValue);
-
     //ui->m_tableView_rawTableView ---> m_pUndockedDataView
     connect(ui->m_tableView_rawTableView->horizontalScrollBar(),&QScrollBar::valueChanged,
             m_pUndockedDataView->horizontalScrollBar(),&QScrollBar::setValue);
@@ -267,7 +257,7 @@ void DataWindow::initMarker()
     m_pDataMarker->raise();
 
     //Get boundary rect coordinates for table view
-    double boundingLeft = ui->m_tableView_rawTableView->verticalHeader()->geometry().right();
+    double boundingLeft = ui->m_tableView_rawTableView->verticalHeader()->geometry().right() + ui->m_tableView_rawTableView->geometry().left();
     double boundingRight = ui->m_tableView_rawTableView->geometry().right() - ui->m_tableView_rawTableView->verticalScrollBar()->width() + 1;
     QRect boundingRect;
     boundingRect.setLeft(boundingLeft);
@@ -544,7 +534,7 @@ void DataWindow::updateMarkerPosition()
 
     m_pDataMarker->move(m_pDataMarker->x(), boundingRect.y()+1);
 
-    double boundingLeft = ui->m_tableView_rawTableView->verticalHeader()->geometry().right();
+    double boundingLeft = ui->m_tableView_rawTableView->verticalHeader()->geometry().right() + ui->m_tableView_rawTableView->geometry().left();
     double boundingRight = ui->m_tableView_rawTableView->geometry().right() - ui->m_tableView_rawTableView->verticalScrollBar()->width() + 1;
     boundingRect.setLeft(boundingLeft);
     boundingRect.setRight(boundingRight);
