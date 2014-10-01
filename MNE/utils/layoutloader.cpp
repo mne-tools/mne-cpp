@@ -177,8 +177,6 @@ bool LayoutLoader::readMNELoutFile(QString path, QMap<QString,QVector<double>> &
         if(fields.at(fields.size()-1) == "")
             fields.removeLast();
 
-        qDebug()<<fields;
-
         QVector<double> posTemp;
         posTemp.push_back(fields.at(1).toDouble());    //x
         posTemp.push_back(fields.at(2).toDouble());    //y

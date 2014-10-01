@@ -261,6 +261,37 @@ void DataWindow::initToolBar()
 
 //*************************************************************************************************************
 
+void DataWindow::initMarker()
+{
+    //Set marker as front top-most widget
+    m_pDataMarker->raise();
+
+    //Get boundary rect coordinates for table view
+    double boundingLeft = ui->m_tableView_rawTableView->verticalHeader()->geometry().right();
+    double boundingRight = ui->m_tableView_rawTableView->geometry().right() - ui->m_tableView_rawTableView->verticalScrollBar()->width() + 1;
+    QRect boundingRect;
+    boundingRect.setLeft(boundingLeft);
+    boundingRect.setRight(boundingRight);
+
+    //Inital position of the marker
+    m_pDataMarker->move(boundingRect.x(), boundingRect.y() + 1);
+
+    //Create Region from bounding rect - this region is used to restrain the marker inside the data view
+    QRegion region(boundingRect);
+    m_pDataMarker->setMovementBoundary(region);
+
+    //Set marker size to table view size minus horizontal scroll bar height
+    m_pDataMarker->resize(m_qSettings.value("DataMarker/data_marker_width").toInt(),
+                          boundingRect.height() - ui->m_tableView_rawTableView->horizontalScrollBar()->height()-1);
+
+    //Connect current marker to marker move signal
+    connect(m_pDataMarker,&DataMarker::markerMoved,
+            this,&DataWindow::updateMarkerPosition);
+}
+
+
+//*************************************************************************************************************
+
 void DataWindow::initLabels()
 {
     //Setup range samples
@@ -296,31 +327,6 @@ void DataWindow::initLabels()
     //Connect current marker sample label to horizontal scroll bar changes
     connect(ui->m_tableView_rawTableView->horizontalScrollBar(),&QScrollBar::valueChanged,
             this,&DataWindow::setMarkerSampleLabel);
-}
-
-
-//*************************************************************************************************************
-
-void DataWindow::initMarker()
-{
-    //Set marker as front top-most widget
-    m_pDataMarker->raise();
-
-    //Get boundary rect coordinates for table view
-    QRect boundingRect = ui->m_tableView_rawTableView->geometry();
-    boundingRect.setLeft(boundingRect.x() + ui->m_tableView_rawTableView->verticalHeader()->width());
-    boundingRect.setRight(boundingRect.right() - ui->m_tableView_rawTableView->verticalScrollBar()->width() + 1);
-
-    //Inital position of the marker
-    m_pDataMarker->move(boundingRect.x(), boundingRect.y() + 1);
-
-    //Create Region from bounding rect - this region is used to restrain the marker inside the data view
-    QRegion region(boundingRect);
-    m_pDataMarker->setMovementBoundary(region);
-
-    //Set marker size to table view size minus horizontal scroll bar height
-    m_pDataMarker->resize(m_qSettings.value("DataMarker/data_marker_width").toInt(),
-                          boundingRect.height() - ui->m_tableView_rawTableView->horizontalScrollBar()->height()-1);
 }
 
 
@@ -538,8 +544,10 @@ void DataWindow::updateMarkerPosition()
 
     m_pDataMarker->move(m_pDataMarker->x(), boundingRect.y()+1);
 
-    boundingRect.setLeft(boundingRect.left() + ui->m_tableView_rawTableView->verticalHeader()->width());
-    boundingRect.setRight(boundingRect.right() - ui->m_tableView_rawTableView->verticalScrollBar()->width() + 1);
+    double boundingLeft = ui->m_tableView_rawTableView->verticalHeader()->geometry().right();
+    double boundingRight = ui->m_tableView_rawTableView->geometry().right() - ui->m_tableView_rawTableView->verticalScrollBar()->width() + 1;
+    boundingRect.setLeft(boundingLeft);
+    boundingRect.setRight(boundingRight);
 
     //Create Region from bounding rect - this region is used to restrain the marker inside the data view
     QRegion region(boundingRect);

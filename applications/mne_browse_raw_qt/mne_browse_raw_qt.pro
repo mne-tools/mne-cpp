@@ -44,11 +44,19 @@ QT += network core widgets concurrent svg
 
 TARGET = mne_browse_raw_qt
 
+#If one single executable is to be build
+#-> comment out flag in .pri file
+#-> add DEFINES += BUILD_MNECPP_STATIC_LIB in projects .pro file
+#-> This needs to be done in order to avoid problem with the Q_DECL_EXPORT/Q_DECL_IMPORT flag in the global headers
+contains(MNECPP_CONFIG, build_MNECPP_Static_Lib) {
+    DEFINES += BUILD_MNECPP_STATIC_LIB
+}
+
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
-CONFIG += console #DEBUG
+CONFIG += console static #DEBUG
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {

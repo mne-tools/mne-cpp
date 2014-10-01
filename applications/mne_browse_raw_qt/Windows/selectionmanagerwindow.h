@@ -188,7 +188,7 @@ private:
 
     Ui::SelectionManagerWindow*     ui;
 
-    QMap<QString,QVector<double>>   m_layoutMap;
+    QMap<QString,QVector<double> >  m_layoutMap;
     QMap<QString,QStringList>       m_selectionGroupsMap;
 
     MainWindow*                     m_pMainWindow;

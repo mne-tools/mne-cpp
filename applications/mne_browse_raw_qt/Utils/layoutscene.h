@@ -89,7 +89,7 @@ public:
     * Updates layout data.
     * @param [in] layoutMap layout data map.
     */
-    void setNewLayout(QMap<QString,QVector<double>> layoutMap);
+    void setNewLayout(QMap<QString,QVector<double> > layoutMap);
 
     //=========================================================================================================
     /**
@@ -102,7 +102,7 @@ public:
 
 private:
     QGraphicsView*                  m_qvView;                       /**< Holds the view which visualizes this scene.*/
-    QMap<QString,QVector<double>>   m_layoutMap;                    /**< Holds the layout data.*/
+    QMap<QString,QVector<double> >  m_layoutMap;                    /**< Holds the layout data.*/
     bool                            m_dragSceneIsActive;
     QPointF                         m_mousePressPosition;
 
