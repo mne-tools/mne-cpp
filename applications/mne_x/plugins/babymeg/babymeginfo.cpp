@@ -258,7 +258,7 @@ void BabyMEGInfo::MGH_LM_Parse_Para(QByteArray cmdstr)
         t_ch.unit_mul = 1.0;//lm_ch_scales.at(i).toFloat();
         t_ch.range =1.0f/lm_ch_gain.at(i).toFloat();//1; // set gain
 
-        qDebug()<<i<<":="<<t_ch.ch_name<<","<<t_ch.range<<","<<t_ch.cal;
+        //qDebug()<<i<<":="<<t_ch.ch_name<<","<<t_ch.range<<","<<t_ch.cal;
 
         t_ch.loc.setZero(12,1);
 
@@ -281,11 +281,11 @@ void BabyMEGInfo::MGH_LM_Parse_Para(QByteArray cmdstr)
         int type = lm_ch_coiltype.at(i).toInt();
         int ntype = 0;
 
-        if (type == FIFFV_COIL_BABY_INLAYER_MAG) //inner layer MEG
+        if (type == FIFFV_COIL_BABY_MAG) //inner layer MEG
             ntype = 1;
-        else if (type == FIFFV_COIL_BABY_OUTLAYER_MAG)
-            ntype = 2;
         else if (type == FIFFV_COIL_BABY_REF_MAG)
+            ntype = 2;
+        else if (type == FIFFV_COIL_BABY_REF_MAG2)
             ntype = 3;
         else if (type == FIFFV_STIM_CH)
             ntype = 4;
@@ -298,21 +298,21 @@ void BabyMEGInfo::MGH_LM_Parse_Para(QByteArray cmdstr)
             t_ch.kind = FIFFV_MEG_CH;
             t_ch.unit = FIFF_UNIT_T;
             t_ch.unit_mul = FIFF_UNITM_NONE;
-            t_ch.coil_type = FIFFV_COIL_BABY_INLAYER_MAG;
+            t_ch.coil_type = FIFFV_COIL_BABY_MAG;
 
             break;
         case 2: // outer layer meg sensors
             t_ch.kind = FIFFV_MEG_CH;
             t_ch.unit = FIFF_UNIT_T;
             t_ch.unit_mul = FIFF_UNITM_NONE;
-            t_ch.coil_type = FIFFV_COIL_BABY_OUTLAYER_MAG;
+            t_ch.coil_type = FIFFV_COIL_BABY_REF_MAG;
 
             break;
         case 3: // reference meg sensors
             t_ch.kind = FIFFV_REF_MEG_CH;
             t_ch.unit = FIFF_UNIT_T;
             t_ch.unit_mul = FIFF_UNITM_NONE;
-            t_ch.coil_type = FIFFV_COIL_BABY_REF_MAG;
+            t_ch.coil_type = FIFFV_COIL_BABY_REF_MAG2;
 
             break;
         case 4: // trigger lines
