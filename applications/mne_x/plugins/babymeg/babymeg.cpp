@@ -457,7 +457,7 @@ void BabyMEG::run()
 
             //Write raw data to fif file
             if(m_bWriteToFile)
-                m_pOutfid->write_raw_buffer(matValue.cast<double>(), m_cals);
+                m_pOutfid->write_raw_buffer(matValue.cast<double>());
 
             if(m_pRTMSABabyMEG)
             {
