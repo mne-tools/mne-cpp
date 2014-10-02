@@ -230,7 +230,7 @@ void RawDelegate::createPlotPath(const QModelIndex &index, const QStyleOptionVie
     double dValue;
     double dScaleY = option.rect.height()/(2*dMaxValue);
 
-    double y_base = path.currentPosition().y();
+    double y_base = -path.currentPosition().y();
     QPointF qSamplePosition;
 
     //plot all rows from list of pairs
@@ -243,7 +243,7 @@ void RawDelegate::createPlotPath(const QModelIndex &index, const QStyleOptionVie
 
             double newY = y_base+dValue;
 
-            qSamplePosition.setY(newY);
+            qSamplePosition.setY(-newY);
             qSamplePosition.setX(path.currentPosition().x()+m_dDx);
 
             path.lineTo(qSamplePosition);

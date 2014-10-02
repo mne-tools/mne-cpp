@@ -1,15 +1,15 @@
 //=============================================================================================================
 /**
-* @file     asaelc.cpp
+* @file     ChannelSceneItem.cpp
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     November, 2013
+* @date     June, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2013, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Implementation of the AsAElc class
+* @brief    Contains the implementation of the ChannelSceneItem class.
 *
 */
 
@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "asaelc.h"
+#include "channelsceneitem.h"
 
 
 //*************************************************************************************************************
@@ -47,7 +47,8 @@
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace UTILSLIB;
+using namespace MNEBrowseRawQt;
+using namespace std;
 
 
 //*************************************************************************************************************
@@ -55,89 +56,87 @@ using namespace UTILSLIB;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-AsAElc::AsAElc()
+ChannelSceneItem::ChannelSceneItem(QString electrodeName, QPointF electrodePosition, QColor electrodeColor)
+: m_sElectrodeName(electrodeName)
+, m_qpElectrodePosition(electrodePosition)
+, m_cElectrodeColor(electrodeColor)
+, m_bHighlight(false)
 {
+    this->setAcceptHoverEvents(true);
+    this->setFlag(QGraphicsItem::ItemIsSelectable, true);
 }
-
 
 //*************************************************************************************************************
 
-bool AsAElc::readElcFile(QString path, QStringList &channelNames, QVector<QVector<double> > &location3D, QVector<QVector<double> > &location2D, QString &unit)
+QRectF ChannelSceneItem::boundingRect() const
 {
-    //Open .elc file
-    if(!path.contains(".elc"))
-        return false;
-
-    QFile file(path);
-    file.open(QIODevice::ReadOnly | QIODevice::Text);
-
-    //Start reading from file
-    double numberElectrodes;
-    QTextStream in(&file);
-    bool read2D = false;
-
-    while(!in.atEnd())
-    {
-        QString line = in.readLine();
-
-        QStringList fields = line.split(QRegExp("\\s+"));
-
-        //Delete last element if it is a blank character
-        if(fields.at(fields.size()-1) == "")
-            fields.removeLast();
-
-        if(!line.contains("#")) //Skip commented areas in file
-        {
-            //Read number of electrodes
-            if(line.contains("NumberPositions"))
-                numberElectrodes = fields.at(1).toDouble();
-
-            //Read the unit of the position values
-            if(line.contains("UnitPosition"))
-                unit = fields.at(1);
-
-            //Read actual electrode positions
-            if(line.contains("Positions2D"))
-                read2D = true;
-
-            if(line.contains(":") && !read2D) //Read 3D positions
-            {
-                channelNames.push_back(fields.at(0));
-                QVector<double> posTemp;
-
-                posTemp.push_back(fields.at(fields.size()-3).toDouble());    //x
-                posTemp.push_back(fields.at(fields.size()-2).toDouble());    //y
-                posTemp.push_back(fields.at(fields.size()-1).toDouble());    //z
-
-                location3D.push_back(posTemp);
-            }
-
-            if(line.contains(":") && read2D) //Read 2D positions
-            {
-                QVector<double> posTemp;
-                posTemp.push_back(fields.at(fields.size()-2).toDouble());    //x
-                posTemp.push_back(fields.at(fields.size()-1).toDouble());    //y
-                location2D.push_back(posTemp);
-            }
-
-            //Read channel names
-            if(line.contains("Labels"))
-            {
-                line = in.readLine();
-                fields = line.split(QRegExp("\\s+"));
-
-                //Delete last element if it is a blank character
-                if(fields.at(fields.size()-1) == "")
-                    fields.removeLast();
-
-                channelNames = fields;
-            }
-        }
-    }
-
-    Q_UNUSED(numberElectrodes);
-
-    file.close();
-
-    return true;
+    return QRectF(-25, -35, 50, 70);
 }
+
+//*************************************************************************************************************
+
+void ChannelSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+{
+    Q_UNUSED(option);
+    Q_UNUSED(widget);
+
+    // Plot shadow
+    painter->setPen(Qt::NoPen);
+    painter->setBrush(Qt::darkGray);
+    painter->drawEllipse(-12, -12, 30, 30);
+
+    // Plot colored circle
+    painter->setPen(QPen(Qt::black, 1));
+    if(this->isSelected())
+        painter->setBrush(QBrush(Qt::red));
+    else
+        painter->setBrush(QBrush(m_cElectrodeColor));
+    painter->drawEllipse(-15, -15, 30, 30);
+
+    // Plot electrode name
+    QStaticText staticElectrodeName = QStaticText(m_sElectrodeName);
+    QSizeF sizeText = staticElectrodeName.size();
+    painter->drawStaticText(-15+((30-sizeText.width())/2), -32, staticElectrodeName);
+
+    this->setPos(10*m_qpElectrodePosition.x(), -10*m_qpElectrodePosition.y());
+}
+
+//*************************************************************************************************************
+
+void ChannelSceneItem::setColor(QColor electrodeColor)
+{
+    m_cElectrodeColor = electrodeColor;
+}
+
+//*************************************************************************************************************
+
+QString ChannelSceneItem::getElectrodeName()
+{
+    return m_sElectrodeName;
+}
+
+//*************************************************************************************************************
+
+void ChannelSceneItem::setPosition(QPointF newPosition)
+{
+    m_qpElectrodePosition = newPosition;
+}
+
+//*************************************************************************************************************
+
+QPointF ChannelSceneItem::getPosition()
+{
+    return m_qpElectrodePosition;
+}
+
+
+
+
+
+
+
+
+
+
+
+
