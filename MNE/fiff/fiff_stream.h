@@ -644,6 +644,19 @@ public:
 
     //=========================================================================================================
     /**
+    * fiff_write_raw_buffer
+    *
+    *
+    * Writes a raw buffer without calibrations.
+    *
+    * @param[in] buf        the buffer to write
+    *
+    * @return true if succeeded, false otherwise
+    */
+    bool write_raw_buffer(const MatrixXd& buf);
+
+    //=========================================================================================================
+    /**
     * fiff_write_string
     *
     * ### MNE toolbox root function ###

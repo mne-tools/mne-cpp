@@ -2462,6 +2462,16 @@ bool FiffStream::write_raw_buffer(const MatrixXd& buf, const RowVectorXd& cals)
 
 //*************************************************************************************************************
 
+bool FiffStream::write_raw_buffer(const MatrixXd& buf)
+{
+    MatrixXf tmp = buf.cast<float>();
+    this->write_float(FIFF_DATA_BUFFER,tmp.data(),tmp.rows()*tmp.cols());
+    return true;
+}
+
+
+//*************************************************************************************************************
+
 void FiffStream::write_string(fiff_int_t kind, const QString& data)
 {
     fiff_int_t datasize = data.size();
