@@ -256,7 +256,7 @@ void BabyMEGInfo::MGH_LM_Parse_Para(QByteArray cmdstr)
         t_ch.logno = i+1;
         t_ch.cal = lm_ch_calicoef.at(i).toDouble();
         t_ch.unit_mul = 1.0;//lm_ch_scales.at(i).toFloat();
-        t_ch.range =lm_ch_gain.at(i).toFloat();//1; // set scale
+        t_ch.range =1.0f/lm_ch_gain.at(i).toFloat();//1; // set gain
 
         qDebug()<<i<<":="<<t_ch.ch_name<<","<<t_ch.range<<","<<t_ch.cal;
 
@@ -309,7 +309,7 @@ void BabyMEGInfo::MGH_LM_Parse_Para(QByteArray cmdstr)
 
             break;
         case 3: // reference meg sensors
-            t_ch.kind = FIFFV_MEG_CH;
+            t_ch.kind = FIFFV_REF_MEG_CH;
             t_ch.unit = FIFF_UNIT_T;
             t_ch.unit_mul = FIFF_UNITM_NONE;
             t_ch.coil_type = FIFFV_COIL_BABY_REF_MAG;
