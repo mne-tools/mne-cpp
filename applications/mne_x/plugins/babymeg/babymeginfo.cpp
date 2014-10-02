@@ -186,9 +186,7 @@ void BabyMEGInfo::MGH_LM_Get_Channel_Info(QByteArray cmdstr)
 
 //                qDebug()<<lm_ch_scales;
 //                qDebug()<<lm_ch_pos2;
-//                qDebug()<<lm_ch_coiltype;
-
-
+//                qDebug()<<"coiltype"<<lm_ch_coiltype<<"calicoef"<<lm_ch_calicoef;
             }
         }
     }
@@ -257,9 +255,11 @@ void BabyMEGInfo::MGH_LM_Parse_Para(QByteArray cmdstr)
         t_ch.scanno = i;
         t_ch.logno = i+1;
         t_ch.cal = lm_ch_calicoef.at(i).toDouble();
-        t_ch.unit_mul = lm_ch_scales.at(i).toFloat();
-        //qDebug()<<t_ch.cal;
-        t_ch.range = lm_ch_gain.at(i).toFloat();//1; // set scale
+        t_ch.unit_mul = 1.0;//lm_ch_scales.at(i).toFloat();
+        t_ch.range =1.0f/lm_ch_gain.at(i).toFloat();//1; // set gain
+
+        //qDebug()<<i<<":="<<t_ch.ch_name<<","<<t_ch.range<<","<<t_ch.cal;
+
         t_ch.loc.setZero(12,1);
 
         //set loc
@@ -278,86 +278,70 @@ void BabyMEGInfo::MGH_LM_Parse_Para(QByteArray cmdstr)
 
         //qDebug()<<t_ch.loc(0,0)<<t_ch.loc(1,0)<<t_ch.loc(2,0);
 
-        int type = lm_ch_coiltype.at(i).toInt(); //t_ch.ch_name.left(3);
+        int type = lm_ch_coiltype.at(i).toInt();
         int ntype = 0;
-//        if (type == "MEG")
-//            ntype = 1;
-//        else if (type == "EEG")
-//            ntype = 2;
-        if (type == FIFFV_COIL_BABY_MAG)
+
+        if (type == FIFFV_COIL_BABY_MAG) //inner layer MEG
             ntype = 1;
-        else if (type == FIFFV_COIL_EEG)
-            ntype = 2;
         else if (type == FIFFV_COIL_BABY_REF_MAG)
+            ntype = 2;
+        else if (type == FIFFV_COIL_BABY_REF_MAG2)
             ntype = 3;
+        else if (type == FIFFV_STIM_CH)
+            ntype = 4;
+        else if (type == FIFFV_EEG_CH)
+            ntype = 5;
 
         switch (ntype)
         {
-        case 1:
+        case 1: // inner layer meg sensors
             t_ch.kind = FIFFV_MEG_CH;
             t_ch.unit = FIFF_UNIT_T;
             t_ch.unit_mul = FIFF_UNITM_NONE;
-            t_ch.coil_type = FIFFV_COIL_BABY_MAG;// ToDo FIFFV_COIL_BABY_MAG
+            t_ch.coil_type = FIFFV_COIL_BABY_MAG;
 
             break;
-        case 2:
+        case 2: // outer layer meg sensors
+            t_ch.kind = FIFFV_MEG_CH;
+            t_ch.unit = FIFF_UNIT_T;
+            t_ch.unit_mul = FIFF_UNITM_NONE;
+            t_ch.coil_type = FIFFV_COIL_BABY_REF_MAG;
+
+            break;
+        case 3: // reference meg sensors
+            t_ch.kind = FIFFV_REF_MEG_CH;
+            t_ch.unit = FIFF_UNIT_T;
+            t_ch.unit_mul = FIFF_UNITM_NONE;
+            t_ch.coil_type = FIFFV_COIL_BABY_REF_MAG2;
+
+            break;
+        case 4: // trigger lines
+            t_ch.kind = FIFFV_STIM_CH;
+            t_ch.unit = FIFF_UNIT_V;
+            t_ch.unit_mul = FIFF_UNITM_NONE;
+            t_ch.coil_type = FIFFV_STIM_CH;
+            break;
+        case 5: // EEG channels
             t_ch.kind = FIFFV_EEG_CH;
             t_ch.unit = FIFF_UNIT_V;
             t_ch.unit_mul = FIFF_UNITM_NONE;
             t_ch.coil_type = FIFFV_COIL_EEG;
 
             break;
-        case 3:
+        default: // other unknown type sensors
             t_ch.kind = FIFFV_MEG_CH;
             t_ch.unit = FIFF_UNIT_T;
             t_ch.unit_mul = FIFF_UNITM_NONE;
-            t_ch.coil_type = FIFFV_COIL_BABY_REF_MAG;// ToDo FIFFV_COIL_BABY_REF_MAG
-
-            break;
-
-        default:
-            t_ch.kind = FIFFV_MEG_CH;
-            t_ch.unit = FIFF_UNIT_T;
-            t_ch.unit_mul = FIFF_UNITM_NONE;
-            t_ch.coil_type = FIFFV_COIL_BABY_MAG;// ToDo FIFFV_COIL_BABY_REF_MAG
+            t_ch.coil_type = FIFFV_COIL_NONE;
 
             break;
         }
         m_FiffInfo.chs.append(t_ch);
         m_FiffInfo.ch_names.append(t_ch.ch_name);
+
     }
 
     emit fiffInfoAvailable(m_FiffInfo);
 
     return;
 }
-/*
-//*************************************************************************************************************
-
-void BabyMEGInfo::EnQueue(QByteArray DataIn)
-{
-    g_mutex.lock();
-    if (g_queue.size() == g_maxlen) {
-        qDebug() << "g_queue is full, waiting!";
-        g_queueNotFull.wait(&g_mutex);
-    }
-    g_queue.enqueue(DataIn);
-    g_queueNotEmpty.wakeAll();
-    g_mutex.unlock();
-    qDebug() << "Data In...[size="<<g_queue.size()<<"]";
-}
-//*************************************************************************************************************
-
-QByteArray BabyMEGInfo::DeQueue()
-{
-    QMutexLocker locker(&g_mutex);
-    if (g_queue.isEmpty()) {
-    qDebug() << "g_queue empty, waiting!";
-    g_queueNotEmpty.wait(&g_mutex);
-    }
-    QByteArray val = g_queue.dequeue();
-    g_queueNotFull.wakeAll();
-    qDebug() << "Data Out...[size="<<g_queue.size()<<"]";
-    return val;
-}
-*/
