@@ -17,12 +17,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -44,6 +44,7 @@
 //=============================================================================================================
 #include <iostream>
 #include <fstream>
+#include <direct.h>
 
 #include "tmsi_global.h"
 
@@ -51,9 +52,9 @@
 #include <generics/circularmatrixbuffer.h>
 #include <xMeas/newrealtimemultisamplearray.h>
 
-#include <utils/asaelc.h>
+#include <utils/layoutloader.h>
 
-#include <Eigen/unsupported/FFT>
+#include <unsupported/Eigen/FFT>
 #include <Eigen/Geometry>
 
 
@@ -67,9 +68,10 @@
 #include <QTime>
 #include <QtConcurrent/QtConcurrent>
 
-
 #include "FormFiles/tmsisetupwidget.h"
 #include "FormFiles/tmsimanualannotationwidget.h"
+#include "FormFiles/tmsiimpedancewidget.h"
+#include "FormFiles/tmsisetupprojectwidget.h"
 
 
 //*************************************************************************************************************
@@ -126,6 +128,8 @@ class TMSISHARED_EXPORT TMSI : public ISensor
 
     friend class TMSIProducer;
     friend class TMSISetupWidget;
+    friend class TMSIImpedanceWidget;
+    friend class TMSISetupProjectWidget;
 
 public:
     //=========================================================================================================
@@ -154,7 +158,13 @@ public:
 
     //=========================================================================================================
     /**
-    * Sets up the fiff info with the current data chosen by the user.
+    * Is called when plugin is detached of the stage. Can be used to safe settings.
+    */
+    virtual void unload();
+
+    //=========================================================================================================
+    /**
+    * Sets up the fiff info with the current data chosen by the user. Note: Only works for ANT Neuro Waveguard Duke caps.
     */
     void setUpFiffInfo();
 
@@ -186,9 +196,41 @@ protected:
     */
     virtual void run();
 
+    //=========================================================================================================
+    /**
+    * Opens a widget to check the impedance values
+    */
+    void showImpedanceDialog();
+
+    //=========================================================================================================
+    /**
+    * Opens a dialog to setup the project to check the impedance values
+    */
+    void showSetupProjectDialog();
+
+    //=========================================================================================================
+    /**
+    * Starts data recording
+    */
+    void showStartRecording();
+
+    //=========================================================================================================
+    /**
+    * Implements blinking recording button
+    */
+    void changeRecordingButton();
+
+    //=========================================================================================================
+    /**
+    * Checks if a dir exists
+    */
+    bool dirExists(const std::string& dirName_in);
+
 private:
     PluginOutputData<NewRealTimeMultiSampleArray>::SPtr m_pRMTSA_TMSI;      /**< The RealTimeSampleArray to provide the EEG data.*/
     QSharedPointer<TMSIManualAnnotationWidget> m_tmsiManualAnnotationWidget;/**< Widget for manually annotation the trigger during session.*/
+    QSharedPointer<TMSIImpedanceWidget> m_pTmsiImpedanceWidget;             /**< Widget for checking the impedances*/
+    QSharedPointer<TMSISetupProjectWidget> m_pTmsiSetupProjectWidget;       /**< Widget for checking the impedances*/
 
     QString                             m_qStringResourcePath;              /**< The path to the EEG resource directory.*/
 
@@ -210,6 +252,7 @@ private:
     bool                                m_bBeepTrigger;                     /**< Flag for using a trigger input.*/
     bool                                m_bUseCommonAverage;                /**< Flag for using common average.*/
     bool                                m_bUseKeyboardTrigger;              /**< Flag for using the keyboard as a trigger input.*/
+    bool                                m_bCheckImpedances;                 /**< Flag for checking the impedances of the EEG amplifier.*/
 
     int                                 m_iTriggerType;                     /**< Holds the trigger type | 0 - no trigger activated, 254 - left, 253 - right, 252 - beep.*/
 
@@ -228,6 +271,14 @@ private:
     MatrixXf                            m_matOldMatrix;                     /**< Last received sample matrix by the tmsiproducer/tmsidriver class. Used for simple HP filtering.*/
 
     QMutex                              m_qMutex;                           /**< Holds the threads mutex.*/
+
+    QAction*                            m_pActionImpedance;                 /**< shows impedance widget */
+    QAction*                            m_pActionSetupProject;              /**< shows setup project dialog */
+    QAction*                            m_pActionStartRecording;            /**< starts to record data */
+
+    QSharedPointer<QTimer>              m_pTimerRecordingChange;            /**< timer to control blinking of the recording icon */
+    qint16                              m_iBlinkStatus;                     /**< flag for recording icon blinking */
+
 };
 
 } // NAMESPACE

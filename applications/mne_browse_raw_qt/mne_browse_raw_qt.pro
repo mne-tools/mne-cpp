@@ -1,7 +1,8 @@
 #--------------------------------------------------------------------------------------------------------------
 #
 # @file     applications.pro
-# @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
+# @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>;
+#           Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
 #           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 #           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 #           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
@@ -10,7 +11,7 @@
 #
 # @section  LICENSE
 #
-# Copyright (C) 2014, Florian Schlembach, Christoph Dinh, Matti Hamalainen and Jens Haueisen. All rights reserved.
+# Copyright (C) 2014, Lorenz Esch, Florian Schlembach, Christoph Dinh, Matti Hamalainen and Jens Haueisen. All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 # the following conditions are met:
@@ -18,12 +19,12 @@
 #       following disclaimer.
 #     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 #       the following disclaimer in the documentation and/or other materials provided with the distribution.
-#     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+#     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 #       to endorse or promote products derived from this software without specific prior written permission.
 #
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 # WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-# PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+# PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 # INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 # PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 # HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -39,7 +40,7 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = app
 
-QT += network core widgets concurrent
+QT += network core widgets concurrent svg
 
 TARGET = mne_browse_raw_qt
 
@@ -67,25 +68,57 @@ else {
 
 DESTDIR = $${MNE_BINARY_DIR}
 
-SOURCES += rawsettings.cpp\
-    main.cpp\
-    rawmodel.cpp \
-    mainwindow.cpp \
-    rawdelegate.cpp \
-    mneoperator.cpp \
-    filteroperator.cpp
+SOURCES += \
+    main.cpp \
+    Utils/datamarker.cpp \
+    Utils/rawsettings.cpp \
+    Utils/mneoperator.cpp \
+    Utils/filteroperator.cpp \
+    Utils/filterplotscene.cpp \
+    Utils/layoutscene.cpp \
+    Utils/channelsceneitem.cpp \
+    Models/rawmodel.cpp \
+    Models/eventmodel.cpp \
+    Delegates/rawdelegate.cpp \
+    Delegates/eventdelegate.cpp \
+    Windows/mainwindow.cpp \
+    Windows/filterwindow.cpp \
+    Windows/eventwindow.cpp \
+    Windows/datawindow.cpp \
+    Windows/aboutwindow.cpp \
+    Windows/informationwindow.cpp \
+    Windows/selectionmanagerwindow.cpp
 
-HEADERS += types.h\
-    info.h\
-    rawsettings.h\
-    rawmodel.h\
-    mainwindow.h \
-    rawdelegate.h \
-    mneoperator.h \
-    filteroperator.h
+HEADERS += \
+    Utils/datamarker.h \
+    Utils/rawsettings.h \
+    Utils/mneoperator.h \
+    Utils/filteroperator.h \
+    Utils/types.h \
+    Utils/info.h \
+    Utils/filterplotscene.h \
+    Utils/layoutscene.h \
+    Utils/channelsceneitem.h \
+    Models/rawmodel.h \
+    Models/eventmodel.h \
+    Delegates/rawdelegate.h \
+    Delegates/eventdelegate.h \
+    Windows/mainwindow.h \
+    Windows/filterwindow.h \
+    Windows/eventwindow.h \
+    Windows/datawindow.h \
+    Windows/aboutwindow.h \
+    Windows/informationwindow.h \
+    Windows/selectionmanagerwindow.h
 
-
-FORMS +=
+FORMS += \
+    Windows/filterwindow.ui \
+    Windows/eventwindowdock.ui \
+    Windows/datawindowdock.ui \
+    Windows/mainwindow.ui \
+    Windows/aboutwindow.ui \
+    Windows/informationwindow.ui \
+    Windows/selectionmanagerwindow.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}
@@ -103,3 +136,7 @@ macx {
     CONFIG +=c++11
 }
 
+RESOURCES += \
+    mnebrowserawqt.qrc
+
+RC_FILE = Resources/Images/ApplicationIcons/myapp.rc

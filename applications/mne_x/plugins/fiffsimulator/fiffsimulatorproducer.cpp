@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -44,6 +44,13 @@
 
 //*************************************************************************************************************
 //=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QMutexLocker>
+
+//*************************************************************************************************************
+//=============================================================================================================
 // USED NAMESPACES
 //=============================================================================================================
 
@@ -52,7 +59,7 @@ using namespace FiffSimulatorPlugin;
 
 //*************************************************************************************************************
 //=============================================================================================================
-// QT INCLUDES
+// DEFINE MEMBER METHODS
 //=============================================================================================================
 
 FiffSimulatorProducer::FiffSimulatorProducer(FiffSimulator* p_pFiffSimulator)
@@ -192,19 +199,25 @@ void FiffSimulatorProducer::run()
     qint32 from = 0;
     qint32 to = -1;
 
-    while(m_bIsRunning)
+    while(true)
     {
+        {
+            QMutexLocker locker(&producerMutex);
+            if(!m_bIsRunning)
+                break;
+        }
+
+        producerMutex.lock();
         if(m_bFlagInfoRequest)
         {
-            m_pFiffSimulator->rtServerMutex.lock();
+            m_pFiffSimulator->m_qMutex.lock();
             m_pFiffSimulator->m_pFiffInfo = m_pRtDataClient->readInfo();
             emit m_pFiffSimulator->fiffInfoAvailable();
-            m_pFiffSimulator->rtServerMutex.unlock();
+            m_pFiffSimulator->m_qMutex.unlock();
 
-            producerMutex.lock();
             m_bFlagInfoRequest = false;
-            producerMutex.unlock();
         }
+        producerMutex.unlock();
 
         if(m_bFlagMeasuring)
         {

@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -208,30 +208,48 @@ void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, 
         case FIFFV_MEG_CH: {
             qint32 unit =t_pModel->getUnit(index.row());
             if(unit == FIFF_UNIT_T_M) {
-                fMaxValue = 1e-10f;// m_qSettings.value("RawDelegate/max_meg_grad").toDouble();
+                fMaxValue = 1e-10f;
+                if(t_pModel->getScaling().contains(FIFF_UNIT_T_M))
+                    fMaxValue = t_pModel->getScaling()[FIFF_UNIT_T_M];
             }
             else if(unit == FIFF_UNIT_T)
             {
                 if(t_pModel->getCoil(index.row()) == FIFFV_COIL_BABY_MAG)
-                    fMaxValue = 1e-4f;
+                    fMaxValue = 1e-11f;
                 else
-                    fMaxValue = 1e-11f;// m_qSettings.value("RawDelegate/max_meg_mag").toDouble();
+                    fMaxValue = 1e-11f;
+
+                if(t_pModel->getScaling().contains(FIFF_UNIT_T))
+                    fMaxValue = t_pModel->getScaling()[FIFF_UNIT_T];
             }
             break;
         }
         case FIFFV_EEG_CH: {
-            fMaxValue = 1e-4f;// m_qSettings.value("RawDelegate/max_eeg").toDouble();
+            fMaxValue = 1e-4f;
+            if(t_pModel->getScaling().contains(FIFFV_EEG_CH))
+                fMaxValue = t_pModel->getScaling()[FIFFV_EEG_CH];
             break;
         }
         case FIFFV_EOG_CH: {
-            fMaxValue = 1e-3f; //m_qSettings.value("RawDelegate/max_eog").toDouble();
+            fMaxValue = 1e-3f;
+            if(t_pModel->getScaling().contains(FIFFV_EOG_CH))
+                fMaxValue = t_pModel->getScaling()[FIFFV_EOG_CH];
             break;
         }
         case FIFFV_STIM_CH: {
-            fMaxValue = 5; //m_qSettings.value("RawDelegate/max_stim").toDouble();
+            fMaxValue = 5;
+            if(t_pModel->getScaling().contains(FIFFV_STIM_CH))
+                fMaxValue = t_pModel->getScaling()[FIFFV_STIM_CH];
+            break;
+        }
+        case FIFFV_MISC_CH: {
+            fMaxValue = 1e-3f;
+            if(t_pModel->getScaling().contains(FIFFV_MISC_CH))
+                fMaxValue = t_pModel->getScaling()[FIFFV_MISC_CH];
             break;
         }
     }
+
 
     float fValue;
     float fScaleY = option.rect.height()/(2*fMaxValue);
@@ -247,7 +265,7 @@ void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, 
 //        float val = data[0];
         fValue = 0;//(val-data[0])*fScaleY;
 
-        float newY = y_base+fValue;
+        float newY = y_base-fValue;//Reverse direction -> plot the right way
 
         qSamplePosition.setY(newY);
         qSamplePosition.setX(path.currentPosition().x());
@@ -261,7 +279,7 @@ void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, 
         float val = data[i] - data[0]; //remove first sample data[0] as offset
         fValue = val*fScaleY;
 
-        float newY = y_base+fValue;
+        float newY = y_base-fValue;//Reverse direction -> plot the right way
 
         qSamplePosition.setY(newY);
         qSamplePosition.setX(path.currentPosition().x()+fDx);
@@ -278,7 +296,7 @@ void RealTimeMultiSampleArrayDelegate::createPlotPath(const QModelIndex &index, 
         float val = lastData[i] - lastData[0]; //remove first sample lastData[0] as offset
         fValue = val*fScaleY;
 
-        float newY = y_base+fValue;
+        float newY = y_base-fValue;
 
         qSamplePosition.setY(newY);
         qSamplePosition.setX(lastPath.currentPosition().x()+fDx);

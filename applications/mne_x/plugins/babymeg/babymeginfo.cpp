@@ -17,12 +17,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -141,6 +141,9 @@ void BabyMEGInfo::MGH_LM_Get_Channel_Info(QByteArray cmdstr)
     lm_ch_pos10.clear();
     lm_ch_pos11.clear();
     lm_ch_pos12.clear();
+    lm_ch_coiltype.clear();
+    lm_ch_calicoef.clear();
+    lm_ch_gain.clear();
 
 
     // parse the information for each channel
@@ -158,7 +161,7 @@ void BabyMEGInfo::MGH_LM_Get_Channel_Info(QByteArray cmdstr)
                 //qDebug()<<tt;
                 //extract value array from tt by separated char ","
                 QStringList schp = tt.split(",");
-
+                //qDebug()<<schp;
                 // scale
                 lm_ch_scales.append(schp.at(0));
                 // positions : x,y,z and units of x,y,z
@@ -174,11 +177,16 @@ void BabyMEGInfo::MGH_LM_Get_Channel_Info(QByteArray cmdstr)
                 lm_ch_pos10.append(schp.at(10));
                 lm_ch_pos11.append(schp.at(11));
                 lm_ch_pos12.append(schp.at(12));
+                //coil type
+                lm_ch_coiltype.append(schp.at(13));
+                //calibration coefficient
+                lm_ch_calicoef.append(schp.at(14));
+                //gain
+                lm_ch_gain.append(schp.at(15));
 
 //                qDebug()<<lm_ch_scales;
 //                qDebug()<<lm_ch_pos2;
-
-
+//                qDebug()<<"coiltype"<<lm_ch_coiltype<<"calicoef"<<lm_ch_calicoef;
             }
         }
     }
@@ -246,10 +254,12 @@ void BabyMEGInfo::MGH_LM_Parse_Para(QByteArray cmdstr)
         //qDebug()<<t_ch.ch_name;
         t_ch.scanno = i;
         t_ch.logno = i+1;
-        t_ch.cal = 1;
-        t_ch.unit_mul = lm_ch_scales.at(i).toFloat(); // set scale
-        //qDebug()<<t_ch.cal;
-        t_ch.range = 1;
+        t_ch.cal = lm_ch_calicoef.at(i).toDouble();
+        t_ch.unit_mul = 1.0;//lm_ch_scales.at(i).toFloat();
+        t_ch.range =1.0f/lm_ch_gain.at(i).toFloat();//1; // set gain
+
+        //qDebug()<<i<<":="<<t_ch.ch_name<<","<<t_ch.range<<","<<t_ch.cal;
+
         t_ch.loc.setZero(12,1);
 
         //set loc
@@ -268,68 +278,70 @@ void BabyMEGInfo::MGH_LM_Parse_Para(QByteArray cmdstr)
 
         //qDebug()<<t_ch.loc(0,0)<<t_ch.loc(1,0)<<t_ch.loc(2,0);
 
-        QString type = t_ch.ch_name.left(3);
+        int type = lm_ch_coiltype.at(i).toInt();
         int ntype = 0;
-        if (type == "MEG")
+
+        if (type == FIFFV_COIL_BABY_MAG) //inner layer MEG
             ntype = 1;
-        else if (type == "EEG")
+        else if (type == FIFFV_COIL_BABY_REF_MAG)
             ntype = 2;
+        else if (type == FIFFV_COIL_BABY_REF_MAG2)
+            ntype = 3;
+        else if (type == FIFFV_STIM_CH)
+            ntype = 4;
+        else if (type == FIFFV_EEG_CH)
+            ntype = 5;
+
         switch (ntype)
         {
-        case 1:
-                t_ch.kind = FIFFV_MEG_CH;
-                t_ch.unit = FIFF_UNIT_T;
-                t_ch.unit_mul = FIFF_UNITM_NONE;
-                t_ch.coil_type = FIFFV_COIL_BABY_MAG;// ToDo FIFFV_COIL_BABY_REF_MAG
-            break;
-        case 2:
-                t_ch.kind = FIFFV_EEG_CH;
-                t_ch.unit = FIFF_UNIT_V;
-                t_ch.unit_mul = FIFF_UNITM_NONE;
-                t_ch.coil_type = FIFFV_COIL_EEG;
-            break;
-        default:
+        case 1: // inner layer meg sensors
             t_ch.kind = FIFFV_MEG_CH;
             t_ch.unit = FIFF_UNIT_T;
             t_ch.unit_mul = FIFF_UNITM_NONE;
-            t_ch.coil_type = FIFFV_COIL_BABY_MAG;// ToDo FIFFV_COIL_BABY_REF_MAG
+            t_ch.coil_type = FIFFV_COIL_BABY_MAG;
+
+            break;
+        case 2: // outer layer meg sensors
+            t_ch.kind = FIFFV_MEG_CH;
+            t_ch.unit = FIFF_UNIT_T;
+            t_ch.unit_mul = FIFF_UNITM_NONE;
+            t_ch.coil_type = FIFFV_COIL_BABY_REF_MAG;
+
+            break;
+        case 3: // reference meg sensors
+            t_ch.kind = FIFFV_REF_MEG_CH;
+            t_ch.unit = FIFF_UNIT_T;
+            t_ch.unit_mul = FIFF_UNITM_NONE;
+            t_ch.coil_type = FIFFV_COIL_BABY_REF_MAG2;
+
+            break;
+        case 4: // trigger lines
+            t_ch.kind = FIFFV_STIM_CH;
+            t_ch.unit = FIFF_UNIT_V;
+            t_ch.unit_mul = FIFF_UNITM_NONE;
+            t_ch.coil_type = FIFFV_STIM_CH;
+            break;
+        case 5: // EEG channels
+            t_ch.kind = FIFFV_EEG_CH;
+            t_ch.unit = FIFF_UNIT_V;
+            t_ch.unit_mul = FIFF_UNITM_NONE;
+            t_ch.coil_type = FIFFV_COIL_EEG;
+
+            break;
+        default: // other unknown type sensors
+            t_ch.kind = FIFFV_MEG_CH;
+            t_ch.unit = FIFF_UNIT_T;
+            t_ch.unit_mul = FIFF_UNITM_NONE;
+            t_ch.coil_type = FIFFV_COIL_NONE;
 
             break;
         }
         m_FiffInfo.chs.append(t_ch);
         m_FiffInfo.ch_names.append(t_ch.ch_name);
+
     }
 
     emit fiffInfoAvailable(m_FiffInfo);
 
     return;
-}
-
-//*************************************************************************************************************
-
-void BabyMEGInfo::EnQueue(QByteArray DataIn)
-{
-    g_mutex.lock();
-    if (g_queue.size() == g_maxlen) {
-        qDebug() << "g_queue is full, waiting!";
-        g_queueNotFull.wait(&g_mutex);
-    }
-    g_queue.enqueue(DataIn);
-    g_queueNotEmpty.wakeAll();
-    g_mutex.unlock();
-    qDebug() << "Data In...[size="<<g_queue.size()<<"]";
-}
-//*************************************************************************************************************
-
-QByteArray BabyMEGInfo::DeQueue()
-{
-    QMutexLocker locker(&g_mutex);
-    if (g_queue.isEmpty()) {
-    qDebug() << "g_queue empty, waiting!";
-    g_queueNotEmpty.wait(&g_mutex);
-    }
-    QByteArray val = g_queue.dequeue();
-    g_queueNotFull.wakeAll();
-    qDebug() << "Data Out...[size="<<g_queue.size()<<"]";
-    return val;
 }

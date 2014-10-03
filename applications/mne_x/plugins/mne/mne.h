@@ -1,0 +1,250 @@
+//=============================================================================================================
+/**
+* @file     mne.h
+* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+* @version  1.0
+* @date     February, 2013
+*
+* @section  LICENSE
+*
+* Copyright (C) 2013, Christoph Dinh and Matti Hamalainen. All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without modification, are permitted provided that
+* the following conditions are met:
+*     * Redistributions of source code must retain the above copyright notice, this list of conditions and the
+*       following disclaimer.
+*     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
+*       the following disclaimer in the documentation and/or other materials provided with the distribution.
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
+*       to endorse or promote products derived from this software without specific prior written permission.
+*
+* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+* WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
+* INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+* NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+* POSSIBILITY OF SUCH DAMAGE.
+*
+*
+* @brief    Contains the declaration of the MNE class.
+*
+*/
+
+#ifndef MNE_H
+#define MNE_H
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// INCLUDES
+//=============================================================================================================
+
+#include "mne_global.h"
+#include <mne_x/Interfaces/IAlgorithm.h>
+
+#include <generics/circularmatrixbuffer.h>
+
+#include <fs/annotationset.h>
+#include <fs/surfaceset.h>
+#include <fiff/fiff_info.h>
+#include <fiff/fiff_evoked.h>
+#include <mne/mne_forwardsolution.h>
+#include <mne/mne_sourceestimate.h>
+#include <inverse/minimumNorm/minimumnorm.h>
+#include <rtInv/rtinvop.h>
+
+#include <xMeas/realtimesourceestimate.h>
+#include <xMeas/realtimecov.h>
+#include <xMeas/realtimeevoked.h>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// QT INCLUDES
+//=============================================================================================================
+
+#include <QtWidgets>
+#include <QFile>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE NAMESPACE MNEPlugin
+//=============================================================================================================
+
+namespace MNEPlugin
+{
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace FSLIB;
+using namespace FIFFLIB;
+using namespace MNELIB;
+using namespace INVERSELIB;
+using namespace RTINVLIB;
+using namespace MNEX;
+using namespace XMEASLIB;
+using namespace IOBuffer;
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// FORWARD DECLARATIONS
+//=============================================================================================================
+
+
+//=============================================================================================================
+/**
+* DECLARE CLASS MNE
+*
+* @brief The MNE class provides a dummy algorithm structure.
+*/
+class MNESHARED_EXPORT MNE : public IAlgorithm
+{
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID "mne_x/1.0" FILE "mne.json") //NEw Qt5 Plugin system replaces Q_EXPORT_PLUGIN2 macro
+    // Use the Q_INTERFACES() macro to tell Qt's meta-object system about the interfaces
+    Q_INTERFACES(MNEX::IAlgorithm)
+
+    friend class MNESetupWidget;
+
+public:
+
+    //=========================================================================================================
+    /**
+    * Constructs a MNE.
+    */
+    MNE();
+    //=========================================================================================================
+    /**
+    * Destroys the MNE.
+    */
+    ~MNE();
+
+    //=========================================================================================================
+    /**
+    * Clone the plugin
+    */
+    virtual QSharedPointer<IPlugin> clone() const;
+
+    //=========================================================================================================
+    /**
+    * Initialise the MNE.
+    */
+    void init();
+
+    //=========================================================================================================
+    /**
+    * Is called when plugin is detached of the stage. Can be used to safe settings.
+    */
+    virtual void unload();
+
+    void calcFiffInfo();
+
+    void doClustering();
+
+    void finishedClustering();
+
+    virtual bool start();
+    virtual bool stop();
+
+    virtual IPlugin::PluginType getType() const;
+    virtual QString getName() const;
+
+    virtual QWidget* setupWidget();
+
+    //=========================================================================================================
+    /**
+    * Slot to update the fiff covariance
+    *
+    */
+    void updateRTC(XMEASLIB::NewMeasurement::SPtr pMeasurement);
+
+    //=========================================================================================================
+    /**
+    * Slot to update the fiff evoked
+    *
+    * @param[in] pMeasurement   The evoked to be appended
+    */
+    void updateRTE(XMEASLIB::NewMeasurement::SPtr pMeasurement);
+
+    //=========================================================================================================
+    /**
+    * Slot to update the inverse operator
+    *
+    * @param[in] p_pInvOp    The inverse operator to update
+    */
+    void updateInvOp(MNEInverseOperator::SPtr p_pInvOp);
+
+signals:
+    //=========================================================================================================
+    /**
+    * Signal when clsutering is started
+    */
+    void clusteringStarted();
+
+    //=========================================================================================================
+    /**
+    * Signal when clsutering has finished
+    */
+    void clusteringFinished();
+
+protected:
+    virtual void run();
+
+private:
+    PluginInputData<RealTimeEvoked>::SPtr   m_pRTEInput;    /**< The RealTimeEvoked input.*/
+    PluginInputData<RealTimeCov>::SPtr      m_pRTCInput;    /**< The RealTimeCov input.*/
+
+    PluginOutputData<RealTimeSourceEstimate>::SPtr      m_pRTSEOutput;  /**< The RealTimeSourceEstimate output.*/
+
+    QMutex m_qMutex;
+
+    QVector<FiffEvoked> m_qVecFiffEvoked;
+    qint32 m_iNumAverages;
+
+    QVector<FiffCov>        m_qVecFiffCov;
+
+    bool m_bIsRunning;      /**< If source lab is running */
+    bool m_bReceiveData;    /**< If thread is ready to receive data */
+    bool m_bProcessData;    /**< If data should be received for processing */
+
+    //MNE stuff
+    QFile                       m_qFileFwdSolution; /**< File to forward solution. */
+    MNEForwardSolution::SPtr    m_pFwd;             /**< Forward solution. */
+    MNEForwardSolution::SPtr    m_pClusteredFwd;    /**< Clustered forward solution. */
+
+    bool m_bFinishedClustering;                     /**< If clustered forward solution is available. */
+
+    QString                     m_sAtlasDir;        /**< File to Atlas. */
+    AnnotationSet::SPtr         m_pAnnotationSet;   /**< Annotation set. */
+    QString                     m_sSurfaceDir;      /**< File to Surface. */
+    SurfaceSet::SPtr            m_pSurfaceSet;      /**< Surface set. */
+
+
+    FiffInfo::SPtr              m_pFiffInfo;        /**< Fiff information. */
+    FiffInfo::SPtr              m_pFiffInfoEvoked;  /**< Fiff information of the evoked. */
+    QStringList                 m_qListCovChNames;  /**< Covariance channel names. */
+    FiffInfoBase::SPtr          m_pFiffInfoForward; /**< Fiff information of the forward solution. */
+
+    QStringList                 m_qListPickChannels;        /**< Channels to pick */
+
+    RtInvOp::SPtr               m_pRtInvOp;         /**< Real-time inverse operator. */
+    MNEInverseOperator::SPtr    m_pInvOp;           /**< The inverse operator. */
+
+    MinimumNorm::SPtr           m_pMinimumNorm;     /**< Minimum Norm Estimation. */
+    qint32                      m_iDownSample;      /**< Sampling rate */
+
+//    RealTimeSourceEstimate::SPtr m_pRTSE_MNE; /**< Source Estimate output channel. */
+};
+
+} // NAMESPACE
+
+#endif // MNE_H

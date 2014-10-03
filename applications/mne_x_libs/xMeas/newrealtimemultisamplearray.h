@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -57,6 +57,8 @@
 #include <QSharedPointer>
 #include <QVector>
 #include <QList>
+#include <QMutex>
+#include <QMutexLocker>
 
 
 //*************************************************************************************************************
@@ -185,15 +187,15 @@ public:
     *
     * @return the reference to the orig FiffInfo.
     */
-    inline FiffInfo::SPtr& getFiffInfo();
+    inline FiffInfo::SPtr& info();
 
     //=========================================================================================================
     /**
     * Sets the number of sample vectors which should be gathered before attached observers are notified by calling the Subject notify() method.
     *
-    * @param [in] ucMultiArraySize the number of values.
+    * @param [in] iMultiArraySize the number of values.
     */
-    inline void setMultiArraySize(unsigned char ucMultiArraySize);
+    inline void setMultiArraySize(qint32 iMultiArraySize);
 
     //=========================================================================================================
     /**
@@ -201,7 +203,7 @@ public:
     *
     * @return the number of values which are gathered before a notify() is called.
     */
-    inline unsigned char getMultiArraySize() const;
+    inline qint32 getMultiArraySize() const;
 
     //=========================================================================================================
     /**
@@ -214,7 +216,6 @@ public:
     //=========================================================================================================
     /**
     * Attaches a value to the sample array vector.
-    * This method is inherited by Measurement.
     *
     * @param [in] v the value which is attached to the sample array vector.
     */
@@ -230,12 +231,14 @@ public:
     virtual VectorXd getValue() const;
 
 private:
+    mutable QMutex              m_qMutex;           /**< Mutex to ensure thread safety */
+
     FiffInfo::SPtr              m_pFiffInfo_orig;   /**< Original Fiff Info if initialized by fiff info. */
 
     QString                     m_sXMLLayoutFile;   /**< Layout file name. */
     double                      m_dSamplingRate;    /**< Sampling rate of the RealTimeSampleArray.*/
     VectorXd                    m_vecValue;         /**< The current attached sample vector.*/
-    unsigned char               m_ucMultiArraySize; /**< Sample size of the multi sample array.*/
+    qint32                      m_iMultiArraySize; /**< Sample size of the multi sample array.*/
     QVector< VectorXd >         m_matSamples;       /**< The multi sample array.*/
     QList<RealTimeSampleArrayChInfo> m_qListChInfo; /**< Channel info list.*/
     bool                        m_bChInfoIsInit;    /**< If channel info is initialized.*/
@@ -249,6 +252,7 @@ private:
 
 inline void NewRealTimeMultiSampleArray::clear()
 {
+    QMutexLocker locker(&m_qMutex);
     m_matSamples.clear();
 }
 
@@ -257,6 +261,7 @@ inline void NewRealTimeMultiSampleArray::clear()
 
 inline bool NewRealTimeMultiSampleArray::isChInit() const
 {
+    QMutexLocker locker(&m_qMutex);
     return m_bChInfoIsInit;
 }
 
@@ -265,6 +270,7 @@ inline bool NewRealTimeMultiSampleArray::isChInit() const
 
 inline const QString& NewRealTimeMultiSampleArray::getXMLLayoutFile() const
 {
+    QMutexLocker locker(&m_qMutex);
     return m_sXMLLayoutFile;
 }
 
@@ -273,6 +279,7 @@ inline const QString& NewRealTimeMultiSampleArray::getXMLLayoutFile() const
 
 inline void NewRealTimeMultiSampleArray::setXMLLayoutFile(const QString& layout)
 {
+    QMutexLocker locker(&m_qMutex);
     m_sXMLLayoutFile = layout;
 }
 
@@ -281,6 +288,7 @@ inline void NewRealTimeMultiSampleArray::setXMLLayoutFile(const QString& layout)
 
 inline void NewRealTimeMultiSampleArray::setSamplingRate(double dSamplingRate)
 {
+    QMutexLocker locker(&m_qMutex);
     m_dSamplingRate = dSamplingRate;
 }
 
@@ -289,6 +297,7 @@ inline void NewRealTimeMultiSampleArray::setSamplingRate(double dSamplingRate)
 
 inline double NewRealTimeMultiSampleArray::getSamplingRate() const
 {
+    QMutexLocker locker(&m_qMutex);
     return m_dSamplingRate;
 }
 
@@ -297,6 +306,7 @@ inline double NewRealTimeMultiSampleArray::getSamplingRate() const
 
 inline unsigned int NewRealTimeMultiSampleArray::getNumChannels() const
 {
+    QMutexLocker locker(&m_qMutex);
     return m_qListChInfo.size();
 }
 
@@ -305,35 +315,39 @@ inline unsigned int NewRealTimeMultiSampleArray::getNumChannels() const
 
 inline QList<RealTimeSampleArrayChInfo>& NewRealTimeMultiSampleArray::chInfo()
 {
+    QMutexLocker locker(&m_qMutex);
     return m_qListChInfo;
 }
 
 
 //*************************************************************************************************************
 
-inline FiffInfo::SPtr& NewRealTimeMultiSampleArray::getFiffInfo()
+inline FiffInfo::SPtr& NewRealTimeMultiSampleArray::info()
 {
+    QMutexLocker locker(&m_qMutex);
     return m_pFiffInfo_orig;
 }
 
 
 //*************************************************************************************************************
 
-inline void NewRealTimeMultiSampleArray::setMultiArraySize(unsigned char ucMultiArraySize)
+inline void NewRealTimeMultiSampleArray::setMultiArraySize(qint32 iMultiArraySize)
 {
+    QMutexLocker locker(&m_qMutex);
     //Obsolete unsigned char can't be bigger
 //    if(ucArraySize > 255)
 //        m_ucArraySize = 255;
 //    else
-        m_ucMultiArraySize = ucMultiArraySize;
+        m_iMultiArraySize = iMultiArraySize;
 }
 
 
 //*************************************************************************************************************
 
-unsigned char NewRealTimeMultiSampleArray::getMultiArraySize() const
+qint32 NewRealTimeMultiSampleArray::getMultiArraySize() const
 {
-    return m_ucMultiArraySize;
+    QMutexLocker locker(&m_qMutex);
+    return m_iMultiArraySize;
 }
 
 

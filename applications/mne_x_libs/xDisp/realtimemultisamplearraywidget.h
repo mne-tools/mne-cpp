@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -47,6 +47,7 @@
 #include "helpers/realtimemultisamplearraymodel.h"
 #include "helpers/realtimemultisamplearraydelegate.h"
 
+#include "helpers/realtimemultisamplearrayscalingwidget.h"
 #include "helpers/sensorwidget.h"
 
 
@@ -57,6 +58,7 @@
 
 #include <QSharedPointer>
 #include <QList>
+#include <QMap>
 #include <QTableView>
 #include <QAction>
 #include <QSpinBox>
@@ -123,6 +125,8 @@ using namespace XMEASLIB;
 class XDISPSHARED_EXPORT RealTimeMultiSampleArrayWidget : public NewMeasurementWidget
 {
     Q_OBJECT
+
+    friend class RealTimeMultiSampleArrayScalingWidget;
 
 public:
     //=========================================================================================================
@@ -220,6 +224,12 @@ protected:
 
     //=========================================================================================================
     /**
+    * Show channel scaling widget
+    */
+    void showChScalingWidget();
+
+    //=========================================================================================================
+    /**
     * Is called when mouse wheel is used.
     * Function is selecting the tool (freezing/annotation);
     *
@@ -228,6 +238,12 @@ protected:
     virtual void wheelEvent(QWheelEvent* wheelEvent);
 
 private:
+    //=========================================================================================================
+    /**
+    * Broadcast channel scaling
+    */
+    void broadcastScaling();
+
     //=========================================================================================================
     /**
     * Sets new zoom factor
@@ -258,7 +274,6 @@ private:
     float m_fZoomFactor;                                    /**< Zoom factor */
     QDoubleSpinBox* m_pDoubleSpinBoxZoom;                   /**< Adjust Zoom Factor */
 
-
     QSharedPointer<NewRealTimeMultiSampleArray> m_pRTMSA;   /**< The real-time sample array measurement. */
 
     bool m_bInitialized;                                    /**< Is Initialized */
@@ -273,10 +288,13 @@ private:
 
     QAction*    m_pActionSelectSensors;                     /**< show roi select widget */
 
-
     SensorModel* m_pSensorModel;                            /**< Sensor model for channel selection */
     QSharedPointer<SensorWidget> m_pSensorSelectionWidget;  /**< Sensor selection widget. */
 
+    QMap< qint32,float > m_qMapChScaling;                   /**< Sensor selection widget. */
+    QAction* m_pActionChScaling;                            /**< Show channel scaling Action. */
+
+    QSharedPointer<RealTimeMultiSampleArrayScalingWidget> m_pRTMSAScalingWidget;   /**< Channel scaling widget. */
 
     QList<qint32> m_qListCurrentSelection;  /**< Current selection list -> hack around C++11 lambda  */
     void applySelection();                  /**< apply the in m_qListCurrentSelection stored selection -> hack around C++11 lambda */
