@@ -102,7 +102,7 @@ BabyMEG::BabyMEG()
     connect(m_pActionRecordFile, &QAction::triggered, this, &BabyMEG::toggleRecordingFile);
     addPluginAction(m_pActionRecordFile);
 
-    m_pActionRecordFile->setEnabled(false);
+    //m_pActionRecordFile->setEnabled(false);
 
     m_pActionSqdCtrl = new QAction(QIcon(":/images/sqdctrl.png"), tr("Squid Control"),this);
 //    m_pActionSetupProject->setShortcut(tr("F12"));
@@ -240,7 +240,7 @@ void BabyMEG::UpdateFiffInfo()
 
     sleep(0.5);
 
-    m_pActionRecordFile->setEnabled(true);
+    //m_pActionRecordFile->setEnabled(true);
 
 }
 
@@ -457,7 +457,7 @@ void BabyMEG::run()
 
             //Write raw data to fif file
             if(m_bWriteToFile)
-                m_pOutfid->write_raw_buffer(matValue.cast<double>(), m_cals);
+                m_pOutfid->write_raw_buffer(matValue.cast<double>());
 
             if(m_pRTMSABabyMEG)
             {
