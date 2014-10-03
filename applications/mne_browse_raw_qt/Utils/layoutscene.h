@@ -57,6 +57,10 @@
 #include <QRubberBand>
 #include <QWidget>
 #include <QMouseEvent>
+#include <QGestureEvent>
+#include <QPanGesture>
+#include <QPinchGesture>
+#include <QGraphicsSceneEvent>
 
 
 //*************************************************************************************************************
@@ -66,6 +70,7 @@
 
 namespace MNEBrowseRawQt
 {
+
 
 //=============================================================================================================
 /**
@@ -105,6 +110,7 @@ private:
     QMap<QString,QVector<double> >  m_layoutMap;                    /**< Holds the layout data.*/
     bool                            m_dragSceneIsActive;
     QPointF                         m_mousePressPosition;
+    bool                            m_bDragMode;
 
     //=========================================================================================================
     /**
@@ -141,6 +147,14 @@ private:
     * Reimplemented double mouse release event.
     */
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent);
+
+    bool event(QEvent *event);
+    bool gestureEvent(QGestureEvent *event);
+    void panTriggered(QPanGesture*);
+    void pinchTriggered(QPinchGesture*);
+    void swipeTriggered(QSwipeGesture*);
+
+    bool eventFilter(QObject *object, QEvent *event);
 };
 
 } // NAMESPACE

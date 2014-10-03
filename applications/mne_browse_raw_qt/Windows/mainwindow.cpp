@@ -105,7 +105,7 @@ void MainWindow::setupWindowWidgets()
     //Create dockble information window - QTDesigner used - see /FormFiles
     m_pInformationWindow = new InformationWindow(this);
     addDockWidget(Qt::BottomDockWidgetArea, m_pInformationWindow);
-    m_pInformationWindow->hide();
+    //m_pInformationWindow->hide();
 
     //Create about window - QTDesigner used - see /FormFiles
     m_pAboutWindow = new AboutWindow(this);

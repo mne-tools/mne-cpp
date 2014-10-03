@@ -96,9 +96,9 @@ void SelectionManagerWindow::initListWidgets()
 //*************************************************************************************************************
 
 void SelectionManagerWindow::initGraphicsView()
-{
+{    
     //Create layout scene and set to view
-    m_pLayoutScene = new LayoutScene(ui->m_graphicsView_layoutPlot);
+    m_pLayoutScene = new LayoutScene(ui->m_graphicsView_layoutPlot, 0);
     ui->m_graphicsView_layoutPlot->setScene(m_pLayoutScene);
 
     connect(m_pLayoutScene, &QGraphicsScene::selectionChanged,
@@ -211,7 +211,7 @@ bool SelectionManagerWindow::loadSelectionGroups(QString path)
     m_selectionGroupsMap.insert("All", allChannelsList);
 
     //Fit scene in view
-    ui->m_graphicsView_layoutPlot->fitInView(m_pLayoutScene->itemsBoundingRect(), Qt::KeepAspectRatio);
+    //ui->m_graphicsView_layoutPlot->fitInView(m_pLayoutScene->itemsBoundingRect(), Qt::KeepAspectRatio);
 
     updateDataView();
 
@@ -252,17 +252,9 @@ void SelectionManagerWindow::updateUserDefinedChannels()
     QList<QGraphicsItem*> itemList = m_pLayoutScene->selectedItems();
     QStringList userDefinedChannels;
 
-    switch(m_pLayoutScene->m_iSceneType) {
-        case 0: //Channel selection plot scene
-            for(int i = 0; i<itemList.size(); i++) {
-                ChannelSceneItem* item = static_cast<ChannelSceneItem*>(itemList.at(i));
-                userDefinedChannels << item->getElectrodeName();
-            }
-        break;
-
-        case 1: //Average plot scene
-
-        break;
+    for(int i = 0; i<itemList.size(); i++) {
+        ChannelSceneItem* item = static_cast<ChannelSceneItem*>(itemList.at(i));
+        userDefinedChannels << item->getElectrodeName();
     }
 
     ui->m_listWidget_userDefined->clear();
@@ -285,17 +277,9 @@ void SelectionManagerWindow::updateDataView()
 
     QStringList visibleChannels;
 
-    switch(m_pLayoutScene->m_iSceneType) {
-        case 0: //Channel selection plot scene
-            for(int i = 0; i<targetListWidget->count(); i++) {
-                QListWidgetItem* item = targetListWidget->item(i);
-                visibleChannels << item->text();
-            }
-        break;
-
-        case 1: //Average plot scene
-
-        break;
+    for(int i = 0; i<targetListWidget->count(); i++) {
+        QListWidgetItem* item = targetListWidget->item(i);
+        visibleChannels << item->text();
     }
 
     //Hide selected channels/rows in the raw data view
@@ -335,17 +319,12 @@ bool SelectionManagerWindow::eventFilter(QObject *obj, QEvent *event)
 {
     //Setup delte key on user defined channel list
     if (obj == ui->m_listWidget_userDefined) {
-        if (event->type() == QEvent::KeyPress) {
-            QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
+        QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
 
-            if(keyEvent->key() == Qt::Key_Delete)
-                qDeleteAll(ui->m_listWidget_userDefined->selectedItems());
-
-            return true;
-        }
-        else {
+        if(keyEvent->key() == Qt::Key_Delete)
+            qDeleteAll(ui->m_listWidget_userDefined->selectedItems());
+        else
             return false;
-        }
     }
     else {
         // pass the event on to the parent class
