@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -131,12 +131,18 @@ public:
 
     //=========================================================================================================
     /**
+    * Is called when plugin is detached of the stage. Can be used to safe settings.
+    */
+    virtual void unload() = 0;// = 0 call is not longer possible - it has to be reimplemented in child;
+
+    //=========================================================================================================
+    /**
     * Starts the IPlugin.
     * Pure virtual method.
     *
     * @return true if success, false otherwise
     */
-    virtual bool start() = 0;// = 0 call is not longer possible - it has to be reimplemented in child;
+    virtual bool start() = 0;
 
     //=========================================================================================================
     /**
@@ -154,14 +160,6 @@ public:
     * @return a list of plugin actions
     */
     inline QList< QAction* > getPluginActions();
-
-    //=========================================================================================================
-    /**
-    * A list of plugin widgets for the current plugin.
-    *
-    * @return a list of plugin widgets
-    */
-    inline QList< QWidget* > getPluginWidgets();
 
     //=========================================================================================================
     /**
@@ -220,20 +218,11 @@ protected:
     */
     inline void addPluginAction(QAction* pAction);
 
-    //=========================================================================================================
-    /**
-    * Adds a plugin widget to the current plugin.
-    *
-    * @param [in] pWidget  pointer to the widget to be added to the plugin
-    */
-    inline void addPluginWidget(QWidget* pWidget);
-
     InputConnectorList m_inputConnectors;    /**< Set of input connectors associated with this plug-in. */
     OutputConnectorList m_outputConnectors;  /**< Set of output connectors associated with this plug-in. */
 
 private:
     QList< QAction* >   m_qListPluginActions;  /**< List of plugin actions */
-    QList< QWidget* >   m_qListPluginWidgets;  /**< List of plugin widgets */
 };
 
 //*************************************************************************************************************
@@ -257,14 +246,6 @@ inline QList< QAction* > IPlugin::getPluginActions()
 
 //*************************************************************************************************************
 
-inline QList< QWidget* > IPlugin::getPluginWidgets()
-{
-    return m_qListPluginWidgets;
-}
-
-
-//*************************************************************************************************************
-
 inline void IPlugin::addPluginAction(QAction* pAction)
 {
     m_qListPluginActions.append(pAction);
@@ -273,10 +254,10 @@ inline void IPlugin::addPluginAction(QAction* pAction)
 
 //*************************************************************************************************************
 
-inline void IPlugin::addPluginWidget(QWidget* pWidget)
-{
-    m_qListPluginWidgets.append(pWidget);
-}
+//inline void IPlugin::addPluginWidget(QWidget* pWidget)
+//{
+//    m_qListPluginWidgets.append(pWidget);
+//}
 
 } //Namespace
 

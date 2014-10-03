@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -777,6 +777,49 @@ QList<MatrixXd> RtSssAlgoTest::getSSSRR(MatrixXd EqnIn, MatrixXd EqnOut, MatrixX
     NumCoil = EqnB.rows();
     NumExp = EqnB.cols();
 
+    //ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+    //    QFile t_fileRaw("/autofs/cluster/fusion/slew/GitHub/mne-cpp/bin/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+    //    FiffRawData raw(t_fileRaw);
+
+    //    QStringList include;
+    //    include << "STI 014";
+    //    bool want_meg   = true;
+    //    bool want_eeg   = false;
+    //    bool want_stim  = false;
+
+    //    RowVectorXi picks = raw.info.pick_types(want_meg, want_eeg, want_stim, include, raw.info.bads);
+
+    //    float from = 42.956f;
+    //    float to = 320.670f;
+    //    bool in_samples = false;
+    //    bool readSuccessful = false;
+    //    MatrixXd data;
+    //    MatrixXd times;
+    //    if (in_samples)
+    //        readSuccessful = raw.read_raw_segment(data, times, (qint32)from, (qint32)to, picks);
+    //    else
+    //        readSuccessful = raw.read_raw_segment_times(data, times, from, to, picks);
+
+    //    if (!readSuccessful)
+    //    {
+    //        printf("Could not read raw segment.\n");
+    //        exit(1);
+    //    }
+    //
+    ////    printf("Read %d samples.\n",(qint32)data.cols());
+    ////    printf("Read %d channels.\n",(qint32)data.rows());
+    ////    std::cout << data.block(0,0,10,10) << std::endl;
+    //
+    //    int start_sample = 0;
+    //    int end_sample = 20;
+
+    //    EqnB = data.block(0, start_sample, NumCoil, end_sample-start_sample+1);
+    //    NumCoil = EqnB.rows();
+    //    NumExp = EqnB.cols();
+    //    printf("%d samples,  %d channels \n",(qint32)EqnB.cols(), (qint32)EqnB.rows());
+
+    //cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
+
     EqnRRInv = (EqnARR.transpose() * EqnARR).inverse();
     EqnInv = (EqnA.transpose() * EqnA).inverse();
 
@@ -928,6 +971,51 @@ QList<MatrixXd> RtSssAlgoTest::getSSSOLS(MatrixXd EqnIn, MatrixXd EqnOut, Matrix
     NumBOut = EqnOut.cols();
     NumCoil = EqnB.rows();
     NumExp = EqnB.cols();
+
+/*
+        //ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
+        QFile t_fileRaw("/autofs/cluster/fusion/slew/GitHub/mne-cpp/bin/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
+        FiffRawData raw(t_fileRaw);
+
+        QStringList include;
+        include << "STI 014";
+        bool want_meg   = true;
+        bool want_eeg   = false;
+        bool want_stim  = false;
+
+        RowVectorXi picks = raw.info.pick_types(want_meg, want_eeg, want_stim, include, raw.info.bads);
+
+        float from = 42.956f;
+        float to = 320.670f;
+        bool in_samples = false;
+        bool readSuccessful = false;
+        MatrixXd data;
+        MatrixXd times;
+        if (in_samples)
+            readSuccessful = raw.read_raw_segment(data, times, (qint32)from, (qint32)to, picks);
+        else
+            readSuccessful = raw.read_raw_segment_times(data, times, from, to, picks);
+
+        if (!readSuccessful)
+        {
+            printf("Could not read raw segment.\n");
+            exit(1);
+        }
+
+        //    printf("Read %d samples.\n",(qint32)data.cols());
+        //    printf("Read %d channels.\n",(qint32)data.rows());
+        //    std::cout << data.block(0,0,10,10) << std::endl;
+
+
+        int start_sample = 0;
+        int end_sample = 20;
+
+        EqnB = data.block(0, start_sample, NumCoil, end_sample-start_sample+1);
+        NumCoil = EqnB.rows();
+        NumExp = EqnB.cols();
+        printf("%d samples,  %d channels \n",(qint32)EqnB.cols(), (qint32)EqnB.rows());
+    */
+        //cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
 
     EqnRRInv = (EqnA.transpose() * EqnA).inverse();
     SSSIn.setZero(NumCoil,NumExp);

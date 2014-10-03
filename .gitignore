@@ -334,3 +334,14 @@ bin/mne_browse_raw_qt.app/Contents/PkgInfo
 /bin/centroids_RH_sel.txt
 /bin/centroids_LH_full_oct-5.txt
 /bin/centroids_LH_sel_oct-5.txt
+
+/bin/fsSurfaced
+/bin/test_mne_clusterd
+/bin/test_mne_dispd
+/bin/test_mne_futured
+/bin/test_mne_graphd
+/bin/test_mne_libsd
+/bin/test_mne_rtd
+/bin/test_mne_stcd
+/bin/test_mne_surfaced
+/bin/mne_x_default.xml

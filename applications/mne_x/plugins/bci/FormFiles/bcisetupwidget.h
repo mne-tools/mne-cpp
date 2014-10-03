@@ -178,6 +178,14 @@ private:
     */
     void setFilterOptions();
 
+    //=========================================================================================================
+    /**
+    * Sets classification options
+    *
+    */
+    void setClassificationOptions();
+
+
     BCI* m_pBCI;                                    /**< a pointer to corresponding BCI.*/
 
     QStringList m_vAvailableFeaturesSensor;         /**< QStringList holding available features to select on sensor level (electrodes).*/

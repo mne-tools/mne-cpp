@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -70,18 +70,11 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QPaintEvent>
-#include <QPainter>
-#include <QTimer>
-#include <QTime>
+#include <QLabel>
+#include <QGridLayout>
+#include <QSettings>
 
 #include <QDebug>
-
-
-#include <QWindow>
-#include <QWidget>
-#include <QHBoxLayout>
-#include <QLineEdit>
 
 
 //*************************************************************************************************************
@@ -105,12 +98,49 @@ using namespace INVERSELIB;
 
 RealTimeSourceEstimateWidget::RealTimeSourceEstimateWidget(QSharedPointer<RealTimeSourceEstimate> &pRTSE, QWidget* parent)
 : NewMeasurementWidget(parent)
-, m_pRTMSE(pRTSE)
+, m_pRTSE(pRTSE)
 , m_bInitialized(false)
-, m_bInitializationStarted(false)
-, count(0)
 {
-    connect(this,&RealTimeSourceEstimateWidget::startInit, this, &RealTimeSourceEstimateWidget::init);
+    m_pClustStcModel = new ClustStcModel(this);
+//    m_pClustStcModel->init(t_annotationSet, t_surfSet);
+    m_pClustStcModel->setLoop(false);
+
+    //
+    // STC view
+    //
+    QGridLayout *mainLayoutView = new QGridLayout;
+
+    QLabel * pLabelNormView = new QLabel("Norm");
+    m_pSliderNormView = new QSlider(Qt::Vertical);
+    QObject::connect(m_pSliderNormView, &QSlider::valueChanged, m_pClustStcModel, &ClustStcModel::setNormalization);
+    m_pSliderNormView->setMinimum(1);
+    m_pSliderNormView->setMaximum(20000);
+    m_pSliderNormView->setValue(2000);
+
+    QLabel* pLabelAverageView = new QLabel("Average");
+    m_pSliderAverageView = new QSlider(Qt::Horizontal);
+    QObject::connect(m_pSliderAverageView, &QSlider::valueChanged, m_pClustStcModel, &ClustStcModel::setAverage);
+    m_pSliderAverageView->setMinimum(1);
+    m_pSliderAverageView->setMaximum(500);
+    m_pSliderAverageView->setValue(100);
+
+    m_pClustView = new ClustStcView(false, true, QGLView::RedCyanAnaglyph);//(false); (true, QGLView::StretchedLeftRight); (true, QGLView::RedCyanAnaglyph);
+    m_pClustView->setModel(m_pClustStcModel);
+
+    if (m_pClustView->stereoType() != QGLView::RedCyanAnaglyph)
+        m_pClustView->camera()->setEyeSeparation(0.3f);
+
+    QWidget *pWidgetContainer = QWidget::createWindowContainer(m_pClustView);
+
+    mainLayoutView->addWidget(pWidgetContainer,0,0,2,2);
+    mainLayoutView->addWidget(pLabelNormView,0,3);
+    mainLayoutView->addWidget(m_pSliderNormView,1,3);
+    mainLayoutView->addWidget(pLabelAverageView,3,0);
+    mainLayoutView->addWidget(m_pSliderAverageView,3,1);
+
+    this->setLayout(mainLayoutView);
+
+    getData();
 }
 
 
@@ -118,8 +148,17 @@ RealTimeSourceEstimateWidget::RealTimeSourceEstimateWidget(QSharedPointer<RealTi
 
 RealTimeSourceEstimateWidget::~RealTimeSourceEstimateWidget()
 {
-//    // Clear sampling rate vector
-//    RealTimeSourceEstimateWidget::s_listSamplingRates.clear();
+    //
+    // Store Settings
+    //
+    if(!m_pRTSE->getName().isEmpty())
+    {
+        QString t_sRTSEName = m_pRTSE->getName();
+
+        QSettings settings;
+        settings.setValue(QString("RTSEW/%1/norm").arg(t_sRTSEName), m_pSliderNormView->value());
+        settings.setValue(QString("RTSEW/%1/average").arg(t_sRTSEName), m_pSliderAverageView->value());
+    }
 }
 
 
@@ -127,22 +166,31 @@ RealTimeSourceEstimateWidget::~RealTimeSourceEstimateWidget()
 
 void RealTimeSourceEstimateWidget::update(XMEASLIB::NewMeasurement::SPtr)
 {
+    getData();
+}
+
+
+//*************************************************************************************************************
+
+void RealTimeSourceEstimateWidget::getData()
+{
     if(m_bInitialized)
     {
-        if(count % 4 == 0)
-        {
-            MNESourceEstimate stc = m_pRTMSE->getStc();
-            m_pView->pushSourceEstimate(stc);
-        }
-        ++count;
+        //
+        // Add Data
+        //
+        m_pClustStcModel->addData(*m_pRTSE->getValue());
     }
     else
     {
-        if(!m_bInitializationStarted && !m_pRTMSE->getSrc().isEmpty())
+        if(m_pRTSE->getAnnotSet() && m_pRTSE->getSurfSet())
         {
-            m_pRTMSE->m_bStcSend = false;
-            m_bInitializationStarted = true;
-            emit startInit();
+            m_pRTSE->m_bStcSend = false;
+            init();
+            //
+            // Add Data
+            //
+            m_pClustStcModel->addData(*m_pRTSE->getValue());
         }
     }
 }
@@ -152,52 +200,16 @@ void RealTimeSourceEstimateWidget::update(XMEASLIB::NewMeasurement::SPtr)
 
 void RealTimeSourceEstimateWidget::init()
 {
-    if(this->initOpenGLWidget())
-    {
-        m_bInitialized = true;
-        m_pRTMSE->m_bStcSend = true;
-    }
-    else
-    {
-        m_bInitialized = false;
-        m_bInitializationStarted = false;
-    }
+    QString t_sRTSEName = m_pRTSE->getName();
+    QSettings settings;
+    m_pSliderNormView->setValue(settings.value(QString("RTSEW/%1/norm").arg(t_sRTSEName), 2000).toInt());
+    m_pSliderAverageView->setValue(settings.value(QString("RTSEW/%1/average").arg(t_sRTSEName), 100).toInt());
+
+    m_pClustStcModel->init(*m_pRTSE->getAnnotSet(), *m_pRTSE->getSurfSet());
+    m_bInitialized = true;
+    m_pRTSE->m_bStcSend = true;
 }
 
-
-//*************************************************************************************************************
-
-bool RealTimeSourceEstimateWidget::initOpenGLWidget()
-{
-    if(     !m_pRTMSE->getSrc().isEmpty() &&
-            !m_pRTMSE->getAnnotSet()->isEmpty() &&
-            !m_pRTMSE->getSurfSet()->isEmpty())
-    {
-        QList<Label> t_qListLabels;
-        QList<RowVector4i> t_qListRGBAs;
-
-        m_pRTMSE->getAnnotSet()->toLabels(*m_pRTMSE->getSurfSet().data(), t_qListLabels, t_qListRGBAs);
-
-        QHBoxLayout *layout = new QHBoxLayout(this);
-
-        m_pView = new InverseView(m_pRTMSE->getSrc(), t_qListLabels, t_qListRGBAs, 12, false);
-
-        if (m_pView->stereoType() != QGLView::RedCyanAnaglyph)
-            m_pView->camera()->setEyeSeparation(0.3f);
-
-        m_pWidgetView = QWidget::createWindowContainer(m_pView); //widget take owner ship of m_pView
-//        m_pContainer->setFocusPolicy(Qt::StrongFocus);
-        m_pWidgetView->setFocusPolicy(Qt::TabFocus);
-
-//        layout->addWidget(new QLineEdit(QLatin1String("A QLineEdit")));
-        layout->addWidget(m_pWidgetView);
-//        layout->addWidget(new QLineEdit(QLatin1String("A QLabel")));
-
-        return true;
-    }
-    else
-        return false;
-}
 
 //*************************************************************************************************************
 //=============================================================================================================

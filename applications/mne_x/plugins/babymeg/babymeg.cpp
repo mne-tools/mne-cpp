@@ -2,6 +2,7 @@
 /**
 * @file     babymeg.cpp
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Limin Sun <liminsun@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     February, 2013
@@ -16,12 +17,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -43,7 +44,6 @@
 #include "FormFiles/babymegsetupwidget.h"
 #include "FormFiles/babymegprojectdialog.h"
 
-#include "FormFiles/babymegsquidcontroldgl.h"
 
 #include <utils/ioutils.h>
 
@@ -91,17 +91,25 @@ BabyMEG::BabyMEG()
     connect(m_pActionSetupProject, &QAction::triggered, this, &BabyMEG::showProjectDialog);
     addPluginAction(m_pActionSetupProject);
 
+    m_pActionUpdateFiffInfo = new QAction(QIcon(":/images/latestFiffInfo.png"), tr("Update Fiff Info"),this);
+    m_pActionUpdateFiffInfo->setStatusTip(tr("Update Fiff Info"));
+    connect(m_pActionUpdateFiffInfo, &QAction::triggered, this, &BabyMEG::UpdateFiffInfo);
+    addPluginAction(m_pActionUpdateFiffInfo);
+
     m_pActionRecordFile = new QAction(QIcon(":/images/record.png"), tr("Start Recording"),this);
 //    m_pActionSetupProject->setShortcut(tr("F12"));
     m_pActionRecordFile->setStatusTip(tr("Start Recording"));
     connect(m_pActionRecordFile, &QAction::triggered, this, &BabyMEG::toggleRecordingFile);
     addPluginAction(m_pActionRecordFile);
 
+    //m_pActionRecordFile->setEnabled(false);
+
     m_pActionSqdCtrl = new QAction(QIcon(":/images/sqdctrl.png"), tr("Squid Control"),this);
 //    m_pActionSetupProject->setShortcut(tr("F12"));
     m_pActionSqdCtrl->setStatusTip(tr("Squid Control"));
     connect(m_pActionSqdCtrl, &QAction::triggered, this, &BabyMEG::showSqdCtrlDialog);
     addPluginAction(m_pActionSqdCtrl);
+
 }
 
 
@@ -114,6 +122,7 @@ BabyMEG::~BabyMEG()
 
     if(myClient && myClient->isConnected())
             myClient->DisConnectBabyMEG();
+
 }
 
 
@@ -149,6 +158,15 @@ void BabyMEG::init()
 
     //init channels when fiff info is available
     connect(this, &BabyMEG::fiffInfoAvailable, this, &BabyMEG::initConnector);
+
+}
+
+
+//*************************************************************************************************************
+
+void BabyMEG::unload()
+{
+
 }
 
 
@@ -161,7 +179,8 @@ void BabyMEG::initConnector()
 {
     if(m_pFiffInfo)
     {
-        m_pRTMSABabyMEG = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "RtClient", "MNE Rt Client");
+        m_pRTMSABabyMEG = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "BabyMEG Output", "BabyMEG");
+        m_pRTMSABabyMEG->data()->setName(this->getName());//Provide name to auto store widget settings
 
         m_pRTMSABabyMEG->data()->initFromFiffInfo(m_pFiffInfo);
         m_pRTMSABabyMEG->data()->setMultiArraySize(500);
@@ -172,7 +191,6 @@ void BabyMEG::initConnector()
 
         m_outputConnectors.append(m_pRTMSABabyMEG);
     }
-
 }
 
 
@@ -198,9 +216,34 @@ void BabyMEG::showProjectDialog()
 
 void BabyMEG::showSqdCtrlDialog()
 {
-    BabyMEGSQUIDControlDgl SQUIDCtrlDlg(this);
-    SQUIDCtrlDlg.exec();
+    //BabyMEGSQUIDControlDgl SQUIDCtrlDlg(this);
+    //SQUIDCtrlDlg.exec();
+    // added by Limin for nonmodal dialog
+    if (SQUIDCtrlDlg == NULL)
+        SQUIDCtrlDlg = QSharedPointer<BabyMEGSQUIDControlDgl>(new BabyMEGSQUIDControlDgl(this));
+
+    if (!SQUIDCtrlDlg->isVisible())
+    {
+        SQUIDCtrlDlg->show();
+        SQUIDCtrlDlg->raise();
+        SQUIDCtrlDlg->Init();
+    }
 }
+
+//*************************************************************************************************************
+
+void BabyMEG::UpdateFiffInfo()
+{
+
+    // read gain info and save them to the m_pFiffInfo.range
+    myClientComm->SendCommandToBabyMEGShortConnection("INFO");
+
+    sleep(0.5);
+
+    //m_pActionRecordFile->setEnabled(true);
+
+}
+
 
 //*************************************************************************************************************
 
@@ -223,6 +266,7 @@ void BabyMEG::toggleRecordingFile()
             msgBox.exec();
             return;
         }
+
 
         //Initiate the stream for writing to the fif file
         m_qFileOut.setFileName(m_sRecordFile);
@@ -295,6 +339,8 @@ void BabyMEG::setFiffInfo(FiffInfo p_FiffInfo)
 
     m_iBufferSize = pInfo->dataLength;
     sfreq = pInfo->sfreq;
+
+    emit fiffInfoAvailable();
 }
 
 //*************************************************************************************************************
@@ -411,12 +457,11 @@ void BabyMEG::run()
 
             //Write raw data to fif file
             if(m_bWriteToFile)
-                m_pOutfid->write_raw_buffer(matValue.cast<double>(), m_cals);
-
+                m_pOutfid->write_raw_buffer(matValue.cast<double>());
 
             if(m_pRTMSABabyMEG)
             {
-//                std::cout << "matValue" << matValue.block(0,0,2,2) << std::endl;
+                //std::cout << "matValue" << matValue.block(0,0,2,2) << std::endl;
                 //emit values
                 for(qint32 i = 0; i < matValue.cols(); ++i)
                     m_pRTMSABabyMEG->data()->setValue(matValue.col(i).cast<double>());

@@ -2,7 +2,6 @@
 /**
 * @file     rtsssalgo.cpp
 * @author   Seok Lew <slew@nmr.mgh.harvard.edu>;
-*           Xin Li <xinli@cmu.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     June, 2013
@@ -17,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -32,9 +31,14 @@
 *
 * @brief    Contains the implementation of the RtSssAlgo class.
 *
+* @remarks  This rtsssalgo is implemented based on a paper, 'Real-Time Robust Signal Space Separation for Magnetoencephalography',
+*           authored by Chenlei Guo, Xin Li, Samu Taulu, Wei Wang, and Douglas J. Weber,
+*           published in IEEE Transactions on Biomedical Engieering Vol 57, p1856~1866, August 2010.
 */
 
 #include "rtsssalgo.h"
+#include <QFuture>
+#include <QtConcurrent/QtConcurrentMap>
 //#include "FormFiles/rtssssetupwidget.h"
 
 RtSssAlgo::RtSssAlgo()
@@ -47,7 +51,8 @@ RtSssAlgo::~RtSssAlgo()
 
 }
 
-QList<MatrixXd> RtSssAlgo::buildLinearEqn()
+//QList<MatrixXd> RtSssAlgo::buildLinearEqn()
+MatrixXd RtSssAlgo::buildLinearEqn()
 {
     QList<MatrixXd> Eqn, EqnRR;
     QList<MatrixXd> LinEqn;
@@ -72,6 +77,7 @@ QList<MatrixXd> RtSssAlgo::buildLinearEqn()
 //        std::cout << "loading coil information (BabyMEG)..... ** finisehd **" << endl;
 //    }
 
+
 //  Compute SSS equation
     LIn = LInRR;
     LOut = LOutRR;
@@ -84,6 +90,22 @@ QList<MatrixXd> RtSssAlgo::buildLinearEqn()
     Eqn = getSSSEqn(LIn, LOut);
     EqnIn = Eqn[0];
     EqnOut = Eqn[1];
+
+//
+//    Vector2i  LexpRR, LexpOLS;
+//    LexpRR(0) =LInRR;
+//    LexpRR(1) = LOutRR;
+
+//    LexpOLS(0) =LInOLS;
+//    LexpOLS(1) = LOutOLS;
+
+//    QList<Vector2i> Lexp;
+//    Lexp.append(LexpRR);
+//    Lexp.append(LexpOLS);
+
+//    QFuture<QList> res = QtConcurrent::mapped(Lexp,getSSSEqn);
+//    res.waitForFinished();
+
 
 //  build linear equation
 //    MatrixXd EqnARR(NumCoil, EqnInRR.cols()+EqnOutRR.cols());
@@ -139,7 +161,8 @@ QList<MatrixXd> RtSssAlgo::buildLinearEqn()
 
 //    std::cout << "building SSS linear equation .....finished !" << endl;
 
-    return LinEqn;
+//    return LinEqn;
+    return CoilScale.asDiagonal();
 }
 
 void RtSssAlgo::setSSSParameter(QList<int> expansionOrder)
@@ -162,14 +185,35 @@ void RtSssAlgo::setMEGInfo(FiffInfo::SPtr fiffInfo)
     Origin.resize(3);
     Origin << 0.0, 0.0, 0.04;
 
+//    // Find the number of MEG channels
+//    qint32 nmegchan = 0;
+//    for (qint32 i=0; i<fiffInfo->nchan; ++i)
+//        if(fiffInfo->chs[i].kind == FIFFV_MEG_CH)
+//            nmegchan ++;
+
     // Find the number of MEG channels
-    qint32 nmegchan = 0;
+    NumMEGChan = 0,
+    NumBadCoil = 0;
+    BadChan.setZero(fiffInfo->nchan);
     for (qint32 i=0; i<fiffInfo->nchan; ++i)
         if(fiffInfo->chs[i].kind == FIFFV_MEG_CH)
-            nmegchan ++;
+        {
+            for(qint32 j = 0; j < fiffInfo->bads.size(); j++)
+                if(fiffInfo->chs[i].ch_name == fiffInfo->bads[j])
+                {
+                    BadChan(i) = 1;
+                    qDebug() << "bad ch: " << i << "(" << fiffInfo->chs[i].ch_name << ")";
+                    NumBadCoil ++;
+//                    nmegbadchan ++;
+                }
+            NumMEGChan ++;
+        }
 
-    NumCoil = nmegchan;
-    std::cout << "number of meg channels: " << NumCoil << " out of " << fiffInfo->nchan << std::endl;
+    NumCoil =  NumMEGChan - NumBadCoil;
+
+    qDebug() << "number of meg channels: " << NumMEGChan;
+    qDebug() << "number of bad meg channels : " << NumBadCoil;
+    qDebug() << "number of meg channels used for rtSSS: " << NumCoil;
 
 //    CoilTk.append("VV_PLANAR_T1");
 //    CoilTk.append("VV_MAG_T1");
@@ -178,20 +222,25 @@ void RtSssAlgo::setMEGInfo(FiffInfo::SPtr fiffInfo)
     CoilNk.resize(NumCoil);
 
     // Coordinate of coil integrating points:  This is assigned to CoilRk.
-    //      7001 (babyMEG inlayer magnetometer): 7 pts
-    //      7002 (babyMEG outlayer magnetometer): 7 pts
+    //      7002 (babyMEG circular (10mm diameter) inlayer magnetometer): 7 pts
+    //      7003 (babyMEG square (20x20mm) outlayer magnetometer): 7 pts
     //      3012 (VectorView planar grdiometer, Type 1): 8 pts
     //      3024 (VectorView magnetometer,Type 3): 9 pts
-    MatrixXd C7001intpts7(3,7), C7002intpts7(3,7), C3012intpts8(3,8), C3024intpts9(3,9);
-    C7001intpts7 << 0.000000, 0.000000, 0.000000, 0.0040825, 0.000000, 0.000000, -0.0040825, 0.000000, 0.000000,  0.0020412, 0.0035356, 0.000000, 0.0020412, -0.0035356, 0.000000, -0.0020412, 0.0035356, 0.000000, -0.0020412, -0.0035356, 0.000000;
-    C7002intpts7 << 0.000000, 0.000000, 0.000000, 0.0081650, 0.000000, 0.000000, -0.0081650, 0.000000, 0.000000,  0.0040824, 0.0070712, 0.000000, 0.0040824, -0.0070712, 0.000000, -0.0040824, 0.0070712, 0.000000, -0.0040824, -0.0070712, 0.000000;
+    //      initialization order X1.....Xn Y1.....Yn Z1.....Zn
+    MatrixXd C7002intpts7(3,7), C7003intpts4(3,4), C7003intpts16(3,16), C3012intpts8(3,8), C3024intpts9(3,9);
+    C7002intpts7 << 0.0000000, 0.0020412, -0.0020412, -0.0040825, -0.0020412,  0.0020412, 0.0040825, 0.0000000, 0.0035356,  0.0035356,  0.0000000, -0.0035356, -0.0035356, 0.0000000, 0.0000000, 0.0000000,  0.0000000,  0.0000000,  0.0000000,  0.0000000, 0.0000000;
+    C7003intpts4 << 0.0050000, -0.0050000, -0.0050000, 0.0050000, 0.0050000, 0.0050000, 0.0050000,  0.0050000, 0.0000000, 0.0000000, 0.0000000, 0.0000000;
+    C7003intpts16 << 0.006, -0.006, -0.006, 0.006, 0.006, -0.006, -0.006, 0.006, 0.002, -0.002, -0.002, 0.002, 0.002, -0.002, -0.002, 0.002, 0.006, 0.006, -0.006, -0.006, 0.002, 0.002, -0.002, -0.002, 0.006, 0.006, -0.006, -0.006, 0.002, 0.002, -0.002, -0.002, 0.000, 0.000, 0.000, 0.000,0.000, 0.000, 0.000, 0.000,0.000, 0.000, 0.000, 0.000,0.000, 0.000, 0.000, 0.000;
+
     C3012intpts8 << 0.0059, -0.0059, 0.0059, -0.0059, 0.0108, -0.0108, 0.0108, -0.0108, 0.0067, 0.0067, -0.0067, -0.0067, 0.0067, 0.0067, -0.0067, -0.0067, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003;
     C3024intpts9 << 0.0000, 0.0100, -0.0100, 0.0100, -0.0100, 0.0000, 0.0000, 0.0100, -0.0100, 0.0000, 0.0100, 0.0100, -0.0100, -0.0100, 0.0100, -0.0100, 0.0000, 0.0000, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003, 0.0003;
 
     // Coil point weight:  This is assinged to CoilWk
-    MatrixXd C7001Wintpts7(1,7), C7002Wintpts7(1,7), C3012Wintpts8(1,8), C3024Wintpts9(1,9);
-    C7001Wintpts7 << 0.25, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125;
+    MatrixXd C7002Wintpts7(1,7), C7003Wintpts4(1,4), C7003Wintpts16(1,16), C3012Wintpts8(1,8), C3024Wintpts9(1,9);
     C7002Wintpts7 << 0.25, 0.125, 0.125, 0.125, 0.125, 0.125, 0.125;
+    C7003Wintpts4 << 0.25, 0.25, 0.25, 0.25;
+    C7003Wintpts16 << 0.0625, 0.0625, 0.0625, 0.0625, 0.0625, 0.0625, 0.0625, 0.0625, 0.0625, 0.0625, 0.0625, 0.0625, 0.0625, 0.0625, 0.0625, 0.0625;
+
     C3012Wintpts8 << 14.9790,  -14.9790,   14.9790,  -14.9790,   14.9790,  -14.9790,   14.9790,  -14.9790;
     C3024Wintpts9 << 0.1975,    0.0772,    0.0772,    0.0772,    0.0772,    0.1235,    0.1235,    0.1235,    0.1235;
 
@@ -200,10 +249,13 @@ void RtSssAlgo::setMEGInfo(FiffInfo::SPtr fiffInfo)
 
     for (qint32 i=0; i<fiffInfo->nchan; ++i)
     {
-        if(fiffInfo->chs[i].kind == FIFFV_MEG_CH)
+        if(fiffInfo->chs[i].kind == FIFFV_MEG_CH && BadChan(i) == 0)
         {
+
             CoilT.append(fiffInfo->chs[i].coil_trans);
             CoilName.append(fiffInfo->chs[i].ch_name);
+
+//            qDebug() << "coil type= " << fiffInfo->chs[i].coil_type;
 
             switch (fiffInfo->chs[i].coil_type)
             {
@@ -221,13 +273,6 @@ void RtSssAlgo::setMEGInfo(FiffInfo::SPtr fiffInfo)
                     CoilWk.append(C3024Wintpts9);
                     break;
 
-                case 7001:
-                    CoilGrad(cid) = 0;
-                    CoilNk(cid) = 7;
-                    CoilRk.append(C7001intpts7);
-                    CoilWk.append(C7001Wintpts7);
-                    break;
-
                 case 7002:
                     CoilGrad(cid) = 0;
                     CoilNk(cid) = 7;
@@ -235,8 +280,20 @@ void RtSssAlgo::setMEGInfo(FiffInfo::SPtr fiffInfo)
                     CoilWk.append(C7002Wintpts7);
                     break;
 
+                case 7003:
+                    CoilGrad(cid) = 0;
+                    CoilNk(cid) = 4;
+                    CoilRk.append(C7003intpts4);
+                    CoilWk.append(C7003Wintpts4);
+//                    CoilRk.append(C7003intpts16);
+//                    CoilWk.append(C7003Wintpts16);
+                    break;
+
+                default:
+                    qDebug() << " This coil type is NOT supported";
+                    break;
             }
-//        std::cout << fiffInfo->chs[i].coil_type << ", CoilNk(" << cid << "): " << CoilNk(cid) << std::endl;
+//        qDebug() << fiffInfo->chs[i].coil_type << ", CoilNk(" << cid << "): " << CoilNk(cid);
             cid++;
         }
     }
@@ -248,10 +305,8 @@ void RtSssAlgo::setMEGInfo(FiffInfo::SPtr fiffInfo)
 //    for(int k=0; k<NumCoil; k++)    inMEGData >> tmpvec(k);
 //    MEGData.col(0) = tmpvec;
 //    inMEGData.close();
-
+//NumCoil = 275;
 }
-
-
 
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -276,6 +331,7 @@ void RtSssAlgo::setMEGInfo(FiffInfo::SPtr fiffInfo)
 //      function [EqnIn,EqnOut] = get_SSS_Eqn(Origin,LIn,LOut,CoilTk,CoilNk,CoilWk,CoilRk,CoilName,CoilT)
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 QList<MatrixXd> RtSssAlgo::getSSSEqn(qint32 LIn, qint32 LOut)
+//QList<MatrixXd> RtSssAlgo::getSSSEqn(VectorXi Lexp)
 {
     int NumBIn, NumBOut;
 //    int coil_index=1;
@@ -285,7 +341,11 @@ QList<MatrixXd> RtSssAlgo::getSSSEqn(qint32 LIn, qint32 LOut)
     MatrixXd EqnIn, EqnOut;
     QList<MatrixXd> Eqn;
 
-//  % initialization
+//    qint32 LIn,LOut;
+//    LIn = Lexp(0);
+//    LOut = Lexp(1);
+
+    //  % initialization
     NumBIn = (LIn*LIn) + 2*LIn;
     NumBOut = (LOut*LOut) + 2*LOut;
 
@@ -323,11 +383,11 @@ QList<MatrixXd> RtSssAlgo::getSSSEqn(qint32 LIn, qint32 LOut)
 //        int NumCoilPts = CoilNk(coil_index);
         qint32 NumCoilPts = CoilNk(i);
         MatrixXd tmpmat; tmpmat.setOnes(4,NumCoilPts);
-
+//qDebug() << "pass 2";
 //        tmpmat.topRows(3) = CoilRk[coil_index];
 //        std::cout << "CoilRk: " << CoilRk[i].rows() << " x " << CoilRk[i].cols()  << std::endl;
         tmpmat.topRows(3) = CoilRk[i];
-
+//qDebug() << "pass 3";
         coil_location = CoilT[i] * tmpmat;
         tmpmat = coil_location.topRows(3);   coil_location.resize(3,NumCoilPts);   coil_location = tmpmat;
         coil_location = coil_location - Origin.replicate(1,NumCoilPts);
@@ -673,7 +733,9 @@ void RtSssAlgo::getSphereToCartesianVector()
 //  function [SSSIn,SSSOut,Weight,ErrRel] = get_SSS_RR(EqnIn,EqnOut,EqnARR,EqnA,EqnB)
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-QList<MatrixXd> RtSssAlgo::getSSSRR(MatrixXd EqnIn, MatrixXd EqnOut, MatrixXd EqnARR, MatrixXd EqnA, MatrixXd EqnB)
+//QList<MatrixXd> RtSssAlgo::getSSSRR(MatrixXd EqnIn, MatrixXd EqnOut, MatrixXd EqnARR, MatrixXd EqnA, MatrixXd EqnB)
+//QList<MatrixXd> RtSssAlgo::getSSSRR(MatrixXd EqnB)
+MatrixXd RtSssAlgo::getSSSRR(MatrixXd EqnB)
 {
     int NumBIn, NumBOut, NumCoil, NumExp;
     MatrixXd EqnRRInv, EqnInv, SSSIn, SSSOut, Weight; //, ErrRel;
@@ -691,58 +753,11 @@ QList<MatrixXd> RtSssAlgo::getSSSRR(MatrixXd EqnIn, MatrixXd EqnOut, MatrixXd Eq
 //  % weight threshold for robust regression
     double WeightThres = 1 - 1e-6;
 
-//    std::cout << "ok 0" << std::endl;
-
 //  % initialization
     NumBIn = EqnIn.cols();
     NumBOut = EqnOut.cols();
     NumCoil = EqnB.rows();
     NumExp = EqnB.cols();
-
-//ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
-//    QFile t_fileRaw("/autofs/cluster/fusion/slew/GitHub/mne-cpp/bin/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
-//    FiffRawData raw(t_fileRaw);
-
-//    QStringList include;
-//    include << "STI 014";
-//    bool want_meg   = true;
-//    bool want_eeg   = false;
-//    bool want_stim  = false;
-
-//    RowVectorXi picks = raw.info.pick_types(want_meg, want_eeg, want_stim, include, raw.info.bads);
-
-//    float from = 42.956f;
-//    float to = 320.670f;
-//    bool in_samples = false;
-//    bool readSuccessful = false;
-//    MatrixXd data;
-//    MatrixXd times;
-//    if (in_samples)
-//        readSuccessful = raw.read_raw_segment(data, times, (qint32)from, (qint32)to, picks);
-//    else
-//        readSuccessful = raw.read_raw_segment_times(data, times, from, to, picks);
-
-//    if (!readSuccessful)
-//    {
-//        printf("Could not read raw segment.\n");
-//        exit(1);
-//    }
-//
-////    printf("Read %d samples.\n",(qint32)data.cols());
-////    printf("Read %d channels.\n",(qint32)data.rows());
-////    std::cout << data.block(0,0,10,10) << std::endl;
-//
-//    int start_sample = 0;
-//    int end_sample = 20;
-
-//    EqnB = data.block(0, start_sample, NumCoil, end_sample-start_sample+1);
-//    NumCoil = EqnB.rows();
-//    NumExp = EqnB.cols();
-//    printf("%d samples,  %d channels \n",(qint32)EqnB.cols(), (qint32)EqnB.rows());
-
-//cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-
-//    std::cout << "ok 1" << std::endl;
 
     EqnRRInv = (EqnARR.transpose() * EqnARR).inverse();
     EqnInv = (EqnA.transpose() * EqnA).inverse();
@@ -754,8 +769,6 @@ QList<MatrixXd> RtSssAlgo::getSSSRR(MatrixXd EqnIn, MatrixXd EqnOut, MatrixXd Eq
     RR_K3 = 3;
     RR_K2 = 4.685;
     RR_K1 = qSqrt(1-qSqrt(3)/2) * RR_K2;
-
-//    std::cout << "ok 2" << std::endl;
 
     for(int i=0; i<NumExp; i++)
     {
@@ -859,7 +872,8 @@ QList<MatrixXd> RtSssAlgo::getSSSRR(MatrixXd EqnIn, MatrixXd EqnOut, MatrixXd Eq
     RRsss.append(Weight);
     RRsss.append(ErrRel);
 
-    return RRsss;
+//    return RRsss;
+    return SSSIn;
 }
 
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -884,7 +898,9 @@ QList<MatrixXd> RtSssAlgo::getSSSRR(MatrixXd EqnIn, MatrixXd EqnOut, MatrixXd Eq
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 //function [SSSIn,SSSOut,ErrRel] = get_SSS_OLS(EqnIn,EqnOut,EqnA,EqnB)
 //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-QList<MatrixXd> RtSssAlgo::getSSSOLS(MatrixXd EqnIn, MatrixXd EqnOut, MatrixXd EqnA, MatrixXd EqnB)
+//QList<MatrixXd> RtSssAlgo::getSSSOLS(MatrixXd EqnIn, MatrixXd EqnOut, MatrixXd EqnA, MatrixXd EqnB)
+//QList<MatrixXd> RtSssAlgo::getSSSOLS(MatrixXd EqnB)
+MatrixXd RtSssAlgo::getSSSOLS(MatrixXd EqnB)
 {
     int NumBIn, NumBOut, NumCoil, NumExp;
     MatrixXd EqnRRInv, EqnInv, SSSIn, SSSOut;
@@ -898,85 +914,54 @@ QList<MatrixXd> RtSssAlgo::getSSSOLS(MatrixXd EqnIn, MatrixXd EqnOut, MatrixXd E
     NumCoil = EqnB.rows();
     NumExp = EqnB.cols();
 
-    //ooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooooo
-    QFile t_fileRaw("/autofs/cluster/fusion/slew/GitHub/mne-cpp/bin/MNE-sample-data/MEG/sample/sample_audvis_raw.fif");
-    FiffRawData raw(t_fileRaw);
-
-    QStringList include;
-    include << "STI 014";
-    bool want_meg   = true;
-    bool want_eeg   = false;
-    bool want_stim  = false;
-
-    RowVectorXi picks = raw.info.pick_types(want_meg, want_eeg, want_stim, include, raw.info.bads);
-
-    float from = 42.956f;
-    float to = 320.670f;
-    bool in_samples = false;
-    bool readSuccessful = false;
-    MatrixXd data;
-    MatrixXd times;
-    if (in_samples)
-        readSuccessful = raw.read_raw_segment(data, times, (qint32)from, (qint32)to, picks);
-    else
-        readSuccessful = raw.read_raw_segment_times(data, times, from, to, picks);
-
-    if (!readSuccessful)
-    {
-        printf("Could not read raw segment.\n");
-        exit(1);
-    }
-
-    //    printf("Read %d samples.\n",(qint32)data.cols());
-    //    printf("Read %d channels.\n",(qint32)data.rows());
-    //    std::cout << data.block(0,0,10,10) << std::endl;
-
-
-    int start_sample = 0;
-    int end_sample = 20;
-
-    EqnB = data.block(0, start_sample, NumCoil, end_sample-start_sample+1);
-    NumCoil = EqnB.rows();
-    NumExp = EqnB.cols();
-    printf("%d samples,  %d channels \n",(qint32)EqnB.cols(), (qint32)EqnB.rows());
-
-    //cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc
-
     EqnRRInv = (EqnA.transpose() * EqnA).inverse();
     SSSIn.setZero(NumCoil,NumExp);
     SSSOut.setZero(NumCoil,NumExp);
     ErrRel.setZero(NumExp);
-//    cout << "PASS * 1 ******" << endl;
+
     for (int i=0; i<NumExp; i++)
     {
 //      % solve OLS solution
         sol_X = EqnRRInv * (EqnA.transpose() * EqnB.col(i));
-//            cout << "PASS * 2 ******" << endl;
+
         ErrRel(i) = (EqnA * sol_X - EqnB.col(i)).norm() / EqnB.col(i).norm();
-//            cout << "PASS * 3 ******" << endl;
+
         sol_in = sol_X.block(0,0,NumBIn,1);
-//            cout << "PASS * 4 ******" << endl;
+
         sol_out = sol_X.block(NumBIn,0, NumBOut,1);    // probably NumBIn+0 is correct.  Please debug !!!!
 
 //      % recover internal/external MEG siganl
         SSSIn.col(i) = EqnIn * sol_in;
         SSSOut.col(i) = EqnOut * sol_out;
-//            cout << "PASS * 5 ******" << endl;
     }
-
-//        cout << "PASS * 10 ******" << endl;
 
     OLSsss.append(SSSIn);
     OLSsss.append(SSSOut);
     OLSsss.append(ErrRel);
 
-    return OLSsss;
+//    return OLSsss;
+    return SSSIn;
 }
 
 // Return number of meg channels
-qint32 RtSssAlgo::getNumMEGCh()
+qint32 RtSssAlgo::getNumMEGChanUsed()
 {
     return NumCoil;
+}
+
+qint32 RtSssAlgo::getNumMEGChan()
+{
+    return NumMEGChan;
+}
+
+VectorXi RtSssAlgo::getBadChan()
+{
+    return BadChan;
+}
+
+qint32 RtSssAlgo::getNumMEGBadChan()
+{
+    return NumBadCoil;
 }
 
 // Set MEG signal
@@ -999,6 +984,208 @@ QList<MatrixXd> RtSssAlgo::getLinEqn()
 
     return LinEqn;
 }
+
+
+// Legendre Polyn0mial
+MatrixXd legendre(int l, VectorXd x)
+{
+    MatrixXd outP;
+//   std::cout << "x: " << x.rows() << " x " << x.cols() << endl;
+
+    outP.setZero(l+1, x.size());
+//   std::cout << " outP: " << outP.rows() << " x " << outP.cols() << endl;
+
+    for(int m=0; m<=l; m++)
+    {
+        for(int k=0; k<x.size(); k++)
+            outP(m,k) = plgndr(l,m,x(k));
+    }
+
+    return outP;
+}
+
+
+float plgndr(int l, int m, float x)
+{
+//    void nrerror(char error_text[]);
+    float fact,pll,pmm,pmmp1,somx2;
+    int i,ll;
+
+    if (m < 0 || m > l || fabs(x) > 1.0)
+        std::cout << "Bad arguments in routine plgndr";
+//        nrerror("Bad arguments in routine plgndr");
+    pmm=1.0;
+    if (m > 0)
+    {
+        somx2=sqrt((1.0-x)*(1.0+x));
+        fact=1.0;
+        for (i=1;i<=m;i++)
+        {
+            pmm *= -fact*somx2;
+            fact += 2.0;
+        }
+    }
+    if (l == m)
+        return pmm;
+    else {
+        pmmp1=x*(2*m+1)*pmm;
+        if (l == (m+1))
+            return pmmp1;
+        else
+        {
+            for (ll=m+2;ll<=l;ll++)
+            {
+                pll=(x*(2*ll-1)*pmmp1-(ll+m-1)*pmm)/(ll-m);
+                pmm=pmmp1;
+                pmmp1=pll;
+            }
+            return pll;
+        }
+    }
+}
+
+//---------------------------------------------------------------------
+/*  MATLAB: hypot.m
+ Robust computation of the square root of the sum of squares.
+ C = hypot(A,B) returns SQRT(ABS(A).^2+ABS(B).^2) carefully computed to
+ avoid underflow and overflow.*/
+VectorXd hypot(VectorXd X, VectorXd Y)
+{
+    VectorXd rst;
+    rst = (X.array().abs().pow(2) + Y.array().abs().pow(2)).sqrt();
+    return rst;
+}
+
+//---------------------------------------------------------------------
+// atan2() for vector
+// since no
+VectorXd atan2vec(VectorXd a, VectorXd b)
+{
+    int n = a.size();
+    VectorXd at2(n);
+
+    for(int i=0; i<n; i++)
+    {
+        at2(i) = qAtan2(a(i),b(i));
+    }
+
+    return at2;
+}
+
+VectorXd find(MatrixXd M, int I)
+{
+    VectorXd outIDX;
+    int k=0;
+    for(int i=0; i<M.cols(); i++)
+        for(int j=0; j<M.rows(); j++)
+            if (M(i,j) == I)
+            {
+                outIDX(k) = i*M.rows() + j;
+                k++;
+            }
+    return outIDX;
+}
+
+
+
+double factorial(int n)
+{
+    double fac=1;
+
+    for(int i=2; i<=n; i++)  fac *= i;
+
+    return fac;
+}
+
+
+//----------------------------------------------------------------------
+// standard deviation of vector
+double stdev(VectorXd V)
+{
+    int size = V.size();
+    double ave, sum=0;
+
+    ave = V.mean();
+    for(int i=0; i<size; i++)
+    {
+       sum += pow((V(i)-ave),2);
+    }
+    return sqrt(sum/size);
+}
+
+//
+// Check matrix elements to see if they are less than or equal to the given tolerance
+// Returns a vector whose elements consists of 1 if true, or 0 if false
+VectorXd eigen_LTE(VectorXd V, double tol)
+{
+    int row = V.rows();
+    VectorXd outTrue = VectorXd::Zero(row);
+
+    for(int i=0; i<row; i++)
+            if(V(i) <= tol) outTrue(i) = 1;
+//    std::cout << "LTE **********************" << outTrue.transpose() << endl;
+    return outTrue;
+}
+
+//
+// Check matrix elements to see if they are greater than the given tolerance
+// Returns a vector whose elements consists of 1 if true, or 0 if false
+VectorXd eigen_GT(VectorXd V, double tol)
+{
+    int row = V.rows();
+    VectorXd outTrue = VectorXd::Zero(row);
+
+    for(int i=0; i<row; i++)
+            if(V(i) > tol) outTrue(i) = 1;
+    return outTrue;
+}
+
+//
+// Check if the elements of two matrices are both true
+// Returns a vector whose elements consists of 1 if true, or 0 if false
+VectorXd eigen_AND(VectorXd V1, VectorXd V2)
+{
+    int row = V1.rows();
+    VectorXd outTrue = VectorXd::Zero(row);
+
+    for(int i=0; i<row; i++)
+            if(V1(i) && V2(i)) outTrue(i) = 1;
+//    std::cout << "AND **********************" << outTrue.transpose() << endl;
+    return outTrue;
+}
+
+// Check matrix elements to see if they are less than the given tolerance
+// Returns a vector whose elements consists index of true
+VectorXd eigen_LT_index(VectorXd V, double tol)
+{
+    int cnt = 0;
+    int size = V.size();
+    VectorXd outIdx; outIdx.setZero(size);
+
+    for(int i=0; i<size; i++)
+        if(V(i) < tol)
+        {
+            outIdx(cnt) = i;
+            cnt++;
+        }
+    return outIdx.head(cnt);
+}
+
+//VectorXd eigen_LT_index_test(VectorXd V, int cnt)
+VectorXd eigen_LT_index_test(int cnt)
+{
+    VectorXd outIdx = VectorXd::Zero(cnt+1);
+
+    for (int i=0; i<cnt+1; i++)
+        outIdx(i) = i+1;
+
+//    std::cout << "outIdx: " << outIdx.rows() << " x " << outIdx.cols() << ",  cnt: " << cnt << endl;
+            return outIdx;
+}
+
+//******************************************************************************************************************
+//******************************************************************************************************************
+//******************************************************************************************************************
 
 //  Read FIFF coil configuration and assign them to the Coil class variables
 //    such as CoilName,CoilT,CoilTk, CoilNk, CoilRk, CoilWk, CoilGrad.
@@ -1276,203 +1463,5 @@ void RtSssAlgo::getCoilInfoVectorView4Sim()
     CoilGrad.resize(NumCoil);
     CoilGrad << 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0, 1, 1, 0;
 //    std::cout << CoilGrad << endl;
-}
-
-
-// Legendre Polyn0mial
-MatrixXd legendre(int l, VectorXd x)
-{
-    MatrixXd outP;
-//   std::cout << "x: " << x.rows() << " x " << x.cols() << endl;
-
-    outP.setZero(l+1, x.size());
-//   std::cout << " outP: " << outP.rows() << " x " << outP.cols() << endl;
-
-    for(int m=0; m<=l; m++)
-    {
-        for(int k=0; k<x.size(); k++)
-            outP(m,k) = plgndr(l,m,x(k));
-    }
-
-    return outP;
-}
-
-
-float plgndr(int l, int m, float x)
-{
-//    void nrerror(char error_text[]);
-    float fact,pll,pmm,pmmp1,somx2;
-    int i,ll;
-
-    if (m < 0 || m > l || fabs(x) > 1.0)
-        std::cout << "Bad arguments in routine plgndr";
-//        nrerror("Bad arguments in routine plgndr");
-    pmm=1.0;
-    if (m > 0)
-    {
-        somx2=sqrt((1.0-x)*(1.0+x));
-        fact=1.0;
-        for (i=1;i<=m;i++)
-        {
-            pmm *= -fact*somx2;
-            fact += 2.0;
-        }
-    }
-    if (l == m)
-        return pmm;
-    else {
-        pmmp1=x*(2*m+1)*pmm;
-        if (l == (m+1))
-            return pmmp1;
-        else
-        {
-            for (ll=m+2;ll<=l;ll++)
-            {
-                pll=(x*(2*ll-1)*pmmp1-(ll+m-1)*pmm)/(ll-m);
-                pmm=pmmp1;
-                pmmp1=pll;
-            }
-            return pll;
-        }
-    }
-}
-
-//---------------------------------------------------------------------
-/*  MATLAB: hypot.m
- Robust computation of the square root of the sum of squares.
- C = hypot(A,B) returns SQRT(ABS(A).^2+ABS(B).^2) carefully computed to
- avoid underflow and overflow.*/
-VectorXd hypot(VectorXd X, VectorXd Y)
-{
-    VectorXd rst;
-    rst = (X.array().abs().pow(2) + Y.array().abs().pow(2)).sqrt();
-    return rst;
-}
-
-//---------------------------------------------------------------------
-// atan2() for vector
-// since no
-VectorXd atan2vec(VectorXd a, VectorXd b)
-{
-    int n = a.size();
-    VectorXd at2(n);
-
-    for(int i=0; i<n; i++)
-    {
-        at2(i) = qAtan2(a(i),b(i));
-    }
-
-    return at2;
-}
-
-VectorXd find(MatrixXd M, int I)
-{
-    VectorXd outIDX;
-    int k=0;
-    for(int i=0; i<M.cols(); i++)
-        for(int j=0; j<M.rows(); j++)
-            if (M(i,j) == I)
-            {
-                outIDX(k) = i*M.rows() + j;
-                k++;
-            }
-    return outIDX;
-}
-
-
-
-double factorial(int n)
-{
-    double fac=1;
-
-    for(int i=2; i<=n; i++)  fac *= i;
-
-    return fac;
-}
-
-
-//----------------------------------------------------------------------
-// standard deviation of vector
-double stdev(VectorXd V)
-{
-    int size = V.size();
-    double ave, sum=0;
-
-    ave = V.mean();
-    for(int i=0; i<size; i++)
-    {
-       sum += pow((V(i)-ave),2);
-    }
-    return sqrt(sum/size);
-}
-
-//
-// Check matrix elements to see if they are less than or equal to the given tolerance
-// Returns a vector whose elements consists of 1 if true, or 0 if false
-VectorXd eigen_LTE(VectorXd V, double tol)
-{
-    int row = V.rows();
-    VectorXd outTrue = VectorXd::Zero(row);
-
-    for(int i=0; i<row; i++)
-            if(V(i) <= tol) outTrue(i) = 1;
-//    std::cout << "LTE **********************" << outTrue.transpose() << endl;
-    return outTrue;
-}
-
-//
-// Check matrix elements to see if they are greater than the given tolerance
-// Returns a vector whose elements consists of 1 if true, or 0 if false
-VectorXd eigen_GT(VectorXd V, double tol)
-{
-    int row = V.rows();
-    VectorXd outTrue = VectorXd::Zero(row);
-
-    for(int i=0; i<row; i++)
-            if(V(i) > tol) outTrue(i) = 1;
-    return outTrue;
-}
-
-//
-// Check if the elements of two matrices are both true
-// Returns a vector whose elements consists of 1 if true, or 0 if false
-VectorXd eigen_AND(VectorXd V1, VectorXd V2)
-{
-    int row = V1.rows();
-    VectorXd outTrue = VectorXd::Zero(row);
-
-    for(int i=0; i<row; i++)
-            if(V1(i) && V2(i)) outTrue(i) = 1;
-//    std::cout << "AND **********************" << outTrue.transpose() << endl;
-    return outTrue;
-}
-
-// Check matrix elements to see if they are less than the given tolerance
-// Returns a vector whose elements consists index of true
-VectorXd eigen_LT_index(VectorXd V, double tol)
-{
-    int cnt = 0;
-    int size = V.size();
-    VectorXd outIdx; outIdx.setZero(size);
-
-    for(int i=0; i<size; i++)
-        if(V(i) < tol)
-        {
-            outIdx(cnt) = i;
-            cnt++;
-        }
-    return outIdx.head(cnt);
-}
-
-//VectorXd eigen_LT_index_test(VectorXd V, int cnt)
-VectorXd eigen_LT_index_test(int cnt)
-{
-    VectorXd outIdx = VectorXd::Zero(cnt+1);
-
-    for (int i=0; i<cnt+1; i++)
-        outIdx(i) = i+1;
-
-//    std::cout << "outIdx: " << outIdx.rows() << " x " << outIdx.cols() << ",  cnt: " << cnt << endl;
-            return outIdx;
 }
 

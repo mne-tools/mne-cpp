@@ -2,6 +2,7 @@
 /**
 * @file     babymeg.h
 * @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Limin Sun <liminsun@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     February, 2013
@@ -16,12 +17,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -44,6 +45,9 @@
 
 #include "babymeg_global.h"
 #include "babymegclient.h"
+
+#include "FormFiles/babymegsquidcontroldgl.h"
+
 
 #include <mne_x/Interfaces/ISensor.h>
 #include <generics/circularbuffer_old.h>
@@ -154,7 +158,13 @@ public:
     /**
     * Initialise the BabyMEG.
     */
-    void init();
+    virtual void init();
+
+    //=========================================================================================================
+    /**
+    * Is called when plugin is detached of the stage. Can be used to safe settings.
+    */
+    virtual void unload();
 
     void showProjectDialog();
 
@@ -182,6 +192,14 @@ public:
     */
     void comFLL(QString t_sFLLControlCommand);
 
+    //=========================================================================================================
+    /**
+    * Update fiff information
+    *
+    */
+    void UpdateFiffInfo();
+
+
 signals:
     //=========================================================================================================
     /**
@@ -197,7 +215,15 @@ signals:
     */
     void fiffInfoAvailable();
 
+    //=========================================================================================================
+    /**
+    * Emitted when data is ready
+    */
     void DataToSquidCtrlGUI(MatrixXf tmp);
+    //=========================================================================================================
+    /**
+    * Emitted when data received from tcp/ip socket
+    */
     void SendCMDDataToSQUIDControl(QByteArray DATA);
 
 
@@ -225,6 +251,8 @@ private:
     QSharedPointer<BabyMEGInfo>   pInfo;
     bool DataStartFlag;
 
+    QSharedPointer<BabyMEGSQUIDControlDgl> SQUIDCtrlDlg; // added by Dr. Limin Sun for nonmodal dialog
+
     FiffInfo::SPtr m_pFiffInfo;                             /**< Fiff measurement info.*/
     qint32 m_iBufferSize;                                   /**< The raw data buffer size.*/
 
@@ -243,6 +271,7 @@ private:
     QAction*                        m_pActionSetupProject;      /**< shows setup project dialog */
     QAction*                        m_pActionRecordFile;        /**< start recording action */
     QAction*                        m_pActionSqdCtrl;           /**< show squid control */
+    QAction*                        m_pActionUpdateFiffInfo;        /**< Update Fiff Info action */
 
 
 public:

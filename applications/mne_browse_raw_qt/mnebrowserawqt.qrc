@@ -1,0 +1,19 @@
+<RCC>
+    <qresource prefix="/Resources/Images">
+        <file alias="addEvent.png">Resources/Images/Icons/addEvent.png</file>
+        <file alias="splashscreen_mne_browse_raw_qt.png">Resources/Images/Splashscreen/splashscreen_mne_browse_raw_qt.png</file>
+        <file alias="undockView.png">Resources/Images/Icons/undockView.png</file>
+        <file alias="application_icon_mne_browse_raw_qt.png">Resources/Images/ApplicationIcons/application_icon_mne_browse_raw_qt.png</file>
+    </qresource>
+    <qresource prefix="/Resources/Templates">
+        <file alias="CTF-275.lout">Resources/Templates/Layouts/CTF-275.lout</file>
+        <file alias="magnesWH3600.lout">Resources/Templates/Layouts/magnesWH3600.lout</file>
+        <file alias="Vectorview-all.lout">Resources/Templates/Layouts/Vectorview-all.lout</file>
+        <file alias="Vectorview-grad.lout">Resources/Templates/Layouts/Vectorview-grad.lout</file>
+        <file alias="Vectorview-mag.lout">Resources/Templates/Layouts/Vectorview-mag.lout</file>
+        <file alias="mne_browse_raw_CTF_275.sel">Resources/Templates/ChannelSelection/mne_browse_raw_CTF_275.sel</file>
+        <file alias="mne_browse_raw_Magnes_3600WH.sel">Resources/Templates/ChannelSelection/mne_browse_raw_Magnes_3600WH.sel</file>
+        <file alias="mne_browse_raw_vv.sel">Resources/Templates/ChannelSelection/mne_browse_raw_vv.sel</file>
+        <file alias="mne_browse_raw_vv_new.sel">Resources/Templates/ChannelSelection/mne_browse_raw_vv_new.sel</file>
+    </qresource>
+</RCC>

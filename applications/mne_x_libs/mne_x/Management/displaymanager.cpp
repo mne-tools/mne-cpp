@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -42,17 +42,20 @@
 
 
 #include <xDisp/realtimesamplearraywidget.h>
-
 #include <xDisp/realtimemultisamplearraywidget.h>
-
 #if defined(QT3D_LIBRARY_AVAILABLE)
 #include <xDisp/realtimesourceestimatewidget.h>
 #endif
+#include <xDisp/realtimeevokedwidget.h>
+#include <xDisp/realtimecovwidget.h>
+#include <xDisp/frequencyspectrumwidget.h>
 
 #include <xMeas/newrealtimesamplearray.h>
 #include <xMeas/newrealtimemultisamplearray.h>
-
 #include <xMeas/realtimesourceestimate.h>
+#include <xMeas/realtimeevoked.h>
+#include <xMeas/realtimecov.h>
+#include <xMeas/frequencyspectrum.h>
 
 
 //#include <xDisp/measurementwidget.h>
@@ -167,6 +170,51 @@ QWidget* DisplayManager::show(IPlugin::OutputConnectorList &outputConnectorList,
             rtseWidget->init();
         }
     #endif
+        else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeEvoked> >())
+        {
+            QSharedPointer<RealTimeEvoked>* pRealTimeEvoked = &pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeEvoked> >()->data();
+
+            RealTimeEvokedWidget* rteWidget = new RealTimeEvokedWidget(*pRealTimeEvoked, pT, newDisp);
+
+            qListActions.append(rteWidget->getDisplayActions());
+            qListWidgets.append(rteWidget->getDisplayWidgets());
+
+            connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
+                    rteWidget, &RealTimeEvokedWidget::update, Qt::BlockingQueuedConnection);
+
+            vboxLayout->addWidget(rteWidget);
+            rteWidget->init();
+        }
+        else if(pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeCov> >())
+        {
+            QSharedPointer<RealTimeCov>* pRealTimeCov = &pPluginOutputConnector.dynamicCast< PluginOutputData<RealTimeCov> >()->data();
+
+            RealTimeCovWidget* rtcWidget = new RealTimeCovWidget(*pRealTimeCov, pT, newDisp);
+
+            qListActions.append(rtcWidget->getDisplayActions());
+            qListWidgets.append(rtcWidget->getDisplayWidgets());
+
+            connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
+                    rtcWidget, &RealTimeCovWidget::update, Qt::BlockingQueuedConnection);
+
+            vboxLayout->addWidget(rtcWidget);
+            rtcWidget->init();
+        }
+        else if(pPluginOutputConnector.dynamicCast< PluginOutputData<FrequencySpectrum> >())
+        {
+            QSharedPointer<FrequencySpectrum>* pFrequencySpectrum = &pPluginOutputConnector.dynamicCast< PluginOutputData<FrequencySpectrum> >()->data();
+
+            FrequencySpectrumWidget* fsWidget = new FrequencySpectrumWidget(*pFrequencySpectrum, pT, newDisp);
+
+            qListActions.append(fsWidget->getDisplayActions());
+            qListWidgets.append(fsWidget->getDisplayWidgets());
+
+            connect(pPluginOutputConnector.data(), &PluginOutputConnector::notify,
+                    fsWidget, &FrequencySpectrumWidget::update, Qt::BlockingQueuedConnection);
+
+            vboxLayout->addWidget(fsWidget);
+            fsWidget->init();
+        }
     }
 
 //    // Add all widgets but NumericWidgets to layout and display them

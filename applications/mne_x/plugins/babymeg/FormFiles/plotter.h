@@ -39,6 +39,8 @@ private:
     void refreshPixmap();
     void drawGrid(QPainter *painter);
     void drawCurve(QPainter *painter);
+    void drawRotatedText(QPainter *painter, int x, int y, const QString &text);
+
 
     enum {Margin = 30, xMargin = 80};
 

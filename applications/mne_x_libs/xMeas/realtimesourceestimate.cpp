@@ -16,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -46,8 +46,6 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QDebug>
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -66,15 +64,10 @@ using namespace XMEASLIB;
 RealTimeSourceEstimate::RealTimeSourceEstimate(QObject *parent)
 : NewMeasurement(QMetaType::type("RealTimeSourceEstimate::SPtr"), parent)
 , m_bStcSend(true)
-, m_dSamplingRate(0)
-, m_fT(0)
-, m_iArraySize(600)
-, m_iCurIdx(0)
-, m_fCurTimePoint(0)
+, m_pMNEStc(new MNESourceEstimate)
+, m_bInitialized(false)
 {
-    m_MNEStc.data = MatrixXd(0,0);
-    m_MNEStc.times = RowVectorXf(m_iArraySize);
-    m_MNEStc.tmin = 0;
+
 }
 
 
@@ -88,46 +81,27 @@ RealTimeSourceEstimate::~RealTimeSourceEstimate()
 
 //*************************************************************************************************************
 
-VectorXd RealTimeSourceEstimate::getValue() const
+MNESourceEstimate::SPtr& RealTimeSourceEstimate::getValue()
 {
-    return m_vecValue;
+    QMutexLocker locker(&m_qMutex);
+    return m_pMNEStc;
 }
 
 
 //*************************************************************************************************************
 
-void RealTimeSourceEstimate::setValue(VectorXd v)
+void RealTimeSourceEstimate::setValue(MNESourceEstimate& v)
 {
-//    //check vector size
-//    if(v.size() != m_qListChInfo.size())
-//        qCritical() << "Error Occured in RealTimeMultiSampleArrayNew::setVector: Vector size does not matche the number of channels! ";
-
-//    //Check if maximum exceeded //ToDo speed this up
-//    for(qint32 i = 0; i < v.size(); ++i)
-//    {
-//        if(v[i] < m_qListChInfo[i].getMinValue()) v[i] = m_qListChInfo[i].getMinValue();
-//        else if(v[i] > m_qListChInfo[i].getMaxValue()) v[i] = m_qListChInfo[i].getMaxValue();
-//    }
+    m_qMutex.lock();
 
     //Store
-    m_vecValue = v;
+    *m_pMNEStc = v;
 
-    if(m_MNEStc.data.cols() == 0)
-        m_MNEStc.data = MatrixXd(m_vecValue.size(), m_iArraySize);
+    m_bInitialized = true;
 
-    m_MNEStc.data.col(m_iCurIdx) = m_vecValue;
-    m_MNEStc.times[m_iCurIdx] = m_fCurTimePoint;
+    m_qMutex.unlock();
 
-    m_fCurTimePoint += m_fT;
-    ++m_iCurIdx;
+    emit notify();
 
-    if(m_iCurIdx >= m_iArraySize)
-    {
-        if(m_bStcSend)
-            emit notify();
-
-        m_iCurIdx = 0;
-        m_MNEStc.tmin = m_fCurTimePoint;
-    }
 }
 

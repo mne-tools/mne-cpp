@@ -2,7 +2,6 @@
 /**
 * @file     rtsssalgo.h
 * @author   Seok Lew <slew@nmr.mgh.harvard.edu>;
-*           Xin Li <xinli@cmu.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
 * @date     June, 2013
@@ -17,12 +16,12 @@
 *       following disclaimer.
 *     * Redistributions in binary form must reproduce the above copyright notice, this list of conditions and
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
-*     * Neither the name of the Massachusetts General Hospital nor the names of its contributors may be used
+*     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
 *
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
-* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL MASSACHUSETTS GENERAL HOSPITAL BE LIABLE FOR ANY DIRECT,
+* PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
 * INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
 * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
 * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
@@ -32,6 +31,10 @@
 *
 * @brief    Contains the declaration of the RtSssAlgo class.
 *
+* @remarks  This rtsssalgo is implemented based on a paper, 'Real-Time Robust Signal Space Separation for Magnetoencephalography',
+*           authored by Chenlei Guo, Xin Li, Samu Taulu, Wei Wang, and Douglas J. Weber,
+*           published in IEEE Transactions on Biomedical Engieering Vol 57, p1856~1866, August 2010.
+
 */
 
 #ifndef RTSSSALGO_H
@@ -60,7 +63,7 @@
 
 #include <fiff/fiff.h>
 #include <fiff/fiff_info.h>
-#include <xMeas/Measurement/realtimemultisamplearray_new.h>
+//#include <xMeas/Measurement/realtimemultisamplearray_new.h>
 
 #define BABYMEG 1
 #define VECTORVIEW 2
@@ -68,7 +71,7 @@
 using namespace Eigen;
 using namespace std;
 using namespace FIFFLIB;
-using namespace XMEASLIB;
+//using namespace XMEASLIB;
 
 typedef std::complex<double> cplxd;
 
@@ -93,27 +96,39 @@ public:
     RtSssAlgo();
     ~RtSssAlgo();
 
-    QList<MatrixXd> buildLinearEqn();
-    QList<MatrixXd> getSSSRR(MatrixXd EqnIn, MatrixXd EqnOut, MatrixXd EqnARR, MatrixXd EqnA, MatrixXd EqnB);
-    QList<MatrixXd> getSSSOLS(MatrixXd EqnIn, MatrixXd EqnOut, MatrixXd EqnA, MatrixXd EqnB);
+//    QList<MatrixXd> buildLinearEqn();
+    MatrixXd buildLinearEqn();
+
+//    QList<MatrixXd> getSSSRR(MatrixXd EqnIn, MatrixXd EqnOut, MatrixXd EqnARR, MatrixXd EqnA, MatrixXd EqnB);
+//    QList<MatrixXd> getSSSRR(MatrixXd EqnB);
+    MatrixXd getSSSRR(MatrixXd EqnB);
+
+//    QList<MatrixXd> getSSSOLS(MatrixXd EqnIn, MatrixXd EqnOut, MatrixXd EqnA, MatrixXd EqnB);
+//    QList<MatrixXd> getSSSOLS(MatrixXd EqnB);
+    MatrixXd getSSSOLS(MatrixXd EqnB);
+
     QList<MatrixXd> getLinEqn();
 
     void setMEGInfo(FiffInfo::SPtr fiffinfo);
     void setSSSParameter(QList<int>);
-    qint32 getNumMEGCh();
-//    void setMEGsignal(MatrixXd megfrombuffer);
+    qint32 getNumMEGChan();
+    qint32 getNumMEGChanUsed();
+    qint32 getNumMEGBadChan();
+    VectorXi getBadChan();
 
 private:
     void getCoilInfoVectorView();
     void getCoilInfoVectorView4Sim();
     void getCoilInfoBabyMEG4Sim();
     QList<MatrixXd> getSSSEqn(qint32, qint32);
+//    QList<MatrixXd> getSSSEqn(VectorXi Lexp);
     void getSSSBasis(VectorXd, VectorXd, VectorXd, qint32, qint32);
     void getCartesianToSpherCoordinate(VectorXd, VectorXd, VectorXd);
     void getSphereToCartesianVector();
     int strmatch(char, char);
 
-    qint32 NumCoil;
+    qint32 NumMEGChan, NumCoil, NumBadCoil;
+    VectorXi BadChan;
     QList<MatrixXd> CoilT;
     QList<QString> CoilName, CoilTk;
     QList<MatrixXd> CoilRk, CoilWk;
