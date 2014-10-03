@@ -62,6 +62,8 @@ EventModel::EventModel(QObject *parent)
 , m_bFileloaded(false)
 , m_sFilterEventType("All")
 {
+    //Create default event type list
+    m_eventTypeList<<"1"<<"2"<<"3"<<"4"<<"4"<<"5"<<"32"<<"998"<<"999";
 }
 
 

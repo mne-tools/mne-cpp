@@ -277,6 +277,28 @@ void DataWindow::initMarker()
     //Connect current marker to marker move signal
     connect(m_pDataMarker,&DataMarker::markerMoved,
             this,&DataWindow::updateMarkerPosition);
+
+    //If no file has been loaded yet dont show the marker and its label
+    if(!m_pRawModel->m_bFileloaded) {
+        m_pDataMarker->hide();
+        m_pCurrentDataMarkerLabel->hide();
+    }
+
+    //Connect current marker to loading a fiff file - no loaded file - no visible marker
+    connect(m_pRawModel, &RawModel::fileLoaded,[this](bool state){
+        if(state) {
+            //Inital position of the marker
+            m_pDataMarker->move(74, m_pDataMarker->y());
+            m_pCurrentDataMarkerLabel->move(m_pDataMarker->geometry().left() + (m_qSettings.value("DataMarker/data_marker_width").toInt()/2) - (m_pCurrentDataMarkerLabel->width()/2) + 1, m_pDataMarker->geometry().top() - 20);
+
+            m_pDataMarker->show();
+            m_pCurrentDataMarkerLabel->show();
+        }
+        else {
+            m_pDataMarker->hide();
+            m_pCurrentDataMarkerLabel->hide();
+        }
+    });
 }
 
 

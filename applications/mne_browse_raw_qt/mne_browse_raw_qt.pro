@@ -40,7 +40,7 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = app
 
-QT += network core widgets concurrent svg
+QT += gui network core widgets concurrent svg
 
 TARGET = mne_browse_raw_qt
 
@@ -56,6 +56,7 @@ CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
+#Note that the static flag is ingored when building against a dynamic qt version
 CONFIG += console static #DEBUG
 
 LIBS += -L$${MNE_LIBRARY_DIR}
