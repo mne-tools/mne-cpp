@@ -85,8 +85,9 @@ void LayoutScene::setNewLayout(QMap<QString,QVector<double>> layoutMap)
 
 //*************************************************************************************************************
 
-void LayoutScene::hideItems(QStringList list)
+void LayoutScene::hideItems(QStringList visibleItems)
 {
+    //Hide all items which names are in the the string list visibleItems. All other items' opacity is set to 0.25 an dthey are no longer selectable.
     QList<QGraphicsItem *> itemList = this->items();
 
     switch(m_iSceneType) {
@@ -94,7 +95,7 @@ void LayoutScene::hideItems(QStringList list)
             for(int i = 0; i<itemList.size(); i++) {
                 ChannelSceneItem* item = static_cast<ChannelSceneItem*>(itemList.at(i));
 
-                if(!list.contains(item->getElectrodeName())) {
+                if(!visibleItems.contains(item->getElectrodeName())) {
                     item->setFlag(QGraphicsItem::ItemIsSelectable, false);
                     item->setOpacity(0.25);
                 }

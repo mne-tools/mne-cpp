@@ -79,7 +79,8 @@ SOURCES += \
     filterdata.cpp \
     mp/adaptivemp.cpp \
     mp/atom.cpp \
-    mp/fixdictmp.cpp
+    mp/fixdictmp.cpp \
+    selectionloader.cpp
 
 HEADERS += \
     kmeans.h\
@@ -91,7 +92,8 @@ HEADERS += \
     filterdata.h \
     mp/adaptivemp.h \
     mp/atom.h \
-    mp/fixdictmp.h
+    mp/fixdictmp.h \
+    selectionloader.h
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

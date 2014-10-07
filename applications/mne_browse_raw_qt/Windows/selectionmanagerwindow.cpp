@@ -134,6 +134,12 @@ bool SelectionManagerWindow::loadLayout(QString path)
     //Read layout
     bool state = manager->readMNELoutFile(path.prepend("./MNE_Browse_Raw_Resources/Templates/Layouts/"), m_layoutMap);
 
+    //Load selection groups again because they need to be reinitialised every time a new layout was loaded
+    loadSelectionGroups(ui->m_comboBox_selectionFiles->currentText());
+
+    //Delete all MEG channels from the selection groups which are not in the loaded layout
+    cleanUpSelectionGroups();
+
     //Update scene
     m_pLayoutScene->setNewLayout(m_layoutMap);
 
@@ -148,56 +154,24 @@ bool SelectionManagerWindow::loadLayout(QString path)
 
 bool SelectionManagerWindow::loadSelectionGroups(QString path)
 {
-    //Open .sel file
-    if(!path.contains(".sel"))
-        return false;
-
     ui->m_listWidget_selectionGroups->clear();
     ui->m_listWidget_visibleChannels->clear();
     m_selectionGroupsMap.clear();
 
-    QFile file(path.prepend("./MNE_Browse_Raw_Resources/Templates/ChannelSelection/"));
-    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qDebug()<<"Error opening selection file";
-        return false;
+    SelectionLoader* manager = new SelectionLoader();
+
+    //Read selection from file
+    m_selectionGroupsMap.clear();
+    bool state = manager->readMNESelFile(path.prepend("./MNE_Browse_Raw_Resources/Templates/ChannelSelection/"), m_selectionGroupsMap);
+
+    //Add selection groups to list widget
+    QMapIterator<QString, QStringList> selectionIndex(m_selectionGroupsMap);
+    while (selectionIndex.hasNext()) {
+        selectionIndex.next();
+        ui->m_listWidget_selectionGroups->insertItem(0, selectionIndex.key());
     }
 
-    //Start reading from file
-    QTextStream in(&file);
-
-    while(!in.atEnd()) {
-        QString line = in.readLine();
-
-        if(line.contains("%") == false && line.contains(":") == true) //Skip commented areas in file
-        {
-            QStringList firstSplit = line.split(":");
-
-            //Create new key
-            QString key = firstSplit.at(0);
-
-            QStringList secondSplit = firstSplit.at(1).split("|");
-
-            //Delete last element if it is a blank character
-            if(secondSplit.at(secondSplit.size()-1) == "")
-                secondSplit.removeLast();
-
-            //Add to map
-            m_selectionGroupsMap.insert(key, secondSplit);
-
-            //Add to list widget
-            int count = ui->m_listWidget_selectionGroups->count();
-            if(count<1)
-                ui->m_listWidget_selectionGroups->insertItem(0, key);
-            else
-                ui->m_listWidget_selectionGroups->insertItem(count, key);
-        }
-    }
-
-    file.close();
-
-    //Create group 'All' manually
-    ui->m_listWidget_selectionGroups->insertItem(0, "All");
-
+    //Create group 'All' manually from the loaded fiff file
     RawModel* model = m_pMainWindow->m_pDataWindow->getDataModel();
 
     QStringList allChannelsList;
@@ -210,12 +184,41 @@ bool SelectionManagerWindow::loadSelectionGroups(QString path)
 
     m_selectionGroupsMap.insert("All", allChannelsList);
 
-    //Fit scene in view
-    //ui->m_graphicsView_layoutPlot->fitInView(m_pLayoutScene->itemsBoundingRect(), Qt::KeepAspectRatio);
+    ui->m_listWidget_selectionGroups->insertItem(0, "All");
+
+    //Delete all MEG channels from the selection groups which are not in the loaded layout
+    cleanUpSelectionGroups();
 
     updateDataView();
 
-    return true;
+    return state;
+}
+
+
+//*************************************************************************************************************
+
+void SelectionManagerWindow::cleanUpSelectionGroups()
+{
+    QMapIterator<QString,QStringList> selectionIndex(m_selectionGroupsMap);
+
+    //Iterate through all loaded selection groups
+    while (selectionIndex.hasNext()) {
+        selectionIndex.next();
+
+        QStringList channelList = selectionIndex.value();
+
+        //Search the current selection group for MEG channels which are not in the currently loaded layout file and delete them
+        QMutableStringListIterator stringListIndex(channelList);
+        while (stringListIndex.hasNext()) {
+            stringListIndex.next();
+
+            if(!m_layoutMap.contains(stringListIndex.value()) && stringListIndex.value().contains("MEG"))
+                stringListIndex.remove();
+        }
+
+        //Overwrite old selection groups channels
+        m_selectionGroupsMap.insert(selectionIndex.key(), channelList);
+    }
 }
 
 
@@ -236,12 +239,12 @@ void SelectionManagerWindow::updateSelectionGroups(QListWidgetItem* item)
 
 void SelectionManagerWindow::updateSceneItems()
 {
-    QStringList channelNamesToHide;
+    QStringList visibleItems;
 
     for(int i = 0; i<ui->m_listWidget_visibleChannels->count(); i++)
-        channelNamesToHide << ui->m_listWidget_visibleChannels->item(i)->text();
+        visibleItems << ui->m_listWidget_visibleChannels->item(i)->text();
 
-    m_pLayoutScene->hideItems(channelNamesToHide);
+    m_pLayoutScene->hideItems(visibleItems);
 }
 
 
@@ -268,13 +271,14 @@ void SelectionManagerWindow::updateUserDefinedChannels()
 
 void SelectionManagerWindow::updateDataView()
 {
-    //Create list of channels which are to be visible in the view
+    //if no channels have been selected by the user - show selected group channels
     QListWidget* targetListWidget;
     if(ui->m_listWidget_userDefined->count()>0)
         targetListWidget = ui->m_listWidget_userDefined;
     else
         targetListWidget = ui->m_listWidget_visibleChannels;
 
+    //Create list of channels which are to be visible in the view
     QStringList visibleChannels;
 
     for(int i = 0; i<targetListWidget->count(); i++) {

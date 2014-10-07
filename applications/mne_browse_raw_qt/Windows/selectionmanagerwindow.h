@@ -45,6 +45,7 @@
 #include "mainwindow.h"
 #include "ui_selectionmanagerwindow.h"
 #include "utils/layoutloader.h"         //MNE-CPP utils
+#include "utils/selectionloader.h"         //MNE-CPP utils
 #include "../Utils/layoutscene.h"       //MNE Browse Raw QT utils
 
 
@@ -54,6 +55,7 @@
 //=============================================================================================================
 
 #include <QDockWidget>
+#include <QMutableStringListIterator>
 
 
 //*************************************************************************************************************
@@ -136,6 +138,13 @@ private:
     * @param [in] path holds file path
     */
     bool loadSelectionGroups(QString path);
+
+    //=========================================================================================================
+    /**
+    * Delete all MEG channels from the selection groups which are not in the loaded layout. This needs to be done to guarantee consistency between the selection files and layout files (the selection files always include ALL MEG channels (gradiometers+magnitometers))
+    *
+    */
+    void cleanUpSelectionGroups();
 
     //=========================================================================================================
     /**
