@@ -101,7 +101,7 @@ public:
     * Hides all items described in list.
     * @param [in] list string list with items name which are to be hidden.
     */
-    void hideItems(QStringList list);
+    void hideItems(QStringList visibleItems);
 
     int                             m_iSceneType;                   /**< Holds the current scene type (channel selection = 0, average = 1).*/
 
