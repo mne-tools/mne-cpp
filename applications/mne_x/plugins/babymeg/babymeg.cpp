@@ -144,6 +144,7 @@ void BabyMEG::init()
     connect(pInfo.data(), &BabyMEGInfo::fiffInfoAvailable, this, &BabyMEG::setFiffInfo);
     connect(pInfo.data(), &BabyMEGInfo::SendDataPackage, this, &BabyMEG::setFiffData);
     connect(pInfo.data(), &BabyMEGInfo::SendCMDPackage, this, &BabyMEG::setCMDData);
+    connect(pInfo.data(), &BabyMEGInfo::GainInfoUpdate, this, &BabyMEG::setFiffGainInfo);
 
     myClient = QSharedPointer<BabyMEGClient>(new BabyMEGClient(6340,this));
     myClient->SetInfo(pInfo);
@@ -236,9 +237,9 @@ void BabyMEG::UpdateFiffInfo()
 {
 
     // read gain info and save them to the m_pFiffInfo.range
-    myClientComm->SendCommandToBabyMEGShortConnection("INFO");
+    myClientComm->SendCommandToBabyMEGShortConnection("INFG");
 
-    sleep(0.5);
+    //sleep(0.5);
 
     //m_pActionRecordFile->setEnabled(true);
 
@@ -343,6 +344,29 @@ void BabyMEG::setFiffInfo(FiffInfo p_FiffInfo)
     emit fiffInfoAvailable();
 }
 
+//*************************************************************************************************************
+
+void BabyMEG::setFiffGainInfo(QStringList GainInfo)
+{
+    if(!m_pFiffInfo)
+    {
+        QMessageBox msgBox;
+        msgBox.setText("FiffInfo missing!");
+        msgBox.exec();
+        return;
+    }
+    else
+    {
+        //set up the gain info
+        qDebug()<<"Set Gain Info";
+        for(qint32 i = 0; i < m_pFiffInfo->nchan; i++)
+        {
+            m_pFiffInfo->chs[i].range = 1.0f/GainInfo.at(i).toFloat();//1; // set gain
+            //qDebug()<<i<<"="<<m_pFiffInfo->chs[i].ch_name<<","<<m_pFiffInfo->chs[i].range;
+        }
+    }
+
+}
 //*************************************************************************************************************
 
 void BabyMEG::setCMDData(QByteArray DATA)
