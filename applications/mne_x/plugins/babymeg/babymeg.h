@@ -183,6 +183,8 @@ public:
     void setFiffInfo(FIFFLIB::FiffInfo);
     void setFiffData(QByteArray DATA);
     void setCMDData(QByteArray DATA);
+    void setFiffGainInfo(QStringList);
+
 
     //=========================================================================================================
     /**
