@@ -137,6 +137,10 @@ void EventWindow::initMVCSettings()
     connect(ui->m_tableView_eventTableView->selectionModel(),&QItemSelectionModel::currentRowChanged,
                 this,&EventWindow::jumpToEvent);
 
+    //Update the data views whenever the data in the event model changes
+    connect(m_pEventModel,&EventModel::dataChanged,
+                m_pMainWindow->m_pDataWindow,&DataWindow::updateDataTableViews);
+
     //Set MVC in delegate
     m_pEventDelegate->setModelView(m_pEventModel);
 }
@@ -149,11 +153,13 @@ void EventWindow::initCheckBoxes()
     connect(ui->m_checkBox_activateEvents,&QCheckBox::stateChanged, [=](int state){
         m_pMainWindow->m_pDataWindow->getDataDelegate()->m_bActivateEvents = state;
         jumpToEvent(ui->m_tableView_eventTableView->selectionModel()->currentIndex(), QModelIndex());
+        m_pMainWindow->m_pDataWindow->updateDataTableViews();
     });
 
     connect(ui->m_checkBox_showSelectedEventsOnly,&QCheckBox::stateChanged, [=](int state){
         m_pMainWindow->m_pDataWindow->getDataDelegate()->m_bShowSelectedEventsOnly = state;
         jumpToEvent(ui->m_tableView_eventTableView->selectionModel()->currentIndex(), QModelIndex());
+        m_pMainWindow->m_pDataWindow->updateDataTableViews();
     });
 }
 
@@ -170,6 +176,7 @@ void EventWindow::initComboBoxes()
     connect(ui->m_comboBox_filterTypes,&QComboBox::currentTextChanged,
                 this,[=](QString string){
             m_pEventModel->setEventFilterType(string);
+            m_pMainWindow->m_pDataWindow->updateDataTableViews();
     });
 
     connect(m_pEventModel,&EventModel::updateEventTypes,
