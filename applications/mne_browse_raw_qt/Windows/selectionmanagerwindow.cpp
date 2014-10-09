@@ -134,11 +134,8 @@ bool SelectionManagerWindow::loadLayout(QString path)
     //Read layout
     bool state = manager->readMNELoutFile(path.prepend("./MNE_Browse_Raw_Resources/Templates/Layouts/"), m_layoutMap);
 
-    //Load selection groups again because they need to be reinitialised every time a new layout was loaded
+    //Load selection groups again because they need to be reinitialised every time a new layout hase been loaded
     loadSelectionGroups(ui->m_comboBox_selectionFiles->currentText());
-
-    //Delete all MEG channels from the selection groups which are not in the loaded layout
-    cleanUpSelectionGroups();
 
     //Update scene
     m_pLayoutScene->setNewLayout(m_layoutMap);

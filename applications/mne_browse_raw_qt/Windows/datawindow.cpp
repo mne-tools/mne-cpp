@@ -132,6 +132,15 @@ RawDelegate* DataWindow::getDataDelegate()
 
 //*************************************************************************************************************
 
+void DataWindow::updateDataTableViews()
+{
+    ui->m_tableView_rawTableView->viewport()->update();
+    m_pUndockedDataView->viewport()->update();
+}
+
+
+//*************************************************************************************************************
+
 void DataWindow::initMVCSettings()
 {
     //-----------------------------------
