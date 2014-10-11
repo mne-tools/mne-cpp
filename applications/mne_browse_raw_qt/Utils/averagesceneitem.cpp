@@ -1,11 +1,11 @@
 //=============================================================================================================
 /**
-* @file     channelsceneitem.h
+* @file     ChannelSceneItem.cpp
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     September, 2014
+* @date     June, 2014
 *
 * @section  LICENSE
 *
@@ -30,41 +30,16 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the ChannelSceneItem class.
+* @brief    Contains the implementation of the ChannelSceneItem class.
 *
 */
-
-#ifndef CHANNELSCENEITEM_H
-#define CHANNELSCENEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <iostream>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// QT INCLUDES
-//=============================================================================================================
-
-#include <QGraphicsItem>
-#include <QString>
-#include <QColor>
-#include <QPainter>
-#include <QStaticText>
-#include <QDebug>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE MNEBrowseRawQt
-//=============================================================================================================
-
-namespace MNEBrowseRawQt
-{
+#include "averagesceneitem.h"
 
 
 //*************************************************************************************************************
@@ -72,65 +47,100 @@ namespace MNEBrowseRawQt
 // USED NAMESPACES
 //=============================================================================================================
 
+using namespace MNEBrowseRawQt;
+using namespace std;
 
+
+//*************************************************************************************************************
 //=============================================================================================================
-/**
-* ChannelSceneItem...
-*
-* @brief The ChannelSceneItem class provides a new data structure for visualizing channels in a 2D layout.
-*/
-class ChannelSceneItem : public QGraphicsItem
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+AverageSceneItem::AverageSceneItem(QString channelName, QPointF channelPosition, QColor averageColor)
+: m_sChannelName(channelName)
+, m_qpChannelPosition(channelPosition)
+, m_cAverageColor(averageColor)
 {
+}
 
-public:
-    //=========================================================================================================
-    /**
-    * Constructs a ChannelSceneItem.
-    */
-    ChannelSceneItem(QString channelName, QPointF channelPosition, QColor channelColor = Qt::blue);
 
-    //=========================================================================================================
-    /**
-    * Sets the color of the electrode item.
-    */
-    void setColor(QColor channelColor);
+//*************************************************************************************************************
 
-    //=========================================================================================================
-    /**
-    * Returns the bounding rect of the electrode item. This rect describes the area which the item uses to plot in.
-    */
-    QRectF boundingRect() const;
+QRectF AverageSceneItem::boundingRect() const
+{
+    return QRectF(-25, -35, 50, 70);
+}
 
-    //=========================================================================================================
-    /**
-    * Reimplemented paint function.
-    */
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
-    //=========================================================================================================
-    /**
-    * Returns the channel name.
-    */
-    QString getChannelName();
+//*************************************************************************************************************
 
-    //=========================================================================================================
-    /**
-    * Updates the channels position.
-    */
-    void setPosition(QPointF newPosition);
+void AverageSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+{
+    Q_UNUSED(option);
+    Q_UNUSED(widget);
 
-    //=========================================================================================================
-    /**
-    * Updates the electrodes position.
-    */
-    QPointF getPosition();
+    // Plot shadow
+    painter->setPen(Qt::NoPen);
+    painter->setBrush(Qt::darkGray);
+    painter->drawEllipse(-12, -12, 30, 30);
 
-private:
-    QString     m_sChannelName;             /**< Holds the channel's name.*/
-    QPointF     m_qpChannelPosition;        /**< Holds the channel's 2D position in the scene.*/
-    QColor      m_cChannelColor;            /**< Holds the current channel color.*/
-};
+    // Plot colored circle
+    painter->setPen(QPen(Qt::black, 1));
+    if(this->isSelected())
+        painter->setBrush(QBrush(Qt::red));
+    else
+        painter->setBrush(QBrush(m_cAverageColor));
+    painter->drawEllipse(-15, -15, 30, 30);
 
-} // NAMESPACE MNEBrowseRawQt
+    // Plot electrode name
+    QStaticText staticElectrodeName = QStaticText(m_sChannelName);
+    QSizeF sizeText = staticElectrodeName.size();
+    painter->drawStaticText(-15+((30-sizeText.width())/2), -32, staticElectrodeName);
 
-#endif // CHANNELSCENEITEM_H
+    this->setPos(10*m_qpChannelPosition.x(), -10*m_qpChannelPosition.y());
+}
+
+
+//*************************************************************************************************************
+
+void AverageSceneItem::setColor(QColor channelColor)
+{
+    m_cAverageColor = channelColor;
+}
+
+
+//*************************************************************************************************************
+
+QString AverageSceneItem::getChannelName()
+{
+    return m_sChannelName;
+}
+
+
+//*************************************************************************************************************
+
+void AverageSceneItem::setPosition(QPointF newPosition)
+{
+    m_qpChannelPosition = newPosition;
+}
+
+
+//*************************************************************************************************************
+
+QPointF AverageSceneItem::getPosition()
+{
+    return m_qpChannelPosition;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+

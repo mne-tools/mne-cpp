@@ -86,6 +86,7 @@ SOURCES += \
     Utils/filterplotscene.cpp \
     Utils/layoutscene.cpp \
     Utils/channelsceneitem.cpp \
+    Utils/averagesceneitem.cpp \
     Models/rawmodel.cpp \
     Models/eventmodel.cpp \
     Delegates/rawdelegate.cpp \
@@ -96,7 +97,8 @@ SOURCES += \
     Windows/datawindow.cpp \
     Windows/aboutwindow.cpp \
     Windows/informationwindow.cpp \
-    Windows/selectionmanagerwindow.cpp
+    Windows/selectionmanagerwindow.cpp \
+    Windows/averagewindow.cpp
 
 HEADERS += \
     Utils/datamarker.h \
@@ -108,6 +110,7 @@ HEADERS += \
     Utils/filterplotscene.h \
     Utils/layoutscene.h \
     Utils/channelsceneitem.h \
+    Utils/averagesceneitem.h \
     Models/rawmodel.h \
     Models/eventmodel.h \
     Delegates/rawdelegate.h \
@@ -118,7 +121,8 @@ HEADERS += \
     Windows/datawindow.h \
     Windows/aboutwindow.h \
     Windows/informationwindow.h \
-    Windows/selectionmanagerwindow.h
+    Windows/selectionmanagerwindow.h \
+    Windows/averagewindow.h
 
 FORMS += \
     Windows/filterwindow.ui \
@@ -127,7 +131,8 @@ FORMS += \
     Windows/mainwindow.ui \
     Windows/aboutwindow.ui \
     Windows/informationwindow.ui \
-    Windows/selectionmanagerwindow.ui
+    Windows/selectionmanagerwindow.ui \
+    Windows/averagewindow.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

@@ -1,11 +1,11 @@
 //=============================================================================================================
 /**
-* @file     channelsceneitem.h
-* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+* @file     averagewindow.h
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     September, 2014
+* @date     October, 2014
 *
 * @section  LICENSE
 *
@@ -30,19 +30,22 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the ChannelSceneItem class.
+* @brief    Contains the declaration of the AverageWindow class.
 *
 */
 
-#ifndef CHANNELSCENEITEM_H
-#define CHANNELSCENEITEM_H
+#ifndef AVERAGEWINDOW_H
+#define AVERAGEWINDOW_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <iostream>
+#include "mainwindow.h"
+#include "ui_averagewindow.h"
+#include "utils/layoutloader.h"         //MNE-CPP utils
+#include "../Utils/layoutscene.h"       //MNE Browse Raw QT utils
 
 
 //*************************************************************************************************************
@@ -50,12 +53,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QGraphicsItem>
-#include <QString>
-#include <QColor>
-#include <QPainter>
-#include <QStaticText>
-#include <QDebug>
+#include <QDockWidget>
 
 
 //*************************************************************************************************************
@@ -69,68 +67,42 @@ namespace MNEBrowseRawQt
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// DEFINE FORWARD DECLARATIONS
 //=============================================================================================================
 
+class LayoutScene;
+class MainWindow;
 
-//=============================================================================================================
+
 /**
-* ChannelSceneItem...
+* DECLARE CLASS AverageWindow
 *
-* @brief The ChannelSceneItem class provides a new data structure for visualizing channels in a 2D layout.
+* @brief The AverageWindow class provides a dock window for plotting averages.
 */
-class ChannelSceneItem : public QGraphicsItem
+class AverageWindow : public QDockWidget
 {
+    Q_OBJECT
 
 public:
     //=========================================================================================================
     /**
-    * Constructs a ChannelSceneItem.
+    * Constructs a AverageWindow which is a child of parent.
+    *
+    * @param [in] parent pointer to parent widget; If parent is 0, the new AverageWindow becomes a window. If parent is another widget, AverageWindow becomes a child window inside parent. AverageWindow is deleted when its parent is deleted.
     */
-    ChannelSceneItem(QString channelName, QPointF channelPosition, QColor channelColor = Qt::blue);
+    AverageWindow(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Sets the color of the electrode item.
+    * Destroys the AverageWindow.
+    * All AverageWindow's children are deleted first. The application exits if AverageWindow is the main widget.
     */
-    void setColor(QColor channelColor);
-
-    //=========================================================================================================
-    /**
-    * Returns the bounding rect of the electrode item. This rect describes the area which the item uses to plot in.
-    */
-    QRectF boundingRect() const;
-
-    //=========================================================================================================
-    /**
-    * Reimplemented paint function.
-    */
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
-
-    //=========================================================================================================
-    /**
-    * Returns the channel name.
-    */
-    QString getChannelName();
-
-    //=========================================================================================================
-    /**
-    * Updates the channels position.
-    */
-    void setPosition(QPointF newPosition);
-
-    //=========================================================================================================
-    /**
-    * Updates the electrodes position.
-    */
-    QPointF getPosition();
+    ~AverageWindow();
 
 private:
-    QString     m_sChannelName;             /**< Holds the channel's name.*/
-    QPointF     m_qpChannelPosition;        /**< Holds the channel's 2D position in the scene.*/
-    QColor      m_cChannelColor;            /**< Holds the current channel color.*/
+    Ui::AverageWindow *ui;
 };
 
 } // NAMESPACE MNEBrowseRawQt
 
-#endif // CHANNELSCENEITEM_H
+#endif // AVERAGEWINDOW_H

@@ -1,11 +1,11 @@
 //=============================================================================================================
 /**
-* @file     channelsceneitem.h
+* @file     averagesceneitem.h
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     September, 2014
+* @date     October, 2014
 *
 * @section  LICENSE
 *
@@ -30,12 +30,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the ChannelSceneItem class.
+* @brief    Contains the declaration of the AverageSceneItem class.
 *
 */
 
-#ifndef CHANNELSCENEITEM_H
-#define CHANNELSCENEITEM_H
+#ifndef AVERAGESCENEITEM_H
+#define AVERAGESCENEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -75,25 +75,25 @@ namespace MNEBrowseRawQt
 
 //=============================================================================================================
 /**
-* ChannelSceneItem...
+* AverageSceneItem...
 *
-* @brief The ChannelSceneItem class provides a new data structure for visualizing channels in a 2D layout.
+* @brief The AverageSceneItem class provides a new data structure for visualizing averages in a 2D layout.
 */
-class ChannelSceneItem : public QGraphicsItem
+class AverageSceneItem : public QGraphicsItem
 {
 
 public:
     //=========================================================================================================
     /**
-    * Constructs a ChannelSceneItem.
+    * Constructs a AverageSceneItem.
     */
-    ChannelSceneItem(QString channelName, QPointF channelPosition, QColor channelColor = Qt::blue);
+    AverageSceneItem(QString channelName, QPointF channelPosition, QColor averageColor);
 
     //=========================================================================================================
     /**
     * Sets the color of the electrode item.
     */
-    void setColor(QColor channelColor);
+    void setColor(QColor electrodeColor);
 
     //=========================================================================================================
     /**
@@ -115,22 +115,22 @@ public:
 
     //=========================================================================================================
     /**
-    * Updates the channels position.
+    * Updates the electrodes position.
     */
     void setPosition(QPointF newPosition);
 
     //=========================================================================================================
     /**
-    * Updates the electrodes position.
+    * Updates the channel's position.
     */
     QPointF getPosition();
 
 private:
-    QString     m_sChannelName;             /**< Holds the channel's name.*/
-    QPointF     m_qpChannelPosition;        /**< Holds the channel's 2D position in the scene.*/
-    QColor      m_cChannelColor;            /**< Holds the current channel color.*/
+    QString     m_sChannelName;           /**< Holds the channel name.*/
+    QPointF     m_qpChannelPosition;      /**< Holds the channels 2D position in the scene.*/
+    QColor      m_cAverageColor;            /**< Holds the current average color.*/
 };
 
 } // NAMESPACE MNEBrowseRawQt
 
-#endif // CHANNELSCENEITEM_H
+#endif // AVERAGESCENEITEM_H
