@@ -1,11 +1,11 @@
 //=============================================================================================================
 /**
-* @file     ChannelSceneItem.cpp
-* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+* @file     averagewindow.cpp
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     June, 2014
+* @date     October, 2014
 *
 * @section  LICENSE
 *
@@ -30,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the implementation of the ChannelSceneItem class.
+* @brief    Contains the implementation of the AverageWindow class.
 *
 */
 
@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "channelsceneitem.h"
+#include "averagewindow.h"
 
 
 //*************************************************************************************************************
@@ -48,7 +48,6 @@
 //=============================================================================================================
 
 using namespace MNEBrowseRawQt;
-using namespace std;
 
 
 //*************************************************************************************************************
@@ -56,92 +55,17 @@ using namespace std;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ChannelSceneItem::ChannelSceneItem(QString channelName, QPointF channelPosition, QColor channelColor)
-: m_sChannelName(channelName)
-, m_qpChannelPosition(channelPosition)
-, m_cChannelColor(channelColor)
+AverageWindow::AverageWindow(QWidget *parent) :
+    QDockWidget(parent),
+    ui(new Ui::AverageWindow)
 {
-    this->setAcceptHoverEvents(true);
-    this->setFlag(QGraphicsItem::ItemIsSelectable, true);
+    ui->setupUi(this);
 }
 
 
 //*************************************************************************************************************
 
-QRectF ChannelSceneItem::boundingRect() const
+AverageWindow::~AverageWindow()
 {
-    return QRectF(-25, -35, 50, 70);
+    delete ui;
 }
-
-
-//*************************************************************************************************************
-
-void ChannelSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-{
-    Q_UNUSED(option);
-    Q_UNUSED(widget);
-
-    // Plot shadow
-    painter->setPen(Qt::NoPen);
-    painter->setBrush(Qt::darkGray);
-    painter->drawEllipse(-12, -12, 30, 30);
-
-    // Plot colored circle
-    painter->setPen(QPen(Qt::black, 1));
-    if(this->isSelected())
-        painter->setBrush(QBrush(Qt::red));
-    else
-        painter->setBrush(QBrush(m_cChannelColor));
-    painter->drawEllipse(-15, -15, 30, 30);
-
-    // Plot electrode name
-    QStaticText staticElectrodeName = QStaticText(m_sChannelName);
-    QSizeF sizeText = staticElectrodeName.size();
-    painter->drawStaticText(-15+((30-sizeText.width())/2), -32, staticElectrodeName);
-
-    this->setPos(10*m_qpChannelPosition.x(), -10*m_qpChannelPosition.y());
-}
-
-
-//*************************************************************************************************************
-
-void ChannelSceneItem::setColor(QColor channelColor)
-{
-    m_cChannelColor = channelColor;
-}
-
-
-//*************************************************************************************************************
-
-QString ChannelSceneItem::getChannelName()
-{
-    return m_sChannelName;
-}
-
-
-//*************************************************************************************************************
-
-void ChannelSceneItem::setPosition(QPointF newPosition)
-{
-    m_qpChannelPosition = newPosition;
-}
-
-
-//*************************************************************************************************************
-
-QPointF ChannelSceneItem::getPosition()
-{
-    return m_qpChannelPosition;
-}
-
-
-
-
-
-
-
-
-
-
-
-

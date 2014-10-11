@@ -254,7 +254,7 @@ void SelectionManagerWindow::updateUserDefinedChannels()
 
     for(int i = 0; i<itemList.size(); i++) {
         ChannelSceneItem* item = static_cast<ChannelSceneItem*>(itemList.at(i));
-        userDefinedChannels << item->getElectrodeName();
+        userDefinedChannels << item->getChannelName();
     }
 
     ui->m_listWidget_userDefined->clear();

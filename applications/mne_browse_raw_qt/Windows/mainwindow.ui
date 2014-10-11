@@ -48,6 +48,7 @@
     <addaction name="m_eventAction"/>
     <addaction name="m_informationAction"/>
     <addaction name="m_channelSelectionManagerAction"/>
+    <addaction name="m_averageWindow_Action"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -117,6 +118,11 @@
   <action name="m_channelSelectionManagerAction">
    <property name="text">
     <string>Show channel selection manager</string>
+   </property>
+  </action>
+  <action name="m_averageWindow_Action">
+   <property name="text">
+    <string>Show averages</string>
    </property>
   </action>
  </widget>

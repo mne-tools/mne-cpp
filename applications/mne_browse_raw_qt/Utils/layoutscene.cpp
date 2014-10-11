@@ -95,7 +95,7 @@ void LayoutScene::hideItems(QStringList visibleItems)
             for(int i = 0; i<itemList.size(); i++) {
                 ChannelSceneItem* item = static_cast<ChannelSceneItem*>(itemList.at(i));
 
-                if(!visibleItems.contains(item->getElectrodeName())) {
+                if(!visibleItems.contains(item->getChannelName())) {
                     item->setFlag(QGraphicsItem::ItemIsSelectable, false);
                     item->setOpacity(0.25);
                 }

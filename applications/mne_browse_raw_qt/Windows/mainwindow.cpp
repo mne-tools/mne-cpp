@@ -102,7 +102,7 @@ void MainWindow::setupWindowWidgets()
     m_pFilterWindow = new FilterWindow(this);
     m_pFilterWindow->hide();
 
-    //Create dockble information window - QTDesigner used - see /FormFiles
+    //Create dockable information window - QTDesigner used - see /FormFiles
     m_pInformationWindow = new InformationWindow(this);
     addDockWidget(Qt::BottomDockWidgetArea, m_pInformationWindow);
     m_pInformationWindow->hide();
@@ -114,6 +114,10 @@ void MainWindow::setupWindowWidgets()
     //Create selection manager window - QTDesigner used - see /FormFiles
     m_pSelectionManagerWindow = new SelectionManagerWindow(this);
     addDockWidget(Qt::BottomDockWidgetArea, m_pSelectionManagerWindow);
+
+    //Create selection manager window - QTDesigner used - see /FormFiles
+    m_pAverageWindow = new AverageWindow(this);
+    addDockWidget(Qt::BottomDockWidgetArea, m_pAverageWindow);
 
     //Init windows
     m_pDataWindow->init();
@@ -140,6 +144,7 @@ void MainWindow::connectMenus()
     connect(ui->m_eventAction, SIGNAL(triggered()), this, SLOT(showEventWindow()));
     connect(ui->m_informationAction, SIGNAL(triggered()), this, SLOT(showInformationWindow()));
     connect(ui->m_channelSelectionManagerAction, SIGNAL(triggered()), this, SLOT(showSelectionManagerWindow()));
+    connect(ui->m_averageWindow_Action, SIGNAL(triggered()), this, SLOT(showAverageWindow()));
 
     //Help
     connect(ui->m_aboutAction, SIGNAL(triggered()), this, SLOT(showAboutWindow()));
@@ -430,3 +435,19 @@ void MainWindow::showSelectionManagerWindow()
     else // if visible raise the widget to be sure that it is not obscured by other windows
         m_pSelectionManagerWindow->raise();
 }
+
+
+//*************************************************************************************************************
+
+void MainWindow::showAverageWindow()
+{
+    //Note: A widget that happens to be obscured by other windows on the screen is considered to be visible.
+    if(!m_pAverageWindow->isVisible())
+    {
+        m_pAverageWindow->show();
+        m_pAverageWindow->raise();
+    }
+    else // if visible raise the widget to be sure that it is not obscured by other windows
+        m_pAverageWindow->raise();
+}
+
