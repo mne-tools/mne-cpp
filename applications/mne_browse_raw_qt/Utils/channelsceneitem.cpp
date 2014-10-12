@@ -70,7 +70,7 @@ ChannelSceneItem::ChannelSceneItem(QString channelName, QPointF channelPosition,
 
 QRectF ChannelSceneItem::boundingRect() const
 {
-    return QRectF(-25, -35, 50, 70);
+    return QRectF(-25, -35, 50, 50);
 }
 
 
