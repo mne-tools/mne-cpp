@@ -117,7 +117,7 @@
   </action>
   <action name="m_channelSelectionManagerAction">
    <property name="text">
-    <string>Show channel selection manager</string>
+    <string>Show channel selection manager...</string>
    </property>
   </action>
   <action name="m_averageWindow_Action">

@@ -303,7 +303,7 @@
          <enum>QGraphicsView::AnchorViewCenter</enum>
         </property>
         <property name="rubberBandSelectionMode">
-         <enum>Qt::ContainsItemShape</enum>
+         <enum>Qt::IntersectsItemShape</enum>
         </property>
        </widget>
       </item>
