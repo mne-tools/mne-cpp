@@ -219,7 +219,15 @@ public:
     *
     * @param [in] v the value which is attached to the sample array vector.
     */
-    virtual void setValue(VectorXd v);
+    virtual void setValue(const VectorXd& v);
+
+    //=========================================================================================================
+    /**
+    * Attaches a value to the sample array vector.
+    *
+    * @param [in] v the value which is attached to the sample array vector.
+    */
+//    virtual void setValue(MatrixXd& v);
 
     //=========================================================================================================
     /**
