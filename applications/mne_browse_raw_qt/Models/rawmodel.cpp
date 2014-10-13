@@ -59,7 +59,6 @@ using namespace MNEBrowseRawQt;
 RawModel::RawModel(QObject *parent)
 : QAbstractTableModel(parent)
 , m_bFileloaded(false)
-, m_qSettings()
 , m_bStartReached(false)
 , m_bEndReached(false)
 , m_bReloading(false)
@@ -67,10 +66,10 @@ RawModel::RawModel(QObject *parent)
 , m_fiffInfo(FiffInfo())
 , m_pfiffIO(QSharedPointer<FiffIO>(new FiffIO()))
 {
-    m_iWindowSize = m_qSettings.value("RawModel/window_size").toInt();
-    m_reloadPos = m_qSettings.value("RawModel/reload_pos").toInt();
-    m_maxWindows = m_qSettings.value("RawModel/max_windows").toInt();
-    m_iFilterTaps = m_qSettings.value("RawModel/num_filter_taps").toInt();
+    m_iWindowSize = MODEL_WINDOW_SIZE;
+    m_reloadPos = MODEL_RELOAD_POS;
+    m_maxWindows = MODEL_MAX_WINDOWS;
+    m_iFilterTaps = MODEL_NUM_FILTER_TAPS;
 
     //Set default sampling freq to 1024
     m_fiffInfo.sfreq = 1024;
@@ -105,7 +104,6 @@ RawModel::RawModel(QObject *parent)
 RawModel::RawModel(QFile &qFile, QObject *parent)
 : QAbstractTableModel(parent)
 , m_bFileloaded(false)
-, m_qSettings()
 , m_bStartReached(false)
 , m_bEndReached(false)
 , m_bReloading(false)
@@ -113,10 +111,10 @@ RawModel::RawModel(QFile &qFile, QObject *parent)
 , m_fiffInfo(FiffInfo())
 , m_pfiffIO(QSharedPointer<FiffIO>(new FiffIO()))
 {
-    m_iWindowSize = m_qSettings.value("RawModel/window_size").toInt();
-    m_reloadPos = m_qSettings.value("RawModel/reload_pos").toInt();
-    m_maxWindows = m_qSettings.value("RawModel/max_windows").toInt();
-    m_iFilterTaps = m_qSettings.value("RawModel/num_filter_taps").toInt();
+    m_iWindowSize = MODEL_WINDOW_SIZE;
+    m_reloadPos = MODEL_RELOAD_POS;
+    m_maxWindows = MODEL_MAX_WINDOWS;
+    m_iFilterTaps = MODEL_NUM_FILTER_TAPS;
 
     //read fiff data
     loadFiffData(qFile);

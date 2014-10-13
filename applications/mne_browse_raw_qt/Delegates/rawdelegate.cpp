@@ -72,9 +72,9 @@ RawDelegate::RawDelegate(QObject *parent)
 , m_bShowSelectedEventsOnly(false)
 , m_bActivateEvents(true)
 {
-    m_iDefaultPlotHeight = m_qSettings.value("RawDelegate/plotheight").toDouble();
-    m_dDx = m_qSettings.value("RawDelegate/dx").toDouble();
-    m_nhlines = m_qSettings.value("RawDelegate/nhlines").toDouble();
+    m_iDefaultPlotHeight = DELEGATE_PLOT_HEIGHT;
+    m_dDx = DELEGATE_DX;
+    m_nhlines = DELEGATE_NHLINES;
 
     m_pEventModel = new EventModel(NULL);
     m_pEventView = new QTableView(NULL);
@@ -203,22 +203,22 @@ void RawDelegate::createPlotPath(const QModelIndex &index, const QStyleOptionVie
     case FIFFV_MEG_CH: {
         qint32 unit = (static_cast<const RawModel*>(index.model()))->m_pfiffIO->m_qlistRaw[0]->info.chs[index.row()].unit;
         if(unit == FIFF_UNIT_T_M) {
-            dMaxValue = m_qSettings.value("RawDelegate/max_meg_grad").toDouble();
+            dMaxValue = DELEGATE_MAX_MEG_GRAD;
         }
         else if(unit == FIFF_UNIT_T)
-            dMaxValue = m_qSettings.value("RawDelegate/max_meg_mag").toDouble();
+            dMaxValue = DELEGATE_MAX_MEG_MAG;
         break;
     }
     case FIFFV_EEG_CH: {
-        dMaxValue = m_qSettings.value("RawDelegate/max_eeg").toDouble();
+        dMaxValue = DELEGATE_MAX_EEG;
         break;
     }
     case FIFFV_EOG_CH: {
-        dMaxValue = m_qSettings.value("RawDelegate/max_eog").toDouble();
+        dMaxValue = DELEGATE_MAX_EOG;
         break;
     }
     case FIFFV_STIM_CH: {
-        dMaxValue = m_qSettings.value("RawDelegate/max_stim").toDouble();
+        dMaxValue = DELEGATE_MAX_STIM;
         break;
     }
     }
@@ -280,7 +280,7 @@ void RawDelegate::plotEvents(const QModelIndex &index, const QStyleOptionViewIte
     qint32 sampleRangeHigh = sampleRangeLow + rawModel->sizeOfPreloadedData();
 
     QPen pen;
-    pen.setWidth(m_qSettings.value("EventDesignParameters/event_marker_width").toInt());
+    pen.setWidth(EVENT_MARKER_WIDTH);
 
     QColor colorTemp;
 
@@ -293,39 +293,39 @@ void RawDelegate::plotEvents(const QModelIndex &index, const QStyleOptionViewIte
                 //Set color for pen depending on current event type
                 switch(type) {
                     default:
-                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_default").value<QColor>());
+                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_default", QColor(Qt::black)).value<QColor>());
                     break;
 
                     case 1:
-                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_1").value<QColor>());
+                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_1", QColor(Qt::black)).value<QColor>());
                     break;
 
                     case 2:
-                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_2").value<QColor>());
+                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_2", QColor(Qt::magenta)).value<QColor>());
                     break;
 
                     case 3:
-                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_3").value<QColor>());
+                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_3", QColor(Qt::green)).value<QColor>());
                     break;
 
                     case 4:
-                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_4").value<QColor>());
+                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_4", QColor(Qt::red)).value<QColor>());
                     break;
 
                     case 5:
-                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_5").value<QColor>());
+                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_5", QColor(Qt::cyan)).value<QColor>());
                     break;
 
                     case 32:
-                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_32").value<QColor>());
+                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_32", QColor(Qt::yellow)).value<QColor>());
                     break;
 
                     case 998:
-                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_998").value<QColor>());
+                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_998", QColor(Qt::darkBlue)).value<QColor>());
                     break;
 
                     case 999:
-                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_999").value<QColor>());
+                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_999", QColor(Qt::darkCyan)).value<QColor>());
                     break;
                 }
 
@@ -335,7 +335,7 @@ void RawDelegate::plotEvents(const QModelIndex &index, const QStyleOptionViewIte
                 painter->setPen(pen);
 
                 //Draw line from sample position (x) and highest to lowest y position of the column widget - Add -m_qSettings.value("EventDesignParameters/event_marker_width").toInt() to avoid painting ovre the edge of the column widget
-                painter->drawLine(option.rect.x() + sampleValue, option.rect.y(), option.rect.x() + sampleValue, option.rect.y() + option.rect.height() - m_qSettings.value("EventDesignParameters/event_marker_width").toInt());
+                painter->drawLine(option.rect.x() + sampleValue, option.rect.y(), option.rect.x() + sampleValue, option.rect.y() + option.rect.height() - EVENT_MARKER_WIDTH);
             } // END for statement
         } // END if statement event in data range
     } // END if statement plot all
@@ -353,49 +353,49 @@ void RawDelegate::plotEvents(const QModelIndex &index, const QStyleOptionViewIte
                 //Set color for pen depending on current event type
                 switch(type) {
                     default:
-                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_default").value<QColor>());
+                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_default", QColor(Qt::black)).value<QColor>());
                     break;
 
                     case 1:
-                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_1").value<QColor>());
+                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_1", QColor(Qt::black)).value<QColor>());
                     break;
 
                     case 2:
-                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_2").value<QColor>());
+                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_2", QColor(Qt::magenta)).value<QColor>());
                     break;
 
                     case 3:
-                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_3").value<QColor>());
+                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_3", QColor(Qt::green)).value<QColor>());
                     break;
 
                     case 4:
-                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_4").value<QColor>());
+                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_4", QColor(Qt::red)).value<QColor>());
                     break;
 
                     case 5:
-                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_5").value<QColor>());
+                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_5", QColor(Qt::cyan)).value<QColor>());
                     break;
 
                     case 32:
-                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_32").value<QColor>());
+                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_32", QColor(Qt::yellow)).value<QColor>());
                     break;
 
                     case 998:
-                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_998").value<QColor>());
+                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_998", QColor(Qt::darkBlue)).value<QColor>());
                     break;
 
                     case 999:
-                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_999").value<QColor>());
+                        pen.setColor(m_qSettings.value("EventDesignParameters/event_color_999", QColor(Qt::darkCyan)).value<QColor>());
                     break;
                 }
 
                 colorTemp = pen.color();
-                colorTemp.setAlpha(m_qSettings.value("EventDesignParameters/event_marker_opacity").toInt());
+                colorTemp.setAlpha(EVENT_MARKER_OPACITY);
                 pen.setColor(colorTemp);
                 painter->setPen(pen);
 
                 //Draw line from sample position (x) and highest to lowest y position of the column widget - Add +m_qSettings.value("EventDesignParameters/event_marker_width").toInt() to avoid painting ovre the edge of the column widget
-                painter->drawLine(option.rect.x() + sampleValue, option.rect.y(), option.rect.x() + sampleValue, option.rect.y() - option.rect.height() + m_qSettings.value("EventDesignParameters/event_marker_width").toInt());
+                painter->drawLine(option.rect.x() + sampleValue, option.rect.y(), option.rect.x() + sampleValue, option.rect.y() - option.rect.height() + EVENT_MARKER_WIDTH);
             } // END for statement
         } // END if statement
     } // END else statement

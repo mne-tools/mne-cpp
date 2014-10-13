@@ -68,8 +68,8 @@ FilterWindow::FilterWindow(QWidget *parent) :
     initComboBoxes();
     initFilterPlot();
 
-    m_iWindowSize = m_qSettings.value("RawModel/window_size").toInt();
-    m_iFilterTaps = m_qSettings.value("RawModel/num_filter_taps").toInt();
+    m_iWindowSize = MODEL_WINDOW_SIZE;
+    m_iFilterTaps = MODEL_NUM_FILTER_TAPS;
 }
 
 

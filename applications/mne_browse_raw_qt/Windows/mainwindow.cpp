@@ -160,8 +160,8 @@ void MainWindow::connectMenus()
 void MainWindow::setupMainWindow()
 {
     //set Window functions
-    resize(m_qSettings.value("MainWindow/size").toSize()); //Resize to predefined default size
-    move(m_qSettings.value("MainWindow/position").toPoint()); // Move this main window to position 50/50 on the screen
+    resize(m_qSettings.value("MainWindow/size", QSize(MAINWINDOW_WINDOW_SIZE_W, MAINWINDOW_WINDOW_SIZE_H)).toSize()); //Resize to predefined default size
+    move(m_qSettings.value("MainWindow/position", QPoint(MAINWINDOW_WINDOW_POSITION_X, MAINWINDOW_WINDOW_POSITION_Y)).toPoint()); // Move this main window to position 50/50 on the screen
 
     //Set data window as central widget - This is needed because we are using QDockWidgets
     setCentralWidget(m_pDataWindow);
