@@ -50,10 +50,18 @@
 // DEFINES
 //=============================================================================================================
 
-#if defined(RTCOMMAND_LIBRARY)
+#if defined(BUILD_MNECPP_STATIC_LIB)
+#  define RTCOMMANDSHARED_EXPORT
+#elif defined(RTCOMMAND_LIBRARY)
 #  define RTCOMMANDSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
 #else
 #  define RTCOMMANDSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
 #endif
+
+//#if defined(RTCOMMAND_LIBRARY)
+//#  define RTCOMMANDSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
+//#else
+//#  define RTCOMMANDSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
+//#endif
 
 #endif // RTCOMMUNICATION_GLOBAL_H

@@ -39,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "channelsceneitem.h"
+#include "averagesceneitem.h"
 
 
 //*************************************************************************************************************
@@ -56,27 +56,25 @@ using namespace std;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ChannelSceneItem::ChannelSceneItem(QString channelName, QPointF channelPosition, QColor channelColor)
+AverageSceneItem::AverageSceneItem(QString channelName, QPointF channelPosition, QColor averageColor)
 : m_sChannelName(channelName)
 , m_qpChannelPosition(channelPosition)
-, m_cChannelColor(channelColor)
+, m_cAverageColor(averageColor)
 {
-    this->setAcceptHoverEvents(true);
-    this->setFlag(QGraphicsItem::ItemIsSelectable, true);
 }
 
 
 //*************************************************************************************************************
 
-QRectF ChannelSceneItem::boundingRect() const
+QRectF AverageSceneItem::boundingRect() const
 {
-    return QRectF(-25, -30, 50, 50);
+    return QRectF(-25, -35, 50, 70);
 }
 
 
 //*************************************************************************************************************
 
-void ChannelSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void AverageSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(option);
     Q_UNUSED(widget);
@@ -91,7 +89,7 @@ void ChannelSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     if(this->isSelected())
         painter->setBrush(QBrush(Qt::red));
     else
-        painter->setBrush(QBrush(m_cChannelColor));
+        painter->setBrush(QBrush(m_cAverageColor));
     painter->drawEllipse(-15, -15, 30, 30);
 
     // Plot electrode name
@@ -105,15 +103,15 @@ void ChannelSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
 
 //*************************************************************************************************************
 
-void ChannelSceneItem::setColor(QColor channelColor)
+void AverageSceneItem::setColor(QColor channelColor)
 {
-    m_cChannelColor = channelColor;
+    m_cAverageColor = channelColor;
 }
 
 
 //*************************************************************************************************************
 
-QString ChannelSceneItem::getChannelName()
+QString AverageSceneItem::getChannelName()
 {
     return m_sChannelName;
 }
@@ -121,7 +119,7 @@ QString ChannelSceneItem::getChannelName()
 
 //*************************************************************************************************************
 
-void ChannelSceneItem::setPosition(QPointF newPosition)
+void AverageSceneItem::setPosition(QPointF newPosition)
 {
     m_qpChannelPosition = newPosition;
 }
@@ -129,10 +127,11 @@ void ChannelSceneItem::setPosition(QPointF newPosition)
 
 //*************************************************************************************************************
 
-QPointF ChannelSceneItem::getPosition()
+QPointF AverageSceneItem::getPosition()
 {
     return m_qpChannelPosition;
 }
+
 
 
 

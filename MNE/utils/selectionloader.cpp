@@ -1,14 +1,15 @@
 //=============================================================================================================
 /**
-* @file     generics_global.h
-* @author   Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+* @file     selectionloader.cpp
+* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+*           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     July, 2012
+* @date     October, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2012, Christoph Dinh and Matti Hamalainen. All rights reserved.
+* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -18,7 +19,7 @@
 *       the following disclaimer in the documentation and/or other materials provided with the distribution.
 *     * Neither the name of MNE-CPP authors nor the names of its contributors may be used
 *       to endorse or promote products derived from this software without specific prior written permission.
-* 
+*
 * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
 * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A
 * PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT,
@@ -29,39 +30,75 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief     generics library export/import macros.
+* @brief    Implementation of the SelectionLoader class
 *
 */
-
-#ifndef GENERICS_GLOBAL_H
-#define GENERICS_GLOBAL_H
-
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include <QtCore/qglobal.h>
+#include "selectionloader.h"
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// DEFINES
+// USED NAMESPACES
 //=============================================================================================================
 
-#if defined(BUILD_MNECPP_STATIC_LIB)
-#  define GENERICSSHARED_EXPORT
-#elif defined(GENERICS_LIBRARY)
-#  define GENERICSSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
-#else
-#  define GENERICSSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
-#endif
+using namespace UTILSLIB;
 
-//#if defined(GENERICS_LIBRARY)
-//#  define GENERICSSHARED_EXPORT Q_DECL_EXPORT    /**< Q_DECL_EXPORT must be added to the declarations of symbols used when compiling a shared library. */
-//#else
-//#  define GENERICSSHARED_EXPORT Q_DECL_IMPORT    /**< Q_DECL_IMPORT must be added to the declarations of symbols used when compiling a client that uses the shared library. */
-//#endif
 
-#endif // GENERICS_GLOBAL_H
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE MEMBER METHODS
+//=============================================================================================================
+
+SelectionLoader::SelectionLoader()
+{
+}
+
+
+//*************************************************************************************************************
+
+bool SelectionLoader::readMNESelFile(QString path, QMap<QString,QStringList> &selectionMap)
+{
+    //Open .sel file
+    if(!path.contains(".sel"))
+        return false;
+
+    QFile file(path);
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        qDebug()<<"Error opening selection file";
+        return false;
+    }
+
+    //Start reading from file
+    QTextStream in(&file);
+
+    while(!in.atEnd()) {
+        QString line = in.readLine();
+
+        if(line.contains("%") == false && line.contains(":") == true) //Skip commented areas in file
+        {
+            QStringList firstSplit = line.split(":");
+
+            //Create new key
+            QString key = firstSplit.at(0);
+
+            QStringList secondSplit = firstSplit.at(1).split("|");
+
+            //Delete last element if it is a blank character
+            if(secondSplit.at(secondSplit.size()-1) == "")
+                secondSplit.removeLast();
+
+            //Add to map
+            selectionMap.insert(key, secondSplit);
+        }
+    }
+
+    file.close();
+
+    return true;
+}

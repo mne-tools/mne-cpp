@@ -130,6 +130,12 @@ public:
     */
     RawDelegate* getDataDelegate();
 
+    //=========================================================================================================
+    /**
+    * Updates the data table views
+    */
+    void updateDataTableViews();
+
 private:
     //=========================================================================================================
     /**
@@ -172,6 +178,12 @@ private:
     * keyPressEvent reimplemented virtual function to handle key press events of the data dock window
     */
     void keyPressEvent(QKeyEvent* event);
+
+    //=========================================================================================================
+    /**
+    * eventFilter filter events fro mthe table views
+    */
+    bool eventFilter(QObject *object, QEvent *event);
 
     Ui::DataWindowDockWidget *ui;                   /**< the ui variabe to initalise and access the ui file with this class */
 

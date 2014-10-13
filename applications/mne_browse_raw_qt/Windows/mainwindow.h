@@ -81,6 +81,7 @@
 #include "aboutwindow.h"
 #include "informationwindow.h"
 #include "selectionmanagerwindow.h"
+#include "averagewindow.h"
 
 
 //*************************************************************************************************************
@@ -145,6 +146,7 @@ class MainWindow : public QMainWindow
     friend class DataWindow;
     friend class InformationWindow;
     friend class SelectionManagerWindow;
+    friend class AverageWindow;
 
     Q_OBJECT
 public:
@@ -216,6 +218,12 @@ private slots:
     */
     void showSelectionManagerWindow();
 
+    //=========================================================================================================
+    /**
+    * showAverageWindow shows the average window
+    */
+    void showAverageWindow();
+
 private:
     //=========================================================================================================
     /**
@@ -260,6 +268,7 @@ private:
     AboutWindow*            m_pAboutWindow;             /**< About widget which displays information about this application*/
     InformationWindow*      m_pInformationWindow;       /**< Information widget which displays information about this application (log, etc.)*/
     SelectionManagerWindow* m_pSelectionManagerWindow;  /**< Selection manager window which can be used to select channels*/
+    AverageWindow*          m_pAverageWindow;           /**< Average window can be used to plot calculated averages in a 2D layout scene*/
 
     //application settings
     QSettings               m_qSettings;

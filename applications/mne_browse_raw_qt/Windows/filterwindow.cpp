@@ -282,6 +282,8 @@ void FilterWindow::applyFilterToAll()
             m_pMainWindow->m_pDataWindow->getDataModel()->applyOperator(QModelIndexList(),it.value());
         }
     }
+
+    m_pMainWindow->m_pDataWindow->updateDataTableViews();
 }
 
 
@@ -290,6 +292,8 @@ void FilterWindow::applyFilterToAll()
 void FilterWindow::undoFilterToAll()
 {
     m_pMainWindow->m_pDataWindow->getDataModel()->undoFilter();
+
+    m_pMainWindow->m_pDataWindow->updateDataTableViews();
 }
 
 
