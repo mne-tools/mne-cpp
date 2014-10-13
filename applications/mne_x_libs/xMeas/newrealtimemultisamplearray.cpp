@@ -243,7 +243,7 @@ VectorXd NewRealTimeMultiSampleArray::getValue() const
 
 //*************************************************************************************************************
 
-void NewRealTimeMultiSampleArray::setValue(VectorXd v)
+void NewRealTimeMultiSampleArray::setValue(const VectorXd& v)
 {
     if(!m_bChInfoIsInit)
         return;
@@ -274,3 +274,10 @@ void NewRealTimeMultiSampleArray::setValue(VectorXd v)
     }
 }
 
+
+//*************************************************************************************************************
+
+//void NewRealTimeMultiSampleArray::setValue(MatrixXd& v)
+//{
+
+//}
