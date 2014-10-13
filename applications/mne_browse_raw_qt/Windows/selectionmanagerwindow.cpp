@@ -90,15 +90,19 @@ void SelectionManagerWindow::initListWidgets()
 
     connect(ui->m_listWidget_selectionGroups, &QListWidget::itemClicked,
                 this, &SelectionManagerWindow::updateSceneItems);
+
+    //Update data view whenever a drag and drop item movement is performed - TODO: This is inefficient because updateDataView is called everytime the list's viewport is entered
+    connect(ui->m_listWidget_userDefined->model(), &QAbstractTableModel::dataChanged,
+                this, &SelectionManagerWindow::updateDataView);
 }
 
 
 //*************************************************************************************************************
 
 void SelectionManagerWindow::initGraphicsView()
-{
+{    
     //Create layout scene and set to view
-    m_pLayoutScene = new LayoutScene(ui->m_graphicsView_layoutPlot);
+    m_pLayoutScene = new LayoutScene(ui->m_graphicsView_layoutPlot, 0);
     ui->m_graphicsView_layoutPlot->setScene(m_pLayoutScene);
 
     connect(m_pLayoutScene, &QGraphicsScene::selectionChanged,
@@ -132,7 +136,10 @@ bool SelectionManagerWindow::loadLayout(QString path)
     LayoutLoader* manager = new LayoutLoader();
 
     //Read layout
-    bool state = manager->readMNELoutFile(path.prepend(":/Resources/Templates/"), m_layoutMap);
+    bool state = manager->readMNELoutFile(path.prepend("./MNE_Browse_Raw_Resources/Templates/Layouts/"), m_layoutMap);
+
+    //Load selection groups again because they need to be reinitialised every time a new layout hase been loaded
+    loadSelectionGroups(ui->m_comboBox_selectionFiles->currentText());
 
     //Update scene
     m_pLayoutScene->setNewLayout(m_layoutMap);
@@ -148,56 +155,24 @@ bool SelectionManagerWindow::loadLayout(QString path)
 
 bool SelectionManagerWindow::loadSelectionGroups(QString path)
 {
-    //Open .sel file
-    if(!path.contains(".sel"))
-        return false;
-
     ui->m_listWidget_selectionGroups->clear();
     ui->m_listWidget_visibleChannels->clear();
     m_selectionGroupsMap.clear();
 
-    QFile file(path.prepend(":/Resources/Templates/"));
-    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qDebug()<<"Error opening selection file";
-        return false;
+    SelectionLoader* manager = new SelectionLoader();
+
+    //Read selection from file
+    m_selectionGroupsMap.clear();
+    bool state = manager->readMNESelFile(path.prepend("./MNE_Browse_Raw_Resources/Templates/ChannelSelection/"), m_selectionGroupsMap);
+
+    //Add selection groups to list widget
+    QMapIterator<QString, QStringList> selectionIndex(m_selectionGroupsMap);
+    while (selectionIndex.hasNext()) {
+        selectionIndex.next();
+        ui->m_listWidget_selectionGroups->insertItem(0, selectionIndex.key());
     }
 
-    //Start reading from file
-    QTextStream in(&file);
-
-    while(!in.atEnd()) {
-        QString line = in.readLine();
-
-        if(line.contains("%") == false && line.contains(":") == true) //Skip commented areas in file
-        {
-            QStringList firstSplit = line.split(":");
-
-            //Create new key
-            QString key = firstSplit.at(0);
-
-            QStringList secondSplit = firstSplit.at(1).split("|");
-
-            //Delete last element if it is a blank character
-            if(secondSplit.at(secondSplit.size()-1) == "")
-                secondSplit.removeLast();
-
-            //Add to map
-            m_selectionGroupsMap.insert(key, secondSplit);
-
-            //Add to list widget
-            int count = ui->m_listWidget_selectionGroups->count();
-            if(count<1)
-                ui->m_listWidget_selectionGroups->insertItem(0, key);
-            else
-                ui->m_listWidget_selectionGroups->insertItem(count, key);
-        }
-    }
-
-    file.close();
-
-    //Create group 'All' manually
-    ui->m_listWidget_selectionGroups->insertItem(0, "All");
-
+    //Create group 'All' manually from the loaded fiff file
     RawModel* model = m_pMainWindow->m_pDataWindow->getDataModel();
 
     QStringList allChannelsList;
@@ -210,12 +185,41 @@ bool SelectionManagerWindow::loadSelectionGroups(QString path)
 
     m_selectionGroupsMap.insert("All", allChannelsList);
 
-    //Fit scene in view
-    ui->m_graphicsView_layoutPlot->fitInView(m_pLayoutScene->itemsBoundingRect(), Qt::KeepAspectRatio);
+    ui->m_listWidget_selectionGroups->insertItem(0, "All");
+
+    //Delete all MEG channels from the selection groups which are not in the loaded layout
+    cleanUpSelectionGroups();
 
     updateDataView();
 
-    return true;
+    return state;
+}
+
+
+//*************************************************************************************************************
+
+void SelectionManagerWindow::cleanUpSelectionGroups()
+{
+    QMapIterator<QString,QStringList> selectionIndex(m_selectionGroupsMap);
+
+    //Iterate through all loaded selection groups
+    while (selectionIndex.hasNext()) {
+        selectionIndex.next();
+
+        QStringList channelList = selectionIndex.value();
+
+        //Search the current selection group for MEG channels which are not in the currently loaded layout file and delete them
+        QMutableStringListIterator stringListIndex(channelList);
+        while (stringListIndex.hasNext()) {
+            stringListIndex.next();
+
+            if(!m_layoutMap.contains(stringListIndex.value()) && stringListIndex.value().contains("MEG"))
+                stringListIndex.remove();
+        }
+
+        //Overwrite old selection groups channels
+        m_selectionGroupsMap.insert(selectionIndex.key(), channelList);
+    }
 }
 
 
@@ -236,12 +240,12 @@ void SelectionManagerWindow::updateSelectionGroups(QListWidgetItem* item)
 
 void SelectionManagerWindow::updateSceneItems()
 {
-    QStringList channelNamesToHide;
+    QStringList visibleItems;
 
     for(int i = 0; i<ui->m_listWidget_visibleChannels->count(); i++)
-        channelNamesToHide << ui->m_listWidget_visibleChannels->item(i)->text();
+        visibleItems << ui->m_listWidget_visibleChannels->item(i)->text();
 
-    m_pLayoutScene->hideItems(channelNamesToHide);
+    m_pLayoutScene->hideItems(visibleItems);
 }
 
 
@@ -252,17 +256,9 @@ void SelectionManagerWindow::updateUserDefinedChannels()
     QList<QGraphicsItem*> itemList = m_pLayoutScene->selectedItems();
     QStringList userDefinedChannels;
 
-    switch(m_pLayoutScene->m_iSceneType) {
-        case 0: //Channel selection plot scene
-            for(int i = 0; i<itemList.size(); i++) {
-                ChannelSceneItem* item = static_cast<ChannelSceneItem*>(itemList.at(i));
-                userDefinedChannels << item->getElectrodeName();
-            }
-        break;
-
-        case 1: //Average plot scene
-
-        break;
+    for(int i = 0; i<itemList.size(); i++) {
+        ChannelSceneItem* item = static_cast<ChannelSceneItem*>(itemList.at(i));
+        userDefinedChannels << item->getChannelName();
     }
 
     ui->m_listWidget_userDefined->clear();
@@ -276,26 +272,20 @@ void SelectionManagerWindow::updateUserDefinedChannels()
 
 void SelectionManagerWindow::updateDataView()
 {
-    //Create list of channels which are to be visible in the view
+    qDebug()<<"Update data View";
+    //if no channels have been selected by the user - show selected group channels
     QListWidget* targetListWidget;
     if(ui->m_listWidget_userDefined->count()>0)
         targetListWidget = ui->m_listWidget_userDefined;
     else
         targetListWidget = ui->m_listWidget_visibleChannels;
 
+    //Create list of channels which are to be visible in the view
     QStringList visibleChannels;
 
-    switch(m_pLayoutScene->m_iSceneType) {
-        case 0: //Channel selection plot scene
-            for(int i = 0; i<targetListWidget->count(); i++) {
-                QListWidgetItem* item = targetListWidget->item(i);
-                visibleChannels << item->text();
-            }
-        break;
-
-        case 1: //Average plot scene
-
-        break;
+    for(int i = 0; i<targetListWidget->count(); i++) {
+        QListWidgetItem* item = targetListWidget->item(i);
+        visibleChannels << item->text();
     }
 
     //Hide selected channels/rows in the raw data view
@@ -333,18 +323,18 @@ void SelectionManagerWindow::resizeEvent(QResizeEvent* event)
 
 bool SelectionManagerWindow::eventFilter(QObject *obj, QEvent *event)
 {
+    //Setup delte key on user defined channel list
     if (obj == ui->m_listWidget_userDefined) {
-        if (event->type() == QEvent::KeyPress) {
-            QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
+        QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
 
-            if(keyEvent->key() == Qt::Key_Delete)
-                qDeleteAll(ui->m_listWidget_userDefined->selectedItems());
-
-            return true;
-        } else {
-            return false;
+        if(keyEvent->key() == Qt::Key_Delete) {
+            qDeleteAll(ui->m_listWidget_userDefined->selectedItems());
+            updateDataView();
         }
-    } else {
+        else
+            return false;
+    }
+    else {
         // pass the event on to the parent class
         return QDockWidget::eventFilter(obj, event);
     }

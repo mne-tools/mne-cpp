@@ -40,15 +40,24 @@ include(../../mne-cpp.pri)
 
 TEMPLATE = app
 
-QT += network core widgets concurrent svg
+QT += gui network core widgets concurrent svg
 
 TARGET = mne_browse_raw_qt
+
+#If one single executable is to be build
+#-> comment out flag in .pri file
+#-> add DEFINES += BUILD_MNECPP_STATIC_LIB in projects .pro file
+#-> This needs to be done in order to avoid problem with the Q_DECL_EXPORT/Q_DECL_IMPORT flag in the global headers
+contains(MNECPP_CONFIG, build_MNECPP_Static_Lib) {
+    DEFINES += BUILD_MNECPP_STATIC_LIB
+}
 
 CONFIG(debug, debug|release) {
     TARGET = $$join(TARGET,,,d)
 }
 
-CONFIG += console #DEBUG
+#Note that the static flag is ingored when building against a dynamic qt version
+CONFIG += console static #DEBUG
 
 LIBS += -L$${MNE_LIBRARY_DIR}
 CONFIG(debug, debug|release) {
@@ -77,6 +86,7 @@ SOURCES += \
     Utils/filterplotscene.cpp \
     Utils/layoutscene.cpp \
     Utils/channelsceneitem.cpp \
+    Utils/averagesceneitem.cpp \
     Models/rawmodel.cpp \
     Models/eventmodel.cpp \
     Delegates/rawdelegate.cpp \
@@ -87,7 +97,8 @@ SOURCES += \
     Windows/datawindow.cpp \
     Windows/aboutwindow.cpp \
     Windows/informationwindow.cpp \
-    Windows/selectionmanagerwindow.cpp
+    Windows/selectionmanagerwindow.cpp \
+    Windows/averagewindow.cpp
 
 HEADERS += \
     Utils/datamarker.h \
@@ -99,6 +110,7 @@ HEADERS += \
     Utils/filterplotscene.h \
     Utils/layoutscene.h \
     Utils/channelsceneitem.h \
+    Utils/averagesceneitem.h \
     Models/rawmodel.h \
     Models/eventmodel.h \
     Delegates/rawdelegate.h \
@@ -109,7 +121,8 @@ HEADERS += \
     Windows/datawindow.h \
     Windows/aboutwindow.h \
     Windows/informationwindow.h \
-    Windows/selectionmanagerwindow.h
+    Windows/selectionmanagerwindow.h \
+    Windows/averagewindow.h
 
 FORMS += \
     Windows/filterwindow.ui \
@@ -118,7 +131,8 @@ FORMS += \
     Windows/mainwindow.ui \
     Windows/aboutwindow.ui \
     Windows/informationwindow.ui \
-    Windows/selectionmanagerwindow.ui
+    Windows/selectionmanagerwindow.ui \
+    Windows/averagewindow.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

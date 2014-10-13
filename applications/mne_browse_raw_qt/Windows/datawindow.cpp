@@ -132,6 +132,15 @@ RawDelegate* DataWindow::getDataDelegate()
 
 //*************************************************************************************************************
 
+void DataWindow::updateDataTableViews()
+{
+    ui->m_tableView_rawTableView->viewport()->update();
+    m_pUndockedDataView->viewport()->update();
+}
+
+
+//*************************************************************************************************************
+
 void DataWindow::initMVCSettings()
 {
     //-----------------------------------
@@ -166,6 +175,10 @@ void DataWindow::initMVCSettings()
                                  m_pMainWindow->m_pEventWindow->getEventTableView(),
                                  ui->m_tableView_rawTableView);
 
+    //Install event filter to overcome QGrabGesture and QScrollBar problem
+    ui->m_tableView_rawTableView->horizontalScrollBar()->installEventFilter(this);
+    ui->m_tableView_rawTableView->verticalScrollBar()->installEventFilter(this);
+
     //-----------------------------------
     //------ Init "dockable" view -------
     //-----------------------------------
@@ -182,8 +195,8 @@ void DataWindow::initMVCSettings()
     m_pUndockedDataView->setShowGrid(false);
     m_pUndockedDataView->horizontalHeader()->setVisible(false);
 
-    //activate kinetic scrolling
-    QScroller::grabGesture(m_pUndockedDataView, QScroller::LeftMouseButtonGesture);
+    m_pUndockedDataView->verticalScrollBar()->setVisible(false);
+    m_pUndockedDataView->horizontalScrollBar()->setVisible(false);
 
     //connect QScrollBar with model in order to reload data samples
     connect(m_pUndockedDataView->horizontalScrollBar(),&QScrollBar::valueChanged,
@@ -192,12 +205,6 @@ void DataWindow::initMVCSettings()
     //---------------------------------------------------------
     //-- Interconnect scrollbars of docked and undocked view --
     //---------------------------------------------------------
-    //m_pUndockedDataView ---> ui->m_tableView_rawTableView
-    connect(m_pUndockedDataView->horizontalScrollBar(),&QScrollBar::valueChanged,
-            ui->m_tableView_rawTableView->horizontalScrollBar(),&QScrollBar::setValue);
-    connect(m_pUndockedDataView->verticalScrollBar(),&QScrollBar::valueChanged,
-            ui->m_tableView_rawTableView->verticalScrollBar(),&QScrollBar::setValue);
-
     //ui->m_tableView_rawTableView ---> m_pUndockedDataView
     connect(ui->m_tableView_rawTableView->horizontalScrollBar(),&QScrollBar::valueChanged,
             m_pUndockedDataView->horizontalScrollBar(),&QScrollBar::setValue);
@@ -253,6 +260,59 @@ void DataWindow::initToolBar()
 
 //*************************************************************************************************************
 
+void DataWindow::initMarker()
+{
+    //Set marker as front top-most widget
+    m_pDataMarker->raise();
+
+    //Get boundary rect coordinates for table view
+    double boundingLeft = ui->m_tableView_rawTableView->verticalHeader()->geometry().right() + ui->m_tableView_rawTableView->geometry().left();
+    double boundingRight = ui->m_tableView_rawTableView->geometry().right() - ui->m_tableView_rawTableView->verticalScrollBar()->width() + 1;
+    QRect boundingRect;
+    boundingRect.setLeft(boundingLeft);
+    boundingRect.setRight(boundingRight);
+
+    //Inital position of the marker
+    m_pDataMarker->move(boundingRect.x(), boundingRect.y() + 1);
+
+    //Create Region from bounding rect - this region is used to restrain the marker inside the data view
+    QRegion region(boundingRect);
+    m_pDataMarker->setMovementBoundary(region);
+
+    //Set marker size to table view size minus horizontal scroll bar height
+    m_pDataMarker->resize(m_qSettings.value("DataMarker/data_marker_width").toInt(),
+                          boundingRect.height() - ui->m_tableView_rawTableView->horizontalScrollBar()->height()-1);
+
+    //Connect current marker to marker move signal
+    connect(m_pDataMarker,&DataMarker::markerMoved,
+            this,&DataWindow::updateMarkerPosition);
+
+    //If no file has been loaded yet dont show the marker and its label
+    if(!m_pRawModel->m_bFileloaded) {
+        m_pDataMarker->hide();
+        m_pCurrentDataMarkerLabel->hide();
+    }
+
+    //Connect current marker to loading a fiff file - no loaded file - no visible marker
+    connect(m_pRawModel, &RawModel::fileLoaded,[this](bool state){
+        if(state) {
+            //Inital position of the marker
+            m_pDataMarker->move(74, m_pDataMarker->y());
+            m_pCurrentDataMarkerLabel->move(m_pDataMarker->geometry().left() + (m_qSettings.value("DataMarker/data_marker_width").toInt()/2) - (m_pCurrentDataMarkerLabel->width()/2) + 1, m_pDataMarker->geometry().top() - 20);
+
+            m_pDataMarker->show();
+            m_pCurrentDataMarkerLabel->show();
+        }
+        else {
+            m_pDataMarker->hide();
+            m_pCurrentDataMarkerLabel->hide();
+        }
+    });
+}
+
+
+//*************************************************************************************************************
+
 void DataWindow::initLabels()
 {
     //Setup range samples
@@ -262,7 +322,7 @@ void DataWindow::initLabels()
 
     //Setup marker label
     //Set current marker sample label to vertical spacer position and initalize text
-    m_pCurrentDataMarkerLabel->resize(m_pCurrentDataMarkerLabel->width()+15, m_pCurrentDataMarkerLabel->height());
+    m_pCurrentDataMarkerLabel->resize(150, m_pCurrentDataMarkerLabel->height());
     m_pCurrentDataMarkerLabel->setAlignment(Qt::AlignHCenter);
     m_pCurrentDataMarkerLabel->move(m_pDataMarker->geometry().left(), m_pDataMarker->geometry().top() + 5);
     QString numberString = QString().number(m_iCurrentMarkerSample);
@@ -288,31 +348,6 @@ void DataWindow::initLabels()
     //Connect current marker sample label to horizontal scroll bar changes
     connect(ui->m_tableView_rawTableView->horizontalScrollBar(),&QScrollBar::valueChanged,
             this,&DataWindow::setMarkerSampleLabel);
-}
-
-
-//*************************************************************************************************************
-
-void DataWindow::initMarker()
-{
-    //Set marker as front top-most widget
-    m_pDataMarker->raise();
-
-    //Get boundary rect coordinates for table view
-    QRect boundingRect = ui->m_tableView_rawTableView->geometry();
-    boundingRect.setLeft(boundingRect.x() + ui->m_tableView_rawTableView->verticalHeader()->width());
-    boundingRect.setRight(boundingRect.right() - ui->m_tableView_rawTableView->verticalScrollBar()->width() + 1);
-
-    //Inital position of the marker
-    m_pDataMarker->move(boundingRect.x(), boundingRect.y() + 1);
-
-    //Create Region from bounding rect - this region is used to restrain the marker inside the data view
-    QRegion region(boundingRect);
-    m_pDataMarker->setMovementBoundary(region);
-
-    //Set marker size to table view size minus horizontal scroll bar height
-    m_pDataMarker->resize(m_qSettings.value("DataMarker/data_marker_width").toInt(),
-                          boundingRect.height() - ui->m_tableView_rawTableView->horizontalScrollBar()->height()-1);
 }
 
 
@@ -348,6 +383,29 @@ void DataWindow::keyPressEvent(QKeyEvent* event)
     return QWidget::keyPressEvent(event);
 }
 
+
+//*************************************************************************************************************
+
+bool DataWindow::eventFilter(QObject *object, QEvent *event)
+{
+    if ((object == m_pUndockedDataView->horizontalScrollBar() || object == ui->m_tableView_rawTableView->horizontalScrollBar() ||
+         object == m_pUndockedDataView->verticalScrollBar() || object == ui->m_tableView_rawTableView->verticalScrollBar())
+        && event->type() == QEvent::Enter) {
+        QScroller::ungrabGesture(m_pUndockedDataView);
+        QScroller::ungrabGesture(ui->m_tableView_rawTableView);
+        return true;
+    }
+
+    if ((object == m_pUndockedDataView->horizontalScrollBar() || object == ui->m_tableView_rawTableView->horizontalScrollBar()||
+         object == m_pUndockedDataView->verticalScrollBar() || object == ui->m_tableView_rawTableView->verticalScrollBar())
+        && event->type() == QEvent::Leave) {
+        QScroller::grabGesture(m_pUndockedDataView, QScroller::LeftMouseButtonGesture);
+        QScroller::grabGesture(ui->m_tableView_rawTableView, QScroller::LeftMouseButtonGesture);
+        return true;
+    }
+
+    return false;
+}
 
 //*************************************************************************************************************
 
@@ -507,8 +565,10 @@ void DataWindow::updateMarkerPosition()
 
     m_pDataMarker->move(m_pDataMarker->x(), boundingRect.y()+1);
 
-    boundingRect.setLeft(boundingRect.left() + ui->m_tableView_rawTableView->verticalHeader()->width());
-    boundingRect.setRight(boundingRect.right() - ui->m_tableView_rawTableView->verticalScrollBar()->width() + 1);
+    double boundingLeft = ui->m_tableView_rawTableView->verticalHeader()->geometry().right() + ui->m_tableView_rawTableView->geometry().left();
+    double boundingRight = ui->m_tableView_rawTableView->geometry().right() - ui->m_tableView_rawTableView->verticalScrollBar()->width() + 1;
+    boundingRect.setLeft(boundingLeft);
+    boundingRect.setRight(boundingRight);
 
     //Create Region from bounding rect - this region is used to restrain the marker inside the data view
     QRegion region(boundingRect);
@@ -532,4 +592,5 @@ void DataWindow::updateMarkerPosition()
     //Update current marker sample lable
     m_pCurrentDataMarkerLabel->move(m_pDataMarker->geometry().left() - (m_pCurrentDataMarkerLabel->width()/2) + 1, m_pDataMarker->geometry().top() - 20);
 }
+
 

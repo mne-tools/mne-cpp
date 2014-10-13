@@ -1,11 +1,11 @@
 //=============================================================================================================
 /**
-* @file     layoutloader.h
+* @file     averagesceneitem.h
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
-*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
+*           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
 * @version  1.0
-* @date     September, 2014
+* @date     October, 2014
 *
 * @section  LICENSE
 *
@@ -30,50 +30,40 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    LayoutLoader class declaration.
+* @brief    Contains the declaration of the AverageSceneItem class.
 *
 */
 
-#ifndef LAYOUTLOADER_H
-#define LAYOUTLOADER_H
+#ifndef AVERAGESCENEITEM_H
+#define AVERAGESCENEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "utils_global.h"
+#include <iostream>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
-#include <QSharedPointer>
-#include <QVector>
-#include <QFile>
-#include <QTextStream>
-#include <QStringList>
-#include <QDebug>
-#include <QIODevice>
+#include <QGraphicsItem>
 #include <QString>
+#include <QColor>
+#include <QPainter>
+#include <QStaticText>
+#include <QDebug>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Eigen INCLUDES
+// DEFINE NAMESPACE MNEBrowseRawQt
 //=============================================================================================================
 
-#include <Eigen/Core>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE MNELIB
-//=============================================================================================================
-
-namespace UTILSLIB
+namespace MNEBrowseRawQt
 {
 
 
@@ -82,57 +72,65 @@ namespace UTILSLIB
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace Eigen;
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINES
-//=============================================================================================================
-
 
 //=============================================================================================================
 /**
-* Processes layout files (AsA .elc, MNE .lout) files which contain the electrode positions of a EEG/MEG hat.
+* AverageSceneItem...
 *
-* @brief Processes AsA .elc files which contain the electrode positions of a EEG hat.
+* @brief The AverageSceneItem class provides a new data structure for visualizing averages in a 2D layout.
 */
-class UTILSSHARED_EXPORT LayoutLoader
+class AverageSceneItem : public QGraphicsItem
 {
+
 public:
-    typedef QSharedPointer<LayoutLoader> SPtr;            /**< Shared pointer type for LayoutLoader. */
-    typedef QSharedPointer<const LayoutLoader> ConstSPtr; /**< Const shared pointer type for LayoutLoader. */
+    //=========================================================================================================
+    /**
+    * Constructs a AverageSceneItem.
+    */
+    AverageSceneItem(QString channelName, QPointF channelPosition, QColor averageColor);
 
     //=========================================================================================================
     /**
-    * Constructs a Filter object.
+    * Sets the color of the electrode item.
     */
-    LayoutLoader();
+    void setColor(QColor electrodeColor);
 
     //=========================================================================================================
     /**
-    * Reads the specified ANT elc-layout file.
-    * @param [in] path holds the file path of the elc file which is to be read.
-    * @param [in] location3D holds the vector to which the read 3D positions are stored.
-    * @param [in] location2D holds the vector to which the read 2D positions are stored.
-    * @param [out] bool returns true if reading was successful, false otherwise.
+    * Returns the bounding rect of the electrode item. This rect describes the area which the item uses to plot in.
     */
-    bool readAsaElcFile(QString path, QStringList &channelNames, QVector<QVector<double> > &location3D, QVector<QVector<double> > &location2D, QString &unit);
-
+    QRectF boundingRect() const;
 
     //=========================================================================================================
     /**
-    * Reads the specified MNE .lout file.
-    * @param [in] path holds the file path of the lout file which is to be read.
-    * @param [in] channel data holds the x,y and channel number for every channel. The map keys are the channel names (i.e. 'MEG 0113').
-    * @param [out] bool returns true if reading was successful, false otherwise.
+    * Reimplemented paint function.
     */
-    bool readMNELoutFile(QString path, QMap<QString, QVector<double> > &channelData);
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+
+    //=========================================================================================================
+    /**
+    * Returns the channel name.
+    */
+    QString getChannelName();
+
+    //=========================================================================================================
+    /**
+    * Updates the electrodes position.
+    */
+    void setPosition(QPointF newPosition);
+
+    //=========================================================================================================
+    /**
+    * Updates the channel's position.
+    */
+    QPointF getPosition();
 
 private:
-
+    QString     m_sChannelName;           /**< Holds the channel name.*/
+    QPointF     m_qpChannelPosition;      /**< Holds the channels 2D position in the scene.*/
+    QColor      m_cAverageColor;            /**< Holds the current average color.*/
 };
 
-} // NAMESPACE
+} // NAMESPACE MNEBrowseRawQt
 
-#endif // LAYOUTLOADER_H
+#endif // AVERAGESCENEITEM_H

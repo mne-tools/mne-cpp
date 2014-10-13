@@ -34,6 +34,9 @@ isEmpty( MNE_BINARY_DIR ) {
 MNECPP_CONFIG += withGui
 #MNECPP_CONFIG += withPython
 
+#Build MNE-CPP libraries as static libs
+#MNECPP_CONFIG += build_MNECPP_Static_Lib
+
 contains(MNECPP_CONFIG, withPython) {
     message(Configure Python!)
 

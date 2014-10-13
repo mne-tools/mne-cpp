@@ -57,6 +57,10 @@
 #include <QRubberBand>
 #include <QWidget>
 #include <QMouseEvent>
+#include <QGestureEvent>
+#include <QPanGesture>
+#include <QPinchGesture>
+#include <QGraphicsSceneEvent>
 
 
 //*************************************************************************************************************
@@ -66,6 +70,7 @@
 
 namespace MNEBrowseRawQt
 {
+
 
 //=============================================================================================================
 /**
@@ -89,22 +94,23 @@ public:
     * Updates layout data.
     * @param [in] layoutMap layout data map.
     */
-    void setNewLayout(QMap<QString,QVector<double>> layoutMap);
+    void setNewLayout(QMap<QString,QVector<double> > layoutMap);
 
     //=========================================================================================================
     /**
     * Hides all items described in list.
     * @param [in] list string list with items name which are to be hidden.
     */
-    void hideItems(QStringList list);
+    void hideItems(QStringList visibleItems);
 
     int                             m_iSceneType;                   /**< Holds the current scene type (channel selection = 0, average = 1).*/
 
 private:
     QGraphicsView*                  m_qvView;                       /**< Holds the view which visualizes this scene.*/
-    QMap<QString,QVector<double>>   m_layoutMap;                    /**< Holds the layout data.*/
+    QMap<QString,QVector<double> >  m_layoutMap;                    /**< Holds the layout data.*/
     bool                            m_dragSceneIsActive;
     QPointF                         m_mousePressPosition;
+    bool                            m_bDragMode;
 
     //=========================================================================================================
     /**
@@ -141,6 +147,14 @@ private:
     * Reimplemented double mouse release event.
     */
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent);
+
+    bool event(QEvent *event);
+    bool gestureEvent(QGestureEvent *event);
+    void panTriggered(QPanGesture*);
+    void pinchTriggered(QPinchGesture*);
+    void swipeTriggered(QSwipeGesture*);
+
+    bool eventFilter(QObject *object, QEvent *event);
 };
 
 } // NAMESPACE
