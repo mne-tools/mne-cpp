@@ -63,8 +63,8 @@ DataMarker::DataMarker(QWidget *parent) :
     //Set background color
     QPalette Pal(palette());
 
-    QColor color = m_qSettings.value("DataMarker/data_marker_color").value<QColor>();
-    color.setAlpha(m_qSettings.value("DataMarker/data_marker_opacity").toInt());
+    QColor color = m_qSettings.value("DataMarker/data_marker_color", QColor(227,6,19)).value<QColor>();
+    color.setAlpha(DATA_MARKER_OPACITY);
     Pal.setColor(QPalette::Background, color);
 
     setAutoFillBackground(true);
