@@ -91,7 +91,8 @@ QWidget *EventDelegate::createEditor(QWidget *parent,
         }
     }
 
-    return &QWidget();
+    QWidget *returnWidget = new QWidget();
+    return returnWidget;
 }
 
 

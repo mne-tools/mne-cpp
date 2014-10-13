@@ -129,7 +129,7 @@ QVariant EventModel::headerData(int section, Qt::Orientation orientation, int ro
 QVariant EventModel::data(const QModelIndex &index, int role) const
 {
     if(role == Qt::TextAlignmentRole)
-        return Qt::AlignCenter | Qt::AlignVCenter;
+        return QVariant(Qt::AlignCenter | Qt::AlignVCenter);
 
     if(role != Qt::DisplayRole && role != Qt::BackgroundRole)
         return QVariant();
