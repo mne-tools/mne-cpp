@@ -90,6 +90,10 @@ void SelectionManagerWindow::initListWidgets()
 
     connect(ui->m_listWidget_selectionGroups, &QListWidget::itemClicked,
                 this, &SelectionManagerWindow::updateSceneItems);
+
+    //Update data view whenever a drag and drop item movement is performed - TODO: This is inefficient because updateDataView is called everytime the list's viewport is entered
+    connect(ui->m_listWidget_userDefined->model(), &QAbstractTableModel::dataChanged,
+                this, &SelectionManagerWindow::updateDataView);
 }
 
 
@@ -268,6 +272,7 @@ void SelectionManagerWindow::updateUserDefinedChannels()
 
 void SelectionManagerWindow::updateDataView()
 {
+    qDebug()<<"Update data View";
     //if no channels have been selected by the user - show selected group channels
     QListWidget* targetListWidget;
     if(ui->m_listWidget_userDefined->count()>0)
@@ -322,8 +327,10 @@ bool SelectionManagerWindow::eventFilter(QObject *obj, QEvent *event)
     if (obj == ui->m_listWidget_userDefined) {
         QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
 
-        if(keyEvent->key() == Qt::Key_Delete)
+        if(keyEvent->key() == Qt::Key_Delete) {
             qDeleteAll(ui->m_listWidget_userDefined->selectedItems());
+            updateDataView();
+        }
         else
             return false;
     }

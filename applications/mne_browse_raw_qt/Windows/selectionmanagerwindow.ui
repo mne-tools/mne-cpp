@@ -40,6 +40,9 @@
           <height>16777215</height>
          </size>
         </property>
+        <property name="mouseTracking">
+         <bool>true</bool>
+        </property>
         <property name="acceptDrops">
          <bool>true</bool>
         </property>
@@ -300,7 +303,7 @@
          <enum>QGraphicsView::AnchorUnderMouse</enum>
         </property>
         <property name="resizeAnchor">
-         <enum>QGraphicsView::AnchorViewCenter</enum>
+         <enum>QGraphicsView::AnchorUnderMouse</enum>
         </property>
         <property name="rubberBandSelectionMode">
          <enum>Qt::IntersectsItemShape</enum>
