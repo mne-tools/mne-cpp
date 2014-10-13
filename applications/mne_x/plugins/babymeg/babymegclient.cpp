@@ -355,6 +355,8 @@ void BabyMEGClient::handleBuffer()
                 OPT = 5;
             else if (CMD == "QUIS")
                 OPT = 6;
+            else if (CMD == "INFG")
+                OPT = 7;
 
             switch (OPT){
             case 1:
@@ -419,6 +421,16 @@ void BabyMEGClient::handleBuffer()
                             tcpSocket->waitForDisconnected();
                 m_bSocketIsConnected = false;
                 qDebug()<< "Disconnect Server";
+                break;
+            case 7: //INFG
+                {
+                QByteArray PARA = buffer.left(tmp);
+                qDebug()<<"[INFG]"<<PARA;
+                //Parse parameters from PARA string
+                myBabyMEGInfo->MGH_LM_Parse_Para_Infg(PARA);
+                buffer.remove(0,tmp);
+                qDebug()<<"INFG has been received!!!!";
+                }
                 break;
 
             default:

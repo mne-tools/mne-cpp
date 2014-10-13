@@ -345,3 +345,80 @@ void BabyMEGInfo::MGH_LM_Parse_Para(QByteArray cmdstr)
 
     return;
 }
+
+//*************************************************************************************************************
+
+void BabyMEGInfo::MGH_LM_Get_Channel_Infg(QByteArray cmdstr)
+{
+    //operation about lm_ch_names
+    if (cmdstr[0]==':')
+        cmdstr.remove(0,1);
+
+    QStringList sList = MGH_LM_Exact_Single_Channel_Info(cmdstr);
+
+    lm_ch_names.clear();
+    lm_ch_gain.clear();
+
+
+    // parse the information for each channel
+    for(qint32 k =0; k<sList.size(); k++)
+    {
+        QString t = sList.at(k);
+        for (qint32 z=0;z<t.size();z++)
+        {
+            if (t[z]=='|')
+            {
+                lm_ch_names.append(t.left(z));
+                //qDebug()<<t.left(z);
+                //extract the substring contained channel information: scale and coil positions
+                QString tt = t.mid(z+1);
+                qDebug()<<tt;
+                //gain
+                lm_ch_gain.append(tt);
+                qDebug()<<t.left(z)<<"----"<<tt;
+
+            }
+        }
+    }
+    return;
+}
+
+//*************************************************************************************************************
+
+void BabyMEGInfo::MGH_LM_Parse_Para_Infg(QByteArray cmdstr)
+{
+
+    QByteArray CMD = cmdstr.left(4);
+    if (CMD == "INFG")
+    {
+        //remove INFG
+        cmdstr.remove(0,4);
+        //ACQ the number of channels
+        QByteArray T = MGH_LM_Get_Field(cmdstr);
+        cmdstr.remove(0,T.size());
+        T.remove(0,1);
+        chnNum = T.toInt();
+        //ACQ the length of data package
+        T = MGH_LM_Get_Field(cmdstr);
+        cmdstr.remove(0,T.size());
+        T.remove(0,1);
+        dataLength = T.toInt();
+        // ACQ sampling rate
+        T = MGH_LM_Get_Field(cmdstr);
+        cmdstr.remove(0,T.size());
+        T.remove(0,1);
+        sfreq = T.toDouble();
+        qDebug()<<"[babyMEG_INFG] chnNum:" << chnNum << "Data Length" <<dataLength<<"sampling rate"<<sfreq;
+        //qDebug()<<"cmdstr"<<cmdstr;
+        // Start to acquire the channel's name and channel's scale
+        MGH_LM_Get_Channel_Infg(cmdstr);
+
+
+        //emit gain info
+        emit GainInfoUpdate(lm_ch_gain);
+
+    }
+
+    return;
+}
+
