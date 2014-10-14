@@ -330,7 +330,7 @@ void RawDelegate::plotEvents(const QModelIndex &index, const QStyleOptionViewIte
                 }
 
                 colorTemp = pen.color();
-                colorTemp.setAlpha(m_qSettings.value("EventDesignParameters/event_marker_opacity").toInt());
+                colorTemp.setAlpha(EVENT_MARKER_OPACITY);
                 pen.setColor(colorTemp);
                 painter->setPen(pen);
 
