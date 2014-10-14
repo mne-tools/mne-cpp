@@ -58,8 +58,8 @@ using namespace MNEBrowseRawQt;
 
 MainWindow::MainWindow(QWidget *parent)
 : QMainWindow(parent)
-, m_qFileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
-, m_qEventFile("./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif")
+//, m_qFileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
+//, m_qEventFile("./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif")
 , m_qSettings()
 , m_rawSettings()
 , ui(new Ui::MainWindowWidget)
@@ -116,7 +116,7 @@ void MainWindow::setupWindowWidgets()
     m_pSelectionManagerWindow = new SelectionManagerWindow(this);
     addDockWidget(Qt::BottomDockWidgetArea, m_pSelectionManagerWindow);
     m_pSelectionManagerWindow->setFloating(true);
-    m_pSelectionManagerWindow->hide();
+    m_pSelectionManagerWindow->setVisible(false);
 
     //Create selection manager window - QTDesigner used - see /FormFiles
     m_pAverageWindow = new AverageWindow(this);
@@ -288,6 +288,9 @@ void MainWindow::openFile()
 
     //Update status bar
     setWindowStatus();
+
+    //Update selection Group All
+    m_pSelectionManagerWindow->createSelectionGroupAll();
 }
 
 
