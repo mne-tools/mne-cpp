@@ -41,7 +41,8 @@ SUBDIRS += \
     test_mne_libs \
     test_mne_rt \
     mne_x_plugin_com \
-    test_mne_future
+    test_mne_future \
+	test_mne_cluster_eval
 
 contains(MNECPP_CONFIG, withGui) {
     SUBDIRS += \

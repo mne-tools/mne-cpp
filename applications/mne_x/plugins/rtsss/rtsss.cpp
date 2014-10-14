@@ -247,7 +247,7 @@ void RtSss::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
     {
         //Check if buffer initialized
         if(!m_pRtSssBuffer)
-            m_pRtSssBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSA->getNumChannels(), pRTMSA->getMultiArraySize()));
+            m_pRtSssBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSA->getNumChannels(), pRTMSA->getMultiSampleArray()[0].cols()));
 
         //Fiff information
         if(!m_pFiffInfo)
@@ -255,11 +255,12 @@ void RtSss::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
         if(m_bProcessData)
         {
-            MatrixXd in_mat(pRTMSA->getNumChannels(), pRTMSA->getMultiArraySize());
+            MatrixXd in_mat;
             for(unsigned char i = 0; i < pRTMSA->getMultiArraySize(); ++i)
-                in_mat.col(i) = pRTMSA->getMultiSampleArray()[i];
-
-            m_pRtSssBuffer->push(&in_mat);
+            {
+                in_mat = pRTMSA->getMultiSampleArray()[i];
+                m_pRtSssBuffer->push(&in_mat);
+            }
         }
     }
 }

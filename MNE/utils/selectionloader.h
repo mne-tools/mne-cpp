@@ -1,11 +1,11 @@
 //=============================================================================================================
 /**
-* @file     layoutloader.h
+* @file     selectionloader.h
 * @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     September, 2014
+* @date     October, 2014
 *
 * @section  LICENSE
 *
@@ -30,12 +30,12 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    LayoutLoader class declaration.
+* @brief    SelectionLoader class declaration.
 *
 */
 
-#ifndef LAYOUTLOADER_H
-#define LAYOUTLOADER_H
+#ifndef SELECTIONLOADER_H
+#define SELECTIONLOADER_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -49,23 +49,17 @@
 //=============================================================================================================
 // Qt INCLUDES
 //=============================================================================================================
-
-#include <QSharedPointer>
-#include <QVector>
-#include <QFile>
-#include <QTextStream>
+#include <QMap>
 #include <QStringList>
+#include <QFile>
 #include <QDebug>
-#include <QIODevice>
-#include <QString>
+#include <QTextStream>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
 // Eigen INCLUDES
 //=============================================================================================================
-
-#include <Eigen/Core>
 
 
 //*************************************************************************************************************
@@ -82,8 +76,6 @@ namespace UTILSLIB
 // USED NAMESPACES
 //=============================================================================================================
 
-using namespace Eigen;
-
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -93,46 +85,29 @@ using namespace Eigen;
 
 //=============================================================================================================
 /**
-* Processes layout files (AsA .elc, MNE .lout) files which contain the electrode positions of a EEG/MEG hat.
+* Processes selection files (mne .sel) files which contain the chanels for each selection group.
 *
-* @brief Processes AsA .elc files which contain the electrode positions of a EEG hat.
+* @brief Processes selection files (mne .sel) files which contain the chanels for each selection group.
 */
-class UTILSSHARED_EXPORT LayoutLoader
+class UTILSSHARED_EXPORT SelectionLoader
 {
 public:
-    typedef QSharedPointer<LayoutLoader> SPtr;            /**< Shared pointer type for LayoutLoader. */
-    typedef QSharedPointer<const LayoutLoader> ConstSPtr; /**< Const shared pointer type for LayoutLoader. */
-
     //=========================================================================================================
     /**
     * Constructs a Filter object.
     */
-    LayoutLoader();
+    SelectionLoader();
 
     //=========================================================================================================
     /**
-    * Reads the specified ANT elc-layout file.
+    * Reads the specified MNE sel file.
     * @param [in] path holds the file path of the elc file which is to be read.
-    * @param [in] location3D holds the vector to which the read 3D positions are stored.
-    * @param [in] location2D holds the vector to which the read 2D positions are stored.
-    * @param [out] bool returns true if reading was successful, false otherwise.
+    * @param [in] selectionMap holds the map to which the read selection groups are stored.
     */
-    bool readAsaElcFile(QString path, QStringList &channelNames, QVector<QVector<double> > &location3D, QVector<QVector<double> > &location2D, QString &unit);
-
-
-    //=========================================================================================================
-    /**
-    * Reads the specified MNE .lout file.
-    * @param [in] path holds the file path of the lout file which is to be read.
-    * @param [in] channel data holds the x,y and channel number for every channel. The map keys are the channel names (i.e. 'MEG 0113').
-    * @param [out] bool returns true if reading was successful, false otherwise.
-    */
-    bool readMNELoutFile(QString path, QMap<QString, QVector<double> > &channelData);
-
-private:
+    bool readMNESelFile(QString path, QMap<QString,QStringList> &selectionMap);
 
 };
 
 } // NAMESPACE
 
-#endif // LAYOUTLOADER_H
+#endif // SELECTIONLOADER_H

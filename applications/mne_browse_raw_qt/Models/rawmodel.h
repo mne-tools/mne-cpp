@@ -73,6 +73,7 @@
 
 #include "../Utils/types.h"
 #include "../Utils/filteroperator.h"
+#include "../Utils/rawsettings.h"
 
 
 //*************************************************************************************************************
@@ -82,7 +83,6 @@
 
 #include <QDebug>
 #include <QAbstractTableModel>
-#include <QSettings>
 #include <QMetaEnum>
 
 #include <QBrush>
@@ -244,9 +244,6 @@ private:
     //Filter operators
     QMap<int,QSharedPointer<MNEOperator> >      m_assignedOperators;    /**< Map of MNEOperator types to channels*/
 
-    //Settings
-    QSettings                               m_qSettings;
-
     qint32                                  m_iAbsFiffCursor;           /**< Cursor that points to the current position in the fiff data file [in samples] */
     qint32                                  m_iCurAbsScrollPos;         /**< the current (absolute) ScrollPosition in the fiff data file */
 
@@ -261,6 +258,12 @@ signals:
     * dataReloaded is emitted when data reloading has finished in the background-thread
     */
     void dataReloaded();
+
+    //=========================================================================================================
+    /**
+    * fileLoaded is emitted whenever a file was (tried) to be loaded
+    */
+    void fileLoaded(bool);
 
 public slots:
     //=========================================================================================================

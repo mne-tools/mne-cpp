@@ -115,6 +115,7 @@ signals:
     void fiffInfoAvailable(FIFFLIB::FiffInfo);
     void SendDataPackage(QByteArray DATA);
     void SendCMDPackage(QByteArray DATA);
+    void GainInfoUpdate(QStringList);
 
 public:
     //=========================================================================================================
@@ -161,21 +162,21 @@ public:
     * @param[in] DATA - QByteArray contains MEG data.
     */
     void MGH_LM_Send_CMDPackage(QByteArray DATA);
-//    //=========================================================================================================
-//    /**
-//    * Put data block into a queue
-//    *
-//    * @param[in] DataIn - Input Data Block (QByteArray).
-//    */
-//    void EnQueue(QByteArray DataIn);
-//    //=========================================================================================================
-//    /**
-//    * Get data block from a queue
-//    *
-//    * @param[in] void
-//    * @param[out] Output Data Block (QByteArray)
-//    */
-//    QByteArray DeQueue();
+
+    //=========================================================================================================
+    /**
+    * Parse the information about header information
+    *
+    * @param[in] cmdstr - QByteArray contains the header information.
+    */
+    void MGH_LM_Parse_Para_Infg(QByteArray cmdstr);
+    //=========================================================================================================
+    /**
+    * extract channel information from string with separate char ":","|",";"
+    *
+    * @param[in] cmdstr - QByteArray contains the channel information.
+    */
+    void MGH_LM_Get_Channel_Infg(QByteArray cmdstr);
 
 
 private:

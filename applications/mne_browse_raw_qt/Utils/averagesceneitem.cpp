@@ -1,16 +1,15 @@
 //=============================================================================================================
 /**
-* @file     rawsettings.cpp
-* @author   Florian Schlembach <florian.schlembach@tu-ilmenau.de>;
+* @file     ChannelSceneItem.cpp
+* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>;
-*           Jens Haueisen <jens.haueisen@tu-ilmenau.de>
 * @version  1.0
-* @date     January, 2014
+* @date     June, 2014
 *
 * @section  LICENSE
 *
-* Copyright (C) 2014, Florian Schlembach, Christoph Dinh, Matti Hamalainen and Jens Haueisen. All rights reserved.
+* Copyright (C) 2014, Lorenz Esch, Christoph Dinh and Matti Hamalainen. All rights reserved.
 *
 * Redistribution and use in source and binary forms, with or without modification, are permitted provided that
 * the following conditions are met:
@@ -31,7 +30,7 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains all application settings.
+* @brief    Contains the implementation of the ChannelSceneItem class.
 *
 */
 
@@ -40,7 +39,7 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "rawsettings.h"
+#include "averagesceneitem.h"
 
 
 //*************************************************************************************************************
@@ -49,6 +48,7 @@
 //=============================================================================================================
 
 using namespace MNEBrowseRawQt;
+using namespace std;
 
 
 //*************************************************************************************************************
@@ -56,99 +56,91 @@ using namespace MNEBrowseRawQt;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-RawSettings::RawSettings(QObject *parent)
-: QObject(parent)
-, m_qSettings("mne-cpp","MNE_BROWSE_RAW_QT")
-{
-    init();
-}
-
-
-//*************************************************************************************************************
-
-RawSettings::~RawSettings()
+AverageSceneItem::AverageSceneItem(QString channelName, QPointF channelPosition, QColor averageColor)
+: m_sChannelName(channelName)
+, m_qpChannelPosition(channelPosition)
+, m_cAverageColor(averageColor)
 {
 }
 
 
 //*************************************************************************************************************
 
-void RawSettings::write()
+QRectF AverageSceneItem::boundingRect() const
 {
-    //MainWindow
-    //ToDo: ask for already stored setting in OS environment before setting them
-    //e.g. if(!m_qSettings.contains("RawModel/window_size")) m_qSettings.setValue("window_size",MODEL_WINDOW_SIZE);
-
-    //Window settings
-    m_qSettings.beginGroup("MainWindow");
-
-        m_qSettings.setValue("size",QSize(m_mainwindow_size_w, m_mainwindow_size_h));
-        m_qSettings.setValue("position",QPoint(m_mainwindow_position_x, m_mainwindow_position_y));
-
-    m_qSettings.endGroup();
-
-    //EventDesignParameters
-    m_qSettings.beginGroup("EventDesignParameters");
-
-        //Event colors
-        QVariant variant;
-        variant = m_event_color_default;
-        m_qSettings.setValue("event_color_default",variant);
-
-        variant = m_event_color_1;
-        m_qSettings.setValue("event_color_1",variant);
-
-        variant = m_event_color_2;
-        m_qSettings.setValue("event_color_2",variant);
-
-        variant = m_event_color_3;
-        m_qSettings.setValue("event_color_3",variant);
-
-        variant = m_event_color_4;
-        m_qSettings.setValue("event_color_4",variant);
-
-        variant = m_event_color_5;
-        m_qSettings.setValue("event_color_5",variant);
-
-        variant = m_event_color_32;
-        m_qSettings.setValue("event_color_32",variant);
-
-        variant = m_event_color_998;
-        m_qSettings.setValue("event_color_998",variant);
-
-        variant = m_event_color_999;
-        m_qSettings.setValue("event_color_999",variant);
-
-    m_qSettings.endGroup();
-
-    //Data window marker
-    m_qSettings.beginGroup("DataMarker");
-
-        //data marker color and width colors
-        variant = m_data_marker_color;
-        m_qSettings.setValue("data_marker_color",variant);
-
-    m_qSettings.endGroup();
+    return QRectF(-25, -35, 50, 70);
 }
 
 
 //*************************************************************************************************************
 
-void RawSettings::init()
+void AverageSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
-    m_mainwindow_size_w = MAINWINDOW_WINDOW_SIZE_W;
-    m_mainwindow_size_h = MAINWINDOW_WINDOW_SIZE_H;
-    m_mainwindow_position_x = MAINWINDOW_WINDOW_POSITION_X;
-    m_mainwindow_position_y = MAINWINDOW_WINDOW_POSITION_Y;
+    Q_UNUSED(option);
+    Q_UNUSED(widget);
 
-    m_event_color_default = Qt::black;
-    m_event_color_1 = Qt::black;
-    m_event_color_2 = Qt::magenta;
-    m_event_color_3 = Qt::green;
-    m_event_color_4 = Qt::red;
-    m_event_color_5 = Qt::cyan;
-    m_event_color_32 = Qt::yellow;
-    m_event_color_998 = Qt::darkBlue;
-    m_event_color_999 = Qt::darkCyan;
-    m_data_marker_color = QColor (227,6,19);
+    // Plot shadow
+    painter->setPen(Qt::NoPen);
+    painter->setBrush(Qt::darkGray);
+    painter->drawEllipse(-12, -12, 30, 30);
+
+    // Plot colored circle
+    painter->setPen(QPen(Qt::black, 1));
+    if(this->isSelected())
+        painter->setBrush(QBrush(Qt::red));
+    else
+        painter->setBrush(QBrush(m_cAverageColor));
+    painter->drawEllipse(-15, -15, 30, 30);
+
+    // Plot electrode name
+    QStaticText staticElectrodeName = QStaticText(m_sChannelName);
+    QSizeF sizeText = staticElectrodeName.size();
+    painter->drawStaticText(-15+((30-sizeText.width())/2), -32, staticElectrodeName);
+
+    this->setPos(10*m_qpChannelPosition.x(), -10*m_qpChannelPosition.y());
 }
+
+
+//*************************************************************************************************************
+
+void AverageSceneItem::setColor(QColor channelColor)
+{
+    m_cAverageColor = channelColor;
+}
+
+
+//*************************************************************************************************************
+
+QString AverageSceneItem::getChannelName()
+{
+    return m_sChannelName;
+}
+
+
+//*************************************************************************************************************
+
+void AverageSceneItem::setPosition(QPointF newPosition)
+{
+    m_qpChannelPosition = newPosition;
+}
+
+
+//*************************************************************************************************************
+
+QPointF AverageSceneItem::getPosition()
+{
+    return m_qpChannelPosition;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+

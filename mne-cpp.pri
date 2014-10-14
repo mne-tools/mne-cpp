@@ -30,9 +30,19 @@ isEmpty( MNE_BINARY_DIR ) {
 }
 
 #QT Packages use new qtHaveModule(<package>):
-#MNE cpp config
+### MNE cpp config ###
 MNECPP_CONFIG += withGui
 #MNECPP_CONFIG += withPython
+
+#Build MNE-CPP libraries as static libs
+#MNECPP_CONFIG += build_MNECPP_Static_Lib
+
+linux-g++ {
+    system( g++ --version | grep -e "\<4.[0-4]" ) {
+        # g++ version < 4.5 not found
+        MNECPP_CONFIG += oldCompiler
+    }
+}
 
 contains(MNECPP_CONFIG, withPython) {
     message(Configure Python!)

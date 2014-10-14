@@ -45,6 +45,7 @@
 #include "mainwindow.h"
 #include "ui_selectionmanagerwindow.h"
 #include "utils/layoutloader.h"         //MNE-CPP utils
+#include "utils/selectionloader.h"         //MNE-CPP utils
 #include "../Utils/layoutscene.h"       //MNE Browse Raw QT utils
 
 
@@ -54,6 +55,7 @@
 //=============================================================================================================
 
 #include <QDockWidget>
+#include <QMutableStringListIterator>
 
 
 //*************************************************************************************************************
@@ -99,6 +101,13 @@ public:
     */
     ~SelectionManagerWindow();
 
+    //=========================================================================================================
+    /**
+    * Creates the selection group 'All'
+    * This function should be called from outside, whenever a new fiff file was loaded because the group all depends on the fiff channel names
+    */
+    void createSelectionGroupAll();
+
 private:
     //=========================================================================================================
     /**
@@ -136,6 +145,13 @@ private:
     * @param [in] path holds file path
     */
     bool loadSelectionGroups(QString path);
+
+    //=========================================================================================================
+    /**
+    * Delete all MEG channels from the selection groups which are not in the loaded layout. This needs to be done to guarantee consistency between the selection files and layout files (the selection files always include ALL MEG channels (gradiometers+magnitometers))
+    *
+    */
+    void cleanUpSelectionGroups();
 
     //=========================================================================================================
     /**
@@ -188,7 +204,7 @@ private:
 
     Ui::SelectionManagerWindow*     ui;
 
-    QMap<QString,QVector<double>>   m_layoutMap;
+    QMap<QString,QVector<double> >  m_layoutMap;
     QMap<QString,QStringList>       m_selectionGroupsMap;
 
     MainWindow*                     m_pMainWindow;

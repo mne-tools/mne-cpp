@@ -34,8 +34,8 @@
 *
 */
 
-#ifndef ChannelSceneItem_H
-#define ChannelSceneItem_H
+#ifndef CHANNELSCENEITEM_H
+#define CHANNELSCENEITEM_H
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -77,7 +77,7 @@ namespace MNEBrowseRawQt
 /**
 * ChannelSceneItem...
 *
-* @brief The ChannelSceneItem class provides a new data structure for impedance values.
+* @brief The ChannelSceneItem class provides a new data structure for visualizing channels in a 2D layout.
 */
 class ChannelSceneItem : public QGraphicsItem
 {
@@ -87,13 +87,13 @@ public:
     /**
     * Constructs a ChannelSceneItem.
     */
-    ChannelSceneItem(QString electrodeName, QPointF electrodePosition, QColor electrodeColor = Qt::blue);
+    ChannelSceneItem(QString channelName, QPointF channelPosition, QColor channelColor = Qt::blue);
 
     //=========================================================================================================
     /**
     * Sets the color of the electrode item.
     */
-    void setColor(QColor electrodeColor);
+    void setColor(QColor channelColor);
 
     //=========================================================================================================
     /**
@@ -109,13 +109,13 @@ public:
 
     //=========================================================================================================
     /**
-    * Returns the electrode name.
+    * Returns the channel name.
     */
-    QString getElectrodeName();
+    QString getChannelName();
 
     //=========================================================================================================
     /**
-    * Updates the electrodes position.
+    * Updates the channels position.
     */
     void setPosition(QPointF newPosition);
 
@@ -126,12 +126,11 @@ public:
     QPointF getPosition();
 
 private:
-    QString     m_sElectrodeName;           /**< Holds the electrode name.*/
-    QPointF     m_qpElectrodePosition;      /**< Holds the electrode 2D position in the scene.*/
-    QColor      m_cElectrodeColor;          /**< Holds the current electrode color.*/
-    bool        m_bHighlight;               /**< Highlight item flag.*/
+    QString     m_sChannelName;             /**< Holds the channel's name.*/
+    QPointF     m_qpChannelPosition;        /**< Holds the channel's 2D position in the scene.*/
+    QColor      m_cChannelColor;            /**< Holds the current channel color.*/
 };
 
 } // NAMESPACE MNEBrowseRawQt
 
-#endif // ChannelSceneItem_H
+#endif // CHANNELSCENEITEM_H
