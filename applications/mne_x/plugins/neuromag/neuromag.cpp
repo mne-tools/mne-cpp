@@ -140,7 +140,7 @@ void Neuromag::initConnector()
         m_pRTMSA_Neuromag = PluginOutputData<NewRealTimeMultiSampleArray>::create(this, "RtClient", "MNE Rt Client");
 
         m_pRTMSA_Neuromag->data()->initFromFiffInfo(m_pFiffInfo);
-        m_pRTMSA_Neuromag->data()->setMultiArraySize(100);
+        m_pRTMSA_Neuromag->data()->setMultiArraySize(1);
 
         m_pRTMSA_Neuromag->data()->setVisibility(true);
 
@@ -396,7 +396,6 @@ void Neuromag::run()
         matValue = m_pRawMatrixBuffer_In->pop();
 
         //emit values
-        for(qint32 i = 0; i < matValue.cols(); ++i)
-            m_pRTMSA_Neuromag->data()->setValue(matValue.col(i).cast<double>());
+        m_pRTMSA_Neuromag->data()->setValue(matValue.cast<double>());
     }
 }
