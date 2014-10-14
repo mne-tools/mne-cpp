@@ -115,8 +115,7 @@ void MainWindow::setupWindowWidgets()
     //Create selection manager window - QTDesigner used - see /FormFiles
     m_pSelectionManagerWindow = new SelectionManagerWindow(this);
     addDockWidget(Qt::BottomDockWidgetArea, m_pSelectionManagerWindow);
-    m_pSelectionManagerWindow->setFloating(true);
-    m_pSelectionManagerWindow->setVisible(false);
+    m_pSelectionManagerWindow->hide();
 
     //Create selection manager window - QTDesigner used - see /FormFiles
     m_pAverageWindow = new AverageWindow(this);
@@ -277,6 +276,7 @@ void MainWindow::openFile()
 
     //set position of QScrollArea
     m_pDataWindow->getDataTableView()->horizontalScrollBar()->setValue(0);
+    m_pDataWindow->initMVCSettings();
 
     //Set fiffInfo in event model
     m_pEventWindow->getEventModel()->setFiffInfo(m_pDataWindow->getDataModel()->m_fiffInfo);
