@@ -108,6 +108,12 @@ public:
 
     //=========================================================================================================
     /**
+    * Setup the model view controller of the data window
+    */
+    void initMVCSettings();
+
+    //=========================================================================================================
+    /**
     * Returns the data QTableView of this window
     */
     QTableView* getDataTableView();
@@ -137,12 +143,6 @@ public:
     void updateDataTableViews();
 
 private:
-    //=========================================================================================================
-    /**
-    * Setup the model view controller of the data window
-    */
-    void initMVCSettings();
-
     //=========================================================================================================
     /**
     * Setup the undocked data view window.
