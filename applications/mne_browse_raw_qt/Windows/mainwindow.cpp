@@ -58,8 +58,8 @@ using namespace MNEBrowseRawQt;
 
 MainWindow::MainWindow(QWidget *parent)
 : QMainWindow(parent)
-, m_qFileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
-, m_qEventFile("./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif")
+//, m_qFileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
+//, m_qEventFile("./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif")
 , m_qSettings()
 , m_rawSettings()
 , ui(new Ui::MainWindowWidget)
@@ -97,12 +97,13 @@ void MainWindow::setupWindowWidgets()
     //Create dockble event window - QTDesigner used - see /FormFiles
     m_pEventWindow = new EventWindow(this);
     addDockWidget(Qt::RightDockWidgetArea, m_pEventWindow);
+    m_pEventWindow->hide();
 
     //Create filter window - QTDesigner used - see /FormFiles
     m_pFilterWindow = new FilterWindow(this);
     m_pFilterWindow->hide();
 
-    //Create dockble information window - QTDesigner used - see /FormFiles
+    //Create dockable information window - QTDesigner used - see /FormFiles
     m_pInformationWindow = new InformationWindow(this);
     addDockWidget(Qt::BottomDockWidgetArea, m_pInformationWindow);
     m_pInformationWindow->hide();
@@ -111,9 +112,15 @@ void MainWindow::setupWindowWidgets()
     m_pAboutWindow = new AboutWindow(this);
     m_pAboutWindow->hide();
 
-    //Create about window - QTDesigner used - see /FormFiles
+    //Create selection manager window - QTDesigner used - see /FormFiles
     m_pSelectionManagerWindow = new SelectionManagerWindow(this);
     addDockWidget(Qt::BottomDockWidgetArea, m_pSelectionManagerWindow);
+    m_pSelectionManagerWindow->hide();
+
+    //Create selection manager window - QTDesigner used - see /FormFiles
+    m_pAverageWindow = new AverageWindow(this);
+    addDockWidget(Qt::BottomDockWidgetArea, m_pAverageWindow);
+    m_pAverageWindow->hide();
 
     //Init windows
     m_pDataWindow->init();
@@ -140,6 +147,7 @@ void MainWindow::connectMenus()
     connect(ui->m_eventAction, SIGNAL(triggered()), this, SLOT(showEventWindow()));
     connect(ui->m_informationAction, SIGNAL(triggered()), this, SLOT(showInformationWindow()));
     connect(ui->m_channelSelectionManagerAction, SIGNAL(triggered()), this, SLOT(showSelectionManagerWindow()));
+    connect(ui->m_averageWindow_Action, SIGNAL(triggered()), this, SLOT(showAverageWindow()));
 
     //Help
     connect(ui->m_aboutAction, SIGNAL(triggered()), this, SLOT(showAboutWindow()));
@@ -151,8 +159,8 @@ void MainWindow::connectMenus()
 void MainWindow::setupMainWindow()
 {
     //set Window functions
-    resize(m_qSettings.value("MainWindow/size").toSize()); //Resize to predefined default size
-    move(m_qSettings.value("MainWindow/position").toPoint()); // Move this main window to position 50/50 on the screen
+    resize(m_qSettings.value("MainWindow/size", QSize(MAINWINDOW_WINDOW_SIZE_W, MAINWINDOW_WINDOW_SIZE_H)).toSize()); //Resize to predefined default size
+    move(m_qSettings.value("MainWindow/position", QPoint(MAINWINDOW_WINDOW_POSITION_X, MAINWINDOW_WINDOW_POSITION_Y)).toPoint()); // Move this main window to position 50/50 on the screen
 
     //Set data window as central widget - This is needed because we are using QDockWidgets
     setCentralWidget(m_pDataWindow);
@@ -268,6 +276,7 @@ void MainWindow::openFile()
 
     //set position of QScrollArea
     m_pDataWindow->getDataTableView()->horizontalScrollBar()->setValue(0);
+    m_pDataWindow->initMVCSettings();
 
     //Set fiffInfo in event model
     m_pEventWindow->getEventModel()->setFiffInfo(m_pDataWindow->getDataModel()->m_fiffInfo);
@@ -279,6 +288,9 @@ void MainWindow::openFile()
 
     //Update status bar
     setWindowStatus();
+
+    //Update selection Group All
+    m_pSelectionManagerWindow->createSelectionGroupAll();
 }
 
 
@@ -430,3 +442,19 @@ void MainWindow::showSelectionManagerWindow()
     else // if visible raise the widget to be sure that it is not obscured by other windows
         m_pSelectionManagerWindow->raise();
 }
+
+
+//*************************************************************************************************************
+
+void MainWindow::showAverageWindow()
+{
+    //Note: A widget that happens to be obscured by other windows on the screen is considered to be visible.
+    if(!m_pAverageWindow->isVisible())
+    {
+        m_pAverageWindow->show();
+        m_pAverageWindow->raise();
+    }
+    else // if visible raise the widget to be sure that it is not obscured by other windows
+        m_pAverageWindow->raise();
+}
+

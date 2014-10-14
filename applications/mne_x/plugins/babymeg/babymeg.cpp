@@ -102,7 +102,7 @@ BabyMEG::BabyMEG()
     connect(m_pActionRecordFile, &QAction::triggered, this, &BabyMEG::toggleRecordingFile);
     addPluginAction(m_pActionRecordFile);
 
-    m_pActionRecordFile->setEnabled(false);
+    //m_pActionRecordFile->setEnabled(false);
 
     m_pActionSqdCtrl = new QAction(QIcon(":/images/sqdctrl.png"), tr("Squid Control"),this);
 //    m_pActionSetupProject->setShortcut(tr("F12"));
@@ -144,6 +144,7 @@ void BabyMEG::init()
     connect(pInfo.data(), &BabyMEGInfo::fiffInfoAvailable, this, &BabyMEG::setFiffInfo);
     connect(pInfo.data(), &BabyMEGInfo::SendDataPackage, this, &BabyMEG::setFiffData);
     connect(pInfo.data(), &BabyMEGInfo::SendCMDPackage, this, &BabyMEG::setCMDData);
+    connect(pInfo.data(), &BabyMEGInfo::GainInfoUpdate, this, &BabyMEG::setFiffGainInfo);
 
     myClient = QSharedPointer<BabyMEGClient>(new BabyMEGClient(6340,this));
     myClient->SetInfo(pInfo);
@@ -183,7 +184,7 @@ void BabyMEG::initConnector()
         m_pRTMSABabyMEG->data()->setName(this->getName());//Provide name to auto store widget settings
 
         m_pRTMSABabyMEG->data()->initFromFiffInfo(m_pFiffInfo);
-        m_pRTMSABabyMEG->data()->setMultiArraySize(500);
+        m_pRTMSABabyMEG->data()->setMultiArraySize(2);
 
         m_pRTMSABabyMEG->data()->setSamplingRate(m_pFiffInfo->sfreq);
 
@@ -236,11 +237,11 @@ void BabyMEG::UpdateFiffInfo()
 {
 
     // read gain info and save them to the m_pFiffInfo.range
-    myClientComm->SendCommandToBabyMEGShortConnection("INFO");
+    myClientComm->SendCommandToBabyMEGShortConnection("INFG");
 
-    sleep(0.5);
+    //sleep(0.5);
 
-    m_pActionRecordFile->setEnabled(true);
+    //m_pActionRecordFile->setEnabled(true);
 
 }
 
@@ -343,6 +344,29 @@ void BabyMEG::setFiffInfo(FiffInfo p_FiffInfo)
     emit fiffInfoAvailable();
 }
 
+//*************************************************************************************************************
+
+void BabyMEG::setFiffGainInfo(QStringList GainInfo)
+{
+    if(!m_pFiffInfo)
+    {
+        QMessageBox msgBox;
+        msgBox.setText("FiffInfo missing!");
+        msgBox.exec();
+        return;
+    }
+    else
+    {
+        //set up the gain info
+        qDebug()<<"Set Gain Info";
+        for(qint32 i = 0; i < m_pFiffInfo->nchan; i++)
+        {
+            m_pFiffInfo->chs[i].range = 1.0f/GainInfo.at(i).toFloat();//1; // set gain
+            //qDebug()<<i<<"="<<m_pFiffInfo->chs[i].ch_name<<","<<m_pFiffInfo->chs[i].range;
+        }
+    }
+
+}
 //*************************************************************************************************************
 
 void BabyMEG::setCMDData(QByteArray DATA)
@@ -457,14 +481,15 @@ void BabyMEG::run()
 
             //Write raw data to fif file
             if(m_bWriteToFile)
-                m_pOutfid->write_raw_buffer(matValue.cast<double>(), m_cals);
+                m_pOutfid->write_raw_buffer(matValue.cast<double>());
 
             if(m_pRTMSABabyMEG)
             {
                 //std::cout << "matValue" << matValue.block(0,0,2,2) << std::endl;
                 //emit values
-                for(qint32 i = 0; i < matValue.cols(); ++i)
-                    m_pRTMSABabyMEG->data()->setValue(matValue.col(i).cast<double>());
+//                for(qint32 i = 0; i < matValue.cols(); ++i)
+//                    m_pRTMSABabyMEG->data()->setValue(matValue.col(i).cast<double>());
+                m_pRTMSABabyMEG->data()->setValue(matValue.cast<double>());
             }
         }
     }

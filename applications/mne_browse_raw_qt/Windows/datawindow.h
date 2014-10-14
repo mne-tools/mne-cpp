@@ -108,6 +108,12 @@ public:
 
     //=========================================================================================================
     /**
+    * Setup the model view controller of the data window
+    */
+    void initMVCSettings();
+
+    //=========================================================================================================
+    /**
     * Returns the data QTableView of this window
     */
     QTableView* getDataTableView();
@@ -130,13 +136,13 @@ public:
     */
     RawDelegate* getDataDelegate();
 
-private:
     //=========================================================================================================
     /**
-    * Setup the model view controller of the data window
+    * Updates the data table views
     */
-    void initMVCSettings();
+    void updateDataTableViews();
 
+private:
     //=========================================================================================================
     /**
     * Setup the undocked data view window.
@@ -172,6 +178,12 @@ private:
     * keyPressEvent reimplemented virtual function to handle key press events of the data dock window
     */
     void keyPressEvent(QKeyEvent* event);
+
+    //=========================================================================================================
+    /**
+    * eventFilter filter events fro mthe table views
+    */
+    bool eventFilter(QObject *object, QEvent *event);
 
     Ui::DataWindowDockWidget *ui;                   /**< the ui variabe to initalise and access the ui file with this class */
 

@@ -1,11 +1,11 @@
 //=============================================================================================================
 /**
-* @file     layoutloader.h
-* @author   Lorenz Esch <lorenz.esch@tu-ilmenau.de>;
+* @file     averagewindow.h
+* @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     September, 2014
+* @date     October, 2014
 *
 * @section  LICENSE
 *
@@ -30,109 +30,79 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    LayoutLoader class declaration.
+* @brief    Contains the declaration of the AverageWindow class.
 *
 */
 
-#ifndef LAYOUTLOADER_H
-#define LAYOUTLOADER_H
+#ifndef AVERAGEWINDOW_H
+#define AVERAGEWINDOW_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "utils_global.h"
+#include "mainwindow.h"
+#include "ui_averagewindow.h"
+#include "utils/layoutloader.h"         //MNE-CPP utils
+#include "../Utils/layoutscene.h"       //MNE Browse Raw QT utils
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Qt INCLUDES
+// QT INCLUDES
 //=============================================================================================================
 
-#include <QSharedPointer>
-#include <QVector>
-#include <QFile>
-#include <QTextStream>
-#include <QStringList>
-#include <QDebug>
-#include <QIODevice>
-#include <QString>
+#include <QDockWidget>
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// Eigen INCLUDES
+// DEFINE NAMESPACE MNEBrowseRawQt
 //=============================================================================================================
 
-#include <Eigen/Core>
-
-
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINE NAMESPACE MNELIB
-//=============================================================================================================
-
-namespace UTILSLIB
+namespace MNEBrowseRawQt
 {
 
 
 //*************************************************************************************************************
 //=============================================================================================================
-// USED NAMESPACES
+// DEFINE FORWARD DECLARATIONS
 //=============================================================================================================
 
-using namespace Eigen;
+class LayoutScene;
+class MainWindow;
 
 
-//*************************************************************************************************************
-//=============================================================================================================
-// DEFINES
-//=============================================================================================================
-
-
-//=============================================================================================================
 /**
-* Processes layout files (AsA .elc, MNE .lout) files which contain the electrode positions of a EEG/MEG hat.
+* DECLARE CLASS AverageWindow
 *
-* @brief Processes AsA .elc files which contain the electrode positions of a EEG hat.
+* @brief The AverageWindow class provides a dock window for plotting averages.
 */
-class UTILSSHARED_EXPORT LayoutLoader
+class AverageWindow : public QDockWidget
 {
+    Q_OBJECT
+
 public:
-    typedef QSharedPointer<LayoutLoader> SPtr;            /**< Shared pointer type for LayoutLoader. */
-    typedef QSharedPointer<const LayoutLoader> ConstSPtr; /**< Const shared pointer type for LayoutLoader. */
+    //=========================================================================================================
+    /**
+    * Constructs a AverageWindow which is a child of parent.
+    *
+    * @param [in] parent pointer to parent widget; If parent is 0, the new AverageWindow becomes a window. If parent is another widget, AverageWindow becomes a child window inside parent. AverageWindow is deleted when its parent is deleted.
+    */
+    AverageWindow(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Constructs a Filter object.
+    * Destroys the AverageWindow.
+    * All AverageWindow's children are deleted first. The application exits if AverageWindow is the main widget.
     */
-    LayoutLoader();
-
-    //=========================================================================================================
-    /**
-    * Reads the specified ANT elc-layout file.
-    * @param [in] path holds the file path of the elc file which is to be read.
-    * @param [in] location3D holds the vector to which the read 3D positions are stored.
-    * @param [in] location2D holds the vector to which the read 2D positions are stored.
-    * @param [out] bool returns true if reading was successful, false otherwise.
-    */
-    bool readAsaElcFile(QString path, QStringList &channelNames, QVector<QVector<double> > &location3D, QVector<QVector<double> > &location2D, QString &unit);
-
-
-    //=========================================================================================================
-    /**
-    * Reads the specified MNE .lout file.
-    * @param [in] path holds the file path of the lout file which is to be read.
-    * @param [in] channel data holds the x,y and channel number for every channel. The map keys are the channel names (i.e. 'MEG 0113').
-    * @param [out] bool returns true if reading was successful, false otherwise.
-    */
-    bool readMNELoutFile(QString path, QMap<QString, QVector<double> > &channelData);
+    ~AverageWindow();
 
 private:
-
+    Ui::AverageWindow *ui;
 };
 
-} // NAMESPACE
+} // NAMESPACE MNEBrowseRawQt
 
-#endif // LAYOUTLOADER_H
+#endif // AVERAGEWINDOW_H

@@ -56,22 +56,23 @@ using namespace std;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-ChannelSceneItem::ChannelSceneItem(QString electrodeName, QPointF electrodePosition, QColor electrodeColor)
-: m_sElectrodeName(electrodeName)
-, m_qpElectrodePosition(electrodePosition)
-, m_cElectrodeColor(electrodeColor)
-, m_bHighlight(false)
+ChannelSceneItem::ChannelSceneItem(QString channelName, QPointF channelPosition, QColor channelColor)
+: m_sChannelName(channelName)
+, m_qpChannelPosition(channelPosition)
+, m_cChannelColor(channelColor)
 {
     this->setAcceptHoverEvents(true);
     this->setFlag(QGraphicsItem::ItemIsSelectable, true);
 }
 
+
 //*************************************************************************************************************
 
 QRectF ChannelSceneItem::boundingRect() const
 {
-    return QRectF(-25, -35, 50, 70);
+    return QRectF(-25, -30, 50, 50);
 }
+
 
 //*************************************************************************************************************
 
@@ -90,43 +91,47 @@ void ChannelSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     if(this->isSelected())
         painter->setBrush(QBrush(Qt::red));
     else
-        painter->setBrush(QBrush(m_cElectrodeColor));
+        painter->setBrush(QBrush(m_cChannelColor));
     painter->drawEllipse(-15, -15, 30, 30);
 
     // Plot electrode name
-    QStaticText staticElectrodeName = QStaticText(m_sElectrodeName);
+    QStaticText staticElectrodeName = QStaticText(m_sChannelName);
     QSizeF sizeText = staticElectrodeName.size();
     painter->drawStaticText(-15+((30-sizeText.width())/2), -32, staticElectrodeName);
 
-    this->setPos(10*m_qpElectrodePosition.x(), -10*m_qpElectrodePosition.y());
+    this->setPos(10*m_qpChannelPosition.x(), -10*m_qpChannelPosition.y());
 }
+
 
 //*************************************************************************************************************
 
-void ChannelSceneItem::setColor(QColor electrodeColor)
+void ChannelSceneItem::setColor(QColor channelColor)
 {
-    m_cElectrodeColor = electrodeColor;
+    m_cChannelColor = channelColor;
 }
+
 
 //*************************************************************************************************************
 
-QString ChannelSceneItem::getElectrodeName()
+QString ChannelSceneItem::getChannelName()
 {
-    return m_sElectrodeName;
+    return m_sChannelName;
 }
+
 
 //*************************************************************************************************************
 
 void ChannelSceneItem::setPosition(QPointF newPosition)
 {
-    m_qpElectrodePosition = newPosition;
+    m_qpChannelPosition = newPosition;
 }
+
 
 //*************************************************************************************************************
 
 QPointF ChannelSceneItem::getPosition()
 {
-    return m_qpElectrodePosition;
+    return m_qpChannelPosition;
 }
 
 

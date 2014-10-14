@@ -68,8 +68,8 @@ FilterWindow::FilterWindow(QWidget *parent) :
     initComboBoxes();
     initFilterPlot();
 
-    m_iWindowSize = m_qSettings.value("RawModel/window_size").toInt();
-    m_iFilterTaps = m_qSettings.value("RawModel/num_filter_taps").toInt();
+    m_iWindowSize = MODEL_WINDOW_SIZE;
+    m_iFilterTaps = MODEL_NUM_FILTER_TAPS;
 }
 
 
@@ -282,6 +282,8 @@ void FilterWindow::applyFilterToAll()
             m_pMainWindow->m_pDataWindow->getDataModel()->applyOperator(QModelIndexList(),it.value());
         }
     }
+
+    m_pMainWindow->m_pDataWindow->updateDataTableViews();
 }
 
 
@@ -290,6 +292,8 @@ void FilterWindow::applyFilterToAll()
 void FilterWindow::undoFilterToAll()
 {
     m_pMainWindow->m_pDataWindow->getDataModel()->undoFilter();
+
+    m_pMainWindow->m_pDataWindow->updateDataTableViews();
 }
 
 
@@ -322,7 +326,7 @@ void FilterWindow::exportFilterPlot()
 
         if(fileName.contains(".png"))
         {
-            m_pFilterPlotScene->setSceneRect(m_pFilterPlotScene->itemsBoundingRect());                           // Re-shrink the scene to it's bounding contents
+            m_pFilterPlotScene->setSceneRect(m_pFilterPlotScene->itemsBoundingRect());                  // Re-shrink the scene to it's bounding contents
             QImage image(m_pFilterPlotScene->sceneRect().size().toSize(), QImage::Format_ARGB32);       // Create the image with the exact size of the shrunk scene
             image.fill(Qt::transparent);                                                                // Start all pixels transparent
 

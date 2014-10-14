@@ -167,7 +167,7 @@ public:
     *
     * @param[in] data       data to add (Time points of channel samples)
     */
-    void addData(const QVector<VectorXd> &data);
+    void addData(const QList<MatrixXd> &data);
 
     //=========================================================================================================
     /**
