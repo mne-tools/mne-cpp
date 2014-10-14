@@ -192,6 +192,7 @@ void DataWindow::initMVCSettings()
     m_pUndockedDataView->setAutoScroll(false);
     m_pUndockedDataView->setSelectionBehavior(QAbstractItemView::SelectItems);
     m_pUndockedDataView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
+    m_pUndockedDataView->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
     m_pUndockedDataView->setShowGrid(false);
     m_pUndockedDataView->horizontalHeader()->setVisible(false);
 
