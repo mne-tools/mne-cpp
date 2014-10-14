@@ -192,6 +192,7 @@ void DataWindow::initMVCSettings()
     m_pUndockedDataView->setAutoScroll(false);
     m_pUndockedDataView->setSelectionBehavior(QAbstractItemView::SelectItems);
     m_pUndockedDataView->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
+    m_pUndockedDataView->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
     m_pUndockedDataView->setShowGrid(false);
     m_pUndockedDataView->horizontalHeader()->setVisible(false);
 
@@ -280,7 +281,7 @@ void DataWindow::initMarker()
     m_pDataMarker->setMovementBoundary(region);
 
     //Set marker size to table view size minus horizontal scroll bar height
-    m_pDataMarker->resize(m_qSettings.value("DataMarker/data_marker_width").toInt(),
+    m_pDataMarker->resize(DATA_MARKER_WIDTH,
                           boundingRect.height() - ui->m_tableView_rawTableView->horizontalScrollBar()->height()-1);
 
     //Connect current marker to marker move signal
@@ -298,7 +299,7 @@ void DataWindow::initMarker()
         if(state) {
             //Inital position of the marker
             m_pDataMarker->move(74, m_pDataMarker->y());
-            m_pCurrentDataMarkerLabel->move(m_pDataMarker->geometry().left() + (m_qSettings.value("DataMarker/data_marker_width").toInt()/2) - (m_pCurrentDataMarkerLabel->width()/2) + 1, m_pDataMarker->geometry().top() - 20);
+            m_pCurrentDataMarkerLabel->move(m_pDataMarker->geometry().left() + (DATA_MARKER_WIDTH/2) - (m_pCurrentDataMarkerLabel->width()/2) + 1, m_pDataMarker->geometry().top() - 20);
 
             m_pDataMarker->show();
             m_pCurrentDataMarkerLabel->show();
@@ -330,8 +331,8 @@ void DataWindow::initLabels()
 
     //Set color
     QPalette palette;
-    QColor textColor = m_qSettings.value("DataMarker/data_marker_color").value<QColor>();
-    textColor.setAlpha(m_qSettings.value("DataMarker/data_marker_opacity").toInt());
+    QColor textColor = m_qSettings.value("DataMarker/data_marker_color", QColor (227,6,19)).value<QColor>();
+    textColor.setAlpha(DATA_MARKER_OPACITY);
     palette.setColor(QPalette::WindowText, textColor);
 
     QColor windowColor;
@@ -535,7 +536,7 @@ void DataWindow::setMarkerSampleLabel()
     QString numberString = QString("%1 / %2 sec").arg(QString().number(m_iCurrentMarkerSample)).arg(QString().number((double)currentSeconds/1000,'g'));
     m_pCurrentDataMarkerLabel->setText(numberString);
 
-    m_pCurrentDataMarkerLabel->move(m_pDataMarker->geometry().left() + (m_qSettings.value("DataMarker/data_marker_width").toInt()/2) - (m_pCurrentDataMarkerLabel->width()/2) + 1, m_pDataMarker->geometry().top() - 20);
+    m_pCurrentDataMarkerLabel->move(m_pDataMarker->geometry().left() + (DATA_MARKER_WIDTH/2) - (m_pCurrentDataMarkerLabel->width()/2) + 1, m_pDataMarker->geometry().top() - 20);
 }
 
 
@@ -586,7 +587,7 @@ void DataWindow::updateMarkerPosition()
     }
 
     //Set marker size to table view size minus horizontal scroll bar height
-    m_pDataMarker->resize(m_qSettings.value("DataMarker/data_marker_width").toInt(),
+    m_pDataMarker->resize(DATA_MARKER_WIDTH,
                           boundingRect.height() - ui->m_tableView_rawTableView->horizontalScrollBar()->height()-1);
 
     //Update current marker sample lable

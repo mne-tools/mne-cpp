@@ -58,7 +58,7 @@ using namespace MNEBrowseRawQt;
 
 MainWindow::MainWindow(QWidget *parent)
 : QMainWindow(parent)
-, m_qFileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
+//, m_qFileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
 //, m_qEventFile("./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif")
 , m_qSettings()
 , m_rawSettings()
@@ -115,7 +115,6 @@ void MainWindow::setupWindowWidgets()
     //Create selection manager window - QTDesigner used - see /FormFiles
     m_pSelectionManagerWindow = new SelectionManagerWindow(this);
     addDockWidget(Qt::BottomDockWidgetArea, m_pSelectionManagerWindow);
-    m_pSelectionManagerWindow->setFloating(true);
     m_pSelectionManagerWindow->hide();
 
     //Create selection manager window - QTDesigner used - see /FormFiles
@@ -160,8 +159,8 @@ void MainWindow::connectMenus()
 void MainWindow::setupMainWindow()
 {
     //set Window functions
-    resize(m_qSettings.value("MainWindow/size").toSize()); //Resize to predefined default size
-    move(m_qSettings.value("MainWindow/position").toPoint()); // Move this main window to position 50/50 on the screen
+    resize(m_qSettings.value("MainWindow/size", QSize(MAINWINDOW_WINDOW_SIZE_W, MAINWINDOW_WINDOW_SIZE_H)).toSize()); //Resize to predefined default size
+    move(m_qSettings.value("MainWindow/position", QPoint(MAINWINDOW_WINDOW_POSITION_X, MAINWINDOW_WINDOW_POSITION_Y)).toPoint()); // Move this main window to position 50/50 on the screen
 
     //Set data window as central widget - This is needed because we are using QDockWidgets
     setCentralWidget(m_pDataWindow);
@@ -277,6 +276,7 @@ void MainWindow::openFile()
 
     //set position of QScrollArea
     m_pDataWindow->getDataTableView()->horizontalScrollBar()->setValue(0);
+    m_pDataWindow->initMVCSettings();
 
     //Set fiffInfo in event model
     m_pEventWindow->getEventModel()->setFiffInfo(m_pDataWindow->getDataModel()->m_fiffInfo);
@@ -288,6 +288,9 @@ void MainWindow::openFile()
 
     //Update status bar
     setWindowStatus();
+
+    //Update selection Group All
+    m_pSelectionManagerWindow->createSelectionGroupAll();
 }
 
 

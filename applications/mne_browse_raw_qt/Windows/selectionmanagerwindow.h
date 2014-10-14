@@ -101,6 +101,13 @@ public:
     */
     ~SelectionManagerWindow();
 
+    //=========================================================================================================
+    /**
+    * Creates the selection group 'All'
+    * This function should be called from outside, whenever a new fiff file was loaded because the group all depends on the fiff channel names
+    */
+    void createSelectionGroupAll();
+
 private:
     //=========================================================================================================
     /**

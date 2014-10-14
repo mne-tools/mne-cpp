@@ -79,6 +79,19 @@ SelectionManagerWindow::~SelectionManagerWindow()
 
 //*************************************************************************************************************
 
+void SelectionManagerWindow::createSelectionGroupAll()
+{
+    loadLayout(ui->m_comboBox_layoutFile->currentText());
+
+    //Set current index to group All
+    ui->m_listWidget_selectionGroups->setCurrentRow(0, QItemSelectionModel::Select);
+
+    updateSelectionGroups(ui->m_listWidget_selectionGroups->item(0));
+}
+
+
+//*************************************************************************************************************
+
 void SelectionManagerWindow::initListWidgets()
 {
     //Install event filter to receive key press events
@@ -190,7 +203,10 @@ bool SelectionManagerWindow::loadSelectionGroups(QString path)
     //Delete all MEG channels from the selection groups which are not in the loaded layout
     cleanUpSelectionGroups();
 
-    updateDataView();
+    //Set current index to group All and update data view (inside updateSelectionGroups(..))
+    ui->m_listWidget_selectionGroups->setCurrentRow(0, QItemSelectionModel::Select);
+
+    updateSelectionGroups(ui->m_listWidget_selectionGroups->item(0));
 
     return state;
 }

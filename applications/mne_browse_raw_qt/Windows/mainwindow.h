@@ -96,7 +96,7 @@
 #include <QScroller>
 #include <QTextBrowser>
 #include <QMessageBox>
-#include <QPixMap>
+#include <QPixmap>
 #include <QSignalMapper>
 
 
@@ -134,6 +134,20 @@ using namespace Eigen;
 
 namespace MNEBrowseRawQt
 {
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE FORWARD DECLARATIONS
+//=============================================================================================================
+
+class FilterWindow;
+class EventWindow;
+class DataWindow;
+class InformationWindow;
+class SelectionManagerWindow;
+class AverageWindow;
+
 
 //=============================================================================================================
 /**
