@@ -184,7 +184,7 @@ void BabyMEG::initConnector()
         m_pRTMSABabyMEG->data()->setName(this->getName());//Provide name to auto store widget settings
 
         m_pRTMSABabyMEG->data()->initFromFiffInfo(m_pFiffInfo);
-        m_pRTMSABabyMEG->data()->setMultiArraySize(500);
+        m_pRTMSABabyMEG->data()->setMultiArraySize(2);
 
         m_pRTMSABabyMEG->data()->setSamplingRate(m_pFiffInfo->sfreq);
 
@@ -487,8 +487,9 @@ void BabyMEG::run()
             {
                 //std::cout << "matValue" << matValue.block(0,0,2,2) << std::endl;
                 //emit values
-                for(qint32 i = 0; i < matValue.cols(); ++i)
-                    m_pRTMSABabyMEG->data()->setValue(matValue.col(i).cast<double>());
+//                for(qint32 i = 0; i < matValue.cols(); ++i)
+//                    m_pRTMSABabyMEG->data()->setValue(matValue.col(i).cast<double>());
+                m_pRTMSABabyMEG->data()->setValue(matValue.cast<double>());
             }
         }
     }
