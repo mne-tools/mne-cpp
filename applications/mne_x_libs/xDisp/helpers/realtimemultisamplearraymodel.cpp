@@ -231,15 +231,19 @@ void RealTimeMultiSampleArrayModel::setSamplingInfo(float sps, int T, float dest
 
 //*************************************************************************************************************
 
-void RealTimeMultiSampleArrayModel::addData(const QVector<VectorXd> &data)
+void RealTimeMultiSampleArrayModel::addData(const QList<MatrixXd> &data)
 {
     //Downsampling ->ToDo make this more accurate
-    qint32 i;
-    for(i = m_iCurrentSample; i < data.size(); i += m_iDownsampling)
-        m_dataCurrent.append(data[i]);
 
-    //store for next buffer
-    m_iCurrentSample = i - data.size();
+    for(qint32 b = 0; b < data.size(); ++b)
+    {
+        qint32 i;
+        for(i = m_iCurrentSample; i < data[b].cols(); i += m_iDownsampling)
+            m_dataCurrent.append(data[b].col(i));
+
+        //store for next buffer
+        m_iCurrentSample = i - data[b].cols();
+    }
 
     //ToDo separate worker thread? ToDo 2000 -> size of screen
     if(m_dataCurrent.size() > m_iMaxSamples)

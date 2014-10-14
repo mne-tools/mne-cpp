@@ -211,15 +211,15 @@ public:
     *
     * @return the current multi sample array.
     */
-    inline const QVector< VectorXd >& getMultiSampleArray();
+    inline const QList< MatrixXd >& getMultiSampleArray();
 
     //=========================================================================================================
     /**
-    * Attaches a value to the sample array vector.
+    * Attaches a value to the sample array list.
     *
-    * @param [in] v the value which is attached to the sample array vector.
+    * @param [in] mat   the value which is attached to the sample array list.
     */
-    virtual void setValue(const VectorXd& v);
+    virtual void setValue(const MatrixXd& mat);
 
     //=========================================================================================================
     /**
@@ -229,15 +229,6 @@ public:
     */
 //    virtual void setValue(MatrixXd& v);
 
-    //=========================================================================================================
-    /**
-    * Returns the current value set.
-    * This method is inherited by Measurement.
-    *
-    * @return the last attached value.
-    */
-    virtual VectorXd getValue() const;
-
 private:
     mutable QMutex              m_qMutex;           /**< Mutex to ensure thread safety */
 
@@ -245,9 +236,9 @@ private:
 
     QString                     m_sXMLLayoutFile;   /**< Layout file name. */
     double                      m_dSamplingRate;    /**< Sampling rate of the RealTimeSampleArray.*/
-    VectorXd                    m_vecValue;         /**< The current attached sample vector.*/
+//    MatrixXd                    m_vecValue;         /**< The current attached sample vector.*/
     qint32                      m_iMultiArraySize; /**< Sample size of the multi sample array.*/
-    QVector< VectorXd >         m_matSamples;       /**< The multi sample array.*/
+    QList< MatrixXd >           m_matSamples;       /**< The multi sample array.*/
     QList<RealTimeSampleArrayChInfo> m_qListChInfo; /**< Channel info list.*/
     bool                        m_bChInfoIsInit;    /**< If channel info is initialized.*/
 };
@@ -361,7 +352,7 @@ qint32 NewRealTimeMultiSampleArray::getMultiArraySize() const
 
 //*************************************************************************************************************
 
-inline const QVector< VectorXd >& NewRealTimeMultiSampleArray::getMultiSampleArray()
+inline const QList< MatrixXd >& NewRealTimeMultiSampleArray::getMultiSampleArray()
 {
     return m_matSamples;
 }
