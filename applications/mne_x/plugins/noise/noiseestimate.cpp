@@ -236,7 +236,7 @@ void NoiseEstimate::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
         mutex.lock();
         if(!m_pBuffer)
-            m_pBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(64, pRTMSA->getNumChannels(), pRTMSA->getMultiSampleArray()[0].cols()));
+            m_pBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(8, pRTMSA->getNumChannels(), pRTMSA->getMultiSampleArray()[0].cols()));
 
         //Fiff information
         if(!m_pFiffInfo)
@@ -279,7 +279,7 @@ void NoiseEstimate::run()
     // Read Fiff Info
     //
     bool waitForFiffInfo = true;
-    while(!m_pFiffInfo)
+    while(waitForFiffInfo)
     {
         mutex.lock();
         if(m_pFiffInfo)
