@@ -55,18 +55,17 @@ using namespace MNEBrowseRawQt;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-DataWindow::DataWindow(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::DataWindowDockWidget),
-    m_pMainWindow(static_cast<MainWindow*>(parent)),
-    m_pDataMarker(new DataMarker(this)),
-    m_pCurrentDataMarkerLabel(new QLabel(this)),
-    m_iCurrentMarkerSample(0),
-    m_pUndockedViewWidget(new QWidget(this,Qt::Window))
+DataWindow::DataWindow(QWidget *parent)
+: QWidget(parent)
+, ui(new Ui::DataWindowDockWidget)
+, m_pMainWindow(static_cast<MainWindow*>(parent))
+, m_pDataMarker(new DataMarker(this))
+, m_pCurrentDataMarkerLabel(new QLabel(this))
+, m_iCurrentMarkerSample(0)
+, m_pUndockedViewWidget(new QWidget(this,Qt::Window))
+, m_pUndockedDataView(new QTableView(m_pUndockedViewWidget))
 {
     ui->setupUi(this);
-
-    m_pUndockedDataView = new QTableView(m_pUndockedViewWidget);
 
     //------------------------
     //--- Setup data model ---
@@ -204,13 +203,17 @@ void DataWindow::initMVCSettings()
             m_pRawModel,&RawModel::updateScrollPos);
 
     //---------------------------------------------------------
-    //-- Interconnect scrollbars of docked and undocked view --
+    //--------- Interconnect docked and undocked view ---------
     //---------------------------------------------------------
-    //ui->m_tableView_rawTableView ---> m_pUndockedDataView
+    //Scrolling ui->m_tableView_rawTableView ---> m_pUndockedDataView
     connect(ui->m_tableView_rawTableView->horizontalScrollBar(),&QScrollBar::valueChanged,
             m_pUndockedDataView->horizontalScrollBar(),&QScrollBar::setValue);
     connect(ui->m_tableView_rawTableView->verticalScrollBar(),&QScrollBar::valueChanged,
             m_pUndockedDataView->verticalScrollBar(),&QScrollBar::setValue);
+
+    //Selection ui->m_tableView_rawTableView ---> m_pUndockedDataView
+    connect(ui->m_tableView_rawTableView,&QTableView::clicked,
+            m_pUndockedDataView,&QTableView::setCurrentIndex);
 }
 
 

@@ -61,6 +61,7 @@
 #include <QPanGesture>
 #include <QPinchGesture>
 #include <QGraphicsSceneEvent>
+#include <QMutableListIterator>
 
 
 //*************************************************************************************************************
@@ -111,6 +112,9 @@ private:
     bool                            m_dragSceneIsActive;
     QPointF                         m_mousePressPosition;
     bool                            m_bDragMode;
+    bool                            m_bExtendedSelectionMode;
+    QPainterPath                    m_oldSelectionArea;
+    QList<QGraphicsItem *>          m_selectedItems;
 
     //=========================================================================================================
     /**
@@ -147,6 +151,18 @@ private:
     * Reimplemented double mouse release event.
     */
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent);
+
+    //=========================================================================================================
+    /**
+    * Reimplemented key press event.
+    */
+    void keyPressEvent(QKeyEvent *keyEvent);
+
+    //=========================================================================================================
+    /**
+    * Reimplemented key release event.
+    */
+    void keyReleaseEvent(QKeyEvent *keyEvent);
 
     bool event(QEvent *event);
     bool gestureEvent(QGestureEvent *event);
