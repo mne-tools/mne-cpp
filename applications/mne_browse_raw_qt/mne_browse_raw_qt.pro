@@ -153,4 +153,4 @@ macx {
 RESOURCES += \
     mnebrowserawqt.qrc
 
-RC_FILE = Resources/Images/ApplicationIcons/myapp.rc
+RC_FILE = Resources/Images/ApplicationIcons/browse_raw.rc
