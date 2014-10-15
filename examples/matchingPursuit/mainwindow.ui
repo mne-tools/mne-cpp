@@ -285,11 +285,26 @@
           </item>
           <item>
            <widget class="QComboBox" name="cb_channels">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
+            <property name="minimumSize">
+             <size>
+              <width>130</width>
+              <height>0</height>
+             </size>
+            </property>
             <property name="toolTip">
              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;channel select&lt;/span&gt;&lt;/p&gt;&lt;p&gt;drops down channel selection before decomposing. Bad channels are initially deselected and marked by red color.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
             <property name="maxVisibleItems">
              <number>51</number>
+            </property>
+            <property name="frame">
+             <bool>true</bool>
             </property>
            </widget>
           </item>
