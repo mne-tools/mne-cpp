@@ -92,6 +92,24 @@ void SelectionManagerWindow::createSelectionGroupAll()
 
 //*************************************************************************************************************
 
+void SelectionManagerWindow::selectChannels(QStringList channelList)
+{
+    QList<QGraphicsItem *> allSceneItems = m_pLayoutScene->items();
+
+    for(int i = 0; i<allSceneItems.size(); i++) {
+        ChannelSceneItem* item = static_cast<ChannelSceneItem*>(allSceneItems.at(i));
+        if(channelList.contains(item->getChannelName()))
+            item->setHighlightChannel(true);
+        else
+            item->setHighlightChannel(false);
+    }
+
+    m_pLayoutScene->update();
+}
+
+
+//*************************************************************************************************************
+
 void SelectionManagerWindow::initListWidgets()
 {
     //Install event filter to receive key press events
@@ -146,12 +164,11 @@ void SelectionManagerWindow::initComboBoxes()
 
 bool SelectionManagerWindow::loadLayout(QString path)
 {
-    //Bakup the scene transformation matrix
-    QMatrix transformationTemp = ui->m_graphicsView_layoutPlot->matrix();
-
     //Read layout
     LayoutLoader* manager = new LayoutLoader();
-    bool state = manager->readMNELoutFile(path.prepend("./MNE_Browse_Raw_Resources/Templates/Layouts/"), m_layoutMap);
+    QString newPath = QCoreApplication::applicationDirPath() + path.prepend("/MNE_Browse_Raw_Resources/Templates/Layouts/");
+
+    bool state = manager->readMNELoutFile(newPath, m_layoutMap);
 
     //Load selection groups again because they need to be reinitialised every time a new layout hase been loaded
     loadSelectionGroups(ui->m_comboBox_selectionFiles->currentText());
@@ -164,8 +181,6 @@ bool SelectionManagerWindow::loadLayout(QString path)
     //ui->m_graphicsView_layoutPlot->fitInView(m_pLayoutScene->itemsBoundingRect(), Qt::KeepAspectRatio);
 
     ui->m_graphicsView_layoutPlot->ensureVisible(m_pLayoutScene->itemsBoundingRect());
-    //Set transformation to old one
-    //ui->m_graphicsView_layoutPlot->setMatrix(transformationTemp);
 
     return state;
 }
@@ -179,11 +194,12 @@ bool SelectionManagerWindow::loadSelectionGroups(QString path)
     ui->m_listWidget_visibleChannels->clear();
     m_selectionGroupsMap.clear();
 
-    SelectionLoader* manager = new SelectionLoader();
-
     //Read selection from file
+    SelectionLoader* manager = new SelectionLoader();
+    QString newPath = QCoreApplication::applicationDirPath() + path.prepend("/MNE_Browse_Raw_Resources/Templates/ChannelSelection/");
+
     m_selectionGroupsMap.clear();
-    bool state = manager->readMNESelFile(path.prepend("./MNE_Browse_Raw_Resources/Templates/ChannelSelection/"), m_selectionGroupsMap);
+    bool state = manager->readMNESelFile(newPath, m_selectionGroupsMap);
 
     //Add selection groups to list widget
     QMapIterator<QString, QStringList> selectionIndex(m_selectionGroupsMap);
