@@ -108,6 +108,13 @@ public:
     */
     void createSelectionGroupAll();
 
+    //=========================================================================================================
+    /**
+    * Select channels
+    * This function selects channels which were selected outside this selection manager (i.e in the DataWindow's Table View)
+    */
+    void selectChannels(QStringList channelList);
+
 private:
     //=========================================================================================================
     /**

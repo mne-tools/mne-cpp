@@ -169,6 +169,10 @@ void DataWindow::initMVCSettings()
     connect(ui->m_tableView_rawTableView->horizontalScrollBar(),&QScrollBar::valueChanged,
             m_pRawModel,&RawModel::updateScrollPos);
 
+    //connect selection of a channel to selection manager
+    connect(ui->m_tableView_rawTableView->selectionModel(),&QItemSelectionModel::selectionChanged,
+            this,&DataWindow::selectChannelsInSelectionManager);
+
     //Set MVC in delegate
     m_pRawDelegate->setModelView(m_pMainWindow->m_pEventWindow->getEventModel(),
                                  m_pMainWindow->m_pEventWindow->getEventTableView(),
@@ -597,4 +601,22 @@ void DataWindow::updateMarkerPosition()
     m_pCurrentDataMarkerLabel->move(m_pDataMarker->geometry().left() - (m_pCurrentDataMarkerLabel->width()/2) + 1, m_pDataMarker->geometry().top() - 20);
 }
 
+
+//*************************************************************************************************************
+
+void DataWindow::selectChannelsInSelectionManager()
+{
+    if(m_pMainWindow->m_pSelectionManagerWindow->isVisible()) {
+        QStringList currentSelectedChannelNames;
+
+        QModelIndexList selectedIndexes = ui->m_tableView_rawTableView->selectionModel()->selectedIndexes();
+
+        for(int i = 0; i<selectedIndexes.size(); i++) {
+            QModelIndex index = m_pRawModel->index(selectedIndexes.at(i).row(), 0);
+            currentSelectedChannelNames << m_pRawModel->data(index).toString();
+        }
+
+        m_pMainWindow->m_pSelectionManagerWindow->selectChannels(currentSelectedChannelNames);
+    }
+}
 
