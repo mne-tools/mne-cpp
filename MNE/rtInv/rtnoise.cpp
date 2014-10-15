@@ -101,7 +101,7 @@ void RtNoise::append(const MatrixXd &p_DataSegment)
 //    if(m_pRawMatrixBuffer) // ToDo handle change buffersize
 
     if(!m_pRawMatrixBuffer)
-        m_pRawMatrixBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(120, p_DataSegment.rows(), p_DataSegment.cols()));
+        m_pRawMatrixBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(8, p_DataSegment.rows(), p_DataSegment.cols()));
 
     if (SendDataToBuffer)
         m_pRawMatrixBuffer->push(&p_DataSegment);
