@@ -544,9 +544,7 @@ private slots:
     //==========================================================================================================
 
     void on_dsb_energy_valueChanged(double arg1);
-
     void on_actionBeenden_triggered();
-
     void on_mouse_button_release();
 
 signals:
@@ -584,6 +582,7 @@ private:
     QList<GaborAtom> _adaptive_atom_list;
     QList<FixDictAtom> _fix_dict_atom_list;
     MatrixXd datas;
+    RowVectorXf times_vec;
     MatrixXd times;
     MatrixXd original_signal_matrix;
     MatrixXd real_residuum_matrix;
@@ -692,9 +691,23 @@ private:
     *
     * @param[in] QString file name  name of average-file
     *
-    * @return   void
+    * @return   bool
     */
-    void read_fiff_ave(QString file_name);
+    bool read_fiff_ave(QString file_name);
+
+    //==========================================================================================================
+    /**
+    * MainWindow_read_fiff_ave
+    *
+    * ### MP toolbox main function ###
+    *
+    * reads data from ave files
+    *
+    * @param[in] QString file name  name of average-file
+    *
+    * @return   bool
+    */
+    void read_fiff_ave_new();
 
     //==========================================================================================================
     /**

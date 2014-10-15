@@ -81,10 +81,12 @@ bool _new_paint;
 
 fiff_int_t _from;
 fiff_int_t _to;
+
 fiff_int_t _first_sample;
 fiff_int_t _last_sample;
 fiff_int_t _press_pos;
 
+qreal _offset_time;
 qint32 _samplecount;
 qreal _max_pos;
 qreal _max_neg;
@@ -96,6 +98,7 @@ QList<QColor> _colors;
 MatrixXd _signal_matrix;
 MatrixXd _atom_sum_matrix;
 MatrixXd _residuum_matrix;
+FiffEvoked _pick_evoked;
 
 QTimer *_counter_timer;
 QThread* mp_Thread;
@@ -279,7 +282,7 @@ void MainWindow::closeEvent(QCloseEvent * event)
         msg_box->close();
     }
 
-    /*
+    /* ToDo: call threadinterrupt
     if(mp_Thread != NULL)
         if(mp_Thread->isRunning())
             emit mp_Thread->requestInterruption();
@@ -340,12 +343,13 @@ void MainWindow::open_file()
 
     _colors.clear();
     _colors.append(QColor(0, 0, 0));
-
+    _pick_evoked.clear();
+    _offset_time = 0;
     _from = -1;
     if(file_name.endsWith(".fif", Qt::CaseInsensitive))
     {
-        read_fiff_ave(file_name);
-        //if(!read_fiff_file(file_name)) return;
+        if(!read_fiff_ave(file_name))
+            if(!read_fiff_file(file_name)) return;
 
         ui->dsb_sample_rate->setEnabled(false);
         original_signal_matrix = _signal_matrix;
@@ -366,8 +370,8 @@ void MainWindow::open_file()
     last_to = _to;
     last_sample_count = _to - _from + 1;
 
-    ui->dsb_from->setMaximum((_last_sample - 63) / _sample_rate);
-    ui->dsb_to->setMinimum((_first_sample + 63) / _sample_rate);
+    ui->dsb_from->setMaximum((_last_sample - 63) / _sample_rate - _offset_time);
+    ui->dsb_to->setMinimum((_first_sample + 63) / _sample_rate - _offset_time);
     ui->lb_from->setToolTip(QString("minimum: %1 seconds").arg(_first_sample / _sample_rate));
     ui->lb_to->setToolTip(QString("maximum: %1 seconds").arg(_last_sample / _sample_rate));
     ui->dsb_from->setToolTip(QString("sample: %1").arg(_from));
@@ -375,8 +379,8 @@ void MainWindow::open_file()
     ui->sb_sample_count->setToolTip(QString("epoch: %1 sec").arg((_to - _from + 1) / _sample_rate));
     ui->lb_samples->setToolTip(QString("min: 64 (%1 sec)\nmax: 4096 (%2 sec)").arg(64 / _sample_rate).arg(4096 / _sample_rate));
 
-    ui->dsb_from->setValue(_from / _sample_rate);
-    ui->dsb_to->setValue(_to / _sample_rate);
+    ui->dsb_from->setValue((_from / _sample_rate) - _offset_time);
+    ui->dsb_to->setValue(_to / _sample_rate - _offset_time);
     _samplecount = _to - _from + 1;
     ui->sb_sample_count->setValue(_to - _from + 1);
 
@@ -476,7 +480,7 @@ void MainWindow::cb_selection_changed(const QModelIndex& topLeft, const QModelIn
 
 //*************************************************************************************************************************************
 
-void MainWindow::read_fiff_ave(QString file_name)
+bool MainWindow::read_fiff_ave(QString file_name)
 {
     QFile t_fileEvoked(file_name);
 
@@ -484,7 +488,7 @@ void MainWindow::read_fiff_ave(QString file_name)
     QPair<QVariant, QVariant> baseline(QVariant(), 0);
     FiffEvoked evoked(t_fileEvoked, setno, baseline);    
     if(evoked.isEmpty())
-        return;
+        return false;
 
     QSettings settings;
     QMap<QString, QVariant> chn_name_map;
@@ -517,18 +521,69 @@ void MainWindow::read_fiff_ave(QString file_name)
                 filter_list.append(evoked.info.ch_names.at(i));
     }
 
-    FiffEvoked pick_evoked = evoked.pick_channels(filter_list);
+    _pick_evoked = evoked.pick_channels(filter_list);
+    if(_pick_evoked.isEmpty())
+        return false;
 
-    ui->dsb_sample_rate->setValue(pick_evoked.info.sfreq);
-    _sample_rate = pick_evoked.info.sfreq;
+    ui->dsb_sample_rate->setValue(_pick_evoked.info.sfreq);
+    _sample_rate = _pick_evoked.info.sfreq;
 
-    _signal_matrix = MatrixXd::Zero(pick_evoked.data.cols(), pick_evoked.data.rows());
+    _signal_matrix = MatrixXd::Zero(_pick_evoked.data.cols(), _pick_evoked.data.rows());
 
-    for(qint32 channels = 0; channels <  pick_evoked.data.rows(); channels++)
-        _signal_matrix.col(channels) = pick_evoked.data.row(channels);
+    for(qint32 channels = 0; channels <  _pick_evoked.data.rows(); channels++)
+        _signal_matrix.col(channels) = _pick_evoked.data.row(channels);
 
+    _offset_time = abs(_pick_evoked.times[0]);
     _from = _first_sample = 0;
-    _to = _last_sample = _signal_matrix.rows();
+    _to = _last_sample = _signal_matrix.rows() - 1;
+
+    return true;
+}
+
+//*************************************************************************************************************************************
+
+void MainWindow::read_fiff_ave_new()
+{
+    qint32 row_number = 0;
+    qint32 selected_chn = 0;
+
+    qint32 size = 0;
+    for(qint32 i = 0; i < original_signal_matrix.cols(); i++)
+        if(select_channel_map[i] == true)
+            size++;
+
+    _signal_matrix = MatrixXd::Zero(_to - _from, size);
+
+    _colors.clear();
+    for(qint32 channels = 0; channels < original_signal_matrix.cols(); channels++)
+        if(select_channel_map[channels] == true)
+        {
+            row_number = 0;
+            _colors.append(original_colors.at(channels));
+            for(qint32 i = _from; i < _to; i++)
+            {
+                _signal_matrix(row_number, selected_chn) = original_signal_matrix(row_number, channels);
+                row_number++;
+            }
+            selected_chn++;
+        }
+
+    _atom_sum_matrix = MatrixXd::Zero(_signal_matrix.rows(), _signal_matrix.cols()); //resize
+    _residuum_matrix = MatrixXd::Zero(_signal_matrix.rows(), _signal_matrix.cols()); //resize
+
+    ui->tbv_Results->clearContents();
+    ui->tbv_Results->setRowCount(0);
+    ui->actionSpeicher->setEnabled(false);
+    ui->actionSpeicher_unter->setEnabled(false);
+    ui->lb_info_content->setText("");
+    ui->cb_all_select->setHidden(true);
+    ui->lb_timer->setHidden(true);
+    ui->progressBarCalc->setHidden(true);
+    ui->actionExport->setEnabled(false);
+
+    has_warning = false;
+    _new_paint = true;
+    update();
 }
 
 //*************************************************************************************************************************************
@@ -545,7 +600,7 @@ bool MainWindow::read_fiff_file(QString fileName)
     for(qint32 m = 0; m < 4; m++)
         chn_name_map.insert(QString("MEG;EEG;STI;EOG").split(';').at(m), true);
 
-    chn_name_map = settings.value("channel_names", chn_name_map).toMap();//<QString, bool>();
+    chn_name_map = settings.value("channel_names", chn_name_map).toMap();
     QString next_name;
 
     for(qint32 k = 0; k < raw.info.ch_names.length(); k++)
@@ -570,13 +625,11 @@ bool MainWindow::read_fiff_file(QString fileName)
     bool want_eeg   = chn_name_map["EEG"].toBool();
     bool want_stim  = chn_name_map["STI"].toBool();
 
-
-
     picks = raw.info.pick_types(want_meg, want_eeg, want_stim/*, include /*, raw.info.bads*/);
 
     //save fiff data borders global
-    _first_sample = raw.first_samp;
-    _last_sample = raw.last_samp;
+    _first_sample = raw.first_samp;    
+    _last_sample = raw.last_samp;    
 
     if(_from == -1)
     {
@@ -654,7 +707,6 @@ void MainWindow::read_fiff_file_new(QString file_name)
 
 void MainWindow::fill_channel_combobox()
 {
-
     //select all channels item
     this->cb_item = new QStandardItem;
     this->cb_item->setText("de/select all channels");
@@ -774,7 +826,6 @@ bool MainWindow::read_matlab_file(QString fileName)
 
 void MainWindow::read_matlab_file_new()
 {
-
     bool isFloat;
     qint32 row_number = 0;
 
@@ -783,10 +834,9 @@ void MainWindow::read_matlab_file_new()
     for(qint32 i = _from; i < _to; i++)
     {
         qreal value = matlab_signal.at(i).toFloat(&isFloat);
-        if(!isFloat)
-        {
+        if(!isFloat)        
              _signal_matrix = MatrixXd::Zero(0, 0);
-        }
+
         _signal_matrix(row_number, 0) = value;
         row_number++;
     }
@@ -1082,12 +1132,12 @@ void XAxisWindow::paint_axis(MatrixXd signalMatrix, QSize windowSize)
         {
             if(j == 20)
             {
-                painter.drawText(j * scaleXAchse + 37, 20, QString::number(j * scaleXText + _from / _sample_rate, 'f', 2));    // scalevalue as string
+                painter.drawText(j * scaleXAchse + 37, 20, QString::number(j * scaleXText + _from / _sample_rate - _offset_time, 'f', 2));    // scalevalue as string
                 painter.drawLine(j * scaleXAchse + 55, 5 + 2, j * scaleXAchse + 55 , 5 - 2);                    // scalelines
             }
             else
             {
-                painter.drawText(j * scaleXAchse + 45, 20, QString::number(j * scaleXText + _from / _sample_rate, 'f', 2));    // scalevalue as string
+                painter.drawText(j * scaleXAchse + 45, 20, QString::number(j * scaleXText + _from / _sample_rate  - _offset_time, 'f', 2));    // scalevalue as string
                 painter.drawLine(j * scaleXAchse + 55, 5 + 2, j * scaleXAchse + 55 , 5 - 2);                    // scalelines
             }
         }
@@ -1874,8 +1924,8 @@ void MainWindow::on_dsb_sample_rate_editingFinished()
     {
         read_fiff_changed = true;
         if(_from != 0)
-            ui->dsb_from->setValue(_from / _sample_rate);
-        ui->dsb_to->setValue(_to / _sample_rate);
+            ui->dsb_from->setValue(_from / _sample_rate - _offset_time);
+        ui->dsb_to->setValue(_to / _sample_rate - _offset_time);
         read_fiff_changed = false;
     }
     callXAxisWindow->update();
@@ -1887,10 +1937,15 @@ void MainWindow::on_dsb_from_editingFinished()
 {   
     if(read_fiff_changed || _from == last_from) return;
     if(ui->dsb_from->value() * _sample_rate < _first_sample)
-        ui->dsb_from->setValue(_first_sample / _sample_rate);
+        ui->dsb_from->setValue(_first_sample / _sample_rate - _offset_time);
 
     if(file_name.split('.').last() == "fif")
-        read_fiff_file_new(file_name);
+    {
+        if(!_pick_evoked.isEmpty())
+            read_fiff_ave_new();
+        else
+            read_fiff_file_new(file_name);
+    }
     else read_matlab_file_new();
     last_from = _from;
 }
@@ -1904,7 +1959,12 @@ void MainWindow::on_dsb_to_editingFinished()
         ui->dsb_to->setValue(_last_sample / _sample_rate);
 
     if(file_name.split('.').last() == "fif")
-        read_fiff_file_new(file_name);
+    {
+        if(!_pick_evoked.isEmpty())
+            read_fiff_ave_new();
+        else
+            read_fiff_file_new(file_name);
+    }
     else read_matlab_file_new();
     last_to = _to;
 }
@@ -1916,7 +1976,12 @@ void MainWindow::on_sb_sample_count_editingFinished()
     if(read_fiff_changed || ui->sb_sample_count->value() == last_sample_count) return;
 
     if(file_name.split('.').last() == "fif")
-        read_fiff_file_new(file_name);
+    {
+        if(!_pick_evoked.isEmpty())
+            read_fiff_ave_new();
+        else
+            read_fiff_file_new(file_name);
+    }
     else read_matlab_file_new();
 
     last_sample_count = ui->sb_sample_count->value();
@@ -1929,7 +1994,7 @@ void MainWindow::on_dsb_from_valueChanged(double arg1)
     if(read_fiff_changed) return;
 
     read_fiff_changed = true;
-    _from = floor(arg1 * _sample_rate);
+    _from = floor((arg1 + _offset_time) * _sample_rate);
     _to = _from + ui->sb_sample_count->value() - 1;
 
     if(_to >= _last_sample)
@@ -1953,7 +2018,7 @@ void MainWindow::on_dsb_to_valueChanged(double arg1)
     if(read_fiff_changed) return;
 
     read_fiff_changed = true;
-    _to = floor(arg1 * _sample_rate);
+    _to = floor((arg1 + _offset_time) * _sample_rate);
     _from = _to - ui->sb_sample_count->value() + 1;
 
     if(_from <= _first_sample)
@@ -1963,7 +2028,7 @@ void MainWindow::on_dsb_to_valueChanged(double arg1)
         ui->sb_sample_count->setValue(_samplecount);
     }
 
-    ui->dsb_from->setValue(_from / _sample_rate);
+    ui->dsb_from->setValue(_from / _sample_rate - _offset_time);
     read_fiff_changed = false;
 
      ui->dsb_to->setToolTip(QString("sample: %1").arg(_to));
@@ -2587,7 +2652,7 @@ void GraphWindow::mouseMoveEvent(QMouseEvent *event)
    {
        qint32 temp_pos = mapFromGlobal(QCursor::pos()).x() - 55;
        qreal stretch_factor = qreal(this->width() - 55/*left_margin*/ - 15/*right_margin*/) / (qreal)(_to -_from);
-       qreal time = (qreal)_from / _sample_rate + (qreal)temp_pos / stretch_factor / _sample_rate;
+       qreal time = (qreal)_from / _sample_rate - _offset_time + (qreal)temp_pos / stretch_factor / _sample_rate;
        if(mapFromGlobal(QCursor::pos()).x() >= 55 && mapFromGlobal(QCursor::pos()).x() <= (this->width() - 15))
            this->setToolTip(QString("time: %1 sec").arg(time));
        if(event->buttons() == Qt::LeftButton)
@@ -2606,7 +2671,7 @@ void AtomSumWindow::mouseMoveEvent(QMouseEvent *event)
     {
         qint32 temp_pos = mapFromGlobal(QCursor::pos()).x() - 55;
         qreal stretch_factor = qreal(this->width() - 55/*left_margin*/ - 15/*right_margin*/) / (qreal)(_samplecount);
-        qreal time = (qreal)_from / _sample_rate + (qreal)temp_pos / stretch_factor / _sample_rate;
+        qreal time = (qreal)_from / _sample_rate - _offset_time + (qreal)temp_pos / stretch_factor / _sample_rate;
         if(mapFromGlobal(QCursor::pos()).x() >= 55 && mapFromGlobal(QCursor::pos()).x() <= (this->width() - 15))
             this->setToolTip(QString("time: %1 sec").arg(time));
        setCursor(Qt::CrossCursor);
@@ -2622,7 +2687,7 @@ void ResiduumWindow::mouseMoveEvent(QMouseEvent *event)
     {
         qint32 temp_pos = mapFromGlobal(QCursor::pos()).x() - 55;
         qreal stretch_factor = qreal(this->width() - 55/*left_margin*/ - 15/*right_margin*/) / (qreal)(_samplecount);
-        qreal time = (qreal)_from / _sample_rate + (qreal)temp_pos / stretch_factor / _sample_rate;
+        qreal time = (qreal)_from / _sample_rate - _offset_time+ (qreal)temp_pos / stretch_factor / _sample_rate;
         if(mapFromGlobal(QCursor::pos()).x() >= 55 && mapFromGlobal(QCursor::pos()).x() <= (this->width() - 15))
             this->setToolTip(QString("time: %1 sec").arg(time));
 
@@ -2651,7 +2716,7 @@ void GraphWindow::mouseReleaseEvent(QMouseEvent *event)
     if(_to - _from != 0)
     {
         fiff_int_t release_pos = mapFromGlobal(QCursor::pos()).x();
-        qreal stretch_factor = qreal(this->width() - 55/*left_margin*/ - 15/*right_margin*/) / (qreal)(_samplecount);
+        qreal stretch_factor = qreal(this->width() - 55 - 15) / (qreal)(_samplecount);
         qint32 old_from = _from;
         qint32 old_to = _to;
         _from += floor((_press_pos - release_pos) / stretch_factor);
@@ -2660,14 +2725,12 @@ void GraphWindow::mouseReleaseEvent(QMouseEvent *event)
         {
             _from = _first_sample;
              _to = _from + _samplecount - 1;
-            //_samplecount = _to - _from + 1;
         }
 
         if(_to > _last_sample)
         {
             _to = _last_sample;
             _from = _to - _samplecount + 1;
-            //_samplecount = _to - _from + 1;
         }
 
         setCursor(Qt::CrossCursor);
@@ -2726,17 +2789,21 @@ void GraphWindow::wheelEvent(QWheelEvent *event)
 
 void MainWindow::on_mouse_button_release()
 {
-
     read_fiff_changed = true;
 
-    ui->dsb_from->setValue(_from / _sample_rate);
-    ui->dsb_to->setValue(_to / _sample_rate);
+    ui->dsb_from->setValue(_from / _sample_rate - _offset_time);
+    ui->dsb_to->setValue(_to / _sample_rate - _offset_time);
     ui->sb_sample_count->setValue(_samplecount);
 
     read_fiff_changed = false;
 
-    if(file_name.endsWith(".fif", Qt::CaseInsensitive))
-        read_fiff_file_new(file_name);
+    if(file_name.split('.').last() == "fif")
+    {
+        if(!_pick_evoked.isEmpty())
+            read_fiff_ave_new();
+        else
+            read_fiff_file_new(file_name);
+    }
     else
         read_matlab_file_new();
 }
