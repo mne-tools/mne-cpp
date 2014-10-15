@@ -40,6 +40,8 @@
 
 #include "newrealtimemultisamplearray.h"
 
+#include <iostream>
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -234,23 +236,14 @@ void NewRealTimeMultiSampleArray::initFromFiffInfo(FiffInfo::SPtr &p_pFiffInfo)
 
 //*************************************************************************************************************
 
-VectorXd NewRealTimeMultiSampleArray::getValue() const
-{
-    QMutexLocker locker(&m_qMutex);
-    return m_vecValue;
-}
-
-
-//*************************************************************************************************************
-
-void NewRealTimeMultiSampleArray::setValue(const VectorXd& v)
+void NewRealTimeMultiSampleArray::setValue(const MatrixXd& mat)
 {
     if(!m_bChInfoIsInit)
         return;
 
     m_qMutex.lock();
     //check vector size
-    if(v.size() != m_qListChInfo.size())
+    if(mat.rows() != m_qListChInfo.size())
         qCritical() << "Error Occured in RealTimeMultiSampleArrayNew::setVector: Vector size does not matche the number of channels! ";
 
     //ToDo
@@ -262,8 +255,8 @@ void NewRealTimeMultiSampleArray::setValue(const VectorXd& v)
 //    }
 
     //Store
-    m_vecValue = v;
-    m_matSamples.push_back(m_vecValue);
+    m_matSamples.push_back(mat);
+
     m_qMutex.unlock();
     if(m_matSamples.size() >= m_iMultiArraySize)
     {

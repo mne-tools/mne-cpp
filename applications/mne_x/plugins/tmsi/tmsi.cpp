@@ -717,8 +717,7 @@ void TMSI::run()
             }
 
             //emit values to real time multi sample array
-            for(qint32 i = 0; i < matValue.cols(); ++i)
-                m_pRMTSA_TMSI->data()->setValue(matValue.col(i).cast<double>());
+            m_pRMTSA_TMSI->data()->setValue(matValue.cast<double>());
 
             // Reset keyboard trigger
             m_iTriggerType = 0;
