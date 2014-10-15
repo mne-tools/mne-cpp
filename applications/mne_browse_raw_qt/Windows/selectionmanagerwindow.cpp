@@ -146,9 +146,11 @@ void SelectionManagerWindow::initComboBoxes()
 
 bool SelectionManagerWindow::loadLayout(QString path)
 {
-    LayoutLoader* manager = new LayoutLoader();
+    //Bakup the scene transformation matrix
+    QMatrix transformationTemp = ui->m_graphicsView_layoutPlot->matrix();
 
     //Read layout
+    LayoutLoader* manager = new LayoutLoader();
     bool state = manager->readMNELoutFile(path.prepend("./MNE_Browse_Raw_Resources/Templates/Layouts/"), m_layoutMap);
 
     //Load selection groups again because they need to be reinitialised every time a new layout hase been loaded
@@ -156,9 +158,14 @@ bool SelectionManagerWindow::loadLayout(QString path)
 
     //Update scene
     m_pLayoutScene->setNewLayout(m_layoutMap);
+    m_pLayoutScene->update();
 
     //Fit to view
-    ui->m_graphicsView_layoutPlot->fitInView(m_pLayoutScene->itemsBoundingRect(), Qt::KeepAspectRatio);
+    //ui->m_graphicsView_layoutPlot->fitInView(m_pLayoutScene->itemsBoundingRect(), Qt::KeepAspectRatio);
+
+    ui->m_graphicsView_layoutPlot->ensureVisible(m_pLayoutScene->itemsBoundingRect());
+    //Set transformation to old one
+    //ui->m_graphicsView_layoutPlot->setMatrix(transformationTemp);
 
     return state;
 }
@@ -288,8 +295,7 @@ void SelectionManagerWindow::updateUserDefinedChannels()
 
 void SelectionManagerWindow::updateDataView()
 {
-    qDebug()<<"Update data View";
-    //if no channels have been selected by the user - show selected group channels
+    //if no channels have been selected by the user -> show selected group channels
     QListWidget* targetListWidget;
     if(ui->m_listWidget_userDefined->count()>0)
         targetListWidget = ui->m_listWidget_userDefined;
@@ -331,7 +337,7 @@ void SelectionManagerWindow::resizeEvent(QResizeEvent* event)
     Q_UNUSED(event);
 
     //Fit scene in view
-    ui->m_graphicsView_layoutPlot->fitInView(m_pLayoutScene->itemsBoundingRect(), Qt::KeepAspectRatio);
+    //ui->m_graphicsView_layoutPlot->fitInView(m_pLayoutScene->itemsBoundingRect(), Qt::KeepAspectRatio);
 }
 
 

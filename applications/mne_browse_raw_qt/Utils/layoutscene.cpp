@@ -62,12 +62,12 @@ LayoutScene::LayoutScene(QGraphicsView* view, QObject* parent, int sceneType)
 , m_iSceneType(sceneType)
 , m_dragSceneIsActive(false)
 , m_bDragMode(false)
+, m_bExtendedSelectionMode(false)
 {
     m_qvView->grabGesture(Qt::PanGesture);
     m_qvView->grabGesture(Qt::PinchGesture);
 
     //Install event filter to overcome QGrabGesture and QScrollBar problem
-    m_qvView->installEventFilter(this);
     m_qvView->installEventFilter(this);
 }
 
@@ -153,7 +153,7 @@ void LayoutScene::repaintItems()
 //*************************************************************************************************************
 
 void LayoutScene::wheelEvent(QGraphicsSceneWheelEvent* event) {
-    m_qvView->setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
+    m_qvView->setTransformationAnchor(QGraphicsView::AnchorViewCenter);
 
     // Scale the view / do the zoom
     double scaleFactor = 1.15;
@@ -164,6 +164,8 @@ void LayoutScene::wheelEvent(QGraphicsSceneWheelEvent* event) {
         // Zooming out
         m_qvView->scale(1.0 / scaleFactor, 1.0 / scaleFactor);
     }
+
+    //m_qvView->centerOn(event->scenePos());
 }
 
 
@@ -185,15 +187,20 @@ void LayoutScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
     switch(mouseEvent->button()) {
     case Qt::LeftButton:
         m_qvView->setDragMode(QGraphicsView::RubberBandDrag);
+
+        //If a normal left lick occurs without holding down CTRL -> Delete all selected items
+        if(!m_bExtendedSelectionMode)
+            m_selectedItems.clear();
+
         break;
 
     case Qt::RightButton:
         m_bDragMode = true;
         m_qvView->setDragMode(QGraphicsView::NoDrag);
-
         m_mousePressPosition = mouseEvent->screenPos();
 
-        break;
+        //return so that no selection event is called
+        return;
     }
 
     QGraphicsScene::mousePressEvent(mouseEvent);
@@ -210,8 +217,8 @@ void LayoutScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
         m_mousePressPosition = mouseEvent->screenPos();
 
-        m_qvView->verticalScrollBar()->setValue(m_qvView->verticalScrollBar()->value() + diffY);
-        m_qvView->horizontalScrollBar()->setValue(m_qvView->horizontalScrollBar()->value() + diffX);
+        m_qvView->verticalScrollBar()->setValue(m_qvView->verticalScrollBar()->value() - diffY);
+        m_qvView->horizontalScrollBar()->setValue(m_qvView->horizontalScrollBar()->value() - diffX);
     }
 
     QGraphicsScene::mouseMoveEvent(mouseEvent);
@@ -222,10 +229,58 @@ void LayoutScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
 void LayoutScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
+    if(m_bExtendedSelectionMode) {
+        qDebug()<<"Extended Selection";
+        //List of selected items during last rubberband action
+        QList<QGraphicsItem *> currentSelectedItemsList = this->selectedItems();
+
+        //Generate list of all selected items (dont add duplicates)
+        for(int i = 0; i<currentSelectedItemsList.size(); i++) {
+            if(!m_selectedItems.contains(currentSelectedItemsList.at(i))) {
+                //Duplicate not found - new item was selected since the last extended selection
+                qDebug()<<"add item to m_selectedItems";
+                m_selectedItems << currentSelectedItemsList.at(i);
+            }
+            else {
+                qDebug()<<"delete item from m_selectedItems";
+                //Duplicate found - already selected item was selected again since the last extended selection
+                m_selectedItems.removeAll(currentSelectedItemsList.at(i));
+                currentSelectedItemsList.at(i)->setSelected(false);
+            }
+        }
+
+        for(int i = 0; i<m_selectedItems.size(); i++)
+            m_selectedItems.at(i)->setSelected(true);
+
+        qDebug()<<m_selectedItems.size();
+    }
+
     if(m_bDragMode)
         m_bDragMode = false;
 
     QGraphicsScene::mouseReleaseEvent(mouseEvent);
+}
+
+
+//*************************************************************************************************************
+
+void LayoutScene::keyPressEvent(QKeyEvent *keyEvent)
+{
+    if(keyEvent->key() == Qt::Key_Control)
+        m_bExtendedSelectionMode = true;
+
+    QGraphicsScene::keyPressEvent(keyEvent);
+}
+
+
+//*************************************************************************************************************
+
+void LayoutScene::keyReleaseEvent(QKeyEvent *keyEvent)
+{
+    if(keyEvent->key() == Qt::Key_Control)
+        m_bExtendedSelectionMode = false;
+
+    QGraphicsScene::keyReleaseEvent(keyEvent);
 }
 
 
