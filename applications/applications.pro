@@ -42,10 +42,14 @@ SUBDIRS += \
 
 contains(MNECPP_CONFIG, withGui) {
     SUBDIRS += \
-        mne_browse_raw_qt \
         mne_x_libs \
         mne_x
 
+    !contains(MNECPP_CONFIG, oldCompiler) {
+        message(Configure mne_browse_raw_qt)
+        SUBDIRS += \
+            mne_browse_raw_qt \
+    }
 
     qtHaveModule(3d) {
         message(Qt3D available: disp3D library configured!)
