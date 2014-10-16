@@ -132,6 +132,9 @@ void MainWindow::setupWindowWidgets()
     m_pEventWindow->init();
     m_pFilterWindow->init();
     m_pScaleWindow->init();
+
+    if(m_pDataWindow->getDataModel()->m_bFileloaded)
+        emit newDataLoaded(m_pDataWindow->getDataModel()->m_fiffInfo);
 }
 
 
@@ -270,10 +273,8 @@ void MainWindow::openFile()
         m_qFileRaw.close();
     m_qFileRaw.setFileName(filename);
 
-    if(m_pDataWindow->getDataModel()->loadFiffData(m_qFileRaw)){
-        emit newDataLoaded(&m_pDataWindow->getDataModel()->m_fiffInfo);
+    if(m_pDataWindow->getDataModel()->loadFiffData(m_qFileRaw))
         qDebug() << "Fiff data file" << filename << "loaded.";
-    }
     else
         qDebug("ERROR loading fiff data file %s",filename.toLatin1().data());
 
@@ -297,6 +298,8 @@ void MainWindow::openFile()
 
     //Update selection Group All
     m_pSelectionManagerWindow->createSelectionGroupAll();
+
+    emit newDataLoaded(m_pDataWindow->getDataModel()->m_fiffInfo);
 }
 
 

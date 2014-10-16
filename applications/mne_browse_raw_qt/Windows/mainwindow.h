@@ -252,7 +252,7 @@ signals:
     /**
     * newDataLoaded is emitted whenever a new file was loaded
     */
-    void newDataLoaded(const FiffInfo *currentFiffInfo);
+    void newDataLoaded(FiffInfo currentFiffInfo);
 
 private:
     //=========================================================================================================

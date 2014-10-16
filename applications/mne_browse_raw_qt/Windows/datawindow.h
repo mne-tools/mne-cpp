@@ -246,9 +246,9 @@ protected slots:
 
     //=========================================================================================================
     /**
-    * Selects the current selected channels in the selection manager
+    * Highlights the current selected channels in the 2D plot of selection manager
     */
-    void selectChannelsInSelectionManager();
+    void highlightChannelsInSelectionManager();
 };
 
 } // NAMESPACE MNEBrowseRawQt
