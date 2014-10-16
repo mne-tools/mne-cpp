@@ -178,6 +178,9 @@ void DataWindow::initMVCSettings()
                                  m_pMainWindow->m_pEventWindow->getEventTableView(),
                                  ui->m_tableView_rawTableView);
 
+    //Set scale window in delegate
+    m_pRawDelegate->setScaleWindow(m_pMainWindow->m_pScaleWindow);
+
     //Install event filter to overcome QGrabGesture and QScrollBar problem
     ui->m_tableView_rawTableView->horizontalScrollBar()->installEventFilter(this);
     ui->m_tableView_rawTableView->verticalScrollBar()->installEventFilter(this);

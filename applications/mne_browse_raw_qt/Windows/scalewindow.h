@@ -1,11 +1,11 @@
 //=============================================================================================================
 /**
-* @file     filterwindow.h
+* @file     scalewindow.h
 * @author   Lorenz Esch <Lorenz.Esch@tu-ilmenau.de>
 *           Christoph Dinh <chdinh@nmr.mgh.harvard.edu>;
 *           Matti Hamalainen <msh@nmr.mgh.harvard.edu>
 * @version  1.0
-* @date     August, 2014
+* @date     October, 2014
 *
 * @section  LICENSE
 *
@@ -30,21 +30,21 @@
 * POSSIBILITY OF SUCH DAMAGE.
 *
 *
-* @brief    Contains the declaration of the FilterWindow class.
+* @brief    Contains the declaration of the ScaleWindow class.
 *
 */
 
-#ifndef FILTERWINDOW_H
-#define FILTERWINDOW_H
+#ifndef SCALEWINDOW_H
+#define SCALEWINDOW_H
 
 //*************************************************************************************************************
 //=============================================================================================================
 // INCLUDES
 //=============================================================================================================
 
-#include "ui_filterwindow.h"
+#include "ui_scalewindow.h"
 #include "mainwindow.h"
-#include "../Utils/filterplotscene.h"
+#include <fiff/fiff.h>
 
 
 //*************************************************************************************************************
@@ -52,10 +52,7 @@
 // QT INCLUDES
 //=============================================================================================================
 
-#include <QWidget>
-#include <QSettings>
-#include <QGraphicsScene>
-#include <QSvgGenerator>
+#include <QDockWidget>
 
 
 //*************************************************************************************************************
@@ -72,32 +69,30 @@ namespace MNEBrowseRawQt
 // DEFINE FORWARD DECLARATIONS
 //=============================================================================================================
 
-class MainWindow;
-
 /**
-* DECLARE CLASS FilterWindow
+* DECLARE CLASS ScaleWindow
 *
-* @brief The FilterWindow class provides the filter window.
+* @brief The ScaleWindow class provides the scale window.
 */
-class FilterWindow : public QWidget
+class ScaleWindow : public QDockWidget
 {
     Q_OBJECT
 
 public:
     //=========================================================================================================
     /**
-    * Constructs a FilterWindow dialog which is a child of parent.
+    * Constructs a ScaleWindow dialog which is a child of parent.
     *
-    * @param [in] parent pointer to parent widget; If parent is 0, the new FilterWindow becomes a window. If parent is another widget, FilterWindow becomes a child window inside parent. FilterWindow is deleted when its parent is deleted.
+    * @param [in] parent pointer to parent widget; If parent is 0, the new ScaleWindow becomes a window. If parent is another widget, ScaleWindow becomes a child window inside parent. ScaleWindow is deleted when its parent is deleted.
     */
-    FilterWindow(QWidget *parent = 0);
+    ScaleWindow(QWidget *parent = 0);
 
     //=========================================================================================================
     /**
-    * Destroys the FilterWindow.
-    * All FilterWindow's children are deleted first. The application exits if FilterWindow is the main widget.
+    * Destroys the ScaleWindow.
+    * All ScaleWindow's children are deleted first. The application exits if ScaleWindow is the main widget.
     */
-    ~FilterWindow();
+    ~ScaleWindow();
 
     //=========================================================================================================
     /**
@@ -105,93 +100,25 @@ public:
     */
     void init();
 
+    //=========================================================================================================
+    /**
+    * Destroys the ScaleWindow.
+    * All ScaleWindow's children are deleted first. The application exits if ScaleWindow is the main widget.
+    */
+    QMap<QString,double> getScalingMap();
+
 private:
-    //=========================================================================================================
-    /**
-    * inits all spin boxes.
-    */
-    void initSpinBoxes();
+    Ui::ScaleWindow *ui;
+
+    MainWindow*     m_pMainWindow;                  /**< pointer to the main window (parent) */
 
     //=========================================================================================================
     /**
-    * inits all buttons.
+    * hideSpinBoxes hides all spin boxes and labels which are not present in the current fiff file.
     */
-    void initButtons();
-
-    //=========================================================================================================
-    /**
-    * inits the QComboBoxes.
-    */
-    void initComboBoxes();
-
-    //=========================================================================================================
-    /**
-    * inits the filter plot.
-    */
-    void initFilterPlot();
-
-    //=========================================================================================================
-    /**
-    * resizeEvent reimplemented virtual function to handle resize events of the filter window
-    */
-    void resizeEvent(QResizeEvent * event);
-
-    //=========================================================================================================
-    /**
-    * updates the filter plot scene with the newly generated filter
-    */
-    void updateFilterPlot();
-
-    Ui::FilterWindowWidget *ui;
-
-    MainWindow*         m_pMainWindow;
-
-    int                 m_iWindowSize;
-    int                 m_iFilterTaps;
-
-    QSettings           m_qSettings;
-
-    FilterPlotScene*    m_pFilterPlotScene;
-
-protected slots:
-    //=========================================================================================================
-    /**
-    * This function gets called whenever the combo box is altered by the user via the gui.
-    * @param currentIndex holds the current index of the combo box
-    */
-    void changeStateSpinBoxes(int currentIndex);
-
-    //=========================================================================================================
-    /**
-    * This function gets called whenever the filter parameters are altered by the user via the gui.
-    */
-    void filterParametersChanged();
-
-    //=========================================================================================================
-    /**
-    * This function applies the user defined filter to all channels.
-    */
-    void applyFilterToAll();
-
-    //=========================================================================================================
-    /**
-    * This function undoes the user defined filter to all channels.
-    */
-    void undoFilterToAll();
-
-    //=========================================================================================================
-    /**
-    * Saves an svg graphic of the scene if wanted by the user.
-    */
-    void exportFilterPlot();
-
-    //=========================================================================================================
-    /**
-    * This function exports the filter coefficients to a txt file.
-    */
-    void exportFilterCoefficients();
+    void hideSpinBoxes(const FiffInfo *currentFiffInfo);
 };
 
 } // NAMESPACE MNEBrowseRawQt
 
-#endif // FILTERWINDOW_H
+#endif // SCALEWINDOW_H
