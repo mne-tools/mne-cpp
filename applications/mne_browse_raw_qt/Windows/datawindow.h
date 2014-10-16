@@ -74,6 +74,7 @@ namespace MNEBrowseRawQt
 //=============================================================================================================
 
 class MainWindow;
+class RawDelegate;
 
 /**
 * DECLARE CLASS DataWindow
@@ -242,6 +243,12 @@ protected slots:
     * Updates the marker position
     */
     void updateMarkerPosition();
+
+    //=========================================================================================================
+    /**
+    * Selects the current selected channels in the selection manager
+    */
+    void selectChannelsInSelectionManager();
 };
 
 } // NAMESPACE MNEBrowseRawQt

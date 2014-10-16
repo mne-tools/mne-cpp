@@ -193,32 +193,50 @@ void RawDelegate::setModelView(EventModel *eventModel, QTableView* eventView, QT
 
 //*************************************************************************************************************
 
+void RawDelegate::setScaleWindow(ScaleWindow *scaleWindow)
+{
+    m_pScaleWindow = scaleWindow;
+}
+
+
+//*************************************************************************************************************
+
 void RawDelegate::createPlotPath(const QModelIndex &index, const QStyleOptionViewItem &option, QPainterPath& path, QList<RowVectorPair>& listPairs) const
 {
     //get maximum range of respective channel type (range value in FiffChInfo does not seem to contain a reasonable value)
     qint32 kind = (static_cast<const RawModel*>(index.model()))->m_chInfolist[index.row()].kind;
     double dMaxValue = 1e-9;
 
+    QMap<QString,double> scaleMap = m_pScaleWindow->getScalingMap();
+
     switch(kind) {
     case FIFFV_MEG_CH: {
         qint32 unit = (static_cast<const RawModel*>(index.model()))->m_pfiffIO->m_qlistRaw[0]->info.chs[index.row()].unit;
         if(unit == FIFF_UNIT_T_M) {
-            dMaxValue = DELEGATE_MAX_MEG_GRAD;
+            dMaxValue = scaleMap["MEG_grad"];
         }
         else if(unit == FIFF_UNIT_T)
-            dMaxValue = DELEGATE_MAX_MEG_MAG;
+            dMaxValue = scaleMap["MEG_mag"];
         break;
     }
     case FIFFV_EEG_CH: {
-        dMaxValue = DELEGATE_MAX_EEG;
+        dMaxValue = scaleMap["MEG_EEG"];
         break;
     }
     case FIFFV_EOG_CH: {
-        dMaxValue = DELEGATE_MAX_EOG;
+        dMaxValue = scaleMap["MEG_EOG"];
         break;
     }
     case FIFFV_STIM_CH: {
-        dMaxValue = DELEGATE_MAX_STIM;
+        dMaxValue = scaleMap["MEG_STIM"];
+        break;
+    }
+    case FIFFV_EMG_CH: {
+        dMaxValue = scaleMap["MEG_EMG"];
+        break;
+    }
+    case FIFFV_MISC_CH: {
+        dMaxValue = scaleMap["MEG_MISC"];
         break;
     }
     }

@@ -58,8 +58,8 @@ using namespace MNEBrowseRawQt;
 
 MainWindow::MainWindow(QWidget *parent)
 : QMainWindow(parent)
-//, m_qFileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
-//, m_qEventFile("./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif")
+, m_qFileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
+, m_qEventFile("./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif")
 , m_qSettings()
 , m_rawSettings()
 , ui(new Ui::MainWindowWidget)
@@ -122,10 +122,16 @@ void MainWindow::setupWindowWidgets()
     addDockWidget(Qt::BottomDockWidgetArea, m_pAverageWindow);
     m_pAverageWindow->hide();
 
+    //Create selection manager window - QTDesigner used - see /FormFiles
+    m_pScaleWindow = new ScaleWindow(this);
+    addDockWidget(Qt::RightDockWidgetArea, m_pScaleWindow);
+    //m_pScaleWindow->hide();
+
     //Init windows
     m_pDataWindow->init();
     m_pEventWindow->init();
     m_pFilterWindow->init();
+    m_pScaleWindow->init();
 }
 
 
@@ -147,7 +153,8 @@ void MainWindow::connectMenus()
     connect(ui->m_eventAction, SIGNAL(triggered()), this, SLOT(showEventWindow()));
     connect(ui->m_informationAction, SIGNAL(triggered()), this, SLOT(showInformationWindow()));
     connect(ui->m_channelSelectionManagerAction, SIGNAL(triggered()), this, SLOT(showSelectionManagerWindow()));
-    connect(ui->m_averageWindow_Action, SIGNAL(triggered()), this, SLOT(showAverageWindow()));
+    connect(ui->m_averageWindowAction, SIGNAL(triggered()), this, SLOT(showAverageWindow()));
+    connect(ui->m_scalingAction, SIGNAL(triggered()), this, SLOT(showScaleWindow()));
 
     //Help
     connect(ui->m_aboutAction, SIGNAL(triggered()), this, SLOT(showAboutWindow()));
@@ -263,8 +270,10 @@ void MainWindow::openFile()
         m_qFileRaw.close();
     m_qFileRaw.setFileName(filename);
 
-    if(m_pDataWindow->getDataModel()->loadFiffData(m_qFileRaw))
+    if(m_pDataWindow->getDataModel()->loadFiffData(m_qFileRaw)){
+        emit newDataLoaded(&m_pDataWindow->getDataModel()->m_fiffInfo);
         qDebug() << "Fiff data file" << filename << "loaded.";
+    }
     else
         qDebug("ERROR loading fiff data file %s",filename.toLatin1().data());
 
@@ -454,4 +463,22 @@ void MainWindow::showAverageWindow()
     else // if visible raise the widget to be sure that it is not obscured by other windows
         m_pAverageWindow->raise();
 }
+
+
+//*************************************************************************************************************
+
+void MainWindow::showScaleWindow()
+{
+    //Note: A widget that happens to be obscured by other windows on the screen is considered to be visible.
+    if(!m_pScaleWindow->isVisible())
+    {
+        m_pScaleWindow->show();
+        m_pScaleWindow->raise();
+    }
+    else // if visible raise the widget to be sure that it is not obscured by other windows
+        m_pScaleWindow->raise();
+}
+
+
+
 
