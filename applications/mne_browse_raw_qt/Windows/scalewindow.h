@@ -116,7 +116,7 @@ private:
     /**
     * hideSpinBoxes hides all spin boxes and labels which are not present in the current fiff file.
     */
-    void hideSpinBoxes(const FiffInfo *currentFiffInfo);
+    void hideSpinBoxes(FiffInfo currentFiffInfo);
 };
 
 } // NAMESPACE MNEBrowseRawQt

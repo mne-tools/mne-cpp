@@ -92,7 +92,7 @@ void SelectionManagerWindow::createSelectionGroupAll()
 
 //*************************************************************************************************************
 
-void SelectionManagerWindow::selectChannels(QStringList channelList)
+void SelectionManagerWindow::highlightChannels(QStringList channelList)
 {
     QList<QGraphicsItem *> allSceneItems = m_pLayoutScene->items();
 
