@@ -164,8 +164,6 @@ void LayoutScene::wheelEvent(QGraphicsSceneWheelEvent* event) {
         // Zooming out
         m_qvView->scale(1.0 / scaleFactor, 1.0 / scaleFactor);
     }
-
-    //m_qvView->centerOn(event->scenePos());
 }
 
 
@@ -188,9 +186,9 @@ void LayoutScene::mousePressEvent(QGraphicsSceneMouseEvent *mouseEvent)
     case Qt::LeftButton:
         m_qvView->setDragMode(QGraphicsView::RubberBandDrag);
 
-        //If a normal left lick occurs without holding down CTRL -> Delete all selected items
-        if(!m_bExtendedSelectionMode)
-            m_selectedItems.clear();
+//        //If a normal left lick occurs without holding down CTRL -> Delete all selected items
+//        if(!m_bExtendedSelectionMode)
+//            m_selectedItems.clear();
 
         break;
 
@@ -229,31 +227,31 @@ void LayoutScene::mouseMoveEvent(QGraphicsSceneMouseEvent *mouseEvent)
 
 void LayoutScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *mouseEvent)
 {
-    if(m_bExtendedSelectionMode) {
-        qDebug()<<"Extended Selection";
-        //List of selected items during last rubberband action
-        QList<QGraphicsItem *> currentSelectedItemsList = this->selectedItems();
+//    if(m_bExtendedSelectionMode) {
+//        qDebug()<<"Extended Selection";
+//        //List of selected items during last rubberband action
+//        QList<QGraphicsItem *> currentSelectedItemsList = this->selectedItems();
 
-        //Generate list of all selected items (dont add duplicates)
-        for(int i = 0; i<currentSelectedItemsList.size(); i++) {
-            if(!m_selectedItems.contains(currentSelectedItemsList.at(i))) {
-                //Duplicate not found - new item was selected since the last extended selection
-                qDebug()<<"add item to m_selectedItems";
-                m_selectedItems << currentSelectedItemsList.at(i);
-            }
-            else {
-                qDebug()<<"delete item from m_selectedItems";
-                //Duplicate found - already selected item was selected again since the last extended selection
-                m_selectedItems.removeAll(currentSelectedItemsList.at(i));
-                currentSelectedItemsList.at(i)->setSelected(false);
-            }
-        }
+//        //Generate list of all selected items (dont add duplicates)
+//        for(int i = 0; i<currentSelectedItemsList.size(); i++) {
+//            if(!m_selectedItems.contains(currentSelectedItemsList.at(i))) {
+//                //Duplicate not found - new item was selected since the last extended selection
+//                qDebug()<<"add item to m_selectedItems";
+//                m_selectedItems << currentSelectedItemsList.at(i);
+//            }
+//            else {
+//                qDebug()<<"delete item from m_selectedItems";
+//                //Duplicate found - already selected item was selected again since the last extended selection
+//                m_selectedItems.removeAll(currentSelectedItemsList.at(i));
+//                currentSelectedItemsList.at(i)->setSelected(false);
+//            }
+//        }
 
-        for(int i = 0; i<m_selectedItems.size(); i++)
-            m_selectedItems.at(i)->setSelected(true);
+//        for(int i = 0; i<m_selectedItems.size(); i++)
+//            m_selectedItems.at(i)->setSelected(true);
 
-        qDebug()<<m_selectedItems.size();
-    }
+//        qDebug()<<m_selectedItems.size();
+//    }
 
     if(m_bDragMode)
         m_bDragMode = false;
