@@ -82,6 +82,14 @@ RtNoise::RtNoise(qint32 p_iMaxSamples, FiffInfo::SPtr p_pFiffInfo, qint32 p_data
     m_Fs = m_pFiffInfo->sfreq;
 
     SendDataToBuffer = true;
+
+    m_fWin.clear();
+
+    //create a hanning window
+    m_fWin = hanning(m_iFFTlength,0);
+
+    qDebug()<<"Hanning window is created.";
+
 }
 
 
@@ -89,17 +97,61 @@ RtNoise::RtNoise(qint32 p_iMaxSamples, FiffInfo::SPtr p_pFiffInfo, qint32 p_data
 
 RtNoise::~RtNoise()
 {
-    if(this->isRunning())
+    if(this->isRunning()){
         stop();
+    }
 }
 
+//*************************************************************************************************************
+
+QVector <float> RtNoise::hanning(int N, short itype)
+{
+    int half, i, idx, n;
+    QVector <float> w(N,0.0);
+
+    if(itype==1)    //periodic function
+        n = N-1;
+    else
+        n = N;
+
+    if(n%2==0)
+    {
+        half = n/2;
+        for(i=0; i<half; i++) //CALC_HANNING   Calculates Hanning window samples.
+            w[i] = 0.5 * (1 - cos(2*3.14159265*(i+1) / (n+1)));
+
+        idx = half-1;
+        for(i=half; i<n; i++) {
+            w[i] = w[idx];
+            idx--;
+        }
+    }
+    else
+    {
+        half = (n+1)/2;
+        for(i=0; i<half; i++) //CALC_HANNING   Calculates Hanning window samples.
+            w[i] = 0.5 * (1 - cos(23.14159265*(i+1) / (n+1)));
+
+        idx = half-2;
+        for(i=half; i<n; i++) {
+            w[i] = w[idx];
+            idx--;
+        }
+    }
+
+    if(itype==1)    //periodic function
+    {
+        for(i=N-1; i>=1; i--)
+            w[i] = w[i-1];
+        w[0] = 0.0;
+    }
+    return(w);
+}
 
 //*************************************************************************************************************
 
 void RtNoise::append(const MatrixXd &p_DataSegment)
 {
-//    if(m_pRawMatrixBuffer) // ToDo handle change buffersize
-
     if(!m_pRawMatrixBuffer)
         m_pRawMatrixBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(8, p_DataSegment.rows(), p_DataSegment.cols()));
 
@@ -132,6 +184,8 @@ bool RtNoise::stop()
     m_pRawMatrixBuffer->releaseFromPop();
 
     m_pRawMatrixBuffer->clear();
+
+    qDebug()<<"Thread is stopped.";
 
     return true;
 }
@@ -211,6 +265,9 @@ void RtNoise::run()
                         RowVectorXd t_dataZeroPad = RowVectorXd::Zero(m_iFFTlength);
                         t_dataZeroPad.head(data.cols()) = data;
 
+                        for (qint32 lk = 0; lk<m_iFFTlength; lk++)
+                            t_dataZeroPad[lk] = t_dataZeroPad[lk]*m_fWin[lk];
+
                         //generate fft object
                         Eigen::FFT<double> fft;
                         fft.SetFlag(fft.HalfSpectrum);
@@ -226,7 +283,6 @@ void RtNoise::run()
                             double spower = (1.0/(m_Fs*m_iFFTlength))* mag_abs;
                             if (j>0&&j<m_iFFTlength/2) spower = 2.0*spower;
                             sum_psdx(i,j) = sum_psdx(i,j) + spower;
-                //            t_psdx(i,j) = 10.0*log10(sum_psdx(i,j)/ncount);
                         }
                      }//row computing is done
                 }//nb
