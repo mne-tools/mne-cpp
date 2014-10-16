@@ -46,7 +46,7 @@ contains(MNECPP_CONFIG, withGui) {
         mne_x
 
     !contains(MNECPP_CONFIG, oldCompiler) {
-        message(Configure mne_browse_raw_qt)
+        message(mne_browse_raw_qt configured!)
         SUBDIRS += \
             mne_browse_raw_qt \
     }
