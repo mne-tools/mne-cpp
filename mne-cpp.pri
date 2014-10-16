@@ -38,10 +38,10 @@ MNECPP_CONFIG += withGui
 #MNECPP_CONFIG += build_MNECPP_Static_Lib
 
 linux-g++ {
-    system( g++ --version | grep -e "\<4.[0-4]" ) {
+#    system( g++ --version | grep -e "\<4.[0-4]" ) {
         # g++ version < 4.5 not found
         MNECPP_CONFIG += oldCompiler
-    }
+#    }
 }
 
 contains(MNECPP_CONFIG, withPython) {
