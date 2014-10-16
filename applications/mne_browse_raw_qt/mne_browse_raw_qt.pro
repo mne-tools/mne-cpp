@@ -98,7 +98,8 @@ SOURCES += \
     Windows/aboutwindow.cpp \
     Windows/informationwindow.cpp \
     Windows/selectionmanagerwindow.cpp \
-    Windows/averagewindow.cpp
+    Windows/averagewindow.cpp \
+    Windows/scalewindow.cpp
 
 HEADERS += \
     Utils/datamarker.h \
@@ -122,7 +123,8 @@ HEADERS += \
     Windows/aboutwindow.h \
     Windows/informationwindow.h \
     Windows/selectionmanagerwindow.h \
-    Windows/averagewindow.h
+    Windows/averagewindow.h \
+    Windows/scalewindow.h
 
 FORMS += \
     Windows/filterwindow.ui \
@@ -132,7 +134,8 @@ FORMS += \
     Windows/aboutwindow.ui \
     Windows/informationwindow.ui \
     Windows/selectionmanagerwindow.ui \
-    Windows/averagewindow.ui
+    Windows/averagewindow.ui \
+    Windows/scalewindow.ui
 
 INCLUDEPATH += $${EIGEN_INCLUDE_DIR}
 INCLUDEPATH += $${MNE_INCLUDE_DIR}

@@ -55,18 +55,17 @@ using namespace MNEBrowseRawQt;
 // DEFINE MEMBER METHODS
 //=============================================================================================================
 
-DataWindow::DataWindow(QWidget *parent) :
-    QWidget(parent),
-    ui(new Ui::DataWindowDockWidget),
-    m_pMainWindow(static_cast<MainWindow*>(parent)),
-    m_pDataMarker(new DataMarker(this)),
-    m_pCurrentDataMarkerLabel(new QLabel(this)),
-    m_iCurrentMarkerSample(0),
-    m_pUndockedViewWidget(new QWidget(this,Qt::Window))
+DataWindow::DataWindow(QWidget *parent)
+: QWidget(parent)
+, ui(new Ui::DataWindowDockWidget)
+, m_pMainWindow(static_cast<MainWindow*>(parent))
+, m_pDataMarker(new DataMarker(this))
+, m_pCurrentDataMarkerLabel(new QLabel(this))
+, m_iCurrentMarkerSample(0)
+, m_pUndockedViewWidget(new QWidget(this,Qt::Window))
+, m_pUndockedDataView(new QTableView(m_pUndockedViewWidget))
 {
     ui->setupUi(this);
-
-    m_pUndockedDataView = new QTableView(m_pUndockedViewWidget);
 
     //------------------------
     //--- Setup data model ---
@@ -170,10 +169,17 @@ void DataWindow::initMVCSettings()
     connect(ui->m_tableView_rawTableView->horizontalScrollBar(),&QScrollBar::valueChanged,
             m_pRawModel,&RawModel::updateScrollPos);
 
+    //connect selection of a channel to selection manager
+    connect(ui->m_tableView_rawTableView->selectionModel(),&QItemSelectionModel::selectionChanged,
+            this,&DataWindow::selectChannelsInSelectionManager);
+
     //Set MVC in delegate
     m_pRawDelegate->setModelView(m_pMainWindow->m_pEventWindow->getEventModel(),
                                  m_pMainWindow->m_pEventWindow->getEventTableView(),
                                  ui->m_tableView_rawTableView);
+
+    //Set scale window in delegate
+    m_pRawDelegate->setScaleWindow(m_pMainWindow->m_pScaleWindow);
 
     //Install event filter to overcome QGrabGesture and QScrollBar problem
     ui->m_tableView_rawTableView->horizontalScrollBar()->installEventFilter(this);
@@ -204,13 +210,17 @@ void DataWindow::initMVCSettings()
             m_pRawModel,&RawModel::updateScrollPos);
 
     //---------------------------------------------------------
-    //-- Interconnect scrollbars of docked and undocked view --
+    //--------- Interconnect docked and undocked view ---------
     //---------------------------------------------------------
-    //ui->m_tableView_rawTableView ---> m_pUndockedDataView
+    //Scrolling ui->m_tableView_rawTableView ---> m_pUndockedDataView
     connect(ui->m_tableView_rawTableView->horizontalScrollBar(),&QScrollBar::valueChanged,
             m_pUndockedDataView->horizontalScrollBar(),&QScrollBar::setValue);
     connect(ui->m_tableView_rawTableView->verticalScrollBar(),&QScrollBar::valueChanged,
             m_pUndockedDataView->verticalScrollBar(),&QScrollBar::setValue);
+
+    //Selection ui->m_tableView_rawTableView ---> m_pUndockedDataView
+    connect(ui->m_tableView_rawTableView,&QTableView::clicked,
+            m_pUndockedDataView,&QTableView::setCurrentIndex);
 }
 
 
@@ -594,4 +604,22 @@ void DataWindow::updateMarkerPosition()
     m_pCurrentDataMarkerLabel->move(m_pDataMarker->geometry().left() - (m_pCurrentDataMarkerLabel->width()/2) + 1, m_pDataMarker->geometry().top() - 20);
 }
 
+
+//*************************************************************************************************************
+
+void DataWindow::selectChannelsInSelectionManager()
+{
+    if(m_pMainWindow->m_pSelectionManagerWindow->isVisible()) {
+        QStringList currentSelectedChannelNames;
+
+        QModelIndexList selectedIndexes = ui->m_tableView_rawTableView->selectionModel()->selectedIndexes();
+
+        for(int i = 0; i<selectedIndexes.size(); i++) {
+            QModelIndex index = m_pRawModel->index(selectedIndexes.at(i).row(), 0);
+            currentSelectedChannelNames << m_pRawModel->data(index).toString();
+        }
+
+        m_pMainWindow->m_pSelectionManagerWindow->selectChannels(currentSelectedChannelNames);
+    }
+}
 

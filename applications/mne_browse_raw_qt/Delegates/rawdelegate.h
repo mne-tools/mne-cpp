@@ -56,6 +56,8 @@
 #include "../Utils/types.h"
 #include "../Utils/rawsettings.h"
 
+#include "../Windows/scalewindow.h"
+
 
 //*************************************************************************************************************
 //=============================================================================================================
@@ -106,6 +108,14 @@ using namespace MNELIB;
 namespace MNEBrowseRawQt
 {
 
+//*************************************************************************************************************
+//=============================================================================================================
+// DEFINE FORWARD DECLARATIONS
+//=============================================================================================================
+
+class ScaleWindow;
+
+
 //=============================================================================================================
 /**
 * DECLARE CLASS RawDelegate
@@ -127,6 +137,14 @@ public:
     * @param[in] rawView holds a pointer to the raw view. This view needs to be set in order to access the raw view for manual viewport updating.
     */
     void setModelView(EventModel *eventModel, QTableView* eventView, QTableView *rawView);
+
+    //=========================================================================================================
+    /**
+    * setModelView creates the QPointer path for the data plot.
+    *
+    * @param[in] scaleWindow holds a pointer to the scale window. This model needs to be set in order to access the event data for plotting.
+    */
+    void setScaleWindow(ScaleWindow *scaleWindow);
 
     // Plots settings
     int         m_iDefaultPlotHeight;       /**< The height of the plot */
@@ -174,6 +192,7 @@ private:
     EventModel*     m_pEventModel;           /**< Pointer to the event model. */
     QTableView*     m_pEventView;            /**< Pointer to the event view. */
     QTableView*     m_pRawView;              /**< Pointer to the raw view. */
+    ScaleWindow*    m_pScaleWindow;          /**< Pointer to the scale window. */
 };
 
 } // NAMESPACE

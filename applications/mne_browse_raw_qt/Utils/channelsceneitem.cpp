@@ -60,6 +60,7 @@ ChannelSceneItem::ChannelSceneItem(QString channelName, QPointF channelPosition,
 : m_sChannelName(channelName)
 , m_qpChannelPosition(channelPosition)
 , m_cChannelColor(channelColor)
+, m_bHighlightItem(false)
 {
     this->setAcceptHoverEvents(true);
     this->setFlag(QGraphicsItem::ItemIsSelectable, true);
@@ -86,15 +87,24 @@ void ChannelSceneItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *
     painter->setBrush(Qt::darkGray);
     painter->drawEllipse(-12, -12, 30, 30);
 
-    // Plot colored circle
-    painter->setPen(QPen(Qt::black, 1));
+    //Plot selected item
     if(this->isSelected())
         painter->setBrush(QBrush(Qt::red));
     else
         painter->setBrush(QBrush(m_cChannelColor));
-    painter->drawEllipse(-15, -15, 30, 30);
+
+    //Plot highlighted selected item
+    if(m_bHighlightItem) {
+        painter->setPen(QPen(Qt::darkGreen, 4));
+        painter->drawEllipse(-15, -15, 30, 30);
+    }
+    else {
+        painter->setPen(QPen(Qt::black, 1));
+        painter->drawEllipse(-15, -15, 30, 30);
+    }
 
     // Plot electrode name
+    painter->setPen(QPen(Qt::black, 1));
     QStaticText staticElectrodeName = QStaticText(m_sChannelName);
     QSizeF sizeText = staticElectrodeName.size();
     painter->drawStaticText(-15+((30-sizeText.width())/2), -32, staticElectrodeName);
@@ -132,6 +142,14 @@ void ChannelSceneItem::setPosition(QPointF newPosition)
 QPointF ChannelSceneItem::getPosition()
 {
     return m_qpChannelPosition;
+}
+
+
+//*************************************************************************************************************
+
+void ChannelSceneItem::setHighlightChannel(bool highlightItem)
+{
+    m_bHighlightItem = highlightItem;
 }
 
 
