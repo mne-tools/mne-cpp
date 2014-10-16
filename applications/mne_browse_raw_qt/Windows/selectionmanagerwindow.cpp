@@ -178,9 +178,7 @@ bool SelectionManagerWindow::loadLayout(QString path)
     m_pLayoutScene->update();
 
     //Fit to view
-    //ui->m_graphicsView_layoutPlot->fitInView(m_pLayoutScene->itemsBoundingRect(), Qt::KeepAspectRatio);
-
-    ui->m_graphicsView_layoutPlot->ensureVisible(m_pLayoutScene->itemsBoundingRect());
+    ui->m_graphicsView_layoutPlot->fitInView(m_pLayoutScene->itemsBoundingRect(), Qt::KeepAspectRatio);
 
     return state;
 }
