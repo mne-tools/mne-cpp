@@ -82,6 +82,7 @@
 #include "informationwindow.h"
 #include "selectionmanagerwindow.h"
 #include "averagewindow.h"
+#include "scalewindow.h"
 
 
 //*************************************************************************************************************
@@ -147,6 +148,7 @@ class DataWindow;
 class InformationWindow;
 class SelectionManagerWindow;
 class AverageWindow;
+class ScaleWindow;
 
 
 //=============================================================================================================
@@ -161,6 +163,7 @@ class MainWindow : public QMainWindow
     friend class InformationWindow;
     friend class SelectionManagerWindow;
     friend class AverageWindow;
+    friend class ScaleWindow;
 
     Q_OBJECT
 public:
@@ -238,6 +241,19 @@ private slots:
     */
     void showAverageWindow();
 
+    //=========================================================================================================
+    /**
+    * showScalingWindow shows the scaling window
+    */
+    void showScaleWindow();
+
+signals:
+    //=========================================================================================================
+    /**
+    * newDataLoaded is emitted whenever a new file was loaded
+    */
+    void newDataLoaded(const FiffInfo *currentFiffInfo);
+
 private:
     //=========================================================================================================
     /**
@@ -283,6 +299,7 @@ private:
     InformationWindow*      m_pInformationWindow;       /**< Information widget which displays information about this application (log, etc.)*/
     SelectionManagerWindow* m_pSelectionManagerWindow;  /**< Selection manager window which can be used to select channels*/
     AverageWindow*          m_pAverageWindow;           /**< Average window can be used to plot calculated averages in a 2D layout scene*/
+    ScaleWindow*            m_pScaleWindow;             /**< Scale widget can be used to set the scaling of the different channels types */
 
     //application settings
     QSettings               m_qSettings;

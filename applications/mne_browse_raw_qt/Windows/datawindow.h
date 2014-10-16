@@ -74,6 +74,7 @@ namespace MNEBrowseRawQt
 //=============================================================================================================
 
 class MainWindow;
+class RawDelegate;
 
 /**
 * DECLARE CLASS DataWindow

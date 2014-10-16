@@ -141,7 +141,7 @@ private:
     /**
     * Loads a new layout from given file path.
     *
-    * @param [in] path holds file path
+    * @param [in] path holds file pathloll
     */
     bool loadLayout(QString path);
 
