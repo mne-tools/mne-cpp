@@ -133,35 +133,21 @@ void MainWindow::setupWindowWidgets()
     m_pFilterWindow->init();
     m_pScaleWindow->init();
 
-    //If a default file has been specified on startup -> call hideSpinBoxes here
-    if(m_pDataWindow->getDataModel()->m_bFileloaded)
-        m_pScaleWindow->hideSpinBoxes(m_pDataWindow->getDataModel()->m_fiffInfo);
-
     //Connect window signals
     //Change scaling of the data whenever a spinbox value changed
     connect(m_pScaleWindow, &ScaleWindow::scalingValueChanged,
             m_pDataWindow, &DataWindow::updateDataTableViews);
 
     //Hide non selected channels
-    connect(m_pSelectionManagerWindow,&SelectionManagerWindow::showSelectedChannels, [=](QStringList selectedChannels){
-        //Hide selected channels/rows in the raw data view
-        QTableView* view = m_pDataWindow->getDataTableView();
-        RawModel* model = m_pDataWindow->getDataModel();
+    connect(m_pSelectionManagerWindow, &SelectionManagerWindow::showSelectedChannelsOnly,
+            m_pDataWindow, &DataWindow::showSelectedChannelsOnly);
 
-        for(int i = 0; i<model->rowCount(); i++) {
-            QModelIndex index = model->index(i, 0);
-            QString channel = model->data(index, Qt::DisplayRole).toString();
+    //If a default file has been specified on startup -> call hideSpinBoxes and set laoded fiff channels
+    if(m_pDataWindow->getDataModel()->m_bFileloaded) {
+        m_pScaleWindow->hideSpinBoxes(m_pDataWindow->getDataModel()->m_fiffInfo);
 
-            if(!selectedChannels.contains(channel)) {
-                view->hideRow(i);
-                m_pDataWindow->getUndockedDataTableView()->hideRow(i);
-            }
-            else {
-                view->showRow(i);
-                m_pDataWindow->getUndockedDataTableView()->showRow(i);
-            }
-        }
-    });
+        m_pSelectionManagerWindow->setCurrentlyLoadedFiffChannels(m_pDataWindow->getDataModel()->m_fiffInfo);
+    }
 }
 
 
@@ -318,16 +304,17 @@ void MainWindow::openFile()
                                                         m_pDataWindow->getDataModel()->lastSample());
 
     //resize columns to contents - needs to be done because the new data file can be shorter than the old one
+    m_pDataWindow->updateDataTableViews();
     m_pDataWindow->getDataTableView()->resizeColumnsToContents();
 
     //Update status bar
     setWindowStatus();
 
-    //Update selection Group All
-    m_pSelectionManagerWindow->createSelectionGroupAll();
-
     //Hide not presented channel types and their spin boxes in the scale window
     m_pScaleWindow->hideSpinBoxes(m_pDataWindow->getDataModel()->m_fiffInfo);
+
+    //Create group All whenever a new file was loaded
+    m_pSelectionManagerWindow->setCurrentlyLoadedFiffChannels(m_pDataWindow->getDataModel()->m_fiffInfo);
 }
 
 
