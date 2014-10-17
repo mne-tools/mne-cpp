@@ -7,19 +7,19 @@
     <x>0</x>
     <y>0</y>
     <width>600</width>
-    <height>400</height>
+    <height>200</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>600</width>
-    <height>400</height>
+    <height>200</height>
    </size>
   </property>
   <property name="maximumSize">
    <size>
     <width>600</width>
-    <height>400</height>
+    <height>200</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -34,15 +34,22 @@
      <x>10</x>
      <y>0</y>
      <width>581</width>
-     <height>391</height>
+     <height>191</height>
     </rect>
    </property>
    <property name="title">
     <string>Acquisition</string>
    </property>
    <layout class="QGridLayout" name="gridLayout_2">
+    <item row="5" column="0">
+     <widget class="QLabel" name="m_qLabel">
+      <property name="text">
+       <string>File:</string>
+      </property>
+     </widget>
+    </item>
     <item row="3" column="0" colspan="3">
-     <widget class="Line" name="line_2">
+     <widget class="Line" name="m_qLine">
       <property name="orientation">
        <enum>Qt::Horizontal</enum>
       </property>
@@ -51,34 +58,17 @@
     <item row="1" column="1">
      <widget class="QComboBox" name="m_qComboBox_ProjectSelection"/>
     </item>
-    <item row="1" column="0">
-     <widget class="QLabel" name="m_qLabel_ProjectDescription">
-      <property name="text">
-       <string>Project</string>
-      </property>
-     </widget>
-    </item>
-    <item row="5" column="0">
-     <widget class="QLabel" name="label">
-      <property name="text">
-       <string>File:</string>
-      </property>
-     </widget>
-    </item>
-    <item row="5" column="2">
-     <widget class="QPushButton" name="m_qPushButtonFiffRecordFile">
-      <property name="text">
-       <string>...</string>
-      </property>
-     </widget>
-    </item>
-    <item row="5" column="1">
-     <widget class="QLineEdit" name="m_qLineEditFiffRecordFile"/>
-    </item>
     <item row="2" column="0">
      <widget class="QLabel" name="m_qLabel_SubjectDescription">
       <property name="text">
        <string>Subject:</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="2">
+     <widget class="QPushButton" name="m_qPushButtonNewProject">
+      <property name="text">
+       <string>New Project</string>
       </property>
      </widget>
     </item>
@@ -92,12 +82,15 @@
     <item row="2" column="1">
      <widget class="QComboBox" name="m_qComboBox_SubjectSelection"/>
     </item>
-    <item row="1" column="2">
-     <widget class="QPushButton" name="m_qPushButtonNewProject">
+    <item row="1" column="0">
+     <widget class="QLabel" name="m_qLabel_ProjectDescription">
       <property name="text">
-       <string>New Project</string>
+       <string>Project</string>
       </property>
      </widget>
+    </item>
+    <item row="5" column="1">
+     <widget class="QLineEdit" name="m_qLineEditFileName"/>
     </item>
    </layout>
   </widget>

@@ -236,7 +236,9 @@ void NoiseEstimate::update(XMEASLIB::NewMeasurement::SPtr pMeasurement)
 
         mutex.lock();
         if(!m_pBuffer)
+        {
             m_pBuffer = CircularMatrixBuffer<double>::SPtr(new CircularMatrixBuffer<double>(8, pRTMSA->getNumChannels(), pRTMSA->getMultiSampleArray()[0].cols()));
+        }
 
         //Fiff information
         if(!m_pFiffInfo)
@@ -293,7 +295,7 @@ void NoiseEstimate::run()
     // calculate the segments according to the requested data length
     // here 500 is the number of samples for a block specified in babyMEG plugin
     m_Fs = m_pFiffInfo->sfreq;
-    int segments =  (qint32) ((m_DataLen * m_pFiffInfo->sfreq)/500.0);
+    int segments =  (qint32) ((m_DataLen * m_pFiffInfo->sfreq)/m_pBuffer->cols());
 
     qDebug()<<"+++++++++++segments :"<<segments<< "m_DataLen"<<m_DataLen<<"m_Fs"<<m_Fs<<"++++++++++++++++++++++++";
 
@@ -329,6 +331,7 @@ void NoiseEstimate::run()
             }
         }//m_bProcessData
     }//m_bIsRunning
+    qDebug()<<"noise estimation [Run] is done!";
     m_pRtNoise->stop();
 //    delete m_pRtNoise;
 }
