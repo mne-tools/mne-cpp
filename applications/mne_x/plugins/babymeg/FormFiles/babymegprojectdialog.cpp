@@ -55,6 +55,7 @@
 #include <QDir>
 #include <QDebug>
 #include <QSettings>
+#include <QInputDialog>
 
 
 //*************************************************************************************************************
@@ -77,27 +78,34 @@ BabyMEGProjectDialog::BabyMEGProjectDialog(BabyMEG* p_pBabyMEG, QWidget *parent)
 {
     ui->setupUi(this);
 
-    //BabyMEGData Path
-    m_sBabyMEGDataPath = QDir::homePath() + "/BabyMEGData";
-    if(!QDir(m_sBabyMEGDataPath).exists())
-        QDir().mkdir(m_sBabyMEGDataPath);
-
-    //Test Project
-    if(!QDir(m_sBabyMEGDataPath+"/TestProject").exists())
-        QDir().mkdir(m_sBabyMEGDataPath+"/TestProject");
-    QSettings settings;
-    m_sCurrentProject = settings.value(QString("Plugin/%1/currentProject").arg(p_pBabyMEG->getName()), "TestProject").toString();
     scanForProjects();
-
-    //Test Subject
-    if(!QDir(m_sBabyMEGDataPath+"/TestProject/TestSubject").exists())
-        QDir().mkdir(m_sBabyMEGDataPath+"/TestProject/TestSubject");
-    m_sCurrentSubject = settings.value(QString("Plugin/%1/currentSubject").arg(p_pBabyMEG->getName()), "TestSubject").toString();
     scanForSubjects();
+
+    connect(ui->m_qComboBox_ProjectSelection,static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentIndexChanged),
+                this,&BabyMEGProjectDialog::selectNewProject);
+
+    connect(ui->m_qComboBox_SubjectSelection,static_cast<void (QComboBox::*)(const QString&)>(&QComboBox::currentIndexChanged),
+                this,&BabyMEGProjectDialog::selectNewSubject);
+
+    connect(ui->m_qLineEditParadigm,&QLineEdit::textChanged,
+                this,&BabyMEGProjectDialog::paradigmChanged);
+
+    connect(ui->m_qPushButtonNewProject,&QPushButton::clicked,
+                this,&BabyMEGProjectDialog::addProject);
+
+    connect(ui->m_qPushButtonNewSubject,&QPushButton::clicked,
+                this,&BabyMEGProjectDialog::addSubject);
 
     ui->m_qLineEditFileName->setReadOnly(true);
 
     updateFileName();
+
+
+
+
+//    QString text = QInputDialog::getText(this, tr("QInputDialog::getText()"),
+//                                              tr("User name:"), QLineEdit::Normal,
+//                                              QDir::home().dirName(), &ok);
 }
 
 
@@ -111,11 +119,51 @@ BabyMEGProjectDialog::~BabyMEGProjectDialog()
 
 //*************************************************************************************************************
 
-QString BabyMEGProjectDialog::getFilePath() const
+void BabyMEGProjectDialog::addProject()
 {
-    QString sFilePath = m_sBabyMEGDataPath + "/" + m_sCurrentProject + "/" + m_sCurrentSubject;
+    bool ok;
+    QString sProject = QInputDialog::getText(this, tr("Add new Project"),
+                                              tr("Add new Project:"), QLineEdit::Normal,
+                                              tr("NewProject"), &ok);
+    if (ok && !sProject.isEmpty())
+    {
+        if(!QDir(m_pBabyMEG->m_sBabyMEGDataPath+"/" + sProject).exists())
+            QDir().mkdir(m_pBabyMEG->m_sBabyMEGDataPath+"/"+sProject);
 
-    return sFilePath;
+        m_pBabyMEG->m_sCurrentProject = sProject;
+
+        scanForProjects();
+    }
+}
+
+
+//*************************************************************************************************************
+
+void BabyMEGProjectDialog::addSubject()
+{
+    bool ok;
+    QString sSubject = QInputDialog::getText(this, tr("Add new Subject"),
+                                              tr("Add new Subject:"), QLineEdit::Normal,
+                                              tr("NewSubject"), &ok);
+
+    if (ok && !sSubject.isEmpty())
+    {
+        if(!QDir(m_pBabyMEG->m_sBabyMEGDataPath + "/" + m_pBabyMEG->m_sCurrentProject + "/" + sSubject).exists())
+            QDir().mkdir(m_pBabyMEG->m_sBabyMEGDataPath + "/" + m_pBabyMEG->m_sCurrentProject + "/" + sSubject);
+
+        m_pBabyMEG->m_sCurrentSubject = sSubject;
+
+        scanForSubjects();
+    }
+}
+
+
+//*************************************************************************************************************
+
+void BabyMEGProjectDialog::paradigmChanged(const QString &newParadigm)
+{
+    m_pBabyMEG->m_sCurrentParadigm = newParadigm;
+    updateFileName();
 }
 
 
@@ -127,7 +175,7 @@ void BabyMEGProjectDialog::scanForProjects()
     ui->m_qComboBox_ProjectSelection->clear();
     m_sListProjects.clear();
 
-    QDir t_qDirData(m_sBabyMEGDataPath);
+    QDir t_qDirData(m_pBabyMEG->m_sBabyMEGDataPath);
 
     QFileInfoList t_qFileInfoList = t_qDirData.entryInfoList();
     QFileInfoList::const_iterator it;
@@ -136,7 +184,7 @@ void BabyMEGProjectDialog::scanForProjects()
             m_sListProjects.append(it->fileName());
 
     ui->m_qComboBox_ProjectSelection->insertItems(0,m_sListProjects);
-    ui->m_qComboBox_ProjectSelection->setCurrentIndex(ui->m_qComboBox_ProjectSelection->findText(m_sCurrentProject));
+    ui->m_qComboBox_ProjectSelection->setCurrentIndex(ui->m_qComboBox_ProjectSelection->findText(m_pBabyMEG->m_sCurrentProject));
 }
 
 
@@ -148,7 +196,7 @@ void BabyMEGProjectDialog::scanForSubjects()
     ui->m_qComboBox_SubjectSelection->clear();
     m_sListSubjects.clear();
 
-    QDir t_qDirProject(m_sBabyMEGDataPath+"/"+m_sCurrentProject);
+    QDir t_qDirProject(m_pBabyMEG->m_sBabyMEGDataPath+"/"+m_pBabyMEG->m_sCurrentProject);
 
     QFileInfoList t_qFileInfoList = t_qDirProject.entryInfoList();
     QFileInfoList::const_iterator it;
@@ -157,7 +205,36 @@ void BabyMEGProjectDialog::scanForSubjects()
             m_sListSubjects.append(it->fileName());
 
     ui->m_qComboBox_SubjectSelection->insertItems(0,m_sListSubjects);
-    ui->m_qComboBox_SubjectSelection->setCurrentIndex(ui->m_qComboBox_SubjectSelection->findText(m_sCurrentSubject));
+
+    qint32 idx = ui->m_qComboBox_SubjectSelection->findText(m_pBabyMEG->m_sCurrentSubject);
+    if(idx >= 0)
+        ui->m_qComboBox_SubjectSelection->setCurrentIndex(idx);
+    else
+    {
+        ui->m_qComboBox_SubjectSelection->setCurrentIndex(0);
+        selectNewSubject(ui->m_qComboBox_SubjectSelection->itemText(0));
+    }
+}
+
+
+//*************************************************************************************************************
+
+void BabyMEGProjectDialog::selectNewProject(const QString &newProject)
+{
+    m_pBabyMEG->m_sCurrentProject = newProject;
+
+    scanForSubjects();
+    updateFileName();
+}
+
+
+//*************************************************************************************************************
+
+void BabyMEGProjectDialog::selectNewSubject(const QString &newSubject)
+{
+    m_pBabyMEG->m_sCurrentSubject = newSubject;
+
+    updateFileName();
 }
 
 
@@ -165,5 +242,5 @@ void BabyMEGProjectDialog::scanForSubjects()
 
 void BabyMEGProjectDialog::updateFileName()
 {
-    ui->m_qLineEditFileName->setText(getFilePath() + "/<YYMMDD_HMS>_" + m_sCurrentSubject + "_raw.fif");
+        ui->m_qLineEditFileName->setText(m_pBabyMEG->getFilePath());
 }
