@@ -140,6 +140,32 @@ void DataWindow::updateDataTableViews()
 
 //*************************************************************************************************************
 
+void DataWindow::showSelectedChannelsOnly(QStringList selectedChannels)
+{
+    //Hide non selected channels/rows in the data views
+    for(int i = 0; i<m_pRawModel->rowCount(); i++) {
+        QModelIndex index = m_pRawModel->index(i, 0);
+        QString channel = m_pRawModel->data(index, Qt::DisplayRole).toString();
+
+        ui->m_tableView_rawTableView->showRow(i);
+        m_pUndockedDataView->showRow(i);
+
+        if(!selectedChannels.contains(channel)) {
+            ui->m_tableView_rawTableView->hideRow(i);
+            m_pUndockedDataView->hideRow(i);
+        }
+        else {
+            ui->m_tableView_rawTableView->showRow(i);
+            m_pUndockedDataView->showRow(i);
+        }
+    }
+
+    updateDataTableViews();
+}
+
+
+//*************************************************************************************************************
+
 void DataWindow::initMVCSettings()
 {
     //-----------------------------------
@@ -306,7 +332,8 @@ void DataWindow::initMarker()
     }
 
     //Connect current marker to loading a fiff file - no loaded file - no visible marker
-    connect(m_pRawModel, &RawModel::fileLoaded,[this](bool state){
+    connect(m_pRawModel, &RawModel::fileLoaded,[this](){
+        bool state = m_pRawModel->m_bFileloaded;
         if(state) {
             //Inital position of the marker
             m_pDataMarker->move(74, m_pDataMarker->y());

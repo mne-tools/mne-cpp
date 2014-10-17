@@ -247,13 +247,6 @@ private slots:
     */
     void showScaleWindow();
 
-signals:
-    //=========================================================================================================
-    /**
-    * newDataLoaded is emitted whenever a new file was loaded
-    */
-    void newDataLoaded(FiffInfo currentFiffInfo);
-
 private:
     //=========================================================================================================
     /**

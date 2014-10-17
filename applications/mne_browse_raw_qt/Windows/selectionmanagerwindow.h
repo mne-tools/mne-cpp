@@ -42,7 +42,6 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "mainwindow.h"
 #include "ui_selectionmanagerwindow.h"
 #include "utils/layoutloader.h"         //MNE-CPP utils
 #include "utils/selectionloader.h"         //MNE-CPP utils
@@ -103,10 +102,9 @@ public:
 
     //=========================================================================================================
     /**
-    * Creates the selection group 'All'
-    * This function should be called from outside, whenever a new fiff file was loaded because the group all depends on the fiff channel names
+    * Sets the currently loaded fiff channels. used to create the group All.
     */
-    void createSelectionGroupAll();
+    void setCurrentlyLoadedFiffChannels(FiffInfo loadedFiffInfo);
 
     //=========================================================================================================
     /**
@@ -122,8 +120,21 @@ public:
     */
     void selectChannels(QStringList channelList);
 
+    //=========================================================================================================
+    /**
+    * Current selected channels
+    * This function returns the current channel selection
+    */
+    QStringList getSelectedChannels();
+
+    //=========================================================================================================
+    /**
+    * gets the item corresponding to text in listWidget
+    */
+    QListWidgetItem* getItem(QListWidget *listWidget, QString text);
+
 signals:
-    void showSelectedChannels(QStringList selectedChannels);
+    void showSelectedChannelsOnly(QStringList selectedChannels);
 
 private:
     //=========================================================================================================
@@ -168,7 +179,7 @@ private:
     * Delete all MEG channels from the selection groups which are not in the loaded layout. This needs to be done to guarantee consistency between the selection files and layout files (the selection files always include ALL MEG channels (gradiometers+magnitometers))
     *
     */
-    void cleanUpSelectionGroups();
+    void cleanUpMEGChannels();
 
     //=========================================================================================================
     /**
@@ -224,9 +235,9 @@ private:
     QMap<QString,QVector<double> >  m_layoutMap;
     QMap<QString,QStringList>       m_selectionGroupsMap;
 
-    MainWindow*                     m_pMainWindow;
-
     LayoutScene*                    m_pLayoutScene;
+
+    QStringList                     m_currentlyLoadedFiffChannels;
 };
 
 } // NAMESPACE MNEBrowseRawQt

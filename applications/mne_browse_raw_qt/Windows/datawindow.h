@@ -143,6 +143,12 @@ public:
     */
     void updateDataTableViews();
 
+    //=========================================================================================================
+    /**
+    * Only shows the channels defined in the QStringList
+    */
+    void showSelectedChannelsOnly(QStringList selectedChannels);
+
 private:
     //=========================================================================================================
     /**
