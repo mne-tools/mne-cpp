@@ -678,9 +678,11 @@ bool DataWindow::gestureEvent(QGestureEvent *event)
 
 //*************************************************************************************************************
 
-void DataWindow::pinchTriggered(QPinchGesture *gesture)
+bool DataWindow::pinchTriggered(QPinchGesture *gesture)
 {
     qDebug()<<"pinchTriggered";
 
     emit scaleChannels(gesture->scaleFactor());
+
+    return true;
 }

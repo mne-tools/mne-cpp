@@ -42,7 +42,6 @@
 // INCLUDES
 //=============================================================================================================
 
-#include "mainwindow.h"
 #include "ui_averagewindow.h"
 #include "utils/layoutloader.h"         //MNE-CPP utils
 #include "../Utils/layoutscene.h"       //MNE Browse Raw QT utils
@@ -71,7 +70,6 @@ namespace MNEBrowseRawQt
 //=============================================================================================================
 
 class LayoutScene;
-class MainWindow;
 
 
 /**

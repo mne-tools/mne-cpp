@@ -361,6 +361,7 @@ void RawDelegate::plotEvents(const QModelIndex &index, const QStyleOptionViewIte
         QModelIndexList indexes = m_pEventView->selectionModel()->selectedIndexes();
 
         for(int i = 0; i<indexes.size(); i++) {
+            qDebug()<<indexes.at(i).row();
             int currentRow = indexes.at(i).row();
             int sampleValue = m_pEventModel->data(m_pEventModel->index(currentRow,0)).toInt();
             int type = m_pEventModel->data(m_pEventModel->index(currentRow,2)).toInt();
