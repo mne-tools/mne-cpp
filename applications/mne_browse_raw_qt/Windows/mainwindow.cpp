@@ -58,8 +58,8 @@ using namespace MNEBrowseRawQt;
 
 MainWindow::MainWindow(QWidget *parent)
 : QMainWindow(parent)
-, m_qFileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
-, m_qEventFile("./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif")
+//, m_qFileRaw("./MNE-sample-data/MEG/sample/sample_audvis_raw.fif")
+//, m_qEventFile("./MNE-sample-data/MEG/sample/sample_audvis_raw-eve.fif")
 , m_qSettings()
 , m_rawSettings()
 , ui(new Ui::MainWindowWidget)
@@ -234,21 +234,7 @@ void MainWindow::setWindowStatus()
 //Log
 void MainWindow::writeToLog(const QString& logMsg, LogKind lgknd, LogLevel lglvl)
 {
-    if(lglvl<=m_eLogLevelCurrent) {
-        if(lgknd == _LogKndError)
-            m_pTextBrowser_Log->insertHtml("<font color=red><b>Error:</b> "+logMsg+"</font>");
-        else if(lgknd == _LogKndWarning)
-            m_pTextBrowser_Log->insertHtml("<font color=blue><b>Warning:</b> "+logMsg+"</font>");
-        else
-            m_pTextBrowser_Log->insertHtml(logMsg);
-        m_pTextBrowser_Log->insertPlainText("\n"); // new line
-        //scroll down to the latest entry
-        QTextCursor c = m_pTextBrowser_Log->textCursor();
-        c.movePosition(QTextCursor::End);
-        m_pTextBrowser_Log->setTextCursor(c);
-
-        m_pTextBrowser_Log->verticalScrollBar()->setValue(m_pTextBrowser_Log->verticalScrollBar()->maximum());
-    }
+    m_pInformationWindow->writeToLog(logMsg, lgknd, lglvl);
 }
 
 
@@ -256,19 +242,7 @@ void MainWindow::writeToLog(const QString& logMsg, LogKind lgknd, LogLevel lglvl
 
 void MainWindow::setLogLevel(LogLevel lvl)
 {
-    switch(lvl) {
-    case _LogLvMin:
-        writeToLog(tr("minimal log level set"), _LogKndMessage, _LogLvMin);
-        break;
-    case _LogLvNormal:
-        writeToLog(tr("normal log level set"), _LogKndMessage, _LogLvMin);
-        break;
-    case _LogLvMax:
-        writeToLog(tr("maximum log level set"), _LogKndMessage, _LogLvMin);
-        break;
-    }
-
-    m_eLogLevelCurrent = lvl;
+    m_pInformationWindow->setLogLevel(lvl);
 }
 
 

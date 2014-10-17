@@ -145,10 +145,6 @@ namespace MNEBrowseRawQt
 class FilterWindow;
 class EventWindow;
 class DataWindow;
-class InformationWindow;
-class SelectionManagerWindow;
-class AverageWindow;
-class ScaleWindow;
 
 
 //=============================================================================================================
@@ -160,10 +156,6 @@ class MainWindow : public QMainWindow
     friend class FilterWindow;
     friend class EventWindow;
     friend class DataWindow;
-    friend class InformationWindow;
-    friend class SelectionManagerWindow;
-    friend class AverageWindow;
-    friend class ScaleWindow;
 
     Q_OBJECT
 public:
@@ -297,10 +289,6 @@ private:
     //application settings
     QSettings               m_qSettings;
     RawSettings             m_rawSettings;
-
-    //Log
-    QTextBrowser*           m_pTextBrowser_Log;         /** a textbox being part of the log feature */
-    LogLevel                m_eLogLevelCurrent;         /**< Holds the current log level.*/
 
     Ui::MainWindowWidget*   ui;
 };

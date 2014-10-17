@@ -202,14 +202,14 @@ void ScaleWindow::hideSpinBoxes(FiffInfo currentFiffInfo)
 
 void ScaleWindow::scaleAllChannels(double scaleValue)
 {
-    ui->m_doubleSpinBox_MEG_grad->setValue(scaleValue*ui->m_doubleSpinBox_MEG_grad->value());
-    ui->m_doubleSpinBox_MEG_mag->setValue(scaleValue*ui->m_doubleSpinBox_MEG_grad->value());
-    ui->m_doubleSpinBox_EEG->setValue(scaleValue*ui->m_doubleSpinBox_MEG_grad->value());
-    ui->m_doubleSpinBox_EOG->setValue(scaleValue*ui->m_doubleSpinBox_MEG_grad->value());
-    ui->m_doubleSpinBox_EMG->setValue(scaleValue*ui->m_doubleSpinBox_MEG_grad->value());
-    ui->m_doubleSpinBox_ECG->setValue(scaleValue*ui->m_doubleSpinBox_MEG_grad->value());
-    ui->m_doubleSpinBox_MISC->setValue(scaleValue*ui->m_doubleSpinBox_MEG_grad->value());
-    ui->m_doubleSpinBox_STIM->setValue(scaleValue*ui->m_doubleSpinBox_MEG_grad->value());
+    ui->m_doubleSpinBox_MEG_grad->setValue((scaleValue*ui->m_doubleSpinBox_MEG_grad->singleStep()) + ui->m_doubleSpinBox_MEG_grad->value());
+    ui->m_doubleSpinBox_MEG_mag->setValue((scaleValue*ui->m_doubleSpinBox_MEG_mag->singleStep()) + ui->m_doubleSpinBox_MEG_mag->value());
+    ui->m_doubleSpinBox_EEG->setValue((scaleValue*ui->m_doubleSpinBox_EEG->singleStep()) + ui->m_doubleSpinBox_EEG->value());
+    ui->m_doubleSpinBox_EOG->setValue((scaleValue*ui->m_doubleSpinBox_EOG->singleStep()) + ui->m_doubleSpinBox_EOG->value());
+    ui->m_doubleSpinBox_EMG->setValue((scaleValue*ui->m_doubleSpinBox_EMG->singleStep()) + ui->m_doubleSpinBox_EMG->value());
+    ui->m_doubleSpinBox_ECG->setValue((scaleValue*ui->m_doubleSpinBox_ECG->singleStep()) + ui->m_doubleSpinBox_ECG->value());
+    ui->m_doubleSpinBox_MISC->setValue((scaleValue*ui->m_doubleSpinBox_MISC->singleStep()) + ui->m_doubleSpinBox_MISC->value());
+    ui->m_doubleSpinBox_STIM->setValue((scaleValue*ui->m_doubleSpinBox_STIM->singleStep()) + ui->m_doubleSpinBox_STIM->value());
 }
 
 
