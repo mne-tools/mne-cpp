@@ -2,6 +2,7 @@
 #define BABYMEGPROJECTDIALOG_H
 
 #include <QDialog>
+#include <QStringList>
 
 namespace Ui {
 class BabyMEGProjectDialog;
@@ -32,12 +33,25 @@ public:
     explicit BabyMEGProjectDialog(BabyMEG* p_pBabyMEG, QWidget *parent = 0);
     ~BabyMEGProjectDialog();
 
-    void pressedFiffRecordFile();   /**< Triggers file dialog to select record file.*/
+    QString getFilePath() const;
 
 private:
+    void scanForProjects();
+    void scanForSubjects();
+
+    void updateFileName();
+
     BabyMEG* m_pBabyMEG;
 
     Ui::BabyMEGProjectDialog *ui;
+
+    QString m_sBabyMEGDataPath;
+
+    QString m_sCurrentProject;
+    QStringList m_sListProjects;
+
+    QString m_sCurrentSubject;
+    QStringList m_sListSubjects;
 };
 
 } // NAMESPACE
