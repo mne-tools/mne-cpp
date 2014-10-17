@@ -57,8 +57,7 @@ using namespace MNEBrowseRawQt;
 
 ScaleWindow::ScaleWindow(QWidget *parent) :
     QDockWidget(parent),
-    ui(new Ui::ScaleWindow),
-    m_pMainWindow(static_cast<MainWindow*>(parent))
+    ui(new Ui::ScaleWindow)
 {
     ui->setupUi(this);
 }
@@ -76,27 +75,23 @@ ScaleWindow::~ScaleWindow()
 
 void ScaleWindow::init()
 {
-    //Connect hide spin boxes when a new file was loaded
-    connect(m_pMainWindow,&MainWindow::newDataLoaded,
-            this,&ScaleWindow::hideSpinBoxes);
-
     //Connect spin boxes
     connect(ui->m_doubleSpinBox_MEG_grad,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            m_pMainWindow->m_pDataWindow,&DataWindow::updateDataTableViews);
+            this,&ScaleWindow::scaleValueChanged);
     connect(ui->m_doubleSpinBox_MEG_mag,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            m_pMainWindow->m_pDataWindow,&DataWindow::updateDataTableViews);
+            this,&ScaleWindow::scaleValueChanged);
     connect(ui->m_doubleSpinBox_EEG,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            m_pMainWindow->m_pDataWindow,&DataWindow::updateDataTableViews);
+            this,&ScaleWindow::scaleValueChanged);
     connect(ui->m_doubleSpinBox_EOG,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            m_pMainWindow->m_pDataWindow,&DataWindow::updateDataTableViews);
+            this,&ScaleWindow::scaleValueChanged);
     connect(ui->m_doubleSpinBox_EMG,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            m_pMainWindow->m_pDataWindow,&DataWindow::updateDataTableViews);
+            this,&ScaleWindow::scaleValueChanged);
     connect(ui->m_doubleSpinBox_ECG,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            m_pMainWindow->m_pDataWindow,&DataWindow::updateDataTableViews);
+            this,&ScaleWindow::scaleValueChanged);
     connect(ui->m_doubleSpinBox_MISC,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            m_pMainWindow->m_pDataWindow,&DataWindow::updateDataTableViews);
+            this,&ScaleWindow::scaleValueChanged);
     connect(ui->m_doubleSpinBox_STIM,static_cast<void (QDoubleSpinBox::*)(double)>(&QDoubleSpinBox::valueChanged),
-            m_pMainWindow->m_pDataWindow,&DataWindow::updateDataTableViews);
+            this,&ScaleWindow::scaleValueChanged);
 }
 
 
@@ -200,4 +195,12 @@ void ScaleWindow::hideSpinBoxes(FiffInfo currentFiffInfo)
 
         }
     }
+}
+
+
+//*************************************************************************************************************
+
+void ScaleWindow::scaleValueChanged()
+{
+    emit scalingValueChanged();
 }

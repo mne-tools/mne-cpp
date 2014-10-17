@@ -83,9 +83,6 @@ void SelectionManagerWindow::createSelectionGroupAll()
 {
     loadLayout(ui->m_comboBox_layoutFile->currentText());
 
-    //Set current index to group All
-    ui->m_listWidget_selectionGroups->setCurrentRow(0, QItemSelectionModel::Select);
-
     updateSelectionGroups(ui->m_listWidget_selectionGroups->item(0));
 }
 
@@ -107,6 +104,23 @@ void SelectionManagerWindow::highlightChannels(QStringList channelList)
     m_pLayoutScene->update();
 }
 
+
+//*************************************************************************************************************
+
+void SelectionManagerWindow::selectChannels(QStringList channelList)
+{
+    QList<QGraphicsItem *> allSceneItems = m_pLayoutScene->items();
+
+    for(int i = 0; i<allSceneItems.size(); i++) {
+        ChannelSceneItem* item = static_cast<ChannelSceneItem*>(allSceneItems.at(i));
+        if(channelList.contains(item->getChannelName()))
+            item->setSelected(true);
+        else
+            item->setSelected(false);
+    }
+
+    m_pLayoutScene->update();
+}
 
 //*************************************************************************************************************
 
@@ -317,30 +331,14 @@ void SelectionManagerWindow::updateDataView()
         targetListWidget = ui->m_listWidget_visibleChannels;
 
     //Create list of channels which are to be visible in the view
-    QStringList visibleChannels;
+    QStringList selectedChannels;
 
     for(int i = 0; i<targetListWidget->count(); i++) {
         QListWidgetItem* item = targetListWidget->item(i);
-        visibleChannels << item->text();
+        selectedChannels << item->text();
     }
 
-    //Hide selected channels/rows in the raw data view
-    QTableView* view = m_pMainWindow->m_pDataWindow->getDataTableView();
-    RawModel* model = m_pMainWindow->m_pDataWindow->getDataModel();
-
-    for(int i = 0; i<model->rowCount(); i++) {
-        QModelIndex index = model->index(i, 0);
-        QString channel = model->data(index, Qt::DisplayRole).toString();
-
-        if(!visibleChannels.contains(channel)) {
-            view->hideRow(i);
-            m_pMainWindow->m_pDataWindow->getUndockedDataTableView()->hideRow(i);
-        }
-        else {
-            view->showRow(i);
-            m_pMainWindow->m_pDataWindow->getUndockedDataTableView()->showRow(i);
-        }
-    }
+    emit showSelectedChannels(selectedChannels);
 }
 
 

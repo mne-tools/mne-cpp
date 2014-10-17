@@ -111,9 +111,19 @@ public:
     //=========================================================================================================
     /**
     * Highlight channels
-    * This function selects channels which were selected outside this selection manager (i.e in the DataWindow's Table View)
+    * This function highlights channels which were selected outside this selection manager (i.e in the DataWindow's Table View)
     */
     void highlightChannels(QStringList channelList);
+
+    //=========================================================================================================
+    /**
+    * Select channels
+    * This function selects channels which were selected outside this selection manager (i.e in the DataWindow's Table View)
+    */
+    void selectChannels(QStringList channelList);
+
+signals:
+    void showSelectedChannels(QStringList selectedChannels);
 
 private:
     //=========================================================================================================

@@ -43,7 +43,6 @@
 //=============================================================================================================
 
 #include "ui_scalewindow.h"
-#include "mainwindow.h"
 #include <fiff/fiff.h>
 
 
@@ -53,6 +52,14 @@
 //=============================================================================================================
 
 #include <QDockWidget>
+
+
+//*************************************************************************************************************
+//=============================================================================================================
+// USED NAMESPACES
+//=============================================================================================================
+
+using namespace FIFFLIB;
 
 
 //*************************************************************************************************************
@@ -107,16 +114,28 @@ public:
     */
     QMap<QString,double> getScalingMap();
 
-private:
-    Ui::ScaleWindow *ui;
-
-    MainWindow*     m_pMainWindow;                  /**< pointer to the main window (parent) */
-
     //=========================================================================================================
     /**
     * hideSpinBoxes hides all spin boxes and labels which are not present in the current fiff file.
     */
     void hideSpinBoxes(FiffInfo currentFiffInfo);
+
+signals:
+    //=========================================================================================================
+    /**
+    * updateDataTableViews is emmited whenever a connected spin box value changed
+    */
+    void scalingValueChanged();
+
+private:
+    Ui::ScaleWindow *ui;
+
+    //=========================================================================================================
+    /**
+    * scaleValueChanged is called whenever a a spin box value changed.
+    */
+    void scaleValueChanged();
+
 };
 
 } // NAMESPACE MNEBrowseRawQt
