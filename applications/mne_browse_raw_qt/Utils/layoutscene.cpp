@@ -302,7 +302,6 @@ bool LayoutScene::event(QEvent *event)
 
 //*************************************************************************************************************
 
-
 bool LayoutScene::gestureEvent(QGestureEvent *event)
 {
     //Pan event
@@ -331,7 +330,6 @@ void LayoutScene::panTriggered(QPanGesture *gesture)
 
 //*************************************************************************************************************
 
-
 void LayoutScene::pinchTriggered(QPinchGesture *gesture)
 {
     qDebug()<<"pinchTriggered";
@@ -341,7 +339,6 @@ void LayoutScene::pinchTriggered(QPinchGesture *gesture)
 }
 
 //*************************************************************************************************************
-
 
 bool LayoutScene::eventFilter(QObject *object, QEvent *event)
 {
