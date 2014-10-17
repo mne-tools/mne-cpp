@@ -134,9 +134,11 @@ void MainWindow::setupWindowWidgets()
     m_pScaleWindow->init();
 
     //Connect window signals
-    //Change scaling of the data whenever a spinbox value changed
+    //Change scaling of the data whenever a spinbox value changed or the user performs a pinch gesture on the view
     connect(m_pScaleWindow, &ScaleWindow::scalingValueChanged,
             m_pDataWindow, &DataWindow::updateDataTableViews);
+    connect(m_pDataWindow, &DataWindow::scaleChannels,
+            m_pScaleWindow, &ScaleWindow::scaleAllChannels);
 
     //Hide non selected channels
     connect(m_pSelectionManagerWindow, &SelectionManagerWindow::showSelectedChannelsOnly,

@@ -120,6 +120,12 @@ public:
     */
     void hideSpinBoxes(FiffInfo currentFiffInfo);
 
+    //=========================================================================================================
+    /**
+    * scaleAllChannels scales all channels by scaleValue.
+    */
+    void scaleAllChannels(double scaleValue);
+
 signals:
     //=========================================================================================================
     /**

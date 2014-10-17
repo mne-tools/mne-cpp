@@ -212,6 +212,10 @@ void DataWindow::initMVCSettings()
     ui->m_tableView_rawTableView->verticalScrollBar()->installEventFilter(this);
     ui->m_tableView_rawTableView->verticalHeader()->installEventFilter(this);
 
+    //Enable gestures for the view
+    ui->m_tableView_rawTableView->grabGesture(Qt::PinchGesture);
+    ui->m_tableView_rawTableView->installEventFilter(this);
+
     //-----------------------------------
     //------ Init "dockable" view -------
     //-----------------------------------
@@ -445,6 +449,12 @@ bool DataWindow::eventFilter(QObject *object, QEvent *event)
         return true;
     }
 
+    if (object == ui->m_tableView_rawTableView && event->type() == QEvent::Gesture) {
+        QGestureEvent* gestureEventCast = static_cast<QGestureEvent*>(event);
+
+        return gestureEvent(static_cast<QGestureEvent*>(gestureEventCast));
+    }
+
     return false;
 }
 
@@ -653,3 +663,24 @@ void DataWindow::highlightChannelsInSelectionManager()
     }
 }
 
+
+//*************************************************************************************************************
+
+bool DataWindow::gestureEvent(QGestureEvent *event)
+{
+    //Pinch event
+    if (QGesture *pinch = event->gesture(Qt::PinchGesture))
+        pinchTriggered(static_cast<QPinchGesture *>(pinch));
+
+    return true;
+}
+
+
+//*************************************************************************************************************
+
+void DataWindow::pinchTriggered(QPinchGesture *gesture)
+{
+    qDebug()<<"pinchTriggered";
+
+    emit scaleChannels(gesture->scaleFactor());
+}
